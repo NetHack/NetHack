@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.806 $ $NHDT-Date: 1645298657 2022/02/19 19:24:17 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.835 $ $NHDT-Date: 1646136928 2022/03/01 12:15:28 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1071,6 +1071,7 @@ counting "just picked up" items when deciding what pseudo-classes should be
 	an uninitialized varaible
 changes to stair internals resulted in summoned Kops blockcading the stairs up
 	rather than intended stairs down
+dumplog's list of "major events" showed all logged events, not just major ones
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1646084789 2022/02/28 21:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1646136940 2022/03/01 12:15:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -793,7 +793,7 @@ dump_everything(
 
     dump_plines();
     putstr(0, 0, "");
-    (void) do_gamelog();
+    show_gamelog((how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
     putstr(0, 0, "");
     putstr(0, 0, "Inventory:");
     (void) display_inventory((char *) 0, TRUE);
@@ -1393,7 +1393,7 @@ really_done(int how)
 
         /* it would be better to do this after killer.name fixups but
            that comes too late; end-of-game is classified as a "major
-           achievement" even if it happens to be ending in failure */
+           achievement" even if game happens to be ending in failure */
         formatkiller(pbuf, (unsigned) sizeof pbuf, how, TRUE);
         if (!*pbuf)
             Strcpy(pbuf, deaths[how]);

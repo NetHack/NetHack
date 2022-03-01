@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1646084773 2022/02/28 21:46:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.294 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1646136939 2022/03/01 12:15:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.295 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1759,7 +1759,7 @@ goto_level(
         if (!In_quest(&u.uz0) && at_dgn_entrance("The Quest")
             && !(u.uevent.qcompleted || u.uevent.qexpelled
                  || g.quest_status.leader_is_dead)) {
-            /* [TODO: copy of same TODO below; if an anchievement for
+            /* [TODO: copy of same TODO below; if an achievement for
                receiving quest call from leader gets added, that should
                come after logging new level entry] */
             if (!u.uevent.qcalled) {
@@ -1775,7 +1775,7 @@ goto_level(
 
     /* this was originally done earlier; moved here to be logged after
        any achievement related to entering a dungeon branch
-       [TODO: if an anchievement for receiving quest call from leader
+       [TODO: if an achievement for receiving quest call from leader
        gets added, that should come after this rather than take place
        where the message is delivered above] */
     if (new)

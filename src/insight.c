@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1646084789 2022/02/28 21:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.52 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1646136941 2022/03/01 12:15:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -62,8 +62,10 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "entered the Planes" },
     { LL_ACHIEVE, "entered the Astral Plane" },
     { LL_ACHIEVE, "ascended" },
-    { LL_ACHIEVE, "acquired the Mines' End luckstone" },
-    { LL_ACHIEVE, "completed Sokoban" },
+    { LL_ACHIEVE | LL_SPOILER, "acquired the Mines' End luckstone" },
+    { LL_ACHIEVE, "completed Sokoban" }, /* actually, acquired the prize item
+                                          * which doesn't necessarily mean all
+                                          * four levels have been solved */
     { LL_ACHIEVE | LL_UMONST, "killed Medusa" },
      /* these two are not logged */
     { 0, "hero was always blond, no, blind" },
@@ -89,11 +91,12 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "" }, /* Xp 22 */
     { LL_ACHIEVE, "" }, /* Xp 26 */
     { LL_ACHIEVE, "" }, /* Xp 30 */
-    { LL_MINORAC, "learned castle drawbridge's tune" },
+    { LL_MINORAC, "learned castle drawbridge's tune" }, /* achievement #31 */
     { 0, "" } /* keep this one at the end */
 };
 
-
+/* macros to simplify output of enlightenment messages; also used by
+   conduct and achievements */
 #define enl_msg(prefix, present, past, suffix, ps) \
     enlght_line(prefix, final ? past : present, suffix, ps)
 #define you_are(attr, ps) enl_msg(You_, are, were, attr, ps)
@@ -2358,6 +2361,61 @@ sokoban_in_play(void)
         if (u.uachieved[achidx] == ACH_SOKO)
             return TRUE;
     return FALSE;
+}
+
+#define majorevent(llmsg) (((llmsg)->flags & LL_ACHIEVE) != 0)
+#define spoilerevent(llmsg) (((llmsg)->flags & LL_SPOILER) != 0)
+
+/* #chronicle command */
+int
+do_gamelog(void)
+{
+#ifdef CHRONICLE
+    if (g.gamelog) {
+        show_gamelog(0);
+    } else {
+        pline("No chronicled events.");
+    }
+#else
+    pline("Chronicle was turned off during compile-time.");
+#endif /* !CHRONICLE */
+    return ECMD_OK;
+}
+
+/* #chronicle details */
+void
+show_gamelog(int final)
+{
+#ifdef CHRONICLE
+    struct gamelog_line *llmsg;
+    winid win;
+    char buf[BUFSZ];
+    int eventcnt = 0;
+
+    win = create_nhwindow(NHW_TEXT);
+    Sprintf(buf, "%s events:", final ? "Major" : "Logged");
+    putstr(win, 0, buf);
+    for (llmsg = g.gamelog; llmsg; llmsg = llmsg->next) {
+        if (final && !majorevent(llmsg))
+            continue;
+        if (!final && !wizard && spoilerevent(llmsg))
+            continue;
+        if (!eventcnt++)
+            putstr(win, 0, " Turn");
+        Sprintf(buf, "%5ld: %s", llmsg->turn, llmsg->text);
+        putstr(win, 0, buf);
+    }
+    /* since start of game is logged as a major event, 'eventcnt' should
+       never end up as 0; for 'final', end of game is a major event too */
+    if (!eventcnt)
+        putstr(win, 0, " none");
+
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+#else
+    nhUse(final);
+#endif /* !CHRONICLE */
+    return;
 }
 
 /*

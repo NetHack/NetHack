@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1645223894 2022/02/18 22:38:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1646136934 2022/03/01 12:15:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -761,8 +761,8 @@ welcome(boolean new_game) /* false => restoring an old game */
           Hello((struct monst *) 0), g.plname, buf);
 
     l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
-    if (new_game)
-        livelog_printf(LL_MINORAC, "%s the%s entered the dungeon",
+    if (new_game) /* guarantee that 'major' event category is never empty */
+        livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
                        g.plname, buf);
 }
 

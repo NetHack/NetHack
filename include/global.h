@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1642630918 2022/01/19 22:21:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1646136933 2022/03/01 12:15:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -464,20 +464,22 @@ extern struct nomakedefs_s nomakedefs;
 #define unmeta(c) (0x7f & (c))
 
 /* Game log message type flags */
-#define LL_NONE       0x0000 /* No message is livelogged */
-#define LL_WISH       0x0001 /* Report stuff people type at the wish prompt */
-#define LL_ACHIEVE    0x0002 /* Achievements bitfield + invocation, planes */
-#define LL_UMONST     0x0004 /* Kill, Bribe or otherwise dispatch unique monsters */
-#define LL_DIVINEGIFT 0x0008 /* Sacrifice gifts, crowning */
-#define LL_LIFESAVE   0x0010 /* Use up amulet of lifesaving */
-#define LL_CONDUCT    0x0020 /* Break conduct - not reported early-game */
-#define LL_ARTIFACT   0x0040 /* Excalibur, Sting, Orcrist, plus sac gifts and artwishes */
-#define LL_GENOCIDE   0x0080 /* Logging of genocides */
-#define LL_KILLEDPET  0x0100 /* Killed a tame monster */
-#define LL_ALIGNMENT  0x0200 /* changed alignment temporarily or permanently */
-#define LL_DUMP_ASC   0x0400 /* Log URL for dumplog if ascended */
-#define LL_DUMP_ALL   0x0800 /* Log dumplog url for all games */
-#define LL_MINORAC    0x1000 /* Log 'minor' achievements - can be spammy */
-#define LL_DEBUG      0x8000 /* For debugging messages and other spam */
+#define LL_NONE       0x0000L /* No message is livelogged */
+#define LL_WISH       0x0001L /* Report stuff people type at the wish prompt */
+#define LL_ACHIEVE    0x0002L /* Achievements bitfield + invocation, planes */
+#define LL_UMONST     0x0004L /* defeated unique monster */
+#define LL_DIVINEGIFT 0x0008L /* Sacrifice gifts, crowning */
+#define LL_LIFESAVE   0x0010L /* Use up amulet of lifesaving */
+#define LL_CONDUCT    0x0020L /* Break conduct - not reported early-game */
+#define LL_ARTIFACT   0x0040L /* bestowed, found, or manifactured */
+#define LL_GENOCIDE   0x0080L /* Logging of genocides */
+#define LL_KILLEDPET  0x0100L /* Killed a tame monster */
+#define LL_ALIGNMENT  0x0200L /* changed alignment, temporary or permanent */
+#define LL_DUMP_ASC   0x0400L /* Log URL for dumplog if ascended */
+#define LL_DUMP_ALL   0x0800L /* Log dumplog url for all games */
+#define LL_MINORAC    0x1000L /* Log 'minor' achievements - can be spammy */
+#define LL_SPOILER    0x4000L /* reveals information so don't show in-game
+                               * via #chronicle unless in wizard mode */
+#define LL_DEBUG      0x8000L /* For debugging messages and other spam */
 
 #endif /* GLOBAL_H */

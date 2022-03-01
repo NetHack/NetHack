@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1644610344 2022/02/11 20:12:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.519 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1646136938 2022/03/01 12:15:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.528 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -847,36 +847,6 @@ enter_explore_mode(void)
             pline("Continuing with %s.", oldmode);
         }
     }
-    return ECMD_OK;
-}
-
-int
-do_gamelog(void)
-{
-#ifdef CHRONICLE
-    struct gamelog_line *tmp = g.gamelog;
-    winid win;
-    char buf[BUFSZ];
-
-    if (!tmp) {
-        pline("No chronicled events.");
-        return ECMD_OK;
-    }
-
-    win = create_nhwindow(NHW_TEXT);
-    putstr(win, 0, "Major events:");
-    putstr(win, 0, "");
-    putstr(win, 0, " Turn");
-    while (tmp) {
-        Sprintf(buf, "%5li: %s", tmp->turn, tmp->text);
-        putstr(win, 0, buf);
-        tmp = tmp->next;
-    }
-    display_nhwindow(win, TRUE);
-    destroy_nhwindow(win);
-#else
-    pline("Chronicle was turned off during compile-time.");
-#endif /* !CHRONICLE */
     return ECMD_OK;
 }
 
