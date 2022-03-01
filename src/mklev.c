@@ -1468,7 +1468,7 @@ mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
 
     if (kind == WEB && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
-    if ((mktrapflags & MKTRAP_SEEN))
+    if (t && (mktrapflags & MKTRAP_SEEN))
         t->tseen = TRUE;
 
     /* The hero isn't the only person who's entered the dungeon in
