@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1626390626 2021/07/15 23:10:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.247 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1646172696 2022/03/01 22:11:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.261 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1035,7 +1035,7 @@ cpostfx(int pm)
 
             if (!u.uconduct.polyselfs++) /* you're changing form */
                 livelog_printf(LL_CONDUCT,
-                               "changed form for the first time by mimicking %s",
+                            "changed form for the first time by mimicking %s",
                                Hallucination ? "an orange" : "a pile of gold");
             You_cant("resist the temptation to mimic %s.",
                      Hallucination ? "an orange" : "a pile of gold");
@@ -1648,13 +1648,14 @@ eatcorpse(struct obj *otmp)
     if (!vegan(&mons[mnum]))
         if (!u.uconduct.unvegan++) {
             livelog_printf(LL_CONDUCT,
-                           "consumed animal products for the first time, by eating %s",
+                  "consumed animal products for the first time, by eating %s",
                            an(food_xname(otmp, FALSE)));
             ll_conduct++;
         }
     if (!vegetarian(&mons[mnum])) {
         if (!u.uconduct.unvegetarian && !ll_conduct)
-            livelog_printf(LL_CONDUCT, "tasted meat for the first time, by eating %s",
+            livelog_printf(LL_CONDUCT,
+                           "tasted meat for the first time, by eating %s",
                            an(food_xname(otmp, FALSE)));
         violated_vegetarian();
     }
@@ -2266,7 +2267,8 @@ fpostfx(struct obj *otmp)
         outrumor(bcsign(otmp), BY_COOKIE);
         if (!Blind)
             if (!u.uconduct.literate++)
-                livelog_printf(LL_CONDUCT, "became literate by reading the fortune inside a cookie");
+                livelog_printf(LL_CONDUCT,
+                    "became literate by reading the fortune inside a cookie");
         break;
     case LUMP_OF_ROYAL_JELLY:
         if (g.youmonst.data == &mons[PM_KILLER_BEE] && !Unchanging
@@ -2661,17 +2663,20 @@ doeat(void)
         if (material == LEATHER || material == BONE
             || material == DRAGON_HIDE) {
             if (!u.uconduct.unvegan++ && !ll_conduct) {
-                livelog_printf(LL_CONDUCT, "consumed animal products for the first time, by eating %s",
+                livelog_printf(LL_CONDUCT,
+                  "consumed animal products for the first time, by eating %s",
                                an(food_xname(otmp, FALSE)));
                 ll_conduct++;
             }
             if (!u.uconduct.unvegetarian && !ll_conduct)
-                livelog_printf(LL_CONDUCT, "tasted meat for the first time, by eating %s",
+                livelog_printf(LL_CONDUCT,
+                               "tasted meat for the first time, by eating %s",
                                an(food_xname(otmp, FALSE)));
             violated_vegetarian();
         } else if (material == WAX)
             if (!u.uconduct.unvegan++ && !ll_conduct)
-                livelog_printf(LL_CONDUCT, "consumed animal products for the first time, by eating %s",
+                livelog_printf(LL_CONDUCT,
+                  "consumed animal products for the first time, by eating %s",
                                an(food_xname(otmp, FALSE)));
 
         if (otmp->cursed) {
@@ -2736,7 +2741,8 @@ doeat(void)
 
     /* KMH, conduct */
     if (!u.uconduct.food++) {
-        livelog_printf(LL_CONDUCT, "ate for the first time - %s", food_xname(otmp, FALSE));
+        livelog_printf(LL_CONDUCT, "ate for the first time - %s",
+                       food_xname(otmp, FALSE));
         ll_conduct++;
     }
 
@@ -2769,25 +2775,27 @@ doeat(void)
         switch (objects[otmp->otyp].oc_material) {
         case FLESH:
             if (!u.uconduct.unvegan++ && !ll_conduct) {
-                livelog_printf(LL_CONDUCT, "consumed animal products for the first time, by eating %s",
+                livelog_printf(LL_CONDUCT,
+                  "consumed animal products for the first time, by eating %s",
                                an(food_xname(otmp, FALSE)));
                 ll_conduct++;
             }
             if (otmp->otyp != EGG) {
                 if (!u.uconduct.unvegetarian && !ll_conduct)
-                    livelog_printf(LL_CONDUCT, "tasted meat for the first time, by eating %s",
+                    livelog_printf(LL_CONDUCT,
+                               "tasted meat for the first time, by eating %s",
                                    an(food_xname(otmp, FALSE)));
 
                 violated_vegetarian();
             }
             break;
-
         default:
             if (otmp->otyp == PANCAKE || otmp->otyp == FORTUNE_COOKIE /*eggs*/
                 || otmp->otyp == CREAM_PIE || otmp->otyp == CANDY_BAR /*milk*/
                 || otmp->otyp == LUMP_OF_ROYAL_JELLY)
                 if (!u.uconduct.unvegan++ && !ll_conduct)
-                    livelog_printf(LL_CONDUCT, "consumed animal products (%s) for the first time",
+                    livelog_printf(LL_CONDUCT,
+                           "consumed animal products (%s) for the first time",
                                    food_xname(otmp, FALSE));
             break;
         }
@@ -2820,7 +2828,8 @@ doeat(void)
                 g.context.victual.reqtime, otmp->oeaten, basenutrit);
 
     g.context.victual.reqtime = (basenutrit == 0) ? 0
-        : rounddiv(g.context.victual.reqtime * (long) otmp->oeaten, basenutrit);
+                   : rounddiv(g.context.victual.reqtime * (long) otmp->oeaten,
+                              basenutrit);
 
     debugpline1("after rounddiv: victual.reqtime == %d",
                 g.context.victual.reqtime);
@@ -3569,10 +3578,11 @@ consume_oeaten(struct obj *obj, int amt)
             obj->oeaten = 0;
     }
 
+    /* mustn't let partly-eaten drop all the way to 0 or the item would
+       become restored to untouched; set to no bites left */
     if (obj->oeaten == 0) {
         if (obj == g.context.victual.piece) /* always true unless wishing... */
-            g.context.victual.reqtime =
-                g.context.victual.usedtime; /* no bites left */
+            g.context.victual.reqtime = g.context.victual.usedtime;
         obj->oeaten = 1; /* smallest possible positive value */
     }
 }
