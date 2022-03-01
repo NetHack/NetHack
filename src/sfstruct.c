@@ -172,6 +172,13 @@ bwrite(int fd, const genericptr_t loc, unsigned num)
     int idx = getidx(fd, NOFLG);
 
     if (idx >= 0) {
+        if (num == 0) {
+            /* nothing to do; we need a special case to exit early
+               because glibc fwrite doesn't give reliable
+               success/failure indication when writing 0 bytes */
+            return;
+        }
+
 #ifdef USE_BUFFERING
         if (bw_buffered[idx] && bw_FILE[idx]) {
             failed = (fwrite(loc, (int) num, 1, bw_FILE[idx]) != 1);
