@@ -1,4 +1,4 @@
-/* NetHack 3.7	worn.c	$NHDT-Date: 1627505148 2021/07/28 20:45:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	worn.c	$NHDT-Date: 1646260985 2022/03/02 22:43:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -826,6 +826,10 @@ clear_bypasses(void)
         otmp->bypass = 0;
     for (otmp = g.migrating_objs; otmp; otmp = otmp->nobj)
         otmp->bypass = 0;
+    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj)
+        otmp->bypass = 0;
+    for (otmp = g.billobjs; otmp; otmp = otmp->nobj)
+        otmp->bypass = 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
@@ -845,6 +849,11 @@ clear_bypasses(void)
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
+    /* this is a no-op since mydogs is only non-Null during level change or
+       final ascension and we aren't called at those times, but be thorough */
+    for (mtmp = g.mydogs; mtmp; mtmp = mtmp->nmon)
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+            otmp->bypass = 0;
 
     /* ball can be "floating", not on any chain */
     if (uball)

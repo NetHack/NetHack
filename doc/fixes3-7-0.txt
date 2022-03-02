@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.835 $ $NHDT-Date: 1646136928 2022/03/01 12:15:28 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.836 $ $NHDT-Date: 1646260985 2022/03/02 22:43:05 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -826,6 +826,12 @@ if a lit potion of oil on the floor was launched by an explosion and it hit
 place_object() validated coordinates after using them to index level.objects
 killed rope golem may drop leashes and bullwhips
 using magic portals and level teleporters stuns hero for a few turns
+clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
+	inventory is subjected to burning and surviving objects have their
+	bypass bit set, giant is killed by fire trap and drops a boulder and
+	other inventory, ice is melted, boulder plugs resulting pool burying
+	rest of giant's dropped inventory, subsequent sanity checks report
+	that there are buried objects which are 'flagged bypass']
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
