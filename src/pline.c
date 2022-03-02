@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1637982230 2021/11/27 03:03:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1646255375 2022/03/02 21:09:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -401,7 +401,7 @@ verbalize(const char *line, ...)
 #ifdef CHRONICLE
 
 void
-gamelog_add(unsigned int glflags, long gltime, const char *str)
+gamelog_add(long glflags, long gltime, const char *str)
 {
     struct gamelog_line *tmp;
     struct gamelog_line *lst = g.gamelog;
@@ -420,13 +420,13 @@ gamelog_add(unsigned int glflags, long gltime, const char *str)
 }
 
 void
-livelog_printf(unsigned ll_type, const char *line, ...)
+livelog_printf(long ll_type, const char *line, ...)
 {
     char gamelogbuf[BUFSZ * 2];
     va_list the_args;
 
     va_start(the_args, line);
-    vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
+    (void) vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
     va_end(the_args);
 
     gamelog_add(ll_type, g.moves, gamelogbuf);
@@ -438,13 +438,14 @@ livelog_printf(unsigned ll_type, const char *line, ...)
 
 void
 gamelog_add(
-    unsigned glflags UNUSED, long gltime UNUSED, const char *msg UNUSED)
+    long glflags UNUSED, long gltime UNUSED, const char *msg UNUSED)
 {
     ; /* nothing here */
 }
 
 void
-livelog_printf(unsigned ll_type UNUSED, const char *line UNUSED, ...)
+livelog_printf(
+    long ll_type UNUSED, const char *line UNUSED, ...)
 {
     ; /* nothing here */
 }

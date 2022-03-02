@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1620522110 2021/05/09 01:01:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.334 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1646255374 2022/03/02 21:09:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2578,13 +2578,18 @@ parse_config_line(char *origbuf)
             n = 10;
         }
         sysopt.tt_oname_maxrank = n;
-    } else if (src == set_in_sysconf && match_varname(buf, "LIVELOG", 7)) {
-        n = strtol(bufp,NULL,0);
-        if (n < 0 || n > 0xFFFF) {
-            raw_printf("Illegal value in LIVELOG (must be between 0 and 0xFFFF).");
+    } else if (in_sysconf && match_varname(buf, "LIVELOG", 7)) {
+        /* using 0 for base accepts "dddd" as decimal provided that first 'd'
+           isn't '0', "0xhhhh" as hexadecimal, and "0oooo" as octal; ignores
+           any trailing junk, including '8' or '9' for leading '0' octal */
+        long L = strtol(bufp, NULL, 0);
+
+        if (L < 0L || L > 0xffffL) {
+            config_error_add(
+                 "Illegal value for LIVELOG (must be between 0 and 0xFFFF).");
             return 0;
         }
-        sysopt.livelog = n;
+        sysopt.livelog = L;
 
     /* SYSCF PANICTRACE options */
     } else if (in_sysconf && match_varname(buf, "PANICTRACE_LIBC", 15)) {
@@ -4667,52 +4672,66 @@ Death_quote(char *buf, int bufsz)
 
 /* ----------  END TRIBUTE ----------- */
 
-#if defined LIVELOG
-#define LLOG_SEP '\t' /* livelog field separator */
+#ifdef LIVELOG
+#define LLOG_SEP "\t" /* livelog field separator, as a string literal */
+#define LLOG_EOL "\n" /* end-of-line, for abstraction consistency */
 
 /* Locks the live log file and writes 'buffer'
- * IF the ll_type matches sysopt.livelog mask
- * lltype is included in LL entry for post-process filtering also
+ * iff the ll_type matches sysopt.livelog mask.
+ * lltype is included in LL entry for post-process filtering also.
  */
 void
-livelog_add(unsigned int ll_type, const char *str)
+livelog_add(long ll_type, const char *str)
 {
-    FILE* livelogfile;
+    FILE *livelogfile;
+    time_t now;
+    int gindx, aindx;
 
     if (!(ll_type & sysopt.livelog))
         return;
+
     if (lock_file(LIVELOGFILE, SCOREPREFIX, 10)) {
         if (!(livelogfile = fopen_datafile(LIVELOGFILE, "a", SCOREPREFIX))) {
             pline("Cannot open live log file!");
             unlock_file(LIVELOGFILE);
             return;
         }
-        fprintf(livelogfile,
-                 "lltype=%d%cname=%s%crole=%s%crace=%s%cgender=%s%c"
-                 "align=%s%cturns=%ld%cstarttime=%ld%ccurtime=%ld%c"
-                 "message=%s\n",
-                 (ll_type & sysopt.livelog), LLOG_SEP,
-                 g.plname, LLOG_SEP,
-                 g.urole.filecode, LLOG_SEP,
-                 g.urace.filecode, LLOG_SEP,
-                 genders[flags.female].filecode, LLOG_SEP,
-                 aligns[1-u.ualign.type].filecode, LLOG_SEP,
-                 g.moves, LLOG_SEP,
-                 (long)ubirthday, LLOG_SEP,
-                 (long)time(NULL),
-                 LLOG_SEP, str);
+
+        now = getnow();
+        gindx = flags.female ? 1 : 0;
+        /* note on alignment designation:
+               aligns[] uses [0] lawful, [1] neutral, [2] chaotic;
+               u.ualign.type uses -1 chaotic, 0 neutral, 1 lawful;
+           so subtracting from 1 converts from either to the other */
+        aindx = 1 - u.ualign.type;
+        /* format relies on STD C's implicit concatenation of
+           adjacent string literals */
+        (void) fprintf(livelogfile,
+                       "lltype=%ld"  LLOG_SEP  "name=%s"       LLOG_SEP
+                       "role=%s"     LLOG_SEP  "race=%s"       LLOG_SEP
+                       "gender=%s"   LLOG_SEP  "align=%s"      LLOG_SEP
+                       "turns=%ld"   LLOG_SEP  "starttime=%ld" LLOG_SEP
+                       "curtime=%ld" LLOG_SEP  "message=%s"    LLOG_EOL,
+                       (ll_type & sysopt.livelog), g.plname,
+                       g.urole.filecode, g.urace.filecode,
+                       genders[gindx].filecode, aligns[aindx].filecode,
+                       g.moves, timet_to_seconds(ubirthday),
+                       timet_to_seconds(now), str);
         (void) fclose(livelogfile);
         unlock_file(LIVELOGFILE);
     }
 }
 #undef LLOG_SEP
+#undef LLOG_EOL
 
 #else
+
 void
-livelog_add(unsigned int ll_type UNUSED, const char *str UNUSED)
+livelog_add(long ll_type UNUSED, const char *str UNUSED)
 {
     /* nothing here */
 }
+
 #endif /* !LIVELOG */
 
 /*files.c*/

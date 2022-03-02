@@ -1,4 +1,4 @@
-/* NetHack 3.7	sys.h	$NHDT-Date: 1596498561 2020/08/03 23:49:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.7	sys.h	$NHDT-Date: 1646255373 2022/03/02 21:09:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -28,7 +28,7 @@ struct sysopt {
     int check_save_uid; /* restoring savefile checks UID? */
     int check_plname; /* use plname for checking wizards/explorers/shellers */
     int bones_pools;
-    unsigned int livelog; /* LL_foo events to livelog */
+    long livelog; /* LL_foo events to livelog */
 
     /* record file */
     int persmax;
