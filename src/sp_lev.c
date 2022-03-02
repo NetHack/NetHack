@@ -4095,6 +4095,7 @@ lspo_trap(lua_State *L)
     create_des_coder();
 
     tmptrap.spider_on_web = TRUE;
+    tmptrap.seen = FALSE;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);

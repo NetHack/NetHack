@@ -690,7 +690,7 @@ getpos(coord *ccp, boolean force, const char *goal)
     char mMoOdDxX[13];
     int result = 0;
     int cx, cy, i, c;
-    int sidx, tx, ty;
+    int sidx, tx = u.ux, ty = u.uy;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
     boolean hilite_state = FALSE;
@@ -1764,7 +1764,7 @@ x_monnam(
 
     /* priests and minions: don't even use this function */
     if (mtmp->ispriest || mtmp->isminion) {
-        char priestnambuf[BUFSZ];
+        char priestnambuf[BUFSZ] = DUMMY;
         char *name;
         long save_prop = EHalluc_resistance;
         unsigned save_invis = mtmp->minvis;

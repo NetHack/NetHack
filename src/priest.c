@@ -316,7 +316,7 @@ priestname(
         if (article == ARTICLE_THE) {
             Strcat(pname, "the ");
         } else {
-            char buf2[BUFSZ];
+            char buf2[BUFSZ] = DUMMY;
 
             /* don't let "Angel of <foo>" fool an() into using "the " */
             Strcpy(buf2, pname);
