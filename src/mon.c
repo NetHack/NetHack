@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1646182267 2022/03/02 00:51:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.411 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1646184187 2022/03/02 01:23:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.412 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2605,15 +2605,20 @@ mondead(register struct monst* mtmp)
            use of undead turning to revive a corpse or petrification plus
            stone-to-flesh to create and revive a statue */
         if (howmany <= 3 || howmany == 5 || howmany == 10 || howmany == 25
-            || (howmany % 50) == 0) {
+            || (howmany % 50) == 0) { /* 50, 100, 150, 200, 250 */
             char xtra[40];
+            long llevent_type = LL_UMONST;
 
+            /* first kill of any unique is a major event; all kills of the
+               Wizard and the Riders are major if they're logged but they
+               still don't get logged every time */
+            if (howmany == 1 || mtmp->iswiz || is_rider(mtmp->data))
+                llevent_type |= LL_ACHIEVE;
             xtra[0] = '\0';
             if (howmany > 1) /* "(2nd time)" or "(50th time)" */
                 Sprintf(xtra, " (%d%s time)", howmany, ordin(howmany));
 
-            livelog_printf(LL_UMONST | ((howmany == 1) ? LL_ACHIEVE : 0),
-                           "%s %s%s",
+            livelog_printf(llevent_type, "%s %s%s",
                            nonliving(mtmp->data) ? "destroyed" : "killed",
                            livelog_mon_nam(mtmp), xtra);
         }
