@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1645223897 2022/02/18 22:38:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1646313937 2022/03/03 13:25:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -333,7 +333,7 @@ lopt(
     if (p && opttype == ArgValDisallowed)
         goto loptnotallowed;
 
-    l = (int) (p ? (p - arg) : strlen(arg));
+    l = (int) (p ? (long) (p - arg) : (long) strlen(arg));
     if (!strncmp(arg, optname, l)) {
         /* "-windowtype[=foo]" */
         if (p)
