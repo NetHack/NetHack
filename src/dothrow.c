@@ -910,6 +910,9 @@ mhurtle_step(genericptr_t arg, int x, int y)
     /* TODO: Treat walls, doors, iron bars, etc. specially
      * rather than just stopping before.
      */
+    if (!isok(x, y))
+        return FALSE;
+
     if (goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA)
         && m_in_out_region(mon, x, y)) {
         int res;
