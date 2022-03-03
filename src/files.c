@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1646255374 2022/03/02 21:09:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.345 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1646314650 2022/03/03 13:37:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1805,7 +1805,7 @@ lock_file(const char *filename, int whichprefix, int retryct)
                            filename, retryct);
             sleep(1);
         } else {
-            HUP(void) raw_print("I give up.  Sorry.");
+            HUP raw_print("I give up.  Sorry.");
             HUP raw_printf("Some other process has an unnatural grip on %s.",
                            filename);
             g.nesting--;
@@ -1817,15 +1817,14 @@ lock_file(const char *filename, int whichprefix, int retryct)
         switch (errnosv) { /* George Barbanis */
         case EEXIST:
             if (retryct--) {
-                HUP raw_printf(
-                    "Waiting for access to %s.  (%d retries left).", filename,
-                    retryct);
+                HUP raw_printf("Waiting for access to %s.  (%d retries left).",
+                               filename, retryct);
 #if defined(SYSV) || defined(ULTRIX) || defined(VMS)
                 (void)
 #endif
                     sleep(1);
             } else {
-                HUP(void) raw_print("I give up.  Sorry.");
+                HUP raw_print("I give up.  Sorry.");
                 HUP raw_printf("Perhaps there is an old %s around?",
                                lockname);
                 g.nesting--;
