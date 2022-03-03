@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1629817679 2021/08/24 15:07:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.372 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1646322469 2022/03/03 15:47:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5551,6 +5551,7 @@ makewish(void)
     char promptbuf[BUFSZ];
     char bufcpy[BUFSZ];
     struct obj *otmp, nothing;
+    long maybe_LL_arti;
     int tries = 0;
     int prev_artwish = u.uconduct.wisharti;
 
@@ -5593,15 +5594,17 @@ makewish(void)
         return;
     }
 
+    maybe_LL_arti = ((prev_artwish < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
-        livelog_printf(LL_CONDUCT | LL_WISH | (prev_artwish < u.uconduct.wisharti ? LL_ARTIFACT : 0),
+        livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
                        "made %s first wish - \"%s\"", uhis(), bufcpy);
-    else if (!prev_artwish && u.uconduct.wisharti) /* arti conduct handled in readobjnam() above */
-        livelog_printf(LL_CONDUCT | LL_WISH | LL_ARTIFACT, "made %s first artifact wish - \"%s\"",
-                       uhis(), bufcpy);
+    else if (!prev_artwish && u.uconduct.wisharti) /* wisharti conduct handled
+                                                    * in readobjnam() above */
+        livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
+                       "made %s first artifact wish - \"%s\"", uhis(), bufcpy);
     else
-        livelog_printf(LL_WISH | (prev_artwish < u.uconduct.wisharti ? LL_ARTIFACT : 0),
+        livelog_printf((LL_WISH | maybe_LL_arti),
                        "wished for \"%s\"", bufcpy);
 
     if (otmp != &cg.zeroobj) {

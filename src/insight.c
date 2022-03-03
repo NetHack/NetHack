@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1646171624 2022/03/01 21:53:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1646322468 2022/03/03 15:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2363,9 +2363,6 @@ sokoban_in_play(void)
     return FALSE;
 }
 
-#define majorevent(llmsg) (((llmsg)->flags & LL_ACHIEVE) != 0)
-#define spoilerevent(llmsg) (((llmsg)->flags & LL_SPOILER) != 0)
-
 /* #chronicle command */
 int
 do_gamelog(void)
@@ -2381,6 +2378,19 @@ do_gamelog(void)
 #endif /* !CHRONICLE */
     return ECMD_OK;
 }
+
+/* 'major' events for dumplog; inclusion or exclusion here may need tuning */
+#define LL_majors (0L \
+                   | LL_WISH            \
+                   | LL_ACHIEVE         \
+                   | LL_UMONST          \
+                   | LL_DIVINEGIFT      \
+                   | LL_LIFESAVE        \
+                   | LL_ARTIFACT        \
+                   | LL_GENOCIDE        \
+                   | LL_DUMP) /* explicitly for dumplog */
+#define majorevent(llmsg) (((llmsg)->flags & LL_majors) != 0)
+#define spoilerevent(llmsg) (((llmsg)->flags & LL_SPOILER) != 0)
 
 /* #chronicle details */
 void

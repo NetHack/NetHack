@@ -1,4 +1,4 @@
-# NetHack 3.7 sysconf $NHDT-Date: 1596498296 2020/08/03 23:44:56 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $
+# NetHack 3.7 sysconf $NHDT-Date: 1646322470 2022/03/03 15:47:50 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -106,6 +106,8 @@ MAXPLAYERS=10
 # 0x0400 - Log URL for dumplog if ascended
 # 0x0800 - Log dumplog url for all games
 # 0x1000 - Log 'minor' achievements - can be spammy
+# 0x2000 - Spoiler event; can include in livelog but hidden from #chronicle
+# 0x4000 - Include as 'major' event in dumplog; can be hidden from livelog
 # 0x8000 - Livelog debug msgs (currently only 'enter new level')
 #LIVELOG=0x1FFF
 

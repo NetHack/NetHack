@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1646136940 2022/03/01 12:15:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1646322468 2022/03/03 15:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1392,12 +1392,12 @@ really_done(int how)
             disclose(how, taken);
 
         /* it would be better to do this after killer.name fixups but
-           that comes too late; end-of-game is classified as a "major
-           achievement" even if game happens to be ending in failure */
+           that comes too late; included in final dumplog but might be
+           excluded by active livelog */
         formatkiller(pbuf, (unsigned) sizeof pbuf, how, TRUE);
         if (!*pbuf)
             Strcpy(pbuf, deaths[how]);
-        livelog_printf(LL_ACHIEVE, "%s", pbuf);
+        livelog_printf(LL_DUMP, "%s", pbuf);
 
         dump_everything(how, endtime);
     }

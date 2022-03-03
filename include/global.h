@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1646136933 2022/03/01 12:15:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1646322467 2022/03/03 15:47:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -478,8 +478,9 @@ extern struct nomakedefs_s nomakedefs;
 #define LL_DUMP_ASC   0x0400L /* Log URL for dumplog if ascended */
 #define LL_DUMP_ALL   0x0800L /* Log dumplog url for all games */
 #define LL_MINORAC    0x1000L /* Log 'minor' achievements - can be spammy */
-#define LL_SPOILER    0x4000L /* reveals information so don't show in-game
+#define LL_SPOILER    0x2000L /* reveals information so don't show in-game
                                * via #chronicle unless in wizard mode */
+#define LL_DUMP       0x4000L /* none of the above but should be in dumplog */
 #define LL_DEBUG      0x8000L /* For debugging messages and other spam */
 
 #endif /* GLOBAL_H */
