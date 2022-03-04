@@ -2751,6 +2751,7 @@ launch_obj(
 
     if (otmp->quan == 1L) {
         obj_extract_self(otmp);
+        maybe_unhide_at(otmp->ox, otmp->oy);
         singleobj = otmp;
         otmp = (struct obj *) 0;
     } else {
