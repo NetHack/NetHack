@@ -1441,6 +1441,8 @@ m_move(register struct monst* mtmp, register int after)
                 didseeit = canseeit;
 
         if (mmoved == MMOVE_MOVED) {
+            int trapret;
+
             /* normal monster move will already have <nix,niy>,
                but pet dog_move() with 'goto postmov' won't */
             nix = mtmp->mx, niy = mtmp->my;
@@ -1475,7 +1477,8 @@ m_move(register struct monst* mtmp, register int after)
             }
 
             newsym(omx, omy); /* update the old position */
-            if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon) {
+            trapret = mintrap(mtmp, NO_TRAP_FLAGS);
+            if (trapret == Trap_Killed_Mon || trapret == Trap_Moved_Mon) {
                 if (mtmp->mx)
                     newsym(mtmp->mx, mtmp->my);
                 return 2; /* it died */
