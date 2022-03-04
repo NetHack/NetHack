@@ -1421,6 +1421,8 @@ m_move(register struct monst* mtmp, register int after)
         if (mtmp->wormno)
             worm_move(mtmp);
 
+        maybe_unhide_at(mtmp->mx, mtmp->my);
+
         for (j = MTSZ - 1; j > 0; j--)
             mtmp->mtrack[j] = mtmp->mtrack[j - 1];
         mtmp->mtrack[0].x = omx;
