@@ -2736,6 +2736,7 @@ extern void sokoban_guilt(void);
 extern const char * trapname(int, boolean);
 extern void ignite_items(struct obj *);
 extern void trap_ice_effects(xchar x, xchar y, boolean ice_is_melting);
+extern void trap_sanity_check(void);
 
 /* ### u_init.c ### */
 

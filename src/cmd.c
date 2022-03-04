@@ -3419,6 +3419,7 @@ sanity_check(void)
     mon_sanity_check();
     light_sources_sanity_check();
     bc_sanity_check();
+    trap_sanity_check();
 }
 
 #ifdef DEBUG_MIGRATING_MONS

@@ -6125,4 +6125,20 @@ trap_ice_effects(xchar x, xchar y, boolean ice_is_melting)
         }
     }
 }
+
+/* sanity check traps */
+void
+trap_sanity_check(void)
+{
+    struct trap *ttmp = g.ftrap;
+
+    while (ttmp) {
+        if (!isok(ttmp->tx, ttmp->ty))
+            impossible("trap sanity: location");
+        if (ttmp->ttyp < 0 || ttmp->ttyp >= TRAPNUM)
+            impossible("trap sanity: type");
+        ttmp = ttmp->ntrap;
+    }
+}
+
 /*trap.c*/
