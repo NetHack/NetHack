@@ -6134,9 +6134,9 @@ trap_sanity_check(void)
 
     while (ttmp) {
         if (!isok(ttmp->tx, ttmp->ty))
-            impossible("trap sanity: location");
-        if (ttmp->ttyp < 0 || ttmp->ttyp >= TRAPNUM)
-            impossible("trap sanity: type");
+            impossible("trap sanity: location (%i,%i)", ttmp->tx, ttmp->ty);
+        if (ttmp->ttyp <= NO_TRAP || ttmp->ttyp >= TRAPNUM)
+            impossible("trap sanity: type (%i)", ttmp->ttyp);
         ttmp = ttmp->ntrap;
     }
 }
