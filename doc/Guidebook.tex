@@ -6195,6 +6195,19 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 %.ei
 %.ed
 \elist
+%.lp
+\item[\ib{LIVELOG}]
+A bit-mask of types of events that should be written to
+the {\it livelog\/} file if one is present.
+The sample {\it sysconf\/} file accompanying the program contains a
+comment which lists the meaning of the various bits used.
+Intended for server systems supporting simultaneous play by multiple
+players (to be clear, each one running a separate single player game),
+for displaying their game progress to observers.
+Only relevant if the program was built with LIVELOG enabled.
+When available, it should be left commented out on single player
+installations because over time the file could grow to be extremely
+large unless it is actively maintained.
 
 %.hn 1
 \section{Scoring}

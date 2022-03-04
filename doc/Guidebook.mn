@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.450 $ $NHDT-Date: 1646146100 2022/03/01 14:48:20 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ $NHDT-Date: 1646402548 2022/03/04 14:02:28 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -5627,6 +5627,18 @@ player name
 .PL %N
 first character of player name
 .PE
+.lp
+LIVELOG\ =\ A bit-mask of types of events that should be written to
+the \fIlivelog\fP file if one is present.
+The sample \fIsysconf\fP file accompanying the program contains a
+comment which lists the meaning of the various bits used.
+Intended for server systems supporting simultaneous play by multiple
+players (to be clear, each one running a separate single player game),
+for displaying their game progress to observers.
+Only relevant if the program was built with LIVELOG enabled.
+When available, it should be left commented out on single player
+installations because over time the file could grow to be extremely
+large unless it is actively maintained.
 .
 .hn 1
 Scoring
