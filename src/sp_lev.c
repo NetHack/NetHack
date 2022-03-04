@@ -1,4 +1,4 @@
-/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1646171627 2022/03/01 21:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
+/* NetHack 3.7	sp_lev.c	$NHDT-Date: 1646428015 2022/03/04 21:06:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.259 $ */
 /*      Copyright (c) 1989 by Jean-Christophe Collet */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2276,6 +2276,7 @@ create_object(object* o, struct mkroom* croom)
         if (Is_mineend_level(&u.uz)) {
             if (!g.context.achieveo.mines_prize_oid) {
                 g.context.achieveo.mines_prize_oid = otmp->o_id;
+                g.context.achieveo.mines_prize_otyp = otmp->otyp;
                 /* prevent stacking; cleared when achievement is recorded */
                 otmp->nomerge = 1;
             } else {
@@ -2284,6 +2285,7 @@ create_object(object* o, struct mkroom* croom)
         } else if (Is_sokoend_level(&u.uz)) {
             if (!g.context.achieveo.soko_prize_oid) {
                 g.context.achieveo.soko_prize_oid = otmp->o_id;
+                g.context.achieveo.soko_prize_otyp = otmp->otyp;
                 otmp->nomerge = 1; /* redundant; Sokoban prizes don't stack */
             } else {
                 impossible(prize_warning, "sokoban end");

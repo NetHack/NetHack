@@ -1,4 +1,4 @@
-/* NetHack 3.7	context.h	$NHDT-Date: 1596498530 2020/08/03 23:48:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.41 $ */
+/* NetHack 3.7	context.h	$NHDT-Date: 1646428003 2022/03/04 21:06:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -116,10 +116,14 @@ struct novel_tracking { /* for choosing random passage when reading novel */
 };
 
 struct achievement_tracking {
-    unsigned mines_prize_oid,  /* luckstone->o_id */
-             soko_prize_oid,   /* {bag or amulet}->o_id */
-             castle_prize_old; /* wand->o_id; not yet implemented */
-    boolean minetn_reached;    /* avoid redundant checking for town entry */
+    unsigned mines_prize_oid,   /* luckstone->o_id */
+             soko_prize_oid,    /* {bag or amulet}->o_id */
+             castle_prize_old;  /* wand->o_id; not yet implemented */
+    /* record_achievement() wants the item type for livelog() event */
+    short    mines_prize_otyp,  /* luckstone */
+             soko_prize_otyp,   /* bag of holding or amulet of reflection */
+             castle_prize_otyp; /* strange object (someday wand of wishing) */
+    boolean minetn_reached;     /* avoid redundant checking for town entry */
 };
 
 struct context_info {

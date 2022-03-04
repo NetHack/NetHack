@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1646322468 2022/03/03 15:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1646428012 2022/03/04 21:06:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -62,30 +62,32 @@ static struct ll_achieve_msg achieve_msg [] = {
     { LL_ACHIEVE, "entered the Elemental Planes" },
     { LL_ACHIEVE, "entered the Astral Plane" },
     { LL_ACHIEVE, "ascended" },
-    { LL_ACHIEVE | LL_SPOILER, "acquired the Mines' End luckstone" },
-    { LL_ACHIEVE, "completed Sokoban" }, /* actually, acquired the prize item
-                                          * which doesn't necessarily mean all
-                                          * four levels have been solved */
+    /* if the type of item isn't discovered yet, disclosing the event
+       via #chronicle would be a spoiler (particularly for gray stone);
+       the ID'd name for the type of item will be appended to the next
+       two messages, for display via livelog and/or dumplog */
+    { LL_ACHIEVE | LL_SPOILER, "acquired the Mines' End" }, /* " luckstone" */
+    { LL_ACHIEVE | LL_SPOILER, "acquired the Sokoban" }, /* " <item>" */
     { LL_ACHIEVE | LL_UMONST, "killed Medusa" },
      /* these two are not logged */
     { 0, "hero was always blond, no, blind" },
     { 0, "hero never wore armor" },
      /* */
-    { LL_MINORAC, "entered the Gnomish Mines" },
+    { LL_MINORAC | LL_DUMP, "entered the Gnomish Mines" },
     { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
     { LL_MINORAC, "entered a shop" },
     { LL_MINORAC, "entered a temple" },
     { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
-    { LL_ACHIEVE, "read a Discworld novel" }, /* ditto */
+    { LL_MINORAC | LL_DUMP, "read a Discworld novel" }, /* even more so */
     { LL_ACHIEVE, "entered Sokoban" }, /* keep as major for turn comparison
                                         * with completed sokoban */
     { LL_ACHIEVE, "entered the Bigroom" },
     /* The following 8 are for advancing through the ranks
        and messages differ by role so are created on the fly;
        rank 0 (Xp 1 and 2) isn't an achievement */
-    { LL_MINORAC, "" }, /* Xp 3 */
-    { LL_MINORAC, "" }, /* Xp 6 */
-    { LL_MINORAC, "" }, /* Xp 10 */
+    { LL_MINORAC | LL_DUMP, "" }, /* Xp 3 */
+    { LL_MINORAC | LL_DUMP, "" }, /* Xp 6 */
+    { LL_MINORAC | LL_DUMP, "" }, /* Xp 10 */
     { LL_ACHIEVE, "" }, /* Xp 14, so able to attempt the quest */
     { LL_ACHIEVE, "" }, /* Xp 18 */
     { LL_ACHIEVE, "" }, /* Xp 22 */
@@ -2302,9 +2304,19 @@ record_achievement(schar achidx)
                        rank_of(rank_to_xlev(absidx - (ACH_RNK1 - 1)),
                                Role_switch, (achidx < 0) ? TRUE : FALSE),
                        u.ulevel);
-    } else
+    } else if (achidx == ACH_SOKO_PRIZE
+               || achidx == ACH_MINE_PRIZE) {
+        /* need to supply extra information for these two */
+        short otyp = ((achidx == ACH_SOKO_PRIZE)
+                      ? g.context.achieveo.soko_prize_otyp
+                      : g.context.achieveo.mines_prize_otyp);
+
+        livelog_printf(achieve_msg[achidx].llflag, "%s %s",
+                       achieve_msg[achidx].msg, OBJ_NAME(objects[otyp]));
+    } else {
         livelog_printf(achieve_msg[absidx].llflag, "%s",
                        achieve_msg[absidx].msg);
+    }
 }
 
 /* discard a recorded achievement; return True if removed, False otherwise */
