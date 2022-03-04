@@ -6146,7 +6146,7 @@ user who is restoring is the same one who saved).
 \elist
 
 %.pg
-The following options affect the score file:
+The following four options affect the score file:
 \blist {}
 %.pg
 %.lp
@@ -6179,10 +6179,10 @@ rather than at the standard locations.
 %.lp
 \item[\ib{DUMPLOGFILE}]
 A filename where the end-of-game dumplog is saved.
-Not defining this will prevent dumplog from being created. Only available
-if your game is compiled with DUMPLOG. Allows the following placeholders:
-%.sd
-%.si
+Not defining this will prevent dumplog from being created.
+Only available if your game is compiled with DUMPLOG.
+Allows the following placeholders:
+% FIXME: this should be changed to a nested list or else be forcibly indented
 {\tt \%\%}  --- literal `{\tt \%}'\\
 {\tt \%v}  --- version (eg. ``{\tt 3.7.0-0}'')\\
 {\tt \%u}  --- game UID\\
@@ -6192,9 +6192,6 @@ if your game is compiled with DUMPLOG. Allows the following placeholders:
 {\tt \%D}  --- current time, YYYYMMDDhhmmss format\\
 {\tt \%n}  --- player name\\
 {\tt \%N}  --- first character of player name
-%.ei
-%.ed
-\elist
 %.lp
 \item[\ib{LIVELOG}]
 A bit-mask of types of events that should be written to
@@ -6208,6 +6205,7 @@ Only relevant if the program was built with LIVELOG enabled.
 When available, it should be left commented out on single player
 installations because over time the file could grow to be extremely
 large unless it is actively maintained.
+\elist
 
 %.hn 1
 \section{Scoring}

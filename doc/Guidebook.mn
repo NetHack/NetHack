@@ -5580,7 +5580,7 @@ CHECK_SAVE_UID\ =\ 0 or 1 to disable or enable, respectively, the UID
 (used identification number) checking for save files (to verify that the
 user who is restoring is the same one who saved).
 .pg
-The following options affect the score file:
+The following four options affect the score file:
 .pg
 .lp
 PERSMAX\ =\ Maximum number of entries for one person.
@@ -5595,38 +5595,42 @@ to identify unique people for the score file.
 MAX_STATUENAME_RANK\ =\ Maximum number of score file entries to use for
 random statue names (default is 10).
 .lp
-ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability for players 
-to set S_pet_override and S_hero_override symbols in their configuration file.
+ACCESSIBILITY\ =\ 0 or 1 to disable or enable, respectively, the ability
+for players to set S_pet_override and S_hero_override symbols in their
+configuration file.
 .lp
 PORTABLE_DEVICE_PATHS\ =\ 0 or 1 Windows OS only, the game will look
-for all of its external files, and write to all of its output files in one place
-rather than at the standard locations.
+for all of its external files, and write to all of its output files in
+one place rather than at the standard locations.
 .lp
 DUMPLOGFILE\ =\ A filename where the end-of-game dumplog is saved.
-Not defining this will prevent dumplog from being created. Only available
-if your game is compiled with DUMPLOG. Allows the following placeholders:
+Not defining this will prevent dumplog from being created.
+Only available if your game is compiled with DUMPLOG.
+Allows the following placeholders:
+.in +4n
 .\" note: %M is not an entry in the table, but 'M' is the widest letter
 .PS %M
 .\" \f(CR = set font to constant-width Roman; approximation of {\tt ...} in TeX
-.PL %%
+.PL \f(CR%%\fP
 literal \(oq\f(CR%\fP\(cq
-.PL %v
+.PL \f(CR%v\fP
 version (eg. \(lq\f(CR3.7.0\-0\fP\(rq)
-.PL %u
+.PL \f(CR%u\fP
 game UID
-.PL %t
+.PL \f(CR%t\fP
 game start time, UNIX timestamp format
-.PL %T
+.PL \f(CR%T\fP
 current time, UNIX timestamp format
-.PL %d
+.PL \f(CR%d\fP
 game start time, YYYYMMDDhhmmss format
-.PL %D
+.PL \f(CR%D\fP
 current time, YYYYMMDDhhmmss format
-.PL %n
+.PL \f(CR%n\fP
 player name
-.PL %N
+.PL \f(CR%N\fP
 first character of player name
 .PE
+.in -4n
 .lp
 LIVELOG\ =\ A bit-mask of types of events that should be written to
 the \fIlivelog\fP file if one is present.
