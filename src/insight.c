@@ -46,7 +46,7 @@ static const char have_been[] = "have been ", have_never[] = "have never ",
 
 /* for livelogging: */
 struct ll_achieve_msg {
-    unsigned long llflag;
+    long llflag;
     const char *msg;
 };
 /* ordered per 'enum achievements' in you.h */
