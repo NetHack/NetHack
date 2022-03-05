@@ -424,6 +424,7 @@ moverock(void)
             /* Move the boulder *after* the message. */
             if (glyph_is_invisible(levl[rx][ry].glyph))
                 unmap_object(rx, ry);
+            otmp->next_boulder = 0;
             movobj(otmp, rx, ry); /* does newsym(rx,ry) */
             if (Blind) {
                 feel_location(rx, ry);
