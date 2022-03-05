@@ -854,7 +854,9 @@ minimal_xname(struct obj *obj)
     objects[otyp].oc_uname = 0;
     /* suppress actual name if object's description is unknown */
     saveobcls.oc_name_known = objects[otyp].oc_name_known;
-    if (!obj->dknown)
+    if (iflags.override_ID)
+        objects[otyp].oc_name_known = 1;
+    else if (!obj->dknown)
         objects[otyp].oc_name_known = 0;
 
     /* caveat: this makes a lot of assumptions about which fields
@@ -862,7 +864,7 @@ minimal_xname(struct obj *obj)
     bareobj = cg.zeroobj;
     bareobj.otyp = otyp;
     bareobj.oclass = obj->oclass;
-    bareobj.dknown = obj->dknown;
+    bareobj.dknown = (obj->dknown || iflags.override_ID) ? 1 : 0;
     /* suppress known except for amulets (needed for fakes and real A-of-Y) */
     bareobj.known = (obj->oclass == AMULET_CLASS)
                         ? obj->known
@@ -2085,7 +2087,7 @@ ansimpleoname(struct obj* obj)
 
 /* "the scroll" or "the scrolls" */
 char *
-thesimpleoname(struct obj* obj)
+thesimpleoname(struct obj *obj)
 {
     char *obufp, *simpleoname = simpleonames(obj);
 
@@ -2095,9 +2097,24 @@ thesimpleoname(struct obj* obj)
     return simpleoname;
 }
 
+/* basic name of obj, as if it has been discovered; for some types of
+   items, we can't just use OBJ_NAME() because it doesn't always include
+   the class (for instance "light" when we want "spellbook of light");
+   minimal_xname() uses xname() to get that */
+char *
+actualoname(struct obj *obj)
+{
+    char *res;
+
+    iflags.override_ID = TRUE;
+    res = minimal_xname(obj);
+    iflags.override_ID = FALSE;
+    return res;
+}
+
 /* artifact's name without any object type or known/dknown/&c feedback */
 char *
-bare_artifactname(struct obj* obj)
+bare_artifactname(struct obj *obj)
 {
     char *outbuf;
 

@@ -758,6 +758,7 @@ static void
 gcrownu(void)
 {
     struct obj *obj;
+    const char *what;
     boolean already_exists, in_hand;
     short class_gift;
 #define ok_wep(o) ((o) && ((o)->oclass == WEAPON_CLASS || is_weptool(o)))
@@ -791,13 +792,14 @@ gcrownu(void)
         u.uevent.uhand_of_elbereth = 1;
         verbalize("I crown thee...  The Hand of Elbereth!");
         livelog_printf(LL_DIVINEGIFT,
-                       "was crowned \"The Hand of Elbereth\" by %s", u_gname());
+                       "was crowned \"The Hand of Elbereth\" by %s",
+                       u_gname());
         break;
     case A_NEUTRAL:
         u.uevent.uhand_of_elbereth = 2;
         in_hand = (uwep && uwep->oartifact == ART_VORPAL_BLADE);
-        already_exists =
-            exist_artifact(LONG_SWORD, artiname(ART_VORPAL_BLADE));
+        already_exists = exist_artifact(LONG_SWORD,
+                                        artiname(ART_VORPAL_BLADE));
         verbalize("Thou shalt be my Envoy of Balance!");
         livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
                        s_suffix(u_gname()));
@@ -805,27 +807,35 @@ gcrownu(void)
     case A_CHAOTIC:
         u.uevent.uhand_of_elbereth = 3;
         in_hand = (uwep && uwep->oartifact == ART_STORMBRINGER);
-        already_exists =
-            exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
-        verbalize("Thou art chosen to %s for My Glory!",
-                  ((already_exists && !in_hand)
-                   || class_gift != STRANGE_OBJECT) ? "take lives"
-                  : "steal souls");
-        livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
-                       ((already_exists && !in_hand)
-                        || class_gift != STRANGE_OBJECT) ? "take lives"
-                       : "steal souls",
-                       u_gname());
+        already_exists = exist_artifact(RUNESWORD, artiname(ART_STORMBRINGER));
+        what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
+                ? "take lives"
+                : "steal souls");
+        verbalize("Thou art chosen to %s for My Glory!", what);
+        livelog_printf(LL_DIVINEGIFT, "chosen to %s for the Glory of %s",
+                       what, u_gname());
         break;
     }
 
     if (objects[class_gift].oc_class == SPBOOK_CLASS) {
+        char bbuf[BUFSZ];
+
         obj = mksobj(class_gift, TRUE, FALSE);
+        /* get book type before dropping (don't think that could destroy
+           the book because we need to be on an altar in order to become
+           crowned, but be paranoid about it) */
+        Strcpy(bbuf, actualoname(obj)); /* for livelog; "spellbook of <foo>"
+                                         * even if hero doesn't know book */
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
         at_your_feet("A spellbook");
         dropy(obj);
         u.ugifts++;
+        /* not an artifact, but treat like one for this situation;
+           classify as a spoiler in case player hasn't IDed the book yet */
+        livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER,
+                       "bestowed with %s", bbuf);
+
         /* when getting a new book for known spell, enhance
            currently wielded weapon rather than the book */
         if (known_spell(class_gift) && ok_wep(uwep))
@@ -837,11 +847,18 @@ gcrownu(void)
         if (class_gift != STRANGE_OBJECT) {
             ; /* already got bonus above */
         } else if (obj && obj->otyp == LONG_SWORD && !obj->oartifact) {
+            char lbuf[BUFSZ];
+
+            Strcpy(lbuf, simpleonames(obj)); /* before transformation */
             if (!Blind)
                 Your("sword shines brightly for a moment.");
             obj = oname(obj, artiname(ART_EXCALIBUR));
-            if (obj && obj->oartifact == ART_EXCALIBUR)
+            if (obj && obj->oartifact == ART_EXCALIBUR) {
                 u.ugifts++;
+                livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                               "wielded %s transformed into %s",
+                               lbuf, artiname(ART_EXCALIBUR));
+            }
         }
         /* acquire Excalibur's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_LONG_SWORD);
@@ -861,6 +878,8 @@ gcrownu(void)
             at_your_feet("A sword");
             dropy(obj);
             u.ugifts++;
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                           "bestowed with %s", artiname(ART_VORPAL_BLADE));
         }
         /* acquire Vorpal Blade's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_LONG_SWORD);
@@ -883,6 +902,8 @@ gcrownu(void)
             at_your_feet(An(swordbuf));
             dropy(obj);
             u.ugifts++;
+            livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
+                           "bestowed with %s", artiname(ART_STORMBRINGER));
         }
         /* acquire Stormbringer's skill regardless of weapon or gift */
         unrestrict_weapon_skill(P_BROAD_SWORD);
@@ -1798,10 +1819,10 @@ dosacrifice(void)
                     u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
-                    livelog_printf (LL_DIVINEGIFT|LL_ARTIFACT,
-                                    "had %s bestowed upon %s by %s",
+                    livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
+                                    "bestowed with %s by %s",
                                     artiname(otmp->oartifact),
-                                    uhim(), align_gname(u.ualign.type));
+                                    align_gname(u.ualign.type));
                     /* make sure we can use this weapon */
                     unrestrict_weapon_skill(weapon_type(otmp));
                     if (!Hallucination && !Blind) {

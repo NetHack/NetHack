@@ -1864,6 +1864,7 @@ extern char *Ysimple_name2(struct obj *);
 extern char *simpleonames(struct obj *);
 extern char *ansimpleoname(struct obj *);
 extern char *thesimpleoname(struct obj *);
+extern char *actualoname(struct obj *);
 extern char *bare_artifactname(struct obj *);
 extern char *makeplural(const char *);
 extern char *makesingular(const char *);
