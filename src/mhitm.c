@@ -717,6 +717,10 @@ engulf_target(struct monst *magr, struct monst *mdef)
     if (mdef->data->msize >= MZ_HUGE)
         return FALSE;
 
+    /* can't swallow trapped monsters. TODO: could do some? */
+    if (mdef->mtrapped)
+        return FALSE;
+
     /* (hypothetical) engulfers who can pass through walls aren't
      limited by rock|trees|bars */
     if ((magr == &g.youmonst) ? Passes_walls : passes_walls(magr->data))
