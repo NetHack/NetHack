@@ -1196,13 +1196,14 @@ pleased(aligntyp g_align)
                         && !P_RESTRICTED(spell_skilltype(otmp->otyp)))
                         break; /* usable, but not yet known */
                 } else {
-                    if (!objects[SPE_BLANK_PAPER].oc_name_known
-                        || carrying(MAGIC_MARKER))
+                    if ((!objects[SPE_BLANK_PAPER].oc_name_known
+                         || carrying(MAGIC_MARKER)) && u.uconduct.literate)
                         break;
                 }
                 otmp->otyp = rnd_class(g.bases[SPBOOK_CLASS], SPE_BLANK_PAPER);
             }
-            if (!u.uconduct.literate && !known_spell(otmp->otyp)) {
+            if (!u.uconduct.literate && (otmp->otyp != SPE_BLANK_PAPER)
+                && !known_spell(otmp->otyp)) {
                 if (force_learn_spell(otmp->otyp))
                     pline("Divine knowledge of %s fills your mind!",
                           OBJ_NAME(objects[otmp->otyp]));
