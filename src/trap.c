@@ -4500,6 +4500,7 @@ cnv_trap_obj(
     boolean bury_it)
 {
     struct obj *otmp = mksobj(otyp, TRUE, FALSE);
+    struct monst *mtmp;
 
     otmp->quan = cnt;
     otmp->owt = weight(otmp);
@@ -4519,6 +4520,8 @@ cnv_trap_obj(
     newsym(ttmp->tx, ttmp->ty);
     if (u.utrap && u_at(ttmp->tx, ttmp->ty))
         reset_utrap(TRUE);
+    if (((mtmp = m_at(ttmp->tx, ttmp->ty)) != 0) && mtmp->mtrapped)
+        mtmp->mtrapped = 0;
     deltrap(ttmp);
 }
 
