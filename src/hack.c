@@ -154,7 +154,8 @@ moverock(void)
             pline("That feels like a boulder.");
             map_object(otmp, TRUE);
             nomul(0);
-            return -1;
+            res = -1;
+            goto moverock_done;
         }
 
         /* when otmp->next_boulder is 1, xname() will format it as
