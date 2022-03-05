@@ -365,8 +365,14 @@ teleds(int nux, int nuy, int teleds_flags)
         if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
                       &chainy, &cause_delay, allow_drag))
             move_bc(0, bc_control, ballx, bally, chainx, chainy);
-        else /* dragging fails if hero is encumbered beyond 'burdened' */
-            unplacebc(); /* to match placebc() below */
+        else {
+            /* dragging fails if hero is encumbered beyond 'burdened' */
+            /* uball might've been cleared via drag_ball -> spoteffects ->
+               dotrap -> magic trap unpunishment */
+            ball_active = (Punished && uball->where != OBJ_FREE);
+            if (ball_active)
+                unplacebc(); /* to match placebc() below */
+        }
     }
 
     /* must set u.ux, u.uy after drag_ball(), which may need to know
