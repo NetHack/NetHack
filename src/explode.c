@@ -840,6 +840,8 @@ scatter(int sx, int sy,  /* location of objects to scatter */
     newsym(sx, sy);
     if (u_at(sx, sy) && u.uundetected && hides_under(g.youmonst.data))
         (void) hideunder(&g.youmonst);
+    if (((mtmp = m_at(sx, sy)) != 0) && mtmp->mtrapped)
+        mtmp->mtrapped = 0;
     if (lostgoods) /* implies shop_origin and therefore shkp valid */
         credit_report(shkp, 1, FALSE);
     return total;
