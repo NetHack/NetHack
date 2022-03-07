@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1645311270 2022/02/19 22:54:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1646652766 2022/03/07 11:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -464,9 +464,17 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                         otmp = obj;
                         if (carryamt != obj->quan)
                             otmp = splitobj(obj, carryamt);
-                        if (cansee(omx, omy) && flags.verbose)
-                            pline("%s picks up %s.", Monnam(mtmp),
-                                  distant_name(otmp, doname));
+                        if (cansee(omx, omy)) {
+                            if (otmp->oartifact) {
+                                otmp->dknown = 1; /* see mpickstuff() */
+                                find_artifact(otmp);
+                            }
+                            if (flags.verbose)
+                                pline("%s picks up %s.", Monnam(mtmp),
+                                      ((distu(omx, omy) <= 5)
+                                       ? doname(otmp)
+                                       : distant_name(otmp, doname)));
+                        }
                         obj_extract_self(otmp);
                         newsym(omx, omy);
                         (void) mpickobj(mtmp, otmp);

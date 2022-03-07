@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1644347179 2022/02/08 19:06:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.343 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1646652769 2022/03/07 11:32:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -512,6 +512,28 @@ xname_flags(
         dknown = obj->dknown;
         bknown = obj->bknown;
     }
+
+    /*
+     * Maybe find a previously unseen artifact.
+     *
+     * Assumption 1: if an artifact object is being formatted, it is
+     *  being shown to the hero (on floor, or looking into container,
+     *  or probing a monster, or seeing a monster wield it).
+     * Assumption 2: if in a pile that has been stepped on, the
+     *  artifact won't be noticed for cases where the pile to too deep
+     *  to be auto-shown, unless the player explicitly looks at that
+     *  spot (via ':').  Might need to make an exception somehow (at
+     *  the point where the decision whether to auto-show gets made?)
+     *  when an artifact is on the top of the pile.
+     * Assumption 3: since this is used for livelog events, not being
+     *  100% correct won't negatively affect the player's current game.
+     *
+     * We use the real obj->dknown rather than the override_ID variant
+     * so that wizard-mode ^I doesn't cause a not-yet-seen artifact in
+     * inventory (picked up while blind, still blind) to become found.
+     */
+    if (obj->oartifact && obj->dknown)
+        find_artifact(obj);
 
     if (obj_is_pname(obj))
         goto nameit;

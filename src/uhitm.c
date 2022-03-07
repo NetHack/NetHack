@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1641668224 2022/01/08 18:57:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.328 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1646652773 2022/03/07 11:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1768,6 +1768,11 @@ steal_it(struct monst *mdef, struct attack *mattk)
         if (!Upolyd)
             break; /* no longer have ability to steal */
         unwornmask = otmp->owornmask;
+        /* this would take place when doname() formats the object for
+           the hold_another_object() call, but we want to do it before
+           otmp gets removed from mdef's inventory */
+        if (otmp->oartifact && !Blind)
+            find_artifact(otmp);
         /* take the object away from the monster */
         extract_from_minvent(mdef, otmp, TRUE, FALSE);
         /* special message for final item; no need to check owornmask because

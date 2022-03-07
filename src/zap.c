@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1646322469 2022/03/03 15:47:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.400 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1646652775 2022/03/07 11:32:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.401 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2032,7 +2032,8 @@ bhito(struct obj *obj, struct obj *otmp)
             }
             /* KMH, conduct */
             if (!u.uconduct.polypiles++)
-                livelog_printf(LL_CONDUCT, "polymorphed %s first object", uhis());
+                livelog_printf(LL_CONDUCT, "polymorphed %s first object",
+                               uhis());
 
             /* any saved lock context will be dangerously obsolete */
             if (Is_box(obj))
@@ -5593,6 +5594,10 @@ makewish(void)
            to retain wishless conduct */
         return;
     }
+
+    if (otmp->oartifact)
+        /* update artifact bookkeeping; doesn't produce a livelog event */
+        found_artifact(otmp->oartifact);
 
     maybe_LL_arti = ((prev_artwish < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
     /* KMH, conduct */

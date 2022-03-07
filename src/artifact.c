@@ -1,4 +1,4 @@
-/* NetHack 3.7	artifact.c	$NHDT-Date: 1620326528 2021/05/06 18:42:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.167 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1646652747 2022/03/07 11:32:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -292,14 +292,46 @@ found_artifact(int a)
     artiexist[a].found = 1;
 }
 
-/* if an artifact hasn't already been designated 'found', do that now */
+/* if an artifact hasn't already been designated 'found', do that now
+   and generate a livelog event about finding it */
 void
 find_artifact(struct obj *otmp)
 {
     int a = otmp->oartifact;
 
     if (a && !artiexist[a].found) {
+        char buf[BUFSZ];
+        const char *where;
+
         found_artifact(a); /* artiexist[a].found = 1 */
+        /*
+         * Unlike costly_spot(), inside_shop() includes the "free spot"
+         * in front of the door.  And it doesn't care whether or not
+         * there is a shopkeeper present.
+         *
+         * If hero sees a monster pick up a not-yet-found artifact, it
+         * will have its dknown flag set even if far away and will be
+         * described as 'found on the floor'.  Similarly for dropping
+         * (possibly upon monster's death), dknown will be set and the
+         * artifact will be described as 'carried by a monster'.
+         * That's handled by caller:  dog_invent(), mpickstuff(), or
+         * mdrop_obj() so that we get called before obj->where changes.
+         */
+        where = ((otmp->where == OBJ_FLOOR)
+                 ?  ((inside_shop(otmp->ox, otmp->oy) != NO_ROOM)
+                     ? " in a shop"
+                     : " on the floor")
+                 /* artifacts aren't created in containers but could be
+                    inside one if it comes from a bones level */
+                 : (otmp->where == OBJ_CONTAINED) ? " in a container"
+                   /* perhaps probing, or seeing monster wield artifact */
+                   : (otmp->where == OBJ_MINVENT) ? " carried by a monster"
+                     /* catchall: probably in inventory, picked up while
+                        blind but now seen; there's no previous_where to
+                        figure out how it got here */
+                     : "");
+        (void) strsubst(strcpy(buf, artiname(a)), "The ", "the ");
+        livelog_printf(LL_ARTIFACT, "found %s%s", buf, where);
     }
 }
 
@@ -1001,7 +1033,8 @@ Mb_hit(struct monst *magr, /* attacker */
 {
     struct permonst *old_uasmon;
     const char *verb;
-    boolean youattack = (magr == &g.youmonst), youdefend = (mdef == &g.youmonst),
+    boolean youattack = (magr == &g.youmonst),
+            youdefend = (mdef == &g.youmonst),
             resisted = FALSE, do_stun, do_confuse, result;
     int attack_indx, fakeidx, scare_dieroll = MB_MAX_DIEROLL / 2;
 

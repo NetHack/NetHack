@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1646184187 2022/03/02 01:23:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.412 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1646652768 2022/03/07 11:32:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.414 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1553,6 +1553,18 @@ mpickstuff(struct monst *mtmp, const char *str)
                 otmp3 = splitobj(otmp, carryamt);
             }
             if (cansee(mtmp->mx, mtmp->my)) {
+                /* find an artifact as monster picks it up if its location
+                   can be seen, even if monster itself can't be seen or
+                   is far away at the time; the longer distance than for
+                   seeing item "up close" is mostly for pets rummaging in
+                   shops; we prefer to have an artifact in such situation
+                   described as 'found in a shop' or 'found on floor' now
+                   rather than 'carried by a monster' when later dropped */
+                if (otmp3->oartifact) {
+                    otmp3->dknown = 1;
+                    find_artifact(otmp3);
+                }
+
                 if (flags.verbose)
                     /* see 'otmp3' "up close" if within a knight's jump */
                     pline("%s picks up %s.", Monnam(mtmp),

@@ -1,4 +1,4 @@
-/* NetHack 3.7	steal.c	$NHDT-Date: 1620329782 2021/05/06 19:36:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	steal.c	$NHDT-Date: 1646652771 2022/03/07 11:32:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -678,6 +678,14 @@ mdrop_obj(
 {
     int omx = mon->mx, omy = mon->my;
     long unwornmask = obj->owornmask;
+
+    /* if an artifact, find dropped item 'carried by a monster' rather
+       than later finding it on the floor, even if not very close to the
+       drop and even if the monster itself can't be seen */
+    if (obj->oartifact && cansee(omx, omy)) {
+        obj->dknown = 1;
+        find_artifact(obj);
+    }
 
     extract_from_minvent(mon, obj, FALSE, TRUE);
     /* don't charge for an owned saddle on dead steed (provided
