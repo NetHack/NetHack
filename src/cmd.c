@@ -2550,7 +2550,7 @@ extcmds_match(const char *findstr, int ecmflags, int **matchlist)
 {
     static int retmatchlist[SIZE(extcmdlist)] = DUMMY;
     int i, mi = 0;
-    int fslen = findstr ? strlen(findstr) : 0;
+    int fslen = findstr ? Strlen(findstr) : 0;
     boolean ignoreac = (ecmflags & ECM_IGNOREAC) != 0;
     boolean exactmatch = (ecmflags & ECM_EXACTMATCH) != 0;
     boolean no1charcmd = (ecmflags & ECM_NO1CHARCMD) != 0;

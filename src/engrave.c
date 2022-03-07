@@ -388,7 +388,7 @@ void
 make_engr_at(int x, int y, const char *s, long e_time, xchar e_type)
 {
     struct engr *ep;
-    unsigned smem = strlen(s) + 1;
+    unsigned smem = Strlen(s) + 1;
 
     if ((ep = engr_at(x, y)) != 0)
         del_engr(ep);

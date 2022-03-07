@@ -2906,8 +2906,8 @@ lspo_message(lua_State *L)
 
     msg = luaL_checkstring(L, 1);
 
-    old_n = g.lev_message ? (strlen(g.lev_message) + 1) : 0;
-    n = strlen(msg);
+    old_n = g.lev_message ? (Strlen(g.lev_message) + 1) : 0;
+    n = Strlen(msg);
 
     levmsg = (char *) alloc(old_n + n + 1);
     if (old_n)

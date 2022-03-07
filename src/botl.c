@@ -368,7 +368,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)
-                    *title_length = strlen(roles[i].rank[j].m);
+                    *title_length = Strlen(roles[i].rank[j].m);
                 return roles[i].mnum;
             }
             if (roles[i].rank[j].f
@@ -376,7 +376,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)
-                    *title_length = strlen(roles[i].rank[j].f);
+                    *title_length = Strlen(roles[i].rank[j].f);
                 return roles[i].mnum;
             }
         }

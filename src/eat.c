@@ -176,9 +176,10 @@ eatmupdate(void)
 
     if (altmsg) {
         /* replace end-of-mimicking message */
-        if (strlen(altmsg) > strlen(g.eatmbuf)) {
+        int amlen = Strlen(altmsg);
+        if (amlen > Strlen(g.eatmbuf)) {
             free((genericptr_t) g.eatmbuf);
-            g.eatmbuf = (char *) alloc(strlen(altmsg) + 1);
+            g.eatmbuf = (char *) alloc(amlen + 1);
         }
         g.nomovemsg = strcpy(g.eatmbuf, altmsg);
         /* update current image */

@@ -24,6 +24,7 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          stripdigits     (char *)
+	unsigned	Strlen		(const char *str)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
         int             str_lines_maxlen (const char *)
@@ -226,6 +227,16 @@ eos(register char *s)
     while (*s)
         s++; /* s += strlen(s); */
     return s;
+}
+
+/* like strlen(3) but returns unsigned and panics if string is unreasonably long */
+unsigned
+Strlen(const char *str){
+    size_t len = strnlen(str, LARGEST_INT);
+
+    if (len == LARGEST_INT)
+	panic("string too long");
+    return (unsigned) len;
 }
 
 /* determine whether 'str' ends in 'chkstr' */

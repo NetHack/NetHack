@@ -243,7 +243,7 @@ save_gamelog(NHFILE *nhfp)
         tmp2 = tmp->next;
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel) {
-                slen = strlen(tmp->text);
+                slen = Strlen(tmp->text);
                 bwrite(nhfp->fd, (genericptr_t) &slen, sizeof slen);
                 bwrite(nhfp->fd, (genericptr_t) tmp->text, slen);
                 bwrite(nhfp->fd, (genericptr_t) tmp,

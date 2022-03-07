@@ -117,7 +117,7 @@ formatkiller(
         /*FALLTHRU*/
     case KILLED_BY:
         (void) strncat(buf, killed_by_prefix[how], siz - 1);
-        l = strlen(buf);
+        l = Strlen(buf);
         buf += l, siz -= l;
         break;
     }

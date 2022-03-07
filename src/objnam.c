@@ -402,7 +402,7 @@ fruit_from_name(
     if (!exact) {
         tentativef = 0;
         for (f = g.ffruit; f; f = f->nextf) {
-            k = strlen(f->fname);
+            k = Strlen(f->fname);
             if (!strncmp(f->fname, fname, k)
                 && (!fname[k] || fname[k] == ' ')
                 && (!tentativef || k > strlen(tentativef->fname)))
@@ -422,11 +422,11 @@ fruit_from_name(
     }
     if (!f && !exact) {
         char fnamebuf[BUFSZ], *p;
-        unsigned fname_k = strlen(fname); /* length of assumed plural fname */
+        unsigned fname_k = Strlen(fname); /* length of assumed plural fname */
 
         tentativef = 0;
         for (f = g.ffruit; f; f = f->nextf) {
-            k = strlen(f->fname);
+            k = Strlen(f->fname);
             /* reload fnamebuf[] each iteration in case it gets modified;
                there's no need to recalculate fname_k */
             Strcpy(fnamebuf, fname);
@@ -441,7 +441,7 @@ fruit_from_name(
             if (fname_k >= k && (p = index(&fnamebuf[k], ' ')) != 0) {
                 *p = '\0'; /* truncate at 1st space past length of f->fname */
                 altfname = makesingular(fnamebuf);
-                k = strlen(altfname); /* actually revised 'fname_k' */
+                k = Strlen(altfname); /* actually revised 'fname_k' */
                 if (!strcmp(f->fname, altfname)
                     && (!tentativef || k > strlen(tentativef->fname)))
                     tentativef = f;
@@ -1976,7 +1976,7 @@ yobjnam(struct obj* obj, const char *verb)
     if (!carried(obj) || !obj_is_pname(obj)
         || obj->oartifact >= ART_ORB_OF_DETECTION) {
         char *outbuf = shk_your(nextobuf(), obj);
-        int space_left = BUFSZ - 1 - strlen(outbuf);
+        int space_left = BUFSZ - 1 - Strlen(outbuf);
 
         s = strncat(outbuf, s, space_left);
     }
@@ -2050,7 +2050,7 @@ yname(struct obj* obj)
     if (!carried(obj) || !obj_is_pname(obj)
         || obj->oartifact >= ART_ORB_OF_DETECTION) {
         char *outbuf = shk_your(nextobuf(), obj);
-        int space_left = BUFSZ - 1 - strlen(outbuf);
+        int space_left = BUFSZ - 1 - Strlen(outbuf);
 
         s = strncat(outbuf, s, space_left);
     }
@@ -2077,7 +2077,7 @@ ysimple_name(struct obj* obj)
 {
     char *outbuf = nextobuf();
     char *s = shk_your(outbuf, obj); /* assert( s == outbuf ); */
-    int space_left = BUFSZ - 1 - strlen(s);
+    int space_left = BUFSZ - 1 - Strlen(s);
 
     return strncat(s, minimal_xname(obj), space_left);
 }
@@ -2273,7 +2273,7 @@ vtense(const char* subj, const char* verb)
             /* check for special cases to avoid false matches */
             len = (int) (spot - subj) + 1;
             for (spec = special_subjs; *spec; spec++) {
-                ltmp = strlen(*spec);
+                ltmp = Strlen(*spec);
                 if (len == ltmp && !strncmpi(*spec, subj, len))
                     goto sing;
                 /* also check for <prefix><space><special_subj>
@@ -2377,7 +2377,7 @@ const char *const *alt_as_is) /* another set like as_is[] */
     const struct sing_plur *sp;
     const char *same, *other, *const *as;
     int al;
-    int baselen = strlen(basestr);
+    int baselen = Strlen(basestr);
 
     for (as = as_is; *as; ++as) {
         al = (int) strlen(*as);
@@ -2555,7 +2555,7 @@ makeplural(const char* oldstr)
     *(spot + 1) = '\0';
     /* Now spot is the last character of the string */
 
-    len = strlen(str);
+    len = Strlen(str);
 
     /* Single letters */
     if (len == 1 || !letter(*spot)) {
@@ -4118,7 +4118,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         && strncmpi(d->bp, "food ration", 11)
         && strncmpi(d->bp, "meat ring", 9))
         for (i = 0; i < (int) (sizeof wrpsym); i++) {
-            register int j = strlen(wrp[i]);
+            register int j = Strlen(wrp[i]);
 
             /* check for "<class> [ of ] something" */
             if (!strncmpi(d->bp, wrp[i], j)) {

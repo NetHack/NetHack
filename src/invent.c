@@ -3985,8 +3985,8 @@ let_to_name(char let, boolean unpaid, boolean showsym)
     else
         class_name = names[0];
 
-    len = strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "")
-          + (oclass ? (strlen(ocsymfmt) + invbuf_sympadding) : 0);
+    len = Strlen(class_name) + (unpaid ? sizeof "unpaid_" : sizeof "")
+          + (oclass ? (Strlen(ocsymfmt) + invbuf_sympadding) : 0);
     if (len > g.invbufsiz) {
         if (g.invbuf)
             free((genericptr_t) g.invbuf);
@@ -3999,7 +3999,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
         Strcpy(g.invbuf, class_name);
     if ((oclass != 0) && showsym) {
         char *bp = eos(g.invbuf);
-        int mlen = invbuf_sympadding - strlen(class_name);
+        int mlen = invbuf_sympadding - Strlen(class_name);
         while (--mlen > 0) {
             *bp = ' ';
             bp++;

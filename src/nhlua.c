@@ -1382,7 +1382,7 @@ nhl_loadlua(lua_State *L, const char *fname)
     long buflen, ct, cnt;
     int llret;
 
-    altfname = (char *) alloc(strlen(fname) + 3); /* 3: '('...')\0' */
+    altfname = (char *) alloc(Strlen(fname) + 3); /* 3: '('...')\0' */
     /* don't know whether 'fname' is inside a dlb container;
        if we did, we could choose between "nhdat(<fname>)" and "<fname>"
        but since we don't, compromise */

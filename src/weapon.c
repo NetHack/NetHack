@@ -1170,7 +1170,7 @@ enhance_weapon_skill(void)
         for (longest = 0, i = 0; i < P_NUM_SKILLS; i++) {
             if (P_RESTRICTED(i))
                 continue;
-            if ((len = strlen(P_NAME(i))) > longest)
+            if ((len = Strlen(P_NAME(i))) > longest)
                 longest = len;
             if (can_advance(i, speedy))
                 to_advance++;

@@ -383,7 +383,7 @@ savenames(NHFILE* nhfp)
     for (i = 0; i < NUM_OBJECTS; i++)
         if (objects[i].oc_uname) {
             if (perform_bwrite(nhfp)) {
-                len = strlen(objects[i].oc_uname) + 1;
+                len = Strlen(objects[i].oc_uname) + 1;
                 if (nhfp->structlevel) {
                     bwrite(nhfp->fd, (genericptr_t)&len, sizeof len);
                     bwrite(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);

@@ -1423,7 +1423,7 @@ really_done(int how)
 
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, g.plname);
         Sprintf(pbuf, "%s, ", g.plname);
-        formatkiller(eos(pbuf), sizeof pbuf - strlen(pbuf), how, TRUE);
+        formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
