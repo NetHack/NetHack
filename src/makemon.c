@@ -1,4 +1,4 @@
-/* NetHack 3.7	makemon.c	$NHDT-Date: 1606033928 2020/11/22 08:32:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1646694721 2022/03/07 23:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -324,7 +324,9 @@ m_initweap(register struct monst *mtmp)
             otmp = mksobj(LONG_SWORD, FALSE, FALSE);
 
             /* maybe make it special */
-            if (!rn2(20) || is_lord(ptr))
+            if ((!rn2(20) || is_lord(ptr))
+                 && sgn(mtmp->isminion ? EMIN(mtmp)->min_align
+                                       : ptr->maligntyp) == A_LAWFUL)
                 otmp = oname(otmp,
                              artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD),
                              ONAME_NO_FLAGS);

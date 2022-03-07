@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.836 $ $NHDT-Date: 1646260985 2022/03/02 22:43:05 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.838 $ $NHDT-Date: 1646694720 2022/03/07 23:12:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -833,6 +833,7 @@ clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
 	other inventory, ice is melted, boulder plugs resulting pool burying
 	rest of giant's dropped inventory, subsequent sanity checks report
 	that there are buried objects which are 'flagged bypass']
+only give Sunsword or Demonbane as starting gear to lawful Angels
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
