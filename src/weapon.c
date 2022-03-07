@@ -1,4 +1,4 @@
-/* NetHack 3.7	weapon.c	$NHDT-Date: 1629243070 2021/08/17 23:31:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	weapon.c	$NHDT-Date: 1646688071 2022/03/07 21:21:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -703,11 +703,12 @@ possibly_unwield(struct monst *mon, boolean polyspot)
     if (!attacktype(mon->data, AT_WEAP)) {
         setmnotwielded(mon, mw_tmp);
         mon->weapon_check = NO_WEAPON_WANTED;
-        obj_extract_self(obj);
+        /* if we're going to call distant_name(), do so before extract_self */
         if (cansee(mon->mx, mon->my)) {
             pline("%s drops %s.", Monnam(mon), distant_name(obj, doname));
             newsym(mon->mx, mon->my);
         }
+        obj_extract_self(obj);
         /* might be dropping object into water or lava */
         if (!flooreffects(obj, mon->mx, mon->my, "drop")) {
             if (polyspot)

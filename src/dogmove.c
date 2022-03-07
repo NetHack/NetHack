@@ -1,4 +1,4 @@
-/* NetHack 3.7	dogmove.c	$NHDT-Date: 1646652766 2022/03/07 11:32:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $ */
+/* NetHack 3.7	dogmove.c	$NHDT-Date: 1646688063 2022/03/07 21:21:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.112 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -222,7 +222,7 @@ dog_eat(struct monst *mtmp,
     boolean poly, grow, heal, eyes, slimer, deadmimic;
     int nutrit, res, corpsenm;
     long oprice;
-    char objnambuf[BUFSZ];
+    char objnambuf[BUFSZ], *obj_name;
 
     objnambuf[0] = '\0';
     if (edog->hungrytime < g.moves)
@@ -288,14 +288,18 @@ dog_eat(struct monst *mtmp,
            pet as "it".  However, we want "it" if invisible/unsensed
            pet eats visible food. */
         if (sawpet || (seeobj && canspotmon(mtmp))) {
+            /* call distant_name() for possible side-effects even if the
+               result won't be printed */
+            obj_name = distant_name(obj, doname);
             if (tunnels(mtmp->data))
                 pline("%s digs in.", noit_Monnam(mtmp));
             else
                 pline("%s %s %s.", noit_Monnam(mtmp),
-                      devour ? "devours" : "eats", distant_name(obj, doname));
-        } else if (seeobj)
-            pline("It %s %s.", devour ? "devours" : "eats",
-                  distant_name(obj, doname));
+                      devour ? "devours" : "eats", obj_name);
+        } else if (seeobj) {
+            obj_name = distant_name(obj, doname);
+            pline("It %s %s.", devour ? "devours" : "eats", obj_name);
+        }
     }
     if (obj->unpaid) {
         Strcpy(objnambuf, xname(obj));
@@ -316,9 +320,11 @@ dog_eat(struct monst *mtmp,
             costly_alteration(obj, COST_DEGRD);
         obj->oerodeproof = 0;
         mtmp->mstun = 1;
-        if (canseemon(mtmp) && flags.verbose) {
-            pline("%s spits %s out in disgust!", Monnam(mtmp),
-                  distant_name(obj, doname));
+        if (canseemon(mtmp)) {
+            obj_name = distant_name(obj, doname); /* (see above) */
+            if (flags.verbose)
+                pline("%s spits %s out in disgust!",
+                      Monnam(mtmp), obj_name);
         }
     } else if (obj == uball) {
         unpunish();
@@ -417,7 +423,7 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
 static int
 dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 {
-    register int omx, omy, carryamt = 0;
+    int omx, omy, carryamt = 0;
     struct obj *obj, *otmp;
 
     if (mtmp->msleeping || !mtmp->mcanmove)
@@ -465,15 +471,16 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                         if (carryamt != obj->quan)
                             otmp = splitobj(obj, carryamt);
                         if (cansee(omx, omy)) {
-                            if (otmp->oartifact) {
-                                otmp->dknown = 1; /* see mpickstuff() */
-                                find_artifact(otmp);
-                            }
+                            /* call distant_name() for possible side-effects
+                               even if the result won't be printed; should be
+                               done before extract+pickup for distant_name()
+                               -> doname() -> xname() -> find_artifact()
+                               while otmp is still on floor */
+                            char *otmpname = distant_name(otmp, doname);
+
                             if (flags.verbose)
-                                pline("%s picks up %s.", Monnam(mtmp),
-                                      ((distu(omx, omy) <= 5)
-                                       ? doname(otmp)
-                                       : distant_name(otmp, doname)));
+                                pline("%s picks up %s.",
+                                      Monnam(mtmp), otmpname);
                         }
                         obj_extract_self(otmp);
                         newsym(omx, omy);

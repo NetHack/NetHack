@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1646652768 2022/03/07 11:32:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.414 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1646688064 2022/03/07 21:21:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.415 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1097,10 +1097,11 @@ movemon(void)
  * has young and old forms).
  */
 int
-meatmetal(register struct monst* mtmp)
+meatmetal(struct monst *mtmp)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     struct permonst *ptr;
+    char *otmpname;
     int poly, grow, heal, mstone, vis = canseemon(mtmp);
 
     /* If a pet, eating is handled separately, in dog.c */
@@ -1118,24 +1119,33 @@ meatmetal(register struct monst* mtmp)
         if (is_metallic(otmp) && !obj_resists(otmp, 5, 95)
             && touch_artifact(otmp, mtmp)) {
             if (mtmp->data == &mons[PM_RUST_MONSTER] && otmp->oerodeproof) {
-                if (vis && flags.verbose) {
-                    pline("%s eats %s!", Monnam(mtmp),
-                          distant_name(otmp, doname));
+                if (vis) {
+                    /* call distant_name() for its side-effects even when
+                       !verbose so won't be printed */
+                    otmpname = distant_name(otmp, doname);
+                    if (flags.verbose)
+                        pline("%s eats %s!", Monnam(mtmp), otmpname);
                 }
                 /* The object's rustproofing is gone now */
                 otmp->oerodeproof = 0;
                 mtmp->mstun = 1;
-                if (vis && flags.verbose) {
-                    pline("%s spits %s out in disgust!", Monnam(mtmp),
-                          distant_name(otmp, doname));
+                if (vis) {
+                    /* (see above; format even if it won't be printed) */
+                    otmpname = distant_name(otmp, doname);
+                    if (flags.verbose)
+                        pline("%s spits %s out in disgust!",
+                              Monnam(mtmp), otmpname);
                 }
             } else {
-                /* [should this be canseemon()?] */
-                if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-                    pline("%s eats %s!", Monnam(mtmp),
-                          distant_name(otmp, doname));
-                else if (flags.verbose)
-                    You_hear("a crunching sound.");
+                if (cansee(mtmp->mx, mtmp->my)) {
+                    /* (see above; format even if it won't be printed) */
+                    otmpname = distant_name(otmp, doname);
+                    if (flags.verbose)
+                        pline("%s eats %s!", Monnam(mtmp), otmpname);
+                } else {
+                    if (flags.verbose)
+                        You_hear("a crunching sound.");
+                }
                 mtmp->meating = otmp->owt / 2 + 1;
                 /* Heal up to the object's weight in hp */
                 if (mtmp->mhp < mtmp->mhpmax) {
@@ -1200,7 +1210,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
     struct obj *otmp, *otmp2;
     struct permonst *ptr, *original_ptr = mtmp->data;
     int poly, grow, heal, eyes, count = 0, ecount = 0, vis = canseemon(mtmp);
-    char buf[BUFSZ];
+    char buf[BUFSZ], *otmpname;
 
     buf[0] = '\0';
     /* If a pet, eating is handled separately, in dog.c */
@@ -1261,9 +1271,11 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                        && !slimeproof(mtmp->data))) {
             /* engulf */
             ++ecount;
+            /* call distant_name() for its possible side-effects even if
+               the result won't be printed */
+            otmpname = distant_name(otmp, doname);
             if (ecount == 1)
-                Sprintf(buf, "%s engulfs %s.", Monnam(mtmp),
-                        distant_name(otmp, doname));
+                Sprintf(buf, "%s engulfs %s.", Monnam(mtmp), otmpname);
             else if (ecount == 2)
                 Sprintf(buf, "%s engulfs several objects.", Monnam(mtmp));
             obj_extract_self(otmp);
@@ -1274,9 +1286,10 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
             /* devour */
             ++count;
             if (cansee(mtmp->mx, mtmp->my)) {
+                /* (see above; distant_name() sometimes has side-effects */
+                otmpname = distant_name(otmp, doname);
                 if (flags.verbose)
-                    pline("%s eats %s!", Monnam(mtmp),
-                          distant_name(otmp, doname));
+                    pline("%s eats %s!", Monnam(mtmp), otmpname);
                 /* give this one even if !verbose */
                 if (otmp->oclass == SCROLL_CLASS
                     && objdescr_is(otmp, "YUM YUM"))
@@ -1389,8 +1402,12 @@ meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters 
             otmp = splitobj(otmp, 1L);
 
         if (cansee(x, y) && canseemon(mtmp)) {
+            /* call distant_name() for its possible side-effects even if
+               the result won't be printed */
+            char *otmpname = distant_name(otmp, doname);
+
             if (flags.verbose)
-                pline("%s eats %s!", Monnam(mtmp), distant_name(otmp, doname));
+                pline("%s eats %s!", Monnam(mtmp), otmpname);
         } else {
             if (flags.verbose)
                 You_hear("a masticating sound.");
@@ -1553,24 +1570,13 @@ mpickstuff(struct monst *mtmp, const char *str)
                 otmp3 = splitobj(otmp, carryamt);
             }
             if (cansee(mtmp->mx, mtmp->my)) {
-                /* find an artifact as monster picks it up if its location
-                   can be seen, even if monster itself can't be seen or
-                   is far away at the time; the longer distance than for
-                   seeing item "up close" is mostly for pets rummaging in
-                   shops; we prefer to have an artifact in such situation
-                   described as 'found in a shop' or 'found on floor' now
-                   rather than 'carried by a monster' when later dropped */
-                if (otmp3->oartifact) {
-                    otmp3->dknown = 1;
-                    find_artifact(otmp3);
-                }
+                /* call distant_name() for its possible side-effects even
+                   if the result won't be printed; do it before the extract
+                   from floor and subsequent pickup by mtmp */
+                char *otmpname = distant_name(otmp, doname);
 
                 if (flags.verbose)
-                    /* see 'otmp3' "up close" if within a knight's jump */
-                    pline("%s picks up %s.", Monnam(mtmp),
-                          ((distu(mtmp->mx, mtmp->my) <= 5)
-                           ? doname(otmp3)
-                           : distant_name(otmp3, doname)));
+                    pline("%s picks up %s.", Monnam(mtmp), otmpname);
             }
             obj_extract_self(otmp3);      /* remove from floor */
             (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1620329779 2021/05/06 19:36:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.143 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1646688066 2022/03/07 21:21:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.159 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1993,7 +1993,8 @@ mloot_container(
         container->cknown = 0; /* hero no longer knows container's contents
                                 * even if [attempted] removal is observed */
         if (!*contnr_nam) {
-            /* xname sets dknown, distant_name doesn't */
+            /* xname sets dknown, distant_name might depending on its own
+               idea about nearness */
             Strcpy(contnr_nam, an(nearby ? xname(container)
                                          : distant_name(container, xname)));
         }
@@ -2563,10 +2564,9 @@ mon_consume_unstone(
 
         obj->quan = 1L;
         pline("%s %s %s.", Monnam(mon),
-              (obj->oclass == POTION_CLASS)
-                  ? "quaffs"
-                  : (obj->otyp == TIN) ? "opens and eats the contents of"
-                                       : "eats",
+              ((obj->oclass == POTION_CLASS) ? "quaffs"
+               : (obj->otyp == TIN) ? "opens and eats the contents of"
+                 : "eats"),
               distant_name(obj, doname));
         obj->quan = save_quan;
     } else if (!Deaf)

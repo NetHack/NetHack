@@ -1,4 +1,4 @@
-/* NetHack 3.7	artifact.c	$NHDT-Date: 1646652747 2022/03/07 11:32:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.180 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1646688062 2022/03/07 21:21:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -285,7 +285,7 @@ artifact_exists(
     return;
 }
 
-/* make an artifact as 'found' */
+/* mark an artifact as 'found' */
 void
 found_artifact(int a)
 {
@@ -1427,13 +1427,16 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                 drain = (mhpmax > m_lev) ? (mhpmax - (m_lev + 1)) : 0;
 
             if (vis) {
+                /* call distant_name() for possible side-effects even if
+                   the result won't be printed */
+                char *otmpname = distant_name(otmp, xname);
+
                 if (otmp->oartifact == ART_STORMBRINGER)
                     pline_The("%s blade draws the %s from %s!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
                 else
                     pline("%s draws the %s from %s!",
-                          The(distant_name(otmp, xname)), life,
-                          mon_nam(mdef));
+                          The(otmpname), life, mon_nam(mdef));
             }
             if (mdef->m_lev == 0) {
                 /* losing a level when at 0 is fatal */
@@ -1459,17 +1462,23 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
         } else { /* youdefend */
             int oldhpmax = u.uhpmax;
 
-            if (Blind)
+            if (Blind) {
                 You_feel("an %s drain your %s!",
                          (otmp->oartifact == ART_STORMBRINGER)
                             ? "unholy blade"
                             : "object",
                          life);
-            else if (otmp->oartifact == ART_STORMBRINGER)
-                pline_The("%s blade drains your %s!", hcolor(NH_BLACK), life);
-            else
-                pline("%s drains your %s!", The(distant_name(otmp, xname)),
-                      life);
+            } else {
+                /* call distant_name() for possible side-effects even if
+                   the result won't be printed */
+                char *otmpname = distant_name(otmp, xname);
+
+                if (otmp->oartifact == ART_STORMBRINGER)
+                    pline_The("%s blade drains your %s!",
+                              hcolor(NH_BLACK), life);
+                else
+                    pline("%s drains your %s!", The(otmpname), life);
+            }
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
                 magr->mhp += (oldhpmax - u.uhpmax + 1) / 2;
