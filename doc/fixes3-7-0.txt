@@ -134,6 +134,7 @@ tribute (Discworld snippets) typos, in book order rather than fix order:
 	The Truth #1, italicize several words
 	Thief of Time #2, "gold starts" -> "gold stars"
 	A Hat Full of Sky passage #9 "though" -> "thought"
+	Death quotes #29, "metaphore" -> "metaphor"
 	various, including Death quotes:  use two spaces to separate sentences
 unicorn corpses and wraith corpses could be sacrificed even if "too old"
 hero polymorphed into a hider and hiding was not unhidden when teleporting
