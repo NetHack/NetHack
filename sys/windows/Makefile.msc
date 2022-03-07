@@ -314,7 +314,7 @@ LUAVER=5.4.4
 LUALIB   = $(O)lua$(LUAVER)-static.lib
 LUADLL   = $(O)lua$(LUAVER).dll
 LUAINCL  = /I$(LUASRC)
-LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+LUATARGETS = lua.exe $(LUADLL) $(LUALIB)
 
 LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c              \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
