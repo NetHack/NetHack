@@ -377,11 +377,12 @@ dipfountain(register struct obj *obj)
         return;
     }
 
-    /* Don't grant Excalibur when there's more than one object.  */
-    /* (quantity could be > 1 if merged daggers got polymorphed) */
-    if (obj->otyp == LONG_SWORD && obj->quan == 1L && u.ulevel >= 5 && !rn2(6)
-        && !obj->oartifact
+    if (obj->otyp == LONG_SWORD && u.ulevel >= 5 && !rn2(6)
+        /* once upon a time it was possible to poly N daggers into N swords */
+        && obj->quan == 1L && !obj->oartifact
         && !exist_artifact(LONG_SWORD, artiname(ART_EXCALIBUR))) {
+        static const char lady[] = "Lady of the Lake";
+
         if (u.ualign.type != A_LAWFUL) {
             /* Ha!  Trying to cheat her. */
             pline("A freezing mist rises from the %s and envelopes the sword.",
@@ -392,20 +393,23 @@ dipfountain(register struct obj *obj)
                 obj->spe--;
             obj->oerodeproof = FALSE;
             exercise(A_WIS, FALSE);
-            livelog_printf(LL_ARTIFACT, "was denied Excalibur! The Lady of the Lake has deemed %s unworthy", uhim());
+            livelog_printf(LL_ARTIFACT,
+                           "was denied %s!  The %s has deemed %s unworthy",
+                           artiname(ART_EXCALIBUR), lady, uhim());
         } else {
             /* The lady of the lake acts! - Eric Backus */
             /* Be *REAL* nice */
             pline(
               "From the murky depths, a hand reaches up to bless the sword.");
             pline("As the hand retreats, the fountain disappears!");
-            obj = oname(obj, artiname(ART_EXCALIBUR));
+            obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
             discover_artifact(ART_EXCALIBUR);
             bless(obj);
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;
             exercise(A_WIS, TRUE);
-            livelog_printf(LL_ARTIFACT, "was given Excalibur");
+            livelog_printf(LL_ARTIFACT, "was given %s by the %s",
+                           artiname(ART_EXCALIBUR), lady);
         }
         update_inventory();
         levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;

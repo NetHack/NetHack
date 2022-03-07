@@ -352,7 +352,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
     if (!obj2->oextra)
         obj2->oextra = newoextra();
     if (has_oname(obj1))
-        oname(obj2, ONAME(obj1));
+        oname(obj2, ONAME(obj1), ONAME_NO_FLAGS);
     if (has_omonst(obj1)) {
         if (!OMONST(obj2))
             newomonst(obj2);
@@ -1127,7 +1127,7 @@ mksobj(int otyp, boolean init, boolean artif)
         break;
     case SPE_NOVEL:
         otmp->novelidx = -1; /* "none of the above"; will be changed */
-        otmp = oname(otmp, noveltitle(&otmp->novelidx));
+        otmp = oname(otmp, noveltitle(&otmp->novelidx), ONAME_NO_FLAGS);
         break;
     }
 
@@ -2044,7 +2044,7 @@ mk_named_object(
 
     otmp = mkcorpstat(objtype, (struct monst *) 0, ptr, x, y, corpstatflags);
     if (nm)
-        otmp = oname(otmp, nm);
+        otmp = oname(otmp, nm, ONAME_NO_FLAGS);
     return otmp;
 }
 
@@ -2280,7 +2280,7 @@ discard_minvent(struct monst *mtmp, boolean uncreate_artifacts)
         /* this has now become very similar to m_useupall()... */
         extract_from_minvent(mtmp, otmp, TRUE, TRUE);
         if (uncreate_artifacts && otmp->oartifact)
-            artifact_exists(otmp, safe_oname(otmp), FALSE);
+            artifact_exists(otmp, safe_oname(otmp), FALSE, FALSE);
         obfree(otmp, (struct obj *) 0); /* dealloc_obj() isn't sufficient */
     }
 }

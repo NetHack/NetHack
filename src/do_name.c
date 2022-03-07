@@ -1300,16 +1300,16 @@ do_oname(register struct obj *obj)
            a valid artifact name */
         u.uconduct.literate++;
     }
-    ++g.via_naming; /* This ought to be an argument rather than a static... */
-    obj = oname(obj, buf);
-    --g.via_naming; /* ...but oname() is used in a lot of places, so defer. */
+    obj = oname(obj, buf, ONAME_VIA_NAMING);
 }
 
 struct obj *
-oname(struct obj *obj, const char *name)
+oname(struct obj *obj, const char *name, unsigned oflgs)
 {
     int lth;
     char buf[PL_PSIZ];
+    boolean via_naming = (oflgs & ONAME_VIA_NAMING) != 0,
+            found_arti = (oflgs & ONAME_FOUND_ARTI) != 0;
 
     lth = *name ? (int) (strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
@@ -1318,9 +1318,9 @@ oname(struct obj *obj, const char *name)
         buf[PL_PSIZ - 1] = '\0';
     }
     /* If named artifact exists in the game, do not create another.
-     * Also trying to create an artifact shouldn't de-artifact
-     * it (e.g. Excalibur from prayer). In this case the object
-     * will retain its current name. */
+       Also trying to create an artifact shouldn't de-artifact
+       it (e.g. Excalibur from prayer). In this case the object
+       will retain its current name. */
     if (obj->oartifact || (lth && exist_artifact(obj->otyp, name)))
         return obj;
 
@@ -1329,7 +1329,7 @@ oname(struct obj *obj, const char *name)
         Strcpy(ONAME(obj), name);
 
     if (lth)
-        artifact_exists(obj, name, TRUE);
+        artifact_exists(obj, name, TRUE, via_naming || found_arti);
     if (obj->oartifact) {
         /* can't dual-wield with artifact as secondary weapon */
         if (obj == uswapwep)
@@ -1340,7 +1340,7 @@ oname(struct obj *obj, const char *name)
         /* if obj is owned by a shop, increase your bill */
         if (obj->unpaid)
             alter_cost(obj, 0L);
-        if (g.via_naming) {
+        if (via_naming) {
             /* violate illiteracy conduct since successfully wrote arti-name */
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT | LL_ARTIFACT,

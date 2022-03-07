@@ -678,7 +678,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         bypass_obj(obj);
 
     if (has_mgivenname(mtmp))
-        obj = oname(obj, MGIVENNAME(mtmp));
+        obj = oname(obj, MGIVENNAME(mtmp), ONAME_NO_FLAGS);
 
     /*  Avoid "It was hidden under a green mold corpse!"
      *  during Blind combat. An unseen monster referred to as "it"
@@ -1514,7 +1514,7 @@ mpickgold(register struct monst* mtmp)
 }
 
 boolean
-mpickstuff(register struct monst* mtmp, register const char* str)
+mpickstuff(struct monst *mtmp, const char *str)
 {
     register struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
@@ -1552,11 +1552,14 @@ mpickstuff(register struct monst* mtmp, register const char* str)
             if (carryamt != otmp->quan) {
                 otmp3 = splitobj(otmp, carryamt);
             }
-            if (cansee(mtmp->mx, mtmp->my) && flags.verbose)
-                pline("%s picks up %s.", Monnam(mtmp),
-                      (distu(mtmp->mx, mtmp->my) <= 5)
-                          ? doname(otmp3)
-                          : distant_name(otmp3, doname));
+            if (cansee(mtmp->mx, mtmp->my)) {
+                if (flags.verbose)
+                    /* see 'otmp3' "up close" if within a knight's jump */
+                    pline("%s picks up %s.", Monnam(mtmp),
+                          ((distu(mtmp->mx, mtmp->my) <= 5)
+                           ? doname(otmp3)
+                           : distant_name(otmp3, doname)));
+            }
             obj_extract_self(otmp3);      /* remove from floor */
             (void) mpickobj(mtmp, otmp3); /* may merge and free otmp3 */
             m_dowear(mtmp, FALSE);
@@ -2793,7 +2796,7 @@ monstone(struct monst* mdef)
             corpstatflags |= CORPSTAT_HISTORIC;
         otmp = mkcorpstat(STATUE, mdef, mdef->data, x, y, corpstatflags);
         if (has_mgivenname(mdef))
-            otmp = oname(otmp, MGIVENNAME(mdef));
+            otmp = oname(otmp, MGIVENNAME(mdef), ONAME_NO_FLAGS);
         while ((obj = oldminvent) != 0) {
             oldminvent = obj->nobj;
             obj->nobj = 0; /* avoid merged-> obfree-> dealloc_obj-> panic */
@@ -3038,7 +3041,7 @@ xkilled(
                 /* oc_big is also oc_bimanual and oc_bulky */
                 && (otmp->owt > 30 || objects[otyp].oc_big)) {
                 if (otmp->oartifact)
-                    artifact_exists(otmp, safe_oname(otmp), FALSE);
+                    artifact_exists(otmp, safe_oname(otmp), FALSE, FALSE);
                 delobj(otmp);
             } else if (!flooreffects(otmp, x, y, nomsg ? "" : "fall")) {
                 place_object(otmp, x, y);

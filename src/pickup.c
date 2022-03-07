@@ -2609,7 +2609,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
                now rather than from when this special corpse got created */
             deadcat->age = g.moves;
             set_corpsenm(deadcat, PM_HOUSECAT);
-            deadcat = oname(deadcat, sc);
+            deadcat = oname(deadcat, sc, ONAME_NO_FLAGS);
         }
         if (givemsg)
             pline_The("%s inside the box is dead!",

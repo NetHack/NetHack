@@ -852,7 +852,7 @@ gcrownu(void)
             Strcpy(lbuf, simpleonames(obj)); /* before transformation */
             if (!Blind)
                 Your("sword shines brightly for a moment.");
-            obj = oname(obj, artiname(ART_EXCALIBUR));
+            obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
             if (obj && obj->oartifact == ART_EXCALIBUR) {
                 u.ugifts++;
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
@@ -870,10 +870,10 @@ gcrownu(void)
             ; /* already got bonus above */
         } else if (obj && in_hand) {
             Your("%s goes snicker-snack!", xname(obj));
-            obj->dknown = TRUE;
+            obj->dknown = 1;
         } else if (!already_exists) {
             obj = mksobj(LONG_SWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_VORPAL_BLADE));
+            obj = oname(obj, artiname(ART_VORPAL_BLADE), ONAME_FOUND_ARTI);
             obj->spe = 1;
             at_your_feet("A sword");
             dropy(obj);
@@ -894,10 +894,10 @@ gcrownu(void)
             ; /* already got bonus above */
         } else if (obj && in_hand) {
             Your("%s hums ominously!", swordbuf);
-            obj->dknown = TRUE;
+            obj->dknown = 1;
         } else if (!already_exists) {
             obj = mksobj(RUNESWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_STORMBRINGER));
+            obj = oname(obj, artiname(ART_STORMBRINGER), ONAME_FOUND_ARTI);
             obj->spe = 1;
             at_your_feet(An(swordbuf));
             dropy(obj);

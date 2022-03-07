@@ -1364,7 +1364,7 @@ tt_oname(struct obj* otmp)
         otmp->spe = CORPSTAT_FEMALE;
     else if (tt->plgend[0] == 'M')
         otmp->spe = CORPSTAT_MALE;
-    otmp = oname(otmp, tt->name);
+    otmp = oname(otmp, tt->name, ONAME_NO_FLAGS);
 
     return otmp;
 }

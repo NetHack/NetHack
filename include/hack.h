@@ -371,6 +371,11 @@ typedef struct sortloot_item Loot;
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2
 
+/* Flags for oname() */
+#define ONAME_NO_FLAGS   0U /* none of the below */
+#define ONAME_VIA_NAMING 1U /* oname() is being called by do_oname() */
+#define ONAME_FOUND_ARTI 2U /* if an artifact, hero becomes aware of it */
+
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */
 #define FM_MIGRATE 0x02 /* search the migrating monster chain */

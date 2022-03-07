@@ -39,6 +39,23 @@ static int count_surround_traps(int, int);
    of hit points that will fit in a 15 bit integer. */
 #define FATAL_DAMAGE_MODIFIER 200
 
+/* artifact tracking */
+struct arti_info {
+    Bitfield(exists, 1); /* True if corresponding artifact has been created */
+    Bitfield(found, 1);  /* True if artifact is known by hero to exist */
+};
+/* array of flags tracking which artifacts exist, indexed by ART_xx;
+   ART_xx values are 1..N, element [0] isn't used */
+static struct arti_info artiexist[1 + NROFARTIFACTS];
+/* discovery list; for N discovered artifacts, the first N entries are ART_xx
+   values in discovery order, the remaining (NROFARTIFACTS-N) slots are 0 */
+static xchar artidisco[NROFARTIFACTS];
+/* note: artiexist[] and artidisco[] don't need to be in struct g; they
+ * get explicitly initialized at game start so don't need to be part of
+ * bulk re-init if game restart ever gets implemented.  They are saved
+ * and restored but that is done through this file so they can be local.
+ */
+
 static void hack_artifacts(void);
 static boolean attacks(int, struct obj *);
 
@@ -70,8 +87,8 @@ hack_artifacts(void)
 void
 init_artifacts(void)
 {
-    (void) memset((genericptr_t) g.artiexist, 0, sizeof g.artiexist);
-    (void) memset((genericptr_t) g.artidisco, 0, sizeof g.artidisco);
+    (void) memset((genericptr_t) artiexist, 0, sizeof artiexist);
+    (void) memset((genericptr_t) artidisco, 0, sizeof artidisco);
     hack_artifacts();
 }
 
@@ -79,8 +96,8 @@ void
 save_artifacts(NHFILE *nhfp)
 {
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
-        bwrite(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
+        bwrite(nhfp->fd, (genericptr_t) artiexist, sizeof artiexist);
+        bwrite(nhfp->fd, (genericptr_t) artidisco, sizeof artidisco);
     }
 }
 
@@ -88,8 +105,8 @@ void
 restore_artifacts(NHFILE *nhfp)
 {
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.artiexist, sizeof g.artiexist);
-        mread(nhfp->fd, (genericptr_t) g.artidisco, sizeof g.artidisco);
+        mread(nhfp->fd, (genericptr_t) artiexist, sizeof artiexist);
+        mread(nhfp->fd, (genericptr_t) artidisco, sizeof artidisco);
     }
     hack_artifacts();	/* redo non-saved special cases */
 }
@@ -114,8 +131,9 @@ artiname(int artinum)
    for the 1st, ``obj = mk_artifact((struct obj *)0, some_alignment);''.
  */
 struct obj *
-mk_artifact(struct obj *otmp,   /* existing object; ignored if alignment specified */
-            aligntyp alignment) /* target alignment, or A_NONE */
+mk_artifact(
+    struct obj *otmp,   /* existing object; ignored if alignment specified */
+    aligntyp alignment) /* target alignment, or A_NONE */
 {
     const struct artifact *a;
     int m, n, altn;
@@ -128,7 +146,7 @@ mk_artifact(struct obj *otmp,   /* existing object; ignored if alignment specifi
     eligible[0] = 0; /* lint suppression */
     /* gather eligible artifacts */
     for (m = 1, a = &artilist[m]; a->otyp; a++, m++) {
-        if (g.artiexist[m])
+        if (artiexist[m].exists)
             continue;
         if ((a->spfx & SPFX_NOGEN) || unique)
             continue;
@@ -186,9 +204,10 @@ mk_artifact(struct obj *otmp,   /* existing object; ignored if alignment specifi
             otmp = mksobj((int) a->otyp, TRUE, FALSE);
 
         if (otmp) {
-            otmp = oname(otmp, a->name);
+            otmp = oname(otmp, a->name, ONAME_NO_FLAGS);
             otmp->oartifact = m;
-            g.artiexist[m] = TRUE;
+            artiexist[m].exists = 1;
+            artiexist[m].found = 0;
         }
     } else {
         /* nothing appropriate could be found; return original object */
@@ -232,43 +251,66 @@ boolean
 exist_artifact(int otyp, const char *name)
 {
     register const struct artifact *a;
-    boolean *arex;
+    struct arti_info *arex;
 
     if (otyp && *name)
-        for (a = artilist + 1, arex = g.artiexist + 1; a->otyp; a++, arex++)
+        for (a = artilist + 1, arex = artiexist + 1; a->otyp; a++, arex++)
             if ((int) a->otyp == otyp && !strcmp(a->name, name))
-                return *arex;
+                return arex->exists ? TRUE : FALSE;
     return FALSE;
 }
 
 void
-artifact_exists(struct obj *otmp, const char *name, boolean mod)
+artifact_exists(
+    struct obj *otmp,
+    const char *name,
+    boolean mod,      /* True: exists, False: being uncreated */
+    boolean knwn)     /* True: hero knows it exists */
 {
     register const struct artifact *a;
 
     if (otmp && *name)
         for (a = artilist + 1; a->otyp; a++)
             if (a->otyp == otmp->otyp && !strcmp(a->name, name)) {
-                register int m = (int) (a - artilist);
+                int m = (int) (a - artilist);
+
                 otmp->oartifact = (char) (mod ? m : 0);
                 otmp->age = 0;
                 if (otmp->otyp == RIN_INCREASE_DAMAGE)
                     otmp->spe = 0;
-                g.artiexist[m] = mod;
+                artiexist[m].exists = mod ? 1 : 0;
+                artiexist[m].found = (mod && knwn) ? 1 : 0;
                 break;
             }
     return;
 }
 
+/* make an artifact as 'found' */
+void
+found_artifact(int a)
+{
+    artiexist[a].found = 1;
+}
+
+/* if an artifact hasn't already been designated 'found', do that now */
+void
+find_artifact(struct obj *otmp)
+{
+    int a = otmp->oartifact;
+
+    if (a && !artiexist[a].found) {
+        found_artifact(a); /* artiexist[a].found = 1 */
+    }
+}
+
 int
 nartifact_exist(void)
 {
-    int a = 0;
-    int n = SIZE(g.artiexist);
+    int i, a = 0;
 
-    while (n > 1)
-        if (g.artiexist[--n])
-            a++;
+    for (i = 1; i <= NROFARTIFACTS; ++i)
+        if (artiexist[i].exists)
+            ++a;
 
     return a;
 }
@@ -861,8 +903,9 @@ discover_artifact(xchar m)
     /* look for this artifact in the discoveries list;
        if we hit an empty slot then it's not present, so add it */
     for (i = 0; i < NROFARTIFACTS; i++)
-        if (g.artidisco[i] == 0 || g.artidisco[i] == m) {
-            g.artidisco[i] = m;
+        if (artidisco[i] == 0 || artidisco[i] == m) {
+            artidisco[i] = m;
+            artiexist[i].found = 1; /* (we expect this to already be set) */
             return;
         }
     /* there is one slot per artifact, so we should never reach the
@@ -879,9 +922,9 @@ undiscovered_artifact(xchar m)
     /* look for this artifact in the discoveries list;
        if we hit an empty slot then it's undiscovered */
     for (i = 0; i < NROFARTIFACTS; i++)
-        if (g.artidisco[i] == m)
+        if (artidisco[i] == m)
             return FALSE;
-        else if (g.artidisco[i] == 0)
+        else if (artidisco[i] == 0)
             break;
     return TRUE;
 }
@@ -894,14 +937,14 @@ disp_artifact_discoveries(winid tmpwin) /* supplied by dodiscover() */
     char buf[BUFSZ];
 
     for (i = 0; i < NROFARTIFACTS; i++) {
-        if (g.artidisco[i] == 0)
+        if (artidisco[i] == 0)
             break; /* empty slot implies end of list */
         if (tmpwin == WIN_ERR)
             continue; /* for WIN_ERR, we just count */
 
         if (i == 0)
             putstr(tmpwin, iflags.menu_headings, "Artifacts");
-        m = g.artidisco[i];
+        m = artidisco[i];
         otyp = artilist[m].otyp;
         Sprintf(buf, "  %s [%s %s]", artiname(m),
                 align_str(artilist[m].alignment), simple_typename(otyp));

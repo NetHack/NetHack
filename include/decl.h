@@ -421,7 +421,6 @@ struct plinemsg_type {
 /* bitmask for callers of hide_unhide_msgtypes() */
 #define MSGTYP_MASK_REP_SHOW ((1 << MSGTYP_NOREP) | (1 << MSGTYP_NOSHOW))
 
-
 enum bcargs {override_restriction = -1};
 struct breadcrumbs {
     const char *funcnm;
@@ -701,10 +700,6 @@ struct instance_globals {
     /* artifcat.c */
     int spec_dbon_applies; /* coordinate effects from spec_dbon() with
                               messages in artifact_hit() */
-    /* flags including which artifacts have already been created */
-    boolean artiexist[1 + NROFARTIFACTS + 1];
-    /* and a discovery list for them (no dummy first entry here) */
-    xchar artidisco[NROFARTIFACTS];
     int mkot_trap_warn_count;
 
     /* botl.c */
@@ -864,7 +859,6 @@ struct instance_globals {
     /* do_name.c */
     struct selectionvar *gloc_filter_map;
     int gloc_filter_floodfill_match_glyph;
-    int via_naming;
 
     /* do_wear.c */
     /* starting equipment gets auto-worn at beginning of new game,

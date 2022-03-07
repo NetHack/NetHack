@@ -492,7 +492,7 @@ steal(struct monst* mtmp, char* objnambuf)
 
 /* Returns 1 if otmp is free'd, 0 otherwise. */
 int
-mpickobj(register struct monst* mtmp, register struct obj* otmp)
+mpickobj(struct monst *mtmp, struct obj *otmp)
 {
     int freed_otmp;
     boolean snuff_otmp = FALSE;
@@ -706,7 +706,7 @@ mdrop_obj(
    even leaving the game entirely; when that happens, prevent them from
    taking the Amulet, invocation items, or quest artifact with them */
 void
-mdrop_special_objs(struct monst* mon)
+mdrop_special_objs(struct monst *mon)
 {
     struct obj *obj, *otmp;
 

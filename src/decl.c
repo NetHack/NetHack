@@ -202,8 +202,6 @@ const struct instance_globals g_init = {
 
     /* artifact.c */
     0,  /* spec_dbon_applies */
-    UNDEFINED_VALUES, /* artiexist */
-    UNDEFINED_VALUES, /* artdisco */
     0, /* mkot_trap_warn_count */
 
     /* botl.c */
@@ -352,7 +350,6 @@ const struct instance_globals g_init = {
     /* do_name.c */
     NULL, /* gloc_filter_map */
     UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
-    0, /* via_naming */
 
     /* do_wear.c */
     FALSE, /* initial_don */

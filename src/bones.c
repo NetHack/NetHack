@@ -70,7 +70,7 @@ resetobjs(struct obj *ochain, boolean restore)
                     if (has_oname(otmp))
                         free_oname(otmp);
                 } else {
-                    artifact_exists(otmp, safe_oname(otmp), TRUE);
+                    artifact_exists(otmp, safe_oname(otmp), TRUE, FALSE);
                 }
             } else if (has_oname(otmp)) {
                 sanitize_name(ONAME(otmp));

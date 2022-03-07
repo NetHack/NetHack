@@ -2311,6 +2311,9 @@ record_achievement(schar achidx)
                       ? g.context.achieveo.soko_prize_otyp
                       : g.context.achieveo.mines_prize_otyp);
 
+        /* note: OBJ_NAME() works here because both "bag of holding" and
+           "amulet of reflection" are fully named in their objects[] entry
+           but that's not true in the general case */
         livelog_printf(achieve_msg[achidx].llflag, "%s %s",
                        achieve_msg[achidx].msg, OBJ_NAME(objects[otyp]));
     } else {

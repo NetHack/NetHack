@@ -326,7 +326,8 @@ m_initweap(register struct monst *mtmp)
             /* maybe make it special */
             if (!rn2(20) || is_lord(ptr))
                 otmp = oname(otmp,
-                             artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD));
+                             artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD),
+                             ONAME_NO_FLAGS);
             bless(otmp);
             otmp->oerodeproof = TRUE;
             otmp->spe = rn2(4);

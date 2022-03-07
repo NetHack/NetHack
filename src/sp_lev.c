@@ -2152,7 +2152,7 @@ create_object(object* o, struct mkroom* croom)
     /* set_corpsenm() took care of egg hatch and corpse timers */
 
     if (named) {
-        otmp = oname(otmp, o->name.str);
+        otmp = oname(otmp, o->name.str, ONAME_NO_FLAGS);
         if (otmp->otyp == SPE_NOVEL) {
             /* needs to be an existing title */
             (void) lookup_novel(o->name.str, &otmp->novelidx);
@@ -2215,7 +2215,7 @@ create_object(object* o, struct mkroom* croom)
             } else {
                 obj_extract_self(otmp);
                 if (otmp->oartifact)
-                    artifact_exists(otmp, safe_oname(otmp), FALSE);
+                    artifact_exists(otmp, safe_oname(otmp), FALSE, FALSE);
                 obfree(otmp, NULL);
                 return;
             }
