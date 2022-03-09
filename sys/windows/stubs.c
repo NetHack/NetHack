@@ -198,4 +198,23 @@ set_keyhandling_via_option(void)
 {
     return 1;
 }
+
+#ifdef CURSES_GRAPHICS
+struct window_procs curses_procs = {0};
+
+int curses_read_attrs(const char *attrs)
+{
+    return 0;
+}
+
+char *
+curses_fmt_attrs(char *outbuf)
+{
+    int attr = iflags.wc2_petattr;
+    outbuf[0] = '\0';
+    Sprintf(outbuf, "+unknown [%d]", attr);
+    return &outbuf[1];
+}
+#endif
+
 #endif /* TTYSTUBS */
