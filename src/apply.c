@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1629242800 2021/08/17 23:26:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.347 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1756,7 +1756,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     coord cc;
 
     /* attempt "jumping" spell if hero has no innate jumping ability */
-    if (!magic && !Jumping && known_spell(SPE_JUMPING))
+    if (!magic && !Jumping && known_spell(SPE_JUMPING) >= spe_Fresh)
         return spelleffects(SPE_JUMPING, FALSE);
 
     if (!magic && (nolimbs(g.youmonst.data) || slithy(g.youmonst.data))) {
@@ -1767,6 +1767,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     } else if (!magic && !Jumping) {
         You_cant("jump very far.");
         return ECMD_OK;
+
     /* if steed is immobile, can't do physical jump but can do spell one */
     } else if (!magic && u.usteed && stucksteed(FALSE)) {
         /* stucksteed gave "<steed> won't move" message */

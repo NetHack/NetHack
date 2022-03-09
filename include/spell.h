@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.h	$NHDT-Date: 1596498560 2020/08/03 23:49:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	spell.h	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
 /* Copyright 1986, M. Stephenson				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -15,6 +15,13 @@ struct spell {
     short sp_id;  /* spell id (== object.otyp) */
     xchar sp_lev; /* power level */
     int sp_know;  /* knowlege of spell */
+};
+
+enum spellknowledge {
+    spe_Forgotten  = -1, /* known but no longer castable */
+    spe_Unknown    =  0, /* not yet known */
+    spe_Fresh      =  1, /* castable if various casting criteria are met */
+    spe_GoingStale =  2  /* still castable but nearly forgotten */
 };
 
 /* levels of memory destruction with a scroll of amnesia */

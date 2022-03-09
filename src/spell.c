@@ -1,4 +1,4 @@
-/* NetHack 3.7	spell.c	$NHDT-Date: 1638499998 2021/12/03 02:53:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.7	spell.c	$NHDT-Date: 1646838390 2022/03/09 15:06:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
 /*      Copyright (c) M. Stephenson 1988                          */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -538,7 +538,11 @@ study_book(register struct obj* spellbook)
             if (spellid(i) == booktype || spellid(i) == NO_SPELL)
                 break;
         if (spellid(i) == booktype && spellknow(i) > KEEN / 10) {
-            You("know \"%s\" quite well already.", OBJ_NAME(objects[booktype]));
+            You("know \"%s\" quite well already.",
+                OBJ_NAME(objects[booktype]));
+            /* hero has just been told what spell this book is for; it may
+               have been undiscovered if spell was learned via divine gift */
+            makeknown(booktype);
             if (yn("Refresh your memory anyway?") == 'n')
                 return 0;
         }
@@ -1668,7 +1672,7 @@ dospellmenu(
 {
     winid tmpwin;
     int i, n, how, splnum;
-    char buf[BUFSZ], retentionbuf[24];
+    char buf[BUFSZ], retentionbuf[24], sep;
     const char *fmt;
     menu_item *selected;
     anything any;
@@ -1685,13 +1689,18 @@ dospellmenu(
      * given string and are of the form "a - ".
      */
     if (!iflags.menu_tab_sep) {
-        Sprintf(buf, "%-20s     Level %-12s Fail Retention", "    Name",
-                "Category");
+        Sprintf(buf, "%-20s     Level %-12s Fail Retention",
+                "    Name", "Category");
         fmt = "%-20s  %2d   %-12s %3d%% %9s";
+        sep = ' ';
     } else {
         Sprintf(buf, "Name\tLevel\tCategory\tFail\tRetention");
         fmt = "%s\t%-d\t%s\t%-d%%\t%s";
+        sep = '\t';
     }
+    if (wizard)
+        Sprintf(eos(buf), "%c%6s", sep, "turns");
+
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              iflags.menu_headings, buf, MENU_ITEMFLAGS_NONE);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
@@ -1700,6 +1709,8 @@ dospellmenu(
                 spelltypemnemonic(spell_skilltype(spellid(splnum))),
                 100 - percent_success(splnum),
                 spellretention(splnum, retentionbuf));
+        if (wizard)
+            Sprintf(eos(buf), "%c%6d", sep, spellknow(i));
 
         any.a_int = splnum + 1; /* must be non-zero */
         add_menu(tmpwin, &nul_glyphinfo, &any, spellet(splnum), 0,
@@ -1898,10 +1909,10 @@ spellretention(int idx, char * outbuf)
          * KEEN is a multiple of 100; KEEN/100 loses no precision.
          */
         percent = (turnsleft - 1L) / ((long) KEEN / 100L) + 1L;
-        accuracy =
-            (skill == P_EXPERT) ? 2L : (skill == P_SKILLED)
-                                           ? 5L
-                                           : (skill == P_BASIC) ? 10L : 25L;
+        accuracy = (skill == P_EXPERT) ? 2L
+                   : (skill == P_SKILLED) ? 5L
+                     : (skill == P_BASIC) ? 10L
+                       : 25L;
         /* round up to the high end of this range */
         percent = accuracy * ((percent - 1L) / accuracy + 1L);
         Sprintf(outbuf, "%ld%%-%ld%%", percent - accuracy + 1L, percent);
@@ -1932,16 +1943,20 @@ initialspell(struct obj* obj)
     return;
 }
 
-/* return TRUE if hero knows spell otyp, FALSE otherwise */
-boolean
+/* returns one of spe_Unknown, spe_Fresh, spe_GoingStale, spe_Forgotten */
+int
 known_spell(short otyp)
 {
-    int i;
+    int i, k;
 
     for (i = 0; (i < MAXSPELL) && (spellid(i) != NO_SPELL); i++)
-        if (spellid(i) == otyp)
-            return TRUE;
-    return FALSE;
+        if (spellid(i) == otyp) {
+            k = spellknow(i);
+            return (k > KEEN / 10) ? spe_Fresh
+                   : (k > 0) ? spe_GoingStale
+                     : spe_Forgotten;
+        }
+    return spe_Unknown;
 }
 
 /* return index for spell otyp, or UNKNOWN_SPELL if not found */
@@ -1956,27 +1971,30 @@ spell_idx(short otyp)
     return UNKNOWN_SPELL;
 }
 
-/* forcibly learn spell otyp, if possible */
-boolean
+/* learn or refresh spell otyp, if feasible; return casting letter or '\0' */
+char
 force_learn_spell(short otyp)
 {
     int i;
 
-    if (known_spell(otyp))
-        return FALSE;
+    if (otyp == SPE_BLANK_PAPER || otyp == SPE_BOOK_OF_THE_DEAD
+        || known_spell(otyp) == spe_Fresh)
+        return '\0';
 
     for (i = 0; i < MAXSPELL; i++)
-        if (spellid(i) == NO_SPELL)
+        if (spellid(i) == NO_SPELL || spellid(i) == otyp)
             break;
-    if (i == MAXSPELL)
+    if (i == MAXSPELL) {
         impossible("Too many spells memorized");
-    else {
-        g.spl_book[i].sp_id = otyp;
-        g.spl_book[i].sp_lev = objects[otyp].oc_level;
-        incrnknow(i, 1);
-        return TRUE;
+        return '\0';
     }
-    return FALSE;
+    /* for a going-stale or forgotten spell the sp_id and sp_lev assignments
+       are redundant but harmless; for an unknown spell, they're essential */
+    g.spl_book[i].sp_id = otyp;
+    g.spl_book[i].sp_lev = objects[otyp].oc_level;
+    incrnknow(i, 0); /* set spl_book[i].sp_know to KEEN; unlike when learning
+                      * a spell by reading its book, we don't need to add 1 */
+    return spellet(i);
 }
 
 /* number of spells hero knows */

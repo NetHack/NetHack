@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1646255373 2022/03/02 21:09:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1064 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1646838387 2022/03/09 15:06:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1068 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2543,9 +2543,9 @@ extern int tport_spell(int);
 extern void losespells(void);
 extern int dovspell(void);
 extern void initialspell(struct obj *);
-extern boolean known_spell(short);
+extern int known_spell(short);
 extern int spell_idx(short);
-extern boolean force_learn_spell(short);
+extern char force_learn_spell(short);
 extern int num_spells(void);
 
 /* ### steal.c ### */

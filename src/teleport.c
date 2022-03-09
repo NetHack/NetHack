@@ -1,4 +1,4 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1605305493 2020/11/13 22:11:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1646838392 2022/03/09 15:06:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -713,16 +713,15 @@ dotele(
         if (!Teleportation || (u.ulevel < (Role_if(PM_WIZARD) ? 8 : 12)
                                && !can_teleport(g.youmonst.data))) {
             /* Try to use teleport away spell. */
-            boolean knownsp = known_spell(SPE_TELEPORT_AWAY);
+            int knownsp = known_spell(SPE_TELEPORT_AWAY);
 
             /* casting isn't inhibited by being Stunned (...it ought to be) */
-            castit = (knownsp && !Confusion);
+            castit = (knownsp >= spe_Fresh && !Confusion);
             if (!castit && !break_the_rules) {
-                You("%s.",
-                    !Teleportation ? (knownsp
-                                        ? "can't cast that spell"
-                                        : "don't know that spell")
-                                   : "are not able to teleport at will");
+                You("%s.", (!Teleportation ? ((knownsp != spe_Unknown)
+                                              ? "can't cast that spell"
+                                              : "don't know that spell")
+                            : "are not able to teleport at will"));
                 return 0;
             }
         }
