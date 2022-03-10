@@ -5682,7 +5682,9 @@ txt2key(char *txt)
 void
 initoptions(void)
 {
+#ifdef SYSCF_FILE
     int i;
+#endif
 
     initoptions_init();
 #ifdef SYSCF
