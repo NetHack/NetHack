@@ -62,7 +62,7 @@ static xchar artidisco[NROFARTIFACTS];
  * bulk re-init if game restart ever gets implemented.  They are saved
  * and restored but that is done through this file so they can be local.
  */
-static const struct arti_info zero_artiexist; /* all bits zero */
+static const struct arti_info zero_artiexist = {0}; /* all bits zero */
 
 static void hack_artifacts(void);
 static boolean attacks(int, struct obj *);
