@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.838 $ $NHDT-Date: 1646694720 2022/03/07 23:12:00 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.839 $ $NHDT-Date: 1646953027 2022/03/10 22:57:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -834,6 +834,9 @@ clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
 	rest of giant's dropped inventory, subsequent sanity checks report
 	that there are buried objects which are 'flagged bypass']
 only give Sunsword or Demonbane as starting gear to lawful Angels
+for #knownclass with menustyle=Tradtional, allow player to ask for `a even if
+	no artifacts have been discovered yet, same as `<any-object-class>;
+	likewise for `u to ask to see unique items
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
