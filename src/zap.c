@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1646652775 2022/03/07 11:32:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.401 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1646870848 2022/03/10 00:07:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5554,7 +5554,7 @@ makewish(void)
     struct obj *otmp, nothing;
     long maybe_LL_arti;
     int tries = 0;
-    int prev_artwish = u.uconduct.wisharti;
+    int oldwisharti = u.uconduct.wisharti;
 
     promptbuf[0] = '\0';
     nothing = cg.zeroobj; /* lint suppression; only its address matters */
@@ -5595,22 +5595,30 @@ makewish(void)
         return;
     }
 
-    if (otmp->oartifact)
-        /* update artifact bookkeeping; doesn't produce a livelog event */
-        found_artifact(otmp->oartifact);
+    if (otmp != &cg.zeroobj) {
+        /* treat as if seen up close even if hero is blind and hasn't
+           touched it yet */
+        otmp->dknown = 1;
 
-    maybe_LL_arti = ((prev_artwish < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
+        if (otmp->oartifact)
+            /* update artifact bookkeeping; doesn't produce a livelog event */
+            artifact_wish(otmp, TRUE); /* calls found_artifact() */
+    }
+
+    /* wisharti conduct handled in readobjnam() */
+    maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
         livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
                        "made %s first wish - \"%s\"", uhis(), bufcpy);
-    else if (!prev_artwish && u.uconduct.wisharti) /* wisharti conduct handled
-                                                    * in readobjnam() above */
+    else if (!oldwisharti && u.uconduct.wisharti)
         livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
                        "made %s first artifact wish - \"%s\"", uhis(), bufcpy);
     else
         livelog_printf((LL_WISH | maybe_LL_arti),
                        "wished for \"%s\"", bufcpy);
+    /* TODO? maybe generate a second event decribing what was received since
+       those just echo player's request rather than show actual result */
 
     if (otmp != &cg.zeroobj) {
         const char

@@ -1,4 +1,4 @@
-/* NetHack 3.7	pray.c	$NHDT-Date: 1646838389 2022/03/09 15:06:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	pray.c	$NHDT-Date: 1646870846 2022/03/10 00:07:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -750,8 +750,9 @@ at_your_feet(const char *str)
               s_suffix(mon_nam(u.ustuck)), mbodypart(u.ustuck, STOMACH));
     } else {
         pline("%s %s %s your %s!", str,
-              Blind ? "lands" : vtense(str, "appear"),
-              Levitation ? "beneath" : "at", makeplural(body_part(FOOT)));
+              vtense(str, Blind ? "land" : "appear"),
+              Levitation ? "beneath" : "at",
+              makeplural(body_part(FOOT)));
     }
 }
 
@@ -829,9 +830,10 @@ gcrownu(void)
                                          * even if hero doesn't know book */
         bless(obj);
         obj->bknown = 1; /* ok to skip set_bknown() */
-        at_your_feet("A spellbook");
+        obj->dknown = 1;
+        at_your_feet(upstart(ansimpleoname(obj)));
         dropy(obj);
-        u.ugifts++;
+        u.ugifts++; /* bypass artifact_gift() */
         /* not an artifact, but treat like one for this situation;
            classify as a spoiler in case player hasn't IDed the book yet */
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER,
@@ -855,7 +857,7 @@ gcrownu(void)
                 Your("sword shines brightly for a moment.");
             obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
             if (obj && obj->oartifact == ART_EXCALIBUR) {
-                u.ugifts++;
+                artifact_gift(obj, TRUE); /* u.ugifts++; */
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                                "wielded %s transformed into %s",
                                lbuf, artiname(ART_EXCALIBUR));
@@ -878,7 +880,7 @@ gcrownu(void)
             obj->spe = 1;
             at_your_feet("A sword");
             dropy(obj);
-            u.ugifts++;
+            artifact_gift(obj, TRUE); /* u.ugifts++; */
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                            "bestowed with %s", artiname(ART_VORPAL_BLADE));
         }
@@ -902,7 +904,7 @@ gcrownu(void)
             obj->spe = 1;
             at_your_feet(An(swordbuf));
             dropy(obj);
-            u.ugifts++;
+            artifact_gift(obj, TRUE); /* u.ugifts++; */
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                            "bestowed with %s", artiname(ART_STORMBRINGER));
         }
@@ -1003,16 +1005,7 @@ give_spell(void)
         if (otmp->otyp == SPE_BLANK_PAPER || !rn2(100))
             makeknown(otmp->otyp);
         bless(otmp);
-        /* note: Hallucination case can't happen because we only get
-           called for a boon and boons are only bestowed if all troubles
-           (including hallucination) have been cured/repaired; might
-           apply in variants that offer "always high" as a play option
-           and classify hallucinating as not trouble or not fixable */
-        at_your_feet(Hallucination ? "A thesarus"
-                     : Blind ? "A spellbook"
-                       /* "An orange spellbook" or "A spellbook of knock"
-                          depending on discoveries */
-                       : upstart(ansimpleoname(otmp)));
+        at_your_feet(upstart(ansimpleoname(otmp)));
         place_object(otmp, u.ux, u.uy);
         newsym(u.ux, u.uy);
     }
@@ -1859,15 +1852,23 @@ dosacrifice(void)
                 && !rn2(10 + (2 * u.ugifts * nartifacts))) {
                 otmp = mk_artifact((struct obj *) 0, a_align(u.ux, u.uy));
                 if (otmp) {
+                    char buf[BUFSZ];
+
                     if (otmp->spe < 0)
                         otmp->spe = 0;
                     if (otmp->cursed)
                         uncurse(otmp);
                     otmp->oerodeproof = TRUE;
-                    at_your_feet("An object");
+                    Strcpy(buf, (Hallucination ? "a doodad"
+                                 : Blind ? "an object"
+                                   : ansimpleoname(otmp)));
+                    if (!Blind)
+                        Sprintf(eos(buf), " named %s",
+                                bare_artifactname(otmp));
+                    at_your_feet(upstart(buf));
                     dropy(otmp);
                     godvoice(u.ualign.type, "Use my gift wisely!");
-                    u.ugifts++;
+                    artifact_gift(otmp, TRUE); /* u.ugifts++; */
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
                     livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,

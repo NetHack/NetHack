@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1644347168 2022/02/08 19:06:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.231 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1646870842 2022/03/10 00:07:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1341,6 +1341,8 @@ oname(struct obj *obj, const char *name, unsigned oflgs)
         if (obj->unpaid)
             alter_cost(obj, 0L);
         if (via_naming) {
+            artifact_named(obj, TRUE);
+
             /* violate illiteracy conduct since successfully wrote arti-name */
             if (!u.uconduct.literate++)
                 livelog_printf(LL_CONDUCT | LL_ARTIFACT,

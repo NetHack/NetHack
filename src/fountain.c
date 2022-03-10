@@ -1,4 +1,4 @@
-/* NetHack 3.7	fountain.c	$NHDT-Date: 1596498170 2020/08/03 23:42:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.69 $ */
+/* NetHack 3.7	fountain.c	$NHDT-Date: 1646870844 2022/03/10 00:07:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -404,6 +404,7 @@ dipfountain(register struct obj *obj)
             pline("As the hand retreats, the fountain disappears!");
             obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
             discover_artifact(ART_EXCALIBUR);
+            artifact_viadip(obj, TRUE);
             bless(obj);
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	artifact.c	$NHDT-Date: 1646688062 2022/03/07 21:21:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.7	artifact.c	$NHDT-Date: 1646870837 2022/03/10 00:07:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.182 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -39,10 +39,17 @@ static int count_surround_traps(int, int);
    of hit points that will fit in a 15 bit integer. */
 #define FATAL_DAMAGE_MODIFIER 200
 
-/* artifact tracking */
+/* artifact tracking; gift and wish imply found; it also gets set for items
+   seen on the floor, in containers, and wielded or dropped by monsters */
 struct arti_info {
     Bitfield(exists, 1); /* True if corresponding artifact has been created */
     Bitfield(found, 1);  /* True if artifact is known by hero to exist */
+    Bitfield(gift, 1);   /* True if artifact was created as a prayer reward */
+    Bitfield(wish, 1);   /* True if artifact was created via wish */
+    Bitfield(named, 1);  /* True if artifact was made by naming an item */
+    Bitfield(viadip, 1); /* True if dipped long sword became Excalibur */
+    Bitfield(rndm, 1);   /* randomly generated; not (yet?) implemented */
+    Bitfield(bones, 1);  /* came from bones file; not (yet?) implemented */
 };
 /* array of flags tracking which artifacts exist, indexed by ART_xx;
    ART_xx values are 1..N, element [0] isn't used */
@@ -55,6 +62,7 @@ static xchar artidisco[NROFARTIFACTS];
  * bulk re-init if game restart ever gets implemented.  They are saved
  * and restored but that is done through this file so they can be local.
  */
+static const struct arti_info zero_artiexist; /* all bits zero */
 
 static void hack_artifacts(void);
 static boolean attacks(int, struct obj *);
@@ -206,8 +214,8 @@ mk_artifact(
         if (otmp) {
             otmp = oname(otmp, a->name, ONAME_NO_FLAGS);
             otmp->oartifact = m;
+            artiexist[m] = zero_artiexist;
             artiexist[m].exists = 1;
-            artiexist[m].found = 0;
         }
     } else {
         /* nothing appropriate could be found; return original object */
@@ -260,11 +268,13 @@ exist_artifact(int otyp, const char *name)
     return FALSE;
 }
 
+/* an artifact has just been created or is being "un-created" for a chance
+   to be created again later */
 void
 artifact_exists(
     struct obj *otmp,
     const char *name,
-    boolean mod,      /* True: exists, False: being uncreated */
+    boolean mod,      /* True: exists, False: being un-created */
     boolean knwn)     /* True: hero knows it exists */
 {
     register const struct artifact *a;
@@ -278,6 +288,8 @@ artifact_exists(
                 otmp->age = 0;
                 if (otmp->otyp == RIN_INCREASE_DAMAGE)
                     otmp->spe = 0;
+                /* clear all the flag bits, then maybe set a couple of them */
+                artiexist[m] = zero_artiexist;
                 artiexist[m].exists = mod ? 1 : 0;
                 artiexist[m].found = (mod && knwn) ? 1 : 0;
                 break;
@@ -289,7 +301,12 @@ artifact_exists(
 void
 found_artifact(int a)
 {
-    artiexist[a].found = 1;
+    if (a < 1 || a > NROFARTIFACTS)
+        impossible("found_artifact: invalid artifact index! (%d)", a);
+    else if (!artiexist[a].exists)
+        impossible("found_artifact: artifact doesn't exist yet? (%d)", a);
+    else
+        artiexist[a].found = 1;
 }
 
 /* if an artifact hasn't already been designated 'found', do that now
@@ -300,7 +317,6 @@ find_artifact(struct obj *otmp)
     int a = otmp->oartifact;
 
     if (a && !artiexist[a].found) {
-        char buf[BUFSZ];
         const char *where;
 
         found_artifact(a); /* artiexist[a].found = 1 */
@@ -330,8 +346,8 @@ find_artifact(struct obj *otmp)
                         blind but now seen; there's no previous_where to
                         figure out how it got here */
                      : "");
-        (void) strsubst(strcpy(buf, artiname(a)), "The ", "the ");
-        livelog_printf(LL_ARTIFACT, "found %s%s", buf, where);
+        livelog_printf(LL_ARTIFACT, "found %s%s",
+                       bare_artifactname(otmp), where);
     }
 }
 
@@ -345,6 +361,102 @@ nartifact_exist(void)
             ++a;
 
     return a;
+}
+
+/*
+ * TODO:
+ *  artifact_gift(), artifact_wish(), artifact_named(), and artifact_viadip()
+ *  are nearly identical and should be folded into a single routine.
+ */
+
+/* mark artifact as a divine gift or query if it has been marked as such */
+int
+artifact_gift(
+    struct obj *otmp,
+    boolean set) /* True, mark otmp->oartifact as gift; False, ask if it is */
+{
+    int a = otmp->oartifact;
+
+    if (a) {
+        if (set && !artiexist[a].gift) {
+            /* clear all bits; most are mutually exclusive */
+            artiexist[a] = zero_artiexist;
+            /* set gift bit and force exists bit back on */
+            artiexist[a].gift = 1;
+            artiexist[a].exists = 1;
+            found_artifact(a); /* assume hero is aware of the gift... */
+
+            u.ugifts++; /* used to be done at several places in pray.c */
+        }
+        return (int) artiexist[a].gift; /* cast: convert unsigned bitfield */
+    }
+    return 0;
+}
+
+/* mark artifact as a player wish or query if it has been marked as such */
+int
+artifact_wish(
+    struct obj *otmp,
+    boolean set) /* True, mark otmp->oartifact as wish; False, ask if it is */
+{
+    int a = otmp->oartifact;
+
+    if (a) {
+        if (set && !artiexist[a].wish) {
+            /* clear all bits; most are mutually exclusive */
+            artiexist[a] = zero_artiexist;
+            /* set wish bit and force exists bit back on */
+            artiexist[a].wish = 1;
+            artiexist[a].exists = 1;
+            found_artifact(a); /* assume hero is aware of wish outcome */
+        }
+        return (int) artiexist[a].wish; /* cast: convert unsigned bitfield */
+    }
+    return 0;
+}
+
+/* mark artifact as created via naming or query if it is marked as such */
+int
+artifact_named(
+    struct obj *otmp,
+    boolean set) /* True, mark otmp->oartifact as named */
+{
+    int a = otmp->oartifact;
+
+    if (a) {
+        if (set && !artiexist[a].named) {
+            /* clear all bits; most are mutually exclusive */
+            artiexist[a] = zero_artiexist;
+            /* set named bit and force exists bit back on */
+            artiexist[a].named = 1;
+            artiexist[a].exists = 1;
+            found_artifact(a); /* hero should be aware of naming outcome */
+        }
+        return (int) artiexist[a].named; /* cast: convert unsigned bitfield */
+    }
+    return 0;
+}
+
+/* mark artifact as created via dipping or query if it is marked as such */
+int
+artifact_viadip(
+    struct obj *otmp,
+    boolean set) /* True, mark otmp->oartifact as viadip */
+{
+    int a = otmp->oartifact;
+
+    if (a) {
+        if (set && !artiexist[a].viadip) {
+            /* clear all bits; most are mutually exclusive */
+            artiexist[a] = zero_artiexist;
+            /* set viadip bit and force exists bit back on */
+            artiexist[a].viadip = 1;
+            artiexist[a].exists = 1;
+            found_artifact(a); /* hero is aware of dip outcome */
+        }
+        return (int) artiexist[a].viadip; /* cast: convert unsigned bitfield */
+    }
+    return 0;
 }
 
 boolean

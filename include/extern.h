@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1646838387 2022/03/09 15:06:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1068 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1646870811 2022/03/10 00:06:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1069 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -73,6 +73,10 @@ extern void artifact_exists(struct obj *, const char *, boolean, boolean);
 extern void found_artifact(int);
 extern void find_artifact(struct obj *);
 extern int nartifact_exist(void);
+extern int artifact_gift(struct obj *, boolean);
+extern int artifact_wish(struct obj *, boolean);
+extern int artifact_named(struct obj *, boolean);
+extern int artifact_viadip(struct obj *, boolean);
 extern boolean arti_immune(struct obj *, int);
 extern boolean spec_ability(struct obj *, unsigned long);
 extern boolean confers_luck(struct obj *);
