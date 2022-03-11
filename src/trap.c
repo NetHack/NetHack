@@ -4463,12 +4463,12 @@ dountrap(void)
 
 /* Probability of disabling a trap.  Helge Hafting */
 static int
-untrap_prob(struct trap *ttmp)
+untrap_prob(
+    struct trap *ttmp) /* must not be Null */
 {
     int chance = 3;
 
-    /* Only spiders know how to deal with webs reliably */
-    /* Assume ttmp is not NULL */
+    /* non-spiders are less adept at dealing with webs */
     if (ttmp->ttyp == WEB && !webmaker(g.youmonst.data))
         chance = 7; /* 3.7: used to be 30 */
     if (Confusion || Hallucination)
