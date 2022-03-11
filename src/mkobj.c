@@ -1516,18 +1516,20 @@ shrink_glob(
 static void
 shrinking_glob_gone(struct obj *obj)
 {
-    if (obj->where == OBJ_INVENT) {
+    xchar owhere = obj->where;
+
+    if (owhere == OBJ_INVENT) {
         if (obj->owornmask) {
             remove_worn_item(obj, FALSE);
             stop_occupation();
         }
         useupall(obj); /* freeinv()+obfree() */
     } else {
-        if (obj->where == OBJ_MIGRATING) {
+        if (owhere == OBJ_MIGRATING) {
             /* destination flag overloads owornmask; clear it so obfree()'s
                check for freeing a worn object doesn't get a false hit */
             obj->owornmask = 0L;
-        } else if (obj->where == OBJ_MINVENT) {
+        } else if (owhere == OBJ_MINVENT) {
             /* monsters don't wield globs so this isn't strictly needed */
             if (obj->owornmask && obj == MON_WEP(obj->ocarry))
                 setmnotwielded(obj->ocarry, obj); /* clears owornmask */
@@ -1536,6 +1538,8 @@ shrinking_glob_gone(struct obj *obj)
            if it's contained, obj_extract_self() will update the container's
            weight and if nested, the enclosing containers' weights too */
         obj_extract_self(obj);
+        if (owhere == OBJ_FLOOR)
+            maybe_unhide_at(obj->ox, obj->oy);
         obfree(obj, (struct obj *) 0);
     }
 }
