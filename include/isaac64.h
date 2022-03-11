@@ -1,7 +1,6 @@
 /* CC0 (Public domain) - see http://creativecommons.org/publicdomain/zero/1.0/ for details */
 #if !defined(_isaac64_H)
 # define _isaac64_H (1)
-# include <integer.h>
 
 
 

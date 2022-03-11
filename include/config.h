@@ -648,6 +648,7 @@ typedef unsigned char uchar;
 # endif
 #endif
 
+#include "integer.h"
 #include "global.h" /* Define everything else according to choices above */
 
 #endif /* CONFIG_H */
