@@ -77,6 +77,7 @@ extern int artifact_gift(struct obj *, boolean);
 extern int artifact_wish(struct obj *, boolean);
 extern int artifact_named(struct obj *, boolean);
 extern int artifact_viadip(struct obj *, boolean);
+extern int artifact_bones(struct obj *, boolean);
 extern boolean arti_immune(struct obj *, int);
 extern boolean spec_ability(struct obj *, unsigned long);
 extern boolean confers_luck(struct obj *);
@@ -93,6 +94,7 @@ extern int spec_dbon(struct obj *, struct monst *, int);
 extern void discover_artifact(xchar);
 extern boolean undiscovered_artifact(xchar);
 extern int disp_artifact_discoveries(winid);
+extern void dump_artifact_info(winid);
 extern boolean artifact_hit(struct monst *, struct monst *, struct obj *,
                             int *, int);
 extern int doinvoke(void);

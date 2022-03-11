@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1646953028 2022/03/10 22:57:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1646950588 2022/03/10 22:16:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -892,6 +892,15 @@ doclassdisco(void)
             You(havent_discovered_any, unique_items);
         break;
     case 'a':
+        /* note: this will work all the time for menustyle traditional
+           but requires at least one artifact discovery for other styles
+           [could fix that by forcing the 'a' choice into the pick-class
+           menu when running in wizard mode] */
+        if (wizard && yn("Dump information about all artifacts?") == 'y') {
+            dump_artifact_info(tmpwin);
+            ct = NROFARTIFACTS; /* non-zero vs zero is what matters below */
+            break;
+        }
         /* disp_artifact_discoveries() includes a header */
         ct = disp_artifact_discoveries(tmpwin);
         if (!ct)

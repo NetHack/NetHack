@@ -1341,7 +1341,7 @@ oname(struct obj *obj, const char *name, unsigned oflgs)
         if (obj->unpaid)
             alter_cost(obj, 0L);
         if (via_naming) {
-            artifact_named(obj, TRUE);
+            (void) artifact_named(obj, TRUE);
 
             /* violate illiteracy conduct since successfully wrote arti-name */
             if (!u.uconduct.literate++)

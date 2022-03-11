@@ -52,7 +52,7 @@ struct arti_info {
     Bitfield(bones, 1);  /* came from bones file; not (yet?) implemented */
 };
 /* array of flags tracking which artifacts exist, indexed by ART_xx;
-   ART_xx values are 1..N, element [0] isn't used */
+   ART_xx values are 1..N, element [0] isn't used; no terminator needed */
 static struct arti_info artiexist[1 + NROFARTIFACTS];
 /* discovery list; for N discovered artifacts, the first N entries are ART_xx
    values in discovery order, the remaining (NROFARTIFACTS-N) slots are 0 */
@@ -216,6 +216,8 @@ mk_artifact(
             otmp->oartifact = m;
             artiexist[m] = zero_artiexist;
             artiexist[m].exists = 1;
+            /* default creation reason is 'random'; caller can revise it */
+            artiexist[m].rndm = 1;
         }
     } else {
         /* nothing appropriate could be found; return original object */
@@ -365,8 +367,9 @@ nartifact_exist(void)
 
 /*
  * TODO:
- *  artifact_gift(), artifact_wish(), artifact_named(), and artifact_viadip()
- *  are nearly identical and should be folded into a single routine.
+ *  artifact_gift(), artifact_wish(), artifact_named(), artifact_viadip(),
+ *  and artifact_bones() are nearly identical and should be folded into a
+ *  single routine.
  */
 
 /* mark artifact as a divine gift or query if it has been marked as such */
@@ -455,6 +458,28 @@ artifact_viadip(
             found_artifact(a); /* hero is aware of dip outcome */
         }
         return (int) artiexist[a].viadip; /* cast: convert unsigned bitfield */
+    }
+    return 0;
+}
+
+/* mark artifact as coming from a bones file or query if it did */
+int
+artifact_bones(
+    struct obj *otmp,
+    boolean set) /* True, mark otmp->oartifact as bones */
+{
+    int a = otmp->oartifact;
+
+    if (a) {
+        if (set && !artiexist[a].bones) {
+            /* clear all bits; most are mutually exclusive */
+            artiexist[a] = zero_artiexist;
+            /* set bones bit and force exists bit back on */
+            artiexist[a].bones = 1;
+            artiexist[a].exists = 1;
+            /* don't mark artifact from bones as found */
+        }
+        return (int) artiexist[a].bones; /* cast: convert unsigned bitfield */
     }
     return 0;
 }
@@ -1049,7 +1074,6 @@ discover_artifact(xchar m)
     for (i = 0; i < NROFARTIFACTS; i++)
         if (artidisco[i] == 0 || artidisco[i] == m) {
             artidisco[i] = m;
-            artiexist[i].found = 1; /* (we expect this to already be set) */
             return;
         }
     /* there is one slot per artifact, so we should never reach the
@@ -1078,6 +1102,7 @@ int
 disp_artifact_discoveries(winid tmpwin) /* supplied by dodiscover() */
 {
     int i, m, otyp;
+    const char *algnstr;
     char buf[BUFSZ];
 
     for (i = 0; i < NROFARTIFACTS; i++) {
@@ -1090,11 +1115,48 @@ disp_artifact_discoveries(winid tmpwin) /* supplied by dodiscover() */
             putstr(tmpwin, iflags.menu_headings, "Artifacts");
         m = artidisco[i];
         otyp = artilist[m].otyp;
+        algnstr = align_str(artilist[m].alignment);
+        if (!strcmp(algnstr, "unaligned"))
+            algnstr = "non-aligned";
+
         Sprintf(buf, "  %s [%s %s]", artiname(m),
-                align_str(artilist[m].alignment), simple_typename(otyp));
+                algnstr, simple_typename(otyp));
         putstr(tmpwin, 0, buf);
     }
     return i;
+}
+
+/* (wizard mode only) show all artifacts and their flags */
+void
+dump_artifact_info(winid tmpwin)
+{
+    int m;
+    char buf[BUFSZ], buf2[BUFSZ];
+
+    putstr(tmpwin, iflags.menu_headings, "Artifacts");
+    for (m = 1; m <= NROFARTIFACTS; ++m) {
+        Sprintf(buf2, "[%s%s%s%s%s%s%s%s]",
+                /* if any of these are non-zero we expect .exists to be too
+                   so no leading space for it */
+                artiexist[m].exists ? "exists"  : "",
+                artiexist[m].found  ? " found"  : "",
+                artiexist[m].gift   ? " gift"   : "",
+                artiexist[m].wish   ? " wish"   : "",
+                artiexist[m].named  ? " named"  : "",
+                artiexist[m].viadip ? " viadip" : "",
+                artiexist[m].rndm   ? " random" : "",
+                artiexist[m].bones  ? " bones"  : "");
+#if 0   /* 'tmpwin' here is a text window, not a menu */
+        if (iflags.menu_tab_sep)
+            Sprintf(buf, "  %s\t%s", artiname(m), buf2);
+        else
+#else
+            /* "The Platinum Yendorian Express Card" is 35 characters */
+            Sprintf(buf, "  %-36.36s%s", artiname(m), buf2);
+#endif
+        putstr(tmpwin, 0, buf);
+    }
+    return;
 }
 
 /*

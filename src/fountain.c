@@ -404,7 +404,7 @@ dipfountain(register struct obj *obj)
             pline("As the hand retreats, the fountain disappears!");
             obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
             discover_artifact(ART_EXCALIBUR);
-            artifact_viadip(obj, TRUE);
+            (void) artifact_viadip(obj, TRUE);
             bless(obj);
             obj->oeroded = obj->oeroded2 = 0;
             obj->oerodeproof = TRUE;

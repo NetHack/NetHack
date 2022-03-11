@@ -5602,7 +5602,7 @@ makewish(void)
 
         if (otmp->oartifact)
             /* update artifact bookkeeping; doesn't produce a livelog event */
-            artifact_wish(otmp, TRUE); /* calls found_artifact() */
+            (void) artifact_wish(otmp, TRUE); /* calls found_artifact() */
     }
 
     /* wisharti conduct handled in readobjnam() */
