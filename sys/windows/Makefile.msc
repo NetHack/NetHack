@@ -1530,8 +1530,9 @@ $(LIBDIR)\pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
 	@echo Building library $@ from $**
 	@$(librarian) -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
-$(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c $(MSWSYS)\stub-pdcscrn.c
-	@$(cc) $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(MSWSYS)\stub-pdcscrn.c
+$(O)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c
+	@$(cc) $(PDCINCL) $(cflagsBuild) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
+		-Fo$@ $(PDCWINCON)\pdcscrn.c
 
 #===============================================================================
 # LUA
