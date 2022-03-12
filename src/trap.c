@@ -40,6 +40,7 @@ static int trapeffect_selector(struct monst *, struct trap *, unsigned);
 static char *trapnote(struct trap *, boolean);
 static int steedintrap(struct trap *, struct obj *);
 static void launch_drop_spot(struct obj *, xchar, xchar);
+static boolean find_random_launch_coord(struct trap *, coord *);
 static int mkroll_launch(struct trap *, xchar, xchar, short, long);
 static boolean isclearpath(coord *, int, schar, schar);
 static void dofiretrap(struct obj *);
@@ -3012,23 +3013,22 @@ feeltrap(struct trap* trap)
     newsym(trap->tx, trap->ty);
 }
 
-static int
-mkroll_launch(
-    struct trap *ttmp,
-    xchar x,
-    xchar y,
-    short otyp,
-    long ocount)
+/* try to find a random coordinate where launching a rolling boulder
+   could work. return TRUE if found, with coordinate in cc. */
+static boolean
+find_random_launch_coord(struct trap *ttmp, coord *cc)
 {
-    struct obj *otmp;
     register int tmp;
-    schar dx, dy;
-    int distance;
-    coord cc = UNDEFINED_VALUES,
-          bcc = UNDEFINED_VALUES;
-    int trycount = 0;
     boolean success = FALSE;
+    coord bcc = UNDEFINED_VALUES;
+    int distance;
     int mindist = 4;
+    int trycount = 0;
+    xchar dx, dy;
+    xchar x = ttmp->tx, y = ttmp->ty;
+
+    if (!ttmp || !cc)
+        return FALSE;
 
     if (ttmp->ttyp == ROLLING_BOULDER_TRAP)
         mindist = 2;
@@ -3037,14 +3037,14 @@ mkroll_launch(
     while (distance >= mindist) {
         dx = xdir[tmp];
         dy = ydir[tmp];
-        cc.x = x;
-        cc.y = y;
+        cc->x = x;
+        cc->y = y;
         /* Prevent boulder from being placed on water */
         if (ttmp->ttyp == ROLLING_BOULDER_TRAP
             && is_pool_or_lava(x + distance * dx, y + distance * dy))
             success = FALSE;
         else
-            success = isclearpath(&cc, distance, dx, dy);
+            success = isclearpath(cc, distance, dx, dy);
         if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
             boolean success_otherway;
 
@@ -3061,10 +3061,27 @@ mkroll_launch(
         if ((++trycount % 8) == 0)
             --distance;
     }
+    return success;
+}
+
+static int
+mkroll_launch(
+    struct trap *ttmp,
+    xchar x,
+    xchar y,
+    short otyp,
+    long ocount)
+{
+    struct obj *otmp;
+    coord cc = UNDEFINED_VALUES;
+    boolean success = FALSE;
+
+    success = find_random_launch_coord(ttmp, &cc);
+
     if (!success) {
         /* create the trap without any ammo, launch pt at trap location */
-        cc.x = bcc.x = x;
-        cc.y = bcc.y = y;
+        cc.x = x;
+        cc.y = y;
     } else {
         otmp = mksobj(otyp, TRUE, FALSE);
         otmp->quan = ocount;
@@ -3075,8 +3092,8 @@ mkroll_launch(
     ttmp->launch.x = cc.x;
     ttmp->launch.y = cc.y;
     if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-        ttmp->launch2.x = bcc.x;
-        ttmp->launch2.y = bcc.y;
+        ttmp->launch2.x = x - (cc.x - x);
+        ttmp->launch2.y = y - (cc.y - y);
     } else
         ttmp->launch_otyp = otyp;
     newsym(ttmp->launch.x, ttmp->launch.y);
