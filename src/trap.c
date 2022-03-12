@@ -3030,6 +3030,14 @@ find_random_launch_coord(struct trap *ttmp, coord *cc)
     if (!ttmp || !cc)
         return FALSE;
 
+    bcc.x = ttmp->tx + g.launchplace.x;
+    bcc.y = ttmp->ty + g.launchplace.y;
+    if (isok(bcc.x, bcc.y) && linedup(ttmp->tx, ttmp->ty, bcc.x, bcc.y, 1)) {
+        cc->x = bcc.x;
+        cc->y = bcc.y;
+        return TRUE;
+    }
+
     if (ttmp->ttyp == ROLLING_BOULDER_TRAP)
         mindist = 2;
     distance = rn1(5, 4); /* 4..8 away */

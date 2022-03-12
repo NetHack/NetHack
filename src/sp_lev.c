@@ -4123,6 +4123,16 @@ lspo_trap(lua_State *L)
         tmptrap.type = get_table_traptype_opt(L, "type", -1);
         tmptrap.spider_on_web = get_table_boolean_opt(L, "spider_on_web", 1);
         tmptrap.seen = get_table_boolean_opt(L, "seen", FALSE);
+
+        lua_getfield(L, -1, "launchfrom");
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            int lx = -1, ly = -1;
+
+            get_coord(L, -1, &lx, &ly);
+            lua_pop(L, 1);
+            g.launchplace.x = lx;
+            g.launchplace.y = ly;
+        }
     }
 
     if (tmptrap.type == NO_TRAP)
@@ -4134,6 +4144,7 @@ lspo_trap(lua_State *L)
         tmptrap.coord = SP_COORD_PACK(x, y);
 
     create_trap(&tmptrap, g.coder->croom);
+    g.launchplace.x = g.launchplace.y = 0;
 
     return 0;
 }
