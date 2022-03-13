@@ -31,7 +31,10 @@
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\initscr.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\inopts.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\insch.c" />
-    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\insstr.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\insstr.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\kernel.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\keyname.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\mouse.c" />
@@ -50,15 +53,21 @@
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\touch.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\util.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\pdcurses\window.c" />
-    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcclip.c" />
-    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcdisp.c" />
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcclip.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcdisp.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4996;4244;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcgetsc.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdckbd.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcscrn.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcsetsc.c" />
     <ClCompile Condition="Exists('$(PDCURSES)')" Include="$(PDCURSES)\wincon\pdcutil.c" />
   </ItemGroup>
-  <PropertyGroup >
+  <PropertyGroup>
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(PDCURSES);$(IncludePath)</IncludePath>
   </PropertyGroup>

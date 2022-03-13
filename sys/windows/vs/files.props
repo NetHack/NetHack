@@ -3,7 +3,6 @@
   <ItemGroup>
     <!-- -v -->
     <Defs Include = "$(DatDir)options"/>
-    <Defs Include = "$(IncDir)date.h"/>
 	<!-- -o -->
     <Defs Include = "$(IncDir)onames.h"/>
 	<!-- -r -->
