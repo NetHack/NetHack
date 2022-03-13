@@ -1067,7 +1067,8 @@ dump_artifact_info(winid tmpwin)
 
     putstr(tmpwin, iflags.menu_headings, "Artifacts");
     for (m = 1; m <= NROFARTIFACTS; ++m) {
-        Sprintf(buf2, "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
+        Snprintf(buf2, sizeof buf2,
+                "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
                 artiexist[m].exists ? "exists;" : "",
                 artiexist[m].found  ? " hero knows;" : "",
                 /* .exists and .found have different punctuation because
@@ -1085,7 +1086,7 @@ dump_artifact_info(winid tmpwin)
         else
 #else
             /* "The Platinum Yendorian Express Card" is 35 characters */
-            Sprintf(buf, "  %-36.36s%s", artiname(m), buf2);
+            Snprintf(buf, sizeof buf, "  %-36.36s%s", artiname(m), buf2);
 #endif
         putstr(tmpwin, 0, buf);
     }
