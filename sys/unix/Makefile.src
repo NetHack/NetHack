@@ -599,7 +599,7 @@ all:	$(GAME)
 pregame:
 	$(PREGAME)
 
-$(GAME):	pregame $(SYSTEM)
+$(GAME):	pregame $(MAKEDEFS) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
