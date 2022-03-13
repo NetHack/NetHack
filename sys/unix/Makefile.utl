@@ -319,7 +319,7 @@ tilemap: tilemap.o $(OBJDIR)/objects.o $(OBJDIR)/monst.o $(OBJDIR)/drawing.o
 
 tiletext.o: ../win/share/tiletext.c $(CONFIG_H) ../win/share/tile.h
 	$(CC) $(CFLAGS) -I../win/share -c ../win/share/tiletext.c -o $@
-tiletxt.o: ../win/share/tiletxt.c $(HACK_H)
+tiletxt.o: ../win/share/tiletxt.c ../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) -I../win/share -c ../win/share/tiletxt.c -o $@
 tilemap.o: ../win/share/tilemap.c $(HACK_H)
 	$(CC) $(CFLAGS) -c ../win/share/tilemap.c -o $@
