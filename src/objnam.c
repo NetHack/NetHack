@@ -4838,7 +4838,7 @@ readobjnam(char *bp, struct obj *no_wish)
                 d.name = novelname;
         }
 
-        d.otmp = oname(d.otmp, d.name, ONAME_NO_FLAGS);
+        d.otmp = oname(d.otmp, d.name, ONAME_WISH);
         /* name==aname => wished for artifact (otmp->oartifact => got it) */
         if (d.otmp->oartifact || d.name == aname) {
             d.otmp->quan = 1L;
@@ -4850,7 +4850,7 @@ readobjnam(char *bp, struct obj *no_wish)
     /* and make them pay; charge them for the wish anyway! */
     if ((is_quest_artifact(d.otmp)
          || (d.otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
-        artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, FALSE);
+        artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, ONAME_NO_FLAGS);
         obfree(d.otmp, (struct obj *) 0);
         d.otmp = (struct obj *) &cg.zeroobj;
         pline("For a moment, you feel %s in your %s, but it disappears!",

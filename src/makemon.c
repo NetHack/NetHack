@@ -329,7 +329,7 @@ m_initweap(register struct monst *mtmp)
                                        : ptr->maligntyp) == A_LAWFUL)
                 otmp = oname(otmp,
                              artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD),
-                             ONAME_NO_FLAGS);
+                             ONAME_RANDOM); /* randomly created */
             bless(otmp);
             otmp->oerodeproof = TRUE;
             otmp->spe = rn2(4);

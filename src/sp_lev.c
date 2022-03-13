@@ -2152,13 +2152,12 @@ create_object(object* o, struct mkroom* croom)
     /* set_corpsenm() took care of egg hatch and corpse timers */
 
     if (named) {
-        otmp = oname(otmp, o->name.str, ONAME_NO_FLAGS);
+        otmp = oname(otmp, o->name.str, ONAME_LEVEL_DEF);
         if (otmp->otyp == SPE_NOVEL) {
             /* needs to be an existing title */
             (void) lookup_novel(o->name.str, &otmp->novelidx);
         }
     }
-
     if (o->eroded) {
         if (o->eroded < 0) {
             otmp->oerodeproof = 1;
@@ -2214,8 +2213,11 @@ create_object(object* o, struct mkroom* croom)
                 cobj->owt = weight(cobj);
             } else {
                 obj_extract_self(otmp);
+                /* uncreate a random artifact created in a container */
+                /* FIXME: it could be intentional rather than random */
                 if (otmp->oartifact)
-                    artifact_exists(otmp, safe_oname(otmp), FALSE, FALSE);
+                    artifact_exists(otmp, safe_oname(otmp), FALSE,
+                                    ONAME_NO_FLAGS); /* flags don't matter */
                 obfree(otmp, NULL);
                 return;
             }

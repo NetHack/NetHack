@@ -371,10 +371,25 @@ typedef struct sortloot_item Loot;
 #define BUCX_TYPES (BUC_ALLBKNOWN | BUC_UNKNOWN)
 #define ALL_TYPES_SELECTED -2
 
-/* Flags for oname() */
-#define ONAME_NO_FLAGS   0U /* none of the below */
-#define ONAME_VIA_NAMING 1U /* oname() is being called by do_oname() */
-#define ONAME_FOUND_ARTI 2U /* if an artifact, hero becomes aware of it */
+/* Flags for oname(), artifact_exists(), artifact_origin() */
+#define ONAME_NO_FLAGS   0U /* none of the below; they apply to artifacts */
+/*                       0x0001U is reserved for 'exists' */
+/* flags indicating where an artifact came from */
+#define ONAME_VIA_NAMING 0x0002U /* oname() is being called by do_oname();
+                                  * only matters if creating Sting|Orcrist */
+#define ONAME_WISH       0x0004U /* created via wish */
+#define ONAME_GIFT       0x0008U /* created as a divine reward after #offer or
+                                  * special #pray result of being crowned */
+#define ONAME_VIA_DIP    0x0010U /* created Excalibur in a fountain */
+#define ONAME_LEVEL_DEF  0x0020U /* placed by a special level's definition */
+#define ONAME_BONES      0x0040U /* object came from bones; in its original
+                                  * game it had one of the other bits but we
+                                  * don't care which one */
+#define ONAME_RANDOM     0x0080U /* something created an artifact randomly
+                                  * with mk_artifact() (mksboj or mk_player)
+                                  * or m_initweap() (lawful Angel) */
+/* flag congrolling potential livelog event of finding an artifact */
+#define ONAME_KNOW_ARTI  0x0100U /* hero is already aware of this artifact */
 
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */

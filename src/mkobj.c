@@ -2284,7 +2284,7 @@ discard_minvent(struct monst *mtmp, boolean uncreate_artifacts)
         /* this has now become very similar to m_useupall()... */
         extract_from_minvent(mtmp, otmp, TRUE, TRUE);
         if (uncreate_artifacts && otmp->oartifact)
-            artifact_exists(otmp, safe_oname(otmp), FALSE, FALSE);
+            artifact_exists(otmp, safe_oname(otmp), FALSE, ONAME_NO_FLAGS);
         obfree(otmp, (struct obj *) 0); /* dealloc_obj() isn't sufficient */
     }
 }

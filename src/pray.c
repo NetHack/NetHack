@@ -833,7 +833,7 @@ gcrownu(void)
         obj->dknown = 1;
         at_your_feet(upstart(ansimpleoname(obj)));
         dropy(obj);
-        u.ugifts++; /* bypass artifact_gift() */
+        u.ugifts++;
         /* not an artifact, but treat like one for this situation;
            classify as a spoiler in case player hasn't IDed the book yet */
         livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT | LL_SPOILER,
@@ -855,9 +855,10 @@ gcrownu(void)
             Strcpy(lbuf, simpleonames(obj)); /* before transformation */
             if (!Blind)
                 Your("sword shines brightly for a moment.");
-            obj = oname(obj, artiname(ART_EXCALIBUR), ONAME_FOUND_ARTI);
+            obj = oname(obj, artiname(ART_EXCALIBUR),
+                        ONAME_GIFT | ONAME_KNOW_ARTI);
             if (obj && obj->oartifact == ART_EXCALIBUR) {
-                (void) artifact_gift(obj, TRUE); /* u.ugifts++; */
+                u.ugifts++;
                 livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                                "wielded %s transformed into %s",
                                lbuf, artiname(ART_EXCALIBUR));
@@ -876,11 +877,12 @@ gcrownu(void)
             obj->dknown = 1;
         } else if (!already_exists) {
             obj = mksobj(LONG_SWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_VORPAL_BLADE), ONAME_FOUND_ARTI);
+            obj = oname(obj, artiname(ART_VORPAL_BLADE),
+                        ONAME_GIFT | ONAME_KNOW_ARTI);
             obj->spe = 1;
             at_your_feet("A sword");
             dropy(obj);
-            (void) artifact_gift(obj, TRUE); /* u.ugifts++; */
+            u.ugifts++;
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                            "bestowed with %s", artiname(ART_VORPAL_BLADE));
         }
@@ -900,11 +902,12 @@ gcrownu(void)
             obj->dknown = 1;
         } else if (!already_exists) {
             obj = mksobj(RUNESWORD, FALSE, FALSE);
-            obj = oname(obj, artiname(ART_STORMBRINGER), ONAME_FOUND_ARTI);
+            obj = oname(obj, artiname(ART_STORMBRINGER),
+                        ONAME_GIFT | ONAME_KNOW_ARTI);
             obj->spe = 1;
             at_your_feet(An(swordbuf));
             dropy(obj);
-            (void) artifact_gift(obj, TRUE); /* u.ugifts++; */
+            u.ugifts++;
             livelog_printf(LL_DIVINEGIFT | LL_ARTIFACT,
                            "bestowed with %s", artiname(ART_STORMBRINGER));
         }
@@ -1854,6 +1857,7 @@ dosacrifice(void)
                 if (otmp) {
                     char buf[BUFSZ];
 
+                    artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
                     if (otmp->spe < 0)
                         otmp->spe = 0;
                     if (otmp->cursed)
@@ -1868,7 +1872,7 @@ dosacrifice(void)
                     at_your_feet(upstart(buf));
                     dropy(otmp);
                     godvoice(u.ualign.type, "Use my gift wisely!");
-                    (void) artifact_gift(otmp, TRUE); /* u.ugifts++; */
+                    u.ugifts++;
                     u.ublesscnt = rnz(300 + (50 * nartifacts));
                     exercise(A_WIS, TRUE);
                     livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
