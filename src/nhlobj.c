@@ -26,6 +26,7 @@ static int l_obj_timer_has(lua_State *);
 static int l_obj_timer_peek(lua_State *);
 static int l_obj_timer_stop(lua_State *);
 static int l_obj_timer_start(lua_State *);
+static int l_obj_bury(lua_State *);
 
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
@@ -537,6 +538,36 @@ l_obj_timer_start(lua_State *L)
     return 0;
 }
 
+/* bury an obj. returns true if object is gone (merged with ground),
+   false otherwise. */
+/* local ogone = o:bury(); */
+/* local ogone = o:bury(5,5); */
+static int
+l_obj_bury(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    boolean dealloced = FALSE;
+    struct _lua_obj *lo = l_obj_check(L, 1);
+    xchar x, y;
+
+    if (argc == 1) {
+        x = lo->obj->ox;
+        y = lo->obj->oy;
+    } else if (argc == 3) {
+        x = (xchar) lua_tointeger(L, 2);
+        y = (xchar) lua_tointeger(L, 3);
+    } else
+        nhl_error(L, "l_obj_bury: Wrong args");
+
+    if (lobj_is_ok(lo) && isok(x, y)) {
+        lo->obj->ox = x;
+        lo->obj->oy = y;
+        (void) bury_an_obj(lo->obj, &dealloced);
+    }
+    lua_pushboolean(L, dealloced);
+    return 1;
+}
+
 static const struct luaL_Reg l_obj_methods[] = {
     { "new", l_obj_new_readobjnam },
     { "isnull", l_obj_isnull },
@@ -552,6 +583,7 @@ static const struct luaL_Reg l_obj_methods[] = {
     { "peek_timer", l_obj_timer_peek },
     { "stop_timer", l_obj_timer_stop },
     { "start_timer", l_obj_timer_start },
+    { "bury", l_obj_bury },
     { NULL, NULL }
 };
 
