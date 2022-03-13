@@ -39,6 +39,15 @@ enum timeout_types {
     NUM_TIME_FUNCS
 };
 
+#define timer_is_obj(ttype) ((ttype) == ROT_ORGANIC      \
+                             || (ttype) == ROT_CORPSE    \
+                             || (ttype) == REVIVE_MON    \
+                             || (ttype) == ZOMBIFY_MON   \
+                             || (ttype) == BURN_OBJECT   \
+                             || (ttype) == HATCH_EGG     \
+                             || (ttype) == FIG_TRANSFORM \
+                             || (ttype) == SHRINK_GLOB)
+
 /* used in timeout.c */
 typedef struct fe {
     struct fe *next;          /* next item in chain */

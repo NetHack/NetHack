@@ -191,6 +191,21 @@ get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
     return typ;
 }
 
+short
+nhl_get_timertype(lua_State *L, int idx)
+{
+    static const char *const timerstr[NUM_TIME_FUNCS+1] = {
+        "rot-organic", "rot-corpse", "revive-mon", "zombify-mon",
+        "burn-obj", "hatch-egg", "fig-transform", "melt-ice", "shrink-glob",
+        NULL
+    };
+    short ret = luaL_checkoption(L, idx, NULL, timerstr);
+
+    if (ret < 0 || ret >= NUM_TIME_FUNCS)
+        nhl_error(L, "Unknown timer type");
+    return ret;
+}
+
 void
 nhl_add_table_entry_int(lua_State *L, const char *name, int value)
 {

@@ -22,6 +22,10 @@ static int l_obj_placeobj(lua_State *);
 static int l_obj_to_table(lua_State *);
 static int l_obj_at(lua_State *);
 static int l_obj_container(lua_State *);
+static int l_obj_timer_has(lua_State *);
+static int l_obj_timer_peek(lua_State *);
+static int l_obj_timer_stop(lua_State *);
+static int l_obj_timer_start(lua_State *);
 
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
@@ -431,6 +435,107 @@ l_obj_isnull(lua_State *L)
     return 1;
 }
 
+/* does object have a timer of certain type? */
+/* local hastimer = o:has_timer("rot-organic"); */
+static int
+l_obj_timer_has(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 2) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        short timertype = nhl_get_timertype(L, 2);
+
+        if (timer_is_obj(timertype) && lo && lo->obj) {
+            lua_pushboolean(L, obj_has_timer(lo->obj, timertype));
+            return 1;
+        } else {
+            lua_pushboolean(L, FALSE);
+            return 1;
+        }
+    } else
+        nhl_error(L, "l_obj_timer_has: Wrong args");
+    return 0;
+}
+
+/* peek at an object timer. return the turn when timer triggers.
+   returns 0 if no such timer attached to the object. */
+/* local timeout = o:peek_timer("hatch-egg"); */
+static int
+l_obj_timer_peek(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 2) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        short timertype = nhl_get_timertype(L, 2);
+
+        if (timer_is_obj(timertype) && lo && lo->obj) {
+            lua_pushinteger(L, peek_timer(timertype, obj_to_any(lo->obj)));
+            return 1;
+        } else {
+            lua_pushinteger(L, 0);
+            return 1;
+        }
+    } else
+        nhl_error(L, "l_obj_timer_peek: Wrong args");
+    return 0;
+}
+
+/* stop object timer(s). return the turn when timer triggers.
+   returns 0 if no such timer attached to the object.
+   without a timer type parameter, stops all timers for the object. */
+/* local timeout = o:stop_timer("rot-organic"); */
+/* o:stop_timer(); */
+static int
+l_obj_timer_stop(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+
+        if (lo && lo->obj)
+            obj_stop_timers(lo->obj);
+        return 0;
+
+    } else if (argc == 2) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        short timertype = nhl_get_timertype(L, 2);
+
+        if (timer_is_obj(timertype) && lo && lo->obj) {
+            lua_pushinteger(L, stop_timer(timertype, obj_to_any(lo->obj)));
+            return 1;
+        } else {
+            lua_pushinteger(L, 0);
+            return 1;
+        }
+    } else
+        nhl_error(L, "l_obj_timer_stop: Wrong args");
+    return 0;
+}
+
+/* start an object timer. */
+/* o:start_timer("hatch-egg", 10); */
+static int
+l_obj_timer_start(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 3) {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        short timertype = nhl_get_timertype(L, 2);
+        long when = luaL_checkinteger(L, 3);
+
+        if (timer_is_obj(timertype) && lo && lo->obj && when > 0) {
+            if (obj_has_timer(lo->obj, timertype))
+                stop_timer(timertype, obj_to_any(lo->obj));
+            start_timer(when, TIMER_OBJECT, timertype, obj_to_any(lo->obj));
+        }
+    } else
+        nhl_error(L, "l_obj_timer_start: Wrong args");
+    return 0;
+}
 
 static const struct luaL_Reg l_obj_methods[] = {
     { "new", l_obj_new_readobjnam },
@@ -443,6 +548,10 @@ static const struct luaL_Reg l_obj_methods[] = {
     { "container", l_obj_container },
     { "contents", l_obj_getcontents },
     { "addcontent", l_obj_add_to_container },
+    { "has_timer", l_obj_timer_has },
+    { "peek_timer", l_obj_timer_peek },
+    { "stop_timer", l_obj_timer_stop },
+    { "start_timer", l_obj_timer_start },
     { NULL, NULL }
 };
 
