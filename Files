@@ -529,7 +529,7 @@ win/share:
 bmptiles.c     gifread.c      giftiles.c     monsters.txt   nhicns.uu
 nhsplash.xpm   objects.txt    other.txt      ppmwrite.c     renumtiles.pl
 safeproc.c     thintile.c     tile.doc       tile.h         tile2bmp.c
-tilemap.c      tileset.c      tiletext.c
+tilemap.c      tileset.c      tiletext.c     tiletxt.c
 
 win/shim:
 (file in top directory)
