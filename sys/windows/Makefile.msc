@@ -137,12 +137,6 @@ X11     = ..\win\X11     # X11 support files
 LIBDIR  = ..\lib         # libraries and external bits
 SUBM    = ..\submodules  # NetHack git submodules
 
-#
-#  Object directory.
-#
-
-OBJ     = o
-
 #==============================================================================
 # Sanity checks for prerequisite Lua and pdcurses
 #
@@ -226,6 +220,30 @@ ADD_CURSES=Y
 !MESSAGE NetHack 3.7 will be built without support for the curses window-port.
 !ENDIF
 
+#These will be in the environment variables with one of the Visual Studio
+#developer command prompts.
+#VSCMD_ARG_HOST_ARCH=x64
+#VSCMD_ARG_TGT_ARCH=x86
+
+# We need to do this here, so some output files can
+# incorporate TARGET_CPU into their names.
+#
+!IFDEF VSCMD_ARG_HOST_ARCH
+!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
+!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
+! IFNDEF TARGET_CPU
+!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
+TARGET_CPU=x64
+!  ELSE
+TARGET_CPU=x86
+!  ENDIF
+! ENDIF
+!ENDIF
+
+!IF "$(TARGET_CPU)" == ""
+TARGET_CPU=x86
+!ENDIF
+
 #TEST_CROSSCOMPILE=Y
 
 #
@@ -272,6 +290,12 @@ DLBDEF =
 # referenced later on in the Makefile.
 #
 #
+#  Object directory.
+#
+
+OBJ     = o\$(TARGET_CPU)
+
+#
 # Shorten up the location for some files
 #
 
@@ -313,8 +337,8 @@ CROSSCOMPILE=
 LUAVER=5.4.4
 !ENDIF
 
-LUALIB   = $(LIBDIR)\lua$(LUAVER)-static.lib
-LUADLL   = $(LIBDIR)\lua$(LUAVER).dll
+LUALIB   = $(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU)-static.lib
+LUADLL   = $(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU).dll
 LUAINCL  = /I$(LUASRC)
 LUATARGETS = lua.exe $(LUADLL) $(LUALIB)
 
@@ -366,7 +390,7 @@ PDCLIBOBJS = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o \
 PDCOBJS = $(O)pdcclip.o $(O)pdcdisp.o $(O)pdcgetsc.o $(O)pdckbd.o $(O)pdcscrn.o \
 	$(O)pdcsetsc.o $(O)pdcutil.o
 
-PDCLIB = $(LIBDIR)\pdcurses.lib
+PDCLIB = $(LIBDIR)\pdcurses-$(TARGET_CPU).lib
 
 PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
 
@@ -661,27 +685,6 @@ VSVER=2999              #untested future version
 # DO NOT DELETE THE FOLLOWING LINE
 !include <win32.mak>
 ! ENDIF
-
-#These will be in the environment variables with one of the Visual Studio
-#developer command prompts.
-#VSCMD_ARG_HOST_ARCH=x64
-#VSCMD_ARG_TGT_ARCH=x86
-
-!IFDEF VSCMD_ARG_HOST_ARCH
-!MESSAGE Host architecture is $(VSCMD_ARG_HOST_ARCH)
-!MESSAGE Target architecture is $(VSCMD_ARG_TGT_ARCH)
-! IFNDEF TARGET_CPU
-!  IF "$(VSCMD_ARG_TGT_ARCH)"=="x64"
-TARGET_CPU=x64
-!  ELSE
-TARGET_CPU=x86
-!  ENDIF
-! ENDIF
-!ENDIF
-
-!IF "$(TARGET_CPU)" == ""
-TARGET_CPU=x86
-!ENDIF
 
 !IF ($(VSVER) == 2010)
 CL_RECENT=
@@ -1526,7 +1529,7 @@ $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 # PDCurses
 #===============================================================================
 
-$(LIBDIR)\pdcurses.lib : $(PDCLIBOBJS) $(PDCOBJS)
+$(LIBDIR)\pdcurses-$(TARGET_CPU).lib : $(PDCLIBOBJS) $(PDCOBJS)
 	@echo Building library $@ from $**
 	@$(librarian) -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
@@ -1546,11 +1549,11 @@ lua.exe: $(O)lua.o $(LUALIB)
 #	@echo Linking $(@:\=/)
 #	@$(link) /OUT:$@ $(O)luac.o $(LUALIB)
 
-$(LIBDIR)\lua$(LUAVER).dll: $(LUAOBJFILES)
+$(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU).dll: $(LUAOBJFILES)
 	@echo Linking $(@:\=/)
 	@$(link) /DLL /IMPLIB:$(LIBDIR)\lua$(LUAVER).lib /OUT:$@ $(LUAOBJFILES)
 
-$(LIBDIR)\lua$(LUAVER)-static.lib: $(LUAOBJFILES)
+$(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU)-static.lib: $(LUAOBJFILES)
 	@echo Building library $@ from $**
 	@$(librarian) /OUT:$@ $(LUAOBJFILES)
 
@@ -1568,6 +1571,7 @@ $(O)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)
 $(O)windsys.o:  $(MSWSYS)\windsys.c $(WINDHDR) $(HACK_H)
 $(O)ntsound.o: $(MSWSYS)\ntsound.c $(WINDHDR) $(HACK_H)
 $(O)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
+$(O)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
 
 #if you aren't linking in the full gui then
 #include the following stub for proper linkage.
@@ -1611,8 +1615,8 @@ $(O)ttystub.o: $(WINDHDR) $(HACK_H) $(MSWSYS)\stubs.c
 # sys/share dependencies
 #===================================================================
 
-(O)cppregex.o:	$(O)cppregex.cpp $(HACK_H)
-	@$(CC) $(cppflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ ..\sys\share\cppregex.cpp
+$(O)cppregex.o: $(SSYS)\cppregex.cpp $(HACK_H)
+	@$(CC) $(cppflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(SSYS)\cppregex.cpp
 
 #===================================================================
 # curses window port dependencies
@@ -1957,7 +1961,7 @@ $(TARGETPFX)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 #$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)winshim.o: ..\win\shim\winshim.c $(HACK_H)
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\shim\winshim.c
-$(TARGETPFX)cppregex.o: ..\sys\share\cppregex.cpp
+#$(TARGETPFX)cppregex.o: ..\sys\share\cppregex.cpp
 #	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\sys\share\cppregex.cpp
 $(TARGETPFX)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
