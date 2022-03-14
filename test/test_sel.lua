@@ -222,6 +222,29 @@ function test_sel_logical_xor()
    sel_has_n_points(selr, 2, __func__);
 end -- test_sel_logical_xor
 
+function test_sel_subtraction()
+   local __func__ = "test_sel_subtraction";
+   local sela = selection.new();
+   local selb = selection.new();
+
+   sela:set(5,5);
+   sela:set(6,5);
+   sela:set(5,6);
+   sela:set(6,6);
+
+   selb:set(5,5);
+   selb:set(6,6);
+
+   local selr = sela - selb;
+
+   sel_pt_ne(selr, 5,5, 0, __func__);
+   sel_pt_ne(selr, 6,5, 1, __func__);
+   sel_pt_ne(selr, 5,6, 1, __func__);
+   sel_pt_ne(selr, 6,6, 0, __func__);
+
+   sel_has_n_points(selr, 2, __func__);
+end -- test_sel_subtraction
+
 function test_sel_filter_percent()
    local __func__ = "test_sel_filter_percent";
    local sela = selection.negate();
@@ -448,6 +471,8 @@ test_sel_negate();
 test_sel_logical_and();
 test_sel_logical_or();
 test_sel_logical_xor();
+-- addition operator is the same as logical or
+test_sel_subtraction();
 test_sel_filter_percent();
 test_sel_line();
 test_sel_rect();
