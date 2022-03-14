@@ -837,6 +837,7 @@ only give Sunsword or Demonbane as starting gear to lawful Angels
 for #knownclass with menustyle=Tradtional, allow player to ask for `a even if
 	no artifacts have been discovered yet, same as `<any-object-class>;
 	likewise for `u to ask to see unique items
+reduce eucalyptus leaf nutrition to 1
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

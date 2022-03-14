@@ -992,7 +992,7 @@ FOOD("glob of black pudding", 0,  2, 20, 0, FLESH,  20, CLR_BLACK,
 
 /* fruits & veggies */
 FOOD("kelp frond",            0,  1,  1, 0, VEGGY,  30, CLR_GREEN, KELP_FROND),
-FOOD("eucalyptus leaf",       3,  1,  1, 0, VEGGY,  30, CLR_GREEN,
+FOOD("eucalyptus leaf",       3,  1,  1, 0, VEGGY,   1, CLR_GREEN,
                                                              EUCALYPTUS_LEAF),
 FOOD("apple",                15,  1,  2, 0, VEGGY,  50, CLR_RED, APPLE),
 FOOD("orange",               10,  1,  2, 0, VEGGY,  80, CLR_ORANGE, ORANGE),
