@@ -548,7 +548,7 @@ l_obj_bury(lua_State *L)
     int argc = lua_gettop(L);
     boolean dealloced = FALSE;
     struct _lua_obj *lo = l_obj_check(L, 1);
-    xchar x, y;
+    xchar x = 0, y = 0;
 
     if (argc == 1) {
         x = lo->obj->ox;
