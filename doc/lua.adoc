@@ -793,11 +793,13 @@ Example:
 
 === Logical or
 
-Choose locations that are selected in either or both selections.
+Choose locations that are selected in either or both selections. The
+addition operator also does this.
 
 Example:
 
  local sel = selection.area(4,5, 40,10) | selection.rect(7,8, 60,14);
+ local sel = selection.area(4,5, 40,10) + selection.rect(7,8, 60,14);
 
 
 === Logical xor
@@ -807,6 +809,15 @@ Choose locations in either selection, but not both.
 Example:
 
  local sel = selection.area(4,5, 40,10) ~ selection.rect(7,8, 60,14);
+
+
+=== Logical difference
+
+Choose locations in the first selection but not in the second selection.
+
+Example:
+
+ local sel = selection.area(10,10, 20,20) - selection.area(14,14, 17,17);
 
 
 === area
