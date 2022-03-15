@@ -507,7 +507,7 @@ l_selection_grow(lua_State *L)
 {
     int argc = lua_gettop(L);
     const char *const growdirs[] = { "all", "random", "north", "west", "east", "south", NULL };
-    const int growdirs2i[] = { W_ANY, -1, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
+    const int growdirs2i[] = { W_ANY, W_RANDOM, W_NORTH, W_WEST, W_EAST, W_SOUTH, 0 };
 
     struct selectionvar *sel = l_selection_check(L, 1);
     int dir = growdirs2i[luaL_checkoption(L, 2, "all", growdirs)];

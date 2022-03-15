@@ -2496,7 +2496,6 @@ extern void flip_level_rnd(int, boolean);
 extern boolean check_room(xchar *, xchar *, xchar *, xchar *, boolean);
 extern boolean create_room(xchar, xchar, xchar, xchar, xchar, xchar, xchar,
                            xchar);
-extern void create_secret_door(struct mkroom *, xchar);
 extern boolean dig_corridor(coord *, coord *, boolean, schar, schar);
 extern void fill_special_room(struct mkroom *);
 extern void wallify_map(int, int, int, int);
