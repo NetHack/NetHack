@@ -966,10 +966,13 @@ use_pick_axe(struct obj *obj)
 
     /* Check tool */
     if (obj != uwep) {
-        if (!wield_tool(obj, "swing"))
-            return ECMD_OK;
-        else
-            res = ECMD_TIME;
+        if (wield_tool(obj, "swing")) {
+            /* we're now wielding it. next turn, apply to dig. */
+            cmdq_add_ec(doapply);
+            cmdq_add_key(obj->invlet);
+            return ECMD_TIME;
+        }
+        return ECMD_OK;
     }
     ispick = is_pick(obj);
     verb = ispick ? "dig" : "chop";

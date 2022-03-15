@@ -461,7 +461,7 @@ dofire(void)
                        swap to it and retry */
                     cmdq_add_ec(doswapweapon);
                     cmdq_add_ec(dofire);
-                    return ECMD_OK;
+                    return ECMD_TIME;
                 } else
                     You("have no ammunition readied.");
             }
@@ -502,7 +502,7 @@ dofire(void)
             /* swap weapons and retry fire */
             cmdq_add_ec(doswapweapon);
             cmdq_add_ec(dofire);
-            return ECMD_OK;
+            return ECMD_TIME;
         } else if ((olauncher = find_launcher(obj)) != 0) {
             /* wield launcher, retry fire */
             if (uwep && !flags.pushweapon)
@@ -510,7 +510,7 @@ dofire(void)
             cmdq_add_ec(dowield);
             cmdq_add_key(olauncher->invlet);
             cmdq_add_ec(dofire);
-            return ECMD_OK;
+            return ECMD_TIME;
         }
     }
 

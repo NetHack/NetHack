@@ -1576,8 +1576,14 @@ dorub(void)
             return ECMD_OK;
         }
     }
-    if (!wield_tool(obj, "rub"))
+    if (obj != uwep) {
+        if (wield_tool(obj, "rub")) {
+            cmdq_add_ec(dorub);
+            cmdq_add_key(obj->invlet);
+            return ECMD_TIME;
+        }
         return ECMD_OK;
+    }
 
     /* now uwep is obj */
     if (uwep->otyp == MAGIC_LAMP) {
@@ -2686,9 +2692,12 @@ use_whip(struct obj *obj)
     const char *msg_snap = "Snap!";
 
     if (obj != uwep) {
-        if (!wield_tool(obj, "lash"))
-            return ECMD_OK;
-        res = ECMD_TIME;
+        if (wield_tool(obj, "lash")) {
+            cmdq_add_ec(doapply);
+            cmdq_add_key(obj->invlet);
+            return ECMD_TIME;
+        }
+        return ECMD_OK;
     }
     if (!getdir((char *) 0))
         return (res|ECMD_CANCEL);
@@ -3078,9 +3087,12 @@ use_pole(struct obj *obj, boolean autohit)
         return ECMD_OK;
     }
     if (obj != uwep) {
-        if (!wield_tool(obj, "swing"))
-            return ECMD_OK;
-        res = ECMD_TIME;
+        if (wield_tool(obj, "swing")) {
+            cmdq_add_ec(doapply);
+            cmdq_add_key(obj->invlet);
+            return ECMD_TIME;
+        }
+        return ECMD_OK;
     }
     /* assert(obj == uwep); */
 
@@ -3331,10 +3343,12 @@ use_grapple(struct obj *obj)
         return ECMD_OK;
     }
     if (obj != uwep) {
-        if (!wield_tool(obj, "cast"))
-            return ECMD_OK;
-        else
-            res = ECMD_TIME;
+        if (wield_tool(obj, "cast")) {
+            cmdq_add_ec(doapply);
+            cmdq_add_key(obj->invlet);
+            return ECMD_TIME;
+        }
+        return ECMD_OK;
     }
     /* assert(obj == uwep); */
 
@@ -3947,12 +3961,10 @@ doapply(void)
             break;
         }
         pline("Sorry, I don't know how to use that.");
-        nomul(0);
-        return ECMD_OK;
+        return ECMD_FAIL;
     }
     if ((res & ECMD_TIME) && obj && obj->oartifact)
         arti_speak(obj);
-    nomul(0);
     return res;
 }
 
