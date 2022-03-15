@@ -4922,6 +4922,24 @@ l_table_getset_feature_flag(
     }
 }
 
+/* convert relative coordinate to absolute */
+int
+nhl_abs_coord(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    xchar x = -1, y = -1;
+
+    if (argc == 2) {
+        x = (xchar) lua_tointeger(L, 1);
+        y = (xchar) lua_tointeger(L, 2);
+        get_location_coord(&x, &y, ANY_LOC, NULL, SP_COORD_PACK(x,y));
+    } else
+        nhl_error(L, "nhl_abs_coord: Wrong args");
+    lua_pushinteger(L, x);
+    lua_pushinteger(L, y);
+    return 2;
+}
+
 /* feature("fountain", x, y); */
 /* feature("fountain", {x,y}); */
 /* feature({ type="fountain", x=NN, y=NN }); */

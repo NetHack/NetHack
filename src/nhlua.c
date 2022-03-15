@@ -1152,6 +1152,8 @@ static const struct luaL_Reg nhl_functions[] = {
     {"stop_timer_at", nhl_timer_stop_at},
     {"start_timer_at", nhl_timer_start_at},
 
+    {"abscoord", nhl_abs_coord},
+
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},

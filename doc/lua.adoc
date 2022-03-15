@@ -6,6 +6,17 @@
 
 Functions exposed from the NetHack core. They are all in the `nh` table.
 
+=== abscoord
+
+Convert a relative coordinate to absolute.
+des-routines tend to use relative coordinates, nh and obj use absolute.
+(This mess is still very much in need of improvement.)
+
+Example:
+
+ local ax, ay = nh.abscoord(x, y);
+
+
 === an
 
 Returns a string with "a " or "an " prepended to it.

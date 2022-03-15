@@ -73,7 +73,16 @@ themerooms = {
    function()
       des.room({ type = "themed", filled = 1,
                  contents = function()
-                    des.terrain(selection.floodfill(1,1), "I");
+                    local ice = selection.floodfill(1,1);
+                    des.terrain(ice, "I");
+                    if (percent(25)) then
+                       local mintime = 1000 - (nh.level_difficulty() * 100);
+                       local ice_melter = function(x,y)
+                          local ax,ay = nh.abscoord(x,y);
+                          nh.start_timer_at(ax,ay, "melt-ice", mintime + nh.rn2(1000));
+                       end;
+                       ice:iterate(ice_melter);
+                    end
                  end
       });
    end,

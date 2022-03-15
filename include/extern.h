@@ -2527,6 +2527,7 @@ extern void selection_do_gradient(struct selectionvar *, long, long, long,
                                   long, long, long, long, long);
 extern int lspo_reset_level(lua_State *);
 extern int lspo_finalize_level(lua_State *);
+extern int nhl_abs_coord(lua_State *);
 extern void update_croom(void);
 extern const char *get_trapname_bytype(int);
 extern void l_register_des(lua_State *);
