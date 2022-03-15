@@ -1068,11 +1068,17 @@ Example:
 === next
 
 Get the next object in the object chain.
+When called without an object, returns the first object in the object chain.
+When called with an object, an optional boolean parameter can be given. When
+it is true, and the object is on the map, the next object at the same location
+is returned. Otherwise the normal object chain is followed.
 
 Example:
 
- local o = obj.at(x, y);
- local o2 = o:next();
+ local first = obj.next();
+ local second = first:next();
+ local o_at_xy = obj.at(x, y);
+ local next_at_xy = o_at_xy:next(true);
 
 
 === totable

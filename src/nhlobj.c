@@ -399,15 +399,28 @@ l_obj_placeobj(lua_State *L)
 
 /* Get the next object in the object chain */
 /* local o = obj.at(x, y);
-   local o2 = o:next();
+   local o2 = o:next(true);
+   local firstobj = obj.next();
 */
 static int
 l_obj_nextobj(lua_State *L)
 {
-    struct _lua_obj *lo = l_obj_check(L, 1);
+    int argc = lua_gettop(L);
 
-    if (lo && lo->obj)
-        (void) l_obj_push(L, lo->obj->where == OBJ_FLOOR ? lo->obj->nexthere : lo->obj->nobj);
+    if (argc == 0) {
+        (void) l_obj_push(L, fobj);
+    } else {
+        struct _lua_obj *lo = l_obj_check(L, 1);
+        boolean use_nexthere = FALSE;
+
+        if (argc == 2)
+            use_nexthere = lua_toboolean(L, 2);
+
+        if (lo && lo->obj)
+            (void) l_obj_push(L, (use_nexthere && lo->obj->where == OBJ_FLOOR)
+                                  ? lo->obj->nexthere
+                                  : lo->obj->nobj);
+    }
     return 1;
 }
 
