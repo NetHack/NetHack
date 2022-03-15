@@ -158,6 +158,15 @@ Example:
  local t = nh.gettrap(x, y);
 
 
+=== has_timer_at
+
+Does location at x,y have a timer?
+
+Example:
+
+ local has_melttimer = nh.has_timer_at(x,y, "melt-ice");
+
+
 === deltrap
 
 Delete a trap at x,y
@@ -245,6 +254,15 @@ Example:
  nh.pline("Line: " .. errors[1].line .. ", " .. errors[1].error);
 
 
+=== peek_timer_at
+
+When does timer at location at x,y trigger?
+
+Example:
+
+ local melttime = nh.peek_timer_at(x,y, "melt-ice");
+
+
 === pline
 
 Show the text in the message area.
@@ -306,6 +324,24 @@ Example:
  for k, v in pairs(stairs) do
    nh.pline("stair[" .. k .. "]:(" .. v.x .. "," .. v.y .. ")," .. tostring(v.up));
  end
+
+
+=== start_timer_at
+
+Start a timer at location x,y, with trigger time of `when` - relative to current turn.
+
+Example:
+
+ nh.start_timer_at(x,y, "melt-ice", when);
+
+
+=== stop_timer_at
+
+Stop a timer at location x,y.
+
+Example:
+
+ nh.stop_timer_at(x,y, "melt-ice");
 
 
 === verbalize

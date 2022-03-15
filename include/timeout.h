@@ -39,6 +39,7 @@ enum timeout_types {
     NUM_TIME_FUNCS
 };
 
+#define timer_is_pos(ttype) ((ttype) == MELT_ICE_AWAY)
 #define timer_is_obj(ttype) ((ttype) == ROT_ORGANIC      \
                              || (ttype) == ROT_CORPSE    \
                              || (ttype) == REVIVE_MON    \
