@@ -1813,8 +1813,7 @@ mfndpos(
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
-    poolok = ((!Is_waterlevel(&u.uz) && IS_WATERWALL(nowtyp)
-               && !grounded(mdat))
+    poolok = ((!Is_waterlevel(&u.uz) && !grounded(mdat))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be
        simplified, but then adding another floater would be error prone */
@@ -1865,6 +1864,8 @@ mfndpos(
             if (IS_ROCK(ntyp)
                 && !((flag & ALLOW_WALL) && may_passwall(nx, ny))
                 && !((IS_TREE(ntyp) ? treeok : rockok) && may_dig(nx, ny)))
+                continue;
+            if (IS_WATERWALL(ntyp) && !is_swimmer(mdat))
                 continue;
             /* KMH -- Added iron bars */
             if (ntyp == IRONBARS
