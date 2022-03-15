@@ -1033,6 +1033,158 @@ Example:
  local sel = sel:set();
  local sel = selection.set(sel);
 
+== Obj
+
+Handling objects via obj-class.
+
+=== new
+
+Create a new object via wishing routine.
+
+Example:
+
+ local o = obj.new("rock");
+
+
+=== isnull
+
+Is the object a "null" object?  Meaning, the object variable exists in lua, but NetHack
+core has freed it.
+
+Example:
+
+ local badobj = o:isnull();
+
+
+=== at
+
+Get the topmost object on the map at x,y.
+
+Example:
+
+ local o = obj.at(x, y);
+
+
+=== next
+
+Get the next object in the object chain.
+
+Example:
+
+ local o = obj.at(x, y);
+ local o2 = o:next();
+
+
+=== totable
+
+Create a lua table representation of the object, unpacking all the object fields.
+
+Example:
+
+ local o = obj.new("rock");
+ local otbl = o:totable();
+
+
+=== class
+
+Get a lua table of object class data.
+
+Example:
+
+ local odata1 = obj.class(obj.new("rock"));
+
+
+=== placeobj
+
+Place object on the map at x,y.
+
+Example:
+
+ local o = obj.new("rock");
+ o:placeobj(u.ux, u.uy);
+
+
+=== container
+
+Get the container object is in.
+
+Example:
+
+ local box = o:container();
+
+
+=== contents
+
+Get the contents of an object.
+
+Example:
+
+ local o = obj.new("large chest");
+ local cobj = o:contents();
+
+
+=== addcontent
+
+Put object inside another object.
+
+Example:
+
+ local box = obj.new("large chest");
+ box.addcontent(obj.new("rock"));
+
+
+=== has_timer
+
+Does object have an attached timer of certain type?
+
+Example:
+
+ local hastimer = o:has_timer("rot-organic");
+
+
+=== peek_timer
+
+Peek at an object timer. Returns the turn when timer triggers.
+Returns 0 if no such timer attached to the object.
+
+Example:
+
+ local when = o:peek_timer("hatch-egg");
+
+
+=== stop_timer
+
+Stop object timer(s). Return the turn when timer would have triggered.
+Returns 0 if no such timer was attached to the object.
+Without a timer type parameters, stops all timers for the object,
+and returns nothing.
+
+Example:
+
+ o:stop_timer();
+ local when = o:stop_timer("rot-organic");
+
+
+=== start_timer
+
+Start an object timer.
+
+Example:
+
+ o:start_timer("hatch-egg", 10);
+
+
+=== bury
+
+Bury an object. Returns true if object is gone (merged with ground), false otherwise.
+Without parameters, buries the object at the location it is.
+
+Example:
+
+ local ogone = o:bury();
+ local ogone = o:bury(5, 5);
+
+
 == Map characters
 
 [%header, cols="10%,90%"]
