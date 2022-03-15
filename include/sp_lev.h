@@ -6,6 +6,7 @@
 #define SP_LEV_H
 
 /* wall directions */
+#define W_RANDOM -1
 #define W_NORTH 1
 #define W_SOUTH 2
 #define W_EAST 4
