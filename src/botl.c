@@ -111,7 +111,7 @@ do_statusline2(void)
             time (in moves), varying number of status conditions */
          dloc[QBUFSZ], hlth[QBUFSZ], expr[QBUFSZ], tmmv[QBUFSZ], cond[QBUFSZ];
     register char *nb;
-    unsigned dln, dx, hln, xln, tln, cln;
+    size_t dln, dx, hln, xln, tln, cln;
     int hp, hpmax, cap;
     long money;
 
@@ -227,7 +227,7 @@ do_statusline2(void)
     } else {
         if (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1 > MAXCO) {
             panic("bot2: second status line exceeds MAXCO (%u > %d)",
-                  (dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1), MAXCO);
+                  (unsigned)(dln + 1 + hln + 1 + xln + 1 + tln + 1 + cln + 1), MAXCO);
         } else if ((dln - dx) + 1 + hln + 1 + xln + 1 + cln <= COLNO) {
             Snprintf(newbot2, sizeof(newbot2), "%s %s %s %s %s", dloc, hlth,
                      expr, cond, tmmv);
@@ -391,14 +391,15 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
 void
 max_rank_sz(void)
 {
-    register int i, r, maxr = 0;
+    register int i;
+    size_t r, maxr = 0;
     for (i = 0; i < 9; i++) {
         if (g.urole.rank[i].m && (r = strlen(g.urole.rank[i].m)) > maxr)
             maxr = r;
         if (g.urole.rank[i].f && (r = strlen(g.urole.rank[i].f)) > maxr)
             maxr = r;
     }
-    g.mrank_sz = maxr;
+    g.mrank_sz = (int) maxr;
     return;
 }
 
@@ -2929,7 +2930,8 @@ hlattr2attrname(int attrib, char *buf, int bufsz)
 {
     if (attrib && buf) {
         char attbuf[BUFSZ];
-        int k, first = 0;
+        int first = 0;
+        size_t k;
 
         attbuf[0] = '\0';
         if (attrib == HL_NONE) {
@@ -2949,7 +2951,7 @@ hlattr2attrname(int attrib, char *buf, int bufsz)
             Strcat(attbuf, first++ ? "+dim" : "dim");
 
         k = strlen(attbuf);
-        if (k < (bufsz - 1))
+        if (k < (size_t)(bufsz - 1))
             Strcpy(buf, attbuf);
         return buf;
     }

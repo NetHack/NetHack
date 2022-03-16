@@ -736,7 +736,8 @@ name_to_monplus(
     register int mntmp = NON_PM;
     register char *s, *str, *term;
     char buf[BUFSZ];
-    int len, slen, mgend, matchgend = -1;
+    int len, mgend, matchgend = -1;
+    size_t slen;
     boolean exact_match = FALSE;
 
     if (remainder_p)
@@ -866,13 +867,13 @@ name_to_monplus(
 
         m_i_len = (int) strlen(mons[i].pmnames[mgend]);
         if (m_i_len > len && !strncmpi(mons[i].pmnames[mgend], str, m_i_len)) {
-            if (m_i_len == slen) {
+            if (m_i_len == (int) slen) {
                 mntmp = i;
                 len = m_i_len;
                 matchgend = mgend;
                 exact_match = TRUE;
                 break; /* exact match */
-            } else if (slen > m_i_len
+            } else if ((int) slen > m_i_len
                        && (str[m_i_len] == ' '
                            || !strcmpi(&str[m_i_len], "s")
                            || !strncmpi(&str[m_i_len], "s ", 2)

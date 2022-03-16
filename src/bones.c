@@ -690,7 +690,7 @@ boolean
 bones_include_name(const char *name)
 {
     struct cemetery *bp;
-    int len;
+    size_t len;
     char buf[BUFSZ];
 
     /* prepare buffer by appending terminal hyphen to name, to avoid partial

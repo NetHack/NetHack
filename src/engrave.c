@@ -535,7 +535,7 @@ doengrave(void)
     const char *everb;          /* Present tense of engraving type */
     const char *eloc; /* Where the engraving is (ie dust/floor/...) */
     char *sp;         /* Place holder for space count of engr text */
-    int len;          /* # of nonspace chars of new engraving text */
+    size_t len;          /* # of nonspace chars of new engraving text */
     struct engr *oep = engr_at(u.ux, u.uy);
     /* The current engraving */
     struct obj *otmp; /* Object selected with which to engrave */

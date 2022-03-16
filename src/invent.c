@@ -3622,7 +3622,7 @@ stackobj(struct obj *obj)
 boolean
 mergable(register struct obj *otmp, register struct obj *obj)
 {
-    int objnamelth = 0, otmpnamelth = 0;
+    size_t objnamelth = 0, otmpnamelth = 0;
 
     /* fail if already the same object, if different types, if either is
        explicitly marked to prevent merge, or if not mergable in general */
