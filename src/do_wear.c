@@ -1533,7 +1533,7 @@ stop_donning(struct obj *stolenobj) /* no message if stolenobj is already
                 thesimpleoname(otmp));
     } else {
         buf[0] = '\0';   /* silently stop doffing stolenobj */
-        result = -g.multi; /* remember this before calling unmul() */
+        result = (int) -g.multi; /* remember this before calling unmul() */
     }
     unmul(buf);
     /* while putting on, item becomes worn immediately but side-effects are

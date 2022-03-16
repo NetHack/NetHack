@@ -257,7 +257,7 @@ throw_obj(struct obj *obj, int shotlimit)
 static boolean
 ok_to_throw(int *shotlimit_p) /* (see dothrow()) */
 {
-    *shotlimit_p = g.command_count;
+    *shotlimit_p = LIMIT_TO_RANGE_INT(0, LARGEST_INT, g.command_count);
     g.multi = 0; /* reset; it's been used up */
 
     if (notake(g.youmonst.data)) {

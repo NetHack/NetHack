@@ -642,6 +642,15 @@ enum optset_restrictions {
 #endif
 #define plur(x) (((x) == 1) ? "" : "s")
 
+/* Cast to int, but limit value to range. */
+#define LIMIT_TO_RANGE_INT(lo, hi, var) \
+    (int) (                             \
+	(var) < (lo) ? (lo) : (         \
+	    (var) > (hi) ? (hi) :       \
+	    (var)                       \
+	)                               \
+    )
+
 #define ARM_BONUS(obj)                      \
     (objects[(obj)->otyp].a_ac + (obj)->spe \
      - min((int) greatest_erosion(obj), objects[(obj)->otyp].a_ac))

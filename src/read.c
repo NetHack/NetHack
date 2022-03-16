@@ -2894,7 +2894,7 @@ create_particular_parse(char* str, struct _create_particular_data* d)
     char *bufp = str;
     char *tmpp;
 
-    d->quan = 1 + ((g.multi > 0) ? g.multi : 0);
+    d->quan = 1 + ((g.multi > 0) ? (int) g.multi : 0);
     d->monclass = MAXMCLASSES;
     d->which = g.urole.mnum; /* an arbitrary index into mons[] */
     d->fem = -1;     /* gender not specified */

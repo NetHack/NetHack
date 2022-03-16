@@ -3176,7 +3176,7 @@ dopickup(void)
 {
     int count, tmpcount, ret;
 
-    count = g.command_count;
+    count = (int) g.command_count;
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks()) >= 0) {
