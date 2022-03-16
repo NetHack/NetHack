@@ -3045,7 +3045,7 @@ status_hilite_linestr_gather_conditions(void)
     int i;
     struct _cond_map {
         unsigned long bm;
-        unsigned long clratr;
+        unsigned int clratr;
     } cond_maps[SIZE(conditions)];
 
     (void) memset(cond_maps, 0,
@@ -3075,7 +3075,7 @@ status_hilite_linestr_gather_conditions(void)
             atr &= ~HL_NONE;
 
         if (clr != NO_COLOR || atr != HL_NONE) {
-            unsigned long ca = clr | (atr << 8);
+            unsigned int ca = clr | (atr << 8);
             boolean added_condmap = FALSE;
 
             for (j = 0; j < SIZE(conditions); j++)

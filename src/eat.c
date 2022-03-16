@@ -1762,7 +1762,7 @@ eatcorpse(struct obj *otmp)
                           ? herbivorous(g.youmonst.data)
                           : carnivorous(g.youmonst.data))
                          && rn2(10)
-                         && ((rotted < 1) ? TRUE : !rn2(rotted+1)));
+                         && ((rotted < 1) ? TRUE : !rn2((int)rotted+1)));
         const char *pmxnam = food_xname(otmp, FALSE);
 
         if (!strncmpi(pmxnam, "the ", 4))

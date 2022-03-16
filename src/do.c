@@ -11,7 +11,7 @@ static void polymorph_sink(void);
 static boolean teleport_sink(void);
 static void dosinkring(struct obj *);
 static int drop(struct obj *);
-static int menudrop_split(struct obj *, int);
+static int menudrop_split(struct obj *, long);
 static boolean engulfer_digests_food(struct obj *);
 static int wipeoff(void);
 static int menu_drop(int);
@@ -838,7 +838,7 @@ doddrop(void)
 }
 
 static int /* check callers */
-menudrop_split(struct obj *otmp, int cnt)
+menudrop_split(struct obj *otmp, long cnt)
 {
     if (cnt && cnt < otmp->quan) {
         if (welded(otmp)) {

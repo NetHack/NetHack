@@ -327,7 +327,8 @@ check_version(struct version_info *version_data, const char *filename,
 boolean
 uptodate(NHFILE *nhfp, const char *name, unsigned long utdflags)
 {
-    int rlen = 0, cmc = 0, filecmc = 0;
+    ssize_t rlen = 0;
+    int cmc = 0, filecmc = 0;
     struct version_info vers_info;
     boolean verbose = name ? TRUE : FALSE;
     char indicator;

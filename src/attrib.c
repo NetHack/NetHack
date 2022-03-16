@@ -1132,7 +1132,7 @@ adjalign(int n)
     } else if (newalign > u.ualign.record) {
         u.ualign.record = newalign;
         if (u.ualign.record > ALIGNLIM)
-            u.ualign.record = ALIGNLIM;
+            u.ualign.record = (int)ALIGNLIM;
     }
 }
 

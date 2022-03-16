@@ -279,6 +279,8 @@ typedef uchar nhsym;
    declaration has been moved out of the '#else' below to avoid getting
    a complaint from -Wmissing-prototypes when building with MONITOR_HEAP */
 extern char *dupstr(const char *);
+/* same, but return strlen(string) */
+extern char *dupstr_n(const char *string, unsigned int *lenout);
 
 /*
  * MONITOR_HEAP is conditionally used for primitive memory leak debugging.

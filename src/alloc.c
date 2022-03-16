@@ -150,4 +150,15 @@ dupstr(const char *string)
     return strcpy((char *) alloc(strlen(string) + 1), string);
 }
 
+/* similar for reasonable size strings, but return the length of the input as well */
+char *
+dupstr_n(const char *string, unsigned int *lenout)
+{
+    size_t len = strlen(string);
+    if(len >= LARGEST_INT)
+        panic("string too long");
+    *lenout = (unsigned int) len;
+    return strcpy((char *) alloc((unsigned)len + 1), string);
+}
+
 /*alloc.c*/

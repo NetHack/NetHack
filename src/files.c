@@ -3034,7 +3034,7 @@ read_config_file(const char *filename, int src)
 
 struct _cnf_parser_state {
     char *inbuf;
-    size_t inbufsz;
+    unsigned inbufsz;
     int rv;
     char *ep;
     char *buf;

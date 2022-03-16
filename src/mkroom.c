@@ -520,7 +520,7 @@ mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
             || has_dnstairs(sroom))
             continue;
 
-        rmno = (sroom - g.rooms) + ROOMOFFSET;
+        rmno = (int)(sroom - g.rooms) + ROOMOFFSET;
 
         /* satisfied; make a swamp */
         sroom->rtype = SWAMP;

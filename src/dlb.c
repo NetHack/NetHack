@@ -298,7 +298,7 @@ lib_dlb_fread(char *buf, int size, int quan, dlb *dp)
 
     /* make sure we don't read into the next file */
     if ((dp->size - dp->mark) < (size * quan))
-        quan = (dp->size - dp->mark) / size;
+        quan = (int)((dp->size - dp->mark) / size);
     if (quan == 0)
         return 0;
 
@@ -313,7 +313,7 @@ lib_dlb_fread(char *buf, int size, int quan, dlb *dp)
     dp->mark += nbytes;
     dp->lib->fmark += nbytes;
 
-    return nread;
+    return (int)nread;
 }
 
 static int

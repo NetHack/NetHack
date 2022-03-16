@@ -235,7 +235,7 @@ monmulti(struct monst* mtmp, struct obj* otmp, struct obj* mwep)
         if (ammo_and_launcher(otmp, mwep) && mwep->spe > 1)
             multishot += (long) rounddiv(mwep->spe, 3);
         /* Some randomness */
-        multishot = (long) rnd((int) multishot);
+        multishot = rnd((int) multishot);
 
         /* class bonus */
         multishot += multishot_class_bonus(monsndx(mtmp->data), otmp, mwep);
