@@ -80,7 +80,7 @@ browse_map(int ter_typ, const char *ter_explain)
     save_autodescribe = iflags.autodescribe;
     iflags.autodescribe = TRUE;
     iflags.terrainmode = ter_typ;
-    getpos(&dummy_pos, FALSE, ter_explain);
+    (void) getpos(&dummy_pos, FALSE, ter_explain);
     iflags.terrainmode = 0;
     iflags.autodescribe = save_autodescribe;
 }
