@@ -348,7 +348,6 @@ maketrap(int x, int y, int typ)
     boolean oldplace;
     struct trap *ttmp;
     struct rm *lev = &levl[x][y];
-    boolean was_ice = (lev->typ == ICE);
 
     if ((ttmp = t_at(x, y)) != 0) {
         if (undestroyable_trap(ttmp->ttyp))
@@ -447,21 +446,19 @@ maketrap(int x, int y, int typ)
                            : 0L);
         lev->doormask = 0;     /* subsumes altarmask, icedpool... */
         if (IS_ROOM(lev->typ)) /* && !IS_AIR(lev->typ) */
-            lev->typ = ROOM;
+            (void) set_levltyp(x, y, ROOM);
         /*
          * some cases which can happen when digging
          * down while phazing thru solid areas
          */
         else if (lev->typ == STONE || lev->typ == SCORR)
-            lev->typ = CORR;
+            (void) set_levltyp(x, y, CORR);
         else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
-            lev->typ = g.level.flags.is_maze_lev ? ROOM
-                       : g.level.flags.is_cavernous_lev ? CORR
-                         : DOOR;
+            (void) set_levltyp(x, y,  g.level.flags.is_maze_lev ? ROOM
+                               : g.level.flags.is_cavernous_lev ? CORR
+                                                                : DOOR);
 
         unearth_objs(x, y);
-        if (was_ice && lev->typ != ICE)
-            spot_stop_timers(x, y, MELT_ICE_AWAY);
         break;
     }
 

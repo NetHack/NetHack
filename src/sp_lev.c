@@ -329,7 +329,8 @@ lvlfill_solid(schar filling, schar lit)
 
     for (x = 2; x <= g.x_maze_max; x++)
         for (y = 0; y <= g.y_maze_max; y++) {
-            SET_TYPLIT(x, y, filling, lit);
+            if (!set_levltyp_lit(x, y, filling, lit))
+                continue;
             /* TODO: consolidate this w lspo_map ? */
             levl[x][y].flags = 0;
             levl[x][y].horizontal = 0;
@@ -350,7 +351,7 @@ lvlfill_swamp(schar fg, schar bg, schar lit)
         for (y = 0; y <= g.y_maze_max; y += 2) {
             int c = 0;
 
-            SET_TYPLIT(x, y, fg, lit);
+            (void) set_levltyp_lit(x, y, fg, lit);
             if (levl[x + 1][y].typ == bg)
                 ++c;
             if (levl[x][y + 1].typ == bg)
@@ -360,13 +361,13 @@ lvlfill_swamp(schar fg, schar bg, schar lit)
             if (c == 3) {
                 switch (rn2(3)) {
                 case 0:
-                    SET_TYPLIT(x + 1,y, fg, lit);
+                    (void) set_levltyp_lit(x + 1,y, fg, lit);
                     break;
                 case 1:
-                    SET_TYPLIT(x, y + 1, fg, lit);
+                    (void) set_levltyp_lit(x, y + 1, fg, lit);
                     break;
                 case 2:
-                    SET_TYPLIT(x + 1, y + 1, fg, lit);
+                    (void) set_levltyp_lit(x + 1, y + 1, fg, lit);
                     break;
                 default:
                     break;
@@ -1664,7 +1665,8 @@ create_door(room_door *dd, struct mkroom *broom)
         impossible("create_door: Can't find a proper place!");
         return;
     }
-    levl[x][y].typ = (dd->secret ? SDOOR : DOOR);
+    if (!set_levltyp(x, y, (dd->secret ? SDOOR : DOOR)))
+        return;
     levl[x][y].doormask = dd->mask;
 }
 
@@ -2278,7 +2280,6 @@ create_altar(altar* a, struct mkroom* croom)
     xchar x = -1, y = -1;
     unsigned int amask;
     boolean croom_is_temple = TRUE;
-    int oldtyp;
 
     if (croom) {
         get_free_room_loc(&x, &y, croom, a->coord);
@@ -2293,13 +2294,11 @@ create_altar(altar* a, struct mkroom* croom)
     }
 
     /* check for existing features */
-    oldtyp = levl[x][y].typ;
-    if (!CAN_OVERWRITE_TERRAIN(oldtyp))
+    if (!set_levltyp(x, y, ALTAR))
         return;
 
     amask = sp_amask_to_amask(a->sp_amask);
 
-    levl[x][y].typ = ALTAR;
     levl[x][y].altarmask = amask;
 
     if (a->shrine < 0)
@@ -4801,7 +4800,9 @@ sel_set_ter(int x, int y, genericptr_t arg)
     terrain terr;
 
     terr = *(terrain *) arg;
-    SET_TYPLIT(x, y, terr.ter, terr.tlit);
+    if (!set_levltyp_lit(x, y, terr.ter, terr.tlit))
+        return;
+    /* TODO: move this below into set_levltyp? */
     /* handle doors and secret doors */
     if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
         if (levl[x][y].typ == SDOOR)
@@ -5167,10 +5168,10 @@ lspo_replace_terrain(lua_State *L)
             if (selection_getpoint(x, y,sel)) {
                 if (mf) {
                     if (mapfrag_match(mf, x, y) && (rn2(100)) < chance)
-                        SET_TYPLIT(x, y, totyp, tolit);
+                        (void) set_levltyp_lit(x, y, totyp, tolit);
                 } else {
                     if (levl[x][y].typ == fromtyp && rn2(100) < chance)
-                        SET_TYPLIT(x, y, totyp, tolit);
+                        (void) set_levltyp_lit(x, y, totyp, tolit);
                 }
             }
 

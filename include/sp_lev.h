@@ -63,11 +63,6 @@ enum lvlinit_types {
 #define SEL_GRADIENT_RADIAL 0
 #define SEL_GRADIENT_SQUARE 1
 
-/* light states for terrain replacements, specifically for SET_TYPLIT
- * (not used for init_level) */
-#define SET_LIT_RANDOM -1
-#define SET_LIT_NOCHANGE -2
-
 #define SP_COORD_IS_RANDOM 0x01000000L
 /* Humidity flags for get_location() and friends, used with
  * SP_COORD_PACK_RANDOM() */
@@ -197,25 +192,5 @@ struct mapfragment {
     int wid, hei;
     char *data;
 };
-
-#define CAN_OVERWRITE_TERRAIN(ttyp) \
-    (iflags.debug_overwrite_stairs || !((ttyp) == LADDER || (ttyp) == STAIRS))
-
-#define SET_TYPLIT(x, y, ttyp, llit) \
-    do {                                                          \
-        if ((x) >= 1 && (y) >= 0 && (x) < COLNO && (y) < ROWNO) { \
-            if ((ttyp) < MAX_TYPE                                 \
-                && CAN_OVERWRITE_TERRAIN(levl[(x)][(y)].typ))     \
-                levl[(x)][(y)].typ = (ttyp);                      \
-            if ((ttyp) == LAVAPOOL)                               \
-                levl[(x)][(y)].lit = 1;                           \
-            else if ((schar)(llit) != SET_LIT_NOCHANGE) {         \
-                if ((schar)(llit) == SET_LIT_RANDOM)              \
-                    levl[(x)][(y)].lit = rn2(2);                  \
-                else                                              \
-                    levl[(x)][(y)].lit = (llit);                  \
-            }                                                     \
-        }                                                         \
-    } while (0)
 
 #endif /* SP_LEV_H */
