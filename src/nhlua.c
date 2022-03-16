@@ -34,6 +34,7 @@ static int nhl_deltrap(lua_State *);
 #if 0
 static int nhl_setmap(lua_State *);
 #endif
+static int nhl_impossible(lua_State *);
 static int nhl_pline(lua_State *);
 static int nhl_verbalize(lua_State *);
 static int nhl_parse_config(lua_State *);
@@ -490,6 +491,19 @@ nhl_getmap(lua_State *L)
 }
 
 RESTORE_WARNING_CONDEXPR_IS_CONSTANT
+
+/* impossible("Error!") */
+static int
+nhl_impossible(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1)
+        impossible("%s", luaL_checkstring(L, 1));
+    else
+        nhl_error(L, "Wrong args");
+    return 0;
+}
 
 /* pline("It hits!") */
 static int
@@ -1154,6 +1168,7 @@ static const struct luaL_Reg nhl_functions[] = {
 
     {"abscoord", nhl_abs_coord},
 
+    {"impossible", nhl_impossible},
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},

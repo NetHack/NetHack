@@ -187,6 +187,15 @@ Example:
  nh.deltrap(x, y);
 
 
+=== impossible
+
+Issue an impossible, signaling a possible error in the code.
+
+Example:
+
+ nh.impossible("Something errory happened!");
+
+
 === ing_suffix
 
 Construct a gerund (a verb formed by appending "ing" to a noun).
