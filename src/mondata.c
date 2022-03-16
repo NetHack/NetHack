@@ -860,20 +860,20 @@ name_to_monplus(
 
     for (len = 0, i = LOW_PM; i < NUMMONS; i++) {
       for (mgend = MALE; mgend < NUM_MGENDERS; mgend++) {
-        int m_i_len;
+        size_t m_i_len;
 
         if (!mons[i].pmnames[mgend])
             continue;
 
-        m_i_len = (int) strlen(mons[i].pmnames[mgend]);
-        if (m_i_len > len && !strncmpi(mons[i].pmnames[mgend], str, m_i_len)) {
-            if (m_i_len == (int) slen) {
+        m_i_len = strlen(mons[i].pmnames[mgend]);
+        if (m_i_len > (size_t) len && !strncmpi(mons[i].pmnames[mgend], str, (int) m_i_len)) {
+            if (m_i_len == slen) {
                 mntmp = i;
-                len = m_i_len;
+                len = (int) m_i_len;
                 matchgend = mgend;
                 exact_match = TRUE;
                 break; /* exact match */
-            } else if ((int) slen > m_i_len
+            } else if (slen > m_i_len
                        && (str[m_i_len] == ' '
                            || !strcmpi(&str[m_i_len], "s")
                            || !strncmpi(&str[m_i_len], "s ", 2)
@@ -884,7 +884,7 @@ name_to_monplus(
                            || !strcmpi(&str[m_i_len], "es")
                            || !strncmpi(&str[m_i_len], "es ", 3))) {
                 mntmp = i;
-                len = m_i_len;
+                len = (int) m_i_len;
                 matchgend = mgend;
             }
         }

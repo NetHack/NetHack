@@ -6660,7 +6660,8 @@ msgtype_parse_add(char *str)
         int i;
 
         for (i = 0; i < SIZE(msgtype_names); i++)
-            if (!strncmpi(msgtype_names[i].name, msgtype, strlen(msgtype))) {
+            if (streq(msgtype_names[i].name, msgtype, TRUE)) {
+            //if (!strncmpi(msgtype_names[i].name, msgtype, strlen(msgtype))) {
                 typ = msgtype_names[i].msgtyp;
                 break;
             }

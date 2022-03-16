@@ -364,8 +364,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
         /* loop through each of the rank titles for role #i */
         for (j = 0; j < 9; j++) {
             if (roles[i].rank[j].m
-                && !strncmpi(str, roles[i].rank[j].m,
-                             strlen(roles[i].rank[j].m))) {
+                && streq(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)
@@ -373,8 +372,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                 return roles[i].mnum;
             }
             if (roles[i].rank[j].f
-                && !strncmpi(str, roles[i].rank[j].f,
-                             strlen(roles[i].rank[j].f))) {
+                && streq(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)
@@ -498,7 +496,7 @@ static char *conditionbitmask2str(unsigned long);
 static unsigned long match_str2conditionbitmask(const char *);
 static unsigned long str2conditionbitmask(char *);
 static boolean parse_condition(char (*)[QBUFSZ], int);
-static char *hlattr2attrname(int, char *, int);
+static char *hlattr2attrname(int, char *, size_t);
 static void status_hilite_linestr_add(int, struct hilite_s *, unsigned long,
                                       const char *);
 static void status_hilite_linestr_done(void);
@@ -2926,7 +2924,7 @@ clear_status_hilites(void)
 }
 
 static char *
-hlattr2attrname(int attrib, char *buf, int bufsz)
+hlattr2attrname(int attrib, char *buf, size_t bufsz)
 {
     if (attrib && buf) {
         char attbuf[BUFSZ];

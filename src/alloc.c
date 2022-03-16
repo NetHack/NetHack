@@ -158,7 +158,7 @@ dupstr_n(const char *string, unsigned int *lenout)
     if(len >= LARGEST_INT)
         panic("string too long");
     *lenout = (unsigned int) len;
-    return strcpy((char *) alloc((unsigned)len + 1), string);
+    return strcpy((char *) alloc(len + 1), string);
 }
 
 /*alloc.c*/

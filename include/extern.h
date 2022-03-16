@@ -999,6 +999,7 @@ extern int strncmpi(const char *, const char *, int);
 #ifndef STRSTRI
 extern char *strstri(const char *, const char *);
 #endif
+extern int streq(const char *, const char *, boolean);
 extern boolean fuzzymatch(const char *, const char *, const char *, boolean);
 extern void init_random(int(*fn)(int));
 extern void reseed_random(int(*fn)(int));

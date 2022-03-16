@@ -635,7 +635,7 @@ rounddiv(long x, int y)
         divsgn = -divsgn;
         x = -x;
     }
-    r = x / y;
+    r = (int) (x / y);
     m = x % y;
     if (2 * m >= y)
         r++;
@@ -836,6 +836,30 @@ strstri(const char *str, const char *sub)
     return (char *) 0; /* not found */
 }
 #endif /* STRSTRI */
+
+/* string equality, possibly ignoring case; panics on huge strings */
+int
+streq(register const char *s1, register const char *s2,
+         boolean caseblind)
+{
+    register char t1, t2;
+    int n = LARGEST_INT;
+
+    while (n--) {
+        if (!*s2)
+            return (*s1 == 0); /* s1 >= s2 */
+        else if (!*s1)
+            return 1; /* s1 < s2 */
+	t1 = caseblind ? lowc(*s1) : *s1;
+	t2 = caseblind ? lowc(*s2) : *s2;
+	s1++,s2++;
+        if (t1 != t2)
+            return 0;
+    }
+    if (n==0)
+        panic("string too long");
+    return 1;
+}
 
 /* compare two strings for equality, ignoring the presence of specified
    characters (typically whitespace) and possibly ignoring case */

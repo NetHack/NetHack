@@ -2466,8 +2466,7 @@ donamelevel(void)
     /* add new annotation, unless it's all spaces (which will be an
        empty string after mungspaces() above) */
     if (*nbuf && strcmp(nbuf, " ")) {
-        mptr->custom = dupstr(nbuf);
-        mptr->custom_lth = strlen(mptr->custom);
+        mptr->custom = dupstr_n(nbuf,&mptr->custom_lth);
     }
     return ECMD_OK;
 }
