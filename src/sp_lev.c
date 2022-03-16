@@ -4932,7 +4932,8 @@ nhl_abs_coord(lua_State *L)
     if (argc == 2) {
         x = (xchar) lua_tointeger(L, 1);
         y = (xchar) lua_tointeger(L, 2);
-        get_location_coord(&x, &y, ANY_LOC, NULL, SP_COORD_PACK(x,y));
+        x += g.xstart;
+        y += g.ystart;
     } else
         nhl_error(L, "nhl_abs_coord: Wrong args");
     lua_pushinteger(L, x);
