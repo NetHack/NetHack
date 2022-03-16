@@ -313,7 +313,7 @@ opt_##a,
     NHOPTO("menu colors", o_menu_colors, BUFSZ, opt_in, set_in_game,
            No, Yes, No, NoAlias, "edit menu colors")
     NHOPTC(menuinvertmode, 5, opt_in, set_in_game, No, Yes, No, No, NoAlias,
-                "behaviour of menu iverts")
+                "experimental behaviour of menu inverts")
     NHOPTC(menustyle, MENUTYPELEN, opt_in, set_in_game, Yes, Yes, No, Yes,
                 NoAlias, "user interface for object selection")
     NHOPTO("message types", o_message_types, BUFSZ, opt_in, set_in_game,
