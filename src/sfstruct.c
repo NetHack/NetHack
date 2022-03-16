@@ -215,14 +215,14 @@ minit(void)
 void
 mread(int fd, genericptr_t buf, unsigned len)
 {
-    int rlen;
 #if defined(BSD) || defined(ULTRIX)
 #define readLenType int
 #else /* e.g. SYSV, __TURBOC__ */
 #define readLenType unsigned
 #endif
-
-    rlen = read(fd, buf, (readLenType) len);
+    readLenType rlen;
+        /* Not perfect, but we don't have ssize_t available. */
+    rlen = (readLenType) read(fd, buf, (readLenType) len);
     if ((readLenType) rlen != (readLenType) len) {
         if (restoreinfo.mread_flags == 1) { /* means "return anyway" */
             restoreinfo.mread_flags = -1;
