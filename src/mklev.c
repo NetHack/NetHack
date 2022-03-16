@@ -620,7 +620,7 @@ makeniche(int trap_type)
                 else {
                     /* inaccessible niches occasionally have iron bars */
                     if (!rn2(5) && IS_WALL(levl[xx][yy].typ)) {
-                        levl[xx][yy].typ = IRONBARS;
+                        (void) set_levltyp(xx, yy, IRONBARS);
                         if (rn2(3))
                             (void) mkcorpstat(CORPSE, (struct monst *) 0,
                                               mkclass(S_HUMAN, 0), xx,
@@ -1271,8 +1271,8 @@ place_branch(branch *br,       /* branch to place */
                                                      : !br->end1_up;
 
         stairway_add(x, y, goes_up, FALSE, dest);
+        (void) set_levltyp(x, y, STAIRS);
         levl[x][y].ladder = goes_up ? LA_UP : LA_DOWN;
-        levl[x][y].typ = STAIRS;
     }
     /*
      * Set made_branch to TRUE even if we didn't make a stairwell (i.e.
@@ -1635,10 +1635,7 @@ mkstairs(xchar x, xchar y,
     dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
     stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
-    if (levl[x][y].typ == ICE)
-        spot_stop_timers(x, y, MELT_ICE_AWAY);
-
-    levl[x][y].typ = STAIRS;
+    (void) set_levltyp(x,y, STAIRS);
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
 }
 
@@ -1733,7 +1730,8 @@ mkfount(int mazeflag, struct mkroom *croom)
     } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
 
     /* Put a fountain at m.x, m.y */
-    levl[m.x][m.y].typ = FOUNTAIN;
+    if (!set_levltyp(m.x, m.y, FOUNTAIN))
+        return;
     /* Is it a "blessed" fountain? (affects drinking from fountain) */
     if (!rn2(7))
         levl[m.x][m.y].blessedftn = 1;
@@ -1764,7 +1762,8 @@ mksink(struct mkroom *croom)
         return;
 
     /* Put a sink at m.x, m.y */
-    levl[m.x][m.y].typ = SINK;
+    if (!set_levltyp(m.x, m.y, SINK))
+        return;
 
     g.level.flags.nsinks++;
 }
@@ -1782,7 +1781,8 @@ mkaltar(struct mkroom *croom)
         return;
 
     /* Put an altar at m.x, m.y */
-    levl[m.x][m.y].typ = ALTAR;
+    if (!set_levltyp(m.x, m.y, ALTAR))
+        return;
 
     /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
     al = rn2((int) A_LAWFUL + 2) - 1;

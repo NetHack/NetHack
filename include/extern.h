@@ -1347,6 +1347,8 @@ extern boolean litstate_rnd(int);
 
 /* ### mkmaze.c ### */
 
+extern boolean set_levltyp(xchar, xchar, schar);
+extern boolean set_levltyp_lit(xchar, xchar, schar, schar);
 extern void create_maze(int, int, boolean);
 extern void wallification(int, int, int, int);
 extern void fix_wall_spines(int, int, int, int);

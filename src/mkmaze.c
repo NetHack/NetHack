@@ -67,6 +67,52 @@ is_solid(int x, int y)
     return (boolean) (!isok(x, y) || IS_STWALL(levl[x][y].typ));
 }
 
+/* set map terrain type, handling lava lit, ice melt timers, etc */
+boolean
+set_levltyp(xchar x, xchar y, schar typ)
+{
+    if (isok(x, y)) {
+        if ((typ < MAX_TYPE) && CAN_OVERWRITE_TERRAIN(levl[x][y].typ)) {
+            boolean was_ice = (levl[x][y].typ == ICE);
+
+            levl[x][y].typ = typ;
+
+            if (typ == LAVAPOOL)
+                levl[x][y].lit = 1;
+
+            if (was_ice && typ != ICE)
+                spot_stop_timers(x, y, MELT_ICE_AWAY);
+            return TRUE;
+        }
+#ifdef EXTRA_SANITY_CHECKS
+    } else {
+        impossible("set_levltyp(%i,%i,%i) !isok", x, y, typ);
+#endif /*EXTRA_SANITY_CHECKS*/
+    }
+    return FALSE;
+}
+
+/* set map terrain type and light state */
+boolean
+set_levltyp_lit(xchar x, xchar y, schar typ, schar lit)
+{
+    boolean ret = set_levltyp(x, y, typ);
+
+    if (ret && isok(x, y)) {
+        /* LAVAPOOL handled in set_levltyp */
+        if ((typ != LAVAPOOL) && (lit != SET_LIT_NOCHANGE)) {
+#ifdef EXTRA_SANITY_CHECKS
+            if (lit < SET_LIT_NOCHANGE || lit > 1)
+                impossible("set_levltyp_lit(%i,%i,%i,%i)", x, y, typ, lit);
+#endif /*EXTRA_SANITY_CHECKS*/
+            if (lit == SET_LIT_RANDOM)
+                lit = rn2(2);
+            levl[x][y].lit = lit;
+        }
+    }
+    return ret;
+}
+
 /*
  * Return 1 (not TRUE - we're doing bit vectors here) if we want to extend
  * a wall spine in the (dx,dy) direction.  Return 0 otherwise.

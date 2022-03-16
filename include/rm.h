@@ -233,6 +233,13 @@ struct rm {
     Bitfield(candig, 1); /* Exception to Can_dig_down; was a trapdoor */
 };
 
+/* light states for terrain replacements, for set_levltyp_lit */
+#define SET_LIT_RANDOM -1
+#define SET_LIT_NOCHANGE -2
+
+#define CAN_OVERWRITE_TERRAIN(ttyp) \
+    (iflags.debug_overwrite_stairs || !((ttyp) == LADDER || (ttyp) == STAIRS))
+
 /*
  * Add wall angle viewing by defining "modes" for each wall type.  Each
  * mode describes which parts of a wall are finished (seen as as wall)
