@@ -1635,6 +1635,9 @@ mkstairs(xchar x, xchar y,
     dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
     stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
+    if (levl[x][y].typ == ICE)
+        spot_stop_timers(x, y, MELT_ICE_AWAY);
+
     levl[x][y].typ = STAIRS;
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
 }
