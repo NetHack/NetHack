@@ -214,7 +214,7 @@ reset_occupations(void)
  * function times out by its own means.
  */
 void
-set_occupation(int (*fn)(void), const char *txt, cmdcount_t xtime)
+set_occupation(int (*fn)(void), const char *txt, cmdcount_nht xtime)
 {
     if (xtime) {
         g.occupation = timed_occupation;
@@ -4766,7 +4766,7 @@ get_count(
     char *allowchars,
     char inkey,
     long maxcount,
-    cmdcount_t *count,
+    cmdcount_nht *count,
     boolean historicmsg) /* whether to include in ^P history: True => yes */
 {
     char qbuf[QBUFSZ];

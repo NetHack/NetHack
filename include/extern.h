@@ -247,7 +247,7 @@ extern const char *cmdname_from_func(int(*)(void), char *, boolean);
 extern boolean redraw_cmd(char);
 extern const char *levltyp_to_name(int);
 extern void reset_occupations(void);
-extern void set_occupation(int(*)(void), const char *, cmdcount_t);
+extern void set_occupation(int(*)(void), const char *, cmdcount_nht);
 extern void cmdq_add_ec(int(*)(void));
 extern void cmdq_add_key(char);
 extern struct _cmd_queue *cmdq_pop(void);
@@ -279,7 +279,7 @@ extern const char *directionname(int);
 extern int isok(int, int);
 extern int get_adjacent_loc(const char *, const char *, xchar, xchar, coord *);
 extern const char *click_to_cmd(int, int, int);
-extern char get_count(char *, char, long, cmdcount_t *, boolean);
+extern char get_count(char *, char, long, cmdcount_nht *, boolean);
 #ifdef HANGUPHANDLING
 extern void hangup(int);
 extern void end_of_input(void);
