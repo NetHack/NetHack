@@ -161,8 +161,15 @@ static const struct paranoia_opts {
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
 };
 
-static NEARDATA const char *menutype[] = {
-    "traditional",  "combination",  "full",     "partial"
+static NEARDATA const char *menutype[][3] = { /* 'menustyle' settings */
+    { "traditional",  "[prompt for object class(es), then",
+                      " ask y/n for each item in those classes]" },
+    { "combination",  "[prompt for object class(es), then",
+                      " use menu for items in those classes]" },
+    { "full",         "[use menu to choose class(es), then",
+                      " use another menu for items in those]" },
+    { "partial",      "[skip class filtering; always",
+                      " use menu of all available items]" }
 };
 static NEARDATA const char *burdentype[] = {
     "unencumbered", "burdened",     "stressed",
@@ -1721,7 +1728,7 @@ optfn_menustyle(int optidx, int req, boolean negated, char *opts, char *op)
     if (req == get_val) {
         if (!opts)
             return optn_err;
-        Sprintf(opts, "%s", menutype[(int) flags.menu_style]);
+        Sprintf(opts, "%s", menutype[(int) flags.menu_style][0]);
         return optn_ok;
     }
     if (req == do_handler) {
@@ -4291,27 +4298,41 @@ handler_menustyle(void)
 {
     winid tmpwin;
     anything any;
-    int i;
-    const char *style_name;
+    boolean chngd;
+    int i, n, old_menu_style = flags.menu_style;
+    char buf[BUFSZ], sep = iflags.menu_tab_sep ? '\t' : ' ';
     menu_item *style_pick = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(menutype); i++) {
-        style_name = menutype[i];
-        /* note: separate `style_name' variable used
-           to avoid an optimizer bug in VAX C V2.3 */
+        Sprintf(buf, "%-12.12s%c%.60s", menutype[i][0], sep, menutype[i][1]);
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, *style_name, 0,
-                 ATR_NONE, style_name, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *buf, 0, ATR_NONE, buf,
+                 (i == flags.menu_style) ? MENU_ITEMFLAGS_SELECTED
+                                         : MENU_ITEMFLAGS_NONE);
+        /* second line is prefixed by spaces that "c - " would use */
+        Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, menutype[i][2]);
+        any.a_int = 0;
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+                 MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select menustyle:");
-    if (select_menu(tmpwin, PICK_ONE, &style_pick) > 0) {
-        flags.menu_style = style_pick->item.a_int - 1;
+    n = select_menu(tmpwin, PICK_ONE, &style_pick);
+    if (n > 0) {
+        i = style_pick[0].item.a_int - 1;
+        /* if there are two picks, use the one that wasn't pre-selected */
+        if (n > 1 && i == old_menu_style)
+            i = style_pick[1].item.a_int - 1;
+        flags.menu_style = i;
         free((genericptr_t) style_pick);
     }
     destroy_nhwindow(tmpwin);
+    chngd = (flags.menu_style != old_menu_style);
+    if (chngd || flags.verbose)
+        pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
+              menutype[(int) flags.menu_style][0]);
     return optn_ok;
 }
 
