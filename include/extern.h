@@ -1761,7 +1761,7 @@ extern void lcheck_param_table(lua_State *);
 extern schar get_table_mapchr(lua_State *, const char *);
 extern schar get_table_mapchr_opt(lua_State *, const char *, schar);
 extern short nhl_get_timertype(lua_State *, int);
-extern void nhl_add_table_entry_int(lua_State *, const char *, int);
+extern void nhl_add_table_entry_int(lua_State *, const char *, lua_Integer);
 extern void nhl_add_table_entry_char(lua_State *, const char *, char);
 extern void nhl_add_table_entry_str(lua_State *, const char *, const char *);
 extern void nhl_add_table_entry_bool(lua_State *, const char *, boolean);

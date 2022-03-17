@@ -93,11 +93,11 @@ static void selection_iterate(struct selectionvar *, select_iter_func,
 static void sel_set_ter(int, int, genericptr_t);
 static void sel_set_door(int, int, genericptr_t);
 static void sel_set_feature(int, int, genericptr_t);
-static int get_coord(lua_State *, int, int *, int *);
+static int get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
 static void levregion_add(lev_region *);
-static void get_table_xy_or_coord(lua_State *, int *, int *);
-static int get_table_region(lua_State *, const char *, int *, int *, int *,
-                            int *, boolean);
+static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
+static int get_table_region(lua_State *, const char *, lua_Integer *, lua_Integer *, lua_Integer *,
+                            lua_Integer *, boolean);
 static void set_wallprop_in_selection(lua_State *, int);
 static xchar random_wdir(void);
 static int floodfillchk_match_under(int, int);
@@ -109,7 +109,7 @@ static int get_table_align(lua_State *);
 static int get_table_monclass(lua_State *);
 static int find_montype(lua_State *, const char *, int *);
 static int get_table_montype(lua_State *, int *);
-static int get_table_int_or_random(lua_State *, const char *, int);
+static lua_Integer get_table_int_or_random(lua_State *, const char *, int);
 static int get_table_buc(lua_State *);
 static int get_table_objclass(lua_State *);
 static int find_objtype(lua_State *, const char *);
@@ -118,7 +118,7 @@ static const char *get_mkroom_name(int);
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
-static int get_table_intarray_entry(lua_State *, int, int);
+static lua_Integer get_table_intarray_entry(lua_State *, int, int);
 static struct sp_coder *sp_level_coder_init(void);
 
 /* lua_CFunction prototypes */
@@ -2992,10 +2992,10 @@ get_table_montype(lua_State *L, int *mgender)
 }
 
 static void
-get_table_xy_or_coord(lua_State *L, int *x, int *y)
+get_table_xy_or_coord(lua_State *L, lua_Integer *x, lua_Integer *y)
 {
-    int mx = get_table_int_opt(L, "x", -1);
-    int my = get_table_int_opt(L, "y", -1);
+    lua_Integer mx = get_table_int_opt(L, "x", -1);
+    lua_Integer my = get_table_int_opt(L, "y", -1);
 
     if (mx == -1 && my == -1) {
         lua_getfield(L, 1, "coord");
@@ -3019,7 +3019,8 @@ lspo_monster(lua_State *L)
 {
     int argc = lua_gettop(L);
     monster tmpmons;
-    int mx = -1, my = -1, mgend = NEUTRAL;
+    lua_Integer mx = -1, my = -1;
+    int mgend = NEUTRAL;
     char *mappear = NULL;
 
     create_des_coder();
@@ -3176,10 +3177,10 @@ lspo_monster(lua_State *L)
 
 /* the hash key 'name' is an integer or "random",
    or if not existent, also return rndval */
-static int
+static lua_Integer
 get_table_int_or_random(lua_State *L, const char *name, int rndval)
 {
-    int ret;
+    lua_Integer ret;
     char buf[BUFSZ];
 
     lua_getfield(L, 1, name);
@@ -3297,7 +3298,7 @@ lspo_object(lua_State *L)
 #endif
     long quancnt;
     object tmpobj;
-    int ox = -1, oy = -1;
+    lua_Integer ox = -1, oy = -1;
     int argc = lua_gettop(L);
     int maybe_contents = 0;
 
@@ -3581,7 +3582,7 @@ lspo_engraving(lua_State *L)
     create_des_coder();
 
     if (argc == 1) {
-        int ex, ey;
+        lua_Integer ex, ey;
         lcheck_param_table(L);
 
         get_table_xy_or_coord(L, &ex, &ey);
@@ -3590,7 +3591,7 @@ lspo_engraving(lua_State *L)
         etyp = engrtypes2i[get_table_option(L, "type", "engrave", engrtypes)];
         txt = get_table_str(L, "text");
     } else if (argc == 3) {
-        int ex, ey;
+        lua_Integer ex, ey;
         get_coord(L, 1, &ex, &ey);
         x = ex;
         y = ey;
@@ -3721,7 +3722,7 @@ lspo_room(lua_State *L)
         static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1, -1 };
         room tmproom;
         struct mkroom *tmpcr;
-        int rx, ry;
+        lua_Integer rx, ry;
 
         get_table_xy_or_coord(L, &rx, &ry);
         tmproom.x = rx, tmproom.y = ry;
@@ -3811,7 +3812,7 @@ l_create_stairway(lua_State *L, boolean using_ladder)
     struct trap *badtrap;
 
     long scoord;
-    int ax = -1, ay = -1;
+    lua_Integer ax = -1, ay = -1;
     int up;
     int ltype = lua_type(L, 1);
 
@@ -3898,7 +3899,7 @@ lspo_grave(lua_State *L)
     int argc = lua_gettop(L);
     xchar x, y;
     long scoord;
-    int ax,ay;
+    lua_Integer ax,ay;
     char *txt;
 
     create_des_coder();
@@ -3942,7 +3943,7 @@ lspo_altar(lua_State *L)
 
     altar tmpaltar;
 
-    int x, y;
+    lua_Integer x, y;
     long acoord;
     int shrine;
     int al;
@@ -4050,7 +4051,7 @@ int
 lspo_trap(lua_State *L)
 {
     spltrap tmptrap;
-    int x, y;
+    lua_Integer x, y;
     int argc = lua_gettop(L);
 
     create_des_coder();
@@ -4085,7 +4086,7 @@ lspo_trap(lua_State *L)
 
         lua_getfield(L, -1, "launchfrom");
         if (lua_type(L, -1) == LUA_TTABLE) {
-            int lx = -1, ly = -1;
+            lua_Integer lx = -1, ly = -1;
 
             get_coord(L, -1, &lx, &ly);
             lua_pop(L, 1);
@@ -4120,7 +4121,7 @@ lspo_gold(lua_State *L)
     xchar x, y;
     long amount;
     long gcoord;
-    int gx, gy;
+    lua_Integer gx, gy;
 
     create_des_coder();
 
@@ -4865,7 +4866,7 @@ lspo_door(lua_State *L)
         y = luaL_checkinteger(L, 3);
 
     } else {
-        int dx, dy;
+        lua_Integer dx, dy;
         lcheck_param_table(L);
 
         get_table_xy_or_coord(L, &dx, &dy);
@@ -4963,7 +4964,7 @@ lspo_feature(lua_State *L)
 
     if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
         && lua_type(L, 2) == LUA_TTABLE) {
-        int fx, fy;
+        lua_Integer fx, fy;
         typ = features2i[luaL_checkoption(L, 1, NULL, features)];
         get_coord(L, 2, &fx, &fy);
         x = fx;
@@ -4973,7 +4974,7 @@ lspo_feature(lua_State *L)
         x = luaL_checkinteger(L, 2);
         y = luaL_checkinteger(L, 3);
     } else {
-        int fx, fy;
+        lua_Integer fx, fy;
         lcheck_param_table(L);
 
         get_table_xy_or_coord(L, &fx, &fy);
@@ -5038,7 +5039,7 @@ lspo_terrain(lua_State *L)
     tmpterrain.ter = INVALID_TYPE;
 
     if (argc == 1) {
-        int tx, ty;
+        lua_Integer tx, ty;
         lcheck_param_table(L);
 
         get_table_xy_or_coord(L, &tx, &ty);
@@ -5052,7 +5053,7 @@ lspo_terrain(lua_State *L)
         tmpterrain.tlit = get_table_int_opt(L, "lit", SET_LIT_NOCHANGE);
     } else if (argc == 2 && lua_type(L, 1) == LUA_TTABLE
                && lua_type(L, 2) == LUA_TSTRING) {
-        int tx, ty;
+        lua_Integer tx, ty;
         tmpterrain.ter = check_mapchr(luaL_checkstring(L, 2));
         lua_pop(L, 1);
         get_coord(L, 1, &tx, &ty);
@@ -5101,7 +5102,7 @@ lspo_replace_terrain(lua_State *L)
     struct selectionvar *sel = NULL;
     boolean freesel = FALSE;
     int x, y;
-    int x1, y1, x2, y2;
+    lua_Integer x1, y1, x2, y2;
     int chance;
     int tolit;
 
@@ -5295,10 +5296,10 @@ ensure_way_out(void)
     selection_free(ov, TRUE);
 }
 
-static int
+static lua_Integer
 get_table_intarray_entry(lua_State *L, int tableidx, int entrynum)
 {
-    int ret = 0;
+    lua_Integer ret = 0;
     if (tableidx < 0)
         tableidx--;
 
@@ -5321,11 +5322,11 @@ static int
 get_table_region(
     lua_State *L,
     const char *name,
-    int *x1, int *y1,
-    int *x2, int *y2,
+    lua_Integer *x1, lua_Integer *y1,
+    lua_Integer *x2, lua_Integer *y2,
     boolean optional)
 {
-    int arrlen;
+    lua_Integer arrlen;
 
     lua_getfield(L, 1, name);
     if (optional && lua_type(L, -1) == LUA_TNIL) {
@@ -5354,7 +5355,7 @@ get_table_region(
 }
 
 static int
-get_coord(lua_State *L, int i, int *x, int *y)
+get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
 {
     if (lua_type(L, i) == LUA_TTABLE) {
         int arrlen;
@@ -5418,7 +5419,7 @@ lspo_teleport_region(lua_State *L)
     static const char *const teledirs[] = { "both", "down", "up", NULL };
     static const int teledirs2i[] = { LR_TELE, LR_DOWNTELE, LR_UPTELE, -1 };
     lev_region tmplregion;
-    int x1,y1,x2,y2;
+    lua_Integer x1,y1,x2,y2;
 
     create_des_coder();
 
@@ -5471,7 +5472,7 @@ lspo_levregion(lua_State *L)
         LR_TELE, LR_UPTELE, LR_DOWNTELE, 0
     };
     lev_region tmplregion;
-    int x1,y1,x2,y2;
+    lua_Integer x1,y1,x2,y2;
 
     create_des_coder();
 
@@ -5556,7 +5557,7 @@ lspo_region(lua_State *L)
         dy2 = get_table_int_opt(L, "y2", -1);
 
         if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
-            int rx1, ry1, rx2, ry2;
+            lua_Integer rx1, ry1, rx2, ry2;
             get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
             dx1 = rx1; dy1 = ry1;
             dx2 = rx2; dy2 = ry2;
@@ -5679,7 +5680,8 @@ lspo_drawbridge(lua_State *L)
     };
     static const int dbopens2i[] = { 1, 0, -1, -2 };
     xchar x, y;
-    int mx, my, dir;
+    lua_Integer mx, my;
+    int dir;
     int db_open;
     long dcoord;
 
@@ -5716,7 +5718,7 @@ lspo_mazewalk(lua_State *L)
     };
     static const int mwdirs2i[] = { W_NORTH, W_SOUTH, W_EAST, W_WEST, W_RANDOM, -2 };
     xchar x, y;
-    int mx, my;
+    lua_Integer mx, my;
     xchar ftyp = ROOM;
     int fstocked = 1, dir = -1;
     long mcoord;
@@ -5826,7 +5828,7 @@ lspo_wall_property(lua_State *L)
     dy2 = get_table_int_opt(L, "y2", -1);
 
     if (dx1 == -1 && dy1 == -1 && dx2 == -1 && dy2 == -1) {
-        int rx1, ry1, rx2, ry2;
+        lua_Integer rx1, ry1, rx2, ry2;
         get_table_region(L, "region", &rx1, &ry1, &rx2, &ry2, FALSE);
         dx1 = rx1; dy1 = ry1;
         dx2 = rx2; dy2 = ry2;
@@ -6024,7 +6026,8 @@ TODO: g.coder->croom needs to be updated
         "top", "center", "bottom", "none", NULL
     };
     static const int t_or_b2i[] = { TOP, CENTER, BOTTOM, -1, -1 };
-    int lr, tb, x = -1, y = -1;
+    int lr, tb;
+    lua_Integer x = -1, y = -1;
     struct mapfragment *mf;
     char *tmpstr;
     int argc = lua_gettop(L);

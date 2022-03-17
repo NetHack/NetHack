@@ -212,7 +212,7 @@ nhl_get_timertype(lua_State *L, int idx)
 }
 
 void
-nhl_add_table_entry_int(lua_State *L, const char *name, int value)
+nhl_add_table_entry_int(lua_State *L, const char *name, lua_Integer value)
 {
     lua_pushstring(L, name);
     lua_pushinteger(L, value);
@@ -923,7 +923,7 @@ nhl_dnum_name(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc == 1) {
-        int dnum = luaL_checkinteger(L, 1);
+        lua_Integer dnum = luaL_checkinteger(L, 1);
 
         if (dnum >= 0 && dnum < g.n_dgns)
             lua_pushstring(L, g.dungeons[dnum].dname);
