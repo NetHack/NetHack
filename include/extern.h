@@ -1229,7 +1229,7 @@ extern void newmonhp(struct monst *, int);
 extern struct mextra *newmextra(void);
 extern void copy_mextra(struct monst *, struct monst *);
 extern void dealloc_mextra(struct monst *);
-extern struct monst *makemon(struct permonst *, int, int, long);
+extern struct monst *makemon(struct permonst *, int, int, mmflags_nht);
 extern struct monst *unmakemon(struct monst *, long);
 extern boolean create_critters(int, struct permonst *, boolean);
 extern struct permonst *rndmonst(void);

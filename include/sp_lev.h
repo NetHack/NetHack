@@ -138,7 +138,7 @@ typedef struct {
         paralyzed, stunned, confused, waiting;
     long seentraps;
     short has_invent;
-    long mm_flags; /* makemon flags */
+    mmflags_nht mm_flags; /* makemon flags */
 } monster;
 
 typedef struct {

@@ -71,7 +71,7 @@ make_familiar(struct obj *otmp, xchar x, xchar y, boolean quietly)
     int chance, trycnt = 100;
 
     do {
-        long mmflags;
+        mmflags_nht mmflags;
         int cgend, mndx;
 
         if (otmp) { /* figurine; otherwise spell */

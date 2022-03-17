@@ -18,7 +18,7 @@ static boolean uncommon(int);
 static int align_shift(struct permonst *);
 static boolean mk_gen_ok(int, unsigned, unsigned);
 static boolean wrong_elem_type(struct permonst *);
-static void m_initgrp(struct monst *, int, int, int, int);
+static void m_initgrp(struct monst *, int, int, int, mmflags_nht);
 static void m_initthrow(struct monst *, int, int);
 static void m_initweap(struct monst *);
 static void m_initinv(struct monst *);
@@ -71,7 +71,7 @@ wrong_elem_type(struct permonst *ptr)
 
 /* make a group just like mtmp */
 static void
-m_initgrp(struct monst *mtmp, int x, int y, int n, int mmflags)
+m_initgrp(struct monst *mtmp, int x, int y, int n, mmflags_nht mmflags)
 {
     coord mm;
     register int cnt = rnd(n);
@@ -1114,7 +1114,7 @@ makemon_rnd_goodpos(struct monst *mon, long gpflags, coord *cc)
  */
 struct monst *
 makemon(register struct permonst *ptr,
-        register int x, register int y, long mmflags)
+        register int x, register int y, mmflags_nht mmflags)
 {
     register struct monst *mtmp;
     struct monst fakemon;

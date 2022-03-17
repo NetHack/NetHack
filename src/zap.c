@@ -776,7 +776,7 @@ revive(struct obj *corpse, boolean by_hero)
     coord xy;
     xchar x, y;
     boolean one_of;
-    long mmflags = NO_MINVENT | MM_NOWAIT | MM_NOMSG;
+    mmflags_nht mmflags = NO_MINVENT | MM_NOWAIT | MM_NOMSG;
     int montype, cgend, container_nesting = 0;
     boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
 
@@ -5554,7 +5554,7 @@ makewish(void)
     struct obj *otmp, nothing;
     long maybe_LL_arti;
     int tries = 0;
-    int oldwisharti = u.uconduct.wisharti;
+    long oldwisharti = u.uconduct.wisharti;
 
     promptbuf[0] = '\0';
     nothing = cg.zeroobj; /* lint suppression; only its address matters */

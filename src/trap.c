@@ -642,7 +642,7 @@ animate_statue(
             wary_dog(mon, TRUE);
     } else {
         int sgend = (statue->spe & CORPSTAT_GENDER);
-        long mmflags = (NO_MINVENT | MM_NOMSG
+        mmflags_nht mmflags = (NO_MINVENT | MM_NOMSG
                         | ((sgend == CORPSTAT_MALE) ? MM_MALE : 0)
                         | ((sgend == CORPSTAT_FEMALE) ? MM_FEMALE : 0));
 

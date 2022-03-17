@@ -263,6 +263,8 @@ typedef struct sortloot_item Loot;
          || (g.context.warntype.species                                 \
              && (g.context.warntype.species == (mon)->data))))
 
+typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
+
 #include "trap.h"
 #include "flag.h"
 #include "vision.h"
