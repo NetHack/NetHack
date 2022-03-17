@@ -146,6 +146,11 @@ extern void interject(int);
 #endif
 /* Turn on some additional warnings */
 #pragma warning(3:4389)
+
+/* supply ssize_t */
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+
 #endif /* _MSC_VER */
 
 /* The following is needed for prototypes of certain functions */
