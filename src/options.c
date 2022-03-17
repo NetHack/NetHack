@@ -371,7 +371,7 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         got_match = FALSE;
 
         if (allopt[i].pfx) {
-            if (!strncmpi(opts, allopt[i].name, strlen(allopt[i].name))) {
+            if (streq(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
                 got_match = TRUE;
             }
@@ -2717,13 +2717,13 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
         if (negated) {
             flags.runmode = RUN_TPORT;
         } else if (op != empty_optstr) {
-            if (!strncmpi(op, "teleport", strlen(op)))
+            if (streq(op, "teleport", TRUE))
                 flags.runmode = RUN_TPORT;
-            else if (!strncmpi(op, "run", strlen(op)))
+            else if (streq(op, "run", TRUE))
                 flags.runmode = RUN_LEAP;
-            else if (!strncmpi(op, "walk", strlen(op)))
+            else if (streq(op, "walk", TRUE))
                 flags.runmode = RUN_STEP;
-            else if (!strncmpi(op, "crawl", strlen(op)))
+            else if (streq(op, "crawl", TRUE))
                 flags.runmode = RUN_CRAWL;
             else {
                 config_error_add("Unknown %s parameter '%s'",
@@ -5156,7 +5156,7 @@ handler_menu_colors(void)
                     (tmp->attr != ATR_NONE) ? "&" : "",
                     (tmp->attr != ATR_NONE) ? sattr : "");
             /* now main string */
-            ln = sizeof buf - strlen(buf) - 1; /* length available */
+            ln = sizeof buf - Strlen(buf) - 1; /* length available */
             Strcpy(mcbuf, "\"");
             if (strlen(tmp->origstr) > ln)
                 Strcat(strncat(mcbuf, tmp->origstr, ln - 3), "...");
@@ -5229,7 +5229,7 @@ handler_msgtype(void)
             mtype = msgtype2name(tmp->msgtype);
             any.a_int = ++mt_idx;
             Sprintf(mtbuf, "%-5s \"", mtype);
-            ln = sizeof mtbuf - strlen(mtbuf) - sizeof "\"";
+            ln = sizeof mtbuf - Strlen(mtbuf) - sizeof "\"";
             if (strlen(tmp->pattern) > ln)
                 Strcat(strncat(mtbuf, tmp->pattern, ln - 3), "...\"");
             else
@@ -5334,7 +5334,7 @@ determine_ambiguities(void)
         }
     }
     for (i = 0; i < SIZE(allopt) - 1; ++i) {
-        len = strlen(allopt[i].name);
+        len = Strlen(allopt[i].name);
         allopt[i].minmatch = (needed[i] < 3) ? 3
                                 : (needed[i] <= len) ? needed[i] : len;
     }
@@ -7345,8 +7345,9 @@ longest_option_name(int startpass, int endpass)
                 || (is_wc2_option(name) && !wc2_supported(name)))
                 continue;
 
-            if (strlen(name) > longest_name_len)
-                longest_name_len = strlen(name);
+            unsigned len = Strlen(name);
+            if (len > longest_name_len)
+                longest_name_len = len;
         }
     return longest_name_len;
 }
@@ -8021,7 +8022,7 @@ match_sym(char *buf)
         { "S_explode8" , "S_expl_bc" },
         { "S_explode9" , "S_expl_br" },
     };
-    size_t len = strlen(buf);
+    unsigned len = Strlen(buf);
     const char *p = index(buf, ':'), *q = index(buf, '=');
     struct symparse *sp = loadsyms;
 
@@ -8035,7 +8036,7 @@ match_sym(char *buf)
         len = (int) (p - buf);
     }
     while (sp->range) {
-        if ((len >= strlen(sp->name)) && !strncmpi(buf, sp->name, len))
+        if ((len >= Strlen(sp->name)) && !strncmpi(buf, sp->name, len))
             return sp;
         sp++;
     }
@@ -8232,7 +8233,7 @@ next_opt(winid datawin, const char *str)
             Strcpy(s - 2, "."); /* replace last ", " */
         i = COLNO;              /* (greater than COLNO - 2) */
     } else {
-        i = strlen(buf) + strlen(str) + 2;
+        i = Strlen(buf) + Strlen(str) + 2;
     }
 
     if (i > COLNO - 2) { /* rule of thumb */

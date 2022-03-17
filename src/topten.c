@@ -1062,7 +1062,7 @@ outentry(int rank, struct toptenentry* t1, boolean so)
         } else
             topten_print(linebuf);
         Snprintf(linebuf, sizeof(linebuf), "%15s %s", "", linebuf3);
-        lngr = strlen(linebuf);
+        lngr = Strlen(linebuf);
     }
     /* beginning of hp column not including padding */
     hppos = COLNO - 7 - (int) strlen(hpbuf);

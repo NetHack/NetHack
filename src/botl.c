@@ -1048,7 +1048,7 @@ parse_cond_option(boolean negated, char *opts)
     uniqpart = opts + (sizeof prefix - 1);
     for (i = 0; i < CONDITION_COUNT; ++i) {
         compareto = condtests[i].useroption;
-        sl = strlen(compareto);
+        sl = Strlen(compareto);
         if (match_optname(uniqpart, compareto, (sl >= 4) ? 4 : sl, FALSE)) {
             condopt(i, &condtests[i].choice, negated);
             return 0;

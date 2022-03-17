@@ -1923,7 +1923,7 @@ the(const char* str)
             if (tmp && (!named || tmp < named)) /* found an "of" */
                 insert_the = TRUE;
             /* stupid special case: lacks "of" but needs "the" */
-            else if (!named && (l = strlen(str)) >= 31
+            else if (!named && (l = Strlen(str)) >= 31
                      && !strcmp(&str[l - 31],
                                 "Platinum Yendorian Express Card"))
                 insert_the = TRUE;

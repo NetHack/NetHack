@@ -706,7 +706,7 @@ migr_booty_item(int otyp, const char* gang)
 
     otmp = mksobj_migr_to_species(otyp, (unsigned long) M2_ORC, TRUE, FALSE);
     if (otmp && gang) {
-        new_oname(otmp, strlen(gang) + 1); /* removes old name if present */
+        new_oname(otmp, Strlen(gang) + 1); /* removes old name if present */
         Strcpy(ONAME(otmp), gang);
         if (objects[otyp].oc_class == FOOD_CLASS) {
             if (otyp == SLIME_MOLD)

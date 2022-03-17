@@ -24,7 +24,7 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          stripdigits     (char *)
-	unsigned	Strlen		(const char *str)
+	unsigned	Strlen_		(const char *str, const char *, int)
         char *          eos             (char *)
         boolean         str_end_is      (const char *, const char *)
         int             str_lines_maxlen (const char *)
@@ -231,11 +231,11 @@ eos(register char *s)
 
 /* like strlen(3) but returns unsigned and panics if string is unreasonably long */
 unsigned
-Strlen(const char *str){
+Strlen_(const char *str, const char *file, int line){
     size_t len = strnlen(str, LARGEST_INT);
 
     if (len == LARGEST_INT)
-	panic("string too long");
+	panic("%s:%d string too long", file, line);
     return (unsigned) len;
 }
 

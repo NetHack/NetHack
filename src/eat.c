@@ -176,7 +176,7 @@ eatmupdate(void)
 
     if (altmsg) {
         /* replace end-of-mimicking message */
-        int amlen = Strlen(altmsg);
+        unsigned amlen = Strlen(altmsg);
         if (amlen > Strlen(g.eatmbuf)) {
             free((genericptr_t) g.eatmbuf);
             g.eatmbuf = (char *) alloc(amlen + 1);

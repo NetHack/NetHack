@@ -814,7 +814,7 @@ str2race(const char *str)
         return ROLE_NONE;
 
     /* Match as much of str as is provided */
-    len = strlen(str);
+    len = Strlen(str);
     for (i = 0; races[i].noun; i++) {
         /* Does it match the noun? */
         if (!strncmpi(str, races[i].noun, len))

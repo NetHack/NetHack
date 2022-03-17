@@ -1008,7 +1008,7 @@ save_msghistory(NHFILE* nhfp)
         /* ask window port for each message in sequence */
         while ((msg = getmsghistory(init)) != 0) {
             init = FALSE;
-            msglen = strlen(msg);
+            msglen = Strlen(msg);
             if (msglen < 1)
                 continue;
             /* sanity: truncate if necessary (shouldn't happen);
