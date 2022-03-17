@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1612127121 2021/01/31 21:05:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
+/* NetHack 3.7	windows.c	$NHDT-Date: 1647472699 2022/03/16 23:18:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1493,21 +1493,32 @@ genl_putmixed(winid window, int attr, const char *str)
  * logic into one place instead of 7 different window-port routines.
  */
 boolean
-menuitem_invert_test(int mode,
-                     unsigned itemflags,     /* The itemflags for the item */
-                     boolean is_selected)    /* The current selection status
-                                                of the item */
+menuitem_invert_test(
+    int mode UNUSED,        /* 0: invert; 1: set; 2: unset */
+    unsigned itemflags,     /* itemflags for the item */
+    boolean is_selected)    /* current selection status of the item */
 {
     boolean skipinvert = (itemflags & MENU_ITEMFLAGS_SKIPINVERT) != 0;
 
-    if ((iflags.menuinvertmode == 1 || iflags.menuinvertmode == 2)
-        && !mode && skipinvert && !is_selected)
+    if (!skipinvert) /* if not flagged SKIPINVERT, always pass test */
+        return TRUE;
+    /*
+     * mode 0: inverting current on/off state;
+     *      1: unconditionally setting on;
+     *      2: unconditionally setting off.
+     * menuinvertmode 0: treat entries flagged with skipinvert as ordinary
+     *                   (same as if not flagged);
+     * menuinvertmode 1: don't toggle bulk invert or bulk set entries On
+     *                   (allow such toggling or setting to change to Off);
+     * menuinvertmode 2: don't toggle skipinvert entries either On or Off
+     *                   when a bulk change is performed.
+     */
+    if (iflags.menuinvertmode == 2) {
         return FALSE;
-    else if (iflags.menuinvertmode == 2
-        && !mode && skipinvert && is_selected)
-        return TRUE;
-    else
-        return TRUE;
+    } else if (iflags.menuinvertmode == 1) {
+        return is_selected ? TRUE : FALSE;
+    }
+    return TRUE;
 }
 
 /*windows.c*/

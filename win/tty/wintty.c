@@ -204,8 +204,8 @@ static void set_item_state(winid, int, tty_menu_item *);
 static void set_all_on_page(winid, tty_menu_item *, tty_menu_item *);
 static void unset_all_on_page(winid, tty_menu_item *, tty_menu_item *);
 static void invert_all_on_page(winid, tty_menu_item *, tty_menu_item *,
-                               char);
-static void invert_all(winid, tty_menu_item *, tty_menu_item *, char);
+                               char, long);
+static void invert_all(winid, tty_menu_item *, tty_menu_item *, char, long);
 static void toggle_menu_attr(boolean, int, int);
 static void process_menu_window(winid, struct WinDesc *);
 static void process_text_window(winid, struct WinDesc *);
@@ -1108,10 +1108,11 @@ reset_role_filtering(void)
 
 /* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
 static void
-setup_rolemenu(winid win,
-               boolean filtering, /*  True => exclude filtered roles;
-                                     False => filter reset */
-               int race, int gend, int algn) /* all ROLE_NONE for !filtering case */
+setup_rolemenu(
+    winid win,
+    boolean filtering, /* True => exclude filtered roles;
+                        * False => filter reset */
+    int race, int gend, int algn) /* all ROLE_NONE for !filtering case */
 {
     anything any;
     int i;
@@ -1685,9 +1686,15 @@ tty_clear_nhwindow(winid window)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+/* toggle a specific entry */
 static boolean
-toggle_menu_curr(winid window, tty_menu_item *curr, int lineno,
-                 boolean in_view, boolean counting, long count)
+toggle_menu_curr(
+    winid window,
+    tty_menu_item *curr,
+    int lineno,
+    boolean in_view,
+    boolean counting,
+    long count)
 {
     if (curr->selected) {
         if (counting && count > 0) {
@@ -1721,8 +1728,9 @@ toggle_menu_curr(winid window, tty_menu_item *curr, int lineno,
 }
 
 static void
-dmore(register struct WinDesc *cw,
-      const char *s) /* valid responses */
+dmore(
+    struct WinDesc *cw,
+    const char *s) /* valid responses */
 {
     const char *prompt = cw->morestr ? cw->morestr : defmorestr;
     int offset = (cw->type == NHW_TEXT) ? 1 : 2;
@@ -1740,8 +1748,13 @@ dmore(register struct WinDesc *cw,
     xwaitforspace(s);
 }
 
+/* change screen display for selection state of an item;
+   not used or wanted for items that aren't shown by the current page */
 static void
-set_item_state(winid window, int lineno, tty_menu_item *item)
+set_item_state(
+    winid window,
+    int lineno,
+    tty_menu_item *item)
 {
     char ch = item->selected ? (item->count == -1L ? '+' : '#') : '-';
 
@@ -1753,88 +1766,118 @@ set_item_state(winid window, int lineno, tty_menu_item *item)
     term_end_attr(item->attr);
 }
 
+/* select all [ignores pending count, if any] */
 static void
-set_all_on_page(winid window, tty_menu_item *page_start,
-                tty_menu_item *page_end)
-{
-    tty_menu_item *curr;
-    int n;
-
-    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next)
-        if (curr->identifier.a_void && !curr->selected) {
-            curr->selected = TRUE;
-            set_item_state(window, n, curr);
-        }
-}
-
-static void
-unset_all_on_page(winid window, tty_menu_item *page_start,
-                  tty_menu_item *page_end)
-{
-    tty_menu_item *curr;
-    int n;
-
-    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next)
-        if (curr->identifier.a_void && curr->selected) {
-            curr->selected = FALSE;
-            curr->count = -1L;
-            set_item_state(window, n, curr);
-        }
-}
-
-static void
-invert_all_on_page(winid window, tty_menu_item *page_start,
-                   tty_menu_item *page_end,
-                   char acc) /* group accelerator, 0 => all */
+set_all_on_page(
+    winid window,
+    tty_menu_item *page_start,
+    tty_menu_item *page_end)
 {
     tty_menu_item *curr;
     int n;
 
     for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
-        if (!menuitem_invert_test(0, curr->itemflags, curr->selected))
+        if (!curr->identifier.a_void /* not selectable */
+            || curr->selected /* already selected */
+            || !menuitem_invert_test(1, curr->itemflags, FALSE))
             continue;
-
-        if (curr->identifier.a_void && (acc == 0 || curr->gselector == acc)) {
-            if (curr->selected) {
-                curr->selected = FALSE;
-                curr->count = -1L;
-            } else
-                curr->selected = TRUE;
-            set_item_state(window, n, curr);
-        }
+        curr->selected = TRUE;
+        set_item_state(window, n, curr);
     }
 }
 
-/*
- * Invert all entries that match the give group accelerator (or all if zero).
- */
+/* unselect all */
 static void
-invert_all(winid window, tty_menu_item *page_start,
-           tty_menu_item *page_end,
-           char acc) /* group accelerator, 0 => all */
+unset_all_on_page(
+    winid window,
+    tty_menu_item *page_start,
+    tty_menu_item *page_end)
+{
+    tty_menu_item *curr;
+    int n;
+
+    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
+        if (!curr->identifier.a_void /* skip if not selectable */
+            || !curr->selected /* skip if already de-selected */
+            || !menuitem_invert_test(2, curr->itemflags, TRUE))
+            continue;
+        curr->selected = FALSE;
+        curr->count = -1L;
+        set_item_state(window, n, curr);
+    }
+}
+
+/* invert current page */
+static void
+invert_all_on_page(
+    winid window,
+    tty_menu_item *page_start,
+    tty_menu_item *page_end,
+    char acc, /* group accelerator, 0 => all */
+    long count) /* pending count; -1L for non-group toggling */
+{
+    tty_menu_item *curr;
+    int n;
+
+    for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
+        if (!curr->identifier.a_void /* not selectable */
+            || (acc != 0 && curr->gselector != acc) /* not group 'acc' */
+            || !menuitem_invert_test(0, curr->itemflags, curr->selected))
+            continue;
+
+        if (curr->selected) {
+            curr->selected = FALSE;
+            curr->count = -1L;
+        } else {
+            curr->selected = TRUE;
+            if (count > 0)
+                curr->count = count;
+        }
+        set_item_state(window, n, curr);
+    }
+}
+
+/* invert all entries that match given group accelerator (or all if zero) */
+static void
+invert_all(
+    winid window,
+    tty_menu_item *page_start,
+    tty_menu_item *page_end,
+    char acc, /* group accelerator, 0 => all */
+    long count) /* pending count; -1L for non-group toggling */
 {
     tty_menu_item *curr;
     boolean on_curr_page;
     struct WinDesc *cw = wins[window];
 
-    invert_all_on_page(window, page_start, page_end, acc);
+    /* handle current page separately (it will need screen updating) */
+    invert_all_on_page(window, page_start, page_end, acc, count);
 
-    /* invert the rest */
+    /* invert the rest (no screen updating for them) */
     for (on_curr_page = FALSE, curr = cw->mlist; curr; curr = curr->next) {
         if (curr == page_start)
             on_curr_page = TRUE;
         else if (curr == page_end)
             on_curr_page = FALSE;
 
-        if (!on_curr_page && curr->identifier.a_void
-            && (acc == 0 || curr->gselector == acc)) {
-            if (menuitem_invert_test(0, curr->itemflags, curr->selected)) {
-                if (curr->selected) {
-                    curr->selected = FALSE;
-                    curr->count = -1;
-                } else
-                curr->selected = TRUE;
-            }
+        /* skip if on current page (already handled above) or not
+           selectable (header line or similar) or if group toggling
+           is taking place and this item isn't in specified group or
+           group toggling is not taking place and this item is off
+           limits to bulk toggling (assumes that an item won't be
+           both in a group and also subject to bulk restrictions) */
+        if (on_curr_page || !curr->identifier.a_void
+            || (acc != 0 && curr->gselector != acc)
+            || !menuitem_invert_test(0, curr->itemflags, curr->selected))
+            continue;
+
+        if (curr->selected) {
+            curr->selected = FALSE;
+            curr->count = -1;
+        } else {
+            curr->selected = TRUE;
+            if (count > 0)
+                curr->count = count;
         }
     }
 }
@@ -1919,7 +1962,7 @@ process_menu_window(winid window, struct WinDesc *cw)
         HUPSKIP();
         if (reset_count) {
             counting = FALSE;
-            count = 0;
+            count = 0L;
         } else
             reset_count = TRUE;
 
@@ -2045,7 +2088,7 @@ process_menu_window(winid window, struct WinDesc *cw)
             xwaitforspace(resp);
         }
 
-        really_morc = morc; /* (only used with MENU_EXPLICIT_CHOICE */
+        really_morc = morc; /* (only used with MENU_EXPLICIT_CHOICE) */
         if ((rp = index(resp, morc)) != 0 && rp < resp + resp_len)
             /* explicit menu selection; don't override it if it also
                happens to match a mapped menu command (such as ':' to
@@ -2142,29 +2185,44 @@ process_menu_window(winid window, struct WinDesc *cw)
             break;
         case MENU_INVERT_PAGE:
             if (cw->how == PICK_ANY)
-                invert_all_on_page(window, page_start, page_end, 0);
+                invert_all_on_page(window, page_start, page_end, 0, -1L);
             break;
         case MENU_SELECT_ALL:
             if (cw->how == PICK_ANY) {
+                /* entries on the current page need screen updating */
                 set_all_on_page(window, page_start, page_end);
-                /* set the rest */
-                for (curr = cw->mlist; curr; curr = curr->next)
-                    if (curr->identifier.a_void && !curr->selected)
-                        curr->selected = TRUE;
-            }
+                /* set the rest; entries on current page will be skipped
+                   because all of those will be 'already selected' now
+                   (some won't be if they failed menuitem_invert_test()
+                   in set_all_on_page() but those will fail it again here) */
+                for (curr = cw->mlist; curr; curr = curr->next) {
+                    if (!curr->identifier.a_void /* not selectable */
+                        || curr->selected /* already selected */
+                        || !menuitem_invert_test(1, curr->itemflags, TRUE))
+                        continue;
+                    curr->selected = TRUE;
+                }
+            } /* if PICK_ANY */
             break;
         case MENU_UNSELECT_ALL:
+            /* entries on the current page need screen updating */
             unset_all_on_page(window, page_start, page_end);
-            /* unset the rest */
-            for (curr = cw->mlist; curr; curr = curr->next)
-                if (curr->identifier.a_void && curr->selected) {
-                    curr->selected = FALSE;
-                    curr->count = -1;
-                }
+            /* unset the rest; entries on current page will be skipped
+               because none of those will still be in 'selected' state
+               (unless they failed the menuitem_invert_test() in
+               unset_all_on_page() but those will fail it again here) */
+            for (curr = cw->mlist; curr; curr = curr->next) {
+                if (!curr->identifier.a_void /* not selectable */
+                    || !curr->selected /* already de-selected */
+                    || !menuitem_invert_test(2, curr->itemflags, FALSE))
+                    continue;
+                curr->selected = FALSE;
+                curr->count = -1;
+            }
             break;
         case MENU_INVERT_ALL:
             if (cw->how == PICK_ANY)
-                invert_all(window, page_start, page_end, 0);
+                invert_all(window, page_start, page_end, 0, -1L);
             break;
         case MENU_SEARCH:
             if (cw->how == PICK_NONE) {
@@ -2211,7 +2269,8 @@ process_menu_window(winid window, struct WinDesc *cw)
  group_accel:
                 /* group accelerator; for the PICK_ONE case, we know that
                    it matches exactly one item in order to be in gacc[] */
-                invert_all(window, page_start, page_end, morc);
+                invert_all(window, page_start, page_end, morc,
+                           counting ? count : -1L);
                 if (cw->how == PICK_ONE)
                     finished = TRUE;
                 break;
