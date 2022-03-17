@@ -614,7 +614,8 @@ dodiscovered(void) /* free after Robert Viduya */
     char *s, *p, oclass, prev_class,
          classes[MAXOCLASSES], buf[BUFSZ],
          *sorted_lines[NUM_OBJECTS]; /* overkill */
-    int i, j, sortindx, dis, ct, uniq_ct, arti_ct, sorted_ct;
+    int i, j, dis, ct, uniq_ct, arti_ct, sorted_ct;
+    long sortindx;  // should be ptrdiff_t, but we don't require that exists
     boolean alphabetized, alphabyclass, lootsort;
 
     if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
