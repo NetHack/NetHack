@@ -18,6 +18,7 @@ static void xexit(int) NORETURN;
 char *eos(char *); /* also used by dlb.c */
 FILE *fopen_datafile(const char *, const char *);
 unsigned FITSuint_(unsigned long long, const char *, int);
+unsigned Strlen_(const char *, const char *, int);
 
 #ifdef DLB
 #ifdef DLBLIB
@@ -314,9 +315,9 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
                 if (remainder > (long) sizeof(buf))
                     r = (int) sizeof(buf);
                 else
-                    r = remainder;
+                    r = (int) remainder;
 
-                n = fread(buf, 1, r, lib.fdata);
+                n = (int) fread(buf, 1, r, lib.fdata);
                 if (n != r) {
                     printf("Read Error in '%s'\n", lib.dir[i].fname);
                     xexit(EXIT_FAILURE);
@@ -361,7 +362,7 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
             for (; ap < argc; ap++, nfiles++) {
                 if (nfiles == ldlimit)
                     grow_ld(&ld, &ldlimit, DLB_FILES_ALLOC / 5);
-                ld[nfiles].fname = (char *) alloc(strlen(argv[ap]) + 1);
+                ld[nfiles].fname = (char *) alloc(Strlen(argv[ap]) + 1);
                 Strcpy(ld[nfiles].fname, argv[ap]);
             }
         }
@@ -379,7 +380,7 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
                 if (nfiles == ldlimit)
                     grow_ld(&ld, &ldlimit, DLB_FILES_ALLOC / 5);
                 *(eos(buf) - 1) = '\0'; /* strip newline */
-                ld[nfiles].fname = (char *) alloc(strlen(buf) + 1);
+                ld[nfiles].fname = (char *) alloc((int)strlen(buf) + 1);
                 Strcpy(ld[nfiles].fname, buf);
             }
             fclose(list);
@@ -436,7 +437,7 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
                 printf("%s\n", ld[i].fname);
 
             fsiz = 0L;
-            while ((r = read(fd, buf, sizeof buf)) != 0) {
+            while ((r = (int) read(fd, buf, sizeof buf)) != 0) {
                 if (r == -1) {
                     printf("Read Error in '%s'\n", ld[i].fname);
                     xexit(EXIT_FAILURE);
@@ -553,5 +554,17 @@ FITSuint_(unsigned long long i, const char *file, int line){
         xexit(EXIT_FAILURE);
     }
     return (unsigned)i;
+}
+
+    /* ditto */
+unsigned
+Strlen_(const char *str, const char *file, int line){
+    size_t len = strnlen(str, LARGEST_INT);
+
+    if (len == LARGEST_INT) {
+        printf("%s:%d string too long", file, line);
+        xexit(EXIT_FAILURE);
+    }
+    return (unsigned) len;
 }
 /*dlb_main.c*/
