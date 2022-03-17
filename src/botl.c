@@ -1039,8 +1039,7 @@ menualpha_cmp(const genericptr vptr1, const genericptr vptr2)
 int
 parse_cond_option(boolean negated, char *opts)
 {
-    int i;
-    size_t sl;
+    int i, sl;
     const char *compareto, *uniqpart, prefix[] = "cond_";
 
     if (!opts || strlen(opts) <= sizeof prefix - 1)

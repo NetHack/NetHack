@@ -889,7 +889,7 @@ extern void reveal_paths(void);
 extern boolean read_tribute(const char *, const char *, int, char *, int,
                             unsigned);
 extern boolean Death_quote(char *, int);
-extern void livelog_add(long, const char *);
+extern void livelog_add(long ll_type, const char *);
 
 /* ### fountain.c ### */
 
@@ -1031,6 +1031,10 @@ extern void shuffle_int_array(int *, int);
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...) PRINTF_F(5, 6);
+#define FITSint(x) FITSint_(x, __func__, __LINE__)
+extern int FITSint_(long long, const char *, int);
+#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 /* ### insight.c ### */
 

@@ -36,6 +36,10 @@ char dlbfilename[MAX_DLB_FILENAME];
 
 /* without extern.h via hack.h, these haven't been declared for us */
 extern FILE *fopen_datafile(const char *, const char *, int);
+#define FITSuint(x) FITSuint_((x), __func__, __LINE__)
+/* implementation will be in either dlb_main.c or the core */
+extern unsigned FITSuint_(unsigned long long, const char *, int);
+
 
 #ifdef DLBLIB
 /*
@@ -132,8 +136,8 @@ readlibdir(library *lp) /* library pointer to fill in */
     if (lp->rev > DLB_MAX_VERS || lp->rev < DLB_MIN_VERS)
         return FALSE;
 
-    lp->dir = (libdir *) alloc(lp->nentries * sizeof(libdir));
-    lp->sspace = (char *) alloc(lp->strsize);
+    lp->dir = (libdir *) alloc(FITSuint(lp->nentries * sizeof(libdir)));
+    lp->sspace = (char *) alloc(FITSuint(lp->strsize));
 
     /* read in each directory entry */
     for (i = 0, sp = lp->sspace; i < lp->nentries; i++) {

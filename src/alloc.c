@@ -8,6 +8,10 @@
 /* since this file is also used in auxiliary programs, don't include all the
    function declarations for all of nethack */
 #define EXTERN_H /* comment line for pre-compiled headers */
+/* but we need this one */
+#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
+
 #include "config.h"
 
 char *fmt_ptr(const genericptr);
@@ -147,7 +151,8 @@ nhdupstr(const char *string, const char *file, int line)
 char *
 dupstr(const char *string)
 {
-    return strcpy((char *) alloc(strlen(string) + 1), string);
+    unsigned len = FITSuint(strlen(string));
+    return strcpy((char *) alloc(len + 1), string);
 }
 
 /* similar for reasonable size strings, but return the length of the input as well */

@@ -6697,7 +6697,6 @@ msgtype_parse_add(char *str)
 
         for (i = 0; i < SIZE(msgtype_names); i++)
             if (streq(msgtype_names[i].name, msgtype, TRUE)) {
-            //if (!strncmpi(msgtype_names[i].name, msgtype, strlen(msgtype))) {
                 typ = msgtype_names[i].msgtyp;
                 break;
             }
@@ -8468,7 +8467,8 @@ set_option_mod_status(const char *optnam, int status)
         return;
     }
     for (k = 0; allopt[k].name; k++) {
-        if (!strncmpi(allopt[k].name, optnam, strlen(optnam))) {
+        if (streq(allopt[k].name, optnam, TRUE)) {
+        //if (!strncmpi(allopt[k].name, optnam, strlen(optnam))) {
             allopt[k].setwhere = status;
             return;
         }

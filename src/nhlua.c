@@ -1399,7 +1399,7 @@ nhl_loadlua(lua_State *L, const char *fname)
     dlb_fseek(fh, 0L, SEEK_SET);
 
     /* extra +1: room to add final '\n' if missing */
-    buf = bufout = (char *) alloc(buflen + 1 + 1);
+    buf = bufout = (char *) alloc(FITSint(buflen + 1 + 1));
     buf[0] = '\0';
     bufin = bufout = buf;
 
@@ -1416,7 +1416,7 @@ nhl_loadlua(lua_State *L, const char *fname)
          * in use, and fseek(SEEK_END) only yields an upper bound on
          * the actual amount of data in that situation.]
          */
-        if ((cnt = dlb_fread(bufin, 1, min(buflen, LOADCHUNKSIZE), fh)) < 0L)
+        if ((cnt = dlb_fread(bufin, 1, min((int)buflen, LOADCHUNKSIZE), fh)) < 0L)
             break;
         buflen -= cnt; /* set up for next iteration, if any */
         if (cnt == 0L) {

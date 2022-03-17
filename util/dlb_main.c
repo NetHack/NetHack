@@ -17,6 +17,7 @@
 static void xexit(int) NORETURN;
 char *eos(char *); /* also used by dlb.c */
 FILE *fopen_datafile(const char *, const char *);
+unsigned FITSuint_(unsigned long long, const char *, int);
 
 #ifdef DLB
 #ifdef DLBLIB
@@ -543,4 +544,14 @@ xexit(int retcd)
     /*NOTREACHED*/
 }
 
+    /* In hacklib.c, but we don't have that and it calls panic() */
+unsigned
+FITSuint_(unsigned long long i, const char *file, int line){
+    unsigned ret = (unsigned)i;
+    if (ret != i) {
+        printf("Overflow at %s:%d\n", file, line);
+        xexit(EXIT_FAILURE);
+    }
+    return (unsigned)i;
+}
 /*dlb_main.c*/

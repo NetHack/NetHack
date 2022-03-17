@@ -171,6 +171,8 @@ static boolean use_enum = TRUE;
 extern unsigned _stklen = STKSIZ;
 #endif
 
+unsigned FITSuint_(unsigned long long, const char *, int);
+
 /*
  * Some of the routines in this source file were moved into .../src/mdlib
  * to facilitate the use of a cross-compiler generation of some of the
@@ -2349,4 +2351,14 @@ struct attribs attrmax, attrmin;
 #endif
 #endif /* STRICT_REF_DEF */
 
+/* In hacklib.c, but we don't have that and it calls panic() */
+unsigned
+FITSuint_(unsigned long long i, const char *file, int line){
+unsigned ret = (unsigned)i;
+if (ret != i) {
+    Fprintf(stdout, "Overflow at %s:%d\n", file, line);
+    makedefs_exit(EXIT_FAILURE);
+}
+return (unsigned)i;
+}
 /*makedefs.c*/
