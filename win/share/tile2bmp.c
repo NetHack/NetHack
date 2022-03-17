@@ -99,6 +99,8 @@ lelong(INT32 x)
 #endif
 }
 
+unsigned FITSuint_(unsigned long long, const char *, int);
+
 #ifdef __GNUC__
 typedef struct tagBMIH {
     UINT32 biSize;
@@ -376,3 +378,15 @@ build_bmptile(pixel(*pixels)[TILE_X])
         }
     }
 }
+
+/* we need a local copy of this for alloc.o and because we don't have panic() */
+unsigned
+FITSuint_(unsigned long long i, const char *file, int line){
+    unsigned ret = (unsigned)i;
+    if (ret != i) {
+        Fprintf(stderr, "Overflow at %s:%d", file, line);
+        exit(EXIT_FAILURE);
+    }
+    return (unsigned)i;
+}
+
