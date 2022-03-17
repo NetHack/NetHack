@@ -97,9 +97,10 @@ struct sp_coder {
  */
 
 #define packed_coord long
+typedef uint32_t getloc_flags_t;
 typedef struct {
     xchar is_random;
-    long getloc_flags;
+    getloc_flags_t getloc_flags;
     int x, y;
 } unpacked_coord;
 

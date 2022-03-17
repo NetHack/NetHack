@@ -37,8 +37,8 @@ static void maybe_add_door(int, int, struct mkroom *);
 static void link_doors_rooms(void);
 static int rnddoor(void);
 static int rndtrap(void);
-static void get_location(xchar *, xchar *, int, struct mkroom *);
-static boolean is_ok_location(xchar, xchar, int);
+static void get_location(xchar *, xchar *, getloc_flags_t, struct mkroom *);
+static boolean is_ok_location(xchar, xchar, getloc_flags_t);
 static unpacked_coord get_unpacked_coord(long, int);
 static void get_room_loc(xchar *, xchar *, struct mkroom *);
 static void get_free_room_loc(xchar *, xchar *, struct mkroom *,
@@ -1081,11 +1081,11 @@ rndtrap(void)
  * Coordinates in special level files are handled specially:
  *
  *      if x or y is < 0, we generate a random coordinate.
- *      The "humidity" flag is used to insure that engravings aren't
+ *      The "humidity" flag is used to ensure that engravings aren't
  *      created underwater, or eels on dry land.
  */
 static void
-get_location(xchar *x, xchar *y, int humidity, struct mkroom* croom)
+get_location(xchar *x, xchar *y, getloc_flags_t humidity, struct mkroom* croom)
 {
     int cpt = 0;
     int mx, my, sx, sy;
@@ -1152,7 +1152,7 @@ get_location(xchar *x, xchar *y, int humidity, struct mkroom* croom)
 }
 
 static boolean
-is_ok_location(xchar x, xchar y, int humidity)
+is_ok_location(xchar x, xchar y, getloc_flags_t humidity)
 {
     register int typ = levl[x][y].typ;
 
@@ -1193,7 +1193,7 @@ get_unpacked_coord(long loc, int defhumidity)
     if (loc & SP_COORD_IS_RANDOM) {
         c.x = c.y = -1;
         c.is_random = 1;
-        c.getloc_flags = (loc & ~SP_COORD_IS_RANDOM);
+        c.getloc_flags = (getloc_flags_t)(loc & ~SP_COORD_IS_RANDOM);
         if (!c.getloc_flags)
             c.getloc_flags = defhumidity;
     } else {
