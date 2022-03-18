@@ -714,7 +714,7 @@ dochug(register struct monst* mtmp)
             break;
         case MMOVE_MOVED: /* monster moved */
             /* Maybe it stepped on a trap and fell asleep... */
-            if (mtmp->msleeping || !mtmp->mcanmove)
+            if (helpless(mtmp))
                 return 0;
             /* Monsters can move and then shoot on same turn;
                our hero can't.  Is that fair? */
@@ -754,7 +754,7 @@ dochug(register struct monst* mtmp)
         }
     }
     /* special speeches for quest monsters */
-    if (!mtmp->msleeping && mtmp->mcanmove && nearby)
+    if (!helpless(mtmp) && nearby)
         quest_talk(mtmp);
     /* extra emotional attack for vile monsters */
     if (inrange && mtmp->data->msound == MS_CUSS && !mtmp->mpeaceful
@@ -970,7 +970,7 @@ static void
 maybe_spin_web(struct monst *mtmp)
 {
     if (webmaker(mtmp->data)
-        && mtmp->mcanmove && !mtmp->msleeping && !mtmp->mspec_used
+        && !helpless(mtmp) && !mtmp->mspec_used
         && !t_at(mtmp->mx, mtmp->my) && soko_allow_web(mtmp)) {
         struct trap *trap;
         int prob = ((((mtmp->data == &mons[PM_GIANT_SPIDER]) ? 15 : 5)
@@ -1226,7 +1226,7 @@ m_move(register struct monst* mtmp, register int after)
                        underneath an immobile or hidden monster;
                        paralysis victims excluded */
                     if ((mtoo = m_at(xx, yy)) != 0
-                        && (mtoo->msleeping || mtoo->mundetected
+                        && (helpless(mtoo) || mtoo->mundetected
                             || (mtoo->mappearance && !mtoo->iswiz)
                             || !mtoo->data->mmove))
                         continue;
@@ -1686,7 +1686,7 @@ m_move(register struct monst* mtmp, register int after)
                (just in case the object it was hiding under went away);
                usually set mundetected unless monster can't move.  */
             if (mtmp->mundetected
-                || (mtmp->mcanmove && !mtmp->msleeping && rn2(5)))
+                || (!helpless(mtmp) && rn2(5)))
                 (void) hideunder(mtmp);
             newsym(mtmp->mx, mtmp->my);
         }

@@ -1490,7 +1490,7 @@ dogaze(void)
                         continue;
                 }
                 setmangry(mtmp, TRUE);
-                if (!mtmp->mcanmove || mtmp->mstun || mtmp->msleeping
+                if (helpless(mtmp) || mtmp->mstun
                     || !mtmp->mcansee || !haseyes(mtmp->data)) {
                     looked--;
                     continue;

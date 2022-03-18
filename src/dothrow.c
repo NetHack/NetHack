@@ -1848,7 +1848,7 @@ thitmonst(
        and also treat gems or glass shot via sling as attacks */
     if (obj->oclass == GEM_CLASS && is_unicorn(mon->data)
         && objects[obj->otyp].oc_material != MINERAL && !uslinging()) {
-        if (mon->msleeping || !mon->mcanmove) {
+        if (helpless(mon)) {
             tmiss(obj, mon, FALSE);
             return 0;
         } else if (mon->mtame) {

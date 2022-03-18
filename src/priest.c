@@ -428,7 +428,7 @@ intemple(int roomno)
         shrined = has_shrine(priest);
         sanctum = (priest->data == &mons[PM_HIGH_CLERIC]
                    && (Is_sanctum(&u.uz) || In_endgame(&u.uz)));
-        can_speak = (priest->mcanmove && !priest->msleeping);
+        can_speak = !helpless(priest);
         if (can_speak && !Deaf && g.moves >= epri_p->intone_time) {
             unsigned save_priest = priest->ispriest;
 
@@ -572,15 +572,14 @@ priest_talk(struct monst *priest)
     }
 
     /* priests don't chat unless peaceful and in their own temple */
-    if (!inhistemple(priest) || !priest->mpeaceful
-        || !priest->mcanmove || priest->msleeping) {
+    if (!inhistemple(priest) || !priest->mpeaceful || helpless(priest)) {
         static const char *const cranky_msg[3] = {
             "Thou wouldst have words, eh?  I'll give thee a word or two!",
             "Talk?  Here is what I have to say!",
             "Pilgrim, I would speak no longer with thee."
         };
 
-        if (!priest->mcanmove || priest->msleeping) {
+        if (helpless(priest)) {
             pline("%s breaks out of %s reverie!", Monnam(priest),
                   mhis(priest));
             priest->mfrozen = priest->msleeping = 0;

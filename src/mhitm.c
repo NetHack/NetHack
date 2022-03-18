@@ -301,7 +301,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
 
     if (!magr || !mdef)
         return MM_MISS; /* mike@genat */
-    if (!magr->mcanmove || magr->msleeping)
+    if (helpless(magr))
         return MM_MISS;
     pa = magr->data;
     pd = mdef->data;
@@ -313,7 +313,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
 
     /* Calculate the armour class differential. */
     tmp = find_mac(mdef) + magr->m_lev;
-    if (mdef->mconf || !mdef->mcanmove || mdef->msleeping) {
+    if (mdef->mconf || helpless(mdef)) {
         tmp += 4;
         mdef->msleeping = 0;
     }
@@ -540,7 +540,7 @@ mattackm(register struct monst *magr, register struct monst *mdef)
         if (res[i] & MM_AGR_DIED)
             return res[i];
         /* return if aggressor can no longer attack */
-        if (!magr->mcanmove || magr->msleeping)
+        if (helpless(magr))
             return res[i];
         if (res[i] & MM_HIT)
             struck = 1; /* at least one hit */
@@ -1091,7 +1091,7 @@ sleep_monst(struct monst *mon, int amt, int how)
 void
 slept_monst(struct monst *mon)
 {
-    if ((mon->msleeping || !mon->mcanmove) && mon == u.ustuck
+    if (helpless(mon) && mon == u.ustuck
         && !sticks(g.youmonst.data) && !u.uswallow) {
         pline("%s grip relaxes.", s_suffix(Monnam(mon)));
         unstuck(mon);

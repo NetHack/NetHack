@@ -608,7 +608,7 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
                 the amulet; if you don't have it, will chase you
                 only if in range. -3. */
              || (u.uhave.amulet && mtmp->iswiz))
-            && ((!mtmp->msleeping && mtmp->mcanmove)
+            && (!helpless(mtmp)
                 /* eg if level teleport or new trap, steed has no control
                    to avoid following */
                 || (mtmp == u.usteed))

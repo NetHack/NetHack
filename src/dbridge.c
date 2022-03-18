@@ -477,7 +477,7 @@ e_missed(struct entity *etmp, boolean chunks)
 
     if (is_flyer(etmp->edata)
         && (is_u(etmp) ? !Unaware
-                       : (etmp->emon->mcanmove && !etmp->emon->msleeping)))
+                       : !helpless(etmp->emon)))
         /* flying requires mobility */
         misses = 5; /* out of 8 */
     else if (is_floater(etmp->edata)
@@ -505,7 +505,7 @@ e_jumps(struct entity *etmp)
     int tmp = 4; /* out of 10 */
 
     if (is_u(etmp) ? (Unaware || Fumbling)
-                   : (!etmp->emon->mcanmove || etmp->emon->msleeping
+                   : (helpless(etmp->emon)
                       || !etmp->edata->mmove || etmp->emon->wormno))
         return FALSE;
 

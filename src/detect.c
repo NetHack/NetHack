@@ -800,8 +800,7 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
                     && mclass == S_WORM_TAIL))
                 map_monst(mtmp, TRUE);
 
-            if (otmp && otmp->cursed
-                && (mtmp->msleeping || !mtmp->mcanmove)) {
+            if (otmp && otmp->cursed && helpless(mtmp)) {
                 mtmp->msleeping = mtmp->mfrozen = 0;
                 mtmp->mcanmove = 1;
                 woken = TRUE;

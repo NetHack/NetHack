@@ -1213,7 +1213,7 @@ do_mgivenname(void)
         if (!alreadynamed(mtmp, monnambuf, buf))
             pline("%s doesn't like being called names!", upstart(monnambuf));
     } else if (mtmp->isshk
-               && !(Deaf || mtmp->msleeping || !mtmp->mcanmove
+               && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);

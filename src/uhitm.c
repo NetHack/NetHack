@@ -269,7 +269,7 @@ check_caitiff(struct monst *mtmp)
 
     if (Role_if(PM_KNIGHT) && u.ualign.type == A_LAWFUL
         && !is_undead(mtmp->data)
-        && (!mtmp->mcanmove || mtmp->msleeping
+        && (helpless(mtmp)
             || (mtmp->mflee && !mtmp->mavenge))) {
         You("caitiff!");
         adjalign(-1);
@@ -432,7 +432,7 @@ do_attack(struct monst *mtmp)
                 You("stop.  %s is in the way!", buf);
                 end_running(TRUE);
                 return TRUE;
-            } else if (mtmp->mfrozen || mtmp->msleeping || !mtmp->mcanmove
+            } else if (mtmp->mfrozen || helpless(mtmp)
                        || (mtmp->data->mmove == 0 && rn2(6))) {
                 pline("%s doesn't seem to move!", Monnam(mtmp));
                 end_running(TRUE);
@@ -485,7 +485,7 @@ do_attack(struct monst *mtmp)
     u_wipe_engr(3);
 
     /* Is the "it died" check actually correct? */
-    if (mdat->mlet == S_LEPRECHAUN && !mtmp->mfrozen && !mtmp->msleeping
+    if (mdat->mlet == S_LEPRECHAUN && !mtmp->mfrozen && !helpless(mtmp)
         && !mtmp->mconf && mtmp->mcansee && !rn2(7)
         && (m_move(mtmp, 0) == MMOVE_DIED /* it died */
             || mtmp->mx != u.ux + u.dx
@@ -1473,8 +1473,7 @@ hmon_hitmon(
         nohandglow(mon);
         if (!mon->mconf && !resist(mon, SPBOOK_CLASS, 0, NOTELL)) {
             mon->mconf = 1;
-            if (!mon->mstun && mon->mcanmove && !mon->msleeping
-                && canseemon(mon))
+            if (!mon->mstun && !helpless(mon) && canseemon(mon))
                 pline("%s appears confused.", Monnam(mon));
         }
     }
@@ -4603,7 +4602,7 @@ missum(struct monst *mdef, struct attack *mattk, boolean wouldhavehit)
         You("miss %s.", mon_nam(mdef));
     else
         You("miss it.");
-    if (!mdef->msleeping && mdef->mcanmove)
+    if (!helpless(mdef))
         wakeup(mdef, TRUE);
 }
 

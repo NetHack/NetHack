@@ -426,7 +426,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
     int omx, omy, carryamt = 0;
     struct obj *obj, *otmp;
 
-    if (mtmp->msleeping || !mtmp->mcanmove)
+    if (helpless(mtmp))
         return 0;
 
     omx = mtmp->mx;

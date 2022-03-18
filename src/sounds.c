@@ -222,7 +222,7 @@ dosounds(void)
                 continue;
             if (mtmp->ispriest && inhistemple(mtmp)
                 /* priest must be active */
-                && mtmp->mcanmove && !mtmp->msleeping
+                && !helpless(mtmp)
                 /* hero must be outside this temple */
                 && temple_occupied(u.urooms) != EPRI(mtmp)->shroom)
                 break;
@@ -351,7 +351,7 @@ growl(register struct monst* mtmp)
 {
     register const char *growl_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || mtmp->data->msound == MS_SILENT)
+    if (helpless(mtmp) || mtmp->data->msound == MS_SILENT)
         return;
 
     /* presumably nearness and soundok checks have already been made */
@@ -376,7 +376,7 @@ yelp(register struct monst* mtmp)
 {
     register const char *yelp_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound)
+    if (helpless(mtmp) || !mtmp->data->msound)
         return;
 
     /* presumably nearness and soundok checks have already been made */
@@ -418,7 +418,7 @@ whimper(register struct monst* mtmp)
 {
     register const char *whimper_verb = 0;
 
-    if (mtmp->msleeping || !mtmp->mcanmove || !mtmp->data->msound)
+    if (helpless(mtmp) || !mtmp->data->msound)
         return;
 
     /* presumably nearness and soundok checks have already been made */
@@ -449,7 +449,7 @@ whimper(register struct monst* mtmp)
 void
 beg(register struct monst* mtmp)
 {
-    if (mtmp->msleeping || !mtmp->mcanmove
+    if (helpless(mtmp)
         || !(carnivorous(mtmp->data) || herbivorous(mtmp->data)))
         return;
 
@@ -1117,7 +1117,7 @@ dochat(void)
     }
 
     if (u.usteed && u.dz > 0) {
-        if (!u.usteed->mcanmove || u.usteed->msleeping) {
+        if (helpless(u.usteed)) {
             pline("%s seems not to notice you.", Monnam(u.usteed));
             return ECMD_TIME;
         } else
@@ -1198,7 +1198,7 @@ dochat(void)
         return ECMD_OK;
 
     /* sleeping monsters won't talk, except priests (who wake up) */
-    if ((!mtmp->mcanmove || mtmp->msleeping) && !mtmp->ispriest) {
+    if (helpless(mtmp) && !mtmp->ispriest) {
         /* If it is unseen, the player can't tell the difference between
            not noticing him and just not existing, so skip the message. */
         if (canspotmon(mtmp))
@@ -1235,7 +1235,7 @@ responsive_mon_at(int x, int y)
 {
     struct monst *mtmp = isok(x, y) ? m_at(x, y) : 0;
 
-    if (mtmp && (!mtmp->mcanmove || mtmp->msleeping /* immobilized monst */
+    if (mtmp && (helpless(mtmp) /* immobilized monst */
                  || !mtmp->mcansee || !haseyes(mtmp->data) /* blind monst */
                  || (Invis && !perceives(mtmp->data)) /* unseen hero */
                  || (x != mtmp->mx || y != mtmp->my))) /* worm tail */
@@ -1271,7 +1271,7 @@ tiphat(void)
 
     if (!u.dx && !u.dy) {
         if (u.usteed && u.dz > 0) {
-            if (!u.usteed->mcanmove || u.usteed->msleeping)
+            if (helpless(u.usteed))
                 pline("%s doesn't notice.", Monnam(u.usteed));
             else
                 (void) domonnoise(u.usteed);

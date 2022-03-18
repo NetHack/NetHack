@@ -1655,7 +1655,7 @@ domove_attackmon_at(struct monst *mtmp, xchar x, xchar y, boolean *displaceu)
         /* target monster might decide to switch places with you... */
         *displaceu = (mtmp->data == &mons[PM_DISPLACER_BEAST] && !rn2(2)
                       && mtmp->mux == u.ux0 && mtmp->muy == u.uy0
-                      && mtmp->mcanmove && !mtmp->msleeping
+                      && !helpless(mtmp)
                       && !mtmp->meating && !mtmp->mtrapped
                       && !u.utrap && !u.ustuck && !u.usteed
                       && !(u.dx && u.dy
@@ -3410,7 +3410,7 @@ monster_nearby(void)
                 && (Hallucination
                     || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
                 && (!is_hider(mtmp->data) || !mtmp->mundetected)
-                && mtmp->mcanmove && !mtmp->msleeping
+                && !helpless(mtmp)
                 && !onscary(u.ux, u.uy, mtmp) && canspotmon(mtmp))
                 return 1;
         }
