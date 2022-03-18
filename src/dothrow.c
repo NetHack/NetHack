@@ -810,6 +810,17 @@ hurtle_step(genericptr_t arg, int x, int y)
         if (!canspotmon(mon))
             map_invisible(mon->mx, mon->my);
         setmangry(mon, FALSE);
+        if (touch_petrifies(mon->data)
+            /* this is a bodily collision, so check for body armor */
+            && !uarmu && !uarm && !uarmc) {
+            Sprintf(g.killer.name, "bumping into %s",
+                    an(pmname(mon->data, NEUTRAL)));
+            instapetrify(g.killer.name);
+        }
+        if (touch_petrifies(g.youmonst.data)
+            && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
+            minstapetrify(mon, TRUE);
+        }
         wake_nearto(x, y, 10);
         return FALSE;
     }
@@ -934,10 +945,21 @@ mhurtle_step(genericptr_t arg, int x, int y)
         delay_output();
         return TRUE;
     }
-    if ((mtmp = m_at(x, y)) != 0 && (canseemon(mon) || canseemon(mtmp))) {
-        pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
+    if ((mtmp = m_at(x, y)) != 0) {
+        if (canseemon(mon) || canseemon(mtmp))
+            pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
         wakeup(mon, !g.context.mon_moving);
         wakeup(mtmp, !g.context.mon_moving);
+        if (touch_petrifies(mtmp->data)
+            && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
+            minstapetrify(mon, !g.context.mon_moving);
+            newsym(mon->mx, mon->my);
+        }
+        if (touch_petrifies(mon->data)
+            && !which_armor(mtmp, W_ARMU | W_ARM | W_ARMC)) {
+            minstapetrify(mtmp, !g.context.mon_moving);
+            newsym(mtmp->mx, mtmp->my);
+        }
     }
 
     return FALSE;
