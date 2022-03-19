@@ -503,12 +503,15 @@ select_all(struct xwindow *wp)
 
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
-         curr = curr->next, count++)
-        if (curr->identifier.a_void != 0)
-            if (!curr->selected) {
-                invert_line(wp, curr, count, -1L);
-            }
-
+         curr = curr->next, count++) {
+        /* skip 'curr' if not selectable (header or such) or already
+           selected (no need to set) or rejected due to skip-invert test */
+        if (!curr->identifier.a_void
+            || curr->selected
+            || !menuitem_invert_test(1, curr->itemflags, FALSE))
+            continue;
+        invert_line(wp, curr, count, -1L);
+    }
 }
 
 static void
@@ -519,11 +522,15 @@ select_none(struct xwindow *wp)
 
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
-         curr = curr->next, count++)
-        if (curr->identifier.a_void != 0)
-            if (curr->selected) {
-                invert_line(wp, curr, count, -1L);
-            }
+         curr = curr->next, count++) {
+        /* skip 'curr' if not selectable (header or such) or already not
+           selected (no need to unset) or rejected due to skip-invert test */
+        if (!curr->identifier.a_void
+            || !curr->selected
+            || !menuitem_invert_test(2, curr->itemflags, TRUE))
+            continue;
+        invert_line(wp, curr, count, -1L);
+    }
 
 }
 
@@ -536,10 +543,12 @@ invert_all(struct xwindow *wp)
     reset_menu_count(wp->menu_information);
     for (count = 0, curr = wp->menu_information->curr_menu.base; curr;
          curr = curr->next, count++) {
-        if (!menuitem_invert_test(0, curr->itemflags, curr->selected))
+        /* skip 'curr' if not selectable (header or such)
+           or rejected due to skip-invert test */
+        if (!curr->identifier.a_void
+            || !menuitem_invert_test(0, curr->itemflags, curr->selected))
             continue;
-        if (curr->identifier.a_void != 0)
-            invert_line(wp, curr, count, -1L);
+        invert_line(wp, curr, count, -1L);
     }
 }
 
