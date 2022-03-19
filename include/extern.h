@@ -969,6 +969,7 @@ extern char *stripchars(char *, const char *, const char *);
 extern char *stripdigits(char *);
 extern char *eos(char *);
 extern unsigned Strlen_(const char *, const char *, int);
+extern boolean str_start_is(const char *, const char *, boolean);
 extern boolean str_end_is(const char *, const char *);
 extern int str_lines_maxlen(const char *);
 extern char *strkitten(char *, char);

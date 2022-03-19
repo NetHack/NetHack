@@ -24,8 +24,9 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          stripdigits     (char *)
-	unsigned	Strlen_		(const char *str, const char *, int)
+        unsigned	Strlen_		(const char *str, const char *, int)
         char *          eos             (char *)
+        boolean         str_start_is    (const char *, const char *, boolean)
         boolean         str_end_is      (const char *, const char *)
         int             str_lines_maxlen (const char *)
         char *          strkitten       (char *,char)
@@ -235,8 +236,32 @@ Strlen_(const char *str, const char *file, int line){
     size_t len = strnlen(str, LARGEST_INT);
 
     if (len == LARGEST_INT)
-	panic("%s:%d string too long", file, line);
+        panic("%s:%d string too long", file, line);
     return (unsigned) len;
+}
+
+/* determine whether 'str' starts with 'chkstr', possibly ignoring case;
+ * panics on huge strings */
+boolean
+str_start_is(const char *str, const char *chkstr, boolean caseblind)
+{
+    int n = LARGEST_INT;
+
+    while (n--) {
+        char t1, t2;
+        if (!*str)
+            return (*chkstr == 0); /* chkstr >= str */
+        else if (!*chkstr)
+            return TRUE; /* chkstr < str */
+        t1 = caseblind ? lowc(*str) : *str;
+        t2 = caseblind ? lowc(*chkstr) : *chkstr;
+        str++, chkstr++;
+        if (t1 != t2)
+            return FALSE;
+    }
+    if (n == 0)
+        panic("string too long");
+    return TRUE;
 }
 
 /* determine whether 'str' ends in 'chkstr' */
@@ -847,30 +872,6 @@ strstri(const char *str, const char *sub)
     return (char *) 0; /* not found */
 }
 #endif /* STRSTRI */
-
-/* string equality, possibly ignoring case; panics on huge strings */
-int
-streq(register const char *s1, register const char *s2,
-         boolean caseblind)
-{
-    register char t1, t2;
-    int n = LARGEST_INT;
-
-    while (n--) {
-        if (!*s2)
-            return (*s1 == 0); /* s1 >= s2 */
-        else if (!*s1)
-            return 1; /* s1 < s2 */
-	t1 = caseblind ? lowc(*s1) : *s1;
-	t2 = caseblind ? lowc(*s2) : *s2;
-	s1++,s2++;
-        if (t1 != t2)
-            return 0;
-    }
-    if (n==0)
-        panic("string too long");
-    return 1;
-}
 
 /* compare two strings for equality, ignoring the presence of specified
    characters (typically whitespace) and possibly ignoring case */

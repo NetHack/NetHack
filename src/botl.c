@@ -364,7 +364,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
         /* loop through each of the rank titles for role #i */
         for (j = 0; j < 9; j++) {
             if (roles[i].rank[j].m
-                && streq(str, roles[i].rank[j].m, TRUE)) {
+                && str_start_is(str, roles[i].rank[j].m, TRUE)) {
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)
@@ -372,7 +372,7 @@ title_to_mon(const char *str, int *rank_indx, int *title_length)
                 return roles[i].mnum;
             }
             if (roles[i].rank[j].f
-                && streq(str, roles[i].rank[j].m, TRUE)) {
+                && str_start_is(str, roles[i].rank[j].f, TRUE)) {
                 if (rank_indx)
                     *rank_indx = j;
                 if (title_length)

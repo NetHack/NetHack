@@ -378,7 +378,7 @@ parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
         got_match = FALSE;
 
         if (allopt[i].pfx) {
-            if (streq(opts, allopt[i].name, TRUE)) {
+            if (str_start_is(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
                 got_match = TRUE;
             }
@@ -2724,13 +2724,13 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
         if (negated) {
             flags.runmode = RUN_TPORT;
         } else if (op != empty_optstr) {
-            if (streq(op, "teleport", TRUE))
+            if (str_start_is("teleport", op, TRUE))
                 flags.runmode = RUN_TPORT;
-            else if (streq(op, "run", TRUE))
+            else if (str_start_is("run", op, TRUE))
                 flags.runmode = RUN_LEAP;
-            else if (streq(op, "walk", TRUE))
+            else if (str_start_is("walk", op, TRUE))
                 flags.runmode = RUN_STEP;
-            else if (streq(op, "crawl", TRUE))
+            else if (str_start_is("crawl", op, TRUE))
                 flags.runmode = RUN_CRAWL;
             else {
                 config_error_add("Unknown %s parameter '%s'",
@@ -6696,7 +6696,7 @@ msgtype_parse_add(char *str)
         int i;
 
         for (i = 0; i < SIZE(msgtype_names); i++)
-            if (streq(msgtype_names[i].name, msgtype, TRUE)) {
+            if (str_start_is(msgtype_names[i].name, msgtype, TRUE)) {
                 typ = msgtype_names[i].msgtyp;
                 break;
             }
@@ -8467,8 +8467,7 @@ set_option_mod_status(const char *optnam, int status)
         return;
     }
     for (k = 0; allopt[k].name; k++) {
-        if (streq(allopt[k].name, optnam, TRUE)) {
-        //if (!strncmpi(allopt[k].name, optnam, strlen(optnam))) {
+        if (str_start_is(allopt[k].name, optnam, TRUE)) {
             allopt[k].setwhere = status;
             return;
         }

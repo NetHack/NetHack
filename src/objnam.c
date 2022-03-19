@@ -3196,7 +3196,7 @@ wizterrainwish(struct _readobjnam_data *d)
         const char *tname;
 
         tname = trapname(trap, TRUE);
-        if(!streq(tname, bp, TRUE))
+        if (!str_start_is(bp, tname, TRUE))
             continue;
         /* found it; avoid stupid mistakes */
         if (is_hole(trap) && !Can_fall_thru(&u.uz))
