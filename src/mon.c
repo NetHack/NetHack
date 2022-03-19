@@ -2515,7 +2515,7 @@ mondead(register struct monst* mtmp)
                 if (enexto(&new_xy, mtmp->mx, mtmp->my, &mons[mndx]))
                     rloc_to(mtmp, new_xy.x, new_xy.y);
             }
-            newcham(mtmp, &mons[mndx], FALSE, FALSE);
+            (void) newcham(mtmp, &mons[mndx], FALSE, FALSE);
             if (mtmp->data == &mons[mndx])
                 mtmp->cham = NON_PM;
             else
@@ -3219,7 +3219,7 @@ vamp_stone(struct monst* mtmp)
                 pline("%s!", buf);
                 display_nhwindow(WIN_MESSAGE, FALSE);
             }
-            newcham(mtmp, &mons[mndx], FALSE, FALSE);
+            (void) newcham(mtmp, &mons[mndx], FALSE, FALSE);
             if (mtmp->data == &mons[mndx])
                 mtmp->cham = NON_PM;
             else

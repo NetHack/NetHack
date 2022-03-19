@@ -1068,7 +1068,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     cc.y = mon->my + (dy * range);
     (void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t) mon);
     if (!DEADMONSTER(mon) && t_at(mon->mx, mon->my))
-        mintrap(mon, FORCEBUNGLE);
+        (void) mintrap(mon, FORCEBUNGLE);
     else
         (void) minliquid(mon);
     return;
