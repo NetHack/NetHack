@@ -1323,6 +1323,8 @@ hmon_hitmon(
 
     if (!already_killed) {
         if (obj && (obj == uwep || (obj == uswapwep && u.twoweap))
+            /* known_hitum 'what counts as a weapon' criteria */
+            && (obj->oclass == WEAPON_CLASS || is_weptool(obj))
             && (thrown == HMON_MELEE || thrown == HMON_APPLIED)
             /* note: caller has already incremented u.uconduct.weaphit
                so we test for 1; 0 shouldn't be able to happen here... */
