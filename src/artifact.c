@@ -1589,7 +1589,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
             }
             losexp("life drainage");
             if (magr && magr->mhp < magr->mhpmax) {
-                magr->mhp += (oldhpmax - u.uhpmax + 1) / 2;
+                magr->mhp += (abs(oldhpmax - u.uhpmax) + 1) / 2;
                 if (magr->mhp > magr->mhpmax)
                     magr->mhp = magr->mhpmax;
             }
