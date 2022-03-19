@@ -1703,9 +1703,10 @@ menu_operation(
         }
 
         if (menu_item_ptr->identifier.a_void != NULL) {
-            if (operation != INVERT
-                || menuitem_invert_test(0, menu_item_ptr->itemflags,
-                                        menu_item_ptr->selected))
+            if  (menuitem_invert_test(((operation == INVERT) ? 0
+                                       : (operation == SELECT) ? 1 : 2),
+                                      menu_item_ptr->itemflags,
+                                      menu_item_ptr->selected))
                 menu_select_deselect(win, menu_item_ptr,
                                      operation, current_page);
         }
