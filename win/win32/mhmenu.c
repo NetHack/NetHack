@@ -1289,6 +1289,9 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
             for (i = 0; i < data->menui.menu.size; i++) {
+                if (!menuitem_invert_test(1, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
                 SelectMenuItem(hwndList, data, i, -1);
             }
             return -2;
@@ -1299,6 +1302,9 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
             for (i = 0; i < data->menui.menu.size; i++) {
+                if (!menuitem_invert_test(2, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
                 SelectMenuItem(hwndList, data, i, 0);
             }
             return -2;
@@ -1309,9 +1315,10 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
         if (data->how == PICK_ANY) {
             reset_menu_count(hwndList, data);
             for (i = 0; i < data->menui.menu.size; i++) {
-                if (menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
-                                         NHMENU_IS_SELECTED(data->menui.menu.items[i])))
-                    SelectMenuItem(hwndList, data, i,
+                if (!menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
+                SelectMenuItem(hwndList, data, i,
                                NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                        : -1);
             }
@@ -1328,6 +1335,9 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             from = max(0, topIndex);
             to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
+                if (!menuitem_invert_test(1, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
                 SelectMenuItem(hwndList, data, i, -1);
             }
             return -2;
@@ -1343,6 +1353,9 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             from = max(0, topIndex);
             to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
+                if (!menuitem_invert_test(2, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
                 SelectMenuItem(hwndList, data, i, 0);
             }
             return -2;
@@ -1358,9 +1371,10 @@ onListChar(HWND hWnd, HWND hwndList, WORD ch)
             from = max(0, topIndex);
             to = min(data->menui.menu.size, from + pageSize);
             for (i = from; i < to; i++) {
-                if (menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
-                                         NHMENU_IS_SELECTED(data->menui.menu.items[i])))                    
-                    SelectMenuItem(hwndList, data, i,
+                if (!menuitem_invert_test(0, data->menui.menu.items[i].itemflags,
+                                NHMENU_IS_SELECTED(data->menui.menu.items[i])))
+                    continue;
+                SelectMenuItem(hwndList, data, i,
                                NHMENU_IS_SELECTED(data->menui.menu.items[i]) ? 0
                                                                        : -1);
             }
