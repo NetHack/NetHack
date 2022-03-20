@@ -24,7 +24,7 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          stripdigits     (char *)
-        unsigned	Strlen_		(const char *str, const char *, int)
+        unsigned        Strlen_         (const char *str, const char *, int)
         char *          eos             (char *)
         boolean         str_start_is    (const char *, const char *, boolean)
         boolean         str_end_is      (const char *, const char *)
