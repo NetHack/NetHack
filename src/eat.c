@@ -2279,7 +2279,7 @@ fpostfx(struct obj *otmp)
         /* This stuff seems to be VERY healthy! */
         gainstr(otmp, 1, TRUE);
         if (Upolyd) {
-            u.mh += otmp->cursed ? -rnd(20) : rnd(20);
+            u.mh += otmp->cursed ? -rnd(20) : rnd(20), g.context.botl = TRUE;
             if (u.mh > u.mhmax) {
                 if (!rn2(17))
                     u.mhmax++;
@@ -2288,13 +2288,10 @@ fpostfx(struct obj *otmp)
                 rehumanize();
             }
         } else {
-            u.uhp += otmp->cursed ? -rnd(20) : rnd(20);
+            u.uhp += otmp->cursed ? -rnd(20) : rnd(20), g.context.botl = TRUE;
             if (u.uhp > u.uhpmax) {
-                if (!rn2(17)) {
-                    u.uhpmax++;
-                    if (u.uhpmax > u.uhppeak)
-                        u.uhppeak = u.uhpmax;
-                }
+                if (!rn2(17))
+                    setuhpmax(u.uhpmax + 1);
                 u.uhp = u.uhpmax;
             } else if (u.uhp <= 0) {
                 g.killer.format = KILLED_BY_AN;

@@ -3658,11 +3658,23 @@ dofiretrap(
         if (alt > num)
             num = alt;
         if (u.mhmax > mons[u.umonnum].mlevel)
-            u.mhmax -= rn2(min(u.mhmax, num + 1)), g.context.botl = 1;
+            u.mhmax -= rn2(min(u.mhmax, num + 1)), g.context.botl = TRUE;
+        if (u.mh > u.mhmax)
+            u.mh = u.mhmax, g.context.botl = TRUE;
     } else {
+        int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
+
         num = d(2, 4);
-        if (u.uhpmax > u.ulevel)
-            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), g.context.botl = 1;
+        if (u.uhpmax > uhpmin) {
+            u.uhpmax -= rn2(min(u.uhpmax, num + 1)), g.context.botl = TRUE;
+        } /* note: no 'else' here */
+        if (u.uhpmax < uhpmin) {
+            setuhpmax(min(olduhpmax, uhpmin)); /* sets g.context.botl */
+            if (!Drain_resistance)
+                losexp(NULL); /* never fatal when 'drainer' is Null */
+        }
+        if (u.uhp > u.uhpmax)
+            u.uhp = u.uhpmax, g.context.botl = TRUE;
     }
     if (!num)
         You("are uninjured.");

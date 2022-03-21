@@ -204,9 +204,10 @@ more_experienced(register int exper, register int rexp)
 
 /* e.g., hit by drain life attack */
 void
-losexp(const char *drainer) /* cause of death, if drain should be fatal */
+losexp(
+    const char *drainer) /* cause of death, if drain should be fatal */
 {
-    register int num;
+    int num, uhpmin, olduhpmax;
 
     /* override life-drain resistance when handling an explicit
        wizard mode request to reduce level; never fatal though */
@@ -237,10 +238,21 @@ losexp(const char *drainer) /* cause of death, if drain should be fatal */
         u.uexp = 0;
         livelog_printf(LL_MINORAC, "lost all experience");
     }
+
+    olduhpmax = u.uhpmax;
+    uhpmin = minuhpmax(10); /* same minimum as is used by life-saving */
     num = (int) u.uhpinc[u.ulevel];
     u.uhpmax -= num;
-    if (u.uhpmax < 1)
-        u.uhpmax = 1;
+    if (u.uhpmax < uhpmin)
+        setuhpmax(uhpmin);
+    /* uhpmax might try to go up if it has previously been reduced by
+       strength loss or by a fire trap or by an attack by Death which
+       all use a different minimum than life-saving or experience loss;
+       we don't allow it to go up because that contradicts assumptions
+       elsewhere (such as healing wielder who drains with Strombringer) */
+    if (u.uhpmax > olduhpmax)
+        setuhpmax(olduhpmax);
+
     u.uhp -= num;
     if (u.uhp < 1)
         u.uhp = 1;
@@ -302,9 +314,7 @@ pluslvl(
         u.mh += hpinc;
     }
     hpinc = newhp();
-    u.uhpmax += hpinc;
-    if (u.uhpmax > u.uhppeak)
-        u.uhppeak = u.uhpmax;
+    setuhpmax(u.uhpmax + hpinc);
     u.uhp += hpinc;
 
     /* increase spell power/energy points */

@@ -1082,7 +1082,7 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
                 lowerlimit = min((int) g.youmonst.data->mlevel, u.ulevel);
             } else {
                 hpmax_p = &u.uhpmax;
-                lowerlimit = u.ulevel;
+                lowerlimit = minuhpmax(1);
             }
             if (*hpmax_p - mhm.permdmg > lowerlimit)
                 *hpmax_p -= mhm.permdmg;

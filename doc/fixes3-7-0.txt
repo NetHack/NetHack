@@ -838,6 +838,10 @@ for #knownclass with menustyle=Tradtional, allow player to ask for `a even if
 	no artifacts have been discovered yet, same as `<any-object-class>;
 	likewise for `u to ask to see unique items
 reduce eucalyptus leaf nutrition to 1
+life-saving might increase max HP; if level drain triggers that, don't let max
+	HP go up because it confuses healing for monster wielding Stormbringer
+HP recovery and/or max HP boost from eating royal jelly didn't perform a
+	status update to show the change
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

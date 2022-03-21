@@ -908,16 +908,17 @@ savelife(int how)
        reducing ulevel below 1, but include this for bulletproofing */
     if (u.ulevel < 1)
         u.ulevel = 1;
-    uhpmin = max(2 * u.ulevel, 10);
+    uhpmin = minuhpmax(10);
     if (u.uhpmax < uhpmin)
-        u.uhpmax = uhpmin;
+        setuhpmax(uhpmin);
     u.uhp = u.uhpmax;
     if (Upolyd) /* Unchanging, or death which bypasses losing hit points */
         u.mh = u.mhmax;
     if (u.uhunger < 500 || how == CHOKING) {
         init_uhunger();
     }
-    /* cure impending doom of sickness hero won't have time to fix */
+    /* cure impending doom of sickness hero won't have time to fix
+       [shouldn't this also be applied to other fatal timeouts?] */
     if ((Sick & TIMEOUT) == 1L) {
         make_sick(0L, (char *) 0, FALSE, SICK_ALL);
     }
@@ -929,7 +930,7 @@ savelife(int how)
         g.multi = -1;
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
-    g.context.botl = 1;
+    g.context.botl = TRUE;
     u.ugrave_arise = NON_PM;
     HUnchanging = 0L;
     curs_on_u();

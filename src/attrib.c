@@ -111,8 +111,11 @@ static int innately(long *);
 
 /* adjust an attribute; return TRUE if change is made, FALSE otherwise */
 boolean
-adjattrib(int ndx, int incr, int msgflg) /* positive => no message, zero => message, and */
-{           /* negative => conditional (msg if change made) */
+adjattrib(
+    int ndx,    /* which characteristic */
+    int incr,   /* amount of change */
+    int msgflg) /* positive => no message, zero => message, and */
+{               /* negative => conditional (msg if change made) */
     int old_acurr, old_abase, old_amax, decr;
     boolean abonflg;
     const char *attrstr;
@@ -181,9 +184,9 @@ adjattrib(int ndx, int incr, int msgflg) /* positive => no message, zero => mess
         return FALSE;
     }
 
+    g.context.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    g.context.botl = TRUE;
     if (g.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
@@ -210,6 +213,7 @@ gainstr(struct obj *otmp, int incr, boolean givemsg)
 void
 losestr(int num)
 {
+    int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
     int ustr = ABASE(A_STR) - num;
 
     while (ustr < 3) {
@@ -220,8 +224,14 @@ losestr(int num)
             u.mhmax -= 6;
         } else {
             u.uhp -= 6;
-            u.uhpmax -= 6;
+            setuhpmax(u.uhpmax - 6);
         }
+        g.context.botl = TRUE;
+    }
+    if (u.uhpmax < uhpmin) {
+        setuhpmax(min(olduhpmax, uhpmin));
+        if (!Drain_resistance)
+            losexp(NULL); /* won't be fatal when no 'drainer' is supplied */
     }
     (void) adjattrib(A_STR, -num, 1);
 }
@@ -1036,6 +1046,30 @@ newhp(void)
             hp = lim;
     }
     return hp;
+}
+
+/* minimum value for uhpmax is ulevel but for life-saving it is always at
+   least 10 if ulevel is less than that */
+int
+minuhpmax(int altmin)
+{
+    if (altmin < 1)
+        altmin = 1;
+    return max(u.ulevel, altmin);
+}
+
+/* update u.uhpmax and values of other things that depend upon it */
+void
+setuhpmax(int newmax)
+{
+    if (newmax != u.uhpmax) {
+        u.uhpmax = newmax;
+        if (u.uhpmax > u.uhppeak)
+            u.uhppeak = u.uhpmax;
+        g.context.botl = TRUE;
+    }
+    if (u.uhp > u.uhpmax)
+        u.uhp = u.uhpmax, g.context.botl = TRUE;
 }
 
 schar
