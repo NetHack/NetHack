@@ -1940,6 +1940,7 @@ use_tinning_kit(struct obj *obj)
 
         if (poly_when_stoned(g.youmonst.data)) {
             You("tin %s without wearing gloves.", corpse_name);
+            kbuf[0] = '\0';
         } else {
             pline("Tinning %s without wearing gloves is a fatal mistake...",
                   corpse_name);
