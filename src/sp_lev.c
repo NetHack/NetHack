@@ -5373,6 +5373,13 @@ get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
 
         return 1;
     }
+    if (lua_type(L, i) != LUA_TNIL) {
+        /* if coord is not supplied at all, it will be nil; however, if someone
+         * mistakenly supplies a number or other type (forgetting to put braces
+         * around {selection:rndcoord()} is one way this can easily happen),
+         * this should not quietly allow it to do so with x and y unmodified. */
+        nhl_error(L, "non-table coord specified");
+    }
     return 0;
 }
 
