@@ -3025,10 +3025,13 @@ find_random_launch_coord(struct trap *ttmp, coord *cc)
     int mindist = 4;
     int trycount = 0;
     xchar dx, dy;
-    xchar x = ttmp->tx, y = ttmp->ty;
+    xchar x, y;
 
     if (!ttmp || !cc)
         return FALSE;
+
+    x = ttmp->tx;
+    y = ttmp->ty;
 
     bcc.x = ttmp->tx + g.launchplace.x;
     bcc.y = ttmp->ty + g.launchplace.y;
