@@ -180,10 +180,18 @@ static int
 l_selection_getpoint(lua_State *L)
 {
     struct selectionvar *sel = l_selection_check(L, 1);
-    xchar x = (xchar) luaL_checkinteger(L, 2);
-    xchar y = (xchar) luaL_checkinteger(L, 3);
+    xchar x, y;
+    int ix, iy;
     int val;
     long crd;
+
+    lua_remove(L, 1); /* sel */
+    if (!nhl_get_xy_params(L, &ix, &iy)) {
+        nhl_error(L, "l_selection_getpoint: Incorrect params");
+        return 0;
+    }
+    x = (xchar) ix;
+    y = (xchar) iy;
 
     if (x == -1 && y == -1)
         crd = SP_COORD_PACK_RANDOM(0);
@@ -327,15 +335,17 @@ l_selection_rndcoord(lua_State *L)
 {
     struct selectionvar *sel = l_selection_check(L, 1);
     int removeit = (int) luaL_optinteger(L, 2, 0);
-    xchar x, y;
+    xchar x = -1, y = -1;
     selection_rndcoord(sel, &x, &y, removeit);
-    update_croom();
-    if (g.coder && g.coder->croom) {
-        x -= g.coder->croom->lx;
-        y -= g.coder->croom->ly;
-    } else {
-        x -= g.xstart;
-        y -= g.ystart;
+    if (!(x == -1 && y == -1)) {
+        update_croom();
+        if (g.coder && g.coder->croom) {
+            x -= g.coder->croom->lx;
+            y -= g.coder->croom->ly;
+        } else {
+            x -= g.xstart;
+            y -= g.ystart;
+        }
     }
     lua_settop(L, 0);
     lua_newtable(L);

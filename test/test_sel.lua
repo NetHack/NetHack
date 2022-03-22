@@ -66,8 +66,9 @@ function test_selection_params()
       error("sel:rndcoord returned unset coordinate (" .. pt.x .. "," .. pt.y .. ")");
    end
 
+   -- no coordinates in selection, returns -1,-1
    pt = sel:rndcoord(1);
-   if pt.x ~= -2 or pt.y ~= -1 then
+   if pt.x ~= -1 or pt.y ~= -1 then
       error("sel:rndcoord returned (" .. pt.x .. "," .. pt.y .. ") coordinate");
    end
 
@@ -89,6 +90,8 @@ function test_selection_params()
 
    -- variable as param
    selection.get(sel, 1, 2);
+   selection.get(sel, {1, 2});
+   selection.get(sel, { x = 1, y = 2 });
    selection.set(sel, 1, 2);
    selection.negate(sel);
    selection.percentage(sel, 50);

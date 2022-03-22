@@ -957,6 +957,7 @@ Get the selection value at (x,y).
 Example:
 
  local value = selection.get(sel, x, y);
+ local value = selection.get(sel, { x = 10, y = 14 });
 
 === gradient
 
