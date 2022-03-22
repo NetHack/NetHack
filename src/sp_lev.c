@@ -5371,8 +5371,9 @@ boolean
 get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
 {
     boolean ret = FALSE;
+    int ltyp = lua_type(L, i);
 
-    if (lua_type(L, i) == LUA_TTABLE) {
+    if (ltyp == LUA_TTABLE) {
         int arrlen;
         boolean gotx = FALSE;
 
@@ -5407,6 +5408,9 @@ get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
 
             return TRUE;
         }
+    } else if (ltyp != LUA_TNIL) {
+        /* non-existent coord is ok */
+        nhl_error(L, "non-table coord specified");
     }
     return ret;
 }
