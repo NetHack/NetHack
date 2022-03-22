@@ -120,18 +120,18 @@ local near_temple = selection.area(17,8, 23,14) & inside
 
 for i=1,5 + math.random(1 - 1,1*10) do
    if percent(50) then
-      des.monster({ id = "orc-captain", coord = { inside:rndcoord(1) }, peaceful=0 });
+      des.monster({ id = "orc-captain", coord = inside:rndcoord(1), peaceful=0 });
    else
       if percent(80) then
-         des.monster({ id = "Uruk-hai", coord = { inside:rndcoord(1) }, peaceful=0 })
+         des.monster({ id = "Uruk-hai", coord = inside:rndcoord(1), peaceful=0 })
       else
-         des.monster({ id = "Mordor orc", coord = { inside:rndcoord(1) }, peaceful=0 })
+         des.monster({ id = "Mordor orc", coord = inside:rndcoord(1), peaceful=0 })
       end
    end
 end
 -- shamans can be hanging out in/near the temple
 for i=1,math.random(2 - 1,2*3) do
-   des.monster({ id = "orc shaman", coord = { near_temple:rndcoord(0) }, peaceful=0 });
+   des.monster({ id = "orc shaman", coord = near_temple:rndcoord(0), peaceful=0 });
 end
 -- these are not such a big deal
 -- to run into outside the bars

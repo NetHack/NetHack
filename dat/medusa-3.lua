@@ -53,18 +53,16 @@ des.non_diggable(selection.area(44,13,48,17))
 -- restricting the placement when teleporting from levels below this.
 des.teleport_region({ region = {33,02,38,07}, dir="down" })
 des.levregion({ region = {32,01,39,07}, type="stair-up" });
-local mx, my = place:rndcoord(1);
-des.stair("down", mx, my)
+
+des.stair("down", place:rndcoord(1))
 des.door("locked",08,08)
 des.door("locked",64,05)
 des.door("random",50,13)
 des.door("locked",48,15)
 --
-local px, py = place:rndcoord(1);
-des.feature("fountain", px,py);
+des.feature("fountain", place:rndcoord(1));
 --
-local px, py = place:rndcoord(1);
-des.object({ id="statue",x=px, y=py, buc="uncursed",
+des.object({ id="statue", coord=place:rndcoord(1), buc = "uncursed",
                       montype="knight", historic=1, male=1,name="Perseus",
                       contents = function()
                          if percent(75) then

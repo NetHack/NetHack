@@ -521,4 +521,5 @@ function run_tests()
    des.level_init();
 end
 
+nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
 run_tests();

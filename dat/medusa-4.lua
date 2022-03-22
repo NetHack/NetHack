@@ -49,8 +49,8 @@ des.teleport_region({ region = {64,01,74,17}, dir="down" });
 des.teleport_region({ region = {02,02,18,13}, dir="up" });
 --
 des.levregion({ region = {67,01,74,20}, type="stair-up" });
-local mx, my = place:rndcoord(1);
-des.stair("down", mx, my)
+
+des.stair("down", place:rndcoord(1))
 --
 des.door("locked",04,06)
 des.door("locked",04,10)
@@ -66,8 +66,7 @@ des.non_diggable(selection.area(01,01,22,14));
 --
 des.object("crystal ball", 07,08)
 --
-local px, py = place:rndcoord(1);
-des.object({ id="statue",x=px, y=py, buc="uncursed",
+des.object({ id="statue",coord=place:rndcoord(1), buc="uncursed",
                       montype="knight", historic=1, male=1,name="Perseus",
                       contents = function()
                          if percent(75) then

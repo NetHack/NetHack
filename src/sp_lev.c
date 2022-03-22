@@ -93,7 +93,6 @@ static void selection_iterate(struct selectionvar *, select_iter_func,
 static void sel_set_ter(int, int, genericptr_t);
 static void sel_set_door(int, int, genericptr_t);
 static void sel_set_feature(int, int, genericptr_t);
-static int get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
 static void levregion_add(lev_region *);
 static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
 static int get_table_region(lua_State *, const char *, lua_Integer *, lua_Integer *, lua_Integer *,
@@ -347,8 +346,8 @@ lvlfill_swamp(schar fg, schar bg, schar lit)
     lvlfill_solid(bg, lit);
 
     /* "relaxed blockwise maze" algorithm, Jamis Buck */
-    for (x = 2; x <= g.x_maze_max; x += 2)
-        for (y = 0; y <= g.y_maze_max; y += 2) {
+    for (x = 2; x <= min(g.x_maze_max, COLNO-2); x += 2)
+        for (y = 0; y <= min(g.y_maze_max, ROWNO-2); y += 2) {
             int c = 0;
 
             (void) set_levltyp_lit(x, y, fg, lit);
@@ -2999,7 +2998,7 @@ get_table_xy_or_coord(lua_State *L, lua_Integer *x, lua_Integer *y)
 
     if (mx == -1 && my == -1) {
         lua_getfield(L, 1, "coord");
-        get_coord(L, -1, &mx, &my);
+        (void) get_coord(L, -1, &mx, &my);
         lua_pop(L, 1);
     }
 
@@ -3062,7 +3061,7 @@ lspo_monster(lua_State *L)
                && lua_type(L, 2) == LUA_TTABLE) {
         const char *paramstr = luaL_checkstring(L, 1);
 
-        get_coord(L, 2, &mx, &my);
+        (void) get_coord(L, 2, &mx, &my);
 
         if (strlen(paramstr) == 1) {
             tmpmons.class = *paramstr;
@@ -3325,7 +3324,7 @@ lspo_object(lua_State *L)
                && lua_type(L, 2) == LUA_TTABLE) {
         const char *paramstr = luaL_checkstring(L, 1);
 
-        get_coord(L, 2, &ox, &oy);
+        (void) get_coord(L, 2, &ox, &oy);
 
         if (strlen(paramstr) == 1) {
             tmpobj.class = *paramstr;
@@ -3592,7 +3591,7 @@ lspo_engraving(lua_State *L)
         txt = get_table_str(L, "text");
     } else if (argc == 3) {
         lua_Integer ex, ey;
-        get_coord(L, 1, &ex, &ey);
+        (void) get_coord(L, 1, &ex, &ey);
         x = ex;
         y = ey;
         etyp = engrtypes2i[luaL_checkoption(L, 2, "engrave", engrtypes)];
@@ -4069,7 +4068,7 @@ lspo_trap(lua_State *L)
         const char *trapstr = luaL_checkstring(L, 1);
 
         tmptrap.type = get_traptype_byname(trapstr);
-        get_coord(L, 2, &x, &y);
+        (void) get_coord(L, 2, &x, &y);
     } else if (argc == 3) {
         const char *trapstr = luaL_checkstring(L, 1);
 
@@ -4088,7 +4087,7 @@ lspo_trap(lua_State *L)
         if (lua_type(L, -1) == LUA_TTABLE) {
             lua_Integer lx = -1, ly = -1;
 
-            get_coord(L, -1, &lx, &ly);
+            (void) get_coord(L, -1, &lx, &ly);
             lua_pop(L, 1);
             g.launchplace.x = lx;
             g.launchplace.y = ly;
@@ -4131,7 +4130,7 @@ lspo_gold(lua_State *L)
         y = gy = luaL_checkinteger(L, 2);
     } else if (argc == 2 && lua_type(L, 2) == LUA_TTABLE) {
         amount = luaL_checkinteger(L, 1);
-        get_coord(L, 2, &gx, &gy);
+        (void) get_coord(L, 2, &gx, &gy);
         x = gx;
         y = gy;
     } else if (argc == 0 || (argc == 1 && lua_type(L, 1) == LUA_TTABLE)) {
@@ -4290,7 +4289,7 @@ selection_filter_mapchar(struct selectionvar* ov,  xchar typ, int lit)
     if (!ov || !ret)
         return NULL;
 
-    for (x = 0; x < ret->wid; x++)
+    for (x = 1; x < ret->wid; x++)
         for (y = 0; y < ret->hei; y++)
             if (selection_getpoint(x, y, ov)
                 && match_maptyps(typ, levl[x][y].typ)) {
@@ -4332,14 +4331,14 @@ selection_rndcoord(struct selectionvar* ov, xchar *x, xchar *y, boolean removeit
     int c;
     int dx, dy;
 
-    for (dx = 0; dx < ov->wid; dx++)
+    for (dx = 1; dx < ov->wid; dx++)
         for (dy = 0; dy < ov->hei; dy++)
             if (selection_getpoint(dx, dy, ov))
                 idx++;
 
     if (idx) {
         c = rn2(idx);
-        for (dx = 0; dx < ov->wid; dx++)
+        for (dx = 1; dx < ov->wid; dx++)
             for (dy = 0; dy < ov->hei; dy++)
                 if (selection_getpoint(dx, dy, ov)) {
                     if (!c) {
@@ -4791,7 +4790,7 @@ selection_iterate(
     /* yes, this is very naive, but it's not _that_ expensive. */
     for (x = 0; x < ov->wid; x++)
         for (y = 0; y < ov->hei; y++)
-            if (selection_getpoint(x, y, ov))
+            if (isok(x,y) && selection_getpoint(x, y, ov))
                 (*func)(x, y, arg);
 }
 
@@ -4924,7 +4923,10 @@ l_table_getset_feature_flag(
     }
 }
 
-/* convert relative coordinate to absolute */
+/* convert relative coordinate to map-absolute.
+  local ax,ay = nh.abscoord(rx, ry);
+  local pt = nh.abscoord({ x = 10, y = 5 });
+ */
 int
 nhl_abs_coord(lua_State *L)
 {
@@ -4936,11 +4938,22 @@ nhl_abs_coord(lua_State *L)
         y = (xchar) lua_tointeger(L, 2);
         x += g.xstart;
         y += g.ystart;
-    } else
+        lua_pushinteger(L, x);
+        lua_pushinteger(L, y);
+        return 2;
+    } else if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
+        x = (xchar) get_table_int(L, "x");
+        y = (xchar) get_table_int(L, "y");
+        x += g.xstart;
+        y += g.ystart;
+        lua_newtable(L);
+        nhl_add_table_entry_int(L, "x", x);
+        nhl_add_table_entry_int(L, "y", y);
+        return 1;
+    } else {
         nhl_error(L, "nhl_abs_coord: Wrong args");
-    lua_pushinteger(L, x);
-    lua_pushinteger(L, y);
-    return 2;
+        return 0;
+    }
 }
 
 /* feature("fountain", x, y); */
@@ -4966,7 +4979,7 @@ lspo_feature(lua_State *L)
         && lua_type(L, 2) == LUA_TTABLE) {
         lua_Integer fx, fy;
         typ = features2i[luaL_checkoption(L, 1, NULL, features)];
-        get_coord(L, 2, &fx, &fy);
+        (void) get_coord(L, 2, &fx, &fy);
         x = fx;
         y = fy;
     } else if (argc == 3) {
@@ -5056,7 +5069,7 @@ lspo_terrain(lua_State *L)
         lua_Integer tx, ty;
         tmpterrain.ter = check_mapchr(luaL_checkstring(L, 2));
         lua_pop(L, 1);
-        get_coord(L, 1, &tx, &ty);
+        (void) get_coord(L, 1, &tx, &ty);
         x = tx;
         y = ty;
     } else if (argc == 2) {
@@ -5165,7 +5178,7 @@ lspo_replace_terrain(lua_State *L)
     }
 
     for (y = 0; y <= sel->hei; y++)
-        for (x = 0; x < sel->wid; x++)
+        for (x = 1; x < sel->wid; x++)
             if (selection_getpoint(x, y,sel)) {
                 if (mf) {
                     if (mapfrag_match(mf, x, y) && (rn2(100)) < chance)
@@ -5354,26 +5367,48 @@ get_table_region(
     return 1;
 }
 
-static int
+boolean
 get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
 {
+    boolean ret = FALSE;
+
     if (lua_type(L, i) == LUA_TTABLE) {
         int arrlen;
+        boolean gotx = FALSE;
 
-        lua_len(L, i);
-        arrlen = lua_tointeger(L, -1);
-        lua_pop(L, 1);
-        if (arrlen != 2) {
-            nhl_error(L, "Not a coordinate");
-            return 0;
+        lua_getfield(L, i, "x");
+        if (!lua_isnil(L, -1)) {
+            *x = luaL_checkinteger(L, -1);
+            gotx = TRUE;
         }
+        lua_pop(L, 1);
 
-        *x = get_table_intarray_entry(L, i, 1);
-        *y = get_table_intarray_entry(L, i, 2);
+        if (gotx) {
+            lua_getfield(L, i, "y");
+            if (!lua_isnil(L, -1)) {
+                *y = luaL_checkinteger(L, -1);
+                lua_pop(L, 1);
+                ret = TRUE;
+            } else {
+                nhl_error(L, "Not a coordinate");
+                return FALSE;
+            }
+        } else {
+            lua_len(L, i);
+            arrlen = lua_tointeger(L, -1);
+            lua_pop(L, 1);
+            if (arrlen != 2) {
+                nhl_error(L, "Not a coordinate");
+                return FALSE;
+            }
 
-        return 1;
+            *x = get_table_intarray_entry(L, i, 1);
+            *y = get_table_intarray_entry(L, i, 2);
+
+            return TRUE;
+        }
     }
-    return 0;
+    return ret;
 }
 
 static void

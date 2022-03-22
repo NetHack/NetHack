@@ -1767,6 +1767,7 @@ extern void lcheck_param_table(lua_State *);
 extern schar get_table_mapchr(lua_State *, const char *);
 extern schar get_table_mapchr_opt(lua_State *, const char *, schar);
 extern short nhl_get_timertype(lua_State *, int);
+extern boolean nhl_get_xy_params(lua_State *, int *, int *);
 extern void nhl_add_table_entry_int(lua_State *, const char *, lua_Integer);
 extern void nhl_add_table_entry_char(lua_State *, const char *, char);
 extern void nhl_add_table_entry_str(lua_State *, const char *, const char *);
@@ -2537,6 +2538,7 @@ extern void selection_do_gradient(struct selectionvar *, long, long, long,
                                   long, long, long, long, long);
 extern int lspo_reset_level(lua_State *);
 extern int lspo_finalize_level(lua_State *);
+extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
 extern int nhl_abs_coord(lua_State *);
 extern void update_croom(void);
 extern const char *get_trapname_bytype(int);

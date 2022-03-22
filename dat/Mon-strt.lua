@@ -88,8 +88,7 @@ des.monster("abbot", 33, 12)
 des.non_diggable(selection.area(18,03,55,16))
 -- Random traps
 for i = 1, 2 do
-   local x,y = spacelocs:rndcoord(1);
-   des.trap("dart",x,y)
+   des.trap("dart", spacelocs:rndcoord(1))
 end
 des.trap()
 des.trap()
@@ -97,10 +96,8 @@ des.trap()
 des.trap()
 -- Monsters on siege duty.
 for i = 1, 8 do
-   local x,y = spacelocs:rndcoord(1);
-   des.monster("earth elemental", x, y)
+   des.monster("earth elemental", spacelocs:rndcoord(1))
 end
 for i = 1, 4 do
-   local x,y = spacelocs:rndcoord(1);
-   des.monster("xorn", x, y)
+   des.monster("xorn", spacelocs:rndcoord(1))
 end

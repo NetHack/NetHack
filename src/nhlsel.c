@@ -320,8 +320,8 @@ l_selection_filter_percent(lua_State *L)
     return 1;
 }
 
-/* local x,y = selection.rndcoord(sel); */
-/* local x,y = selection.rndcoord(sel, 1); */
+/* local pt = selection.rndcoord(sel); */
+/* local pt = selection.rndcoord(sel, 1); */
 static int
 l_selection_rndcoord(lua_State *L)
 {
@@ -338,9 +338,10 @@ l_selection_rndcoord(lua_State *L)
         y -= g.ystart;
     }
     lua_settop(L, 0);
-    lua_pushnumber(L, x);
-    lua_pushnumber(L, y);
-    return 2;
+    lua_newtable(L);
+    nhl_add_table_entry_int(L, "x", x);
+    nhl_add_table_entry_int(L, "y", y);
+    return 1;
 }
 
 /* internal function to get a selection and 4 integer values from lua stack.
@@ -585,7 +586,7 @@ l_selection_match(lua_State *L)
     }
 
     for (y = 0; y <= sel->hei; y++)
-        for (x = 0; x < sel->wid; x++)
+        for (x = 1; x < sel->wid; x++)
             selection_setpoint(x, y, sel, mapfrag_match(mf, x,y) ? 1 : 0);
 
     mapfrag_free(&mf);
@@ -801,7 +802,7 @@ l_selection_iterate(lua_State *L)
     if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
         sel = l_selection_check(L, 1);
         for (y = 0; y < sel->hei; y++)
-            for (x = 0; x < sel->wid; x++)
+            for (x = 1; x < sel->wid; x++)
                 if (selection_getpoint(x, y, sel)) {
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, x - g.xstart);

@@ -8,13 +8,16 @@ Functions exposed from the NetHack core. They are all in the `nh` table.
 
 === abscoord
 
-Convert a relative coordinate to absolute.
+Convert a room-relative coordinate to map-absolute.
+Can accept one table with x and y keys (and in that case, returns similar),
+or two integer values (and returns two integer values)
 des-routines tend to use relative coordinates, nh and obj use absolute.
 (This mess is still very much in need of improvement.)
 
 Example:
 
  local ax, ay = nh.abscoord(x, y);
+ local coord = nh.abscoord({ x = 10, y = 15 });
 
 
 === an
@@ -135,7 +138,8 @@ Example:
  local x = 20;
  local y = 10;
  local loc = nh.getmap(x,y);
- nh.pline("Map location at (" .. x .. "," .. y .. ) is " .. (loc.lit ? "lit" : "unlit") );
+ nh.pline("Map location at (" .. x .. "," .. y .. ) is " .. (loc.lit and "lit" or "unlit") );
+ local loc2 = nh.getmap({ x = 18, y = 16 });
 
 
 === get_config
@@ -166,7 +170,8 @@ Returns a table with the following elements:
 
 Example:
 
- local t = nh.gettrap(x, y);
+ local t1 = nh.gettrap(x, y);
+ local t2 = nh.gettrap({ x = 10, y = 15 });
 
 
 === has_timer_at
@@ -185,6 +190,7 @@ Delete a trap at x,y
 Example:
 
  nh.deltrap(x, y);
+ nh.deltrap({ x = 10, y = 10 });
 
 
 === impossible
@@ -281,6 +287,7 @@ When does timer at location at x,y trigger?
 Example:
 
  local melttime = nh.peek_timer_at(x,y, "melt-ice");
+ local melttime = nh.peek_timer_at({x=5,y=6}, "melt-ice");
 
 
 === pline
@@ -353,6 +360,7 @@ Start a timer at location x,y, with trigger time of `when` - relative to current
 Example:
 
  nh.start_timer_at(x,y, "melt-ice", when);
+ nh.start_timer_at({x=7,y=8}, "melt-ice", when);
 
 
 === stop_timer_at
@@ -362,6 +370,7 @@ Stop a timer at location x,y.
 Example:
 
  nh.stop_timer_at(x,y, "melt-ice");
+ nh.stop_timer_at({x=5,y=6}, "melt-ice");
 
 
 === verbalize
@@ -1033,13 +1042,14 @@ Example:
 
 === rndcoord
 
-Choose one of the selected locations, and return the x,y coordinates.
+Choose one of the selected locations, and return a table with x and y keys.
 If the optional second argument is 1, removes the location from the selection.
+If there are no coordinates in the selection, returns -1, -1.
 
 Example:
 
- local x,y = selection.rndcoord(sel);
- local x,y = selection.rndcoord(sel, 1);
+ local coord = selection.rndcoord(sel);
+ local coord = selection.rndcoord(sel, 1);
 
 === set
 

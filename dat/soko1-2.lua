@@ -98,13 +98,13 @@ des.door("closed",17,12)
 des.door("closed",17,14)
 des.region({ region={18,09, 22,15}, lit = 1, type = "zoo", filled = 1, irregular = 1 });
 
-px, py = selection.rndcoord(place);
+local pt = selection.rndcoord(place);
 if percent(25) then
-   des.object({ id="bag of holding", x=px, y=py,
+   des.object({ id="bag of holding", coord=pt,
 		buc="not-cursed", achievement=1 });
 else
-   des.object({ id="amulet of reflection", x=px, y=py,
+   des.object({ id="amulet of reflection", coord=pt,
 		buc="not-cursed", achievement=1 });
 end
-des.engraving({ x = px, y = py, type = "burn", text = "Elbereth" });
-des.object({ id = "scare monster", x = px, y = py, buc = "cursed" });
+des.engraving({ coord = pt, type = "burn", text = "Elbereth" });
+des.object({ id = "scare monster", coord = pt, buc = "cursed" });

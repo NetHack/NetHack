@@ -90,8 +90,7 @@ des.monster("acolyte", 33, 12)
 des.non_diggable(selection.area(18,03,55,16))
 -- Random traps
 for i = 1, 2 do
-   local x,y = spacelocs:rndcoord(1);
-   des.trap("dart",x,y)
+   des.trap("dart", spacelocs:rndcoord(1))
 end
 des.trap()
 des.trap()
@@ -99,6 +98,5 @@ des.trap()
 des.trap()
 -- Monsters on siege duty.
 for i = 1, 12 do
-   local x,y = spacelocs:rndcoord(1);
-   des.monster("human zombie", x, y);
+   des.monster("human zombie", spacelocs:rndcoord(1));
 end

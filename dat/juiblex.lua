@@ -63,9 +63,9 @@ des.levregion({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17}, typ
 des.teleport_region({ region = {01,00,11,20}, region_islev=1, exclude={0,0,50,17},dir="up" })
 des.teleport_region({ region = {69,00,79,20}, region_islev=1, exclude={0,0,50,17},dir="down" })
 des.feature("fountain", place:rndcoord(1))
-des.monster({ id = "giant mimic", coord = { place:rndcoord(1) }, appear_as = "ter:fountain" })
-des.monster({ id = "giant mimic", coord = { place:rndcoord(1) }, appear_as = "ter:fountain" })
-des.monster({ id = "giant mimic", coord = { place:rndcoord(1) }, appear_as = "ter:fountain" })
+des.monster({ id = "giant mimic", coord = place:rndcoord(1), appear_as = "ter:fountain" })
+des.monster({ id = "giant mimic", coord = place:rndcoord(1), appear_as = "ter:fountain" })
+des.monster({ id = "giant mimic", coord = place:rndcoord(1), appear_as = "ter:fountain" })
 -- The demon of the swamp
 des.monster("Juiblex",25,08)
 -- And a couple demons

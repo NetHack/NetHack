@@ -61,14 +61,14 @@ function test_selection_params()
    sel:set(1, 2);
    sel_pt_ne(sel, 1,2, 1, "test_selection_params 2");
 
-   local x,y = sel:rndcoord(1);
-   if x ~= 1 or y ~= 2 then
-      error("sel:rndcoord returned unset coordinate");
+   local pt = sel:rndcoord(1);
+   if pt.x ~= 1 or pt.y ~= 2 then
+      error("sel:rndcoord returned unset coordinate (" .. pt.x .. "," .. pt.y .. ")");
    end
 
-   x,y = sel:rndcoord(1);
-   if x ~= -2 and y ~= -1 then
-      error("sel:rndcoord returned (" .. x .. "," .. y .. ") coordinate");
+   pt = sel:rndcoord(1);
+   if pt.x ~= -2 or pt.y ~= -1 then
+      error("sel:rndcoord returned (" .. pt.x .. "," .. pt.y .. ") coordinate");
    end
 
    -- OO style
@@ -466,6 +466,7 @@ function test_sel_iterate()
    is_map_at(9,5, "L");
 end
 
+nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
 test_selection_params();
 test_sel_negate();
 test_sel_logical_and();
