@@ -1305,7 +1305,8 @@ query_category(const char *qstr,      /* query string */
         char tmpbuf[BUFSZ];
 
         if (num_justpicked == 1)
-            Sprintf(tmpbuf, "%s", doname(find_justpicked(olist)));
+            Sprintf(tmpbuf, "Just picked up: %s",
+                    doname(find_justpicked(olist)));
         else
             Sprintf(tmpbuf, "Items you just picked up");
         invlet = 'P';

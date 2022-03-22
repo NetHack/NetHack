@@ -2209,6 +2209,7 @@ dodip(void)
                  flags.verbose ? obuf : shortestname);
         /* "Dip <the object> into the fountain?" */
         if (yn(qbuf) == 'y') {
+            obj->pickup_prev = 0;
             dipfountain(obj);
             return ECMD_TIME;
         }
@@ -2225,6 +2226,7 @@ dodip(void)
                        && P_SKILL(P_RIDING) < P_BASIC) {
                 rider_cant_reach(); /* not skilled enough to reach */
             } else {
+                obj->pickup_prev = 0;
                 if (obj->otyp == POT_ACID)
                     obj->in_use = 1;
                 if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
@@ -2244,6 +2246,8 @@ dodip(void)
         pline("That is a potion bottle, not a Klein bottle!");
         return ECMD_OK;
     }
+
+    obj->pickup_prev = 0; /* no longer 'recently picked up' */
     potion->in_use = TRUE; /* assume it will be used up */
     if (potion->otyp == POT_WATER) {
         boolean useeit = !Blind || (obj == ublindf && Blindfolded_only);
@@ -2260,7 +2264,8 @@ dodip(void)
 
             /* KMH, conduct */
             if (!u.uconduct.polypiles++)
-                livelog_printf(LL_CONDUCT, "polymorphed %s first item", uhis());
+                livelog_printf(LL_CONDUCT, "polymorphed %s first item",
+                               uhis());
 
             obj = poly_obj(obj, STRANGE_OBJECT);
 

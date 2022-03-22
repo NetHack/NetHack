@@ -3224,6 +3224,8 @@ dotypeinv(void)
             *extra_types++ = 'C';
         if (!xcnt)
             *extra_types++ = 'X';
+        if (!jcnt)
+            *extra_types++ = 'P';
         *extra_types = '\0'; /* for index() */
         for (i = 0; i < MAXOCLASSES; i++)
             if (!index(types, def_oc_syms[i].sym)) {
@@ -3289,7 +3291,7 @@ dotypeinv(void)
                 after = " whose blessed/uncursed/cursed status is unknown";
                 break; /* better phrasing is desirable */
             case 'P':
-                after = " you just picked up";
+                after = " that were just picked up";
                 break;
             default:
                 /* 'c' is an object class, because we've already handled

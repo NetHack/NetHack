@@ -356,6 +356,7 @@ doread(void)
     if (!scroll)
         return ECMD_CANCEL;
     otyp = scroll->otyp;
+    scroll->pickup_prev = 0; /* no longer 'just picked up' */
 
     /* outrumor has its own blindness check */
     if (otyp == FORTUNE_COOKIE) {
