@@ -1837,6 +1837,11 @@ mbodypart(struct monst *mon, int part)
                           "posterior", "over stretched", "clitellum",
                           "length", "posterior setae", "setae", "blood",
                           "skin", "prostomium", "stomach" },
+        *spider_parts[] = { "pedipalp", "eye", "face", "pedipalp", "tarsus",
+                            "claw", "pedipalp", "palped", "cephalothorax",
+                            "leg", "spun out", "cephalothorax", "abdomen",
+                            "claw", "hair", "hemolymph", "book lung",
+                            "labrum", "digestive tract" },
         *fish_parts[] = { "fin", "eye", "premaxillary", "pelvic axillary",
                           "pelvic fin", "anal fin", "pectoral fin", "finned",
                           "head", "peduncle", "played out", "gills",
@@ -1890,6 +1895,8 @@ mbodypart(struct monst *mon, int part)
     if (humanoid(mptr) && (part == ARM || part == FINGER || part == FINGERTIP
                            || part == HAND || part == HANDED))
         return humanoid_parts[part];
+    if (mptr->mlet == S_COCKATRICE)
+        return (part == HAIR) ? snake_parts[part] : bird_parts[part];
     if (mptr == &mons[PM_RAVEN])
         return bird_parts[part];
     if (mptr->mlet == S_CENTAUR || mptr->mlet == S_UNICORN
@@ -1911,6 +1918,8 @@ mbodypart(struct monst *mon, int part)
         return fish_parts[part];
     if (mptr->mlet == S_WORM)
         return worm_parts[part];
+    if (mptr->mlet == S_SPIDER)
+        return spider_parts[part];
     if (slithy(mptr) || (mptr->mlet == S_DRAGON && part == HAIR))
         return snake_parts[part];
     if (mptr->mlet == S_EYE)
