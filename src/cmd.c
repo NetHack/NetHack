@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1646136938 2022/03/01 12:15:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.528 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1647912063 2022/03/22 01:21:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.533 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -770,21 +770,30 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 int
 domonability(void)
 {
-    if (can_breathe(g.youmonst.data))
+    struct permonst *uptr = g.youmonst.data;
+    boolean might_hide = (is_hider(uptr) || hides_under(uptr));
+    char c = '\0';
+
+    if (might_hide && webmaker(uptr)) {
+        c = yn_function("Hide [h] or spin a web [s]?", "hsq", 'q');
+        if (c == 'q' || c == '\033')
+            return ECMD_OK;
+    }
+    if (can_breathe(uptr))
         return dobreathe();
-    else if (attacktype(g.youmonst.data, AT_SPIT))
+    else if (attacktype(uptr, AT_SPIT))
         return dospit();
-    else if (g.youmonst.data->mlet == S_NYMPH)
+    else if (uptr->mlet == S_NYMPH)
         return doremove();
-    else if (attacktype(g.youmonst.data, AT_GAZE))
+    else if (attacktype(uptr, AT_GAZE))
         return dogaze();
-    else if (is_were(g.youmonst.data))
+    else if (is_were(uptr))
         return dosummon();
-    else if (webmaker(g.youmonst.data))
-        return dospinweb();
-    else if (is_hider(g.youmonst.data))
+    else if (c ? c == 'h' : might_hide)
         return dohide();
-    else if (is_mind_flayer(g.youmonst.data))
+    else if (c ? c == 's' : webmaker(uptr))
+        return dospinweb();
+    else if (is_mind_flayer(uptr))
         return domindblast();
     else if (u.umonnum == PM_GREMLIN) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
@@ -792,16 +801,16 @@ domonability(void)
                 dryup(u.ux, u.uy, TRUE);
         } else
             There("is no fountain here.");
-    } else if (is_unicorn(g.youmonst.data)) {
+    } else if (is_unicorn(uptr)) {
         use_unicorn_horn((struct obj **) 0);
         return ECMD_TIME;
-    } else if (g.youmonst.data->msound == MS_SHRIEK) {
+    } else if (uptr->msound == MS_SHRIEK) {
         You("shriek.");
         if (u.uburied)
             pline("Unfortunately sound does not carry well through rock.");
         else
             aggravate();
-    } else if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst)) {
+    } else if (is_vampire(uptr) || is_vampshifter(&g.youmonst)) {
         return dopoly();
     } else if (Upolyd) {
         pline("Any special ability you may have is purely reflexive.");

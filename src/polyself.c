@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1626312523 2021/07/15 01:28:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.162 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1647912064 2022/03/22 01:21:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -847,38 +847,41 @@ polymon(int mntmp)
     if (flags.verbose) {
         static const char use_thec[] = "Use the command #%s to %s.";
         static const char monsterc[] = "monster";
+        struct permonst *uptr = g.youmonst.data;
+        boolean might_hide = (is_hider(uptr) || hides_under(uptr));
 
-        if (can_breathe(g.youmonst.data))
+        if (can_breathe(uptr))
             pline(use_thec, monsterc, "use your breath weapon");
-        if (attacktype(g.youmonst.data, AT_SPIT))
+        if (attacktype(uptr, AT_SPIT))
             pline(use_thec, monsterc, "spit venom");
-        if (g.youmonst.data->mlet == S_NYMPH)
+        if (uptr->mlet == S_NYMPH)
             pline(use_thec, monsterc, "remove an iron ball");
-        if (attacktype(g.youmonst.data, AT_GAZE))
+        if (attacktype(uptr, AT_GAZE))
             pline(use_thec, monsterc, "gaze at monsters");
-        if (is_hider(g.youmonst.data))
+        if (might_hide && webmaker(uptr))
+            pline(use_thec, monsterc, "hide or to spin a web");
+        else if (might_hide)
             pline(use_thec, monsterc, "hide");
-        if (is_were(g.youmonst.data))
-            pline(use_thec, monsterc, "summon help");
-        if (webmaker(g.youmonst.data))
+        else if (webmaker(uptr))
             pline(use_thec, monsterc, "spin a web");
+        if (is_were(uptr))
+            pline(use_thec, monsterc, "summon help");
         if (u.umonnum == PM_GREMLIN)
             pline(use_thec, monsterc, "multiply in a fountain");
-        if (is_unicorn(g.youmonst.data))
+        if (is_unicorn(uptr))
             pline(use_thec, monsterc, "use your horn");
-        if (is_mind_flayer(g.youmonst.data))
+        if (is_mind_flayer(uptr))
             pline(use_thec, monsterc, "emit a mental blast");
-        if (g.youmonst.data->msound == MS_SHRIEK) /* worthless, actually */
+        if (uptr->msound == MS_SHRIEK) /* worthless, actually */
             pline(use_thec, monsterc, "shriek");
-        if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst))
+        if (is_vampire(uptr) || is_vampshifter(&g.youmonst))
             pline(use_thec, monsterc, "change shape");
 
-        if (lays_eggs(g.youmonst.data) && flags.female
-            && !(g.youmonst.data == &mons[PM_GIANT_EEL]
-                 || g.youmonst.data == &mons[PM_ELECTRIC_EEL]))
+        if (lays_eggs(uptr) && flags.female
+            && !(uptr == &mons[PM_GIANT_EEL]
+                 || uptr == &mons[PM_ELECTRIC_EEL]))
             pline(use_thec, "sit",
-                  eggs_in_water(g.youmonst.data) ? "spawn in the water"
-                                                 : "lay an egg");
+                  eggs_in_water(uptr) ? "spawn in the water" : "lay an egg");
     }
 
     /* you now know what an egg of your type looks like */
@@ -1406,6 +1409,7 @@ dospinweb(void)
     }
     ttmp = maketrap(u.ux, u.uy, WEB);
     if (ttmp) {
+        You("spin a web.");
         ttmp->madeby_u = 1;
         feeltrap(ttmp);
         if (*in_rooms(u.ux, u.uy, SHOPBASE))
@@ -1604,10 +1608,40 @@ dohide(void)
         u.uundetected = 0;
         return ECMD_OK;
     }
-    if (hides_under(g.youmonst.data) && !g.level.objects[u.ux][u.uy]) {
-        There("is nothing to hide under here.");
-        u.uundetected = 0;
-        return ECMD_OK;
+    if (hides_under(g.youmonst.data)) {
+        long ct = 0L;
+        struct obj *otmp, *otop = g.level.objects[u.ux][u.uy];
+
+        if (!otop) {
+            There("is nothing to hide under here.");
+            u.uundetected = 0;
+            return ECMD_OK;
+        }
+        for (otmp = otop;
+             otmp && otmp->otyp == CORPSE
+                  && touch_petrifies(&mons[otmp->corpsenm]);
+             otmp = otmp->nexthere)
+            ct += otmp->quan;
+        /* otmp will be Null iff the entire pile consists of 'trice corpses */
+        if (!otmp && !Stone_resistance) {
+            char kbuf[BUFSZ];
+            const char *corpse_name = cxname(otop);
+
+            /* for the plural case, we'll say "cockatrice corpses" or
+               "chickatrice corpses" depending on the top of the pile
+               even if both types are present */
+            if (ct == 1)
+                corpse_name = an(corpse_name);
+            /* no need to check poly_when_stoned(); no hide-underers can
+               turn into stone golems instead of becoming petrified */
+            pline("Hiding under %s%s is a fatal mistake...",
+                  corpse_name, plur(ct));
+            Sprintf(kbuf, "hiding under %s%s", corpse_name, plur(ct));
+            instapetrify(kbuf);
+            /* only reach here if life-saved */
+            u.uundetected = 0;
+            return ECMD_TIME;
+        }
     }
     /* Planes of Air and Water */
     if (on_ceiling && !has_ceiling(&u.uz)) {
