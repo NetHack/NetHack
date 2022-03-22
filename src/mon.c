@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1646688064 2022/03/07 21:21:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.415 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1647911478 2022/03/22 01:11:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.419 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3882,17 +3882,20 @@ maybe_unhide_at(xchar x, xchar y)
 {
     struct monst *mtmp;
 
-    if (!OBJ_AT(x, y) && (mtmp = m_at(x, y)) != 0
-        && mtmp->mundetected && hides_under(mtmp->data))
+    if (OBJ_AT(x, y))
+        return;
+    if ((mtmp = m_at(x, y)) == 0 && u_at(x, y))
+        mtmp = &g.youmonst;
+    if (mtmp && mtmp->mundetected && hides_under(mtmp->data))
         (void) hideunder(mtmp);
 }
 
 /* monster/hero tries to hide under something at the current location */
 boolean
-hideunder(struct monst* mtmp)
+hideunder(struct monst *mtmp)
 {
     struct trap *t;
-    boolean undetected = FALSE, is_u = (mtmp == &g.youmonst);
+    boolean oldundetctd, undetected = FALSE, is_u = (mtmp == &g.youmonst);
     xchar x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
     if (mtmp == u.ustuck) {
@@ -3906,17 +3909,25 @@ hideunder(struct monst* mtmp)
     } else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
         struct obj *otmp = g.level.objects[x][y];
 
-        /* most monsters won't hide under cockatrice corpse */
-        if (otmp->nexthere || otmp->otyp != CORPSE
-            || (mtmp == &g.youmonst ? Stone_resistance : resists_ston(mtmp))
-            || !touch_petrifies(&mons[otmp->corpsenm]))
+        /* most monsters won't hide under cockatrice corpse but they
+           can hide under a pile containing more than just such corpses */
+        while (otmp && otmp->otyp == CORPSE
+               && touch_petrifies(&mons[otmp->corpsenm]))
+            otmp = otmp->nexthere;
+        if (otmp != 0 || ((mtmp == &g.youmonst) ? Stone_resistance
+                                                : resists_ston(mtmp)))
             undetected = TRUE;
     }
 
-    if (is_u)
-        u.uundetected = undetected;
-    else
-        mtmp->mundetected = undetected;
+    if (is_u) {
+        oldundetctd = u.uundetected != 0;
+        u.uundetected = undetected ? 1 : 0;
+    } else {
+        oldundetctd = mtmp->mundetected != 0;
+        mtmp->mundetected = undetected ? 1 : 0;
+    }
+    if (undetected != oldundetctd)
+        newsym(x, y);
     return undetected;
 }
 
@@ -3938,9 +3949,9 @@ hide_monst(struct monst* mon)
         /* try again if mimic missed its 1/3 chance to hide */
         if (mon->data->mlet == S_MIMIC && !M_AP_TYPE(mon))
             (void) restrap(mon);
+        g.viz_array[y][x] = save_viz;
         if (hider_under)
             (void) hideunder(mon);
-        g.viz_array[y][x] = save_viz;
     }
 }
 

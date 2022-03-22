@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.839 $ $NHDT-Date: 1646953027 2022/03/10 22:57:07 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.844 $ $NHDT-Date: 1647911478 2022/03/22 01:11:18 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -842,6 +842,10 @@ life-saving might increase max HP; if level drain triggers that, don't let max
 	HP go up because it confuses healing for monster wielding Stormbringer
 HP recovery and/or max HP boost from eating royal jelly didn't perform a
 	status update to show the change
+if poly'd hero is hiding under food and eats or #offers that food, stop hiding
+hide-under monsters who can be turned to stone aren't able to hide under a
+	cockatrice corpse unless there is something else present but make sure
+	that the other items aren't all more cockatrice corpses
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
