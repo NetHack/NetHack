@@ -1504,6 +1504,7 @@ looking at a monster will indicate whether it is asleep, and waking up a
 extend farlook's "<mon>, asleep" to "<mon>, can't move (paralyzed or sleeping
 	or busy)" for timed sleep and also "<mon>, meditating" for monster
 	that is waiting for hero to approach
+add body part terminology for spiders; enhance it for cockatrices
 
 
 Platform- and/or Interface-Specific New Features
