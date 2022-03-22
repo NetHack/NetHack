@@ -4395,7 +4395,7 @@ doherecmdmenu(void)
 {
     char ch = here_cmd_menu(TRUE);
 
-    return ch ? ECMD_TIME : ECMD_OK;
+    return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
 }
 
 /* #therecmdmenu command, a way to test there_cmd_menu without mouse */
@@ -4412,7 +4412,7 @@ dotherecmdmenu(void)
     else
         ch = here_cmd_menu(TRUE);
 
-    return ch ? ECMD_TIME : ECMD_OK;
+    return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
 }
 
 static void
