@@ -480,6 +480,7 @@ steal(struct monst* mtmp, char* objnambuf)
     urgent_pline("%s%s stole %s.", named ? "She" : Monnam(mtmp),
                  (was_punished && !Punished) ? " removed your chain and" : "",
                  doname(otmp));
+    (void) encumber_msg();
     could_petrify = (otmp->otyp == CORPSE
                      && touch_petrifies(&mons[otmp->corpsenm]));
     (void) mpickobj(mtmp, otmp); /* may free otmp */
@@ -622,6 +623,7 @@ stealamulet(struct monst* mtmp)
         pline("%s steals %s!", Monnam(mtmp), buf);
         if (can_teleport(mtmp->data) && !tele_restrict(mtmp))
             (void) rloc(mtmp, RLOC_MSG);
+        (void) encumber_msg();
     }
 }
 
@@ -644,12 +646,10 @@ maybe_absorb_item(
         if (obj->unpaid)
             subfrombill(obj, shop_keeper(*u.ushops));
         if (cansee(mon->mx, mon->my)) {
-            const char *MonName = Monnam(mon);
-
-            /* mon might be invisible; avoid "It pulls ... and absorbs it!" */
-            if (!strcmp(MonName, "It"))
-                MonName = "Something";
-            pline("%s pulls %s away from you and absorbs %s!", MonName,
+            /* Some_Monnam() avoids "It pulls ... and absorbs it!"
+               if hero can see the location but not the monster */
+            pline("%s pulls %s away from you and absorbs %s!",
+                  Some_Monnam(mon), /* Monnam() or "Something" */
                   yname(obj), (obj->quan > 1L) ? "them" : "it");
         } else {
             const char *hand_s = body_part(HAND);
@@ -660,6 +660,7 @@ maybe_absorb_item(
                   otense(obj, "are"), hand_s);
         }
         freeinv(obj);
+        (void) encumber_msg();
     } else {
         /* not carried; presumably thrown or kicked */
         if (canspotmon(mon))

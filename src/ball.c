@@ -34,7 +34,7 @@ ballrelease(boolean showmsg)
         /* [this used to test 'if (uwep != uball)' but that always passes
            after the setuwep() above] */
         freeinv(uball); /* remove from inventory but don't place on floor */
-        encumber_msg();
+        (void) encumber_msg();
     }
 }
 
@@ -975,7 +975,6 @@ litter(void)
                     otense(otmp, "fall"));
                 freeinv(otmp);
                 hitfloor(otmp, FALSE);
-                encumber_msg(); /* drop[xyz]() probably ought to to this... */
             }
         }
     }

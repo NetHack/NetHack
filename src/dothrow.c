@@ -245,6 +245,7 @@ throw_obj(struct obj *obj, int shotlimit)
         }
         freeinv(otmp);
         throwit(otmp, wep_mask, twoweap, oldslot);
+        (void) encumber_msg();
     }
     g.m_shot.n = g.m_shot.i = 0;
     g.m_shot.o = STRANGE_OBJECT;

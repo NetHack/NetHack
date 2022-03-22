@@ -1097,6 +1097,8 @@ changes to stair internals resulted in summoned Kops blockcading the stairs up
 	rather than intended stairs down
 dumplog's list of "major events" showed all logged events, not just major ones
 pickup via menu ignored player-specified count when picking up gold
+changes in encumbrance sometimes went unreported, leaving stale status line
+	info until hero's next move
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

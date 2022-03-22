@@ -360,7 +360,7 @@ moveloop_core(void)
            inventory may have changed in, e.g., nh_timeout(); we do
            need two checks here so that the player gets feedback
            immediately if their own action encumbered them */
-        encumber_msg();
+        (void) encumber_msg();
 
 #ifdef STATUS_HILITES
         if (iflags.hilite_delta)

@@ -734,6 +734,7 @@ dropz(struct obj *obj, boolean with_impact)
             map_object(obj, 0);
         newsym(u.ux, u.uy); /* remap location under self */
     }
+    (void) encumber_msg();
 }
 
 /* when swallowed, move dropped object from OBJ_FREE to u.ustuck's inventory;

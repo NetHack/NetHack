@@ -1065,7 +1065,7 @@ hold_another_object(struct obj *obj, const char *drop_fmt,
                 prinv(hold_msg, obj, oquan);
             /* obj made it into inventory and is staying there */
             update_inventory();
-            encumber_msg();
+            (void) encumber_msg();
         }
     }
     return obj;
