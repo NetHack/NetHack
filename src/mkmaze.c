@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1627951223 2021/08/03 00:40:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.7	mkmaze.c	$NHDT-Date: 1648064596 2022/03/23 19:43:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1218,10 +1218,10 @@ mazexy(coord *cc)
     do {
         cc->x = 1 + rn2(g.x_maze_max);
         cc->y = 1 + rn2(g.y_maze_max);
-        cpt++;
-    } while (cpt < 100
-             && levl[cc->x][cc->y].typ
-                    != (g.level.flags.corrmaze ? CORR : ROOM));
+        if (levl[cc->x][cc->y].typ == (g.level.flags.corrmaze ? CORR : ROOM))
+            return;
+    } while (++cpt < 100);
+
     if (cpt >= 100) {
         int x, y;
 
@@ -1230,8 +1230,7 @@ mazexy(coord *cc)
             for (y = 1; y < g.y_maze_max; y++) {
                 cc->x = x;
                 cc->y = y;
-                if (levl[cc->x][cc->y].typ
-                    == (g.level.flags.corrmaze ? CORR : ROOM))
+                if (levl[x][y].typ == (g.level.flags.corrmaze ? CORR : ROOM))
                     return;
             }
         panic("mazexy: can't find a place!");
