@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1613085478 2021/02/11 23:17:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1648066813 2022/03/23 20:20:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1227,8 +1227,9 @@ pos_to_room(xchar x, xchar y)
 
 /* If given a branch, randomly place a special stair or portal. */
 void
-place_branch(branch *br,       /* branch to place */
-             xchar x, xchar y) /* location */
+place_branch(
+    branch *br,       /* branch to place */
+    xchar x, xchar y) /* location */
 {
     coord m = {0};
     d_level *dest;
@@ -1337,7 +1338,7 @@ dodoor(int x, int y, struct mkroom *aroom)
 }
 
 boolean
-occupied(register xchar x, register xchar y)
+occupied(xchar x, xchar y)
 {
     return (boolean) (t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
                       || is_lava(x, y) || is_pool(x, y)
@@ -1347,7 +1348,11 @@ occupied(register xchar x, register xchar y)
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
 /* if tm != null, make trap at that location */
 void
-mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
+mktrap(
+    int num,
+    int mktrapflags,
+    struct mkroom *croom,
+    coord *tm)
 {
     register int kind;
     struct trap *t;
@@ -1611,15 +1616,25 @@ mktrap(int num, int mktrapflags, struct mkroom *croom, coord *tm)
 }
 
 void
-mkstairs(xchar x, xchar y,
-         char up,       /* [why 'char' when usage is boolean?] */
-         struct mkroom *croom UNUSED)
+mkstairs(
+    xchar x, xchar y,
+    char up,       /* [why 'char' when usage is boolean?] */
+    struct mkroom *croom UNUSED)
 {
+    int ltyp;
     d_level dest;
 
-    if (!x) {
+    if (!x || !isok(x, y)) {
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
+    }
+    ltyp = levl[x][y].typ; /* somexyspace() allows ice */
+    if (ltyp != ROOM && ltyp != CORR && ltyp != ICE) {
+        int glyph = back_to_glyph(x, y),
+            sidx = glyph_to_cmap(glyph);
+
+        impossible("mkstairs:  placing stairs %s on %s at <%d,%d>",
+                   up ? "up" : "down", defsyms[sidx].explanation, x, y);
     }
 
     /*
@@ -1627,28 +1642,28 @@ mkstairs(xchar x, xchar y,
      * attempt can happen when a special level is placed at an end and
      * has an up or down stair specified in its description file.
      */
-    if ((dunlev(&u.uz) == 1 && up)
-        || (dunlev(&u.uz) == dunlevs_in_dungeon(&u.uz) && !up))
+    if (dunlev(&u.uz) == (up ? 1 : dunlevs_in_dungeon(&u.uz)))
         return;
 
     dest.dnum = u.uz.dnum;
     dest.dlevel = u.uz.dlevel + (up ? -1 : 1);
     stairway_add(x, y, up ? TRUE : FALSE, FALSE, &dest);
 
-    (void) set_levltyp(x,y, STAIRS);
+    (void) set_levltyp(x, y, STAIRS);
     levl[x][y].ladder = up ? LA_UP : LA_DOWN;
 }
 
 /* is room a good one to generate up or down stairs in? */
-/* phase values, smaller allows for more relaxed criteria:
-     2 == no relaxed criteria
-     1 == allow a themed room
-     0 == allow same room as existing up/downstairs
-    -1 == allow an unjoined room
-*/
 static boolean
 generate_stairs_room_good(struct mkroom *croom, int phase)
 {
+    /*
+     * phase values, smaller allows for more relaxed criteria:
+     *  2 == no relaxed criteria;
+     *  1 == allow a themed room;
+     *  0 == allow same room as existing up/downstairs;
+     * -1 == allow an unjoined room.
+     */
     return (croom && (croom->needjoining || (phase < 0))
             && ((!has_dnstairs(croom) && !has_upstairs(croom))
                 || phase < 1)
@@ -1669,9 +1684,9 @@ generate_stairs_find_room(void)
     for (phase = 2; phase > -1; phase--) {
         do {
             croom = &g.rooms[rn2(g.nroom)];
-        } while (!generate_stairs_room_good(croom, phase) && (tryct++ < 50));
-        if (tryct < 50)
-            return croom;
+            if (generate_stairs_room_good(croom, phase))
+                return croom;
+        } while (tryct++ < 50);
     }
 
     for (phase = 2; phase > -2; phase--) {
