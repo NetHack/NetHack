@@ -1793,7 +1793,7 @@ look_traps(boolean nearby)
     else
         pline("No traps seen or remembered%s.", nearby ? " nearby" : "");
     destroy_nhwindow(win);
-    }
+}
 
 static const char *suptext1[] = {
     "%s is a member of a marauding horde of orcs",
