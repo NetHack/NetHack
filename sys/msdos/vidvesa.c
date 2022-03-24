@@ -19,8 +19,7 @@
 
 #define FIRST_TEXT_COLOR 240
 
-extern int total_tiles_used; /* tile.c */
-
+extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
 struct VesaCharacter {
     int colour;
     int chr;
@@ -88,16 +87,17 @@ static struct map_struct {
     short int tileidx;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
-#define vesa_clearmap()                                   \
-    {                                                     \
-        int x, y;                                         \
-        for (y = 0; y < ROWNO; ++y)                       \
-            for (x = 0; x < COLNO; ++x) {                 \
-                map[y][x].glyph = cmap_to_glyph(S_stone); \
-                map[y][x].ch = S_stone;                   \
-                map[y][x].attr = 0;                       \
-                map[y][x].special = 0;                    \
-            }                                             \
+#define vesa_clearmap()                                         \
+    {                                                           \
+        int x, y;                                               \
+        for (y = 0; y < ROWNO; ++y)                             \
+            for (x = 0; x < COLNO; ++x) {                       \
+                map[y][x].glyph = GLYPH_UNEXPLORED;             \
+                map[y][x].ch = glyph2ttychar(GLYPH_UNEXPLORED); \
+                map[y][x].attr = 0;                             \
+                map[y][x].special = 0;                          \
+                map[y][x].tileidx = Tile_unexplored;            \
+            }                                                   \
     }
 #define TOP_MAP_ROW 1
 
