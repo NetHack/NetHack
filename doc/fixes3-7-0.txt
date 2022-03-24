@@ -846,6 +846,8 @@ if poly'd hero is hiding under food and eats or #offers that food, stop hiding
 hide-under monsters who can be turned to stone aren't able to hide under a
 	cockatrice corpse unless there is something else present but make sure
 	that the other items aren't all more cockatrice corpses
+don't stop travel when going past a closed door (eg. when traveling along
+	a room wall)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -3252,7 +3252,7 @@ lookaround(void)
                 /* ignore if diagonal */
                 if (x != u.ux && y != u.uy)
                     continue;
-                if (g.context.run != 1) {
+                if (g.context.run != 1 && !g.context.travel) {
                     if (flags.mention_walls)
                         You("stop in front of the door.");
                     goto stop;
