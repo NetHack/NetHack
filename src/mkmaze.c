@@ -816,7 +816,10 @@ static boolean
 maze_inbounds(int x, int y)
 {
     return (x >= 2 && y >= 2
-            && x < g.x_maze_max && y < g.y_maze_max && isok(x, y));
+            && x < g.x_maze_max && y < g.y_maze_max
+            /* isok() test is superfluous here (unless something has
+               clobbered the static *_maze_max variables) */
+            && isok(x, y));
 }
 
 static void
@@ -1213,28 +1216,36 @@ walkfrom(int x, int y, schar typ)
 void
 mazexy(coord *cc)
 {
+    int x, y, allowedtyp = (g.level.flags.corrmaze ? CORR : ROOM);
     int cpt = 0;
 
     do {
-        cc->x = 1 + rn2(g.x_maze_max);
-        cc->y = 1 + rn2(g.y_maze_max);
-        if (levl[cc->x][cc->y].typ == (g.level.flags.corrmaze ? CORR : ROOM))
+        /* once upon a time this only considered odd values greater than 2
+           and less than N (for N=={x,y}_maze_max) because even values were
+           where maze walls always got placed; when wider maze corridors
+           were introduced it was changed to 1+rn2(N) which is just an
+           obscure way to get rnd(N); probably ought to be using 2+rn2(N-1)
+           to exclude the maze's outer boundary walls; trying and rejecting
+           those walls will waste some of the 100 random attempts... */
+        x = rnd(g.x_maze_max);
+        y = rnd(g.y_maze_max);
+        if (levl[x][y].typ == allowedtyp) {
+            cc->x = (xchar) x;
+            cc->y = (xchar) y;
             return;
+        }
     } while (++cpt < 100);
-
-    if (cpt >= 100) {
-        int x, y;
-
-        /* last try */
-        for (x = 1; x < g.x_maze_max; x++)
-            for (y = 1; y < g.y_maze_max; y++) {
-                cc->x = x;
-                cc->y = y;
-                if (levl[x][y].typ == (g.level.flags.corrmaze ? CORR : ROOM))
-                    return;
+    /* 100 random attempts failed; systematically try every possibility */
+    for (x = 1; x <= g.x_maze_max; x++)
+        for (y = 1; y <= g.y_maze_max; y++)
+            if (levl[x][y].typ == allowedtyp) {
+                cc->x = (xchar) x;
+                cc->y = (xchar) y;
+                return;
             }
-        panic("mazexy: can't find a place!");
-    }
+    /* every spot on the area of map allowed for mazes has been rejected */
+    panic("mazexy: can't find a place!");
+    /*NOTREACHED*/
     return;
 }
 
