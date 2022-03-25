@@ -2666,10 +2666,9 @@ doeat(void)
                 ll_conduct++;
             }
             if (material != WAX) {
-                /* FIXME: none of the materials which reach here are meat */
                 if (!u.uconduct.unvegetarian && !ll_conduct)
                     livelog_printf(LL_CONDUCT,
-                                   "tasted meat for first time, by eating %s",
+                       "tasted meat by-products for first time, by eating %s",
                                    an(food_xname(otmp, FALSE)));
                 violated_vegetarian();
             }
