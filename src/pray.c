@@ -19,6 +19,7 @@ static void fry_by_god(aligntyp, boolean);
 static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
+static void offer_too_soon(aligntyp);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
 
@@ -1410,6 +1411,25 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+static void
+offer_too_soon(aligntyp altaralign)
+{
+    if (altaralign == A_NONE && Inhell)
+        /* hero has left Moloch's Sanctum so is in the process
+            of getting away with the Amulet (outside of Gehennom,
+            fall through to the "ashamed" feedback) */
+        gods_upset(A_NONE);
+    else
+        You_feel("%s.",
+                    Hallucination
+                    ? "homesick"
+                    /* if on track, give a big hint */
+                    : (altaralign == u.ualign.type)
+                        ? "an urge to return to the surface"
+                        /* else headed towards celestial disgrace */
+                        : "ashamed");
+}
+
 /* the #offer command - sacrifice something to the gods */
 int
 dosacrifice(void)
@@ -1601,21 +1621,7 @@ dosacrifice(void)
 
     if (otmp->otyp == AMULET_OF_YENDOR) {
         if (!highaltar) {
- too_soon:
-            if (altaralign == A_NONE && Inhell)
-                /* hero has left Moloch's Sanctum so is in the process
-                   of getting away with the Amulet (outside of Gehennom,
-                   fall through to the "ashamed" feedback) */
-                gods_upset(A_NONE);
-            else
-                You_feel("%s.",
-                         Hallucination
-                            ? "homesick"
-                            /* if on track, give a big hint */
-                            : (altaralign == u.ualign.type)
-                               ? "an urge to return to the surface"
-                               /* else headed towards celestial disgrace */
-                               : "ashamed");
+            offer_too_soon(altaralign);
             return ECMD_TIME;
         } else {
             /* The final Test.  Did you win? */
@@ -1673,8 +1679,10 @@ dosacrifice(void)
     } /* real Amulet */
 
     if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-        if (!highaltar && !otmp->known)
-            goto too_soon;
+        if (!highaltar && !otmp->known) {
+            offer_too_soon(altaralign);
+            return ECMD_TIME;
+        }
         You_hear("a nearby thunderclap.");
         if (!otmp->known) {
             You("realize you have made a %s.",
