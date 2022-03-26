@@ -20,6 +20,7 @@ static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
 static void offer_too_soon(aligntyp);
+static void desecrate_high_altar(aligntyp);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
 
@@ -1437,6 +1438,21 @@ offer_too_soon(aligntyp altaralign)
                         : "ashamed");
 }
 
+static void
+desecrate_high_altar(aligntyp altaralign)
+{
+    /*
+     * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
+     * gets the god who owns it truly pissed off.
+     */
+    You_feel("the air around you grow charged...");
+    pline("Suddenly, you realize that %s has noticed you...", a_gname());
+    godvoice(altaralign,
+                "So, mortal!  You dare desecrate my High Temple!");
+    /* Throw everything we have at the player */
+    god_zaps_you(altaralign);
+}
+
 /* the #offer command - sacrifice something to the gods */
 int
 dosacrifice(void)
@@ -1506,7 +1522,8 @@ dosacrifice(void)
 
             if (highaltar
                 && (altaralign != A_CHAOTIC || u.ualign.type != A_CHAOTIC)) {
-                goto desecrate_high_altar;
+                desecrate_high_altar(altaralign);
+                return ECMD_TIME;
             } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
                 /* curse the lawful/neutral altar */
                 pline_The("altar is stained with %s blood.", g.urace.adj);
@@ -1714,17 +1731,7 @@ dosacrifice(void)
     }
 
     if (altaralign != u.ualign.type && highaltar) {
- desecrate_high_altar:
-        /*
-         * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
-         * gets the god who owns it truly pissed off.
-         */
-        You_feel("the air around you grow charged...");
-        pline("Suddenly, you realize that %s has noticed you...", a_gname());
-        godvoice(altaralign,
-                 "So, mortal!  You dare desecrate my High Temple!");
-        /* Throw everything we have at the player */
-        god_zaps_you(altaralign);
+        desecrate_high_altar(altaralign);
     } else if (value < 0) { /* don't think the gods are gonna like this... */
         gods_upset(altaralign);
     } else {
