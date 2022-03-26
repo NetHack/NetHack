@@ -849,6 +849,7 @@ hide-under monsters who can be turned to stone aren't able to hide under a
 don't stop travel when going past a closed door (eg. when traveling along
 	a room wall)
 some monster corpses can now convey temporary acid or stoning resistance
+fix travel getting stuck oscillating between two locations
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

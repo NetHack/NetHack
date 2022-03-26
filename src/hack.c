@@ -1274,26 +1274,29 @@ findtravelpath(int mode)
         if (mode == TRAVP_GUESS) {
             int px = tx, py = ty; /* pick location */
             int dist, nxtdist, d2, nd2;
+            int ctrav, ptrav = COLNO*ROWNO;
 
             dist = distmin(ux, uy, tx, ty);
             d2 = dist2(ux, uy, tx, ty);
             for (tx = 1; tx < COLNO; ++tx)
                 for (ty = 0; ty < ROWNO; ++ty)
-                    if (travel[tx][ty]) {
+                    if (couldsee(tx, ty) && (ctrav = travel[tx][ty]) > 0) {
                         nxtdist = distmin(ux, uy, tx, ty);
-                        if (nxtdist == dist && couldsee(tx, ty)) {
+                        if (nxtdist == dist && ctrav < ptrav) {
                             nd2 = dist2(ux, uy, tx, ty);
                             if (nd2 < d2) {
                                 /* prefer non-zigzag path */
                                 px = tx;
                                 py = ty;
                                 d2 = nd2;
+                                ptrav = ctrav;
                             }
-                        } else if (nxtdist < dist && couldsee(tx, ty)) {
+                        } else if (nxtdist < dist) {
                             px = tx;
                             py = ty;
                             dist = nxtdist;
                             d2 = dist2(ux, uy, tx, ty);
+                            ptrav = ctrav;
                         }
                     }
 
