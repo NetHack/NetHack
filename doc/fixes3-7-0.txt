@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.844 $ $NHDT-Date: 1647911478 2022/03/22 01:11:18 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.849 $ $NHDT-Date: 1648318980 2022/03/26 18:23:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -848,8 +848,7 @@ hide-under monsters who can be turned to stone aren't able to hide under a
 	that the other items aren't all more cockatrice corpses
 don't stop travel when going past a closed door (eg. when traveling along
 	a room wall)
-monster definition for green mold falsely indicated that eating a green mold
-	corpse could convey stoning resistance
+some monster corpses can now convey temporary acid or stoning resistance
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

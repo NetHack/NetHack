@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1606243387 2020/11/24 18:43:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.122 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1648318982 2022/03/26 18:23:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -47,6 +47,9 @@ const struct propname {
     { DETECT_MONSTERS, "monster detection" },
     { SEE_INVIS, "see invisible" },
     { INVIS, "invisible" },
+    /* temporary acid resistance and stone resistance can come from eating */
+    { ACID_RES, "acid resistance" },
+    { STONE_RES, "stoning resistance" },
     /* timed displacement is possible via eating a displacer beast corpse */
     { DISPLACED, "displaced" },
     /* timed pass-walls is a potential prayer result if surrounded by stone
@@ -55,7 +58,8 @@ const struct propname {
     /*
      * Properties beyond here don't have timed values during normal play,
      * so there's not much point in trying to order them sensibly.
-     * They're either on or off based on equipment, role, actions, &c.
+     * They're either on or off based on equipment, role, actions, &c,
+     * but in wizard mode #wizintrinsic can give then as timed effects.
      */
     { FIRE_RES, "fire resistance" },
     { COLD_RES, "cold resistance" },
@@ -63,8 +67,6 @@ const struct propname {
     { DISINT_RES, "disintegration resistance" },
     { SHOCK_RES, "shock resistance" },
     { POISON_RES, "poison resistance" },
-    { ACID_RES, "acid resistance" },
-    { STONE_RES, "stoning resistance" },
     { DRAIN_RES, "drain resistance" },
     { SICK_RES, "sickness resistance" },
     { ANTIMAGIC, "magic resistance" },
@@ -723,12 +725,14 @@ nh_timeout(void)
                 }
                 break;
             case LEVITATION:
-                /* timed Flying is via #wizintrinsic only; still, we want to
-                   avoid float_down() reporting "you have stopped levitating
-                   and are now flying" if both are timing out together;
-                   relies on knowing that Lev timeout is handled before Fly */
+                /* timed Levitation is ordinary, timed Flying is via
+                   #wizintrinsic only; still, we want to avoid float_down()
+                   reporting "you have stopped levitating and are now flying"
+                   when both are timing out together; if that is about to
+                   happen, end Flying early to skip feedback about it;
+                   assumes Levitation is handled before Flying */
                 if ((HFlying & TIMEOUT) == 1L)
-                    --HFlying; /* bypass pending 'case FLYING' */
+                    set_itimeout(&HFlying, 0L); /* bypass 'case FLYING' */
                 (void) float_down(I_SPECIAL | TIMEOUT, 0L);
                 break;
             case FLYING:
@@ -738,6 +742,14 @@ nh_timeout(void)
                     You("land.");
                     spoteffects(TRUE);
                 }
+                break;
+            case ACID_RES:
+                if (!Acid_resistance && !Unaware)
+                    You("no longer feel safe from acid.");
+                break;
+            case STONE_RES:
+                if (!Stone_resistance && !Unaware)
+                    You("no longer feel secure from petrification.");
                 break;
             case DISPLACED:
                 if (!Displaced) /* give a message */

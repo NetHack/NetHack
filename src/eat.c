@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1647133629 2022/03/13 01:07:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.262 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1648318981 2022/03/26 18:23:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,6 +19,7 @@ static void do_reset_eat(void);
 static void done_eating(boolean);
 static void cprefx(int);
 static int intrinsic_possible(int, struct permonst *);
+static boolean temp_givit(int, struct permonst *);
 static void givit(int, struct permonst *);
 static void eye_of_newt_buzz(void);
 static void cpostfx(int);
@@ -326,7 +327,7 @@ touchfood(struct obj *otmp)
             (void) splitobj(otmp, otmp->quan - 1L);
         else
             otmp = splitobj(otmp, 1L);
-        debugpline0("split object,");
+        debugpline0("split food,");
     }
 
     if (!otmp->oeaten) {
@@ -761,7 +762,7 @@ fix_petrification(void)
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
 static int
-intrinsic_possible(int type, register struct permonst *ptr)
+intrinsic_possible(int type, struct permonst *ptr)
 {
     int res = 0;
 
@@ -798,6 +799,14 @@ intrinsic_possible(int type, register struct permonst *ptr)
     case POISON_RES:
         res = (ptr->mconveys & MR_POISON) != 0;
         ifdebugresist("can get poison resistance");
+        break;
+    case ACID_RES:
+        res = (ptr->mconveys & MR_ACID) != 0;
+        ifdebugresist("can get acid resistance temporarily");
+        break;
+    case STONE_RES:
+        res = (ptr->mconveys & MR_STONE) != 0;
+        ifdebugresist("can get stoning resistance temporarily");
         break;
     case TELEPORT:
         res = can_teleport(ptr);
@@ -854,6 +863,14 @@ should_givit(int type, struct permonst *ptr)
     return (ptr->mlevel > rn2(chance));
 }
 
+static boolean
+temp_givit(int type, struct permonst *ptr)
+{
+    int chance = (type == STONE_RES) ? 6 : (type == ACID_RES) ? 3 : 0;
+
+    return chance ? (ptr->mlevel > rn2(chance)) : FALSE;
+}
+
 /* givit() tries to give you an intrinsic based on the monster's level
  * and what type of intrinsic it is trying to give you.
  */
@@ -862,7 +879,7 @@ givit(int type, register struct permonst *ptr)
 {
     debugpline1("Attempting to give intrinsic %d", type);
 
-    if (!should_givit(type, ptr))
+    if (!should_givit(type, ptr) && !temp_givit(type, ptr))
         return;
 
     switch (type) {
@@ -937,13 +954,25 @@ givit(int type, register struct permonst *ptr)
                 see_monsters();
         }
         break;
+    case ACID_RES:
+        debugpline0("Giving timed acid resistance");
+        if (!Acid_resistance)
+            You_feel("%s.", Hallucination ? "secure from flashbacks"
+                            : "less concerned about being harmed by acid");
+        incr_itimeout(&HAcid_resistance, d(3, 6));
+        break;
+    case STONE_RES:
+        debugpline0("Giving timed stoning resistance");
+        if (!Stone_resistance)
+            You_feel("%s.", Hallucination ? "unusually limber"
+                            : "less concerned about becoming pertrified");
+        incr_itimeout(&HStone_resistance, d(3, 6));
+        break;
     default:
         debugpline0("Tried to give an impossible intrinsic");
         break;
     }
 }
-
-DISABLE_WARNING_FORMAT_NONLITERAL
 
 static void
 eye_of_newt_buzz(void)
@@ -967,6 +996,8 @@ eye_of_newt_buzz(void)
         }
     }
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* called after completely consuming a corpse */
 static void
@@ -1078,6 +1109,7 @@ cpostfx(int pm)
             make_stunned(2L, FALSE);
         if ((HConfusion & TIMEOUT) > 2)
             make_confused(2L, FALSE);
+        check_intrinsics = TRUE; /* might convery temporary stoning resist */
         break;
     case PM_CHAMELEON:
     case PM_DOPPELGANGER:
