@@ -1126,6 +1126,7 @@ findtravelpath(int mode)
         int set = 0;    /* two sets current and previous */
         int radius = 1; /* search radius */
         int i;
+        xchar guessx = -1, guessy = -1;
 
         /* If guessing, first find an "obvious" goal location.  The obvious
          * goal is the position the player knows of, or might figure out
@@ -1231,11 +1232,15 @@ findtravelpath(int mode)
                                 u.dx = x - ux;
                                 u.dy = y - uy;
                                 if (mode == TRAVP_TRAVEL
-                                    && x == u.tx && y == u.ty) {
+                                    && ((x == u.tx && y == u.ty)
+                                        || (x == guessx && y == guessy))) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     g.context.run = 8;
-                                    iflags.travelcc.x = iflags.travelcc.y = 0;
+                                    if (x == guessx && y == guessy)
+                                        You("stop, unsure which way to go.");
+                                    else
+                                        iflags.travelcc.x = iflags.travelcc.y = 0;
                                 }
                                 return TRUE;
                             }
@@ -1327,6 +1332,8 @@ findtravelpath(int mode)
             ty = py;
             ux = u.ux;
             uy = u.uy;
+            guessx = u.ux - u.dx;
+            guessy = u.uy - u.dy;
             set = 0;
             n = radius = 1;
             mode = TRAVP_TRAVEL;
