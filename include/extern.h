@@ -734,6 +734,7 @@ extern void vomit(void);
 extern int eaten_stat(int, struct obj *);
 extern void food_disappears(struct obj *);
 extern void food_substitution(struct obj *, struct obj *);
+extern long temp_resist(int);
 extern void eating_conducts(struct permonst *);
 extern int eat_brains(struct monst *, struct monst *, boolean, int *);
 extern void fix_petrification(void);
