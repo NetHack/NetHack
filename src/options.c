@@ -5742,6 +5742,7 @@ initoptions(void)
     initoptions_finish();
 }
 
+/* set up default values for options where 0 or False isn't sufficient */
 void
 initoptions_init(void)
 {
@@ -5964,7 +5965,12 @@ initoptions_finish(void)
      * Remove "slime mold" from list of object names.  This will
      * prevent it from being wished unless it's actually present
      * as a named (or default) fruit.  Wishing for "fruit" will
-     * result in the player's preferred fruit [better than "\033"].
+     * result in the player's preferred fruit.  [Once upon a time
+     * the override value used was "\033" which prevented wishing
+     * for the slime mold object at all except by asking for a
+     * specific named fruit.]  Note that there are multiple fruit
+     * object types (apple, melon, &c) but the "fruit" object is
+     * slime mold or whatever custom name player assigns to that.
      */
     obj_descr[SLIME_MOLD].oc_name = "fruit";
 
