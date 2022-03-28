@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1646428017 2022/03/04 21:06:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.459 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1648428945 2022/03/28 00:55:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.471 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5430,7 +5430,7 @@ chest_trap(
             struct monst *shkp = 0;
             long loss = 0L;
             boolean costly, insider;
-            register xchar ox = obj->ox, oy = obj->oy;
+            xchar ox = obj->ox, oy = obj->oy;
 
             /* the obj location need not be that of player */
             costly = (costly_spot(ox, oy)
@@ -5446,14 +5446,21 @@ chest_trap(
                 loss += stolen_value(obj, ox, oy, (boolean) shkp->mpeaceful,
                                      TRUE);
             delete_contents(obj);
+            /*
+             * Note:  the explosion is taking place at the chest's
+             * location, not necessarily at the hero's.  (Simplest
+             * case: kicking it from one step away and getting the
+             * chest_trap() outcome.)
+             */
             /* unpunish() in advance if either ball or chain (or both)
                is going to be destroyed */
-            if (Punished && (u_at(uchain->ox, uchain->oy)
+            if (Punished && ((uchain->ox == ox && uchain->oy == oy)
                              || (uball->where == OBJ_FLOOR
-                                 && u_at(uball->ox, uball->oy))))
+                                 && uball->ox == ox && uball->oy == oy)))
                 unpunish();
-
-            for (otmp = g.level.objects[u.ux][u.uy]; otmp; otmp = otmp2) {
+            /* destroy everything at the spot (the Amulet, the
+               invocation tools, and Rider corpses will remain intact) */
+            for (otmp = g.level.objects[ox][oy]; otmp; otmp = otmp2) {
                 otmp2 = otmp->nexthere;
                 if (costly)
                     loss += stolen_value(otmp, otmp->ox, otmp->oy,

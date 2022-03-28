@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1647472704 2022/03/16 23:18:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1648428942 2022/03/28 00:55:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1204,10 +1204,9 @@ delobj(struct obj *obj)
 {
     boolean update_map;
 
-    if (obj->otyp == AMULET_OF_YENDOR
-        || obj->otyp == CANDELABRUM_OF_INVOCATION
-        || obj->otyp == BELL_OF_OPENING
-        || obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+    /* obj_resists(obj,0,0) protects the Amulet, the invocation tools,
+       and Rider corspes */
+    if (obj_resists(obj, 0, 0)) {
         /* player might be doing something stupid, but we
          * can't guarantee that.  assume special artifacts
          * are indestructible via drawbridges, and exploding

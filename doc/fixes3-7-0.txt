@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.849 $ $NHDT-Date: 1648318980 2022/03/26 18:23:00 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.851 $ $NHDT-Date: 1648428942 2022/03/28 00:55:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -850,6 +850,10 @@ don't stop travel when going past a closed door (eg. when traveling along
 	a room wall)
 some monster corpses can now convey temporary acid or stoning resistance
 fix travel getting stuck oscillating between two locations
+kicking a trapped chest and getting the exploding chest result destroyed items
+	at the hero's location rather than the chest's location; because of
+	that it left the exploded chest intact
+it was possible to destroy a Rider corpse with an exploding chest
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
