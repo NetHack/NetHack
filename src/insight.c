@@ -1402,8 +1402,8 @@ weapon_insight(int final)
 static void
 attributes_enlightenment(int unused_mode UNUSED, int final)
 {
-    static NEARDATA const char if_surroundings_permitted[] =
-        " if surroundings permitted";
+    static NEARDATA const char
+        if_surroundings_permitted[] = " if surroundings permitted";
     int ltmp, armpro;
     char buf[BUFSZ];
 
@@ -1439,33 +1439,46 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
     if (Fire_resistance)
         you_are("fire resistant", from_what(FIRE_RES));
     if (u_adtyp_resistance_obj(AD_FIRE))
-        enl_msg("Your items ", "are", "were", " protected from fire", "");
+        enl_msg("Your items ", "are", "were", " protected from fire",
+                item_what(AD_FIRE));
     if (Cold_resistance)
         you_are("cold resistant", from_what(COLD_RES));
     if (u_adtyp_resistance_obj(AD_COLD))
-        enl_msg("Your items ", "are", "were", " protected from cold", "");
+        enl_msg("Your items ", "are", "were", " protected from cold",
+                item_what(AD_COLD));
     if (Sleep_resistance)
         you_are("sleep resistant", from_what(SLEEP_RES));
     if (Disint_resistance)
         you_are("disintegration-resistant", from_what(DISINT_RES));
     if (u_adtyp_resistance_obj(AD_DISN))
-        enl_msg("Your items ", "are", "were", " protected from disintegration", "");
+        enl_msg("Your items ", "are", "were",
+                " protected from disintegration", item_what(AD_DISN));
     if (Shock_resistance)
         you_are("shock resistant", from_what(SHOCK_RES));
     if (u_adtyp_resistance_obj(AD_ELEC))
-        enl_msg("Your items ", "are", "were", " protected from electric shocks", "");
+        enl_msg("Your items ", "are", "were",
+                " protected from electric shocks", item_what(AD_ELEC));
     if (Poison_resistance)
         you_are("poison resistant", from_what(POISON_RES));
-    if (Acid_resistance)
-        you_are("acid resistant", from_what(ACID_RES));
+    if (Acid_resistance) {
+        Sprintf(buf, "%.20s%.30s",
+                temp_resist(ACID_RES) ? "temporarily " : "",
+                "acid resistant");
+        you_are(buf, from_what(ACID_RES));
+    }
     if (u_adtyp_resistance_obj(AD_ACID))
-        enl_msg("Your items ", "are", "were", " protected from acid", "");
+        enl_msg("Your items ", "are", "were", " protected from acid",
+                item_what(AD_ACID));
     if (Drain_resistance)
         you_are("level-drain resistant", from_what(DRAIN_RES));
     if (Sick_resistance)
         you_are("immune to sickness", from_what(SICK_RES));
-    if (Stone_resistance)
-        you_are("petrification resistant", from_what(STONE_RES));
+    if (Stone_resistance) {
+        Sprintf(buf, "%.20s%.30s",
+                temp_resist(STONE_RES) ? "temporarily " : "",
+                "petrification resistant");
+        you_are(buf, from_what(STONE_RES));
+    }
     if (Halluc_resistance)
         enl_msg(You_, "resist", "resisted", " hallucinations",
                 from_what(HALLUC_RES));

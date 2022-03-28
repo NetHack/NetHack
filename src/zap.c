@@ -5014,13 +5014,20 @@ static int
 adtyp_to_prop(int dmgtyp)
 {
     switch (dmgtyp) {
-    case AD_COLD: return COLD_RES;
-    case AD_FIRE: return FIRE_RES;
-    case AD_ELEC: return SHOCK_RES;
-    case AD_ACID: return ACID_RES;
-    case AD_DISN: return DISINT_RES;
-    default: return 0; /* prop_types start at 1 */
+    case AD_COLD:
+        return COLD_RES;
+    case AD_FIRE:
+        return FIRE_RES;
+    case AD_ELEC:
+        return SHOCK_RES;
+    case AD_ACID:
+        return ACID_RES;
+    case AD_DISN:
+        return DISINT_RES;
+    default:
+        break;
     }
+    return 0; /* prop_types start at 1 */
 }
 
 /* is hero wearing or wielding an object with resistance
@@ -5037,6 +5044,51 @@ u_adtyp_resistance_obj(int dmgtyp)
         return TRUE;
 
     return FALSE;
+}
+
+/* for enlightenment; currently only useful in wizard mode; cf from_what() */
+char *
+item_what(int dmgtyp)
+{
+    static char whatbuf[50];
+    const char *what = 0;
+    int prop = adtyp_to_prop(dmgtyp);
+    long xtrinsic = u.uprops[prop].extrinsic;
+
+    whatbuf[0] = '\0';
+    if (wizard) {
+        if (!prop || !xtrinsic) {
+            ; /* 'what' stays Null */
+        } else if (xtrinsic & W_ARMC) {
+            what = cloak_simple_name(uarmc);
+        } else if (xtrinsic & W_ARM) {
+            what = suit_simple_name(uarm); /* "dragon {scales,mail}" */
+        } else if (xtrinsic & W_ARMU) {
+            what = shirt_simple_name(uarmu);
+        } else if (xtrinsic & W_ARMH) {
+            what = helm_simple_name(uarmh);
+        } else if (xtrinsic & W_ARMG) {
+            what = gloves_simple_name(uarmg);
+        } else if (xtrinsic & W_ARMF) {
+            what = boots_simple_name(uarmf);
+        } else if (xtrinsic & W_ARMS) {
+            what = shield_simple_name(uarms);
+        } else if (xtrinsic & (W_AMUL | W_TOOL)) {
+            what = simpleonames((xtrinsic & W_AMUL) ? uamul : ublindf);
+        } else if (xtrinsic & W_RING) {
+            if ((xtrinsic & W_RING) == W_RING) /* both */
+                what = "rings";
+            else
+                what = simpleonames((xtrinsic & W_RINGL) ? uleft : uright);
+        } else if (xtrinsic & W_WEP) {
+            what = simpleonames(uwep);
+        }
+        /* format the output to be ready for enl_msg() to append it to
+           "Your items {are,were} protected against <damage-type>" */
+        if (what) /* strlen(what) will be less than 30 */
+            Sprintf(whatbuf, " by your %.40s", what);
+    }
+    return whatbuf;
 }
 
 /*
