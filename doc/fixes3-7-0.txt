@@ -1094,7 +1094,7 @@ have com_pager() check for failed nhl_init(); probably can't actually happen
 rearranging first-kill and first-hit gamelog messages to get hit before kill
 	ordering resulted in "hit with a wielded weapon for first time" being
 	given twice if that hit was delivered via applied polearm
-rearranging the feedback for first-kill and first-hit  introduced a bug by
+rearranging the feedback for first-kill and first-hit introduced a bug by
 	not verifying that the wielded item used to hit was a weapon, giving
 	erroneous event feedback and potentially giving it over and over for
 	other non-weapon hits for as long as never-hit conduct stayed unbroken
