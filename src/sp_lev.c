@@ -38,6 +38,7 @@ static void link_doors_rooms(void);
 static int rnddoor(void);
 static int rndtrap(void);
 static void get_location(xchar *, xchar *, getloc_flags_t, struct mkroom *);
+static void set_ok_location_func(boolean (*)(xchar, xchar));
 static boolean is_ok_location(xchar, xchar, getloc_flags_t);
 static unpacked_coord get_unpacked_coord(long, int);
 static void get_room_loc(xchar *, xchar *, struct mkroom *);
@@ -1150,6 +1151,14 @@ get_location(xchar *x, xchar *y, getloc_flags_t humidity, struct mkroom* croom)
     }
 }
 
+static boolean (*is_ok_location_func)(xchar, xchar) = NULL;
+
+static void
+set_ok_location_func(boolean (*func)(xchar, xchar))
+{
+    is_ok_location_func = func;
+}
+
 static boolean
 is_ok_location(xchar x, xchar y, getloc_flags_t humidity)
 {
@@ -1157,6 +1166,9 @@ is_ok_location(xchar x, xchar y, getloc_flags_t humidity)
 
     if (Is_waterlevel(&u.uz))
         return TRUE; /* accept any spot */
+
+    if (is_ok_location_func)
+        return is_ok_location_func(x, y);
 
     /* TODO: Should perhaps check if wall is diggable/passwall? */
     if (humidity & ANY_LOC)
@@ -3801,6 +3813,16 @@ spo_endroom(struct sp_coder* coder UNUSED)
     update_croom();
 }
 
+/* callback for is_ok_location.
+   stairs generated at random location shouldn't overwrite special terrain */
+static boolean
+good_stair_loc(xchar x, xchar y)
+{
+    schar typ = levl[x][y].typ;
+
+    return (typ == ROOM || typ == CORR || typ == ICE);
+}
+
 static int
 l_create_stairway(lua_State *L, boolean using_ladder)
 {
@@ -3832,12 +3854,14 @@ l_create_stairway(lua_State *L, boolean using_ladder)
     x = ax;
     y = ay;
 
-    if (x == -1 && y == -1)
+    if (x == -1 && y == -1) {
+        set_ok_location_func(good_stair_loc);
         scoord = SP_COORD_PACK_RANDOM(0);
-    else
+    } else
         scoord = SP_COORD_PACK(x, y);
 
     get_location_coord(&x, &y, DRY, g.coder->croom, scoord);
+    set_ok_location_func(NULL);
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
     SpLev_Map[x][y] = 1;
