@@ -3618,7 +3618,7 @@ Persistent.
 .lp autoopen
 Walking into a closed door attempts to open it (default true).
 Persistent.
-.lp "autopickup  "
+.lp autopickup
 Automatically pick up things onto which you move (default off).
 Persistent.
 .lp ""
@@ -3626,8 +3626,12 @@ See
 .op pickup_types
 and also
 .op autopickup_exception
-to refine the behavior.
-.lp "autoquiver  "
+for ways to refine the behavior.
+.lp ""
+Note: prior to version 3.7, the default for
+.op autopickup
+was \fIon\fP.
+.lp autoquiver
 This option controls what happens when you attempt the \(oqf\(cq (fire)
 command when nothing is quivered or readied (default false).
 When true, the computer will fill
@@ -4555,6 +4559,10 @@ for smaller sizes if they are too big.
 Default is the current window size.
 .lp tile_file
 Specify the name of an alternative tile file to override the default.
+.lp ""
+Note: the X11 interface uses X resources rather than NetHack's options
+to select an alternate tile file.
+See \f(CRNetHack.ad\fP, the sample X \(lqapplication defaults\(rq file.
 .lp tile_height
 Specify the preferred height of each tile in a tile capable port.
 .lp tile_width
@@ -4660,7 +4668,7 @@ keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
 OS/2, PC, and ST NetHack only).
 .lp flush
 (default off, Amiga NetHack only).
-.lp "MACgraphics"
+.lp MACgraphics
 (default on, Mac NetHack only).
 .lp page_wait
 (default on, Mac NetHack only).

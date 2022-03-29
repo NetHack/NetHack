@@ -3937,7 +3937,10 @@ Persistent.
 \\
 %.lp ""
 See ``{\it pickup\verb+_+types\/}'' and also
-``{\it autopickup\verb+_+exceptions\/}'' to refine the behavior.
+``{\it autopickup\verb+_+exception\/}'' for ways to refine the behavior.
+\\
+%.lp ""
+Note: prior to version 3.7, the default for {\it autopickup\/} was {\it on}.
 %.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `f' (fire)
@@ -5007,6 +5010,11 @@ Default is the current window size.
 %.lp
 \item[\ib{tile\verb+_+file}]
 Specify the name of an alternative tile file to override the default.
+\\
+%.lp ""
+Note: the X11 interface uses X resources rather than NetHack's options
+to select an alternate tile file.
+See {\tt NetHack.ad}, the sample X ``application defaults'' file.
 %.lp
 \item[\ib{tile\verb+_+height}]
 Specify the preferred height of each tile in a tile capable port.
