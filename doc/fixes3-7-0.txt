@@ -854,6 +854,8 @@ kicking a trapped chest and getting the exploding chest result destroyed items
 	at the hero's location rather than the chest's location; because of
 	that it left the exploded chest intact
 it was possible to destroy a Rider corpse with an exploding chest
+when teleporting, don't consider pits/spiked pits/trap doors/holes as unsafe
+	destination locations if hero is levitating or flying
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

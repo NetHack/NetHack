@@ -284,10 +284,19 @@ static boolean
 teleok(register int x, register int y, boolean trapok)
 {
     if (!trapok) {
-        /* allow teleportation onto vibrating square, it's not a real trap */
+        /* allow teleportation onto vibrating square, it's not a real trap;
+           also allow pits and holes if levitating or flying */
         struct trap *trap = t_at(x, y);
 
-        if (trap && trap->ttyp != VIBRATING_SQUARE)
+        if (!trap)
+            trapok = TRUE;
+        else if (trap->ttyp == VIBRATING_SQUARE)
+            trapok = TRUE;
+        else if ((is_pit(trap->ttyp) || is_hole(trap->ttyp))
+                 && (Levitation || Flying))
+            trapok = TRUE;
+
+        if (!trapok)
             return FALSE;
     }
     if (!goodpos(x, y, &g.youmonst, 0))
