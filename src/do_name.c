@@ -1478,7 +1478,7 @@ docallcmd(void)
             if (!obj->dknown) {
                 You("would never recognize another one.");
 #if 0
-            } else if (!call_ok(obj)) {
+            } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
                 You("know those as well as you ever will.");
 #endif
             } else {
@@ -1645,7 +1645,7 @@ namefloorobj(void)
         pline("%s %s to call you \"%s.\"",
               The(buf), use_plural ? "decide" : "decides",
               unames[rn2_on_display_rng(SIZE(unames))]);
-    } else if (!call_ok(obj)) {
+    } else if (call_ok(obj) == GETOBJ_EXCLUDE) {
         pline("%s %s can't be assigned a type name.",
               use_plural ? "Those" : "That", buf);
     } else if (!obj->dknown) {

@@ -3908,6 +3908,10 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         /* if we didn't recognize monster type, pick a valid one at random */
         if (d->mntmp == NON_PM)
             d->mntmp = rn1(PM_BLACK_PUDDING - PM_GRAY_OOZE, PM_GRAY_OOZE);
+        /* normally this would be done when makesingular() changes the value
+           but canonical form here is already singular so that won't happen */
+        if (d->cnt < 2 && strstri(d->bp, "globs"))
+            d->cnt = 2; /* affects otmp->owt but not otmp->quan for globs */
         /* construct canonical spelling in case name_to_mon() recognized a
            variant (grey ooze) or player used inverted syntax (<foo> glob);
            if player has given a valid monster type but not valid glob type,
@@ -3915,7 +3919,6 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         Sprintf(d->globbuf, "glob of %s", mons[d->mntmp].pmnames[NEUTRAL]);
         d->bp = d->globbuf;
         d->mntmp = NON_PM; /* not useful for "glob of <foo>" object lookup */
-        d->cnt = 0; /* globs don't stack */
         d->oclass = FOOD_CLASS;
         d->actualn = d->bp, d->dn = 0;
         return 1; /*goto srch;*/
@@ -4569,12 +4572,42 @@ readobjnam(char *bp, struct obj *no_wish)
         obj_extract_self(d.otmp); /* now release it for caller's use */
     }
 
-    /* if player specified a reasonable count, maybe honor it */
-    if (d.cnt > 0 && objects[d.typ].oc_merge
-        && (wizard || d.cnt < rnd(6) || (d.cnt <= 7 && Is_candle(d.otmp))
-            || (d.cnt <= 20 && ((d.oclass == WEAPON_CLASS && is_ammo(d.otmp))
-                              || d.typ == ROCK || is_missile(d.otmp)))))
-        d.otmp->quan = (long) d.cnt;
+    /* if player specified a reasonable count, maybe honor it;
+       quantity for gold is handled elsewhere and d.cnt is 0 for it here */
+    if (d.otmp->globby) {
+        /* for globs, calculate weight based on gsize, then multiply by cnt;
+           asking for 2 globs or for 2 small globs produces 1 small glob
+           weighing 40au instead of normal 20au; asking for 5 medium globs
+           might produce 1 very large glob weighing 600au */
+        d.otmp->quan = 1L; /* always 1 for globs */
+        d.otmp->owt = weight(d.otmp);
+        /* gsize 0: unspecified => small;
+           1: small (1..5) => keep default owt for 1, yielding 20;
+           2: medium (6..15) => use weight for 6, yielding 120;
+           3: large (16..25) => 320; 4: very large (26+) => 520 */
+        if (d.gsize > 1)
+            d.otmp->owt += (unsigned) (100 + (d.gsize - 2) * 200);
+        if (d.cnt > 1) {
+            if ((d.cnt > 6 - d.gsize) && !wizard)
+                d.cnt = rn1(5, 2); /* 2..6 */
+            d.otmp->owt *= (unsigned) d.cnt;
+        }
+        /* note: the owt assignment below will not change glob's weight */
+        d.cnt = 0;
+    } else if (d.cnt > 0) {
+        if (objects[d.typ].oc_merge
+            && (wizard /* quantity isn't restricted when debugging */
+                /* note: in normal play, explicitly asking for 1 might
+                   fail the 'cnt < rnd(6)' test and could produce more
+                   than 1 if mksobj() creates the item that way */
+                || d.cnt < rnd(6)
+                || (d.cnt <= 7 && Is_candle(d.otmp))
+                || (d.cnt <= 20
+                    && (d.typ == ROCK || is_missile(d.otmp)
+                        /* WEAPON_CLASS test is to exclude gems */
+                        || (d.oclass == WEAPON_CLASS && is_ammo(d.otmp))))))
+            d.otmp->quan = (long) d.cnt;
+    }
 
     if (d.spesgn == 0) {
         /* spe not specifed; retain the randomly assigned value */
@@ -4873,10 +4906,6 @@ readobjnam(char *bp, struct obj *no_wish)
     d.otmp->owt = weight(d.otmp);
     if (d.very && d.otmp->otyp == HEAVY_IRON_BALL)
         d.otmp->owt += IRON_BALL_W_INCR;
-    else if (d.gsize > 1 && d.otmp->globby)
-        /* 0: unspecified => small; 1: small => keep default owt of 20;
-           2: medium => 120; 3: large => 320; 4: very large => 520 */
-        d.otmp->owt += 100 + (d.gsize - 2) * 200;
 
     return d.otmp;
 }
