@@ -27,10 +27,9 @@ static int Armor_on(void);
 static int Cloak_on(void);
 static int Helmet_on(void);
 static int Gloves_on(void);
-static void wielding_corpse(struct obj *, boolean);
 static int Shield_on(void);
 static int Shirt_on(void);
-static void dragon_armor_handling(struct obj *, boolean);
+static void dragon_armor_handling(struct obj *, boolean, boolean);
 static void Amulet_on(void);
 static void learnring(struct obj *, boolean);
 static void Ring_off_or_gone(struct obj *, boolean);
@@ -531,32 +530,50 @@ Gloves_on(void)
     return 0;
 }
 
-static void
-wielding_corpse(struct obj *obj,
-                boolean voluntary) /* taking gloves off on purpose? */
+/* check for wielding cockatrice corpse after taking off gloves or yellow
+   dragon scales/mail or having temporary stoning resistance time out */
+void
+wielding_corpse(
+    struct obj *obj,   /* uwep, potentially a wielded cockatrice corpse */
+    struct obj *how,   /* gloves or dragon armor or Null (resist timeout) */
+    boolean voluntary) /* True: taking protective armor off on purpose */
 {
-    char kbuf[BUFSZ];
-
-    if (!obj || obj->otyp != CORPSE)
+    if (!obj || obj->otyp != CORPSE || uarmg)
         return;
+    /* note: can't dual-wield with non-weapons/weapon-tools so u.twoweap
+       will always be false if uswapwep happens to be a corpse */
     if (obj != uwep && (obj != uswapwep || !u.twoweap))
         return;
 
     if (touch_petrifies(&mons[obj->corpsenm]) && !Stone_resistance) {
-        You("now wield %s in your bare %s.",
+        char kbuf[BUFSZ], hbuf[BUFSZ];
+
+        You("%s %s in your bare %s.",
+            (how && is_gloves(how)) ? "now wield" : "are wielding",
             corpse_xname(obj, (const char *) 0, CXN_ARTICLE),
             makeplural(body_part(HAND)));
-        Sprintf(kbuf, "%s gloves while wielding %s",
-                voluntary ? "removing" : "losing", killer_xname(obj));
+        /* "removing" ought to be "taking off" but that makes the
+           tombstone text more likely to be truncated */
+        if (how)
+            Sprintf(hbuf, "%s %s", voluntary ? "removing" : "losing",
+                    is_gloves(how) ? gloves_simple_name(how)
+                    : strsubst(simpleonames(how), "set of ", ""));
+        else
+            Strcpy(hbuf, "resistance timing out");
+        Snprintf(kbuf, sizeof kbuf, "%s while wielding %s",
+                 hbuf, killer_xname(obj));
         instapetrify(kbuf);
-        /* life-saved; can't continue wielding cockatrice corpse though */
-        remove_worn_item(obj, FALSE);
+        /* life-saved or got poly'd into a stone golem; can't continue
+           wielding cockatrice corpse unless have now become resistant */
+        if (!Stone_resistance)
+            remove_worn_item(obj, FALSE);
     }
 }
 
 int
 Gloves_off(void)
 {
+    struct obj *gloves = uarmg; /* needed after uarmg has been set to Null */
     long oldprop =
         u.uprops[objects[uarmg->otyp].oc_oprop].extrinsic & ~WORN_GLOVES;
     boolean on_purpose = !g.context.mon_moving && !uarmg->in_use;
@@ -595,13 +612,17 @@ Gloves_off(void)
 
     /* prevent wielding cockatrice when not wearing gloves */
     if (uwep && uwep->otyp == CORPSE)
-        wielding_corpse(uwep, on_purpose);
-
+        wielding_corpse(uwep, gloves, on_purpose);
     /* KMH -- ...or your secondary weapon when you're wielding it
-       [This case can't actually happen; twoweapon mode won't
-       engage if a corpse has been set up as the alternate weapon.] */
+       [This case can't actually happen; twoweapon mode won't engage
+       if a corpse has been set up as either the primary or alternate
+       weapon.  If it could happen and /both/ uwep and uswapwep could
+       be cockatrice corpses, life-saving for the first would need to
+       prevent the second from being fatal since conceptually they'd
+       be being touched simultaneously.] */
     if (u.twoweap && uswapwep && uswapwep->otyp == CORPSE)
-        wielding_corpse(uswapwep, on_purpose);
+        wielding_corpse(uswapwep, gloves, on_purpose);
+
     if (condtests[bl_bareh].enabled)
         g.context.botl = 1;
 
@@ -627,7 +648,7 @@ Shield_on(void)
     default:
         impossible(unknown_type, c_shield, uarms->otyp);
     }
-    if (uarms) /* no known instance of !uarmgs here but play it safe */
+    if (uarms) /* no known instance of !uarms here but play it safe */
         uarms->known = 1; /* shield's +/- evident because of status line AC */
     return 0;
 }
@@ -694,7 +715,10 @@ Shirt_off(void)
 
 /* handle extra abilities for hero wearing dragon scale armor */
 static void
-dragon_armor_handling(struct obj *otmp, boolean puton)
+dragon_armor_handling(
+    struct obj *otmp,   /* armor being put on or taken off */
+    boolean puton,      /* True: on, False: off */
+    boolean on_purpose) /* voluntary removal; not applicable for putting on */
 {
     if (!otmp)
         return;
@@ -759,6 +783,11 @@ dragon_armor_handling(struct obj *otmp, boolean puton)
             EStone_resistance |= W_ARM;
         } else {
             EStone_resistance &= ~W_ARM;
+
+            /* prevent wielding cockatrice after losing stoning resistance
+               when not wearing gloves; the uswapwep case is always a no-op */
+            wielding_corpse(uwep, otmp, on_purpose);
+            wielding_corpse(uswapwep, otmp, on_purpose);
         }
         break;
     case WHITE_DRAGON_SCALES:
@@ -781,11 +810,9 @@ Armor_on(void)
         return 0;
     uarm->known = 1; /* suit's +/- evident because of status line AC */
 
-    dragon_armor_handling(uarm, TRUE);
-
-    /*
-     * Gold DSM requires special handling since it emits light when worn.
-     */
+    dragon_armor_handling(uarm, TRUE, TRUE);
+    /* gold DSM requires special handling since it emits light when worn;
+       do that after the special armor handling */
     if (artifact_light(uarm) && !uarm->lamplit) {
         begin_burn(uarm, FALSE);
         if (!Blind)
@@ -806,13 +833,17 @@ Armor_off(void)
     setworn((struct obj *) 0, W_ARM);
     g.context.takeoff.cancelled_don = FALSE;
 
-    dragon_armor_handling(otmp, FALSE);
-
+    /* taking off yellow dragon scales/mail might be fatal; arti_light
+       comes from gold dragon scales/mail so they don't overlap, but
+       conceptually the non-fatal change should be done before the
+       potentially fatal change in case the latter results in bones */
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
             pline("%s shining.", Tobjnam(otmp, "stop"));
     }
+    dragon_armor_handling(otmp, FALSE, TRUE);
+
     return 0;
 }
 
@@ -832,13 +863,17 @@ Armor_gone(void)
     setnotworn(uarm);
     g.context.takeoff.cancelled_don = FALSE;
 
-    dragon_armor_handling(otmp, FALSE);
-
+    /* losing yellow dragon scales/mail might be fatal; arti_light
+       comes from gold dragon scales/mail so they don't overlap, but
+       conceptually the non-fatal change should be done before the
+       potentially fatal change in case the latter results in bones */
     if (was_arti_light && !artifact_light(otmp)) {
         end_burn(otmp, FALSE);
         if (!Blind)
             pline("%s shining.", Tobjnam(otmp, "stop"));
     }
+    dragon_armor_handling(otmp, FALSE, FALSE);
+
     return 0;
 }
 

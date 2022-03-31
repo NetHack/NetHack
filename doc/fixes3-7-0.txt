@@ -1112,6 +1112,9 @@ dumplog's list of "major events" showed all logged events, not just major ones
 pickup via menu ignored player-specified count when picking up gold
 changes in encumbrance sometimes went unreported, leaving stale status line
 	info until hero's next move
+taking off yellow dragon scales/mail or having temporary stoning resistance
+	time out while wielding a cockatrice corpse without gloves left that
+	corpse safely wielded instead of petrifying the hero
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

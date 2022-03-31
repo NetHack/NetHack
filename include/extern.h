@@ -534,6 +534,7 @@ extern int stop_donning(struct obj *);
 extern int Armor_off(void);
 extern int Armor_gone(void);
 extern int Helmet_off(void);
+extern void wielding_corpse(struct obj *, struct obj *, boolean);
 extern int Gloves_off(void);
 extern int Boots_on(void);
 extern int Boots_off(void);

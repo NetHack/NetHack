@@ -748,8 +748,14 @@ nh_timeout(void)
                     You("no longer feel safe from acid.");
                 break;
             case STONE_RES:
-                if (!Stone_resistance && !Unaware)
-                    You("no longer feel secure from petrification.");
+                if (!Stone_resistance) {
+                    if (!Unaware)
+                        You("no longer feel secure from petrification.");
+                    /* no-op if not wielding a cockatrice corpse;
+                       uswapwep case is always a no-op (see Gloves_off()) */
+                    wielding_corpse(uwep, (struct obj *) 0, FALSE);
+                    wielding_corpse(uswapwep, (struct obj *) 0, FALSE);
+                }
                 break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
