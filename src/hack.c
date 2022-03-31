@@ -2196,8 +2196,8 @@ domove_core(void)
             displaceu = FALSE;          /* involuntary swap */
 
     if (g.context.travel) {
-        if (!findtravelpath(FALSE))
-            (void) findtravelpath(TRUE);
+        if (!findtravelpath(TRAVP_TRAVEL))
+            (void) findtravelpath(TRAVP_GUESS);
         g.context.travel1 = 0;
     }
 
