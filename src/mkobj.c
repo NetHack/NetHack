@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1637992348 2021/11/27 05:52:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1648835240 2022/04/01 17:47:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1449,7 +1449,7 @@ shrink_glob(
             pline("%s %s.", globnambuf,
                   /* globs always have quantity 1 so we don't need otense()
                      because the verb always references a singular item */
-                  gone ? "dissippates completely" : "shrinks");
+                  gone ? "dissolves completely" : "shrinks");
         updinv = TRUE;
     } else if (contnr) {
         /* when in a container, it might be nested so find outermost one */
