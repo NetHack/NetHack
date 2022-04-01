@@ -295,11 +295,12 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MM_FEMALE   0x020000L /* female variation */
 #define MM_NOMSG    0x040000L /* no appear message */
 /* if more MM_ flag masks are added, skip or renumber the GP_ one(s) */
-#define GP_ALLOW_XY 0x080000L /* [actually used by enexto() to decide whether
-                               * to make an extra call to goodpos()]        */
-#define GP_ALLOW_U  0x100000L /* don't reject hero's location */
-#define MM_NOEXCLAM 0x200000L /* more sedate "<mon> appears." mesg for ^G */
-#define MM_IGNORELAVA   0x400000L /* ignore lava when positioning */
+#define GP_ALLOW_XY   0x080000L /* [actually used by enexto() to decide
+                                 * whether to make extra call to goodpos()] */
+#define GP_ALLOW_U    0x100000L /* don't reject hero's location */
+#define GP_CHECKSCARY 0x200000L /* check monster for onscary() */
+#define MM_NOEXCLAM   0x400000L /* more sedate "<mon> appears." mesg for ^G */
+#define MM_IGNORELAVA 0x800000L /* ignore lava when positioning */
 
 /* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
 #define CORPSTAT_NONE     0x00

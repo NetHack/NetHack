@@ -22,7 +22,7 @@ static void m_initgrp(struct monst *, int, int, int, mmflags_nht);
 static void m_initthrow(struct monst *, int, int);
 static void m_initweap(struct monst *);
 static void m_initinv(struct monst *);
-static boolean makemon_rnd_goodpos(struct monst *, long, coord *);
+static boolean makemon_rnd_goodpos(struct monst *, mmflags_nht, coord *);
 
 #define m_initsgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 3, mmf)
 #define m_initlgrp(mtmp, x, y, mmf) m_initgrp(mtmp, x, y, 10, mmf)
@@ -1042,13 +1042,16 @@ newmextra(void)
 {
     struct mextra *mextra;
 
-    mextra = (struct mextra *) alloc(sizeof(struct mextra));
+    mextra = (struct mextra *) alloc(sizeof (struct mextra));
     init_mextra(mextra);
     return mextra;
 }
 
 static boolean
-makemon_rnd_goodpos(struct monst *mon, long gpflags, coord *cc)
+makemon_rnd_goodpos(
+    struct monst *mon,
+    mmflags_nht gpflags,
+    coord *cc) /* output */
 {
     int tryct = 0;
     int nx, ny;
@@ -1058,7 +1061,7 @@ makemon_rnd_goodpos(struct monst *mon, long gpflags, coord *cc)
         nx = rn1(COLNO - 3, 2);
         ny = rn2(ROWNO);
         good = (!g.in_mklev && cansee(nx,ny)) ? FALSE
-                                            : goodpos(nx, ny, mon, gpflags);
+                                              : goodpos(nx, ny, mon, gpflags);
     } while ((++tryct < 50) && !good);
 
     if (!good) {
@@ -1071,6 +1074,8 @@ makemon_rnd_goodpos(struct monst *mon, long gpflags, coord *cc)
         int bl = (g.in_mklev || Blind) ? 1 : 0;
 
         for ( ; bl < 2; bl++) {
+            if (!bl)
+                gpflags &= ~GP_CHECKSCARY; /* perhaps should be a 3rd pass */
             for (dx = 0; dx < COLNO; dx++)
                 for (dy = 0; dy < ROWNO; dy++) {
                     nx = ((dx + xofs) % (COLNO - 1)) + 1;
@@ -1113,8 +1118,10 @@ makemon_rnd_goodpos(struct monst *mon, long gpflags, coord *cc)
  *      In case we make a monster group, only return the one at [x,y].
  */
 struct monst *
-makemon(register struct permonst *ptr,
-        register int x, register int y, mmflags_nht mmflags)
+makemon(
+    struct permonst *ptr,
+    int x, int y,
+    mmflags_nht mmflags)
 {
     register struct monst *mtmp;
     struct monst fakemon;
@@ -1125,7 +1132,8 @@ makemon(register struct permonst *ptr,
             allow_minvent = ((mmflags & NO_MINVENT) == 0),
             countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0),
             allowtail = ((mmflags & MM_NOTAIL) == 0);
-    unsigned gpflags = (mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0;
+    mmflags_nht gpflags = (((mmflags & MM_IGNOREWATER) ? MM_IGNOREWATER : 0)
+                           | GP_CHECKSCARY);
 
     fakemon = cg.zeromonst;
     cc.x = cc.y = 0;
@@ -1142,7 +1150,8 @@ makemon(register struct permonst *ptr,
         x = cc.x;
         y = cc.y;
     } else if (byyou && !g.in_mklev) {
-        if (!enexto_core(&cc, u.ux, u.uy, ptr, gpflags))
+        if (!enexto_core(&cc, u.ux, u.uy, ptr, gpflags)
+            && !enexto_core(&cc, u.ux, u.uy, ptr, gpflags & ~GP_CHECKSCARY))
             return (struct monst *) 0;
         x = cc.x;
         y = cc.y;
@@ -1447,7 +1456,9 @@ makemon(register struct permonst *ptr,
 
 /* caller rejects makemon()'s result; always returns Null */
 struct monst *
-unmakemon(struct monst *mon, long mmflags)
+unmakemon(
+    struct monst *mon,
+    mmflags_nht mmflags)
 {
     boolean countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0);
     int mndx = monsndx(mon->data);

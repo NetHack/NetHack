@@ -1238,7 +1238,7 @@ extern struct mextra *newmextra(void);
 extern void copy_mextra(struct monst *, struct monst *);
 extern void dealloc_mextra(struct monst *);
 extern struct monst *makemon(struct permonst *, int, int, mmflags_nht);
-extern struct monst *unmakemon(struct monst *, long);
+extern struct monst *unmakemon(struct monst *, mmflags_nht);
 extern boolean create_critters(int, struct permonst *, boolean);
 extern struct permonst *rndmonst(void);
 extern struct permonst *mkclass(char, int);
@@ -2622,9 +2622,10 @@ extern void sysopt_seduce_set(int);
 /* ### teleport.c ### */
 
 extern boolean noteleport_level(struct monst *);
-extern boolean goodpos(int, int, struct monst *, long);
+extern boolean goodpos(int, int, struct monst *, mmflags_nht);
 extern boolean enexto(coord *, xchar, xchar, struct permonst *);
-extern boolean enexto_core(coord *, xchar, xchar, struct permonst *, long);
+extern boolean enexto_core(coord *, xchar, xchar, struct permonst *,
+                           mmflags_nht);
 extern void teleds(int, int, int);
 extern boolean safe_teleds(int);
 extern boolean teleport_pet(struct monst *, boolean);

@@ -5,6 +5,7 @@
 
 #include "hack.h"
 
+static boolean goodpos_onscary(int, int, struct permonst *);
 static boolean tele_jump_ok(int, int, int, int);
 static boolean teleok(int, int, boolean);
 static void vault_tele(void);
@@ -31,6 +32,33 @@ noteleport_level(struct monst* mon)
     return FALSE;
 }
 
+/* this is an approximation of onscary() that doesn't use any 'struct monst'
+   fields aside from 'monst->data' */
+static boolean
+goodpos_onscary(
+    int x, int y,
+    struct permonst *mptr)
+{
+    /* onscary() checks Angels and lawful minions; this oversimplifies */
+    if (mptr->mlet == S_HUMAN || mptr->mlet == S_ANGEL
+        || is_rider(mptr) || unique_corpstat(mptr))
+        return FALSE;
+    /* onscary() checks for vampshifted vampire bats/fog clouds/wolves too */
+    if (IS_ALTAR(levl[x][y].typ) && mptr->mlet == S_VAMPIRE)
+        return TRUE;
+    /* scare monster scroll doesn't have any of the below restrictions,
+       being its own source of power */
+    if (sobj_at(SCR_SCARE_MONSTER, x, y))
+        return TRUE;
+    /* engraved Elbereth doesn't work in Gehennom or the end-game */
+    if (Inhell || In_endgame(&u.uz))
+        return FALSE;
+    /* creatures who don't (or can't) fear a written Elbereth */
+    if (mptr == &mons[PM_MINOTAUR] || !haseyes(mptr))
+        return FALSE;
+    return sengr_at("Elbereth", x, y, TRUE);
+}
+
 /*
  * Is (x,y) a good position of mtmp?  If mtmp is NULL, then is (x,y) good
  * for an object?
@@ -39,11 +67,15 @@ noteleport_level(struct monst* mon)
  * call it to generate new monster positions with fake monster structures.
  */
 boolean
-goodpos(int x, int y, struct monst* mtmp, long gpflags)
+goodpos(
+    int x, int y,
+    struct monst *mtmp,
+    mmflags_nht gpflags)
 {
     struct permonst *mdat = (struct permonst *) 0;
     boolean ignorewater = ((gpflags & MM_IGNOREWATER) != 0),
             ignorelava = ((gpflags & MM_IGNORELAVA) != 0),
+            checkscary = ((gpflags & GP_CHECKSCARY) != 0),
             allow_u = ((gpflags & GP_ALLOW_U) != 0);
 
     if (!isok(x, y))
@@ -113,15 +145,20 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
             return TRUE;
         if (amorphous(mdat) && closed_door(x, y))
             return TRUE;
+        /* avoid onscary() if caller has specified that restriction */
+        if (checkscary && (mtmp->m_id ? onscary(x, y, mtmp)
+                                      : goodpos_onscary(x, y, mdat)))
+            return FALSE;
     }
     if (!accessible(x, y)) {
         if (!(is_pool(x, y) && ignorewater)
             && !(is_lava(x, y) && ignorelava))
             return FALSE;
     }
-
+    /* skip boulder locations for most creatures */
     if (sobj_at(BOULDER, x, y) && (!mdat || !throws_rocks(mdat)))
         return FALSE;
+
     return TRUE;
 }
 
@@ -136,20 +173,19 @@ goodpos(int x, int y, struct monst* mtmp, long gpflags)
 boolean
 enexto(
     coord *cc,
-    register xchar xx,
-    register xchar yy,
+    xchar xx, xchar yy,
     struct permonst *mdat)
 {
-    return enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS);
+    return (enexto_core(cc, xx, yy, mdat, GP_CHECKSCARY)
+            || enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS));
 }
 
 boolean
 enexto_core(
     coord *cc,
-    xchar xx,
-    xchar yy,
+    xchar xx, xchar yy,
     struct permonst *mdat,
-    long entflags)
+    mmflags_nht entflags)
 {
 #define MAX_GOOD 15
     coord good[MAX_GOOD], *good_ptr;
@@ -1156,13 +1192,12 @@ level_tele_trap(struct trap* trap, unsigned int trflags)
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
 static boolean
 rloc_pos_ok(
-    register int x,
-    register int y, /* x,y - coordinates of candidate location */
+    int x, int y, /* coordinates of candidate location */
     struct monst *mtmp)
 {
     register int xx, yy;
 
-    if (!goodpos(x, y, mtmp, 0))
+    if (!goodpos(x, y, mtmp, GP_CHECKSCARY))
         return FALSE;
     /*
      * Check for restricted areas present in some special levels.
@@ -1223,9 +1258,10 @@ rloc_pos_ok(
  * placed randomly around the head of the worm.
  */
 static void
-rloc_to_core(struct monst* mtmp,
-             int x, int y,
-             unsigned int rlocflags)
+rloc_to_core(
+    struct monst* mtmp,
+    int x, int y,
+    unsigned rlocflags)
 {
     register int oldx = mtmp->mx, oldy = mtmp->my;
     boolean resident_shk = mtmp->isshk && inhishop(mtmp);
@@ -1359,7 +1395,7 @@ rloc(
         /* if the wiz teleports away to heal, try the up staircase,
            to block the player's escaping before he's healed
            (deliberately use `goodpos' rather than `rloc_pos_ok' here) */
-        if (goodpos(x, y, mtmp, 0))
+        if (goodpos(x, y, mtmp, NO_MM_FLAGS))
             goto found_xy;
     }
 
@@ -1367,15 +1403,16 @@ rloc(
     do {
         x = rn1(COLNO - 3, 2);
         y = rn2(ROWNO);
+        /* rloc_pos_ok() passes GP_CHECKSCARY to goodpos(), we don't */
         if ((trycount < 500) ? rloc_pos_ok(x, y, mtmp)
-                             : goodpos(x, y, mtmp, 0))
+                             : goodpos(x, y, mtmp, NO_MM_FLAGS))
             goto found_xy;
     } while (++trycount < 1000);
 
     /* last ditch attempt to find a good place */
     for (x = 2; x < COLNO - 1; x++)
         for (y = 0; y < ROWNO; y++)
-            if (goodpos(x, y, mtmp, 0))
+            if (goodpos(x, y, mtmp, NO_MM_FLAGS))
                 goto found_xy;
 
     /* level either full of monsters or somehow faulty */
