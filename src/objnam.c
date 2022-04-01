@@ -4586,7 +4586,8 @@ readobjnam(char *bp, struct obj *no_wish)
            2: medium (6..15) => use weight for 6, yielding 120;
            3: large (16..25) => 320; 4: very large (26+) => 520 */
         if (d.gsize > 1)
-            d.otmp->owt += (unsigned) (100 + (d.gsize - 2) * 200);
+            d.otmp->owt += ((unsigned) (5 + (d.gsize - 2) * 10)
+                            * d.otmp->owt);  /* 20 + {5|15|25} times 20 */
         if (d.cnt > 1) {
             if ((d.cnt > 6 - d.gsize) && !wizard)
                 d.cnt = rn1(5, 2); /* 2..6 */
@@ -4603,8 +4604,8 @@ readobjnam(char *bp, struct obj *no_wish)
                 || d.cnt < rnd(6)
                 || (d.cnt <= 7 && Is_candle(d.otmp))
                 || (d.cnt <= 20
-                    && (d.typ == ROCK || is_missile(d.otmp)
-                        /* WEAPON_CLASS test is to exclude gems */
+                    && (d.typ == ROCK || d.typ == FLINT || is_missile(d.otmp)
+                        /* WEAPON_CLASS test excludes gems, gray stones */
                         || (d.oclass == WEAPON_CLASS && is_ammo(d.otmp))))))
             d.otmp->quan = (long) d.cnt;
     }
