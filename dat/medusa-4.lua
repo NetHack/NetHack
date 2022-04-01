@@ -99,7 +99,7 @@ for i=1,7 do
    des.trap()
 end
 --
-des.monster("Medusa", mx, my)
+des.monster("Medusa", place:rndcoord(1))
 des.monster("kraken", 07,07)
 --
 -- the nesting dragon

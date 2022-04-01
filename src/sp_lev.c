@@ -3833,26 +3833,28 @@ l_create_stairway(lua_State *L, boolean using_ladder)
     struct trap *badtrap;
 
     long scoord;
-    lua_Integer ax = -1, ay = -1;
-    int up;
+    int up = 0; /* default is down */
     int ltype = lua_type(L, 1);
 
     create_des_coder();
 
-    if (argc == 1 && ltype == LUA_TSTRING) {
-        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-    } else if (argc == 3 && ltype == LUA_TSTRING) {
-        up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
-        ax = luaL_checkinteger(L, 2);
-        ay = luaL_checkinteger(L, 3);
-    } else {
+    if (argc == 1 && ltype == LUA_TTABLE) {
+        lua_Integer ax = -1, ay = -1;
         lcheck_param_table(L);
         get_table_xy_or_coord(L, &ax, &ay);
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
+        x = ax;
+        y = ay;
+    } else {
+        int ix = -1, iy = -1;
+        if (argc > 0 && ltype == LUA_TSTRING) {
+            up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
+            lua_remove(L, 1);
+        }
+        nhl_get_xy_params(L, &ix, &iy);
+        x = ix;
+        y = iy;
     }
-
-    x = ax;
-    y = ay;
 
     if (x == -1 && y == -1) {
         set_ok_location_func(good_stair_loc);

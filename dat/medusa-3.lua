@@ -36,6 +36,8 @@ place:set(08,06);
 place:set(66,05);
 place:set(46,15);
 
+local medloc = place:rndcoord(1);
+
 des.region(selection.area(00,00,74,19),"lit")
 -- fixup_special hack: the first room defined on a Medusa level gets some
 -- leaderboard statues, use arrival_room to force it to be a room even though
@@ -54,7 +56,7 @@ des.non_diggable(selection.area(44,13,48,17))
 des.teleport_region({ region = {33,02,38,07}, dir="down" })
 des.levregion({ region = {32,01,39,07}, type="stair-up" });
 
-des.stair("down", place:rndcoord(1))
+des.stair("down", medloc);
 des.door("locked",08,08)
 des.door("locked",64,05)
 des.door("random",50,13)
@@ -100,7 +102,7 @@ des.trap("board")
 des.trap("board")
 des.trap()
 --
-des.monster({ id = "Medusa", x=mx, y=my, asleep=1 })
+des.monster({ id = "Medusa", coord=medloc, asleep=1 })
 des.monster("giant eel")
 des.monster("giant eel")
 des.monster("jellyfish")

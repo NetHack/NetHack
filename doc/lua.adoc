@@ -488,6 +488,7 @@ Example:
 
  des.ladder("down");
  des.ladder("up", 6,10);
+ des.ladder("up", {6,10});
  des.ladder({ x=11, y=05, dir="down" });
  des.ladder({ coord={11, 05}, dir="down" });
 
@@ -785,6 +786,7 @@ Example:
  des.stair({ dir = "down", x = 4, y = 7 });
  des.stair({ dir = "down", coord = {5,12} });
  des.stair("down", 4, 7);
+ des.stair("down", {4, 7});
 
 === teleport_region
 

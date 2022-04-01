@@ -400,8 +400,10 @@ function test_stair()
    des.reset_level();
    des.level_init();
 
+   des.stair();
    des.stair("up");
    des.stair("down", 4, 7);
+   des.stair("down", {7, 7});
    des.stair({ dir = "down", x = 5,  y = 7 });
    des.stair({ dir = "down", coord = {6, 7} });
 end
@@ -410,8 +412,10 @@ function test_ladder()
    des.reset_level();
    des.level_init();
 
+   des.ladder();
    des.ladder("up");
    des.ladder("down", 4, 7);
+   des.ladder("down", {7, 7});
    des.ladder({ dir = "down", x = 5,  y = 7 });
    des.ladder({ dir = "down", coord = {6, 7} });
 end
