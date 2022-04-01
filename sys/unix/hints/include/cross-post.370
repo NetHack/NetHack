@@ -37,7 +37,7 @@ dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
 	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
 	-touch $(TARGETPFX)pkg/RECORD
-	zip -9 $(TARGETPFX)NH370DOS.ZIP $(TARGETPFX)pkg/*
+	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
 	@echo msdos package zip file $(TARGETPFX)NH370DOS.ZIP
 endif  # CROSS_TO_MSDOS
 
