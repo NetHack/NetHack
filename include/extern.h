@@ -778,7 +778,7 @@ extern void cant_reach_floor(int, int, boolean, boolean);
 extern const char *surface(int, int);
 extern const char *ceiling(int, int);
 extern struct engr *engr_at(xchar, xchar);
-extern int sengr_at(const char *, xchar, xchar, boolean);
+extern boolean sengr_at(const char *, xchar, xchar, boolean);
 extern void u_wipe_engr(int);
 extern void wipe_engr_at(xchar, xchar, xchar, boolean);
 extern void read_engr_at(int, int);

@@ -268,16 +268,15 @@ engr_at(xchar x, xchar y)
  * If strict checking is requested, the word is only considered to be
  * present if it is intact and is the entire content of the engraving.
  */
-int
+boolean
 sengr_at(const char *s, xchar x, xchar y, boolean strict)
 {
     register struct engr *ep = engr_at(x, y);
 
     if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= g.moves) {
-        return strict ? (fuzzymatch(ep->engr_txt, s, "", TRUE))
-                      : (strstri(ep->engr_txt, s) != 0);
+        return (strict ? !strcmpi(ep->engr_txt, s)
+                       : (strstri(ep->engr_txt, s) != 0));
     }
-
     return FALSE;
 }
 
