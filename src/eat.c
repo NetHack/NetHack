@@ -1023,7 +1023,7 @@ givit(int type, register struct permonst *ptr)
         debugpline0("Giving timed stoning resistance");
         if (!Stone_resistance)
             You_feel("%s.", Hallucination ? "unusually limber"
-                            : "less concerned about becoming pertrified");
+                            : "less concerned about becoming petrified");
         incr_itimeout(&HStone_resistance, d(3, 6));
         break;
     default:
