@@ -861,6 +861,7 @@ try to avoid locations with engraved Elbereth or scare monster scroll when
 	who are susceptible to those
 be more flexible when wishing checks for artifact name matches; now allows
 	"firebrand" or "fire-brand" to yield "Fire Brand"
+exclude unique monsters from pacification when untrapped from web
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
