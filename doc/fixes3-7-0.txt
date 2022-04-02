@@ -859,6 +859,8 @@ when teleporting, don't consider pits/spiked pits/trap doors/holes as unsafe
 try to avoid locations with engraved Elbereth or scare monster scroll when
 	creating new monsters or picking teleport destinations for monsters
 	who are susceptible to those
+be more flexible when wishing checks for artifact name matches; now allows
+	"firebrand" or "fire-brand" to yield "Fire Brand"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

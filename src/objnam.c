@@ -1113,7 +1113,7 @@ doname_base(
        format the name like the corresponding artifact, which may or may not
        want "the" prefix and when it doesn't, avoid "a"/"an" prefix too */
     fake_arti = (obj->otyp == SLIME_MOLD
-                 && (aname = artifact_name(bp, (short *) 0)) != 0);
+                 && (aname = artifact_name(bp, (short *) 0, FALSE)) != 0);
     force_the = (fake_arti && !strncmpi(aname, "the ", 4));
 
     prefix[0] = '\0';
@@ -1899,7 +1899,7 @@ the(const char* str)
                   has assigned a capitalized proper name as his/her fruit,
                   unless it matches an artifact name */
                || (fruit_from_name(str, TRUE, (int *) 0)
-                   && ((aname = artifact_name(str, (short *) 0)) == 0
+                   && ((aname = artifact_name(str, (short *) 0, FALSE)) == 0
                        || strncmpi(aname, "the ", 4) == 0))) {
         /* not a proper name, needs an article */
         insert_the = TRUE;
@@ -3890,10 +3890,10 @@ readobjnam_postparse1(struct _readobjnam_data *d)
         d->bp += 8;
     }
 
-    /* intercept pudding globs here; they're a valid wish target,
+    /* Intercept pudding globs here; they're a valid wish target,
      * but we need them to not get treated like a corpse.
-     *
-     * also don't let player wish for multiple globs.
+     * If a count is specified, it will be used to magnify weight
+     * rather than to specify quantity (which is always 1 for globs).
      */
     i = (int) strlen(d->bp);
     d->p = (char *) 0;
@@ -4415,7 +4415,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
         short objtyp;
 
         /* Perhaps it's an artifact specified by name, not type */
-        d->name = artifact_name(d->actualn, &objtyp);
+        d->name = artifact_name(d->actualn, &objtyp, TRUE);
         if (d->name) {
             d->typ = objtyp;
             return 2; /*goto typfnd;*/
@@ -4855,22 +4855,18 @@ readobjnam(char *bp, struct obj *no_wish)
         set_tin_variety(d.otmp, d.tvariety);
 
     if (d.name) {
-        const char *aname;
+        const char *aname, *novelname;
         short objtyp;
 
         /* an artifact name might need capitalization fixing */
-        aname = artifact_name(d.name, &objtyp);
+        aname = artifact_name(d.name, &objtyp, TRUE);
         if (aname && objtyp == d.otmp->otyp)
             d.name = aname;
 
         /* 3.6 tribute - fix up novel */
-        if (d.otmp->otyp == SPE_NOVEL) {
-            const char *novelname;
-
-            novelname = lookup_novel(d.name, &d.otmp->novelidx);
-            if (novelname)
-                d.name = novelname;
-        }
+        if (d.otmp->otyp == SPE_NOVEL
+            && (novelname = lookup_novel(d.name, &d.otmp->novelidx)) != 0)
+            d.name = novelname;
 
         d.otmp = oname(d.otmp, d.name, ONAME_WISH);
         /* name==aname => wished for artifact (otmp->oartifact => got it) */

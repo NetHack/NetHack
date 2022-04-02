@@ -1269,7 +1269,8 @@ do_oname(register struct obj *obj)
      */
 
     /* relax restrictions over proper capitalization for artifacts */
-    if ((aname = artifact_name(buf, &objtyp)) != 0 && objtyp == obj->otyp)
+    if ((aname = artifact_name(buf, &objtyp, TRUE)) != 0
+        && objtyp == obj->otyp)
         Strcpy(buf, aname);
 
     if (obj->oartifact) {

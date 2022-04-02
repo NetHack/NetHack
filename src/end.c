@@ -1104,7 +1104,6 @@ artifact_score(
     char pbuf[BUFSZ];
     struct obj *otmp;
     long value, points;
-    short dummy; /* object type returned by artifact_name() */
 
     for (otmp = list; otmp; otmp = otmp->nobj) {
         if (otmp->oartifact || otmp->otyp == BELL_OF_OPENING
@@ -1120,7 +1119,7 @@ artifact_score(
                 /* assumes artifacts don't have quan > 1 */
                 Sprintf(pbuf, "%s%s (worth %ld %s and %ld points)",
                         the_unique_obj(otmp) ? "The " : "",
-                        otmp->oartifact ? artifact_name(xname(otmp), &dummy)
+                        otmp->oartifact ? artiname(otmp->oartifact)
                                         : OBJ_NAME(objects[otmp->otyp]),
                         value, currency(value), points);
                 putstr(endwin, 0, pbuf);

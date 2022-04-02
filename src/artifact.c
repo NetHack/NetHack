@@ -234,7 +234,10 @@ mk_artifact(
  * is non-NULL.
  */
 const char *
-artifact_name(const char *name, short *otyp)
+artifact_name(
+    const char *name, /* string from player that might be an artifact name */
+    short *otyp_p,    /* secondary output */
+    boolean fuzzy)    /* whether to allow extra or omitted spaces or dashes */
 {
     register const struct artifact *a;
     register const char *aname;
@@ -246,9 +249,10 @@ artifact_name(const char *name, short *otyp)
         aname = a->name;
         if (!strncmpi(aname, "the ", 4))
             aname += 4;
-        if (!strcmpi(name, aname)) {
-            if (otyp)
-                *otyp = a->otyp;
+        if (!fuzzy ? !strcmpi(name, aname)
+                   : fuzzymatch(name, aname, " -", TRUE)) {
+            if (otyp_p)
+                *otyp_p = a->otyp;
             return a->name;
         }
     }
@@ -2147,8 +2151,9 @@ Sting_effects(int orc_count) /* new count (warn_obj_cnt is old count); -1 is a f
    after undergoing a transformation (alignment change, lycanthropy,
    polymorph) which might affect item access */
 int
-retouch_object(struct obj **objp, /* might be destroyed or unintentionally dropped */
-               boolean loseit)    /* whether to drop it if hero can longer touch it */
+retouch_object(
+    struct obj **objp, /* might be destroyed or unintentionally dropped */
+    boolean loseit)    /* whether to drop it if hero can longer touch it */
 {
     struct obj *obj = *objp;
 
@@ -2206,7 +2211,8 @@ retouch_object(struct obj **objp, /* might be destroyed or unintentionally dropp
             freeinv(obj);
             hitfloor(obj, TRUE);
         } else {
-            /* dropx gives a message iff item lands on an altar */
+            /* dropx gives a message if a dropped item lands on an altar;
+               we provide one for other terrain */
             if (!IS_ALTAR(levl[u.ux][u.uy].typ))
                 pline("%s to the %s.", Tobjnam(obj, "fall"),
                       surface(u.ux, u.uy));
