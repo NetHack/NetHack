@@ -466,8 +466,7 @@ moveloop_core(void)
         }
         if (g.context.mv) {
             if (g.multi < COLNO && !--g.multi)
-                g.context.travel = g.context.travel1 = g.context.mv =
-                    g.context.run = 0;
+                end_running(TRUE);
             domove();
         } else {
             --g.multi;

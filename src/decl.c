@@ -422,8 +422,9 @@ const struct instance_globals g_init = {
 
 
     /* hack.c */
-    UNDEFINED_VALUES,
-    UNDEFINED_VALUE,
+    UNDEFINED_VALUES, /* tmp_anything */
+    UNDEFINED_VALUE, /* wc */
+    NULL, /* travelmap */
 
     /* invent.c */
     51, /* lastinvr */

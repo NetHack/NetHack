@@ -938,6 +938,7 @@ struct instance_globals {
     /* hack.c */
     anything tmp_anything;
     int wc; /* current weight_cap(); valid after call to inv_weight() */
+    struct selectionvar *travelmap;
 
     /* insight.c */
 

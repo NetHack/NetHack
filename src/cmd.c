@@ -3855,6 +3855,10 @@ reset_cmd_vars(boolean reset_cmdq)
     g.multi = 0;
     iflags.menu_requested = FALSE;
     g.context.travel = g.context.travel1 = 0;
+    if (g.travelmap) {
+        selection_free(g.travelmap, TRUE);
+        g.travelmap = NULL;
+    }
     if (reset_cmdq)
         cmdq_clear();
 }

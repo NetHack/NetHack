@@ -1094,10 +1094,14 @@ test_move(int ux, int uy, int dx, int dy, int mode)
  * A shortest path is returned.  If guess is TRUE, consider various
  * inaccessible locations as valid intermediate path points.
  * Returns TRUE if a path was found.
+ * g.travelmap keeps track of map locations we've moved through
+ * this travel session. It will be cleared once the travel stops.
  */
 static boolean
 findtravelpath(int mode)
 {
+    if (!g.travelmap)
+        g.travelmap = selection_new();
     /* if travel to adjacent, reachable location, use normal movement rules */
     if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
         /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
@@ -1126,7 +1130,6 @@ findtravelpath(int mode)
         int set = 0;    /* two sets current and previous */
         int radius = 1; /* search radius */
         int i;
-        xchar guessx = -1, guessy = -1;
 
         /* If guessing, first find an "obvious" goal location.  The obvious
          * goal is the position the player knows of, or might figure out
@@ -1229,19 +1232,21 @@ findtravelpath(int mode)
                             || (!Blind && couldsee(nx, ny)))) {
                         if (nx == ux && ny == uy) {
                             if (mode == TRAVP_TRAVEL || mode == TRAVP_VALID) {
+                                boolean visited =
+                                    selection_getpoint(x, y, g.travelmap);
                                 u.dx = x - ux;
                                 u.dy = y - uy;
                                 if (mode == TRAVP_TRAVEL
-                                    && ((x == u.tx && y == u.ty)
-                                        || (x == guessx && y == guessy))) {
+                                    && ((x == u.tx && y == u.ty) || visited)) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
                                     g.context.run = 8;
-                                    if (x == guessx && y == guessy)
+                                    if (visited)
                                         You("stop, unsure which way to go.");
                                     else
                                         iflags.travelcc.x = iflags.travelcc.y = 0;
                                 }
+                                selection_setpoint(u.ux, u.uy, g.travelmap, 1);
                                 return TRUE;
                             }
                         } else if (!travel[nx][ny]) {
@@ -1309,8 +1314,10 @@ findtravelpath(int mode)
                 /* no guesses, just go in the general direction */
                 u.dx = sgn(u.tx - u.ux);
                 u.dy = sgn(u.ty - u.uy);
-                if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE))
+                if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)) {
+                    selection_setpoint(u.ux, u.uy, g.travelmap, 1);
                     return TRUE;
+                }
                 goto found;
             }
 #ifdef DEBUG
@@ -1332,8 +1339,6 @@ findtravelpath(int mode)
             ty = py;
             ux = u.ux;
             uy = u.uy;
-            guessx = u.ux - u.dx;
-            guessy = u.uy - u.dy;
             set = 0;
             n = radius = 1;
             mode = TRAVP_TRAVEL;
@@ -3439,7 +3444,11 @@ end_running(boolean and_travel)
        all clear it too */
     if (and_travel)
         g.context.travel = g.context.travel1 = g.context.mv = 0;
-    /* cancel mutli */
+    if (g.travelmap) {
+        selection_free(g.travelmap, TRUE);
+        g.travelmap = NULL;
+    }
+    /* cancel multi */
     if (g.multi > 0)
         g.multi = 0;
 }
