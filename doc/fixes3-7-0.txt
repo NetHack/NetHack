@@ -1150,6 +1150,9 @@ tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
 	new level after level change when S_unexplored is <space>
+tty: for #wizidentify, using ^I as an unseen group accelerator to pick the
+	'all' choice was incorrectly checking menuitem_invert_test() and
+	failing, so the 'all' choice wasn't being toggled on if user typed ^I
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new

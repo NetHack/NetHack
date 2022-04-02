@@ -74,7 +74,7 @@ extern void msmsg(const char *, ...);
  */
 #define HUPSKIP() \
     do {                                        \
-        if (g.program_state.done_hup) {           \
+        if (g.program_state.done_hup) {         \
             morc = '\033';                      \
             return;                             \
         }                                       \
@@ -82,7 +82,7 @@ extern void msmsg(const char *, ...);
     /* morc=ESC - in case we bypass xwaitforspace() which sets that */
 #define HUPSKIP_RESULT(RES) \
     do {                                        \
-        if (g.program_state.done_hup)             \
+        if (g.program_state.done_hup)           \
             return (RES);                       \
     } while (0)
 #else /* !HANGUP_HANDLING */
@@ -1821,8 +1821,9 @@ invert_all_on_page(
 
     for (n = 0, curr = page_start; curr != page_end; n++, curr = curr->next) {
         if (!curr->identifier.a_void /* not selectable */
-            || (acc != 0 && curr->gselector != acc) /* not group 'acc' */
-            || !menuitem_invert_test(0, curr->itemflags, curr->selected))
+            || (acc ? curr->gselector != acc /* skip if not group 'acc' */
+                /* inverting all rather than a group; skip if flagged */
+                : !menuitem_invert_test(0, curr->itemflags, curr->selected)))
             continue;
 
         if (curr->selected) {
@@ -1867,8 +1868,8 @@ invert_all(
            limits to bulk toggling (assumes that an item won't be
            both in a group and also subject to bulk restrictions) */
         if (on_curr_page || !curr->identifier.a_void
-            || (acc != 0 && curr->gselector != acc)
-            || !menuitem_invert_test(0, curr->itemflags, curr->selected))
+            || (acc ? curr->gselector != acc
+                : !menuitem_invert_test(0, curr->itemflags, curr->selected)))
             continue;
 
         if (curr->selected) {
