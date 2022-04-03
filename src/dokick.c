@@ -827,7 +827,7 @@ dokick(void)
     if (no_kick) {
         /* ignore direction typed before player notices kick failed */
         display_nhwindow(WIN_MESSAGE, TRUE); /* --More-- */
-        return ECMD_OK;
+        return ECMD_FAIL;
     }
 
     if (!getdir((char *) 0))

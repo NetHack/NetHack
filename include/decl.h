@@ -666,11 +666,13 @@ struct _create_particular_data {
 enum cmdq_cmdtypes {
     CMDQ_KEY = 0, /* a literal character, cmdq_add_key() */
     CMDQ_EXTCMD,  /* extended command, cmdq_add_ec() */
+    CMDQ_DIR,     /* direction, cmdq_add_dir() */
 };
 
 struct _cmd_queue {
     int typ;
     char key;
+    schar dirx, diry, dirz;
     const struct ext_func_tab *ec_entry;
     struct _cmd_queue *next;
 };

@@ -798,8 +798,15 @@ doopen_indir(int x, int y)
             break;
         }
         pline("This door%s.", mesg);
-        if (locked && flags.autounlock && (unlocktool = autokey(TRUE)) != 0) {
-            res = pick_lock(unlocktool, cc.x, cc.y, (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
+        if (locked) {
+            if (flags.autounlock && (unlocktool = autokey(TRUE)) != 0) {
+                res = pick_lock(unlocktool, cc.x, cc.y,
+                                (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
+            } else if (!u.usteed && ynq("Kick it?") == 'y') {
+                cmdq_add_ec(dokick);
+                cmdq_add_dir(sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
+                res = ECMD_TIME;
+            }
         }
         return res;
     }

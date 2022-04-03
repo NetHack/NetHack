@@ -266,6 +266,28 @@ cmdq_add_key(char key)
         g.command_queue = tmp;
 }
 
+/* add a direction to the command queue */
+void
+cmdq_add_dir(schar dx, schar dy, schar dz)
+{
+    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *cq = g.command_queue;
+
+    tmp->typ = CMDQ_DIR;
+    tmp->dirx = dx;
+    tmp->diry = dy;
+    tmp->dirz = dz;
+    tmp->next = NULL;
+
+    while (cq && cq->next)
+        cq = cq->next;
+
+    if (cq)
+        cq->next = tmp;
+    else
+        g.command_queue = tmp;
+}
+
 /* pop off the topmost command from the command queue.
  * caller is responsible for freeing the returned _cmd_queue.
  */
@@ -4148,6 +4170,23 @@ getdir(const char *s)
 {
     char dirsym;
     int is_mov;
+    struct _cmd_queue *cmdq = cmdq_pop();
+
+    if (cmdq) {
+        if (cmdq->typ == CMDQ_DIR) {
+            if (!cmdq->dirz) {
+                dirsym = g.Cmd.dirchars[xytod(cmdq->dirx, cmdq->diry)];
+            } else {
+                dirsym = g.Cmd.dirchars[(cmdq->dirz > 0) ? DIR_DOWN : DIR_UP];
+            }
+        } else {
+            cmdq_clear();
+            dirsym = '\0';
+            impossible("getdir: command queue had no dir?");
+        }
+        free(cmdq);
+        goto got_dirsym;
+    }
 
  retry:
     if (g.in_doagain || *readchar_queue)
@@ -4164,6 +4203,7 @@ getdir(const char *s)
     }
     savech(dirsym);
 
+ got_dirsym:
     if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
         || dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF2]) {
         u.dx = u.dy = u.dz = 0;
