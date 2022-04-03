@@ -38,6 +38,7 @@ NhRegion *create_force_field(xchar,xchar,int,long);
 #endif
 
 static void reset_region_mids(NhRegion *);
+static boolean is_hero_inside_gas_cloud(void);
 
 static const callback_proc callbacks[] = {
 #define INSIDE_GAS_CLOUD 0
@@ -1062,6 +1063,17 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
     return FALSE; /* Monster is still alive */
 }
 
+static boolean
+is_hero_inside_gas_cloud(void)
+{
+    int i;
+
+    for (i = 0; i < g.n_regions; i++)
+        if (hero_inside(g.regions[i]) && g.regions[i]->inside_f == INSIDE_GAS_CLOUD)
+            return TRUE;
+    return FALSE;
+}
+
 /* Create a gas cloud which starts at (x,y) and grows outward from it via
  * breadth-first search.
  * cloudsize is the number of squares the cloud will attempt to fill.
@@ -1081,6 +1093,7 @@ create_gas_cloud(xchar x, xchar y, int cloudsize, int damage)
     ycoords[0] = y;
     int curridx;
     int newidx = 1; /* initial spot is already taken */
+    boolean inside_cloud = is_hero_inside_gas_cloud();
 
     if (cloudsize > MAX_CLOUD_SIZE) {
         impossible("create_gas_cloud: cloud too large (%d)!", cloudsize);
@@ -1160,6 +1173,10 @@ create_gas_cloud(xchar x, xchar y, int cloudsize, int damage)
     cloud->visible = TRUE;
     cloud->glyph = cmap_to_glyph(damage ? S_poisoncloud : S_cloud);
     add_region(cloud);
+
+    if (!g.in_mklev && !inside_cloud && is_hero_inside_gas_cloud())
+        You("are enveloped in a cloud of noxious gas!");
+
     return cloud;
 }
 
