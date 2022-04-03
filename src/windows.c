@@ -1494,7 +1494,7 @@ genl_putmixed(winid window, int attr, const char *str)
  */
 boolean
 menuitem_invert_test(
-    int mode UNUSED,        /* 0: invert; 1: set; 2: unset */
+    int mode UNUSED,        /* 0: invert; 1: select; 2: deselect */
     unsigned itemflags,     /* itemflags for the item */
     boolean is_selected)    /* current selection status of the item */
 {
@@ -1508,10 +1508,11 @@ menuitem_invert_test(
      *      2: unconditionally setting off.
      * menuinvertmode 0: treat entries flagged with skipinvert as ordinary
      *                   (same as if not flagged);
-     * menuinvertmode 1: don't toggle bulk invert or bulk set entries On
-     *                   (allow such toggling or setting to change to Off);
+     * menuinvertmode 1: don't toggle bulk invert or bulk select entries On;
+     *                   allow toggling to Off (for invert and deselect;
+     *                   select doesn't do Off);
      * menuinvertmode 2: don't toggle skipinvert entries either On or Off
-     *                   when a bulk change is performed.
+     *                   when any bulk change is performed.
      */
     if (iflags.menuinvertmode == 2) {
         return FALSE;
