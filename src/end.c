@@ -924,10 +924,15 @@ savelife(int how)
     }
     g.nomovemsg = "You survived that attempt on your life.";
     g.context.move = 0;
-    if (g.multi > 0)
-        g.multi = 0;
-    else
-        g.multi = -1;
+
+    g.multi = -1; /* can't move again during the current turn */
+    /* in case being life-saved is immediately followed by being killed
+       again (perhaps due to zap rebound); this text will be appended to
+          "killed by <something>, while "
+       in high scores entry, if any, and in logfile (but not on tombstone) */
+    g.multi_reason = Role_if(PM_TOURIST) ? "being toyed with by Fate"
+                                         : "attempting to cheat Death";
+
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
     g.context.botl = TRUE;
