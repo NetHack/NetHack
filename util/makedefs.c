@@ -2122,7 +2122,7 @@ macronamelimit(char *name, int pref)
 void
 do_objs(void)
 {
-    int i, sum = 0;
+    int i, sum UNUSED = 0;
     char *c, *objnam;
     int nspell = 0;
     int prefix = 0;
