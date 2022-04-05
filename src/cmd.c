@@ -3917,6 +3917,9 @@ rhack(char *cmd)
             goto do_cmdq_extcmd;
     } else if (firsttime) {
         cmd = parse();
+        /* parse() pushed a cmd but didn't return any key */
+        if (!*cmd && g.command_queue)
+            goto got_prefix_input;
     }
 
     if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
