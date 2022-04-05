@@ -18,6 +18,13 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 
 #define BACKWARD_COMPAT
 
+/* whether the 'msg_window' option is used to control ^P behavior */
+#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#define PREV_MSGS 1
+#else
+#define PREV_MSGS 0
+#endif
+
 /*
  *  NOTE:  If you add (or delete) an option, please review the following:
  *             doc/options.txt
@@ -171,6 +178,18 @@ static NEARDATA const char *menutype[][3] = { /* 'menustyle' settings */
     { "partial",      "[skip class filtering; always",
                       " use menu of all available items]" }
 };
+#if PREV_MSGS /* tty supports all four settings, curses just final two */
+static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
+    { "single",       "[show one old message at a time,",
+                      " most recent first]" },
+    { "combination",  "[for consecutive ^P requests, use",
+                      " 'single' for first two, then 'full']" },
+    { "full",         "[show all available messages,",
+                      " oldest first and most recent last]" },
+    { "reversed",     "[show all available messages,",
+                      " most recent first]" }
+};
+#endif
 static NEARDATA const char *burdentype[] = {
     "unencumbered", "burdened",     "stressed",
     "strained",     "overtaxed",    "overloaded"
@@ -1814,13 +1833,6 @@ optfn_mouse_support(
     }
     return optn_ok;
 }
-
-/* whether the 'msg_window' option is used to control ^P behavior */
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
-#define PREV_MSGS 1
-#else
-#define PREV_MSGS 0
-#endif
 
 static int
 optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
@@ -4494,39 +4506,58 @@ handler_menu_headings(void)
 static int
 handler_msg_window(void)
 {
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if PREV_MSGS /* tty or curses */
     winid tmpwin;
     anything any;
+    boolean is_tty = WINDOWPORT("tty"), is_curses = WINDOWPORT("curses");
 
-    if (WINDOWPORT("tty") || WINDOWPORT("curses")) {
+    if (is_tty || is_curses) {
         /* by Christian W. Cooper */
+        boolean chngd;
+        int i, n;
+        char buf[BUFSZ], c,
+             sep = iflags.menu_tab_sep ? '\t' : ' ',
+             old_prevmsg_window = iflags.prevmsg_window;
         menu_item *window_pick = (menu_item *) 0;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any = cg.zeroany;
-        if (!WINDOWPORT("curses")) {
-            any.a_char = 's';
-            add_menu(tmpwin, &nul_glyphinfo, &any, 's',
-                     0, ATR_NONE, "single", MENU_ITEMFLAGS_NONE);
-            any.a_char = 'c';
-            add_menu(tmpwin, &nul_glyphinfo, &any, 'c',
-                     0, ATR_NONE, "combination", MENU_ITEMFLAGS_NONE);
+
+        for (i = 0; i < SIZE(menutype); i++) {
+            if (i < 2 && is_curses)
+                continue;
+            Sprintf(buf, "%-12.12s%c%.60s", msgwind[i][0], sep, msgwind[i][1]);
+            any.a_char = c = *msgwind[i][0];
+            add_menu(tmpwin, &nul_glyphinfo, &any, *buf, 0, ATR_NONE, buf,
+                     (c == iflags.prevmsg_window) ? MENU_ITEMFLAGS_SELECTED
+                                                  : MENU_ITEMFLAGS_NONE);
+            /* second line is prefixed by spaces that "c - " would use */
+            Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, msgwind[i][2]);
+            any.a_char = '\0';
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+                     MENU_ITEMFLAGS_NONE);
         }
-        any.a_char = 'f';
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'f',
-                 0, ATR_NONE, "full", MENU_ITEMFLAGS_NONE);
-        any.a_char = 'r';
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'r',
-                 0, ATR_NONE, "reversed", MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Select message history display type:");
-        if (select_menu(tmpwin, PICK_ONE, &window_pick) > 0) {
-            iflags.prevmsg_window = window_pick->item.a_char;
+        n = select_menu(tmpwin, PICK_ONE, &window_pick);
+        if (n > 0) {
+            c = window_pick[0].item.a_char;
+            /* if there are two picks, use the one that wasn't pre-selected */
+            if (n > 1 && c == old_prevmsg_window)
+                c = window_pick[1].item.a_char;
+            iflags.prevmsg_window = c;
             free((genericptr_t) window_pick);
         }
         destroy_nhwindow(tmpwin);
+        chngd = (iflags.prevmsg_window != old_prevmsg_window);
+        if (chngd || flags.verbose) {
+            (void) optfn_msg_window(opt_msg_window, get_val,
+                                    FALSE, buf, empty_optstr);
+            pline("'msg_window' %.20s \"%.20s\".",
+                  chngd ? "changed to" : "is still", buf);
+        }
     } else
-#endif /* msg_window for tty or curses */
+#endif /* PREV_MSGS (for tty or curses) */
         pline("'%s' option is not supported for '%s'.",
               allopt[opt_msg_window].name, windowprocs.name);
     return optn_ok;

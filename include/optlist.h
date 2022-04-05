@@ -324,7 +324,7 @@ opt_##a,
                 NoAlias, "list of symbols to use for monsters")
     NHOPTC(mouse_support, 0, opt_in, set_in_game, No, Yes, No, No, NoAlias,
                 "game receives click info from mouse")
-#if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
+#if PREV_MSGS /* tty or curses */
     NHOPTC(msg_window, 1, opt_in, set_in_game, Yes, Yes, No, Yes, NoAlias,
                 "control of \"view previous message(s)\" (^P) behavior")
 #else
