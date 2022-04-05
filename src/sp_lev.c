@@ -3109,7 +3109,7 @@ lspo_monster(lua_State *L)
         tmpmons.appear = 0;
         tmpmons.appear_as.str = (char *) 0;
         tmpmons.sp_amask = get_table_align(L);
-        tmpmons.female = get_table_boolean_opt(L, "female", FALSE);
+        tmpmons.female = get_table_boolean_opt(L, "female", BOOL_RANDOM);
         tmpmons.invis = get_table_boolean_opt(L, "invisible", FALSE);
         tmpmons.cancelled = get_table_boolean_opt(L, "cancelled", FALSE);
         tmpmons.revived = get_table_boolean_opt(L, "revived", FALSE);
@@ -3152,8 +3152,19 @@ lspo_monster(lua_State *L)
         get_table_xy_or_coord(L, &mx, &my);
 
         tmpmons.id = get_table_montype(L, &mgend);
-        if (mgend != NEUTRAL)
+        /* get_table_montype will return a random gender if the species isn't
+         * all-male or all-female; if the level designer specified a certain
+         * gender, override that random one now, unless it *is* a one-gender
+         * species, in which case don't override (don't permit creation of a
+         * male nymph or female Nazgul, etc.) */
+        if (mgend != NEUTRAL
+            && (tmpmons.female == BOOL_RANDOM || is_female(&mons[tmpmons.id])
+                || is_male(&mons[tmpmons.id])))
             tmpmons.female = mgend;
+        /* safety net - if find_montype did not find a gender for this species
+         * (should cause a lua error anyway) */
+        if (tmpmons.female == BOOL_RANDOM)
+            tmpmons.female = 0;
 
         tmpmons.class = get_table_monclass(L);
 
