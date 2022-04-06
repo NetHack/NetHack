@@ -1510,7 +1510,7 @@ getobj(const char *word,
 
     struct _cmd_queue *cmdq = cmdq_pop();
 
-    if (cmdq) {
+    if (cmdq && cmdq->typ != CMDQ_USER_INPUT) {
         /* it's not a key, abort */
         if (cmdq->typ != CMDQ_KEY) {
             free(cmdq);
@@ -1532,6 +1532,8 @@ getobj(const char *word,
         cmdq_clear();
         return (struct obj *)0;
     }
+    if (cmdq)
+        free(cmdq);
 
     /* is "hands"/"self" a valid thing to do this action on? */
     switch ((*obj_ok)((struct obj *) 0)) {

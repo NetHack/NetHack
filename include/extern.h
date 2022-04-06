@@ -253,6 +253,7 @@ extern void set_occupation(int(*)(void), const char *, cmdcount_nht);
 extern void cmdq_add_ec(int(*)(void));
 extern void cmdq_add_key(char);
 extern void cmdq_add_dir(schar, schar, schar);
+extern void cmdq_add_userinput(void);
 extern struct _cmd_queue *cmdq_pop(void);
 extern void cmdq_clear(void);
 extern char pgetchar(void);

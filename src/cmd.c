@@ -147,9 +147,9 @@ static void contained_stats(winid, const char *, long *, long *);
 static void misc_stats(winid, long *, long *);
 static boolean accept_menu_prefix(const struct ext_func_tab *);
 static void reset_cmd_vars(boolean);
-static void add_herecmd_menuitem(winid, int (*)(void), const char *);
-static char here_cmd_menu(boolean);
-static char there_cmd_menu(boolean, int, int);
+static void mcmd_addmenu(winid, int, const char *);
+static char here_cmd_menu(void);
+static char there_cmd_menu(int, int);
 static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
@@ -277,6 +277,25 @@ cmdq_add_dir(schar dx, schar dy, schar dz)
     tmp->dirx = dx;
     tmp->diry = dy;
     tmp->dirz = dz;
+    tmp->next = NULL;
+
+    while (cq && cq->next)
+        cq = cq->next;
+
+    if (cq)
+        cq->next = tmp;
+    else
+        g.command_queue = tmp;
+}
+
+/* add placeholder to the command queue, allows user input there */
+void
+cmdq_add_userinput(void)
+{
+    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *cq = g.command_queue;
+
+    tmp->typ = CMDQ_USER_INPUT;
     tmp->next = NULL;
 
     while (cq && cq->next)
@@ -4440,7 +4459,7 @@ isok(register int x, register int y)
 static int
 doherecmdmenu(void)
 {
-    char ch = here_cmd_menu(TRUE);
+    char ch = here_cmd_menu();
 
     return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
 }
@@ -4455,32 +4474,59 @@ dotherecmdmenu(void)
         return ECMD_CANCEL;
 
     if (u.dx || u.dy)
-        ch = there_cmd_menu(TRUE, u.ux + u.dx, u.uy + u.dy);
+        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy);
     else
-        ch = here_cmd_menu(TRUE);
+        ch = here_cmd_menu();
 
     return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
 }
 
+/* commands for [t]herecmdmenu */
+enum menucmd {
+    MCMD_NOTHING = 0,
+    MCMD_OPEN_DOOR,
+    MCMD_LOCK_DOOR,
+    MCMD_UNTRAP_DOOR,
+    MCMD_KICK_DOOR,
+    MCMD_CLOSE_DOOR,
+    MCMD_SEARCH,
+    MCMD_LOOK_TRAP,
+    MCMD_UNTRAP_TRAP,
+    MCMD_RIDE,
+    MCMD_REMOVE_SADDLE,
+    MCMD_APPLY_SADDLE,
+
+    MCMD_QUAFF,
+    MCMD_DIP,
+    MCMD_SIT,
+    MCMD_UP,
+    MCMD_DOWN,
+    MCMD_DISMOUNT,
+    MCMD_MONABILITY,
+    MCMD_PICKUP,
+    MCMD_LOOT,
+    MCMD_EAT,
+    MCMD_DROP,
+    MCMD_REST,
+    MCMD_LOOK_HERE,
+    MCMD_ATTACK_NEXT2U,
+    MCMD_UNTRAP_HERE,
+};
+
 static void
-add_herecmd_menuitem(winid win, int (*func)(void), const char *text)
+mcmd_addmenu(winid win, int act, const char *txt)
 {
-    char ch;
     anything any;
 
-    if ((ch = cmd_from_func(func)) != '\0') {
-        any = cg.zeroany;
-        any.a_nfunc = func;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, text,
-                 MENU_ITEMFLAGS_NONE);
-    }
+    /* TODO: fixed letters for the menu entries? */
+    any = cg.zeroany;
+    any.a_int = act;
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
 }
 
-/* offer choice of actions to perform at adjacent location <x,y>;
-   does not work as intended because the actions that get invoked
-   ask for a direction or target instead of using our <x,y> */
+/* offer choice of actions to perform at adjacent location <x,y> */
 static char
-there_cmd_menu(boolean doit, int x, int y)
+there_cmd_menu(int x, int y)
 {
     winid win;
     char ch;
@@ -4490,6 +4536,9 @@ there_cmd_menu(boolean doit, int x, int y)
     menu_item *picks = (menu_item *) 0;
     struct trap *ttmp;
     struct monst *mtmp;
+    int dx = sgn(x - u.ux), dy = sgn(y - u.uy);
+    int dir = xytod(dx, dy);
+    boolean do_attack = FALSE;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
@@ -4499,7 +4548,7 @@ there_cmd_menu(boolean doit, int x, int y)
         int dm = levl[x][y].doormask;
 
         if ((dm & (D_CLOSED | D_LOCKED))) {
-            add_herecmd_menuitem(win, doopen, "Open the door"), ++K;
+            mcmd_addmenu(win, MCMD_OPEN_DOOR, "Open the door"), ++K;
             /* unfortunately there's no lknown flag for doors to
                remember the locked/unlocked state */
             key_or_pick = (carrying(SKELETON_KEY) || carrying(LOCK_PICK));
@@ -4507,26 +4556,26 @@ there_cmd_menu(boolean doit, int x, int y)
             if (key_or_pick || card) {
                 Sprintf(buf, "%sunlock the door",
                         key_or_pick ? "lock or " : "");
-                add_herecmd_menuitem(win, doapply, upstart(buf)), ++K;
+                mcmd_addmenu(win, MCMD_LOCK_DOOR, upstart(buf)), ++K;
             }
             /* unfortunately there's no tknown flag for doors (or chests)
                to remember whether a trap had been found */
-            add_herecmd_menuitem(win, dountrap,
-                                 "Search the door for a trap"), ++K;
+            mcmd_addmenu(win, MCMD_UNTRAP_DOOR,
+                         "Search the door for a trap"), ++K;
             /* [what about #force?] */
-            add_herecmd_menuitem(win, dokick, "Kick the door"), ++K;
+            mcmd_addmenu(win, MCMD_KICK_DOOR, "Kick the door"), ++K;
         } else if ((dm & D_ISOPEN)) {
-            add_herecmd_menuitem(win, doclose, "Close the door"), ++K;
+            mcmd_addmenu(win, MCMD_CLOSE_DOOR, "Close the door"), ++K;
         }
     }
 
     if (typ <= SCORR)
-        add_herecmd_menuitem(win, dosearch, "Search for secret doors"), ++K;
+        mcmd_addmenu(win, MCMD_SEARCH, "Search for secret doors"), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
-        add_herecmd_menuitem(win, doidtrap, "Examine trap"), ++K;
+        mcmd_addmenu(win, MCMD_LOOK_TRAP, "Examine trap"), ++K;
         if (ttmp->ttyp != VIBRATING_SQUARE)
-            add_herecmd_menuitem(win, dountrap,
+            mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
                                  "Attempt to disarm trap"), ++K;
     }
 
@@ -4539,15 +4588,15 @@ there_cmd_menu(boolean doit, int x, int y)
 
         if (!u.usteed) {
             Sprintf(buf, "Ride %s", mnam);
-            add_herecmd_menuitem(win, doride, buf), ++K;
+            mcmd_addmenu(win, MCMD_RIDE, buf), ++K;
         }
         Sprintf(buf, "Remove saddle from %s", mnam);
-        add_herecmd_menuitem(win, doloot, buf), ++K;
+        mcmd_addmenu(win, MCMD_REMOVE_SADDLE, buf), ++K;
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
         Sprintf(buf, "Put saddle on %s", mon_nam(mtmp)), ++K;
-        add_herecmd_menuitem(win, doapply, buf);
+        mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
     }
 #if 0
     if (mtmp) {
@@ -4558,43 +4607,103 @@ there_cmd_menu(boolean doit, int x, int y)
         add_herecmd_menuitem(win, XXX(), buf);
     }
 #endif
-#if 0
-    /* these are necessary if click_to_cmd() is deferring to us; however,
-       moving/fighting aren't implmented as independent commands so don't
-       fit our menu's use of command functions */
-    if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
-        /* "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature" */
-    } else {
-        /* "Move %s", direction */
-    }
-#endif
 
-    if (K) {
+    if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
+        Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
+        mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
+        do_attack = TRUE;
+    } else {
+        /* "Move %s", direction - handled below */
+    }
+
+    /* no menu options, or only the attack option? */
+    if (!K || ((K == 1) && do_attack)) {
+        cmdq_add_ec(move_funcs[dir][MV_WALK]);
+        npick = 0;
+        ch = '\0';
+    } else if (K) {
         end_menu(win, "What do you want to do?");
         npick = select_menu(win, PICK_ONE, &picks);
-    } else {
-        pline("No applicable actions.");
-        npick = 0;
+        ch = '\033';
     }
     destroy_nhwindow(win);
-    ch = '\033';
     if (npick > 0) {
-        int (*func)(void) = picks->item.a_nfunc;
+        int act = picks->item.a_int;
+
         free((genericptr_t) picks);
 
-        if (doit) {
-            int ret = (*func)();
-
-            ch = (char) ret;
-        } else {
-            ch = cmd_from_func(func);
+        switch (act) {
+        case MCMD_OPEN_DOOR:
+            cmdq_add_ec(doopen);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_LOCK_DOOR:
+            {
+                struct obj *otmp = carrying(SKELETON_KEY);
+                if (!otmp) otmp = carrying(LOCK_PICK);
+                if (!otmp) otmp = carrying(CREDIT_CARD);
+                if (otmp) {
+                    cmdq_add_ec(doapply);
+                    cmdq_add_key(otmp->invlet);
+                    cmdq_add_dir(dx, dy, 0);
+                    cmdq_add_key('y'); /* "Lock it?" */
+                }
+            }
+            break;
+        case MCMD_UNTRAP_DOOR:
+            cmdq_add_ec(dountrap);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_KICK_DOOR:
+            cmdq_add_ec(dokick);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_CLOSE_DOOR:
+            cmdq_add_ec(doclose);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_SEARCH:
+            cmdq_add_ec(dosearch);
+            break;
+        case MCMD_LOOK_TRAP:
+            cmdq_add_ec(doidtrap);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_UNTRAP_TRAP:
+            cmdq_add_ec(dountrap);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_RIDE:
+            cmdq_add_ec(doride);
+            cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_REMOVE_SADDLE:
+            cmdq_add_ec(doloot);
+            cmdq_add_dir(dx, dy, 0);
+            cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
+            break;
+        case MCMD_APPLY_SADDLE:
+            {
+                struct obj *otmp = carrying(SADDLE);
+                if (otmp) {
+                    cmdq_add_ec(doapply);
+                    cmdq_add_key(otmp->invlet);
+                    cmdq_add_dir(dx, dy, 0);
+                }
+            }
+            break;
+        case MCMD_ATTACK_NEXT2U:
+            cmdq_add_ec(move_funcs[dir][MV_WALK]);
+            break;
+        default: break;
         }
+        return '\0';
     }
     return ch;
 }
 
 static char
-here_cmd_menu(boolean doit)
+here_cmd_menu(void)
 {
     winid win;
     char ch;
@@ -4603,6 +4712,7 @@ here_cmd_menu(boolean doit)
     int npick;
     menu_item *picks = (menu_item *) 0;
     stairway *stway = stairway_at(u.ux, u.uy);
+    struct trap *ttmp;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
@@ -4610,37 +4720,35 @@ here_cmd_menu(boolean doit)
     if (IS_FOUNTAIN(typ) || IS_SINK(typ)) {
         Sprintf(buf, "Drink from the %s",
                 defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
-        add_herecmd_menuitem(win, dodrink, buf);
+        mcmd_addmenu(win, MCMD_QUAFF, buf);
     }
     if (IS_FOUNTAIN(typ))
-        add_herecmd_menuitem(win, dodip,
-                             "Dip something into the fountain");
+        mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain");
     if (IS_THRONE(typ))
-        add_herecmd_menuitem(win, dosit,
-                             "Sit on the throne");
+        mcmd_addmenu(win, MCMD_SIT, "Sit on the throne");
 
     if (stway && stway->up) {
         Sprintf(buf, "Go up the %s",
                 stway->isladder ? "ladder" : "stairs");
-        add_herecmd_menuitem(win, doup, buf);
+        mcmd_addmenu(win, MCMD_UP, buf);
     }
     if (stway && !stway->up) {
         Sprintf(buf, "Go down the %s",
                 stway->isladder ? "ladder" : "stairs");
-        add_herecmd_menuitem(win, dodown, buf);
+        mcmd_addmenu(win, MCMD_DOWN, buf);
     }
     if (u.usteed) { /* another movement choice */
         Sprintf(buf, "Dismount %s",
                 x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
-        add_herecmd_menuitem(win, doride, buf);
+        mcmd_addmenu(win, MCMD_DISMOUNT, buf);
     }
 
 #if 0
     if (Upolyd) { /* before objects */
         Sprintf(buf, "Use %s special ability",
                 s_suffix(pmname(&mons[u.umonnum], Ugender)));
-        add_herecmd_menuitem(win, domonability, buf);
+        mcmd_addmenu(win, MCMD_MONABILITY, buf);
     }
 #endif
 
@@ -4648,40 +4756,94 @@ here_cmd_menu(boolean doit)
         struct obj *otmp = g.level.objects[u.ux][u.uy];
 
         Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
-        add_herecmd_menuitem(win, dopickup, buf);
+        mcmd_addmenu(win, MCMD_PICKUP, buf);
 
         if (Is_container(otmp)) {
             Sprintf(buf, "Loot %s", doname(otmp));
-            add_herecmd_menuitem(win, doloot, buf);
+            mcmd_addmenu(win, MCMD_LOOT, buf);
         }
         if (otmp->oclass == FOOD_CLASS) {
             Sprintf(buf, "Eat %s", doname(otmp));
-            add_herecmd_menuitem(win, doeat, buf);
+            mcmd_addmenu(win, MCMD_EAT, buf);
         }
     }
 
     if (g.invent)
-        add_herecmd_menuitem(win, dodrop, "Drop items");
+        mcmd_addmenu(win, MCMD_DROP, "Drop items");
 
-    add_herecmd_menuitem(win, donull, "Rest one turn");
-    add_herecmd_menuitem(win, dosearch, "Search around you");
-    add_herecmd_menuitem(win, dolook, "Look at what is here");
+    mcmd_addmenu(win, MCMD_REST, "Rest one turn");
+    mcmd_addmenu(win, MCMD_SEARCH, "Search around you");
+    mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here");
+
+    if ((ttmp = t_at(u.ux, u.uy)) != 0 && ttmp->tseen) {
+        if (ttmp->ttyp != VIBRATING_SQUARE)
+            mcmd_addmenu(win, MCMD_UNTRAP_HERE,
+                         "Attempt to disarm trap");
+    }
 
     end_menu(win, "What do you want to do?");
     npick = select_menu(win, PICK_ONE, &picks);
     destroy_nhwindow(win);
     ch = '\033';
     if (npick > 0) {
-        int (*func)(void) = picks->item.a_nfunc;
+        int act = picks->item.a_int;
+
         free((genericptr_t) picks);
 
-        if (doit) {
-            int ret = (*func)();
-
-            ch = (char) ret;
-        } else {
-            ch = cmd_from_func(func);
+        switch (act) {
+        case MCMD_QUAFF:
+            cmdq_add_ec(dodrink);
+            cmdq_add_key('y'); /* "Drink from the fountain?" */
+            break;
+        case MCMD_DIP:
+            cmdq_add_ec(dodip);
+            cmdq_add_userinput();
+            cmdq_add_key('y'); /* "Dip foo into the fountain?" */
+            break;
+        case MCMD_SIT:
+            cmdq_add_ec(dosit);
+            break;
+        case MCMD_UP:
+            cmdq_add_ec(doup);
+            break;
+        case MCMD_DOWN:
+            cmdq_add_ec(dodown);
+            break;
+        case MCMD_DISMOUNT:
+            cmdq_add_ec(doride);
+            break;
+        case MCMD_MONABILITY:
+            cmdq_add_ec(domonability);
+            break;
+        case MCMD_PICKUP:
+            cmdq_add_ec(dopickup);
+            break;
+        case MCMD_LOOT:
+            cmdq_add_ec(doloot);
+            break;
+        case MCMD_EAT:
+            cmdq_add_ec(doeat);
+            cmdq_add_key('y'); /* "There is foo here; eat it?" */
+            break;
+        case MCMD_DROP:
+            cmdq_add_ec(dodrop);
+            break;
+        case MCMD_REST:
+            cmdq_add_ec(donull);
+            break;
+        case MCMD_SEARCH:
+            cmdq_add_ec(dosearch);
+            break;
+        case MCMD_LOOK_HERE:
+            cmdq_add_ec(dolook);
+            break;
+        case MCMD_UNTRAP_HERE:
+            cmdq_add_ec(dountrap);
+            cmdq_add_dir(0, 0, 1);
+            break;
+        default: break;
         }
+        return '\0';
     }
     return ch;
 }
@@ -4710,15 +4872,11 @@ click_to_cmd(int x, int y, int mod)
     if (iflags.herecmd_menu && isok(x, y)) {
         udist = distu(x, y);
         if (!udist) {
-            cmd[0] = here_cmd_menu(FALSE);
+            cmd[0] = here_cmd_menu();
             return cmd;
         } else if (udist <= 2) {
-#if 0       /* there_cmd_menu() is broken; the commands it invokes
-             * tend to ask for a direction or target instead of using
-             * the adjacent coordinates that are being passed to it */
-            cmd[0] = there_cmd_menu(FALSE, x, y);
+            cmd[0] = there_cmd_menu(x, y);
             return cmd;
-#endif
         }
     }
 
@@ -5145,6 +5303,7 @@ char
 yn_function(const char *query, const char *resp, char def)
 {
     char res, qbuf[QBUFSZ];
+    struct _cmd_queue *cmdq = cmdq_pop();
 #ifdef DUMPLOG
     unsigned idx = g.saved_pline_index;
     /* buffer to hold query+space+formatted_single_char_response */
@@ -5161,7 +5320,12 @@ yn_function(const char *query, const char *resp, char def)
         Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
         query = qbuf;
     }
-    res = (*windowprocs.win_yn_function)(query, resp, def);
+    if (cmdq && cmdq->typ == CMDQ_KEY) {
+        res = cmdq->key;
+    } else {
+        res = (*windowprocs.win_yn_function)(query, resp, def);
+    }
+    free(cmdq);
 #ifdef DUMPLOG
     if (idx == g.saved_pline_index) {
         /* when idx is still the same as g.saved_pline_index, the interface

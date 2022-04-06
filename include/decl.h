@@ -667,6 +667,7 @@ enum cmdq_cmdtypes {
     CMDQ_KEY = 0, /* a literal character, cmdq_add_key() */
     CMDQ_EXTCMD,  /* extended command, cmdq_add_ec() */
     CMDQ_DIR,     /* direction, cmdq_add_dir() */
+    CMDQ_USER_INPUT, /* placeholder for user input, cmdq_add_userinput() */
 };
 
 struct _cmd_queue {
