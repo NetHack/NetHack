@@ -667,8 +667,12 @@ optfn_align_status(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_altkeyhandling(int optidx UNUSED, int req, boolean negated UNUSED,
-                    char *opts, char *op UNUSED)
+optfn_altkeyhandling(
+    int optidx UNUSED,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -677,11 +681,12 @@ optfn_altkeyhandling(int optidx UNUSED, int req, boolean negated UNUSED,
         /* altkeyhandling:string */
 
 #if defined(WIN32) && defined(TTY_GRAPHICS)
-        if (op != empty_optstr) {
-            set_altkeyhandling(op);
-        } else {
+        if (op == empty_optstr || negated)
             return optn_err;
-        }
+        set_altkeyhandling(op);
+#else
+        nhUse(negated);
+        nhUse(op);
 #endif
         return optn_ok;
     }
@@ -1276,8 +1281,12 @@ optfn_gender(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_hilite_status(int optidx UNUSED, int req, boolean negated,
-                    char *opts, char *op)
+optfn_hilite_status(
+    int optidx UNUSED,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -1297,6 +1306,8 @@ optfn_hilite_status(int optidx UNUSED, int req, boolean negated,
             return optn_err;
         return optn_ok;
 #else
+        nhUse(negated);
+        nhUse(op);
         config_error_add("'%s' is not supported", allopt[optidx].name);
         return optn_err;
 #endif
@@ -1304,7 +1315,13 @@ optfn_hilite_status(int optidx UNUSED, int req, boolean negated,
     if (req == get_val) {
         if (!opts)
             return optn_err;
+#ifdef STATUS_HILITES
+        Strcpy(opts, count_status_hilites()
+                     ? "(see \"status highlight rules\" below)"
+                     : "(none)");
+#else
         opts[0] = '\0';
+#endif
         return optn_ok;
     }
     return optn_ok;
@@ -3028,23 +3045,27 @@ optfn_sortloot(int optidx, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_statushilites(int optidx UNUSED, int req, boolean negated,
-                    char *opts, char *op)
+optfn_statushilites(
+    int optidx UNUSED,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
-        /* control over whether highlights should be displayed, and for
-         * how long */
+        /* control over whether highlights should be displayed (non-zero), and
+           also for how long to show temporary ones (N turns; default 3) */
 
 #ifdef STATUS_HILITES
         if (negated) {
             iflags.hilite_delta = 0L;
         } else {
             op = string_for_opt(opts, TRUE);
-            iflags.hilite_delta =
-                (op == empty_optstr || !*op) ? 3L : atol(op);
+            iflags.hilite_delta = (op == empty_optstr || !*op) ? 3L
+                                                               : atol(op);
             if (iflags.hilite_delta < 0L)
                 iflags.hilite_delta = 1L;
         }
@@ -3052,6 +3073,8 @@ optfn_statushilites(int optidx UNUSED, int req, boolean negated,
             reset_status_hilites();
         return optn_ok;
 #else
+        nhUse(negated);
+        nhUse(op);
         config_error_add("'%s' is not supported", allopt[optidx].name);
         return optn_err;
 #endif
@@ -7328,8 +7351,12 @@ optfn_o_status_cond(int optidx UNUSED, int req, boolean negated UNUSED,
 
 #ifdef STATUS_HILITES
 static int
-optfn_o_status_hilites(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_o_status_hilites(
+    int optidx UNUSED,
+    int req,
+    boolean negated UNUSED,
+    char *opts,
+    char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;

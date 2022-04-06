@@ -96,8 +96,13 @@ opt_##a,
                "message window alignment")
     NHOPTC(align_status, 20, opt_in, set_gameview, No, Yes, No, Yes, NoAlias,
                "status window alignment")
+#ifdef WIN32
     NHOPTC(altkeyhandling, 20, opt_in, set_in_game, No, Yes, No, Yes,
                "altkeyhandler", "alternative key handling")
+#else
+    NHOPTC(altkeyhandling, 20, opt_in, set_in_config, No, Yes, No, Yes,
+               "altkeyhandler", "(not applicable)")
+#endif
 #ifdef ALTMETA
     NHOPTB(altmeta, 0, opt_out, set_in_game, Off, Yes, No, No, NoAlias,
                &iflags.altmeta)
@@ -229,6 +234,9 @@ opt_##a,
 #ifdef STATUS_HILITES
     NHOPTC(hilite_status, 13, opt_out, set_in_game, Yes, Yes, Yes, No, NoAlias,
                 "a status highlighting rule (can occur multiple times)")
+#else
+    NHOPTC(hilite_status, 13, opt_out, set_in_config, Yes, Yes, Yes, No,
+                NoAlias, "(not available)")
 #endif
     NHOPTB(hitpointbar, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &iflags.wc2_hitpointbar)
