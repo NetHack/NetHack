@@ -1093,6 +1093,10 @@ level_finalize_topology(void)
     bound_digging();
     mineralize(-1, -1, -1, -1, FALSE);
     g.in_mklev = FALSE;
+    /* avoid coordinates in future lua-loads for this level being thrown off
+     * because xstart and ystart aren't saved with the level and will be 0 after
+     * leaving and returning */
+    g.xstart = g.ystart = 0;
     /* has_morgue gets cleared once morgue is entered; graveyard stays
        set (graveyard might already be set even when has_morgue is clear
        [see fixup_special()], so don't update it unconditionally) */
