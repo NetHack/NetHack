@@ -1013,7 +1013,7 @@ if an invisible hero managed to convert an unaligned altar to an aligned one
 repair some regressions to (a)pply introduced by "getobj refactor" patch
 getobj too: allow attempting to (E)ngrave with any item in inventory
 getobj refactor also allowed non-nameable items on floor to be assigned names
-exploting the bug to assign type name to glob on floor allowed wishing for
+exploiting the bug to assign type name to glob on floor allowed wishing for
 	"N assigned-glob-name" to create a glob with quantity N instead of 1
 fix ^X feedback when held typo: "unseen createure" -> "unseen creature"
 if a <foo> corpse was set to revive as a <foo> zombie and corpse was partly
