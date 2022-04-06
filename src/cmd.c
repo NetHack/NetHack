@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1647912063 2022/03/22 01:21:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.533 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1649272000 2022/04/06 19:06:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.539 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4621,7 +4621,7 @@ there_cmd_menu(int x, int y)
         cmdq_add_ec(move_funcs[dir][MV_WALK]);
         npick = 0;
         ch = '\0';
-    } else if (K) {
+    } else {
         end_menu(win, "What do you want to do?");
         npick = select_menu(win, PICK_ONE, &picks);
         ch = '\033';
