@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.851 $ $NHDT-Date: 1648428942 2022/03/28 00:55:42 $
+NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.864 $ $NHDT-Date: 1649269126 2022/04/06 18:18:46 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1168,6 +1168,7 @@ Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),
 	fseek(), ftell() and fread()
 Windows: when VIRTUAL_TERMINAL_SEQUENCES was not defined, the preprocessing
 	would fail on consoletty.c
+X11: fix build failure if STATUS_HILITES is disabled
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
 X11: for text map without color, add support for black&white ice; draw it in

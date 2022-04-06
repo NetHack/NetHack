@@ -1,4 +1,4 @@
-/* NetHack 3.7	winstat.c	$NHDT-Date: 1646171629 2022/03/01 21:53:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.36 $ */
+/* NetHack 3.7	winstat.c	$NHDT-Date: 1649269127 2022/04/06 18:18:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Dean Luick, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1986,12 +1986,17 @@ check_turn_events(void)
 {
     int i;
     struct X_status_value *sv;
+    int hilight_time = 1;
 
+#ifdef STATUS_HILITES
+    if (iflags.hilite_delta)
+        hilight_time = (int) iflags.hilite_delta;
+#endif
     for (sv = shown_stats, i = 0; i < NUM_STATS; i++, sv++) {
         if (!sv->set)
             continue;
 
-        if (sv->turn_count++ >= iflags.hilite_delta) {
+        if (sv->turn_count++ >= hilight_time) {
             /* unhighlights by toggling a highlighted item back off again,
                unless forced inverted by a status_hilite rule */
             if (!sv->inverted_hilite) {
