@@ -726,7 +726,8 @@ object_detect(struct obj *detector, /* object doing the detecting */
             temp.quan = 1L;
             temp.ox = mtmp->mx;
             temp.oy = mtmp->my;
-            temp.corpsenm = PM_TENGU; /* if mimicing a corpse */
+            /* used for mimicking a corpse or statue */
+            temp.corpsenm = has_mcorpsenm(mtmp) ? MCORPSENM(mtmp) : PM_TENGU;
             map_object(&temp, 1);
         } else if (findgold(mtmp->minvent)
                    && (!class || class == COIN_CLASS)) {
