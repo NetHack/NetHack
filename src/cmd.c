@@ -4495,6 +4495,7 @@ enum menucmd {
     MCMD_RIDE,
     MCMD_REMOVE_SADDLE,
     MCMD_APPLY_SADDLE,
+    MCMD_TALK,
 
     MCMD_QUAFF,
     MCMD_DIP,
@@ -4511,6 +4512,7 @@ enum menucmd {
     MCMD_LOOK_HERE,
     MCMD_ATTACK_NEXT2U,
     MCMD_UNTRAP_HERE,
+    MCMD_OFFER,
 };
 
 static void
@@ -4595,8 +4597,12 @@ there_cmd_menu(int x, int y)
     }
     if (mtmp && can_saddle(mtmp) && !which_armor(mtmp, W_SADDLE)
         && carrying(SADDLE)) {
-        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp)), ++K;
+        Sprintf(buf, "Put saddle on %s", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_APPLY_SADDLE, buf), ++K;
+    }
+    if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
+        Sprintf(buf, "Talk to %s", mon_nam(mtmp));
+        mcmd_addmenu(win, MCMD_TALK, buf), ++K;
     }
 #if 0
     if (mtmp) {
@@ -4695,6 +4701,10 @@ there_cmd_menu(int x, int y)
         case MCMD_ATTACK_NEXT2U:
             cmdq_add_ec(move_funcs[dir][MV_WALK]);
             break;
+        case MCMD_TALK:
+            cmdq_add_ec(dotalk);
+            cmdq_add_dir(dx, dy, 0);
+            break;
         default: break;
         }
         return '\0';
@@ -4726,6 +4736,8 @@ here_cmd_menu(void)
         mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain");
     if (IS_THRONE(typ))
         mcmd_addmenu(win, MCMD_SIT, "Sit on the throne");
+    if (IS_ALTAR(typ))
+        mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar");
 
     if (stway && stway->up) {
         Sprintf(buf, "Go up the %s",
@@ -4840,6 +4852,10 @@ here_cmd_menu(void)
         case MCMD_UNTRAP_HERE:
             cmdq_add_ec(dountrap);
             cmdq_add_dir(0, 0, 1);
+            break;
+        case MCMD_OFFER:
+            cmdq_add_ec(dosacrifice);
+            cmdq_add_userinput();
             break;
         default: break;
         }
