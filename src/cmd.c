@@ -4717,12 +4717,12 @@ here_cmd_menu(void)
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
 
-    if (IS_FOUNTAIN(typ) || IS_SINK(typ)) {
+    if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
         Sprintf(buf, "Drink from the %s",
                 defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
         mcmd_addmenu(win, MCMD_QUAFF, buf);
     }
-    if (IS_FOUNTAIN(typ))
+    if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))
         mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain");
     if (IS_THRONE(typ))
         mcmd_addmenu(win, MCMD_SIT, "Sit on the throne");
