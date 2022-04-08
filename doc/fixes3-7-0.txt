@@ -868,6 +868,8 @@ when being life-saved prevents the hero from moving again during current turn,
 	avoid logfile annotation "while helpless" if hero dies a second time
 if drinking from a fountain randomly gave the 'detect monsters' effect but
 	there were no monsters on the level then there was no feedback
+object detection always showed a mimic imitating a statue as a tengu even if
+	it had information available about some other type of monster
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
