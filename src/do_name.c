@@ -2209,9 +2209,22 @@ obj_pmname(struct obj *obj)
         int cgend = (obj->spe & CORPSTAT_GENDER),
             mgend = ((cgend == CORPSTAT_MALE) ? MALE
                      : (cgend == CORPSTAT_FEMALE) ? FEMALE
-                       : NEUTRAL);
+                       : NEUTRAL),
+            mndx = obj->corpsenm;
 
-        return pmname(&mons[obj->corpsenm], mgend);
+        /* mons[].pmnames[] for monster cleric uses "priest" or "priestess"
+           or "aligned cleric"; we want to avoid "aligned cleric [corpse]"
+           unless it has been explicitly flagged as neuter rather than
+           defaulting to random (which fails male or female check above);
+           role monster cleric uses "priest" or "priestess" or "cleric"
+           without "aligned" prefix so we switch to that; [can't force
+           random gender to be chosen here because splitting a stack of
+           corpses could cause the split-off portion to change gender, so
+           settle for avoiding "aligned"] */
+        if (mndx == PM_ALIGNED_CLERIC && cgend == CORPSTAT_RANDOM)
+            mndx = PM_CLERIC;
+
+        return pmname(&mons[mndx], mgend);
     }
     return "two-legged glorkum-seeker";
 }

@@ -1560,11 +1560,6 @@ corpse_xname(
         mnam = OBJ_NAME(objects[otmp->otyp]); /* "glob of <monster>" */
     } else if (omndx == NON_PM) { /* paranoia */
         mnam = "thing";
-        /* [Possible enhancement:  check whether corpse has monster traits
-            attached in order to use priestname() for priests and minions.] */
-    } else if (omndx == PM_ALIGNED_CLERIC) {
-        /* avoid "aligned priest"; it just exposes internal details */
-        mnam = "priest";
     } else {
         mnam = obj_pmname(otmp);
         if (the_unique_pm(&mons[omndx]) || type_is_pname(&mons[omndx])) {
