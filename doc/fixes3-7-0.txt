@@ -866,6 +866,8 @@ ask to kick a door open, if it's locked and you don't have unlocking tool
 give a message when stinking cloud is created on top of hero
 when being life-saved prevents the hero from moving again during current turn,
 	avoid logfile annotation "while helpless" if hero dies a second time
+if drinking from a fountain randomly gave the 'detect monsters' effect but
+	there were no monsters on the level then there was no feedback
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
