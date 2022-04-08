@@ -149,7 +149,7 @@ static boolean accept_menu_prefix(const struct ext_func_tab *);
 static void reset_cmd_vars(boolean);
 static void mcmd_addmenu(winid, int, const char *);
 static char here_cmd_menu(void);
-static char there_cmd_menu(int, int);
+static char there_cmd_menu(int, int, int);
 static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
@@ -4474,7 +4474,7 @@ dotherecmdmenu(void)
         return ECMD_CANCEL;
 
     if (u.dx || u.dy)
-        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy);
+        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy, CLICK_1);
     else
         ch = here_cmd_menu();
 
@@ -4510,9 +4510,13 @@ enum menucmd {
     MCMD_DROP,
     MCMD_REST,
     MCMD_LOOK_HERE,
+    MCMD_LOOK_AT,
     MCMD_ATTACK_NEXT2U,
     MCMD_UNTRAP_HERE,
     MCMD_OFFER,
+
+    MCMD_THROW_OBJ,
+    MCMD_TRAVEL,
 };
 
 static void
@@ -4526,24 +4530,99 @@ mcmd_addmenu(winid win, int act, const char *txt)
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
 }
 
-/* offer choice of actions to perform at adjacent location <x,y> */
-static char
-there_cmd_menu(int x, int y)
+/* command menu entries when targeting self */
+static int
+there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
 {
-    winid win;
-    char ch;
+    int K = 0;
     char buf[BUFSZ];
     schar typ = levl[x][y].typ;
-    int npick, K = 0;
-    menu_item *picks = (menu_item *) 0;
+    stairway *stway = stairway_at(x, y);
+    struct trap *ttmp;
+
+    if (!u_at(x,y))
+        return K;
+
+    if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
+        Sprintf(buf, "Drink from the %s",
+                defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
+        mcmd_addmenu(win, MCMD_QUAFF, buf), ++K;
+    }
+    if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))
+        mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain"), ++K;
+    if (IS_THRONE(typ))
+        mcmd_addmenu(win, MCMD_SIT, "Sit on the throne"), ++K;
+    if (IS_ALTAR(typ))
+        mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar"), ++K;
+
+    if (stway && stway->up) {
+        Sprintf(buf, "Go up the %s",
+                stway->isladder ? "ladder" : "stairs");
+        mcmd_addmenu(win, MCMD_UP, buf), ++K;
+    }
+    if (stway && !stway->up) {
+        Sprintf(buf, "Go down the %s",
+                stway->isladder ? "ladder" : "stairs");
+        mcmd_addmenu(win, MCMD_DOWN, buf), ++K;
+    }
+    if (u.usteed) { /* another movement choice */
+        Sprintf(buf, "Dismount %s",
+                x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
+                         SUPPRESS_SADDLE, FALSE));
+        mcmd_addmenu(win, MCMD_DISMOUNT, buf), ++K;
+    }
+
+#if 0
+    if (Upolyd) { /* before objects */
+        Sprintf(buf, "Use %s special ability",
+                s_suffix(pmname(&mons[u.umonnum], Ugender)));
+        mcmd_addmenu(win, MCMD_MONABILITY, buf), ++K;
+    }
+#endif
+
+    if (OBJ_AT(x, y)) {
+        struct obj *otmp = g.level.objects[x][y];
+
+        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
+        mcmd_addmenu(win, MCMD_PICKUP, buf), ++K;
+
+        if (Is_container(otmp)) {
+            Sprintf(buf, "Loot %s", doname(otmp));
+            mcmd_addmenu(win, MCMD_LOOT, buf), ++K;
+        }
+        if (otmp->oclass == FOOD_CLASS) {
+            Sprintf(buf, "Eat %s", doname(otmp));
+            mcmd_addmenu(win, MCMD_EAT, buf), ++K;
+        }
+    }
+
+    if (g.invent)
+        mcmd_addmenu(win, MCMD_DROP, "Drop items"), ++K;
+
+    mcmd_addmenu(win, MCMD_REST, "Rest one turn"), ++K;
+    mcmd_addmenu(win, MCMD_SEARCH, "Search around you"), ++K;
+    mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here"), ++K;
+
+    if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
+        if (ttmp->ttyp != VIBRATING_SQUARE)
+            mcmd_addmenu(win, MCMD_UNTRAP_HERE,
+                         "Attempt to disarm trap"), ++K;
+    }
+    return K;
+}
+
+/* add entries to there_cmd_menu, when x,y is next to hero */
+static int
+there_cmd_menu_next2u(winid win, int x, int y, int mod, int *act)
+{
+    int K = 0;
+    char buf[BUFSZ];
+    schar typ = levl[x][y].typ;
     struct trap *ttmp;
     struct monst *mtmp;
-    int dx = sgn(x - u.ux), dy = sgn(y - u.uy);
-    int dir = xytod(dx, dy);
-    boolean do_attack = FALSE;
 
-    win = create_nhwindow(NHW_MENU);
-    start_menu(win, MENU_BEHAVE_STANDARD);
+    if (!next2u(x, y))
+        return K;
 
     if (IS_DOOR(typ)) {
         boolean key_or_pick, card;
@@ -4566,7 +4645,7 @@ there_cmd_menu(int x, int y)
                          "Search the door for a trap"), ++K;
             /* [what about #force?] */
             mcmd_addmenu(win, MCMD_KICK_DOOR, "Kick the door"), ++K;
-        } else if ((dm & D_ISOPEN)) {
+        } else if ((dm & D_ISOPEN) && (mod == CLICK_2)) {
             mcmd_addmenu(win, MCMD_CLOSE_DOOR, "Close the door"), ++K;
         }
     }
@@ -4579,6 +4658,7 @@ there_cmd_menu(int x, int y)
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
                                  "Attempt to disarm trap"), ++K;
+        /* TODO: "Step on the <trap>" */
     }
 
     mtmp = m_at(x, y);
@@ -4617,16 +4697,82 @@ there_cmd_menu(int x, int y)
     if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
         Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
-        do_attack = TRUE;
+        /* attacking overrides any other automatic action */
+        *act = MCMD_ATTACK_NEXT2U;
     } else {
         /* "Move %s", direction - handled below */
     }
+    return K;
+}
 
-    /* no menu options, or only the attack option? */
-    if (!K || ((K == 1) && do_attack)) {
-        cmdq_add_ec(move_funcs[dir][MV_WALK]);
+static int
+there_cmd_menu_far(winid win, xchar x, xchar y, int mod)
+{
+    int K = 0;
+
+    if (mod != CLICK_2)
+        return K;
+
+    if (linedup(u.ux, u.uy, x, y, 1) && (dist2(u.ux, u.uy, x, y) < 18*18)) {
+        mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
+    }
+
+    if (flags.travelcmd) {
+        mcmd_addmenu(win, MCMD_TRAVEL, "Travel here"), ++K;
+    }
+
+    return K;
+}
+
+static int
+there_cmd_menu_common(winid win, xchar x UNUSED, xchar y UNUSED, int mod, int *act UNUSED)
+{
+    int K = 0;
+
+    if (mod == CLICK_2 && iflags.clicklook) {
+        mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
+    }
+
+    return K;
+}
+
+/* offer choice of actions to perform at adjacent location <x,y> */
+static char
+there_cmd_menu(int x, int y, int mod)
+{
+    winid win;
+    char ch = '\0';
+    int npick = 0, K = 0;
+    menu_item *picks = (menu_item *) 0;
+    int dx = sgn(x - u.ux), dy = sgn(y - u.uy);
+    int dir = xytod(dx, dy);
+    int act = MCMD_NOTHING;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+
+    if (u_at(x, y))
+        K += there_cmd_menu_self(win, x, y, &act);
+    else if (next2u(x, y))
+        K += there_cmd_menu_next2u(win, x, y, mod, &act);
+    else
+        K += there_cmd_menu_far(win, x, y, mod);
+    K += there_cmd_menu_common(win, x, y, mod, &act);
+
+    if (!K) {
+        /* no menu options, try to move */
+        if (next2u(x, y) && !test_move(u.ux, u.uy, x, y, TEST_MOVE))
+            cmdq_add_ec(move_funcs[dir][MV_WALK]);
+        else if (flags.travelcmd) {
+            iflags.travelcc.x = u.tx = x;
+            iflags.travelcc.y = u.ty = y;
+            cmdq_add_ec(dotravel_target);
+        }
         npick = 0;
         ch = '\0';
+    } else if ((K == 1) && (act != MCMD_NOTHING)) {
+        destroy_nhwindow(win);
+        goto act_on_act;
     } else {
         end_menu(win, "What do you want to do?");
         npick = select_menu(win, PICK_ONE, &picks);
@@ -4634,11 +4780,22 @@ there_cmd_menu(int x, int y)
     }
     destroy_nhwindow(win);
     if (npick > 0) {
-        int act = picks->item.a_int;
+        act = picks->item.a_int;
 
         free((genericptr_t) picks);
 
+    act_on_act:
         switch (act) {
+        case MCMD_TRAVEL:
+            iflags.travelcc.x = u.tx = x;
+            iflags.travelcc.y = u.ty = y;
+            cmdq_add_ec(dotravel_target);
+            break;
+        case MCMD_THROW_OBJ:
+            cmdq_add_ec(dothrow);
+            cmdq_add_userinput();
+            cmdq_add_dir(dx, dy, 0);
+            break;
         case MCMD_OPEN_DOOR:
             cmdq_add_ec(doopen);
             cmdq_add_dir(dx, dy, 0);
@@ -4705,104 +4862,6 @@ there_cmd_menu(int x, int y)
             cmdq_add_ec(dotalk);
             cmdq_add_dir(dx, dy, 0);
             break;
-        default: break;
-        }
-        return '\0';
-    }
-    return ch;
-}
-
-static char
-here_cmd_menu(void)
-{
-    winid win;
-    char ch;
-    char buf[BUFSZ];
-    schar typ = levl[u.ux][u.uy].typ;
-    int npick;
-    menu_item *picks = (menu_item *) 0;
-    stairway *stway = stairway_at(u.ux, u.uy);
-    struct trap *ttmp;
-
-    win = create_nhwindow(NHW_MENU);
-    start_menu(win, MENU_BEHAVE_STANDARD);
-
-    if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
-        Sprintf(buf, "Drink from the %s",
-                defsyms[IS_FOUNTAIN(typ) ? S_fountain : S_sink].explanation);
-        mcmd_addmenu(win, MCMD_QUAFF, buf);
-    }
-    if (IS_FOUNTAIN(typ) && can_reach_floor(FALSE))
-        mcmd_addmenu(win, MCMD_DIP, "Dip something into the fountain");
-    if (IS_THRONE(typ))
-        mcmd_addmenu(win, MCMD_SIT, "Sit on the throne");
-    if (IS_ALTAR(typ))
-        mcmd_addmenu(win, MCMD_OFFER, "Sacrifice something on the altar");
-
-    if (stway && stway->up) {
-        Sprintf(buf, "Go up the %s",
-                stway->isladder ? "ladder" : "stairs");
-        mcmd_addmenu(win, MCMD_UP, buf);
-    }
-    if (stway && !stway->up) {
-        Sprintf(buf, "Go down the %s",
-                stway->isladder ? "ladder" : "stairs");
-        mcmd_addmenu(win, MCMD_DOWN, buf);
-    }
-    if (u.usteed) { /* another movement choice */
-        Sprintf(buf, "Dismount %s",
-                x_monnam(u.usteed, ARTICLE_THE, (char *) 0,
-                         SUPPRESS_SADDLE, FALSE));
-        mcmd_addmenu(win, MCMD_DISMOUNT, buf);
-    }
-
-#if 0
-    if (Upolyd) { /* before objects */
-        Sprintf(buf, "Use %s special ability",
-                s_suffix(pmname(&mons[u.umonnum], Ugender)));
-        mcmd_addmenu(win, MCMD_MONABILITY, buf);
-    }
-#endif
-
-    if (OBJ_AT(u.ux, u.uy)) {
-        struct obj *otmp = g.level.objects[u.ux][u.uy];
-
-        Sprintf(buf, "Pick up %s", otmp->nexthere ? "items" : doname(otmp));
-        mcmd_addmenu(win, MCMD_PICKUP, buf);
-
-        if (Is_container(otmp)) {
-            Sprintf(buf, "Loot %s", doname(otmp));
-            mcmd_addmenu(win, MCMD_LOOT, buf);
-        }
-        if (otmp->oclass == FOOD_CLASS) {
-            Sprintf(buf, "Eat %s", doname(otmp));
-            mcmd_addmenu(win, MCMD_EAT, buf);
-        }
-    }
-
-    if (g.invent)
-        mcmd_addmenu(win, MCMD_DROP, "Drop items");
-
-    mcmd_addmenu(win, MCMD_REST, "Rest one turn");
-    mcmd_addmenu(win, MCMD_SEARCH, "Search around you");
-    mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here");
-
-    if ((ttmp = t_at(u.ux, u.uy)) != 0 && ttmp->tseen) {
-        if (ttmp->ttyp != VIBRATING_SQUARE)
-            mcmd_addmenu(win, MCMD_UNTRAP_HERE,
-                         "Attempt to disarm trap");
-    }
-
-    end_menu(win, "What do you want to do?");
-    npick = select_menu(win, PICK_ONE, &picks);
-    destroy_nhwindow(win);
-    ch = '\033';
-    if (npick > 0) {
-        int act = picks->item.a_int;
-
-        free((genericptr_t) picks);
-
-        switch (act) {
         case MCMD_QUAFF:
             cmdq_add_ec(dodrink);
             cmdq_add_key('y'); /* "Drink from the fountain?" */
@@ -4843,11 +4902,13 @@ here_cmd_menu(void)
         case MCMD_REST:
             cmdq_add_ec(donull);
             break;
-        case MCMD_SEARCH:
-            cmdq_add_ec(dosearch);
-            break;
         case MCMD_LOOK_HERE:
             cmdq_add_ec(dolook);
+            break;
+        case MCMD_LOOK_AT:
+            g.clicklook_cc.x = x;
+            g.clicklook_cc.y = y;
+            cmdq_add_ec(doclicklook);
             break;
         case MCMD_UNTRAP_HERE:
             cmdq_add_ec(dountrap);
@@ -4864,6 +4925,13 @@ here_cmd_menu(void)
     return ch;
 }
 
+static char
+here_cmd_menu(void)
+{
+    there_cmd_menu(u.ux, u.uy, CLICK_1);
+    return '\0';
+}
+
 /*
  * convert a MAP window position into a movement key usable with movecmd()
  */
@@ -4872,28 +4940,18 @@ click_to_cmd(int x, int y, int mod)
 {
     static char cmd[4];
     struct obj *o;
-    int dir, udist;
+    int dir;
 
     cmd[0] = cmd[1] = '\0';
-    if (iflags.clicklook && mod == CLICK_2) {
+    if (!iflags.herecmd_menu && iflags.clicklook && mod == CLICK_2) {
         g.clicklook_cc.x = x;
         g.clicklook_cc.y = y;
         cmdq_add_ec(doclicklook);
         return cmd;
     }
-    /* this used to be inside the 'if (flags.travelcmd)' block, but
-       handle click-on-self even when travel is disabled; unlike
-       accidentally zooming across the level because of a stray click,
-       clicking on self can easily be cancelled if it wasn't intended */
     if (iflags.herecmd_menu && isok(x, y)) {
-        udist = distu(x, y);
-        if (!udist) {
-            cmd[0] = here_cmd_menu();
-            return cmd;
-        } else if (udist <= 2) {
-            cmd[0] = there_cmd_menu(x, y);
-            return cmd;
-        }
+        (void) there_cmd_menu(x, y, mod);
+        return cmd;
     }
 
     x -= u.ux;
@@ -5301,7 +5359,7 @@ dotravel_target(void)
 static int
 doclicklook(void)
 {
-    if (!iflags.clicklook || !isok(g.clicklook_cc.x, g.clicklook_cc.y))
+    if (!isok(g.clicklook_cc.x, g.clicklook_cc.y))
         return 0;
 
     g.context.move = FALSE;
