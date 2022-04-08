@@ -1,4 +1,4 @@
-/* NetHack 3.7	pray.c	$NHDT-Date: 1646870846 2022/03/10 00:07:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
+/* NetHack 3.7	pray.c	$NHDT-Date: 1649454525 2022/04/08 21:48:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.168 $ */
 /* Copyright (c) Benson I. Margulies, Mike Stephenson, Steve Linhart, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -667,11 +667,11 @@ fry_by_god(aligntyp resp_god, boolean via_disintegration)
 static void
 angrygods(aligntyp resp_god)
 {
-    int maxanger;
+    int maxanger, new_ublesscnt;
 
     if (Inhell)
         resp_god = A_NONE;
-    u.ublessed = 0;
+    u.ublessed = 0; /* lose divine protection */
 
     /* changed from tmp = u.ugangr + abs (u.uluck) -- rph */
     /* added test for alignment diff -dlc */
@@ -735,7 +735,10 @@ angrygods(aligntyp resp_god)
         god_zaps_you(resp_god);
         break;
     }
-    u.ublesscnt = rnz(300);
+    /* even though this might not be in response to prayer, set pray timer */
+    new_ublesscnt = rnz(300);
+    if (new_ublesscnt > u.ublesscnt)
+        u.ublesscnt = new_ublesscnt;
     return;
 }
 
@@ -1411,17 +1414,21 @@ consume_offering(struct obj *otmp)
     exercise(A_WIS, TRUE);
 }
 
+/* feedback when attempting to offer the Amulet on a "low altar" (not one of
+   the high altars in the temples on the Astral Plane or Moloch's Sanctum) */
 static void
 offer_too_soon(aligntyp altaralign)
 {
-    if (altaralign == A_NONE && Inhell)
-        /* hero has left Moloch's Sanctum so is in the process
-            of getting away with the Amulet (outside of Gehennom,
-            fall through to the "ashamed" feedback) */
-        gods_upset(A_NONE);
-    else
-        You_feel("%s.",
-                    Hallucination
+    if (altaralign == A_NONE && Inhell) {
+        /* offering on an unaligned altar in Gehennom;
+           hero has left Moloch's Sanctum (caller handles that)
+           so is in the process of getting away with the Amulet;
+           for any unaligned altar outside of Gehennom, give the
+           "you feel ashamed" feedback for wrong alignment below */
+        gods_upset(A_NONE); /* Moloch becomes angry */
+        return;
+    }
+    You_feel("%s.", Hallucination
                     ? "homesick"
                     /* if on track, give a big hint */
                     : (altaralign == u.ualign.type)
