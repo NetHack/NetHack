@@ -1125,6 +1125,7 @@ changes in encumbrance sometimes went unreported, leaving stale status line
 taking off yellow dragon scales/mail or having temporary stoning resistance
 	time out while wielding a cockatrice corpse without gloves left that
 	corpse safely wielded instead of petrifying the hero
+special level loading wasn't honoring gender specified in lua code
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
