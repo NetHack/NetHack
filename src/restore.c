@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1629818407 2021/08/24 15:20:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1649530943 2022/04/09 19:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.194 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -90,6 +90,14 @@ find_lev_obj(void)
     while ((otmp = fobjtmp) != 0) {
         fobjtmp = otmp->nobj;
         place_object(otmp, otmp->ox, otmp->oy);
+
+        /* fixup(s) performed when restoring the level that the hero
+           is on, rather than just an arbitrary one */
+        if (u.uz.dlevel) { /* 0 during full restore until current level */
+            /* handle uchain and uball when they're on the floor */
+            if (otmp->owornmask & (W_BALL | W_CHAIN))
+                setworn(otmp, otmp->owornmask);
+        }
     }
 }
 
@@ -160,6 +168,14 @@ restdamage(NHFILE* nhfp)
 
         if (ghostly)
             tmp_dam->when += (g.moves - g.omoves);
+
+        /*
+         * This should be removed and handled separately when returning
+         * to a level.  It's a holdover from when restore would catch up
+         * for lost time on any level as it went through all the levels
+         * instead of just splitting the save file into individual level
+         * files.
+         */
         Strcpy(damaged_shops,
                in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
         if (u.uz.dlevel) {
@@ -760,7 +776,6 @@ dorecover(NHFILE* nhfp)
     unsigned int stuckid = 0, steedid = 0; /* not a register */
     xchar ltmp = 0;
     int rtmp;
-    struct obj *otmp;
 
     /* suppress map display if some part of the code tries to update that */
     g.program_state.restoring = 1;
@@ -861,10 +876,6 @@ dorecover(NHFILE* nhfp)
     reset_glyphmap(gm_levelchange);
     max_rank_sz(); /* to recompute g.mrank_sz (botl.c) */
     init_oclass_probs(); /* recompute g.oclass_prob_totals[] */
-    /* take care of iron ball & chain */
-    for (otmp = fobj; otmp; otmp = otmp->nobj)
-        if (otmp->owornmask)
-            setworn(otmp, otmp->owornmask);
 
     if ((uball && !uchain) || (uchain && !uball)) {
         impossible("restgamestate: lost ball & chain");
