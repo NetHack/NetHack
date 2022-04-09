@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1646688068 2022/03/07 21:21:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1649529937 2022/04/09 18:45:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1333,8 +1333,9 @@ doname_base(
     case BALL_CLASS:
     case CHAIN_CLASS:
         add_erosion_words(obj, prefix);
-        if (obj->owornmask & W_BALL)
-            Strcat(bp, " (chained to you)");
+        if (obj->owornmask & (W_BALL | W_CHAIN))
+            Sprintf(eos(bp), " (%s to you)",
+                    (obj->owornmask & W_BALL) ? "chained" : "attached");
         break;
     }
 
