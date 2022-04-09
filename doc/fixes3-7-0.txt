@@ -1,4 +1,4 @@
-NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.870 $ $NHDT-Date: 1649530942 2022/04/09 19:02:22 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.870 $ $NHDT-Date: 1649530942 2022/04/09 19:02:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -875,6 +875,8 @@ avoid "the Lord Surtur's corpse glows iridescently" when shk_your() or the()
 restoring while attached ball or chain is on floor in a breach of a shop wall
 	could have it be moved out of wall gap as that gets repaired, then
 	might trigger an impossible about being positioned too far from hero
+don't try to catch up for lost time for shop damage repair in restdamage()
+	called from getlev(); let normal shopkeeper movement take care of it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -154,51 +154,22 @@ restdamage(NHFILE* nhfp)
     boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &dmgcount, sizeof(dmgcount));
+        mread(nhfp->fd, (genericptr_t) &dmgcount, sizeof dmgcount);
     counter = (int) dmgcount;
 
     if (!counter)
         return;
-    tmp_dam = (struct damage *) alloc(sizeof(struct damage));
-    while (--counter >= 0) {
-        char damaged_shops[5], *shp = (char *) 0;
-
+    do {
+        tmp_dam = (struct damage *) alloc(sizeof *tmp_dam);
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof(*tmp_dam));
+            mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof *tmp_dam);
 
         if (ghostly)
             tmp_dam->when += (g.moves - g.omoves);
 
-        /*
-         * This should be removed and handled separately when returning
-         * to a level.  It's a holdover from when restore would catch up
-         * for lost time on any level as it went through all the levels
-         * instead of just splitting the save file into individual level
-         * files.
-         */
-        Strcpy(damaged_shops,
-               in_rooms(tmp_dam->place.x, tmp_dam->place.y, SHOPBASE));
-        if (u.uz.dlevel) {
-            /* when restoring, there are two passes over the current
-             * level.  the first time, u.uz isn't set, so neither is
-             * shop_keeper().  just wait and process the damage on
-             * the second pass.
-             */
-            for (shp = damaged_shops; *shp; shp++) {
-                struct monst *shkp = shop_keeper(*shp);
-
-                if (shkp && inhishop(shkp)
-                    && repair_damage(shkp, tmp_dam, TRUE))
-                    break;
-            }
-        }
-        if (!shp || !*shp) {
-            tmp_dam->next = g.level.damagelist;
-            g.level.damagelist = tmp_dam;
-            tmp_dam = (struct damage *) alloc(sizeof(*tmp_dam));
-        }
-    }
-    free((genericptr_t) tmp_dam);
+        tmp_dam->next = g.level.damagelist;
+        g.level.damagelist = tmp_dam;
+    } while (--counter > 0);
 }
 
 /* restore one object */

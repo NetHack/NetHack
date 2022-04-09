@@ -1805,6 +1805,11 @@ goto_level(
 
     /* assume this will always return TRUE when changing level */
     (void) in_out_region(u.ux, u.uy);
+    /* shop repair is normally done when shopkeepers move, but we may
+       need to catch up for lost time here; do this before maybe dying
+       so bones map will include it */
+    if (!new)
+        fix_shop_damage();
 
     /* fall damage? */
     if (do_fall_dmg) {

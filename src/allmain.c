@@ -68,6 +68,7 @@ moveloop_preamble(boolean resuming)
     g.context.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
+        fix_shop_damage();
     }
 
     (void) encumber_msg(); /* in case they auto-picked up something */

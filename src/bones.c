@@ -660,6 +660,7 @@ getbones(void)
             }
             resetobjs(fobj, TRUE);
             resetobjs(g.level.buriedobjlist, TRUE);
+            fix_shop_damage();
         }
     }
     close_nhfile(nhfp);
