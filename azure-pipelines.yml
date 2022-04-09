@@ -139,13 +139,13 @@ steps:
     export LUA_VERSION=5.4.4
     #
     # 64-bit
-    #export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-ucrt-r4/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64ucrt-9.0.0-r4.zip
+    #export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-ucrt-r5/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64ucrt-9.0.0-r5.zip
     #export CURLDST=mingw-x64.zip
     #export MINGWBIN=mingw64
     #export MSYSTEM=MINGW64
     #
     # 32-bit
-    export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-ucrt-r4/winlibs-i686-posix-dwarf-gcc-11.2.0-mingw-w64ucrt-9.0.0-r4.zip
+    export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-ucrt-r5/winlibs-i686-posix-dwarf-gcc-11.2.0-mingw-w64ucrt-9.0.0-r5.zip
     export CURLDST=mingw-x86.zip
     export MINGWBIN=mingw32
     export MSYSTEM=MINGW32
