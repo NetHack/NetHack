@@ -4514,6 +4514,7 @@ enum menucmd {
     MCMD_ATTACK_NEXT2U,
     MCMD_UNTRAP_HERE,
     MCMD_OFFER,
+    MCMD_INVENTORY,
 
     MCMD_THROW_OBJ,
     MCMD_TRAVEL,
@@ -4596,9 +4597,11 @@ there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
         }
     }
 
-    if (g.invent)
-        mcmd_addmenu(win, MCMD_DROP, "Drop items"), ++K;
 
+    if (g.invent) {
+        mcmd_addmenu(win, MCMD_INVENTORY, "Inventory"), ++K;
+        mcmd_addmenu(win, MCMD_DROP, "Drop items"), ++K;
+    }
     mcmd_addmenu(win, MCMD_REST, "Rest one turn"), ++K;
     mcmd_addmenu(win, MCMD_SEARCH, "Search around you"), ++K;
     mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here"), ++K;
@@ -4898,6 +4901,9 @@ there_cmd_menu(int x, int y, int mod)
             break;
         case MCMD_DROP:
             cmdq_add_ec(dodrop);
+            break;
+        case MCMD_INVENTORY:
+            cmdq_add_ec(ddoinv);
             break;
         case MCMD_REST:
             cmdq_add_ec(donull);

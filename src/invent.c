@@ -2492,11 +2492,349 @@ xprname(struct obj *obj,
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+enum item_action_actions {
+    IA_NONE          = 0,
+    IA_APPLY_OBJ,
+    IA_DIP_OBJ,
+    IA_DROP_OBJ,
+    IA_EAT_OBJ,
+    IA_ENGRAVE_OBJ,
+    IA_BUY_OBJ,
+    IA_QUAFF_OBJ,
+    IA_QUIVER_OBJ,
+    IA_READ_OBJ,
+    IA_RUB_OBJ,
+    IA_THROW_OBJ,
+    IA_TAKEOFF_OBJ,
+    IA_INVOKE_OBJ,
+    IA_WIELD_OBJ,
+    IA_WEAR_OBJ,
+    IA_SWAPWEAPON,
+    IA_ZAP_OBJ,
+    IA_SACRIFICE,
+};
+
+static void
+ia_addmenu(winid win, int act, char let, const char *txt)
+{
+    anything any;
+
+    any = cg.zeroany;
+    any.a_int = act;
+    add_menu(win, &nul_glyphinfo, &any, let, 0,
+             ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
+}
+
+/* Show menu of possible actions hero could do with item otmp */
+static int
+itemactions(struct obj *otmp)
+{
+    int n, act = IA_NONE;
+    int ret = ECMD_TIME;
+    winid win;
+    char buf[BUFSZ];
+    menu_item *selected;
+    struct monst *mtmp;
+    const char *light = otmp->lamplit ? "Extinguish" : "Light";
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+
+    /* a: apply */
+    if (otmp->otyp == CREAM_PIE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Hit yourself with this cream pie");
+    else if (otmp->otyp == BULLWHIP)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Lash out with this whip");
+    else if (otmp->otyp == GRAPPLING_HOOK)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Grapple something with this hook");
+    else if (otmp->otyp == BAG_OF_TRICKS && objects[otmp->otyp].oc_name_known)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Reach into this bag");
+    else if (Is_container(otmp) || otmp->otyp == BAG_OF_TRICKS)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Open this container");
+    else if (otmp->otyp == CAN_OF_GREASE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use the can to grease an item");
+    else if (otmp->otyp == LOCK_PICK
+             || otmp->otyp == CREDIT_CARD
+             || otmp->otyp == SKELETON_KEY)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this tool to pick a lock");
+    else if (otmp->otyp == TINNING_KIT)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this kit to tin a corpse");
+    else if (otmp->otyp == LEASH)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Tie a pet to this leash");
+    else if (otmp->otyp == SADDLE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Place this saddle on a pet");
+    else if (otmp->otyp == MAGIC_WHISTLE
+             || otmp->otyp == TIN_WHISTLE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Blow this whistle");
+    else if (otmp->otyp == EUCALYPTUS_LEAF)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this leaf as a whistle");
+    else if (otmp->otyp == STETHOSCOPE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Listen through the stethoscope");
+    else if (otmp->otyp == MIRROR)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Show something its reflection");
+    else if (otmp->otyp == BELL || otmp->otyp == BELL_OF_OPENING)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Ring the bell");
+    else if (otmp->otyp == CANDELABRUM_OF_INVOCATION) {
+        Sprintf(buf, "%s the candelabrum", light);
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
+    } else if (otmp->otyp == WAX_CANDLE || otmp->otyp == TALLOW_CANDLE) {
+        Sprintf(buf, "%s %s %s", light,
+                is_plural(otmp) ? "these" : "this",
+                simpleonames(otmp));
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
+    } else if (otmp->otyp == OIL_LAMP || otmp->otyp == MAGIC_LAMP
+               || otmp->otyp == BRASS_LANTERN) {
+        Sprintf(buf, "%s this light source", light);
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
+    } else if (otmp->otyp == POT_OIL && objects[otmp->otyp].oc_name_known) {
+        Sprintf(buf, "%s this oil", light);
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
+    } else if (otmp->oclass == POTION_CLASS)
+        ia_addmenu(win, IA_DIP_OBJ, 'a', "Dip something into this potion");
+    else if (otmp->otyp == EXPENSIVE_CAMERA)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Take a photograph");
+    else if (otmp->otyp == TOWEL)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Clean yourself off with this towel");
+    else if (otmp->otyp == CRYSTAL_BALL)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Peer into this crystal ball");
+    else if (otmp->otyp == MAGIC_MARKER)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Write on something with this marker");
+    else if (otmp->otyp == FIGURINE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Make this figurine transform");
+    else if (otmp->otyp == UNICORN_HORN)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use this unicorn horn");
+    else if (otmp->otyp == HORN_OF_PLENTY && objects[otmp->otyp].oc_name_known)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Blow into the horn of plenty");
+    else if (otmp->otyp >= WOODEN_FLUTE && otmp->otyp <= DRUM_OF_EARTHQUAKE)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Play this musical instrument");
+    else if (otmp->otyp == LAND_MINE || otmp->otyp == BEARTRAP)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Arm this trap");
+    else if (otmp->otyp == PICK_AXE || otmp->otyp == DWARVISH_MATTOCK)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Dig with this digging tool");
+    else if (otmp->oclass == WAND_CLASS)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Break this wand");
+
+    /* d: drop item, works on everything */
+    ia_addmenu(win, IA_DROP_OBJ, 'd', "Drop this item");
+
+    /* e: eat item */
+    if (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
+        ia_addmenu(win, IA_EAT_OBJ, 'e', "Open and eat this tin with your tin opener");
+    else if (otmp->otyp == TIN)
+        ia_addmenu(win, IA_EAT_OBJ, 'e', "Open and eat this tin");
+    else if (is_edible(otmp))
+        ia_addmenu(win, IA_EAT_OBJ, 'e', "Eat this item");
+
+    /* E: engrave with item */
+    if (otmp->otyp == TOWEL)
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Wipe the floor with this towel");
+    else if (otmp->otyp == MAGIC_MARKER)
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Scribble graffiti on the floor");
+    else if (otmp->oclass == WEAPON_CLASS || otmp->oclass == WAND_CLASS
+             || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Write on the floor with this object");
+
+    /* p: pay for unpaid utems */
+    if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
+        inhishop(mtmp) && otmp->unpaid)
+        ia_addmenu(win, IA_BUY_OBJ, 'p', "Buy this unpaid item");
+
+    /* q: drink item */
+    if (otmp->oclass == POTION_CLASS)
+        ia_addmenu(win, IA_QUAFF_OBJ, 'q', "Quaff this potion");
+
+    /* Q: quiver throwable item */
+    if (otmp->oclass == GEM_CLASS || otmp->oclass == WEAPON_CLASS)
+        ia_addmenu(win, IA_QUIVER_OBJ, 'Q', "Quiver this item for easy throwing");
+
+    /* r: read item */
+    if (otmp->otyp == FORTUNE_COOKIE)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the message inside this cookie");
+    else if (otmp->otyp == T_SHIRT)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the slogan on the shirt");
+    else if (otmp->otyp == ALCHEMY_SMOCK)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the slogan on the apron");
+    else if (otmp->otyp == HAWAIIAN_SHIRT)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Look at the pattern on the shirt");
+    else if (otmp->oclass == SCROLL_CLASS)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Cast the spell on this scroll");
+    else if (otmp->oclass == SPBOOK_CLASS)
+        ia_addmenu(win, IA_READ_OBJ, 'r', "Study this spellbook");
+
+    /* R: rub item */
+    if (otmp->otyp == OIL_LAMP || otmp->otyp == MAGIC_LAMP
+        || otmp->otyp == BRASS_LANTERN) {
+        Sprintf(buf, "Rub this %s", simpleonames(otmp));
+        ia_addmenu(win, IA_RUB_OBJ, 'R', buf);
+    } else if (otmp->oclass == GEM_CLASS && is_graystone(otmp))
+        ia_addmenu(win, IA_RUB_OBJ, 'R', "Rub something on this stone");
+
+    /* t: throw item */
+    ia_addmenu(win, IA_THROW_OBJ, 't', "Throw this item");
+
+    /* T: take off, unequip worn item */
+    if ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
+        ia_addmenu(win, IA_TAKEOFF_OBJ, 'T', "Unequip this equipment");
+
+    /* V: invoke */
+    if ((otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known) ||
+        otmp->oartifact || objects[otmp->otyp].oc_unique)
+        ia_addmenu(win, IA_INVOKE_OBJ, 'V',
+                   "Try to invoke a unique power of this object");
+
+    /* w: wield, hold in hands, works on everything but with different
+       advice text; not mentioned for things that are already wielded */
+    if (otmp == uwep) { /* nothing here */ }
+    else if (otmp->oclass == WEAPON_CLASS || otmp->otyp == PICK_AXE
+             || otmp->otyp == UNICORN_HORN)
+        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Wield this as your weapon");
+    else if (otmp->otyp == TIN_OPENER)
+        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold the tin opener to open tins");
+    else
+        ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold this item in your hands");
+
+    /* W: Equip this item */
+    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+        if (otmp->oclass == ARMOR_CLASS)
+            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Wear this armor");
+        else if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING)
+            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put this ring on");
+        else if (otmp->oclass == AMULET_CLASS)
+            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put this amulet on");
+        else if (otmp->otyp == TOWEL || otmp->otyp == BLINDFOLD)
+            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Use this to blindfold yourself");
+        else if (otmp->otyp == LENSES)
+            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put these lenses on");
+    }
+
+    /* x: Swap main and readied weapon */
+    if (otmp == uwep && uswapwep)
+        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your alternate weapon");
+    else if (otmp == uwep)
+        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Ready this as an alternate weapon");
+    else if (otmp == uswapwep)
+        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your main weapon");
+
+    /* z: Zap wand */
+    if (otmp->oclass == WAND_CLASS)
+        ia_addmenu(win, IA_ZAP_OBJ, 'z', "Zap this wand to release its magic");
+
+    if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
+        if (otmp->otyp == CORPSE)
+            ia_addmenu(win, IA_SACRIFICE, 'S', "Sacrifice this corpse at this altar");
+        else if (otmp->otyp == AMULET_OF_YENDOR
+                 || otmp->otyp == FAKE_AMULET_OF_YENDOR)
+            ia_addmenu(win, IA_SACRIFICE, 'S', "Sacrifice this amulet at this altar");
+    }
+
+    Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
+    end_menu(win, buf);
+
+    n = select_menu(win, PICK_ONE, &selected);
+
+    if (n > 0) {
+        act = selected[0].item.a_int;
+        free((genericptr_t) selected);
+
+        switch (act) {
+        default:
+            impossible("Unknown item action");
+        case IA_NONE: break;
+        case IA_APPLY_OBJ:
+            cmdq_add_ec(doapply);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_DIP_OBJ:
+            cmdq_add_ec(dodip);
+            cmdq_add_userinput();
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_DROP_OBJ:
+            cmdq_add_ec(dodrop);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_EAT_OBJ:
+            /* FIXME: can't add this! cmdq_add_key('m');*/ /* m-prefix: eat, skip floor obj */
+            cmdq_add_ec(doeat);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_ENGRAVE_OBJ:
+            cmdq_add_ec(doengrave);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_BUY_OBJ:
+            cmdq_add_ec(dopay);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_QUAFF_OBJ:
+            cmdq_add_ec(dodrink);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_QUIVER_OBJ:
+            cmdq_add_ec(dowieldquiver);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_READ_OBJ:
+            cmdq_add_ec(doread);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_RUB_OBJ:
+            cmdq_add_ec(dorub);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_THROW_OBJ:
+            cmdq_add_ec(dothrow);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_TAKEOFF_OBJ:
+            cmdq_add_ec(dotakeoff);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_INVOKE_OBJ:
+            cmdq_add_ec(doinvoke);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_WIELD_OBJ:
+            cmdq_add_ec(dowield);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_WEAR_OBJ:
+            cmdq_add_ec(dowear);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_SWAPWEAPON:
+            cmdq_add_ec(doswapweapon);
+            break;
+        case IA_ZAP_OBJ:
+            cmdq_add_ec(dozap);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_SACRIFICE:
+            cmdq_add_ec(dosacrifice);
+            cmdq_add_key(otmp->invlet);
+            break;
+        }
+    } else
+        ret = !n ? ECMD_CANCEL : ECMD_OK; /* cancelled */
+    destroy_nhwindow(win);
+
+    return ret;
+}
+
+
 /* the #inventory command */
 int
 ddoinv(void)
 {
-    (void) display_inventory((char *) 0, FALSE);
+    struct obj *otmp;
+    char c = display_inventory((char *) 0, TRUE);
+
+    if (!c)
+        return ECMD_OK;
+    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        if (otmp->invlet == c)
+            return itemactions(otmp);
+
     return ECMD_OK;
 }
 
@@ -2813,6 +3151,26 @@ display_pickinv(
 char
 display_inventory(const char *lets, boolean want_reply)
 {
+    struct _cmd_queue *cmdq = cmdq_pop();
+
+    if (cmdq) {
+        if (cmdq->typ == CMDQ_KEY) {
+            struct obj *otmp;
+
+            for (otmp = g.invent; otmp; otmp = otmp->nobj)
+                if (otmp->invlet == cmdq->key
+                    && (!lets || !*lets
+                        || index(lets, def_oc_syms[(int)otmp->oclass].sym))) {
+                    free(cmdq);
+                    return otmp->invlet;
+                }
+        }
+
+        /* cmdq not a key, or did not find the object, abort */
+        free(cmdq);
+        cmdq_clear();
+        return '\0';
+    }
     return display_pickinv(lets, (char *) 0, (char *) 0,
                            want_reply, (long *) 0);
 }
