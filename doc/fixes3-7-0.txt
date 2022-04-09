@@ -870,6 +870,8 @@ if drinking from a fountain randomly gave the 'detect monsters' effect but
 	there were no monsters on the level then there was no feedback
 object detection always showed a mimic imitating a statue as a tengu even if
 	it had information available about some other type of monster
+avoid "the Lord Surtur's corpse glows iridescently" when shk_your() or the()
+	is applied to the corpse of unique monster with a personal name
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -792,10 +792,11 @@ CapitalMon(
         /*
          * Unlike name_to_mon(), we don't need to find the longest match
          * or return the gender or a pointer to trailing stuff.  We do
-         * check full words though: "Foo" matches "Foo" and "Foo bar" but
-         * not "Foobar".  We use case-sensitive matching here.
+         * check full words though: "Foo" matches "Foo" and "Foo bar" and
+         * "Foo's bar" but not "Foobar".  We use case-sensitive matching.
          */
-        if (!strncmp(nam, word, nln) && (!word[nln] || word[nln] == ' '))
+        if (!strncmp(nam, word, nln)
+            && (!word[nln] || word[nln] == ' ' || word[nln] == '\''))
             return TRUE; /* 'word' is a capitalized monster name */
     }
     return FALSE;

@@ -4776,15 +4776,22 @@ block_entry(register xchar x, register xchar y)
 
 /* "your " or "Foobar's " (note the trailing space) */
 char *
-shk_your(char *buf, struct obj* obj)
+shk_your(char *buf, struct obj *obj)
 {
-    if (!shk_owns(buf, obj) && !mon_owns(buf, obj))
+    boolean chk_pm = obj->otyp == CORPSE && obj->corpsenm >= LOW_PM;
+
+    buf[0] = '\0';
+    if (chk_pm && type_is_pname(&mons[obj->corpsenm]))
+        return buf; /* skip ownership prefix and space: "Medusa's corpse" */
+    else if (chk_pm && the_unique_pm(&mons[obj->corpsenm]))
+        Strcpy(buf, "the"); /* override ownership: "the Oracle's corpse" */
+    else if (!shk_owns(buf, obj) && !mon_owns(buf, obj))
         Strcpy(buf, the_your[carried(obj) ? 1 : 0]);
     return strcat(buf, " ");
 }
 
 char *
-Shk_Your(char* buf, struct obj* obj)
+Shk_Your(char *buf, struct obj *obj)
 {
     (void) shk_your(buf, obj);
     *buf = highc(*buf);
@@ -4792,7 +4799,7 @@ Shk_Your(char* buf, struct obj* obj)
 }
 
 static char *
-shk_owns(char* buf, struct obj* obj)
+shk_owns(char *buf, struct obj *obj)
 {
     struct monst *shkp;
     xchar x, y;
@@ -4807,7 +4814,7 @@ shk_owns(char* buf, struct obj* obj)
 }
 
 static char *
-mon_owns(char* buf, struct obj* obj)
+mon_owns(char *buf, struct obj *obj)
 {
     if (obj->where == OBJ_MINVENT)
         return strcpy(buf, s_suffix(y_monnam(obj->ocarry)));

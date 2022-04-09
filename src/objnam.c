@@ -1906,7 +1906,10 @@ the(const char* str)
         /* some objects have capitalized adjectives in their names */
         if (((tmp = rindex(str, ' ')) != 0 || (tmp = rindex(str, '-')) != 0)
             && (tmp[1] < 'A' || tmp[1] > 'Z')) {
-            insert_the = TRUE;
+            /* insert "the" unless we have an apostrophe (where we assume
+               we're dealing with "Unique's corpse" when "Unique" wasn't
+               caught by CapitalMon() above) */
+            insert_the = !index(str, '\'');
         } else if (tmp && index(str, ' ') < tmp) { /* has spaces */
             /* it needs an article if the name contains "of" */
             tmp = strstri(str, " of ");
@@ -1934,7 +1937,7 @@ the(const char* str)
 }
 
 char *
-The(const char* str)
+The(const char *str)
 {
     char *tmp = the(str);
 
@@ -1944,7 +1947,7 @@ The(const char* str)
 
 /* returns "count cxname(otmp)" or just cxname(otmp) if count == 1 */
 char *
-aobjnam(struct obj* otmp, const char* verb)
+aobjnam(struct obj *otmp, const char *verb)
 {
     char prefix[PREFIX];
     char *bp = cxname(otmp);
