@@ -2515,6 +2515,7 @@ enum item_action_actions {
     IA_SWAPWEAPON,
     IA_ZAP_OBJ,
     IA_SACRIFICE,
+    IA_UNWIELD
 };
 
 static void
@@ -2542,6 +2543,17 @@ itemactions(struct obj *otmp)
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
+
+    /* -: unwield; picking current weapon offers an opportunity for 'w-'
+       to wield bare/gloved hands */
+    if (otmp == uwep) {
+        /* TODO: if uwep is ammo, tell player that to shoot instead of toss,
+         *       the corresponding launcher must be wielded */
+        Sprintf(buf,  "Wield '-' to unwield this %s",
+                (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)) ? "weapon"
+                : "item");
+        ia_addmenu(win, IA_UNWIELD, '-', buf);
+    }
 
     /* a: apply */
     if (otmp->otyp == CREAM_PIE)
@@ -2622,7 +2634,8 @@ itemactions(struct obj *otmp)
 
     /* e: eat item */
     if (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
-        ia_addmenu(win, IA_EAT_OBJ, 'e', "Open and eat this tin with your tin opener");
+        ia_addmenu(win, IA_EAT_OBJ, 'e',
+                   "Open and eat this tin with your tin opener");
     else if (otmp->otyp == TIN)
         ia_addmenu(win, IA_EAT_OBJ, 'e', "Open and eat this tin");
     else if (is_edible(otmp))
@@ -2635,12 +2648,26 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Scribble graffiti on the floor");
     else if (otmp->oclass == WEAPON_CLASS || otmp->oclass == WAND_CLASS
              || otmp->oclass == GEM_CLASS || otmp->oclass == RING_CLASS)
-        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E', "Write on the floor with this object");
+        ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
+                   "Write on the floor with this object");
 
     /* p: pay for unpaid utems */
     if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
         inhishop(mtmp) && otmp->unpaid)
         ia_addmenu(win, IA_BUY_OBJ, 'p', "Buy this unpaid item");
+
+    /* P: put on accessory */
+    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+        if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING)
+            ia_addmenu(win, IA_WEAR_OBJ, 'P', "Put this ring on");
+        else if (otmp->oclass == AMULET_CLASS)
+            ia_addmenu(win, IA_WEAR_OBJ, 'P', "Put this amulet on");
+        else if (otmp->otyp == TOWEL || otmp->otyp == BLINDFOLD)
+            ia_addmenu(win, IA_WEAR_OBJ, 'P',
+                       "Use this to blindfold yourself");
+        else if (otmp->otyp == LENSES)
+            ia_addmenu(win, IA_WEAR_OBJ, 'P', "Put these lenses on");
+    }
 
     /* q: drink item */
     if (otmp->oclass == POTION_CLASS)
@@ -2648,11 +2675,13 @@ itemactions(struct obj *otmp)
 
     /* Q: quiver throwable item */
     if (otmp->oclass == GEM_CLASS || otmp->oclass == WEAPON_CLASS)
-        ia_addmenu(win, IA_QUIVER_OBJ, 'Q', "Quiver this item for easy throwing");
+        ia_addmenu(win, IA_QUIVER_OBJ, 'Q',
+                   "Quiver this item for easy throwing");
 
     /* r: read item */
     if (otmp->otyp == FORTUNE_COOKIE)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the message inside this cookie");
+        ia_addmenu(win, IA_READ_OBJ, 'r',
+                   "Read the message inside this cookie");
     else if (otmp->otyp == T_SHIRT)
         ia_addmenu(win, IA_READ_OBJ, 'r', "Read the slogan on the shirt");
     else if (otmp->otyp == ALCHEMY_SMOCK)
@@ -2664,7 +2693,9 @@ itemactions(struct obj *otmp)
     else if (otmp->oclass == SPBOOK_CLASS)
         ia_addmenu(win, IA_READ_OBJ, 'r', "Study this spellbook");
 
-    /* R: rub item */
+    /* R: remove accessory or rub item */
+    if (otmp->owornmask & (W_RING | W_AMUL | W_TOOL))
+        ia_addmenu(win, IA_TAKEOFF_OBJ, 'R', "Remove this accessory");
     if (otmp->otyp == OIL_LAMP || otmp->otyp == MAGIC_LAMP
         || otmp->otyp == BRASS_LANTERN) {
         Sprintf(buf, "Rub this %s", simpleonames(otmp));
@@ -2673,11 +2704,27 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_RUB_OBJ, 'R', "Rub something on this stone");
 
     /* t: throw item */
-    ia_addmenu(win, IA_THROW_OBJ, 't', "Throw this item");
+    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+        const char *verb = ammo_and_launcher(otmp, uwep) ? "Shoot" : "Throw";
 
-    /* T: take off, unequip worn item */
-    if ((otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL)))
-        ia_addmenu(win, IA_TAKEOFF_OBJ, 'T', "Unequip this equipment");
+        /*
+         * FIXME:
+         *  'one of these' should be changed to 'some of these' when there
+         *  is the possibility of a multi-shot volley but we don't have
+         *  any way to determine that except by actually calculating the
+         *  volley count and that could randomly yield 1 here and 2..N
+         *  while throwing or vice versa.
+         */
+        Sprintf(buf, "%s %s", verb,
+                (otmp->quan == 1L) ? "this item"
+                : (otmp->otyp == GOLD_PIECE) ? "them"
+                  : "one of these");
+        ia_addmenu(win, IA_THROW_OBJ, 't', buf);
+    }
+
+    /* T: take off armor */
+    if (otmp->owornmask & W_ARMOR)
+        ia_addmenu(win, IA_TAKEOFF_OBJ, 'T', "Take off this armor");
 
     /* V: invoke */
     if ((otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known) ||
@@ -2687,27 +2734,22 @@ itemactions(struct obj *otmp)
 
     /* w: wield, hold in hands, works on everything but with different
        advice text; not mentioned for things that are already wielded */
-    if (otmp == uwep) { /* nothing here */ }
-    else if (otmp->oclass == WEAPON_CLASS || otmp->otyp == PICK_AXE
-             || otmp->otyp == UNICORN_HORN)
+    if (otmp == uwep)
+        ;
+    else if (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)
+             || is_wet_towel(otmp))
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Wield this as your weapon");
     else if (otmp->otyp == TIN_OPENER)
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold the tin opener to open tins");
     else
+        /* FIXME: there's no concept of "holding an item" that's any
+           different from having it in inventory; 'w' means wield as weapon */
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold this item in your hands");
 
-    /* W: Equip this item */
+    /* W: wear armor */
     if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
         if (otmp->oclass == ARMOR_CLASS)
             ia_addmenu(win, IA_WEAR_OBJ, 'W', "Wear this armor");
-        else if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING)
-            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put this ring on");
-        else if (otmp->oclass == AMULET_CLASS)
-            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put this amulet on");
-        else if (otmp->otyp == TOWEL || otmp->otyp == BLINDFOLD)
-            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Use this to blindfold yourself");
-        else if (otmp->otyp == LENSES)
-            ia_addmenu(win, IA_WEAR_OBJ, 'W', "Put these lenses on");
     }
 
     /* x: Swap main and readied weapon */
@@ -2724,10 +2766,12 @@ itemactions(struct obj *otmp)
 
     if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
         if (otmp->otyp == CORPSE)
-            ia_addmenu(win, IA_SACRIFICE, 'S', "Sacrifice this corpse at this altar");
+            ia_addmenu(win, IA_SACRIFICE, 'O',
+                       "Offer this corpse as a sacrifice at this altar");
         else if (otmp->otyp == AMULET_OF_YENDOR
                  || otmp->otyp == FAKE_AMULET_OF_YENDOR)
-            ia_addmenu(win, IA_SACRIFICE, 'S', "Sacrifice this amulet at this altar");
+            ia_addmenu(win, IA_SACRIFICE, 'O',
+                       "Offer this amulet as a sacrifice at this altar");
     }
 
     Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
@@ -2742,7 +2786,8 @@ itemactions(struct obj *otmp)
         switch (act) {
         default:
             impossible("Unknown item action");
-        case IA_NONE: break;
+        case IA_NONE:
+            break;
         case IA_APPLY_OBJ:
             cmdq_add_ec(doapply);
             cmdq_add_key(otmp->invlet);
@@ -2815,6 +2860,10 @@ itemactions(struct obj *otmp)
         case IA_SACRIFICE:
             cmdq_add_ec(dosacrifice);
             cmdq_add_key(otmp->invlet);
+            break;
+        case IA_UNWIELD:
+            cmdq_add_ec(dowield);
+            cmdq_add_key('-');
             break;
         }
     } else
