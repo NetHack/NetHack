@@ -4764,7 +4764,7 @@ there_cmd_menu(int x, int y, int mod)
 
     if (!K) {
         /* no menu options, try to move */
-        if (next2u(x, y) && !test_move(u.ux, u.uy, x, y, TEST_MOVE))
+        if (next2u(x, y) && !test_move(u.ux, u.uy, dx, dy, TEST_MOVE))
             cmdq_add_ec(move_funcs[dir][MV_WALK]);
         else if (flags.travelcmd) {
             iflags.travelcc.x = u.tx = x;
