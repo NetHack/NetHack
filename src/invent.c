@@ -1477,13 +1477,14 @@ any_obj_ok(struct obj *obj)
  * getobj returns:
  *      struct obj *xxx:        object to do something with.
  *      (struct obj *) 0        error return: no object.
- *      &cg.zeroobj                explicitly no object (as in w-).
+ *      &cg.zeroobj             explicitly no object (as in w-).
  * The obj_ok callback should not have side effects (apart from
  * abnormal-behavior things like impossible calls); it can be called multiple
  * times on the same object during the execution of this function.
- * Callbacks' argument is either a valid object pointer or a null pointer, which
- * represents the validity of doing that action on HANDS_SYM. getobj won't call
- * it with &cg.zeroobj, so its behavior can be undefined in that case.
+ * Callbacks' argument is either a valid object pointer or a null pointer,
+ * which represents the validity of doing that action on HANDS_SYM. getobj
+ * won't call it with &cg.zeroobj, so its behavior can be undefined in that
+ * case.
  */
 struct obj *
 getobj(const char *word,
@@ -1511,26 +1512,28 @@ getobj(const char *word,
     struct _cmd_queue *cmdq = cmdq_pop();
 
     if (cmdq && cmdq->typ != CMDQ_USER_INPUT) {
+        int v;
+
         /* it's not a key, abort */
         if (cmdq->typ != CMDQ_KEY) {
             free(cmdq);
-            return (struct obj *)0;
+            return (struct obj *) 0;
         }
-
         for (otmp = g.invent; otmp; otmp = otmp->nobj)
             if (otmp->invlet == cmdq->key) {
-                int v = (*obj_ok)(otmp);
-
-                if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY) {
-                    free(cmdq);
-                    return otmp;
-                }
+                v = (*obj_ok)(otmp);
+                if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
+                    break;
             }
-
-        /* did not find the object, abort */
+        if (!otmp) {
+            v = (*obj_ok)((struct obj *) 0);
+            if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
+                otmp = (struct obj *) &cg.zeroobj; /* cast away const */
+        }
         free(cmdq);
-        cmdq_clear();
-        return (struct obj *)0;
+        if (!otmp)
+            cmdq_clear();
+        return otmp;
     }
     if (cmdq)
         free(cmdq);
