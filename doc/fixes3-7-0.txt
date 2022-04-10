@@ -1371,6 +1371,7 @@ X11: with 'slow' resource set to False, the pop up yn_function didn't always
 X11: (possibly X11+OSX): if persistent inventory was displayed at time of
 	end-of-game prompting, prompting would stall until that window was
 	manually dismissed
+X11: set all selectable menu lines to the same length, left justified
 
 
 General New Features
