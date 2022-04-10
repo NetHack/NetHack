@@ -432,8 +432,9 @@ const struct instance_globals g_init = {
     NULL, /* invbuf */
     0, /* inbufsize */
     WIN_ERR, /* cached_pickinv_win */
-    UNDEFINED_VALUE,
-    UNDEFINED_VALUES,
+    0, /* this_type */
+    NULL, /* this_title */
+    UNDEFINED_VALUES, /* only (coord) */
 
     /* light.c */
     NULL, /* light_source */

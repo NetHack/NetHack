@@ -957,6 +957,7 @@ struct instance_globals {
     winid cached_pickinv_win;
     /* query objlist callback: return TRUE if obj type matches "this_type" */
     int this_type;
+    const char *this_title; /* title for inventory list of specific type */
     /* query objlist callback: return TRUE if obj is at given location */
     coord only;
 

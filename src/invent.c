@@ -3503,20 +3503,25 @@ this_type_only(struct obj *obj)
 int
 dotypeinv(void)
 {
+    static const char
+        prompt[] = "What type of object do you want an inventory of?";
     char c = '\0';
     int n, i = 0;
-    char *extra_types, types[BUFSZ];
+    char *extra_types, types[BUFSZ], title[QBUFSZ];
+    const char *before = "", *after = "";
     int class_count, oclass, unpaid_count, itemcount;
     int bcnt, ccnt, ucnt, xcnt, ocnt, jcnt;
     boolean billx = *u.ushops && doinvbill(0);
     menu_item *pick_list;
     boolean traditional = TRUE;
-    const char *prompt = "What type of object do you want an inventory of?";
 
+    g.this_type = 0;
+    g.this_title = NULL;
     if (!g.invent && !billx) {
         You("aren't carrying anything.");
-        return ECMD_OK;
+        goto doI_done;
     }
+    title[0] = '\0';
     unpaid_count = count_unpaid(g.invent);
     tally_BUCX(g.invent, FALSE, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt, &jcnt);
 
@@ -3540,7 +3545,7 @@ dotypeinv(void)
             i |= INCLUDE_VENOM;
             n = query_category(prompt, g.invent, i, &pick_list, PICK_ONE);
             if (!n)
-                return ECMD_OK;
+                goto doI_done;
             g.this_type = c = pick_list[0].item.a_int;
             free((genericptr_t) pick_list);
         }
@@ -3551,7 +3556,7 @@ dotypeinv(void)
         class_count = collect_obj_classes(types, g.invent, FALSE,
                                           (boolean (*)(OBJ_P)) 0,
                                           &itemcount);
-        if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0)
+        if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0 || jcnt)
             types[class_count++] = ' ';
         if (unpaid_count)
             types[class_count++] = 'u';
@@ -3597,7 +3602,7 @@ dotypeinv(void)
             savech(c);
             if (c == '\0') {
                 clear_nhwindow(WIN_MESSAGE);
-                return ECMD_OK;
+                goto doI_done;
             }
         } else {
             /* only one thing to itemize */
@@ -3615,63 +3620,84 @@ dotypeinv(void)
         else
             pline("No used-up objects%s.",
                   unpaid_count ? " on your shopping bill" : "");
-        return ECMD_OK;
+        goto doI_done;
     }
     if (c == 'u' || (c == 'U' && unpaid_count && !ucnt)) {
         if (unpaid_count)
             dounpaid();
         else
             You("are not carrying any unpaid objects.");
-        return ECMD_OK;
+        goto doI_done;
     }
+
+    if (index("BUCXP", c))
+        oclass = c; /* not a class but understood by this_type_only() */
+    else
+        oclass = def_char_to_objclass(c); /* change to object class */
+#if 0
+    /* this used to be done for the 'if traditional' case but not for the
+       menu case; also unlike '$', 'I$' explicitly asks about inventory,
+       so we no longer handle coin class differently from other classes */
+    if (oclass == COIN_CLASS) {
+        return doprgold();
+    }
+#endif
+    /* these are used for traditional when not applicable and also for
+       constructing a title to be used by query_objlist() */
+    switch (c) {
+    case 'B':
+        before = "known to be blessed ";
+        break;
+    case 'U':
+        before = "known to be uncursed ";
+        break;
+    case 'C':
+        before = "known to be cursed ";
+        break;
+    case 'X':
+        after = " whose blessed/uncursed/cursed status is unknown";
+        break; /* better phrasing is desirable */
+    case 'P':
+        after = " that were just picked up";
+        break;
+    default:
+        /* 'c' is an object class, because we've already handled
+           all the non-class letters which were put into 'types[]';
+           could/should move object class names[] array from below
+           to somewhere above so that we can access it here (via
+           lcase(strcpy(classnamebuf, names[(int) c]))), but the
+           game-play value of doing so is low... */
+        before = "such ";
+        break;
+    }
+
     if (traditional) {
-        if (index("BUCXP", c))
-            oclass = c; /* not a class but understood by this_type_only() */
-        else
-            oclass = def_char_to_objclass(c); /* change to object class */
-
-        if (oclass == COIN_CLASS)
-            return doprgold();
         if (index(types, c) > index(types, '\033')) {
-            /* '> ESC' => hidden choice, something known not to be carried */
-            const char *before = "", *after = "";
-
-            switch (c) {
-            case 'B':
-                before = "known to be blessed ";
-                break;
-            case 'U':
-                before = "known to be uncursed ";
-                break;
-            case 'C':
-                before = "known to be cursed ";
-                break;
-            case 'X':
-                after = " whose blessed/uncursed/cursed status is unknown";
-                break; /* better phrasing is desirable */
-            case 'P':
-                after = " that were just picked up";
-                break;
-            default:
-                /* 'c' is an object class, because we've already handled
-                   all the non-class letters which were put into 'types[]';
-                   could/should move object class names[] array from below
-                   to somewhere above so that we can access it here (via
-                   lcase(strcpy(classnamebuf, names[(int) c]))), but the
-                   game-play value of doing so is low... */
-                before = "such ";
-                break;
-            }
             You("have no %sobjects%s.", before, after);
-            return ECMD_OK;
+            goto doI_done;
         }
-        g.this_type = oclass;
+        g.this_type = oclass; /* extra input for this_type_only() */
     }
+    if (index("BUCXP", c)) {
+        /* the before and after phrases for "you have no..." can both be
+           treated as mutually-exclusive suffices when creating a title */
+        Sprintf(title, "Items %s", (before && *before) ? before : after);
+        /* get rid of trailing space from 'before' and double-space from
+           'after's leading space */
+        (void) mungspaces(title);
+        Strcat(title, ":"); /* after removing unwanted trailing space */
+        g.this_title = title;
+    }
+
     if (query_objlist((char *) 0, &g.invent,
                       ((flags.invlet_constant ? USE_INVLET : 0)
                        | INVORDER_SORT | INCLUDE_VENOM),
                       &pick_list, PICK_NONE, this_type_only) > 0)
         free((genericptr_t) pick_list);
+
+ doI_done:
+    g.this_type = 0;
+    g.this_title = NULL;
     return ECMD_OK;
 }
 
