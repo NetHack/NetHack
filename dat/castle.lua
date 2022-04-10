@@ -140,14 +140,15 @@ des.object(object[4],53,11)
 des.object(object[4],54,11)
 des.object(object[4],55,11)
 -- THE WAND OF WISHING in 1 of the 4 towers
-des.object({ id = "chest", trapped = 0, locked = 1, coord = place:rndcoord(1),
+local loc = place:rndcoord(1);
+des.object({ id = "chest", trapped = 0, locked = 1, coord = loc ,
              contents = function()
                 des.object("wishing");
              end
 });
 -- Prevent monsters from eating it.  (@'s never eat objects)
-des.engraving({ x = px, y = py, type="burn", text="Elbereth" })
-des.object({ id = "scare monster", x = px, y = py, buc="cursed" })
+des.engraving({ coord = loc, type="burn", text="Elbereth" })
+des.object({ id = "scare monster", coord = loc, buc="cursed" })
 -- The treasure of the lord
 des.object("chest",37,08)
 -- Traps
