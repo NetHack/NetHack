@@ -2501,6 +2501,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 enum item_action_actions {
     IA_NONE          = 0,
+    IA_UNWIELD, /* hack for 'w-' */
     IA_APPLY_OBJ,
     IA_DIP_OBJ,
     IA_DROP_OBJ,
@@ -2513,13 +2514,13 @@ enum item_action_actions {
     IA_RUB_OBJ,
     IA_THROW_OBJ,
     IA_TAKEOFF_OBJ,
+    IA_TIP_CONTAINER,
     IA_INVOKE_OBJ,
     IA_WIELD_OBJ,
     IA_WEAR_OBJ,
     IA_SWAPWEAPON,
     IA_ZAP_OBJ,
     IA_SACRIFICE,
-    IA_UNWIELD
 };
 
 static void
@@ -2567,8 +2568,10 @@ itemactions(struct obj *otmp)
     else if (otmp->otyp == GRAPPLING_HOOK)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Grapple something with this hook");
     else if (otmp->otyp == BAG_OF_TRICKS && objects[otmp->otyp].oc_name_known)
+        /* bag of tricks skips this unless discovered */
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Reach into this bag");
-    else if (Is_container(otmp) || otmp->otyp == BAG_OF_TRICKS)
+    else if (Is_container(otmp))
+        /* bag of tricks gets here only if not yet discovered */
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Open this container");
     else if (otmp->otyp == CAN_OF_GREASE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Use the can to grease an item");
@@ -2613,11 +2616,13 @@ itemactions(struct obj *otmp)
     else if (otmp->otyp == EXPENSIVE_CAMERA)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Take a photograph");
     else if (otmp->otyp == TOWEL)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Clean yourself off with this towel");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a',
+                   "Clean yourself off with this towel");
     else if (otmp->otyp == CRYSTAL_BALL)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Peer into this crystal ball");
     else if (otmp->otyp == MAGIC_MARKER)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Write on something with this marker");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a',
+                   "Write on something with this marker");
     else if (otmp->otyp == FIGURINE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Make this figurine transform");
     else if (otmp->otyp == UNICORN_HORN)
@@ -2726,9 +2731,13 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_THROW_OBJ, 't', buf);
     }
 
-    /* T: take off armor */
+    /* T: take off armor, tip carried container */
     if (otmp->owornmask & W_ARMOR)
         ia_addmenu(win, IA_TAKEOFF_OBJ, 'T', "Take off this armor");
+    if ((Is_container(otmp) && (Has_contents(otmp) || !otmp->cknown))
+        || (otmp->otyp == HORN_OF_PLENTY && (otmp->spe > 0 || !otmp->known)))
+        ia_addmenu(win, IA_TIP_CONTAINER, 'T',
+                   "Tip all the contents out of this container");
 
     /* V: invoke */
     if ((otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known) ||
@@ -2758,9 +2767,11 @@ itemactions(struct obj *otmp)
 
     /* x: Swap main and readied weapon */
     if (otmp == uwep && uswapwep)
-        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your alternate weapon");
+        ia_addmenu(win, IA_SWAPWEAPON, 'x',
+                   "Swap this with your alternate weapon");
     else if (otmp == uwep)
-        ia_addmenu(win, IA_SWAPWEAPON, 'x', "Ready this as an alternate weapon");
+        ia_addmenu(win, IA_SWAPWEAPON, 'x',
+                   "Ready this as an alternate weapon");
     else if (otmp == uswapwep)
         ia_addmenu(win, IA_SWAPWEAPON, 'x', "Swap this with your main weapon");
 
@@ -2791,6 +2802,10 @@ itemactions(struct obj *otmp)
         default:
             impossible("Unknown item action");
         case IA_NONE:
+            break;
+        case IA_UNWIELD:
+            cmdq_add_ec(dowield);
+            cmdq_add_key('-');
             break;
         case IA_APPLY_OBJ:
             cmdq_add_ec(doapply);
@@ -2842,6 +2857,10 @@ itemactions(struct obj *otmp)
             cmdq_add_ec(dotakeoff);
             cmdq_add_key(otmp->invlet);
             break;
+        case IA_TIP_CONTAINER:
+            cmdq_add_ec(dotip);
+            cmdq_add_key(otmp->invlet);
+            break;
         case IA_INVOKE_OBJ:
             cmdq_add_ec(doinvoke);
             cmdq_add_key(otmp->invlet);
@@ -2864,10 +2883,6 @@ itemactions(struct obj *otmp)
         case IA_SACRIFICE:
             cmdq_add_ec(dosacrifice);
             cmdq_add_key(otmp->invlet);
-            break;
-        case IA_UNWIELD:
-            cmdq_add_ec(dowield);
-            cmdq_add_key('-');
             break;
         }
     } else
