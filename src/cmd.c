@@ -4492,6 +4492,7 @@ enum menucmd {
     MCMD_SEARCH,
     MCMD_LOOK_TRAP,
     MCMD_UNTRAP_TRAP,
+    MCMD_MOVE_DIR,
     MCMD_RIDE,
     MCMD_REMOVE_SADDLE,
     MCMD_APPLY_SADDLE,
@@ -4665,7 +4666,7 @@ there_cmd_menu_next2u(winid win, int x, int y, int mod, int *act)
         if (ttmp->ttyp != VIBRATING_SQUARE)
             mcmd_addmenu(win, MCMD_UNTRAP_TRAP,
                                  "Attempt to disarm trap"), ++K;
-        /* TODO: "Step on the <trap>" */
+        mcmd_addmenu(win, MCMD_MOVE_DIR, "Move on the trap"), ++K;
     }
 
     mtmp = m_at(x, y);
@@ -4842,6 +4843,9 @@ there_cmd_menu(int x, int y, int mod)
         case MCMD_UNTRAP_TRAP:
             cmdq_add_ec(dountrap);
             cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_MOVE_DIR:
+            cmdq_add_ec(move_funcs[xytod(dx, dy)][MV_WALK]);
             break;
         case MCMD_RIDE:
             cmdq_add_ec(doride);
