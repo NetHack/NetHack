@@ -267,19 +267,16 @@ struct console_t {
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 };
 
-static DWORD ccount, acount;
-#ifndef CLR_MAX
-#define CLR_MAX 16
-#endif
+static const char default_name[] = "default";
+const char *const legal_key_handling[] = {
+    "none",
+    "default",
+    "ray",
+    "340",
+};
 
-int ttycolors[CLR_MAX];
-int ttycolors_inv[CLR_MAX];
-
-#define MAX_OVERRIDES 256
-unsigned char key_overrides[MAX_OVERRIDES];
-static char nullstr[] = "";
-char erase_char, kill_char;
-#define DEFTEXTCOLOR ttycolors[7]
+enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling, ray_keyhandling,
+                                     nh340_keyhandling };
 
 int default_processkeystroke(HANDLE, INPUT_RECORD *, boolean *, boolean, int);
 int default_kbhit(HANDLE, INPUT_RECORD *);
@@ -297,19 +294,32 @@ int nh340_checkinput(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                        int, int *, coord *);
 
 struct keyboard_handling_t {
-    char *pKeyHandlingName;
+    enum windows_key_handling khid;
     int (*pProcessKeystroke)(HANDLE, INPUT_RECORD *, boolean *,
                                           boolean, int);
     int (*pNHkbhit)(HANDLE, INPUT_RECORD *);
     int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                                    int, int *, coord *);
 } keyboard_handling = {
-    "none",
+    no_keyhandling,
     default_processkeystroke,
     default_kbhit,
     default_checkinput
 };
 
+static DWORD ccount, acount;
+#ifndef CLR_MAX
+#define CLR_MAX 16
+#endif
+
+int ttycolors[CLR_MAX];
+int ttycolors_inv[CLR_MAX];
+
+#define MAX_OVERRIDES 256
+unsigned char key_overrides[MAX_OVERRIDES];
+static char nullstr[] = "";
+char erase_char, kill_char;
+#define DEFTEXTCOLOR ttycolors[7]
 static INPUT_RECORD bogus_key;
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
@@ -2922,15 +2932,6 @@ nh340_numpad[PADKEYS] = {
 
 static struct pad keypad[PADKEYS], numpad[PADKEYS];
 static BYTE KeyState[256];
-static const char default_name[] = "default";
-const char *const legal_key_handling[] = {
-    "none",
-    "default",
-    "ray",
-    "340",
-};
-enum windows_key_handling keyh[] = { no_keyhandling, default_keyhandling, ray_keyhandling,
-                                     nh340_keyhandling };
 
 void set_altkeyhandling(const char *inName)
 {
@@ -2938,22 +2939,18 @@ void set_altkeyhandling(const char *inName)
     /*backward compatibility - so people's existing config files
       may work as is */
     if (!strcmpi(inName, "nhraykey.dll"))
-        inName = legal_key_handling[ray_keyhandling];
+         inName = legal_key_handling[ray_keyhandling];
     else if (!strcmpi(inName, "nh340key.dll"))
-        inName = legal_key_handling[nh340_keyhandling];
+         inName = legal_key_handling[nh340_keyhandling];
     else if (!strcmpi(inName, "nhdefkey.dll"))
-        inName = legal_key_handling[default_keyhandling];
+         inName = legal_key_handling[default_keyhandling];
 
     for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
         if (!strcmpi(inName, legal_key_handling[i])) {
             iflags.key_handling = keyh[i];
-            if (keyboard_handling.pKeyHandlingName) {
-                free((genericptr_t) keyboard_handling.pKeyHandlingName);
-                keyboard_handling.pKeyHandlingName = (char *) 0;
-            }
             switch(iflags.key_handling) {
             case ray_keyhandling:
-                keyboard_handling.pKeyHandlingName = strdup("ray");
+                keyboard_handling.khid = ray_keyhandling;
                 keyboard_handling.pProcessKeystroke = ray_processkeystroke;
                 keyboard_handling.pNHkbhit = ray_kbhit;
                 keyboard_handling.pCheckInput = ray_checkinput;
@@ -2972,7 +2969,7 @@ void set_altkeyhandling(const char *inName)
                 }
                 break;
             case nh340_keyhandling:
-                keyboard_handling.pKeyHandlingName = strdup("340");
+                keyboard_handling.khid = nh340_keyhandling;
                 keyboard_handling.pProcessKeystroke = nh340_processkeystroke;
                 keyboard_handling.pNHkbhit = nh340_kbhit;
                 keyboard_handling.pCheckInput = nh340_checkinput;
@@ -2983,7 +2980,7 @@ void set_altkeyhandling(const char *inName)
                 break;
             case default_keyhandling:
             default:
-                keyboard_handling.pKeyHandlingName = strdup("default");
+                keyboard_handling.khid = default_keyhandling;
                 keyboard_handling.pProcessKeystroke
                                             = default_processkeystroke;
                 keyboard_handling.pNHkbhit = default_kbhit;
