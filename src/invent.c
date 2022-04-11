@@ -2545,6 +2545,7 @@ itemactions(struct obj *otmp)
     menu_item *selected;
     struct monst *mtmp;
     const char *light = otmp->lamplit ? "Extinguish" : "Light";
+    boolean already_worn = (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) != 0;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
@@ -2638,8 +2639,11 @@ itemactions(struct obj *otmp)
     else if (otmp->oclass == WAND_CLASS)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Break this wand");
 
-    /* d: drop item, works on everything */
-    ia_addmenu(win, IA_DROP_OBJ, 'd', "Drop this item");
+    /* d: drop item, works on everything except worn items; those will
+       always have a takeoff/remove choice so we don't have to worry
+       about the menu maybe being empty when 'd' is suppressed */
+    if (!already_worn)
+        ia_addmenu(win, IA_DROP_OBJ, 'd', "Drop this item");
 
     /* e: eat item */
     if (otmp->otyp == TIN && uwep && uwep->otyp == TIN_OPENER)
@@ -2660,13 +2664,29 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
                    "Write on the floor with this object");
 
+    /* O: offer sacrifice */
+    if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
+        /* FIXME: this doesn't match #offer's likely candidates, which don't
+           include corpses on Astral and don't include amulets off Astral */
+        if (otmp->otyp == CORPSE)
+            ia_addmenu(win, IA_SACRIFICE, 'O',
+                       "Offer this corpse as a sacrifice at this altar");
+        else if (otmp->otyp == AMULET_OF_YENDOR
+                 || otmp->otyp == FAKE_AMULET_OF_YENDOR)
+            ia_addmenu(win, IA_SACRIFICE, 'O',
+                       "Offer this amulet as a sacrifice at this altar");
+    }
+
     /* p: pay for unpaid utems */
-    if ((mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) &&
-        inhishop(mtmp) && otmp->unpaid)
+    if (otmp->unpaid
+        /* FIXME: should also handle player owned container (so not
+           flagged 'unpaid') holding shop owned items */
+        && (mtmp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE))) != 0
+        && inhishop(mtmp))
         ia_addmenu(win, IA_BUY_OBJ, 'p', "Buy this unpaid item");
 
     /* P: put on accessory */
-    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+    if (!already_worn) {
         if (otmp->oclass == RING_CLASS || otmp->otyp == MEAT_RING)
             ia_addmenu(win, IA_WEAR_OBJ, 'P', "Put this ring on");
         else if (otmp->oclass == AMULET_CLASS)
@@ -2703,7 +2723,7 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_READ_OBJ, 'r', "Study this spellbook");
 
     /* R: remove accessory or rub item */
-    if (otmp->owornmask & (W_RING | W_AMUL | W_TOOL))
+    if (otmp->owornmask & W_ACCESSORY)
         ia_addmenu(win, IA_TAKEOFF_OBJ, 'R', "Remove this accessory");
     if (otmp->otyp == OIL_LAMP || otmp->otyp == MAGIC_LAMP
         || otmp->otyp == BRASS_LANTERN) {
@@ -2713,7 +2733,7 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_RUB_OBJ, 'R', "Rub something on this stone");
 
     /* t: throw item */
-    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+    if (!already_worn) {
         const char *verb = ammo_and_launcher(otmp, uwep) ? "Shoot" : "Throw";
 
         /*
@@ -2740,8 +2760,11 @@ itemactions(struct obj *otmp)
                    "Tip all the contents out of this container");
 
     /* V: invoke */
-    if ((otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known) ||
-        otmp->oartifact || objects[otmp->otyp].oc_unique)
+    if ((otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)
+        || otmp->oartifact || objects[otmp->otyp].oc_unique
+        /* non-artifact crystal balls don't have any unique power but
+           the #invoke command lists them as likely candidates */
+        || otmp->otyp == CRYSTAL_BALL)
         ia_addmenu(win, IA_INVOKE_OBJ, 'V',
                    "Try to invoke a unique power of this object");
 
@@ -2754,13 +2777,13 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Wield this as your weapon");
     else if (otmp->otyp == TIN_OPENER)
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold the tin opener to open tins");
-    else
+    else if (!already_worn)
         /* FIXME: there's no concept of "holding an item" that's any
            different from having it in inventory; 'w' means wield as weapon */
         ia_addmenu(win, IA_WIELD_OBJ, 'w', "Hold this item in your hands");
 
     /* W: wear armor */
-    if (!(otmp->owornmask & (W_ARMOR | W_RING | W_AMUL | W_TOOL))) {
+    if (!already_worn) {
         if (otmp->oclass == ARMOR_CLASS)
             ia_addmenu(win, IA_WEAR_OBJ, 'W', "Wear this armor");
     }
@@ -2778,16 +2801,6 @@ itemactions(struct obj *otmp)
     /* z: Zap wand */
     if (otmp->oclass == WAND_CLASS)
         ia_addmenu(win, IA_ZAP_OBJ, 'z', "Zap this wand to release its magic");
-
-    if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
-        if (otmp->otyp == CORPSE)
-            ia_addmenu(win, IA_SACRIFICE, 'O',
-                       "Offer this corpse as a sacrifice at this altar");
-        else if (otmp->otyp == AMULET_OF_YENDOR
-                 || otmp->otyp == FAKE_AMULET_OF_YENDOR)
-            ia_addmenu(win, IA_SACRIFICE, 'O',
-                       "Offer this amulet as a sacrifice at this altar");
-    }
 
     Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
     end_menu(win, buf);
