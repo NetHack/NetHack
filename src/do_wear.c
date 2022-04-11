@@ -1700,7 +1700,7 @@ dotakeoff(void)
             pline("Not wearing any armor or accessories.");
         return ECMD_OK;
     }
-    if (Narmorpieces != 1 || ParanoidRemove || g.command_queue)
+    if (Narmorpieces != 1 || ParanoidRemove || cmdq_peek())
         otmp = getobj("take off", takeoff_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return ECMD_CANCEL;
@@ -1719,7 +1719,7 @@ doremring(void)
         pline("Not wearing any accessories or armor.");
         return ECMD_OK;
     }
-    if (Naccessories != 1 || ParanoidRemove || g.command_queue)
+    if (Naccessories != 1 || ParanoidRemove || cmdq_peek())
         otmp = getobj("remove", remove_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return ECMD_CANCEL;

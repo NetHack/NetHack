@@ -270,7 +270,7 @@ cmdq_add_key(char key)
 void
 cmdq_add_dir(schar dx, schar dy, schar dz)
 {
-    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
     struct _cmd_queue *cq = g.command_queue;
 
     tmp->typ = CMDQ_DIR;
@@ -292,7 +292,7 @@ cmdq_add_dir(schar dx, schar dy, schar dz)
 void
 cmdq_add_userinput(void)
 {
-    struct _cmd_queue *tmp = (struct _cmd_queue *)alloc(sizeof(struct _cmd_queue));
+    struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
     struct _cmd_queue *cq = g.command_queue;
 
     tmp->typ = CMDQ_USER_INPUT;
@@ -320,6 +320,13 @@ cmdq_pop(void)
         tmp->next = NULL;
     }
     return tmp;
+}
+
+/* get the top entry without popping it */
+struct _cmd_queue *
+cmdq_peek(void)
+{
+    return g.command_queue;
 }
 
 /* clear all commands from the command queue */

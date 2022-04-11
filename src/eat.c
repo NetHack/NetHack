@@ -3401,8 +3401,9 @@ tin_ok(struct obj *obj)
  * Object may be either on floor or in inventory.
  */
 struct obj *
-floorfood(const char *verb,
-          int corpsecheck) /* 0, no check, 1, corpses, 2, tinnable corpses */
+floorfood(
+    const char *verb,
+    int corpsecheck) /* 0, no check, 1, corpses, 2, tinnable corpses */
 {
     register struct obj *otmp;
     char qbuf[QBUFSZ];
@@ -3411,8 +3412,10 @@ floorfood(const char *verb,
     boolean feeding = !strcmp(verb, "eat"),        /* corpsecheck==0 */
             offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
-    /* if we can't touch floor objects then use invent food only */
-    if (iflags.menu_requested /* command was preceded by 'm' prefix */
+    /* if we can't touch floor objects then use invent food only;
+       same if 'm' prefix was used or we're executing an item action
+       for context-sensitive inventory */
+    if (iflags.menu_requested || cmdq_peek()
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
             && (Wwalking || is_clinger(uptr) || (Flying && !Breathless))))
