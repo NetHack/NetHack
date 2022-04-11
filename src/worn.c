@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static void m_lose_armor(struct monst *, struct obj *);
+static void clear_bypass(struct obj *);
 static void m_dowear_type(struct monst *, long, boolean, boolean);
 static int extra_pref(struct monst *, struct obj *);
 
@@ -786,11 +787,25 @@ m_lose_armor(struct monst *mon, struct obj *obj)
     newsym(mon->mx, mon->my);
 }
 
-/* all objects with their bypass bit set should now be reset to normal */
+/* clear bypass bits for an object chain, plus contents if applicable */
+static void
+clear_bypass(struct obj *objchn)
+{
+    struct obj *o;
+
+    for (o = objchn; o; o = o->nobj) {
+        o->bypass = 0;
+        if (Has_contents(o))
+            clear_bypass(o->cobj);
+    }
+}
+
+/* all objects with their bypass bit set should now be reset to normal;
+   this can be a relatively expensive operation so is only called if
+   g.context.bypasses is set */
 void
 clear_bypasses(void)
 {
-    struct obj *otmp, *nobj;
     struct monst *mtmp;
 
     /*
@@ -800,41 +815,15 @@ clear_bypasses(void)
      * bypassed.
      */
 
-    for (otmp = fobj; otmp; otmp = nobj) {
-        nobj = otmp->nobj;
-        if (otmp->bypass) {
-            otmp->bypass = 0;
-
-            /* bypass will have inhibited any stacking, but since it's
-             * used for polymorph handling, the objects here probably
-             * have been transformed and won't be stacked in the usual
-             * manner afterwards; so don't bother with this.
-             * [Changing the fobj chain mid-traversal would also be risky.]
-             */
-#if 0
-            if (objects[otmp->otyp].oc_merge) {
-                xchar ox, oy;
-
-                (void) get_obj_location(otmp, &ox, &oy, 0);
-                stack_object(otmp);
-                newsym(ox, oy);
-            }
-#endif /*0*/
-        }
-    }
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        otmp->bypass = 0;
-    for (otmp = g.migrating_objs; otmp; otmp = otmp->nobj)
-        otmp->bypass = 0;
-    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj)
-        otmp->bypass = 0;
-    for (otmp = g.billobjs; otmp; otmp = otmp->nobj)
-        otmp->bypass = 0;
+    clear_bypass(fobj);
+    clear_bypass(g.invent);
+    clear_bypass(g.migrating_objs);
+    clear_bypass(g.level.buriedobjlist);
+    clear_bypass(g.billobjs);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
-        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-            otmp->bypass = 0;
+        clear_bypass(mtmp->minvent);
         /* long worm created by polymorph has mon->mextra->mcorpsenm set
            to PM_LONG_WORM to flag it as not being subject to further
            polymorph (so polymorph zap won't hit monster to transform it
@@ -844,22 +833,21 @@ clear_bypasses(void)
             MCORPSENM(mtmp) = NON_PM;
     }
     for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
-        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-            otmp->bypass = 0;
+        clear_bypass(mtmp->minvent);
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
     /* this is a no-op since mydogs is only non-Null during level change or
        final ascension and we aren't called at those times, but be thorough */
     for (mtmp = g.mydogs; mtmp; mtmp = mtmp->nmon)
-        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
-            otmp->bypass = 0;
-
-    /* ball can be "floating", not on any chain */
+        clear_bypass(mtmp->minvent);
+    /* ball and chain can be "floating", not on any object chain (when
+       hero is swallowed by an engulfing monster, for instance) */
     if (uball)
         uball->bypass = 0;
+    if (uchain)
+        uchain->bypass = 0;
 
-    /* g.billobjs and g.mydogs chains don't matter here */
     g.context.bypasses = FALSE;
 }
 

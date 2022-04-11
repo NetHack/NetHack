@@ -2697,10 +2697,10 @@ stash_ok(struct obj *obj)
 }
 
 int
-use_container(struct obj **objp,
-              int held,
-              boolean more_containers) /* True iff #loot multiple and this
-                                          isn't last one */
+use_container(
+    struct obj **objp,
+    int held,
+    boolean more_containers) /* True iff #loot multiple and this isn't last */
 {
     struct obj *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,
@@ -2817,7 +2817,8 @@ use_container(struct obj **objp,
             } else {
                 c = in_or_out_menu(qbuf, g.current_container,
                                    outmaybe, inokay,
-                                   (boolean) (used != ECMD_OK), more_containers);
+                                   (boolean) (used != ECMD_OK),
+                                   more_containers);
             }
         } else { /* TRADITIONAL or COMBINATION */
             xbuf[0] = '\0'; /* list of extra acceptable responses */

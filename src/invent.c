@@ -2051,15 +2051,16 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
  * Walk through the chain starting at objchn and ask for all objects
  * with olet in olets (if nonNULL) and satisfying ckfn (if nonnull)
  * whether the action in question (i.e., fn) has to be performed.
- * If allflag then no questions are asked.  Mx gives the max number
- * of objects to be treated.  Return the number of objects treated.
  */
 int
-askchain(struct obj **objchn, /* *objchn might change */
-         const char *olets,   /* olets is an Obj Class char array */
-         int allflag,
-         int (*fn)(OBJ_P), int (*ckfn)(OBJ_P),
-         int mx, const char *word)
+askchain(
+    struct obj **objchn, /* *objchn might change */
+    const char *olets,   /* olets is an Obj Class char array */
+    int allflag,         /* bypass prompting about individual items */
+    int (*fn)(OBJ_P),    /* action to perform on selected items */
+    int (*ckfn)(OBJ_P),  /* callback to decided if an item is selectable */
+    int mx,              /* if non-0, maximum number of objects to process */
+    const char *word)    /* name of the action */
 {
     struct obj *otmp, *otmpo;
     char sym, ilet;
@@ -2202,7 +2203,10 @@ askchain(struct obj **objchn, /* *objchn might change */
         pline("No applicable objects.");
  ret:
     unsortloot(&sortedchn);
-    bypass_objlist(*objchn, FALSE);
+    /* can't just clear bypass bit of items in objchn because the action
+       applied to selected ones might move them to a different chain */
+    /*bypass_objlist(*objchn, FALSE);*/
+    clear_bypasses();
     return cnt;
 }
 

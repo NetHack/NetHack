@@ -877,6 +877,9 @@ restoring while attached ball or chain is on floor in a breach of a shop wall
 	might trigger an impossible about being positioned too far from hero
 don't try to catch up for lost time for shop damage repair in restdamage()
 	called from getlev(); let normal shopkeeper movement take care of it
+putting objects into a container with menustyle=traditional and then taking
+	them back out with #tip would result in complaints about obj bypass
+	bit being set if sanity_check was On
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
