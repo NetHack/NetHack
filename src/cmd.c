@@ -4515,6 +4515,7 @@ enum menucmd {
     MCMD_UNTRAP_HERE,
     MCMD_OFFER,
     MCMD_INVENTORY,
+    MCMD_CAST_SPELL,
 
     MCMD_THROW_OBJ,
     MCMD_TRAVEL,
@@ -4605,6 +4606,9 @@ there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
     mcmd_addmenu(win, MCMD_REST, "Rest one turn"), ++K;
     mcmd_addmenu(win, MCMD_SEARCH, "Search around you"), ++K;
     mcmd_addmenu(win, MCMD_LOOK_HERE, "Look at what is here"), ++K;
+
+    if (num_spells() > 0)
+        mcmd_addmenu(win, MCMD_CAST_SPELL, "Cast a spell"), ++K;
 
     if ((ttmp = t_at(x, y)) != 0 && ttmp->tseen) {
         if (ttmp->ttyp != VIBRATING_SQUARE)
@@ -4923,6 +4927,9 @@ there_cmd_menu(int x, int y, int mod)
         case MCMD_OFFER:
             cmdq_add_ec(dosacrifice);
             cmdq_add_userinput();
+            break;
+        case MCMD_CAST_SPELL:
+            cmdq_add_ec(docast);
             break;
         default: break;
         }
