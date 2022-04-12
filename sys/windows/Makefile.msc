@@ -630,10 +630,8 @@ rc=Rc.exe
 #
 # Recently tested versions:
 #NMAKE version 1416270470 from latest VS 2017 (Apr 12, 2022 version 15.9.46)
-#NMAKE version 1429301390 from latest VS 2019 (Apr 12, 2022 version 16.11.12)
-#NMAKE version 1431311050 from latest VS 2022 (Apr 12, 2022 version 17.1.4)
-
-
+#NMAKE version 1429301421 from latest VS 2019 (Apr 12, 2022 version 16.11.12)
+#NMAKE version 1431311062 from latest VS 2022 (Apr 12, 2022 version 17.1.4)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
