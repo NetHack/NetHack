@@ -2612,9 +2612,12 @@ itemactions(struct obj *otmp)
     } else if (otmp->otyp == POT_OIL && objects[otmp->otyp].oc_name_known) {
         Sprintf(buf, "%s this oil", light);
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
-    } else if (otmp->oclass == POTION_CLASS)
-        ia_addmenu(win, IA_DIP_OBJ, 'a', "Dip something into this potion");
-    else if (otmp->otyp == EXPENSIVE_CAMERA)
+    } else if (otmp->oclass == POTION_CLASS) {
+        /* FIXME? this should probably be moved to 'D' rather than be 'a' */
+        Sprintf(buf, "Dip something into %s potion%s",
+                is_plural(otmp) ? "one of these" : "this", plur(otmp->quan));
+        ia_addmenu(win, IA_DIP_OBJ, 'a', buf);
+    } else if (otmp->otyp == EXPENSIVE_CAMERA)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Take a photograph");
     else if (otmp->otyp == TOWEL)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
@@ -2825,8 +2828,9 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         case IA_DIP_OBJ:
-            cmdq_add_ec(dodip);
-            cmdq_add_userinput();
+            /*cmdq_add_ec(dodip);*/
+            /*cmdq_add_userinput();*/
+            cmdq_add_ec(dip_into);
             cmdq_add_key(otmp->invlet);
             break;
         case IA_DROP_OBJ:

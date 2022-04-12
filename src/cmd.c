@@ -2554,7 +2554,8 @@ struct ext_func_tab extcmdlist[] = {
             do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
 
     /* internal commands: only used by game core, not available for user */
-    { '\0',   "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
+    { '\0', "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
+    { '\0', "altdip", NULL, dip_into, INTERNALCMD, NULL },
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 

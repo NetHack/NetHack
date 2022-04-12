@@ -40,6 +40,7 @@ static short mixtype(struct obj *, struct obj *);
 static int dip_ok(struct obj *);
 static void hold_potion(struct obj *, const char *, const char *,
                         const char *);
+static int potion_dip(struct obj *obj, struct obj *potion);
 
 /* force `val' to be within valid range for intrinsic timeout value */
 static long
@@ -1037,13 +1038,13 @@ peffect_gain_level(struct obj *otmp)
         /* they went up a level */
         if ((ledger_no(&u.uz) == 1 && u.uhave.amulet)
             || Can_rise_up(u.ux, u.uy, &u.uz)) {
-            const char *riseup = "rise up, through the %s!";
+            static const char *riseup = "rise up, through the %s!";
 
             if (ledger_no(&u.uz) == 1) {
                 You(riseup, ceiling(u.ux, u.uy));
                 goto_level(&earth_level, FALSE, FALSE, FALSE);
             } else {
-                register int newlev = depth(&u.uz) - 1;
+                int newlev = depth(&u.uz) - 1;
                 d_level newlevel;
 
                 get_level(&newlevel, newlev);
@@ -2170,15 +2171,13 @@ hold_potion(struct obj *potobj, const char *drop_fmt, const char *drop_arg,
     return;
 }
 
-/* #dip command */
+/* #dip command - get item to dip, then get potion to dip it into */
 int
 dodip(void)
 {
     static const char Dip_[] = "Dip ";
-    register struct obj *potion, *obj;
-    struct obj *singlepotion;
+    struct obj *potion, *obj;
     uchar here;
-    short mixture;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
 
@@ -2237,11 +2236,47 @@ dodip(void)
     }
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
-    Snprintf(qbuf, sizeof(qbuf), "dip %s into",
+    Snprintf(qbuf, sizeof qbuf, "dip %s into",
              flags.verbose ? obuf : shortestname);
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
         return ECMD_CANCEL;
+    return potion_dip(obj, potion);
+}
+
+/* #altdip - for context-sensitive inventory item-action;
+   potion already selected */
+int
+dip_into(void)
+{
+    struct obj *obj, *potion;
+    char qbuf[QBUFSZ];
+
+    if (!cmdq_peek())
+        panic("dip_into: where is potion?");
+    potion = getobj("dip", drink_ok, GETOBJ_NOFLAGS);
+    if (!potion || potion->oclass != POTION_CLASS)
+        return ECMD_CANCEL;
+
+    /* "What do you want to dip into <the potion>? [abc or ?*] " */
+    Snprintf(qbuf, sizeof qbuf, "dip into %s%s",
+             is_plural(potion) ? "one of " : "", thesimpleoname(potion));
+    obj = getobj(qbuf, dip_ok, GETOBJ_PROMPT);
+    if (!obj)
+        return ECMD_CANCEL;
+    if (inaccessible_equipment(obj, "dip", FALSE))
+        return ECMD_OK;
+    return potion_dip(obj, potion);
+}
+
+/* called by dodip() or dip_into() after obj and potion have been chosen */
+static int
+potion_dip(struct obj *obj, struct obj *potion)
+{
+    struct obj *singlepotion;
+    char qbuf[QBUFSZ];
+    short mixture;
+
     if (potion == obj && potion->quan == 1L) {
         pline("That is a potion bottle, not a Klein bottle!");
         return ECMD_OK;

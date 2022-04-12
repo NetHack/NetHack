@@ -2131,6 +2131,7 @@ extern void impact_arti_light(struct obj *, boolean, boolean);
 extern void potionhit(struct monst *, struct obj *, int);
 extern void potionbreathe(struct obj *);
 extern int dodip(void);
+extern int dip_into(void); /* altdip */
 extern void mongrantswish(struct monst **);
 extern void djinni_from_bottle(struct obj *);
 extern struct monst *split_mon(struct monst *, struct monst *);
