@@ -4009,11 +4009,11 @@ rhack(char *cmd)
                    doextcmd() notifies us what that was via ext_tlist;
                    other commands leave it Null */
                 if (g.ext_tlist)
-                    tlist = g.ext_tlist;
+                    tlist = g.ext_tlist, g.ext_tlist = NULL;
 
-                if ((tlist->flags & PREFIXCMD)) {
+                if ((tlist->flags & PREFIXCMD) != 0) {
                     /* it was a prefix command, mark and get another cmd */
-                    if ((res & ECMD_CANCEL)) {
+                    if ((res & ECMD_CANCEL) != 0) {
                         /* prefix commands cancel if pressed twice */
                         reset_cmd_vars(TRUE);
                         return;
@@ -4056,17 +4056,14 @@ rhack(char *cmd)
                 prefix_seen = 0;
                 was_m_prefix = FALSE;
             }
-            if ((res & (ECMD_CANCEL|ECMD_FAIL))) {
+            if ((res & (ECMD_CANCEL | ECMD_FAIL)) != 0) {
                 /* command was canceled by user, maybe they declined to
                    pick an object to act on, or command failed to finish */
                 reset_cmd_vars(TRUE);
-                prefix_seen = 0;
-                cmdq_ec = NULL;
-            }
-            if (!(res & ECMD_TIME)) {
+            } else if ((res & ECMD_TIME) != 0) {
+                g.context.move = TRUE;
+            } else { /* ECMD_OK */
                 reset_cmd_vars(FALSE);
-                prefix_seen = 0;
-                cmdq_ec = NULL;
             }
             return;
         }
@@ -5143,7 +5140,7 @@ parse(void)
 
     iflags.in_parse = TRUE;
     g.command_count = 0;
-    g.context.move = 1;
+    g.context.move = TRUE; /* assume next command will take game time */
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
     g.program_state.getting_a_command = 1; /* affects readchar() behavior for

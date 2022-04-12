@@ -2539,7 +2539,6 @@ static int
 itemactions(struct obj *otmp)
 {
     int n, act = IA_NONE;
-    int ret = ECMD_TIME;
     winid win;
     char buf[BUFSZ];
     menu_item *selected;
@@ -2902,11 +2901,12 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         }
-    } else
-        ret = !n ? ECMD_CANCEL : ECMD_OK; /* cancelled */
+    }
     destroy_nhwindow(win);
 
-    return ret;
+    /* finish the 'i' command:  no time elapses and cancelling without
+       selecting an action doesn't matter */
+    return ECMD_OK;
 }
 
 
@@ -2917,12 +2917,11 @@ ddoinv(void)
     struct obj *otmp;
     char c = display_inventory((char *) 0, TRUE);
 
-    if (!c)
-        return ECMD_OK;
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (otmp->invlet == c)
-            return itemactions(otmp);
-
+    if (c && c != '\033') {
+        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+            if (otmp->invlet == c)
+                return itemactions(otmp);
+    }
     return ECMD_OK;
 }
 
