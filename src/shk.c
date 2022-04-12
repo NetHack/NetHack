@@ -19,9 +19,7 @@ static void kops_gone(boolean);
 #define ANGRY(mon) (!NOTANGRY(mon))
 #define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
 
-#define muteshk(shkp)                       \
-    (helpless(shkp) \
-     || (shkp)->data->msound <= MS_ANIMAL)
+#define muteshk(shkp) (helpless(shkp) || (shkp)->data->msound <= MS_ANIMAL)
 
 extern const struct shclass shtypes[]; /* defined in shknam.c */
 
@@ -67,6 +65,7 @@ static void shk_fixes_damage(struct monst *);
 static xchar *litter_getpos(int *, xchar, xchar, struct monst *);
 static void litter_scatter(xchar *, int, xchar, xchar, struct monst *);
 static void litter_newsyms(xchar *, xchar, xchar);
+static int repair_damage(struct monst *, struct damage *, boolean);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
 static void dropped_container(struct obj *, struct monst *, boolean);
@@ -3651,7 +3650,7 @@ shk_fixes_damage(struct monst *shkp)
     else if (!Deaf && shk_closeby)
         You_hear("someone muttering an incantation.");
 
-    (void) repair_damage(shkp, dam);
+    (void) repair_damage(shkp, dam, FALSE);
 
     discard_damage_struct(dam);
 }
@@ -3768,17 +3767,18 @@ litter_newsyms(xchar *litter, xchar x, xchar y)
  * 0: repair postponed, 1: silent repair (no messages), 2: normal repair
  * 3: untrap
  */
-int
+static int
 repair_damage(
     struct monst *shkp,
-    struct damage *tmp_dam)
+    struct damage *tmp_dam,
+    boolean catchup)
 {
     xchar x, y;
     xchar *litter;
     struct obj *otmp;
     struct trap *ttmp;
     int k, disposition = 1;
-    boolean catchup, stop_picking = FALSE;
+    boolean stop_picking = FALSE;
 
     if (!repairable_damage(tmp_dam, shkp))
         return 0;
@@ -3881,11 +3881,26 @@ void
 fix_shop_damage(void)
 {
     struct monst *shkp;
+    struct damage *damg, *nextdamg;
 
+    /* if this level has no shop damage, there's nothing to do */
+    if (!g.level.damagelist)
+        return;
+
+    /* go through all shopkeepers on the level */
     for (shkp = next_shkp(fmon, FALSE); shkp;
          shkp = next_shkp(shkp->nmon, FALSE)) {
-        if (shkp->mcanmove && inhishop(shkp))
-            shk_fixes_damage(shkp);
+        /* if this shopkeeper isn't in his shop or can't move, skip */
+        if (shk_impaired(shkp))
+            continue;
+        /* go through all damage data trying to have this shopkeeper
+           fix it; repair_damage() will only make repairs for damage
+           matching shop controlled by specified shopkeeper */
+        for (damg = g.level.damagelist; damg; damg = nextdamg) {
+            nextdamg = damg->next;
+            if (repair_damage(shkp, damg, TRUE))
+                discard_damage_struct(damg);
+        }
     }
 }
 
