@@ -744,7 +744,8 @@ a menu of several sorting alternatives (which sets a new value for the
 {\it sortdiscoveries\/} option).
 \\
 %.lp ""
-A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+A few other commands (eat food, offer sacrifice, apply tinning-kit,
+drink/quaff, dip) use
 the `{\tt m}' prefix to skip checking for applicable objects on
 the floor and go straight to checking inventory,
 or (for ``{\tt \#loot}'' to remove a saddle),
@@ -972,7 +973,14 @@ For some interfaces, the behavior can be varied via the
 {\it msg\verb+_+window\/} option.
 %.lp
 \item[\tb{q}]
-Quaff (drink) something (potion, water, etc).
+Quaff (drink) something (potion, water, etc).\\
+%.lp ""
+When there is a fountain or sink present, it asks whether to drink
+from that.
+If that is declined, then it offers a chance to choose a potion from
+inventory.
+Precede {\tt q} with the {\tt m} prefix to skip asking about
+drinking from a fountain or sink.
 %.lp
 \item[\tb{Q}]
 Select an object for your quiver, quiver sack, or just generally at
@@ -1317,7 +1325,10 @@ Default key is `{\tt M-C}'.\\
 See the section below entitled ``Conduct'' for details.
 %.lp
 \item[\tb{\#dip}]
-Dip an object into something. Autocompletes. Default key is `{\tt M-d}'.
+Dip an object into something. Autocompletes. Default key is `{\tt M-d}'.\\
+%.lp ""
+The {\tt m} prefix skips dipping into a fountain or pool if there
+is one at your location.
 %.lp
 \item[\tb{\#down}]
 Go down a staircase. Default key is `{\tt >}'.
@@ -1525,7 +1536,10 @@ Show previously displayed game messages. Default key is `{\tt \^{}P}'.
 Put on an accessory (ring, amulet, etc). Default key is `{\tt P}'.
 %.lp
 \item[\tb{\#quaff}]
-Quaff (drink) something. Default key is `{\tt q}'.
+Quaff (drink) something. Default key is `{\tt q}'.\\
+%.lp ""
+The {\tt m} prefix skips drinking from a fountain or sink if there
+is one at your location.
 %.lp
 \item[\tb{\#quit}]
 Quit the program without saving your game. Autocompletes.\\

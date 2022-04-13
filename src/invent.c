@@ -1552,6 +1552,12 @@ getobj(const char *word,
         allownone = TRUE;
         *ap++ = HANDS_SYM;
         break;
+    case GETOBJ_EXCLUDE_NONINVENT: /* player skipped some alternative that's
+                                    * not in inventory, now the hands/self
+                                    * possibility is telling us so */
+        forceprompt = FALSE;
+        inaccess++;
+        break;
     default:
         break;
     }
@@ -1595,6 +1601,7 @@ getobj(const char *word,
             break;
         case GETOBJ_SUGGEST:
             break; /* adding otmp->invlet is all that's needed */
+        case GETOBJ_EXCLUDE_NONINVENT: /* not applicable for invent items */
         default:
             impossible("bad return from getobj callback");
         }

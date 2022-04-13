@@ -42,6 +42,11 @@ static void hold_potion(struct obj *, const char *, const char *,
                         const char *);
 static int potion_dip(struct obj *obj, struct obj *potion);
 
+/* note: (*potn_test)() is for use by drink_ok() which is used to validate
+   potion to drink and also for potion to dip into [reinitialized every time
+   it's used so does not need to be placed in struct instance_globals g] */
+static boolean (*potn_test)(void) = (boolean (*)(void)) 0;
+
 /* force `val' to be within valid range for intrinsic timeout value */
 static long
 itimeout(long val)
@@ -489,6 +494,27 @@ ghost_from_bottle(void)
     g.nomovemsg = "You regain your composure.";
 }
 
+/* for drink_ok() when called for dodrink(); called thru (*potn_test)  */
+static boolean
+could_have_drunk(void)
+{
+    /* caveat: relies on knowing details of dodrink() */
+    return (((IS_FOUNTAIN(levl[u.ux][u.uy].typ)
+              || IS_SINK(levl[u.ux][u.uy].typ))
+             && can_reach_floor(FALSE))
+            || (Underwater && !u.uswallow));
+}
+
+/* for drink_ok() when called for dodip(); called thru (*potn_test)  */
+static boolean
+could_have_dipped(void)
+{
+    /* caveat: relies on knowing details of dodip() */
+    return ((IS_FOUNTAIN(levl[u.ux][u.uy].typ)
+             || is_pool(u.ux, u.uy))
+            && can_reach_floor(FALSE));
+}
+
 /* getobj callback for object to drink from, which also does double duty as
    the callback for dipping into (both just allow potions). */
 static int
@@ -496,6 +522,15 @@ drink_ok(struct obj *obj)
 {
     if (obj && obj->oclass == POTION_CLASS)
         return GETOBJ_SUGGEST;
+
+    /* getobj()'s callback to test whether hands/self is a valid "item" to
+       pick is used here to communicate the fact that player has already
+       passed up an opportunity to perform the action (drink or dip) on a
+       non-inventory dungeon feature, so if there are no potions in invent
+       the message will be "you have nothing /else/ to {drink | dip into}";
+       skip "else" if player used 'm' prefix to bypass dungeon features */
+    if (!obj && !iflags.menu_requested && potn_test && (*potn_test)())
+        return GETOBJ_EXCLUDE_NONINVENT;
 
     return GETOBJ_EXCLUDE;
 }
@@ -505,39 +540,47 @@ drink_ok(struct obj *obj)
 int
 dodrink(void)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (Strangled) {
         pline("If you can't breathe air, how can you drink liquid?");
         return ECMD_OK;
     }
-    /* Is there a fountain to drink from here? */
-    if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
-        /* not as low as floor level but similar restrictions apply */
-        && can_reach_floor(FALSE)) {
-        if (yn("Drink from the fountain?") == 'y') {
-            drinkfountain();
-            return ECMD_TIME;
+
+    /* preceding 'q'/#quaff with 'm' skips the possibility of drinking
+       from fountains, sinks, and surrounding water plus the prompting
+       which those entail */
+    if (!iflags.menu_requested) {
+        /* Is there a fountain to drink from here? */
+        if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
+            /* not as low as floor level but similar restrictions apply */
+            && can_reach_floor(FALSE)) {
+            if (yn("Drink from the fountain?") == 'y') {
+                drinkfountain();
+                return ECMD_TIME;
+            }
         }
-    }
-    /* Or a kitchen sink? */
-    if (IS_SINK(levl[u.ux][u.uy].typ)
-        /* not as low as floor level but similar restrictions apply */
-        && can_reach_floor(FALSE)) {
-        if (yn("Drink from the sink?") == 'y') {
-            drinksink();
-            return ECMD_TIME;
+        /* Or a kitchen sink? */
+        if (IS_SINK(levl[u.ux][u.uy].typ)
+            /* not as low as floor level but similar restrictions apply */
+            && can_reach_floor(FALSE)) {
+            if (yn("Drink from the sink?") == 'y') {
+                drinksink();
+                return ECMD_TIME;
+            }
         }
-    }
-    /* Or are you surrounded by water? */
-    if (Underwater && !u.uswallow) {
-        if (yn("Drink the water around you?") == 'y') {
-            pline("Do you know what lives in this water?");
-            return ECMD_TIME;
+        /* Or are you surrounded by water? */
+        if (Underwater && !u.uswallow) {
+            if (yn("Drink the water around you?") == 'y') {
+                pline("Do you know what lives in this water?");
+                return ECMD_TIME;
+            }
         }
     }
 
+    potn_test = could_have_drunk;
     otmp = getobj("drink", drink_ok, GETOBJ_NOFLAGS);
+    potn_test = (boolean (*)(void)) 0;
     if (!otmp)
         return ECMD_CANCEL;
 
@@ -2186,66 +2229,74 @@ dodip(void)
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
-    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
-    /*
-     * Bypass safe_qbuf() since it doesn't handle varying suffix without
-     * an awful lot of support work.  Format the object once, even though
-     * the fountain and pool prompts offer a lot more room for it.
-     * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
-     * of buffer overflow but drew bug reports because it omits user-
-     * supplied type name.
-     * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
-     */
-    Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
+    /* preceding #dip with 'm' skips the possibility of dipping into
+       fountains and pools plus the prompting which those entail */
+    if (!iflags.menu_requested) {
+        shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
+        /*
+         * Bypass safe_qbuf() since it doesn't handle varying suffix without
+         * an awful lot of support work.  Format the object once, even though
+         * the fountain and pool prompts offer a lot more room for it.
+         * 3.6.0 used thesimpleoname() unconditionally, which posed no risk
+         * of buffer overflow but drew bug reports because it omits user-
+         * supplied type name.
+         * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
+         */
+        Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
                              /* 128 - (24 + 54 + 1) leaves 49 for <object> */
-                             QBUFSZ - sizeof "What do you want to dip \
+                                 QBUFSZ - sizeof "What do you want to dip \
  into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
 
-    here = levl[u.ux][u.uy].typ;
-    /* Is there a fountain to dip into here? */
-    if (IS_FOUNTAIN(here)) {
-        Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
-                 flags.verbose ? obuf : shortestname);
-        /* "Dip <the object> into the fountain?" */
-        if (yn(qbuf) == 'y') {
-            obj->pickup_prev = 0;
-            dipfountain(obj);
-            return ECMD_TIME;
-        }
-    } else if (is_pool(u.ux, u.uy)) {
-        const char *pooltype = waterbody_name(u.ux, u.uy);
-
-        Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
-                 flags.verbose ? obuf : shortestname, pooltype);
-        /* "Dip <the object> into the {pool, moat, &c}?" */
-        if (yn(qbuf) == 'y') {
-            if (Levitation) {
-                floating_above(pooltype);
-            } else if (u.usteed && !is_swimmer(u.usteed->data)
-                       && P_SKILL(P_RIDING) < P_BASIC) {
-                rider_cant_reach(); /* not skilled enough to reach */
-            } else {
+        here = levl[u.ux][u.uy].typ;
+        /* Is there a fountain to dip into here? */
+        if (!can_reach_floor(FALSE)) {
+            ; /* can't dip something into fountain or pool if can't reach */
+        } else if (IS_FOUNTAIN(here)) {
+            Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
+                     flags.verbose ? obuf : shortestname);
+            /* "Dip <the object> into the fountain?" */
+            if (yn(qbuf) == 'y') {
                 obj->pickup_prev = 0;
-                if (obj->otyp == POT_ACID)
-                    obj->in_use = 1;
-                if (water_damage(obj, 0, TRUE) != ER_DESTROYED && obj->in_use)
-                    useup(obj);
+                dipfountain(obj);
+                return ECMD_TIME;
             }
-            return ECMD_TIME;
+        } else if (is_pool(u.ux, u.uy)) {
+            const char *pooltype = waterbody_name(u.ux, u.uy);
+
+            Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
+                     flags.verbose ? obuf : shortestname, pooltype);
+            /* "Dip <the object> into the {pool, moat, &c}?" */
+            if (yn(qbuf) == 'y') {
+                if (Levitation) {
+                    floating_above(pooltype);
+                } else if (u.usteed && !is_swimmer(u.usteed->data)
+                           && P_SKILL(P_RIDING) < P_BASIC) {
+                    rider_cant_reach(); /* not skilled enough to reach */
+                } else {
+                    obj->pickup_prev = 0;
+                    if (obj->otyp == POT_ACID)
+                        obj->in_use = 1;
+                    if (water_damage(obj, 0, TRUE) != ER_DESTROYED
+                        && obj->in_use)
+                        useup(obj);
+                }
+                return ECMD_TIME;
+            }
         }
     }
-
+    potn_test = could_have_dipped; /* augment drink_ok() */
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
     Snprintf(qbuf, sizeof qbuf, "dip %s into",
              flags.verbose ? obuf : shortestname);
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
+    potn_test = (boolean (*)(void)) 0;
     if (!potion)
         return ECMD_CANCEL;
     return potion_dip(obj, potion);
 }
 
 /* #altdip - for context-sensitive inventory item-action;
-   potion already selected */
+   potion already selected and pending in cmdq */
 int
 dip_into(void)
 {
@@ -2254,6 +2305,9 @@ dip_into(void)
 
     if (!cmdq_peek())
         panic("dip_into: where is potion?");
+    potn_test = (boolean (*)(void)) 0; /* not needed for this drink_ok() */
+    /* note: drink_ok() callback for quaffing is also used to validate
+       a potion to dip into */
     potion = getobj("dip", drink_ok, GETOBJ_NOFLAGS);
     if (!potion || potion->oclass != POTION_CLASS)
         return ECMD_CANCEL;

@@ -880,6 +880,8 @@ don't try to catch up for lost time for shop damage repair in restdamage()
 putting objects into a container with menustyle=traditional and then taking
 	them back out with #tip would result in complaints about obj bypass
 	bit being set if sanity_check was On
+when drinking or dipping, allow the 'm' prefix to be used to skip asking
+	about fountains and pools
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -651,7 +651,8 @@ a menu of several sorting alternatives (which sets a new value for the
 .op sortdiscoveries
 option).
 .lp ""
-A few other commands (eat food, offer sacrifice, apply tinning-kit) use
+A few other commands (eat food, offer sacrifice, apply tinning-kit,
+drink/quaff, dip) use
 the \(oq\f(CRm\fP\(cq prefix to skip checking for applicable objects on
 the floor and go straight to checking inventory,
 or (for \(lq#loot\(rq to remove a saddle),
@@ -878,6 +879,13 @@ For some interfaces, the behavior can be varied via the
 option.
 .lp q
 Quaff (drink) something (potion, water, etc).
+.lp ""
+When there is a fountain or sink present, it asks whether to drink
+from that.
+If that is declined, then it offers a chance to choose a potion from
+inventory.
+Precede \(oqq\(cq with the \(oqm\(cq prefix to skip asking about
+drinking from a fountain or sink.
 .lp Q
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).
@@ -1216,6 +1224,9 @@ See the section below entitled \(lqConduct\(rq for details.
 Dip an object into something.
 Autocompletes.
 Default key is \(oqM-d\(cq.
+.lp ""
+The \(oqm\(cq prefix skips dipping into a fountain or pool if there
+is one at your location.
 .lp "#down    "
 Go down a staircase.
 Default key is \(oq>\(cq.
@@ -1419,6 +1430,9 @@ Default key is \(oqP\(cq.
 .lp "#quaff   "
 Quaff (drink) something.
 Default key is \(oqq\(cq.
+.lp ""
+The \(oqm\(cq prefix skips drinking from a fountain or sink if there
+is one at your location.
 .lp "#quit    "
 Quit the program without saving your game.
 Autocompletes.

@@ -2244,7 +2244,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('C'), "conduct", "list voluntary challenges you have maintained",
               doconduct, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
     { M('d'), "dip", "dip an object into something",
-              dodip, AUTOCOMPLETE, NULL },
+              dodip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '>',    "down", "go down a staircase",
               /* allows 'm' prefix (for move without autopickup) but not the
                  g/G/F movement modifiers; not flagged as MOVEMENTCMD because
@@ -2336,7 +2336,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'P',    "puton", "put on an accessory (ring, amulet, etc)",
               doputon, 0, NULL },
     { 'q',    "quaff", "quaff (drink) something",
-              dodrink, 0, NULL },
+              dodrink, CMD_M_PREFIX, NULL },
     { '\0', "quit", "exit without saving current game",
               done2, IFBURIED | AUTOCOMPLETE | GENERALCMD | NOFUZZERCMD,
               NULL },

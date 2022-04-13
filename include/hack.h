@@ -583,7 +583,11 @@ enum getobj_callback_returns {
     /* generally invalid - can't be used for this purpose. will give a "silly
      * thing" message if the player tries to pick it, unless a more specific
      * failure message is in getobj itself - e.g. "You cannot foo gold". */
-    GETOBJ_EXCLUDE = -2,
+    GETOBJ_EXCLUDE = -3,
+    /* invalid because it is not in inventory; used when the hands/self
+     * possibility is queried and the player passed up something on the
+     * floor before getobj. */
+    GETOBJ_EXCLUDE_NONINVENT = -2,
     /* invalid because it is an inaccessible or unwanted piece of gear, but
      * psuedo-valid for the purposes of allowing the player to select it and
      * getobj to return it if there is a prompt instead of getting "silly
