@@ -1146,6 +1146,7 @@ add '#tip' for containers to context-sensitive invent handling
 sequencing confusion: picking an item when viewing inventory and picking an
 	action to do with it caused the inventory command to use time, then
 	on next turn the action was performed without taking any time
+program would access freed memory if charging caused a ring to explode
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
