@@ -65,6 +65,15 @@ static int tin_ok(struct obj *);
 const char *hu_stat[] = { "Satiated", "        ", "Hungry  ", "Weak    ",
                           "Fainting", "Fainted ", "Starved " };
 
+/* used by getobj() callback routines eat_ok()/offer_ok()/tin_ok() to
+   indicate whether player was given an opportunity to eat or offer or
+   tin an item on the floor and declined, in order to insert "else"
+   into the "you don't have anything [else] to {eat | offer | tin}"
+   feedback if hero lacks any suitable items in inventory
+   [reinitialized every time it's used so does not need to be placed
+   in struct instance_globals g for potential bulk reinitialization] */
+static int getobj_else = 0;
+
 /*
  * Decide whether a particular object can be eaten by the possibly
  * polymorphed character.  Not used for monster checks.
@@ -3350,8 +3359,11 @@ newuhs(boolean incr)
 static int
 eat_ok(struct obj *obj)
 {
+    /* 'getobj_else' will be non-zero if floor food is present and
+       player declined to eat that; used to insert "else" into
+       "you don't have anything [else] to eat" if not carrying any food */
     if (!obj)
-        return GETOBJ_EXCLUDE;
+        return getobj_else ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
 
     if (is_edible(obj))
         return GETOBJ_SUGGEST;
@@ -3369,7 +3381,10 @@ eat_ok(struct obj *obj)
 static int
 offer_ok(struct obj *obj)
 {
-    if (!obj || (obj->oclass != FOOD_CLASS && obj->oclass != AMULET_CLASS))
+    if (!obj)
+        return getobj_else ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
+
+    if (obj->oclass != FOOD_CLASS && obj->oclass != AMULET_CLASS)
         return GETOBJ_EXCLUDE;
 
     if (obj->otyp != CORPSE && obj->otyp != AMULET_OF_YENDOR
@@ -3388,7 +3403,10 @@ offer_ok(struct obj *obj)
 static int
 tin_ok(struct obj *obj)
 {
-    if (!obj || obj->oclass != FOOD_CLASS)
+    if (!obj)
+        return getobj_else ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
+
+    if (obj->oclass != FOOD_CLASS)
         return GETOBJ_EXCLUDE;
 
     if (obj->otyp != CORPSE || !tinnable(obj))
@@ -3412,6 +3430,10 @@ floorfood(
     boolean feeding = !strcmp(verb, "eat"),        /* corpsecheck==0 */
             offering = !strcmp(verb, "sacrifice"); /* corpsecheck==1 */
 
+    getobj_else = 0; /* haven't asked about floor food; is used to vary
+                      * "you don't have anything [else] to eat" when
+                      * floor food has been declined and inventory lacks
+                      * any suitable items */
     /* if we can't touch floor objects then use invent food only;
        same if 'm' prefix was used or we're executing an item action
        for context-sensitive inventory */
@@ -3441,6 +3463,7 @@ floorfood(
             } else if (c == 'q') {
                 return (struct obj *) 0;
             }
+            ++getobj_else;
         }
         if (levl[u.ux][u.uy].typ == IRONBARS) {
             /* already verified that hero is metallivorous above */
@@ -3464,6 +3487,7 @@ floorfood(
                 return (struct obj *) &cg.zeroobj; /* csst away 'const' */
             else if (c == 'q')
                 return (struct obj *) 0;
+            ++getobj_else;
         }
         if (uptr != &mons[PM_RUST_MONSTER]
             && (gold = g_at(u.ux, u.uy)) != 0) {
@@ -3477,6 +3501,7 @@ floorfood(
             } else if (c == 'q') {
                 return (struct obj *) 0;
             }
+            ++getobj_else;
         }
     }
 
@@ -3510,27 +3535,32 @@ floorfood(
                 return  otmp;
             else if (c == 'q')
                 return (struct obj *) 0;
+            ++getobj_else;
         }
     }
 
  skipfloor:
     /* We cannot use GETOBJ_PROMPT since we don't want a prompt in the case
-     * where nothing edible is being carried. */
-    if (feeding)
+       where nothing edible is being carried. */
+    if (feeding) {
         otmp = getobj("eat", eat_ok, GETOBJ_NOFLAGS);
-    else if (offering)
+    } else if (offering) {
         otmp = getobj("sacrifice", offer_ok, GETOBJ_NOFLAGS);
-    else if (corpsecheck == 2)
+    } else if (corpsecheck == 2) {
         otmp = getobj(verb, tin_ok, GETOBJ_NOFLAGS);
-    else {
+    } else {
         impossible("floorfood: unknown request (%s)", verb);
-        return (struct obj *) 0;
+        otmp = (struct obj *) 0;
     }
-    if (corpsecheck && otmp && !(offering && otmp->oclass == AMULET_CLASS))
+    if (otmp && corpsecheck && !(offering && otmp->oclass == AMULET_CLASS)) {
         if (otmp->otyp != CORPSE || (corpsecheck == 2 && !tinnable(otmp))) {
             You_cant("%s that!", verb);
-            return (struct obj *) 0;
+            otmp = (struct obj *) 0;
         }
+    }
+    /* reseting 'getobj_else' here isn't essential; it will be cleared the
+       next time it needs to be used */
+    getobj_else = 0;
     return otmp;
 }
 
