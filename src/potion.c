@@ -2212,11 +2212,12 @@ dodip(void)
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
+    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
+
     drink_ok_extra = 0;
     /* preceding #dip with 'm' skips the possibility of dipping into
        fountains and pools plus the prompting which those entail */
     if (!iflags.menu_requested) {
-        shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
         /*
          * Bypass safe_qbuf() since it doesn't handle varying suffix without
          * an awful lot of support work.  Format the object once, even though
