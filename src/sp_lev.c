@@ -96,8 +96,8 @@ static void sel_set_door(int, int, genericptr_t);
 static void sel_set_feature(int, int, genericptr_t);
 static void levregion_add(lev_region *);
 static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
-static int get_table_region(lua_State *, const char *, lua_Integer *, lua_Integer *, lua_Integer *,
-                            lua_Integer *, boolean);
+static int get_table_region(lua_State *, const char *, lua_Integer *,
+                        lua_Integer *, lua_Integer *, lua_Integer *, boolean);
 static void set_wallprop_in_selection(lua_State *, int);
 static xchar random_wdir(void);
 static int floodfillchk_match_under(int, int);
@@ -1085,7 +1085,10 @@ rndtrap(void)
  *      created underwater, or eels on dry land.
  */
 static void
-get_location(xchar *x, xchar *y, getloc_flags_t humidity, struct mkroom* croom)
+get_location(
+    xchar *x, xchar *y,
+    getloc_flags_t humidity,
+    struct mkroom *croom)
 {
     int cpt = 0;
     int mx, my, sx, sy;
@@ -1220,7 +1223,7 @@ void
 get_location_coord(
     xchar *x, xchar *y,
     int humidity,
-    struct mkroom* croom,
+    struct mkroom *croom,
     long crd)
 {
     unpacked_coord c;
@@ -1238,9 +1241,8 @@ get_location_coord(
  * Get a relative position inside a room.
  * negative values for x or y means RANDOM!
  */
-
 static void
-get_room_loc(xchar* x, xchar* y, struct mkroom* croom)
+get_room_loc(xchar *x, xchar *y, struct mkroom *croom)
 {
     coord c;
 
@@ -1265,7 +1267,10 @@ get_room_loc(xchar* x, xchar* y, struct mkroom* croom)
  * negative values for x or y means RANDOM!
  */
 static void
-get_free_room_loc(xchar* x, xchar* y, struct mkroom* croom, packed_coord pos)
+get_free_room_loc(
+    xchar *x, xchar *y,
+    struct mkroom *croom,
+    packed_coord pos)
 {
     xchar try_x, try_y;
     register int trycnt = 0;
@@ -1284,7 +1289,10 @@ get_free_room_loc(xchar* x, xchar* y, struct mkroom* croom, packed_coord pos)
 }
 
 boolean
-check_room(xchar* lowx, xchar* ddx, xchar* lowy, xchar* ddy, boolean vault)
+check_room(
+    xchar *lowx, xchar *ddx,
+    xchar *lowy, xchar *ddy,
+    boolean vault)
 {
     register int x, y, hix = *lowx + *ddx, hiy = *lowy + *ddy;
     register struct rm *lev;
@@ -3897,6 +3905,21 @@ l_create_stairway(lua_State *L, boolean using_ladder)
             levl[x][y].ladder = LA_DOWN;
         }
     } else {
+        /* hack for Valkyrie goal level where upstairs are at a fixed
+           location outside the mapped area; make sure they don't get
+           placed on a lava spot */
+        if (levl[x][y].typ == LAVAPOOL) {
+            int tx, ty;
+
+            for (tx = x - 1; tx <= x + 1; ++tx)
+                for (ty = y - 1; ty <= y + 1; ++ty)
+                    if (isok(tx, ty) && levl[tx][ty].typ == LAVAPOOL
+                        && ((tx == x && ty == y) || !rn2(2))) {
+                        levl[tx][ty].typ = ROOM;
+                        SpLev_Map[tx][ty] = 1;
+                    }
+        }
+
         mkstairs(x, y, (char) up, g.coder->croom);
     }
     return 0;
@@ -5792,7 +5815,9 @@ lspo_mazewalk(lua_State *L)
     static const char *const mwdirs[] = {
         "north", "south", "east", "west", "random", NULL
     };
-    static const int mwdirs2i[] = { W_NORTH, W_SOUTH, W_EAST, W_WEST, W_RANDOM, -2 };
+    static const int mwdirs2i[] = {
+        W_NORTH, W_SOUTH, W_EAST, W_WEST, W_RANDOM, -2
+    };
     xchar x, y;
     lua_Integer mx, my;
     xchar ftyp = ROOM;
