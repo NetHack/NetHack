@@ -4261,10 +4261,10 @@ getdir(const char *s)
 }
 
 static void
-show_direction_keys(winid win, /* should specify a window which is
-                                * using a fixed-width font... */
-                    char centerchar, /* '.' or '@' or ' ' */
-                    boolean nodiag)
+show_direction_keys(
+    winid win, /* should specify a window which is using a fixed-width font */
+    char centerchar, /* '.' or '@' or ' ' */
+    boolean nodiag)
 {
     char buf[BUFSZ];
 
@@ -5159,12 +5159,16 @@ parse(void)
     } else if (g.in_doagain) {
         g.command_count = g.last_command_count;
     } else if (foo && foo == cmd_from_func(do_repeat)) {
-        // g.command_count will be set again when we
-        // re-enter with g.in_doagain set true
+        /* g.command_count will be set again when we
+           re-enter with g.in_doagain set true */
         g.command_count = g.last_command_count;
     } else {
+        uchar c = (g.shead > 0) ? (uchar) g.saveq[g.shead - 1] & 0xff : 0;
+
         g.last_command_count = g.command_count;
-        savech(0); /* reset input queue */
+        /* reset saveq unless it holds a prefix */
+        if (!c || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
+            savech(0);
         savech((char) foo);
     }
 
@@ -5186,8 +5190,9 @@ parse(void)
    the return value so we should be safe using `void' unconditionally */
 /*ARGUSED*/
 void
-hangup(int sig_unused UNUSED)   /* called as signal() handler, so sent
-                                   at least one arg */
+hangup(
+    int sig_unused UNUSED)   /* called as signal() handler, so sent
+                              * at least one arg */
 {
     if (g.program_state.exiting)
         g.program_state.in_moveloop = 0;
