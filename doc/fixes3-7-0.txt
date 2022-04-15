@@ -1151,6 +1151,8 @@ arriving on Valkyrie quest final level could produce impossible warning
 	"mkstairs: placing stairs up on molten lava at <68,13>"
 if the repeat command was used after prefix+command, only the command part got
 	repeated
+the change for repeat after prefix+command would result in a crash if repeat
+	was attempted after an unassigned key
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

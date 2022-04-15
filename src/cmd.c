@@ -5163,11 +5163,12 @@ parse(void)
            re-enter with g.in_doagain set true */
         g.command_count = g.last_command_count;
     } else {
-        uchar c = (g.shead > 0) ? (uchar) g.saveq[g.shead - 1] & 0xff : 0;
+        uchar c = (g.shead > 0) ? (uchar) (g.saveq[g.shead - 1] & 0xff) : 0;
 
         g.last_command_count = g.command_count;
         /* reset saveq unless it holds a prefix */
-        if (!c || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
+        if (!c || !g.Cmd.commands[c]
+            || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
             savech(0);
         savech((char) foo);
     }
