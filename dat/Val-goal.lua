@@ -32,6 +32,8 @@ xxxxxxxxx..................xxxxxxxx
 des.region(selection.area(00,00,34,16), "lit")
 -- Stairs
 -- Note:  The up stairs are *intentionally* off of the map.
+-- if the stairs are surrounded by lava, maybe give some room
+des.replace_terrain({ region = {44,09, 46,11}, fromterrain='L', toterrain='.', chance=50 });
 des.stair("up", 45,10)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,34,16))

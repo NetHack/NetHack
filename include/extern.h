@@ -1348,7 +1348,7 @@ extern boolean occupied(xchar, xchar);
 extern int okdoor(xchar, xchar);
 extern void dodoor(int, int, struct mkroom *);
 extern void mktrap(int, int, struct mkroom *, coord *);
-extern void mkstairs(xchar, xchar, char, struct mkroom *);
+extern void mkstairs(xchar, xchar, char, struct mkroom *, boolean);
 extern void mkinvokearea(void);
 extern void mineralize(int, int, int, int, boolean);
 

@@ -3905,22 +3905,8 @@ l_create_stairway(lua_State *L, boolean using_ladder)
             levl[x][y].ladder = LA_DOWN;
         }
     } else {
-        /* hack for Valkyrie goal level where upstairs are at a fixed
-           location outside the mapped area; make sure they don't get
-           placed on a lava spot */
-        if (levl[x][y].typ == LAVAPOOL) {
-            int tx, ty;
-
-            for (tx = x - 1; tx <= x + 1; ++tx)
-                for (ty = y - 1; ty <= y + 1; ++ty)
-                    if (isok(tx, ty) && levl[tx][ty].typ == LAVAPOOL
-                        && ((tx == x && ty == y) || !rn2(2))) {
-                        levl[tx][ty].typ = ROOM;
-                        SpLev_Map[tx][ty] = 1;
-                    }
-        }
-
-        mkstairs(x, y, (char) up, g.coder->croom);
+        mkstairs(x, y, (char) up, g.coder->croom,
+                 !(scoord & SP_COORD_IS_RANDOM));
     }
     return 0;
 }

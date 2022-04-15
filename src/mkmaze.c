@@ -392,7 +392,7 @@ put_lregion_here(
         break;
     case LR_DOWNSTAIR:
     case LR_UPSTAIR:
-        mkstairs(x, y, (char) rtype, (struct mkroom *) 0);
+        mkstairs(x, y, (char) rtype, (struct mkroom *) 0, FALSE);
         break;
     case LR_BRANCH:
         place_branch(Is_branchlev(&u.uz), x, y);
@@ -1043,10 +1043,10 @@ makemaz(const char *s)
         wallification(2, 2, g.x_maze_max, g.y_maze_max);
 
     mazexy(&mm);
-    mkstairs(mm.x, mm.y, 1, (struct mkroom *) 0); /* up */
+    mkstairs(mm.x, mm.y, 1, (struct mkroom *) 0, FALSE); /* up */
     if (!Invocation_lev(&u.uz)) {
         mazexy(&mm);
-        mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0); /* down */
+        mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0, FALSE); /* down */
     } else { /* choose "vibrating square" location */
         stairway *stway;
         int trycnt = 0;

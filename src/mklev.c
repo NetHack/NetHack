@@ -1619,11 +1619,14 @@ mktrap(
     }
 }
 
+/* Create stairs up or down at x,y.
+   If force is TRUE, change the terrain to ROOM first */
 void
 mkstairs(
     xchar x, xchar y,
     char up,       /* [why 'char' when usage is boolean?] */
-    struct mkroom *croom UNUSED)
+    struct mkroom *croom UNUSED,
+    boolean force)
 {
     int ltyp;
     d_level dest;
@@ -1632,6 +1635,8 @@ mkstairs(
         impossible("mkstairs:  bogus stair attempt at <%d,%d>", x, y);
         return;
     }
+    if (force)
+        levl[x][y].typ = ROOM;
     ltyp = levl[x][y].typ; /* somexyspace() allows ice */
     if (ltyp != ROOM && ltyp != CORR && ltyp != ICE) {
         int glyph = back_to_glyph(x, y),
@@ -1718,7 +1723,7 @@ generate_stairs(void)
             pos.x = somex(croom);
             pos.y = somey(croom);
         }
-        mkstairs(pos.x, pos.y, 0, croom); /* down */
+        mkstairs(pos.x, pos.y, 0, croom, FALSE); /* down */
     }
 
     if (g.nroom > 1)
@@ -1729,7 +1734,7 @@ generate_stairs(void)
             pos.x = somex(croom);
             pos.y = somey(croom);
         }
-        mkstairs(pos.x, pos.y, 1, croom); /* up */
+        mkstairs(pos.x, pos.y, 1, croom, FALSE); /* up */
     }
 }
 
@@ -1920,7 +1925,7 @@ mkinvokearea(void)
     }
 
     You("are standing at the top of a stairwell leading down!");
-    mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0); /* down */
+    mkstairs(u.ux, u.uy, 0, (struct mkroom *) 0, FALSE); /* down */
     newsym(u.ux, u.uy);
     g.vision_full_recalc = 1; /* everything changed */
 }
