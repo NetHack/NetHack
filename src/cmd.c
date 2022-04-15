@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1649272000 2022/04/06 19:06:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.539 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1650048286 2022/04/15 18:44:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.553 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2199,15 +2199,26 @@ do_fight(void)
 int
 do_repeat(void)
 {
-    if (!g.in_doagain && g.saveq[0]) {
+    int res = ECMD_OK;
+
+    if (!g.in_doagain) {
+        char c = g.saveq[0];
+
+        if (!c || !g.Cmd.commands[c & 0xff]) {
+            Norep("There is no command available to repeat.");
+            if (c)
+                savech(0);
+            return ECMD_FAIL;
+        }
         g.in_doagain = TRUE;
         g.stail = 0;
         rhack((char *) 0); /* read and execute command */
         g.in_doagain = FALSE;
         iflags.menu_requested = FALSE;
-        return ECMD_TIME;
+        if (g.context.move)
+            res = ECMD_TIME;
     }
-    return ECMD_OK;
+    return res;
 }
 
 /* extcmdlist: full command list, ordered by command name;
@@ -5158,7 +5169,8 @@ parse(void)
         g.last_command_count = 0;
     } else if (g.in_doagain) {
         g.command_count = g.last_command_count;
-    } else if (foo && foo == cmd_from_func(do_repeat)) {
+    } else if (foo && g.Cmd.commands[foo & 0xff]
+               && g.Cmd.commands[foo & 0xff]->ef_funct == do_repeat) {
         /* g.command_count will be set again when we
            re-enter with g.in_doagain set true */
         g.command_count = g.last_command_count;
@@ -5247,8 +5259,10 @@ readchar_core(int *x, int *y, int *mod)
         return randomkey();
     if (*readchar_queue)
         sym = *readchar_queue++;
+    else if (g.in_doagain)
+        sym = pgetchar();
     else
-        sym = g.in_doagain ? pgetchar() : nh_poskey(x, y, mod);
+        sym = nh_poskey(x, y, mod);
 
 #ifdef NR_OF_EOFS
     if (sym == EOF) {
