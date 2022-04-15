@@ -2205,7 +2205,7 @@ do_repeat(void)
         rhack((char *) 0); /* read and execute command */
         g.in_doagain = FALSE;
         iflags.menu_requested = FALSE;
-        return ECMD_TIME;
+        return ECMD_PASS;
     }
     return ECMD_OK;
 }
@@ -4062,6 +4062,9 @@ rhack(char *cmd)
                 reset_cmd_vars(TRUE);
             } else if ((res & ECMD_TIME) != 0) {
                 g.context.move = TRUE;
+            } else if ((res & ECMD_PASS) != 0) {
+                /* do nothing, don't modify cmd vars: used for ^A/do_repeat to
+                   preserve the values from the repeated command */ 
             } else { /* ECMD_OK */
                 reset_cmd_vars(FALSE);
             }

@@ -577,6 +577,7 @@ enum bodypart_types {
 #define ECMD_TIME   0x01 /* cmd took time, uses up a turn */
 #define ECMD_CANCEL 0x02 /* cmd canceled by user */
 #define ECMD_FAIL   0x04 /* cmd failed to finish, maybe with a yafm */
+#define ECMD_PASS   0x08 /* don't reset or modify cmd vars; used by ^A */
 
 /* values returned from getobj() callback functions */
 enum getobj_callback_returns {
