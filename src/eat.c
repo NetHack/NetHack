@@ -414,7 +414,9 @@ do_reset_eat(void)
     newuhs(FALSE);
 }
 
-/* return True if 'prop' has a non-zero timed value and no other source */
+/* if 'prop' is only set because of a timed value (so not an intrinsic
+   attribute or because of polymorph shape or worn or carried gear), return
+   its timeout, otherwise return 0 */
 long
 temp_resist(int prop)
 {
