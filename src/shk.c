@@ -2337,8 +2337,9 @@ set_cost(register struct obj* obj, register struct monst* shkp)
             /* different shop keepers give different prices */
             if (objects[obj->otyp].oc_material == GEMSTONE
                 || objects[obj->otyp].oc_material == GLASS) {
-                tmp = (obj->otyp % (6 - shkp->m_id % 3));
+                tmp = ((obj->otyp - FIRST_GEM) % (6 - shkp->m_id % 3));
                 tmp = (tmp + 3) * obj->quan;
+                divisor = 1L;
             }
         } else if (tmp > 1L && !(shkp->m_id % 4))
             multiplier *= 3L, divisor *= 4L;
