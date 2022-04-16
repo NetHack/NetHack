@@ -271,6 +271,8 @@ tty_get_ext_cmd(void)
     char buf[BUFSZ];
     int nmatches;
     int *ecmatches;
+    boolean (*no_hook)(char *base) = (boolean (*)(char *)) 0;
+    char extcmd_char[2];
 
     if (iflags.extmenu)
         return extcmd_via_menu();
@@ -282,27 +284,24 @@ tty_get_ext_cmd(void)
      *                      ? ext_cmd_getlin_hook
      *                      : (getlin_hook_proc) 0);
      */
+    extcmd_char[0] = extcmd_initiator(), extcmd_char[1] = '\0';
     buf[0] = '\0';
-    hooked_tty_getlin("#", buf, g.in_doagain ? (getlin_hook_proc) 0
-                                           : ext_cmd_getlin_hook);
+    hooked_tty_getlin(extcmd_char, buf,
+                      !g.in_doagain ? ext_cmd_getlin_hook : no_hook);
     (void) mungspaces(buf);
-    if (buf[0] == 0 || buf[0] == '\033')
-        return -1;
 
-    nmatches = extcmds_match(buf, ECM_IGNOREAC|ECM_EXACTMATCH, &ecmatches);
-
-    if (!g.in_doagain) {
-        int j;
-        for (j = 0; buf[j]; j++)
-            savech(buf[j]);
-        savech('\n');
-    }
-
+    nmatches = (buf[0] == '\0' || buf[0] == '\033') ? -1
+              : extcmds_match(buf, ECM_IGNOREAC | ECM_EXACTMATCH, &ecmatches);
     if (nmatches != 1) {
-        pline("%s: unknown extended command.", buf);
+        if (nmatches != -1)
+            pline("%s%.60s: unknown extended command.",
+                  visctrl(extcmd_char[0]), buf);
+        savech(0); /* reset do-again buffer */
+        savech(extcmd_char[0]);
         return -1;
     }
 
+    savech_extcmd(buf, TRUE); /* savech() for extcmd_char+buf[...]+'\n' */
     return ecmatches[0];
 }
 

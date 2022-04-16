@@ -581,7 +581,15 @@ int NetHackQtExtCmdRequestor::get()
     }
     if (result() == xcmdNone)
 	exec();
-    return result() - 1;
+
+    int ret = result() - 1;
+    if (!::g.in_doagain) {
+        if (ret >= 0)
+            savech_extcmd(::extcmdlist[ret].ef_txt, FALSE);
+        else
+            savech(0);
+    }
+    return ret;
 }
 
 // Enable only buttons that match the current prompt string

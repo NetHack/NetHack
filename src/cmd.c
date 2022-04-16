@@ -400,6 +400,43 @@ savech(char ch)
     return;
 }
 
+/* perform savech() for the characters of an extended command name;
+   inserts the '#' first because rhack() no longer does that one
+   while processing do_extcmd();
+   'str' might be the full command name or maybe just enough to be
+   unambiguous depending on how the interface handles that--we don't
+   care as long as ^A feeds back what the interface expects to see */
+void
+savech_extcmd(const char *str, boolean addnewline)
+{
+    int j;
+
+    /* this debuging line might be immediately erased and need ^P to read */
+    debugpline1("savech_extcmd(\"%s\")", str);
+
+    if (!g.in_doagain && strcmp(str, "repeat")) {
+        uchar c = (g.shead > 0) ? (uchar) (g.saveq[g.shead - 1] & 0xff) : 0;
+
+        /* reset saveq unless it holds a prefix */
+        if (!c || !g.Cmd.commands[c]
+            || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
+            savech(0);
+
+        savech(g.Cmd.extcmd_char);
+        for (j = 0; str[j]; j++)
+            savech(str[j]);
+        if (addnewline)
+            savech('\n');
+    }
+}
+
+/* '#' or whatever has been bound to do_extcmd() in its place */
+char
+extcmd_initiator(void)
+{
+    return g.Cmd.extcmd_char;
+}
+
 static boolean
 can_do_extcmd(const struct ext_func_tab *extcmd)
 {
@@ -3683,7 +3720,8 @@ reset_commands(boolean initial)
         if (backed_dir_cmd) {
             for (dir = 0; dir < N_DIRS; dir++) {
                 for (mode = 0; mode < N_MOVEMODES; mode++) {
-                    g.Cmd.commands[back_dir_key[dir][mode]] = back_dir_cmd[dir][mode];
+                    g.Cmd.commands[back_dir_key[dir][mode]]
+                        = back_dir_cmd[dir][mode];
                 }
             }
         }
@@ -3766,7 +3804,8 @@ reset_commands(boolean initial)
                 else if (mode == MV_RUSH) di = M(di);
             }
             back_dir_key[dir][mode] = di;
-            back_dir_cmd[dir][mode] = (struct ext_func_tab *) g.Cmd.commands[di];
+            back_dir_cmd[dir][mode]
+                = (struct ext_func_tab *) g.Cmd.commands[di];
             g.Cmd.commands[di] = (struct ext_func_tab *) 0;
         }
     }
@@ -3776,15 +3815,17 @@ reset_commands(boolean initial)
     for (i = 0; i < N_DIRS; i++) {
         (void) bind_key_fn(g.Cmd.dirchars[i], move_funcs[i][MV_WALK]);
         if (!g.Cmd.num_pad) {
-            (void) bind_key_fn(highc(g.Cmd.dirchars[i]), move_funcs[i][MV_RUN]);
+            (void) bind_key_fn(highc(g.Cmd.dirchars[i]),
+                               move_funcs[i][MV_RUN]);
             (void) bind_key_fn(C(g.Cmd.dirchars[i]), move_funcs[i][MV_RUSH]);
         } else {
             /* M(number) works when altmeta is on */
             (void) bind_key_fn(M(g.Cmd.dirchars[i]), move_funcs[i][MV_RUN]);
-            /* can't bind highc() or C() of numbers. just use the 5 prefix. */
+            /* can't bind highc() or C() of digits. just use the 5 prefix. */
         }
     }
     update_rest_on_space();
+    g.Cmd.extcmd_char = cmd_from_func(doextcmd);
 }
 
 /* called when 'rest_on_space' is toggled, also called by reset_commands()
@@ -5170,7 +5211,12 @@ parse(void)
     } else if (g.in_doagain) {
         g.command_count = g.last_command_count;
     } else if (foo && g.Cmd.commands[foo & 0xff]
-               && g.Cmd.commands[foo & 0xff]->ef_funct == do_repeat) {
+               /* these shouldn't go into the do-again buffer */
+               && (g.Cmd.commands[foo & 0xff]->ef_funct == do_repeat
+                   || g.Cmd.commands[foo & 0xff]->ef_funct == doprev_message
+                   /* this one might get put into the do-again buffer but
+                      only if the interface code tells the core to do it */
+                   || g.Cmd.commands[foo & 0xff]->ef_funct == doextcmd)) {
         /* g.command_count will be set again when we
            re-enter with g.in_doagain set true */
         g.command_count = g.last_command_count;

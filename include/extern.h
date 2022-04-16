@@ -260,6 +260,8 @@ extern void cmdq_clear(void);
 extern char pgetchar(void);
 extern void pushch(char);
 extern void savech(char);
+extern void savech_extcmd(const char *, boolean);
+extern char extcmd_initiator(void);
 extern int doextcmd(void);
 extern struct ext_func_tab *extcmds_getentry(int);
 extern int extcmds_match(const char *, int, int **);

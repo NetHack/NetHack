@@ -1750,12 +1750,12 @@ int get_ext_cmd(void)
 int
 mswin_get_ext_cmd(void)
 {
+    char cmd[BUFSZ];
     int ret;
     logDebug("mswin_get_ext_cmd()\n");
 
     if (!iflags.wc_popup_dialog) {
         char c;
-        char cmd[BUFSZ];
         int i, len;
         int createcaret;
 
@@ -1784,7 +1784,8 @@ mswin_get_ext_cmd(void)
                         break;
 
                 if (extcmdlist[i].ef_txt == (char *) 0) {
-                    pline("%s: unknown extended command.", cmd);
+                    pline("%s%s: unknown extended command.",
+                          visctrl(extcmd_initiator()), cmd);
                     i = -1;
                 }
                 break;
@@ -1825,13 +1826,22 @@ mswin_get_ext_cmd(void)
         createcaret = 0;
         SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
                     (WPARAM) MSNH_MSG_CARET, (LPARAM) &createcaret);
-        return i;
+        ret = i;
     } else {
-        if (mswin_ext_cmd_window(&ret) == IDCANCEL)
-            return -1;
+        cmd[0] = '\0';
+        if (mswin_ext_cmd_window(&ret) != IDCANCEL)
+            Strcpy(cmd, extcmdlist[ret].ef_txt);
         else
-            return ret;
+            ret = -1;
     }
+
+    if (!g.in_doagain) {
+        if (ret >= 0)
+            savech_extcmd(cmd, TRUE);
+        else
+            savech(0);
+    }
+    return ret;
 }
 
 /*

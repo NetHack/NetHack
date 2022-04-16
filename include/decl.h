@@ -499,6 +499,7 @@ struct cmd {
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */
     char spkeys[NUM_NHKF];
+    char extcmd_char;      /* key that starts an extended command ('#') */
 };
 
 
