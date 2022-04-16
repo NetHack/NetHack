@@ -400,21 +400,20 @@ savech(char ch)
     return;
 }
 
-/* perform savech() for the characters of an extended command name;
-   inserts the '#' first because rhack() no longer does that one
-   while processing do_extcmd();
-   'str' might be the full command name or maybe just enough to be
-   unambiguous depending on how the interface handles that--we don't
-   care as long as ^A feeds back what the interface expects to see */
+/* perform savech() for the characters of an extended command name */
 void
 savech_extcmd(const char *str, boolean addnewline)
 {
-    int j;
+    unsigned j, L = Strlen(str);
 
-    /* this debuging line might be immediately erased and need ^P to read */
+    /* DEBUGFILES='cmd.c' -- for tty or other one-line message 'window'
+       this debuging line could be immediately erased and need ^P to read */
     debugpline1("savech_extcmd(\"%s\")", str);
 
-    if (!g.in_doagain && strcmp(str, "repeat")) {
+    /* 'str' might be the full command name or maybe just enough to be
+       unambiguous depending on how the interface handles that; if it is
+       "repeat" (or leading substring of that), don't save it for do-again */
+    if (!g.in_doagain && (L > 2 && strncmp(str, "repeat", L))) {
         uchar c = (g.shead > 0) ? (uchar) (g.saveq[g.shead - 1] & 0xff) : 0;
 
         /* reset saveq unless it holds a prefix */
@@ -422,15 +421,17 @@ savech_extcmd(const char *str, boolean addnewline)
             || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
             savech(0);
 
+        /* insert the '#' first because rhack() avoids doing that when
+           processing doextcmd() */
         savech(g.Cmd.extcmd_char);
-        for (j = 0; str[j]; j++)
+        for (j = 0; j < L; ++j)
             savech(str[j]);
         if (addnewline)
             savech('\n');
     }
 }
 
-/* '#' or whatever has been bound to do_extcmd() in its place */
+/* '#' or whatever has been bound to doextcmd() in its place */
 char
 extcmd_initiator(void)
 {
@@ -3126,11 +3127,11 @@ cmdname_from_func(
         res = strcpy(outbuf, res);
     } else {
         const struct ext_func_tab *matchcmd = extcmdlist;
-        int len = 0;
+        unsigned len = 0, maxlen = Strlen(res);
 
         /* find the shortest leading substring which is unambiguous */
         do {
-            if (++len >= (int) strlen(res))
+            if (++len >= maxlen)
                 break;
             for (extcmd = matchcmd; extcmd->ef_txt; ++extcmd) {
                 if (extcmd == cmdptr)
@@ -3145,6 +3146,8 @@ cmdname_from_func(
             }
         } while (extcmd->ef_txt);
         copynchars(outbuf, res, len);
+        /* [note: for Qt, this debugpline writes a couple dozen lines to
+            stdout during menu setup when message window isn't ready yet] */
         debugpline2("shortened %s: \"%s\"", res, outbuf);
         res = outbuf;
     }
