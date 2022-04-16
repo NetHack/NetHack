@@ -841,6 +841,8 @@ int NetHackQtBind::qt_get_ext_cmd()
         result = xcmd->get();
         delete xcmd;
     } while (result == xcmdNoMatch);
+    // refresh message window after extended command dialog is dismissed
+    NetHackQtBind::qt_clear_nhwindow(WIN_MESSAGE);
     return result;
 }
 
