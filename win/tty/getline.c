@@ -270,7 +270,7 @@ tty_get_ext_cmd(void)
 {
     char buf[BUFSZ];
     int nmatches;
-    int *ecmatches;
+    int *ecmatches = 0;
     boolean (*no_hook)(char *base) = (boolean (*)(char *)) 0;
     char extcmd_char[2];
 
