@@ -2834,8 +2834,10 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         case IA_DIP_OBJ:
-            /*cmdq_add_ec(dodip);*/
-            /*cmdq_add_userinput();*/
+            /* #altdip instead of normal #dip - takes potion to dip into
+               first (the inventory item instigating this) and item to
+               be dipped second, also ignores floor features such as
+               fountain/sink so we don't need to force m-prefix here */
             cmdq_add_ec(dip_into);
             cmdq_add_key(otmp->invlet);
             break;
@@ -2844,7 +2846,9 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         case IA_EAT_OBJ:
-            /* FIXME: can't add this! cmdq_add_key('m');*/ /* m-prefix: eat, skip floor obj */
+            /* start with m-prefix; for #eat, it means ignore floor food
+               if present and eat food from invent */
+            cmdq_add_ec(do_reqmenu);
             cmdq_add_ec(doeat);
             cmdq_add_key(otmp->invlet);
             break;
@@ -2857,6 +2861,9 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         case IA_QUAFF_OBJ:
+            /* start with m-prefix; for #quaff, it means ignore fountain
+               or sink if present and drink a potion from invent */
+            cmdq_add_ec(do_reqmenu);
             cmdq_add_ec(dodrink);
             cmdq_add_key(otmp->invlet);
             break;

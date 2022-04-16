@@ -531,11 +531,9 @@ dodrink(void)
     drink_ok_extra = 0;
     /* preceding 'q'/#quaff with 'm' skips the possibility of drinking
        from fountains, sinks, and surrounding water plus the prompting
-       which those entail; if cmdq is non-empty, player has selected a
-       potion from inventory and then chosen action-item 'quaff' so
-       skip fountains,&c for that case too--the potion's inv letter is
-       queued up for next getobj() */
-    if (!iflags.menu_requested && !cmdq_peek()) {
+       which those entail; optional for interactive use, essential for
+       context-sensitive inventory item action 'quaff' */
+    if (!iflags.menu_requested) {
         /* Is there a fountain to drink from here? */
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
             /* not as low as floor level but similar restrictions apply */

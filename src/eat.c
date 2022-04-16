@@ -3437,9 +3437,8 @@ floorfood(
                       * floor food has been declined and inventory lacks
                       * any suitable items */
     /* if we can't touch floor objects then use invent food only;
-       same if 'm' prefix was used or we're executing an item action
-       for context-sensitive inventory */
-    if (iflags.menu_requested || cmdq_peek()
+       same when 'm' prefix is used--for #eat, it means "skip floor food" */
+    if (iflags.menu_requested
         || !can_reach_floor(TRUE) || (feeding && u.usteed)
         || (is_pool_or_lava(u.ux, u.uy)
             && (Wwalking || is_clinger(uptr) || (Flying && !Breathless))))
