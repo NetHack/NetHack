@@ -2265,7 +2265,7 @@ do_repeat(void)
    or control keystroke generally should not be; there are a few exceptions
    such as ^O/#overview and C/N/#name */
 struct ext_func_tab extcmdlist[] = {
-    { '#',    "#", "perform an extended command",
+    { '#',    "#", "enter and perform an extended command",
               doextcmd, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('?'), "?", "list all extended commands",
               doextlist, IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX,
@@ -2624,7 +2624,7 @@ static int (*move_funcs[N_DIRS_Z][N_MOVEMODES])(void) = {
     { doup,              doup,             doup },
 };
 
-/* used by dokeylist() and by key2extcmdesc() for dowhatdoes() */
+/* used by dokeylist() and by key2extcmddesc() for dowhatdoes() */
 static const struct {
     int nhkf;
     const char *desc;
@@ -2694,6 +2694,7 @@ const char *
 key2extcmddesc(uchar key)
 {
     static char key2cmdbuf[QBUFSZ];
+    const char *txt;
     int k, i, j;
     uchar M_5 = (uchar) M('5'), M_0 = (uchar) M('0');
 
@@ -2728,13 +2729,11 @@ key2extcmddesc(uchar key)
             return misc_keys[i].desc;
     }
     /* finally, check whether 'key' is a command */
-    if (g.Cmd.commands[key]) {
-        if (g.Cmd.commands[key]->ef_txt) {
-            Sprintf(key2cmdbuf, "%s (#%s)",
-                    g.Cmd.commands[key]->ef_desc,
-                    g.Cmd.commands[key]->ef_txt);
-            return key2cmdbuf;
-        }
+    if (g.Cmd.commands[key] && (txt = g.Cmd.commands[key]->ef_txt) != 0) {
+        Sprintf(key2cmdbuf, "%s (#%s)", g.Cmd.commands[key]->ef_desc, txt);
+        /* special case: 'txt' for '#' is "#" and showing that as
+           "perform an extended command (##)" looks silly; strip "(##)" off */
+        return strsubst(key2cmdbuf, " (##)", "");
     }
     return (char *) 0;
 }
