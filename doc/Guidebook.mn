@@ -36,7 +36,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "February 13, 2022
+.ds f2 "February 27, 2022
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
