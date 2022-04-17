@@ -500,18 +500,18 @@ ghost_from_bottle(void)
 static int
 drink_ok(struct obj *obj)
 {
-    if (obj && obj->oclass == POTION_CLASS)
-        return GETOBJ_SUGGEST;
-
     /* getobj()'s callback to test whether hands/self is a valid "item" to
        pick is used here to communicate the fact that player has already
        passed up an opportunity to perform the action (drink or dip) on a
        non-inventory dungeon feature, so if there are no potions in invent
        the message will be "you have nothing /else/ to {drink | dip into}";
        if player used 'm' prefix to bypass dungeon features, drink_ok_extra
-       will be 0 and the potential "else" will omitted */
-    if (!obj && drink_ok_extra)
-        return GETOBJ_EXCLUDE_NONINVENT;
+       will be 0 and the potential "else" will be omitted */
+    if (!obj)
+        return drink_ok_extra ? GETOBJ_EXCLUDE_NONINVENT : GETOBJ_EXCLUDE;
+
+    if (obj->oclass == POTION_CLASS)
+        return GETOBJ_SUGGEST;
 
     return GETOBJ_EXCLUDE;
 }
@@ -1065,7 +1065,7 @@ peffect_gain_level(struct obj *otmp)
         /* they went up a level */
         if ((ledger_no(&u.uz) == 1 && u.uhave.amulet)
             || Can_rise_up(u.ux, u.uy, &u.uz)) {
-            static const char *riseup = "rise up, through the %s!";
+            static const char riseup[] = "rise up, through the %s!";
 
             if (ledger_no(&u.uz) == 1) {
                 You(riseup, ceiling(u.ux, u.uy));
