@@ -1817,8 +1817,9 @@ container_at(int x, int y, boolean countem)
 }
 
 static boolean
-able_to_loot(int x, int y,
-             boolean looting) /* loot vs tip */
+able_to_loot(
+    int x, int y,
+    boolean looting) /* loot vs tip */
 {
     const char *verb = looting ? "loot" : "tip";
     struct trap *t = t_at(x, y);
@@ -2045,21 +2046,20 @@ doloot_core(void)
         if (!get_adjacent_loc("Loot in what direction?",
                               "Invalid loot location", u.ux, u.uy, &cc))
             return ECMD_OK;
-        if (u_at(cc.x, cc.y)) {
-            underfoot = TRUE;
-            if (container_at(cc.x, cc.y, FALSE))
-                goto lootcont;
-        } else
-            underfoot = FALSE;
+        underfoot = u_at(cc.x, cc.y);
+        if (underfoot && container_at(cc.x, cc.y, FALSE))
+            goto lootcont;
         if (u.dz < 0) {
             You("%s to loot on the %s.", dont_find_anything,
                 ceiling(cc.x, cc.y));
-            timepassed = 1;
-            return (timepassed ? ECMD_TIME : ECMD_OK);
+            return ECMD_TIME;
         }
         mtmp = m_at(cc.x, cc.y);
-        if (mtmp)
+        if (mtmp) {
             timepassed = loot_mon(mtmp, &prev_inquiry, &prev_loot);
+            if (timepassed)
+                underfoot = 1; /* not true but skips dont_find_anything */
+        }
         /* always use a turn when choosing a direction is impaired,
            even if you've successfully targetted a saddled creature
            and then answered "no" to the "remove its saddle?" prompt */
@@ -2201,6 +2201,9 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                 return 1;
             }
             extract_from_minvent(mtmp, otmp, TRUE, FALSE);
+            if (flags.verbose)
+                You("take %s off of %s.",
+                    thesimpleoname(otmp), mon_nam(mtmp));
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
                                        (const char *) 0);
             nhUse(otmp);

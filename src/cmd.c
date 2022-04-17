@@ -3969,9 +3969,10 @@ reset_cmd_vars(boolean reset_cmdq)
 void
 rhack(char *cmd)
 {
+    char queuedkeystroke[2];
     int spkey = NHKF_ESC;
     boolean bad_command, firsttime = (cmd == 0);
-    struct _cmd_queue *cmdq = NULL;
+    struct _cmd_queue cq, *cmdq = NULL;
     const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
     boolean was_m_prefix = FALSE;
 
@@ -3983,19 +3984,16 @@ rhack(char *cmd)
 #endif
     if ((cmdq = cmdq_pop()) != 0) {
         /* doing queued commands */
-        if (cmdq->typ == CMDQ_KEY) {
-            static char commandline[2];
-
-            if (!cmd)
-                cmd = commandline;
-            cmd[0] = cmdq->key;
-            cmd[1] = '\0';
-        } else if (cmdq->typ == CMDQ_EXTCMD) {
-            cmdq_ec = cmdq->ec_entry;
-        }
+        cq = *cmdq;
         free(cmdq);
-        if (cmdq_ec)
+        if (cq.typ == CMDQ_EXTCMD && (cmdq_ec = cq.ec_entry) != 0)
             goto do_cmdq_extcmd;
+        cmd = queuedkeystroke;
+        /* already handled a queued command (goto do_cmdq_extcmd);
+           if something other than a key is queued, we'll drop down
+           to the !*cmd handling which clears out the command-queue */
+        cmd[0] = (cq.typ == CMDQ_KEY) ? cq.key : '\0';
+        cmd[1] = '\0';
     } else if (firsttime) {
         cmd = parse();
         /* parse() pushed a cmd but didn't return any key */
@@ -4003,21 +4001,17 @@ rhack(char *cmd)
             goto got_prefix_input;
     }
 
-    if (*cmd == g.Cmd.spkeys[NHKF_ESC]) {
+    /* if there's no command, there's nothing to do except reset */
+    if (!cmd || !*cmd || *cmd == (char) 0377
+        || *cmd == g.Cmd.spkeys[NHKF_ESC]) {
+        if (!cmd || *cmd != g.Cmd.spkeys[NHKF_ESC])
+            nhbell();
         reset_cmd_vars(TRUE);
         return;
     }
 
-    /* Special case of *cmd == ' ' handled better below */
-    if (!*cmd || *cmd == (char) 0377) {
-        nhbell();
-        reset_cmd_vars(TRUE);
-        return; /* probably we just had an interrupt */
-    }
-
     /* handle most movement commands */
     g.context.travel = g.context.travel1 = 0;
-
     {
         register const struct ext_func_tab *tlist;
         int res, (*func)(void);
@@ -4117,7 +4111,7 @@ rhack(char *cmd)
             } else if ((res & ECMD_TIME) != 0) {
                 g.context.move = TRUE;
             } else { /* ECMD_OK */
-                reset_cmd_vars(FALSE);
+                reset_cmd_vars(g.multi < 0);
             }
             return;
         }
@@ -4911,6 +4905,8 @@ there_cmd_menu(int x, int y, int mod)
             cmdq_add_dir(dx, dy, 0);
             break;
         case MCMD_REMOVE_SADDLE:
+            /* m-prefix for #loot: skip any floor containers */
+            cmdq_add_ec(do_reqmenu);
             cmdq_add_ec(doloot);
             cmdq_add_dir(dx, dy, 0);
             cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
@@ -4918,6 +4914,7 @@ there_cmd_menu(int x, int y, int mod)
         case MCMD_APPLY_SADDLE:
             {
                 struct obj *otmp = carrying(SADDLE);
+
                 if (otmp) {
                     cmdq_add_ec(doapply);
                     cmdq_add_key(otmp->invlet);
@@ -5466,7 +5463,7 @@ doclicklook(void)
 char
 yn_function(const char *query, const char *resp, char def)
 {
-    char res, qbuf[QBUFSZ];
+    char res = '\033', qbuf[QBUFSZ];
     struct _cmd_queue *cmdq = cmdq_pop();
 #ifdef DUMPLOG
     unsigned idx = g.saved_pline_index;
@@ -5484,8 +5481,11 @@ yn_function(const char *query, const char *resp, char def)
         Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
         query = qbuf;
     }
-    if (cmdq && cmdq->typ == CMDQ_KEY) {
-        res = cmdq->key;
+    if (cmdq) {
+        if (cmdq->typ == CMDQ_KEY)
+            res = cmdq->key;
+        else
+            cmdq_clear(); /* 'res' is ESC */
     } else {
         res = (*windowprocs.win_yn_function)(query, resp, def);
     }
