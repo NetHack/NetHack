@@ -2402,9 +2402,11 @@ throw_gold(struct obj *obj)
     }
     freeinv(obj);
     if (u.uswallow) {
-        pline(is_animal(u.ustuck->data) ? "%s in the %s's entrails."
-                                        : "%s into %s.",
-              "The gold disappears", mon_nam(u.ustuck));
+        const char *swallower = mon_nam(u.ustuck);
+        if (is_animal(u.ustuck->data))
+            swallower = s_suffix(swallower);
+        pline_The("gold disappears into %s%s.", swallower,
+                  is_animal(u.ustuck->data) ? " entrails" : "");
         add_to_minv(u.ustuck, obj);
         return ECMD_TIME;
     }
