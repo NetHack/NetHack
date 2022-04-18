@@ -87,6 +87,7 @@ static int l_create_stairway(lua_State *, boolean);
 static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
                                         int);
+static void l_get_lregion(lua_State *, lev_region *);
 static void sel_set_lit(int, int, genericptr_t);
 static void add_doors_to_room(struct mkroom *);
 static void selection_iterate(struct selectionvar *, select_iter_func,
@@ -5495,6 +5496,32 @@ levregion_add(lev_region* lregion)
                   sizeof (lev_region));
 }
 
+/* get params from topmost lua hash:
+   - region = {x1,y1,x2,y2}
+   - exclude = {x1,y1,x2,y2} (optional)
+   - region_islev=true, exclude_idlev=true (optional) */
+static void
+l_get_lregion(lua_State *L, lev_region *tmplregion)
+{
+    lua_Integer x1,y1,x2,y2;
+
+    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
+    tmplregion->inarea.x1 = x1;
+    tmplregion->inarea.y1 = y1;
+    tmplregion->inarea.x2 = x2;
+    tmplregion->inarea.y2 = y2;
+
+    x1 = y1 = x2 = y2 = 0;
+    get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
+    tmplregion->delarea.x1 = x1;
+    tmplregion->delarea.y1 = y1;
+    tmplregion->delarea.x2 = x2;
+    tmplregion->delarea.y2 = y2;
+
+    tmplregion->in_islev = get_table_boolean_opt(L, "region_islev", 0);
+    tmplregion->del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+}
+
 /* teleport_region({ region = { x1,y1, x2,y2} }); */
 /* teleport_region({ region = { x1,y1, x2,y2}, [ region_islev = 1, ] exclude = { x1,y1, x2,y2}, [ exclude_islen = 1, ] [ dir = "up" ] }); */
 /* TODO: maybe allow using selection, with a new selection method "getextents()"? */
@@ -5504,28 +5531,10 @@ lspo_teleport_region(lua_State *L)
     static const char *const teledirs[] = { "both", "down", "up", NULL };
     static const int teledirs2i[] = { LR_TELE, LR_DOWNTELE, LR_UPTELE, -1 };
     lev_region tmplregion;
-    lua_Integer x1,y1,x2,y2;
 
     create_des_coder();
-
     lcheck_param_table(L);
-
-    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
-    tmplregion.inarea.x1 = x1;
-    tmplregion.inarea.y1 = y1;
-    tmplregion.inarea.x2 = x2;
-    tmplregion.inarea.y2 = y2;
-
-    x1 = y1 = x2 = y2 = 0;
-    get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
-    tmplregion.delarea.x1 = x1;
-    tmplregion.delarea.y1 = y1;
-    tmplregion.delarea.x2 = x2;
-    tmplregion.delarea.y2 = y2;
-
-    tmplregion.in_islev = get_table_boolean_opt(L, "region_islev", 0);
-    tmplregion.del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
-
+    l_get_lregion(L, &tmplregion);
     tmplregion.rtype = teledirs2i[get_table_option(L, "dir", "both",
                                                    teledirs)];
     tmplregion.padding = 0;
@@ -5557,29 +5566,10 @@ lspo_levregion(lua_State *L)
         LR_TELE, LR_UPTELE, LR_DOWNTELE, 0
     };
     lev_region tmplregion;
-    lua_Integer x1,y1,x2,y2;
 
     create_des_coder();
-
     lcheck_param_table(L);
-
-    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
-
-    tmplregion.inarea.x1 = x1;
-    tmplregion.inarea.y1 = y1;
-    tmplregion.inarea.x2 = x2;
-    tmplregion.inarea.y2 = y2;
-
-    x1 = y1 = x2 = y2 = 0;
-    get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
-
-    tmplregion.delarea.x1 = x1;
-    tmplregion.delarea.y1 = y1;
-    tmplregion.delarea.x2 = x2;
-    tmplregion.delarea.y2 = y2;
-
-    tmplregion.in_islev = get_table_boolean_opt(L, "region_islev", 0);
-    tmplregion.del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+    l_get_lregion(L, &tmplregion);
     tmplregion.rtype = regiontypes2i[get_table_option(L, "type", "stair-down",
                                                       regiontypes)];
     tmplregion.padding = get_table_int_opt(L, "padding", 0);
