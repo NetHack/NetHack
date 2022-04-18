@@ -14,6 +14,7 @@ static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
 static long mm_displacement(struct monst *, struct monst *);
+static void mon_leaving_level(struct monst *);
 static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
@@ -2189,50 +2190,28 @@ relmon(
     struct monst *mon,
     struct monst **monst_list) /* &g.migrating_mons or &g.mydogs or null */
 {
-    struct monst *mtmp;
-    int mx = mon->mx, my = mon->my;
-    boolean on_map = (m_at(mx, my) == mon),
-            unhide = (monst_list != 0);
-
     if (!fmon)
         panic("relmon: no fmon available.");
 
-    if (mon == g.context.polearm.hitmon)
-        g.context.polearm.hitmon = (struct monst *) 0;
+    /* take 'mon' off the map */
+    mon_leaving_level(mon);
 
-    if (unhide) {
-        /* can't remain hidden across level changes (exception: wizard
-           clone can continue imitating some other monster form); also,
-           might be imitating a boulder so need line-of-sight unblocking */
-        mon->mundetected = 0;
-        if (M_AP_TYPE(mon) && M_AP_TYPE(mon) != M_AP_MONSTER)
-            seemimic(mon);
-    }
-
-    if (on_map) {
-        mon->mtrapped = 0;
-        if (mon->wormno)
-            remove_worm(mon);
-        else
-            remove_monster(mx, my);
-    }
-
+    /* remove 'mon' from the 'fmon' list */
     if (mon == fmon) {
         fmon = fmon->nmon;
     } else {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->nmon == mon)
-                break;
+        struct monst *mtmp;
 
-        if (mtmp)
-            mtmp->nmon = mon->nmon;
-        else
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (mtmp->nmon == mon) {
+                mtmp->nmon = mon->nmon;
+                break;
+            }
+        if (!mtmp)
             panic("relmon: mon not in list.");
     }
 
-    if (unhide) {
-        if (on_map)
-            newsym(mx, my);
+    if (monst_list) {
         /* insert into g.mydogs or g.migrating_mons */
         mon->nmon = *monst_list;
         *monst_list = mon;
@@ -2323,20 +2302,55 @@ dealloc_monst(struct monst *mon)
     free((genericptr_t) mon);
 }
 
-/* remove effects of mtmp from other data structures */
+/* 'mon' is being removed from level due to migration [relmon from keepdogs
+   or migrate_to_level] or due to death [m_detach from mondead or mongone] */
+static void
+mon_leaving_level(struct monst *mon)
+{
+    int mx = mon->mx, my = mon->my;
+    boolean onmap = mx > 0;
+
+    /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
+    mon->mtrapped = 0;
+    unstuck(mon); /* mon is not swallowing or holding you nor held by you */
+
+    /* vault guard might be at <0,0> */
+    if (onmap || mon == g.level.monsters[0][0]) {
+        if (mon->wormno)
+            remove_worm(mon);
+        else
+            remove_monster(mx, my);
+    }
+    if (onmap) {
+        mon->mundetected = 0; /* for migration; doesn't matter for death */
+        /* unhide mimic in case its shape has been blocking line of sight
+           or it is accompanying the hero to another level */
+        if (M_AP_TYPE(mon) != M_AP_NOTHING && M_AP_TYPE(mon) != M_AP_MONSTER)
+            seemimic(mon);
+        /* if mon is pinned by a boulder, removing mon lets boulder drop */
+        fill_pit(mx, my);
+        newsym(mx, my);
+    }
+    /* if mon is a remembered target, forget it since it isn't here anymore */
+    if (mon == g.context.polearm.hitmon)
+        g.context.polearm.hitmon = (struct monst *) 0;
+}
+
+/* 'mtmp' is going away; remove effects of mtmp from other data structures */
 static void
 m_detach(
     struct monst *mtmp,
     struct permonst *mptr) /* reflects mtmp->data _prior_ to mtmp's death */
 {
-    boolean onmap = (mtmp->mx > 0);
-
-    if (mtmp == g.context.polearm.hitmon)
-        g.context.polearm.hitmon = 0;
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
-    /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
-    mtmp->mtrapped = 0;
+
+    if (mtmp->mx > 0 && emits_light(mptr))
+        del_light_source(LS_MONSTER, monst_to_any(mtmp));
+
+    /* take mtmp off map but not out of fmon list yet (dmonsfree does that) */
+    mon_leaving_level(mtmp);
+
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
     if (mtmp->iswiz)
         wizdead();
@@ -2346,23 +2360,8 @@ m_detach(
         leaddead();
     if (mtmp->m_id == g.stealmid)
         thiefdead();
+    /* release (drop onto map) all objects carried by mtmp */
     relobj(mtmp, 0, FALSE);
-
-    if (onmap || mtmp == g.level.monsters[0][0]) {
-        if (mtmp->wormno)
-            remove_worm(mtmp);
-        else
-            remove_monster(mtmp->mx, mtmp->my);
-    }
-    if (emits_light(mptr))
-        del_light_source(LS_MONSTER, monst_to_any(mtmp));
-    if (M_AP_TYPE(mtmp))
-        seemimic(mtmp);
-    if (onmap)
-        newsym(mtmp->mx, mtmp->my);
-    unstuck(mtmp);
-    if (onmap)
-        fill_pit(mtmp->mx, mtmp->my);
 
     if (mtmp->isshk)
         shkgone(mtmp);
@@ -3248,7 +3247,7 @@ vamp_stone(struct monst* mtmp)
 
 /* drop monster into "limbo" - that is, migrate to the current level */
 void
-m_into_limbo(struct monst* mtmp)
+m_into_limbo(struct monst *mtmp)
 {
     xchar target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
 
@@ -3257,16 +3256,15 @@ m_into_limbo(struct monst* mtmp)
 }
 
 static void
-migrate_mon(struct monst* mtmp, xchar target_lev, xchar xyloc)
+migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
 {
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
     migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);
-    mtmp->mstate |= MON_MIGRATING;
 }
 
 static boolean
-ok_to_obliterate(struct monst* mtmp)
+ok_to_obliterate(struct monst *mtmp)
 {
     /*
      * Add checks for monsters that should not be obliterated
@@ -3274,13 +3272,13 @@ ok_to_obliterate(struct monst* mtmp)
      */
     if (mtmp->data == &mons[PM_WIZARD_OF_YENDOR] || is_rider(mtmp->data)
         || has_emin(mtmp) || has_epri(mtmp) || has_eshk(mtmp)
-        || (u.ustuck == mtmp) || (u.usteed == mtmp))
+        || mtmp == u.ustuck || mtmp == u.usteed)
         return FALSE;
     return TRUE;
 }
 
 void
-elemental_clog(struct monst* mon)
+elemental_clog(struct monst *mon)
 {
     static long msgmv = 0L;
     int m_lev = 0;

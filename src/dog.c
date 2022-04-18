@@ -325,6 +325,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
     /* some monsters might need to do something special upon arrival
        _after_ the current level has been fully set up; see dochug() */
     mtmp->mstrategy |= STRAT_ARRIVE;
+    mtmp->mstate &= ~MON_MIGRATING;
 
     /* make sure mnexto(rloc_to(set_apparxy())) doesn't use stale data */
     mtmp->mux = u.ux, mtmp->muy = u.uy;
@@ -480,8 +481,9 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
 /* heal monster for time spent elsewhere */
 void
-mon_catchup_elapsed_time(struct monst *mtmp,
-                         long nmv) /* number of moves */
+mon_catchup_elapsed_time(
+    struct monst *mtmp,
+    long nmv) /* number of moves */
 {
     int imv = 0; /* avoid zillions of casts and lint warnings */
 
@@ -689,10 +691,11 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
 }
 
 void
-migrate_to_level(struct monst *mtmp,
-                 xchar tolev, /* destination level */
-                 xchar xyloc, /* MIGR_xxx destination xy location: */
-                 coord *cc)   /* optional destination coordinates */
+migrate_to_level(
+    struct monst *mtmp,
+    xchar tolev, /* destination level */
+    xchar xyloc, /* MIGR_xxx destination xy location: */
+    coord *cc)   /* optional destination coordinates */
 {
     struct obj *obj;
     d_level new_lev;
@@ -724,6 +727,7 @@ migrate_to_level(struct monst *mtmp,
         m_unleash(mtmp, TRUE);
     }
     relmon(mtmp, &g.migrating_mons); /* move it from map to g.migrating_mons */
+    mtmp->mstate |= MON_MIGRATING;
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
     new_lev.dlevel = ledger_to_dlev((xchar) tolev);
@@ -743,6 +747,11 @@ migrate_to_level(struct monst *mtmp,
     mtmp->mux = new_lev.dnum;
     mtmp->muy = new_lev.dlevel;
     mtmp->mx = mtmp->my = 0; /* this implies migration */
+
+    /* don't extinguish a mobile light; it still exists but has changed
+       from local (monst->mx > 0) to global (mx==0, not on this level) */
+    if (emits_light(mtmp->data))
+        vision_recalc(0);
 }
 
 /* return quality of food; the lower the better */
