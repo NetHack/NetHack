@@ -713,6 +713,7 @@ migrate_to_level(
         wormgone(mtmp); /* destroys tail and takes head off map */
         /* there used to be a place_monster() here for the relmon() below,
            but it doesn't require the monster to be on the map anymore */
+        mtmp->mx = mtmp->my = 0;
     }
 
     /* set minvent's obj->no_charge to 0 */
