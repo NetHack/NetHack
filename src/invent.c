@@ -1834,6 +1834,13 @@ silly_thing(const char *word,
               !(is_plural(otmp) || pair_of(otmp)) ? "that" : "those", s3);
     else
 #endif
+    /* see comment about Amulet of Yendor in objtyp_is_callable(do_name.c);
+       known fakes yield the silly thing feedback */
+    if (!strcmp(word, "call")
+        && (otmp->otyp == AMULET_OF_YENDOR
+            || (otmp->otyp == FAKE_AMULET_OF_YENDOR && !otmp->known)))
+        pline_The("Amulet doesn't like being called names.");
+    else
         pline(silly_thing_to, word);
 }
 

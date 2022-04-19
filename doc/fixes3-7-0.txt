@@ -882,6 +882,7 @@ putting objects into a container with menustyle=traditional and then taking
 	bit being set if sanity_check was On
 when drinking or dipping, allow the 'm' prefix to be used to skip asking
 	about fountains and pools
+calling real or fake Amulet something could give away information about them
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
