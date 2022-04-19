@@ -36,6 +36,7 @@ static int adjust_ok(struct obj *);
 static int adjust_gold_ok(struct obj *);
 static char obj_to_let(struct obj *);
 static boolean item_naming_classification(struct obj *, char *, char *);
+static int item_reading_classification(struct obj *, char *);
 static void mime_action(const char *);
 
 /* wizards can wish for venom, which will become an invisible inventory
@@ -2537,26 +2538,76 @@ enum item_action_actions {
 static boolean
 item_naming_classification(struct obj *obj, char *onamebuf, char *ocallbuf)
 {
-    static const char Name[] = "Name", Rename[] = "Rename or unname";
+    static const char Name[] = "Name", Rename[] = "Rename or un-name",
+                      /* "re-call" seems a bit weird, but "recall" and
+                         "rename" don't fit for changing a type name */
+                      Call[] = "Call", Recall[] = "Re-call or un-call";
 
     onamebuf[0] = ocallbuf[0] = '\0';
     if (name_ok(obj) == GETOBJ_SUGGEST) {
         Sprintf(onamebuf, "%s %s %s",
                 (!has_oname(obj) || !*ONAME(obj)) ? Name : Rename,
-                !is_plural(obj) ? "this" : "these",
+                the_unique_obj(obj) ? "the"
+                : !is_plural(obj) ? "this"
+                  : "these",
                 simpleonames(obj));
     }
     if (call_ok(obj) == GETOBJ_SUGGEST) {
         char *callname = simpleonames(obj);
 
-        if (!is_plural(obj)) /* when not already plural, force plural */
+        /* prefix known unique item with "the", make all other types plural */
+        if (the_unique_obj(obj)) /* treats unID'd fake amulets as if real */
+            callname = the(callname);
+        else if (!is_plural(obj))
             callname = makeplural(callname);
         Sprintf(ocallbuf, "%s the type for %s",
                 (!objects[obj->otyp].oc_uname
-                 || !*objects[obj->otyp].oc_uname) ? Name : Rename,
+                 || !*objects[obj->otyp].oc_uname) ? Call : Recall,
                 callname);
     }
     return (*onamebuf || *ocallbuf) ? TRUE : FALSE;
+}
+
+/* construct text for the menu entries for IA_READ_OBJ */
+static int
+item_reading_classification(struct obj *obj, char *outbuf)
+{
+    int otyp = obj->otyp, res = IA_READ_OBJ;
+
+    *outbuf = '\0';
+    if (otyp == FORTUNE_COOKIE) {
+        Strcpy(outbuf, "Read the message inside this cookie");
+    } else if (otyp == T_SHIRT) {
+        Strcpy(outbuf, "Read the slogan on the shirt");
+    } else if (otyp == ALCHEMY_SMOCK) {
+        Strcpy(outbuf, "Read the slogan on the apron");
+    } else if (otyp == HAWAIIAN_SHIRT) {
+        Strcpy(outbuf, "Look at the pattern on the shirt");
+    } else if (obj->oclass == SCROLL_CLASS) {
+        const char *magic = ((obj->dknown
+#ifdef MAIL_STRUCTURES
+                              && otyp != SCR_MAIL
+#endif
+                              && (otyp != SCR_BLANK_PAPER
+                                  || !objects[otyp].oc_name_known))
+                             ? " to activate its magic" : "");
+
+        Sprintf(outbuf, "Read this scroll%s", magic);
+    } else if (obj->oclass == SPBOOK_CLASS) {
+        boolean novel = (otyp == SPE_NOVEL),
+                blank = (otyp == SPE_BLANK_PAPER
+                         && objects[otyp].oc_name_known),
+                tome = (otyp == SPE_BOOK_OF_THE_DEAD
+                        && objects[otyp].oc_name_known);
+
+        Sprintf(outbuf, "%s this %s",
+                (novel || blank) ? "Read" : tome ? "Examine" : "Study",
+                novel ? simpleonames(obj) /* "novel" or "paperback book" */
+                      : tome ? "tome" : "spellbook");
+    } else {
+        res = IA_NONE;
+    }
+    return res;
 }
 
 static void
@@ -2754,19 +2805,8 @@ itemactions(struct obj *otmp)
                    "Quiver this item for easy throwing");
 
     /* r: read item */
-    if (otmp->otyp == FORTUNE_COOKIE)
-        ia_addmenu(win, IA_READ_OBJ, 'r',
-                   "Read the message inside this cookie");
-    else if (otmp->otyp == T_SHIRT)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the slogan on the shirt");
-    else if (otmp->otyp == ALCHEMY_SMOCK)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Read the slogan on the apron");
-    else if (otmp->otyp == HAWAIIAN_SHIRT)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Look at the pattern on the shirt");
-    else if (otmp->oclass == SCROLL_CLASS)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Cast the spell on this scroll");
-    else if (otmp->oclass == SPBOOK_CLASS)
-        ia_addmenu(win, IA_READ_OBJ, 'r', "Study this spellbook");
+    if (item_reading_classification(otmp, buf) == IA_READ_OBJ)
+        ia_addmenu(win, IA_READ_OBJ, 'r', buf);
 
     /* R: remove accessory or rub item */
     if (otmp->owornmask & W_ACCESSORY)
