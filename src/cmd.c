@@ -5464,7 +5464,7 @@ char
 yn_function(const char *query, const char *resp, char def)
 {
     char res = '\033', qbuf[QBUFSZ];
-    struct _cmd_queue *cmdq = cmdq_pop();
+    struct _cmd_queue cq, *cmdq;
 #ifdef DUMPLOG
     unsigned idx = g.saved_pline_index;
     /* buffer to hold query+space+formatted_single_char_response */
@@ -5481,15 +5481,24 @@ yn_function(const char *query, const char *resp, char def)
         Strcpy(&qbuf[QBUFSZ - 1 - 3], "...");
         query = qbuf;
     }
-    if (cmdq) {
-        if (cmdq->typ == CMDQ_KEY)
-            res = cmdq->key;
+
+    if ((cmdq = cmdq_pop()) != 0) {
+        cq = *cmdq;
+        free(cmdq);
+    } else {
+        cq.typ = CMDQ_USER_INPUT;
+        cq.key = '\0'; /* lint suppression */
+    }
+
+    if (cq.typ != CMDQ_USER_INPUT) {
+        if (cq.typ == CMDQ_KEY)
+            res = cq.key;
         else
             cmdq_clear(); /* 'res' is ESC */
     } else {
         res = (*windowprocs.win_yn_function)(query, resp, def);
     }
-    free(cmdq);
+
 #ifdef DUMPLOG
     if (idx == g.saved_pline_index) {
         /* when idx is still the same as g.saved_pline_index, the interface

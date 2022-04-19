@@ -1489,9 +1489,10 @@ any_obj_ok(struct obj *obj)
  * case.
  */
 struct obj *
-getobj(const char *word,
-       int (*obj_ok)(OBJ_P), /* callback */
-       unsigned int ctrlflags)
+getobj(
+    const char *word,       /* usually a direct verb such as "drop" */
+    int (*obj_ok)(OBJ_P),   /* callback to classify an object's suitability */
+    unsigned int ctrlflags) /* some control to fine-tune the behavior */
 {
     register struct obj *otmp;
     register char ilet = 0;
@@ -1504,41 +1505,47 @@ getobj(const char *word,
             allownone = FALSE;
     int inaccess = 0; /* counts GETOBJ_EXCLUDE_INACCESS items to decide
                        * between "you don't have anything to <foo>"
-                       * versus "you don't have anything _else_ to <foo>" */
+                       * versus "you don't have anything _else_ to <foo>"
+                       * (also used for GETOBJ_EXCLUDE_NONINVENT) */
     long cnt;
     boolean cntgiven = FALSE;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
     Loot *sortedinvent, *srtinv;
+    struct _cmd_queue cq, *cmdq;
 
-    struct _cmd_queue *cmdq = cmdq_pop();
+    if ((cmdq = cmdq_pop()) != 0) {
+        cq = *cmdq;
+        free(cmdq);
+        /* user-input means pick something interactively now, with more
+           in the command queue for after that; if not user-input, it
+           has to be a key here */
+        if (cq.typ != CMDQ_USER_INPUT) {
+            otmp = 0; /* in case of non-key or lookup failure */
+            if (cq.typ == CMDQ_KEY) {
+                int v;
 
-    if (cmdq && cmdq->typ != CMDQ_USER_INPUT) {
-        int v;
-
-        /* it's not a key, abort */
-        if (cmdq->typ != CMDQ_KEY) {
-            free(cmdq);
-            return (struct obj *) 0;
-        }
-        for (otmp = g.invent; otmp; otmp = otmp->nobj)
-            if (otmp->invlet == cmdq->key) {
-                v = (*obj_ok)(otmp);
-                if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
-                    break;
+                if (cq.key == '-') {
+                    /* check whether the hands/self choice is suitable */
+                    v = (*obj_ok)((struct obj *) 0);
+                    if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
+                        otmp = (struct obj *) &cg.zeroobj;
+                } else {
+                    /* there could be more than one match if key is '#';
+                       take first one which passes the obj_ok callback */
+                    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+                        if (otmp->invlet == cq.key) {
+                            v = (*obj_ok)(otmp);
+                            if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
+                                break;
+                        }
+                }
             }
-        if (!otmp) {
-            v = (*obj_ok)((struct obj *) 0);
-            if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
-                otmp = (struct obj *) &cg.zeroobj; /* cast away const */
-        }
-        free(cmdq);
-        if (!otmp)
-            cmdq_clear();
-        return otmp;
-    }
-    if (cmdq)
-        free(cmdq);
+            if (!otmp)        /* didn't find what we were looking for, */
+                cmdq_clear(); /* so discard any other queued commands  */
+            return otmp;
+        } /* !CMDQ_USER_INPUT */
+    } /* cmdq */
 
     /* is "hands"/"self" a valid thing to do this action on? */
     switch ((*obj_ok)((struct obj *) 0)) {
