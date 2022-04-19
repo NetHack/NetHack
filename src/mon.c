@@ -2989,6 +2989,8 @@ xkilled(
         EDOG(mtmp)->killed_by_u = 1;
 
     if (wasinside && g.thrownobj && g.thrownobj != uball
+        /* don't give to mon if missile is going to be destroyed */
+        && g.thrownobj->oclass != POTION_CLASS
         /* don't give to mon if missile is going to return to hero */
         && g.thrownobj != (struct obj *) iflags.returning_missile) {
         /* thrown object has killed hero's engulfer; add it to mon's
