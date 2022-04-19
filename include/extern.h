@@ -484,6 +484,8 @@ extern const char *safe_oname(struct obj *);
 extern struct monst *christen_monst(struct monst *, const char *);
 extern struct obj *oname(struct obj *, const char *, unsigned);
 extern boolean objtyp_is_callable(int);
+extern int name_ok(struct obj *);
+extern int call_ok(struct obj *);
 extern int docallcmd(void);
 extern void docall(struct obj *);
 extern const char *rndghostname(void);

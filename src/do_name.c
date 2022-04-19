@@ -21,8 +21,6 @@ static void truncate_to_map(int *, int *, schar, schar);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
 static void do_oname(struct obj *);
-static int name_ok(struct obj *);
-static int call_ok(struct obj *);
 static char *docall_xname(struct obj *);
 static void namefloorobj(void);
 
@@ -1231,7 +1229,7 @@ do_mgivenname(void)
  * allocates a replacement object, so that old risk is gone.
  */
 static void
-do_oname(register struct obj *obj)
+do_oname(struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
@@ -1387,17 +1385,20 @@ objtyp_is_callable(int i)
 }
 
 /* getobj callback for object to name (specific item) - anything but gold */
-static int
+int
 name_ok(struct obj *obj)
 {
     if (!obj || obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
+    if (!obj->dknown || obj->oartifact || obj->otyp == SPE_NOVEL)
+        return GETOBJ_DOWNPLAY;
+
     return GETOBJ_SUGGEST;
 }
 
 /* getobj callback for object to call (name its type) */
-static int
+int
 call_ok(struct obj *obj)
 {
     if (!obj || !objtyp_is_callable(obj->otyp))
@@ -1414,10 +1415,18 @@ docallcmd(void)
     winid win;
     anything any;
     menu_item *pick_list = 0;
-    char ch;
+    struct _cmd_queue *cmdq;
+    char ch = 0;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
 
+    if ((cmdq = cmdq_pop()) != 0) {
+        if (cmdq->typ == CMDQ_KEY)
+            ch = cmdq->key;
+        else
+            cmdq_clear();
+        goto docallcmd;
+    }
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
@@ -1456,6 +1465,7 @@ docallcmd(void)
         ch = 'q';
     destroy_nhwindow(win);
 
+ docallcmd:
     switch (ch) {
     default:
     case 'q':

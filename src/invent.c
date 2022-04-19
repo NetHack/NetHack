@@ -35,6 +35,7 @@ static boolean tool_being_used(struct obj *);
 static int adjust_ok(struct obj *);
 static int adjust_gold_ok(struct obj *);
 static char obj_to_let(struct obj *);
+static boolean item_naming_classification(struct obj *, char *, char *);
 static void mime_action(const char *);
 
 /* wizards can wish for venom, which will become an invisible inventory
@@ -2510,6 +2511,8 @@ enum item_action_actions {
     IA_NONE          = 0,
     IA_UNWIELD, /* hack for 'w-' */
     IA_APPLY_OBJ,
+    IA_NAME_OBJ, /* 'c' name individual item */
+    IA_NAME_OTYP, /* 'C' name item's type */
     IA_DIP_OBJ,
     IA_DROP_OBJ,
     IA_EAT_OBJ,
@@ -2530,6 +2533,32 @@ enum item_action_actions {
     IA_SACRIFICE,
 };
 
+/* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
+static boolean
+item_naming_classification(struct obj *obj, char *onamebuf, char *ocallbuf)
+{
+    static const char Name[] = "Name", Rename[] = "Rename or unname";
+
+    onamebuf[0] = ocallbuf[0] = '\0';
+    if (name_ok(obj) == GETOBJ_SUGGEST) {
+        Sprintf(onamebuf, "%s %s %s",
+                (!has_oname(obj) || !*ONAME(obj)) ? Name : Rename,
+                !is_plural(obj) ? "this" : "these",
+                simpleonames(obj));
+    }
+    if (call_ok(obj) == GETOBJ_SUGGEST) {
+        char *callname = simpleonames(obj);
+
+        if (!is_plural(obj)) /* when not already plural, force plural */
+            callname = makeplural(callname);
+        Sprintf(ocallbuf, "%s the type for %s",
+                (!objects[obj->otyp].oc_uname
+                 || !*objects[obj->otyp].oc_uname) ? Name : Rename,
+                callname);
+    }
+    return (*onamebuf || *ocallbuf) ? TRUE : FALSE;
+}
+
 static void
 ia_addmenu(winid win, int act, char let, const char *txt)
 {
@@ -2547,7 +2576,7 @@ itemactions(struct obj *otmp)
 {
     int n, act = IA_NONE;
     winid win;
-    char buf[BUFSZ];
+    char buf[BUFSZ], buf2[BUFSZ];
     menu_item *selected;
     struct monst *mtmp;
     const char *light = otmp->lamplit ? "Extinguish" : "Light";
@@ -2647,6 +2676,14 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Dig with this digging tool");
     else if (otmp->oclass == WAND_CLASS)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Break this wand");
+
+    /* 'c', 'C' - call an item or its type something */
+    if (item_naming_classification(otmp, buf, buf2)) {
+        if (*buf)
+            ia_addmenu(win, IA_NAME_OBJ, 'c', buf);
+        if (*buf2)
+            ia_addmenu(win, IA_NAME_OTYP, 'C', buf2);
+    }
 
     /* d: drop item, works on everything except worn items; those will
        always have a takeoff/remove choice so we don't have to worry
@@ -2831,6 +2868,12 @@ itemactions(struct obj *otmp)
             break;
         case IA_APPLY_OBJ:
             cmdq_add_ec(doapply);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_NAME_OBJ:
+        case IA_NAME_OTYP:
+            cmdq_add_ec(docallcmd);
+            cmdq_add_key((act == IA_NAME_OBJ) ? 'i' : 'o');
             cmdq_add_key(otmp->invlet);
             break;
         case IA_DIP_OBJ:
