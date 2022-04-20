@@ -883,6 +883,8 @@ putting objects into a container with menustyle=traditional and then taking
 when drinking or dipping, allow the 'm' prefix to be used to skip asking
 	about fountains and pools
 calling real or fake Amulet something could give away information about them
+throwing gold while inside a purple worm would yield "The gold disappears
+	in the the purple worm's entrails." (note doubled "the")
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
