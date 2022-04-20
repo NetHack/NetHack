@@ -1566,7 +1566,9 @@ extend farlook's "<mon>, asleep" to "<mon>, can't move (paralyzed or sleeping
 	that is waiting for hero to approach
 add body part terminology for spiders; enhance it for cockatrices
 context sensitive item usage menu from inventory, aka "item actions"
-
+pets are more likely to follow you closely if you are carrying something they
+	really like to eat; behave as if you are carrying such whenever you
+	are standing on stairs so that pets will try harder to come to you
 
 Platform- and/or Interface-Specific New Features
 ------------------------------------------------

@@ -593,13 +593,19 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
                 || (dog_has_minvent && rn2(edog->apport)))
                 appr = 1;
         }
-        /* if you have dog food it'll follow you more closely */
-        if (appr == 0)
-            for (obj = g.invent; obj; obj = obj->nobj)
-                if (dogfood(mtmp, obj) == DOGFOOD) {
-                    appr = 1;
-                    break;
-                }
+        /* if you have dog food it'll follow you more closely; if you are
+           on stairs (or ladder), it will behave as if you have dog food */
+        if (appr == 0) {
+            if (On_stairs(u.ux, u.uy)) {
+                appr = 1;
+            } else {
+                for (obj = g.invent; obj; obj = obj->nobj)
+                    if (dogfood(mtmp, obj) == DOGFOOD) {
+                        appr = 1;
+                        break;
+                    }
+            }
+        }
     } else
         appr = 1; /* gtyp != UNDEF */
     if (mtmp->mconf)
