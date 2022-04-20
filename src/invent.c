@@ -2525,14 +2525,17 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 enum item_action_actions {
     IA_NONE          = 0,
     IA_UNWIELD, /* hack for 'w-' */
-    IA_APPLY_OBJ,
+    IA_APPLY_OBJ, /* 'a' */
+    IA_DIP_OBJ, /* 'a' on a potion == dip */
     IA_NAME_OBJ, /* 'c' name individual item */
     IA_NAME_OTYP, /* 'C' name item's type */
-    IA_DIP_OBJ,
-    IA_DROP_OBJ,
-    IA_EAT_OBJ,
-    IA_ENGRAVE_OBJ,
-    IA_BUY_OBJ,
+    IA_DROP_OBJ, /* 'd' */
+    IA_EAT_OBJ, /* 'e' */
+    IA_ENGRAVE_OBJ, /* 'E' */
+    IA_ADJUST_OBJ, /* 'i' #adjust inventory letter */
+    IA_ADJUST_STACK, /* 'I' #adjust with count to split stack */
+    IA_SACRIFICE, /* 'O' offer sacrifice */
+    IA_BUY_OBJ, /* 'p' pay shopkeeper */
     IA_QUAFF_OBJ,
     IA_QUIVER_OBJ,
     IA_READ_OBJ,
@@ -2545,7 +2548,6 @@ enum item_action_actions {
     IA_WEAR_OBJ,
     IA_SWAPWEAPON,
     IA_ZAP_OBJ,
-    IA_SACRIFICE,
 };
 
 /* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
@@ -2775,6 +2777,17 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
                    "Write on the floor with this object");
 
+    /* i: #adjust inventory letter */
+    if (otmp->oclass != COIN_CLASS) /* gold is always "letter" '$' */
+        ia_addmenu(win, IA_ADJUST_OBJ, 'i',
+                   "Adjust inventory by assigning new letter");
+#if 0
+    /* I: #adjust inventory item by splitting its stack  */
+    if (otmp->quan > 1L && otmp->oclass != COIN_CLASS)
+        ia_addmenu(win, IA_ADJUST_STACK, 'I',
+                   "Adjust inventory by splitting this stack");
+#endif
+
     /* O: offer sacrifice */
     if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
         /* FIXME: this doesn't match #offer's likely candidates, which don't
@@ -2924,18 +2937,18 @@ itemactions(struct obj *otmp)
             cmdq_add_ec(doapply);
             cmdq_add_key(otmp->invlet);
             break;
-        case IA_NAME_OBJ:
-        case IA_NAME_OTYP:
-            cmdq_add_ec(docallcmd);
-            cmdq_add_key((act == IA_NAME_OBJ) ? 'i' : 'o');
-            cmdq_add_key(otmp->invlet);
-            break;
         case IA_DIP_OBJ:
             /* #altdip instead of normal #dip - takes potion to dip into
                first (the inventory item instigating this) and item to
                be dipped second, also ignores floor features such as
                fountain/sink so we don't need to force m-prefix here */
             cmdq_add_ec(dip_into);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_NAME_OBJ:
+        case IA_NAME_OTYP:
+            cmdq_add_ec(docallcmd);
+            cmdq_add_key((act == IA_NAME_OBJ) ? 'i' : 'o');
             cmdq_add_key(otmp->invlet);
             break;
         case IA_DROP_OBJ:
@@ -2951,6 +2964,21 @@ itemactions(struct obj *otmp)
             break;
         case IA_ENGRAVE_OBJ:
             cmdq_add_ec(doengrave);
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_ADJUST_OBJ:
+            cmdq_add_ec(doorganize); /* #adjust */
+            cmdq_add_key(otmp->invlet);
+            break;
+        case IA_ADJUST_STACK:
+#if 0       /* will need an alternate command routine (like #altdip) in
+             * order to prompt for a count */
+            cmdq_add_ec(doorganize);
+            cmdq_add_key(otmp->invlet);
+#endif
+            break;
+        case IA_SACRIFICE:
+            cmdq_add_ec(dosacrifice);
             cmdq_add_key(otmp->invlet);
             break;
         case IA_BUY_OBJ:
@@ -3005,10 +3033,6 @@ itemactions(struct obj *otmp)
             break;
         case IA_ZAP_OBJ:
             cmdq_add_ec(dozap);
-            cmdq_add_key(otmp->invlet);
-            break;
-        case IA_SACRIFICE:
-            cmdq_add_ec(dosacrifice);
             cmdq_add_key(otmp->invlet);
             break;
         }
