@@ -702,9 +702,11 @@ curses_get_count(int first_digit)
        curses's message window will display that in count window instead */
     current_char = get_count(NULL, (char) first_digit,
                              /* 0L => no limit on value unless it wraps
-                              * to negative;
-                              * FALSE => suppress from message history */
-                             0L, &current_count, FALSE);
+                                to negative */
+                             0L, &current_count,
+                             /* default: don't put into message history,
+                                don't echo until second digit entered */
+                             GC_NOFLAGS);
 
     ungetch(current_char);
     if (current_char == '\033') {     /* Cancelled with escape */

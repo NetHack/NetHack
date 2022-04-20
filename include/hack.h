@@ -476,6 +476,11 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define SUPPRESS_HISTORY 4
 #define URGENT_MESSAGE   8
 
+/* get_count flags */
+#define GC_NOFLAGS   0
+#define GC_SAVEHIST  1 /* save "Count: 123" in message history */
+#define GC_ECHOFIRST 2 /* echo "Count: 1" even when there's only one digit */
+
 /* rloc() flags */
 #define RLOC_NONE    0x00
 #define RLOC_ERR     0x01 /* allow impossible() if no rloc */

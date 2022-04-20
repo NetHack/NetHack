@@ -34,6 +34,7 @@ static void menu_identify(int);
 static boolean tool_being_used(struct obj *);
 static int adjust_ok(struct obj *);
 static int adjust_gold_ok(struct obj *);
+static int doorganize_core(struct obj *);
 static char obj_to_let(struct obj *);
 static boolean item_naming_classification(struct obj *, char *, char *);
 static int item_reading_classification(struct obj *, char *);
@@ -1659,7 +1660,7 @@ getobj(
                 pline("No count allowed with this command.");
                 continue;
             }
-            ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, TRUE);
+            ilet = get_count(NULL, ilet, LARGEST_INT, &tmpcnt, GC_SAVEHIST);
             if (tmpcnt) {
                 cnt = tmpcnt;
                 cntgiven = TRUE;
@@ -2777,16 +2778,15 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_ENGRAVE_OBJ, 'E',
                    "Write on the floor with this object");
 
-    /* i: #adjust inventory letter */
-    if (otmp->oclass != COIN_CLASS) /* gold is always "letter" '$' */
+    /* i: #adjust inventory letter; gold can't be adjusted unless there
+       is some in a slot other than '$' (which shouldn't be possible) */
+    if (otmp->oclass != COIN_CLASS || check_invent_gold("item-action"))
         ia_addmenu(win, IA_ADJUST_OBJ, 'i',
                    "Adjust inventory by assigning new letter");
-#if 0
     /* I: #adjust inventory item by splitting its stack  */
     if (otmp->quan > 1L && otmp->oclass != COIN_CLASS)
         ia_addmenu(win, IA_ADJUST_STACK, 'I',
                    "Adjust inventory by splitting this stack");
-#endif
 
     /* O: offer sacrifice */
     if (IS_ALTAR(levl[u.ux][u.uy].typ) && !u.uswallow) {
@@ -2971,11 +2971,8 @@ itemactions(struct obj *otmp)
             cmdq_add_key(otmp->invlet);
             break;
         case IA_ADJUST_STACK:
-#if 0       /* will need an alternate command routine (like #altdip) in
-             * order to prompt for a count */
-            cmdq_add_ec(doorganize);
+            cmdq_add_ec(adjust_split); /* #altadjust */
             cmdq_add_key(otmp->invlet);
-#endif
             break;
         case IA_SACRIFICE:
             cmdq_add_ec(dosacrifice);
@@ -4760,18 +4757,8 @@ adjust_gold_ok(struct obj *obj)
 int
 doorganize(void) /* inventory organizer by Del Lamb */
 {
-    struct obj *obj, *otmp, *splitting, *bumped;
-    int ix, cur, trycnt;
-    char let;
-#define GOLD_INDX   0
-#define GOLD_OFFSET 1
-#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
-    char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
-    char qbuf[QBUFSZ];
-    char *objname, *otmpname;
-    const char *adj_type;
     int (*adjust_filter)(struct obj *);
-    boolean ever_mind = FALSE, collect, isgold;
+    struct obj *obj;
 
     /* when no invent, or just gold in '$' slot, there's nothing to adjust */
     if (!g.invent || (g.invent->oclass == COIN_CLASS
@@ -4789,8 +4776,80 @@ doorganize(void) /* inventory organizer by Del Lamb */
 
     /* get object the user wants to organize (the 'from' slot) */
     obj = getobj("adjust", adjust_filter, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
+
+    return doorganize_core(obj);
+}
+
+/* alternate version of #adjust used by itemactions() for splitting */
+int
+adjust_split(void)
+{
+    struct obj *obj;
+    cmdcount_nht splitamount = 0L;
+    char let, dig = '\0';
+
+    /* invlet should be queued so no getobj prompting is expected */
+    obj = getobj("split", adjust_ok, GETOBJ_NOFLAGS);
+    if (!obj || obj->quan < 2L || obj->otyp == GOLD_PIECE)
+        return ECMD_FAIL; /* caller has set things up to avoid this */
+
+    if (obj->quan == 2L) {
+        splitamount = 1L;
+    } else {
+        /* get first digit; doesn't wait for <return> */
+        dig = yn_function("Split off how many?", (char *) 0, '\0');
+        if (!digit(dig)) {
+            pline1(Never_mind);
+            return ECMD_CANCEL;
+        }
+        /* got first digit, get more until next non-digit (except for
+           backspace/delete which will take away most recent digit and
+           keep going; we expect one of ' ', '\n', or '\r') */
+        let = get_count(NULL, dig, LARGEST_INT, &splitamount, GC_ECHOFIRST);
+        /* \033 is in quitchars[] so we need to check for it separately
+           in order to treat it as cancel rather than as accept */
+        if (!let || let == '\033' || !index(quitchars, let)) {
+            pline1(Never_mind);
+            return ECMD_CANCEL;
+        }
+    }
+    if (splitamount < 1L || splitamount >= obj->quan) {
+        static const char
+            Amount[] = "Amount to split from current stack must be";
+
+        if (splitamount < 1L)
+            pline("%s at least 1.", Amount);
+        else
+            pline("%s less than %ld.", Amount, obj->quan);
+        return ECMD_CANCEL;
+    }
+
+    /* normally a split would take place in getobj() if player supplies
+       a count there, so doorganize_core() figures out 'splitamount'
+       from the object; it will undo the split if player cancels while
+       selecting the destination slot */
+    obj = splitobj(obj, (long) splitamount);
+    return doorganize_core(obj);
+}
+
+static int
+doorganize_core(struct obj *obj)
+{
+    struct obj *otmp, *splitting, *bumped;
+    int ix, cur, trycnt;
+    char let;
+#define GOLD_INDX   0
+#define GOLD_OFFSET 1
+#define OVRFLW_INDX (GOLD_OFFSET + 52) /* past gold and 2*26 letters */
+    char lets[1 + 52 + 1 + 1]; /* room for '$a-zA-Z#\0' */
+    char qbuf[QBUFSZ];
+    char *objname, *otmpname;
+    const char *adj_type;
+    boolean ever_mind = FALSE, collect, isgold;
+
     if (!obj)
         return ECMD_CANCEL;
+
     /* can only be gold if check_invent_gold() found a problem:  multiple '$'
        stacks and/or gold in some other slot, otherwise (*adjust_filter)()
        won't allow gold to be picked; if player has picked any stack of gold
@@ -4843,7 +4902,11 @@ doorganize(void) /* inventory organizer by Del Lamb */
         compactify(lets);
 
     /* get 'to' slot to use as destination */
-    Sprintf(qbuf, "Adjust letter to what [%s]%s?", lets,
+    if (!splitting)
+        Strcpy(qbuf, "Adjust letter");
+    else /* note: splitting->quan is the amount being left in original slot */
+        Sprintf(qbuf, "Split %ld", obj->quan);
+    Sprintf(eos(qbuf), " to what [%s]%s?", lets,
             g.invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
         let = !isgold ? yn_function(qbuf, (char *) 0, '\0') : GOLD_SYM;

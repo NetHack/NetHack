@@ -2605,6 +2605,7 @@ struct ext_func_tab extcmdlist[] = {
     /* internal commands: only used by game core, not available for user */
     { '\0', "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
     { '\0', "altdip", NULL, dip_into, INTERNALCMD, NULL },
+    { '\0', "altadjust", NULL, adjust_split, INTERNALCMD, NULL },
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 
@@ -5124,20 +5125,25 @@ click_to_cmd(int x, int y, int mod)
 /* gather typed digits into a number in *count; return the next non-digit */
 char
 get_count(
-    char *allowchars,
-    char inkey,
-    long maxcount,
-    cmdcount_nht *count,
-    boolean historicmsg) /* whether to include in ^P history: True => yes */
+    const char *allowchars, /* what comes after digits; if Null, anything */
+    char inkey,          /* if caller already got first digit, this is it */
+    long maxcount,       /* if user tries to enter a bigger count, use this */
+    cmdcount_nht *count, /* primary output */
+    unsigned gc_flags)   /* control flags: GC_SAVEHIST, GC_ECHOFIRST */
 {
     char qbuf[QBUFSZ];
     int key;
     long cnt = 0L;
-    boolean backspaced = FALSE;
+    boolean backspaced = FALSE, showzero = TRUE,
+            /* should "Count: 123" go into message history? */
+            historicmsg = (gc_flags & GC_SAVEHIST) != 0,
+            /* normally "Count: 12" isn't echoed until the second digit */
+            echoalways = (gc_flags & GC_ECHOFIRST) != 0;
     /* this should be done in port code so that we have erase_char
        and kill_char available; we can at least fake erase_char */
 #define STANDBY_erase_char '\177'
 
+    *count = 0;
     for (;;) {
         if (inkey) {
             key = inkey;
@@ -5151,19 +5157,26 @@ get_count(
                 cnt = 0L;
             else if (maxcount > 0L && cnt > maxcount)
                 cnt = maxcount;
-        } else if (cnt && (key == '\b' || key == STANDBY_erase_char)) {
+            /* if we've backed up to nothing, then typed 0, show that 0 */
+            showzero = (key == '0');
+        } else if (key == '\b' || key == STANDBY_erase_char) {
+            if (!cnt && !echoalways)
+                break;
+            showzero = FALSE;
             cnt = cnt / 10L;
             backspaced = TRUE;
         } else if (key == g.Cmd.spkeys[NHKF_ESC]) {
             break;
         } else if (!allowchars || index(allowchars, key)) {
-            *count = cnt;
+            *count = (cmdcount_nht) cnt;
+            if ((long) *count != cnt)
+                impossible("get_count: cmdcount_nht");
             break;
         }
 
-        if (cnt > 9 || backspaced) {
+        if (cnt > 9 || backspaced || echoalways) {
             clear_nhwindow(WIN_MESSAGE);
-            if (backspaced && !cnt) {
+            if (backspaced && !cnt && !showzero) {
                 Sprintf(qbuf, "Count: ");
             } else {
                 Sprintf(qbuf, "Count: %ld", cnt);
@@ -5199,7 +5212,7 @@ parse(void)
                                             * reset to 0 by readchar() */
     if (!g.Cmd.num_pad || (foo = readchar()) == g.Cmd.spkeys[NHKF_COUNT]) {
         foo = get_count((char *) 0, '\0', LARGEST_INT,
-                        &g.command_count, FALSE);
+                        &g.command_count, GC_NOFLAGS);
         g.last_command_count = g.command_count;
     }
 

@@ -286,7 +286,7 @@ extern const char *directionname(int);
 extern int isok(int, int);
 extern int get_adjacent_loc(const char *, const char *, xchar, xchar, coord *);
 extern const char *click_to_cmd(int, int, int);
-extern char get_count(char *, char, long, cmdcount_nht *, boolean);
+extern char get_count(const char *, char, long, cmdcount_nht *, unsigned);
 #ifdef HANGUPHANDLING
 extern void hangup(int);
 extern void end_of_input(void);
@@ -1148,6 +1148,7 @@ extern void free_invbuf(void);
 extern void reassign(void);
 extern boolean check_invent_gold(const char *);
 extern int doorganize(void);
+extern int adjust_split(void);
 extern void free_pickinv_cache(void);
 extern int count_unpaid(struct obj *);
 extern int count_buc(struct obj *, int, boolean(*)(struct obj *));
