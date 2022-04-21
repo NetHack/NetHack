@@ -3911,8 +3911,12 @@ dotypeinv(void)
     if (query_objlist((char *) 0, &g.invent,
                       ((flags.invlet_constant ? USE_INVLET : 0)
                        | INVORDER_SORT | INCLUDE_VENOM),
-                      &pick_list, PICK_NONE, this_type_only) > 0)
+                      &pick_list, PICK_ONE, this_type_only) > 0) {
+        struct obj *otmp = pick_list[0].item.a_obj;
+
         free((genericptr_t) pick_list);
+        (void) itemactions(otmp); /* always returns ECMD_OK */
+    }
 
  doI_done:
     g.this_type = 0;
