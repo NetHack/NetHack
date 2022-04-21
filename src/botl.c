@@ -2351,7 +2351,7 @@ query_arrayvalue(
 static void
 status_hilite_add_threshold(int fld, struct hilite_s *hilite)
 {
-    struct hilite_s *new_hilite;
+    struct hilite_s *new_hilite, *old_hilite;
 
     if (!hilite)
         return;
@@ -2362,8 +2362,16 @@ status_hilite_add_threshold(int fld, struct hilite_s *hilite)
 
     new_hilite->set = TRUE;
     new_hilite->fld = fld;
-    new_hilite->next = g.blstats[0][fld].thresholds;
-    g.blstats[0][fld].thresholds = new_hilite;
+    new_hilite->next = (struct hilite_s *) 0;
+    /* insert new entry at the end of the list */
+    if (!g.blstats[0][fld].thresholds) {
+        g.blstats[0][fld].thresholds = new_hilite;
+    } else {
+        for (old_hilite = g.blstats[0][fld].thresholds; old_hilite->next;
+             old_hilite = old_hilite->next)
+            continue;
+        old_hilite->next = new_hilite;
+    }
     /* sort_hilites(fld) */
 
     /* current and prev must both point at the same hilites */
@@ -3680,12 +3688,11 @@ status_hilite_menu_add(int origfld)
             hilite.rel = TXT_VALUE;
             Strcpy(hilite.textmatch, aligntxt[rv]);
         } else if (fld == BL_HUNGER) {
-            static const char *const hutxt[] = { "Satiated", (char *) 0, "Hungry",
-                                           "Weak", "Fainting", "Fainted",
-                                           "Starved" };
-            int rv = query_arrayvalue(qry_buf,
-                                      hutxt,
-                                      SATIATED, STARVED + 1);
+            static const char *const hutxt[] = {
+                "Satiated", (char *) 0, "Hungry", "Weak",
+                "Fainting", "Fainted", "Starved"
+            };
+            int rv = query_arrayvalue(qry_buf, hutxt, SATIATED, STARVED + 1);
 
             if (rv < SATIATED)
                 goto choose_behavior;
