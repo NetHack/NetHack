@@ -1127,7 +1127,8 @@ makemon(
     struct monst fakemon;
     coord cc;
     int mndx, mcham, ct, mitem;
-    boolean anymon = !ptr,
+    boolean femaleok, maleok,
+            anymon = !ptr,
             byyou = u_at(x, y),
             allow_minvent = ((mmflags & NO_MINVENT) == 0),
             countbirth = ((mmflags & MM_NOCOUNTBIRTH) == 0),
@@ -1230,10 +1231,13 @@ makemon(
     /* set up level and hit points */
     newmonhp(mtmp, mndx);
 
-    if (is_female(ptr) || ((mmflags & MM_FEMALE) && !is_male(ptr)))
-        mtmp->female = TRUE;
-    else if (is_male(ptr) || ((mmflags & MM_MALE) && !is_female(ptr)))
-        mtmp->female = FALSE;
+    femaleok = (!is_male(ptr) && !is_neuter(ptr));
+    maleok = (!is_female(ptr) && !is_neuter(ptr));
+    if (is_female(ptr) || ((mmflags & MM_FEMALE) != 0 && femaleok))
+        mtmp->female = 1;
+    else if (is_male(ptr) || ((mmflags & MM_MALE) != 0 && maleok))
+        mtmp->female = 0;
+
     /* leader and nemesis gender is usually hardcoded in mons[],
        but for ones which can be random, it has already been chosen
        (in role_init(), for possible use by the quest pager code) */
@@ -1241,8 +1245,12 @@ makemon(
         mtmp->female = g.quest_status.ldrgend;
     else if (ptr->msound == MS_NEMESIS && quest_info(MS_NEMESIS) == mndx)
         mtmp->female = g.quest_status.nemgend;
+
+    /* female used to be set randomly here even for neuters on the
+       grounds that it was ignored, but after corpses were changed to
+       retain gender it matters because it affects stacking of corpses */
     else
-        mtmp->female = rn2(2); /* ignored for neuters */
+        mtmp->female = femaleok ? rn2(2) : 0;
 
     if (In_sokoban(&u.uz) && !mindless(ptr)) /* know about traps here */
         mtmp->mtrapseen = (1L << (PIT - 1)) | (1L << (HOLE - 1));
