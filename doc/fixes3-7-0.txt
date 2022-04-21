@@ -1156,6 +1156,8 @@ if the repeat command was used after prefix+command, only the command part got
 	repeated
 the change for repeat after prefix+command would result in a crash if repeat
 	was attempted after an unassigned key
+items obtained via wishing while blind were erroneously being marked as 'seen
+	up close' so behaving differently from items picked up off the floor
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

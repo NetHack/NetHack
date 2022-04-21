@@ -5647,14 +5647,9 @@ makewish(void)
         return;
     }
 
-    if (otmp != &cg.zeroobj) {
-        /* treat as if seen up close even if hero is blind and hasn't
-           touched it yet */
-        otmp->dknown = 1;
-
-        if (otmp->oartifact)
-            /* update artifact bookkeeping; doesn't produce a livelog event */
-            artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
+    if (otmp->oartifact) {
+        /* update artifact bookkeeping; doesn't produce a livelog event */
+        artifact_origin(otmp, ONAME_WISH | ONAME_KNOW_ARTI);
     }
 
     /* wisharti conduct handled in readobjnam() */
