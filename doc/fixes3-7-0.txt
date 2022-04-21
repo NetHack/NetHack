@@ -1160,6 +1160,9 @@ items obtained via wishing while blind were erroneously being marked as 'seen
 	up close' so behaving differently from items picked up off the floor
 corpses of neuter monsters had random chance to be flagged as female so would
 	only stack with others that made the same random choice
+one-shot food testing ability conferred by blessed scroll of food detection
+	didn't warn about globs of green slime because the relevant code was
+	only executed for corpses, eggs, and tins, not for globs
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

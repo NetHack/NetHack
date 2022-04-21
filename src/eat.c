@@ -52,9 +52,13 @@ static int tin_ok(struct obj *);
 #define flesh_petrifies(pm) (touch_petrifies(pm) || (pm) == &mons[PM_MEDUSA])
 
 /* Rider corpses are treated as non-rotting so that attempting to eat one
-   will be sure to reach the stage of eating where that meal is fatal */
+   will be sure to reach the stage of eating where that meal is fatal;
+   acid blob corpses eventually rot away to nothing but before that happens
+   they can be sacrificed regardless of age which implies that they never
+   become rotten */
 #define nonrotting_corpse(mnum) \
-    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || is_rider(&mons[mnum]))
+    ((mnum) == PM_LIZARD || (mnum) == PM_LICHEN || is_rider(&mons[mnum]) \
+     || (mnum) == PM_ACID_BLOB)
 
 /* non-rotting non-corpses; unlike lizard corpses, these items will behave
    as if rotten if they are cursed (fortune cookies handled elsewhere) */
@@ -1772,8 +1776,7 @@ eatcorpse(struct obj *otmp)
     }
 
     /* 3.7: globs don't become tainted, they shrink away */
-    if (mnum != PM_ACID_BLOB && !glob && !stoneable && !slimeable
-        && rotted > 5L) {
+    if (!glob && !stoneable && !slimeable && rotted > 5L) {
         boolean cannibal = maybe_cannibal(mnum, FALSE);
 
         /* tp++; -- early return makes this unnecessary */
@@ -1815,6 +1818,7 @@ eatcorpse(struct obj *otmp)
                    KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
+
     /* now any corpse left too long will make you mildly ill */
     } else if ((rotted > 5L || (rotted > 3L && rn2(5))) && !Sick_resistance) {
         tp++;
@@ -1860,11 +1864,11 @@ eatcorpse(struct obj *otmp)
                                && herbivorous(g.youmonst.data))
                             : (carnivorous(g.youmonst.data)
                                && !herbivorous(g.youmonst.data))),
-            palatable = ((vegetarian(&mons[mnum])
-                          ? herbivorous(g.youmonst.data)
-                          : carnivorous(g.youmonst.data))
-                         && rn2(10)
-                         && ((rotted < 1) ? TRUE : !rn2((int)rotted+1)));
+                palatable = ((vegetarian(&mons[mnum])
+                              ? herbivorous(g.youmonst.data)
+                              : carnivorous(g.youmonst.data))
+                             && rn2(10)
+                             && (rotted < 1 || !rn2((int) rotted + 1)));
         const char *pmxnam = food_xname(otmp, FALSE);
 
         if (!strncmpi(pmxnam, "the ", 4))
@@ -2474,7 +2478,7 @@ edibility_prompts(struct obj *otmp)
      * or dangerous and avoid it.
      */
     char buf[BUFSZ], foodsmell[BUFSZ],
-         it_or_they[QBUFSZ], eat_it_anyway[QBUFSZ];
+         it_or_they[QBUFSZ];
     /* 3.7: decaying globs don't become tainted anymore; in 3.6, they did */
     boolean cadaver = (otmp->otyp == CORPSE), stoneorslime = FALSE;
     int material = objects[otmp->otyp].oc_material, mnum = otmp->corpsenm;
@@ -2482,10 +2486,9 @@ edibility_prompts(struct obj *otmp)
 
     Strcpy(foodsmell, Tobjnam(otmp, "smell"));
     Strcpy(it_or_they, (otmp->quan == 1L) ? "it" : "they");
-    Sprintf(eat_it_anyway, "Eat %s anyway?",
-            (otmp->quan == 1L) ? "it" : "one");
 
-    if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN) {
+    if (cadaver || otmp->otyp == EGG || otmp->otyp == TIN
+        || otmp->otyp == GLOB_OF_GREEN_SLIME) {
         /* These checks must match those in eatcorpse() */
         stoneorslime = (mnum >= LOW_PM
                         && flesh_petrifies(&mons[mnum])
@@ -2512,109 +2515,64 @@ edibility_prompts(struct obj *otmp)
      * These problems with food should be checked in
      * order from most detrimental to least detrimental.
      */
-    if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && !Sick_resistance) {
+    buf[0] = '\0';
+    if (cadaver && rotted > 5L && !Sick_resistance) {
         /* Tainted meat */
-        Snprintf(buf, sizeof(buf), "%s like %s could be tainted!  %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (stoneorslime) {
-        Snprintf(buf, sizeof(buf),
-                 "%s like %s could be something very dangerous!  %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (otmp->orotten || (cadaver && rotted > 3L)) {
+        Snprintf(buf, sizeof buf, "%s like %s could be tainted!",
+                 foodsmell, it_or_they);
+    } else if (stoneorslime) {
+        Snprintf(buf, sizeof buf,
+                 "%s like %s could be something very dangerous!",
+                 foodsmell, it_or_they);
+    } else if (cadaver && rotted > 5L && Sick_resistance) {
+        /* Tainted meat with Sick_resistance (testing for that is
+           redundant; we don't get this far for !Sick_resistance)
+           needs to be done now even though there is no danger because
+           it can't match after the rotten (cadaver && rotted > 3) test */
+        Snprintf(buf, sizeof buf, "%s like %s could be tainted.",
+                 foodsmell, it_or_they);
+    } else if (otmp->orotten || (cadaver && rotted > 3L)) {
         /* Rotten */
-        Snprintf(buf, sizeof(buf), "%s like %s could be rotten! %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
+        Snprintf(buf, sizeof buf, "%s like %s could be rotten!",
+                 foodsmell, it_or_they);
+    } else if (cadaver && poisonous(&mons[mnum]) && !Poison_resistance) {
         /* poisonous */
-        Snprintf(buf, sizeof(buf), "%s like %s might be poisonous!  %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
+        Snprintf(buf, sizeof buf, "%s like %s might be poisonous!",
+                 foodsmell, it_or_they);
+    } else if (otmp->otyp == APPLE && otmp->cursed && !Sleep_resistance) {
         /* causes sleep, for long enough to be dangerous */
-        Snprintf(buf, sizeof(buf), "%s like %s might have been poisoned.  %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
-    }
-    if (cadaver && !vegetarian(&mons[mnum]) && !u.uconduct.unvegetarian
-        && Role_if(PM_MONK)) {
-        Snprintf(buf, sizeof(buf), "%s unhealthy.  %s", foodsmell,
-                 eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
-        Snprintf(buf, sizeof(buf), "%s rather acidic.  %s",
-                 foodsmell, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
-        && otmp->oerodeproof) {
-        Snprintf(buf, sizeof(buf), "%s disgusting to you right now.  %s",
-                 foodsmell, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
+        Snprintf(buf, sizeof buf, "%s like %s might have been poisoned.",
+                 foodsmell, it_or_they);
+    } else if (cadaver && !vegetarian(&mons[mnum])
+               && !u.uconduct.unvegetarian && Role_if(PM_MONK)) {
+        Snprintf(buf, sizeof buf, "%s unhealthy.", foodsmell);
+    } else if (cadaver && acidic(&mons[mnum]) && !Acid_resistance) {
+        Snprintf(buf, sizeof buf, "%s rather acidic.", foodsmell);
+    } else if (Upolyd && u.umonnum == PM_RUST_MONSTER && is_metallic(otmp)
+               && otmp->oerodeproof) {
+        Snprintf(buf, sizeof buf, "%s disgusting to you right now.",
+                 foodsmell);
 
     /*
      * Breaks conduct, but otherwise safe.
      */
-    if (!u.uconduct.unvegan
-        && ((material == LEATHER || material == BONE
-             || material == DRAGON_HIDE || material == WAX)
-            || (cadaver && !vegan(&mons[mnum])))) {
-        Snprintf(buf, sizeof(buf), "%s foul and unfamiliar to you.  %s",
-                 foodsmell, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
-    }
-    if (!u.uconduct.unvegetarian
-        && ((material == LEATHER || material == BONE
-             || material == DRAGON_HIDE)
-            || (cadaver && !vegetarian(&mons[mnum])))) {
-        Snprintf(buf, sizeof(buf), "%s unfamiliar to you.  %s",
-                 foodsmell, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
+    } else if (!u.uconduct.unvegan
+               && ((material == LEATHER || material == BONE
+                    || material == DRAGON_HIDE || material == WAX)
+                   || (cadaver && !vegan(&mons[mnum])))) {
+        Snprintf(buf, sizeof buf, "%s foul and unfamiliar to you.",
+                 foodsmell);
+    } else if (!u.uconduct.unvegetarian
+               && ((material == LEATHER || material == BONE
+                    || material == DRAGON_HIDE)
+                   || (cadaver && !vegetarian(&mons[mnum])))) {
+        Snprintf(buf, sizeof buf, "%s unfamiliar to you.", foodsmell);
     }
 
-    if (cadaver && mnum != PM_ACID_BLOB && rotted > 5L && Sick_resistance) {
-        /* Tainted meat with Sick_resistance */
-        Snprintf(buf, sizeof(buf), "%s like %s could be tainted!  %s",
-                 foodsmell, it_or_they, eat_it_anyway);
-        if (yn_function(buf, ynchars, 'n') == 'n')
-            return 1;
-        else
-            return 2;
+    if (*buf) {
+        Snprintf(eos(buf), sizeof buf - strlen(buf), "  Eat %s anyway?",
+                 (otmp->quan == 1L) ? "it" : "one");
+        return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
     }
     return 0;
 }
