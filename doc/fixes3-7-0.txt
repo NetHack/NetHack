@@ -1163,6 +1163,9 @@ corpses of neuter monsters had random chance to be flagged as female so would
 one-shot food testing ability conferred by blessed scroll of food detection
 	didn't warn about globs of green slime because the relevant code was
 	only executed for corpses, eggs, and tins, not for globs
+worn ring of slow digestion blocks per-turn hunger but not the hunger caused
+	by wearing it; white dragon scales/mail was blocking per-turn hunger
+	and didn't cause any hunger itself; change to treat it like the ring
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
