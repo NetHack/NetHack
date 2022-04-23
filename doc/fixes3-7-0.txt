@@ -885,6 +885,10 @@ when drinking or dipping, allow the 'm' prefix to be used to skip asking
 calling real or fake Amulet something could give away information about them
 throwing gold while inside a purple worm would yield "The gold disappears
 	in the the purple worm's entrails." (note doubled "the")
+inventory #adjust for !fixinv, after picking 'from' slot the prompt for 'to'
+	slot was supposed to include the next letter beyond those in use as
+	a candidate for destination but an off by 1 error only showed a-x
+	where x is last letter used (despite that, y could still be picked)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

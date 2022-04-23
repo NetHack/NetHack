@@ -4891,7 +4891,7 @@ doorganize_core(struct obj *obj)
     lets[sizeof lets - 1] = '\0';
     /* for floating inv letters, truncate list after the first open slot */
     if (!flags.invlet_constant && (ix = inv_cnt(FALSE)) < 52)
-        lets[ix + (splitting ? 0 : 1)] = '\0';
+        lets[ix + (splitting ? 1 : 2)] = '\0';
 
     /* blank out all the letters currently in use in the inventory
        except those that will be merged with the selected object */
