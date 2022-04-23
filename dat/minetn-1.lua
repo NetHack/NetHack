@@ -107,11 +107,11 @@ des.object({ id = "tallow candle", coord = place[4], quantity = math.random(1,2)
 -- go ahead and leave a lamp next to one corpse to be suggestive
 -- and some empty wands...
 des.object("oil lamp",place[2])
-des.object({ id = "striking", coord = place[1], buc="uncursed", spe=0 })
-des.object({ id = "striking", coord = place[3], buc="uncursed", spe=0 })
-des.object({ id = "striking", coord = place[4], buc="uncursed", spe=0 })
-des.object({ id = "magic missile", coord = place[4], buc="uncursed", spe=0 })
-des.object({ id = "magic missile", coord = place[5], buc="uncursed", spe=0 })
+des.object({ id = "wand of striking", coord = place[1], buc="uncursed", spe=0 })
+des.object({ id = "wand of striking", coord = place[3], buc="uncursed", spe=0 })
+des.object({ id = "wand of striking", coord = place[4], buc="uncursed", spe=0 })
+des.object({ id = "wand of magic missile", coord = place[4], buc="uncursed", spe=0 })
+des.object({ id = "wand of magic missile", coord = place[5], buc="uncursed", spe=0 })
 
 -- the Orcish Army
 

@@ -41,7 +41,7 @@ des.stair("down")
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,75,20))
 -- Objects
-des.object({ id = "teleportation", x=11, y=18, buc="cursed", spe=0 })
+des.object({ id = "scroll of teleportation", x=11, y=18, buc="cursed", spe=0 })
 des.object()
 des.object()
 des.object()

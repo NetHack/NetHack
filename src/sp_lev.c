@@ -3271,11 +3271,37 @@ find_objtype(lua_State *L, const char *s)
     if (s) {
         int i;
         const char *objname;
+        char class = 0;
+
+        /* In objects.h, some item classes are defined without prefixes (such
+         * as "scroll of ") in their names, making some names (such as
+         * "teleportation") ambiguous.  Get the object class if it is
+         * specified, and only return an object of the matching class. */
+        struct {
+            const char *prefix;
+            char class;
+        } class_prefixes[] = {
+            {"ring of ", RING_CLASS},
+            {"potion of ", POTION_CLASS},
+            {"scroll of ", SCROLL_CLASS},
+            {"spellbook of ", SPBOOK_CLASS},
+            {"wand of ", WAND_CLASS},
+            {NULL, 0}
+        };
+        for (i = 0; class_prefixes[i].prefix; i++) {
+            const char *p = class_prefixes[i].prefix;
+            if (!strncmpi(s, p, strlen(p))) {
+                class = class_prefixes[i].class;
+                s = s + strlen(p);
+                break;
+            }
+        }
 
         /* find by object name */
         for (i = 0; i < NUM_OBJECTS; i++) {
             objname = OBJ_NAME(objects[i]);
-            if (objname && !strcmpi(s, objname))
+            if ((!class || class == objects[i].oc_class) &&
+                objname && !strcmpi(s, objname))
                 return i;
         }
 
