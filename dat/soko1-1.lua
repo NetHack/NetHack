@@ -105,5 +105,5 @@ else
 		buc="not-cursed", achievement=1 });
 end
 des.engraving({ coord = pt, type = "burn", text = "Elbereth" });
-des.object({ id = "scare monster", coord = pt, buc = "cursed" });
+des.object({ id = "scroll of scare monster", coord = pt, buc = "cursed" });
 

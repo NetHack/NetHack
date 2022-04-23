@@ -44,7 +44,7 @@ des.object({ id = "chest", coord = place[6],
 });
 des.object("water walking boots",place[7])
 des.object("crystal plate mail",place[8])
-des.object("invisibility",place[9])
+des.object("spellbook of invisibility",place[9])
 -- Walls in the tower are non diggable
 des.non_diggable(selection.area(00,00,14,10))
 

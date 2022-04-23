@@ -93,8 +93,8 @@ des.object({ id = "statue", contents=0 })
 for i=1,8 do
    des.object()
 end
-des.object("blank paper",48,18)
-des.object("blank paper",48,18)
+des.object("scroll of blank paper",48,18)
+des.object("scroll of blank paper",48,18)
 --
 des.trap("rust")
 des.trap("rust")
