@@ -3134,6 +3134,7 @@ extern void setuswapwep(struct obj *);
 extern int dowield(void);
 extern int doswapweapon(void);
 extern int dowieldquiver(void);
+extern int doquiver_core(const char *);
 extern boolean wield_tool(struct obj *, const char *);
 extern int can_twoweapon(void);
 extern void drop_uswapwep(void);

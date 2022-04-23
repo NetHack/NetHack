@@ -265,29 +265,40 @@ setuswapwep(struct obj *obj)
     return;
 }
 
-/* getobj callback for object to ready for throwing/shooting */
+/* getobj callback for object to ready for throwing/shooting;
+   this filter lets worn items through so that caller can reject them */
 static int
 ready_ok(struct obj *obj)
 {
     if (!obj)
-        return GETOBJ_SUGGEST;
+        return GETOBJ_SUGGEST; /* '-', will empty quiver slot if chosen */
 
-    /* exclude when wielded... */
-    if ((obj == uwep || (obj == uswapwep && u.twoweap))
-        && obj->quan == 1) /* ...unless more than one */
-        return GETOBJ_EXCLUDE_INACCESS;
+    /* downplay when wielded, unless more than one */
+    if (obj == uwep || (obj == uswapwep && u.twoweap))
+        return (obj->quan == 1) ? GETOBJ_DOWNPLAY : GETOBJ_SUGGEST;
 
-    if (obj->oclass == WEAPON_CLASS || obj->oclass == COIN_CLASS)
-        return GETOBJ_SUGGEST;
-    /* Possible extension: exclude weapons that make no sense to throw, such as
-     * whips, bows, slings, rubber hoses. */
+    if (is_ammo(obj)) {
+        return ((uwep && ammo_and_launcher(obj, uwep))
+                || (uswapwep && ammo_and_launcher(obj, uswapwep)))
+                ? GETOBJ_SUGGEST
+                : GETOBJ_DOWNPLAY;
+    } else if (is_launcher(obj)) { /* part of 'possible extension' below */
+        return GETOBJ_DOWNPLAY;
+    } else {
+        if (obj->oclass == WEAPON_CLASS || obj->oclass == COIN_CLASS)
+            return GETOBJ_SUGGEST;
+        /* Possible extension: exclude weapons that make no sense to throw,
+           such as whips, bows, slings, rubber hoses. */
+    }
 
+#if 0   /* superseded by ammo_and_launcher handling above */
     /* Include gems/stones as likely candidates if either primary
        or secondary weapon is a sling. */
     if (obj->oclass == GEM_CLASS
         && (uslinging()
             || (uswapwep && objects[uswapwep->otyp].oc_skill == P_SLING)))
         return GETOBJ_SUGGEST;
+#endif
 
     return GETOBJ_DOWNPLAY;
 }
@@ -468,6 +479,13 @@ doswapweapon(void)
 int
 dowieldquiver(void)
 {
+    return doquiver_core("ready");
+}
+
+/* guts of #quiver command; also used by #fire when refilling empty quiver */
+int
+doquiver_core(const char *verb) /* "ready" or "fire" */
+{
     char qbuf[QBUFSZ];
     struct obj *newquiver;
     int res;
@@ -480,8 +498,8 @@ dowieldquiver(void)
     /* forget last splitobj() before calling getobj() with GETOBJ_ALLOWCNT */
     clear_splitobjs();
 
-    /* Prompt for a new quiver: "What do you want to ready?" */
-    newquiver = getobj("ready", ready_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
+    /* Prompt for a new quiver: "What do you want to {ready|fire}?" */
+    newquiver = getobj(verb, ready_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
 
     if (!newquiver) {
         /* Cancelled */
@@ -515,7 +533,7 @@ dowieldquiver(void)
         pline("That ammunition is already readied!");
         return ECMD_OK;
     } else if (newquiver->owornmask & (W_ARMOR | W_ACCESSORY | W_SADDLE)) {
-        You("cannot ready that!");
+        You("cannot %s that!", verb);
         return ECMD_OK;
     } else if (newquiver == uwep) {
         int weld_res = !uwep->bknown;
@@ -607,10 +625,18 @@ dowieldquiver(void)
         addinv(newquiver);
         newquiver->nomerge = 0;
     }
-    /* place item in quiver before printing so that inventory feedback
-       includes "(at the ready)" */
-    setuqwep(newquiver);
-    prinv((char *) 0, newquiver, 0L);
+
+    if (!strcmp(verb, "ready")) {
+        /* place item in quiver before printing so that inventory feedback
+           includes "(at the ready)" */
+        setuqwep(newquiver);
+        prinv((char *) 0, newquiver, 0L);
+    } else { /* verb=="fire", manually refilling quiver during 'f'ire */
+        /* prefix item with description of action, so don't want that to
+           include "(at the ready)" */
+        prinv("You ready:", newquiver, 0L);
+        setuqwep(newquiver);
+    }
 
     /* quiver is a convenience slot and manipulating it ordinarily
        consumes no time, but unwielding primary or secondary weapon

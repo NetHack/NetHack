@@ -1751,9 +1751,10 @@ getobj(
             }
         }
         if (cntgiven && !strcmp(word, "throw")) {
-            /* permit counts for throwing gold, but don't accept
-             * counts for other things since the throw code will
-             * split off a single item anyway */
+            /* permit counts for throwing gold, but don't accept counts
+               for other things since the throw code will split off a
+               single item anyway; if populating quiver, 'word' will be
+               "ready" or "fire" and this restriction doesn't apply */
             if (cnt == 0)
                 return (struct obj *) 0;
             if (cnt > 1 && (ilet != def_oc_syms[COIN_CLASS].sym

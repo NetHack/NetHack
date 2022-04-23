@@ -408,16 +408,22 @@ autoquiver(void)
 static struct obj *
 find_launcher(struct obj *ammo)
 {
-    struct obj *otmp;
+    struct obj *otmp, *oX;
 
     if (!ammo)
-        return (struct obj *)0;
+        return (struct obj *) 0;
 
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (ammo_and_launcher(ammo, otmp) && !(otmp->cursed && otmp->bknown))
-            return otmp;
-
-    return (struct obj *)0;
+    for (oX = 0, otmp = g.invent; otmp; otmp = otmp->nobj) {
+        if (otmp->cursed && otmp->bknown)
+            continue; /* known to be cursed, so skip */
+        if (ammo_and_launcher(ammo, otmp)) {
+            if (otmp->bknown)
+                return otmp; /* known-B or known-U (known-C won't get here) */
+            if (!oX)
+                oX = otmp; /* unknown-BUC; used if no known-BU item found */
+        }
+    }
+    return oX;
 }
 
 /* the #fire command -- throw from the quiver or use wielded polearm */
@@ -426,16 +432,25 @@ dofire(void)
 {
     int shotlimit;
     struct obj *obj;
+    /* AutoReturn() verifies Valkyrie if weapon is Mjollnir, but it relies
+       on its caller to make sure hero is strong enough to throw that */
+    boolean uwep_Throw_and_Return = (uwep && AutoReturn(uwep, uwep->owornmask)
+                                     && (uwep->oartifact != ART_MJOLLNIR
+                                         || ACURR(A_STR) >= STR19(25)));
+    int altres, res = ECMD_OK;
 
     /*
      * Same as dothrow(), except we use quivered missile instead
-     * of asking what to throw/shoot.
+     * of asking what to throw/shoot.  [Note: with the advent of
+     * fireassist that is no longer accurate...]
      *
-     * If quiver is empty, we use autoquiver to fill it when the
-     * corresponding option is on.  If the option is off and hero
-     * is wielding a thrown-and-return weapon, use the wielded
-     * weapon.  If option is off and not wielding such a weapon or
-     * if autoquiver doesn't select anything, we ask what to throw.
+     * If hero is wielding a thrown-and-return weapon and quiver
+     * is empty or contains ammo, use the wielded weapon (won't
+     * have any ammo's launcher wielded due to the weapon).
+     * If quiver is empty, use autoquiver to fill it when the
+     * corresponding option is on.
+     * If option is off or autoquiver doesn't select anything,
+     * we ask what to throw.
      * Then we put the chosen item into the quiver slot unless
      * it is already in another slot.  [Matters most if it is a
      * stack but also matters for single item if this throw gets
@@ -444,78 +459,87 @@ dofire(void)
     if (!ok_to_throw(&shotlimit))
         return ECMD_OK;
 
-    if ((obj = uquiver) == 0) {
+    obj = uquiver;
+    /* if wielding a throw-and-return weapon, throw it if quiver is empty
+       or has ammo rather than missiles [since the throw/return weapon is
+       wielded, the ammo's launcher isn't; the ammo-only policy avoids
+       throwing Mjollnir if quiver contains daggers] */
+    if (uwep_Throw_and_Return && (!obj || is_ammo(obj))) {
+        obj = uwep;
+
+    } else if (!obj) {
         if (!flags.autoquiver) {
-            if (uwep && AutoReturn(uwep, uwep->owornmask))
-                obj = uwep;
-            else {
-                /* if we're wielding a polearm, apply it */
-                if (uwep && is_pole(uwep))
-                    return use_pole(uwep, TRUE);
-                /* if we're wielding a bullwhip, apply it */
-                else if (uwep && uwep->otyp == BULLWHIP)
-                    return use_whip(uwep);
-                else if (iflags.fireassist
-                         && uswapwep && is_pole(uswapwep)
-                         && !(uswapwep->cursed && uswapwep->bknown)) {
-                    /* we have a known not-cursed polearm as swap weapon.
-                       swap to it and retry */
-                    cmdq_add_ec(doswapweapon);
-                    cmdq_add_ec(dofire);
-                    return ECMD_TIME;
-                } else
-                    You("have no ammunition readied.");
+            /* if we're wielding a polearm, apply it */
+            if (uwep && is_pole(uwep)) {
+                return use_pole(uwep, TRUE);
+            /* if we're wielding a bullwhip, apply it */
+            } else if (uwep && uwep->otyp == BULLWHIP) {
+                return use_whip(uwep);
+            } else if (iflags.fireassist
+                       && uswapwep && is_pole(uswapwep)
+                       && !(uswapwep->cursed && uswapwep->bknown)) {
+                /* we have a known not-cursed polearm as swap weapon.
+                   swap to it and retry */
+                cmdq_add_ec(doswapweapon);
+                cmdq_add_ec(dofire);
+                return ECMD_OK; /* haven't taken any time yet */
+            } else {
+                You("have no ammunition readied.");
             }
         } else {
             autoquiver();
-            if ((obj = uquiver) == 0)
+            obj = uquiver;
+            if (obj) {
+                /* give feedback if quiver has now been filled */
+                uquiver->owornmask &= ~W_QUIVER; /* less verbose */
+                prinv("You ready:", obj, 0L);
+                uquiver->owornmask |= W_QUIVER;
+            } else {
                 You("have nothing appropriate for your quiver.");
-        }
-        /* if autoquiver is disabled or has failed, prompt for missile;
-           fill quiver with it if it's not wielded or worn */
-        if (!obj) {
-            /* in case we're using ^A to repeat prior 'f' command, don't
-               use direction of previous throw as getobj()'s choice here */
-            g.in_doagain = 0;
-            /* choose something from inventory, then usually quiver it */
-            obj = getobj("throw", throw_ok, GETOBJ_PROMPT | GETOBJ_ALLOWCNT);
-            /* Q command doesn't allow gold in quiver */
-            if (!obj)
-                return ECMD_CANCEL;
-            if (obj && !obj->owornmask && obj->oclass != COIN_CLASS)
-                setuqwep(obj); /* demi-autoquiver */
-        }
-        /* give feedback if quiver has now been filled */
-        if (uquiver) {
-            uquiver->owornmask &= ~W_QUIVER; /* less verbose */
-            prinv("You ready:", uquiver, 0L);
-            uquiver->owornmask |= W_QUIVER;
+            }
         }
     }
 
-    if (uquiver && iflags.fireassist) {
+    /* if autoquiver is disabled or has failed, prompt for missile */
+    if (!obj) {
+        /* in case we're using ^A to repeat prior 'f' command, don't
+           use direction of previous throw as getobj()'s choice here */
+        g.in_doagain = 0;
+
+        /* this gives its own feedback about populating the quiver slot */
+        res = doquiver_core("fire");
+        if (res != ECMD_OK && res != ECMD_TIME)
+            return res;
+
+        obj = uquiver;
+    }
+
+    if (uquiver && is_ammo(uquiver) && iflags.fireassist) {
         struct obj *olauncher;
 
         /* Try to find a launcher */
         if (ammo_and_launcher(uquiver, uwep)) {
-            /* Do nothing, already wielding a launcher */
+            obj = uquiver;
         } else if (ammo_and_launcher(uquiver, uswapwep)) {
             /* swap weapons and retry fire */
             cmdq_add_ec(doswapweapon);
             cmdq_add_ec(dofire);
-            return ECMD_TIME;
-        } else if ((olauncher = find_launcher(obj)) != 0) {
+            return res;
+        } else if ((olauncher = find_launcher(uquiver)) != 0) {
             /* wield launcher, retry fire */
             if (uwep && !flags.pushweapon)
                 cmdq_add_ec(doswapweapon);
             cmdq_add_ec(dowield);
             cmdq_add_key(olauncher->invlet);
             cmdq_add_ec(dofire);
-            return ECMD_TIME;
+            return res;
         }
     }
 
-    return obj ? throw_obj(obj, shotlimit) : ECMD_OK;
+    altres = obj ? throw_obj(obj, shotlimit) : ECMD_CANCEL;
+    /* fire can take time by filling quiver (if that causes something which
+       was wielded to be unwielded) even if the throw itself gets cancelled */
+    return (res == ECMD_TIME) ? res : altres;
 }
 
 /* if in midst of multishot shooting/throwing, stop early */
