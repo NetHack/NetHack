@@ -2606,6 +2606,7 @@ struct ext_func_tab extcmdlist[] = {
     { '\0', "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
     { '\0', "altdip", NULL, dip_into, INTERNALCMD, NULL },
     { '\0', "altadjust", NULL, adjust_split, INTERNALCMD, NULL },
+    { '\0', "altunwield", NULL, remarm_swapwep, INTERNALCMD, NULL },
     { '\0', (char *) 0, (char *) 0, donull, 0, (char *) 0 } /* sentinel */
 };
 

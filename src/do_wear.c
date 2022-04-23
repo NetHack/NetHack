@@ -86,10 +86,10 @@ on_msg(struct obj *otmp)
    give feedback and discover it iff stealth state is changing */
 static
 void
-toggle_stealth(struct obj *obj,
-               long oldprop, /* prop[].extrinsic, with obj->owornmask
-                                stripped by caller */
-               boolean on)
+toggle_stealth(
+    struct obj *obj,
+    long oldprop, /* prop[].extrinsic, with obj->owornmask pre-stripped */
+    boolean on)
 {
     if (on ? g.initial_don : g.context.takeoff.cancelled_don)
         return;
@@ -2825,8 +2825,8 @@ doddoremarm(void)
         You("continue %s.", g.context.takeoff.disrobing);
         set_occupation(take_off, g.context.takeoff.disrobing, 0);
         return ECMD_OK;
-    } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf && !uleft
-               && !uright && !wearing_armor()) {
+    } else if (!uwep && !uswapwep && !uquiver && !uamul && !ublindf
+               && !uleft && !uright && !wearing_armor()) {
         You("are not wearing anything.");
         return ECMD_OK;
     }
@@ -2852,6 +2852,36 @@ doddoremarm(void)
      * disrobe.
      */
     return ECMD_OK;
+}
+
+/* #altunwield - just unwield alternate weapon, item-action '-' when picking
+   uswapwep from context-sensitive inventory */
+int
+remarm_swapwep(void)
+{
+    struct _cmd_queue cq, *cmdq;
+    boolean oldbknown;
+
+    if ((cmdq = cmdq_pop()) != 0) {
+        /* '-' uswapwep item-action picked from context-sensitive invent */
+        cq = *cmdq;
+        free(cmdq);
+    } else {
+        cq.typ = CMDQ_KEY;
+        cq.key = '\0'; /* something other than '-' */
+    }
+    if (cq.typ != CMDQ_KEY || cq.key != '-' || !uswapwep)
+        return ECMD_FAIL;
+
+    oldbknown = uswapwep->bknown; /* when deciding whether this command
+                                   * has done something that takes time,
+                                   * behave as if a cursed secondary weapon
+                                   * can't be unwielded even though things
+                                   * don't work that way... */
+    reset_remarm();
+    g.context.takeoff.what = g.context.takeoff.mask = W_SWAPWEP;
+    (void) do_takeoff();
+    return (!uswapwep || uswapwep->bknown != oldbknown) ? ECMD_TIME : ECMD_OK;
 }
 
 static int

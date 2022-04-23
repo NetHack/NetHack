@@ -2656,7 +2656,7 @@ itemactions(struct obj *otmp)
 
     /* -: unwield; picking current weapon offers an opportunity for 'w-'
        to wield bare/gloved hands; likewise for 'Q-' with quivered item(s) */
-    if (otmp == uwep || otmp == uquiver) {
+    if (otmp == uwep || otmp == uswapwep || otmp == uquiver) {
         const char *verb = (otmp == uquiver) ? "Quiver" : "Wield",
                    *action = (otmp == uquiver) ? "un-ready" : "un-wield",
                    *which = is_plural(otmp) ? "these" : "this",
@@ -2665,8 +2665,6 @@ itemactions(struct obj *otmp)
         /*
          * TODO: if uwep is ammo, tell player that to shoot instead of toss,
          *       the corresponding launcher must be wielded;
-         * TODO too: if otmp is uswapwep, remove it from that slot (possibly
-         *       stopping dual-wielding in the process).
          */
         Sprintf(buf,  "%s '%c' to %s %s %s",
                 verb, HANDS_SYM, action, which,
@@ -2942,8 +2940,9 @@ itemactions(struct obj *otmp)
             break;
         case IA_UNWIELD:
             cmdq_add_ec((otmp == uwep) ? dowield
-                        : (otmp == uquiver) ? dowieldquiver
-                          : donull); /* can't happen */
+                        : (otmp == uswapwep) ? remarm_swapwep
+                          : (otmp == uquiver) ? dowieldquiver
+                            : donull); /* can't happen */
             cmdq_add_key('-');
             break;
         case IA_APPLY_OBJ:
