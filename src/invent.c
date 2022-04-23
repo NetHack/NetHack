@@ -1526,7 +1526,7 @@ getobj(
             if (cq.typ == CMDQ_KEY) {
                 int v;
 
-                if (cq.key == '-') {
+                if (cq.key == HANDS_SYM) {
                     /* check whether the hands/self choice is suitable */
                     v = (*obj_ok)((struct obj *) 0);
                     if (v == GETOBJ_SUGGEST || v == GETOBJ_DOWNPLAY)
@@ -2655,13 +2655,22 @@ itemactions(struct obj *otmp)
     start_menu(win, MENU_BEHAVE_STANDARD);
 
     /* -: unwield; picking current weapon offers an opportunity for 'w-'
-       to wield bare/gloved hands */
-    if (otmp == uwep) {
-        /* TODO: if uwep is ammo, tell player that to shoot instead of toss,
-         *       the corresponding launcher must be wielded */
-        Sprintf(buf,  "Wield '-' to unwield this %s",
-                (otmp->oclass == WEAPON_CLASS || is_weptool(otmp)) ? "weapon"
-                : "item");
+       to wield bare/gloved hands; likewise for 'Q-' with quivered item(s) */
+    if (otmp == uwep || otmp == uquiver) {
+        const char *verb = (otmp == uquiver) ? "Quiver" : "Wield",
+                   *action = (otmp == uquiver) ? "un-ready" : "un-wield",
+                   *which = is_plural(otmp) ? "these" : "this",
+                   *what = ((otmp->oclass == WEAPON_CLASS || is_weptool(otmp))
+                            ? "weapon" : "item");
+        /*
+         * TODO: if uwep is ammo, tell player that to shoot instead of toss,
+         *       the corresponding launcher must be wielded;
+         * TODO too: if otmp is uswapwep, remove it from that slot (possibly
+         *       stopping dual-wielding in the process).
+         */
+        Sprintf(buf,  "%s '%c' to %s %s %s",
+                verb, HANDS_SYM, action, which,
+                is_plural(otmp) ? makeplural(what) : what);
         ia_addmenu(win, IA_UNWIELD, '-', buf);
     }
 
@@ -2828,7 +2837,8 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_QUAFF_OBJ, 'q', "Quaff this potion");
 
     /* Q: quiver throwable item */
-    if (otmp->oclass == GEM_CLASS || otmp->oclass == WEAPON_CLASS)
+    if ((otmp->oclass == GEM_CLASS || otmp->oclass == WEAPON_CLASS)
+        && otmp != uquiver)
         ia_addmenu(win, IA_QUIVER_OBJ, 'Q',
                    "Quiver this item for easy throwing");
 
@@ -2931,7 +2941,9 @@ itemactions(struct obj *otmp)
         case IA_NONE:
             break;
         case IA_UNWIELD:
-            cmdq_add_ec(dowield);
+            cmdq_add_ec((otmp == uwep) ? dowield
+                        : (otmp == uquiver) ? dowieldquiver
+                          : donull); /* can't happen */
             cmdq_add_key('-');
             break;
         case IA_APPLY_OBJ:
