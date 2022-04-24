@@ -8689,7 +8689,9 @@ wc_set_window_colors(char *op)
     int j;
     char buf[BUFSZ];
     char *wn, *tfg, *tbg, *newop;
-    static const char *const wnames[] = { "menu", "message", "status", "text" };
+    static const char *const wnames[] = {
+        "menu", "message", "status", "text"
+    };
     static const char *const shortnames[] = { "mnu", "msg", "sts", "txt" };
     static char **fgp[] = { &iflags.wc_foregrnd_menu,
                             &iflags.wc_foregrnd_message,
@@ -8706,48 +8708,41 @@ wc_set_window_colors(char *op)
         wn = tfg = tbg = (char *) 0;
 
         /* until first non-space in case there's leading spaces - before
-         * colorname*/
+           colorname*/
         if (*newop == ' ')
             newop++;
-        if (*newop)
-            wn = newop;
-        else
+        if (!*newop)
             return 0;
+        wn = newop;
 
         /* until first space - colorname*/
         while (*newop && *newop != ' ')
             newop++;
-        if (*newop)
-            *newop = '\0';
-        else
+        if (!*newop)
             return 0;
-        newop++;
+        *newop++ = '\0';
 
         /* until first non-space - before foreground*/
         if (*newop == ' ')
             newop++;
-        if (*newop)
-            tfg = newop;
-        else
+        if (!*newop)
             return 0;
+        tfg = newop;
 
         /* until slash - foreground */
         while (*newop && *newop != '/')
             newop++;
-        if (*newop)
-            *newop = '\0';
-        else
+        if (!*newop)
             return 0;
-        newop++;
+        *newop++ = '\0';
 
         /* until first non-space (in case there's leading space after slash) -
          * before background */
         if (*newop == ' ')
             newop++;
-        if (*newop)
-            tbg = newop;
-        else
+        if (!*newop)
             return 0;
+        tbg = newop;
 
         /* until first space - background */
         while (*newop && *newop != ' ')
