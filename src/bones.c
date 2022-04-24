@@ -10,6 +10,7 @@ static void goodfruit(int);
 static void resetobjs(struct obj *, boolean);
 static void give_to_nearby_mon(struct obj *, int, int);
 static boolean fixuporacle(struct monst *);
+static void remove_mon_from_bones(struct monst *);
 
 static boolean
 no_bones_level(d_level *lev)
@@ -377,6 +378,20 @@ can_make_bones(void)
     return TRUE;
 }
 
+/* monster removed before saving a bones file,
+   in case these characters are not in their home bases */
+static void
+remove_mon_from_bones(struct monst *mtmp)
+{
+    struct permonst *mptr = mtmp->data;
+
+    if (mtmp->iswiz || mptr == &mons[PM_MEDUSA]
+        || mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER
+        || mptr == &mons[PM_VLAD_THE_IMPALER]
+        || (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
+        mongone(mtmp);
+}
+
 /* save bones and possessions of a deceased adventurer */
 void
 savebones(int how, time_t when, struct obj *corpse)
@@ -384,7 +399,6 @@ savebones(int how, time_t when, struct obj *corpse)
     int x, y;
     struct trap *ttmp;
     struct monst *mtmp;
-    struct permonst *mptr;
     struct fruit *f;
     struct cemetery *newbones;
     char c, *bonesid;
@@ -413,17 +427,8 @@ savebones(int how, time_t when, struct obj *corpse)
 
  make_bones:
     unleash_all();
-    /* in case these characters are not in their home bases */
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        mptr = mtmp->data;
-        if (mtmp->iswiz || mptr == &mons[PM_MEDUSA]
-            || mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER
-            || mptr == &mons[PM_VLAD_THE_IMPALER]
-            || (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
-            mongone(mtmp);
-    }
+    iter_mons(remove_mon_from_bones);
+
     if (u.usteed)
         dismount_steed(DISMOUNT_BONES);
     dmonsfree(); /* discard dead or gone monsters */

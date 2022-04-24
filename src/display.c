@@ -131,6 +131,7 @@ static void display_warning(struct monst *);
 static int check_pos(int, int, int);
 static int get_bk_glyph(xchar x, xchar y);
 static int tether_glyph(int, int);
+static void mimic_light_blocking(struct monst *);
 #ifdef UNBUFFERED_GLYPHINFO
 static glyph_info *glyphinfo_at(xchar, xchar, int);
 #endif
@@ -1304,6 +1305,17 @@ see_monsters(void)
         newsym(u.ux, u.uy);
 }
 
+static void
+mimic_light_blocking(struct monst *mtmp)
+{
+    if (mtmp->minvis && is_lightblocker_mappear(mtmp)) {
+        if (See_invisible)
+            block_point(mtmp->mx, mtmp->my);
+        else
+            unblock_point(mtmp->mx, mtmp->my);
+    }
+}
+
 /*
  * Block/unblock light depending on what a mimic is mimicing and if it's
  * invisible or not.  Should be called only when the state of See_invisible
@@ -1312,18 +1324,7 @@ see_monsters(void)
 void
 set_mimic_blocking(void)
 {
-    register struct monst *mon;
-
-    for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon))
-            continue;
-        if (mon->minvis && is_lightblocker_mappear(mon)) {
-            if (See_invisible)
-                block_point(mon->mx, mon->my);
-            else
-                unblock_point(mon->mx, mon->my);
-        }
-    }
+    iter_mons(mimic_light_blocking);
 }
 
 /*

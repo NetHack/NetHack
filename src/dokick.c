@@ -17,6 +17,8 @@ static void kick_monster(struct monst *, xchar, xchar);
 static int kick_object(xchar, xchar, char *);
 static int really_kick_object(xchar, xchar);
 static char *kickstr(char *, const char *);
+static boolean watchman_thief_arrest(struct monst *);
+static boolean watchman_door_damage(struct monst *, xchar, xchar);
 static void otransit_msg(struct obj *, boolean, boolean, long);
 static void drop_to(coord *, schar, xchar, xchar);
 
@@ -768,6 +770,36 @@ kickstr(char *buf, const char *kickobjnam)
     return strcat(strcpy(buf, "kicking "), what);
 }
 
+static boolean
+watchman_thief_arrest(struct monst *mtmp)
+{
+    if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
+        && mtmp->mpeaceful) {
+        mon_yells(mtmp, "Halt, thief!  You're under arrest!");
+        (void) angry_guards(FALSE);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+static boolean
+watchman_door_damage(struct monst *mtmp, xchar x, xchar y)
+{
+    if (is_watch(mtmp->data) && mtmp->mpeaceful
+        && couldsee(mtmp->mx, mtmp->my)) {
+        if (levl[x][y].looted & D_WARNED) {
+            mon_yells(mtmp,
+                      "Halt, vandal!  You're under arrest!");
+            (void) angry_guards(FALSE);
+        } else {
+            mon_yells(mtmp, "Hey, stop damaging that door!");
+            levl[x][y].looted |= D_WARNED;
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* the #kick command */
 int
 dokick(void)
@@ -1291,16 +1323,7 @@ dokick(void)
             pay_for_damage("break", FALSE);
         }
         if (in_town(x, y))
-            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (DEADMONSTER(mtmp))
-                    continue;
-                if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
-                    && mtmp->mpeaceful) {
-                    mon_yells(mtmp, "Halt, thief!  You're under arrest!");
-                    (void) angry_guards(FALSE);
-                    break;
-                }
-            }
+            (void) get_iter_mons(watchman_thief_arrest);
     } else {
         if (Blind)
             feel_location(x, y); /* we know we hit it */
@@ -1310,22 +1333,7 @@ dokick(void)
            hear; we've kept the extra 'm's and one of the extra '!'s */
         pline("%s!!", (Deaf || !rn2(3)) ? "Thwack" : "Whammm");
         if (in_town(x, y))
-            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (DEADMONSTER(mtmp))
-                    continue;
-                if (is_watch(mtmp->data) && mtmp->mpeaceful
-                    && couldsee(mtmp->mx, mtmp->my)) {
-                    if (levl[x][y].looted & D_WARNED) {
-                        mon_yells(mtmp,
-                                  "Halt, vandal!  You're under arrest!");
-                        (void) angry_guards(FALSE);
-                    } else {
-                        mon_yells(mtmp, "Hey, stop damaging that door!");
-                        levl[x][y].looted |= D_WARNED;
-                    }
-                    break;
-                }
-            }
+            (void) get_iter_mons_xy(watchman_door_damage, x, y);
     }
     return ECMD_TIME;
 }

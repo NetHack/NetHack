@@ -12,6 +12,7 @@ static int use_stethoscope(struct obj *);
 static void use_whistle(struct obj *);
 static void use_magic_whistle(struct obj *);
 static int use_leash(struct obj *);
+static boolean mleashed_next2u(struct monst *);
 static int use_mirror(struct obj *);
 static void use_bell(struct obj **);
 static void use_candelabrum(struct obj *);
@@ -718,33 +719,38 @@ get_mleash(struct monst *mtmp)
     return otmp;
 }
 
+static boolean
+mleashed_next2u(struct monst *mtmp)
+{
+    if (mtmp->mleashed) {
+        if (!next2u(mtmp->mx, mtmp->my))
+            mnexto(mtmp, RLOC_NOMSG);
+        if (!next2u(mtmp->mx, mtmp->my)) {
+            struct obj *otmp = get_mleash(mtmp);
+
+            if (!otmp) {
+                impossible("leashed-unleashed mon?");
+                return TRUE;
+            }
+
+            if (otmp->cursed)
+                return TRUE;
+            mtmp->mleashed = 0;
+            otmp->leashmon = 0;
+            update_inventory();
+            You_feel("%s leash go slack.",
+                     (number_leashed() > 1) ? "a" : "the");
+        }
+    }
+    return FALSE;
+}
+
 boolean
 next_to_u(void)
 {
-    register struct monst *mtmp;
-    register struct obj *otmp;
+    if (get_iter_mons(mleashed_next2u))
+        return FALSE;
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        if (mtmp->mleashed) {
-            if (!next2u(mtmp->mx, mtmp->my))
-                mnexto(mtmp, RLOC_NOMSG);
-            if (!next2u(mtmp->mx, mtmp->my)) {
-                for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                    if (otmp->otyp == LEASH
-                        && (unsigned) otmp->leashmon == mtmp->m_id) {
-                        if (otmp->cursed)
-                            return FALSE;
-                        mtmp->mleashed = 0;
-                        otmp->leashmon = 0;
-                        update_inventory();
-                        You_feel("%s leash go slack.",
-                                 (number_leashed() > 1) ? "a" : "the");
-                    }
-            }
-        }
-    }
     /* no pack mules for the Amulet */
     if (u.usteed && mon_has_amulet(u.usteed))
         return FALSE;

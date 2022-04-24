@@ -12,18 +12,25 @@ static void vault_tele(void);
 static boolean rloc_pos_ok(int, int, struct monst *);
 static void rloc_to_core(struct monst *, int, int, unsigned);
 static void mvault_tele(struct monst *);
+static boolean m_blocks_teleporting(struct monst *);
+
+/* does monster block others from teleporting? */
+static boolean
+m_blocks_teleporting(struct monst *mtmp)
+{
+    if (is_dlord(mtmp->data) || is_dprince(mtmp->data))
+        return TRUE;
+    return FALSE;
+}
 
 /* teleporting is prevented on this level for this monster? */
 boolean
 noteleport_level(struct monst* mon)
 {
-    struct monst *mtmp;
-
     /* demon court in Gehennom prevent others from teleporting */
     if (In_hell(&u.uz) && !(is_dlord(mon->data) || is_dprince(mon->data)))
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (is_dlord(mtmp->data) || is_dprince(mtmp->data))
-                return TRUE;
+        if (get_iter_mons(m_blocks_teleporting))
+            return TRUE;
 
     /* natural no-teleport level */
     if (g.level.flags.noteleport)

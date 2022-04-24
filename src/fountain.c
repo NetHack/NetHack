@@ -11,6 +11,7 @@ static void dowaterdemon(void);
 static void dowaternymph(void);
 static void gush(int, int, genericptr_t);
 static void dofindgem(void);
+static boolean watchman_warn_fountain(struct monst *);
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
@@ -163,6 +164,28 @@ dofindgem(void)
     exercise(A_WIS, TRUE); /* a discovery! */
 }
 
+static boolean
+watchman_warn_fountain(struct monst *mtmp)
+{
+    if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
+        && mtmp->mpeaceful) {
+        if (!Deaf) {
+            pline("%s yells:", Amonnam(mtmp));
+            verbalize("Hey, stop using that fountain!");
+        } else {
+            pline("%s earnestly %s %s %s!",
+                  Amonnam(mtmp),
+                  nolimbs(mtmp->data) ? "shakes" : "waves",
+                  mhis(mtmp),
+                  nolimbs(mtmp->data)
+                  ? mbodypart(mtmp, HEAD)
+                  : makeplural(mbodypart(mtmp, ARM)));
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
 void
 dryup(xchar x, xchar y, boolean isyou)
 {
@@ -173,26 +196,7 @@ dryup(xchar x, xchar y, boolean isyou)
 
             SET_FOUNTAIN_WARNED(x, y);
             /* Warn about future fountain use. */
-            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (DEADMONSTER(mtmp))
-                    continue;
-                if (is_watch(mtmp->data) && couldsee(mtmp->mx, mtmp->my)
-                    && mtmp->mpeaceful) {
-                    if (!Deaf) {
-                        pline("%s yells:", Amonnam(mtmp));
-                        verbalize("Hey, stop using that fountain!");
-                    } else {
-                        pline("%s earnestly %s %s %s!",
-                              Amonnam(mtmp),
-                              nolimbs(mtmp->data) ? "shakes" : "waves",
-                              mhis(mtmp),
-                              nolimbs(mtmp->data)
-                                      ? mbodypart(mtmp, HEAD)
-                                      : makeplural(mbodypart(mtmp, ARM)));
-                    }
-                    break;
-                }
-            }
+            mtmp = get_iter_mons(watchman_warn_fountain);
             /* You can see or hear this effect */
             if (!mtmp)
                 pline_The("flow reduces to a trickle.");

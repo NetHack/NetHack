@@ -10,6 +10,7 @@
 static void sanity_check_single_mon(struct monst *, boolean, const char *);
 static struct obj *make_corpse(struct monst *, unsigned);
 static int minliquid_core(struct monst *);
+static void m_calcdistress(struct monst *);
 static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
@@ -21,6 +22,7 @@ static void lifesaved_monster(struct monst *);
 static void migrate_mon(struct monst *, xchar, xchar);
 static boolean ok_to_obliterate(struct monst *);
 static void deal_with_overcrowding(struct monst *);
+static void m_restartcham(struct monst *);
 static boolean restrap(struct monst *);
 static int pick_animal(void);
 static int pickvampshape(struct monst *);
@@ -28,6 +30,7 @@ static boolean isspecmon(struct monst *);
 static boolean validspecmon(struct monst *, int);
 static struct permonst *accept_newcham_form(struct monst *, int);
 static void kill_eggs(struct obj *);
+static void pacify_guard(struct monst *);
 
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
@@ -907,42 +910,41 @@ mcalcmove(
 void
 mcalcdistress(void)
 {
-    struct monst *mtmp;
+    iter_mons(m_calcdistress);
+}
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-
-        /* must check non-moving monsters once/turn in case they managed
-           to end up in water or lava; note: when not in liquid they regen,
-           shape-shift, timeout temporary maladies just like other monsters */
-        if (mtmp->data->mmove == 0) {
-            if (g.vision_full_recalc)
-                vision_recalc(0);
-            if (minliquid(mtmp))
-                continue;
-        }
-
-        /* regenerate hit points */
-        mon_regen(mtmp, FALSE);
-
-        /* possibly polymorph shapechangers and lycanthropes */
-        if (mtmp->cham >= LOW_PM)
-            decide_to_shapeshift(mtmp, (canspotmon(mtmp)
-                                        || engulfing_u(mtmp))
-                                          ? SHIFT_MSG : 0);
-        were_change(mtmp);
-
-        /* gradually time out temporary problems */
-        if (mtmp->mblinded && !--mtmp->mblinded)
-            mtmp->mcansee = 1;
-        if (mtmp->mfrozen && !--mtmp->mfrozen)
-            mtmp->mcanmove = 1;
-        if (mtmp->mfleetim && !--mtmp->mfleetim)
-            mtmp->mflee = 0;
-
-        /* FIXME: mtmp->mlstmv ought to be updated here */
+static void
+m_calcdistress(struct monst *mtmp)
+{
+    /* must check non-moving monsters once/turn in case they managed
+       to end up in water or lava; note: when not in liquid they regen,
+       shape-shift, timeout temporary maladies just like other monsters */
+    if (mtmp->data->mmove == 0) {
+        if (g.vision_full_recalc)
+            vision_recalc(0);
+        if (minliquid(mtmp))
+            return;
     }
+
+    /* regenerate hit points */
+    mon_regen(mtmp, FALSE);
+
+    /* possibly polymorph shapechangers and lycanthropes */
+    if (mtmp->cham >= LOW_PM)
+        decide_to_shapeshift(mtmp, (canspotmon(mtmp)
+                                    || engulfing_u(mtmp))
+                             ? SHIFT_MSG : 0);
+    were_change(mtmp);
+
+    /* gradually time out temporary problems */
+    if (mtmp->mblinded && !--mtmp->mblinded)
+        mtmp->mcansee = 1;
+    if (mtmp->mfrozen && !--mtmp->mfrozen)
+        mtmp->mcanmove = 1;
+    if (mtmp->mfleetim && !--mtmp->mfleetim)
+        mtmp->mflee = 0;
+
+    /* FIXME: mtmp->mlstmv ought to be updated here */
 }
 
 int
@@ -3801,18 +3803,72 @@ normal_shape(struct monst *mon)
     }
 }
 
+/* iterate all living monsters on current level, calling func for each. */
+void
+iter_mons(void (*func)(struct monst *))
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        func(mtmp);
+    }
+}
+
+
+/* iterate all living monsters on current level, calling func for each.
+   if func returns TRUE, stop and return that monster. */
+struct monst *
+get_iter_mons(boolean (*func)(struct monst *))
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if (func(mtmp))
+            return mtmp;
+    }
+    return (struct monst *) 0;
+}
+
+/* iterate all living monsters on current level, calling func for each,
+   passing x,y to the function.
+   if func returns TRUE, stop and return that monster. */
+struct monst *
+get_iter_mons_xy(boolean (*func)(struct monst *, xchar, xchar),
+                xchar x, xchar y)
+{
+    struct monst *mtmp;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp))
+            continue;
+        if (func(mtmp, x, y))
+            return mtmp;
+    }
+    return (struct monst *) 0;
+}
+
+
 /* force all chameleons and mimics to become themselves and werecreatures
    to revert to human form; called when Protection_from_shape_changers gets
    activated via wearing or eating ring */
 void
 rescham(void)
 {
-    register struct monst *mtmp;
+    iter_mons(normal_shape);
+}
 
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        normal_shape(mtmp);
+static void
+m_restartcham(struct monst *mtmp)
+{
+    if (!mtmp->mcan)
+        mtmp->cham = pm_to_cham(monsndx(mtmp->data));
+    if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping) {
+        set_mimic_sym(mtmp);
+        newsym(mtmp->mx, mtmp->my);
     }
 }
 
@@ -3821,18 +3877,7 @@ rescham(void)
 void
 restartcham(void)
 {
-    register struct monst *mtmp;
-
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        if (!mtmp->mcan)
-            mtmp->cham = pm_to_cham(monsndx(mtmp->data));
-        if (mtmp->data->mlet == S_MIMIC && mtmp->msleeping) {
-            set_mimic_sym(mtmp);
-            newsym(mtmp->mx, mtmp->my);
-        }
-    }
+    iter_mons(m_restartcham);
 }
 
 /* called when restoring a monster from a saved level; protection
@@ -4812,17 +4857,17 @@ angry_guards(boolean silent)
     return FALSE;
 }
 
+static void
+pacify_guard(struct monst *mtmp)
+{
+    if (is_watch(mtmp->data))
+        mtmp->mpeaceful = 1;
+}
+
 void
 pacify_guards(void)
 {
-    struct monst *mtmp;
-
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        if (is_watch(mtmp->data))
-            mtmp->mpeaceful = 1;
-    }
+    iter_mons(pacify_guard);
 }
 
 void

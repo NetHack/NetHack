@@ -1839,14 +1839,8 @@ maybe_lvltport_feedback(void)
 static void
 final_level(void)
 {
-    struct monst *mtmp;
-
     /* reset monster hostility relative to player */
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        reset_hostility(mtmp);
-    }
+    iter_mons(reset_hostility);
 
     /* create some player-monsters */
     create_mplayers(rn1(4, 3), TRUE);
