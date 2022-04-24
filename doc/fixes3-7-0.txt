@@ -877,6 +877,9 @@ restoring while attached ball or chain is on floor in a breach of a shop wall
 	might trigger an impossible about being positioned too far from hero
 don't try to catch up for lost time for shop damage repair in restdamage()
 	called from getlev(); let normal shopkeeper movement take care of it
+shop wall repair that was delayed because the hero or a monster was an
+	obstacle in the gap at repair time might not be displayed as wall
+	once the obstacle moved and the repair eventually took place
 putting objects into a container with menustyle=traditional and then taking
 	them back out with #tip would result in complaints about obj bypass
 	bit being set if sanity_check was On

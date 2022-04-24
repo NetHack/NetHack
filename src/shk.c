@@ -3690,7 +3690,11 @@ litter_getpos(int *k, xchar x, xchar y, struct monst *shkp)
 }
 
 static void
-litter_scatter(xchar *litter, int k, xchar x, xchar y, struct monst *shkp)
+litter_scatter(
+    xchar *litter,
+    int k,
+    xchar x, xchar y,
+    struct monst *shkp)
 {
     struct obj *otmp;
 
@@ -3778,17 +3782,16 @@ repair_damage(
     struct obj *otmp;
     struct trap *ttmp;
     int k, disposition = 1;
-    boolean stop_picking = FALSE;
+    boolean seeit, stop_picking = FALSE;
 
     if (!repairable_damage(tmp_dam, shkp))
         return 0;
 
-    catchup = g.moves > tmp_dam->when + REPAIR_DELAY;
     x = tmp_dam->place.x;
     y = tmp_dam->place.y;
+    seeit = cansee(x, y);
 
     ttmp = t_at(x, y);
-
     if (ttmp) {
         switch (ttmp->ttyp) {
         case LANDMINE:
@@ -3818,7 +3821,7 @@ repair_damage(
             break;
         }
         deltrap(ttmp);
-        if (cansee(x, y))
+        if (seeit)
             newsym(x, y);
         if (!catchup)
             disposition = 3;
@@ -3845,11 +3848,18 @@ repair_damage(
     litter = litter_getpos(&k, x, y, shkp);
     litter_scatter(litter, k, x, y, shkp);
 
+    /* needed if hero has line-of-sight to the former gap from outside
+       the shop but is farther than one step away; once the light inside
+       the shop is blocked, the other newsym() below won't redraw the
+       spot showing its repaired wall */
+    if (seeit)
+        newsym(x, y);
+    block_point(x, y);
+
     if (catchup)
         return 1; /* repair occurred while off level so no messages */
 
-    block_point(x, y);
-    if (cansee(x, y)) {
+    if (seeit) {
         if (IS_WALL(tmp_dam->typ)) {
             /* player sees actual repair process, so KNOWS it's a wall */
             levl[x][y].seenv = SVALL;
