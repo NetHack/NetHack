@@ -32,7 +32,7 @@ des.stair("up", 39,10)
 des.non_diggable(selection.area(00,00,40,11))
 -- Objects
 des.object({ id = "quarterstaff", x=20, y=06, buc="blessed", spe=0, name="The Staff of Aesculapius" })
-des.object("lightning", 20, 06)
+des.object("wand of lightning", 20, 06)
 des.object()
 des.object()
 des.object()

@@ -54,8 +54,8 @@ des.trap("pit",05,08)
 des.trap("pit",06,08)
 
 -- A little help
-des.object("earth",01,09)
-des.object("earth",02,09)
+des.object("scroll of earth",01,09)
+des.object("scroll of earth",02,09)
 
 -- Random objects
 des.object({ class = "%" });
