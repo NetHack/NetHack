@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1648428942 2022/03/28 00:55:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1650838836 2022/04/24 22:20:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.384 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1201,15 +1201,25 @@ delallobj(int x, int y)
     }
 }
 
-/* destroy object in fobj chain (if unpaid, it remains on the bill) */
+/* normal object deletion (if unpaid, it remains on the bill) */
 void
 delobj(struct obj *obj)
+{
+    delobj_core(obj, FALSE);
+}
+
+/* destroy object; caller has control over whether to destroy something
+   that ordinarily shouldn't be destroyed */
+void
+delobj_core(
+    struct obj *obj,
+    boolean force) /* 'force==TRUE' used when reviving Rider corpses */
 {
     boolean update_map;
 
     /* obj_resists(obj,0,0) protects the Amulet, the invocation tools,
        and Rider corspes */
-    if (obj_resists(obj, 0, 0)) {
+    if (!force && obj_resists(obj, 0, 0)) {
         /* player might be doing something stupid, but we
          * can't guarantee that.  assume special artifacts
          * are indestructible via drawbridges, and exploding
@@ -1220,7 +1230,7 @@ delobj(struct obj *obj)
     }
     update_map = (obj->where == OBJ_FLOOR);
     obj_extract_self(obj);
-    if (update_map) {
+    if (update_map) { /* floor object's coordinates are always up to date */
         maybe_unhide_at(obj->ox, obj->oy);
         newsym(obj->ox, obj->oy);
     }

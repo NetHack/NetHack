@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1646870848 2022/03/10 00:07:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.402 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1650838839 2022/04/24 22:20:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -993,7 +993,7 @@ revive(struct obj *corpse, boolean by_hero)
         /* not useupf(), which charges */
         if (corpse->quan > 1L)
             corpse = splitobj(corpse, 1L);
-        delobj(corpse);
+        delobj_core(corpse, TRUE);
         newsym(x, y);
         break;
     case OBJ_MINVENT:
