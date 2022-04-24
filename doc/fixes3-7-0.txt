@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.870 $ $NHDT-Date: 1649530942 2022/04/09 19:02:22 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.890 $ $NHDT-Date: 1650836671 2022/04/24 21:44:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1173,6 +1173,8 @@ one-shot food testing ability conferred by blessed scroll of food detection
 worn ring of slow digestion blocks per-turn hunger but not the hunger caused
 	by wearing it; white dragon scales/mail was blocking per-turn hunger
 	and didn't cause any hunger itself; change to treat it like the ring
+if the progarm was built with EXTRA_SANITY_CHECKS enabled, changing levels
+	while riding would give impossible warning "no monster to remove"
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

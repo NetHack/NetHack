@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1647911478 2022/03/22 01:11:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.419 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1650836671 2022/04/24 21:44:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2310,7 +2310,7 @@ static void
 mon_leaving_level(struct monst *mon)
 {
     int mx = mon->mx, my = mon->my;
-    boolean onmap = mx > 0;
+    boolean onmap = (mx > 0 && mon != u.usteed);
 
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
     mon->mtrapped = 0;
