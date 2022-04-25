@@ -8,9 +8,9 @@
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2017 Community Edition v 15.9.46
-#            - Microsoft Visual Studio 2019 Community Edition v 16.11.12
-#            - Microsoft Visual Studio 2022 Community Edition v 17.1.4
+#            - Microsoft Visual Studio 2017 Community Edition v 15.9.47
+#            - Microsoft Visual Studio 2019 Community Edition v 16.11.13
+#            - Microsoft Visual Studio 2022 Community Edition v 17.1.5
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -629,9 +629,19 @@ rc=Rc.exe
 # is too old or untested.
 #
 # Recently tested versions:
-#NMAKE version 1416270470 from latest VS 2017 (Apr 12, 2022 version 15.9.46)
-#NMAKE version 1429301421 from latest VS 2019 (Apr 12, 2022 version 16.11.12)
-#NMAKE version 1431311062 from latest VS 2022 (Apr 12, 2022 version 17.1.4)
+TESTEDVS2017 = 14.16.27048.0
+TESTEDVS2019 = 14.29.30143.0
+TESTEDVS2022 = 14.31.31107.0
+
+VS2017CUR = $(TESTEDVS2017:.=)
+VS2019CUR = $(TESTEDVS2019:.=)
+VS2022CUR = $(TESTEDVS2022:.=)
+VS2017UP1 = $(VS2017CUR) + 1
+VS2019UP1 = $(VS2019CUR) + 1
+VS2022UP1 = $(VS2022CUR) + 1
+VS20171ST = 1411000000
+VS20191ST = $(VS2017UP1)
+VS20221ST = $(VS2019UP1)
 
 #!MESSAGE $(MAKEFLAGS)
 #!MESSAGE $(MAKEDIR)
@@ -654,13 +664,13 @@ VSVER=2012
 VSVER=2013
 !ELSEIF ($(MAKEVERSION) > 1400000000) && ($(MAKEVERSION) < 1411000000)
 VSVER=2015
-!ELSEIF ($(MAKEVERSION) > 1411000000) && ($(MAKEVERSION) < 1416270471)
+!ELSEIF ($(MAKEVERSION) > $(VS20171ST)) && ($(MAKEVERSION) < $(VS2017UP1))
 VSVER=2017
-!ELSEIF ($(MAKEVERSION) > 1416270470) && ($(MAKEVERSION) < 1429301422)
+!ELSEIF ($(MAKEVERSION) > $(VS20191ST)) && ($(MAKEVERSION) < $(VS2019UP1))
 VSVER=2019
-!ELSEIF ($(MAKEVERSION) > 1429301421) && ($(MAKEVERSION) < 1431311063)
+!ELSEIF ($(MAKEVERSION) > $(VS20221ST)) && ($(MAKEVERSION) < $(VS2022UP1))
 VSVER=2022
-!ELSEIF ($(MAKEVERSION) > 1431311062)
+!ELSEIF ($(MAKEVERSION) > $(VS2022CUR)
 VSVER=2999              #untested future version
 !ENDIF
 
