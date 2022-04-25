@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_wear.c	$NHDT-Date: 1605578866 2020/11/17 02:07:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.136 $ */
+/* NetHack 3.7	do_wear.c	$NHDT-Date: 1650875489 2022/04/25 08:31:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.156 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2655,7 +2655,7 @@ do_takeoff(void)
             if (was_twoweap)
                 You("are no longer wielding either weapon.");
             else
-                You("are empty %s.", body_part(HANDED));
+                You("are %s.", empty_handed());
         }
     } else if (doff->what == W_SWAPWEP) {
         setuswapwep((struct obj *) 0);

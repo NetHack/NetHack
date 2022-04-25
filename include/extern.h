@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1650838834 2022/04/24 22:20:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1108 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1650875486 2022/04/25 08:31:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1109 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3134,6 +3134,7 @@ extern void set_ulycn(int);
 /* ### wield.c ### */
 
 extern void setuwep(struct obj *);
+extern const char *empty_handed(void);
 extern void setuqwep(struct obj *);
 extern void setuswapwep(struct obj *);
 extern int dowield(void);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	wield.c	$NHDT-Date: 1607200367 2020/12/05 20:32:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	wield.c	$NHDT-Date: 1650875488 2022/04/25 08:31:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -146,6 +146,19 @@ cant_wield_corpse(struct obj *obj)
     return TRUE;
 }
 
+/* description of hands when not wielding anything; also used
+   by #seeweapon (')'), #attributes (^X), and #takeoffall ('A') */
+const char *
+empty_handed(void)
+{
+    return uarmg ? "empty handed" /* gloves imply hands */
+           : humanoid(g.youmonst.data)
+             /* hands but no weapon and no gloves */
+             ? "bare handed"
+               /* alternate phrasing for paws or lack of hands */
+               : "not wielding anything";
+}
+
 static int
 ready_weapon(struct obj *wep)
 {
@@ -156,11 +169,11 @@ ready_weapon(struct obj *wep)
     if (!wep) {
         /* No weapon */
         if (uwep) {
-            You("are empty %s.", body_part(HANDED));
+            You("are %s.", empty_handed());
             setuwep((struct obj *) 0);
             res = ECMD_TIME;
         } else
-            You("are already empty %s.", body_part(HANDED));
+            You("are already %s.", empty_handed());
     } else if (wep->otyp == CORPSE && cant_wield_corpse(wep)) {
         /* hero must have been life-saved to get here; use a turn */
         res = ECMD_TIME; /* corpse won't be wielded */
@@ -645,7 +658,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
        something we're wielding that's vulnerable to its damage) */
     res = 0;
     if (was_uwep) {
-        You("are now empty %s.", body_part(HANDED));
+        You("are now %s.", empty_handed());
         res = 1;
     } else if (was_twoweap && !u.twoweap) {
         You("%s.", are_no_longer_twoweap);

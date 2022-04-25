@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1646428012 2022/03/04 21:06:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1650875487 2022/04/25 08:31:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1203,13 +1203,7 @@ weapon_insight(int final)
     /* report being weaponless; distinguish whether gloves are worn
        [perhaps mention silver ring(s) when not wearning gloves?] */
     if (!uwep) {
-        you_are(uarmg ? "empty handed" /* gloves imply hands */
-                      : humanoid(g.youmonst.data)
-                         /* hands but no weapon and no gloves */
-                         ? "bare handed"
-                         /* alternate phrasing for paws or lack of hands */
-                         : "not wielding anything",
-                "");
+        you_are(empty_handed(), "");
 
     /* two-weaponing implies hands and
        a weapon or wep-tool (not other odd stuff) in each hand */

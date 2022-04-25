@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1650838836 2022/04/24 22:20:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.384 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1650875487 2022/04/25 08:31:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.385 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4400,7 +4400,7 @@ int
 doprwep(void)
 {
     if (!uwep) {
-        You("are empty %s.", body_part(HANDED));
+        You("are %s.", empty_handed());
     } else {
         prinv((char *) 0, uwep, 0L);
         if (u.twoweap)
