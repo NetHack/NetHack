@@ -2860,7 +2860,7 @@ int
 remarm_swapwep(void)
 {
     struct _cmd_queue cq, *cmdq;
-    boolean oldbknown;
+    unsigned oldbknown;
 
     if ((cmdq = cmdq_pop()) != 0) {
         /* '-' uswapwep item-action picked from context-sensitive invent */
