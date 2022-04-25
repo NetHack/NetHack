@@ -122,7 +122,7 @@ Via zip download
         to
             LUATOP = ../lib/lua-5.4.4
 
-      In sys/windows/Makefile.msc
+      In sys/windows/Makefile.nmake
         change from
             PDCURSES_TOP = ..\submodules\pdcurses
         to
@@ -290,7 +290,7 @@ Compiling
 
     For the Visual Studio compiler:
 	Issue these commands:
-            copy ..\sys\windows\Makefile.msc Makefile
+            copy ..\sys\windows\Makefile.nmake Makefile
 	    nmake install
 
     For GCC:

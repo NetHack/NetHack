@@ -35,15 +35,15 @@ REM Some file movemet for those that still want to use MAKE or NMAKE and a Makef
 :do_tty
 if NOT exist %BINPATH%\*.* mkdir %BINPATH%
 if NOT exist %BINPATH%\license copy ..\..\dat\license %BINPATH%\license >nul
-echo Copying Microsoft Makefile - Makefile.msc to ..\..\src\Makefile...
-if NOT exist ..\..\src\Makefile goto :domsc
+echo Copying Microsoft Makefile - Makefile.nmake to ..\..\src\Makefile...
+if NOT exist ..\..\src\Makefile goto :donmake
 copy ..\..\src\Makefile ..\..\src\Makefile-orig >nul
 echo      Your existing
 echo           ..\..\src\Makefile
 echo      has been renamed to
 echo           ..\..\src\Makefile-orig
-:domsc
-copy Makefile.msc ..\..\src\Makefile >nul
+:donmake
+copy Makefile.nmake ..\..\src\Makefile >nul
 echo Microsoft Makefile copied ok.
 
 echo Done copying files.

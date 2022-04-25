@@ -43,7 +43,7 @@ export ADD_CURSES=Y
 export PDCURSES_TOP=../lib/pdcurses
 export
 cd src
-cp ../sys/windows/Makefile.msc ./Makefile
+cp ../sys/windows/Makefile.nmake ./Makefile
 nmake install
 cd ..
 powershell -Command "Compress-Archive -U -Path binary/* -DestinationPath $TRAVIS_TAG.x86.zip"
