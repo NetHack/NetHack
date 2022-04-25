@@ -10,6 +10,7 @@ static void mkcavepos(xchar, xchar, int, boolean, boolean);
 static void mkcavearea(boolean);
 static int dig(void);
 static void dig_up_grave(coord *);
+static boolean watchman_canseeu(struct monst *);
 static int adj_pit_checks(coord *, char *);
 static void pit_flow(struct trap *, schar);
 static boolean furniture_handled(int, int, boolean);
@@ -1203,6 +1204,15 @@ use_pick_axe2(struct obj *obj)
     return ECMD_TIME;
 }
 
+static boolean
+watchman_canseeu(struct monst *mtmp)
+{
+    if (is_watch(mtmp->data) && mtmp->mcansee && m_canseeu(mtmp)
+        && couldsee(mtmp->mx, mtmp->my) && mtmp->mpeaceful)
+        return TRUE;
+    return FALSE;
+}
+
 /*
  * Town Watchmen frown on damage to the town walls, trees or fountains.
  * It's OK to dig holes in the ground, however.
@@ -1217,15 +1227,8 @@ watch_dig(struct monst *mtmp, xchar x, xchar y, boolean zap)
     if (in_town(x, y)
         && (closed_door(x, y) || lev->typ == SDOOR || IS_WALL(lev->typ)
             || IS_FOUNTAIN(lev->typ) || IS_TREE(lev->typ))) {
-        if (!mtmp) {
-            for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-                if (DEADMONSTER(mtmp))
-                    continue;
-                if (is_watch(mtmp->data) && mtmp->mcansee && m_canseeu(mtmp)
-                    && couldsee(mtmp->mx, mtmp->my) && mtmp->mpeaceful)
-                    break;
-            }
-        }
+        if (!mtmp)
+            mtmp = get_iter_mons(watchman_canseeu);
 
         if (mtmp) {
             if (zap || g.context.digging.warned) {

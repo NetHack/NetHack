@@ -6,6 +6,7 @@
 #include "hack.h"
 
 static int pet_type(void);
+static void set_mon_lastmove(struct monst *);
 
 void
 newedog(struct monst *mtmp)
@@ -200,20 +201,18 @@ makedog(void)
     return  mtmp;
 }
 
+static void
+set_mon_lastmove(struct monst *mtmp)
+{
+    mtmp->mlstmv = g.moves;
+}
+
 /* record `last move time' for all monsters prior to level save so that
    mon_arrive() can catch up for lost time when they're restored later */
 void
 update_mlstmv(void)
 {
-    struct monst *mon;
-
-    /* monst->mlstmv used to be updated every time `monst' actually moved,
-       but that is no longer the case so we just do a blanket assignment */
-    for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon))
-            continue;
-        mon->mlstmv = g.moves;
-    }
+    iter_mons(set_mon_lastmove);
 }
 
 void
