@@ -363,7 +363,7 @@ vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
 sys/windows:
 (files for Windows 7/8.x/10/11 version)
 .nethackrc.template      Install.windows          Makefile.mingw32
-Makefile.mingw32.depend  Makefile.msc             console.rc
+Makefile.mingw32.depend  Makefile.nmake           console.rc
 consoletty.c             nethack.def              nhico.uu
 nhsetup.bat              ntsound.c                porthelp
 stubs.c                  sysconf.template         win10.c
