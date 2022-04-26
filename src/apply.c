@@ -565,12 +565,10 @@ m_unleash(struct monst *mtmp, boolean feedback)
         else
             Your("leash falls slack.");
     }
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == LEASH && (unsigned) otmp->leashmon == mtmp->m_id) {
-            otmp->leashmon = 0;
-            update_inventory();
-            break;
-        }
+    if ((otmp = get_mleash(mtmp)) != 0) {
+        otmp->leashmon = 0;
+        update_inventory();
+    }
     mtmp->mleashed = 0;
 }
 
