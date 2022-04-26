@@ -7,6 +7,7 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
+static void mk_trap_statue(xchar, xchar);
 static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
                                             struct obj *);
 static boolean mu_maybe_destroy_web(struct monst *, boolean, struct trap *);
@@ -342,6 +343,35 @@ grease_protect(
     return FALSE;
 }
 
+/* create a "living" statue at x,y */
+static void
+mk_trap_statue(xchar x, xchar y)
+{
+    struct monst *mtmp;
+    struct obj *otmp, *statue;
+    struct permonst *mptr;
+    int trycount = 10;
+
+    do { /* avoid ultimately hostile co-aligned unicorn */
+        mptr = &mons[rndmonnum()];
+    } while (--trycount > 0 && is_unicorn(mptr)
+             && sgn(u.ualign.type) == sgn(mptr->maligntyp));
+    statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
+                        CORPSTAT_NONE);
+    mtmp = makemon(&mons[statue->corpsenm], 0, 0,
+                   MM_NOCOUNTBIRTH|MM_NOMSG);
+    if (!mtmp)
+        return; /* should never happen */
+    while (mtmp->minvent) {
+        otmp = mtmp->minvent;
+        otmp->owornmask = 0;
+        obj_extract_self(otmp);
+        (void) add_to_container(statue, otmp);
+    }
+    statue->owt = weight(statue);
+    mongone(mtmp);
+}
+
 struct trap *
 maketrap(int x, int y, int typ)
 {
@@ -389,32 +419,9 @@ maketrap(int x, int y, int typ)
     case SQKY_BOARD:
         ttmp->tnote = choose_trapnote(ttmp);
         break;
-    case STATUE_TRAP: { /* create a "living" statue */
-        struct monst *mtmp;
-        struct obj *otmp, *statue;
-        struct permonst *mptr;
-        int trycount = 10;
-
-        do { /* avoid ultimately hostile co-aligned unicorn */
-            mptr = &mons[rndmonnum()];
-        } while (--trycount > 0 && is_unicorn(mptr)
-                 && sgn(u.ualign.type) == sgn(mptr->maligntyp));
-        statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
-                            CORPSTAT_NONE);
-        mtmp = makemon(&mons[statue->corpsenm], 0, 0,
-                       MM_NOCOUNTBIRTH|MM_NOMSG);
-        if (!mtmp)
-            break; /* should never happen */
-        while (mtmp->minvent) {
-            otmp = mtmp->minvent;
-            otmp->owornmask = 0;
-            obj_extract_self(otmp);
-            (void) add_to_container(statue, otmp);
-        }
-        statue->owt = weight(statue);
-        mongone(mtmp);
+    case STATUE_TRAP: /* create a "living" statue */
+        mk_trap_statue(x, y);
         break;
-    }
     case ROLLING_BOULDER_TRAP: /* boulder will roll towards trigger */
         (void) mkroll_launch(ttmp, x, y, BOULDER, 1L);
         break;
