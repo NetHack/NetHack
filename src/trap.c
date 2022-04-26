@@ -38,6 +38,7 @@ static int trapeffect_vibrating_square(struct monst *, struct trap *,
                                        unsigned);
 static int trapeffect_selector(struct monst *, struct trap *, unsigned);
 static char *trapnote(struct trap *, boolean);
+static int choose_trapnote(struct trap *);
 static int steedintrap(struct trap *, struct obj *);
 static void launch_drop_spot(struct obj *, xchar, xchar);
 static boolean find_random_launch_coord(struct trap *, coord *);
@@ -385,23 +386,9 @@ maketrap(int x, int y, int typ)
     ttmp->ttyp = typ;
 
     switch (typ) {
-    case SQKY_BOARD: {
-        int tavail[12], tpick[12], tcnt = 0, k;
-        struct trap *t;
-
-        for (k = 0; k < 12; ++k)
-            tavail[k] = tpick[k] = 0;
-        for (t = g.ftrap; t; t = t->ntrap)
-            if (t->ttyp == SQKY_BOARD && t != ttmp)
-                tavail[t->tnote] = 1;
-        /* now populate tpick[] with the available indices */
-        for (k = 0; k < 12; ++k)
-            if (tavail[k] == 0)
-                tpick[tcnt++] = k;
-        /* choose an unused note; if all are in use, pick a random one */
-        ttmp->tnote = (short) ((tcnt > 0) ? tpick[rn2(tcnt)] : rn2(12));
+    case SQKY_BOARD:
+        ttmp->tnote = choose_trapnote(ttmp);
         break;
-    }
     case STATUE_TRAP: { /* create a "living" statue */
         struct monst *mtmp;
         struct obj *otmp, *statue;
@@ -2546,6 +2533,27 @@ trapnote(struct trap* trap, boolean noprefix)
     if (!noprefix)
         (void) just_an(tnbuf, tn);
     return strcat(tnbuf, tn);
+}
+
+/* choose a note not used by any trap on current level,
+   ignoring ttmp; if all are in use, pick a random one */
+static int
+choose_trapnote(struct trap *ttmp)
+{
+    int tavail[12], tpick[12], tcnt = 0, k;
+    struct trap *t;
+
+    for (k = 0; k < 12; ++k)
+        tavail[k] = tpick[k] = 0;
+    for (t = g.ftrap; t; t = t->ntrap)
+        if (t->ttyp == SQKY_BOARD && t != ttmp)
+            tavail[t->tnote] = 1;
+    /* now populate tpick[] with the available indices */
+    for (k = 0; k < 12; ++k)
+        if (tavail[k] == 0)
+            tpick[tcnt++] = k;
+    /* choose an unused note; if all are in use, pick a random one */
+    return ((tcnt > 0) ? tpick[rn2(tcnt)] : rn2(12));
 }
 
 static int
