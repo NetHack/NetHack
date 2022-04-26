@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.891 $ $NHDT-Date: 1650838834 2022/04/24 22:20:34 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.892 $ $NHDT-Date: 1650963745 2022/04/26 09:02:25 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -892,6 +892,8 @@ inventory #adjust for !fixinv, after picking 'from' slot the prompt for 'to'
 	slot was supposed to include the next letter beyond those in use as
 	a candidate for destination but an off by 1 error only showed a-x
 	where x is last letter used (despite that, y could still be picked)
+with two-weapon combat or Cleaver attacking multiple targets, hero kept going
+	with next attack after being paralyzed by passive counter-attack
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1646652773 2022/03/07 11:32:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1650963745 2022/04/26 09:02:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -656,9 +656,9 @@ hitum_cleave(
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
 
-        /* stop attacking if weapon is gone or hero got killed and
-           life-saved after passive counter-attack */
-        if (!uwep || u.umortality > umort)
+        /* stop attacking if weapon is gone or hero got paralyzed or
+           killed (and then life-saved) by passive counter-attack */
+        if (!uwep || g.multi < 0 || u.umortality > umort)
             break;
     }
     /* set up for next time */
@@ -679,10 +679,11 @@ hitum(struct monst *mon, struct attack *uattk)
     struct obj *wepbefore = uwep;
     int armorpenalty, attknum = 0,
         x = u.ux + u.dx, y = u.uy + u.dy,
+        oldumort = u.umortality,
         tmp = find_roll_to_hit(mon, uattk->aatyp, uwep,
-                               &attknum, &armorpenalty);
-    int dieroll = rnd(20);
-    int mhit = (tmp > dieroll || u.uswallow);
+                               &attknum, &armorpenalty),
+        dieroll = rnd(20),
+        mhit = (tmp > dieroll || u.uswallow);
 
     mon_maybe_wakeup_on_hit(mon);
 
@@ -702,9 +703,13 @@ hitum(struct monst *mon, struct attack *uattk)
     (void) passive(mon, uwep, mhit, malive, AT_WEAP, wep_was_destroyed);
 
     /* second attack for two-weapon combat; won't occur if Stormbringer
-       overrode confirmation (assumes Stormbringer is primary weapon)
-       or if the monster was killed or knocked to different location */
-    if (u.twoweap && !g.override_confirmation && malive && m_at(x, y) == mon) {
+       overrode confirmation (assumes Stormbringer is primary weapon),
+       or if hero became paralyzed by passive counter-attack, or if hero
+       was killed by passive counter-attack and got life-saved, or if
+       monster was killed or knocked to different location */
+    if (u.twoweap && !(g.override_confirmation
+                       || g.multi < 0 || u.umortality > oldumort
+                       || !malive || m_at(x, y) != mon)) {
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
         mon_maybe_wakeup_on_hit(mon);
