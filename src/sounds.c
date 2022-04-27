@@ -1422,12 +1422,18 @@ add_sound_mapping(const char* mapping)
     char text[256];
     char filename[256];
     char filespec[256];
+    char msgtyp[11];
     int volume, idx = -1;
 
-    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d", text,
-               filename, &volume, &idx) == 4
-        || sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d", text,
-               filename, &volume) == 3) {
+    msgtyp[0] = '\0';
+    if (sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
+               text, filename, &volume, &idx) == 4
+        || sscanf(mapping, "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d %d",
+                  msgtyp, text, filename, &volume, &idx) == 5
+        || sscanf(mapping, "MESG %10[^\"] \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d",
+                  msgtyp, text, filename, &volume) == 4
+        || sscanf(mapping, "MESG \"%255[^\"]\"%*[\t ]\"%255[^\"]\" %d",
+                  text, filename, &volume) == 3) {
         audio_mapping *new_map;
 
         if (!sounddir)
@@ -1455,6 +1461,12 @@ add_sound_mapping(const char* mapping)
                 raw_print(re_error_desc);
                 return 0;
             } else {
+                if (*msgtyp) {
+                    char tmpbuf[BUFSZ];
+
+                    Sprintf(tmpbuf, "%.10s \"%.230s\"", msgtyp, text);
+                    (void) msgtype_parse_add(tmpbuf);
+                }
                 soundmap = new_map;
             }
         } else {

@@ -5053,6 +5053,8 @@ Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
 message window mapping (the only one supported in 3.7);
+.PL msgtype
+optional; message type to use, see \(lqConfiguring Message Types\(rq
 .PL pattern
 the pattern to match;
 .PL "sound file"
@@ -5064,6 +5066,15 @@ optional; the index corresponding to a sound file.
 .PE
 .lp ""
 The pattern should be a POSIX extended regular expression.
+.pg
+For example:
+.sd
+.si
+SOUNDDIR=C:\\nethack\\sounds
+SOUND=MESG "This door is locked" "lock.wav" 100
+SOUND=MESG hide "^You miss the " "swing.wav" 75
+.ei
+.ed
 .pg
 .hn 2
 Configuring Status Hilites

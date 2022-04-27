@@ -5589,6 +5589,7 @@ Each SOUND entry is broken down into the following parts:
 %.sd
 %.si
 {\tt MESG       } --- message window mapping (the only one supported in 3.7);\\
+{\tt msgtype    } --- optional; message type to use, see ``Configuring User Sounds''\\
 {\tt pattern    } --- the pattern to match;\\
 {\tt sound file } --- the sound file to play;\\
 {\tt volume     } --- the volume to be set while playing the sound file;\\
@@ -5599,6 +5600,15 @@ Each SOUND entry is broken down into the following parts:
 
 %.lp ""
 The pattern should be a POSIX extended regular expression.
+
+For example:
+
+\begin{verbatim}
+    SOUNDDIR=C:\\nethack\\sounds
+    SOUND=MESG "This door is locked" "lock.wav" 100
+    SOUND=MESG hide "^You miss the " "swing.wav" 75
+\end{verbatim}
+%.pg
 
 %.lp
 %.hn 2
