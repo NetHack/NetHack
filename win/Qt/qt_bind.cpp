@@ -17,9 +17,10 @@ extern "C" {
 #include <QtWidgets/QtWidgets>
 #include <QtMultimedia/QSoundEffect>
 #else
+/* Qt6 or above */
 #include <QtWidgets/QtWidgets>
 #include <QSoundEffect>
-#endif
+#endif  /* QT_VERSION */
 #include "qt_post.h"
 #include "qt_bind.h"
 #include "qt_click.h"
