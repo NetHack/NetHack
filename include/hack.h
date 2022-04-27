@@ -214,6 +214,7 @@ enum misc_arti_nums {
 
 #include "rect.h"
 #include "region.h"
+#include "trap.h"
 #include "display.h"
 #include "decl.h"
 #include "timeout.h"
@@ -265,7 +266,6 @@ typedef struct sortloot_item Loot;
 
 typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
-#include "trap.h"
 #include "flag.h"
 #include "vision.h"
 #include "engrave.h"

@@ -21,7 +21,9 @@ static boolean m_balks_at_approaching(struct monst *);
 static boolean stuff_prevents_passage(struct monst *);
 static int vamp_shift(struct monst *, struct permonst *, boolean);
 
-/* True if mtmp died */
+/* monster has triggered trapped door lock or was present when it got
+   triggered remotely (at door spot, door hit by zap);
+   returns True if mtmp dies */
 boolean
 mb_trapped(struct monst *mtmp, boolean canseeit)
 {
@@ -42,6 +44,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
             return TRUE;
         /* will get here if lifesaved */
     }
+    mtmp->mtrapseen |= (1 << (TRAPPED_DOOR - 1));
     return FALSE;
 }
 

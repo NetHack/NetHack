@@ -913,8 +913,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                         || c == (int) g.showsyms[sidx]
                         /* have '^' match webs and vibrating square or any
                            other trap that uses something other than '^' */
-                        || (c == '^' && (is_cmap_trap(sidx)
-                                         || sidx == S_vibrating_square)))
+                        || (c == '^' && is_cmap_trap(sidx)))
                         matching[sidx] = (char) ++k;
                 }
                 if (k) {

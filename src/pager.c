@@ -1035,7 +1035,7 @@ add_cmap_descr(
 
     if (!found) {
         /* this is the first match */
-        if (is_cmap_trap(idx)) {
+        if (is_cmap_trap(idx) && idx != S_vibrating_square) {
             Sprintf(out_str, "%sa trap", prefix);
             *hit_trap = TRUE;
         } else {
@@ -1056,7 +1056,7 @@ add_cmap_descr(
         found += append_str(out_str, (article == 2) ? the(x_str)
                                      : (article == 1) ? an(x_str)
                                        : x_str);
-        if (is_cmap_trap(idx))
+        if (is_cmap_trap(idx) && idx != S_vibrating_square)
             *hit_trap = TRUE;
     }
     return found;

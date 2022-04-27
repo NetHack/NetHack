@@ -572,6 +572,8 @@ static NEARDATA const char *trap_engravings[TRAPNUM] = {
     /* 14..16: trap door, teleport, level-teleport */
     "Vlad was here", "ad aerarium", "ad aerarium", (char *) 0, (char *) 0,
     (char *) 0,      (char *) 0,    (char *) 0,    (char *) 0, (char *) 0,
+    /* 24..25 */
+    (char *) 0, (char *) 0,
 };
 
 static void
@@ -1367,7 +1369,7 @@ mktrap(
     if (tm && is_pool(tm->x, tm->y))
         return;
 
-    if (num > 0 && num < TRAPNUM) {
+    if (num > NO_TRAP && num < TRAPNUM) {
         kind = num;
     } else if (Is_rogue_level(&u.uz)) {
         switch (rn2(7)) {
@@ -1401,6 +1403,14 @@ mktrap(
             kind = rnd(TRAPNUM - 1);
             /* reject "too hard" traps */
             switch (kind) {
+            /* these are controlled by the feature or object they guard,
+               not by the map so mustn't be created on it */
+            case TRAPPED_DOOR:
+            case TRAPPED_CHEST:
+                kind = NO_TRAP;
+                break;
+            /* these can have a random location but can't be generated
+               randomly */
             case MAGIC_PORTAL:
             case VIBRATING_SQUARE:
                 kind = NO_TRAP;
