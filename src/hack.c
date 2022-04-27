@@ -1892,13 +1892,16 @@ domove_fight_empty(xchar x, xchar y)
         } else if (solid) {
             /* glyph might indicate unseen terrain if hero is blind;
                unlike searching, this won't reveal what that terrain is;
-               3.7: used to say "solid rock" for the stone case, but that
-               made it be different from unmapped walls outside of rooms */
-            Strcpy(buf, (levl[x][y].typ == STONE || levl[x][y].typ == SCORR)
-                         ? "stone"
-                         : glyph_is_cmap(glyph)
-                            ? the(defsyms[glyph_to_cmap(glyph)].explanation)
-                            : (const char *) "an unknown obstacle");
+               3.7: used to say "solid rock" for STONE, but that made it be
+               different from unmapped walls outside of rooms (and was wrong
+               on arboreal levels) */
+            if (levl[x][y].seenv || IS_STWALL(levl[x][y].typ)
+                || levl[x][y].typ == SDOOR || levl[x][y].typ == SCORR) {
+                glyph = back_to_glyph(x, y);
+                Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
+            } else {
+                Strcpy(buf, "an unknown obstacle");
+            }
             /* note: 'solid' is misleadingly named and catches pools
                of water and lava as well as rock and walls;
                3.7: furniture too */
