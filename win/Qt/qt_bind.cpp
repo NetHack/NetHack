@@ -18,8 +18,7 @@ extern "C" {
 #include <QtMultimedia/QSoundEffect>
 #else
 #include <QtWidgets/QtWidgets>
-#undef QT_NO_SOUND
-#define QT_NO_SOUND 1
+#include <QSoundEffect>
 #endif
 #include "qt_post.h"
 #include "qt_bind.h"
@@ -1100,9 +1099,7 @@ struct window_procs Qt_procs = {
 #ifndef WIN32
 extern "C" void play_usersound(const char *, int);
 
-#if QT_VERSION < 0x060000
 QSoundEffect *effect = NULL;
-#endif
 
 /* called from core, sounds.c */
 void
