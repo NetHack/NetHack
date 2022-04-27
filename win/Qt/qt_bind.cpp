@@ -19,11 +19,7 @@ extern "C" {
 #else
 /* Qt6 or above */
 #include <QtWidgets/QtWidgets>
-#ifdef MACOS
-#include <QtMultimedia/QSoundEffect>
-#else
 #include <QSoundEffect>
-#endif
 #endif  /* QT_VERSION */
 #include "qt_post.h"
 #include "qt_bind.h"
