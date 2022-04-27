@@ -12,10 +12,10 @@ extern "C" {
 #include <QtGui/QtGui>
 #include <QtCore/QStringList>
 #if QT_VERSION < 0x050000
-#include <QtGui/QSound>
+#include <QtGui/QSoundEffect>
 #elif QT_VERSION < 0x060000
 #include <QtWidgets/QtWidgets>
-#include <QtMultimedia/QSound>
+#include <QtMultimedia/QSoundEffect>
 #else
 #include <QtWidgets/QtWidgets>
 #undef QT_NO_SOUND
@@ -1100,14 +1100,24 @@ struct window_procs Qt_procs = {
 #ifndef WIN32
 extern "C" void play_usersound(const char *, int);
 
+QSoundEffect *effect = NULL;
+
 /* called from core, sounds.c */
 void
-play_usersound(const char *filename, int volume UNUSED)
+play_usersound(const char *filename, int volume)
 {
 #if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
-    QSound::play(filename);
+    if (!effect)
+        effect = new QSoundEffect(nethack_qt_::NetHackQtBind::mainWidget());
+    if (effect) {
+        effect->setLoopCount(1);
+        effect->setVolume((1.00f * volume) / 100.0f);
+        effect->setSource(QUrl::fromLocalFile(filename));
+        effect->play();
+    }
 #else
     nhUse(filename);
+    nhUse(volume);
 #endif
 }
 #endif /*!WIN32*/

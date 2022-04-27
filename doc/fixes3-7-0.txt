@@ -1360,6 +1360,7 @@ Qt: during role/race/&c selection, update role titles with their icons, and
 Qt: if a menu of objects contains at least one iron ball, and player is not
 	alreadly in the midst of entering a count, recognize '0' as a group
 	accelerator rather than the start of a count
+Qt: to play user sounds with volume, replace QSound with QSoundEffect
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
