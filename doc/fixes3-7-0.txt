@@ -1360,7 +1360,6 @@ Qt: during role/race/&c selection, update role titles with their icons, and
 Qt: if a menu of objects contains at least one iron ball, and player is not
 	alreadly in the midst of entering a count, recognize '0' as a group
 	accelerator rather than the start of a count
-Qt: to play user sounds with volume, replace QSound with QSoundEffect
 Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
@@ -1638,7 +1637,8 @@ Qt: add '#' as "Extended-commands" to the 'game' dropdown menu
 Qt: add tool tips to the extended command selector's buttons to show command
 	descriptions
 Qt: add tool tips to the icons shown in the status window
-Qt: use QSoundEffect instead of QSound in qt_bind.cpp
+Qt: to play user sounds with volume, replace QSound with QSoundEffect; also
+	restores user sound support for Qt6
 tiles: male and female variations in monsters.txt; tested only with tile2bmp
 	conversion utility so far; also supported by tilemap utility to
 	generate tile.c
