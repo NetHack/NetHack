@@ -160,10 +160,10 @@ QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Q
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif    # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore
+QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore -I $(QTDIR)/include/QtMultimedia
 MOC = moc
 MOCPATH = $(QTDIR)/share/qt/libexec/moc
-WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets
+WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets -framework QtMultimedia
 endif    # WANT_WIN_QT6
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
