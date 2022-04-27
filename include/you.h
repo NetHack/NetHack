@@ -327,12 +327,13 @@ struct Align {
 extern const struct Align aligns[]; /* table of available alignments */
 
 enum utraptypes {
-    TT_BEARTRAP   = 0,
-    TT_PIT        = 1,
-    TT_WEB        = 2,
-    TT_LAVA       = 3,
-    TT_INFLOOR    = 4,
-    TT_BURIEDBALL = 5
+    TT_NONE       = 0,
+    TT_BEARTRAP   = 1,
+    TT_PIT        = 2,
+    TT_WEB        = 3,
+    TT_LAVA       = 4,
+    TT_INFLOOR    = 5,
+    TT_BURIEDBALL = 6
 };
 
 enum utotypes {

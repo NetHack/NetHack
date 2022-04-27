@@ -1858,3 +1858,5 @@ remove obsolete roles[].femalenum and rename roles[].malenum to roles[].mnum;
 	likewise for races[]
 add git submodule support to the Makefiles by specifying git=1 or GIT=1 on the
 	make command
+add TT_NONE==0, renumber other u.utraptype values so that TT_BEARTRAP isn't 0
+

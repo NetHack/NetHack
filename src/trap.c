@@ -902,12 +902,7 @@ set_utrap(unsigned int tim, unsigned int typ)
         g.context.botl = TRUE;
 
     u.utrap = tim;
-    /* FIXME:
-     * utraptype==0 is bear trap rather than 'none'; we probably ought
-     * to change that but can't do so until save file compatability is
-     * able to be broken.
-     */
-    u.utraptype = tim ? typ : 0;
+    u.utraptype = tim ? typ : TT_NONE;
 
     float_vs_flight(); /* maybe block Lev and/or Fly */
 }

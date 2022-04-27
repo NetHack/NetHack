@@ -1510,6 +1510,9 @@ trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
                 buried_ball_to_punishment();
         }
         break;
+    case TT_NONE:
+        impossible("trapmove: trapped in nothing?");
+        break;
     default:
         impossible("trapmove: stuck in unknown trap? (%d)",
                    (int) u.utraptype);
