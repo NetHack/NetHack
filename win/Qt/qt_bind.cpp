@@ -1100,7 +1100,9 @@ struct window_procs Qt_procs = {
 #ifndef WIN32
 extern "C" void play_usersound(const char *, int);
 
+#if QT_VERSION < 0x060000
 QSoundEffect *effect = NULL;
+#endif
 
 /* called from core, sounds.c */
 void
