@@ -145,11 +145,10 @@ monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
 static void
 trap_description(char *outbuf, int tnum, int x, int y)
 {
-    /* Trap detection displays a bear trap at locations having
-     * a trapped door or trapped container or both.
-     *
-     * TODO: we should create actual trap types for doors and
-     * chests so that they can have their own glyphs and tiles.
+    /*
+     * Trap detection used to display a bear trap at locations having
+     * a trapped door or trapped container or both.  They're semi-real
+     * traps now (defined trap types but not part of ftrap chain).
      */
     if (trapped_chest_at(tnum, x, y))
         Strcpy(outbuf, "trapped chest"); /* might actually be a large box */
@@ -1908,9 +1907,14 @@ doidtrap(void)
     x = u.ux + u.dx;
     y = u.uy + u.dy;
 
-    /* check fake bear trap from confused gold detection */
+    /* trapped doors and chests used to be shown as fake bear traps;
+       they have their own trap types now but aren't part of the ftrap
+       chain; usually they revert to normal door or chest when the hero
+       sees them but player might be using '^' while the hero is blind */
     glyph = glyph_at(x, y);
-    if (glyph_is_trap(glyph) && (tt = glyph_to_trap(glyph)) == BEAR_TRAP) {
+    if (glyph_is_trap(glyph)
+        && ((tt = glyph_to_trap(glyph)) == BEAR_TRAP
+            || tt == TRAPPED_DOOR || tt == TRAPPED_CHEST)) {
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {

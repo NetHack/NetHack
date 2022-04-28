@@ -894,6 +894,8 @@ inventory #adjust for !fixinv, after picking 'from' slot the prompt for 'to'
 	where x is last letter used (despite that, y could still be picked)
 with two-weapon combat or Cleaver attacking multiple targets, hero kept going
 	with next attack after being paralyzed by passive counter-attack
+trap detection could falsely find trapped secret doors; those can't be trapped
+	due to details of how they use overlaid fields in the rm structure
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1595,6 +1597,8 @@ pets are more likely to follow you closely if you are carrying something they
 	really like to eat; behave as if you are carrying such whenever you
 	are standing on stairs so that pets will try harder to come to you
 allow setting msgtype in SOUND line
+display detected door traps and chest traps as trapped doors and trapped
+	chests rather than as fake bear traps
 
 
 Platform- and/or Interface-Specific New Features
