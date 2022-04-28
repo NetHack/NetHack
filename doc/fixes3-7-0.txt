@@ -896,6 +896,8 @@ with two-weapon combat or Cleaver attacking multiple targets, hero kept going
 	with next attack after being paralyzed by passive counter-attack
 trap detection could falsely find trapped secret doors; those can't be trapped
 	due to details of how they use overlaid fields in the rm structure
+for force-fight against edge of level, report "you harmlessly attack unknown
+	obstacle" rather than "you have moved as far <direction> as possible"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

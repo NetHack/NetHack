@@ -1839,7 +1839,14 @@ domove_swap_with_pet(struct monst *mtmp, xchar x, xchar y)
 static boolean
 domove_fight_empty(xchar x, xchar y)
 {
-    int glyph = glyph_at(x, y);
+    static const char unknown_obstacle[] = "an unknown obstacle";
+    boolean off_edge = !isok(x, y);
+    int glyph = !off_edge ? glyph_at(x, y) : GLYPH_UNEXPLORED;
+
+    if (off_edge)
+        x = y = 0; /* for forcefight against the edge of the map; make
+                    * sure 'bad' coordinates are within array bounds in
+                    * case a bounds check gets overlooked */
 
     /* specifying 'F' with no monster wastes a turn */
     if (g.context.forcefight
@@ -1847,8 +1854,15 @@ domove_fight_empty(xchar x, xchar y)
         || (glyph_is_invisible(glyph) && !g.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
-                solid = (!accessible(x, y) || IS_FURNITURE(levl[x][y].typ));
+                solid = (off_edge || (!accessible(x, y)
+                                      || IS_FURNITURE(levl[x][y].typ)));
         char buf[BUFSZ];
+
+        if (off_edge) {
+            /* treat as if solid rock, even on planes' levels */
+            Strcpy(buf, unknown_obstacle);
+            goto futile;
+        }
 
         if (!Underwater) {
             boulder = sobj_at(BOULDER, x, y);
@@ -1900,7 +1914,7 @@ domove_fight_empty(xchar x, xchar y)
                 glyph = back_to_glyph(x, y);
                 Strcpy(buf, the(defsyms[glyph_to_cmap(glyph)].explanation));
             } else {
-                Strcpy(buf, "an unknown obstacle");
+                Strcpy(buf, unknown_obstacle);
             }
             /* note: 'solid' is misleadingly named and catches pools
                of water and lava as well as rock and walls;
@@ -1908,16 +1922,20 @@ domove_fight_empty(xchar x, xchar y)
         } else {
             Strcpy(buf, "thin air");
         }
+
+ futile:
         You("%s%s %s.",
             !(boulder || solid) ? "" : !explo ? "harmlessly " : "futilely ",
             explo ? "explode at" : "attack", buf);
 
         nomul(0);
         if (explo) {
-            struct attack *attk;
+            struct attack *attk
+                        = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY);
+
             /* no monster has been attacked so we have bypassed explum() */
             wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
-            if ((attk = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY)))
+            if (attk)
                 explum((struct monst *) 0, attk);
             u.mh = -1; /* dead in the current form */
             rehumanize();
@@ -2079,6 +2097,9 @@ static boolean
 move_out_of_bounds(xchar x, xchar y)
 {
     if (!isok(x, y)) {
+        if (g.context.forcefight)
+            return domove_fight_empty(x, y);
+
         if (flags.mention_walls) {
             int dx = u.dx, dy = u.dy;
 
@@ -2236,7 +2257,7 @@ domove_core(void)
         if (water_turbulence(&x, &y))
             return;
 
-        if (move_out_of_bounds(x,y))
+        if (move_out_of_bounds(x, y))
             return;
 
         if (avoid_running_into_trap_or_liquid(x, y))
