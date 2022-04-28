@@ -1181,6 +1181,8 @@ if the progarm was built with EXTRA_SANITY_CHECKS enabled, changing levels
 	while riding would give impossible warning "no monster to remove"
 the change to protect Rider corpses from being destroyed by exploding chests
 	inadvertently prevented them from being used up when Riders revived
+force-fight against furniture covered by an object described the attack as
+	missing an unknown obstacle
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
