@@ -748,11 +748,12 @@ init_dungeons(void)
     struct proto_dungeon pd;
     struct level_map *lev_map;
     int tidx;
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
 
     (void) memset(&pd, 0, sizeof (struct proto_dungeon));
     pd.n_levs = pd.n_brs = 0;
 
-    L = nhl_init();
+    L = nhl_init(&sbi);	/* private Lua state for this function */
     if (!L) {
         panic1("'nhl_init' failed; can't continue.");
         /*NOTREACHED*/

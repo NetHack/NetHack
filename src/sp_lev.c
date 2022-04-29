@@ -3195,7 +3195,9 @@ lspo_monster(lua_State *L)
 
     if (tmpmons.has_invent && lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-        lua_call(L, 0, 0);
+	if (nhl_pcall(L, 0, 0)){
+	    impossible("Lua error: %s", lua_tostring(L, -1));
+	}
         spo_end_moninvent();
     } else
         lua_pop(L, 1);
@@ -3509,7 +3511,9 @@ lspo_object(lua_State *L)
 
     if (lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-        lua_call(L, 0, 0);
+	if (nhl_pcall(L, 0, 0)){
+	    impossible("Lua error: %s", lua_tostring(L, -1));
+	}
     } else
         lua_pop(L, 1);
 
@@ -3819,7 +3823,9 @@ lspo_room(lua_State *L)
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
                     l_push_mkroom_table(L, tmpcr);
-                    lua_call(L, 1, 0);
+		    if (nhl_pcall(L, 1, 0)){
+			impossible("Lua error: %s", lua_tostring(L, -1));
+		    }
                 } else
                     lua_pop(L, 1);
                 spo_endroom(g.coder);
@@ -5758,7 +5764,9 @@ lspo_region(lua_State *L)
             lua_getfield(L, 1, "contents");
             if (lua_type(L, -1) == LUA_TFUNCTION) {
                 lua_remove(L, -2);
-                lua_call(L, 0, 0);
+		if (nhl_pcall(L, 0, 0)){
+		    impossible("Lua error: %s", lua_tostring(L, -1));
+		}
             } else
                 lua_pop(L, 1);
             spo_endroom(g.coder);
@@ -6362,7 +6370,9 @@ TODO: g.coder->croom needs to be updated
 
     if (has_contents && !(g.in_mk_themerooms && g.themeroom_failed)) {
         l_push_wid_hei_table(L, g.xsize, g.ysize);
-        lua_call(L, 1, 0);
+	if (nhl_pcall(L, 1, 0)){
+	    impossible("Lua error: %s", lua_tostring(L, -1));
+	}
     }
 
     return 0;
@@ -6500,10 +6510,11 @@ boolean
 load_special(const char *name)
 {
     boolean result = FALSE;
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
 
     create_des_coder();
 
-    if (!load_lua(name))
+    if (!load_lua(name, &sbi))
         goto give_up;
 
     link_doors_rooms();

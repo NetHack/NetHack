@@ -433,11 +433,12 @@ com_pager_core(const char *section, const char *msgid, boolean showerror)
     lua_State *L;
     char *text = NULL, *synopsis = NULL, *fallback_msgid = NULL;
     boolean res = FALSE;
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
 
     if (skip_pager(TRUE))
         return FALSE;
 
-    L = nhl_init();
+    L = nhl_init(&sbi);
     if (!L) {
         if (showerror)
             impossible("com_pager: nhl_init() failed");

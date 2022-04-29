@@ -680,7 +680,7 @@ newgame(void)
                        * any artifacts */
     u_init();
 
-    l_nhcore_init();
+    l_nhcore_init();	/* create a Lua state that lasts until the end of the game */
     reset_glyphmap(gm_newgame);
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);

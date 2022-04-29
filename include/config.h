@@ -640,6 +640,10 @@ typedef unsigned char uchar;
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
+/* TEMPORARY - MAKE UNCONDITIONAL BEFORE RELEASE */
+/* undef this to check if sandbox breaks something */
+#define NHL_SANDBOX
+
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES

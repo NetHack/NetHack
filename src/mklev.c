@@ -265,10 +265,11 @@ makerooms(void)
     boolean tried_vault = FALSE;
     int themeroom_tries = 0;
     char *fname;
+    nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
     lua_State *themes = (lua_State *) g.luathemes[u.uz.dnum];
 
     if (!themes && *(fname = g.dungeons[u.uz.dnum].themerms)) {
-        if ((themes = nhl_init()) != 0) {
+        if ((themes = nhl_init(&sbi)) != 0) {
             if (!nhl_loadlua(themes, fname)) {
                 /* loading lua failed, don't use themed rooms */
                 nhl_done(themes);
@@ -303,7 +304,9 @@ makerooms(void)
                 iflags.in_lua = g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
-                lua_call(themes, 0, 0);
+		if ( nhl_pcall(themes, 0, 0)){
+		    impossible("Lua error: %s", lua_tostring(themes, -1));
+		}
                 iflags.in_lua = g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)

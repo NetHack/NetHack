@@ -1161,6 +1161,7 @@ wiz_load_lua(void)
 {
     if (wizard) {
         char buf[BUFSZ];
+	nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
 
         buf[0] = '\0';
         getlin("Load which lua file?", buf);
@@ -1168,7 +1169,7 @@ wiz_load_lua(void)
             return 0;
         if (!strchr(buf, '.'))
             strcat(buf, ".lua");
-        (void) load_lua(buf);
+        (void) load_lua(buf, &sbi);
     } else
         pline(unavailcmd, ecname_from_fn(wiz_load_lua));
     return ECMD_OK;

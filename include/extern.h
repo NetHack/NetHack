@@ -1773,10 +1773,11 @@ extern int l_obj_register(lua_State *);
 extern void l_nhcore_init(void);
 extern void l_nhcore_done(void);
 extern void l_nhcore_call(int);
-extern lua_State * nhl_init(void);
+extern lua_State * nhl_init(nhl_sandbox_info *);
 extern void nhl_done(lua_State *);
 extern boolean nhl_loadlua(lua_State *, const char *);
-extern boolean load_lua(const char *);
+extern int nhl_pcall(lua_State *, int, int);
+extern boolean load_lua(const char *, nhl_sandbox_info *);
 extern void nhl_error(lua_State *, const char *) NORETURN;
 extern void lcheck_param_table(lua_State *);
 extern schar get_table_mapchr(lua_State *, const char *);
@@ -1802,6 +1803,7 @@ extern int get_table_option(lua_State *, const char *, const char *,
 extern int str_lines_max_width(const char *);
 extern char *stripdigits(char *);
 extern const char *get_lua_version(void);
+extern void nhl_pushhooked_open_table(lua_State *L);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
 /* ### nhregex.c ### */
