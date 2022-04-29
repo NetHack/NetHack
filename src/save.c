@@ -19,6 +19,7 @@ int dotcnt, dotrow; /* also used in restore */
 static void savelevchn(NHFILE *);
 static void savelevl(NHFILE *,boolean);
 static void savedamage(NHFILE *);
+static void save_bubbles(NHFILE *, xchar);
 static void save_stairs(NHFILE *);
 static void saveobj(NHFILE *,struct obj *);
 static void saveobjchn(NHFILE *,struct obj **);
@@ -27,6 +28,7 @@ static void savemonchn(NHFILE *,struct monst *);
 static void savetrapchn(NHFILE *,struct trap *);
 static void save_gamelog(NHFILE *);
 static void savegamestate(NHFILE *);
+static void savelev_core(NHFILE *, xchar);
 static void save_msghistory(NHFILE *);
 
 #ifdef ZEROCOMP
@@ -76,7 +78,6 @@ dosave0(void)
 {
     const char *fq_save;
     xchar ltmp;
-    d_level uz_save;
     char whynot[BUFSZ];
     NHFILE *nhfp, *onhfp;
     int res = 0;
@@ -174,8 +175,9 @@ dosave0(void)
      * parts of the restore code from completely initializing all
      * in-core data structures, since all we're doing is copying.
      * This also avoids at least one nasty core dump.
+     * [g.uz_save is used by save_bubbles() as well as to restore u.uz]
      */
-    uz_save = u.uz;
+    g.uz_save = u.uz;
     u.uz.dnum = u.uz.dlevel = 0;
     /* these pointers are no longer valid, and at least u.usteed
      * may mislead place_monster() on other levels
@@ -184,7 +186,7 @@ dosave0(void)
     u.usteed = (struct monst *) 0;
 
     for (ltmp = (xchar) 1; ltmp <= maxledgerno(); ltmp++) {
-        if (ltmp == ledger_no(&uz_save))
+        if (ltmp == ledger_no(&g.uz_save))
             continue;
         if (!(g.level_info[ltmp].flags & LFILE_EXISTS))
             continue;
@@ -218,7 +220,8 @@ dosave0(void)
     }
     close_nhfile(nhfp);
 
-    u.uz = uz_save;
+    u.uz = g.uz_save;
+    g.uz_save.dnum = g.uz_save.dlevel = 0;
 
     /* get rid of current level --jgm */
     delete_levelfile(ledger_no(&u.uz));
@@ -349,7 +352,6 @@ savegamestate(NHFILE* nhfp)
     }
     savefruitchn(nhfp);
     savenames(nhfp);
-    save_waterlevel(nhfp);
     save_msghistory(nhfp);
     save_gamelog(nhfp);
     if (nhfp->structlevel)
@@ -458,6 +460,27 @@ savestateinlock(void)
 void
 savelev(NHFILE *nhfp, xchar lev)
 {
+    boolean set_uz_save = (g.uz_save.dnum == 0 && g.uz_save.dlevel == 0);
+
+    /* caller might have already set up g.uz_save and zeroed u.uz;
+       if not, we need to set it for save_bubbles() */
+    if (set_uz_save) {
+        if (u.uz.dnum == 0 && u.uz.dlevel == 0) {
+            g.program_state.something_worth_saving = 0;
+            panic("savelev: where are we?");
+        }
+        g.uz_save = u.uz;
+    }
+
+    savelev_core(nhfp, lev);
+
+    if (set_uz_save)
+        g.uz_save.dnum = g.uz_save.dlevel = 0; /* unset */
+}
+
+static void
+savelev_core(NHFILE *nhfp, xchar lev)
+{
 #ifdef TOS
     short tlev;
 #endif
@@ -544,6 +567,8 @@ savelev(NHFILE *nhfp, xchar lev)
     save_engravings(nhfp);
     savedamage(nhfp); /* pending shop wall and/or floor repair */
     save_regions(nhfp);
+    save_bubbles(nhfp, lev); /* for water and air */
+
     if (nhfp->mode != FREEING) {
         if (nhfp->structlevel)
             bflush(nhfp->fd);
@@ -616,6 +641,28 @@ savelevl(NHFILE* nhfp, boolean rlecomp)
         bwrite(nhfp->fd, (genericptr_t) levl, sizeof levl);
     }
     return;
+}
+
+/* save Plane of Water's air bubbles and Plane of Air's clouds */
+static void
+save_bubbles(NHFILE *nhfp, xchar lev)
+{
+    xchar bbubbly;
+
+    /* air bubbles and clouds used to be saved as part of game state
+       because restoring them needs dungeon data that isn't available
+       during the first pass of their levels; now that they are part of
+       the current level instead, we write a zero or non-zero marker
+       so that restore can determine whether they are present even when
+       u.uz and ledger_no() aren't available to it yet */
+    bbubbly = 0;
+    if (lev == ledger_no(&water_level) || lev == ledger_no(&air_level))
+        bbubbly = lev; /* non-zero */
+    if (nhfp->structlevel)
+        bwrite(nhfp->fd, (genericptr_t) &bbubbly, sizeof bbubbly);
+
+    if (bbubbly)
+        save_waterlevel(nhfp); /* save air bubbles or clouds */
 }
 
 /* used when saving a level and also when saving dungeon overview data */

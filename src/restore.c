@@ -30,6 +30,7 @@ static void ghostfruit(struct obj *);
 static boolean restgamestate(NHFILE *, unsigned int *, unsigned int *);
 static void restlevelstate(unsigned int, unsigned int);
 static int restlevelfile(xchar);
+static void rest_bubbles(NHFILE *);
 static void restore_gamelog(NHFILE *);
 static void restore_msghistory(NHFILE *);
 static void reset_oattached_mids(boolean);
@@ -683,7 +684,6 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     g.ffruit = loadfruitchn(nhfp);
 
     restnames(nhfp);
-    restore_waterlevel(nhfp);
     restore_msghistory(nhfp);
     restore_gamelog(nhfp);
     /* must come after all mons & objs are restored */
@@ -1127,6 +1127,7 @@ getlev(NHFILE* nhfp, int pid, xchar lev)
     }
     restdamage(nhfp);
     rest_regions(nhfp);
+    rest_bubbles(nhfp); /* for water and air; empty marker on other levels */
 
     if (ghostly) {
         stairway *stway = g.stairs;
@@ -1215,6 +1216,23 @@ get_plname_from_file(NHFILE* nhfp, char *plbuf)
         (void) read(nhfp->fd, (genericptr_t) plbuf, pltmpsiz);
     }
     return;
+}
+
+/* restore Plane of Water's air bubbles and Plane of Air's clouds */
+static void
+rest_bubbles(NHFILE *nhfp)
+{
+    xchar bbubbly;
+
+    /* whether or not the Plane of Water's air bubbles or Plane of Air's
+       clouds are present is recorded during save so that we don't have to
+       know what level is being restored */
+    bbubbly = 0;
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &bbubbly, sizeof bbubbly);
+
+    if (bbubbly)
+        restore_waterlevel(nhfp);
 }
 
 static void

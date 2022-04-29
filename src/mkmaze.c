@@ -1592,7 +1592,7 @@ save_waterlevel(NHFILE* nhfp)
 {
     struct bubble *b;
 
-    if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
+    if (!g.bbubbles)
         return;
 
     if (perform_bwrite(nhfp)) {
@@ -1621,17 +1621,6 @@ restore_waterlevel(NHFILE* nhfp)
     struct bubble *b = (struct bubble *) 0, *btmp;
     int i, n = 0;
 
-    if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
-        return;
-
-    if (nhfp->fd == -1) { /* special handling for restore in goto_level() */
-        if (!wizard)
-            impossible("restore_waterlevel: returning to %s?",
-                       Is_waterlevel(&u.uz) ? "Water" : "Air");
-        setup_waterlevel();
-        return;
-    }
-
     set_wportal();
     if (nhfp->structlevel) {
         mread(nhfp->fd,(genericptr_t)&n,sizeof(int));
@@ -1655,7 +1644,21 @@ restore_waterlevel(NHFILE* nhfp)
       mv_bubble(b, 0, 0, TRUE);
     }
     g.ebubbles = b;
-    b->next = (struct bubble *) 0;
+    if (b) {
+        b->next = (struct bubble *) 0;
+    } else {
+        /* avoid "saving and reloading may fix this" */
+        g.program_state.something_worth_saving = 0;
+        /* during restore, information about what level this is might not
+           be available so we're wishy-washy about what we describe */
+        impossible("No %s to restore?",
+                   (Is_waterlevel(&u.uz) || Is_waterlevel(&g.uz_save))
+                   ? "air bubbles"
+                   : (Is_airlevel(&u.uz) || Is_airlevel(&g.uz_save))
+                     ? "clouds"
+                     : "air bubbles or clouds");
+        g.program_state.something_worth_saving = 1;
+    }
 }
 
 static void

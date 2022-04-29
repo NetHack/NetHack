@@ -228,7 +228,8 @@ mread(int fd, genericptr_t buf, unsigned len)
             restoreinfo.mread_flags = -1;
             return;
         } else {
-            pline("Read %d instead of %u bytes.", rlen, len);
+            pline("Read %d instead of %u bytes.", (int) rlen, len);
+            display_nhwindow(WIN_MESSAGE, TRUE); /* flush before error() */
             if (g.program_state.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();

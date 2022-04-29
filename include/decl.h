@@ -1165,6 +1165,7 @@ struct instance_globals {
     unsigned usteed_id; /* need to preserve during save */
     struct obj *looseball;  /* track uball during save and... */
     struct obj *loosechain; /* track uchain since saving might free it */
+    d_level uz_save;
 
     /* shk.c */
     /* auto-response flag for/from "sell foo?" 'a' => 'y', 'q' => 'n' */
@@ -1231,6 +1232,7 @@ struct instance_globals {
     xchar *viz_rmin;			/* min could see indices */
     xchar *viz_rmax;			/* max could see indices */
     boolean vision_full_recalc;
+    int seethru; /* 'bubble' debugging: clouds and water don't block light */
 
     /* weapon.c */
     struct obj *propellor;

@@ -143,15 +143,28 @@ does_block(int x, int y, struct rm *lev)
     struct monst *mon;
     int i;
 
+#ifdef DEBUG
+    /* set DEBUGFILES=seethru in environment to see through bubbles */
+    if (g.seethru == 0) { /* init once */
+        g.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
+    }
+#endif
+
     /* Features that block . . */
     if (IS_ROCK(lev->typ) || lev->typ == TREE
         || (IS_DOOR(lev->typ)
             && (lev->doormask & (D_CLOSED | D_LOCKED | D_TRAPPED))))
         return 1;
 
+#ifdef DEBUG
+    if (g.seethru != 1) {
+#endif
     if (lev->typ == CLOUD || IS_WATERWALL(lev->typ)
-        || (lev->typ == MOAT && Underwater))
+        || (Underwater && is_moat(x, y)))
         return 1;
+#ifdef DEBUG
+    } /* g.seethru */
+#endif
 
     /* Boulders block light. */
     for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere)
@@ -163,6 +176,9 @@ does_block(int x, int y, struct rm *lev)
         && is_lightblocker_mappear(mon))
         return 1;
 
+#ifdef DEBUG
+    if (g.seethru != 1) {
+#endif
     /* Clouds (poisonous or not) block light. */
     for (i = 0; i < g.n_regions; i++) {
         /* Ignore regions with ttl == 0 - expire_gas_cloud must unblock its
@@ -172,6 +188,9 @@ does_block(int x, int y, struct rm *lev)
             return 1;
         }
     }
+#ifdef DEBUG
+    } /* g.seethru */
+#endif
 
     return 0;
 }
@@ -828,6 +847,17 @@ vision_recalc(int control)
 void
 block_point(int x, int y)
 {
+#ifdef DEBUG
+    /* set DEBUGFILES=seethru in environment to see through clouds & water */
+    if (g.seethru == 0) { /* init once */
+        g.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
+    }
+    if (g.seethru == 1) {
+        if (!does_block(x, y, &levl[x][y]))
+            return;
+    }
+#endif
+
     fill_point(y, x);
 
     /* recalc light sources here? */

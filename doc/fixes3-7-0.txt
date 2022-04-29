@@ -898,6 +898,9 @@ trap detection could falsely find trapped secret doors; those can't be trapped
 	due to details of how they use overlaid fields in the rm structure
 for force-fight against edge of level, report "you harmlessly attack unknown
 	obstacle" rather than "you have moved as far <direction> as possible"
+using wizard mode ^V in endgame to return to previously visited Plane of Water
+	now gets the same air bubbles back instead of a replacement set;
+	likewise for clouds on Plane of Air
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1185,6 +1188,9 @@ the change to protect Rider corpses from being destroyed by exploding chests
 	inadvertently prevented them from being used up when Riders revived
 force-fight against furniture covered by an object described the attack as
 	missing an unknown obstacle
+using #wizmakemap on Plane of Water added a new set of air bubbles each time
+	it was run and eventually replaced just about all the water; likewise
+	with clouds on Plane of Air
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -1603,6 +1609,9 @@ pets are more likely to follow you closely if you are carrying something they
 allow setting msgtype in SOUND line
 display detected door traps and chest traps as trapped doors and trapped
 	chests rather than as fake bear traps
+if built with DEBUG enabled and running in wizard mode, starting play with
+	DEBUGFILES=seethru in environment makes clouds on the Plane of Air,
+	water on Plane of Water, and fumaroles on Plane of Fire be transparent
 
 
 Platform- and/or Interface-Specific New Features
@@ -1822,7 +1831,7 @@ pm.h dependency and inclusion is removed and comparable functionality is
 	file called monsters.h, then taking advantage of the C preprocessor to
 	generate appropriate enum values during compile
 onames.h dependency and inclusion is removed and comparable functionality is
-	produced by moving the object definitions from objects.c into new header
+	produced by moving object definitions from objects.c into new header
 	file called objects.h, then taking advantage of the C preprocessor to
 	generate appropriate enum values during compile
 artilist.h is used to generate appropriate artifact enum values by the C
@@ -1867,4 +1876,6 @@ remove obsolete roles[].femalenum and rename roles[].malenum to roles[].mnum;
 add git submodule support to the Makefiles by specifying git=1 or GIT=1 on the
 	make command
 add TT_NONE==0, renumber other u.utraptype values so that TT_BEARTRAP isn't 0
+for Planes of Water and Air, save the air bubbles and clouds with the level
+	rather than as game state; affects wizard mode ^V and #wizmakemap
 

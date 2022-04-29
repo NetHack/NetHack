@@ -1444,22 +1444,6 @@ goto_level(
     nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
     savelev(nhfp, ledger_no(&u.uz));
     nhfp->mode = save_mode;
-    /* air bubbles and clouds are saved in game-state rather than with the
-       level they're used on; in normal play, you can't leave and return
-       to any endgame level--bubbles aren't needed once you move to the
-       next level so used to be discarded when the next special level was
-       loaded; but in wizard mode you can leave and return, and since they
-       aren't saved with the level and restored upon return (new ones are
-       created instead), we need to discard them to avoid a memory leak;
-       so bubbles are now discarded as we leave the level they're used on */
-    if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
-        NHFILE tmpnhfp;
-
-        zero_nhfile(&tmpnhfp);
-        tmpnhfp.fd = -1;
-        tmpnhfp.mode = FREEING;
-        save_waterlevel(&tmpnhfp);
-    }
     close_nhfile(nhfp);
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
@@ -1517,16 +1501,6 @@ goto_level(
         reseed_random(rn2_on_display_rng);
         minit(); /* ZEROCOMP */
         getlev(nhfp, g.hackpid, new_ledger);
-        /* when in wizard mode, it is possible to leave from and return to
-           any level in the endgame; above, we discarded bubble/cloud info
-           when leaving Plane of Water or Air so recreate some now */
-        if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz)) {
-            NHFILE tmpnhfp;
-
-            zero_nhfile(&tmpnhfp);
-            tmpnhfp.fd = -1;
-            restore_waterlevel(&tmpnhfp);
-        }
         close_nhfile(nhfp);
         oinit(); /* reassign level dependent obj probabilities */
     }

@@ -615,6 +615,7 @@ const struct instance_globals g_init = {
     0, /* usteed_id */
     (struct obj *) 0, /* looseball */
     (struct obj *) 0, /* loosechain */
+    { 0, 0 }, /* uz_save */
 
     /* shk.c */
     'a', /* sell_response */
@@ -670,6 +671,7 @@ const struct instance_globals g_init = {
     NULL, /* viz_rmin */
     NULL, /* viz_rmax */
     FALSE, /* vision_full_recalc */
+    0, /* seethru */
 
     /* weapon.c */
     UNDEFINED_PTR, /* propellor */
