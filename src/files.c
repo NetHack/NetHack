@@ -2796,7 +2796,7 @@ parse_config_line(char *origbuf)
     } else if (match_varname(buf, "SOUNDDIR", 8)
                || match_varname(buf, "SOUND", 5)) {
         if (!g.no_sound_notified++) {
-            config_error_add("SOUND and SOUNDDIR are not available.");
+            config_error_add("SOUND and SOUNDDIR are not available");
         }
         ; /* skip this and any further SOUND or SOUNDDIR lines
            * but leave 'retval' set to True */
