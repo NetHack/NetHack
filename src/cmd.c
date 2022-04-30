@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1650048286 2022/04/15 18:44:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.553 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1651279805 2022/04/30 00:50:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.561 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4106,15 +4106,22 @@ rhack(char *cmd)
                 prefix_seen = 0;
                 was_m_prefix = FALSE;
             }
+            /* it is possible to have a result of (ECMD_TIME|ECMD_CANCEL)
+               [for example, using 'f'ire, manually filling quiver with
+               wielded weapon or dual-wielded swap-weapon, then cancelling
+               at the direction prompt; using time to unwield should take
+               precedence over general cancellation] */
             if ((res & (ECMD_CANCEL | ECMD_FAIL)) != 0) {
                 /* command was canceled by user, maybe they declined to
                    pick an object to act on, or command failed to finish */
                 reset_cmd_vars(TRUE);
-            } else if ((res & ECMD_TIME) != 0) {
-                g.context.move = TRUE;
-            } else { /* ECMD_OK */
+            } else if ((res & (ECMD_OK | ECMD_TIME)) == ECMD_OK) {
                 reset_cmd_vars(g.multi < 0);
             }
+            /* reset_cmd_vars() sets context.move to False so we might
+               need to change it [back] to True */
+            if ((res & ECMD_TIME) != 0)
+                g.context.move = TRUE;
             return;
         }
         /* if we reach here, cmd wasn't found in cmdlist[] */
@@ -4132,6 +4139,7 @@ rhack(char *cmd)
         if (!prefix_seen || !help_dir(c1, spkey, "Invalid direction key!"))
             Norep("Unknown command '%s'.", expcmd);
         cmdq_clear();
+        savech(0); /* clear do-again queue */
     }
     /* didn't move */
     g.context.move = FALSE;
