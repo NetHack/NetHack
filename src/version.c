@@ -1,4 +1,4 @@
-/* NetHack 3.7	version.c	$NHDT-Date: 1596498224 2020/08/03 23:43:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.7	version.c	$NHDT-Date: 1651297024 2022/04/30 05:37:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -299,8 +299,10 @@ check_version(struct version_info *version_data, const char *filename,
         version_data->incarnation != nomakedefs.version_number
 #endif
         ) {
-        if (complain)
+        if (complain) {
             pline("Version mismatch for file \"%s\".", filename);
+            display_nhwindow(WIN_MESSAGE, TRUE);
+        }
         return FALSE;
     } else if (
 #ifndef IGNORED_FEATURES
@@ -315,8 +317,10 @@ check_version(struct version_info *version_data, const char *filename,
             && version_data->struct_sizes1 != nomakedefs.version_sanity2)
         || ((utdflags & UTD_CHECKSIZES) != 0
             && version_data->struct_sizes2 != nomakedefs.version_sanity3)) {
-        if (complain)
+        if (complain) {
             pline("Configuration incompatibility for file \"%s\".", filename);
+            display_nhwindow(WIN_MESSAGE, TRUE);
+        }
         return FALSE;
     }
     return TRUE;

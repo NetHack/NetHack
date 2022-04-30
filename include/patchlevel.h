@@ -1,4 +1,4 @@
-/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1646870832 2022/03/10 00:07:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	patchlevel.h	$NHDT-Date: 1651297020 2022/04/30 05:37:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 56
+#define EDITLEVEL 57
 
 /*
  * Development status possibilities.
@@ -51,8 +51,15 @@
  * 0x = literal prefix "0x", MM = major version, mm = minor version,
  * PP = patch level, ee = edit level, L = literal suffix "L",
  * with all four numbers specified as two hexadecimal digits.
+ *
+ * When developing a new version, VERSION_COMPATIBILITY should be
+ * commented out so that increments of EDITLEVEL can be used to forcibly
+ * invalidate existing save files whenever incompatible changes are made
+ * to saved data.  [Bones files should be less sensitive (only changes
+ * to individual level files matter; changes to general game state don't)
+ * but the extra complexity to support that is not worth the effort.]
  */
-#define VERSION_COMPATIBILITY 0x03070000L
+/*#define VERSION_COMPATIBILITY 0x03070000L*/
 
 /****************************************************************************/
 /* Version 3.7.x */

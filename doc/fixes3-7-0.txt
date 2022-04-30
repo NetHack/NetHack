@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.892 $ $NHDT-Date: 1650963745 2022/04/26 09:02:25 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.902 $ $NHDT-Date: 1651297020 2022/04/30 05:37:00 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -901,10 +901,15 @@ for force-fight against edge of level, report "you harmlessly attack unknown
 using wizard mode ^V in endgame to return to previously visited Plane of Water
 	now gets the same air bubbles back instead of a replacement set;
 	likewise for clouds on Plane of Air
+on tty at least, "version incompatibility for save/123xyzzy" was invisible:
+	a blank message of appropriate length followed by --More--
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
 ------------------------------------------------------------------
+incrementing EDITLEVEL to invalidate incompatible save files was not working
+	as intended because VERSION_COMPABILITY was defined as 3.7.0-0 and up
+	rather than as 3.7.0-N for the current EDITLEVEL 'N'; undefine it
 fix compile when DLB isn't defined
 urealtime.realtime was being incorrectly calculated
 revised "mysterious force" when climbing out of gehennom could generate
