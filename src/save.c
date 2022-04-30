@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1644524061 2022/02/10 20:14:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1651298444 2022/04/30 06:00:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -463,8 +463,10 @@ savelev(NHFILE *nhfp, xchar lev)
     boolean set_uz_save = (g.uz_save.dnum == 0 && g.uz_save.dlevel == 0);
 
     /* caller might have already set up g.uz_save and zeroed u.uz;
-       if not, we need to set it for save_bubbles() */
-    if (set_uz_save) {
+       if not, we need to set it for save_bubbles(); caveat: if the
+       player quits during character selection, u.uz won't be set yet
+       but we'll be called during run-down */
+    if (set_uz_save && perform_bwrite(nhfp)) {
         if (u.uz.dnum == 0 && u.uz.dlevel == 0) {
             g.program_state.something_worth_saving = 0;
             panic("savelev: where are we?");

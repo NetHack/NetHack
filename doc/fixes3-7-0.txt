@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.902 $ $NHDT-Date: 1651297020 2022/04/30 05:37:00 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.903 $ $NHDT-Date: 1651298443 2022/04/30 06:00:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1196,6 +1196,7 @@ force-fight against furniture covered by an object described the attack as
 using #wizmakemap on Plane of Water added a new set of air bubbles each time
 	it was run and eventually replaced just about all the water; likewise
 	with clouds on Plane of Air
+avoid new "where are we?" panic if player quits during character selection
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
