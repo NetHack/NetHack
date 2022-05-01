@@ -1595,6 +1595,8 @@ nhl_loadlua(lua_State *L, const char *fname)
     return ret;
 }
 
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 lua_State *
 nhl_init(nhl_sandbox_info *sbi)
 {
@@ -1658,6 +1660,8 @@ nhl_init(nhl_sandbox_info *sbi)
 
     return L;
 }
+
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 void
 nhl_done(lua_State *L)
@@ -1999,6 +2003,8 @@ out:
 }
 #endif
 
+DISABLE_WARNING_CONDEXPR_IS_CONSTANT
+
 #ifdef NHL_SANDBOX
 static void
 nhlL_openlibs(lua_State *L, uint32_t lflags){
@@ -2147,6 +2153,8 @@ multiple levels - io.*, FILE.* - can we hook FILE.*?
     }
 }
 #endif
+
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 /*
  * All we can do is approximate the amount of storage used.  Every allocator
