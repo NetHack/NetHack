@@ -594,7 +594,8 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
                 appr = 1;
         }
         /* if you have dog food it'll follow you more closely; if you are
-           on stairs (or ladder), it will behave as if you have dog food */
+           on stairs (or ladder) or on or next to a magic portal, it will
+           behave as if you have dog food */
         if (appr == 0) {
             if (On_stairs(u.ux, u.uy)) {
                 appr = 1;
@@ -604,6 +605,18 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
                         appr = 1;
                         break;
                     }
+                if (appr == 0) {
+                    struct trap *t;
+
+                    /* assume at most one magic portal per level;
+                       [should this be limited to known portals?] */
+                    for (t = g.ftrap; t; t = t->ntrap)
+                        if (t->ttyp == MAGIC_PORTAL) {
+                            if (/*t->tseen &&*/ distu(t->tx, t->ty) <= 2)
+                                appr = 1;
+                            break;
+                        }
+                }
             }
         }
     } else
