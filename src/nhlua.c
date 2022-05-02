@@ -1445,7 +1445,8 @@ traceback_handler(lua_State *L)
 /* lua_pcall with our traceback handler and instruction step limiting.
  *  On error, traceback will be on top of stack */
 int
-nhl_pcall(lua_State *L, int nargs, int nresults){
+nhl_pcall(lua_State *L, int nargs, int nresults)
+{
     struct nhl_user_data *nud;
     int rv;
 
@@ -1784,7 +1785,8 @@ static const char *ct_base_unsafe[] = {
 };
 
 static void
-nhl_clearfromtable(lua_State *L, int tndx, const char **todo){
+nhl_clearfromtable(lua_State *L, int tndx, const char **todo)
+{
     while(*todo){
 	lua_pushnil(L);
 	lua_setfield(L, tndx, *todo++);
@@ -1829,7 +1831,8 @@ return values from "call it":
  */
 #ifdef notyet
 static boolean
-start_luapat(){
+start_luapat(void)
+{
     int rv;
 /* XXX set memory and step limits */
     nhl_sandbox_info sbi = {NHL_SB_STRING, 0, 0, 0};
@@ -1849,7 +1852,8 @@ start_luapat(){
 #endif
 
 static void
-end_luapat(){
+end_luapat(void)
+{
     if(luapat){
 	lua_close(luapat);
 	luapat = NULL;
@@ -1858,7 +1862,8 @@ end_luapat(){
 
 #ifdef notyet
 static int
-opencheckpat(lua_State *L, const char *ename, int param){
+opencheckpat(lua_State *L, const char *ename, int param)
+{
 	/* careful - we're using 2 different and unrelated Lua states */
     const char *string;
     int rv;
@@ -2165,7 +2170,7 @@ RESTORE_WARNING_CONDEXPR_IS_CONSTANT
  * it's worth the processing time), it can be overridden.
  */
 #ifndef NHL_ALLOC_ADJUST
-#define NHL_ALLOC_ADJUST(d) d = (d+15 & ~15)
+#define NHL_ALLOC_ADJUST(d) d = ((d+15) & ~15)
 #endif
 static void *
 nhl_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
