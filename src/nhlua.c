@@ -1463,6 +1463,7 @@ nhl_pcall(lua_State *L, int nargs, int nresults){
 #endif
 
     rv = lua_pcall(L, nargs, nresults, 1);
+    lua_remove(L, 1);	// remove handler
 
 #ifdef NHL_SANDBOX
     if(nud
