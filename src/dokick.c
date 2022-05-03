@@ -19,6 +19,7 @@ static int really_kick_object(xchar, xchar);
 static char *kickstr(char *, const char *);
 static boolean watchman_thief_arrest(struct monst *);
 static boolean watchman_door_damage(struct monst *, xchar, xchar);
+static void kick_dumb(int, int);
 static void otransit_msg(struct obj *, boolean, boolean, long);
 static void drop_to(coord *, schar, xchar, xchar);
 
@@ -800,6 +801,23 @@ watchman_door_damage(struct monst *mtmp, xchar x, xchar y)
     return FALSE;
 }
 
+static void
+kick_dumb(int x, int y)
+{
+    exercise(A_DEX, FALSE);
+    if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
+        You("kick at empty space.");
+        if (Blind)
+            feel_location(x, y);
+    } else {
+        pline("Dumb move!  You strain a muscle.");
+        exercise(A_STR, FALSE);
+        set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
+    }
+    if ((Is_airlevel(&u.uz) || Levitation) && rn2(2))
+        hurtle(-u.dx, -u.dy, 1, TRUE);
+}
+
 /* the #kick command */
 int
 dokick(void)
@@ -1039,8 +1057,10 @@ dokick(void)
         }
         if (IS_THRONE(g.maploc->typ)) {
             register int i;
-            if (Levitation)
-                goto dumb;
+            if (Levitation) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
             if ((Luck < 0 || g.maploc->doormask) && !rn2(3)) {
                 g.maploc->typ = ROOM;
                 g.maploc->doormask = 0; /* don't leave loose ends.. */
@@ -1081,8 +1101,10 @@ dokick(void)
             goto ouch;
         }
         if (IS_ALTAR(g.maploc->typ)) {
-            if (Levitation)
-                goto dumb;
+            if (Levitation) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
             You("kick %s.", (Blind ? something : "the altar"));
             altar_wrath(x, y);
             if (!rn2(3))
@@ -1091,8 +1113,10 @@ dokick(void)
             return ECMD_TIME;
         }
         if (IS_FOUNTAIN(g.maploc->typ)) {
-            if (Levitation)
-                goto dumb;
+            if (Levitation) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
             You("kick %s.", (Blind ? something : "the fountain"));
             if (!rn2(3))
                 goto ouch;
@@ -1106,8 +1130,10 @@ dokick(void)
             return ECMD_TIME;
         }
         if (IS_GRAVE(g.maploc->typ)) {
-            if (Levitation)
-                goto dumb;
+            if (Levitation) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
             if (rn2(4))
                 goto ouch;
             exercise(A_WIS, FALSE);
@@ -1189,8 +1215,10 @@ dokick(void)
         if (IS_SINK(g.maploc->typ)) {
             int gend = poly_gender();
 
-            if (Levitation)
-                goto dumb;
+            if (Levitation) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
             if (rn2(5)) {
                 if (!Deaf)
                     pline("Klunk!  The pipes vibrate noisily.");
@@ -1247,8 +1275,10 @@ dokick(void)
         }
         if (g.maploc->typ == STAIRS || g.maploc->typ == LADDER
             || IS_STWALL(g.maploc->typ)) {
-            if (!IS_STWALL(g.maploc->typ) && g.maploc->ladder == LA_DOWN)
-                goto dumb;
+            if (!IS_STWALL(g.maploc->typ) && g.maploc->ladder == LA_DOWN) {
+                kick_dumb(x, y);
+                return ECMD_TIME;
+            }
  ouch:
             pline("Ouch!  That hurts!");
             exercise(A_DEX, FALSE);
@@ -1271,24 +1301,13 @@ dokick(void)
                 hurtle(-u.dx, -u.dy, rn1(2, 4), TRUE); /* assume it's heavy */
             return ECMD_TIME;
         }
-        goto dumb;
+        kick_dumb(x, y);
+        return ECMD_TIME;
     }
 
     if (g.maploc->doormask == D_ISOPEN || g.maploc->doormask == D_BROKEN
         || g.maploc->doormask == D_NODOOR) {
- dumb:
-        exercise(A_DEX, FALSE);
-        if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
-            You("kick at empty space.");
-            if (Blind)
-                feel_location(x, y);
-        } else {
-            pline("Dumb move!  You strain a muscle.");
-            exercise(A_STR, FALSE);
-            set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
-        }
-        if ((Is_airlevel(&u.uz) || Levitation) && rn2(2))
-            hurtle(-u.dx, -u.dy, 1, TRUE);
+        kick_dumb(x, y);
         return ECMD_TIME; /* uses a turn */
     }
 
