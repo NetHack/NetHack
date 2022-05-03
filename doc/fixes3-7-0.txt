@@ -1673,6 +1673,7 @@ Unix: can define NOSUSPEND in config.h or src/Makefile's CFLAGS to prevent
 Unix: support --nethackrc=filename on the command line; same effect as
 	NETHACKOPTIONS='@filename' but leaves NETHACKOPTIONS available for
 	specifying options; --no-nethackrc is same as --nethackrc=/dev/null
+Windows: implement MSGHANDLER (pr #749 by argrath)
 X11: implement 'selectsaved', restore via menu of saved games
 X11: echo getline prompt and response (wishes, applying names) to message
 	window and dumplog message history
