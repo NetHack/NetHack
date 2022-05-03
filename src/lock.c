@@ -780,7 +780,6 @@ doopen_indir(int x, int y)
     if (!(door->doormask & D_CLOSED)) {
         const char *mesg;
         boolean locked = FALSE;
-        struct obj* unlocktool;
 
         switch (door->doormask) {
         case D_BROKEN:
@@ -798,8 +797,9 @@ doopen_indir(int x, int y)
             break;
         }
         pline("This door%s.", mesg);
-        if (locked) {
-            if (flags.autounlock && (unlocktool = autokey(TRUE)) != 0) {
+        if (locked && flags.autounlock) {
+            struct obj *unlocktool = autokey(TRUE);
+            if (unlocktool) {
                 res = pick_lock(unlocktool, cc.x, cc.y,
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
             } else if (!u.usteed && ynq("Kick it?") == 'y') {

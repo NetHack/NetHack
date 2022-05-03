@@ -1872,7 +1872,6 @@ do_loot_cont(struct obj **cobjp,
     if (!cobj)
         return ECMD_OK;
     if (cobj->olocked) {
-        struct obj *unlocktool;
 
         if (ccount < 2 && (g.level.objects[cobj->ox][cobj->oy] == cobj))
             pline("%s locked.",
@@ -1884,7 +1883,8 @@ do_loot_cont(struct obj **cobjp,
         cobj->lknown = 1;
 
         if (flags.autounlock) {
-            if ((unlocktool = autokey(TRUE)) != 0) {
+            struct obj *unlocktool = autokey(TRUE);
+            if (unlocktool) {
                 /* pass ox and oy to avoid direction prompt */
                 return (pick_lock(unlocktool, cobj->ox, cobj->oy, cobj) != 0);
             } else if (ccount == 1 && u_have_forceable_weapon()) {
