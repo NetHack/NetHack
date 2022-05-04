@@ -422,7 +422,7 @@ pick_lock(struct obj *pick,
         boolean it;
         int count;
 
-        if (u.dz < 0) {
+        if (u.dz < 0 && !autounlock) {
             There("isn't any sort of lock up %s.",
                   Levitation ? "here" : "there");
             return PICKLOCK_LEARNED_SOMETHING;
