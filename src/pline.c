@@ -534,7 +534,9 @@ static boolean use_pline_handler = TRUE;
 static void
 execplinehandler(const char *line)
 {
+#if defined(POSIX_TYPES) || defined(__GNUC__)
     int f;
+#endif
     const char *args[3];
     char *env;
 
