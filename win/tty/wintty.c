@@ -2199,7 +2199,8 @@ process_menu_window(winid window, struct WinDesc *cw)
                 for (curr = cw->mlist; curr; curr = curr->next) {
                     if (!curr->identifier.a_void /* not selectable */
                         || curr->selected /* already selected */
-                        || !menuitem_invert_test(1, curr->itemflags, TRUE))
+                        /* FALSE: not currently selected */
+                        || !menuitem_invert_test(1, curr->itemflags, FALSE))
                         continue;
                     curr->selected = TRUE;
                 }
@@ -2215,7 +2216,8 @@ process_menu_window(winid window, struct WinDesc *cw)
             for (curr = cw->mlist; curr; curr = curr->next) {
                 if (!curr->identifier.a_void /* not selectable */
                     || !curr->selected /* already de-selected */
-                    || !menuitem_invert_test(2, curr->itemflags, FALSE))
+                    /* TRUE: currently selected */
+                    || !menuitem_invert_test(2, curr->itemflags, TRUE))
                     continue;
                 curr->selected = FALSE;
                 curr->count = -1;
