@@ -9,8 +9,6 @@ autoopen       walking into a door attempts to open it             [True]
 autopickup     automatically pick up objects you move over         [True]
 autoquiver     when firing with an empty quiver, select some      [False]
                suitable inventory weapon to fill the quiver
-autounlock     when opening a locked door or looting a locked      [True]
-               container while carrying a key, offer to use it
 BIOS           allow the use of IBM ROM BIOS calls                [False]
 blind          your character is permanently blind                [False]
 bones          allow loading bones files                           [True]
@@ -150,6 +148,12 @@ Compound options are written as option_name:option_value.
 
 Compound options which can be set during the game are:
 
+autounlock    when attempting to open a door or loot a          [Apply-Key]
+              container that is locked, specifies an action to take:
+              can be None, or one or more of Apply-Key + Kick + Force;
+              Kick is only useful for doors and Force is only useful for
+              containers; either will only be attempted if Apply-Key is
+              omitted or you aren't carrying any unlocking tool
 boulder       override the default boulder symbol                       [`]
 disclose      the types of information you want         [ni na nv ng nc no]
               offered at the end of the game

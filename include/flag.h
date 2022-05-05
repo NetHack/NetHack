@@ -20,7 +20,6 @@ struct flag {
     boolean autodig;         /* MRKR: Automatically dig */
     boolean autoquiver;      /* Automatically fill quiver */
     boolean autoopen;        /* open doors by walking into them */
-    boolean autounlock;      /* automatically apply unlocking tools */
     boolean beginner;        /* True early in each game; affects feedback */
     boolean biff;            /* enable checking for mail */
     boolean bones;           /* allow saving/loading bones */
@@ -63,6 +62,11 @@ struct flag {
     boolean tombstone;       /* print tombstone */
     boolean verbose;         /* max battle info */
     int end_top, end_around; /* describe desired score list */
+    unsigned autounlock;     /* locked door/chest action */
+#define AUTOUNLOCK_UNTRAP    1
+#define AUTOUNLOCK_APPLY_KEY 2
+#define AUTOUNLOCK_KICK      4
+#define AUTOUNLOCK_FORCE     8
     unsigned moonphase;
     unsigned long suppress_alert;
 #define NEW_MOON 0

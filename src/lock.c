@@ -350,18 +350,19 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* player is applying a key, lock pick, or credit card */
 int
-pick_lock(struct obj *pick,
-          xchar rx, xchar ry, /* coordinates of doors/container,
-                                 for autounlock: does not prompt
-                                 for direction if these are set */
-          struct obj *container) /* container, for autounlock */
+pick_lock(
+    struct obj *pick,
+    xchar rx, xchar ry, /* coordinates of door/container, for autounlock:
+                         * does not prompt for direction if these are set */
+    struct obj *container) /* container, for autounlock */
 {
     int picktyp, c, ch;
     coord cc;
     struct rm *door;
     struct obj *otmp;
     char qbuf[QBUFSZ];
-    boolean autounlock = (rx != 0 && ry != 0) || (container != NULL);
+    boolean autounlock = (((rx != 0 && ry != 0) || container != NULL)
+                          && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0);
 
     picktyp = pick->otyp;
 
@@ -422,7 +423,7 @@ pick_lock(struct obj *pick,
         boolean it;
         int count;
 
-        if (u.dz < 0) {
+        if (u.dz < 0 && !autounlock) { /* beware stale u.dz value */
             There("isn't any sort of lock up %s.",
                   Levitation ? "here" : "there");
             return PICKLOCK_LEARNED_SOMETHING;
@@ -436,10 +437,12 @@ pick_lock(struct obj *pick,
 
         count = 0;
         c = 'n'; /* in case there are no boxes here */
-        for (otmp = g.level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere)
-            /* autounlock on boxes: only the one that just informed you it was
-             * locked. Don't include any other boxes which might be here. */
-            if ((!autounlock && Is_box(otmp)) || (otmp == container)) {
+        for (otmp = g.level.objects[cc.x][cc.y]; otmp; otmp = otmp->nexthere) {
+            /* autounlock on boxes: only the one that was just discovered to
+               be locked; don't include any other boxes which might be here */
+            if (autounlock && otmp != container)
+                continue;
+            if (Is_box(otmp)) {
                 ++count;
                 if (!can_reach_floor(TRUE)) {
                     You_cant("reach %s from up here.", the(xname(otmp)));
@@ -508,6 +511,7 @@ pick_lock(struct obj *pick,
                 g.xlock.door = 0;
                 break;
             }
+        }
         if (c != 'y') {
             if (!count)
                 There("doesn't seem to be any sort of lock here.");
@@ -625,6 +629,11 @@ doforce(void)
     register struct obj *otmp;
     register int c, picktyp;
     char qbuf[QBUFSZ];
+
+    /*
+     * TODO?
+     *  allow force with edged weapon to be performed on doors.
+     */
 
     if (u.uswallow) {
         You_cant("force anything from inside here.");
@@ -780,7 +789,6 @@ doopen_indir(int x, int y)
     if (!(door->doormask & D_CLOSED)) {
         const char *mesg;
         boolean locked = FALSE;
-        struct obj* unlocktool;
 
         switch (door->doormask) {
         case D_BROKEN:
@@ -798,11 +806,17 @@ doopen_indir(int x, int y)
             break;
         }
         pline("This door%s.", mesg);
-        if (locked) {
-            if (flags.autounlock && (unlocktool = autokey(TRUE)) != 0) {
+        if (locked && flags.autounlock) {
+            struct obj *unlocktool;
+
+            u.dz = 0; /* should already be 0 since hero moved toward door */
+            if ((flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0
+                && (unlocktool = autokey(TRUE)) != 0) {
                 res = pick_lock(unlocktool, cc.x, cc.y,
                                 (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
-            } else if (!u.usteed && ynq("Kick it?") == 'y') {
+            } else if (!u.usteed
+                       && (flags.autounlock & AUTOUNLOCK_KICK) != 0
+                       && ynq("Kick it?") == 'y') {
                 cmdq_add_ec(dokick);
                 cmdq_add_dir(sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
                 res = ECMD_TIME;

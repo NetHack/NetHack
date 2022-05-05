@@ -1872,8 +1872,6 @@ do_loot_cont(struct obj **cobjp,
     if (!cobj)
         return ECMD_OK;
     if (cobj->olocked) {
-        struct obj *unlocktool;
-
         if (ccount < 2 && (g.level.objects[cobj->ox][cobj->oy] == cobj))
             pline("%s locked.",
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
@@ -1884,10 +1882,18 @@ do_loot_cont(struct obj **cobjp,
         cobj->lknown = 1;
 
         if (flags.autounlock) {
-            if ((unlocktool = autokey(TRUE)) != 0) {
+            struct obj *unlocktool;
+
+            /* TODO: handle AUTOUNLOCK_UNTRAP and maybe add kicking at
+               self when chest present to handle AUTOUNLOCK_KICK */
+            u.dz = 0; /* might be non-zero from previous command since
+                       * #loot isn't a move command; pick_lock() cares */
+            if ((flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0
+                && (unlocktool = autokey(TRUE)) != 0) {
                 /* pass ox and oy to avoid direction prompt */
                 return (pick_lock(unlocktool, cobj->ox, cobj->oy, cobj) != 0);
-            } else if (ccount == 1 && u_have_forceable_weapon()) {
+            } else if ((flags.autounlock & AUTOUNLOCK_FORCE) != 0
+                       && ccount == 1 && u_have_forceable_weapon()) {
                 /* single container, and we could #force it open... */
                 cmdq_add_ec(doforce); /* doforce asks for confirmation */
                 g.abort_looting = TRUE;

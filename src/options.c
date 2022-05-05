@@ -190,6 +190,14 @@ static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
                       " most recent first]" }
 };
 #endif
+/* autounlock settings */
+static NEARDATA const char *unlocktypes[][2] = {
+    { "none",      "" },
+    { "untrap",    "(might fail)" },
+    { "apply-key", "" },
+    { "kick",      "(doors only)" },
+    { "force",     "(chests/boxes only)" },
+};
 static NEARDATA const char *burdentype[] = {
     "unencumbered", "burdened",     "stressed",
     "strained",     "overtaxed",    "overloaded"
@@ -297,6 +305,7 @@ static int count_apes(void);
 static int count_cond(void);
 
 static int handler_align_misc(int);
+static int handler_autounlock(int);
 static int handler_disclose(void);
 static int handler_menu_headings(void);
 static int handler_menustyle(void);
@@ -709,6 +718,107 @@ optfn_altkeyhandling(
         return set_keyhandling_via_option();
     }
 #endif
+    return optn_ok;
+}
+
+static int
+optfn_autounlock(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
+{
+    if (req == do_init) {
+        flags.autounlock = AUTOUNLOCK_APPLY_KEY;
+        return optn_ok;
+    }
+    if (req == do_set) {
+        /* autounlock:none or autounlock:untrap+apply-key+kick+force;
+           autounlock without a value is same as autounlock:apply-key and
+           !autounlock is same as autounlock:none; multiple values can be
+           space separated or plus-sign separated but the same separation
+           must be used for each element, not mix&match */
+        char sep, *nxt;
+        unsigned newflags;
+        int i;
+
+        if ((op = string_for_opt(opts, TRUE)) == empty_optstr) {
+            flags.autounlock = negated ? 0 : AUTOUNLOCK_APPLY_KEY;
+            return optn_ok;
+        }
+        newflags = 0;
+        sep = index(op, '+') ? '+' : ' ';
+        while (op) {
+            op = trimspaces(op); /* might have leading space */
+            if ((nxt = index(op, sep)) != '\0') {
+                *nxt++ = '\0';
+                op = trimspaces(op); /* might have trailing space after
+                                      * plus sign removal */
+            }
+            for (i = 0; i < SIZE(unlocktypes); ++i)
+                if (!strncmpi(op, unlocktypes[i][0], Strlen(op))
+                    /* fuzzymatch() doesn't match leading substrings but
+                       this allows "apply_key" and "applykey" to match
+                       "apply-key"; "apply key" too if part of foo+bar */
+                    || fuzzymatch(op, unlocktypes[i][0], " -_", TRUE)) {
+                    switch (*op) {
+                    case 'n':
+                        negated = TRUE;
+                        break;
+                    case 'u':
+                        newflags |= AUTOUNLOCK_UNTRAP;
+                        break;
+                    case 'a':
+                        newflags |= AUTOUNLOCK_APPLY_KEY;
+                        break;
+                    case 'k':
+                        newflags |= AUTOUNLOCK_KICK;
+                        break;
+                    case 'f':
+                        newflags |= AUTOUNLOCK_FORCE;
+                        break;
+                    default:
+                        config_error_add("Invalid value for \"%s\": \"%s\"",
+                                         allopt[optidx].name, op);
+                        return optn_silenterr;
+                    }
+                }
+            op = nxt;
+        }
+        if (negated && newflags != 0) {
+            config_error_add(
+                     "Invalid value combination for \"%s\": 'none' with some",
+                             allopt[optidx].name);
+            return optn_silenterr;
+        }
+        flags.autounlock = newflags;
+        return optn_ok;
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        if (!flags.autounlock) {
+            Strcpy(opts, "none");
+        } else {
+            static const char plus[] = " + ";
+            const char *p = "";
+
+            *opts = '\0';
+            if (flags.autounlock & AUTOUNLOCK_UNTRAP)
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[1][0]), p = plus;
+            if (flags.autounlock & AUTOUNLOCK_APPLY_KEY)
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[2][0]), p = plus;
+            if (flags.autounlock & AUTOUNLOCK_KICK)
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[3][0]), p = plus;
+            if (flags.autounlock & AUTOUNLOCK_FORCE)
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[4][0]); /*no more p*/
+        }
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_autounlock(optidx);
+    }
     return optn_ok;
 }
 
@@ -4406,6 +4516,75 @@ handler_align_misc(int optidx)
     }
     destroy_nhwindow(tmpwin);
     return optn_ok;
+}
+
+static int
+handler_autounlock(int optidx)
+{
+    winid tmpwin;
+    anything any;
+    boolean chngd;
+    unsigned oldflags = flags.autounlock;
+    const char *optname = allopt[optidx].name;
+    char buf[BUFSZ], sep = iflags.menu_tab_sep ? '\t' : ' ';
+    menu_item *window_pick = (menu_item *) 0;
+    int i, n, presel, res = optn_ok;
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+    for (i = 0; i < SIZE(unlocktypes); ++i) {
+        if (i == 1)             /*** suppress 'untrap' from the menu... ***/
+            continue;           /*** until it actually gets implemented ***/
+        Sprintf(buf, "%-10.10s%c%.40s",
+                unlocktypes[i][0], sep, unlocktypes[i][1]);
+        presel = !i ? !flags.autounlock : (flags.autounlock & (1 << (i - 1)));
+        any.a_int = i + 1;
+        add_menu(tmpwin, &nul_glyphinfo, &any, *unlocktypes[i][0], 0,
+                 ATR_NONE, buf,
+                 ((presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE)
+                  | (!i ? MENU_ITEMFLAGS_SKIPINVERT : 0)));
+    }
+    Sprintf(buf, "Select '%.20s' actions:", optname);
+    end_menu(tmpwin, buf);
+    n = select_menu(tmpwin, PICK_ANY, &window_pick);
+    if (n > 0) {
+        int k;
+        boolean wasnone = !flags.autounlock;
+        unsigned newflags = 0, noflags = 0;
+
+        for (i = 0; i < n; ++i) {
+            k = window_pick[i].item.a_int - 1;
+            if (k)
+                newflags |= (1 << (k - 1));
+            else
+                noflags = 1;
+        }
+        /* wasnone: 'none' is preselected;
+           !wasnone: don't force it to be unselected */
+        if (newflags && noflags && !wasnone) {
+            config_error_add(
+                     "Invalid value combination for \"%s\": 'none' with some",
+                             optname);
+            res = optn_silenterr;
+        } else {
+            flags.autounlock = newflags;
+        }
+        free((genericptr_t) window_pick);
+    } else if (n == 0) { /* nothing was picked but menu wasn't cancelled */
+        /* something that was preselected got unselected, leaving nothing;
+           treat that as picking 'none' (even though 'none' might be what
+           got unselected) */
+        flags.autounlock = 0;
+    }
+    destroy_nhwindow(tmpwin);
+    chngd = (flags.autounlock != oldflags);
+    if (chngd || flags.verbose) {
+        optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
+        pline("'%s' %s '%s'.", optname,
+              chngd ? "changed to" : "is still", buf);
+    }
+    return res;
 }
 
 static int

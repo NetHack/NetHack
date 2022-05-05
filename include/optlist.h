@@ -124,8 +124,11 @@ opt_##a,
            set_in_game, No, Yes, No, NoAlias, "edit autopickup exceptions")
     NHOPTB(autoquiver, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.autoquiver)
-    NHOPTB(autounlock, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
-                &flags.autounlock)
+    NHOPTC(autounlock,
+                (sizeof "none" + sizeof "untrap" + sizeof "apply-key"
+                 + sizeof "kick" + sizeof "force" + 20),
+                opt_out, set_in_game, Yes, Yes, No, Yes, NoAlias,
+                "action to take when encountering locked door or chest")
 #if defined(MICRO) && !defined(AMIGA)
     NHOPTB(BIOS, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.BIOS)

@@ -3970,9 +3970,31 @@ If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  Persistent.
 %.lp
 \item[\ib{autounlock}]
-Walking into a locked door or looting a locked container while carrying
-an unlocking tool (such as a key) will ask whether to use that tool to
-unlock the door or container (default true).
+Controls what action to take when attempting to walk into a locked door
+or to loot a locked container.
+Takes a plus-sign separated list of values:
+{\it apply-key\/} which will attempt to use a key or other unlocking tool
+if you have one;
+{\it kick\/} which will kick the door (if you lack a key or omit apply-key;
+has no effect on containers);
+{\it force\/} which will try to force a container's lid with your currently
+wielded weapon (if you lack a key or omit apply-key; has no effect on
+doors); or
+{\it none\/} which can't be combined with the other choices.
+\\
+%.lp ""
+Omitting the value is treated as if {\tt autounlock:apply-key}.
+Preceding {\tt autounlock} with `{\tt !}' or ``{\tt no}'' is treated as
+{\tt autounlock:none}.
+\\
+%.lp ""
+Applying a key might set off a trap if the door or container is trapped.
+Successfully kicking a door will break it and wake up nearby monsters.
+Successfully forcing a container open will break its lock and might also
+destroy some of its contents or damage your weapon or both.
+\\
+%.lp ""
+The default is {\it apply-key\/}.
 Persistent.
 %.lp
 \item[\ib{blind}]
