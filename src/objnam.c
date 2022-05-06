@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1649529937 2022/04/09 18:45:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.359 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1651868823 2022/05/06 20:27:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3370,14 +3370,15 @@ wizterrainwish(struct _readobjnam_data *d)
                 lev->wall_info |= (old_wall_info & WM_MASK);
             /* set up trapped flag; open door states aren't eligible */
             if (d->trapped == 2 /* 2: wish includes explicit "untrapped" */
-                || (!secret && ((lev->doormask & (D_LOCKED | D_CLOSED)) == 0)))
+                || secret /* secret doors can't trapped due to their use
+                           * of both doormask and wall_info; those both
+                           * overlay rm->flags and partially conflict */
+                || (lev->doormask & (D_LOCKED | D_CLOSED)) == 0)
                 d->trapped = 0;
             if (d->trapped)
                 lev->doormask |= D_TRAPPED;
             /* feedback */
             dbuf[0] = '\0';
-            /* locked state and trapped flag can augment secret doors; other
-               states apply to normal doors only (see above about 'closed') */
             if (lev->doormask & D_TRAPPED)
                 Strcat(dbuf, "trapped ");
             if (lev->doormask & D_LOCKED)
@@ -3593,13 +3594,15 @@ readobjnam_preparse(struct _readobjnam_data *d)
             d->unlabeled = 1;
         } else if (!strncmpi(d->bp, "poisoned ", l = 9)) {
             d->ispoisoned = 1;
-            /* "trapped" recognized but not honored outside wizard mode */
+
+        /* "trapped" recognized but not honored outside wizard mode */
         } else if (!strncmpi(d->bp, "trapped ", l = 8)) {
             d->trapped = 0; /* undo any previous "untrapped" */
             if (wizard)
                 d->trapped = 1;
         } else if (!strncmpi(d->bp, "untrapped ", l = 10)) {
             d->trapped = 2; /* not trapped */
+
         /* locked, unlocked, broken: box/chest lock states, also door states;
            open, closed, doorless: additional door states */
         } else if (!strncmpi(d->bp, "locked ", l = 7)) {
@@ -4841,6 +4844,8 @@ readobjnam(char *bp, struct obj *no_wish)
         } else if (d.broken) {
             d.otmp->olocked = 0, d.otmp->obroken = 1;
         }
+        if (d.otmp->obroken)
+            d.otmp->otrapped = 0;
     }
 
     if (d.isgreased)

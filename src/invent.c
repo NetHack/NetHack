@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1650875487 2022/04/25 08:31:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.385 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1651868822 2022/05/06 20:27:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,6 +17,8 @@ static struct obj *addinv_core0(struct obj *, struct obj *, boolean);
 static void noarmor(boolean);
 static void invdisp_nothing(const char *, const char *);
 static boolean worn_wield_only(struct obj *);
+static char *cinv_doname(struct obj *);
+static char *cinv_ansimpleoname(struct obj *);
 static boolean only_here(struct obj *);
 static void compactify(char *);
 static boolean taking_off(const char *);
@@ -5169,10 +5171,63 @@ display_minventory(struct monst *mon, int dflags, char *title)
     return ret;
 }
 
-/*
- * Display the contents of a container in inventory style.
- * Currently, this is only used for statues, via wand of probing.
- */
+/* format a container name for cinventory_display(), inserting "trapped"
+   if that's appropriate */
+static char *
+cinv_doname(struct obj *obj)
+{
+    char *result = doname(obj);
+
+    /*
+     * If obj->tknown ever gets implemented, doname() will handle this.
+     * Assumes that probing reveals the trap prior to calling us.  Since
+     * we lack that flag, hero forgets about it as soon as we're done....
+     */
+
+    /* 'result' is an obuf[] but might point into the middle (&buf[PREFIX])
+       rather than the beginning and we don't have access to that;
+       assume that there is at least QBUFSZ available when reusing it */
+    if (obj->otrapped && strlen(result) + sizeof "trapped " <= QBUFSZ) {
+        /* obj->lknown has been set before calling us so either "locked" or
+           "unlocked" should always be present (for a trapped container) */
+        char *p = strstri(result, " locked"),
+             *q = strstri(result, " unlocked");
+
+        if (p && (!q || p < q))
+            (void) strsubst(p, " locked ", " trapped locked ");
+        else if (q)
+            (void) strsubst(q, " unlocked ", " trapped unlocked ");
+        /* might need to change "an" to "a"; when no BUC is present,
+           "an unlocked" yielded "an trapped unlocked" above */
+        (void) strsubst(result, "an trapped ", "a trapped ");
+    }
+    return result;
+}
+
+/* used by safe_qbuf() if the full doname() result is too long */
+static char *
+cinv_ansimpleoname(struct obj *obj)
+{
+    char *result = ansimpleoname(obj);
+
+    /* result is an obuf[] so we know this will always fit */
+    if (obj->otrapped) {
+        if (strncmp(result, "a ", 2))
+            (void) strsubst(result, "a ", "a trapped ");
+        else if (strncmp(result, "an ", 3))
+            (void) strsubst(result, "an ", "an trapped ");
+        /* unique container? nethack doesn't have any */
+        else if (strncmp(result, "the ", 4))
+            (void) strsubst(result, "the ", "the trapped ");
+        /* no leading article at all? shouldn't happen with ansimpleoname() */
+        else
+            (void) strsubst(result, "", "trapped "); /* insert at beginning */
+    }
+    return result;
+}
+
+/* Display the contents of a container in inventory style.
+   Used for wand of probing of non-empty containers and statues. */
 struct obj *
 display_cinventory(struct obj *obj)
 {
@@ -5181,8 +5236,11 @@ display_cinventory(struct obj *obj)
     int n;
     menu_item *selected = 0;
 
-    (void) safe_qbuf(qbuf, "Contents of ", ":", obj, doname, ansimpleoname,
-                     "that");
+    (void) safe_qbuf(qbuf, "Contents of ", ":", obj,
+                     /* custom formatting routines to insert "trapped"
+                        into the object's name when appropriate;
+                        last resort "that" won't ever get used */
+                     cinv_doname, cinv_ansimpleoname, "that");
 
     if (obj->cobj) {
         n = query_objlist(qbuf, &(obj->cobj), INVORDER_SORT,

@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1650838839 2022/04/24 22:20:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.408 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1651868824 2022/05/06 20:27:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2066,6 +2066,11 @@ bhito(struct obj *obj, struct obj *otmp)
             obj->dknown = 1;
             if (Is_container(obj) || obj->otyp == STATUE) {
                 obj->cknown = obj->lknown = 1;
+                /* plural handling here is superfluous because containers
+                   and statues don't stack */
+                if (obj->otrapped)
+                    pline("%s trapped!", Tobjnam(obj, "are"));
+
                 if (!obj->cobj) {
                     pline("%s empty.", Tobjnam(obj, "are"));
                 } else if (SchroedingersBox(obj)) {
