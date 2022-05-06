@@ -1720,7 +1720,7 @@ arti_invoke(struct obj *obj)
             break;
         }
         case UNTRAP: {
-            if (!untrap(TRUE)) {
+            if (!untrap(TRUE, 0, 0, (struct obj *) 0)) {
                 obj->age = 0; /* don't charge for changing their mind */
                 return ECMD_OK;
             }

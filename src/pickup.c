@@ -1863,43 +1863,64 @@ mon_beside(int x, int y)
 }
 
 static int
-do_loot_cont(struct obj **cobjp,
-             int cindex, /* index of this container (1..N)... */
-             int ccount) /* ...number of them (N) */
+do_loot_cont(
+    struct obj **cobjp,
+    int cindex, /* index of this container (1..N)... */
+    int ccount) /* ...number of them (N) */
 {
     struct obj *cobj = *cobjp;
 
     if (!cobj)
         return ECMD_OK;
     if (cobj->olocked) {
+        int res = ECMD_OK;
+
+#if 0
         if (ccount < 2 && (g.level.objects[cobj->ox][cobj->oy] == cobj))
             pline("%s locked.",
                   cobj->lknown ? "It is" : "Hmmm, it turns out to be");
-        else if (cobj->lknown)
+        else
+#endif
+        if (cobj->lknown)
             pline("%s is locked.", The(xname(cobj)));
         else
             pline("Hmmm, %s turns out to be locked.", the(xname(cobj)));
         cobj->lknown = 1;
 
         if (flags.autounlock) {
-            struct obj *unlocktool;
+            struct obj *otmp, *unlocktool = 0;
+            xchar ox = cobj->ox, oy = cobj->oy;
 
-            /* TODO: handle AUTOUNLOCK_UNTRAP and maybe add kicking at
-               self when chest present to handle AUTOUNLOCK_KICK */
             u.dz = 0; /* might be non-zero from previous command since
                        * #loot isn't a move command; pick_lock() cares */
-            if ((flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0
-                && (unlocktool = autokey(TRUE)) != 0) {
+            /* if both the untrap and apply_key bits are set, untrap
+               attempt will be performed first but we need to set up
+               unlocktool in case "check for trap?" is declined */
+            if (((flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0
+                 && (unlocktool = autokey(TRUE)) != 0)
+                || (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0) {
                 /* pass ox and oy to avoid direction prompt */
-                return (pick_lock(unlocktool, cobj->ox, cobj->oy, cobj) != 0);
-            } else if ((flags.autounlock & AUTOUNLOCK_FORCE) != 0
-                       && ccount == 1 && u_have_forceable_weapon()) {
+                if (pick_lock(unlocktool, ox, oy, cobj))
+                    res = ECMD_TIME;
+                /* attempting to untrap or unlock might trigger a trap
+                   which destroys 'cobj'; inform caller if that happens */
+                for (otmp = g.level.objects[ox][oy]; otmp;
+                     otmp = otmp->nexthere)
+                    if (otmp == cobj)
+                        break;
+                if (!otmp)
+                    *cobjp = (struct obj *) 0;
+                return res;
+            }
+            if ((flags.autounlock & AUTOUNLOCK_FORCE) != 0
+                && res != ECMD_TIME
+                && ccount == 1 && u_have_forceable_weapon()) {
                 /* single container, and we could #force it open... */
                 cmdq_add_ec(doforce); /* doforce asks for confirmation */
                 g.abort_looting = TRUE;
             }
         }
-        return ECMD_OK;
+        return res;
     }
     cobj->lknown = 1; /* floor container, so no need for update_inventory() */
 

@@ -4534,8 +4534,6 @@ handler_autounlock(int optidx)
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     for (i = 0; i < SIZE(unlocktypes); ++i) {
-        if (i == 1)             /*** suppress 'untrap' from the menu... ***/
-            continue;           /*** until it actually gets implemented ***/
         Sprintf(buf, "%-10.10s%c%.40s",
                 unlocktypes[i][0], sep, unlocktypes[i][1]);
         presel = !i ? !flags.autounlock : (flags.autounlock & (1 << (i - 1)));

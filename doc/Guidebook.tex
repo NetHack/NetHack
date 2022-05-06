@@ -3970,19 +3970,42 @@ If no weapon is found or the option is
 false, the `t' (throw) command is executed instead.  Persistent.
 %.lp
 \item[\ib{autounlock}]
+%\hyphenation{apply\-key}%this needs to be tested...
 Controls what action to take when attempting to walk into a locked door
 or to loot a locked container.
 Takes a plus-sign separated list of values:
-{\it apply-key\/} which will attempt to use a key or other unlocking tool
-if you have one;
-{\it kick\/} which will kick the door (if you lack a key or omit apply-key;
+% paranoid
+% au => autounlock
+\newlength{\auwidth}
+%.PS Apply-Key
+\settowidth{\auwidth}{\tt Apply-Key}
+\addtolength{\auwidth}{\labelsep}
+\blist{\leftmargin \auwidth \topsep 1mm \itemsep 0mm}
+%.PL Untrap
+\item[{\tt Untrap}]
+prompt about whether to attempt to find a trap;
+it might fail to find one even when present; if it does find one, it
+will ask whether you want to try to disarm the trap; if you decline,
+your character will forget that the door or box is trapped;
+%.PL Apply-Key
+\item[{\tt Apply-Key}]
+if carrying a key or other unlocking tool, prompt about using it;
+%.PL Kick
+\item[{\tt Kick}]
+kick the door (if you omit untrap or decline to attempt untrap and
+you omit apply-key or you lack a key or you decline to use the key;
 has no effect on containers);
-{\it force\/} which will try to force a container's lid with your currently
-wielded weapon (if you lack a key or omit apply-key; has no effect on
-doors); or
-{\it none\/} which can't be combined with the other choices.
-\\
-%.lp ""
+%.PL Force
+\item[{\tt Force}]
+try to force a container's lid with your currently
+wielded weapon (if you omit untrap or decline to attempt untrap and
+you omit apply-key or you lack a key or you decline to use the key;
+has no effect on doors);
+%.PL None
+\item[{\tt None}]
+none of the above; can't be combined with the other choices.
+%.PE
+\elist
 Omitting the value is treated as if {\tt autounlock:apply-key}.
 Preceding {\tt autounlock} with `{\tt !}' or ``{\tt no}'' is treated as
 {\tt autounlock:none}.
@@ -3994,7 +4017,7 @@ Successfully forcing a container open will break its lock and might also
 destroy some of its contents or damage your weapon or both.
 \\
 %.lp ""
-The default is {\it apply-key\/}.
+The default is Apply-Key.
 Persistent.
 %.lp
 \item[\ib{blind}]

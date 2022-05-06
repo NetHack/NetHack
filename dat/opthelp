@@ -148,12 +148,18 @@ Compound options are written as option_name:option_value.
 
 Compound options which can be set during the game are:
 
-autounlock    when attempting to open a door or loot a          [Apply-Key]
-              container that is locked, specifies an action to take:
-              can be None, or one or more of Apply-Key + Kick + Force;
+autounlock    when attempting to open a locked door or loot     [Apply-Key]
+              a locked container, specifies an action to take: can be
+              None, or one or more of Untrap + Apply-Key + Kick + Force;
+              if Untrap is included, it will be handled first; the
+              others apply if you answer "no" to "check for traps?";
+              for "yes", it won't necessary find anything even when a
+              trap happens to be present and will use up the rest of
+              the current move regardless of whether it finds anything;
               Kick is only useful for doors and Force is only useful for
-              containers; either will only be attempted if Apply-Key is
-              omitted or you aren't carrying any unlocking tool
+              containers; either will only be attempted if Untrap is
+              omitted or skipped and Apply-Key is omitted or you aren't
+              carrying an unlocking tool or you decline to use one
 boulder       override the default boulder symbol                       [`]
 disclose      the types of information you want         [ni na nv ng nc no]
               offered at the end of the game

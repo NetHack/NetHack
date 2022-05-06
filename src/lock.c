@@ -356,14 +356,19 @@ pick_lock(
                          * does not prompt for direction if these are set */
     struct obj *container) /* container, for autounlock */
 {
+    struct obj dummypick;
     int picktyp, c, ch;
     coord cc;
     struct rm *door;
     struct obj *otmp;
     char qbuf[QBUFSZ];
-    boolean autounlock = (((rx != 0 && ry != 0) || container != NULL)
-                          && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0);
+    boolean autounlock = (rx != 0 || container != NULL);
 
+    /* 'pick' might be Null [called by do_loot_cont() for AUTOUNLOCK_UNTRAP] */
+    if (!pick) {
+        dummypick = cg.zeroobj;
+        pick = &dummypick; /* pick->otyp will be STRANGE_OBJECT */
+    }
     picktyp = pick->otyp;
 
     /* check whether we're resuming an interrupted previous attempt */
@@ -401,15 +406,14 @@ pick_lock(
         return PICKLOCK_DID_NOTHING;
     }
 
-    if (picktyp != LOCK_PICK
-        && picktyp != CREDIT_CARD
-        && picktyp != SKELETON_KEY) {
+    if (pick != &dummypick && picktyp != SKELETON_KEY
+        && picktyp != LOCK_PICK && picktyp != CREDIT_CARD) {
         impossible("picking lock with object %d?", picktyp);
         return PICKLOCK_DID_NOTHING;
     }
     ch = 0; /* lint suppression */
 
-    if (rx != 0 && ry != 0) { /* autounlock; caller has provided coordinates */
+    if (rx != 0) { /* autounlock; caller has provided coordinates */
         cc.x = rx;
         cc.y = ry;
     } else if (!get_adjacent_loc((char *) 0, "Invalid location!",
@@ -458,11 +462,25 @@ pick_lock(
                 else
                     verb = "pick";
 
-                if (autounlock) {
-                    Sprintf(qbuf, "Unlock it with %s?", yname(pick));
-                    c = yn(qbuf);
-                    if (c == 'n')
-                        return 0;
+                if (autounlock && (flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
+                    && could_untrap(FALSE, TRUE)
+                    && (c = ynq(safe_qbuf(qbuf, "Check ", " for a trap?",
+                                          otmp, yname, ysimple_name, "this")))
+                       != 'n') {
+                    if (c == 'q')
+                        return PICKLOCK_DID_NOTHING; /* c == 'q' */
+                    /* c == 'y' */
+                    untrap(FALSE, 0, 0, otmp);
+                    return PICKLOCK_DID_SOMETHING; /* even if no trap found */
+                } else if (autounlock
+                          && (flags.autounlock & AUTOUNLOCK_APPLY_KEY) != 0) {
+                    c = 'q';
+                    if (pick != &dummypick) {
+                        Sprintf(qbuf, "Unlock it with %s?", yname(pick));
+                        c = ynq(qbuf);
+                    }
+                    if (c != 'y')
+                        return PICKLOCK_DID_NOTHING;
                 } else {
                     /* "There is <a box> here; <verb> <it|its lock>?" */
                     Sprintf(qsfx, " here; %s %s?",
@@ -473,9 +491,9 @@ pick_lock(
 
                     c = ynq(qbuf);
                     if (c == 'q')
-                        return 0;
+                        return PICKLOCK_DID_NOTHING;
                     if (c == 'n')
-                        continue;
+                        continue; /* try next box */
                 }
 
                 if (otmp->obroken) {
@@ -561,6 +579,15 @@ pick_lock(
             pline("This door is broken.");
             return PICKLOCK_LEARNED_SOMETHING;
         default:
+            if ((flags.autounlock & AUTOUNLOCK_UNTRAP) != 0
+                && could_untrap(FALSE, FALSE)
+                && (c = ynq("Check this door for a trap?")) != 'n') {
+                if (c == 'q')
+                    return PICKLOCK_DID_NOTHING;
+                /* c == 'y' */
+                untrap(FALSE, cc.x, cc.y, (struct obj *) 0);
+                return PICKLOCK_DID_SOMETHING; /* even if no trap found */
+            }
             /* credit cards are only good for unlocking */
             if (picktyp == CREDIT_CARD && !(door->doormask & D_LOCKED)) {
                 You_cant("lock a door with a credit card.");
@@ -571,9 +598,8 @@ pick_lock(
                     (door->doormask & D_LOCKED) ? "Unlock" : "Lock",
                     autounlock ? " with " : "",
                     autounlock ? yname(pick) : "");
-
-            c = yn(qbuf);
-            if (c == 'n')
+            c = ynq(qbuf);
+            if (c != 'y')
                 return 0;
 
             /* note: for !autounlock, 'apply' already did touch check */

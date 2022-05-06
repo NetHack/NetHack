@@ -61,6 +61,7 @@ static void clear_conjoined_pits(struct trap *);
 static boolean adj_nonconjoined_pit(struct trap *);
 static int try_lift(struct monst *, struct trap *, int, boolean);
 static int help_monster_out(struct monst *, struct trap *);
+static void untrap_box(struct obj *, boolean, boolean);
 #if 0
 static void join_adjacent_pits(struct trap *);
 #endif
@@ -4495,23 +4496,40 @@ drain_en(int n)
 int
 dountrap(void)
 {
+    if (!could_untrap(TRUE, FALSE))
+        return ECMD_OK;
+
+    return untrap(FALSE, 0, 0, (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
+}
+
+/* the #untrap command - disarm a trap */
+int
+could_untrap(boolean verbosely, boolean check_floor)
+{
+    char buf[BUFSZ];
+
+    buf[0] = '\0';
     if (near_capacity() >= HVY_ENCUMBER) {
-        pline("You're too strained to do that.");
-        return ECMD_OK;
-    }
-    if ((nohands(g.youmonst.data) && !webmaker(g.youmonst.data))
-        || !g.youmonst.data->mmove) {
-        pline("And just how do you expect to do that?");
-        return ECMD_OK;
+        Strcpy(buf, "You're too strained to do that.");
+    } else if ((nohands(g.youmonst.data) && !webmaker(g.youmonst.data))
+               || !g.youmonst.data->mmove) {
+        Strcpy(buf, "And just how do you expect to do that?");
     } else if (u.ustuck && sticks(g.youmonst.data)) {
-        pline("You'll have to let go of %s first.", mon_nam(u.ustuck));
-        return ECMD_OK;
+        Sprintf(buf, "You'll have to let go of %s first.", mon_nam(u.ustuck));
+    } else if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
+        Sprintf(buf, "Your %s seem to be too busy for that.",
+                makeplural(body_part(HAND)));
+    } else if (check_floor && !can_reach_floor(FALSE)) {
+        /* only checked here for autounlock of chest/box and that will
+           be !verbosely so precise details of the message don't matter */
+        Sprintf(buf, "You can't reach the %s.", surface(u.ux, u.uy));
     }
-    if (u.ustuck || (welded(uwep) && bimanual(uwep))) {
-        Your("%s seem to be too busy for that.", makeplural(body_part(HAND)));
-        return ECMD_OK;
+    if (buf[0]) {
+        if (verbosely)
+            pline("%s", buf);
+        return 0;
     }
-    return untrap(FALSE) ? ECMD_TIME : ECMD_OK;
+    return 1;
 }
 
 /* Probability of disabling a trap.  Helge Hafting */
@@ -4964,8 +4982,50 @@ help_monster_out(
     return 1;
 }
 
+/* check a particular container for a trap and optionally disarm it */
+static void
+untrap_box(
+    struct obj *box,
+    boolean force,
+    boolean confused)
+{
+    if ((box->otrapped
+         && (force || (!confused && rn2(MAXULEV + 1 - u.ulevel) < 10)))
+        || (!force && confused && !rn2(3))) {
+        You("find a trap on %s!", the(xname(box)));
+        if (!confused)
+            exercise(A_WIS, TRUE);
+
+        if (ynq("Disarm it?") == 'y') {
+            if (box->otrapped) {
+                int ch = ACURR(A_DEX) + u.ulevel;
+
+                if (Role_if(PM_ROGUE))
+                    ch *= 2;
+                if (!force && (confused || Fumbling
+                               || rnd(75 + level_difficulty() / 2) > ch)) {
+                    (void) chest_trap(box, FINGER, TRUE);
+                    /* 'box' might be gone now */
+                } else {
+                    You("disarm it!");
+                    box->otrapped = 0;
+                }
+                exercise(A_DEX, TRUE);
+            } else {
+                pline("That %s was not trapped.", xname(box));
+            }
+        }
+    } else {
+        You("find no traps on %s.", the(xname(box)));
+    }
+}
+
+/* hero is able to attempt untrap, so do so */
 int
-untrap(boolean force)
+untrap(
+    boolean force,
+    int rx, int ry,
+    struct obj *container)
 {
     register struct obj *otmp;
     register int x, y;
@@ -4975,22 +5035,35 @@ untrap(boolean force)
     const char *trapdescr;
     boolean here, useplural, deal_with_floor_trap,
             confused = (Confusion || Hallucination),
-            trap_skipped = FALSE;
+            trap_skipped = FALSE, autounlock_door = FALSE;
     int boxcnt = 0;
     char the_trap[BUFSZ], qbuf[QBUFSZ];
 
-    if (!getdir((char *) 0))
-        return 0;
-    x = u.ux + u.dx;
-    y = u.uy + u.dy;
+    /* 'force' is true for #invoke; if carrying MKoT, make it be true
+       for #untrap or autounlock */
+    if (!force && has_magic_key(&g.youmonst))
+        force = TRUE;
+
+    if (!rx && !container) {
+        /* usual case */
+        if (!getdir((char *) 0))
+            return 0;
+        x = u.ux + u.dx;
+        y = u.uy + u.dy;
+    } else {
+        /* autounlock's untrap; skip most prompting */
+        if (container) {
+            untrap_box(container, force, confused);
+            return 1;
+        }
+        /* levl[rx][ry] is a locked or trapped door */
+        x = rx, y = ry;
+        autounlock_door = TRUE;
+    }
     if (!isok(x, y)) {
         pline_The("perils lurking there are beyond your grasp.");
         return 0;
     }
-    /* 'force' is true for #invoke; make it be true for #untrap if
-       carrying MKoT */
-    if (!force && has_magic_key(&g.youmonst))
-        force = TRUE;
 
     ttmp = t_at(x, y);
     if (ttmp && !ttmp->tseen)
@@ -5006,7 +5079,9 @@ untrap(boolean force)
             }
 
     deal_with_floor_trap = can_reach_floor(FALSE);
-    if (!deal_with_floor_trap) {
+    if (autounlock_door) {
+        ; /* skip a bunch */
+    } else if (!deal_with_floor_trap) {
         *the_trap = '\0';
         if (ttmp)
             Strcat(the_trap, an(trapdescr));
@@ -5095,6 +5170,11 @@ untrap(boolean force)
         } /* end if */
 
         if (boxcnt) {
+            /* 3.7: this used to allow searching for traps on multiple
+               containers on the same move and needed to keep track of
+               whether any had been found but not attempted to untrap;
+               now at most one per move may be checked and we only
+               continue on to door handling if they are all declined */
             for (otmp = g.level.objects[x][y]; otmp; otmp = otmp->nexthere)
                 if (Is_box(otmp)) {
                     (void) safe_qbuf(qbuf, "There is ",
@@ -5103,59 +5183,34 @@ untrap(boolean force)
                     switch (ynq(qbuf)) {
                     case 'q':
                         return 0;
-                    case 'n':
-                        continue;
+                    case 'y':
+                        untrap_box(otmp, force, confused);
+                        return 1; /* even for 'no' at "Disarm it?" prompt */
                     }
-
-                    if ((otmp->otrapped
-                         && (force || (!confused
-                                       && rn2(MAXULEV + 1 - u.ulevel) < 10)))
-                        || (!force && confused && !rn2(3))) {
-                        You("find a trap on %s!", the(xname(otmp)));
-                        if (!confused)
-                            exercise(A_WIS, TRUE);
-
-                        switch (ynq("Disarm it?")) {
-                        case 'q':
-                            return 1;
-                        case 'n':
-                            trap_skipped = TRUE;
-                            continue;
-                        }
-
-                        if (otmp->otrapped) {
-                            exercise(A_DEX, TRUE);
-                            ch = ACURR(A_DEX) + u.ulevel;
-                            if (Role_if(PM_ROGUE))
-                                ch *= 2;
-                            if (!force && (confused || Fumbling
-                                           || rnd(75 + level_difficulty() / 2)
-                                                  > ch)) {
-                                (void) chest_trap(otmp, FINGER, TRUE);
-                            } else {
-                                You("disarm it!");
-                                otmp->otrapped = 0;
-                            }
-                        } else
-                            pline("That %s was not trapped.", xname(otmp));
-                        return 1;
-                    } else {
-                        You("find no traps on %s.", the(xname(otmp)));
-                        return 1;
-                    }
+                    /* 'n' => continue to next box */
                 }
-
-            You(trap_skipped ? "find no other traps here."
-                             : "know of no traps here.");
-            return 0;
+            There("are no other chests or boxes here.");
         }
 
         if (stumble_on_door_mimic(x, y))
             return 1;
-
     } /* deal_with_floor_trap */
-    /* doors can be manipulated even while levitating/unskilled riding */
 
+    /*
+     * Doors can be manipulated even while levitating/unskilled riding.
+     *
+     * Ordinarily there won't be a closed or locked door at the same
+     * location as a floor trap or a container.  However, there could
+     * be a container at a closed/locked door spot if it was dropped
+     * there by a monster or poly'd hero with Passes_walls capability,
+     * and poly'd hero could move onto that spot and attempt #untrap
+     * in direction '.' or '>'.  We'll get here for that situation if
+     * player declines to check all containers for traps.
+     *
+     * The usual situation is #untrap toward an adjacent closed door.
+     * No floor trap would be present and any containers would be
+     * ignored because they're only checked when direction is '.'/'>'.
+     */
     if (!IS_DOOR(levl[x][y].typ)) {
         if (!trap_skipped)
             You("know of no traps there.");

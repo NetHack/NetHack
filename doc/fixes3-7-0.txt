@@ -1197,6 +1197,7 @@ using #wizmakemap on Plane of Water added a new set of air bubbles each time
 	it was run and eventually replaced just about all the water; likewise
 	with clouds on Plane of Air
 avoid new "where are we?" panic if player quits during character selection
+add Untrap as a potential 'autounlock' action
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

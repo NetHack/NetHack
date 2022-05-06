@@ -3662,15 +3662,26 @@ Persistent.
 Controls what action to take when attempting to walk into a locked door
 or to loot a locked container.
 Takes a plus-sign separated list of values:
-\fIapply-key\fP which will attempt to use a key or other unlocking tool
-if you have one;
-\fIkick\fP which will kick the door (if you lack a key or omit apply-key;
+.PS Apply-Key
+.PL Untrap
+prompt about whether to attempt to find a trap;
+it might fail to find one even when present; if it does find one, it
+will ask whether you want to try to disarm the trap; if you decline,
+your character will forget that the door or box is trapped;
+.PL Apply-Key
+if carrying a key or other unlocking tool, prompt about using it;
+.PL Kick
+kick the door (if you omit untrap or decline to attempt untrap and
+you omit apply-key or you lack a key or you decline to use the key;
 has no effect on containers);
-\fIforce\fP which will try to force a container's lid with your currently
-wielded weapon (if you lack a key or omit apply-key; has no effect on
-doors); or
-\fInone\fP which can't be combined with the other choices.
-.lp ""
+.PL Force
+try to force a container's lid with your currently
+wielded weapon (if you omit untrap or decline to attempt untrap and
+you omit apply-key or you lack a key or you decline to use the key;
+has no effect on doors);
+.PL None
+none of the above; can't be combined with the other choices.
+.PE
 Omitting the value is treated as if \f(CRautounlock:apply-key\fP.
 Preceding \f(CRautounlock\fP with \(oq!\(cq or \(lqno\(rq is treated as
 \f(CRautounlock:none\fP.
@@ -3680,7 +3691,7 @@ Successfully kicking a door will break it and wake up nearby monsters.
 Successfully forcing a container open will break its lock and might also
 destroy some of its contents or damage your weapon or both.
 .lp ""
-The default is \fIapply-key\fP.
+The default is Apply-Key.
 Persistent.
 .lp blind
 Start the character permanently blind (default false).
