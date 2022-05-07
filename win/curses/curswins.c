@@ -33,6 +33,7 @@ typedef struct nhchar {
     int ch;                     /* character */
     int color;                  /* color info for character */
     int attr;                   /* attributes of character */
+    struct unicode_representation *unicode_representation;
 } nethack_char;
 
 static boolean map_clipped;     /* Map window smaller than 80x21 */
@@ -363,7 +364,13 @@ curs_destroy_all_wins(void)
 /* Print a single character in the given window at the given coordinates */
 
 void
+#ifdef ENHANCED_SYMBOLS
+curses_putch(winid wid, int x, int y, int ch,
+             struct unicode_representation *unicode_representation,
+             int color, int attr)
+#else
 curses_putch(winid wid, int x, int y, int ch, int color, int attr)
+#endif
 {
     static boolean map_initted = FALSE;
     int sx, sy, ex, ey;
@@ -387,6 +394,9 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
     map[y][x].ch = ch;
     map[y][x].color = color;
     map[y][x].attr = attr;
+#ifdef ENHANCED_SYMBOLS
+    map[y][x].unicode_representation = unicode_representation;
+#endif
     nch = map[y][x];
 
     (void) curses_map_borders(&sx, &sy, &ex, &ey, -1, -1);
@@ -589,7 +599,10 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 #ifdef PDCURSES
     mvwaddrawch(win, y, x, nch.ch);
 #else
-    mvwaddch(win, y, x, nch.ch);
+    if (nch.unicode_representation && nch.unicode_representation->utf8str)
+        mvwprintw(win, y, x, "%s", nch.unicode_representation->utf8str);
+    else
+        mvwaddch(win, y, x, nch.ch);
 #endif
     curses_toggle_color_attr(win, nch.color, nch.attr, OFF);
 }
@@ -694,6 +707,7 @@ clear_map(void)
             map[y][x].ch = ' ';
             map[y][x].color = NO_COLOR;
             map[y][x].attr = A_NORMAL;
+            map[y][x].unicode_representation = NULL;
         }
     }
 }

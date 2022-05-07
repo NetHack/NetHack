@@ -6,6 +6,7 @@
 #include "color.h"
 #include "rm.h"
 #include "objclass.h"
+#include "wintype.h"
 #include "sym.h"
 
 /* Relevant header information in rm.h, objclass.h, sym.h, defsym.h. */

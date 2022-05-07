@@ -237,6 +237,8 @@ struct instance_flags {
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
     int menu_headings;    /* ATR for menu headings */
+    uint32_t colorcount;    /* store how many colors terminal is capable of */
+    boolean use_truecolor;  /* force use of truecolor */
 #ifdef ALTMETA
     boolean altmeta;      /* Alt-c sends ESC c rather than M-c */
 #endif
@@ -389,7 +391,7 @@ struct instance_flags {
     Bitfield(save_uinwater, 1);
     Bitfield(save_uburied, 1);
     struct debug_flags debug;
-    boolean windowtype_locked;  /* windowtype can't change from configfile */
+    boolean windowtype_locked;   /* windowtype can't change from configfile */
     boolean windowtype_deferred; /* pick a windowport and store it in
                                     chosen_windowport[], but do not switch to
                                     it in the midst of options processing */

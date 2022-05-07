@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{February 27, 2022}
+\date{May 7, 2022}
 
 \maketitle
 
@@ -6070,6 +6070,46 @@ Statues and boulders are the rock being referred to, but since
 version 3.6.0, statues are displayed as the monster they depict.
 So S\verb+_+rock is only used for boulders and not used at all if
 overridden by the more specific S\verb+_+boulder.
+
+%.lp
+%.hn 2
+\subsection*{Customizing Map Glyph Representations Using Unicode}
+
+%.pg
+If your platform or terminal supports the display of UTF-8 character
+sequences, you can customize your game display by assigning Unicode
+codepoint values and red-green-blue colors to glyph
+representations. The customizations can be specified for use with a symset that
+has a UTF8 handler within the symbols file such as the enhanced1 set, or
+individually within your own nethack.rc file.
+
+The format for defining a glyph representation is:\\
+\begin{verbatim}
+OPTIONS=glyph:glyphid/U+nnnn/R-G-B
+\end{verbatim}
+
+The window port that is active needs to provide support for displaying UTF-8
+character sequences and explicit 24-bit red-green-blue colors in order for the glyph
+representation to be visible as specified.
+
+For example, the following line in your configuration file will cause
+the glyph representation for glyphid G_pool to use Unicode codepoint U+224B
+and the color represented by R-G-B value 0-0-160:\\
+\begin{verbatim}
+OPTIONS=glyph:G_pool/U+224B/0-0-160
+\end{verbatim}
+
+The list of acceptable glyphid's can be produced by 
+\begin{verbatim}
+    nethack --glyphids
+\end{verbatim}
+Individual NetHack glyphs can be specified using the G\verb+_+ prefix,
+or you can use an S\verb+_+ symbol for a glyphid and store the custom
+representation for all NetHack glyphs that would map to that
+particular symbol.
+
+You will need to select a symset with a UTF8 handler to enable the
+display of the customizations, such as the Enhanced symset.
 
 %.pg
 %.hn 2

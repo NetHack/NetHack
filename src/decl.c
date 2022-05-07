@@ -373,9 +373,12 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* nowhere */
     UNDEFINED_PTR, /* gate_str */
 
-    /* drawing.c */
+    /* symbols.c */
     DUMMY, /* symset */
-    0, /* currentgraphics */
+#ifdef ENHANCED_SYMBOLS
+    DUMMY, /* symset_customizations */
+#endif
+    0,     /* currentgraphics */
     DUMMY, /* showsyms */
     DUMMY, /* primary_syms */
     DUMMY, /* rogue_syms */

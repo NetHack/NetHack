@@ -113,7 +113,7 @@ X11_print_glyph(
         register unsigned char *co_ptr;
 #endif
 
-        color = glyphinfo->gm.color;
+        color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
         och = glyphinfo->ttychar;
         ch = (uchar) och;

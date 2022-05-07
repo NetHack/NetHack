@@ -15,6 +15,7 @@
 
 #ifndef NO_VT
 #define VIRTUAL_TERMINAL_SEQUENCES
+#define UTF8_FROM_CORE
 #endif
 
 #ifdef WIN32
@@ -84,6 +85,7 @@ typedef struct {
     WCHAR wcharacter;
     WORD attr;
     long color24;
+    int color256idx;
     const char *colorseq;
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 } cell_t;
@@ -94,9 +96,9 @@ cell_t undefined_cell = { CONSOLE_UNDEFINED_CHARACTER,
                           CONSOLE_UNDEFINED_ATTRIBUTE };
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
 cell_t clear_cell = { { CONSOLE_CLEAR_CHARACTER, 0, 0, 0, 0, 0, 0 },
-                        CONSOLE_CLEAR_CHARACTER, 0, 0L, "\x1b[0m" };
+                        CONSOLE_CLEAR_CHARACTER, 0, 0L, 0, "\x1b[0m" };
 cell_t undefined_cell = { { CONSOLE_UNDEFINED_CHARACTER, 0, 0, 0, 0, 0, 0 },
-                            CONSOLE_UNDEFINED_CHARACTER, 0, 0L, (const char *) 0 };
+                            CONSOLE_UNDEFINED_CHARACTER, 0, 0L, 0, (const char *) 0 };
 static const uint8 empty_utf8str[MAX_UTF8_SEQUENCE] = { 0 };
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
@@ -137,7 +139,8 @@ static void restore_original_console_font(void);
 extern void safe_routines(void);
 void tty_ibmgraphics_fixup(void);
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-extern void (*ibmgraphics_mode_callback)(void); /* symbols.c */
+extern void (*ibmgraphics_mode_callback)(void);  /* symbols.c */
+extern void (*utf8graphics_mode_callback)(void); /* symbols.c */
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
 /* Win32 Screen buffer,coordinate,console I/O information */
@@ -160,27 +163,9 @@ static boolean init_ttycolor_completed;
 #ifdef PORT_DEBUG
 static boolean display_cursor_info = FALSE;
 #endif
-#ifdef CHANGE_COLOR
-static void adjust_palette(void);
-static int match_color_name(const char *);
-typedef HWND(WINAPI *GETCONSOLEWINDOW)();
-static HWND GetConsoleHandle(void);
-static HWND GetConsoleHwnd(void);
-static boolean altered_palette;
-static COLORREF UserDefinedColors[CLR_MAX];
-static COLORREF NetHackColors[CLR_MAX] = {
-    0x00000000, 0x00c80000, 0x0000c850, 0x00b4b432, 0x000000d2, 0x00800080,
-    0x000064b4, 0x00c0c0c0, 0x00646464, 0x00f06464, 0x0000ff00, 0x00ffff00,
-    0x000000ff, 0x00ff00ff, 0x0000ffff, 0x00ffffff
-};
-static COLORREF DefaultColors[CLR_MAX] = {
-    0x00000000, 0x00800000, 0x00008000, 0x00808000, 0x00000080, 0x00800080,
-    0x00008080, 0x00c0c0c0, 0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
-    0x000000ff, 0x00ff00ff, 0x0000ffff, 0x00ffffff
-};
-#endif
 struct console_t {
     boolean is_ready;
+    HWND hWnd;
     WORD background;
     WORD foreground;
     WORD attr;
@@ -217,8 +202,10 @@ struct console_t {
     DWORD in_cmode;
     DWORD out_cmode;
     long color24;
+    int color256idx;
 } console = {
     FALSE,
+    0,
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* background */
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
     0,                                                     /* attr */
@@ -263,7 +250,8 @@ struct console_t {
     NULL,     /* localestr */
     0,        /* in_cmode */
     0,        /* out_cmode */
-    0L        /* color24 */
+    0L,       /* color24 */
+    0         /* color256idx */
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 };
 
@@ -532,6 +520,7 @@ void emit_stop_underline(void);
 void emit_start_inverse(void);
 void emit_stop_inverse(void);
 void emit_start_24bitcolor(long color24bit);
+void emit_start_256color(int u256coloridx);
 void emit_default_color(void);
 void emit_return_to_default(void);
 void emit_hide_cursor(void);
@@ -656,22 +645,42 @@ emit_stop_inverse(void)
                   &unused, &reserved);
 }
 
+#if 0
 #define tcfmtstr "\x1b[38;2;%d;%d;%dm"
 #if 0
 #define tcfmtstr "\x1b[38:2:%d:%d:%dm"
 #endif
+#endif
+
+#ifndef SEP2
+#define tcfmtstr24bit "\x1b[38;2;%ld;%ld;%ldm"
+#define tcfmtstr256 "\x1b[38;5;%ldm"
+#else
+#define tcfmtstr24bit "\x1b[38:2:%ld:%ld:%ldm"
+#define tcfmtstr256 "\x1b[38:5:%dm"
+#endif
+ 
+void
+emit_start_256color(int u256coloridx)
+{
+    DWORD unused, reserved;
+    static char tcolorbuf[QBUFSZ];
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256, u256coloridx);
+    WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
+                  (int) strlen(tcolorbuf), &unused, &reserved);
+}
 
 void
 emit_start_24bitcolor(long color24bit)
 {
     DWORD unused, reserved;
     static char tcolorbuf[QBUFSZ];
-    long mcolor24bit =
+    long mcolor =
         (color24bit & 0xFFFFFF); /* color 0 has bit 0x1000000 set */
-    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr,
-             ((mcolor24bit >> 0) & 0xFF),   /* red */
-             ((mcolor24bit >> 8) & 0xFF),   /* green */
-             ((mcolor24bit >> 16) & 0xFF)); /* blue */
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr24bit,
+             ((mcolor >> 16) & 0xFF),   /* red */
+             ((mcolor >>  8) & 0xFF),   /* green */
+             ((mcolor >>  0) & 0xFF));  /* blue */
     WriteConsoleA(console.hConOut, (LPCSTR) tcolorbuf,
                   (int) strlen(tcolorbuf), &unused, &reserved);
 }
@@ -744,9 +753,19 @@ back_buffer_flip(void)
                 do_anything |= do_colorseq;
             if (back->attr != front->attr)
                 do_anything |= do_newattr;
-            if (strcmp((const char *) back->utf8str,
-                       (const char *) front->utf8str))
-                do_anything |= do_utf8_content;
+#ifdef UTF8_FROM_CORE
+            if (!SYMHANDLING(H_UTF8)) {
+                if (console.has_unicode
+                    && (back->wcharacter != front->wcharacter))
+                    do_anything |= do_wide_content;
+            } else {
+#endif
+                if (strcmp((const char *) back->utf8str,
+                           (const char *) front->utf8str))
+                    do_anything |= do_utf8_content;
+#ifdef UTF8_FROM_CORE
+            }
+#endif
             if (do_anything) {
                 SetConsoleCursorPosition(console.hConOut, pos);
                 pos_set = TRUE;
@@ -771,7 +790,10 @@ back_buffer_flip(void)
                 if (color24_on && back->color24) {
                     did_anything |= did_color24;
                     if (back->color24) {
-                        emit_start_24bitcolor(back->color24);
+                        if (!iflags.use_truecolor && iflags.colorcount == 256)
+                            emit_start_256color(back->color256idx);
+                        else
+                            emit_start_24bitcolor(back->color24);
                     }
                 } else if (back->colorseq) {
                     did_anything |= did_colorseq;
@@ -784,9 +806,20 @@ back_buffer_flip(void)
                 }
                 if (did_anything
                     || (do_anything & (do_wide_content | do_utf8_content))) {
+#ifdef UTF8_FROM_CORE
+                    if (SYMHANDLING(H_UTF8) || !console.has_unicode) {
+                        WriteConsoleA(console.hConOut, (LPCSTR) back->utf8str,
+                                      (int) strlen((char *) back->utf8str),
+                                      &unused, &reserved);
+                        did_anything |= did_utf8_content;
+                    } else {
+#endif
                     WriteConsoleW(console.hConOut, &back->wcharacter, 1,
                                   &unused, &reserved);
                     did_anything |= did_wide_content;
+#ifdef UTF8_FROM_CORE
+                    }
+#endif
                 }
             }
             if (did_anything) {
@@ -930,10 +963,6 @@ settty(const char* s)
 void
 setftty()
 {
-#ifdef CHANGE_COLOR
-    if (altered_palette)
-        adjust_palette();
-#endif
     start_screen();
 }
 
@@ -943,6 +972,8 @@ tty_startup(int *wid, int *hgt)
     *wid = console.width;
     *hgt = console.height;
     set_option_mod_status("mouse_support", set_in_game);
+    iflags.colorcount = 16777216;
+//    iflags.colorcount = 256;
 }
 
 void
@@ -958,6 +989,11 @@ tty_start_screen()
         tty_number_pad(1); /* make keypad send digits */
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
     ibmgraphics_mode_callback = tty_ibmgraphics_fixup;
+#ifdef ENHANCED_SYMBOLS
+#ifdef UTF8_FROM_CORE
+    utf8graphics_mode_callback = tty_utf8graphics_fixup;
+#endif
+#endif
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 }
 
@@ -1234,13 +1270,25 @@ xputc_core(int ch)
         // if (console.color24)
         //    __debugbreak();
         cell.color24 = 0L;
+        cell.color256idx = 0;
         wch[1] = 0;
         if (console.has_unicode) {
             wch[0] = (ch >= 0 && ch < SIZE(console.cpMap)) ? console.cpMap[ch]
                                                            : ch;
+#ifdef UTF8_FROM_CORE
+            if (SYMHANDLING(H_UTF8)) {
+                /* we have to convert it to UTF-8 for cell.utf8str */
+                ccount = WideCharToMultiByte(
+                    CP_UTF8, 0, wch, -1, (char *) cell.utf8str,
+                    (int) sizeof cell.utf8str, NULL, NULL);
+            } else {
+#endif
             /* store the wide version here also, so we don't slow
                down back_buffer_flip() with conversions */
             cell.wcharacter = wch[0];
+#ifdef UTF8_FROM_CORE
+            }
+#endif
         } else {
             /* we can just use the UTF-8 utf8str field, since ascii is a
                single-byte representation of a small subset of unicode */
@@ -1278,6 +1326,11 @@ xputc_core(int ch)
  * Overrides wintty.c function of the same name
  * for win32. It is used for glyphs only, not text.
  */
+#ifdef UTF8_FROM_CORE
+ /* See g_pututf8() for a corresponding UTF-8 sequence
+  * version, rather than a single character.
+  */
+#endif
 void
 g_putch(int in_ch)
 {
@@ -1308,12 +1361,24 @@ g_putch(int in_ch)
     cell.attr = console.attr;
     cell.colorseq = esc_seq_colors[console.current_nhcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
+    cell.color256idx = 0;
     wch[1] = 0;
     if (console.has_unicode) {
         wch[0] = (ch >= 0 && ch < SIZE(console.cpMap)) ? console.cpMap[ch] : ch;
+#ifdef UTF8_FROM_CORE
+        if (SYMHANDLING(H_UTF8)) {
+            /* we have to convert it to UTF-8 for cell.utf8str */
+            ccount = WideCharToMultiByte(
+                CP_UTF8, 0, wch, -1, (char *) cell.utf8str,
+                (int) sizeof cell.utf8str, NULL, NULL);
+        } else {
+#endif
             /* store the wide version here also, so we don't slow
                down back_buffer_flip() with conversions */
             cell.wcharacter = wch[0];
+#ifdef UTF8_FROM_CORE
+        }
+#endif
     } else {
         /* we can just use the UTF-8 utf8str field, since ascii is a
            single-byte representation of a small subset of unicode */
@@ -1326,16 +1391,41 @@ g_putch(int in_ch)
 }
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
+#ifdef UTF8_FROM_CORE
+/*
+ * Overrides wintty.c function of the same name
+ * for win32. It is used for glyphs only, not text and
+ * only when a UTF-8 sequence is involved for the
+ * representation. Single character representations
+ * use g_putch() instead.
+ */
 void
-term_start_24bitcolor(long color24bit)
+g_pututf8(uint8 *sequence)
 {
-    console.color24 = color24bit; /* color 0 has bit 0x1000000 set */
+    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+    cell_t cell;
+    cell.attr = console.attr;
+    cell.colorseq = esc_seq_colors[console.current_nhcolor];
+    cell.color24 = console.color24 ? console.color24 : 0L;
+    cell.color256idx =console.color256idx ? console.color256idx : 0;
+    Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
+             (char *) sequence);
+    buffer_write(console.back_buffer, &cell, console.cursor);
+}
+#endif /* UTF8_FROM_CORE */
+
+void
+term_start_24bitcolor(struct unicode_representation *uval)
+{
+    console.color24 = uval->ucolor; /* color 0 has bit 0x1000000 set */
+    console.color256idx = uval->u256coloridx;
 }
 
 void
 term_end_24bitcolor(void)
 {
     console.color24 = 0L;
+    console.color256idx = 0;
 }
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 
@@ -1712,13 +1802,85 @@ consoletty_preference_update(const char* pref)
 #endif
     }
     if (stricmp(pref, "symset") == 0) {
+#ifdef UTF8_FROM_CORE
+        if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
+#ifdef ENHANCED_SYMBOLS
+            tty_utf8graphics_fixup();
+#endif
+        } else if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_IBM)) {
+#else
         if (SYMHANDLING(H_IBM)) {
+#endif
             tty_ibmgraphics_fixup();
         }
         check_and_set_font();
     }
     return;
 }
+
+#ifdef UTF8_FROM_CORE
+#ifdef VIRTUAL_TERMINAL_SEQUENCES
+/*
+ * This is called when making the switch to a symset
+ * with a UTF8 handler to allow any operating system
+ * specific changes to be carried out.
+ */
+void
+tty_utf8graphics_fixup(void)
+{
+    CONSOLE_FONT_INFOEX console_font_info;
+    if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
+        if (!console.hConOut)
+            console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        /* the locale */
+        if (console.localestr)
+            free(console.localestr);
+        console.localestr = strdup(setlocale(LC_ALL, ".UTF8"));
+        /* the code page */
+        SetConsoleOutputCP(65001);
+        console.code_page = GetConsoleOutputCP();
+        /* the font */
+        console_font_info.cbSize = sizeof(console_font_info);
+        BOOL success = GetCurrentConsoleFontEx(console.hConOut, FALSE,
+                                               &console_font_info);
+        /* Try DejaVu Sans Mono for Powerline */
+        wcscpy_s(console_font_info.FaceName,
+                 sizeof(console_font_info.FaceName)
+                     / sizeof(console_font_info.FaceName[0]),
+                 L"DejaVu Sans Mono for Powerline");
+        console_font_info.cbSize = sizeof(console_font_info);
+        success = SetCurrentConsoleFontEx(console.hConOut, FALSE,
+                                          &console_font_info);
+        if (!success) {
+            /* Next, try Lucida Console */
+            wcscpy_s(console_font_info.FaceName,
+                     sizeof(console_font_info.FaceName)
+                         / sizeof(console_font_info.FaceName[0]),
+                     L"Lucida Console");
+            console_font_info.cbSize = sizeof(console_font_info);
+            success = SetCurrentConsoleFontEx(console.hConOut, FALSE,
+                                              &console_font_info);
+        }
+        nhassert(success);
+        if (success) {
+            console.font_info = console_font_info;
+            console.font_changed = TRUE;
+        }
+        /* the console mode */
+        GetConsoleMode(console.hConOut, &console.out_cmode);
+#if 1
+        if ((console.out_cmode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0) {
+            /* recognize escape sequences */
+            console.out_cmode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(console.hConOut, console.out_cmode);
+        }
+#else
+        console.out_cmode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+#endif
+    }
+}
+#endif
+#endif /* UTF8_FROM_CORE */
 
 /*
  * This is called when making the switch to a symset
@@ -1836,400 +1998,6 @@ synch_cursor(void)
     really_move_cursor();
 }
 
-#ifdef CHANGE_COLOR
-void
-tty_change_color(color_number, rgb, reverse)
-int color_number, reverse;
-long rgb;
-{
-    /* Map NetHack color index to NT Console palette index */
-    int idx, win32_color_number[] = {
-        0,  /* CLR_BLACK           0 */
-        4,  /* CLR_RED             1 */
-        2,  /* CLR_GREEN           2 */
-        6,  /* CLR_BROWN           3 */
-        1,  /* CLR_BLUE            4 */
-        5,  /* CLR_MAGENTA         5 */
-        3,  /* CLR_CYAN            6 */
-        7,  /* CLR_GRAY            7 */
-        8,  /* NO_COLOR            8 */
-        12, /* CLR_ORANGE          9 */
-        10, /* CLR_BRIGHT_GREEN   10 */
-        14, /* CLR_YELLOW         11 */
-        9,  /* CLR_BRIGHT_BLUE    12 */
-        13, /* CLR_BRIGHT_MAGENTA 13 */
-        11, /* CLR_BRIGHT_CYAN    14 */
-        15  /* CLR_WHITE          15 */
-    };
-    int k;
-    if (color_number < 0) { /* indicates OPTIONS=palette with no value */
-        /* copy the NetHack palette into UserDefinedColors */
-        for (k = 0; k < CLR_MAX; k++)
-            UserDefinedColors[k] = NetHackColors[k];
-    } else if (color_number >= 0 && color_number < CLR_MAX) {
-        if (!altered_palette) {
-            /* make sure a full suite is available */
-            for (k = 0; k < CLR_MAX; k++)
-                UserDefinedColors[k] = DefaultColors[k];
-        }
-        idx = win32_color_number[color_number];
-        UserDefinedColors[idx] = rgb;
-    }
-    altered_palette = TRUE;
-}
-
-char *
-tty_get_color_string()
-{
-    return "";
-}
-
-int
-match_color_name(c)
-const char *c;
-{
-    const struct others {
-        int idx;
-        const char *colorname;
-    } othernames[] = {
-        { CLR_MAGENTA, "purple" },
-        { CLR_BRIGHT_MAGENTA, "bright purple" },
-        { NO_COLOR, "dark gray" },
-        { NO_COLOR, "dark grey" },
-        { CLR_GRAY, "grey" },
-    };
-
-    int cnt;
-    for (cnt = 0; cnt < CLR_MAX; ++cnt) {
-        if (!strcmpi(c, c_obj_colors[cnt]))
-            return cnt;
-    }
-    for (cnt = 0; cnt < SIZE(othernames); ++cnt) {
-        if (!strcmpi(c, othernames[cnt].colorname))
-            return othernames[cnt].idx;
-    }
-    return -1;
-}
-
-/*
- * Returns 0 if badoption syntax
- */
-int
-alternative_palette(op)
-char *op;
-{
-    /*
-     *	palette:color-R-G-B
-     *	OPTIONS=palette:green-4-3-1, palette:0-0-0-0
-     */
-    int fieldcnt, color_number, rgb, red, green, blue;
-    char *fields[4], *cp;
-
-    if (!op) {
-        change_color(-1, 0, 0); /* indicates palette option with
-                                   no value meaning "load an entire
-                                   hard-coded NetHack palette." */
-        return 1;
-    }
-
-    cp = fields[0] = op;
-    for (fieldcnt = 1; fieldcnt < 4; ++fieldcnt) {
-        cp = index(cp, '-');
-        if (!cp)
-            return 0;
-        fields[fieldcnt] = cp;
-        cp++;
-    }
-    for (fieldcnt = 1; fieldcnt < 4; ++fieldcnt) {
-        *(fields[fieldcnt]) = '\0';
-        ++fields[fieldcnt];
-    }
-    rgb = 0;
-    for (fieldcnt = 0; fieldcnt < 4; ++fieldcnt) {
-        if (fieldcnt == 0 && isalpha(*(fields[0]))) {
-            color_number = match_color_name(fields[0]);
-            if (color_number == -1)
-                return 0;
-        } else {
-            int dcount = 0, cval = 0;
-            cp = fields[fieldcnt];
-            if (*cp == '\\' && index("0123456789xXoO", cp[1])) {
-                const char *dp, *hex = "00112233445566778899aAbBcCdDeEfF";
-
-                cp++;
-                if (*cp == 'x' || *cp == 'X')
-                    for (++cp; (dp = index(hex, *cp)) && (dcount++ < 2); cp++)
-                        cval = (int) ((cval * 16) + (dp - hex) / 2);
-                else if (*cp == 'o' || *cp == 'O')
-                    for (++cp; (index("01234567", *cp)) && (dcount++ < 3);
-                         cp++)
-                        cval = (cval * 8) + (*cp - '0');
-                else
-                    return 0;
-            } else {
-                for (; *cp && (index("0123456789", *cp)) && (dcount++ < 3);
-                     cp++)
-                    cval = (cval * 10) + (*cp - '0');
-            }
-            switch (fieldcnt) {
-            case 0:
-                color_number = cval;
-                break;
-            case 1:
-                red = cval;
-                break;
-            case 2:
-                green = cval;
-                break;
-            case 3:
-                blue = cval;
-                break;
-            }
-        }
-    }
-    rgb = RGB(red, green, blue);
-    if (color_number >= 0 && color_number < CLR_MAX)
-        change_color(color_number, rgb, 0);
-    return 1;
-}
-
-/*
- *  This uses an undocumented method to set console attributes
- *  at runtime including console palette
- *
- * 	VOID WINAPI SetConsolePalette(COLORREF palette[16])
- *
- *  Author: James Brown at www.catch22.net
- *
- *  Set palette of current console.
- *  Palette should be of the form:
- *
- * 	COLORREF DefaultColors[CLR_MAX] =
- * 	{
- *		0x00000000, 0x00800000, 0x00008000, 0x00808000,
- *		0x00000080, 0x00800080, 0x00008080, 0x00c0c0c0,
- *		0x00808080, 0x00ff0000, 0x0000ff00, 0x00ffff00,
- *		0x000000ff, 0x00ff00ff,	0x0000ffff, 0x00ffffff
- *	 };
- */
-
-#pragma pack(push, 1)
-
-/*
- *	Structure to send console via WM_SETCONSOLEINFO
- */
-typedef struct _CONSOLE_INFO {
-    ULONG Length;
-    COORD ScreenBufferSize;
-    COORD WindowSize;
-    ULONG WindowPosX;
-    ULONG WindowPosY;
-
-    COORD FontSize;
-    ULONG FontFamily;
-    ULONG FontWeight;
-    WCHAR FaceName[32];
-
-    ULONG CursorSize;
-    ULONG FullScreen;
-    ULONG QuickEdit;
-    ULONG AutoPosition;
-    ULONG InsertMode;
-
-    USHORT ScreenColors;
-    USHORT PopupColors;
-    ULONG HistoryNoDup;
-    ULONG HistoryBufferSize;
-    ULONG NumberOfHistoryBuffers;
-
-    COLORREF ColorTable[16];
-
-    ULONG CodePage;
-    HWND Hwnd;
-
-    WCHAR ConsoleTitle[0x100];
-} CONSOLE_INFO;
-
-#pragma pack(pop)
-
-BOOL SetConsoleInfo(HWND hwndConsole, CONSOLE_INFO *pci);
-static void GetConsoleSizeInfo(CONSOLE_INFO *pci);
-VOID WINAPI SetConsolePalette(COLORREF crPalette[16]);
-
-void
-adjust_palette(void)
-{
-    SetConsolePalette(UserDefinedColors);
-    altered_palette = 0;
-}
-
-/*
-/* only in Win2k+  (use FindWindow for NT4) */
-/* HWND WINAPI GetConsoleWindow(); */
-
-/*  Undocumented console message */
-#define WM_SETCONSOLEINFO (WM_USER + 201)
-
-VOID WINAPI
-SetConsolePalette(COLORREF palette[16])
-{
-    CONSOLE_INFO ci = { sizeof(ci) };
-    int i;
-    HWND hwndConsole = GetConsoleHandle();
-
-    /* get current size/position settings rather than using defaults.. */
-    GetConsoleSizeInfo(&ci);
-
-    /* set these to zero to keep current settings */
-    ci.FontSize.X = 0; /* def = 8  */
-    ci.FontSize.Y = 0; /* def = 12 */
-    ci.FontFamily = 0; /* def = 0x30 = FF_MODERN|FIXED_PITCH */
-    ci.FontWeight = 0; /* 0x400;   */
-    /* lstrcpyW(ci.FaceName, L"Terminal"); */
-    ci.FaceName[0] = L'\0';
-
-    ci.CursorSize = 25;
-    ci.FullScreen = FALSE;
-    ci.QuickEdit = TRUE;
-    ci.AutoPosition = 0x10000;
-    ci.InsertMode = TRUE;
-    ci.ScreenColors = MAKEWORD(0x7, 0x0);
-    ci.PopupColors = MAKEWORD(0x5, 0xf);
-
-    ci.HistoryNoDup = FALSE;
-    ci.HistoryBufferSize = 50;
-    ci.NumberOfHistoryBuffers = 4;
-
-    // colour table
-    for (i = 0; i < 16; i++)
-        ci.ColorTable[i] = palette[i];
-
-    ci.CodePage = GetConsoleOutputCP();
-    ci.Hwnd = hwndConsole;
-
-    lstrcpyW(ci.ConsoleTitle, L"");
-
-    SetConsoleInfo(hwndConsole, &ci);
-}
-
-/*
- *  Wrapper around WM_SETCONSOLEINFO. We need to create the
- *  necessary section (file-mapping) object in the context of the
- *  process which owns the console, before posting the message
- */
-BOOL
-SetConsoleInfo(HWND hwndConsole, CONSOLE_INFO *pci)
-{
-    DWORD dwConsoleOwnerPid;
-    HANDLE hProcess;
-    HANDLE hSection, hDupSection;
-    PVOID ptrView = 0;
-    HANDLE hThread;
-
-    /*
-     *	Open the process which "owns" the console
-     */
-    GetWindowThreadProcessId(hwndConsole, &dwConsoleOwnerPid);
-    hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, dwConsoleOwnerPid);
-
-    /*
-     * Create a SECTION object backed by page-file, then map a view of
-     * this section into the owner process so we can write the contents
-     * of the CONSOLE_INFO buffer into it
-     */
-    hSection = CreateFileMapping(INVALID_HANDLE_VALUE, 0, PAGE_READWRITE, 0,
-                                 pci->Length, 0);
-
-    /*
-     *	Copy our console structure into the section-object
-     */
-    ptrView = MapViewOfFile(hSection, FILE_MAP_WRITE | FILE_MAP_READ, 0, 0,
-                            pci->Length);
-    memcpy(ptrView, pci, pci->Length);
-    UnmapViewOfFile(ptrView);
-
-    /*
-     *	Map the memory into owner process
-     */
-    DuplicateHandle(GetCurrentProcess(), hSection, hProcess, &hDupSection, 0,
-                    FALSE, DUPLICATE_SAME_ACCESS);
-
-    /*  Send console window the "update" message */
-    SendMessage(hwndConsole, WM_SETCONSOLEINFO, (WPARAM) hDupSection, 0);
-
-    /*
-     * clean up
-     */
-    hThread = CreateRemoteThread(hProcess, 0, 0,
-                                 (LPTHREAD_START_ROUTINE) CloseHandle,
-                                 hDupSection, 0, 0);
-
-    CloseHandle(hThread);
-    CloseHandle(hSection);
-    CloseHandle(hProcess);
-
-    return TRUE;
-}
-
-/*
- *  Fill the CONSOLE_INFO structure with information
- *  about the current console window
- */
-static void
-GetConsoleSizeInfo(CONSOLE_INFO *pci)
-{
-    CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-    HANDLE hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    GetConsoleScreenBufferInfo(hConsoleOut, &csbi);
-
-    pci->ScreenBufferSize = csbi.dwSize;
-    pci->WindowSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    pci->WindowSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-    pci->WindowPosX = csbi.srWindow.Left;
-    pci->WindowPosY = csbi.srWindow.Top;
-}
-
-static HWND
-GetConsoleHandle(void)
-{
-    HMODULE hMod = GetModuleHandle("kernel32.dll");
-    GETCONSOLEWINDOW pfnGetConsoleWindow =
-        (GETCONSOLEWINDOW) GetProcAddress(hMod, "GetConsoleWindow");
-    if (pfnGetConsoleWindow)
-        return pfnGetConsoleWindow();
-    else
-        return GetConsoleHwnd();
-}
-
-static HWND
-GetConsoleHwnd(void)
-{
-    int iterations = 0;
-    HWND hwndFound = 0;
-    char OldTitle[1024], NewTitle[1024], TestTitle[1024];
-
-    /* Get current window title */
-    GetConsoleTitle(OldTitle, sizeof OldTitle);
-
-    (void) sprintf(NewTitle, "NETHACK%d/%d", GetTickCount(),
-                   GetCurrentProcessId());
-    SetConsoleTitle(NewTitle);
-
-    GetConsoleTitle(TestTitle, sizeof TestTitle);
-    while (strcmp(TestTitle, NewTitle) != 0) {
-        iterations++;
-        /* sleep(0); */
-        GetConsoleTitle(TestTitle, sizeof TestTitle);
-    }
-    hwndFound = FindWindow(NULL, NewTitle);
-    SetConsoleTitle(OldTitle);
-    /*       printf("%d iterations\n", iterations); */
-    return hwndFound;
-}
-#endif /*CHANGE_COLOR*/
-
 static int CALLBACK EnumFontCallback(
     const LOGFONTW * lf, const TEXTMETRICW * tm, DWORD fontType, LPARAM lParam)
 {
@@ -2271,8 +2039,8 @@ check_font_widths(void)
      * NOTE: the DC from the console window does not have the correct
      *       font selected at this point.
      */
-    HWND hWnd = GetConsoleWindow();
-    HDC hDC = GetDC(hWnd);
+    console.hWnd = GetConsoleWindow();
+    HDC hDC = GetDC(console.hWnd);
 
     LOGFONTW logical_font;
     logical_font.lfCharSet = DEFAULT_CHARSET;
@@ -2574,6 +2342,14 @@ void nethack_enter_consoletty(void)
 #if 0
     /* set up state needed by early_raw_print() */
     windowprocs.win_raw_print = early_raw_print;
+#endif
+#if 0
+    /* prevent re-sizing of the console window */
+    if (!console.hWnd)
+        console.hWnd = GetConsoleWindow();
+    SetWindowLong(console.hWnd, GWL_STYLE,
+                  GetWindowLong(console.hWnd, GWL_STYLE)
+                     & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 #endif
     console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
     nhassert(console.hConOut != NULL); // NOTE: this assert will not print

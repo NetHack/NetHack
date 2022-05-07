@@ -231,8 +231,10 @@ extern
                                    *    via non-display attribute flag  */
 #define WC2_SUPPRESS_HIST 0x8000L /* 16 putstr(WIN_MESSAGE) supports history
                                    *    suppression via non-disp attr   */
-#define WC2_MENU_SHIFT  0x010000L /* 17 horizontal menu scrolling */
-                                  /* 15 free bits */
+#define WC2_MENU_SHIFT   0x010000L /* 17 horizontal menu scrolling */
+#define WC2_U_UTF8STR    0x020000L /* 18 utf8str support */
+#define WC2_U_24BITCOLOR 0x040000L /* 19 24-bit color support available */
+                                   /* 13 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

@@ -1375,7 +1375,7 @@ glyph2symidx(int glyph)
     glyph_info glyphinfo;
 
     map_glyphinfo(0, 0, glyph, 0, &glyphinfo);
-    return glyphinfo.gm.symidx;
+    return glyphinfo.gm.sym.symidx;
 }
 
 char *
@@ -1387,10 +1387,37 @@ encglyph(int glyph)
     return encbuf;
 }
 
+int
+decode_glyph(const char *str, int *glyph_ptr)
+{
+    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
+    int rndchk = 0, dcount = 0, retval = 0;
+    const char *dp;
+
+    for (; *str && ++dcount <= 4; ++str) {
+        if ((dp = index(hex, *str)) != 0) {
+            retval++;
+            rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
+        } else
+            break;
+    }
+    if (rndchk == g.context.rndencode) {
+        *glyph_ptr = dcount = 0;
+        for (; *str && ++dcount <= 4; ++str) {
+            if ((dp = index(hex, *str)) != 0) {
+                retval++;
+                *glyph_ptr = (*glyph_ptr * 16) + ((int) (dp - hex) / 2);
+            } else
+                break;
+        }
+        return retval;
+    }
+    return 0;
+}
+
 char *
 decode_mixed(char *buf, const char *str)
 {
-    static const char hex[] = "00112233445566778899aAbBcCdDeEfF";
     char *put = buf;
     glyph_info glyphinfo = nul_glyphinfo;
 
@@ -1399,27 +1426,16 @@ decode_mixed(char *buf, const char *str)
 
     while (*str) {
         if (*str == '\\') {
-            int rndchk, dcount, so, gv;
-            const char *dp, *save_str;
+            int dcount, so, gv;
+            const char *save_str;
 
             save_str = str++;
             switch (*str) {
             case 'G': /* glyph value \GXXXXNNNN*/
-                rndchk = dcount = 0;
-                for (++str; *str && ++dcount <= 4; ++str)
-                    if ((dp = index(hex, *str)) != 0)
-                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
-                    else
-                        break;
-                if (rndchk == g.context.rndencode) {
-                    gv = dcount = 0;
-                    for (; *str && ++dcount <= 4; ++str)
-                        if ((dp = index(hex, *str)) != 0)
-                            gv = (gv * 16) + ((int) (dp - hex) / 2);
-                        else
-                            break;
+                if ((dcount = decode_glyph(str + 1, &gv))) {
+                    str += (dcount + 1);
                     map_glyphinfo(0, 0, gv, 0, &glyphinfo);
-                    so = glyphinfo.gm.symidx;
+                    so = glyphinfo.gm.sym.symidx;
                     *put++ = g.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */
@@ -1429,25 +1445,6 @@ decode_mixed(char *buf, const char *str)
                     str = save_str;
                 }
                 break;
-#if 0
-            case 'S': /* symbol offset */
-                so = rndchk = dcount = 0;
-                for (++str; *str && ++dcount <= 4; ++str)
-                    if ((dp = index(hex, *str)) != 0)
-                        rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
-                    else
-                        break;
-                if (rndchk == g.context.rndencode) {
-                    dcount = 0;
-                    for (; *str && ++dcount <= 2; ++str)
-                        if ((dp = index(hex, *str)) != 0)
-                            so = (so * 16) + ((int) (dp - hex) / 2);
-                        else
-                            break;
-                }
-                *put++ = g.showsyms[so];
-                break;
-#endif
             case '\\':
                 break;
             case '\0':
@@ -1466,6 +1463,7 @@ decode_mixed(char *buf, const char *str)
     *put = '\0';
     return buf;
 }
+
 
 /*
  * This differs from putstr() because the str parameter can

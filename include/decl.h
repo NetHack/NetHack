@@ -434,7 +434,10 @@ E const char *ARGV0;
 enum earlyarg {ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
 #ifndef NODUMPENUMS
     , ARG_DUMPENUMS
+#ifdef ENHANCED_SYMBOLS
+    , ARG_DUMPGLYPHIDS
 #endif
+#endif /* NODUMPENUMS */
 #ifdef WIN32
     ,ARG_WINDOWS
 #endif
@@ -679,6 +682,11 @@ struct _cmd_queue {
     struct _cmd_queue *next;
 };
 
+struct enum_dump {
+    int val;
+    const char *nm;
+};
+
 typedef long cmdcount_nht;	/* Command counts */
 
 /*
@@ -888,8 +896,11 @@ struct instance_globals {
     struct rm nowhere;
     const char *gate_str;
 
-    /* drawing */
+    /* symbols.c */
     struct symsetentry symset[NUM_GRAPHICS];
+#ifdef ENHANCED_SYMBOLS
+    struct symset_customization sym_customizations[NUM_GRAPHICS + 1]; /* adds UNICODESET */
+#endif
     int currentgraphics;
     nhsym showsyms[SYM_MAX]; /* symbols to be displayed */
     nhsym primary_syms[SYM_MAX];   /* loaded primary symbols          */

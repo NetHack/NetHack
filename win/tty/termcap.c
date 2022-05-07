@@ -17,6 +17,9 @@ static char *e_atr2str(int);
 
 void cmov(int, int);
 void nocmov(int, int);
+void term_start_24bitcolor(struct unicode_representation *);
+void term_end_24bitcolor(void);
+
 #if defined(TEXTCOLOR) && defined(TERMLIB)
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
 static void analyze_seq(char *, int *, int *);
@@ -430,11 +433,12 @@ tty_decgraphics_termcap_fixup(void)
 #endif /* TERMLIB */
 
 #if defined(ASCIIGRAPH) && defined(PC9800)
-extern void (*ibmgraphics_mode_callback)(void); /* defined in drawing.c */
+extern void (*ibmgraphics_mode_callback)(void); /* defined in symbols.c */
 #endif
+extern void (*utf8graphics_mode_callback)(void); /* defined in symbols.c */
 
 #ifdef PC9800
-extern void (*ascgraphics_mode_callback)(void); /* defined in drawing.c */
+extern void (*ascgraphics_mode_callback)(void); /* defined in symbols.c */
 static void tty_ascgraphics_hilite_fixup(void);
 
 static void
@@ -478,6 +482,10 @@ tty_start_screen(void)
     /* set up callback in case option is not set yet but toggled later */
     decgraphics_mode_callback = tty_decgraphics_termcap_fixup;
 #endif
+#ifdef ENHANCED_SYMBOLS
+    utf8graphics_mode_callback = tty_utf8graphics_fixup;
+#endif
+
     if (g.Cmd.num_pad)
         tty_number_pad(1); /* make keypad send digits */
 }
@@ -870,14 +878,21 @@ const struct {
                 { COLOR_MAGENTA, CLR_MAGENTA, CLR_BRIGHT_MAGENTA },
                 { COLOR_CYAN, CLR_CYAN, CLR_BRIGHT_CYAN } };
 
+typedef struct {
+    unsigned char r, g, b;
+} RGB;
+
 static char nilstring[] = "";
 
 static void
 init_hilite(void)
 {
+    int c, colors;
     char *setf, *scratch;
-    int c, md_len = 0;
-    int colors = tgetnum("Co");
+
+    colors = tgetnum("Co");
+    iflags.colorcount = colors;
+    int md_len = 0;
 
     if (colors < 8 || (MD == NULL) || (strlen(MD) == 0)
         || ((setf = tgetstr("AF", (char **) 0)) == (char *) 0
@@ -1410,9 +1425,66 @@ term_start_color(int color)
     if (color < CLR_MAX && hilites[color] && *hilites[color])
         xputs(hilites[color]);
 }
-
 #endif /* TEXTCOLOR */
 
-#endif /* TTY_GRAPHICS && !NO_TERMS */
+#ifdef ENHANCED_SYMBOLS
+
+#ifndef SEP2
+#define tcfmtstr "\033[38;2;%ld;%ld;%ldm"
+#ifdef UNIX
+#define tcfmtstr24bit "\033[38;2;%u;%u;%um"
+#define tcfmtstr256 "\033[38;5;%dm"
+#else
+#define tcfmtstr "\033[38:2:%ld:%ld:%ldm"
+#define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
+#define tcfmtstr256 "\033[38:5:%ldm"
+#endif
+#endif
+ 
+static void emit24bit(long mcolor);
+static void emit256(int u256coloridx);
+
+static void emit24bit(long mcolor)
+{
+    static char tcolorbuf[QBUFSZ];
+
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr,
+             ((mcolor >> 16) & 0xFF),   /* red */
+             ((mcolor >>  8) & 0xFF),   /* green */
+             ((mcolor >>  0) & 0xFF));  /* blue */
+    xputs(tcolorbuf);
+}
+
+static void emit256(int u256coloridx)
+{
+    static char tcolorbuf[QBUFSZ];
+
+    Snprintf(tcolorbuf, sizeof tcolorbuf, tcfmtstr256,
+             u256coloridx);
+    xputs(tcolorbuf);
+}
+
+void
+term_start_24bitcolor(struct unicode_representation *urep)
+{
+    if (urep && SYMHANDLING(H_UTF8)) {
+        /* color 0 has bit 0x1000000 set */
+        long mcolor = (urep->ucolor & 0xFFFFFF); 
+        if (iflags.colorcount == 256)
+            emit256(urep->u256coloridx);
+        else
+            emit24bit(mcolor);
+    }
+}
+
+void
+term_end_24bitcolor(void)
+{
+    if (SYMHANDLING(H_UTF8)) {
+        xputs("\033[0m");
+    }
+}
+#endif /* ENHANCED_SYMBOLS */
+#endif /* TTY_GRAPHICS && !NO_TERMS  */
 
 /*termcap.c*/

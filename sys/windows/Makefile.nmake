@@ -435,8 +435,8 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
 	   shk.c shknam.c sit.c sounds.c \
 	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
-	   timeout.c topten.c track.c trap.c u_init.c \
-	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
+	   timeout.c topten.c track.c trap.c u_init.c uhitm.c utf8map.c \
+	   vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
 
@@ -496,10 +496,10 @@ VOBJ21 = $(O)sfstruct.o $(O)shk.o      $(O)shknam.o   $(O)sit.o
 VOBJ22 = $(O)sounds.o   $(O)sp_lev.o   $(O)spell.o    $(O)steal.o
 VOBJ23 = $(O)steed.o    $(O)symbols.o  $(O)sys.o      $(O)teleport.o
 VOBJ24 = $(O)timeout.o  $(O)topten.o   $(O)track.o    $(O)trap.o
-VOBJ25 = $(O)u_init.o   $(O)uhitm.o    $(O)vault.o    $(O)vision.o
-VOBJ26 = $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o
-VOBJ27 = $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o
-VOBJ28 = $(O)zap.o
+VOBJ25 = $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o
+VOBJ26 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o
+VOBJ27 = $(O)windows.o  $(O)wizard.o   $(O)worm.o     $(O)worn.o
+VOBJ28 = $(O)write.o    $(O)zap.o
 
 LUAOBJ = $(O)nhlua.o    $(O)nhlsel.o    $(O)nhlobj.o
 
@@ -510,7 +510,7 @@ DLBOBJ = $(O)dlb.o
 
 REGEX  = $(O)cppregex.o
 
-TTYOBJ = $(O)topl.o     $(O)getline.o  $(O)wintty.o
+TTYOBJ = $(O)topl.o $(O)getline.o  $(O)wintty.o
 
 MDLIB = $(O)mdlib.o
 
@@ -723,7 +723,7 @@ ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO
 	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) $(RUNTIMEOPTDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
-cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od
+cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od /fsanitize=address
 crelease= -analyze- -D"_MBCS" -errorReport:prompt -MT -O2 -Ot -Ox -Oy
 
 lcommon= /NOLOGO /INCREMENTAL:NO
@@ -2246,6 +2246,7 @@ $(TARGETPFX)track.o: track.c $(HACK_H)
 $(TARGETPFX)trap.o: trap.c $(HACK_H)
 $(TARGETPFX)u_init.o: u_init.c $(HACK_H)
 $(TARGETPFX)uhitm.o: uhitm.c $(HACK_H)
+$(TARGETPFX)utf8map.o: utf8map.c $(HACK_H)
 $(TARGETPFX)vault.o: vault.c $(HACK_H)
 $(TARGETPFX)version.o: version.c $(HACK_H) $(INCL)\dlb.h
 $(TARGETPFX)vision.o: vision.c $(HACK_H)

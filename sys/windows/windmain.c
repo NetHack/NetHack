@@ -35,6 +35,16 @@ extern void backsp(void);
 #endif
 extern void clear_screen(void);
 
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
+extern void (*decgraphics_mode_callback)(void);
+#endif
+#ifdef CURSES_GRAPHICS
+extern void (*cursesgraphics_mode_callback)(void);
+#endif
+#ifdef ENHANCED_SYMBOLS
+extern void (*utf8graphics_mode_callback)(void);
+#endif
+
 #ifdef _MSC_VER
 #ifdef kbhit
 #undef kbhit
@@ -393,7 +403,8 @@ copy_hack_content()
     update_file(g.fqn_prefix[HACKPREFIX], OPTIONFILE,
         g.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
 }
-
+extern const char *known_handling[];     /* symbols.c */
+extern const char *known_restrictions[]; /* symbols.c */
 /*
  * __MINGW32__ Note
  * If the graphics version is built, we don't need a main; it is skipped
@@ -420,7 +431,7 @@ mingw_main(int argc, char *argv[])
     safe_routines();
     early_init();
 #ifdef _MSC_VER
-# ifdef DEBUG
+#ifdef DEBUG
     /* set these appropriately for VS debugging */
     _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
     _CrtSetReportMode(_CRT_ERROR,
@@ -439,7 +450,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         | _CRTDBG_LEAK_CHECK_DF);
     _CrtSetBreakAlloc(1423);
 */
-# endif
+#endif
 #endif
 
     g.hname = "NetHack"; /* used for syntax messages */
@@ -480,7 +491,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     }
 
     /* Finished processing options, lock all directory paths */
-    for(int i = 0; i < PREFIX_COUNT; i++)
+    for (int i = 0; i < PREFIX_COUNT; i++)
         fqn_prefix_locked[i] = TRUE;
 
     if (!validate_prefix_locations(failbuf)) {
@@ -491,23 +502,23 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     copy_hack_content();
 
-/*
- * It seems you really want to play.
- */
-    if (argc >= 1
-        && !strcmpi(default_window_sys, "mswin")
+    /*
+     * It seems you really want to play.
+     */
+    if (argc >= 1 && !strcmpi(default_window_sys, "mswin")
         && (strstri(argv[0], "nethackw.exe") || GUILaunched))
         iflags.windowtype_locked = TRUE;
     windowtype = default_window_sys;
 
 #ifdef DLB
     if (!dlb_init()) {
-        pline("%s\n%s\n%s\n%s\n\n",
-              copyright_banner_line(1), copyright_banner_line(2),
-              copyright_banner_line(3), copyright_banner_line(4));
-        pline("NetHack was unable to open the required file \"%s\"",DLBFILE);
+        pline("%s\n%s\n%s\n%s\n\n", copyright_banner_line(1),
+              copyright_banner_line(2), copyright_banner_line(3),
+              copyright_banner_line(4));
+        pline("NetHack was unable to open the required file \"%s\"", DLBFILE);
         if (file_exists(DLBFILE))
-            pline("\nAre you perhaps trying to run NetHack within a zip utility?");
+            pline("\nAre you perhaps trying to run NetHack within a zip "
+                  "utility?");
         error("dlb_init failure.");
     }
 #endif
@@ -539,6 +550,33 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     if (WINDOWPORT("tty"))
         toggle_mouse_support();
+
+    if (g.symset[PRIMARYSET].handling
+        && !symset_is_compatible(g.symset[PRIMARYSET].handling,
+                                 windowprocs.wincap2)) {
+        /* current symset handling and windowtype are
+           not compatible, feature-wise. Use IBM defaults */
+            load_symset("IBMGraphics_2", PRIMARYSET);
+            load_symset("RogueEpyx", ROGUESET);
+    }
+    /* Has the callback for the symset been invoked? Config file processing to
+       load a symset runs too early to accomplish that because 
+       the various *graphics_mode_callback pointers don't get set until
+       term_start_screen, unfortunately */
+#if defined(TERMLIB) || defined(CURSES_GRAPHICS)
+    if (SYMHANDLING(H_DEC) && decgraphics_mode_callback)
+        (*decgraphics_mode_callback)();
+#endif     /* TERMLIB || CURSES */
+#if 0
+#ifdef CURSES_GRAPHICS
+    if (WINDOWPORT("curses"))
+        (*cursesgraphics_mode_callback)();
+#endif
+#endif
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8) && utf8graphics_mode_callback)
+        (*utf8graphics_mode_callback)();
+#endif
 
     /* strip role,race,&c suffix; calls askname() if g.plname[] is empty
        or holds a generic user name like "player" or "games" */
@@ -656,7 +694,12 @@ process_options(int argc, char * argv[])
 #ifndef NODUMPENUMS
         if (argcheck(argc, argv, ARG_DUMPENUMS) == 2) {
             nethack_exit(EXIT_SUCCESS);
-       }
+        }
+#ifdef ENHANCED_SYMBOLS
+        if (argcheck(argc, argv, ARG_DUMPGLYPHIDS) == 2) {
+            nethack_exit(EXIT_SUCCESS);
+        }
+#endif
 #endif
         if (argcheck(argc, argv, ARG_DEBUG) == 1) {
             argc--;

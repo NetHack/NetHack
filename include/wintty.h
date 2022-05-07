@@ -78,6 +78,7 @@ struct DisplayDesc {
     int intr;          /* non-zero if inread was interrupted */
     winid lastwin;     /* last window used for I/O */
     char dismiss_more; /* extra character accepted at --More-- */
+    int topl_utf8;     /* non-zero if utf8 in str */
 };
 
 #endif /* WINDOW_STRUCTS */
@@ -165,6 +166,10 @@ E void term_end_raw_bold(void);
 E void term_end_color(void);
 E void term_start_color(int color);
 #endif /* TEXTCOLOR */
+#ifdef ENHANCED_SYMBOLS
+extern void term_start_24bitcolor(struct unicode_representation *);
+extern void term_end_24bitcolor(void); /* termcap.c, consoletty.c */
+#endif
 
 /* ### topl.c ### */
 
@@ -182,6 +187,11 @@ E void setclipped(void);
 E void docorner(int, int);
 E void end_glyphout(void);
 E void g_putch(int);
+#ifdef ENHANCED_SYMBOLS
+#if defined(WIN32) || defined(UNIX)
+E void g_pututf8(uint8 *);
+#endif
+#endif /* ENHANCED_SYMBOLS */
 E void win_tty_init(int);
 
 /* external declarations */
@@ -200,6 +210,7 @@ E void tty_dismiss_nhwindow(winid);
 E void tty_destroy_nhwindow(winid);
 E void tty_curs(winid, int, int);
 E void tty_putstr(winid, int, const char *);
+E void tty_putmixed(winid window, int attr, const char *str);
 E void tty_display_file(const char *, boolean);
 E void tty_start_menu(winid, unsigned long);
 E void tty_add_menu(winid, const glyph_info *, const ANY_P *, char, char,

@@ -829,7 +829,10 @@ static const struct early_opt earlyopts[] = {
     {ARG_SHOWPATHS, "showpaths", 9, FALSE},
 #ifndef NODUMPENUMS
     {ARG_DUMPENUMS, "dumpenums", 9, FALSE},
+#ifdef ENHANCED_SYMBOLS
+    {ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE}, 
 #endif
+#endif /* NODUMPENUMS */
 #ifdef WIN32
     {ARG_WINDOWS, "windows", 4, TRUE},
 #endif
@@ -913,7 +916,13 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             dump_enums();
             return 2;
         }
+#ifdef ENHANCED_SYMBOLS
+        case ARG_DUMPGLYPHIDS: {
+            dump_glyphids();
+            return 2;
+        }
 #endif
+#endif /* NODUMPENUMS */
 #ifdef WIN32
         case ARG_WINDOWS: {
             if (extended_opt) {
@@ -1006,6 +1015,17 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
 }
 
 #ifndef NODUMPENUMS
+#define DUMP_ENUMS
+struct enum_dump monsdump[] = {
+#include "monsters.h"
+        { NUMMONS, "NUMMONS" },
+};
+struct enum_dump objdump[] = {
+#include "objects.h"
+        { NUM_OBJECTS, "NUM_OBJECTS" },
+};
+#undef DUMP_ENUMS
+
 void
 dump_enums(void)
 {
@@ -1018,21 +1038,6 @@ dump_enums(void)
     };
     static const char *const titles[NUM_ENUM_DUMPS] =
         { "monnums", "objects_nums" , "misc_object_nums" };
-    struct enum_dump {
-        int val;
-        const char *nm;
-    };
-
-#define DUMP_ENUMS
-    struct enum_dump monsdump[] = {
-#include "monsters.h"
-        { NUMMONS, "NUMMONS" },
-    };
-    struct enum_dump objdump[] = {
-#include "objects.h"
-        { NUM_OBJECTS, "NUM_OBJECTS" },
-    };
-#undef DUMP_ENUMS
 
     struct enum_dump omdump[] = {
             { LAST_GEM, "LAST_GEM" },
@@ -1058,6 +1063,14 @@ dump_enums(void)
     }
     raw_print("");
 }
+
+#ifdef ENHANCED_SYMBOLS
+void
+dump_glyphids(void)
+{
+    dump_all_glyphids(stdout);
+}
+#endif /* ENHANCED_SYMBOLS */
 #endif /* NODUMPENUMS */
 
 /*allmain.c*/

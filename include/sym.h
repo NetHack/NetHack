@@ -25,13 +25,28 @@ enum mon_syms {
 };
 
 #ifndef MAKEDEFS_C
-
 /* Default characters for dungeon surroundings and furniture */
 enum cmap_symbols {
 #define PCHAR_S_ENUM
 #include "defsym.h"
 #undef PCHAR_S_ENUM
     MAXPCHARS
+};
+
+/*
+ * special symbol set handling types ( for invoking callbacks, etc.)
+ * Must match the order of the known_handlers strings
+ * in drawing.c
+ */
+
+enum symset_handling_types {
+    H_UNK = 0,
+    H_IBM = 1,
+    H_DEC = 2,
+    H_CURS = 3,
+    H_MAC = 4, /* obsolete; needed so that the listing of available
+                * symsets by 'O' can skip it for !MAC_GRAPHICS_ENV */
+    H_UTF8 = 5
 };
 
 struct symdef {
@@ -51,7 +66,7 @@ enum symparse_range {
 };
 
 struct symparse {
-    unsigned range;
+    enum symparse_range range;
     int idx;
     const char *name;
 };
@@ -62,7 +77,7 @@ struct symsetentry {
     char *name;               /* ptr to symset name                   */
     char *desc;               /* ptr to description                   */
     int idx;                  /* an index value                       */
-    int handling;             /* known handlers value                 */
+    enum symset_handling_types handling;      /* known handlers value */
     Bitfield(nocolor, 1);     /* don't use color if set               */
     Bitfield(primary, 1);     /* restricted for use as primary set    */
     Bitfield(rogue, 1);       /* restricted for use as rogue lev set  */
@@ -109,25 +124,41 @@ enum misc_symbols {
  */
 #define DEFAULT_GRAPHICS 0 /* regular characters: '-', '+', &c */
 enum graphics_sets {
-        PRIMARY = 0,          /* primary graphics set        */
+        PRIMARYSET = 0,       /* primary graphics set        */
         ROGUESET = 1,         /* rogue graphics set          */
-        NUM_GRAPHICS
+        NUM_GRAPHICS,
+        UNICODESET = NUM_GRAPHICS
 };
 
-/*
- * special symbol set handling types ( for invoking callbacks, etc.)
- * Must match the order of the known_handlers strings
- * in drawing.c
- */
+#ifdef ENHANCED_SYMBOLS
+enum customization_types { custom_none, custom_symbols, custom_ureps };
 
-enum symset_handling_types {
-        H_UNK  = 0,
-        H_IBM  = 1,
-        H_DEC  = 2,
-        H_CURS = 3,
-        H_MAC  = 4 /* obsolete; needed so that the listing of available
-                     * symsets by 'O' can skip it for !MAC_GRAPHICS_ENV */
+struct custom_symbol {
+    const struct symparse *symparse;
+    unsigned char val;
 };
+struct custom_urep {
+    int glyphidx;
+    struct unicode_representation u;
+};
+union customization_content {
+    struct custom_symbol sym;
+    struct custom_urep urep;
+};
+struct customization_detail {
+    union customization_content content;
+    struct customization_detail *next;
+};
+
+
+/* one set per symset_name */
+struct symset_customization {
+    const char *customization_name;
+    int count;
+    int custtype;
+    struct customization_detail *details;
+};
+#endif /* ENHANCED_SYMBOLS */
 
 extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
 #define WARNCOUNT 6 /* number of different warning levels */

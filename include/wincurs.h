@@ -127,8 +127,14 @@ extern void curses_refresh_nethack_windows(void);
 extern void curses_del_nhwin(winid wid);
 extern void curses_del_wid(winid wid);
 extern void curs_destroy_all_wins(void);
+#ifdef ENHANCED_SYMBOLS
 extern void curses_putch(winid wid, int x, int y, int ch,
-                         int color, int attrs);
+                         struct unicode_representation *u, int color,
+                         int attrs);
+#else
+extern void curses_putch(winid wid, int x, int y, int ch, int color,
+                         int attrs);
+#endif
 extern void curses_get_window_size(winid wid, int *height, int *width);
 extern boolean curses_window_has_border(winid wid);
 extern boolean curses_window_exists(winid wid);

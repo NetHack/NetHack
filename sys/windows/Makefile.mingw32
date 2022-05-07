@@ -724,7 +724,7 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region restore rip rnd role rumors \
 	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed stubs symbols sys \
-	   teleport timeout topten track trap u_init uhitm vault version vision \
+	   teleport timeout topten track trap u_init uhitm utf8map vault version vision \
 	   weapon were wield windmain windows windsys wizard worm worn write zap)
 
 CFLAGSW = $(CFLAGS) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRPHICS

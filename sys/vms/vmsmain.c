@@ -281,7 +281,7 @@ process_options(int argc, char *argv[])
         case 'I':
         case 'i':
             if (!strncmpi(argv[0] + 1, "IBM", 3)) {
-                load_symset("IBMGraphics", PRIMARY);
+                load_symset("IBMGraphics", PRIMARYSET);
                 load_symset("RogueIBM", ROGUESET);
                 switch_symbols(TRUE);
             }
@@ -289,7 +289,7 @@ process_options(int argc, char *argv[])
         /*  case 'D': */
         case 'd':
             if (!strncmpi(argv[0] + 1, "DEC", 3)) {
-                load_symset("DECGraphics", PRIMARY);
+                load_symset("DECGraphics", PRIMARYSET);
                 switch_symbols(TRUE);
             }
             break;

@@ -218,6 +218,8 @@ opt_##a,
                 &iflags.wc2_fullscreen)
     NHOPTC(gender, 8, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "your starting gender (male or female)")
+    NHOPTC(glyph, 40, opt_in, set_in_game, No, Yes, Yes, No, NoAlias,
+                "set representation of a glyph to a unicode value and color")
     NHOPTB(goldX, 0, opt_in, set_in_game, Off, Yes, No, No, NoAlias,
                 &flags.goldX)
     NHOPTB(guicolor, 0, opt_out, set_in_game, On, Yes, No, No,  NoAlias,
@@ -521,6 +523,8 @@ opt_##a,
                 &iflags.wc2_darkgray)
     NHOPTB(use_inverse, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &iflags.wc_inverse)
+    NHOPTB(use_truecolor, 0, opt_in, set_in_config, Off, Yes, No, No,
+                "use_truecolour", &iflags.use_truecolor)
     NHOPTC(vary_msgcount, 20, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "show more old messages at a time")
     NHOPTB(verbose, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,

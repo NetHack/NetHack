@@ -930,7 +930,7 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
     #else
         ch = (char) data->map[i][j].ttychar;
-        color = (int) data->map[i][j].gm.color;
+        color = (int) data->map[i][j].gm.sym.color;
         if (((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
             || ((data->map[i][j].gm.glyphflags & (MG_DETECT | MG_BW_LAVA))
                 && iflags.use_inverse)) {
@@ -1000,7 +1000,7 @@ static void setGlyph(PNHMapWindow data, int i, int j,
     if ((data->map[i][j].glyph != fg->glyph)
             || (data->bkmap[i][j].glyph != bg->glyph)
         || data->map[i][j].ttychar != fg->ttychar
-        || data->map[i][j].gm.color != fg->gm.color
+        || data->map[i][j].gm.sym.color != fg->gm.sym.color
         || data->map[i][j].gm.glyphflags != fg->gm.glyphflags
         || data->map[i][j].gm.tileidx != fg->gm.tileidx) {
         data->map[i][j] = *fg;

@@ -281,6 +281,15 @@
 /* #define NODUMPENUMS */
 
 /*
+ *      ENHANCED_SYMBOLS
+ *      Support the enhanced display of symbols by utilizing utf8 and 24-bit
+ *      color sequences. Enabled by default, but it can be disabled by
+ *      commenting it out.
+ */
+
+#define ENHANCED_SYMBOLS
+
+/*
  *      If COMPRESS is defined, it should contain the full path name of your
  *      'compress' program.
  *

@@ -1341,22 +1341,32 @@ main(int argc UNUSED, char *argv[] UNUSED)
     Fprintf(ofp, "int maxmontile = %d,\n", lastmontile);
     Fprintf(ofp, "%smaxobjtile = %d,\n", indent, lastobjtile);
     Fprintf(ofp, "%smaxothtile = %d;\n\n", indent, lastothtile);
-    Fprintf(ofp,
-      "/* glyph, ttychar, { color, symidx, ovidx, glyphflags, tileidx} */\n");
+    Fprintf(ofp, 
+      "/* glyph, ttychar, { glyphflags, {color, symidx}, ovidx, tileidx, 0 } */\n");
     Fprintf(ofp, "const glyph_info nul_glyphinfo = { \n");
     Fprintf(ofp, "%sNO_GLYPH, ' ',\n", indent);
     Fprintf(ofp, "%s%s{  /* glyph_map */\n", indent, indent);
-    Fprintf(ofp, "%s%s%sNO_COLOR, SYM_UNEXPLORED + SYM_OFF_X,\n",
+    Fprintf(ofp, "%s%s%sMG_UNEXPL, { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X },\n",
             indent, indent, indent);
-    Fprintf(ofp, "%s%s%sMG_UNEXPL, %d\n", indent, indent, indent,
+#ifdef ENHANCED_SYMBOLS
+    Fprintf(ofp, "%s%s%s%d, 0\n", indent, indent, indent,
             TILE_unexplored);
+#else
+    Fprintf(ofp, "%s%s%s%d\n", indent, indent, indent,
+            TILE_unexplored);
+#endif
     Fprintf(ofp, "%s%s}\n", indent, indent);
     Fprintf(ofp, "};\n");
     Fprintf(ofp, "\nglyph_map glyphmap[MAX_GLYPH] = {\n");
 
     for (i = 0; i < MAX_GLYPH; i++) {
         tilenum = tilemap[i].tilenum;
-        Fprintf(ofp, "    { 0, 0, 0U, %4d },   /* [%04d] %s=%03d %s */\n",
+        Fprintf(ofp,
+#ifdef ENHANCED_SYMBOLS
+                "    { 0U, { 0, 0 }, %4d, 0 },   /* [%04d] %s:%03d %s */\n",
+#else
+                "    { 0U, { 0, 0 }, %4d},   /* [%04d] %s:%03d %s */\n",
+#endif
                 tilenum, i,
                 tilesrc_texts[tilelist[tilenum]->src],
                 tilelist[tilenum]->file_entry,

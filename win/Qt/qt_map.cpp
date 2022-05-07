@@ -547,7 +547,7 @@ void NetHackQtMapViewport::PrintGlyph(int x, int y,
 {
     Glyph(x, y) = (unsigned short) glyphinfo->glyph;
     Glyphttychar(x, y) = (unsigned short) glyphinfo->ttychar;
-    Glyphcolor(x, y) = (unsigned short) glyphinfo->gm.color;
+    Glyphcolor(x, y) = (unsigned short) glyphinfo->gm.sym.color;
     Glyphflags(x, y) = glyphinfo->gm.glyphflags;
     Glyphtileidx(x, y) = (unsigned short) glyphinfo->gm.tileidx;
     Changed(x, y);

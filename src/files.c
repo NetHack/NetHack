@@ -165,8 +165,6 @@ static void wizkit_addinv(struct obj *);
 boolean proc_wizkit_line(char *buf);
 void read_wizkit(void);
 static FILE *fopen_sym_file(void);
-boolean proc_symset_line(char *);
-static void set_symhandling(char *, int);
 
 #ifdef SELF_RECOVER
 static boolean copy_bytes(int, int);
@@ -2678,7 +2676,7 @@ parse_config_line(char *origbuf)
         }
         switch_symbols(TRUE);
     } else if (match_varname(buf, "SYMBOLS", 4)) {
-        if (!parsesymbols(bufp, PRIMARY)) {
+        if (!parsesymbols(bufp, PRIMARYSET)) {
             config_error_add("Error in SYMBOLS definition '%s'", bufp);
             retval = FALSE;
         }
@@ -3443,7 +3441,7 @@ fopen_sym_file(void)
 }
 
 /*
- * Returns 1 if the chose symset was found and loaded.
+ * Returns 1 if the chosen symset was found and loaded.
  *         0 if it wasn't found in the sym file or other problem.
  */
 int
@@ -3490,214 +3488,6 @@ read_sym_file(int which_set)
                                                 : "unknown");
     config_error_done();
     return 1;
-}
-
-boolean
-proc_symset_line(char *buf)
-{
-    return !((boolean) parse_sym_line(buf, g.symset_which_set));
-}
-
-/* returns 0 on error */
-int
-parse_sym_line(char *buf, int which_set)
-{
-    int val, i;
-    struct symparse *symp;
-    char *bufp, *commentp, *altp;
-
-    if (strlen(buf) >= BUFSZ)
-        buf[BUFSZ - 1] = '\0';
-    /* convert each instance of whitespace (tabs, consecutive spaces)
-       into a single space; leading and trailing spaces are stripped */
-    mungspaces(buf);
-
-    /* remove trailing comment, if any (this isn't strictly needed for
-       individual symbols, and it won't matter if "X#comment" without
-       separating space slips through; for handling or set description,
-       symbol set creator is responsible for preceding '#' with a space
-       and that comment itself doesn't contain " #") */
-    if ((commentp = rindex(buf, '#')) != 0 && commentp[-1] == ' ')
-        commentp[-1] = '\0';
-
-    /* find the '=' or ':' */
-    bufp = index(buf, '=');
-    altp = index(buf, ':');
-    if (!bufp || (altp && altp < bufp))
-        bufp = altp;
-    if (!bufp) {
-        if (strncmpi(buf, "finish", 6) == 0) {
-            /* end current graphics set */
-            if (g.chosen_symset_start)
-                g.chosen_symset_end = TRUE;
-            g.chosen_symset_start = FALSE;
-            return 1;
-        }
-        config_error_add("No \"finish\"");
-        return 0;
-    }
-    /* skip '=' and space which follows, if any */
-    ++bufp;
-    if (*bufp == ' ')
-        ++bufp;
-
-    symp = match_sym(buf);
-    if (!symp) {
-        config_error_add("Unknown sym keyword");
-        return 0;
-    }
-
-    if (!g.symset[which_set].name) {
-        /* A null symset name indicates that we're just
-           building a pick-list of possible symset
-           values from the file, so only do that */
-        if (symp->range == SYM_CONTROL) {
-            struct symsetentry *tmpsp, *lastsp;
-
-            for (lastsp = g.symset_list; lastsp; lastsp = lastsp->next)
-                if (!lastsp->next)
-                    break;
-            switch (symp->idx) {
-            case 0:
-                tmpsp = (struct symsetentry *) alloc(sizeof *tmpsp);
-                tmpsp->next = (struct symsetentry *) 0;
-                if (!lastsp)
-                    g.symset_list = tmpsp;
-                else
-                    lastsp->next = tmpsp;
-                tmpsp->idx = g.symset_count++;
-                tmpsp->name = dupstr(bufp);
-                tmpsp->desc = (char *) 0;
-                tmpsp->handling = H_UNK;
-                /* initialize restriction bits */
-                tmpsp->nocolor = 0;
-                tmpsp->primary = 0;
-                tmpsp->rogue = 0;
-                break;
-            case 2:
-                /* handler type identified */
-                tmpsp = lastsp; /* most recent symset */
-                for (i = 0; known_handling[i]; ++i)
-                    if (!strcmpi(known_handling[i], bufp)) {
-                        tmpsp->handling = i;
-                        break; /* for loop */
-                    }
-                break;
-            case 3:
-                /* description:something */
-                tmpsp = lastsp; /* most recent symset */
-                if (tmpsp && !tmpsp->desc)
-                    tmpsp->desc = dupstr(bufp);
-                break;
-            case 5:
-                /* restrictions: xxxx*/
-                tmpsp = lastsp; /* most recent symset */
-                for (i = 0; known_restrictions[i]; ++i) {
-                    if (!strcmpi(known_restrictions[i], bufp)) {
-                        switch (i) {
-                        case 0:
-                            tmpsp->primary = 1;
-                            break;
-                        case 1:
-                            tmpsp->rogue = 1;
-                            break;
-                        }
-                        break; /* while loop */
-                    }
-                }
-                break;
-            }
-        }
-        return 1;
-    }
-    if (symp->range) {
-        if (symp->range == SYM_CONTROL) {
-            switch (symp->idx) {
-            case 0:
-                /* start of symset */
-                if (!strcmpi(bufp, g.symset[which_set].name)) {
-                    /* matches desired one */
-                    g.chosen_symset_start = TRUE;
-                    /* these init_*() functions clear symset fields too */
-                    if (which_set == ROGUESET)
-                        init_rogue_symbols();
-                    else if (which_set == PRIMARY)
-                        init_primary_symbols();
-                }
-                break;
-            case 1:
-                /* finish symset */
-                if (g.chosen_symset_start)
-                    g.chosen_symset_end = TRUE;
-                g.chosen_symset_start = FALSE;
-                break;
-            case 2:
-                /* handler type identified */
-                if (g.chosen_symset_start)
-                    set_symhandling(bufp, which_set);
-                break;
-            /* case 3: (description) is ignored here */
-            case 4: /* color:off */
-                if (g.chosen_symset_start) {
-                    if (bufp) {
-                        if (!strcmpi(bufp, "true") || !strcmpi(bufp, "yes")
-                            || !strcmpi(bufp, "on"))
-                            g.symset[which_set].nocolor = 0;
-                        else if (!strcmpi(bufp, "false")
-                                 || !strcmpi(bufp, "no")
-                                 || !strcmpi(bufp, "off"))
-                            g.symset[which_set].nocolor = 1;
-                    }
-                }
-                break;
-            case 5: /* restrictions: xxxx*/
-                if (g.chosen_symset_start) {
-                    int n = 0;
-
-                    while (known_restrictions[n]) {
-                        if (!strcmpi(known_restrictions[n], bufp)) {
-                            switch (n) {
-                            case 0:
-                                g.symset[which_set].primary = 1;
-                                break;
-                            case 1:
-                                g.symset[which_set].rogue = 1;
-                                break;
-                            }
-                            break; /* while loop */
-                        }
-                        n++;
-                    }
-                }
-                break;
-            }
-        } else { /* !SYM_CONTROL */
-            val = sym_val(bufp);
-            if (g.chosen_symset_start) {
-                if (which_set == PRIMARY) {
-                    update_primary_symset(symp, val);
-                } else if (which_set == ROGUESET) {
-                    update_rogue_symset(symp, val);
-                }
-            }
-        }
-    }
-    return 1;
-}
-
-static void
-set_symhandling(char *handling, int which_set)
-{
-    int i = 0;
-
-    g.symset[which_set].handling = H_UNK;
-    while (known_handling[i]) {
-        if (!strcmpi(known_handling[i], handling)) {
-            g.symset[which_set].handling = i;
-            return;
-        }
-        i++;
-    }
 }
 
 /* ----------  END SYMSET FILE HANDLING ----------- */

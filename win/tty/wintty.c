@@ -97,7 +97,7 @@ struct window_procs tty_procs = {
 #ifdef MSDOS
      | WC_TILED_MAP | WC_ASCII_MAP
 #endif
-#if defined(WIN32CON)
+#if defined(WIN32)
      | WC_MOUSE_SUPPORT
 #endif
      | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
@@ -109,7 +109,12 @@ struct window_procs tty_procs = {
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
      | WC2_RESET_STATUS
 #endif
-     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES),
+     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES)
+     | WC2_U_UTF8STR
+#if !defined(NO_TERMS) || defined(WIN32)
+     | WC2_U_24BITCOLOR
+#endif
+    ,
 #ifdef TEXTCOLOR
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
 #else
@@ -118,7 +123,8 @@ struct window_procs tty_procs = {
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,
     tty_create_nhwindow, tty_clear_nhwindow, tty_display_nhwindow,
-    tty_destroy_nhwindow, tty_curs, tty_putstr, genl_putmixed,
+    tty_destroy_nhwindow, tty_curs, tty_putstr,
+    tty_putmixed,
     tty_display_file, tty_start_menu, tty_add_menu, tty_end_menu,
     tty_select_menu, tty_message_menu, tty_update_inventory, tty_mark_synch,
     tty_wait_synch,
@@ -159,6 +165,7 @@ struct DisplayDesc *ttyDisplay; /* the tty display descriptor */
 
 extern void cmov(int, int);   /* from termcap.c */
 extern void nocmov(int, int); /* from termcap.c */
+
 #if defined(UNIX) || defined(VMS)
 static char obuf[BUFSIZ]; /* BUFSIZ is defined in stdio.h */
 #endif
@@ -230,6 +237,9 @@ static void shrink_dlvl(int);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
 static void status_sanity_check(void);
 #endif /* NH_DEVEL_STATUS */
+#endif
+#if !defined(NO_TERMS) && !defined(WIN32)
+void g_pututf8(uint8 *utf8str);
 #endif
 
 /*
@@ -442,6 +452,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     /* set up tty descriptor */
     ttyDisplay = (struct DisplayDesc *) alloc(sizeof (struct DisplayDesc));
     ttyDisplay->toplin = TOPLINE_EMPTY;
+    ttyDisplay->topl_utf8 = 0;  /* putmixed may set this */
     ttyDisplay->rows = hgt;
     ttyDisplay->cols = wid;
     ttyDisplay->curx = ttyDisplay->cury = 0;
@@ -2344,9 +2355,14 @@ process_text_window(winid window, struct WinDesc *cw)
                  ) {
                 /* message recall for msg_window:full/combination/reverse
                    might have output from '/' in it (see redotoplin()) */
-                if (linestart && (*cp & 0x80) != 0) {
-                    g_putch(*cp);
-                    end_glyphout();
+                if (linestart) {
+                    if (SYMHANDLING(H_UTF8)) {
+                        /* FIXME: what is actually in that line? is it the \GNNNNNNNN or UTF-8? */
+                        g_putch(*cp);
+                    } else if ((*cp & 0x80) != 0) {
+                        g_putch(*cp);
+                        end_glyphout();
+                    }
                     linestart = FALSE;
                 } else {
                     (void) putchar(*cp);
@@ -3367,8 +3383,11 @@ g_putch(int in_ch)
     register char ch = (char) in_ch;
 
     HUPSKIP();
+
 #if defined(ASCIIGRAPH) && !defined(NO_TERMS)
-    if (SYMHANDLING(H_IBM)
+    if (SYMHANDLING(H_UTF8)) {
+        (void) putchar(ch);
+    } else if (SYMHANDLING(H_IBM)
         /* for DECgraphics, lower-case letters with high bit set mean
            switch character set and render with high bit clear;
            user might want 8-bits for other characters */
@@ -3395,6 +3414,17 @@ g_putch(int in_ch)
 
 #endif /* ASCIIGRAPH && !NO_TERMS */
 
+    return;
+}
+
+void
+g_pututf8(uint8 *utf8str)
+{
+    HUPSKIP();
+    while (*utf8str) {
+        (void) putchar(*utf8str);
+        utf8str++;
+    }
     return;
 }
 #endif /* !WIN32 */
@@ -3458,6 +3488,11 @@ tty_print_glyph(winid window, xchar x, xchar y,
     boolean inverse_on = FALSE;
     int ch, color;
     unsigned special;
+#ifdef ENHANCED_SYMBOLS
+#if !defined(NO_TERMS) || defined(WIN32)
+    boolean color24bit_on = FALSE;
+#endif
+#endif
 
     HUPSKIP();
 #ifdef CLIPPING
@@ -3468,7 +3503,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
 #endif
     /* get glyph ttychar, color, and special flags */
     ch = glyphinfo->ttychar;
-    color = glyphinfo->gm.color;
+    color = glyphinfo->gm.sym.color;
     special = glyphinfo->gm.glyphflags;
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
@@ -3484,24 +3519,33 @@ tty_print_glyph(winid window, xchar x, xchar y,
         backsp();
     }
 #endif
-
+    if (iflags.use_color) {
 #ifdef TEXTCOLOR
-    if (iflags.wizmgender && (special & MG_FEMALE) && iflags.use_inverse) {
-        if (ttyDisplay->color != NO_COLOR)
-            term_end_color();
-        term_start_attr(ATR_INVERSE);
-        inverse_on = TRUE;
-        ttyDisplay->color = CLR_RED;
-        term_start_color(ttyDisplay->color);
-    } else if (color != ttyDisplay->color) {
-        if (ttyDisplay->color != NO_COLOR)
-            term_end_color();
-        ttyDisplay->color = color;
-        if (color != NO_COLOR)
-            term_start_color(color);
-    }
+        if (color != ttyDisplay->color) {
+            if (ttyDisplay->color != NO_COLOR)
+                term_end_color();
+        }
+#endif
+#if !defined(NO_TERMS) || defined(WIN32)
+#ifdef ENHANCED_SYMBOLS
+        /* we don't link with termcap.o if NO_TERMS is defined */
+        if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
+            && glyphinfo->gm.u && glyphinfo->gm.u->ucolor) {
+            term_start_24bitcolor(glyphinfo->gm.u);
+            color24bit_on = TRUE;
+        } else 
+#endif
+#endif
+        {
+#ifdef TEXTCOLOR
+            ttyDisplay->color = color;
+            if (color != NO_COLOR)
+                term_start_color(color);
 #endif /* TEXTCOLOR */
-
+#if !defined(NO_TERMS) || defined(WIN32)
+        }
+#endif
+    }   /* iflags.use_color aka iflags.wc_color */
     /* must be after color check; term_end_color may turn off inverse too;
        BW_LAVA and BW_ICE won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
@@ -3519,21 +3563,34 @@ tty_print_glyph(winid window, xchar x, xchar y,
         xputg(glyphinfo);
     else
 #endif
-        g_putch(ch); /* print the character */
-
-    if (inverse_on) {
+#ifdef ENHANCED_SYMBOLS
+    if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)
+            && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
+        /* we have a sequence to do */
+        g_pututf8(glyphinfo->gm.u->utf8str);
+    } else
+#endif
+    g_putch(ch); /* print the character */
+   
+    if (inverse_on)
         term_end_attr(ATR_INVERSE);
+    if (iflags.use_color) {
 #ifdef TEXTCOLOR
         /* turn off color as well, turning off ATR_INVERSE may have done
-           this already and if so, we won't know the current state unless
-           we do it explicitly */
+          this already and if so, we won't know the current state unless
+          we do it explicitly */
         if (ttyDisplay->color != NO_COLOR) {
             term_end_color();
             ttyDisplay->color = NO_COLOR;
         }
 #endif
+#ifdef ENHANCED_SYMBOLS
+#if !defined(NO_TERMS) || defined(WIN32)
+        if (color24bit_on)
+            term_end_24bitcolor();
+#endif
+#endif
     }
-
     print_vt_code1(AVTC_GLYPH_END);
 
     wins[window]->curx++; /* one character over */
@@ -3688,6 +3745,31 @@ tty_update_positionbar(char *posbar)
 }
 #endif /* POSITIONBAR */
 
+void
+tty_putmixed(winid window, int attr, const char *str)
+{
+    struct WinDesc *cw;
+    char buf[BUFSZ];
+#ifdef ENHANCED_SYMBOLS
+    int utf8flag = 0;
+#endif
+
+    if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0) {
+        tty_raw_print(str);
+        return;
+    }
+#ifdef ENHANCED_SYMBOLS
+    if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
+        mixed_to_utf8(buf, sizeof buf, str, &utf8flag);
+        if (cw->type == NHW_MESSAGE)
+            ttyDisplay->topl_utf8 = utf8flag;
+    } else
+#endif
+        decode_mixed(buf, str);
+    /* now send it to the normal tty_putstr */
+    tty_putstr(window, attr, buf);
+    ttyDisplay->topl_utf8 = 0;
+}
 
 /*
  * +------------------+

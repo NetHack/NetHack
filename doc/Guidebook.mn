@@ -36,7 +36,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "February 27, 2022
+.ds f2 "May 7, 2022
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5517,6 +5517,41 @@ Statues and boulders are the rock being referred to, but since
 version 3.6.0, statues are displayed as the monster they depict.
 So S_rock is only used for boulders and not used at all if
 overridden by the more specific S_boulder.
+.pg
+.hn 2
+Customizing Map Glyph Representations Using Unicode
+.pg
+If your platform or terminal supports the display of UTF-8 character
+sequences, you can customize your game display by assigning Unicode
+codepoint values and \fIred-green-blue\fP colors to glyph
+representations. The customizations can be specified for use with a symset that
+has a UTF8 handler within the symbols file such as the enhanced1 set, or 
+individually within your nethack.rc file.
+
+.pg
+The format for defining a glyph representation is:
+.SD n
+\f(CROPTIONS=glyph:glyphid\fIU+nnnn\fP/\fIR-G-B\fP\fP
+.ED
+.pg
+The window port that is active needs to provide support for displaying
+UTF-8 character sequences and explicit red-green-blue colors in order
+for the glyph representation to be visible.
+For example, the following line in your configuration file will cause
+the glyph representation for glyphid G_pool to use Unicode codepoint
+U+224B and the color represented by R-G-B value 0-0-160
+.SD n
+\f(CROPTIONS=glyph:G_pool/U+224B/0-0-160\fP
+.ED
+The list of acceptable glyphid's can be produced by 
+\fBnethack \-\-dumpglyphids\fP.
+Individual NetHack glyphs can be specified using the G_ prefix,
+or you can use an S_ symbol for a glyphid and store the custom
+representation for all NetHack glyphs that would map to that
+particular symbol.
+
+You will need to select a symset with a UTF8 handler to enable the
+display of the customizations, such as the Enhanced symset.
 .pg
 .hn 2
 Configuring NetHack for Play by the Blind

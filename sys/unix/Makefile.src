@@ -488,7 +488,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   rip.c rnd.c role.c rumors.c save.c sfstruct.c \
 	   shk.c shknam.c sit.c sounds.c \
 	   sp_lev.c spell.c steal.c steed.c symbols.c sys.c teleport.c \
-	   timeout.c topten.c track.c trap.c u_init.c \
+	   timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
@@ -580,8 +580,8 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)symbols.o $(TARGETPFX)sys.o $(TARGETPFX)steal.o \
 	$(TARGETPFX)steed.o $(TARGETPFX)teleport.o $(TARGETPFX)timeout.o \
 	$(TARGETPFX)topten.o $(TARGETPFX)track.o $(TARGETPFX)trap.o \
-	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)vault.o \
-	$(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
+	$(TARGETPFX)u_init.o $(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o \
+	$(TARGETPFX)vault.o $(TARGETPFX)vision.o $(TARGETPFX)weapon.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
 	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \

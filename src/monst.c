@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "permonst.h"
+#include "wintype.h"
 #include "sym.h"
 
 #ifdef C

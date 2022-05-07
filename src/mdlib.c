@@ -16,6 +16,7 @@
 #include "config.h"
 #include "permonst.h"
 #include "objclass.h"
+#include "wintype.h"
 #include "sym.h"
 #include "artilist.h"
 #include "dungeon.h"

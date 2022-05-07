@@ -7,6 +7,9 @@
 #include "hack.h"
 #include "color.h"
 #include "wincurs.h"
+#ifdef CURSES_UNICODE
+#include "locale.h"
+#endif
 
 /* define this if not linking with <foo>tty.o|.obj for some reason */
 #ifdef CURSES_DEFINE_ERASE_CHAR
@@ -41,6 +44,9 @@ struct window_procs curses_procs = {
 #endif
      | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
     (WC2_DARKGRAY | WC2_HITPOINTBAR
+#ifdef CURSES_UNICODE
+     | WC2_U_UTF8STR
+#endif
 #ifdef SELECTSAVED
      | WC2_SELECTSAVED
 #endif
@@ -148,6 +154,10 @@ curses_init_nhwindows(int *argcp UNUSED,
 {
 #ifdef PDCURSES
     char window_title[BUFSZ];
+#endif
+
+#ifdef CURSES_UNICODE
+    setlocale(LC_CTYPE, "");
 #endif
 
 #ifdef XCURSES
@@ -760,7 +770,7 @@ curses_print_glyph(winid wid, xchar x, xchar y,
     glyph = glyphinfo->glyph;
     special = glyphinfo->gm.glyphflags;
     ch = glyphinfo->ttychar;
-    color = glyphinfo->gm.color;
+    color = glyphinfo->gm.sym.color;
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }
@@ -789,7 +799,17 @@ curses_print_glyph(winid wid, xchar x, xchar y,
         }
     }
 
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8)
+        && glyphinfo->gm.u
+        && glyphinfo->gm.u->utf8str) {
+        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color, attr);
+    } else {
+        curses_putch(wid, x, y, ch, NULL, color, attr);
+    }
+#else
     curses_putch(wid, x, y, ch, color, attr);
+#endif
 }
 
 /*

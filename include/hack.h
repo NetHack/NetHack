@@ -183,6 +183,7 @@ typedef struct {
 
 #include "align.h"
 #include "dungeon.h"
+#include "wintype.h"
 #include "sym.h"
 #include "mkroom.h"
 
@@ -199,7 +200,6 @@ enum misc_arti_nums {
 
 #include "objclass.h"
 #include "youprop.h"
-#include "wintype.h"
 #include "context.h"
 #include "rm.h"
 #include "botl.h"

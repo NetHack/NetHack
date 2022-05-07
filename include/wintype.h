@@ -5,6 +5,8 @@
 #ifndef WINTYPE_H
 #define WINTYPE_H
 
+#include "integer.h"
+
 typedef int winid; /* a window identifier */
 
 /* generic parameter - must not be any larger than a pointer */
@@ -60,15 +62,28 @@ typedef struct mi {
 } menu_item;
 #define MENU_ITEM_P struct mi
 
-/* These would be in display.h if they weren't needed to define
-   the windowproc interface for X11 which doesn't seem to include
-   the main NetHack header files */
+/* These would be in sym.h and display.h if they weren't needed to
+   define the windowproc interface for X11 which doesn't include
+   most of the main NetHack header files */
 
-typedef struct glyph_map_entry {
+struct classic_representation {
     int color;
     int symidx;
+};
+
+struct unicode_representation {
+    uint32 ucolor;
+    uint16 u256coloridx;
+    uint8 *utf8str;
+};
+
+typedef struct glyph_map_entry {
     unsigned glyphflags;
+    struct classic_representation sym;
     short int tileidx;
+#ifdef ENHANCED_SYMBOLS
+    struct unicode_representation *u;
+#endif
 } glyph_map;
 
 /* glyph plus additional info

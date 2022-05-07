@@ -1455,7 +1455,7 @@ goto_level(
     }
 
     if (Is_rogue_level(newlevel) || Is_rogue_level(&u.uz))
-        assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARY);
+        assign_graphics(Is_rogue_level(newlevel) ? ROGUESET : PRIMARYSET);
     check_gold_symbol();
     /* record this level transition as a potential seen branch unless using
      * some non-standard means of transportation (level teleport).
