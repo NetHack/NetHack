@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1648428945 2022/03/28 00:55:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.471 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1651909086 2022/05/07 07:38:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.479 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4502,7 +4502,7 @@ dountrap(void)
     return untrap(FALSE, 0, 0, (struct obj *) 0) ? ECMD_TIME : ECMD_OK;
 }
 
-/* the #untrap command - disarm a trap */
+/* preliminary checks for dountrap(); also used for autounlock */
 int
 could_untrap(boolean verbosely, boolean check_floor)
 {
