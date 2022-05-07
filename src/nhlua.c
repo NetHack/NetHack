@@ -1754,42 +1754,127 @@ RESTORE_WARNINGS
  ***/
 #ifdef NHL_SANDBOX
 
+enum ewhen {NEVER, IFFLAG, EOT};
+struct e {
+    enum ewhen when;
+    const char *fnname;
+};
+
 /* NHL_BASE_BASE - safe things */
-static const char *ct_base_base[] = {
-    "ipairs", "next", "pairs", "pcall", "rawequal", "rawlen", "select",
-    "tonumber", "tostring", "type", "xpcall", NULL
+static struct e ct_base_base[] = {
+    {IFFLAG, "ipairs"},
+    {IFFLAG, "next"},
+    {IFFLAG, "pairs"},
+    {IFFLAG, "pcall"},
+    {IFFLAG, "select"},
+    {IFFLAG, "tonumber"},
+    {IFFLAG, "tostring"},
+    {IFFLAG, "type"},
+    {IFFLAG, "xpcall"},
+    {EOT, NULL}
 };
 
 /* NHL_BASE_ERROR - not really safe - might not want Lua to kill the process */
-static const char *ct_base_error[] = {
-    "assert",   /* ok, calls error */
-    "error",    /* ok, calls G->panic */
-    /* "print",	not ok - calls lua_writestring/lua_writeline -> stdout*/
-    /* "warn",	not ok - calls lua_writestringerror -> stderr */
-    NULL
+static struct e ct_base_error[] = {
+    {IFFLAG, "assert"},   /* ok, calls error */
+    {IFFLAG, "error"},    /* ok, calls G->panic */
+    {NEVER, "print"}, /*not ok - calls lua_writestring/lua_writeline -> stdout*/
+    {NEVER, "warn"}, /*not ok - calls lua_writestringerror -> stderr*/
+    {EOT, NULL}
 };
 
 /* NHL_BASE_META - metatable access */
-static const char *ct_base_meta[] = {
-    "getmetatable", "rawget", "rawset", "setmetatable", NULL
+static struct e ct_base_meta[] = {
+    {IFFLAG, "getmetatable"},
+    {IFFLAG, "rawequal"},
+    {IFFLAG, "rawget"},
+    {IFFLAG, "rawlen"},
+    {IFFLAG, "rawset"},
+    {IFFLAG, "setmetatable"},
+    {EOT, NULL}
 };
 
 /* NHL_BASE_GC - questionable safety */
-static const char *ct_base_iffy[] = {
-    "collectgarbage", NULL
+static struct e ct_base_iffy[] = {
+    {IFFLAG, "collectgarbage"},
+    {EOT, NULL}
 };
 
 /* NHL_BASE_UNSAFE - include only if required */
-static const char *ct_base_unsafe[] = {
-    "dofile", "loadfile", "load", NULL
+static struct e ct_base_unsafe[] = {
+    {IFFLAG, "dofile"},
+    {IFFLAG, "loadfile"},
+    {IFFLAG, "load"},
+    {EOT, NULL}
 };
 
+/* no ct_co_ tables; all fns at same level of concern */
+/* no ct_string_ tables; all fns at same level of concern */
+/* no ct_table_ tables; all fns at same level of concern (but
+   sort can take a lot of time and can't be caught by the step limit */
+/* no ct_utf8_ tables; all fns at same level of concern */
+
+
+/* possible ct_debug tables - likely to need changes */
+static struct e ct_debug_debug[] = {
+    {NEVER,  "debug"},		/* uses normal I/O so needs re-write */
+    {IFFLAG, "getuservalue"},
+    {NEVER,  "gethook"},	/* see sethook */
+    {IFFLAG, "getinfo"},
+    {IFFLAG, "getlocal"},
+    {IFFLAG, "getregistry"},
+    {IFFLAG, "getmetatable"},
+    {IFFLAG, "getupvalue"},
+    {IFFLAG, "upvaluejoin"},
+    {IFFLAG, "upvalueid"},
+    {IFFLAG, "setuservalue"},
+    {NEVER,  "sethook"},	/* used for memory and step limits */
+    {IFFLAG, "setlocal"},
+    {IFFLAG, "setmetatable"},
+    {IFFLAG, "setupvalue"},
+    {IFFLAG, "setcstacklimit"},
+    {EOT, NULL}
+};
+static struct e ct_debug_safe[] = {
+    {IFFLAG, "traceback"},
+    {EOT, NULL}
+};
+
+/* possible ct_os_ tables */
+static struct e ct_os_time[] = {
+    {IFFLAG, "clock"},		/* is this portable? XXX */
+    {IFFLAG, "date"},
+    {IFFLAG, "difftime"},
+    {IFFLAG, "time"},
+    {EOT, NULL}
+};
+
+static struct e ct_os_files[] = {
+    {NEVER, "execute"},		/* not portable */
+    {NEVER, "exit"},
+    {NEVER, "getenv"},
+    {IFFLAG, "remove"},
+    {IFFLAG, "rename"},
+    {NEVER, "setlocale"},
+    {NEVER, "tmpname"},
+    {EOT, NULL}
+};
+
+
+#define DROPIF(flag, lib, ct) \
+    nhl_clearfromtable(L, !!(lflags & flag), lib, ct)
+
 static void
-nhl_clearfromtable(lua_State *L, int tndx, const char **todo)
+nhl_clearfromtable(lua_State *L, int flag, int tndx, struct e *todo)
 {
-    while(*todo){
+    while(todo->when != EOT){
 	lua_pushnil(L);
-	lua_setfield(L, tndx, *todo++);
+		/* if we load the library at all, NEVER items must be erased
+		 * and IFFLAG items should be erased if !flag */
+	if(todo->when==NEVER || !flag) {
+	    lua_setfield(L, tndx, todo->fnname);
+	}
+	todo++;
     }
 }
 #endif
@@ -2014,27 +2099,14 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 #ifdef NHL_SANDBOX
 static void
 nhlL_openlibs(lua_State *L, uint32_t lflags){
-    uint32_t needbase;
-
 	/* translate lflags from user-friendly to internal */
     if (NHL_SB_DEBUGGING & lflags){
-#if 1	/* XXX */
-	lflags |= NHL_SB_DB;
-/* XXX
-Should these be available as safe or as a low level group?
-debug.getinfo
-debug.traceback?
-*/
-#endif
+	lflags |= NHL_SB_DB_SAFE;
     }
 	/* only for debugging the sandbox integration */
     if (NHL_SB_ALL & lflags){
 	lflags = -1;
-    } else if ((NHL_SB_SAFE
-#ifdef notyet
-|NHL_SB_CANREAD
-#endif
-	    ) & lflags){
+    } else if (NHL_SB_SAFE & lflags){
 	lflags |= NHL_SB_BASE_BASE;
 	lflags |= NHL_SB_COROUTINE;
 	lflags |= NHL_SB_TABLE;
@@ -2043,30 +2115,22 @@ debug.traceback?
 	lflags |= NHL_SB_UTF8;
     } else if (NHL_SB_VERSION){
 	lflags |= NHL_SB_BASE_BASE;
+    }
 #ifdef notyet
-    } else if (NHL_SB_CANREAD & lflags){
-/* QQQ */
-/*
-canread may be wrong.
-How about:
-    - sets of fns (as below, as base)
+/*  Handling I/O is complex, so it's not available yet.  I'll
+finish it if and when we need it. (keni)
     - hooked open; array of tuples of (r/w/rw/a/etc, directory pat, file pat)
 
-XXX
-really don't have anything here
-because IO is too broad?
-we need to split it like BASE - load then delete:
-SAFEIO:
 {"close", io_close},	but with no args closes default output, so needs hook
 {"flush", io_flush},
 {"lines", io_lines},	hook due to filename
-{"open", io_open},  but we need a hooked version:
+{"open", io_open},  hooked version:
     only safe if mode not present or == "r"
 	or WRITEIO
     only safe if path has no slashes
 	XXX probably need to be: matches port-specific list of paths
 	WRITEIO needs a different list
-    dlb integration?????
+    dlb integration?
     may need to #define l_getc (but that wouldn't hook core)
 	may need to #define fopen/fread/fwrite/feof/ftell (etc?)
 	ugh: lauxlib.c uses getc() below luaL_loadfilex
@@ -2084,39 +2148,24 @@ UNSAFEIO:
   {"tmpfile", io_tmpfile},
 */
 #endif
-    }
 
-/*
-multiple levels - io.*, FILE.* - can we hook FILE.*?
-  see liolib.c:{meta, createmeta, luaopen_io}
-// do we need anything else? meta?
-*/
-
-    needbase = lflags & NHL_SB_BASEMASK;
-    if(needbase){
+    if(lflags & NHL_SB_BASEMASK){
+	int baselib;
+	    /* load the entire library ... */
 	luaL_requiref(L, LUA_GNAME, luaopen_base, 1);
-	int baselib = lua_gettop(L);
 
-	    /* now remove everything not requested */
-	uint16_t rejectflags = ~lflags;
-#define DROPIF(flag, x, table) \
-    if(rejectflags & flag){ nhl_clearfromtable(L, x, table); }
+	baselib = lua_gettop(L);
 
+	    /* ... and remove anything unsupported or not requested */
 	DROPIF(NHL_SB_BASE_BASE, baselib, ct_base_base);
 	DROPIF(NHL_SB_BASE_ERROR, baselib, ct_base_error);
 	DROPIF(NHL_SB_BASE_META, baselib, ct_base_meta);
 	DROPIF(NHL_SB_BASE_GC, baselib, ct_base_iffy);
 	DROPIF(NHL_SB_BASE_UNSAFE, baselib, ct_base_unsafe);
-#undef DROPIF
+
 	lua_pop(L, 1);
     }
 
-#ifdef notyet
-    if(lflags & NHL_SB_PACKAGE){
-	luaL_requiref(L, LUA_LOADLIBNAME, luaopen_package, 1);
-	lua_pop(L, 1);
-    }
-#endif
     if(lflags & NHL_SB_COROUTINE){
 	luaL_requiref(L, LUA_COLIBNAME, luaopen_coroutine, 1);
 	lua_pop(L, 1);
@@ -2132,12 +2181,16 @@ multiple levels - io.*, FILE.* - can we hook FILE.*?
 	if(!hook_open(L))
 	    panic("can't hook io.open");
     }
-// maybe ok: time, difftime, getenv clock date
-    if(lflags & NHL_SB_OS){
+#endif
+    if(lflags & NHL_SB_OSMASK){
+	int oslib;
 	luaL_requiref(L, LUA_OSLIBNAME, luaopen_os, 1);
+	oslib = lua_gettop(L);
+	DROPIF(NHL_SB_OS_TIME, oslib, ct_os_time);
+	DROPIF(NHL_SB_OS_FILES, oslib, ct_os_files);
 	lua_pop(L, 1);
     }
-#endif
+
     if(lflags & NHL_SB_STRING){
 	luaL_requiref(L, LUA_STRLIBNAME, luaopen_string, 1);
 	lua_pop(L, 1);
@@ -2153,8 +2206,12 @@ multiple levels - io.*, FILE.* - can we hook FILE.*?
 	luaL_requiref(L, LUA_UTF8LIBNAME, luaopen_utf8, 1);
 	lua_pop(L, 1);
     }
-    if(lflags & NHL_SB_DB){
+    if(lflags & NHL_SB_DBMASK){
+	int dblib;
 	luaL_requiref(L, LUA_DBLIBNAME, luaopen_debug, 1);
+	dblib = lua_gettop(L);
+	DROPIF(NHL_SB_DB_DB, dblib, ct_debug_debug);
+	DROPIF(NHL_SB_DB_SAFE, dblib, ct_debug_safe);
 	lua_pop(L, 1);
     }
 }

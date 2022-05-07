@@ -514,12 +514,7 @@ typedef struct nhl_sandbox_info {
 #define NHL_SB_SAFE        0x80000000
     /* Access to Lua version information. */
 #define NHL_SB_VERSION     0x40000000
-#ifdef notyet
-    /* XXX These need to be replaced. */
-#define NHL_SB_CANREAD     0x20000000
-#define NHL_SB_CANWRITE    0x10000000
-#endif
-    /* Debugging library - highly unsafe. */
+    /* Debugging library - mostly unsafe. */
 #define NHL_SB_DEBUGGING   0x08000000
     /* Use with memlimit/steps/perpcall to get usage. */
 #define NHL_SB_REPORT      0x04000000
@@ -528,24 +523,30 @@ typedef struct nhl_sandbox_info {
 
 /* Low level groups.  If you need these, you probably need to define
  * a new high level group instead. */
-#define NHL_SB_DB          0x00000001
-#define NHL_SB_STRING      0x00000002
-#define NHL_SB_TABLE       0x00000004
-#define NHL_SB_COROUTINE   0x00000008
-#define NHL_SB_MATH        0x00000010
-#define NHL_SB_UTF8        0x00000020
+#define NHL_SB_STRING      0x00000001
+#define NHL_SB_TABLE       0x00000002
+#define NHL_SB_COROUTINE   0x00000004
+#define NHL_SB_MATH        0x00000008
+#define NHL_SB_UTF8        0x00000010
 #ifdef notyet
-#define NHL_SB_PACKAGE     0x00000040
-#define NHL_SB_IO          0x00000080
-#define NHL_SB_OS          0x00000100
+#define NHL_SB_IO          0x00000020
 #endif
+#define NHL_SB_OS          0x00000040
 
-#define NHL_SB_BASEMASK    0x0001f000
-#define NHL_SB_BASE_BASE   0x00001000
-#define NHL_SB_BASE_ERROR  0x00002000
-#define NHL_SB_BASE_META   0x00004000
-#define NHL_SB_BASE_GC     0x00008000
-#define NHL_SB_BASE_UNSAFE 0x00010000
+#define NHL_SB_BASEMASK    0x00000f80
+#define NHL_SB_BASE_BASE   0x00000080
+#define NHL_SB_BASE_ERROR  0x00000100
+#define NHL_SB_BASE_META   0x00000200
+#define NHL_SB_BASE_GC     0x00000400
+#define NHL_SB_BASE_UNSAFE 0x00000800
+
+#define NHL_SB_DBMASK      0x00003000
+#define NHL_SB_DB_DB       0x00001000
+#define NHL_SB_DB_SAFE     0x00002000
+
+#define NHL_SB_OSMASK      0x0000c000
+#define NHL_SB_OS_TIME     0x00004000
+#define NHL_SB_OS_FILES    0x00008000
 
 #define NHL_SB_ALL         0x0000ffff
 
