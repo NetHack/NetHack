@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.906 $ $NHDT-Date: 1651886993 2022/05/07 01:29:53 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.907 $ $NHDT-Date: 1651908301 2022/05/07 07:25:01 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -903,6 +903,10 @@ using wizard mode ^V in endgame to return to previously visited Plane of Water
 	likewise for clouds on Plane of Air
 on tty at least, "version incompatibility for save/123xyzzy" was invisible:
 	a blank message of appropriate length followed by --More--
+fix a pair of off-by-one bugs when doling out initial characteristics points,
+	resulting in an unintentional bias toward Str and away from Cha;
+	negligible effect on individual games but had a minor cumulative
+	effect across a large set of games
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

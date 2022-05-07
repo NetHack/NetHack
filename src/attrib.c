@@ -1,4 +1,4 @@
-/* NetHack 3.7	attrib.c	$NHDT-Date: 1626312521 2021/07/15 01:28:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	attrib.c	$NHDT-Date: 1651908297 2022/05/07 07:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
 /*      Copyright 1988, 1989, 1990, 1992, M. Stephenson           */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -459,14 +459,11 @@ exerper(void)
 {
     if (!(g.moves % 10)) {
         /* Hunger Checks */
-
-        int hs = (u.uhunger > 1000) ? SATIATED : (u.uhunger > 150)
-                                                     ? NOT_HUNGRY
-                                                     : (u.uhunger > 50)
-                                                           ? HUNGRY
-                                                           : (u.uhunger > 0)
-                                                                 ? WEAK
-                                                                 : FAINTING;
+        int hs = (u.uhunger > 1000) ? SATIATED
+                 : (u.uhunger > 150) ? NOT_HUNGRY
+                   : (u.uhunger > 50) ? HUNGRY
+                     : (u.uhunger > 0) ? WEAK
+                       : FAINTING;
 
         debugpline0("exerper: Hunger checks");
         switch (hs) {
@@ -578,19 +575,13 @@ exerchk(void)
                 goto nextattrib;
 
             debugpline2("exerchk: testing %s (%d).",
-                        (i == A_STR)
-                            ? "Str"
-                            : (i == A_INT)
-                                  ? "Int?"
-                                  : (i == A_WIS)
-                                        ? "Wis"
-                                        : (i == A_DEX)
-                                              ? "Dex"
-                                              : (i == A_CON)
-                                                    ? "Con"
-                                                    : (i == A_CHA)
-                                                          ? "Cha?"
-                                                          : "???",
+                        (i == A_STR) ? "Str"
+                        : (i == A_INT) ? "Int?"
+                          : (i == A_WIS) ? "Wis"
+                            : (i == A_DEX) ? "Dex"
+                              : (i == A_CON) ? "Con"
+                                : (i == A_CHA) ? "Cha?"
+                                  : "???",
                         ax);
             /*
              *  Law of diminishing returns (Part III):
@@ -617,10 +608,12 @@ exerchk(void)
             AEXE(i) = (abs(ax) / 2) * mod_val;
         }
         g.context.next_attrib_check += rn1(200, 800);
-        debugpline1("exerchk: next check at %ld.", g.context.next_attrib_check);
+        debugpline1("exerchk: next check at %ld.",
+                    g.context.next_attrib_check);
     }
 }
 
+/* allocate hero's initial characteristics */
 void
 init_attr(int np)
 {
@@ -632,15 +625,15 @@ init_attr(int np)
         np -= g.urole.attrbase[i];
     }
 
+    /* 3.7: the x -= ... calculation used to have an off by 1 error that
+       resulted in the values being biased toward Str and away from Cha */
     tryct = 0;
     while (np > 0 && tryct < 100) {
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
-            ;
-        if (i >= A_MAX)
-            continue; /* impossible */
-
-        if (ABASE(i) >= ATTRMAX(i)) {
+        for (i = 0; i < A_MAX; ++i)
+            if ((x -= g.urole.attrdist[i]) < 0)
+                break;
+        if (i >= A_MAX || ABASE(i) >= ATTRMAX(i)) {
             tryct++;
             continue;
         }
@@ -652,14 +645,11 @@ init_attr(int np)
 
     tryct = 0;
     while (np < 0 && tryct < 100) { /* for redistribution */
-
         x = rn2(100);
-        for (i = 0; (i < A_MAX) && ((x -= g.urole.attrdist[i]) > 0); i++)
-            ;
-        if (i >= A_MAX)
-            continue; /* impossible */
-
-        if (ABASE(i) <= ATTRMIN(i)) {
+        for (i = 0; i < A_MAX; ++i)
+            if ((x -= g.urole.attrdist[i]) < 0)
+                break;
+        if (i >= A_MAX || ABASE(i) <= ATTRMIN(i)) {
             tryct++;
             continue;
         }
