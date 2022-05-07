@@ -54,6 +54,10 @@ extern void exit(int);
 #endif
 #endif
 
+#if defined(CROSSCOMPILE) && defined(ENHANCED_SYMBOLS)
+#undef ENHANCED_SYMBOLS
+#endif
+
 struct {
     int idx;
     const char *tilelabel;
