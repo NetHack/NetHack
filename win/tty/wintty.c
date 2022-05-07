@@ -24,6 +24,12 @@ extern void msmsg(const char *, ...);
 #endif
 #endif
 
+#ifdef MSDOS
+#ifdef ENHANCED_SYMBOLS
+#undef ENHANCED_SYMBOLS
+#endif
+#endif /* MSDOS */
+
 #ifndef NO_TERMS
 #include "tcap.h"
 #endif
@@ -238,7 +244,7 @@ static void shrink_dlvl(int);
 static void status_sanity_check(void);
 #endif /* NH_DEVEL_STATUS */
 #endif
-#if !defined(NO_TERMS) && !defined(WIN32)
+#ifdef ENHANCED_SYMBOLS
 void g_pututf8(uint8 *utf8str);
 #endif
 
@@ -3416,7 +3422,9 @@ g_putch(int in_ch)
 
     return;
 }
+#endif /* !WIN32 */
 
+#if defined(ENHANCED_SYMBOLS) && defined(UNIX)
 void
 g_pututf8(uint8 *utf8str)
 {
@@ -3427,7 +3435,7 @@ g_pututf8(uint8 *utf8str)
     }
     return;
 }
-#endif /* !WIN32 */
+#endif /* ENHANCED_SYMBOLS && UNIX */
 
 #ifdef CLIPPING
 void
@@ -3485,13 +3493,11 @@ tty_print_glyph(winid window, xchar x, xchar y,
 #endif
                 const glyph_info *bkglyphinfo UNUSED)
 {
-    boolean inverse_on = FALSE;
+    boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
     int ch, color;
     unsigned special;
 #ifdef ENHANCED_SYMBOLS
-#if !defined(NO_TERMS) || defined(WIN32)
     boolean color24bit_on = FALSE;
-#endif
 #endif
 
     HUPSKIP();
@@ -3526,26 +3532,24 @@ tty_print_glyph(winid window, xchar x, xchar y,
                 term_end_color();
         }
 #endif
-#if !defined(NO_TERMS) || defined(WIN32)
 #ifdef ENHANCED_SYMBOLS
         /* we don't link with termcap.o if NO_TERMS is defined */
         if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
             && glyphinfo->gm.u && glyphinfo->gm.u->ucolor) {
             term_start_24bitcolor(glyphinfo->gm.u);
             color24bit_on = TRUE;
-        } else 
+            colordone = TRUE;
+        }
 #endif
-#endif
-        {
 #ifdef TEXTCOLOR
+        if (!colordone) {
             ttyDisplay->color = color;
             if (color != NO_COLOR)
                 term_start_color(color);
+	}
 #endif /* TEXTCOLOR */
-#if !defined(NO_TERMS) || defined(WIN32)
-        }
-#endif
     }   /* iflags.use_color aka iflags.wc_color */
+
     /* must be after color check; term_end_color may turn off inverse too;
        BW_LAVA and BW_ICE won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
@@ -3559,19 +3563,23 @@ tty_print_glyph(winid window, xchar x, xchar y,
     }
 
 #if defined(USE_TILES) && defined(MSDOS)
-    if (iflags.grmode && iflags.tile_view)
+    if (iflags.grmode && iflags.tile_view) {
         xputg(glyphinfo);
-    else
+        glyphdone = TRUE;
+    }
 #endif
 #ifdef ENHANCED_SYMBOLS
-    if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)
+    if (!glyphdone
+        && (tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)
             && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         /* we have a sequence to do */
         g_pututf8(glyphinfo->gm.u->utf8str);
-    } else
+        glyphdone = TRUE;
+    }
 #endif
-    g_putch(ch); /* print the character */
-   
+    if (!glyphdone)
+        g_putch(ch); /* print the character */
+
     if (inverse_on)
         term_end_attr(ATR_INVERSE);
     if (iflags.use_color) {
@@ -3585,10 +3593,8 @@ tty_print_glyph(winid window, xchar x, xchar y,
         }
 #endif
 #ifdef ENHANCED_SYMBOLS
-#if !defined(NO_TERMS) || defined(WIN32)
         if (color24bit_on)
             term_end_24bitcolor();
-#endif
 #endif
     }
     print_vt_code1(AVTC_GLYPH_END);
