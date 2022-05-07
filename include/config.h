@@ -661,10 +661,6 @@ typedef unsigned char uchar;
 # endif
 #endif
 
-#if defined(MSDOS) && defined(ENHANCED_SYMBOLS)
-#undef ENHANCED_SYMBOLS
-#endif
-
 #include "integer.h"
 #include "global.h" /* Define everything else according to choices above */
 

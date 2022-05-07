@@ -3417,10 +3417,6 @@ g_putch(int in_ch)
     return;
 }
 
-
-#if !defined(NO_TERMS) && !defined(WIN32)
-#ifdef ENHANCED_SYMBOLS
-
 void
 g_pututf8(uint8 *utf8str)
 {
@@ -3431,8 +3427,7 @@ g_pututf8(uint8 *utf8str)
     }
     return;
 }
-#endif
-#endif /* !NO_TERMS && !WIN32 */
+#endif /* !WIN32 */
 
 #ifdef CLIPPING
 void
@@ -3547,10 +3542,10 @@ tty_print_glyph(winid window, xchar x, xchar y,
             if (color != NO_COLOR)
                 term_start_color(color);
 #endif /* TEXTCOLOR */
+#if !defined(NO_TERMS) || defined(WIN32)
         }
 #endif
-    }
-    /* iflags.use_color aka iflags.wc_color */
+    }   /* iflags.use_color aka iflags.wc_color */
     /* must be after color check; term_end_color may turn off inverse too;
        BW_LAVA and BW_ICE won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
