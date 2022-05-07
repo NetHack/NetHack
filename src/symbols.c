@@ -1064,7 +1064,7 @@ find_display_sym_customization(const char *customization_name,
 {
     struct symset_customization *gdc = &g.sym_customizations[which_set];
     struct customization_detail *symdetails;
-    if ((gdc->custtype == custom_symbols) 
+    if ((gdc->custtype == custom_symbols)
         && (strcmp(customization_name, gdc->customization_name) == 0)) {
         symdetails = gdc->details;
         while (symdetails) {

@@ -1363,7 +1363,7 @@ see_traps(void)
     }
 }
 
-/*  glyph, ttychar, { glyphflags, { sym.color, sym.symidx }, 
+/*  glyph, ttychar, { glyphflags, { sym.color, sym.symidx },
                       tileidx, u } */
 static glyph_info no_ginfo = {
     NO_GLYPH, ' ', { MG_BADXY, { NO_COLOR, 0 }, 0

@@ -830,7 +830,7 @@ static const struct early_opt earlyopts[] = {
 #ifndef NODUMPENUMS
     {ARG_DUMPENUMS, "dumpenums", 9, FALSE},
 #ifdef ENHANCED_SYMBOLS
-    {ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE}, 
+    {ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE},
 #endif
 #endif /* NODUMPENUMS */
 #ifdef WIN32
