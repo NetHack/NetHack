@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1650875486 2022/04/25 08:31:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1109 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1651886993 2022/05/07 01:29:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1112 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1622,7 +1622,7 @@ extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
 extern boolean monhaskey(struct monst *, boolean);
 extern void mon_regen(struct monst *, boolean);
-extern int dochugw(struct monst *);
+extern int dochugw(struct monst *, boolean);
 extern boolean onscary(int, int, struct monst *);
 extern struct monst *find_pmmonst(int);
 extern int bee_eat_jelly(struct monst *, struct obj *);

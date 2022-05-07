@@ -1,4 +1,4 @@
-/* NetHack 3.7	makemon.c	$NHDT-Date: 1646694721 2022/03/07 23:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.7	makemon.c	$NHDT-Date: 1651886995 2022/05/07 01:29:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.204 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1456,6 +1456,10 @@ makemon(
                         : "",
                       exclaim ? '!' : '.');
         }
+        /* if discernable and a threat, stop fiddling while Rome burns */
+        if (g.occupation)
+            (void) dochugw(mtmp, TRUE);
+
         /* TODO: unify with teleport appears msg */
     }
 

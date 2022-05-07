@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1650836671 2022/04/24 21:44:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1651886997 2022/05/07 01:29:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1064,7 +1064,7 @@ movemon(void)
                 && fightm(mtmp))
                 continue; /* mon might have died */
         }
-        if (dochugw(mtmp)) /* otherwise just move the monster */
+        if (dochugw(mtmp, FALSE)) /* otherwise just move the monster */
             continue;
     }
 
