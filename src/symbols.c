@@ -273,7 +273,7 @@ switch_symbols(int nondefault)
             (*cursesgraphics_mode_callback)();
 # endif
 #endif
-#ifdef WIN32
+#if defined(TTY_GRAPHICS) && defined(WIN32)
         if (SYMHANDLING(H_IBM) && ibmgraphics_mode_callback)
             (*ibmgraphics_mode_callback)();
 #endif
