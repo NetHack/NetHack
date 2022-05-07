@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1647472681 2022/03/16 23:18:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.542 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1651887695 2022/05/07 01:41:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.555 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -751,7 +751,7 @@ optfn_autounlock(
         sep = index(op, '+') ? '+' : ' ';
         while (op) {
             op = trimspaces(op); /* might have leading space */
-            if ((nxt = index(op, sep)) != '\0') {
+            if ((nxt = index(op, sep)) != 0) {
                 *nxt++ = '\0';
                 op = trimspaces(op); /* might have trailing space after
                                       * plus sign removal */
