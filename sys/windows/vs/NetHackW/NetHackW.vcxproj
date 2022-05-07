@@ -146,6 +146,7 @@
     <ClCompile Include="$(SrcDir)trap.c" />
     <ClCompile Include="$(SrcDir)uhitm.c" />
     <ClCompile Include="$(SrcDir)u_init.c" />
+    <ClCompile Include="$(SrcDir)utf8map.c" />
     <ClCompile Include="$(SrcDir)vault.c" />
     <ClCompile Include="$(SrcDir)version.c" />
     <ClCompile Include="$(SrcDir)vision.c" />
