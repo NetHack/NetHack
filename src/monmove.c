@@ -113,14 +113,15 @@ watch_on_duty(register struct monst* mtmp)
 int
 dochugw(
     register struct monst *mtmp,
-    boolean dontchug) /* True: monster was just created, or maybe it has
-                       * teleported; perform stop-what-you're-doing-if-close-
-                       * enough-to-be-a-threat check but don't move mtmp */
+    boolean chug) /* True: monster is moving;
+                   * False: monster was just created or has teleported
+                   * so perform stop-what-you're-doing-if-close-enough-
+                   * to-be-a-threat check but don't move mtmp */
 {
-    int x = mtmp->mx, y = mtmp->my;
-    boolean already_saw_mon = ((dontchug || !g.occupation) ? 0
-                               : canspotmon(mtmp));
-    int rd = dontchug ? 0 : dochug(mtmp);
+    int x = mtmp->mx, y = mtmp->my; /* 'mtmp's location before dochug() */
+    /* skip canspotmon() if occupation is Null */
+    boolean already_saw_mon = (chug && g.occupation) ? canspotmon(mtmp) : 0;
+    int rd = chug ? dochug(mtmp) : 0;
 
     /*
      * A similar check is in monster_nearby() in hack.c.

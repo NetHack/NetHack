@@ -1064,7 +1064,7 @@ movemon(void)
                 && fightm(mtmp))
                 continue; /* mon might have died */
         }
-        if (dochugw(mtmp, FALSE)) /* otherwise just move the monster */
+        if (dochugw(mtmp, TRUE)) /* otherwise just move the monster */
             continue;
     }
 

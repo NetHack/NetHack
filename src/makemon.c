@@ -1458,7 +1458,7 @@ makemon(
         }
         /* if discernable and a threat, stop fiddling while Rome burns */
         if (g.occupation)
-            (void) dochugw(mtmp, TRUE);
+            (void) dochugw(mtmp, FALSE);
 
         /* TODO: unify with teleport appears msg */
     }

@@ -1324,15 +1324,16 @@ rloc_to_core(
                   Monnam(mtmp),
                   next2u(x, y) ? " next to you"
                   : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
-                  : (distu(x, y) < distu(oldx, oldy)) ? " closer to you"
-                  : " further away");
+                    : (distu(x, y) < distu(oldx, oldy)) ? " closer to you"
+                      : " further away");
         } else {
             pline("%s %s%s%s!",
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
                   appearmsg ? "suddenly " : "",
                   !Blind ? "appears" : "arrives",
                   next2u(x, y) ? " next to you"
-                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by" : "");
+                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
+                    : "");
         }
     }
 
@@ -1341,6 +1342,10 @@ rloc_to_core(
        the latter only happens if you've attacked them with polymorph */
     if (resident_shk && !inhishop(mtmp))
         make_angry_shk(mtmp, oldx, oldy);
+
+    /* if hero is busy, maybe stop occupation */
+    if (g.occupation)
+        (void) dochugw(mtmp, FALSE);
 
     /* trapped monster teleported away */
     if (mtmp->mtrapped && !mtmp->wormno)
