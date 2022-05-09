@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.907 $ $NHDT-Date: 1651908301 2022/05/07 07:25:01 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.908 $ $NHDT-Date: 1652091707 2022/05/09 10:21:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1205,6 +1205,8 @@ add Untrap as a potential 'autounlock' action
 if a zombie revived near the hero, a busy hero would keep doing whatever
 	action was in progress instead of stopping because the zombify didn't
 	walk across the threshold from no-threat to threat
+revised monster teleportation message handling caused magic whistle to be
+	changed to not operate on pets that were already adjacent; change back
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

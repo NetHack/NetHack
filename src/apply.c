@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.369 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1652091707 2022/05/09 10:21:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.374 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,6 +11,7 @@ static boolean its_dead(int, int, int *);
 static int use_stethoscope(struct obj *);
 static void use_whistle(struct obj *);
 static void use_magic_whistle(struct obj *);
+static void magic_whistled(struct obj *);
 static int use_leash(struct obj *);
 static boolean mleashed_next2u(struct monst *);
 static int use_mirror(struct obj *);
@@ -469,8 +470,6 @@ use_whistle(struct obj *obj)
 static void
 use_magic_whistle(struct obj *obj)
 {
-    register struct monst *mtmp, *nextmon;
-
     if (!can_blow(&g.youmonst)) {
         You("are incapable of using the whistle.");
     } else if (obj->cursed && !rn2(2)) {
@@ -478,46 +477,142 @@ use_magic_whistle(struct obj *obj)
             Deaf ? "frequency vibration" : "pitched humming noise");
         wake_nearby();
     } else {
-        int pet_cnt = 0, omx, omy;
-
         /* it's magic!  it works underwater too (at a higher pitch) */
         You(Deaf ? alt_whistle_str : whistle_str,
             Hallucination ? "normal"
             : (Underwater && !Deaf) ? "strange, high-pitched"
               : "strange");
-        for (mtmp = fmon; mtmp; mtmp = nextmon) {
-            nextmon = mtmp->nmon; /* trap might kill mon */
-            if (DEADMONSTER(mtmp))
-                continue;
-            /* steed is already at your location, so not affected;
-               this avoids trap issues if you're on a trap location */
-            if (mtmp == u.usteed)
-                continue;
-            if (mtmp->mtame) {
-                if (mtmp->mtrapped) {
-                    /* no longer in previous trap (affects mintrap) */
-                    mtmp->mtrapped = 0;
-                    fill_pit(mtmp->mx, mtmp->my);
-                }
-                /* mimic must be revealed before we know whether it
-                   actually moves because line-of-sight may change */
-                if (M_AP_TYPE(mtmp))
-                    seemimic(mtmp);
-                omx = mtmp->mx, omy = mtmp->my;
-                if (!next2u(omx, omy))
-                    mnexto(mtmp, RLOC_MSG);
-                if (mtmp->mx != omx || mtmp->my != omy) {
-                    mtmp->mundetected = 0; /* reveal non-mimic hider */
-                    if (canspotmon(mtmp))
-                        ++pet_cnt;
-                    if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
-                        change_luck(-1);
-                }
-            }
-        }
-        if (pet_cnt > 0)
-            makeknown(obj->otyp);
+
+        magic_whistled(obj);
     }
+}
+
+/* 'obj' is assumed to be a magic whistle */
+static void
+magic_whistled(struct obj *obj)
+{
+    struct monst *mtmp, *nextmon;
+    char buf[BUFSZ];
+    boolean oseen, already_discovered = objects[obj->otyp].oc_name_known != 0;
+    int omx, omy, shift = 0, appear = 0, disappear = 0;
+    const char *one = 0;
+
+    for (mtmp = fmon; mtmp; mtmp = nextmon) {
+        nextmon = mtmp->nmon; /* trap might kill mon */
+        if (DEADMONSTER(mtmp))
+            continue;
+        /* only tame monsters are affected;
+           steed is already at your location, so not affected;
+           this avoids trap issues if you're on a trap location */
+        if (!mtmp->mtame || mtmp == u.usteed)
+            continue;
+        if (mtmp->mtrapped) {
+            /* no longer in previous trap (affects mintrap) */
+            mtmp->mtrapped = 0;
+            fill_pit(mtmp->mx, mtmp->my);
+        }
+
+        oseen = canspotmon(mtmp);
+        if (oseen && !one)
+            one = upstart(y_monnam(mtmp));
+        /* mimic must be revealed before we know whether it
+           actually moves because line-of-sight may change */
+        if (M_AP_TYPE(mtmp))
+            seemimic(mtmp);
+        omx = mtmp->mx, omy = mtmp->my;
+        mnexto(mtmp, !already_discovered ? RLOC_MSG : RLOC_NONE);
+        if (mtmp->mx != omx || mtmp->my != omy) {
+            mtmp->mundetected = 0; /* reveal non-mimic hider iff it moved */
+
+            if (canspotmon(mtmp)) {
+                if (!one)
+                    one = upstart(y_monnam(mtmp));
+
+                if (oseen)
+                    ++shift;
+                else
+                    ++appear;
+            } else if (oseen) {
+                ++disappear;
+            }
+            /*
+             * FIXME:
+             *  All relocated monsters should change positions essentially
+             *  simultaneously but we're dealing with them sequentially.
+             *  That could kill some off in the process, each time leaving
+             *  their target position (which should be occupied at least
+             *  momentarily) available as a potential death trap for others.
+             */
+            if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
+                change_luck(-1);
+        }
+    }
+
+    /*
+     * If any pets changed location, (1) they might have been in view
+     * before and still in view after, (2) out of view before but in
+     * view after, (3) in view before but out of view after (perhaps
+     * on the far side of a boulder/door/wall), or (4) out of view
+     * before and still out of view after.  The first two cases are
+     * the usual ones; the fourth will happen if the hero can't see.
+     *
+     * If the magic whistle hasn't been discovered yet, rloc() issued
+     * any applicable vanishing and/or appearing messages, and we make
+     * it become discovered now if any pets moved within or into view.
+     * If it has already been discovered, we told rloc() not to issue
+     * messages and will issue one cumulative message now (for any of
+     * the first three cases, not the fourth) to reduce verbosity for
+     * the first case of a single pet (avoid "vanishes and reappears")
+     * and greatly reduce verbosity for multiple pets regardless of
+     * each one's case.
+     */
+    buf[0] = '\0';
+    if (!already_discovered) {
+        /* message(s) handled by rloc(); if the only noticeable change was
+           pet(s) disappearing, the magic whistle won't become discovered */
+        if (shift + appear > 0)
+            makeknown(obj->otyp);
+    } else if (shift + appear > 0) {
+        /* rloc() message(s) were suppressed above so issue one now;
+           'one' should always be non-Null at this point */
+        if (shift + appear + disappear == 1 && one) {
+            Sprintf(buf, "%.99s %s", one,
+                    appear ? "appears" : "shifts location");
+        } else {
+            Strcpy(buf, (shift == 1) ? "One creature shifts location"
+                        : (shift > 1) ? "Some creatures shift locations"
+                          : "");
+            if (shift == 0)
+                Strcpy(buf, (appear == 1) ? "One creature appears"
+                            : (appear > 1) ? "Some creatures appear"
+                              : "");
+            else if (appear > 0)
+                Sprintf(eos(buf), "%s%s",
+                        disappear ? ", " : " and ",
+                        (appear == 1) ? "another appears" : "others appear");
+#if 0       /* this case can't happen; only get here when shift+appear > 0 */
+            if (shift == 0 && appear == 0)
+                Strcpy(buf, (disappear == 1) ? "One creature disappears"
+                            : (disappear > 1) ? "Some creatures disappear"
+                              : "");
+            else
+#endif
+            if (disappear > 0)
+                Sprintf(eos(buf), "%s%s",
+                        (shift && appear) ? ", and " : " and ",
+                        (disappear == 1) ? "another disappears"
+                                         : "others disappear");
+        }
+    } else if (disappear > 0) {
+        /* none appeared or just shifted; 'one' should be non-Null  */
+        if (shift + appear + disappear == 1 && one)
+            Sprintf(buf, "%.99s disappears", one);
+        else
+            Strcpy(buf, "Some creatures disappear");
+    }
+    if (*buf)
+        pline("%s.", buf);
+    return;
 }
 
 boolean
