@@ -619,13 +619,11 @@ lookat(int x, int y, char *buf, char *monbuf)
             Sprintf(buf, "%s %saltar",
                     /* like endgame high priests, endgame high altars
                        are only recognizable when immediately adjacent */
-                    (Is_astralevel(&u.uz) && !next2u(x, y))
+                    (Is_astralevel(&u.uz) && !next2u(x, y)
+                     && (amsk & AM_SANCTUM))
                         ? "aligned"
                         : align_str(algn),
-                    ((amsk & AM_SHRINE) != 0
-                     && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
-                        ? "high "
-                        : "");
+                    (amsk & AM_SANCTUM) ? "high " : "");
             break;
         case S_ndoor:
             if (is_drawbridge_wall(x, y) >= 0)
