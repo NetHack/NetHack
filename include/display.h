@@ -544,18 +544,17 @@ enum glyph_offsets {
             (((mon)->female == 0) ? GLYPH_PET_MALE_OFF : GLYPH_PET_FEM_OFF))
 
 #define altar_to_glyph(amsk) \
-    (((amsk & (AM_MASK | AM_SHRINE)) == AM_NONE)               \
-       ? (GLYPH_ALTAR_OFF + altar_unaligned)                   \
-       : (((amsk & AM_SHRINE) == AM_SHRINE)                    \
-          && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))      \
-          ? (GLYPH_ALTAR_OFF + altar_other)                    \
-          : ((amsk & AM_MASK) == AM_CHAOTIC)                   \
-            ? (GLYPH_ALTAR_OFF + altar_chaotic)                \
-            : ((amsk & AM_MASK) == AM_NEUTRAL)                 \
-              ? (GLYPH_ALTAR_OFF + altar_neutral)              \
-              : ((amsk & AM_MASK) == AM_LAWFUL)                \
-                ? (GLYPH_ALTAR_OFF + altar_lawful)             \
-                : (GLYPH_ALTAR_OFF + altar_neutral))
+    ((((amsk) & AM_SANCTUM) == AM_SANCTUM)                \
+      ? (GLYPH_ALTAR_OFF + altar_other)                   \
+      : (((amsk) & AM_MASK) == AM_LAWFUL)                 \
+         ? (GLYPH_ALTAR_OFF + altar_lawful)               \
+         : (((amsk) & AM_MASK) == AM_NEUTRAL)             \
+            ? (GLYPH_ALTAR_OFF + altar_neutral)           \
+            : (((amsk) & AM_MASK) == AM_CHAOTIC)          \
+               ? (GLYPH_ALTAR_OFF + altar_chaotic)        \
+               : (((amsk) & AM_MASK) == AM_NONE)          \
+                  ? (GLYPH_ALTAR_OFF + altar_unaligned)   \
+                  : (GLYPH_ALTAR_OFF + altar_neutral))
 
 /* not used, nor is it correct
 #define zap_to_glyph(zaptype, cmap_idx) \

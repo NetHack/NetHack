@@ -292,12 +292,10 @@ do_earthquake(int force)
                     pline_The("kitchen sink falls%s.", into_a_chasm);
                 goto do_pit;
             case ALTAR:
-                /* always preserve the high altars */
-                if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz))
-                    break;
-                /* no need to check for high altar here; we've just
-                   excluded those */
                 amsk = altarmask_at(x, y);
+                /* always preserve the high altars */
+                if ((amsk & AM_SANCTUM) != 0)
+                    break;
                 algn = Amask2align(amsk & AM_MASK);
                 if (cansee(x, y))
                     pline_The("%s altar falls%s.",

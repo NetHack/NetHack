@@ -3991,10 +3991,7 @@ dfeature_at(int x, int y, char *buf)
         cmap = S_sink; /* "sink" */
     else if (IS_ALTAR(ltyp)) {
         Sprintf(altbuf, "%saltar to %s (%s)",
-                ((lev->altarmask & AM_SHRINE)
-                 && (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)))
-                    ? "high "
-                    : "",
+                (lev->altarmask & AM_SANCTUM) ? "high " : "",
                 a_gname(),
                 align_str(Amask2align(lev->altarmask & ~AM_SHRINE)));
         dfeature = altbuf;
