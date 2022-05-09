@@ -2368,6 +2368,8 @@ process_text_window(winid window, struct WinDesc *cw)
                     } else if ((*cp & 0x80) != 0) {
                         g_putch(*cp);
                         end_glyphout();
+                    } else {
+                        (void) putchar(*cp);
                     }
                     linestart = FALSE;
                 } else {
