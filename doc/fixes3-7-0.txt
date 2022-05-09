@@ -1779,6 +1779,7 @@ remove unnecessary null checks from christen_orc() (pr #681 by argrath)
 mark high altars in altarmask (pr #748 by entrez)
 split kicking empty space into separate function (pr #754 by argrath)
 split adjusting attributes into separate function (pr #757 by argrath)
+split getting damages with a kick into separate function (pr #758 by argrath)
 
 
 Code Cleanup and Reorganization
