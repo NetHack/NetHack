@@ -1777,6 +1777,7 @@ function tin_details() in eat.c was passing an obj pointer to
 	NULL check above that tin_variety() call (pr #676 by argrath)
 remove unnecessary null checks from christen_orc() (pr #681 by argrath)
 mark high altars in altarmask (pr #748 by entrez)
+split kicking empty space into separate function (pr #754 by argrath)
 
 
 Code Cleanup and Reorganization
