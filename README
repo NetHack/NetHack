@@ -7,8 +7,8 @@ NetHack 3.6.
 NetHack 3.7.0 work-in-progress is not a release of NetHack. As a .0 version,
 and still very early in its development cycle, there has already been changes
 made, and there will continue to be many more prior to an eventual release.
-The file doc/fixes37.0 in the source distribution will be updated with a list
-of fixes as they are committed.
+The file doc/fixes3-7-0.txt in the source distribution will be updated with
+a list of fixes as they are committed.
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
 released code, and if stability is paramount, then the most recent
@@ -211,6 +211,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1652133306 2022/05/09 21:55:06 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $
+# $NHDT-Date: 1652133501 2022/05/09 21:58:21 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
