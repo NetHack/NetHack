@@ -18,9 +18,9 @@ We're making the .0 work-in-progress available so that you can observe, test
 out, and contribute to its development. Constructive suggestions, GitHub pull
 requests, and bug reports are all welcome and encouraged.
 
-The file doc/fixes37.0 in the source distribution has a full list of bug-fixes
-included so far, as well as brief mentions of some of the other code changes.
-The text in there was written for the development team's own use and is
+The file doc/fixes3-7-0.txt in the source distribution has a full list of
+bug-fixes included so far, as well as brief mentions of some of the other code
+changes. The text in there was written for the development team's own use and is
 provided  "as is", so please do not ask us to further explain the entries in
 that file. Some entries might be considered "spoilers", particularly in the
 "new features" section.
@@ -211,6 +211,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1583508658 2020/03/06 15:30:58 $ $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.80 $
+# $NHDT-Date: 1652133306 2022/05/09 21:55:06 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
