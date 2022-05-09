@@ -41,7 +41,7 @@ static int unicode_val(const char *cp);
 static int parse_id(const char *id, struct find_struct *findwhat);
 static int glyph_find_core(const char *id, struct find_struct *findwhat);
 static char *fix_glyphname(char *str);
-static uint32_t rgbstr_to_uint32(const char *rgbstr);
+static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
 
 static void
@@ -114,7 +114,7 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     if (c_unicode && (*c_unicode == 'U' || *c_unicode == 'u')
         && (c_unicode[1] == '+')) {
         /* unicode = unicode_val(c_unicode); */
-        if ((rgb = rgbstr_to_uint32(c_rgb)) != -1L || !c_rgb) {
+        if ((rgb = rgbstr_to_int32(c_rgb)) != -1L || !c_rgb) {
             to_custom_symbol_find.unicode_val = c_unicode;
             /* if the color 0 is an actual color, as opposed to just "not set"
                we set a marker bit outside the 24-bit range to indicate a
@@ -134,8 +134,8 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
     return 0;
 }
 
-static uint32_t
-rgbstr_to_uint32(const char *rgbstr)
+static int32_t
+rgbstr_to_int32(const char *rgbstr)
 {
     int r, gn, b, milestone = 0;
     char *cp, *c_r,*c_g,*c_b;
