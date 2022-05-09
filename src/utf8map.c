@@ -139,7 +139,7 @@ rgbstr_to_int32(const char *rgbstr)
 {
     int r, gn, b, milestone = 0;
     char *cp, *c_r,*c_g,*c_b;
-    uint32_t rgb = 0L;
+    int32_t rgb = 0;
     char buf[BUFSZ];
     boolean dash = FALSE;
 
