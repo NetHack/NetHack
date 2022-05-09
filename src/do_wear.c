@@ -32,6 +32,7 @@ static int Shirt_on(void);
 static void dragon_armor_handling(struct obj *, boolean, boolean);
 static void Amulet_on(void);
 static void learnring(struct obj *, boolean);
+static void adjust_attrib(struct obj *, int, int);
 static void Ring_off_or_gone(struct obj *, boolean);
 static int select_off(struct obj *);
 static struct obj *do_takeoff(void);
@@ -1079,11 +1080,29 @@ learnring(struct obj *ring, boolean observed)
     }
 }
 
+static void
+adjust_attrib(struct obj *obj, int which, int val)
+{
+    int old_attrib;
+    boolean observable;
+
+    old_attrib = ACURR(which);
+    ABON(which) += val;
+    observable = (old_attrib != ACURR(which));
+    /* if didn't change, usually means ring is +0 but might
+        be because nonzero couldn't go below min or above max;
+        learn +0 enchantment if attribute value is not stuck
+        at a limit [and ring has been seen and its type is
+        already discovered, both handled by learnring()] */
+    if (observable || !extremeattr(which))
+        learnring(obj, observable);
+    g.context.botl = 1;
+}
+
 void
 Ring_on(register struct obj *obj)
 {
     long oldprop = u.uprops[objects[obj->otyp].oc_oprop].extrinsic;
-    int old_attrib, which;
     boolean observable;
 
     /* make sure ring isn't wielded; can't use remove_worn_item()
@@ -1154,25 +1173,13 @@ Ring_on(register struct obj *obj)
         }
         break;
     case RIN_GAIN_STRENGTH:
-        which = A_STR;
-        goto adjust_attrib;
+        adjust_attrib(obj, A_STR, obj->spe);
+        break;
     case RIN_GAIN_CONSTITUTION:
-        which = A_CON;
-        goto adjust_attrib;
+        adjust_attrib(obj, A_CON, obj->spe);
+        break;
     case RIN_ADORNMENT:
-        which = A_CHA;
- adjust_attrib:
-        old_attrib = ACURR(which);
-        ABON(which) += obj->spe;
-        observable = (old_attrib != ACURR(which));
-        /* if didn't change, usually means ring is +0 but might
-           be because nonzero couldn't go below min or above max;
-           learn +0 enchantment if attribute value is not stuck
-           at a limit [and ring has been seen and its type is
-           already discovered, both handled by learnring()] */
-        if (observable || !extremeattr(which))
-            learnring(obj, observable);
-        g.context.botl = 1;
+        adjust_attrib(obj, A_CHA, obj->spe);
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         u.uhitinc += obj->spe;
@@ -1199,7 +1206,6 @@ static void
 Ring_off_or_gone(register struct obj *obj, boolean gone)
 {
     long mask = (obj->owornmask & W_RING);
-    int old_attrib, which;
     boolean observable;
 
     g.context.takeoff.mask &= ~mask;
@@ -1266,21 +1272,13 @@ Ring_off_or_gone(register struct obj *obj, boolean gone)
         }
         break;
     case RIN_GAIN_STRENGTH:
-        which = A_STR;
-        goto adjust_attrib;
+        adjust_attrib(obj, A_STR, -obj->spe);
+        break;
     case RIN_GAIN_CONSTITUTION:
-        which = A_CON;
-        goto adjust_attrib;
+        adjust_attrib(obj, A_CON, -obj->spe);
+        break;
     case RIN_ADORNMENT:
-        which = A_CHA;
- adjust_attrib:
-        old_attrib = ACURR(which);
-        ABON(which) -= obj->spe;
-        observable = (old_attrib != ACURR(which));
-        /* same criteria as Ring_on() */
-        if (observable || !extremeattr(which))
-            learnring(obj, observable);
-        g.context.botl = 1;
+        adjust_attrib(obj, A_CHA, -obj->spe);
         break;
     case RIN_INCREASE_ACCURACY: /* KMH */
         u.uhitinc -= obj->spe;
