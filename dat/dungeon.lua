@@ -1,4 +1,8 @@
-
+-- NetHack 3.6	dungeon dungeon.lua	$NHDT-Date: 1652196135 2022/05/10 15:22:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
+-- Copyright (c) 1990-95 by M. Stephenson
+-- NetHack may be freely redistributed.  See license for details.
+--
+-- The dungeon description file.
 dungeon = {
    {
       name = "The Dungeons of Doom",

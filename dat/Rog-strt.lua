@@ -1,4 +1,4 @@
--- NetHack 3.7	Rogue.des	$NHDT-Date: 1432512784 2015/05/25 00:13:04 $  $NHDT-Branch: master $:$NHDT-Revision: 1.11 $
+-- NetHack Rogue Rog-strt.lua	$NHDT-Date: 1652196012 2022/05/10 15:20:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1992 by Dean Luick
 -- NetHack may be freely redistributed.  See license for details.
 --

@@ -1,4 +1,6 @@
-
+-- NetHack quest.lua	$NHDT-Date: 1652196288 2022/05/10 15:24:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
+-- Copyright (c) 2021 by Pasi Kallinen
+-- NetHack may be freely redistributed.  See license for details.
 -- TODO:
 --  - output = "verbalize"
 --  - export the quest string replacements to lua, instead of %H etc

@@ -1,4 +1,7 @@
-
+-- NetHack bigroom bigrm-11.lua	$NHDT-Date: 1652196024 2022/05/10 15:20:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
+--	Copyright (c) 2021 by Pasi Kallinen
+-- NetHack may be freely redistributed.  See license for details.
+--
 -- Boulder "maze" with wide corridors
 
 function t_or_f() return percent(50) and true or false; end
