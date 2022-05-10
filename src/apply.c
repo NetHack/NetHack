@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1652091707 2022/05/09 10:21:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.374 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1652223183 2022/05/10 22:53:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -492,10 +492,17 @@ static void
 magic_whistled(struct obj *obj)
 {
     struct monst *mtmp, *nextmon;
-    char buf[BUFSZ];
+    char buf[BUFSZ], *mnam,
+         shiftbuf[BUFSZ + sizeof "shifts location"],
+         appearbuf[BUFSZ + sizeof "appears"],
+         disappearbuf[BUFSZ + sizeof "disappears"];
     boolean oseen, already_discovered = objects[obj->otyp].oc_name_known != 0;
     int omx, omy, shift = 0, appear = 0, disappear = 0;
-    const char *one = 0;
+
+    /* need to copy (up to 3) names as they're collected rather than just
+       save pointers to them, otherwise churning through every mbuf[] might
+       clobber the ones we care about */
+    shiftbuf[0] = appearbuf[0] = disappearbuf[0] = '\0';
 
     for (mtmp = fmon; mtmp; mtmp = nextmon) {
         nextmon = mtmp->nmon; /* trap might kill mon */
@@ -513,8 +520,8 @@ magic_whistled(struct obj *obj)
         }
 
         oseen = canspotmon(mtmp);
-        if (oseen && !one)
-            one = upstart(y_monnam(mtmp));
+        if (oseen) /* get name in case it's one we'll remember */
+            mnam = y_monnam(mtmp); /* before mnexto(); it might disappear */
         /* mimic must be revealed before we know whether it
            actually moves because line-of-sight may change */
         if (M_AP_TYPE(mtmp))
@@ -525,15 +532,17 @@ magic_whistled(struct obj *obj)
             mtmp->mundetected = 0; /* reveal non-mimic hider iff it moved */
 
             if (canspotmon(mtmp)) {
-                if (!one)
-                    one = upstart(y_monnam(mtmp));
-
-                if (oseen)
-                    ++shift;
-                else
-                    ++appear;
+                mnam = y_monnam(mtmp);
+                if (oseen) {
+                    if (++shift == 1)
+                        Sprintf(shiftbuf, "%s shifts location", mnam);
+                } else {
+                    if (++appear == 1)
+                        Sprintf(appearbuf, "%s appears", mnam);
+                }
             } else if (oseen) {
-                ++disappear;
+                if (++disappear == 1)
+                    Sprintf(disappearbuf, "%s disappears", mnam);
             }
             /*
              * FIXME:
@@ -568,47 +577,59 @@ magic_whistled(struct obj *obj)
      */
     buf[0] = '\0';
     if (!already_discovered) {
-        /* message(s) handled by rloc(); if the only noticeable change was
+        /* message(s) were handled by rloc(); if only noticeable change was
            pet(s) disappearing, the magic whistle won't become discovered */
         if (shift + appear > 0)
             makeknown(obj->otyp);
-    } else if (shift + appear > 0) {
-        /* rloc() message(s) were suppressed above so issue one now;
-           'one' should always be non-Null at this point */
-        if (shift + appear + disappear == 1 && one) {
-            Sprintf(buf, "%.99s %s", one,
-                    appear ? "appears" : "shifts location");
-        } else {
-            Strcpy(buf, (shift == 1) ? "One creature shifts location"
-                        : (shift > 1) ? "Some creatures shift locations"
-                          : "");
-            if (shift == 0)
-                Strcpy(buf, (appear == 1) ? "One creature appears"
-                            : (appear > 1) ? "Some creatures appear"
-                              : "");
-            else if (appear > 0)
-                Sprintf(eos(buf), "%s%s",
-                        disappear ? ", " : " and ",
-                        (appear == 1) ? "another appears" : "others appear");
-#if 0       /* this case can't happen; only get here when shift+appear > 0 */
-            if (shift == 0 && appear == 0)
-                Strcpy(buf, (disappear == 1) ? "One creature disappears"
-                            : (disappear > 1) ? "Some creatures disappear"
-                              : "");
-            else
-#endif
-            if (disappear > 0)
-                Sprintf(eos(buf), "%s%s",
-                        (shift && appear) ? ", and " : " and ",
-                        (disappear == 1) ? "another disappears"
-                                         : "others disappear");
+    } else {
+        /* could use array of cardinal number names like wishcmdassist() but
+           extra precision above 3 or 4 seems pedantic; not used for 0 or 1 */
+#define HowMany(n) (((n) < 2) ? "sqrt(-1)"          \
+                    : ((n) == 2) ? "two"            \
+                      : ((n) == 3) ? "three"        \
+                        : ((n) == 4) ? "four"       \
+                          : ((n) <= 7) ? "several"  \
+                            : "many")
+        /* magic whistle is already discovered so rloc() message(s)
+           were suppressed above; if any discernible relocation occured,
+           construct a message now and issue it below */
+        if (shift > 0) {
+            if (shift > 1)
+                Sprintf(shiftbuf, "%s creatures shift locations",
+                        HowMany(shift));
+            copynchars(buf, upstart(shiftbuf), (int) sizeof buf - 1);
         }
-    } else if (disappear > 0) {
-        /* none appeared or just shifted; 'one' should be non-Null  */
-        if (shift + appear + disappear == 1 && one)
-            Sprintf(buf, "%.99s disappears", one);
-        else
-            Strcpy(buf, "Some creatures disappear");
+        if (appear > 0) {
+            if (appear > 1)
+                /* shift==0: N creatures appear;
+                   shift==1: Foo shifts location and N other creatures appear;
+                   shift >1: M creatures shift locations and N others appear */
+                Sprintf(appearbuf, "%s %s appear", HowMany(appear),
+                        (shift == 0) ? "creatures"
+                        : (shift == 1) ? "other creatures"
+                          : "others");
+            if (shift == 0)
+                copynchars(buf, upstart(appearbuf), (int) sizeof buf - 1);
+            else
+                Snprintf(eos(buf), sizeof buf - strlen(buf), "%s %s",
+                         /* to get here:  appear > 0 and shift != 0,
+                            so "shifters, appearers" if disappear != 0
+                            with ", and disappearers" yet to be appended,
+                            or "shifters and appearers" otherwise */
+                         disappear ? "," : " and", appearbuf);
+        }
+        if (disappear > 0) {
+            if (disappear > 1)
+                Sprintf(disappearbuf, "%s %s disappear", HowMany(disappear),
+                        (shift == 0 && appear == 0) ? "creatures"
+                        : (shift < 2 && appear < 2) ? "other creatures"
+                          : "others");
+            if (shift + appear == 0)
+                copynchars(buf, upstart(disappearbuf), (int) sizeof buf - 1);
+            else
+                Snprintf(eos(buf), sizeof buf - strlen(buf), "%s and %s",
+                         (shift && appear) ? "," : "", disappearbuf);
+        }
     }
     if (*buf)
         pline("%s.", buf);
