@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1651886993 2022/05/07 01:29:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1112 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1652299940 2022/05/11 20:12:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1114 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2429,7 +2429,6 @@ extern boolean tended_shop(struct mkroom *);
 extern boolean is_unpaid(struct obj *);
 extern void delete_contents(struct obj *);
 extern void obfree(struct obj *, struct obj *);
-extern void home_shk(struct monst *, boolean);
 extern void make_happy_shk(struct monst *, boolean);
 extern void make_happy_shoppers(boolean);
 extern void hot_pursuit(struct monst *);

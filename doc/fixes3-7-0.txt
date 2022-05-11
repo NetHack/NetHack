@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.908 $ $NHDT-Date: 1652091707 2022/05/09 10:21:47 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.913 $ $NHDT-Date: 1652299940 2022/05/11 20:12:20 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1207,6 +1207,8 @@ if a zombie revived near the hero, a busy hero would keep doing whatever
 	walk across the threshold from no-threat to threat
 revised monster teleportation message handling caused magic whistle to be
 	changed to not operate on pets that were already adjacent; change back
+revised monster teleportation message handling could produce duplicate message
+	when shopkeeper who left shop got returned to it
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

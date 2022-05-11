@@ -1,4 +1,4 @@
-/* NetHack 3.7	shk.c	$NHDT-Date: 1629548922 2021/08/21 12:28:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.205 $ */
+/* NetHack 3.7	shk.c	$NHDT-Date: 1652299941 2022/05/11 20:12:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.232 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -54,6 +54,7 @@ static void set_repo_loc(struct monst *);
 static struct obj *bp_to_obj(struct bill_x *);
 static long get_pricing_units(struct obj *);
 static boolean angry_shk_exists(void);
+static void home_shk(struct monst *, boolean);
 static void rile_shk(struct monst *);
 static void rouse_shk(struct monst *, boolean);
 static boolean shk_impaired(struct monst *);
@@ -1041,12 +1042,12 @@ pay(long tmp, register struct monst* shkp)
 }
 
 /* return shkp to home position */
-void
-home_shk(register struct monst* shkp, register boolean killkops)
+static void
+home_shk(struct monst *shkp, boolean killkops)
 {
-    register xchar x = ESHK(shkp)->shk.x, y = ESHK(shkp)->shk.y;
+    xchar x = ESHK(shkp)->shk.x, y = ESHK(shkp)->shk.y;
 
-    (void) mnearto(shkp, x, y, TRUE, RLOC_MSG);
+    (void) mnearto(shkp, x, y, TRUE, RLOC_NOMSG);
     g.level.flags.has_shop = 1;
     if (killkops) {
         kops_gone(TRUE);
@@ -1136,9 +1137,11 @@ make_happy_shk(register struct monst* shkp, register boolean silentkops)
         Strcpy(shk_nam, shkname(shkp));
         if (on_level(&eshkp->shoplevel, &u.uz)) {
             home_shk(shkp, FALSE);
-            /* didn't disappear if shk can still be seen */
-            if (canseemon(shkp))
-                vanished = FALSE;
+            if (canspotmon(shkp)) {
+                pline("%s returns to %s shop.", Shknam(shkp),
+                      noit_mhis(shkp));
+                vanished = FALSE; /* don't give 'Shk disappears' message */
+            }
         } else {
             /* if sensed, does disappear regardless whether seen */
             if (sensemon(shkp))
@@ -4324,6 +4327,10 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
             !animal ? cad(TRUE) : "", cost_of_damage,
             currency(cost_of_damage), !animal ? "\"" : "");
     if (yn(qbuf) != 'n') {
+        boolean is_seen, was_seen = canseemon(shkp),
+                was_outside = !inhishop(shkp);
+        xchar sx = shkp->mx, sy = shkp->my;
+
         cost_of_damage = check_credit(cost_of_damage, shkp);
         if (cost_of_damage > 0L) {
             money2mon(shkp, cost_of_damage);
@@ -4333,6 +4340,16 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
         /* move shk back to his home loc */
         home_shk(shkp, FALSE);
         pacify_shk(shkp);
+        /* home_shk() suppresses rloc()'s vanish/appear messages */
+        if (shkp->mx != sx || shkp->my != sy) {
+            if (was_outside && canspotmon(shkp))
+                pline("%s returns to %s shop.", Shknam(shkp),
+                      noit_mhis(shkp));
+            else if ((is_seen = canseemon(shkp)) == TRUE || was_seen)
+                pline("%s %s.", Shknam(shkp), !was_seen ? "appears"
+                                              : is_seen ? "shifts location"
+                                                : "disappears");
+        }
     } else {
         if (!animal) {
             if (!Deaf && !muteshk(shkp))
