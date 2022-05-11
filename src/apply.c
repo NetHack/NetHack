@@ -492,7 +492,7 @@ static void
 magic_whistled(struct obj *obj)
 {
     struct monst *mtmp, *nextmon;
-    char buf[BUFSZ], *mnam,
+    char buf[BUFSZ], *mnam = 0,
          shiftbuf[BUFSZ + sizeof "shifts location"],
          appearbuf[BUFSZ + sizeof "appears"],
          disappearbuf[BUFSZ + sizeof "disappears"];
