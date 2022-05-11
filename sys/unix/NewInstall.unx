@@ -32,7 +32,7 @@ If you are using the traditional configuration system, see Install.unx.
    See the "User Interface Build Customizations" section below if you want to
    configure your build with support for interfaces beyond traditional TTY.
 
-   The 'make fetch-Lua' step really only needs to be done one time unless 
+   The 'make fetch-Lua' step really only needs to be done one time unless
    your sources get refreshed, or the lib folder and its contents get
    removed.
 
@@ -83,69 +83,69 @@ Note that curses, X11, and Qt will almost certainly require the installation
 of prerequisite packages in order to successfully build with support for
 additional interfaces. See below.
 
- +----------+---------+-----------------+-------------------------------------+
- | Platform |Interface| Build Variable  |  Prerequisite package               |
- |----------+---------+-----------------+-------------------------------------|
- | MacOS    | tty     | WANT_WIN_TTY    | none                                |
- |----------+---------+-----------------+-------------------------------------|
- | MacOS    | curses  | WANT_WIN_CURSES | ncurses development libraries       |
- |----------+---------+-----------------+-------------------------------------|
- | MacOS    | X11     | WANT_WIN_X11    | You will need to obtain and         |
- |          |         |                 | install XQuartz if you want X11     |
- |          |         |                 | support in your build.              |
- |          |         |                 | (Attempting to run X11.app  will    |
- |          |         |                 |  describe where to get it)          |
- |          |         |                 |                                     |
- |          |         |                 | One possible way:                   |
- |          |         |                 |    brew install xquartz             |
- |----------+---------+-----------------+-------------------------------------|
- | MacOS    | Qt      | WANT_WIN_QT     | You will need to obtain and         |
- |          |         |                 | install Qt if you want Qt           |
- |          |         |                 | support in your build.              |
- |          |         |                 |                                     |
- |          |         |                 | One possible way:                   |
- |          |         |                 |    brew install Qt                  |
- |----------+---------+-----------------+-------------------------------------|
- | Linux    | tty     | WANT_WIN_TTY    |                                     | 
- | (Ubuntu) |         |                 |                                     |
- |----------+---------+-----------------+-------------------------------------|
- | Linux    | curses  | WANT_WIN_CURSES | If it isn't already included        |
- | (Ubuntu) |         |                 | in your distribution, here is one   |
- |          |         |                 | possible way:                       |
- |          |         |                 |                                     |
- |          |         |                 | sudo apt-get install libncurses-dev |
- |----------+---------+-----------------+-------------------------------------|
- | Linux    | X11     | WANT_WIN_X11    | Here is one possible way to obtain  |
- | (Ubuntu) |         |                 | the required packages:              |
- |          |         |                 |                                     |
- |          |         |                 |sudo apt-get install libx11-dev      |
- |          |         |                 |sudo apt-get install libmotif-dev    |
- |          |         |                 |sudo apt-get install libxaw7-dev     |
- |          |         |                 |sudo apt install xfonts-utils        |
- |          |         |                 |(That last one is for bdftopcf and   |
- |          |         |                 | mkfontdir utils)                    |
- |          |         |                 |                                     |
- |----------+---------+-----------------+-------------------------------------|
- | Linux    | Qt      | WANT_WIN_QT     | Here is one possible way to obtain  |
- | (Ubuntu) |         |                 | the required packages:              |
- |          |         |                 |                                     |
- |          |         |                 |sudo apt-get install qtbase5-dev     |
- |          |         |                 |sudo apt-get install qtmultimedia-dev|
- |          |         |                 |                                     |
- |          |         |                 |Another odd note about Qt on Linux is|
- |          |         |                 |that if you find you are getting the |
- |          |         |                 |following error trying to run NetHack|
- |          |         |                 |after you build it with Qt support:  |
- |          |         |                 |"error while loading shared          |
- |          |         |                 |libraries: libQt5Core.so.5: cannot   |
- |          |         |                 |open shared object file: No such file|
- |          |         |                 |or directory",                       |
- |          |         |                 |you may have to fix that (one-time)  |
- |          |         |                 |by issuing the command below:        |
- | sudo strip \                                                               |
- | --remove-section=.note.ABI-tag/usr/lib/x86_64-linux-gnu/libQt5Core.so.5    |
- +----------+---------+-----------------+-------------------------------------+
++----------+---------+-----------------+--------------------------------------+
+| Platform |Interface| Build Variable  |  Prerequisite package                |
+|----------+---------+-----------------+--------------------------------------|
+| MacOS    | tty     | WANT_WIN_TTY    | none                                 |
+|----------+---------+-----------------+--------------------------------------|
+| MacOS    | curses  | WANT_WIN_CURSES | ncurses development libraries        |
+|----------+---------+-----------------+--------------------------------------|
+| MacOS    | X11     | WANT_WIN_X11    | You will need to obtain and          |
+|          |         |                 | install XQuartz if you want X11      |
+|          |         |                 | support in your build.               |
+|          |         |                 | (Attempting to run X11.app  will     |
+|          |         |                 |  describe where to get it)           |
+|          |         |                 |                                      |
+|          |         |                 | One possible way:                    |
+|          |         |                 |    brew install xquartz              |
+|----------+---------+-----------------+--------------------------------------|
+| MacOS    | Qt      | WANT_WIN_QT     | You will need to obtain and          |
+|          |         |                 | install Qt if you want Qt            |
+|          |         |                 | support in your build.               |
+|          |         |                 |                                      |
+|          |         |                 | One possible way:                    |
+|          |         |                 |    brew install Qt                   |
+|----------+---------+-----------------+--------------------------------------|
+| Linux    | tty     | WANT_WIN_TTY    |                                      |
+| (Ubuntu) |         |                 |                                      |
+|----------+---------+-----------------+--------------------------------------|
+| Linux    | curses  | WANT_WIN_CURSES | If it isn't already included         |
+| (Ubuntu) |         |                 | in your distribution, here is one    |
+|          |         |                 | possible way:                        |
+|          |         |                 |                                      |
+|          |         |                 | sudo apt-get install libncurses-dev  |
+|----------+---------+-----------------+--------------------------------------|
+| Linux    | X11     | WANT_WIN_X11    | Here is one possible way to obtain   |
+| (Ubuntu) |         |                 | the required packages:               |
+|          |         |                 |                                      |
+|          |         |                 |sudo apt-get install libx11-dev       |
+|          |         |                 |sudo apt-get install libmotif-dev     |
+|          |         |                 |sudo apt-get install libxaw7-dev      |
+|          |         |                 |sudo apt install xfonts-utils         |
+|          |         |                 |(That last one is for bdftopcf and    |
+|          |         |                 | mkfontdir utils)                     |
+|          |         |                 |                                      |
+|----------+---------+-----------------+--------------------------------------|
+| Linux    | Qt      | WANT_WIN_QT     | Here is one possible way to obtain   |
+| (Ubuntu) |         |                 | the required packages:               |
+|          |         |                 |                                      |
+|          |         |                 |sudo apt-get install qtbase5-dev      |
+|          |         |                 |sudo apt-get install qtmultimedia5-dev|
+|          |         |                 |                                      |
+|          |         |                 |Another odd note about Qt on Linux is |
+|          |         |                 |that if you find you are getting the  |
+|          |         |                 |following error trying to run NetHack |
+|          |         |                 |after you build it with Qt support:   |
+|          |         |                 |"error while loading shared           |
+|          |         |                 |libraries: libQt5Core.so.5: cannot    |
+|          |         |                 |open shared object file: No such file |
+|          |         |                 |or directory",                        |
+|          |         |                 |you may have to fix that (one-time)   |
+|          |         |                 |by issuing the command below:         |
+| sudo strip \                                                                |
+| --remove-section=.note.ABI-tag/usr/lib/x86_64-linux-gnu/libQt5Core.so.5     |
++----------+---------+-----------------+--------------------------------------+
 
-# NetHack 3.7  NewInstall.unx       $NHDT-Date: 1599337707 2020/09/05 20:28:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $
+# NetHack 3.7  NewInstall.unx       $NHDT-Date: 1652276817 2022/05/11 13:46:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
 # Copyright (c) 2009 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
