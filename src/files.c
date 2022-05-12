@@ -3637,7 +3637,8 @@ paniclog(const char *type,   /* panic, impossible, trickery */
             char playmode = wizard ? 'D' : discover ? 'X' : '-';
 
             (void) fprintf(lfile, "%s %08ld %06ld %d %c: %s %s\n",
-                           version_string(buf), yyyymmdd(now), hhmmss(now),
+                           version_string(buf, sizeof buf),
+                           yyyymmdd(now), hhmmss(now),
                            uid, playmode, type, reason);
 #endif /* !PANICLOG_FMT2 */
             (void) fclose(lfile);

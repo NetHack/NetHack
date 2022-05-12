@@ -1061,7 +1061,7 @@ About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
     switch (message) {
     case WM_INITDIALOG:
-        getversionstring(buf);
+        getversionstring(buf, sizeof buf);
         SetDlgItemText(hDlg, IDC_ABOUT_VERSION,
                        NH_A2W(buf, wbuf, sizeof(wbuf)));
 

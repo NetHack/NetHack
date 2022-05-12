@@ -153,7 +153,7 @@ mswin_display_splash_window(BOOL show_ver)
         char verbuf[BUFSZ];
         /* int verstrsize = 0; */
 
-        getversionstring(verbuf);
+        getversionstring(verbuf, sizeof verbuf);
         strbuf_append(&strbuf, verbuf);
         strbuf_append(&strbuf, "\n\n");
             
