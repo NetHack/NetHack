@@ -14,14 +14,15 @@ static void insert_rtoption(char *);
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
-version_string(char *buf)
+version_string(char *buf, size_t bufsz)
 {
-    return strcpy(buf, nomakedefs.version_string);
+    Snprintf(buf, bufsz, "%s", nomakedefs.version_string);
+    return buf;
 }
 
 /* fill and return the given buffer with the long nethack version string */
 char *
-getversionstring(char *buf)
+getversionstring(char *buf, size_t bufsz)
 {
     Strcpy(buf, nomakedefs.version_id);
 
@@ -39,25 +40,25 @@ getversionstring(char *buf)
 #if defined(RUNTIME_PORT_ID)
         tmp = get_port_id(tmpbuf);
         if (tmp)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%s%s", c++ ? "," : "", tmp);
 #endif
         if (nomakedefs.git_sha)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%s%s", c++ ? "," : "", nomakedefs.git_sha);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED)
         if (nomakedefs.git_branch)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%sbranch:%s",
                      c++ ? "," : "", nomakedefs.git_branch);
 #endif
         if (c)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%s", ")");
         else /* if nothing has been added, strip " (" back off */
             *p = '\0';
         if (dotoff)
-            Snprintf(eos(buf), (sizeof buf - strlen(buf)) - 1,
+            Snprintf(eos(buf), (bufsz - strlen(buf)) - 1,
                      "%s", ".");
     }
     return buf;
@@ -69,7 +70,7 @@ doversion(void)
 {
     char buf[BUFSZ];
 
-    pline("%s", getversionstring(buf));
+    pline("%s", getversionstring(buf, sizeof buf));
     return ECMD_OK;
 }
 
@@ -113,7 +114,7 @@ doextversion(void)
     /* instead of using ``display_file(OPTIONS_USED,TRUE)'' we handle
        the file manually so we can include dynamic version info */
 
-    (void) getversionstring(buf);
+    (void) getversionstring(buf, sizeof buf);
     /* if extra text (git info) is present, put it on separate line
        but don't wrap on (x86) */
     if (strlen(buf) >= COLNO)
@@ -209,7 +210,7 @@ early_version_info(boolean pastebuf)
 
     Snprintf(buf1, sizeof(buf1), "test");
     /* this is early enough that we have to do our own line-splitting */
-    getversionstring(buf1);
+    getversionstring(buf1, sizeof buf1);
     tmp = strstri(buf1, " ("); /* split at start of version info */
     if (tmp) {
         /* retain one buffer so that it all goes into the paste buffer */
