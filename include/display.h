@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1651099381 2022/04/27 22:43:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.67 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1652391718 2022/05/12 21:41:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -31,8 +31,14 @@
  * (or display non-adjacent, non-submerged ones when hero is underwater),
  * so treat those situations as blocking telepathy, detection, and warning
  * even though conceptually they shouldn't do so.
+ *
+ * [3.7 also] The macros whose name begins with an understore have been
+ * converted to functions in order to have compilers generate smaller code.
+ * The retained underscore versions are still used in display.c but should
+ * only be used in other situations if the function calls actually produce
+ * noticeably slower processing.
  */
-#define tp_sensemon(mon) \
+#define _tp_sensemon(mon) \
     (/* The hero can always sense a monster IF:        */  \
      /* 1. the monster has a brain to sense            */  \
      (!mindless(mon->data))                                \
@@ -42,10 +48,11 @@
           /*        object and in range                */  \
           || (Unblind_telepat                              \
               && (distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM)))))
+
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
    lava, but presumeably any monster there is on top so not sensed */
-#define sensemon(mon) \
+#define _sensemon(mon) \
     (   (!u.uswallow || (mon) == u.ustuck)                                 \
      && (!Underwater || (distu((mon)->mx, (mon)->my) <= 2                  \
                          && is_pool((mon)->mx, (mon)->my)))                \
@@ -55,7 +62,7 @@
  * mon_warning() is used to warn of any dangerous monsters in your
  * vicinity, and a glyph representing the warning level is displayed.
  */
-#define mon_warning(mon)                                                 \
+#define _mon_warning(mon) \
     (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
      && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))
 
@@ -77,13 +84,13 @@
  * reviewing all those instances and also existing mundetected instances.]
  */
 #if 0
-#define mon_visible(mon) \
+#define _mon_visible(mon) \
     (/* The hero can see the monster IF the monster                     */ \
      (!mon->minvis || See_invisible)  /*     1. is not invisible        */ \
      && !mon->mundetected             /* AND 2. not an undetected hider */ \
      && !(mon->mburied || u.uburied)) /* AND 3. neither you nor it is buried */
 #else   /* without 'mburied' and 'uburied' */
-#define mon_visible(mon) \
+#define _mon_visible(mon) \
     (/* The hero can see the monster IF the monster                     */ \
      (!mon->minvis || See_invisible)  /*     1. is not invisible        */ \
      && !mon->mundetected)            /* AND 2. not an undetected hider */
@@ -97,7 +104,7 @@
  * invisible to infravision), because this is usually called from within
  * canseemon() or canspotmon() which already check that.
  */
-#define see_with_infrared(mon)                        \
+#define _see_with_infrared(mon) \
     (!Blind && Infravision && mon && infravisible(mon->data) \
      && couldsee(mon->mx, mon->my))
 
@@ -108,7 +115,7 @@
  * routines.  Like mon_visible(), but it checks to see if the hero sees the
  * location instead of assuming it.  (And also considers worms.)
  */
-#define canseemon(mon)                                                    \
+#define _canseemon(mon) \
     ((mon->wormno ? worm_known(mon)                                       \
                   : (cansee(mon->mx, mon->my) || see_with_infrared(mon))) \
      && mon_visible(mon))
@@ -132,12 +139,17 @@
  * creature in an apparently empty spot.
  * Infravision is not relevant; we assume that invisible monsters are also
  * invisible to infravision.
+ * [3.7: the macro definition erroneously started with 'mtmp->minvis' for
+ * over 20 years.  The one place it's used called it as knowninvisible(mtmp)
+ * so worked by coincidence when there was no argument expansion involved
+ * on the first line.]
  */
-#define knowninvisible(mon)                                               \
-    (mtmp->minvis                                                         \
-     && ((cansee(mon->mx, mon->my) && (See_invisible || Detect_monsters)) \
-         || (!Blind && (HTelepat & ~INTRINSIC)                            \
-             && distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM))))
+#define _knowninvisible(mon) \
+    ((mon)->minvis                                                      \
+     && ((cansee((mon)->mx, (mon)->my)                                  \
+          && (See_invisible || Detect_monsters))                        \
+         || (!Blind && (HTelepat & ~INTRINSIC)                          \
+             && distu((mon)->mx, (mon)->my) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
  * is_safemon(mon)
@@ -145,7 +157,7 @@
  * A special case check used in attack() and domove().  Placing the
  * definition here is convenient.  No longer limited to pets.
  */
-#define is_safemon(mon) \
+#define _is_safemon(mon) \
     (flags.safe_dog && (mon) && (mon)->mpeaceful && canspotmon(mon)     \
      && !Confusion && !Hallucination && !Stunned)
 

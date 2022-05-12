@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1652299940 2022/05/11 20:12:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1114 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1652391728 2022/05/12 21:42:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1115 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -393,6 +393,14 @@ extern int wiz_debug_cmd_bury(void);
 
 /* ### display.c ### */
 
+extern int tp_sensemon(struct monst *);
+extern int sensemon(struct monst *);
+extern int mon_warning(struct monst *);
+extern int mon_visible(struct monst *);
+extern int see_with_infrared(struct monst *);
+extern int canseemon(struct monst *);
+extern int knowninvisible(struct monst *);
+extern int is_safemon(struct monst *);
 extern void magic_map_background(xchar, xchar, int);
 extern void map_background(xchar, xchar, int);
 extern void map_trap(struct trap *, int);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1644440006 2022/02/09 20:53:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.177 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1652391730 2022/05/12 21:42:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -150,6 +150,77 @@ static void t_warn(struct rm *);
 static int wall_angle(struct rm *);
 
 #define remember_topology(x, y) (g.lastseentyp[x][y] = levl[x][y].typ)
+
+/*
+ *      See display.h for descriptions of tp_sensemon() through
+ *      is_safemon().  Some of these were generating an awful lot of
+ *      code "behind the curtain", particularly canspotmon() (which is
+ *      still a macro but one that now expands to a pair of function
+ *      calls rather than to a ton of special case checks).  Return
+ *      values are all int 0 or 1, not boolean.
+ *
+ *      They're still implemented as macros within this file.
+ */
+int
+tp_sensemon(struct monst *mon)
+{
+    return _tp_sensemon(mon);
+}
+#define tp_sensemon(mon) _tp_sensemon(mon)
+
+int
+sensemon(struct monst *mon)
+{
+    return _sensemon(mon);
+}
+#define sensemon(mon) _sensemon(mon)
+
+int
+mon_warning(struct monst *mon)
+{
+    return _mon_warning(mon);
+}
+#define mon_warning(mon) _mon_warning(mon)
+
+int
+mon_visible(struct monst *mon)
+{
+    return _mon_visible(mon);
+}
+#define mon_visible(mon) _mon_visible(mon)
+
+int
+see_with_infrared(struct monst *mon)
+{
+    return _see_with_infrared(mon);
+}
+#define see_with_infrared(mon) _see_with_infrared(mon)
+
+int
+canseemon(struct monst *mon)
+{
+    return _canseemon(mon);
+}
+#define canseemon(mon) _canseemon(mon)
+
+int
+knowninvisible(struct monst *mon)
+{
+    return _knowninvisible(mon);
+}
+/* #define knowninvisible() isn't useful here */
+
+int
+is_safemon(struct monst *mon)
+{
+    return _is_safemon(mon);
+}
+/* #define is_safemon() isn't useful here */
+
+/*
+ *      End of former macro-only vision related (mostly) routines
+ *      converted to functions.
+ */
 
 /*
  * magic_map_background()
