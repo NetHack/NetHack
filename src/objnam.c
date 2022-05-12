@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1651868823 2022/05/06 20:27:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1652332281 2022/05/12 05:11:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3047,6 +3047,8 @@ static const struct alt_spellings {
     { "gauntlets of giant strength", GAUNTLETS_OF_POWER },
     { "elven chain mail", ELVEN_MITHRIL_COAT },
     { "potion of sleep", POT_SLEEPING },
+    { "scroll of recharging", SCR_CHARGING },
+    { "recharging", SCR_CHARGING },
     { "stone", ROCK },
     { "camera", EXPENSIVE_CAMERA },
     { "tee shirt", T_SHIRT },
