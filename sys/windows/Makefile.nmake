@@ -705,6 +705,12 @@ CL_RECENT=-sdl
 ! ENDIF
 !ENDIF
 
+!IF ($(VSVER) >= 2019)
+ASAN=/fsanitize=address
+!ELSE
+ASAN=
+!ENDIF
+
 #==========================================
 # More compiler setup post-macros
 #==========================================
@@ -723,7 +729,7 @@ ccommon= -c -nologo -D"_CONSOLE" -D"_CRT_NONSTDC_NO_DEPRECATE" -D"_CRT_SECURE_NO
 	-DHAS_STDINT_H -DHAS_INLINE $(CURSESDEF) $(RUNTIMEOPTDEF) \
 	-EHsc -fp:precise -Gd -GF -GS -Gy \
 	$(CL_RECENT) -WX- -Zc:forScope -Zc:wchar_t -Zi
-cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od /fsanitize=address
+cdebug= -analyze- -D"_DEBUG" -MTd -RTC1 -Od $(ASAN)
 crelease= -analyze- -D"_MBCS" -errorReport:prompt -MT -O2 -Ot -Ox -Oy
 
 lcommon= /NOLOGO /INCREMENTAL:NO
