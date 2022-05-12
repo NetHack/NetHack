@@ -855,9 +855,8 @@ dokick(void)
     int glyph, oldglyph = -1;
     register struct monst *mtmp;
     boolean no_kick = FALSE;
-    char buf[BUFSZ], kickobjnam[BUFSZ];
+    char buf[BUFSZ];
 
-    kickobjnam[0] = '\0';
     if (nolimbs(g.youmonst.data) || slithy(g.youmonst.data)) {
         You("have no legs to kick with.");
         no_kick = TRUE;
@@ -976,7 +975,7 @@ dokick(void)
 
     if (!isok(x, y)) {
         g.maploc = &g.nowhere;
-        kick_ouch(x, y, kickobjnam);
+        kick_ouch(x, y, "");
         return ECMD_TIME;
     }
     g.maploc = &levl[x][y];
@@ -1040,6 +1039,8 @@ dokick(void)
 
     if (OBJ_AT(x, y) && (!Levitation || Is_airlevel(&u.uz)
                          || Is_waterlevel(&u.uz) || sobj_at(BOULDER, x, y))) {
+        char kickobjnam[BUFSZ];
+
         if (kick_object(x, y, kickobjnam)) {
             if (Is_airlevel(&u.uz))
                 hurtle(-u.dx, -u.dy, 1, TRUE); /* assume it's light */
@@ -1072,7 +1073,7 @@ dokick(void)
                     unblock_point(x, y); /* vision */
                 return ECMD_TIME;
             } else {
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
         }
@@ -1085,7 +1086,7 @@ dokick(void)
                 unblock_point(x, y); /* vision */
                 return ECMD_TIME;
             } else {
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
         }
@@ -1130,11 +1131,11 @@ dokick(void)
                     fall_through(FALSE, 0);
                     return ECMD_TIME;
                 } else {
-                    kick_ouch(x, y, kickobjnam);
+                    kick_ouch(x, y, "");
                     return ECMD_TIME;
                 }
             }
-            kick_ouch(x, y, kickobjnam);
+            kick_ouch(x, y, "");
             return ECMD_TIME;
         }
         if (IS_ALTAR(g.maploc->typ)) {
@@ -1145,7 +1146,7 @@ dokick(void)
             You("kick %s.", (Blind ? something : "the altar"));
             altar_wrath(x, y);
             if (!rn2(3)) {
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
             exercise(A_DEX, TRUE);
@@ -1158,7 +1159,7 @@ dokick(void)
             }
             You("kick %s.", (Blind ? something : "the fountain"));
             if (!rn2(3)) {
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
             /* make metal boots rust */
@@ -1176,7 +1177,7 @@ dokick(void)
                 return ECMD_TIME;
             }
             if (rn2(4)) {
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
             exercise(A_WIS, FALSE);
@@ -1197,7 +1198,7 @@ dokick(void)
             return ECMD_TIME;
         }
         if (g.maploc->typ == IRONBARS) {
-            kick_ouch(x, y, kickobjnam);
+            kick_ouch(x, y, "");
             return ECMD_TIME;
         }
         if (IS_TREE(g.maploc->typ)) {
@@ -1207,7 +1208,7 @@ dokick(void)
             if (rn2(3)) {
                 if (!rn2(6) && !(g.mvitals[PM_KILLER_BEE].mvflags & G_GONE))
                     You_hear("a low buzzing."); /* a warning */
-                kick_ouch(x, y, kickobjnam);
+                kick_ouch(x, y, "");
                 return ECMD_TIME;
             }
             if (rn2(15) && !(g.maploc->looted & TREE_LOOTED)
@@ -1256,7 +1257,7 @@ dokick(void)
                 g.maploc->looted |= TREE_SWARM;
                 return ECMD_TIME;
             }
-            kick_ouch(x, y, kickobjnam);
+            kick_ouch(x, y, "");
             return ECMD_TIME;
         }
         if (IS_SINK(g.maploc->typ)) {
@@ -1318,7 +1319,7 @@ dokick(void)
                 }
                 return ECMD_TIME;
             }
-            kick_ouch(x, y, kickobjnam);
+            kick_ouch(x, y, "");
             return ECMD_TIME;
         }
         if (g.maploc->typ == STAIRS || g.maploc->typ == LADDER
@@ -1327,7 +1328,7 @@ dokick(void)
                 kick_dumb(x, y);
                 return ECMD_TIME;
             }
-            kick_ouch(x, y, kickobjnam);
+            kick_ouch(x, y, "");
             return ECMD_TIME;
         }
         kick_dumb(x, y);
@@ -1342,7 +1343,7 @@ dokick(void)
 
     /* not enough leverage to kick open doors while levitating */
     if (Levitation) {
-        kick_ouch(x, y, kickobjnam);
+        kick_ouch(x, y, "");
         return ECMD_TIME;
     }
 
