@@ -907,6 +907,8 @@ fix a pair of off-by-one bugs when doling out initial characteristics points,
 	resulting in an unintentional bias toward Str and away from Cha;
 	negligible effect on individual games but had a minor cumulative
 	effect across a large set of games
+using a marker to write "novel" or "paperback book" on a known blank spellbook
+	was producing a randomly chosen Pratchett novel; make it fail instead
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
