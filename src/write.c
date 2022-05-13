@@ -128,11 +128,9 @@ dowrite(struct obj *pen)
         return ECMD_CANCEL;
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
-    typeword = (paper->otyp == SPE_NOVEL)
-                  ? "book"
-                  : (paper->oclass == SPBOOK_CLASS)
-                     ? "spellbook"
-                     : "scroll";
+    typeword = (paper->otyp == SPE_NOVEL) ? "book"
+               : (paper->oclass == SPBOOK_CLASS) ? "spellbook"
+                 : "scroll";
     if (Blind) {
         if (!paper->dknown) {
             You("don't know if that %s is blank or not.", typeword);
@@ -221,9 +219,23 @@ dowrite(struct obj *pen)
         pline("It's obscene!");
         return ECMD_TIME;
     } else if (i == SPE_NOVEL) {
-        You(
-         "prepare to write the Great Yendorian Novel, but lack inspiration.");
-        You("give up on the idea.");
+        boolean fanfic = !rn2(3), tearup = !rn2(3);
+
+        if (!fanfic) {
+            You("%s to write the Great Yendorian Novel, but %s inspiration.",
+                !tearup ? "prepare" : "try",
+                !Hallucination ? "lack" : "have too much");
+        } else {
+            You("%sproduce really %s fan-fiction.",
+                !tearup ? "start to " : "",
+                !Hallucination ? "lame" : "awesome");
+        }
+        if (!tearup) {
+            You("give up on the idea.");
+        } else {
+            You("tear it up.");
+            useup(paper);
+        }
         return ECMD_TIME;
     } else if (i == SPE_BOOK_OF_THE_DEAD) {
         pline("No mere dungeon adventurer could write that.");
