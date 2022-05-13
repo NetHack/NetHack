@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.913 $ $NHDT-Date: 1652299940 2022/05/11 20:12:20 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.914 $ $NHDT-Date: 1652478351 2022/05/13 21:45:51 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1209,6 +1209,8 @@ revised monster teleportation message handling caused magic whistle to be
 	changed to not operate on pets that were already adjacent; change back
 revised monster teleportation message handling could produce duplicate message
 	when shopkeeper who left shop got returned to it
+recent changes in removing a dead monster from the map didn't update screen
+	to show objects it dropped; they were present, just not displayed
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
@@ -1242,6 +1244,8 @@ tty: previous change resulted in remnants of previous level being shown on
 tty: for #wizidentify, using ^I as an unseen group accelerator to pick the
 	'all' choice was incorrectly checking menuitem_invert_test() and
 	failing, so the 'all' choice wasn't being toggled on if user typed ^I
+tty: changes to support utf8 resulted in lines of text windows being shown
+	starting at their second character
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new

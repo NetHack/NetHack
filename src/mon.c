@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1651886997 2022/05/07 01:29:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1652478356 2022/05/13 21:45:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2322,6 +2322,10 @@ mon_leaving_level(struct monst *mon)
             remove_worm(mon);
         else
             remove_monster(mx, my);
+
+        mon->mx = mon->my = 0; /* off normal map; if caller wants to use
+                                * mon's coordinates after this, it must
+                                * save those before calling us */
     }
     if (onmap) {
         mon->mundetected = 0; /* for migration; doesn't matter for death */
@@ -2344,13 +2348,23 @@ m_detach(
     struct monst *mtmp,
     struct permonst *mptr) /* reflects mtmp->data _prior_ to mtmp's death */
 {
+    xchar mx = mtmp->mx, my = mtmp->my;
+
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
 
     if (mtmp->mx > 0 && emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
 
-    /* take mtmp off map but not out of fmon list yet (dmonsfree does that) */
+    /*
+     * Take mtmp off map but not out of fmon list yet (dmonsfree does that).
+     *
+     * Sequencing issue:  mtmp's inventory should be dropped before taking
+     * it off the map but if that includes a boulder and mtmp is at a pit
+     * location, dropping minvent ought to be deferred until its corpse
+     * gets placed.  We compromise and just make sure mtmp is off the map
+     * before dropping its former belongings.
+     */
     mon_leaving_level(mtmp);
 
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
@@ -2362,8 +2376,13 @@ m_detach(
         leaddead();
     if (mtmp->m_id == g.stealmid)
         thiefdead();
-    /* release (drop onto map) all objects carried by mtmp */
-    relobj(mtmp, 0, FALSE);
+    /* release (drop onto map) all objects carried by mtmp; first,
+       temporarily restore mtmp's internal location (without actually
+       putting it back on the map) because relobj() relies on that but
+       mon_leaving_level() just cleared that */
+    mtmp->mx = mx, mtmp->my = my;
+    relobj(mtmp, 1, FALSE); /* drop mtmp->minvent, then issue newsym(mx,my) */
+    mtmp->mx = mtmp->my = 0;
 
     if (mtmp->isshk)
         shkgone(mtmp);
@@ -2842,6 +2861,7 @@ monstone(struct monst* mdef)
             You("%s through an opening in the new %s.",
                 u_locomotion("jump"), xname(otmp));
     }
+    return;
 }
 
 /* another monster has killed the monster mdef */
@@ -2886,6 +2906,7 @@ monkilled(
         if (rxt)
             pline("May %s %s in peace.", noit_mon_nam(mdef), rxt);
     }
+    return;
 }
 
 void
@@ -3159,6 +3180,7 @@ xkilled(
 
     /* malign was already adjusted for u.ualign.type and randomization */
     adjalign(mtmp->malign);
+    return;
 }
 
 /* changes the monster into a stone monster of the same type
@@ -4483,8 +4505,11 @@ newcham(
         *p = '\0';
 
     if (mtmp->wormno) { /* throw tail away */
-        wormgone(mtmp);
-        place_monster(mtmp, mtmp->mx, mtmp->my);
+        xchar mx = mtmp->mx, my = mtmp->my;
+
+        wormgone(mtmp); /* discards tail segments, takes head off the map */
+        /* put the head back; it will morph into mtmp's new form */
+        place_monster(mtmp, mx, my);
     }
     if (M_AP_TYPE(mtmp) && mdat->mlet != S_MIMIC)
         seemimic(mtmp); /* revert to normal monster */

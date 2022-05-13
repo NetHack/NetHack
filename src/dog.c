@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1599330917 2020/09/05 18:35:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.104 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1652478351 2022/05/13 21:45:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -653,16 +653,6 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
             if (mtmp->isshk)
                 set_residency(mtmp, TRUE);
 
-            if (mtmp->wormno) {
-                register int cnt;
-                /* NOTE: worm is truncated to # segs = max wormno size */
-                cnt = count_wsegs(mtmp);
-                num_segs = min(cnt, MAX_NUM_WORMS - 1);
-                wormgone(mtmp);
-                place_monster(mtmp, mtmp->mx, mtmp->my);
-            } else
-                num_segs = 0;
-
             /* set minvent's obj->no_charge to 0 */
             for (obj = mtmp->minvent; obj; obj = obj->nobj) {
                 if (Has_contents(obj))
@@ -670,8 +660,22 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
                 obj->no_charge = 0;
             }
 
-            relmon(mtmp, &g.mydogs);   /* move it from map to g.mydogs */
-            mtmp->mx = mtmp->my = 0; /* avoid mnexto()/MON_AT() problem */
+            if (mtmp->wormno) {
+                int cnt = count_wsegs(mtmp);
+
+                /* since monst->wormno is overloaded to hold the number of
+                   tail segments during migration, a very long worm with
+                   more segments than can fit in that field gets truncated */
+                num_segs = min(cnt, MAX_NUM_WORMS - 1);
+                wormgone(mtmp); /* discard tail segments, take head off map */
+                /* this used to be place_monster() but relmon() doesn't
+                   need that as long as coordinates reflect actual state */
+                mtmp->mx = mtmp->my = 0; /* off normal map */
+            } else
+                num_segs = 0;
+
+            /* take off map and move mtmp from fmon list to mydogs */
+            relmon(mtmp, &g.mydogs); /* mtmp->mx,my get changed to 0,0 */
             mtmp->wormno = num_segs;
             mtmp->mlstmv = g.moves;
         } else if (mtmp->iswiz) {
@@ -698,7 +702,7 @@ migrate_to_level(
 {
     struct obj *obj;
     d_level new_lev;
-    xchar xyflags;
+    xchar xyflags, mx = mtmp->mx, my = mtmp->my; /* might be needed below */
     int num_segs = 0; /* count of worm segments */
 
     if (mtmp->isshk)
@@ -712,7 +716,7 @@ migrate_to_level(
         wormgone(mtmp); /* destroys tail and takes head off map */
         /* there used to be a place_monster() here for the relmon() below,
            but it doesn't require the monster to be on the map anymore */
-        mtmp->mx = mtmp->my = 0;
+        mtmp->mx = mtmp->my = 0; /* wormgone() doesn't do this for us */
     }
 
     /* set minvent's obj->no_charge to 0 */
@@ -726,7 +730,9 @@ migrate_to_level(
         mtmp->mtame--;
         m_unleash(mtmp, TRUE);
     }
-    relmon(mtmp, &g.migrating_mons); /* move it from map to g.migrating_mons */
+
+    /* take off map and move mtmp from fmon list to migrating_mons */
+    relmon(mtmp, &g.migrating_mons); /* mtmp->mx,my get changed to 0,0 */
     mtmp->mstate |= MON_MIGRATING;
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
@@ -740,13 +746,14 @@ migrate_to_level(
     mtmp->mlstmv = g.moves;
     mtmp->mtrack[2].x = u.uz.dnum; /* migrating from this dungeon */
     mtmp->mtrack[2].y = u.uz.dlevel; /* migrating from this dungeon level */
-    mtmp->mtrack[1].x = cc ? cc->x : mtmp->mx;
-    mtmp->mtrack[1].y = cc ? cc->y : mtmp->my;
+    mtmp->mtrack[1].x = cc ? cc->x : mx;
+    mtmp->mtrack[1].y = cc ? cc->y : my;
     mtmp->mtrack[0].x = xyloc;
     mtmp->mtrack[0].y = xyflags;
     mtmp->mux = new_lev.dnum;
     mtmp->muy = new_lev.dlevel;
-    mtmp->mx = mtmp->my = 0; /* this implies migration */
+    mtmp->mx = mtmp->my = 0; /* this implies migration (note: already done
+                              * by relmon() -> mon_leaving_level() above) */
 
     /* don't extinguish a mobile light; it still exists but has changed
        from local (monst->mx > 0) to global (mx==0, not on this level) */
