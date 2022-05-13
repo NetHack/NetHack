@@ -2350,9 +2350,6 @@ m_detach(
     if (mtmp->mx > 0 && emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
 
-    /* take mtmp off map but not out of fmon list yet (dmonsfree does that) */
-    mon_leaving_level(mtmp);
-
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
     if (mtmp->iswiz)
         wizdead();
@@ -2364,6 +2361,9 @@ m_detach(
         thiefdead();
     /* release (drop onto map) all objects carried by mtmp */
     relobj(mtmp, 0, FALSE);
+
+    /* take mtmp off map but not out of fmon list yet (dmonsfree does that) */
+    mon_leaving_level(mtmp);
 
     if (mtmp->isshk)
         shkgone(mtmp);
