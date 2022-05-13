@@ -220,6 +220,11 @@ dowrite(struct obj *pen)
         You_cant("write that!");
         pline("It's obscene!");
         return ECMD_TIME;
+    } else if (i == SPE_NOVEL) {
+        You(
+         "prepare to write the Great Yendorian Novel, but lack inspiration.");
+        You("give up on the idea.");
+        return ECMD_TIME;
     } else if (i == SPE_BOOK_OF_THE_DEAD) {
         pline("No mere dungeon adventurer could write that.");
         return ECMD_TIME;
