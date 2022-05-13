@@ -459,7 +459,7 @@ aboutMsg()
     char *p, vbuf[BUFSZ];
     /* nethack's getversionstring() includes a final period
        but we're using it mid-sentence so strip period off */
-    if ((p = strrchr(::getversionstring(vbuf), '.')) != 0 && *(p + 1) == '\0')
+    if ((p = strrchr(::getversionstring(vbuf, sizeof vbuf), '.')) != 0 && *(p + 1) == '\0')
         *p = '\0';
     /* it's also long; break it into two pieces */
     (void) strsubst(vbuf, " - ", "\n- ");

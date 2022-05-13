@@ -66,7 +66,7 @@ NetHackQtSavedGameSelector::NetHackQtSavedGameSelector(const char** saved) :
     QHBoxLayout* hb;
 
     char cvers[BUFSZ];
-    QString qvers = QString("NetHack ") + QString(version_string(cvers));
+    QString qvers = QString("NetHack ") + QString(version_string(cvers, sizeof cvers));
     QLabel *vers = new QLabel(qvers, this);
     vers->setAlignment(Qt::AlignCenter);
     vbl->addWidget(vers);

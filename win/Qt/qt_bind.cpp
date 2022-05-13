@@ -88,7 +88,7 @@ NetHackQtBind::NetHackQtBind(int& argc, char** argv) :
     QCoreApplication::setApplicationName("NetHack-Qt"); // Qt NetHack
     {
         char cvers[BUFSZ];
-        QString qvers = QString(::version_string(cvers));
+        QString qvers = QString(::version_string(cvers, sizeof cvers));
         QCoreApplication::setApplicationVersion(qvers);
     }
 #ifdef MACOS

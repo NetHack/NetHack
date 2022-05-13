@@ -280,7 +280,7 @@ NetHackQtPlayerSelector::NetHackQtPlayerSelector(
     QVBoxLayout* vbab UNUSED = new QVBoxLayout(alignbox);
     char versionbuf[QBUFSZ];
     QLabel *logo = new QLabel(QString(nh_attribution).arg(
-                                           version_string(versionbuf)), this);
+                        version_string(versionbuf, sizeof versionbuf)), this);
 
     l->addWidget( namebox, 0,0,1,3 );
     role = new NhPSListView(this);
