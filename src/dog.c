@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1652478351 2022/05/13 21:45:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1652524227 2022/05/14 10:30:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -7,6 +7,7 @@
 
 static int pet_type(void);
 static void set_mon_lastmove(struct monst *);
+static int mon_leave(struct monst *);
 
 void
 newedog(struct monst *mtmp)
@@ -578,14 +579,50 @@ mon_catchup_elapsed_time(
         mtmp->mhp += imv;
 }
 
+/* bookkeeping when mtmp is about to leave the current level;
+   common to keepdogs() and migrate_to_level() */
+static int
+mon_leave(struct monst *mtmp)
+{
+    struct obj *obj;
+    int num_segs = 0; /* return value */
+
+    /* set minvent's obj->no_charge to 0 */
+    for (obj = mtmp->minvent; obj; obj = obj->nobj) {
+        if (Has_contents(obj))
+            picked_container(obj); /* does the right thing */
+        obj->no_charge = 0;
+    }
+
+    /* if this is a shopkeeper, clear the 'resident' field of her shop;
+       if/when she returns, it will be set back by mon_arrive()  */
+    if (mtmp->isshk)
+        set_residency(mtmp, TRUE);
+
+    /* if this is a long worm, handle its tail segments before mtmp itself;
+       we pass possibly trundated segment count to caller via return value  */
+    if (mtmp->wormno) {
+        int cnt = count_wsegs(mtmp);
+
+        /* since monst->wormno is overloaded to hold the number of
+           tail segments during migration, a very long worm with
+           more segments than can fit in that field gets truncated */
+        num_segs = min(cnt, MAX_NUM_WORMS - 1);
+        wormgone(mtmp); /* discard tail segments, take head off map */
+        /* this used to be place_monster() but relmon() doesn't
+           need that as long as coordinates reflect actual state */
+        mtmp->mx = mtmp->my = 0; /* off normal map */
+    }
+
+    return num_segs;
+}
+
 /* called when you move to another level */
 void
-keepdogs(boolean pets_only) /* true for ascension or final escape */
+keepdogs(
+    boolean pets_only) /* true for ascension or final escape */
 {
     register struct monst *mtmp, *mtmp2;
-    register struct obj *obj;
-    int num_segs;
-    boolean stay_behind;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp2) {
         mtmp2 = mtmp->nmon;
@@ -615,7 +652,9 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
                 || (mtmp == u.usteed))
             /* monster won't follow if it hasn't noticed you yet */
             && !(mtmp->mstrategy & STRAT_WAITFORU)) {
-            stay_behind = FALSE;
+            int num_segs;
+            boolean stay_behind = FALSE;
+
             if (mtmp->mtrapped)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS); /* try to escape */
             if (mtmp == u.usteed) {
@@ -650,30 +689,9 @@ keepdogs(boolean pets_only) /* true for ascension or final escape */
                 }
                 continue;
             }
-            if (mtmp->isshk)
-                set_residency(mtmp, TRUE);
 
-            /* set minvent's obj->no_charge to 0 */
-            for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-                if (Has_contents(obj))
-                    picked_container(obj); /* does the right thing */
-                obj->no_charge = 0;
-            }
-
-            if (mtmp->wormno) {
-                int cnt = count_wsegs(mtmp);
-
-                /* since monst->wormno is overloaded to hold the number of
-                   tail segments during migration, a very long worm with
-                   more segments than can fit in that field gets truncated */
-                num_segs = min(cnt, MAX_NUM_WORMS - 1);
-                wormgone(mtmp); /* discard tail segments, take head off map */
-                /* this used to be place_monster() but relmon() doesn't
-                   need that as long as coordinates reflect actual state */
-                mtmp->mx = mtmp->my = 0; /* off normal map */
-            } else
-                num_segs = 0;
-
+            /* prepare to take mtmp off the map */
+            num_segs = mon_leave(mtmp);
             /* take off map and move mtmp from fmon list to mydogs */
             relmon(mtmp, &g.mydogs); /* mtmp->mx,my get changed to 0,0 */
             mtmp->wormno = num_segs;
@@ -700,31 +718,12 @@ migrate_to_level(
     xchar xyloc, /* MIGR_xxx destination xy location: */
     coord *cc)   /* optional destination coordinates */
 {
-    struct obj *obj;
     d_level new_lev;
-    xchar xyflags, mx = mtmp->mx, my = mtmp->my; /* might be needed below */
-    int num_segs = 0; /* count of worm segments */
+    xchar xyflags, mx = mtmp->mx, my = mtmp->my; /* <mx,my> needed below */
+    int num_segs; /* count of worm segments */
 
-    if (mtmp->isshk)
-        set_residency(mtmp, TRUE);
-
-    if (mtmp->wormno) {
-        int cnt = count_wsegs(mtmp);
-
-        /* **** NOTE: worm is truncated to # segs = max wormno size **** */
-        num_segs = min(cnt, MAX_NUM_WORMS - 1); /* used below */
-        wormgone(mtmp); /* destroys tail and takes head off map */
-        /* there used to be a place_monster() here for the relmon() below,
-           but it doesn't require the monster to be on the map anymore */
-        mtmp->mx = mtmp->my = 0; /* wormgone() doesn't do this for us */
-    }
-
-    /* set minvent's obj->no_charge to 0 */
-    for (obj = mtmp->minvent; obj; obj = obj->nobj) {
-        if (Has_contents(obj))
-            picked_container(obj); /* does the right thing */
-        obj->no_charge = 0;
-    }
+    /* prepare to take mtmp off the map */
+    num_segs = mon_leave(mtmp);
 
     if (mtmp->mleashed) {
         mtmp->mtame--;
@@ -737,10 +736,10 @@ migrate_to_level(
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
     new_lev.dlevel = ledger_to_dlev((xchar) tolev);
-    /* overload mtmp->[mx,my], mtmp->[mux,muy], and mtmp->mtrack[] as */
-    /* destination codes (setup flag bits before altering mx or my) */
+    /* overload mtmp->[mx,my], mtmp->[mux,muy], and mtmp->mtrack[] as
+       destination codes */
     xyflags = (depth(&new_lev) < depth(&u.uz)); /* 1 => up */
-    if (In_W_tower(mtmp->mx, mtmp->my, &u.uz))
+    if (In_W_tower(mx, my, &u.uz))
         xyflags |= 2;
     mtmp->wormno = num_segs;
     mtmp->mlstmv = g.moves;
