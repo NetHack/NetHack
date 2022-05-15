@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1652524227 2022/05/14 10:30:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1652577033 2022/05/15 01:10:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -609,9 +609,7 @@ mon_leave(struct monst *mtmp)
            more segments than can fit in that field gets truncated */
         num_segs = min(cnt, MAX_NUM_WORMS - 1);
         wormgone(mtmp); /* discard tail segments, take head off map */
-        /* this used to be place_monster() but relmon() doesn't
-           need that as long as coordinates reflect actual state */
-        mtmp->mx = mtmp->my = 0; /* off normal map */
+        /* mtmp->mx,mtmp->my is now 0,0 */
     }
 
     return num_segs;
@@ -722,14 +720,13 @@ migrate_to_level(
     xchar xyflags, mx = mtmp->mx, my = mtmp->my; /* <mx,my> needed below */
     int num_segs; /* count of worm segments */
 
-    /* prepare to take mtmp off the map */
-    num_segs = mon_leave(mtmp);
-
     if (mtmp->mleashed) {
         mtmp->mtame--;
         m_unleash(mtmp, TRUE);
     }
 
+    /* prepare to take mtmp off the map */
+    num_segs = mon_leave(mtmp);
     /* take off map and move mtmp from fmon list to migrating_mons */
     relmon(mtmp, &g.migrating_mons); /* mtmp->mx,my get changed to 0,0 */
     mtmp->mstate |= MON_MIGRATING;

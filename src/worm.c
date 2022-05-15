@@ -1,4 +1,4 @@
-/* NetHack 3.7	worm.c	$NHDT-Date: 1608236444 2020/12/17 20:20:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1652577033 2022/05/15 01:10:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -297,23 +297,38 @@ worm_nomove(struct monst *worm)
 /*
  *  wormgone()
  *
- *  Check for mon->wormno before calling this function!
+ *  Kill a worm tail.  Also takes the head off the map.  Caller needs to
+ *  keep track of what its coordinates were if planning to put it back.
  *
- *  Kill a worm tail.
+ *  Should only be called when mon->wormno is non-zero.
  */
 void
 wormgone(struct monst *worm)
 {
     int wnum = worm->wormno;
 
-    worm->wormno = 0;
-    /*  This will also remove the real monster (ie 'w') from the its
-     *  position in level.monsters[][].
+    if (!wnum) /* note: continuing with wnum==0 runs to completion */
+        impossible("wormgone: wormno is 0");
+
+    worm->wormno = 0; /* still a long worm but doesn't grow/shrink anymore */
+    /*
+     *  This will also remove the real monster (ie 'w') from the its
+     *  position in level.monsters[][].  (That happens when removing
+     *  the hidden tail segment which is co-located with the head.)
      */
     toss_wsegs(wtails[wnum], TRUE);
+    worm->mx = worm->my = 0; /* 'worm' is no longer on map but has not
+                              * been killed off; caller might put it back */
 
     wheads[wnum] = wtails[wnum] = (struct wseg *) 0;
     wgrowtime[wnum] = 0L;
+
+    /* we don't expect to encounter this here but check for it anyway;
+       when a long worm gets created by a polymorph zap, it gets flagged
+       with MCORPSENM()==PM_LONG_WORM so that the same zap won't trigger
+       another polymorph if it hits the new tail */
+    if (worm->data == &mons[PM_LONG_WORM] && has_mcorpsenm(worm))
+        MCORPSENM(worm) = NON_PM; /* not polymorph-proof */
 }
 
 /*
