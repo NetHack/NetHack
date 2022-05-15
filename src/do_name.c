@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1646870842 2022/03/10 00:07:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1652637698 2022/05/15 18:01:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -684,6 +684,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         NHKF_GETPOS_VALID_NEXT,
         NHKF_GETPOS_VALID_PREV
     };
+    struct _cmd_queue cq, *cmdq;
     char pick_chars[6];
     char mMoOdDxX[13];
     int result = 0;
@@ -698,6 +699,21 @@ getpos(coord *ccp, boolean force, const char *goal)
     schar udx = u.dx, udy = u.dy, udz = u.dz;
     int dx, dy;
     boolean rushrun = FALSE;
+
+    /* temporary? if we have a queued direction, return the adjacent spot
+       in that direction */
+    if ((cmdq = cmdq_pop()) != 0) {
+        cq = *cmdq;
+        free((genericptr_t) cmdq);
+        if (cq.typ == CMDQ_DIR && !cq.dirz) {
+            ccp->x = u.ux + cq.dirx;
+            ccp->y = u.uy + cq.diry;
+        } else {
+            cmdq_clear();
+            result = -1;
+        }
+        return result;
+    }
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
         pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
@@ -1424,14 +1440,16 @@ docallcmd(void)
     winid win;
     anything any;
     menu_item *pick_list = 0;
-    struct _cmd_queue *cmdq;
+    struct _cmd_queue cq, *cmdq;
     char ch = 0;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
 
     if ((cmdq = cmdq_pop()) != 0) {
-        if (cmdq->typ == CMDQ_KEY)
-            ch = cmdq->key;
+        cq = *cmdq;
+        free((genericptr_t) cmdq);
+        if (cq.typ == CMDQ_KEY)
+            ch = cq.key;
         else
             cmdq_clear();
         goto docallcmd;

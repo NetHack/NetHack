@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1651279805 2022/04/30 00:50:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.561 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1652637694 2022/05/15 18:01:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.563 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4561,6 +4561,7 @@ enum menucmd {
     MCMD_REMOVE_SADDLE,
     MCMD_APPLY_SADDLE,
     MCMD_TALK,
+    MCMD_NAME,
 
     MCMD_QUAFF,
     MCMD_DIP,
@@ -4594,7 +4595,8 @@ mcmd_addmenu(winid win, int act, const char *txt)
     /* TODO: fixed letters for the menu entries? */
     any = cg.zeroany;
     any.a_int = act;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, txt,
+             MENU_ITEMFLAGS_NONE);
 }
 
 /* command menu entries when targeting self */
@@ -4685,7 +4687,11 @@ there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
 
 /* add entries to there_cmd_menu, when x,y is next to hero */
 static int
-there_cmd_menu_next2u(winid win, int x, int y, int mod, int *act)
+there_cmd_menu_next2u(
+    winid win,
+    int x, int y,
+    int mod,
+    int *act)
 {
     int K = 0;
     char buf[BUFSZ];
@@ -4756,15 +4762,12 @@ there_cmd_menu_next2u(winid win, int x, int y, int mod, int *act)
         Sprintf(buf, "Talk to %s", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
     }
-#if 0
     if (mtmp) {
-        Sprintf(buf, "%s %s", mon_nam(mtmp),
-                !has_mname(mtmp) ? "Name" : "Rename"), ++K;
-        /* need a way to pass mtmp or <ux+dx,uy+dy>to an 'int f()' function
-           as well as reorganizinging do_mname() to use that function */
-        add_herecmd_menuitem(win, XXX(), buf);
+        Sprintf(buf, "%s %s",
+                !MGIVENNAME(mtmp) ? "Name" : "Rename",
+                mon_nam(mtmp));
+        mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
-#endif
 
     if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
         Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
@@ -4797,7 +4800,11 @@ there_cmd_menu_far(winid win, xchar x, xchar y, int mod)
 }
 
 static int
-there_cmd_menu_common(winid win, xchar x UNUSED, xchar y UNUSED, int mod, int *act UNUSED)
+there_cmd_menu_common(
+    winid win,
+    xchar x UNUSED, xchar y UNUSED,
+    int mod,
+    int *act UNUSED)
 {
     int K = 0;
 
@@ -4813,6 +4820,7 @@ static char
 there_cmd_menu(int x, int y, int mod)
 {
     winid win;
+    struct obj *otmp;
     char ch = '\0';
     int npick = 0, K = 0;
     menu_item *picks = (menu_item *) 0;
@@ -4873,16 +4881,16 @@ there_cmd_menu(int x, int y, int mod)
             cmdq_add_dir(dx, dy, 0);
             break;
         case MCMD_LOCK_DOOR:
-            {
-                struct obj *otmp = carrying(SKELETON_KEY);
-                if (!otmp) otmp = carrying(LOCK_PICK);
-                if (!otmp) otmp = carrying(CREDIT_CARD);
-                if (otmp) {
-                    cmdq_add_ec(doapply);
-                    cmdq_add_key(otmp->invlet);
-                    cmdq_add_dir(dx, dy, 0);
-                    cmdq_add_key('y'); /* "Lock it?" */
-                }
+            otmp = carrying(SKELETON_KEY);
+            if (!otmp)
+                otmp = carrying(LOCK_PICK);
+            if (!otmp)
+                otmp = carrying(CREDIT_CARD);
+            if (otmp) {
+                cmdq_add_ec(doapply);
+                cmdq_add_key(otmp->invlet);
+                cmdq_add_dir(dx, dy, 0);
+                cmdq_add_key('y'); /* "Lock it?" */
             }
             break;
         case MCMD_UNTRAP_DOOR:
@@ -4923,14 +4931,10 @@ there_cmd_menu(int x, int y, int mod)
             cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
             break;
         case MCMD_APPLY_SADDLE:
-            {
-                struct obj *otmp = carrying(SADDLE);
-
-                if (otmp) {
-                    cmdq_add_ec(doapply);
-                    cmdq_add_key(otmp->invlet);
-                    cmdq_add_dir(dx, dy, 0);
-                }
+            if ((otmp = carrying(SADDLE)) != 0) {
+                cmdq_add_ec(doapply);
+                cmdq_add_key(otmp->invlet);
+                cmdq_add_dir(dx, dy, 0);
             }
             break;
         case MCMD_ATTACK_NEXT2U:
@@ -4939,6 +4943,11 @@ there_cmd_menu(int x, int y, int mod)
         case MCMD_TALK:
             cmdq_add_ec(dotalk);
             cmdq_add_dir(dx, dy, 0);
+            break;
+        case MCMD_NAME:
+            cmdq_add_ec(docallcmd);
+            cmdq_add_key('m'); /* name a monster */
+            cmdq_add_dir(dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
             break;
         case MCMD_QUAFF:
             cmdq_add_ec(dodrink);
