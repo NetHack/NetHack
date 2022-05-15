@@ -2370,8 +2370,18 @@ m_detach(
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
     if (mtmp->iswiz)
         wizdead();
-    if (mtmp->data->msound == MS_NEMESIS)
+    if (mtmp->data->msound == MS_NEMESIS) {
+        struct permonst *mdat = mtmp->data;
         nemdead();
+        /* The Archeologist, Caveman, and Priest quest texts describe
+           the nemesis's body creating noxious fumes/gas when
+           killed. */
+        if (mdat == &mons[PM_MINION_OF_HUHETOTL]
+            || mdat == &mons[PM_CHROMATIC_DRAGON]
+            || mdat == &mons[PM_NALZOK]) {
+            create_gas_cloud(mx, my, 5, 8);
+        }
+    }
     if (mtmp->data->msound == MS_LEADER)
         leaddead();
     if (mtmp->m_id == g.stealmid)
