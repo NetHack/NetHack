@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1652391718 2022/05/12 21:41:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1652719570 2022/05/16 16:46:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -503,13 +503,12 @@ enum glyph_offsets {
     GLYPH_CMAP_STONE_OFF = (GLYPH_CMAP_OFF),
     GLYPH_CMAP_MAIN_OFF = (1 + GLYPH_CMAP_STONE_OFF),
     GLYPH_CMAP_MINES_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_MAIN_OFF),
-    GLYPH_CMAP_GEH_OFF   = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_MINES_OFF),
-    GLYPH_CMAP_KNOX_OFF  = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_GEH_OFF),
-    GLYPH_CMAP_SOKO_OFF  = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_KNOX_OFF),
-    GLYPH_CMAP_A_OFF     = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_SOKO_OFF),
+    GLYPH_CMAP_GEH_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_MINES_OFF),
+    GLYPH_CMAP_KNOX_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_GEH_OFF),
+    GLYPH_CMAP_SOKO_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_KNOX_OFF),
+    GLYPH_CMAP_A_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_SOKO_OFF),
     GLYPH_ALTAR_OFF = (((S_brdnladder - S_ndoor) + 1) + GLYPH_CMAP_A_OFF),
     GLYPH_CMAP_B_OFF = (5 + GLYPH_ALTAR_OFF),
-    /*               (46           + (26  -  1)- 32     ) == 39 */
     GLYPH_ZAP_OFF = ((S_arrow_trap + MAXTCHARS - S_grave)
                      + GLYPH_CMAP_B_OFF),
     GLYPH_CMAP_C_OFF = ((NUM_ZAP << 2) + GLYPH_ZAP_OFF),
@@ -573,27 +572,23 @@ enum glyph_offsets {
     ((((cmap_idx) - S_vbeam) + 1) + GLYPH_ZAP_OFF)
 */
 
+/* EXPL_FIERY is the default explosion type */
 #define explosion_to_glyph(expltyp, idx) \
-    ((expltyp == EXPL_FROSTY) ?                                 \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_FROSTY_OFF)   \
-     : (expltyp == EXPL_FIERY) ?                                \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_FIERY_OFF)    \
-     : (expltyp == EXPL_MAGICAL) ?                              \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_MAGICAL_OFF)  \
-     : (expltyp == EXPL_WET) ?                                  \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_WET_OFF)      \
-     : (expltyp == EXPL_MUDDY) ?                                \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_MUDDY_OFF)    \
-     : (expltyp == EXPL_NOXIOUS) ?                              \
-            (((idx) - S_expl_tl) + GLYPH_EXPLODE_NOXIOUS_OFF)  \
-     :       (((idx) - S_expl_tl) + GLYPH_EXPLODE_FIERY_OFF))
+    ((idx) - S_expl_tl                                                  \
+     + (((expltyp) == EXPL_FROSTY) ? GLYPH_EXPLODE_FROSTY_OFF           \
+        : ((expltyp) == EXPL_MAGICAL) ? GLYPH_EXPLODE_MAGICAL_OFF       \
+          : ((expltyp) == EXPL_WET) ? GLYPH_EXPLODE_WET_OFF             \
+           : ((expltyp) == EXPL_MUDDY) ? GLYPH_EXPLODE_MUDDY_OFF        \
+             : ((expltyp) == EXPL_NOXIOUS) ? GLYPH_EXPLODE_NOXIOUS_OFF  \
+               : GLYPH_EXPLODE_FIERY_OFF))
 
 #define cmap_walls_to_glyph(cmap_idx) \
-     ( In_mines(&u.uz) ? (((cmap_idx) - S_vwall)  + GLYPH_CMAP_MINES_OFF)       \
-     : In_hell(&u.uz) ? (((cmap_idx) - S_vwall) + GLYPH_CMAP_GEH_OFF)       \
-     : Is_knox(&u.uz) ? (((cmap_idx) - S_vwall) + GLYPH_CMAP_KNOX_OFF)      \
-     : In_sokoban(&u.uz) ? (((cmap_idx) - S_vwall) + GLYPH_CMAP_SOKO_OFF)  \
-     : (((cmap_idx) - S_vwall) + GLYPH_CMAP_MAIN_OFF))
+    ((cmap_idx) - S_vwall                               \
+     + (In_mines(&u.uz) ? GLYPH_CMAP_MINES_OFF          \
+        : In_hell(&u.uz) ? GLYPH_CMAP_GEH_OFF           \
+          : Is_knox(&u.uz) ? GLYPH_CMAP_KNOX_OFF        \
+            : In_sokoban(&u.uz) ? GLYPH_CMAP_SOKO_OFF   \
+              : GLYPH_CMAP_MAIN_OFF))
 
 #define cmap_a_to_glyph(cmap_idx) \
     (((cmap_idx) - S_ndoor) + GLYPH_CMAP_A_OFF)
@@ -605,14 +600,13 @@ enum glyph_offsets {
     (((cmap_idx) - S_digbeam) + GLYPH_CMAP_C_OFF)
 
 #define cmap_to_glyph(cmap_idx) \
-        ( ((cmap_idx) == S_stone) ? GLYPH_CMAP_STONE_OFF                   \
-        : ((cmap_idx) <= S_trwall) ? cmap_walls_to_glyph(cmap_idx)         \
-        : ((cmap_idx) <  S_altar) ? cmap_a_to_glyph(cmap_idx)              \
-        : ((cmap_idx) == S_altar) ? altar_to_glyph(AM_NEUTRAL)             \
-        : ((cmap_idx) <  S_arrow_trap + MAXTCHARS)                         \
-          ? cmap_b_to_glyph(cmap_idx)                                      \
-        : ((cmap_idx) <= S_goodpos) ? cmap_c_to_glyph(cmap_idx)            \
-        : NO_GLYPH)
+    ( ((cmap_idx) == S_stone)   ? GLYPH_CMAP_STONE_OFF                      \
+    : ((cmap_idx) <= S_trwall)  ? cmap_walls_to_glyph(cmap_idx)             \
+    : ((cmap_idx) <  S_altar)   ? cmap_a_to_glyph(cmap_idx)                 \
+    : ((cmap_idx) == S_altar)   ? altar_to_glyph(AM_NEUTRAL)                \
+    : ((cmap_idx) <  S_arrow_trap + MAXTCHARS) ? cmap_b_to_glyph(cmap_idx)  \
+    : ((cmap_idx) <= S_goodpos) ? cmap_c_to_glyph(cmap_idx)                 \
+    : NO_GLYPH )
 
 #define trap_to_glyph(trap)                                \
     cmap_to_glyph(trap_to_defsym(((int) (trap)->ttyp)))
