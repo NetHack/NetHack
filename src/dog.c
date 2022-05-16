@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1652577033 2022/05/15 01:10:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.120 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1652689621 2022/05/16 08:27:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -602,14 +602,15 @@ mon_leave(struct monst *mtmp)
     /* if this is a long worm, handle its tail segments before mtmp itself;
        we pass possibly trundated segment count to caller via return value  */
     if (mtmp->wormno) {
-        int cnt = count_wsegs(mtmp);
+        int cnt = count_wsegs(mtmp), mx = mtmp->mx, my = mtmp->my;
 
         /* since monst->wormno is overloaded to hold the number of
            tail segments during migration, a very long worm with
            more segments than can fit in that field gets truncated */
         num_segs = min(cnt, MAX_NUM_WORMS - 1);
-        wormgone(mtmp); /* discard tail segments, take head off map */
-        /* mtmp->mx,mtmp->my is now 0,0 */
+        wormgone(mtmp);
+        /* put the head back */
+        place_monster(mtmp, mx, my);
     }
 
     return num_segs;
@@ -691,7 +692,8 @@ keepdogs(
             /* prepare to take mtmp off the map */
             num_segs = mon_leave(mtmp);
             /* take off map and move mtmp from fmon list to mydogs */
-            relmon(mtmp, &g.mydogs); /* mtmp->mx,my get changed to 0,0 */
+            relmon(mtmp, &g.mydogs); /* mtmp->mx,my retain current value */
+            mtmp->mx = mtmp->my = 0; /* mx==0 implies migating */
             mtmp->wormno = num_segs;
             mtmp->mlstmv = g.moves;
         } else if (mtmp->iswiz) {
@@ -728,7 +730,7 @@ migrate_to_level(
     /* prepare to take mtmp off the map */
     num_segs = mon_leave(mtmp);
     /* take off map and move mtmp from fmon list to migrating_mons */
-    relmon(mtmp, &g.migrating_mons); /* mtmp->mx,my get changed to 0,0 */
+    relmon(mtmp, &g.migrating_mons); /* mtmp->mx,my retain their value */
     mtmp->mstate |= MON_MIGRATING;
 
     new_lev.dnum = ledger_to_dnum((xchar) tolev);
@@ -748,8 +750,7 @@ migrate_to_level(
     mtmp->mtrack[0].y = xyflags;
     mtmp->mux = new_lev.dnum;
     mtmp->muy = new_lev.dlevel;
-    mtmp->mx = mtmp->my = 0; /* this implies migration (note: already done
-                              * by relmon() -> mon_leaving_level() above) */
+    mtmp->mx = mtmp->my = 0; /* mx==0 implies migating */
 
     /* don't extinguish a mobile light; it still exists but has changed
        from local (monst->mx > 0) to global (mx==0, not on this level) */

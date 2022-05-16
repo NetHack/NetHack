@@ -1,4 +1,4 @@
-/* NetHack 3.7	worm.c	$NHDT-Date: 1652577033 2022/05/15 01:10:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
+/* NetHack 3.7	worm.c	$NHDT-Date: 1652689653 2022/05/16 08:27:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -317,8 +317,6 @@ wormgone(struct monst *worm)
      *  the hidden tail segment which is co-located with the head.)
      */
     toss_wsegs(wtails[wnum], TRUE);
-    worm->mx = worm->my = 0; /* 'worm' is no longer on map but has not
-                              * been killed off; caller might put it back */
 
     wheads[wnum] = wtails[wnum] = (struct wseg *) 0;
     wgrowtime[wnum] = 0L;
@@ -328,7 +326,7 @@ wormgone(struct monst *worm)
        with MCORPSENM()==PM_LONG_WORM so that the same zap won't trigger
        another polymorph if it hits the new tail */
     if (worm->data == &mons[PM_LONG_WORM] && has_mcorpsenm(worm))
-        MCORPSENM(worm) = NON_PM; /* not polymorph-proof */
+        MCORPSENM(worm) = NON_PM; /* no longer polymorph-proof */
 }
 
 /*

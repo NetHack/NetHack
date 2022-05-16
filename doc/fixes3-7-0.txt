@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.914 $ $NHDT-Date: 1652478351 2022/05/13 21:45:51 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.916 $ $NHDT-Date: 1652689792 2022/05/16 08:29:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1213,6 +1213,8 @@ revised monster teleportation message handling could produce duplicate message
 	when shopkeeper who left shop got returned to it
 recent changes in removing a dead monster from the map didn't update screen
 	to show objects it dropped; they were present, just not displayed
+further changes resulted in dead monsters' corpses be placed at <0,0>;
+	reverse the part(s) that cleared stale monst->mx,my
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
