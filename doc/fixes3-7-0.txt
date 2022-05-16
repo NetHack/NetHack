@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.916 $ $NHDT-Date: 1652689792 2022/05/16 08:29:52 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.917 $ $NHDT-Date: 1652719274 2022/05/16 16:41:14 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1215,6 +1215,8 @@ recent changes in removing a dead monster from the map didn't update screen
 	to show objects it dropped; they were present, just not displayed
 further changes resulted in dead monsters' corpses be placed at <0,0>;
 	reverse the part(s) that cleared stale monst->mx,my
+adding name/rename choice to #therecmdmenu caused it to crash when picking an
+	adjacent unnamed, untame monster
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

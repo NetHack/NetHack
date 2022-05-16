@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1652637694 2022/05/15 18:01:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.563 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1652719274 2022/05/16 16:41:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.564 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4764,7 +4764,7 @@ there_cmd_menu_next2u(
     }
     if (mtmp) {
         Sprintf(buf, "%s %s",
-                !MGIVENNAME(mtmp) ? "Name" : "Rename",
+                !has_mgivenname(mtmp) ? "Name" : "Rename",
                 mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
