@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1652391728 2022/05/12 21:42:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1115 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1652831518 2022/05/17 23:51:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1117 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -464,6 +464,7 @@ extern void save_currentstate(void);
 #endif
 extern void u_collide_m(struct monst *);
 extern void goto_level(d_level *, boolean, boolean, boolean);
+extern void hellish_smoke_mesg(void);
 extern void maybe_lvltport_feedback(void);
 extern void schedule_goto(d_level *, int, const char *, const char *);
 extern void deferred_goto(void);

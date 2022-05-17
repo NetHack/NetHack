@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1646136934 2022/03/01 12:15:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1652831519 2022/05/17 23:51:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -727,6 +727,8 @@ welcome(boolean new_game) /* false => restoring an old game */
     char buf[BUFSZ];
     boolean currentgend = Upolyd ? u.mfemale : flags.female;
 
+    l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
+
     /* skip "welcome back" if restoring a doomed character */
     if (!new_game && Upolyd && ugenocided()) {
         /* death via self-genocide is pending */
@@ -760,10 +762,15 @@ welcome(boolean new_game) /* false => restoring an old game */
                    : "%s %s, the%s, welcome back to NetHack!",
           Hello((struct monst *) 0), g.plname, buf);
 
-    l_nhcore_call(new_game ? NHCORE_START_NEW_GAME : NHCORE_RESTORE_OLD_GAME);
-    if (new_game) /* guarantee that 'major' event category is never empty */
+    if (new_game) {
+        /* guarantee that 'major' event category is never empty */
         livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
                        g.plname, buf);
+    } else {
+        /* if restroing in Gehennom, give same hot/smoky message as when
+           first entering it */
+        hellish_smoke_mesg();
+    }
 }
 
 #ifdef POSITIONBAR

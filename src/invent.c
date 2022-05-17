@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1651868822 2022/05/06 20:27:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.386 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1652831520 2022/05/17 23:52:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.388 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4018,8 +4018,9 @@ dfeature_at(int x, int y, char *buf)
 /* look at what is here; if there are many objects (pile_limit or more),
    don't show them unless obj_cnt is 0 */
 int
-look_here(int obj_cnt, /* obj_cnt > 0 implies that autopickup is in progress */
-          unsigned lookhere_flags)
+look_here(
+    int obj_cnt, /* obj_cnt > 0 implies that autopickup is in progress */
+    unsigned lookhere_flags)
 {
     struct obj *otmp;
     struct trap *trap;
