@@ -1,4 +1,4 @@
-/* NetHack 3.7	questpgr.c	$NHDT-Date: 1596498201 2020/08/03 23:43:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $ */
+/* NetHack 3.7	questpgr.c	$NHDT-Date: 1652827965 2022/05/17 22:52:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -146,9 +146,9 @@ homebase(void) /* return your role leader's location */
 /* replace deity, leader, nemesis, or artifact name with pronoun;
    overwrites cvt_buf[] */
 static void
-qtext_pronoun(char who,   /* 'd' => deity, 'l' => leader, 'n' => nemesis,
-                             'o' => artifact */
-              char which) /* 'h'|'H'|'i'|'I'|'j'|'J' */
+qtext_pronoun(
+    char who,   /* 'd' => deity, 'l' => leader, 'n' => nemesis, 'o' => arti */
+    char which) /* 'h'|'H'|'i'|'I'|'j'|'J' */
 {
     const char *pnoun;
     int godgend;
@@ -192,7 +192,8 @@ convert_arg(char c)
         str = g.plname;
         break;
     case 'c':
-        str = (flags.female && g.urole.name.f) ? g.urole.name.f : g.urole.name.m;
+        str = (flags.female && g.urole.name.f) ? g.urole.name.f
+                                               : g.urole.name.m;
         break;
     case 'r':
         str = rank_of(u.ulevel, Role_switch, flags.female);
@@ -368,20 +369,14 @@ convert_line(char *in_line, char *out_line)
 static void
 deliver_by_pline(const char *str)
 {
-    const char *msgp = str;
-    const char *msgend = eos((char *)str);
     char in_line[BUFSZ], out_line[BUFSZ];
+    const char *msgp = str, *msgend = eos((char *) str);
 
-    while (msgp && msgp != msgend) {
-        int i = 0;
-        while (*msgp != '\0' && *msgp != '\n' && (i < BUFSZ-2)) {
-            in_line[i] = *msgp;
-            i++;
-            msgp++;
-        }
-        if (*msgp == '\n')
-            msgp++;
-        in_line[i] = '\0';
+    while (msgp < msgend) {
+        /* copynchars() will stop at newline if it finds one */
+        copynchars(in_line, msgp, (int) sizeof in_line - 1);
+        msgp += strlen(in_line) + 1;
+
         convert_line(in_line, out_line);
         pline("%s", out_line);
     }
@@ -390,21 +385,15 @@ deliver_by_pline(const char *str)
 static void
 deliver_by_window(const char *msg, int how)
 {
-    const char *msgp = msg;
-    const char *msgend = eos((char *)msg);
     char in_line[BUFSZ], out_line[BUFSZ];
+    const char *msgp = msg, *msgend = eos((char *) msg);
     winid datawin = create_nhwindow(how);
 
-    while (msgp && msgp != msgend) {
-        int i = 0;
-        while (*msgp != '\0' && *msgp != '\n' && (i < BUFSZ-2)) {
-            in_line[i] = *msgp;
-            i++;
-            msgp++;
-        }
-        if (*msgp == '\n')
-            msgp++;
-        in_line[i] = '\0';
+    while (msgp < msgend) {
+        /* copynchars() will stop at newline if it finds one */
+        copynchars(in_line, msgp, (int) sizeof in_line - 1);
+        msgp += strlen(in_line) + 1;
+
         convert_line(in_line, out_line);
         putstr(datawin, 0, out_line);
     }
@@ -423,7 +412,10 @@ skip_pager(boolean common UNUSED)
 }
 
 static boolean
-com_pager_core(const char *section, const char *msgid, boolean showerror)
+com_pager_core(
+    const char *section,
+    const char *msgid,
+    boolean showerror)
 {
     static const char *const howtoput[] = {
         "pline", "window", "text", "menu", "default", NULL
@@ -507,7 +499,7 @@ com_pager_core(const char *section, const char *msgid, boolean showerror)
         if (nelems < 2) {
             if (showerror)
                 impossible(
-              "com_pager: questtext[%s][%s] in %s in not an array of strings",
+              "com_pager: questtext[%s][%s] in %s is not an array of strings",
                            section, fallback_msgid ? fallback_msgid : msgid,
                            QTEXT_FILE);
             goto compagerdone;
@@ -518,8 +510,25 @@ com_pager_core(const char *section, const char *msgid, boolean showerror)
         text = dupstr(luaL_checkstring(L, -1));
     }
 
-    if (output == 0 && (index(text, '\n') || (strlen(text) >= (BUFSZ - 1))))
+    /* switch from by_pline to by_window if line has multiple segments or
+       is unreasonably long (the latter ought to checked after formatting
+       conversions rather than before...) */
+    if (output == 0 && (index(text, '\n') || strlen(text) >= BUFSZ - 1)) {
         output = 2;
+
+        /*
+         * FIXME:  should update quest.lua to include proper synopsis line
+         * for any item subject to having its delivery converted to by_window.
+         */
+        if (!synopsis) {
+            char tmpbuf[BUFSZ];
+
+            Sprintf(tmpbuf, "[%.*s]", BUFSZ - 1 - 2, text);
+            /* change every newline character to a space */
+            (void) strNsubst(tmpbuf, "\n", " ", 0);
+            synopsis = dupstr(tmpbuf);
+        }
+    }
 
     if (output == 0 || output == 1)
         deliver_by_pline(text);
@@ -586,22 +595,9 @@ qt_montype(void)
 void
 deliver_splev_message(void)
 {
-    char *str, *nl, in_line[BUFSZ], out_line[BUFSZ];
-
     /* there's no provision for delivering via window instead of pline */
     if (g.lev_message) {
-        /* lev_message can span multiple lines using embedded newline chars;
-           any segments too long to fit within in_line[] will be truncated */
-        for (str = g.lev_message; *str; str = nl + 1) {
-            /* copying will stop at newline if one is present */
-            copynchars(in_line, str, (int) (sizeof in_line) - 1);
-
-            convert_line(in_line, out_line);
-            pline("%s", out_line);
-
-            if ((nl = index(str, '\n')) == 0)
-                break; /* done if no newline */
-        }
+        deliver_by_pline(g.lev_message);
 
         free((genericptr_t) g.lev_message);
         g.lev_message = NULL;
