@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1652894653 2022/05/18 17:24:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1652897460 2022/05/18 18:11:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2298,11 +2298,16 @@ nhlL_newstate (nhl_sandbox_info *sbi) {
     }
 
     lua_State *L = lua_newstate(nhl_alloc, nud);
+#if LUA_VERSION_NUM == 503
+# define luai_likely(x) (x)
+#endif
     if (luai_likely(L)) {
 	lua_atpanic(L, &nhl_panic);
+#if LUA_VERSION_NUM == 504
 	    /* no warning system at the moment - it requires concatenting
 	     * strings to fit NetHack's API XXX */
 	lua_setwarnf(L, 0, L);  /* default is warnings off */
+#endif
     }
 
 #ifdef NHL_SANDBOX
