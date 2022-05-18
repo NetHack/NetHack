@@ -1801,7 +1801,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 /* give a message when entering a Gehennom level other than the Valley;
    also given if restoring a game in that situation */
 void
-hellish_smoke_mesg()
+hellish_smoke_mesg(void)
 {
     if (Inhell && !Is_valley(&u.uz))
         pline("It is hot here.  You %s smoke...",
