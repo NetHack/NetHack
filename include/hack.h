@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1601595709 2020/10/01 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.141 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1652861829 2022/05/18 08:17:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -479,7 +479,9 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 /* get_count flags */
 #define GC_NOFLAGS   0
 #define GC_SAVEHIST  1 /* save "Count: 123" in message history */
-#define GC_ECHOFIRST 2 /* echo "Count: 1" even when there's only one digit */
+#define GC_CONDHIST  2 /* save "Count: N" in message history unless the
+                        * first digit is passed in and N matches it */
+#define GC_ECHOFIRST 4 /* echo "Count: 1" even when there's only one digit */
 
 /* rloc() flags */
 #define RLOC_NONE    0x00

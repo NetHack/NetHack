@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1652719274 2022/05/16 16:41:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.564 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1652861829 2022/05/18 08:17:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.565 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5152,10 +5152,13 @@ get_count(
 {
     char qbuf[QBUFSZ];
     int key;
-    long cnt = 0L;
+    long cnt = 0L, first = inkey ? (long) (inkey - '0') : 0L;
     boolean backspaced = FALSE, showzero = TRUE,
             /* should "Count: 123" go into message history? */
             historicmsg = (gc_flags & GC_SAVEHIST) != 0,
+            /* put "Count: N" into mesg hist unless N is the same as the
+               [first digit] value passed in via 'inkey' */
+            conditionalmsg = (gc_flags & GC_CONDHIST) != 0,
             /* normally "Count: 12" isn't echoed until the second digit */
             echoalways = (gc_flags & GC_ECHOFIRST) != 0;
     /* this should be done in port code so that we have erase_char
@@ -5206,7 +5209,7 @@ get_count(
         }
     }
 
-    if (historicmsg) {
+    if (historicmsg || (conditionalmsg && *count != first)) {
         Sprintf(qbuf, "Count: %ld ", *count);
         (void) key2txt((uchar) key, eos(qbuf));
         putmsghistory(qbuf, FALSE);
