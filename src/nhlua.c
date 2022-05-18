@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1580506559 2020/01/31 21:35:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1652894653 2022/05/18 17:24:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1607,11 +1607,14 @@ nhl_init(nhl_sandbox_info *sbi)
 #ifndef NHL_VERSION_EXPECTED
 #define NHL_VERSION_EXPECTED 50404
 #endif
+
+#ifdef NHL_SANDBOX
     if(NHL_VERSION_EXPECTED != LUA_VERSION_RELEASE_NUM){
 	panic(
 	    "sandbox doesn't know this Lua version: this=%d != expected=%d ",
 	    LUA_VERSION_RELEASE_NUM, NHL_VERSION_EXPECTED);
     }
+#endif
 
     lua_State *L = nhlL_newstate(sbi);
 
