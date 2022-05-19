@@ -465,7 +465,10 @@ PACKAGE=@true
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
-LUALIB = ../lib/lua/liblua-$(LUA_VERSION).a -lm $(DLLIB)
+LUA_VERSION ?=5.4.4
+LUABASE = liblua-$(LUA_VERSION).a
+LUALIB = ../lib/lua/$(LUABASE)
+LUALIBS = $(LUALIB) -lm $(DLLIB)
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
@@ -599,43 +602,43 @@ all:	$(GAME)
 pregame:
 	$(PREGAME)
 
-$(GAME):	pregame $(MAKEDEFS) $(SYSTEM)
+$(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS)
 	@touch Sysunix
 
 Sys3B2:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB) -lmalloc
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS) -lmalloc
 	@touch Sys3B2
 
 Sysatt:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Loading $(GAME)."
 	$(AT)$(LD) $(TARGET_LFLAGS) /lib/crt0s.o /lib/shlib.ifile \
-		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(LUALIB)
+		-o $(GAMEBIN) $(HOSTOBJ) $(HOBJ) $(DATE_O) $(LUALIBS)
 	@touch Sysatt
 
 Systos:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS)
 	@touch Systos
 
 SysV-AT:	DUMB.Setup $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(LUALIBS)
 	@touch SysV-AT
 
 SysBe: $(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAME) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIB)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS)
 	@xres -o $(GAME) ../win/BeOS/nethack.rsrc
 	@mimeset -f $(GAME)
 	@touch SysBe
@@ -660,7 +663,7 @@ DUMB.Setup:	../include/extern.h
 	cp ../include/extern.DUMB ../include/extern.h
 	@touch DUMB.Setup
 
-../lib/lua/liblua-$(LUA_VERSION).a ../include/nhlua.h:
+$(LUALIB) ../include/nhlua.h:
 	@( cd .. ; $(MAKE) lua_support )
 
 #	dependencies for makedefs and its outputs, which the util
