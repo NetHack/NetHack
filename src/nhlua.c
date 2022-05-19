@@ -5,6 +5,12 @@
 #include "hack.h"
 #include "dlb.h"
 
+#ifndef LUA_VERSION_RELEASE_NUM
+#ifdef NHL_SANDBOX
+#undef NHL_SANDBOX
+#endif
+#endif
+
 #ifdef NHL_SANDBOX
 #include <setjmp.h>
 #endif
