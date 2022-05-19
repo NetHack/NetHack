@@ -995,10 +995,14 @@ delay_output()  -- Causes a visible delay of 50ms in the output.
 void
 curses_delay_output(void)
 {
-    /* refreshing the whole display is a waste of time,
-     * but that's why we're here */
-    refresh();
-    napms(50);
+#ifdef TIMED_DELAY
+    if (flags.nap) {
+        /* refreshing the whole display is a waste of time,
+         * but that's why we're here */
+        refresh();
+        napms(50);
+    }
+#endif
 }
 
 /*
