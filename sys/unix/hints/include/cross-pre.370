@@ -179,6 +179,7 @@ override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
 		$(TARGETPFX)tileset.o $(TARGETPFX)tile.o
 override WINLIB=
 override LUALIB=
+override LUALIBS=
 override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
