@@ -465,7 +465,7 @@ PACKAGE=@true
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
-LUALIB = ../lib/lua/liblua.a -lm $(DLLIB)
+LUALIB = ../lib/lua/liblua-$(LUA_VERSION).a -lm $(DLLIB)
 
 # timestamp files to reduce `make' overhead and shorten .o dependency lists
 CONFIG_H = ../src/config.h-t
@@ -660,7 +660,7 @@ DUMB.Setup:	../include/extern.h
 	cp ../include/extern.DUMB ../include/extern.h
 	@touch DUMB.Setup
 
-../lib/lua/liblua.a ../include/nhlua.h:
+../lib/lua/liblua-$(LUA_VERSION).a ../include/nhlua.h:
 	@( cd .. ; $(MAKE) lua_support )
 
 #	dependencies for makedefs and its outputs, which the util

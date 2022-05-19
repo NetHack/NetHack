@@ -109,7 +109,7 @@ LUATESTTARGET = $(LUAHEADERS)/lua.h
 LUATOP = $(LUAHEADERS)
 LUAMAKEFLAGS = CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
 LUA2NHTOP = ../../..
-TOPLUALIB = lib/lua/liblua.a
+TOPLUALIB = lib/lua/liblua-$(LUA_VERSION).a
 
 ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
 
@@ -119,14 +119,14 @@ all:    $(ALLDEP)
 	@echo "Done."
 
 $(GAME): lua_support
-	( cd src ; $(MAKE) $(GAME) )
+	( cd src ; $(MAKE) LUA_VERSION=$(LUA_VERSION) $(GAME) )
 
 lua_support: include/nhlua.h
 	@true
 $(LUATOP)/liblua.a: $(LUAHEADERS)/lua.h
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFLAGS) a && cd $(LUA2NHTOP) )
-lib/lua/liblua.a: $(LUATOP)/liblua.a
+$(TOPLUALIB): $(LUATOP)/liblua.a
 	@( if test -d lib/lua ; then true ; else mkdir -p lib/lua ; fi )
 	cp $(LUATOP)/liblua.a $@
 
