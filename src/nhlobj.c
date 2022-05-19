@@ -31,12 +31,12 @@ static int l_obj_bury(lua_State *);
 #define lobj_is_ok(lo) ((lo) && (lo)->obj && (lo)->obj->where != OBJ_LUAFREE)
 
 static struct _lua_obj *
-l_obj_check(lua_State *L, int index)
+l_obj_check(lua_State *L, int indx)
 {
     struct _lua_obj *lo;
 
-    luaL_checktype(L, index, LUA_TUSERDATA);
-    lo = (struct _lua_obj *)luaL_checkudata(L, index, "obj");
+    luaL_checktype(L, indx, LUA_TUSERDATA);
+    lo = (struct _lua_obj *) luaL_checkudata(L, indx, "obj");
     if (!lo)
         nhl_error(L, "Obj error");
     return lo;
