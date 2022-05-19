@@ -109,7 +109,8 @@ LUATESTTARGET = $(LUAHEADERS)/lua.h
 LUATOP = $(LUAHEADERS)
 LUAMAKEFLAGS = CC='$(CC)' SYSCFLAGS='$(SYSCFLAGS)'
 LUA2NHTOP = ../../..
-TOPLUALIB = lib/lua/liblua-$(LUA_VERSION).a
+LUABASELIB = liblua-$(LUA_VERSION).a
+TOPLUALIB = lib/lua/$(LUABASELIB)
 
 ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
 
@@ -366,7 +367,7 @@ spotless:: spotless-lib spotless-keep-lib
 	@true
 
 spotless-lib:: clean-lib
-	-( cd lib/lua && rm liblua.a )
+	-( cd lib/lua && rm $(LUABASELIB) )
 
 spotless-keep-lib: clean-keep-lib
 	( cd src ; $(MAKE) spotless )
