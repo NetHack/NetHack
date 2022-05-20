@@ -333,7 +333,7 @@ static void
 fix_curse_trouble(struct obj *otmp, const char *what)
 {
     if (!otmp) {
-        impossible("fix_worst_trouble: nothing to uncurse.");
+        impossible("fix_curse_trouble: nothing to uncurse.");
         return;
     }
     if (otmp == uarmg && Glib) {
