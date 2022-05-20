@@ -2359,7 +2359,8 @@ static const char *const as_is[] = {
     "tuna",    "yaki",      "-hai",      "krill",     "manes",
     "moose",   "ninja",     "sheep",     "ronin",     "roshi",
     "shito",   "tengu",     "ki-rin",    "Nazgul",    "gunyoki",
-    "piranha", "samurai",   "shuriken",  "haggis", 0,
+    "piranha", "samurai",   "shuriken",  "haggis",    "Bordeaux",
+    0,
     /* Note:  "fish" and "piranha" are collective plurals, suitable
        for "wiped out all <foo>".  For "3 <foo>", they should be
        "fishes" and "piranhas" instead.  We settle for collective
@@ -2453,7 +2454,8 @@ singplur_compound(char *str)
           " versus ", " from ",    " in ",
           " on ",     " a la ",    " with", /* " with "? */
           " de ",     " d'",       " du ",
-          "-in-",     "-at-",      0
+          "-in-",     "-at-",      " au ",
+          0
         }, /* list of first characters for all compounds[] entries */
         compound_start[] = " -";
 
@@ -2566,6 +2568,7 @@ makeplural(const char* oldstr)
     {
         static const char *const already_plural[] = {
             "ae",  /* algae, larvae, &c */
+            "eaux", /* chateaux, gateaux */
             "matzot", 0,
         };
 
@@ -2624,6 +2627,13 @@ makeplural(const char* oldstr)
         Strcasecpy(spot - 1, "es");
         goto bottom;
     }
+    /* -eau/-eaux (gateau, chapeau...) */
+    if (len >= 3 && !strcmpi(spot - 2, "eau")
+        /* 'bureaus' is the more common plural of 'bureau' */
+        && strncmpi(str, "bureau", 6)) {
+        Strcasecpy(spot + 1, "x");
+        goto bottom;
+    }
     /* matzoh/matzot, possible food name */
     if (len >= 6
         && (!strcmpi(spot - 5, "matzoh") || !strcmpi(spot - 5, "matzah"))) {
@@ -2636,7 +2646,6 @@ makeplural(const char* oldstr)
         goto bottom;
     }
 
-    /* note: -eau/-eaux (gateau, bordeau...) */
     /* note: ox/oxen, VAX/VAXen, goose/geese */
 
     lo_c = lowc(*spot);
@@ -2795,8 +2804,9 @@ makesingular(const char* oldstr)
             goto bottom;
         }
         /* matzot -> matzo, algae -> alga */
-        if (!BSTRCMPI(bp, p - 6, "matzot") || !BSTRCMPI(bp, p - 2, "ae")) {
-            *(p - 1) = '\0'; /* drop t/e */
+        if (!BSTRCMPI(bp, p - 6, "matzot") || !BSTRCMPI(bp, p - 2, "ae")
+            || !BSTRCMPI(bp, p - 4, "eaux")) {
+            *(p - 1) = '\0'; /* drop t/e/x */
             goto bottom;
         }
         /* balactheria -> balactherium */
