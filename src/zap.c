@@ -5644,6 +5644,7 @@ makewish(void)
     } else if (otmp == &nothing) {
         /* explicitly wished for "nothing", presumably attempting
            to retain wishless conduct */
+        livelog_printf(LL_WISH, "declined to make a wish");
         return;
     }
 

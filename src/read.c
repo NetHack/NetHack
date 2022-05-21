@@ -2471,8 +2471,11 @@ do_class_genocide(void)
         } while (!*buf);
         /* choosing "none" preserves genocideless conduct */
         if (*buf == '\033' || !strcmpi(buf, "none")
-            || !strcmpi(buf, "nothing"))
+            || !strcmpi(buf, "nothing")) {
+            livelog_printf(LL_GENOCIDE,
+                           "declined to perform class genocide");
             return;
+        }
 
         class = name_to_monclass(buf, (int *) 0);
         if (class == 0 && (i = name_to_mon(buf, (int *) 0)) != NON_PM)
@@ -2653,6 +2656,8 @@ do_genocide(int how)
                 if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
 
+                livelog_printf(LL_GENOCIDE,
+                               "declined to perform genocide");
                 return;
             }
 
