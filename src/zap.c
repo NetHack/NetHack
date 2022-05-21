@@ -1016,7 +1016,7 @@ revive(struct obj *corpse, boolean by_hero)
         }
         /*FALLTHRU*/
     default:
-        panic("revive");
+        panic("revive default case %d", (int) corpse->where);
     }
 
     return mtmp;
