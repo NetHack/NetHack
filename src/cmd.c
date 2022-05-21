@@ -151,6 +151,7 @@ static void reset_cmd_vars(boolean);
 static void mcmd_addmenu(winid, int, const char *);
 static char here_cmd_menu(void);
 static char there_cmd_menu(int, int, int);
+static void act_on_act(int, int, int, int, int, int);
 static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
@@ -4902,12 +4903,166 @@ there_cmd_menu_common(
     return K;
 }
 
+static void
+act_on_act(int act, int x, int y, int dx, int dy, int dir)
+{
+    struct obj *otmp;
+
+    switch (act) {
+    case MCMD_TRAVEL:
+        iflags.travelcc.x = u.tx = x;
+        iflags.travelcc.y = u.ty = y;
+        cmdq_add_ec(dotravel_target);
+        break;
+    case MCMD_THROW_OBJ:
+        cmdq_add_ec(dothrow);
+        cmdq_add_userinput();
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_OPEN_DOOR:
+        cmdq_add_ec(doopen);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_LOCK_DOOR:
+        otmp = carrying(SKELETON_KEY);
+        if (!otmp)
+            otmp = carrying(LOCK_PICK);
+        if (!otmp)
+            otmp = carrying(CREDIT_CARD);
+        if (otmp) {
+            cmdq_add_ec(doapply);
+            cmdq_add_key(otmp->invlet);
+            cmdq_add_dir(dx, dy, 0);
+            cmdq_add_key('y'); /* "Lock it?" */
+        }
+        break;
+    case MCMD_UNTRAP_DOOR:
+        cmdq_add_ec(dountrap);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_KICK_DOOR:
+        cmdq_add_ec(dokick);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_CLOSE_DOOR:
+        cmdq_add_ec(doclose);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_SEARCH:
+        cmdq_add_ec(dosearch);
+        break;
+    case MCMD_LOOK_TRAP:
+        cmdq_add_ec(doidtrap);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_UNTRAP_TRAP:
+        cmdq_add_ec(dountrap);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_MOVE_DIR:
+        cmdq_add_ec(move_funcs[xytod(dx, dy)][MV_WALK]);
+        break;
+    case MCMD_RIDE:
+        cmdq_add_ec(doride);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_REMOVE_SADDLE:
+        /* m-prefix for #loot: skip any floor containers */
+        cmdq_add_ec(do_reqmenu);
+        cmdq_add_ec(doloot);
+        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
+        break;
+    case MCMD_APPLY_SADDLE:
+        if ((otmp = carrying(SADDLE)) != 0) {
+            cmdq_add_ec(doapply);
+            cmdq_add_key(otmp->invlet);
+            cmdq_add_dir(dx, dy, 0);
+        }
+        break;
+    case MCMD_ATTACK_NEXT2U:
+        cmdq_add_ec(move_funcs[dir][MV_WALK]);
+        break;
+    case MCMD_TALK:
+        cmdq_add_ec(dotalk);
+        cmdq_add_dir(dx, dy, 0);
+        break;
+    case MCMD_NAME:
+        cmdq_add_ec(docallcmd);
+        cmdq_add_key('m'); /* name a monster */
+        cmdq_add_dir(dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
+        break;
+    case MCMD_QUAFF:
+        cmdq_add_ec(dodrink);
+        cmdq_add_key('y'); /* "Drink from the fountain?" */
+        break;
+    case MCMD_DIP:
+        cmdq_add_ec(dodip);
+        cmdq_add_userinput();
+        cmdq_add_key('y'); /* "Dip foo into the fountain?" */
+        break;
+    case MCMD_SIT:
+        cmdq_add_ec(dosit);
+        break;
+    case MCMD_UP:
+        cmdq_add_ec(doup);
+        break;
+    case MCMD_DOWN:
+        cmdq_add_ec(dodown);
+        break;
+    case MCMD_DISMOUNT:
+        cmdq_add_ec(doride);
+        break;
+    case MCMD_MONABILITY:
+        cmdq_add_ec(domonability);
+        break;
+    case MCMD_PICKUP:
+        cmdq_add_ec(dopickup);
+        break;
+    case MCMD_LOOT:
+        cmdq_add_ec(doloot);
+        break;
+    case MCMD_EAT:
+        cmdq_add_ec(doeat);
+        cmdq_add_key('y'); /* "There is foo here; eat it?" */
+        break;
+    case MCMD_DROP:
+        cmdq_add_ec(dodrop);
+        break;
+    case MCMD_INVENTORY:
+        cmdq_add_ec(ddoinv);
+        break;
+    case MCMD_REST:
+        cmdq_add_ec(donull);
+        break;
+    case MCMD_LOOK_HERE:
+        cmdq_add_ec(dolook);
+        break;
+    case MCMD_LOOK_AT:
+        g.clicklook_cc.x = x;
+        g.clicklook_cc.y = y;
+        cmdq_add_ec(doclicklook);
+        break;
+    case MCMD_UNTRAP_HERE:
+        cmdq_add_ec(dountrap);
+        cmdq_add_dir(0, 0, 1);
+        break;
+    case MCMD_OFFER:
+        cmdq_add_ec(dosacrifice);
+        cmdq_add_userinput();
+        break;
+    case MCMD_CAST_SPELL:
+        cmdq_add_ec(docast);
+        break;
+    default: break;
+    }
+}
+
 /* offer choice of actions to perform at adjacent location <x,y> */
 static char
 there_cmd_menu(int x, int y, int mod)
 {
     winid win;
-    struct obj *otmp;
     char ch = '\0';
     int npick = 0, K = 0;
     menu_item *picks = (menu_item *) 0;
@@ -4939,7 +5094,8 @@ there_cmd_menu(int x, int y, int mod)
         ch = '\0';
     } else if ((K == 1) && (act != MCMD_NOTHING)) {
         destroy_nhwindow(win);
-        goto act_on_act;
+        act_on_act(act, x, y, dx, dy, dir);
+        return '\0';
     } else {
         end_menu(win, "What do you want to do?");
         npick = select_menu(win, PICK_ONE, &picks);
@@ -4951,155 +5107,7 @@ there_cmd_menu(int x, int y, int mod)
 
         free((genericptr_t) picks);
 
-    act_on_act:
-        switch (act) {
-        case MCMD_TRAVEL:
-            iflags.travelcc.x = u.tx = x;
-            iflags.travelcc.y = u.ty = y;
-            cmdq_add_ec(dotravel_target);
-            break;
-        case MCMD_THROW_OBJ:
-            cmdq_add_ec(dothrow);
-            cmdq_add_userinput();
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_OPEN_DOOR:
-            cmdq_add_ec(doopen);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_LOCK_DOOR:
-            otmp = carrying(SKELETON_KEY);
-            if (!otmp)
-                otmp = carrying(LOCK_PICK);
-            if (!otmp)
-                otmp = carrying(CREDIT_CARD);
-            if (otmp) {
-                cmdq_add_ec(doapply);
-                cmdq_add_key(otmp->invlet);
-                cmdq_add_dir(dx, dy, 0);
-                cmdq_add_key('y'); /* "Lock it?" */
-            }
-            break;
-        case MCMD_UNTRAP_DOOR:
-            cmdq_add_ec(dountrap);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_KICK_DOOR:
-            cmdq_add_ec(dokick);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_CLOSE_DOOR:
-            cmdq_add_ec(doclose);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_SEARCH:
-            cmdq_add_ec(dosearch);
-            break;
-        case MCMD_LOOK_TRAP:
-            cmdq_add_ec(doidtrap);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_UNTRAP_TRAP:
-            cmdq_add_ec(dountrap);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_MOVE_DIR:
-            cmdq_add_ec(move_funcs[xytod(dx, dy)][MV_WALK]);
-            break;
-        case MCMD_RIDE:
-            cmdq_add_ec(doride);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_REMOVE_SADDLE:
-            /* m-prefix for #loot: skip any floor containers */
-            cmdq_add_ec(do_reqmenu);
-            cmdq_add_ec(doloot);
-            cmdq_add_dir(dx, dy, 0);
-            cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
-            break;
-        case MCMD_APPLY_SADDLE:
-            if ((otmp = carrying(SADDLE)) != 0) {
-                cmdq_add_ec(doapply);
-                cmdq_add_key(otmp->invlet);
-                cmdq_add_dir(dx, dy, 0);
-            }
-            break;
-        case MCMD_ATTACK_NEXT2U:
-            cmdq_add_ec(move_funcs[dir][MV_WALK]);
-            break;
-        case MCMD_TALK:
-            cmdq_add_ec(dotalk);
-            cmdq_add_dir(dx, dy, 0);
-            break;
-        case MCMD_NAME:
-            cmdq_add_ec(docallcmd);
-            cmdq_add_key('m'); /* name a monster */
-            cmdq_add_dir(dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
-            break;
-        case MCMD_QUAFF:
-            cmdq_add_ec(dodrink);
-            cmdq_add_key('y'); /* "Drink from the fountain?" */
-            break;
-        case MCMD_DIP:
-            cmdq_add_ec(dodip);
-            cmdq_add_userinput();
-            cmdq_add_key('y'); /* "Dip foo into the fountain?" */
-            break;
-        case MCMD_SIT:
-            cmdq_add_ec(dosit);
-            break;
-        case MCMD_UP:
-            cmdq_add_ec(doup);
-            break;
-        case MCMD_DOWN:
-            cmdq_add_ec(dodown);
-            break;
-        case MCMD_DISMOUNT:
-            cmdq_add_ec(doride);
-            break;
-        case MCMD_MONABILITY:
-            cmdq_add_ec(domonability);
-            break;
-        case MCMD_PICKUP:
-            cmdq_add_ec(dopickup);
-            break;
-        case MCMD_LOOT:
-            cmdq_add_ec(doloot);
-            break;
-        case MCMD_EAT:
-            cmdq_add_ec(doeat);
-            cmdq_add_key('y'); /* "There is foo here; eat it?" */
-            break;
-        case MCMD_DROP:
-            cmdq_add_ec(dodrop);
-            break;
-        case MCMD_INVENTORY:
-            cmdq_add_ec(ddoinv);
-            break;
-        case MCMD_REST:
-            cmdq_add_ec(donull);
-            break;
-        case MCMD_LOOK_HERE:
-            cmdq_add_ec(dolook);
-            break;
-        case MCMD_LOOK_AT:
-            g.clicklook_cc.x = x;
-            g.clicklook_cc.y = y;
-            cmdq_add_ec(doclicklook);
-            break;
-        case MCMD_UNTRAP_HERE:
-            cmdq_add_ec(dountrap);
-            cmdq_add_dir(0, 0, 1);
-            break;
-        case MCMD_OFFER:
-            cmdq_add_ec(dosacrifice);
-            cmdq_add_userinput();
-            break;
-        case MCMD_CAST_SPELL:
-            cmdq_add_ec(docast);
-            break;
-        default: break;
-        }
+        act_on_act(act, x, y, dx, dy, dir);
         return '\0';
     }
     return ch;
