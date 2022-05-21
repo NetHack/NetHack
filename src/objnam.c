@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1652332281 2022/05/12 05:11:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.361 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1653171584 2022/05/21 22:19:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4514,7 +4514,7 @@ readobjnam(char *bp, struct obj *no_wish)
      * Disallow such topology tweaks for WIZKIT startup wishes.
      */
  wiztrap:
-    if (wizard && !g.program_state.wizkit_wishing) {
+    if (wizard && !g.program_state.wizkit_wishing && !d.oclass) {
         /* [inline code moved to separate routine to unclutter readobjnam] */
         if ((d.otmp = wizterrainwish(&d)) != 0)
             return d.otmp;
