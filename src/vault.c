@@ -15,6 +15,7 @@ static void move_gold(struct obj *, int);
 static void wallify_vault(struct monst *);
 static void gd_mv_monaway(struct monst *, int, int);
 static void gd_pick_corridor_gold(struct monst *, int, int);
+static int gd_move_cleanup(struct monst, boolean, boolean);
 
 void
 newegd(struct monst *mtmp)
@@ -761,6 +762,42 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     return;
 }
 
+
+/* return 1: guard moved, -2: died  */
+static int
+gd_move_cleanup(
+    struct monst *grd,
+    boolean semi_dead,
+    boolean disappear_msg_seen)
+{
+    int x, y;
+    boolean see_guard;
+
+    /* The following is a kludge.  We need to keep    */
+    /* the guard around in order to be able to make   */
+    /* the fake corridor disappear as the player      */
+    /* moves out of it, but we also need the guard    */
+    /* out of the way.  We send the guard to never-   */
+    /* never land.  We set ogx ogy to mx my in order  */
+    /* to avoid a check at the top of this function.  */
+    /* At the end of the process, the guard is killed */
+    /* in restfakecorr().                             */
+    x = grd->mx, y = grd->my;
+    see_guard = canspotmon(grd);
+    parkguard(grd); /* move to <0,0> */
+    wallify_vault(grd);
+    restfakecorr(grd);
+    debugpline2("gd_move_cleanup: %scleanup%s",
+                grd->isgd ? "" : "final ",
+                grd->isgd ? " attempt" : "");
+    if (!semi_dead && (in_fcorridor(grd, u.ux, u.uy) || cansee(x, y))) {
+        if (!disappear_msg_seen && see_guard)
+            pline("Suddenly, %s disappears.", noit_mon_nam(grd));
+        return 1;
+    }
+    return -2;
+}
+
 /*
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
  */
@@ -775,7 +812,7 @@ gd_move(struct monst *grd)
     register struct egd *egrd = EGD(grd);
     long umoney = 0L;
     boolean goldincorridor = FALSE, u_in_vault = FALSE, grd_in_vault = FALSE,
-            disappear_msg_seen = FALSE, semi_dead = DEADMONSTER(grd),
+            semi_dead = DEADMONSTER(grd),
             u_carry_gold = FALSE, newspot = FALSE, see_guard;
 
     if (!on_level(&(egrd->gdlevel), &u.uz))
@@ -783,7 +820,7 @@ gd_move(struct monst *grd)
     nx = ny = m = n = 0;
     if (semi_dead || !grd->mx || egrd->gddone) {
         egrd->gddone = 1;
-        goto cleanup;
+        return gd_move_cleanup(grd, semi_dead, FALSE);
     }
     debugpline1("gd_move: %s guard", grd->mpeaceful ? "peaceful" : "hostile");
 
@@ -872,7 +909,7 @@ gd_move(struct monst *grd)
                 if (!Deaf)
                     verbalize("Well, begone.");
                 egrd->gddone = 1;
-                goto cleanup;
+                return gd_move_cleanup(grd, semi_dead, FALSE);
             }
         }
     }
@@ -883,8 +920,7 @@ gd_move(struct monst *grd)
             && (levl[egrd->fakecorr[0].fx][egrd->fakecorr[0].fy].typ
                 == egrd->fakecorr[0].ftyp)) {
             pline("%s, confused, disappears.", noit_Monnam(grd));
-            disappear_msg_seen = TRUE;
-            goto cleanup;
+            return gd_move_cleanup(grd, semi_dead, TRUE);
         }
         if (u_carry_gold && (in_fcorridor(grd, u.ux, u.uy)
                              /* cover a 'blind' spot */
@@ -1038,39 +1074,14 @@ gd_move(struct monst *grd)
         if (!find_guard_dest(grd, &egrd->gdx, &egrd->gdy)
             || (egrd->gdx == gx && egrd->gdy == gy)) {
             pline("%s, confused, disappears.", Monnam(grd));
-            disappear_msg_seen = TRUE;
-            goto cleanup;
+            return gd_move_cleanup(grd, semi_dead, TRUE);
         } else
             goto nextpos;
     }
  newpos:
     gd_mv_monaway(grd, nx, ny);
-    if (egrd->gddone) {
-        /* The following is a kludge.  We need to keep    */
-        /* the guard around in order to be able to make   */
-        /* the fake corridor disappear as the player      */
-        /* moves out of it, but we also need the guard    */
-        /* out of the way.  We send the guard to never-   */
-        /* never land.  We set ogx ogy to mx my in order  */
-        /* to avoid a check at the top of this function.  */
-        /* At the end of the process, the guard is killed */
-        /* in restfakecorr().                             */
- cleanup:
-        x = grd->mx, y = grd->my;
-        see_guard = canspotmon(grd);
-        parkguard(grd); /* move to <0,0> */
-        wallify_vault(grd);
-        restfakecorr(grd);
-        debugpline2("gd_move: %scleanup%s",
-                    grd->isgd ? "" : "final ",
-                    grd->isgd ? " attempt" : "");
-        if (!semi_dead && (in_fcorridor(grd, u.ux, u.uy) || cansee(x, y))) {
-            if (!disappear_msg_seen && see_guard)
-                pline("Suddenly, %s disappears.", noit_mon_nam(grd));
-            return 1;
-        }
-        return -2;
-    }
+    if (egrd->gddone)
+        return gd_move_cleanup(grd, semi_dead, FALSE);
     egrd->ogx = grd->mx; /* update old positions */
     egrd->ogy = grd->my;
     remove_monster(grd->mx, grd->my);
