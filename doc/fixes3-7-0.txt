@@ -1641,6 +1641,7 @@ display detected door traps and chest traps as trapped doors and trapped
 if built with DEBUG enabled and running in wizard mode, starting play with
 	DEBUGFILES=seethru in environment makes clouds on the Plane of Air,
 	water on Plane of Water, and fumaroles on Plane of Fire be transparent
+add wizard mode #wizkill command to remove monster(s) from play
 
 
 Platform- and/or Interface-Specific New Features
