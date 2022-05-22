@@ -2630,7 +2630,7 @@ makeplural(const char* oldstr)
     /* -eau/-eaux (gateau, chapeau...) */
     if (len >= 3 && !strcmpi(spot - 2, "eau")
         /* 'bureaus' is the more common plural of 'bureau' */
-        && strncmpi(str, "bureau", 6)) {
+        && BSTRCMPI(str, spot - 5, "bureau")) {
         Strcasecpy(spot + 1, "x");
         goto bottom;
     }
