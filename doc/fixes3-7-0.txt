@@ -1235,6 +1235,7 @@ curses: messages were tagged by turn in 3.6.x so that ^P can place a separator
 curses: when entering a count while in a menu, cursor would jump to the spot
 	on screen where the hero was, even if menu covered that part of map;
 	post-3.6--started when curses was changed to use core's get_count()
+curses: clipped map crashed due to uninitialized memory
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching

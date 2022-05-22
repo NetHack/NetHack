@@ -629,15 +629,19 @@ curses_draw_map(int sx, int sy, int ex, int ey)
     hsb_back.ch = '-';
     hsb_back.color = SCROLLBAR_BACK_COLOR;
     hsb_back.attr = A_NORMAL;
+    hsb_back.unicode_representation = NULL;
     hsb_bar.ch = '*';
     hsb_bar.color = SCROLLBAR_COLOR;
     hsb_bar.attr = A_NORMAL;
+    hsb_bar.unicode_representation = NULL;
     vsb_back.ch = '|';
     vsb_back.color = SCROLLBAR_BACK_COLOR;
     vsb_back.attr = A_NORMAL;
+    vsb_back.unicode_representation = NULL;
     vsb_bar.ch = '*';
     vsb_bar.color = SCROLLBAR_COLOR;
     vsb_bar.attr = A_NORMAL;
+    vsb_bar.unicode_representation = NULL;
 
     /* Horizontal scrollbar */
     if (sx > 0 || ex < (COLNO - 1)) {
