@@ -1203,12 +1203,33 @@ wiz_kill(void)
         }
 
         if (mtmp) {
-            /* we don't require that monster be seen or sensed but when it
-               isn't, death message will be "You kill it" or "It is killed" */
-            if (!iflags.menu_requested)
-                killed(mtmp); /* normal case: hero is credited/blamed */
-            else
-                monkilled(mtmp, "", AD_PHYS); /* 'm'-prefix */
+            /* we don't require that the monster be seen or sensed so
+               we issue our own message in order to name it in case it
+               isn't; note that if it triggers other kills, those might
+               be referred to as "it" */
+            if (!iflags.menu_requested) {
+                boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
+
+                /* normal case: hero is credited/blamed */
+                You("%s %s!", nonliving(mtmp->data) ? "destroy" : "kill",
+                    !mtmp->mtame ? noit_mon_nam(mtmp)
+                    : x_monnam(mtmp, ARTICLE_YOUR, "poor",
+                               SUPPRESS_IT | (namedpet ? SUPPRESS_SADDLE : 0),
+                               FALSE));
+                xkilled(mtmp, XKILL_NOMSG);
+            } else { /* 'm'-prefix */
+                /* we know that monsters aren't moving because player has
+                   just issued this #wizkill command, but if 'mtmp' is a
+                   gas spore whose explosion kills any other monsters we
+                   need to have the mon_moving flag be True in order to
+                   avoid blaming or crediting hero for their deaths */
+                g.context.mon_moving = TRUE;
+                pline("%s is %s.", noit_Monnam(mtmp),
+                      nonliving(mtmp->data) ? "destroyed" : "killed");
+                /* Null second arg suppresses message */
+                monkilled(mtmp, (char *) 0, AD_PHYS);
+                g.context.mon_moving = FALSE;
+            }
         } else {
             There("is no monster there.");
             break;
