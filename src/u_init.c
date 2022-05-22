@@ -1082,9 +1082,6 @@ ini_inv(struct trobj *trop)
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
                 g.nocreate4 = otyp;
-            /* First spellbook should be level 1 - did we get it? */
-            if (obj->oclass == SPBOOK_CLASS && objects[obj->otyp].oc_level == 1)
-                got_sp1 = TRUE;
         }
 
         if (g.urace.mnum != PM_HUMAN) {
@@ -1182,6 +1179,10 @@ ini_inv(struct trobj *trop)
         }
         if (obj->oclass == SPBOOK_CLASS && obj->otyp != SPE_BLANK_PAPER)
             initialspell(obj);
+
+        /* First spellbook should be level 1 - did we get it? */
+        if (obj->oclass == SPBOOK_CLASS && objects[obj->otyp].oc_level == 1)
+            got_sp1 = TRUE;
 
         if (--trop->trquan)
             continue; /* make a similar object */
