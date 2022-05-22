@@ -1159,7 +1159,7 @@ wiz_detect(void)
 /* the #wizkill command - pick targets and reduce them to 0HP;
    by default, the hero is credited/blamed; use 'm' prefix to avoid that */
 static int
-wiz_kill()
+wiz_kill(void)
 {
     struct monst *mtmp;
     coord cc;
