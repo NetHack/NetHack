@@ -114,6 +114,7 @@ static int wiz_where(void);
 static int wiz_detect(void);
 static int wiz_panic(void);
 static int wiz_polyself(void);
+static int wiz_kill(void);
 static int wiz_load_lua(void);
 static int wiz_level_tele(void);
 static int wiz_level_change(void);
@@ -1155,6 +1156,68 @@ wiz_detect(void)
     return ECMD_OK;
 }
 
+/* the #wizkill command - pick targets and reduce them to 0HP;
+   by default, the hero is credited/blamed; use 'm' prefix to avoid that */
+static int
+wiz_kill()
+{
+    struct monst *mtmp;
+    coord cc;
+    int ans;
+    char c, qbuf[QBUFSZ];
+    const char *prompt = "Pick first monster to slay";
+    boolean save_verbose = flags.verbose;
+
+    cc.x = u.ux, cc.y = u.uy;
+    for (;;) {
+        pline("%s:", prompt);
+        prompt = "Next monster";
+
+        flags.verbose = FALSE;
+        ans = getpos(&cc, TRUE, "a monster");
+        flags.verbose = save_verbose;
+        if (ans < 0 || cc.x < 1)
+            break;
+
+        mtmp = 0;
+        if (u_at(cc.x, cc.y)) {
+            if (u.usteed) {
+                Sprintf(qbuf, "Kill %.110s?", mon_nam(u.usteed));
+                if ((c = ynq(qbuf)) == 'q')
+                    break;
+                if (c == 'y')
+                    mtmp = u.usteed;
+            }
+            if (!mtmp) {
+                Sprintf(qbuf, "%s?", Role_if(PM_SAMURAI) ? "Perform seppuku"
+                                                         : "Commit suicide");
+                if (paranoid_query(TRUE, qbuf)) {
+                    Sprintf(g.killer.name, "%s own player", uhis());
+                    g.killer.format = KILLED_BY;
+                    done(DIED);
+                }
+                break;
+            }
+        } else {
+            mtmp = m_at(cc.x, cc.y);
+        }
+
+        if (mtmp) {
+            /* we don't require that monster be seen or sensed but when it
+               isn't, death message will be "You kill it" or "It is killed" */
+            if (!iflags.menu_requested)
+                killed(mtmp); /* normal case: hero is credited/blamed */
+            else
+                monkilled(mtmp, "", AD_PHYS); /* 'm'-prefix */
+        } else {
+            There("is no monster there.");
+            break;
+        }
+    }
+    /* distinction between ECMD_CANCEL and ECMD_OK is unimportant here */
+    return ECMD_OK; /* no time elapses */
+}
+
 /* the #wizloadlua command - load an arbitrary lua file */
 static int
 wiz_load_lua(void)
@@ -1166,7 +1229,7 @@ wiz_load_lua(void)
         buf[0] = '\0';
         getlin("Load which lua file?", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
-            return 0;
+            return ECMD_CANCEL;
         if (!strchr(buf, '.'))
             strcat(buf, ".lua");
         (void) load_lua(buf, &sbi);
@@ -1185,7 +1248,7 @@ wiz_load_splua(void)
         buf[0] = '\0';
         getlin("Load which des lua file?", buf);
         if (buf[0] == '\033' || buf[0] == '\0')
-            return 0;
+            return ECMD_CANCEL;
         if (!strchr(buf, '.'))
             strcat(buf, ".lua");
 
@@ -1303,7 +1366,7 @@ wiz_telekinesis(void)
     pline("Pick a monster to hurtle.");
     do {
         ans = getpos(&cc, TRUE, "a monster");
-        if (ans < 0 || cc.x < 0)
+        if (ans < 0 || cc.x < 1)
             return ECMD_CANCEL;
 
         if ((((mtmp = m_at(cc.x, cc.y)) != 0) && canspotmon(mtmp))
@@ -2524,6 +2587,9 @@ struct ext_func_tab extcmdlist[] = {
               wiz_identify, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizintrinsic", "set an intrinsic",
               wiz_intrinsic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+    { '\0',   "wizkill", "slay a monster",
+              wiz_kill, (IFBURIED | AUTOCOMPLETE | WIZMODECMD
+                         | CMD_M_PREFIX | NOFUZZERCMD), NULL },
     { C('v'), "wizlevelport", "teleport to another level",
               wiz_level_tele, IFBURIED | WIZMODECMD | CMD_M_PREFIX, NULL },
     { '\0',   "wizloaddes", "load and execute a des-file lua script",

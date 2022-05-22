@@ -1709,6 +1709,10 @@ Default key is \(oq\(haI\(cq.
 Set one or more intrinsic attributes.
 Autocompletes.
 Debug mode only.
+.lp "#wizkill "
+Remove monsters from play by just pointing at them.
+Autocompletes.
+Debug mode only.
 .lp #wizlevelport
 Teleport to another level.
 Autocompletes.
