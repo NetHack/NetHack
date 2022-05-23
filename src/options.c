@@ -7230,8 +7230,6 @@ fruitadd(char *str, struct fruit *replace_fruit)
            str==pl_fruit but makesingular() creates a copy
            so we need to copy that back into pl_fruit */
         nmcpy(g.pl_fruit, makesingular(str), PL_FSIZ);
-        /* (assertion doesn't matter; we use 'g.pl_fruit' from here on out) */
-        /* assert( str == g.pl_fruit ); */
 
         /* disallow naming after other foods (since it'd be impossible
          * to tell the difference); globs might have a size prefix which
@@ -7239,8 +7237,9 @@ fruitadd(char *str, struct fruit *replace_fruit)
          */
         globpfx = (!strncmp(g.pl_fruit, "small ", 6)
                    || !strncmp(g.pl_fruit, "large ", 6)) ? 6
-                  : (!strncmp(g.pl_fruit, "very large ", 11)) ? 11
-                    : 0;
+                  : (!strncmp(g.pl_fruit, "medium ", 7)) ? 7
+                    : (!strncmp(g.pl_fruit, "very large ", 11)) ? 11
+                      : 0;
         for (i = g.bases[FOOD_CLASS]; objects[i].oc_class == FOOD_CLASS; i++) {
             if (!strcmp(OBJ_NAME(objects[i]), g.pl_fruit)
                 || (globpfx > 0
