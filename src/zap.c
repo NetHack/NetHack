@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1651868824 2022/05/06 20:27:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1653329964 2022/05/23 18:19:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.415 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -586,11 +586,12 @@ get_obj_location(struct obj *obj, xchar *xp, xchar *yp, int locflags)
 }
 
 boolean
-get_mon_location(struct monst *mon, xchar *xp, xchar *yp,
-                 int locflags) /* non-zero means get location even if monster
-                                  is buried */
+get_mon_location(
+    struct monst *mon,
+    xchar *xp, xchar *yp,
+    int locflags) /* non-zero means get location even if monster is buried */
 {
-    if (mon == &g.youmonst) {
+    if (mon == &g.youmonst || (u.usteed && mon == u.usteed)) {
         *xp = u.ux;
         *yp = u.uy;
         return TRUE;
@@ -819,7 +820,7 @@ revive(struct obj *corpse, boolean by_hero)
             break; /* x,y are 0 */
         }
     }
-    if (!x || !y
+    if (!x
         /* Rules for revival from containers:
          *  - the container cannot be locked
          *  - the container cannot be heavily nested (>2 is arbitrary)
