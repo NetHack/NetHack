@@ -4830,7 +4830,7 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
     if (!exploding_wand_typ) {
         if (abs(type) < ZT_SPELL(0))
             zapverb = "bolt"; /* wand zap */
-        /* kludge check:
+        /* burning oil kludge check:
            ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
         else if (type == (ZT_SPELL(AD_FIRE - 1)))
             yourzap = FALSE;  /* and leave zapverb as "blast" */
