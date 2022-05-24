@@ -1711,6 +1711,8 @@ Autocompletes.
 Debug mode only.
 .lp "#wizkill "
 Remove monsters from play by just pointing at them.
+By default the hero gets credit or blame for killing the targets.
+Precede this command with the \(oq\f(CRm\fP\(cq prefix to override that.
 Autocompletes.
 Debug mode only.
 .lp #wizlevelport
