@@ -4256,8 +4256,12 @@ buzz(int type, int nd, xchar sx, xchar sy, int dx, int dy)
  * called with dx = dy = 0 with vertical bolts
  */
 void
-dobuzz(int type, int nd, xchar sx, xchar sy, int dx, int dy,
-       boolean say) /* Announce out of sight hit/miss events if true */
+dobuzz(
+    int type,
+    int nd,
+    xchar sx, xchar sy,
+    int dx, int dy,
+    boolean say) /* announce out of sight hit/miss events if true */
 {
     int range, abstype = abs(type) % 10;
     register xchar lsx, lsy;
@@ -4629,8 +4633,12 @@ melt_ice_away(anything *arg, long timeout UNUSED)
  * amount by which range is reduced (the latter is just ignored by fireballs)
  */
 int
-zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
-               short exploding_wand_typ)
+zap_over_floor(
+    xchar x, xchar y,         /* location */
+    int type,                 /* damage type plus {wand|spell|breath} info */
+    boolean *shopdamage,      /* extra output if shop door is destroyed */
+    short exploding_wand_typ) /* supplied when breaking a wand; or POT_OIL
+                               * when a lit potion of oil explodes */
 {
     const char *zapverb;
     struct monst *mon;
@@ -4831,12 +4839,14 @@ zap_over_floor(xchar x, xchar y, int type, boolean *shopdamage,
     if (!exploding_wand_typ) {
         if (abs(type) < ZT_SPELL(0))
             zapverb = "bolt"; /* wand zap */
-        /* burning oil kludge check:
-           ZT_SPELL(ZT_FIRE) = ZT_SPELL(AD_FIRE-1) = 10+(2-1) = 11 */
-        else if (type == (ZT_SPELL(AD_FIRE - 1)))
-            yourzap = FALSE;  /* and leave zapverb as "blast" */
         else if (abs(type) < ZT_BREATH(0))
             zapverb = "spell";
+    } else if (exploding_wand_typ == POT_OIL) {
+        /* breakobj() -> explode_oil() -> splatter_buring_oil()
+           -> explode(ZT_SPELL(ZT_FIRE), BURNING_OIL)
+           -> zap_over_floor(ZT_SPELL(ZT_FIRE), POT_OIL) */
+        yourzap = FALSE;  /* and leave zapverb as "blast" */
+        exploding_wand_typ = 0; /* not actually an exploding wand */
     }
 
     /* secret door gets revealed, converted into regular door */
