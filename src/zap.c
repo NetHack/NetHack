@@ -4842,7 +4842,7 @@ zap_over_floor(
         else if (abs(type) < ZT_BREATH(0))
             zapverb = "spell";
     } else if (exploding_wand_typ == POT_OIL) {
-        /* breakobj() -> explode_oil() -> splatter_buring_oil()
+        /* breakobj() -> explode_oil() -> splatter_burning_oil()
            -> explode(ZT_SPELL(ZT_FIRE), BURNING_OIL)
            -> zap_over_floor(ZT_SPELL(ZT_FIRE), POT_OIL) */
         yourzap = FALSE;  /* and leave zapverb as "blast" */
