@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1648318981 2022/03/26 18:23:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1653506421 2022/05/25 19:20:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.278 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3692,8 +3692,8 @@ maybe_finished_meal(boolean stopping)
         && g.context.victual.usedtime >= g.context.victual.reqtime) {
         if (stopping)
             g.occupation = 0; /* for do_reset_eat */
-        (void) eatfood();   /* calls done_eating() to use up
-                               g.context.victual.piece */
+        /* eatfood() calls done_eating() to use up g.context.victual.piece */
+        (void) eatfood();
         return TRUE;
     }
     return FALSE;
