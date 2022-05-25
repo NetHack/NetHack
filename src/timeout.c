@@ -1,4 +1,4 @@
-/* NetHack 3.7	timeout.c	$NHDT-Date: 1648318982 2022/03/26 18:23:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.137 $ */
+/* NetHack 3.7	timeout.c	$NHDT-Date: 1653507043 2022/05/25 19:30:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.139 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2022,6 +2022,7 @@ start_timer(
 long
 stop_timer(short func_index, anything *arg)
 {
+    timeout_proc cleanup_func;
     timer_element *doomed;
     long timeout;
 
@@ -2031,8 +2032,8 @@ stop_timer(short func_index, anything *arg)
         timeout = doomed->timeout;
         if (doomed->kind == TIMER_OBJECT)
             (arg->a_obj)->timed--;
-        if (timeout_funcs[doomed->func_index].cleanup)
-            (*timeout_funcs[doomed->func_index].cleanup)(arg, timeout);
+        if ((cleanup_func = timeout_funcs[doomed->func_index].cleanup) != 0)
+            (*cleanup_func)(arg, timeout);
         free((genericptr_t) doomed);
         return (timeout - g.moves);
     }
@@ -2098,6 +2099,7 @@ obj_split_timers(struct obj* src, struct obj* dest)
 void
 obj_stop_timers(struct obj* obj)
 {
+    timeout_proc cleanup_func;
     timer_element *curr, *prev, *next_timer = 0;
 
     for (prev = 0, curr = g.timer_base; curr; curr = next_timer) {
@@ -2107,9 +2109,8 @@ obj_stop_timers(struct obj* obj)
                 prev->next = curr->next;
             else
                 g.timer_base = curr->next;
-            if (timeout_funcs[curr->func_index].cleanup)
-                (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
-                                                           curr->timeout);
+            if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0)
+                (*cleanup_func)(&curr->arg, curr->timeout);
             free((genericptr_t) curr);
         } else {
             prev = curr;
@@ -2136,6 +2137,7 @@ obj_has_timer(struct obj* object, short timer_type)
 void
 spot_stop_timers(xchar x, xchar y, short func_index)
 {
+    timeout_proc cleanup_func;
     timer_element *curr, *prev, *next_timer = 0;
     long where = (((long) x << 16) | ((long) y));
 
@@ -2147,9 +2149,8 @@ spot_stop_timers(xchar x, xchar y, short func_index)
                 prev->next = curr->next;
             else
                 g.timer_base = curr->next;
-            if (timeout_funcs[curr->func_index].cleanup)
-                (*timeout_funcs[curr->func_index].cleanup)(&curr->arg,
-                                                           curr->timeout);
+            if ((cleanup_func = timeout_funcs[curr->func_index].cleanup) != 0)
+                (*cleanup_func)(&curr->arg, curr->timeout);
             free((genericptr_t) curr);
         } else {
             prev = curr;
