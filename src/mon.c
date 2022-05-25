@@ -651,9 +651,10 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
             obj = obj_meld(&obj, &otmp);
         }
         free_mgivenname(mtmp);
+        newsym(x, y);
         return obj;
     default:
- default_1:
+default_1:
         if (g.mvitals[mndx].mvflags & G_NOCORPSE) {
             return (struct obj *) 0;
         } else {
