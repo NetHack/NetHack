@@ -133,6 +133,10 @@ CURSESLIB = -lncurses
 endif
 
 ifdef CURSESLIB
+# Newer versions of ncurses are commonly installed via homebrew, but intentionally unlinked.
+# Uncommenting the following two lines will compile nethack with it.
+# LFLAGS += -L$(shell brew --prefix)/opt/ncurses/lib
+# WINLIB += -I$(shell brew --prefix)/opt/ncurses/include
 WINLIB += $(CURSESLIB)
 endif
 
@@ -152,7 +156,7 @@ WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
 WINLIB += $(WINX11LIB)
-LFLAGS=-L/opt/X11/lib
+LFLAGS += -L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
