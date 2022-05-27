@@ -1799,6 +1799,7 @@ split adjusting attributes into separate function (pr #757 by argrath)
 split getting damages with a kick into separate function (pr #758 by argrath)
 split fixing curse trouble into separate function (pr #765 by argrath)
 Handle -eaux plurals in makeplural/makesingular (pr #767 by entrez)
+mdisplacem stoning and gloves had test backwards (pr #773 by entrez)
 
 
 Code Cleanup and Reorganization
