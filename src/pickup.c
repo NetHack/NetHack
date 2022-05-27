@@ -3047,6 +3047,7 @@ menu_loot(int retry, boolean put_in)
                 loot_justpicked = TRUE;
                 count = max(0, pick_list[i].count);
                 add_valid_menu_class(pick_list[i].item.a_int);
+                loot_everything = FALSE;
             } else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else {
