@@ -226,13 +226,18 @@ mdisplacem(register struct monst *magr, register struct monst *mdef,
     g.vis = (canspotmon(magr) && canspotmon(mdef));
 
     if (touch_petrifies(pd) && !resists_ston(magr)) {
-        if (which_armor(magr, W_ARMG) != 0) {
+        if (!which_armor(magr, W_ARMG)) {
             if (poly_when_stoned(pa)) {
                 mon_to_stone(magr);
                 return MM_HIT; /* no damage during the polymorph */
             }
-            if (!quietly && canspotmon(magr))
+            if (!quietly && canspotmon(magr)) {
+                if (g.vis) {
+                    pline("%s tries to move %s out of %s way.", Monnam(magr),
+                          mon_nam(mdef), is_rider(pa) ? "the" : mhis(magr));
+                }
                 pline("%s turns to stone!", Monnam(magr));
+            }
             monstone(magr);
             if (!DEADMONSTER(magr))
                 return MM_HIT; /* lifesaved */
