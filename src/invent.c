@@ -2115,7 +2115,8 @@ askchain(
     ininv = (*objchn == g.invent);
     bycat = (menu_class_present('u')
              || menu_class_present('B') || menu_class_present('U')
-             || menu_class_present('C') || menu_class_present('X'));
+             || menu_class_present('C') || menu_class_present('X')
+             || menu_class_present('P'));
 
     /* someday maybe we'll sort by 'olets' too (temporarily replace
        flags.packorder and pass SORTLOOT_PACK), but not yet... */
