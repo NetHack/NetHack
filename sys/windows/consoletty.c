@@ -2180,7 +2180,8 @@ restore_original_console_font(void)
         raw_print("Restoring original font and code page\n");
         success = SetConsoleOutputCP(console.original_code_page);
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
-        raw_print("Restoring original font, code page and locale\n");
+        if (wizard)
+            raw_print("Restoring original font, code page and locale\n");
 
         tmplocalestr = setlocale(LC_ALL, console.orig_localestr);
         if (tmplocalestr) {
