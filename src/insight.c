@@ -199,8 +199,7 @@ walking_on_water(void)
 {
     if (u.uinwater || Levitation || Flying)
         return FALSE;
-    return (boolean) (Wwalking
-                      && (is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy)));
+    return (boolean) (Wwalking && is_pool_or_lava(u.ux, u.uy));
 }
 
 /* describe u.utraptype; used by status_enlightenment() and self_lookat() */
@@ -1642,6 +1641,23 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
                     "");
         }
         BFlying = save_BFly;
+    }
+    /* including this might bring attention to the fact that ceiling
+       clinging has inconsistencies... */
+    if (is_clinger(g.youmonst.data)) {
+        boolean has_lid = has_ceiling(&u.uz);
+
+        if (has_lid && !u.uinwater) {
+            you_can("cling to the ceiling", "");
+        } else {
+            Sprintf(buf, " to the ceiling if %s%s%s",
+                    !has_lid ? "there was one" : "",
+                    (!has_lid && u.uinwater) ? " and " : "",
+                    u.uinwater ? (Underwater ? "you weren't underwater"
+                                  : "you weren't in the water") : "");
+            /* past tense is applicable for death while Unchanging */
+            enl_msg(You_, "could cling", "could have clung", buf, "");
+        }
     }
     /* actively walking on water handled earlier as a status condition */
     if (Wwalking && !walking_on_water())
