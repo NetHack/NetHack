@@ -1224,6 +1224,10 @@ further changes resulted in dead monsters' corpses be placed at <0,0>;
 	reverse the part(s) that cleared stale monst->mx,my
 adding name/rename choice to #therecmdmenu caused it to crash when picking an
 	adjacent unnamed, untame monster
+for menustyle:Full, fix the combination of 'A' auto-pick all plus 'P' just
+	picked up to limit what "all" means
+for menustyle:Traditional, fix 'P' for just picked up items in inventory when
+	filtering what items to put into a container
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
