@@ -45,26 +45,26 @@ l_obj_check(lua_State *L, int indx)
 static int
 l_obj_gc(lua_State *L)
 {
+    struct obj *obj, *otmp;
     struct _lua_obj *lo = l_obj_check(L, 1);
 
-    if (lo && lo->obj) {
-        if (lo->obj->lua_ref_cnt > 0)
-            lo->obj->lua_ref_cnt--;
+    if (lo && (obj = lo->obj) != 0) {
+        if (obj->lua_ref_cnt > 0)
+            obj->lua_ref_cnt--;
         /* free-floating objects with no other refs are deallocated. */
-        if (!lo->obj->lua_ref_cnt
-            && (lo->obj->where == OBJ_FREE || lo->obj->where == OBJ_LUAFREE)) {
-            if (Has_contents(lo->obj)) {
-                struct obj *otmp;
-                while ((otmp = lo->obj->cobj) != 0) {
+        if (!obj->lua_ref_cnt
+            && (obj->where == OBJ_FREE || obj->where == OBJ_LUAFREE)) {
+            if (Has_contents(obj)) {
+                while ((otmp = obj->cobj) != 0) {
                     obj_extract_self(otmp);
                     dealloc_obj(otmp);
                 }
             }
-            dealloc_obj(lo->obj);
+            obj->where = OBJ_FREE;
+            dealloc_obj(obj), obj = 0;
         }
         lo->obj = NULL;
     }
-
     return 0;
 }
 
