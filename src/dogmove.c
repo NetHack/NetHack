@@ -1034,7 +1034,12 @@ dog_move(register struct monst *mtmp,
              * 60% to 80%:  up to level
              * 40% to 60%:  up to level - 1
              * 25% to 40%:  up to level - 2
-             *  below 25%:  prevented from attacking at all by a different case
+             *  below 25%:  won't attack peacefuls of any level (different case)
+             *  below 20%:  up to level - 3
+             *
+             * note that balk's maximum value is +3, as it is the lowest level
+             * the pet will balk at attacking rather than the highest level they
+             * are willing to attack; note the >= used when comparing it.
              */
             int balk = mtmp->m_lev + ((5 * mtmp->mhp) / mtmp->mhpmax) - 2;
 
