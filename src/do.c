@@ -766,7 +766,7 @@ engulfer_digests_food(struct obj *obj)
 
         if (could_poly || could_slime) {
             (void) newcham(u.ustuck, could_slime ? &mons[PM_GREEN_SLIME] : 0,
-                           FALSE, could_slime);
+                           could_slime ? NC_SHOW_MSG : NO_NC_FLAGS);
         } else if (could_petrify) {
             minstapetrify(u.ustuck, TRUE);
         } else if (could_grow) {

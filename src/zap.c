@@ -251,17 +251,24 @@ bhitm(struct monst *mtmp, struct obj *otmp)
                 /* g.context.bypasses = TRUE; ## for make_corpse() */
                 /* no corpse after system shock */
                 xkilled(mtmp, XKILL_GIVEMSG | XKILL_NOCORPSE);
-            } else if (newcham(mtmp, (struct permonst *) 0,
-                               polyspot, give_msg) != 0
-                       /* if shapechange failed because there aren't
-                          enough eligible candidates (most likely for
-                          vampshifter), try reverting to original form */
-                       || (mtmp->cham >= LOW_PM
-                           && newcham(mtmp, &mons[mtmp->cham],
-                                      polyspot, give_msg) != 0)) {
-                if (give_msg && (canspotmon(mtmp)
-                                 || engulfing_u(mtmp)))
-                    learn_it = TRUE;
+            } else {
+                unsigned ncflags = NO_NC_FLAGS;
+
+                if (polyspot)
+                    ncflags |= NC_VIA_WAND_OR_SPELL;
+                if (give_msg)
+                    ncflags |= NC_SHOW_MSG;
+                if (newcham(mtmp, (struct permonst *) 0, ncflags) != 0
+                           /* if shapechange failed because there aren't
+                              enough eligible candidates (most likely for
+                              vampshifter), try reverting to original form */
+                           || (mtmp->cham >= LOW_PM
+                               && newcham(mtmp, &mons[mtmp->cham],
+                                          ncflags) != 0)) {
+                    if (give_msg && (canspotmon(mtmp)
+                                     || engulfing_u(mtmp)))
+                        learn_it = TRUE;
+                }
             }
 
             /* do this even if polymorphed failed (otherwise using
@@ -407,7 +414,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             char *name = Monnam(mtmp);
 
             /* turn into flesh golem */
-            if (newcham(mtmp, &mons[PM_FLESH_GOLEM], FALSE, FALSE)) {
+            if (newcham(mtmp, &mons[PM_FLESH_GOLEM], NO_NC_FLAGS)) {
                 if (canseemon(mtmp))
                     pline("%s turns to flesh!", name);
             } else {
@@ -877,7 +884,7 @@ revive(struct obj *corpse, boolean by_hero)
                 free_omonst(corpse);
             if (mtmp->cham == PM_DOPPELGANGER) {
                 /* change shape to match the corpse */
-                (void) newcham(mtmp, mptr, FALSE, FALSE);
+                (void) newcham(mtmp, mptr, NO_NC_FLAGS);
             } else if (mtmp->data->mlet == S_ZOMBIE) {
                 mtmp->mhp = mtmp->mhpmax = 100;
                 mon_adjust_speed(mtmp, 2, (struct obj *) 0); /* MFAST */
@@ -1901,7 +1908,8 @@ stone_to_flesh_obj(struct obj *obj)
                 ptr = mon->data;
                 /* this golem handling is redundant... */
                 if (is_golem(ptr) && ptr != &mons[PM_FLESH_GOLEM])
-                    (void) newcham(mon, &mons[PM_FLESH_GOLEM], TRUE, FALSE);
+                    (void) newcham(mon, &mons[PM_FLESH_GOLEM],
+                                   NC_VIA_WAND_OR_SPELL);
             } else if ((ptr->geno & (G_NOCORPSE | G_UNIQ)) != 0) {
                 /* didn't revive but can't leave corpse either */
                 res = 0;

@@ -3117,7 +3117,7 @@ create_particular_creation(struct _create_particular_data* d)
            for, make it start out looking like what was asked for */
         if (mtmp->cham != NON_PM && firstchoice != NON_PM
             && mtmp->cham != firstchoice)
-            (void) newcham(mtmp, &mons[firstchoice], FALSE, FALSE);
+            (void) newcham(mtmp, &mons[firstchoice], NO_NC_FLAGS);
     }
     return madeany;
 }

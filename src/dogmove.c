@@ -356,7 +356,8 @@ dog_eat(struct monst *mtmp,
     if (poly || slimer) {
         struct permonst *ptr = slimer ? &mons[PM_GREEN_SLIME] : 0;
 
-        (void) newcham(mtmp, ptr, FALSE, cansee(mtmp->mx, mtmp->my));
+        (void) newcham(mtmp, ptr,
+                       cansee(mtmp->mx, mtmp->my) ? NC_SHOW_MSG : 0);
     }
 
     /* limit "instant" growth to prevent potential abuse */

@@ -3001,7 +3001,7 @@ mhitm_ad_slim(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 /* this assumes newcham() won't fail; since hero has
                    a slime attack, green slimes haven't been geno'd */
                 You("turn %s into slime.", mon_nam(mdef));
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE, FALSE))
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], NO_NC_FLAGS))
                     pd = mdef->data;
             }
             /* munslime attempt could have been fatal */
@@ -3037,8 +3037,11 @@ mhitm_ad_slim(struct monst *magr, struct attack *mattk, struct monst *mdef,
             return; /* physical damage only */
         if (!rn2(4) && !slimeproof(pd)) {
             if (!munslime(mdef, FALSE) && !DEADMONSTER(mdef)) {
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], FALSE,
-                            (boolean) (g.vis && canseemon(mdef))))
+                unsigned ncflags = NO_NC_FLAGS;
+
+                if (g.vis && canseemon(mdef))
+                    ncflags |= NC_SHOW_MSG;
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags)) 
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
                 mhm->hitflags = MM_HIT;
@@ -4321,7 +4324,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
         /* force vampire in bat, cloud, or wolf form to revert back to
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
-            && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+            && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
             You("engulf it, then expel it.");
             if (canspotmon(mdef))
                 pline("It turns into %s.", a_monnam(mdef));

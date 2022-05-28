@@ -1568,7 +1568,7 @@ extern boolean valid_vampshiftform(int, int);
 extern boolean validvamp(struct monst *, int *, int);
 extern int select_newcham_form(struct monst *);
 extern void mgender_from_permonst(struct monst *, struct permonst *);
-extern int newcham(struct monst *, struct permonst *, boolean, boolean);
+extern int newcham(struct monst *, struct permonst *, unsigned);
 extern int can_be_hatched(int);
 extern int egg_type_from_parent(int, boolean);
 extern boolean dead_species(int, boolean);

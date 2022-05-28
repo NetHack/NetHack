@@ -585,6 +585,11 @@ enum bodypart_types {
 #define ECMD_CANCEL 0x02 /* cmd canceled by user */
 #define ECMD_FAIL   0x04 /* cmd failed to finish, maybe with a yafm */
 
+/* flags for newcham() */
+#define NO_NC_FLAGS          0U
+#define NC_SHOW_MSG          0x01U
+#define NC_VIA_WAND_OR_SPELL 0x02U
+
 /* values returned from getobj() callback functions */
 enum getobj_callback_returns {
     /* generally invalid - can't be used for this purpose. will give a "silly

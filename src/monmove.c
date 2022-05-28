@@ -1967,7 +1967,7 @@ vamp_shift(
         reslt = 1;
         domsg = FALSE;
     } else if (is_vampshifter(mon)) {
-        reslt = newcham(mon, ptr, FALSE, FALSE);
+        reslt = newcham(mon, ptr, NO_NC_FLAGS);
     }
 
     if (reslt && domsg) {

@@ -772,7 +772,7 @@ gulpmm(register struct monst *magr, register struct monst *mdef,
     }
 
     if (is_vampshifter(mdef)
-        && newcham(mdef, &mons[mdef->cham], FALSE, FALSE)) {
+        && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
         if (g.vis) {
             /* 'it' -- previous form is no longer available and
                using that would be excessively verbose */
@@ -959,9 +959,9 @@ mdamagem(struct monst *magr, struct monst *mdef,
             /* various checks similar to dog_eat and meatobj.
              * after monkilled() to provide better message ordering */
             if (mdef->cham >= LOW_PM) {
-                (void) newcham(magr, (struct permonst *) 0, FALSE, TRUE);
+                (void) newcham(magr, (struct permonst *) 0, NC_SHOW_MSG);
             } else if (pd == &mons[PM_GREEN_SLIME] && !slimeproof(pa)) {
-                (void) newcham(magr, &mons[PM_GREEN_SLIME], FALSE, TRUE);
+                (void) newcham(magr, &mons[PM_GREEN_SLIME], NC_SHOW_MSG);
             } else if (pd == &mons[PM_WRAITH]) {
                 (void) grow_up(magr, (struct monst *) 0);
                 /* don't grow up twice */
@@ -1029,7 +1029,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 else
                     monkilled(mdef, "", AD_RBRE);
             }
-        } else if (newcham(mdef, (struct permonst *) 0, FALSE, FALSE)) {
+        } else if (newcham(mdef, (struct permonst *) 0, NO_NC_FLAGS)) {
             if (g.vis) { /* either seen or adjacent */
                 boolean was_seen = !!strcmpi("It", Before),
                         verbosely = flags.verbose || !was_seen;

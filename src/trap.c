@@ -656,7 +656,7 @@ animate_statue(
             /* if hero has protection from shape changers, cham field will
                be NON_PM; otherwise, set form to match the statue */
             if (mon && mon->cham >= LOW_PM)
-                (void) newcham(mon, mptr, FALSE, FALSE);
+                (void) newcham(mon, mptr, NO_NC_FLAGS);
         } else {
             if (cause == ANIMATE_SPELL)
                 mmflags |= MM_ADJACENTOK;
@@ -2166,7 +2166,8 @@ trapeffect_poly_trap(
         if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
         } else if (!resist(mtmp, WAND_CLASS, 0, NOTELL)) {
-            (void) newcham(mtmp, (struct permonst *) 0, FALSE, in_sight);
+            (void) newcham(mtmp, (struct permonst *) 0,
+                           in_sight ? NC_SHOW_MSG : NO_NC_FLAGS);
             if (in_sight)
                 seetrap(trap);
         }
@@ -2617,7 +2618,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
         if (!resists_magm(steed) && !resist(steed, WAND_CLASS, 0, NOTELL)) {
             struct permonst *mdat = steed->data;
 
-            (void) newcham(steed, (struct permonst *) 0, FALSE, FALSE);
+            (void) newcham(steed, (struct permonst *) 0, NO_NC_FLAGS);
             if (!can_saddle(steed) || !can_ride(steed)) {
                 dismount_steed(DISMOUNT_POLY);
             } else {

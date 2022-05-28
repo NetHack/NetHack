@@ -1326,7 +1326,7 @@ makemon(
                to the level's difficulty but ignoring the changer's usual
                type selection, so was inappropriate for vampshifters.
                Let newcham() pick the shape. */
-            && newcham(mtmp, (struct permonst *) 0, FALSE, FALSE))
+            && newcham(mtmp, (struct permonst *) 0, NO_NC_FLAGS))
             allow_minvent = FALSE;
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
