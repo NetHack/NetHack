@@ -635,7 +635,7 @@ makeniche(int trap_type)
                         (void) mksobj_at(SCR_TELEPORTATION, xx, yy + dy, TRUE,
                                          FALSE);
                     if (!rn2(3))
-                        (void) mkobj_at(0, xx, yy + dy, TRUE);
+                        (void) mkobj_at(RANDOM_CLASS, xx, yy + dy, TRUE);
                 }
             }
             return;
@@ -833,14 +833,14 @@ fill_ordinary_room(struct mkroom *croom)
 
  skip_nonrogue:
     if (!rn2(3) && somexyspace(croom, &pos)) {
-        (void) mkobj_at(0, pos.x, pos.y, TRUE);
+        (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
         trycnt = 0;
         while (!rn2(5)) {
             if (++trycnt > 100) {
                 impossible("trycnt overflow4");
                 break;
             }
-            (void) mkobj_at(0, pos.x, pos.y, TRUE);
+            (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
         }
     }
 }

@@ -1273,7 +1273,7 @@ makemon(
     case S_SNAKE:
         if (g.in_mklev)
             if (x && y)
-                (void) mkobj_at(0, x, y, TRUE);
+                (void) mkobj_at(RANDOM_CLASS, x, y, TRUE);
         (void) hideunder(mtmp);
         break;
     case S_LIGHT:
