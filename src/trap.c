@@ -1468,8 +1468,9 @@ trapeffect_fire_trap(
         seetrap(trap);
         dofiretrap((struct obj *) 0);
     } else {
+        coordxy tx = trap->tx, ty = trap->ty;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
-        boolean see_it = cansee(mtmp->mx, mtmp->my);
+        boolean see_it = cansee(tx, ty);
         boolean trapkilled = FALSE;
         struct permonst *mptr = mtmp->data;
 
@@ -1527,13 +1528,13 @@ trapeffect_fire_trap(
             (void) destroy_mitem(mtmp, POTION_CLASS, AD_FIRE);
             ignite_items(mtmp->minvent);
         }
-        if (burn_floor_objects(mtmp->mx, mtmp->my, see_it, FALSE)
-            && !see_it && distu(mtmp->mx, mtmp->my) <= 3 * 3)
+        if (burn_floor_objects(tx, ty, see_it, FALSE)
+            && !see_it && distu(tx, ty) <= 3 * 3)
             You("smell smoke.");
-        if (is_ice(mtmp->mx, mtmp->my))
-            melt_ice(mtmp->mx, mtmp->my, (char *) 0);
-        if (see_it && t_at(mtmp->mx, mtmp->my))
-            seetrap(trap);
+        if (is_ice(tx, ty))
+            melt_ice(tx, ty, (char *) 0);
+        if (see_it && t_at(tx, ty))
+            seetrap(t_at(tx, ty));
 
         return trapkilled ? Trap_Killed_Mon : mtmp->mtrapped
             ? Trap_Caught_Mon : Trap_Effect_Finished;
