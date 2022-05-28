@@ -4841,11 +4841,13 @@ zap_over_floor(
             zapverb = "bolt"; /* wand zap */
         else if (abs(type) < ZT_BREATH(0))
             zapverb = "spell";
-    } else if (exploding_wand_typ == POT_OIL) {
+    } else if (exploding_wand_typ == POT_OIL
+               || exploding_wand_typ == SCR_FIRE) {
         /* breakobj() -> explode_oil() -> splatter_burning_oil()
            -> explode(ZT_SPELL(ZT_FIRE), BURNING_OIL)
            -> zap_over_floor(ZT_SPELL(ZT_FIRE), POT_OIL) */
-        yourzap = FALSE;  /* and leave zapverb as "blast" */
+        /* leave zapverb as "blast"; exploding_wand_typ was nonzero, so
+           'yourzap' is FALSE and the result will be "the blast" */
         exploding_wand_typ = 0; /* not actually an exploding wand */
     }
 

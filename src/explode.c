@@ -85,6 +85,9 @@ explode(
     } else if (olet == BURNING_OIL) {
         /* used to provide extra information to zap_over_floor() */
         exploding_wand_typ = POT_OIL;
+    } else if (olet == SCROLL_CLASS) {
+        /* ditto */
+        exploding_wand_typ = SCR_FIRE;
     }
     /* muse_unslime: SCR_FIRE */
     if (expltype < 0) {
