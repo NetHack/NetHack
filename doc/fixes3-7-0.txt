@@ -1806,6 +1806,7 @@ split fixing curse trouble into separate function (pr #765 by argrath)
 Handle -eaux plurals in makeplural/makesingular (pr #767 by entrez)
 mdisplacem stoning and gloves had test backwards (pr #773 by entrez)
 writing type-named scrolls (pr #551 by entrez)
+more cases where newcham() gives messages (pr #775 by copperwater)
 
 
 Code Cleanup and Reorganization
@@ -1925,4 +1926,5 @@ add git submodule support to the Makefiles by specifying git=1 or GIT=1 on the
 add TT_NONE==0, renumber other u.utraptype values so that TT_BEARTRAP isn't 0
 for Planes of Water and Air, save the air bubbles and clouds with the level
 	rather than as game state; affects wizard mode ^V and #wizmakemap
+switch to a flags arg on newcham() in place of a the pair of boolean args
 
