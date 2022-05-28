@@ -911,6 +911,11 @@ using a marker to write "novel" or "paperback book" on a known blank spellbook
 	was producing a randomly chosen Pratchett novel; make it fail instead
 when a monster killed a pudding and it left a glob, that glob might not be
 	displayed on the map (wasn't an issue for killed-by-hero case)
+lua's garbage collection doesn't like the way nethack is trying to use it and
+	issues a pair of warnings each time the relevant code gets run; they
+	were vanishing into a bit bucket but now they will be displayed when
+	running in wizard mode; we need to fix the usage rather than just
+	hide the feedback
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

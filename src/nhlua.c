@@ -2273,6 +2273,32 @@ nhl_panic(lua_State *L)
     return 0; /* return to Lua to abort */
 }
 
+/* called when lua issues a warning message; the text of the message
+   is passed to us in pieces across multiple function calls */
+static void
+nhl_warn(
+    void *userdata UNUSED,
+    const char *msg_fragment,
+    int to_be_continued) /* 0: last fragment; 1: more to come */
+{
+    static char warnbuf[BUFSZ];
+    size_t fraglen, buflen = strlen(warnbuf);
+
+    if (msg_fragment && buflen < sizeof warnbuf - 1) {
+        fraglen = strlen(msg_fragment);
+        if (buflen + fraglen > sizeof warnbuf - 1)
+            fraglen = sizeof warnbuf - 1 - buflen;
+        (void) strncat(warnbuf, msg_fragment, fraglen);
+    }
+    if (!to_be_continued) {
+        /* this is a warning so probably ought to be delivered via
+           impossible() but until the current garbage collection issue
+           gets fixed that would be way too verbose */
+        pline("[lua] %s", warnbuf);
+        warnbuf[0] = '\0';
+    }
+}
+
 #ifdef NHL_SANDBOX
 static void
 nhl_hookfn(lua_State *L, lua_Debug *ar UNUSED)
@@ -2311,7 +2337,9 @@ nhlL_newstate(nhl_sandbox_info *sbi)
 
     lua_atpanic(L, nhl_panic);
 #if LUA_VERSION_NUM == 504
-    lua_setwarnf(L, (lua_WarnFunction) 0, L);
+    /* issue lua warnings only when in wizard mode, at least until
+       someone figures out and fixes the garbage collection problem */
+    lua_setwarnf(L, wizard ? nhl_warn : (lua_WarnFunction) 0, L);
 #endif
 
 #ifdef NHL_SANDBOX
