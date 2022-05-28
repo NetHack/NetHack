@@ -1096,9 +1096,9 @@ dokick(void)
                 kick_dumb(x, y);
                 return ECMD_TIME;
             }
-            if ((Luck < 0 || g.maploc->doormask) && !rn2(3)) {
+            if ((Luck < 0 || g.maploc->looted) && !rn2(3)) {
+                g.maploc->looted = 0; /* don't leave loose ends.. */
                 g.maploc->typ = ROOM;
-                g.maploc->doormask = 0; /* don't leave loose ends.. */
                 (void) mkgold((long) rnd(200), x, y);
                 if (Blind)
                     pline("CRASH!  You destroy it.");

@@ -12,7 +12,7 @@
 static boolean generate_stairs_room_good(struct mkroom *, int);
 static struct mkroom *generate_stairs_find_room(void);
 static void generate_stairs(void);
-static void mkfount(int, struct mkroom *);
+static void mkfount(struct mkroom *);
 static boolean find_okay_roompos(struct mkroom *, coord *);
 static void mksink(struct mkroom *);
 static void mkaltar(struct mkroom *);
@@ -635,7 +635,7 @@ makeniche(int trap_type)
                         (void) mksobj_at(SCR_TELEPORTATION, xx, yy + dy, TRUE,
                                          FALSE);
                     if (!rn2(3))
-                        (void) mkobj_at(0, xx, yy + dy, TRUE);
+                        (void) mkobj_at(RANDOM_CLASS, xx, yy + dy, TRUE);
                 }
             }
             return;
@@ -789,7 +789,7 @@ fill_ordinary_room(struct mkroom *croom)
     if (Is_rogue_level(&u.uz))
         goto skip_nonrogue;
     if (!rn2(10))
-        mkfount(0, croom);
+        mkfount(croom);
     if (!rn2(60))
         mksink(croom);
     if (!rn2(60))
@@ -833,14 +833,14 @@ fill_ordinary_room(struct mkroom *croom)
 
  skip_nonrogue:
     if (!rn2(3) && somexyspace(croom, &pos)) {
-        (void) mkobj_at(0, pos.x, pos.y, TRUE);
+        (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
         trycnt = 0;
         while (!rn2(5)) {
             if (++trycnt > 100) {
                 impossible("trycnt overflow4");
                 break;
             }
-            (void) mkobj_at(0, pos.x, pos.y, TRUE);
+            (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
         }
     }
 }
@@ -1752,19 +1752,12 @@ generate_stairs(void)
 }
 
 static void
-mkfount(int mazeflag, struct mkroom *croom)
+mkfount(struct mkroom *croom)
 {
     coord m;
-    register int tryct = 0;
 
-    do {
-        if (++tryct > 200)
-            return;
-        if (mazeflag)
-            mazexy(&m);
-        else if (!somexy(croom, &m))
-            return;
-    } while (occupied(m.x, m.y) || bydoor(m.x, m.y));
+    if (!find_okay_roompos(croom, &m))
+        return;
 
     /* Put a fountain at m.x, m.y */
     if (!set_levltyp(m.x, m.y, FOUNTAIN))
