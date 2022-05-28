@@ -51,7 +51,6 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ]]);
 -- Dungeon Description
 des.region(selection.area(00,00,75,19), "lit")
-des.region(selection.area(27,08,42,12), "lit")
 -- Portal arrival point
 des.levregion({ region = {66,17,66,17}, type="branch" })
 -- Stairs
