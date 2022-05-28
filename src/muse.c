@@ -2143,7 +2143,8 @@ use_misc(struct monst* mtmp)
         return 2;
     case MUSE_WAN_POLYMORPH:
         mzapwand(mtmp, otmp, TRUE);
-        (void) newcham(mtmp, muse_newcham_mon(mtmp), NC_VIA_WAND_OR_SPELL);
+        (void) newcham(mtmp, muse_newcham_mon(mtmp),
+                       NC_VIA_WAND_OR_SPELL | NC_SHOW_MSG);
         if (oseen)
             makeknown(WAN_POLYMORPH);
         return 2;
@@ -2152,7 +2153,7 @@ use_misc(struct monst* mtmp)
         m_useup(mtmp, otmp);
         if (vismon)
             pline("%s suddenly mutates!", Monnam(mtmp));
-        (void) newcham(mtmp, muse_newcham_mon(mtmp), NO_NC_FLAGS);
+        (void) newcham(mtmp, muse_newcham_mon(mtmp), NC_SHOW_MSG);
         if (oseen)
             makeknown(POT_POLYMORPH);
         return 2;
@@ -2179,7 +2180,7 @@ use_misc(struct monst* mtmp)
             worm_move(mtmp);
         newsym(g.trapx, g.trapy);
 
-        (void) newcham(mtmp, (struct permonst *) 0, NO_NC_FLAGS);
+        (void) newcham(mtmp, (struct permonst *) 0, NC_SHOW_MSG);
         return 2;
     case MUSE_BAG:
         return mloot_container(mtmp, otmp, vismon);
