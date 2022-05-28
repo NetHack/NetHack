@@ -3808,7 +3808,7 @@ normal_shape(struct monst *mon)
     if (mcham >= LOW_PM) {
         unsigned mcan = mon->mcan;
 
-        (void) newcham(mon, &mons[mcham], FALSE, FALSE);
+        (void) newcham(mon, &mons[mcham], FALSE, TRUE);
         mon->cham = NON_PM;
         /* newcham() may uncancel a polymorphing monster; override that */
         if (mcan)
