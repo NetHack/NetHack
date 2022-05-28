@@ -600,7 +600,7 @@ pick_lock(
                     autounlock ? yname(pick) : "");
             c = ynq(qbuf);
             if (c != 'y')
-                return 0;
+                return PICKLOCK_DID_NOTHING;
 
             /* note: for !autounlock, 'apply' already did touch check */
             if (autounlock && !touch_artifact(pick, &g.youmonst))
