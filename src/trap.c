@@ -1533,6 +1533,8 @@ trapeffect_fire_trap(
             You("smell smoke.");
         if (is_ice(tx, ty))
             melt_ice(tx, ty, (char *) 0);
+        if (DEADMONSTER(mtmp))
+            trapkilled = TRUE;
         if (see_it && t_at(tx, ty))
             seetrap(t_at(tx, ty));
 
