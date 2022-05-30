@@ -817,11 +817,11 @@ l_selection_iterate(lua_State *L)
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, x - g.xstart);
                     lua_pushinteger(L, y - g.ystart);
-		    if (nhl_pcall(L, 2, 0)) {
-			impossible("Lua error: %s", lua_tostring(L, -1));
-			/* abort the loops to prevent possible error cascade */
-			goto out;
-		    }
+                    if (nhl_pcall(L, 2, 0)) {
+                        impossible("Lua error: %s", lua_tostring(L, -1));
+                        /* abort the loops to prevent possible error cascade */
+                        goto out;
+                    }
                 }
     } else {
         nhl_error(L, "wrong parameters");

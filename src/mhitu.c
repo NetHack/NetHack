@@ -1916,7 +1916,7 @@ doseduce(struct monst *mon)
                           yourgloves ? " and eleven more pairs of gloves"
                                      : "");
             }
-	} else if (seewho)
+        } else if (seewho)
             pline("%s appears to sigh.", Monnam(mon));
         /* else no regret message if can't see or hear seducer */
 

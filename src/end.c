@@ -1871,7 +1871,7 @@ save_killers(NHFILE *nhfp)
     if (perform_bwrite(nhfp)) {
         for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
             if (nhfp->structlevel)
-	        bwrite(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
+                bwrite(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
         }
     }
     if (release_data(nhfp)) {
@@ -1890,7 +1890,7 @@ restore_killers(NHFILE *nhfp)
 
     for (kptr = &g.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
         if (nhfp->structlevel)
-	    mread(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
+            mread(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
         if (kptr->next) {
             kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }

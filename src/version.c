@@ -272,7 +272,7 @@ insert_rtoption(char *buf)
     for (i = 0; i < SIZE(rt_opts); ++i) {
         if (strstri(buf, rt_opts[i].token) && *rt_opts[i].value) {
             (void) strsubst(buf, rt_opts[i].token, rt_opts[i].value);
-	}
+        }
         /* we don't break out of the loop after a match; there might be
            other matches on the same line */
     }

@@ -664,7 +664,7 @@ ck_server_admin_msg(void)
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)
             read_simplemail(nonconst(SERVER_ADMIN_MSG, adminbuf,
-				     sizeof adminbuf), TRUE);
+                                     sizeof adminbuf), TRUE);
         ost.st_mtime = nst.st_mtime;
     }
 #endif /* SERVER_ADMIN_MSG */

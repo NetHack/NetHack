@@ -543,46 +543,46 @@ flip_level(int flp, boolean extras)
     for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
         if (!inFlipArea(ttmp->tx, ttmp->ty))
             continue;
-	if (flp & 1) {
-	    ttmp->ty = FlipY(ttmp->ty);
-	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-		ttmp->launch.y = FlipY(ttmp->launch.y);
-		ttmp->launch2.y = FlipY(ttmp->launch2.y);
-	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+        if (flp & 1) {
+            ttmp->ty = FlipY(ttmp->ty);
+            if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+                ttmp->launch.y = FlipY(ttmp->launch.y);
+                ttmp->launch2.y = FlipY(ttmp->launch2.y);
+            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
                 ttmp->conjoined = flip_encoded_direction_bits(flp,
                                                               ttmp->conjoined);
             }
-	}
-	if (flp & 2) {
-	    ttmp->tx = FlipX(ttmp->tx);
-	    if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
-		ttmp->launch.x = FlipX(ttmp->launch.x);
-		ttmp->launch2.x = FlipX(ttmp->launch2.x);
-	    } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
+        }
+        if (flp & 2) {
+            ttmp->tx = FlipX(ttmp->tx);
+            if (ttmp->ttyp == ROLLING_BOULDER_TRAP) {
+                ttmp->launch.x = FlipX(ttmp->launch.x);
+                ttmp->launch2.x = FlipX(ttmp->launch2.x);
+            } else if (is_pit(ttmp->ttyp) && ttmp->conjoined) {
                 ttmp->conjoined = flip_encoded_direction_bits(flp,
                                                               ttmp->conjoined);
-	    }
-	}
+            }
+        }
     }
 
     /* objects */
     for (otmp = fobj; otmp; otmp = otmp->nobj) {
         if (!inFlipArea(otmp->ox, otmp->oy))
             continue;
-	if (flp & 1)
-	    otmp->oy = FlipY(otmp->oy);
-	if (flp & 2)
-	    otmp->ox = FlipX(otmp->ox);
+        if (flp & 1)
+            otmp->oy = FlipY(otmp->oy);
+        if (flp & 2)
+            otmp->ox = FlipX(otmp->ox);
     }
 
     /* buried objects */
     for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
         if (!inFlipArea(otmp->ox, otmp->oy))
             continue;
-	if (flp & 1)
-	    otmp->oy = FlipY(otmp->oy);
-	if (flp & 2)
-	    otmp->ox = FlipX(otmp->ox);
+        if (flp & 1)
+            otmp->oy = FlipY(otmp->oy);
+        if (flp & 2)
+            otmp->ox = FlipX(otmp->ox);
     }
 
     /* monsters */
@@ -592,10 +592,10 @@ flip_level(int flp, boolean extras)
         /* skip the occasional earth elemental outside the flip area */
         if (!inFlipArea(mtmp->mx, mtmp->my))
             continue;
-	if (flp & 1)
-	    mtmp->my = FlipY(mtmp->my);
-	if (flp & 2)
-	    mtmp->mx = FlipX(mtmp->mx);
+        if (flp & 1)
+            mtmp->my = FlipY(mtmp->my);
+        if (flp & 2)
+            mtmp->mx = FlipX(mtmp->mx);
 
         if (mtmp->ispriest) {
             Flip_coord(EPRI(mtmp)->shrpos);
@@ -606,8 +606,8 @@ flip_level(int flp, boolean extras)
             if (flp & 1)
                 flip_worm_segs_vertical(mtmp, miny, maxy);
             if (flp & 2)
-		flip_worm_segs_horizontal(mtmp, minx, maxx);
-	}
+                flip_worm_segs_horizontal(mtmp, minx, maxx);
+        }
 #if 0   /* not useful unless tracking also gets flipped */
         if (extras) {
             if (mtmp->tame && has_edog(mtmp))
@@ -618,48 +618,48 @@ flip_level(int flp, boolean extras)
 
     /* engravings */
     for (etmp = head_engr; etmp; etmp = etmp->nxt_engr) {
-	if (flp & 1)
-	    etmp->engr_y = FlipY(etmp->engr_y);
-	if (flp & 2)
-	    etmp->engr_x = FlipX(etmp->engr_x);
+        if (flp & 1)
+            etmp->engr_y = FlipY(etmp->engr_y);
+        if (flp & 2)
+            etmp->engr_x = FlipX(etmp->engr_x);
     }
 
     /* level (teleport) regions */
     for (i = 0; i < g.num_lregions; i++) {
-	if (flp & 1) {
-	    g.lregions[i].inarea.y1 = FlipY(g.lregions[i].inarea.y1);
-	    g.lregions[i].inarea.y2 = FlipY(g.lregions[i].inarea.y2);
-	    if (g.lregions[i].inarea.y1 > g.lregions[i].inarea.y2) {
-		itmp = g.lregions[i].inarea.y1;
-		g.lregions[i].inarea.y1 = g.lregions[i].inarea.y2;
-		g.lregions[i].inarea.y2 = itmp;
-	    }
+        if (flp & 1) {
+            g.lregions[i].inarea.y1 = FlipY(g.lregions[i].inarea.y1);
+            g.lregions[i].inarea.y2 = FlipY(g.lregions[i].inarea.y2);
+            if (g.lregions[i].inarea.y1 > g.lregions[i].inarea.y2) {
+                itmp = g.lregions[i].inarea.y1;
+                g.lregions[i].inarea.y1 = g.lregions[i].inarea.y2;
+                g.lregions[i].inarea.y2 = itmp;
+            }
 
-	    g.lregions[i].delarea.y1 = FlipY(g.lregions[i].delarea.y1);
-	    g.lregions[i].delarea.y2 = FlipY(g.lregions[i].delarea.y2);
-	    if (g.lregions[i].delarea.y1 > g.lregions[i].delarea.y2) {
-		itmp = g.lregions[i].delarea.y1;
-		g.lregions[i].delarea.y1 = g.lregions[i].delarea.y2;
-		g.lregions[i].delarea.y2 = itmp;
-	    }
-	}
-	if (flp & 2) {
-	    g.lregions[i].inarea.x1 = FlipX(g.lregions[i].inarea.x1);
-	    g.lregions[i].inarea.x2 = FlipX(g.lregions[i].inarea.x2);
-	    if (g.lregions[i].inarea.x1 > g.lregions[i].inarea.x2) {
-		itmp = g.lregions[i].inarea.x1;
-		g.lregions[i].inarea.x1 = g.lregions[i].inarea.x2;
-		g.lregions[i].inarea.x2 = itmp;
-	    }
+            g.lregions[i].delarea.y1 = FlipY(g.lregions[i].delarea.y1);
+            g.lregions[i].delarea.y2 = FlipY(g.lregions[i].delarea.y2);
+            if (g.lregions[i].delarea.y1 > g.lregions[i].delarea.y2) {
+                itmp = g.lregions[i].delarea.y1;
+                g.lregions[i].delarea.y1 = g.lregions[i].delarea.y2;
+                g.lregions[i].delarea.y2 = itmp;
+            }
+        }
+        if (flp & 2) {
+            g.lregions[i].inarea.x1 = FlipX(g.lregions[i].inarea.x1);
+            g.lregions[i].inarea.x2 = FlipX(g.lregions[i].inarea.x2);
+            if (g.lregions[i].inarea.x1 > g.lregions[i].inarea.x2) {
+                itmp = g.lregions[i].inarea.x1;
+                g.lregions[i].inarea.x1 = g.lregions[i].inarea.x2;
+                g.lregions[i].inarea.x2 = itmp;
+            }
 
-	    g.lregions[i].delarea.x1 = FlipX(g.lregions[i].delarea.x1);
-	    g.lregions[i].delarea.x2 = FlipX(g.lregions[i].delarea.x2);
-	    if (g.lregions[i].delarea.x1 > g.lregions[i].delarea.x2) {
-		itmp = g.lregions[i].delarea.x1;
-		g.lregions[i].delarea.x1 = g.lregions[i].delarea.x2;
-		g.lregions[i].delarea.x2 = itmp;
-	    }
-	}
+            g.lregions[i].delarea.x1 = FlipX(g.lregions[i].delarea.x1);
+            g.lregions[i].delarea.x2 = FlipX(g.lregions[i].delarea.x2);
+            if (g.lregions[i].delarea.x1 > g.lregions[i].delarea.x2) {
+                itmp = g.lregions[i].delarea.x1;
+                g.lregions[i].delarea.x1 = g.lregions[i].delarea.x2;
+                g.lregions[i].delarea.x2 = itmp;
+            }
+        }
     }
 
     /* regions (poison clouds, etc) */
@@ -693,100 +693,100 @@ flip_level(int flp, boolean extras)
 
     /* rooms */
     for (sroom = &g.rooms[0]; ; sroom++) {
-	if (sroom->hx < 0)
+        if (sroom->hx < 0)
             break;
 
-	if (flp & 1) {
-	    sroom->ly = FlipY(sroom->ly);
-	    sroom->hy = FlipY(sroom->hy);
-	    if (sroom->ly > sroom->hy) {
-		itmp = sroom->ly;
-		sroom->ly = sroom->hy;
-		sroom->hy = itmp;
-	    }
-	}
-	if (flp & 2) {
-	    sroom->lx = FlipX(sroom->lx);
-	    sroom->hx = FlipX(sroom->hx);
-	    if (sroom->lx > sroom->hx) {
-		itmp = sroom->lx;
-		sroom->lx = sroom->hx;
-		sroom->hx = itmp;
-	    }
-	}
+        if (flp & 1) {
+            sroom->ly = FlipY(sroom->ly);
+            sroom->hy = FlipY(sroom->hy);
+            if (sroom->ly > sroom->hy) {
+                itmp = sroom->ly;
+                sroom->ly = sroom->hy;
+                sroom->hy = itmp;
+            }
+        }
+        if (flp & 2) {
+            sroom->lx = FlipX(sroom->lx);
+            sroom->hx = FlipX(sroom->hx);
+            if (sroom->lx > sroom->hx) {
+                itmp = sroom->lx;
+                sroom->lx = sroom->hx;
+                sroom->hx = itmp;
+            }
+        }
 
-	if (sroom->nsubrooms)
-	    for (i = 0; i < sroom->nsubrooms; i++) {
-		struct mkroom *rroom = sroom->sbrooms[i];
+        if (sroom->nsubrooms)
+            for (i = 0; i < sroom->nsubrooms; i++) {
+                struct mkroom *rroom = sroom->sbrooms[i];
 
-		if (flp & 1) {
-		    rroom->ly = FlipY(rroom->ly);
-		    rroom->hy = FlipY(rroom->hy);
-		    if (rroom->ly > rroom->hy) {
-			itmp = rroom->ly;
-			rroom->ly = rroom->hy;
-			rroom->hy = itmp;
-		    }
-		}
-		if (flp & 2) {
-		    rroom->lx = FlipX(rroom->lx);
-		    rroom->hx = FlipX(rroom->hx);
-		    if (rroom->lx > rroom->hx) {
-			itmp = rroom->lx;
-			rroom->lx = rroom->hx;
-			rroom->hx = itmp;
-		    }
-		}
-	    }
+                if (flp & 1) {
+                    rroom->ly = FlipY(rroom->ly);
+                    rroom->hy = FlipY(rroom->hy);
+                    if (rroom->ly > rroom->hy) {
+                        itmp = rroom->ly;
+                        rroom->ly = rroom->hy;
+                        rroom->hy = itmp;
+                    }
+                }
+                if (flp & 2) {
+                    rroom->lx = FlipX(rroom->lx);
+                    rroom->hx = FlipX(rroom->hx);
+                    if (rroom->lx > rroom->hx) {
+                        itmp = rroom->lx;
+                        rroom->lx = rroom->hx;
+                        rroom->hx = itmp;
+                    }
+                }
+            }
     }
 
     /* doors */
     for (i = 0; i < g.doorindex; i++) {
-	Flip_coord(g.doors[i]);
+        Flip_coord(g.doors[i]);
     }
 
     /* the map */
     if (flp & 1) {
-	for (x = minx; x <= maxx; x++)
-	    for (y = miny; y < (miny + ((maxy - miny + 1) / 2)); y++) {
+        for (x = minx; x <= maxx; x++)
+            for (y = miny; y < (miny + ((maxy - miny + 1) / 2)); y++) {
                 int ny = FlipY(y);
 
-		flip_drawbridge_vertical(&levl[x][y]);
-		flip_drawbridge_vertical(&levl[x][ny]);
+                flip_drawbridge_vertical(&levl[x][y]);
+                flip_drawbridge_vertical(&levl[x][ny]);
 
-		trm = levl[x][y];
-		levl[x][y] = levl[x][ny];
-		levl[x][ny] = trm;
+                trm = levl[x][y];
+                levl[x][y] = levl[x][ny];
+                levl[x][ny] = trm;
 
-		otmp = g.level.objects[x][y];
-		g.level.objects[x][y] = g.level.objects[x][ny];
-		g.level.objects[x][ny] = otmp;
+                otmp = g.level.objects[x][y];
+                g.level.objects[x][y] = g.level.objects[x][ny];
+                g.level.objects[x][ny] = otmp;
 
-		mtmp = g.level.monsters[x][y];
-		g.level.monsters[x][y] = g.level.monsters[x][ny];
-		g.level.monsters[x][ny] = mtmp;
-	    }
+                mtmp = g.level.monsters[x][y];
+                g.level.monsters[x][y] = g.level.monsters[x][ny];
+                g.level.monsters[x][ny] = mtmp;
+            }
     }
     if (flp & 2) {
-	for (x = minx; x < (minx + ((maxx - minx + 1) / 2)); x++)
-	    for (y = miny; y <= maxy; y++) {
+        for (x = minx; x < (minx + ((maxx - minx + 1) / 2)); x++)
+            for (y = miny; y <= maxy; y++) {
                 int nx = FlipX(x);
 
-		flip_drawbridge_horizontal(&levl[x][y]);
-		flip_drawbridge_horizontal(&levl[nx][y]);
+                flip_drawbridge_horizontal(&levl[x][y]);
+                flip_drawbridge_horizontal(&levl[nx][y]);
 
-		trm = levl[x][y];
-		levl[x][y] = levl[nx][y];
-		levl[nx][y] = trm;
+                trm = levl[x][y];
+                levl[x][y] = levl[nx][y];
+                levl[nx][y] = trm;
 
-		otmp = g.level.objects[x][y];
-		g.level.objects[x][y] = g.level.objects[nx][y];
-		g.level.objects[nx][y] = otmp;
+                otmp = g.level.objects[x][y];
+                g.level.objects[x][y] = g.level.objects[nx][y];
+                g.level.objects[nx][y] = otmp;
 
-		mtmp = g.level.monsters[x][y];
-		g.level.monsters[x][y] = g.level.monsters[nx][y];
-		g.level.monsters[nx][y] = mtmp;
-	    }
+                mtmp = g.level.monsters[x][y];
+                g.level.monsters[x][y] = g.level.monsters[nx][y];
+                g.level.monsters[nx][y] = mtmp;
+            }
     }
 
     /* timed effects */
@@ -3197,9 +3197,9 @@ lspo_monster(lua_State *L)
 
     if (tmpmons.has_invent && lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-	if (nhl_pcall(L, 0, 0)){
-	    impossible("Lua error: %s", lua_tostring(L, -1));
-	}
+        if (nhl_pcall(L, 0, 0)){
+            impossible("Lua error: %s", lua_tostring(L, -1));
+        }
         spo_end_moninvent();
     } else
         lua_pop(L, 1);
@@ -3513,9 +3513,9 @@ lspo_object(lua_State *L)
 
     if (lua_type(L, -1) == LUA_TFUNCTION) {
         lua_remove(L, -2);
-	if (nhl_pcall(L, 0, 0)){
-	    impossible("Lua error: %s", lua_tostring(L, -1));
-	}
+        if (nhl_pcall(L, 0, 0)){
+            impossible("Lua error: %s", lua_tostring(L, -1));
+        }
     } else
         lua_pop(L, 1);
 
@@ -3825,9 +3825,9 @@ lspo_room(lua_State *L)
                 if (lua_type(L, -1) == LUA_TFUNCTION) {
                     lua_remove(L, -2);
                     l_push_mkroom_table(L, tmpcr);
-		    if (nhl_pcall(L, 1, 0)){
-			impossible("Lua error: %s", lua_tostring(L, -1));
-		    }
+                    if (nhl_pcall(L, 1, 0)){
+                        impossible("Lua error: %s", lua_tostring(L, -1));
+                    }
                 } else
                     lua_pop(L, 1);
                 spo_endroom(g.coder);
@@ -5766,9 +5766,9 @@ lspo_region(lua_State *L)
             lua_getfield(L, 1, "contents");
             if (lua_type(L, -1) == LUA_TFUNCTION) {
                 lua_remove(L, -2);
-		if (nhl_pcall(L, 0, 0)){
-		    impossible("Lua error: %s", lua_tostring(L, -1));
-		}
+                if (nhl_pcall(L, 0, 0)){
+                    impossible("Lua error: %s", lua_tostring(L, -1));
+                }
             } else
                 lua_pop(L, 1);
             spo_endroom(g.coder);
@@ -6372,9 +6372,9 @@ TODO: g.coder->croom needs to be updated
 
     if (has_contents && !(g.in_mk_themerooms && g.themeroom_failed)) {
         l_push_wid_hei_table(L, g.xsize, g.ysize);
-	if (nhl_pcall(L, 1, 0)){
-	    impossible("Lua error: %s", lua_tostring(L, -1));
-	}
+        if (nhl_pcall(L, 1, 0)){
+            impossible("Lua error: %s", lua_tostring(L, -1));
+        }
     }
 
     return 0;

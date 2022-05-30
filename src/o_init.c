@@ -417,7 +417,7 @@ restnames(NHFILE* nhfp)
             if (nhfp->structlevel) {
                 mread(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
             }
-	}
+        }
     }
 #ifdef USE_TILES
     shuffle_tiles();

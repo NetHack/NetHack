@@ -651,7 +651,7 @@ hitum_cleave(
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
         g.bhitpos.x = tx, g.bhitpos.y = ty; /* normally set up by
-					       do_attack() */
+                                               do_attack() */
         (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);

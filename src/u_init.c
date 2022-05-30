@@ -1007,7 +1007,7 @@ ini_inv(struct trobj *trop)
     int otyp, i;
     boolean got_sp1 = FALSE; /* got a level 1 spellbook? */
 
-	while (trop->trclass) {
+    while (trop->trclass) {
         otyp = (int) trop->trotyp;
         if (otyp != UNDEF_TYP) {
             obj = mksobj(otyp, TRUE, FALSE);

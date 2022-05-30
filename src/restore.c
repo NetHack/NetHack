@@ -1453,18 +1453,18 @@ validate(NHFILE* nhfp, const char *name)
     if (!(reslt = uptodate(nhfp, name, utdflags))) return 1;
 
     if ((nhfp->mode & WRITING) == 0) {
-	if (nhfp->structlevel)
+        if (nhfp->structlevel)
             rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
     } else {
         if (nhfp->structlevel)
             rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
         minit();		/* ZEROCOMP */
         if (rlen == 0) {
-	    if (verbose) {
-	        pline("File \"%s\" is empty during save file feature check?", name);
-	        wait_synch();
-	    }
-	    return -1;
+            if (verbose) {
+                pline("File \"%s\" is empty during save file feature check?", name);
+                wait_synch();
+            }
+            return -1;
         }
     }
     return 0;

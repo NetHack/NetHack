@@ -1026,7 +1026,7 @@ static int find_glyphs(const char *id);
 static void just_find_callback(int glyph, struct find_struct *findwhat);
 static void to_unicode_callback(int glyph, struct find_struct *findwhat);
 static struct customization_detail *find_display_urep_customization(
-		const char *customization_name, int glyphidx,
+                const char *customization_name, int glyphidx,
                 enum graphics_sets which_set);
 
 void
@@ -1045,7 +1045,7 @@ test_glyphnames(void)
 static void
 just_find_callback(int glyph UNUSED, struct find_struct *findwhat UNUSED)
 {
-	/* nothing */
+    /* nothing */
 }
 static int
 find_glyphs(const char *id)

@@ -69,7 +69,7 @@ new_light_core(xchar x, xchar y, int range, int type, anything *id)
         /* camera flash uses radius 0 and passes Null object */
         || (range == 0 && (type != LS_OBJECT || id->a_obj != 0))) {
         impossible("new_light_source:  illegal range %d", range);
-	return (light_source *) 0;
+        return (light_source *) 0;
     }
 
     ls = (light_source *) alloc(sizeof *ls);

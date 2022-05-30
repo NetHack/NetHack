@@ -304,9 +304,9 @@ makerooms(void)
                 iflags.in_lua = g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
-		if ( nhl_pcall(themes, 0, 0)){
-		    impossible("Lua error: %s", lua_tostring(themes, -1));
-		}
+                if ( nhl_pcall(themes, 0, 0)){
+                    impossible("Lua error: %s", lua_tostring(themes, -1));
+                }
                 iflags.in_lua = g.in_mk_themerooms = FALSE;
                 if (g.themeroom_failed
                     && ((themeroom_tries++ > 10)
