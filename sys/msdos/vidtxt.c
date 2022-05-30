@@ -338,8 +338,8 @@ void txt_xputc(char ch, int attr)
     switch (ch) {
     case '\n':
 #if 0
-			col = 0;
-			++row;
+                col = 0;
+                ++row;
 #endif
         break;
     default:

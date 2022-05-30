@@ -388,8 +388,8 @@ E const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 struct restore_info {
-	const char *name;
-	int mread_flags;
+    const char *name;
+    int mread_flags;
 };
 E struct restore_info restoreinfo;
 

@@ -297,7 +297,7 @@ BIOSgetch(void)
         if ((shift & ALT) && !ch) {
 #endif
 #if 0
-		pline("Scan code: %d 0x%03X", scan, scan);
+            pline("Scan code: %d 0x%03X", scan, scan);
 #endif
             if (inmap(scan))
                 ch = scanmap[scan - SCANLO];

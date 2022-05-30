@@ -664,10 +664,10 @@ enum optset_restrictions {
 /* Cast to int, but limit value to range. */
 #define LIMIT_TO_RANGE_INT(lo, hi, var) \
     (int) (                             \
-	(var) < (lo) ? (lo) : (         \
-	    (var) > (hi) ? (hi) :       \
-	    (var)                       \
-	)                               \
+        (var) < (lo) ? (lo) : (         \
+            (var) > (hi) ? (hi) :       \
+            (var)                       \
+        )                               \
     )
 
 #define ARM_BONUS(obj)                      \

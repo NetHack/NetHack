@@ -214,11 +214,11 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
     }
 
-	case MSNH_MSG_RANDOM_INPUT: {
-        PostMessage(GetDlgItem(hWnd, IDC_TEXT_CONTROL), 
+        case MSNH_MSG_RANDOM_INPUT: {
+            PostMessage(GetDlgItem(hWnd, IDC_TEXT_CONTROL), 
             WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
-	}
-	break;
+        }
+        break;
 
     }
 }

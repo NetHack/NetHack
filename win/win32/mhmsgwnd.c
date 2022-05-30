@@ -416,9 +416,9 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             }
     } break;
 
-	case MSNH_MSG_RANDOM_INPUT:
-		nhassert(0); // unexpected
-		break;
+    case MSNH_MSG_RANDOM_INPUT:
+        nhassert(0); // unexpected
+        break;
 
     } /* switch( wParam ) */
 }

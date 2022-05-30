@@ -625,7 +625,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->menui.menu.items[new_item].attr = msg_data->attr;
         strncpy(data->menui.menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
-	/* prevent & being interpreted as a mnemonic start */
+        /* prevent & being interpreted as a mnemonic start */
         strNsubst(data->menui.menu.items[new_item].str, "&", "&&", 0);
         data->menui.menu.items[new_item].presel = msg_data->presel;
         data->menui.menu.items[new_item].itemflags = msg_data->itemflags;
@@ -690,10 +690,10 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } break;
 
-	case MSNH_MSG_RANDOM_INPUT: {
-        PostMessage(GetMenuControl(hWnd),
-            WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
-	} break;
+        case MSNH_MSG_RANDOM_INPUT: {
+            PostMessage(GetMenuControl(hWnd),
+                        WM_MSNH_COMMAND, MSNH_MSG_RANDOM_INPUT, 0);
+        } break;
 
     }
 }
@@ -915,10 +915,10 @@ GetMenuControl(HWND hWnd)
 
     data = (PNHMenuWindow) GetWindowLongPtr(hWnd, GWLP_USERDATA);
 
-	/* We may continue getting window messages after a window's WM_DESTROY is
-	   called.  We need to handle the case that USERDATA has been freed. */
-	if (data == NULL)
-		return NULL;
+        /* We may continue getting window messages after a window's WM_DESTROY is
+           called.  We need to handle the case that USERDATA has been freed. */
+    if (data == NULL)
+        return NULL;
 
     if (data->type == MENU_TYPE_TEXT) {
         return GetDlgItem(hWnd, IDC_MENU_TEXT);

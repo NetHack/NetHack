@@ -220,9 +220,9 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             InvalidateRect(hWnd, NULL, TRUE);
         } break;
 
-		case MSNH_MSG_RANDOM_INPUT:
-			nhassert(0); // unexpected
-			break;
+                case MSNH_MSG_RANDOM_INPUT:
+                    nhassert(0); // unexpected
+                    break;
 
         } /* end switch( wParam ) { */
     } break;

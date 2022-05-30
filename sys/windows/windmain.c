@@ -642,7 +642,7 @@ attempt_restore:
         if (g.program_state.in_self_recover) {
             g.program_state.in_self_recover = FALSE;
             set_savefile_name(TRUE);
-	}
+        }
     }
 
     if (!resuming) {

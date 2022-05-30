@@ -490,8 +490,8 @@ getreturn(const char *str)
    initializing the window port */
 void nethack_enter_windows(void)
 {
-	if (WINDOWPORT("tty"))
-		nethack_enter_consoletty();
+    if (WINDOWPORT("tty"))
+        nethack_enter_consoletty();
 }
 
 /* CP437 to Unicode mapping according to the Unicode Consortium */

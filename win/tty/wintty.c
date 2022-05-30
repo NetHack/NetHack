@@ -3548,7 +3548,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
             ttyDisplay->color = color;
             if (color != NO_COLOR)
                 term_start_color(color);
-	}
+        }
 #endif /* TEXTCOLOR */
     }   /* iflags.use_color aka iflags.wc_color */
 
