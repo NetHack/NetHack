@@ -608,30 +608,28 @@ static const luaL_Reg l_obj_meta[] = {
 int
 l_obj_register(lua_State *L)
 {
-    int lib_id, meta_id;
-
-    /* newclass = {} */
-    lua_createtable(L, 0, 0);
-    lib_id = lua_gettop(L);
-
-    /* metatable = {} */
-    luaL_newmetatable(L, "obj");
-    meta_id = lua_gettop(L);
-    luaL_setfuncs(L, l_obj_meta, 0);
-
-    /* metatable.__index = _methods */
+    /* Table of instance methods (e.g. an_object:isnull())
+       and static methods (e.g. obj.new("dagger")). */
     luaL_newlib(L, l_obj_methods);
-    lua_setfield(L, meta_id, "__index");
 
-    /* metatable.__metatable = _meta */
+    /* metatable = { __name = "obj", __gc = l_obj_gc } */
+    luaL_newmetatable(L, "obj");
+    luaL_setfuncs(L, l_obj_meta, 0);
+    /* metatable.__index points at the object method table. */
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, "__index"); 
+
+    /* Don't let lua code mess with the real metatable.
+       Instead offer a fake one that only contains __gc. */
     luaL_newlib(L, l_obj_meta);
-    lua_setfield(L, meta_id, "__metatable");
+    lua_setfield(L, -2, "__metatable");
 
-    /* class.__metatable = metatable */
-    lua_setmetatable(L, lib_id);
+    /* We don't need the metatable anymore. It's safe in the
+       Lua registry for use by luaL_setmetatable. */
+    lua_pop(L, 1);
 
-    /* _G["obj"] = newclass */
+    /* global obj = the method table we created at the start */
     lua_setglobal(L, "obj");
-
     return 0;
 }
+

@@ -874,29 +874,27 @@ static const luaL_Reg l_selection_meta[] = {
 int
 l_selection_register(lua_State *L)
 {
-    int lib_id, meta_id;
+    /* Table of instance methods and static methods. */
+    luaL_newlib(L, l_selection_methods);
 
-    /* newclass = {} */
-    lua_createtable(L, 0, 0);
-    lib_id = lua_gettop(L);
-
-    /* metatable = {} */
+    /* metatable = { __name = "selection", __gc = l_selection_gc } */
     luaL_newmetatable(L, "selection");
-    meta_id = lua_gettop(L);
     luaL_setfuncs(L, l_selection_meta, 0);
 
-    /* metatable.__index = _methods */
-    luaL_newlib(L, l_selection_methods);
-    lua_setfield(L, meta_id, "__index");
+    /* metatable.__index points at the selection method table. */
+    lua_pushvalue(L, -2);
+    lua_setfield(L, -2, "__index");
 
-    /* metatable.__metatable = _meta */
+    /* Don't let lua code mess with the real metatable.
+       Instead offer a fake one that only contains __gc. */
     luaL_newlib(L, l_selection_meta);
-    lua_setfield(L, meta_id, "__metatable");
+    lua_setfield(L, -2, "__metatable");
 
-    /* class.__metatable = metatable */
-    lua_setmetatable(L, lib_id);
+    /* We don't need the metatable anymore. It's safe in the
+       Lua registry for use by luaL_setmetatable. */
+    lua_pop(L, 1);
 
-    /* _G["selection"] = newclass */
+    /* global selection = the method table we created at the start */
     lua_setglobal(L, "selection");
 
     return 0;
