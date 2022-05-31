@@ -2255,11 +2255,8 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
         free(ptr);
         return NULL;
     }
-    /*
-     * FIXME:
-     *  Use of realloc() confuses MONITOR_HEAP.
-     */
-    return realloc(ptr, nsize);
+
+    return re_alloc(ptr, nsize);
 }
 
 static int

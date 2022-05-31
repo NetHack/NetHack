@@ -301,6 +301,7 @@ extern char *dupstr_n(const char *string, unsigned int *lenout);
 #ifdef MONITOR_HEAP
 /* plain alloc() is not declared except in alloc.c */
 extern long *nhalloc(unsigned int, const char *, int);
+extern long *nhrealloc(long *, unsigned int, const char *, int);
 extern void nhfree(genericptr_t, const char *, int);
 extern char *nhdupstr(const char *, const char *, int);
 /* this predates C99's __func__; that is trickier to use conditionally
@@ -314,11 +315,13 @@ extern char *nhdupstr(const char *, const char *, int);
 #define __LINE__ 0
 #endif
 #define alloc(a) nhalloc(a, __FILE__, (int) __LINE__)
+#define re_alloc(a,n) nhrealloc(a, n, __FILE__, (int) __LINE__)
 #define free(a) nhfree(a, __FILE__, (int) __LINE__)
 #define dupstr(s) nhdupstr(s, __FILE__, (int) __LINE__)
 #else /* !MONITOR_HEAP */
 /* declare alloc.c's alloc(); allocations made with it use ordinary free() */
 extern long *alloc(unsigned int);  /* alloc.c */
+extern long *re_alloc(long *, unsigned int);
 #endif /* ?MONITOR_HEAP */
 
 /* Used for consistency checks of various data files; declare it here so

@@ -379,14 +379,5 @@ build_bmptile(pixel(*pixels)[TILE_X])
     }
 }
 
-/* we need a local copy of this for alloc.o and because we don't have panic() */
-unsigned
-FITSuint_(unsigned long long i, const char *file, int line){
-    unsigned ret = (unsigned)i;
-    if (ret != i) {
-        Fprintf(stderr, "Overflow at %s:%d", file, line);
-        exit(EXIT_FAILURE);
-    }
-    return (unsigned)i;
-}
+/*tile2bmp.c*/
 

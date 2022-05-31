@@ -15,6 +15,7 @@
 #endif
 
 static void xexit(int) NORETURN;
+extern void panic(const char *, ...) NORETURN;
 char *eos(char *); /* also used by dlb.c */
 FILE *fopen_datafile(const char *, const char *);
 unsigned FITSuint_(unsigned long long, const char *, int);
@@ -545,25 +546,15 @@ xexit(int retcd)
     /*NOTREACHED*/
 }
 
-    /* In hacklib.c, but we don't have that and it calls panic() */
+/* from hacklib.c */
 unsigned
-FITSuint_(unsigned long long i, const char *file, int line){
-    unsigned ret = (unsigned)i;
-    if (ret != i) {
-        printf("Overflow at %s:%d\n", file, line);
-        xexit(EXIT_FAILURE);
-    }
-    return (unsigned)i;
-}
-
-    /* ditto */
-unsigned
-Strlen_(const char *str, const char *file, int line){
+Strlen_(const char *str, const char *file, int line)
+{
     size_t len = strnlen(str, LARGEST_INT);
 
     if (len == LARGEST_INT) {
-        printf("%s:%d string too long", file, line);
-        xexit(EXIT_FAILURE);
+        panic("%s:%d string too long", file, line);
+        /*NOTREACHED*/
     }
     return (unsigned) len;
 }

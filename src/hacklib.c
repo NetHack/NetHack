@@ -1361,23 +1361,6 @@ nh_snprintf(
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* cast to int or panic on overflow; use via macro */
-int
-FITSint_(lua_Integer i, const char *file, int line){
-    int ret = (int)i;
-    if (ret != i)
-        panic("Overflow at %s:%d", file, line);
-    return (int)i;
-}
-
-unsigned
-FITSuint_(unsigned long long i, const char *file, int line){
-    unsigned ret = (unsigned)i;
-    if (ret != i)
-        panic("Overflow at %s:%d", file, line);
-    return (unsigned)i;
-}
-
 #ifdef ENHANCED_SYMBOLS
 
 /* Unicode routines */
