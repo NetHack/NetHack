@@ -62,18 +62,18 @@ alloc(unsigned int lth)
 #endif
 }
 
-/* realloc() call that might get substituted by nhrealloc(p,l,file,line) */
+/* realloc() call that might get substituted by nhrealloc(p,n,file,line) */
 long *
 re_alloc(long *oldptr, unsigned int newlth)
 {
     /*
-     * if LINT support ever gets resurrected,
-     * we probably need some hackery here
+     * If LINT support ever gets resurrected,
+     * we'll probably need some hackery here.
      */
 
     long *newptr = (long *) realloc((genericptr_t) oldptr, (size_t) newlth);
 #ifndef MONITOR_HEAP
-    /* "extend":  assume if won't ever fail if asked to shrink */
+    /* "extend to":  assume it won't ever fail if asked to shrink */
     if (newlth && !newptr)
         panic("Memory allocation failure; cannot extend to %u bytes", newlth);
 #endif
@@ -172,8 +172,10 @@ nhrealloc(
         (void) fprintf(heaplog, "%c%5u %s %4d %s\n", op, newlth,
                            fmt_ptr((genericptr_t) newptr), line, file);
     }
-    /* potential panic in re_alloc() was deferred til here */
-    /* "extend to":  assume if won't ever fail if asked to shrink */
+    /* potential panic in re_alloc() was deferred til here;
+       "extend to":  assume it won't ever fail if asked to shrink;
+       even if that assumption happens to be wrong, we lack access to
+       the old size so can't use alternate phrasing for that case */
     if (newlth && !newptr)
         panic("Cannot extend to %u bytes, line %d of %s", newlth, line, file);
 
