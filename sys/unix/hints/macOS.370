@@ -22,7 +22,7 @@
 # 3. If you set WANT_WIN_QT, you need to
 #  A) set QTDIR either here or in the environment to point to the Qt5
 #     library installation root.  (Qt2, Qt3, Qt4 will not work)
-#  B) set XPMLIB to point to the Xpm library
+#  B) set LIBXPM to point to the Xpm library
 ifndef WANT_WIN_QT
 ifdef WANT_WIN_ALL
 WANT_WIN_QT=1
@@ -39,6 +39,10 @@ endif   # not WANT_WIN_QT
 endif   # WANT_WIN_QT6
 endif   # not WANT_WIN_QT
 
+#check for homebrew or macports
+HAVE_HOMEBREW := $(shell expr `which -s brew; echo $$?` = 0)
+HAVE_MACPORTS := $(shell expr `which -s port; echo $$?` = 0)
+
 ifdef WANT_WIN_QT
 ifndef WANT_WIN_QT5
 ifndef WANT_WIN_QT6
@@ -46,15 +50,20 @@ WANT_WIN_QT5=1
 endif   # not WANT_WIN_QT6
 endif   # not WANT_WIN_QT5
 #QTDIR=/Developer/Qt
+ifeq "$(HAVE_HOMEBREW)" "1"
 ifdef WANT_WIN_QT5
 # Qt5 installed via homebrew
-QTDIR=$(shell brew --prefix)/opt/qt@5
+QTDIR :=$(shell brew --prefix)/opt/qt@5
 endif   # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-QTDIR=$(shell brew --prefix)/opt/qt@6
+QTDIR :=$(shell brew --prefix)/opt/qt@6
 endif   # WANT_WIN_QT6
+else   # not HAVE_HOMEBREW
+ifeq "$(HAVE_MACPORTS)" "1"
 # Qt5 installed via macports
-#QTDIR=/opt/local/libexec/qt5
+QTDIR=/opt/local/libexec/qt5
+endif   # HAVE_MACPORTS
+endif   # HAVE_HOMEBREW
 endif	# WANT_WIN_QT
 
 ifndef LIBXPM
@@ -132,13 +141,23 @@ ifdef WANT_WIN_CURSES
 CURSESLIB = -lncurses
 endif
 
+ifdef MAKEFILE_SRC
 ifdef CURSESLIB
+ifeq "$(HAVE_HOMEBREW)" "1"
+HAVE_HOMEBREW_NCURSES := $(shell expr `brew ls --versions ncurses > /dev/null; echo $$?` = 0)
+#$(info HAVE_HOMEBREW_NCURSES=$(HAVE_HOMEBREW_NCURSES))
+ifeq "$(HAVE_HOMEBREW_NCURSES)" "1"
 # Newer versions of ncurses are commonly installed via homebrew, but intentionally unlinked.
-# Uncommenting the following two lines will compile nethack with it.
-# LFLAGS += -L$(shell brew --prefix)/opt/ncurses/lib
-# WINLIB += -I$(shell brew --prefix)/opt/ncurses/include
-WINLIB += $(CURSESLIB)
+HOMEBREW_LFLAGS := -L$(shell brew --prefix)/opt/ncurses/lib
+HOMEBREW_WINLIB := -I$(shell brew --prefix)/opt/ncurses/include
+endif   #HAVE_HOMEBREW_NCURSES
+endif   #HAVE_HOMEBREW
+ifdef HOMEBREW_LFLAGS
+LFLAGS += $(HOMEBREW_LFLAGS)
 endif
+WINLIB += $(HOMEBREW_WINLIB) $(CURSESLIB)
+endif   #CURSESLIB
+endif   #MAKEFILE_SRC
 
 ifdef WANT_WIN_X11
 USE_XPM=1
