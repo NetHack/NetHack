@@ -164,9 +164,10 @@ nhrealloc(
                         * allocation rather than make a new one */
 
         if (newptr != oldptr) {
-            /* realloc() freed oldptr */
-            (void) fprintf(heaplog, "%c%5s %s %4d %s\n", '<', "",
-                           fmt_ptr((genericptr_t) oldptr), line, file);
+            /* if oldptr wasn't Null, realloc() freed it */
+            if (oldptr)
+                (void) fprintf(heaplog, "%c%5s %s %4d %s\n", '<', "",
+                               fmt_ptr((genericptr_t) oldptr), line, file);
             op = '>'; /* new allocation rather than size-change of old one */
         }
         (void) fprintf(heaplog, "%c%5u %s %4d %s\n", op, newlth,
