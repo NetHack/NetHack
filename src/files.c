@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1646314650 2022/03/03 13:37:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.346 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1654069053 2022/06/01 07:37:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3616,12 +3616,12 @@ check_recordfile(const char *dir UNUSED_if_not_OS2_CODEVIEW)
 
 /*ARGSUSED*/
 void
-paniclog(const char *type,   /* panic, impossible, trickery */
-         const char *reason) /* explanation */
+paniclog(
+    const char *type,   /* panic, impossible, trickery, [lua] */
+    const char *reason) /* explanation */
 {
 #ifdef PANICLOG
     FILE *lfile;
-    char buf[BUFSZ];
 
     if (!g.program_state.in_paniclog) {
         g.program_state.in_paniclog = 1;
@@ -3629,9 +3629,10 @@ paniclog(const char *type,   /* panic, impossible, trickery */
         if (lfile) {
 #ifdef PANICLOG_FMT2
             (void) fprintf(lfile, "%ld %s: %s %s\n",
-                           ubirthday, (g.plname ? g.plname : "(none)"),
+                           ubirthday, (g.plname[0] ? g.plname : "(none)"),
                            type, reason);
 #else
+            char buf[BUFSZ];
             time_t now = getnow();
             int uid = getuid();
             char playmode = wizard ? 'D' : discover ? 'X' : '-';

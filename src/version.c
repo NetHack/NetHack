@@ -1,4 +1,4 @@
-/* NetHack 3.7	version.c	$NHDT-Date: 1651297024 2022/04/30 05:37:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.88 $ */
+/* NetHack 3.7	version.c	$NHDT-Date: 1654069065 2022/06/01 07:37:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,13 +10,19 @@
 #define OPTIONS_AT_RUNTIME
 #endif
 
+extern char *mdlib_version_string(char *, const char *);
 static void insert_rtoption(char *);
 
 /* fill buffer with short version (so caller can avoid including date.h) */
 char *
 version_string(char *buf, size_t bufsz)
 {
-    Snprintf(buf, bufsz, "%s", nomakedefs.version_string);
+    Snprintf(buf, bufsz, "%s",
+             ((nomakedefs.version_string && nomakedefs.version_string[0])
+              ? nomakedefs.version_string
+              /* in case we try to write a paniclog entry after releasing
+                 the 'nomakedefs' data */
+              : mdlib_version_string(buf, ".")));
     return buf;
 }
 
