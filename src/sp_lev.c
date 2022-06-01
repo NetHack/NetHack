@@ -4369,10 +4369,12 @@ struct selectionvar *
 selection_filter_mapchar(struct selectionvar* ov,  xchar typ, int lit)
 {
     int x, y;
-    struct selectionvar *ret = selection_new();
+    struct selectionvar *ret;
 
-    if (!ov || !ret)
+    if (!ov)
         return NULL;
+
+    ret = selection_new();
 
     for (x = 1; x < ret->wid; x++)
         for (y = 0; y < ret->hei; y++)
@@ -4452,10 +4454,12 @@ void
 selection_do_grow(struct selectionvar* ov, int dir)
 {
     int x, y;
-    struct selectionvar *tmp = selection_new();
+    struct selectionvar *tmp;
 
-    if (!ov || !tmp)
+    if (!ov)
         return;
+
+    tmp = selection_new();
 
     if (dir == W_RANDOM)
         dir = random_wdir();
