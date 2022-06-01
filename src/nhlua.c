@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1652897460 2022/05/18 18:11:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1654070580 2022/06/01 08:03:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2278,21 +2278,17 @@ nhl_warn(
     const char *msg_fragment,
     int to_be_continued) /* 0: last fragment; 1: more to come */
 {
-    static char warnbuf[BUFSZ];
-    size_t fraglen, buflen = strlen(warnbuf);
+    size_t fraglen, buflen = strlen(g.lua_warnbuf);
 
-    if (msg_fragment && buflen < sizeof warnbuf - 1) {
+    if (msg_fragment && buflen < sizeof g.lua_warnbuf - 1) {
         fraglen = strlen(msg_fragment);
-        if (buflen + fraglen > sizeof warnbuf - 1)
-            fraglen = sizeof warnbuf - 1 - buflen;
-        (void) strncat(warnbuf, msg_fragment, fraglen);
+        if (buflen + fraglen > sizeof g.lua_warnbuf - 1)
+            fraglen = sizeof g.lua_warnbuf - 1 - buflen;
+        (void) strncat(g.lua_warnbuf, msg_fragment, fraglen);
     }
     if (!to_be_continued) {
-        /* this is a warning so probably ought to be delivered via
-           impossible() but until the current garbage collection issue
-           gets fixed that would be way too verbose */
-        pline("[lua] %s", warnbuf);
-        warnbuf[0] = '\0';
+        paniclog("[lua]", g.lua_warnbuf);
+        g.lua_warnbuf[0] = '\0';
     }
 }
 

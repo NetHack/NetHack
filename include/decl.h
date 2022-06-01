@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1645000560 2022/02/16 08:36:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1654070559 2022/06/01 08:02:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1048,6 +1048,7 @@ struct instance_globals {
 
     /* nhlua.c */
     genericptr_t luacore; /* lua_State * */
+    char lua_warnbuf[BUFSZ];
 
     /* o_init.c */
     short disco[NUM_OBJECTS];
