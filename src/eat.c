@@ -3433,10 +3433,20 @@ floorfood(
             Sprintf(qbuf, "There is a bear trap here (%s); eat it?",
                     u_in_beartrap ? "holding you" : "armed");
             if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
+                struct obj *beartrap;
+
                 deltrap(ttmp);
                 if (u_in_beartrap)
                     reset_utrap(TRUE);
-                return mksobj(BEARTRAP, TRUE, FALSE);
+                beartrap = mksobj(BEARTRAP, TRUE, FALSE);
+                Sprintf(qbuf,"You only manage to %s the bear trap.",
+                        u_in_beartrap ? "free yourself from" : "disarm");
+                if (check_capacity(qbuf) && beartrap) {
+                    obj_extract_self(beartrap);
+                    dropy(beartrap);           /* put it on the floor */
+                    return (struct obj *) 0;
+                }
+                return beartrap;
             } else if (c == 'q') {
                 return (struct obj *) 0;
             }
