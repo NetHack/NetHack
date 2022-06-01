@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1654070580 2022/06/01 08:03:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.83 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1654116350 2022/06/01 20:45:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2330,9 +2330,7 @@ nhlL_newstate(nhl_sandbox_info *sbi)
 
     lua_atpanic(L, nhl_panic);
 #if LUA_VERSION_NUM == 504
-    /* issue lua warnings only when in wizard mode, at least until
-       someone figures out and fixes the garbage collection problem */
-    lua_setwarnf(L, wizard ? nhl_warn : (lua_WarnFunction) 0, L);
+    lua_setwarnf(L, nhl_warn, L);
 #endif
 
 #ifdef NHL_SANDBOX
