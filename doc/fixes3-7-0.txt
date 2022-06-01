@@ -1811,7 +1811,7 @@ Handle -eaux plurals in makeplural/makesingular (pr #767 by entrez)
 mdisplacem stoning and gloves had test backwards (pr #773 by entrez)
 writing type-named scrolls (pr #551 by entrez)
 more cases where newcham() gives messages (pr #775 by copperwater)
-lua fix contributed by ToxicFrog
+lua: instance cleanup should not be applied to classes (by ToxicFrog)
 fix memory leaks related to selection_new() (pr #782 by argrath)
 
 
