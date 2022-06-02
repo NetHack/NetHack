@@ -915,8 +915,8 @@ if player gave a subset count when removing an item from a container, then got
 	the pickup_burden prompt and declined to continue, the item remained
 	split rather be recombined, making it possible to create multiple
 	stacks of gold inside a container
-two-handed weapon message stated "welded to monster's hand" instead of
-	"welded to monster's hands"
+two-handed weapon message stated "welds to monster's hand" instead of
+	"welds to monster's hands"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
