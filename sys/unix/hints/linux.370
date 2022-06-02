@@ -140,7 +140,12 @@ ifndef MAKEFILE_UTL
 # If CURSES_UNICODE is defined, we need ncursesw.
 # Without CURSES_UNICODE the following simpler setting works.
 # CURSESLIB = -lncurses -ltinfo
-CURSESLIB = $(shell pkg-config ncursesw --libs || echo -lncursesw)
+HAVE_NCURSESW = $(shell expr `pkg-config ncursesw --libs >/dev/null; echo $$?` = 0)
+ifeq "$(HAVE_NCURSESW)" "1"
+CURSESLIB = -lncursesw
+else
+CURSESLIB = -lncurses
+endif      #HAVE_NCURSESW
 CURSESLIB += -ltinfo
 endif      #not MAKEFILE_UTL
 endif      #not MAKEFILE_DAT
