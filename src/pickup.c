@@ -650,7 +650,6 @@ pickup(int what) /* should be a long */
             nomul(0);
     }
 
-    reset_justpicked(g.invent);
     add_valid_menu_class(0); /* reset */
     if (!u.uswallow) {
         objchain_p = &g.level.objects[u.ux][u.uy];
@@ -691,6 +690,8 @@ pickup(int what) /* should be a long */
         }
 
  menu_pickup:
+        if (n > 0)
+            reset_justpicked(g.invent);
         n_tried = n;
         for (n_picked = i = 0; i < n; i++) {
             res = pickup_object(pick_list[i].item.a_obj, pick_list[i].count,
@@ -723,6 +724,7 @@ pickup(int what) /* should be a long */
             obj = *objchain_p;
             lcount = min(obj->quan, (long) count);
             n_tried++;
+            reset_justpicked(g.invent);
             if (pickup_object(obj, lcount, FALSE) > 0)
                 n_picked++; /* picked something */
             goto end_query;
@@ -788,6 +790,9 @@ pickup(int what) /* should be a long */
             }
             if (lcount == -1L)
                 lcount = obj->quan;
+
+            if (!n_tried) /* reset just before the first item picked */
+                reset_justpicked(g.invent);
 
             n_tried++;
             if ((res = pickup_object(obj, lcount, FALSE)) < 0)
