@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1653171584 2022/05/21 22:19:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1654200083 2022/06/02 20:01:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.366 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -685,15 +685,11 @@ xname_flags(
                doname() so we've added an external flag to request it */
             Strcat(buf, "partly eaten ");
         }
-        if (obj->globby) {
-            Sprintf(eos(buf), "%s%s",
-                    (obj->owt <= 100)
-                       ? "small "
-                       : (obj->owt > 500)
-                          ? "very large "
-                          : (obj->owt > 300)
-                             ? "large "
-                             : "medium ",
+        if (obj->globby) { /* 3.7 added "medium" to replace no-prefix */
+            Sprintf(eos(buf), "%s %s", (obj->owt <= 100) ? "small"
+                                       : (obj->owt <= 300) ? "medium"
+                                         : (obj->owt <= 500) ? "large"
+                                           : "very large",
                     actualn);
             break;
         }
@@ -4602,9 +4598,17 @@ readobjnam(char *bp, struct obj *no_wish)
         if (d.gsize > 1)
             d.otmp->owt += ((unsigned) (5 + (d.gsize - 2) * 10)
                             * d.otmp->owt);  /* 20 + {5|15|25} times 20 */
+        /* limit overall weight which limits shrink-away time which in turn
+           affects how long some of it will remain available to be eaten */
         if (d.cnt > 1) {
-            if ((d.cnt > 6 - d.gsize) && !wizard)
-                d.cnt = rn1(5, 2); /* 2..6 */
+            int rn1cnt = rn1(5, 2); /* 2..6 */
+
+            if (rn1cnt > 6 - d.gsize)
+                rn1cnt = 6 - d.gsize;
+            if (d.cnt > rn1cnt
+                && (!wizard || g.program_state.wizkit_wishing
+                    || yn("Override glob weight limit?") != 'y'))
+                d.cnt = rn1cnt;
             d.otmp->owt *= (unsigned) d.cnt;
         }
         /* note: the owt assignment below will not change glob's weight */
