@@ -843,9 +843,13 @@ register struct monst *mon;
             newly_welded = mwelded(obj);
             obj->owornmask &= ~W_WEP;
             if (newly_welded) {
+                const char *mon_hand = mbodypart(mon, HAND);
+
+                if (bimanual(obj))
+                    mon_hand = makeplural(mon_hand);
                 pline("%s %s to %s %s!", Tobjnam(obj, "weld"),
                       is_plural(obj) ? "themselves" : "itself",
-                      s_suffix(mon_nam(mon)), mbodypart(mon, HAND));
+                      s_suffix(mon_nam(mon)), mon_hand);
                 obj->bknown = 1;
             }
         }
