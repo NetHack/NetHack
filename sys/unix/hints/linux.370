@@ -102,15 +102,16 @@ ifeq "$(USE_CURSESLIB)" "1"
 # Without CURSES_UNICODE the following simpler setting works.
 # CURSESLIB = -lncurses -ltinfo
 ifdef MAKEFILE_SRC
-HAVE_NCURSESW = $(shell expr `pkg-config ncursesw --libs >/dev/null; echo $$?` = 0)
-endif
-ifeq "$(HAVE_NCURSESW)" "1"
-CURSESLIB = -lncursesw
+comma:=,
+NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
+CURSESLIB += $(subst -Wl$(comma)-Bsymbolic-functions,,$(NCURSES_LFLAGS))
+ifneq (,$(findstring ncursesw, $(CURSESLIB)))
+HAVE_NCURSESW=1
 else
-CURSESLIB = -lncurses
-endif      #HAVE_NCURSESW
-CURSESLIB += -ltinfo
+HAVE_NCURSESW=0
+endif
 WINLIB += $(CURSESLIB)
+endif      #MAKEFILE_SRC
 endif      #USE_CURSESLIB
 
 # NetHack sources control
