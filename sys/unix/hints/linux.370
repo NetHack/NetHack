@@ -86,7 +86,6 @@ endif
 
 #-INCLUDE compiler.370
 
-CURSESLIB =
 ifdef WANT_WIN_TTY
 USE_CURSESLIB=1
 endif
@@ -98,20 +97,32 @@ endif
 endif
 
 ifeq "$(USE_CURSESLIB)" "1"
+# default
+CURSESLIB = -lncurses -ltinfo
 # If CURSES_UNICODE is defined, we need ncursesw.
 # Without CURSES_UNICODE the following simpler setting works.
 # CURSESLIB = -lncurses -ltinfo
 ifdef MAKEFILE_SRC
 comma:=,
 NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
-CURSESLIB += $(subst -Wl$(comma)-Bsymbolic-functions,,$(NCURSES_LFLAGS))
-ifneq (,$(findstring ncursesw, $(CURSESLIB)))
+ifneq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
 HAVE_NCURSESW=1
 else
 HAVE_NCURSESW=0
 endif
-WINLIB += $(CURSESLIB)
+#$(info $(NCURSES_LFLAGS))
+#$(info HAVE_NCURSESW=$(HAVE_NCURSESW))
+ifeq "$(HAVE_NCURSESW)" "1"
+# remove unnecessary -Wl,-Bsymbolic-functions if present
+ifneq (,$(findstring -Wl$(comma)-Bsymbolic-functions, $(NCURSES_LFLAGS)))
+CURSESLIB = $(subst -Wl$(comma)-Bsymbolic-functions,,$(NCURSES_LFLAGS))
+else
+CURSESLIB = $(NCURSES_LFLAGS)
+endif
+#$(info $(CURSESLIB))
+endif      #HAVE_NCURSESW
 endif      #MAKEFILE_SRC
+WINLIB += $(CURSESLIB)
 endif      #USE_CURSESLIB
 
 # NetHack sources control
