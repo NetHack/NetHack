@@ -1228,6 +1228,7 @@ for menustyle:Full, fix the combination of 'A' auto-pick all plus 'P' just
 	picked up to limit what "all" means
 for menustyle:Traditional, fix 'P' for just picked up items in inventory when
 	filtering what items to put into a container
+restrict stunning effect to is_xport trap types
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

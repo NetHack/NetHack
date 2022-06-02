@@ -1571,7 +1571,14 @@ mlevel_tele_trap(
             if (trap)
                 seetrap(trap);
         }
-        mtmp->mstun = 1;
+        /*
+         * Commit 6a65b412 stated "Using magic portals and level teleporters
+         * stuns for a few turns. It's taxing to teleport long distances."
+         *
+         * In keeping with that stated intent, restrict the stunning effect.
+         */
+        if (is_xport(tt))
+            mtmp->mstun = 1;
         migrate_to_level(mtmp, ledger_no(&tolevel), migrate_typ, (coord *) 0);
         return Trap_Moved_Mon; /* no longer on this level */
     }
