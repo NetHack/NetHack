@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.917 $ $NHDT-Date: 1652719274 2022/05/16 16:41:14 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.933 $ $NHDT-Date: 1654205933 2022/06/02 21:38:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -911,11 +911,10 @@ using a marker to write "novel" or "paperback book" on a known blank spellbook
 	was producing a randomly chosen Pratchett novel; make it fail instead
 when a monster killed a pudding and it left a glob, that glob might not be
 	displayed on the map (wasn't an issue for killed-by-hero case)
-lua's garbage collection doesn't like the way nethack is trying to use it and
-	issues a pair of warnings each time the relevant code gets run; they
-	were vanishing into a bit bucket but now they will be displayed when
-	running in wizard mode; we need to fix the usage rather than just
-	hide the feedback
+if player gave a subset count when removing an item from a container, then got
+	the pickup_burden prompt and declined to continue, the item remained
+	split rather be recombined, making it possible to create multiple
+	stacks of gold inside a container
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1229,6 +1228,8 @@ for menustyle:Full, fix the combination of 'A' auto-pick all plus 'P' just
 for menustyle:Traditional, fix 'P' for just picked up items in inventory when
 	filtering what items to put into a container
 restrict stunning effect to is_xport trap types
+lua's garbage collection didn't like the way nethack was trying to use it and
+	issued a pair of warnings each time the relevant code got run
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

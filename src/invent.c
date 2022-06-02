@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1652861830 2022/05/18 08:17:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.389 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1654205933 2022/06/02 21:38:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2205,16 +2205,17 @@ askchain(
             /*FALLTHRU*/
         case 'y':
             tmp = (*fn)(otmp);
-            if (tmp < 0) {
+            if (tmp <= 0) {
                 if (container_gone(fn)) {
                     /* otmp caused magic bag to explode;
                        both are now gone */
                     otmp = 0; /* and return */
                 } else if (otmp && otmp != otmpo) {
                     /* split occurred, merge again */
-                    (void) merged(&otmpo, &otmp);
+                    (void) unsplitobj(otmp);
                 }
-                goto ret;
+                if (tmp < 0)
+                    goto ret;
             }
             cnt += tmp;
             if (--mx == 0)

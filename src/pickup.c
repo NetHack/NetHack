@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1608673693 2020/12/22 21:48:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.273 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1654205934 2022/06/02 21:38:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1526,10 +1526,11 @@ carry_count(struct obj *obj,            /* object to pick up... */
 /* determine whether character is able and player is willing to carry `obj' */
 static
 int
-lift_object(struct obj *obj,       /* object to pick up... */
-            struct obj *container, /* ...bag it's coming out of */
-            long *cnt_p,
-            boolean telekinesis)
+lift_object(
+    struct obj *obj,       /* object to pick up... */
+    struct obj *container, /* ...bag it's coming out of */
+    long *cnt_p,
+    boolean telekinesis)
 {
     int result, old_wt, new_wt, prev_encumbr, next_encumbr;
 
@@ -1621,8 +1622,10 @@ lift_object(struct obj *obj,       /* object to pick up... */
  * up, 1 if otherwise.
  */
 int
-pickup_object(struct obj *obj, long count,
-              boolean telekinesis) /* not picking it up directly by hand */
+pickup_object(
+    struct obj *obj,
+    long count,
+    boolean telekinesis) /* not picking it up directly by hand */
 {
     int res, nearload;
 
@@ -3119,16 +3122,17 @@ menu_loot(int retry, boolean put_in)
                     /* special split case also handled by askchain() */
                 }
                 res = put_in ? in_container(otmp) : out_container(otmp);
-                if (res < 0) {
+                if (res <= 0) {
                     if (!g.current_container) {
                         /* otmp caused current_container to explode;
                            both are now gone */
                         otmp = 0; /* and break loop */
                     } else if (otmp && otmp != pick_list[i].item.a_obj) {
                         /* split occurred, merge again */
-                        (void) merged(&pick_list[i].item.a_obj, &otmp);
+                        (void) unsplitobj(otmp);
                     }
-                    break;
+                    if (res < 0)
+                        break;
                 }
             }
             free((genericptr_t) pick_list);
@@ -3138,8 +3142,13 @@ menu_loot(int retry, boolean put_in)
 }
 
 static char
-in_or_out_menu(const char *prompt, struct obj *obj, boolean outokay,
-               boolean inokay, boolean alreadyused, boolean more_containers)
+in_or_out_menu(
+    const char *prompt,
+    struct obj *obj,
+    boolean outokay,     /* can take out */
+    boolean inokay,      /* can put in */
+    boolean alreadyused, /* controls phrasing of the decline choice */
+    boolean more_containers)
 {
     /* underscore is not a choice; it's used to skip element [0] */
     static const char lootchars[] = "_:oibrsnq", abc_chars[] = "_:abcdenq";
