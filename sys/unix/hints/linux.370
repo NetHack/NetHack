@@ -86,6 +86,33 @@ endif
 
 #-INCLUDE compiler.370
 
+CURSESLIB =
+ifdef WANT_WIN_TTY
+USE_CURSESLIB=1
+endif
+
+ifdef WANT_WIN_CURSES
+ifneq "$(USE_CURSESLIB)" "1"
+USE_CURSESLIB=1
+endif
+endif
+
+ifeq "$(USE_CURSESLIB)" "1"
+# If CURSES_UNICODE is defined, we need ncursesw.
+# Without CURSES_UNICODE the following simpler setting works.
+# CURSESLIB = -lncurses -ltinfo
+ifdef MAKEFILE_SRC
+HAVE_NCURSESW = $(shell expr `pkg-config ncursesw --libs >/dev/null; echo $$?` = 0)
+endif
+ifeq "$(HAVE_NCURSESW)" "1"
+CURSESLIB = -lncursesw
+else
+CURSESLIB = -lncurses
+endif      #HAVE_NCURSESW
+CURSESLIB += -ltinfo
+WINLIB += $(CURSESLIB)
+endif      #USE_CURSESLIB
+
 # NetHack sources control
 NHCFLAGS+=-DDLB
 NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
@@ -106,8 +133,14 @@ NHCFLAGS+=-DCOMPRESS=\"/bin/gzip\" -DCOMPRESS_EXTENSION=\".gz\"
 #NHCFLAGS+=-DNO_CHRONICLE
 #NHCFLAGS+=-DLIVELOG
 ifdef WANT_WIN_CURSES
+ifeq "$(HAVE_NCURSESW)" "1"
 NHCFLAGS+=-DCURSES_UNICODE
-endif
+else
+ifdef MAKEFILE_SRC
+$(info Attention: CURSES_UNICODE is not being defined without ncursesw)
+endif   #MAKEFILE_SRC
+endif   #HAVE_NCURSESW
+endif   #WANT_WIN_CURSES
 
 CFLAGS+= $(WINCFLAGS)	  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)
@@ -117,40 +150,11 @@ CCXXFLAGS+= $(NHCFLAGS)
 
 VARDATND =
 VARDATND0 =
-CURSESLIB =
 
 #ifdef WANT_WIN_CHAIN
 #HINTSRC=$(CHAINSRC)
 #HINTOBJ=$(CHAINOBJ)
 #endif # WANT_WIN_CHAIN
-
-ifdef WANT_WIN_TTY
-USE_CURSESLIB=1
-endif
-
-ifdef WANT_WIN_CURSES
-ifneq "$(USE_CURSESLIB)" "1"
-USE_CURSESLIB=1
-endif
-endif
-
-ifeq "$(USE_CURSESLIB)" "1"
-ifndef MAKEFILE_DAT
-ifndef MAKEFILE_UTL
-# If CURSES_UNICODE is defined, we need ncursesw.
-# Without CURSES_UNICODE the following simpler setting works.
-# CURSESLIB = -lncurses -ltinfo
-HAVE_NCURSESW = $(shell expr `pkg-config ncursesw --libs >/dev/null; echo $$?` = 0)
-ifeq "$(HAVE_NCURSESW)" "1"
-CURSESLIB = -lncursesw
-else
-CURSESLIB = -lncurses
-endif      #HAVE_NCURSESW
-CURSESLIB += -ltinfo
-endif      #not MAKEFILE_UTL
-endif      #not MAKEFILE_DAT
-WINLIB += $(CURSESLIB)
-endif      #USE_CURSESLIB
 
 ifdef WANT_WIN_X11
 USE_XPM=1
