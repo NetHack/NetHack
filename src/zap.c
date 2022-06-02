@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1653329964 2022/05/23 18:19:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.415 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1654181493 2022/06/02 14:51:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.421 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5630,8 +5630,7 @@ void
 makewish(void)
 {
     char buf[BUFSZ] = DUMMY;
-    char promptbuf[BUFSZ];
-    char bufcpy[BUFSZ];
+    char bufcpy[BUFSZ], wish[BUFSZ], promptbuf[QBUFSZ];
     struct obj *otmp, nothing;
     long maybe_LL_arti;
     int tries = 0;
@@ -5684,16 +5683,16 @@ makewish(void)
 
     /* wisharti conduct handled in readobjnam() */
     maybe_LL_arti = ((oldwisharti < u.uconduct.wisharti) ? LL_ARTIFACT : 0L);
+    Snprintf(wish, sizeof wish, "\"%s\", got \"%s\"", bufcpy, doname(otmp));
     /* KMH, conduct */
     if (!u.uconduct.wishes++)
         livelog_printf((LL_CONDUCT | LL_WISH | maybe_LL_arti),
-                       "made %s first wish - \"%s\"", uhis(), bufcpy);
+                       "made %s first wish - %s", uhis(), wish);
     else if (!oldwisharti && u.uconduct.wisharti)
         livelog_printf((LL_CONDUCT | LL_WISH | LL_ARTIFACT),
-                       "made %s first artifact wish - \"%s\"", uhis(), bufcpy);
+                       "made %s first artifact wish - %s", uhis(), wish);
     else
-        livelog_printf((LL_WISH | maybe_LL_arti),
-                       "wished for \"%s\"", bufcpy);
+        livelog_printf((LL_WISH | maybe_LL_arti), "wished for %s", wish);
     /* TODO? maybe generate a second event decribing what was received since
        those just echo player's request rather than show actual result */
 
