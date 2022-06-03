@@ -3474,10 +3474,10 @@ wizterrainwish(struct _readobjnam_data *d)
             || IS_DOOR(oldtyp) || oldtyp == SDOOR) {
             /* when new terrain is a fountain, 'blessedftn' was explicitly
                set above; likewise for grave and 'disturbed'; when it's a
-               secret door, the old type was a wall or a door and we retain
-               the 'horizontal' value from those */
+               door, the old type was a wall or a door and we retain the
+               'horizontal' value from those */
             if (!IS_FOUNTAIN(lev->typ) && !IS_GRAVE(lev->typ)
-                && lev->typ != SDOOR)
+                && !IS_DOOR(lev->typ) && lev->typ != SDOOR)
                 lev->horizontal = 0; /* also clears blessedftn, disturbed */
         }
         /* note: lev->lit and lev->nondiggable retain their values even
