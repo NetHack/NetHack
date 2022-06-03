@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1654286542 2022/06/03 20:02:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -847,8 +847,7 @@ $(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h \
 $(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/tcap.h ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/wintty.c
-$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) \
-		../include/wincurs.h ../include/locale.h
+$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
 $(TARGETPFX)curswins.o: ../win/curses/curswins.c $(HACK_H) \
 		../include/wincurs.h ../win/curses/curswins.h

@@ -8,7 +8,7 @@
 #include "color.h"
 #include "wincurs.h"
 #ifdef CURSES_UNICODE
-#include "locale.h"
+#include <locale.h>
 #endif
 
 /* define this if not linking with <foo>tty.o|.obj for some reason */
