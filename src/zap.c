@@ -5674,6 +5674,9 @@ makewish(void)
            to retain wishless conduct */
         livelog_printf(LL_WISH, "declined to make a wish");
         return;
+    } else if (otmp == &cg.zeroobj) {
+        /* wizard mode terrain wish: skip livelogging, etc */
+        return;
     }
 
     if (otmp->oartifact) {
@@ -5696,23 +5699,19 @@ makewish(void)
     /* TODO? maybe generate a second event decribing what was received since
        those just echo player's request rather than show actual result */
 
-    if (otmp != &cg.zeroobj) {
-        const char
-            *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),
-            *oops_msg = (u.uswallow
-                         ? "Oops!  %s out of your reach!"
-                         : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
-                            || levl[u.ux][u.uy].typ < IRONBARS
-                            || levl[u.ux][u.uy].typ >= ICE)
-                            ? "Oops!  %s away from you!"
-                            : "Oops!  %s to the floor!");
+    const char *verb = ((Is_airlevel(&u.uz) || u.uinwater) ? "slip" : "drop"),
+               *oops_msg = (u.uswallow
+                            ? "Oops!  %s out of your reach!"
+                            : (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
+                               || levl[u.ux][u.uy].typ < IRONBARS
+                               || levl[u.ux][u.uy].typ >= ICE)
+                               ? "Oops!  %s away from you!"
+                               : "Oops!  %s to the floor!");
 
-        /* The(aobjnam()) is safe since otmp is unidentified -dlc */
-        (void) hold_another_object(otmp, oops_msg,
-                                   The(aobjnam(otmp, verb)),
-                                   (const char *) 0);
-        u.ublesscnt += rn1(100, 50); /* the gods take notice */
-    }
+    /* The(aobjnam()) is safe since otmp is unidentified -dlc */
+    (void) hold_another_object(otmp, oops_msg, The(aobjnam(otmp, verb)),
+                               (const char *) 0);
+    u.ublesscnt += rn1(100, 50); /* the gods take notice */
 }
 
 /* Fills buf with the appropriate string for this ray.
