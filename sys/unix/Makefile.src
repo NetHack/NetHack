@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1626967328 2021/07/22 15:22:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.128 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1654286542 2022/06/03 20:02:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -787,28 +787,28 @@ depend: ../sys/unix/depend.awk \
 
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
-		../include/tradstdc.h ../include/global.h ../include/coord.h \
-		../include/vmsconf.h ../include/system.h ../include/nhlua.h \
-		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
-		../include/windconf.h ../include/warnings.h \
-		../include/fnamesiz.h
+		../include/tradstdc.h ../include/integer.h \
+		../include/global.h ../include/coord.h ../include/vmsconf.h \
+		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+		../include/pcconf.h ../include/micro.h ../include/windconf.h \
+		../include/warnings.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
 $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
-		../include/dungeon.h ../include/sym.h ../include/defsym.h \
-		../include/mkroom.h ../include/artilist.h \
+		../include/dungeon.h ../include/wintype.h ../include/sym.h \
+		../include/defsym.h ../include/mkroom.h ../include/artilist.h \
 		../include/objclass.h ../include/objects.h \
 		../include/youprop.h ../include/prop.h ../include/permonst.h \
 		../include/monattk.h ../include/monflag.h \
 		../include/monsters.h ../include/mondata.h \
-		../include/wintype.h ../include/context.h ../include/rm.h \
-		../include/botl.h ../include/rect.h ../include/region.h \
+		../include/context.h ../include/rm.h ../include/botl.h \
+		../include/rect.h ../include/region.h ../include/trap.h \
 		../include/display.h ../include/vision.h ../include/color.h \
 		../include/decl.h ../include/quest.h ../include/spell.h \
 		../include/obj.h ../include/engrave.h ../include/you.h \
 		../include/attrib.h ../include/monst.h ../include/mextra.h \
-		../include/skills.h ../include/timeout.h ../include/trap.h \
-		../include/flag.h ../include/winprocs.h ../include/sys.h
+		../include/skills.h ../include/timeout.h ../include/flag.h \
+		../include/winprocs.h ../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -847,7 +847,8 @@ $(TARGETPFX)topl.o: ../win/tty/topl.c $(HACK_H) ../include/tcap.h \
 $(TARGETPFX)wintty.o: ../win/tty/wintty.c $(HACK_H) ../include/dlb.h \
 		../include/tcap.h ../include/wintty.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/tty/wintty.c
-$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) ../include/wincurs.h
+$(TARGETPFX)cursmain.o: ../win/curses/cursmain.c $(HACK_H) \
+		../include/wincurs.h ../include/locale.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursmain.c
 $(TARGETPFX)curswins.o: ../win/curses/curswins.c $(HACK_H) \
 		../include/wincurs.h ../win/curses/curswins.h
@@ -1081,7 +1082,7 @@ $(TARGETPFX)dokick.o: dokick.c $(HACK_H)
 $(TARGETPFX)dothrow.o: dothrow.c $(HACK_H)
 $(TARGETPFX)drawing.o: drawing.c $(CONFIG_H) ../include/color.h \
 		../include/rm.h ../include/objclass.h ../include/defsym.h \
-		../include/objects.h ../include/sym.h
+		../include/objects.h ../include/wintype.h ../include/sym.h
 $(TARGETPFX)dungeon.o: dungeon.c $(HACK_H) ../include/dgn_file.h \
 		../include/dlb.h
 $(TARGETPFX)eat.o: eat.c $(HACK_H)
@@ -1106,11 +1107,12 @@ $(TARGETPFX)mcastu.o: mcastu.c $(HACK_H)
 $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/align.h ../include/monattk.h ../include/monflag.h \
 		../include/monsters.h ../include/objclass.h \
-		../include/defsym.h ../include/objects.h ../include/sym.h \
-		../include/artilist.h ../include/dungeon.h ../include/obj.h \
-		../include/monst.h ../include/mextra.h ../include/you.h \
-		../include/attrib.h ../include/prop.h ../include/skills.h \
-		../include/context.h ../include/flag.h ../include/dlb.h
+		../include/defsym.h ../include/objects.h ../include/wintype.h \
+		../include/sym.h ../include/artilist.h ../include/dungeon.h \
+		../include/obj.h ../include/monst.h ../include/mextra.h \
+		../include/you.h ../include/attrib.h ../include/prop.h \
+		../include/skills.h ../include/context.h ../include/flag.h \
+		../include/dlb.h
 $(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)minion.o: minion.c $(HACK_H)
@@ -1125,8 +1127,8 @@ $(TARGETPFX)monmove.o: monmove.c $(HACK_H) ../include/mfndpos.h \
 		../include/artifact.h
 $(TARGETPFX)monst.o: monst.c $(CONFIG_H) ../include/permonst.h \
 		../include/align.h ../include/monattk.h ../include/monflag.h \
-		../include/monsters.h ../include/sym.h ../include/defsym.h \
-		../include/color.h
+		../include/monsters.h ../include/wintype.h ../include/sym.h \
+		../include/defsym.h ../include/color.h
 $(TARGETPFX)mplayer.o: mplayer.c $(HACK_H)
 $(TARGETPFX)mthrowu.o: mthrowu.c $(HACK_H)
 $(TARGETPFX)muse.o: muse.c $(HACK_H)
@@ -1178,6 +1180,7 @@ $(TARGETPFX)topten.o: topten.c $(HACK_H) ../include/dlb.h
 $(TARGETPFX)track.o: track.c $(HACK_H)
 $(TARGETPFX)trap.o: trap.c $(HACK_H)
 $(TARGETPFX)u_init.o: u_init.c $(HACK_H)
+$(TARGETPFX)utf8map.o: utf8map.c $(HACK_H)
 $(TARGETPFX)uhitm.o: uhitm.c $(HACK_H)
 $(TARGETPFX)vault.o: vault.c $(HACK_H)
 $(TARGETPFX)version.o: version.c $(HACK_H) ../include/dlb.h
