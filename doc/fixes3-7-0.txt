@@ -1232,6 +1232,8 @@ for menustyle:Traditional, fix 'P' for just picked up items in inventory when
 restrict stunning effect to is_xport trap types
 lua's garbage collection didn't like the way nethack was trying to use it and
 	issued a pair of warnings each time the relevant code got run
+items flagged as just-picked-up were unflagged if you stepped on other items
+	without picking anything up
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
