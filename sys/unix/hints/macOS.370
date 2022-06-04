@@ -95,6 +95,39 @@ endif
 
 #-INCLUDE compiler.370
 
+ifdef WANT_WIN_TTY
+USE_CURSESLIB=1
+endif
+
+ifdef WANT_WIN_CURSES
+ifneq "$(USE_CURSESLIB)" "1"
+USE_CURSESLIB=1
+endif
+endif
+
+ifeq "$(USE_CURSESLIB)" "1"
+# default
+CURSESLIB = -lncurses
+# If CURSES_UNICODE is defined, we need ncursesw.
+# Without CURSES_UNICODE the following simpler setting works.
+# CURSESLIB = -lncurses -ltinfo
+ifdef MAKEFILE_SRC
+comma:=,
+NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
+ifneq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+HAVE_NCURSESW=1
+else
+HAVE_NCURSESW=0
+endif
+#$(info $(NCURSES_LFLAGS))
+#$(info HAVE_NCURSESW=$(HAVE_NCURSESW))
+ifeq "$(HAVE_NCURSESW)" "1"
+CURSESLIB = $(NCURSES_LFLAGS)
+#$(info $(CURSESLIB))
+endif      #HAVE_NCURSESW
+endif      #MAKEFILE_SRC
+endif      #USE_CURSESLIB
+
 # NetHack sources control
 NHCFLAGS+=-DDLB
 NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
@@ -115,8 +148,14 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DNO_CHRONICLE
 #NHCFLAGS+=-DLIVELOG
 ifdef WANT_WIN_CURSES
+ifeq "$(HAVE_NCURSESW)" "1"
 NHCFLAGS+=-DCURSES_UNICODE
-endif
+else
+ifdef MAKEFILE_SRC
+$(info Attention: CURSES_UNICODE is not being defined without ncursesw)
+endif   #MAKEFILE_SRC
+endif   #HAVE_NCURSESW
+endif   #WANT_WIN_CURSES
 
 CFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)
@@ -126,20 +165,11 @@ CCXXFLAGS+= $(NHCFLAGS)
 
 VARDATND =
 VARDATND0 =
-CURSESLIB =
 
 ifdef WANT_WIN_CHAIN
 HINTSRC=$(CHAINSRC)
 HINTOBJ=$(CHAINOBJ)
 endif # WANT_WIN_CHAIN
-
-ifdef WANT_WIN_TTY
-CURSESLIB = -lncurses
-endif
-
-ifdef WANT_WIN_CURSES
-CURSESLIB = -lncurses
-endif
 
 ifdef MAKEFILE_SRC
 ifdef CURSESLIB

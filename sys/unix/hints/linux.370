@@ -122,7 +122,6 @@ endif
 #$(info $(CURSESLIB))
 endif      #HAVE_NCURSESW
 endif      #MAKEFILE_SRC
-WINLIB += $(CURSESLIB)
 endif      #USE_CURSESLIB
 
 # NetHack sources control
@@ -167,6 +166,12 @@ VARDATND0 =
 #HINTSRC=$(CHAINSRC)
 #HINTOBJ=$(CHAINOBJ)
 #endif # WANT_WIN_CHAIN
+
+ifdef MAKEFILE_SRC
+ifdef CURSESLIB
+WINLIB += $(CURSESLIB)
+endif   #CURSESLIB
+endif   #MAKEFILE_SRC
 
 ifdef WANT_WIN_X11
 USE_XPM=1
