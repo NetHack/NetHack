@@ -618,22 +618,24 @@ montraits(struct obj *obj, coord *cc,
           boolean adjacentok) /* False: at obj's spot only, True: nearby is
                                  allowed */
 {
-    struct monst *mtmp, *mtmp2 = has_omonst(obj) ? get_mtraits(obj, TRUE) : 0;
+    struct monst *mtmp = (struct monst *) 0,
+                 *mtmp2 = has_omonst(obj) ? get_mtraits(obj, TRUE) : 0;
 
     if (mtmp2) {
         /* save_mtraits() validated mtmp2->mnum */
         mtmp2->data = &mons[mtmp2->mnum];
-        if (mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))
-            return (struct monst *) 0;
-        mtmp = makemon(mtmp2->data, cc->x, cc->y,
-                       (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
-                        /* in case mtmp2 is a long worm; saved traits for
-                           long worm don't include tail segments so don't
-                           give mtmp any; it will be given a new 'wormno'
-                           though (unless those are exhausted) so be able
-                           to grow new tail segments */
-                        | MM_NOTAIL | MM_NOMSG
-                        | (adjacentok ? MM_ADJACENTOK : 0)));
+
+        if (!(mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))) {
+            mtmp = makemon(mtmp2->data, cc->x, cc->y,
+                           (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
+                            /* in case mtmp2 is a long worm; saved traits for
+                               long worm don't include tail segments so don't
+                               give mtmp any; it will be given a new 'wormno'
+                               though (unless those are exhausted) so be able
+                               to grow new tail segments */
+                            | MM_NOTAIL | MM_NOMSG
+                            | (adjacentok ? MM_ADJACENTOK : 0)));
+        }
         if (!mtmp) {
             /* mtmp2 is a copy of obj's object->oextra->omonst extension
                and is not on the map or on any monst lists */
