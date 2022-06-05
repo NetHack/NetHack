@@ -1,4 +1,4 @@
-/* NetHack 3.7	lock.c	$NHDT-Date: 1602355548 2020/10/10 18:45:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	lock.c	$NHDT-Date: 1654464994 2022/06/05 21:36:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.114 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -877,23 +877,21 @@ doopen_indir(int x, int y)
 }
 
 static boolean
-obstructed(register int x, register int y, boolean quietly)
+obstructed(int x, int y, boolean quietly)
 {
-    register struct monst *mtmp = m_at(x, y);
+    struct monst *mtmp = m_at(x, y);
 
     if (mtmp && M_AP_TYPE(mtmp) != M_AP_FURNITURE) {
         if (M_AP_TYPE(mtmp) == M_AP_OBJECT)
             goto objhere;
         if (!quietly) {
-            if ((mtmp->mx != x) || (mtmp->my != y)) {
-                /* worm tail */
-                pline("%s%s blocks the way!",
-                      !canspotmon(mtmp) ? Something : s_suffix(Monnam(mtmp)),
-                      !canspotmon(mtmp) ? "" : " tail");
-            } else {
-                pline("%s blocks the way!",
-                      !canspotmon(mtmp) ? "Some creature" : Monnam(mtmp));
-            }
+            char *Mn = Some_Monnam(mtmp); /* Monnam, Someone or Something */
+
+            if ((mtmp->mx != x || mtmp->my != y) && canspotmon(mtmp))
+                /* s_suffix() returns a modifiable buffer */
+                Mn = strcat(s_suffix(Mn), " tail");
+
+            pline("%s blocks the way!", Mn);
         }
         if (!canspotmon(mtmp))
             map_invisible(x, y);
