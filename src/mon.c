@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1652689648 2022/05/16 08:27:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.428 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1654465182 2022/06/05 21:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.433 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -696,8 +696,12 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     if (Blind && !sensemon(mtmp))
         clear_dknown(obj); /* obj->dknown = 0; */
 
-    stackobj(obj);
+    stackobj(obj); /* 'obj' remains valid if stacking happens */
     newsym(x, y);
+    /* in case the corpse was placed at a different spot from where
+       the monster was (not expected to happen) */
+    if (obj->ox != x || obj->oy != y)
+        newsym(obj->ox, obj->oy);
     return obj;
 }
 
@@ -4317,7 +4321,7 @@ select_newcham_form(struct monst* mon)
 
     /* for debugging: allow control of polymorphed monster */
     if (wizard && iflags.mon_polycontrol) {
-        char pprompt[BUFSZ], parttwo[QBUFSZ], buf[BUFSZ];
+        char pprompt[BUFSZ], parttwo[QBUFSZ], buf[BUFSZ], prevbuf[BUFSZ];
         int monclass, len;
 
         /* construct prompt in pieces */
@@ -4336,7 +4340,7 @@ select_newcham_form(struct monst* mon)
             *(eos(pprompt) - (len - (QBUFSZ - 1))) = '\0';
         Strcat(pprompt, parttwo);
 
-        buf[0] = '\0'; /* clear buffer for EDIT_GETLIN */
+        buf[0] = prevbuf[0] = '\0'; /* clear buffer for EDIT_GETLIN */
 #define TRYLIMIT 5
         tryct = TRYLIMIT;
         do {
@@ -4374,6 +4378,16 @@ select_newcham_form(struct monst* mon)
             }
 
             pline("It can't become that.");
+#ifdef EDIT_GETLIN
+            /* EDIT_GETLIN preloads the input buffer with the previous
+               response but we shouldn't just keep repeating that if player
+               leaves it unchanged; affects retry for empty input too */
+            if (!strcmp(buf, prevbuf))
+                Strcpy(buf, "random");
+            Strcpy(prevbuf, buf);
+#else
+            nhUse(prevbuf);
+#endif
         } while (--tryct > 0);
 
         if (!tryct)
@@ -4397,7 +4411,7 @@ select_newcham_form(struct monst* mon)
 
 /* this used to be inline within newcham() but monpolycontrol needs it too */
 static struct permonst *
-accept_newcham_form(struct monst* mon, int mndx)
+accept_newcham_form(struct monst *mon, int mndx)
 {
     struct permonst *mdat;
 
@@ -4422,16 +4436,18 @@ accept_newcham_form(struct monst* mon, int mndx)
     return polyok(mdat) ? mdat : 0;
 }
 
+/* shapechanger might take on a shape that forces gender change */
 void
-mgender_from_permonst(struct monst* mtmp, struct permonst* mdat)
+mgender_from_permonst(
+    struct monst *mtmp,
+    struct permonst *mdat)
 {
     if (is_male(mdat)) {
-        if (mtmp->female)
-            mtmp->female = FALSE;
+        mtmp->female = FALSE;
     } else if (is_female(mdat)) {
-        if (!mtmp->female)
-            mtmp->female = TRUE;
+        mtmp->female = TRUE;
     } else if (!is_neuter(mdat)) {
+        /* usually leave as-is; same chance to change as polymorphing hero */
         if (!rn2(10))
             mtmp->female = !mtmp->female;
     }
@@ -4443,7 +4459,8 @@ mgender_from_permonst(struct monst* mtmp, struct permonst* mdat)
 int
 newcham(
     struct monst *mtmp,
-    struct permonst *mdat, unsigned ncflags)
+    struct permonst *mdat,
+    unsigned ncflags)
 {
     boolean polyspot = ((ncflags & NC_VIA_WAND_OR_SPELL) !=0),
             /* "The oldmon turns into a newmon!" */
