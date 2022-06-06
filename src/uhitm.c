@@ -3909,6 +3909,7 @@ mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
             if (nutrit > 1)
                 nutrit /= 2;
             EDOG(magr)->hungrytime += nutrit;
+            mon_givit(magr, pd);
         }
     }
 }
