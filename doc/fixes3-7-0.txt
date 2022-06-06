@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.933 $ $NHDT-Date: 1654205933 2022/06/02 21:38:53 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.939 $ $NHDT-Date: 1654557302 2022/06/06 23:15:02 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -917,6 +917,8 @@ if player gave a subset count when removing an item from a container, then got
 	stacks of gold inside a container
 two-handed weapon message stated "welds to monster's hand" instead of
 	"welds to monster's hands"
+when formatting an object, avoid capitalization of "The" in "<item> named
+	The <quest-artifact>"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

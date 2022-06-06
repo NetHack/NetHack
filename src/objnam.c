@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1654200083 2022/06/02 20:01:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.366 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1654557302 2022/06/06 23:15:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -501,8 +501,8 @@ xname_flags(
 {
     register char *buf;
     char *obufp;
-    register int typ = obj->otyp;
-    register struct objclass *ocl = &objects[typ];
+    int typ = obj->otyp;
+    struct objclass *ocl = &objects[typ];
     int nn = ocl->oc_name_known, omndx = obj->corpsenm;
     const char *actualn = OBJ_NAME(*ocl);
     const char *dn = OBJ_DESCR(*ocl);
@@ -873,7 +873,11 @@ xname_flags(
     if (has_oname(obj) && dknown) {
         Strcat(buf, " named ");
  nameit:
+        obufp = eos(buf);
         Strcat(buf, ONAME(obj));
+        /* downcase "The" in "<quest-artifact-item> named The ..." */
+        if (obj->oartifact && !strncmp(obufp, "The ", 4))
+            *obufp = lowc(*obufp); /* = 't'; */
     }
 
     if (!strncmpi(buf, "the ", 4))
