@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.940 $ $NHDT-Date: 1654710405 2022/06/08 17:46:45 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.941 $ $NHDT-Date: 1654717838 2022/06/08 19:50:38 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -919,6 +919,9 @@ two-handed weapon message stated "welds to monster's hand" instead of
 	"welds to monster's hands"
 when formatting an object, avoid capitalization of "The" in "<item> named
 	The <quest-artifact>"
+be less specific when cause of death is "handling a <ring or wand>" that
+	happened to be silver for current game; list it as "a silver ring" or
+	"a silver wand" rather than "ring of searching" or "wand of locking"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
