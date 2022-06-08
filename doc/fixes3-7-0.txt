@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.939 $ $NHDT-Date: 1654557302 2022/06/06 23:15:02 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.940 $ $NHDT-Date: 1654710405 2022/06/08 17:46:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1236,6 +1236,9 @@ lua's garbage collection didn't like the way nethack was trying to use it and
 	issued a pair of warnings each time the relevant code got run
 items flagged as just-picked-up were unflagged if you stepped on other items
 	without picking anything up
+activating a magic portal still gave "you feel dizzy for a moment, but the
+	sensation passes" after portal traversal was changed to make the hero
+	be stunned for a few turns
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -1,4 +1,4 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1646838392 2022/03/09 15:06:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1654710406 2022/06/08 17:46:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1114,9 +1114,10 @@ level_tele(void)
 }
 
 void
-domagicportal(register struct trap* ttmp)
+domagicportal(struct trap *ttmp)
 {
     struct d_level target_level;
+    boolean already_stunned;
 
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
         buried_ball_to_punishment();
@@ -1142,15 +1143,17 @@ domagicportal(register struct trap* ttmp)
         return;
     }
 
+    already_stunned = !!Stunned;
     make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     target_level = ttmp->dst;
     schedule_goto(&target_level, UTOTYPE_PORTAL,
-                  "You feel dizzy for a moment, but the sensation passes.",
+                  !already_stunned ? "You feel slightly dizzy."
+                                   : "You feel dizzier.",
                   (char *) 0);
 }
 
 void
-tele_trap(struct trap* trap)
+tele_trap(struct trap *trap)
 {
     if (In_endgame(&u.uz) || Antimagic) {
         if (Antimagic)
