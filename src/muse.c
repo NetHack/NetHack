@@ -782,10 +782,23 @@ use_defensive(struct monst* mtmp)
             return 2;
         }
         if (!Can_dig_down(&u.uz) && !levl[mtmp->mx][mtmp->my].candig) {
-            if (canseemon(mtmp))
-                pline_The("%s here is too hard to dig in.",
-                          surface(mtmp->mx, mtmp->my));
-            return 2;
+            /* can't dig further if there's already a pit (or other trap)
+               here, or if pit creation fails for some reason */
+            if (t_at(mtmp->mx, mtmp->my)
+                || !(ttmp = maketrap(mtmp->mx, mtmp->my, PIT))) {
+                if (vismon) {
+                    pline_The("%s here is too hard to dig in.",
+                              surface(mtmp->mx, mtmp->my));
+                }
+                return 2;
+            }
+            /* pit creation succeeded */
+            if (vis) {
+                seetrap(ttmp);
+                pline("%s has made a pit in the %s.", Monnam(mtmp),
+                      surface(mtmp->mx, mtmp->my));
+            }
+            return (mintrap(mtmp, FORCEBUNGLE) == Trap_Killed_Mon) ? 1 : 2;
         }
         ttmp = maketrap(mtmp->mx, mtmp->my, HOLE);
         if (!ttmp)
