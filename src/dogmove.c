@@ -322,7 +322,7 @@ dog_eat(struct monst *mtmp,
         mtmp->mstun = 1;
         if (canseemon(mtmp)) {
             obj_name = distant_name(obj, doname); /* (see above) */
-            if (flags.verbose)
+            if (Verbose(0, dog_eat))
                 pline("%s spits %s out in disgust!",
                       Monnam(mtmp), obj_name);
         }
@@ -479,7 +479,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                                while otmp is still on floor */
                             char *otmpname = distant_name(otmp, doname);
 
-                            if (flags.verbose)
+                            if (Verbose(0, dog_invent))
                                 pline("%s picks up %s.",
                                       Monnam(mtmp), otmpname);
                         }

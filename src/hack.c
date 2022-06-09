@@ -262,7 +262,7 @@ moverock(void)
                         deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (flags.verbose) {
+                if (Verbose(1, moverock)) {
                     char you_or_steed[BUFSZ];
 
                     Strcpy(you_or_steed,
@@ -568,7 +568,7 @@ still_chewing(xchar x, xchar y)
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     } else if ((g.context.digging.effort += (30 + u.udaminc)) <= 100) {
-        if (flags.verbose)
+        if (Verbose(1, still_chewing))
             You("%s chewing on the %s.",
                 g.context.digging.chew ? "continue" : "begin",
                 boulder
@@ -1395,7 +1395,7 @@ trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
 
     switch (u.utraptype) {
     case TT_BEARTRAP:
-        if (flags.verbose) {
+        if (Verbose(1, trapmove1)) {
             predicament = "caught in a bear trap";
             if (u.usteed)
                 Norep("%s is %s.", upstart(steedname), predicament);
@@ -1423,7 +1423,7 @@ trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
             break;
         }
         if (--u.utrap) {
-            if (flags.verbose) {
+            if (Verbose(1, trapmove2)) {
                 predicament = "stuck to the web";
                 if (u.usteed)
                     Norep("%s is %s.", upstart(steedname), predicament);
@@ -1438,7 +1438,7 @@ trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
         }
         break;
     case TT_LAVA:
-        if (flags.verbose) {
+        if (Verbose(1, trapmove3)) {
             predicament = "stuck in the lava";
             if (u.usteed)
                 Norep("%s is %s.", upstart(steedname), predicament);
@@ -1474,13 +1474,13 @@ trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
                    our next attempt to move out of tether range
                    after this successful move would have its
                    can't-do-that message suppressed by Norep */
-                if (flags.verbose)
+                if (Verbose(1, trapmove4))
                     Norep("You move within the chain's reach.");
                 return TRUE;
             }
         }
         if (--u.utrap) {
-            if (flags.verbose) {
+            if (Verbose(1, trapmove5)) {
                 if (anchored) {
                     predicament = "chained to the";
                     culprit = "buried ball";

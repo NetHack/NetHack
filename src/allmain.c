@@ -812,7 +812,7 @@ interrupt_multi(const char *msg)
 {
     if (g.multi > 0 && !g.context.travel && !g.context.run) {
         nomul(0);
-        if (flags.verbose && msg)
+        if (Verbose(0,interrupt_multi) && msg)
             Norep("%s", msg);
     }
 }

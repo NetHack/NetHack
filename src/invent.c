@@ -1679,7 +1679,7 @@ getobj(
             }
         }
         if (index(quitchars, ilet)) {
-            if (flags.verbose)
+            if (Verbose(1, getobj1))
                 pline1(Never_mind);
             return (struct obj *) 0;
         }
@@ -1724,7 +1724,7 @@ getobj(
             if (ilet == HANDS_SYM)
                 return (struct obj *) &cg.zeroobj; /* cast away 'const' */
             if (ilet == '\033') {
-                if (flags.verbose)
+                if (Verbose(1, getobj2))
                     pline1(Never_mind);
                 return (struct obj *) 0;
             }
@@ -4371,7 +4371,7 @@ doprgold(void)
        person, but you have no such preternatural gold-sense. */
     long hmoney = hidden_gold(FALSE);
 
-    if (flags.verbose) {
+    if (Verbose(1, doprgold)) {
         if (!umoney && !hmoney)
             Your("wallet is empty.");
         else if (umoney && !hmoney)

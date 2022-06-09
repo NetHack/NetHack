@@ -220,7 +220,7 @@ ready_weapon(struct obj *wep)
         }
 
         setuwep(wep);
-        if (was_twoweap && !u.twoweap && flags.verbose) {
+        if (was_twoweap && !u.twoweap && Verbose(1, ready_weapon)) {
             /* skip this message if we already got "empty handed" one above;
                also, Null is not safe for neither TWOWEAPOK() or bimanual() */
             if (uwep)
@@ -690,7 +690,7 @@ wield_tool(struct obj *obj,
         return FALSE;
     }
     if (welded(uwep)) {
-        if (flags.verbose) {
+        if (Verbose(1, wield_tool)) {
             const char *hand = body_part(HAND);
 
             if (bimanual(uwep))

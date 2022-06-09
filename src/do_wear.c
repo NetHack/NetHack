@@ -61,7 +61,7 @@ fingers_or_gloves(boolean check_gloves)
 void
 off_msg(struct obj *otmp)
 {
-    if (flags.verbose)
+    if (Verbose(0, off_msg))
         You("were wearing %s.", doname(otmp));
 }
 
@@ -69,7 +69,7 @@ off_msg(struct obj *otmp)
 static void
 on_msg(struct obj *otmp)
 {
-    if (flags.verbose) {
+    if (Verbose(0, on_msg)) {
         char how[BUFSZ];
         /* call xname() before obj_is_pname(); formatting obj's name
            might set obj->dknown and that affects the pname test */
@@ -1328,7 +1328,7 @@ Blindf_on(struct obj *otmp)
 
     if (Blind && !already_blind) {
         changed = TRUE;
-        if (flags.verbose)
+        if (Verbose(0, Blindf_on))
             You_cant("see any more.");
         /* set ball&chain variables before the hero goes blind */
         if (Punished)

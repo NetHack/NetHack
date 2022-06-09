@@ -1032,7 +1032,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
         } else if (newcham(mdef, (struct permonst *) 0, NO_NC_FLAGS)) {
             if (g.vis) { /* either seen or adjacent */
                 boolean was_seen = !!strcmpi("It", Before),
-                        verbosely = flags.verbose || !was_seen;
+                        verbosely = Verbose(1, monpoly1) || !was_seen;
 
                 if (canspotmon(mdef))
                     pline("%s%s%s turns into %s.", Before,
@@ -1052,7 +1052,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                     (void) rloc(magr, RLOC_MSG);
             }
         } else {
-            if (g.vis && flags.verbose)
+            if (g.vis && Verbose(1, monpoly2))
                 pline1(nothing_happens);
         }
     }
@@ -1132,7 +1132,7 @@ mswingsm(
     struct monst *mdef, /* defender */
     struct obj *otemp)  /* attacker's weapon */
 {
-    if (flags.verbose && !Blind && mon_visible(magr)) {
+    if (Verbose(1, mswingsm) && !Blind && mon_visible(magr)) {
         boolean bash = (is_pole(otemp)
                         && dist2(magr->mx, magr->my, mdef->mx, mdef->my) <= 2);
 

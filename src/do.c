@@ -89,7 +89,7 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
                     Strcpy(whobuf, y_monnam(u.usteed));
                 pline("%s %s %s into the %s.", upstart(whobuf),
                       vtense(whobuf, "push"), the(xname(otmp)), what);
-                if (flags.verbose && !Blind)
+                if (Verbose(0, boulder_hits_pool1) && !Blind)
                     pline("Now you can cross it!");
                 /* no splashing in this case */
             }
@@ -118,7 +118,7 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
                 dmg = d((Fire_resistance ? 1 : 3), 6);
                 losehp(Maybe_Half_Phys(dmg), /* lava damage */
                        "molten lava", KILLED_BY);
-            } else if (!fills_up && flags.verbose
+            } else if (!fills_up && Verbose(0, boulder_hits_pool2)
                        && (pushing ? !Blind : cansee(rx, ry)))
                 pline("It sinks without a trace!");
         }
@@ -637,7 +637,7 @@ drop(struct obj *obj)
 
     if (u.uswallow) {
         /* barrier between you and the floor */
-        if (flags.verbose) {
+        if (Verbose(0, drop1)) {
             char *onam_p, monbuf[BUFSZ];
 
             /* doname can call s_suffix, reusing its buffer */
@@ -660,7 +660,7 @@ drop(struct obj *obj)
 
             if (levhack)
                 ELevitation = W_ART; /* other than W_ARTI */
-            if (flags.verbose)
+            if (Verbose(0, drop2))
                 You("drop %s.", doname(obj));
             freeinv(obj);
             hitfloor(obj, TRUE);
@@ -668,7 +668,7 @@ drop(struct obj *obj)
                 float_down(I_SPECIAL | TIMEOUT, W_ARTI | W_ART);
             return ECMD_TIME;
         }
-        if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
+        if (!IS_ALTAR(levl[u.ux][u.uy].typ) && Verbose(0, drop3))
             You("drop %s.", doname(obj));
     }
     dropx(obj);
@@ -1546,7 +1546,7 @@ goto_level(
             /* you climb up the {stairs|ladder};
                fly up the stairs; fly up along the ladder */
             great_effort = (Punished && !Levitation);
-            if (flags.verbose || great_effort)
+            if (Verbose(0, go_to_level1) || great_effort)
                 pline("%s %s up%s the %s.",
                       great_effort ? "With great effort, you" : "You",
                       u_locomotion("climb"),
@@ -1564,7 +1564,7 @@ goto_level(
             if (!u.dz) {
                 ; /* stayed on same level? (no transit effects) */
             } else if (Flying) {
-                if (flags.verbose)
+                if (Verbose(0, go_to_level2))
                     You("fly down %s.",
                         g.at_ladder ? "along the ladder" : "the stairs");
             } else if (near_capacity() > UNENCUMBERED
@@ -1584,7 +1584,7 @@ goto_level(
                            KILLED_BY);
                 selftouch("Falling, you");
             } else { /* ordinary descent */
-                if (flags.verbose)
+                if (Verbose(0, go_to_level3))
                     You("%s.", g.at_ladder ? "climb down the ladder"
                                          : "descend the stairs");
             }

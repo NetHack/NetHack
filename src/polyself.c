@@ -844,7 +844,7 @@ polymon(int mntmp)
             dismount_steed(DISMOUNT_POLY);
     }
 
-    if (flags.verbose) {
+    if (Verbose(2, polymon)) {
         static const char use_thec[] = "Use the command #%s to %s.";
         static const char monsterc[] = "monster";
         struct permonst *uptr = g.youmonst.data;

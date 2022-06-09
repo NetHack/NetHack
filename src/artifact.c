@@ -1300,7 +1300,7 @@ Mb_hit(struct monst *magr, /* attacker */
             shieldeff(youdefend ? u.ux : mdef->mx,
                       youdefend ? u.uy : mdef->my);
         }
-        if ((do_stun || do_confuse) && flags.verbose) {
+        if ((do_stun || do_confuse) && Verbose(0,Mb_hit)) {
             char buf[BUFSZ];
 
             buf[0] = '\0';

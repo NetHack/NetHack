@@ -527,7 +527,7 @@ intemple(int roomno)
                 You("sense a presence close by!");
             mtmp->mpeaceful = 0;
             set_malign(mtmp);
-            if (flags.verbose)
+            if (Verbose(3, intemple))
                 You("are frightened to death, and unable to move.");
             nomul(-3);
             g.multi_reason = "being terrified of a ghost";

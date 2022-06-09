@@ -102,7 +102,7 @@ thitu(
 
     if (u.uac + tlev <= (dieroll = rnd(20))) {
         ++g.mesg_given;
-        if (Blind || !flags.verbose) {
+        if (Blind || !Verbose(2, thitu1)) {
             pline("It misses.");
         } else if (u.uac + tlev <= dieroll - 2) {
             if (onm != onmbuf)
@@ -112,7 +112,7 @@ thitu(
             You("are almost hit by %s.", onm);
         return 0;
     } else {
-        if (Blind || !flags.verbose)
+        if (Blind || !Verbose(2, thitu2))
             You("are hit%s", exclam(dam));
         else
             You("are hit by %s%s", onm, exclam(dam));
@@ -589,7 +589,7 @@ m_throw(
         clear_dknown(singleobj); /* singleobj->dknown = 0; */
 
     if ((singleobj->cursed || singleobj->greased) && (dx || dy) && !rn2(7)) {
-        if (canseemon(mon) && flags.verbose) {
+        if (canseemon(mon) && Verbose(2, m_throw)) {
             if (is_ammo(singleobj))
                 pline("%s misfires!", Monnam(mon));
             else

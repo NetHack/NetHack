@@ -1353,7 +1353,7 @@ dokick(void)
         boolean shopdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
         /* break the door */
         if (g.maploc->doormask & D_TRAPPED) {
-            if (flags.verbose)
+            if (Verbose(0, dokick))
                 You("kick the door.");
             exercise(A_STR, FALSE);
             g.maploc->doormask = D_NODOOR;

@@ -84,7 +84,7 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         pline("%s pretends to be friendly.", Monnam(mtmp));
     else
         pline("%s %smisses!", Monnam(mtmp),
-              (nearmiss && flags.verbose) ? "just " : "");
+              (nearmiss && Verbose(1, missmu)) ? "just " : "");
 
     stop_occupation();
 }
@@ -122,7 +122,7 @@ mswings(
     struct obj *otemp,  /* attacker's weapon */
     boolean bash)       /* True: polearm used at too close range */
 {
-    if (flags.verbose && !Blind && mon_visible(mtmp)) {
+    if (Verbose(1, mswings) && !Blind && mon_visible(mtmp)) {
         pline("%s %s %s%s %s.", Monnam(mtmp), mswings_verb(otemp, bash),
               (otemp->quan > 1L) ? "one of " : "", mhis(mtmp), xname(otemp));
     }
@@ -165,7 +165,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     /* no map_invisible() -- no way to tell where _this_ is coming from */
 
-    if (!flags.verbose)
+    if (!Verbose(1, wildmiss))
         return;
     if (!cansee(mtmp->mx, mtmp->my))
         return;
@@ -1376,7 +1376,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
            however, polymorphing into a huge form while already
            swallowed is still possible */
         You("get %s!", is_animal(mtmp->data) ? "regurgitated" : "expelled");
-        if (flags.verbose
+        if (Verbose(1, gulpmu)
             && (is_animal(mtmp->data)
                 || (dmgtype(mtmp->data, AD_DGST) && Slow_digestion)))
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
@@ -1425,7 +1425,7 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
                 make_blinded((long) tmp, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
-            } else if (flags.verbose)
+            } else if (Verbose(1, explmu))
                 You("get the impression it was not terribly bright.");
         }
         break;

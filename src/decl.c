@@ -753,4 +753,8 @@ decl_globals_init(void)
     g.urace = urace_init_data;
 }
 
+#ifndef NO_VERBOSE_GRANULARITY
+long verbosity_suppressions[vb_elements] = { 0L, 0L, 0L, 0L, 0L, };
+#endif
+
 /*decl.c*/

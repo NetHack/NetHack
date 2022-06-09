@@ -3331,7 +3331,7 @@ hit(const char *str,    /* zap text or missile name */
     const char *force)  /* usually either "." or "!" via exclam() */
 {
     boolean verbosely = (mtmp == &g.youmonst
-                         || (flags.verbose
+                         || (Verbose(3, hit)
                              && (cansee(g.bhitpos.x, g.bhitpos.y)
                                  || canspotmon(mtmp) || engulfing_u(mtmp))));
 
@@ -3347,7 +3347,7 @@ miss(const char *str, struct monst *mtmp)
 {
     pline("%s %s %s.", The(str), vtense(str, "miss"),
           ((cansee(g.bhitpos.x, g.bhitpos.y) || canspotmon(mtmp))
-           && flags.verbose) ? mon_nam(mtmp) : "it");
+           && Verbose(3, miss)) ? mon_nam(mtmp) : "it");
 }
 
 static void
@@ -5640,7 +5640,7 @@ makewish(void)
 
     promptbuf[0] = '\0';
     nothing = cg.zeroobj; /* lint suppression; only its address matters */
-    if (flags.verbose)
+    if (Verbose(3, makewish))
         You("may wish for an object.");
  retry:
     Strcpy(promptbuf, "For what do you wish");
