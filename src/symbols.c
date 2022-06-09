@@ -1,4 +1,4 @@
-/* NetHack 3.7	symbols.c	$NHDT-Date: 1596498214 2020/08/03 23:43:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	symbols.c	$NHDT-Date: 1654759698 2022/06/09 07:28:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -703,8 +703,8 @@ parsesymbols(register char *opts, int which_set)
             int glyph;
 #endif
 
-            if ((g.symset[which_set].handling == H_UTF8)
-                || (lowc(strval[0]) == 'u') && (strval[1] == '+')) {
+            if (g.symset[which_set].handling == H_UTF8
+                || (lowc(strval[0]) == 'u' && strval[1] == '+')) {
 #ifdef ENHANCED_SYMBOLS
                 char buf[BUFSZ];
 
