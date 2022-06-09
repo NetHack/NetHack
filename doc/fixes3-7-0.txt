@@ -1831,6 +1831,8 @@ lua: instance cleanup should not be applied to classes (by ToxicFrog)
 fix memory leaks related to selection_new() (pr #782 by argrath)
 wished-for doors in wizmode always vertical (pr #788 by entrez)
 vampire shapeshifting in a door (pr #794 by entrez)
+split "act_on_act" into separate function (pr #777 by argrath)
+unnecessary null-check on parsesymbols() (pr #793 by argrath)
 
 
 Code Cleanup and Reorganization
