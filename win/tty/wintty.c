@@ -115,12 +115,12 @@ struct window_procs tty_procs = {
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
      | WC2_RESET_STATUS
 #endif
-     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES)
+     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
      | WC2_U_UTF8STR
 #if !defined(NO_TERMS) || defined(WIN32)
      | WC2_U_24BITCOLOR
 #endif
-    ,
+    ),
 #ifdef TEXTCOLOR
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
 #else
@@ -481,11 +481,28 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 
     tty_clear_nhwindow(BASE_WINDOW);
 
-    tty_putstr(BASE_WINDOW, 0, "");
+    /* Once pline() is functional, error-related prompts such as
+     * those relating to save files etc. can intrude on the
+     * copyright information display because their prompts are
+     * up at the very top in the message window.
+     * Move the copyright information a little further down to
+     * row 3, out of the way. */
+
+    tty_curs(BASE_WINDOW, 1, 4);
     for (i = 1; i <= 4; ++i)
         tty_putstr(BASE_WINDOW, 0, copyright_banner_line(i));
     tty_putstr(BASE_WINDOW, 0, "");
     tty_display_nhwindow(BASE_WINDOW, FALSE);
+
+    /* Move to a default location for the "Shall I pick .." player
+     * selection prompts, which also use the BASE_WINDOW. Leave
+     * room for as many as 3 unexpected raw_prints early startup
+     * messages above that.
+     * If there is a topline message prompt, before the
+     * "Shall I pick ..." prompt, the latter will end up appearing
+     * immediately after the topline message prompt. There should
+     * now be room. */
+    tty_curs(BASE_WINDOW, 1, 11);
 
     /* 'statuslines' defaults to set_in_config, allowed but invisible;
        make it dynamically settable if feasible, otherwise visible */

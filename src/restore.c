@@ -870,6 +870,17 @@ dorecover(NHFILE* nhfp)
 
     run_timers(); /* expire all timers that have gone off while away */
     g.program_state.restoring = 0; /* affects bot() so clear before docrt() */
+
+    if (g.early_raw_messages && !g.program_state.beyond_savefile_load) {
+        /*
+         * We're about to obliterate some potentially important
+         * startup messages, so give the player a chance to see them.
+         */
+        g.early_raw_messages = 0;
+        wait_synch();
+    }
+    g.program_state.beyond_savefile_load = 0;
+
     docrt();
     clear_nhwindow(WIN_MESSAGE);
 

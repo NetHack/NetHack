@@ -693,6 +693,7 @@ const struct instance_globals g_init = {
 
     /* per-level glyph mapping flags */
     0L,     /* glyphmap_perlevel_flags */
+    0,      /* early_raw_messages */
 
     IVMAGIC  /* used to validate that structure layout has been preserved */
 };

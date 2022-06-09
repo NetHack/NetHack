@@ -171,7 +171,7 @@ getlock(void)
             /* this is a candidate for paranoid_confirmation */
             c = yn(destroy_old_game_prompt);
         } else {
-            (void) printf("\n%s [yn] ", destroy_old_game_prompt);
+            (void) raw_printf("\n%s [yn] ", destroy_old_game_prompt);
             (void) fflush(stdout);
             if ((c = getchar()) != EOF) {
                 int tmp;

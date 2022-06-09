@@ -101,6 +101,7 @@ struct sinfo {
     int in_self_recover;
     int in_parseoptions;        /* in parseoptions */
     int config_error_ready;     /* config_error_add is ready, available */
+    int beyond_savefile_load;   /* set when past savefile loading */
 #ifdef PANICLOG
     int in_paniclog;
 #endif
@@ -1262,6 +1263,8 @@ struct instance_globals {
 
     /* per-level glyph mapping flags */
     long glyphmap_perlevel_flags;
+    int early_raw_messages;   /* if raw_prints occurred early prior
+                                 to g.beyond_savefile_load */
 
     unsigned long magic; /* validate that structure layout is preserved */
 };

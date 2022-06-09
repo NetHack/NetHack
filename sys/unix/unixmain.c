@@ -235,7 +235,12 @@ main(int argc, char *argv[])
             iflags.news = FALSE; /* in case dorecover() fails */
         }
 #endif
-        pline("Restoring save file...");
+        /* if there are early trouble-messages issued, let's
+         * not go overtop of them with a pline just yet */
+        if (g.early_raw_messages)
+            raw_print("Restoring save file...");
+        else
+            pline("Restoring save file...");
         mark_synch(); /* flush output */
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */

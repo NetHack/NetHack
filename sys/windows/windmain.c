@@ -625,7 +625,10 @@ attempt_restore:
             iflags.news = FALSE;
         }
 #endif
-        pline("Restoring save file...");
+        if (g.early_raw_messages)
+            raw_print("Restoring save file...");
+        else
+            pline("Restoring save file...");
         mark_synch(); /* flush output */
         if (dorecover(nhfp)) {
             resuming = TRUE; /* not starting new game */
@@ -1193,7 +1196,7 @@ getlock(void)
                         : "not start a new game");
     if (istty)
         clear_screen();
-    pline(oops);
+    raw_printf("%s", oops);
     if (prompt_result == 1) {          /* recover */
         if (recover_savefile()) {
 #if 0

@@ -469,6 +469,7 @@ windows_console_custom_nhgetch(void)
     return _getch();
 }
 
+extern int windows_console_custom_nhgetch(void);
 
 void
 getreturn(const char *str)
@@ -481,6 +482,8 @@ getreturn(const char *str)
     in_getreturn = TRUE;
     Sprintf(buf,"Hit <Enter> %s.", str);
     raw_print(buf);
+    if (WINDOWPORT("tty"))
+        windows_console_custom_nhgetch();
     wait_synch();
     in_getreturn = FALSE;
     return;
