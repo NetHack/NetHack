@@ -879,7 +879,7 @@ dorecover(NHFILE* nhfp)
         g.early_raw_messages = 0;
         wait_synch();
     }
-    g.program_state.beyond_savefile_load = 0;
+    g.program_state.beyond_savefile_load = 1;
 
     docrt();
     clear_nhwindow(WIN_MESSAGE);
