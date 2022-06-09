@@ -938,7 +938,7 @@ m_calcdistress(struct monst *mtmp)
     if (mtmp->cham >= LOW_PM)
         decide_to_shapeshift(mtmp, (canspotmon(mtmp)
                                     || engulfing_u(mtmp))
-                             ? SHIFT_MSG : 0);
+                                    ? SHIFT_MSG : 0);
     were_change(mtmp);
 
     /* gradually time out temporary problems */
@@ -2494,7 +2494,7 @@ lifesaved_monster(struct monst* mtmp)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-mondead(register struct monst* mtmp)
+mondead(struct monst *mtmp)
 {
     struct permonst *mptr;
     boolean be_sad;
@@ -2516,15 +2516,13 @@ mondead(register struct monst* mtmp)
             && !(g.mvitals[mndx].mvflags & G_GENOD)) {
             coord new_xy;
             char buf[BUFSZ];
-            boolean in_door = (amorphous(mtmp->data)
-                               && closed_door(mtmp->mx, mtmp->my)),
-                /* alternate message phrasing for some monster types */
-                spec_mon = (nonliving(mtmp->data)
-                            || noncorporeal(mtmp->data)
-                            || amorphous(mtmp->data)),
-                spec_death = (g.disintegested /* disintegrated or digested */
-                              || noncorporeal(mtmp->data)
-                              || amorphous(mtmp->data));
+            /* alternate message phrasing for some monster types */
+            boolean spec_mon = (nonliving(mtmp->data)
+                                || noncorporeal(mtmp->data)
+                                || amorphous(mtmp->data)),
+                    spec_death = (g.disintegested /* disintegrated/digested */
+                                  || noncorporeal(mtmp->data)
+                                  || amorphous(mtmp->data));
             int x = mtmp->mx, y = mtmp->my;
 
             /* construct a format string before transformation;
@@ -2546,7 +2544,9 @@ mondead(register struct monst* mtmp)
                 else
                     uunstick();
             }
-            if (in_door) {
+            /* if fog cloud is on a closed door space, move it to a more
+               appropriate spot for its intended new form */
+            if (amorphous(mtmp->data) && closed_door(mtmp->mx, mtmp->my)) {
                 if (enexto(&new_xy, mtmp->mx, mtmp->my, &mons[mndx]))
                     rloc_to(mtmp, new_xy.x, new_xy.y);
             }
@@ -3220,7 +3220,7 @@ mon_to_stone(struct monst* mtmp)
 }
 
 boolean
-vamp_stone(struct monst* mtmp)
+vamp_stone(struct monst *mtmp)
 {
     if (is_vampshifter(mtmp)) {
         int mndx = mtmp->cham;
@@ -3230,8 +3230,6 @@ vamp_stone(struct monst* mtmp)
         if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
             && !(g.mvitals[mndx].mvflags & G_GENOD)) {
             char buf[BUFSZ];
-            boolean in_door = (amorphous(mtmp->data)
-                               && closed_door(mtmp->mx, mtmp->my));
 
             /* construct a format string before transformation */
             Sprintf(buf, "The lapidifying %s %s %s",
@@ -3241,7 +3239,7 @@ vamp_stone(struct monst* mtmp)
                     amorphous(mtmp->data) ? "coalesces on the"
                        : is_flyer(mtmp->data) ? "drops to the"
                           : "writhes on the",
-                    surface(x,y));
+                    surface(x, y));
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
             set_mon_min_mhpmax(mtmp, 10); /* mtmp->mhpmax=max(m_lev+1,10) */
@@ -3249,7 +3247,7 @@ vamp_stone(struct monst* mtmp)
             /* this can happen if previously a fog cloud */
             if (engulfing_u(mtmp))
                 expels(mtmp, mtmp->data, FALSE);
-            if (in_door) {
+            if (amorphous(mtmp->data) && closed_door(mtmp->mx, mtmp->my)) {
                 coord new_xy;
 
                 if (enexto(&new_xy, mtmp->mx, mtmp->my, &mons[mndx])) {
@@ -4081,7 +4079,7 @@ pick_animal(void)
 }
 
 void
-decide_to_shapeshift(struct monst* mon, int shiftflags)
+decide_to_shapeshift(struct monst *mon, int shiftflags)
 {
     struct permonst *ptr = 0;
     int mndx;
@@ -4110,9 +4108,9 @@ decide_to_shapeshift(struct monst* mon, int shiftflags)
                 ptr = &mons[mon->cham];
                 dochng = TRUE;
             } else if (mon->data == &mons[PM_FOG_CLOUD]
-                     && mon->mhp == mon->mhpmax && !rn2(4)
-                     && (!canseemon(mon)
-                         || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
+                       && mon->mhp == mon->mhpmax && !rn2(4)
+                       && (!canseemon(mon)
+                           || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
                 /* if a fog cloud, maybe change to wolf or vampire bat;
                    those are more likely to take damage--at least when
                    tame--and then switch back to vampire; they'll also
@@ -4121,6 +4119,14 @@ decide_to_shapeshift(struct monst* mon, int shiftflags)
                 if (mndx >= LOW_PM) {
                     ptr = &mons[mndx];
                     dochng = (ptr != mon->data);
+                }
+            }
+            if (dochng && amorphous(mon->data)
+                && closed_door(mon->mx, mon->my)) {
+                coord new_xy;
+
+                if (enexto(&new_xy, mon->mx, mon->my, ptr)) {
+                    rloc_to(mon, new_xy.x, new_xy.y);
                 }
             }
         } else {
