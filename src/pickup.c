@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1654205934 2022/06/02 21:38:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.308 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1654760203 2022/06/09 07:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -543,6 +543,16 @@ void
 reset_justpicked(struct obj *olist)
 {
     struct obj *otmp;
+    /*
+     * TODO?  Possible enchancement: don't reset if hero is still at same
+     *  spot where most recent pickup took place.  Not resetting will be
+     *  the correct behavior for autopickup immediately followed by manual
+     *  pickup.  It would probably be correct for either or both pickups
+     *  followed by manual pickup of a newly arrived missile after some
+     *  time has elapsed.  Things becomes murkier for other activity.
+     *  Taking anything out of a container ought to be treated as if
+     *  having moved to another spot.
+     */
 
     for (otmp = olist; otmp; otmp = otmp->nobj)
         otmp->pickup_prev = 0;
@@ -876,9 +886,10 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
  * function must free the pickup list.
  */
 static int
-autopick(struct obj *olist,     /* the object list */
-         int follow,            /* how to follow the object list */
-         menu_item **pick_list) /* list of objects and counts to pick up */
+autopick(
+    struct obj *olist,     /* the object list */
+    int follow,            /* how to follow the object list */
+    menu_item **pick_list) /* list of objects and counts to pick up */
 {
     menu_item *pi; /* pick item */
     struct obj *curr;
