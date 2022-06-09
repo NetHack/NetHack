@@ -1830,6 +1830,7 @@ more cases where newcham() gives messages (pr #775 by copperwater)
 lua: instance cleanup should not be applied to classes (by ToxicFrog)
 fix memory leaks related to selection_new() (pr #782 by argrath)
 wished-for doors in wizmode always vertical (pr #788 by entrez)
+vampire shapeshifting in a door (pr #794 by entrez)
 
 
 Code Cleanup and Reorganization
