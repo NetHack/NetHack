@@ -922,6 +922,8 @@ when formatting an object, avoid capitalization of "The" in "<item> named
 be less specific when cause of death is "handling a <ring or wand>" that
 	happened to be silver for current game; list it as "a silver ring" or
 	"a silver wand" rather than "ring of searching" or "wand of locking"
+adjust the row placement of copyright and early startup messages so that
+	aren't partially overwritten by prompts that follow
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
