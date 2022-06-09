@@ -704,7 +704,7 @@ parsesymbols(register char *opts, int which_set)
 #endif
 
             if ((g.symset[which_set].handling == H_UTF8)
-                || (strval && (lowc(strval[0]) == 'u') && (strval[1] == '+'))) {
+                || (lowc(strval[0]) == 'u') && (strval[1] == '+')) {
 #ifdef ENHANCED_SYMBOLS
                 char buf[BUFSZ];
 
