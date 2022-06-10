@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1654181493 2022/06/02 14:51:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.421 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1654881021 2022/06/10 17:10:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -558,7 +558,10 @@ probe_monster(struct monst *mtmp)
  * is not available or subject to the constraints above.
  */
 boolean
-get_obj_location(struct obj *obj, xchar *xp, xchar *yp, int locflags)
+get_obj_location(
+    struct obj *obj,
+    xchar *xp, xchar *yp,
+    int locflags)
 {
     switch (obj->where) {
     case OBJ_INVENT:
@@ -614,9 +617,11 @@ get_mon_location(
 
 /* used by revive() and animate_statue() */
 struct monst *
-montraits(struct obj *obj, coord *cc,
-          boolean adjacentok) /* False: at obj's spot only, True: nearby is
-                                 allowed */
+montraits(
+    struct obj *obj,
+    coord *cc,
+    boolean adjacentok) /* False: at obj's spot only,
+                         * True: nearby is allowed */
 {
     struct monst *mtmp = (struct monst *) 0,
                  *mtmp2 = has_omonst(obj) ? get_mtraits(obj, TRUE) : 0;
@@ -625,7 +630,7 @@ montraits(struct obj *obj, coord *cc,
         /* save_mtraits() validated mtmp2->mnum */
         mtmp2->data = &mons[mtmp2->mnum];
 
-        if (!(mtmp2->mhpmax <= 0 && !is_rider(mtmp2->data))) {
+        if (mtmp2->mhpmax > 0 || is_rider(mtmp2->data)) {
             mtmp = makemon(mtmp2->data, cc->x, cc->y,
                            (NO_MINVENT | MM_NOWAIT | MM_NOCOUNTBIRTH
                             /* in case mtmp2 is a long worm; saved traits for
@@ -740,11 +745,11 @@ montraits(struct obj *obj, coord *cc,
  * if applicable.
  */
 struct monst *
-get_container_location(struct obj *obj, int *loc, int *container_nesting)
+get_container_location(
+    struct obj *obj,
+    int *loc,
+    int *container_nesting)
 {
-    if (!obj || !loc)
-        return 0;
-
     if (container_nesting)
         *container_nesting = 0;
     while (obj && obj->where == OBJ_CONTAINED) {
@@ -764,7 +769,7 @@ get_container_location(struct obj *obj, int *loc, int *container_nesting)
 static boolean
 zombie_can_dig(xchar x, xchar y)
 {
-    if (isok(x,y)) {
+    if (isok(x, y)) {
         schar typ = levl[x][y].typ;
         struct trap *ttmp;
 
@@ -829,6 +834,9 @@ revive(struct obj *corpse, boolean by_hero)
             break; /* x,y are 0 */
         }
     }
+    if (x) /* update corpse's location now that we're sure where it is */
+        corpse->ox = x, corpse->oy = y;
+
     if (!x
         /* Rules for revival from containers:
          *  - the container cannot be locked
@@ -838,15 +846,10 @@ revive(struct obj *corpse, boolean by_hero)
          */
         || (container && (container->olocked || container_nesting > 2
                           || container->otyp == STATUE
-                          || (container->otyp == BAG_OF_HOLDING && rn2(40)))))
+                          || (container->otyp == BAG_OF_HOLDING && rn2(40))))
+        /* if buried zombie cannot dig itself out, do not revive */
+        || (is_zomb && corpse->where == OBJ_BURIED && !zombie_can_dig(x, y)))
         return (struct monst *) 0;
-
-    /* buried zombie cannot dig itself out, do not revive */
-    if (is_zomb && corpse->where == OBJ_BURIED && !zombie_can_dig(x, y))
-        return (struct monst *) 0;
-
-    /* record the object's location now that we're sure where it is */
-    corpse->ox = x, corpse->oy = y;
 
     /* prepare for the monster */
     montype = corpse->corpsenm;
@@ -1003,13 +1006,9 @@ revive(struct obj *corpse, boolean by_hero)
         useup(corpse);
         break;
     case OBJ_FLOOR:
-        /* in case MON_AT+enexto for invisible mon */
-        x = corpse->ox, y = corpse->oy;
-        /* not useupf(), which charges */
-        if (corpse->quan > 1L)
-            corpse = splitobj(corpse, 1L);
-        delobj_core(corpse, TRUE);
-        newsym(x, y);
+        /* not useupf(), which charges;
+           delobj() won't use up a Rider's corpse, delobj_core(,TRUE) will */
+        delobj_core(corpse, TRUE); /* for floor, also calls newsym() */
         break;
     case OBJ_MINVENT:
         m_useup(corpse->ocarry, corpse);
