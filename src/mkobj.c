@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1648835240 2022/04/01 17:47:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.236 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1654881236 2022/06/10 17:13:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -406,10 +406,16 @@ splitobj(struct obj *obj, long num)
     g.context.objsplit.parent_oid = obj->o_id;
     g.context.objsplit.child_oid = otmp->o_id;
     obj->nobj = otmp;
-    /* Only set nexthere when on the floor, nexthere is also used */
-    /* as a back pointer to the container object when contained. */
+    /* Only set nexthere when on the floor; nexthere is also used
+       as a back pointer to the container object when contained.
+       For either case, otmp's nexthere pointer is already pointing
+       at the right thing. */
     if (obj->where == OBJ_FLOOR)
-        obj->nexthere = otmp;
+        obj->nexthere = otmp; /* insert into chain: obj -> otmp -> next */
+    /* lua isn't tracking the split off portion even if it happens to
+       be tracking the original */
+    if (otmp->where == OBJ_LUAFREE)
+        otmp->where = OBJ_FREE;
     copy_oextra(otmp, obj);
     if (has_omid(otmp))
         free_omid(otmp); /* only one association with m_id*/
