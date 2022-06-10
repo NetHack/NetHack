@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.941 $ $NHDT-Date: 1654717838 2022/06/08 19:50:38 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.945 $ $NHDT-Date: 1654886097 2022/06/10 18:34:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1244,6 +1244,9 @@ items flagged as just-picked-up were unflagged if you stepped on other items
 activating a magic portal still gave "you feel dizzy for a moment, but the
 	sensation passes" after portal traversal was changed to make the hero
 	be stunned for a few turns
+after the fix for zombie reviving near hero (which now interrupts hero's
+	occupation), could get "revive panic" when eating a troll corpse if
+	it revived on the same turn that eating the corpse would finish
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

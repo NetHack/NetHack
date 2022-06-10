@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1654881021 2022/06/10 17:10:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.425 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1654886101 2022/06/10 18:35:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.426 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -804,6 +804,10 @@ revive(struct obj *corpse, boolean by_hero)
         impossible("Attempting to revive %s?", xname(corpse));
         return (struct monst *) 0;
     }
+    /* if this corpse is being eaten, stop doing that; this should be done
+       after makemon() succeeds and skipped if it fails, but waiting until
+       we know the result for that would be too late */
+    cant_finish_meal(corpse);
 
     x = y = 0;
     if (corpse->where != OBJ_CONTAINED) {

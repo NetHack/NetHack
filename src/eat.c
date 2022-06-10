@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1653506421 2022/05/25 19:20:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.278 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1654886097 2022/06/10 18:34:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3707,6 +3707,32 @@ maybe_finished_meal(boolean stopping)
         return TRUE;
     }
     return FALSE;
+}
+
+/* called by revive(); sort of the opposite of maybe_finished_meal() */
+void
+cant_finish_meal(struct obj *corpse)
+{
+    /*
+     * When a corpse gets resurrected, the makemon() for that might
+     * call stop_occupation().  If that happens, prevent it from using
+     * up the corpse via maybe_finished_meal() when there's not enough
+     * left for another bite.  revive() needs continued access to the
+     * corpse and will delete it when done.
+     */
+    if (g.occupation == eatfood && g.context.victual.piece == corpse) {
+        /* normally performed by done_eating() */
+        g.context.victual.piece = (struct obj *) 0;
+        g.context.victual.o_id = 0;
+        g.context.victual.fullwarn = g.context.victual.eating =
+            g.context.victual.doreset = FALSE;
+
+        if (!corpse->oeaten)
+            corpse->oeaten = 1; /* [see consume_oeaten()] */
+        g.occupation = donull; /* any non-Null other than eatfood() */
+        stop_occupation();
+        newuhs(FALSE);
+    }
 }
 
 /* Tin of <something> to the rescue?  Decide whether current occupation
