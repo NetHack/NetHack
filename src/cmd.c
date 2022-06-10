@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1652861829 2022/05/18 08:17:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.565 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1654899519 2022/06/10 22:18:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.571 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1199,6 +1199,8 @@ wiz_kill(void)
                 }
                 break;
             }
+        } else if (u.uswallow) {
+            mtmp = next2u(cc.x, cc.y) ? u.ustuck : 0;
         } else {
             mtmp = m_at(cc.x, cc.y);
         }
