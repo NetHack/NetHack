@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1652831518 2022/05/17 23:51:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1117 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1654896957 2022/06/10 21:35:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1119 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -759,6 +759,7 @@ extern void fix_petrification(void);
 extern boolean should_givit(int, struct permonst *);
 extern void consume_oeaten(struct obj *, int);
 extern boolean maybe_finished_meal(boolean);
+extern void cant_finish_meal(struct obj *);
 extern void set_tin_variety(struct obj *, int);
 extern int tin_variety_txt(char *, int *);
 extern void tin_details(struct obj *, int, char *);
