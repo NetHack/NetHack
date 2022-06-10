@@ -918,17 +918,17 @@ DLB =
 	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJ)}.o:
-	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) /wd4244 /wd4267 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJ)}.o:
-	@$(cc) /wd4244 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) /wd4244 /wd4267 $(PDCINCL) $(cflagsBuild) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
 #==========================================
 
 {$(LUASRC)}.c{$(OBJ)}.o:
-	@$(cc) $(cflagsBuild) -wd4701 -wd4702 -wd4774 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	@$(cc) $(cflagsBuild) -wd4701 -wd4702 -wd4774 -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -1845,6 +1845,8 @@ clean:
 #   * commented out $(TARGETPFX)tile.o: tile.c $(HACK_H)
 #   * commented out the lines starting with
 #	$(TARGET_CC) so the rules in this Makefile will be used instead
+#   * add compile recipe for nhlua.c to add -wd4324 to suppress a
+#     warning during x64 build related to padding due to alignment
 # but otherwise untouched.
 # That means that there is some irrelevant stuff
 # in here, but maintenance should be easier.
@@ -2205,6 +2207,7 @@ $(TARGETPFX)mthrowu.o: mthrowu.c $(HACK_H)
 $(TARGETPFX)muse.o: muse.c $(HACK_H)
 $(TARGETPFX)music.o: music.c $(HACK_H)
 $(TARGETPFX)nhlua.o: nhlua.c $(HACK_H) $(INCL)\dlb.h
+	@$(cc) $(cflagsBuild) -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(@B).c
 $(TARGETPFX)nhlsel.o: nhlsel.c $(HACK_H) $(INCL)\sp_lev.h
 $(TARGETPFX)nhlobj.o: nhlobj.c $(HACK_H) $(INCL)\sp_lev.h
 $(TARGETPFX)o_init.o: o_init.c $(HACK_H)
