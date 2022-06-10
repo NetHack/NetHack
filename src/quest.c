@@ -194,6 +194,7 @@ expulsion(boolean seal)
     dest = (br->end1.dnum == u.uz.dnum) ? &br->end2 : &br->end1;
     if (seal)
         portal_flag |= UTOTYPE_RMPORTAL;
+    nomul(0); /* stop running */
     schedule_goto(dest, portal_flag, (char *) 0, (char *) 0);
     if (seal) { /* remove the portal to the quest - sealing it off */
         int reexpelled = u.uevent.qexpelled;
