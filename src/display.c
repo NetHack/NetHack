@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1652391730 2022/05/12 21:42:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.183 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1654931503 2022/06/11 07:11:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -769,19 +769,25 @@ feel_location(xchar x, xchar y)
              * something has been dropped on the ball/chain.  If the bit is
              * not cleared, then when the ball/chain is moved it will drop
              * the wrong glyph.
+             *
+             * Note: during unpunish() we can be called by delobj() when
+             * destroying uchain while uball hasn't been cleared yet (so
+             * Punished will still yield True but uchain might not be part
+             * of the floor list anymore).
              */
-            if (uchain->ox == x && uchain->oy == y) {
-                if (g.level.objects[x][y] == uchain)
-                    u.bc_felt |= BC_CHAIN;
-                else
-                    u.bc_felt &= ~BC_CHAIN; /* do not feel the chain */
-            }
-            if (!carried(uball) && uball->ox == x && uball->oy == y) {
-                if (g.level.objects[x][y] == uball)
-                    u.bc_felt |= BC_BALL;
-                else
-                    u.bc_felt &= ~BC_BALL; /* do not feel the ball */
-            }
+            if (uchain && uchain->where == OBJ_FLOOR
+                && uchain->ox == x && uchain->oy == y
+                && g.level.objects[x][y] == uchain)
+                u.bc_felt |= BC_CHAIN;
+            else
+                u.bc_felt &= ~BC_CHAIN; /* do not feel the chain */
+
+            if (uball && uball->where == OBJ_FLOOR
+                && uball->ox == x && uball->oy == y
+                && g.level.objects[x][y] == uball)
+                u.bc_felt |= BC_BALL;
+            else
+                u.bc_felt &= ~BC_BALL; /* do not feel the ball */
         }
 
         /* Floor spaces are dark if unlit.  Corridors are dark if unlit. */

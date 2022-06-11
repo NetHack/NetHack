@@ -1,4 +1,4 @@
-/* NetHack 3.7	read.c	$NHDT-Date: 1637992351 2021/11/27 05:52:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.229 $ */
+/* NetHack 3.7	read.c	$NHDT-Date: 1654931501 2022/06/11 07:11:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.257 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2833,11 +2833,10 @@ unpunish(void)
     struct obj *savechain = uchain;
 
     /* chain goes away */
-    obj_extract_self(uchain);
-    maybe_unhide_at(uchain->ox, uchain->oy);
-    newsym(uchain->ox, uchain->oy);
     setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
-    dealloc_obj(savechain);
+    /* for floor, unhides monster hidden under chain, calls newsym() */
+    delobj(savechain);
+
     /* the chain is gone but the no longer attached ball persists */
     setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
 }
