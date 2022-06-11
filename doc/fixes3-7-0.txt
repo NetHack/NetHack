@@ -1248,6 +1248,8 @@ activating a magic portal still gave "you feel dizzy for a moment, but the
 after the fix for zombie reviving near hero (which now interrupts hero's
 	occupation), could get "revive panic" when eating a troll corpse if
 	it revived on the same turn that eating the corpse would finish
+a wizard's starting equipment was supposed to include a random spellbook of
+	spell level 1 through 3 but it was being foced to be level 1
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
