@@ -1,4 +1,4 @@
-/* NetHack 3.7	bones.c	$NHDT-Date: 1596498151 2020/08/03 23:42:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.7	bones.c	$NHDT-Date: 1654931350 2022/06/11 07:09:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985,1993. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -253,18 +253,21 @@ give_to_nearby_mon(struct obj *otmp, int x, int y)
 
 /* called by savebones(); also by finish_paybill(shk.c) */
 void
-drop_upon_death(struct monst *mtmp, /* monster if hero turned into one (other than ghost) */
-                struct obj *cont,   /* container if hero is turned into a statue */
-                int x, int y)
+drop_upon_death(
+    struct monst *mtmp, /* monster if hero rises as one (non ghost) */
+    struct obj *cont,   /* container if hero is turned into a statue */
+    int x, int y)
 {
     struct obj *otmp;
 
-    /* when dual-wielding, the second weapon gets dropped rather than welded if
-       it becomes cursed; ensure that that won't happen here by ending dual-wield */
+    /* when dual-wielding, the second weapon gets dropped rather than
+       welded if it becomes cursed; ensure that that won't happen here
+       by ending dual-wield */
     u.twoweap = FALSE; /* bypass set_twoweap() */
 
-    /* all inventory is dropped (for the normal case), even non-droppable things
-       like worn armor and accessories, welded weapon, or cursed loadstones */
+    /* all inventory is dropped (for the normal case), even non-droppable
+       things like worn armor and accessories, welded weapon, or cursed
+       loadstones */
     while ((otmp = g.invent) != 0) {
         obj_extract_self(otmp);
         /* when turning into green slime, all gear remains held;
@@ -311,7 +314,7 @@ fixuporacle(struct monst *oracle)
     if (!Is_oracle_level(&u.uz))
         return FALSE;
 
-    oracle->mpeaceful = 1;
+    oracle->mpeaceful = 1; /* for behavior toward next character */
     o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
     if (o_ridx >= 0 && g.rooms[o_ridx].rtype == DELPHI)
         return TRUE; /* no fixup needed */
@@ -427,21 +430,23 @@ savebones(int how, time_t when, struct obj *corpse)
 
  make_bones:
     unleash_all();
-    iter_mons(remove_mon_from_bones);
-
+    /* new ghost or other undead isn't punished even if hero was;
+       end-of-game disclosure has already had a chance to report the
+       Punished status so we don't need to preserve it any further */
+    if (Punished)
+        unpunish(); /* unwear uball, destroy uchain */
+    /* in case dismounting kills steed [is that even possible?], do so
+       before cleaning up dead monsters */
     if (u.usteed)
         dismount_steed(DISMOUNT_BONES);
-    dmonsfree(); /* discard dead or gone monsters */
 
-    /* mark all fruits as nonexistent; when we come to them we'll mark
-     * them as existing (using goodfruit())
-     */
+    iter_mons(remove_mon_from_bones); /* send various unique monsters away, */
+    dmonsfree();                      /* then discard dead or gone monsters */
+
+    /* mark all named fruits as nonexistent; if/when we come to instances
+       of any of them we'll mark those as existing (using goodfruit()) */
     for (f = g.ffruit; f; f = f->nextf)
         f->fid = -f->fid;
-
-    /* check iron balls separately--maybe they're not carrying it */
-    if (uball)
-        uball->owornmask = uchain->owornmask = 0L;
 
     /* dispose of your possessions, usually cursed */
     if (u.ugrave_arise == (NON_PM - 1)) {
@@ -531,7 +536,8 @@ savebones(int how, time_t when, struct obj *corpse)
     /* format name+role,&c, death reason, and date+time;
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
-    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", g.plname, g.urole.filecode,
+    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
+            g.plname, g.urole.filecode,
             g.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
