@@ -2744,7 +2744,7 @@ list_vanquished(char defquery, boolean ask)
                                 makeplural(mons[i].pmnames[NEUTRAL]));
                 }
                 /* number of leading spaces to match 3 digit prefix */
-                pfx = !strncmpi(buf, "the ", 3) ? 0
+                pfx = !strncmpi(buf, "the ", 4) ? 0
                       : !strncmpi(buf, "an ", 3) ? 1
                         : !strncmpi(buf, "a ", 2) ? 2
                           : !digit(buf[2]) ? 4 : 0;
