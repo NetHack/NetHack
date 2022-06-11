@@ -1,4 +1,4 @@
-/* NetHack 3.7	muse.c	$NHDT-Date: 1646688066 2022/03/07 21:21:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.159 $ */
+/* NetHack 3.7	muse.c	$NHDT-Date: 1654972707 2022/06/11 18:38:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $ */
 /*      Copyright (C) 1990 by Ken Arromdee                         */
 /* NetHack may be freely redistributed.  See license for details.  */
 
@@ -1095,11 +1095,14 @@ rnd_defensive_item(struct monst* mtmp)
     case 5:
         return (mtmp->data != &mons[PM_PESTILENCE]) ? POT_FULL_HEALING
                                                     : POT_SICKNESS;
-    case 7:
+    case 7: /* wand of digging */
+        /* usually avoid digging in Sokoban */
+        if (Sokoban && rn2(4))
+            goto try_again;
+        /* some creatures shouldn't dig down to another level when hurt */
         if (is_floater(pm) || mtmp->isshk || mtmp->isgd || mtmp->ispriest)
             return 0;
-        else
-            return WAN_DIGGING;
+        return WAN_DIGGING;
     }
     /*NOTREACHED*/
     return 0;
