@@ -15,7 +15,7 @@ static void move_gold(struct obj *, int);
 static void wallify_vault(struct monst *);
 static void gd_mv_monaway(struct monst *, int, int);
 static void gd_pick_corridor_gold(struct monst *, int, int);
-static int gd_move_cleanup(struct monst, boolean, boolean);
+static int gd_move_cleanup(struct monst *, boolean, boolean);
 
 void
 newegd(struct monst *mtmp)
@@ -813,7 +813,7 @@ gd_move(struct monst *grd)
     long umoney = 0L;
     boolean goldincorridor = FALSE, u_in_vault = FALSE, grd_in_vault = FALSE,
             semi_dead = DEADMONSTER(grd),
-            u_carry_gold = FALSE, newspot = FALSE, see_guard;
+            u_carry_gold = FALSE, newspot = FALSE;
 
     if (!on_level(&(egrd->gdlevel), &u.uz))
         return -1;
