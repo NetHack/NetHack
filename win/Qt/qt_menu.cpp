@@ -1058,7 +1058,7 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
 
     char buf[BUFSZ];
     char *dpx;
-    int line;
+    int line, snpres;
 
     /* Put name on stone */
     (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
@@ -1079,8 +1079,8 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
        it's arbitrary but still way, way more than could ever be needed */
     if (cash > 999999999L)
         cash = 999999999L;
-    (void) snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN + 1, "%ld Au", cash);
-
+    snpres = snprintf(rip_line[GOLD_LINE], STONE_LINE_LEN + 1, "%ld Au", cash);
+    nhUse(snpres);
     /* Put together death description */
     formatkiller(buf, sizeof buf, how, FALSE);
     //str_copy(buf, killer, SIZE(buf));

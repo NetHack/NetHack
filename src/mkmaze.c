@@ -974,20 +974,24 @@ makemaz(const char *s)
 
     if (*s) {
         if (sp && sp->rndlevs)
-            Sprintf(protofile, "%s-%d", s, rnd((int) sp->rndlevs));
+            Snprintf(protofile, sizeof protofile,
+                     "%s-%d", s, rnd((int) sp->rndlevs));
         else
             Strcpy(protofile, s);
     } else if (*(g.dungeons[u.uz.dnum].proto)) {
         if (dunlevs_in_dungeon(&u.uz) > 1) {
             if (sp && sp->rndlevs)
-                Sprintf(protofile, "%s%d-%d", g.dungeons[u.uz.dnum].proto,
-                        dunlev(&u.uz), rnd((int) sp->rndlevs));
+                Snprintf(protofile, sizeof protofile,
+                         "%s%d-%d", g.dungeons[u.uz.dnum].proto,
+                         dunlev(&u.uz), rnd((int) sp->rndlevs));
             else
-                Sprintf(protofile, "%s%d", g.dungeons[u.uz.dnum].proto,
-                        dunlev(&u.uz));
+                Snprintf(protofile, sizeof protofile,
+                         "%s%d", g.dungeons[u.uz.dnum].proto,
+                         dunlev(&u.uz));
         } else if (sp && sp->rndlevs) {
-            Sprintf(protofile, "%s-%d", g.dungeons[u.uz.dnum].proto,
-                    rnd((int) sp->rndlevs));
+            Snprintf(protofile, sizeof protofile,
+                     "%s-%d", g.dungeons[u.uz.dnum].proto,
+                     rnd((int) sp->rndlevs));
         } else
             Strcpy(protofile, g.dungeons[u.uz.dnum].proto);
 
