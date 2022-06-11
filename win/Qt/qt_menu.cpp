@@ -172,7 +172,7 @@ NetHackQtMenuWindow::NetHackQtMenuWindow(QWidget *parent) :
     table->setColumnCount(5);
 #if __cplusplus >= 202002L
     table->setFrameStyle(static_cast<int>(QFrame::Panel)
-                             | static_cast<int>(QFrame::Raised));
+                             | static_cast<int>(QFrame::Sunken));
 #else
     table->setFrameStyle(QFrame::Panel|QFrame::Sunken);
 #endif
