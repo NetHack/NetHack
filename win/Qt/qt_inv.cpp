@@ -137,7 +137,7 @@ void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
         nhUse(alttip);
 #endif
         // an empty slot is shown as floor tile unless it's always empty
-        glyph = canbe ? cmap_to_glyph(S_room) : GLYPH_UNEXPLORED;
+        glyph = canbe ? fn_cmap_to_glyph(S_room) : GLYPH_UNEXPLORED;
     }
     map_glyphinfo(0, 0, glyph, 0, &gi); /* this skirts the defined
                                          * interface unfortunately */

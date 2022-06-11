@@ -139,7 +139,12 @@ NetHackQtBind::qt_Splash()
         if (qt_compact_mode) {
             splash->showMaximized();
         } else {
+#if __cplusplus >= 202002L
+            splash->setFrameStyle(static_cast<int>(QFrame::WinPanel)
+                                     | static_cast<int>(QFrame::Raised));
+#else
             splash->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
+#endif
             splash->setLineWidth(10);
             splash->adjustSize();
             splash->show();

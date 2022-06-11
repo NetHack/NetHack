@@ -352,7 +352,12 @@ char NetHackQtYnDialog::Exec()
     } else {
 	QLabel label(qlabel,this);
 	QPushButton cancel("Dismiss",this);
+#if __cplusplus >= 202002L
+	label.setFrameStyle(static_cast<int>(QFrame::Box)
+                                | static_cast<int>(QFrame::Sunken));
+#else
 	label.setFrameStyle(QFrame::Box|QFrame::Sunken);
+#endif
 	label.setAlignment(Qt::AlignCenter);
 	label.resize(fontMetrics().QFM_WIDTH(qlabel)+60,30+fontMetrics().height());
 	cancel.move(width()/2-cancel.width()/2,label.geometry().bottom()+8);

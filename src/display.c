@@ -3486,4 +3486,16 @@ wall_angle(struct rm *lev)
     return idx;
 }
 
+/*
+ * c++ 20 has problems with some of the display.h macros because
+ * comparisons and bit-fiddling and math between different enums
+ * is deprecated.
+ * Create function versions of some of the macros used in some
+ * NetHack c++ source files (Qt) for use there.
+ */
+int
+fn_cmap_to_glyph(int cmap)
+{
+    return cmap_to_glyph(cmap);
+}
 /*display.c*/

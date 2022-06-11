@@ -79,8 +79,14 @@ void NetHackQtRIP::paintEvent(QPaintEvent* event UNUSED)
 	painter.begin(this);
 	painter.drawPixmap(pix_x,pix_y,*pixmap);
 	for (int i=0; i<riplines; i++) {
-	    painter.drawText(rip_text_x-i/2,rip_text_y+i*rip_text_h,
-		1,1,Qt::TextDontClip|Qt::AlignHCenter,line[i]);
+	    painter.drawText(rip_text_x-i/2,rip_text_y+i*rip_text_h, 1,1,
+#if __cplusplus >= 202002L
+                static_cast<int>(Qt::TextDontClip)
+                    | static_cast<int>(Qt::AlignHCenter),
+#else
+                Qt::TextDontClip|Qt::AlignHCenter,
+#endif
+               line[i]);
 	}
 	painter.end();
     }

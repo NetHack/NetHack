@@ -222,15 +222,31 @@ NetHackQtStatusWindow::NetHackQtStatusWindow() :
     ride.setIcon(p_ride, "riding");
 
     // separator lines
+#if __cplusplus >= 202002L
+    hline1.setFrameStyle(static_cast<int>(QFrame::HLine)
+                             | static_cast<int>(QFrame::Sunken));
+    hline2.setFrameStyle(static_cast<int>(QFrame::HLine)
+                             | static_cast<int>(QFrame::Sunken));
+    hline3.setFrameStyle(static_cast<int>(QFrame::HLine)
+                             | static_cast<int>(QFrame::Sunken));
+#else
     hline1.setFrameStyle(QFrame::HLine | QFrame::Sunken);
     hline2.setFrameStyle(QFrame::HLine | QFrame::Sunken);
     hline3.setFrameStyle(QFrame::HLine | QFrame::Sunken);
+#endif
     hline1.setLineWidth(1);
     hline2.setLineWidth(1);
     hline3.setLineWidth(1);
     // vertical separators for condensed layout (statuslines:2)
+#if __cplusplus >= 202002L
+    vline1.setFrameStyle(static_cast<int>(QFrame::VLine)
+                             | static_cast<int>(QFrame::Sunken));
+    vline2.setFrameStyle(static_cast<int>(QFrame::VLine)
+                             | static_cast<int>(QFrame::Sunken));
+#else
     vline1.setFrameStyle(QFrame::VLine | QFrame::Sunken);
     vline2.setFrameStyle(QFrame::VLine | QFrame::Sunken);
+#endif
     vline1.setLineWidth(1); // separates Alignment from Charisma
     vline2.setLineWidth(1);
     vline2.hide(); // padding to keep row 2 aligned with row 1, never shown
