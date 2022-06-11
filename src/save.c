@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1651298444 2022/04/30 06:00:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.186 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1654931286 2022/06/11 07:08:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.187 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -21,6 +21,7 @@ static void savelevl(NHFILE *,boolean);
 static void savedamage(NHFILE *);
 static void save_bubbles(NHFILE *, xchar);
 static void save_stairs(NHFILE *);
+static void save_bc(NHFILE *);
 static void saveobj(NHFILE *,struct obj *);
 static void saveobjchn(NHFILE *,struct obj **);
 static void savemon(NHFILE *,struct monst *);
@@ -273,7 +274,6 @@ static void
 savegamestate(NHFILE* nhfp)
 {
     unsigned long uid;
-    struct obj *bc_objs = (struct obj *)0;
 
     g.program_state.saving++; /* caller should/did already set this... */
     uid = (unsigned long) getuid();
@@ -304,22 +304,8 @@ savegamestate(NHFILE* nhfp)
        pointers into invent (uwep, uarmg, uamul, &c) are set to Null too */
     saveobjchn(nhfp, &g.invent);
 
-    /* save ball and chain if they are currently dangling free (i.e. not
-       on floor or in inventory); 'looseball' and 'loosechain' have been
-       set up in caller because ball and chain will be gone by now if on
-       floor, or ball gone if carried; caveat: uball and uchain pointers
-       will be non-Null but stale (point to freed memory) in those cases */
-    bc_objs = (struct obj *) 0;
-    if (g.loosechain) {
-        g.loosechain->nobj = bc_objs; /* uchain */
-        bc_objs = g.loosechain;
-    }
-    if (g.looseball) {
-        g.looseball->nobj = bc_objs;
-        bc_objs = g.looseball;
-    }
-    saveobjchn(nhfp, &bc_objs); /* frees objs in list, sets bc_objs to Null */
-    g.looseball = g.loosechain = (struct obj *) 0;
+    /* save ball and chain if they happen to be in an unusal state */
+    save_bc(nhfp);
 
     saveobjchn(nhfp, &g.migrating_objs); /* frees objs and sets to Null */
     savemonchn(nhfp, g.migrating_mons);
@@ -332,7 +318,8 @@ savegamestate(NHFILE* nhfp)
     savelevchn(nhfp);
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
-        bwrite(nhfp->fd, (genericptr_t) &g.quest_status, sizeof g.quest_status);
+        bwrite(nhfp->fd, (genericptr_t) &g.quest_status,
+               sizeof g.quest_status);
         bwrite(nhfp->fd, (genericptr_t) g.spl_book,
                sizeof (struct spell) * (MAXSPELL + 1));
     }
@@ -445,6 +432,8 @@ savestateinlock(void)
 
             g.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
             g.usteed_id = (u.usteed ? u.usteed->m_id : 0);
+            /* if ball and/or chain aren't on floor or in invent, keep a copy
+               of their pointers; not valid when on floor or in invent */
             g.looseball = BALL_IN_MON ? uball : 0;
             g.loosechain = CHAIN_IN_MON ? uchain : 0;
             savegamestate(nhfp);
@@ -751,10 +740,40 @@ save_stairs(NHFILE* nhfp)
     }
 }
 
+/* if ball and/or chain are loose, make an object chain for it/them and
+   save that separately from other objects */
+static void
+save_bc(NHFILE *nhfp)
+{
+    struct obj *bc_objs = 0;
+
+    /* save ball and chain if they are currently dangling free (i.e. not
+       on floor or in inventory); 'looseball' and 'loosechain' have been
+       set up in caller because ball and chain will be gone by now if on
+       floor, or ball gone if carried */
+    if (g.loosechain) {
+        g.loosechain->nobj = bc_objs; /* uchain */
+        bc_objs = g.loosechain;
+        if (nhfp->mode & FREEING) {
+            setworn((struct obj *) 0, W_CHAIN); /* sets 'uchain' to Null */
+            g.loosechain = (struct obj *) 0;
+        }
+    }
+    if (g.looseball) {
+        g.looseball->nobj = bc_objs;
+        bc_objs = g.looseball;
+        if (nhfp->mode & FREEING) {
+            setworn((struct obj *) 0, W_BALL); /* sets 'uball' to Null */
+            g.looseball = (struct obj *) 0;
+        }
+    }
+    saveobjchn(nhfp, &bc_objs); /* frees objs in list, sets bc_objs to Null */
+}
+
 /* save one object;
    caveat: this is only for perform_bwrite(); caller handles release_data() */
 static void
-saveobj(NHFILE* nhfp, struct obj* otmp)
+saveobj(NHFILE *nhfp, struct obj *otmp)
 {
     int buflen, zerobuf = 0;
 
@@ -839,6 +858,11 @@ saveobjchn(NHFILE* nhfp, struct obj** obj_p)
             otmp->leashmon = 0;     /* mon->mleashed could still be set;
                                      * unfortunately, we can't clear that
                                      * until after the monster is saved */
+            /* clear 'uball' and 'uchain' pointers if resetting their mask;
+               could also do same for other worn items but don't need to */
+            if ((otmp->owornmask & (W_BALL | W_CHAIN)) != 0)
+                setworn((struct obj *) 0,
+                        otmp->owornmask & (W_BALL | W_CHAIN));
             otmp->owornmask = 0L;   /* no longer care */
             dealloc_obj(otmp);
         }
