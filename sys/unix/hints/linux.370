@@ -197,21 +197,38 @@ LINK = $(CXX)
 ifdef WANT_WIN_QT5
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
-endif   # WANT_WIN_QT5
+endif    # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-# As of January 2022 there was no Qt6 package available.
-ifndef QT_PACKAGE_AVAILABLE
 # Try some likely spots for a self-built Qt6.
 # You'll have to change these manually before using the hints file
 # if they don't match the installed location on your system.
+ifneq "$(HOSTTYPE)" ""
+QTHOST=$(HOSTTYPE)
+else
+QTHOST=x86_64
+endif
+QTTOP=/usr/include/$(HOSTTYPE)-linux-gnu/qt6
+ifneq ($(wildcard $(QTTOP)/*),)
+#we don't set QTLOCATED=1 for this
+QTINCDIR=/usr/include/$(QTHOST)-linux-gnu/qt6
+QTLIBDIR=/usr/lib/$(QTHOST)-linux.gnu
+QTCXXFLAGS += -DQT_WIDGETS_LIB -DQT_MULTIMEDIA_LIB -DQT_NETWORK_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+QTCXXFLAGS += -I$(QTINCDIR)/QtWidgets -I$(QTINCDIR) -I$(QTINCDIR)/QtMultimedia
+QTCXXFLAGS += -I$(QTINCDIR)/QtNetwork -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtCore
+WINLIB += -L$(QTLIBDIR) -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
+MOCPATH = /usr/lib/qt6/libexec/moc
+#/usr/lib/x86_64-linux-gnu/libQt6EglFSDeviceIntegration.so
+endif
+ifndef QTINCDIR
 ifneq ($(wildcard /usr/local/Qt6/*),)
 QTDIR=/usr/local/Qt6
 QTLOCATED=1
-endif
+endif    # wildcard /usr/local/Qt6
 ifneq ($(wildcard /usr/local/qt6/*),)
 QTDIR=/usr/local/qt6
 QTLOCATED=1
-endif
+endif    # wildcard /usr/local/qt6
+endif    # !QTINCDIR
 ifdef QTLOCATED
 QTCXXFLAGS += -I$(QTDIR)/include/QtCore
 QTCXXFLAGS += -I$(QTDIR)/include/QtGui
@@ -219,13 +236,8 @@ QTCXXFLAGS += -I$(QTDIR)/include/QtMultimedia
 QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
 MOCPATH = $(QTDIR)/libexec/moc
 WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
-endif
-else   # QT_PACKAGE_AVAILABLE
-QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
-WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
-endif   # WANT_WIN_QT6
-else    # QT_PACKAGE_AVAILABLE
-endif   # QT_PACKAGE_AVAILABLE
+endif   # QTLOCATED
+endif   # !QTINCDIR
 ifndef QTDIR
 $(error QTDIR not defined in the environment or Makefile)
 endif	# QTDIR
@@ -235,7 +247,7 @@ QTCXXFLAGS += -fPIC
 POSTINSTALL+= bdftopcf win/X11/nh10.bdf > $(INSTDIR)/nh10.pcf; \
 		( cd $(INSTDIR); mkfontdir -x .lev );
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
-else
+else    # WANT_WIN_QT
 LINK = $(CC)
 endif	# !WANT_WIN_QT
 
