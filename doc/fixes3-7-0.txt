@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.946 $ $NHDT-Date: 1654931291 2022/06/11 07:08:11 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.949 $ $NHDT-Date: 1655065133 2022/06/12 20:18:53 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1676,6 +1676,7 @@ if built with DEBUG enabled and running in wizard mode, starting play with
 	DEBUGFILES=seethru in environment makes clouds on the Plane of Air,
 	water on Plane of Water, and fumaroles on Plane of Fire be transparent
 add wizard mode #wizkill command to remove monster(s) from play
+some quest nemeses release a cloud of poisonous gas when they die
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.7	questpgr.c	$NHDT-Date: 1652827965 2022/05/17 22:52:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	questpgr.c	$NHDT-Date: 1655065145 2022/06/12 20:19:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,7 +24,7 @@ static void convert_line(char *,char *);
 static void deliver_by_pline(const char *);
 static void deliver_by_window(const char *, int);
 static boolean skip_pager(boolean);
-static boolean com_pager_core(const char *, const char *, boolean);
+static boolean com_pager_core(const char *, const char *, boolean, char **);
 
 short
 quest_info(int typ)
@@ -141,6 +141,55 @@ static const char *
 homebase(void) /* return your role leader's location */
 {
     return g.urole.homebase;
+}
+
+/* returns 1 if nemesis death message mentions noxious fumes, otherwise 0;
+   does not display the message */
+int
+stinky_nemesis(struct monst *mon)
+{
+    char *mesg = 0;
+    int res = 0;
+
+#if 0
+    /* get the quest text for dying nemesis; don't assume that mon is
+       hero's own role's nemesis (overkill since m_detach() and nemdead()
+       both make that assumption--valid for normal play but not necessarily
+       valid for wizard mode) */
+    int r, mndx = monsndx(mon->data);
+    for (r = 0; roles[r].name.m || roles[r].name.f; ++r)
+        if (roles[r].neminum == mndx) {
+            (void) com_pager_core(roles[r].filecode, "killed_nemesis",
+                                  FALSE, &mesg);
+            break;
+        }
+#else
+    nhUse(mon);
+    /* since nemdead() just gave the message for hero's nemesis even if 'mon'
+       is some other role's nemesis (feasible in wizard mode), base any gas
+       cloud on the text that was shown even if not appropriate for 'mon' */
+    (void) com_pager_core(g.urole.filecode, "killed_nemesis", FALSE, &mesg);
+#endif
+
+    /* this is somewhat fragile; it assumes that when both (noxious or
+       poisonous or toxic) and (gas or fumes) are present, the latter
+       refers to the former rather than to something unrelated; it does
+       make sure that fumes occurs after noxious rather than before */
+    if (mesg) {
+        char *p;
+
+        /* change newlines into spaces to cope with "...noxious\nfumes..." */
+        (void) strNsubst(mesg, "\n", " ", 0);
+
+        if (((p = strstri(mesg, "noxious")) != 0
+             || (p = strstri(mesg, "poisonous")) != 0
+             || (p = strstri(mesg, "toxic")) != 0)
+            && (strstri(p, " gas") || strstri(p, " fumes")))
+            res = 1;
+
+        free((genericptr_t) mesg);
+    }
+    return res;
 }
 
 /* replace deity, leader, nemesis, or artifact name with pronoun;
@@ -415,7 +464,8 @@ static boolean
 com_pager_core(
     const char *section,
     const char *msgid,
-    boolean showerror)
+    boolean showerror,
+    char **rawtext)
 {
     static const char *const howtoput[] = {
         "pline", "window", "text", "menu", "default", NULL
@@ -486,8 +536,13 @@ com_pager_core(
         goto compagerdone;
     }
 
-    synopsis = get_table_str_opt(L, "synopsis", NULL);
     text = get_table_str_opt(L, "text", NULL);
+    if (rawtext) {
+        *rawtext = dupstr(text);
+        res = TRUE;
+        goto compagerdone;
+    }
+    synopsis = get_table_str_opt(L, "synopsis", NULL);
     output = howtoput2i[get_table_option(L, "output", "default", howtoput)];
 
     if (!text) {
@@ -564,14 +619,14 @@ com_pager_core(
 void
 com_pager(const char *msgid)
 {
-    com_pager_core("common", msgid, TRUE);
+    (void) com_pager_core("common", msgid, TRUE, (char **) 0);
 }
 
 void
 qt_pager(const char *msgid)
 {
-    if (!com_pager_core(g.urole.filecode, msgid, FALSE))
-        com_pager_core("common", msgid, TRUE);
+    if (!com_pager_core(g.urole.filecode, msgid, FALSE, (char **) 0))
+        (void) com_pager_core("common", msgid, TRUE, (char **) 0);
 }
 
 struct permonst *

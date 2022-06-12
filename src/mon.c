@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1654465182 2022/06/05 21:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.433 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1655065140 2022/06/12 20:19:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.436 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2380,16 +2380,11 @@ m_detach(
     if (mtmp->iswiz)
         wizdead();
     if (mtmp->data->msound == MS_NEMESIS) {
-        struct permonst *mdat = mtmp->data;
         nemdead();
         /* The Archeologist, Caveman, and Priest quest texts describe
-           the nemesis's body creating noxious fumes/gas when
-           killed. */
-        if (mdat == &mons[PM_MINION_OF_HUHETOTL]
-            || mdat == &mons[PM_CHROMATIC_DRAGON]
-            || mdat == &mons[PM_NALZOK]) {
+           the nemesis's body creating noxious fumes/gas when killed. */
+        if (stinky_nemesis(mtmp))
             create_gas_cloud(mx, my, 5, 8);
-        }
     }
     if (mtmp->data->msound == MS_LEADER)
         leaddead();

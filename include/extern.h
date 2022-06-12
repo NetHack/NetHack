@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1654896957 2022/06/10 21:35:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1119 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1655065134 2022/06/12 20:18:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1121 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2231,6 +2231,7 @@ extern short quest_info(int);
 extern const char *ldrname(void);
 extern boolean is_quest_artifact(struct obj *);
 extern struct obj *find_quest_artifact(unsigned);
+extern int stinky_nemesis(struct monst *);
 extern void com_pager(const char *);
 extern void qt_pager(const char *);
 extern struct permonst *qt_montype(void);
