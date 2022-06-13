@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655120485 2022/06/13 11:41:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655145035 2022/06/13 18:30:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.574 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4927,15 +4927,15 @@ there_cmd_menu_common(
 static void
 act_on_act(
     int act,        /* action */
-    int dx, int dy) /* delta to adjacent spot (except for couple of cases) */
+    int dx, int dy) /* delta to adjacent spot (farther for couple of cases) */
 {
     struct obj *otmp;
     int dir;
 
     switch (act) {
     case MCMD_TRAVEL:
-        iflags.travelcc.x = u.tx = dx; /* caller passed x via dx */
-        iflags.travelcc.y = u.ty = dy; /* and y via dy           */
+        iflags.travelcc.x = u.tx = u.ux + dx;
+        iflags.travelcc.y = u.ty = u.uy + dy;
         cmdq_add_ec(dotravel_target);
         break;
     case MCMD_THROW_OBJ:
@@ -5065,8 +5065,8 @@ act_on_act(
         cmdq_add_ec(dolook);
         break;
     case MCMD_LOOK_AT:
-        g.clicklook_cc.x = dx; /* caller passed x via dx */
-        g.clicklook_cc.y = dy; /* and y via dy           */
+        g.clicklook_cc.x = u.ux + dx;
+        g.clicklook_cc.y = u.uy + dy;
         cmdq_add_ec(doclicklook);
         break;
     case MCMD_UNTRAP_HERE:
@@ -5084,8 +5084,6 @@ act_on_act(
         break;
     }
 }
-
-#define act_needs_xy(act) ((act) == MCMD_TRAVEL || (act) == MCMD_LOOK_AT)
 
 /* offer choice of actions to perform at adjacent location <x,y> */
 static char
@@ -5124,8 +5122,7 @@ there_cmd_menu(int x, int y, int mod)
         ch = '\0';
     } else if (K == 1 && act != MCMD_NOTHING) {
         destroy_nhwindow(win);
-        if (act_needs_xy(act))
-            dx = x, dy = y;
+
         act_on_act(act, dx, dy);
         return '\0';
     } else {
@@ -5138,16 +5135,11 @@ there_cmd_menu(int x, int y, int mod)
         act = picks->item.a_int;
         free((genericptr_t) picks);
 
-        /* most actions want <dx,dy> but a few want absolute <x,y> */
-        if (act_needs_xy(act))
-            dx = x, dy = y;
         act_on_act(act, dx, dy);
         return '\0';
     }
     return ch;
 }
-
-#undef act_needs_xy
 
 static char
 here_cmd_menu(void)
