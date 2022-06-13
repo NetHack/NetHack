@@ -1,4 +1,4 @@
-/* NetHack 3.7	pager.c	$NHDT-Date: 1642630920 2022/01/19 22:22:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.210 $ */
+/* NetHack 3.7	pager.c	$NHDT-Date: 1655120486 2022/06/13 11:41:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.225 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2249,9 +2249,16 @@ dowhatdoes(void)
 #endif
     reslt = dowhatdoes_core(q, bufr);
     if (reslt) {
+        char *p = index(reslt, '\n'); /* 'm' prefix has two lines of output */
+
         if (q == '&' || q == '?')
             whatdoes_help();
+        if (p)
+            *p = '\0';
         pline("%s", reslt);
+        if (p)
+            /* cheat by knowing how dowhatdoes_core() handles key portion */
+            pline("%8.8s%s", reslt, p + 1);
     } else {
         pline("No such command '%s', char code %d (0%03o or 0x%02x).",
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655114986 2022/06/13 10:09:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.572 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655120485 2022/06/13 11:41:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.573 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2487,6 +2487,11 @@ struct ext_func_tab extcmdlist[] = {
               doremring, 0, NULL },
     { C('a'), "repeat", "repeat a previous command",
               do_repeat, IFBURIED | GENERALCMD, NULL },
+    /* "modify command" is a vague description for use as no-autopickup,
+       no-attack movement as well as miscellaneous non-movement things;
+       key2extcmddesc() constructs a more explicit two line description
+       for display by the '&' command and expects to find "prefix:" as
+       the start of the text here */
     { 'm',    "reqmenu", "prefix: request menu or modify command",
               do_reqmenu, PREFIXCMD, NULL },
     { C('_'), "retravel", "travel to previously selected travel location",
@@ -2824,7 +2829,19 @@ key2extcmddesc(uchar key)
     /* finally, check whether 'key' is a command */
     if (g.Cmd.commands[key] && (txt = g.Cmd.commands[key]->ef_txt) != 0) {
         Sprintf(key2cmdbuf, "%s (#%s)", g.Cmd.commands[key]->ef_desc, txt);
-        /* special case: 'txt' for '#' is "#" and showing that as
+
+        /* special case: for reqmenu prefix (normally 'm'), replace
+           "prefix: request menu or modify command (#reqmenu)"
+           with two-line "movement prefix:...\nnon-movement prefix:..." */
+        if (!strncmpi(key2cmdbuf, "prefix:", 7) && !strcmpi(txt, "reqmenu"))
+            (void) strsubst(key2cmdbuf, "prefix:",
+                     /* relies on implicit concatenation of literal strings */
+                            "movement prefix:"
+                            " move without autopickup and without attacking"
+                            "\n"
+                            "non-movement prefix:"); /* and rest of buf */
+
+        /* another special case: 'txt' for '#' is "#" and showing that as
            "perform an extended command (##)" looks silly; strip "(##)" off */
         return strsubst(key2cmdbuf, " (##)", "");
     }
