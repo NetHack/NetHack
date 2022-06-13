@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.451 $ $NHDT-Date: 1646402548 2022/03/04 14:02:28 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ $NHDT-Date: 1655161563 2022/06/13 23:06:03 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -4876,11 +4876,20 @@ Default is \(oqn\(cq.
 .lp getdir.help
 When asked for a direction, the key to show the help.
 Default is \(oq?\(cq.
+.lp getdir.mouse
+When asked for a direction, the key to initiate a simulated mouse click.
+You will be asked to pick a location.
+Use movement keystrokes to move the cursor around the map, then type
+the getpos.pick.once key (default \(oq\f(CR,\fP\(cq)
+or the getpos.pick key (default \(oq\f(CR.\fP\(cq)
+to finish as if performing a left or right click.
+Only useful when using the \f(CR#therecmdmenu\fP command.
+Default is \(oq_\(cq. \" underscore
 .lp getdir.self
 When asked for a direction, the key to target yourself.
 Default is \(oq.\(cq.
 .lp getdir.self2
-When asked for a direction, the key to target yourself.
+When asked for a direction, an alternate key to target yourself.
 Default is \(oqs\(cq.
 .lp getpos.autodescribe
 When asked for a location, the key to toggle autodescribe.
@@ -4931,10 +4940,14 @@ Default is \(oq\(dq\(cq. \" double quote
 .lp getpos.pick
 When asked for a location, the key to choose the location, and possibly
 ask for more info.
+When simulating a mouse click after being asked for a direction (see
+getdir.mouse above), the key to use to respond as right click.
 Default is \(oq.\(cq.
 .lp getpos.pick.once
 When asked for a location, the key to choose the location, and skip asking
 for more info.
+When simulating a mouse click after being asked for a direction,
+the key to respond as left click.
 Default is \(oq,\(cq.
 .lp getpos.pick.quick
 When asked for a location, the key to choose the location, skip asking for

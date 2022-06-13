@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1654070559 2022/06/01 08:02:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.296 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1655161560 2022/06/13 23:06:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -458,6 +458,9 @@ enum nh_keyfunc {
     NHKF_GETDIR_SELF,
     NHKF_GETDIR_SELF2,
     NHKF_GETDIR_HELP,
+    NHKF_GETDIR_MOUSE,   /* simulated click for #therecmdmenu; use '_' as
+                          * direction to initiate, then getpos() finishing
+                          * with ',' (left click) or '.' (right click) */
     NHKF_COUNT,
     NHKF_GETPOS_SELF,
     NHKF_GETPOS_PICK,

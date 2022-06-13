@@ -5388,11 +5388,22 @@ With {\it number\verb+_+pad\/} only. Default is~`{\tt n}'.
 \item[{\bb{getdir.help}}]
 When asked for a direction, the key to show the help. Default is~`{\tt ?}'.
 %.lp
+\item[{\bb{getdir.mouse}}]
+When asked for a direction, the key to initiate a simulated mouse click.
+You will be asked to pick a location.
+Use movement keystrokes to move the cursor around the map, then type
+the getpos.pick.once key (default `{\tt ,}')
+or the getpos.pick key (default `{\tt .}')
+to finish as if performing a left or right click.
+Only useful when using the {\tt \#therecmdmenu} command.
+Default is~`{\tt \verb+_+}'.
+%.lp
 \item[{\bb{getdir.self}}]
 When asked for a direction, the key to target yourself. Default is~`{\tt .}'.
 %.lp
 \item[{\bb{getdir.self2}}]
-When asked for a direction, the key to target yourself. Default is~`{\tt s}'.
+When asked for a direction, an alternate key to target yourself.
+Default is~`{\tt s}'.
 %.lp
 \item[{\bb{getpos.autodescribe}}]
 When asked for a location, the key to toggle {\it autodescribe\/}.
@@ -5450,11 +5461,17 @@ filtering, in view only, and in the same area only. Default is~`{\tt "}'.
 %.lp
 \item[{\bb{getpos.pick}}]
 When asked for a location, the key to choose the location, and possibly
-ask for more info. Default is~`{\tt .}'.
+ask for more info.
+When simulating a mouse click after being asked for a direction (see
+getdir.mouse above), the key to use to respond as right click.
+Default is~`{\tt .}'.
 %.lp
 \item[{\bb{getpos.pick.once}}]
 When asked for a location, the key to choose the location, and skip
-asking for more info. Default is~`{\tt ,}'.
+asking for more info.
+When simulating a mouse click after being asked for a direction,
+the key to respond as left click.
+Default is~`{\tt ,}'.
 %.lp
 \item[{\bb{getpos.pick.quick}}]
 When asked for a location, the key to choose the location, skip asking

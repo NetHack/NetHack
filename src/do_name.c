@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1652637698 2022/05/15 18:01:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1655161562 2022/06/13 23:06:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.252 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -776,6 +776,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         }
         if (c == cmd_from_func(do_run) || c == cmd_from_func(do_rush)) {
             c = readchar_poskey(&tx, &ty, &sidx);
+            iflags.getloc_click = sidx; /* [is this useful?] */
             rushrun = TRUE;
         }
         if (c == 0) {

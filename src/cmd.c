@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655156619 2022/06/13 21:43:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.575 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655161561 2022/06/13 23:06:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.576 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3681,6 +3681,7 @@ static struct {
     { NHKF_GETDIR_SELF,      '.', "getdir.self" },
     { NHKF_GETDIR_SELF2,     's', "getdir.self2" },
     { NHKF_GETDIR_HELP,      '?', "getdir.help" },
+    { NHKF_GETDIR_MOUSE,     '_', "getdir.mouse" },
     { NHKF_COUNT,            'n', "count" },
     { NHKF_GETPOS_SELF,      '@', "getpos.self" },
     { NHKF_GETPOS_PICK,      '.', "getpos.pick" },
@@ -4337,8 +4338,11 @@ redraw_cmd(char c)
  * Returns non-zero if coordinates in cc are valid.
  */
 int
-get_adjacent_loc(const char *prompt, const char *emsg,
-                 xchar x, xchar y, coord *cc)
+get_adjacent_loc(
+    const char *prompt,
+    const char *emsg,
+    xchar x, xchar y,
+    coord *cc)
 {
     xchar new_x, new_y;
     if (!getdir(prompt)) {
@@ -4358,6 +4362,8 @@ get_adjacent_loc(const char *prompt, const char *emsg,
     return 1;
 }
 
+/* prompt for a direction (specified via movement keystroke) and return it
+   in u.dx, u.dy, and u.dz; function return value is 1 for ok, 0 otherwise */
 int
 getdir(const char *s)
 {
@@ -4400,6 +4406,70 @@ getdir(const char *s)
     if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
         || dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF2]) {
         u.dx = u.dy = u.dz = 0;
+    } else if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_MOUSE]) {
+        char qbuf[QBUFSZ];
+        coord cc;
+        int pos, mod;
+
+        /*
+         * For #therecmdmenu:
+         * Player has entered the 'simulated mouse' key ('_' by default)
+         * at the "which direction?" prompt so we use getpos() to get a
+         * simulated click after moving cursor to the desired location.
+         *
+         * getpos() returns 0..3 for period, comma, semi-colon, colon.
+         * We treat "," as left click and "." as right click due to
+         * their positions relative to each other on the keyboard.
+         * Using ";" as synonym for "," and ":" for "." is due to their
+         * shapes rather than to their keyboard location.
+         *
+         * Those keys aren't separately bindable for being treated as
+         * clicks but we do honor their getpos bindings if player has
+         * changed them.  (Bound values might have scrambled keyboard
+         * locations relative to each other so ruin the memory aid of
+         * "," being left of ".".)
+         */
+        Sprintf(qbuf,
+            "desired location, then type '%s' for left click, '%s' for right",
+                /* visctrl() cycles through several static buffers for its
+                   return value so using two in the same expression is ok */
+                visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_Q]), /* ',' */
+                visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK])); /* '.' */
+        cc.x = u.ux, cc.y = u.uy; /* starting cursor location for getpos() */
+        pos = getpos(&cc, TRUE, qbuf);
+
+        if (pos < 0) {
+            /* ESC or other rejection */
+            u.dx = u.dy = u.dz = 0;
+            mod = 0; /* neither CLICK_1 nor CLICK_2 */
+        } else {
+            /* caller expects simulated click to be relative to hero's spot */
+            u.dx = cc.x - u.ux;
+            u.dy = cc.y - u.uy;
+            u.dz = 0;
+
+            switch (pos + NHKF_GETPOS_PICK) {
+            case NHKF_GETPOS_PICK_Q: /* 1: quick:   ',' */
+            case NHKF_GETPOS_PICK_O: /* 2: once:    ';' */
+                mod = CLICK_1;
+                break;
+            case NHKF_GETPOS_PICK:   /* 0: normal:  '.' */
+            case NHKF_GETPOS_PICK_V: /* 3: verbose: ':' */
+                mod = CLICK_2;
+                break;
+            default:
+                /* could plug in bound values for spkeys[NHKF_GETPOS_PICK],&c
+                   but that feels like overkill for something which should
+                   never happen; just show their default values */
+                impossible("getpos successful but not one of [.,;:] (%d)",
+                           pos);
+                mod = 0; /* neither CLICK_1 nor CLICK_2 */
+                pos = -1; /* return failure */
+                break;
+            }
+        }
+        iflags.getloc_click = mod;
+        return (pos >= 0);
     } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
 
@@ -4646,7 +4716,7 @@ dotherecmdmenu(void)
         return ECMD_CANCEL;
 
     if (u.dx || u.dy)
-        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy, CLICK_1);
+        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy, iflags.getloc_click);
     else
         ch = here_cmd_menu();
 
@@ -4893,17 +4963,13 @@ there_cmd_menu_far(winid win, xchar x, xchar y, int mod)
 {
     int K = 0;
 
-    if (mod != CLICK_2)
-        return K;
+    if (mod == CLICK_1) {
+        if (linedup(u.ux, u.uy, x, y, 1)
+            && dist2(u.ux, u.uy, x, y) < 18*18)
+            mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
 
-    if (linedup(u.ux, u.uy, x, y, 1) && (dist2(u.ux, u.uy, x, y) < 18*18)) {
-        mcmd_addmenu(win, MCMD_THROW_OBJ, "Throw something"), ++K;
-    }
-
-    if (flags.travelcmd) {
         mcmd_addmenu(win, MCMD_TRAVEL, "Travel here"), ++K;
     }
-
     return K;
 }
 
@@ -4916,10 +4982,9 @@ there_cmd_menu_common(
 {
     int K = 0;
 
-    if (mod == CLICK_2 && iflags.clicklook) {
+    if (mod == CLICK_1 || mod == CLICK_2) { /* ignore iflags.clicklook here */
         mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
     }
-
     return K;
 }
 
@@ -4934,6 +4999,10 @@ act_on_act(
 
     switch (act) {
     case MCMD_TRAVEL:
+        /* FIXME: player has explicilty picked "travel to this location"
+           from the menu but it will only work if flags.travelcmd is True.
+           That option is intended as way to guard against stray mouse
+           clicks and shouldn't inhibit explicit travel. */
         iflags.travelcc.x = u.tx = u.ux + dx;
         iflags.travelcc.y = u.ty = u.uy + dy;
         cmdq_add_ec(dotravel_target);
@@ -5121,7 +5190,7 @@ there_cmd_menu(int x, int y, int mod)
         }
         npick = 0;
         ch = '\0';
-    } else if (K == 1 && act != MCMD_NOTHING) {
+    } else if (K == 1 && act != MCMD_NOTHING && act != MCMD_TRAVEL) {
         destroy_nhwindow(win);
 
         act_on_act(act, dx, dy);
