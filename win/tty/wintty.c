@@ -3554,6 +3554,7 @@ tty_print_glyph(winid window, xchar x, xchar y,
 #ifdef ENHANCED_SYMBOLS
         /* we don't link with termcap.o if NO_TERMS is defined */
         if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
+            && iflags.colorcount >= 256
             && glyphinfo->gm.u && glyphinfo->gm.u->ucolor) {
             term_start_24bitcolor(glyphinfo->gm.u);
             color24bit_on = TRUE;
