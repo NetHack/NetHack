@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655145035 2022/06/13 18:30:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.574 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655156619 2022/06/13 21:43:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.575 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5093,7 +5093,8 @@ there_cmd_menu(int x, int y, int mod)
     char ch = '\0';
     int npick = 0, K = 0;
     menu_item *picks = (menu_item *) 0;
-    int dx = sgn(x - u.ux), dy = sgn(y - u.uy);
+    /*int dx = sgn(x - u.ux), dy = sgn(y - u.uy);*/
+    int dx = x - u.ux, dy = y - u.uy;
     int act = MCMD_NOTHING;
 
     win = create_nhwindow(NHW_MENU);
