@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1633802068 2021/10/09 17:54:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1655116515 2022/06/13 10:35:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -587,16 +587,13 @@ still_chewing(xchar x, xchar y)
 
     /* Okay, you've chewed through something */
     if (!u.uconduct.food++)
-        livelog_printf(LL_CONDUCT, "ate for the first time, by chewing through %s",
-                       boulder
-                       ? "a boulder"
-                       : IS_TREE(lev->typ)
-                       ? "a tree"
-                       : IS_ROCK(lev->typ)
-                       ? "rock"
-                       : (lev->typ == IRONBARS)
-                       ? "iron bars"
-                       : "a door");
+        livelog_printf(LL_CONDUCT,
+                       "ate for the first time, by chewing through %s",
+                       boulder ? "a boulder"
+                       : IS_TREE(lev->typ) ? "a tree"
+                         : IS_ROCK(lev->typ) ? "rock"
+                           : (lev->typ == IRONBARS) ? "iron bars"
+                             : "a door");
     u.uhunger += rnd(20);
 
     if (boulder) {
@@ -918,7 +915,8 @@ test_move(int ux, int uy, int dx, int dy, int mode)
                     const char *firstmatch = 0;
 
                     cc.x = x, cc.y = y;
-                    do_screen_description(cc, TRUE, sym, buf, &firstmatch, NULL);
+                    do_screen_description(cc, TRUE, sym, buf, &firstmatch,
+                                          NULL);
                     if (!strcmp(firstmatch, "stone"))
                         Sprintf(buf, "solid stone");
                     else
@@ -954,7 +952,8 @@ test_move(int ux, int uy, int dx, int dy, int mode)
                     if (flags.autoopen && !g.context.run
                         && !Confusion && !Stunned && !Fumbling) {
                         g.context.door_opened
-                            = g.context.move = (doopen_indir(x, y) == ECMD_TIME ? 1 : 0);
+                        = g.context.move
+                          = (doopen_indir(x, y) == ECMD_TIME ? 1 : 0);
                     } else if (x == ux || y == uy) {
                         if (Blind || Stunned || ACURR(A_DEX) < 10
                             || Fumbling) {
@@ -1244,7 +1243,8 @@ findtravelpath(int mode)
                                     if (visited)
                                         You("stop, unsure which way to go.");
                                     else
-                                        iflags.travelcc.x = iflags.travelcc.y = 0;
+                                        iflags.travelcc.x
+                                        = iflags.travelcc.y = 0;
                                 }
                                 selection_setpoint(u.ux, u.uy, g.travelmap, 1);
                                 return TRUE;
@@ -1379,8 +1379,9 @@ is_valid_travelpt(int x, int y)
    return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
-trapmove(int x, int y,       /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
-         struct trap *desttrap) /* nonnull if another trap at <x,y> */
+trapmove(
+    int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    struct trap *desttrap) /* nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
     const char *predicament, *culprit;
@@ -1615,7 +1616,8 @@ swim_move_danger(xchar x, xchar y)
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
                 if (!g.context.swim_tip) {
-                    pline("(Use '%s' prefix to step in if you really want to.)",
+                    pline(
+                        "(Use '%s' prefix to step in if you really want to.)",
                           visctrl(cmd_from_func(do_reqmenu)));
                     g.context.swim_tip = TRUE;
                 }
@@ -3222,13 +3224,14 @@ dopickup(void)
     g.multi = 0; /* always reset */
 
     if ((ret = pickup_checks()) >= 0) {
-        return (ret ? ECMD_TIME : ECMD_OK);
+        return ret ? ECMD_TIME : ECMD_OK;
     } else if (ret == -2) {
         tmpcount = -count;
-        return (loot_mon(u.ustuck, &tmpcount, (boolean *) 0) ? ECMD_TIME : ECMD_OK);
+        return loot_mon(u.ustuck, &tmpcount, (boolean *) 0) ? ECMD_TIME
+                                                            : ECMD_OK;
     } /* else ret == -1 */
 
-    return (pickup(-count) ? ECMD_TIME : ECMD_OK);
+    return pickup(-count) ? ECMD_TIME : ECMD_OK;
 }
 
 /* stop running if we see something interesting next to us */
@@ -3273,7 +3276,8 @@ lookaround(void)
                 if ((g.context.run != 1 && !is_safemon(mtmp))
                     || (infront && !g.context.travel)) {
                     if (flags.mention_walls)
-                        pline("%s blocks your path.", upstart(a_monnam(mtmp)));
+                        pline("%s blocks your path.",
+                              upstart(a_monnam(mtmp)));
                     goto stop;
                 }
             }
@@ -3313,13 +3317,13 @@ lookaround(void)
                         /* ignore if not on or directly adjacent to it */
                         if (i > 2)
                             continue;
-                        /* x,y is (adjacent to) the location we're moving to */
-                        /* if we've seen one corridor, and x,y is not directly
+                        /* x,y is (adjacent to) the location we're moving to;
+                           if we've seen one corridor, and x,y is not directly
                            orthogonally next to it, mark noturn */
                         if (corrct == 1 && dist2(x, y, x0, y0) != 1)
                             noturn = 1;
-                        /* if previous x,y was diagonal, now x,y is orthogonal */
-                        /* (or this is the first time we're here) */
+                        /* if previous x,y was diagonal, now x,y is
+                           orthogonal (or this is first time we're here) */
                         if (i < i0) {
                             i0 = i;
                             x0 = x;
@@ -3362,7 +3366,8 @@ lookaround(void)
         goto stop;
     }
     if ((g.context.run == 1 || g.context.run == 3 || g.context.run == 8)
-        && !noturn && !m0 && i0 && (corrct == 1 || (corrct == 2 && i0 == 1))) {
+        && !noturn && !m0 && i0
+        && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */
         if (i0 == 2) {
             if (u.dx == y0 - u.uy && u.dy == u.ux - x0)
