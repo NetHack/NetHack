@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1654899519 2022/06/10 22:18:39 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.571 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655114986 2022/06/13 10:09:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.572 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -151,7 +151,7 @@ static void reset_cmd_vars(boolean);
 static void mcmd_addmenu(winid, int, const char *);
 static char here_cmd_menu(void);
 static char there_cmd_menu(int, int, int);
-static void act_on_act(int, int, int, int, int, int);
+static void act_on_act(int, int, int);
 static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
@@ -490,9 +490,9 @@ doextcmd(void)
 
 /* format extended command flags for display */
 static char *
-doc_extcmd_flagstr(winid menuwin,
-                   /* if Null, add a footnote to the menu */
-                   const struct ext_func_tab *efp)
+doc_extcmd_flagstr(
+    winid menuwin,
+    const struct ext_func_tab *efp) /* if Null, add a footnote to the menu */
 {
     static char Abuf[10]; /* 5 would suffice: {'[','m','A',']','\0'} */
 
@@ -4459,9 +4459,10 @@ show_direction_keys(
    an invalid direction after a prefix key ('F', 'g', 'm', &c), which
    might be bogus but could be up, down, or self when not applicable */
 static boolean
-help_dir(char sym,
-         int spkey, /* NHKF_ code for prefix key, if used, or for ESC */
-         const char *msg)
+help_dir(
+    char sym,
+    int spkey, /* NHKF_ code for prefix key, if used, or for ESC */
+    const char *msg)
 {
     static const char wiz_only_list[] = "EFGIVW";
     char ctrl;
@@ -4905,15 +4906,19 @@ there_cmd_menu_common(
     return K;
 }
 
+/* queue up command(s) to perform #therecmdmenu action */
 static void
-act_on_act(int act, int x, int y, int dx, int dy, int dir)
+act_on_act(
+    int act,        /* action */
+    int dx, int dy) /* delta to adjacent spot (except for couple of cases) */
 {
     struct obj *otmp;
+    int dir;
 
     switch (act) {
     case MCMD_TRAVEL:
-        iflags.travelcc.x = u.tx = x;
-        iflags.travelcc.y = u.ty = y;
+        iflags.travelcc.x = u.tx = dx; /* caller passed x via dx */
+        iflags.travelcc.y = u.ty = dy; /* and y via dy           */
         cmdq_add_ec(dotravel_target);
         break;
     case MCMD_THROW_OBJ:
@@ -4962,7 +4967,8 @@ act_on_act(int act, int x, int y, int dx, int dy, int dir)
         cmdq_add_dir(dx, dy, 0);
         break;
     case MCMD_MOVE_DIR:
-        cmdq_add_ec(move_funcs[xytod(dx, dy)][MV_WALK]);
+        dir = xytod(dx, dy);
+        cmdq_add_ec(move_funcs[dir][MV_WALK]);
         break;
     case MCMD_RIDE:
         cmdq_add_ec(doride);
@@ -4983,6 +4989,7 @@ act_on_act(int act, int x, int y, int dx, int dy, int dir)
         }
         break;
     case MCMD_ATTACK_NEXT2U:
+        dir = xytod(dx, dy);
         cmdq_add_ec(move_funcs[dir][MV_WALK]);
         break;
     case MCMD_TALK:
@@ -5041,8 +5048,8 @@ act_on_act(int act, int x, int y, int dx, int dy, int dir)
         cmdq_add_ec(dolook);
         break;
     case MCMD_LOOK_AT:
-        g.clicklook_cc.x = x;
-        g.clicklook_cc.y = y;
+        g.clicklook_cc.x = dx; /* caller passed x via dx */
+        g.clicklook_cc.y = dy; /* and y via dy           */
         cmdq_add_ec(doclicklook);
         break;
     case MCMD_UNTRAP_HERE:
@@ -5056,9 +5063,12 @@ act_on_act(int act, int x, int y, int dx, int dy, int dir)
     case MCMD_CAST_SPELL:
         cmdq_add_ec(docast);
         break;
-    default: break;
+    default:
+        break;
     }
 }
+
+#define act_needs_xy(act) ((act) == MCMD_TRAVEL || (act) == MCMD_LOOK_AT)
 
 /* offer choice of actions to perform at adjacent location <x,y> */
 static char
@@ -5069,7 +5079,6 @@ there_cmd_menu(int x, int y, int mod)
     int npick = 0, K = 0;
     menu_item *picks = (menu_item *) 0;
     int dx = sgn(x - u.ux), dy = sgn(y - u.uy);
-    int dir = xytod(dx, dy);
     int act = MCMD_NOTHING;
 
     win = create_nhwindow(NHW_MENU);
@@ -5085,18 +5094,22 @@ there_cmd_menu(int x, int y, int mod)
 
     if (!K) {
         /* no menu options, try to move */
-        if (next2u(x, y) && !test_move(u.ux, u.uy, dx, dy, TEST_MOVE))
+        if (next2u(x, y) && !test_move(u.ux, u.uy, dx, dy, TEST_MOVE)) {
+            int dir = xytod(dx, dy);
+
             cmdq_add_ec(move_funcs[dir][MV_WALK]);
-        else if (flags.travelcmd) {
+        } else if (flags.travelcmd) {
             iflags.travelcc.x = u.tx = x;
             iflags.travelcc.y = u.ty = y;
             cmdq_add_ec(dotravel_target);
         }
         npick = 0;
         ch = '\0';
-    } else if ((K == 1) && (act != MCMD_NOTHING)) {
+    } else if (K == 1 && act != MCMD_NOTHING) {
         destroy_nhwindow(win);
-        act_on_act(act, x, y, dx, dy, dir);
+        if (act_needs_xy(act))
+            dx = x, dy = y;
+        act_on_act(act, dx, dy);
         return '\0';
     } else {
         end_menu(win, "What do you want to do?");
@@ -5106,14 +5119,18 @@ there_cmd_menu(int x, int y, int mod)
     destroy_nhwindow(win);
     if (npick > 0) {
         act = picks->item.a_int;
-
         free((genericptr_t) picks);
 
-        act_on_act(act, x, y, dx, dy, dir);
+        /* most actions want <dx,dy> but a few want absolute <x,y> */
+        if (act_needs_xy(act))
+            dx = x, dy = y;
+        act_on_act(act, dx, dy);
         return '\0';
     }
     return ch;
 }
+
+#undef act_needs_xy
 
 static char
 here_cmd_menu(void)
