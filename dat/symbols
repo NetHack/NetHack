@@ -611,7 +611,7 @@ start: Enhanced1
 	G_blcorn_sokoban: U+2514/0-0-190
 	G_brcorn_sokoban: U+2518/0-0-190
 	G_crwall_sokoban: U+253C/0-0-190
-	G_tuwall_sokoban: U+2500/0-0-190
+	G_tuwall_sokoban: U+2534/0-0-190
 	G_tdwall_sokoban: U+252C/0-0-190
 	G_tlwall_sokoban: U+2524/0-0-190
 	G_trwall_sokoban: U+251C/0-0-190
@@ -622,7 +622,7 @@ start: Enhanced1
 	G_blcorn_gehennom: U+2514/190-0-0
 	G_brcorn_gehennom: U+2518/190-0-0
 	G_crwall_gehennom: U+253C/190-0-0
-	G_tuwall_gehennom: U+2500/190-0-0
+	G_tuwall_gehennom: U+2534/190-0-0
 	G_tdwall_gehennom: U+252C/190-0-0
 	G_tlwall_gehennom: U+2524/190-0-0
 	G_trwall_gehennom: U+251C/190-0-0
@@ -633,7 +633,7 @@ start: Enhanced1
 	G_blcorn_knox: U+2514/150-75-0
 	G_brcorn_knox: U+2518/150-75-0
 	G_crwall_knox: U+253C/150-75-0
-	G_tuwall_knox: U+2500/150-75-0
+	G_tuwall_knox: U+2534/150-75-0
 	G_tdwall_knox: U+252C/150-75-0
 	G_tlwall_knox: U+2524/150-75-0
 	G_trwall_knox: U+251C/150-75-0
@@ -644,7 +644,7 @@ start: Enhanced1
 	G_blcorn_mines: U+2514/113-126-142
 	G_brcorn_mines: U+2518/113-126-142
 	G_crwall_mines: U+253C/113-126-142
-	G_tuwall_mines: U+2500/113-126-142
+	G_tuwall_mines: U+2534/113-126-142
 	G_tdwall_mines: U+252C/113-126-142
 	G_tlwall_mines: U+2524/113-126-142
 	G_trwall_mines: U+251C/113-126-142
