@@ -2405,6 +2405,8 @@ learn_unseen_invent(void)
 void
 update_inventory(void)
 {
+    boolean save_suppress_price;
+
     if (suppress_map_output()) /* despite name, used for perm_invent too */
         return;
 
@@ -2414,8 +2416,21 @@ update_inventory(void)
      * We currently don't skip this call when iflags.perm_invent is False
      * because curses uses that to disable a previous perm_invent window
      * (after toggle via 'O'; perhaps the options code should handle that).
+     *
+     * perm_invent might get updated while some code is avoiding price
+     * feedback during obj name formatting for messages.  Temporarily
+     * force 'normal' formatting during the perm_invent update.  (Cited
+     * example was an update triggered by change in invent gold when
+     * transferring some to shk during itemized billing.  A previous fix
+     * attempt in the shop code handled it for unpaid items but not for
+     * paying for used-up shop items; that follows a different code path.)
      */
+    save_suppress_price = iflags.suppress_price;
+    iflags.suppress_price = FALSE;
+
     (*windowprocs.win_update_inventory)(0);
+
+    iflags.suppress_price = save_suppress_price;
 }
 
 /* the #perminv command - call interface's persistent inventory routine */

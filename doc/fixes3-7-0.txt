@@ -1250,6 +1250,10 @@ after the fix for zombie reviving near hero (which now interrupts hero's
 	it revived on the same turn that eating the corpse would finish
 a wizard's starting equipment was supposed to include a random spellbook of
 	spell level 1 through 3 but it was being foced to be level 1
+earlier fix for prices of unpaid objects going away in persistent inventory
+	display when hero bought something during itemized billing didn't work
+	if paying for a used-up shop item--prices of any unpaid items vanished
+	when inventory got updated to reflect transfer of hero's gold to shk
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
