@@ -134,10 +134,13 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DLIVELOG
 
 ifdef MAKEFILE_SRC
-ifeq "$(USE_CURSESLIB)" "1"
 # default
 CURSESLIB = -lncurses
 ifeq "$(CURSES_UNICODE)" "sys"
+NHCFLAGS+=-DCURSES_UNICODE
+WINLIB += $(CURSESLIB)
+else
+ifeq "$(USE_CURSESLIB)" "1"
 NHCFLAGS+=-DCURSES_UNICODE
 else
 # If CURSES_UNICODE is defined, we need ncursesw.
@@ -158,11 +161,7 @@ else
 $(info Attention: CURSES_UNICODE is not being defined without ncursesw)
 endif   #HAVE_NCURSESW
 endif   #not CURSES_UNICODE=0
-endif   #not CURSES_UNICODE=sys
 endif   #USE_CURSESLIB
-endif   #MAKEFILE_SRC
-
-ifdef MAKEFILE_SRC
 ifneq "$(CURSES_UNICODE)" "0"
 ifdef CURSESLIB
 PKGCFLAGS=
@@ -192,7 +191,10 @@ PKGCFLAGS += $(HOMEBREW_CFLAGS) $(MACPORTS_CFLAGS)
 endif   #CURSESLIB
 else    # CURSES_UNICODE
 WINLIB += $(CURSESLIB)
+$(info WINLIB=$(WINLIB))
+$(info CURSESLIB=$(CURSESLIB))
 endif   #not CURSES_UNICODE=0
+endif   #not CURSES_UNIODE=sys
 endif   #MAKEFILE_SRC
 
 CFLAGS+= $(PKGCFLAGS) $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
