@@ -63,6 +63,7 @@ ifdef WANT_WIN_QT6
 QTDIR :=$(shell brew --prefix)/opt/qt@6
 endif   # WANT_WIN_QT6
 endif   # HAVE_HOMEBREW
+ifndef QTDIR
 ifeq "$(HAVE_MACPORTS)" "1"
 ifdef WANT_WIN_QT5
 # Qt5 installed via macports
@@ -72,6 +73,7 @@ ifdef WANT_WIN_QT6
 QTDIR=/opt/local/libexec/qt6
 endif   # WANT_WIN_QT6
 endif   # HAVE_MACPORTS
+endif   # QTDIR
 endif	# WANT_WIN_QT
 
 ifndef LIBXPM
