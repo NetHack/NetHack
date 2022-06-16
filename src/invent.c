@@ -2405,7 +2405,7 @@ learn_unseen_invent(void)
 void
 update_inventory(void)
 {
-    boolean save_suppress_price;
+    int save_suppress_price;
 
     if (suppress_map_output()) /* despite name, used for perm_invent too */
         return;
@@ -2426,7 +2426,7 @@ update_inventory(void)
      * paying for used-up shop items; that follows a different code path.)
      */
     save_suppress_price = iflags.suppress_price;
-    iflags.suppress_price = FALSE;
+    iflags.suppress_price = 0;
 
     (*windowprocs.win_update_inventory)(0);
 
