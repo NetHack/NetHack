@@ -1,4 +1,4 @@
-/* NetHack 3.7	version.c	$NHDT-Date: 1654069065 2022/06/01 07:37:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.91 $ */
+/* NetHack 3.7	version.c	$NHDT-Date: 1655402415 2022/06/16 18:00:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.92 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -295,11 +295,14 @@ comp_times(long filetime)
 #endif
 
 boolean
-check_version(struct version_info *version_data, const char *filename,
-              boolean complain, unsigned long utdflags)
+check_version(
+    struct version_info *version_data,
+    const char *filename,
+    boolean complain,
+    unsigned long utdflags)
 {
     if (
-#ifdef VERSION_COMPATIBILITY
+#ifdef VERSION_COMPATIBILITY /* patchlevel.h */
         version_data->incarnation < VERSION_COMPATIBILITY
         || version_data->incarnation > nomakedefs.version_number
 #else
@@ -312,18 +315,15 @@ check_version(struct version_info *version_data, const char *filename,
         }
         return FALSE;
     } else if (
-#ifndef IGNORED_FEATURES
-        version_data->feature_set != nomakedefs.version_features
-#else
         (version_data->feature_set & ~nomakedefs.ignored_features)
-            != (VERSION_FEATURES & ~nomakedefs.ignored_features)
-#endif
+            != (nomakedefs.version_features & ~nomakedefs.ignored_features)
         || ((utdflags & UTD_SKIP_SANITY1) == 0
              && version_data->entity_count != nomakedefs.version_sanity1)
         || ((utdflags & UTD_CHECKSIZES) != 0
             && version_data->struct_sizes1 != nomakedefs.version_sanity2)
         || ((utdflags & UTD_CHECKSIZES) != 0
-            && version_data->struct_sizes2 != nomakedefs.version_sanity3)) {
+            && version_data->struct_sizes2 != nomakedefs.version_sanity3)
+        ) {
         if (complain) {
             pline("Configuration incompatibility for file \"%s\".", filename);
             display_nhwindow(WIN_MESSAGE, TRUE);
@@ -390,7 +390,7 @@ void
 store_version(NHFILE *nhfp)
 {
     struct version_info version_data = {
-        0UL,0UL,0UL,0UL,0Ul
+        0UL, 0UL, 0UL, 0UL, 0UL
     };
 
     /* actual version number */
@@ -408,7 +408,7 @@ store_version(NHFILE *nhfp)
         bufoff(nhfp->fd);
         /* bwrite() before bufon() uses plain write() */
         store_formatindicator(nhfp);
-        bwrite(nhfp->fd,(genericptr_t) &version_data,
+        bwrite(nhfp->fd, (genericptr_t) &version_data,
                (unsigned) (sizeof version_data));
         bufon(nhfp->fd);
     }

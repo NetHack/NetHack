@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.949 $ $NHDT-Date: 1655065133 2022/06/12 20:18:53 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.951 $ $NHDT-Date: 1655402422 2022/06/16 18:00:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1254,6 +1254,8 @@ earlier fix for prices of unpaid objects going away in persistent inventory
 	display when hero bought something during itemized billing didn't work
 	if paying for a used-up shop item--prices of any unpaid items vanished
 	when inventory got updated to reflect transfer of hero's gold to shk
+save files created with SCORE_ON_BOTL disabled were erroneously being rejected
+	if the program was rebuilt with it enabled and vice versa
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

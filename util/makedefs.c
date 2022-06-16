@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1645393932 2022/02/20 21:52:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1655402416 2022/06/16 18:00:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -1285,10 +1285,12 @@ do_date(void)
             ul_sfx);
     Fprintf(ofp, "#define VERSION_FEATURES 0x%08lx%s\n", version.feature_set,
             ul_sfx);
-#ifdef MD_IGNORED_FEATURES
-    Fprintf(ofp, "#define IGNORED_FEATURES 0x%08lx%s\n",
-            (unsigned long) MD_IGNORED_FEATURES, ul_sfx);
-#endif
+    {
+        unsigned long ignored_features = md_ignored_features();
+
+        Fprintf(ofp, "#define IGNORED_FEATURES 0x%08lx%s\n",
+                ignored_features, ul_sfx);
+    }
     Fprintf(ofp, "#define VERSION_SANITY1 0x%08lx%s\n", version.entity_count,
             ul_sfx);
 #ifndef __EMSCRIPTEN__

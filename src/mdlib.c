@@ -1,4 +1,4 @@
-/* NetHack 3.7  mdlib.c  $NHDT-Date: 1644524060 2022/02/10 20:14:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.27 $ */
+/* NetHack 3.7  mdlib.c  $NHDT-Date: 1655402414 2022/06/16 18:00:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -53,6 +53,7 @@
 /* REPRODUCIBLE_BUILD will change this to TRUE */
 static boolean date_via_env = FALSE;
 
+extern unsigned long md_ignored_features(void);
 char *mdlib_version_string(char *, const char *);
 char *version_id_string(char *, int, const char *);
 char *bannerc_string(char *, int, const char *);
@@ -169,13 +170,15 @@ static struct win_info window_opts[] = {
  * That check is done in src/restore.c now.
  *
  */
-#ifndef MD_IGNORED_FEATURES
-#define MD_IGNORED_FEATURES              \
-    (0L | (1L << 19) /* SCORE_ON_BOTL */ \
-     | (1L << 27)    /* ZEROCOMP */      \
-     | (1L << 28)    /* RLECOMP */       \
-     )
-#endif /* MD_IGNORED_FEATUES */
+unsigned long
+md_ignored_features(void)
+{
+    return (0UL
+            | (1UL << 19) /* SCORE_ON_BOTL */
+            | (1UL << 27) /* ZEROCOMP */
+            | (1UL << 28) /* RLECOMP */
+            );
+}
 
 static void
 make_version(void)
@@ -454,6 +457,9 @@ static const char *const build_opts[] = {
     "data librarian with a version-dependent name",
 #endif
 #endif
+#ifdef EDIT_GETLIN
+    "edit getlin - some prompts remember previous response",
+#endif
 #ifdef DUMPLOG
     "end-of-game dumplogs",
 #endif
@@ -473,6 +479,9 @@ static const char *const build_opts[] = {
 #ifdef INSURANCE
     "insurance files for recovering from crashes",
 #endif
+#ifdef LIVELOG
+    "live logging support",
+#endif
 #ifdef LOGFILE
     "log file",
 #endif
@@ -484,6 +493,9 @@ static const char *const build_opts[] = {
 #endif
 #ifdef MAIL
     "mail daemon",
+#endif
+#ifdef MONITOR_HEAP
+    "monitor heap - record memory usage for later analysis",
 #endif
 #if defined(GNUDOS) || defined(__DJGPP__)
     "MSDOS protected mode",
