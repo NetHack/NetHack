@@ -3140,8 +3140,9 @@ lesshungry(int num)
             } else {
                 g.context.victual.fullwarn = TRUE;
                 if (g.context.victual.canchoke
-                    && g.context.victual.reqtime > 1) {
-                    /* a one-gulp food will not survive a stop */
+                    && (g.context.victual.reqtime
+                        - g.context.victual.usedtime) > 1) {
+                    /* food with one bite left will not survive a stop */
                     if (!paranoid_query(ParanoidEating, "Continue eating?")) {
                         reset_eat();
                         g.nomovemsg = (char *) 0;
