@@ -35,7 +35,7 @@ strategy:
       toolchainName: clang
       buildTargetName: all
     mac_monterey_clang13_all:
-      imageName: 'macOS-12.4'
+      imageName: 'macOS-12'
       toolchainName: clang
       buildTargetName: all
     windows-visualstudio:
