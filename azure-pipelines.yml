@@ -16,6 +16,10 @@ strategy:
       imageName: 'ubuntu-20.04'
       toolchainName: gcc10
       buildTargetName: all
+    linux_jammy_gcc11_all:
+      imageName: 'ubuntu-22.04'
+      toolchainName: gcc11
+      buildTargetName: all
     linux_bionic_gcc7_all:
       imageName: 'ubuntu-18.04'
       toolchainName: gcc7
@@ -75,6 +79,11 @@ steps:
     then
       echo "##vso[task.setvariable variable=CC]gcc-10"
       echo "##vso[task.setvariable variable=CXX]g++-10"
+    fi
+    if [ "$(toolchain)" == "gcc11" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-11"
+      echo "##vso[task.setvariable variable=CXX]g++-11"
     fi
     if [ "$(toolchain)" == "clang" ]
     then
