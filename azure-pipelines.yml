@@ -34,6 +34,10 @@ strategy:
       imageName: 'macOS-10.15'
       toolchainName: clang
       buildTargetName: all
+    mac_monterey_clang13_all:
+      imageName: 'macOS-12.4'
+      toolchainName: clang
+      buildTargetName: all
     windows-visualstudio:
       imageName: 'windows-2019'
       toolchainName: vs
