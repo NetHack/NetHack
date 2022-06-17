@@ -30,11 +30,15 @@ strategy:
 #      ccName: gcc-8
 #      cxxName: g++-8
 #      buildSetting: 'all'
-    mac_catalina_clang_all:
+    macOS_catalina_clang_all:
       imageName: 'macOS-10.15'
       toolchainName: clang
       buildTargetName: all
-    mac_monterey_clang13_all:
+    macOS_latest_clang_all:
+      imageName: 'macOS-latest'
+      toolchainName: clang
+      buildTargetName: all
+    macOS_monterey_clang13_all:
       imageName: 'macOS-12'
       toolchainName: clang
       buildTargetName: all
