@@ -129,6 +129,12 @@ steps:
     command: 'restore'
     restoreSolution: '$(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln'
     feedsToUse: 'select'
+- task: DotNetCoreCLI@2
+  displayName: 'Push'
+  inputs:
+    command: 'push'
+    packagesToPush:'$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    allowPackageConflicts: true
 
 - task: MSBuild@1
   inputs:
