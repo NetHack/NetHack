@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.951 $ $NHDT-Date: 1655402422 2022/06/16 18:00:22 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.952 $ $NHDT-Date: 1655503067 2022/06/17 21:57:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1227,6 +1227,8 @@ revised monster teleportation message handling caused magic whistle to be
 	changed to not operate on pets that were already adjacent; change back
 revised monster teleportation message handling could produce duplicate message
 	when shopkeeper who left shop got returned to it
+revised magic whistle produced message sequencing issues when summoned pet
+	arrived on a trap, particularly if killed or sent away or shape changed
 recent changes in removing a dead monster from the map didn't update screen
 	to show objects it dropped; they were present, just not displayed
 further changes resulted in dead monsters' corpses be placed at <0,0>;

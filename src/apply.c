@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1652223183 2022/05/10 22:53:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.375 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1655503068 2022/06/17 21:57:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.378 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -492,11 +492,13 @@ static void
 magic_whistled(struct obj *obj)
 {
     struct monst *mtmp, *nextmon;
+    struct permonst *optr;
     char buf[BUFSZ], *mnam = 0,
          shiftbuf[BUFSZ + sizeof "shifts location"],
          appearbuf[BUFSZ + sizeof "appears"],
          disappearbuf[BUFSZ + sizeof "disappears"];
-    boolean oseen, already_discovered = objects[obj->otyp].oc_name_known != 0;
+    boolean oseen, nseen,
+            already_discovered = objects[obj->otyp].oc_name_known != 0;
     int omx, omy, shift = 0, appear = 0, disappear = 0;
 
     /* need to copy (up to 3) names as they're collected rather than just
@@ -519,7 +521,7 @@ magic_whistled(struct obj *obj)
             fill_pit(mtmp->mx, mtmp->my);
         }
 
-        oseen = canspotmon(mtmp);
+        oseen = canspotmon(mtmp); /* old 'seen' status */
         if (oseen) /* get name in case it's one we'll remember */
             mnam = y_monnam(mtmp); /* before mnexto(); it might disappear */
         /* mimic must be revealed before we know whether it
@@ -527,11 +529,36 @@ magic_whistled(struct obj *obj)
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         omx = mtmp->mx, omy = mtmp->my;
+        optr = mtmp->data;
         mnexto(mtmp, !already_discovered ? RLOC_MSG : RLOC_NONE);
+
         if (mtmp->mx != omx || mtmp->my != omy) {
             mtmp->mundetected = 0; /* reveal non-mimic hider iff it moved */
+            /*
+             * FIXME:
+             *  All relocated monsters should change positions essentially
+             *  simultaneously but we're dealing with them sequentially.
+             *  That could kill some off in the process, each time leaving
+             *  their target position (which should be occupied at least
+             *  momentarily) available as a potential death trap for others.
+             *
+             *  Also, teleporting onto a trap introduces message sequencing
+             *  issues.  We try to avoid the most obvious non sequiturs by
+             *  checking whether pline() got called during mintrap().
+             *  iflags.last_msg will be changed from the value we set here
+             *  to PLNMSG_UNKNOWN in that situation.
+             */
+            iflags.last_msg = PLNMSG_enum; /* not a specific message */
+            if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
+                change_luck(-1);
+            if (iflags.last_msg != PLNMSG_enum)
+                continue;
+            /* dying while seen would have issued a message and not get here;
+               being sent to an unseen location and dying there should be
+               included in the disappeared case */
+            nseen = DEADMONSTER(mtmp) ? FALSE : canspotmon(mtmp);
 
-            if (canspotmon(mtmp)) {
+            if (nseen) {
                 mnam = y_monnam(mtmp);
                 if (oseen) {
                     if (++shift == 1)
@@ -544,16 +571,6 @@ magic_whistled(struct obj *obj)
                 if (++disappear == 1)
                     Sprintf(disappearbuf, "%s disappears", mnam);
             }
-            /*
-             * FIXME:
-             *  All relocated monsters should change positions essentially
-             *  simultaneously but we're dealing with them sequentially.
-             *  That could kill some off in the process, each time leaving
-             *  their target position (which should be occupied at least
-             *  momentarily) available as a potential death trap for others.
-             */
-            if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
-                change_luck(-1);
         }
     }
 
