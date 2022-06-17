@@ -474,8 +474,14 @@ Movement~modifiers:
 
 %.lp ""
 Other conditions and modifiers exist, but there isn't enough room to
-display them with the other status fields.  The `{\tt \^{}X}' command shows
-all relevant status conditions.
+display them with the other status fields.
+\\
+% unindented paragraph
+The {\tt \#doattributes} command (default key {\tt \^{}X} will show
+all current status information in unabbreviated format.
+It also shows other information which might be included on the status
+lines if those had more room.
+
 \elist
 
 %.hn 2
@@ -758,30 +764,43 @@ used with the ``{\tt \#teleport}'' and ``{\tt \#wizlevelport}'' commands.
 \item[\tb{F[yuhjklbn]}]
 Prefix:  fight a monster (even if you only guess one is there).
 %.lp
-\item[\tb{M[yuhjklbn]}]
-Prefix:  Move far, no pickup.
-%.lp
 \item[\tb{g[yuhjklbn]}]
 Prefix:  Move until something interesting is found.
 %.lp
-\item[\tb{G[yuhjklbn] {\rm or} <CONTROL->[yuhjklbn]}]
-Prefix:  Same as `{\tt g}', but forking of corridors is not considered
+\item[\tb{G[yuhjklbn] {\rm or} <Control>+[yuhjklbn]}]
+Prefix:  Similar to `{\tt g}', but forking of corridors is not considered
 interesting.
+\\
+Note:  <Control>+<key> means using the holding the <Control> or <Ctrl> key
+down like <Shift> while typing and releasing <key>, then releasing <Control>.
+Control characters are case-insensitive so {\tt \^{}x} and {\tt \^{}X}
+are the same.
+%.lp
+\item[\tb(M<direction>}]
+Old versions supported `{\tt M}' as a movement prefix which
+combined the effect of `{\tt m}' with {\tt <Control>}+<direction>.
+That is no longer supported as a prefix but similar effect can be achieved
+by using {\tt m} and {\tt G}+<direction> in combination.
+{\tt m} can also be used in combination with {\tt g}+<direction>,
+{\tt <Control>}+<direction>, or {\tt <Shift>}+<direction>.
 %.lp
 \item[\tb{_}]
 Travel to a map location via a shortest-path algorithm.\\
 %.lp ""
 The shortest path
 is computed over map locations the hero knows about (e.g. seen or
-previously traversed).  If there is no known path, a guess is made instead.
+previously traversed).
+If there is no known path, a guess is made instead.
 Stops on most of
 the same conditions as the `G' command, but without picking up
-objects, similar to the `M' command.  For ports with mouse
+objects, so implicitly forces the `m' prefix.
+For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 %.lp
 \item[\tb{.}]
-Wait or rest, do nothing for one turn. Precede with the `{\tt m}' prefix
+Wait or rest, do nothing for one turn.
+Precede with the `{\tt m}' prefix
 to wait for a turn even next to a hostile monster, if {\it safe\verb+_+wait\/}
 is on.
 %.lp
@@ -789,7 +808,8 @@ is on.
 Apply (use) a tool (pick-axe, key, lamp \ldots).\\
 %.lp ""
 If used on a wand, that wand will be broken, releasing its magic in the
-process.  Confirmation is required.
+process.
+Confirmation is required.
 %.lp
 \item[\tb{A}]
 Remove one or more worn items, such as armor.\\

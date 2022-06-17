@@ -134,7 +134,7 @@ tiled_map      show map as tiles, forces ascii_map Off; Qt, X11
 Boolean options available when running in debug mode (aka wizard mode):
 menu_tab_sep   menu formatting--do not touch
 monpolycontrol have player choose shape-changing monsters' new shapes
-travel_debug   not implemented?
+travel_debug   show state of travel pathfindinging algorithm on the map
 wizweight      include item weights in inventory display
 
 Any Boolean option can be set to True by including it among options being

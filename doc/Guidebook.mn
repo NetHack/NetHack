@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.463 $ $NHDT-Date: 1655161563 2022/06/13 23:06:03 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ $NHDT-Date: 1655461129 2022/06/17 10:18:49 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\" Guidebook.mn currently does *not* fully adhere to these guidelines.
@@ -415,7 +415,13 @@ Movement modifiers:
 .lp ""
 Other conditions and modifiers exist, but there isn't enough room to
 display them with the other status fields.
-The \(oq\(haX\(cq command shows all relevant status conditions.
+.pg
+.in -5n .\" outdent this paragraph
+The \f(CR#doattributes\fP command (default key \f(CR\(haX\fP) will show
+all current status information in unabbreviated format.
+It also shows other information which might be included on the status
+lines if those had more room.
+.in 0 .\" reset indentation
 .hn 2
 The message line (top)
 .pg
@@ -662,13 +668,22 @@ In debug mode (aka \(lqwizard mode\(rq), the \(oqm\(cq prefix may also be
 used with the \(lq#teleport\(rq and \(lq#wizlevelport\(rq commands.
 .lp F[yuhjklbn]
 Prefix:  fight a monster (even if you only guess one is there).
-.lp M[yuhjklbn]
-Prefix:  move far, no pickup.
 .lp "g[yuhjklbn]"
 Prefix:  move until something interesting is found.
-.lp "G[yuhjklbn] or <CONTROL->[yuhjklbn]"
-Prefix:  same as \(oqg\(cq, but forking of corridors is not considered
+.lp "G[yuhjklbn] or <Control>[yuhjklbn]"
+Prefix:  similar to \(oqg\(cq, but forking of corridors is not considered
 interesting.
+.lp ""
+Note:  <Control>+<key> means using the holding the <Control> or <Ctrl> key
+down like <Shift> while typing and releasing <key>, then releasing <Control>.
+Control characters are case-insensitive so \(hax and \(haX are the same.
+.lp "M<direction>"
+Old versions supported \(oq\f(CRM\fP\(cq as a movement prefix which
+combined the effect of \(oq\f(CRm\fP\(cq with \f(CR<Control>\fP+<direction>.
+That is no longer supported as a prefix but similar effect can be achieved
+by using \f(CRm\fP and \f(CRG\fP+<direction> in combination.
+\f(CRm\fP can also be used in combination with \f(CRg\fP+<direction>,
+\f(CR<Control>\fP+<direction>, or \f(CR<Shift>\fP+<direction>.
 .lp _
 Travel to a map location via a shortest-path algorithm.
 .lp ""
@@ -677,13 +692,14 @@ is computed over map locations the hero knows about (e.g. seen or
 previously traversed).
 If there is no known path, a guess is made instead.
 Stops on most of
-the same conditions as the \(oqG\(cq command, but without picking up
-objects, similar to the \(oqM\(cq command.
+the same conditions as the \f(CRG\fP prefix, but without picking up
+objects, so implicitly forces the \f(CRm\fP prefix.
 For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
 .lp .
-Wait or rest, do nothing for one turn. Precede with the \(oqm\(cq prefix
+Wait or rest, do nothing for one turn.
+Precede with the \(oqm\(cq prefix
 to wait for a turn even next to a hostile monster, if
 .op safe_wait
 is on.
@@ -691,7 +707,8 @@ is on.
 Apply (use) a tool (pick-axe, key, lamp...).
 .lp ""
 If used on a wand, that wand will be broken, releasing its magic in the
-process.  Confirmation is required.
+process.
+Confirmation is required.
 .lp A
 Remove one or more worn items, such as armor.
 .lp ""
