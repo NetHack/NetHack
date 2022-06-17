@@ -124,23 +124,6 @@ steps:
   condition: eq( variables.toolchain, 'vs' )
   displayName: 'Copying store key'
 
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln'
-    feedsToUse: 'select'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Push'
-  inputs:
-    command: 'push'
-    packagesToPush:'$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'internal'
-    feedsToUse: 'select'
-    vstsFeed: 'your feed'
-    publishVstsFeed: 'your feed'
-    allowPackageConflicts: true
-
 - task: MSBuild@1
   inputs:
     solution: $(Agent.BuildDirectory)/$(netHackPath)/sys/windows/vs/NetHack.sln
