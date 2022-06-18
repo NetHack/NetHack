@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655161561 2022/06/13 23:06:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.576 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655513914 2022/06/18 00:58:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.577 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -155,7 +155,7 @@ static void act_on_act(int, int, int);
 static char readchar_core(int *, int *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
-static boolean help_dir(char, int, const char *);
+static boolean help_dir(char, uchar, const char *);
 
 static boolean bind_key_fn(uchar, int (*)(void));
 static void commands_init(void);
@@ -4081,7 +4081,6 @@ void
 rhack(char *cmd)
 {
     char queuedkeystroke[2];
-    int spkey = NHKF_ESC;
     boolean bad_command, firsttime = (cmd == 0);
     struct _cmd_queue cq, *cmdq = NULL;
     const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
@@ -4142,17 +4141,31 @@ rhack(char *cmd)
             } else if (prefix_seen && !(tlist->flags & PREFIXCMD)
                        && !(tlist->flags & (was_m_prefix ? CMD_M_PREFIX
                                                          : CMD_gGF_PREFIX))) {
-                /* got prefix previously but this command doesn't accept one */
                 char pfxidx = cmd_from_func(prefix_seen->ef_funct);
                 const char *which = (pfxidx != 0) ? visctrl(pfxidx)
                                     : (prefix_seen->ef_funct == do_reqmenu)
                                       ? "move-no-pickup or request-menu"
                                       : prefix_seen->ef_txt;
 
-                pline("The %s command does not accept '%s' prefix.",
-                      tlist->ef_txt, which);
-                reset_cmd_vars(TRUE);
-                res = ECMD_OK;
+                /*
+                 * We got a prefix previously and looped for another
+                 * command instead of returning, but the command we got
+                 * doesn't accept a prefix.  The feedback here supersedes
+                 * the former call to help_dir() (for 'bad_command' below).
+                 */
+                if (was_m_prefix) {
+                    pline("The %s command does not accept '%s' prefix.",
+                          tlist->ef_txt, which);
+                } else {
+                    uchar key = tlist->key;
+                    boolean up = (key == '<' || tlist->ef_funct == doup),
+                            down = (key == '>' || tlist->ef_funct == dodown);
+
+                    pline(
+                  "The '%s' prefix should be followed by a movement command%s.",
+                          which, (up || down) ? " other than up or down" : "");
+                }
+                res = ECMD_FAIL;
                 prefix_seen = 0;
                 was_m_prefix = FALSE;
             } else {
@@ -4244,8 +4257,14 @@ rhack(char *cmd)
         expcmd[0] = '\0';
         while ((c = *cmd++) != '\0')
             Strcat(expcmd, visctrl(c)); /* add 1..4 chars plus terminator */
-
-        if (!prefix_seen || !help_dir(c1, spkey, "Invalid direction key!"))
+#if 1
+        nhUse(c1);
+#else
+        /* note: since prefix keys became actual commnads, we can no longer get
+           here with 'prefix_seen' set so this never calls help_dir() anymore */
+        if (!prefix_seen
+            || !help_dir(c1, prefix_seen->key, "Invalid direction key!"))
+#endif
             Norep("Unknown command '%s'.", expcmd);
         cmdq_clear();
         savech(0); /* clear do-again queue */
@@ -4477,9 +4496,9 @@ getdir(const char *s)
             help_requested = (dirsym == g.Cmd.spkeys[NHKF_GETDIR_HELP]);
             if (help_requested || iflags.cmdassist) {
                 did_help = help_dir((s && *s == '^') ? dirsym : '\0',
-                                    NHKF_ESC,
+                                    g.Cmd.spkeys[NHKF_ESC],
                                     help_requested ? (const char *) 0
-                                                  : "Invalid direction key!");
+                                                   : "Invalid direction key!");
                 if (help_requested)
                     goto retry;
             }
@@ -4548,7 +4567,7 @@ show_direction_keys(
 static boolean
 help_dir(
     char sym,
-    int spkey, /* NHKF_ code for prefix key, if used, or for ESC */
+    uchar spkey, /* actual key; either prefix or ESC */
     const char *msg)
 {
     static const char wiz_only_list[] = "EFGIVW";
@@ -4559,8 +4578,8 @@ help_dir(
     boolean prefixhandling, viawindow;
 
     /* NHKF_ESC indicates that player asked for help at getdir prompt */
-    viawindow = (spkey == NHKF_ESC || iflags.cmdassist);
-    prefixhandling = (spkey != NHKF_ESC);
+    viawindow = (spkey == g.Cmd.spkeys[NHKF_ESC] || iflags.cmdassist);
+    prefixhandling = (spkey != g.Cmd.spkeys[NHKF_ESC]);
     /*
      * Handling for prefix keys that don't want special directions.
      * Delivered via pline if 'cmdassist' is off, or instead of the
@@ -4570,6 +4589,9 @@ help_dir(
     how = " at"; /* for "<action> at yourself"; not used for up/down */
 
     buf[0] = '\0';
+#if 0   /* Since prefix keys got 'promoted' to commands, feedback for
+         * invalid prefix is done in rhack() these days.
+         */
     /* for movement prefix followed by '.' or (numpad && 's') to mean 'self';
        note: '-' for hands (inventory form of 'self') is not handled here */
     if (prefixhandling
@@ -4590,13 +4612,16 @@ help_dir(
         if (prefixhandling) {
             if (!*buf)
                 Sprintf(buf, "Invalid direction for '%s' prefix.",
-                        visctrl(g.Cmd.spkeys[spkey]));
+                        visctrl(spkey));
             pline("%s", buf);
             return TRUE;
         }
         /* when 'cmdassist' is off and caller doesn't insist, do nothing */
         return FALSE;
     }
+#else
+    nhUse(prefixhandling);
+#endif
 
     win = create_nhwindow(NHW_TEXT);
     if (!win)
