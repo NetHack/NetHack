@@ -52,6 +52,7 @@ strategy:
       imageName: 'ubuntu-22.04'
       toolchainName: docs
       buildTargetName: all
+      continueOnError: true
 
 pool:
   vmImage: $(imageName)
@@ -251,8 +252,7 @@ steps:
     sudo apt-get install texlive
     make Guidebook
     make Guidebook.txt
-    pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
-    pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
+    make Guidebook.pdf
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'docs'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building NetHack documentation'
