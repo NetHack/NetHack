@@ -128,7 +128,8 @@ clean:
 	-rm -f Guidebook.aux Guidebook.log $(DOC_EXTRAS)
 
 spotless: clean
-	-rm -f Guidebook Guidebook.dat Guidebook.ps Guidebook.dvi
+	-rm -f Guidebook Guidebook.dat Guidebook.ps \
+		Guidebook.dvi $(DOC_SPOTLESS_EXTRAS)
 
 maintainer-clean: spotless
 	-rm -f $(DISTRIB)

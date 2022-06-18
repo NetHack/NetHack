@@ -6,5 +6,9 @@ Guidebook.dated.mn: $(GUIDEBOOK_MN_SRC)
 Guidebook.dated.tex: $(GUIDEBOOK_TEX_SRC)
 	@awk 'f{$$0="\\date{$(GB_DATESTAMP)}";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_TEX_SRC) > $@
 endif   # GB_DATESTAMP
+
+Guidebook.pdf: Guidebook.dated.tex
+	pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
+	pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
 endif   # MAKEFILE_DOC
 #

@@ -157,6 +157,9 @@ Guidebook:
 Guidebook.txt:
 	( cd doc ; $(MAKE) Guidebook.txt )
 
+Guidebook.pdf:
+	( cd doc ; $(MAKE) Guidebook.pdf )
+
 manpages:
 	( cd doc ; $(MAKE) manpages )
 

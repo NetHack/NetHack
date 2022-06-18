@@ -11,6 +11,7 @@ ifneq "$(GB_DATESTAMP)" ""
 DOC_EXTRAS += Guidebook.dated.mn Guidebook.dated.tex
 override GUIDEBOOK_MN = Guidebook.dated.mn
 override GUIDEBOOK_TEX = Guidebook.dated.tex
+DOC_SPOTLESS_EXTRAS += Guidebook.pdf
 endif   # GB_DATESTAMP
 endif   # GIT=0 explicitly
 endif   # MAKEFILE_DOC

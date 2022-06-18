@@ -577,7 +577,7 @@ A boulder or statue.
 \item[\tb{0}]
 An iron ball.
 %.lp
-\item[\tb{_}]
+\item[\tb{\verb+_+}]
 An altar, or an iron chain.
 %.lp
 \item[\tb{\{}]
@@ -776,7 +776,7 @@ down like <Shift> while typing and releasing <key>, then releasing <Control>.
 Control characters are case-insensitive so {\tt \^{}x} and {\tt \^{}X}
 are the same.
 %.lp
-\item[\tb(M<direction>}]
+\item[\tb{M<direction>}]
 Old versions supported `{\tt M}' as a movement prefix which
 combined the effect of `{\tt m}' with {\tt <Control>}+<direction>.
 That is no longer supported as a prefix but similar effect can be achieved
@@ -784,7 +784,7 @@ by using {\tt m} and {\tt G}+<direction> in combination.
 {\tt m} can also be used in combination with {\tt g}+<direction>,
 {\tt <Control>}+<direction>, or {\tt <Shift>}+<direction>.
 %.lp
-\item[\tb{_}]
+\item[\tb{\tt \verb+_+}]
 Travel to a map location via a shortest-path algorithm.\\
 %.lp ""
 The shortest path
@@ -1230,7 +1230,7 @@ May be preceded by `{\tt m}' to select preferred display order.
 %.lp
 \item[\tb{|}]
 If persistent inventory display is supported and enabled (with the
-{\it perm_invent\/}
+{\it perm\verb+_+invent\/}
 option), interact with it instead of with the map.
 \\
 %.lp ""
@@ -1238,7 +1238,7 @@ Allows scrolling with the
 menu\verb+_+first\verb+_+page, menu\verb+_+previous\verb+_+page,
 menu\verb+_+next\verb+_+page, and menu\verb+_+last\verb+_+page
 keys (`{\tt \^{}}', `{\tt <}', `{\tt >}', `{\tt \verb+|+}' by default).
-Some interfaces also support menu_shift_left and menu_shift_right
+Some interfaces also support menu\verb+_+shift\verb+_+left and menu\verb+_+shift\verb+_+right
 keys (`{\tt \verb+{+}' and `{\tt \verb+}+}' by default).
 Use the {\it Return\/} (aka {\it Enter\/}) or {\it Escape\/} key to
 resume play.
@@ -1597,7 +1597,7 @@ Default key is `{\tt m}'.
 %.lp
 \item[\tb{\#retravel}]
 Travel to a previously selected travel destination.
-Default key is `{\tt C-_}'.
+Default key is `{\tt C-\verb+_+}'.
 See also {\tt \#travel}.
 %.lp
 \item[\tb{\#ride}]
@@ -2905,7 +2905,7 @@ weapons or having one of them be stolen or destroyed will also make you
 revert to single-weapon combat.
 
 %.hn 2
-\subsection*{Armor (`{\tt [}')}
+\subsection*{Armor (`{\tt \verb+[+}')}
 
 %.pg
 Lots of unfriendly things lurk about; you need armor to protect
@@ -3667,8 +3667,8 @@ Any line in the configuration file starting with `{\tt \#}' is treated
 as a comment and ignored.
 Empty lines are ignored.
 
-Any line beginning with `{\tt [}' and ending in `{\tt ]}'
-is a section marker (the closing `{\tt ]}' can be followed
+Any line beginning with `{\tt \verb+[+}' and ending in `{\tt \verb+]+}'
+is a section marker (the closing `{\tt \verb+]+}' can be followed
 by whitespace and then an arbitrary comment beginning with `{\tt \#}').
 The text between the square brackets is the section name.
 Section markers are only valid after a CHOOSE directive and their names
@@ -6137,7 +6137,7 @@ character sequences and explicit 24-bit red-green-blue colors in order for the g
 representation to be visible as specified.
 
 For example, the following line in your configuration file will cause
-the glyph representation for glyphid G_pool to use Unicode codepoint U+224B
+the glyph representation for glyphid G\verb+_+pool to use Unicode codepoint U+224B
 and the color represented by R-G-B value 0-0-160:\\
 \begin{verbatim}
 OPTIONS=glyph:G_pool/U+224B/0-0-160

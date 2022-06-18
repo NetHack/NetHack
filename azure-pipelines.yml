@@ -24,12 +24,6 @@ strategy:
       imageName: 'ubuntu-18.04'
       toolchainName: gcc7
       buildTargetName: all
-# build is currently broken
-#    mac_catalina_gcc8_all:
-#      imageName: 'macOS-10.15'
-#      ccName: gcc-8
-#      cxxName: g++-8
-#      buildSetting: 'all'
     macOS_catalina_clang_all:
       imageName: 'macOS-10.15'
       toolchainName: clang
@@ -43,7 +37,7 @@ strategy:
       toolchainName: clang
       buildTargetName: all
     windows-visualstudio:
-      imageName: 'windows-2019'
+      imageName: 'windows-latest'
       toolchainName: vs
       buildTargetName: all
     windows-mingw:
@@ -54,6 +48,10 @@ strategy:
       imageName: 'ubuntu-20.04'
       toolchainName: cross
       buildTargetName: msdos
+    linux_jammy_docs:
+      imageName: 'ubuntu-22.04'
+      toolchainName: docs
+      buildTargetName: all
 
 pool:
   vmImage: $(imageName)
@@ -249,3 +247,12 @@ steps:
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building MSDOS build'
+- bash: |
+    sudo apt-get install texlive
+    make Guidebook
+    make Guidebook.txt
+    pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
+    pdflatex -interaction=nonstopmode -jobname=Guidebook Guidebook.dated.tex
+  condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'docs'))
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Building NetHack documentation'
