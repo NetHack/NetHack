@@ -1,0 +1,17 @@
+# NetHack 3.7  gbdates-pre.370 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+
+ifdef MAKEFILE_DOC
+ifneq "$(GIT)" "0"
+#Get the hash of the last update to Guidebook.mn
+GB_LAST_COMMIT := $(shell git log -n 1 --pretty=format:%H -- Guidebook.mn)
+ifneq "$(GB_LAST_COMMIT)" ""
+GB_DATESTAMP := $(shell git show -s --format=%cd --date=format:'%B %d, %Y' $(GB_LAST_COMMIT))
+endif   # GB_LAST_COMMIT
+ifneq "$(GB_DATESTAMP)" ""
+DOC_EXTRAS += Guidebook.dated.mn Guidebook.dated.tex
+override GUIDEBOOK_MN = Guidebook.dated.mn
+override GUIDEBOOK_TEX = Guidebook.dated.tex
+endif   # GB_DATESTAMP
+endif   # GIT=0 explicitly
+endif   # MAKEFILE_DOC
+#

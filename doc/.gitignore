@@ -12,5 +12,6 @@ Guidebook.dvi
 Guidebook.log
 Guidebook.pdf
 Guidebook.ps
+Guidebook.dated.*
 *.synctex.*
 

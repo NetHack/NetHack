@@ -409,7 +409,14 @@ VARDIR=$(HACKDIR)
 #
 #-INCLUDE cross-pre.370
 #
+#
+#-INCLUDE gbdates-pre.370
+#
 #-POST
+
+#
+#-INCLUDE gbdates-post.370
+#
 
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a

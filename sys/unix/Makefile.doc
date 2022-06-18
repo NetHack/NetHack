@@ -47,26 +47,31 @@ NEEDMAKEDEFS = $(MAKEDEFS)
 #NHGREP = cat
 #NEEDMAKEDEFS =
 
-GUIDE_PREFORMAT = cat Guidebook.mn | $(NHGREP) | tbl tmac.n -
+GUIDEBOOK_MN_SRC = Guidebook.mn
+GUIDEBOOK_MN = $(GUIDEBOOK_MN_SRC)
+GUIDEBOOK_TEX_SRC = Guidebook.tex
+GUIDEBOOK_TEX = $(GUIDEBOOK_TEX_SRC)
+
+GUIDE_PREFORMAT = cat $(GUIDEBOOK_MN) | $(NHGREP) | tbl tmac.n -
 # for Guidebook.dat, unpaginated version of Guidebook.txt
-ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn Guidebook.mn Gbk-1pg-sfx.mn \
+ONEPAGE_PREFORMAT = cat Gbk-1pg-pfx.mn $(GUIDEBOOK_MN) Gbk-1pg-sfx.mn \
 	| $(NHGREP) | tbl tmac.n -
 
 # the basic guidebook
-Guidebook	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
+Guidebook	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDECMD) > Guidebook
 
 # Fancier output for those with ditroff, psdit and a PostScript printer.
-Guidebook.ps	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
+Guidebook.ps	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
 	$(GUIDE_PREFORMAT) | $(PSCMD) > Guidebook.ps
 
 # Guidebook.tex is the same as Guidebook.mn but formatted with LaTeX.
 # - The invocation command for LaTeX may vary in different installations.
 # - To print Guidebook.dvi you need to use a suitable dvi-driver.
 # - LaTeX needs to be run twice; second pass uses Guidebook.aux made by first.
-Guidebook.dvi	: Guidebook.tex
-	latex Guidebook.tex
-	latex Guidebook.tex
+Guidebook.dvi	: $(GUIDEBOOK_TEX)
+	latex $(GUIDEBOOK_TEX)
+	latex $(GUIDEBOOK_TEX)
 
 # makedefs has more dependencies than these; this is mainly to cope with the
 # case where it hasn't been built yet since it is usually needed for $(NHGREP)
@@ -97,17 +102,17 @@ manpages:
 	-$(MDMANCREATE) $(MANDIR)/makedefs.$(MANEXT)
 
 # manual creation for distribution
-DISTRIB = Guidebook.txt nethack.txt recover.txt \
+DISTRIB = $(GUIDEBOOK_TEX) nethack.txt recover.txt \
 	dlb.txt makedefs.txt
 
 distrib: $(DISTRIB)
 	@echo "Plain text documentation is up to date."
 
-Guidebook.txt	: Guidebook.mn tmac.n tmac.nh $(NEEDMAKEDEFS)
-	$(GUIDECMD) > Guidebook.txt
-Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn Guidebook.mn tmac.n tmac.nh \
+Guidebook.txt	: $(GUIDEBOOK_MN) tmac.n tmac.nh $(NEEDMAKEDEFS)
+	$(GUIDECMD) > $@
+Guidebook.dat	: Gbk-1pg-pfx.mn Gbk-1pg-sfx.mn $(GUIDEBOOK_MN) tmac.n tmac.nh \
 		  $(NEEDMAKEDEFS)
-	$(ONEPAGECMD) > Guidebook.dat
+	$(ONEPAGECMD) > $@
 
 MAN2TXT = $(NHGREP) | nroff -man - | $(COLCMD)
 nethack.txt	: nethack.6
@@ -120,7 +125,7 @@ makedefs.txt		: makedefs.6
 	cat makedefs.6 | $(MAN2TXT) > makedefs.txt
 
 clean:
-	-rm -f Guidebook.aux Guidebook.log
+	-rm -f Guidebook.aux Guidebook.log $(DOC_EXTRAS)
 
 spotless: clean
 	-rm -f Guidebook Guidebook.dat Guidebook.ps Guidebook.dvi

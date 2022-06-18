@@ -154,6 +154,9 @@ submodules/lua/lua.h:
 Guidebook:
 	( cd doc ; $(MAKE) Guidebook )
 
+Guidebook.txt:
+	( cd doc ; $(MAKE) Guidebook.txt )
+
 manpages:
 	( cd doc ; $(MAKE) manpages )
 

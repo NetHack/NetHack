@@ -1,0 +1,10 @@
+# NetHack 3.7  gbdates-post.370 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+ifdef MAKEFILE_DOC
+ifdef GB_DATESTAMP
+Guidebook.dated.mn: $(GUIDEBOOK_MN_SRC)
+	@awk 'f{$$0=".ds f2 \"$(GB_DATESTAMP)";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_MN_SRC) > $@
+Guidebook.dated.tex: $(GUIDEBOOK_TEX_SRC)
+	@awk 'f{$$0="\\date{$(GB_DATESTAMP)}";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_TEX_SRX) > $@
+endif   # GB_DATESTAMP
+endif   # MAKEFILE_DOC
+#
