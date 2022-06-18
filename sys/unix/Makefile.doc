@@ -102,7 +102,7 @@ manpages:
 	-$(MDMANCREATE) $(MANDIR)/makedefs.$(MANEXT)
 
 # manual creation for distribution
-DISTRIB = $(GUIDEBOOK_TEX) nethack.txt recover.txt \
+DISTRIB = Guidebook.txt nethack.txt recover.txt \
 	dlb.txt makedefs.txt
 
 distrib: $(DISTRIB)
