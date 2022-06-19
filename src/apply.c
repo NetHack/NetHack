@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1655503068 2022/06/17 21:57:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.378 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1655627973 2022/06/19 08:39:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.379 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -499,7 +499,7 @@ magic_whistled(struct obj *obj)
          disappearbuf[BUFSZ + sizeof "disappears"];
     boolean oseen, nseen,
             already_discovered = objects[obj->otyp].oc_name_known != 0;
-    int omx, omy, shift = 0, appear = 0, disappear = 0;
+    int omx, omy, shift = 0, appear = 0, disappear = 0, trapped = 0;
 
     /* need to copy (up to 3) names as they're collected rather than just
        save pointers to them, otherwise churning through every mbuf[] might
@@ -551,8 +551,10 @@ magic_whistled(struct obj *obj)
             iflags.last_msg = PLNMSG_enum; /* not a specific message */
             if (mintrap(mtmp, NO_TRAP_FLAGS) == Trap_Killed_Mon)
                 change_luck(-1);
-            if (iflags.last_msg != PLNMSG_enum)
+            if (iflags.last_msg != PLNMSG_enum) {
+                ++trapped;
                 continue;
+            }
             /* dying while seen would have issued a message and not get here;
                being sent to an unseen location and dying there should be
                included in the disappeared case */
@@ -596,7 +598,7 @@ magic_whistled(struct obj *obj)
     if (!already_discovered) {
         /* message(s) were handled by rloc(); if only noticeable change was
            pet(s) disappearing, the magic whistle won't become discovered */
-        if (shift + appear > 0)
+        if (shift + appear + trapped > 0)
             makeknown(obj->otyp);
     } else {
         /* could use array of cardinal number names like wishcmdassist() but
