@@ -76,18 +76,33 @@ BEGIN
         MENUITEM "&Lock Windows",               IDM_SETTING_LOCKWINDOWS
     END
     POPUP "&Help"
+    // 3.7: HELP_LONG and HELP_OPTIONS_LONG both used to specify &L as their
+    // accelator.  Typing 'L' or 'l' highlighted one of the two, then <enter>
+    // would execute it or typing another 'l' or 'L' would unhighlight the
+    // currently highlit one and highlight the other.  All other accelerators
+    // just run the relevant entry without needing <enter>.   HELP_LONG has
+    // finally been changed to &g for "game".
+    //
+    // "// {...}" lines are placeholders for missing entries that are more
+    // recent than this resource file.  The wizard mode one may need to
+    // stay suppressed since it is conditional.
     BEGIN
         MENUITEM "&About ...",                  IDM_ABOUT
-        MENUITEM "&Long description of the game", IDM_HELP_LONG
+        MENUITEM "Long description of the &game", IDM_HELP_LONG
         MENUITEM "List of &commands",           IDM_HELP_COMMANDS
         MENUITEM "&History of NetHack",         IDM_HELP_HISTORY
-        MENUITEM "&Info on a character",        IDM_HELP_INFO_CHAR
+        MENUITEM "&Info on a display character", IDM_HELP_INFO_CHAR
         MENUITEM "Info on what a given &key does", IDM_HELP_INFO_KEY
         MENUITEM "List of game &options",       IDM_HELP_OPTIONS
         MENUITEM "&Longer list of game options", IDM_HELP_OPTIONS_LONG
+	// { dispfile_optmenu, "Using the %s command to set options." } //"'O'"
+	// { dokeylist, "Full list of keyboard commands." }
         MENUITEM "List of e&xtended commands",  IDM_HELP_EXTCMD
+	// { domenucontrols, "List menu control keys." }
         MENUITEM "The &NetHack license",        IDM_HELP_LICENSE
+	// { docontact, "Support information." }
         MENUITEM "NetHack for &Windows help",   IDM_HELP_PORTHELP
+	// { dispfile_debughelp, "List of wizard-mode commands." }
     END
 END
 
