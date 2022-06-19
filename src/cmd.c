@@ -4574,11 +4574,11 @@ help_dir(
     char ctrl;
     winid win;
     char buf[BUFSZ], buf2[BUFSZ], *explain;
-    const char *dothat, *how;
-    boolean prefixhandling, viawindow;
+    const char *dothat /*, *how */;
+    boolean prefixhandling /*, viawindow */;
 
     /* NHKF_ESC indicates that player asked for help at getdir prompt */
-    viawindow = (spkey == g.Cmd.spkeys[NHKF_ESC] || iflags.cmdassist);
+    /* viawindow = (spkey == g.Cmd.spkeys[NHKF_ESC] || iflags.cmdassist); */
     prefixhandling = (spkey != g.Cmd.spkeys[NHKF_ESC]);
     /*
      * Handling for prefix keys that don't want special directions.
@@ -4586,7 +4586,7 @@ help_dir(
      * general message if it's on.
      */
     dothat = "do that";
-    how = " at"; /* for "<action> at yourself"; not used for up/down */
+    /* how = " at"; */ /* for "<action> at yourself"; not used for up/down */
 
     buf[0] = '\0';
 #if 0   /* Since prefix keys got 'promoted' to commands, feedback for

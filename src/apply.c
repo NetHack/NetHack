@@ -492,7 +492,7 @@ static void
 magic_whistled(struct obj *obj)
 {
     struct monst *mtmp, *nextmon;
-    struct permonst *optr;
+    /* struct permonst *optr; */
     char buf[BUFSZ], *mnam = 0,
          shiftbuf[BUFSZ + sizeof "shifts location"],
          appearbuf[BUFSZ + sizeof "appears"],
@@ -529,7 +529,7 @@ magic_whistled(struct obj *obj)
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         omx = mtmp->mx, omy = mtmp->my;
-        optr = mtmp->data;
+        /* optr = mtmp->data; */
         mnexto(mtmp, !already_discovered ? RLOC_MSG : RLOC_NONE);
 
         if (mtmp->mx != omx || mtmp->my != omy) {
