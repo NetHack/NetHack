@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1655627973 2022/06/19 08:39:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.379 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1655631557 2022/06/19 09:39:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.381 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -492,7 +492,6 @@ static void
 magic_whistled(struct obj *obj)
 {
     struct monst *mtmp, *nextmon;
-    /* struct permonst *optr; */
     char buf[BUFSZ], *mnam = 0,
          shiftbuf[BUFSZ + sizeof "shifts location"],
          appearbuf[BUFSZ + sizeof "appears"],
@@ -529,7 +528,6 @@ magic_whistled(struct obj *obj)
         if (M_AP_TYPE(mtmp))
             seemimic(mtmp);
         omx = mtmp->mx, omy = mtmp->my;
-        /* optr = mtmp->data; */
         mnexto(mtmp, !already_discovered ? RLOC_MSG : RLOC_NONE);
 
         if (mtmp->mx != omx || mtmp->my != omy) {
