@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1655631843 2022/06/19 09:44:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.253 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1655663780 2022/06/19 18:36:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1774,8 +1774,7 @@ x_monnam(
     struct permonst *mdat = mtmp->data;
     const char *pm_name = mon_pmname(mtmp);
     boolean do_hallu, do_invis, do_it, do_saddle, do_name, augment_it;
-    boolean name_at_start, has_adjectives, insertbuf2,
-            falseCap = (*pm_name != lowc(*pm_name));
+    boolean name_at_start, has_adjectives, insertbuf2;
     char *bp, buf2[BUFSZ];
 
     if (mtmp == &g.youmonst)
@@ -1921,34 +1920,23 @@ x_monnam(
         article = ARTICLE_THE;
     }
 
-    insertbuf2 = FALSE;
+    insertbuf2 = TRUE;
     buf2[0] = '\0'; /* lint suppression */
-    if (article == ARTICLE_A && falseCap && !name_at_start) {
-        char buf3[BUFSZ];
-
-        /* some type names like "Archon", "Green-elf", and "Uruk-hai" fool
-           an() because of the capitalization and would result in "the " */
-        Strcpy(buf3, buf);
-        *buf3 = lowc(*buf3);
-        (void) just_an(buf2, buf3);
-        insertbuf2 = TRUE;
-    } else {
-        switch (article) {
-        case ARTICLE_YOUR:
-            Strcpy(buf2, "your ");
-            insertbuf2 = TRUE;
-            break;
-        case ARTICLE_THE:
-            Strcpy(buf2, "the ");
-            insertbuf2 = TRUE;
-            break;
-        case ARTICLE_A:
-            buf = an(buf); /* (this consumes a 2nd mbuf[]) */
-            break;
-        case ARTICLE_NONE:
-        default:
-            break;
-        }
+    switch (article) {
+    case ARTICLE_YOUR:
+        Strcpy(buf2, "your ");
+        break;
+    case ARTICLE_THE:
+        Strcpy(buf2, "the ");
+        break;
+    case ARTICLE_A:
+        /* avoid an() here */
+        (void) just_an(buf2, buf); /* copy "a " or "an " into buf2[] */
+        break;
+    case ARTICLE_NONE:
+    default:
+        insertbuf2 = FALSE;
+        break;
     }
     if (insertbuf2) {
         Strcat(buf2, buf); /* buf2[] isn't viable to return,  */
