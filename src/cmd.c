@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655513914 2022/06/18 00:58:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.577 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1655671810 2022/06/19 20:50:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.579 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1210,15 +1210,17 @@ wiz_kill(void)
                we issue our own message in order to name it in case it
                isn't; note that if it triggers other kills, those might
                be referred to as "it" */
-            if (!iflags.menu_requested) {
-                boolean namedpet = has_mgivenname(mtmp) && !Hallucination;
+            int tame = !!mtmp->mtame, seen = canspotmon(mtmp),
+                flgs = SUPPRESS_IT | SUPPRESS_HALLUCINATION
+                       | ((tame && has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0),
+                articl = tame ? ARTICLE_YOUR : seen ? ARTICLE_THE : ARTICLE_A;
+            const char *adjs = tame ? (!seen ? "poor, unseen" : "poor")
+                                    : (!seen ? "unseen" : (const char *) 0);
+            char *Mn = x_monnam(mtmp, articl, adjs, flgs, FALSE);
 
+            if (!iflags.menu_requested) {
                 /* normal case: hero is credited/blamed */
-                You("%s %s!", nonliving(mtmp->data) ? "destroy" : "kill",
-                    !mtmp->mtame ? noit_mon_nam(mtmp)
-                    : x_monnam(mtmp, ARTICLE_YOUR, "poor",
-                               SUPPRESS_IT | (namedpet ? SUPPRESS_SADDLE : 0),
-                               FALSE));
+                You("%s %s!", nonliving(mtmp->data) ? "destroy" : "kill", Mn);
                 xkilled(mtmp, XKILL_NOMSG);
             } else { /* 'm'-prefix */
                 /* we know that monsters aren't moving because player has
@@ -1227,9 +1229,9 @@ wiz_kill(void)
                    need to have the mon_moving flag be True in order to
                    avoid blaming or crediting hero for their deaths */
                 g.context.mon_moving = TRUE;
-                pline("%s is %s.", noit_Monnam(mtmp),
+                pline("%s is %s.", upstart(Mn),
                       nonliving(mtmp->data) ? "destroyed" : "killed");
-                /* Null second arg suppresses message */
+                /* Null second arg suppresses the usual message */
                 monkilled(mtmp, (char *) 0, AD_PHYS);
                 g.context.mon_moving = FALSE;
             }
