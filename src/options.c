@@ -8901,7 +8901,7 @@ void
 enhance_menu_text(
     char *buf,
     size_t sz,
-    int whichpass,
+    int whichpass UNUSED,
     boolean *bool_p,
     struct allopt_t *thisopt)
 {
