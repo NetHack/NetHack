@@ -80,6 +80,7 @@ CCXXFLAGS+= -Wno-deprecated-copy
 endif  # WANT_WIN_QT
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
+GCCGTEQ11 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 11)
 GCCGTEQ12 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 12)
 ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
@@ -88,6 +89,7 @@ endif  #gcc version greater than or equal to 9
 #still in gcc-specific section here
 # get the version of g++
 GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+GPPGTEQ11 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 11)
 GPPGTEQ12 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 12)
 ifeq "$(GPPGTEQ9)" "1"
 CCXXFLAGS+=-Wformat-overflow
@@ -96,10 +98,17 @@ CCXXFLAGS+=-Wno-deprecated-copy
 CCXXFLAGS+=-Wno-deprecated-declarations
 endif  # WANT_WIN_QT
 endif  # g++ version greater than or equal to 9
+ifeq "$(GPPGTEQ11)" "1"
+#the g++ linker will have trouble linker if the following isn't included
+#when compiling the C files.
+ifdef WANT_WIN_QT
+CFLAGS+=-fPIC
+endif  # WANT_WIN_QT
+endif  # g++ version greater than or equal to 11
 ifeq "$(GPPGTEQ12)" "1"
 ifdef WANT_WIN_QT6
 CXX=g++ -std=c++20
-endif
+endif  # WANT_WIN_QT6
 endif  # g++ version greater than or equal to 12
 # end of gcc-specific
 
@@ -107,6 +116,7 @@ else   # clang-specific follows
 
 # get the version of clang++
 CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
 ifeq "$(CLANGPPGTEQ9)" "1"
 ifdef WANT_WIN_QT
 CCXXFLAGS+=-Wno-deprecated-copy
@@ -114,6 +124,11 @@ endif  # WANT_WIN_QT
 endif  #clang++ greater than or equal to 9
 
 ifdef WANT_WIN_QT
+ifeq "$(CLANGPPGTEQ14)" "1"
+# The clang++ linker seems to have trouble linker if the following isn't
+# included when compiling the C files by clang..
+CFLAGS+=-fPIC
+endif  # clang++ greater than or equal to 14
 CCXXFLAGS+=-Wno-deprecated-declarations
 endif  # WANT_WIN_QT
 endif  # clang-specific ends here
