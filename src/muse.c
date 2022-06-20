@@ -1673,7 +1673,7 @@ use_offensive(struct monst *mtmp)
     /* offensive potions are not drunk, they're thrown */
     if (otmp->oclass != POTION_CLASS && (i = precheck(mtmp, otmp)) != 0)
         return i;
-    oseen = otmp && canseemon(mtmp);
+    oseen = canseemon(mtmp);
 
     switch (gm.m.has_offense) {
     case MUSE_WAN_DEATH:
