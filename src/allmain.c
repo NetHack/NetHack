@@ -636,7 +636,7 @@ display_gamewindows(void)
     start_menu(WIN_INVEN, 0U), end_menu(WIN_INVEN, (char *) 0);
 
 #ifdef TTY_PERM_INVENT
-    if (WINDOWPORT("tty")) {
+    if (WINDOWPORT("tty") && iflags.perm_invent) {
         g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
     }
 #endif

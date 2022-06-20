@@ -306,6 +306,7 @@ static int handle_add_list_remove(const char *, int);
 static void remove_autopickup_exception(struct autopickup_exception *);
 static int count_apes(void);
 static int count_cond(void);
+static void enhance_menu_text(char *, size_t, int, boolean *, struct allopt_t *);
 
 static int handler_align_misc(int);
 static int handler_autounlock(int);
@@ -7759,10 +7760,11 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 else
                     Sprintf(buf, fmtstr_doset_tab,
                             name, *bool_p ? "true" : "false");
+                if (pass == 0)
+                    enhance_menu_text(buf, sizeof buf, pass, bool_p, &allopt[i]);
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
             }
-
     any = cg.zeroany;
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, "", MENU_ITEMFLAGS_NONE);
@@ -8895,6 +8897,30 @@ set_playmode(void)
     }
     /* don't need to do anything special for explore mode or normal play */
 }
+void
+enhance_menu_text(
+    char *buf,
+    size_t sz,
+    int whichpass,
+    boolean *bool_p,
+    struct allopt_t *thisopt)
+{
+    size_t nowsz, availsz;
+
+    if (!buf)
+        return;
+    nowsz = strlen(buf) + 1;
+    availsz = sz - nowsz;
+
+#ifdef TTY_PERM_INVENT
+    if (bool_p == &iflags.perm_invent && WINDOWPORT("tty")) {
+        if (thisopt->setwhere == set_gameview)
+            Snprintf(eos(buf), availsz, " *terminal size is too small");
+    }
+#endif
+    return;
+}
+
 
 #endif /* OPTION_LISTS_ONLY */
 

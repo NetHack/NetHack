@@ -1623,30 +1623,26 @@ tty_create_nhwindow(int type)
         newwin->datlen = (short *) 0;
         newwin->cells = (struct tty_perminvent_cell **) 0;
 
+        if ((newwin->rows < tty_pi_minrow) || (newwin->cols < tty_pi_mincol)) {
         if (newwin->rows < tty_pi_minrow) {
             tty_destroy_nhwindow(newid);
-            if (iflags.perm_invent) {
-                raw_printf("tty perm_invent has been disabled.");
-                raw_printf(
-                    "tty perm_invent requires %d rows, your terminal has %d.",
-                    (iflags.wc2_statuslines > 2) ? 54 : 53, ttyDisplay->rows);
-                iflags.perm_invent = FALSE;
+            if (!g.program_state.beyond_savefile_load)
+               raw_printf("tty perm_invent could not be enabled.");
+                if (newwin->rows < tty_pi_minrow)
+                    raw_printf(
+                "tty perm_invent requires %d rows, your terminal has %d.",
+                                (iflags.wc2_statuslines > 2) ? 54 : 53,
+                                ttyDisplay->rows);
+                else
+                   raw_printf(
+                "tty perm_invent requires %d columns, your terminal has %d.",
+                          tty_pi_mincol, ttyDisplay->cols);
             }
-            return WIN_ERR;
-        } else if (newwin->cols < tty_pi_mincol) {
-            tty_destroy_nhwindow(newid);
-            if (iflags.perm_invent) {
-                raw_printf("tty perm_invent has been disabled.");
-                raw_printf(
-                    "tty perm_invent requires %d columns, your terminal has %d.",
-                    tty_pi_mincol, ttyDisplay->cols);
-                iflags.perm_invent = FALSE;
-            }
+            set_option_mod_status("perm_invent", set_gameview);
+            iflags.perm_invent = FALSE;
             return WIN_ERR;
         } else {
             int r, c;
-
-            iflags.perm_invent = TRUE;
 
             newwin->maxrow = tty_pi_minrow;
             newwin->maxcol = newwin->cols;
