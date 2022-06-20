@@ -527,8 +527,10 @@ opt_##a,
                 "use_truecolour", &iflags.use_truecolor)
     NHOPTC(vary_msgcount, 20, opt_in, set_gameview, No, Yes, No, No, NoAlias,
                 "show more old messages at a time")
+#if defined(NO_VERBOSE_GRANULARITY)
     NHOPTB(verbose, 0, opt_out, set_in_game, On, Yes, No, No, NoAlias,
                 &flags.verbose)
+#endif
 #ifdef MSDOS
     NHOPTC(video, 20, opt_in, set_in_config, No, Yes, No, No, NoAlias,
                 "method of video updating")
@@ -599,7 +601,10 @@ opt_##a,
     NHOPTP(IBM_, 0, opt_in, set_hidden, No, No, Yes, No, NoAlias,
                 "prefix for old micro IBM_ options")
 #endif /* MICRO */
-
+#if !defined(NO_VERBOSE_GRANULARITY)
+    NHOPTP(verbose, 0, opt_in, set_in_game, Yes, Yes, Yes, Yes, NoAlias,
+                "suppress verbose messages")
+#endif
 #undef NoAlias
 #undef NHOPTB
 #undef NHOPTC
