@@ -4403,6 +4403,27 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                 }
             }
             break;
+        case opt_perm_invent:
+#ifdef TTY_PERM_INVENT
+            /* if attempting to enable perm_invent fails, say so and return
+               before "'perm_invent' option toggled on" would be given below;
+               tty_perm_invent_toggled() and routines it calls don't check
+               iflags.perm_invent so it doesn't matter that 'SET IT HERE'
+               hasn't been executed yet */
+            if (WINDOWPORT("tty") && !negated) {
+                tty_perm_invent_toggled(!negated);
+
+                if (g.tty_invent_win == WIN_ERR) {
+                    /* FIXME: there is some confusion between this and
+                       tty_create_nhwindow(NHW_TTYINVENT) over when this
+                       should be done */
+                    set_option_mod_status("perm_invent", set_gameview);
+                    if (!g.opt_initial)
+                        config_error_add("Enabling perm_invent failed");
+                    return optn_silenterr;
+                }
+            }
+#endif
         }
         /* this dates from when 'O' prompted for a line of options text
            rather than use a menu to control access to which options can
@@ -4471,10 +4492,6 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         case opt_use_inverse:
         case opt_hilite_pile:
         case opt_perm_invent:
-#ifdef TTY_PERM_INVENT
-            if (WINDOWPORT("tty"))
-                tty_perm_invent_toggled(negated);
-#endif
         case opt_ascii_map:
         case opt_tiled_map:
             g.opt_need_redraw = TRUE;

@@ -1630,12 +1630,12 @@ tty_create_nhwindow(int type)
                raw_printf("tty perm_invent could not be enabled.");
                 if (newwin->rows < tty_pi_minrow)
                     raw_printf(
-                "tty perm_invent requires %d rows, your terminal has %d.",
+                      "tty perm_invent requires %d rows, your terminal has %d.",
                                 (iflags.wc2_statuslines > 2) ? 54 : 53,
                                 ttyDisplay->rows);
                 else
                    raw_printf(
-                "tty perm_invent requires %d columns, your terminal has %d.",
+                   "tty perm_invent requires %d columns, your terminal has %d.",
                           tty_pi_mincol, ttyDisplay->cols);
             }
             set_option_mod_status("perm_invent", set_gameview);
@@ -2902,7 +2902,7 @@ tty_putstr(winid window, int attr, const char *str)
         return;
     if (cw->type != NHW_MESSAGE
 #ifdef TTY_PERM_INVENT
-&& window != g.tty_invent_win
+        && window != g.tty_invent_win
 #endif
        )
         str = compress_str(str);
@@ -3484,12 +3484,11 @@ x                                       x                                     x
     }
     for (pass = 0; pass < 2; ++pass) {
         for (row = 1; row < (cw->maxrow - 1); ++row) { /* row below top border */
-            for (col = (pass
-                            ? bordercol[border_middle] + 1
-                            : bordercol[border_left] + 1);
-                 col < (pass
-                            ? bordercol[border_right]
-                            : bordercol[border_middle]); ++col) {
+            for (col = (pass ? bordercol[border_middle] + 1
+                             : bordercol[border_left] + 1);
+                 col < (pass ? bordercol[border_right]
+                             : bordercol[border_middle]);
+                 ++col) {
                 cell = &cw->cells[row][col];
                 if (obj && *text && ccnt < (bordercol[border_middle] - 1)) {
                     if (cell->content.ttychar != *text)
@@ -3605,7 +3604,8 @@ x                                       x                                     x
             if (row == 0) {
                 if (col == bordercol[border_left])
                     glyph = cmap_to_glyph(S_tlcorn);
-                else if ((col > bordercol[border_left] && col < bordercol[border_middle])
+                else if ((col > bordercol[border_left]
+                          && col < bordercol[border_middle])
                          || (col > bordercol[border_middle]
                              && col < bordercol[border_right]))
                     glyph = cmap_to_glyph(S_hwall);
@@ -3616,7 +3616,8 @@ x                                       x                                     x
             } else if (row == (cw->maxrow - 1)) {
                 if (col == bordercol[border_left])
                     glyph = cmap_to_glyph(S_blcorn);
-                else if ((col > bordercol[border_left] && col < bordercol[border_middle])
+                else if ((col > bordercol[border_left]
+                          && col < bordercol[border_middle])
                          || (col > bordercol[border_middle]
                              && col < bordercol[border_right]))
                     glyph = cmap_to_glyph(S_hwall);
@@ -3656,14 +3657,13 @@ void
 tty_perm_invent_toggled(boolean negated)
 {
     if (negated) {
-        destroy_nhwindow(g.tty_invent_win), g.tty_invent_win = WIN_ERR;
+        if (g.tty_invent_win != WIN_ERR)
+            destroy_nhwindow(g.tty_invent_win), g.tty_invent_win = WIN_ERR;
         done_box_init = FALSE;
     } else {
-        if (WINDOWPORT("tty")) {
-            g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
-            if (g.tty_invent_win != WIN_ERR)
-                display_nhwindow(g.tty_invent_win, FALSE);
-        }
+        g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
+        if (g.tty_invent_win != WIN_ERR)
+            display_nhwindow(g.tty_invent_win, FALSE);
     }
 }
 #endif
