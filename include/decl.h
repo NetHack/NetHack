@@ -98,6 +98,7 @@ struct sinfo {
     int restoring;
     int in_moveloop;
     int in_impossible;
+    int in_docrt;               /* in docrt() */
     int in_self_recover;
     int in_parseoptions;        /* in parseoptions */
     int config_error_ready;     /* config_error_add is ready, available */
@@ -971,6 +972,9 @@ struct instance_globals {
        persistent one doesn't get shrunk during filtering for item selection
        then regrown to full inventory, possibly being resized in the process */
     winid cached_pickinv_win;
+#ifdef TTY_PERM_INVENT
+    winid tty_invent_win;
+#endif
     /* query objlist callback: return TRUE if obj type matches "this_type" */
     int this_type;
     const char *this_title; /* title for inventory list of specific type */

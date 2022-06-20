@@ -435,6 +435,9 @@ const struct instance_globals g_init = {
     NULL, /* invbuf */
     0, /* inbufsize */
     WIN_ERR, /* cached_pickinv_win */
+#ifdef TTY_PERM_INVENT
+    WIN_ERR, /* tty_invent_win */
+#endif
     0, /* this_type */
     NULL, /* this_title */
     UNDEFINED_VALUES, /* only (coord) */

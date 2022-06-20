@@ -10,6 +10,23 @@
 #ifndef WINDOW_STRUCTS
 #define WINDOW_STRUCTS
 
+#ifdef TTY_PERM_INVENT
+enum { tty_pi_minrow = 28, tty_pi_mincol = 79 };
+union ttycellcontent {
+    char ttychar;
+    glyph_info *gi;
+};
+struct tty_perminvent_cell {
+    Bitfield(refresh, 1);
+    Bitfield(text, 1);
+    Bitfield(glyph, 1);
+    Bitfield(colorbits, 5);
+    union ttycellcontent content;
+    int32_t color;
+};
+extern struct tty_perminvent_cell zerottycell;
+#endif
+
 /* menu structure */
 typedef struct tty_mi {
     struct tty_mi *next;
@@ -45,6 +62,9 @@ struct WinDesc {
     long nitems;           /* total number of items (MENU) */
     short how;             /* menu mode - pick 1 or N (MENU) */
     char menu_ch;          /* menu char (MENU) */
+#ifdef TTY_PERM_INVENT
+    struct tty_perminvent_cell **cells;
+#endif
 };
 
 /* window flags */
@@ -103,7 +123,11 @@ struct tty_status_fields {
 #ifdef NHW_BASE
 #undef NHW_BASE
 #endif
-#define NHW_BASE 6
+#define NHW_BASE (NHW_TEXT + 1)
+
+#ifdef TTY_PERM_INVENT
+#define NHW_TTYINVENT (NHW_BASE + 1)
+#endif
 
 extern struct window_procs tty_procs;
 
@@ -260,6 +284,10 @@ E void genl_outrip(winid, int, time_t);
 
 E char *tty_getmsghistory(boolean);
 E void tty_putmsghistory(const char *, boolean);
+
+#ifdef TTY_PERM_INVENT
+E void tty_refresh_inventory(int start, int stop, int y);
+#endif
 
 #ifdef NO_TERMS
 #ifdef MAC

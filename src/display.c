@@ -1507,8 +1507,10 @@ docrt(void)
     register int x, y;
     register struct rm *lev;
 
-    if (!u.ux)
+    if (!u.ux || g.program_state.in_docrt)
         return; /* display isn't ready yet */
+
+    g.program_state.in_docrt = TRUE;
 
     if (u.uswallow) {
         swallowed(1);
@@ -1552,6 +1554,7 @@ docrt(void)
     update_inventory();
 
     g.context.botlx = 1; /* force a redraw of the bottom line */
+    g.program_state.in_docrt = FALSE;
 }
 
 /* for panning beyond a clipped region; resend the current map data to

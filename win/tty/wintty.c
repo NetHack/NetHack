@@ -100,6 +100,9 @@ extern void msmsg(const char *, ...);
 struct window_procs tty_procs = {
     "tty",
     (0
+#ifdef TTY_PERM_INVENT
+     | WC_PERM_INVENT
+#endif
 #ifdef MSDOS
      | WC_TILED_MAP | WC_ASCII_MAP
 #endif
@@ -246,6 +249,15 @@ static void status_sanity_check(void);
 #endif
 #ifdef ENHANCED_SYMBOLS
 void g_pututf8(uint8 *utf8str);
+#endif
+
+#ifdef TTY_PERM_INVENT
+void tty_perm_invent_toggled(boolean negated);
+static void tty_invent_box_glyph_init(struct WinDesc *cw);
+static boolean calling_from_update_inventory = FALSE;
+struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
+enum { border_left, border_middle, border_right, border_elements };
+static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
 #endif
 
 /*
@@ -525,6 +537,12 @@ tty_preference_update(const char *pref)
     consoletty_preference_update(pref);
 #else
     genl_preference_update(pref);
+#endif
+#ifdef TTY_PERM_INVENT
+    if (!strcmp(pref, "symset") && iflags.window_inited) {
+       if (g.tty_invent_win != WIN_ERR)
+           tty_invent_box_glyph_init(wins[g.tty_invent_win]);
+    }
 #endif
     return;
 }
@@ -1567,6 +1585,99 @@ tty_create_nhwindow(int type)
         newwin->cols = ttyDisplay->cols;
         newwin->maxrow = newwin->maxcol = 0;
         break;
+#ifdef TTY_PERM_INVENT
+    case NHW_TTYINVENT:
+        /* Is there enough real estate to do this beyond the status line?
+         * Rows:
+         * Top border line (1)
+         * 26 inventory rows (26)
+         * Bottom border line (1)
+         * 1 + 26 + 1 = 28
+         *
+         * Cols:
+         * Left border (1)
+         * Left inventory items (38)
+         * Middle separation (1)
+         * Right inventory items (38)
+         * Right border (1)
+         * 1 + 38 + 1 + 38 + 1 = 79
+         *
+         * The topline + map rows + status lines require:
+         * 1 + 21 + 2 (or 3) = 24 (or 25 depending on status line count).
+         * So we can only present a full inventory on tty if there are
+         * 28 + 24 (or 25) available (52 or 53 rows on the terminal).
+         * Correspondingly ttyDisplay->rows has to be at least 52 (or 53).
+         *
+         */
+        newwin->offx = 0;
+        /* topline + map rows + status lines */
+        newwin->offy = 1 + ROWNO + ((iflags.wc2_statuslines > 2) ? 3 : 2);
+        newwin->rows = (ttyDisplay->rows - newwin->offy) - 1;
+        newwin->cols = ttyDisplay->cols;
+        newwin->maxrow = 0;
+        newwin->maxcol = 79;  /* bhaak */
+        /* these weren't initialized as of yet, and as such could
+           be non-zero which would cause tty_destroy_window()
+           and friends to try and free non-malloc'd memory */
+        newwin->data = (char **) 0;
+        newwin->datlen = (short *) 0;
+        newwin->cells = (struct tty_perminvent_cell **) 0;
+
+        if (newwin->rows < tty_pi_minrow) {
+            tty_destroy_nhwindow(newid);
+            raw_printf("tty perm_invent has been disabled.");
+            raw_printf(
+                "tty perm_invent requires %d rows, your terminal has %d.",
+                (iflags.wc2_statuslines > 2) ? 54 : 53, ttyDisplay->rows);
+            iflags.perm_invent = FALSE;
+            return WIN_ERR;
+        } else if (newwin->cols < tty_pi_mincol) {
+            tty_destroy_nhwindow(newid);
+            raw_printf("tty perm_invent has been disabled.");
+            raw_printf(
+                "tty perm_invent requires %d columns, your terminal has %d.",
+                tty_pi_mincol, ttyDisplay->cols);
+            iflags.perm_invent = FALSE;
+            return WIN_ERR;
+        } else {
+            int r, c;
+
+            newwin->maxrow = tty_pi_minrow;
+            newwin->maxcol = newwin->cols;
+            /* establish the borders */
+            bordercol[border_left] = 0;
+            bordercol[border_middle] = ( newwin->maxcol / 2) + 1;
+            bordercol[border_right] = newwin->maxcol - 1;
+
+            if (newwin->maxrow) {
+                newwin->cells = (struct tty_perminvent_cell **) alloc(
+                    (unsigned) (newwin->maxrow
+                                * sizeof(struct tty_perminvent_cell *)));
+                for (i = 0; i < newwin->maxrow; i++) {
+                    if (newwin->maxcol) {
+                        newwin->cells[i] = (struct tty_perminvent_cell *) alloc(
+                            (unsigned) (newwin->maxcol
+                                * sizeof(struct tty_perminvent_cell)));
+                    }
+                }
+            }
+
+            for (r = 0; r < newwin->maxrow; r++)
+                for (c = 0; c < newwin->maxcol; c++) {
+                    newwin->cells[r][c] = zerottycell;
+                    if (r == 0 || (newwin->maxrow - 1)
+                               || c == bordercol[border_left]
+                               || c == bordercol[border_middle]
+                               || c == bordercol[border_right]) {
+                        newwin->cells[r][c].content.gi = (glyph_info *) alloc(
+                                                    (unsigned) sizeof(glyph_info));
+                    }
+                }
+            return newid;
+        }
+        /*NOTREACHED*/
+        break;
+#endif
     default:
         panic("Tried to create window type %d\n", (int) type);
         /*NOTREACHED*/
@@ -2571,7 +2682,30 @@ tty_destroy_nhwindow(winid window)
         iflags.window_inited = 0;
     if (cw->type == NHW_MAP)
         clear_screen();
+#ifdef TTY_PERM_INVENT
+    if (cw->type == NHW_TTYINVENT) {
+        int r, c;
 
+        if (cw->cells) {
+            for (r = 0; r < cw->maxrow; r++)
+                for (c = 0; c < cw->maxcol; c++) {
+                    if (cw->cells[r][c].glyph)
+                        free((genericptr_t) cw->cells[r][c].content.gi);
+                    cw->cells[r][c] = zerottycell;
+                }
+            for (r = 0; r < cw->maxrow; r++)
+                if (cw->cells[r]) {
+                    free((genericptr_t) cw->cells[r]);
+                    cw->cells[r] = (struct tty_perminvent_cell *) 0;
+                }
+            free((genericptr_t) cw->cells);
+            cw->cells = (struct tty_perminvent_cell **) 0;
+            cw->rows = cw->cols = 0;
+        }
+        cw->maxrow = cw->maxcol = 0;
+        g.tty_invent_win = WIN_ERR;
+    }
+#endif
     free_window_info(cw, TRUE);
     free((genericptr_t) cw);
     wins[window] = 0; /* available for re-use */
@@ -2693,6 +2827,9 @@ tty_putsym(winid window, int x, int y, char ch)
 #ifndef STATUS_HILITES
     case NHW_STATUS:
 #endif
+#ifdef TTY_PERM_INVENT
+    case NHW_TTYINVENT:
+#endif
     case NHW_MAP:
     case NHW_BASE:
         tty_curs(window, x, y);
@@ -2761,7 +2898,11 @@ tty_putstr(winid window, int attr, const char *str)
     if (str == (const char *) 0
         || ((cw->flags & WIN_CANCELLED) && (cw->type != NHW_MESSAGE)))
         return;
-    if (cw->type != NHW_MESSAGE)
+    if (cw->type != NHW_MESSAGE
+#ifdef TTY_PERM_INVENT
+&& window != g.tty_invent_win
+#endif
+       )
         str = compress_str(str);
 
     ttyDisplay->lastwin = window;
@@ -3290,13 +3431,240 @@ tty_message_menu(char let, int how, const char *mesg)
     return ((how == PICK_ONE && morc == let) || morc == '\033') ? morc : '\0';
 }
 
+#ifdef TTY_PERM_INVENT
+static boolean done_box_init = FALSE;
+DISABLE_WARNING_FORMAT_NONLITERAL
+#endif
+
 /* update persistent inventory window */
 void
 tty_update_inventory(int arg UNUSED)
 {
-    /* tty doesn't support persistent inventory window */
+#ifdef TTY_PERM_INVENT
+    int row, col, pass, ccnt;
+    struct WinDesc *cw = 0;
+    winid window = g.tty_invent_win;
+    struct obj *obj;
+    char invbuf[BUFSZ], *text, null[1] = {'\0'};
+    boolean force_redraw = g.program_state.in_docrt ? TRUE
+                            : FALSE;
+    struct tty_perminvent_cell *cell;
+
+/*
+          1         2         3         4         5         6         7
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+x                                       x                                     x
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+*/
+    /* we just return if the window creation failed, probably due to
+       not meeting size requirements */
+    if (window == WIN_ERR || !iflags.perm_invent)
+        return;
+
+    if ((cw = wins[window]) == (struct WinDesc *) 0)
+        panic(winpanicstr, window);
+
+    if (!done_box_init) {
+        tty_invent_box_glyph_init(cw);
+    }
+
+    obj = g.invent;
+    text = null;
+    ccnt = 0;
+    if (obj) {
+        if (obj->invlet == '$')
+            obj = obj->nobj;
+        if (obj) {
+            Snprintf(invbuf, sizeof invbuf, "%c - %s", obj->invlet,
+                     doname(obj));
+            text = invbuf;
+        }
+    }
+    for (pass = 0; pass < 2; ++pass) {
+        for (row = 1; row < (cw->maxrow - 1); ++row) { /* row below top border */
+            for (col = (pass
+                            ? bordercol[border_middle] + 1
+                            : bordercol[border_left] + 1);
+                 col < (pass
+                            ? bordercol[border_right]
+                            : bordercol[border_middle]); ++col) {
+                cell = &cw->cells[row][col];
+                if (obj && *text && ccnt < (bordercol[border_middle] - 1)) {
+                    if (cell->content.ttychar != *text)
+                        cell->refresh = 1;
+                    cell->content.ttychar = *text;
+                    text++;
+                    ccnt++;
+                } else {
+                    if (cell->content.ttychar != ' ')
+                        cell->refresh = 1;
+                    cell->content.ttychar = ' ';
+                }
+                cell->text = 1;
+                cell->glyph = 0;
+            }
+            if (obj) {
+                obj = obj->nobj;
+                if (obj) {
+                    if (obj->invlet == '$')
+                        obj = obj->nobj;
+                    if (obj) {
+                        Snprintf(invbuf, sizeof invbuf, "%c - %s",
+                                 obj->invlet, doname(obj));
+                        text = invbuf;
+                        ccnt = 0;
+                    }
+                }
+            } else {
+                text = null;
+            }
+        }
+    }
+    /* now render to the display */
+    for (row = 0; row < cw->maxrow; ++row)
+        for (col = 0; col < cw->maxcol; ++col) {
+            cell = &cw->cells[row][col];
+            if (cell->refresh || force_redraw) {
+                if (cell->glyph) {
+                    tty_print_glyph(window, col + 1, row,
+                                    cell->content.gi,
+                                    &nul_glyphinfo);
+                    end_glyphout();
+                } else {
+                    if (col != cw->curx || row != cw->cury)
+                        tty_curs(window, col + 1, row);
+                    (void) putchar(cell->content.ttychar);
+                    ttyDisplay->curx++;
+                    cw->curx++;
+                }
+                cell->refresh = 0;
+            }
+        }
+#endif
     return;
 }
+
+#ifdef TTY_PERM_INVENT
+
+void
+tty_refresh_inventory(int start, int stop, int y)
+{
+    int row = y, col, col_limit = stop;
+    struct WinDesc *cw = 0;
+    winid window = g.tty_invent_win;
+    struct tty_perminvent_cell *cell;
+
+    if (window == WIN_ERR || !iflags.perm_invent || y < 0)
+        return;
+
+    if ((cw = wins[window]) == (struct WinDesc *) 0)
+        panic(winpanicstr, window);
+
+    if (col_limit > cw->maxcol)
+        col_limit = cw->maxcol;
+
+    if (row >= cw->maxrow)
+        return; /* out of our range. Huge menus can do this */
+
+    /* we've been asked to redisplay a portion of the screen, one row */
+    for (col = start - 1; col < col_limit; ++col) {
+        cell = &cw->cells[row][col];
+        if (cell->glyph) {
+            tty_print_glyph(window, col + 1, row, cell->content.gi,
+                            &nul_glyphinfo);
+            end_glyphout();
+        } else {
+            if (col != cw->curx || row != cw->cury)
+                tty_curs(window, col + 1, row);
+            (void) putchar(cell->content.ttychar);
+            ttyDisplay->curx++;
+            cw->curx++;
+        }
+        cell->refresh = 0;
+    }
+}
+
+static void tty_invent_box_glyph_init(struct WinDesc *cw)
+{
+    int row, col, glyph;
+    struct tty_perminvent_cell *cell;
+
+/*
+          1         2         3         4         5         6         7
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+x                                       x                                     x
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+*/
+
+    for (row = 0; row < cw->maxrow; ++row)
+        for (col = 0; col < cw->maxcol; ++col) {
+            cell = &cw->cells[row][col];
+            glyph = 0;
+            if (row == 0) {
+                if (col == bordercol[border_left])
+                    glyph = cmap_to_glyph(S_tlcorn);
+                else if ((col > bordercol[border_left] && col < bordercol[border_middle])
+                         || (col > bordercol[border_middle]
+                             && col < bordercol[border_right]))
+                    glyph = cmap_to_glyph(S_hwall);
+                else if (col == bordercol[border_middle])
+                    glyph = cmap_to_glyph(S_tdwall);
+                else if (col == bordercol[border_right])
+                    glyph = cmap_to_glyph(S_trcorn);
+            } else if (row == (cw->maxrow - 1)) {
+                if (col == bordercol[border_left])
+                    glyph = cmap_to_glyph(S_blcorn);
+                else if ((col > bordercol[border_left] && col < bordercol[border_middle])
+                         || (col > bordercol[border_middle]
+                             && col < bordercol[border_right]))
+                    glyph = cmap_to_glyph(S_hwall);
+                else if (col == bordercol[border_middle])
+                    glyph = cmap_to_glyph(S_tuwall);
+                else if (col == bordercol[border_right])
+                    glyph = cmap_to_glyph(S_brcorn);
+            } else {
+                if (col == bordercol[border_left]
+                    || col == bordercol[border_middle]
+                    || col == bordercol[border_right])
+                    glyph = cmap_to_glyph(S_vwall);
+            }
+            if (glyph) {
+                int oldsymidx = cell->content.gi->gm.sym.symidx;
+#ifdef ENHANCED_SYMBOLS
+                struct unicode_representation *oldgmu =
+                    cell->content.gi->gm.u;
+#endif
+                map_glyphinfo(0, 0, glyph, 0, cell->content.gi);
+                if (
+#ifdef ENHANCED_SYMBOLS
+                    cell->content.gi->gm.u != oldgmu ||
+#endif
+                    cell->content.gi->gm.sym.symidx != oldsymidx)
+                    cell->refresh = 1;
+                cell->glyph = 1;
+                cell->text = 0;
+            }
+        }
+    done_box_init = TRUE;
+}
+
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+void
+tty_perm_invent_toggled(boolean negated)
+{
+    if (negated) {
+        destroy_nhwindow(g.tty_invent_win), g.tty_invent_win = WIN_ERR;
+        done_box_init = FALSE;
+    } else {
+        if (WINDOWPORT("tty")) {
+            g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
+            if (g.tty_invent_win != WIN_ERR)
+                display_nhwindow(g.tty_invent_win, FALSE);
+        }
+    }
+}
+#endif
 
 void
 tty_mark_synch(void)
@@ -3357,6 +3725,14 @@ docorner(register int xmin, register int ymax)
     for (y = 0; y < ymax; y++) {
         tty_curs(BASE_WINDOW, xmin, y); /* move cursor */
         cl_end();                       /* clear to end of line */
+#ifdef TTY_PERM_INVENT
+        /* the whole thing is beyond the board */
+        if (g.tty_invent_win != WIN_ERR && WINDOWPORT("tty")) {
+            struct WinDesc *icw = wins[g.tty_invent_win];
+            tty_refresh_inventory(xmin - (int) icw->offx, icw->maxcol,
+                                  y - (int) icw->offy);
+        }
+#endif
 #ifdef CLIPPING
         if (y < (int) cw->offy || y + clipy > ROWNO)
             continue; /* only refresh board */
@@ -3373,6 +3749,7 @@ docorner(register int xmin, register int ymax)
             continue; /* only refresh board  */
         row_refresh(xmin - (int) cw->offx, COLNO - 1, y - (int) cw->offy);
 #endif
+
     }
 
     end_glyphout();
@@ -3505,11 +3882,7 @@ tty_cliparound(int x, int y)
 
 void
 tty_print_glyph(winid window, xchar x, xchar y,
-#if defined(TTY_TILES_ESCCODES) || defined(MSDOS)
                 const glyph_info *glyphinfo,
-#else
-                const glyph_info *glyphinfo UNUSED,
-#endif
                 const glyph_info *bkglyphinfo UNUSED)
 {
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
@@ -3555,6 +3928,9 @@ tty_print_glyph(winid window, xchar x, xchar y,
         /* we don't link with termcap.o if NO_TERMS is defined */
         if ((tty_procs.wincap2 & WC2_U_24BITCOLOR) && SYMHANDLING(H_UTF8)
             && iflags.colorcount >= 256
+#ifdef TTY_PERM_INVENT
+            && !calling_from_update_inventory
+#endif
             && glyphinfo->gm.u && glyphinfo->gm.u->ucolor) {
             term_start_24bitcolor(glyphinfo->gm.u);
             color24bit_on = TRUE;

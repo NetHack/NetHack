@@ -109,6 +109,9 @@ extern boolean colors_changed;  /* in tos.c */
 extern char *shade[3];          /* in sys/msdos/video.c */
 extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
+#ifdef TTY_PERM_INVENT
+extern void tty_perm_invent_toggled(boolean negated);
+#endif
 
 static char empty_optstr[] = { '\0' };
 boolean duplicate, using_alias;
@@ -4467,6 +4470,10 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         case opt_use_inverse:
         case opt_hilite_pile:
         case opt_perm_invent:
+#ifdef TTY_PERM_INVENT
+            if (WINDOWPORT("tty"))
+                tty_perm_invent_toggled(negated);
+#endif
         case opt_ascii_map:
         case opt_tiled_map:
             g.opt_need_redraw = TRUE;

@@ -161,6 +161,12 @@ synch_cursor(void)
 {
     return;
 }
+#ifdef TTY_PERM_INVENT
+void
+tty_perm_invent_toggled(boolean negated)
+{
+}
+#endif
 #endif
 
 void

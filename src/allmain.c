@@ -12,6 +12,10 @@
 #include <signal.h>
 #endif
 
+#ifdef TTY_PERM_INVENT
+#include "wintty.h"     /* just for define of NHW_TTYINVENT */
+#endif
+
 static void moveloop_preamble(boolean);
 static void u_calc_moveamt(int);
 #ifdef POSITIONBAR
@@ -631,6 +635,11 @@ display_gamewindows(void)
        ever having been used, use it here to pacify the Qt interface */
     start_menu(WIN_INVEN, 0U), end_menu(WIN_INVEN, (char *) 0);
 
+#ifdef TTY_PERM_INVENT
+    if (WINDOWPORT("tty") && iflags.perm_invent) {
+        g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
+    }
+#endif
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
      * have to split display_gamewindows into create_gamewindows
@@ -650,6 +659,10 @@ display_gamewindows(void)
     display_nhwindow(WIN_MESSAGE, FALSE);
     clear_glyph_buffer();
     display_nhwindow(WIN_MAP, FALSE);
+#ifdef TTY_PERM_INVENT
+    if (g.tty_invent_win != WIN_ERR)
+        display_nhwindow(g.tty_invent_win, FALSE);
+#endif
 }
 
 void

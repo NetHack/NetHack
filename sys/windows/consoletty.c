@@ -2364,13 +2364,18 @@ void nethack_enter_consoletty(void)
                      console.orig_csbi.srWindow.Left + 1;
     console.Width = max(console.Width, COLNO);
 #else
-    console.width = COLNO;
+//    console.width = COLNO;
+    console.width = console.orig_csbi.srWindow.Right -
+                     console.orig_csbi.srWindow.Left + 1;
+    if (console.width < COLNO)
+        console.width = COLNO;
 #endif
 
     console.height = console.orig_csbi.srWindow.Bottom -
                      console.orig_csbi.srWindow.Top + 1;
-    console.height = max(console.height, ROWNO + 3);
-
+//    console.height = max(console.height, ROWNO + 3);
+    if (console.height < (ROWNO + 2 + 1))
+        console.height = (ROWNO + 2 + 1);
     console.buffer_size = console.width * console.height;
 
 
