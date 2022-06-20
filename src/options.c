@@ -4324,7 +4324,7 @@ int pfxfn_verbose(int optidx UNUSED, int req, boolean negated,
     }
     if (req == do_handler) {
         reslt = handler_verbose(optidx);
-        return optn_ok;
+        return reslt;
     }
     return optn_ok;
 }
