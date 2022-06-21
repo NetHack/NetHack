@@ -237,7 +237,7 @@ steps:
   displayName: 'Building mac full build'
 
 - bash: |
-    export GCCVER=gcc1020
+    export GCCVER=gcc1210
     cd sys/unix
     sh setup.sh hints/linux.370
     cd ../..
