@@ -1252,7 +1252,7 @@ do_oname(struct obj *obj)
 {
     char *bufp, buf[BUFSZ], bufcpy[BUFSZ], qbuf[QBUFSZ];
     const char *aname;
-    short objtyp;
+    short objtyp = STRANGE_OBJECT;
 
     /* Do this now because there's no point in even asking for a name */
     if (obj->otyp == SPE_NOVEL) {
@@ -1285,15 +1285,21 @@ do_oname(struct obj *obj)
      * Orcrist, clearly being literate (no pun intended...).
      */
 
+    if (obj->oartifact) {
+        /* this used to give "The artifact seems to resist the attempt."
+           but resisting is definite, no "seems to" about it */
+        pline("%s resists the attempt.",
+              /* any artifact should always pass the has_oname() test
+                 but be careful just in case */
+              has_oname(obj) ? ONAME(obj) : "The artifact");
+        return;
+    }
+
     /* relax restrictions over proper capitalization for artifacts */
     if ((aname = artifact_name(buf, &objtyp, TRUE)) != 0
-        && objtyp == obj->otyp)
+        && (restrict_name(obj, aname) || exist_artifact(obj->otyp, aname))) {
+        /* substitute canonical spelling before slippage */
         Strcpy(buf, aname);
-
-    if (obj->oartifact) {
-        pline_The("artifact seems to resist the attempt.");
-        return;
-    } else if (restrict_name(obj, buf) || exist_artifact(obj->otyp, buf)) {
         /* this used to change one letter, substituting a value
            of 'a' through 'y' (due to an off by one error, 'z'
            would never be selected) and then force that to
@@ -1307,7 +1313,7 @@ do_oname(struct obj *obj)
            because buf[] matches a valid artifact name) */
         Strcpy(bufcpy, buf);
         /* for "the Foo of Bar", only scuff "Foo of Bar" part */
-        bufp = !strncmpi(bufcpy, "the ", 4) ? (buf + 4) : buf;
+        bufp = !strncmpi(buf, "the ", 4) ? (buf + 4) : buf;
         do {
             wipeout_text(bufp, rn2_on_display_rng(2), (unsigned) 0);
         } while (!strcmp(buf, bufcpy));
@@ -1317,8 +1323,15 @@ do_oname(struct obj *obj)
         /* violate illiteracy conduct since hero attempted to write
            a valid artifact name */
         u.uconduct.literate++;
+    } else if (obj->otyp == objtyp) {
+        /* artifact_name() found a match and restrict_name() didn't reject
+           it; since 'obj' is the right type, naming will change it into an
+           artifact so use canonical capitalization (Sting or Orcrist) */
+        Strcpy(buf, aname);
     }
+
     obj = oname(obj, buf, ONAME_VIA_NAMING | ONAME_KNOW_ARTI);
+    nhUse(obj);
 }
 
 struct obj *

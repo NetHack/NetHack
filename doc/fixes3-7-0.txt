@@ -925,6 +925,9 @@ be less specific when cause of death is "handling a <ring or wand>" that
 adjust the row placement of copyright and early startup messages so that
 	aren't partially overwritten by prompts that follow
 ball and chain could be accessed after having been freed if bones were saved
+early post-3.4.3 tried to fix the "naming artifacts trick" which could be used
+	to distinguish the type of some undiscovered items, but using a name
+	that only matched an artifact after capitalization was exploitable
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
