@@ -489,13 +489,7 @@ release_hold(void)
 
     if (!mtmp) {
         impossible("release_hold when not held?");
-    } else if (sticks(g.youmonst.data)) {
-        /* order matters if 'holding' status condition is enabled;
-           set_ustuck() will set flag for botl update, You() pline will
-           trigger a status update with "UHold" removed */
-        set_ustuck((struct monst *) 0);
-        You("release %s.", mon_nam(mtmp));
-    } else if (u.uswallow) {
+    } else if (u.uswallow) { /* possible for sticky hero to be swallowed */
         if (is_animal(mtmp->data)) {
             if (!Blind)
                 pline("%s opens its mouth!", Monnam(mtmp));
@@ -504,6 +498,12 @@ release_hold(void)
         }
         /* gives "you get regurgitated" or "you get expelled from <mon>" */
         expels(mtmp, mtmp->data, TRUE);
+    } else if (sticks(g.youmonst.data)) {
+        /* order matters if 'holding' status condition is enabled;
+           set_ustuck() will set flag for botl update, You() pline will
+           trigger a status update with "UHold" removed */
+        set_ustuck((struct monst *) 0);
+        You("release %s.", mon_nam(mtmp));
     } else { /* held but not swallowed */
         char relbuf[BUFSZ];
 

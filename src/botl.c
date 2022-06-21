@@ -887,23 +887,30 @@ bot_via_windowport(void)
                                        && !condtests[bl_tethered].test);
     }
     condtests[bl_grab].test = condtests[bl_held].test
+#if 0
+        = condtests[bl_engulfed].test
+#endif
         = condtests[bl_holding].test = FALSE;
     if (u.ustuck) {
-        if (Upolyd && sticks(g.youmonst.data)) {
+        /* it is possible for a hero in sticks() form to be swallowed,
+           so swallowed needs to be checked first; it is not possible for
+           a hero in sticks() form to be held--sticky hero does the holding
+           even if u.ustuck is also a holder */
+        if (u.uswallow) {
+            /* engulfed/swallowed isn't currently a tracked status condition;
+               "held" might look odd for it but seems better than blank */
+#if 0
+            test_if_enabled(bl_engulfed) = TRUE;
+#else
+            test_if_enabled(bl_held) = TRUE;
+#endif
+        } else if (Upolyd && sticks(g.youmonst.data)) {
             test_if_enabled(bl_holding) = TRUE;
         } else {
+            /* grab == hero is held by sea monster and about to be drowned;
+               held == hero is held by something else and can't move away */
             test_if_enabled(bl_grab) = (u.ustuck->data->mlet == S_EEL);
-#if 0
-            test_if_enabled(bl_engulfed) = u.uswallow ? TRUE : FALSE;
-            test_if_enabled(bl_held) = (!condtests[bl_grab].test
-                                        && !condtests[bl_engulfed].test);
-#else
-            test_if_enabled(bl_held) = (!condtests[bl_grab].test
-                /* engulfed/swallowed isn't currently a tracked condition
-                   and showing "held" when in that state looks a bit odd,
-                   so suppress "held" if swallowed */
-                                        && !u.uswallow);
-#endif
+            test_if_enabled(bl_held) = !condtests[bl_grab].test;
         }
     }
     condtests[bl_blind].test     = (Blind) ? TRUE : FALSE;

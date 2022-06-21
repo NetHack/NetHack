@@ -928,6 +928,12 @@ ball and chain could be accessed after having been freed if bones were saved
 early post-3.4.3 tried to fix the "naming artifacts trick" which could be used
 	to distinguish the type of some undiscovered items, but using a name
 	that only matched an artifact after capitalization was exploitable
+the u.ustuck hierarchy is:  swallowed by ustuck, hero poly'd into sticky form
+	is holding ustuck even if ustuck is sticky, ustuck is holding hero;
+	but some code assumed that the first two cases were reversed and
+	could make formerly sticky pold'd hero clear ustuck, leaving hero
+	swallowed by nothing (u.uswallow==1 with u.ustuck==NULL); that could
+	cause a crash if u.ustuck got dereferenced
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

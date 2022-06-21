@@ -146,6 +146,7 @@ static void mon_chain(winid, const char *, struct monst *, boolean, long *,
                       long *);
 static void contained_stats(winid, const char *, long *, long *);
 static void misc_stats(winid, long *, long *);
+static void you_sanity_check(void);
 static boolean accept_menu_prefix(const struct ext_func_tab *);
 static void reset_cmd_vars(boolean);
 static void mcmd_addmenu(winid, int, const char *);
@@ -3630,10 +3631,25 @@ wiz_show_stats(void)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+static void
+you_sanity_check(void)
+{
+    if (u.uswallow && !u.ustuck) {
+        /* this probably ought to be panic() */
+        impossible("sanity_check: swallowed by nothing?");
+        display_nhwindow(WIN_MESSAGE, TRUE);
+        /* try to recover from whatever the problem is */
+        u.uswallow = 0;
+        u.uswldtim = 0;
+        docrt();
+    }
+    (void) check_invent_gold("invent");
+}
+
 void
 sanity_check(void)
 {
-    (void) check_invent_gold("invent");
+    you_sanity_check();
     obj_sanity_check();
     timer_sanity_check();
     mon_sanity_check();
