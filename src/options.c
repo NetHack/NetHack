@@ -4424,6 +4424,9 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                 }
             }
 #endif
+            break; /* from opt_perm_invent */
+        default:
+            break;
         }
         /* this dates from when 'O' prompted for a line of options text
            rather than use a menu to control access to which options can
@@ -4448,6 +4451,8 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             break;
         case opt_tiled_map:
             iflags.wc_ascii_map = negated;
+            break;
+        default:
             break;
         }
 
@@ -4544,6 +4549,8 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             break;
         case opt_rest_on_space:
             update_rest_on_space();
+            break;
+        default:
             break;
         }
 
