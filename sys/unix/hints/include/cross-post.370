@@ -18,6 +18,9 @@ $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
+$(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_CC) -c -o $@ ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
+	$(TARGET_AR) ru ../lib/djgpp/i586-pc-msdosdjgpp/lib/libc.a $(TARGETPFX)exceptn.o
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)

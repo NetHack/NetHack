@@ -1,0 +1,20 @@
+source https://www.vogons.org/viewtopic.php?f=61&t=71459
+--- orig/src/libc/go32/exceptn.S        2002-12-21 21:08:39.000000000 -0800
++++ ./src/libc/go32/exceptn.S 2020-01-18 18:37:27.397176800 -0800
+@@ -337,6 +337,15 @@
+        je      6f
+        orb     $2,%ah  /* If RShift is set, set LShift as well */
+ 6:
++        movb    %ah,%al
++       andb    %cs:___djgpp_sigint_mask, %ah   /* Mask off irrelevant bits */
++       cmpb    %cs:___djgpp_sigint_key+1, %ah  /* Test for SIGINT */
++        je      60f
++        movb    %al,%ah
++       andb    %cs:___djgpp_sigquit_mask, %ah  /* Mask off irrelevant bits */
++       cmpb    %cs:___djgpp_sigquit_key+1, %ah /* Test for SIGQUIT*/
++       jne     Lkbd_chain
++60:
+        inb     $0x60,%al                       /* Read the scan code */
+ 99:
+        movb    %ah,%bh                         /* Save KB status */
+

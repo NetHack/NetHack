@@ -183,7 +183,7 @@ override LUALIBS=
 override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
-override PREGAME += mkdir -p $(TARGETDIR) ;
+override PREGAME += mkdir -p $(TARGETDIR) ; make $(TARGETPFX)exceptn.o ;
 override CLEANMORE += rm -f -r $(TARGETDIR) ;
 VARDATND += nhtiles.bmp
 #
