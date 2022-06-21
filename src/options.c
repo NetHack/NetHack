@@ -4410,16 +4410,15 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                tty_perm_invent_toggled() and routines it calls don't check
                iflags.perm_invent so it doesn't matter that 'SET IT HERE'
                hasn't been executed yet */
-            if (WINDOWPORT("tty") && !negated) {
-                tty_perm_invent_toggled(!negated);
+            if (WINDOWPORT("tty") && !g.opt_initial && !negated) {
+                tty_perm_invent_toggled(FALSE);
 
                 if (g.tty_invent_win == WIN_ERR) {
                     /* FIXME: there is some confusion between this and
                        tty_create_nhwindow(NHW_TTYINVENT) over when this
                        should be done */
                     set_option_mod_status("perm_invent", set_gameview);
-                    if (!g.opt_initial)
-                        config_error_add("Enabling perm_invent failed");
+                    config_error_add("Enabling perm_invent failed");
                     return optn_silenterr;
                 }
             }
