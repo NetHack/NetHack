@@ -1623,20 +1623,20 @@ tty_create_nhwindow(int type)
         newwin->datlen = (short *) 0;
         newwin->cells = (struct tty_perminvent_cell **) 0;
 
-        if ((newwin->rows < tty_pi_minrow) || (newwin->cols < tty_pi_mincol)) {
-        if (newwin->rows < tty_pi_minrow) {
+        if ((newwin->rows < tty_pi_minrow)
+            || (newwin->cols < tty_pi_mincol)) {
             tty_destroy_nhwindow(newid);
-            if (!g.program_state.beyond_savefile_load)
-               raw_printf("tty perm_invent could not be enabled.");
-                if (newwin->rows < tty_pi_minrow)
-                    raw_printf(
-                      "tty perm_invent requires %d rows, your terminal has %d.",
-                                (iflags.wc2_statuslines > 2) ? 54 : 53,
-                                ttyDisplay->rows);
+            if (!g.program_state.beyond_savefile_load) {
+                raw_printf("tty perm_invent could not be enabled.");
+                if (newwin->cols < tty_pi_mincol)
+                    raw_printf("tty perm_invent requires %d columns, your "
+                               "terminal has %d.",
+                               tty_pi_mincol, ttyDisplay->cols);
                 else
-                   raw_printf(
-                   "tty perm_invent requires %d columns, your terminal has %d.",
-                          tty_pi_mincol, ttyDisplay->cols);
+                    raw_printf("tty perm_invent requires %d rows, your "
+                               "terminal has %d.",
+                               (iflags.wc2_statuslines > 2) ? 54 : 53,
+                               ttyDisplay->rows);
             }
             set_option_mod_status("perm_invent", set_gameview);
             iflags.perm_invent = FALSE;
@@ -1648,7 +1648,7 @@ tty_create_nhwindow(int type)
             newwin->maxcol = newwin->cols;
             /* establish the borders */
             bordercol[border_left] = 0;
-            bordercol[border_middle] = ( newwin->maxcol / 2) + 1;
+            bordercol[border_middle] = (newwin->maxcol / 2) + 1;
             bordercol[border_right] = newwin->maxcol - 1;
 
             if (newwin->maxrow) {
@@ -1657,9 +1657,10 @@ tty_create_nhwindow(int type)
                                 * sizeof(struct tty_perminvent_cell *)));
                 for (i = 0; i < newwin->maxrow; i++) {
                     if (newwin->maxcol) {
-                        newwin->cells[i] = (struct tty_perminvent_cell *) alloc(
-                            (unsigned) (newwin->maxcol
-                                * sizeof(struct tty_perminvent_cell)));
+                        newwin->cells[i] =
+                            (struct tty_perminvent_cell *) alloc(
+                                (unsigned) (newwin->maxcol
+                                    * sizeof(struct tty_perminvent_cell)));
                     }
                 }
             }
@@ -1668,11 +1669,11 @@ tty_create_nhwindow(int type)
                 for (c = 0; c < newwin->maxcol; c++) {
                     newwin->cells[r][c] = zerottycell;
                     if (r == 0 || (newwin->maxrow - 1)
-                               || c == bordercol[border_left]
-                               || c == bordercol[border_middle]
-                               || c == bordercol[border_right]) {
+                        || c == bordercol[border_left]
+                        || c == bordercol[border_middle]
+                        || c == bordercol[border_right]) {
                         newwin->cells[r][c].content.gi = (glyph_info *) alloc(
-                                                    (unsigned) sizeof(glyph_info));
+                            (unsigned) sizeof(glyph_info));
                     }
                 }
             return newid;
@@ -3434,7 +3435,7 @@ tty_message_menu(char let, int how, const char *mesg)
 }
 
 #ifdef TTY_PERM_INVENT
-static boolean done_box_init = FALSE;
+static boolean done_tty_perm_invent_init = FALSE;
 DISABLE_WARNING_FORMAT_NONLITERAL
 #endif
 
@@ -3460,13 +3461,24 @@ x                                       x                                     x
 */
     /* we just return if the window creation failed, probably due to
        not meeting size requirements */
-    if (window == WIN_ERR || !iflags.perm_invent)
+    if (window == WIN_ERR)
         return;
 
+    if (!iflags.perm_invent) {
+        if (done_tty_perm_invent_init) {
+            /* Odd - but this could be end-of-game disclosure
+             * which just sets boolean iflag.perm_invent to
+             * FALSE without actually doing anything else.
+             */
+            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
+            (void) doredraw();
+        }
+        return;
+    }
     if ((cw = wins[window]) == (struct WinDesc *) 0)
         panic(winpanicstr, window);
 
-    if (!done_box_init) {
+    if (!done_tty_perm_invent_init) {
         tty_invent_box_glyph_init(cw);
     }
 
@@ -3521,6 +3533,7 @@ x                                       x                                     x
             }
         }
     }
+    calling_from_update_inventory = TRUE;
     /* now render to the display */
     for (row = 0; row < cw->maxrow; ++row)
         for (col = 0; col < cw->maxcol; ++col) {
@@ -3541,6 +3554,7 @@ x                                       x                                     x
                 cell->refresh = 0;
             }
         }
+    calling_from_update_inventory = FALSE;
 #endif
     return;
 }
@@ -3648,7 +3662,7 @@ x                                       x                                     x
                 cell->text = 0;
             }
         }
-    done_box_init = TRUE;
+    done_tty_perm_invent_init = TRUE;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -3659,7 +3673,7 @@ tty_perm_invent_toggled(boolean negated)
     if (negated) {
         if (g.tty_invent_win != WIN_ERR)
             destroy_nhwindow(g.tty_invent_win), g.tty_invent_win = WIN_ERR;
-        done_box_init = FALSE;
+        done_tty_perm_invent_init = FALSE;
     } else {
         g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
         if (g.tty_invent_win != WIN_ERR)
