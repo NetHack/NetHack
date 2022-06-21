@@ -674,7 +674,7 @@ Prefix:  move until something interesting is found.
 Prefix:  similar to \(oqg\(cq, but forking of corridors is not considered
 interesting.
 .lp ""
-Note:  <Control>+<key> means using the holding the <Control> or <Ctrl> key
+Note:  <Control>+<key> means holding the <Control> or <Ctrl> key
 down like <Shift> while typing and releasing <key>, then releasing <Control>.
 Control characters are case-insensitive so \(hax and \(haX are the same.
 .lp "M<direction>"
