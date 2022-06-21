@@ -2149,6 +2149,8 @@ dowhatdoes_core(char q, char *cbuf)
     if ((ec_desc = key2extcmddesc(q)) != NULL) {
         char keybuf[QBUFSZ];
 
+        /* note: if "%-8s" gets changed, the "%8.8s" in dowhatdoes() will
+           need a comparable change */
         Sprintf(buf, "%-8s%s.", key2txt(q, keybuf), ec_desc);
         Strcpy(cbuf, buf);
         return cbuf;
@@ -2253,12 +2255,19 @@ dowhatdoes(void)
 
         if (q == '&' || q == '?')
             whatdoes_help();
-        if (p)
-            *p = '\0';
-        pline("%s", reslt);
-        if (p)
+        if (!p) {
+            /* normal usage; 'reslt' starts with key, some indentation, and
+               then explanation followed by '.' for sentence punctuation */
+            pline("%s", reslt);
+        } else {
+            /* for 'm' prefix, where 'reslt' has an embedded newline to
+               indicate and separate two lines of output; we add a comma to
+               first line so that the combination is a complete sentence */
+            *p = '\0'; /* replace embedded newline with end of first line */
+            pline("%s,", reslt);
             /* cheat by knowing how dowhatdoes_core() handles key portion */
             pline("%8.8s%s", reslt, p + 1);
+        }
     } else {
         pline("No such command '%s', char code %d (0%03o or 0x%02x).",
               visctrl(q), (uchar) q, (uchar) q, (uchar) q);
