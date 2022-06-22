@@ -602,7 +602,7 @@ opt_##a,
                 "prefix for old micro IBM_ options")
 #endif /* MICRO */
 #if !defined(NO_VERBOSE_GRANULARITY)
-    NHOPTP(verbose, 0, opt_in, set_in_game, Yes, Yes, Yes, Yes, NoAlias,
+    NHOPTP(verbose, 0, opt_out, set_in_game, Yes, Yes, Yes, Yes, NoAlias,
                 "suppress verbose messages")
 #endif
 #undef NoAlias
