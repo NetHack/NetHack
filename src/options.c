@@ -4269,7 +4269,7 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
             return optn_err;
         opts[0] = '\0';
         return optn_ok;
-    }b
+    }
     return optn_ok;
 }
 #endif
