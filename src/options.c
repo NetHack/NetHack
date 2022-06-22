@@ -4269,7 +4269,7 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
             return optn_err;
         opts[0] = '\0';
         return optn_ok;
-    }
+    }b
     return optn_ok;
 }
 #endif
@@ -4284,6 +4284,7 @@ int pfxfn_verbose(int optidx UNUSED, int req, boolean negated,
     boolean param_optional = FALSE;
 
     if (req == do_init) {
+        flags.verbose = allopt[optidx].opt_in_out;
         return optn_ok;
     }
     if (req == do_set) {
