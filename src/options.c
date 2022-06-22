@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1651887695 2022/05/07 01:41:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.555 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1655932898 2022/06/22 21:21:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.569 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4413,15 +4413,12 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                hasn't been executed yet */
             if (WINDOWPORT("tty") && !g.opt_initial && !negated) {
                 tty_perm_invent_toggled(FALSE);
-
-                if (g.tty_invent_win == WIN_ERR) {
-                    /* FIXME: there is some confusion between this and
-                       tty_create_nhwindow(NHW_TTYINVENT) over when this
-                       should be done */
-                    set_option_mod_status("perm_invent", set_gameview);
-                    config_error_add("Enabling perm_invent failed");
+                /* tty_perm_invent_toggled()
+                   -> tty_create_nhwindow(WIN_TTYINVENT)
+                      -> tty_create_invent()
+                   gives feedback for failure (terminal too small) */
+                if (g.tty_invent_win == WIN_ERR)
                     return optn_silenterr;
-                }
             }
 #endif
             break; /* from opt_perm_invent */

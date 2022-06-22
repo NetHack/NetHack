@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1644531502 2022/02/10 22:18:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.283 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1655932905 2022/06/22 21:21:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -253,9 +253,12 @@ void g_pututf8(uint8 *utf8str);
 
 #ifdef TTY_PERM_INVENT
 void tty_perm_invent_toggled(boolean negated);
+static int tty_create_invent(int, struct WinDesc *);
 static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean calling_from_update_inventory = FALSE;
+/* this could/should be static */
 struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
+static glyph_info zerogi = { 0 };
 enum { border_left, border_middle, border_right, border_elements };
 static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
 #endif
@@ -1587,99 +1590,7 @@ tty_create_nhwindow(int type)
         break;
 #ifdef TTY_PERM_INVENT
     case NHW_TTYINVENT:
-        /* Is there enough real estate to do this beyond the status line?
-         * Rows:
-         * Top border line (1)
-         * 26 inventory rows (26)
-         * Bottom border line (1)
-         * 1 + 26 + 1 = 28
-         *
-         * Cols:
-         * Left border (1)
-         * Left inventory items (38)
-         * Middle separation (1)
-         * Right inventory items (38)
-         * Right border (1)
-         * 1 + 38 + 1 + 38 + 1 = 79
-         *
-         * The topline + map rows + status lines require:
-         * 1 + 21 + 2 (or 3) = 24 (or 25 depending on status line count).
-         * So we can only present a full inventory on tty if there are
-         * 28 + 24 (or 25) available (52 or 53 rows on the terminal).
-         * Correspondingly ttyDisplay->rows has to be at least 52 (or 53).
-         *
-         */
-        newwin->offx = 0;
-        /* topline + map rows + status lines */
-        newwin->offy = 1 + ROWNO + ((iflags.wc2_statuslines > 2) ? 3 : 2);
-        newwin->rows = (ttyDisplay->rows - newwin->offy) - 1;
-        newwin->cols = ttyDisplay->cols;
-        newwin->maxrow = 0;
-        newwin->maxcol = 79;  /* bhaak */
-        /* these weren't initialized as of yet, and as such could
-           be non-zero which would cause tty_destroy_window()
-           and friends to try and free non-malloc'd memory */
-        newwin->data = (char **) 0;
-        newwin->datlen = (short *) 0;
-        newwin->cells = (struct tty_perminvent_cell **) 0;
-
-        if ((newwin->rows < tty_pi_minrow)
-            || (newwin->cols < tty_pi_mincol)) {
-            tty_destroy_nhwindow(newid);
-            if (!g.program_state.beyond_savefile_load) {
-                raw_printf("tty perm_invent could not be enabled.");
-                if (newwin->cols < tty_pi_mincol)
-                    raw_printf("tty perm_invent requires %d columns, your "
-                               "terminal has %d.",
-                               tty_pi_mincol, ttyDisplay->cols);
-                else
-                    raw_printf("tty perm_invent requires %d rows, your "
-                               "terminal has %d.",
-                               (iflags.wc2_statuslines > 2) ? 54 : 53,
-                               ttyDisplay->rows);
-            }
-            set_option_mod_status("perm_invent", set_gameview);
-            iflags.perm_invent = FALSE;
-            return WIN_ERR;
-        } else {
-            int r, c;
-
-            newwin->maxrow = tty_pi_minrow;
-            newwin->maxcol = newwin->cols;
-            /* establish the borders */
-            bordercol[border_left] = 0;
-            bordercol[border_middle] = (newwin->maxcol / 2) + 1;
-            bordercol[border_right] = newwin->maxcol - 1;
-
-            if (newwin->maxrow) {
-                newwin->cells = (struct tty_perminvent_cell **) alloc(
-                    (unsigned) (newwin->maxrow
-                                * sizeof(struct tty_perminvent_cell *)));
-                for (i = 0; i < newwin->maxrow; i++) {
-                    if (newwin->maxcol) {
-                        newwin->cells[i] =
-                            (struct tty_perminvent_cell *) alloc(
-                                (unsigned) (newwin->maxcol
-                                    * sizeof(struct tty_perminvent_cell)));
-                    }
-                }
-            }
-
-            for (r = 0; r < newwin->maxrow; r++)
-                for (c = 0; c < newwin->maxcol; c++) {
-                    newwin->cells[r][c] = zerottycell;
-                    if (r == 0 || (newwin->maxrow - 1)
-                        || c == bordercol[border_left]
-                        || c == bordercol[border_middle]
-                        || c == bordercol[border_right]) {
-                        newwin->cells[r][c].content.gi = (glyph_info *) alloc(
-                            (unsigned) sizeof(glyph_info));
-                    }
-                }
-            return newid;
-        }
-        /*NOTREACHED*/
-        break;
+        return tty_create_invent(newid, newwin);
 #endif
     default:
         panic("Tried to create window type %d\n", (int) type);
@@ -1710,6 +1621,100 @@ tty_create_nhwindow(int type)
 
     return newid;
 }
+
+#ifdef TTY_PERM_INVENT
+
+static int
+tty_create_invent(int newid, struct WinDesc *newwin)
+{
+    int i, r, c;
+    unsigned n;
+
+    /* Is there enough real estate to do this beyond the status line?
+     * Rows:
+     * Top border line (1)
+     * 26 inventory rows (26)
+     * [should be 27 to have room for '$' and '#']
+     * Bottom border line (1)
+     * 1 + 26 + 1 = 28
+     *
+     * Cols:
+     * Left border (1)
+     * Left inventory items (38)
+     * Middle separation (1)
+     * Right inventory items (38)
+     * Right border (1)
+     * 1 + 38 + 1 + 38 + 1 = 79
+     *
+     * The topline + map rows + status lines require:
+     * 1 + 21 + 2 (or 3) = 24 (or 25 depending on status line count).
+     * So we can only present a full inventory on tty if there are
+     * 28 + 24 (or 25) available (52 or 53 rows on the terminal).
+     * Correspondingly ttyDisplay->rows has to be at least 52 (or 53).
+     * [The top and bottom borderlines aren't necessary.  Suppressing
+     * them would reduce the number of rows needed by 2.]
+     *
+     */
+    newwin->offx = 0;
+    /* topline + map rows + status lines */
+    newwin->offy = 1 + ROWNO + 3; /* 3: + 2 + (iflags.wc2_statuslines > 2) */
+    newwin->rows = (ttyDisplay->rows - newwin->offy);
+    newwin->cols = ttyDisplay->cols;
+    newwin->maxrow = 0;
+    newwin->maxcol = 79;  /* bhaak */
+    /* these weren't initialized as of yet, and as such could
+       be non-zero which would cause tty_destroy_window()
+       and friends to try and free non-malloc'd memory */
+    newwin->data = (char **) 0;
+    newwin->datlen = (short *) 0;
+    newwin->cells = (struct tty_perminvent_cell **) 0;
+
+    if (newwin->rows < tty_pi_minrow || newwin->cols < tty_pi_mincol) {
+        tty_destroy_nhwindow(newid); /* sets g.tty_invent_win to WIN_ERR */
+        pline("%s.", "tty perm_invent could not be enabled");
+        pline(
+   "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d.",
+              tty_pi_minrow + 1 + ROWNO + 3, tty_pi_mincol,
+              ttyDisplay->rows, ttyDisplay->cols);
+        tty_wait_synch();
+        set_option_mod_status("perm_invent", set_gameview);
+        iflags.perm_invent = FALSE;
+        return WIN_ERR;
+    }
+
+    /*
+     * Terminal/window/screen is big enough.
+     */
+    newwin->maxrow = tty_pi_minrow;
+    newwin->maxcol = newwin->cols;
+    /* establish the borders */
+    bordercol[border_left] = 0;
+    bordercol[border_middle] = (newwin->maxcol + 1) / 2;
+    bordercol[border_right] = newwin->maxcol - 1;
+
+    n = (unsigned) (newwin->maxrow * sizeof (struct tty_perminvent_cell *));
+    newwin->cells = (struct tty_perminvent_cell **) alloc(n);
+
+    n = (unsigned) (newwin->maxcol * sizeof (struct tty_perminvent_cell));
+    for (i = 0; i < newwin->maxrow; i++)
+        newwin->cells[i] = (struct tty_perminvent_cell *) alloc(n);
+
+    n = (unsigned) sizeof (glyph_info);
+    for (r = 0; r < newwin->maxrow; r++)
+        for (c = 0; c < newwin->maxcol; c++) {
+            newwin->cells[r][c] = zerottycell;
+            if (r == 0 || r == newwin->maxrow - 1
+                || c == bordercol[border_left]
+                || c == bordercol[border_middle]
+                || c == bordercol[border_right]) {
+                newwin->cells[r][c].content.gi = (glyph_info *) alloc(n);
+                *newwin->cells[r][c].content.gi = zerogi;
+            }
+        }
+
+    return newid;
+}
+#endif
 
 static void
 erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
@@ -2715,10 +2720,10 @@ tty_destroy_nhwindow(winid window)
 }
 
 void
-tty_curs(winid window,
-         register int x, register int y) /* not xchar: perhaps xchar is
-                                            unsigned and curx-x would be
-                                            unsigned as well */
+tty_curs(
+    winid window,
+    register int x, register int y) /* not xchar: perhaps xchar is unsigned
+                                     * then curx-x would be unsigned too */
 {
     struct WinDesc *cw = 0;
     int cx = ttyDisplay->curx;
@@ -3174,15 +3179,16 @@ tty_start_menu(winid window, unsigned long mbehavior)
  * later.
  */
 void
-tty_add_menu(winid window,  /* window to use, must be of type NHW_MENU */
-             const glyph_info *glyphinfo UNUSED, /* glyph info with glyph to
-                                                    display with item */
-             const anything *identifier, /* what to return if selected */
-             char ch,             /* keyboard accelerator (0 = pick our own) */
-             char gch,            /* group accelerator (0 = no group) */
-             int attr,            /* attribute for string (like tty_putstr()) */
-             const char *str,     /* menu string */
-             unsigned int itemflags) /* itemflags such as MENU_ITEMFLAGS_SELECTED */
+tty_add_menu(
+    winid window,  /* window to use, must be of type NHW_MENU */
+    const glyph_info *glyphinfo UNUSED, /* glyph info with glyph to
+                                         * display with item */
+    const anything *identifier, /* what to return if selected */
+    char ch,                /* selector letter (0 = pick our own) */
+    char gch,               /* group accelerator (0 = no group) */
+    int attr,               /* attribute for string (like tty_putstr()) */
+    const char *str,        /* menu string */
+    unsigned int itemflags) /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
     boolean preselected = ((itemflags & MENU_ITEMFLAGS_SELECTED) != 0);
     register struct WinDesc *cw = 0;
@@ -3453,12 +3459,6 @@ tty_update_inventory(int arg UNUSED)
                             : FALSE;
     struct tty_perminvent_cell *cell;
 
-/*
-          1         2         3         4         5         6         7
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-x                                       x                                     x
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-*/
     /* we just return if the window creation failed, probably due to
        not meeting size requirements */
     if (window == WIN_ERR)
@@ -3897,9 +3897,11 @@ tty_cliparound(int x, int y)
  */
 
 void
-tty_print_glyph(winid window, xchar x, xchar y,
-                const glyph_info *glyphinfo,
-                const glyph_info *bkglyphinfo UNUSED)
+tty_print_glyph(
+    winid window,
+    xchar x, xchar y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo UNUSED)
 {
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
     int ch, color;
