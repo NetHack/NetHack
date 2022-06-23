@@ -253,7 +253,7 @@ void g_pututf8(uint8 *utf8str);
 
 #ifdef TTY_PERM_INVENT
 void tty_perm_invent_toggled(boolean negated);
-static int tty_create_invent(int, struct WinDesc *);
+static int ttyinv_create_window(int, struct WinDesc *);
 static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean calling_from_update_inventory = FALSE;
 /* this could/should be static */
@@ -261,6 +261,8 @@ struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
 static glyph_info zerogi = { 0 };
 enum { border_left, border_middle, border_right, border_elements };
 static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
+enum { InvNormal = 0, InvShowGold = 1, InvSparse = 2, InvInUse = 4 };
+static int ttyinvmode = InvNormal;
 #endif
 
 /*
@@ -1590,7 +1592,12 @@ tty_create_nhwindow(int type)
         break;
 #ifdef TTY_PERM_INVENT
     case NHW_TTYINVENT:
-        return tty_create_invent(newid, newwin);
+        {
+            /*TEMPORARY*/
+            char *envtmp = nh_getenv("TTYINV");
+            ttyinvmode = envtmp ? atoi(envtmp) : InvNormal;
+        }
+        return ttyinv_create_window(newid, newwin);
 #endif
     default:
         panic("Tried to create window type %d\n", (int) type);
@@ -1625,9 +1632,9 @@ tty_create_nhwindow(int type)
 #ifdef TTY_PERM_INVENT
 
 static int
-tty_create_invent(int newid, struct WinDesc *newwin)
+ttyinv_create_window(int newid, struct WinDesc *newwin)
 {
-    int i, r, c;
+    int i, r, c, minrow;
     unsigned n;
 
     /* Is there enough real estate to do this beyond the status line?
@@ -1662,19 +1669,30 @@ tty_create_invent(int newid, struct WinDesc *newwin)
     newwin->cols = ttyDisplay->cols;
     newwin->maxrow = 0;
     newwin->maxcol = 79;  /* bhaak */
-    /* these weren't initialized as of yet, and as such could
-       be non-zero which would cause tty_destroy_window()
-       and friends to try and free non-malloc'd memory */
+    /* preliminary init in case tty_desctroy_nhwindow() gets called */
     newwin->data = (char **) 0;
     newwin->datlen = (short *) 0;
     newwin->cells = (struct tty_perminvent_cell **) 0;
 
-    if (newwin->rows < tty_pi_minrow || newwin->cols < tty_pi_mincol) {
+    minrow = tty_pi_minrow;
+    if ((ttyinvmode & InvShowGold) != 0)
+        minrow += 1;
+    /* "normal" max for items in use would be 3 weapon + 7 armor + 4
+       accessories == 14, but being punished and picking up the ball will
+       add 1, and some quest artifacts have an an #invoke property that's
+       tracked via obj->owornmask so could add more; if hero ends up with
+       more than 15 in-use items, some will be left out;
+       Qt's "paper doll" adds first lit lamp/candle and first active
+       leash; those aren't tracked via owornmask so we don't notice them */
+    if ((ttyinvmode & InvInUse) != 0)
+        minrow = 1 + 15 + 1; /* top border + 15 lines + border border */
+
+    if (newwin->rows < minrow || newwin->cols < tty_pi_mincol) {
         tty_destroy_nhwindow(newid); /* sets g.tty_invent_win to WIN_ERR */
         pline("%s.", "tty perm_invent could not be enabled");
         pline(
    "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d.",
-              tty_pi_minrow + 1 + ROWNO + 3, tty_pi_mincol,
+              minrow + 1 + ROWNO + 3, tty_pi_mincol,
               ttyDisplay->rows, ttyDisplay->cols);
         tty_wait_synch();
         set_option_mod_status("perm_invent", set_gameview);
@@ -1685,12 +1703,15 @@ tty_create_invent(int newid, struct WinDesc *newwin)
     /*
      * Terminal/window/screen is big enough.
      */
-    newwin->maxrow = tty_pi_minrow;
+    newwin->maxrow = minrow;
     newwin->maxcol = newwin->cols;
     /* establish the borders */
     bordercol[border_left] = 0;
     bordercol[border_middle] = (newwin->maxcol + 1) / 2;
     bordercol[border_right] = newwin->maxcol - 1;
+    /* for in-use mode, use full lines */
+    if ((ttyinvmode & InvInUse) != 0)
+        bordercol[border_middle] = bordercol[border_right];
 
     n = (unsigned) (newwin->maxrow * sizeof (struct tty_perminvent_cell *));
     newwin->cells = (struct tty_perminvent_cell **) alloc(n);
@@ -3442,6 +3463,10 @@ tty_message_menu(char let, int how, const char *mesg)
 
 #ifdef TTY_PERM_INVENT
 static boolean done_tty_perm_invent_init = FALSE;
+static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *);
+#ifndef NOINVSYM /* invent.c */
+#define NOINVSYM '#'
+#endif
 DISABLE_WARNING_FORMAT_NONLITERAL
 #endif
 
@@ -3450,14 +3475,17 @@ void
 tty_update_inventory(int arg UNUSED)
 {
 #ifdef TTY_PERM_INVENT
-    int row, col, pass, ccnt;
-    struct WinDesc *cw = 0;
-    winid window = g.tty_invent_win;
-    struct obj *obj;
-    char invbuf[BUFSZ], *text, null[1] = {'\0'};
-    boolean force_redraw = g.program_state.in_docrt ? TRUE
-                            : FALSE;
+    static char Empty[1] = { '\0' };
+    struct WinDesc *cw;
     struct tty_perminvent_cell *cell;
+    struct obj *obj;
+    char invbuf[BUFSZ], *text, nxtlet;
+    int row, col, side, slot, maxslot;
+    winid window = g.tty_invent_win;
+    boolean force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
+            show_gold = (ttyinvmode & InvShowGold) != 0,
+            inuse_only = (ttyinvmode & InvInUse) != 0,
+            sparse = (ttyinvmode & InvSparse) != 0;
 
     /* we just return if the window creation failed, probably due to
        not meeting size requirements */
@@ -3482,57 +3510,68 @@ tty_update_inventory(int arg UNUSED)
         tty_invent_box_glyph_init(cw);
     }
 
+    text = Empty; /* lint suppression */
+    maxslot = cw->maxrow - 1;
     obj = g.invent;
-    text = null;
-    ccnt = 0;
-    if (obj) {
-        if (obj->invlet == '$')
-            obj = obj->nobj;
-        if (obj) {
-            Snprintf(invbuf, sizeof invbuf, "%c - %s", obj->invlet,
-                     doname(obj));
-            text = invbuf;
-        }
-    }
-    for (pass = 0; pass < 2; ++pass) {
-        for (row = 1; row < (cw->maxrow - 1); ++row) { /* row below top border */
-            for (col = (pass ? bordercol[border_middle] + 1
-                             : bordercol[border_left] + 1);
-                 col < (pass ? bordercol[border_right]
-                             : bordercol[border_middle]);
-                 ++col) {
-                cell = &cw->cells[row][col];
-                if (obj && *text && ccnt < (bordercol[border_middle] - 1)) {
-                    if (cell->content.ttychar != *text)
-                        cell->refresh = 1;
-                    cell->content.ttychar = *text;
-                    text++;
-                    ccnt++;
-                } else {
-                    if (cell->content.ttychar != ' ')
-                        cell->refresh = 1;
-                    cell->content.ttychar = ' ';
-                }
-                cell->text = 1;
-                cell->glyph = 0;
-            }
-            if (obj) {
+    for (slot = 0; slot < maxslot; ++slot) {
+        if (!sparse) {
+            while (obj && ((obj->invlet == GOLD_SYM && !show_gold)
+                           || (!obj->owornmask && inuse_only)))
                 obj = obj->nobj;
-                if (obj) {
-                    if (obj->invlet == '$')
-                        obj = obj->nobj;
-                    if (obj) {
-                        Snprintf(invbuf, sizeof invbuf, "%c - %s",
-                                 obj->invlet, doname(obj));
-                        text = invbuf;
-                        ccnt = 0;
-                    }
-                }
+        } else {
+            if (!show_gold)
+                nxtlet = (slot < 26) ? ('a' + slot) : ('A' + slot - 26);
+            else
+                nxtlet = (slot == 0) ? GOLD_SYM
+                         : (slot < 27) ? ('a' + slot - 1)
+                           : (slot < 53) ? ('A' + slot - 27)
+                             : NOINVSYM;
+            for (obj = g.invent; obj; obj = obj->nobj)
+                if (obj->invlet == nxtlet)
+                    break;
+        }
+
+        if (obj) {
+            /* TODO: check for MENUCOLORS match */
+            text = doname(obj); /* 'text' will switch to invbuf[] below */
+            /* strip away "a"/"an"/"the" prefix to show a bit more of the
+               interesting part of the object's description;
+               this is inline version of pi_article_skip() from cursinvt.c;
+               should move that to hacklib.c and use it here */
+            if (text[0] == 'a') {
+                if (text[1] == ' ')
+                    text += 2;
+                else if (text[1] == 'n' && text[2] == ' ')
+                    text += 3;
+            } else if (text[0] == 't') {
+                if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
+                    text += 4;
+            }
+            Snprintf(invbuf, sizeof invbuf, "%c - %s", obj->invlet, text);
+            text = invbuf;
+            obj = obj->nobj; /* set up for next iteration */
+        } else if (sparse) {
+            Sprintf(invbuf, "%c", nxtlet); /* empty slot */
+            text = invbuf;
+        } else {
+            if (slot == 0) {
+                Sprintf(invbuf, "%-4s[%s]", "",
+                        !g.invent ? "empty"
+                        : inuse_only ? "no items are in use"
+                          : "only gold");
+                text = invbuf;
             } else {
-                text = null;
+                text = Empty; /* "" => fill slot with spaces */
             }
         }
+
+        row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
+        /* side: left side panel or right side panel, not a window column */
+        side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
+
+        ttyinv_populate_slot(cw, row, side, text);
     }
+
     calling_from_update_inventory = TRUE;
     /* now render to the display */
     for (row = 0; row < cw->maxrow; ++row)
@@ -3541,8 +3580,7 @@ tty_update_inventory(int arg UNUSED)
             if (cell->refresh || force_redraw) {
                 if (cell->glyph) {
                     tty_print_glyph(window, col + 1, row,
-                                    cell->content.gi,
-                                    &nul_glyphinfo);
+                                    cell->content.gi, &nul_glyphinfo);
                     end_glyphout();
                 } else {
                     if (col != cw->curx || row != cw->cury)
@@ -3560,6 +3598,38 @@ tty_update_inventory(int arg UNUSED)
 }
 
 #ifdef TTY_PERM_INVENT
+
+/* put the formatted object description for one item into a particular row
+   and left/right panel, truncating if long or padding with spaces if short */
+static void
+ttyinv_populate_slot(
+     struct WinDesc *cw,
+     int row, /* 'row' within the window, not within screen */
+     int side, /* 'side'==0 is left panel or ==1 is right panel */
+     const char *text)
+{
+    struct tty_perminvent_cell *cell;
+    char c;
+    int ccnt, col, endcol;
+
+    col = bordercol[side] + 1;
+    endcol = bordercol[side + 1] - 1;
+    cell = &cw->cells[row][col];
+    for (ccnt = col; ccnt <= endcol; ++ccnt, ++cell) {
+        if ((c = *text) != '\0') {
+            if (cell->content.ttychar != c)
+                cell->refresh = 1;
+            cell->content.ttychar = c;
+            ++text;
+        } else {
+            if (cell->content.ttychar != ' ')
+                cell->refresh = 1;
+            cell->content.ttychar = ' ';
+        }
+        cell->text = 1;
+        cell->glyph = 0;
+    }
+}
 
 void
 tty_refresh_inventory(int start, int stop, int y)
@@ -3599,17 +3669,11 @@ tty_refresh_inventory(int start, int stop, int y)
     }
 }
 
-static void tty_invent_box_glyph_init(struct WinDesc *cw)
+static void
+tty_invent_box_glyph_init(struct WinDesc *cw)
 {
     int row, col, glyph;
     struct tty_perminvent_cell *cell;
-
-/*
-          1         2         3         4         5         6         7
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-x                                       x                                     x
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-*/
 
     for (row = 0; row < cw->maxrow; ++row)
         for (col = 0; col < cw->maxcol; ++col) {
