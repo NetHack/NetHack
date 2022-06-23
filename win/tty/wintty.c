@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1655932905 2022/06/22 21:21:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1656014602 2022/06/23 20:03:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -258,8 +258,7 @@ void tty_perm_invent_toggled(boolean negated);
 static int ttyinv_create_window(int, struct WinDesc *);
 static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean calling_from_update_inventory = FALSE;
-/* this could/should be static */
-struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
+static struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
 static glyph_info zerogi = { 0 };
 enum { border_left, border_middle, border_right, border_elements };
 static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
@@ -1732,6 +1731,7 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
                 || c == bordercol[border_right]) {
                 newwin->cells[r][c].content.gi = (glyph_info *) alloc(n);
                 *newwin->cells[r][c].content.gi = zerogi;
+                newwin->cells[r][c].glyph = 1;
             }
         }
 
@@ -2718,17 +2718,20 @@ tty_destroy_nhwindow(winid window)
         int r, c;
 
         if (cw->cells) {
-            for (r = 0; r < cw->maxrow; r++)
-                for (c = 0; c < cw->maxcol; c++) {
-                    if (cw->cells[r][c].glyph)
-                        free((genericptr_t) cw->cells[r][c].content.gi);
-                    cw->cells[r][c] = zerottycell;
-                }
-            for (r = 0; r < cw->maxrow; r++)
+            for (r = 0; r < cw->maxrow; r++) {
                 if (cw->cells[r]) {
+                    for (c = 0; c < cw->maxcol; c++) {
+                        /* glyph is a flag indicating whether content union
+                           contains a glyph_info structure or just a char */
+                        if (cw->cells[r][c].glyph)
+                            free((genericptr_t) cw->cells[r][c].content.gi);
+                        cw->cells[r][c] = zerottycell;
+                        cw->cells[r][c].glyph = 0;
+                    }
                     free((genericptr_t) cw->cells[r]);
                     cw->cells[r] = (struct tty_perminvent_cell *) 0;
                 }
+            }
             free((genericptr_t) cw->cells);
             cw->cells = (struct tty_perminvent_cell **) 0;
             cw->rows = cw->cols = 0;
@@ -3513,9 +3516,10 @@ tty_update_inventory(int arg UNUSED)
     }
 
     text = Empty; /* lint suppression */
-    maxslot = cw->maxrow - 1;
+    maxslot = ((int) cw->maxrow - 2) * (!inuse_only ? 2 : 1);
     obj = g.invent;
     for (slot = 0; slot < maxslot; ++slot) {
+        nxtlet = '?'; /* always gets set to something else if actually used */
         if (!sparse) {
             while (obj && ((obj->invlet == GOLD_SYM && !show_gold)
                            || (!obj->owornmask && inuse_only)))
@@ -3691,31 +3695,38 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
     for (row = 0; row < cw->maxrow; ++row)
         for (col = 0; col < cw->maxcol; ++col) {
             cell = &cw->cells[row][col];
+            /* cell->glyph is a flag for whether the content union contains
+               a glyph_info structure rather than just a char */
+            if (!cell->glyph)
+                continue;
             glyph = 0;
+            /* note: for top and bottom, check [border_right] before
+               [border_middle] because they could be the same and if so
+               we want corner rather than tee */
             if (row == 0) {
                 if (col == bordercol[border_left])
                     glyph = cmap_to_glyph(S_tlcorn);
-                else if ((col > bordercol[border_left]
-                          && col < bordercol[border_middle])
-                         || (col > bordercol[border_middle]
-                             && col < bordercol[border_right]))
-                    glyph = cmap_to_glyph(S_hwall);
-                else if (col == bordercol[border_middle])
-                    glyph = cmap_to_glyph(S_tdwall);
                 else if (col == bordercol[border_right])
                     glyph = cmap_to_glyph(S_trcorn);
+                else if (col == bordercol[border_middle])
+                    glyph = cmap_to_glyph(S_tdwall);
+                else /*if ((col > bordercol[border_left]
+                            && col < bordercol[border_middle])
+                           || (col > bordercol[border_middle]
+                               && col < bordercol[border_right]))*/
+                    glyph = cmap_to_glyph(S_hwall);
             } else if (row == (cw->maxrow - 1)) {
                 if (col == bordercol[border_left])
                     glyph = cmap_to_glyph(S_blcorn);
-                else if ((col > bordercol[border_left]
-                          && col < bordercol[border_middle])
-                         || (col > bordercol[border_middle]
-                             && col < bordercol[border_right]))
-                    glyph = cmap_to_glyph(S_hwall);
-                else if (col == bordercol[border_middle])
-                    glyph = cmap_to_glyph(S_tuwall);
                 else if (col == bordercol[border_right])
                     glyph = cmap_to_glyph(S_brcorn);
+                else if (col == bordercol[border_middle])
+                    glyph = cmap_to_glyph(S_tuwall);
+                else /*if ((col > bordercol[border_left]
+                            && col < bordercol[border_middle])
+                           || (col > bordercol[border_middle]
+                               && col < bordercol[border_right]))*/
+                    glyph = cmap_to_glyph(S_hwall);
             } else {
                 if (col == bordercol[border_left]
                     || col == bordercol[border_middle]
@@ -3735,8 +3746,12 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
 #endif
                     cell->content.gi->gm.sym.symidx != oldsymidx)
                     cell->refresh = 1;
-                cell->glyph = 1;
+                cell->glyph = 1; /* (redundant) */
                 cell->text = 0;
+            } else {
+                /* we can only get here when cell->glyph is 1;
+                   not assigning anything in that situation is a bug */
+                impossible("tty invent: expected glyph");
             }
         }
     done_tty_perm_invent_init = TRUE;

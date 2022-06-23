@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.h	$NHDT-Date: 1596498572 2020/08/03 23:49:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.7	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
 /* Copyright (c) David Cohrs, 1991,1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -12,9 +12,10 @@
 
 #ifdef TTY_PERM_INVENT
 enum { tty_pi_minrow = 28, tty_pi_mincol = 79 };
+/* for static init of zerottycell, put pointer first */
 union ttycellcontent {
-    char ttychar;
     glyph_info *gi;
+    char ttychar;
 };
 struct tty_perminvent_cell {
     Bitfield(refresh, 1);
@@ -24,7 +25,6 @@ struct tty_perminvent_cell {
     union ttycellcontent content;
     int32_t color;
 };
-extern struct tty_perminvent_cell zerottycell;
 #endif
 
 /* menu structure */
