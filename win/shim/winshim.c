@@ -183,8 +183,21 @@ void shim_update_inventory(int a1 UNUSED) {
         display_inventory(NULL, FALSE);
     }
 }
+perminvent_info *
+shim_update_invent_slot(
+    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi UNUSED) {
+    return (perminvent_info *) 0;
+}
 #else /* !__EMSCRIPTEN__ */
-VDECLCB(shim_update_inventory,(int a1 UNUSED), "v")
+VDECLCB(shim_update_inventory,(int a1 UNUSED)
+DECLB(perminvent_info *, shim_update_invent_slot,
+    (winid window, int inventory_slot, perminvent_info *pi),
+    "viip",
+    A2P window UNUSED, A2P inventory_slot UNUSED, P2V pi UNUSED)
 #endif
 
 /* Interface definition used in windows.c */
@@ -212,7 +225,7 @@ struct window_procs shim_procs = {
     shim_create_nhwindow, shim_clear_nhwindow, shim_display_nhwindow,
     shim_destroy_nhwindow, shim_curs, shim_putstr, genl_putmixed,
     shim_display_file, shim_start_menu, shim_add_menu, shim_end_menu,
-    shim_select_menu, shim_message_menu, shim_update_inventory, shim_mark_synch,
+    shim_select_menu, shim_message_menu, shim_mark_synch,
     shim_wait_synch,
 #ifdef CLIPPING
     shim_cliparound,
@@ -243,6 +256,8 @@ struct window_procs shim_procs = {
     genl_status_update,
 #endif
     genl_can_suspend_yes,
+    shim_update_inventory,
+    shim_update_invent_slot,
 };
 
 #ifdef __EMSCRIPTEN__

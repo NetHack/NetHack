@@ -37,7 +37,6 @@ struct window_procs {
     void (*win_end_menu)(winid, const char *);
     int (*win_select_menu)(winid, int, MENU_ITEM_P **);
     char (*win_message_menu)(char, int, const char *);
-    void (*win_update_inventory)(int);
     void (*win_mark_synch)(void);
     void (*win_wait_synch)(void);
 #ifdef CLIPPING
@@ -83,6 +82,8 @@ struct window_procs {
     void (*win_status_update)(int, genericptr_t, int, int, int,
                               unsigned long *);
     boolean (*win_can_suspend)(void);
+    void (*win_update_inventory)(int);
+    perminvent_info *(*win_update_invent_slot)(winid, int, perminvent_info *);
 };
 
 extern
@@ -164,6 +165,7 @@ extern
  */
 #define status_enablefield (*windowprocs.win_status_enablefield)
 #define status_update (*windowprocs.win_status_update)
+#define update_invent_slot (*windowprocs.win_update_invent_slot)
 
 /*
  * WINCAP
@@ -421,7 +423,6 @@ extern void safe_add_menu(winid, const glyph_info *, const ANY_P *,
 extern void safe_end_menu(winid, const char *);
 extern int safe_select_menu(winid, int, MENU_ITEM_P **);
 extern char safe_message_menu(char, int, const char *);
-extern void safe_update_inventory(int);
 extern void safe_mark_synch(void);
 extern void safe_wait_synch(void);
 #ifdef CLIPPING
@@ -468,6 +469,8 @@ extern void stdio_raw_print(const char *);
 extern void stdio_nonl_raw_print(const char *);
 extern void stdio_raw_print_bold(const char *);
 extern void stdio_wait_synch(void);
+extern void safe_update_inventory(int);
+extern perminvent_info *safe_update_invent_slot(winid, int, perminvent_info *);
 extern int stdio_nhgetch(void);
 #endif /* SAFEPROCS */
 #endif /* WINPROCS_H */

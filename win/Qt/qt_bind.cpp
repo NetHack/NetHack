@@ -490,6 +490,17 @@ void NetHackQtBind::qt_update_inventory(int arg UNUSED)
     */
 }
 
+perminvent_info *NetHackQtBind::qt_update_invent_slot(
+    winid wid UNUSED,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot UNUSED,                 /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi UNUSED)
+{
+    NetHackQtWindow* window UNUSED =id_to_window[(int)wid];
+    return (perminvent_info *) 0;
+}
+
 void NetHackQtBind::qt_mark_synch()
 {
 }
@@ -1053,7 +1064,6 @@ struct window_procs Qt_procs = {
     nethack_qt_::NetHackQtBind::qt_end_menu,
     nethack_qt_::NetHackQtBind::qt_select_menu,
     genl_message_menu,      /* no need for Qt-specific handling */
-    nethack_qt_::NetHackQtBind::qt_update_inventory,
     nethack_qt_::NetHackQtBind::qt_mark_synch,
     nethack_qt_::NetHackQtBind::qt_wait_synch,
 #ifdef CLIPPING
@@ -1100,6 +1110,8 @@ struct window_procs Qt_procs = {
     genl_status_update,
 #endif
     genl_can_suspend_yes,
+    nethack_qt_::NetHackQtBind::qt_update_inventory,
+    nethack_qt_::NetHackQtBind::qt_update_invent_slot,
 };
 
 #ifndef WIN32

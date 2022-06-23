@@ -135,7 +135,7 @@ struct window_procs tty_procs = {
     tty_destroy_nhwindow, tty_curs, tty_putstr,
     tty_putmixed,
     tty_display_file, tty_start_menu, tty_add_menu, tty_end_menu,
-    tty_select_menu, tty_message_menu, tty_update_inventory, tty_mark_synch,
+    tty_select_menu, tty_message_menu, tty_mark_synch,
     tty_wait_synch,
 #ifdef CLIPPING
     tty_cliparound,
@@ -166,6 +166,8 @@ struct window_procs tty_procs = {
     genl_status_update,
 #endif
     genl_can_suspend_yes,
+    tty_update_inventory,
+    tty_update_invent_slot,
 };
 
 winid BASE_WINDOW;
@@ -3595,6 +3597,17 @@ tty_update_inventory(int arg UNUSED)
     calling_from_update_inventory = FALSE;
 #endif
     return;
+}
+
+perminvent_info *
+tty_update_invent_slot(
+    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi UNUSED)
+{
+    return (perminvent_info *) 0;
 }
 
 #ifdef TTY_PERM_INVENT

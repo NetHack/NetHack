@@ -100,7 +100,7 @@ struct window_procs mswin_procs = {
     genl_putmixed, mswin_display_file, mswin_start_menu, mswin_add_menu,
     mswin_end_menu, mswin_select_menu,
     genl_message_menu, /* no need for X-specific handling */
-    mswin_update_inventory, mswin_mark_synch, mswin_wait_synch,
+    mswin_mark_synch, mswin_wait_synch,
 #ifdef CLIPPING
     mswin_cliparound,
 #endif
@@ -119,6 +119,8 @@ struct window_procs mswin_procs = {
     mswin_status_init, mswin_status_finish, mswin_status_enablefield,
     mswin_status_update,
     genl_can_suspend_yes,
+    mswin_update_inventory,
+    mswin_update_invent_slot,
 };
 
 /*
@@ -1239,6 +1241,17 @@ mswin_update_inventory(int arg)
     if (iflags.perm_invent && g.program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
+}
+
+perminvent_info *
+mswin_update_invent_slot(
+    winid window,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot,                 /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi)
+{
+    return (perminvent_info *) 0;
 }
 
 /*

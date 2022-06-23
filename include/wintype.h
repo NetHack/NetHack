@@ -162,6 +162,28 @@ typedef struct gi {
 
 #define MENU_BEHAVE_STANDARD      0x0000000U
 
+struct to_core {
+    boolean active;
+    boolean use_update_inventory;    /* disable the newer slot interface */
+    int slotcount;
+    int low_slot_num, high_slot_num;
+    int max_slot_text;
+};
+
+struct from_core {
+    long piflags;
+    int slot;           /* which inventory slot; 0 means info exchange only */
+    int invlet;
+    const char *text;   /* the text to display */
+};
+
+struct perminvent_info_t {
+    struct to_core tocore;
+    struct from_core fromcore;
+};
+
+typedef struct perminvent_info_t perminvent_info;
+
 /* clang-format on */
 
 #endif /* WINTYPE_H */

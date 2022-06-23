@@ -74,7 +74,7 @@ struct window_procs safe_procs = {
     safe_create_nhwindow, safe_clear_nhwindow, safe_display_nhwindow,
     safe_destroy_nhwindow, safe_curs, safe_putstr, safe_putmixed,
     safe_display_file, safe_start_menu, safe_add_menu, safe_end_menu,
-    safe_select_menu, safe_message_menu, safe_update_inventory,
+    safe_select_menu, safe_message_menu,
     safe_mark_synch,
     safe_wait_synch,
 #ifdef CLIPPING
@@ -100,6 +100,8 @@ struct window_procs safe_procs = {
     safe_status_finish, safe_status_enablefield,
     safe_status_update,
     safe_can_suspend,
+    safe_update_inventory,
+    safe_update_invent_slot,
 };
 
 struct window_procs *
@@ -268,12 +270,6 @@ safe_message_menu(
     const char *mesg)
 {
     return '\033';
-}
-
-void
-safe_update_inventory(int arg UNUSED)
-{
-    return;
 }
 
 void
@@ -474,6 +470,23 @@ safe_status_update(
     int color UNUSED,
     unsigned long *colormasks UNUSED)
 {
+}
+
+void
+safe_update_inventory(int arg UNUSED)
+{
+    return;
+}
+
+perminvent_info *
+safe_update_invent_slot(
+    winid window,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot,                 /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi)
+{
+    return (perminvent_info *) 0;
 }
 
 /**************************************************************

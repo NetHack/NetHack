@@ -77,7 +77,6 @@ struct window_procs curses_procs = {
     curses_end_menu,
     curses_select_menu,
     genl_message_menu,
-    curses_update_inventory,
     curses_mark_synch,
     curses_wait_synch,
 #ifdef CLIPPING
@@ -117,6 +116,8 @@ struct window_procs curses_procs = {
     genl_status_enablefield,
     curses_status_update,
     genl_can_suspend_yes,
+    curses_update_inventory,
+    curses_update_invent_slot,
 };
 
 /*
@@ -691,6 +692,17 @@ curses_update_inventory(int arg)
         /* perform scrolling operations on persistent inventory window */
         curs_update_invt(arg);
     }
+}
+
+perminvent_info *
+curses_update_invent_slot(
+    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi UNUSED)
+{
+    return (perminvent_info *) 0;
 }
 
 /*

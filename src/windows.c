@@ -536,6 +536,7 @@ static void hup_void_fdecl_int(int);
 static void hup_void_fdecl_winid(winid);
 static void hup_void_fdecl_winid_ulong(winid, unsigned long);
 static void hup_void_fdecl_constchar_p(const char *);
+static perminvent_info *hup_update_invent_slot(winid, int, perminvent_info *);
 
 static struct window_procs hup_procs = {
     "hup", 0L, 0L,
@@ -551,7 +552,6 @@ static struct window_procs hup_procs = {
     hup_curs, hup_putstr, hup_putstr,                  /* putmixed */
     hup_display_file, hup_void_fdecl_winid_ulong,      /* start_menu */
     hup_add_menu, hup_end_menu, hup_select_menu, genl_message_menu,
-    hup_void_fdecl_int,                                /* update_inventory */
     hup_void_ndecl,                                    /* mark_synch */
     hup_void_ndecl,                                    /* wait_synch */
 #ifdef CLIPPING
@@ -584,6 +584,8 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
     genl_can_suspend_no,
+    hup_void_fdecl_int,                                /* update_inventory */
+    hup_update_invent_slot,                            /* update_invent_slot */
 };
 
 static void (*previnterface_exit_nhwindows)(const char *) = 0;
@@ -835,6 +837,18 @@ static void
 hup_void_fdecl_constchar_p(const char *string UNUSED)
 {
     return;
+}
+
+/*ARGUSED*/
+perminvent_info *
+hup_update_invent_slot(
+    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot UNUSED,                 /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi UNUSED)
+{
+    return (perminvent_info *) 0;
 }
 
 #endif /* HANGUPHANDLING */

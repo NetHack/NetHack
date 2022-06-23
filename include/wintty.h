@@ -242,7 +242,6 @@ E void tty_add_menu(winid, const glyph_info *, const ANY_P *, char, char,
 E void tty_end_menu(winid, const char *);
 E int tty_select_menu(winid, int, MENU_ITEM_P **);
 E char tty_message_menu(char, int, const char *);
-E void tty_update_inventory(int);
 E void tty_mark_synch(void);
 E void tty_wait_synch(void);
 #ifdef CLIPPING
@@ -284,6 +283,8 @@ E void genl_outrip(winid, int, time_t);
 
 E char *tty_getmsghistory(boolean);
 E void tty_putmsghistory(const char *, boolean);
+E void tty_update_inventory(int);
+E perminvent_info *tty_update_invent_slot(winid, int, perminvent_info *);
 
 #ifdef TTY_PERM_INVENT
 E void tty_refresh_inventory(int start, int stop, int y);

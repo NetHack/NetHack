@@ -29,7 +29,6 @@ void chainout_add_menu(void *,winid, const glyph_info *, const ANY_P *,
 void chainout_end_menu(void *,winid, const char *);
 int chainout_select_menu(void *,winid, int, MENU_ITEM_P **);
 char chainout_message_menu(void *,char, int, const char *);
-void chainout_update_inventory(void *,int);
 void chainout_mark_synch(void *);
 void chainout_wait_synch(void *);
 #ifdef CLIPPING
@@ -75,6 +74,8 @@ void chainout_status_update(void *,int, genericptr_t, int, int, int,
                            unsigned long *);
 
 boolean chainout_can_suspend(void *);
+void chainout_update_inventory(void *, int);
+perminvent_info *chainout_update_invent_slot(void *, winid, int, perminvent_info *);
 
 void chainout_procs_init(int dir);
 void *chainout_procs_chain(int cmd, int n, void *me, void *nextprocs, void *nextdata);
@@ -698,6 +699,22 @@ chainout_can_suspend(void *vp)
     return rv;
 }
 
+perminvent_info *
+chainout_update_invent_slot(
+    winid window,  /* window to use, must be of type NHW_MENU */
+    int inventory_slot,                 /* slot id: 0 - info return to core */
+                                        /*          1 - gold slot */
+                                        /*          2 - 29 obj slots */
+    perminvent_info *pi)
+{
+    struct chainout_data *tdp = vp;
+    boolean rv;
+
+    rv = (*tdp->nprocs->win_update_invent_slot)(window,
+                                                inventory_slot, pi);
+    return rv;
+}
+
 struct chain_procs chainout_procs = {
     "-chainout", 0, /* wincap */
     0,              /* wincap2 */
@@ -744,4 +761,6 @@ struct chain_procs chainout_procs = {
     chainout_status_init, chainout_status_finish, chainout_status_enablefield,
     chainout_status_update,
     chainout_can_suspend,
+    chainout_update_inventory,
+    chainout_update_invent_slot,
 };
