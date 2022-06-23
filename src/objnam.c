@@ -1339,6 +1339,17 @@ doname_base(
         break;
     }
 
+    if ((obj->otyp == STATUE || obj->otyp == CORPSE || obj->otyp == FIGURINE)
+        && iflags.wizmgender) {
+        int cgend = (obj->spe & CORPSTAT_GENDER),
+            mgend = ((cgend == CORPSTAT_MALE) ? MALE
+                     : (cgend == CORPSTAT_FEMALE) ? FEMALE
+                       : NEUTRAL);
+        Sprintf(eos(bp), " (%s)",
+                cgend != CORPSTAT_RANDOM ? genders[mgend].adj
+                                         : "unspecified gender");
+    }
+
     if ((obj->owornmask & W_WEP) && !g.mrg_to_wielded) {
         boolean twoweap_primary = (obj == uwep && u.twoweap),
                 tethered = (obj->otyp == AKLYS);
