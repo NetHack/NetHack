@@ -545,6 +545,11 @@ tty_preference_update(const char *pref)
     genl_preference_update(pref);
 #endif
 #ifdef TTY_PERM_INVENT
+    /* the boundary box around persistent inventory is drawn with wall
+       symbols, so if player changes to a different symbol set (other
+       than temporary switch to the rogue one), redraw perm_invent; not
+       only might individual symbols change (punctuation vs line drawing),
+       the way to render them might change too (Handling: DEC/UTF8/&c) */
     if (!strcmp(pref, "symset") && iflags.window_inited) {
        if (g.tty_invent_win != WIN_ERR)
            tty_invent_box_glyph_init(wins[g.tty_invent_win]);
@@ -1686,7 +1691,7 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
        Qt's "paper doll" adds first lit lamp/candle and first active
        leash; those aren't tracked via owornmask so we don't notice them */
     if ((ttyinvmode & InvInUse) != 0)
-        minrow = 1 + 15 + 1; /* top border + 15 lines + border border */
+        minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
 
     if (newwin->rows < minrow || newwin->cols < tty_pi_mincol) {
         tty_destroy_nhwindow(newid); /* sets g.tty_invent_win to WIN_ERR */
@@ -3620,10 +3625,10 @@ tty_update_invent_slot(
    and left/right panel, truncating if long or padding with spaces if short */
 static void
 ttyinv_populate_slot(
-     struct WinDesc *cw,
-     int row, /* 'row' within the window, not within screen */
-     int side, /* 'side'==0 is left panel or ==1 is right panel */
-     const char *text)
+    struct WinDesc *cw,
+    int row, /* 'row' within the window, not within screen */
+    int side, /* 'side'==0 is left panel or ==1 is right panel */
+    const char *text)
 {
     struct tty_perminvent_cell *cell;
     char c;
@@ -3633,6 +3638,14 @@ ttyinv_populate_slot(
     endcol = bordercol[side + 1] - 1;
     cell = &cw->cells[row][col];
     for (ccnt = col; ccnt <= endcol; ++ccnt, ++cell) {
+        /* [don't expect this to happen] if there was a glyph here, release
+           memory allocated for it; gi pointer and ttychar character overlay
+           each other in a union, so clear gi before assigning ttychar */
+        if (cell->glyph) {
+            free((genericptr_t) cell->content.gi), cell->content.gi = 0;
+            cell->glyph = 0; /* cell->content.gi is gone */
+        }
+
         if ((c = *text) != '\0') {
             if (cell->content.ttychar != c)
                 cell->refresh = 1;
@@ -3643,8 +3656,7 @@ ttyinv_populate_slot(
                 cell->refresh = 1;
             cell->content.ttychar = ' ';
         }
-        cell->text = 1;
-        cell->glyph = 0;
+        cell->text = 1; /* cell->content.ttychar is current */
     }
 }
 
