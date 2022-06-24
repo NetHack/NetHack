@@ -4417,7 +4417,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                    -> tty_create_nhwindow(WIN_TTYINVENT)
                       -> tty_create_invent()
                    gives feedback for failure (terminal too small) */
-                if (g.tty_invent_win == WIN_ERR)
+                if (g.perm_invent_win == WIN_ERR)
                     return optn_silenterr;
             }
 #endif

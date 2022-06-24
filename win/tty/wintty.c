@@ -255,15 +255,25 @@ void g_pututf8(uint8 *utf8str);
 
 #ifdef TTY_PERM_INVENT
 void tty_perm_invent_toggled(boolean negated);
-static int ttyinv_create_window(int, struct WinDesc *);
-static void tty_invent_box_glyph_init(struct WinDesc *cw);
-static boolean calling_from_update_inventory = FALSE;
 static struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
 static glyph_info zerogi = { 0 };
+#ifdef CORE_INVENT
+static struct to_core zero_tocore = { 0 };
+#endif
 enum { border_left, border_middle, border_right, border_elements };
 static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
-enum { InvNormal = 0, InvShowGold = 1, InvSparse = 2, InvInUse = 4 };
-static int ttyinvmode = InvNormal;
+static int ttyinvmode = InvNormal; /* enum is in wintype.h */
+static boolean done_tty_perm_invent_init = FALSE;
+#ifndef NOINVSYM /* invent.c */
+#define NOINVSYM '#'
+#endif
+static int ttyinv_create_window(int, struct WinDesc *);
+
+static void tty_invent_box_glyph_init(struct WinDesc *cw);
+static boolean calling_from_update_inventory = FALSE;
+static boolean assesstty(enum inv_modes, short *, short *,
+        long *, long *, long *, long *, long *);
+static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *);
 #endif
 
 /*
@@ -551,8 +561,8 @@ tty_preference_update(const char *pref)
        only might individual symbols change (punctuation vs line drawing),
        the way to render them might change too (Handling: DEC/UTF8/&c) */
     if (!strcmp(pref, "symset") && iflags.window_inited) {
-       if (g.tty_invent_win != WIN_ERR)
-           tty_invent_box_glyph_init(wins[g.tty_invent_win]);
+       if (g.perm_invent_win != WIN_ERR)
+           tty_invent_box_glyph_init(wins[g.perm_invent_win]);
     }
 #endif
     return;
@@ -1597,12 +1607,7 @@ tty_create_nhwindow(int type)
         newwin->maxrow = newwin->maxcol = 0;
         break;
 #ifdef TTY_PERM_INVENT
-    case NHW_TTYINVENT:
-        {
-            /*TEMPORARY*/
-            char *envtmp = nh_getenv("TTYINV");
-            ttyinvmode = envtmp ? atoi(envtmp) : InvNormal;
-        }
+    case NHW_PERMINVENT:
         return ttyinv_create_window(newid, newwin);
 #endif
     default:
@@ -1640,7 +1645,8 @@ tty_create_nhwindow(int type)
 static int
 ttyinv_create_window(int newid, struct WinDesc *newwin)
 {
-    int i, r, c, minrow;
+    int i, r, c;
+    long minrow;    /* long to match maxrow declaration */
     unsigned n;
 
     /* Is there enough real estate to do this beyond the status line?
@@ -1668,37 +1674,20 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
      * them would reduce the number of rows needed by 2.]
      *
      */
-    newwin->offx = 0;
-    /* topline + map rows + status lines */
-    newwin->offy = 1 + ROWNO + 3; /* 3: + 2 + (iflags.wc2_statuslines > 2) */
-    newwin->rows = (ttyDisplay->rows - newwin->offy);
-    newwin->cols = ttyDisplay->cols;
-    newwin->maxrow = 0;
-    newwin->maxcol = 79;  /* bhaak */
+
     /* preliminary init in case tty_desctroy_nhwindow() gets called */
     newwin->data = (char **) 0;
     newwin->datlen = (short *) 0;
     newwin->cells = (struct tty_perminvent_cell **) 0;
 
-    minrow = tty_pi_minrow;
-    if ((ttyinvmode & InvShowGold) != 0)
-        minrow += 1;
-    /* "normal" max for items in use would be 3 weapon + 7 armor + 4
-       accessories == 14, but being punished and picking up the ball will
-       add 1, and some quest artifacts have an an #invoke property that's
-       tracked via obj->owornmask so could add more; if hero ends up with
-       more than 15 in-use items, some will be left out;
-       Qt's "paper doll" adds first lit lamp/candle and first active
-       leash; those aren't tracked via owornmask so we don't notice them */
-    if ((ttyinvmode & InvInUse) != 0)
-        minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
-
-    if (newwin->rows < minrow || newwin->cols < tty_pi_mincol) {
-        tty_destroy_nhwindow(newid); /* sets g.tty_invent_win to WIN_ERR */
+    if (!assesstty(ttyinvmode,
+                  &newwin->offx, &newwin->offy, &newwin->rows, &newwin->cols,
+                  &newwin->maxcol, &minrow, &newwin->maxrow)) {
+        tty_destroy_nhwindow(newid); /* sets g.perm_invent_win to WIN_ERR */
         pline("%s.", "tty perm_invent could not be enabled");
         pline(
    "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d.",
-              minrow + 1 + ROWNO + 3, tty_pi_mincol,
+              (int) (minrow + 1 + ROWNO + 3), tty_pi_mincol,
               ttyDisplay->rows, ttyDisplay->cols);
         tty_wait_synch();
         set_option_mod_status("perm_invent", set_gameview);
@@ -1739,10 +1728,11 @@ ttyinv_create_window(int newid, struct WinDesc *newwin)
                 newwin->cells[r][c].glyph = 1;
             }
         }
-
+    if (!done_tty_perm_invent_init)
+        tty_invent_box_glyph_init(newwin);
     return newid;
 }
-#endif
+#endif  /* TTY_PERM_INVENT */
 
 static void
 erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
@@ -2739,7 +2729,7 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MAP)
         clear_screen();
 #ifdef TTY_PERM_INVENT
-    if (cw->type == NHW_TTYINVENT) {
+    if (cw->type == NHW_PERMINVENT) {
         int r, c;
 
         if (cw->cells) {
@@ -2762,7 +2752,7 @@ tty_destroy_nhwindow(winid window)
             cw->rows = cw->cols = 0;
         }
         cw->maxrow = cw->maxcol = 0;
-        g.tty_invent_win = WIN_ERR;
+        g.perm_invent_win = WIN_ERR;
     }
 #endif
     free_window_info(cw, TRUE);
@@ -2887,7 +2877,7 @@ tty_putsym(winid window, int x, int y, char ch)
     case NHW_STATUS:
 #endif
 #ifdef TTY_PERM_INVENT
-    case NHW_TTYINVENT:
+    case NHW_PERMINVENT:
 #endif
     case NHW_MAP:
     case NHW_BASE:
@@ -2959,7 +2949,7 @@ tty_putstr(winid window, int attr, const char *str)
         return;
     if (cw->type != NHW_MESSAGE
 #ifdef TTY_PERM_INVENT
-        && window != g.tty_invent_win
+        && window != g.perm_invent_win
 #endif
        )
         str = compress_str(str);
@@ -3457,8 +3447,6 @@ tty_select_menu(winid window, int how, menu_item **menu_list)
     return n;
 }
 
-RESTORE_WARNING_FORMAT_NONLITERAL
-
 /* special hack for treating top line --More-- as a one item menu */
 char
 tty_message_menu(char let, int how, const char *mesg)
@@ -3491,32 +3479,34 @@ tty_message_menu(char let, int how, const char *mesg)
     return ((how == PICK_ONE && morc == let) || morc == '\033') ? morc : '\0';
 }
 
-#ifdef TTY_PERM_INVENT
-static boolean done_tty_perm_invent_init = FALSE;
-static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *);
-#ifndef NOINVSYM /* invent.c */
-#define NOINVSYM '#'
-#endif
-DISABLE_WARNING_FORMAT_NONLITERAL
-#endif
-
 /* update persistent inventory window */
 void
 tty_update_inventory(int arg UNUSED)
 {
 #ifdef TTY_PERM_INVENT
+#ifndef CORE_INVENT
     static char Empty[1] = { '\0' };
     struct WinDesc *cw;
     struct tty_perminvent_cell *cell;
     struct obj *obj;
     char invbuf[BUFSZ], *text, nxtlet;
     int row, col, side, slot, maxslot;
-    winid window = g.tty_invent_win;
+    winid window = g.perm_invent_win;
     boolean force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
             show_gold = (ttyinvmode & InvShowGold) != 0,
             inuse_only = (ttyinvmode & InvInUse) != 0,
             sparse = (ttyinvmode & InvSparse) != 0;
 
+    if (g.perm_invent_win == WIN_ERR
+        && !done_tty_perm_invent_init && iflags.perm_invent) {
+        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
+        if (g.perm_invent_win == WIN_ERR) {
+            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
+            return;
+        }
+        display_nhwindow(g.perm_invent_win, FALSE);
+        window = g.perm_invent_win;
+    }
     /* we just return if the window creation failed, probably due to
        not meeting size requirements */
     if (window == WIN_ERR)
@@ -3624,29 +3614,155 @@ tty_update_inventory(int arg UNUSED)
             }
         }
     calling_from_update_inventory = FALSE;
-#endif
+#endif  /* CORE_INVENT */
+#endif  /* TTY_PERM_INVENT */
     return;
 }
 
 perminvent_info *
 tty_update_invent_slot(
-    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi UNUSED)
+    winid window,  /* window to use, must be of type NHW_MENU */
+    int slot,
+    perminvent_info *pi)
 {
+#if !defined(TTY_PERM_INVENT) || !defined(CORE_INVENT)
     return (perminvent_info *) 0;
+    nhUse(window);
+    nhUse(slot);
+    nhUse(pi);
+#else
+    boolean force_redraw, tty_ok, show_gold, inuse_only;
+    int row, col, side, maxslot;
+    /* winid window = g.perm_invent_win; */
+    struct WinDesc *cw;
+    struct tty_perminvent_cell *cell;
+    /* these types are set match the wintty.h field declarations */
+    long minrow;    /* long to match maxrow declaration in wintty.h */
+    short offx, offy;
+    long rows, cols, maxrow, maxcol;
+
+    if (!pi)
+        return (perminvent_info *) 0;
+    if (!done_tty_perm_invent_init
+        && pi->fromcore.core_request != request_settings) {
+        pi->tocore.tocore_flags |= no_init_done;
+        return pi;
+    }
+
+    switch(pi->fromcore.core_request) {
+    case request_settings: {
+        pi->tocore = zero_tocore;
+        ttyinvmode = pi->fromcore.invmode;
+        inuse_only = (ttyinvmode & InvInUse) != 0;
+        tty_ok = assesstty(pi->fromcore.invmode,
+                           &offx, &offy, &rows, &cols,
+                           &maxcol, &minrow, &maxrow);
+        pi->tocore.needrows = (int) (minrow + 1 + ROWNO + 3);
+        pi->tocore.needcols = (int) tty_pi_mincol;
+        pi->tocore.haverows = (int) ttyDisplay->rows;
+        pi->tocore.havecols = (int) ttyDisplay->cols;
+        if (!tty_ok) {
+            pi->tocore.tocore_flags |= prohibited;  /* prohibited */
+            return pi;
+        }
+        maxslot = (maxrow - 2) * (!inuse_only ? 2 : 1);
+        pi->tocore.maxslot = maxslot;
+        return pi;
+        break;
+    }
+    case update_slot:
+        if ((cw = wins[window]) == (struct WinDesc *) 0)
+            panic(winpanicstr, window);
+        slot -= 1;  /* 0 is used for commands */
+        show_gold = (ttyinvmode & InvShowGold) != 0;
+        row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
+        /* side: left side panel or right side panel, not a window column */
+        side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
+        ttyinv_populate_slot(cw, row, side, pi->fromcore.text);
+        break;
+    case render:
+        if ((cw = wins[window]) == (struct WinDesc *) 0)
+            panic(winpanicstr, window);
+        /* render to the display */
+        force_redraw = pi->fromcore.force_redraw;
+//        show_gold = (ttyinvmode & InvShowGold) != 0;
+//        inuse_only = (ttyinvmode & InvInUse) != 0;
+//        sparse = (ttyinvmode & InvSparse) != 0;
+//        if (!done_tty_perm_invent_init)
+        calling_from_update_inventory = TRUE;
+        for (row = 0; row < cw->maxrow; ++row)
+            for (col = 0; col < cw->maxcol; ++col) {
+                cell = &cw->cells[row][col];
+                if (cell->refresh || force_redraw) {
+                    if (cell->glyph) {
+                        tty_print_glyph(window, col + 1, row,
+                                    cell->content.gi, &nul_glyphinfo);
+                        end_glyphout();
+                    } else {
+                        if (col != cw->curx || row != cw->cury)
+                        tty_curs(window, col + 1, row);
+                        (void) putchar(cell->content.ttychar);
+                        ttyDisplay->curx++;
+                        cw->curx++;
+                    }
+                    cell->refresh = 0;
+                }
+            }
+        calling_from_update_inventory = FALSE;
+        break;
+    default:
+        impossible("invalid request to tty_update_invent_slot %u",
+                   pi->fromcore.core_request);
+    }
+    return pi;
+#endif
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #ifdef TTY_PERM_INVENT
+/*
+ * returns TRUE if things are ok
+ */
+static boolean
+assesstty(
+    enum inv_modes invmode,
+    short *offx, short *offy, long *rows, long *cols,
+    long *maxcol, long *minrow, long *maxrow)
+{
+    boolean show_gold, inuse_only;
+
+    show_gold = (invmode & InvShowGold) != 0;
+    inuse_only = (invmode & InvInUse) != 0;
+
+    *offx = 0;
+    /* topline + map rows + status lines */
+    *offy = 1 + ROWNO + 3; /* 3: + 2 + (iflags.wc2_statuslines > 2) */
+    *rows = (ttyDisplay->rows - (*offy));
+    *cols = ttyDisplay->cols;
+    *minrow = tty_pi_minrow;
+    if (show_gold)
+        *minrow += 1;
+    /* "normal" max for items in use would be 3 weapon + 7 armor + 4
+       accessories == 14, but being punished and picking up the ball will
+       add 1, and some quest artifacts have an an #invoke property that's
+       tracked via obj->owornmask so could add more; if hero ends up with
+       more than 15 in-use items, some will be left out;
+       Qt's "paper doll" adds first lit lamp/candle and first active
+       leash; those aren't tracked via owornmask so we don't notice them */
+    if (inuse_only)
+        *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
+    *maxrow = *minrow;
+    *maxcol = *cols;
+    return !(*rows < *minrow || *cols < tty_pi_mincol);
+}
 
 /* put the formatted object description for one item into a particular row
    and left/right panel, truncating if long or padding with spaces if short */
 static void
 ttyinv_populate_slot(
     struct WinDesc *cw,
-    int row, /* 'row' within the window, not within screen */
+    int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
     const char *text)
 {
@@ -3680,12 +3796,14 @@ ttyinv_populate_slot(
     }
 }
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 void
 tty_refresh_inventory(int start, int stop, int y)
 {
     int row = y, col, col_limit = stop;
     struct WinDesc *cw = 0;
-    winid window = g.tty_invent_win;
+    winid window = g.perm_invent_win;
     struct tty_perminvent_cell *cell;
 
     if (window == WIN_ERR || !iflags.perm_invent || y < 0)
@@ -3717,6 +3835,8 @@ tty_refresh_inventory(int start, int stop, int y)
         cell->refresh = 0;
     }
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 tty_invent_box_glyph_init(struct WinDesc *cw)
@@ -3789,22 +3909,20 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
     done_tty_perm_invent_init = TRUE;
 }
 
-RESTORE_WARNING_FORMAT_NONLITERAL
-
 void
 tty_perm_invent_toggled(boolean negated)
 {
     if (negated) {
-        if (g.tty_invent_win != WIN_ERR)
-            destroy_nhwindow(g.tty_invent_win), g.tty_invent_win = WIN_ERR;
+        if (g.perm_invent_win != WIN_ERR)
+            destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
         done_tty_perm_invent_init = FALSE;
     } else {
-        g.tty_invent_win = create_nhwindow(NHW_TTYINVENT);
-        if (g.tty_invent_win != WIN_ERR)
-            display_nhwindow(g.tty_invent_win, FALSE);
+        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
+        if (g.perm_invent_win != WIN_ERR)
+            display_nhwindow(g.perm_invent_win, FALSE);
     }
 }
-#endif
+#endif  /* TTY_PERM_INVENT */
 
 void
 tty_mark_synch(void)
@@ -3848,8 +3966,8 @@ docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
 #ifdef TTY_PERM_INVENT
     struct WinDesc *icw = 0;
 
-    if (g.tty_invent_win != WIN_ERR)
-        icw = wins[g.tty_invent_win];
+    if (g.perm_invent_win != WIN_ERR)
+        icw = wins[g.perm_invent_win];
 #endif
 
     HUPSKIP();
@@ -3902,7 +4020,8 @@ docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
     }
 
     end_glyphout();
-    if (ymax >= (int) wins[WIN_STATUS]->offy) {
+    if (ymax >= (int) wins[WIN_STATUS]->offy
+        && !ystart_between_menu_pages) {
         /* we have wrecked the bottom line */
         g.context.botlx = 1;
         bot();

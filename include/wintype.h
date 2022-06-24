@@ -111,6 +111,8 @@ typedef struct gi {
 #define NHW_MAP 3
 #define NHW_MENU 4
 #define NHW_TEXT 5
+#define NHW_PERMINVENT 6
+#define NHW_LAST_TYPE NHW_PERMINVENT
 
 /* attribute types for putstr; the same as the ANSI value, for convenience */
 #define ATR_NONE       0
@@ -162,19 +164,37 @@ typedef struct gi {
 
 #define MENU_BEHAVE_STANDARD      0x0000000U
 
+/* inventory modes */
+enum inv_modes { InvNormal = 0, InvShowGold = 1, InvSparse = 2, InvInUse = 4 };
+
+enum to_core_flags {
+    active           = 0x001,
+    prohibited       = 0x002,
+    no_init_done     = 0x004
+};
+
+enum from_core_requests {
+    request_settings = 1,
+    update_slot      = 2,
+    render           = 3
+};
+
 struct to_core {
+    long tocore_flags;
     boolean active;
     boolean use_update_inventory;    /* disable the newer slot interface */
-    int slotcount;
-    int low_slot_num, high_slot_num;
-    int max_slot_text;
+    int maxslot;
+    int needrows, needcols;
+    int haverows, havecols;
 };
 
 struct from_core {
-    long piflags;
-    int slot;           /* which inventory slot; 0 means info exchange only */
+    enum from_core_requests core_request;
+    enum inv_modes invmode;
+    boolean force_redraw;
+    int slot;           /* which inventory slot; 0 indicates request */
     int invlet;
-    const char *text;   /* the text to display */
+    char text[BUFSZ];
 };
 
 struct perminvent_info_t {
@@ -183,6 +203,8 @@ struct perminvent_info_t {
 };
 
 typedef struct perminvent_info_t perminvent_info;
+
+#define CORE_INVENT
 
 /* clang-format on */
 

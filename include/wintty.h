@@ -11,6 +11,7 @@
 #define WINDOW_STRUCTS
 
 #ifdef TTY_PERM_INVENT
+
 enum { tty_pi_minrow = 28, tty_pi_mincol = 79 };
 /* for static init of zerottycell, put pointer first */
 union ttycellcontent {
@@ -123,11 +124,7 @@ struct tty_status_fields {
 #ifdef NHW_BASE
 #undef NHW_BASE
 #endif
-#define NHW_BASE (NHW_TEXT + 1)
-
-#ifdef TTY_PERM_INVENT
-#define NHW_TTYINVENT (NHW_BASE + 1)
-#endif
+#define NHW_BASE (NHW_LAST_TYPE + 1)
 
 extern struct window_procs tty_procs;
 

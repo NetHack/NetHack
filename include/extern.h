@@ -1174,6 +1174,7 @@ extern long count_contents(struct obj *, boolean, boolean, boolean, boolean);
 extern void carry_obj_effects(struct obj *);
 extern const char *currency(long);
 extern void silly_thing(const char *, struct obj *);
+extern void core_update_invent_slot(void);
 
 /* ### ioctl.c ### */
 

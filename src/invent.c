@@ -2429,9 +2429,13 @@ update_inventory(void)
      */
     save_suppress_price = iflags.suppress_price;
     iflags.suppress_price = 0;
-
-    (*windowprocs.win_update_inventory)(0);
-
+#if defined(TTY_PERM_INVENT) && defined(CORE_INVENT)
+    if (WINDOWPORT("tty"))
+        core_update_invent_slot();
+    else
+#else
+        (*windowprocs.win_update_inventory)(0);
+#endif
     iflags.suppress_price = save_suppress_price;
 }
 
@@ -5332,5 +5336,189 @@ display_binventory(int x, int y, boolean as_if_seen)
     }
     return n;
 }
+
+#if defined(CORE_INVENT)
+/* enum and structs are defined in wintype.h */
+static perminvent_info zeropi = { 0 };
+static perminvent_info pi_info;
+static int invmode = InvNormal;
+static char Empty[1] = { '\0' };
+#ifdef TTY_PERM_INVENT
+extern void tty_perm_invent_toggled(boolean negated);
+#endif
+
+void
+core_update_invent_slot()
+{
+    static perminvent_info *pi = 0;
+    char *text, nxtlet;
+    int slot;
+    boolean show_gold = (invmode & InvShowGold) != 0,
+            inuse_only = (invmode & InvInUse) != 0,
+            sparse = (invmode & InvSparse) != 0;
+    const char *wport_id;
+    struct obj *obj;
+
+    if (g.perm_invent_win == WIN_ERR && g.core_invent_state)
+            return;
+
+    if (!iflags.perm_invent && g.core_invent_state) {
+        /* Odd - but this could be end-of-game disclosure
+         * which just sets boolean iflag.perm_invent to
+         * FALSE without actually doing anything else.
+         */
+#ifdef TTY_PERM_INVENT
+        if (WINDOWPORT("tty"))
+            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
+#endif
+        (void) doredraw();
+        return;
+    }
+
+    /*
+     * The core looks after what content goes into the
+     * inventory slots, and deals with things like obj
+     * chains etc, so the window port doesn't have to.
+     *
+     * The window port informs the core of the number of
+     * slots that it will process.
+     *
+     * The core tells the window port what the contents of the
+     * inventory slots should be.
+     *
+     * The core requests the window port when to render, after
+     * all the content has been updated.
+     *
+     * The window port looks after the placement of an inventory
+     * slot's contents onto the display in an appropriate fashion,
+     * The core doesn't care, and leaves that up to the window port.
+     *
+     * The core slot handling is no longer tied to TTY_PERM_INVENT,
+     * although at this point that's the only window port to utilize
+     * it. The rest are still rolling their own via the basic
+     * [port]_update_inventory() mechanism.
+     */
+
+    if (WINDOWPORT("tty") && iflags.perm_invent)
+        wport_id = "tty perm_invent";
+    else
+        wport_id = "perm_invent";
+
+    pi_info.fromcore.core_request = 0;
+    if (!g.core_invent_state) {
+        {
+            /*TEMPORARY*/
+            char *envtmp = nh_getenv("TTYINV");
+            invmode = envtmp ? atoi(envtmp) : InvNormal;
+        }
+        pi_info.fromcore.invmode = invmode;
+        pi_info = zeropi;
+        /* Send the wport a request to get the related settings. */
+        pi_info.fromcore.core_request = request_settings;
+        if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
+            if ((pi->tocore.tocore_flags & prohibited) != 0) {
+                /* sizes aren't good enough */
+                set_option_mod_status("perm_invent", set_gameview);
+                iflags.perm_invent = FALSE;
+                pline("%s could not be enabled.", wport_id); 
+                pline("%s needs a terminal that is at least %dx%d, yours is %dx%d.",
+                      wport_id,
+                      pi->tocore.needrows, pi->tocore.needcols,
+                      pi->tocore.haverows, pi->tocore.havecols);
+                wait_synch();
+                return;
+            }
+        }
+        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
+        if (g.perm_invent_win == WIN_ERR)
+            return;
+        display_nhwindow(g.perm_invent_win, FALSE);
+        g.core_invent_state++;
+    }
+    text = Empty; /* lint suppression */
+    pi_info.fromcore.core_request = update_slot;
+    pi_info.fromcore.force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
+
+    obj = g.invent;
+    for (slot = 0; slot < pi->tocore.maxslot; ++slot) {
+        nxtlet = '?'; /* always gets set to something else if actually used */
+        if (!sparse) {
+            while (obj && ((obj->invlet == GOLD_SYM && !show_gold)
+                           || (!obj->owornmask && inuse_only)))
+                obj = obj->nobj;
+        } else {
+            if (!show_gold)
+                nxtlet = (slot < 26) ? ('a' + slot) : ('A' + slot - 26);
+            else
+                nxtlet = (slot == 0) ? GOLD_SYM
+                         : (slot < 27) ? ('a' + slot - 1)
+                           : (slot < 53) ? ('A' + slot - 27)
+                             : NOINVSYM;
+            for (obj = g.invent; obj; obj = obj->nobj)
+                if (obj->invlet == nxtlet)
+                    break;
+        }
+        if (obj) {
+            /* TODO: check for MENUCOLORS match */
+            text = doname(obj); /* 'text' will switch to fromcore.text below */
+            /* strip away "a"/"an"/"the" prefix to show a bit more of the
+               interesting part of the object's description;
+               this is inline version of pi_article_skip() from cursinvt.c;
+               should move that to hacklib.c and use it here */
+            if (text[0] == 'a') {
+                if (text[1] == ' ')
+                    text += 2;
+                else if (text[1] == 'n' && text[2] == ' ')
+                    text += 3;
+            } else if (text[0] == 't') {
+                if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
+                    text += 4;
+            }
+            Snprintf(pi_info.fromcore.text,
+                     sizeof pi_info.fromcore.text,
+                     "%c - %s", obj->invlet, text);
+            text = pi_info.fromcore.text;
+            obj = obj->nobj; /* set up for next iteration */
+        } else if (sparse) {
+            Sprintf(pi_info.fromcore.text, "%c", nxtlet); /* empty slot */
+            text = pi_info.fromcore.text;
+        } else {
+            if (slot == 0) {
+                Sprintf(pi_info.fromcore.text, "%-4s[%s]", "",
+                        !g.invent ? "empty"
+                        : inuse_only ? "no items are in use"
+                          : "only gold");
+                text = pi_info.fromcore.text;
+            } else {
+                text = Empty; /* "" => fill slot with spaces */
+            }
+        }
+        if (!*text)
+            pi_info.fromcore.text[0] = Empty[0];
+        pi = update_invent_slot(g.perm_invent_win, slot + 1, &pi_info);
+    }
+    pi_info.fromcore.force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
+    pi_info.fromcore.core_request = render;
+    pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info);
+}
+
+#if 0
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+void
+tty_perm_invent_toggled(boolean negated)
+{
+    if (negated) {
+        if (g.perm_invent_win != WIN_ERR)
+            destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
+        done_tty_perm_invent_init = FALSE;
+    } else {
+        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
+        if (g.perm_invent_win != WIN_ERR)
+            display_nhwindow(g.perm_invent_win, FALSE);
+    }
+}
+#endif
+#endif  /* CORE_INVENT */
 
 /*invent.c*/

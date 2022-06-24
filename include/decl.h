@@ -972,9 +972,9 @@ struct instance_globals {
        persistent one doesn't get shrunk during filtering for item selection
        then regrown to full inventory, possibly being resized in the process */
     winid cached_pickinv_win;
-#ifdef TTY_PERM_INVENT
-    winid tty_invent_win;
-#endif
+    winid perm_invent_win;
+    int core_invent_state;
+
     /* query objlist callback: return TRUE if obj type matches "this_type" */
     int this_type;
     const char *this_title; /* title for inventory list of specific type */
