@@ -5359,7 +5359,8 @@ core_update_invent_slot()
     const char *wport_id;
     struct obj *obj;
 
-    if (g.perm_invent_win == WIN_ERR && g.core_invent_state)
+    if ((g.perm_invent_win == WIN_ERR && g.core_invent_state)
+        || (pi_info.tocore.tocore_flags & prohibited))
             return;
 
     if (!iflags.perm_invent && g.core_invent_state) {
