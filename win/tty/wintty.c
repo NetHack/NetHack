@@ -2252,8 +2252,18 @@ process_menu_window(winid window, struct WinDesc *cw)
                  * information. Let's repair the blacked-out rows now
                  * because it looks better.
                  */
-                if (previous_page_lines != 0 && page_lines < previous_page_lines)
-                    docorner((int) cw->offx, cw->maxrow + 1, page_lines + 3);
+                if (previous_page_lines != 0
+                        && page_lines < previous_page_lines) {
+                    /*
+                     * +3 to leave a couple of blank rows
+                     * under the menu to make it contrast well.
+                     */
+                    int row_startoffset = page_lines + 3;
+
+                    if (row_startoffset > cw->maxrow - 1)
+                        row_startoffset = cw->maxrow - 1;
+                    docorner((int) cw->offx, cw->maxrow + 1, row_startoffset);
+                }
             }
             /* set extra chars.. */
             Strcat(resp, default_menu_cmds);
@@ -3834,9 +3844,9 @@ docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
 {
     register int y;
     register struct WinDesc *cw = wins[WIN_MAP];
+    int ystart = 0;
 #ifdef TTY_PERM_INVENT
     struct WinDesc *icw = 0;
-    int ystart = 0;
 
     if (g.tty_invent_win != WIN_ERR)
         icw = wins[g.tty_invent_win];
