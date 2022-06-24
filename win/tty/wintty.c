@@ -1758,7 +1758,7 @@ erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
             flush_screen(1);
         }
     } else {
-        docorner((int) cw->offx, cw->maxrow + 1);
+        docorner((int) cw->offx, cw->maxrow + 1, 0);
     }
 }
 
@@ -1829,7 +1829,7 @@ tty_clear_nhwindow(winid window)
             home();
             cl_end();
             if (cw->cury)
-                docorner(1, cw->cury + 1);
+                docorner(1, cw->cury + 1, 0);
             ttyDisplay->toplin = TOPLINE_EMPTY;
         }
         break;
@@ -2092,7 +2092,7 @@ process_menu_window(winid window, struct WinDesc *cw)
 {
     tty_menu_item *page_start, *page_end, *curr;
     long count;
-    int n, attr_n, curr_page, page_lines, resp_len;
+    int n, attr_n, curr_page, page_lines, resp_len, previous_page_lines;
     boolean finished, counting, reset_count;
     char *cp, *rp, resp[QBUFSZ], gacc[QBUFSZ], *msave, *morestr, really_morc;
 #define MENU_EXPLICIT_CHOICE 0x7f /* pseudo menu manipulation char */
@@ -2105,6 +2105,7 @@ process_menu_window(winid window, struct WinDesc *cw)
     count = 0L;
     reset_count = TRUE;
     finished = FALSE;
+    previous_page_lines = 0;
 
     /* collect group accelerators; for PICK_NONE, they're ignored;
        for PICK_ONE, only those which match exactly one entry will be
@@ -2244,8 +2245,16 @@ process_menu_window(winid window, struct WinDesc *cw)
                     tty_curs(window, 1, n);
                     cl_end();
                 }
+                /*
+                 * If this corner menu was big, there are likely large
+                 * portions of the map, status window, and tty perm_invent
+                 * window (is there is one), that are all missing a lot of
+                 * information. Let's repair the blacked-out rows now
+                 * because it looks better.
+                 */
+                if (previous_page_lines != 0 && page_lines < previous_page_lines)
+                    docorner((int) cw->offx, cw->maxrow + 1, page_lines + 3);
             }
-
             /* set extra chars.. */
             Strcat(resp, default_menu_cmds);
             Strcat(resp, " ");                  /* next page or end */
@@ -2333,6 +2342,7 @@ process_menu_window(winid window, struct WinDesc *cw)
         case ' ':
         case MENU_NEXT_PAGE:
             if (cw->npages > 0 && curr_page != cw->npages - 1) {
+                previous_page_lines = page_lines;
                 curr_page++;
                 page_start = 0;
             } else if (morc == ' ') {
@@ -3820,10 +3830,17 @@ tty_wait_synch(void)
 }
 
 void
-docorner(register int xmin, register int ymax)
+docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
 {
     register int y;
     register struct WinDesc *cw = wins[WIN_MAP];
+#ifdef TTY_PERM_INVENT
+    struct WinDesc *icw = 0;
+    int ystart = 0;
+
+    if (g.tty_invent_win != WIN_ERR)
+        icw = wins[g.tty_invent_win];
+#endif
 
     HUPSKIP();
 #if 0   /* this optimization is not valuable enough to justify
@@ -3842,16 +3859,18 @@ docorner(register int xmin, register int ymax)
     if (ymax > LI)
         ymax = LI; /* can happen if window gets smaller */
 #endif
-    for (y = 0; y < ymax; y++) {
+    if (ystart_between_menu_pages)
+        ystart = ystart_between_menu_pages;
+
+    for (y = ystart; y < ymax; y++) {
         tty_curs(BASE_WINDOW, xmin, y); /* move cursor */
-        cl_end();                       /* clear to end of line */
+        if (!ystart_between_menu_pages)
+            cl_end();                   /* clear to end of line */
 #ifdef TTY_PERM_INVENT
         /* the whole thing is beyond the board */
-        if (g.tty_invent_win != WIN_ERR && WINDOWPORT("tty")) {
-            struct WinDesc *icw = wins[g.tty_invent_win];
+        if (icw)
             tty_refresh_inventory(xmin - (int) icw->offx, icw->maxcol,
                                   y - (int) icw->offy);
-        }
 #endif
 #ifdef CLIPPING
         if (y < (int) cw->offy || y + clipy > ROWNO)

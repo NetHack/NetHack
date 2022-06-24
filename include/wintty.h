@@ -208,7 +208,7 @@ E void putsyms(const char *);
 #ifdef CLIPPING
 E void setclipped(void);
 #endif
-E void docorner(int, int);
+E void docorner(int, int, int);
 E void end_glyphout(void);
 E void g_putch(int);
 #ifdef ENHANCED_SYMBOLS

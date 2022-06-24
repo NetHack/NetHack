@@ -233,7 +233,7 @@ more(void)
     }
 
     if (ttyDisplay->toplin && cw->cury) {
-        docorner(1, cw->cury + 1);
+        docorner(1, cw->cury + 1, 0);
         cw->curx = cw->cury = 0;
         home();
     } else if (morc == '\033') {
@@ -271,8 +271,8 @@ update_topl(register const char *bp)
         if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
             more();
         } else if (cw->cury) { /* for toplin==TOPLINE_NON_EMPTY && cury > 1 */
-            docorner(1, cw->cury + 1); /* reset cury = 0 if redraw screen */
-            cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n) */
+            docorner(1, cw->cury + 1, 0); /* reset cury = 0 if redraw screen */
+            cw->curx = cw->cury = 0;   /* from home--cls() & docorner(1,n,0) */
         }
     }
     remember_topl();
