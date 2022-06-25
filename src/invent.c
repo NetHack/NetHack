@@ -5341,7 +5341,6 @@ display_binventory(int x, int y, boolean as_if_seen)
 /* enum and structs are defined in wintype.h */
 static perminvent_info zeropi = { 0 };
 static perminvent_info pi_info;
-static int invmode = InvNormal;
 static char Empty[1] = { '\0' };
 static int done_environment_var = 0;
 #ifdef TTY_PERM_INVENT
@@ -5354,20 +5353,20 @@ core_update_invent_slot()
     static perminvent_info *pi = 0;
     char *text, nxtlet;
     int slot;
-    boolean show_gold = (invmode & InvShowGold) != 0,
-            inuse_only = (invmode & InvInUse) != 0,
-            sparse = (invmode & InvSparse) != 0;
+    boolean show_gold, inuse_only, sparse;
     const char *wport_id;
     struct obj *obj;
 
     if (!done_environment_var) {
+       pi_info = zeropi;
        /*TEMPORARY*/
        char *envtmp = nh_getenv("TTYINV");
-       invmode = envtmp ? atoi(envtmp) : InvNormal;
+       pi_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
        done_environment_var = 1;
-       pi_info = zeropi;
-       pi_info.fromcore.invmode = invmode;
     }
+    show_gold = (pi_info.fromcore.invmode & InvShowGold) != 0;
+    inuse_only = (pi_info.fromcore.invmode & InvInUse) != 0;
+    sparse = (pi_info.fromcore.invmode & InvSparse) != 0;
 
     if ((g.perm_invent_win == WIN_ERR && g.core_invent_state)
         || (pi_info.tocore.tocore_flags & prohibited))
