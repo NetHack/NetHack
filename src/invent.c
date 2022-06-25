@@ -5343,6 +5343,7 @@ static perminvent_info zeropi = { 0 };
 static perminvent_info pi_info;
 static int invmode = InvNormal;
 static char Empty[1] = { '\0' };
+static int done_environment_var = 0;
 #ifdef TTY_PERM_INVENT
 extern void tty_perm_invent_toggled(boolean negated);
 #endif
@@ -5358,6 +5359,15 @@ core_update_invent_slot()
             sparse = (invmode & InvSparse) != 0;
     const char *wport_id;
     struct obj *obj;
+
+    if (!done_environment_var) {
+       /*TEMPORARY*/
+       char *envtmp = nh_getenv("TTYINV");
+       invmode = envtmp ? atoi(envtmp) : InvNormal;
+       done_environment_var = 1;
+       pi_info = zeropi;
+       pi_info.fromcore.invmode = invmode;
+    }
 
     if ((g.perm_invent_win == WIN_ERR && g.core_invent_state)
         || (pi_info.tocore.tocore_flags & prohibited))
@@ -5407,13 +5417,6 @@ core_update_invent_slot()
 
     pi_info.fromcore.core_request = 0;
     if (!g.core_invent_state) {
-        {
-            /*TEMPORARY*/
-            char *envtmp = nh_getenv("TTYINV");
-            invmode = envtmp ? atoi(envtmp) : InvNormal;
-        }
-        pi_info = zeropi;
-        pi_info.fromcore.invmode = invmode;
         /* Send the wport a request to get the related settings. */
         pi_info.fromcore.core_request = request_settings;
         if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
@@ -5437,9 +5440,8 @@ core_update_invent_slot()
         g.core_invent_state++;
     }
     text = Empty; /* lint suppression */
-    pi_info.fromcore.core_request = update_slot;
-    pi_info.fromcore.force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
 
+    pi_info.fromcore.core_request = update_slot;
     obj = g.invent;
     for (slot = 0; slot < pi->tocore.maxslot; ++slot) {
         nxtlet = '?'; /* always gets set to something else if actually used */
@@ -5501,6 +5503,8 @@ core_update_invent_slot()
     pi_info.fromcore.force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
     pi_info.fromcore.core_request = render;
     pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info);
+
+    pi_info.fromcore.core_request = 0;
 }
 
 #if 0
