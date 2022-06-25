@@ -582,6 +582,8 @@ enum glyph_offsets {
              : ((expltyp) == EXPL_NOXIOUS) ? GLYPH_EXPLODE_NOXIOUS_OFF  \
                : GLYPH_EXPLODE_FIERY_OFF))
 
+/* cmap_walls_to_glyph(): return the glyph number for specified wall
+   symbol; result varies by dungeon branch */
 #define cmap_walls_to_glyph(cmap_idx) \
     ((cmap_idx) - S_vwall                               \
      + (In_mines(&u.uz) ? GLYPH_CMAP_MINES_OFF          \
@@ -589,6 +591,12 @@ enum glyph_offsets {
           : Is_knox(&u.uz) ? GLYPH_CMAP_KNOX_OFF        \
             : In_sokoban(&u.uz) ? GLYPH_CMAP_SOKO_OFF   \
               : GLYPH_CMAP_MAIN_OFF))
+
+/* cmap_D0walls_to_glyph(): simpler version of cmap_walls_to_glyph()
+   which returns the glyph that would be used in the main dungeon,
+   regardless of hero's current location */
+#define cmap_D0walls_to_glyph(cmap_idx) \
+    ((cmap_idx) - S_vwall + GLYPH_CMAP_MAIN_OFF)
 
 #define cmap_a_to_glyph(cmap_idx) \
     (((cmap_idx) - S_ndoor) + GLYPH_CMAP_A_OFF)

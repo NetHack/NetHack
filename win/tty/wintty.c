@@ -3842,7 +3842,8 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 static void
 tty_invent_box_glyph_init(struct WinDesc *cw)
 {
-    int row, col, glyph;
+    int row, col;
+    uchar sym;
     struct tty_perminvent_cell *cell;
 
     for (row = 0; row < cw->maxrow; ++row)
@@ -3852,46 +3853,52 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                a glyph_info structure rather than just a char */
             if (!cell->glyph)
                 continue;
-            glyph = 0;
+            /* sym will always get another value; if for some reason it
+               doesn't, this default is valid for cmap_walls_to_glyph() */
+               sym = S_crwall;
             /* note: for top and bottom, check [border_right] before
                [border_middle] because they could be the same and if so
                we want corner rather than tee */
             if (row == 0) {
                 if (col == bordercol[border_left])
-                    glyph = cmap_to_glyph(S_tlcorn);
+                    sym = S_tlcorn;
                 else if (col == bordercol[border_right])
-                    glyph = cmap_to_glyph(S_trcorn);
+                    sym = S_trcorn;
                 else if (col == bordercol[border_middle])
-                    glyph = cmap_to_glyph(S_tdwall);
+                    sym = S_tdwall;
                 else /*if ((col > bordercol[border_left]
                             && col < bordercol[border_middle])
                            || (col > bordercol[border_middle]
                                && col < bordercol[border_right]))*/
-                    glyph = cmap_to_glyph(S_hwall);
+                    sym = S_hwall;
             } else if (row == (cw->maxrow - 1)) {
                 if (col == bordercol[border_left])
-                    glyph = cmap_to_glyph(S_blcorn);
+                    sym = S_blcorn;
                 else if (col == bordercol[border_right])
-                    glyph = cmap_to_glyph(S_brcorn);
+                    sym = S_brcorn;
                 else if (col == bordercol[border_middle])
-                    glyph = cmap_to_glyph(S_tuwall);
+                    sym = S_tuwall;
                 else /*if ((col > bordercol[border_left]
                             && col < bordercol[border_middle])
                            || (col > bordercol[border_middle]
                                && col < bordercol[border_right]))*/
-                    glyph = cmap_to_glyph(S_hwall);
+                    sym = S_hwall;
             } else {
                 if (col == bordercol[border_left]
                     || col == bordercol[border_middle]
                     || col == bordercol[border_right])
-                    glyph = cmap_to_glyph(S_vwall);
+                    sym = S_vwall;
             }
-            if (glyph) {
+
+            /* to get here, cell->glyph is 1 and cell->content union has gi */
+            {
                 int oldsymidx = cell->content.gi->gm.sym.symidx;
 #ifdef ENHANCED_SYMBOLS
-                struct unicode_representation *oldgmu =
-                    cell->content.gi->gm.u;
+                struct unicode_representation *
+                    oldgmu = cell->content.gi->gm.u;
 #endif
+                int glyph = cmap_D0walls_to_glyph(sym);
+
                 map_glyphinfo(0, 0, glyph, 0, cell->content.gi);
                 if (
 #ifdef ENHANCED_SYMBOLS
@@ -3901,10 +3908,6 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
                     cell->refresh = 1;
                 cell->glyph = 1; /* (redundant) */
                 cell->text = 0;
-            } else {
-                /* we can only get here when cell->glyph is 1;
-                   not assigning anything in that situation is a bug */
-                impossible("tty invent: expected glyph");
             }
         }
     done_tty_perm_invent_init = TRUE;
