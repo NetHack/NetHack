@@ -5343,7 +5343,7 @@ display_binventory(int x, int y, boolean as_if_seen)
 
 #if defined(CORE_INVENT)
 /* enum and structs are defined in wintype.h */
-static perminvent_info zeropi = { {0L,0,0,0,0,0,0,0}, {0,0,0,0,{0},0} };
+static perminvent_info zeropi = { {0L,0,0,0,0,0,0,0}, {0,0,0,0,0,{0},0} };
 static perminvent_info pi_info;
 static char Empty[1] = { '\0' };
 static int done_environment_var = 0;
