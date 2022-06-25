@@ -5412,8 +5412,8 @@ core_update_invent_slot()
             char *envtmp = nh_getenv("TTYINV");
             invmode = envtmp ? atoi(envtmp) : InvNormal;
         }
-        pi_info.fromcore.invmode = invmode;
         pi_info = zeropi;
+        pi_info.fromcore.invmode = invmode;
         /* Send the wport a request to get the related settings. */
         pi_info.fromcore.core_request = request_settings;
         if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
