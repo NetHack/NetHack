@@ -71,7 +71,7 @@ static void dump_display_nhwindow(winid, boolean);
 static void dump_destroy_nhwindow(winid);
 static void dump_start_menu(winid, unsigned long);
 static void dump_add_menu(winid, const glyph_info *, const ANY_P *, char,
-                          char, int, const char *, unsigned int);
+                          char, int, int, const char *, unsigned int);
 static void dump_end_menu(winid, const char *);
 static int dump_select_menu(winid, int, MENU_ITEM_P **);
 static void dump_putstr(winid, int, const char *);
@@ -508,7 +508,7 @@ static void hup_exit_nhwindows(const char *);
 static winid hup_create_nhwindow(int);
 static int hup_select_menu(winid, int, MENU_ITEM_P **);
 static void hup_add_menu(winid, const glyph_info *, const anything *, char,
-                         char, int, const char *, unsigned int);
+                         char, int, int, const char *, unsigned int);
 static void hup_end_menu(winid, const char *);
 static void hup_putstr(winid, int, const char *);
 static void hup_print_glyph(winid, xchar, xchar, const glyph_info *,
@@ -694,6 +694,7 @@ hup_add_menu(winid window UNUSED,
              char sel UNUSED,
              char grpsel UNUSED,
              int attr UNUSED,
+             int clr UNUSED,
              const char *txt UNUSED,
              unsigned int itemflags UNUSED)
 {
@@ -1298,6 +1299,7 @@ dump_add_menu(winid win UNUSED,
               char ch,
               char gch UNUSED,
               int attr UNUSED,
+              int clr UNUSED,
               const char *str,
               unsigned int itemflags UNUSED)
 {

@@ -557,7 +557,8 @@ curses_start_menu(winid wid, unsigned long mbehavior)
 add_menu(winid wid, const glyph_info *glyphinfo,
                                 const anything identifier,
                                 char accelerator, char groupacc,
-                                int attr, char *str, unsigned int itemflags)
+                                int attr, int color,
+                                char *str, unsigned int itemflags)
                 -- Add a text line str to the given menu window.  If identifier
                    is 0, then the line cannot be selected (e.g. a title).
                    Otherwise, identifier is the value returned if the line is
@@ -590,7 +591,7 @@ void
 curses_add_menu(winid wid, const glyph_info *glyphinfo,
                 const ANY_P *identifier,
                 char accelerator, char group_accel, int attr,
-                const char *str, unsigned itemflags)
+                int clr UNUSED, const char *str, unsigned itemflags)
 {
     int curses_attr;
 

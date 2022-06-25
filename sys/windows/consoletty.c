@@ -2785,7 +2785,7 @@ set_keyhandling_via_option(void)
 {
     winid tmpwin;
     anything any;
-    int i;
+    int i, clr = 0;
     menu_item *console_key_handling_pick = (menu_item *) 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
@@ -2794,7 +2794,7 @@ set_keyhandling_via_option(void)
     for (i = default_keyhandling; i < SIZE(legal_key_handling); i++) {
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
-                 0, ATR_NONE,
+                 0, ATR_NONE, clr,
                  legal_key_handling[i], MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select windows console key handling:");

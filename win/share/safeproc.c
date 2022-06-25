@@ -236,6 +236,7 @@ safe_add_menu(
     char ch,                    /* keyboard accelerator (0 = pick our own) */
     char gch,                   /* group accelerator (0 = no group) */
     int attr,                   /* attribute for string (like safe_putstr()) */
+    int clr,                    /* colour for string */
     const char *str,            /* menu string */
     unsigned int itemflags)     /* itemflags such as marked as selected */
 {

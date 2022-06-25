@@ -586,6 +586,7 @@ getpos_menu(coord *ccp, int gloc)
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
     char tmpbuf[BUFSZ];
+    int clr = 0;
 
     gather_locs(&garr, &gcount, gloc);
 
@@ -618,7 +619,7 @@ getpos_menu(coord *ccp, int gloc)
             Snprintf(fullbuf, sizeof fullbuf, "%s%s%s", firstmatch,
                     (*tmpbuf ? " " : ""), tmpbuf);
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, fullbuf, MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, fullbuf, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -1461,6 +1462,7 @@ docallcmd(void)
     char ch = 0;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
+    int clr = 0;
 
     if ((cmdq = cmdq_pop()) != 0) {
         cq = *cmdq;
@@ -1476,30 +1478,30 @@ docallcmd(void)
     any = cg.zeroany;
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
-             ATR_NONE, "a monster", MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, "a monster", MENU_ITEMFLAGS_NONE);
     if (g.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'y',
-                 ATR_NONE, "a particular object in inventory",
+                 ATR_NONE, clr, "a particular object in inventory",
                  MENU_ITEMFLAGS_NONE);
         any.a_char = 'o'; /* group accelerator 'n' */
         add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'n',
-                 ATR_NONE, "the type of an object in inventory",
+                 ATR_NONE, clr, "the type of an object in inventory",
                  MENU_ITEMFLAGS_NONE);
     }
     any.a_char = 'f'; /* group accelerator ',' (or ':' instead?) */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, ',',
-             ATR_NONE, "the type of an object upon the floor",
+             ATR_NONE, clr, "the type of an object upon the floor",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'd'; /* group accelerator '\' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, '\\',
-             ATR_NONE, "the type of an object on discoveries list",
+             ATR_NONE, clr, "the type of an object on discoveries list",
              MENU_ITEMFLAGS_NONE);
     any.a_char = 'a'; /* group accelerator 'l' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'l',
-             ATR_NONE, "record an annotation for the current level",
+             ATR_NONE, clr, "record an annotation for the current level",
              MENU_ITEMFLAGS_NONE);
     end_menu(win, "What do you want to name?");
     if (select_menu(win, PICK_ONE, &pick_list) > 0) {

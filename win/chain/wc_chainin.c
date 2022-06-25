@@ -24,7 +24,7 @@ void chainin_putmixed(winid, int, const char *);
 void chainin_display_file(const char *, boolean);
 void chainin_start_menu(winid, unsigned long);
 void chainin_add_menu(winid, const glyph_info *, const ANY_P *,
-                         char, char, int,
+                         char, char, int, int,
                          const char *, unsigned int);
 void chainin_end_menu(winid, const char *);
 int chainin_select_menu(winid, int, MENU_ITEM_P **);
@@ -263,12 +263,13 @@ chainin_add_menu(
     char ch,                    /* keyboard accelerator (0 = pick our own) */
     char gch,                   /* group accelerator (0 = no group) */
     int attr,                   /* attribute for string (like tty_putstr()) */
+    int clr,                    /* attribute for string (like tty_putstr()) */
     const char *str,            /* menu string */
     unsigned int itemflags)     /* flags such as item is marked as selected
                                MENU_ITEMFLAGS_SELECTED */
 {
     (*cibase->nprocs->win_add_menu)(cibase->ndata, window, glyphinfo,
-                                    identifier, ch, gch, attr, str, itemflags);
+                                    identifier, ch, gch, attr, clr, str, itemflags);
 }
 
 void

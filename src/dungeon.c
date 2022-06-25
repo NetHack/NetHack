@@ -2090,6 +2090,7 @@ tport_menu(winid win, char *entry, struct lchoice *lchoices,
 {
     char tmpbuf[BUFSZ];
     anything any;
+    int clr = 0;
 
     lchoices->lev[lchoices->idx] = lvl_p->dlevel;
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;
@@ -2104,7 +2105,7 @@ tport_menu(winid win, char *entry, struct lchoice *lchoices,
         any.a_int = lchoices->idx + 1;
     }
     add_menu(win, &nul_glyphinfo, &any, lchoices->menuletter, 0,
-             ATR_NONE, entry, MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, entry, MENU_ITEMFLAGS_NONE);
     /* this assumes there are at most 52 interesting levels */
     if (lchoices->menuletter == 'z')
         lchoices->menuletter = 'A';
@@ -2236,6 +2237,7 @@ print_dungeon(boolean bymenu, schar *rlev, xchar *rdgn)
     anything any;
     struct lchoice lchoices;
     winid win = create_nhwindow(NHW_MENU);
+    int clr = 0;
 
     if (bymenu) {
         start_menu(win, MENU_BEHAVE_STANDARD);
@@ -2268,7 +2270,7 @@ print_dungeon(boolean bymenu, schar *rlev, xchar *rdgn)
         if (bymenu) {
             any = cg.zeroany;
             add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     iflags.menu_headings, buf, MENU_ITEMFLAGS_NONE);
+                     iflags.menu_headings, clr, buf, MENU_ITEMFLAGS_NONE);
         } else
             putstr(win, 0, buf);
 

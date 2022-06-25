@@ -373,6 +373,7 @@ curses_prev_mesg(void)
     boolean do_lifo = (iflags.prevmsg_window != 'f');
 #ifdef DEBUG
     static int showturn = 0; /* 1: show hero_seq value in separators */
+    int clr = 0;
 
     /*
      * Set DEBUGFILES=MesgTurn in environment or sysconf to decorate
@@ -400,16 +401,16 @@ curses_prev_mesg(void)
                             (mesg->turn >> 3), (mesg->turn & 7L));
 #endif
                 curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                                A_NORMAL, sepbuf, MENU_ITEMFLAGS_NONE);
+                                A_NORMAL, clr, sepbuf, MENU_ITEMFLAGS_NONE);
             }
             turn = mesg->turn;
         }
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                        A_NORMAL, mesg->str, MENU_ITEMFLAGS_NONE);
+                        A_NORMAL, clr, mesg->str, MENU_ITEMFLAGS_NONE);
     }
     if (!count)
         curses_add_menu(wid, &nul_glyphinfo, &Id, 0, 0,
-                        A_NORMAL, "[No past messages available.]",
+                        A_NORMAL, clr, "[No past messages available.]",
                         MENU_ITEMFLAGS_NONE);
 
     curses_end_menu(wid, "");

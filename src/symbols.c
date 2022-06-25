@@ -787,6 +787,7 @@ do_symset(boolean rogueflag)
     char *symset_name, fmtstr[20];
     struct symsetentry *sl;
     int res, which_set, setcount = 0, chosen = -2, defindx = 0;
+    int clr = 0;
 
     which_set = rogueflag ? ROGUESET : PRIMARYSET;
     g.symset_list = (struct symsetentry *) 0;
@@ -838,7 +839,7 @@ do_symset(boolean rogueflag)
         if (!symset_name)
             defindx = any.a_int;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 "Default Symbols",
+                 clr, "Default Symbols",
                  (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
 
@@ -863,7 +864,7 @@ do_symset(boolean rogueflag)
                     defindx = any.a_int;
                 Sprintf(buf, fmtstr, sl->name, sl->desc ? sl->desc : "");
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, buf,
+                         ATR_NONE, clr, buf,
                          (any.a_int == defindx) ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
             }

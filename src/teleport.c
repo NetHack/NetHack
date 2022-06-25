@@ -661,7 +661,7 @@ dotelecmd(void)
         menu_item *picks = (menu_item *) 0;
         anything any;
         winid win;
-        int i, tmode;
+        int i, tmode, clr = 0;
 
         win = create_nhwindow(NHW_MENU);
         start_menu(win, MENU_BEHAVE_STANDARD);
@@ -669,7 +669,7 @@ dotelecmd(void)
         for (i = 0; i < SIZE(tports); ++i) {
             any.a_int = (int) tports[i].menulet;
             add_menu(win, &nul_glyphinfo, &any, (char) any.a_int, 0,
-                     ATR_NONE, tports[i].menudesc,
+                     ATR_NONE, clr, tports[i].menudesc,
                      (tports[i].menulet == 'w') ? MENU_ITEMFLAGS_SELECTED
                                                 : MENU_ITEMFLAGS_NONE);
         }

@@ -1412,6 +1412,7 @@ do_look(int mode, coord *click_cc)
     coord cc;             /* screen pos of unknown glyph */
     boolean save_verbose; /* saved value of flags.verbose */
     boolean from_screen;  /* question from the screen */
+    int clr = 0;
 
     cc.x = 0;
     cc.y = 0;
@@ -1433,20 +1434,20 @@ do_look(int mode, coord *click_cc)
                versions: "Specify unknown object by cursor?" */
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 'y', ATR_NONE,
-                     "something on the map", MENU_ITEMFLAGS_NONE);
+                     clr, "something on the map", MENU_ITEMFLAGS_NONE);
             any.a_char = 'i';
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                     "something you're carrying", MENU_ITEMFLAGS_NONE);
+                     clr, "something you're carrying", MENU_ITEMFLAGS_NONE);
             any.a_char = '?';
             add_menu(win, &nul_glyphinfo, &any,
                      flags.lootabc ? 0 : any.a_char, 'n', ATR_NONE,
-                     "something else (by symbol or name)",
+                     clr, "something else (by symbol or name)",
                      MENU_ITEMFLAGS_NONE);
             if (!u.uswallow && !Hallucination) {
                 any = cg.zeroany;
                 add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         "", MENU_ITEMFLAGS_NONE);
+                         clr, "", MENU_ITEMFLAGS_NONE);
                 /* these options work sensibly for the swallowed case,
                    but there's no reason for the player to use them then;
                    objects work fine when hallucinating, but screen
@@ -1455,27 +1456,28 @@ do_look(int mode, coord *click_cc)
                 any.a_char = 'm';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "nearby monsters", MENU_ITEMFLAGS_NONE);
+                         clr, "nearby monsters", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "all monsters shown on map", MENU_ITEMFLAGS_NONE);
+                         clr, "all monsters shown on map", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "nearby objects", MENU_ITEMFLAGS_NONE);
+                         clr, "nearby objects", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "all objects shown on map", MENU_ITEMFLAGS_NONE);
+                         clr, "all objects shown on map", MENU_ITEMFLAGS_NONE);
                 any.a_char = '^';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "nearby traps", MENU_ITEMFLAGS_NONE);
+                         clr, "nearby traps", MENU_ITEMFLAGS_NONE);
                 any.a_char = '\"';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         "all seen or remembered traps", MENU_ITEMFLAGS_NONE);
+                         clr, "all seen or remembered traps",
+                         MENU_ITEMFLAGS_NONE);
             }
             end_menu(win, "What do you want to look at:");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
@@ -2418,6 +2420,7 @@ dohelp(void)
     menu_item *selected;
     anything any;
     int sel;
+    int clr = 0;
 
     any = cg.zeroany; /* zero all bits */
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -2433,7 +2436,7 @@ dohelp(void)
             Strcpy(helpbuf, help_menu_items[i].text);
         }
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  helpbuf, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select one item:");

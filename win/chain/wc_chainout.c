@@ -24,7 +24,7 @@ void chainout_putmixed(void *,winid, int, const char *);
 void chainout_display_file(void *,const char *, boolean);
 void chainout_start_menu(void *,winid, unsigned long);
 void chainout_add_menu(void *,winid, const glyph_info *, const ANY_P *,
-                         char, char, int,
+                         char, char, int, int,
                          const char *, unsigned int);
 void chainout_end_menu(void *,winid, const char *);
 int chainout_select_menu(void *,winid, int, MENU_ITEM_P **);
@@ -300,13 +300,14 @@ chainout_add_menu(
     char ch,                     /* keyboard accelerator (0 = pick our own) */
     char gch,                    /* group accelerator (0 = no group) */
     int attr,                    /* attribute for string (like tty_putstr()) */
+    int clr,                     /* clr for string */
     const char *str,             /* menu string */
     unsigned int itemflags)      /* itemflags such as marked as selected */
 {
     struct chainout_data *tdp = vp;
 
     (*tdp->nprocs->win_add_menu)(window, glyphinfo, identifier, ch, gch,
-                                 attr, str, itemflags);
+                                 attr, clr, str, itemflags);
 }
 
 void

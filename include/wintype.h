@@ -192,9 +192,13 @@ struct from_core {
     enum from_core_requests core_request;
     enum inv_modes invmode;
     boolean force_redraw;
-    int slot;           /* which inventory slot; 0 indicates request */
+    int slot;           /* which inventory slot + 1; 0 indicates request */
     int invlet;
     char text[BUFSZ];
+    int32_t clr;        /* adjusted color 0 = ignore
+                         * 1-16             = NetHack color + 1
+                         * 17..16,777,233   = 24-bit color  + 17
+                         */
 };
 
 struct perminvent_info_t {

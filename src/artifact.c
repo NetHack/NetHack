@@ -1749,6 +1749,7 @@ arti_invoke(struct obj *obj)
             d_level newlev;
             winid tmpwin = create_nhwindow(NHW_MENU);
             anything any;
+            int clr = 0;
 
             any = cg.zeroany; /* set all bits to zero */
             start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -1758,7 +1759,8 @@ arti_invoke(struct obj *obj)
                     continue;
                 any.a_int = i + 1;
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, g.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr,
+                         g.dungeons[i].dname, MENU_ITEMFLAGS_NONE);
                 num_ok_dungeons++;
                 last_ok_dungeon = i;
             }

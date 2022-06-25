@@ -2676,11 +2676,12 @@ static void
 ia_addmenu(winid win, int act, char let, const char *txt)
 {
     anything any;
+    int clr = 0;
 
     any = cg.zeroany;
     any.a_int = act;
     add_menu(win, &nul_glyphinfo, &any, let, 0,
-             ATR_NONE, txt, MENU_ITEMFLAGS_NONE);
+             ATR_NONE, clr, txt, MENU_ITEMFLAGS_NONE);
 }
 
 /* Show menu of possible actions hero could do with item otmp */
@@ -3177,6 +3178,7 @@ display_pickinv(
     unsigned sortflags;
     Loot *sortedinvent, *srtinv;
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
+    int clr = 0;
 
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
@@ -3268,10 +3270,10 @@ display_pickinv(
             Sprintf(eos(prompt),
                     " -- unidentified or partially identified item%s",
                     plur(unid_cnt));
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, prompt,
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, prompt,
                  MENU_ITEMFLAGS_NONE);
         if (!unid_cnt) {
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                      "(all items are permanently identified already)",
                      MENU_ITEMFLAGS_NONE);
             gotsomething = TRUE;
@@ -3288,18 +3290,18 @@ display_pickinv(
                 Sprintf(eos(prompt), " (%s for all)",
                         visctrl(iflags.override_ID));
             add_menu(win, &nul_glyphinfo, &any, '_', iflags.override_ID,
-                     ATR_NONE, prompt, MENU_ITEMFLAGS_SKIPINVERT);
+                     ATR_NONE, clr, prompt, MENU_ITEMFLAGS_SKIPINVERT);
             gotsomething = TRUE;
         }
    } else if (xtra_choice) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
             add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     iflags.menu_headings,
+                     iflags.menu_headings, clr,
                     "Miscellaneous", MENU_ITEMFLAGS_NONE);
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
-                 xtra_choice, MENU_ITEMFLAGS_NONE);
+                 clr, xtra_choice, MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
 
@@ -3318,7 +3320,7 @@ display_pickinv(
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
                 add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                         iflags.menu_headings,
+                         iflags.menu_headings, clr,
                          let_to_name(*invlet, FALSE,
                                      (want_reply && iflags.menu_head_objsym)),
                          MENU_ITEMFLAGS_NONE);
@@ -3333,7 +3335,7 @@ display_pickinv(
             formattedobj = doname(otmp);
             add_menu(win, &tmpglyphinfo, &any, ilet,
                      wizid ? def_oc_syms[(int) otmp->oclass].sym : 0,
-                     ATR_NONE, formattedobj, MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, formattedobj, MENU_ITEMFLAGS_NONE);
             /* doname() uses a static pool of obuf[] output buffers and
                we don't want inventory display to overwrite all of them,
                so when we've used one we release it for re-use */
@@ -3357,9 +3359,9 @@ display_pickinv(
         && (int) strlen(lets) < inv_cnt(TRUE)) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 iflags.menu_headings, "Special", MENU_ITEMFLAGS_NONE);
+                 iflags.menu_headings, clr, "Special", MENU_ITEMFLAGS_NONE);
         any.a_char = '*';
-        add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE,
+        add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, clr,
                  "(list everything)", MENU_ITEMFLAGS_NONE);
         gotsomething = TRUE;
     }
@@ -3370,7 +3372,7 @@ display_pickinv(
        into the menu */
     if (iflags.perm_invent && !lets && !gotsomething) {
         any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, 0,
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  not_carrying_anything, MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
@@ -3465,6 +3467,7 @@ display_used_invlets(char avoidlet)
     winid win;
     anything any;
     menu_item *selected;
+    int clr = 0;
 
     if (g.invent) {
         win = create_nhwindow(NHW_MENU);
@@ -3480,7 +3483,7 @@ display_used_invlets(char avoidlet)
                     if (flags.sortpack && !classcount) {
                         any = cg.zeroany; /* zero */
                         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 iflags.menu_headings,
+                                 iflags.menu_headings, clr,
                                  let_to_name(*invlet, FALSE, FALSE),
                                  MENU_ITEMFLAGS_NONE);
                         classcount++;
@@ -3489,7 +3492,7 @@ display_used_invlets(char avoidlet)
                     tmpglyph = obj_to_glyph(otmp, rn2_on_display_rng);
                     map_glyphinfo(0, 0, tmpglyph, 0U, &tmpglyphinfo);
                     add_menu(win, &tmpglyphinfo, &any, ilet, 0,
-                             ATR_NONE, doname(otmp), MENU_ITEMFLAGS_NONE);
+                             ATR_NONE, clr, doname(otmp), MENU_ITEMFLAGS_NONE);
                 }
             }
             if (flags.sortpack && *++invlet)
@@ -5116,15 +5119,16 @@ invdisp_nothing(const char *hdr, const char *txt)
     winid win;
     anything any;
     menu_item *selected;
+    int clr = 0;
 
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings, clr,
              hdr, MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              "", MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, txt,
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, txt,
              MENU_ITEMFLAGS_NONE);
     end_menu(win, (char *) 0);
     if (select_menu(win, PICK_NONE, &selected) > 0)

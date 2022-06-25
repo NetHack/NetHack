@@ -787,6 +787,7 @@ X11_add_menu(winid window,
              char ch,  /* selector letter; 0 if not selectable */
              char gch, /* group accelerator (0 = no group) */
              int attr,
+             int clr UNUSED,
              const char *str,
              unsigned itemflags)
 {

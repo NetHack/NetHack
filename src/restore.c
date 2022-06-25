@@ -1392,6 +1392,7 @@ restore_menu(
     char **saved;
     menu_item *chosen_game = (menu_item *) 0;
     int k, clet, ch = 0; /* ch: 0 => new game */
+    int clr = 0;
 
     *g.plname = '\0';
     saved = get_saved_games(); /* array of character names */
@@ -1405,25 +1406,25 @@ restore_menu(
             /* COPYRIGHT_BANNER_[ABCD] */
             for (k = 1; k <= 4; ++k)
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         copyright_banner_line(k), MENU_ITEMFLAGS_NONE);
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "",
+                         clr, copyright_banner_line(k), MENU_ITEMFLAGS_NONE);
+            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, "",
                      MENU_ITEMFLAGS_NONE);
         }
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 "Select one of your saved games", MENU_ITEMFLAGS_NONE);
+                 clr, "Select one of your saved games", MENU_ITEMFLAGS_NONE);
         for (k = 0; saved[k]; ++k) {
             any.a_int = k + 1;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, saved[k], MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, saved[k], MENU_ITEMFLAGS_NONE);
         }
         clet = (k <= 'n' - 'a') ? 'n' : 0; /* new game */
         any.a_int = -1;                    /* not >= 0 */
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE,
-                 "Start a new character", MENU_ITEMFLAGS_NONE);
+                 clr, "Start a new character", MENU_ITEMFLAGS_NONE);
         clet = (k + 1 <= 'q' - 'a') ? 'q' : 0; /* quit */
         any.a_int = -2;
         add_menu(tmpwin, &nul_glyphinfo, &any, clet, 0, ATR_NONE,
-                 "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
+                 clr, "Never mind (quit)", MENU_ITEMFLAGS_SELECTED);
         /* no prompt on end_menu, as we've done our own at the top */
         end_menu(tmpwin, (char *) 0);
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {

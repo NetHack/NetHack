@@ -561,6 +561,7 @@ choose_disco_sort(
     menu_item *selected;
     anything any;
     int i, n, choice;
+    int clr = 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -568,7 +569,7 @@ choose_disco_sort(
     for (i = 0; disco_orders_descr[i]; ++i) {
         any.a_int = disco_order_let[i];
         add_menu(tmpwin, &nul_glyphinfo, &any, (char) any.a_int,
-                 0, ATR_NONE,
+                 0, ATR_NONE, clr,
                  disco_orders_descr[i],
                  (disco_order_let[i] == flags.discosort)
                     ? MENU_ITEMFLAGS_SELECTED
@@ -579,15 +580,15 @@ choose_disco_sort(
            (only showing one class so can't span all classes) but the
            chosen sort will stick and also apply to '\' usage */
         any = cg.zeroany;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "", MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "Note: full alphabetical and alphabetical within class",
                  MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "      are equivalent for single class discovery, but",
                  MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "      will matter for future use of total discoveries.",
                  MENU_ITEMFLAGS_NONE);
     }
@@ -755,6 +756,7 @@ doclassdisco(void)
          *sorted_lines[NUM_OBJECTS]; /* overkill */
     int i, ct, dis, xtras, sorted_ct;
     boolean traditional, alphabetized, lootsort;
+    int clr = 0;
 
     if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
         flags.discosort = 'o';
@@ -783,7 +785,7 @@ doclassdisco(void)
             if (!traditional) {
                 any.a_int = 'u';
                 add_menu(tmpwin, &nul_glyphinfo, &any, menulet++,
-                         0, ATR_NONE, unique_items, MENU_ITEMFLAGS_NONE);
+                         0, ATR_NONE, clr, unique_items, MENU_ITEMFLAGS_NONE);
             }
             break;
         }
@@ -794,7 +796,7 @@ doclassdisco(void)
         if (!traditional) {
             any.a_int = 'a';
             add_menu(tmpwin, &nul_glyphinfo, &any, menulet++,
-                     0, ATR_NONE, artifact_items, MENU_ITEMFLAGS_NONE);
+                     0, ATR_NONE, clr, artifact_items, MENU_ITEMFLAGS_NONE);
         }
     }
 
@@ -815,7 +817,7 @@ doclassdisco(void)
                     if (!traditional) {
                         any.a_int = c;
                         add_menu(tmpwin, &nul_glyphinfo, &any,
-                                 menulet++, c, ATR_NONE,
+                                 menulet++, c, ATR_NONE, clr,
                                  oclass_to_name(oclass, buf),
                                  MENU_ITEMFLAGS_NONE);
                     }
@@ -961,6 +963,7 @@ rename_disco(void)
     winid tmpwin;
     anything any;
     menu_item *selected = 0;
+    int clr = 0;
 
     any = cg.zeroany;
     tmpwin = create_nhwindow(NHW_MENU);
@@ -990,14 +993,14 @@ rename_disco(void)
             if (oclass != prev_class) {
                 any.a_int = 0;
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         iflags.menu_headings,
+                         iflags.menu_headings, clr, 
                          let_to_name(oclass, FALSE, FALSE),
                          MENU_ITEMFLAGS_NONE);
                 prev_class = oclass;
             }
             any.a_int = dis;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE,
+                     ATR_NONE, clr,
                      obj_typename(dis), MENU_ITEMFLAGS_NONE);
         }
     }

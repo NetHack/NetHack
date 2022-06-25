@@ -3523,21 +3523,22 @@ use_grapple(struct obj *obj)
         anything any;
         char buf[BUFSZ];
         menu_item *selected;
+        int clr = 0;
 
         any = cg.zeroany; /* set all bits to zero */
         any.a_int = 1; /* use index+1 (cant use 0) as identifier */
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
         any.a_int++;
         Sprintf(buf, "an object on the %s", surface(cc.x, cc.y));
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 clr, buf, MENU_ITEMFLAGS_NONE);
         any.a_int++;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 "a monster", MENU_ITEMFLAGS_NONE);
+                 clr, "a monster", MENU_ITEMFLAGS_NONE);
         any.a_int++;
         Sprintf(buf, "the %s", surface(cc.x, cc.y));
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                 buf, MENU_ITEMFLAGS_NONE);
         end_menu(tmpwin, "Aim for what?");
         tohit = rn2(4);
         if (select_menu(tmpwin, PICK_ONE, &selected) > 0

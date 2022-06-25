@@ -1749,6 +1749,7 @@ role_menu_extra(int which, winid where, boolean preselect)
     char buf[BUFSZ];
     const char *what = 0, *constrainer = 0, *forcedvalue = 0;
     int f = 0, r, c, gend, a, i, allowmask;
+    int clr = 0;
 
     r = flags.initrole;
     c = flags.initrace;
@@ -1852,13 +1853,13 @@ role_menu_extra(int which, winid where, boolean preselect)
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
-        add_menu(where, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+        add_menu(where, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
         Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
         add_menu(where, &nul_glyphinfo, &any, RS_menu_let[which], 0,
-                 ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     } else if (which == RS_filter) {
         char setfiltering[40];
 
@@ -1866,16 +1867,16 @@ role_menu_extra(int which, winid where, boolean preselect)
         Sprintf(setfiltering, "%s role/race/&c filtering",
                 gotrolefilter() ? "Reset" : "Set");
         add_menu(where, &nul_glyphinfo, &any, '~', 0, ATR_NONE,
-                 setfiltering, MENU_ITEMFLAGS_NONE);
+                 clr, setfiltering, MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_RANDOM) {
         any.a_int = ROLE_RANDOM;
         add_menu(where, &nul_glyphinfo, &any, '*', 0,
-                 ATR_NONE, "Random",
+                 ATR_NONE, clr, "Random",
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else if (which == ROLE_NONE) {
         any.a_int = ROLE_NONE;
         add_menu(where, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, "Quit",
+                 ATR_NONE, clr, "Quit",
                  preselect ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     } else {
         impossible("role_menu_extra: bad arg (%d)", which);

@@ -273,7 +273,7 @@ static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean calling_from_update_inventory = FALSE;
 static boolean assesstty(enum inv_modes, short *, short *,
         long *, long *, long *, long *, long *);
-static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *);
+static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *, int32_t);
 #endif
 
 /*
@@ -585,6 +585,7 @@ tty_player_selection(void)
     winid win;
     anything any;
     menu_item *selected = 0;
+    int clr = 0;
 
     /* Used to avoid "Is this ok?" if player has already specified all
      * four facets of role.
@@ -679,7 +680,7 @@ tty_player_selection(void)
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
                     any = cg.zeroany; /* separator, not a choice */
                     add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                             ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
                     role_menu_extra(RS_RACE, win, FALSE);
                     role_menu_extra(RS_GENDER, win, FALSE);
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -777,7 +778,7 @@ tty_player_selection(void)
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -869,7 +870,7 @@ tty_player_selection(void)
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -957,7 +958,7 @@ tty_player_selection(void)
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
                         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
@@ -1043,27 +1044,27 @@ tty_player_selection(void)
                  aligns[ALGN].adj, plbuf, races[RACE].adj,
                  (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                                                    : roles[ROLE].name.m);
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, pbuf,
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, pbuf,
                  MENU_ITEMFLAGS_NONE);
         /* blank separator */
         any.a_int = 0;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
         /* [ynaq] menu choices */
         any.a_int = 1;
         add_menu(win, &nul_glyphinfo, &any, 'y', 0,
-                 ATR_NONE, "Yes; start game", MENU_ITEMFLAGS_SELECTED);
+                 ATR_NONE, clr, "Yes; start game", MENU_ITEMFLAGS_SELECTED);
         any.a_int = 2;
         add_menu(win, &nul_glyphinfo, &any, 'n', 0,
-                 ATR_NONE, "No; choose role again", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, "No; choose role again", MENU_ITEMFLAGS_NONE);
         if (iflags.renameallowed) {
             any.a_int = 3;
             add_menu(win, &nul_glyphinfo, &any, 'a', 0, ATR_NONE,
-                     "Not yet; choose another name", MENU_ITEMFLAGS_NONE);
+                     clr, "Not yet; choose another name", MENU_ITEMFLAGS_NONE);
         }
         any.a_int = -1;
         add_menu(win, &nul_glyphinfo, &any, 'q', 0,
-                 ATR_NONE, "Quit", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, "Quit", MENU_ITEMFLAGS_NONE);
         Sprintf(pbuf, "Is this ok? [yn%sq]", iflags.renameallowed ? "a" : "");
         end_menu(win, pbuf);
         n = select_menu(win, PICK_ONE, &selected);
@@ -1129,7 +1130,7 @@ reset_role_filtering(void)
 {
     winid win;
     anything any;
-    int i, n;
+    int i, n, clr = 0;
     char filterprompt[QBUFSZ];
     menu_item *selected = 0;
 
@@ -1138,23 +1139,26 @@ reset_role_filtering(void)
     any = cg.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              "Unacceptable roles", MENU_ITEMFLAGS_NONE);
     setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             "Unacceptable races", MENU_ITEMFLAGS_NONE);
+             clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             clr, "Unacceptable races", MENU_ITEMFLAGS_NONE);
     setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             "Unacceptable genders", MENU_ITEMFLAGS_NONE);
+             clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             clr, "Unacceptable genders", MENU_ITEMFLAGS_NONE);
     setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, "", MENU_ITEMFLAGS_NONE);
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             "Unacceptable alignments", MENU_ITEMFLAGS_NONE);
+             clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             clr, "Unacceptable alignments", MENU_ITEMFLAGS_NONE);
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     Sprintf(filterprompt, "Pick all that apply%s",
@@ -1192,6 +1196,7 @@ setup_rolemenu(
     int i;
     boolean role_ok;
     char thisch, lastch = '\0', rolenamebuf[50];
+    int clr = 0;
 
     any = cg.zeroany; /* zero out all bits */
     for (i = 0; roles[i].name.m; i++) {
@@ -1224,7 +1229,7 @@ setup_rolemenu(
         /* !filtering implies reset_role_filtering() where we want to
            mark this role as preseleted if current filter excludes it */
         add_menu(win, &nul_glyphinfo, &any, thisch, 0,
-                 ATR_NONE, an(rolenamebuf),
+                 ATR_NONE, clr, an(rolenamebuf),
                  (!filtering && !role_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
         lastch = thisch;
@@ -1238,6 +1243,7 @@ setup_racemenu(winid win, boolean filtering, int role, int gend, int algn)
     boolean race_ok;
     int i;
     char this_ch;
+    int clr = 0;
 
     any = cg.zeroany;
     for (i = 0; races[i].noun; i++) {
@@ -1259,7 +1265,7 @@ setup_racemenu(winid win, boolean filtering, int role, int gend, int algn)
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, races[i].noun,
+                 ATR_NONE, clr, races[i].noun,
                  (!filtering && !race_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -1272,6 +1278,7 @@ setup_gendmenu(winid win, boolean filtering, int role, int race, int algn)
     boolean gend_ok;
     int i;
     char this_ch;
+    int clr = 0;
 
     any = cg.zeroany;
     for (i = 0; i < ROLE_GENDERS; i++) {
@@ -1291,7 +1298,7 @@ setup_gendmenu(winid win, boolean filtering, int role, int race, int algn)
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, genders[i].adj,
+                 ATR_NONE, clr, genders[i].adj,
                  (!filtering && !gend_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -1304,6 +1311,7 @@ setup_algnmenu(winid win, boolean filtering, int role, int race, int gend)
     boolean algn_ok;
     int i;
     char this_ch;
+    int clr = 0;
 
     any = cg.zeroany;
     for (i = 0; i < ROLE_ALIGNS; i++) {
@@ -1323,7 +1331,7 @@ setup_algnmenu(winid win, boolean filtering, int role, int race, int gend)
         add_menu(win, &nul_glyphinfo, &any,
                  filtering ? this_ch : highc(this_ch),
                  filtering ? highc(this_ch) : 0,
-                 ATR_NONE, aligns[i].adj,
+                 ATR_NONE, clr, aligns[i].adj,
                  (!filtering && !algn_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
@@ -3229,6 +3237,7 @@ tty_add_menu(
     char ch,                /* selector letter (0 = pick our own) */
     char gch,               /* group accelerator (0 = no group) */
     int attr,               /* attribute for string (like tty_putstr()) */
+    int clr UNUSED,         /* color for string */
     const char *str,        /* menu string */
     unsigned int itemflags) /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
@@ -3307,6 +3316,7 @@ tty_end_menu(winid window,       /* menu to use */
     short len;
     int lmax, n;
     char menu_ch;
+    int clr = 0;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0
         || cw->type != NHW_MENU)
@@ -3321,9 +3331,9 @@ tty_end_menu(winid window,       /* menu to use */
 
         any = cg.zeroany; /* not selectable */
         tty_add_menu(window, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, "", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
         tty_add_menu(window, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, prompt, MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, prompt, MENU_ITEMFLAGS_NONE);
     }
 
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
@@ -3591,7 +3601,7 @@ tty_update_inventory(int arg UNUSED)
         /* side: left side panel or right side panel, not a window column */
         side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
 
-        ttyinv_populate_slot(cw, row, side, text);
+        ttyinv_populate_slot(cw, row, side, text, 0);
     }
 
     calling_from_update_inventory = TRUE;
@@ -3679,7 +3689,8 @@ tty_update_invent_slot(
         row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
-        ttyinv_populate_slot(cw, row, side, pi->fromcore.text);
+        ttyinv_populate_slot(cw, row, side,
+                             pi->fromcore.text, pi->fromcore.clr);
         break;
     case render:
         if ((cw = wins[window]) == (struct WinDesc *) 0)
@@ -3761,7 +3772,7 @@ ttyinv_populate_slot(
     struct WinDesc *cw,
     int row,  /* 'row' within the window, not within screen */
     int side, /* 'side'==0 is left panel or ==1 is right panel */
-    const char *text)
+    const char *text, int32_t color)
 {
     struct tty_perminvent_cell *cell;
     char c;
@@ -3770,6 +3781,9 @@ ttyinv_populate_slot(
     col = bordercol[side] + 1;
     endcol = bordercol[side + 1] - 1;
     cell = &cw->cells[row][col];
+    if (cell->color != color)
+        cell->refresh = 1;
+    cell->color = color;
     for (ccnt = col; ccnt <= endcol; ++ccnt, ++cell) {
         /* [don't expect this to happen] if there was a glyph here, release
            memory allocated for it; gi pointer and ttychar character overlay

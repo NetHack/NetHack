@@ -22,9 +22,11 @@ struct tty_perminvent_cell {
     Bitfield(refresh, 1);
     Bitfield(text, 1);
     Bitfield(glyph, 1);
-    Bitfield(colorbits, 5);
     union ttycellcontent content;
-    int32_t color;
+    int32_t color;      /* adjusted color 0 = ignore
+                         * 1-16             = NetHack color + 1
+                         * 17..16,777,233   = 24-bit color  + 17
+                         */
 };
 #endif
 
@@ -235,7 +237,7 @@ E void tty_putmixed(winid window, int attr, const char *str);
 E void tty_display_file(const char *, boolean);
 E void tty_start_menu(winid, unsigned long);
 E void tty_add_menu(winid, const glyph_info *, const ANY_P *, char, char,
-                    int, const char *, unsigned int);
+                    int, int, const char *, unsigned int);
 E void tty_end_menu(winid, const char *);
 E int tty_select_menu(winid, int, MENU_ITEM_P **);
 E char tty_message_menu(char, int, const char *);

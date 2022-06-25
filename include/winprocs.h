@@ -32,7 +32,7 @@ struct window_procs {
     void (*win_display_file)(const char *, boolean);
     void (*win_start_menu)(winid, unsigned long);
     void (*win_add_menu)(winid, const glyph_info *, const ANY_P *,
-                         char, char, int,
+                         char, char, int, int,
                          const char *, unsigned int);
     void (*win_end_menu)(winid, const char *);
     int (*win_select_menu)(winid, int, MENU_ITEM_P **);
@@ -341,7 +341,7 @@ struct chain_procs {
     void (*win_start_menu)(CARGS, winid, unsigned long);
     void (*win_add_menu)(CARGS, winid, const glyph_info *,
                          const ANY_P *, char, char, int,
-                         const char *, unsigned int);
+                         int, const char *, unsigned int);
     void (*win_end_menu)(CARGS, winid, const char *);
     int (*win_select_menu)(CARGS, winid, int, MENU_ITEM_P **);
     char (*win_message_menu)(CARGS, char, int, const char *);
@@ -418,7 +418,7 @@ extern void safe_putmixed(winid, int, const char *);
 extern void safe_display_file(const char *, boolean);
 extern void safe_start_menu(winid, unsigned long);
 extern void safe_add_menu(winid, const glyph_info *, const ANY_P *,
-                          char, char, int, const char *,
+                          char, char, int, int, const char *,
                           unsigned int);
 extern void safe_end_menu(winid, const char *);
 extern int safe_select_menu(winid, int, MENU_ITEM_P **);

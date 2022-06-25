@@ -130,9 +130,9 @@ VDECLCB(shim_putstr,(winid w, int attr, const char *str), "viis", A2P w, A2P att
 VDECLCB(shim_display_file,(const char *name, boolean complain), "vsi", P2V name, A2P complain)
 VDECLCB(shim_start_menu,(winid window, unsigned long mbehavior), "vii", A2P window, A2P mbehavior)
 VDECLCB(shim_add_menu,
-    (winid window, const glyph_info *glyphinfo, const ANY_P *identifier, char ch, char gch, int attr, const char *str, unsigned int itemflags),
+    (winid window, const glyph_info *glyphinfo, const ANY_P *identifier, char ch, char gch, int attr, int clr, const char *str, unsigned int itemflags),
     "vippiiisi",
-    A2P window, P2V glyphinfo, P2V identifier, A2P ch, A2P gch, A2P attr, P2V str, A2P itemflags)
+    A2P window, P2V glyphinfo, P2V identifier, A2P ch, A2P gch, A2P attr, A2P clr, P2V str, A2P itemflags)
 VDECLCB(shim_end_menu,(winid window, const char *prompt), "vis", A2P window, P2V prompt)
 /* XXX: shim_select_menu menu_list is an output */
 DECLCB(int, shim_select_menu,(winid window, int how, MENU_ITEM_P **menu_list), "iiio", A2P window, A2P how, P2V menu_list)

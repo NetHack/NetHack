@@ -54,7 +54,7 @@ public:
 	static void qt_display_file(const char *filename, boolean must_exist);
 	static void qt_start_menu(winid wid, unsigned long mbehavior);
 	static void qt_add_menu(winid wid, const glyph_info *glyphinfo,
-		const ANY_P * identifier, char ch, char gch, int attr,
+		const ANY_P * identifier, char ch, char gch, int attr, int clr,
 		const char *str, unsigned int itemflags);
 	static void qt_end_menu(winid wid, const char *prompt);
 	static int qt_select_menu(winid wid, int how, MENU_ITEM_P **menu_list);

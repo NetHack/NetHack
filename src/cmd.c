@@ -496,6 +496,7 @@ doc_extcmd_flagstr(
     const struct ext_func_tab *efp) /* if Null, add a footnote to the menu */
 {
     static char Abuf[10]; /* 5 would suffice: {'[','m','A',']','\0'} */
+    int clr = 0;
 
     /* note: tag shown for menu prefix is 'm' even if m-prefix action
        has been bound to some other key */
@@ -503,11 +504,11 @@ doc_extcmd_flagstr(
         char qbuf[QBUFSZ];
         anything any = cg.zeroany;
 
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "[A] Command autocompletes", MENU_ITEMFLAGS_NONE);
         Sprintf(qbuf, "[m] Command accepts '%s' prefix",
                 visctrl(cmd_from_func(do_reqmenu)));
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, qbuf,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, qbuf,
                  MENU_ITEMFLAGS_NONE);
         return (char *) 0;
     } else {
@@ -544,6 +545,7 @@ doextlist(void)
     boolean redisplay = TRUE, search = FALSE;
     static const char *const headings[] = { "Extended commands",
                                       "Debugging Extended Commands" };
+    int clr = 0;
 
     searchbuf[0] = '\0';
     menuwin = create_nhwindow(NHW_MENU);
@@ -552,16 +554,16 @@ doextlist(void)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "Extended Commands List",
                  MENU_ITEMFLAGS_NONE);
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "", MENU_ITEMFLAGS_NONE);
 
         Sprintf(buf, "Switch to %s commands that don't autocomplete",
                 menumode ? "including" : "excluding");
         any.a_int = 1;
-        add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, buf,
+        add_menu(menuwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
 
         if (!*searchbuf) {
@@ -572,7 +574,7 @@ doextlist(void)
                having ':' as an explicit selector overrides the default
                menu behavior for it; we retain 's' as a group accelerator */
             add_menu(menuwin, &nul_glyphinfo, &any, ':', 's', ATR_NONE,
-                     "Search extended commands",
+                     clr, "Search extended commands",
                      MENU_ITEMFLAGS_NONE);
         } else {
             Strcpy(buf, "Switch back from search");
@@ -585,17 +587,17 @@ doextlist(void)
                work for interfaces which support ':' to search; use as a
                general menu command takes precedence over group accelerator */
             add_menu(menuwin, &nul_glyphinfo, &any, 's', ':', ATR_NONE,
-                     buf, MENU_ITEMFLAGS_NONE);
+                     clr, buf, MENU_ITEMFLAGS_NONE);
         }
         if (wizard) {
             any.a_int = 4;
-            add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE,
+            add_menu(menuwin, &nul_glyphinfo, &any, 'z', 0, ATR_NONE, clr,
           onelist ? "Switch to showing debugging commands in separate section"
        : "Switch to showing all alphabetically, including debugging commands",
                      MENU_ITEMFLAGS_NONE);
         }
         any = cg.zeroany;
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  "", MENU_ITEMFLAGS_NONE);
         menushown[0] = menushown[1] = 0;
         n = 0;
@@ -638,7 +640,7 @@ doextlist(void)
                 if (!menushown[pass]) {
                     Strcpy(buf, headings[pass]);
                     add_menu(menuwin, &nul_glyphinfo, &any, 0, 0,
-                             iflags.menu_headings, buf,
+                             iflags.menu_headings, clr, buf,
                              MENU_ITEMFLAGS_NONE);
                     menushown[pass] = 1;
                 }
@@ -647,16 +649,16 @@ doextlist(void)
                 Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
                         doc_extcmd_flagstr(menuwin, efp), efp->ef_desc);
                 add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         buf, MENU_ITEMFLAGS_NONE);
+                         clr, buf, MENU_ITEMFLAGS_NONE);
                 ++n;
             }
             if (n)
                 add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         "", MENU_ITEMFLAGS_NONE);
+                         clr, "", MENU_ITEMFLAGS_NONE);
         }
         if (*searchbuf && !n)
             add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     "no matches", MENU_ITEMFLAGS_NONE);
+                     clr, "no matches", MENU_ITEMFLAGS_NONE);
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
@@ -734,6 +736,7 @@ extcmd_via_menu(void)
     int accelerator, prevaccelerator;
     int matchlevel = 0;
     boolean wastoolong, one_per_line;
+    int clr = 0;
 
     ret = 0;
     cbuf[0] = '\0';
@@ -797,7 +800,7 @@ extcmd_via_menu(void)
                     Sprintf(buf, fmtstr, prompt);
                     any.a_char = prevaccelerator;
                     add_menu(win, &nul_glyphinfo, &any, any.a_char,
-                             0, ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+                             0, ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
                     acount = 0;
                     if (!(accelerator != prevaccelerator || one_per_line))
                         wastoolong = TRUE;
@@ -821,7 +824,7 @@ extcmd_via_menu(void)
             Sprintf(buf, fmtstr, prompt);
             any.a_char = prevaccelerator;
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, buf, MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
         }
         Snprintf(prompt, sizeof(prompt), "Extended Command: %s", cbuf);
         end_menu(win, prompt);
@@ -1838,6 +1841,7 @@ wiz_intrinsic(void)
         long oldtimeout, newtimeout;
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
+        int clr = 0;
 
         any = cg.zeroany;
         win = create_nhwindow(NHW_MENU);
@@ -1848,7 +1852,7 @@ wiz_intrinsic(void)
         "[Precede any selection with a count to increment by other than %d.]",
                     DEFAULT_TIMEOUT_INCR);
             any.a_int = 0;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                      MENU_ITEMFLAGS_NONE);
         }
         for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
@@ -1866,7 +1870,7 @@ wiz_intrinsic(void)
                    set to timed values here so show a separator */
                 any.a_int = 0;
                 add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, "--", MENU_ITEMFLAGS_NONE);
+                         ATR_NONE, clr, "--", MENU_ITEMFLAGS_NONE);
             }
             any.a_int = i + 1; /* +1: avoid 0 */
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
@@ -1874,7 +1878,7 @@ wiz_intrinsic(void)
                 Sprintf(buf, "%-27s [%li]", propname, oldtimeout);
             else
                 Sprintf(buf, "%s", propname);
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                      MENU_ITEMFLAGS_NONE);
         }
         end_menu(win, "Which intrinsics?");
@@ -1991,6 +1995,7 @@ doterrain(void)
     anything any;
     int n;
     int which;
+    int clr = 0;
 
     /*
      * normal play: choose between known map without mons, obj, and traps
@@ -2006,30 +2011,30 @@ doterrain(void)
     start_menu(men, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
     any.a_int = 1;
-    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+    add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              "known map without monsters, objects, and traps",
              MENU_ITEMFLAGS_SELECTED);
     any.a_int = 2;
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             "known map without monsters and objects",
+             clr, "known map without monsters and objects",
              MENU_ITEMFLAGS_NONE);
     any.a_int = 3;
     add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             "known map without monsters",
+             clr, "known map without monsters",
              MENU_ITEMFLAGS_NONE);
     if (discover || wizard) {
         any.a_int = 4;
         add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 "full map without monsters, objects, and traps",
+                 clr, "full map without monsters, objects, and traps",
                  MENU_ITEMFLAGS_NONE);
         if (wizard) {
             any.a_int = 5;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     "internal levl[][].typ codes in base-36",
+                     clr, "internal levl[][].typ codes in base-36",
                      MENU_ITEMFLAGS_NONE);
             any.a_int = 6;
             add_menu(men, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     "legend of base-36 levl[][].typ codes",
+                     clr, "legend of base-36 levl[][].typ codes",
                      MENU_ITEMFLAGS_NONE);
         }
     }
@@ -4812,11 +4817,12 @@ static void
 mcmd_addmenu(winid win, int act, const char *txt)
 {
     anything any;
+    int clr = 0;
 
     /* TODO: fixed letters for the menu entries? */
     any = cg.zeroany;
     any.a_int = act;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, txt,
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, txt,
              MENU_ITEMFLAGS_NONE);
 }
 

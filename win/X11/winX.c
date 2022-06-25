@@ -2011,6 +2011,7 @@ X11_display_file(const char *str, boolean complain)
     menu_item *menu_list;
 #define LLEN 128
     char line[LLEN];
+    int clr = 0;
 
     /* Use the port-independent file opener to see if the file exists. */
     fp = dlb_fopen(str, RDTMODE);
@@ -2027,7 +2028,7 @@ X11_display_file(const char *str, boolean complain)
     any = cg.zeroany;
     while (dlb_fgets(line, LLEN, fp)) {
         X11_add_menu(newwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     line, MENU_ITEMFLAGS_NONE);
+                     clr, line, MENU_ITEMFLAGS_NONE);
     }
     (void) dlb_fclose(fp);
 

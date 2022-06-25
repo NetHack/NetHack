@@ -158,7 +158,7 @@ void mswin_start_menu(winid wid, unsigned long mbehavior);
 void mswin_add_menu(winid wid, const glyph_info *glyphinfo,
                     const ANY_P *identifier,
                     char accelerator, char group_accel, int attr,
-                    const char *str, unsigned int itemflags);
+                    int clr, const char *str, unsigned int itemflags);
 void mswin_end_menu(winid wid, const char *prompt);
 int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
 void mswin_mark_synch(void);

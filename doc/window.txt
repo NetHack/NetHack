@@ -327,7 +327,7 @@ start_menu(window, unsigned long mbehavior)
 		-- mbehavior allows flags to be passed to alter the appearance
                    and/or behavior of the menu.
 add_menu(windid window, glyphinfo, const anything identifier, char accelerator,
-                                char groupacc, int attr, char *str,
+                                char groupacc, int attr, int clr, char *str,
                                 unsigned itemflags)
 		-- Add a text line str to the given menu window.  If identifier
 		   is 0, then the line cannot be selected (e.g. a title).
@@ -356,6 +356,30 @@ add_menu(windid window, glyphinfo, const anything identifier, char accelerator,
 		   the menu command (or their user defined aliases), it loses.
 		   The menu commands and aliases take care not to interfere
 		   with the default object class symbols.
+                -- attr attributes can be one of
+			ATR_NONE (or 0)
+			ATR_ULINE
+			ATR_BOLD
+			ATR_BLINK
+			ATR_INVERSE
+		   If a window-port does not support all of these, it may map
+		   unsupported attributes to a supported one (e.g. map them
+		   all to ATR_INVERSE).
+                -- clr color will hold a color value including 24-bit
+                   true color values. To do that, and make it
+                   distinguishable on the windowport side of things, the
+                   windowport needs to treat it as follows:
+                      0      = not used, just ignore the clr value.
+                      1-16   = indicates a normal NetHack color value from
+                               0 - 15, so subtract 1 to get the NetHack
+                               color value.
+                      17...  = indicates a 24-bit RGB color value, so
+                               subtract 17 to get the actual 24-bit
+                               color value.
+                   When placing the values into this parameter, the core
+                   will add 1 to a NetHack color value, and add 17 to a
+                   24-bit RGB color value. 
+                -- str is a pointer to the menu item text.
 		-- itemflags on this item (such as MENU_ITEMFLAGS_SELECTED etc.).
 
 end_menu(window, prompt)

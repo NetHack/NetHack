@@ -113,11 +113,13 @@ static struct ll_achieve_msg achieve_msg [] = {
 static void
 enlght_out(const char *buf)
 {
+    int clr = 0;
+
     if (g.en_via_menu) {
         anything any;
 
         any = cg.zeroany;
-        add_menu(g.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, buf,
+        add_menu(g.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
     } else
         putstr(g.en_win, 0, buf);
@@ -2567,7 +2569,8 @@ set_vanq_order(void)
     winid tmpwin;
     menu_item *selected;
     anything any;
-    int i, n, choice;
+    int i, n, choice,
+        clr = 0;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -2576,7 +2579,7 @@ set_vanq_order(void)
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
                  vanqorders[i],
                  (i == g.vanq_sortmode)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
