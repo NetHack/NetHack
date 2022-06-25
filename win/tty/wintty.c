@@ -3649,13 +3649,15 @@ tty_update_invent_slot(
         pi->tocore.tocore_flags |= no_init_done;
         return pi;
     }
+    ttyinvmode = pi->fromcore.invmode;
+    show_gold = (ttyinvmode & InvShowGold) != 0;
+    inuse_only = (ttyinvmode & InvInUse) != 0;
+    /* sparse isn't needed port-side */
 
     switch(pi->fromcore.core_request) {
     case request_settings: {
         pi->tocore = zero_tocore;
-        ttyinvmode = pi->fromcore.invmode;
-        inuse_only = (ttyinvmode & InvInUse) != 0;
-        tty_ok = assesstty(pi->fromcore.invmode,
+        tty_ok = assesstty(ttyinvmode,
                            &offx, &offy, &rows, &cols,
                            &maxcol, &minrow, &maxrow);
         pi->tocore.needrows = (int) (minrow + 1 + ROWNO + 3);
@@ -3675,7 +3677,6 @@ tty_update_invent_slot(
         if ((cw = wins[window]) == (struct WinDesc *) 0)
             panic(winpanicstr, window);
         slot -= 1;  /* 0 is used for commands */
-        show_gold = (ttyinvmode & InvShowGold) != 0;
         row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
@@ -3686,10 +3687,6 @@ tty_update_invent_slot(
             panic(winpanicstr, window);
         /* render to the display */
         force_redraw = pi->fromcore.force_redraw;
-//        show_gold = (ttyinvmode & InvShowGold) != 0;
-//        inuse_only = (ttyinvmode & InvInUse) != 0;
-//        sparse = (ttyinvmode & InvSparse) != 0;
-//        if (!done_tty_perm_invent_init)
         calling_from_update_inventory = TRUE;
         for (row = 0; row < cw->maxrow; ++row)
             for (col = 0; col < cw->maxcol; ++col) {
