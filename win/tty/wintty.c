@@ -255,7 +255,7 @@ void g_pututf8(uint8 *utf8str);
 
 #ifdef TTY_PERM_INVENT
 void tty_perm_invent_toggled(boolean negated);
-static struct tty_perminvent_cell zerottycell = { 0, 0, 0, 0, { 0 } };
+static struct tty_perminvent_cell zerottycell = { 0, 0, 0, { 0 }, 0 };
 static glyph_info zerogi = { 0 };
 #ifdef CORE_INVENT
 static struct to_core zero_tocore = { 0 };
