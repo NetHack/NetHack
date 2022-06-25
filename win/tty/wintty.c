@@ -3655,7 +3655,7 @@ tty_update_invent_slot(
     /* sparse isn't needed port-side */
 
     switch(pi->fromcore.core_request) {
-    case request_settings: {
+    case request_settings:
         pi->tocore = zero_tocore;
         tty_ok = assesstty(ttyinvmode,
                            &offx, &offy, &rows, &cols,
@@ -3672,7 +3672,6 @@ tty_update_invent_slot(
         pi->tocore.maxslot = maxslot;
         return pi;
         break;
-    }
     case update_slot:
         if ((cw = wins[window]) == (struct WinDesc *) 0)
             panic(winpanicstr, window);
