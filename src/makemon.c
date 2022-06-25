@@ -1963,13 +1963,15 @@ grow_up(struct monst *mtmp, struct monst *victim)
                   an(buf));
         }
         set_mon_data(mtmp, ptr);
+        if (mtmp->cham == oldtype && is_shapeshifter(ptr))
+            mtmp->cham = newtype; /* vampire growing into vampire lord */
         newsym(mtmp->mx, mtmp->my);    /* color may change */
         lev_limit = (int) mtmp->m_lev; /* never undo increment */
 
         mtmp->female = fem; /* gender might be changing */
         /* if 'mtmp' is leashed, persistent inventory window needs updating */
         if (mtmp->mleashed)
-            update_inventory(); /* x - leash (attached to a <mon> */
+            update_inventory(); /* x - leash (attached to a <mon>) */
     }
 
     /* sanity checks */

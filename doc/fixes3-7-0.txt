@@ -934,6 +934,9 @@ the u.ustuck hierarchy is:  swallowed by ustuck, hero poly'd into sticky form
 	could make formerly sticky pold'd hero clear ustuck, leaving hero
 	swallowed by nothing (u.uswallow==1 with u.ustuck==NULL); that could
 	cause a crash if u.ustuck got dereferenced
+when a vampire gains levels and grows into a vampire lord, change its cham
+	field (shapechanger base type) from vampire to vampire lord so that if
+	it revives in base form it won't revert to plain vampire
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
