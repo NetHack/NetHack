@@ -560,7 +560,8 @@ tty_preference_update(const char *pref)
        than temporary switch to the rogue one), redraw perm_invent; not
        only might individual symbols change (punctuation vs line drawing),
        the way to render them might change too (Handling: DEC/UTF8/&c) */
-    if (!strcmp(pref, "symset") && iflags.window_inited) {
+    if ((!strcmp(pref, "symset") || !strcmp(pref, "perm_invent"))
+        && iflags.window_inited) {
        if (g.perm_invent_win != WIN_ERR)
            tty_invent_box_glyph_init(wins[g.perm_invent_win]);
     }
