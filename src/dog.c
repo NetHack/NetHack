@@ -609,8 +609,10 @@ mon_leave(struct monst *mtmp)
            more segments than can fit in that field gets truncated */
         num_segs = min(cnt, MAX_NUM_WORMS - 1);
         wormgone(mtmp);
-        /* put the head back */
-        place_monster(mtmp, mx, my);
+        /* put the head back; note: mtmp might not be on the map if this
+           is happening during a failed attempt to migrate to this level */
+        if (mx)
+            place_monster(mtmp, mx, my);
     }
 
     return num_segs;

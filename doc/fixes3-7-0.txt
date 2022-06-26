@@ -937,6 +937,10 @@ the u.ustuck hierarchy is:  swallowed by ustuck, hero poly'd into sticky form
 when a vampire gains levels and grows into a vampire lord, change its cham
 	field (shapechanger base type) from vampire to vampire lord so that if
 	it revives in base form it won't revert to plain vampire
+a migrating long worm that couldn't arrive could be placed at <0,0> while
+	setting up another migration attempt to the level, triggering
+        impossible "trying to place long worm tail at <0,0> mstate:8 on level"
+	(message is confused; it should say "long worm" without tail)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

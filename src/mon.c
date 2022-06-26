@@ -3293,6 +3293,12 @@ m_into_limbo(struct monst *mtmp)
 static void
 migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
 {
+    if (!mtmp->mx) {
+        /* this was a failed arrival attempt from a prior migration;
+           force mtmp to temporarily have a valid location when starting
+           its new migration */
+        mtmp->mx = u.ux, mtmp->my = u.uy;
+    }
     unstuck(mtmp);
     mdrop_special_objs(mtmp);
     migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);

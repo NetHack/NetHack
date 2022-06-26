@@ -2186,7 +2186,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
         Sprintf(outbuf, "[Invalid mon->data %s >= %s]",
                 fmt_ptr((genericptr_t) mon->data),
                 fmt_ptr((genericptr_t) &mons[NUMMONS]));
-    } else if (ckloc && ptr == &mons[PM_LONG_WORM]
+    } else if (ckloc && ptr == &mons[PM_LONG_WORM] && mon->mx
                && g.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
                 pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)),
