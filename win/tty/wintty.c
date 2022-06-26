@@ -1769,7 +1769,8 @@ free_window_info(struct WinDesc *cw, boolean free_data)
     int i;
 
     if (cw->data) {
-        if (cw == wins[WIN_MESSAGE] && cw->rows > cw->maxrow)
+        if (WIN_MESSAGE != WIN_ERR && cw == wins[WIN_MESSAGE]
+            && cw->rows > cw->maxrow)
             cw->maxrow = cw->rows; /* topl data */
         for (i = 0; i < cw->maxrow; i++)
             if (cw->data[i]) {
