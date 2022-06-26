@@ -11,6 +11,7 @@
 #define DOG_WEAK        500
 #define DOG_STARVE      750
 
+static void dog_starve(struct monst *);
 static boolean dog_hunger(struct monst *, struct edog *);
 static int dog_invent(struct monst *, struct edog *, int);
 static int dog_goal(struct monst *, struct edog *, int, int, int);
@@ -376,6 +377,19 @@ dog_eat(struct monst *mtmp,
     return 1;
 }
 
+static void
+dog_starve(struct monst *mtmp)
+{
+    if (mtmp->mleashed && mtmp != u.usteed)
+        Your("leash goes slack.");
+    else if (cansee(mtmp->mx, mtmp->my))
+        pline("%s starves.", Monnam(mtmp));
+    else
+        You_feel("%s for a moment.",
+                    Hallucination ? "bummed" : "sad");
+    mondied(mtmp);
+}
+
 /* hunger effects -- returns TRUE on starvation */
 static boolean
 dog_hunger(struct monst *mtmp, struct edog *edog)
@@ -392,8 +406,10 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
             mtmp->mhpmax = newmhpmax;
             if (mtmp->mhp > mtmp->mhpmax)
                 mtmp->mhp = mtmp->mhpmax;
-            if (DEADMONSTER(mtmp))
-                goto dog_died;
+            if (DEADMONSTER(mtmp)) {
+                dog_starve(mtmp);
+                return TRUE;
+            }
             if (cansee(mtmp->mx, mtmp->my))
                 pline("%s is confused from hunger.", Monnam(mtmp));
             else if (couldsee(mtmp->mx, mtmp->my))
@@ -403,16 +419,8 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
             stop_occupation();
         } else if (g.moves > edog->hungrytime + DOG_STARVE
                    || DEADMONSTER(mtmp)) {
- dog_died:
-            if (mtmp->mleashed && mtmp != u.usteed)
-                Your("leash goes slack.");
-            else if (cansee(mtmp->mx, mtmp->my))
-                pline("%s starves.", Monnam(mtmp));
-            else
-                You_feel("%s for a moment.",
-                         Hallucination ? "bummed" : "sad");
-            mondied(mtmp);
-            return  TRUE;
+            dog_starve(mtmp);
+            return TRUE;
         }
     }
     return FALSE;
