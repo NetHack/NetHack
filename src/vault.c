@@ -16,6 +16,7 @@ static void wallify_vault(struct monst *);
 static void gd_mv_monaway(struct monst *, int, int);
 static void gd_pick_corridor_gold(struct monst *, int, int);
 static int gd_move_cleanup(struct monst *, boolean, boolean);
+static void gd_letknow(struct monst *);
 
 void
 newegd(struct monst *mtmp)
@@ -805,6 +806,22 @@ gd_move_cleanup(
     return -2;
 }
 
+static void
+gd_letknow(struct monst *grd)
+{
+    if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
+        You_hear("%s.",
+                    m_carrying(grd, TIN_WHISTLE)
+                        ? "the shrill sound of a guard's whistle"
+                        : "angry shouting");
+    else
+        You(um_dist(grd->mx, grd->my, 2)
+                ? "see %s approaching."
+                : "are confronted by %s.",
+            /* "an angry guard" */
+            x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+}
+
 /*
  * return  1: guard moved,  0: guard didn't,  -1: let m_move do it,  -2: died
  */
@@ -844,7 +861,8 @@ gd_move(struct monst *grd)
             wallify_vault(grd);
             if (!in_fcorridor(grd, grd->mx, grd->my))
                 (void) clear_fcorr(grd, TRUE);
-            goto letknow;
+            gd_letknow(grd);
+            return -1;
         }
         if (!in_fcorridor(grd, grd->mx, grd->my))
             (void) clear_fcorr(grd, TRUE);
@@ -899,18 +917,7 @@ gd_move(struct monst *grd)
                 levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
                 grd->mpeaceful = 0;
- letknow:
-                if (!cansee(grd->mx, grd->my) || !mon_visible(grd))
-                    You_hear("%s.",
-                             m_carrying(grd, TIN_WHISTLE)
-                                 ? "the shrill sound of a guard's whistle"
-                                 : "angry shouting");
-                else
-                    You(um_dist(grd->mx, grd->my, 2)
-                            ? "see %s approaching."
-                            : "are confronted by %s.",
-                        /* "an angry guard" */
-                        x_monnam(grd, ARTICLE_A, "angry", 0, FALSE));
+                gd_letknow(grd);
                 return -1;
             } else {
                 if (!Deaf)
