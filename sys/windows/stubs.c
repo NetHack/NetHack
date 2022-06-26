@@ -162,12 +162,14 @@ synch_cursor(void)
     return;
 }
 #ifdef TTY_PERM_INVENT
+boolean in_tty_perm_invent_toggled = FALSE;
+
 void
 tty_perm_invent_toggled(boolean negated)
 {
 }
-#endif
-#endif
+#endif /* TTY_PERM_INVENT */
+#endif /* TTY_GRAPHICS */
 
 void
 more(void)

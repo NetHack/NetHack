@@ -267,6 +267,8 @@ static boolean done_tty_perm_invent_init = FALSE;
 #ifndef NOINVSYM /* invent.c */
 #define NOINVSYM '#'
 #endif
+/* not static, core_update_invent_slot() needs to see it from invent.c */
+boolean in_tty_perm_invent_toggled = FALSE;
 static int ttyinv_create_window(int, struct WinDesc *);
 
 static void tty_invent_box_glyph_init(struct WinDesc *cw);
@@ -3926,15 +3928,20 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
 void
 tty_perm_invent_toggled(boolean negated)
 {
+    in_tty_perm_invent_toggled = TRUE;
     if (negated) {
         if (g.perm_invent_win != WIN_ERR)
             destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
         done_tty_perm_invent_init = FALSE;
+        g.core_invent_state = 0;
     } else {
-        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
-        if (g.perm_invent_win != WIN_ERR)
-            display_nhwindow(g.perm_invent_win, FALSE);
+        core_update_invent_slot();
+        /* Doing this here was a problem */
+ //       g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
+ //       if (g.perm_invent_win != WIN_ERR)
+ //           display_nhwindow(g.perm_invent_win, FALSE);
     }
+    in_tty_perm_invent_toggled = FALSE;
 }
 #endif  /* TTY_PERM_INVENT */
 

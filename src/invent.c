@@ -5349,6 +5349,7 @@ static char Empty[1] = { '\0' };
 static int done_environment_var = 0;
 #ifdef TTY_PERM_INVENT
 extern void tty_perm_invent_toggled(boolean negated);
+extern boolean in_tty_perm_invent_toggled;
 #endif
 
 void
@@ -5376,7 +5377,8 @@ core_update_invent_slot()
         || (pi_info.tocore.tocore_flags & prohibited))
             return;
 
-    if (!iflags.perm_invent && g.core_invent_state) {
+    if ((!iflags.perm_invent && g.core_invent_state)
+        && !in_tty_perm_invent_toggled) {
         /* Odd - but this could be end-of-game disclosure
          * which just sets boolean iflag.perm_invent to
          * FALSE without actually doing anything else.
@@ -5388,7 +5390,8 @@ core_update_invent_slot()
         (void) doredraw();
         return;
     }
-
+    if (!iflags.perm_invent && !in_tty_perm_invent_toggled)
+        return;
     /*
      * The core looks after what content goes into the
      * inventory slots, and deals with things like obj
@@ -5419,7 +5422,7 @@ core_update_invent_slot()
         wport_id = "perm_invent";
 
     pi_info.fromcore.core_request = 0;
-    if (!g.core_invent_state) {
+    if ((iflags.perm_invent && !g.core_invent_state) || in_tty_perm_invent_toggled) {
         /* Send the wport a request to get the related settings. */
         pi_info.fromcore.core_request = request_settings;
         if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
@@ -5427,7 +5430,7 @@ core_update_invent_slot()
                 /* sizes aren't good enough */
                 set_option_mod_status("perm_invent", set_gameview);
                 iflags.perm_invent = FALSE;
-                pline("%s could not be enabled.", wport_id); 
+                pline("%s could not be enabled.", wport_id);
                 pline("%s needs a terminal that is at least %dx%d, yours is %dx%d.",
                       wport_id,
                       pi->tocore.needrows, pi->tocore.needcols,
@@ -5442,8 +5445,10 @@ core_update_invent_slot()
         display_nhwindow(g.perm_invent_win, FALSE);
         g.core_invent_state++;
     }
-    text = Empty; /* lint suppression */
+    if (!pi || pi->tocore.maxslot == 0)
+        return;
 
+    text = Empty; /* lint suppression */
     pi_info.fromcore.core_request = update_slot;
     obj = g.invent;
     for (slot = 0; slot < pi->tocore.maxslot; ++slot) {
