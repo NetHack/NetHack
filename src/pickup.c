@@ -459,20 +459,9 @@ allow_category(struct obj *obj)
     /* For coins, if any class filter is specified, accept if coins
      * are included regardless of whether either unpaid or BUC-status
      * is also specified since player has explicitly requested coins.
-     * If no class filtering is specified but bless/curse state is,
-     * coins are either unknown or uncursed based on an option setting.
      */
-    if (obj->oclass == COIN_CLASS)
-        return g.class_filter
-                 ? (index(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE)
-                 : g.shop_filter /* coins are never unpaid, but check anyway */
-                    ? (obj->unpaid ? TRUE : FALSE)
-            : g.picked_filter
-            ? obj->pickup_prev
-                    : g.bucx_filter
-                       ? (index(g.valid_menu_classes, flags.goldX ? 'X' : 'U')
-                          ? TRUE : FALSE)
-                       : TRUE; /* catchall: no filters specified, so accept */
+    if (obj->oclass == COIN_CLASS && g.class_filter)
+        return index(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
 
     if (Role_if(PM_CLERIC) && !obj->bknown)
         set_bknown(obj, 1);
@@ -505,8 +494,18 @@ allow_category(struct obj *obj)
     /* check for particular bless/curse state */
     if (g.bucx_filter) {
         /* first categorize this object's bless/curse state */
-        char bucx = !obj->bknown ? 'X'
-                      : obj->blessed ? 'B' : obj->cursed ? 'C' : 'U';
+        char bucx;
+        if (obj->oclass == COIN_CLASS) {
+            /* If no class filtering is specified but bless/curse state is,
+               coins are treated as either unknown or uncursed based on an
+               option setting. */
+            bucx = flags.goldX ? 'X' : 'U';
+        } else {
+            bucx = !obj->bknown ? 'X'
+                     : obj->blessed ? 'B'
+                        : obj->cursed ? 'C'
+                           : 'U';
+        }
 
         /* if its category is not in the list, reject */
         if (!index(g.valid_menu_classes, bucx))
