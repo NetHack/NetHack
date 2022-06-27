@@ -5378,7 +5378,10 @@ sync_perminvent(void)
             return;
 
     if ((!iflags.perm_invent && g.core_invent_state)
-        && !in_perm_invent_toggled) {
+#ifdef TTY_PERM_INVENT
+        && !in_perm_invent_toggled
+#endif
+                                                     ){
         /* Odd - but this could be end-of-game disclosure
          * which just sets boolean iflag.perm_invent to
          * FALSE without actually doing anything else.
@@ -5390,7 +5393,11 @@ sync_perminvent(void)
         (void) doredraw();
         return;
     }
-    if (!iflags.perm_invent && !in_perm_invent_toggled)
+    if (!iflags.perm_invent
+#ifdef TTY_PERM_INVENT
+&& !in_perm_invent_toggled
+#endif
+                            )
         return;
     /*
      * The core looks after what content goes into the
@@ -5422,7 +5429,11 @@ sync_perminvent(void)
         wport_id = "perm_invent";
 
     pi_info.fromcore.core_request = 0;
-    if ((iflags.perm_invent && !g.core_invent_state) || in_perm_invent_toggled) {
+    if ((iflags.perm_invent && !g.core_invent_state)
+#ifdef TTY_PERM_INVENT
+        || in_perm_invent_toggled
+#endif
+                                                    ) {
         /* Send the wport a request to get the related settings. */
         pi_info.fromcore.core_request = request_settings;
         if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
@@ -5518,7 +5529,9 @@ sync_perminvent(void)
 void
 perm_invent_toggled(boolean negated)
 {
+#ifdef TTY_PERM_INVENT
     in_perm_invent_toggled = TRUE;
+#endif
     if (negated) {
         if (g.perm_invent_win != WIN_ERR)
             destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
@@ -5526,7 +5539,9 @@ perm_invent_toggled(boolean negated)
     } else {
         sync_perminvent();
     }
+#ifdef TTY_PERM_INVENT
     in_perm_invent_toggled = FALSE;
+#endif
 }
 
 #endif  /* CORE_INVENT */
