@@ -3576,6 +3576,8 @@ tally_BUCX(struct obj *list, boolean by_nexthere,
         /* priests always know bless/curse state */
         if (Role_if(PM_CLERIC))
             list->bknown = (list->oclass != COIN_CLASS);
+        if (list->pickup_prev)
+            ++(*jcp);
         /* coins are either uncursed or unknown based upon option setting */
         if (list->oclass == COIN_CLASS) {
             if (flags.goldX)
@@ -3584,8 +3586,6 @@ tally_BUCX(struct obj *list, boolean by_nexthere,
                 ++(*ucp);
             continue;
         }
-        if (list->pickup_prev)
-            ++(*jcp);
         /* ordinary items */
         if (!list->bknown)
             ++(*xcp);
@@ -3739,7 +3739,9 @@ this_type_only(struct obj *obj)
 {
     boolean res = (obj->oclass == g.this_type);
 
-    if (obj->oclass == COIN_CLASS) {
+    if (g.this_type == 'P') {
+        res = obj->pickup_prev;
+    } else if (obj->oclass == COIN_CLASS) {
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
         if (g.this_type && index("BUCX", g.this_type))
@@ -3757,9 +3759,6 @@ this_type_only(struct obj *obj)
             break;
         case 'X':
             res = !obj->bknown;
-            break;
-        case 'P':
-            res = obj->pickup_prev;
             break;
         default:
             break; /* use 'res' as-is */
