@@ -4412,8 +4412,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                 perm_invent_toggled(FALSE);
                 /* perm_invent_toggled()
                    -> sync_perminvent()
-                      -> tty_update_invent_core()
-                          -> tty_create_invent()
+                          -> tty_create_nhwindow(NHW_PERMINVENT)
                    gives feedback for failure (terminal too small) */
                 if (g.perm_invent_win == WIN_ERR)
                     return optn_silenterr;
