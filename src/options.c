@@ -109,9 +109,6 @@ extern boolean colors_changed;  /* in tos.c */
 extern char *shade[3];          /* in sys/msdos/video.c */
 extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
-#ifdef TTY_PERM_INVENT
-extern void tty_perm_invent_toggled(boolean negated);
-#endif
 
 static char empty_optstr[] = { '\0' };
 boolean duplicate, using_alias;
@@ -4408,12 +4405,12 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
 #ifdef TTY_PERM_INVENT
             /* if attempting to enable perm_invent fails, say so and return
                before "'perm_invent' option toggled on" would be given below;
-               tty_perm_invent_toggled() and routines it calls don't check
+               perm_invent_toggled() and routines it calls don't check
                iflags.perm_invent so it doesn't matter that 'SET IT HERE'
                hasn't been executed yet */
             if (WINDOWPORT("tty") && !g.opt_initial && !negated) {
-                tty_perm_invent_toggled(FALSE);
-                /* tty_perm_invent_toggled()
+                perm_invent_toggled(FALSE);
+                /* perm_invent_toggled()
                    -> tty_create_nhwindow(WIN_TTYINVENT)
                       -> tty_create_invent()
                    gives feedback for failure (terminal too small) */

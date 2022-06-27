@@ -2431,7 +2431,7 @@ update_inventory(void)
     iflags.suppress_price = 0;
 #if defined(TTY_PERM_INVENT) && defined(CORE_INVENT)
     if (WINDOWPORT("tty"))
-        core_update_invent_slot();
+        sync_perminvent();
     else
 #else
         (*windowprocs.win_update_inventory)(0);
@@ -5349,11 +5349,11 @@ static char Empty[1] = { '\0' };
 static int done_environment_var = 0;
 #ifdef TTY_PERM_INVENT
 extern void tty_perm_invent_toggled(boolean negated);
-extern boolean in_tty_perm_invent_toggled;
+static boolean in_perm_invent_toggled;
 #endif
 
 void
-core_update_invent_slot()
+sync_perminvent(void)
 {
     static perminvent_info *pi = 0;
     char *text, nxtlet;
@@ -5378,19 +5378,19 @@ core_update_invent_slot()
             return;
 
     if ((!iflags.perm_invent && g.core_invent_state)
-        && !in_tty_perm_invent_toggled) {
+        && !in_perm_invent_toggled) {
         /* Odd - but this could be end-of-game disclosure
          * which just sets boolean iflag.perm_invent to
          * FALSE without actually doing anything else.
          */
 #ifdef TTY_PERM_INVENT
         if (WINDOWPORT("tty"))
-            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
+            perm_invent_toggled(TRUE); /* TRUE means negated */
 #endif
         (void) doredraw();
         return;
     }
-    if (!iflags.perm_invent && !in_tty_perm_invent_toggled)
+    if (!iflags.perm_invent && !in_perm_invent_toggled)
         return;
     /*
      * The core looks after what content goes into the
@@ -5422,7 +5422,7 @@ core_update_invent_slot()
         wport_id = "perm_invent";
 
     pi_info.fromcore.core_request = 0;
-    if ((iflags.perm_invent && !g.core_invent_state) || in_tty_perm_invent_toggled) {
+    if ((iflags.perm_invent && !g.core_invent_state) || in_perm_invent_toggled) {
         /* Send the wport a request to get the related settings. */
         pi_info.fromcore.core_request = request_settings;
         if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
@@ -5515,23 +5515,20 @@ core_update_invent_slot()
     pi_info.fromcore.core_request = 0;
 }
 
-#if 0
-RESTORE_WARNING_FORMAT_NONLITERAL
-
 void
-tty_perm_invent_toggled(boolean negated)
+perm_invent_toggled(boolean negated)
 {
+    in_perm_invent_toggled = TRUE;
     if (negated) {
         if (g.perm_invent_win != WIN_ERR)
             destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
-        done_tty_perm_invent_init = FALSE;
+        g.core_invent_state = 0;
     } else {
-        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
-        if (g.perm_invent_win != WIN_ERR)
-            display_nhwindow(g.perm_invent_win, FALSE);
+        sync_perminvent();
     }
+    in_perm_invent_toggled = FALSE;
 }
-#endif
+
 #endif  /* CORE_INVENT */
 
 /*invent.c*/
