@@ -21,6 +21,7 @@ static boolean check_map_spot(int, int, char, unsigned);
 static boolean clear_stale_map(char, unsigned);
 static void sense_trap(struct trap *, xchar, xchar, int);
 static int detect_obj_traps(struct obj *, boolean, int);
+static void display_trap_map(struct trap *, int);
 static int furniture_detect(void);
 static void show_map_spot(int, int);
 static void findone(int, int, genericptr_t);
@@ -908,85 +909,13 @@ detect_obj_traps(
     return result;
 }
 
-/* the detections are pulled out so they can
- * also be used in the crystal ball routine
- * returns 1 if nothing was detected
- * returns 0 if something was detected
- */
-int
-trap_detect(struct obj *sobj) /* null if crystal ball,
-                                 *scroll if gold detection scroll */
+static void
+display_trap_map(struct trap *ttmp, int cursed_src)
 {
-    register struct trap *ttmp;
     struct monst *mon;
-    int door, glyph, tr, ter_typ = TER_DETECT | TER_TRP;
-    int cursed_src = sobj && sobj->cursed;
-    boolean found = FALSE;
+    int door, glyph, ter_typ = TER_DETECT | TER_TRP;
     coord cc;
 
-    if (u.usteed)
-        u.usteed->mx = u.ux, u.usteed->my = u.uy;
-
-    /* floor/ceiling traps */
-    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
-        if (ttmp->tx != u.ux || ttmp->ty != u.uy)
-            goto outtrapmap;
-        else
-            found = TRUE;
-    }
-    /* chest traps (might be buried or carried) */
-    if ((tr = detect_obj_traps(fobj, FALSE, 0)) != OTRAP_NONE) {
-        if (tr & OTRAP_THERE)
-            goto outtrapmap;
-        else
-            found = TRUE;
-    }
-    if ((tr = detect_obj_traps(g.level.buriedobjlist, FALSE, 0))
-        != OTRAP_NONE) {
-        if (tr & OTRAP_THERE)
-            goto outtrapmap;
-        else
-            found = TRUE;
-    }
-    for (mon = fmon; mon; mon = mon->nmon) {
-        if (DEADMONSTER(mon) || (mon->isgd && !mon->mx))
-            continue;
-        if ((tr = detect_obj_traps(mon->minvent, FALSE, 0)) != OTRAP_NONE) {
-            if (tr & OTRAP_THERE)
-                goto outtrapmap;
-            else
-                found = TRUE;
-        }
-    }
-    if (detect_obj_traps(g.invent, FALSE, 0) != OTRAP_NONE)
-        found = TRUE;
-    /* door traps */
-    for (door = 0; door < g.doorindex; door++) {
-        cc = g.doors[door];
-        /* levl[][].doormask and .wall_info both overlay levl[][].flags;
-           the bit in doormask for D_TRAPPED is also a bit in wall_info;
-           secret doors use wall_info so can't be marked as trapped */
-        if (levl[cc.x][cc.y].typ == SDOOR)
-            continue;
-        if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
-            if (cc.x != u.ux || cc.y != u.uy)
-                goto outtrapmap;
-            else
-                found = TRUE;
-        }
-    }
-    if (!found) {
-        char buf[BUFSZ];
-
-        Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
-        strange_feeling(sobj, buf);
-        return 1;
-    }
-    /* traps exist, but only under me - no separate display required */
-    Your("%s itch.", makeplural(body_part(TOE)));
-    return 0;
-
- outtrapmap:
     cls();
 
     (void) unconstrain_map();
@@ -1026,6 +955,89 @@ trap_detect(struct obj *sobj) /* null if crystal ball,
     browse_map(ter_typ, "trap of interest");
 
     map_redisplay();
+}
+
+/* the detections are pulled out so they can
+ * also be used in the crystal ball routine
+ * returns 1 if nothing was detected
+ * returns 0 if something was detected
+ */
+int
+trap_detect(struct obj *sobj) /* null if crystal ball,
+                                 *scroll if gold detection scroll */
+{
+    register struct trap *ttmp;
+    struct monst *mon;
+    int door, tr;
+    int cursed_src = sobj && sobj->cursed;
+    boolean found = FALSE;
+    coord cc;
+
+    if (u.usteed)
+        u.usteed->mx = u.ux, u.usteed->my = u.uy;
+
+    /* floor/ceiling traps */
+    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
+        if (ttmp->tx != u.ux || ttmp->ty != u.uy) {
+            display_trap_map(ttmp, cursed_src);
+            return 0;
+        } else
+            found = TRUE;
+    }
+    /* chest traps (might be buried or carried) */
+    if ((tr = detect_obj_traps(fobj, FALSE, 0)) != OTRAP_NONE) {
+        if (tr & OTRAP_THERE) {
+            display_trap_map(ttmp, cursed_src);
+            return 0;
+        } else
+            found = TRUE;
+    }
+    if ((tr = detect_obj_traps(g.level.buriedobjlist, FALSE, 0))
+        != OTRAP_NONE) {
+        if (tr & OTRAP_THERE) {
+            display_trap_map(ttmp, cursed_src);
+            return 0;
+        } else
+            found = TRUE;
+    }
+    for (mon = fmon; mon; mon = mon->nmon) {
+        if (DEADMONSTER(mon) || (mon->isgd && !mon->mx))
+            continue;
+        if ((tr = detect_obj_traps(mon->minvent, FALSE, 0)) != OTRAP_NONE) {
+            if (tr & OTRAP_THERE) {
+                display_trap_map(ttmp, cursed_src);
+                return 0;
+            } else
+                found = TRUE;
+        }
+    }
+    if (detect_obj_traps(g.invent, FALSE, 0) != OTRAP_NONE)
+        found = TRUE;
+    /* door traps */
+    for (door = 0; door < g.doorindex; door++) {
+        cc = g.doors[door];
+        /* levl[][].doormask and .wall_info both overlay levl[][].flags;
+           the bit in doormask for D_TRAPPED is also a bit in wall_info;
+           secret doors use wall_info so can't be marked as trapped */
+        if (levl[cc.x][cc.y].typ == SDOOR)
+            continue;
+        if (levl[cc.x][cc.y].doormask & D_TRAPPED) {
+            if (cc.x != u.ux || cc.y != u.uy) {
+                display_trap_map(ttmp, cursed_src);
+                return 0;
+            } else
+                found = TRUE;
+        }
+    }
+    if (!found) {
+        char buf[BUFSZ];
+
+        Sprintf(buf, "Your %s stop itching.", makeplural(body_part(TOE)));
+        strange_feeling(sobj, buf);
+        return 1;
+    }
+    /* traps exist, but only under me - no separate display required */
+    Your("%s itch.", makeplural(body_part(TOE)));
     return 0;
 }
 
