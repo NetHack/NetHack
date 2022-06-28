@@ -1194,10 +1194,15 @@ level_tele_trap(struct trap* trap, unsigned int trflags)
         You("are momentarily blinded by a flash of light.");
     else
         You("are momentarily disoriented.");
-    make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     deltrap(trap);
     newsym(u.ux, u.uy); /* get rid of trap symbol */
     level_tele();
+    /* magic portal traversal causes brief Stun; for level teleport, use
+       confusion instead, and only when hero lacks control; do this after
+       processing the level teleportation attempt because being confused
+       can affect the outcome ("Oops" result) */
+    if (!Teleport_control)
+        make_confused((HConfusion & TIMEOUT) + 3L, FALSE);
 }
 
 /* check whether monster can arrive at location <x,y> via Tport (or fall) */
@@ -1575,14 +1580,8 @@ mlevel_tele_trap(
             if (trap)
                 seetrap(trap);
         }
-        /*
-         * Commit 6a65b412 stated "Using magic portals and level teleporters
-         * stuns for a few turns. It's taxing to teleport long distances."
-         *
-         * In keeping with that stated intent, restrict the stunning effect.
-         */
-        if (is_xport(tt))
-            mtmp->mstun = 1;
+        if (is_xport(tt) && !control_teleport(mtmp->data))
+            mtmp->mconf = 1;
         migrate_to_level(mtmp, ledger_no(&tolevel), migrate_typ, (coord *) 0);
         return Trap_Moved_Mon; /* no longer on this level */
     }

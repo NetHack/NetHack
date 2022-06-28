@@ -826,7 +826,8 @@ if a lit potion of oil on the floor was launched by an explosion and it hit
 	tried to extinguish it as a light source
 place_object() validated coordinates after using them to index level.objects
 killed rope golem may drop leashes and bullwhips
-using magic portals and level teleporters stuns hero for a few turns
+using magic portals stuns hero for a few turns
+using level teleporters confuses hero without teleport control for a few turns
 clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
 	inventory is subjected to burning and surviving objects have their
 	bypass bit set, giant is killed by fire trap and drops a boulder and
