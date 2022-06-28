@@ -5156,10 +5156,8 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
     long i, cnt, quan;
     int dmg, xresist, skip, dindx;
     const char *mult;
-    boolean physical_damage;
     boolean chargeit = FALSE;
 
-    physical_damage = FALSE;
     xresist = skip = 0;
     /* lint suppression */
     dmg = dindx = 0;
@@ -5295,8 +5293,6 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
 
                 if (dmgtyp == AD_FIRE && osym == FOOD_CLASS)
                     how = "exploding glob of slime";
-                if (physical_damage)
-                    dmg = Maybe_Half_Phys(dmg);
                 losehp(dmg, one ? how : (const char *) makeplural(how),
                        one ? KILLED_BY_AN : KILLED_BY);
                 exercise(A_STR, FALSE);
