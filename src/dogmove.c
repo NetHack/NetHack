@@ -1115,13 +1115,15 @@ dog_move(register struct monst *mtmp,
 
         /* dog eschews cursed objects, but likes dog food */
         /* (minion isn't interested; `cursemsg' stays FALSE) */
-        if (has_edog)
+        if (has_edog) {
+            boolean can_reach_food = could_reach_item(mtmp, nx, ny);
             for (obj = g.level.objects[nx][ny]; obj; obj = obj->nexthere) {
                 if (obj->cursed) {
                     cursemsg[i] = TRUE;
-                } else if ((otyp = dogfood(mtmp, obj)) < MANFOOD
-                         && (otyp < ACCFOOD
-                             || edog->hungrytime <= g.moves)) {
+                } else if (can_reach_food
+                           && (otyp = dogfood(mtmp, obj)) < MANFOOD
+                           && (otyp < ACCFOOD
+                               || edog->hungrytime <= g.moves)) {
                     /* Note: our dog likes the food so much that he
                      * might eat it even when it conceals a cursed object */
                     nix = nx;
@@ -1132,6 +1134,7 @@ dog_move(register struct monst *mtmp,
                     goto newdogpos;
                 }
             }
+        }
         /* didn't find something to eat; if we saw a cursed item and
            aren't being forced to walk on it, usually keep looking */
         if (cursemsg[i] && !mtmp->mleashed && uncursedcnt > 0
