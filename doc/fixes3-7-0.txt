@@ -942,6 +942,8 @@ a migrating long worm that couldn't arrive could be placed at <0,0> while
 	setting up another migration attempt to the level, triggering
         impossible "trying to place long worm tail at <0,0> mstate:8 on level"
 	(message is confused; it should say "long worm" without tail)
+dropping things with 'D' wouldn't merge them with compatible items already at
+	that floor spot because use of obj->bypass made them seem incompatible
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

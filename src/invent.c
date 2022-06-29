@@ -770,6 +770,17 @@ merged(struct obj **potmp, struct obj **pobj)
 #endif /*0*/
         }
 
+        /* mergable() no longer requires 'bypass' to match; if 'obj' has
+           the bypass bit set, force the combined stack to have that too;
+           primarily in case this merge is occurring because stackobj()
+           is operating on an object just dropped by a monster that was
+           zapped with polymorph, we want bypass set in order to inhibit
+           the same zap from affecting the new combined stack when it hits
+           objects at the monster's spot (but also in case we're called by
+           code that's using obj->bypass to track 'already processed') */
+        if (obj->bypass)
+            otmp->bypass = 1;
+
         /* handle puddings a bit differently; absorption will free the
            other object automatically so we can just return out from here */
         if (obj->globby) {
@@ -4273,6 +4284,8 @@ feel_cockatrice(struct obj *otmp, boolean force_touch)
     }
 }
 
+/* 'obj' is being placed on the floor; if it can merge with something that
+   is already there, combine them and discard obj as a separate object */
 void
 stackobj(struct obj *obj)
 {
@@ -4286,7 +4299,9 @@ stackobj(struct obj *obj)
 
 /* returns TRUE if obj & otmp can be merged; used in invent.c and mkobj.c */
 boolean
-mergable(register struct obj *otmp, register struct obj *obj)
+mergable(
+    register struct obj *otmp, /* potential 'into' stack */
+    register struct obj *obj)  /* 'combine' stack */
 {
     size_t objnamelth = 0, otmpnamelth = 0;
 
@@ -4300,9 +4315,14 @@ mergable(register struct obj *otmp, register struct obj *obj)
     if (obj->oclass == COIN_CLASS)
         return TRUE;
 
-    if (obj->bypass != otmp->bypass
-        || obj->cursed != otmp->cursed || obj->blessed != otmp->blessed)
+    if (obj->cursed != otmp->cursed || obj->blessed != otmp->blessed)
         return FALSE;
+#if 0   /* don't require 'bypass' to match; that results in items dropped
+         * via 'D' not stacking with compatible items already on the floor;
+         * caller who wants that behavior should use 'nomerge' instead */
+    if (obj->bypass != otmp->bypass)
+        return FALSE;
+#endif
 
     if (obj->globby)
         return TRUE;
