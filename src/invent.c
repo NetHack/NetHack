@@ -2441,7 +2441,7 @@ update_inventory(void)
     save_suppress_price = iflags.suppress_price;
     iflags.suppress_price = 0;
 #if defined(TTY_PERM_INVENT) && defined(CORE_INVENT)
-    if (WINDOWPORT("tty"))
+    if (WINDOWPORT(tty))
         sync_perminvent();
     else
 #else
@@ -5407,7 +5407,7 @@ sync_perminvent(void)
          * FALSE without actually doing anything else.
          */
 #ifdef TTY_PERM_INVENT
-        if (WINDOWPORT("tty"))
+        if (WINDOWPORT(tty))
             perm_invent_toggled(TRUE); /* TRUE means negated */
 #endif
         (void) doredraw();
@@ -5443,7 +5443,7 @@ sync_perminvent(void)
      * [port]_update_inventory() mechanism.
      */
 
-    if (WINDOWPORT("tty") && iflags.perm_invent)
+    if (WINDOWPORT(tty) && iflags.perm_invent)
         wport_id = "tty perm_invent";
     else
         wport_id = "perm_invent";

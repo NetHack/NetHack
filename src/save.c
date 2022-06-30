@@ -149,7 +149,7 @@ dosave0(void)
     dotcnt = 0;
     dotrow = 2;
     curs(WIN_MAP, 1, 1);
-    if (!WINDOWPORT("X11"))
+    if (!WINDOWPORT(X11))
         putstr(WIN_MAP, 0, "Saving:");
 #endif
     nhfp->mode = WRITING | FREEING;
@@ -197,7 +197,7 @@ dosave0(void)
             dotrow++;
             dotcnt = 0;
         }
-        if (!WINDOWPORT("X11")) {
+        if (!WINDOWPORT(X11)) {
             putstr(WIN_MAP, 0, ".");
         }
         mark_synch();

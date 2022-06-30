@@ -1441,7 +1441,7 @@ cl_end(void)
 void
 raw_clear_screen(void)
 {
-    if (WINDOWPORT("tty")) {
+    if (WINDOWPORT(tty)) {
         cell_t * back = console.back_buffer;
         cell_t * front = console.front_buffer;
         COORD pos;

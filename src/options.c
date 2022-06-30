@@ -2063,7 +2063,7 @@ optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
         opts[0] = '\0';
 #if PREV_MSGS
         tmp = iflags.prevmsg_window;
-        if (WINDOWPORT("curses")) {
+        if (WINDOWPORT(curses)) {
             if (tmp == 's' || tmp == 'c')
                 tmp = iflags.prevmsg_window = 'r';
         }
@@ -2492,7 +2492,7 @@ optfn_petattr(int optidx, int req, boolean negated, char *opts, char *op)
             return optn_err;
 
 #ifdef CURSES_GRAPHICS
-        if (WINDOWPORT("curses")) {
+        if (WINDOWPORT(curses)) {
             char tmpbuf[QBUFSZ];
 
             Strcpy(opts, curses_fmt_attrs(tmpbuf));
@@ -4408,7 +4408,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                perm_invent_toggled() and routines it calls don't check
                iflags.perm_invent so it doesn't matter that 'SET IT HERE'
                hasn't been executed yet */
-            if (WINDOWPORT("tty") && !g.opt_initial && !negated) {
+            if (WINDOWPORT(tty) && !g.opt_initial && !negated) {
                 perm_invent_toggled(FALSE);
                 /* perm_invent_toggled()
                    -> sync_perminvent()
@@ -4498,7 +4498,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             break;
         case opt_hilite_pet:
 #ifdef CURSES_GRAPHICS
-            if (WINDOWPORT("curses")) {
+            if (WINDOWPORT(curses)) {
                 /* if we're enabling hilite_pet and petattr isn't set,
                    set it to Inverse; if we're disabling, leave petattr
                    alone so that re-enabling will get current value back
@@ -4515,7 +4515,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                 status_initialize(REASSESS_ONLY);
                 g.opt_need_redraw = TRUE;
 #ifdef QT_GRAPHICS
-            } else if (WINDOWPORT("Qt")) {
+            } else if (WINDOWPORT(Qt)) {
                 /* Qt doesn't support HILITE_STATUS or FLUSH_STATUS so fails
                    VIA_WINDOWPORT(), but it does support WC2_HITPOINTBAR */
                 g.context.botlx = TRUE;
@@ -4877,7 +4877,7 @@ handler_msg_window(void)
 #if PREV_MSGS /* tty or curses */
     winid tmpwin;
     anything any;
-    boolean is_tty = WINDOWPORT("tty"), is_curses = WINDOWPORT("curses");
+    boolean is_tty = WINDOWPORT(tty), is_curses = WINDOWPORT(curses);
     int clr = 0;
 
     if (is_tty || is_curses) {
@@ -6304,7 +6304,7 @@ initoptions_finish(void)
      * Option processing can take place before a user-decided WindowPort
      * is even initialized, so check for that too.
      */
-    if (!WINDOWPORT("safe-startup")) {
+    if (!WINDOWPORT(safe-startup)) {
         if (iflags.hilite_delta && !wc2_supported("statushilites")) {
             raw_printf("Status highlighting not supported for %s interface.",
                        windowprocs.name);
@@ -8956,7 +8956,7 @@ enhance_menu_text(
     availsz = sz - nowsz;
 
 #ifdef TTY_PERM_INVENT
-    if (bool_p == &iflags.perm_invent && WINDOWPORT("tty")) {
+    if (bool_p == &iflags.perm_invent && WINDOWPORT(tty)) {
         if (thisopt->setwhere == set_gameview)
             Snprintf(eos(buf), availsz, " *terminal size is too small");
     }

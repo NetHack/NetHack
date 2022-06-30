@@ -788,7 +788,7 @@ dorecover(NHFILE* nhfp)
 #ifdef AMII_GRAPHICS
     {
         extern struct window_procs amii_procs;
-        if (WINDOWPORT("amii")) {
+        if (WINDOWPORT(amii)) {
             extern winid WIN_BASE;
             clear_nhwindow(WIN_BASE); /* hack until there's a hook for this */
         }
@@ -804,7 +804,7 @@ dorecover(NHFILE* nhfp)
     curs(WIN_MAP, 1, 1);
     dotcnt = 0;
     dotrow = 2;
-    if (!WINDOWPORT("X11"))
+    if (!WINDOWPORT(X11))
         putstr(WIN_MAP, 0, "Restoring:");
 #endif
     restoreinfo.mread_flags = 1; /* return despite error */
@@ -821,7 +821,7 @@ dorecover(NHFILE* nhfp)
             dotrow++;
             dotcnt = 0;
         }
-        if (!WINDOWPORT("X11")) {
+        if (!WINDOWPORT(X11)) {
             putstr(WIN_MAP, 0, ".");
         }
         mark_synch();

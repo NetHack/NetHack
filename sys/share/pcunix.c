@@ -188,7 +188,7 @@ getlock(void)
 #else /*SELF_RECOVER*/
         if (recover_savefile()) {
 #if defined(TTY_GRAPHICS)
-            if (WINDOWPORT("tty"))
+            if (WINDOWPORT(tty))
                 clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;

@@ -110,7 +110,7 @@ panictrace_handler(int sig_unused UNUSED)
     int f2;
 
 #ifdef CURSES_GRAPHICS
-    if (iflags.window_inited && WINDOWPORT("curses")) {
+    if (iflags.window_inited && WINDOWPORT(curses)) {
         extern void curses_uncurse_terminal(void); /* wincurs.h */
 
         /* it is risky calling this during a program-terminating signal,

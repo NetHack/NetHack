@@ -541,14 +541,14 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 
     nethack_enter(argc, argv);
     iflags.use_background_glyph = FALSE;
-    if (WINDOWPORT("mswin"))
+    if (WINDOWPORT(mswin))
         iflags.use_background_glyph = TRUE;
-    if (WINDOWPORT("tty"))
+    if (WINDOWPORT(tty))
         consoletty_open(1);
 
     init_nhwindows(&argc, argv);
 
-    if (WINDOWPORT("tty"))
+    if (WINDOWPORT(tty))
         toggle_mouse_support();
 
     if (g.symset[PRIMARYSET].handling
@@ -569,7 +569,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #endif     /* TERMLIB || CURSES */
 #if 0
 #ifdef CURSES_GRAPHICS
-    if (WINDOWPORT("curses"))
+    if (WINDOWPORT(curses))
         (*cursesgraphics_mode_callback)();
 #endif
 #endif
@@ -893,7 +893,7 @@ safe_routines(void)
      * Get a set of valid safe windowport function
      * pointers during early startup initialization.
      */
-    if (!WINDOWPORT("safe-startup"))
+    if (!WINDOWPORT(safe-startup))
         windowprocs = *get_safe_procs(1);
     if (!GUILaunched)
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
@@ -1148,7 +1148,7 @@ getlock(void)
     const char *fq_lock;
 #define OOPS_BUFSZ 512
     char oops[OOPS_BUFSZ];
-    boolean istty = WINDOWPORT("tty");
+    boolean istty = WINDOWPORT(tty);
 
     /* we ignore QUIT and INT at this point */
     if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
@@ -1179,7 +1179,7 @@ getlock(void)
 
     (void) nhclose(fd);
 
-    if (WINDOWPORT("tty"))
+    if (WINDOWPORT(tty))
         prompt_result = tty_self_recover_prompt();
     else
         prompt_result = other_self_recover_prompt();
@@ -1316,7 +1316,7 @@ tty_self_recover_prompt(void)
     c = 'n';
     ct = 0;
     saved_procs = windowprocs;
-    if (!WINDOWPORT("safe-startup"))
+    if (!WINDOWPORT(safe-startup))
         windowprocs = *get_safe_procs(2); /* arg 2 uses no-newline variant */
     windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     raw_print("\n");
@@ -1376,13 +1376,13 @@ int
 other_self_recover_prompt(void)
 {
     register int c, ci, ct, pl, retval = 0;
-    boolean ismswin = WINDOWPORT("mswin"),
-            iscurses = WINDOWPORT("curses");
+    boolean ismswin = WINDOWPORT(mswin),
+            iscurses = WINDOWPORT(curses);
 
     pl = 1;
     c = 'n';
     ct = 0;
-    if (iflags.window_inited || WINDOWPORT("curses")) {
+    if (iflags.window_inited || WINDOWPORT(curses)) {
         c = yn("There are files from a game in progress under your name. "
                "Recover?");
     } else {

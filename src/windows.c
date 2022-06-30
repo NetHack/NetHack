@@ -312,7 +312,7 @@ choose_windows(const char *s)
         free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
     if (windowprocs.win_raw_print == def_raw_print
-            || WINDOWPORT("safe-startup"))
+            || WINDOWPORT(safe-startup))
         nh_terminate(EXIT_SUCCESS);
 }
 

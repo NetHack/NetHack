@@ -279,7 +279,7 @@ struct wc_Opt {
 /* Macro for the currently active Window Port whose function
    pointers have been loaded */
 #define WINDOWPORT(wn) \
-    (windowprocs.name && !strncmpi((wn), windowprocs.name, strlen((wn))))
+    (windowprocs.name && !strncmpi((#wn), windowprocs.name, strlen((#wn))))
 
 /* role selection by player_selection(); this ought to be in the core... */
 #define RS_NAME    0

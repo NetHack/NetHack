@@ -1516,16 +1516,16 @@ maybe_play_sound(const char* msg)
         && !iflags.vt_sounddata
 #endif
 #if defined(QT_GRAPHICS)
-        && WINDOWPORT("Qt")
+        && WINDOWPORT(Qt)
 #endif
 #if defined(WIN32)
-        && (WINDOWPORT("tty") || WINDOWPORT("mswin") || WINDOWPORT("curses"))
+        && (WINDOWPORT(tty) || WINDOWPORT(mswin) || WINDOWPORT(curses))
 #endif
 #endif /* WIN32 || QT_GRAPHICS */
         )
         play_usersound(snd->filename, snd->volume);
 #if defined(TTY_GRAPHICS) && defined(TTY_SOUND_ESCCODES)
-    else if (snd && iflags.vt_sounddata && snd->idx >= 0 && WINDOWPORT("tty"))
+    else if (snd && iflags.vt_sounddata && snd->idx >= 0 && WINDOWPORT(tty))
         play_usersound_via_idx(snd->idx, snd->volume);
 #endif  /* TTY_GRAPHICS && TTY_SOUND_ESCCODES */
 #endif  /* WIN32 || QT_GRAPHICS || TTY_SOUND_ESCCODES */

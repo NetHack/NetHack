@@ -1361,7 +1361,7 @@ docompress_file(const char *filename, boolean uncomp)
     int f;
     unsigned ln;
 #ifdef TTY_GRAPHICS
-    boolean istty = WINDOWPORT("tty");
+    boolean istty = WINDOWPORT(tty);
 #endif
 
 #ifdef COMPRESS_EXTENSION

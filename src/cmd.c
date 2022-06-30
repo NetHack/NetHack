@@ -1532,7 +1532,7 @@ wiz_show_wmodes(void)
     int x, y;
     char row[COLNO + 1];
     struct rm *lev;
-    boolean istty = WINDOWPORT("tty");
+    boolean istty = WINDOWPORT(tty);
 
     win = create_nhwindow(NHW_TEXT);
     if (istty)
