@@ -717,7 +717,7 @@ chainout_update_invent_slot(
 }
 
 struct chain_procs chainout_procs = {
-    "-chainout", 0, /* wincap */
+    WPIDMINUS(chainout), 0, /* wincap */
     0,              /* wincap2 */
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     /*

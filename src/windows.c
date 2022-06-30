@@ -312,7 +312,7 @@ choose_windows(const char *s)
         free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
     if (windowprocs.win_raw_print == def_raw_print
-            || WINDOWPORT(safe-startup))
+            || WINDOWPORT(safestartup))
         nh_terminate(EXIT_SUCCESS);
 }
 
@@ -539,7 +539,7 @@ static void hup_void_fdecl_constchar_p(const char *);
 static perminvent_info *hup_update_invent_slot(winid, int, perminvent_info *);
 
 static struct window_procs hup_procs = {
-    "hup", 0L, 0L,
+    WPID(hup), 0L, 0L,
     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
     hup_init_nhwindows,
     hup_void_ndecl,                                    /* player_selection */

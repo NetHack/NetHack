@@ -233,7 +233,7 @@ win32_abort(void)
             exit_nhwindows((char *) 0);
         iflags.window_inited = FALSE;
     }
-    if (!WINDOWPORT(mswin) && !WINDOWPORT(safe-startup))
+    if (!WINDOWPORT(mswin) && !WINDOWPORT(safestartup))
         safe_routines();
     if (wizard) {
         raw_print("Execute debug breakpoint wizard?");

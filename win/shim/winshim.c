@@ -202,7 +202,7 @@ DECLB(perminvent_info *, shim_update_invent_slot,
 
 /* Interface definition used in windows.c */
 struct window_procs shim_procs = {
-    "shim",
+    WPID(shim),
     (0
      | WC_ASCII_MAP
      | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),

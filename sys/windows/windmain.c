@@ -893,7 +893,7 @@ safe_routines(void)
      * Get a set of valid safe windowport function
      * pointers during early startup initialization.
      */
-    if (!WINDOWPORT(safe-startup))
+    if (!WINDOWPORT(safestartup))
         windowprocs = *get_safe_procs(1);
     if (!GUILaunched)
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
@@ -1316,7 +1316,7 @@ tty_self_recover_prompt(void)
     c = 'n';
     ct = 0;
     saved_procs = windowprocs;
-    if (!WINDOWPORT(safe-startup))
+    if (!WINDOWPORT(safestartup))
         windowprocs = *get_safe_procs(2); /* arg 2 uses no-newline variant */
     windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     raw_print("\n");

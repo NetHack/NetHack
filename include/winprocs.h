@@ -7,11 +7,20 @@
 
 #include "botl.h"
 
+enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses, 
+              wp_chainin, wp_chainout, wp_safestartup, wp_shim,
+	      wp_hup, wp_guistubs, wp_ttystubs,
+#ifdef OUTDATED_STUFF
+	      , wp_mac, wp_Gem, wp_Gnome, wp_amii, wp_amiv
+#endif
+};
+
 /* NB: this MUST match chain_procs below */
 struct window_procs {
     const char *name;     /* Names should start with [a-z].  Names must
                            * not start with '-'.  Names starting with
                            * '+' are reserved for processors. */
+    enum wp_ids wp_id;
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
     boolean has_color[CLR_MAX];
@@ -168,6 +177,12 @@ extern
 #define update_invent_slot (*windowprocs.win_update_invent_slot)
 
 /*
+ * 
+ */
+#define WPID(name) #name, wp_##name
+#define WPIDMINUS(name) "-" #name, wp_##name 
+
+/*
  * WINCAP
  * Window port preference capability bits.
  * Some day this might be better in its own wincap.h file.
@@ -278,8 +293,13 @@ struct wc_Opt {
 
 /* Macro for the currently active Window Port whose function
    pointers have been loaded */
+#if 0
+/* 3.7 The string comparison version isn't used anymore */
 #define WINDOWPORT(wn) \
     (windowprocs.name && !strncmpi((#wn), windowprocs.name, strlen((#wn))))
+#endif
+
+#define WINDOWPORT(wn) (windowprocs.wp_id == wp_##wn)
 
 /* role selection by player_selection(); this ought to be in the core... */
 #define RS_NAME    0
@@ -320,6 +340,7 @@ struct chain_procs {
     const char *name;     /* Names should start with [a-z].  Names must
                            * not start with '-'.  Names starting with
                            * '+' are reserved for processors. */
+    enum wp_ids wp_id;
     unsigned long wincap; /* window port capability options supported */
     unsigned long wincap2; /* additional window port capability options */
     boolean has_color[CLR_MAX];

@@ -98,7 +98,7 @@ extern void msmsg(const char *, ...);
 
 /* Interface definition, for windows.c */
 struct window_procs tty_procs = {
-    "tty",
+    WPID(tty),
     (0
 #ifdef TTY_PERM_INVENT
      | WC_PERM_INVENT

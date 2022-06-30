@@ -594,7 +594,7 @@ chainin_update_invent_slot(
 }
 
 struct window_procs chainin_procs = {
-    "-chainin", 0, /* wincap */
+    WPIDMINUS(chainin), 0, /* wincap */
     0,             /* wincap2 */
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     /*

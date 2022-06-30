@@ -36,7 +36,7 @@ static char *dummy_get_color_string(void);
 
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
-    "curses",
+    WPID(curses),
     (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
      | WC_HILITE_PET
 #ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */

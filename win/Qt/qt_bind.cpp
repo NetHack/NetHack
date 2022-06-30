@@ -1033,7 +1033,7 @@ static void Qt_positionbar(char *) {}
 } // namespace nethack_qt_
 
 struct window_procs Qt_procs = {
-    "Qt",
+    WPID(Qt),
     (WC_COLOR | WC_HILITE_PET
      | WC_ASCII_MAP | WC_TILED_MAP
      | WC_FONT_MAP | WC_TILE_FILE | WC_TILE_WIDTH | WC_TILE_HEIGHT

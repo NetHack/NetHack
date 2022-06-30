@@ -10,10 +10,10 @@
 #error You cannot compile this with both GUISTUB and TTYSTUB defined.
 #endif
 
-struct window_procs mswin_procs = { "-guistubs" };
+struct window_procs mswin_procs = { WPIDMINUS(guistubs) };
 
 #ifdef QT_GRAPHICS
-struct window_procs Qt_procs = { "-guistubs" };
+struct window_procs Qt_procs = { WPIDMINUS(guistubs) };
 int qt_tilewidth, qt_tileheight, qt_fontsize, qt_compact_mode;
 #endif
 void
@@ -59,7 +59,7 @@ main(int argc, char *argv[])
 
 HANDLE hConIn;
 HANDLE hConOut;
-struct window_procs tty_procs = { "-ttystubs" };
+struct window_procs tty_procs = { WPIDMINUS(ttystubs) };
 #ifdef CURSES_GRAPHICS
 char erase_char, kill_char;
 #endif
