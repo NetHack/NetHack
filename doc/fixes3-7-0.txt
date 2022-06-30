@@ -944,6 +944,9 @@ a migrating long worm that couldn't arrive could be placed at <0,0> while
 	(message is confused; it should say "long worm" without tail)
 dropping things with 'D' wouldn't merge them with compatible items already at
 	that floor spot because use of obj->bypass made them seem incompatible
+a hero on the quest home level who runs or travels past the quest leader and
+	gets tossed out of the quest for some reason would keep running on the
+	far side of the quest portal
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
