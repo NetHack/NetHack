@@ -1832,6 +1832,7 @@ extern boolean regex_compile(const char *, struct nhregex *);
 extern const char *regex_error_desc(struct nhregex *);
 extern boolean regex_match(const char *, struct nhregex *);
 extern void regex_free(struct nhregex *);
+extern void regex_at_exit(void);
 
 /* ### consoletty.c ### */
 

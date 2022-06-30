@@ -63,3 +63,13 @@ extern "C" {
     delete re;
   }
 }
+
+void
+regex_at_exit(void)
+{
+    if (cppregex_static_buffer != 0) {
+        free((genericptr_t) cppregex_static_buffer);
+        cppregex_static_buffer = (char *) 0;
+    }
+}
+
