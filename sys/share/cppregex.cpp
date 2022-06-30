@@ -12,7 +12,7 @@ extern "C" {
   #include <hack.h>
 
   extern const char regex_id[] = "cppregex";
-  static char cppregex_static_buffer[BUFSZ];
+  static char *cppregex_static_buffer = (char *) 0;
 
   struct nhregex {
     std::unique_ptr<std::regex> re;
@@ -41,8 +41,9 @@ extern "C" {
 
   const char *regex_error_desc(struct nhregex *re) {
       if (re->err) {
-          Snprintf(cppregex_static_buffer, sizeof cppregex_static_buffer,
-                   "%s", re->err->what());
+          if (cppregex_static_buffer != 0)
+              free(cppregex_static_buffer);
+          cppregex_static_buffer = dupstr(re->err->what());
           return cppregex_static_buffer;
       } else
           return nullptr;
