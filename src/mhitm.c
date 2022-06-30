@@ -969,6 +969,7 @@ mdamagem(struct monst *magr, struct monst *mdef,
             } else if (pd == &mons[PM_NURSE]) {
                 magr->mhp = magr->mhpmax;
             }
+            mon_givit(magr, pd);
         }
         /* caveat: above digestion handling doesn't keep `pa' up to date */
 
