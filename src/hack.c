@@ -39,6 +39,16 @@ static void maybe_wail(void);
 
 #define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
 
+/* XXX: if more sources of water walking than just boots are added,
+   cause_known(insight.c) should be externified and used for this */
+#define Known_wwalking \
+    (uarmf && uarmf->otyp == WATER_WALKING_BOOTS \
+     && objects[WATER_WALKING_BOOTS].oc_name_known \
+     && !u.usteed)
+#define Known_lwalking \
+    (Known_wwalking && Fire_resistance \
+     && uarmf->oerodeproof && uarmf->rknown)
+
 /* mode values for findtravelpath() */
 #define TRAVP_TRAVEL 0
 #define TRAVP_GUESS  1
@@ -1028,8 +1038,10 @@ test_move(coordxy ux, coordxy uy, coordxy dx, coordxy dy, int mode)
         struct trap *t = t_at(x, y);
 
         if ((t && t->tseen)
-            || (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-                && is_pool_or_lava(x, y) && levl[x][y].seenv))
+            || (!Levitation && !Flying && !Known_lwalking
+                && !(is_pool(x, y) && Known_wwalking)
+                && is_pool_or_lava(x, y) && levl[x][y].seenv)
+            || (IS_WATERWALL(levl[x][y].typ) && levl[x][y].seenv))
             return (mode == TEST_TRAP);
     }
 
@@ -1593,19 +1605,13 @@ swim_move_danger(coordxy x, coordxy y)
     if ((newtyp != u_simple_floortyp(u.ux, u.uy))
         && !Stunned && !Confusion && levl[x][y].seenv
         && (is_pool(x, y) || is_lava(x, y) || liquid_wall)) {
-        boolean known_wwalking, known_lwalking;
 
-        known_wwalking = (uarmf && uarmf->otyp == WATER_WALKING_BOOTS
-                          && objects[WATER_WALKING_BOOTS].oc_name_known
-                          && !u.usteed);
-        known_lwalking = (known_wwalking && Fire_resistance &&
-                          uarmf->oerodeproof && uarmf->rknown);
         /* FIXME: This can be exploited to identify the ring of fire resistance
         * if the player is wearing it unidentified and has identified
         * fireproof boots of water walking and is walking over lava. However,
         * this is such a marginal case that it may not be worth fixing. */
-        if ((is_pool(x, y) && !known_wwalking)
-            || (is_lava(x, y) && !known_lwalking)
+        if ((is_pool(x, y) && !Known_wwalking)
+            || (is_lava(x, y) && !Known_lwalking)
             || liquid_wall) {
             if (g.context.nopick) {
                 /* moving with m-prefix */
@@ -2063,8 +2069,14 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
 static boolean
 avoid_moving_on_liquid(coordxy x, coordxy y, boolean msg)
 {
-    if (!Levitation && !Flying && !is_clinger(g.youmonst.data)
-        && is_pool_or_lava(x, y) && levl[x][y].seenv) {
+    if ((g.context.run < 2 || g.context.travel || is_pool_or_lava(u.ux, u.uy))
+        && (Levitation || Flying || Known_lwalking
+            || (is_pool(x, y) && Known_wwalking))
+        && !IS_WATERWALL(levl[x][y].typ)) {
+        /* XXX: should send 'is_clinger(g.youmonst.data)' here once clinging
+           polyforms are allowed to move over water */
+        return FALSE; /* liquid is safe to traverse */
+    } else if (is_pool_or_lava(x, y) && levl[x][y].seenv) {
         if (msg && flags.mention_walls)
             You("stop at the edge of the %s.",
                 hliquid(is_pool(x,y) ? "water" : "lava"));
@@ -3340,8 +3352,8 @@ lookaround(void)
                 if (infront)
                     goto stop;
                 continue;
-            } else if (avoid_moving_on_liquid(x, y, infront)) {
-                if (infront)
+            } else if (is_pool_or_lava(x, y)) {
+                if (infront && avoid_moving_on_liquid(x, y, TRUE))
                     goto stop;
                 continue;
             } else { /* e.g. objects or trap or stairs */
