@@ -91,7 +91,7 @@ typedef unsigned long long int uint64_t;
 
 #endif /* !C99 */
 
-/* Provide uint8, int16, uint16, int32, uint32, int64 and uint64 */
+/* Provide int8, uint8, int16, uint16, int32, uint32, int64 and uint64 */
 typedef int8_t int8;
 typedef uint8_t uint8;
 typedef int16_t int16;
