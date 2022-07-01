@@ -1182,6 +1182,11 @@ really_move_cursor()
 void
 cmov(int x, int y)
 {
+    if (x >= console.width)
+        x = console.width - 1;
+    if (y >= console.height)
+        y = console.height - 1;
+
     ttyDisplay->cury = y;
     ttyDisplay->curx = x;
 
@@ -1221,8 +1226,11 @@ xputs(const char* s)
 int
 xputc(int ch)
 {
-    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    xputc_core(ch);
+    int x = ttyDisplay->curx, y = ttyDisplay->cury;
+    if (x < console.width && y < console.height) {
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        xputc_core(ch);
+    }
     return 0;
 }
 
@@ -1432,10 +1440,14 @@ term_end_24bitcolor(void)
 void
 cl_end(void)
 {
-    set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
-    buffer_clear_to_end_of_line(console.back_buffer, console.cursor.X,
-                                console.cursor.Y);
-    tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1, (int) ttyDisplay->cury);
+    if (ttyDisplay->curx < console.width 
+            && ttyDisplay->cury < console.height) {
+        set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
+        buffer_clear_to_end_of_line(console.back_buffer, console.cursor.X,
+                                    console.cursor.Y);
+        tty_curs(BASE_WINDOW, (int) ttyDisplay->curx + 1,
+                 (int) ttyDisplay->cury);
+    }
 }
 
 void
