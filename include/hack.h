@@ -254,6 +254,11 @@ enum saveformats {
     ascii = 3           /* each field, ascii text (just proof of concept) */
 };
 
+enum restore_stages {
+    REST_GSTATE = 1,    /* restoring current level and game state */
+    REST_LEVELS = 2,    /* restoring remainder of dungeon */
+};
+
 /* sortloot() return type; needed before extern.h */
 struct sortloot_item {
     struct obj *obj;

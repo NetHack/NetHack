@@ -717,7 +717,9 @@ save_stairs(NHFILE* nhfp)
 
     while (stway) {
         if (perform_bwrite(nhfp)) {
-            if (stway->tolev.dnum == u.uz.dnum) {
+            boolean use_relative = (g.program_state.restoring != REST_GSTATE
+                                    && stway->tolev.dnum == u.uz.dnum);
+            if (use_relative) {
                 /* make dlevel relative to current level */
                 stway->tolev.dlevel -= u.uz.dlevel;
             }
@@ -725,7 +727,7 @@ save_stairs(NHFILE* nhfp)
                 bwrite(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
                 bwrite(nhfp->fd, (genericptr_t) stway, sizeof *stway);
             }
-            if (stway->tolev.dnum == u.uz.dnum) {
+            if (use_relative) {
                 /* reset staiway dlevel back to absolute */
                 stway->tolev.dlevel += u.uz.dlevel;
             }

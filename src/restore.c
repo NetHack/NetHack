@@ -749,7 +749,7 @@ dorecover(NHFILE* nhfp)
     int rtmp;
 
     /* suppress map display if some part of the code tries to update that */
-    g.program_state.restoring = 1;
+    g.program_state.restoring = REST_GSTATE;
 
     get_plname_from_file(nhfp, g.plname);
     getlev(nhfp, 0, (xint8) 0);
@@ -775,6 +775,8 @@ dorecover(NHFILE* nhfp)
     rtmp = restlevelfile(ledger_no(&u.uz));
     if (rtmp < 2)
         return rtmp; /* dorecover called recursively */
+
+    g.program_state.restoring = REST_LEVELS;
 
     /* these pointers won't be valid while we're processing the
      * other levels, but they'll be reset again by restlevelstate()
@@ -909,7 +911,8 @@ rest_stairs(NHFILE* nhfp)
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
         }
-        if (stway.tolev.dnum == u.uz.dnum) {
+        if (g.program_state.restoring != REST_GSTATE
+            && stway.tolev.dnum == u.uz.dnum) {
             /* stairway dlevel is relative, make it absolute */
             stway.tolev.dlevel += u.uz.dlevel;
         }
