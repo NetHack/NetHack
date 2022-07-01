@@ -21,7 +21,7 @@
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
       <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;SAFEPROCS;NOTTYGRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;SAFEPROCS;NOTTYGRAPHICS;HAS_STDINT_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4820;4706;4244;4245;4100;4310</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4820;4706;4244;4245;4100;4310</DisableSpecificWarnings>
     </ClCompile>
@@ -168,7 +168,7 @@
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWindDir)ntsound.c" />
     <ClCompile Include="$(SysWindDir)stubs.c">
-      <PreprocessorDefinitions>TTYSTUB;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TTYSTUB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="$(SysWindDir)windmain.c" />
     <ClCompile Include="$(SysWindDir)windsys.c" />
