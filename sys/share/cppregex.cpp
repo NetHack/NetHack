@@ -42,7 +42,7 @@ extern "C" {
   const char *regex_error_desc(struct nhregex *re) {
       if (re->err) {
           if (cppregex_static_buffer != 0)
-              free((genericptr_t) cppregex_static_buffer);
+              free(cppregex_static_buffer);
           cppregex_static_buffer = dupstr(re->err->what());
           return cppregex_static_buffer;
       } else
