@@ -1829,7 +1829,7 @@ extern void nhl_pushhooked_open_table(lua_State *L);
 
 extern struct nhregex *regex_init(void);
 extern boolean regex_compile(const char *, struct nhregex *);
-extern const char *regex_error_desc(struct nhregex *);
+extern char *regex_error_desc(struct nhregex *, char *);
 extern boolean regex_match(const char *, struct nhregex *);
 extern void regex_free(struct nhregex *);
 

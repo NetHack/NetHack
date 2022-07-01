@@ -1453,7 +1453,8 @@ add_sound_mapping(const char* mapping)
             new_map->next = soundmap;
 
             if (!regex_compile(text, new_map->regex)) {
-                const char *re_error_desc = regex_error_desc(new_map->regex);
+                char errbuf[BUFSZ];
+                char *re_error_desc = regex_error_desc(new_map->regex, errbuf);
 
                 regex_free(new_map->regex);
                 free((genericptr_t) new_map->filename);

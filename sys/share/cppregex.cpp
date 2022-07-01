@@ -8,57 +8,83 @@
 
 /* nhregex interface documented in sys/share/posixregex.c */
 
-extern "C" {
-  #include <hack.h>
+extern "C" { // rest of file
 
-  extern const char regex_id[] = "cppregex";
-  static char cppregex_static_buffer[BUFSZ];
+#include "config.h"
 
-  struct nhregex {
+extern const char regex_id[] = "cppregex";
+
+struct nhregex {
     std::unique_ptr<std::regex> re;
     std::unique_ptr<std::regex_error> err;
-  };
+};
 
-  struct nhregex *regex_init(void) {
+struct nhregex *
+regex_init(void)
+{
     return new nhregex;
-  }
-
-  boolean regex_compile(const char *s, struct nhregex *re) {
-    if (!re)
-      return FALSE;
-    try {
-      re->re.reset(new std::regex(s, (std::regex::extended
-                                    | std::regex::nosubs
-                                    | std::regex::optimize)));
-      re->err.reset(nullptr);
-      return TRUE;
-    } catch (const std::regex_error& err) {
-      re->err.reset(new std::regex_error(err));
-      re->re.reset(nullptr);
-      return FALSE;
-    }
-  }
-
-  const char *regex_error_desc(struct nhregex *re) {
-      if (re->err) {
-          Snprintf(cppregex_static_buffer, sizeof cppregex_static_buffer,
-                   "%s", re->err->what());
-          return cppregex_static_buffer;
-      } else
-          return nullptr;
-  }
-
-  boolean regex_match(const char *s, struct nhregex *re) {
-    if (!re->re)
-      return false;
-    try {
-      return regex_search(s, *re->re, std::regex_constants::match_any);
-    } catch (const std::regex_error& err) {
-      return false;
-    }
-  }
-
-  void regex_free(struct nhregex *re) {
-    delete re;
-  }
 }
+
+boolean
+regex_compile(const char *s, struct nhregex *re)
+{
+    if (!re)
+        return FALSE;
+    try {
+        re->re.reset(new std::regex(s, (std::regex::extended
+                                      | std::regex::nosubs
+                                      | std::regex::optimize)));
+        re->err.reset(nullptr);
+        return TRUE;
+    } catch (const std::regex_error& err) {
+        re->err.reset(new std::regex_error(err));
+        re->re.reset(nullptr);
+        return FALSE;
+    }
+}
+
+char *
+regex_error_desc(struct nhregex *re, char *errbuf)
+{
+    if (!re) {
+        Strcpy(errbuf, "no regexp");
+    } else if (!re->err) {
+        Strcpy(errbuf, "no explanation");
+    } else {
+        char *p;
+
+        errbuf[0] = '\0';
+        (void) strncat(errbuf, re->err->what(), BUFSZ - 1);
+        if (!errbuf[0])
+            Strcpy(errbuf, "unspecified regexp error");
+
+        /* caller will pass our result to config_error_add() and it adds
+           sentence ending period, so if the regex class error explanation
+           already ends in a period, strip that off */
+        if ((p = strrchr(errbuf, '.')) != 0 && !p[1])
+            *p = '\0';
+    }
+    return errbuf;
+}
+
+boolean
+regex_match(const char *s, struct nhregex *re)
+{
+    if (!re->re)
+        return false;
+    try {
+        return regex_search(s, *re->re, std::regex_constants::match_any);
+    } catch (const std::regex_error& err) {
+        return false;
+    }
+}
+
+void
+regex_free(struct nhregex *re)
+{
+    delete re;
+}
+
+} // extern "C"
+
+/*cppregex.cpp*/

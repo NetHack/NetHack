@@ -905,7 +905,7 @@ $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
-$(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp
+$(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../sys/share/cppregex.cpp
 $(TARGETPFX)qt_bind.o: ../win/Qt/qt_bind.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_bind.h ../win/Qt/qt_main.h \

@@ -29,12 +29,6 @@
  * successful and FALSE otherwise. re is invalidated regardless of
  * success.
  *
- * const char *regex_error_desc(struct nhregex *re)
- * Used to retrieve an error description from an error created involving
- * re. Returns NULL if no description can be retrieved. The returned
- * string may be a static buffer and so is only valid until the next
- * call to regex_error_desc.
- *
  * boolean regex_match(const char *s, struct nhregex *re)
  * Used to determine if s (or any substring) matches the regex compiled
  * into re. Only valid if the most recent call to regex_compile on re
@@ -42,6 +36,17 @@
  *
  * void regex_free(struct nhregex *re)
  * Deallocate a regex object.
+ *
+ * char *regex_error_desc(struct nhregex *re, char *outbuf)
+ * Used to retrieve an explanation for an error encountered by
+ * regex_compile() or regex_match().  The explanation is copied into
+ * outbuf[] and a pointer to that is returned.  regex_error_desc()
+ * should be called before regex_free() but outbuf[] may be used after
+ * that.  outbuf[] must be able to hold at least BUFSZ characters.
+ *
+ * One possible error result is "out of memory" so freeing the failed
+ * re should be done to try to recover memory before issuing any error
+ * feedback.
  */
 
 const char regex_id[] = "posixregex";
@@ -54,7 +59,7 @@ struct nhregex {
 struct nhregex *
 regex_init(void)
 {
-    return (struct nhregex *) alloc(sizeof(struct nhregex));
+    return (struct nhregex *) alloc(sizeof (struct nhregex));
 }
 
 boolean
@@ -67,19 +72,20 @@ regex_compile(const char *s, struct nhregex *re)
     return TRUE;
 }
 
-const char *
-regex_error_desc(struct nhregex *re)
+char *
+regex_error_desc(struct nhregex *re, char *errbuf)
 {
-    static char buf[BUFSZ];
-
-    if (!re || !re->err)
-        return (const char *) 0;
-
-    /* FIXME: Using a static buffer here is not ideal, but avoids memory
-     * leaks. Consider the allocation more carefully. */
-    regerror(re->err, &re->re, buf, BUFSZ);
-
-    return buf;
+    if (!re) {
+        Strcpy(errbuf, "no regexp");
+    } else if (!re->err) {
+        Strcpy(errbuf, "no explanation");
+    } else {
+        errbuf[0] = '\0';
+        regerror(re->err, &re->re, errbuf, BUFSZ);
+        if (!errbuf[0])
+            Strcpy(errbuf, "unspecified regexp error");
+    }
+    return errbuf;
 }
 
 boolean
@@ -104,3 +110,5 @@ regex_free(struct nhregex *re)
     regfree(&re->re);
     free(re);
 }
+
+/*posixregex.c*/
