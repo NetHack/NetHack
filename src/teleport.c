@@ -1297,6 +1297,11 @@ rloc_to_core(
             } else {
                 pline("%s vanishes!", Monnam(mtmp));
             }
+            /* avoid "It suddenly appears!" for a STRAT_APPEARMSG monster
+               that has just teleported away if we won't see it after this
+               vanishing (the regular appears message will be given if we
+               do see it) */
+            appearmsg = FALSE;
         }
 
         if (mtmp->wormno) {
@@ -1327,22 +1332,25 @@ rloc_to_core(
     newsym(x, y);      /* update new location */
     set_apparxy(mtmp); /* orient monster */
     if (domsg && (canspotmon(mtmp) || appearmsg)) {
+        int du = distu(x, y), olddu;
+        const char *next = (du <= 2) ? " next to you" : 0, /* next2u() */
+                   *near = (du <= BOLT_LIM * BOLT_LIM) ? " close by" : 0;
+
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),
-                  next2u(x, y) ? " next to you"
-                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
-                    : (distu(x, y) < distu(oldx, oldy)) ? " closer to you"
-                      : " further away");
+                  next ? next
+                  : near ? near
+                    : ((olddu = distu(oldx, oldy)) == du) ? ""
+                      : (du < olddu) ? " closer to you"
+                        : " farther away");
         } else {
             pline("%s %s%s%s!",
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
                   appearmsg ? "suddenly " : "",
                   !Blind ? "appears" : "arrives",
-                  next2u(x, y) ? " next to you"
-                  : (distu(x, y) <= (BOLT_LIM * BOLT_LIM)) ? " close by"
-                    : "");
+                  next ? next : near ? near : "");
         }
     }
 
