@@ -4378,7 +4378,8 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         }
         if (iflags.debug_fuzzer && !g.opt_initial) {
             /* don't randomly toggle this/these */
-            if (optidx == opt_silent)
+            if ((optidx == opt_silent)
+                || (optidx == opt_perm_invent))
                 return optn_ok;
         }
         /* Before the change */
