@@ -431,8 +431,8 @@ set_bc(int already_blind)
  *  Should not be called while swallowed.
  */
 void
-move_bc(int before, int control, xchar ballx, xchar bally,
-        xchar chainx, xchar chainy)
+move_bc(int before, int control, coordxy ballx, coordxy bally,
+        coordxy chainx, coordxy chainy)
 {
     if (Blind) {
         /*
@@ -554,8 +554,8 @@ move_bc(int before, int control, xchar ballx, xchar bally,
 
 /* return TRUE if the caller needs to place the ball and chain down again */
 boolean
-drag_ball(xchar x, xchar y, int *bc_control,
-          xchar *ballx, xchar *bally, xchar *chainx, xchar *chainy,
+drag_ball(coordxy x, coordxy y, int *bc_control,
+          coordxy *ballx, coordxy *bally, coordxy *chainx, coordxy *chainy,
           boolean *cause_delay, boolean allow_drag)
 {
     struct trap *t = (struct trap *) 0;
@@ -589,7 +589,7 @@ drag_ball(xchar x, xchar y, int *bc_control,
 
     /* only need to move the chain? */
     if (carried(uball) || distmin(x, y, uball->ox, uball->oy) <= 2) {
-        xchar oldchainx = uchain->ox, oldchainy = uchain->oy;
+        coordxy oldchainx = uchain->ox, oldchainy = uchain->oy;
 
         *bc_control = BC_CHAIN;
         move_bc(1, *bc_control, *ballx, *bally, *chainx, *chainy);
@@ -646,7 +646,7 @@ drag_ball(xchar x, xchar y, int *bc_control,
          *    0
          */
         case 5: {
-            xchar tempx, tempy, tempx2, tempy2;
+            coordxy tempx, tempy, tempx2, tempy2;
 
             /* find position closest to current position of chain;
                no effect if current position is already OK */
@@ -835,7 +835,7 @@ drag_ball(xchar x, xchar y, int *bc_control,
         *ballx = *chainx = x;
         *bally = *chainy = y;
     } else {
-        xchar newchainx = u.ux, newchainy = u.uy;
+        coordxy newchainx = u.ux, newchainy = u.uy;
 
         /*
          * Generally, chain moves to hero's previous location and ball
@@ -877,7 +877,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  *  Should not be called while swallowed.
  */
 void
-drop_ball(xchar x, xchar y)
+drop_ball(coordxy x, coordxy y)
 {
     if (Blind) {
         /* get the order */

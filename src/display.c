@@ -124,16 +124,16 @@
 #include "hack.h"
 
 static void show_mon_or_warn(int, int, int);
-static void display_monster(xchar, xchar, struct monst *, int, boolean);
+static void display_monster(coordxy, coordxy, struct monst *, int, boolean);
 static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *);
 
 static int check_pos(int, int, int);
-static int get_bk_glyph(xchar x, xchar y);
+static int get_bk_glyph(coordxy x, coordxy y);
 static int tether_glyph(int, int);
 static void mimic_light_blocking(struct monst *);
 #ifdef UNBUFFERED_GLYPHINFO
-static glyph_info *glyphinfo_at(xchar, xchar, int);
+static glyph_info *glyphinfo_at(coordxy, coordxy, int);
 #endif
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
@@ -229,7 +229,7 @@ is_safemon(struct monst *mon)
  * attention to and correct unexplored, lit ROOM and CORR spots.
  */
 void
-magic_map_background(xchar x, xchar y, int show)
+magic_map_background(coordxy x, coordxy y, int show)
 {
     int glyph = back_to_glyph(x, y); /* assumes hero can see x,y */
     struct rm *lev = &levl[x][y];
@@ -266,7 +266,7 @@ magic_map_background(xchar x, xchar y, int show)
  * having to create fake objects and traps.  However, I am reluctant to
  * make this change.
  */
-/* FIXME: some of these use xchars for x and y, and some use ints.  Make
+/* FIXME: some of these use coordxys for x and y, and some use ints.  Make
  * this consistent.
  */
 
@@ -277,7 +277,7 @@ magic_map_background(xchar x, xchar y, int show)
  * the hero can physically see the location.  Update the screen if directed.
  */
 void
-map_background(register xchar x, register xchar y, register int show)
+map_background(register coordxy x, register coordxy y, register int show)
 {
     register int glyph = back_to_glyph(x, y);
 
@@ -341,7 +341,7 @@ map_object(register struct obj *obj, register int show)
  * by newsym() if necessary.
  */
 void
-map_invisible(register xchar x, register xchar y)
+map_invisible(register coordxy x, register coordxy y)
 {
     if (x != u.ux || y != u.uy) { /* don't display I at hero's location */
         if (g.level.flags.hero_memory)
@@ -458,7 +458,7 @@ show_mon_or_warn(int x, int y, int monglyph)
  *
  */
 static void
-display_monster(xchar x, xchar y,    /* display position */
+display_monster(coordxy x, coordxy y,    /* display position */
                 struct monst *mon,   /* monster to display */
                 int sightflags,      /* 1 if the monster is physically seen;
                                         2 if detected using Detect_monsters */
@@ -626,7 +626,7 @@ suppress_map_output(void)
  * When hero knows what happened to location, even when blind.
  */
 void
-feel_newsym(xchar x, xchar y)
+feel_newsym(coordxy x, coordxy y)
 {
     if (Blind)
         feel_location(x, y);
@@ -646,7 +646,7 @@ feel_newsym(xchar x, xchar y)
  * searching only finds one monster per turn so we must check that separately.
  */
 void
-feel_location(xchar x, xchar y)
+feel_location(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct obj *boulder;
@@ -978,7 +978,7 @@ newsym(register int x, register int y)
  * pulled into a platform dependent routine for fancier graphics if desired.
  */
 void
-shieldeff(xchar x, xchar y)
+shieldeff(coordxy x, coordxy y)
 {
     register int i;
 
@@ -1198,7 +1198,7 @@ flash_glyph_at(int x, int y, int tg, int rpt)
 void
 swallowed(int first)
 {
-    static xchar lastx, lasty; /* last swallowed position */
+    static coordxy lastx, lasty; /* last swallowed position */
     int swallower, left_ok, rght_ok;
 
     if (first) {
@@ -1261,7 +1261,7 @@ swallowed(int first)
 void
 under_water(int mode)
 {
-    static xchar lastx, lasty;
+    static coordxy lastx, lasty;
     static boolean dela;
     register int x, y;
 
@@ -1600,7 +1600,7 @@ redraw_map(void)
 void
 reglyph_darkroom(void)
 {
-    xchar x, y;
+    coordxy x, y;
 
     for (x = 1; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++) {
@@ -1988,7 +1988,7 @@ flush_screen(int cursor_on_u)
  * variables.
  */
 int
-back_to_glyph(xchar x, xchar y)
+back_to_glyph(coordxy x, coordxy y)
 {
     int idx, bypass_glyph = NO_GLYPH;
     struct rm *ptr = &(levl[x][y]);
@@ -2170,7 +2170,7 @@ zapdir_to_glyph(int dx, int dy, int beam_type)
  * structure, so we must check the "third screen".
  */
 int
-glyph_at(xchar x, xchar y)
+glyph_at(coordxy x, coordxy y)
 {
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
@@ -2179,7 +2179,7 @@ glyph_at(xchar x, xchar y)
 
 #ifdef UNBUFFERED_GLYPHINFO
 glyph_info *
-glyphinfo_at(xchar x, xchar y, int glyph)
+glyphinfo_at(coordxy x, coordxy y, int glyph)
 {
     map_glyphinfo(x, y, glyph, 0, &ginfo);
     return &ginfo;
@@ -2200,7 +2200,7 @@ glyphinfo_at(xchar x, xchar y, int glyph)
  */
 
 static int
-get_bk_glyph(xchar x, xchar y)
+get_bk_glyph(coordxy x, coordxy y)
 {
     int idx, bkglyph = GLYPH_UNEXPLORED;
     struct rm *lev = &levl[x][y];
@@ -2272,7 +2272,7 @@ get_bk_glyph(xchar x, xchar y)
 
 void
 map_glyphinfo(
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int glyph,
     unsigned mgflags,
     glyph_info *glyphinfo)

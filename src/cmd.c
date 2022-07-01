@@ -1144,7 +1144,7 @@ static int
 wiz_where(void)
 {
     if (wizard)
-        (void) print_dungeon(FALSE, (schar *) 0, (xchar *) 0);
+        (void) print_dungeon(FALSE, (schar *) 0, (xint16 *) 0);
     else
         pline(unavailcmd, ecname_from_fn(wiz_where));
     return ECMD_OK;
@@ -4383,10 +4383,10 @@ int
 get_adjacent_loc(
     const char *prompt,
     const char *emsg,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     coord *cc)
 {
-    xchar new_x, new_y;
+    coordxy new_x, new_y;
     if (!getdir(prompt)) {
         pline1(Never_mind);
         return 0;
@@ -5008,7 +5008,7 @@ there_cmd_menu_next2u(
 }
 
 static int
-there_cmd_menu_far(winid win, xchar x, xchar y, int mod)
+there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
 {
     int K = 0;
 
@@ -5025,7 +5025,7 @@ there_cmd_menu_far(winid win, xchar x, xchar y, int mod)
 static int
 there_cmd_menu_common(
     winid win,
-    xchar x UNUSED, xchar y UNUSED,
+    coordxy x UNUSED, coordxy y UNUSED,
     int mod,
     int *act UNUSED)
 {

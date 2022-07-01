@@ -777,7 +777,7 @@ int
 thrwmm(struct monst* mtmp, struct monst* mtarg)
 {
     struct obj *otmp, *mwep;
-    register xchar x, y;
+    register coordxy x, y;
     boolean ispole;
 
     /* Polearms won't be applied by monsters against other monsters */
@@ -833,8 +833,8 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
     }
     if (m_lined_up(mtarg, mtmp)) {
         boolean utarg = (mtarg == &g.youmonst);
-        xchar tx = utarg ? mtmp->mux : mtarg->mx;
-        xchar ty = utarg ? mtmp->muy : mtarg->my;
+        coordxy tx = utarg ? mtmp->mux : mtarg->mx;
+        coordxy ty = utarg ? mtmp->muy : mtarg->my;
 
         switch (mattk->adtyp) {
         case AD_BLND:
@@ -972,7 +972,7 @@ void
 thrwmu(struct monst* mtmp)
 {
     struct obj *otmp, *mwep;
-    xchar x, y;
+    coordxy x, y;
     const char *onm;
 
     /* Rearranged beginning so monsters can use polearms not in a line */
@@ -1072,10 +1072,10 @@ breamu(struct monst* mtmp, struct attack* mattk)
    Returns TRUE if fnc returned TRUE. */
 boolean
 linedup_callback(
-    xchar ax,
-    xchar ay,
-    xchar bx,
-    xchar by,
+    coordxy ax,
+    coordxy ay,
+    coordxy bx,
+    coordxy by,
     boolean (*fnc)(int, int))
 {
     int dx, dy;
@@ -1110,10 +1110,10 @@ linedup_callback(
 
 boolean
 linedup(
-    register xchar ax,
-    register xchar ay,
-    register xchar bx,
-    register xchar by,
+    register coordxy ax,
+    register coordxy ay,
+    register coordxy bx,
+    register coordxy by,
     int boulderhandling) /* 0=block, 1=ignore, 2=conditionally block */
 {
     int dx, dy, boulderspots;
@@ -1159,8 +1159,8 @@ static int
 m_lined_up(struct monst* mtarg, struct monst* mtmp)
 {
     boolean utarget = (mtarg == &g.youmonst);
-    xchar tx = utarget ? mtmp->mux : mtarg->mx;
-    xchar ty = utarget ? mtmp->muy : mtarg->my;
+    coordxy tx = utarget ? mtmp->mux : mtarg->mx;
+    coordxy ty = utarget ? mtmp->muy : mtarg->my;
     boolean ignore_boulders = utarget && (throws_rocks(mtmp->data)
                                           || m_carrying(mtmp, WAN_STRIKING));
 

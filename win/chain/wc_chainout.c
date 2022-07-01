@@ -37,7 +37,7 @@ void chainout_cliparound(void *,int, int);
 #ifdef POSITIONBAR
 void chainout_update_positionbar(void *,char *);
 #endif
-void chainout_print_glyph(void *,winid, xchar, xchar,
+void chainout_print_glyph(void *,winid, coordxy, coordxy,
                             const glyph_info *, const glyph_info *);
 void chainout_raw_print(void *,const char *);
 void chainout_raw_print_bold(void *,const char *);
@@ -404,8 +404,8 @@ void
 chainout_print_glyph(
     void *vp,
     winid window,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo)
 {

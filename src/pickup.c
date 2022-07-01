@@ -1910,7 +1910,7 @@ do_loot_cont(
 
         if (flags.autounlock) {
             struct obj *otmp, *unlocktool = 0;
-            xchar ox = cobj->ox, oy = cobj->oy;
+            coordxy ox = cobj->ox, oy = cobj->oy;
 
             u.dz = 0; /* might be non-zero from previous command since
                        * #loot isn't a move command; pick_lock() cares */
@@ -2622,7 +2622,7 @@ observe_quantum_cat(struct obj *box, boolean makecat, boolean givemsg)
     static NEARDATA const char sc[] = "Schroedinger's Cat";
     struct obj *deadcat;
     struct monst *livecat = 0;
-    xchar ox, oy;
+    coordxy ox, oy;
     boolean itsalive = !rn2(2);
 
     if (get_obj_location(box, &ox, &oy, 0))
@@ -3431,7 +3431,7 @@ enum tipping_check_values {
 static void
 tipcontainer(struct obj *box) /* or bag */
 {
-    xchar ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
+    coordxy ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
     boolean empty_it = TRUE, maybeshopgoods;
     struct obj *targetbox = (struct obj *) 0;
     boolean cancelled = FALSE;
@@ -3655,7 +3655,7 @@ tipcontainer_checks(struct obj *box, boolean allowempty)
         boolean bag = box->otyp == BAG_OF_TRICKS;
         int old_spe = box->spe, seen = 0;
         boolean maybeshopgoods = !carried(box) && costly_spot(box->ox, box->oy);
-        xchar ox = u.ux, oy = u.uy;
+        coordxy ox = u.ux, oy = u.uy;
 
         if (get_obj_location(box, &ox, &oy, 0))
             box->ox = ox, box->oy = oy;

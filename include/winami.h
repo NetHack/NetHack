@@ -37,13 +37,13 @@ struct amii_menu {
  * tty-style windows also, then things will need to change. */
 /* per-window data */
 struct amii_WinDesc {
-    xchar type; /* type of window */
+    xint16 type; /* type of window */
     struct amii_menu menu;
     boolean active; /* true if window is active */
     boolean wasup;  /* true if menu/text window was already open */
     short
         disprows; /* Rows displayed so far (used for paging in message win) */
-    xchar offx, offy;         /* offset from topleft of display */
+    coordxy offx, offy;         /* offset from topleft of display */
     short vwx, vwy, vcx, vcy; /* View cursor location */
     short rows, cols;         /* dimensions */
     short curx, cury;         /* current cursor position */

@@ -108,8 +108,8 @@ enum skill_levels {
 
 /* The hero's skill in various weapons. */
 struct skills {
-    xchar skill;
-    xchar max_skill;
+    xint16 skill;
+    xint16 max_skill;
     unsigned short advance;
 };
 
@@ -122,8 +122,8 @@ struct skills {
 
 /* Initial skill matrix structure; used in u_init.c and weapon.c */
 struct def_skill {
-    xchar skill;
-    xchar skmax;
+    xint16 skill;
+    xint16 skmax;
 };
 
 #endif /* SKILLS_H */

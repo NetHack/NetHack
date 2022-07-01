@@ -12,8 +12,8 @@ static int disturb(struct monst *);
 static void release_hero(struct monst *);
 static void distfleeck(struct monst *, int *, int *, int *);
 static int m_arrival(struct monst *);
-static boolean holds_up_web(xchar, xchar);
-static int count_webbing_walls(xchar, xchar);
+static boolean holds_up_web(coordxy, coordxy);
+static int count_webbing_walls(coordxy, coordxy);
 static boolean soko_allow_web(struct monst *);
 static boolean leppie_avoidance(struct monst *);
 static void leppie_stash(struct monst *);
@@ -812,8 +812,8 @@ should_displace(
     coord *poss, /* coord poss[9] */
     long *info,  /* long info[9] */
     int cnt,
-    xchar gx,
-    xchar gy)
+    coordxy gx,
+    coordxy gy)
 {
     int shortest_with_displacing = -1;
     int shortest_without_displacing = -1;
@@ -845,7 +845,7 @@ should_displace(
 }
 
 boolean
-m_digweapon_check(struct monst* mtmp, xchar nix, xchar niy)
+m_digweapon_check(struct monst* mtmp, coordxy nix, coordxy niy)
 {
     boolean can_tunnel = 0;
     struct obj *mw_tmp = MON_WEP(mtmp);
@@ -940,7 +940,7 @@ m_balks_at_approaching(struct monst* mtmp)
 }
 
 static boolean
-holds_up_web(xchar x, xchar y)
+holds_up_web(coordxy x, coordxy y)
 {
     stairway *sway;
 
@@ -957,7 +957,7 @@ holds_up_web(xchar x, xchar y)
 /* returns the number of walls in the four cardinal directions that could
    hold up a web */
 static int
-count_webbing_walls(xchar x, xchar y)
+count_webbing_walls(coordxy x, coordxy y)
 {
     return (holds_up_web(x, y - 1) + holds_up_web(x + 1, y)
             + holds_up_web(x, y + 1) + holds_up_web(x - 1, y));
@@ -1018,7 +1018,8 @@ int
 m_move(register struct monst* mtmp, register int after)
 {
     int appr, etmp;
-    xchar gx, gy, nix, niy, chcnt;
+    coordxy gx, gy, nix, niy;
+    xint16 chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
             conceals = 0;
@@ -1076,7 +1077,7 @@ m_move(register struct monst* mtmp, register int after)
 
     /* and the acquisitive monsters get special treatment */
     if (is_covetous(ptr)) {
-        xchar tx = STRAT_GOALX(mtmp->mstrategy),
+        coordxy tx = STRAT_GOALX(mtmp->mstrategy),
               ty = STRAT_GOALY(mtmp->mstrategy);
         struct monst *intruder = m_at(tx, ty);
         /*
@@ -1723,7 +1724,7 @@ m_move(register struct monst* mtmp, register int after)
  * (mtmp died) or 3 (mtmp made its move).
  */
 int
-m_move_aggress(struct monst* mtmp, xchar x, xchar y)
+m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
 {
     struct monst *mtmp2;
     int mstatus;
@@ -1855,8 +1856,8 @@ set_apparxy(register struct monst* mtmp)
 boolean
 undesirable_disp(
     struct monst *mtmp, /* barging creature */
-    xchar x,
-    xchar y) /* spot 'mtmp' is considering moving to */
+    coordxy x,
+    coordxy y) /* spot 'mtmp' is considering moving to */
 {
     boolean is_pet = (mtmp && mtmp->mtame && !mtmp->isminion);
     struct trap *trap = t_at(x, y);

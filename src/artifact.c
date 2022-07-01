@@ -57,7 +57,7 @@ struct arti_info {
 static struct arti_info artiexist[1 + NROFARTIFACTS];
 /* discovery list; for N discovered artifacts, the first N entries are ART_xx
    values in discovery order, the remaining (NROFARTIFACTS-N) slots are 0 */
-static xchar artidisco[NROFARTIFACTS];
+static xint16 artidisco[NROFARTIFACTS];
 /* note: artiexist[] and artidisco[] don't need to be in struct g; they
  * get explicitly initialized at game start so don't need to be part of
  * bulk re-init if game restart ever gets implemented.  They are saved
@@ -1001,7 +1001,7 @@ spec_dbon(struct obj *otmp, struct monst *mon, int tmp)
 
 /* add identified artifact to discoveries list */
 void
-discover_artifact(xchar m)
+discover_artifact(xint16 m)
 {
     int i;
 
@@ -1019,7 +1019,7 @@ discover_artifact(xchar m)
 
 /* used to decide whether an artifact has been fully identified */
 boolean
-undiscovered_artifact(xchar m)
+undiscovered_artifact(xint16 m)
 {
     int i;
 

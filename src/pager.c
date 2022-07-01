@@ -466,7 +466,7 @@ look_at_monster(char *buf,
    caller should use it or copy it before calling waterbody_name() again
    [3.7: moved here from mkmaze.c] */
 const char *
-waterbody_name(xchar x, xchar y)
+waterbody_name(coordxy x, coordxy y)
 {
     static char pooltype[40];
     struct rm *lev;

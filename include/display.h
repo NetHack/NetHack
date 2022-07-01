@@ -984,7 +984,7 @@ enum glyph_offsets {
 #define MG_BADXY   0x04000  /* bad coordinates were passed */
 
 typedef struct {
-    xchar gnew; /* perhaps move this bit into the rm structure. */
+    xint8 gnew; /* perhaps move this bit into the rm structure. */
     glyph_info glyphinfo;
 } gbuf_entry;
 

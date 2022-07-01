@@ -114,7 +114,7 @@ mk_mplayer_armor(struct monst* mon, short typ)
 }
 
 struct monst *
-mk_mplayer(struct permonst *ptr, xchar x, xchar y, boolean special)
+mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
 {
     struct monst *mtmp;
     char nam[PL_NSIZ];
@@ -343,7 +343,7 @@ create_mplayers(register int num, boolean special)
         if (tryct > 50)
             return;
 
-        (void) mk_mplayer(&mons[pm], (xchar) x, (xchar) y, special);
+        (void) mk_mplayer(&mons[pm], (coordxy) x, (coordxy) y, special);
         num--;
     }
 }

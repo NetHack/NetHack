@@ -73,7 +73,7 @@ static void display_cursor(struct xwindow *);
 void
 X11_print_glyph(
     winid window,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo UNUSED)
 {
@@ -894,7 +894,7 @@ display_map_window(struct xwindow *wp)
         check_cursor_visibility(wp);
         highlight_yn(TRUE); /* change fg/bg to match map */
     } else if (wp->prevx != wp->cursx || wp->prevy != wp->cursy) {
-        register xchar x = wp->prevx, y = wp->prevy;
+        register coordxy x = wp->prevx, y = wp->prevy;
 
         /*
          * Previous cursor position is not the same as the current

@@ -654,7 +654,7 @@ magic_whistled(struct obj *obj)
 }
 
 boolean
-um_dist(xchar x, xchar y, xchar n)
+um_dist(coordxy x, coordxy y, xint16 n)
 {
     return (boolean) (abs(u.ux - x) > n || abs(u.uy - y) > n);
 }
@@ -889,7 +889,7 @@ next_to_u(void)
 }
 
 void
-check_leash(xchar x, xchar y)
+check_leash(coordxy x, coordxy y)
 {
     register struct obj *otmp;
     register struct monst *mtmp;
@@ -1427,7 +1427,7 @@ snuff_candle(struct obj *otmp)
     if ((candle || otmp->otyp == CANDELABRUM_OF_INVOCATION)
         && otmp->lamplit) {
         char buf[BUFSZ];
-        xchar x, y;
+        coordxy x, y;
         boolean many = candle ? (otmp->quan > 1L) : (otmp->spe > 1);
 
         (void) get_obj_location(otmp, &x, &y, 0);
@@ -1447,7 +1447,7 @@ snuff_candle(struct obj *otmp)
 boolean
 snuff_lit(struct obj *obj)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (obj->lamplit) {
         if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
@@ -1491,7 +1491,7 @@ splash_lit(struct obj *obj)
                    /* don't assume that lit lantern has been swallowed;
                       a nymph might have stolen it or picked it up */
                    && ((mtmp = obj->ocarry), humanoid(mtmp->data))) {
-            xchar x, y;
+            coordxy x, y;
 
             useeit = get_obj_location(obj, &x, &y, 0) && cansee(x, y);
             uhearit = couldsee(x, y) && distu(x, y) < 5 * 5;
@@ -1525,7 +1525,7 @@ splash_lit(struct obj *obj)
 boolean
 catch_lit(struct obj *obj)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (!obj->lamplit && ignitable(obj) && get_obj_location(obj, &x, &y, 0)) {
         if (((obj->otyp == MAGIC_LAMP /* spe==0 => no djinni inside */
@@ -2380,7 +2380,7 @@ fig_transform(anything *arg, long timeout)
 static boolean
 figurine_location_checks(struct obj *obj, coord *cc, boolean quietly)
 {
-    xchar x, y;
+    coordxy x, y;
 
     if (carried(obj) && u.uswallow) {
         if (!quietly)
@@ -2414,7 +2414,7 @@ static int
 use_figurine(struct obj **optr)
 {
     register struct obj *obj = *optr;
-    xchar x, y;
+    coordxy x, y;
     coord cc;
 
     if (u.uswallow) {

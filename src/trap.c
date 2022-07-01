@@ -7,7 +7,7 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
-static void mk_trap_statue(xchar, xchar);
+static void mk_trap_statue(coordxy, coordxy);
 static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
                                             struct obj *);
 static boolean mu_maybe_destroy_web(struct monst *, boolean, struct trap *);
@@ -41,9 +41,9 @@ static int trapeffect_selector(struct monst *, struct trap *, unsigned);
 static char *trapnote(struct trap *, boolean);
 static int choose_trapnote(struct trap *);
 static int steedintrap(struct trap *, struct obj *);
-static void launch_drop_spot(struct obj *, xchar, xchar);
+static void launch_drop_spot(struct obj *, coordxy, coordxy);
 static boolean find_random_launch_coord(struct trap *, coord *);
-static int mkroll_launch(struct trap *, xchar, xchar, short, long);
+static int mkroll_launch(struct trap *, coordxy, coordxy, short, long);
 static boolean isclearpath(coord *, int, schar, schar);
 static void dofiretrap(struct obj *);
 static void domagictrap(void);
@@ -346,7 +346,7 @@ grease_protect(
 
 /* create a "living" statue at x,y */
 static void
-mk_trap_statue(xchar x, xchar y)
+mk_trap_statue(coordxy x, coordxy y)
 {
     struct monst *mtmp;
     struct obj *otmp, *statue;
@@ -599,8 +599,8 @@ fall_through(
 struct monst *
 animate_statue(
     struct obj *statue,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     int cause,
     int *fail_reason)
 {
@@ -779,8 +779,8 @@ animate_statue(
 struct monst *
 activate_statue_trap(
     struct trap *trap,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     boolean shatter)
 {
     struct monst *mtmp = (struct monst *) 0;
@@ -821,7 +821,7 @@ keep_saddle_with_steedcorpse(
 
             if (mtmp->m_id == steed_mid) {
                 /* move saddle */
-                xchar x, y;
+                coordxy x, y;
                 if (get_obj_location(objchn, &x, &y, 0)) {
                     obj_extract_self(saddle);
                     place_object(saddle, x, y);
@@ -851,8 +851,8 @@ mu_maybe_destroy_web(
 
     if (amorphous(mptr) || is_whirly(mptr) || flaming(mptr)
         || unsolid(mptr) || mptr == &mons[PM_GELATINOUS_CUBE]) {
-        xchar x = trap->tx;
-        xchar y = trap->ty;
+        coordxy x = trap->tx;
+        coordxy y = trap->ty;
 
         if (flaming(mptr) || acidic(mptr)) {
             if (domsg) {
@@ -2241,7 +2241,7 @@ trapeffect_landmine(
         boolean trapkilled = FALSE;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
         struct permonst *mptr = mtmp->data;
-        xchar tx = trap->tx, ty = trap->ty;
+        coordxy tx = trap->tx, ty = trap->ty;
 
         if (rn2(3))
             return Trap_Effect_Finished; /* monsters usually don't set it off */
@@ -2691,7 +2691,7 @@ blow_up_landmine(struct trap* trap)
 }
 
 static void
-launch_drop_spot(struct obj* obj, xchar x, xchar y)
+launch_drop_spot(struct obj* obj, coordxy x, coordxy y)
 {
     if (!obj) {
         g.launchplace.obj = (struct obj *) 0;
@@ -3038,8 +3038,8 @@ find_random_launch_coord(struct trap *ttmp, coord *cc)
     int distance;
     int mindist = 4;
     int trycount = 0;
-    xchar dx, dy;
-    xchar x, y;
+    coordxy dx, dy;
+    coordxy x, y;
 
     if (!ttmp || !cc)
         return FALSE;
@@ -3092,8 +3092,8 @@ find_random_launch_coord(struct trap *ttmp, coord *cc)
 static int
 mkroll_launch(
     struct trap *ttmp,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     short otyp,
     long ocount)
 {
@@ -3134,7 +3134,7 @@ isclearpath(
 {
     struct trap *t;
     uchar typ;
-    xchar x, y;
+    coordxy x, y;
 
     x = cc->x;
     y = cc->y;
@@ -3855,8 +3855,8 @@ boolean
 fire_damage(
     struct obj *obj,
     boolean force,
-    xchar x,
-    xchar y)
+    coordxy x,
+    coordxy y)
 {
     int chance;
     struct obj *otmp, *ncobj;
@@ -3947,8 +3947,8 @@ fire_damage_chain(
     struct obj *chain,
     boolean force,
     boolean here,
-    xchar x,
-    xchar y)
+    coordxy x,
+    coordxy y)
 {
     struct obj *obj, *nobj;
     int num = 0;
@@ -3970,7 +3970,7 @@ fire_damage_chain(
 
 /* obj has been thrown or dropped into lava; damage is worse than mere fire */
 boolean
-lava_damage(struct obj* obj, xchar x, xchar y)
+lava_damage(struct obj* obj, coordxy x, coordxy y)
 {
     int otyp = obj->otyp, ocls = obj->oclass;
 
@@ -4212,7 +4212,7 @@ water_damage_chain(
     boolean here)
 {
     struct obj *otmp;
-    xchar x, y;
+    coordxy x, y;
 
     if (!obj)
         return;
@@ -4602,7 +4602,7 @@ static void
 move_into_trap(struct trap *ttmp)
 {
     int bc = 0;
-    xchar x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
+    coordxy x = ttmp->tx, y = ttmp->ty, bx, by, cx, cy;
     boolean unused;
 
     bx = by = cx = cy = 0; /* lint suppression */
@@ -5499,7 +5499,7 @@ chest_trap(
             struct monst *shkp = 0;
             long loss = 0L;
             boolean costly, insider;
-            xchar ox = obj->ox, oy = obj->oy;
+            coordxy ox = obj->ox, oy = obj->oy;
 
             /* the obj location need not be that of player */
             costly = (costly_spot(ox, oy)
@@ -6231,7 +6231,7 @@ ignite_items(struct obj* objchn)
 }
 
 void
-trap_ice_effects(xchar x, xchar y, boolean ice_is_melting)
+trap_ice_effects(coordxy x, coordxy y, boolean ice_is_melting)
 {
     struct trap *ttmp = t_at(x, y);
 

@@ -19,7 +19,7 @@ static void mon_leaving_level(struct monst *);
 static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
-static void migrate_mon(struct monst *, xchar, xchar);
+static void migrate_mon(struct monst *, coordxy, coordxy);
 static boolean ok_to_obliterate(struct monst *);
 static void deal_with_overcrowding(struct monst *);
 static void m_restartcham(struct monst *);
@@ -1807,7 +1807,7 @@ mfndpos(
 {
     struct permonst *mdat = mon->data;
     register struct trap *ttmp;
-    xchar x, y, nx, ny;
+    coordxy x, y, nx, ny;
     int cnt = 0;
     uchar ntyp;
     uchar nowtyp;
@@ -2357,7 +2357,7 @@ m_detach(
     struct monst *mtmp,
     struct permonst *mptr) /* reflects mtmp->data _prior_ to mtmp's death */
 {
-    xchar mx = mtmp->mx, my = mtmp->my;
+    coordxy mx = mtmp->mx, my = mtmp->my;
 
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
@@ -2790,7 +2790,7 @@ void
 monstone(struct monst* mdef)
 {
     struct obj *otmp, *obj, *oldminvent;
-    xchar x = mdef->mx, y = mdef->my;
+    coordxy x = mdef->mx, y = mdef->my;
     boolean wasinside = FALSE;
 
     /* vampshifter reverts to vampire;
@@ -3284,14 +3284,14 @@ vamp_stone(struct monst *mtmp)
 void
 m_into_limbo(struct monst *mtmp)
 {
-    xchar target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
+    xint16 target_lev = ledger_no(&u.uz), xyloc = MIGR_APPROX_XY;
 
     mtmp->mstate |= MON_LIMBO;
     migrate_mon(mtmp, target_lev, xyloc);
 }
 
 static void
-migrate_mon(struct monst *mtmp, xchar target_lev, xchar xyloc)
+migrate_mon(struct monst *mtmp, xint16 target_lev, xint16 xyloc)
 {
     if (!mtmp->mx) {
         /* this was a failed arrival attempt from a prior migration;
@@ -3382,7 +3382,7 @@ elemental_clog(struct monst *mon)
         /* last resort - migrate mon to the next plane */
         } else if (!Is_astralevel(&u.uz)) {
             d_level dest;
-            xchar target_lev;
+            coordxy target_lev;
 
             dest = u.uz;
             dest.dlevel--;
@@ -3462,13 +3462,13 @@ maybe_mnexto(struct monst* mtmp)
 int
 mnearto(
     register struct monst *mtmp,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     boolean move_other, /* make sure mtmp gets to x, y! so move m_at(x, y) */
     unsigned int rlocflags)
 {
     struct monst *othermon = (struct monst *) 0;
-    xchar newx, newy;
+    coordxy newx, newy;
     coord mm;
     int res = 1;
 
@@ -3874,8 +3874,8 @@ get_iter_mons(boolean (*func)(struct monst *))
    passing x,y to the function.
    if func returns TRUE, stop and return that monster. */
 struct monst *
-get_iter_mons_xy(boolean (*func)(struct monst *, xchar, xchar),
-                xchar x, xchar y)
+get_iter_mons_xy(boolean (*func)(struct monst *, coordxy, coordxy),
+                coordxy x, coordxy y)
 {
     struct monst *mtmp;
 
@@ -3960,7 +3960,7 @@ restrap(struct monst *mtmp)
 /* reveal a monster at x,y hiding under an object,
    if there are no objects there */
 void
-maybe_unhide_at(xchar x, xchar y)
+maybe_unhide_at(coordxy x, coordxy y)
 {
     struct monst *mtmp;
 
@@ -3978,7 +3978,7 @@ hideunder(struct monst *mtmp)
 {
     struct trap *t;
     boolean oldundetctd, undetected = FALSE, is_u = (mtmp == &g.youmonst);
-    xchar x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
+    coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
     if (mtmp == u.ustuck) {
         ; /* can't hide if holding you or held by you */
@@ -4021,7 +4021,7 @@ hide_monst(struct monst* mon)
 
     if ((is_hider(mon->data) || hider_under)
         && !(mon->mundetected || M_AP_TYPE(mon))) {
-        xchar x = mon->mx, y = mon->my;
+        coordxy x = mon->mx, y = mon->my;
         char save_viz = g.viz_array[y][x];
 
         /* override vision, forcing hero to be unable to see monster's spot */
@@ -4541,7 +4541,7 @@ newcham(
         *p = '\0';
 
     if (mtmp->wormno) { /* throw tail away */
-        xchar mx = mtmp->mx, my = mtmp->my;
+        coordxy mx = mtmp->mx, my = mtmp->my;
 
         wormgone(mtmp); /* discards tail segments, takes head off the map */
         /* put the head back; it will morph into mtmp's new form */

@@ -12,17 +12,17 @@
 /* g.kickedobj (decl.c) tracks a kicked object until placed or destroyed */
 
 static void kickdmg(struct monst *, boolean);
-static boolean maybe_kick_monster(struct monst *, xchar, xchar);
-static void kick_monster(struct monst *, xchar, xchar);
-static int kick_object(xchar, xchar, char *);
-static int really_kick_object(xchar, xchar);
+static boolean maybe_kick_monster(struct monst *, coordxy, coordxy);
+static void kick_monster(struct monst *, coordxy, coordxy);
+static int kick_object(coordxy, coordxy, char *);
+static int really_kick_object(coordxy, coordxy);
 static char *kickstr(char *, const char *);
 static boolean watchman_thief_arrest(struct monst *);
-static boolean watchman_door_damage(struct monst *, xchar, xchar);
+static boolean watchman_door_damage(struct monst *, coordxy, coordxy);
 static void kick_dumb(int, int);
 static void kick_ouch(int, int, const char *);
 static void otransit_msg(struct obj *, boolean, boolean, long);
-static void drop_to(coord *, schar, xchar, xchar);
+static void drop_to(coord *, schar, coordxy, coordxy);
 
 static const char kick_passes_thru[] = "kick passes harmlessly through";
 
@@ -120,7 +120,7 @@ kickdmg(struct monst *mon, boolean clumsy)
 }
 
 static boolean
-maybe_kick_monster(struct monst *mon, xchar x, xchar y)
+maybe_kick_monster(struct monst *mon, coordxy x, coordxy y)
 {
     if (mon) {
         boolean save_forcefight = g.context.forcefight;
@@ -140,7 +140,7 @@ maybe_kick_monster(struct monst *mon, xchar x, xchar y)
 }
 
 static void
-kick_monster(struct monst *mon, xchar x, xchar y)
+kick_monster(struct monst *mon, coordxy x, coordxy y)
 {
     boolean clumsy = FALSE;
     int i, j;
@@ -389,8 +389,8 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
 void
-container_impact_dmg(struct obj *obj, xchar x,
-                     xchar y) /* coordinates where object was before the impact, not after */
+container_impact_dmg(struct obj *obj, coordxy x,
+                     coordxy y) /* coordinates where object was before the impact, not after */
 {
     struct monst *shkp;
     struct obj *otmp, *otmp2;
@@ -456,7 +456,7 @@ container_impact_dmg(struct obj *obj, xchar x,
 
 /* jacket around really_kick_object */
 static int
-kick_object(xchar x, xchar y, char *kickobjnam)
+kick_object(coordxy x, coordxy y, char *kickobjnam)
 {
     int res = 0;
 
@@ -474,7 +474,7 @@ kick_object(xchar x, xchar y, char *kickobjnam)
 
 /* guts of kick_object */
 static int
-really_kick_object(xchar x, xchar y)
+really_kick_object(coordxy x, coordxy y)
 {
     int range;
     struct monst *mon, *shkp = 0;
@@ -785,7 +785,7 @@ watchman_thief_arrest(struct monst *mtmp)
 }
 
 static boolean
-watchman_door_damage(struct monst *mtmp, xchar x, xchar y)
+watchman_door_damage(struct monst *mtmp, coordxy x, coordxy y)
 {
     if (is_watch(mtmp->data) && mtmp->mpeaceful
         && couldsee(mtmp->mx, mtmp->my)) {
@@ -1390,7 +1390,7 @@ dokick(void)
 }
 
 static void
-drop_to(coord *cc, schar loc, xchar x, xchar y)
+drop_to(coord *cc, schar loc, coordxy x, coordxy y)
 {
     stairway *stway = stairway_at(x, y);
 
@@ -1428,8 +1428,8 @@ drop_to(coord *cc, schar loc, xchar x, xchar y)
 /* player or missile impacts location, causing objects to fall down */
 void
 impact_drop(struct obj *missile, /* caused impact, won't drop itself */
-            xchar x, xchar y,    /* location affected */
-            xchar dlev)          /* if !0 send to dlev near player */
+            coordxy x, coordxy y,    /* location affected */
+            xint16 dlev)          /* if !0 send to dlev near player */
 {
     schar toloc;
     register struct obj *obj, *obj2;
@@ -1554,10 +1554,10 @@ impact_drop(struct obj *missile, /* caused impact, won't drop itself */
  * otmp is either a kicked, dropped, or thrown object.
  */
 boolean
-ship_object(struct obj *otmp, xchar x, xchar y, boolean shop_floor_obj)
+ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
 {
     schar toloc;
-    xchar ox, oy;
+    coordxy ox, oy;
     coord cc;
     struct obj *obj;
     struct trap *t;
@@ -1850,7 +1850,7 @@ otransit_msg(register struct obj *otmp, boolean nodrop, boolean chainthere, long
 
 /* migration destination for objects which fall down to next level */
 schar
-down_gate(xchar x, xchar y)
+down_gate(coordxy x, coordxy y)
 {
     struct trap *ttmp;
     stairway *stway = stairway_at(x, y);

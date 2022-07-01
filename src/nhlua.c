@@ -213,7 +213,7 @@ schar
 get_table_mapchr(lua_State *L, const char *name)
 {
     char *ter;
-    xchar typ;
+    xint8 typ;
 
     ter = get_table_str(L, name);
     typ = check_mapchr(ter);
@@ -228,15 +228,15 @@ schar
 get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
 {
     char *ter;
-    xchar typ;
+    xint8 typ;
 
     ter = get_table_str_opt(L, name, emptystr);
     if (name && *ter) {
-        typ = check_mapchr(ter);
+        typ = (xint8) check_mapchr(ter);
         if (typ == INVALID_TYPE)
             nhl_error(L, "Erroneous map char");
     } else
-        typ = defval;
+        typ = (xint8) defval;
     if (ter)
         free(ter);
     return typ;
@@ -292,7 +292,7 @@ nhl_add_table_entry_bool(lua_State *L, const char *name, boolean value)
 
 void
 nhl_add_table_entry_region(lua_State *L, const char *name,
-                           xchar x1, xchar y1, xchar x2, xchar y2)
+                           coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     lua_pushstring(L, name);
     lua_newtable(L);
@@ -1345,8 +1345,8 @@ nhl_meta_u_index(lua_State *L)
         { "mh", &(u.mh), ANY_INT },
         { "mhmax", &(u.mhmax), ANY_INT },
         { "mtimedone", &(u.mtimedone), ANY_INT },
-        { "dlevel", &(u.uz.dlevel), ANY_SCHAR }, /* actually xchar */
-        { "dnum", &(u.uz.dnum), ANY_SCHAR }, /* actually xchar */
+        { "dlevel", &(u.uz.dlevel), ANY_SCHAR }, /* actually coordxy */
+        { "dnum", &(u.uz.dnum), ANY_SCHAR }, /* actually coordxy */
         { "uluck", &(u.uluck), ANY_SCHAR },
         { "uhp", &(u.uhp), ANY_INT },
         { "uhpmax", &(u.uhpmax), ANY_INT },

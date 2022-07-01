@@ -180,7 +180,7 @@ goodpos(
 boolean
 enexto(
     coord *cc,
-    xchar xx, xchar yy,
+    coordxy xx, coordxy yy,
     struct permonst *mdat)
 {
     return (enexto_core(cc, xx, yy, mdat, GP_CHECKSCARY)
@@ -190,7 +190,7 @@ enexto(
 boolean
 enexto_core(
     coord *cc,
-    xchar xx, xchar yy,
+    coordxy xx, coordxy yy,
     struct permonst *mdat,
     mmflags_nht entflags)
 {
@@ -411,7 +411,7 @@ teleds(int nux, int nuy, int teleds_flags)
     }
     if (ball_active && (ball_still_in_range || allow_drag)) {
         int bc_control;
-        xchar ballx, bally, chainx, chainy;
+        coordxy ballx, bally, chainx, chainy;
         boolean cause_delay;
 
         if (drag_ball(nux, nuy, &bc_control, &ballx, &bally, &chainx,
@@ -901,7 +901,7 @@ level_tele(void)
             }
             if (wizard && !strcmp(buf, "?")) {
                 schar destlev;
-                xchar destdnum;
+                coordxy destdnum;
 
  levTport_menu:
                 destlev = 0;
@@ -1592,7 +1592,7 @@ mlevel_tele_trap(
 boolean
 rloco(register struct obj* obj)
 {
-    register xchar tx, ty, otx, oty;
+    register coordxy tx, ty, otx, oty;
     boolean restricted_fall;
     int try_limit = 4000;
 

@@ -99,31 +99,32 @@ struct sp_coder {
 #define packed_coord long
 typedef uint32_t getloc_flags_t;
 typedef struct {
-    xchar is_random;
+    xint16 is_random;
     getloc_flags_t getloc_flags;
     int x, y;
 } unpacked_coord;
 
 typedef struct {
-    xchar init_style; /* one of LVLINIT_foo */
+    xint16 init_style; /* one of LVLINIT_foo */
     long flags;
     schar filling;
     boolean init_present, padding;
     char fg, bg;
     boolean smoothed, joined;
-    xchar lit, walled;
+    xint16 lit, walled;
     boolean icedpools;
     int corrwid, wallthick;
     boolean rm_deadends;
 } lev_init;
 
 typedef struct {
-    xchar wall, pos, secret, mask;
+    xint16 wall, pos, secret, mask;
 } room_door;
 
 typedef struct {
     packed_coord coord;
-    xchar x, y, type;
+    coordxy x, y;
+    xint16 type;
     boolean spider_on_web;
     boolean seen;
 } spltrap;
@@ -133,7 +134,8 @@ typedef struct {
     short id;
     unsigned int sp_amask; /* splev amask */
     packed_coord coord;
-    xchar x, y, class, appear;
+    coordxy x, y;
+    xint16 class, appear;
     schar peaceful, asleep;
     short female, invis, cancelled, revived, avenge, fleeing, blinded,
         paralyzed, stunned, confused, waiting;
@@ -147,7 +149,8 @@ typedef struct {
     int corpsenm;
     short id, spe;
     packed_coord coord;
-    xchar x, y, class, containment;
+    coordxy x, y;
+    xint16 class, containment;
     schar curse_state;
     int quan;
     short buried;
@@ -158,34 +161,35 @@ typedef struct {
 
 typedef struct {
     packed_coord coord;
-    xchar x, y;
+    coordxy x, y;
     unsigned int sp_amask; /* splev amask */
-    xchar shrine;
+    xint16 shrine;
 } altar;
 
 typedef struct {
-    xchar x1, y1, x2, y2;
-    xchar rtype, rlit, rirreg;
+    coordxy x1, y1, x2, y2;
+    xint16 rtype, rlit, rirreg;
 } region;
 
 typedef struct {
-    xchar ter, tlit;
+    xint16 ter, tlit;
 } terrain;
 
 typedef struct {
     struct {
-        xchar room;
-        xchar wall;
-        xchar door;
+        xint16 room;
+        xint16 wall;
+        xint16 door;
     } src, dest;
 } corridor;
 
 typedef struct _room {
     Str_or_Len name;
     Str_or_Len parent;
-    xchar x, y, w, h;
-    xchar xalign, yalign;
-    xchar rtype, chance, rlit, needfill;
+    coordxy x, y;
+    xint16 w, h;
+    xint16 xalign, yalign;
+    xint16 rtype, chance, rlit, needfill;
     boolean joined;
 } room;
 

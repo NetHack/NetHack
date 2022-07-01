@@ -21,22 +21,22 @@ static void makevtele(void);
 void clear_level_structures(void);
 static void fill_ordinary_room(struct mkroom *);
 static void makelevel(void);
-static boolean bydoor(xchar, xchar);
+static boolean bydoor(coordxy, coordxy);
 static struct mkroom *find_branch_room(coord *);
-static struct mkroom *pos_to_room(xchar, xchar);
+static struct mkroom *pos_to_room(coordxy, coordxy);
 static boolean place_niche(struct mkroom *, int *, int *, int *);
 static void makeniche(int);
 static void make_niches(void);
 static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
-static void dosdoor(xchar, xchar, struct mkroom *, int);
+static void dosdoor(coordxy, coordxy, struct mkroom *, int);
 static void join(int, int, boolean);
 static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
                                schar, boolean, boolean);
 static void makerooms(void);
-static boolean door_into_nonjoined(xchar, xchar);
-static boolean finddpos(coord *, xchar, xchar, xchar, xchar);
-static void mkinvpos(xchar, xchar, int);
-static void mk_knox_portal(xchar, xchar);
+static boolean door_into_nonjoined(coordxy, coordxy);
+static boolean finddpos(coord *, coordxy, coordxy, coordxy, coordxy);
+static void mkinvpos(coordxy, coordxy, int);
+static void mk_knox_portal(coordxy, coordxy);
 
 #define create_vault() create_room(-1, -1, 2, 2, -1, -1, VAULT, TRUE)
 #define init_vault() g.vault_x = -1
@@ -71,9 +71,9 @@ mkroom_cmp(const genericptr vx, const genericptr vy)
  * to connect them up to other areas.
  */
 static boolean
-door_into_nonjoined(xchar x, xchar y)
+door_into_nonjoined(coordxy x, coordxy y)
 {
-    xchar tx, ty, i;
+    coordxy tx, ty, i;
 
     for (i = 0; i < 4; i++) {
         tx = x + xdir[dirs_ord[i]];
@@ -91,9 +91,9 @@ door_into_nonjoined(xchar x, xchar y)
 }
 
 static boolean
-finddpos(coord *cc, xchar xl, xchar yl, xchar xh, xchar yh)
+finddpos(coord *cc, coordxy xl, coordxy yl, coordxy xh, coordxy yh)
 {
-    register xchar x, y;
+    register coordxy x, y;
 
     x = rn1(xh - xl + 1, xl);
     y = rn1(yh - yl + 1, yl);
@@ -329,7 +329,7 @@ static void
 join(register int a, register int b, boolean nxcor)
 {
     coord cc, tt, org, dest;
-    register xchar tx, ty, xx, yy;
+    register coordxy tx, ty, xx, yy;
     register struct mkroom *croom, *troom;
     register int dx, dy;
 
@@ -481,7 +481,7 @@ add_door(register int x, register int y, register struct mkroom *aroom)
 }
 
 static void
-dosdoor(register xchar x, register xchar y, struct mkroom *aroom, int type)
+dosdoor(register coordxy x, register coordxy y, struct mkroom *aroom, int type)
 {
     boolean shdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
 
@@ -905,7 +905,7 @@ makelevel(void)
 
         /* make a secret treasure vault, not connected to the rest */
         if (do_vault()) {
-            xchar w, h;
+            coordxy w, h;
 
             debugpline0("trying to make a vault...");
             w = 1;
@@ -1222,7 +1222,7 @@ find_branch_room(coord *mp)
 
 /* Find the room for (x,y).  Return null if not in a room. */
 static struct mkroom *
-pos_to_room(xchar x, xchar y)
+pos_to_room(coordxy x, coordxy y)
 {
     int i;
     struct mkroom *curr;
@@ -1238,7 +1238,7 @@ pos_to_room(xchar x, xchar y)
 void
 place_branch(
     branch *br,       /* branch to place */
-    xchar x, xchar y) /* location */
+    coordxy x, coordxy y) /* location */
 {
     coord m = {0};
     d_level *dest;
@@ -1294,7 +1294,7 @@ place_branch(
 }
 
 static boolean
-bydoor(register xchar x, register xchar y)
+bydoor(register coordxy x, register coordxy y)
 {
     register int typ;
 
@@ -1323,7 +1323,7 @@ bydoor(register xchar x, register xchar y)
 
 /* see whether it is allowable to create a door at [x,y] */
 int
-okdoor(xchar x, xchar y)
+okdoor(coordxy x, coordxy y)
 {
     boolean near_door = bydoor(x, y);
 
@@ -1347,7 +1347,7 @@ dodoor(int x, int y, struct mkroom *aroom)
 }
 
 boolean
-occupied(xchar x, xchar y)
+occupied(coordxy x, coordxy y)
 {
     return (boolean) (t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
                       || is_lava(x, y) || is_pool(x, y)
@@ -1636,7 +1636,7 @@ mktrap(
    If force is TRUE, change the terrain to ROOM first */
 void
 mkstairs(
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     char up,       /* [why 'char' when usage is boolean?] */
     struct mkroom *croom UNUSED,
     boolean force)
@@ -1884,9 +1884,9 @@ void
 mkinvokearea(void)
 {
     int dist;
-    xchar xmin = g.inv_pos.x, xmax = g.inv_pos.x,
+    coordxy xmin = g.inv_pos.x, xmax = g.inv_pos.x,
           ymin = g.inv_pos.y, ymax = g.inv_pos.y;
-    register xchar i;
+    register coordxy i;
 
     /* slightly odd if levitating, but not wrong */
     pline_The("floor shakes violently under you!");
@@ -1940,7 +1940,7 @@ mkinvokearea(void)
  * Temporarily overrides vision in the name of a nice effect.
  */
 static void
-mkinvpos(xchar x, xchar y, int dist)
+mkinvpos(coordxy x, coordxy y, int dist)
 {
     struct trap *ttmp;
     struct obj *otmp;
@@ -2035,7 +2035,7 @@ mkinvpos(xchar x, xchar y, int dist)
  * Ludios will remain isolated until the branch is corrected by this function.
  */
 static void
-mk_knox_portal(xchar x, xchar y)
+mk_knox_portal(coordxy x, coordxy y)
 {
     d_level *source;
     branch *br;

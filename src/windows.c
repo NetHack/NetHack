@@ -511,7 +511,7 @@ static void hup_add_menu(winid, const glyph_info *, const anything *, char,
                          char, int, int, const char *, unsigned int);
 static void hup_end_menu(winid, const char *);
 static void hup_putstr(winid, int, const char *);
-static void hup_print_glyph(winid, xchar, xchar, const glyph_info *,
+static void hup_print_glyph(winid, coordxy, coordxy, const glyph_info *,
                             const glyph_info *);
 static void hup_outrip(winid, int, time_t);
 static void hup_curs(winid, int, int);
@@ -718,7 +718,7 @@ hup_putstr(winid window UNUSED, int attr UNUSED, const char *text UNUSED)
 /*ARGSUSED*/
 static void
 hup_print_glyph(winid window UNUSED,
-                xchar x UNUSED, xchar y UNUSED,
+                coordxy x UNUSED, coordxy y UNUSED,
                 const glyph_info *glyphinfo UNUSED,
                 const glyph_info *bkglyphinfo UNUSED)
 {

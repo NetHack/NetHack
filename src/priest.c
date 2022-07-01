@@ -9,7 +9,7 @@
 #define ALGN_SINNED (-4) /* worse than strayed (-1..-3) */
 #define ALGN_PIOUS 14    /* better than fervent (9..13) */
 
-static boolean histemple_at(struct monst *, xchar, xchar);
+static boolean histemple_at(struct monst *, coordxy, coordxy);
 static boolean has_shrine(struct monst *);
 
 void
@@ -40,9 +40,9 @@ free_epri(struct monst *mtmp)
 int
 move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
              boolean uondoor, boolean avoid,
-             xchar omx, xchar omy, xchar gx, xchar gy)
+             coordxy omx, coordxy omy, coordxy gx, coordxy gy)
 {
-    register xchar nx, ny, nix, niy;
+    register coordxy nx, ny, nix, niy;
     register schar i;
     schar chcnt, cnt;
     coord poss[9];
@@ -146,7 +146,7 @@ temple_occupied(char *array)
 }
 
 static boolean
-histemple_at(struct monst *priest, xchar x, xchar y)
+histemple_at(struct monst *priest, coordxy x, coordxy y)
 {
     return (boolean) (priest && priest->ispriest
                       && (EPRI(priest)->shroom == *in_rooms(x, y, TEMPLE))
@@ -172,7 +172,7 @@ inhistemple(struct monst *priest)
 int
 pri_move(struct monst *priest)
 {
-    register xchar gx, gy, omx, omy;
+    register coordxy gx, gy, omx, omy;
     schar temple;
     boolean avoid = TRUE;
 
@@ -670,7 +670,7 @@ priest_talk(struct monst *priest)
 }
 
 struct monst *
-mk_roamer(struct permonst *ptr, aligntyp alignment, xchar x, xchar y,
+mk_roamer(struct permonst *ptr, aligntyp alignment, coordxy x, coordxy y,
           boolean peaceful)
 {
     register struct monst *roamer;
@@ -719,7 +719,7 @@ reset_hostility(struct monst *roamer)
 boolean
 in_your_sanctuary(
     struct monst *mon, /* if non-null, <mx,my> overrides <x,y> */
-    xchar x, xchar y)
+    coordxy x, coordxy y)
 {
     register char roomno;
     register struct monst *priest;

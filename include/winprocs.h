@@ -54,7 +54,7 @@ struct window_procs {
 #ifdef POSITIONBAR
     void (*win_update_positionbar)(char *);
 #endif
-    void (*win_print_glyph)(winid, xchar, xchar,
+    void (*win_print_glyph)(winid, coordxy, coordxy,
                             const glyph_info *, const glyph_info *);
     void (*win_raw_print)(const char *);
     void (*win_raw_print_bold)(const char *);
@@ -375,7 +375,7 @@ struct chain_procs {
 #ifdef POSITIONBAR
     void (*win_update_positionbar)(CARGS, char *);
 #endif
-    void (*win_print_glyph)(CARGS, winid, xchar, xchar,
+    void (*win_print_glyph)(CARGS, winid, coordxy, coordxy,
                             const glyph_info *,
                             const glyph_info *);
     void (*win_raw_print)(CARGS, const char *);
@@ -452,7 +452,7 @@ extern void safe_cliparound(int, int);
 #ifdef POSITIONBAR
 extern void safe_update_positionbar(char *);
 #endif
-extern void safe_print_glyph(winid, xchar, xchar,
+extern void safe_print_glyph(winid, coordxy, coordxy,
                              const glyph_info *, const glyph_info *);
 extern void safe_raw_print(const char *);
 extern void safe_raw_print_bold(const char *);

@@ -6,8 +6,8 @@
 #define RECT_H
 
 typedef struct nhrect {
-    xchar lx, ly;
-    xchar hx, hy;
+    coordxy lx, ly;
+    coordxy hx, hy;
 } NhRect;
 
 #endif /* RECT_H */

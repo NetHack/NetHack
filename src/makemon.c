@@ -815,7 +815,7 @@ m_initinv(register struct monst *mtmp)
 /* Note: for long worms, always call cutworm (cutworm calls clone_mon) */
 struct monst *
 clone_mon(struct monst *mon,
-          xchar x, xchar y) /* clone's preferred location or 0 (near mon) */
+          coordxy x, coordxy y) /* clone's preferred location or 0 (near mon) */
 {
     coord mm;
     struct monst *m2;

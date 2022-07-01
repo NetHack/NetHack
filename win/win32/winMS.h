@@ -164,7 +164,7 @@ int mswin_select_menu(winid wid, int how, MENU_ITEM_P **selected);
 void mswin_mark_synch(void);
 void mswin_wait_synch(void);
 void mswin_cliparound(int x, int y);
-void mswin_print_glyph(winid wid, xchar x, xchar y,
+void mswin_print_glyph(winid wid, coordxy x, coordxy y,
                        const glyph_info *glyph, const glyph_info *bkglyph);
 void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);

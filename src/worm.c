@@ -11,7 +11,7 @@
 /* worm segment structure */
 struct wseg {
     struct wseg *nseg;
-    xchar wx, wy; /* the segment's position */
+    coordxy wx, wy; /* the segment's position */
 };
 
 static void toss_wsegs(struct wseg *, boolean);
@@ -368,7 +368,7 @@ wormhitu(struct monst *worm)
  *  that both halves will survive.
  */
 void
-cutworm(struct monst *worm, xchar x, xchar y,
+cutworm(struct monst *worm, coordxy x, coordxy y,
         boolean cuttier) /* hit is by wielded blade or axe or by thrown axe */
 {
     struct wseg *curr, *new_tail;
@@ -621,7 +621,7 @@ place_wsegs(struct monst *worm, struct monst *oldworm)
     struct wseg *curr = wtails[worm->wormno];
 
     while (curr != wheads[worm->wormno]) {
-        xchar x = curr->wx, y = curr->wy;
+        coordxy x = curr->wx, y = curr->wy;
         struct monst *mtmp = m_at(x, y);
 
         if (oldworm && mtmp == oldworm)
@@ -739,7 +739,7 @@ remove_worm(struct monst *worm)
  *  be, if somehow the head is disjoint from the tail.
  */
 void
-place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
+place_worm_tail_randomly(struct monst *worm, coordxy x, coordxy y)
 {
     int wnum = worm->wormno;
     struct wseg *curr = wtails[wnum];
@@ -810,8 +810,8 @@ place_worm_tail_randomly(struct monst *worm, xchar x, xchar y)
 #endif
         {
             place_worm_seg(worm, nx, ny);
-            curr->wx = (xchar) (ox = nx);
-            curr->wy = (xchar) (oy = ny);
+            curr->wx = (coordxy) (ox = nx);
+            curr->wy = (coordxy) (oy = ny);
             wtails[wnum] = curr;
             curr = curr->nseg;
             wtails[wnum]->nseg = new_tail;
@@ -985,7 +985,7 @@ wseg_at(struct monst *worm, int x, int y)
     if (worm && worm->wormno && m_at(x, y) == worm) {
         struct wseg *curr;
         int i, n;
-        xchar wx = (xchar) x, wy = (xchar) y;
+        coordxy wx = (coordxy) x, wy = (coordxy) y;
 
         for (i = 0, curr = wtails[worm->wormno]; curr; curr = curr->nseg) {
             if (curr->wx == wx && curr->wy == wy)

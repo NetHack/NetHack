@@ -63,9 +63,9 @@ static struct damage *find_damage(struct monst *);
 static void discard_damage_struct(struct damage *);
 static void discard_damage_owned_by(struct monst *);
 static void shk_fixes_damage(struct monst *);
-static xchar *litter_getpos(int *, xchar, xchar, struct monst *);
-static void litter_scatter(xchar *, int, xchar, xchar, struct monst *);
-static void litter_newsyms(xchar *, xchar, xchar);
+static coordxy *litter_getpos(int *, coordxy, coordxy, struct monst *);
+static void litter_scatter(coordxy *, int, coordxy, coordxy, struct monst *);
+static void litter_newsyms(coordxy *, coordxy, coordxy);
 static int repair_damage(struct monst *, struct damage *, boolean);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
@@ -344,7 +344,7 @@ call_kops(register struct monst* shkp, register boolean nearshop)
 
     {
         coord mm;
-        xchar sx = 0, sy = 0;
+        coordxy sx = 0, sy = 0;
 
         choose_stairs(&sx, &sy, TRUE);
 
@@ -374,7 +374,7 @@ call_kops(register struct monst* shkp, register boolean nearshop)
 
 /* x,y is strictly inside shop */
 char
-inside_shop(register xchar x, register xchar y)
+inside_shop(register coordxy x, register coordxy y)
 {
     register char rno;
 
@@ -468,7 +468,7 @@ credit_report(struct monst *shkp, int idx, boolean silent)
 
 /* robbery from outside the shop via telekinesis or grappling hook */
 void
-remote_burglary(xchar x, xchar y)
+remote_burglary(coordxy x, coordxy y)
 {
     struct monst *shkp;
     struct eshk *eshkp;
@@ -1045,7 +1045,7 @@ pay(long tmp, register struct monst* shkp)
 static void
 home_shk(struct monst *shkp, boolean killkops)
 {
-    xchar x = ESHK(shkp)->shk.x, y = ESHK(shkp)->shk.y;
+    coordxy x = ESHK(shkp)->shk.x, y = ESHK(shkp)->shk.y;
 
     (void) mnearto(shkp, x, y, TRUE, RLOC_NOMSG);
     g.level.flags.has_shop = 1;
@@ -1189,7 +1189,7 @@ hot_pursuit(register struct monst* shkp)
    the shop.  These conditions must be checked by the calling function. */
 /*ARGSUSED*/
 void
-make_angry_shk(struct monst* shkp, xchar ox UNUSED, xchar oy UNUSED)
+make_angry_shk(struct monst* shkp, coordxy ox UNUSED, coordxy oy UNUSED)
 /* <ox,oy> predate 'noit_Monnam()', let alone Shknam() */
 {
     struct eshk *eshkp = ESHK(shkp);
@@ -1884,7 +1884,7 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
 static void
 set_repo_loc(struct monst* shkp)
 {
-    register xchar ox, oy;
+    register coordxy ox, oy;
     struct eshk *eshkp = ESHK(shkp);
 
     /* if you're not in this shk's shop room, or if you're in its doorway
@@ -1992,7 +1992,7 @@ get_cost_of_shop_item(
 {
     struct monst *shkp;
     struct obj *top;
-    xchar x, y;
+    coordxy x, y;
     boolean freespot;
     long cost = 0L;
 
@@ -2172,7 +2172,7 @@ contained_cost(
     boolean unpaid_only)
 {
     register struct obj *otmp, *top;
-    xchar x, y;
+    coordxy x, y;
     boolean on_floor, freespot;
 
     for (top = obj; top->where == OBJ_CONTAINED; top = top->ocontainer)
@@ -2433,7 +2433,7 @@ unpaid_cost(
     long amt = 0L;
 
 #if 0   /* if two shops share a wall, this might find wrong shk */
-    xchar ox, oy;
+    coordxy ox, oy;
 
     if (!get_obj_location(unp_obj, &ox, &oy, BURIED_TOO | CONTAINED_TOO))
         ox = u.ux, oy = u.uy; /* (shouldn't happen) */
@@ -2903,8 +2903,8 @@ stolen_container(
 long
 stolen_value(
     struct obj *obj,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     boolean peaceful,
     boolean silent)
 {
@@ -3066,7 +3066,7 @@ sellobj_state(int deliberate)
 }
 
 void
-sellobj(register struct obj* obj, xchar x, xchar y)
+sellobj(register struct obj* obj, coordxy x, coordxy y)
 {
     register struct monst *shkp;
     register struct eshk *eshkp;
@@ -3446,7 +3446,7 @@ getprice(register struct obj* obj, boolean shk_buying)
 
 /* shk catches thrown pick-axe */
 struct monst *
-shkcatch(register struct obj* obj, register xchar x, register xchar y)
+shkcatch(register struct obj* obj, register coordxy x, register coordxy y)
 {
     register struct monst *shkp;
 
@@ -3479,8 +3479,8 @@ shkcatch(register struct obj* obj, register xchar x, register xchar y)
 
 void
 add_damage(
-    register xchar x,
-    register xchar y,
+    register coordxy x,
+    register coordxy y,
     long cost)
 {
     struct damage *tmp_dam;
@@ -3533,7 +3533,7 @@ shk_impaired(struct monst *shkp)
 static boolean
 repairable_damage(struct damage *dam, struct monst *shkp)
 {
-    xchar x, y;
+    coordxy x, y;
     struct trap* ttmp;
     struct monst *mtmp;
 
@@ -3614,7 +3614,7 @@ discard_damage_owned_by(struct monst *shkp)
     struct damage *dam = g.level.damagelist, *dam2, *prevdam = NULL;
 
     while (dam) {
-        xchar x = dam->place.x, y = dam->place.y;
+        coordxy x = dam->place.x, y = dam->place.y;
 
         if (index(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom)) {
             dam2 = dam->next;
@@ -3664,10 +3664,10 @@ shk_fixes_damage(struct monst *shkp)
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
 
-static xchar *
-litter_getpos(int *k, xchar x, xchar y, struct monst *shkp)
+static coordxy *
+litter_getpos(int *k, coordxy x, coordxy y, struct monst *shkp)
 {
-    static xchar litter[9];
+    static xint16 litter[9];
     int i, ix, iy;
 
     (void) memset((genericptr_t) litter, 0, sizeof litter);
@@ -3694,9 +3694,9 @@ litter_getpos(int *k, xchar x, xchar y, struct monst *shkp)
 
 static void
 litter_scatter(
-    xchar *litter,
+    xint16 *litter,
     int k,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     struct monst *shkp)
 {
     struct obj *otmp;
@@ -3755,7 +3755,7 @@ litter_scatter(
 }
 
 static void
-litter_newsyms(xchar *litter, xchar x, xchar y)
+litter_newsyms(xint16 *litter, coordxy x, coordxy y)
 {
     int i;
 
@@ -3780,8 +3780,8 @@ repair_damage(
     struct damage *tmp_dam,
     boolean catchup)
 {
-    xchar x, y;
-    xchar *litter;
+    coordxy x, y;
+    xint16 *litter;
     struct obj *otmp;
     struct trap *ttmp;
     int k, disposition = 1;
@@ -3923,7 +3923,7 @@ fix_shop_damage(void)
 int
 shk_move(struct monst *shkp)
 {
-    xchar gx, gy, omx, omy;
+    coordxy gx, gy, omx, omy;
     int udist;
     schar appr;
     struct eshk *eshkp = ESHK(shkp);
@@ -4179,7 +4179,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
     char shops_affected[5];
     boolean uinshp = (*u.ushops != '\0');
     char qbuf[80];
-    xchar x, y;
+    coordxy x, y;
     boolean dugwall = (!strcmp(dmgstr, "dig into")    /* wand */
                        || !strcmp(dmgstr, "damage")); /* pick-axe */
     boolean animal, pursue;
@@ -4329,7 +4329,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
     if (yn(qbuf) != 'n') {
         boolean is_seen, was_seen = canseemon(shkp),
                 was_outside = !inhishop(shkp);
-        xchar sx = shkp->mx, sy = shkp->my;
+        coordxy sx = shkp->mx, sy = shkp->my;
 
         cost_of_damage = check_credit(cost_of_damage, shkp);
         if (cost_of_damage > 0L) {
@@ -4367,7 +4367,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
 
 /* called in dokick.c when we kick an object that might be in a store */
 boolean
-costly_spot(register xchar x, register xchar y)
+costly_spot(register coordxy x, register coordxy y)
 {
     struct monst *shkp;
     struct eshk *eshkp;
@@ -4385,7 +4385,7 @@ costly_spot(register xchar x, register xchar y)
 /* called by dotalk(sounds.c) when #chatting; returns obj if location
    contains shop goods and shopkeeper is willing & able to speak */
 struct obj *
-shop_object(register xchar x, register xchar y)
+shop_object(register coordxy x, register coordxy y)
 {
     register struct obj *otmp;
     register struct monst *shkp;
@@ -4726,7 +4726,7 @@ check_unpaid(struct obj* otmp)
 }
 
 void
-costly_gold(xchar x, xchar y, long amount, boolean silent)
+costly_gold(coordxy x, coordxy y, long amount, boolean silent)
 {
     register long delta;
     register struct monst *shkp;
@@ -4765,7 +4765,7 @@ costly_gold(xchar x, xchar y, long amount, boolean silent)
 /* used in domove to block diagonal shop-exit */
 /* x,y should always be a door */
 boolean
-block_door(register xchar x, register xchar y)
+block_door(register coordxy x, register coordxy y)
 {
     register int roomno = *in_rooms(x, y, SHOPBASE);
     register struct monst *shkp;
@@ -4799,9 +4799,9 @@ block_door(register xchar x, register xchar y)
 /* used in domove to block diagonal shop-entry;
    u.ux, u.uy should always be a door */
 boolean
-block_entry(register xchar x, register xchar y)
+block_entry(register coordxy x, register coordxy y)
 {
-    register xchar sx, sy;
+    register coordxy sx, sy;
     register int roomno;
     register struct monst *shkp;
 
@@ -4860,7 +4860,7 @@ static char *
 shk_owns(char *buf, struct obj *obj)
 {
     struct monst *shkp;
-    xchar x, y;
+    coordxy x, y;
 
     if (get_obj_location(obj, &x, &y, 0)
         && (obj->unpaid || (obj->where == OBJ_FLOOR && !obj->no_charge

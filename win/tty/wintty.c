@@ -2774,8 +2774,7 @@ tty_destroy_nhwindow(winid window)
 }
 
 void
-tty_curs(
-    winid window,
+tty_curs(winid window,
     register int x, register int y) /* not xchar: perhaps xchar is unsigned
                                      * then curx-x would be unsigned too */
 {
@@ -3720,6 +3719,8 @@ tty_update_invent_slot(
                     cell->refresh = 0;
                 }
             }
+        tty_curs(window, 1, 0);
+        ttyDisplay->curx = 1;
         calling_from_update_inventory = FALSE;
         break;
     default:
@@ -4156,7 +4157,7 @@ tty_cliparound(int x, int y)
 void
 tty_print_glyph(
     winid window,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo UNUSED)
 {

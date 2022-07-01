@@ -19,7 +19,7 @@ int dotcnt, dotrow; /* also used in restore */
 static void savelevchn(NHFILE *);
 static void savelevl(NHFILE *,boolean);
 static void savedamage(NHFILE *);
-static void save_bubbles(NHFILE *, xchar);
+static void save_bubbles(NHFILE *, xint8);
 static void save_stairs(NHFILE *);
 static void save_bc(NHFILE *);
 static void saveobj(NHFILE *,struct obj *);
@@ -29,7 +29,7 @@ static void savemonchn(NHFILE *,struct monst *);
 static void savetrapchn(NHFILE *,struct trap *);
 static void save_gamelog(NHFILE *);
 static void savegamestate(NHFILE *);
-static void savelev_core(NHFILE *, xchar);
+static void savelev_core(NHFILE *, xint8);
 static void save_msghistory(NHFILE *);
 
 #ifdef ZEROCOMP
@@ -78,7 +78,7 @@ int
 dosave0(void)
 {
     const char *fq_save;
-    xchar ltmp;
+    xint8 ltmp;
     char whynot[BUFSZ];
     NHFILE *nhfp, *onhfp;
     int res = 0;
@@ -186,7 +186,7 @@ dosave0(void)
     set_ustuck((struct monst *) 0);
     u.usteed = (struct monst *) 0;
 
-    for (ltmp = (xchar) 1; ltmp <= maxledgerno(); ltmp++) {
+    for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {
         if (ltmp == ledger_no(&g.uz_save))
             continue;
         if (!(g.level_info[ltmp].flags & LFILE_EXISTS))
@@ -447,7 +447,7 @@ savestateinlock(void)
 #endif
 
 void
-savelev(NHFILE *nhfp, xchar lev)
+savelev(NHFILE *nhfp, xint8 lev)
 {
     boolean set_uz_save = (g.uz_save.dnum == 0 && g.uz_save.dlevel == 0);
 
@@ -470,7 +470,7 @@ savelev(NHFILE *nhfp, xchar lev)
 }
 
 static void
-savelev_core(NHFILE *nhfp, xchar lev)
+savelev_core(NHFILE *nhfp, xint8 lev)
 {
 #ifdef TOS
     short tlev;
@@ -636,9 +636,9 @@ savelevl(NHFILE* nhfp, boolean rlecomp)
 
 /* save Plane of Water's air bubbles and Plane of Air's clouds */
 static void
-save_bubbles(NHFILE *nhfp, xchar lev)
+save_bubbles(NHFILE *nhfp, xint8 lev)
 {
-    xchar bbubbly;
+    xint8 bbubbly;
 
     /* air bubbles and clouds used to be saved as part of game state
        because restoring them needs dungeon data that isn't available

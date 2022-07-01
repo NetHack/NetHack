@@ -9,7 +9,7 @@ static void mkbox_cnts(struct obj *);
 static unsigned nextoid(struct obj *, struct obj *);
 static int item_on_ice(struct obj *);
 static void shrinking_glob_gone(struct obj *);
-static void obj_timer_checks(struct obj *, xchar, xchar, int);
+static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
@@ -677,7 +677,7 @@ static const char *const alteration_verbs[] = {
 void
 costly_alteration(struct obj *obj, int alter_type)
 {
-    xchar ox, oy;
+    coordxy ox, oy;
     char objroom;
     boolean learn_bknown;
     const char *those, *them;
@@ -1293,7 +1293,7 @@ static int
 item_on_ice(struct obj *item)
 {
     struct obj *otmp;
-    xchar ox, oy;
+    coordxy ox, oy;
 
     otmp = item;
     /* if in a container, it might be nested so find outermost one since
@@ -1491,7 +1491,7 @@ shrink_glob(
     }
 
     if (gone) {
-        xchar ox = 0, oy = 0;
+        coordxy ox = 0, oy = 0;
         /* check location for visibility before destroying obj */
         boolean seeit = (obj->where == OBJ_FLOOR
                          && get_obj_location(obj, &ox, &oy, 0)
@@ -1522,7 +1522,7 @@ shrink_glob(
 static void
 shrinking_glob_gone(struct obj *obj)
 {
-    xchar owhere = obj->where;
+    xint16 owhere = obj->where;
 
     if (owhere == OBJ_INVENT) {
         if (obj->owornmask) {
@@ -1554,7 +1554,7 @@ void
 maybe_adjust_light(struct obj *obj, int old_range)
 {
     char buf[BUFSZ];
-    xchar ox, oy;
+    coordxy ox, oy;
     int new_range = arti_light_radius(obj), delta = new_range - old_range;
 
     /* radius of light emitting artifact varies by curse/bless state
@@ -2198,7 +2198,7 @@ peek_at_iced_corpse_age(struct obj *otmp)
 static void
 obj_timer_checks(
     struct obj *otmp,
-    xchar x, xchar y,
+    coordxy x, coordxy y,
     int force) /* 0 = no force so do checks, <0 = force off, >0 force on */
 {
     long tleft = 0L;
@@ -2266,8 +2266,8 @@ obj_timer_checks(
 void
 remove_object(struct obj *otmp)
 {
-    xchar x = otmp->ox;
-    xchar y = otmp->oy;
+    coordxy x = otmp->ox;
+    coordxy y = otmp->oy;
 
     if (otmp->where != OBJ_FLOOR)
         panic("remove_object: obj not on floor");

@@ -46,7 +46,7 @@ typedef struct tty_mi {
 /* descriptor for tty-based windows */
 struct WinDesc {
     int flags;           /* window flags */
-    xchar type;          /* type of window */
+    xint16 type;          /* type of window */
     boolean active;      /* true if window is active */
     short offx, offy;    /* offset from topleft of display */
     long rows, cols;     /* dimensions */
@@ -249,7 +249,7 @@ E void tty_cliparound(int, int);
 #ifdef POSITIONBAR
 E void tty_update_positionbar(char *);
 #endif
-E void tty_print_glyph(winid, xchar, xchar, const glyph_info *,
+E void tty_print_glyph(winid, coordxy, coordxy, const glyph_info *,
                        const glyph_info *);
 E void tty_raw_print(const char *);
 E void tty_raw_print_bold(const char *);

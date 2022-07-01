@@ -352,7 +352,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 int
 pick_lock(
     struct obj *pick,
-    xchar rx, xchar ry, /* coordinates of door/container, for autounlock:
+    coordxy rx, coordxy ry, /* coordinates of door/container, for autounlock:
                          * does not prompt for direction if these are set */
     struct obj *container) /* container, for autounlock */
 {

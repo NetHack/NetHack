@@ -522,7 +522,7 @@ void NetHackQtBind::qt_cliparound_window(winid wid, int x, int y)
 }
 
 void NetHackQtBind::qt_print_glyph(
-    winid wid, xchar x, xchar y,
+    winid wid, coordxy x, coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo UNUSED)
 {
@@ -533,7 +533,7 @@ void NetHackQtBind::qt_print_glyph(
 
 #if 0
 void NetHackQtBind::qt_print_glyph_compose(
-    winid wid, xchar x, xchar y, int glyph1, int glyph2)
+    winid wid, coordxy x, coordxy y, int glyph1, int glyph2)
 {
     NetHackQtWindow *window = id_to_window[(int) wid];
     window->PrintGlyphCompose(x, y, glyph1, glyph2);

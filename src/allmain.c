@@ -267,7 +267,7 @@ moveloop_core(void)
 
                 if (!u.uinvulnerable) {
                     if (Teleportation && !rn2(85)) {
-                        xchar old_ux = u.ux, old_uy = u.uy;
+                        coordxy old_ux = u.ux, old_uy = u.uy;
 
                         tele();
                         if (u.ux != old_ux || u.uy != old_uy) {

@@ -6852,7 +6852,7 @@ query_attr(const char *prompt)
 
 static const struct {
     const char *name;
-    xchar msgtyp;
+    xint8 msgtyp;
     const char *descr;
 } msgtype_names[] = {
     { "show", MSGTYP_NORMAL, "Show message normally" },

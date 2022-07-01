@@ -32,9 +32,9 @@ struct dgn_topology { /* special dungeon levels for speed */
     d_level d_fire_level;
     d_level d_air_level;
     d_level d_astral_level;
-    xchar d_tower_dnum;
-    xchar d_sokoban_dnum;
-    xchar d_mines_dnum, d_quest_dnum;
+    xint16 d_tower_dnum;
+    xint16 d_sokoban_dnum;
+    xint16 d_mines_dnum, d_quest_dnum;
     d_level d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level d_knox_level;
     d_level d_mineend_level;
@@ -410,7 +410,7 @@ struct autopickup_exception {
 };
 
 struct plinemsg_type {
-    xchar msgtype;  /* one of MSGTYP_foo */
+    xint16 msgtype;  /* one of MSGTYP_foo */
     struct nhregex *regex;
     char *pattern;
     struct plinemsg_type *next;
@@ -545,7 +545,7 @@ struct xlock_s {
 
 struct trapinfo {
     struct obj *tobj;
-    xchar tx, ty;
+    coordxy tx, ty;
     int time_needed;
     boolean force_bungle;
 };
@@ -564,8 +564,8 @@ enum vanq_order_modes {
 };
 
 struct rogueroom {
-    xchar rlx, rly;
-    xchar dx, dy;
+    coordxy rlx, rly;
+    coordxy dx, dy;
     boolean real;
     uchar doortable;
     int nroom; /* Only meaningful for "real" rooms */
@@ -573,7 +573,7 @@ struct rogueroom {
 
 typedef struct ls_t {
     struct ls_t *next;
-    xchar x, y;  /* source's position */
+    coordxy x, y;  /* source's position */
     short range; /* source's current range */
     short flags;
     short type;  /* type of light source */
@@ -582,7 +582,7 @@ typedef struct ls_t {
 
 struct container {
     struct container *next;
-    xchar x, y;
+    coordxy x, y;
     short what;
     genericptr_t list;
 };
@@ -597,7 +597,7 @@ enum bubble_contains_types {
 #define MAX_BMASK 4
 
 struct bubble {
-    xchar x, y;   /* coordinates of the upper left corner */
+    coordxy x, y;   /* coordinates of the upper left corner */
     schar dx, dy; /* the general direction of the bubble's movement */
     uchar bm[MAX_BMASK + 2];    /* bubble bit mask */
     struct bubble *prev, *next; /* need to traverse the list up and down */
@@ -621,7 +621,7 @@ struct h2o_ctx {
 
 struct launchplace {
     struct obj *obj;
-    xchar x, y;
+    coordxy x, y;
 };
 
 struct repo { /* repossession context */
@@ -862,8 +862,8 @@ struct instance_globals {
 
     /* display.c */
     gbuf_entry gbuf[ROWNO][COLNO];
-    xchar gbuf_start[ROWNO];
-    xchar gbuf_stop[ROWNO];
+    coordxy gbuf_start[ROWNO];
+    coordxy gbuf_stop[ROWNO];
 
 
     /* do.c */
@@ -884,9 +884,9 @@ struct instance_globals {
 
     /* dog.c */
     int petname_used; /* user preferred pet name has been used */
-    xchar gtyp;  /* type of dog's current goal */
-    xchar gx; /* x position of dog's current goal */
-    xchar gy; /* y position of dog's current goal */
+    xint16 gtyp;  /* type of dog's current goal */
+    coordxy gx; /* x position of dog's current goal */
+    coordxy gy; /* y position of dog's current goal */
     char dogname[PL_PSIZ];
     char catname[PL_PSIZ];
     char horsename[PL_PSIZ];
@@ -1000,8 +1000,8 @@ struct instance_globals {
 
     /* mklev.c */
     genericptr_t luathemes[MAXDUNGEON];
-    xchar vault_x;
-    xchar vault_y;
+    coordxy vault_x;
+    coordxy vault_y;
     boolean made_branch; /* used only during level creation */
 
     /* mkmap.c */
@@ -1202,8 +1202,8 @@ struct instance_globals {
     lev_region *lregions;
     int num_lregions;
     struct sp_coder *coder;
-    xchar xstart, ystart;
-    xchar xsize, ysize;
+    coordxy xstart, ystart;
+    coordxy xsize, ysize;
     boolean in_mk_themerooms;
     boolean themeroom_failed;
 
@@ -1248,9 +1248,9 @@ struct instance_globals {
                                       Stormbringer's maliciousness. */
 
     /* vision.c */
-    xchar **viz_array; /* used in cansee() and couldsee() macros */
-    xchar *viz_rmin;			/* min could see indices */
-    xchar *viz_rmax;			/* max could see indices */
+    coordxy **viz_array; /* used in cansee() and couldsee() macros */
+    coordxy *viz_rmin;			/* min could see indices */
+    coordxy *viz_rmax;			/* max could see indices */
     boolean vision_full_recalc;
     int seethru; /* 'bubble' debugging: clouds and water don't block light */
 

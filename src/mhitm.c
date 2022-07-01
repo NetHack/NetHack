@@ -751,7 +751,7 @@ static int
 gulpmm(register struct monst *magr, register struct monst *mdef,
        register struct attack *mattk)
 {
-    xchar ax, ay, dx, dy;
+    coordxy ax, ay, dx, dy;
     int status;
     char buf[BUFSZ];
     struct obj *obj;

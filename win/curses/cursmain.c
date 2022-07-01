@@ -771,7 +771,7 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
 */
 
 void
-curses_print_glyph(winid wid, xchar x, xchar y,
+curses_print_glyph(winid wid, coordxy x, coordxy y,
                    const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
 {
     int glyph;

@@ -283,7 +283,7 @@ fill_zoo(struct mkroom* sroom)
             (void) somexy(sroom, &mm);
             tx = mm.x;
             ty = mm.y;
-        } while (occupied((xchar) tx, (xchar) ty) && --i > 0);
+        } while (occupied((coordxy) tx, (coordxy) ty) && --i > 0);
  throne_placed:
         mk_zoo_thronemon(tx, ty);
         break;
@@ -654,7 +654,7 @@ somey(struct mkroom* croom)
 }
 
 boolean
-inside_room(struct mkroom* croom, xchar x, xchar y)
+inside_room(struct mkroom* croom, coordxy x, coordxy y)
 {
     if (croom->irregular) {
         int i = (int) ((croom - g.rooms) + ROOMOFFSET);

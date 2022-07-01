@@ -13,8 +13,8 @@ static int extend_spine(int[3][3], int, int, int);
 static void wall_cleanup(int, int, int, int);
 static boolean okay(int, int, int);
 static void maze0xy(coord *);
-static boolean put_lregion_here(xchar, xchar, xchar, xchar, xchar,
-                                xchar, xchar, boolean, d_level *);
+static boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
+                                coordxy, coordxy, boolean, d_level *);
 static void baalz_fixup(void);
 static void setup_waterlevel(void);
 static void unsetup_waterlevel(void);
@@ -24,7 +24,7 @@ static void migrate_orc(struct monst *, unsigned long);
 static void shiny_orc_stuff(struct monst *);
 static void stolen_booty(void);
 static boolean maze_inbounds(int, int);
-static void maze_remove_deadends(xchar);
+static void maze_remove_deadends(xint16);
 
 /* adjust a coordinate one step in the specified direction */
 #define mz_move(X, Y, dir) \
@@ -69,7 +69,7 @@ is_solid(int x, int y)
 
 /* set map terrain type, handling lava lit, ice melt timers, etc */
 boolean
-set_levltyp(xchar x, xchar y, schar typ)
+set_levltyp(coordxy x, coordxy y, schar typ)
 {
     if (isok(x, y)) {
         if ((typ < MAX_TYPE) && CAN_OVERWRITE_TERRAIN(levl[x][y].typ)) {
@@ -94,7 +94,7 @@ set_levltyp(xchar x, xchar y, schar typ)
 
 /* set map terrain type and light state */
 boolean
-set_levltyp_lit(xchar x, xchar y, schar typ, schar lit)
+set_levltyp_lit(coordxy x, coordxy y, schar typ, schar lit)
 {
     boolean ret = set_levltyp(x, y, typ);
 
@@ -209,7 +209,7 @@ fix_wall_spines(int x1, int y1, int x2, int y2)
      * so even though this table says VWALL, we actually leave whatever
      * typ was there alone.
      */
-    static xchar spine_array[16] = { VWALL, HWALL,    HWALL,    HWALL,
+    static xint16 spine_array[16] = { VWALL, HWALL,    HWALL,    HWALL,
                                      VWALL, TRCORNER, TLCORNER, TDWALL,
                                      VWALL, BRCORNER, BLCORNER, TUWALL,
                                      VWALL, TLWALL,   TRWALL,   CROSSWALL };
@@ -289,7 +289,7 @@ maze0xy(coord * cc)
  *      NOT (pos is corridor and a maze level OR pos is a room OR pos is air)
  */
 boolean
-bad_location(xchar x, xchar y, xchar lx, xchar ly, xchar hx, xchar hy)
+bad_location(coordxy x, coordxy y, coordxy lx, coordxy ly, coordxy hx, coordxy hy)
 {
     return (boolean) (occupied(x, y)
                       || within_bounded_area(x, y, lx, ly, hx, hy)
@@ -302,14 +302,14 @@ bad_location(xchar x, xchar y, xchar lx, xchar ly, xchar hx, xchar hy)
    and place something (based on rtype) in that region */
 void
 place_lregion(
-    xchar lx, xchar ly, xchar hx, xchar hy,
-    xchar nlx, xchar nly, xchar nhx,xchar nhy,
-    xchar rtype,
+    coordxy lx, coordxy ly, coordxy hx, coordxy hy,
+    coordxy nlx, coordxy nly, coordxy nhx,coordxy nhy,
+    xint16 rtype,
     d_level *lev)
 {
     int trycnt;
     boolean oneshot;
-    xchar x, y;
+    coordxy x, y;
 
     if (!lx) { /* default to whole level */
         /*
@@ -349,9 +349,9 @@ place_lregion(
 
 static boolean
 put_lregion_here(
-    xchar x, xchar y,
-    xchar nlx, xchar nly, xchar nhx, xchar nhy,
-    xchar rtype,
+    coordxy x, coordxy y,
+    coordxy nlx, coordxy nly, coordxy nhx, coordxy nhy,
+    xint16 rtype,
     boolean oneshot,
     d_level *lev)
 {
@@ -823,7 +823,7 @@ maze_inbounds(int x, int y)
 }
 
 static void
-maze_remove_deadends(xchar typ)
+maze_remove_deadends(xint16 typ)
 {
     char dirok[4];
     int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
@@ -1234,8 +1234,8 @@ mazexy(coord *cc)
         x = rnd(g.x_maze_max);
         y = rnd(g.y_maze_max);
         if (levl[x][y].typ == allowedtyp) {
-            cc->x = (xchar) x;
-            cc->y = (xchar) y;
+            cc->x = (coordxy) x;
+            cc->y = (coordxy) y;
             return;
         }
     } while (++cpt < 100);
@@ -1243,8 +1243,8 @@ mazexy(coord *cc)
     for (x = 1; x <= g.x_maze_max; x++)
         for (y = 1; y <= g.y_maze_max; y++)
             if (levl[x][y].typ == allowedtyp) {
-                cc->x = (xchar) x;
-                cc->y = (xchar) y;
+                cc->x = (coordxy) x;
+                cc->y = (coordxy) y;
                 return;
             }
     /* every spot on the area of map allowed for mazes has been rejected */
@@ -1356,7 +1356,7 @@ bound_digging(void)
 }
 
 void
-mkportal(xchar x, xchar y, xchar todnum, xchar todlevel)
+mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
 {
     /* a portal "trap" must be matched by a
        portal in the destination dungeon/dlevel */
@@ -1376,12 +1376,12 @@ mkportal(xchar x, xchar y, xchar todnum, xchar todlevel)
 void
 fumaroles(void)
 {
-    xchar n;
+    xint16 n;
     boolean snd = FALSE, loud = FALSE;
 
     for (n = rn2(3) + 2; n; n--) {
-        xchar x = rn1(COLNO - 4, 3);
-        xchar y = rn1(ROWNO - 4, 3);
+        coordxy x = rn1(COLNO - 4, 3);
+        coordxy y = rn1(ROWNO - 4, 3);
 
         if (levl[x][y].typ == LAVAPOOL) {
             NhRegion *r = create_gas_cloud(x, y, rn1(30, 20), rn1(10, 5));

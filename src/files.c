@@ -3681,7 +3681,7 @@ recover_savefile(void)
 {
     NHFILE *gnhfp, *lnhfp, *snhfp;
     int lev, savelev, hpid, pltmpsiz, filecmc;
-    xchar levc;
+    xint16 levc;
     struct version_info version_data;
     int processed[256];
     char savename[SAVESIZE], errbuf[BUFSZ], indicator;
@@ -3820,14 +3820,14 @@ recover_savefile(void)
     processed[0] = 1;
 
     for (lev = 1; lev < 256; lev++) {
-        /* level numbers are kept in xchars in save.c, so the
+        /* level numbers are kept in xint16s in save.c, so the
          * maximum level number (for the endlevel) must be < 256
          */
         if (lev != savelev) {
             lnhfp = open_levelfile(lev, (char *) 0);
             if (lnhfp) {
                 /* any or all of these may not exist */
-                levc = (xchar) lev;
+                levc = (xint16) lev;
                 write(snhfp->fd, (genericptr_t) &levc, sizeof(levc));
                 if (!copy_bytes(lnhfp->fd, snhfp->fd)) {
                     close_nhfile(lnhfp);
@@ -4257,14 +4257,14 @@ choose_passage(int passagecnt, /* total of available passages */
             /* collect all of the N indices */
             g.context.novel.count = passagecnt;
             for (idx = 0; idx < MAXPASSAGES; idx++)
-                g.context.novel.pasg[idx] = (xchar) ((idx < passagecnt)
+                g.context.novel.pasg[idx] = (xint16) ((idx < passagecnt)
                                                    ? idx + 1 : 0);
         } else {
             /* collect MAXPASSAGES of the N indices */
             g.context.novel.count = MAXPASSAGES;
             for (idx = i = 0; i < passagecnt; ++i, --range)
                 if (range > 0 && rn2(range) < limit) {
-                    g.context.novel.pasg[idx++] = (xchar) (i + 1);
+                    g.context.novel.pasg[idx++] = (xint16) (i + 1);
                     --limit;
                 }
         }

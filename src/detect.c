@@ -19,7 +19,7 @@ static void map_monst(struct monst *, boolean);
 static void do_dknown_of(struct obj *);
 static boolean check_map_spot(int, int, char, unsigned);
 static boolean clear_stale_map(char, unsigned);
-static void sense_trap(struct trap *, xchar, xchar, int);
+static void sense_trap(struct trap *, coordxy, coordxy, int);
 static int detect_obj_traps(struct obj *, boolean, int);
 static void display_trap_map(struct trap *, int);
 static int furniture_detect(void);
@@ -837,7 +837,7 @@ monster_detect(struct obj *otmp, /* detecting object (if any) */
 }
 
 static void
-sense_trap(struct trap *trap, xchar x, xchar y, int src_cursed)
+sense_trap(struct trap *trap, coordxy x, coordxy y, int src_cursed)
 {
     if (Hallucination || src_cursed) {
         struct obj obj; /* fake object */
@@ -885,7 +885,7 @@ detect_obj_traps(
     int how) /* 1 for misleading map feedback */
 {
     struct obj *otmp;
-    xchar x, y;
+    coordxy x, y;
     int result = OTRAP_NONE;
 
     /*
@@ -1776,7 +1776,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
 int
 dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 {
-    xchar x, y;
+    coordxy x, y;
     register struct trap *trap;
     register struct monst *mtmp;
 

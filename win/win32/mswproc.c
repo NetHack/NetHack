@@ -1315,7 +1315,7 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                    
 */
 void
-mswin_print_glyph(winid wid, xchar x, xchar y,
+mswin_print_glyph(winid wid, coordxy x, coordxy y,
                   const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
     logDebug("mswin_print_glyph(%d, %d, %d, %d, %d, %lu)\n",

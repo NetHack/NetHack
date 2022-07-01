@@ -92,7 +92,7 @@ extern int curses_select_menu(winid wid, int how, MENU_ITEM_P **selected);
 extern void curses_mark_synch(void);
 extern void curses_wait_synch(void);
 extern void curses_cliparound(int x, int y);
-extern void curses_print_glyph(winid wid, xchar x, xchar y,
+extern void curses_print_glyph(winid wid, coordxy x, coordxy y,
                                 const glyph_info *, const glyph_info *);
 extern void curses_raw_print(const char *str);
 extern void curses_raw_print_bold(const char *str);

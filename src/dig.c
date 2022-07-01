@@ -6,7 +6,7 @@
 #include "hack.h"
 
 static boolean rm_waslit(void);
-static void mkcavepos(xchar, xchar, int, boolean, boolean);
+static void mkcavepos(coordxy, coordxy, int, boolean, boolean);
 static void mkcavearea(boolean);
 static int dig(void);
 static void dig_up_grave(coord *);
@@ -28,7 +28,7 @@ enum dig_types {
 static boolean
 rm_waslit(void)
 {
-    register xchar x, y;
+    register coordxy x, y;
 
     if (levl[u.ux][u.uy].typ == ROOM && levl[u.ux][u.uy].waslit)
         return TRUE;
@@ -44,7 +44,7 @@ rm_waslit(void)
  * immediately after the effect is complete.
  */
 static void
-mkcavepos(xchar x, xchar y, int dist, boolean waslit, boolean rockit)
+mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
 {
     register struct rm *lev;
 
@@ -87,9 +87,9 @@ static void
 mkcavearea(boolean rockit)
 {
     int dist;
-    xchar xmin = u.ux, xmax = u.ux;
-    xchar ymin = u.uy, ymax = u.uy;
-    register xchar i;
+    coordxy xmin = u.ux, xmax = u.ux;
+    coordxy ymin = u.uy, ymax = u.uy;
+    register coordxy i;
     register boolean waslit = rm_waslit();
 
     if (rockit)
@@ -135,7 +135,7 @@ mkcavearea(boolean rockit)
 
 /* When digging into location <x,y>, what are you actually digging into? */
 int
-dig_typ(struct obj *otmp, xchar x, xchar y)
+dig_typ(struct obj *otmp, coordxy x, coordxy y)
 {
     boolean ispick;
 
@@ -231,7 +231,7 @@ static int
 dig(void)
 {
     struct rm *lev;
-    xchar dpx = g.context.digging.pos.x, dpy = g.context.digging.pos.y;
+    coordxy dpx = g.context.digging.pos.x, dpy = g.context.digging.pos.y;
     boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
@@ -734,7 +734,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * in apply.c.
  */
 void
-liquid_flow(xchar x, xchar y, schar typ, struct trap *ttmp,
+liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp,
             const char *fillmsg)
 {
     struct obj *objchain;
@@ -773,7 +773,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
     struct rm *lev;
     struct obj *boulder_here;
     schar typ, old_typ;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
     boolean nohole, retval = FALSE;
 
     if (!cc) {
@@ -901,7 +901,7 @@ static void
 dig_up_grave(coord *cc)
 {
     struct obj *otmp;
-    xchar dig_x, dig_y;
+    coordxy dig_x, dig_y;
 
     if (!cc) {
         dig_x = u.ux;
@@ -1220,7 +1220,7 @@ watchman_canseeu(struct monst *mtmp)
  * zap == TRUE if wand/spell of digging, FALSE otherwise (chewing)
  */
 void
-watch_dig(struct monst *mtmp, xchar x, xchar y, boolean zap)
+watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
 {
     struct rm *lev = &levl[x][y];
 
@@ -1985,7 +1985,7 @@ rot_organic(anything *arg, long timeout UNUSED)
 void
 rot_corpse(anything *arg, long timeout)
 {
-    xchar x = 0, y = 0;
+    coordxy x = 0, y = 0;
     struct obj *obj = arg->a_obj;
     boolean on_floor = obj->where == OBJ_FLOOR,
             in_invent = obj->where == OBJ_INVENT;

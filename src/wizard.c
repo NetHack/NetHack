@@ -314,7 +314,7 @@ strategy(struct monst *mtmp)
    heal or for guardians (Kops) to congregate at to block hero's progress */
 void
 choose_stairs(
-    xchar *sx, xchar *sy, /* output; left as-is if no spot found */
+    coordxy *sx, coordxy *sy, /* output; left as-is if no spot found */
     boolean dir) /* True: forward, False: backtrack (usually up) */
 {
     stairway *stway;
@@ -353,7 +353,7 @@ int
 tactics(struct monst *mtmp)
 {
     unsigned long strat = strategy(mtmp);
-    xchar sx = 0, sy = 0, mx, my;
+    coordxy sx = 0, sy = 0, mx, my;
 
     mtmp->mstrategy =
         (mtmp->mstrategy & (STRAT_WAITMASK | STRAT_APPEARMSG)) | strat;
@@ -394,7 +394,7 @@ tactics(struct monst *mtmp)
     default: /* kill, maim, pillage! */
     {
         long where = (strat & STRAT_STRATMASK);
-        xchar tx = STRAT_GOALX(strat), ty = STRAT_GOALY(strat);
+        coordxy tx = STRAT_GOALX(strat), ty = STRAT_GOALY(strat);
         int targ = (int) (strat & STRAT_GOAL);
         struct obj *otmp;
 

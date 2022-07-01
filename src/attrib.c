@@ -1025,7 +1025,7 @@ newhp(void)
         hp = 1;
     if (u.ulevel < MAXULEV) {
         /* remember increment; future level drain could take it away again */
-        u.uhpinc[u.ulevel] = (xchar) hp;
+        u.uhpinc[u.ulevel] = (xint16) hp;
     } else {
         /* after level 30, throttle hit point gains from extra experience;
            once max reaches 1200, further increments will be just 1 more */

@@ -70,7 +70,7 @@ struct engrave_info {
                            the possible mutations of this */
     char *nextc;        /* next character(s) in text[] to engrave */
     struct obj *stylus; /* object doing the writing */
-    xchar type;         /* type of engraving (DUST, MARK, etc) */
+    xint8 type;         /* type of engraving (DUST, MARK, etc) */
     coord pos;          /* location the engraving is being placed on */
     int actionct;       /* nth turn spent engraving */
 };
@@ -104,7 +104,7 @@ struct tribute_info {
 struct novel_tracking { /* for choosing random passage when reading novel */
     unsigned id;        /* novel oid from previous passage selection */
     int count;          /* number of passage indices available in pasg[] */
-    xchar pasg[30];     /* pasg[0..count-1] are passage indices */
+    xint8 pasg[30];     /* pasg[0..count-1] are passage indices */
     /* tribute file is allowed to have more than 30 passages for a novel;
        if it does, reading will first choose a random subset of 30 of them;
        reading all 30 or switching to a different novel and then back again

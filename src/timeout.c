@@ -899,7 +899,7 @@ hatch_egg(anything *arg, long timeout)
     struct obj *egg;
     struct monst *mon, *mon2;
     coord cc;
-    xchar x, y;
+    coordxy x, y;
     boolean yours, silent, knows_egg = FALSE;
     boolean cansee_hatchspot = FALSE;
     int i, mnum, hatchcount = 0;
@@ -1222,7 +1222,7 @@ burn_object(anything *arg, long timeout)
 {
     struct obj *obj = arg->a_obj;
     boolean canseeit, many, menorah, need_newsym, need_invupdate;
-    xchar x, y;
+    coordxy x, y;
     char whose[BUFSZ];
 
     menorah = obj->otyp == CANDELABRUM_OF_INVOCATION;
@@ -1604,7 +1604,7 @@ begin_burn(struct obj *obj, boolean already_lit)
     }
 
     if (obj->lamplit && !already_lit) {
-        xchar x, y;
+        coordxy x, y;
 
         if (get_obj_location(obj, &x, &y, CONTAINED_TOO | BURIED_TOO))
             new_light_source(x, y, radius, LS_OBJECT, obj_to_any(obj));
@@ -1925,8 +1925,8 @@ timer_sanity_check(void)
             }
         } else if (curr->kind == TIMER_LEVEL) {
             long where = curr->arg.a_long;
-            xchar x = (xchar) ((where >> 16) & 0xFFFF),
-                  y = (xchar) (where & 0xFFFF);
+            coordxy x = (coordxy) ((where >> 16) & 0xFFFF),
+                  y = (coordxy) (where & 0xFFFF);
 
             if (!isok(x, y)) {
                 impossible("timer sanity: spot timer %lu at <%d,%d>",
@@ -2135,7 +2135,7 @@ obj_has_timer(struct obj* object, short timer_type)
  *
  */
 void
-spot_stop_timers(xchar x, xchar y, short func_index)
+spot_stop_timers(coordxy x, coordxy y, short func_index)
 {
     timeout_proc cleanup_func;
     timer_element *curr, *prev, *next_timer = 0;
@@ -2163,7 +2163,7 @@ spot_stop_timers(xchar x, xchar y, short func_index)
  * Returns 0L if no such timer.
  */
 long
-spot_time_expires(xchar x, xchar y, short func_index)
+spot_time_expires(coordxy x, coordxy y, short func_index)
 {
     timer_element *curr;
     long where = (((long) x << 16) | ((long) y));
@@ -2177,7 +2177,7 @@ spot_time_expires(xchar x, xchar y, short func_index)
 }
 
 long
-spot_time_left(xchar x, xchar y, short func_index)
+spot_time_left(coordxy x, coordxy y, short func_index)
 {
     long expires = spot_time_expires(x, y, func_index);
     return (expires > 0L) ? expires - g.moves : 0L;

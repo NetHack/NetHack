@@ -561,14 +561,14 @@ l_obj_bury(lua_State *L)
     int argc = lua_gettop(L);
     boolean dealloced = FALSE;
     struct _lua_obj *lo = l_obj_check(L, 1);
-    xchar x = 0, y = 0;
+    coordxy x = 0, y = 0;
 
     if (argc == 1) {
         x = lo->obj->ox;
         y = lo->obj->oy;
     } else if (argc == 3) {
-        x = (xchar) lua_tointeger(L, 2);
-        y = (xchar) lua_tointeger(L, 3);
+        x = (coordxy) lua_tointeger(L, 2);
+        y = (coordxy) lua_tointeger(L, 3);
     } else
         nhl_error(L, "l_obj_bury: Wrong args");
 

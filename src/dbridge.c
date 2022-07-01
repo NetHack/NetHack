@@ -34,7 +34,7 @@ static boolean e_jumps(struct entity *);
 static void do_entity(struct entity *);
 
 boolean
-is_waterwall(xchar x, xchar y)
+is_waterwall(coordxy x, coordxy y)
 {
     if (isok(x, y) && IS_WATERWALL(levl[x][y].typ))
         return TRUE;

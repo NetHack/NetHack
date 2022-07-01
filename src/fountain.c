@@ -187,7 +187,7 @@ watchman_warn_fountain(struct monst *mtmp)
 }
 
 void
-dryup(xchar x, xchar y, boolean isyou)
+dryup(coordxy x, coordxy y, boolean isyou)
 {
     if (IS_FOUNTAIN(levl[x][y].typ)
         && (!rn2(3) || FOUNTAIN_IS_WARNED(x, y))) {

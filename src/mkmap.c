@@ -433,7 +433,7 @@ mkmap(lev_init* init_lev)
 {
     schar bg_typ = init_lev->bg, fg_typ = init_lev->fg;
     boolean smooth = init_lev->smoothed, join = init_lev->joined;
-    xchar lit = init_lev->lit, walled = init_lev->walled;
+    xint16 lit = init_lev->lit, walled = init_lev->walled;
     int i;
 
     lit = litstate_rnd(lit);

@@ -15,7 +15,7 @@ static struct obj *find_launcher(struct obj *);
 static int gem_accept(struct monst *, struct obj *);
 static void tmiss(struct obj *, struct monst *, boolean);
 static int throw_gold(struct obj *);
-static void check_shop_obj(struct obj *, xchar, xchar, boolean);
+static void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
 static boolean harmless_missile(struct obj *);
 static void breakmsg(struct obj *, boolean);
 static boolean toss_up(struct obj *, boolean);
@@ -864,7 +864,7 @@ hurtle_step(genericptr_t arg, int x, int y)
        if ball is carried we might still need to drag the chain */
     if (Punished) {
         int bc_control;
-        xchar ballx, bally, chainx, chainy;
+        coordxy ballx, bally, chainx, chainy;
         boolean cause_delay;
 
         if (drag_ball(x, y, &bc_control, &ballx, &bally, &chainx,
@@ -1100,7 +1100,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
 }
 
 static void
-check_shop_obj(struct obj *obj, xchar x, xchar y, boolean broken)
+check_shop_obj(struct obj *obj, coordxy x, coordxy y, boolean broken)
 {
     boolean costly_xy;
     struct monst *shkp = shop_keeper(*u.ushops);
@@ -2198,7 +2198,7 @@ gem_accept(register struct monst *mon, register struct obj *obj)
  */
 int
 hero_breaks(struct obj *obj,
-            xchar x, xchar y, /* object location (ox, oy may not be right) */
+            coordxy x, coordxy y, /* object location (ox, oy may not be right) */
             unsigned breakflags)
 {
     /* from_invent: thrown or dropped by player; maybe on shop bill;
@@ -2225,7 +2225,7 @@ hero_breaks(struct obj *obj,
  */
 int
 breaks(struct obj *obj,
-       xchar x, xchar y) /* object location (ox, oy may not be right) */
+       coordxy x, coordxy y) /* object location (ox, oy may not be right) */
 {
     boolean in_view = Blind ? FALSE : cansee(x, y);
 
@@ -2237,7 +2237,7 @@ breaks(struct obj *obj,
 }
 
 void
-release_camera_demon(struct obj *obj, xchar x, xchar y)
+release_camera_demon(struct obj *obj, coordxy x, coordxy y)
 {
     struct monst *mtmp;
     if (!rn2(3)
@@ -2259,7 +2259,7 @@ release_camera_demon(struct obj *obj, xchar x, xchar y)
 void
 breakobj(
     struct obj *obj,
-    xchar x, xchar y,    /* object location (ox, oy may not be right) */
+    coordxy x, coordxy y,    /* object location (ox, oy may not be right) */
     boolean hero_caused, /* is this the hero's fault? */
     boolean from_invent)
 {

@@ -64,7 +64,7 @@ void trace_cliparound(void *,int, int);
 #ifdef POSITIONBAR
 void trace_update_positionbar(void *,char *);
 #endif
-void trace_print_glyph(void *,winid, xchar, xchar,
+void trace_print_glyph(void *,winid, coordxy, coordxy,
 		                            const glyph_info *, const glyph_info *);
 void trace_raw_print(void *,const char *);
 void trace_raw_print_bold(void *,const char *);
@@ -645,8 +645,8 @@ void
 trace_print_glyph(
     void *vp,
     winid window,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo)
 {

@@ -352,7 +352,7 @@ struct cemetery {
     /* date+time in string of digits rather than binary */
     char when[4 + 2 + 2 + 2 + 2 + 2 + 1]; /* "YYYYMMDDhhmmss\0" */
     /* final resting place spot */
-    xchar frpx, frpy;
+    coordxy frpx, frpy;
     boolean bonesknown;
 };
 

@@ -37,7 +37,7 @@ void chainin_cliparound(int, int);
 #ifdef POSITIONBAR
 void chainin_update_positionbar(char *);
 #endif
-void chainin_print_glyph(winid, xchar, xchar,
+void chainin_print_glyph(winid, coordxy, coordxy,
                             const glyph_info *, const glyph_info *);
 void chainin_raw_print(const char *);
 void chainin_raw_print_bold(const char *);
@@ -345,8 +345,8 @@ chainin_update_positionbar(char *posbar)
 void
 chainin_print_glyph(
     winid window,
-    xchar x,
-    xchar y,
+    coordxy x,
+    coordxy y,
     const glyph_info *glyphinfo,
     const glyph_info *bkglyphinfo)
 {

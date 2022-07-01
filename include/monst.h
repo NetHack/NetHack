@@ -96,8 +96,8 @@ struct monst {
     uchar m_lev;          /* adjusted difficulty level of monster */
     aligntyp malign;      /* alignment of this monster, relative to the
                              player (positive = good to kill) */
-    xchar mx, my;
-    xchar mux, muy;       /* where the monster thinks you are */
+    coordxy mx, my;
+    coordxy mux, muy;       /* where the monster thinks you are */
 #define MTSZ 4
     /* mtrack[0..2] is used to keep extra data when migrating the monster */
     coord mtrack[MTSZ];   /* monster track */
@@ -174,8 +174,8 @@ struct monst {
 #define STRAT_XMASK     0x00ff0000L
 #define STRAT_YMASK     0x0000ff00L
 #define STRAT_GOAL      0x000000ffL
-#define STRAT_GOALX(s) ((xchar) ((s & STRAT_XMASK) >> 16))
-#define STRAT_GOALY(s) ((xchar) ((s & STRAT_YMASK) >> 8))
+#define STRAT_GOALX(s) ((coordxy) ((s & STRAT_XMASK) >> 16))
+#define STRAT_GOALY(s) ((coordxy) ((s & STRAT_YMASK) >> 8))
 
     long mtrapseen;        /* bitmap of traps we've been trapped in */
     long mlstmv;           /* for catching up with lost time */
@@ -185,7 +185,7 @@ struct monst {
     struct obj *minvent;   /* mon's inventory */
     struct obj *mw;        /* mon's weapon */
     long misc_worn_check;  /* mon's wornmask */
-    xchar weapon_check;    /* flag for whether to try switching weapons */
+    xint16 weapon_check;   /* flag for whether to try switching weapons */
 
     int meating;           /* monster is eating timeout */
     struct mextra *mextra; /* point to mextra struct */

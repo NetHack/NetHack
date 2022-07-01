@@ -67,7 +67,7 @@ newpw(void)
         en = 1;
     if (u.ulevel < MAXULEV) {
         /* remember increment; future level drain could take it away again */
-        u.ueninc[u.ulevel] = (xchar) en;
+        u.ueninc[u.ulevel] = (xint16) en;
     } else {
         /* after level 30, throttle energy gains from extra experience;
            once max reaches 600, further increments will be just 1 more */

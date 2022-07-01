@@ -298,8 +298,8 @@ safe_cliparound(int x, int y)
 void
 safe_print_glyph(
     winid window UNUSED,
-    xchar x UNUSED,
-    xchar y UNUSED,
+    coordxy x UNUSED,
+    coordxy y UNUSED,
     const glyph_info *glyphinfo UNUSED,
     const glyph_info *bkglyphinfo UNUSED)
 {

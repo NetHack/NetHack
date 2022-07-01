@@ -63,7 +63,7 @@ public:
 
 	static void qt_cliparound(int x, int y);
 	static void qt_cliparound_window(winid wid, int x, int y);
-        static void qt_print_glyph(winid wid, xchar x, xchar y,
+        static void qt_print_glyph(winid wid, coordxy x, coordxy y,
                                    const glyph_info *glyphingo, 
 				   const glyph_info *bkglyphinfo);
 	static void qt_raw_print(const char *str);

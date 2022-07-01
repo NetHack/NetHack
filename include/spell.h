@@ -13,7 +13,7 @@
 
 struct spell {
     short sp_id;  /* spell id (== object.otyp) */
-    xchar sp_lev; /* power level */
+    xint16 sp_lev; /* power level */
     int sp_know;  /* knowlege of spell */
 };
 

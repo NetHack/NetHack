@@ -1702,7 +1702,7 @@ could_seduce(struct monst *magr, struct monst *mdef,
 {
     struct permonst *pagr;
     boolean agrinvis, defperc;
-    xchar genagr, gendef;
+    xint16 genagr, gendef;
     int adtyp;
 
     if (is_animal(magr->data))

@@ -289,7 +289,7 @@ draw_horizontal(boolean border)
           blPAD, blPAD, blPAD, blPAD }
     };
     const enum statusfields (*fieldorder)[15];
-    xchar spacing[MAXBLSTATS], valline[MAXBLSTATS];
+    coordxy spacing[MAXBLSTATS], valline[MAXBLSTATS];
     enum statusfields fld, prev_fld;
     char *text, *p, cbuf[BUFSZ], ebuf[STATVAL_WIDTH];
 #ifdef SCORE_ON_BOTL
@@ -690,7 +690,7 @@ draw_vertical(boolean border)
          BL_STR, BL_SCORE, BL_TIME, BL_LEVELDESC, BL_HP,
          BL_CONDITION, BL_CAP, BL_HUNGER
     };
-    xchar spacing[MAXBLSTATS];
+    coordxy spacing[MAXBLSTATS];
     int i, fld, cap_and_hunger, time_and_score, cond_count, per_line;
     char *text;
 #ifdef STATUS_HILITES

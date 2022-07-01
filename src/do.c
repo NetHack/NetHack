@@ -18,7 +18,7 @@ static int menu_drop(int);
 static NHFILE *currentlevel_rewrite(void);
 static void final_level(void);
 
-/* static boolean badspot(xchar,xchar); */
+/* static boolean badspot(coordxy,coordxy); */
 
 /* the #drop command: drop one inventory item */
 int
@@ -1237,7 +1237,7 @@ save_currentstate(void)
 
 /*
 static boolean
-badspot(register xchar x, register xchar y)
+badspot(register coordxy x, register coordxy y)
 {
     return (boolean) ((levl[x][y].typ != ROOM
                        && levl[x][y].typ != AIR
@@ -1295,7 +1295,7 @@ goto_level(
 {
     int l_idx, save_mode;
     NHFILE *nhfp;
-    xchar new_ledger;
+    xint16 new_ledger;
     boolean cant_go_back, great_effort,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
@@ -1890,7 +1890,7 @@ revive_corpse(struct obj *corpse)
 {
     struct monst *mtmp, *mcarry;
     boolean is_uwep, chewed;
-    xchar where;
+    xint16 where;
     char cname[BUFSZ];
     struct obj *container = (struct obj *) 0;
     int container_where = 0;
@@ -2005,7 +2005,7 @@ revive_mon(anything *arg, long timeout UNUSED)
     struct obj *body = arg->a_obj;
     struct permonst *mptr = &mons[body->corpsenm];
     struct monst *mtmp;
-    xchar x, y;
+    coordxy x, y;
 
     /* corpse will revive somewhere else if there is a monster in the way;
        Riders get a chance to try to bump the obstacle out of their way */

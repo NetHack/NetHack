@@ -29,7 +29,7 @@ static void freefruitchn(struct fruit *);
 static void ghostfruit(struct obj *);
 static boolean restgamestate(NHFILE *, unsigned int *, unsigned int *);
 static void restlevelstate(unsigned int, unsigned int);
-static int restlevelfile(xchar);
+static int restlevelfile(xint8);
 static void rest_bubbles(NHFILE *);
 static void restore_gamelog(NHFILE *);
 static void restore_msghistory(NHFILE *);
@@ -723,7 +723,7 @@ restlevelstate(unsigned int stuckid, unsigned int steedid)
 
 /*ARGSUSED*/
 static int
-restlevelfile(xchar ltmp)
+restlevelfile(xint8 ltmp)
 {
     char whynot[BUFSZ];
     NHFILE *nhfp = (NHFILE *) 0;
@@ -745,14 +745,14 @@ int
 dorecover(NHFILE* nhfp)
 {
     unsigned int stuckid = 0, steedid = 0; /* not a register */
-    xchar ltmp = 0;
+    xint8 ltmp = 0;
     int rtmp;
 
     /* suppress map display if some part of the code tries to update that */
     g.program_state.restoring = 1;
 
     get_plname_from_file(nhfp, g.plname);
-    getlev(nhfp, 0, (xchar) 0);
+    getlev(nhfp, 0, (xint8) 0);
     if (!restgamestate(nhfp, &stuckid, &steedid)) {
         NHFILE tnhfp;
 
@@ -835,7 +835,7 @@ dorecover(NHFILE* nhfp)
     (void) validate(nhfp, (char *) 0);
     get_plname_from_file(nhfp, g.plname);
 
-    getlev(nhfp, 0, (xchar) 0);
+    getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
     restlevelstate(stuckid, steedid);
     g.program_state.something_worth_saving = 1; /* useful data now exists */
@@ -999,14 +999,14 @@ trickery(char *reason)
 }
 
 void
-getlev(NHFILE* nhfp, int pid, xchar lev)
+getlev(NHFILE* nhfp, int pid, xint8 lev)
 {
     register struct trap *trap;
     register struct monst *mtmp;
     long elapsed;
     branch *br;
     int hpid = 0;
-    xchar dlvl = 0;
+    xint8 dlvl = 0;
     int x, y;
     boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 #ifdef TOS
@@ -1233,7 +1233,7 @@ get_plname_from_file(NHFILE* nhfp, char *plbuf)
 static void
 rest_bubbles(NHFILE *nhfp)
 {
-    xchar bbubbly;
+    xint8 bbubbly;
 
     /* whether or not the Plane of Water's air bubbles or Plane of Air's
        clouds are present is recorded during save so that we don't have to

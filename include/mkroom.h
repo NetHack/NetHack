@@ -9,7 +9,7 @@
 /* mkroom.h - types and structures for room and shop initialization */
 
 struct mkroom {
-    xchar lx, hx, ly, hy; /* usually xchar, but hx may be -1 */
+    coordxy lx, hx, ly, hy; /* usually coordxy, but hx may be -1 */
     schar rtype;          /* type of room (zoo, throne, etc...) */
     schar orig_rtype;     /* same as rtype, but not zeroed later */
     schar rlit;           /* is the room lit ? */

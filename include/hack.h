@@ -170,13 +170,13 @@ typedef union str_or_len {
 /* lev_region from sp_lev.h */
 typedef struct {
     struct {
-        xchar x1, y1, x2, y2;
+        coordxy x1, y1, x2, y2;
     } inarea;
     struct {
-        xchar x1, y1, x2, y2;
+        coordxy x1, y1, x2, y2;
     } delarea;
     boolean in_islev, del_islev;
-    xchar rtype, padding;
+    coordxy rtype, padding;
     Str_or_Len rname;
 } lev_region;
 
@@ -251,9 +251,9 @@ struct sortloot_item {
     char *str; /* result of loot_xname(obj) in some cases, otherwise null */
     int indx; /* signed int, because sortloot()'s qsort comparison routine
                  assumes (a->indx - b->indx) might yield a negative result */
-    xchar orderclass; /* order rather than object class; 0 => not yet init'd */
-    xchar subclass; /* subclass for some classes */
-    xchar disco; /* discovery status */
+    xint16 orderclass; /* order rather than object class; 0 => not yet init'd */
+    xint16 subclass; /* subclass for some classes */
+    xint16 disco; /* discovery status */
 };
 typedef struct sortloot_item Loot;
 

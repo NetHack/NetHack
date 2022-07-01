@@ -324,7 +324,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define CHAR_P char
 #define SCHAR_P schar
 #define UCHAR_P uchar
-#define XCHAR_P xchar
+#define XCHAR_P coordxy
 #define SHORT_P short
 #ifndef SKIP_BOOLEAN
 #define BOOLEAN_P boolean

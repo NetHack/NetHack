@@ -10,7 +10,7 @@ static void blackout(int, int);
 static void restfakecorr(struct monst *);
 static void parkguard(struct monst *);
 static boolean in_fcorridor(struct monst *, int, int);
-static boolean find_guard_dest(struct monst *, xchar *, xchar *);
+static boolean find_guard_dest(struct monst *, coordxy *, coordxy *);
 static void move_gold(struct obj *, int);
 static void wallify_vault(struct monst *);
 static void gd_mv_monaway(struct monst *, int, int);
@@ -255,7 +255,7 @@ uleftvault(struct monst *grd)
 }
 
 static boolean
-find_guard_dest(struct monst *guard, xchar *rx, xchar *ry)
+find_guard_dest(struct monst *guard, coordxy *rx, coordxy *ry)
 {
     register int x, y, dd, lx, ly;
 
@@ -309,7 +309,7 @@ invault(void)
         /* if time ok and no guard now. */
         char buf[BUFSZ];
         int x, y, gx, gy, typ;
-        xchar rx, ry;
+        coordxy rx, ry;
         long umoney;
 
         /* first find the goal for the guard */
@@ -535,8 +535,8 @@ invault(void)
                dug into an empty doorway (which could subsequently have
                been plugged with an intact door by use of locking magic) */
             int vlt = EGD(guard)->vroom;
-            xchar lowx = g.rooms[vlt].lx, hix = g.rooms[vlt].hx;
-            xchar lowy = g.rooms[vlt].ly, hiy = g.rooms[vlt].hy;
+            coordxy lowx = g.rooms[vlt].lx, hix = g.rooms[vlt].hx;
+            coordxy lowy = g.rooms[vlt].ly, hiy = g.rooms[vlt].hy;
 
             if (x == lowx - 1 && y == lowy - 1)
                 typ = TLCORNER;
@@ -571,7 +571,7 @@ invault(void)
 static void
 move_gold(struct obj *gold, int vroom)
 {
-    xchar nx, ny;
+    coordxy nx, ny;
 
     remove_object(gold);
     newsym(gold->ox, gold->oy);
@@ -588,7 +588,7 @@ wallify_vault(struct monst *grd)
     int x, y, typ;
     int vlt = EGD(grd)->vroom;
     char tmp_viz;
-    xchar lox = g.rooms[vlt].lx - 1, hix = g.rooms[vlt].hx + 1,
+    coordxy lox = g.rooms[vlt].lx - 1, hix = g.rooms[vlt].hx + 1,
           loy = g.rooms[vlt].ly - 1, hiy = g.rooms[vlt].hy + 1;
     struct monst *mon;
     struct obj *gold, *rocks;
@@ -701,7 +701,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
         gdelta = distu(guardx, guardy);
         if (gdelta > 2 && see_it) { /* skip if player won't see it */
             bestdelta = gdelta;
-            bestcc.x = (xchar) guardx, bestcc.y = (xchar) guardy;
+            bestcc.x = (coordxy) guardx, bestcc.y = (coordxy) guardy;
             tryct = 9;
             do {
                 /* pick an available spot nearest the hero and also try

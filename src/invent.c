@@ -86,7 +86,7 @@ loot_classify(Loot *sort_item, struct obj *obj)
         k = 1 + (int) (p - classorder);
     else
         k = 1 + (int) strlen(classorder) + (oclass != VENOM_CLASS);
-    sort_item->orderclass = (xchar) k;
+    sort_item->orderclass = (coordxy) k;
     /* subclass designation; only a few classes have subclasses
        and the non-armor ones we use are fairly arbitrary */
     switch (oclass) {
@@ -202,13 +202,13 @@ loot_classify(Loot *sort_item, struct obj *obj)
         k = 1; /* any non-zero would do */
         break;
     }
-    sort_item->subclass = (xchar) k;
+    sort_item->subclass = (coordxy) k;
     /* discovery status */
     k = !seen ? 1 /* unseen */
         : (discovered || !OBJ_DESCR(objects[otyp])) ? 4
           : (objects[otyp].oc_uname) ? 3 /* named (partially discovered) */
             : 2; /* undiscovered */
-    sort_item->disco = (xchar) k;
+    sort_item->disco = (coordxy) k;
 }
 
 /* sortloot() formatting routine; for alphabetizing, not shown to user */
@@ -2283,7 +2283,7 @@ fully_identify_obj(struct obj *otmp)
 {
     makeknown(otmp->otyp);
     if (otmp->oartifact)
-        discover_artifact((xchar) otmp->oartifact);
+        discover_artifact((coordxy) otmp->oartifact);
     otmp->known = otmp->dknown = otmp->bknown = otmp->rknown = 1;
     set_cknown_lknown(otmp); /* set otmp->{cknown,lknown} if applicable */
     if (otmp->otyp == EGG && otmp->corpsenm != NON_PM)
@@ -3634,7 +3634,7 @@ count_contents(struct obj *container,
     long count = 0L;
 
     if (!everything && !newdrop) {
-        xchar x, y;
+        coordxy x, y;
 
         for (topc = container; topc->where == OBJ_CONTAINED;
              topc = topc->ocontainer)

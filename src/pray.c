@@ -2268,7 +2268,7 @@ a_gname(void)
 
 /* returns the name of an altar's deity */
 const char *
-a_gname_at(xchar x, xchar y)
+a_gname_at(coordxy x, coordxy y)
 {
     if (!IS_ALTAR(levl[x][y].typ))
         return (char *) 0;

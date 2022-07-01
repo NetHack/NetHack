@@ -249,7 +249,7 @@ ceiling(int x, int y)
 }
 
 struct engr *
-engr_at(xchar x, xchar y)
+engr_at(coordxy x, coordxy y)
 {
     register struct engr *ep = head_engr;
 
@@ -269,7 +269,7 @@ engr_at(xchar x, xchar y)
  * present if it is intact and is the entire content of the engraving.
  */
 boolean
-sengr_at(const char *s, xchar x, xchar y, boolean strict)
+sengr_at(const char *s, coordxy x, coordxy y, boolean strict)
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -288,7 +288,7 @@ u_wipe_engr(int cnt)
 }
 
 void
-wipe_engr_at(xchar x, xchar y, xchar cnt, boolean magical)
+wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
 {
     register struct engr *ep = engr_at(x, y);
 
@@ -384,7 +384,7 @@ read_engr_at(int x, int y)
 }
 
 void
-make_engr_at(int x, int y, const char *s, long e_time, xchar e_type)
+make_engr_at(int x, int y, const char *s, long e_time, xint16 e_type)
 {
     struct engr *ep;
     unsigned smem = Strlen(s) + 1;
@@ -524,8 +524,8 @@ doengrave(void)
     boolean ptext = TRUE;     /* TRUE if we must prompt for engrave text */
     boolean teleengr = FALSE; /* TRUE if we move the old engraving */
     boolean zapwand = FALSE;  /* TRUE if we remove a wand charge */
-    xchar type = DUST;        /* Type of engraving made */
-    xchar oetype = 0;         /* will be set to type of current engraving */
+    xint16 type = DUST;       /* Type of engraving made */
+    xint16 oetype = 0;        /* will be set to type of current engraving */
     char buf[BUFSZ];          /* Buffer for final/poly engraving text */
     char ebuf[BUFSZ];         /* Buffer for initial engraving text */
     char fbuf[BUFSZ];         /* Buffer for "your fingers" */
@@ -703,7 +703,7 @@ doengrave(void)
             case WAN_POLYMORPH:
                 if (oep) {
                     if (!Blind) {
-                        type = (xchar) 0; /* random */
+                        type = (xint16) 0; /* random */
                         (void) random_engraving(buf);
                     } else {
                         /* keep the same type so that feels don't

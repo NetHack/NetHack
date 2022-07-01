@@ -301,7 +301,7 @@ distant_name(
     char *(*func)(OBJ_P)) /* formatting routine (usually xname or doname) */
 {
     char *str;
-    xchar ox = 0, oy = 0;
+    coordxy ox = 0, oy = 0;
         /*
          * (r * r): square of the x or y distance;
          * (r * r) * 2: sum of squares of both x and y distances

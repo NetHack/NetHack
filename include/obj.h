@@ -36,7 +36,7 @@ struct obj {
 
     struct obj *cobj; /* contents list for containers */
     unsigned o_id;
-    xchar ox, oy;
+    coordxy ox, oy;
     short otyp; /* object class number */
     unsigned owt;
     long quan; /* number of items */
@@ -66,7 +66,7 @@ struct obj {
     char invlet;    /* designation in inventory */
     char oartifact; /* artifact array index */
 
-    xchar where;        /* where the object thinks it is */
+    xint8 where;        /* where the object thinks it is */
 #define OBJ_FREE 0      /* object not attached to anything */
 #define OBJ_FLOOR 1     /* object on floor */
 #define OBJ_CONTAINED 2 /* object in a container */
@@ -77,7 +77,7 @@ struct obj {
 #define OBJ_ONBILL 7    /* object on shk bill */
 #define OBJ_LUAFREE 8   /* object has been dealloc'd, but is ref'd by lua */
 #define NOBJ_STATES 9
-    xchar timed; /* # of fuses (timers) attached to this obj */
+    xint16 timed; /* # of fuses (timers) attached to this obj */
 
     Bitfield(cursed, 1);
     Bitfield(blessed, 1);
@@ -140,8 +140,8 @@ struct obj {
                             * overloaded for the destination of migrating
                             * objects (which can't be worn at same time) */
     unsigned lua_ref_cnt;  /* # of lua script references for this object */
-    xchar omigr_from_dnum; /* where obj is migrating from */
-    xchar omigr_from_dlevel; /* where obj is migrating from */
+    xint16 omigr_from_dnum; /* where obj is migrating from */
+    xint16 omigr_from_dlevel; /* where obj is migrating from */
     struct oextra *oextra; /* pointer to oextra struct */
 };
 
