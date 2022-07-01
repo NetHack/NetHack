@@ -1223,7 +1223,6 @@ freedynamicdata(void)
 #endif
     discard_gamelog();
     release_runtime_info(); /* build-time options and version stuff */
-    regex_at_exit();
 #endif /* FREE_ALL_MEMORY */
 
     if (VIA_WINDOWPORT())
