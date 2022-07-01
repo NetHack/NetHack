@@ -65,9 +65,3 @@ regex_free(struct nhregex *re)
         free((genericptr_t) re);
     }
 }
-
-void
-regex_at_exit(void)
-{
-}
-

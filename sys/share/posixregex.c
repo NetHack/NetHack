@@ -104,9 +104,3 @@ regex_free(struct nhregex *re)
     regfree(&re->re);
     free(re);
 }
-
-void
-regex_at_exit(void)
-{
-}
-
