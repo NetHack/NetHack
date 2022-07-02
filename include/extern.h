@@ -2557,7 +2557,7 @@ extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
 extern void selection_floodfill(struct selectionvar *, coordxy, coordxy, boolean);
 extern boolean pm_good_location(coordxy, coordxy, struct permonst *);
 extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *, long);
-extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, coordxy);
+extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
 extern struct selectionvar * selection_not(struct selectionvar *);
 extern void selection_filter_percent(struct selectionvar *, int);
 extern int selection_rndcoord(struct selectionvar *, coordxy *, coordxy *,
@@ -2568,7 +2568,7 @@ extern void selection_do_line(coordxy, coordxy, coordxy, coordxy,
 extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy, schar, schar,
                                   struct selectionvar *);
 extern struct selectionvar *selection_filter_mapchar(struct selectionvar *,
-                                                     coordxy, int);
+                                                     xint16, int);
 extern void set_floodfillchk_match_under(coordxy);
 extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
                                  int);

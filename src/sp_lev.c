@@ -4345,7 +4345,7 @@ selection_getpoint(coordxy x, coordxy y, struct selectionvar* sel)
 }
 
 void
-selection_setpoint(coordxy x, coordxy y, struct selectionvar* sel, coordxy c)
+selection_setpoint(coordxy x, coordxy y, struct selectionvar* sel, int c)
 {
     if (!sel || !sel->map)
         return;
@@ -4369,7 +4369,7 @@ selection_not(struct selectionvar* s)
 }
 
 struct selectionvar *
-selection_filter_mapchar(struct selectionvar* ov,  coordxy typ, int lit)
+selection_filter_mapchar(struct selectionvar* ov,  xint16 typ, int lit)
 {
     int x, y;
     struct selectionvar *ret;
