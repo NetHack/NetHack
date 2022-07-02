@@ -1282,6 +1282,7 @@ save files created with SCORE_ON_BOTL disabled were erroneously being rejected
 	if the program was rebuilt with it enabled and vice versa
 avoid "It suddenly appears!" if a monster with the STRAT_APPEARMSG attribute
 	is seen to teleport away then not seen at its destination
+avoid boulder-on/in-water sanity_check warnings on the Plane of Water
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
