@@ -24,9 +24,8 @@ static void end_engulf(void);
 static int gulpum(struct monst *, struct attack *);
 static boolean hmonas(struct monst *);
 static void nohandglow(struct monst *);
-static boolean mhurtle_to_doom(struct monst *, int, struct permonst **,
-                               boolean);
-static void first_weapon_hit(void);
+static boolean mhurtle_to_doom(struct monst *, int, struct permonst **);
+static void first_weapon_hit(struct obj *);
 static boolean shade_aware(struct obj *);
 
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
@@ -765,7 +764,7 @@ hmon_hitmon(
      * More complications:  first_weapon_hit() should be called before
      * xkilled() in order to have the gamelog messages in the right order.
      * So it can't be deferred until end of known_hitum() as was originally
-     * done.  We might call it directly or indirectly via mhurtle_to_doom().
+     * done.
      */
     boolean hittxt = FALSE, destroyed = FALSE, already_killed = FALSE;
     boolean get_dmg_bonus = TRUE;
@@ -1312,6 +1311,17 @@ hmon_hitmon(
     if (jousting) {
         tmp += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
         You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
+        /* if this hit is breaking the never-hit-with-wielded-weapon conduct
+           (handled by caller...) we need to log the message about
+           that before mon is possibly killed in mhurtle_to_doom();
+           without this, the log entry sequence
+           N : killed for the first time
+           N : hit with a wielded weapon for the first time
+           reported on the same turn (N) looks "suboptimal";
+           u.uconduct.weaphit has already been incremented => 1 is first hit */
+        if (obj && u.uconduct.weaphit <= 1)
+            first_weapon_hit(obj);
+
         if (jousting < 0) {
             pline("%s shatters on impact!", Yname2(obj));
             /* (must be either primary or secondary weapon to get here) */
@@ -1323,7 +1333,7 @@ hmon_hitmon(
             useup(obj);
             obj = (struct obj *) 0;
         }
-        if (mhurtle_to_doom(mon, tmp, &mdat, TRUE))
+        if (mhurtle_to_doom(mon, tmp, &mdat))
             already_killed = TRUE;
         hittxt = TRUE;
     } else if (unarmed && tmp > 1 && !thrown && !obj && !Upolyd) {
@@ -1333,7 +1343,7 @@ hmon_hitmon(
             if (canspotmon(mon))
                 pline("%s %s from your powerful strike!", Monnam(mon),
                       makeplural(stagger(mon->data, "stagger")));
-            if (mhurtle_to_doom(mon, tmp, &mdat, FALSE))
+            if (mhurtle_to_doom(mon, tmp, &mdat))
                 already_killed = TRUE;
             hittxt = TRUE;
         }
@@ -1344,10 +1354,12 @@ hmon_hitmon(
             /* known_hitum 'what counts as a weapon' criteria */
             && (obj->oclass == WEAPON_CLASS || is_weptool(obj))
             && (thrown == HMON_MELEE || thrown == HMON_APPLIED)
+            /* if jousting, the hit was already logged */
+            && !jousting
             /* note: caller has already incremented u.uconduct.weaphit
                so we test for 1; 0 shouldn't be able to happen here... */
             && tmp > 0 && u.uconduct.weaphit <= 1)
-            first_weapon_hit();
+            first_weapon_hit(obj);
         mon->mhp -= tmp;
     }
     /* adjustments might have made tmp become less than what
@@ -1511,19 +1523,8 @@ static boolean
 mhurtle_to_doom(
     struct monst *mon,         /* target monster */
     int tmp,                   /* amount of pending damage */
-    struct permonst **mptr,    /* caller's cached copy of mon->data */
-    boolean by_wielded_weapon) /* True: violating a potential conduct */
+    struct permonst **mptr)    /* caller's cached copy of mon->data */
 {
-    /* if this hit is breaking the never-hit-with-wielded-weapon conduct
-       (handled by caller's caller...) we need to log the message about
-       that before mon is killed; without this, the log entry sequence
-        N : killed for the first time
-        N : hit with a wielded weapon for the first time
-       reported on the same turn (N) looks "suboptimal";
-       u.uconduct.weaphit has already been incremented => 1 is first hit */
-    if (by_wielded_weapon && u.uconduct.weaphit <= 1)
-        first_weapon_hit();
-
     /* only hurtle if pending physical damage (tmp) isn't going to kill mon */
     if (tmp < mon->mhp) {
         mhurtle(mon, u.dx, u.dy, 1);
@@ -1540,9 +1541,11 @@ mhurtle_to_doom(
 /* gamelog version of "you've broken never-hit-with-wielded-weapon conduct;
    the conduct is tracked in known_hitum(); we're called by hmon_hitmon() */
 static void
-first_weapon_hit(void)
+first_weapon_hit(struct obj *weapon)
 {
-    livelog_printf(LL_CONDUCT, "hit with a wielded weapon for the first time");
+    livelog_printf(LL_CONDUCT,
+                   "hit with a wielded weapon (%s) for the first time",
+                   xname(weapon));
 }
 
 static boolean
