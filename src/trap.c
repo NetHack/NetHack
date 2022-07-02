@@ -2243,8 +2243,11 @@ trapeffect_landmine(
         struct permonst *mptr = mtmp->data;
         coordxy tx = trap->tx, ty = trap->ty;
 
-        if (rn2(3))
-            return Trap_Effect_Finished; /* monsters usually don't set it off */
+        /* heavier monsters are more likely to set off a land mine; on the
+           other hand, any mon lighter than the trigger weight is immune. */
+#define MINE_TRIGGER_WT (WT_ELF / 2)
+        if (rn2(mtmp->data->cwt + 1) < MINE_TRIGGER_WT)
+            return Trap_Effect_Finished;
         if (is_flyer(mptr)) {
             boolean already_seen = trap->tseen;
 
@@ -2293,6 +2296,7 @@ trapeffect_landmine(
     }
     return Trap_Effect_Finished;
 }
+#undef MINE_TRIGGER_WT
 
 static int
 trapeffect_rolling_boulder_trap(
