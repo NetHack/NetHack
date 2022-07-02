@@ -947,6 +947,7 @@ dropping things with 'D' wouldn't merge them with compatible items already at
 a hero on the quest home level who runs or travels past the quest leader and
 	gets tossed out of the quest for some reason would keep running on the
 	far side of the quest portal
+allow rush/run over water if wearing discovered water walking boots
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
