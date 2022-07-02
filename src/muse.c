@@ -20,7 +20,7 @@ static void mplayhorn(struct monst *, struct obj *, boolean);
 static void mreadmsg(struct monst *, struct obj *);
 static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
-static boolean linedup_chk_corpse(int, int);
+static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
 static int mbhitm(struct monst *, struct obj *);
 static void mbhit(struct monst *, int, int (*)(MONST_P, OBJ_P),
@@ -327,7 +327,8 @@ find_defensive(struct monst* mtmp)
 {
     struct obj *obj;
     struct trap *t;
-    int fraction, x = mtmp->mx, y = mtmp->my;
+    int fraction;
+    coordxy x = mtmp->mx, y = mtmp->my;
     boolean stuck = (mtmp == u.ustuck),
             immobile = (mtmp->data->mmove == 0);
     stairway *stway;
@@ -459,7 +460,7 @@ find_defensive(struct monst* mtmp)
         }
     } else {
         /* Note: trap doors take precedence over teleport traps. */
-        int xx, yy, i, locs[10][2];
+        coordxy xx, yy, i, locs[10][2];
         boolean ignore_boulders = (verysmall(mtmp->data)
                                    || throws_rocks(mtmp->data)
                                    || passes_walls(mtmp->data)),
@@ -514,7 +515,7 @@ find_defensive(struct monst* mtmp)
         goto botm;
 
     if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE)) != 0) {
-        int xx, yy;
+        coordxy xx, yy;
         struct monst *mon;
 
         /* Distance is arbitrary.  What we really want to do is
@@ -1129,7 +1130,7 @@ rnd_defensive_item(struct monst* mtmp)
                                      * redefine; nonconsecutive value is ok */
 
 static boolean
-linedup_chk_corpse(int x, int y)
+linedup_chk_corpse(coordxy x, coordxy y)
 {
     return (sobj_at(CORPSE, x, y) != 0);
 }
@@ -1137,9 +1138,9 @@ linedup_chk_corpse(int x, int y)
 static void
 m_use_undead_turning(struct monst* mtmp, struct obj* obj)
 {
-    int ax = u.ux + sgn(mtmp->mux - mtmp->mx) * 3,
-        ay = u.uy + sgn(mtmp->muy - mtmp->my) * 3;
-    int bx = mtmp->mx, by = mtmp->my;
+    coordxy ax = u.ux + sgn(mtmp->mux - mtmp->mx) * 3,
+            ay = u.uy + sgn(mtmp->muy - mtmp->my) * 3;
+    coordxy bx = mtmp->mx, by = mtmp->my;
 
     if (!(obj->otyp == WAN_UNDEAD_TURNING && obj->spe > 0))
         return;
@@ -1468,7 +1469,7 @@ mbhit(
     ddy = sgn(mon->muy - mon->my);
 
     while (range-- > 0) {
-        int x, y;
+        coordxy x, y;
 
         g.bhitpos.x += ddx;
         g.bhitpos.y += ddy;
@@ -1589,7 +1590,7 @@ use_offensive(struct monst* mtmp)
         return 2;
     case MUSE_SCR_EARTH: {
         /* TODO: handle steeds */
-        register int x, y;
+        coordxy x, y;
         /* don't use monster fields after killing it */
         boolean confused = (mtmp->mconf ? TRUE : FALSE);
         int mmx = mtmp->mx, mmy = mtmp->my;
@@ -1774,9 +1775,10 @@ find_misc(struct monst* mtmp)
 {
     register struct obj *obj;
     struct permonst *mdat = mtmp->data;
-    int x = mtmp->mx, y = mtmp->my;
+    coordxy x = mtmp->mx, y = mtmp->my;
     struct trap *t;
-    int xx, yy, pmidx = NON_PM;
+    coordxy xx, yy;
+    int pmidx = NON_PM;
     boolean immobile = (mdat->mmove == 0);
     boolean stuck = (mtmp == u.ustuck);
 
@@ -2704,7 +2706,7 @@ munslime(struct monst* mon, boolean by_you)
 
         if (((t = t_at(mon->mx, mon->my)) == 0 || t->ttyp != FIRE_TRAP)
             && mptr->mmove && !mon->mtrapped) {
-            int xy[2][8], x, y, idx, ridx, nxy = 0;
+            coordxy xy[2][8], x, y, idx, ridx, nxy = 0;
 
             for (x = mon->mx - 1; x <= mon->mx + 1; ++x)
                 for (y = mon->my - 1; y <= mon->my + 1; ++y)

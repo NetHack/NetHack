@@ -744,7 +744,8 @@ in_your_sanctuary(
 void
 ghod_hitsu(struct monst *priest)
 {
-    int x, y, ax, ay, roomno = (int) temple_occupied(u.urooms);
+    coordxy x, y, ax, ay;
+    int roomno = (int) temple_occupied(u.urooms);
     struct mkroom *troom;
 
     if (!roomno || !has_shrine(priest))

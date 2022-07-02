@@ -1112,7 +1112,7 @@ tgetch()
 }
 
 int
-console_poskey(int *x, int *y, int *mod)
+console_poskey(coordxy *x, coordxy *y, int *mod)
 {
     int ch;
     coord cc = { 0, 0 };

@@ -177,7 +177,7 @@ can_reach_floor(boolean check_pit)
 
 /* give a message after caller has determined that hero can't reach */
 void
-cant_reach_floor(int x, int y, boolean up, boolean check_pit)
+cant_reach_floor(coordxy x, coordxy y, boolean up, boolean check_pit)
 {
     You("can't reach the %s.",
         up ? ceiling(x, y)
@@ -187,7 +187,7 @@ cant_reach_floor(int x, int y, boolean up, boolean check_pit)
 }
 
 const char *
-surface(int x, int y)
+surface(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
 
@@ -218,7 +218,7 @@ surface(int x, int y)
 }
 
 const char *
-ceiling(int x, int y)
+ceiling(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
     const char *what;
@@ -310,7 +310,7 @@ wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
 }
 
 void
-read_engr_at(int x, int y)
+read_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
     int sensed = 0;
@@ -384,7 +384,7 @@ read_engr_at(int x, int y)
 }
 
 void
-make_engr_at(int x, int y, const char *s, long e_time, xint16 e_type)
+make_engr_at(coordxy x, coordxy y, const char *s, long e_time, xint16 e_type)
 {
     struct engr *ep;
     unsigned smem = Strlen(s) + 1;
@@ -409,7 +409,7 @@ make_engr_at(int x, int y, const char *s, long e_time, xint16 e_type)
 
 /* delete any engraving at location <x,y> */
 void
-del_engr_at(int x, int y)
+del_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
 
@@ -1437,7 +1437,7 @@ rloc_engr(struct engr *ep)
  * The caller is responsible for newsym(x, y).
  */
 void
-make_grave(int x, int y, const char *str)
+make_grave(coordxy x, coordxy y, const char *str)
 {
     char buf[BUFSZ];
 

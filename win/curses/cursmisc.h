@@ -30,7 +30,7 @@ int curses_convert_attr(int attr);
 int curses_read_attrs(const char *attrs);
 char *curses_fmt_attrs(char *);
 int curses_convert_keys(int key);
-int curses_get_mouse(int *mousex, int *mousey, int *mod);
+int curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod);
 void curses_mouse_support(int);
 
 #endif /* CURSMISC_H */

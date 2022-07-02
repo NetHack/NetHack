@@ -168,7 +168,7 @@ free_omailcmd(struct obj *otmp)
 }
 
 struct obj *
-mkobj_at(char let, int x, int y, boolean artif)
+mkobj_at(char let, coordxy x, coordxy y, boolean artif)
 {
     struct obj *otmp;
 
@@ -178,7 +178,7 @@ mkobj_at(char let, int x, int y, boolean artif)
 }
 
 struct obj *
-mksobj_at(int otyp, int x, int y, boolean init, boolean artif)
+mksobj_at(int otyp, coordxy x, coordxy y, boolean init, boolean artif)
 {
     struct obj *otmp;
 
@@ -1815,14 +1815,14 @@ static const int treefruits[] = {
 
 /* called when a tree is kicked; never returns Null */
 struct obj *
-rnd_treefruit_at(int x, int y)
+rnd_treefruit_at(coordxy x, coordxy y)
 {
     return mksobj_at(treefruits[rn2(SIZE(treefruits))], x, y, TRUE, FALSE);
 }
 
 /* create a stack of N gold pieces; never returns Null */
 struct obj *
-mkgold(long amount, int x, int y)
+mkgold(long amount, coordxy x, coordxy y)
 {
     struct obj *gold = g_at(x, y);
 
@@ -1862,7 +1862,7 @@ mkcorpstat(
     int objtype,          /* CORPSE or STATUE */
     struct monst *mtmp,   /* dead monster, might be Null */
     struct permonst *ptr, /* if non-Null, overrides mtmp->mndx */
-    int x, int y,         /* where to place corpse; <0,0> => random */
+    coordxy x, coordxy y,         /* where to place corpse; <0,0> => random */
     unsigned corpstatflags)
 {
     struct obj *otmp;
@@ -2018,7 +2018,7 @@ get_mtraits(struct obj *obj, boolean copyof)
 struct obj *
 mk_tt_object(
     int objtype, /* CORPSE or STATUE */
-    int x, int y)
+    coordxy x, coordxy y)
 {
     struct obj *otmp;
     boolean initialize_it;
@@ -2045,7 +2045,7 @@ struct obj *
 mk_named_object(
     int objtype, /* CORPSE or STATUE */
     struct permonst *ptr,
-    int x, int y,
+    coordxy x, coordxy y,
     const char *nm)
 {
     struct obj *otmp;
@@ -2093,7 +2093,7 @@ is_rottable(struct obj *otmp)
 
 /* put the object at the given location */
 void
-place_object(struct obj *otmp, int x, int y)
+place_object(struct obj *otmp, coordxy x, coordxy y)
 {
     register struct obj *otmp2;
 
@@ -2153,7 +2153,7 @@ place_object(struct obj *otmp, int x, int y)
  * Also used for starting ice effects too. [zap.c]
  */
 void
-obj_ice_effects(int x, int y, boolean do_buried)
+obj_ice_effects(coordxy x, coordxy y, boolean do_buried)
 {
     struct obj *otmp;
 
@@ -2621,7 +2621,7 @@ static const char NEARDATA /* pline formats for insane_object() */
 void
 obj_sanity_check(void)
 {
-    int x, y;
+    coordxy x, y;
     struct obj *obj, *otop, *prevo;
 
     objlist_sanity(fobj, OBJ_FLOOR, "floor sanity");
@@ -3185,7 +3185,7 @@ obj_nexto(struct obj *otmp)
  * reliably predict which one we want to 'find' first
  */
 struct obj *
-obj_nexto_xy(struct obj *obj, int x, int y, boolean recurs)
+obj_nexto_xy(struct obj *obj, coordxy x, coordxy y, boolean recurs)
 {
     struct obj *otmp;
     int fx, fy, ex, ey, otyp = obj->otyp;

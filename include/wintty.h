@@ -254,7 +254,7 @@ E void tty_print_glyph(winid, coordxy, coordxy, const glyph_info *,
 E void tty_raw_print(const char *);
 E void tty_raw_print_bold(const char *);
 E int tty_nhgetch(void);
-E int tty_nh_poskey(int *, int *, int *);
+E int tty_nh_poskey(coordxy *, coordxy *, int *);
 E void tty_nhbell(void);
 E int tty_doprev_message(void);
 E char tty_yn_function(const char *, const char *, char);

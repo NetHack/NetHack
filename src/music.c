@@ -221,7 +221,7 @@ static void
 do_earthquake(int force)
 {
     static const char into_a_chasm[] = " into a chasm";
-    register int x, y;
+    register coordxy x, y;
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *chasm, *trap_at_u = t_at(u.ux, u.uy);
@@ -689,7 +689,7 @@ do_play_instrument(struct obj* instr)
 {
     char buf[BUFSZ] = DUMMY, c = 'y';
     char *s;
-    int x, y;
+    coordxy x, y;
     boolean ok;
 
     if (Underwater) {

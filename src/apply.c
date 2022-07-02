@@ -7,7 +7,7 @@
 
 static int use_camera(struct obj *);
 static int use_towel(struct obj *);
-static boolean its_dead(int, int, int *);
+static boolean its_dead(coordxy, coordxy, int *);
 static int use_stethoscope(struct obj *);
 static void use_whistle(struct obj *);
 static void use_magic_whistle(struct obj *);
@@ -39,10 +39,10 @@ static int do_break_wand(struct obj *);
 static int apply_ok(struct obj *);
 static int flip_through_book(struct obj *);
 static boolean figurine_location_checks(struct obj *, coord *, boolean);
-static boolean check_jump(genericptr_t, int, int);
-static boolean is_valid_jump_pos(int, int, int, boolean);
-static boolean get_valid_jump_position(int, int);
-static boolean get_valid_polearm_position(int, int);
+static boolean check_jump(genericptr_t, coordxy, coordxy);
+static boolean is_valid_jump_pos(coordxy, coordxy, int, boolean);
+static boolean get_valid_jump_position(coordxy, coordxy);
+static boolean get_valid_polearm_position(coordxy, coordxy);
 static boolean find_poleable_mon(coord *, int, int);
 
 static const char no_elbow_room[] =
@@ -177,7 +177,7 @@ use_towel(struct obj *obj)
 
 /* maybe give a stethoscope message based on floor objects */
 static boolean
-its_dead(int rx, int ry, int *resp)
+its_dead(coordxy rx, coordxy ry, int *resp)
 {
     char buf[BUFSZ];
     boolean more_corpses;
@@ -302,7 +302,8 @@ use_stethoscope(struct obj *obj)
 {
     struct monst *mtmp;
     struct rm *lev;
-    int rx, ry, res;
+    int res;
+    coordxy rx, ry;
     boolean interference = (u.uswallow && is_whirly(u.ustuck->data)
                             && !rn2(Role_if(PM_HEALER) ? 10 : 3));
 
@@ -1769,7 +1770,7 @@ enum jump_trajectory {
 
 /* callback routine for walk_path() */
 static boolean
-check_jump(genericptr arg, int x, int y)
+check_jump(genericptr arg, coordxy x, coordxy y)
 {
     int traj = *(int *) arg;
     struct rm *lev = &levl[x][y];
@@ -1800,7 +1801,7 @@ check_jump(genericptr arg, int x, int y)
 }
 
 static boolean
-is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
+is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
 {
     if (!magic && !(HJumping & ~INTRINSIC) && !EJumping && distu(x, y) != 5) {
         /* The Knight jumping restriction still applies when riding a
@@ -1828,9 +1829,9 @@ is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
            passage through doorways: horizonal, vertical, or diagonal;
            since knight's jump and other irregular directions are
            possible, we flatten those out to simplify door checks */
-        int diag, traj,
-            dx = x - u.ux, dy = y - u.uy,
-            ax = abs(dx), ay = abs(dy);
+        int diag, traj;
+        coordxy dx = x - u.ux, dy = y - u.uy,
+                ax = abs(dx), ay = abs(dy);
 
         /* diag: any non-orthogonal destination classifed as diagonal */
         diag = (magic || Passes_walls || (!dx && !dy)) ? jAny
@@ -1866,7 +1867,7 @@ is_valid_jump_pos(int x, int y, int magic, boolean showmsg)
 }
 
 static boolean
-get_valid_jump_position(int x, int y)
+get_valid_jump_position(coordxy x, coordxy y)
 {
     return (isok(x, y)
             && (ACCESSIBLE(levl[x][y].typ) || Passes_walls)
@@ -1879,12 +1880,12 @@ display_jump_positions(int state)
     if (state == 0) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
-        int x, y, dx, dy;
+        coordxy x, y, dx, dy;
 
         for (dx = -4; dx <= 4; dx++)
             for (dy = -4; dy <= 4; dy++) {
-                x = dx + (int) u.ux;
-                y = dy + (int) u.uy;
+                x = dx + (coordxy) u.ux;
+                y = dy + (coordxy) u.uy;
                 if (get_valid_jump_position(x, y))
                     tmp_at(x, y);
             }
@@ -3143,7 +3144,8 @@ find_poleable_mon(coord *pos, int min_range, int max_range)
     struct monst *mtmp;
     coord mpos;
     boolean impaired;
-    int x, y, lo_x, hi_x, lo_y, hi_y, rt, glyph;
+    coordxy x, y, lo_x, hi_x, lo_y, hi_y, rt;
+    int glyph;
 
     impaired = (Confusion || Stunned || Hallucination);
     mpos.x = mpos.y = 0; /* no candidate location yet */
@@ -3176,7 +3178,7 @@ find_poleable_mon(coord *pos, int min_range, int max_range)
 }
 
 static boolean
-get_valid_polearm_position(int x, int y)
+get_valid_polearm_position(coordxy x, coordxy y)
 {
     int glyph;
 
@@ -3194,7 +3196,7 @@ display_polearm_positions(int state)
     if (state == 0) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
-        int x, y, dx, dy;
+        coordxy x, y, dx, dy;
 
         for (dx = -4; dx <= 4; dx++)
             for (dy = -4; dy <= 4; dy++) {
@@ -3622,7 +3624,8 @@ static int
 do_break_wand(struct obj *obj)
 {
     static const char nothing_else_happens[] = "But nothing else happens...";
-    register int i, x, y;
+    register int i;
+    coordxy x, y;
     register struct monst *mon;
     int dmg, damage;
     boolean affects_objects;

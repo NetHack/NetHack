@@ -13,15 +13,15 @@
 #define LEFT 4
 #define RIGHT 8
 
-static void roguejoin(int, int, int, int, int);
-static void roguecorr(int, int, int);
-static void miniwalk(int, int);
+static void roguejoin(coordxy, coordxy, coordxy, coordxy, int);
+static void roguecorr(coordxy, coordxy, int);
+static void miniwalk(coordxy, coordxy);
 
 static
 void
-roguejoin(int x1, int y1, int x2, int y2, int horiz)
+roguejoin(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int horiz)
 {
-    register int x, y, middle;
+    register coordxy x, y, middle;
     if (horiz) {
         middle = x1 + rn2(x2 - x1 + 1);
         for (x = min(x1, middle); x <= max(x1, middle); x++)
@@ -43,9 +43,9 @@ roguejoin(int x1, int y1, int x2, int y2, int horiz)
 
 static
 void
-roguecorr(int x, int y, int dir)
+roguecorr(coordxy x, coordxy y, int dir)
 {
-    register int fromx, fromy, tox, toy;
+    register coordxy fromx, fromy, tox, toy;
 
     if (dir == DOWN) {
         g.r[x][y].doortable &= ~DOWN;
@@ -138,7 +138,7 @@ roguecorr(int x, int y, int dir)
 /* Modified walkfrom() from mkmaze.c */
 static
 void
-miniwalk(int x, int y)
+miniwalk(coordxy x, coordxy y)
 {
     register int q, dir;
     int dirs[4];
@@ -193,7 +193,7 @@ miniwalk(int x, int y)
 void
 makeroguerooms(void)
 {
-    register int x, y;
+    register coordxy x, y;
     /* Rogue levels are structured 3 by 3, with each section containing
      * a room or an intersection.  The minimum width is 2 each way.
      * One difference between these and "real" Rogue levels: real Rogue
@@ -242,7 +242,7 @@ makeroguerooms(void)
     for (y = 0; y < 3; y++)
         for (x = 0; x < 3; x++) {
             if (here.real) { /* Make a room */
-                int lowx, lowy, hix, hiy;
+                coordxy lowx, lowy, hix, hiy;
 
                 g.r[x][y].nroom = g.nroom;
                 g.smeq[g.nroom] = g.nroom;
@@ -275,7 +275,7 @@ makeroguerooms(void)
 }
 
 void
-corr(int x, int y)
+corr(coordxy x, coordxy y)
 {
     if (rn2(50)) {
         levl[x][y].typ = CORR;
@@ -290,7 +290,7 @@ makerogueghost(void)
     register struct monst *ghost;
     struct obj *ghostobj;
     struct mkroom *croom;
-    int x, y;
+    coordxy x, y;
 
     if (!g.nroom)
         return; /* Should never happen */

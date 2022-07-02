@@ -20,7 +20,7 @@ static boolean harmless_missile(struct obj *);
 static void breakmsg(struct obj *, boolean);
 static boolean toss_up(struct obj *, boolean);
 static void sho_obj_return_to_u(struct obj * obj);
-static boolean mhurtle_step(genericptr_t, int, int);
+static boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 
 /* uwep might already be removed from inventory so test for W_WEP instead;
    for Valk+Mjollnir, caller needs to validate the strength requirement */
@@ -610,10 +610,11 @@ hitfloor(
  */
 boolean
 walk_path(coord *src_cc, coord *dest_cc,
-          boolean (*check_proc)(genericptr_t, int, int),
+          boolean (*check_proc)(genericptr_t, coordxy, coordxy),
           genericptr_t arg)
 {
-    int x, y, dx, dy, x_change, y_change, err, i, prev_x, prev_y;
+    int err;
+    coordxy x, y, dx, dy, x_change, y_change, i, prev_x, prev_y;
     boolean keep_going = TRUE;
 
     /* Use Bresenham's Line Algorithm to walk from src to dest.
@@ -692,7 +693,7 @@ walk_path(coord *src_cc, coord *dest_cc,
    vs drag-to-dest; original callers use first mode, jumping wants second,
    grappling hook backfire and thrown chained ball need third */
 boolean
-hurtle_jump(genericptr_t arg, int x, int y)
+hurtle_jump(genericptr_t arg, coordxy x, coordxy y)
 {
     boolean res;
     long save_EWwalking = EWwalking;
@@ -723,9 +724,10 @@ hurtle_jump(genericptr_t arg, int x, int y)
  *      o let jumps go over boulders
  */
 boolean
-hurtle_step(genericptr_t arg, int x, int y)
+hurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
-    int ox, oy, *range = (int *) arg;
+    coordxy ox, oy;
+    int *range = (int *) arg;
     struct obj *obj;
     struct monst *mon;
     boolean may_pass = TRUE, via_jumping, stopping_short;
@@ -938,7 +940,7 @@ hurtle_step(genericptr_t arg, int x, int y)
 }
 
 static boolean
-mhurtle_step(genericptr_t arg, int x, int y)
+mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;

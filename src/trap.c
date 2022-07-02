@@ -374,7 +374,7 @@ mk_trap_statue(coordxy x, coordxy y)
 }
 
 struct trap *
-maketrap(int x, int y, int typ)
+maketrap(coordxy x, coordxy y, int typ)
 {
     static union vlaunchinfo zero_vl;
     boolean oldplace;
@@ -2647,7 +2647,7 @@ steedintrap(struct trap* trap, struct obj* otmp)
 void
 blow_up_landmine(struct trap* trap)
 {
-    int x = trap->tx, y = trap->ty, dbx, dby;
+    coordxy x = trap->tx, y = trap->ty, dbx, dby;
     struct rm *lev = &levl[x][y];
     schar old_typ, typ;
 
@@ -2731,8 +2731,8 @@ force_launch_placement(void)
 int
 launch_obj(
     short otyp,
-    int x1, int y1,
-    int x2, int y2,
+    coordxy x1, coordxy y1,
+    coordxy x2, coordxy y2,
     int style)
 {
     struct monst *mtmp;
@@ -3406,7 +3406,7 @@ float_up(void)
 }
 
 void
-fill_pit(int x, int y)
+fill_pit(coordxy x, coordxy y)
 {
     struct obj *otmp;
     struct trap *t;
@@ -5024,11 +5024,11 @@ untrap_box(
 int
 untrap(
     boolean force,
-    int rx, int ry,
+    coordxy rx, coordxy ry,
     struct obj *container)
 {
     register struct obj *otmp;
-    register int x, y;
+    coordxy x, y;
     int ch;
     struct trap *ttmp;
     struct monst *mtmp;
@@ -5637,7 +5637,7 @@ chest_trap(
 }
 
 struct trap *
-t_at(register int x, register int y)
+t_at(coordxy x, coordxy y)
 {
     register struct trap *trap = g.ftrap;
 
@@ -5692,7 +5692,7 @@ conjoined_pits(
     struct trap *trap1,
     boolean u_entering_trap2)
 {
-    int dx, dy, diridx, adjidx;
+    coordxy dx, dy, diridx, adjidx;
 
     if (!trap1 || !trap2)
         return FALSE;
@@ -5716,7 +5716,8 @@ conjoined_pits(
 static void
 clear_conjoined_pits(struct trap* trap)
 {
-    int diridx, adjidx, x, y;
+    int diridx, adjidx;
+    coordxy x, y;
     struct trap *t;
 
     if (trap && is_pit(trap->ttyp)) {
@@ -5758,7 +5759,8 @@ static void
 join_adjacent_pits(struct trap* trap)
 {
     struct trap *t;
-    int diridx, x, y;
+    int diridx;
+    coordxy x, y;
 
     if (!trap)
         return;

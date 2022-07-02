@@ -59,7 +59,7 @@ sanity_check_single_mon(
     const char *msg)
 {
     struct permonst *mptr = mtmp->data;
-    int mx = mtmp->mx, my = mtmp->my;
+    coordxy mx = mtmp->mx, my = mtmp->my;
 
     if (!mptr || mptr < &mons[LOW_PM] || mptr >= &mons[NUMMONS]) {
         /* most sanity checks issue warnings if they detect a problem,
@@ -201,7 +201,7 @@ sanity_check_single_mon(
 void
 mon_sanity_check(void)
 {
-    int x, y;
+    coordxy x, y;
     struct monst *mtmp, *m;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
@@ -498,7 +498,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     int num;
     struct obj *obj = (struct obj *) 0;
     struct obj *otmp = (struct obj *) 0;
-    int x = mtmp->mx, y = mtmp->my;
+    coordxy x = mtmp->mx, y = mtmp->my;
     int mndx = monsndx(mdat);
     unsigned corpstatflags = corpseflags;
     boolean burythem = ((corpstatflags & CORPSTAT_BURIED) != 0);
@@ -1377,7 +1377,7 @@ meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters 
     struct obj *otmp;
     struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
     boolean poly, grow, heal, eyes = FALSE, vis = canseemon(mtmp);
-    int x = mtmp->mx, y = mtmp->my;
+    coordxy x = mtmp->mx, y = mtmp->my;
 
     /* if a pet, eating is handled separately, in dog.c */
     if (mtmp->mtame)
@@ -2111,7 +2111,7 @@ mm_displacement(
 
 /* Is the square close enough for the monster to move or attack into? */
 boolean
-monnear(struct monst *mon, int x, int y)
+monnear(struct monst *mon, coordxy x, coordxy y)
 {
     int distance = dist2(mon->mx, mon->my, x, y);
 
@@ -2317,7 +2317,7 @@ dealloc_monst(struct monst *mon)
 static void
 mon_leaving_level(struct monst *mon)
 {
-    int mx = mon->mx, my = mon->my;
+    coordxy mx = mon->mx, my = mon->my;
     boolean onmap = (isok(mx, my) && g.level.monsters[mx][my] == mon);
 
     /* to prevent an infinite relobj-flooreffects-hmon-killed loop */
@@ -2518,7 +2518,7 @@ mondead(struct monst *mtmp)
                     spec_death = (g.disintegested /* disintegrated/digested */
                                   || noncorporeal(mtmp->data)
                                   || amorphous(mtmp->data));
-            int x = mtmp->mx, y = mtmp->my;
+            coordxy x = mtmp->mx, y = mtmp->my;
 
             /* construct a format string before transformation;
                will be capitalized when used, expects one %s arg */
@@ -2977,7 +2977,8 @@ xkilled(
     struct monst *mtmp,
     int xkill_flags) /* 1: suppress message, 2: suppress corpse, 4: pacifist */
 {
-    int tmp, mndx, x = mtmp->mx, y = mtmp->my;
+    int tmp, mndx;
+    coordxy x = mtmp->mx, y = mtmp->my;
     struct permonst *mdat;
     struct obj *otmp;
     struct trap *t;
@@ -3219,7 +3220,7 @@ vamp_stone(struct monst *mtmp)
 {
     if (is_vampshifter(mtmp)) {
         int mndx = mtmp->cham;
-        int x = mtmp->mx, y = mtmp->my;
+        coordxy x = mtmp->mx, y = mtmp->my;
 
         /* this only happens if shapeshifted */
         if (mndx >= LOW_PM && mndx != monsndx(mtmp->data)
@@ -3756,7 +3757,7 @@ wake_nearby(void)
 
 /* Wake up monsters near some particular location. */
 void
-wake_nearto(int x, int y, int distance)
+wake_nearto(coordxy x, coordxy y, int distance)
 {
     struct monst *mtmp;
 

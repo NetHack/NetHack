@@ -881,7 +881,7 @@ curses_nhgetch(void)
 }
 
 /*
-int nh_poskey(int *x, int *y, int *mod)
+int nh_poskey(coordxy *x, coordxy *y, int *mod)
                 -- Returns a single character input from the user or a
                    a positioning event (perhaps from a mouse).  If the
                    return value is non-zero, a character was typed, else,
@@ -896,7 +896,7 @@ int nh_poskey(int *x, int *y, int *mod)
                    routine always returns a non-zero character.
 */
 int
-curses_nh_poskey(int *x, int *y, int *mod)
+curses_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     int key = curses_nhgetch();
 

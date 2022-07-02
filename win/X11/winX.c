@@ -989,7 +989,7 @@ X11_nhgetch(void)
 }
 
 int
-X11_nh_poskey(int *x, int *y, int *mod)
+X11_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     int val = input_event(EXIT_ON_KEY_OR_BUTTON_PRESS);
 

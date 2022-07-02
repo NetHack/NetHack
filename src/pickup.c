@@ -45,9 +45,9 @@ static struct obj *tipcontainer_gettarget(struct obj *, boolean *);
 static int tipcontainer_checks(struct obj *, boolean);
 static char in_or_out_menu(const char *, struct obj *, boolean, boolean,
                            boolean, boolean);
-static boolean able_to_loot(int, int, boolean);
+static boolean able_to_loot(coordxy, coordxy, boolean);
 static boolean reverse_loot(void);
-static boolean mon_beside(int, int);
+static boolean mon_beside(coordxy, coordxy);
 static int do_loot_cont(struct obj **, int, int);
 static int doloot_core(void);
 static void tipcontainer(struct obj *);
@@ -1821,7 +1821,7 @@ encumber_msg(void)
 
 /* Is there a container at x,y. Optional: return count of containers at x,y */
 int
-container_at(int x, int y, boolean countem)
+container_at(coordxy x, coordxy y, boolean countem)
 {
     struct obj *cobj, *nobj;
     int container_count = 0;
@@ -1839,7 +1839,7 @@ container_at(int x, int y, boolean countem)
 
 static boolean
 able_to_loot(
-    int x, int y,
+    coordxy x, coordxy y,
     boolean looting) /* loot vs tip */
 {
     const char *verb = looting ? "loot" : "tip";
@@ -1869,9 +1869,10 @@ able_to_loot(
 }
 
 static boolean
-mon_beside(int x, int y)
+mon_beside(coordxy x, coordxy y)
 {
-    int i, j, nx, ny;
+    int i, j;
+    coordxy nx, ny;
 
     for (i = -1; i <= 1; i++)
         for (j = -1; j <= 1; j++) {

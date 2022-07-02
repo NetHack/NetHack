@@ -359,10 +359,10 @@ l_obj_at(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc == 2) {
-        int x, y;
+        coordxy x, y;
 
-        x = (int) luaL_checkinteger(L, 1);
-        y = (int) luaL_checkinteger(L, 2);
+        x = (coordxy) luaL_checkinteger(L, 1);
+        y = (coordxy) luaL_checkinteger(L, 2);
         lua_pop(L, 2);
         (void) l_obj_push(L, g.level.objects[x][y]);
         return 1;
@@ -379,13 +379,13 @@ l_obj_placeobj(lua_State *L)
 {
     int argc = lua_gettop(L);
     struct _lua_obj *lo = l_obj_check(L, 1);
-    int x, y;
+    coordxy x, y;
 
     if (argc != 3)
         nhl_error(L, "l_obj_placeobj: Wrong args");
 
-    x = (int) luaL_checkinteger(L, 2);
-    y = (int) luaL_checkinteger(L, 3);
+    x = (coordxy) luaL_checkinteger(L, 2);
+    y = (coordxy) luaL_checkinteger(L, 3);
     lua_pop(L, 3);
 
     if (lobj_is_ok(lo)) {

@@ -1440,7 +1440,7 @@ mswin_nhgetch(void)
 }
 
 /*
-int nh_poskey(int *x, int *y, int *mod)
+int nh_poskey(coordxy *x, coordxy *y, int *mod)
                 -- Returns a single character input from the user or a
                    a positioning event (perhaps from a mouse).  If the
                    return value is non-zero, a character was typed, else,
@@ -1455,7 +1455,7 @@ int nh_poskey(int *x, int *y, int *mod)
                    routine always returns a non-zero character.
 */
 int
-mswin_nh_poskey(int *x, int *y, int *mod)
+mswin_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     PMSNHEvent event;
     int key;
@@ -1468,8 +1468,8 @@ mswin_nh_poskey(int *x, int *y, int *mod)
     if (event->type == NHEVENT_MOUSE) {
         if (iflags.wc_mouse_support) {
             *mod = event->ei.ms.mod;
-            *x = event->ei.ms.x;
-            *y = event->ei.ms.y;
+            *x = (coordxy) event->ei.ms.x;
+            *y = (coordxy) event->ei.ms.y;
         }
         key = 0;
     } else {

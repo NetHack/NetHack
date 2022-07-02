@@ -331,7 +331,7 @@ safe_nhgetch(void)
  */
 /*ARGSUSED*/
 int
-safe_nh_poskey(int *x, int *y, int *mod)
+safe_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     return '\033';
 }

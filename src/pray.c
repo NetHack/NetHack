@@ -2244,7 +2244,7 @@ doturn(void)
 }
 
 int
-altarmask_at(int x, int y)
+altarmask_at(coordxy x, coordxy y)
 {
     int res = 0;
 
@@ -2406,7 +2406,7 @@ align_gtitle(aligntyp alignment)
 }
 
 void
-altar_wrath(int x, int y)
+altar_wrath(coordxy x, coordxy y)
 {
     aligntyp altaralign = a_align(x, y);
 

@@ -439,7 +439,8 @@ landing_spot(
     int reason,
     int forceit)
 {
-    int i = 0, x, y, distance, min_distance = -1;
+    int i = 0, distance, min_distance = -1;
+    coordxy x, y;
     boolean found = FALSE;
     struct trap *t;
 

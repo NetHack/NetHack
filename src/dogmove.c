@@ -136,10 +136,10 @@ static NEARDATA const char nofetch[] = { BALL_CLASS, CHAIN_CLASS, ROCK_CLASS,
                                          0 };
 
 
-static void wantdoor(int, int, genericptr_t);
+static void wantdoor(coordxy, coordxy, genericptr_t);
 
 boolean
-cursed_object_at(int x, int y)
+cursed_object_at(coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -214,8 +214,8 @@ dog_nutrition(struct monst *mtmp, struct obj *obj)
 int
 dog_eat(struct monst *mtmp,
         struct obj *obj, /* if unpaid, then thrown or kicked by hero */
-        int x,           /* dog's starting location, */
-        int y,           /*  might be different from current */
+        coordxy x,       /* dog's starting location, */
+        coordxy y,       /* might be different from current */
         boolean devour)
 {
     register struct edog *edog = EDOG(mtmp);
@@ -506,7 +506,7 @@ static int
 dog_goal(register struct monst *mtmp, struct edog *edog,
          int after, int udist, int whappr)
 {
-    register int omx, omy;
+    register coordxy omx, omy;
     boolean in_masters_sight, dog_has_minvent;
     register struct obj *obj;
     xint16 otyp;
@@ -530,7 +530,7 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
 #define DDIST(x, y) (dist2(x, y, omx, omy))
 #define SQSRCHRADIUS 5
         int min_x, max_x, min_y, max_y;
-        register int nx, ny;
+        coordxy nx, ny;
 
         g.gtyp = UNDEF; /* no goal as yet */
         g.gx = g.gy = 0;  /* suppress 'used before set' message */
@@ -917,7 +917,7 @@ dog_move(register struct monst *mtmp,
     boolean has_edog, cursemsg[9], do_eat = FALSE;
     boolean better_with_displacing = FALSE;
     coordxy nix, niy;      /* position mtmp is (considering) moving to */
-    register int nx, ny; /* temporary coordinates */
+    coordxy nx, ny; /* temporary coordinates */
     xint16 cnt, uncursedcnt, chcnt;
     int chi = -1, nidist, ndist;
     coord poss[9];
@@ -1379,7 +1379,7 @@ can_reach_location(struct monst *mon, coordxy mx, coordxy my, coordxy fx, coordx
 
 /* do_clear_area client */
 static void
-wantdoor(int x, int y, genericptr_t distance)
+wantdoor(coordxy x, coordxy y, genericptr_t distance)
 {
     int ndist, *dist_ptr = (int *) distance;
 

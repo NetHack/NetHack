@@ -24,14 +24,15 @@ static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
 static struct mkroom *find_branch_room(coord *);
 static struct mkroom *pos_to_room(coordxy, coordxy);
-static boolean place_niche(struct mkroom *, int *, int *, int *);
+static boolean place_niche(struct mkroom *, coordxy *, coordxy *, coordxy *);
 static void makeniche(int);
 static void make_niches(void);
 static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
 static void dosdoor(coordxy, coordxy, struct mkroom *, int);
 static void join(int, int, boolean);
-static void do_room_or_subroom(struct mkroom *, int, int, int, int, boolean,
-                               schar, boolean, boolean);
+static void do_room_or_subroom(struct mkroom *,
+                               coordxy, coordxy, coordxy, coordxy,
+                               boolean, schar, boolean, boolean);
 static void makerooms(void);
 static boolean door_into_nonjoined(coordxy, coordxy);
 static boolean finddpos(coord *, coordxy, coordxy, coordxy, coordxy);
@@ -124,7 +125,7 @@ finddpos(coord *cc, coordxy xl, coordxy yl, coordxy xh, coordxy yh)
 void
 sort_rooms(void)
 {
-    int x, y;
+    coordxy x, y;
     unsigned i, ri[MAXNROFROOMS + 1], n = (unsigned) g.nroom;
 
     qsort((genericptr_t) g.rooms, n, sizeof (struct mkroom), mkroom_cmp);
@@ -144,10 +145,10 @@ sort_rooms(void)
 
 static void
 do_room_or_subroom(register struct mkroom *croom,
-                   int lowx, int lowy, register int hix, register int hiy,
+                   coordxy lowx, coordxy lowy, coordxy hix, coordxy hiy,
                    boolean lit, schar rtype, boolean special, boolean is_room)
 {
-    register int x, y;
+    coordxy x, y;
     struct rm *lev;
 
     /* locations might bump level edges in wall-less rooms */
@@ -442,7 +443,7 @@ makecorridors(void)
 }
 
 void
-add_door(register int x, register int y, register struct mkroom *aroom)
+add_door(coordxy x, coordxy y, register struct mkroom *aroom)
 {
     register struct mkroom *broom;
     register int tmp;
@@ -545,7 +546,7 @@ dosdoor(register coordxy x, register coordxy y, struct mkroom *aroom, int type)
 }
 
 static boolean
-place_niche(register struct mkroom *aroom, int *dy, int *xx, int *yy)
+place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy)
 {
     coord dd;
 
@@ -585,7 +586,7 @@ makeniche(int trap_type)
     register struct mkroom *aroom;
     struct rm *rm;
     int vct = 8;
-    int dy, xx, yy;
+    coordxy dy, xx, yy;
     struct trap *ttmp;
 
     if (g.doorindex < DOORMAX) {
@@ -678,7 +679,7 @@ clear_level_structures(void)
 {
     static struct rm zerorm = { GLYPH_UNEXPLORED,
                                 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-    register int x, y;
+    coordxy x, y;
     register struct rm *lev;
 
     /* note:  normally we'd start at x=1 because map column #0 isn't used
@@ -751,7 +752,7 @@ fill_ordinary_room(struct mkroom *croom)
     int trycnt = 0;
     coord pos;
     struct monst *tmonst; /* always put a web with a spider */
-    int x, y;
+    coordxy x, y;
 
     if (croom->rtype != OROOM && croom->rtype != THEMEROOM)
         return;
@@ -1000,7 +1001,8 @@ mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob,
 {
     s_level *sp;
     struct obj *otmp;
-    int x, y, cnt;
+    coordxy x, y;
+    int cnt;
 
     if (kelp_pool < 0)
         kelp_pool = 10;
@@ -1148,9 +1150,10 @@ topologize(struct mkroom *croom, boolean do_ordinary)
 topologize(struct mkroom *croom)
 #endif
 {
-    register int x, y, roomno = (int) ((croom - g.rooms) + ROOMOFFSET);
-    int lowx = croom->lx, lowy = croom->ly;
-    int hix = croom->hx, hiy = croom->hy;
+    coordxy x, y;
+    register int roomno = (int) ((croom - g.rooms) + ROOMOFFSET);
+    coordxy lowx = croom->lx, lowy = croom->ly;
+    coordxy hix = croom->hx, hiy = croom->hy;
 #ifdef SPECIALIZATION
     schar rtype = croom->rtype;
 #endif
@@ -1336,7 +1339,7 @@ okdoor(coordxy x, coordxy y)
 }
 
 void
-dodoor(int x, int y, struct mkroom *aroom)
+dodoor(coordxy x, coordxy y, struct mkroom *aroom)
 {
     if (g.doorindex >= DOORMAX) {
         impossible("DOORMAX exceeded?");

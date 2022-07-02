@@ -89,8 +89,8 @@ static coordxy right_ptrs[ROWNO][COLNO];
 static void fill_point(int, int);
 static void dig_point(int, int);
 static void view_init(void);
-static void view_from(int, int, coordxy **, coordxy *, coordxy *, int,
-                      void (*)(int, int, genericptr_t),
+static void view_from(coordxy, coordxy, coordxy **, coordxy *, coordxy *, int,
+                      void (*)(coordxy, coordxy, genericptr_t),
                       genericptr_t);
 static void get_unused_cs(coordxy ***, coordxy **, coordxy **);
 static void rogue_vision(coordxy **, coordxy *, coordxy *);
@@ -549,7 +549,7 @@ vision_recalc(int control)
          *      + Monsters can see you even when you're in a pit.
          */
         view_from(u.uy, u.ux, next_array, next_rmin, next_rmax, 0,
-                  (void (*)(int, int, genericptr_t)) 0,
+                  (void (*)(coordxy, coordxy, genericptr_t)) 0,
                   (genericptr_t) 0);
 
         /*
@@ -615,7 +615,7 @@ vision_recalc(int control)
             }
         } else
             view_from(u.uy, u.ux, next_array, next_rmin, next_rmax, 0,
-                      (void (*)(int, int, genericptr_t)) 0,
+                      (void (*)(coordxy, coordxy, genericptr_t)) 0,
                       (genericptr_t) 0);
 
         /*
@@ -1113,7 +1113,7 @@ static coordxy **cs_rows;
 static coordxy *cs_left;
 static coordxy *cs_right;
 
-static void (*vis_func)(int, int, genericptr_t);
+static void (*vis_func)(coordxy, coordxy, genericptr_t);
 static genericptr_t varg;
 
 /*
@@ -1954,9 +1954,9 @@ left_side(int row, int left_mark, int right, const coordxy *limits)
  *   arg            argument for func
  */
 static void
-view_from(int srow, int scol, coordxy **loc_cs_rows,
+view_from(coordxy srow, coordxy scol, coordxy **loc_cs_rows,
           coordxy *left_most, coordxy *right_most, int range,
-          void (*func)(int, int, genericptr_t), genericptr_t arg)
+          void (*func)(coordxy, coordxy, genericptr_t), genericptr_t arg)
 {
     register int i; /* loop counter */
     coordxy *rowp;     /* optimization for setting could_see */
@@ -2055,8 +2055,8 @@ view_from(int srow, int scol, coordxy **loc_cs_rows,
  * vision matrix and reduce extra work.
  */
 void
-do_clear_area(int scol, int srow, int range,
-              void (*func)(int, int, genericptr_t), genericptr_t arg)
+do_clear_area(coordxy scol, coordxy srow, int range,
+              void (*func)(coordxy, coordxy, genericptr_t), genericptr_t arg)
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy) {

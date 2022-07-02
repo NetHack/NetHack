@@ -42,7 +42,7 @@ void chainout_print_glyph(void *,winid, coordxy, coordxy,
 void chainout_raw_print(void *,const char *);
 void chainout_raw_print_bold(void *,const char *);
 int chainout_nhgetch(void *);
-int chainout_nh_poskey(void *,int *, int *, int *);
+int chainout_nh_poskey(void *,coordxy *, coordxy *, int *);
 void chainout_nhbell(void *);
 int chainout_doprev_message(void *);
 char chainout_yn_function(void *,const char *, const char *, char);
@@ -446,8 +446,8 @@ chainout_nhgetch(void *vp)
 int
 chainout_nh_poskey(
     void *vp,
-    int *x,
-    int *y,
+    coordxy *x,
+    coordxy *y,
     int *mod)
 {
     struct chainout_data *tdp = vp;

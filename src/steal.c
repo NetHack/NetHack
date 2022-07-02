@@ -677,7 +677,7 @@ mdrop_obj(
     struct obj *obj,
     boolean verbosely)
 {
-    int omx = mon->mx, omy = mon->my;
+    coordxy omx = mon->mx, omy = mon->my;
     long unwornmask = obj->owornmask;
     /* call distant_name() for its possible side-effects even if the result
        might not be printed, and do it before extracing obj from minvent */

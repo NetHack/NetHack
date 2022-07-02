@@ -6,12 +6,12 @@
 #include "hack.h"
 #include "sp_lev.h"
 
-static int iswall(int, int);
-static int iswall_or_stone(int, int);
-static boolean is_solid(int, int);
+static int iswall(coordxy, coordxy);
+static int iswall_or_stone(coordxy, coordxy);
+static boolean is_solid(coordxy, coordxy);
 static int extend_spine(int[3][3], int, int, int);
-static void wall_cleanup(int, int, int, int);
-static boolean okay(int, int, int);
+static void wall_cleanup(coordxy, coordxy, coordxy, coordxy);
+static boolean okay(coordxy, coordxy, coordxy);
 static void maze0xy(coord *);
 static boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
                                 coordxy, coordxy, boolean, d_level *);
@@ -23,7 +23,7 @@ static void migr_booty_item(int, const char *);
 static void migrate_orc(struct monst *, unsigned long);
 static void shiny_orc_stuff(struct monst *);
 static void stolen_booty(void);
-static boolean maze_inbounds(int, int);
+static boolean maze_inbounds(coordxy, coordxy);
 static void maze_remove_deadends(xint16);
 
 /* adjust a coordinate one step in the specified direction */
@@ -39,7 +39,7 @@ static void maze_remove_deadends(xint16);
     } while (0)
 
 static int
-iswall(int x, int y)
+iswall(coordxy x, coordxy y)
 {
     int type;
 
@@ -51,7 +51,7 @@ iswall(int x, int y)
 }
 
 static int
-iswall_or_stone(int x, int y)
+iswall_or_stone(coordxy x, coordxy y)
 {
     /* out of bounds = stone */
     if (!isok(x, y))
@@ -62,7 +62,7 @@ iswall_or_stone(int x, int y)
 
 /* return TRUE if out of bounds, wall or rock */
 static boolean
-is_solid(int x, int y)
+is_solid(coordxy x, coordxy y)
 {
     return (boolean) (!isok(x, y) || IS_STWALL(levl[x][y].typ));
 }
@@ -164,10 +164,10 @@ extend_spine(int locale[3][3], int wall_there, int dx, int dy)
 
 /* Remove walls totally surrounded by stone */
 static void
-wall_cleanup(int x1, int y1, int x2, int y2)
+wall_cleanup(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     uchar type;
-    int x, y;
+    coordxy x, y;
     struct rm *lev;
 
     /* sanity check on incoming variables */
@@ -195,12 +195,12 @@ wall_cleanup(int x1, int y1, int x2, int y2)
 
 /* Correct wall types so they extend and connect to each other */
 void
-fix_wall_spines(int x1, int y1, int x2, int y2)
+fix_wall_spines(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     uchar type;
-    int x, y;
+    coordxy x, y;
     struct rm *lev;
-    int (*loc_f)(int, int);
+    int (*loc_f)(coordxy, coordxy);
     int bits;
     int locale[3][3]; /* rock or wall status surrounding positions */
 
@@ -256,14 +256,14 @@ fix_wall_spines(int x1, int y1, int x2, int y2)
 }
 
 void
-wallification(int x1, int y1, int x2, int y2)
+wallification(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     wall_cleanup(x1, y1, x2, y2);
     fix_wall_spines(x1, y1, x2, y2);
 }
 
 static boolean
-okay(int x, int y, int dir)
+okay(coordxy x, coordxy y, coordxy dir)
 {
     mz_move(x, y, dir);
     mz_move(x, y, dir);
@@ -813,7 +813,7 @@ stolen_booty(void)
 #undef ORC_LEADER
 
 static boolean
-maze_inbounds(int x, int y)
+maze_inbounds(coordxy x, coordxy y)
 {
     return (x >= 2 && y >= 2
             && x < g.x_maze_max && y < g.y_maze_max
@@ -826,7 +826,7 @@ static void
 maze_remove_deadends(xint16 typ)
 {
     char dirok[4];
-    int x, y, dir, idx, idx2, dx, dy, dx2, dy2;
+    coordxy x, y, dir, idx, idx2, dx, dy, dx2, dy2;
 
     dirok[0] = 0; /* lint suppression */
     for (x = 2; x < g.x_maze_max; x++)
@@ -871,7 +871,7 @@ maze_remove_deadends(xint16 typ)
 void
 create_maze(int corrwid, int wallthick, boolean rmdeadends)
 {
-    int x,y;
+    coordxy x,y;
     coord mm;
     int tmp_xmax = g.x_maze_max;
     int tmp_ymax = g.y_maze_max;
@@ -967,7 +967,7 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
 void
 makemaz(const char *s)
 {
-    int x, y;
+    coordxy x, y;
     char protofile[20];
     s_level *sp = Is_special(&u.uz);
     coord mm;
@@ -1134,7 +1134,7 @@ makemaz(const char *s)
  * that is totally safe.
  */
 void
-walkfrom(int x, int y, schar typ)
+walkfrom(coordxy x, coordxy y, schar typ)
 {
 #define CELLS (ROWNO * COLNO) / 4            /* a maze cell is 4 squares */
     char mazex[CELLS + 1], mazey[CELLS + 1]; /* char's are OK */
@@ -1181,7 +1181,7 @@ walkfrom(int x, int y, schar typ)
 #else /* !MICRO */
 
 void
-walkfrom(int x, int y, schar typ)
+walkfrom(coordxy x, coordxy y, schar typ)
 {
     int q, a, dir;
     int dirs[4];
@@ -1220,7 +1220,8 @@ walkfrom(int x, int y, schar typ)
 void
 mazexy(coord *cc)
 {
-    int x, y, allowedtyp = (g.level.flags.corrmaze ? CORR : ROOM);
+    coordxy x, y;
+    int allowedtyp = (g.level.flags.corrmaze ? CORR : ROOM);
     int cpt = 0;
 
     do {
@@ -1254,13 +1255,13 @@ mazexy(coord *cc)
 }
 
 void
-get_level_extends(int * left, int * top, int * right, int * bottom)
+get_level_extends(coordxy *left, coordxy *top, coordxy *right, coordxy *bottom)
 {
-    int x, y;
+    coordxy x, y;
     unsigned typ;
     struct rm *lev;
     boolean found, nonwall;
-    int xmin, xmax, ymin, ymax;
+    coordxy xmin, xmax, ymin, ymax;
 
     found = nonwall = FALSE;
     for (xmin = 0; !found && xmin <= COLNO; xmin++) {
@@ -1341,8 +1342,8 @@ get_level_extends(int * left, int * top, int * right, int * bottom)
 void
 bound_digging(void)
 {
-    int x, y;
-    int xmin, xmax, ymin, ymax;
+    coordxy x, y;
+    coordxy xmin, xmax, ymin, ymax;
 
     if (Is_earthlevel(&u.uz))
         return; /* everything diggable here */
@@ -1410,8 +1411,8 @@ fumaroles(void)
 #define gbymax (g.ymax - 1)
 
 static void set_wportal(void);
-static void mk_bubble(int, int, int);
-static void mv_bubble(struct bubble *, int, int, boolean);
+static void mk_bubble(coordxy, coordxy, int);
+static void mv_bubble(struct bubble *, coordxy, coordxy, boolean);
 
 void
 movebubbles(void)
@@ -1424,7 +1425,8 @@ movebubbles(void)
     struct bubble *b;
     struct container *cons;
     struct trap *btrap;
-    int x, y, i, j, bcpin = 0;
+    coordxy x, y;
+    int i, j, bcpin = 0;
 
     /* set up the portal the first time bubbles are moved */
     if (!g.wportal)
@@ -1560,7 +1562,7 @@ movebubbles(void)
 void
 water_friction(void)
 {
-    int x, y, dx, dy;
+    coordxy x, y, dx, dy;
     boolean eff = FALSE;
 
     if (Swimming && rn2(4))
@@ -1678,7 +1680,8 @@ set_wportal(void)
 static void
 setup_waterlevel(void)
 {
-    int x, y, xskip, yskip, typ, glyph;
+    int typ, glyph;
+    coordxy x, y, xskip, yskip;
 
     if (!Is_waterlevel(&u.uz) && !Is_airlevel(&u.uz))
         panic("setup_waterlevel(): [%d:%d] neither 'Water' nor 'Air'",
@@ -1736,7 +1739,7 @@ unsetup_waterlevel(void)
 }
 
 static void
-mk_bubble(int x, int y, int n)
+mk_bubble(coordxy x, coordxy y, int n)
 {
     /*
      * These bit masks make visually pleasing bubbles on a normal aspect
@@ -1799,9 +1802,10 @@ mk_bubble(int x, int y, int n)
  * This property also makes leaving a bubble slightly difficult.
  */
 static void
-mv_bubble(struct bubble* b, int dx, int dy, boolean ini)
+mv_bubble(struct bubble* b, coordxy dx, coordxy dy, boolean ini)
 {
-    int x, y, i, j, colli = 0;
+    int i, j, colli = 0;
+    coordxy x, y;
     struct container *cons, *ctemp;
 
     /* clouds move slowly */

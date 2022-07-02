@@ -586,7 +586,7 @@ QCoreApplication::exec: The event loop is already running
     return keybuffer.GetAscii();
 }
 
-int NetHackQtBind::qt_nh_poskey(int *x, int *y, int *mod)
+int NetHackQtBind::qt_nh_poskey(coordxy *x, coordxy *y, int *mod)
 {
     if (main)
 	main->fadeHighlighting(true);

@@ -19,8 +19,8 @@ static int really_kick_object(coordxy, coordxy);
 static char *kickstr(char *, const char *);
 static boolean watchman_thief_arrest(struct monst *);
 static boolean watchman_door_damage(struct monst *, coordxy, coordxy);
-static void kick_dumb(int, int);
-static void kick_ouch(int, int, const char *);
+static void kick_dumb(coordxy, coordxy);
+static void kick_ouch(coordxy, coordxy, const char *);
 static void otransit_msg(struct obj *, boolean, boolean, long);
 static void drop_to(coord *, schar, coordxy, coordxy);
 
@@ -803,7 +803,7 @@ watchman_door_damage(struct monst *mtmp, coordxy x, coordxy y)
 }
 
 static void
-kick_dumb(int x, int y)
+kick_dumb(coordxy x, coordxy y)
 {
     exercise(A_DEX, FALSE);
     if (martial() || ACURR(A_DEX) >= 16 || rn2(3)) {
@@ -820,7 +820,7 @@ kick_dumb(int x, int y)
 }
 
 static void
-kick_ouch(int x, int y, const char *kickobjnam)
+kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
 {
     int dmg;
     char buf[BUFSZ];
@@ -850,7 +850,7 @@ kick_ouch(int x, int y, const char *kickobjnam)
 int
 dokick(void)
 {
-    int x, y;
+    coordxy x, y;
     int avrg_attrib;
     int glyph, oldglyph = -1;
     register struct monst *mtmp;
@@ -943,7 +943,7 @@ dokick(void)
         return ECMD_TIME;
     }
     if (Levitation) {
-        int xx, yy;
+        coordxy xx, yy;
 
         xx = u.ux - u.dx;
         yy = u.uy - u.dy;

@@ -11,15 +11,15 @@
 
 static boolean is_swallow_sym(int);
 static int append_str(char *, const char *);
-static void trap_description(char *, int, int, int);
-static void look_at_object(char *, int, int, int);
-static void look_at_monster(char *, char *, struct monst *, int, int);
-static struct permonst *lookat(int, int, char *, char *);
+static void trap_description(char *, int, coordxy, coordxy);
+static void look_at_object(char *, coordxy, coordxy, int);
+static void look_at_monster(char *, char *, struct monst *, coordxy, coordxy);
+static struct permonst *lookat(coordxy, coordxy, char *, char *);
 static void checkfile(char *, struct permonst *, boolean, boolean, char *);
 static int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
                           boolean *, const char **, char *);
-static void look_region_nearby(int *, int *, int *, int *, boolean);
+static void look_region_nearby(coordxy *, coordxy *, coordxy *, coordxy *, boolean);
 static void look_all(boolean, boolean);
 static void look_traps(boolean);
 static void do_supplemental_info(char *, struct permonst *, boolean);
@@ -143,7 +143,7 @@ monhealthdescr(struct monst *mon, boolean addspace, char *outbuf)
 
 /* copy a trap's description into outbuf[] */
 static void
-trap_description(char *outbuf, int tnum, int x, int y)
+trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
 {
     /*
      * Trap detection used to display a bear trap at locations having
@@ -169,8 +169,8 @@ mhidden_description(
 {
     struct obj *otmp;
     boolean fakeobj, isyou = (mon == &g.youmonst);
-    int x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my,
-        glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
+    coordxy x = isyou ? u.ux : mon->mx, y = isyou ? u.uy : mon->my;
+    int glyph = (g.level.flags.hero_memory && !isyou) ? levl[x][y].glyph
                                                       : glyph_at(x, y);
 
     *outbuf = '\0';
@@ -220,7 +220,7 @@ mhidden_description(
 
 /* extracted from lookat(); also used by namefloorobj() */
 boolean
-object_from_map(int glyph, int x, int y, struct obj **obj_p)
+object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
 {
     boolean fakeobj = FALSE, mimic_obj = FALSE;
     struct monst *mtmp;
@@ -295,7 +295,7 @@ object_from_map(int glyph, int x, int y, struct obj **obj_p)
 
 static void
 look_at_object(char *buf, /* output buffer */
-               int x, int y, int glyph)
+               coordxy x, coordxy y, int glyph)
 {
     struct obj *otmp = 0;
     boolean fakeobj = object_from_map(glyph, x, y, &otmp);
@@ -331,7 +331,7 @@ static void
 look_at_monster(char *buf,
                 char *monbuf, /* buf: output, monbuf: optional output */
                 struct monst *mtmp,
-                int x, int y)
+                coordxy x, coordxy y)
 {
     char *name, monnambuf[BUFSZ], healthbuf[BUFSZ];
     boolean accurate = !Hallucination;
@@ -524,7 +524,7 @@ waterbody_name(coordxy x, coordxy y)
  * If not hallucinating and the glyph is a monster, also monster data.
  */
 static struct permonst *
-lookat(int x, int y, char *buf, char *monbuf)
+lookat(coordxy x, coordxy y, char *buf, char *monbuf)
 {
     struct monst *mtmp = (struct monst *) 0;
     struct permonst *pm = (struct permonst *) 0;
@@ -1632,7 +1632,9 @@ do_look(int mode, coord *click_cc)
 }
 
 static void
-look_region_nearby(int *lo_x, int *lo_y, int *hi_x, int *hi_y, boolean nearby)
+look_region_nearby(
+    coordxy *lo_x, coordxy *lo_y,
+    coordxy *hi_x, coordxy *hi_y, boolean nearby)
 {
     *lo_y = nearby ? max(u.uy - BOLT_LIM, 0) : 0;
     *lo_x = nearby ? max(u.ux - BOLT_LIM, 1) : 1;
@@ -1648,7 +1650,8 @@ look_all(
     boolean do_mons) /* True => monsters, False => objects */
 {
     winid win;
-    int x, y, lo_x, lo_y, hi_x, hi_y, glyph, count = 0;
+    int glyph, count = 0;
+    coordxy x, y, lo_x, lo_y, hi_x, hi_y;
     char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
@@ -1736,7 +1739,8 @@ look_traps(boolean nearby)
 {
     winid win;
     struct trap *t;
-    int x, y, lo_x, lo_y, hi_x, hi_y, glyph, tnum, count = 0;
+    int glyph, tnum, count = 0;
+    coordxy x, y, lo_x, lo_y, hi_x, hi_y;
     char lookbuf[BUFSZ], outbuf[BUFSZ];
 
     win = create_nhwindow(NHW_TEXT);
@@ -1900,7 +1904,8 @@ int
 doidtrap(void)
 {
     register struct trap *trap;
-    int x, y, tt, glyph;
+    int tt, glyph;
+    coordxy x, y;
 
     if (!getdir("^"))
         return ECMD_CANCEL;

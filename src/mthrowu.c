@@ -9,7 +9,7 @@ static int monmulti(struct monst *, struct obj *, struct obj *);
 static void monshoot(struct monst *, struct obj *, struct obj *);
 static boolean ucatchgem(struct obj *, struct monst *);
 static const char* breathwep_name(int);
-static int drop_throw(struct obj *, boolean, int, int);
+static int drop_throw(struct obj *, boolean, coordxy, coordxy);
 static int m_lined_up(struct monst *, struct monst *);
 
 #define URETREATING(x, y) \
@@ -156,8 +156,8 @@ static int
 drop_throw(
     register struct obj *obj,
     boolean ohit,
-    int x,
-    int y)
+    coordxy x,
+    coordxy y)
 {
     int retvalu = 1;
     int create;
@@ -544,8 +544,8 @@ ucatchgem(
 void
 m_throw(
     struct monst *mon,      /* launching monster */
-    int x, int y,           /* launch point */
-    int dx, int dy,         /* direction */
+    coordxy x, coordxy y,           /* launch point */
+    coordxy dx, coordxy dy,         /* direction */
     int range,              /* maximum distance */
     struct obj *obj)        /* missile (or stack providing it) */
 {
@@ -1076,7 +1076,7 @@ linedup_callback(
     coordxy ay,
     coordxy bx,
     coordxy by,
-    boolean (*fnc)(int, int))
+    boolean (*fnc)(coordxy, coordxy))
 {
     int dx, dy;
 
@@ -1198,8 +1198,8 @@ m_carrying(struct monst* mtmp, int type)
 void
 hit_bars(
     struct obj **objp,    /* *objp will be set to NULL if object breaks */
-    int objx, int objy,   /* hero's spot (when wielded) or missile's spot */
-    int barsx, int barsy, /* adjacent spot where bars are located */
+    coordxy objx, coordxy objy,   /* hero's spot (when wielded) or missile's spot */
+    coordxy barsx, coordxy barsy, /* adjacent spot where bars are located */
     unsigned breakflags)  /* breakage control */
 {
     struct obj *otmp = *objp;
@@ -1237,8 +1237,8 @@ hit_bars(
 boolean
 hits_bars(
     struct obj **obj_p,   /* *obj_p will be set to NULL if object breaks */
-    int x, int y,
-    int barsx, int barsy,
+    coordxy x, coordxy y,
+    coordxy barsx, coordxy barsy,
     int always_hit,       /* caller can force a hit for items which would
                            * fit through */
     int whodidit)         /* 1==hero, 0=other, -1==just check whether it

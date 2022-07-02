@@ -181,7 +181,7 @@ l_selection_getpoint(lua_State *L)
 {
     struct selectionvar *sel = l_selection_check(L, 1);
     coordxy x, y;
-    int ix, iy;
+    lua_Integer ix, iy;
     int val;
     long crd;
 

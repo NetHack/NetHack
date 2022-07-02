@@ -1406,7 +1406,7 @@ prev_level(boolean at_stairs)
 }
 
 void
-u_on_newpos(int x, int y)
+u_on_newpos(coordxy x, coordxy y)
 {
     if (!isok(x, y)) { /* validate location */
         void (*func)(const char *, ...);
@@ -1463,7 +1463,7 @@ u_on_rndspot(int upflag)
 }
 
 void
-stairway_add(int x, int y, boolean up, boolean isladder, d_level *dest)
+stairway_add(coordxy x, coordxy y, boolean up, boolean isladder, d_level *dest)
 {
     stairway *tmp = (stairway *) alloc(sizeof (stairway));
 
@@ -1491,7 +1491,7 @@ stairway_free_all(void)
 }
 
 stairway *
-stairway_at(int x, int y)
+stairway_at(coordxy x, coordxy y)
 {
     stairway *tmp = g.stairs;
 
@@ -1660,7 +1660,7 @@ Can_fall_thru(d_level *lev)
  * Checks for amulets and such must be done elsewhere.
  */
 boolean
-Can_rise_up(int x, int y, d_level *lev)
+Can_rise_up(coordxy x, coordxy y, d_level *lev)
 {
     stairway *stway = stairway_find_special_dir(FALSE);
 
@@ -1815,7 +1815,7 @@ On_W_tower_level(d_level *lev)
 
 /* is <x,y> of `lev' inside the Wizard's tower? */
 boolean
-In_W_tower(int x, int y, d_level *lev)
+In_W_tower(coordxy x, coordxy y, d_level *lev)
 {
     if (!On_W_tower_level(lev))
         return FALSE;
@@ -2766,7 +2766,8 @@ recalc_mapseen(void)
     struct cemetery *bp, **bonesaddr;
     struct trap *t;
     unsigned i, ridx, atmp;
-    int x, y, ltyp, count;
+    int ltyp, count;
+    coordxy x, y;
     char uroom;
 
     /* Should not happen in general, but possible if in the process

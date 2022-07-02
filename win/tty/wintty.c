@@ -4376,9 +4376,9 @@ tty_nhgetch(void)
 /*ARGSUSED*/
 int
 #if defined(WIN32CON)
-tty_nh_poskey(int *x, int *y, int *mod)
+tty_nh_poskey(coordxy *x, coordxy *y, int *mod)
 #else
-tty_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
+tty_nh_poskey(coordxy *x UNUSED, coordxy *y UNUSED, int *mod UNUSED)
 #endif
 {
     int i;

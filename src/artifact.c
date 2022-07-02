@@ -27,7 +27,7 @@ static unsigned long abil_to_spfx(long *);
 static uchar abil_to_adtyp(long *);
 static int glow_strength(int);
 static boolean untouchable(struct obj *, boolean);
-static int count_surround_traps(int, int);
+static int count_surround_traps(coordxy, coordxy);
 
 /* The amount added to the victim's total hit points to insure that the
    victim will be killed even after damage bonus/penalty adjustments.
@@ -2347,12 +2347,13 @@ retouch_equipment(int dropflag) /* 0==don't drop, 1==drop all, 2==drop weapon */
 }
 
 static int
-count_surround_traps(int x, int y)
+count_surround_traps(coordxy x, coordxy y)
 {
     struct rm *levp;
     struct obj *otmp;
     struct trap *ttmp;
-    int dx, dy, glyph, ret = 0;
+    coordxy dx, dy;
+    int glyph, ret = 0;
 
     for (dx = x - 1; dx < x + 2; ++dx)
         for (dy = y - 1; dy < y + 2; ++dy) {

@@ -7,11 +7,11 @@
 
 /* #define DEBUG */ /* uncomment for debugging */
 
-static boolean could_move_onto_boulder(int, int);
+static boolean could_move_onto_boulder(coordxy, coordxy);
 static int moverock(void);
 static void dosinkfall(void);
 static boolean findtravelpath(int);
-static boolean trapmove(int, int, struct trap *);
+static boolean trapmove(coordxy, coordxy, struct trap *);
 static void check_buried_zombies(coordxy, coordxy);
 static schar u_simple_floortyp(coordxy, coordxy);
 static boolean swim_move_danger(coordxy, coordxy);
@@ -30,11 +30,11 @@ static boolean move_out_of_bounds(coordxy, coordxy);
 static boolean carrying_too_much(void);
 static boolean escape_from_sticky_mon(coordxy, coordxy);
 static void domove_core(void);
-static void maybe_smudge_engr(int, int, int, int);
+static void maybe_smudge_engr(coordxy, coordxy, coordxy, coordxy);
 static struct monst *monstinroom(struct permonst *, int);
 static void move_update(boolean);
 static int pickup_checks(void);
-static boolean doorless_door(int, int);
+static boolean doorless_door(coordxy, coordxy);
 static void maybe_wail(void);
 
 #define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
@@ -77,7 +77,7 @@ obj_to_any(struct obj *obj)
 }
 
 boolean
-revive_nasty(int x, int y, const char *msg)
+revive_nasty(coordxy x, coordxy y, const char *msg)
 {
     register struct obj *otmp, *otmp2;
     struct monst *mtmp;
@@ -116,7 +116,7 @@ revive_nasty(int x, int y, const char *msg)
 /* can hero move onto a spot containing one or more boulders?
    used for m<dir> and travel and during boulder push failure */
 static boolean
-could_move_onto_boulder(int sx, int sy)
+could_move_onto_boulder(coordxy sx, coordxy sy)
 {
     /* can if able to phaze through rock (must be poly'd, so not riding) */
     if (Passes_walls)
@@ -853,10 +853,10 @@ invocation_pos(coordxy x, coordxy y)
  * mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP
  */
 boolean
-test_move(int ux, int uy, int dx, int dy, int mode)
+test_move(coordxy ux, coordxy uy, coordxy dx, coordxy dy, int mode)
 {
-    int x = ux + dx;
-    int y = uy + dy;
+    coordxy x = ux + dx;
+    coordxy y = uy + dy;
     register struct rm *tmpr = &levl[x][y];
     struct rm *ust;
 
@@ -1156,15 +1156,15 @@ findtravelpath(int mode)
 
             for (i = 0; i < n; i++) {
                 int dir;
-                int x = travelstepx[set][i];
-                int y = travelstepy[set][i];
+                coordxy x = travelstepx[set][i];
+                coordxy y = travelstepy[set][i];
                 /* no diagonal movement for grid bugs */
                 int dirmax = NODIAG(u.umonnum) ? 4 : N_DIRS;
                 boolean alreadyrepeated = FALSE;
 
                 for (dir = 0; dir < dirmax; ++dir) {
-                    int nx = x + xdir[dirs_ord[dir]];
-                    int ny = y + ydir[dirs_ord[dir]];
+                    coordxy nx = x + xdir[dirs_ord[dir]];
+                    coordxy ny = y + ydir[dirs_ord[dir]];
 
                     /*
                      * When guessing and trying to travel as close as possible
@@ -1355,7 +1355,7 @@ findtravelpath(int mode)
 }
 
 boolean
-is_valid_travelpt(int x, int y)
+is_valid_travelpt(coordxy x, coordxy y)
 {
     int tx = u.tx;
     int ty = u.ty;
@@ -1380,7 +1380,7 @@ is_valid_travelpt(int x, int y)
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
 trapmove(
-    int x, int y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    coordxy x, coordxy y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
     struct trap *desttrap) /* nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
@@ -2103,7 +2103,7 @@ move_out_of_bounds(coordxy x, coordxy y)
             return domove_fight_empty(x, y);
 
         if (flags.mention_walls) {
-            int dx = u.dx, dy = u.dy;
+            coordxy dx = u.dx, dy = u.dy;
 
             if (dx && dy) { /* diagonal */
                 /* only as far as possible diagonally if in very
@@ -2205,7 +2205,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
 void
 domove(void)
 {
-        int ux1 = u.ux, uy1 = u.uy;
+        coordxy ux1 = u.ux, uy1 = u.uy;
 
         g.domove_succeeded = 0L;
         domove_core();
@@ -2493,7 +2493,7 @@ runmode_delay_output(void)
 }
 
 static void
-maybe_smudge_engr(int x1, int y1, int x2, int y2)
+maybe_smudge_engr(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
     struct engr *ep;
 
@@ -2918,7 +2918,7 @@ in_rooms(register coordxy x, register coordxy y, register int typewanted)
 
 /* is (x,y) in a town? */
 boolean
-in_town(register int x, register int y)
+in_town(coordxy x, coordxy y)
 {
     s_level *slev = Is_special(&u.uz);
     register struct mkroom *sroom;
@@ -3240,8 +3240,8 @@ dopickup(void)
 void
 lookaround(void)
 {
-    register int x, y;
-    int i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
+    register coordxy x, y;
+    coordxy i, x0 = 0, y0 = 0, m0 = 1, i0 = 9;
     int corrct = 0, noturn = 0;
     struct monst *mtmp;
 
@@ -3398,7 +3398,7 @@ lookaround(void)
 
 /* check for a doorway which lacks its door (NODOOR or BROKEN) */
 static boolean
-doorless_door(int x, int y)
+doorless_door(coordxy x, coordxy y)
 {
     struct rm *lev_p = &levl[x][y];
 
@@ -3414,7 +3414,7 @@ doorless_door(int x, int y)
 /* used by drown() to check whether hero can crawl from water to <x,y>;
    also used by findtravelpath() when destination is one step away */
 boolean
-crawl_destination(int x, int y)
+crawl_destination(coordxy x, coordxy y)
 {
     /* is location ok in general? */
     if (!goodpos(x, y, &g.youmonst, 0))
@@ -3443,7 +3443,7 @@ crawl_destination(int x, int y)
 int
 monster_nearby(void)
 {
-    register int x, y;
+    register coordxy x, y;
     register struct monst *mtmp;
 
     /* Also see the similar check in dochugw() in monmove.c */

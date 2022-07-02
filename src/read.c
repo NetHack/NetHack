@@ -18,7 +18,7 @@ static void p_glow1(struct obj *);
 static void p_glow2(struct obj *, const char *);
 static void forget(int);
 static int maybe_tame(struct monst *, struct obj *);
-static boolean can_center_cloud(int, int);
+static boolean can_center_cloud(coordxy, coordxy);
 static void display_stinking_cloud_positions(int);
 static void seffect_enchant_armor(struct obj **);
 static void seffect_destroy_armor(struct obj **);
@@ -45,7 +45,7 @@ static void seffect_magic_mapping(struct obj **);
 #ifdef MAIL_STRUCTURES
 static void seffect_mail(struct obj **);
 #endif /* MAIL_STRUCTURES */
-static void set_lit(int, int, genericptr);
+static void set_lit(coordxy, coordxy, genericptr);
 static void do_class_genocide(void);
 static void do_stinking_cloud(struct obj *, boolean);
 static boolean create_particular_parse(char *,
@@ -1032,7 +1032,7 @@ maybe_tame(struct monst* mtmp, struct obj* sobj)
  * NOT the same thing as can_center_cloud.
  */
 boolean
-valid_cloud_pos(int x, int y)
+valid_cloud_pos(coordxy x, coordxy y)
 {
     if (!isok(x,y))
         return FALSE;
@@ -1043,7 +1043,7 @@ valid_cloud_pos(int x, int y)
  * should have its regular effects, or not because it was out of range.
  */
 static boolean
-can_center_cloud(int x, int y)
+can_center_cloud(coordxy x, coordxy y)
 {
     if (!valid_cloud_pos(x, y))
         return FALSE;
@@ -1056,7 +1056,7 @@ display_stinking_cloud_positions(int state)
     if (state == 0) {
         tmp_at(DISP_BEAM, cmap_to_glyph(S_goodpos));
     } else if (state == 1) {
-        int x, y, dx, dy;
+        coordxy x, y, dx, dy;
         int dist = 6;
 
         for (dx = -dist; dx <= dist; dx++)
@@ -1780,7 +1780,7 @@ seffect_earth(struct obj **sobjp)
     /* TODO: handle steeds */
     if (!Is_rogue_level(&u.uz) && has_ceiling(&u.uz)
         && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
-        register int x, y;
+        coordxy x, y;
         int nboulders = 0;
 
         /* Identify the scroll */
@@ -1961,7 +1961,7 @@ seffect_magic_mapping(struct obj **sobjp)
             return;
         }
         if (sblessed) {
-            register int x, y;
+            coordxy x, y;
 
             for (x = 1; x < COLNO; x++)
                 for (y = 0; y < ROWNO; y++)
@@ -2170,7 +2170,7 @@ drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, b
 }
 
 boolean
-drop_boulder_on_monster(int x, int y, boolean confused, boolean byu)
+drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 {
     register struct obj *otmp2;
     register struct monst *mtmp;
@@ -2300,7 +2300,7 @@ static struct litmon *gremlins = 0;
  * Low-level lit-field update routine.
  */
 static void
-set_lit(int x, int y, genericptr_t val)
+set_lit(coordxy x, coordxy y, genericptr_t val)
 {
     struct monst *mtmp;
     struct litmon *gremlin;

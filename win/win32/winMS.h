@@ -170,7 +170,7 @@ void mswin_raw_print(const char *str);
 void mswin_raw_print_bold(const char *str);
 void mswin_raw_print_flush();
 int mswin_nhgetch(void);
-int mswin_nh_poskey(int *x, int *y, int *mod);
+int mswin_nh_poskey(coordxy *x, coordxy *y, int *mod);
 void mswin_nhbell(void);
 int mswin_doprev_message(void);
 char mswin_yn_function(const char *question, const char *choices, char def);

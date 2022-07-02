@@ -151,9 +151,9 @@ static boolean accept_menu_prefix(const struct ext_func_tab *);
 static void reset_cmd_vars(boolean);
 static void mcmd_addmenu(winid, int, const char *);
 static char here_cmd_menu(void);
-static char there_cmd_menu(int, int, int);
-static void act_on_act(int, int, int);
-static char readchar_core(int *, int *, int *);
+static char there_cmd_menu(coordxy, coordxy, int);
+static void act_on_act(int, coordxy, coordxy);
+static char readchar_core(coordxy *, coordxy *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
 static boolean help_dir(char, uchar, const char *);
@@ -1450,7 +1450,8 @@ static int
 wiz_show_seenv(void)
 {
     winid win;
-    int x, y, v, startx, stopx, curx;
+    coordxy x, y, startx, stopx, curx;
+    int v;
     char row[COLNO + 1];
 
     win = create_nhwindow(NHW_TEXT);
@@ -1494,7 +1495,8 @@ static int
 wiz_show_vision(void)
 {
     winid win;
-    int x, y, v;
+    coordxy x, y;
+    int v;
     char row[COLNO + 1];
 
     win = create_nhwindow(NHW_TEXT);
@@ -1529,7 +1531,7 @@ static int
 wiz_show_wmodes(void)
 {
     winid win;
-    int x, y;
+    coordxy x, y;
     char row[COLNO + 1];
     struct rm *lev;
     boolean istty = WINDOWPORT(tty);
@@ -1565,7 +1567,8 @@ static void
 wiz_map_levltyp(void)
 {
     winid win;
-    int x, y, terrain;
+    coordxy x, y;
+    int terrain;
     char row[COLNO + 1];
     boolean istty = !strcmp(windowprocs.name, "tty");
 
@@ -4299,8 +4302,8 @@ rhack(char *cmd)
 }
 
 /* convert an x,y pair into a direction code */
-int
-xytod(schar x, schar y)
+coordxy
+xytod(coordxy x, coordxy y)
 {
     register int dd;
 
@@ -4718,7 +4721,7 @@ help_dir(
 void
 confdir(void)
 {
-    register int x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
+    register coordxy x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
 
     u.dx = xdir[x];
     u.dy = ydir[x];
@@ -4739,7 +4742,7 @@ directionname(int dir)
 }
 
 int
-isok(register int x, register int y)
+isok(register coordxy x, register coordxy y)
 {
     /* x corresponds to curx, so x==1 is the first column. Ach. %% */
     return x >= 1 && x <= COLNO - 1 && y >= 0 && y <= ROWNO - 1;
@@ -4828,7 +4831,7 @@ mcmd_addmenu(winid win, int act, const char *txt)
 
 /* command menu entries when targeting self */
 static int
-there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
+there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
 {
     int K = 0;
     char buf[BUFSZ];
@@ -4916,7 +4919,7 @@ there_cmd_menu_self(winid win, int x, int y, int *act UNUSED)
 static int
 there_cmd_menu_next2u(
     winid win,
-    int x, int y,
+    coordxy x, coordxy y,
     int mod,
     int *act)
 {
@@ -5041,7 +5044,7 @@ there_cmd_menu_common(
 static void
 act_on_act(
     int act,        /* action */
-    int dx, int dy) /* delta to adjacent spot (farther for couple of cases) */
+    coordxy dx, coordxy dy) /* delta to adjacent spot (farther for couple of cases) */
 {
     struct obj *otmp;
     int dir;
@@ -5205,14 +5208,14 @@ act_on_act(
 
 /* offer choice of actions to perform at adjacent location <x,y> */
 static char
-there_cmd_menu(int x, int y, int mod)
+there_cmd_menu(coordxy x, coordxy y, int mod)
 {
     winid win;
     char ch = '\0';
     int npick = 0, K = 0;
     menu_item *picks = (menu_item *) 0;
     /*int dx = sgn(x - u.ux), dy = sgn(y - u.uy);*/
-    int dx = x - u.ux, dy = y - u.uy;
+    coordxy dx = x - u.ux, dy = y - u.uy;
     int act = MCMD_NOTHING;
 
     win = create_nhwindow(NHW_MENU);
@@ -5271,7 +5274,7 @@ here_cmd_menu(void)
  * convert a MAP window position into a movement key usable with movecmd()
  */
 const char *
-click_to_cmd(int x, int y, int mod)
+click_to_cmd(coordxy x, coordxy y, int mod)
 {
     static char cmd[4];
     struct obj *o;
@@ -5573,7 +5576,7 @@ end_of_input(void)
 #endif /* HANGUPHANDLING */
 
 static char
-readchar_core(int *x, int *y, int *mod)
+readchar_core(coordxy *x, coordxy *y, int *mod)
 {
     register int sym;
 
@@ -5632,14 +5635,15 @@ char
 readchar(void)
 {
     char ch;
-    int x = u.ux, y = u.uy, mod = 0;
+    coordxy x = u.ux, y = u.uy;
+    int mod = 0;
 
     ch = readchar_core(&x, &y, &mod);
     return ch;
 }
 
 char
-readchar_poskey(int *x, int *y, int *mod)
+readchar_poskey(coordxy *x, coordxy *y, int *mod)
 {
     char ch;
 

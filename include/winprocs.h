@@ -59,7 +59,7 @@ struct window_procs {
     void (*win_raw_print)(const char *);
     void (*win_raw_print_bold)(const char *);
     int (*win_nhgetch)(void);
-    int (*win_nh_poskey)(int *, int *, int *);
+    int (*win_nh_poskey)(coordxy *, coordxy *, int *);
     void (*win_nhbell)(void);
     int (*win_doprev_message)(void);
     char (*win_yn_function)(const char *, const char *, char);
@@ -381,7 +381,7 @@ struct chain_procs {
     void (*win_raw_print)(CARGS, const char *);
     void (*win_raw_print_bold)(CARGS, const char *);
     int (*win_nhgetch)(CARGS);
-    int (*win_nh_poskey)(CARGS, int *, int *, int *);
+    int (*win_nh_poskey)(CARGS, coordxy *, coordxy *, int *);
     void (*win_nhbell)(CARGS);
     int (*win_doprev_message)(CARGS);
     char (*win_yn_function)
@@ -457,7 +457,7 @@ extern void safe_print_glyph(winid, coordxy, coordxy,
 extern void safe_raw_print(const char *);
 extern void safe_raw_print_bold(const char *);
 extern int safe_nhgetch(void);
-extern int safe_nh_poskey(int *, int *, int *);
+extern int safe_nh_poskey(coordxy *, coordxy *, int *);
 extern void safe_nhbell(void);
 extern int safe_doprev_message(void);
 extern char safe_yn_function(const char *, const char *, char);

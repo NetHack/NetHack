@@ -85,7 +85,7 @@ mon_yells(struct monst* mon, const char* shout)
 static void
 watch_on_duty(register struct monst* mtmp)
 {
-    int x, y;
+    coordxy x, y;
 
     if (mtmp->mpeaceful && in_town(u.ux + u.dx, u.uy + u.dy)
         && mtmp->mcansee && m_canseeu(mtmp) && !rn2(3)) {
@@ -118,7 +118,7 @@ dochugw(
                    * so perform stop-what-you're-doing-if-close-enough-
                    * to-be-a-threat check but don't move mtmp */
 {
-    int x = mtmp->mx, y = mtmp->my; /* 'mtmp's location before dochug() */
+    coordxy x = mtmp->mx, y = mtmp->my; /* 'mtmp's location before dochug() */
     /* skip canspotmon() if occupation is Null */
     boolean already_saw_mon = (chug && g.occupation) ? canspotmon(mtmp) : 0;
     int rd = chug ? dochug(mtmp) : 0;
@@ -148,7 +148,7 @@ dochugw(
 }
 
 boolean
-onscary(int x, int y, struct monst* mtmp)
+onscary(coordxy x, coordxy y, struct monst* mtmp)
 {
     /* creatures who are directly resistant to magical scaring:
      * humans aren't monsters
@@ -1200,8 +1200,8 @@ m_move(register struct monst* mtmp, register int after)
     {
         register int minr = SQSRCHRADIUS; /* not too far away */
         register struct obj *otmp;
-        register int xx, yy;
-        int oomx, oomy, lmx, lmy;
+        register coordxy xx, yy;
+        coordxy oomx, oomy, lmx, lmy;
 
         /* cut down the search radius if it thinks character is closer. */
         if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
@@ -1750,7 +1750,7 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
 }
 
 void
-dissolve_bars(register int x, register int y)
+dissolve_bars(coordxy x, coordxy y)
 {
     levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
     levl[x][y].flags = 0;
@@ -1760,14 +1760,14 @@ dissolve_bars(register int x, register int y)
 }
 
 boolean
-closed_door(register int x, register int y)
+closed_door(coordxy x, coordxy y)
 {
     return (boolean) (IS_DOOR(levl[x][y].typ)
                       && (levl[x][y].doormask & (D_LOCKED | D_CLOSED)));
 }
 
 boolean
-accessible(register int x, register int y)
+accessible(coordxy x, coordxy y)
 {
     int levtyp = levl[x][y].typ;
 
@@ -1783,7 +1783,8 @@ void
 set_apparxy(register struct monst* mtmp)
 {
     boolean notseen, notthere, gotu;
-    int disp, mx = mtmp->mux, my = mtmp->muy;
+    int disp;
+    coordxy mx = mtmp->mux, my = mtmp->muy;
     long umoney = money_cnt(g.invent);
 
     /*

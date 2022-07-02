@@ -20,7 +20,7 @@
 static boolean isbig(struct mkroom *);
 static struct mkroom *pick_room(boolean);
 static void mkshop(void), mkzoo(int), mkswamp(void);
-static void mk_zoo_thronemon(int, int);
+static void mk_zoo_thronemon(coordxy, coordxy);
 static void mktemple(void);
 static coord *shrine_pos(int);
 static struct permonst *morguemon(void);
@@ -164,7 +164,7 @@ mkshop(void)
             break;
     }
     if (!sroom->rlit) {
-        int x, y;
+        coordxy x, y;
 
         for (x = sroom->lx - 1; x <= sroom->hx + 1; x++)
             for (y = sroom->ly - 1; y <= sroom->hy + 1; y++)
@@ -240,7 +240,7 @@ mkzoo(int type)
 }
 
 static void
-mk_zoo_thronemon(int x,int y)
+mk_zoo_thronemon(coordxy x, coordxy y)
 {
     int i = rnd(level_difficulty());
     int pm = (i > 9) ? PM_OGRE_TYRANT
@@ -263,7 +263,8 @@ fill_zoo(struct mkroom* sroom)
 {
     struct monst *mon;
     register int sx, sy, i;
-    int sh, tx = 0, ty = 0, goldlim = 0, type = sroom->rtype;
+    int sh, goldlim = 0, type = sroom->rtype;
+    coordxy tx = 0, ty = 0;
     int rmno = (int) ((sroom - g.rooms) + ROOMOFFSET);
     coord mm;
 
@@ -511,7 +512,8 @@ static void
 mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
 {
     register struct mkroom *sroom;
-    register int sx, sy, i, eelct = 0;
+    register int i, eelct = 0;
+    coordxy sx, sy;
     int rmno;
 
     for (i = 0; i < 5; i++) { /* turn up to 5 rooms swampy */

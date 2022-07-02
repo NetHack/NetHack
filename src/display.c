@@ -123,14 +123,14 @@
  */
 #include "hack.h"
 
-static void show_mon_or_warn(int, int, int);
+static void show_mon_or_warn(coordxy, coordxy, int);
 static void display_monster(coordxy, coordxy, struct monst *, int, boolean);
 static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *);
 
-static int check_pos(int, int, int);
+static int check_pos(coordxy, coordxy, int);
 static int get_bk_glyph(coordxy x, coordxy y);
-static int tether_glyph(int, int);
+static int tether_glyph(coordxy, coordxy);
 static void mimic_light_blocking(struct monst *);
 #ifdef UNBUFFERED_GLYPHINFO
 static glyph_info *glyphinfo_at(coordxy, coordxy, int);
@@ -138,14 +138,14 @@ static glyph_info *glyphinfo_at(coordxy, coordxy, int);
 
 /*#define WA_VERBOSE*/ /* give (x,y) locations for all "bad" spots */
 #ifdef WA_VERBOSE
-static boolean more_than_one(int, int, int, int, int);
+static boolean more_than_one(coordxy, coordxy, coordxy, coordxy, coordxy);
 #endif
 
-static int set_twall(int, int, int, int, int, int, int, int);
-static int set_wall(int, int, int);
-static int set_corn(int, int, int, int, int, int, int, int);
-static int set_crosswall(int, int);
-static void set_seenv(struct rm *, int, int, int, int);
+static int set_twall(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
+static int set_wall(coordxy, coordxy, int);
+static int set_corn(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
+static int set_crosswall(coordxy, coordxy);
+static void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
 static void t_warn(struct rm *);
 static int wall_angle(struct rm *);
 
@@ -266,9 +266,6 @@ magic_map_background(coordxy x, coordxy y, int show)
  * having to create fake objects and traps.  However, I am reluctant to
  * make this change.
  */
-/* FIXME: some of these use coordxys for x and y, and some use ints.  Make
- * this consistent.
- */
 
 /*
  * map_background()
@@ -296,7 +293,7 @@ map_background(register coordxy x, register coordxy y, register int show)
 void
 map_trap(register struct trap *trap, register int show)
 {
-    register int x = trap->tx, y = trap->ty;
+    register coordxy x = trap->tx, y = trap->ty;
     register int glyph = trap_to_glyph(trap);
 
     if (g.level.flags.hero_memory)
@@ -314,7 +311,7 @@ map_trap(register struct trap *trap, register int show)
 void
 map_object(register struct obj *obj, register int show)
 {
-    register int x = obj->ox, y = obj->oy;
+    register coordxy x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj, newsym_rn2);
 
     if (g.level.flags.hero_memory) {
@@ -351,7 +348,7 @@ map_invisible(register coordxy x, register coordxy y)
 }
 
 boolean
-unmap_invisible(int x, int y)
+unmap_invisible(coordxy x, coordxy y)
 {
     if (isok(x,y) && glyph_is_invisible(levl[x][y].glyph)) {
         unmap_object(x, y);
@@ -372,7 +369,7 @@ unmap_invisible(int x, int y)
  * to call newsym().
  */
 void
-unmap_object(register int x, register int y)
+unmap_object(register coordxy x, register coordxy y)
 {
     register struct trap *trap;
 
@@ -419,14 +416,14 @@ unmap_object(register int x, register int y)
     }
 
 void
-map_location(int x, int y, int show)
+map_location(coordxy x, coordxy y, int show)
 {
     _map_location(x, y, show);
 }
 
 /* display something on monster layer; may need to fixup object layer */
 static void
-show_mon_or_warn(int x, int y, int monglyph)
+show_mon_or_warn(coordxy x, coordxy y, int monglyph)
 {
     struct obj *o;
 
@@ -577,7 +574,7 @@ display_monster(coordxy x, coordxy y,    /* display position */
 static void
 display_warning(struct monst *mon)
 {
-    int x = mon->mx, y = mon->my;
+    coordxy x = mon->mx, y = mon->my;
     int glyph;
 
     if (mon_warning(mon)) {
@@ -814,7 +811,7 @@ feel_location(coordxy x, coordxy y)
  * Possibly put a new glyph at the given location.
  */
 void
-newsym(register int x, register int y)
+newsym(coordxy x, coordxy y)
 {
     struct monst *mon;
     int see_it;
@@ -995,7 +992,7 @@ shieldeff(coordxy x, coordxy y)
 }
 
 static int
-tether_glyph(int x, int y)
+tether_glyph(coordxy x, coordxy y)
 {
     int tdx, tdy;
     tdx = u.ux - x;
@@ -1040,7 +1037,7 @@ static struct tmp_glyph {
 } tgfirst;
 
 void
-tmp_at(int x, int y)
+tmp_at(coordxy x, coordxy y)
 {
     static struct tmp_glyph *tglyph = (struct tmp_glyph *) 0;
     struct tmp_glyph *tmp;
@@ -1169,7 +1166,7 @@ tmp_at(int x, int y)
  * meant to be at the location.
  */
 void
-flash_glyph_at(int x, int y, int tg, int rpt)
+flash_glyph_at(coordxy x, coordxy y, int tg, int rpt)
 {
     int i, glyph[2];
 
@@ -1205,7 +1202,7 @@ swallowed(int first)
         cls();
         bot();
     } else {
-        register int x, y;
+        coordxy x, y;
 
         /* Clear old location */
         for (y = lasty - 1; y <= lasty + 1; y++)
@@ -1263,7 +1260,7 @@ under_water(int mode)
 {
     static coordxy lastx, lasty;
     static boolean dela;
-    register int x, y;
+    coordxy x, y;
 
     /* swallowing has a higher precedence than under water */
     if (Is_waterlevel(&u.uz) || u.uswallow)
@@ -1504,7 +1501,7 @@ doredraw(void)
 void
 docrt(void)
 {
-    register int x, y;
+    coordxy x, y;
     register struct rm *lev;
 
     if (!u.ux || g.program_state.in_docrt)
@@ -1562,7 +1559,8 @@ docrt(void)
 void
 redraw_map(void)
 {
-    int x, y, glyph;
+    coordxy x, y;
+    int glyph;
     glyph_info bkglyphinfo = nul_glyphinfo;
 
     /*
@@ -1633,7 +1631,7 @@ reglyph_darkroom(void)
  * between object piles and single objects, it doesn't mark the location
  * for update. */
 void
-newsym_force(int x, int y)
+newsym_force(coordxy x, coordxy y)
 {
     newsym(x, y);
     g.gbuf[y][x].gnew = 1;
@@ -1647,7 +1645,7 @@ newsym_force(int x, int y)
  * Store the glyph in the 3rd screen for later flushing.
  */
 void
-show_glyph(int x, int y, int glyph)
+show_glyph(coordxy x, coordxy y, int glyph)
 {
 #ifndef UNBUFFERED_GLYPHINFO
     glyph_info glyphinfo;
@@ -1826,7 +1824,7 @@ static gbuf_entry nul_gbuf = {
 void
 clear_glyph_buffer(void)
 {
-    register int x, y;
+    register coordxy x, y;
     gbuf_entry *gptr = &g.gbuf[0][0];
     glyph_info *giptr =
 #ifndef UNBUFFERED_GLYPHINFO
@@ -1861,9 +1859,10 @@ clear_glyph_buffer(void)
 /* used by tty after menu or text popup has temporarily overwritten the map
    and it has been erased so shows spaces, not necessarily S_unexplored */
 void
-row_refresh(int start, int stop, int y)
+row_refresh(coordxy start, coordxy stop, coordxy y)
 {
-    register int x, glyph;
+    register coordxy x;
+    int glyph;
     register boolean force;
     gbuf_entry *gptr = &g.gbuf[0][0];
     glyph_info bkglyphinfo = nul_glyphinfo;
@@ -1924,7 +1923,7 @@ flush_screen(int cursor_on_u)
      */
     static int flushing = 0;
     static int delay_flushing = 0;
-    register int x, y;
+    register coordxy x, y;
     glyph_info bkglyphinfo = nul_glyphinfo;
 
     /* 3.7: don't update map, status, or perm_invent during save/restore */
@@ -2784,7 +2783,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 #ifdef WA_VERBOSE
 
 static const char *type_to_name(int);
-static void error4(int, int, int, int, int, int);
+static void error4(coordxy, coordxy, int, int, int, int);
 
 static int bad_count[MAX_TYPE]; /* count of positions flagged as bad */
 static const char *const type_names[MAX_TYPE] = {
@@ -2803,7 +2802,7 @@ type_to_name(int type)
 }
 
 static void
-error4(int x, int y, int a, int b, int c, int dd)
+error4(coordxy x, coordxy y, int a, int b, int c, int dd)
 {
     pline("set_wall_state: %s @ (%d,%d) %s%s%s%s",
           type_to_name(levl[x][y].typ), x, y,
@@ -2819,7 +2818,7 @@ error4(int x, int y, int a, int b, int c, int dd)
  * Things that are ambiguous: lava
  */
 static int
-check_pos(int x, int y, int which)
+check_pos(coordxy x, coordxy y, int which)
 {
     int type;
 
@@ -2835,7 +2834,7 @@ check_pos(int x, int y, int which)
 /*ARGSUSED*/
 #ifdef WA_VERBOSE
 static boolean
-more_than_one(int x, int y, int a, int b, int c)
+more_than_one(coordxy x, coordxy y, coordxy a, coordxy b, coordxy c)
 {
     if ((a && (b | c)) || (b && (a | c)) || (c && (a | b))) {
         error4(x, y, a, b, c, 0);
@@ -2852,11 +2851,11 @@ more_than_one(int x, int y, int a, int b, int c)
 static int
 set_twall(
 #ifdef WA_VERBOSE
-          int x0, int y0, /* used #if WA_VERBOSE */
+          coordxy x0, coordxy y0, /* used #if WA_VERBOSE */
 #else
-          int x0 UNUSED, int y0 UNUSED,
+          coordxy x0 UNUSED, coordxy y0 UNUSED,
 #endif
-          int x1, int y1, int x2, int y2, int x3, int y3)
+          coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3)
 {
     int wmode, is_1, is_2, is_3;
 
@@ -2873,7 +2872,7 @@ set_twall(
 
 /* Return wall mode for a horizontal or vertical wall. */
 static int
-set_wall(int x, int y, int horiz)
+set_wall(coordxy x, coordxy y, int horiz)
 {
     int wmode, is_1, is_2;
 
@@ -2894,9 +2893,9 @@ set_wall(int x, int y, int horiz)
 
 /* Return a wall mode for a corner wall. (x4,y4) is the "inner" position. */
 static int
-set_corn(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+set_corn(coordxy x1, coordxy y1, coordxy x2, coordxy y2, coordxy x3, coordxy y3, coordxy x4, coordxy y4)
 {
-    int wmode, is_1, is_2, is_3, is_4;
+    coordxy wmode, is_1, is_2, is_3, is_4;
 
     is_1 = check_pos(x1, y1, 1);
     is_2 = check_pos(x2, y2, 1);
@@ -2922,9 +2921,9 @@ set_corn(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 
 /* Return mode for a crosswall. */
 static int
-set_crosswall(int x, int y)
+set_crosswall(coordxy x, coordxy y)
 {
-    int wmode, is_1, is_2, is_3, is_4;
+    coordxy wmode, is_1, is_2, is_3, is_4;
 
     is_1 = check_pos(x - 1, y - 1, 1);
     is_2 = check_pos(x + 1, y - 1, 1);
@@ -2958,14 +2957,14 @@ set_crosswall(int x, int y)
 /* called for every <x,y> by set_wall_state() and for specific <x,y> during
    vault wall repair */
 void
-xy_set_wall_state(int x, int y)
+xy_set_wall_state(coordxy x, coordxy y)
 {
-    int wmode;
+    coordxy wmode;
     struct rm *lev = &levl[x][y];
 
     switch (lev->typ) {
     case SDOOR:
-        wmode = set_wall(x, y, (int) lev->horizontal);
+        wmode = set_wall(x, y, (coordxy) lev->horizontal);
         break;
     case VWALL:
         wmode = set_wall(x, y, 0);
@@ -3014,7 +3013,7 @@ xy_set_wall_state(int x, int y)
 void
 set_wall_state(void)
 {
-    int x, y;
+    coordxy x, y;
 
 #ifdef WA_VERBOSE
     for (x = 0; x < MAX_TYPE; x++)
@@ -3030,7 +3029,7 @@ set_wall_state(void)
     for (x = y = 0; x < MAX_TYPE; x++)
         if (bad_count[x]) {
             if (y == 0) {
-                y = 1; /* only print once */
+                y = 1; /* only prcoordxy once */
                 pline("set_wall_type: wall mode problems with: ");
             }
             pline("%s %d;", type_names[x], bad_count[x]);
@@ -3049,21 +3048,22 @@ unsigned char seenv_matrix[3][3] = { { SV2, SV1, SV0 },
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
 static void
 set_seenv(struct rm *lev,
-          int x0, int y0, int x, int y) /* from, to */
+          coordxy x0, coordxy y0, coordxy x, coordxy y) /* from, to */
 {
-    int dx = x - x0, dy = y0 - y;
+    coordxy dx = x - x0, dy = y0 - y;
 
     lev->seenv |= seenv_matrix[sign(dy) + 1][sign(dx) + 1];
 }
 
 /* Called by blackout(vault.c) when vault guard removes temporary corridor,
-   turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
+   turning spot <x0,y0> back coordxyo stone; <x1,y1> is an adjacent spot. */
 void
 unset_seenv(struct rm *lev,                 /* &levl[x1][y1] */
-            int x0, int y0, int x1, int y1) /* from, to; abs(x1-x0)==1
+            coordxy x0, coordxy y0,
+            coordxy x1, coordxy y1)         /* from, to; abs(x1-x0)==1
                                                && abs(y0-y1)==1 */
 {
-    int dx = x1 - x0, dy = y0 - y1;
+    coordxy dx = x1 - x0, dy = y0 - y1;
 
     lev->seenv &= ~seenv_matrix[dy + 1][dx + 1];
 }

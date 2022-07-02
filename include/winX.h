@@ -460,7 +460,7 @@ extern void X11_print_glyph(winid, coordxy, coordxy, const glyph_info *,
 extern void X11_raw_print(const char *);
 extern void X11_raw_print_bold(const char *);
 extern int X11_nhgetch(void);
-extern int X11_nh_poskey(int *, int *, int *);
+extern int X11_nh_poskey(coordxy *, coordxy *, int *);
 extern void X11_nhbell(void);
 extern int X11_doprev_message(void);
 extern char X11_yn_function_core(const char *, const char *, char, unsigned);

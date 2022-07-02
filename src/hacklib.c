@@ -681,9 +681,9 @@ rounddiv(long x, int y)
 
 /* distance between two points, in moves */
 int
-distmin(int x0, int y0, int x1, int y1)
+distmin(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
 {
-    register int dx = x0 - x1, dy = y0 - y1;
+    coordxy dx = x0 - x1, dy = y0 - y1;
 
     if (dx < 0)
         dx = -dx;
@@ -697,9 +697,9 @@ distmin(int x0, int y0, int x1, int y1)
 
 /* square of euclidean distance between pair of pts */
 int
-dist2(int x0, int y0, int x1, int y1)
+dist2(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
 {
-    register int dx = x0 - x1, dy = y0 - y1;
+    coordxy dx = x0 - x1, dy = y0 - y1;
 
     return dx * dx + dy * dy;
 }

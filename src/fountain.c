@@ -9,7 +9,7 @@
 static void dowatersnakes(void);
 static void dowaterdemon(void);
 static void dowaternymph(void);
-static void gush(int, int, genericptr_t);
+static void gush(coordxy, coordxy, genericptr_t);
 static void dofindgem(void);
 static boolean watchman_warn_fountain(struct monst *);
 
@@ -121,7 +121,7 @@ dogushforth(int drinking)
 }
 
 static void
-gush(int x, int y, genericptr_t poolcnt)
+gush(coordxy x, coordxy y, genericptr_t poolcnt)
 {
     register struct monst *mtmp;
     register struct trap *ttmp;
@@ -527,7 +527,7 @@ dipfountain(register struct obj *obj)
 }
 
 void
-breaksink(int x, int y)
+breaksink(coordxy x, coordxy y)
 {
     if (cansee(x, y) || u_at(x, y))
         pline_The("pipes break!  Water spurts out!");

@@ -43,7 +43,7 @@ dodrop(void)
  * it's gone for good...  If the destination is not a pool, returns FALSE.
  */
 boolean
-boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
+boulder_hits_pool(struct obj *otmp, coordxy rx, coordxy ry, boolean pushing)
 {
     if (!otmp || otmp->otyp != BOULDER) {
         impossible("Not a boulder?");
@@ -138,7 +138,7 @@ boulder_hits_pool(struct obj *otmp, int rx, int ry, boolean pushing)
  * away.
  */
 boolean
-flooreffects(struct obj *obj, int x, int y, const char *verb)
+flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
 {
     struct trap *t;
     struct monst *mtmp;
@@ -385,7 +385,7 @@ polymorph_sink(void)
 static boolean
 teleport_sink(void)
 {
-    int cx, cy;
+    coordxy cx, cy;
     int cnt = 0;
     struct trap *trp;
     struct engr *eng;

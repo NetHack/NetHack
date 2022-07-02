@@ -501,7 +501,7 @@ genl_putmsghistory(const char *msg, boolean is_restoring)
 
 static int hup_nhgetch(void);
 static char hup_yn_function(const char *, const char *, char);
-static int hup_nh_poskey(int *, int *, int *);
+static int hup_nh_poskey(coordxy *, coordxy *, int *);
 static void hup_getlin(const char *, char *);
 static void hup_init_nhwindows(int *, char **);
 static void hup_exit_nhwindows(const char *);
@@ -652,7 +652,7 @@ hup_yn_function(const char *prompt UNUSED,
 
 /*ARGSUSED*/
 static int
-hup_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
+hup_nh_poskey(coordxy *x UNUSED, coordxy *y UNUSED, int *mod UNUSED)
 {
     return '\033';
 }

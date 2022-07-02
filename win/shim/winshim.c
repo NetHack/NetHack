@@ -145,7 +145,7 @@ VDECLCB(shim_print_glyph,(winid w, coordxy x, coordxy y, const glyph_info *glyph
 VDECLCB(shim_raw_print,(const char *str), "vs", P2V str)
 VDECLCB(shim_raw_print_bold,(const char *str), "vs", P2V str)
 DECLCB(int, shim_nhgetch,(void), "i")
-DECLCB(int, shim_nh_poskey,(int *x, int *y, int *mod), "iooo", P2V x, P2V y, P2V mod)
+DECLCB(int, shim_nh_poskey,(coordxy *x, coordxy *y, int *mod), "iooo", P2V x, P2V y, P2V mod)
 VDECLCB(shim_nhbell,(void), "v")
 DECLCB(int, shim_doprev_message,(void),"iv")
 DECLCB(char, shim_yn_function,(const char *query, const char *resp, char def), "cssi", P2V query, P2V resp, A2P def)

@@ -10,11 +10,11 @@ static int picklock(void);
 static int forcelock(void);
 
 static const char *lock_action(void);
-static boolean obstructed(int, int, boolean);
+static boolean obstructed(coordxy, coordxy, boolean);
 static void chest_shatter_msg(struct obj *);
 
 boolean
-picking_lock(int *x, int *y)
+picking_lock(coordxy *x, coordxy *y)
 {
     if (g.occupation == picklock) {
         *x = u.ux + u.dx;
@@ -27,7 +27,7 @@ picking_lock(int *x, int *y)
 }
 
 boolean
-picking_at(int x, int y)
+picking_at(coordxy x, coordxy y)
 {
     return (boolean) (g.occupation == picklock && g.xlock.door == &levl[x][y]);
 }
@@ -730,7 +730,7 @@ doforce(void)
 }
 
 boolean
-stumble_on_door_mimic(int x, int y)
+stumble_on_door_mimic(coordxy x, coordxy y)
 {
     struct monst *mtmp;
 
@@ -751,7 +751,7 @@ doopen(void)
 
 /* try to open a door in direction u.dx/u.dy */
 int
-doopen_indir(int x, int y)
+doopen_indir(coordxy x, coordxy y)
 {
     coord cc;
     register struct rm *door;
@@ -877,7 +877,7 @@ doopen_indir(int x, int y)
 }
 
 static boolean
-obstructed(int x, int y, boolean quietly)
+obstructed(coordxy x, coordxy y, boolean quietly)
 {
     struct monst *mtmp = m_at(x, y);
 
@@ -910,7 +910,7 @@ obstructed(int x, int y, boolean quietly)
 int
 doclose(void)
 {
-    register int x, y;
+    register coordxy x, y;
     register struct rm *door;
     boolean portcullis;
     int res = ECMD_OK;
@@ -1051,7 +1051,7 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
 /* Door/secret door was hit with spell or wand effect otmp;
    returns true if something happened */
 boolean
-doorlock(struct obj *otmp, int x, int y)
+doorlock(struct obj *otmp, coordxy x, coordxy y)
 {
     register struct rm *door = &levl[x][y];
     boolean res = TRUE;

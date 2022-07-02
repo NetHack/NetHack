@@ -6,10 +6,10 @@
 #include "hack.h"
 
 static boolean clear_fcorr(struct monst *, boolean);
-static void blackout(int, int);
+static void blackout(coordxy, coordxy);
 static void restfakecorr(struct monst *);
 static void parkguard(struct monst *);
-static boolean in_fcorridor(struct monst *, int, int);
+static boolean in_fcorridor(struct monst *, coordxy, coordxy);
 static boolean find_guard_dest(struct monst *, coordxy *, coordxy *);
 static void move_gold(struct obj *, int);
 static void wallify_vault(struct monst *);
@@ -44,7 +44,7 @@ free_egd(struct monst *mtmp)
 static boolean
 clear_fcorr(struct monst *grd, boolean forceshow)
 {
-    register int fcx, fcy, fcbeg;
+    coordxy fcx, fcy, fcbeg;
     struct monst *mtmp;
     boolean sawcorridor = FALSE,
             silently = g.program_state.stopprint ? TRUE : FALSE;
@@ -117,7 +117,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
    the corridor, we don't want the light to reappear if/when a new tunnel
    goes through the same area */
 static void
-blackout(int x, int y)
+blackout(coordxy x, coordxy y)
 {
     struct rm *lev;
     int i, j;
@@ -185,7 +185,7 @@ grddead(struct monst *grd)
 }
 
 static boolean
-in_fcorridor(struct monst *grd, int x, int y)
+in_fcorridor(struct monst *grd, coordxy x, coordxy y)
 {
     register int fci;
     struct egd *egrd = EGD(grd);
@@ -257,7 +257,7 @@ uleftvault(struct monst *grd)
 static boolean
 find_guard_dest(struct monst *guard, coordxy *rx, coordxy *ry)
 {
-    register int x, y, dd, lx, ly;
+    coordxy x, y, dd, lx, ly;
 
     for (dd = 2; (dd < ROWNO || dd < COLNO); dd++) {
         for (y = u.uy - dd; y <= u.uy + dd; y++) {
@@ -585,7 +585,8 @@ move_gold(struct obj *gold, int vroom)
 static void
 wallify_vault(struct monst *grd)
 {
-    int x, y, typ;
+    int typ;
+    coordxy x, y;
     int vlt = EGD(grd)->vroom;
     char tmp_viz;
     coordxy lox = g.rooms[vlt].lx - 1, hix = g.rooms[vlt].hx + 1,
@@ -804,8 +805,8 @@ gd_move_cleanup(
 int
 gd_move(struct monst *grd)
 {
-    int x, y, nx, ny, m, n;
-    int dx, dy, gx = 0, gy = 0, fci;
+    coordxy x, y, nx, ny, m, n;
+    coordxy dx, dy, gx = 0, gy = 0, fci;
     uchar typ;
     struct rm *crm;
     struct fakecorridor *fcp;

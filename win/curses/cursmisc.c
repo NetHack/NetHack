@@ -974,7 +974,7 @@ event, or the first non-mouse key event in the case of mouse
 movement. */
 
 int
-curses_get_mouse(int *mousex, int *mousey, int *mod)
+curses_get_mouse(coordxy *mousex, coordxy *mousey, int *mod)
 {
     int key = '\033';
 

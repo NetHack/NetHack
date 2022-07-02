@@ -13,7 +13,7 @@ static void dig_up_grave(coord *);
 static boolean watchman_canseeu(struct monst *);
 static int adj_pit_checks(coord *, char *);
 static void pit_flow(struct trap *, schar);
-static boolean furniture_handled(int, int, boolean);
+static boolean furniture_handled(coordxy, coordxy, boolean);
 
 /* Indices returned by dig_typ() */
 enum dig_types {
@@ -173,7 +173,7 @@ is_digging(void)
 #define BY_OBJECT ((struct monst *) 0)
 
 boolean
-dig_check(struct monst *madeby, boolean verbose, int x, int y)
+dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
 {
     struct trap *ttmp = t_at(x, y);
     const char *verb =
@@ -483,7 +483,7 @@ dig(void)
 }
 
 static boolean
-furniture_handled(int x, int y, boolean madeby_u)
+furniture_handled(coordxy x, coordxy y, boolean madeby_u)
 {
     struct rm *lev = &levl[x][y];
 
@@ -495,7 +495,7 @@ furniture_handled(int x, int y, boolean madeby_u)
         breaksink(x, y);
     } else if (lev->typ == DRAWBRIDGE_DOWN
                || (is_drawbridge_wall(x, y) >= 0)) {
-        int bx = x, by = y;
+        coordxy bx = x, by = y;
 
         /* if under the portcullis, the bridge is adjacent */
         (void) find_drawbridge(&bx, &by);
@@ -518,12 +518,12 @@ holetime(void)
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
 schar
-fillholetyp(int x, int y,
+fillholetyp(coordxy x, coordxy y,
             boolean fill_if_any) /* force filling if it exists at all */
 {
-    register int x1, y1;
-    int lo_x = max(1, x - 1), hi_x = min(x + 1, COLNO - 1),
-        lo_y = max(0, y - 1), hi_y = min(y + 1, ROWNO - 1);
+    coordxy x1, y1;
+    coordxy lo_x = max(1, x - 1), hi_x = min(x + 1, COLNO - 1),
+            lo_y = max(0, y - 1), hi_y = min(y + 1, ROWNO - 1);
     int pool_cnt = 0, moat_cnt = 0, lava_cnt = 0;
 
     for (x1 = lo_x; x1 <= hi_x; x1++)
@@ -552,7 +552,7 @@ fillholetyp(int x, int y,
 }
 
 void
-digactualhole(int x, int y, struct monst *madeby, int ttyp)
+digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
     register struct trap *ttmp;
@@ -810,7 +810,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
         if (pit_only) {
             pline_The("drawbridge seems too hard to dig through.");
         } else {
-            int x = dig_x, y = dig_y;
+            coordxy x = dig_x, y = dig_y;
             /* if under the portcullis, the bridge is adjacent */
             (void) find_drawbridge(&x, &y);
             destroy_drawbridge(x, y);
@@ -1029,7 +1029,7 @@ use_pick_axe(struct obj *obj)
 int
 use_pick_axe2(struct obj *obj)
 {
-    register int rx, ry;
+    coordxy rx, ry;
     register struct rm *lev;
     struct trap *trap, *trap_with_u;
     int dig_target;
@@ -1394,7 +1394,8 @@ zap_dig(void)
     struct monst *mtmp;
     struct obj *otmp;
     struct trap *trap_with_u = (struct trap *) 0;
-    int zx, zy, diridx = 8, digdepth, flow_x = -1, flow_y = -1;
+    coordxy zx, zy, flow_x = -1, flow_y = -1;
+    int diridx = 8, digdepth;
     boolean shopdoor, shopwall, maze_dig, pitdig = FALSE, pitflow = FALSE;
 
     /*
@@ -1702,7 +1703,7 @@ pit_flow(struct trap *trap, schar filltyp)
                         : (char *) 0);
         for (idx = 0; idx < N_DIRS; ++idx) {
             if (t.conjoined & (1 << idx)) {
-                int x, y;
+                coordxy x, y;
                 struct trap *t2;
 
                 x = t.tx + xdir[idx];

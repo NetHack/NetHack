@@ -10,11 +10,11 @@ static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
 static int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
 static int gloc_filter_classify_glyph(int);
-static int gloc_filter_floodfill_matcharea(int, int);
-static void gloc_filter_floodfill(int, int);
+static int gloc_filter_floodfill_matcharea(coordxy, coordxy);
+static void gloc_filter_floodfill(coordxy, coordxy);
 static void gloc_filter_init(void);
 static void gloc_filter_done(void);
-static boolean gather_locs_interesting(int, int, int);
+static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void auto_describe(int, int);
 static void truncate_to_map(int *, int *, schar, schar);
@@ -43,10 +43,10 @@ nextmbuf(void)
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
-static boolean (*getpos_getvalid)(int, int) = (boolean (*)(int, int)) 0;
+static boolean (*getpos_getvalid)(coordxy, coordxy) = (boolean (*)(coordxy, coordxy)) 0;
 
 void
-getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(int, int))
+getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(coordxy, coordxy))
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -295,7 +295,7 @@ gloc_filter_classify_glyph(int glyph)
 }
 
 static int
-gloc_filter_floodfill_matcharea(int x, int y)
+gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
 {
     int glyph = back_to_glyph(x, y);
 
@@ -313,7 +313,7 @@ gloc_filter_floodfill_matcharea(int x, int y)
 }
 
 static void
-gloc_filter_floodfill(int x, int y)
+gloc_filter_floodfill(coordxy x, coordxy y)
 {
     g.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
@@ -355,7 +355,7 @@ gloc_filter_done(void)
 DISABLE_WARNING_UNREACHABLE_CODE
 
 static boolean
-gather_locs_interesting(int x, int y, int gloc)
+gather_locs_interesting(coordxy x, coordxy y, int gloc)
 {
     int glyph, sym;
 
@@ -428,7 +428,8 @@ RESTORE_WARNINGS
 static void
 gather_locs(coord **arr_p, int *cnt_p, int gloc)
 {
-    int x, y, pass, idx;
+    int pass, idx;
+    coordxy x, y;
 
     /*
      * We always include the hero's location even if there is no monster
@@ -469,7 +470,7 @@ gather_locs(coord **arr_p, int *cnt_p, int gloc)
 }
 
 char *
-dxdy_to_dist_descr(int dx, int dy, boolean fulldir)
+dxdy_to_dist_descr(coordxy dx, coordxy dy, boolean fulldir)
 {
     static char buf[30];
     int dst;
@@ -507,7 +508,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* coordinate formatting for 'whatis_coord' option */
 char *
-coord_desc(int x, int y, char *outbuf, char cmode)
+coord_desc(coordxy x, coordxy y, char *outbuf, char cmode)
 {
     static char screen_fmt[16]; /* [12] suffices: "[%02d,%02d]" */
     int dx, dy;
@@ -693,7 +694,8 @@ getpos(coord *ccp, boolean force, const char *goal)
     char mMoOdDxX[13];
     int result = 0;
     int cx, cy, i, c;
-    int sidx, tx = u.ux, ty = u.uy;
+    int sidx;
+    coordxy tx = u.ux, ty = u.uy;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
     boolean hilite_state = FALSE;
@@ -1031,7 +1033,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         if (garr[i])
             free((genericptr_t) garr[i]);
     getpos_hilitefunc = (void (*)(int)) 0;
-    getpos_getvalid = (boolean (*)(int, int)) 0;
+    getpos_getvalid = (boolean (*)(coordxy, coordxy)) 0;
     u.dx = udx, u.dy = udy, u.dz = udz;
     return result;
 }

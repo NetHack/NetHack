@@ -3199,7 +3199,8 @@ wizterrainwish(struct _readobjnam_data *d)
 {
     struct rm *lev;
     boolean madeterrain = FALSE, badterrain = FALSE, didblock;
-    int trap, oldtyp, x = u.ux, y = u.uy;
+    int trap, oldtyp;
+    coordxy x = u.ux, y = u.uy;
     char *bp = d->bp, *p = d->p;
 
     for (trap = NO_TRAP + 1; trap < TRAPNUM; trap++) {

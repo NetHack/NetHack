@@ -2264,7 +2264,7 @@ int
 bhitpile(
     struct obj *obj, /* wand or fake spellbook for type of zap */
     int (*fhito)(OBJ_P, OBJ_P), /* callback for each object being hit */
-    int tx, int ty,  /* target location */
+    coordxy tx, coordxy ty,  /* target location */
     schar zz)        /* direction for up/down zaps */
 {
     int hitanything = 0;
@@ -2977,7 +2977,8 @@ static boolean
 zap_updown(struct obj *obj) /* wand or spell */
 {
     boolean striking = FALSE, disclose = FALSE;
-    int x, y, xx, yy, ptmp;
+    coordxy x, y, xx, yy;
+    int ptmp;
     struct obj *otmp;
     struct engr *e;
     struct trap *ttmp;
@@ -3415,7 +3416,7 @@ maybe_explode_trap(struct trap *ttmp, struct obj *otmp)
  *  one is revealed for a weapon, but if not a weapon is left up to fhitm().
  */
 struct monst *
-bhit(int ddx, int ddy, int range,  /* direction and range */
+bhit(coordxy ddx, coordxy ddy, int range,  /* direction and range */
      enum bhit_call_types weapon,  /* defined in hack.h */
      int (*fhitm)(MONST_P, OBJ_P), /* fns called when mon/obj hit */
      int (*fhito)(OBJ_P, OBJ_P),
@@ -3456,7 +3457,7 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
 
     while (range-- > 0) {
-        int x, y;
+        coordxy x, y;
 
         g.bhitpos.x += ddx;
         g.bhitpos.y += ddy;
@@ -3747,7 +3748,7 @@ bhit(int ddx, int ddy, int range,  /* direction and range */
  * is too obviously silly.
  */
 struct monst *
-boomhit(struct obj *obj, int dx, int dy)
+boomhit(struct obj *obj, coordxy dx, coordxy dy)
 {
     register int i, ct;
     int boom; /* showsym[] index  */
@@ -3770,7 +3771,7 @@ boomhit(struct obj *obj, int dx, int dy)
     g.bhitpos.x = u.ux;
     g.bhitpos.y = u.uy;
     boom = counterclockwise ? S_boomleft : S_boomright;
-    i = xytod(dx, dy);
+    i = (int) xytod(dx, dy);
     tmp_at(DISP_FLASH, cmap_to_glyph(boom));
     for (ct = 0; ct < 10; ct++) {
         i = DIR_CLAMP(i);
@@ -4141,7 +4142,7 @@ zhitu(int type, int nd, const char *fltxt, coordxy sx, coordxy sy)
  * at position x,y; return the number of objects burned
  */
 int
-burn_floor_objects(int x, int y,
+burn_floor_objects(coordxy x, coordxy y,
                    boolean give_feedback, /* caller needs to decide about
                                              visibility checks */
                    boolean u_caused)

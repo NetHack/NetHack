@@ -42,7 +42,7 @@ void chainin_print_glyph(winid, coordxy, coordxy,
 void chainin_raw_print(const char *);
 void chainin_raw_print_bold(const char *);
 int chainin_nhgetch(void);
-int chainin_nh_poskey(int *, int *, int *);
+int chainin_nh_poskey(coordxy *, coordxy *, int *);
 void chainin_nhbell(void);
 int chainin_doprev_message(void);
 char chainin_yn_function(const char *, const char *, char);
@@ -377,8 +377,8 @@ chainin_nhgetch(void)
 
 int
 chainin_nh_poskey(
-    int *x,
-    int *y,
+    coordxy *x,
+    coordxy *y,
     int *mod)
 {
     int rv;

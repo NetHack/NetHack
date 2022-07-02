@@ -14,7 +14,7 @@
 #include "hack.h"
 #include "sp_lev.h"
 
-typedef void (*select_iter_func)(int, int, genericptr);
+typedef void (*select_iter_func)(coordxy, coordxy, genericptr);
 
 extern void mkmap(lev_init *);
 
@@ -27,7 +27,7 @@ static void flip_drawbridge_horizontal(struct rm *);
 static void flip_drawbridge_vertical(struct rm *);
 static void flip_visuals(int, int, int, int, int);
 static int flip_encoded_direction_bits(int, int);
-static void sel_set_wall_property(int, int, genericptr_t);
+static void sel_set_wall_property(coordxy, coordxy, genericptr_t);
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
 static void count_features(void);
 static void remove_boundary_syms(void);
@@ -49,7 +49,7 @@ static boolean create_subroom(struct mkroom *, coordxy, coordxy, coordxy,
 static void create_door(room_door *, struct mkroom *);
 static void create_trap(spltrap *, struct mkroom *);
 static int noncoalignment(aligntyp);
-static boolean m_bad_boulder_spot(int, int);
+static boolean m_bad_boulder_spot(coordxy, coordxy);
 static int pm_to_humidity(struct permonst *);
 static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 static void create_monster(monster *, struct mkroom *);
@@ -62,6 +62,8 @@ static void light_region(region *);
 static void maze1xy(coord *, int);
 static void fill_empty_maze(void);
 static void splev_initlev(lev_init *);
+static boolean generate_way_out_method(coordxy nx, coordxy ny,
+                                       struct selectionvar *ov);
 #if 0
 /* macosx complains that these are unused */
 static long sp_code_jmpaddr(long, long);
@@ -79,7 +81,7 @@ static void spo_mazewalk(struct sp_coder *);
 static void spo_wall_property(struct sp_coder *);
 static void spo_room_door(struct sp_coder *);
 static void spo_wallify(struct sp_coder *);
-static void sel_set_wallify(int, int, genericptr_t);
+static void sel_set_wallify(coordxy, coordxy, genericptr_t);
 #endif
 static void spo_end_moninvent(void);
 static void spo_pop_container(void);
@@ -88,22 +90,22 @@ static void spo_endroom(struct sp_coder *);
 static void l_table_getset_feature_flag(lua_State *, int, int, const char *,
                                         int);
 static void l_get_lregion(lua_State *, lev_region *);
-static void sel_set_lit(int, int, genericptr_t);
+static void sel_set_lit(coordxy, coordxy, genericptr_t);
 static void add_doors_to_room(struct mkroom *);
 static void selection_iterate(struct selectionvar *, select_iter_func,
                               genericptr_t);
-static void sel_set_ter(int, int, genericptr_t);
-static void sel_set_door(int, int, genericptr_t);
-static void sel_set_feature(int, int, genericptr_t);
+static void sel_set_ter(coordxy, coordxy, genericptr_t);
+static void sel_set_door(coordxy, coordxy, genericptr_t);
+static void sel_set_feature(coordxy, coordxy, genericptr_t);
 static void levregion_add(lev_region *);
 static void get_table_xy_or_coord(lua_State *, lua_Integer *, lua_Integer *);
 static int get_table_region(lua_State *, const char *, lua_Integer *,
                         lua_Integer *, lua_Integer *, lua_Integer *, boolean);
 static void set_wallprop_in_selection(lua_State *, int);
 static coordxy random_wdir(void);
-static int floodfillchk_match_under(int, int);
-static int floodfillchk_match_accessible(int, int);
-static boolean sel_flood_havepoint(int, int, coordxy *, coordxy *, int);
+static int floodfillchk_match_under(coordxy, coordxy);
+static int floodfillchk_match_accessible(coordxy, coordxy);
+static boolean sel_flood_havepoint(coordxy, coordxy, coordxy *, coordxy *, int);
 static long line_dist_coord(long, long, long, long, long, long);
 static void l_push_mkroom_table(lua_State *, struct mkroom *);
 static int get_table_align(lua_State *);
@@ -485,7 +487,7 @@ void
 flip_level(int flp, boolean extras)
 {
     int x, y, i, itmp;
-    int minx, miny, maxx, maxy;
+    coordxy minx, miny, maxx, maxy;
     struct rm trm;
     struct trap *ttmp;
     struct obj *otmp;
@@ -855,7 +857,7 @@ flip_level_rnd(int flp, boolean extras)
 
 
 static void
-sel_set_wall_property(int x, int y, genericptr_t arg)
+sel_set_wall_property(coordxy x, coordxy y, genericptr_t arg)
 {
     int prop = *(int *)arg;
 
@@ -1195,7 +1197,7 @@ is_ok_location(coordxy x, coordxy y, getloc_flags_t humidity)
 }
 
 boolean
-pm_good_location(int x, int y, struct permonst* pm)
+pm_good_location(coordxy x, coordxy y, struct permonst* pm)
 {
     return is_ok_location(x, y, pm_to_humidity(pm));
 }
@@ -1234,6 +1236,7 @@ get_location_coord(
     *y = c.y;
     get_location(x, y, c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0),
                  croom);
+    
     if (*x == -1 && *y == -1 && c.is_random)
         get_location(x, y, humidity, croom);
 }
@@ -1740,7 +1743,7 @@ noncoalignment(aligntyp alignment)
 
 /* attempt to screen out locations where a mimic-as-boulder shouldn't occur */
 static boolean
-m_bad_boulder_spot(int x, int y)
+m_bad_boulder_spot(coordxy x, coordxy y)
 {
     struct rm *lev;
 
@@ -2707,9 +2710,9 @@ light_region(region* tmpregion)
 }
 
 void
-wallify_map(int x1, int y1, int x2, int y2)
+wallify_map(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 {
-    int x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
+    coordxy x, y, xx, yy, lo_xx, lo_yy, hi_xx, hi_yy;
 
     y1 = max(y1, 0);
     x1 = max(x1, 1);
@@ -3901,17 +3904,17 @@ l_create_stairway(lua_State *L, boolean using_ladder)
         lcheck_param_table(L);
         get_table_xy_or_coord(L, &ax, &ay);
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
-        x = ax;
-        y = ay;
+        x = (coordxy) ax;
+        y = (coordxy) ay;
     } else {
-        int ix = -1, iy = -1;
+        lua_Integer ix = -1, iy = -1;
         if (argc > 0 && ltype == LUA_TSTRING) {
             up = stairdirs2i[luaL_checkoption(L, 1, "down", stairdirs)];
             lua_remove(L, 1);
         }
         nhl_get_xy_params(L, &ix, &iy);
-        x = ix;
-        y = iy;
+        x = (coordxy) ix;
+        y = (coordxy) iy;
     }
 
     if (x == -1 && y == -1) {
@@ -4331,7 +4334,7 @@ selection_clone(struct selectionvar* sel)
 }
 
 coordxy
-selection_getpoint(int x, int y, struct selectionvar* sel)
+selection_getpoint(coordxy x, coordxy y, struct selectionvar* sel)
 {
     if (!sel || !sel->map)
         return 0;
@@ -4342,7 +4345,7 @@ selection_getpoint(int x, int y, struct selectionvar* sel)
 }
 
 void
-selection_setpoint(int x, int y, struct selectionvar* sel, coordxy c)
+selection_setpoint(coordxy x, coordxy y, struct selectionvar* sel, coordxy c)
 {
     if (!sel || !sel->map)
         return;
@@ -4453,7 +4456,7 @@ random_wdir(void)
 void
 selection_do_grow(struct selectionvar* ov, int dir)
 {
-    int x, y;
+    coordxy x, y;
     struct selectionvar *tmp;
 
     if (!ov)
@@ -4494,17 +4497,17 @@ selection_do_grow(struct selectionvar* ov, int dir)
     selection_free(tmp, TRUE);
 }
 
-static int (*selection_flood_check_func)(int, int);
+static int (*selection_flood_check_func)(coordxy, coordxy);
 static schar floodfillchk_match_under_typ;
 
 void
-set_selection_floodfillchk(int (*f)(int, int))
+set_selection_floodfillchk(int (*f)(coordxy, coordxy))
 {
     selection_flood_check_func = f;
 }
 
 static int
-floodfillchk_match_under(int x, int y)
+floodfillchk_match_under(coordxy x, coordxy y)
 {
     return (floodfillchk_match_under_typ == levl[x][y].typ);
 }
@@ -4517,7 +4520,7 @@ set_floodfillchk_match_under(coordxy typ)
 }
 
 static int
-floodfillchk_match_accessible(int x, int y)
+floodfillchk_match_accessible(coordxy x, coordxy y)
 {
     return (ACCESSIBLE(levl[x][y].typ)
             || levl[x][y].typ == SDOOR
@@ -4526,9 +4529,9 @@ floodfillchk_match_accessible(int x, int y)
 
 /* check whethere <x,y> is already in xs[],ys[] */
 static boolean
-sel_flood_havepoint(int x, int y, coordxy xs[], coordxy ys[], int n)
+sel_flood_havepoint(coordxy x, coordxy y, coordxy xs[], coordxy ys[], int n)
 {
-    coordxy xx = (coordxy) x, yy = (coordxy) y;
+    coordxy xx = x, yy = y;
 
     while (n > 0) {
         --n;
@@ -4539,7 +4542,7 @@ sel_flood_havepoint(int x, int y, coordxy xs[], coordxy ys[], int n)
 }
 
 void
-selection_floodfill(struct selectionvar* ov, int x, int y, boolean diagonals)
+selection_floodfill(struct selectionvar* ov, coordxy x, coordxy y, boolean diagonals)
 {
     struct selectionvar *tmp = selection_new();
 #define SEL_FLOOD_STACK (COLNO * ROWNO)
@@ -4565,7 +4568,7 @@ selection_floodfill(struct selectionvar* ov, int x, int y, boolean diagonals)
     coordxy dx[SEL_FLOOD_STACK];
     coordxy dy[SEL_FLOOD_STACK];
 
-    if (selection_flood_check_func == (int (*)(int, int)) 0) {
+    if (selection_flood_check_func == (int (*)(coordxy, coordxy)) 0) {
         selection_free(tmp, TRUE);
         return;
     }
@@ -4871,7 +4874,7 @@ selection_iterate(
     select_iter_func func,
     genericptr_t arg)
 {
-    int x, y;
+    coordxy x, y;
 
     if (!ov)
         return;
@@ -4884,7 +4887,7 @@ selection_iterate(
 }
 
 static void
-sel_set_ter(int x, int y, genericptr_t arg)
+sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 {
     terrain terr;
 
@@ -4902,7 +4905,7 @@ sel_set_ter(int x, int y, genericptr_t arg)
 }
 
 static void
-sel_set_feature(int x, int y, genericptr_t arg)
+sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
 {
     if (IS_FURNITURE(levl[x][y].typ))
         return;
@@ -4910,7 +4913,7 @@ sel_set_feature(int x, int y, genericptr_t arg)
 }
 
 static void
-sel_set_door(int dx, int dy, genericptr_t arg)
+sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
 {
     coordxy typ = *(coordxy *) arg;
     coordxy x = dx, y = dy;
@@ -5203,7 +5206,7 @@ lspo_replace_terrain(lua_State *L)
     struct mapfragment *mf = NULL;
     struct selectionvar *sel = NULL;
     boolean freesel = FALSE;
-    int x, y;
+    coordxy x, y;
     lua_Integer x1, y1, x2, y2;
     int chance;
     int tolit;
@@ -5288,7 +5291,7 @@ lspo_replace_terrain(lua_State *L)
 
 static boolean
 generate_way_out_method(
-    int nx, int ny,
+    coordxy nx, coordxy ny,
     struct selectionvar *ov)
 {
     static const int escapeitems[] = {
@@ -5362,7 +5365,7 @@ ensure_way_out(void)
 {
     struct selectionvar *ov = selection_new();
     struct trap *ttmp = g.ftrap;
-    int x, y;
+    coordxy x, y;
     boolean ret = TRUE;
     stairway *stway = g.stairs;
 
@@ -5622,7 +5625,7 @@ lspo_levregion(lua_State *L)
 }
 
 static void
-sel_set_lit(int x, int y, genericptr_t arg)
+sel_set_lit(coordxy x, coordxy y, genericptr_t arg)
 {
      int lit = *(int *)arg;
 
@@ -5633,7 +5636,7 @@ sel_set_lit(int x, int y, genericptr_t arg)
 static void
 add_doors_to_room(struct mkroom *croom)
 {
-    int x, y;
+    coordxy x, y;
 
     for (x = croom->lx - 1; x <= croom->hx + 1; x++)
         for (y = croom->ly - 1; y <= croom->hy + 1; y++)
@@ -6019,7 +6022,7 @@ lspo_non_passwall(lua_State *L)
 #if 0
 /*ARGSUSED*/
 static void
-sel_set_wallify(int x, int y, genericptr_t arg UNUSED)
+sel_set_wallify(coordxy x, coordxy y, genericptr_t arg UNUSED)
 {
     wallify_map(x, y, x, y);
 }

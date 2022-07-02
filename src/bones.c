@@ -8,7 +8,7 @@
 static boolean no_bones_level(d_level *);
 static void goodfruit(int);
 static void resetobjs(struct obj *, boolean);
-static void give_to_nearby_mon(struct obj *, int, int);
+static void give_to_nearby_mon(struct obj *, coordxy, coordxy);
 static boolean fixuporacle(struct monst *);
 static void remove_mon_from_bones(struct monst *);
 
@@ -220,7 +220,7 @@ sanitize_name(char *namebuf)
    but skipping hero's location.
    If no such monster, place object on floor at x,y. */
 static void
-give_to_nearby_mon(struct obj *otmp, int x, int y)
+give_to_nearby_mon(struct obj *otmp, coordxy x, coordxy y)
 {
     struct monst *mtmp;
     struct monst *selected = (struct monst *) 0;
@@ -256,7 +256,7 @@ void
 drop_upon_death(
     struct monst *mtmp, /* monster if hero rises as one (non ghost) */
     struct obj *cont,   /* container if hero is turned into a statue */
-    int x, int y)
+    coordxy x, coordxy y)
 {
     struct obj *otmp;
 
@@ -399,7 +399,7 @@ remove_mon_from_bones(struct monst *mtmp)
 void
 savebones(int how, time_t when, struct obj *corpse)
 {
-    int x, y;
+    coordxy x, y;
     struct trap *ttmp;
     struct monst *mtmp;
     struct fruit *f;

@@ -42,7 +42,7 @@ static int throwspell(void);
 static void cast_protection(void);
 static void spell_backfire(int);
 static const char *spelltypemnemonic(int);
-static boolean spell_aim_step(genericptr_t, int, int);
+static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
 
 /* The roles[] table lists the role-specific values for tuning
  * percent_success().
@@ -1246,7 +1246,7 @@ spelleffects(int spell_otyp, boolean atme)
 
 /*ARGSUSED*/
 static boolean
-spell_aim_step(genericptr_t arg UNUSED, int x, int y)
+spell_aim_step(genericptr_t arg UNUSED, coordxy x, coordxy y)
 {
     if (!isok(x,y))
         return FALSE;

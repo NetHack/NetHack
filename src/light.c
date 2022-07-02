@@ -136,7 +136,8 @@ del_light_source(int type, anything *id)
 void
 do_light_sources(coordxy **cs_rows)
 {
-    int x, y, min_x, max_x, max_y, offset;
+    coordxy x, y, min_x, max_x, max_y;
+    int offset;
     coordxy *limits;
     short at_hero_range = 0;
     light_source *ls;
@@ -221,7 +222,7 @@ do_light_sources(coordxy **cs_rows)
    remember terrain, objects, and monsters being revealed;
    if 'obj' is Null, <x,y> is being hit by a camera's light flash */
 void
-show_transient_light(struct obj *obj, int x, int y)
+show_transient_light(struct obj *obj, coordxy x, coordxy y)
 {
     light_source *ls = 0;
     anything cameraflash;
@@ -621,7 +622,7 @@ any_light_source(void)
  * only for burning light sources.
  */
 void
-snuff_light_source(int x, int y)
+snuff_light_source(coordxy x, coordxy y)
 {
     light_source *ls;
     struct obj *obj;
