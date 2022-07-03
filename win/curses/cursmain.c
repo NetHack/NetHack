@@ -806,7 +806,12 @@ curses_print_glyph(winid wid, coordxy x, coordxy y,
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */
         if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
-            attr = A_REVERSE; /* map_glyphinfo() only sets this if color is off */
+            /* reset_glyphmap() only sets MG_BW_foo if color is off */
+            attr = A_REVERSE; 
+        }
+        /* highlight female monsters (wizard mode option) */
+        if ((special & MG_FEMALE) && iflags.wizmgender) {
+            attr = A_REVERSE;
         }
     }
 
