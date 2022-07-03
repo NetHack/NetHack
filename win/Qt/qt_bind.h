@@ -89,7 +89,7 @@ public:
 	static void qt_outrip(winid wid, int how, time_t when);
 	static int qt_kbhit();
 	static void qt_update_inventory(int);
-        static perminvent_info *qt_update_invent_slot(winid, int, perminvent_info *);
+        static win_request_info *qt_ctrl_nhwindow(winid, int, win_request_info *);
 
 	static QWidget *mainWidget() { return main; }
 

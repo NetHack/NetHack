@@ -1176,6 +1176,7 @@ extern const char *currency(long);
 extern void silly_thing(const char *, struct obj *);
 extern void sync_perminvent(void);
 extern void perm_invent_toggled(boolean negated);
+extern void prepare_perminvent(winid window);
 
 /* ### ioctl.c ### */
 

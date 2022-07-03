@@ -120,7 +120,7 @@ struct window_procs mswin_procs = {
     mswin_status_update,
     genl_can_suspend_yes,
     mswin_update_inventory,
-    mswin_update_invent_slot,
+    mswin_ctrl_nhwindow,
 };
 
 /*
@@ -1245,15 +1245,13 @@ mswin_update_inventory(int arg)
         display_inventory(NULL, FALSE);
 }
 
-perminvent_info *
-mswin_update_invent_slot(
-    winid window,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot,                 /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi)
+win_request_info *
+mswin_ctrl_nhwindow(
+    winid window,
+    int request,
+    win_request_info *wri)
 {
-    return (perminvent_info *) 0;
+    return (win_request_info *) 0;
 }
 
 /*

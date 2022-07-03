@@ -5,6 +5,7 @@
 /* main.c - Windows */
 
 #include "win32api.h" /* for GetModuleFileName */
+
 #include "hack.h"
 #ifdef DLB
 #include "dlb.h"
@@ -423,6 +424,10 @@ mingw_main(int argc, char *argv[])
     char *windowtype = NULL;
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     char failbuf[BUFSZ];
+
+#ifdef _MSC_VER
+    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+#endif
 
     /*
      * Get a set of valid safe windowport function

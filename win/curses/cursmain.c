@@ -117,7 +117,7 @@ struct window_procs curses_procs = {
     curses_status_update,
     genl_can_suspend_yes,
     curses_update_inventory,
-    curses_update_invent_slot,
+    curses_ctrl_nhwindow,
 };
 
 /*
@@ -695,15 +695,13 @@ curses_update_inventory(int arg)
     }
 }
 
-perminvent_info *
-curses_update_invent_slot(
-    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi UNUSED)
+win_request_info *
+curses_ctrl_nhwindow(
+    winid window UNUSED,
+    int request UNUSED,
+    win_request_info *wri UNUSED)
 {
-    return (perminvent_info *) 0;
+    return (win_request_info *) 0;
 }
 
 /*

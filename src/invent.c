@@ -42,6 +42,12 @@ static boolean item_naming_classification(struct obj *, char *, char *);
 static int item_reading_classification(struct obj *, char *);
 static void mime_action(const char *);
 
+/* enum and structs are defined in wintype.h */
+static win_request_info zerowri = { { 0L, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0 } };
+static win_request_info wri_info;
+static int done_setting_perminv_flags = 0;
+static boolean in_perm_invent_toggled;
+
 /* wizards can wish for venom, which will become an invisible inventory
  * item without this.  putting it in inv_order would mean venom would
  * suddenly become a choice for all the inventory-class commands, which
@@ -2440,7 +2446,7 @@ update_inventory(void)
      */
     save_suppress_price = iflags.suppress_price;
     iflags.suppress_price = 0;
-#if defined(TTY_PERM_INVENT) && defined(CORE_INVENT)
+#if defined(TTY_PERM_INVENT)
     if (WINDOWPORT(tty))
         sync_perminvent();
     else
@@ -3183,27 +3189,40 @@ display_pickinv(
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
     int n, classcount;
-    winid win;                        /* windows being used */
+    winid win; /* windows being used */
     anything any;
     menu_item *selected;
     unsigned sortflags;
     Loot *sortedinvent, *srtinv;
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
-    int clr = 0;
+    int clr = 0, menu_behavior = MENU_BEHAVE_STANDARD;
+    boolean show_gold = TRUE, sparse = FALSE, inuse_only = FALSE,
+            doing_perm_invent = FALSE, save_flags_sortpack = flags.sortpack;
 
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
 
-    if (iflags.perm_invent && (lets || xtra_choice || wizid)) {
+    if ((iflags.perm_invent && (lets || xtra_choice || wizid))
+#ifdef TTY_PERM_INVENT
+        || !g.in_sync_perminvent
+#endif
+        || WIN_INVEN == WIN_ERR) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
            the first time needed and keep it for re-use as needed later */
         if (g.cached_pickinv_win == WIN_ERR)
             g.cached_pickinv_win = create_nhwindow(NHW_MENU);
         win = g.cached_pickinv_win;
-    } else
+    } else {
         win = WIN_INVEN;
-
+        menu_behavior = MENU_BEHAVE_PERMINV;
+        prepare_perminvent(win);
+        show_gold = ((wri_info.fromcore.invmode & InvShowGold) != 0);
+        sparse = ((wri_info.fromcore.invmode & InvSparse) != 0);
+        inuse_only = ((wri_info.fromcore.invmode & InvInUse) != 0);
+        doing_perm_invent = TRUE;
+	nhUse(sparse);
+    }
     /*
      * Exit early if no inventory -- but keep going if we are doing
      * a permanent inventory update.  We need to keep going so the
@@ -3266,10 +3285,18 @@ display_pickinv(
     sortflags = (flags.sortloot == 'f') ? SORTLOOT_LOOT : SORTLOOT_INVLET;
     if (flags.sortpack)
         sortflags |= SORTLOOT_PACK;
+#ifdef TTY_PERM_INVENT
+    if (doing_perm_invent && WINDOWPORT(tty)) {
+        sortflags = SORTLOOT_INVLET;
+        save_flags_sortpack = flags.sortpack;
+        flags.sortpack = FALSE;
+    }
+#else
+    nhUse(save_flags_sortpack);
+#endif
     sortedinvent = sortloot(&g.invent, sortflags, FALSE,
                             (boolean (*)(OBJ_P)) 0);
-
-    start_menu(win, MENU_BEHAVE_STANDARD);
+    start_menu(win, menu_behavior);
     any = cg.zeroany;
     if (wizid) {
         int unid_cnt;
@@ -3326,6 +3353,11 @@ display_pickinv(
             continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (wizid && !not_fully_identified(otmp))
+                continue;
+            if (doing_perm_invent
+                && ((otmp->invlet == GOLD_SYM && !show_gold)
+                    || ((otmp->invlet != GOLD_SYM)
+                        && (!otmp->owornmask && inuse_only))))
                 continue;
             any = cg.zeroany; /* all bits zero */
             ilet = otmp->invlet;
@@ -3387,6 +3419,10 @@ display_pickinv(
                  not_carrying_anything, MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
+#ifdef TTY_PERM_INVENT
+    if (doing_perm_invent && WINDOWPORT(tty))
+        flags.sortpack = save_flags_sortpack;
+#endif
     end_menu(win, (query && *query) ? query : (char *) 0);
 
     n = select_menu(win,
@@ -5361,47 +5397,39 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
     return n;
 }
 
-#if defined(CORE_INVENT)
-/* enum and structs are defined in wintype.h */
-static perminvent_info zeropi = { {0L,0,0,0,0,0,0,0}, {0,0,0,0,0,{0},0} };
-static perminvent_info pi_info;
-static char Empty[1] = { '\0' };
-static int done_environment_var = 0;
-#ifdef TTY_PERM_INVENT
-extern void tty_perm_invent_toggled(boolean negated);
-static boolean in_perm_invent_toggled;
-#endif
+void
+prepare_perminvent(winid window)
+{
+    win_request_info *wri UNUSED;
+
+    if (!done_setting_perminv_flags) {
+        wri_info = zerowri;
+        /*TEMPORARY*/
+        char *envtmp = nh_getenv("TTYINV");
+        wri_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
+        /*  relay the mode settings to the window port */
+        wri = ctrl_nhwindow(window, set_mode, &wri_info);
+        done_setting_perminv_flags = 1;
+    }
+}
 
 void
 sync_perminvent(void)
 {
-    static perminvent_info *pi = 0;
-    char *text, nxtlet;
-    int slot;
-    boolean show_gold, inuse_only, sparse;
+    static win_request_info *wri = 0;
     const char *wport_id;
-    struct obj *obj;
 
-    if (!done_environment_var) {
-       pi_info = zeropi;
-       /*TEMPORARY*/
-       char *envtmp = nh_getenv("TTYINV");
-       pi_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
-       done_environment_var = 1;
-    }
-    show_gold = (pi_info.fromcore.invmode & InvShowGold) != 0;
-    inuse_only = (pi_info.fromcore.invmode & InvInUse) != 0;
-    sparse = (pi_info.fromcore.invmode & InvSparse) != 0;
-
-    if ((g.perm_invent_win == WIN_ERR && g.core_invent_state)
-        || (pi_info.tocore.tocore_flags & prohibited))
+    if (WIN_INVEN == WIN_ERR) {
+        if ((g.core_invent_state
+             || (wri_info.tocore.tocore_flags & prohibited))
+            && !(in_perm_invent_toggled
+                 && g.perm_invent_toggling_direction == toggling_on))
             return;
+    }
+    if (!done_setting_perminv_flags && WIN_INVEN != WIN_ERR)
+        prepare_perminvent(WIN_INVEN);
 
-    if ((!iflags.perm_invent && g.core_invent_state)
-#ifdef TTY_PERM_INVENT
-        && !in_perm_invent_toggled
-#endif
-                                                     ){
+    if ((!iflags.perm_invent && g.core_invent_state)) {
         /* Odd - but this could be end-of-game disclosure
          * which just sets boolean iflag.perm_invent to
          * FALSE without actually doing anything else.
@@ -5413,157 +5441,81 @@ sync_perminvent(void)
         (void) doredraw();
         return;
     }
-    if (!iflags.perm_invent
-#ifdef TTY_PERM_INVENT
-&& !in_perm_invent_toggled
-#endif
-                            )
-        return;
+
     /*
-     * The core looks after what content goes into the
-     * inventory slots, and deals with things like obj
-     * chains etc, so the window port doesn't have to.
+     * The following conditions can bring us to here:
+     * 1. iflags.perm_invent is on
+     *      AND
+     *    g.core_invent_state is still zero.
      *
-     * The window port informs the core of the number of
-     * slots that it will process.
+     * OR
      *
-     * The core tells the window port what the contents of the
-     * inventory slots should be.
-     *
-     * The core requests the window port when to render, after
-     * all the content has been updated.
-     *
-     * The window port looks after the placement of an inventory
-     * slot's contents onto the display in an appropriate fashion,
-     * The core doesn't care, and leaves that up to the window port.
-     *
-     * The core slot handling is no longer tied to TTY_PERM_INVENT,
-     * although at this point that's the only window port to utilize
-     * it. The rest are still rolling their own via the basic
-     * [port]_update_inventory() mechanism.
+     * 2. iflags.perm_invent is off, but we're in the
+     *    midst of toggling it on.
      */
 
-    if (WINDOWPORT(tty) && iflags.perm_invent)
-        wport_id = "tty perm_invent";
-    else
-        wport_id = "perm_invent";
-
-    pi_info.fromcore.core_request = 0;
     if ((iflags.perm_invent && !g.core_invent_state)
-#ifdef TTY_PERM_INVENT
-        || in_perm_invent_toggled
-#endif
-                                                    ) {
-        /* Send the wport a request to get the related settings. */
-        pi_info.fromcore.core_request = request_settings;
-        if ((pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info))) {
-            if ((pi->tocore.tocore_flags & prohibited) != 0) {
-                /* sizes aren't good enough */
-                set_option_mod_status("perm_invent", set_gameview);
-                iflags.perm_invent = FALSE;
-                pline("%s could not be enabled.", wport_id);
-                pline("%s needs a terminal that is at least %dx%d, yours is %dx%d.",
-                      wport_id,
-                      pi->tocore.needrows, pi->tocore.needcols,
-                      pi->tocore.haverows, pi->tocore.havecols);
-                wait_synch();
-                return;
+        || ((!iflags.perm_invent
+            && (in_perm_invent_toggled
+                && g.perm_invent_toggling_direction == toggling_on)))) {
+
+        /* Send windowport a request to return the related settings to us */
+        if ((iflags.perm_invent && !g.core_invent_state)
+            || in_perm_invent_toggled) {
+            if ((wri = ctrl_nhwindow(WIN_INVEN, request_settings, &wri_info))) {
+                if ((wri->tocore.tocore_flags & prohibited) != 0) {
+                    /* sizes aren't good enough */
+                    set_option_mod_status("perm_invent", set_gameview);
+                    iflags.perm_invent = FALSE;
+                    if (WIN_INVEN != WIN_ERR)
+                        destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
+                    if (WINDOWPORT(tty) && iflags.perm_invent)
+                        wport_id = "tty perm_invent";
+                    else
+                        wport_id = "perm_invent";
+                    pline("%s could not be enabled.", wport_id);
+                    pline("%s needs a terminal that is at least %dx%d, yours "
+                          "is %dx%d.",
+                          wport_id, wri->tocore.needrows,
+                          wri->tocore.needcols, wri->tocore.haverows,
+                          wri->tocore.havecols);
+                    wait_synch();
+                    return;
+                }
             }
+            g.core_invent_state++;
         }
-        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
-        if (g.perm_invent_win == WIN_ERR)
-            return;
-        display_nhwindow(g.perm_invent_win, FALSE);
-        g.core_invent_state++;
     }
-    if (!pi || pi->tocore.maxslot == 0)
+
+    if (!wri || wri->tocore.maxslot == 0)
         return;
 
-    text = Empty; /* lint suppression */
-    pi_info.fromcore.core_request = update_slot;
-    obj = g.invent;
-    for (slot = 0; slot < pi->tocore.maxslot; ++slot) {
-        nxtlet = '?'; /* always gets set to something else if actually used */
-        if (!sparse) {
-            while (obj && ((obj->invlet == GOLD_SYM && !show_gold)
-                           || (!obj->owornmask && inuse_only)))
-                obj = obj->nobj;
-        } else {
-            if (!show_gold)
-                nxtlet = (slot < 26) ? ('a' + slot) : ('A' + slot - 26);
-            else
-                nxtlet = (slot == 0) ? GOLD_SYM
-                         : (slot < 27) ? ('a' + slot - 1)
-                           : (slot < 53) ? ('A' + slot - 27)
-                             : NOINVSYM;
-            for (obj = g.invent; obj; obj = obj->nobj)
-                if (obj->invlet == nxtlet)
-                    break;
-        }
-        if (obj) {
-            /* TODO: check for MENUCOLORS match */
-            text = doname(obj); /* 'text' will switch to fromcore.text below */
-            /* strip away "a"/"an"/"the" prefix to show a bit more of the
-               interesting part of the object's description;
-               this is inline version of pi_article_skip() from cursinvt.c;
-               should move that to hacklib.c and use it here */
-            if (text[0] == 'a') {
-                if (text[1] == ' ')
-                    text += 2;
-                else if (text[1] == 'n' && text[2] == ' ')
-                    text += 3;
-            } else if (text[0] == 't') {
-                if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
-                    text += 4;
-            }
-            Snprintf(pi_info.fromcore.text,
-                     sizeof pi_info.fromcore.text,
-                     "%c - %s", obj->invlet, text);
-            text = pi_info.fromcore.text;
-            obj = obj->nobj; /* set up for next iteration */
-        } else if (sparse) {
-            Sprintf(pi_info.fromcore.text, "%c", nxtlet); /* empty slot */
-            text = pi_info.fromcore.text;
-        } else {
-            if (slot == 0) {
-                Sprintf(pi_info.fromcore.text, "%-4s[%s]", "",
-                        !g.invent ? "empty"
-                        : inuse_only ? "no items are in use"
-                          : "only gold");
-                text = pi_info.fromcore.text;
-            } else {
-                text = Empty; /* "" => fill slot with spaces */
-            }
-        }
-        if (!*text)
-            pi_info.fromcore.text[0] = Empty[0];
-        pi = update_invent_slot(g.perm_invent_win, slot + 1, &pi_info);
+    if (in_perm_invent_toggled && g.perm_invent_toggling_direction == toggling_on) {
+        WIN_INVEN = create_nhwindow(NHW_MENU);
     }
-    pi_info.fromcore.force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
-    pi_info.fromcore.core_request = render;
-    pi = update_invent_slot(g.perm_invent_win, (slot = 0), &pi_info);
 
-    pi_info.fromcore.core_request = 0;
+    if (WIN_INVEN != WIN_ERR && g.program_state.beyond_savefile_load) {
+        g.in_sync_perminvent = 1;
+        (void) display_inventory((char *) 0, FALSE);
+        g.in_sync_perminvent = 0;
+    }
 }
 
 void
 perm_invent_toggled(boolean negated)
 {
-#ifdef TTY_PERM_INVENT
     in_perm_invent_toggled = TRUE;
-#endif
     if (negated) {
-        if (g.perm_invent_win != WIN_ERR)
-            destroy_nhwindow(g.perm_invent_win), g.perm_invent_win = WIN_ERR;
+        g.perm_invent_toggling_direction = toggling_off;
+        if (WIN_INVEN != WIN_ERR)
+            destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
         g.core_invent_state = 0;
     } else {
+        g.perm_invent_toggling_direction = toggling_on;
         sync_perminvent();
     }
-#ifdef TTY_PERM_INVENT
+    g.perm_invent_toggling_direction = toggling_not;
     in_perm_invent_toggled = FALSE;
-#endif
 }
-
-#endif  /* CORE_INVENT */
 
 /*invent.c*/

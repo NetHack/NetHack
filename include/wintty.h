@@ -12,7 +12,7 @@
 
 #ifdef TTY_PERM_INVENT
 
-enum { tty_pi_minrow = 28, tty_pi_mincol = 79 };
+enum { tty_perminv_minrow = 28, tty_perminv_mincol = 79 };
 /* for static init of zerottycell, put pointer first */
 union ttycellcontent {
     glyph_info *gi;
@@ -283,7 +283,7 @@ E void genl_outrip(winid, int, time_t);
 E char *tty_getmsghistory(boolean);
 E void tty_putmsghistory(const char *, boolean);
 E void tty_update_inventory(int);
-E perminvent_info *tty_update_invent_slot(winid, int, perminvent_info *);
+E win_request_info *tty_ctrl_nhwindow(winid, int, win_request_info *);
 
 #ifdef TTY_PERM_INVENT
 E void tty_refresh_inventory(int start, int stop, int y);

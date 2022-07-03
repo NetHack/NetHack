@@ -435,8 +435,10 @@ const struct instance_globals g_init = {
     NULL, /* invbuf */
     0, /* inbufsize */
     WIN_ERR, /* cached_pickinv_win */
-    WIN_ERR, /* perm_invent_win */
     0,       /* core_invent_state */
+    0,       /* in_sync_perminvent */
+    0,       /* perm_invent_toggling_direction */
+    0L,      /* glyph_reset_timestamp */
     0, /* this_type */
     NULL, /* this_title */
     UNDEFINED_VALUES, /* only (coord) */

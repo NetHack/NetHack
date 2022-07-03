@@ -96,13 +96,13 @@ char optbuf[COLBUFSZ];
 static struct version_info version;
 static const char opt_indent[] = "    ";
 
-struct win_info {
+struct win_information {
     const char *id, /* DEFAULT_WINDOW_SYS string */
         *name;      /* description, often same as id */
     boolean valid;
 };
 
-static struct win_info window_opts[] = {
+static struct win_information window_opts[] = {
 #ifdef TTY_GRAPHICS
     { "tty",
       /* testing 'USE_TILES' here would bring confusion because it could

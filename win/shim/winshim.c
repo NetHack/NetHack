@@ -183,21 +183,19 @@ void shim_update_inventory(int a1 UNUSED) {
         display_inventory(NULL, FALSE);
     }
 }
-perminvent_info *
-shim_update_invent_slot(
-    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi UNUSED) {
-    return (perminvent_info *) 0;
+win_request_info *
+shim_ctrl_nhwindow(
+    winid window UNUSED,
+    int request,
+    win_request_info *wri UNUSED) {
+    return (win_request_info *) 0;
 }
 #else /* !__EMSCRIPTEN__ */
 VDECLCB(shim_update_inventory,(int a1 UNUSED)
-DECLB(perminvent_info *, shim_update_invent_slot,
-    (winid window, int inventory_slot, perminvent_info *pi),
+DECLB(win_request_info *, shim_ctrl_nhwindow,
+    (winid window, int request, win_request_info *wri),
     "viip",
-    A2P window UNUSED, A2P inventory_slot UNUSED, P2V pi UNUSED)
+    A2P window UNUSED, A2P request UNUSED, P2V wri UNUSED)
 #endif
 
 /* Interface definition used in windows.c */
@@ -257,7 +255,7 @@ struct window_procs shim_procs = {
 #endif
     genl_can_suspend_yes,
     shim_update_inventory,
-    shim_update_invent_slot,
+    shim_ctrl_nhwindow,
 };
 
 #ifdef __EMSCRIPTEN__

@@ -113,7 +113,7 @@ extern void genl_outrip(winid tmpwin, int how, time_t when);
 extern void curses_preference_update(const char *pref);
 extern void curs_reset_windows(boolean, boolean);
 extern void curses_update_inventory(int);
-extern perminvent_info *curses_update_invent_slot(winid, int, perminvent_info *);
+extern win_request_info *curses_ctrl_nhwindow(winid, int, win_request_info *);
 
 /* curswins.c */
 

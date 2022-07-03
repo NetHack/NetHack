@@ -536,7 +536,7 @@ static void hup_void_fdecl_int(int);
 static void hup_void_fdecl_winid(winid);
 static void hup_void_fdecl_winid_ulong(winid, unsigned long);
 static void hup_void_fdecl_constchar_p(const char *);
-static perminvent_info *hup_update_invent_slot(winid, int, perminvent_info *);
+static win_request_info *hup_ctrl_nhwindow(winid, int, win_request_info *);
 
 static struct window_procs hup_procs = {
     WPID(hup), 0L, 0L,
@@ -585,7 +585,7 @@ static struct window_procs hup_procs = {
     genl_status_enablefield, hup_status_update,
     genl_can_suspend_no,
     hup_void_fdecl_int,                                /* update_inventory */
-    hup_update_invent_slot,                            /* update_invent_slot */
+    hup_ctrl_nhwindow,
 };
 
 static void (*previnterface_exit_nhwindows)(const char *) = 0;
@@ -841,15 +841,13 @@ hup_void_fdecl_constchar_p(const char *string UNUSED)
 }
 
 /*ARGUSED*/
-perminvent_info *
-hup_update_invent_slot(
+win_request_info *
+hup_ctrl_nhwindow(
     winid window UNUSED,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot UNUSED,                 /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi UNUSED)
+    int request UNUSED,
+    win_request_info *wri UNUSED)
 {
-    return (perminvent_info *) 0;
+    return (win_request_info *) 0;
 }
 
 #endif /* HANGUPHANDLING */

@@ -619,6 +619,8 @@ stop_occupation(void)
 void
 display_gamewindows(void)
 {
+    int menu_behavior = MENU_BEHAVE_STANDARD;
+
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
         status_initialize(0);
@@ -627,9 +629,15 @@ display_gamewindows(void)
     }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
+#ifdef TTY_PERM_INVENT
+    if (WINDOWPORT(tty) && WIN_INVEN != WIN_ERR) {
+        menu_behavior = MENU_BEHAVE_PERMINV;
+        prepare_perminvent(WIN_INVEN);
+    }
+#endif
     /* in case of early quit where WIN_INVEN could be destroyed before
        ever having been used, use it here to pacify the Qt interface */
-    start_menu(WIN_INVEN, 0U), end_menu(WIN_INVEN, (char *) 0);
+    start_menu(WIN_INVEN, menu_behavior), end_menu(WIN_INVEN, (char *) 0);
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will

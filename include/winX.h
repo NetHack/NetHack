@@ -487,6 +487,6 @@ extern void genl_outrip(winid, int, time_t);
 
 extern void X11_preference_update(const char *);
 extern void X11_update_inventory(int);
-extern perminvent_info *X11_update_invent_slot(winid, int, perminvent_info *);
+extern win_request_info *X11_ctrl_nhwindow(winid, int, win_request_info *);
 
 #endif /* WINX_H */

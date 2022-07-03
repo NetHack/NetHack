@@ -4415,7 +4415,7 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
                    -> sync_perminvent()
                           -> tty_create_nhwindow(NHW_PERMINVENT)
                    gives feedback for failure (terminal too small) */
-                if (g.perm_invent_win == WIN_ERR)
+                if (WIN_INVEN == WIN_ERR)
                     return optn_silenterr;
             }
 #endif
@@ -8964,6 +8964,10 @@ enhance_menu_text(
         if (thisopt->setwhere == set_gameview)
             Snprintf(eos(buf), availsz, " *terminal size is too small");
     }
+#else
+    nhUse(availsz);
+    nhUse(bool_p);
+    nhUse(thisopt);
 #endif
     return;
 }

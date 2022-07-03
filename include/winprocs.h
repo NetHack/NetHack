@@ -92,7 +92,7 @@ struct window_procs {
                               unsigned long *);
     boolean (*win_can_suspend)(void);
     void (*win_update_inventory)(int);
-    perminvent_info *(*win_update_invent_slot)(winid, int, perminvent_info *);
+    win_request_info *(*win_ctrl_nhwindow)(winid, int, win_request_info *);
 };
 
 extern
@@ -174,7 +174,7 @@ extern
  */
 #define status_enablefield (*windowprocs.win_status_enablefield)
 #define status_update (*windowprocs.win_status_update)
-#define update_invent_slot (*windowprocs.win_update_invent_slot)
+#define ctrl_nhwindow (*windowprocs.win_ctrl_nhwindow)
 
 /*
  * 
@@ -491,7 +491,7 @@ extern void stdio_nonl_raw_print(const char *);
 extern void stdio_raw_print_bold(const char *);
 extern void stdio_wait_synch(void);
 extern void safe_update_inventory(int);
-extern perminvent_info *safe_update_invent_slot(winid, int, perminvent_info *);
+extern win_request_info *safe_ctrl_nhwindow(winid, int, win_request_info *);
 extern int stdio_nhgetch(void);
 #endif /* SAFEPROCS */
 #endif /* WINPROCS_H */

@@ -75,7 +75,7 @@ void chainout_status_update(void *,int, genericptr_t, int, int, int,
 
 boolean chainout_can_suspend(void *);
 void chainout_update_inventory(void *, int);
-perminvent_info *chainout_update_invent_slot(void *, winid, int, perminvent_info *);
+win_request_info *chainout_ctrl_nhwindow(void *, winid, int, win_request_info *);
 
 void chainout_procs_init(int dir);
 void *chainout_procs_chain(int cmd, int n, void *me, void *nextprocs, void *nextdata);
@@ -700,19 +700,17 @@ chainout_can_suspend(void *vp)
     return rv;
 }
 
-perminvent_info *
-chainout_update_invent_slot(
-    winid window,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot,                 /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi)
+win_request_info *
+chainout_ctrl_nhwindow(
+    winid window,
+    int request,
+    win_request_info *wri)
 {
     struct chainout_data *tdp = vp;
     boolean rv;
 
-    rv = (*tdp->nprocs->win_update_invent_slot)(window,
-                                                inventory_slot, pi);
+    rv = (*tdp->nprocs->win_ctrl_nhwindow)(window,
+                                           request, wri);
     return rv;
 }
 
@@ -763,5 +761,5 @@ struct chain_procs chainout_procs = {
     chainout_status_update,
     chainout_can_suspend,
     chainout_update_inventory,
-    chainout_update_invent_slot,
+    chainout_ctrl_nhwindow,
 };

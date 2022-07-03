@@ -75,7 +75,7 @@ void chainin_status_update(int, genericptr_t, int, int, int,
 
 boolean chainin_can_suspend(void);
 void chainin_update_inventory(int);
-perminvent_info *chainin_update_invent_slot(winid, int, perminvent_info *);
+win_request_info *chainin_ctrl_nhwindow(winid, int, win_request_info *);
 
 void *chainin_procs_chain(int cmd, int n, void *me, void *nextprocs, void *nextdata);
 void chainin_procs_init(int dir);
@@ -578,18 +578,16 @@ chainin_can_suspend(void)
     return rv;
 }
 
-perminvent_info *
-chainin_update_invent_slot(
-    winid window,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot,                 /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi)
+win_request_info *
+chainin_ctrl_nhwindow(
+    winid window,
+    int request,
+    win_request_info *wri)
 {
     boolean rv;
 
-    rv = (*cibase->nprocs->win_update_invent_slot)(cibase->ndata, window,
-                                                   inventory_slot, pi);
+    rv = (*cibase->nprocs->win_ctrl_nhwindow)(cibase->ndata, window,
+                                                   request, wri);
     return rv;
 }
 
@@ -639,5 +637,5 @@ struct window_procs chainin_procs = {
     chainin_status_update,
     chainin_can_suspend,
     chainin_update_inventory,
-    chainin_update_invent_slot,
+    chainin_ctrl_nhwindow,
 };

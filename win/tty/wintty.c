@@ -167,7 +167,7 @@ struct window_procs tty_procs = {
 #endif
     genl_can_suspend_yes,
     tty_update_inventory,
-    tty_update_invent_slot,
+    tty_ctrl_nhwindow,
 };
 
 winid BASE_WINDOW;
@@ -254,28 +254,32 @@ void g_pututf8(uint8 *utf8str);
 #endif
 
 #ifdef TTY_PERM_INVENT
-void tty_perm_invent_toggled(boolean negated);
+static char Empty[1] = { '\0' };
 static struct tty_perminvent_cell zerottycell = { 0, 0, 0, { 0 }, 0 };
 static glyph_info zerogi = { 0 };
-#ifdef CORE_INVENT
 static struct to_core zero_tocore = { 0 };
-#endif
 enum { border_left, border_middle, border_right, border_elements };
 static int bordercol[border_elements] = { 0, 0, 0 }; /* left, middle, right */
 static int ttyinvmode = InvNormal; /* enum is in wintype.h */
+static int inuse_only_start = 0;
 static boolean done_tty_perm_invent_init = FALSE;
+enum { tty_slots = 52 + 1 + 1 };
+static boolean slot_tracker[tty_slots];
+static long last_glyph_reset_when;
 #ifndef NOINVSYM /* invent.c */
 #define NOINVSYM '#'
 #endif
-/* not static, core_update_invent_slot() needs to see it from invent.c */
-boolean in_tty_perm_invent_toggled = FALSE;
-static int ttyinv_create_window(int, struct WinDesc *);
-
-static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean calling_from_update_inventory = FALSE;
+static int ttyinv_create_window(int, struct WinDesc *);
+static void ttyinv_add_menu(winid, struct WinDesc *, char ch, int attr,
+                            int clr, const char *str);
+static void ttyinv_render(winid window, struct WinDesc *cw);
+static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean assesstty(enum inv_modes, short *, short *,
-        long *, long *, long *, long *, long *);
-static void ttyinv_populate_slot(struct WinDesc *, int, int, const char *, int32_t);
+                         long *, long *, long *, long *, long *);
+static void ttyinv_populate_slot(struct WinDesc *, int, int,
+                                 const char *, int32_t);
+static int selector_to_slot(char ch, const int invflags, boolean *ignore);
 #endif
 
 /*
@@ -564,8 +568,8 @@ tty_preference_update(const char *pref)
        the way to render them might change too (Handling: DEC/UTF8/&c) */
     if ((!strcmp(pref, "symset") || !strcmp(pref, "perm_invent"))
         && iflags.window_inited) {
-       if (g.perm_invent_win != WIN_ERR)
-           tty_invent_box_glyph_init(wins[g.perm_invent_win]);
+        if (WIN_INVEN != WIN_ERR)
+           tty_invent_box_glyph_init(wins[WIN_INVEN]);
     }
 #endif
     return;
@@ -1617,10 +1621,6 @@ tty_create_nhwindow(int type)
         newwin->cols = ttyDisplay->cols;
         newwin->maxrow = newwin->maxcol = 0;
         break;
-#ifdef TTY_PERM_INVENT
-    case NHW_PERMINVENT:
-        return ttyinv_create_window(newid, newwin);
-#endif
     default:
         panic("Tried to create window type %d\n", (int) type);
         /*NOTREACHED*/
@@ -1650,100 +1650,6 @@ tty_create_nhwindow(int type)
 
     return newid;
 }
-
-#ifdef TTY_PERM_INVENT
-
-static int
-ttyinv_create_window(int newid, struct WinDesc *newwin)
-{
-    int i, r, c;
-    long minrow;    /* long to match maxrow declaration */
-    unsigned n;
-
-    /* Is there enough real estate to do this beyond the status line?
-     * Rows:
-     * Top border line (1)
-     * 26 inventory rows (26)
-     * [should be 27 to have room for '$' and '#']
-     * Bottom border line (1)
-     * 1 + 26 + 1 = 28
-     *
-     * Cols:
-     * Left border (1)
-     * Left inventory items (38)
-     * Middle separation (1)
-     * Right inventory items (38)
-     * Right border (1)
-     * 1 + 38 + 1 + 38 + 1 = 79
-     *
-     * The topline + map rows + status lines require:
-     * 1 + 21 + 2 (or 3) = 24 (or 25 depending on status line count).
-     * So we can only present a full inventory on tty if there are
-     * 28 + 24 (or 25) available (52 or 53 rows on the terminal).
-     * Correspondingly ttyDisplay->rows has to be at least 52 (or 53).
-     * [The top and bottom borderlines aren't necessary.  Suppressing
-     * them would reduce the number of rows needed by 2.]
-     *
-     */
-
-    /* preliminary init in case tty_desctroy_nhwindow() gets called */
-    newwin->data = (char **) 0;
-    newwin->datlen = (short *) 0;
-    newwin->cells = (struct tty_perminvent_cell **) 0;
-
-    if (!assesstty(ttyinvmode,
-                  &newwin->offx, &newwin->offy, &newwin->rows, &newwin->cols,
-                  &newwin->maxcol, &minrow, &newwin->maxrow)) {
-        tty_destroy_nhwindow(newid); /* sets g.perm_invent_win to WIN_ERR */
-        pline("%s.", "tty perm_invent could not be enabled");
-        pline(
-   "tty perm_invent needs a terminal that is at least %dx%d, yours is %dx%d.",
-              (int) (minrow + 1 + ROWNO + 3), tty_pi_mincol,
-              ttyDisplay->rows, ttyDisplay->cols);
-        tty_wait_synch();
-        set_option_mod_status("perm_invent", set_gameview);
-        iflags.perm_invent = FALSE;
-        return WIN_ERR;
-    }
-
-    /*
-     * Terminal/window/screen is big enough.
-     */
-    newwin->maxrow = minrow;
-    newwin->maxcol = newwin->cols;
-    /* establish the borders */
-    bordercol[border_left] = 0;
-    bordercol[border_middle] = (newwin->maxcol + 1) / 2;
-    bordercol[border_right] = newwin->maxcol - 1;
-    /* for in-use mode, use full lines */
-    if ((ttyinvmode & InvInUse) != 0)
-        bordercol[border_middle] = bordercol[border_right];
-
-    n = (unsigned) (newwin->maxrow * sizeof (struct tty_perminvent_cell *));
-    newwin->cells = (struct tty_perminvent_cell **) alloc(n);
-
-    n = (unsigned) (newwin->maxcol * sizeof (struct tty_perminvent_cell));
-    for (i = 0; i < newwin->maxrow; i++)
-        newwin->cells[i] = (struct tty_perminvent_cell *) alloc(n);
-
-    n = (unsigned) sizeof (glyph_info);
-    for (r = 0; r < newwin->maxrow; r++)
-        for (c = 0; c < newwin->maxcol; c++) {
-            newwin->cells[r][c] = zerottycell;
-            if (r == 0 || r == newwin->maxrow - 1
-                || c == bordercol[border_left]
-                || c == bordercol[border_middle]
-                || c == bordercol[border_right]) {
-                newwin->cells[r][c].content.gi = (glyph_info *) alloc(n);
-                *newwin->cells[r][c].content.gi = zerogi;
-                newwin->cells[r][c].glyph = 1;
-            }
-        }
-    if (!done_tty_perm_invent_init)
-        tty_invent_box_glyph_init(newwin);
-    return newid;
-}
-#endif  /* TTY_PERM_INVENT */
 
 static void
 erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
@@ -2764,7 +2670,7 @@ tty_destroy_nhwindow(winid window)
             cw->rows = cw->cols = 0;
         }
         cw->maxrow = cw->maxcol = 0;
-        g.perm_invent_win = WIN_ERR;
+        WIN_INVEN = WIN_ERR;
         done_tty_perm_invent_init = FALSE;
     }
 #endif
@@ -2961,7 +2867,7 @@ tty_putstr(winid window, int attr, const char *str)
         return;
     if (cw->type != NHW_MESSAGE
 #ifdef TTY_PERM_INVENT
-        && window != g.perm_invent_win
+        && window != WIN_INVEN
 #endif
        )
         str = compress_str(str);
@@ -3221,12 +3127,37 @@ tty_display_file(const char *fname, boolean complain)
 void
 tty_start_menu(winid window, unsigned long mbehavior)
 {
-    wins[window]->mbehavior = mbehavior;
+    struct WinDesc *cw = 0;
+
+    if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
+        panic(winpanicstr, window);
+
+#ifdef TTY_PERM_INVENT
+    if (window != WIN_ERR && cw->mbehavior == MENU_BEHAVE_PERMINV) {
+        /* PERMINV is ready to go already; not much to do here */
+        inuse_only_start = 0;
+        return;
+    }
+    if (mbehavior == MENU_BEHAVE_PERMINV
+             && (iflags.perm_invent
+                 || g.perm_invent_toggling_direction == toggling_on)) {
+        winid w = ttyinv_create_window(window, wins[window]);
+        if (w == WIN_ERR) {
+            /* something went wrong, so add clean up code here */
+        } else {
+            cw->mbehavior = mbehavior;
+        }
+        return;
+    }
+#else
+    nhUse(mbehavior);
+#endif
+
     tty_clear_nhwindow(window);
     return;
 }
 
-/*ARGSUSED*/
+    /*ARGSUSED*/
 /*
  * Add a menu item to the beginning of the menu list.  This list is reversed
  * later.
@@ -3258,6 +3189,13 @@ tty_add_menu(
         || (cw = wins[window]) == (struct WinDesc *) 0
         || cw->type != NHW_MENU)
         panic(winpanicstr, window);
+
+#ifdef TTY_PERM_INVENT
+    if (cw->mbehavior == MENU_BEHAVE_PERMINV) {
+        ttyinv_add_menu(window, cw, ch, attr, clr, str);
+        return;
+    }
+#endif
 
     cw->nitems++;
     if (identifier->a_void) {
@@ -3322,8 +3260,23 @@ tty_end_menu(winid window,       /* menu to use */
     int clr = 0;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0
-        || cw->type != NHW_MENU)
+        || cw->type != NHW_MENU) {
+        /* this can happen if start_menu failed due to size requirements
+           for the tty perm inventory window. It isn't a situation that
+           requires a panic, just an early return. */
+        if (window == WIN_INVEN && !cw)
+            return;
         panic(winpanicstr, window);
+    }
+#ifdef TTY_PERM_INVENT
+    if (cw->mbehavior == MENU_BEHAVE_PERMINV
+        && (iflags.perm_invent || g.perm_invent_toggling_direction == toggling_on)
+        && window == WIN_INVEN) {
+        if (g.program_state.in_moveloop)
+            ttyinv_render(window, cw);
+        return;
+    }
+#endif
 
     /* Reverse the list so that items are in correct order. */
     cw->mlist = reverse(cw->mlist);
@@ -3433,6 +3386,9 @@ tty_select_menu(winid window, int how, menu_item **menu_list)
         || cw->type != NHW_MENU)
         panic(winpanicstr, window);
 
+    if (cw->mbehavior == MENU_BEHAVE_PERMINV) {
+        return 0;
+    }
     *menu_list = (menu_item *) 0;
     cw->how = (short) how;
     morc = 0;
@@ -3493,129 +3449,287 @@ tty_message_menu(char let, int how, const char *mesg)
     return ((how == PICK_ONE && morc == let) || morc == '\033') ? morc : '\0';
 }
 
-/* update persistent inventory window */
-void
-tty_update_inventory(int arg UNUSED)
+RESTORE_WARNING_FORMAT_NONLITERAL
+
+win_request_info *
+tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
 {
+#if !defined(TTY_PERM_INVENT)
+    return (win_request_info *) 0;
+    nhUse(window);
+    nhUse(request);
+    nhUse(wri);
+#else
+    boolean tty_ok /*, show_gold */, inuse_only;
+    int maxslot;
+    /* these types are set match the wintty.h field declarations */
+    long minrow; /* long to match maxrow declaration in wintty.h */
+    short offx, offy;
+    long rows, cols, maxrow, maxcol;
+
+    if (!wri)
+        return (win_request_info *) 0;
+
+    switch (request) {
+    case set_mode:
+    case request_settings:
+        ttyinvmode = wri->fromcore.invmode;
+        /* show_gold = (ttyinvmode & InvShowGold) != 0; */
+        inuse_only = ((ttyinvmode & InvInUse) != 0);
+        if (request == set_mode)
+            break;
+        wri->tocore = zero_tocore;
+        tty_ok = assesstty(ttyinvmode, &offx, &offy, &rows, &cols, &maxcol,
+                           &minrow, &maxrow);
+        wri->tocore.needrows = (int) (minrow + 1 + ROWNO + 3);
+        wri->tocore.needcols = (int) tty_perminv_mincol;
+        wri->tocore.haverows = (int) ttyDisplay->rows;
+        wri->tocore.havecols = (int) ttyDisplay->cols;
+        if (!tty_ok) {
+            wri->tocore.tocore_flags |= prohibited; /* prohibited */
+            return wri;
+        }
+        maxslot = (maxrow - 2) * (!inuse_only ? 2 : 1);
+        wri->tocore.maxslot = maxslot;
+        return wri;
+        break;
+    default:
+        impossible("invalid request to tty_update_invent_slot %u", request);
+    }
+    return wri;
+#endif
+}
+
 #ifdef TTY_PERM_INVENT
-#ifndef CORE_INVENT
-    static char Empty[1] = { '\0' };
-    struct WinDesc *cw;
+
+static int
+ttyinv_create_window(int newid, struct WinDesc *newwin)
+{
+    int i, r, c;
+    long minrow; /* long to match maxrow declaration */
+    unsigned n;
+
+    /* Is there enough real estate to do this beyond the status line?
+     * Rows:
+     * Top border line (1)
+     * 26 inventory rows (26)
+     * [should be 27 to have room for '$' and '#']
+     * Bottom border line (1)
+     * 1 + 26 + 1 = 28
+     *
+     * Cols:
+     * Left border (1)
+     * Left inventory items (38)
+     * Middle separation (1)
+     * Right inventory items (38)
+     * Right border (1)
+     * 1 + 38 + 1 + 38 + 1 = 79
+     *
+     * The topline + map rows + status lines require:
+     * 1 + 21 + 2 (or 3) = 24 (or 25 depending on status line count).
+     * So we can only present a full inventory on tty if there are
+     * 28 + 24 (or 25) available (52 or 53 rows on the terminal).
+     * Correspondingly ttyDisplay->rows has to be at least 52 (or 53).
+     * [The top and bottom borderlines aren't necessary.  Suppressing
+     * them would reduce the number of rows needed by 2.]
+     *
+     */
+
+    /* preliminary init in case tty_desctroy_nhwindow() gets called */
+    newwin->data = (char **) 0;
+    newwin->datlen = (short *) 0;
+    newwin->cells = (struct tty_perminvent_cell **) 0;
+
+
+    if (!assesstty(ttyinvmode, &newwin->offx, &newwin->offy, &newwin->rows,
+                   &newwin->cols, &newwin->maxcol, &minrow,
+                   &newwin->maxrow)) {
+        tty_destroy_nhwindow(newid); /* sets WIN_INVEN to WIN_ERR */
+        pline("%s.", "tty perm_invent could not be enabled");
+        pline("tty perm_invent needs a terminal that is at least %dx%d, "
+              "yours is %dx%d.",
+              (int) (minrow + 1 + ROWNO + 3), tty_perminv_mincol,
+              ttyDisplay->rows, ttyDisplay->cols);
+        tty_wait_synch();
+        set_option_mod_status("perm_invent", set_gameview);
+        iflags.perm_invent = FALSE;
+        return WIN_ERR;
+    }
+
+    /*
+     * Terminal/window/screen is big enough.
+     */
+    newwin->maxrow = minrow;
+    newwin->maxcol = newwin->cols;
+    /* establish the borders */
+    bordercol[border_left] = 0;
+    bordercol[border_middle] = (newwin->maxcol + 1) / 2;
+    bordercol[border_right] = newwin->maxcol - 1;
+    /* for in-use mode, use full lines */
+    if ((ttyinvmode & InvInUse) != 0)
+        bordercol[border_middle] = bordercol[border_right];
+
+    n = (unsigned) (newwin->maxrow * sizeof(struct tty_perminvent_cell *));
+    newwin->cells = (struct tty_perminvent_cell **) alloc(n);
+
+    n = (unsigned) (newwin->maxcol * sizeof(struct tty_perminvent_cell));
+    for (i = 0; i < newwin->maxrow; i++)
+        newwin->cells[i] = (struct tty_perminvent_cell *) alloc(n);
+
+    n = (unsigned) sizeof(glyph_info);
+    for (r = 0; r < newwin->maxrow; r++)
+        for (c = 0; c < newwin->maxcol; c++) {
+            newwin->cells[r][c] = zerottycell;
+            if (r == 0 || r == newwin->maxrow - 1
+                || c == bordercol[border_left]
+                || c == bordercol[border_middle]
+                || c == bordercol[border_right]) {
+                newwin->cells[r][c].content.gi = (glyph_info *) alloc(n);
+                *newwin->cells[r][c].content.gi = zerogi;
+                newwin->cells[r][c].glyph = 1;
+            }
+        }
+    newwin->active = 1;
+    tty_invent_box_glyph_init(newwin);
+    return newid;
+}
+
+static void
+ttyinv_add_menu(winid window UNUSED, struct WinDesc *cw, char ch,
+                int attr UNUSED, int clr UNUSED, const char *str)
+{
+    char invbuf[BUFSZ];
+    const char *text;
+    boolean inuse_only = (ttyinvmode & InvInUse) != 0,
+            show_gold = (ttyinvmode & InvShowGold) != 0,
+            /* sparse = (ttyinvmode & InvSparse) != 0, */
+            ignore = FALSE;
+    int row, side, slot = 0, rows_per_side = (!show_gold ? 26 : 27);
+
+    if (!g.program_state.in_moveloop)
+        return;
+    slot = selector_to_slot(ch, ttyinvmode, &ignore);
+    if (!ignore) {
+        /* inuse_only = ((ttyinvmode & InvInUse) != 0); */
+        slot_tracker[slot] = TRUE;
+        text = Empty; /* lint suppression */
+        /*            maxslot = ((int) cw->maxrow - 2) * (!inuse_only ? 2 :
+         * 1); */
+
+        /* TODO: check for MENUCOLORS match */
+        text = str; /* 'text' will switch to invbuf[] below */
+        /* strip away "a"/"an"/"the" prefix to show a bit more of
+            the interesting part of the object's description; this
+            is inline version of pi_article_skip() from cursinvt.c;
+            should move that to hacklib.c and use it here */
+        if (text[0] == 'a') {
+            if (text[1] == ' ')
+                text += 2;
+            else if (text[1] == 'n' && text[2] == ' ')
+                text += 3;
+        } else if (text[0] == 't') {
+            if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
+                text += 4;
+        }
+        Snprintf(invbuf, sizeof invbuf, "%c - %s", ch, text);
+        text = invbuf;
+        row = (slot % rows_per_side) + 1; /* +1: top border */
+        /* side: left side panel or right side panel, not a window column */
+        side = slot < rows_per_side ? 0 : 1;
+        if (!(inuse_only && side == 1))
+            ttyinv_populate_slot(cw, row, side, text, 0);
+    }
+    return;
+}
+static int
+selector_to_slot(char ch, const int invflags, boolean *ignore)
+{
+    int slot = 0;
+    boolean show_gold = (invflags & InvShowGold) != 0,
+            inuse_only = (invflags & InvInUse) != 0;
+#if 0
+            sparse = (invflags & InvSparse) != 0,
+#endif
+
+    *ignore = FALSE;
+    switch (ch) {
+    case '$':
+        if (!show_gold)
+            *ignore = TRUE;
+        slot = 0;
+        break;
+    case '#':
+        slot = 52 + (show_gold ? 1 : 0);
+        break;
+    case 0:
+        *ignore = TRUE;
+        break;
+    default:
+        if (!inuse_only) {
+            if (ch >= 'a' && ch <= 'z')
+                slot = (ch - 'a') + (show_gold ? 1 : 0);
+            if (ch >= 'A' && ch <= 'Z')
+                slot = (ch - 'A') + (show_gold ? 1 : 0) + 26;
+        } else {
+            if ((ch >= 'a' && ch <= 'z')
+                || (ch >= 'A' && ch <= 'Z'))
+                slot = (show_gold ? 1 : 0) + inuse_only_start++;
+        }
+    }
+    return slot;
+}
+
+static void
+ttyinv_render(winid window, struct WinDesc *cw)
+{
+    int row, col, slot, side, filled_count = 0, slot_limit;
     struct tty_perminvent_cell *cell;
-    struct obj *obj;
-    char invbuf[BUFSZ], *text, nxtlet;
-    int row, col, side, slot, maxslot;
-    winid window = g.perm_invent_win;
+    char invbuf[BUFSZ], *text;
     boolean force_redraw = g.program_state.in_docrt ? TRUE : FALSE,
             show_gold = (ttyinvmode & InvShowGold) != 0,
-            inuse_only = (ttyinvmode & InvInUse) != 0,
-            sparse = (ttyinvmode & InvSparse) != 0;
+            inuse_only = (ttyinvmode & InvInUse) != 0;
+    int rows_per_side = (!show_gold ? 26 : 27);
 
-    if (g.perm_invent_win == WIN_ERR
-        && !done_tty_perm_invent_init && iflags.perm_invent) {
-        g.perm_invent_win = create_nhwindow(NHW_PERMINVENT);
-        if (g.perm_invent_win == WIN_ERR) {
-            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
-            return;
-        }
-        display_nhwindow(g.perm_invent_win, FALSE);
-        window = g.perm_invent_win;
+    slot_limit = SIZE(slot_tracker);
+    if (inuse_only) {
+        rows_per_side = cw->maxrow - 2; /* -2 top and bottom borders */
     }
-    /* we just return if the window creation failed, probably due to
-       not meeting size requirements */
-    if (window == WIN_ERR)
-        return;
-
-    if (!iflags.perm_invent) {
-        if (done_tty_perm_invent_init) {
-            /* Odd - but this could be end-of-game disclosure
-             * which just sets boolean iflag.perm_invent to
-             * FALSE without actually doing anything else.
-             */
-            tty_perm_invent_toggled(TRUE); /* TRUE means negated */
-            (void) doredraw();
-        }
-        return;
-    }
-    if ((cw = wins[window]) == (struct WinDesc *) 0)
-        panic(winpanicstr, window);
-
-    if (!done_tty_perm_invent_init) {
-        tty_invent_box_glyph_init(cw);
-    }
-
-    text = Empty; /* lint suppression */
-    maxslot = ((int) cw->maxrow - 2) * (!inuse_only ? 2 : 1);
-    obj = g.invent;
-    for (slot = 0; slot < maxslot; ++slot) {
-        nxtlet = '?'; /* always gets set to something else if actually used */
-        if (!sparse) {
-            while (obj && ((obj->invlet == GOLD_SYM && !show_gold)
-                           || (!obj->owornmask && inuse_only)))
-                obj = obj->nobj;
-        } else {
-            if (!show_gold)
-                nxtlet = (slot < 26) ? ('a' + slot) : ('A' + slot - 26);
-            else
-                nxtlet = (slot == 0) ? GOLD_SYM
-                         : (slot < 27) ? ('a' + slot - 1)
-                           : (slot < 53) ? ('A' + slot - 27)
-                             : NOINVSYM;
-            for (obj = g.invent; obj; obj = obj->nobj)
-                if (obj->invlet == nxtlet)
-                    break;
-        }
-
-        if (obj) {
-            /* TODO: check for MENUCOLORS match */
-            text = doname(obj); /* 'text' will switch to invbuf[] below */
-            /* strip away "a"/"an"/"the" prefix to show a bit more of the
-               interesting part of the object's description;
-               this is inline version of pi_article_skip() from cursinvt.c;
-               should move that to hacklib.c and use it here */
-            if (text[0] == 'a') {
-                if (text[1] == ' ')
-                    text += 2;
-                else if (text[1] == 'n' && text[2] == ' ')
-                    text += 3;
-            } else if (text[0] == 't') {
-                if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
-                    text += 4;
-            }
-            Snprintf(invbuf, sizeof invbuf, "%c - %s", obj->invlet, text);
-            text = invbuf;
-            obj = obj->nobj; /* set up for next iteration */
-        } else if (sparse) {
-            Sprintf(invbuf, "%c", nxtlet); /* empty slot */
+    for (slot = 0; slot < slot_limit; ++slot)
+        if (slot_tracker[slot])
+            filled_count++;
+    for (slot = 0; slot < slot_limit; ++slot) {
+        if (slot_tracker[slot])
+           continue;
+        if (slot == 0 && !filled_count) {
+            Sprintf(invbuf, "%-4s[%s]", "",
+                    !filled_count ? "empty"
+                    : inuse_only  ? "no items are in use"
+                                  : "only gold");
             text = invbuf;
         } else {
-            if (slot == 0) {
-                Sprintf(invbuf, "%-4s[%s]", "",
-                        !g.invent ? "empty"
-                        : inuse_only ? "no items are in use"
-                          : "only gold");
-                text = invbuf;
-            } else {
-                text = Empty; /* "" => fill slot with spaces */
-            }
+            text = Empty; /* "" => fill slot with spaces */
         }
-
-        row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
+        row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
-        side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
-
-        ttyinv_populate_slot(cw, row, side, text, 0);
+        side = slot < rows_per_side ? 0 : 1;
+        if (!(inuse_only && side == 1))
+            ttyinv_populate_slot(cw, row, side, text, 0);
     }
-
+    /* has there been a glyph reset since we last got here? */
+    if (g.glyph_reset_timestamp > last_glyph_reset_when) {
+        //        tty_invent_box_glyph_init(wins[WIN_INVEN]);
+        last_glyph_reset_when = g.glyph_reset_timestamp;
+        force_redraw = TRUE;
+    }
+    /* render to the display */
     calling_from_update_inventory = TRUE;
-    /* now render to the display */
     for (row = 0; row < cw->maxrow; ++row)
         for (col = 0; col < cw->maxcol; ++col) {
             cell = &cw->cells[row][col];
             if (cell->refresh || force_redraw) {
                 if (cell->glyph) {
-                    tty_print_glyph(window, col + 1, row,
-                                    cell->content.gi, &nul_glyphinfo);
+                    tty_print_glyph(window, col + 1, row, cell->content.gi,
+                                    &nul_glyphinfo);
                     end_glyphout();
                 } else {
                     if (col != cw->curx || row != cw->cury)
@@ -3627,113 +3741,13 @@ tty_update_inventory(int arg UNUSED)
                 cell->refresh = 0;
             }
         }
+    tty_curs(window, 1, 0);
+    for (slot = 0; slot < SIZE(slot_tracker); ++slot)
+        slot_tracker[slot] = 0;
     calling_from_update_inventory = FALSE;
-#endif  /* CORE_INVENT */
-#endif  /* TTY_PERM_INVENT */
     return;
 }
 
-perminvent_info *
-tty_update_invent_slot(
-    winid window,  /* window to use, must be of type NHW_MENU */
-    int slot,
-    perminvent_info *pi)
-{
-#if !defined(TTY_PERM_INVENT) || !defined(CORE_INVENT)
-    return (perminvent_info *) 0;
-    nhUse(window);
-    nhUse(slot);
-    nhUse(pi);
-#else
-    boolean force_redraw, tty_ok, show_gold, inuse_only;
-    int row, col, side, maxslot;
-    /* winid window = g.perm_invent_win; */
-    struct WinDesc *cw;
-    struct tty_perminvent_cell *cell;
-    /* these types are set match the wintty.h field declarations */
-    long minrow;    /* long to match maxrow declaration in wintty.h */
-    short offx, offy;
-    long rows, cols, maxrow, maxcol;
-
-    if (!pi)
-        return (perminvent_info *) 0;
-    if (!done_tty_perm_invent_init
-        && pi->fromcore.core_request != request_settings) {
-        pi->tocore.tocore_flags |= no_init_done;
-        return pi;
-    }
-    ttyinvmode = pi->fromcore.invmode;
-    show_gold = (ttyinvmode & InvShowGold) != 0;
-    inuse_only = (ttyinvmode & InvInUse) != 0;
-    /* sparse isn't needed port-side */
-
-    switch(pi->fromcore.core_request) {
-    case request_settings:
-        pi->tocore = zero_tocore;
-        tty_ok = assesstty(ttyinvmode,
-                           &offx, &offy, &rows, &cols,
-                           &maxcol, &minrow, &maxrow);
-        pi->tocore.needrows = (int) (minrow + 1 + ROWNO + 3);
-        pi->tocore.needcols = (int) tty_pi_mincol;
-        pi->tocore.haverows = (int) ttyDisplay->rows;
-        pi->tocore.havecols = (int) ttyDisplay->cols;
-        if (!tty_ok) {
-            pi->tocore.tocore_flags |= prohibited;  /* prohibited */
-            return pi;
-        }
-        maxslot = (maxrow - 2) * (!inuse_only ? 2 : 1);
-        pi->tocore.maxslot = maxslot;
-        return pi;
-        break;
-    case update_slot:
-        if ((cw = wins[window]) == (struct WinDesc *) 0)
-            panic(winpanicstr, window);
-        slot -= 1;  /* 0 is used for commands */
-        row = (slot % (!show_gold ? 26 : 27)) + 1; /* +1: top border */
-        /* side: left side panel or right side panel, not a window column */
-        side = slot < (!show_gold ? 26 : 27) ? 0 : 1;
-        ttyinv_populate_slot(cw, row, side,
-                             pi->fromcore.text, pi->fromcore.clr);
-        break;
-    case render:
-        if ((cw = wins[window]) == (struct WinDesc *) 0)
-            panic(winpanicstr, window);
-        /* render to the display */
-        force_redraw = pi->fromcore.force_redraw;
-        calling_from_update_inventory = TRUE;
-        for (row = 0; row < cw->maxrow; ++row)
-            for (col = 0; col < cw->maxcol; ++col) {
-                cell = &cw->cells[row][col];
-                if (cell->refresh || force_redraw) {
-                    if (cell->glyph) {
-                        tty_print_glyph(window, col + 1, row,
-                                    cell->content.gi, &nul_glyphinfo);
-                        end_glyphout();
-                    } else {
-                        if (col != cw->curx || row != cw->cury)
-                        tty_curs(window, col + 1, row);
-                        (void) putchar(cell->content.ttychar);
-                        ttyDisplay->curx++;
-                        cw->curx++;
-                    }
-                    cell->refresh = 0;
-                }
-            }
-        tty_curs(window, 1, 0);
-        ttyDisplay->curx = 1;
-        calling_from_update_inventory = FALSE;
-        break;
-    default:
-        impossible("invalid request to tty_update_invent_slot %u",
-                   pi->fromcore.core_request);
-    }
-    return pi;
-#endif
-}
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-
-#ifdef TTY_PERM_INVENT
 /*
  * returns TRUE if things are ok
  */
@@ -3753,7 +3767,7 @@ assesstty(
     *offy = 1 + ROWNO + 3; /* 3: + 2 + (iflags.wc2_statuslines > 2) */
     *rows = (ttyDisplay->rows - (*offy));
     *cols = ttyDisplay->cols;
-    *minrow = tty_pi_minrow;
+    *minrow = tty_perminv_minrow;
     if (show_gold)
         *minrow += 1;
     /* "normal" max for items in use would be 3 weapon + 7 armor + 4
@@ -3767,7 +3781,7 @@ assesstty(
         *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
     *maxrow = *minrow;
     *maxcol = *cols;
-    return !(*rows < *minrow || *cols < tty_pi_mincol);
+    return !(*rows < *minrow || *cols < tty_perminv_mincol);
 }
 
 /* put the formatted object description for one item into a particular row
@@ -3783,7 +3797,12 @@ ttyinv_populate_slot(
     char c;
     int ccnt, col, endcol;
 
-    col = bordercol[side] + 1;
+    /* FIXME: this needs a review. Crashed under InvInUse without */
+    if ((ttyinvmode & InvInUse) != 0)
+        col = bordercol[0] + 1;
+    else
+        col = bordercol[side] + 1;
+
     endcol = bordercol[side + 1] - 1;
     cell = &cw->cells[row][col];
     if (cell->color != color)
@@ -3819,7 +3838,7 @@ tty_refresh_inventory(int start, int stop, int y)
 {
     int row = y, col, col_limit = stop;
     struct WinDesc *cw = 0;
-    winid window = g.perm_invent_win;
+    winid window = WIN_INVEN;
     struct tty_perminvent_cell *cell;
 
     if (window == WIN_ERR || !iflags.perm_invent || y < 0)
@@ -3856,10 +3875,13 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 tty_invent_box_glyph_init(struct WinDesc *cw)
-{
+        {
     int row, col;
     uchar sym;
     struct tty_perminvent_cell *cell;
+
+    if (cw == 0 || !cw->active)
+        return;
 
     for (row = 0; row < cw->maxrow; ++row)
         for (col = 0; col < cw->maxcol; ++col) {
@@ -3927,8 +3949,15 @@ tty_invent_box_glyph_init(struct WinDesc *cw)
         }
     done_tty_perm_invent_init = TRUE;
 }
-
 #endif  /* TTY_PERM_INVENT */
+
+/* update persistent inventory window */
+void
+tty_update_inventory(int arg UNUSED)
+{
+    /* currently not used */
+    return;
+}
 
 void
 tty_mark_synch(void)
@@ -3972,8 +4001,8 @@ docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
 #ifdef TTY_PERM_INVENT
     struct WinDesc *icw = 0;
 
-    if (g.perm_invent_win != WIN_ERR)
-        icw = wins[g.perm_invent_win];
+    if (WIN_INVEN != WIN_ERR)
+        icw = wins[WIN_INVEN];
 #endif
 
     HUPSKIP();

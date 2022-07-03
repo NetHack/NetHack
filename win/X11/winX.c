@@ -142,7 +142,7 @@ struct window_procs X11_procs = {
     X11_status_update,
     genl_can_suspend_no, /* XXX may not always be correct */
     X11_update_inventory,
-    X11_update_invent_slot,
+    X11_ctrl_nhwindow,
 };
 
 /*
@@ -1272,15 +1272,13 @@ X11_update_inventory(int arg)
     return;
 }
 
-perminvent_info *
-X11_update_invent_slot(
-    winid window UNUSED,  /* window to use, must be of type NHW_MENU */
-    int inventory_slot UNUSED,          /* slot id: 0 - info return to core */
-                                        /*          1 - gold slot */
-                                        /*          2 - 29 obj slots */
-    perminvent_info *pi UNUSED)
+win_request_info *
+X11_ctrl_nhwindow(
+    winid window UNUSED,
+    int request UNUSED,
+    win_request_info *wri UNUSED)
 {
-    return (perminvent_info *) 0;
+    return (win_request_info *) 0;
 }
 
 /* The current implementation has all of the saved lines on the screen. */

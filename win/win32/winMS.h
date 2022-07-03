@@ -193,7 +193,7 @@ void mswin_status_enablefield(int fieldidx, const char *nm, const char *fmt,
                               boolean enable);
 void mswin_status_update(int idx, genericptr_t ptr, int chg, int percent, int color, unsigned long *colormasks);
 void mswin_update_inventory(int);
-perminvent_info *mswin_update_invent_slot(winid, int, perminvent_info *);
+win_request_info *mswin_ctrl_nhwindow(winid, int, win_request_info *);
 
 /* helper function */
 HWND mswin_hwnd_from_winid(winid wid);

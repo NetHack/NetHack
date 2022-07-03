@@ -2775,6 +2775,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             color = NO_COLOR;
         gmap->sym.color = color;
     }
+    g.glyph_reset_timestamp = g.moves;
 }
 
 /* ------------------------------------------------------------------------ */
