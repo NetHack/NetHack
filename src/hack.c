@@ -16,7 +16,8 @@ static void check_buried_zombies(coordxy, coordxy);
 static schar u_simple_floortyp(coordxy, coordxy);
 static boolean swim_move_danger(coordxy, coordxy);
 static boolean domove_bump_mon(struct monst *, int);
-static boolean domove_attackmon_at(struct monst *, coordxy, coordxy, boolean *);
+static boolean domove_attackmon_at(struct monst *, coordxy, coordxy,
+                                   boolean *);
 static boolean domove_fight_ironbars(coordxy, coordxy);
 static boolean domove_swap_with_pet(struct monst *, coordxy, coordxy);
 static boolean domove_fight_empty(coordxy, coordxy);
@@ -859,15 +860,17 @@ invocation_pos(coordxy x, coordxy y)
                       && x == g.inv_pos.x && y == g.inv_pos.y);
 }
 
-/* return TRUE if (dx,dy) is an OK place to move
- * mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP
- */
+/* return TRUE if (dx,dy) is an OK place to move;
+   mode is one of DO_MOVE, TEST_MOVE, TEST_TRAV, or TEST_TRAP */
 boolean
-test_move(coordxy ux, coordxy uy, coordxy dx, coordxy dy, int mode)
+test_move(
+    coordxy ux, coordxy uy,
+    coordxy dx, coordxy dy, /* these are -1|0|+1, not coordinates */
+    int mode)
 {
     coordxy x = ux + dx;
     coordxy y = uy + dy;
-    register struct rm *tmpr = &levl[x][y];
+    struct rm *tmpr = &levl[x][y];
     struct rm *ust;
 
     g.context.door_opened = FALSE;
@@ -1033,14 +1036,19 @@ test_move(coordxy ux, coordxy uy, coordxy dx, coordxy dy, int mode)
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (g.context.run == 8 && (mode != DO_MOVE)
-        && (x != u.ux || y != u.uy)) {
+    if (g.context.run == 8 && (mode != DO_MOVE) && !u_at(x, y)) {
         struct trap *t = t_at(x, y);
 
-        if ((t && t->tseen)
-            || (!Levitation && !Flying && !Known_lwalking
-                && !(is_pool(x, y) && Known_wwalking)
-                && is_pool_or_lava(x, y) && levl[x][y].seenv)
+        if ((t && t->tseen && t->ttyp != VIBRATING_SQUARE)
+            || ((!Levitation && !Flying
+                 /* FIXME:  should be using lastseentyp[x][y] rather than
+                    seen vector (ditto for WATERWALL below) */
+                 && levl[x][y].seenv && is_pool_or_lava(x, y))
+                /* is_lava(ux,uy): don't move onto/over lava with known
+                   lava-walking because it isn't completely safe, but do
+                   continue to move over lava if already doing so */
+                ? (is_lava(x, y) && Known_lwalking && is_lava(u.ux, u.uy))
+                : Known_wwalking) /* must be seen && is_pool() to get here */
             || (IS_WATERWALL(levl[x][y].typ) && levl[x][y].seenv))
             return (mode == TEST_TRAP);
     }
@@ -1606,12 +1614,15 @@ swim_move_danger(coordxy x, coordxy y)
         && !Stunned && !Confusion && levl[x][y].seenv
         && (is_pool(x, y) || is_lava(x, y) || liquid_wall)) {
 
-        /* FIXME: This can be exploited to identify the ring of fire resistance
-        * if the player is wearing it unidentified and has identified
-        * fireproof boots of water walking and is walking over lava. However,
-        * this is such a marginal case that it may not be worth fixing. */
+        /* FIXME: This can be exploited to identify ring of fire resistance
+         * if the player is wearing it unidentified and has identified
+         * fireproof boots of water walking and is walking over lava. However,
+         * this is such a marginal case that it may not be worth fixing. */
         if ((is_pool(x, y) && !Known_wwalking)
-            || (is_lava(x, y) && !Known_lwalking)
+            /* is_lava(ux,uy): don't move onto/over lava with known
+               lava-walking because it isn't completely safe, but do
+               continue to move over lava if already doing so */
+            || (is_lava(x, y) && !Known_lwalking && !is_lava(u.ux, u.uy))
             || liquid_wall) {
             if (g.context.nopick) {
                 /* moving with m-prefix */
@@ -2067,11 +2078,20 @@ avoid_moving_on_trap(coordxy x, coordxy y, boolean msg)
 }
 
 static boolean
-avoid_moving_on_liquid(coordxy x, coordxy y, boolean msg)
+avoid_moving_on_liquid(
+    coordxy x, coordxy y,
+    boolean msg)
 {
-    if ((g.context.run < 2 || g.context.travel || is_pool_or_lava(u.ux, u.uy))
-        && (Levitation || Flying || Known_lwalking
-            || (is_pool(x, y) && Known_wwalking))
+    boolean in_air = (Levitation || Flying);
+
+    /* don't stop if you're not on a transition between terrain types... */
+    if ((levl[x][y].typ == levl[u.ux][u.uy].typ
+         /* or you are using shift-dir running and the transition isn't
+            dangerous... */
+         || (g.context.run < 2 && (!is_lava(x, y) || in_air))
+         || g.context.travel)
+        /* and you know you won't fall in */
+        && (in_air || Known_lwalking || (is_pool(x, y) && Known_wwalking))
         && !IS_WATERWALL(levl[x][y].typ)) {
         /* XXX: should send 'is_clinger(g.youmonst.data)' here once clinging
            polyforms are allowed to move over water */
