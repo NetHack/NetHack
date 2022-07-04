@@ -221,7 +221,7 @@ getpos_help(boolean force, const char *goal)
             Sprintf(sbuf,
                     "  '%s' describe current spot,%s move to another spot;",
                     visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]),
-                    flags.help ? " prompt if 'more info'," : "");
+                    flags.help && !force ? " prompt if 'more info'," : "");
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot, move to another spot;",
