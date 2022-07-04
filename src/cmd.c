@@ -2568,7 +2568,6 @@ struct ext_func_tab extcmdlist[] = {
     { '\177', "terrain",
               "view map without monsters or objects obstructing it",
               doterrain, IFBURIED | AUTOCOMPLETE, NULL },
-    /* therecmdmenu does not work as intended, should probably be removed */
     { '\0',   "therecmdmenu",
               "menu of commands you can do from here to adjacent spot",
               dotherecmdmenu, AUTOCOMPLETE | GENERALCMD, NULL },

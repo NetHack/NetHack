@@ -199,7 +199,8 @@ getpos_help(boolean force, const char *goal)
         }
  skip_non_mons:
         /* disgusting hack; the alternate selection characters work for any
-           getpos call, but only matter for dowhatis (and doquickwhatis) */
+           getpos call, but only matter for dowhatis (and doquickwhatis,
+           also for dotherecmdmenu's simulated mouse) */
         doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
@@ -663,10 +664,11 @@ truncate_to_map(int *cx, int *cy, schar dx, schar dy)
     *cy += dy;
 }
 
+/* have the player use movement keystrokes to position the cursor at a
+   particular map location, then use one of [.,:;] to pick the spot */
 int
 getpos(coord *ccp, boolean force, const char *goal)
 {
-    const char *cp;
     static struct {
         int nhkf, ret;
     } const pick_chars_def[] = {
@@ -690,6 +692,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         NHKF_GETPOS_VALID_PREV
     };
     struct _cmd_queue cq, *cmdq;
+    const char *cp;
     char pick_chars[6];
     char mMoOdDxX[13];
     int result = 0;

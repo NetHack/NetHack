@@ -751,26 +751,29 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                    a 1-1 map between glyphs and distinct things on the map).
                    bkglyphinfo is to render the background behind the glyph.
                    It's not used here.
-               -- bkglyphinfo contains a background glyph for potential use
-                   by some graphical or tiled environments to allow the depiction
-                   to fall against a background consistent with the grid 
-                   around x,y. If bkglyphinfo->glyph is NO_GLYPH, then the
-                   parameter should be ignored (do nothing with it).
+                -- bkglyphinfo contains a background glyph for potential use
+                   by some graphical or tiled environments to allow the
+                   depiction to fall against a background consistent with
+                   the grid around x,y. If bkglyphinfo->glyph is NO_GLYPH,
+                   then the parameter should be ignored (do nothing with it).
                 -- glyph_info struct fields:
-                    int glyph;            the display entity
-                    int color;            color for window ports not using a tile
-                    int ttychar;          the character mapping for the original tty
-                                          interface. Most or all window ports wanted
-                                          and used this for various things so it is
-                                          provided in 3.7+
+                    int glyph;    the display entity
+                    int color;    color for window ports not using a tile
+                    int ttychar;  the character mapping for the original tty
+                                  interface. Most or all window ports wanted
+                                  and used this for various things so it is
+                                  provided in 3.7+
                     short int symidx;     offset into syms array
                     unsigned glyphflags;  more detail about the entity
 
 */
 
 void
-curses_print_glyph(winid wid, coordxy x, coordxy y,
-                   const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
+curses_print_glyph(
+    winid wid,
+    coordxy x, coordxy y,
+    const glyph_info *glyphinfo,
+    const glyph_info *bkglyphinfo UNUSED)
 {
     int glyph;
     int ch;
@@ -807,7 +810,7 @@ curses_print_glyph(winid wid, coordxy x, coordxy y,
            render lava in inverse video so that they look different */
         if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
             /* reset_glyphmap() only sets MG_BW_foo if color is off */
-            attr = A_REVERSE; 
+            attr = A_REVERSE;
         }
         /* highlight female monsters (wizard mode option) */
         if ((special & MG_FEMALE) && iflags.wizmgender) {
