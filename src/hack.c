@@ -1039,17 +1039,20 @@ test_move(
     if (g.context.run == 8 && (mode != DO_MOVE) && !u_at(x, y)) {
         struct trap *t = t_at(x, y);
 
-        if ((t && t->tseen && t->ttyp != VIBRATING_SQUARE)
-            || ((!Levitation && !Flying
-                 /* FIXME:  should be using lastseentyp[x][y] rather than
-                    seen vector (ditto for WATERWALL below) */
-                 && levl[x][y].seenv && is_pool_or_lava(x, y))
-                /* is_lava(ux,uy): don't move onto/over lava with known
-                   lava-walking because it isn't completely safe, but do
-                   continue to move over lava if already doing so */
-                ? (is_lava(x, y) && Known_lwalking && is_lava(u.ux, u.uy))
-                : Known_wwalking) /* must be seen && is_pool() to get here */
-            || (IS_WATERWALL(levl[x][y].typ) && levl[x][y].seenv))
+        if (t && t->tseen && t->ttyp != VIBRATING_SQUARE)
+            return (mode == TEST_TRAP);
+
+        /* FIXME: should be using lastseentyp[x][y] rather than seen vector
+         */
+        if ((levl[x][y].seenv && is_pool_or_lava(x, y)) /* known pool/lava */
+            && (IS_WATERWALL(levl[x][y].typ) /* never enter wall of water */
+                /* don't enter pool or lava (must be one of the two to
+                   get here) unless flying or levitating or have known
+                   water-walking for pool or known lava-walking and
+                   already be on/over lava for lava */
+                || !(Levitation || Flying
+                     || (is_pool(x, y) ? Known_wwalking
+                         : (Known_lwalking && is_lava(u.ux, u.uy))))))
             return (mode == TEST_TRAP);
     }
 
@@ -1592,12 +1595,12 @@ u_simple_floortyp(coordxy x, coordxy y)
 {
     boolean u_in_air = (Levitation || Flying || !grounded(g.youmonst.data));
 
-    if (is_waterwall(x,y))
+    if (is_waterwall(x, y))
         return WATER; /* wall of water, fly/lev does not matter */
     if (!u_in_air) {
-        if (is_pool(x,y))
+        if (is_pool(x, y))
             return POOL;
-        if (is_lava(x,y))
+        if (is_lava(x, y))
             return LAVAPOOL;
     }
     return ROOM;

@@ -57,8 +57,10 @@ boulder_hits_pool(
         int chance = rn2(10); /* water: 90%; lava: 10% */
         struct monst *mtmp;
 
+        /* chance for boulder to fill pool:  Plane of Water==0%,
+           lava 10%, wall of water==50%, other water==90% */
         fills_up = Is_waterlevel(&u.uz) ? FALSE
-                   : (ltyp == WATER) ? (chance < 5) /* wall of water */
+                   : IS_WATERWALL(ltyp) ? (chance < 5)
                      : lava ? (chance == 0) : (chance != 0);
 
         if (fills_up) {
