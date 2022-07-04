@@ -1142,6 +1142,8 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         for (i = 1; i < MAXMCLASSES; i++) {
+            if (i == S_invisible)  /* avoid matching on this */
+                continue;
             if (sym == (looked ? g.showsyms[i + SYM_OFF_M]
                                : def_monsyms[i].sym)
                 && def_monsyms[i].explain && *def_monsyms[i].explain) {
@@ -1192,7 +1194,8 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     if (sym == DEF_INVISIBLE) {
         /* for active clairvoyance, use alternate "unseen creature" */
         boolean usealt = (EDetect_monsters & I_SPECIAL) != 0L;
-        const char *unseen_explain = !usealt ? invisexplain : altinvisexplain;
+        const char *unseen_explain = usealt ? altinvisexplain
+                                    : Blind ? altinvisexplain : invisexplain;
 
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, an(unseen_explain));
