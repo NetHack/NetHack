@@ -605,6 +605,8 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         } else {
             Strcpy(buf, "unexplored area");
         }
+    } else if (glyph_is_invisible(glyph)) {
+        /* already handled */
     } else if (!glyph_is_cmap(glyph)) {
         Strcpy(buf, "unexplored area");
     } else {
@@ -1377,7 +1379,8 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
             if (pm && for_supplement)
                 *for_supplement = pm;
 
-            *firstmatch = look_buf;
+            if (look_buf[0] != '\0')
+                *firstmatch = look_buf;
             if (*(*firstmatch)) {
                 Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
                 (void) strncat(out_str, temp_buf,
