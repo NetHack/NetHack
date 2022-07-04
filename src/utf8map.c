@@ -231,7 +231,7 @@ set_map_u(glyph_map *gm, const uint8 *utf8str, long ucolor)
             free(gm->u->utf8str);
             gm->u->utf8str = 0;
         }
-        gm->u->utf8str = (uint8 *) strdup((const char *) utf8str);
+        gm->u->utf8str = (uint8 *) dupstr((const char *) utf8str);
         gm->u->ucolor = ucolor;
         if (closest_color(ucolor, &closecolor, &clridx))
             gm->u->u256coloridx = clridx;
@@ -487,7 +487,7 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
 
 
     if (!gdc->details) {
-        gdc->customization_name = strdup(customization_name);
+        gdc->customization_name = dupstr(customization_name);
         gdc->custtype = custom_ureps;
         gdc->details = 0;
     }
@@ -499,7 +499,7 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
                 if (details->content.urep.u.utf8str)
                     free(details->content.urep.u.utf8str);
                 details->content.urep.u.utf8str =
-                    (uint8 *) strdup((const char *) utf8str);
+                    (uint8 *) dupstr((const char *) utf8str);
                 details->content.urep.u.ucolor = ucolor;
                 if (closest_color(ucolor, &closecolor, &clridx))
                     details->content.urep.u.u256coloridx = clridx;
@@ -516,7 +516,7 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
         sizeof(struct customization_detail));
     newdetails->content.urep.glyphidx = glyphidx;
     newdetails->content.urep.u.utf8str =
-        (uint8 *) strdup((const char *) utf8str);
+        (uint8 *) dupstr((const char *) utf8str);
     newdetails->content.urep.u.ucolor = ucolor;
     if (closest_color(ucolor, &closecolor, &clridx))
         newdetails->content.urep.u.u256coloridx = clridx;
@@ -820,7 +820,7 @@ parse_id(const char *id, struct find_struct *findwhat)
                         Fprintf(fp, "(%04d) %s\n", glyph, buf[0]);
                     } else if (filling_cache) {
                         glyphid_cache[glyph].glyphnum = glyph;
-                        glyphid_cache[glyph].id = strdup(buf[0]);
+                        glyphid_cache[glyph].id = dupstr(buf[0]);
                     } else if (id) {
                         if (!strcmpi(id, buf[0])) {
                             findwhat->findtype = find_glyph;
