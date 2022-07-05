@@ -1311,15 +1311,9 @@ hmon_hitmon(
     if (jousting) {
         tmp += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
         You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(tmp) : ".");
-        /* if this hit is breaking the never-hit-with-wielded-weapon conduct
-           (handled by caller...) we need to log the message about
-           that before mon is possibly killed in mhurtle_to_doom();
-           without this, the log entry sequence
-           N : killed for the first time
-           N : hit with a wielded weapon for the first time
-           reported on the same turn (N) looks "suboptimal";
-           u.uconduct.weaphit has already been incremented => 1 is first hit */
-        if (obj && u.uconduct.weaphit <= 1)
+        /* if this hit just broke the never-hit-with-wielded-weapon conduct
+           (handled by caller...), give a livelog message for that now */
+        if (u.uconduct.weaphit <= 1)
             first_weapon_hit(obj);
 
         if (jousting < 0) {
@@ -1543,9 +1537,30 @@ mhurtle_to_doom(
 static void
 first_weapon_hit(struct obj *weapon)
 {
+    char buf[BUFSZ];
+
+    /* avoid xname() since that includes "named <foo>" and we don't want
+       player-supplied <foo> in livelog */
+    buf[0] = '\0';
+    /* include "cursed" if known but don't bother with blessed */
+    if (weapon->cursed && weapon->bknown)
+        Strcat(buf, "cursed "); /* normally supplied by doname() */
+    if (obj_is_pname(weapon)) {
+        Strcat(buf, ONAME(weapon)); /* fully IDed artifact */
+    } else {
+        Strcat(buf, simpleonames(weapon));
+        if (weapon->oartifact && weapon->dknown)
+            Sprintf(eos(buf), " named %s", bare_artifactname(weapon));
+    }
+
+    /* when a hit breaks the never-hit-with-wielded-weapon conduct
+       (handled by caller) we need to log the message about that before
+       monster is possibly killed; otherwise getting log entry sequence
+         N : killed for the first time
+         N : hit with a wielded weapon for the first time
+       reported on the same turn (N) looks "suboptimal" */
     livelog_printf(LL_CONDUCT,
-                   "hit with a wielded weapon (%s) for the first time",
-                   xname(weapon));
+                   "hit with a wielded weapon (%s) for the first time", buf);
 }
 
 static boolean
