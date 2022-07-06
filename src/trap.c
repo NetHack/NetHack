@@ -6245,6 +6245,10 @@ trap_ice_effects(coordxy x, coordxy y, boolean ice_is_melting)
     struct trap *ttmp = t_at(x, y);
 
     if (ttmp && ice_is_melting) {
+        struct monst *mtmp;
+
+        if (((mtmp = m_at(x, y)) != 0) && mtmp->mtrapped)
+            mtmp->mtrapped = 0;
         if (ttmp->ttyp == LANDMINE || ttmp->ttyp == BEAR_TRAP) {
             /* landmine or bear trap set on top of the ice falls
                into the water */
