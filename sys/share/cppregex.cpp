@@ -51,18 +51,10 @@ regex_error_desc(struct nhregex *re, char *errbuf)
     } else if (!re->err) {
         Strcpy(errbuf, "no explanation");
     } else {
-        char *p;
-
         errbuf[0] = '\0';
         (void) strncat(errbuf, re->err->what(), BUFSZ - 1);
         if (!errbuf[0])
             Strcpy(errbuf, "unspecified regexp error");
-
-        /* caller will pass our result to config_error_add() and it adds
-           sentence ending period, so if the regex class error explanation
-           already ends in a period, strip that off */
-        if ((p = strrchr(errbuf, '.')) != 0 && !p[1])
-            *p = '\0';
     }
     return errbuf;
 }

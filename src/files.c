@@ -2937,15 +2937,21 @@ void
 config_erradd(const char *buf)
 {
     char lineno[QBUFSZ];
+    const char *punct;
 
     if (!buf || !*buf)
         buf = "Unknown error";
 
+    /* if buf[] doesn't end in a period, exclamation point, or question mark,
+       we'll include a period (in the message, not appended to buf[]) */
+    punct = eos((char *) buf) - 1; /* eos(buf)-1 is valid; cast away const */
+    punct = index(".!?", *punct) ? "" : ".";
+
     if (!g.program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
            player gave bad value when prompted by interactive 'O' command */
-        pline("%s%s.", !iflags.window_inited ? "config_error_add: " : "",
-              buf);
+        pline("%s%s%s", !iflags.window_inited ? "config_error_add: " : "",
+              buf, punct);
         wait_synch();
         return;
     }
@@ -2971,8 +2977,8 @@ config_erradd(const char *buf)
     } else
         lineno[0] = '\0';
 
-    pline("%s %s%s.", config_error_data->secure ? "Error:" : " *",
-          lineno, buf);
+    pline("%s %s%s%s", config_error_data->secure ? "Error:" : " *",
+          lineno, buf, punct);
 }
 
 int
