@@ -366,8 +366,11 @@ put_lregion_here(
                It might still fail if there's a dungeon feature here. */
             struct trap *t = t_at(x, y);
 
-            if (t && !undestroyable_trap(t->ttyp))
+            if (t && !undestroyable_trap(t->ttyp)) {
+                if (((mtmp = m_at(x, y)) != 0) && mtmp->mtrapped)
+                    mtmp->mtrapped = 0;
                 deltrap(t);
+            }
             if (bad_location(x, y, nlx, nly, nhx, nhy))
                 return FALSE;
         }
