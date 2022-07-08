@@ -1462,11 +1462,15 @@ burn_object(anything *arg, long timeout)
                 if (carried(obj)) {
                     useupall(obj);
                 } else {
+                    boolean onfloor = (obj->where == OBJ_FLOOR);
+
                     /* clear migrating obj's destination code
                        so obfree won't think this item is worn */
                     if (obj->where == OBJ_MIGRATING)
                         obj->owornmask = 0L;
                     obj_extract_self(obj);
+                    if (onfloor)
+                        maybe_unhide_at(x, y);
                     obfree(obj, (struct obj *) 0);
                 }
                 obj = (struct obj *) 0;
