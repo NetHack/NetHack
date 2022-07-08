@@ -3292,16 +3292,23 @@ m_into_limbo(struct monst *mtmp)
 }
 
 static void
-migrate_mon(struct monst *mtmp, xint16 target_lev, xint16 xyloc)
+migrate_mon(
+    struct monst *mtmp,
+    xint16 target_lev, /* destination level */
+    xint16 xyloc)      /* MIGR_xxx flag for location within destination */
 {
-    if (!mtmp->mx) {
-        /* this was a failed arrival attempt from a prior migration;
-           force mtmp to temporarily have a valid location when starting
-           its new migration */
-        mtmp->mx = u.ux, mtmp->my = u.uy;
+    /*
+     * If mtmp->mx is zero, this was a failed arrival attempt from a
+     * prior migration and mtmp isn't on the map.  In that situation
+     * it can't be engulfing or holding the hero or held by same and
+     * should have dropped any special objects during that earlier
+     * migration back when it had a valid map location.  So only
+     * perform some actions when mx is non-zero.
+     */
+    if (mtmp->mx) {
+        unstuck(mtmp);
+        mdrop_special_objs(mtmp);
     }
-    unstuck(mtmp);
-    mdrop_special_objs(mtmp);
     migrate_to_level(mtmp, target_lev, xyloc, (coord *) 0);
 }
 
