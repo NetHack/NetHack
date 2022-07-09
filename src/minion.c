@@ -331,14 +331,10 @@ demon_talk(register struct monst *mtmp)
         if (!Deaf && ((offer = bribe(mtmp)) >= demand)) {
             pline("%s vanishes, laughing about cowardly mortals.",
                   Amonnam(mtmp));
-            livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
-                           Amonnam(mtmp), offer, currency(offer));
         } else if (offer > 0L
                    && (long) rnd(5 * ACURR(A_CHA)) > (demand - offer)) {
             pline("%s scowls at you menacingly, then vanishes.",
                   Amonnam(mtmp));
-            livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
-                           Amonnam(mtmp), offer, currency(offer));
         } else {
             pline("%s gets angry...", Amonnam(mtmp));
             mtmp->mpeaceful = 0;
@@ -346,6 +342,8 @@ demon_talk(register struct monst *mtmp)
             return 0;
         }
     }
+    livelog_printf(LL_UMONST, "bribed %s with %ld %s for safe passage",
+                   Amonnam(mtmp), offer, currency(offer));
     mongone(mtmp);
     return 1;
 }

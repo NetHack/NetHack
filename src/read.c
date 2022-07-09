@@ -438,7 +438,7 @@ doread(void)
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
                            (otyp == DUNCE_CAP) ? "a dunce cap"
-                           : "a cornuthaum");
+                                               : "a cornuthaum");
 
         /* yet another note: despite the fact that player will recognize
            the object type, don't make it become a discovery for hero */
@@ -2659,8 +2659,7 @@ do_genocide(int how)
                 if (!(how & REALLY) && (ptr = rndmonst()) != 0)
                     break; /* remaining checks don't apply */
 
-                livelog_printf(LL_GENOCIDE,
-                               "declined to perform genocide");
+                livelog_printf(LL_GENOCIDE, "declined to perform genocide");
                 return;
             }
 
