@@ -1603,8 +1603,10 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
         otransit_msg(otmp, nodrop, chainthere, n);
 
     if (nodrop) {
-        if (impact)
+        if (impact) {
             impact_drop(otmp, x, y, 0);
+            maybe_unhide_at(x, y);
+        }
         return FALSE;
     }
 
