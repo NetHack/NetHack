@@ -4488,8 +4488,14 @@ getdir(const char *s)
             mod = 0; /* neither CLICK_1 nor CLICK_2 */
         } else {
             /* caller expects simulated click to be relative to hero's spot */
-            u.dx = sgn(cc.x - u.ux);
-            u.dy = sgn(cc.y - u.uy);
+            u.dx = cc.x - u.ux;
+            u.dy = cc.y - u.uy;
+            /* getdir_ok2click actually means ok to click farther than
+               one spot away from hero; adjacent click is always allowed */
+            if (!iflags.getdir_ok2click) {
+                u.dx = sgn(u.dx);
+                u.dy = sgn(u.dy);
+            }
             u.dz = 0;
 
             switch (pos + NHKF_GETPOS_PICK) {
@@ -4761,8 +4767,12 @@ static int
 dotherecmdmenu(void)
 {
     char ch;
+    int dir;
 
-    if (!getdir((const char *) 0) || !isok(u.ux + u.dx, u.uy + u.dy))
+    iflags.getdir_ok2click = TRUE;
+    dir = getdir((const char *) 0);
+    iflags.getdir_ok2click = FALSE;
+    if (!dir || !isok(u.ux + u.dx, u.uy + u.dy))
         return ECMD_CANCEL;
 
     if (u.dx || u.dy)
@@ -5042,11 +5052,25 @@ there_cmd_menu_common(
 /* queue up command(s) to perform #therecmdmenu action */
 static void
 act_on_act(
-    int act,        /* action */
-    coordxy dx, coordxy dy) /* delta to adjacent spot (farther for couple of cases) */
+    int act,                /* action */
+    coordxy dx, coordxy dy) /* delta to adjacent spot (farther sometimes) */
 {
     struct obj *otmp;
     int dir;
+
+    /* there_cmd_menu_far() actions use dx,dy differently */
+    switch (act) {
+    case MCMD_THROW_OBJ:
+    case MCMD_TRAVEL:
+    case MCMD_LOOK_AT:
+        /* keep dx,dy as-is */
+        break;
+    default:
+        /* force dx and dy to be +1, 0, or -1 */
+        dx = sgn(dx);
+        dy = sgn(dy);
+        break;
+    }
 
     switch (act) {
     case MCMD_TRAVEL:

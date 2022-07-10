@@ -213,6 +213,7 @@ struct instance_flags {
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
     boolean getloc_travelmode;
+    int getdir_ok2click;   /* for #therecmdmenu */
     int getloc_click;      /* 0 or CLICK_1 (left) or CLICK_2 (right) */
     int getloc_filter;     /* GFILTER_foo */
     boolean getloc_usemenu;
