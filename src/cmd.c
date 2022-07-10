@@ -4488,8 +4488,8 @@ getdir(const char *s)
             mod = 0; /* neither CLICK_1 nor CLICK_2 */
         } else {
             /* caller expects simulated click to be relative to hero's spot */
-            u.dx = cc.x - u.ux;
-            u.dy = cc.y - u.uy;
+            u.dx = sgn(cc.x - u.ux);
+            u.dy = sgn(cc.y - u.uy);
             u.dz = 0;
 
             switch (pos + NHKF_GETPOS_PICK) {
