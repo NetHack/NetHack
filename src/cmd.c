@@ -4490,9 +4490,9 @@ getdir(const char *s)
             /* caller expects simulated click to be relative to hero's spot */
             u.dx = cc.x - u.ux;
             u.dy = cc.y - u.uy;
-            /* getdir_ok2click actually means ok to click farther than
+            /* non-zero getdir_click actually means ok to click farther than
                one spot away from hero; adjacent click is always allowed */
-            if (!iflags.getdir_ok2click) {
+            if (!iflags.getdir_click) {
                 u.dx = sgn(u.dx);
                 u.dy = sgn(u.dy);
             }
@@ -4518,7 +4518,7 @@ getdir(const char *s)
                 break;
             }
         }
-        iflags.getloc_click = mod;
+        iflags.getdir_click = mod;
         return (pos >= 0);
     } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
@@ -4767,16 +4767,18 @@ static int
 dotherecmdmenu(void)
 {
     char ch;
-    int dir;
+    int dir, click;
 
-    iflags.getdir_ok2click = TRUE;
+    iflags.getdir_click = CLICK_1 | CLICK_2; /* allow 'far' click */
     dir = getdir((const char *) 0);
-    iflags.getdir_ok2click = FALSE;
+    click = iflags.getdir_click;
+    iflags.getdir_click = 0;
+
     if (!dir || !isok(u.ux + u.dx, u.uy + u.dy))
         return ECMD_CANCEL;
 
     if (u.dx || u.dy)
-        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy, iflags.getloc_click);
+        ch = there_cmd_menu(u.ux + u.dx, u.uy + u.dy, click);
     else
         ch = here_cmd_menu();
 
@@ -5229,7 +5231,8 @@ act_on_act(
     }
 }
 
-/* offer choice of actions to perform at adjacent location <x,y> */
+/* offer choice of actions to perform at adjacent location <x,y>;
+   a few choices can be farther away */
 static char
 there_cmd_menu(coordxy x, coordxy y, int mod)
 {

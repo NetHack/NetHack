@@ -212,12 +212,14 @@ struct instance_flags {
 #define TER_OBJ    0x04
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
-    boolean getloc_travelmode;
-    int getdir_ok2click;   /* for #therecmdmenu */
-    int getloc_click;      /* 0 or CLICK_1 (left) or CLICK_2 (right) */
+    int getdir_click;      /* as input to getdir(): non-zero, accept simulated
+                            * click that's not adjacent to or on hero;
+                            * as output from getdir(): simulated button used
+                            * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
     int getloc_filter;     /* GFILTER_foo */
-    boolean getloc_usemenu;
     boolean getloc_moveskip;
+    boolean getloc_travelmode;
+    boolean getloc_usemenu;
     coord travelcc;        /* coordinates for travel_cache */
     boolean trav_debug;    /* display travel path (#if DEBUG only) */
     boolean window_inited; /* true if init_nhwindows() completed */

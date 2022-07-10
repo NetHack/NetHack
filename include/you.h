@@ -347,17 +347,17 @@ enum utotypes {
 
 /*** Information about the player ***/
 struct you {
-    coordxy ux, uy;       /* current map coordinates */
-    schar dx, dy, dz;   /* direction of move (or zap or ... ) */
-    schar di;           /* direction of FF */
-    coordxy tx, ty;       /* destination of travel */
-    coordxy ux0, uy0;     /* initial position FF */
+    coordxy ux, uy;     /* current map coordinates */
+    int dx, dy, dz;     /* x,y,z deltas; direction of move (or zap or ... )
+                         * usually +1 or 0 or -1 */
+    coordxy tx, ty;     /* destination of travel */
+    coordxy ux0, uy0;   /* previous ux,uy */
     d_level uz, uz0;    /* your level on this and the previous turn */
     d_level utolev;     /* level monster teleported you to, or uz */
     uchar utotype;      /* bitmask of goto_level() flags for utolev */
     boolean umoved;     /* changed map location (post-move) */
     int last_str_turn;  /* 0: none, 1: half turn, 2: full turn
-                           +: turn right, -: turn left */
+                         * +: turn right, -: turn left */
     int ulevel;         /* 1 to MAXULEV (30) */
     int ulevelmax;      /* highest level, but might go down (to throttle
                          * lost level recovery via blessed full healing) */

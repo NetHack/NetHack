@@ -782,7 +782,6 @@ getpos(coord *ccp, boolean force, const char *goal)
         }
         if (c == cmd_from_func(do_run) || c == cmd_from_func(do_rush)) {
             c = readchar_poskey(&tx, &ty, &sidx);
-            iflags.getloc_click = sidx; /* [is this useful?] */
             rushrun = TRUE;
         }
         if (c == 0) {
