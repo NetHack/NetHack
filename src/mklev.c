@@ -1435,7 +1435,6 @@ mktrap(
                 if (lvl < 5)
                     kind = NO_TRAP;
                 break;
-            case ANTI_MAGIC:
             case LANDMINE:
                 if (lvl < 6)
                     kind = NO_TRAP;

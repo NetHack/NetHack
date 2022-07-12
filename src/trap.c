@@ -2037,17 +2037,13 @@ trapeffect_anti_magic(
     unsigned int trflags UNUSED)
 {
     if (mtmp == &g.youmonst) {
-        int drain = (u.uen > 1) ? (rnd(u.uen / 2) + 2) : 4;
+        int drain = d(2, 6);
+        int halfd = rnd(((drain + 1) / 2));
 
         seetrap(trap);
-        /* hero without magic resistance loses spell energy,
-           hero with magic resistance takes damage instead;
-           possibly non-intuitive but useful for play balance */
-        if (!Antimagic) {
-            drain_en(drain);
-        } else {
+        if (Antimagic) {
             struct obj *otmp;
-            int dmgval2 = rnd(drain), hp = Upolyd ? u.mh : u.uhp;
+            int dmgval2 = rnd(4), hp = Upolyd ? u.mh : u.uhp;
 
             /* Half_XXX_damage has opposite its usual effect (approx)
                but isn't cumulative if hero has more than one */
@@ -2074,6 +2070,11 @@ trapeffect_anti_magic(
             /* opposite of magical explosion */
             losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
+        if (u.uenmax > halfd) {
+            u.uenmax -= halfd;
+            drain -= halfd;
+        }
+        drain_en(drain);
     } else {
         boolean trapkilled = FALSE;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
@@ -2084,7 +2085,7 @@ trapeffect_anti_magic(
         if (!resists_magm(mtmp)) { /* lose spell energy */
             if (!mtmp->mcan && (attacktype(mptr, AT_MAGC)
                                 || attacktype(mptr, AT_BREA))) {
-                mtmp->mspec_used += d(2, 2);
+                mtmp->mspec_used += d(2, 6);
                 if (in_sight) {
                     seetrap(trap);
                     pline("%s seems lethargic.", Monnam(mtmp));

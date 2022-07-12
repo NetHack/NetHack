@@ -533,8 +533,7 @@ dying from being level-drained below level 1 killed hero without saying so
 	and jumped straight to "do you want your possessions identified?"
 conflict will now consider your charisma and requires line of sight
 boost hit points of some golems
-make anti-magic fields drain more energy and prevent them from showing up
-	too early in the dungeon
+make anti-magic fields always drain max energy
 eating magical monsters such as wizards or shamans may give a mild buzz
 make exploding spheres create an actual explosion
 pets are more careful about attacking monsters at low health
