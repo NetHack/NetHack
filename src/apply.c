@@ -1595,7 +1595,11 @@ use_lamp(struct obj *obj)
         return;
     }
     if (obj->cursed && !rn2(2)) {
-        if (!Blind)
+        if ((obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP) && !rn2(3)) {
+            pline_The("lamp spills and covers your %s with oil.",
+                      fingers_or_gloves(TRUE));
+            make_glib((int) (Glib & TIMEOUT) + d(2, 10));
+        } else if (!Blind)
             pline("%s for a moment, then %s.", Tobjnam(obj, "flicker"),
                   otense(obj, "die"));
     } else {
