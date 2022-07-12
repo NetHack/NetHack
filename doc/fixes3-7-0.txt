@@ -951,6 +951,7 @@ flying pets wouldn't target underwater food but if they happened to fly over
 	such food they could and would eat it
 praying on an altar with pet corpse on it can revive the pet
 applying a cursed oil lamp can make your hands slippery
+valkyries start with a spear instead of a long sword
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
