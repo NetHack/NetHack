@@ -1870,6 +1870,9 @@ eatcorpse(struct obj *otmp)
                              && rn2(10)
                              && (rotted < 1 || !rn2((int) rotted + 1)));
         const char *pmxnam = food_xname(otmp, FALSE);
+        static const char *const palatable_msgs[] = {
+            "okay", "stringy", "gamey", "fatty", "tough"
+        };
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
@@ -1883,7 +1886,8 @@ eatcorpse(struct obj *otmp)
               Hallucination
                  ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
                           : palatable ? "copacetic" : "grody")
-                 : (yummy ? "delicious" : palatable ? "okay" : "terrible"),
+              : (yummy ? "delicious" : palatable ?
+                 palatable_msgs[mnum % SIZE(palatable_msgs)] : "terrible"),
               (yummy || !palatable) ? '!' : '.');
     }
 
