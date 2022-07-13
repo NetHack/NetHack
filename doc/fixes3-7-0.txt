@@ -952,6 +952,7 @@ flying pets wouldn't target underwater food but if they happened to fly over
 praying on an altar with pet corpse on it can revive the pet
 applying a cursed oil lamp can make your hands slippery
 valkyries start with a spear instead of a long sword
+grid bugs don't have hands
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
