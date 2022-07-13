@@ -8,6 +8,14 @@
 static int pet_type(void);
 static void set_mon_lastmove(struct monst *);
 static int mon_leave(struct monst *);
+static boolean keep_mon_accessible(struct monst *);
+
+enum arrival {
+    Before_you = 0, /* monsters kept on migrating_mons for accessibility;
+                     * they haven't actually left their level */
+    With_you   = 1, /* pets and level followers */
+    After_you  = 2  /* regular migrating monsters */
+};
 
 void
 newedog(struct monst *mtmp)
@@ -219,14 +227,16 @@ update_mlstmv(void)
 void
 losedogs(void)
 {
-    register struct monst *mtmp, *mtmp0, *mtmp2;
-    int dismissKops = 0;
+    register struct monst *mtmp, **mprev;
+    int dismissKops = 0, xyloc;
 
     /*
      * First, scan g.migrating_mons for shopkeepers who want to dismiss Kops,
      * and scan g.mydogs for shopkeepers who want to retain kops.
      * Second, dismiss kops if warranted, making more room for arrival.
-     * Third, place monsters accompanying the hero.
+     * Third, replace monsters who went onto migrating_mons in order to
+     * be accessible from other levels but didn't actually leave the level.
+     * Fourth, place monsters accompanying the hero.
      * Last, place migrating monsters coming to this level.
      *
      * Hero might eventually be displaced (due to the third step, but
@@ -268,38 +278,49 @@ losedogs(void)
     if (dismissKops > 0)
         make_happy_shoppers(TRUE);
 
-    /* place pets and/or any other monsters who accompany hero */
+    /* put monsters who went onto migrating_mons in order to be accessible
+       when other levels are active back to the positions on this level;
+       they're handled before mydogs so that monsters accompanying the
+       hero can't steal the spot that belongs to them
+       [note: mon_arrive() might fail and put mtmp back at the head of
+       migrating_mons; that doesn't interfere with our list traversal] */
+    for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
+        xyloc = mtmp->mtrack[0].x; /* (for legibility) */
+        if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel
+            && xyloc == MIGR_EXACT_XY) {
+            *mprev = mtmp->nmon;
+            mon_arrive(mtmp, Before_you);
+        } else {
+            mprev = &mtmp->nmon;
+        }
+    }
+
+    /* place pets and/or any other monsters who accompany hero;
+       any that fail to arrive (level may be level) will be moved
+       to migrating_mons and immediately retry (and fail again) below */
     while ((mtmp = g.mydogs) != 0) {
         g.mydogs = mtmp->nmon;
-        mon_arrive(mtmp, TRUE);
+        mon_arrive(mtmp, With_you);
     }
 
     /* time for migrating monsters to arrive;
-       monsters who belong on this level but fail to arrive get put
-       back onto the list (at head), so traversing it is tricky */
-    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp2) {
-        mtmp2 = mtmp->nmon;
-        if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel) {
-            /* remove mtmp from g.migrating_mons list */
-            if (mtmp == g.migrating_mons) {
-                g.migrating_mons = mtmp->nmon;
-            } else {
-                for (mtmp0 = g.migrating_mons; mtmp0; mtmp0 = mtmp0->nmon)
-                    if (mtmp0->nmon == mtmp) {
-                        mtmp0->nmon = mtmp->nmon;
-                        break;
-                    }
-                if (!mtmp0)
-                    panic("losedogs: can't find migrating mon");
-            }
-            mon_arrive(mtmp, FALSE);
+       monsters who belong on this level but fail to arrive get put back
+       onto the list (at head) but that doesn't interfere with traversal */
+    for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
+        xyloc = mtmp->mtrack[0].x;
+        if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel
+            && xyloc != MIGR_EXACT_XY) {
+            *mprev = mtmp->nmon;
+            mon_arrive(mtmp, After_you);
+        } else {
+            mprev = &mtmp->nmon;
         }
     }
 }
 
 /* called from resurrect() in addition to losedogs() */
 void
-mon_arrive(struct monst *mtmp, boolean with_you)
+mon_arrive(struct monst *mtmp, int when)
 {
     struct trap *t;
     coordxy xlocale, ylocale, xyloc, xyflags;
@@ -340,7 +361,7 @@ mon_arrive(struct monst *mtmp, boolean with_you)
 
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */
-    if (with_you) {
+    if (when == With_you) {
         /* When a monster accompanies you, sometimes it will arrive
            at your intended destination and you'll end up next to
            that spot.  This code doesn't control the final outcome;
@@ -619,6 +640,28 @@ mon_leave(struct monst *mtmp)
     return num_segs;
 }
 
+/* when hero leaves a level, some monsters should be placed on the
+   migrating_mons list instead of being stashed inside the level's file */
+static boolean
+keep_mon_accessible(struct monst *mon)
+{
+    /* the Wizard is kept accessible so that his harassment can fetch
+       him instead of creating a new instance but also so that he can
+       be put back at his current location if hero returns to his level */
+    if (mon->iswiz)
+        return TRUE;
+    /* monsters with special attachment to a particular level only need
+       to be kept accessible when on some other level */
+    if (mon->mextra
+        && ((mon->isshk && !on_level(&u.uz, &ESHK(mon)->shoplevel))
+            || (mon->ispriest && !on_level(&u.uz, &EPRI(mon)->shrlevel))
+            || (mon->isgd && !on_level(&u.uz, &EGD(mon)->gdlevel))))
+        return TRUE;
+    /* normal monsters go into the level save file instead of being held
+       on the migrating_mons list for off-level accessibility */
+    return FALSE;
+}
+
 /* called when you move to another level */
 void
 keepdogs(
@@ -699,10 +742,14 @@ keepdogs(
             mtmp->mx = mtmp->my = 0; /* mx==0 implies migating */
             mtmp->wormno = num_segs;
             mtmp->mlstmv = g.moves;
-        } else if (mtmp->iswiz) {
-            /* we want to be able to find him when his next resurrection
-               chance comes up, but have him resume his present location
-               if player returns to this level before that time */
+        } else if (keep_mon_accessible(mtmp)) {
+            /* we want to be able to find the Wizard when his next
+               resurrection chance comes up, but have him resume his
+               present location if player returns to this level before
+               that time; also needed for monsters (shopkeeper, temple
+               priest, vault guard) who have level data in mon->mextra
+               in case #wizmakemap is used to replace their home level
+               while they're away from it */
             migrate_to_level(mtmp, ledger_no(&u.uz), MIGR_EXACT_XY,
                              (coord *) 0);
         } else if (mtmp->mleashed) {

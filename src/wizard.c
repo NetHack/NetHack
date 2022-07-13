@@ -708,7 +708,7 @@ resurrect(void)
                     mtmp->mfrozen = 0, mtmp->mcanmove = 1;
                 if (!helpless(mtmp)) {
                     *mmtmp = mtmp->nmon;
-                    mon_arrive(mtmp, TRUE);
+                    mon_arrive(mtmp, 0); /* 0: not With_you (1) */
                     /* note: there might be a second Wizard; if so,
                        he'll have to wait til the next resurrection */
                     break;

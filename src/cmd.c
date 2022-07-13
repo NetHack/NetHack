@@ -130,6 +130,8 @@ static int wiz_rumor_check(void);
 static int wiz_migrate_mons(void);
 #endif
 
+static void makemap_unmakemon(struct monst *);
+static void makemap_remove_mons(void);
 static void wiz_map_levltyp(void);
 static void wiz_levltyp_legend(void);
 #if defined(__BORLANDC__) && !defined(_WIN32)
@@ -987,6 +989,71 @@ wiz_identify(void)
     return ECMD_OK;
 }
 
+/* used when wiz_makemap() gets rid of monsters for the old incarnation of
+   a level before creating a new incarnation of it */
+static void
+makemap_unmakemon(struct monst *mtmp)
+{
+    int ndx = monsndx(mtmp->data);
+
+    /* uncreate any unique monster so that it is eligible to be remade
+       on the new incarnation of the level; ignores DEADMONSTER() [why?] */
+    if (mtmp->data->geno & G_UNIQ)
+        g.mvitals[ndx].mvflags &= ~G_EXTINCT;
+    if (g.mvitals[ndx].born)
+        g.mvitals[ndx].born--;
+
+    /* vault is going away; get rid of guard who might be in play or
+       be parked at <0,0>; for the latter, might already be flagged as
+       dead but is being kept around because of the 'isgd' flag */
+    if (mtmp->isgd) {
+        mtmp->isgd = 0; /* after this, fall through to mongone() */
+    } else if (DEADMONSTER(mtmp)) {
+        return; /* already set to be discarded */
+    } else if (mtmp->isshk && on_level(&u.uz, &ESHK(mtmp)->shoplevel)) {
+        setpaid(mtmp);
+    }
+    mongone(mtmp);
+}
+
+/* get rid of the all the monsters on--or intimately involved with--current
+   level; used when #wizmakemap destroys the level before replacing it */
+static void
+makemap_remove_mons(void)
+{
+    struct monst *mtmp, **mprev;
+
+    /* keep steed and other adjacent pets after releasing them
+       from traps, stopping eating, &c as if hero were ascending */
+    keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE') */
+    /* get rid of all the monsters that didn't make it to 'mydogs' */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        makemap_unmakemon(mtmp);
+    /* some monsters retain details of this level in mon->mextra; that
+       data becomes invalid when the level is replaced by a new one;
+       get rid of them now if migrating or already arrived elsewhere;
+       [when on their 'home' level, the previous loop got rid of them;
+       if they aren't actually migrating but have been placed on some
+       'away' level, such monsters are treated like the Wizard:  kept
+       on migrating monsters list, scheduled to migrate back to their
+       present location instead of being saved with whatever level they
+       happen to be on; see keepdogs() and keep_mon_accessible(dog.c)] */
+    for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
+        if (mtmp->mextra
+            && ((mtmp->isshk && on_level(&u.uz, &ESHK(mtmp)->shoplevel))
+                || (mtmp->ispriest && on_level(&u.uz, &EPRI(mtmp)->shrlevel))
+                || (mtmp->isgd && on_level(&u.uz, &EGD(mtmp)->gdlevel)))) {
+            *mprev = mtmp->nmon;
+            makemap_unmakemon(mtmp);
+        } else {
+            mprev = &mtmp->nmon;
+        }
+    }
+    /* release dead and 'unmade' monsters */
+    dmonsfree();
+    return;
+}
+
 void
 makemap_prepost(boolean pre, boolean wiztower)
 {
@@ -994,26 +1061,8 @@ makemap_prepost(boolean pre, boolean wiztower)
     struct monst *mtmp;
 
     if (pre) {
-        /* keep steed and other adjacent pets after releasing them
-           from traps, stopping eating, &c as if hero were ascending */
-        keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE' here) */
-
-        rm_mapseen(ledger_no(&u.uz));
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-            int ndx = monsndx(mtmp->data);
-            if (mtmp->isgd) { /* vault is going away; get rid of guard */
-                mtmp->isgd = 0;
-                mongone(mtmp);
-            }
-            if (mtmp->data->geno & G_UNIQ)
-                g.mvitals[ndx].mvflags &= ~(G_EXTINCT);
-            if (g.mvitals[ndx].born)
-                g.mvitals[ndx].born--;
-            if (DEADMONSTER(mtmp))
-                continue;
-            if (mtmp->isshk)
-                setpaid(mtmp);
-        }
+        makemap_remove_mons();
+        rm_mapseen(ledger_no(&u.uz)); /* discard overview info for level */
         {
             static const char Unachieve[] = "%s achievement revoked.";
 

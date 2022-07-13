@@ -592,7 +592,7 @@ extern struct monst *make_familiar(struct obj *, coordxy, coordxy, boolean);
 extern struct monst *makedog(void);
 extern void update_mlstmv(void);
 extern void losedogs(void);
-extern void mon_arrive(struct monst *, boolean);
+extern void mon_arrive(struct monst *, int);
 extern void mon_catchup_elapsed_time(struct monst *, long);
 extern void keepdogs(boolean);
 extern void migrate_to_level(struct monst *, coordxy, coordxy, coord *);
