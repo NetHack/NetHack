@@ -296,7 +296,7 @@ losedogs(void)
     }
 
     /* place pets and/or any other monsters who accompany hero;
-       any that fail to arrive (level may be level) will be moved
+       any that fail to arrive (level may be full) will be moved
        to migrating_mons and immediately retry (and fail again) below */
     while ((mtmp = g.mydogs) != 0) {
         g.mydogs = mtmp->nmon;
