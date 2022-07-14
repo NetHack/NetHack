@@ -509,8 +509,7 @@ enum glyph_offsets {
     GLYPH_CMAP_A_OFF = (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_SOKO_OFF),
     GLYPH_ALTAR_OFF = (((S_brdnladder - S_ndoor) + 1) + GLYPH_CMAP_A_OFF),
     GLYPH_CMAP_B_OFF = (5 + GLYPH_ALTAR_OFF),
-    GLYPH_ZAP_OFF = ((S_arrow_trap + MAXTCHARS - S_grave)
-                     + GLYPH_CMAP_B_OFF),
+    GLYPH_ZAP_OFF = ((S_arrow_trap + MAXTCHARS - S_grave) + GLYPH_CMAP_B_OFF),
     GLYPH_CMAP_C_OFF = ((NUM_ZAP << 2) + GLYPH_ZAP_OFF),
     GLYPH_SWALLOW_OFF = (((S_goodpos - S_digbeam) + 1) + GLYPH_CMAP_C_OFF),
     GLYPH_EXPLODE_OFF = ((NUMMONS << 3) + GLYPH_SWALLOW_OFF),
@@ -654,45 +653,46 @@ enum glyph_offsets {
  *         to return).
  */
 
-#define glyph_to_trap(glyph)                                                \
-    (glyph_is_trap(glyph) \
+#define glyph_to_trap(glyph) \
+    (glyph_is_trap(glyph)                                                   \
         ? ((int) defsym_to_trap(((glyph) - GLYPH_TRAP_OFF) + S_arrow_trap)) \
         : NO_GLYPH)
 
 #define glyph_is_cmap_main(glyph) \
-    ((glyph) >= GLYPH_CMAP_MAIN_OFF && \
-        (glyph) < (((S_trwall - S_vwall) +1) + GLYPH_CMAP_MAIN_OFF))
+    ((glyph) >= GLYPH_CMAP_MAIN_OFF                                     \
+     && (glyph) < (((S_trwall - S_vwall) +1) + GLYPH_CMAP_MAIN_OFF))
 #define glyph_is_cmap_mines(glyph) \
-    ((glyph) >= GLYPH_CMAP_MINES_OFF && \
-        (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_MINES_OFF))
+    ((glyph) >= GLYPH_CMAP_MINES_OFF                                    \
+     && (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_MINES_OFF))
 #define glyph_is_cmap_gehennom(glyph) \
-    ((glyph) >= GLYPH_CMAP_GEH_OFF && \
-        (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_GEH_OFF))
+    ((glyph) >= GLYPH_CMAP_GEH_OFF                                      \
+     && (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_GEH_OFF))
 #define glyph_is_cmap_knox(glyph) \
-    ((glyph) >= GLYPH_CMAP_KNOX_OFF && \
-        (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_KNOX_OFF))
+    ((glyph) >= GLYPH_CMAP_KNOX_OFF                                     \
+     && (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_KNOX_OFF))
 #define glyph_is_cmap_sokoban(glyph) \
-    ((glyph) >= GLYPH_CMAP_SOKO_OFF && \
-        (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_SOKO_OFF))
+    ((glyph) >= GLYPH_CMAP_SOKO_OFF                                     \
+     && (glyph) < (((S_trwall - S_vwall) + 1) + GLYPH_CMAP_SOKO_OFF))
 #define glyph_is_cmap_a(glyph) \
-    ((glyph) >= GLYPH_CMAP_A_OFF && \
-        (glyph) < (((S_brdnladder - S_ndoor) + 1) + GLYPH_CMAP_A_OFF))
+    ((glyph) >= GLYPH_CMAP_A_OFF                                        \
+     && (glyph) < (((S_brdnladder - S_ndoor) + 1) + GLYPH_CMAP_A_OFF))
 #define glyph_is_cmap_altar(glyph) \
-    ((glyph) >= GLYPH_ALTAR_OFF && \
-        (glyph) < (5 + GLYPH_ALTAR_OFF))
+    ((glyph) >= GLYPH_ALTAR_OFF && (glyph) < (5 + GLYPH_ALTAR_OFF))
 #define glyph_is_cmap_b(glyph) \
-    ((glyph) >= GLYPH_CMAP_B_OFF && \
-        ((glyph) < ((S_arrow_trap + MAXTCHARS - S_grave) + GLYPH_CMAP_B_OFF)))
+    ((glyph) >= GLYPH_CMAP_B_OFF                                        \
+     && ((glyph) < ((S_arrow_trap + MAXTCHARS - S_grave) + GLYPH_CMAP_B_OFF)))
 #define glyph_is_cmap_zap(glyph) \
     ((glyph) >= GLYPH_ZAP_OFF && (glyph) < ((NUM_ZAP << 2) + GLYPH_ZAP_OFF))
 #define glyph_is_cmap_c(glyph) \
-    ((glyph) >= GLYPH_CMAP_C_OFF && \
-        (glyph) < (((S_goodpos - S_digbeam) + 1) + GLYPH_CMAP_C_OFF))
+    ((glyph) >= GLYPH_CMAP_C_OFF                                        \
+     && (glyph) < (((S_goodpos - S_digbeam) + 1) + GLYPH_CMAP_C_OFF))
 #define glyph_is_swallow(glyph) \
-    ((glyph) >= GLYPH_SWALLOW_OFF && (glyph) < (((NUMMONS << 3) + GLYPH_SWALLOW_OFF)))
+    ((glyph) >= GLYPH_SWALLOW_OFF                                       \
+     && (glyph) < (((NUMMONS << 3) + GLYPH_SWALLOW_OFF)))
 #define glyph_is_explosion(glyph) \
-    ((glyph) >= GLYPH_EXPLODE_OFF && \
-        (glyph) < (MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF))
+    ((glyph) >= GLYPH_EXPLODE_OFF                                       \
+     && (glyph) < (MAXEXPCHARS + GLYPH_EXPLODE_FROSTY_OFF))
+#if 0   /* this is more precise but expands to a lot of unnecessary code */
 #define glyph_is_cmap(glyph) \
     (((glyph) == GLYPH_CMAP_STONE_OFF) \
      || glyph_is_cmap_main(glyph)      \
@@ -704,6 +704,10 @@ enum glyph_offsets {
      || glyph_is_cmap_altar(glyph)     \
      || glyph_is_cmap_b(glyph)         \
      || glyph_is_cmap_c(glyph))
+#endif
+#define glyph_is_cmap(glyph) \
+    ((glyph) >= GLYPH_CMAP_STONE_OFF \
+     && (glyph) < (GLYPH_CMAP_C_OFF + ((S_goodpos - S_digbeam) + 1)))
 
 #define glyph_to_cmap(glyph) \
     (((glyph) == GLYPH_CMAP_STONE_OFF)                                 \
@@ -804,28 +808,28 @@ enum glyph_offsets {
     || glyph_is_body_piletop(glyph))
 
 #define glyph_is_fem_statue_piletop(glyph) \
-    (((glyph) >= GLYPH_STATUE_FEM_PILETOP_OFF) \
+    (((glyph) >= GLYPH_STATUE_FEM_PILETOP_OFF)                  \
       && ((glyph) < (GLYPH_STATUE_FEM_PILETOP_OFF + NUMMONS)))
 #define glyph_is_male_statue_piletop(glyph) \
-     (((glyph) >= GLYPH_STATUE_MALE_PILETOP_OFF) \
+    (((glyph) >= GLYPH_STATUE_MALE_PILETOP_OFF)                 \
          && ((glyph) < (GLYPH_STATUE_MALE_PILETOP_OFF + NUMMONS)))
 #define glyph_is_fem_statue(glyph) \
-    ((((glyph) >= GLYPH_STATUE_FEM_OFF) && \
-        ((glyph) < (GLYPH_STATUE_FEM_OFF + NUMMONS))) \
+    ((((glyph) >= GLYPH_STATUE_FEM_OFF)                         \
+      && ((glyph) < (GLYPH_STATUE_FEM_OFF + NUMMONS)))          \
      || glyph_is_fem_statue_piletop(glyph))
 #define glyph_is_male_statue(glyph) \
-    ((((glyph) >= GLYPH_STATUE_MALE_OFF) &&            \
-        ((glyph) < (GLYPH_STATUE_MALE_OFF + NUMMONS))) \
+    ((((glyph) >= GLYPH_STATUE_MALE_OFF)                        \
+      && ((glyph) < (GLYPH_STATUE_MALE_OFF + NUMMONS)))         \
      || glyph_is_male_statue_piletop(glyph))
 #define glyph_is_statue(glyph) \
     (glyph_is_male_statue(glyph) || glyph_is_fem_statue(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
-    (((glyph) >= GLYPH_OBJ_PILETOP_OFF) && \
-        ((glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
+    (((glyph) >= GLYPH_OBJ_PILETOP_OFF)                         \
+     && ((glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
-     ((((glyph) >= GLYPH_OBJ_OFF) && \
-        ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))) \
-      || glyph_is_normal_piletop_obj(glyph))
+    ((((glyph) >= GLYPH_OBJ_OFF)                                \
+      && ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS)))             \
+     || glyph_is_normal_piletop_obj(glyph))
 
 #if 0
 #define glyph_is_object(glyph) \
