@@ -5109,7 +5109,7 @@ act_on_act(
     struct obj *otmp;
     int dir;
 
-    /* there_cmd_menu_far() actions use dx,dy differently */
+    /* a few there_cmd_menu_far() actions use dx,dy differently */
     switch (act) {
     case MCMD_THROW_OBJ:
     case MCMD_TRAVEL:
