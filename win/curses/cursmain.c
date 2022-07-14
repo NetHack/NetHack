@@ -813,7 +813,7 @@ curses_print_glyph(
             attr = A_REVERSE;
         }
         /* highlight female monsters (wizard mode option) */
-        if ((special & MG_FEMALE) && iflags.wizmgender) {
+        if ((special & MG_FEMALE) && wizard && iflags.wizmgender) {
             attr = A_REVERSE;
         }
     }

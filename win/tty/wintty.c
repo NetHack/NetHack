@@ -4257,7 +4257,7 @@ tty_print_glyph(
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (((special & MG_PET) != 0 && iflags.hilite_pet)
         || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-        || ((special & MG_FEMALE) != 0 && iflags.wizmgender)
+        || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
         || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
             && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
