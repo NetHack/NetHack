@@ -27,6 +27,8 @@ static void flip_drawbridge_horizontal(struct rm *);
 static void flip_drawbridge_vertical(struct rm *);
 static void flip_visuals(int, int, int, int, int);
 static int flip_encoded_direction_bits(int, int);
+static void flip_vault_guard(int, struct monst *,
+                             coordxy, coordxy, coordxy, coordxy);
 static void sel_set_wall_property(coordxy, coordxy, genericptr_t);
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
 static void count_features(void);
@@ -484,7 +486,10 @@ flip_encoded_direction_bits(int flp, int val)
 /* transpose top with bottom or left with right or both; sometimes called
    for new special levels, or for any level via the #wizfliplevel command */
 void
-flip_level(int flp, boolean extras)
+flip_level(
+    int flp,        /* mask for orientation(s) to transpose */
+    boolean extras) /* False: level creation; True: #wizfliplevel is
+                     * altering an active level so more needs to be done */
 {
     int x, y, i, itmp;
     coordxy minx, miny, maxx, maxy;
@@ -589,8 +594,12 @@ flip_level(int flp, boolean extras)
 
     /* monsters */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (mtmp->isgd && mtmp->mx == 0)
-            continue;
+        if (mtmp->isgd) {
+            if (extras) /* flip mtmp->mextra->egd */
+                flip_vault_guard(flp, mtmp, minx, miny, maxx, maxy);
+            if (mtmp->mx == 0) /* not on map so don't flip guard->mx,my */
+                continue;
+        }
         /* skip the occasional earth elemental outside the flip area */
         if (!inFlipArea(mtmp->mx, mtmp->my))
             continue;
@@ -616,6 +625,20 @@ flip_level(int flp, boolean extras)
                 Flip_coord(EDOG(mtmp)->ogoal);
         }
 #endif
+    }
+    if (extras) { /* #wizfliplevel rather than level creation */
+        for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
+            if (mtmp->isgd && on_level(&u.uz, &EGD(mtmp)->gdlevel)) {
+                flip_vault_guard(flp, mtmp, minx, miny, maxx, maxy); /* egd */
+            } else if (mtmp->ispriest
+                       && on_level(&u.uz, &EPRI(mtmp)->shrlevel)) {
+                Flip_coord(EPRI(mtmp)->shrpos); /* priest's altar */
+            } else if (mtmp->isshk
+                       && on_level(&u.uz, &ESHK(mtmp)->shoplevel)) {
+                Flip_coord(ESHK(mtmp)->shk); /* shk's preferred spot */
+                Flip_coord(ESHK(mtmp)->shd); /* shop door */
+            }
+        }
     }
 
     /* engravings */
@@ -829,6 +852,42 @@ flip_level(int flp, boolean extras)
         flip_visuals(flp, minx, miny, maxx, maxy);
     }
     vision_reset();
+}
+
+/* for #wizfliplevel, flip guard's egd data; not needed for level creation */
+static void
+flip_vault_guard(
+    int flp, /* 1: transpose vertically, 2: transpose horizontally, 3: both */
+    struct monst *gd, /* the vault guard, has monst->mextra->egd data */
+    coordxy minx, coordxy miny, /* needed by FlipX(), FlipY(), */
+    coordxy maxx, coordxy maxy) /* and inFlipArea() macros     */
+{
+    int i;
+    struct egd *egd = EGD(gd);
+
+    if (inFlipArea(egd->gdx, egd->gdy)) {
+        if (flp & 1)
+            egd->gdy = FlipY(egd->gdy);
+        if (flp & 2)
+            egd->gdx = FlipX(egd->gdx);
+    }
+    if (inFlipArea(egd->ogx, egd->ogy)) {
+        if (flp & 1)
+            egd->ogy = FlipY(egd->ogy);
+        if (flp & 2)
+            egd->ogx = FlipX(egd->ogx);
+    }
+    for (i = egd->fcbeg; i < egd->fcend; ++i) {
+        coordxy fx = egd->fakecorr[i].fx, fy = egd->fakecorr[i].fy;
+
+        if (inFlipArea(fx, fy)) {
+            if (flp & 1)
+                egd->fakecorr[i].fy = FlipY(fy);
+            if (flp & 2)
+                egd->fakecorr[i].fx = FlipX(fx);
+        }
+    }
+    return;
 }
 
 #undef FlipX

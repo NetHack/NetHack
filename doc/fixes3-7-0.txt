@@ -957,6 +957,9 @@ if #wizmakemap was used to generate a replacement level while any shopkeeper,
 	temple priest, or vault guard from the level was off of it at the
 	time, the monster's eshk, epri, or egd data became invalid and would
 	cause trouble if the monster returned to its 'home' level
+similarly, if #wizfliplevel was used to transpose an active level while a
+	vauld guard was maintaining a temporary corridor or while a monster
+	with eshk, epri, or egd data was off level, that data became invalid
 blessed potion of polymorph will prompt user for monster to poly into
 
 
