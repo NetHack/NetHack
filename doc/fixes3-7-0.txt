@@ -961,6 +961,8 @@ similarly, if #wizfliplevel was used to transpose an active level while a
 	vauld guard was maintaining a temporary corridor or while a monster
 	with eshk, epri, or egd data was off level, that data became invalid
 blessed potion of polymorph will prompt user for monster to poly into
+out of array bounds access attempt occurred when deciding whether to bounce
+	if wand or spell zap reached edge of map
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

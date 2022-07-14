@@ -4477,9 +4477,9 @@ dobuzz(
             boolean fireball;
 
  make_bounce:
-            bchance = (levl[sx][sy].typ == STONE) ? 10
-                : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
-                : 75;
+            bchance = (!isok(sx, sy) || levl[sx][sy].typ == STONE) ? 10
+                      : (In_mines(&u.uz) && IS_WALL(levl[sx][sy].typ)) ? 20
+                        : 75;
             bounce = 0;
             fireball = (type == ZT_SPELL(ZT_FIRE));
             if ((--range > 0 && isok(lsx, lsy) && cansee(lsx, lsy))
@@ -4532,16 +4532,12 @@ dobuzz(
     if (type == ZT_SPELL(ZT_FIRE))
         explode(sx, sy, type, d(12, 6), 0, EXPL_FIERY);
     if (shopdamage)
-        pay_for_damage(abstype == ZT_FIRE
-                          ? "burn away"
-                          : abstype == ZT_COLD
-                             ? "shatter"
-                             /* "damage" indicates wall rather than door */
-                             : abstype == ZT_ACID
-                                ? "damage"
-                                : abstype == ZT_DEATH
-                                   ? "disintegrate"
-                                   : "destroy",
+        pay_for_damage(abstype == ZT_FIRE ? "burn away"
+                       : abstype == ZT_COLD ? "shatter"
+                         /* "damage" indicates wall rather than door */
+                         : abstype == ZT_ACID ? "damage"
+                           : abstype == ZT_DEATH ? "disintegrate"
+                             : "destroy",
                        FALSE);
     g.bhitpos = save_bhitpos;
 }
