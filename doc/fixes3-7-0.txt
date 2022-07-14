@@ -1300,6 +1300,8 @@ save files created with SCORE_ON_BOTL disabled were erroneously being rejected
 avoid "It suddenly appears!" if a monster with the STRAT_APPEARMSG attribute
 	is seen to teleport away then not seen at its destination
 avoid boulder-on/in-water sanity_check warnings on the Plane of Water
+when one monster swallowed/engulfed another and killed it, impossible
+	"placing <mon> over itself ..." could be given by place_monster()
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

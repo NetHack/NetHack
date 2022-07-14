@@ -748,8 +748,10 @@ engulf_target(struct monst *magr, struct monst *mdef)
 
 /* Returns the same values as mattackm(). */
 static int
-gulpmm(register struct monst *magr, register struct monst *mdef,
-       register struct attack *mattk)
+gulpmm(
+    struct monst *magr,
+    struct monst *mdef,
+    struct attack *mattk)
 {
     coordxy ax, ay, dx, dy;
     int status;
@@ -810,14 +812,31 @@ gulpmm(register struct monst *magr, register struct monst *mdef,
         ;                              /* both died -- do nothing  */
     } else if (status & MM_DEF_DIED) { /* defender died */
         /*
-         *  Note:  remove_monster() was called in relmon(), wiping out
-         *  magr from level.monsters[mdef->mx][mdef->my].  We need to
-         *  put it back and display it.  -kd
+         *  Note: mdamagem() -> monkilled() -> mondead() -> m_detach()
+         *  -> relmon() used to call remove_monster() for the dead
+         *  monster even when it wasn't the one on the map, so we
+         *  needed to put magr back after mdef was killed and removed
+         *  from their shared spot.  But now [3.7] relmon() calls
+         *  mon_leaving_level() and that checks whether the monster at
+         *  dying monster's coordinates is that dying monster and only
+         *  removes it when they match.  So magr is still at mdef's
+         *  former spot these days.
+         *
+         *  We still potentially do one fixup:  if the gulp targetted
+         *  an inhospitable location, magr will return to its previous
+         *  spot instead of staying.
          */
-        if (!goodpos(dx, dy, magr, MM_IGNOREWATER))
-            dx = ax, dy = ay;
-        place_monster(magr, dx, dy);
-        newsym(dx, dy);
+        if (!goodpos(dx, dy, magr, MM_IGNOREWATER)) {
+            if (m_at(dx, dy) == magr) {
+                remove_monster(dx, dy);
+                newsym(dx, dy);
+            }
+            dx = ax, dy = ay; /* magr's spot at start of the attack */
+        }
+        if (m_at(dx, dy) != magr) {
+            place_monster(magr, dx, dy);
+            newsym(dx, dy);
+        }
         /* aggressor moves to <dx,dy> and might encounter trouble there */
         if (minliquid(magr)
             || (t_at(dx, dy)
