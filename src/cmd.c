@@ -1490,7 +1490,7 @@ wiz_panic(void)
 static int
 wiz_polyself(void)
 {
-    polyself(1);
+    polyself(POLY_CONTROLLED);
     return ECMD_OK;
 }
 

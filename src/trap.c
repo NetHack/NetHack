@@ -2162,7 +2162,7 @@ trapeffect_poly_trap(
             deltrap(trap);      /* delete trap before polymorph */
             newsym(u.ux, u.uy); /* get rid of trap symbol */
             You_feel("a change coming over you.");
-            polyself(0);
+            polyself(POLY_NOFLAGS);
         }
     } else {
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);

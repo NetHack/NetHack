@@ -2550,7 +2550,7 @@ do_class_genocide(void)
                     if (Upolyd && vampshifted(&g.youmonst)
                         /* current shifted form or base vampire form */
                         && (i == u.umonnum || i == g.youmonst.cham))
-                        polyself(3); /* vampshifter back to vampire */
+                        polyself(POLY_REVERT); /* vampshifter back to vampire */
                     if (Upolyd && i == u.umonnum) {
                         u.mh = -1;
                         if (Unchanging) {
@@ -2673,7 +2673,7 @@ do_genocide(int how)
             /* first revert if current shifted form or base vampire form */
             if (Upolyd && vampshifted(&g.youmonst)
                 && (mndx == u.umonnum || mndx == g.youmonst.cham))
-                polyself(3); /* vampshifter (bat, &c) back to vampire */
+                polyself(POLY_REVERT); /* vampshifter (bat, &c) back to vampire */
             /* Although "genus" is Latin for race, the hero benefits
              * from both race and role; thus genocide affects either.
              */

@@ -438,9 +438,10 @@ polyself(int psflags)
 {
     char buf[BUFSZ];
     int old_light, new_light, mntmp, class, tryct, gvariant = NEUTRAL;
-    boolean forcecontrol = (psflags == 1),
-            monsterpoly = (psflags == 2),
-            formrevert = (psflags == 3),
+    boolean forcecontrol = ((psflags & POLY_CONTROLLED) != 0),
+            low_control = ((psflags & POLY_LOW_CTRL) != 0),
+            monsterpoly = ((psflags & POLY_MONSTER) != 0),
+            formrevert = ((psflags & POLY_REVERT) != 0),
             draconian = (uarm && Is_dragon_armor(uarm)),
             iswere = (u.ulycn >= LOW_PM),
             isvamp = (is_vampire(g.youmonst.data)
@@ -469,6 +470,11 @@ polyself(int psflags)
         monsterpoly = TRUE;
         controllable_poly = FALSE;
     }
+
+    if (forcecontrol && low_control
+        && (draconian || monsterpoly || isvamp || iswere))
+        forcecontrol = FALSE;
+
     if (monsterpoly && isvamp)
         goto do_vampyr;
 
@@ -1681,7 +1687,7 @@ dopoly(void)
     struct permonst *savedat = g.youmonst.data;
 
     if (is_vampire(g.youmonst.data) || is_vampshifter(&g.youmonst)) {
-        polyself(2);
+        polyself(POLY_MONSTER);
         if (savedat != g.youmonst.data) {
             You("transform into %s.",
                 an(pmname(g.youmonst.data, Ugender)));

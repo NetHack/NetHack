@@ -632,7 +632,7 @@ drinksink(void)
         pline("This %s contains toxic wastes!", hliquid("water"));
         if (!Unchanging) {
             You("undergo a freakish metamorphosis!");
-            polyself(0);
+            polyself(POLY_NOFLAGS);
         }
         break;
     /* more odd messages --JJB */

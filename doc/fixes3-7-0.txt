@@ -957,6 +957,7 @@ if #wizmakemap was used to generate a replacement level while any shopkeeper,
 	temple priest, or vault guard from the level was off of it at the
 	time, the monster's eshk, epri, or egd data became invalid and would
 	cause trouble if the monster returned to its 'home' level
+blessed potion of polymorph will prompt user for monster to poly into
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

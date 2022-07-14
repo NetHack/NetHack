@@ -1295,11 +1295,18 @@ peffect_acid(struct obj *otmp)
 }
 
 static void
-peffect_polymorph(struct obj *otmp UNUSED)
+peffect_polymorph(struct obj *otmp)
 {
     You_feel("a little %s.", Hallucination ? "normal" : "strange");
-    if (!Unchanging)
-        polyself(0);
+    if (!Unchanging) {
+        if (!otmp->blessed || (u.umonnum != u.umonster))
+            polyself(POLY_NOFLAGS);
+        else {
+            polyself(POLY_CONTROLLED|POLY_LOW_CTRL);
+            if (u.mtimedone && u.umonnum != u.umonster)
+                u.mtimedone = min(u.mtimedone, rn2(15) + 10);
+        }
+    }
 }
 
 int
@@ -1654,7 +1661,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         case POT_POLYMORPH:
             You_feel("a little %s.", Hallucination ? "normal" : "strange");
             if (!Unchanging && !Antimagic)
-                polyself(0);
+                polyself(POLY_NOFLAGS);
             break;
         case POT_ACID:
             if (!Acid_resistance) {

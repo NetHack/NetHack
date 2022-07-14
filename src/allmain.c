@@ -292,7 +292,7 @@ moveloop_core(void)
                         if (g.multi >= 0) {
                             stop_occupation();
                             if (mvl_change == 1)
-                                polyself(0);
+                                polyself(POLY_NOFLAGS);
                             else
                                 you_were();
                             mvl_change = 0;

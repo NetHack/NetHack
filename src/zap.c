@@ -2572,7 +2572,7 @@ zapyourself(struct obj *obj, boolean ordinary)
     case SPE_POLYMORPH:
         if (!Unchanging) {
             learn_it = TRUE;
-            polyself(0);
+            polyself(POLY_NOFLAGS);
         }
         break;
 

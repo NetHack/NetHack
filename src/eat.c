@@ -1194,7 +1194,7 @@ cpostfx(int pm)
             You("%s.", (pm == PM_GENETIC_ENGINEER)
                           ? "undergo a freakish metamorphosis"
                           : "feel a change coming over you");
-            polyself(0);
+            polyself(POLY_NOFLAGS);
         }
         break;
     case PM_DISPLACER_BEAST:

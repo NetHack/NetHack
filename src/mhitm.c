@@ -992,7 +992,7 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
             /* system shock might take place in polyself() */
             if (u.ulycn == NON_PM) {
                 You("are subjected to a freakish metamorphosis.");
-                polyself(0);
+                polyself(POLY_NOFLAGS);
             } else if (u.umonnum != u.ulycn) {
                 You_feel("an unnatural urge coming on.");
                 you_were();
