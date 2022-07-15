@@ -55,7 +55,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
     if (!on_level(&egrd->gdlevel, &u.uz))
         return TRUE;
 
-    /* note: guard remains on 'fmons' list (alive or dead, at off-map
+    /* note: guard remains on 'fmon' list (alive or dead, at off-map
        coordinate <0,0>), until temporary corridor from vault back to
        civilization has been removed */
     while ((fcbeg = egrd->fcbeg) < egrd->fcend) {

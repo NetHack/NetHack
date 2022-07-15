@@ -130,7 +130,7 @@ static int wiz_rumor_check(void);
 static int wiz_migrate_mons(void);
 #endif
 
-static void makemap_unmakemon(struct monst *);
+static void makemap_unmakemon(struct monst *, boolean);
 static void makemap_remove_mons(void);
 static void wiz_map_levltyp(void);
 static void wiz_levltyp_legend(void);
@@ -992,7 +992,7 @@ wiz_identify(void)
 /* used when wiz_makemap() gets rid of monsters for the old incarnation of
    a level before creating a new incarnation of it */
 static void
-makemap_unmakemon(struct monst *mtmp)
+makemap_unmakemon(struct monst *mtmp, boolean migratory)
 {
     int ndx = monsndx(mtmp->data);
 
@@ -1013,6 +1013,14 @@ makemap_unmakemon(struct monst *mtmp)
     } else if (mtmp->isshk && on_level(&u.uz, &ESHK(mtmp)->shoplevel)) {
         setpaid(mtmp);
     }
+    if (migratory) {
+        /* caller has removed 'mtmp' from migrating_mons; put it onto fmon
+           so that dmonsfree() bookkeeping for number of dead or removed
+           monsters won't get out of sync; it is not on the map but
+           mongone() -> m_detach() -> mon_leaving_level() copes with that */
+        mtmp->nmon = fmon;
+        fmon = mtmp;
+    }
     mongone(mtmp);
 }
 
@@ -1028,7 +1036,7 @@ makemap_remove_mons(void)
     keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE') */
     /* get rid of all the monsters that didn't make it to 'mydogs' */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        makemap_unmakemon(mtmp);
+        makemap_unmakemon(mtmp, FALSE);
     /* some monsters retain details of this level in mon->mextra; that
        data becomes invalid when the level is replaced by a new one;
        get rid of them now if migrating or already arrived elsewhere;
@@ -1044,13 +1052,16 @@ makemap_remove_mons(void)
                 || (mtmp->ispriest && on_level(&u.uz, &EPRI(mtmp)->shrlevel))
                 || (mtmp->isgd && on_level(&u.uz, &EGD(mtmp)->gdlevel)))) {
             *mprev = mtmp->nmon;
-            makemap_unmakemon(mtmp);
+            makemap_unmakemon(mtmp, TRUE);
         } else {
             mprev = &mtmp->nmon;
         }
     }
     /* release dead and 'unmade' monsters */
     dmonsfree();
+    if (fmon) {
+        impossible("makemap_remove_mons: 'fmon' did not get emptied?");
+    }
     return;
 }
 
