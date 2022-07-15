@@ -1,4 +1,4 @@
-/* NetHack 3.7	vision.c	$NHDT-Date: 1596498225 2020/08/03 23:43:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.7	vision.c	$NHDT-Date: 1657918095 2022/07/15 20:48:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Dave Cohrs, 1990. */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -74,8 +74,8 @@ const coordxy circle_start[] = {
 
 /*------ local variables ------*/
 
-static coordxy could_see[2][ROWNO][COLNO]; /* vision work space */
-static coordxy *cs_rows0[ROWNO], *cs_rows1[ROWNO];
+static seenV could_see[2][ROWNO][COLNO]; /* vision work space */
+static seenV *cs_rows0[ROWNO], *cs_rows1[ROWNO];
 static coordxy cs_rmin0[ROWNO], cs_rmax0[ROWNO];
 static coordxy cs_rmin1[ROWNO], cs_rmax1[ROWNO];
 
@@ -89,11 +89,11 @@ static coordxy right_ptrs[ROWNO][COLNO];
 static void fill_point(int, int);
 static void dig_point(int, int);
 static void view_init(void);
-static void view_from(coordxy, coordxy, coordxy **, coordxy *, coordxy *, int,
+static void view_from(coordxy, coordxy, seenV **, coordxy *, coordxy *, int,
                       void (*)(coordxy, coordxy, genericptr_t),
                       genericptr_t);
-static void get_unused_cs(coordxy ***, coordxy **, coordxy **);
-static void rogue_vision(coordxy **, coordxy *, coordxy *);
+static void get_unused_cs(seenV ***, coordxy **, coordxy **);
+static void rogue_vision(seenV **, coordxy *, coordxy *);
 
 /* Macro definitions that I can't find anywhere. */
 #define sign(z) ((z) < 0 ? -1 : ((z) ? 1 : 0))
@@ -265,7 +265,7 @@ vision_reset(void)
  * to the unused vision work area.
  */
 static void
-get_unused_cs(coordxy ***rows, coordxy **rmin, coordxy **rmax)
+get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
 {
     register int row;
     register coordxy *nrmin, *nrmax;
@@ -284,7 +284,8 @@ get_unused_cs(coordxy ***rows, coordxy **rmin, coordxy **rmax)
     nrmin = *rmin;
     nrmax = *rmax;
 
-    (void) memset((genericptr_t) **rows, 0, sizeof(coordxy) * (ROWNO * COLNO)); /* see nothing */
+    (void) memset((genericptr_t) **rows, 0,
+                  ROWNO * COLNO * sizeof (seenV)); /* see nothing */
     for (row = 0; row < ROWNO; row++) { /* set row min & max */
         *nrmin++ = COLNO - 1;
         *nrmax++ = 1;
@@ -304,7 +305,7 @@ get_unused_cs(coordxy ***rows, coordxy **rmin, coordxy **rmax)
  * due to the one-sided lit wall hack.
  */
 static void
-rogue_vision(coordxy **next, coordxy *rmin, coordxy *rmax)
+rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
 {
     int rnum = levl[u.ux][u.uy].roomno - ROOMOFFSET; /* no SHARED... */
     int start, stop, in_door, xhi, xlo, yhi, ylo;
@@ -504,14 +505,14 @@ new_angle(struct rm *lev, unsigned char *sv, int row, int col)
 void
 vision_recalc(int control)
 {
-    extern unsigned char seenv_matrix[3][3]; /* from display.c */
-    static unsigned char colbump[COLNO + 1]; /* cols to bump sv */
-    coordxy **temp_array; /* points to the old vision array */
-    coordxy **next_array; /* points to the new vision array */
-    coordxy *next_row;    /* row pointer for the new array */
-    coordxy *old_row;     /* row pointer for the old array */
-    coordxy *next_rmin;   /* min pointer for the new array */
-    coordxy *next_rmax;   /* max pointer for the new array */
+    extern const seenV seenv_matrix[3][3]; /* from display.c */
+    static coordxy colbump[COLNO + 1]; /* cols to bump sv */
+    seenV **temp_array; /* points to the old vision array */
+    seenV **next_array; /* points to the new vision array */
+    seenV *next_row;    /* row pointer for the new array */
+    seenV *old_row;     /* row pointer for the old array */
+    coordxy *next_rmin; /* min pointer for the new array */
+    coordxy *next_rmax; /* max pointer for the new array */
     const coordxy *ranges; /* circle ranges -- used for xray & night vision */
     int row = 0;       /* row counter (outer loop)  */
     int start, stop;   /* inner loop starting/stopping index */
@@ -519,7 +520,7 @@ vision_recalc(int control)
     register int col;  /* inner loop counter */
     register struct rm *lev; /* pointer to current pos */
     struct rm *flev;   /* pointer to position in "front" of current pos */
-    unsigned char *sv; /* ptr to seen angle bits */
+    const seenV *sv;   /* ptr to seen angle bits */
     int oldseenv;      /* previous seenv value */
 
     g.vision_full_recalc = 0; /* reset flag */
@@ -1109,7 +1110,7 @@ fill_point(int row, int col)
 static int start_row;
 static int start_col;
 static int step;
-static coordxy **cs_rows;
+static seenV **cs_rows;
 static coordxy *cs_left;
 static coordxy *cs_right;
 
@@ -1623,7 +1624,11 @@ view_init(void)
  *   limits      points at range limit for current row, or NULL
  */
 static void
-right_side(int row, int left, int right_mark, const coordxy *limits)
+right_side(
+    int row,
+    int left,
+    int right_mark,
+    const coordxy *limits)
 {
     int right;                  /* right limit of "could see" */
     int right_edge;             /* right edge of an opening */
@@ -1631,9 +1636,9 @@ right_side(int row, int left, int right_mark, const coordxy *limits)
     int deeper;                 /* if TRUE, call self as needed */
     int result;                 /* set by q?_path() */
     register int i;             /* loop counter */
-    register coordxy *rowp = NULL; /* row optimization */
-    coordxy *row_min = NULL;       /* left most  [used by macro set_min()] */
-    coordxy *row_max = NULL;       /* right most [used by macro set_max()] */
+    register seenV *rowp = NULL; /* row optimization */
+    coordxy *row_min = NULL;     /* left most  [used by macro set_min()] */
+    coordxy *row_max = NULL;     /* right most [used by macro set_max()] */
     int lim_max;                /* right most limit of circle */
 
     nrow = row + step;
@@ -1811,18 +1816,19 @@ right_side(int row, int left, int right_mark, const coordxy *limits)
  * extensive comments.
  */
 static void
-left_side(int row, int left_mark, int right, const coordxy *limits)
+left_side(
+    int row,
+    int left_mark,
+    int right,
+    const coordxy *limits)
 {
     int left, left_edge, nrow, deeper, result;
     register int i;
-    register coordxy *rowp = NULL;
+    register seenV *rowp = NULL;
     coordxy *row_min = NULL;
     coordxy *row_max = NULL;
     int lim_min;
 
-#ifdef GCC_WARN
-    rowp = row_min = row_max = 0;
-#endif
     nrow = row + step;
     deeper = good_row(nrow) && (!limits || (*limits >= *(limits + 1)));
     if (!vis_func) {
@@ -1954,12 +1960,16 @@ left_side(int row, int left_mark, int right, const coordxy *limits)
  *   arg            argument for func
  */
 static void
-view_from(coordxy srow, coordxy scol, coordxy **loc_cs_rows,
-          coordxy *left_most, coordxy *right_most, int range,
-          void (*func)(coordxy, coordxy, genericptr_t), genericptr_t arg)
+view_from(
+    coordxy srow, coordxy scol,
+    seenV **loc_cs_rows,
+    coordxy *left_most, coordxy *right_most,
+    int range,
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
     register int i; /* loop counter */
-    coordxy *rowp;     /* optimization for setting could_see */
+    seenV *rowp;    /* optimization for setting could_see */
     int nrow;       /* the next row */
     int left;       /* the left-most visible column */
     int right;      /* the right-most visible column */
@@ -2055,13 +2065,16 @@ view_from(coordxy srow, coordxy scol, coordxy **loc_cs_rows,
  * vision matrix and reduce extra work.
  */
 void
-do_clear_area(coordxy scol, coordxy srow, int range,
-              void (*func)(coordxy, coordxy, genericptr_t), genericptr_t arg)
+do_clear_area(
+    coordxy scol, coordxy srow,
+    int range,
+    void (*func)(coordxy, coordxy, genericptr_t),
+    genericptr_t arg)
 {
     /* If not centered on hero, do the hard work of figuring the area */
     if (scol != u.ux || srow != u.uy) {
-        view_from(srow, scol, (coordxy **) 0, (coordxy *) 0, (coordxy *) 0, range,
-                  func, arg);
+        view_from(srow, scol, (seenV **) 0, (coordxy *) 0, (coordxy *) 0,
+                  range, func, arg);
     } else {
         register int x;
         int y, min_x, max_x, max_y, offset;

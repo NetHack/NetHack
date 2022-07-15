@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1655065134 2022/06/12 20:18:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1121 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1657918089 2022/07/15 20:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1132 $ */
 /* Copyright (c) Steve Creps, 1988.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1193,7 +1193,7 @@ extern int dosuspend(void);
 
 extern void new_light_source(coordxy, coordxy, int, int, union any *);
 extern void del_light_source(int, union any *);
-extern void do_light_sources(coordxy **);
+extern void do_light_sources(seenV **);
 extern void show_transient_light(struct obj *, coordxy, coordxy);
 extern void transient_light_cleanup(void);
 extern struct monst *find_mid(unsigned, unsigned);

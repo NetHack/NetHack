@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1655161560 2022/06/13 23:06:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.298 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1657918080 2022/07/15 20:48:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1247,10 +1247,10 @@ struct instance_globals {
     short nocreate4;
     /* uhitm.c */
     boolean override_confirmation; /* Used to flag attacks caused by
-                                      Stormbringer's maliciousness. */
+                                    * Stormbringer's maliciousness. */
 
     /* vision.c */
-    coordxy **viz_array; /* used in cansee() and couldsee() macros */
+    seenV **viz_array; /* used in cansee() and couldsee() macros */
     coordxy *viz_rmin;			/* min could see indices */
     coordxy *viz_rmax;			/* max could see indices */
     boolean vision_full_recalc;

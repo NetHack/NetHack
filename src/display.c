@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1654931503 2022/06/11 07:11:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.184 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1657918092 2022/07/15 20:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -141,9 +141,11 @@ static glyph_info *glyphinfo_at(coordxy, coordxy, int);
 static boolean more_than_one(coordxy, coordxy, coordxy, coordxy, coordxy);
 #endif
 
-static int set_twall(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
+static int set_twall(coordxy, coordxy, coordxy, coordxy,
+                     coordxy, coordxy, coordxy, coordxy);
 static int set_wall(coordxy, coordxy, int);
-static int set_corn(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
+static int set_corn(coordxy, coordxy, coordxy, coordxy,
+                    coordxy, coordxy, coordxy, coordxy);
 static int set_crosswall(coordxy, coordxy);
 static void set_seenv(struct rm *, coordxy, coordxy, coordxy, coordxy);
 static void t_warn(struct rm *);
@@ -3040,16 +3042,20 @@ set_wall_state(void)
 
 /* ------------------------------------------------------------------------ */
 /* This matrix is used here and in vision.c. */
-unsigned char seenv_matrix[3][3] = { { SV2, SV1, SV0 },
-                                     { SV3, SVALL, SV7 },
-                                     { SV4, SV5, SV6 } };
+const seenV seenv_matrix[3][3] = {
+    { SV2, SV1,   SV0 },
+    { SV3, SVALL, SV7 },
+    { SV4, SV5,   SV6 }
+};
 
 #define sign(z) ((z) < 0 ? -1 : ((z) > 0 ? 1 : 0))
 
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
 static void
-set_seenv(struct rm *lev,
-          coordxy x0, coordxy y0, coordxy x, coordxy y) /* from, to */
+set_seenv(
+    struct rm *lev,
+    coordxy x0, coordxy y0, /* from */
+    coordxy x, coordxy y)   /*  to  */
 {
     coordxy dx = x - x0, dy = y0 - y;
 
@@ -3059,10 +3065,11 @@ set_seenv(struct rm *lev,
 /* Called by blackout(vault.c) when vault guard removes temporary corridor,
    turning spot <x0,y0> back coordxyo stone; <x1,y1> is an adjacent spot. */
 void
-unset_seenv(struct rm *lev,                 /* &levl[x1][y1] */
-            coordxy x0, coordxy y0,
-            coordxy x1, coordxy y1)         /* from, to; abs(x1-x0)==1
-                                               && abs(y0-y1)==1 */
+unset_seenv(
+    struct rm *lev,         /* &levl[x1][y1] */
+    coordxy x0, coordxy y0, /* from */
+    coordxy x1, coordxy y1) /*  to; abs(x1-x0)==1 && abs(y0-y1)==1 */
+
 {
     coordxy dx = x1 - x0, dy = y0 - y1;
 

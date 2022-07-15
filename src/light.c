@@ -1,4 +1,4 @@
-/* NetHack 3.7	light.c	$NHDT-Date: 1604442297 2020/11/03 22:24:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
+/* NetHack 3.7	light.c	$NHDT-Date: 1657918094 2022/07/15 20:48:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Dean Luick, 1994                                       */
 /* NetHack may be freely redistributed.  See license for details.       */
 
@@ -134,14 +134,14 @@ del_light_source(int type, anything *id)
 
 /* Mark locations that are temporarily lit via mobile light sources. */
 void
-do_light_sources(coordxy **cs_rows)
+do_light_sources(seenV **cs_rows)
 {
     coordxy x, y, min_x, max_x, max_y;
     int offset;
     coordxy *limits;
     short at_hero_range = 0;
     light_source *ls;
-    coordxy *row;
+    seenV *row;
 
     for (ls = g.light_base; ls; ls = ls->next) {
         ls->flags &= ~LSF_SHOW;

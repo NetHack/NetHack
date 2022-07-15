@@ -1,4 +1,4 @@
-/* NetHack 3.7	global.h	$NHDT-Date: 1646322467 2022/03/03 15:47:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.135 $ */
+/* NetHack 3.7	global.h	$NHDT-Date: 1657918090 2022/07/15 20:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.144 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -84,6 +84,11 @@ typedef unsigned char boolean; /* 0 or 1 */
 typedef schar boolean; /* 0 or 1 */
 #endif
 #endif
+
+/* vision seen vectors: viz_array[][] and levl[][].seenv, which use different
+   values from each other but are close enough in size to share a type;
+   viz_array contains 8-bit bitmasks, lev->seenv is a 5-bit bitfield */
+typedef unsigned char seenV; /* no need for uint8_t */
 
 /* Type for third parameter of read(2) */
 #if defined(BSD) || defined(ULTRIX)
