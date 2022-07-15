@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.952 $ $NHDT-Date: 1655503067 2022/06/17 21:57:47 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.975 $ $NHDT-Date: 1657868310 2022/07/15 06:58:30 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -963,6 +963,8 @@ similarly, if #wizfliplevel was used to transpose an active level while a
 blessed potion of polymorph will prompt user for monster to poly into
 out of array bounds access attempt occurred when deciding whether to bounce
 	if wand or spell zap reached edge of map
+if blind hero was challanged by a vault guard, it wasn't possible to see how
+	to start following that guard out of the vault
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

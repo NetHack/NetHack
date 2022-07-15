@@ -1,4 +1,4 @@
-/* NetHack 3.7	vault.c	$NHDT-Date: 1606009006 2020/11/22 01:36:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	vault.c	$NHDT-Date: 1657868307 2022/07/15 06:58:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.91 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -295,7 +295,7 @@ invault(void)
 {
     struct monst *guard;
     struct obj *otmp;
-    boolean gsensed;
+    boolean spotted;
     int trycount, vaultroom = (int) vault_occupied(u.urooms);
 
     if (!vaultroom) {
@@ -370,7 +370,7 @@ invault(void)
         }
 
         /* make something interesting happen */
-        if (!(guard = makemon(&mons[PM_GUARD], x, y, MM_EGD)))
+        if (!(guard = makemon(&mons[PM_GUARD], x, y, MM_EGD | MM_NOMSG)))
             return;
         guard->isgd = 1;
         guard->mpeaceful = 1;
@@ -402,19 +402,24 @@ invault(void)
             (*func)("%s shatter.",
                     (bcnt == 1) ? an(bname) : makeplural(bname));
         }
-        gsensed = !canspotmon(guard);
-        if (!gsensed)
+        spotted = canspotmon(guard);
+        if (spotted) {
             pline("Suddenly one of the Vault's %s enters!",
                   makeplural(pmname(guard->data, Mgender(guard))));
-        else
+            newsym(guard->mx, guard->my);
+        } else {
             pline("Someone else has entered the Vault.");
-        newsym(guard->mx, guard->my);
+            /* make sure that hero who can't see the guard knows where the
+               wall is breeched, otherwise we couldn't follow the guard out;
+               the breech isn't necessarily adjacent to the hero */
+            map_invisible(guard->mx, guard->my);
+        }
 
         if (u.uswallow) {
             /* can't interrogate hero, don't interrogate engulfer */
             if (!Deaf)
                 verbalize("What's going on here?");
-            if (gsensed)
+            if (!spotted)
                 pline_The("other presence vanishes.");
             mongone(guard);
             return;
@@ -671,11 +676,13 @@ wallify_vault(struct monst *grd)
 static void
 gd_mv_monaway(struct monst *grd, int nx, int ny)
 {
-    if (MON_AT(nx, ny) && !(nx == grd->mx && ny == grd->my)) {
+    struct monst *mtmp = m_at(nx, ny);
+
+    if (mtmp && mtmp != grd) {
         if (!Deaf)
             verbalize("Out of my way, scum!");
-        if (!rloc(m_at(nx, ny), RLOC_ERR|RLOC_MSG) || MON_AT(nx, ny))
-            m_into_limbo(m_at(nx, ny));
+        if (!rloc(mtmp, RLOC_ERR | RLOC_MSG) || MON_AT(nx, ny))
+            m_into_limbo(mtmp);
     }
 }
 
@@ -774,15 +781,14 @@ gd_move_cleanup(
     int x, y;
     boolean see_guard;
 
-    /* The following is a kludge.  We need to keep    */
-    /* the guard around in order to be able to make   */
-    /* the fake corridor disappear as the player      */
-    /* moves out of it, but we also need the guard    */
-    /* out of the way.  We send the guard to never-   */
-    /* never land.  We set ogx ogy to mx my in order  */
-    /* to avoid a check at the top of this function.  */
-    /* At the end of the process, the guard is killed */
-    /* in restfakecorr().                             */
+    /*
+     * The following is a kludge.  We need to keep the guard around in
+     * order to be able to make the fake corridor disappear as the
+     * player moves out of it, but we also need the guard out of the
+     * way.  We send the guard to never-never land.  We set ogx ogy to
+     * mx my in order to avoid a check at the top of this function.
+     * At the end of the process, the guard is killed in restfakecorr().
+     */
     x = grd->mx, y = grd->my;
     see_guard = canspotmon(grd);
     parkguard(grd); /* move to <0,0> */
