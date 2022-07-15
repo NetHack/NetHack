@@ -927,12 +927,10 @@ getpos(coord *ccp, boolean force, const char *goal)
 
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
                 for (sidx = 1; sidx < MAXPCHARS; sidx++) { /* [0] left as 0 */
-                    if (IS_DOOR(sidx) || IS_WALL(sidx)
-                        || sidx == SDOOR || sidx == SCORR
-                        || glyph_to_cmap(k) == S_room
-                        || glyph_to_cmap(k) == S_darkroom
-                        || glyph_to_cmap(k) == S_corr
-                        || glyph_to_cmap(k) == S_litcorr)
+                    /* don't even try to match some terrain: walls, room... */
+                    if (sidx <= S_hcdoor
+                        || sidx == S_room || sidx == S_darkroom
+                        || sidx == S_corr || sidx == S_litcorr)
                         continue;
                     if (c == defsyms[sidx].sym
                         || c == (int) g.showsyms[sidx]
