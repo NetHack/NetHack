@@ -3164,7 +3164,7 @@ find_poleable_mon(coord *pos, int min_range, int max_range)
                 && (mtmp->mtame || (mtmp->mpeaceful && flags.confirm)))
                 continue;
             if (glyph_is_poleable(glyph)
-                    && (!glyph_is_statue(glyph) || impaired)) {
+                && (!glyph_is_statue(glyph) || impaired)) {
                 if (mpos.x)
                     return FALSE; /* more than one candidate location */
                 mpos.x = x, mpos.y = y;

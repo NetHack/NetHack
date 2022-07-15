@@ -1885,7 +1885,9 @@ mfndpos(
                         && (dmgtype(mdat, AD_RUST)
                             || dmgtype(mdat, AD_CORR)))))
                 continue;
-            if (IS_DOOR(ntyp) && !(amorphous(mdat) || can_fog(mon))
+            if (IS_DOOR(ntyp)
+                && !((amorphous(mdat) || can_fog(mon))
+                     && !(u.uswallow && mon == u.ustuck))
                 && (((levl[nx][ny].doormask & D_CLOSED) && !(flag & OPENDOOR))
                     || ((levl[nx][ny].doormask & D_LOCKED)
                         && !(flag & UNLOCKDOOR))) && !thrudoor)
