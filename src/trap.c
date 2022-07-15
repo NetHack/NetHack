@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1651909086 2022/05/07 07:38:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.479 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1657925446 2022/07/15 22:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.491 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1556,6 +1556,7 @@ trapeffect_pit(
         boolean plunged = (trflags & TOOKPLUNGE) != 0;
         boolean conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
         boolean adj_pit = adj_nonconjoined_pit(trap);
+        boolean already_known = trap->tseen ? TRUE : FALSE;
         int steed_article = ARTICLE_THE;
         int oldumort;
 
@@ -1569,7 +1570,7 @@ trapeffect_pit(
             return Trap_Effect_Finished;
         feeltrap(trap);
         if (!Sokoban && is_clinger(g.youmonst.data) && !plunged) {
-            if (trap->tseen) {
+            if (already_known) {
                 You_see("%s %spit below you.", a_your[trap->madeby_u],
                         ttype == SPIKED_PIT ? "spiked " : "");
             } else {
@@ -3775,7 +3776,8 @@ domagictrap(void)
                 }
             } else {
                 /* If we're invisible from another source */
-                You_feel("a little more %s now.", HInvis ? "obvious" : "hidden");
+                You_feel("a little more %s now.",
+                         HInvis ? "obvious" : "hidden");
             }
             HInvis = HInvis ? 0 : HInvis | FROMOUTSIDE;
             newsym(u.ux, u.uy);
