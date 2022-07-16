@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1655671810 2022/06/19 20:50:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.579 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1657954617 2022/07/16 06:56:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.593 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1035,8 +1035,12 @@ makemap_remove_mons(void)
        from traps, stopping eating, &c as if hero were ascending */
     keepdogs(TRUE); /* (pets-only; normally we'd be using 'FALSE') */
     /* get rid of all the monsters that didn't make it to 'mydogs' */
-    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        /* if already dead, dmonsfree(below) will get rid of it */
+        if (DEADMONSTER(mtmp))
+            continue;
         makemap_unmakemon(mtmp, FALSE);
+    }
     /* some monsters retain details of this level in mon->mextra; that
        data becomes invalid when the level is replaced by a new one;
        get rid of them now if migrating or already arrived elsewhere;
