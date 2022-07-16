@@ -96,8 +96,10 @@
     PCHAR2( 2, '-',  S_hwall, "horizontal wall", "wall",  CLR(CLR_GRAY))
     PCHAR2( 3, '-',  S_tlcorn, "top left corner wall", "wall",  CLR(CLR_GRAY))
     PCHAR2( 4, '-',  S_trcorn, "top right corner wall", "wall",  CLR(CLR_GRAY))
-    PCHAR2( 5, '-',  S_blcorn, "bottom left corner wall", "wall", CLR(CLR_GRAY))
-    PCHAR2( 6, '-',  S_brcorn, "bottom right corner wall", "wall", CLR(CLR_GRAY))
+    PCHAR2( 5, '-',  S_blcorn,
+           "bottom left corner wall", "wall", CLR(CLR_GRAY))
+    PCHAR2( 6, '-',  S_brcorn,
+           "bottom right corner wall", "wall", CLR(CLR_GRAY))
     PCHAR2( 7, '-',  S_crwall, "cross wall", "wall", CLR(CLR_GRAY))
     PCHAR2( 8, '-',  S_tuwall, "tuwall", "wall", CLR(CLR_GRAY))
     PCHAR2( 9, '-',  S_tdwall, "tdwall", "wall", CLR(CLR_GRAY))
@@ -105,8 +107,10 @@
     PCHAR2(11, '|',  S_trwall, "trwall", "wall", CLR(CLR_GRAY))
     /* start cmap A                                                      */
     PCHAR2(12, '.',  S_ndoor, "no door", "doorway", CLR(CLR_GRAY))
-    PCHAR2(13, '-',  S_vodoor, "vertical open door", "open door", CLR(CLR_BROWN))
-    PCHAR2(14, '|',  S_hodoor, "horizontal open door", "open door", CLR(CLR_BROWN))
+    PCHAR2(13, '-',  S_vodoor,
+           "vertical open door", "open door", CLR(CLR_BROWN))
+    PCHAR2(14, '|',  S_hodoor,
+           "horizontal open door", "open door", CLR(CLR_BROWN))
     PCHAR2(15, '+',  S_vcdoor,
            "vertical closed door", "closed door", CLR(CLR_BROWN))
     PCHAR2(16, '+',  S_hcdoor,
