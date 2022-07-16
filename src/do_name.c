@@ -926,10 +926,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
 
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
-                for (sidx = 1; sidx < MAXPCHARS; sidx++) { /* [0] left as 0 */
-                    /* don't even try to match some terrain: walls, room... */
-                    if (sidx <= S_hcdoor
-                        || sidx == S_room || sidx == S_darkroom
+                /* start the loop one past the block of doors, walls, etc,
+                   because we aren't interested in trying to match them */
+                for (sidx = S_hcdoor + 1; sidx < MAXPCHARS; sidx++) {
+                    /* some additional cmap types that should be skipped */
+                    if (sidx == S_room || sidx == S_darkroom
                         || sidx == S_corr || sidx == S_litcorr)
                         continue;
                     if (c == defsyms[sidx].sym
