@@ -965,6 +965,8 @@ out of array bounds access attempt occurred when deciding whether to bounce
 	if wand or spell zap reached edge of map
 if blind hero was challanged by a vault guard, it wasn't possible to see how
 	to start following that guard out of the vault
+make taming via magic harp be consistent with scroll of taming and charm
+	spell:  an angry shopkeeper becomes pacified (but never tamed)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1731,6 +1733,7 @@ if built with DEBUG enabled and running in wizard mode, starting play with
 	water on Plane of Water, and fumaroles on Plane of Fire be transparent
 add wizard mode #wizkill command to remove monster(s) from play
 some quest nemeses release a cloud of poisonous gas when they die
+taming magic acting on an already tame creature might make it become tamer
 
 
 Platform- and/or Interface-Specific New Features

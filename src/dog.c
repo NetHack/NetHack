@@ -1012,8 +1012,23 @@ tamedog(struct monst *mtmp, struct obj *obj)
             return FALSE;
     }
 
-    if (mtmp->mtame || !mtmp->mcanmove
-        /* monsters with conflicting structures cannot be tamed */
+    /* if already tame, taming magic might make it become tamer */
+    if (mtmp->mtame) {
+        /* maximum tameness is 20, only reachable via eating */
+        if (rnd(10) > mtmp->mtame)
+            mtmp->mtame++;
+        return FALSE; /* didn't just get tamed */
+    }
+    /* pacify angry shopkeeper but don't tame him/her/it/them */
+    if (mtmp->isshk) {
+        make_happy_shk(mtmp, FALSE);
+        return FALSE;
+    }
+
+    if (!mtmp->mcanmove
+        /* monsters with conflicting structures cannot be tamed
+           [note: the various mextra structures don't actually conflict
+           with each other anymore] */
         || mtmp->isshk || mtmp->isgd || mtmp->ispriest || mtmp->isminion
         || is_covetous(mtmp->data) || is_human(mtmp->data)
         || (is_demon(mtmp->data) && !is_demon(g.youmonst.data))
