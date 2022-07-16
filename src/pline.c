@@ -120,6 +120,8 @@ vpline(const char *line, va_list the_args)
         if (vlen >= (int) sizeof pbuf)
             panic("%s: truncation of buffer at %zu of %d bytes",
                   "pline", sizeof pbuf, vlen);
+#else
+        nhUse(vlen);
 #endif
 #else
         Vsprintf(pbuf, line, the_args);
@@ -618,6 +620,8 @@ vconfig_error_add(const char *str, va_list the_args)
     if (vlen >= (int) sizeof buf)
         panic("%s: truncation of buffer at %zu of %d bytes",
               "config_error_add", sizeof buf, vlen);
+#else
+    nhUse(vlen);
 #endif
 #else
     Vsprintf(buf, str, the_args);
