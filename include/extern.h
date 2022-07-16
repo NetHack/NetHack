@@ -1641,6 +1641,8 @@ extern boolean resist_conflict(struct monst *);
 
 extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
+extern void mon_track_add(struct monst *, coordxy, coordxy);
+extern void mon_track_clear(struct monst *);
 extern boolean monhaskey(struct monst *, boolean);
 extern void mon_regen(struct monst *, boolean);
 extern int dochugw(struct monst *, boolean);

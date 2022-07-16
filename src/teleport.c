@@ -1313,7 +1313,7 @@ rloc_to_core(
         }
     }
 
-    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
+    mon_track_clear(mtmp);
     place_monster(mtmp, x, y); /* put monster down */
     update_monster_region(mtmp);
 

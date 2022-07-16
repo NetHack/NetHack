@@ -3788,9 +3788,8 @@ wake_nearto(coordxy x, coordxy y, int distance)
             if (mtmp->mtame) {
                 if (!mtmp->isminion)
                     EDOG(mtmp)->whistletime = g.moves;
-                /* Clear mtrack. This is to fix up a pet who is
-                   stuck "fleeing" its master. */
-                memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
+                /* Fix up a pet who is stuck "fleeing" its master */
+                mon_track_clear(mtmp);
             }
         }
     }

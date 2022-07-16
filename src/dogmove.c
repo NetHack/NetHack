@@ -1278,10 +1278,7 @@ dog_move(register struct monst *mtmp,
             pline("%s %s reluctantly over %s.", noit_Monnam(mtmp),
                   vtense((char *) 0, locomotion(mtmp->data, "step")), what);
         }
-        for (j = MTSZ - 1; j > 0; j--)
-            mtmp->mtrack[j] = mtmp->mtrack[j - 1];
-        mtmp->mtrack[0].x = omx;
-        mtmp->mtrack[0].y = omy;
+        mon_track_add(mtmp, omx, omy);
         /* We have to know if the pet's going to do a combined eat and
          * move before moving it, but it can't eat until after being
          * moved.  Thus the do_eat flag.

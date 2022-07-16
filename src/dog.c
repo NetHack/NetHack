@@ -357,7 +357,7 @@ mon_arrive(struct monst *mtmp, int when)
     ylocale = mtmp->mtrack[1].y;
     fromdlev.dnum = mtmp->mtrack[2].x;
     fromdlev.dlevel = mtmp->mtrack[2].y;
-    memset(mtmp->mtrack, 0, sizeof mtmp->mtrack);
+    mon_track_clear(mtmp);
 
     if (mtmp == u.usteed)
         return; /* don't place steed on the map */

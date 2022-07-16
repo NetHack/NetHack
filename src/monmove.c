@@ -48,6 +48,24 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
     return FALSE;
 }
 
+/* push coordinate x,y to mtrack, making monster remember where it was */
+void
+mon_track_add(struct monst *mtmp, coordxy x, coordxy y)
+{
+    int j;
+
+    for (j = MTSZ - 1; j > 0; j--)
+        mtmp->mtrack[j] = mtmp->mtrack[j - 1];
+    mtmp->mtrack[0].x = x;
+    mtmp->mtrack[0].y = y;
+}
+
+void
+mon_track_clear(struct monst *mtmp)
+{
+    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+}
+
 /* check whether a monster is carrying a locking/unlocking tool */
 boolean
 monhaskey(
@@ -394,7 +412,7 @@ monflee(
         mtmp->mflee = 1;
     }
     /* ignore recently-stepped spaces when made to flee */
-    memset(mtmp->mtrack, 0, sizeof(mtmp->mtrack));
+    mon_track_clear(mtmp);
 }
 
 static void
@@ -1373,8 +1391,6 @@ m_move(register struct monst* mtmp, register int after)
     }
 
     if (mmoved) {
-        register int j;
-
         if (mmoved == MMOVE_MOVED && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
             return MMOVE_DONE;
 
@@ -1439,10 +1455,7 @@ m_move(register struct monst* mtmp, register int after)
 
         maybe_unhide_at(mtmp->mx, mtmp->my);
 
-        for (j = MTSZ - 1; j > 0; j--)
-            mtmp->mtrack[j] = mtmp->mtrack[j - 1];
-        mtmp->mtrack[0].x = omx;
-        mtmp->mtrack[0].y = omy;
+        mon_track_add(mtmp, omx, omy);
     } else {
         if (is_unicorn(ptr) && rn2(2) && !tele_restrict(mtmp)) {
             (void) rloc(mtmp, RLOC_MSG);
