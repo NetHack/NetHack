@@ -1018,6 +1018,8 @@ makemap_unmakemon(struct monst *mtmp, boolean migratory)
            so that dmonsfree() bookkeeping for number of dead or removed
            monsters won't get out of sync; it is not on the map but
            mongone() -> m_detach() -> mon_leaving_level() copes with that */
+        mtmp->mstate |= MON_OFFMAP;
+        mtmp->mstate &= ~(MON_MIGRATING | MON_LIMBO);
         mtmp->nmon = fmon;
         fmon = mtmp;
     }

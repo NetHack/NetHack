@@ -1982,6 +1982,7 @@ save_mtraits(struct obj *obj, struct monst *mtmp)
             mtmp2->mhp = mtmp2->mhpmax;
         if (mtmp2->mhp < 1)
             mtmp2->mhp = 0;
+        mtmp2->mstate &= ~MON_DETACH;
     }
     return obj;
 }
