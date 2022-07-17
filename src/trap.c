@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1657925446 2022/07/15 22:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.491 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1658093068 2022/07/17 21:24:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.493 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4303,9 +4303,9 @@ emergency_disrobe(boolean *lostsome)
 boolean
 rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
 {
-    int i, j, k, dirs[N_DIRS];
+    int i, j;
     boolean is_u = (mtmp == &g.youmonst);
-    coordxy nx, ny;
+    coordxy nx, ny, k, dirs[N_DIRS];
 
     for (i = 0; i < N_DIRS; ++i)
         dirs[i] = i;
@@ -4333,8 +4333,9 @@ boolean
 drown(void)
 {
     const char *pool_of_water;
-    boolean inpool_ok = FALSE, crawl_ok;
-    int i, x, y;
+    boolean inpool_ok = FALSE;
+    int i;
+    coordxy x, y;
     boolean is_solid = is_waterwall(u.ux, u.uy);
 
     feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
@@ -4411,8 +4412,6 @@ drown(void)
         if (!is_pool(u.ux, u.uy))
             return TRUE;
     }
-    crawl_ok = FALSE;
-    x = y = 0; /* lint suppression */
     /* if sleeping, wake up now so that we don't crawl out of water
        while still asleep; we can't do that the same way that waking
        due to combat is handled; note unmul() clears u.usleep */
@@ -4421,14 +4420,11 @@ drown(void)
     /* being doused will revive from fainting */
     if (is_fainted())
         reset_faint();
-    /* can't crawl if unable to move (crawl_ok flag stays false) */
-    if (g.multi < 0 || (Upolyd && !g.youmonst.data->mmove))
-        goto crawl;
+
     x = u.ux, y = u.uy;
-    if (rnd_nextto_goodpos(&x, &y, &g.youmonst))
-        crawl_ok = TRUE;
- crawl:
-    if (crawl_ok) {
+    /* have to be able to move in order to crawl */
+    if (g.multi >= 0 && g.youmonst.data->mmove
+        && rnd_nextto_goodpos(&x, &y, &g.youmonst)) {
         boolean lost = FALSE;
         /* time to do some strip-tease... */
         boolean succ = Is_waterlevel(&u.uz) ? TRUE : emergency_disrobe(&lost);
