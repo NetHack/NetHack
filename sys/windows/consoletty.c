@@ -884,7 +884,8 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
     while (dst != sentinel)
         *dst++ = *fill;
 
-    if (iflags.debug.immediateflips && buffer == console.back_buffer)
+    if ((iflags.debug.immediateflips || !g.program_state.in_moveloop)
+        && buffer == console.back_buffer)
         back_buffer_flip();
 }
 
@@ -899,7 +900,7 @@ static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
     while (dst != sentinel)
         *dst++ = clear_cell;
 
-    if (iflags.debug.immediateflips)
+    if (iflags.debug.immediateflips || !g.program_state.in_moveloop)
         back_buffer_flip();
 }
 
@@ -911,7 +912,8 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
     cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
     *dst = *cell;
 
-    if (iflags.debug.immediateflips && buffer == console.back_buffer)
+    if ((iflags.debug.immediateflips || !g.program_state.in_moveloop)
+        && buffer == console.back_buffer)
         back_buffer_flip();
 }
 

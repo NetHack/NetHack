@@ -36,6 +36,9 @@ extern void backsp(void);
 #endif
 extern void clear_screen(void);
 
+#ifdef update_file
+#undef update_file
+#endif
 #if defined(TERMLIB) || defined(CURSES_GRAPHICS)
 extern void (*decgraphics_mode_callback)(void);
 #endif
@@ -424,6 +427,7 @@ mingw_main(int argc, char *argv[])
     char *windowtype = NULL;
     char fnamebuf[BUFSZ], encodedfnamebuf[BUFSZ];
     char failbuf[BUFSZ];
+    int getlock_result = 0;
 
 #ifdef _MSC_VER
     _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
@@ -599,9 +603,12 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         fnamebuf, encodedfnamebuf, BUFSZ);
     Sprintf(g.lock, "%s", encodedfnamebuf);
     /* regularize(lock); */ /* we encode now, rather than substitute */
-    if (getlock() == 0)
+    if ((getlock_result = getlock()) == 0)
         nethack_exit(EXIT_SUCCESS);
 
+    if (getlock_result < 0) {
+        set_savefile_name(TRUE);
+    }
     /* Set up level 0 file to keep the game state.
      */
     nhfp = create_levelfile(0, (char *) 0);
@@ -623,7 +630,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      * We'll return here if new game player_selection() renames the hero.
      */
 attempt_restore:
-    if ((nhfp = restore_saved_game()) != 0) {
+    if ((getlock_result != -1) && (nhfp = restore_saved_game()) != 0) {
 #ifdef NEWS
         if (iflags.news) {
             display_file(NEWS, FALSE);
@@ -1145,7 +1152,7 @@ eraseoldlocks(void)
 int
 getlock(void)
 {
-    int fd, ern = 0, prompt_result = 0;
+    int fd, ern = 0, prompt_result = 1;
     int fcmask = FCMASK;
 #ifndef SELF_RECOVER
     char tbuf[BUFSZ];
@@ -1265,7 +1272,7 @@ gotlock:
             error("cannot close lock (%s)", fq_lock);
         }
     }
-    return 1;
+    return prompt_result;
 }
 #endif /* PC_LOCKING */
 
