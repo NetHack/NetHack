@@ -24,10 +24,6 @@ strategy:
       imageName: 'ubuntu-18.04'
       toolchainName: gcc7
       buildTargetName: all
-    macOS_catalina_clang_all:
-      imageName: 'macOS-10.15'
-      toolchainName: clang
-      buildTargetName: all
     macOS_latest_clang_all:
       imageName: 'macOS-latest'
       toolchainName: clang
