@@ -1,4 +1,4 @@
-/* NetHack 3.7	recover.c	$NHDT-Date: 1596498262 2020/08/03 23:44:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
+/* NetHack 3.7	recover.c	$NHDT-Date: 1658093138 2022/07/17 21:25:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -208,7 +208,7 @@ restore_savefile(char *basename)
 {
     int gfd, lfd, sfd;
     int res = 0, lev, savelev, hpid, pltmpsiz, filecmc;
-    coordxy levc;
+    xint8 levc;
     struct version_info version_data;
     struct savefile_info sfi;
     char plbuf[PL_NSIZ], indicator;
@@ -345,14 +345,14 @@ restore_savefile(char *basename)
     (void) unlink(lock);
 
     for (lev = 1; lev < 256 && res == 0; lev++) {
-        /* level numbers are kept in coordxys in save.c, so the
+        /* level numbers are kept in 'xint8's in save.c, so the
          * maximum level number (for the endlevel) must be < 256
          */
         if (lev != savelev) {
             lfd = open_levelfile(lev);
             if (lfd >= 0) {
                 /* any or all of these may not exist */
-                levc = (coordxy) lev;
+                levc = (xint8) lev;
                 if (write(sfd, (genericptr_t) &levc, sizeof levc)
                     != sizeof levc)
                     res = -1;
