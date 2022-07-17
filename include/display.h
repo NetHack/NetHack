@@ -977,7 +977,7 @@ enum glyph_offsets {
 #define MG_STATUE  0x00040  /* represents a statue */
 #define MG_OBJPILE 0x00080  /* more than one stack of objects */
 #define MG_BW_LAVA 0x00100  /* 'black & white lava': highlight lava if it
-                             * can't be distringuished from water by color */
+                             * can't be distinguished from water by color */
 #define MG_BW_ICE  0x00200  /* similar for ice vs floor */
 #define MG_NOTHING 0x00400  /* char represents GLYPH_NOTHING */
 #define MG_UNEXPL  0x00800  /* char represents GLYPH_UNEXPLORED */
