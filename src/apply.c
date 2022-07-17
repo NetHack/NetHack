@@ -355,8 +355,7 @@ use_stethoscope(struct obj *obj)
         You_hear("your heart beat.");
         return res;
     }
-    if (Stunned || (Confusion && !rn2(5)))
-        confdir();
+    confdir(FALSE);
     if (!u.dx && !u.dy) {
         ustatusline();
         return res;
@@ -2850,8 +2849,7 @@ use_whip(struct obj *obj)
         rx = mtmp->mx;
         ry = mtmp->my;
     } else {
-        if (Stunned || (Confusion && !rn2(5)))
-            confdir();
+        confdir(FALSE);
         rx = u.ux + u.dx;
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {

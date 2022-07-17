@@ -4607,8 +4607,8 @@ getdir(const char *s)
         You_cant("orient yourself that direction.");
         return 0;
     }
-    if (!u.dz && (Stunned || (Confusion && !rn2(5))))
-        confdir();
+    if (!u.dz)
+        confdir(FALSE);
     return 1;
 }
 
@@ -4789,14 +4789,16 @@ help_dir(
     return TRUE;
 }
 
+/* if hero is impaired, pick random movement direction */
 void
-confdir(void)
+confdir(boolean force_impairment)
 {
-    register coordxy x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
+    if (force_impairment || u_maybe_impaired()) {
+        register coordxy x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
 
-    u.dx = xdir[x];
-    u.dy = ydir[x];
-    return;
+        u.dx = xdir[x];
+        u.dy = ydir[x];
+    }
 }
 
 const char *

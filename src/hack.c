@@ -2046,11 +2046,17 @@ slippery_ice_fumbling(void)
         HFumbling &= ~FROMOUTSIDE;
 }
 
+boolean
+u_maybe_impaired(void)
+{
+    return (Stunned || (Confusion && !rn2(5)));
+}
+
 /* change movement dir if impaired. return TRUE if can't move */
 static boolean
 impaired_movement(coordxy *x, coordxy *y)
 {
-    if (Stunned || (Confusion && !rn2(5))) {
+    if (u_maybe_impaired()) {
         register int tries = 0;
 
         do {
@@ -2058,7 +2064,7 @@ impaired_movement(coordxy *x, coordxy *y)
                 nomul(0);
                 return TRUE;
             }
-            confdir();
+            confdir(TRUE);
             *x = u.ux + u.dx;
             *y = u.uy + u.dy;
         } while (!isok(*x, *y) || bad_rock(g.youmonst.data, *x, *y));

@@ -1058,8 +1058,7 @@ use_pick_axe2(struct obj *obj)
         g.context.botl = 1;
         return ECMD_TIME;
     } else if (u.dz == 0) {
-        if (Stunned || (Confusion && !rn2(5)))
-            confdir();
+        confdir(FALSE);
         rx = u.ux + u.dx;
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {
