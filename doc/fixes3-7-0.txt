@@ -1307,6 +1307,8 @@ avoid "It suddenly appears!" if a monster with the STRAT_APPEARMSG attribute
 avoid boulder-on/in-water sanity_check warnings on the Plane of Water
 when one monster swallowed/engulfed another and killed it, impossible
 	"placing <mon> over itself ..." could be given by place_monster()
+if the game crashed or the process was killed, recovering a save file ended
+	up with incorrect stairway connections between levels
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
