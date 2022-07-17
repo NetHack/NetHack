@@ -776,39 +776,9 @@ place_worm_tail_randomly(struct monst *worm, coordxy x, coordxy y)
     new_tail->wy = y;
 
     while (curr) {
-        int nx = 0, ny = 0;
-#if 0   /* old code */
-        int trycnt = 0;
+        coordxy nx = ox, ny = oy;
 
-        /* pick a random direction from x, y and test for goodpos() */
-        do {
-            random_dir(ox, oy, &nx, &ny);
-        } while (!goodpos(nx, ny, worm, 0) && ++tryct <= 50);
-
-        if (tryct <= 50)
-#else   /* new code */
-        int i, j, k, dirs[N_DIRS];
-
-        /* instead of picking a random direction up to 50 times, try each
-           of the eight directions at most once after shuffling their order */
-        for (i = 0; i < N_DIRS; ++i)
-            dirs[i] = i;
-        for (i = N_DIRS; i > 0; --i) {
-            j = rn2(i);
-            k = dirs[j];
-            dirs[j] = dirs[i - 1];
-            dirs[i - 1] = k;
-        }
-        for (i = 0; i < N_DIRS; ++i) {
-            nx = ox + xdir[dirs[i]];
-            ny = oy + ydir[dirs[i]];
-            if (goodpos(nx, ny, worm, 0)) /* includes an isok() check */
-                break;
-        }
-
-        if (i < N_DIRS)
-#endif
-        {
+        if (rnd_nextto_goodpos(&nx, &ny, worm)) {
             place_worm_seg(worm, nx, ny);
             curr->wx = (coordxy) (ox = nx);
             curr->wy = (coordxy) (oy = ny);

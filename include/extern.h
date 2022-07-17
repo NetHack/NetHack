@@ -2785,6 +2785,7 @@ extern boolean lava_damage(struct obj *, coordxy, coordxy);
 extern void acid_damage(struct obj *);
 extern int water_damage(struct obj *, const char *, boolean);
 extern void water_damage_chain(struct obj *, boolean);
+extern boolean rnd_nextto_goodpos(coordxy *, coordxy *, struct monst *);
 extern boolean drown(void);
 extern void drain_en(int);
 extern int dountrap(void);
