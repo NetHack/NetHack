@@ -4401,7 +4401,7 @@ Persistent.
 When pausing momentarily for display effect, such as with explosions and
 moving objects, use a timer rather than sending extra characters to the
 screen.
-(Applies to \(lqtty\(rq interface only; \(lqX11\(rq interface always
+(Applies to \(lqtty\(rq and \(lqcurses\(rq interfaces only; \(lqX11\(rq interface always
 uses a timer based delay.
 The default is on if configured into the program.)
 Persistent.

@@ -95,7 +95,7 @@ color          use different colors for objects on screen  [True for micros]
 hilite_pet     display pets in a highlighted manner               [False]
 hilite_pile    display item piles in a highlighted manner         [False]
 
-Boolean option if TIMED_DELAY was set at compile time (tty interface only):
+Boolean option if TIMED_DELAY was set at compile time (tty or curses only):
 timed_delay    on unix and VMS, use a timer instead of sending     [True]
                extra screen output when attempting to pause for
                display effect.  on MSDOS without the termcap
