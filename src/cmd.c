@@ -1482,7 +1482,7 @@ wiz_telekinesis(void)
             }
         }
 
-    } while (TRUE);
+    } while (u.utotype == UTOTYPE_NONE);
     return ECMD_OK;
 }
 
