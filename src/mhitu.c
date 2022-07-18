@@ -1032,6 +1032,9 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
         mhm.damage += d((int) mattk->damn, (int) mattk->damd); /* extra dmg */
 
     mhitm_adtyping(mtmp, mattk, &g.youmonst, &mhm);
+
+    (void) mhitm_knockback(mtmp, &g.youmonst, mattk, &mhm.hitflags, (MON_WEP(mtmp) != 0));
+
     if (mhm.done)
         return mhm.hitflags;
 

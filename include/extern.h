@@ -2919,6 +2919,8 @@ extern void do_stone_mon(struct monst *, struct attack *, struct monst *,
 extern int damageum(struct monst *, struct attack *, int);
 extern int explum(struct monst *, struct attack *);
 extern void missum(struct monst *, struct attack *, boolean);
+extern boolean mhitm_knockback(struct monst *, struct monst *,struct attack *,
+                               int *, boolean);
 extern int passive(struct monst *, struct obj *, boolean, boolean, uchar,
                    boolean);
 extern void passive_obj(struct monst *, struct obj *, struct attack *);

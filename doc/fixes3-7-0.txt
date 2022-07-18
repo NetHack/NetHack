@@ -971,6 +971,7 @@ wielding a bec de corbin makes ravens generate peaceful
 moving with 'm' prefix allows hero to enter a known pit carefully
 rangers always succeed in disarming bear traps, unless impaired
 bigroom variant 2 may have ice floor in unlit areas
+some large monsters can knock back smaller monsters with a hit
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

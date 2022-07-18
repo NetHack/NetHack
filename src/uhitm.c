@@ -3459,9 +3459,11 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (!u.ustuck && rn2(2)) {
                 if (u_slip_free(magr, mattk)) {
                     mhm->damage = 0;
+                    mhm->hitflags |= MM_MISS;
                 } else {
                     set_ustuck(magr);
                     pline("%s grabs you!", Monnam(magr));
+                    mhm->hitflags |= MM_HIT;
                 }
             } else if (u.ustuck == magr) {
                 exercise(A_STR, FALSE);
@@ -3497,8 +3499,10 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     mhm->damage = 1;
                 if (!(otmp->oartifact && artifact_hit(magr, mdef, otmp,
                                                       &mhm->damage,
-                                                      g.mhitu_dieroll)))
+                                                      g.mhitu_dieroll))) {
                     hitmsg(magr, mattk);
+                    mhm->hitflags |= MM_HIT;
+                }
                 if (!mhm->damage)
                     return;
                 if (objects[otmp->otyp].oc_material == SILVER
@@ -3531,8 +3535,10 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 }
                 rustm(&g.youmonst, otmp);
             } else if (mattk->aatyp != AT_TUCH || mhm->damage != 0
-                       || magr != u.ustuck)
+                       || magr != u.ustuck) {
                 hitmsg(magr, mattk);
+                mhm->hitflags |= MM_HIT;
+            }
         }
     } else {
         /* mhitm */
@@ -3574,6 +3580,7 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     if (g.vis)
                         pline("%s hits %s.", Monnam(magr),
                               mon_nam_too(mdef, magr));
+                    mhm->hitflags |= MM_HIT;
                 }
                 /* artifact_hit updates 'tmp' but doesn't inflict any
                    damage; however, it might cause carried items to be
@@ -4213,6 +4220,7 @@ damageum(
     }
 
     mhitm_adtyping(&g.youmonst, mattk, mdef, &mhm);
+
     if (mhm.done)
         return mhm.hitflags;
 
@@ -4541,6 +4549,87 @@ missum(struct monst *mdef, struct attack *mattk, boolean wouldhavehit)
         You("miss it.");
     if (!helpless(mdef))
         wakeup(mdef, TRUE);
+}
+
+/* monster hits another monster hard enough to knock it back? */
+boolean
+mhitm_knockback(struct monst *magr,
+                struct monst *mdef,
+                struct attack *mattk,
+                int *hitflags,
+                boolean weapon_used)
+{
+    boolean u_agr = (magr == &g.youmonst);
+    boolean u_def = (mdef == &g.youmonst);
+
+    /* 1/6 chance of attack knocking back a monster */
+    if (rn2(6))
+        return FALSE;
+
+    /* monsters must be alive */
+    if ((!u_agr && DEADMONSTER(magr))
+        || (!u_def && DEADMONSTER(mdef)))
+        return FALSE;
+
+    /* attacker must be much larger than defender */
+    if (!(magr->data->msize > (mdef->data->msize + 1)))
+        return FALSE;
+
+    /* only certain attacks qualify for knockback */
+    if (!((mattk->adtyp == AD_PHYS)
+          && (mattk->aatyp == AT_CLAW
+              || mattk->aatyp == AT_KICK
+              || mattk->aatyp == AT_BUTT
+              || (mattk->aatyp == AT_WEAP && !weapon_used))))
+        return FALSE;
+
+    /* the attack must have hit */
+    /* mon-vs-mon code path doesn't set up hitflags */
+    if ((u_agr || u_def) && !(*hitflags & MM_HIT))
+        return FALSE;
+
+    /* give the message */
+    if (u_def || canseemon(mdef)) {
+        boolean dosteed = u_def && u.usteed;
+
+        /* uhitm: You knock the gnome back with a powerful blow! */
+        /* mhitu: The red dragon knocks you back with a forceful blow! */
+        /* mhitm: The fire giant knocks the gnome back with a forceful strike! */
+
+        pline("%s knock%s %s %s with a %s %s!",
+              u_agr ? "You" : Monnam(magr),
+              u_agr ? "" : "s",
+              u_def ? "you" : y_monnam(mdef),
+              dosteed ? "out of your saddle" : "back",
+              rn2(2) ? "forceful" : "powerful",
+              rn2(2) ? "blow" : "strike");
+    }
+
+    /* do the actual knockback effect */
+    if (u_def) {
+        if (u.usteed)
+            dismount_steed(DISMOUNT_FELL);
+        else
+            hurtle(u.ux - magr->mx, u.uy - magr->my, rnd(2), FALSE);
+        if (!rn2(4))
+            make_stunned((HStun & TIMEOUT) + (long) rnd(2) + 1, TRUE);
+    } else {
+        coordxy x = u_agr ? u.ux : magr->mx;
+        coordxy y = u_agr ? u.uy : magr->my;
+
+        mhurtle(mdef, mdef->mx - x,
+                mdef->my - y, rnd(2));
+        if (DEADMONSTER(mdef))
+            *hitflags |= MM_DEF_DIED;
+        else if (!rn2(4))
+            mdef->mstun = 1;
+    }
+    if (!u_agr) {
+        if (DEADMONSTER(magr))
+            *hitflags |= MM_AGR_DIED;
+    }
+
+    return TRUE;
 }
 
 /* attack monster as a monster; returns True if mon survives */
@@ -4919,6 +5008,9 @@ hmonas(struct monst *mon)
             (void) passive(mon, weapon, (sum[i] != MM_MISS), 1,
                            mattk->aatyp, FALSE);
         }
+
+        if (mhitm_knockback(&g.youmonst, mon, mattk, &sum[i], weapon_used))
+            break;
 
         /* don't use sum[i] beyond this point;
            'i' will be out of bounds if we get here via 'goto' */
