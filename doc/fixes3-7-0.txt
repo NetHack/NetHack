@@ -969,6 +969,7 @@ make taming via magic harp be consistent with scroll of taming and charm
 	spell:  an angry shopkeeper becomes pacified (but never tamed)
 wielding a bec de corbin makes ravens generate peaceful
 moving with 'm' prefix allows hero to enter a known pit carefully
+rangers always succeed in disarming bear traps, unless impaired
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

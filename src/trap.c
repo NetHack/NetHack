@@ -4554,6 +4554,8 @@ untrap_prob(
     /* Your own traps are better known than others. */
     if (ttmp->madeby_u)
         chance--;
+    if (Role_if(PM_RANGER) && ttmp->ttyp == BEAR_TRAP && chance <= 3)
+        return 0; /* always succeeds */
     if (Role_if(PM_ROGUE)) {
         if (rn2(2 * MAXULEV) < u.ulevel)
             chance--;
