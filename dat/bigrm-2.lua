@@ -29,17 +29,27 @@ des.map([[
 -- Dungeon Description
 des.region(selection.area(01,01,73,16),"lit");
 
+local darkness;
+
 local choice = math.random(0, 3)
 if choice == 0 then
-  des.region(selection.area(01,07,22,09),"unlit");
-  des.region(selection.area(24,01,50,05),"unlit");
-  des.region(selection.area(24,11,50,16),"unlit");
-  des.region(selection.area(52,07,73,09),"unlit");
+   darkness = selection.area(01,07,22,09)
+      | selection.area(24,01,50,05)
+      | selection.area(24,11,50,16)
+      | selection.area(52,07,73,09);
 elseif choice == 1 then
-  des.region(selection.area(24,01,50,16),"unlit");
+   darkness = selection.area(24,01,50,16);
 elseif choice == 2 then
-  des.region(selection.area(01,01,22,16),"unlit");
-  des.region(selection.area(52,01,73,16),"unlit");
+   darkness = selection.area(01,01,22,16)
+      | selection.area(52,01,73,16);
+end
+
+if darkness ~= nil then
+   des.region(darkness,"unlit");
+   if percent(25) then
+      des.replace_terrain({ selection = darkness:grow(),
+                            fromterrain = ".", toterrain = "I" });
+   end
 end
 
 -- Stairs
