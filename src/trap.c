@@ -1557,6 +1557,7 @@ trapeffect_pit(
         boolean conj_pit = conjoined_pits(trap, t_at(u.ux0, u.uy0), TRUE);
         boolean adj_pit = adj_nonconjoined_pit(trap);
         boolean already_known = trap->tseen ? TRUE : FALSE;
+        boolean deliberate = FALSE;
         int steed_article = ARTICLE_THE;
         int oldumort;
 
@@ -1593,6 +1594,9 @@ trapeffect_pit(
                     Sprintf(verbbuf, "lead %s",
                             x_monnam(u.usteed, steed_article, "poor",
                                      SUPPRESS_SADDLE, FALSE));
+            } else if (iflags.menu_requested && already_known) {
+                You("carefully %s into the pit.", u_locomotion("lower yourself"));
+                deliberate = TRUE;
             } else if (conj_pit) {
                 You("move into an adjacent pit.");
             } else if (adj_pit) {
@@ -1640,7 +1644,7 @@ trapeffect_pit(
                           "killed while stuck in creature form" */
                        plunged
                        ? "deliberately plunged into a pit of iron spikes"
-                       : conj_pit
+                       : (conj_pit || deliberate)
                        ? "stepped into a pit of iron spikes"
                        : adj_pit
                        ? "stumbled into a pit of iron spikes"
@@ -1648,7 +1652,7 @@ trapeffect_pit(
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                     poisoned("spikes", A_STR,
-                             (conj_pit || adj_pit)
+                             (conj_pit || adj_pit || deliberate)
                              ? "stepping on poison spikes"
                              : "fall onto poison spikes",
                              /* if damage triggered life-saving,
@@ -1656,7 +1660,7 @@ trapeffect_pit(
                              (u.umortality > oldumort) ? 0 : 8, FALSE);
             } else {
                 /* plunging flyers take spike damage but not pit damage */
-                if (!conj_pit
+                if (!conj_pit && !deliberate
                     && !(plunged && (Flying || is_clinger(g.youmonst.data))))
                     losehp(Maybe_Half_Phys(rnd(adj_pit ? 3 : 6)),
                            plunged ? "deliberately plunged into a pit"
