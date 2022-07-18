@@ -416,7 +416,7 @@ maketrap(coordxy x, coordxy y, int typ)
     ttmp->dst.dnum = ttmp->dst.dlevel = -1;
     ttmp->madeby_u = 0;
     ttmp->once = 0;
-    ttmp->tseen = (typ == HOLE); /* hide non-holes */
+    ttmp->tseen = unhideable_trap(typ);
     ttmp->ttyp = typ;
 
     switch (typ) {

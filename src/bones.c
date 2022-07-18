@@ -510,7 +510,7 @@ savebones(int how, time_t when, struct obj *corpse)
     }
     for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
         ttmp->madeby_u = 0;
-        ttmp->tseen = (ttmp->ttyp == HOLE);
+        ttmp->tseen = unhideable_trap(ttmp->ttyp);
     }
     resetobjs(fobj, FALSE);
     resetobjs(g.level.buriedobjlist, FALSE);
