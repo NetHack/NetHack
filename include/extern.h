@@ -1550,6 +1550,7 @@ extern void killed(struct monst *);
 extern void xkilled(struct monst *, int);
 extern void mon_to_stone(struct monst *);
 extern void m_into_limbo(struct monst *);
+extern void migrate_mon(struct monst *, coordxy, coordxy);
 extern void mnexto(struct monst *, unsigned);
 extern void maybe_mnexto(struct monst *);
 extern int mnearto(struct monst *, coordxy, coordxy, boolean, unsigned);

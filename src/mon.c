@@ -19,7 +19,6 @@ static void mon_leaving_level(struct monst *);
 static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
-static void migrate_mon(struct monst *, coordxy, coordxy);
 static boolean ok_to_obliterate(struct monst *);
 static void deal_with_overcrowding(struct monst *);
 static void m_restartcham(struct monst *);
@@ -3296,7 +3295,7 @@ m_into_limbo(struct monst *mtmp)
     migrate_mon(mtmp, target_lev, xyloc);
 }
 
-static void
+void
 migrate_mon(
     struct monst *mtmp,
     xint16 target_lev, /* destination level */

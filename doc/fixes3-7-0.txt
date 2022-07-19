@@ -972,6 +972,8 @@ moving with 'm' prefix allows hero to enter a known pit carefully
 rangers always succeed in disarming bear traps, unless impaired
 bigroom variant 2 may have ice floor in unlit areas
 some large monsters can knock back smaller monsters with a hit
+change Demonbane to a mace, make it the first sac gift for priests,
+	and give it an invoke ability to banish demons
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
