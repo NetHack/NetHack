@@ -1565,7 +1565,7 @@ use_offensive(struct monst* mtmp)
         if (oseen)
             makeknown(otmp->otyp);
         g.m_using = TRUE;
-        buzz((int) (-30 - (otmp->otyp - WAN_MAGIC_MISSILE)),
+        buzz(BZ_M_WAND(BZ_OFS_WAN(otmp->otyp)),
              (otmp->otyp == WAN_MAGIC_MISSILE) ? 2 : 6, mtmp->mx, mtmp->my,
              sgn(mtmp->mux - mtmp->mx), sgn(mtmp->muy - mtmp->my));
         g.m_using = FALSE;
@@ -1574,7 +1574,7 @@ use_offensive(struct monst* mtmp)
     case MUSE_FROST_HORN:
         mplayhorn(mtmp, otmp, FALSE);
         g.m_using = TRUE;
-        buzz(-30 - ((otmp->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1),
+        buzz(BZ_M_WAND(BZ_OFS_AD((otmp->otyp == FROST_HORN) ? AD_COLD : AD_FIRE)),
              rn1(6, 6), mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
              sgn(mtmp->muy - mtmp->my));
         g.m_using = FALSE;

@@ -1203,6 +1203,7 @@ SCROLL("blank paper", "unlabeled",  0,  28,  60, SCR_BLANK_PAPER),
 #define PAPER LEATHER /* override enum for use in SPELL() expansion */
 SPELL("dig",             "parchment",
       P_MATTER_SPELL,      20,  6, 5, 1, RAY, HI_LEATHER, SPE_DIG),
+/* magic missile ... finger of death must be in this order; see buzz() */
 SPELL("magic missile",   "vellum",
       P_ATTACK_SPELL,      45,  2, 2, 1, RAY, HI_LEATHER, SPE_MAGIC_MISSILE),
 #undef PAPER /* revert to normal material */
@@ -1382,6 +1383,7 @@ WAND("probing",       "uranium", 30, 150, 1, IMMEDIATE, METAL, HI_METAL,
                                                     WAN_PROBING),
 WAND("digging",          "iron", 55, 150, 1, RAY, IRON, HI_METAL,
                                                     WAN_DIGGING),
+/* magic missile ... lightning must be in this order; see buzz() */
 WAND("magic missile",   "steel", 50, 150, 1, RAY, IRON, HI_METAL,
                                                     WAN_MAGIC_MISSILE),
 WAND("fire",        "hexagonal", 40, 175, 1, RAY, IRON, HI_METAL,

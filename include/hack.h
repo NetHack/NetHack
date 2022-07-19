@@ -642,6 +642,25 @@ enum getobj_callback_returns {
  * it.  */
 #define PHYS_EXPL_TYPE -1
 
+/* macros for dobuzz() type */
+#define BZ_VALID_ADTYP(adtyp) ((adtyp) >= AD_MAGM && (adtyp) <= AD_SPC2)
+
+#define BZ_OFS_AD(adtyp) (abs((adtyp) - AD_MAGM) % 10)
+#define BZ_OFS_WAN(otyp) (abs((otyp) - WAN_MAGIC_MISSILE) % 10)
+#define BZ_OFS_SPE(otyp) (abs((otyp) - SPE_MAGIC_MISSILE) % 10)
+/* hero shooting a wand */
+#define BZ_U_WAND(bztyp) (0 + (bztyp))
+/* hero casting a spell */
+#define BZ_U_SPELL(bztyp) (10 + (bztyp))
+/* hero breathing as a monster */
+#define BZ_U_BREATH(bztyp) (20 + (bztyp))
+/* monster casting a spell */
+#define BZ_M_SPELL(bztyp) (-10 - (bztyp))
+/* monster breathing */
+#define BZ_M_BREATH(bztyp) (-20 - (bztyp))
+/* monster shooting a wand */
+#define BZ_M_WAND(bztyp) (-30 - (bztyp))
+
 /*
  * option setting restrictions
  */

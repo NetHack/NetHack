@@ -3235,11 +3235,9 @@ weffects(struct obj *obj)
         if (otyp == WAN_DIGGING || otyp == SPE_DIG)
             zap_dig();
         else if (otyp >= SPE_MAGIC_MISSILE && otyp <= SPE_FINGER_OF_DEATH)
-            buzz(otyp - SPE_MAGIC_MISSILE + 10, u.ulevel / 2 + 1, u.ux, u.uy,
-                 u.dx, u.dy);
+            ubuzz(BZ_U_SPELL(BZ_OFS_SPE(otyp)), u.ulevel / 2 + 1);
         else if (otyp >= WAN_MAGIC_MISSILE && otyp <= WAN_LIGHTNING)
-            buzz(otyp - WAN_MAGIC_MISSILE,
-                 (otyp == WAN_MAGIC_MISSILE) ? 2 : 6, u.ux, u.uy, u.dx, u.dy);
+            ubuzz(BZ_U_WAND(BZ_OFS_WAN(otyp)), (otyp == WAN_MAGIC_MISSILE) ? 2 : 6);
         else
             impossible("weffects: unexpected spell or wand");
         disclose = TRUE;
@@ -4252,6 +4250,12 @@ disintegrate_mon(struct monst *mon,
         monkilled(mon, (char *) 0, -AD_RBRE);
     else
         xkilled(mon, XKILL_NOMSG | XKILL_NOCORPSE);
+}
+
+void
+ubuzz(int type, int nd)
+{
+    dobuzz(type, nd, u.ux, u.uy, u.dx, u.dy, TRUE);
 }
 
 void

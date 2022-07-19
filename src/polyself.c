@@ -1252,8 +1252,7 @@ dobreathe(void)
     else if (!u.dx && !u.dy && !u.dz)
         ubreatheu(mattk);
     else
-        buzz((int) (20 + mattk->adtyp - 1), (int) mattk->damn, u.ux, u.uy,
-             u.dx, u.dy);
+        ubuzz(BZ_U_BREATH(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn);
     return ECMD_TIME;
 }
 

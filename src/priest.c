@@ -809,7 +809,7 @@ ghod_hitsu(struct monst *priest)
         break;
     }
 
-    buzz(-10 - (AD_ELEC - 1), 6, x, y, sgn(g.tbx),
+    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(g.tbx),
          sgn(g.tby)); /* bolt of lightning */
     exercise(A_WIS, FALSE);
 }

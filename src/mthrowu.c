@@ -886,7 +886,7 @@ breathwep_name(int typ)
     if (Hallucination)
         return rnd_hallublast();
 
-    return breathwep[typ - 1];
+    return breathwep[BZ_OFS_AD(typ)];
 }
 
 /* monster breathes at monster (ranged) */
@@ -915,12 +915,12 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
             return MM_HIT;
 
         if (!mtmp->mspec_used && rn2(3)) {
-            if ((typ >= AD_MAGM) && (typ <= AD_ACID)) {
+            if (BZ_VALID_ADTYP(typ)) {
                 boolean utarget = (mtarg == &g.youmonst);
                 if (canseemon(mtmp))
                     pline("%s breathes %s!",
                           Monnam(mtmp), breathwep_name(typ));
-                dobuzz((int) (-20 - (typ - 1)), (int) mattk->damn,
+                dobuzz(BZ_M_BREATH(BZ_OFS_AD(typ)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(g.tbx), sgn(g.tby), utarget);
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some

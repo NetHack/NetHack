@@ -599,11 +599,11 @@ do_improvisation(struct obj* instr)
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
-            int type = (instr->otyp == FROST_HORN) ? AD_COLD - 1 : AD_FIRE - 1;
+            int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD : AD_FIRE);
 
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
-            buzz(type, rn1(6, 6), u.ux, u.uy, u.dx, u.dy);
+            ubuzz(BZ_U_WAND(type), rn1(6, 6));
         }
         makeknown(instr->otyp);
         break;

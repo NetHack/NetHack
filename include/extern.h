@@ -3381,6 +3381,7 @@ extern struct monst *bhit(coordxy, coordxy, int, enum bhit_call_types,
 extern struct monst *boomhit(struct obj *, coordxy, coordxy);
 extern int zhitm(struct monst *, int, int, struct obj **);
 extern int burn_floor_objects(coordxy, coordxy, boolean, boolean);
+extern void ubuzz(int, int);
 extern void buzz(int, int, coordxy, coordxy, int, int);
 extern void dobuzz(int, int, coordxy, coordxy, int, int, boolean);
 extern void melt_ice(coordxy, coordxy, const char *);

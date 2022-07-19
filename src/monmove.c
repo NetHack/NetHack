@@ -720,7 +720,7 @@ dochug(register struct monst* mtmp)
             for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
-                    if (castmu(mtmp, a, FALSE, FALSE)) {
+                    if ((castmu(mtmp, a, FALSE, FALSE) & MM_HIT)) {
                         tmp = MMOVE_DONE; /* bypass m_move() */
                         break;
                     }
