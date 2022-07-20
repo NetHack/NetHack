@@ -22,6 +22,7 @@ static boolean m_slips_free(struct monst *, struct attack *);
 static void start_engulf(struct monst *);
 static void end_engulf(void);
 static int gulpum(struct monst *, struct attack *);
+static boolean m_is_steadfast(struct monst *);
 static boolean hmonas(struct monst *);
 static void nohandglow(struct monst *);
 static boolean mhurtle_to_doom(struct monst *, int, struct permonst **);
@@ -4551,6 +4552,22 @@ missum(struct monst *mdef, struct attack *mattk, boolean wouldhavehit)
         wakeup(mdef, TRUE);
 }
 
+static boolean
+m_is_steadfast(struct monst *mtmp)
+{
+    boolean is_u = (mtmp == &g.youmonst);
+    struct obj *otmp = is_u ? uwep : MON_WEP(mtmp);
+
+    /* must be on the ground */
+    if ((is_u && (Flying || Levitation))
+        || (!is_u && (is_flyer(mtmp->data) || is_floater(mtmp->data))))
+        return FALSE;
+
+    if (otmp && otmp->oartifact == ART_GIANTSLAYER)
+        return TRUE;
+    return FALSE;
+}
+
 /* monster hits another monster hard enough to knock it back? */
 boolean
 mhitm_knockback(struct monst *magr,
@@ -4586,6 +4603,10 @@ mhitm_knockback(struct monst *magr,
     /* the attack must have hit */
     /* mon-vs-mon code path doesn't set up hitflags */
     if ((u_agr || u_def) && !(*hitflags & MM_HIT))
+        return FALSE;
+
+    /* steadfast defender cannot be pushed around */
+    if (m_is_steadfast(mdef))
         return FALSE;
 
     /* give the message */
