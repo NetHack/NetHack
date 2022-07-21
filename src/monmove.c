@@ -473,6 +473,7 @@ dochug(register struct monst* mtmp)
     register int tmp = MMOVE_NOTHING;
     int inrange, nearby, scared, res;
     struct obj *otmp;
+    boolean panicattk = FALSE;
 
     /*  Pre-movement adjustments
      */
@@ -734,6 +735,10 @@ dochug(register struct monst* mtmp)
             distfleeck(mtmp, &inrange, &nearby, &scared); /* recalc */
 
         switch (tmp) { /* for pets, cases 0 and 3 are equivalent */
+        case MMOVE_NOMOVES:
+            if (scared)
+                panicattk = TRUE;
+            /*FALLTHRU*/
         case MMOVE_NOTHING: /* no movement, but it can still attack you */
         case MMOVE_DONE: /* absolutely no movement */
             /* vault guard might have vanished */
@@ -775,7 +780,7 @@ dochug(register struct monst* mtmp)
 
     if (tmp != MMOVE_DONE && (!mtmp->mpeaceful
                      || (Conflict && !resist_conflict(mtmp)))) {
-        if (inrange && !scared && !noattacks(mdat)
+        if (((inrange && !scared) || panicattk) && !noattacks(mdat)
             /* [is this hp check really needed?] */
             && (Upolyd ? u.mh : u.uhp) > 0) {
             if (mattacku(mtmp))
@@ -1342,6 +1347,8 @@ m_move(register struct monst* mtmp, register int after)
         coord poss[9];
 
         cnt = mfndpos(mtmp, poss, info, flag);
+        if (cnt == 0)
+            return MMOVE_NOMOVES;
         chcnt = 0;
         jcnt = min(MTSZ, cnt - 1);
         chi = -1;
@@ -1378,7 +1385,7 @@ m_move(register struct monst* mtmp, register int after)
             nearer = ((ndist = dist2(nx, ny, gx, gy)) < nidist);
 
             if ((appr == 1 && nearer) || (appr == -1 && !nearer)
-                || (!appr && !rn2(++chcnt)) || !mmoved) {
+                || (!appr && !rn2(++chcnt)) || (mmoved == MMOVE_NOTHING)) {
                 nix = nx;
                 niy = ny;
                 nidist = ndist;
@@ -1390,7 +1397,7 @@ m_move(register struct monst* mtmp, register int after)
         }
     }
 
-    if (mmoved) {
+    if (mmoved != MMOVE_NOTHING) {
         if (mmoved == MMOVE_MOVED && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
             return MMOVE_DONE;
 

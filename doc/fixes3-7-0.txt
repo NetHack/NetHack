@@ -975,6 +975,7 @@ some large monsters can knock back smaller monsters with a hit
 change Demonbane to a mace, make it the first sac gift for priests,
 	and give it an invoke ability to banish demons
 wielding Giantslayer prevents knockback from larger monsters
+scared hostile monster which cannot move away will attack
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

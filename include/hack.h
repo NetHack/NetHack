@@ -440,6 +440,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MMOVE_MOVED   1 /* monster moved */
 #define MMOVE_DIED    2 /* monster died */
 #define MMOVE_DONE    3 /* monster used up all actions */
+#define MMOVE_NOMOVES 4 /* monster has no valid locations to move to */
 
 /*** some utility macros ***/
 #define yn(query) yn_function(query, ynchars, 'n')
