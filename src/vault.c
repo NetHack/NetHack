@@ -159,12 +159,13 @@ parkguard(struct monst *grd)
     if (grd->mx) {
         remove_monster(grd->mx, grd->my);
         newsym(grd->mx, grd->my);
-        place_monster(grd, 0, 0);
-        /* [grd->mx,my just got set to 0,0 by place_monster(), so this
-           just sets EGD(grd)->ogx,ogy to 0,0 too; is that what we want?] */
-        EGD(grd)->ogx = grd->mx;
-        EGD(grd)->ogy = grd->my;
     }
+    if (m_at(0, 0) != grd)
+        place_monster(grd, 0, 0);
+    /* [grd->mx,my just got set to 0,0 by place_monster(), so this
+       just sets EGD(grd)->ogx,ogy to 0,0 too; is that what we want?] */
+    EGD(grd)->ogx = grd->mx;
+    EGD(grd)->ogy = grd->my;
 }
 
 /* called in mon.c */
@@ -200,13 +201,30 @@ in_fcorridor(struct monst *grd, coordxy x, coordxy y)
 struct monst *
 findgd(void)
 {
-    register struct monst *mtmp;
+    struct monst *mtmp, **mprev;
 
+    /* this might find a guard parked at <0,0> since it'll be on fmon list */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
-            continue;
-        if (mtmp->isgd && on_level(&(EGD(mtmp)->gdlevel), &u.uz))
+        if (mtmp->isgd && on_level(&EGD(mtmp)->gdlevel, &u.uz)) {
+            if (!mtmp->mx && !EGD(mtmp)->gddone)
+                mtmp->mhp = mtmp->mhpmax;
             return mtmp;
+        }
+    }
+    /* if not on fmon, look for a guard waiting to migrate to this level */
+    for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0;
+         mprev = &mtmp->nmon) {
+        if (mtmp->isgd && on_level(&EGD(mtmp)->gdlevel, &u.uz)) {
+            /* take out of migrating_mons and place at <0,0> */
+            *mprev = mtmp->nmon;
+            /* simplified mon_arrive(); avoid that because it would send
+               mtmp into limbo if no regular map spot is available */
+            mon_track_clear(mtmp);
+            mtmp->mux = u.ux, mtmp->muy = u.uy;
+            mtmp->mx = mtmp->my = 0; /* not on map (note: mx is already 0) */
+            parkguard(mtmp);
+            return mtmp;
+        }
     }
     return (struct monst *) 0;
 }
@@ -303,10 +321,13 @@ invault(void)
         u.uinvault = 0;
         return;
     }
-    vaultroom -= ROOMOFFSET;
+    ++u.uinvault;
+    if (u.uinvault < VAULT_GUARD_TIME
+        || (u.uinvault % (VAULT_GUARD_TIME / 2)) != 0)
+        return;
 
     guard = findgd();
-    if (++u.uinvault % VAULT_GUARD_TIME == 0 && !guard) {
+    if (!guard) {
         /* if time ok and no guard now. */
         char buf[BUFSZ];
         int x, y, gx, gy, typ;
@@ -314,9 +335,10 @@ invault(void)
         long umoney;
 
         /* first find the goal for the guard */
-        if (!find_guard_dest((struct monst *)0, &rx, &ry))
+        if (!find_guard_dest((struct monst *) 0, &rx, &ry))
             return;
         gx = rx, gy = ry;
+        vaultroom -= ROOMOFFSET;
 
         /* next find a good place for a door in the wall */
         x = u.ux;
@@ -895,11 +917,11 @@ gd_move(struct monst *grd)
                 n = grd->my;
                 if (!Deaf)
                     verbalize("You've been warned, knave!");
+                grd->mpeaceful = 0;
                 mnexto(grd, RLOC_NOMSG);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 levl[m][n].flags = egrd->fakecorr[0].flags;
                 newsym(m, n);
-                grd->mpeaceful = 0;
                 return -1;
             }
             /* not fair to get mad when (s)he's fainted or paralyzed */
@@ -1117,7 +1139,7 @@ gd_move(struct monst *grd)
 void
 paygd(boolean silently)
 {
-    register struct monst *grd = findgd();
+    struct monst *grd = findgd();
     long umoney = money_cnt(g.invent);
     struct obj *coins, *nextcoins;
     int gx, gy;
@@ -1184,12 +1206,7 @@ hidden_gold(boolean even_if_unknown)
 boolean
 gd_sound(void)
 {
-    struct monst *grd = findgd();
-
-    if (vault_occupied(u.urooms))
-        return FALSE;
-    else
-        return (boolean) (grd == (struct monst *) 0);
+    return !(vault_occupied(u.urooms) || findgd());
 }
 
 void
@@ -1197,7 +1214,7 @@ vault_gd_watching(unsigned int activity)
 {
     struct monst *guard = findgd();
 
-    if (guard && guard->mcansee && m_canseeu(guard)) {
+    if (guard && guard->mx && guard->mcansee && m_canseeu(guard)) {
         if (activity == GD_EATGOLD || activity == GD_DESTROYGOLD)
             EGD(guard)->witness = activity;
     }

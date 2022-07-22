@@ -347,7 +347,7 @@ mon_arrive(struct monst *mtmp, int when)
     /* some monsters might need to do something special upon arrival
        _after_ the current level has been fully set up; see dochug() */
     mtmp->mstrategy |= STRAT_ARRIVE;
-    mtmp->mstate &= ~MON_MIGRATING;
+    mtmp->mstate &= ~(MON_MIGRATING | MON_LIMBO);
 
     /* make sure mnexto(rloc_to(set_apparxy())) doesn't use stale data */
     mtmp->mux = u.ux, mtmp->muy = u.uy;
