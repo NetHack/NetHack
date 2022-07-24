@@ -1746,7 +1746,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
                                   || hides_under(mtmp->data)
                                   || mtmp->data->mlet == S_EEL)) {
             if (via_warning) {
-                Your("warning senses cause you to take a second %s.",
+                Your("danger sense causes you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
             }
