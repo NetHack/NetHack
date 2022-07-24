@@ -942,6 +942,7 @@ cmap_to_type(int sym)
         typ = TREE;
         break;
     case S_room:
+    case S_darkroom:
         typ = ROOM;
         break;
     case S_corr:

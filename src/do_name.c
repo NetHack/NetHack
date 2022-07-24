@@ -926,13 +926,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
 
                 (void) memset((genericptr_t) matching, 0, sizeof matching);
-                for (sidx = 1; sidx < MAXPCHARS; sidx++) { /* [0] left as 0 */
-                    if (IS_DOOR(sidx) || IS_WALL(sidx)
-                        || sidx == SDOOR || sidx == SCORR
-                        || glyph_to_cmap(k) == S_room
-                        || glyph_to_cmap(k) == S_darkroom
-                        || glyph_to_cmap(k) == S_corr
-                        || glyph_to_cmap(k) == S_litcorr)
+                for (sidx = 0; sidx < MAXPCHARS; sidx++) {
+                    /* don't even try to match some terrain: walls, room... */
+                    if (is_cmap_wall(sidx) || is_cmap_room(sidx)
+                        || is_cmap_corr(sidx) || is_cmap_door(sidx)
+                        || sidx == S_ndoor)
                         continue;
                     if (c == defsyms[sidx].sym
                         || c == (int) g.showsyms[sidx]
