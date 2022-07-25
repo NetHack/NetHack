@@ -19,6 +19,7 @@ static boolean domove_bump_mon(struct monst *, int);
 static boolean domove_attackmon_at(struct monst *, coordxy, coordxy,
                                    boolean *);
 static boolean domove_fight_ironbars(coordxy, coordxy);
+static boolean domove_fight_web(coordxy, coordxy);
 static boolean domove_swap_with_pet(struct monst *, coordxy, coordxy);
 static boolean domove_fight_empty(coordxy, coordxy);
 static boolean air_turbulence(void);
@@ -1738,6 +1739,35 @@ domove_fight_ironbars(coordxy x, coordxy y)
     return FALSE;
 }
 
+/* force-fight a spider web with your weapon */
+static boolean
+domove_fight_web(coordxy x, coordxy y)
+{
+    struct trap *trap = t_at(x, y);
+
+    if (g.context.forcefight && trap && trap->ttyp == WEB
+        && trap->tseen && uwep) {
+        if (uwep->oartifact == ART_STING) {
+            /* guaranteed success */
+            pline("%s cuts through the web!",
+                  bare_artifactname(uwep));
+        } else if (!is_blade(uwep)) {
+            You_cant("cut a web with %s!", an(xname(uwep)));
+            return TRUE;
+        } else if (rn2(20) > ACURR(A_STR) + uwep->spe) {
+            /* TODO: add failures, maybe make an occupation? */
+            You("hack ineffectually at some of the strands.");
+            return TRUE;
+        } else {
+            You("cut through the web.");
+        }
+        deltrap(trap);
+        newsym(x, y);
+        return TRUE;
+    }
+    return FALSE;
+}
+
 /* maybe swap places with a pet? returns TRUE if swapped places */
 static boolean
 domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
@@ -2349,6 +2379,9 @@ domove_core(void)
     }
 
     if (domove_fight_ironbars(x, y))
+        return;
+
+    if (domove_fight_web(x, y))
         return;
 
     if (domove_fight_empty(x, y))
