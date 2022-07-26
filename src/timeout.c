@@ -1240,12 +1240,18 @@ burn_object(anything *arg, long timeout)
                 obj->spe = 0; /* no more candles */
                 obj->owt = weight(obj);
             } else if (Is_candle(obj) || obj->otyp == POT_OIL) {
+                struct monst *mtmp = NULL;
+
+                if (obj->where == OBJ_FLOOR)
+                    mtmp = m_at(obj->ox, obj->oy);
                 /* get rid of candles and burning oil potions;
                    we know this object isn't carried by hero,
                    nor is it migrating */
                 obj_extract_self(obj);
                 obfree(obj, (struct obj *) 0);
                 obj = (struct obj *) 0;
+                if (mtmp)
+                    maybe_unhide_at(mtmp->mx, mtmp->my);
             }
 
         } else {
