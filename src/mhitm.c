@@ -947,7 +947,11 @@ mdamagem(struct monst *magr, struct monst *mdef,
 
     mhitm_adtyping(magr, mattk, mdef, &mhm);
 
-    (void) mhitm_knockback(magr, mdef, mattk, &mhm.hitflags, (MON_WEP(magr) != 0));
+    if (mhitm_knockback(magr, mdef, mattk, &mhm.hitflags,
+                        (MON_WEP(magr) != 0))
+        && ((mhm.hitflags & MM_DEF_DIED) != 0
+            || (mdef->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO)) != 0))
+        return mhm.hitflags;
 
     if (mhm.done)
         return mhm.hitflags;
