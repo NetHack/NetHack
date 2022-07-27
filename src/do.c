@@ -1299,7 +1299,7 @@ void
 goto_level(
     d_level *newlevel, /* destination */
     boolean at_stairs, /* True if arriving via stairs/ladder */
-    boolean falling,   /* when fallling to level, objects might tag along */
+    boolean falling,   /* when falling to level, objects might tag along */
     boolean portal)    /* True if arriving via magic portal */
 {
     int l_idx, save_mode;
