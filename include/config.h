@@ -576,8 +576,10 @@ typedef unsigned char uchar;
 
 /* #define WINCHAIN */              /* stacked window systems */
 
-/* #define DEBUG_MIGRATING_MONS */  /* add a wizard-mode command to help debug
-                                       migrating monsters */
+#if defined(DEBUG) && !defined(DEBUG_MIGRATING_MONS)
+#define DEBUG_MIGRATING_MONS  /* add a wizard-mode command to help debug
+                                 migrating monsters */
+#endif
 
 /* SCORE_ON_BOTL is neither experimental nor inadequately tested,
    but doesn't seem to fit in any other section... */
