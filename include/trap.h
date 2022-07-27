@@ -18,7 +18,7 @@ union vlaunchinfo {
 struct trap {
     struct trap *ntrap;
     coordxy tx, ty;
-    d_level dst; /* destination for portals */
+    d_level dst; /* destination for portals/holes/trapdoors */
     coord launch;
     Bitfield(ttyp, 5);
     Bitfield(tseen, 1);

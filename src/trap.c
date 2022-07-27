@@ -8,6 +8,8 @@
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
 static void mk_trap_statue(coordxy, coordxy);
+static int dng_bottom(void);
+static void hole_destination(d_level *);
 static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
                                             struct obj *);
 static boolean mu_maybe_destroy_web(struct monst *, boolean, struct trap *);
@@ -373,6 +375,37 @@ mk_trap_statue(coordxy x, coordxy y)
     mongone(mtmp);
 }
 
+/* find "bottom" level of current dungeon, stopping at quest locate */
+static int
+dng_bottom(void)
+{
+    int bottom = dunlevs_in_dungeon(&u.uz);
+
+    /* when in the upper half of the quest, don't fall past the
+       middle "quest locate" level if hero hasn't been there yet */
+    if (In_quest(&u.uz)) {
+        int qlocate_depth = qlocate_level.dlevel;
+
+        /* deepest reached < qlocate implies current < qlocate */
+        if (dunlev_reached(&u.uz) < qlocate_depth)
+            bottom = qlocate_depth; /* early cut-off */
+    }
+    return bottom;
+}
+
+/* destination dlevel for holes or trapdoors */
+static void
+hole_destination(d_level *dst)
+{
+    int bottom = dng_bottom();
+
+    dst->dnum = u.uz.dnum;
+    dst->dlevel = dunlev(&u.uz);
+    do {
+        dst->dlevel++;
+    } while (!rn2(4) && dst->dlevel < bottom);
+}
+
 struct trap *
 maketrap(coordxy x, coordxy y, int typ)
 {
@@ -435,6 +468,8 @@ maketrap(coordxy x, coordxy y, int typ)
         /*FALLTHRU*/
     case HOLE:
     case TRAPDOOR:
+        if (is_hole(typ))
+            hole_destination(&(ttmp->dst));
         if (*in_rooms(x, y, SHOPBASE)
             && (is_hole(typ) || IS_DOOR(lev->typ) || IS_WALL(lev->typ)))
             add_damage(x, y, /* schedule repair */
@@ -481,7 +516,7 @@ fall_through(
     d_level dtmp;
     char msgbuf[BUFSZ];
     const char *dont_fall = 0;
-    int newlevel, bottom;
+    int newlevel, bottom = dng_bottom();
     struct trap *t = (struct trap *) 0;
 
     /* we'll fall even while levitating in Sokoban; otherwise, if we
@@ -489,20 +524,8 @@ fall_through(
     if (Blind && Levitation && !Sokoban)
         return;
 
-    bottom = dunlevs_in_dungeon(&u.uz);
-    /* when in the upper half of the quest, don't fall past the
-       middle "quest locate" level if hero hasn't been there yet */
-    if (In_quest(&u.uz)) {
-        int qlocate_depth = qlocate_level.dlevel;
-
-        /* deepest reached < qlocate implies current < qlocate */
-        if (dunlev_reached(&u.uz) < qlocate_depth)
-            bottom = qlocate_depth; /* early cut-off */
-    }
     newlevel = dunlev(&u.uz); /* current level */
-    do {
-        newlevel++;
-    } while (!rn2(4) && newlevel < bottom);
+    newlevel++;
 
     if (td) {
         t = t_at(u.ux, u.uy);
@@ -555,8 +578,14 @@ fall_through(
     } else {
         int dist = newlevel - dunlev(&u.uz);
 
-        dtmp.dnum = u.uz.dnum;
-        dtmp.dlevel = newlevel;
+        if (t) {
+            dtmp.dnum = t->dst.dnum;
+            dtmp.dlevel = t->dst.dlevel;
+            dist = dtmp.dlevel - dunlev(&u.uz);
+        } else {
+            dtmp.dnum = u.uz.dnum;
+            dtmp.dlevel = newlevel;
+        }
         if (dist > 1)
             You("fall down a %s%sshaft!", dist > 3 ? "very " : "",
                 dist > 2 ? "deep " : "");

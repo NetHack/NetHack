@@ -978,6 +978,7 @@ wielding Giantslayer prevents knockback from larger monsters
 scared hostile monster which cannot move away will attack
 prevent a fog cloud that has engulfed the hero from moving under closed doors
 allow cutting a known spider web with wielded weapon by force-fighting the web
+holes and trapdoors have a fixed exit level
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
