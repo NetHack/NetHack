@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1657954617 2022/07/16 06:56:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.593 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1658993634 2022/07/28 07:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.597 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3732,26 +3732,125 @@ sanity_check(void)
 }
 
 #ifdef DEBUG_MIGRATING_MONS
+static void list_migrating_mons(d_level *);
+
+/* called by #migratemons; might turn it into separate wizard mode command */
+static void
+list_migrating_mons(
+    d_level *nextlevl) /* default destination for wiz_migrate_mons() */
+{
+    winid win = WIN_ERR;
+    boolean showit = FALSE;
+    int n, xyloc;
+    coordxy x, y;
+    char c, prmpt[10], xtra[10], buf[BUFSZ];
+    struct monst *mtmp;
+    int here = 0, nxtlv = 0, other = 0;
+
+    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
+        if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel)
+            ++here;
+        else if (mtmp->mux == nextlevl->dnum && mtmp->muy == nextlevl->dlevel)
+            ++nxtlv;
+        else
+            ++other;
+    }
+    if (here + nxtlv + other == 0) {
+        pline("No monsters currently migrating.");
+    } else {
+        pline(
+      "%d mon%s pending for current level, %d for next level, %d for others.",
+              here, plur(here), nxtlv, other);
+        prmpt[0] = xtra[0] = '\0';
+        (void) strkitten(here ? prmpt : xtra, 'c');
+        (void) strkitten(nxtlv ? prmpt : xtra, 'n');
+        (void) strkitten(other ? prmpt : xtra, 'o');
+        Strcat(prmpt, "a q");
+        if (*xtra)
+            Sprintf(eos(prmpt), "%c%s", '\033', xtra);
+        c = yn_function("List which?", prmpt, 'q');
+        n = (c == 'c') ? here
+            : (c == 'n') ? nxtlv
+              : (c == 'o') ? other
+                : (c == 'a') ? here + nxtlv + other
+                  : 0;
+        if (n > 0) {
+            win = create_nhwindow(NHW_TEXT);
+            switch (c) {
+            case 'c':
+            case 'n':
+            case 'o':
+                Sprintf(buf, "Monster%s migrating to %s:", plur(n),
+                        (c == 'c') ? "current level"
+                        : (c == 'n') ? "next level"
+                          : "'other' levels");
+                break;
+            default:
+                Strcpy(buf, "All migrating monsters:");
+                break;
+            }
+            putstr(win, 0, buf);
+            putstr(win, 0, "");
+            /* TODO? make multiple passes in order to show mons in
+               destination order */
+            for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
+                if (c == 'a')
+                    showit = TRUE;
+                else if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel)
+                    showit = (c == 'c');
+                else if (mtmp->mux == nextlevl->dnum
+                         && mtmp->muy == nextlevl->dlevel)
+                    showit = (c = 'n');
+                else
+                    showit = (c == 'o');
+
+                if (showit) {
+                    Sprintf(buf, "  %s", minimal_monnam(mtmp, FALSE));
+                    /* minimal_monnam() appends map coordinates; strip that */
+                    (void) strsubst(buf, " <0,0>", "");
+                    if (c == 'o' || c == 'a')
+                        Sprintf(eos(buf), " to %d:%d", mtmp->mux, mtmp->muy);
+                    xyloc = mtmp->mtrack[0].x; /* (for legibility) */
+                    if (xyloc == MIGR_EXACT_XY) {
+                        x = mtmp->mtrack[1].x;
+                        y = mtmp->mtrack[1].y;
+                        Sprintf(eos(buf), " at <%d,%d>", (int) x, (int) y);
+                    }
+                    putstr(win, 0, buf);
+                }
+            }
+            display_nhwindow(win, FALSE);
+            destroy_nhwindow(win);
+        } else if (c != 'q') {
+            pline("None.");
+        }
+
+    }
+}
+
 static int
 wiz_migrate_mons(void)
 {
-    int mcount = 0;
+    int mcount;
     char inbuf[BUFSZ] = DUMMY;
     struct permonst *ptr;
     struct monst *mtmp;
     d_level tolevel;
 
-    getlin("How many random monsters to migrate? [0]", inbuf);
+    if (Is_stronghold(&u.uz))
+        assign_level(&tolevel, &valley_level);
+    else
+        get_level(&tolevel, depth(&u.uz) + 1);
+
+    list_migrating_mons(&tolevel);
+
+    getlin("How many random monsters to migrate to next level? [0]", inbuf);
     if (*inbuf == '\033')
         return ECMD_OK;
     mcount = atoi(inbuf);
     if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz))
         return ECMD_OK;
     while (mcount > 0) {
-        if (Is_stronghold(&u.uz))
-            assign_level(&tolevel, &valley_level);
-        else
-            get_level(&tolevel, depth(&u.uz) + 1);
         ptr = rndmonst();
         mtmp = makemon(ptr, 0, 0, MM_NOMSG);
         if (mtmp)
@@ -3761,7 +3860,7 @@ wiz_migrate_mons(void)
     }
     return ECMD_OK;
 }
-#endif
+#endif /* DEBUG_MIGRATING_MONS */
 
 static struct {
     int nhkf;
