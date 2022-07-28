@@ -1978,7 +1978,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return ECMD_CANCEL; /* user pressed ESC */
     if (!is_valid_jump_pos(cc.x, cc.y, magic, TRUE)) {
-        return ECMD_OK;
+        return ECMD_FAIL;
     } else {
         coord uc;
         int range, temp;
@@ -3288,19 +3288,19 @@ use_pole(struct obj *obj, boolean autohit)
     glyph = glyph_at(cc.x, cc.y);
     if (distu(cc.x, cc.y) > max_range) {
         pline("Too far!");
-        return res;
+        return ECMD_FAIL;
     } else if (distu(cc.x, cc.y) < min_range) {
         if (autohit && u_at(cc.x, cc.y))
             pline("Don't know what to hit.");
         else
             pline("Too close!");
-        return res;
+        return ECMD_FAIL;
     } else if (!cansee(cc.x, cc.y) && !glyph_is_poleable(glyph)) {
         You(cant_see_spot);
-        return res;
+        return ECMD_FAIL;
     } else if (!couldsee(cc.x, cc.y)) { /* Eyes of the Overworld */
         You(cant_reach);
-        return res;
+        return ECMD_FAIL;
     }
 
     g.context.polearm.hitmon = (struct monst *) 0;
