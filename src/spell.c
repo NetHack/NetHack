@@ -42,6 +42,7 @@ static int throwspell(void);
 static void cast_protection(void);
 static void spell_backfire(int);
 static const char *spelltypemnemonic(int);
+static boolean can_center_spell_location(coordxy, coordxy);
 static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
 
 /* The roles[] table lists the role-specific values for tuning
@@ -1256,6 +1257,15 @@ spell_aim_step(genericptr_t arg UNUSED, coordxy x, coordxy y)
     return TRUE;
 }
 
+/* not quite the same as throwspell limits, but close enough */
+static boolean
+can_center_spell_location(coordxy x, coordxy y)
+{
+    if (distmin(u.ux, u.uy, x, y) > 10)
+        return FALSE;
+    return (isok(x, y) && cansee(x, y) && !(IS_STWALL(levl[x][y].typ)));
+}
+
 /* Choose location where spell takes effect. */
 static int
 throwspell(void)
@@ -1274,6 +1284,7 @@ throwspell(void)
     pline("Where do you want to cast the spell?");
     cc.x = u.ux;
     cc.y = u.uy;
+    getpos_sethilite(NULL, can_center_spell_location);
     if (getpos(&cc, TRUE, "the desired position") < 0)
         return 0; /* user pressed ESC */
     clear_nhwindow(WIN_MESSAGE); /* discard any autodescribe feedback */
