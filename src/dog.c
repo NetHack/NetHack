@@ -304,7 +304,8 @@ losedogs(void)
 
     /* place pets and/or any other monsters who accompany hero;
        any that fail to arrive (level may be full) will be moved
-       to migrating_mons and immediately retry (and fail again) below */
+       first to failed_arrivals, then to migrating_mons scheduled
+       to arrive back on this level if hero leaves and returns */
     while ((mtmp = g.mydogs) != 0) {
         g.mydogs = mtmp->nmon;
         mon_arrive(mtmp, With_you);
@@ -336,7 +337,7 @@ losedogs(void)
            because m_into_limbo() expects it to be there */
         mtmp->nmon = fmon;
         fmon = mtmp;
-        /* set this monster to migrate back this level if hero leaves
+        /* set this monster to migrate back to this level if hero leaves
            and then returns */
         m_into_limbo(mtmp);
     }
