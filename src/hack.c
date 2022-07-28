@@ -2149,18 +2149,16 @@ avoid_moving_on_liquid(
 static boolean
 avoid_running_into_trap_or_liquid(coordxy x, coordxy y)
 {
+    boolean would_stop = (g.context.run >= 2);
     if (!g.context.run)
         return FALSE;
 
-    if (avoid_moving_on_trap(x,y, TRUE)) {
+    if (avoid_moving_on_trap(x,y, would_stop)
+        || (Blind && avoid_moving_on_liquid(x,y, would_stop))) {
         nomul(0);
-        g.context.move = 0;
-        return TRUE;
-    }
-    if (Blind && avoid_moving_on_liquid(x,y, TRUE)) {
-        nomul(0);
-        g.context.move = 0;
-        return TRUE;
+        if (would_stop)
+            g.context.move = 0;
+        return would_stop;
     }
     return FALSE;
 }
