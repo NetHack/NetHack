@@ -5435,17 +5435,21 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 static void
 nohandglow(struct monst *mon)
 {
-    char *hands = makeplural(body_part(HAND));
+    char *hands;
+    boolean altfeedback;
 
     if (!u.umconf || mon->mconf)
         return;
+
+    hands = makeplural(body_part(HAND));
+    altfeedback = (Blind || Invisible); /* Invisible == Invis && !See_invis */
     if (u.umconf == 1) {
-        if (Blind)
+        if (altfeedback)
             Your("%s stop tingling.", hands);
         else
             Your("%s stop glowing %s.", hands, hcolor(NH_RED));
     } else {
-        if (Blind)
+        if (altfeedback)
             pline_The("tingling in your %s lessens.", hands);
         else
             Your("%s no longer glow so brightly %s.", hands, hcolor(NH_RED));

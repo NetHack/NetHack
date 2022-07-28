@@ -1273,9 +1273,10 @@ static void
 seffect_confuse_monster(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
-    boolean sblessed = sobj->blessed;
-    boolean scursed = sobj->cursed;
-    boolean confused = (Confusion != 0);
+    boolean sblessed = sobj->blessed,
+            scursed = sobj->cursed,
+            confused = (Confusion != 0),
+            altfeedback = (Blind || Invisible);
 
     if (g.youmonst.data->mlet != S_HUMAN || scursed) {
         if (!HConfusion)
@@ -1284,36 +1285,38 @@ seffect_confuse_monster(struct obj **sobjp)
     } else if (confused) {
         if (!sblessed) {
             Your("%s begin to %s%s.", makeplural(body_part(HAND)),
-                 Blind ? "tingle" : "glow ",
-                 Blind ? "" : hcolor(NH_PURPLE));
+                 altfeedback ? "tingle" : "glow ",
+                 altfeedback ? "" : hcolor(NH_PURPLE));
             make_confused(HConfusion + rnd(100), FALSE);
         } else {
             pline("A %s%s surrounds your %s.",
-                  Blind ? "" : hcolor(NH_RED),
-                  Blind ? "faint buzz" : " glow", body_part(HEAD));
+                  altfeedback ? "" : hcolor(NH_RED),
+                  altfeedback ? "faint buzz" : " glow", body_part(HEAD));
             make_confused(0L, TRUE);
         }
     } else {
+        int incr = 0;
+
         if (!sblessed) {
             Your("%s%s %s%s.", makeplural(body_part(HAND)),
-                 Blind ? "" : " begin to glow",
-                 Blind ? (const char *) "tingle" : hcolor(NH_RED),
+                 altfeedback ? "" : " begin to glow",
+                 altfeedback ? (const char *) "tingle" : hcolor(NH_RED),
                  u.umconf ? " even more" : "");
-            u.umconf++;
+            incr = rnd(2);
         } else {
-            if (Blind)
+            if (altfeedback)
                 Your("%s tingle %s sharply.", makeplural(body_part(HAND)),
                      u.umconf ? "even more" : "very");
             else
-                Your("%s glow a%s brilliant %s.",
+                Your("%s glow %s brilliant %s.",
                      makeplural(body_part(HAND)),
-                     u.umconf ? "n even more" : "", hcolor(NH_RED));
-            /* after a while, repeated uses become less effective */
-            if (u.umconf >= 40)
-                u.umconf++;
-            else
-                u.umconf += rn1(8, 2);
+                     u.umconf ? "an even more" : "a", hcolor(NH_RED));
+            incr = rn1(8, 2);
         }
+        /* after a while, repeated uses become less effective */
+        if (u.umconf >= 40)
+            incr = 1;
+        u.umconf += (unsigned) incr;
     }
 }
 
