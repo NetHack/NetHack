@@ -3361,6 +3361,14 @@ lookaround(void)
             if (x == u.ux - u.dx && y == u.uy - u.dy)
                 continue;
 
+            /* stop for traps, sometimes */
+            if (avoid_moving_on_trap(x, y, (infront && g.context.run > 1))) {
+                if (g.context.run == 1)
+                    goto bcorr; /* if you must */
+                if (infront)
+                    goto stop;
+            }
+
             /* more uninteresting terrain */
             if (IS_ROCK(levl[x][y].typ) || levl[x][y].typ == ROOM
                 || IS_AIR(levl[x][y].typ) || levl[x][y].typ == ICE) {
@@ -3405,12 +3413,6 @@ lookaround(void)
                     }
                     corrct++;
                 }
-                continue;
-            } else if (avoid_moving_on_trap(x, y, infront)) {
-                if (g.context.run == 1)
-                    goto bcorr; /* if you must */
-                if (infront)
-                    goto stop;
                 continue;
             } else if (is_pool_or_lava(x, y)) {
                 if (infront && avoid_moving_on_liquid(x, y, TRUE))
