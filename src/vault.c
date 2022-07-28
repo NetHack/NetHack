@@ -215,10 +215,12 @@ findgd(void)
     for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0;
          mprev = &mtmp->nmon) {
         if (mtmp->isgd && on_level(&EGD(mtmp)->gdlevel, &u.uz)) {
-            /* take out of migrating_mons and place at <0,0> */
+            /* take out of migrating_mons and place at <0,0>;
+               simplified mon_arrive(); avoid that because it would
+               send mtmp into limbo if no regular map spot is available */
             *mprev = mtmp->nmon;
-            /* simplified mon_arrive(); avoid that because it would send
-               mtmp into limbo if no regular map spot is available */
+            mtmp->nmon = fmon;
+            fmon = mtmp;
             mon_track_clear(mtmp);
             mtmp->mux = u.ux, mtmp->muy = u.uy;
             mtmp->mx = mtmp->my = 0; /* not on map (note: mx is already 0) */

@@ -1511,9 +1511,10 @@ mbirth_limit(int mndx)
 /* used for wand/scroll/spell of create monster */
 /* returns TRUE iff you know monsters have been created */
 boolean
-create_critters(int cnt,
-                struct permonst *mptr, /* usually null; used for confused reading */
-                boolean neverask)
+create_critters(
+    int cnt,
+    struct permonst *mptr, /* usually null; used for confused reading */
+    boolean neverask)
 {
     coord c;
     coordxy x, y;

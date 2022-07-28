@@ -11,10 +11,11 @@ static int mon_leave(struct monst *);
 static boolean keep_mon_accessible(struct monst *);
 
 enum arrival {
-    Before_you = 0, /* monsters kept on migrating_mons for accessibility;
-                     * they haven't actually left their level */
-    With_you   = 1, /* pets and level followers */
-    After_you  = 2  /* regular migrating monsters */
+    Before_you =  0, /* monsters kept on migrating_mons for accessibility;
+                      * they haven't actually left their level */
+    With_you   =  1, /* pets and level followers */
+    After_you  =  2, /* regular migrating monsters */
+    Wiz_arrive = -1  /* resurrect(wizard.c) */
 };
 
 void
@@ -224,12 +225,16 @@ update_mlstmv(void)
     iter_mons(set_mon_lastmove);
 }
 
+/* note: always reset when used so doesn't need to be part of struct 'g' */
+static struct monst *failed_arrivals = 0;
+
 void
 losedogs(void)
 {
     register struct monst *mtmp, **mprev;
     int dismissKops = 0, xyloc;
 
+    failed_arrivals = 0;
     /*
      * First, scan g.migrating_mons for shopkeepers who want to dismiss Kops,
      * and scan g.mydogs for shopkeepers who want to retain kops.
@@ -279,15 +284,17 @@ losedogs(void)
         make_happy_shoppers(TRUE);
 
     /* put monsters who went onto migrating_mons in order to be accessible
-       when other levels are active back to the positions on this level;
+       when other levels are active back to their positions on this level;
        they're handled before mydogs so that monsters accompanying the
-       hero can't steal the spot that belongs to them
-       [note: mon_arrive() might fail and put mtmp back at the head of
-       migrating_mons; that doesn't interfere with our list traversal] */
+       hero can't steal the spot that belongs to them; these migraters
+       should always be able to arrive because they were present on the
+       level at the time the hero left [if they can't arrive for some
+       reason, mon_arrive() will put them on the 'failed_arrivals' list] */
     for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
         xyloc = mtmp->mtrack[0].x; /* (for legibility) */
         if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel
             && xyloc == MIGR_EXACT_XY) {
+            /* remove mtmp from migrating_mons */
             *mprev = mtmp->nmon;
             mon_arrive(mtmp, Before_you);
         } else {
@@ -303,18 +310,35 @@ losedogs(void)
         mon_arrive(mtmp, With_you);
     }
 
-    /* time for migrating monsters to arrive;
-       monsters who belong on this level but fail to arrive get put back
-       onto the list (at head) but that doesn't interfere with traversal */
+    /* time for migrating monsters to arrive; monsters who belong on
+       this level but fail to arrive get put on the failed_arrivals list
+       temporarily [by mon_arrive()], then back onto the migrating_mons
+       list below */
     for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
         xyloc = mtmp->mtrack[0].x;
         if (mtmp->mux == u.uz.dnum && mtmp->muy == u.uz.dlevel
             && xyloc != MIGR_EXACT_XY) {
+            /* remove mtmp from migrating_mons */
             *mprev = mtmp->nmon;
+            /* note: if there's no room, it ends up on failed_arrivals list */
             mon_arrive(mtmp, After_you);
         } else {
             mprev = &mtmp->nmon;
         }
+    }
+
+    /* put any monsters who couldn't arrive back on migrating_mons,
+       clearing out the temporary 'failed_arrivals' list in the process */
+    while ((mtmp = failed_arrivals) != 0) {
+        failed_arrivals = mtmp->nmon;
+        /* mon_arrive() put mtmp onto fmon, but if there wasn't room to
+           arrive, relmon() was used to take it off again; put it back now
+           because m_into_limbo() expects it to be there */
+        mtmp->nmon = fmon;
+        fmon = mtmp;
+        /* set this monster to migrate back this level if hero leaves
+           and then returns */
+        m_into_limbo(mtmp);
     }
 }
 
@@ -497,8 +521,13 @@ mon_arrive(struct monst *mtmp, int when)
     else
         failed_to_place = !rloc(mtmp, RLOC_NOMSG);
 
-    if (failed_to_place)
-        m_into_limbo(mtmp); /* try again next time hero comes to this level */
+    if (failed_to_place) {
+        if (when != Wiz_arrive)
+            /* losedogs() will deal with this */
+            relmon(mtmp, &failed_arrivals);
+        else
+            m_into_limbo(mtmp);
+    }
 }
 
 /* heal monster for time spent elsewhere */
