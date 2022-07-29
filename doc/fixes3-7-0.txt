@@ -983,6 +983,7 @@ recent changes to losedogs() could result in an infinite loop when migrating
 	monsters try to arrive as hero moves to a different level
 when invisible without see invisible you could see your hands glowing red
 	after reading a scroll of confuse monster and delivering melee hits
+greased saddle makes it impossible to mount the steed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

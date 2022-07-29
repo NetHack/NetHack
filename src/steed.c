@@ -322,6 +322,7 @@ mount_steed(
     }
     if (!force
         && (Confusion || Fumbling || Glib || Wounded_legs || otmp->cursed
+            || otmp->greased
             || (u.ulevel + mtmp->mtame < rnd(MAXULEV / 2 + 5)))) {
         if (Levitation) {
             pline("%s slips away from you.", Monnam(mtmp));
