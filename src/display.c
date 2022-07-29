@@ -1606,6 +1606,16 @@ reglyph_darkroom(void)
         for (y = 0; y < ROWNO; y++) {
             struct rm *lev = &levl[x][y];
 
+            if (!flags.dark_room) {
+                if (lev->glyph == cmap_to_glyph(S_corr)
+                    && lev->waslit)
+                    lev->glyph = cmap_to_glyph(S_litcorr);
+            } else {
+                if (lev->glyph == cmap_to_glyph(S_litcorr)
+                    && !cansee(x, y))
+                    lev->glyph = cmap_to_glyph(S_corr);
+            }
+
             if (!flags.dark_room || !iflags.use_color
                 || Is_rogue_level(&u.uz)) {
                 if (lev->glyph == cmap_to_glyph(S_darkroom))
