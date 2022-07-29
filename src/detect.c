@@ -1981,8 +1981,11 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
             }
         }
     }
+    /* FIXME: dirty hack */
     if (glyph == cmap_to_glyph(S_darkroom))
-        glyph = cmap_to_glyph(S_room); /* FIXME: dirty hack */
+        glyph = cmap_to_glyph(S_room);
+    else if (glyph == cmap_to_glyph(S_litcorr))
+        glyph = cmap_to_glyph(S_corr);
     return glyph;
 }
 
