@@ -1281,8 +1281,9 @@ wiz_kill(void)
                isn't; note that if it triggers other kills, those might
                be referred to as "it" */
             int tame = !!mtmp->mtame, seen = canspotmon(mtmp),
-                flgs = SUPPRESS_IT | SUPPRESS_HALLUCINATION
-                       | ((tame && has_mgivenname(mtmp)) ? SUPPRESS_SADDLE : 0),
+                flgs = (SUPPRESS_IT | SUPPRESS_HALLUCINATION
+                        | ((tame && has_mgivenname(mtmp)) ? SUPPRESS_SADDLE
+                           : 0)),
                 articl = tame ? ARTICLE_YOUR : seen ? ARTICLE_THE : ARTICLE_A;
             const char *adjs = tame ? (!seen ? "poor, unseen" : "poor")
                                     : (!seen ? "unseen" : (const char *) 0);
@@ -1307,6 +1308,7 @@ wiz_kill(void)
             }
         } else {
             There("is no monster there.");
+            (void) unmap_invisible(cc.x, cc.y);
             break;
         }
     }
