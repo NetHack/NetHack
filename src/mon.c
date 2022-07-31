@@ -1371,7 +1371,8 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
 /* Monster eats a corpse off the ground.
  * Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died */
 int
-meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters */
+meatcorpse(
+    struct monst *mtmp) /* for purple worms and other voracious monsters */
 {
     struct obj *otmp;
     struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
@@ -1458,14 +1459,45 @@ meatcorpse(struct monst* mtmp) /* for purple worms and other voracious monsters 
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* Maybe give an intrinsic to a monster from eating a corpse that confers it. */
+/* Maybe give an intrinsic to monster from eating corpse that confers it. */
 void
-mon_givit(struct monst* mtmp, struct permonst* ptr)
+mon_givit(struct monst *mtmp, struct permonst *ptr)
 {
     int prop = corpse_intrinsic(ptr);
     boolean vis = canseemon(mtmp);
-    const char* msg = NULL;
+    const char *msg = NULL;
     unsigned short intrinsic = 0; /* MR_* constant */
+
+    if (ptr == &mons[PM_STALKER]) {
+        /*
+         * Invisible stalker isn't flagged as conferring invisibility
+         * so prop is 0.  For hero, eating a stalker corpse confers
+         * temporary invisibility if hero is visible.  When already
+         * invisible, if confers permanent invisibilty and also
+         * permanent see invisible.  For monsters, only permanent
+         * invisibility is possible; temporary invisibility and see
+         * invisible aren't implemented for them.
+         *
+         * A monster being invisible gains no benefit against other
+         * monsters, and an invisible pet when hero can't see invisible
+         * is a nuisance at best, so this is probably detrimental.
+         * Players will just have to live with it if they want to be
+         * able to have pets gain intrinsics from eating corpses.
+         */
+        if (!mtmp->perminvis || mtmp->invis_blkd) {
+            char mtmpbuf[BUFSZ];
+
+            Strcpy(mtmpbuf, Monnam(mtmp));
+            mon_set_minvis(mtmp);
+            if (vis)
+                pline("%s %s.", mtmpbuf,
+                      !canspotmon(mtmp) ? "vanishes"
+                      : mtmp->invis_blkd ? "seems to flicker"
+                        : "becomes invisible");
+        }
+        mtmp->mstun = 1; /* no timeout but will eventually wear off */
+        return;
+    }
 
     if (prop == 0)
         return; /* no intrinsic from this corpse */
@@ -1474,8 +1506,8 @@ mon_givit(struct monst* mtmp, struct permonst* ptr)
         return; /* failed die roll */
 
     /* Pets don't have all the fields that the hero does, so they can't get all
-     * the same intrinsics. If it happens to choose strength gain or teleport
-     * control or whatever, ignore it. */
+       the same intrinsics. If it happens to choose strength gain or teleport
+       control or whatever, ignore it. */
     switch (prop) {
     case FIRE_RES:
         intrinsic = MR_FIRE;
@@ -1506,9 +1538,9 @@ mon_givit(struct monst* mtmp, struct permonst* ptr)
     }
 
     /* Don't give message if it already had this property intrinsically, but
-     * still do grant the intrinsic if it only had it from mresists.
-     * Do print the message if it only had this property extrinsically, which is
-     * why mon_resistancebits isn't used here. */
+       still do grant the intrinsic if it only had it from mresists.
+       Do print the message if it only had this property extrinsically, which
+       is why mon_resistancebits isn't used here. */
     if ((mtmp->data->mresists | mtmp->mintrinsics) & intrinsic)
         msg = (const char *) 0;
 
