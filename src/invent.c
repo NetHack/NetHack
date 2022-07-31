@@ -1334,17 +1334,6 @@ currency(long amount)
     return res;
 }
 
-boolean
-have_lizard(void)
-{
-    register struct obj *otmp;
-
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == CORPSE && otmp->corpsenm == PM_LIZARD)
-            return  TRUE;
-    return FALSE;
-}
-
 struct obj *
 u_carried_gloves(void) {
     struct obj *otmp, *gloves = (struct obj *) 0;

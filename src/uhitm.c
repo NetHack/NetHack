@@ -3607,8 +3607,9 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_ston(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_ston(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -3623,10 +3624,31 @@ mhitm_ad_ston(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 if (!Deaf)
                     You_hear("a cough from %s!", mon_nam(magr));
             } else {
-                if (!Deaf)
+                if (Hallucination && !Blind) {
+                    You_hear("hissing."); /* You_hear() deals with Deaf */
+                    pline("%s appears to be blowing you a kiss...",
+                          Monnam(magr));
+                } else if (!Deaf) {
                     You_hear("%s hissing!", s_suffix(mon_nam(magr)));
-                if (!rn2(10)
-                    || (flags.moonphase == NEW_MOON && !have_lizard())) {
+                } else if (!Blind) {
+                    pline("%s seems to grimace.", Monnam(magr));
+                }
+                /*
+                 * 3.7:  New moon is no longer overridden by carrying a
+                 * lizard corpse.  Having the moon's impact on terrestrial
+                 * activity be affected by carrying a dead critter felt
+                 * silly.
+                 *
+                 * That behavior dated to when there were no corpse objects
+                 * yet; "dead lizard" was a distinct item.  With a lizard
+                 * corpse, hero can eat it to survive petrification and
+                 * probably retain a partly eaten corpse for future use.
+                 *
+                 * Maintaining foodless conduct during a new moon might
+                 * become a little harder.  Clearing out cockatrice nests
+                 * could become quite a bit harder.
+                 */
+                if (!rn2(10) || flags.moonphase == NEW_MOON) {
                     if (do_stone_u(magr)) {
                         mhm->hitflags = MM_HIT;
                         mhm->done = TRUE;

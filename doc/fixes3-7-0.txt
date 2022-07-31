@@ -986,6 +986,7 @@ when invisible without see invisible you could see your hands glowing red
 greased saddle makes it impossible to mount the steed
 if an item-using monster zaps a wand of digging downward on a level that
 	doesn't allow holes but does allow pits, create a pit and trigger it
+no longer override the effect of a new moon by simply carring a lizard corpse
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
