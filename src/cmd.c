@@ -385,8 +385,10 @@ pushch(char ch)
 {
     if (!ch)
         g.phead = g.ptail = 0;
-    if (g.phead < BSIZE)
-        g.pushq[g.phead++] = ch;
+    if (g.phead < BSIZE) {
+        g.pushq[g.phead] = ch;
+        g.phead++;
+    }
     return;
 }
 
