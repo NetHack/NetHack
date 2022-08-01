@@ -435,14 +435,15 @@ explode(
                     pline("%s is caught in the %s!", Monnam(mtmp), str);
                 }
 
+                if (adtyp == AD_FIRE) {
+                    (void) burnarmor(mtmp);
+                    ignite_items(mtmp->minvent);
+                }
                 idamres += destroy_mitem(mtmp, SCROLL_CLASS, (int) adtyp);
                 idamres += destroy_mitem(mtmp, SPBOOK_CLASS, (int) adtyp);
                 idamnonres += destroy_mitem(mtmp, POTION_CLASS, (int) adtyp);
-                idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
                 idamnonres += destroy_mitem(mtmp, RING_CLASS, (int) adtyp);
-
-                if (adtyp == AD_FIRE)
-                    ignite_items(mtmp->minvent);
+                idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
 
                 if (explmask[i][j] == 1) {
                     golemeffects(mtmp, (int) adtyp, dam + idamres);
