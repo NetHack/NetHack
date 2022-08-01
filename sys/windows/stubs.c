@@ -208,7 +208,7 @@ set_keyhandling_via_option(void)
 }
 
 #ifdef CURSES_GRAPHICS
-struct window_procs curses_procs = {0};
+struct window_procs curses_procs = {WPID(curses)};
 
 int curses_read_attrs(const char *attrs)
 {
