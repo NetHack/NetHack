@@ -903,6 +903,7 @@ static void
 savelife(int how)
 {
     int uhpmin;
+    int givehp = 50 + 10 * (ACURR(A_CON) / 2);
 
     /* life-drain/level-loss to experience level 0 kills without actually
        reducing ulevel below 1, but include this for bulletproofing */
@@ -911,9 +912,9 @@ savelife(int how)
     uhpmin = minuhpmax(10);
     if (u.uhpmax < uhpmin)
         setuhpmax(uhpmin);
-    u.uhp = u.uhpmax;
+    u.uhp = min(u.uhpmax, givehp);
     if (Upolyd) /* Unchanging, or death which bypasses losing hit points */
-        u.mh = u.mhmax;
+        u.mh = min(u.mhmax, givehp);
     if (u.uhunger < 500 || how == CHOKING) {
         init_uhunger();
     }

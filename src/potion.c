@@ -1099,7 +1099,7 @@ static void
 peffect_healing(struct obj *otmp)
 {
     You_feel("better.");
-    healup(d(6 + 2 * bcsign(otmp), 4), !otmp->cursed ? 1 : 0,
+    healup(8 + d(4 + 2 * bcsign(otmp), 4), !otmp->cursed ? 1 : 0,
            !!otmp->blessed, !otmp->cursed);
     exercise(A_CON, TRUE);
 }
@@ -1108,7 +1108,7 @@ static void
 peffect_extra_healing(struct obj *otmp)
 {
     You_feel("much better.");
-    healup(d(6 + 2 * bcsign(otmp), 8),
+    healup(16 + d(4 + 2 * bcsign(otmp), 8),
            otmp->blessed ? 5 : !otmp->cursed ? 2 : 0, !otmp->cursed,
            TRUE);
     (void) make_hallucinated(0L, TRUE, 0L);
