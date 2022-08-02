@@ -54,6 +54,8 @@ OPTIONS=!autopickup
 #OPTIONS=menustyle:traditional
 #OPTIONS=perm_invent
 
+# Set the default boulder symbol to '0'
+OPTIONS=boulder:0
 
 # Highlight menu lines with different colors. You need to define the colors
 # with MENUCOLOR lines.
