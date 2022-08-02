@@ -1357,7 +1357,7 @@ wiz_load_lua(void)
 {
     if (wizard) {
         char buf[BUFSZ];
-        nhl_sandbox_info sbi = {NHL_SB_SAFE, 0, 0, 0};
+        nhl_sandbox_info sbi = {NHL_SB_SAFE | NHL_SB_DEBUGGING, 0, 0, 0};
 
         buf[0] = '\0';
         getlin("Load which lua file?", buf);
