@@ -28,11 +28,11 @@ function meta(key)
 end
 
 function setup1(param)
-   des.terrain(POS.x - 2, POS.y, param);
+   des.terrain(POS.x - 1, POS.y, param);
 end
 
 function setup2(param)
-   des.terrain(POS.x + 15, POS.y, param);
+   des.terrain(POS.x + 16, POS.y, param);
 end
 
 function setup3(param)
@@ -166,7 +166,7 @@ for k, v in pairs(basicmoves) do
    if (v.dx ~= nil) then
       if (not ((x == (u.ux - v.dx)) and (y == (u.uy - v.dy)))) then
          error(string.format("Move: key '%s' gave (%i,%i), should have been (%i,%i)",
-                             key, u.ux, u.uy, u.ux - v.dx, u.uy - v.dy));
+                             key, u.ux, u.uy, x + v.dx, y + v.dy));
          return;
       end
    elseif (v.x ~= nil) then
