@@ -6233,7 +6233,6 @@ initoptions_finish(void)
     if (g.cmdline_rcfile) {
         namesrc = "command line";
         nameval = g.cmdline_rcfile;
-        free((genericptr_t) g.cmdline_rcfile), g.cmdline_rcfile = 0;
         xtraopts = opts;
         if (opts && (*opts == '/' || *opts == '\\' || *opts == '@'))
             xtraopts = 0; /* NETHACKOPTIONS is a file name; ignore it */
@@ -6274,6 +6273,9 @@ initoptions_finish(void)
         (void) parseoptions(xtraopts, TRUE, FALSE);
         config_error_done();
     }
+
+    if (g.cmdline_rcfile)
+        free((genericptr_t) g.cmdline_rcfile), g.cmdline_rcfile = 0;
     /*[end of nethackrc handling]*/
 
     (void) fruitadd(g.pl_fruit, (struct fruit *) 0);

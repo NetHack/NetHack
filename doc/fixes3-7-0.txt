@@ -1331,6 +1331,9 @@ when one monster swallowed/engulfed another and killed it, impossible
 	"placing <mon> over itself ..." could be given by place_monster()
 if the game crashed or the process was killed, recovering a save file ended
 	up with incorrect stairway connections between levels
+when using --nethackrc=file on the command line (currently only implemented
+	for ports that use unixmain.c), options parsing freed the string
+	containing 'file' before using it as the RC file name
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
