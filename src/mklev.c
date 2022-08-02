@@ -733,10 +733,7 @@ clear_level_structures(void)
     stairway_free_all();
     g.made_branch = FALSE;
     clear_regions();
-    g.xstart = 1;
-    g.ystart = 0;
-    g.xsize = COLNO - 1;
-    g.ysize = ROWNO;
+    reset_xystart_size();
     if (g.lev_message) {
         free(g.lev_message);
         g.lev_message = (char *) 0;

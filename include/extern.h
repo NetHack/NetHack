@@ -2538,6 +2538,7 @@ extern void release_sound_mappings(void);
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 extern void create_des_coder(void);
+extern void reset_xystart_size(void);
 extern struct mapfragment *mapfrag_fromstr(char *);
 extern void mapfrag_free(struct mapfragment **);
 extern schar mapfrag_get(struct mapfragment *, int, int);

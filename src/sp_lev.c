@@ -201,6 +201,15 @@ static struct monst *invent_carrying_monster = (struct monst *) 0;
 
 #define TYP_CANNOT_MATCH(typ) ((typ) == MAX_TYPE || (typ) == INVALID_TYPE)
 
+void
+reset_xystart_size(void)
+{
+    g.xstart = 1; /* column [0] is off limits */
+    g.ystart = 0;
+    g.xsize = COLNO - 1; /* 1..COLNO-1 */
+    g.ysize = ROWNO; /* 0..ROWNO-1 */
+}
+
 /* Does typ match with levl[][].typ, considering special types
    MATCH_WALL and MAX_TYPE (aka transparency)? */
 static boolean
@@ -3923,12 +3932,8 @@ spo_endroom(struct sp_coder* coder UNUSED)
         /* Need to ensure xstart/ystart/xsize/ysize have something sensible,
            in case there's some stuff to be created outside the outermost
            room, and there's no MAP. */
-        if (g.xsize <= 1 && g.ysize <= 1) {
-            g.xstart = 1;
-            g.ystart = 0;
-            g.xsize = COLNO - 1;
-            g.ysize = ROWNO;
-        }
+        if (g.xsize <= 1 && g.ysize <= 1)
+            reset_xystart_size();
     }
     update_croom();
 }
@@ -6349,10 +6354,7 @@ TODO: g.coder->croom needs to be updated
             g.ystart = 0;
     }
     if (g.xsize <= 1 && g.ysize <= 1) {
-        g.xstart = 1;
-        g.ystart = 0;
-        g.xsize = COLNO - 1;
-        g.ysize = ROWNO;
+        reset_xystart_size();
     } else {
         coordxy mptyp;
 
@@ -6493,10 +6495,7 @@ sp_level_coder_init(void)
 
     g.level.flags.is_maze_lev = 0;
 
-    g.xstart = 1; /* column [0] is off limits */
-    g.ystart = 0;
-    g.xsize = COLNO - 1; /* 1..COLNO-1 */
-    g.ysize = ROWNO; /* 0..ROWNO-1 */
+    reset_xystart_size();
 
     return coder;
 }
