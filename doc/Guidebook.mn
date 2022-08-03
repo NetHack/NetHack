@@ -417,7 +417,7 @@ Other conditions and modifiers exist, but there isn't enough room to
 display them with the other status fields.
 .pg
 .in -5n .\" outdent this paragraph
-The \f(CR#doattributes\fP command (default key \f(CR\(haX\fP) will show
+The \f(CR#attributes\fP command (default key \f(CR\(haX\fP) will show
 all current status information in unabbreviated format.
 It also shows other information which might be included on the status
 lines if those had more room.
@@ -670,19 +670,21 @@ used with the \(lq#teleport\(rq and \(lq#wizlevelport\(rq commands.
 Prefix:  fight a monster (even if you only guess one is there).
 .lp "g[yuhjklbn]"
 Prefix:  move until something interesting is found.
-.lp "G[yuhjklbn] or <Control>[yuhjklbn]"
+.lp "G[yuhjklbn] or <Control>+[yuhjklbn]"
 Prefix:  similar to \(oqg\(cq, but forking of corridors is not considered
 interesting.
 .lp ""
 Note:  <Control>+<key> means holding the <Control> or <Ctrl> key
-down like <Shift> while typing and releasing <key>, then releasing <Control>.
-Control characters are case-insensitive so \(hax and \(haX are the same.
-.lp "M<direction>"
+down like <Shift> while typing and releasing <key>, then releasing
+<Control>. \(ha<key> is used as shorthand elsewhere in the Guidebook to mean
+the same thing.  Control characters are case-insensitive so \(hax and \(haX are
+the same.
+.lp "M[yuhjklbn]"
 Old versions supported \(oq\f(CRM\fP\(cq as a movement prefix which
 combined the effect of \(oq\f(CRm\fP\(cq with \f(CR<Control>\fP+<direction>.
 That is no longer supported as a prefix but similar effect can be achieved
-by using \f(CRm\fP and \f(CRG\fP+<direction> in combination.
-\f(CRm\fP can also be used in combination with \f(CRg\fP+<direction>,
+by using \(oq\f(CRm\fP\(cq and \f(CRG\fP<direction> in combination.
+\f(CRm\fP can also be used in combination with \f(CRg\fP<direction>,
 \f(CR<Control>\fP+<direction>, or \f(CR<Shift>\fP+<direction>.
 .lp _
 Travel to a map location via a shortest-path algorithm.
@@ -692,8 +694,8 @@ is computed over map locations the hero knows about (e.g. seen or
 previously traversed).
 If there is no known path, a guess is made instead.
 Stops on most of
-the same conditions as the \f(CRG\fP prefix, but without picking up
-objects, so implicitly forces the \f(CRm\fP prefix.
+the same conditions as the \(oq\f(CRG\fP\(cq prefix, but without picking up
+objects, so implicitly forces the \(oq\f(CRm\fP\(cq prefix.
 For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
@@ -733,7 +735,7 @@ Drop several things.
 .lp ""
 In answer to the question
 .lp ""
-\(lqWhat kinds of things do you want to drop? [!%= BUCXaium]\(rq
+\(lqWhat kinds of things do you want to drop? [!%= BUCXPaium]\(rq
 .lp ""
 you should type zero or more object symbols possibly followed by
 \(oqa\(cq and/or \(oqi\(cq and/or \(oqu\(cq and/or \(oqm\(cq.

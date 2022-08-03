@@ -477,7 +477,7 @@ Other conditions and modifiers exist, but there isn't enough room to
 display them with the other status fields.
 \\
 % unindented paragraph
-The {\tt \#doattributes} command (default key {\tt \^{}X} will show
+The {\tt \#attributes} command (default key {\tt \^{}X}) will show
 all current status information in unabbreviated format.
 It also shows other information which might be included on the status
 lines if those had more room.
@@ -771,18 +771,19 @@ Prefix:  Move until something interesting is found.
 Prefix:  Similar to `{\tt g}', but forking of corridors is not considered
 interesting.
 \\
-Note:  <Control>+<key> means holding the <Control> or <Ctrl> key
-down like <Shift> while typing and releasing <key>, then releasing <Control>.
-Control characters are case-insensitive so {\tt \^{}x} and {\tt \^{}X}
-are the same.
+Note:  {\tt <Control>+<key>} means holding the {\tt <Control>} or
+{\tt <Ctrl>} key down like {\tt <Shift>} while typing and releasing
+{\tt <key>}, then releasing {\tt <Control>}.  {\tt \^{}<key>} is used as
+shorthand elsewhere in the Guidebook to mean the same thing.  Control
+characters are case-insensitive so {\tt \^{}x} and {\tt \^{}X} are the same.
 %.lp
-\item[\tb{M<direction>}]
+\item[\tb{M[yuhjklbn]}]
 Old versions supported `{\tt M}' as a movement prefix which
-combined the effect of `{\tt m}' with {\tt <Control>}+<direction>.
+combined the effect of `{\tt m}' with {\tt <Control>+<direction>}.
 That is no longer supported as a prefix but similar effect can be achieved
-by using {\tt m} and {\tt G}+<direction> in combination.
-{\tt m} can also be used in combination with {\tt g}+<direction>,
-{\tt <Control>}+<direction>, or {\tt <Shift>}+<direction>.
+by using {\tt m} and {\tt G<direction>} in combination.
+{\tt m} can also be used in combination with {\tt g<direction>},
+{\tt <Control>+<direction>}, or {\tt <Shift>+<direction>}.
 %.lp
 \item[\tb{\tt \verb+_+}]
 Travel to a map location via a shortest-path algorithm.\\
@@ -792,8 +793,8 @@ is computed over map locations the hero knows about (e.g. seen or
 previously traversed).
 If there is no known path, a guess is made instead.
 Stops on most of
-the same conditions as the `G' command, but without picking up
-objects, so implicitly forces the `m' prefix.
+the same conditions as the `{\tt G}' command, but without picking up
+objects, so implicitly forces the `{\tt m}' prefix.
 For ports with mouse
 support, the command is also invoked when a mouse-click takes place on a
 location other than the current position.
@@ -840,7 +841,7 @@ For example {\tt d7a} --- drop seven items of object
 Drop several things.\\
 %.lp ""
 In answer to the question\\
-``{\tt What kinds of things do you want to drop? [!\%= BUCXaium]}''\\
+``{\tt What kinds of things do you want to drop? [!\%= BUCXPaium]}''\\
 you should type zero or more object symbols possibly followed by
 `{\tt a}' and/or `{\tt i}' and/or `{\tt u}' and/or `{\tt m}'.
 In addition, one or more of
@@ -1006,7 +1007,7 @@ drinking from a fountain or sink.
 \item[\tb{Q}]
 Select an object for your quiver, quiver sack, or just generally at
 the ready (only one of these is available at a time).  You can then throw
-this (or one of these) using the `f' command.
+this (or one of these) using the `{\tt f}' command.
 %.lp
 \item[\tb{r}]
 Read a scroll or spellbook.
@@ -2472,13 +2473,13 @@ option to require a response of ``{\tt yes}'' instead.
 %.pg
 
 If you can't see a monster (if it is invisible, or if you are blinded),
-the symbol `I' will be shown when you learn of its presence.
+the symbol `{\tt I}' will be shown when you learn of its presence.
 If you attempt to walk into it, you will try to fight it just like
 a monster that you can see; of course,
 if the monster has moved, you will attack empty air.  If you guess
-that the monster has moved and you don't wish to fight, you can use the `m'
-command to move without fighting; likewise, if you don't remember a monster
-but want to try fighting anyway, you can use the `F' command.
+that the monster has moved and you don't wish to fight, you can use the
+`{\tt m}' command to move without fighting; likewise, if you don't remember
+a monster but want to try fighting anyway, you can use the `{\tt F}' command.
 
 %.hn 2
 \subsection*{Your pet}
@@ -3376,8 +3377,8 @@ not violate any food challenges either.
 %.pg
 A strict vegan diet is one which avoids any food derived from animals.
 The primary source of nutrition is fruits and vegetables.  The
-corpses and tins of blobs (`b'), jellies (`j'), and fungi (`F') are
-also considered to be vegetable matter.  Certain human
+corpses and tins of blobs (`{\tt b}'), jellies (`{\tt j}'), and fungi
+(`{\tt F}') are also considered to be vegetable matter.  Certain human
 food is prepared without animal products; namely, lembas wafers, cram
 rations, food rations (gunyoki), K-rations, and C-rations.
 Metal or another normally indigestible material eaten while polymorphed
@@ -3388,7 +3389,7 @@ Note however that eating such items still counts against foodless conduct.
 Vegetarians do not eat animals;
 however, they are less selective about eating animal byproducts than vegans.
 In addition to the vegan items listed above, they may eat any kind
-of pudding (`P') other than the black puddings,
+of pudding (`{\tt P}') other than the black puddings,
 eggs and food made from eggs (fortune cookies and pancakes),
 food made with milk (cream pies and candy bars), and lumps of
 royal jelly.  Monks are expected to observe a vegetarian diet.
@@ -3986,7 +3987,7 @@ See ``{\it pickup\verb+_+types\/}'' and also
 Note: prior to version 3.7, the default for {\it autopickup\/} was {\it on}.
 %.lp
 \item[\ib{autoquiver}]
-This option controls what happens when you attempt the `f' (fire)
+This option controls what happens when you attempt the `{\tt f}' (fire)
 command when nothing is quivered or readied (default false).
 When true, the computer will fill
 your quiver or quiver sack or make ready some suitable weapon.
@@ -3994,9 +3995,9 @@ Note that it will not take
 into account the blessed/cursed status, enchantment, damage, or
 quality of the weapon; you are free to manually fill your quiver
 or quiver sack or make ready
-with the `Q' command instead.
+with the `{\tt Q}' command instead.
 If no weapon is found or the option is
-false, the `t' (throw) command is executed instead.  Persistent.
+false, the `{\tt t}' (throw) command is executed instead.  Persistent.
 %.lp
 \item[\ib{autounlock}]
 %\hyphenation{apply\-key}%this needs to be tested...
@@ -4646,9 +4647,9 @@ it when not allowed or not possible results in explore mode instead.
 Default is normal play.
 %.lp
 \item[\ib{pushweapon}]
-Using the `w' (wield) command when already wielding
+Using the `{\tt w}' (wield) command when already wielding
 something pushes the old item into your alternate weapon slot (default off).
-Likewise for the `a' (apply) command if it causes the applied item to
+Likewise for the `{\tt a}' (apply) command if it causes the applied item to
 become wielded.  Persistent.
 %.lp
 \item[\ib{quick\verb+_+farsight}]
@@ -5066,7 +5067,7 @@ Acceptable values are {\tt 2} and {\tt 3} (default is {\tt 2}).
 When set to {\tt 3}, the {\tt tty} interface moves some fields around and
 mainly shows status conditions on their own line.
 A display capable of showing at least 25 lines is recommended.
-The value can be toggled back and forth during the game with the `O'
+The value can be toggled back and forth during the game with the `{\tt O}'
 command.
 
 %.lp ""
