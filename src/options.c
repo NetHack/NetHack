@@ -7845,6 +7845,7 @@ rerun:
         check_gold_symbol();
         reglyph_darkroom();
         (void) doredraw();
+        flush_screen(FALSE);
     }
     if (g.context.botl || g.context.botlx) {
         bot();
