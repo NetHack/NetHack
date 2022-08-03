@@ -1954,6 +1954,7 @@ extern void initoptions_init(void);
 extern void initoptions_finish(void);
 extern boolean parseoptions(char *, boolean, boolean);
 extern char *get_option_value(const char *);
+extern int doset_simple(void);
 extern int doset(void);
 extern int dotogglepickup(void);
 extern void option_help(void);

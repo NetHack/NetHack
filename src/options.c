@@ -302,7 +302,6 @@ static void free_one_menu_coloring(int);
 static int count_menucolors(void);
 static boolean parse_role_opts(int, boolean, const char *,
                                char *, char **);
-static int doset_simple(void);
 static unsigned int longest_option_name(int, int);
 static void doset_add_menu(winid, const char *, int, int);
 static int handle_add_list_remove(const char *, int);
@@ -7721,7 +7720,7 @@ longest_option_name(int startpass, int endpass)
 }
 
 /* #options - the user friendly version */
-static int
+int
 doset_simple(void)
 {
     static boolean made_fmtstr = FALSE;
@@ -7733,6 +7732,9 @@ doset_simple(void)
     enum OptSection section;
     boolean *bool_p;
     const char *name;
+
+    if (iflags.menu_requested)
+        return doset();
 
     if (!made_fmtstr) {
         Sprintf(fmtstr_doset, "%%s%%-%us [%%s]",
@@ -7855,7 +7857,7 @@ rerun:
     return ECMD_OK;
 }
 
-/* the #options command */
+/* the #optionsfull command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
 {
@@ -7871,9 +7873,6 @@ doset(void) /* changing options via menu by Per Liboriussen */
     boolean setinitial = FALSE, fromfile = FALSE,
             gavehelp = FALSE, skiphelp = !iflags.cmdassist;
     int clr = 0;
-
-    if (!iflags.menu_requested)
-        return doset_simple();
 
     /* if we offer '?' as a choice and it is the only thing chosen,
        we'll end up coming back here after showing the explanatory text */

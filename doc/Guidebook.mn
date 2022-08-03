@@ -1388,6 +1388,8 @@ Default key is \(oqo\(cq.
 Show and change option settings.
 Default key is \(oqO\(cq.
 Precede with the \(oqm\(cq prefix to show advanced options.
+.lp "#optionsfull"
+Show advanced game option settings.
 .lp #overview
 Display information you've discovered about the dungeon.
 Any visited
