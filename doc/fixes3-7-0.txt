@@ -1763,6 +1763,7 @@ add wizard mode #wizkill command to remove monster(s) from play
 some quest nemeses release a cloud of poisonous gas when they die
 taming magic acting on an already tame creature might make it become tamer
 eliminate scimitar skill and have scimitars use saber skill
+simplified configuration options menu
 
 
 Platform- and/or Interface-Specific New Features

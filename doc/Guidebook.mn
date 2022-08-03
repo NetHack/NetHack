@@ -868,6 +868,7 @@ The available options
 are listed later in this Guidebook.
 Options are usually set before the game rather than with the \(oqO\(cq
 command; see the section on options below.
+Precede \(oqO\(cq with the \(oqm\(cq prefix to show advanced options.
 .lp \(haO
 Show overview.
 .lp ""
@@ -1384,6 +1385,7 @@ Default key is \(oqo\(cq.
 .lp "#options "
 Show and change option settings.
 Default key is \(oqO\(cq.
+Precede with the \(oqm\(cq prefix to show advanced options.
 .lp #overview
 Display information you've discovered about the dungeon.
 Any visited

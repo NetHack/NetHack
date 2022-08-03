@@ -2529,7 +2529,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'o',    "open", "open a door",
               doopen, 0, NULL },
     { 'O',    "options", "show option settings, possibly change them",
-              doset, IFBURIED | GENERALCMD, NULL },
+              doset, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* #overview used to need autocomplete and has retained that even
        after being assigned to ^O [old wizard mode ^O is now #wizwhere] */
     { C('o'), "overview", "show a summary of the explored dungeon",
