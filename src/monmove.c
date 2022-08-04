@@ -867,10 +867,14 @@ should_displace(
     return FALSE;
 }
 
+/* have monster wield a pick-axe if it wants to dig and it has one;
+   return True if it spends this move wielding one, False otherwise */
 boolean
-m_digweapon_check(struct monst* mtmp, coordxy nix, coordxy niy)
+m_digweapon_check(
+    struct monst *mtmp,
+    coordxy nix, coordxy niy)
 {
-    boolean can_tunnel = 0;
+    boolean can_tunnel = FALSE;
     struct obj *mw_tmp = MON_WEP(mtmp);
 
     if (!Is_rogue_level(&u.uz))
@@ -880,15 +884,13 @@ m_digweapon_check(struct monst* mtmp, coordxy nix, coordxy niy)
         && (may_dig(nix, niy) || closed_door(nix, niy))) {
         /* may_dig() is either IS_STWALL or IS_TREE */
         if (closed_door(nix, niy)) {
-            if (!mw_tmp
-                || !is_pick(mw_tmp)
-                || !is_axe(mw_tmp))
+            if (!mw_tmp || !is_pick(mw_tmp) || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_OR_AXE;
         } else if (IS_TREE(levl[nix][niy].typ)) {
-            if (!(mw_tmp = MON_WEP(mtmp)) || !is_axe(mw_tmp))
+            if (!mw_tmp || !is_axe(mw_tmp))
                 mtmp->weapon_check = NEED_AXE;
         } else if (IS_STWALL(levl[nix][niy].typ)) {
-            if (!(mw_tmp = MON_WEP(mtmp)) || !is_pick(mw_tmp))
+            if (!mw_tmp || !is_pick(mw_tmp))
                 mtmp->weapon_check = NEED_PICK_AXE;
         }
         if (mtmp->weapon_check >= NEED_PICK_AXE && mon_wield_item(mtmp))
@@ -1398,10 +1400,10 @@ m_move(register struct monst* mtmp, register int after)
     }
 
     if (mmoved != MMOVE_NOTHING) {
-        if (mmoved == MMOVE_MOVED && (u.ux != nix || u.uy != niy) && itsstuck(mtmp))
+        if (mmoved == MMOVE_MOVED && !u_at(nix, niy) && itsstuck(mtmp))
             return MMOVE_DONE;
 
-        if (mmoved == MMOVE_MOVED && m_digweapon_check(mtmp, nix,niy))
+        if (mmoved == MMOVE_MOVED && m_digweapon_check(mtmp, nix, niy))
             return MMOVE_DONE;
 
         /* If ALLOW_U is set, either it's trying to attack you, or it
