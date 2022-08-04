@@ -7844,8 +7844,8 @@ rerun:
     if (g.opt_need_redraw) {
         check_gold_symbol();
         reglyph_darkroom();
-        (void) doredraw();
-        flush_screen(FALSE);
+        docrt();
+        flush_screen(1);
     }
     if (g.context.botl || g.context.botlx) {
         bot();
@@ -8090,7 +8090,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     if (g.opt_need_redraw) {
         check_gold_symbol();
         reglyph_darkroom();
-        (void) doredraw();
+        docrt();
     }
     if (g.context.botl || g.context.botlx) {
         bot();
