@@ -7765,7 +7765,7 @@ doset_simple(void)
     }
 
     give_opt_msg = FALSE;
-rerun:
+ rerun:
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
@@ -7791,6 +7791,8 @@ rerun:
                 bool_p = allopt[i].addr;
                 if (!bool_p)
                     continue;
+                if (iflags.wc_tiled_map && allopt[i].idx == opt_color)
+                    continue;
                 Sprintf(buf, fmtstr_doset, "",
                         name, *bool_p ? "X" : " ");
                 break;
@@ -7802,7 +7804,8 @@ rerun:
                     char buf2[BUFSZ];
                     int k = i;
 
-                    if (allopt[i].optfn == optfn_symset && Is_rogue_level(&u.uz)) {
+                    if (allopt[i].optfn == optfn_symset
+                        && Is_rogue_level(&u.uz)) {
                         k = opt_roguesymset;
                         name = allopt[k].name;
                         any.a_int = k + 1;
@@ -7821,6 +7824,11 @@ rerun:
                 Sprintf(buf, "ERROR");
                 break;
             }
+            /* pickup_types is separated from autopickup due to the
+               spelling of their names; emphasize what it means */
+            if (allopt[i].idx == opt_pickup_types
+                || allopt[i].idx == opt_pickup_thrown)
+                Strcat(buf, "  (for autopickup)");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
         }
