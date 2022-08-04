@@ -7789,6 +7789,8 @@ rerun:
             switch (allopt[i].opttyp) {
             case BoolOpt:
                 bool_p = allopt[i].addr;
+                if (!bool_p)
+                    continue;
                 Sprintf(buf, fmtstr_doset, "",
                         name, *bool_p ? "X" : " ");
                 break;
