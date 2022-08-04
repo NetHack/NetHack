@@ -1764,6 +1764,7 @@ some quest nemeses release a cloud of poisonous gas when they die
 taming magic acting on an already tame creature might make it become tamer
 eliminate scimitar skill and have scimitars use saber skill
 simplified configuration options menu
+rudimentary key rebinding in game options
 
 
 Platform- and/or Interface-Specific New Features

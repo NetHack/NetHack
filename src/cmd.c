@@ -161,6 +161,7 @@ static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
 static boolean help_dir(char, uchar, const char *);
 
+static void handler_rebind_keys_add(boolean);
 static boolean bind_key_fn(uchar, int (*)(void));
 static void commands_init(void);
 static boolean keylist_func_has_key(const struct ext_func_tab *, boolean *);
@@ -2824,6 +2825,187 @@ extcmds_getentry(int i)
     if (i < 0 || i > extcmdlist_length)
         return 0;
     return &extcmdlist[i];
+}
+
+/* return number of extended commands bound to a non-default key */
+int
+count_bind_keys(void)
+{
+    int nbinds = 0;
+    int i;
+
+    for (i = 0; i < extcmdlist_length; i++)
+        if (extcmdlist[i].key && g.Cmd.commands[extcmdlist[i].key] != &extcmdlist[i])
+            nbinds++;
+    return nbinds;
+}
+
+static void
+display_changed_key_binds(void)
+{
+    winid win;
+    int i;
+    char buf[BUFSZ];
+    char buf2[QBUFSZ];
+
+    win = create_nhwindow(NHW_TEXT);
+    for (i = 0; i < extcmdlist_length; i++) {
+        struct ext_func_tab *ec = &extcmdlist[i];
+
+        if (ec->key && g.Cmd.commands[ec->key]
+            && g.Cmd.commands[ec->key] != ec) {
+            Sprintf(buf, "BIND=%s:%s", key2txt(ec->key, buf2),
+                    g.Cmd.commands[ec->key]->ef_txt);
+            putstr(win, 0, buf);
+        }
+    }
+    display_nhwindow(win, TRUE);
+    destroy_nhwindow(win);
+}
+
+/* interactive key binding */
+static void
+handler_rebind_keys_add(boolean keyfirst)
+{
+    struct ext_func_tab *ec;
+    winid win;
+    anything any;
+    int i, npick;
+    menu_item *picks = (menu_item *) 0;
+    char buf[BUFSZ];
+    char buf2[QBUFSZ];
+    uchar key = '\0';
+
+    if (keyfirst) {
+        pline("Bind which key? ");
+        key = pgetchar();
+
+        if (!key || key == '\027')
+            return;
+    }
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+
+    if (key) {
+        if (g.Cmd.commands[key]) {
+            Sprintf(buf, "Key '%s' is currently bound to \"%s\".",
+                    key2txt(key, buf2), g.Cmd.commands[key]->ef_txt);
+        } else {
+            Sprintf(buf, "Key '%s' is not bound to anything.",
+                    key2txt(key, buf2));
+        }
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, buf,
+                 MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "",
+                 MENU_ITEMFLAGS_NONE);
+    }
+
+    any.a_int = -1;
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "nothing: unbind the key",
+             MENU_ITEMFLAGS_NONE);
+
+    any.a_int = 0;
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "",
+             MENU_ITEMFLAGS_NONE);
+
+    for (i = 0; i < extcmdlist_length; i++) {
+        ec = &extcmdlist[i];
+
+        if ((ec->flags & (MOVEMENTCMD|INTERNALCMD|CMD_NOT_AVAILABLE)) != 0)
+            continue;
+
+        any.a_int = (i + 1);
+        Sprintf(buf, "%s: %s", ec->ef_txt, ec->ef_desc);
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, buf,
+             MENU_ITEMFLAGS_NONE);
+    }
+    if (key)
+        Sprintf(buf, "Bind '%s' to what command?", key2txt(key, buf2));
+    else
+        Sprintf(buf, "Bind what command?");
+    end_menu(win, buf);
+    npick = select_menu(win, PICK_ONE, &picks);
+    destroy_nhwindow(win);
+    if (npick > 0) {
+        const struct ext_func_tab *prevec;
+        const char *cmdstr;
+
+        i = picks->item.a_int;
+        free((genericptr_t) picks);
+
+        if (i == -1) {
+            ec = NULL;
+            cmdstr = "nothing";
+            goto bindit;
+        } else {
+            ec = &extcmdlist[i-1];
+            cmdstr = ec->ef_txt;
+        }
+bindit:
+        if (!key) {
+            pline("Bind which key? ");
+            key = pgetchar();
+
+            if (!key || key == '\027')
+                return;
+        }
+
+        prevec = g.Cmd.commands[key];
+
+        if (bind_key(key, cmdstr)) {
+            if (prevec && prevec != ec) {
+                pline("Changed key '%s' from \"%s\" to \"%s\".",
+                      key2txt(key, buf2), prevec->ef_txt, cmdstr);
+            } else if (!prevec) {
+                pline("Bound key '%s' to \"%s\".", key2txt(key, buf2), cmdstr);
+            }
+        } else {
+            pline("Key binding failed?!");
+        }
+    }
+}
+
+void
+handler_rebind_keys(void)
+{
+    winid win;
+    anything any;
+    int i, npick;
+    menu_item *picks = (menu_item *) 0;
+
+redo_rebind:
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+
+    any.a_int = 1;
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "bind key to a command",
+             MENU_ITEMFLAGS_NONE);
+    any.a_int = 2;
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "bind command to a key",
+             MENU_ITEMFLAGS_NONE);
+    if (count_bind_keys()) {
+        any.a_int = 3;
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "view changed key binds",
+                 MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(win, "Do what?");
+    npick = select_menu(win, PICK_ONE, &picks);
+    destroy_nhwindow(win);
+    if (npick > 0) {
+        i = picks->item.a_int;
+        free((genericptr_t) picks);
+
+        if (i == 1 || i == 2) {
+            handler_rebind_keys_add((i == 1));
+        } else if (i == 3) {
+            display_changed_key_binds();
+        }
+        goto redo_rebind;
+    }
 }
 
 /* find extended command entries matching findstr.

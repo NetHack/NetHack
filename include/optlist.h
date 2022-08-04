@@ -132,6 +132,8 @@ opt_##a,
                  + sizeof "kick" + sizeof "force" + 20),
                 opt_out, set_in_game, Yes, Yes, No, Yes, NoAlias,
                 "action to take when encountering locked door or chest")
+    NHOPTO("bind keys", Advanced, o_bind_keys, BUFSZ, opt_in,
+           set_in_game, No, Yes, No, NoAlias, "edit key binds")
 #if defined(MICRO) && !defined(AMIGA)
     NHOPTB(BIOS, Advanced, 0, opt_in, set_in_config, Off, Yes, No, No, NoAlias,
                 &iflags.BIOS)

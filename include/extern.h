@@ -264,6 +264,8 @@ extern void savech_extcmd(const char *, boolean);
 extern char extcmd_initiator(void);
 extern int doextcmd(void);
 extern struct ext_func_tab *extcmds_getentry(int);
+extern int count_bind_keys(void);
+extern void handler_rebind_keys(void);
 extern int extcmds_match(const char *, int, int **);
 extern const char *key2extcmddesc(uchar);
 extern boolean bind_specialkey(uchar, const char *);

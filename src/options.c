@@ -7568,6 +7568,28 @@ optfn_o_autopickup_exceptions(
 }
 
 static int
+optfn_o_bind_keys(
+    int optidx UNUSED, int req, boolean negated UNUSED,
+    char *opts, char *op UNUSED)
+{
+    if (req == do_init) {
+        return optn_ok;
+    }
+    if (req == do_set) {
+    }
+    if (req == get_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, n_currently_set, count_bind_keys());
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        handler_rebind_keys();
+    }
+    return optn_ok;
+}
+
+static int
 optfn_o_menu_colors(int optidx UNUSED, int req, boolean negated UNUSED,
               char *opts, char *op UNUSED)
 {
