@@ -302,7 +302,6 @@ static void free_one_menu_coloring(int);
 static int count_menucolors(void);
 static boolean parse_role_opts(int, boolean, const char *,
                                char *, char **);
-static int get_option_index(const char *);
 static unsigned int longest_option_name(int, int);
 static void doset_add_menu(winid, const char *, int, int);
 static int handle_add_list_remove(const char *, int);
@@ -7742,18 +7741,6 @@ longest_option_name(int startpass, int endpass)
     return longest_name_len;
 }
 
-static int
-get_option_index(const char *optname)
-{
-    int i;
-
-    for (i = 0; allopt[i].name != 0; i++)
-        if (!strcmp(optname, allopt[i].name))
-            return i;
-
-    return -1;
-}
-
 /* #options - the user friendly version */
 int
 doset_simple(void)
@@ -7814,10 +7801,9 @@ rerun:
                     int k = i;
 
                     if (allopt[i].optfn == optfn_symset && Is_rogue_level(&u.uz)) {
-                        k = get_option_index("roguesymset");
-                        if (k == -1)
-                            k = i;
+                        k = opt_roguesymset;
                         name = allopt[k].name;
+                        any.a_int = k + 1;
                     }
 
                     buf2[0] = '\0';
