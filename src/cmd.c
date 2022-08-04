@@ -4473,7 +4473,8 @@ rhack(char *cmd)
     const struct ext_func_tab *cmdq_ec = 0, *prefix_seen = 0;
     boolean was_m_prefix = FALSE;
 
-    reset_cmd_vars(FALSE);
+    iflags.menu_requested = FALSE;
+    g.context.nopick = 0;
  got_prefix_input:
 #ifdef SAFERHANGUP
     if (g.program_state.done_hup)
