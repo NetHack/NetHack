@@ -5805,8 +5805,11 @@ get_count(
         if (inkey) {
             key = inkey;
             inkey = '\0';
-        } else
+        } else {
+            g.program_state.getting_a_command = 1; /* readchar altmeta
+                                                    * compatibility */
             key = readchar();
+        }
 
         if (digit(key)) {
             cnt = 10L * cnt + (long) (key - '0');
