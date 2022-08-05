@@ -8895,7 +8895,7 @@ all_options_strbuf(strbuf_t *sbuf)
         }
     }
 
-    /* TODO: BINDs */
+    get_changed_key_binds(sbuf);
     savedsym_strbuf(sbuf);
     all_options_menucolors(sbuf);
     all_options_msgtypes(sbuf);

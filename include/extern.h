@@ -266,6 +266,7 @@ extern char extcmd_initiator(void);
 extern int doextcmd(void);
 extern struct ext_func_tab *extcmds_getentry(int);
 extern int count_bind_keys(void);
+extern void get_changed_key_binds(strbuf_t *);
 extern void handler_rebind_keys(void);
 extern int extcmds_match(const char *, int, int **);
 extern const char *key2extcmddesc(uchar);

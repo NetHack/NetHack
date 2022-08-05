@@ -2842,27 +2842,35 @@ count_bind_keys(void)
     return nbinds;
 }
 
-static void
-display_changed_key_binds(void)
+/* show changed key bindings in text, or if sbuf is non-null, append to it */
+void
+get_changed_key_binds(strbuf_t *sbuf)
 {
     winid win;
     int i;
     char buf[BUFSZ];
     char buf2[QBUFSZ];
 
-    win = create_nhwindow(NHW_TEXT);
+    if (!sbuf)
+        win = create_nhwindow(NHW_TEXT);
     for (i = 0; i < extcmdlist_length; i++) {
         struct ext_func_tab *ec = &extcmdlist[i];
 
         if (ec->key && g.Cmd.commands[ec->key]
             && g.Cmd.commands[ec->key] != ec) {
-            Sprintf(buf, "BIND=%s:%s", key2txt(ec->key, buf2),
-                    g.Cmd.commands[ec->key]->ef_txt);
-            putstr(win, 0, buf);
+            Sprintf(buf, "BIND=%s:%s%s", key2txt(ec->key, buf2),
+                    g.Cmd.commands[ec->key]->ef_txt,
+                    sbuf ? "\n" : "");
+            if (sbuf)
+                strbuf_append(sbuf, buf);
+            else
+                putstr(win, 0, buf);
         }
     }
-    display_nhwindow(win, TRUE);
-    destroy_nhwindow(win);
+    if (!sbuf) {
+        display_nhwindow(win, TRUE);
+        destroy_nhwindow(win);
+    }
 }
 
 /* interactive key binding */
@@ -3004,7 +3012,7 @@ redo_rebind:
         if (i == 1 || i == 2) {
             handler_rebind_keys_add((i == 1));
         } else if (i == 3) {
-            display_changed_key_binds();
+            get_changed_key_binds(NULL);
         }
         goto redo_rebind;
     }
