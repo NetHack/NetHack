@@ -2846,7 +2846,7 @@ count_bind_keys(void)
 void
 get_changed_key_binds(strbuf_t *sbuf)
 {
-    winid win;
+    winid win = WIN_ERR;
     int i;
     char buf[BUFSZ];
     char buf2[QBUFSZ];
