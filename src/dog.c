@@ -398,6 +398,9 @@ mon_arrive(struct monst *mtmp, int when)
         else
             mnexto(mtmp, RLOC_NOMSG);
         return;
+    } else if (when == Wiz_arrive) {
+        /* resurrect() is bringing existing wizard to harass the hero */
+        xyloc = MIGR_WITH_HERO;
     }
     /*
      * The monster arrived on this level independently of the player.
@@ -410,10 +413,9 @@ mon_arrive(struct monst *mtmp, int when)
         long nmv = g.moves - 1L - mtmp->mlstmv;
 
         mon_catchup_elapsed_time(mtmp, nmv);
-        mtmp->mlstmv = g.moves - 1L;
 
         /* let monster move a bit on new level (see placement code below) */
-        wander = (xint16) min(nmv, 8);
+        wander = (xint16) min(nmv, 8L);
     } else
         wander = 0;
 
@@ -526,7 +528,7 @@ mon_arrive(struct monst *mtmp, int when)
         if (when != Wiz_arrive)
             /* losedogs() will deal with this */
             relmon(mtmp, &failed_arrivals);
-        else
+        else /* when==Wiz_arrive => not being called by losedogs() */
             m_into_limbo(mtmp);
     }
 }
@@ -629,6 +631,8 @@ mon_catchup_elapsed_time(
         mtmp->mhp = mtmp->mhpmax;
     else
         mtmp->mhp += imv;
+
+    set_mon_lastmove(mtmp);
 }
 
 /* bookkeeping when mtmp is about to leave the current level;

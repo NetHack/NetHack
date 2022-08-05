@@ -709,6 +709,9 @@ resurrect(void)
                 if (!helpless(mtmp)) {
                     *mmtmp = mtmp->nmon;
                     mon_arrive(mtmp, -1); /* -1: Wiz_arrive (dog.c) */
+                    /* mx: mon_arrive() might have sent mtmp into limbo */
+                    if (!mtmp->mx)
+                        mtmp = 0;
                     /* note: there might be a second Wizard; if so,
                        he'll have to wait til the next resurrection */
                     break;
@@ -719,7 +722,16 @@ resurrect(void)
     }
 
     if (mtmp) {
-        mtmp->mtame = mtmp->mpeaceful = 0; /* paranoia */
+        /* if wizard ended up far away because of conjestion, clear his
+           wait-until-close flag; otherwise set that flag in case he just
+           came off the migrating_mons list to prevent him from triggering
+           "<mon> vanishes and reappears" on his first move */
+        if (!couldsee(mtmp->mx, mtmp->my))
+            mtmp->mstrategy &= ~STRAT_WAITMASK;
+        else
+            mtmp->mstrategy |= STRAT_WAITMASK;
+
+        mtmp->mtame = 0, mtmp->mpeaceful = 0; /* paranoia */
         set_malign(mtmp);
         if (!Deaf) {
             pline("A voice booms out...");
@@ -734,6 +746,7 @@ void
 intervene(void)
 {
     int which = Is_astralevel(&u.uz) ? rnd(4) : rn2(6);
+
     /* cases 0 and 5 don't apply on the Astral level */
     switch (which) {
     case 0:

@@ -1377,7 +1377,10 @@ rloc_to(struct monst *mtmp, coordxy x, coordxy y)
 }
 
 void
-rloc_to_flag(struct monst *mtmp, coordxy x, coordxy y, unsigned int rlocflags)
+rloc_to_flag(
+    struct monst *mtmp,
+    coordxy x, coordxy y,
+    unsigned rlocflags)
 {
     rloc_to_core(mtmp, x, y, rlocflags);
 }
