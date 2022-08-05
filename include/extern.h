@@ -600,7 +600,7 @@ extern void mon_arrive(struct monst *, int);
 extern void mon_catchup_elapsed_time(struct monst *, long);
 extern void keepdogs(boolean);
 extern void migrate_to_level(struct monst *, coordxy, coordxy, coord *);
-extern void discard_migrating_mons(void);
+extern void discard_migrations(void);
 extern int dogfood(struct monst *, struct obj *);
 extern boolean tamedog(struct monst *, struct obj *);
 extern void abuse_dog(struct monst *);
