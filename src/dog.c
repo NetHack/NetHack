@@ -843,6 +843,28 @@ migrate_to_level(
         vision_recalc(0);
 }
 
+/* when entering the endgame, levels from the dungeon and its branches are
+   discarded because they can't be reached again; do the same for monsters
+   scheduled to migrate to those levels */
+void
+discard_migrating_mons(void)
+{
+    struct monst *mtmp, **mprev;
+    d_level mdest;
+
+    for (mprev = &g.migrating_mons; (mtmp = *mprev) != 0; ) {
+        mdest.dnum = mtmp->mux;
+        mdest.dlevel = mtmp->muy;
+        /* the Wizard is kept regardless of location so that he is
+           ready to be brought back; nothing should be scheduled to
+           migrate to the endgame but if we find such, we'll keep it */
+        if (!mtmp->iswiz && !In_endgame(&mdest))
+            *mprev = mtmp->nmon; /* remove mtmp from migrating_mons */
+        else
+            mprev = &mtmp->nmon; /* keep mtmp on migrating_mons */
+    }
+}
+
 /* return quality of food; the lower the better */
 /* fungi will eat even tainted food */
 int
