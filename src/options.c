@@ -8788,7 +8788,7 @@ all_options_menucolors(strbuf_t *sbuf)
 {
     int i = 0, ncolors = count_menucolors();
     struct menucoloring *tmp = g.menu_colorings;
-    char buf[BUFSZ];
+    char buf[BUFSZ*2]; /* see also: add_menu_coloring() */
     struct menucoloring **arr;
 
     if (!ncolors)
