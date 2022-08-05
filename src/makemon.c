@@ -328,7 +328,7 @@ m_initweap(register struct monst *mtmp)
                  && sgn(mtmp->isminion ? EMIN(mtmp)->min_align
                                        : ptr->maligntyp) == A_LAWFUL)
                 otmp = oname(otmp,
-                             artiname(rn2(2) ? ART_DEMONBANE : ART_SUNSWORD),
+                             artiname(ART_SUNSWORD),
                              ONAME_RANDOM); /* randomly created */
             bless(otmp);
             otmp->oerodeproof = TRUE;
