@@ -455,8 +455,7 @@ has_aggravatables(struct monst *mon)
             continue;
         if (in_w_tower != In_W_tower(mtmp->mx, mtmp->my, &u.uz))
             continue;
-        if ((mtmp->mstrategy & STRAT_WAITFORU) != 0
-            || helpless(mtmp))
+        if ((mtmp->mstrategy & STRAT_WAITFORU) != 0 || helpless(mtmp))
             return TRUE;
     }
     return FALSE;
@@ -688,7 +687,8 @@ resurrect(void)
         mtmp = makemon(&mons[PM_WIZARD_OF_YENDOR], u.ux, u.uy, MM_NOWAIT);
         /* affects experience; he's not coming back from a corpse
            but is subject to repeated killing like a revived corpse */
-        if (mtmp) mtmp->mrevived = 1;
+        if (mtmp)
+            mtmp->mrevived = 1;
     } else {
         /* look for a migrating Wizard */
         verb = "elude";
@@ -722,14 +722,15 @@ resurrect(void)
     }
 
     if (mtmp) {
-        /* if wizard ended up far away because of conjestion, clear his
-           wait-until-close flag; otherwise set that flag in case he just
-           came off the migrating_mons list to prevent him from triggering
-           "<mon> vanishes and reappears" on his first move */
-        if (!couldsee(mtmp->mx, mtmp->my))
-            mtmp->mstrategy &= ~STRAT_WAITMASK;
-        else
-            mtmp->mstrategy |= STRAT_WAITMASK;
+        /* FIXME: when a new wizard is created by makemon(), it gives
+           a "<mon> appears" message, delivered after he's been placed
+           on the map; however, when an existing wizard comes off
+           migrating_mons, he ends up triggering "<mon> vanishes and
+           reappears" on his first move (tactics when hero is carrying
+           the Amulet); setting STRAT_WAITMASK suppresses that but then
+           he just sits wherever he is, "meditating", contradicting the
+           threatening message below */
+        mtmp->mstrategy &= ~STRAT_WAITMASK;
 
         mtmp->mtame = 0, mtmp->mpeaceful = 0; /* paranoia */
         set_malign(mtmp);
