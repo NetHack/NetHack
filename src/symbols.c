@@ -5,6 +5,9 @@
 #include "hack.h"
 #include "tcap.h"
 
+static void savedsym_add(const char *, const char *, int);
+static struct _savedsym *savedsym_find(const char *, int);
+
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
 
 #if defined(TERMLIB) || defined(CURSES_GRAPHICS)
@@ -661,6 +664,74 @@ free_symsets(void)
     /* assert( symset_list == NULL ); */
 }
 
+struct _savedsym {
+    char *name;
+    char *val;
+    int which_set;
+    struct _savedsym *next;
+};
+struct _savedsym *saved_symbols = NULL;
+
+void
+savedsym_free(void)
+{
+    struct _savedsym *tmp = saved_symbols, *tmp2;
+
+    while (tmp) {
+        tmp2 = tmp->next;
+        free(tmp->name);
+        free(tmp->val);
+        free(tmp);
+        tmp = tmp2;
+    }
+}
+
+static struct _savedsym *
+savedsym_find(const char *name, int which_set)
+{
+    struct _savedsym *tmp = saved_symbols;
+
+    while (tmp) {
+        if (which_set == tmp->which_set && !strcmp(name, tmp->name))
+            return tmp;
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
+static void
+savedsym_add(const char *name, const char *val, int which_set)
+{
+    struct _savedsym *tmp = NULL;
+
+    if ((tmp = savedsym_find(name, which_set)) != 0) {
+        free(tmp->val);
+        tmp->val = dupstr(val);
+    } else {
+        tmp = (struct _savedsym *)alloc(sizeof(struct _savedsym));
+        tmp->name = dupstr(name);
+        tmp->val = dupstr(val);
+        tmp->which_set = which_set;
+        tmp->next = saved_symbols;
+        saved_symbols = tmp;
+    }
+}
+
+void
+savedsym_strbuf(strbuf_t *sbuf)
+{
+    struct _savedsym *tmp = saved_symbols;
+    char buf[BUFSZ];
+
+    while (tmp) {
+        Sprintf(buf, "%sSYMBOLS=%s:%s\n",
+                (tmp->which_set == ROGUESET) ? "ROGUE" : "",
+                tmp->name, tmp->val);
+        strbuf_append(sbuf, buf);
+        tmp = tmp->next;
+    }
+}
+
 /* Parse the value of a SYMBOLS line from a config file */
 boolean
 parsesymbols(register char *opts, int which_set)
@@ -720,6 +791,7 @@ parsesymbols(register char *opts, int which_set)
             }
         }
     }
+    savedsym_add(opts, strval, which_set);
     return TRUE;
 }
 

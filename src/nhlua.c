@@ -631,7 +631,7 @@ nhl_get_config(lua_State *L)
     int argc = lua_gettop(L);
 
     if (argc == 1) {
-        lua_pushstring(L, get_option_value(luaL_checkstring(L, 1)));
+        lua_pushstring(L, get_option_value(luaL_checkstring(L, 1), TRUE));
         return 1;
     } else
         nhl_error(L, "Wrong args");

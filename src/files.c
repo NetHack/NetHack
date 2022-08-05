@@ -1984,6 +1984,48 @@ char configfile[BUFSZ];
 const char *backward_compat_configfile = "nethack.cnf";
 #endif
 
+/* #saveoptions - save config options into file */
+int
+do_write_config_file(void)
+{
+    FILE *fp;
+    char tmp[BUFSZ];
+
+    if (!configfile[0]) {
+        pline("Strange, could not figure out config file name.");
+        return ECMD_OK;
+    }
+    if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
+        pline("Warning: saveoptions is highly experimental!");
+        wait_synch();
+        pline("Some settings are not saved!");
+        wait_synch();
+        pline("All manual customization and comments are removed from the file!");
+        wait_synch();
+    }
+#define overwrite_prompt "Overwrite config file %.*s?"
+    Sprintf(tmp, overwrite_prompt, (int)(BUFSZ - sizeof overwrite_prompt - 2), configfile);
+#undef overwrite_prompt
+    if (!paranoid_query(TRUE, tmp))
+        return ECMD_OK;
+
+    fp = fopen(configfile, "w");
+    if (fp) {
+        size_t len, wrote;
+        strbuf_t buf;
+
+        strbuf_init(&buf);
+        all_options_strbuf(&buf);
+        len = strlen(buf.str);
+        wrote = fwrite(buf.str, 1, len, fp);
+        fclose(fp);
+        strbuf_empty(&buf);
+        if (wrote != len)
+            pline("An error occurred, wrote only partial data (%lu/%lu).", wrote, len);
+    }
+    return ECMD_OK;
+}
+
 /* remember the name of the file we're accessing;
    if may be used in option reject messages */
 static void

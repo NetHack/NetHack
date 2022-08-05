@@ -1158,6 +1158,7 @@ freedynamicdata(void)
     free_invbuf();           /* let_to_name (invent.c) */
     free_youbuf();           /* You_buf,&c (pline.c) */
     msgtype_free();
+    savedsym_free();
     tmp_at(DISP_FREEMEM, 0); /* temporary display effects */
 #ifdef FREE_ALL_MEMORY
 #define free_current_level() savelev(&tnhfp, -1)
