@@ -991,6 +991,7 @@ make explosions burn monster's armor just like they do hero's armor
 make healing and extra healing better by upping the average amount healed
 lifesaving healing amount depends on the consitution
 hitting a monster with a wielded potion hits you far less
+pyrolisks get a mundane bite attack
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
