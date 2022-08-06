@@ -1476,6 +1476,11 @@ gazemu(struct monst *mtmp, struct attack *mattk)
     };
     int react = -1;
     boolean cancelled = (mtmp->mcan != 0), already = FALSE;
+    boolean mcanseeu = canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my)
+        && mtmp->mcansee;
+
+    if (m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp)))
+        return MM_MISS;
 
     /* assumes that hero has to see monster's gaze in order to be
        affected, rather than monster just having to look at hero;
@@ -1540,8 +1545,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         }
         break;
     case AD_CONF:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = 0; /* "confused" */
                 already = (mtmp->mconf != 0);
@@ -1559,8 +1563,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         }
         break;
     case AD_STUN:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = 1; /* "stunned" */
                 already = (mtmp->mstun != 0);
@@ -1606,8 +1609,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         }
         break;
     case AD_FIRE:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && !mtmp->mspec_used && rn2(5)) {
+        if (mcanseeu && !mtmp->mspec_used && rn2(5)) {
             if (cancelled) {
                 react = rn1(2, 4); /* "irritated" || "inflamed" */
             } else {
@@ -1636,8 +1638,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         break;
 #ifdef PM_BEHOLDER /* work in progress */
     case AD_SLEE:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
-            && g.multi >= 0 && !rn2(5) && !Sleep_resistance) {
+        if (mcanseeu && g.multi >= 0 && !rn2(5) && !Sleep_resistance) {
             if (cancelled) {
                 react = 6;                      /* "tired" */
                 already = (mtmp->mfrozen != 0); /* can't happen... */
@@ -1649,7 +1650,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
         }
         break;
     case AD_SLOW:
-        if (canseemon(mtmp) && couldsee(mtmp->mx, mtmp->my) && mtmp->mcansee
+        if (mcanseeu
             && (HFast & (INTRINSIC | TIMEOUT)) && !defended(mtmp, AD_SLOW)
             && !rn2(4)) {
             if (cancelled) {

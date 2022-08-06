@@ -1359,7 +1359,7 @@ monstseesu(unsigned long seenres)
 {
     struct monst *mtmp;
 
-    if (seenres == M_SEEN_NOTHING)
+    if (seenres == M_SEEN_NOTHING || u.uswallow)
         return;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
