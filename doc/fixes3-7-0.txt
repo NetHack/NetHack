@@ -1336,6 +1336,8 @@ if the game crashed or the process was killed, recovering a save file ended
 when using --nethackrc=file on the command line (currently only implemented
 	for ports that use unixmain.c), options parsing freed the string
 	containing 'file' before using it as the RC file name
+using 'o'pen as a synonym for #loot of a container at the hero's location did
+	not work if the hero was in a pit
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

@@ -756,6 +756,7 @@ doopen_indir(coordxy x, coordxy y)
     coord cc;
     register struct rm *door;
     boolean portcullis;
+    const char *dirprompt;
     int res = ECMD_OK;
 
     if (nohands(g.youmonst.data)) {
@@ -763,20 +764,31 @@ doopen_indir(coordxy x, coordxy y)
         return ECMD_OK;
     }
 
-    if (u.utrap && u.utraptype == TT_PIT) {
-        You_cant("reach over the edge of the pit.");
-        return ECMD_OK;
-    }
+    dirprompt = NULL; /* have get_adjacent_loc() -> getdir() use default */
+    if (u.utrap && u.utraptype == TT_PIT && container_at(u.ux, u.uy, FALSE))
+        dirprompt = "Open where? [.>]";
 
-    if (x > 0 && y > 0) {
+    if (x > 0 && y >= 0) {
+        /* nonzero <x,y> is used when hero in amorphous form tries to
+           flow under a closed door at <x,y>; the test here was using
+           'y > 0' but that would give incorrect results if doors are
+           ever allowed to be placed on the top row of the map */
         cc.x = x;
         cc.y = y;
-    } else if (!get_adjacent_loc((char *) 0, (char *) 0, u.ux, u.uy, &cc))
+    } else if (!get_adjacent_loc(dirprompt, (char *) 0, u.ux, u.uy, &cc)) {
         return ECMD_OK;
+    }
 
     /* open at yourself/up/down */
     if (u_at(cc.x, cc.y))
         return doloot();
+
+    /* this used to be done prior to get_adjacent_loc() but doing so was
+       incorrect once open at hero's spot became an alternate way to loot */
+    if (u.utrap && u.utraptype == TT_PIT) {
+        You_cant("reach over the edge of the pit.");
+        return ECMD_OK;
+    }
 
     if (stumble_on_door_mimic(cc.x, cc.y))
         return ECMD_TIME;

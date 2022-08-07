@@ -288,7 +288,8 @@ extern int getdir(const char *);
 extern void confdir(boolean);
 extern const char *directionname(int);
 extern int isok(coordxy, coordxy);
-extern int get_adjacent_loc(const char *, const char *, coordxy, coordxy, coord *);
+extern int get_adjacent_loc(const char *, const char *, coordxy, coordxy,
+                            coord *);
 extern const char *click_to_cmd(coordxy, coordxy, int);
 extern char get_count(const char *, char, long, cmdcount_nht *, unsigned);
 #ifdef HANGUPHANDLING
