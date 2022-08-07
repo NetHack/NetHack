@@ -28,6 +28,11 @@
 #define AT_WEAP 254 /* uses weapon */
 #define AT_MAGC 255 /* uses magic spell(s) */
 
+#define DISTANCE_ATTK_TYPE(atyp) ((atyp) == AT_SPIT \
+                                  || (atyp) == AT_BREA \
+                                  || (atyp) == AT_MAGC \
+                                  || (atyp) == AT_GAZE)
+
 /*	Add new damage types below.
  *
  *	Note that 1-10 correspond to the types of attack used in buzz().

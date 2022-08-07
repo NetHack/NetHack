@@ -306,22 +306,11 @@ can_blnd(
 boolean
 ranged_attk(struct permonst* ptr)
 {
-    register int i, atyp;
-    long atk_mask = (1L << AT_BREA) | (1L << AT_SPIT) | (1L << AT_GAZE);
+    int i;
 
-    /* was: (attacktype(ptr, AT_BREA) || attacktype(ptr, AT_WEAP)
-     *       || attacktype(ptr, AT_SPIT) || attacktype(ptr, AT_GAZE)
-     *       || attacktype(ptr, AT_MAGC));
-     * but that's too slow -dlc
-     */
-    for (i = 0; i < NATTK; i++) {
-        atyp = ptr->mattk[i].aatyp;
-        if (atyp >= AT_WEAP)
+    for (i = 0; i < NATTK; i++)
+        if (DISTANCE_ATTK_TYPE(ptr->mattk[i].aatyp))
             return TRUE;
-        /* assert(atyp < 32); */
-        if ((atk_mask & (1L << atyp)) != 0L)
-            return TRUE;
-    }
     return FALSE;
 }
 

@@ -756,7 +756,9 @@ dochug(register struct monst* mtmp)
                 return 0;
             /* Monsters can move and then shoot on same turn;
                our hero can't.  Is that fair? */
-            if (!nearby && (ranged_attk(mdat) || find_offensive(mtmp)))
+            if (!nearby && (ranged_attk(mdat)
+                            || attacktype(mdat, AT_WEAP)
+                            || find_offensive(mtmp)))
                 break;
             /* engulfer/grabber checks */
             if (mtmp == u.ustuck) {
@@ -945,9 +947,8 @@ m_balks_at_approaching(struct monst* mtmp)
         || !m_canseeu(mtmp))
         return FALSE;
 
-    /* has ammo+launcher or can spit */
-    if (m_has_launcher_and_ammo(mtmp)
-        || attacktype(mtmp->data, AT_SPIT))
+    /* has ammo+launcher */
+    if (m_has_launcher_and_ammo(mtmp))
         return TRUE;
 
     /* is using a polearm and in range */
@@ -955,8 +956,8 @@ m_balks_at_approaching(struct monst* mtmp)
         && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= MON_POLE_DIST)
         return TRUE;
 
-    /* breath attack, and hp loss or breath not used */
-    if (attacktype(mtmp->data, AT_BREA)
+    /* can attack from distance, and hp loss or attack not used */
+    if (ranged_attk(mtmp->data)
         && ((mtmp->mhp < (mtmp->mhpmax+1) / 3)
             || !mtmp->mspec_used))
         return TRUE;
