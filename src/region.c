@@ -1175,7 +1175,8 @@ create_gas_cloud(coordxy x, coordxy y, int cloudsize, int damage)
     add_region(cloud);
 
     if (!g.in_mklev && !inside_cloud && is_hero_inside_gas_cloud())
-        You("are enveloped in a cloud of noxious gas!");
+        You("are enveloped in a cloud of %s!",
+            damage ? "noxious gas" : "steam");
 
     return cloud;
 }
