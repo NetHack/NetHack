@@ -715,7 +715,7 @@ getspell(int* spell_no)
         for (;;) {
             Snprintf(qbuf, sizeof(qbuf), "Cast which spell? [%s *?]",
                      lets);
-            ilet = yn_function(qbuf, (char *) 0, '\0');
+            ilet = yn_function(qbuf, (char *) 0, '\0', TRUE);
             if (ilet == '*' || ilet == '?')
                 break; /* use menu mode */
             if (index(quitchars, ilet))

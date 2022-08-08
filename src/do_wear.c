@@ -1698,7 +1698,7 @@ dotakeoff(void)
             pline("Not wearing any armor or accessories.");
         return ECMD_OK;
     }
-    if (Narmorpieces != 1 || ParanoidRemove || cmdq_peek())
+    if (Narmorpieces != 1 || ParanoidRemove || cmdq_peek(CQ_CANNED))
         otmp = getobj("take off", takeoff_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return ECMD_CANCEL;
@@ -1717,7 +1717,7 @@ doremring(void)
         pline("Not wearing any accessories or armor.");
         return ECMD_OK;
     }
-    if (Naccessories != 1 || ParanoidRemove || cmdq_peek())
+    if (Naccessories != 1 || ParanoidRemove || cmdq_peek(CQ_CANNED))
         otmp = getobj("remove", remove_ok, GETOBJ_NOFLAGS);
     if (!otmp)
         return ECMD_CANCEL;
@@ -2105,7 +2105,7 @@ accessory_or_armor_on(struct obj *obj)
                     Sprintf(qbuf, "Which %s%s, Right or Left?",
                             humanoid(g.youmonst.data) ? "ring-" : "",
                             body_part(FINGER));
-                    answer = yn_function(qbuf, "rl", '\0');
+                    answer = yn_function(qbuf, "rl", '\0', TRUE);
                     switch (answer) {
                     case '\0':
                     case '\033':
@@ -2378,13 +2378,13 @@ glibr(void)
             otmp = uleft;
             Ring_off(uleft);
             dropx(otmp);
-            cmdq_clear();
+            cmdq_clear(CQ_CANNED);
         }
         if (rightfall) {
             otmp = uright;
             Ring_off(uright);
             dropx(otmp);
-            cmdq_clear();
+            cmdq_clear(CQ_CANNED);
         }
     }
 
@@ -2405,7 +2405,7 @@ glibr(void)
         xfl++;
         wastwoweap = TRUE;
         setuswapwep((struct obj *) 0); /* clears u.twoweap */
-        cmdq_clear();
+        cmdq_clear(CQ_CANNED);
         if (canletgo(otmp, ""))
             dropx(otmp);
     }
@@ -2441,7 +2441,7 @@ glibr(void)
         /* xfl++; */
         otmp->quan = savequan;
         setuwep((struct obj *) 0);
-        cmdq_clear();
+        cmdq_clear(CQ_CANNED);
         if (canletgo(otmp, ""))
             dropx(otmp);
     }

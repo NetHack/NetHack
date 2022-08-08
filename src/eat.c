@@ -2576,7 +2576,7 @@ edibility_prompts(struct obj *otmp)
     if (*buf) {
         Snprintf(eos(buf), sizeof buf - strlen(buf), "  Eat %s anyway?",
                  (otmp->quan == 1L) ? "it" : "one");
-        return (yn_function(buf, ynchars, 'n') == 'n') ? 1 : 2;
+        return (yn_function(buf, ynchars, 'n', TRUE) == 'n') ? 1 : 2;
     }
     return 0;
 }
@@ -3437,7 +3437,7 @@ floorfood(
                then the trap would just get eaten on the _next_ turn... */
             Sprintf(qbuf, "There is a bear trap here (%s); eat it?",
                     u_in_beartrap ? "holding you" : "armed");
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
+            if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
                 struct obj *beartrap;
 
                 deltrap(ttmp);
@@ -3473,7 +3473,7 @@ floorfood(
                                || !on_level(&g.context.digging.level, &u.uz))
                               ? "; eat them?"
                               : "; resume eating them?"));
-                c = yn_function(qbuf, ynqchars, 'n');
+                c = yn_function(qbuf, ynqchars, 'n', TRUE);
             }
             if (c == 'y')
                 return (struct obj *) &cg.zeroobj; /* csst away 'const' */
@@ -3488,7 +3488,7 @@ floorfood(
             else
                 Sprintf(qbuf, "There are %ld gold pieces here; eat them?",
                         gold->quan);
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
+            if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
                 return gold;
             } else if (c == 'q') {
                 return (struct obj *) 0;
@@ -3523,7 +3523,7 @@ floorfood(
             Sprintf(qsfx, " here; %s %s?", verb, one ? "it" : "one");
             (void) safe_qbuf(qbuf, qbuf, qsfx, otmp, doname, ansimpleoname,
                              one ? something : (const char *) "things");
-            if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y')
+            if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y')
                 return  otmp;
             else if (c == 'q')
                 return (struct obj *) 0;

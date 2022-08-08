@@ -627,13 +627,13 @@ static int
 drop(struct obj *obj)
 {
     if (!obj)
-        return ECMD_OK;
+        return ECMD_FAIL;
     if (!canletgo(obj, "drop"))
-        return ECMD_OK;
+        return ECMD_FAIL;
     if (obj == uwep) {
         if (welded(uwep)) {
             weldmsg(obj);
-            return ECMD_OK;
+            return ECMD_FAIL;
         }
         setuwep((struct obj *) 0);
     }

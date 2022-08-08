@@ -2684,7 +2684,7 @@ list_vanquished(char defquery, boolean ask)
 
         c = ask ? yn_function(
                             "Do you want an account of creatures vanquished?",
-                              ynaqchars, defquery)
+                             ynaqchars, defquery, TRUE)
                 : defquery;
         if (c == 'q')
             done_stopprint++;
@@ -2833,7 +2833,7 @@ list_genocided(char defquery, boolean ask)
                 (nextinct && !ngenocided) ? "extinct " : "",
                 (ngenocided) ? " genocided" : "",
                 (nextinct && ngenocided) ? " and extinct" : "");
-        c = ask ? yn_function(buf, ynqchars, defquery) : defquery;
+        c = ask ? yn_function(buf, ynqchars, defquery, TRUE) : defquery;
         if (c == 'q')
             done_stopprint++;
         if (c == 'y') {

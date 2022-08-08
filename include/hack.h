@@ -443,12 +443,12 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MMOVE_NOMOVES 4 /* monster has no valid locations to move to */
 
 /*** some utility macros ***/
-#define yn(query) yn_function(query, ynchars, 'n')
-#define ynq(query) yn_function(query, ynqchars, 'q')
-#define ynaq(query) yn_function(query, ynaqchars, 'y')
-#define nyaq(query) yn_function(query, ynaqchars, 'n')
-#define nyNaq(query) yn_function(query, ynNaqchars, 'n')
-#define ynNaq(query) yn_function(query, ynNaqchars, 'y')
+#define yn(query) yn_function(query, ynchars, 'n', TRUE)
+#define ynq(query) yn_function(query, ynqchars, 'q', TRUE)
+#define ynaq(query) yn_function(query, ynaqchars, 'y', TRUE)
+#define nyaq(query) yn_function(query, ynaqchars, 'n', TRUE)
+#define nyNaq(query) yn_function(query, ynNaqchars, 'n', TRUE)
+#define ynNaq(query) yn_function(query, ynNaqchars, 'y', TRUE)
 
 /* Macros for scatter */
 #define VIS_EFFECTS 0x01 /* display visual effects */

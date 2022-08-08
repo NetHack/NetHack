@@ -1937,7 +1937,7 @@ do_loot_cont(
                 && res != ECMD_TIME
                 && ccount == 1 && u_have_forceable_weapon()) {
                 /* single container, and we could #force it open... */
-                cmdq_add_ec(doforce); /* doforce asks for confirmation */
+                cmdq_add_ec(CQ_CANNED, doforce); /* doforce asks for confirmation */
                 g.abort_looting = TRUE;
             }
         }
@@ -2237,7 +2237,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
         Sprintf(qbuf, "Do you want to remove the saddle from %s?",
                 x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                          SUPPRESS_SADDLE, FALSE));
-        if ((c = yn_function(qbuf, ynqchars, 'n')) == 'y') {
+        if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
             if (nolimbs(g.youmonst.data)) {
                 You_cant("do that without limbs."); /* not body_part(HAND) */
                 return 0;
@@ -2890,7 +2890,7 @@ use_container(
                 Strcat(xbuf, "?");
             if (*xbuf)
                 Strcat(strcat(pbuf, "\033"), xbuf);
-            c = yn_function(qbuf, pbuf, more_containers ? 'n' : 'q');
+            c = yn_function(qbuf, pbuf, more_containers ? 'n' : 'q', TRUE);
         } /* PARTIAL|FULL vs other modes */
 
         if (c == '?') {

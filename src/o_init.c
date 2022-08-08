@@ -851,8 +851,7 @@ doclassdisco(void)
             }
         }
         /* get the class (via its symbol character) */
-        c = yn_function(prompt, discosyms, '\0');
-        savech(c);
+        c = yn_function(prompt, discosyms, '\0', TRUE);
         if (!c)
             clear_nhwindow(WIN_MESSAGE);
     } else {

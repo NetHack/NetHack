@@ -296,12 +296,9 @@ tty_get_ext_cmd(void)
         if (nmatches != -1)
             pline("%s%.60s: unknown extended command.",
                   visctrl(extcmd_char[0]), buf);
-        savech(0); /* reset do-again buffer */
-        savech(extcmd_char[0]);
         return -1;
     }
 
-    savech_extcmd(buf, TRUE); /* savech() for extcmd_char+buf[...]+'\n' */
     return ecmatches[0];
 }
 

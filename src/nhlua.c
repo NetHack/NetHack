@@ -1077,7 +1077,7 @@ nhl_pushkey(lua_State *L)
     if (argc == 1) {
         const char *key = luaL_checkstring(L, 1);
 
-        cmdq_add_key(key[0]);
+        cmdq_add_key(CQ_CANNED, key[0]);
     }
 
     return 0;

@@ -658,7 +658,6 @@ struct _create_particular_data {
 };
 
 /* some array sizes for 'g' */
-#define BSIZE 20
 #define WIZKIT_MAX 128
 #define CVT_BUF_SIZE 64
 
@@ -677,12 +676,14 @@ enum cmdq_cmdtypes {
     CMDQ_EXTCMD,  /* extended command, cmdq_add_ec() */
     CMDQ_DIR,     /* direction, cmdq_add_dir() */
     CMDQ_USER_INPUT, /* placeholder for user input, cmdq_add_userinput() */
+    CMDQ_INT,     /* integer value, cmdq_add_int() */
 };
 
 struct _cmd_queue {
     int typ;
     char key;
     schar dirx, diry, dirz;
+    int intval;
     const struct ext_func_tab *ec_entry;
     struct _cmd_queue *next;
 };
@@ -693,6 +694,12 @@ struct enum_dump {
 };
 
 typedef long cmdcount_nht;	/* Command counts */
+
+enum {
+    CQ_CANNED = 0, /* internal canned sequence */
+    CQ_REPEAT,     /* user-inputted, if g.in_doagain, replayed */
+    NUM_CQS
+};
 
 /*
  * 'g' -- instance_globals holds engine state that does not need to be
@@ -706,7 +713,7 @@ typedef long cmdcount_nht;	/* Command counts */
  */
 struct instance_globals {
 
-    struct _cmd_queue *command_queue;
+    struct _cmd_queue *command_queue[NUM_CQS];
 
     /* apply.c */
     int jumping_is_magic; /* current jump result of magic */
@@ -740,12 +747,6 @@ struct instance_globals {
        which requires a thing and a direction), and the input prompt is
        not shown.  Also, while in_doagain is TRUE, no keystrokes can be
        saved into the saveq. */
-    char pushq[BSIZE];
-    char saveq[BSIZE];
-    int phead;
-    int ptail;
-    int shead;
-    int stail;
     coord clicklook_cc;
     winid en_win;
     boolean en_via_menu;

@@ -275,8 +275,8 @@ moveloop_core(void)
                                 check_leash(old_ux, old_uy);
                             }
                             /* clear doagain keystrokes */
-                            pushch(0);
-                            savech(0);
+                            cmdq_clear(CQ_CANNED);
+                            cmdq_clear(CQ_REPEAT);
                         }
                     }
                     /* delayed change may not be valid anymore */
@@ -431,7 +431,7 @@ moveloop_core(void)
             if ((ch = pgetchar()) == ABORT)
                 mvl_abort_lev++;
             else
-                pushch(ch);
+                cmdq_push_key(CQ_CANNED, ch);
         }
         if (!mvl_abort_lev && (*g.occupation)() == 0)
 #else
@@ -609,11 +609,10 @@ stop_occupation(void)
         g.occupation = 0;
         g.context.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
-        pushch(0);
     } else if (g.multi >= 0) {
         nomul(0);
     }
-    cmdq_clear();
+    cmdq_clear(CQ_CANNED);
 }
 
 void

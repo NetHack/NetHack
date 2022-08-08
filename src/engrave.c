@@ -969,7 +969,7 @@ doengrave(void)
                    && (!Blind || oep->engr_type == BURN
                        || oep->engr_type == ENGRAVE)) {
             c = yn_function("Do you want to add to the current engraving?",
-                            ynqchars, 'y');
+                            ynqchars, 'y', TRUE);
             if (c == 'q') {
                 pline1(Never_mind);
                 return ECMD_OK;

@@ -1557,12 +1557,8 @@ X11_get_ext_cmd(void)
     (void) x_event(EXIT_ON_EXIT);
 
     if (extended_cmd_selected < 0) {
-        if (!g.in_doagain)
-            savech(0);
         return -1;
     }
-    if (!g.in_doagain)
-        savech_extcmd(command_list[extended_cmd_selected], TRUE);
     return command_indx[extended_cmd_selected];
 }
 

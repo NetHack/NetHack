@@ -496,20 +496,12 @@ curses_ext_cmd(void)
         curses_destroy_win(extwin2);
 
     if (ret != -1) {
-        if (!g.in_doagain)
-            savech_extcmd(cur_choice, TRUE);
     } else {
         char extcmd_char = extcmd_initiator();
 
         if (*cur_choice)
             pline("%s%s: unknown extended command.",
                   visctrl(extcmd_char), cur_choice);
-
-        if (!g.in_doagain) {
-            savech(0); /* reset do-again buffer */
-            if (letter != '\033')
-                savech(extcmd_char);
-        }
     }
     return ret;
 }

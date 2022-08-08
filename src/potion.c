@@ -2299,7 +2299,7 @@ dip_into(void)
     struct obj *obj, *potion;
     char qbuf[QBUFSZ];
 
-    if (!cmdq_peek()) {
+    if (!cmdq_peek(CQ_CANNED)) {
         impossible("dip_into: where is potion?");
         return ECMD_FAIL;
     }

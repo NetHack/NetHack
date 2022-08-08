@@ -530,7 +530,7 @@ void NetHackQtMapViewport::Display(bool block)
     change.clear();
 
     if (block) {
-	yn_function("Press a key when done viewing", NULL, '\0');
+	yn_function("Press a key when done viewing", NULL, '\0', TRUE);
     }
 }
 

@@ -233,12 +233,34 @@ set_occupation(int (*fn)(void), const char *txt, cmdcount_nht xtime)
     return;
 }
 
+/*
+void
+cmdq_print(int q)
+{
+    struct _cmd_queue *cq = g.command_queue[q];
+    char buf[QBUFSZ];
+
+    pline("CQ:%i", q);
+    while (cq) {
+        switch (cq->typ) {
+        case CMDQ_KEY: pline("(key:%s)", key2txt(cq->key, buf)); break;
+        case CMDQ_EXTCMD: pline("(extcmd:#%s)", cq->ec_entry->ef_txt); break;
+        case CMDQ_DIR: pline("(dir:%i,%i,%i)", cq->dirx, cq->diry, cq->dirz); break;
+        case CMDQ_USER_INPUT: pline1("(userinput)"); break;
+        case CMDQ_INT: pline("(int:%i)", cq->intval); break;
+        default: pline("(ERROR:%i)",cq->typ); break;
+        }
+        cq = cq->next;
+    }
+}
+*/
+
 /* add extended command function to the command queue */
 void
-cmdq_add_ec(int (*fn)(void))
+cmdq_add_ec(int q, int (*fn)(void))
 {
     struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
-    struct _cmd_queue *cq = g.command_queue;
+    struct _cmd_queue *cq = g.command_queue[q];
 
     tmp->typ = CMDQ_EXTCMD;
     tmp->ec_entry = ext_func_tab_from_func(fn);
@@ -250,15 +272,15 @@ cmdq_add_ec(int (*fn)(void))
     if (cq)
         cq->next = tmp;
     else
-        g.command_queue = tmp;
+        g.command_queue[q] = tmp;
 }
 
 /* add a key to the command queue */
 void
-cmdq_add_key(char key)
+cmdq_add_key(int q, char key)
 {
     struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
-    struct _cmd_queue *cq = g.command_queue;
+    struct _cmd_queue *cq = g.command_queue[q];
 
     tmp->typ = CMDQ_KEY;
     tmp->key = key;
@@ -270,15 +292,15 @@ cmdq_add_key(char key)
     if (cq)
         cq->next = tmp;
     else
-        g.command_queue = tmp;
+        g.command_queue[q] = tmp;
 }
 
 /* add a direction to the command queue */
 void
-cmdq_add_dir(schar dx, schar dy, schar dz)
+cmdq_add_dir(int q, schar dx, schar dy, schar dz)
 {
     struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
-    struct _cmd_queue *cq = g.command_queue;
+    struct _cmd_queue *cq = g.command_queue[q];
 
     tmp->typ = CMDQ_DIR;
     tmp->dirx = dx;
@@ -292,15 +314,15 @@ cmdq_add_dir(schar dx, schar dy, schar dz)
     if (cq)
         cq->next = tmp;
     else
-        g.command_queue = tmp;
+        g.command_queue[q] = tmp;
 }
 
 /* add placeholder to the command queue, allows user input there */
 void
-cmdq_add_userinput(void)
+cmdq_add_userinput(int q)
 {
     struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
-    struct _cmd_queue *cq = g.command_queue;
+    struct _cmd_queue *cq = g.command_queue[q];
 
     tmp->typ = CMDQ_USER_INPUT;
     tmp->next = NULL;
@@ -311,7 +333,80 @@ cmdq_add_userinput(void)
     if (cq)
         cq->next = tmp;
     else
-        g.command_queue = tmp;
+        g.command_queue[q] = tmp;
+}
+
+/* add integer to the command queue */
+void
+cmdq_add_int(int q, int val)
+{
+    struct _cmd_queue *tmp = (struct _cmd_queue *) alloc(sizeof *tmp);
+    struct _cmd_queue *cq = g.command_queue[q];
+
+    tmp->typ = CMDQ_INT;
+    tmp->intval = val;
+    tmp->next = NULL;
+
+    while (cq && cq->next)
+        cq = cq->next;
+
+    if (cq)
+        cq->next = tmp;
+    else
+        g.command_queue[q] = tmp;
+}
+
+/* shift the last entry in command queue to first */
+void
+cmdq_shift(int q)
+{
+    struct _cmd_queue *tmp = NULL;
+    struct _cmd_queue *cq = g.command_queue[q];
+
+    while (cq && cq->next && cq->next->next)
+        cq = cq->next;
+
+    if (cq)
+        tmp = cq->next;
+    if (tmp) {
+        tmp->next = g.command_queue[q];
+        g.command_queue[q] = tmp;
+        cq->next = NULL;
+    }
+}
+
+struct _cmd_queue *
+cmdq_reverse(struct _cmd_queue *head)
+{
+    struct _cmd_queue *prev = NULL, *curr = head, *next;
+
+    while (curr) {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
+}
+
+struct _cmd_queue *
+cmdq_copy(int q)
+{
+    struct _cmd_queue *tmp = NULL;
+    struct _cmd_queue *cq = g.command_queue[q];
+
+    while (cq) {
+        struct _cmd_queue *tmp2 = (struct _cmd_queue *) alloc(sizeof *tmp2);
+
+        *tmp2 = *cq;
+        tmp2->next = tmp;
+        tmp = tmp2;
+        cq = cq->next;
+    }
+
+    tmp = cmdq_reverse(tmp);
+
+    return tmp;
 }
 
 /* pop off the topmost command from the command queue.
@@ -320,10 +415,11 @@ cmdq_add_userinput(void)
 struct _cmd_queue *
 cmdq_pop(void)
 {
-    struct _cmd_queue *tmp = g.command_queue;
+    int q = (g.in_doagain) ? CQ_REPEAT : CQ_CANNED;
+    struct _cmd_queue *tmp = g.command_queue[q];
 
     if (tmp) {
-        g.command_queue = tmp->next;
+        g.command_queue[q] = tmp->next;
         tmp->next = NULL;
     }
     return tmp;
@@ -331,16 +427,16 @@ cmdq_pop(void)
 
 /* get the top entry without popping it */
 struct _cmd_queue *
-cmdq_peek(void)
+cmdq_peek(int q)
 {
-    return g.command_queue;
+    return g.command_queue[q];
 }
 
 /* clear all commands from the command queue */
 void
-cmdq_clear(void)
+cmdq_clear(int q)
 {
-    struct _cmd_queue *tmp = g.command_queue;
+    struct _cmd_queue *tmp = g.command_queue[q];
     struct _cmd_queue *tmp2;
 
     while (tmp) {
@@ -348,94 +444,20 @@ cmdq_clear(void)
         free(tmp);
         tmp = tmp2;
     }
-    g.command_queue = NULL;
-}
-
-static char popch(void);
-
-static char
-popch(void)
-{
-    /* If occupied, return '\0', letting tgetch know a character should
-     * be read from the keyboard.  If the character read is not the
-     * ABORT character (as checked in pcmain.c), that character will be
-     * pushed back on the pushq.
-     */
-    if (g.occupation)
-        return '\0';
-    if (g.in_doagain)
-        return (char) ((g.shead != g.stail) ? g.saveq[g.stail++] : '\0');
-    else
-        return (char) ((g.phead != g.ptail) ? g.pushq[g.ptail++] : '\0');
+    g.command_queue[q] = NULL;
 }
 
 char
 pgetchar(void) /* courtesy of aeb@cwi.nl */
 {
-    register int ch;
+    register int ch = '\0';
 
+    if (g.occupation)
+        return '\0';
     if (iflags.debug_fuzzer)
         return randomkey();
-    if (!(ch = popch()))
-        ch = nhgetch();
+    ch = nhgetch();
     return (char) ch;
-}
-
-/* A ch == 0 resets the pushq */
-void
-pushch(char ch)
-{
-    if (!ch)
-        g.phead = g.ptail = 0;
-    if (g.phead < BSIZE)
-        g.pushq[g.phead++] = ch;
-    return;
-}
-
-/* A ch == 0 resets the saveq.  Only save keystrokes when not
- * replaying a previous command.
- */
-void
-savech(char ch)
-{
-    if (!g.in_doagain) {
-        if (!ch)
-            g.phead = g.ptail = g.shead = g.stail = 0;
-        else if (g.shead < BSIZE)
-            g.saveq[g.shead++] = ch;
-    }
-    return;
-}
-
-/* perform savech() for the characters of an extended command name */
-void
-savech_extcmd(const char *str, boolean addnewline)
-{
-    unsigned j, L = Strlen(str);
-
-    /* DEBUGFILES='cmd.c' -- for tty or other one-line message 'window'
-       this debuging line could be immediately erased and need ^P to read */
-    debugpline1("savech_extcmd(\"%s\")", str);
-
-    /* 'str' might be the full command name or maybe just enough to be
-       unambiguous depending on how the interface handles that; if it is
-       "repeat" (or leading substring of that), don't save it for do-again */
-    if (!g.in_doagain && (L > 2 && strncmp(str, "repeat", L))) {
-        uchar c = (g.shead > 0) ? (uchar) (g.saveq[g.shead - 1] & 0xff) : 0;
-
-        /* reset saveq unless it holds a prefix */
-        if (!c || !g.Cmd.commands[c]
-            || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
-            savech(0);
-
-        /* insert the '#' first because rhack() avoids doing that when
-           processing doextcmd() */
-        savech(g.Cmd.extcmd_char);
-        for (j = 0; j < L; ++j)
-            savech(str[j]);
-        if (addnewline)
-            savech('\n');
-    }
 }
 
 /* '#' or whatever has been bound to doextcmd() in its place */
@@ -871,7 +893,7 @@ domonability(void)
     char c = '\0';
 
     if (might_hide && webmaker(uptr)) {
-        c = yn_function("Hide [h] or spin a web [s]?", "hsq", 'q');
+        c = yn_function("Hide [h] or spin a web [s]?", "hsq", 'q', TRUE);
         if (c == 'q' || c == '\033')
             return ECMD_OK;
     }
@@ -1388,7 +1410,7 @@ wiz_flip_level(void)
      * as flipping is normally done only during level creation.
      */
     if (wizard) {
-        char c = yn_function(prmpt, choices, '\0');
+        char c = yn_function(prmpt, choices, '\0', TRUE);
 
         if (c && index(choices, c)) {
             c -= '0';
@@ -2409,18 +2431,18 @@ do_repeat(void)
     int res = ECMD_OK;
 
     if (!g.in_doagain) {
-        char c = g.saveq[0];
+        struct _cmd_queue *repeat_copy;
 
-        if (!c || !g.Cmd.commands[c & 0xff]) {
+        if (!cmdq_peek(CQ_REPEAT)) {
             Norep("There is no command available to repeat.");
-            if (c)
-                savech(0);
             return ECMD_FAIL;
         }
+        repeat_copy = cmdq_copy(CQ_REPEAT);
         g.in_doagain = TRUE;
-        g.stail = 0;
         rhack((char *) 0); /* read and execute command */
         g.in_doagain = FALSE;
+        cmdq_clear(CQ_REPEAT);
+        g.command_queue[CQ_REPEAT] = repeat_copy;
         iflags.menu_requested = FALSE;
         if (g.context.move)
             res = ECMD_TIME;
@@ -3965,7 +3987,7 @@ list_migrating_mons(
         Strcat(prmpt, "a q");
         if (*xtra)
             Sprintf(eos(prmpt), "%c%s", '\033', xtra);
-        c = yn_function("List which?", prmpt, 'q');
+        c = yn_function("List which?", prmpt, 'q', TRUE);
         n = (c == 'c') ? here
             : (c == 'n') ? nxtlv
               : (c == 'o') ? other
@@ -4460,8 +4482,10 @@ reset_cmd_vars(boolean reset_cmdq)
         selection_free(g.travelmap, TRUE);
         g.travelmap = NULL;
     }
-    if (reset_cmdq)
-        cmdq_clear();
+    if (reset_cmdq) {
+        cmdq_clear(CQ_CANNED);
+        cmdq_clear(CQ_REPEAT);
+    }
 }
 
 void
@@ -4495,7 +4519,7 @@ rhack(char *cmd)
     } else if (firsttime) {
         cmd = parse();
         /* parse() pushed a cmd but didn't return any key */
-        if (!*cmd && g.command_queue)
+        if (!*cmd && cmdq_peek(CQ_CANNED))
             goto got_prefix_input;
     }
 
@@ -4563,13 +4587,28 @@ rhack(char *cmd)
                 if (tlist->f_text && !g.occupation && g.multi)
                     set_occupation(func, tlist->f_text, g.multi);
                 g.ext_tlist = NULL;
+
+                if (!g.in_doagain && func != do_repeat && func != doextcmd) {
+                    if (!prefix_seen)
+                        cmdq_clear(CQ_REPEAT);
+                    cmdq_add_ec(CQ_REPEAT, ((struct ext_func_tab *) tlist)->ef_funct);
+                } else {
+                    if (func == doextcmd) {
+                        cmdq_clear(CQ_REPEAT);
+                    }
+                }
                 res = (*func)(); /* perform the command */
                 /* if 'func' is doextcmd(), 'tlist' is for Cmd.commands['#']
                    rather than for the command that doextcmd() just ran;
                    doextcmd() notifies us what that was via ext_tlist;
                    other commands leave it Null */
-                if (g.ext_tlist)
+                if (g.ext_tlist) {
                     tlist = g.ext_tlist, g.ext_tlist = NULL;
+                    /* Add the command post-execution */
+                    cmdq_add_ec(CQ_REPEAT, ((struct ext_func_tab *) tlist)->ef_funct);
+                    /* shift the command to first */
+                    cmdq_shift(CQ_REPEAT);
+                }
 
                 if ((tlist->flags & PREFIXCMD) != 0) {
                     /* it was a prefix command, mark and get another cmd */
@@ -4654,8 +4693,8 @@ rhack(char *cmd)
             || !help_dir(c1, prefix_seen->key, "Invalid direction key!"))
 #endif
             Norep("Unknown command '%s'.", expcmd);
-        cmdq_clear();
-        savech(0); /* clear do-again queue */
+        cmdq_clear(CQ_CANNED);
+        cmdq_clear(CQ_REPEAT);
     }
     /* didn't move */
     g.context.move = FALSE;
@@ -4786,7 +4825,7 @@ getdir(const char *s)
                 dirsym = g.Cmd.dirchars[(cmdq->dirz > 0) ? DIR_DOWN : DIR_UP];
             }
         } else {
-            cmdq_clear();
+            cmdq_clear(CQ_CANNED);
             dirsym = '\0';
             impossible("getdir: command queue had no dir?");
         }
@@ -4799,7 +4838,7 @@ getdir(const char *s)
         dirsym = readchar();
     else
         dirsym = yn_function((s && *s != '^') ? s : "In what direction?",
-                             (char *) 0, '\0');
+                             (char *) 0, '\0', FALSE);
     /* remove the prompt string so caller won't have to */
     clear_nhwindow(WIN_MESSAGE);
 
@@ -4807,7 +4846,8 @@ getdir(const char *s)
         docrt();              /* redraw */
         goto retry;
     }
-    savech(dirsym);
+    if (!g.in_doagain)
+        cmdq_add_key(CQ_REPEAT, dirsym);
 
  got_dirsym:
     if (dirsym == g.Cmd.spkeys[NHKF_GETDIR_SELF]
@@ -5447,16 +5487,16 @@ act_on_act(
            clicks and shouldn't inhibit explicit travel. */
         iflags.travelcc.x = u.tx = u.ux + dx;
         iflags.travelcc.y = u.ty = u.uy + dy;
-        cmdq_add_ec(dotravel_target);
+        cmdq_add_ec(CQ_CANNED, dotravel_target);
         break;
     case MCMD_THROW_OBJ:
-        cmdq_add_ec(dothrow);
-        cmdq_add_userinput();
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, dothrow);
+        cmdq_add_userinput(CQ_CANNED);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_OPEN_DOOR:
-        cmdq_add_ec(doopen);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, doopen);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_LOCK_DOOR:
         otmp = carrying(SKELETON_KEY);
@@ -5465,131 +5505,131 @@ act_on_act(
         if (!otmp)
             otmp = carrying(CREDIT_CARD);
         if (otmp) {
-            cmdq_add_ec(doapply);
-            cmdq_add_key(otmp->invlet);
-            cmdq_add_dir(dx, dy, 0);
-            cmdq_add_key('y'); /* "Lock it?" */
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
+            cmdq_add_dir(CQ_CANNED, dx, dy, 0);
+            cmdq_add_key(CQ_CANNED, 'y'); /* "Lock it?" */
         }
         break;
     case MCMD_UNTRAP_DOOR:
-        cmdq_add_ec(dountrap);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, dountrap);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_KICK_DOOR:
-        cmdq_add_ec(dokick);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, dokick);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_CLOSE_DOOR:
-        cmdq_add_ec(doclose);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, doclose);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_SEARCH:
-        cmdq_add_ec(dosearch);
+        cmdq_add_ec(CQ_CANNED, dosearch);
         break;
     case MCMD_LOOK_TRAP:
-        cmdq_add_ec(doidtrap);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, doidtrap);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_UNTRAP_TRAP:
-        cmdq_add_ec(dountrap);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, dountrap);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_MOVE_DIR:
         dir = xytod(dx, dy);
-        cmdq_add_ec(move_funcs[dir][MV_WALK]);
+        cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
         break;
     case MCMD_RIDE:
-        cmdq_add_ec(doride);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, doride);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_REMOVE_SADDLE:
         /* m-prefix for #loot: skip any floor containers */
-        cmdq_add_ec(do_reqmenu);
-        cmdq_add_ec(doloot);
-        cmdq_add_dir(dx, dy, 0);
-        cmdq_add_key('y'); /* "Do you want to remove the saddle ..." */
+        cmdq_add_ec(CQ_CANNED, do_reqmenu);
+        cmdq_add_ec(CQ_CANNED, doloot);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
+        cmdq_add_key(CQ_CANNED, 'y'); /* "Do you want to remove the saddle ..." */
         break;
     case MCMD_APPLY_SADDLE:
         if ((otmp = carrying(SADDLE)) != 0) {
-            cmdq_add_ec(doapply);
-            cmdq_add_key(otmp->invlet);
-            cmdq_add_dir(dx, dy, 0);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
+            cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         }
         break;
     case MCMD_ATTACK_NEXT2U:
         dir = xytod(dx, dy);
-        cmdq_add_ec(move_funcs[dir][MV_WALK]);
+        cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
         break;
     case MCMD_TALK:
-        cmdq_add_ec(dotalk);
-        cmdq_add_dir(dx, dy, 0);
+        cmdq_add_ec(CQ_CANNED, dotalk);
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0);
         break;
     case MCMD_NAME:
-        cmdq_add_ec(docallcmd);
-        cmdq_add_key('m'); /* name a monster */
-        cmdq_add_dir(dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
+        cmdq_add_ec(CQ_CANNED, docallcmd);
+        cmdq_add_key(CQ_CANNED, 'm'); /* name a monster */
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
         break;
     case MCMD_QUAFF:
-        cmdq_add_ec(dodrink);
-        cmdq_add_key('y'); /* "Drink from the fountain?" */
+        cmdq_add_ec(CQ_CANNED, dodrink);
+        cmdq_add_key(CQ_CANNED, 'y'); /* "Drink from the fountain?" */
         break;
     case MCMD_DIP:
-        cmdq_add_ec(dodip);
-        cmdq_add_userinput();
-        cmdq_add_key('y'); /* "Dip foo into the fountain?" */
+        cmdq_add_ec(CQ_CANNED, dodip);
+        cmdq_add_userinput(CQ_CANNED);
+        cmdq_add_key(CQ_CANNED, 'y'); /* "Dip foo into the fountain?" */
         break;
     case MCMD_SIT:
-        cmdq_add_ec(dosit);
+        cmdq_add_ec(CQ_CANNED, dosit);
         break;
     case MCMD_UP:
-        cmdq_add_ec(doup);
+        cmdq_add_ec(CQ_CANNED, doup);
         break;
     case MCMD_DOWN:
-        cmdq_add_ec(dodown);
+        cmdq_add_ec(CQ_CANNED, dodown);
         break;
     case MCMD_DISMOUNT:
-        cmdq_add_ec(doride);
+        cmdq_add_ec(CQ_CANNED, doride);
         break;
     case MCMD_MONABILITY:
-        cmdq_add_ec(domonability);
+        cmdq_add_ec(CQ_CANNED, domonability);
         break;
     case MCMD_PICKUP:
-        cmdq_add_ec(dopickup);
+        cmdq_add_ec(CQ_CANNED, dopickup);
         break;
     case MCMD_LOOT:
-        cmdq_add_ec(doloot);
+        cmdq_add_ec(CQ_CANNED, doloot);
         break;
     case MCMD_EAT:
-        cmdq_add_ec(doeat);
-        cmdq_add_key('y'); /* "There is foo here; eat it?" */
+        cmdq_add_ec(CQ_CANNED, doeat);
+        cmdq_add_key(CQ_CANNED, 'y'); /* "There is foo here; eat it?" */
         break;
     case MCMD_DROP:
-        cmdq_add_ec(dodrop);
+        cmdq_add_ec(CQ_CANNED, dodrop);
         break;
     case MCMD_INVENTORY:
-        cmdq_add_ec(ddoinv);
+        cmdq_add_ec(CQ_CANNED, ddoinv);
         break;
     case MCMD_REST:
-        cmdq_add_ec(donull);
+        cmdq_add_ec(CQ_CANNED, donull);
         break;
     case MCMD_LOOK_HERE:
-        cmdq_add_ec(dolook);
+        cmdq_add_ec(CQ_CANNED, dolook);
         break;
     case MCMD_LOOK_AT:
         g.clicklook_cc.x = u.ux + dx;
         g.clicklook_cc.y = u.uy + dy;
-        cmdq_add_ec(doclicklook);
+        cmdq_add_ec(CQ_CANNED, doclicklook);
         break;
     case MCMD_UNTRAP_HERE:
-        cmdq_add_ec(dountrap);
-        cmdq_add_dir(0, 0, 1);
+        cmdq_add_ec(CQ_CANNED, dountrap);
+        cmdq_add_dir(CQ_CANNED, 0, 0, 1);
         break;
     case MCMD_OFFER:
-        cmdq_add_ec(dosacrifice);
-        cmdq_add_userinput();
+        cmdq_add_ec(CQ_CANNED, dosacrifice);
+        cmdq_add_userinput(CQ_CANNED);
         break;
     case MCMD_CAST_SPELL:
-        cmdq_add_ec(docast);
+        cmdq_add_ec(CQ_CANNED, docast);
         break;
     default:
         break;
@@ -5625,11 +5665,11 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
         if (next2u(x, y) && !test_move(u.ux, u.uy, dx, dy, TEST_MOVE)) {
             int dir = xytod(dx, dy);
 
-            cmdq_add_ec(move_funcs[dir][MV_WALK]);
+            cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
         } else if (flags.travelcmd) {
             iflags.travelcc.x = u.tx = x;
             iflags.travelcc.y = u.ty = y;
-            cmdq_add_ec(dotravel_target);
+            cmdq_add_ec(CQ_CANNED, dotravel_target);
         }
         npick = 0;
         ch = '\0';
@@ -5675,7 +5715,7 @@ click_to_cmd(coordxy x, coordxy y, int mod)
     if (!iflags.herecmd_menu && iflags.clicklook && mod == CLICK_2) {
         g.clicklook_cc.x = x;
         g.clicklook_cc.y = y;
-        cmdq_add_ec(doclicklook);
+        cmdq_add_ec(CQ_CANNED, doclicklook);
         return cmd;
     }
     if (iflags.herecmd_menu && isok(x, y)) {
@@ -5692,7 +5732,7 @@ click_to_cmd(coordxy x, coordxy y, int mod)
         } else {
             iflags.travelcc.x = u.tx = u.ux + x;
             iflags.travelcc.y = u.ty = u.uy + y;
-            cmdq_add_ec(dotravel_target);
+            cmdq_add_ec(CQ_CANNED, dotravel_target);
             return cmd;
         }
 
@@ -5893,15 +5933,6 @@ parse(void)
         /* g.command_count will be set again when we
            re-enter with g.in_doagain set true */
         g.command_count = g.last_command_count;
-    } else {
-        uchar c = (g.shead > 0) ? (uchar) (g.saveq[g.shead - 1] & 0xff) : 0;
-
-        g.last_command_count = g.command_count;
-        /* reset saveq unless it holds a prefix */
-        if (!c || !g.Cmd.commands[c]
-            || (g.Cmd.commands[c]->flags & PREFIXCMD) == 0)
-            savech(0);
-        savech((char) foo);
     }
 
     g.multi = g.command_count;
@@ -6136,7 +6167,7 @@ doclicklook(void)
  *   window port causing a buffer overflow there.
  */
 char
-yn_function(const char *query, const char *resp, char def)
+yn_function(const char *query, const char *resp, char def, boolean addcmdq)
 {
     char res = '\033', qbuf[QBUFSZ];
     struct _cmd_queue cq, *cmdq;
@@ -6169,9 +6200,11 @@ yn_function(const char *query, const char *resp, char def)
         if (cq.typ == CMDQ_KEY)
             res = cq.key;
         else
-            cmdq_clear(); /* 'res' is ESC */
+            cmdq_clear(CQ_CANNED); /* 'res' is ESC */
     } else {
         res = (*windowprocs.win_yn_function)(query, resp, def);
+        if (addcmdq)
+            cmdq_add_key(CQ_REPEAT, res);
     }
 
 #ifdef DUMPLOG

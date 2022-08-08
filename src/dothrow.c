@@ -480,8 +480,8 @@ dofire(void)
                        && !(uswapwep->cursed && uswapwep->bknown)) {
                 /* we have a known not-cursed polearm as swap weapon.
                    swap to it and retry */
-                cmdq_add_ec(doswapweapon);
-                cmdq_add_ec(dofire);
+                cmdq_add_ec(CQ_CANNED, doswapweapon);
+                cmdq_add_ec(CQ_CANNED, dofire);
                 return ECMD_OK; /* haven't taken any time yet */
             } else {
                 You("have no ammunition readied.");
@@ -522,16 +522,16 @@ dofire(void)
             obj = uquiver;
         } else if (ammo_and_launcher(uquiver, uswapwep)) {
             /* swap weapons and retry fire */
-            cmdq_add_ec(doswapweapon);
-            cmdq_add_ec(dofire);
+            cmdq_add_ec(CQ_CANNED, doswapweapon);
+            cmdq_add_ec(CQ_CANNED, dofire);
             return res;
         } else if ((olauncher = find_launcher(uquiver)) != 0) {
             /* wield launcher, retry fire */
             if (uwep && !flags.pushweapon)
-                cmdq_add_ec(doswapweapon);
-            cmdq_add_ec(dowield);
-            cmdq_add_key(olauncher->invlet);
-            cmdq_add_ec(dofire);
+                cmdq_add_ec(CQ_CANNED, doswapweapon);
+            cmdq_add_ec(CQ_CANNED, dowield);
+            cmdq_add_key(CQ_CANNED, olauncher->invlet);
+            cmdq_add_ec(CQ_CANNED, dofire);
             return res;
         }
     }

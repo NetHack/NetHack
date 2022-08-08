@@ -969,8 +969,8 @@ use_pick_axe(struct obj *obj)
     if (obj != uwep) {
         if (wield_tool(obj, "swing")) {
             /* we're now wielding it. next turn, apply to dig. */
-            cmdq_add_ec(doapply);
-            cmdq_add_key(obj->invlet);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, obj->invlet);
             return ECMD_TIME;
         }
         return ECMD_OK;

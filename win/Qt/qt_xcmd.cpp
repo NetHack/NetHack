@@ -583,12 +583,6 @@ int NetHackQtExtCmdRequestor::get()
 	exec();
 
     int ret = result() - 1;
-    if (!::g.in_doagain) {
-        if (ret >= 0)
-            savech_extcmd(::extcmdlist[ret].ef_txt, FALSE);
-        else
-            savech(0);
-    }
     return ret;
 }
 

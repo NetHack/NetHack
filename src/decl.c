@@ -192,7 +192,7 @@ const struct Race urace_init_data = {
 
 const struct instance_globals g_init = {
 
-    NULL, /* command_queue */
+    UNDEFINED_VALUES, /* command_queue */
 
     /* apply.c */
     0,  /* jumping_is_magic */
@@ -219,12 +219,6 @@ const struct instance_globals g_init = {
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
-    UNDEFINED_VALUES, /* pushq */
-    UNDEFINED_VALUES, /* saveq */
-    UNDEFINED_VALUE, /* phead */
-    UNDEFINED_VALUE, /* ptail */
-    UNDEFINED_VALUE, /* shead */
-    UNDEFINED_VALUE, /* stail */
     UNDEFINED_VALUES, /* clicklook_cc */
     WIN_ERR, /* en_win */
     FALSE, /* en_via_menu */

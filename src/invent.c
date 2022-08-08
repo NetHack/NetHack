@@ -1532,7 +1532,9 @@ getobj(
     boolean oneloop = FALSE;
     Loot *sortedinvent, *srtinv;
     struct _cmd_queue cq, *cmdq;
+    boolean need_more_cq = FALSE;
 
+ need_more_cq:
     if ((cmdq = cmdq_pop()) != 0) {
         cq = *cmdq;
         free(cmdq);
@@ -1559,12 +1561,30 @@ getobj(
                                 break;
                         }
                 }
+            } else if (cq.typ == CMDQ_INT) {
+                /* getting a partial stack */
+                if (!cntgiven && allowcnt) {
+                    cnt = cq.intval;
+                    cntgiven = TRUE;
+                    goto need_more_cq; /* now, get CMDQ_KEY */
+                } else {
+                    cmdq_clear(CQ_CANNED); /* this should maybe clear the CQ_REPEAT too? */
+                    return NULL;
+                }
             }
             if (!otmp)        /* didn't find what we were looking for, */
-                cmdq_clear(); /* so discard any other queued commands  */
+                cmdq_clear(CQ_CANNED); /* so discard any other queued commands  */
+            else if (cntgiven) {
+                /* if stack is smaller than count, drop the whole stack */
+                if (cnt < 1 || otmp->quan <= cnt)
+                    cntgiven = FALSE;
+                goto split_otmp;
+            }
             return otmp;
         } /* !CMDQ_USER_INPUT */
-    } /* cmdq */
+    } else if (need_more_cq) {
+        return NULL;
+    }
 
     /* is "hands"/"self" a valid thing to do this action on? */
     switch ((*obj_ok)((struct obj *) 0)) {
@@ -1669,7 +1689,7 @@ getobj(
                 Strcat(qbuf, " [*]");
             else
                 Sprintf(eos(qbuf), " [%s or ?*]", buf);
-            ilet = yn_function(qbuf, (char *) 0, '\0');
+            ilet = yn_function(qbuf, (char *) 0, '\0', FALSE);
         }
         if (digit(ilet)) {
             long tmpcnt = 0;
@@ -1782,7 +1802,11 @@ getobj(
             }
         }
         g.context.botl = 1; /* May have changed the amount of money */
-        savech(ilet);
+        if (otmp && !g.in_doagain) {
+            if (cntgiven && cnt > 0)
+                cmdq_add_int(CQ_REPEAT, cnt);
+            cmdq_add_key(CQ_REPEAT, ilet);
+        }
         /* [we used to set otmp (by finding ilet in invent) here, but
            that's been moved above so that otmp can be checked earlier] */
         /* verify the chosen object */
@@ -1803,6 +1827,7 @@ getobj(
         silly_thing(word, otmp);
         return (struct obj *) 0;
     }
+split_otmp:
     if (cntgiven) {
         if (cnt == 0)
             return (struct obj *) 0;
@@ -2990,110 +3015,110 @@ itemactions(struct obj *otmp)
         case IA_NONE:
             break;
         case IA_UNWIELD:
-            cmdq_add_ec((otmp == uwep) ? dowield
+            cmdq_add_ec(CQ_CANNED, (otmp == uwep) ? dowield
                         : (otmp == uswapwep) ? remarm_swapwep
                           : (otmp == uquiver) ? dowieldquiver
                             : donull); /* can't happen */
-            cmdq_add_key('-');
+            cmdq_add_key(CQ_CANNED, '-');
             break;
         case IA_APPLY_OBJ:
-            cmdq_add_ec(doapply);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_DIP_OBJ:
             /* #altdip instead of normal #dip - takes potion to dip into
                first (the inventory item instigating this) and item to
                be dipped second, also ignores floor features such as
                fountain/sink so we don't need to force m-prefix here */
-            cmdq_add_ec(dip_into);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dip_into);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_NAME_OBJ:
         case IA_NAME_OTYP:
-            cmdq_add_ec(docallcmd);
-            cmdq_add_key((act == IA_NAME_OBJ) ? 'i' : 'o');
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, docallcmd);
+            cmdq_add_key(CQ_CANNED, (act == IA_NAME_OBJ) ? 'i' : 'o');
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_DROP_OBJ:
-            cmdq_add_ec(dodrop);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dodrop);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_EAT_OBJ:
             /* start with m-prefix; for #eat, it means ignore floor food
                if present and eat food from invent */
-            cmdq_add_ec(do_reqmenu);
-            cmdq_add_ec(doeat);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, do_reqmenu);
+            cmdq_add_ec(CQ_CANNED, doeat);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_ENGRAVE_OBJ:
-            cmdq_add_ec(doengrave);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, doengrave);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_ADJUST_OBJ:
-            cmdq_add_ec(doorganize); /* #adjust */
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, doorganize); /* #adjust */
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_ADJUST_STACK:
-            cmdq_add_ec(adjust_split); /* #altadjust */
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, adjust_split); /* #altadjust */
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_SACRIFICE:
-            cmdq_add_ec(dosacrifice);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dosacrifice);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_BUY_OBJ:
-            cmdq_add_ec(dopay);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dopay);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_QUAFF_OBJ:
             /* start with m-prefix; for #quaff, it means ignore fountain
                or sink if present and drink a potion from invent */
-            cmdq_add_ec(do_reqmenu);
-            cmdq_add_ec(dodrink);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, do_reqmenu);
+            cmdq_add_ec(CQ_CANNED, dodrink);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_QUIVER_OBJ:
-            cmdq_add_ec(dowieldquiver);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dowieldquiver);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_READ_OBJ:
-            cmdq_add_ec(doread);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, doread);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_RUB_OBJ:
-            cmdq_add_ec(dorub);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dorub);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_THROW_OBJ:
-            cmdq_add_ec(dothrow);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dothrow);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_TAKEOFF_OBJ:
-            cmdq_add_ec(dotakeoff);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dotakeoff);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_TIP_CONTAINER:
-            cmdq_add_ec(dotip);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dotip);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_INVOKE_OBJ:
-            cmdq_add_ec(doinvoke);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, doinvoke);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_WIELD_OBJ:
-            cmdq_add_ec(dowield);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dowield);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_WEAR_OBJ:
-            cmdq_add_ec(dowear);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dowear);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_SWAPWEAPON:
-            cmdq_add_ec(doswapweapon);
+            cmdq_add_ec(CQ_CANNED, doswapweapon);
             break;
         case IA_ZAP_OBJ:
-            cmdq_add_ec(dozap);
-            cmdq_add_key(otmp->invlet);
+            cmdq_add_ec(CQ_CANNED, dozap);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         }
     }
@@ -3481,7 +3506,7 @@ display_inventory(const char *lets, boolean want_reply)
 
         /* cmdq not a key, or did not find the object, abort */
         free(cmdq);
-        cmdq_clear();
+        cmdq_clear(CQ_CANNED);
         return '\0';
     }
     return display_pickinv(lets, (char *) 0, (char *) 0,
@@ -3911,8 +3936,7 @@ dotypeinv(void)
             }
 
         if (class_count > 1) {
-            c = yn_function(prompt, types, '\0');
-            savech(c);
+            c = yn_function(prompt, types, '\0', TRUE);
             if (c == '\0') {
                 clear_nhwindow(WIN_MESSAGE);
                 goto doI_done;
@@ -4902,7 +4926,7 @@ adjust_split(void)
         splitamount = 1L;
     } else {
         /* get first digit; doesn't wait for <return> */
-        dig = yn_function("Split off how many?", (char *) 0, '\0');
+        dig = yn_function("Split off how many?", (char *) 0, '\0', TRUE);
         if (!digit(dig)) {
             pline1(Never_mind);
             return ECMD_CANCEL;
@@ -5023,7 +5047,7 @@ doorganize_core(struct obj *obj)
     Sprintf(eos(qbuf), " to what [%s]%s?", lets,
             g.invent ? " (? see used letters)" : "");
     for (trycnt = 1; ; ++trycnt) {
-        let = !isgold ? yn_function(qbuf, (char *) 0, '\0') : GOLD_SYM;
+        let = !isgold ? yn_function(qbuf, (char *) 0, '\0', TRUE) : GOLD_SYM;
         if (let == '?' || let == '*') {
             let = display_used_invlets(splitting ? obj->invlet : 0);
             if (!let)

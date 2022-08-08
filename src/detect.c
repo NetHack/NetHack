@@ -1242,7 +1242,7 @@ use_crystal_ball(struct obj **optr)
     /* read a single character */
     if (Verbose(0, use_crystal_ball1))
         You("may look for an object, monster, or special map symbol.");
-    ch = yn_function("What do you look for?", (char *) 0, '\0');
+    ch = yn_function("What do you look for?", (char *) 0, '\0', TRUE);
     /* Don't filter out ' ' here; it has a use */
     if ((ch != def_monsyms[S_GHOST].sym) && index(quitchars, ch)) {
         if (Verbose(0, use_crystal_ball2))

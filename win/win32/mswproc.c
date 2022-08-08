@@ -1848,12 +1848,6 @@ mswin_get_ext_cmd(void)
             ret = -1;
     }
 
-    if (!g.in_doagain) {
-        if (ret >= 0)
-            savech_extcmd(cmd, TRUE);
-        else
-            savech(0);
-    }
     return ret;
 }
 

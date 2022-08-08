@@ -711,17 +711,19 @@ getpos(coord *ccp, boolean force, const char *goal)
 
     /* temporary? if we have a queued direction, return the adjacent spot
        in that direction */
-    if ((cmdq = cmdq_pop()) != 0) {
-        cq = *cmdq;
-        free((genericptr_t) cmdq);
-        if (cq.typ == CMDQ_DIR && !cq.dirz) {
-            ccp->x = u.ux + cq.dirx;
-            ccp->y = u.uy + cq.diry;
-        } else {
-            cmdq_clear();
-            result = -1;
+    if (!g.in_doagain) {
+        if ((cmdq = cmdq_pop()) != 0) {
+            cq = *cmdq;
+            free((genericptr_t) cmdq);
+            if (cq.typ == CMDQ_DIR && !cq.dirz) {
+                ccp->x = u.ux + cq.dirx;
+                ccp->y = u.uy + cq.diry;
+            } else {
+                cmdq_clear(CQ_CANNED);
+                result = -1;
+            }
+            return result;
         }
-        return result;
     }
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
@@ -762,7 +764,19 @@ getpos(coord *ccp, boolean force, const char *goal)
         rushrun = FALSE;
 
         g.program_state.getting_a_command = 1;
-        c = readchar_poskey(&tx, &ty, &sidx);
+        if ((cmdq = cmdq_pop()) != 0) {
+            if (cmdq->typ == CMDQ_KEY) {
+                c = cmdq->key;
+            } else {
+                cmdq_clear(CQ_CANNED);
+                return -1;
+            }
+            free(cmdq);
+        } else {
+            c = readchar_poskey(&tx, &ty, &sidx);
+            if (!g.in_doagain)
+                cmdq_add_key(CQ_REPEAT, c);
+        }
 
         if (hilite_state) {
             (*getpos_hilitefunc)(2);
@@ -1472,7 +1486,7 @@ docallcmd(void)
         if (cq.typ == CMDQ_KEY)
             ch = cq.key;
         else
-            cmdq_clear();
+            cmdq_clear(CQ_CANNED);
         goto docallcmd;
     }
     win = create_nhwindow(NHW_MENU);

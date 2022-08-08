@@ -855,8 +855,8 @@ doopen_indir(coordxy x, coordxy y)
             } else if (!u.usteed
                        && (flags.autounlock & AUTOUNLOCK_KICK) != 0
                        && ynq("Kick it?") == 'y') {
-                cmdq_add_ec(dokick);
-                cmdq_add_dir(sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
+                cmdq_add_ec(CQ_CANNED, dokick);
+                cmdq_add_dir(CQ_CANNED, sgn(cc.x - u.ux), sgn(cc.y - u.uy), 0);
                 res = ECMD_TIME;
             }
         }

@@ -2247,14 +2247,14 @@ dowhatdoes(void)
 #if defined(UNIX) || defined(VMS)
     introff(); /* disables ^C but not ^\ */
 #endif
-    q = yn_function("What command?", (char *) 0, '\0');
+    q = yn_function("What command?", (char *) 0, '\0', TRUE);
 #ifdef ALTMETA
     if (q == '\033' && iflags.altmeta) {
         /* in an ideal world, we would know whether another keystroke
            was already pending, but this is not an ideal world...
            if user typed ESC, we'll essentially hang until another
            character is typed */
-        q = yn_function("]", (char *) 0, '\0');
+        q = yn_function("]", (char *) 0, '\0', TRUE);
         if (q != '\033')
             q = (char) ((uchar) q | 0200);
     }

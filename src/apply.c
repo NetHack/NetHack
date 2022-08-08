@@ -1721,8 +1721,8 @@ dorub(void)
     }
     if (obj != uwep) {
         if (wield_tool(obj, "rub")) {
-            cmdq_add_ec(dorub);
-            cmdq_add_key(obj->invlet);
+            cmdq_add_ec(CQ_CANNED, dorub);
+            cmdq_add_key(CQ_CANNED, obj->invlet);
             return ECMD_TIME;
         }
         return ECMD_OK;
@@ -2837,8 +2837,8 @@ use_whip(struct obj *obj)
 
     if (obj != uwep) {
         if (wield_tool(obj, "lash")) {
-            cmdq_add_ec(doapply);
-            cmdq_add_key(obj->invlet);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, obj->invlet);
             return ECMD_TIME;
         }
         return ECMD_OK;
@@ -3232,8 +3232,8 @@ use_pole(struct obj *obj, boolean autohit)
     }
     if (obj != uwep) {
         if (wield_tool(obj, "swing")) {
-            cmdq_add_ec(doapply);
-            cmdq_add_key(obj->invlet);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, obj->invlet);
             return ECMD_TIME;
         }
         return ECMD_OK;
@@ -3509,8 +3509,8 @@ use_grapple(struct obj *obj)
     }
     if (obj != uwep) {
         if (wield_tool(obj, "cast")) {
-            cmdq_add_ec(doapply);
-            cmdq_add_key(obj->invlet);
+            cmdq_add_ec(CQ_CANNED, doapply);
+            cmdq_add_key(CQ_CANNED, obj->invlet);
             return ECMD_TIME;
         }
         return ECMD_OK;
