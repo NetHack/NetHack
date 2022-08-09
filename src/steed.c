@@ -589,11 +589,13 @@ dismount_steed(
             (void) enexto(&steedcc, u.ux, u.uy, &mons[PM_GHOST]);
     }
     if (!m_at(steedcc.x, steedcc.y)) {
-        if (mtmp->mhp < 1)
-            mtmp->mhp = 0; /* make sure it isn't negative */
-        mtmp->mhp++; /* force at least one hit point, possibly resurrecting */
+        if (mtmp->mhp < 1) /* make sure it isn't negative so that */
+            mtmp->mhp = 0; /* ++mhp produces a positive value     */
+        mtmp->mhp++; /* force at least one hit point, possibly resurrecting
+                      * to avoid impossible("placing defunct monst on map") */
         place_monster(mtmp, steedcc.x, steedcc.y);
-        mtmp->mhp--; /* take the extra hit point away: cancel resurrection */
+        mtmp->mhp--; /* take the extra hit point away: cancel resurrection
+                      * if former steed has died */
     } else {
         impossible("Dismounting: can't place former steed on map.");
     }
@@ -610,7 +612,9 @@ dismount_steed(
             return;
         }
 
-        /* Set hero's and/or steed's positions.  Try moving the hero first. */
+        /* Set hero's and/or steed's positions.  Usually try moving the
+           hero first.  Note: for DISMOUNT_ENGULFED, caller hasn't set
+           u.uswallow yet but has set u.ustuck. */
         if (!u.uswallow && !u.ustuck && have_spot) {
             struct permonst *mdat = mtmp->data;
 
@@ -673,8 +677,9 @@ dismount_steed(
             rloc_to(mtmp, cc.x, cc.y);
             /* Player stays put */
 
-        /* Otherwise, kill the steed. */
+        /* Otherwise, steed goes bye-bye. */
         } else {
+#if 1       /* original there's-no-room handling */
             if (reason == DISMOUNT_BYCHOICE) {
                 /* [un]#ride: hero gets credit/blame for killing steed */
                 killed(mtmp);
@@ -684,6 +689,18 @@ dismount_steed(
                    damage type is just "neither AD_DGST nor -AD_RBRE" */
                 monkilled(mtmp, "", -AD_PHYS);
             }
+#else
+            /* Can't use this [yet?] because it violates monmove()'s
+             * assumption that a moving monster (engulfer) can't cause
+             * another monster (steed) to be removed from the fmon list.
+             * That other monster (steed) might be cached as the next one
+             * to move.
+             */
+            /* migrate back to this level if hero leaves and returns
+               or to next level if it is happening in the endgame */
+            mdrop_special_objs(mtmp);
+            deal_with_overcrowding(mtmp);
+#endif
         }
     } /* !DEADMONST(mtmp) */
 

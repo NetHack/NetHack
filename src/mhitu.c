@@ -1151,16 +1151,17 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         place_monster(mtmp, u.ux, u.uy);
         set_ustuck(mtmp);
         newsym(mtmp->mx, mtmp->my);
-        if (is_animal(mtmp->data) && u.usteed) {
+        /* 3.7: dismount for all engulfers, not just for purple worms */
+        if (u.usteed) {
             char buf[BUFSZ];
 
-            /* Too many quirks presently if hero and steed
-             * are swallowed. Pretend purple worms don't
-             * like horses for now :-)
-             */
             Strcpy(buf, mon_nam(u.usteed));
-            urgent_pline("%s lunges forward and plucks you off %s!",
-                         Monnam(mtmp), buf);
+            urgent_pline("%s %s forward and plucks you off %s!",
+                         Some_Monnam(mtmp),
+                         is_animal(mtmp->data) ? "lunges"
+                           : amorphous(mtmp->data) ? "oozes"
+                             : "surges",
+                         buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
             urgent_pline("%s engulfs you!", Monnam(mtmp));
@@ -1184,7 +1185,11 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         if (touch_petrifies(g.youmonst.data) && !resists_ston(mtmp)) {
             /* put the attacker back where it started;
-               the resulting statue will end up there */
+               the resulting statue will end up there
+               [note: if poly'd hero could ride or non-poly'd hero could
+               acquire touch_petrifies() capability somehow, this code
+               would need to deal with possibility of steed having taken
+               engulfer's previous spot when hero was forcibly dismounted] */
             remove_monster(mtmp->mx, mtmp->my); /* u.ux,u.uy */
             place_monster(mtmp, omx, omy);
             minstapetrify(mtmp, TRUE);

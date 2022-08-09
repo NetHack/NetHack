@@ -1559,6 +1559,7 @@ extern void mon_to_stone(struct monst *);
 extern void m_into_limbo(struct monst *);
 extern void migrate_mon(struct monst *, coordxy, coordxy);
 extern void mnexto(struct monst *, unsigned);
+extern void deal_with_overcrowding(struct monst *);
 extern void maybe_mnexto(struct monst *);
 extern int mnearto(struct monst *, coordxy, coordxy, boolean, unsigned);
 extern void m_respond(struct monst *);
@@ -1571,7 +1572,9 @@ extern void seemimic(struct monst *);
 extern void normal_shape(struct monst *);
 extern void iter_mons(void (*)(struct monst *));
 extern struct monst *get_iter_mons(boolean (*)(struct monst *));
-extern struct monst *get_iter_mons_xy(boolean (*)(struct monst *, coordxy, coordxy), coordxy, coordxy);
+extern struct monst *get_iter_mons_xy(boolean (*)(struct monst *,
+                                                  coordxy, coordxy),
+                                      coordxy, coordxy);
 extern void rescham(void);
 extern void restartcham(void);
 extern void restore_cham(struct monst *);

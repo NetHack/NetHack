@@ -218,9 +218,10 @@ onscary(coordxy x, coordxy y, struct monst* mtmp)
 
 /* regenerate lost hit points */
 void
-mon_regen(struct monst* mon, boolean digest_meal)
+mon_regen(struct monst *mon, boolean digest_meal)
 {
-    if (mon->mhp < mon->mhpmax && (g.moves % 20 == 0 || regenerates(mon->data)))
+    if (mon->mhp < mon->mhpmax
+        && (g.moves % 20 == 0 || regenerates(mon->data)))
         mon->mhp++;
     if (mon->mspec_used)
         mon->mspec_used--;
@@ -238,7 +239,7 @@ mon_regen(struct monst* mon, boolean digest_meal)
  * jolted awake.
  */
 static int
-disturb(register struct monst* mtmp)
+disturb(register struct monst *mtmp)
 {
     /*
      * + Ettins are hard to surprise.
@@ -273,7 +274,7 @@ disturb(register struct monst* mtmp)
 
 /* ungrab/expel held/swallowed hero */
 static void
-release_hero(struct monst* mon)
+release_hero(struct monst *mon)
 {
     if (mon == u.ustuck) {
         if (u.uswallow) {
@@ -416,7 +417,9 @@ monflee(
 }
 
 static void
-distfleeck(register struct monst* mtmp, int* inrange, int* nearby, int* scared)
+distfleeck(
+    struct monst *mtmp,
+    int *inrange, int *nearby, int *scared) /* output */
 {
     int seescaryx, seescaryy;
     boolean sawscary = FALSE, bravegremlin = (rn2(5) == 0);
@@ -1123,12 +1126,22 @@ m_move(register struct monst* mtmp, register int after)
 
     /* likewise for shopkeeper, guard, or priest */
     if (mtmp->isshk || mtmp->isgd || mtmp->ispriest) {
-        int xm = mtmp->isshk ? shk_move(mtmp) : (mtmp->isgd ? gd_move(mtmp) : pri_move(mtmp));
+        int xm = mtmp->isshk ? shk_move(mtmp)
+                 : mtmp->isgd ? gd_move(mtmp)
+                   : pri_move(mtmp);
+
         switch (xm) {
-        case -2: return MMOVE_DIED;
-        case -1: mmoved = MMOVE_NOTHING; break; /* shk follow hero outside shop */
-        case 0: mmoved = MMOVE_NOTHING; goto postmov;
-        case 1: mmoved = MMOVE_MOVED; goto postmov;
+        case -2:
+            return MMOVE_DIED;
+        case -1:
+            mmoved = MMOVE_NOTHING; /* shk follow hero outside shop */
+            break;
+        case 0:
+            mmoved = MMOVE_NOTHING;
+            goto postmov;
+        case 1:
+            mmoved = MMOVE_MOVED;
+            goto postmov;
         default: impossible("unknown shk/gd/pri_move return value (%i)", xm);
             mmoved = MMOVE_NOTHING;
             goto postmov;
@@ -1343,10 +1356,10 @@ m_move(register struct monst* mtmp, register int after)
     niy = omy;
     flag = mon_allowflags(mtmp);
     {
-        register int i, j, nx, ny, nearer;
+        int i, j, nx, ny, nearer;
         int jcnt, cnt;
         int ndist, nidist;
-        register coord *mtrk;
+        coord *mtrk;
         coord poss[9];
 
         cnt = mfndpos(mtmp, poss, info, flag);

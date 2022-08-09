@@ -20,7 +20,6 @@ static void m_detach(struct monst *, struct permonst *);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
 static boolean ok_to_obliterate(struct monst *);
-static void deal_with_overcrowding(struct monst *);
 static void m_restartcham(struct monst *);
 static boolean restrap(struct monst *);
 static int pick_animal(void);
@@ -3444,7 +3443,7 @@ elemental_clog(struct monst *mon)
 /* make monster mtmp next to you (if possible);
    might place monst on far side of a wall or boulder */
 void
-mnexto(struct monst* mtmp, unsigned int rlocflags)
+mnexto(struct monst *mtmp, unsigned int rlocflags)
 {
     coord mm;
 
@@ -3463,8 +3462,8 @@ mnexto(struct monst* mtmp, unsigned int rlocflags)
     return;
 }
 
-static void
-deal_with_overcrowding(struct monst* mtmp)
+void
+deal_with_overcrowding(struct monst *mtmp)
 {
     if (In_endgame(&u.uz)) {
         debugpline1("overcrowding: elemental_clog on %s", m_monnam(mtmp));
@@ -3477,7 +3476,7 @@ deal_with_overcrowding(struct monst* mtmp)
 
 /* like mnexto() but requires destination to be directly accessible */
 void
-maybe_mnexto(struct monst* mtmp)
+maybe_mnexto(struct monst *mtmp)
 {
     coord mm;
     struct permonst *ptr = mtmp->data;

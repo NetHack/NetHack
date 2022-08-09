@@ -719,7 +719,8 @@ engulf_target(struct monst *magr, struct monst *mdef)
     int dx, dy;
 
     /* can't swallow something that's too big */
-    if (mdef->data->msize >= MZ_HUGE)
+    if (mdef->data->msize >= MZ_HUGE
+        || (magr->data->msize < mdef->data->msize && !is_whirly(magr->data)))
         return FALSE;
 
     /* can't (move to) swallow if trapped. TODO: could do some? */
