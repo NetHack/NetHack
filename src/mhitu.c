@@ -1164,7 +1164,9 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                          buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
-            urgent_pline("%s engulfs you!", Monnam(mtmp));
+            urgent_pline("%s %s!", Monnam(mtmp),
+                         is_animal(mtmp->data) ? "swallows you whole"
+                            : "engulfs you");
         }
         stop_occupation();
         reset_occupations(); /* behave as if you had moved */
