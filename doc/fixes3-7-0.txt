@@ -992,6 +992,7 @@ make healing and extra healing better by upping the average amount healed
 lifesaving healing amount depends on the consitution
 hitting a monster with a wielded potion hits you far less
 pyrolisks get a mundane bite attack
+chances of random item being an artifact depends on already existing artifacts
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

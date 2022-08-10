@@ -817,7 +817,7 @@ mksobj(int otyp, boolean init, boolean artif)
             if (is_poisonable(otmp) && !rn2(100))
                 otmp->opoisoned = 1;
 
-            if (artif && !rn2(20))
+            if (artif && !rn2(20 + (10 * nartifact_exist())))
                 otmp = mk_artifact(otmp, (aligntyp) A_NONE);
             break;
         case FOOD_CLASS:
@@ -1020,7 +1020,7 @@ mksobj(int otyp, boolean init, boolean artif)
                 otmp->spe = rne(3);
             } else
                 blessorcurse(otmp, 10);
-            if (artif && !rn2(40))
+            if (artif && !rn2(40 + (10 * nartifact_exist())))
                 otmp = mk_artifact(otmp, (aligntyp) A_NONE);
             /* simulate lacquered armor for samurai */
             if (Role_if(PM_SAMURAI) && otmp->otyp == SPLINT_MAIL
