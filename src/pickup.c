@@ -2091,7 +2091,8 @@ doloot_core(void)
      * 3.3.1 introduced directional looting for some things.
      */
  lootmon:
-    if (c != 'y' && mon_beside(u.ux, u.uy)) {
+    if (c != 'y' && (mon_beside(u.ux, u.uy) || iflags.menu_requested)) {
+        boolean looted_mon = FALSE;
         if (!get_adjacent_loc("Loot in what direction?",
                               "Invalid loot location", u.ux, u.uy, &cc))
             return ECMD_OK;
@@ -2107,7 +2108,7 @@ doloot_core(void)
         if (mtmp) {
             timepassed = loot_mon(mtmp, &prev_inquiry, &prev_loot);
             if (timepassed)
-                underfoot = 1; /* not true but skips dont_find_anything */
+                looted_mon = TRUE;
         }
         /* always use a turn when choosing a direction is impaired,
            even if you've successfully targetted a saddled creature
@@ -2119,8 +2120,8 @@ doloot_core(void)
          * Adjust this if-block to allow container looting
          * from one square away to change that in the future.
          */
-        if (!underfoot) {
-            if (container_at(cc.x, cc.y, FALSE)) {
+        if (!looted_mon) {
+            if (!underfoot && container_at(cc.x, cc.y, FALSE)) {
                 if (mtmp) {
                     You_cant("loot anything %sthere with %s in the way.",
                              prev_inquiry ? "else " : "", mon_nam(mtmp));
@@ -2129,8 +2130,9 @@ doloot_core(void)
                     You("have to be at a container to loot it.");
                 }
             } else {
-                You("%s %sthere to loot.", dont_find_anything,
-                    (prev_inquiry || prev_loot) ? "else " : "");
+                You("%s %s%shere to loot.", dont_find_anything,
+                    (prev_inquiry || prev_loot) ? "else " : "",
+                    !underfoot ? "t" : "");
                 return (timepassed ? ECMD_TIME : ECMD_OK);
             }
         }
