@@ -950,126 +950,118 @@ m_calcdistress(struct monst *mtmp)
     /* FIXME: mtmp->mlstmv ought to be updated here */
 }
 
+/* perform movement for a single monster.
+   meant to be used with iter_mons_safe. */
+boolean
+movemon_singlemon(struct monst *mtmp)
+{
+    /* end monster movement early if hero is flagged to leave the level */
+    if (u.utotype
+#ifdef SAFERHANGUP
+        /* or if the program has lost contact with the user */
+        || g.program_state.done_hup
+#endif
+        ) {
+        g.somebody_can_move = FALSE;
+        return TRUE;
+    }
+
+    /* one dead monster needs to perform a move after death: vault
+       guard whose temporary corridor is still on the map; live
+       guards who have led the hero back to civilization get moved
+       off the map too; gd_move() decides whether the temporary
+       corridor can be removed and guard discarded (via clearing
+       mon->isgd flag so that dmonsfree() will get rid of mon) */
+    if (mtmp->isgd && !mtmp->mx && !(mtmp->mstate & MON_MIGRATING)) {
+        /* parked at <0,0>; eventually isgd should get set to false */
+        if (g.moves > mtmp->mlstmv) {
+            (void) gd_move(mtmp);
+            mtmp->mlstmv = g.moves;
+        }
+        return FALSE;
+    }
+    if (DEADMONSTER(mtmp))
+        return FALSE;
+
+    /* monster isn't on this map anymore */
+    if ((mtmp->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO|MON_OFFMAP)) != 0)
+        return FALSE;
+
+    /* Find a monster that we have not treated yet. */
+    if (mtmp->movement < NORMAL_SPEED)
+        return FALSE;
+
+    mtmp->movement -= NORMAL_SPEED;
+    if (mtmp->movement >= NORMAL_SPEED)
+        g.somebody_can_move = TRUE;
+
+    if (g.vision_full_recalc)
+        vision_recalc(0); /* vision! */
+
+    /* reset obj bypasses before next monster moves */
+    if (g.context.bypasses)
+        clear_bypasses();
+    clear_splitobjs();
+    if (minliquid(mtmp))
+        return FALSE;
+
+    /* after losing equipment, try to put on replacement */
+    if (mtmp->misc_worn_check & I_SPECIAL) {
+        long oldworn;
+
+        mtmp->misc_worn_check &= ~I_SPECIAL;
+        oldworn = mtmp->misc_worn_check;
+        m_dowear(mtmp, FALSE);
+        if (mtmp->misc_worn_check != oldworn || !mtmp->mcanmove)
+            return FALSE;
+    }
+
+    if (is_hider(mtmp->data)) {
+        /* unwatched mimics and piercers may hide again  [MRS] */
+        if (restrap(mtmp))
+            return FALSE;
+        if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
+            || M_AP_TYPE(mtmp) == M_AP_OBJECT)
+            return FALSE;
+        if (mtmp->mundetected)
+            return FALSE;
+    } else if (mtmp->data->mlet == S_EEL && !mtmp->mundetected
+               && (mtmp->mflee || !next2u(mtmp->mx, mtmp->my))
+               && !canseemon(mtmp) && !rn2(4)) {
+        /* some eels end up stuck in isolated pools, where they
+           can't--or at least won't--move, so they never reach
+           their post-move chance to re-hide */
+        if (hideunder(mtmp))
+            return FALSE;
+    }
+
+    /* continue if the monster died fighting */
+    if (Conflict && !mtmp->iswiz && m_canseeu(mtmp)) {
+        /* Note:
+         *  Conflict does not take effect in the first round.
+         *  Therefore, A monster when stepping into the area will
+         *  get to swing at you.
+         *
+         *  The call to fightm() must be _last_.  The monster might
+         *  have died if it returns 1.
+         */
+        if (cansee(mtmp->mx, mtmp->my)
+            && (distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM)
+            && fightm(mtmp))
+            return FALSE; /* mon might have died */
+    }
+    if (dochugw(mtmp, TRUE)) /* otherwise just move the monster */
+        return FALSE;
+    return FALSE;
+}
+
+/* perform movement for all monsters */
 int
 movemon(void)
 {
-    register struct monst *mtmp, *nmtmp;
-    register boolean somebody_can_move = FALSE;
+    g.somebody_can_move = FALSE;
 
-    /*
-     * Some of you may remember the former assertion here that
-     * because of deaths and other actions, a simple one-pass
-     * algorithm wasn't possible for movemon.  Deaths are no longer
-     * removed to the separate list fdmon; they are simply left in
-     * the chain with hit points <= 0, to be cleaned up at the end
-     * of the pass.
-     *
-     * The only other actions which cause monsters to be removed from
-     * the chain are level migrations and losedogs().  I believe losedogs()
-     * is a cleanup routine not associated with monster movements, and
-     * monsters can only affect level migrations on themselves, not others
-     * (hence the fetching of nmon before moving the monster).  Currently,
-     * monsters can jump into traps, read cursed scrolls of teleportation,
-     * and drink cursed potions of raise level to change levels.  These are
-     * all reflexive at this point.  Should one monster be able to level
-     * teleport another, this scheme would have problems.
-     */
-
-    for (mtmp = fmon; mtmp; mtmp = nmtmp) {
-        /* end monster movement early if hero is flagged to leave the level */
-        if (u.utotype
-#ifdef SAFERHANGUP
-            /* or if the program has lost contact with the user */
-            || g.program_state.done_hup
-#endif
-            ) {
-            somebody_can_move = FALSE;
-            break;
-        }
-        nmtmp = mtmp->nmon;
-        /* one dead monster needs to perform a move after death: vault
-           guard whose temporary corridor is still on the map; live
-           guards who have led the hero back to civilization get moved
-           off the map too; gd_move() decides whether the temporary
-           corridor can be removed and guard discarded (via clearing
-           mon->isgd flag so that dmonsfree() will get rid of mon) */
-        if (mtmp->isgd && !mtmp->mx) {
-            /* parked at <0,0>; eventually isgd should get set to false */
-            if (g.moves > mtmp->mlstmv) {
-                (void) gd_move(mtmp);
-                mtmp->mlstmv = g.moves;
-            }
-            continue;
-        }
-        if (DEADMONSTER(mtmp))
-            continue;
-
-        /* Find a monster that we have not treated yet. */
-        if (mtmp->movement < NORMAL_SPEED)
-            continue;
-
-        mtmp->movement -= NORMAL_SPEED;
-        if (mtmp->movement >= NORMAL_SPEED)
-            somebody_can_move = TRUE;
-
-        if (g.vision_full_recalc)
-            vision_recalc(0); /* vision! */
-
-        /* reset obj bypasses before next monster moves */
-        if (g.context.bypasses)
-            clear_bypasses();
-        clear_splitobjs();
-        if (minliquid(mtmp))
-            continue;
-
-        /* after losing equipment, try to put on replacement */
-        if (mtmp->misc_worn_check & I_SPECIAL) {
-            long oldworn;
-
-            mtmp->misc_worn_check &= ~I_SPECIAL;
-            oldworn = mtmp->misc_worn_check;
-            m_dowear(mtmp, FALSE);
-            if (mtmp->misc_worn_check != oldworn || !mtmp->mcanmove)
-                continue;
-        }
-
-        if (is_hider(mtmp->data)) {
-            /* unwatched mimics and piercers may hide again  [MRS] */
-            if (restrap(mtmp))
-                continue;
-            if (M_AP_TYPE(mtmp) == M_AP_FURNITURE
-                || M_AP_TYPE(mtmp) == M_AP_OBJECT)
-                continue;
-            if (mtmp->mundetected)
-                continue;
-        } else if (mtmp->data->mlet == S_EEL && !mtmp->mundetected
-                   && (mtmp->mflee || !next2u(mtmp->mx, mtmp->my))
-                   && !canseemon(mtmp) && !rn2(4)) {
-            /* some eels end up stuck in isolated pools, where they
-               can't--or at least won't--move, so they never reach
-               their post-move chance to re-hide */
-            if (hideunder(mtmp))
-                continue;
-        }
-
-        /* continue if the monster died fighting */
-        if (Conflict && !mtmp->iswiz && m_canseeu(mtmp)) {
-            /* Note:
-             *  Conflict does not take effect in the first round.
-             *  Therefore, A monster when stepping into the area will
-             *  get to swing at you.
-             *
-             *  The call to fightm() must be _last_.  The monster might
-             *  have died if it returns 1.
-             */
-            if (cansee(mtmp->mx, mtmp->my)
-                && (distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM)
-                && fightm(mtmp))
-                continue; /* mon might have died */
-        }
-        if (dochugw(mtmp, TRUE)) /* otherwise just move the monster */
-            continue;
-    }
+    iter_mons_safe(movemon_singlemon);
 
     if (any_light_source())
         g.vision_full_recalc = 1; /* in case a mon moved with a light source */
@@ -1085,10 +1077,10 @@ movemon(void)
     if (u.utotype) {
         deferred_goto();
         /* changed levels, so these monsters are dormant */
-        somebody_can_move = FALSE;
+        g.somebody_can_move = FALSE;
     }
 
-    return somebody_can_move;
+    return g.somebody_can_move;
 }
 
 #define mstoning(obj)                                       \
@@ -3885,6 +3877,35 @@ normal_shape(struct monst *mon)
         }
     }
 }
+
+/* iterate all monsters on the level, even dead ones, calling func
+   for each monster. if func returns TRUE, stop iterating.
+   safe for list deletions and insertions, and guarantees
+   calling func once per monster in the list. */
+void
+iter_mons_safe(boolean (*func)(struct monst *))
+{
+    struct monst **monarr;
+    int i = 0, nmons = 0;
+    struct monst *mtmp;
+    boolean stopiter = FALSE;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        nmons++;
+
+    monarr = (struct monst **)alloc(nmons * sizeof(struct monst *));
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        monarr[i++] = mtmp;
+
+    for (i = 0; i < nmons && !stopiter; i++) {
+        mtmp = monarr[i];
+        if (func(mtmp))
+            stopiter = TRUE;
+    }
+
+    free(monarr);
+}
+
 
 /* iterate all living monsters on current level, calling func for each. */
 void

@@ -488,6 +488,7 @@ const struct instance_globals g_init = {
     FALSE, /* zombify */
     NULL, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
+    FALSE, /* somebody_can_move */
 
     /* mthrowu.c */
     UNDEFINED_VALUE, /* mesg_given */

@@ -1525,6 +1525,7 @@ extern int undead_to_corpse(int);
 extern int genus(int, int);
 extern int pm_to_cham(int);
 extern int minliquid(struct monst *);
+extern boolean movemon_singlemon(struct monst *);
 extern int movemon(void);
 extern int meatmetal(struct monst *);
 extern int meatobj(struct monst *);
@@ -1570,6 +1571,7 @@ extern void wake_nearby(void);
 extern void wake_nearto(coordxy, coordxy, int);
 extern void seemimic(struct monst *);
 extern void normal_shape(struct monst *);
+extern void iter_mons_safe(boolean (*)(struct monst *));
 extern void iter_mons(void (*)(struct monst *));
 extern struct monst *get_iter_mons(boolean (*)(struct monst *));
 extern struct monst *get_iter_mons_xy(boolean (*)(struct monst *,

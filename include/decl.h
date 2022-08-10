@@ -1033,6 +1033,7 @@ struct instance_globals {
     boolean zombify;
     short *animal_list; /* list of PM values for animal monsters */
     int animal_list_count;
+    boolean somebody_can_move;
 
     /* mthrowu.c */
     int mesg_given; /* for m_throw()/thitu() 'miss' message */
