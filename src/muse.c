@@ -1784,6 +1784,8 @@ boolean
 find_misc(struct monst* mtmp)
 {
     register struct obj *obj;
+    struct obj *otmp;
+    struct obj *otmp2;
     struct permonst *mdat = mtmp->data;
     coordxy x = mtmp->mx, y = mtmp->my;
     struct trap *t;
@@ -1829,6 +1831,16 @@ find_misc(struct monst* mtmp)
                         }
                     }
     }
+    if (OBJ_AT(mtmp->mx, mtmp->my) && !rn2(5)) {
+        for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
+            otmp2 = otmp->nexthere;
+            if (Is_container(otmp) && otmp->otyp != BAG_OF_TRICKS && !otmp->olocked) {
+                g.m.has_misc = MUSE_BAG;
+                g.m.misc = otmp;
+                return TRUE;
+            }
+        }
+    }
     if (nohands(mdat))
         return 0;
 
@@ -1843,9 +1855,6 @@ find_misc(struct monst* mtmp)
      * of duplicates when there is no alternate type in between them.
      *
      * MUSE_BAG issues:
-     * should allow looting floor container instead of needing the
-     * monster to have picked it up and now be carrying it which takes
-     * extra time and renders heavily filled containers immune;
      * hero should have a chance to see the monster fail to open a
      * locked container instead of monster always knowing lock state
      * (may not be feasible to implement--requires too much per-object
@@ -1958,7 +1967,7 @@ mloot_container(
     if (!container || !Has_contents(container) || container->olocked)
         return res; /* 0 */
     if (Is_mbag(container) && container->cursed)
-        boh_loss(mon, container, 0);
+        boh_loss(mon, container, container->ocarry == mon);
 
     switch (rn2(10)) {
     default: /* case 0, 1, 2, 3: */
