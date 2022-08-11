@@ -1282,9 +1282,6 @@ find_offensive(struct monst* mtmp)
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_STRIKING;
         }
-        /* use_offensive() has had some code to support wand of teleportation
-         * for a long time, but find_offensive() never selected one;
-         * so for the time being, this is still disabled */
         nomore(MUSE_WAN_TELEPORTATION);
         if (obj->otyp == WAN_TELEPORTATION && obj->spe > 0
             /* don't give controlled hero a free teleport */
