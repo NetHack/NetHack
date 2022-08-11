@@ -2002,7 +2002,7 @@ mloot_container(
         if (!rn2(nitems + 1))
             break;
         nitems = rn2(nitems);
-        for (xobj = container->cobj; nitems > 0; xobj = xobj->nobj)about
+        for (xobj = container->cobj; nitems > 0; xobj = xobj->nobj)
             --nitems;
 
         container->cknown = 0; /* hero no longer knows container's contents
