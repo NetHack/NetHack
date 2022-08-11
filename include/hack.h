@@ -128,8 +128,9 @@ enum cost_alteration_types {
 #define CXN_NOCORPSE 16 /* suppress " corpse" suffix */
 
 /* flags for look_here() */
-#define LOOKHERE_PICKED_SOME   1
-#define LOOKHERE_SKIP_DFEATURE 2
+#define LOOKHERE_NOFLAGS       0U
+#define LOOKHERE_PICKED_SOME   1U
+#define LOOKHERE_SKIP_DFEATURE 2U
 
 /* getpos() return values */
 enum getpos_retval {

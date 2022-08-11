@@ -365,7 +365,7 @@ check_here(boolean picked_some)
 {
     register struct obj *obj;
     register int ct = 0;
-    unsigned lhflags = picked_some ? LOOKHERE_PICKED_SOME : 0;
+    unsigned lhflags = picked_some ? LOOKHERE_PICKED_SOME : LOOKHERE_NOFLAGS;
 
     if (flags.mention_decor) {
         if (describe_decor())
@@ -1025,7 +1025,7 @@ query_objlist(const char *qstr,        /* query string */
             if ((qflags & FEEL_COCKATRICE) && curr->otyp == CORPSE
                 && will_feel_cockatrice(curr, FALSE)) {
                 destroy_nhwindow(win); /* stop the menu and revert */
-                (void) look_here(0, 0);
+                (void) look_here(0, LOOKHERE_NOFLAGS);
                 unsortloot(&sortedolist);
                 return 0;
             }
