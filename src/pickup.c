@@ -2607,7 +2607,8 @@ mbag_item_gone(struct monst *user, int held, struct obj *item, boolean silent)
             You("%s %s disappear!", Blind ? "notice" : "see", doname(item));
     }
 
-    if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0 && user == &g.youmonst) {
+    if (*u.ushops && (shkp = shop_keeper(*u.ushops)) != 0 
+                      && user == &g.youmonst) {
         if (held ? (boolean) item->unpaid : costly_spot(u.ux, u.uy))
             loss = stolen_value(item, u.ux, u.uy, (boolean) shkp->mpeaceful,
                                 TRUE);

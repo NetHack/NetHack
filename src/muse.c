@@ -1831,6 +1831,8 @@ find_misc(struct monst* mtmp)
                         }
                     }
     }
+    if (nohands(mdat))
+        return 0;
     if (OBJ_AT(mtmp->mx, mtmp->my) && !rn2(2)) {
         for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
             otmp2 = otmp->nexthere;
@@ -1838,12 +1840,9 @@ find_misc(struct monst* mtmp)
                 && Has_contents(otmp) && !otmp->olocked && !otmp->otrapped) {
                 g.m.has_misc = MUSE_BAG;
                 g.m.misc = otmp;
-                return TRUE;
             }
         }
     }
-    if (nohands(mdat))
-        return 0;
 
     /* normally we would want to bracket a macro expansion containing
        'if' without matching 'else' with 'do { ... } while (0)' but we
@@ -2060,10 +2059,11 @@ mloot_container(
                 break; /* out of takeout_count loop */
         } /* can_carry */
     } /* takeout_count */
-    /* Monster rummaged through a bag but found nothing of interest, possibly because
-       some items vanished. */
+    /* Monster rummaged through a bag but found nothing of interest,possibly
+       because some items vanished. */
     if (!res && vismon) {
-        pline("%s %s inside %s.", Monnam(mon), mon->mcansee ? "looks" : "feels about", 
+        pline("%s %s inside %s.", Monnam(mon), 
+                                  mon->mcansee ? "looks" : "feels about",
                                   contnr_nam);
     }
     return res;
