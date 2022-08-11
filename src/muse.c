@@ -1831,10 +1831,11 @@ find_misc(struct monst* mtmp)
                         }
                     }
     }
-    if (OBJ_AT(mtmp->mx, mtmp->my) && !rn2(5)) {
+    if (OBJ_AT(mtmp->mx, mtmp->my) && !rn2(2)) {
         for (otmp = g.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
             otmp2 = otmp->nexthere;
-            if (Is_container(otmp) && otmp->otyp != BAG_OF_TRICKS && !otmp->olocked) {
+            if (Is_container(otmp) && otmp->otyp != BAG_OF_TRICKS
+                && Has_contents(otmp) && !otmp->olocked && !otmp->otrapped) {
                 g.m.has_misc = MUSE_BAG;
                 g.m.misc = otmp;
                 return TRUE;
