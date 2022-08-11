@@ -1289,6 +1289,9 @@ find_offensive(struct monst* mtmp)
         if (obj->otyp == WAN_TELEPORTATION && obj->spe > 0
             /* don't give controlled hero a free teleport */
             && !Teleport_control
+            /* same hack as MUSE_WAN_TELEPORTATION_SELF */
+            && (!noteleport_level(mtmp)
+                || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1))))
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
                 || (stairway_at(u.ux, u.uy)))) {
