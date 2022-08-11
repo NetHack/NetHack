@@ -2098,6 +2098,7 @@ extern void observe_quantum_cat(struct obj *, boolean, boolean);
 extern boolean container_gone(int(*)(struct obj *));
 extern boolean u_handsy(void);
 extern int use_container(struct obj **, int, boolean);
+extern long boh_loss(struct monst *, struct obj *, int);
 extern int loot_mon(struct monst *, int *, boolean *);
 extern int dotip(void);
 extern struct autopickup_exception *check_autopickup_exceptions(struct obj *);

@@ -1957,9 +1957,8 @@ mloot_container(
 
     if (!container || !Has_contents(container) || container->olocked)
         return res; /* 0 */
-    /* FIXME: handle cursed bag of holding */
     if (Is_mbag(container) && container->cursed)
-        return res; /* 0 */
+        boh_loss(mon, container, 0);
 
     switch (rn2(10)) {
     default: /* case 0, 1, 2, 3: */
@@ -1983,6 +1982,8 @@ mloot_container(
            from one item to the next */
         Strcpy(mpronounbuf, mhe(mon));
     }
+    Strcpy(contnr_nam, an(nearby ? xname(container)
+                                         : distant_name(container, xname)));
 
     for (takeout_indx = 0; takeout_indx < takeout_count; ++takeout_indx) {
         struct obj *xobj;
@@ -2001,17 +2002,11 @@ mloot_container(
         if (!rn2(nitems + 1))
             break;
         nitems = rn2(nitems);
-        for (xobj = container->cobj; nitems > 0; xobj = xobj->nobj)
+        for (xobj = container->cobj; nitems > 0; xobj = xobj->nobj)about
             --nitems;
 
         container->cknown = 0; /* hero no longer knows container's contents
                                 * even if [attempted] removal is observed */
-        if (!*contnr_nam) {
-            /* xname sets dknown, distant_name might depending on its own
-               idea about nearness */
-            Strcpy(contnr_nam, an(nearby ? xname(container)
-                                         : distant_name(container, xname)));
-        }
         /* this was originally just 'can_carry(mon, xobj)' which
            covers objects a monster shouldn't pick up but also
            checks carrying capacity; for that, it ended up counting
@@ -2055,6 +2050,12 @@ mloot_container(
                 break; /* out of takeout_count loop */
         } /* can_carry */
     } /* takeout_count */
+    /* Monster rummaged through a bag but found nothing of interest, possibly because
+       some items vanished. */
+    if (!res && vismon) {
+        pline("%s %s inside %s.", Monnam(mon), mon->mcansee ? "looks" : "feels about", 
+                                  contnr_nam);
+    }
     return res;
 }
 
@@ -2416,8 +2417,7 @@ searches_for_item(struct monst* mon, struct obj* obj)
                               && mon->data != &mons[PM_KI_RIN]);
         if (typ == FROST_HORN || typ == FIRE_HORN)
             return (obj->spe > 0 && can_blow(mon));
-        if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed)
-            && !obj->olocked)
+        if (Is_container(obj) && !obj->olocked)
             return TRUE;
         break;
     case FOOD_CLASS:
