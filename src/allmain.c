@@ -431,7 +431,7 @@ moveloop_core(void)
             if ((ch = pgetchar()) == ABORT)
                 mvl_abort_lev++;
             else
-                cmdq_push_key(CQ_CANNED, ch);
+                cmdq_add_key(CQ_CANNED, ch);
         }
         if (!mvl_abort_lev && (*g.occupation)() == 0)
 #else
