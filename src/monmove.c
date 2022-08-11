@@ -520,8 +520,7 @@ mind_blast(register struct monst* mtmp)
             continue;
         if (m2 == mtmp)
             continue;
-        if ((telepathic(m2->data) && (rn2(2) || m2->mblinded))
-            || !rn2(10)) {
+        if ((telepathic(m2->data) && (rn2(2) || m2->mblinded)) || !rn2(10)) {
             /* wake it up first, to bring hidden monster out of hiding */
             wakeup(m2, FALSE);
             if (cansee(m2->mx, m2->my))
@@ -546,8 +545,8 @@ dochug(register struct monst* mtmp)
     struct obj *otmp;
     boolean panicattk = FALSE;
 
-    /*  
-     * PHASE ONE: Pre-movement adjustments 
+    /*
+     * PHASE ONE: Pre-movement adjustments
      */
 
     mdat = mtmp->data;
@@ -622,7 +621,7 @@ dochug(register struct monst* mtmp)
         return 0;
     }
 
-    /*  
+    /*
      * PHASE TWO: Special Movements and Actions
      */
 
@@ -710,8 +709,8 @@ dochug(register struct monst* mtmp)
         }
     }
 
-    /*  
-     * PHASE THREE: Now the actual movement phase 
+    /*
+     * PHASE THREE: Now the actual movement phase
      */
 
     /* Hezrous create clouds of stench. This does not cost a move. */
@@ -806,13 +805,13 @@ dochug(register struct monst* mtmp)
         }
     }
 
-    /*  
+    /*
      * PHASE FOUR: Standard Attacks
      */
 
     /* Now, attack the player if possible - one attack set per monst */
     if (status != MMOVE_DONE && (!mtmp->mpeaceful
-                     || (Conflict && !resist_conflict(mtmp)))) {
+                                 || (Conflict && !resist_conflict(mtmp)))) {
         if (((inrange && !scared) || panicattk) && !noattacks(mdat)
             /* [is this hp check really needed?] */
             && (Upolyd ? u.mh : u.uhp) > 0) {
@@ -1213,8 +1212,8 @@ m_move(register struct monst* mtmp, register int after)
 
         if (!mtmp->mcansee
             || (should_see && Invis && !perceives(ptr) && rn2(11))
-            || is_obj_mappear(&g.youmonst,STRANGE_OBJECT) || u.uundetected
-            || (is_obj_mappear(&g.youmonst,GOLD_PIECE) && !likes_gold(ptr))
+            || is_obj_mappear(&g.youmonst, STRANGE_OBJECT) || u.uundetected
+            || (is_obj_mappear(&g.youmonst, GOLD_PIECE) && !likes_gold(ptr))
             || (mtmp->mpeaceful && !mtmp->isshk) /* allow shks to follow */
             || ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
                  || ptr->mlet == S_LIGHT) && !rn2(3)))
@@ -1857,11 +1856,9 @@ set_apparxy(register struct monst* mtmp)
      * do cheapest and/or most likely tests first
      */
 
-    /* pet knows your smell; grabber still has hold of you */
-    if (mtmp->mtame || mtmp == u.ustuck ||
-        /* monsters which know where you are don't suddenly forget,
-       if you haven't moved away */
-        u_at(mx,my)) {
+    /* pet knows your smell; grabber still has hold of you; monsters which
+       know where you are don't suddenly forget, if you haven't moved away */
+    if (mtmp->mtame || mtmp == u.ustuck || u_at(mx, my)) {
             mtmp->mux = u.ux;
             mtmp->muy = u.uy;
             return;
