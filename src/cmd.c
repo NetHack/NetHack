@@ -4824,6 +4824,8 @@ getdir(const char *s)
             } else {
                 dirsym = g.Cmd.dirchars[(cmdq->dirz > 0) ? DIR_DOWN : DIR_UP];
             }
+        } else if (cmdq->typ == CMDQ_KEY) {
+            dirsym = cmdq->key;
         } else {
             cmdq_clear(CQ_CANNED);
             dirsym = '\0';
