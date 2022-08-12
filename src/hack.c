@@ -1441,7 +1441,7 @@ trapmove(
         climb_pit();
         break;
     case TT_WEB:
-        if (uwep && uwep->oartifact == ART_STING) {
+        if (u_wield_art(ART_STING)) {
             /* escape trap but don't move and don't destroy it */
             u.utrap = 0; /* caller will call reset_utrap() */
             pline("Sting cuts through the web!");
@@ -1747,7 +1747,7 @@ domove_fight_web(coordxy x, coordxy y)
 
     if (g.context.forcefight && trap && trap->ttyp == WEB
         && trap->tseen && uwep) {
-        if (uwep->oartifact == ART_STING) {
+        if (u_wield_art(ART_STING)) {
             /* guaranteed success */
             pline("%s cuts through the web!",
                   bare_artifactname(uwep));

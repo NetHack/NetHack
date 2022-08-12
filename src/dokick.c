@@ -567,7 +567,7 @@ really_kick_object(coordxy x, coordxy y)
     }
 
     /* Mjollnir is magically too heavy to kick */
-    if (g.kickedobj->oartifact == ART_MJOLLNIR)
+    if (is_art(g.kickedobj, ART_MJOLLNIR))
         range = 1;
 
     /* see if the object has a place to move into */

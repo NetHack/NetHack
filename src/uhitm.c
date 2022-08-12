@@ -253,7 +253,7 @@ attack_checks(
     if (flags.confirm && mtmp->mpeaceful
         && !Confusion && !Hallucination && !Stunned) {
         /* Intelligent chaotic weapons (Stormbringer) want blood */
-        if (wep && wep->oartifact == ART_STORMBRINGER) {
+        if (is_art(wep, ART_STORMBRINGER)) {
             g.override_confirmation = TRUE;
             return FALSE;
         }
@@ -409,7 +409,7 @@ do_attack(struct monst *mtmp)
      */
     /* Intelligent chaotic weapons (Stormbringer) want blood */
     if (is_safemon(mtmp) && !g.context.forcefight) {
-        if (!uwep || uwep->oartifact != ART_STORMBRINGER) {
+        if (!u_wield_art(ART_STORMBRINGER)) {
             /* There are some additional considerations: this won't work
              * if in a shop or Punished or you miss a random roll or
              * if you can walk thru walls and your pet cannot (KAA) or
@@ -690,7 +690,7 @@ hitum(struct monst *mon, struct attack *uattk)
     /* Cleaver attacks three spots, 'mon' and one on either side of 'mon';
        it can't be part of dual-wielding but we guard against that anyway;
        cleave return value reflects status of primary target ('mon') */
-    if (uwep && uwep->oartifact == ART_CLEAVER && !u.twoweap
+    if (u_wield_art(ART_CLEAVER) && !u.twoweap
         && !u.uswallow && !u.ustuck && !NODIAG(u.umonnum))
         return hitum_cleave(mon, uattk);
 
@@ -874,7 +874,7 @@ hmon_hitmon(
                 if (!train_weapon_skill || mon == u.ustuck || u.twoweap
                     /* Cleaver can hit up to three targets at once so don't
                        let it also hit from behind or shatter foes' weapons */
-                    || (hand_to_hand && obj->oartifact == ART_CLEAVER)) {
+                    || (hand_to_hand && is_art(obj, ART_CLEAVER))) {
                     ; /* no special bonuses */
                 } else if (mon->mflee && Role_if(PM_ROGUE) && !Upolyd
                            /* multi-shot throwing is too powerful here */
@@ -4585,7 +4585,7 @@ m_is_steadfast(struct monst *mtmp)
         || (!is_u && (is_flyer(mtmp->data) || is_floater(mtmp->data))))
         return FALSE;
 
-    if (otmp && otmp->oartifact == ART_GIANTSLAYER)
+    if (is_art(otmp, ART_GIANTSLAYER))
         return TRUE;
     return FALSE;
 }

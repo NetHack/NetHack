@@ -112,8 +112,8 @@ setuwep(struct obj *obj)
             pline("%s shining.", Tobjnam(olduwep, "stop"));
     }
     if (uwep == obj
-        && ((uwep && uwep->oartifact == ART_OGRESMASHER)
-            || (olduwep && olduwep->oartifact == ART_OGRESMASHER)))
+        && (u_wield_art(ART_OGRESMASHER)
+            || is_art(olduwep, ART_OGRESMASHER)))
         g.context.botl = 1;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
@@ -1003,7 +1003,7 @@ chwepon(struct obj *otmp, int amount)
      * addition adverse reaction on Magicbane whose effects are
      * spe dependent.  Give an obscure clue here.
      */
-    if (uwep->oartifact == ART_MAGICBANE && uwep->spe >= 0) {
+    if (u_wield_art(ART_MAGICBANE) && uwep->spe >= 0) {
         Your("right %s %sches!", body_part(HAND),
              (((amount > 1) && (uwep->spe > 1)) ? "flin" : "it"));
     }

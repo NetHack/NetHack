@@ -522,7 +522,7 @@ doread(void)
                            "became literate by reading a coin's engravings");
 
         return ECMD_TIME;
-    } else if (scroll->oartifact == ART_ORB_OF_FATE) {
+    } else if (is_art(scroll, ART_ORB_OF_FATE)) {
         if (Blind)
             You("feel the engraved signature:");
         else

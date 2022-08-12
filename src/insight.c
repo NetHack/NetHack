@@ -801,7 +801,7 @@ one_characteristic(int mode, int final, int attrindx)
     case A_DEX:
         break;
     case A_CON:
-        if (uwep && uwep->oartifact == ART_OGRESMASHER && uwep->cursed)
+        if (u_wield_art(ART_OGRESMASHER) && uwep->cursed)
             hide_innate_value = TRUE;
         break;
     case A_INT:

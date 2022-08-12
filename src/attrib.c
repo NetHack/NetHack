@@ -879,8 +879,7 @@ from_what(int propidx) /* special cases can have negative values */
                replace this with what_blocks() comparable to what_gives() */
             switch (-propidx) {
             case BLINDED:
-                if (ublindf
-                    && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD)
+                if (is_art(ublindf, ART_EYES_OF_THE_OVERWORLD))
                     Sprintf(buf, because_of, bare_artifactname(ublindf));
                 break;
             case INVIS:
@@ -1082,7 +1081,7 @@ acurr(int x)
                 || u.umonnum == PM_AMOROUS_DEMON))
             return (schar) 18;
     } else if (x == A_CON) {
-        if (uwep && uwep->oartifact == ART_OGRESMASHER)
+        if (u_wield_art(ART_OGRESMASHER))
             return (schar) 25;
     } else if (x == A_INT || x == A_WIS) {
         /* yes, this may raise int/wis if player is sufficiently
@@ -1129,7 +1128,7 @@ extremeattr(int attrindx) /* does attrindx's value match its max or min? */
         if (uarmg && uarmg->otyp == GAUNTLETS_OF_POWER)
             lolimit = hilimit;
     } else if (attrindx == A_CON) {
-        if (uwep && uwep->oartifact == ART_OGRESMASHER)
+        if (u_wield_art(ART_OGRESMASHER))
             lolimit = hilimit;
     }
     /* this exception is hypothetical; the only other worn item affecting

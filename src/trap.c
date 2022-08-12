@@ -2084,7 +2084,7 @@ trapeffect_anti_magic(
             if (Half_physical_damage || Half_spell_damage)
                 dmgval2 += rnd(4);
             /* give Magicbane wielder dose of own medicine */
-            if (uwep && uwep->oartifact == ART_MAGICBANE)
+            if (u_wield_art(ART_MAGICBANE))
                 dmgval2 += rnd(4);
             /* having an artifact--other than own quest one--which
                confers magic resistance simply by being carried
@@ -2130,7 +2130,7 @@ trapeffect_anti_magic(
             int dmgval2 = rnd(4);
 
             if ((otmp = MON_WEP(mtmp)) != 0
-                && otmp->oartifact == ART_MAGICBANE)
+                && is_art(otmp, ART_MAGICBANE))
                 dmgval2 += rnd(4);
             for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
                 if (otmp->oartifact

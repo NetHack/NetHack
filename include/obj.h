@@ -391,6 +391,9 @@ struct obj {
 #define is_mines_prize(o) ((o)->o_id == g.context.achieveo.mines_prize_oid)
 #define is_soko_prize(o) ((o)->o_id == g.context.achieveo.soko_prize_oid)
 
+#define is_art(o,art) ((o) && (o)->oartifact == (art))
+#define u_wield_art(art) is_art(uwep, art)
+
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1
 #define BURIED_TOO 0x2

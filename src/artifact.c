@@ -987,7 +987,7 @@ spec_dbon(struct obj *otmp, struct monst *mon, int tmp)
     if (!weap || (weap->attk.adtyp == AD_PHYS /* check for `NO_ATTK' */
                   && weap->attk.damn == 0 && weap->attk.damd == 0))
         g.spec_dbon_applies = FALSE;
-    else if (otmp->oartifact == ART_GRIMTOOTH)
+    else if (is_art(otmp, ART_GRIMTOOTH))
         /* Grimtooth has SPFX settings to warn against elves but we want its
            damage bonus to apply to all targets, so bypass spec_applies() */
         g.spec_dbon_applies = TRUE;
@@ -1428,7 +1428,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
     /* We really want "on a natural 20" but Nethack does it in */
     /* reverse from AD&D. */
     if (spec_ability(otmp, SPFX_BEHEAD)) {
-        if (otmp->oartifact == ART_TSURUGI_OF_MURAMASA && dieroll == 1) {
+        if (is_art(otmp, ART_TSURUGI_OF_MURAMASA) && dieroll == 1) {
             wepdesc = "The razor-sharp blade";
             /* not really beheading, but so close, why add another SPFX */
             if (youattack && engulfing_u(mdef)) {
@@ -1472,7 +1472,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                 otmp->dknown = TRUE;
                 return TRUE;
             }
-        } else if (otmp->oartifact == ART_VORPAL_BLADE
+        } else if (is_art(otmp, ART_VORPAL_BLADE)
                    && (dieroll == 1 || mdef->data == &mons[PM_JABBERWOCK])) {
             static const char *const behead_msg[2] = { "%s beheads %s!",
                                                        "%s decapitates %s!" };
@@ -1543,7 +1543,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                    the result won't be printed */
                 char *otmpname = distant_name(otmp, xname);
 
-                if (otmp->oartifact == ART_STORMBRINGER)
+                if (is_art(otmp, ART_STORMBRINGER))
                     pline_The("%s blade draws the %s from %s!",
                               hcolor(NH_BLACK), life, mon_nam(mdef));
                 else
@@ -1576,7 +1576,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
 
             if (Blind) {
                 You_feel("an %s drain your %s!",
-                         (otmp->oartifact == ART_STORMBRINGER)
+                         is_art(otmp, ART_STORMBRINGER)
                             ? "unholy blade"
                             : "object",
                          life);
@@ -1585,7 +1585,7 @@ artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
                    the result won't be printed */
                 char *otmpname = distant_name(otmp, xname);
 
-                if (otmp->oartifact == ART_STORMBRINGER)
+                if (is_art(otmp, ART_STORMBRINGER))
                     pline_The("%s blade drains your %s!",
                               hcolor(NH_BLACK), life);
                 else
@@ -1976,7 +1976,7 @@ artifact_light(struct obj *obj)
         && (obj->owornmask & W_ARM) != 0L)
         return TRUE;
 
-    return (boolean) (get_artifact(obj) && obj->oartifact == ART_SUNSWORD);
+    return (boolean) (get_artifact(obj) && is_art(obj, ART_SUNSWORD));
 }
 
 /* KMH -- Talking artifacts are finally implemented */
@@ -2164,10 +2164,9 @@ glow_verb(int count, /* 0 means blind rather than no applicable creatures */
 void
 Sting_effects(int orc_count) /* new count (warn_obj_cnt is old count); -1 is a flag value */
 {
-    if (uwep
-        && (uwep->oartifact == ART_STING
-            || uwep->oartifact == ART_ORCRIST
-            || uwep->oartifact == ART_GRIMTOOTH)) {
+    if (u_wield_art(ART_STING)
+        || u_wield_art(ART_ORCRIST)
+        || u_wield_art(ART_GRIMTOOTH)) {
         int oldstr = glow_strength(g.warn_obj_cnt),
             newstr = glow_strength(orc_count);
 
@@ -2450,7 +2449,7 @@ mkot_trap_warn(void)
         "hot", "very hot", "like fire"
     };
 
-    if (!uarmg && uwep && uwep->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+    if (!uarmg && u_wield_art(ART_MASTER_KEY_OF_THIEVERY)) {
         int idx, ntraps = count_surround_traps(u.ux, u.uy);
 
         if (ntraps != g.mkot_trap_warn_count) {
@@ -2468,7 +2467,7 @@ boolean
 is_magic_key(struct monst *mon, /* if null, non-rogue is assumed */
              struct obj *obj)
 {
-    if (obj && obj->oartifact == ART_MASTER_KEY_OF_THIEVERY) {
+    if (is_art(obj, ART_MASTER_KEY_OF_THIEVERY)) {
         if ((mon == &g.youmonst) ? Role_if(PM_ROGUE)
                                  : (mon && mon->data == &mons[PM_ROGUE]))
             return !obj->cursed; /* a rogue; non-cursed suffices for magic */

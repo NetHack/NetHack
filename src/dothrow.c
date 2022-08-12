@@ -115,11 +115,11 @@ throw_obj(struct obj *obj, int shotlimit)
     if (!canletgo(obj, "throw")) {
         return ECMD_OK;
     }
-    if (obj->oartifact == ART_MJOLLNIR && obj != uwep) {
+    if (is_art(obj, ART_MJOLLNIR) && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
         return ECMD_OK;
     }
-    if ((obj->oartifact == ART_MJOLLNIR && ACURR(A_STR) < STR19(25))
+    if ((is_art(obj, ART_MJOLLNIR) && ACURR(A_STR) < STR19(25))
         || (obj->otyp == BOULDER && !throws_rocks(g.youmonst.data))) {
         pline("It's too heavy.");
         return ECMD_TIME;
@@ -1524,7 +1524,7 @@ throwit(struct obj *obj,
 
         if (obj->otyp == BOULDER)
             range = 20; /* you must be giant */
-        else if (obj->oartifact == ART_MJOLLNIR)
+        else if (is_art(obj, ART_MJOLLNIR))
             range = (range + 1) / 2; /* it's heavy */
         else if (tethered_weapon) /* primary weapon is aklys */
             /* if an aklys is going to return, range is limited by the

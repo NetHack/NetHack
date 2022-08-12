@@ -424,7 +424,7 @@ can_be_strangled(struct monst* mon)
 boolean
 can_track(register struct permonst* ptr)
 {
-    if (uwep && uwep->oartifact == ART_EXCALIBUR)
+    if (u_wield_art(ART_EXCALIBUR))
         return TRUE;
     else
         return (boolean) haseyes(ptr);

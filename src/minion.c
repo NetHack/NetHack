@@ -66,7 +66,7 @@ msummon(struct monst *mon)
     if (mon) {
         ptr = mon->data;
 
-        if (uwep && uwep->oartifact == ART_DEMONBANE && is_demon(ptr)) {
+        if (u_wield_art(ART_DEMONBANE) && is_demon(ptr)) {
             if (canseemon(mon))
                 pline("%s looks puzzled for a moment.", Monnam(mon));
             return 0;
@@ -259,8 +259,7 @@ demon_talk(register struct monst *mtmp)
 {
     long cash, demand, offer;
 
-    if (uwep && (uwep->oartifact == ART_EXCALIBUR
-                 || uwep->oartifact == ART_DEMONBANE)) {
+    if (u_wield_art(ART_EXCALIBUR) || u_wield_art(ART_DEMONBANE)) {
         if (canspotmon(mtmp))
             pline("%s looks very angry.", Amonnam(mtmp));
         else
