@@ -5517,11 +5517,6 @@ handler_menu_colors(void)
             if (iflags.perm_invent)
                 update_inventory();
 
-        /* menu colors aren't being used yet; if any MENUCOLOR rules are
-           defined, remind player how to activate them */
-        } else if (nmc > 0) {
-            pline(
-    "To have menu colors become active, toggle 'menucolors' option to True.");
         }
         return optn_ok;
 
@@ -7252,6 +7247,7 @@ add_menu_coloring_parsed(const char *str, int c, int a)
     tmp->color = c;
     tmp->attr = a;
     g.menu_colorings = tmp;
+    iflags.use_menu_color = TRUE;
     return TRUE;
 }
 
