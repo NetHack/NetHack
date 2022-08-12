@@ -1589,7 +1589,10 @@ mlevel_tele_trap(
         }
 
         if (in_sight) {
-            pline("Suddenly, %s disappears out of sight.", mon_nam(mtmp));
+            pline("Suddenly, %s %s.", mon_nam(mtmp),
+                  (tt == HOLE) ? "falls into a hole"
+                  : (tt == TRAPDOOR) ? "falls through a trap door"
+                  : "disappears out of sight");
             if (trap)
                 seetrap(trap);
         }
