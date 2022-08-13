@@ -1917,12 +1917,12 @@ update_fancy_status_field(int i, int color, int attributes)
              *
              * Break out with this.
              */
-            static boolean active = FALSE;
+            static boolean isactive = FALSE;
 
-            if (!active) {
-                active = TRUE;
+            if (!isactive) {
+                isactive = TRUE;
                 impossible("update_other: unknown shown value");
-                active = FALSE;
+                isactive = FALSE;
             }
             val = 0L;
             break;

@@ -1526,7 +1526,7 @@ getobj(
                        * between "you don't have anything to <foo>"
                        * versus "you don't have anything _else_ to <foo>"
                        * (also used for GETOBJ_EXCLUDE_NONINVENT) */
-    long cnt;
+    long cnt = 0L;
     boolean cntgiven = FALSE;
     boolean msggiven = FALSE;
     boolean oneloop = FALSE;
