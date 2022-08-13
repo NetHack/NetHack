@@ -1178,7 +1178,7 @@ slip_or_trip(void)
     }
 }
 
-/* Print a lamp flicker message with tailer. */
+/* Print a lamp flicker message with tailer.  Only called if seen. */
 static void
 see_lamp_flicker(struct obj *obj, const char *tailer)
 {
@@ -1193,7 +1193,7 @@ see_lamp_flicker(struct obj *obj, const char *tailer)
     }
 }
 
-/* Print a dimming message for brass lanterns. */
+/* Print a dimming message for brass lanterns.  Only called if seen. */
 static void
 lantern_message(struct obj *obj)
 {
@@ -1221,7 +1221,7 @@ void
 burn_object(anything *arg, long timeout)
 {
     struct obj *obj = arg->a_obj;
-    boolean canseeit, many, menorah, need_newsym, need_invupdate;
+    boolean canseeit, many, menorah, need_newsym, need_invupdate, bytouch;
     coordxy x, y;
     char whose[BUFSZ];
 
@@ -1269,6 +1269,11 @@ burn_object(anything *arg, long timeout)
     } else {
         canseeit = FALSE;
     }
+    /* when carrying the light source, you can feel the heat from lit lamp
+       or candle so you'll be notified when it burns out even if blind at
+       the time; brass lantern doesn't radiate sufficient heat for that
+       (however, inventory formatting drops "(lit)" so player can tell) */
+    bytouch = (obj->where == OBJ_INVENT && obj->otyp != BRASS_LANTERN);
     need_newsym = need_invupdate = FALSE;
 
     /* obj->age is the age remaining at this point.  */
@@ -1320,9 +1325,9 @@ burn_object(anything *arg, long timeout)
 
         case 25:
             if (canseeit) {
-                if (obj->otyp == BRASS_LANTERN)
+                if (obj->otyp == BRASS_LANTERN) {
                     lantern_message(obj);
-                else {
+                } else {
                     switch (obj->where) {
                     case OBJ_INVENT:
                     case OBJ_MINVENT:
@@ -1338,7 +1343,7 @@ burn_object(anything *arg, long timeout)
 
         case 0:
             /* even if blind you'll know if holding it */
-            if (canseeit || obj->where == OBJ_INVENT) {
+            if (canseeit || bytouch) {
                 switch (obj->where) {
                 case OBJ_INVENT:
                     need_invupdate = TRUE;
@@ -1416,7 +1421,7 @@ burn_object(anything *arg, long timeout)
 
         case 0:
             /* we know even if blind and in our inventory */
-            if (canseeit || obj->where == OBJ_INVENT) {
+            if (canseeit || bytouch) {
                 if (menorah) {
                     switch (obj->where) {
                     case OBJ_INVENT:
@@ -1462,8 +1467,10 @@ burn_object(anything *arg, long timeout)
             end_burn(obj, FALSE);
 
             if (menorah) {
-                obj->spe = 0;
+                obj->spe = 0; /* no candles */
                 obj->owt = weight(obj);
+                if (carried(obj))
+                    need_invupdate = TRUE;
             } else {
                 if (carried(obj)) {
                     useupall(obj);

@@ -47,6 +47,7 @@ static boolean get_valid_jump_position(coordxy, coordxy);
 static boolean get_valid_polearm_position(coordxy, coordxy);
 static boolean find_poleable_mon(coord *, int, int);
 
+static const char Nothing_seems_to_happen[] = "Nothing seems to happen.";
 static const char no_elbow_room[] =
     "don't have enough elbow-room to maneuver.";
 
@@ -995,7 +996,7 @@ use_mirror(struct obj *obj)
         if (!Blind)
             pline_The("%s fogs up and doesn't reflect!", mirror);
         else
-            pline("Nothing seems to happen.");
+            pline("%s", Nothing_seems_to_happen);
         return ECMD_TIME;
     }
     if (!u.dx && !u.dy && !u.dz) {
@@ -1567,15 +1568,25 @@ catch_lit(struct obj *obj)
     return FALSE;
 }
 
+/* light a lamp or candle */
 static void
 use_lamp(struct obj *obj)
 {
     char buf[BUFSZ];
+    const char *lamp = (obj->otyp == OIL_LAMP
+                        || obj->otyp == MAGIC_LAMP) ? "lamp"
+                       : (obj->otyp == BRASS_LANTERN) ? "lantern"
+                         : NULL;
+
+    /*
+     * When blind, lamps' and candles' on/off state can be distinguished
+     * by heat.  For brass lantern assume that there is an on/off switch
+     * that can be felt.
+     */
 
     if (obj->lamplit) {
-        if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
-            || obj->otyp == BRASS_LANTERN)
-            pline("%slamp is now off.", Shk_Your(buf, obj));
+        if (lamp) /* lamp or lantern */
+            pline("%s%s is now off.", Shk_Your(buf, obj), lamp);
         else
             You("snuff out %s.", yname(obj));
         end_burn(obj, TRUE);
@@ -1589,10 +1600,14 @@ use_lamp(struct obj *obj)
     /* magic lamps with an spe == 0 (wished for) cannot be lit */
     if ((!Is_candle(obj) && obj->age == 0)
         || (obj->otyp == MAGIC_LAMP && obj->spe == 0)) {
-        if (obj->otyp == BRASS_LANTERN)
-            Your("lantern is out of power.");
-        else
+        if (obj->otyp == BRASS_LANTERN) {
+            if (!Blind)
+                Your("lantern is out of power.");
+            else
+                pline("%s", Nothing_seems_to_happen);
+        } else {
             pline("This %s has no oil.", xname(obj));
+        }
         return;
     }
     if (obj->cursed && !rn2(2)) {
@@ -1600,14 +1615,16 @@ use_lamp(struct obj *obj)
             pline_The("lamp spills and covers your %s with oil.",
                       fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
-        } else if (!Blind)
+        } else if (!Blind) {
             pline("%s for a moment, then %s.", Tobjnam(obj, "flicker"),
                   otense(obj, "die"));
+        } else {
+            pline("%s", Nothing_seems_to_happen);
+        }
     } else {
-        if (obj->otyp == OIL_LAMP || obj->otyp == MAGIC_LAMP
-            || obj->otyp == BRASS_LANTERN) {
+        if (lamp) { /* lamp or lantern */
             check_unpaid(obj);
-            pline("%slamp is now on.", Shk_Your(buf, obj));
+            pline("%s%s is now on.", Shk_Your(buf, obj), lamp);
         } else { /* candle(s) */
             pline("%s flame%s %s%s", s_suffix(Yname2(obj)), plur(obj->quan),
                   otense(obj, "burn"), Blind ? "." : " brightly!");
@@ -2170,7 +2187,7 @@ use_unicorn_horn(struct obj **optr)
             break;
         case 6:
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
-                pline("Nothing seems to happen.");
+                pline("%s", Nothing_seems_to_happen);
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
             break;
         }
@@ -2261,7 +2278,7 @@ use_unicorn_horn(struct obj **optr)
     if (did_prop)
         g.context.botl = TRUE;
     else
-        pline("Nothing seems to happen.");
+        pline("%s", Nothing_seems_to_happen);
 
 #undef PROP_COUNT
 #undef prop_trouble
@@ -3444,7 +3461,7 @@ use_royal_jelly(struct obj *obj)
         if (eobj->timed || eobj->corpsenm != oldcorpsenm)
             pline("The %s %s feebly.", xname(eobj), otense(eobj, "quiver"));
         else
-            pline("Nothing seems to happen.");
+            pline("%s", Nothing_seems_to_happen);
         kill_egg(eobj);
         goto useup_jelly;
     }
@@ -3463,7 +3480,7 @@ use_royal_jelly(struct obj *obj)
         || eobj->corpsenm != oldcorpsenm)
         pline("The %s %s briefly.", xname(eobj), otense(eobj, "quiver"));
     else
-        pline("Nothing seems to happen.");
+        pline("%s", Nothing_seems_to_happen);
 
  useup_jelly:
     /* not useup() because we've already done freeinv() */

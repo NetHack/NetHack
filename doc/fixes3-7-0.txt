@@ -996,6 +996,9 @@ chances of random item being an artifact depends on already existing artifacts
 monsters can zap wands of teleportation at hero
 piranhas devour corpses
 turn on menucolors boolean automatically if any menucolors are defined
+blind hero was notified when brass lantern burned out even though it isn't
+	warm enough to detect that by touch; manually switching the lantern
+	on or off can be determined that way so still gives on/off message
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
