@@ -1,7 +1,7 @@
 strategy:
   matrix:
-    linux_focal_gcc9_minimal:
-      imageName: 'ubuntu-20.04'
+    linux_latest_gcc9_minimal:
+      imageName: 'ubuntu-latest'
       toolchainName: gcc9
       buildTargetName: minimal
     linux_focal_clang_all:
@@ -19,10 +19,6 @@ strategy:
     linux_jammy_gcc11_all:
       imageName: 'ubuntu-22.04'
       toolchainName: gcc11
-      buildTargetName: all
-    linux_bionic_gcc7_all:
-      imageName: 'ubuntu-18.04'
-      toolchainName: gcc7
       buildTargetName: all
     macOS_latest_clang_all:
       imageName: 'macOS-latest'
