@@ -1050,10 +1050,6 @@ ini_inv(struct trobj *trop)
                     break;
             }
 
-            /* Don't start with +0 or negative rings */
-            if (objects[otyp].oc_charged && obj->spe <= 0)
-                obj->spe = rne(3);
-
             /* Heavily relies on the fact that 1) we create wands
              * before rings, 2) that we create rings before
              * spellbooks, and that 3) not more than 1 object of a
@@ -1075,6 +1071,13 @@ ini_inv(struct trobj *trop)
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
                 g.nocreate4 = otyp;
         }
+        /* Put post-creation object adjustments that don't depend on whether it
+         * was UNDEF_TYP or not after this. */
+
+        /* Don't start with +0 or negative rings */
+        if (objects[otyp].oc_class == RING_CLASS && objects[otyp].oc_charged
+            && obj->spe <= 0)
+            obj->spe = rne(3);
 
         if (g.urace.mnum != PM_HUMAN) {
             /* substitute race-specific items; this used to be in
