@@ -2222,6 +2222,8 @@ parse_status_hl1(char *op, boolean from_configfile)
     }
     if (badopt)
         return FALSE;
+    else if (!iflags.hilite_delta)
+        iflags.hilite_delta = 3L;
     return TRUE;
 }
 
@@ -4118,8 +4120,7 @@ status_hilite_menu(void)
        number of turns for temporary highlights to remain visible
        and also when non-zero it is the flag to enable highlighting */
     if (countall > 0 && !iflags.hilite_delta)
-        pline(
- "To have highlights become active, set 'statushilites' option to non-zero.");
+        iflags.hilite_delta = 3L;
 
     return TRUE;
 }
