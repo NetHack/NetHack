@@ -341,21 +341,6 @@ objdescr_is(struct obj* obj, const char * descr)
     return !strcmp(objdescr, descr);
 }
 
-/* find the object index for snow boots; used [once] by slippery ice code */
-int
-find_skates(void)
-{
-    register int i;
-    register const char *s;
-
-    for (i = SPEED_BOOTS; i <= LEVITATION_BOOTS; i++)
-        if ((s = OBJ_DESCR(objects[i])) != 0 && !strcmp(s, "snow boots"))
-            return i;
-
-    impossible("snow boots not found?");
-    return -1; /* not 0, or caller would try again each move */
-}
-
 /* level dependent initialization */
 void
 oinit(void)
@@ -992,7 +977,7 @@ rename_disco(void)
             if (oclass != prev_class) {
                 any.a_int = 0;
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         iflags.menu_headings, clr, 
+                         iflags.menu_headings, clr,
                          let_to_name(oclass, FALSE, FALSE),
                          MENU_ITEMFLAGS_NONE);
                 prev_class = oclass;

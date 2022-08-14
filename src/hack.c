@@ -2058,13 +2058,11 @@ slippery_ice_fumbling(void)
     boolean on_ice = !Levitation && is_ice(u.ux, u.uy);
 
     if (on_ice) {
-        static int skates = 0;
-
-        if (!skates)
-            skates = find_skates();
-        if ((uarmf && uarmf->otyp == skates) || resists_cold(&g.youmonst)
-            || Flying || is_floater(g.youmonst.data)
-            || is_clinger(g.youmonst.data) || is_whirly(g.youmonst.data)) {
+        if ((uarmf && objdescr_is(uarmf, "snow boots"))
+            || resists_cold(&g.youmonst) || Flying
+            || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
+            || is_whirly(g.youmonst.data)) {
+            pline("skates!");
             on_ice = FALSE;
         } else if (!rn2(Cold_resistance ? 3 : 2)) {
             HFumbling |= FROMOUTSIDE;
@@ -3837,7 +3835,7 @@ spot_checks(coordxy x, coordxy y, schar old_typ)
         db_ice_now = ((levl[x][y].drawbridgemask & DB_UNDER) == DB_ICE);
         /*FALLTHRU*/
     case ICE:
-        if ((new_typ != old_typ) 
+        if ((new_typ != old_typ)
             || (old_typ == DRAWBRIDGE_UP && !db_ice_now)) {
             /* make sure there's no MELT_ICE_AWAY timer */
             if (spot_time_left(x, y, MELT_ICE_AWAY)) {

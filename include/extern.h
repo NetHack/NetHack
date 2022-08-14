@@ -1876,7 +1876,6 @@ extern void tty_ibmgraphics_fixup(void);
 extern void init_objects(void);
 extern void init_oclass_probs(void);
 extern void obj_shuffle_range(int, int *, int *);
-extern int find_skates(void);
 extern boolean objdescr_is(struct obj *, const char *);
 extern void oinit(void);
 extern void savenames(NHFILE *);
