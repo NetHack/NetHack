@@ -107,13 +107,12 @@ des.object()
 des.object()
 des.object()
 des.object()
--- Random traps
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
+-- Random traps - must avoid the 2 shops
+local validtraps = selection.area(00,00,75,19):filter_mapchar('.')
+validtraps = validtraps - selection.area(60,14,71,18)
+for i=1,6 do
+   des.trap(validtraps:rndcoord(1))
+end
 -- Random monsters.
 des.monster({ id = "Master of Thieves", x=04, y=01, peaceful = 0 })
 des.monster("giant spider")
