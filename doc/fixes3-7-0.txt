@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.975 $ $NHDT-Date: 1657868310 2022/07/15 06:58:30 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1011 $ $NHDT-Date: 1660588881 2022/08/15 18:41:21 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1372,6 +1372,9 @@ curses: when entering a count while in a menu, cursor would jump to the spot
 	on screen where the hero was, even if menu covered that part of map;
 	post-3.6--started when curses was changed to use core's get_count()
 curses: clipped map crashed due to uninitialized memory
+curses: changes for tty's TTY_PERM_INVENT resulted in viewing inventory under
+	curses while carrying only gold to crash; didn't matter if perm_invent
+	was On or if TTY_PERM_INVENT was enabled
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
@@ -1389,6 +1392,9 @@ tty: for #wizidentify, using ^I as an unseen group accelerator to pick the
 	failing, so the 'all' choice wasn't being toggled on if user typed ^I
 tty: changes to support utf8 resulted in lines of text windows being shown
 	starting at their second character
+tty: changes to support TTY_PERM_INVENT resulted in blank inventory menu when
+	using the 'i' command while carrying only gold; didn't matter whether
+	or not TTY_PERM_INVENT was enabled during build
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new

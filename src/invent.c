@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1654205933 2022/06/02 21:38:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.391 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1660588881 2022/08/15 18:41:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2464,9 +2464,8 @@ update_inventory(void)
     if (WINDOWPORT(tty))
         sync_perminvent();
     else
-#else
-        (*windowprocs.win_update_inventory)(0);
 #endif
+        (*windowprocs.win_update_inventory)(0);
     iflags.suppress_price = save_suppress_price;
 }
 
@@ -3227,6 +3226,7 @@ display_pickinv(
         if (g.cached_pickinv_win == WIN_ERR)
             g.cached_pickinv_win = create_nhwindow(NHW_MENU);
         win = g.cached_pickinv_win;
+        show_gold = TRUE;
     } else {
         win = WIN_INVEN;
         menu_behavior = MENU_BEHAVE_PERMINV;
@@ -5474,7 +5474,8 @@ sync_perminvent(void)
         /* Send windowport a request to return the related settings to us */
         if ((iflags.perm_invent && !g.core_invent_state)
             || in_perm_invent_toggled) {
-            if ((wri = ctrl_nhwindow(WIN_INVEN, request_settings, &wri_info))) {
+            if ((wri = ctrl_nhwindow(WIN_INVEN, request_settings, &wri_info))
+                != 0) {
                 if ((wri->tocore.tocore_flags & prohibited) != 0) {
                     /* sizes aren't good enough */
                     set_option_mod_status("perm_invent", set_gameview);
@@ -5502,7 +5503,8 @@ sync_perminvent(void)
     if (!wri || wri->tocore.maxslot == 0)
         return;
 
-    if (in_perm_invent_toggled && g.perm_invent_toggling_direction == toggling_on) {
+    if (in_perm_invent_toggled
+        && g.perm_invent_toggling_direction == toggling_on) {
         WIN_INVEN = create_nhwindow(NHW_MENU);
     }
 
