@@ -372,7 +372,7 @@ explode(
                 if (engulfing_u(mtmp)) {
                     const char *adj = (char *) 0;
 
-                    if (is_animal(u.ustuck->data)) {
+                    if (digests(u.ustuck->data)) {
                         switch (adtyp) {
                         case AD_FIRE:
                             adj = "heartburn";

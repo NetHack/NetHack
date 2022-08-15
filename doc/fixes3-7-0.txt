@@ -1001,6 +1001,12 @@ blind hero was notified when brass lantern burned out even though it isn't
 	on or off can be determined that way so still gives on/off message
 turn on statushilites automatically if any are defined
 change poison instakill to damage with attribute and max hp loss
+trappers and lurkers above enfold themselves around and crush their victims,
+	not swallow and digest
+attempting to move up or down when poly'd into a holder and holding a monster
+	rejected the move; release the monster instead
+thowing a non-weapon while engulfed by an ochre jelly reported that the item
+	vanished into the jelly's "currents"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

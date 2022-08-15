@@ -1404,7 +1404,7 @@ is_valid_travelpt(coordxy x, coordxy y)
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
 trapmove(
-    coordxy x, coordxy y,          /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    coordxy x, coordxy y, /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
     struct trap *desttrap) /* nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
@@ -3204,7 +3204,7 @@ pickup_checks(void)
     /* uswallow case added by GAN 01/29/87 */
     if (u.uswallow) {
         if (!u.ustuck->minvent) {
-            if (is_animal(u.ustuck->data)) {
+            if (digests(u.ustuck->data)) {
                 You("pick up %s tongue.", s_suffix(mon_nam(u.ustuck)));
                 pline("But it's kind of slimy, so you drop it.");
             } else

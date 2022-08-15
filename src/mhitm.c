@@ -766,7 +766,8 @@ gulpmm(
         /* [this two-part formatting dates back to when only one x_monnam
            result could be included in an expression because the next one
            would overwrite first's result -- that's no longer the case] */
-        Sprintf(buf, "%s swallows", Monnam(magr));
+        Sprintf(buf, "%s %s", Monnam(magr),
+                digests(magr->data) ? "swallows" : "engulfs");
         pline("%s %s.", buf, mon_nam(mdef));
     }
     if (!flaming(magr->data)) {

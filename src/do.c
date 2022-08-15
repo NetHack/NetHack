@@ -647,13 +647,18 @@ drop(struct obj *obj)
     if (u.uswallow) {
         /* barrier between you and the floor */
         if (Verbose(0, drop1)) {
-            char *onam_p, monbuf[BUFSZ];
+            char *onam_p, *mnam_p, monbuf[BUFSZ];
 
+            mnam_p = mon_nam(u.ustuck);
             /* doname can call s_suffix, reusing its buffer */
-            Strcpy(monbuf, s_suffix(mon_nam(u.ustuck)));
+            if (digests(u.ustuck->data)) {
+                Sprintf(monbuf, "%s %s", s_suffix(mnam_p),
+                        mbodypart(u.ustuck, STOMACH));
+                mnam_p = monbuf;
+            }
             onam_p = is_unpaid(obj) ? yobjnam(obj, (char *) 0) : doname(obj);
-            You("drop %s into %s %s.", onam_p, monbuf,
-                mbodypart(u.ustuck, STOMACH));
+
+            You("drop %s into %s.", onam_p, mnam_p);
         }
     } else {
         if ((obj->oclass == RING_CLASS || obj->otyp == MEAT_RING)
@@ -752,9 +757,9 @@ dropz(struct obj *obj, boolean with_impact)
 static boolean
 engulfer_digests_food(struct obj *obj)
 {
-    /* animal swallower (purple worn, trapper, lurker above) eats any
+    /* animal swallower (purple worn) eats any
        corpse, glob, or meat <item> but not other types of food */
-    if (is_animal(u.ustuck->data)
+    if (digests(u.ustuck->data)
         && (obj->otyp == CORPSE || obj->globby
             || obj->otyp == MEATBALL || obj->otyp == HUGE_CHUNK_OF_MEAT
             || obj->otyp == MEAT_RING || obj->otyp == MEAT_STICK)) {
@@ -1070,11 +1075,18 @@ dodown(void)
     }
 
     if (u.ustuck) {
-        You("are %s, and cannot go down.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
-                                             ? "swallowed"
-                                             : "engulfed");
-        return ECMD_TIME;
+        if (u.uswallow || !sticks(g.youmonst.data)) {
+            You("are %s, and cannot go down.",
+                !u.uswallow ? "being held"
+                : digests(u.ustuck->data) ? "swallowed"
+                  : "engulfed");
+            return ECMD_TIME;
+        } else {
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("release %s.", mon_nam(mtmp));
+        }
     }
 
     if (!stairs_down && !ladder_down) {
@@ -1168,11 +1180,18 @@ doup(void)
         return ECMD_OK;
     }
     if (u.ustuck) {
-        You("are %s, and cannot go up.",
-            !u.uswallow ? "being held" : is_animal(u.ustuck->data)
-                                             ? "swallowed"
-                                             : "engulfed");
-        return ECMD_TIME;
+        if (u.uswallow || !sticks(g.youmonst.data)) {
+            You("are %s, and cannot go up.",
+                !u.uswallow ? "being held"
+                : digests(u.ustuck->data) ? "swallowed"
+                  : "engulfed");
+            return ECMD_TIME;
+        } else {
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("release %s.", mon_nam(mtmp));
+        }
     }
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */

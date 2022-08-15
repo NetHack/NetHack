@@ -490,7 +490,7 @@ release_hold(void)
     if (!mtmp) {
         impossible("release_hold when not held?");
     } else if (u.uswallow) { /* possible for sticky hero to be swallowed */
-        if (is_animal(mtmp->data)) {
+        if (digests(mtmp->data)) {
             if (!Blind)
                 pline("%s opens its mouth!", Monnam(mtmp));
             else

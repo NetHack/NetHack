@@ -456,7 +456,8 @@ breakarm(register struct permonst* ptr)
 boolean
 sticks(register struct permonst* ptr)
 {
-    return (boolean) (dmgtype(ptr, AD_STCK) || dmgtype(ptr, AD_WRAP)
+    return (boolean) (dmgtype(ptr, AD_STCK)
+                      || (dmgtype(ptr, AD_WRAP) && !attacktype(ptr, AT_ENGL))
                       || attacktype(ptr, AT_HUGS));
 }
 

@@ -352,8 +352,8 @@ look_at_monster(char *buf,
             name);
     if (u.ustuck == mtmp) {
         if (u.uswallow || iflags.save_uswallow) /* monster detection */
-            Strcat(buf, is_animal(mtmp->data)
-                          ? ", swallowing you" : ", engulfing you");
+            Strcat(buf, digests(mtmp->data) ? ", swallowing you"
+                                            : ", engulfing you");
         else
             Strcat(buf, (Upolyd && sticks(g.youmonst.data))
                           ? ", being held" : ", holding you");

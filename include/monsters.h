@@ -821,17 +821,22 @@
         M2_HOSTILE, 0, 8, CLR_RED, SCORPION),
     /*
      * trappers, lurkers, &c
+     * Note:  prior to 3.7, these were defined to do AD_DGST damage,
+     * but they don't swallow their victims into their stomachs and
+     * digest, they enfold and crush or suffocate.
+     * The Monster Manual states that someone engulfed by a trapper
+     * can't use weapons but we do not enforce that.
      */
     MON("lurker above", S_TRAPPER, LVL(10, 3, 3, 0, 0), (G_GENO | 2),
-        A(ATTK(AT_ENGL, AD_DGST, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_ENGL, AD_WRAP, 1, 6), ATTK(AT_ENGL, AD_PHYS, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(800, 350, MS_SILENT, MZ_HUGE), 0, 0,
         M1_HIDE | M1_FLY | M1_ANIMAL | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STALK | M2_STRONG, 0, 12, CLR_GRAY, LURKER_ABOVE),
     MON("trapper", S_TRAPPER, LVL(12, 3, 3, 0, 0), (G_GENO | 2),
-        A(ATTK(AT_ENGL, AD_DGST, 1, 10), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_ENGL, AD_WRAP, 1, 8), ATTK(AT_ENGL, AD_PHYS, 2, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(800, 350, MS_SILENT, MZ_HUGE), 0, 0,
         M1_HIDE | M1_ANIMAL | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_CARNIVORE,
@@ -882,15 +887,16 @@
      * vortices
      */
     MON("fog cloud", S_VORTEX, LVL(3, 1, 0, 0, 0), (G_GENO | G_NOCORPSE | 2),
-        A(ATTK(AT_ENGL, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_ENGL, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, MS_SILENT, MZ_HUGE), MR_SLEEP | MR_POISON | MR_STONE, 0,
         M1_FLY | M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_MINDLESS | M1_AMORPHOUS | M1_UNSOLID,
         M2_HOSTILE | M2_NEUTER, 0, 4, CLR_GRAY, FOG_CLOUD),
     MON("dust vortex", S_VORTEX, LVL(4, 20, 2, 30, 0),
-        (G_GENO | G_NOCORPSE | 2), A(ATTK(AT_ENGL, AD_BLND, 2, 8), NO_ATTK,
-                                     NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        (G_GENO | G_NOCORPSE | 2),
+        A(ATTK(AT_ENGL, AD_BLND, 2, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(0, 0, MS_SILENT, MZ_HUGE), MR_SLEEP | MR_POISON | MR_STONE, 0,
         M1_FLY | M1_BREATHLESS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_MINDLESS,

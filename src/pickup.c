@@ -1064,7 +1064,7 @@ query_objlist(const char *qstr,        /* query string */
         any = cg.zeroany;
         if (sorted && n > 1) {
             Sprintf(buf, "%s Creatures",
-                    is_animal(u.ustuck->data) ? "Swallowed" : "Engulfed");
+                    digests(u.ustuck->data) ? "Swallowed" : "Engulfed");
             add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
                      clr, buf, MENU_ITEMFLAGS_NONE);
         }

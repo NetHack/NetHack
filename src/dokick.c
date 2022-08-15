@@ -933,7 +933,7 @@ dokick(void)
             You_cant("move your %s!", body_part(LEG));
             break;
         case 1:
-            if (is_animal(u.ustuck->data)) {
+            if (digests(u.ustuck->data)) {
                 pline("%s burps loudly.", Monnam(u.ustuck));
                 break;
             }

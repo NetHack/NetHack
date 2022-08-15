@@ -2893,13 +2893,13 @@ monstone(struct monst* mdef)
         unmap_object(x, y);
     if (cansee(x, y))
         newsym(x, y);
-    /* We don't currently trap the hero in the statue in this case but we
-     * could */
+    /* we don't currently trap the hero in the statue in this case but we
+       could */
     if (engulfing_u(mdef))
         wasinside = TRUE;
     mondead(mdef);
     if (wasinside) {
-        if (is_animal(mdef->data))
+        if (digests(mdef->data))
             You("%s through an opening in the new %s.",
                 u_locomotion("jump"), xname(otmp));
     }
@@ -4675,7 +4675,7 @@ newcham(
                     if (is_vampshifter(mtmp)) {
                         Sprintf(msgtrail, " which was a shapeshifted %s",
                                 noname_monnam(mtmp, ARTICLE_NONE));
-                    } else if (is_animal(mdat)) {
+                    } else if (digests(mdat)) {
                         Strcpy(msgtrail, "'s stomach");
                     } else {
                         msgtrail[0] = '\0';

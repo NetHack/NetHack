@@ -4547,7 +4547,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (DEADMONSTER(mdef)) /* not lifesaved */
                     return MM_DEF_DIED;
             }
-            You("%s %s!", is_animal(g.youmonst.data) ? "regurgitate" : "expel",
+            You("%s %s!", digests(g.youmonst.data) ? "regurgitate" : "expel",
                 mon_nam(mdef));
             if (Slow_digestion || is_animal(g.youmonst.data)) {
                 pline("Obviously, you didn't like %s taste.",
@@ -4559,7 +4559,10 @@ gulpum(struct monst *mdef, struct attack *mattk)
 }
 
 void
-missum(struct monst *mdef, struct attack *mattk, boolean wouldhavehit)
+missum(
+    struct monst *mdef,
+    struct attack *mattk,
+    boolean wouldhavehit)
 {
     if (wouldhavehit) /* monk is missing due to penalty for wearing suit */
         Your("armor is rather cumbersome...");

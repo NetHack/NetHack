@@ -1676,11 +1676,17 @@ openit(void)
     int num = 0;
 
     if (u.uswallow) {
-        if (is_animal(u.ustuck->data)) {
+        if (digests(u.ustuck->data)) {
+            /* purple worm */
             if (Blind)
                 pline("Its mouth opens!");
             else
                 pline("%s opens its mouth!", Monnam(u.ustuck));
+#if 0   /* expels() will take care of this */
+        } else if (enfolds(u.ustuck->data)) {
+            /* trapper or lurker above */
+            pline("%s unfolds!", Monnam(u.ustuck));
+#endif
         }
         expels(u.ustuck, u.ustuck->data, TRUE);
         return -1;

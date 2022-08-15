@@ -1590,8 +1590,8 @@ dohide(void)
     if (u.ustuck || (u.utrap && (u.utraptype != TT_PIT || on_ceiling))) {
         You_cant("hide while you're %s.",
                  !u.ustuck ? "trapped"
-                   : u.uswallow ? (is_animal(u.ustuck->data) ? "swallowed"
-                                                             : "engulfed")
+                   : u.uswallow ? (digests(u.ustuck->data) ? "swallowed"
+                                                           : "engulfed")
                      : !sticks(g.youmonst.data) ? "being held"
                        : (humanoid(u.ustuck->data) ? "holding someone"
                                                    : "holding that creature"));

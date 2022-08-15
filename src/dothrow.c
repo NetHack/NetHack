@@ -2068,10 +2068,14 @@ thitmonst(
             mon->mstrategy &= ~STRAT_WAITMASK;
         }
     } else if (guaranteed_hit) {
+        char trail[BUFSZ];
+        char *monname;
+        struct permonst *md = u.ustuck->data;
+
         /* this assumes that guaranteed_hit is due to swallowing */
         wakeup(mon, TRUE);
         if (obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])) {
-            if (is_animal(u.ustuck->data)) {
+            if (is_animal(md)) {
                 minstapetrify(u.ustuck, TRUE);
                 /* Don't leave a cockatrice corpse available in a statue */
                 if (!u.uswallow) {
@@ -2080,9 +2084,12 @@ thitmonst(
                 }
             }
         }
-        pline("%s into %s %s.", Tobjnam(obj, "vanish"),
-              s_suffix(mon_nam(mon)),
-              is_animal(u.ustuck->data) ? "entrails" : "currents");
+        Strcpy(trail,
+               digests(md) ? " entrails" : is_whirly(md) ? " currents" : "");
+        monname = mon_nam(mon);
+        if (*trail)
+            monname = s_suffix(monname);
+        pline("%s into %s%s.", Tobjnam(obj, "vanish"), monname, trail);
     } else {
         tmiss(obj, mon, TRUE);
     }
@@ -2429,10 +2436,11 @@ throw_gold(struct obj *obj)
     freeinv(obj);
     if (u.uswallow) {
         const char *swallower = mon_nam(u.ustuck);
-        if (is_animal(u.ustuck->data))
-            swallower = s_suffix(swallower);
-        pline_The("gold disappears into %s%s.", swallower,
-                  is_animal(u.ustuck->data) ? " entrails" : "");
+
+        if (digests(u.ustuck->data))
+            /* note: s_suffix() returns a modifiable buffer */
+            swallower = strcat(s_suffix(swallower), " entrails");
+        pline_The("gold disappears into %s.", swallower);
         add_to_minv(u.ustuck, obj);
         return ECMD_TIME;
     }

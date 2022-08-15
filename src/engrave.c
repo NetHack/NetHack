@@ -192,7 +192,10 @@ surface(coordxy x, coordxy y)
     struct rm *lev = &levl[x][y];
 
     if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
-        return "maw";
+        /* 'husk' is iffy but maw is wrong for 't' class */
+        return digests(u.ustuck->data) ? "maw"
+               : enfolds(u.ustuck->data) ? "husk"
+                 : "nonesuch"; /* can't happen (fingers crossed...) */
     else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
         return "air";
     else if (is_pool(x, y))
@@ -461,6 +464,8 @@ u_can_engrave(void)
             cant_reach_floor(u.ux, u.uy, FALSE, FALSE);
             return FALSE;
         }
+        /* Note: for amorphous engulfers, writing attempt is allowed here
+           but yields the 'jello' result in doengrave() */
     } else if (is_lava(u.ux, u.uy)) {
         You_cant("write on the %s!", surface(u.ux, u.uy));
         return FALSE;

@@ -86,6 +86,8 @@
 #define is_wooden(ptr) ((ptr) == &mons[PM_WOOD_GOLEM])
 #define thick_skinned(ptr) (((ptr)->mflags1 & M1_THICK_HIDE) != 0L)
 #define hug_throttles(ptr) ((ptr) == &mons[PM_ROPE_GOLEM])
+#define digests(ptr) dmgtype_fromattack((ptr), AD_DGST, AT_ENGL) /* purple w*/
+#define enfolds(ptr) dmgtype_fromattack((ptr), AD_WRAP, AT_ENGL) /* 't' */
 #define slimeproof(ptr) \
     ((ptr) == &mons[PM_GREEN_SLIME] || flaming(ptr) || noncorporeal(ptr))
 #define lays_eggs(ptr) (((ptr)->mflags1 & M1_OVIPAROUS) != 0L)

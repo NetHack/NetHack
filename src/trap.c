@@ -3419,10 +3419,11 @@ float_up(void)
     } else if (u.uinwater) {
         spoteffects(TRUE);
     } else if (u.uswallow) {
-        You(is_animal(u.ustuck->data) ? "float away from the %s."
-                                      : "spiral up into %s.",
-            is_animal(u.ustuck->data) ? surface(u.ux, u.uy)
-                                      : mon_nam(u.ustuck));
+        /* FIXME: this isn't correct for trapper/lurker above */
+        if (is_animal(u.ustuck->data))
+            You("float away from the %s.", surface(u.ux, u.uy));
+        else
+            You("spiral up into %s.", mon_nam(u.ustuck));
     } else if (Hallucination) {
         pline("Up, up, and awaaaay!  You're walking on air!");
     } else if (Is_airlevel(&u.uz)) {
@@ -3506,7 +3507,7 @@ float_down(
     }
     if (u.uswallow) {
         You("float down, but you are still %s.",
-            is_animal(u.ustuck->data) ? "swallowed" : "engulfed");
+            digests(u.ustuck->data) ? "swallowed" : "engulfed");
         (void) encumber_msg();
         return 1;
     }
