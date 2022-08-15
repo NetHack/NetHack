@@ -183,7 +183,7 @@ dosave0(void)
     /* these pointers are no longer valid, and at least u.usteed
      * may mislead place_monster() on other levels
      */
-    set_ustuck((struct monst *) 0);
+    set_ustuck((struct monst *) 0); /* also clears u.uswallow */
     u.usteed = (struct monst *) 0;
 
     for (ltmp = (xint8) 1; ltmp <= maxledgerno(); ltmp++) {

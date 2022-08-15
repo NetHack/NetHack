@@ -2952,7 +2952,7 @@ monkilled(
 }
 
 void
-set_ustuck(struct monst* mtmp)
+set_ustuck(struct monst *mtmp)
 {
     if (iflags.sanity_check || iflags.debug_fuzzer) {
         if (mtmp && !next2u(mtmp->mx, mtmp->my))
@@ -2962,23 +2962,26 @@ set_ustuck(struct monst* mtmp)
 
     g.context.botl = 1;
     u.ustuck = mtmp;
+    if (!u.ustuck) {
+        u.uswallow = 0;
+        u.uswldtim = 0;
+    }
 }
 
 void
-unstuck(struct monst* mtmp)
+unstuck(struct monst *mtmp)
 {
     if (u.ustuck == mtmp) {
         struct permonst *ptr = mtmp->data;
+        unsigned swallowed = u.uswallow;
 
         /* do this first so that docrt()'s botl update is accurate;
-           safe to do as long as u.uswallow is also cleared before docrt() */
+           clears u.uswallow as well as setting u.ustuck to Null */
         set_ustuck((struct monst *) 0);
 
-        if (u.uswallow) {
+        if (swallowed) {
             u.ux = mtmp->mx;
             u.uy = mtmp->my;
-            u.uswallow = 0;
-            u.uswldtim = 0;
             if (Punished && uchain->where != OBJ_FLOOR)
                 placebc();
             g.vision_full_recalc = 1;

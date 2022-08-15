@@ -354,6 +354,7 @@ teleok(coordxy x, coordxy y, boolean trapok)
 void
 teleds(coordxy nux, coordxy nuy, int teleds_flags)
 {
+    unsigned was_swallowed;
     boolean ball_active, ball_still_in_range = FALSE,
             allow_drag = (teleds_flags & TELEDS_ALLOW_DRAG) != 0,
             is_teleport = (teleds_flags & TELEDS_TELEPORT) != 0;
@@ -391,6 +392,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
             unplacebc(); /* have to move the ball */
     }
     reset_utrap(FALSE);
+    was_swallowed = u.uswallow; /* set_ustuck(Null) clears uswallow */
     set_ustuck((struct monst *) 0);
     u.ux0 = u.ux;
     u.uy0 = u.uy;
@@ -400,9 +402,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
         g.youmonst.m_ap_type = M_AP_NOTHING;
     }
 
-    if (u.uswallow) {
-        /* subset of unstuck() */
-        u.uswldtim = u.uswallow = 0;
+    if (was_swallowed) {
         if (Punished) { /* ball&chain are off map while swallowed */
             ball_active = TRUE; /* to put chain and non-carried ball on map */
             ball_still_in_range = allow_drag = FALSE; /* (redundant) */

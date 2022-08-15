@@ -1442,8 +1442,7 @@ goto_level(
         unplacebc();
     reset_utrap(FALSE); /* needed in level_tele */
     fill_pit(u.ux, u.uy);
-    set_ustuck((struct monst *) 0); /* idem */
-    u.uswallow = u.uswldtim = 0;
+    set_ustuck((struct monst *) 0); /* clear u.ustuck and u.uswallow */
     set_uinwater(0); /* u.uinwater = 0 */
     u.uundetected = 0; /* not hidden, even if means are available */
     keepdogs(FALSE);
