@@ -1050,8 +1050,7 @@ movemon_singlemon(struct monst *mtmp)
             && fightm(mtmp))
             return FALSE; /* mon might have died */
     }
-    if (dochugw(mtmp, TRUE)) /* otherwise just move the monster */
-        return FALSE;
+    dochugw(mtmp, TRUE); /* otherwise just move the monster */
     return FALSE;
 }
 
