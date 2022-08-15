@@ -1000,6 +1000,7 @@ blind hero was notified when brass lantern burned out even though it isn't
 	warm enough to detect that by touch; manually switching the lantern
 	on or off can be determined that way so still gives on/off message
 turn on statushilites automatically if any are defined
+change poison instakill to damage with attribute and max hp loss
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -314,10 +314,21 @@ poisoned(const char *reason,    /* controls what messages we display */
 
     i = !fatal ? 1 : rn2(fatal + (thrown_weapon ? 20 : 0));
     if (i == 0 && typ != A_CHA) {
-        /* instant kill */
-        u.uhp = -1;
-        g.context.botl = TRUE;
-        pline_The("poison was deadly...");
+        /* sometimes survivable instant kill */
+        loss = 6 + d(4, 6);
+        if (u.uhp <= loss) {
+            u.uhp = -1;
+            g.context.botl = TRUE;
+            pline_The("poison was deadly...");
+        } else {
+            /* survived, but with severe reaction */
+            u.uhpmax = max(3, u.uhpmax - (loss / 2));
+            losehp(loss, pkiller, kprefix); /* poison damage */
+            if (adjattrib(A_CON, (typ != A_CON) ? -1 : -3, TRUE))
+                poisontell(A_CON, TRUE);
+            if (typ != A_CON && adjattrib(typ, -3, 1))
+                poisontell(typ, TRUE);
+        }
     } else if (i > 5) {
         boolean cloud = !strcmp(reason, "gas cloud");
 
