@@ -3226,7 +3226,6 @@ display_pickinv(
         if (g.cached_pickinv_win == WIN_ERR)
             g.cached_pickinv_win = create_nhwindow(NHW_MENU);
         win = g.cached_pickinv_win;
-        show_gold = TRUE;
     } else {
         win = WIN_INVEN;
         menu_behavior = MENU_BEHAVE_PERMINV;
@@ -5412,15 +5411,22 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
 void
 prepare_perminvent(winid window)
 {
-    win_request_info *wri UNUSED;
+    win_request_info *wri;
 
     if (!done_setting_perminv_flags) {
         wri_info = zerowri;
-        /*TEMPORARY*/
-        char *envtmp = nh_getenv("TTYINV");
-        wri_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
+#if defined(TTY_PERM_INVENT)
+        if (WINDOWPORT(tty)) {
+            /*TEMPORARY*/
+            char *envtmp = nh_getenv("TTYINV");
+
+            wri_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
+        } else
+#endif
+            wri_info.fromcore.invmode = InvShowGold;
         /*  relay the mode settings to the window port */
         wri = ctrl_nhwindow(window, set_mode, &wri_info);
+        nhUse(wri);
         done_setting_perminv_flags = 1;
     }
 }

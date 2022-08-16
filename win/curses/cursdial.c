@@ -754,14 +754,14 @@ curses_display_nhmenu(
     if (current_menu == NULL) {
         impossible(
                 "curses_display_nhmenu: attempt to display nonexistent menu");
-        return '\033';
+        return -1; /* not ESC which falsely claims 27 items were selected */
     }
 
     menu_item_ptr = current_menu->entries;
 
     if (menu_item_ptr == NULL) {
         impossible("curses_display_nhmenu: attempt to display empty menu");
-        return '\033';
+        return -1;
     }
 
     /* Reset items to unselected to clear out selections from previous
@@ -790,15 +790,14 @@ curses_display_nhmenu(
         selected = (MENU_ITEM_P *) alloc((unsigned)
                                          (num_chosen * sizeof (MENU_ITEM_P)));
         count = 0;
-
         menu_item_ptr = current_menu->entries;
 
         while (menu_item_ptr != NULL) {
             if (menu_item_ptr->selected) {
                 if (count == num_chosen) {
                     impossible("curses_display_nhmenu: Selected items "
-                          "exceeds expected number");
-                     break;
+                               "exceeds expected number");
+                    break;
                 }
                 selected[count].item = menu_item_ptr->identifier;
                 selected[count].count = menu_item_ptr->count;
@@ -810,6 +809,7 @@ curses_display_nhmenu(
         if (count != num_chosen) {
             impossible(
            "curses_display_nhmenu: Selected items less than expected number");
+            num_chosen = min(count, num_chosen);
         }
     }
 

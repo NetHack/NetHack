@@ -420,7 +420,7 @@ curses_display_nhwindow(winid wid, boolean block)
 
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         curses_end_menu(wid, "");
-        curses_select_menu(wid, PICK_NONE, &selected);
+        (void) curses_select_menu(wid, PICK_NONE, &selected);
         return;
     }
 
