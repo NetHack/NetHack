@@ -22,6 +22,8 @@ static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
 static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
+static boolean hero_behind_chokepoint(struct monst *);
+static boolean mon_has_friends(struct monst *);
 static int mbhitm(struct monst *, struct obj *);
 static void mbhit(struct monst *, int, int (*)(MONST_P, OBJ_P),
                   int (*)(OBJ_P, OBJ_P), struct obj *);
@@ -1193,6 +1195,57 @@ m_use_undead_turning(struct monst* mtmp, struct obj* obj)
     }
 }
 
+/* from monster's point of view, is hero behind a chokepoint? */
+static boolean
+hero_behind_chokepoint(struct monst *mtmp)
+{
+    coordxy dx = sgn(mtmp->mx - mtmp->mux);
+    coordxy dy = sgn(mtmp->my - mtmp->muy);
+
+    coordxy x = mtmp->mux + dx;
+    coordxy y = mtmp->muy + dy;
+
+    int dir = xytod(dx, dy);
+    int dir_l = DIR_CLAMP(DIR_LEFT2(dir));
+    int dir_r = DIR_CLAMP(DIR_RIGHT2(dir));
+
+    coord c1, c2;
+
+    dtoxy(&c1, dir_l);
+    dtoxy(&c2, dir_r);
+    c1.x += x, c2.x += x;
+    c1.y += y, c2.y += y;
+
+    if ((!isok(c1.x, c1.y) || !accessible(c1.x, c1.y))
+        && (!isok(c2.x, c2.y) || !accessible(c2.x, c2.y)))
+        return TRUE;
+    return FALSE;
+}
+
+/* hostile monster has other hostiles next to it */
+static boolean
+mon_has_friends(struct monst *mtmp)
+{
+    coordxy dx, dy;
+    int n = 0;
+    struct monst *mon2;
+
+    if (mtmp->mtame || mtmp->mpeaceful)
+        return FALSE;
+
+    for (dx = -1; dx <= 1; dx++)
+        for (dy = -1; dy <= 1; dy++) {
+            coordxy x = mtmp->mx + dx;
+            coordxy y = mtmp->my + dy;
+
+            if (isok(x, y) && (mon2 = m_at(x, y)) != 0
+                && !mon2->mtame && !mon2->mpeaceful)
+                n++;
+        }
+
+    return (n > 1) ? TRUE : FALSE;
+}
+
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
  */
@@ -1291,6 +1344,7 @@ find_offensive(struct monst* mtmp)
                 || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1))))
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
+                || (hero_behind_chokepoint(mtmp) && mon_has_friends(mtmp))
                 || (stairway_at(u.ux, u.uy)))) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_WAN_TELEPORTATION;
