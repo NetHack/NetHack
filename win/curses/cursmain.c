@@ -1103,7 +1103,7 @@ curs_reset_windows(boolean redo_main, boolean redo_status)
     }
     if (need_redraw) {
         curses_last_messages();
-        doredraw();
+        docrt();
     }
 }
 

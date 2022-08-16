@@ -8126,7 +8126,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
                     Sprintf(buf, fmtstr_doset_tab,
                             name, *bool_p ? "true" : "false");
                 if (pass == 0)
-                    enhance_menu_text(buf, sizeof buf, pass, bool_p, &allopt[i]);
+                    enhance_menu_text(buf, sizeof buf, pass, bool_p,
+                                      &allopt[i]);
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
             }
@@ -8266,6 +8267,20 @@ doset(void) /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         docrt();
+        /*
+         * docrt() calls update_inventory() but
+         * (*windowprocs.win_update_inventory)(0) for curses ends up
+         * calling back to docrt() after creating its perm_invent
+         * window.  That call back has become a no-op because of the
+         * program_state.in_docrt flag.  So call update_inventory()
+         * explicitly in case perm_invent was toggled.  It's only
+         * needed if perm_invent was off and is now on but won't kill
+         * anybody if done when not necessary.
+         * Note:  doset_simple() doesn't need this because it doesn't
+         * offer a chance to toggle perm_invent.
+         */
+        if (iflags.perm_invent)
+            update_inventory();
     }
     if (g.context.botl || g.context.botlx) {
         bot();
