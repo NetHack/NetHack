@@ -1222,12 +1222,11 @@ hero_behind_chokepoint(struct monst *mtmp)
     return FALSE;
 }
 
-/* hostile monster has other hostiles next to it */
+/* hostile monster has another hostile next to it */
 static boolean
 mon_has_friends(struct monst *mtmp)
 {
     coordxy dx, dy;
-    int n = 0;
     struct monst *mon2;
 
     if (mtmp->mtame || mtmp->mpeaceful)
@@ -1239,11 +1238,12 @@ mon_has_friends(struct monst *mtmp)
             coordxy y = mtmp->my + dy;
 
             if (isok(x, y) && (mon2 = m_at(x, y)) != 0
+                && mon2 != mtmp
                 && !mon2->mtame && !mon2->mpeaceful)
-                n++;
+                return TRUE;
         }
 
-    return (n > 1) ? TRUE : FALSE;
+    return FALSE;
 }
 
 /* Select an offensive item/action for a monster.  Returns TRUE iff one is
