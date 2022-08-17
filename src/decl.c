@@ -140,7 +140,7 @@ const char *ARGV0;
 
 #define IVMAGIC 0xdeadbeef
 
-#ifdef GCC_WARN
+#ifdef __GNUC__ /* GCC_WARN */
 #pragma GCC diagnostic ignored "-Wmissing-braces"
 #endif
 

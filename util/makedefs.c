@@ -42,7 +42,7 @@
 #define rewind(fp) fseek((fp), 0L, SEEK_SET) /* guarantee a return value */
 #endif
 
-#if defined(UNIX) && !defined(LINT) && !defined(GCC_WARN)
+#if defined(UNIX) && !defined(LINT) && !defined(__GNUC__) /* GCC_WARN */
 static const char SCCS_Id[] UNUSED = "@(#)makedefs.c\t3.7\t2020/01/18";
 #endif
 
