@@ -674,9 +674,10 @@ enum optset_restrictions {
     set_gameview   = 3, /* may be set via extern program, displayed in game */
     set_in_game    = 4, /* may be set via extern program or set in the game */
     set_wizonly    = 5, /* may be set set in the game if wizmode */
-    set_hidden     = 6  /* placeholder for prefixed entries, never show it  */
+    set_wiznofuz   = 6, /* wizard-mode only, but not by fuzzer */
+    set_hidden     = 7  /* placeholder for prefixed entries, never show it  */
 };
-#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wizonly))
+#define SET__IS_VALUE_VALID(s) ((s < set_in_sysconf) || (s > set_wiznofuz))
 
 #define FEATURE_NOTICE_VER(major, minor, patch)                    \
     (((unsigned long) major << 24) | ((unsigned long) minor << 16) \

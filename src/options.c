@@ -4494,6 +4494,10 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         if (!g.opt_initial && (allopt[optidx].setwhere == set_in_config))
             return optn_err;
 
+        /* options that must NOT come from config file */
+        if (g.opt_initial && allopt[optidx].setwhere == set_wiznofuz)
+            return optn_err;
+
         op = string_for_opt(opts, TRUE);
         if (op != empty_optstr) {
             int ln;
@@ -8090,7 +8094,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     else
 #endif
         startpass = set_gameview;
-    endpass = (wizard) ? set_wizonly : set_in_game;
+    endpass = (wizard) ? set_wiznofuz : set_in_game;
 
     if (!made_fmtstr && !iflags.menu_tab_sep) {
         Sprintf(fmtstr_doset, "%%s%%-%us [%%s]",
@@ -8113,6 +8117,9 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 if (bool_p == &flags.female)
                     continue; /* obsolete */
                 if (allopt[i].setwhere == set_wizonly && !wizard)
+                    continue;
+                if (allopt[i].setwhere == set_wiznofuz
+                    && (!wizard || iflags.debug_fuzzer))
                     continue;
                 if ((is_wc_option(name) && !wc_supported(name))
                     || (is_wc2_option(name) && !wc2_supported(name)))
@@ -8729,6 +8736,9 @@ option_help(void)
         if ((allopt[i].opttyp != BoolOpt || !allopt[i].addr)
             || (allopt[i].setwhere == set_wizonly && !wizard))
             continue;
+        if (allopt[i].setwhere == set_wiznofuz
+            && (!wizard || iflags.debug_fuzzer))
+            continue;
         optname = allopt[i].name;
         if ((is_wc_option(optname) && !wc_supported(optname))
             || (is_wc2_option(optname) && !wc2_supported(optname)))
@@ -8742,6 +8752,9 @@ option_help(void)
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].opttyp != CompOpt
             || (allopt[i].setwhere == set_wizonly && !wizard))
+            continue;
+        if (allopt[i].setwhere == set_wiznofuz
+            && (!wizard || iflags.debug_fuzzer))
             continue;
         optname = allopt[i].name;
         if ((is_wc_option(optname) && !wc_supported(optname))

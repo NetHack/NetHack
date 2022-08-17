@@ -180,6 +180,14 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 Yes, Yes, No, No, NoAlias,
                 "load DECGraphics display symbols into symset")
 #endif
+    NHOPTB(debug_fuzzer, Advanced, 0, opt_in, set_wiznofuz,
+                Off, Yes, No, No, NoAlias, &iflags.debug_fuzzer)
+    NHOPTB(debug_hunger, Advanced, 0, opt_in, set_wiznofuz,
+                Off, Yes, No, No, NoAlias, &iflags.debug_hunger)
+    NHOPTB(debug_mongen, Advanced, 0, opt_in, set_wiznofuz,
+                Off, Yes, No, No, NoAlias, &iflags.debug_mongen)
+    NHOPTB(debug_overwrite_stairs, Advanced, 0, opt_in, set_wiznofuz,
+                Off, Yes, No, No, NoAlias, &iflags.debug_overwrite_stairs)
     NHOPTC(disclose, Advanced, sizeof flags.end_disclose * 2,
                 opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
