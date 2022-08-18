@@ -2633,7 +2633,10 @@ zapyourself(struct obj *obj, boolean ordinary)
             You("don't feel sleepy!");
             monstseesu(M_SEEN_SLEEP);
         } else {
-            pline_The("sleep ray hits you!");
+            if (ordinary)
+                pline_The("sleep ray hits you!");
+            else
+                You("fall alseep!");
             fall_asleep(-rnd(50), TRUE);
         }
         break;

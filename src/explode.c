@@ -156,7 +156,7 @@ explode(
             break;
         case 4:
             adstr = (olet == WAND_CLASS) ? "death field"
-                                       : "disintegration field";
+                                         : "disintegration field";
             adtyp = AD_DISN;
             break;
         case 5:
