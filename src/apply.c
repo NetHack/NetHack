@@ -396,8 +396,7 @@ use_stethoscope(struct obj *obj)
                 /* simple_typename() yields "fruit" for any named fruit;
                    we want the same thing '//' or ';' shows: "slime mold"
                    or "grape" or "slice of pizza" */
-                if (odummy->otyp == SLIME_MOLD
-                    && has_mcorpsenm(mtmp) && MCORPSENM(mtmp) != NON_PM) {
+                if (odummy->otyp == SLIME_MOLD && has_mcorpsenm(mtmp)) {
                     odummy->spe = MCORPSENM(mtmp);
                     what = simpleonames(odummy);
                 } else {
