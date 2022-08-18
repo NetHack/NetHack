@@ -467,11 +467,13 @@ allow_category(struct obj *obj)
         set_bknown(obj, 1);
 
     /*
-     * There are three types of filters possible and the first and
-     * third can have more than one entry:
+     * Version 3.6 had three types of filters possible and the first
+     * and third can have more than one entry:
      *  1) object class (armor, potion, &c);
      *  2) unpaid shop item;
      *  3) bless/curse state (blessed, uncursed, cursed, BUC-unknown).
+     * Version 3.7 added a fourth:
+     *  4) 'novelty' ('P' for just picked up items).
      * When only one type is present, the situation is simple:
      * to be accepted, obj's status must match one of the entries.
      * When more than one type is present, the obj will now only

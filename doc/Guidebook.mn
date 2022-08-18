@@ -764,10 +764,13 @@ use a menu to pick which object(s) to drop.
 drop only unpaid food.
 .PE
 The last example shows a combination.
-There are three categories of object filtering: class (\(oq!\(cq for
+There are four categories of object filtering: class (\(oq!\(cq for
 potions, \(oq?\(cq for scrolls, and so on), shop status (\(oqu\(cq for
-unpaid, in other words, owned by the shop), and bless/curse state
-(\(oqB\(cq, \(oqU\(cq, \(oqC\(cq, and \(oqX\(cq as shown above).
+unpaid, in other words, owned by the shop), bless/curse state
+(\(oqB\(cq, \(oqU\(cq, \(oqC\(cq, and \(oqX\(cq as shown above),
+and novelty (\(oqP\(cq, recently picked up items; controlled by picking
+up or dropping things rather than by any time factor).
+.lp ""
 If you specify more than one value in a category (such as \(lq!?\(rq for
 potions and scrolls or \(lqBU\(rq for blessed and uncursed), an inventory
 object will meet the criteria if it matches any of the specified
