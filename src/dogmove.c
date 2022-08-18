@@ -306,6 +306,9 @@ dog_eat(struct monst *mtmp,
         Strcpy(objnambuf, xname(obj));
         iflags.suppress_price--;
     }
+    /* some monsters that eat items could eat a container with contents */
+    if (Has_contents(obj))
+        meatbox(mtmp, obj);
     /* It's a reward if it's DOGFOOD and the player dropped/threw it.
        We know the player had it if invlet is set. -dlc */
     if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)

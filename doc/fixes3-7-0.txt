@@ -1007,6 +1007,8 @@ attempting to move up or down when poly'd into a holder and holding a monster
 	rejected the move; release the monster instead
 thowing a non-weapon while engulfed by an ochre jelly reported that the item
 	vanished into the jelly's "currents"
+if a pet gelatinous cube eats a container, treat it the same as when a hostile
+	one does:  the container is destroyed but its conters are engulfed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
