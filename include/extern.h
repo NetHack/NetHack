@@ -2349,6 +2349,7 @@ extern long nhrand(void);
 #endif
 extern int rn2(int);
 extern int rn2_on_display_rng(int);
+extern int rnd_on_display_rng(int);
 extern int rnl(int);
 extern int rnd(int);
 extern int d(int, int);

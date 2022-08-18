@@ -167,6 +167,12 @@ rnd(register int x)
     return x;
 }
 
+int
+rnd_on_display_rng(register int x)
+{
+    return rn2_on_display_rng(x) + 1;
+}
+
 /* d(N,X) == NdX == dX+dX+...+dX N times; n <= d(n,x) <= (n*x) */
 int
 d(register int n, register int x)
