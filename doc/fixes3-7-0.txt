@@ -1009,6 +1009,8 @@ thowing a non-weapon while engulfed by an ochre jelly reported that the item
 	vanished into the jelly's "currents"
 if a pet gelatinous cube eats a container, treat it the same as when a hostile
 	one does:  the container is destroyed but its conters are engulfed
+when breaking a wand of sleep hits the hero with the explosion, don't describe
+	that as "the sleep ray hits you"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
