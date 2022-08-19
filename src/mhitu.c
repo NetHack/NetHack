@@ -1174,7 +1174,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                              : unsolid(mtmp->data) ? "flows"
                                /* ochre 'j', Juiblex */
                                : amorphous(mtmp->data) ? "oozes"
-                                 /* none (all AD_ENGL are already covered) */
+                                 /* none (all AT_ENGL are already covered) */
                                  : "surges",
                          buf);
             dismount_steed(DISMOUNT_ENGULFED);
