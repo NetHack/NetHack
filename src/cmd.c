@@ -1299,12 +1299,18 @@ wiz_kill(void)
             mtmp = m_at(cc.x, cc.y);
         }
 
+        /* whether there's an unseen monster here or not, player will know
+           that there's no monster here after the kill or failed attempt;
+           let hero know too */
+        (void) unmap_invisible(cc.x, cc.y);
+
         if (mtmp) {
             /* we don't require that the monster be seen or sensed so
                we issue our own message in order to name it in case it
                isn't; note that if it triggers other kills, those might
                be referred to as "it" */
-            int tame = !!mtmp->mtame, seen = canspotmon(mtmp),
+            int tame = !!mtmp->mtame,
+                seen = (canspotmon(mtmp) || (u.uswallow && mtmp == u.ustuck)),
                 flgs = (SUPPRESS_IT | SUPPRESS_HALLUCINATION
                         | ((tame && has_mgivenname(mtmp)) ? SUPPRESS_SADDLE
                            : 0)),
@@ -1332,7 +1338,6 @@ wiz_kill(void)
             }
         } else {
             There("is no monster there.");
-            (void) unmap_invisible(cc.x, cc.y);
             break;
         }
     }
