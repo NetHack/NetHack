@@ -3197,7 +3197,10 @@ display_pickinv(
     boolean want_reply,      /* True: select an item, False: just display */
     long *out_cnt) /* optional; count player entered when selecting an item */
 {
-    static const char not_carrying_anything[] = "Not carrying anything";
+    static const char /* potential entries for perm_invent window */
+        not_carrying_anything[] = "Not carrying anything",
+        not_using_anything[] = "Not using any items",
+        only_carrying_gold[] = "Only carrying gold";
     struct obj *otmp, wizid_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
@@ -3210,15 +3213,17 @@ display_pickinv(
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
     int clr = 0, menu_behavior = MENU_BEHAVE_STANDARD;
     boolean show_gold = TRUE, sparse = FALSE, inuse_only = FALSE,
+            skipped_gold = FALSE, skipped_noninuse = FALSE,
             doing_perm_invent = FALSE, save_flags_sortpack = flags.sortpack;
 
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
 
-    if ((iflags.perm_invent && (lets || xtra_choice || wizid))
+    if (!iflags.perm_invent
 #ifdef TTY_PERM_INVENT
         || !g.in_sync_perminvent
 #endif
+        || (lets || xtra_choice || wizid || want_reply)
         || WIN_INVEN == WIN_ERR) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
@@ -3367,11 +3372,19 @@ display_pickinv(
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (wizid && !not_fully_identified(otmp))
                 continue;
-            if (doing_perm_invent
-                && ((otmp->invlet == GOLD_SYM && !show_gold)
-                    || ((otmp->invlet != GOLD_SYM)
-                        && (!otmp->owornmask && inuse_only))))
-                continue;
+            if (doing_perm_invent) {
+                /* when showing equipment in use, gold shouldn't be excluded
+                   just because !show_gold is set; it might be quivered */
+                if (inuse_only) {
+                    if (!otmp->owornmask) {
+                        skipped_noninuse = TRUE;
+                        continue;
+                    }
+                } else if (otmp->invlet == GOLD_SYM && !show_gold) {
+                    skipped_gold = TRUE;
+                    continue;
+                }
+            }
             any = cg.zeroany; /* all bits zero */
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
@@ -3422,14 +3435,16 @@ display_pickinv(
         gotsomething = TRUE;
     }
     unsortloot(&sortedinvent);
-    /* for permanent inventory where we intend to show everything but
-       nothing has been listed (because there isn't anyhing to list;
-       the n==0 case above gets skipped for perm_invent), put something
-       into the menu */
+    /* for permanent inventory where nothing has been listed (because
+       there isn't applicable anyhing to list; the n==0 case above
+       gets skipped for perm_invent), put something into the menu */
     if (iflags.perm_invent && !lets && !gotsomething) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 not_carrying_anything, MENU_ITEMFLAGS_NONE);
+                 (inuse_only && skipped_noninuse) ? not_using_anything
+                 : (!show_gold && skipped_gold) ? only_carrying_gold
+                   : not_carrying_anything,
+                 MENU_ITEMFLAGS_NONE);
         want_reply = FALSE;
     }
 #ifdef TTY_PERM_INVENT
@@ -3631,8 +3646,10 @@ count_buc(struct obj *list, int type, boolean (*filterfunc)(OBJ_P))
 /* similar to count_buc(), but tallies all states at once
    rather than looking for a specific type */
 void
-tally_BUCX(struct obj *list, boolean by_nexthere,
-           int *bcp, int *ucp, int *ccp, int *xcp, int *ocp, int *jcp)
+tally_BUCX(
+    struct obj *list,
+    boolean by_nexthere,
+    int *bcp, int *ucp, int *ccp, int *xcp, int *ocp, int *jcp)
 {
     /* Future extensions:
      *  Skip current_container when list is invent, uchain when
@@ -3669,14 +3686,15 @@ tally_BUCX(struct obj *list, boolean by_nexthere,
 
 /* count everything inside a container, or just shop-owned items inside */
 long
-count_contents(struct obj *container,
-               boolean nested,  /* include contents of any nested containers */
-               boolean quantity,   /* count all vs count separate stacks     */
-               boolean everything, /* all objects vs only unpaid objects     */
-               boolean newdrop)    /* on floor, but hero-owned items haven't
-                                    * been marked no_charge yet and shop-owned
-                                    * items are still marked unpaid -- used
-                                    * when asking the player whether to sell */
+count_contents(
+    struct obj *container,
+    boolean nested,     /* include contents of any nested containers */
+    boolean quantity,   /* count all vs count separate stacks        */
+    boolean everything, /* all objects vs only unpaid objects        */
+    boolean newdrop)    /* on floor, but hero-owned items haven't
+                         * been marked no_charge yet and shop-owned
+                         * items are still marked unpaid -- used
+                         * when asking the player whether to sell    */
 {
     struct obj *otmp, *topc;
     boolean shoppy = FALSE;
@@ -5414,16 +5432,17 @@ prepare_perminvent(winid window)
     win_request_info *wri;
 
     if (!done_setting_perminv_flags) {
-        wri_info = zerowri;
-#if defined(TTY_PERM_INVENT)
-        if (WINDOWPORT(tty)) {
-            /*TEMPORARY*/
-            char *envtmp = nh_getenv("TTYINV");
+        /*TEMPORARY*/
+        char *envtmp = nh_getenv("TTYINV");
+        /* default for non-tty includes gold, for tty excludes gold;
+           if non-tty specifies any value, gold will be excluded unless
+           that value includes the show-gold bit (1) */
+        int invmode = envtmp ? atoi(envtmp)
+                      : !WINDOWPORT(tty) ? InvShowGold
+                        : InvNormal;
 
-            wri_info.fromcore.invmode = envtmp ? atoi(envtmp) : InvNormal;
-        } else
-#endif
-            wri_info.fromcore.invmode = InvShowGold;
+        wri_info = zerowri;
+        wri_info.fromcore.invmode = invmode;
         /*  relay the mode settings to the window port */
         wri = ctrl_nhwindow(window, set_mode, &wri_info);
         nhUse(wri);
