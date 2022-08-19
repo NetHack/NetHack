@@ -72,12 +72,6 @@ static struct allopt_t allopt_init[] = {
 #undef NHOPT_PARSE
 
 
-#if defined(USE_TILES) && defined(DEFAULT_WC_TILED_MAP)
-#define PREFER_TILED TRUE
-#else
-#define PREFER_TILED FALSE
-#endif
-
 #define PILE_LIMIT_DFLT 5
 #define rolestring(val, array, field) \
     ((val >= 0) ? array[val].field : (val == ROLE_RANDOM) ? randomrole : none)
@@ -6461,6 +6455,17 @@ initoptions_finish(void)
     }
 #endif
     update_rest_on_space();
+
+    /* these can't rely on compile-time initialization for their defaults
+       because a multi-interface binary might need different values for
+       different interfaces; if neither tiled_map nor ascii_map pass the
+       wc_supported() test, assume ascii_map */
+    if (iflags.wc_tiled_map && !wc_supported("tiled_map"))
+        iflags.wc_tiled_map = FALSE, iflags.wc_ascii_map = TRUE;
+    else if (iflags.wc_ascii_map && !wc_supported("ascii_map")
+             && wc_supported("tiled_map"))
+        iflags.wc_ascii_map = FALSE, iflags.wc_tiled_map = TRUE;
+
 #ifdef ENHANCED_SYMBOLS
     if (glyphid_cache_status())
         free_glyphid_cache();
