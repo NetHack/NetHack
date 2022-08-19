@@ -54,10 +54,9 @@
    PCHAR2(idx, ch, sym, tilenm, desc, clr)
        idx:     index used in enum
        ch:      character symbol
+       sym:     symbol name for parsing purposes
        tilenm:  if the name in the txt file differs from sym,
                 the tile name can be specified here.
-       sym:     symbol name for parsing purposes
-       tilenm:  tile file description if different from desc
        desc:    description
        clr:     color
 */
