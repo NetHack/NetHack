@@ -3436,7 +3436,7 @@ display_pickinv(
     }
     unsortloot(&sortedinvent);
     /* for permanent inventory where nothing has been listed (because
-       there isn't applicable anyhing to list; the n==0 case above
+       there isn't applicable anything to list; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
     if (iflags.perm_invent && !lets && !gotsomething) {
         any = cg.zeroany;
