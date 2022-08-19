@@ -1391,8 +1391,12 @@ Default key is \(oqo\(cq.
 Show and change option settings.
 Default key is \(oqO\(cq.
 Precede with the \(oqm\(cq prefix to show advanced options.
-.lp "#optionsfull"
+.lp #optionsfull
 Show advanced game option settings.
+No default key.
+Precede with the \(oqm\(cq prefix to execute the simpler options command.
+(Mainly useful if you use \f(CRBINDING=O:optionsfull\fP to switch
+\(oq\f(CRO\fP\(cq from simple options back to traditional advanced options.)
 .lp #overview
 Display information you've discovered about the dungeon.
 Any visited

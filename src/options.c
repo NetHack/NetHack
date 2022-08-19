@@ -7895,8 +7895,12 @@ doset_simple(void)
     boolean *bool_p;
     const char *name;
 
-    if (iflags.menu_requested)
+    if (iflags.menu_requested) {
+        /* doset() checks for 'm' and calls doset_simple(); clear the
+           menu-requested flag to avoid doing that recursively */
+        iflags.menu_requested = FALSE;
         return doset();
+    }
 
     if (!made_fmtstr) {
         Sprintf(fmtstr_doset, "%%s%%-%us [%%s]",
@@ -8053,6 +8057,13 @@ doset(void) /* changing options via menu by Per Liboriussen */
     boolean setinitial = FALSE, fromfile = FALSE,
             gavehelp = FALSE, skiphelp = !iflags.cmdassist;
     int clr = 0;
+
+    if (iflags.menu_requested) {
+        /* doset_simple() checks for 'm' and calls doset(); clear the
+           menu-requested flag to avoid doing that recursively */
+        iflags.menu_requested = FALSE;
+        return doset_simple();
+    }
 
     /* if we offer '?' as a choice and it is the only thing chosen,
        we'll end up coming back here after showing the explanatory text */
