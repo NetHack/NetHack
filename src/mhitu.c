@@ -1166,9 +1166,16 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             Strcpy(buf, mon_nam(u.usteed));
             urgent_pline("%s %s forward and plucks you off %s!",
                          Some_Monnam(mtmp),
+                         /* 't', purple 'w' */
                          is_animal(mtmp->data) ? "lunges"
-                           : amorphous(mtmp->data) ? "oozes"
-                             : "surges",
+                           /* 'v', air 'E' */
+                           : is_whirly(mtmp->data) ? "whirls"
+                             /* none (some 'v', already whirling) */
+                             : unsolid(mtmp->data) ? "flows"
+                               /* ochre 'j', Juiblex */
+                               : amorphous(mtmp->data) ? "oozes"
+                                 /* none (all AD_ENGL are already covered) */
+                                 : "surges",
                          buf);
             dismount_steed(DISMOUNT_ENGULFED);
         } else {
