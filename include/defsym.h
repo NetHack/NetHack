@@ -55,8 +55,8 @@
        idx:     index used in enum
        ch:      character symbol
        sym:     symbol name for parsing purposes
-       tilenm:  if the name in the txt file differs from sym,
-                the tile name can be specified here.
+       tilenm:  if the name in the tile txt file differs from desc (below),
+                the name in the tile txt file can be specified here.
        desc:    description
        clr:     color
 */
