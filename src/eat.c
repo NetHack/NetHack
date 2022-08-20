@@ -1871,8 +1871,13 @@ eatcorpse(struct obj *otmp)
                              && (rotted < 1 || !rn2((int) rotted + 1)));
         const char *pmxnam = food_xname(otmp, FALSE);
         static const char *const palatable_msgs[] = {
-            "okay", "stringy", "gamey", "fatty", "tough"
+            /* first char: T = tastes ... , I = is ... */
+            /* veggies are always just "okay" */
+            "Tokay", "Istringy", "Igamey", "Ifatty", "Itough"
         };
+        int idx = vegetarian(&mons[mnum]) ? 0 : rn2(SIZE(palatable_msgs));
+        const char *palat_msg = palatable_msgs[idx];
+        boolean use_is = (Hallucination || (palatable && *palat_msg == 'I'));
 
         if (!strncmpi(pmxnam, "the ", 4))
             pmxnam += 4;
@@ -1880,14 +1885,14 @@ eatcorpse(struct obj *otmp)
               type_is_pname(&mons[mnum])
                  ? "" : the_unique_pm(&mons[mnum]) ? "The " : "This ",
               pmxnam,
-              Hallucination ? "is" : "tastes",
+              use_is ? "is" : "tastes",
                   /* tiger reference is to TV ads for "Frosted Flakes",
                      breakfast cereal targeted at kids by "Tony the tiger" */
               Hallucination
                  ? (yummy ? ((u.umonnum == PM_TIGER) ? "gr-r-reat" : "gnarly")
                           : palatable ? "copacetic" : "grody")
               : (yummy ? "delicious" : palatable ?
-                 palatable_msgs[mnum % SIZE(palatable_msgs)] : "terrible"),
+                 &palat_msg[1] : "terrible"),
               (yummy || !palatable) ? '!' : '.');
     }
 
