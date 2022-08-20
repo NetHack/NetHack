@@ -20,6 +20,7 @@ static void mplayhorn(struct monst *, struct obj *, boolean);
 static void mreadmsg(struct monst *, struct obj *);
 static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
+static boolean m_sees_sleepy_soldier(struct monst *);
 static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
 static boolean hero_behind_chokepoint(struct monst *);
@@ -322,6 +323,30 @@ m_use_healing(struct monst* mtmp)
     return FALSE;
 }
 
+/* return TRUE if monster mtmp can see at least one sleeping soldier */
+static boolean
+m_sees_sleepy_soldier(struct monst *mtmp)
+{
+    coordxy x = mtmp->mx, y = mtmp->my;
+    coordxy xx, yy;
+    struct monst *mon;
+
+    /* Distance is arbitrary.  What we really want to do is
+     * have the soldier play the bugle when it sees or
+     * remembers soldiers nearby...
+     */
+    for (xx = x - 3; xx <= x + 3; xx++)
+        for (yy = y - 3; yy <= y + 3; yy++) {
+            if (!isok(xx, yy) || (xx == x && yy == y))
+                continue;
+            if ((mon = m_at(xx, yy)) != 0 && is_mercenary(mon->data)
+                && mon->data != &mons[PM_GUARD]
+                && helpless(mon))
+                return TRUE;
+        }
+    return FALSE;
+}
+
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
@@ -516,29 +541,10 @@ find_defensive(struct monst* mtmp)
     if (nohands(mtmp->data)) /* can't use objects */
         goto botm;
 
-    if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE)) != 0) {
-        coordxy xx, yy;
-        struct monst *mon;
-
-        /* Distance is arbitrary.  What we really want to do is
-         * have the soldier play the bugle when it sees or
-         * remembers soldiers nearby...
-         */
-        for (xx = x - 3; xx <= x + 3; xx++) {
-            for (yy = y - 3; yy <= y + 3; yy++) {
-                if (!isok(xx, yy) || (xx == x && yy == y))
-                    continue;
-                if ((mon = m_at(xx, yy)) != 0 && is_mercenary(mon->data)
-                    && mon->data != &mons[PM_GUARD]
-                    && helpless(mon)) {
-                    g.m.defensive = obj;
-                    g.m.has_defense = MUSE_BUGLE;
-                    goto toot; /* double break */
-                }
-            }
-        }
- toot:
-        ;
+    if (is_mercenary(mtmp->data) && (obj = m_carrying(mtmp, BUGLE)) != 0
+        && m_sees_sleepy_soldier(mtmp)) {
+        g.m.defensive = obj;
+        g.m.has_defense = MUSE_BUGLE;
     }
 
     /* use immediate physical escape prior to attempting magic */
