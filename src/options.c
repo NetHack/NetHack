@@ -8003,6 +8003,8 @@ doset_simple(void)
                     reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
                                                FALSE, empty_optstr,
                                                empty_optstr);
+                    if (reslt == optn_ok)
+                        got_from_config[k] = TRUE;
                 } else {
                     char abuf[BUFSZ];
 

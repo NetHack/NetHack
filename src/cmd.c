@@ -2565,7 +2565,7 @@ struct ext_func_tab extcmdlist[] = {
 #endif
     { M('m'), "monster", "use monster's special ability",
               domonability, IFBURIED | AUTOCOMPLETE, NULL },
-    { 'N',    "name", "same as call; name a monster or object or object type",
+    { M('n'), "name", "same as call; name a monster or object or object type",
               docallcmd, IFBURIED | AUTOCOMPLETE, NULL },
     { M('o'), "offer", "offer a sacrifice to the gods",
               dosacrifice, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
@@ -3231,6 +3231,7 @@ commands_init(void)
     (void) bind_key('k',    "kick");
     (void) bind_key('l',    "loot");
     (void) bind_key(C('n'), "annotate");
+    (void) bind_key('N',    "name");
     (void) bind_key('u',    "untrap");
     (void) bind_key('5',    "run");
     (void) bind_key(M('5'), "rush");
@@ -3239,7 +3240,6 @@ commands_init(void)
     /* alt keys: */
     (void) bind_key(M('O'), "overview");
     (void) bind_key(M('2'), "twoweapon");
-    (void) bind_key(M('n'), "name");
     (void) bind_key(M('N'), "name");
 #if 0
     /* don't do this until the rest_on_space option is set or cleared */
