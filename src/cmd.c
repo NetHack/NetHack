@@ -114,6 +114,7 @@ static int wiz_genesis(void);
 static int wiz_where(void);
 static int wiz_detect(void);
 static int wiz_panic(void);
+static int wiz_fuzzer(void);
 static int wiz_polyself(void);
 static int wiz_kill(void);
 static int wiz_load_lua(void);
@@ -1534,6 +1535,17 @@ wiz_panic(void)
     return ECMD_OK;
 }
 
+/* #fuzzer command - fuztest the program */
+static int
+wiz_fuzzer(void)
+{
+    pline("The fuz tester will make NetHack execute random keypresses.");
+    pline("There is no conventional way out of this mode.");
+    if (paranoid_query(TRUE, "Do you want to start fuz testing?"))
+        iflags.debug_fuzzer = TRUE; /* Thoth, take the reins */
+    return ECMD_OK;
+}
+
 /* #polyself command - change hero's form */
 static int
 wiz_polyself(void)
@@ -2515,6 +2527,8 @@ struct ext_func_tab extcmdlist[] = {
               dofire, 0, NULL },
     { M('f'), "force", "force a lock",
               doforce, AUTOCOMPLETE, NULL },
+    { '\0',   "fuzzer", "start the fuz tester",
+              wiz_fuzzer, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { ';',    "glance", "show what type of thing a map symbol corresponds to",
               doquickwhatis, IFBURIED | GENERALCMD, NULL },
     { '?',    "help", "give a help message",
