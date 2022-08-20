@@ -1223,9 +1223,13 @@ wiz_map(void)
 static int
 wiz_genesis(void)
 {
-    if (wizard)
+    if (wizard) {
+        boolean mongen_saved = iflags.debug_mongen;
+
+        iflags.debug_mongen = FALSE;
         (void) create_particular();
-    else
+        iflags.debug_mongen = mongen_saved;
+    } else
         pline(unavailcmd, ecname_from_fn(wiz_genesis));
     return ECMD_OK;
 }
