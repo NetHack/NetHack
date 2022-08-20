@@ -645,7 +645,7 @@ dochug(register struct monst* mtmp)
     distfleeck(mtmp, &inrange, &nearby, &scared);
 
     /* search for and potentially use defensive or miscellaneous items. */
-    if (find_defensive(mtmp)) {
+    if (find_defensive(mtmp, FALSE)) {
         if (use_defensive(mtmp) != 0)
             return 1;
     } else if (find_misc(mtmp)) {
@@ -1391,8 +1391,11 @@ m_move(register struct monst* mtmp, register int after)
         coord poss[9];
 
         cnt = mfndpos(mtmp, poss, info, flag);
-        if (cnt == 0)
+        if (cnt == 0) {
+            if (find_defensive(mtmp, TRUE))
+                (void) use_defensive(mtmp);
             return MMOVE_NOMOVES;
+        }
         chcnt = 0;
         jcnt = min(MTSZ, cnt - 1);
         chi = -1;

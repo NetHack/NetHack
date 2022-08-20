@@ -1766,7 +1766,7 @@ extern boolean hits_bars(struct obj **, coordxy, coordxy, coordxy, coordxy, int,
 
 /* ### muse.c ### */
 
-extern boolean find_defensive(struct monst *);
+extern boolean find_defensive(struct monst *, boolean);
 extern int use_defensive(struct monst *);
 extern int rnd_defensive_item(struct monst *);
 extern boolean find_offensive(struct monst *);

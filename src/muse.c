@@ -350,7 +350,7 @@ m_sees_sleepy_soldier(struct monst *mtmp)
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
-find_defensive(struct monst* mtmp)
+find_defensive(struct monst* mtmp, boolean tryescape)
 {
     struct obj *obj;
     struct trap *t;
@@ -365,7 +365,7 @@ find_defensive(struct monst* mtmp)
 
     if (is_animal(mtmp->data) || mindless(mtmp->data))
         return FALSE;
-    if (dist2(x, y, mtmp->mux, mtmp->muy) > 25)
+    if (!tryescape && dist2(x, y, mtmp->mux, mtmp->muy) > 25)
         return FALSE;
     if (u.uswallow && stuck)
         return FALSE;
@@ -448,17 +448,20 @@ find_defensive(struct monst* mtmp)
             }
     }
 
-    fraction = u.ulevel < 10 ? 5 : u.ulevel < 14 ? 4 : 3;
-    if (mtmp->mhp >= mtmp->mhpmax
-        || (mtmp->mhp >= 10 && mtmp->mhp * fraction >= mtmp->mhpmax))
-        return FALSE;
+    if (!tryescape) {
+        /* do we try to heal? */
+        fraction = u.ulevel < 10 ? 5 : u.ulevel < 14 ? 4 : 3;
+        if (mtmp->mhp >= mtmp->mhpmax
+            || (mtmp->mhp >= 10 && mtmp->mhp * fraction >= mtmp->mhpmax))
+            return FALSE;
 
-    if (mtmp->mpeaceful) {
-        if (!nohands(mtmp->data)) {
-            if (m_use_healing(mtmp))
-                return TRUE;
+        if (mtmp->mpeaceful) {
+            if (!nohands(mtmp->data)) {
+                if (m_use_healing(mtmp))
+                    return TRUE;
+            }
+            return FALSE;
         }
-        return FALSE;
     }
 
     if (stuck || immobile) {
