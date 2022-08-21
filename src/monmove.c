@@ -1269,6 +1269,7 @@ m_move(register struct monst* mtmp, register int after)
         register struct obj *otmp;
         register coordxy xx, yy;
         coordxy oomx, oomy, lmx, lmy;
+        struct trap *ttmp;
 
         /* cut down the search radius if it thinks character is closer. */
         if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
@@ -1320,6 +1321,16 @@ m_move(register struct monst* mtmp, register int after)
                     if ((is_pool(xx, yy) && !is_swimmer(ptr))
                         || (is_lava(xx, yy) && !likes_lava(ptr)))
                         continue;
+
+                    /* ignore obj if there's a trap and monster knows it */
+                    if ((ttmp = t_at(xx, yy)) != 0
+                        && mon_knows_traps(mtmp, ttmp->ttyp)) {
+                        if (gx == xx && gy == yy) {
+                            gx = mtmp->mux;
+                            gy = mtmp->muy;
+                        }
+                        continue;
+                    }
 
                     if (((likegold && otmp->oclass == COIN_CLASS)
                          || (likeobjs && index(practical, otmp->oclass)

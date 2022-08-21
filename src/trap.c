@@ -2553,6 +2553,7 @@ dotrap(struct trap *trap, unsigned trflags)
 
     if (u.usteed)
         mon_learns_traps(u.usteed, ttype);
+    mons_see_trap(trap);
 
     /*
      * Note:
@@ -3271,6 +3272,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         }
 
         mon_learns_traps(mtmp, tt);
+        mons_see_trap(trap);
 
         /* Monster is aggravated by being trapped by you.
            Recognizing who made the trap isn't completely

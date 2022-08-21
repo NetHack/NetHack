@@ -1013,6 +1013,7 @@ when breaking a wand of sleep hits the hero with the explosion, don't describe
 	that as "the sleep ray hits you"
 expose fuz tester to wizard-mode as #fuzzer extended command
 monsters which cannot move due to boulders or walls try to escape
+intelligent monsters see and remember when others trigger traps
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

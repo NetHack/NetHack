@@ -1653,6 +1653,7 @@ extern void monstseesu(unsigned long);
 extern boolean resist_conflict(struct monst *);
 extern boolean mon_knows_traps(struct monst *, int);
 extern void mon_learns_traps(struct monst *, int);
+extern void mons_see_trap(struct trap *);
 
 /* ### monmove.c ### */
 
