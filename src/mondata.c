@@ -1372,4 +1372,28 @@ resist_conflict(struct monst* mtmp)
     return (rnd(20) > resist_chance);
 }
 
+/* does monster mtmp know traps of type ttyp */
+boolean
+mon_knows_traps(struct monst *mtmp, int ttyp)
+{
+    if (ttyp == ALL_TRAPS)
+        return (boolean)(mtmp->mtrapseen);
+    else if (ttyp == NO_TRAP)
+        return !(boolean)(mtmp->mtrapseen);
+    else
+        return ((mtmp->mtrapseen & (1L << (ttyp - 1))) != 0);
+}
+
+/* monster mtmp learns all traps of type ttyp */
+void
+mon_learns_traps(struct monst *mtmp, int ttyp)
+{
+    if (ttyp == ALL_TRAPS)
+        mtmp->mtrapseen = ~0L;
+    else if (ttyp == NO_TRAP)
+        mtmp->mtrapseen = 0L;
+    else
+        mtmp->mtrapseen |= (1L << (ttyp - 1));
+}
+
 /*mondata.c*/

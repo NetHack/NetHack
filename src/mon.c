@@ -2075,7 +2075,7 @@ mfndpos(
                                 && !is_whirly(mdat) && !unsolid(mdat)))
                         && (ttmp->ttyp != ANTI_MAGIC || !resists_magm(mon))) {
                         if (!(flag & ALLOW_TRAPS)) {
-                            if (mon->mtrapseen & (1L << (ttmp->ttyp - 1)))
+                            if (mon_knows_traps(mon, ttmp->ttyp))
                                 continue;
                         }
                         info[cnt] |= ALLOW_TRAPS;

@@ -54,6 +54,7 @@ struct trap {
 
 /* unconditional traps */
 enum trap_types {
+    ALL_TRAPS    = -1, /* mon_knows_traps(), mon_learns_traps() */
     NO_TRAP      =  0,
     ARROW_TRAP   =  1,
     DART_TRAP    =  2,

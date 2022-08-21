@@ -641,7 +641,7 @@ shkinit(const struct shclass* shp, struct mkroom* sroom)
     shk->isshk = shk->mpeaceful = 1;
     set_malign(shk);
     shk->msleeping = 0;
-    shk->mtrapseen = ~0; /* we know all the traps already */
+    mon_learns_traps(shk, ALL_TRAPS); /* we know all the traps already */
     eshkp->shoproom = (schar) ((sroom - g.rooms) + ROOMOFFSET);
     sroom->resident = shk;
     eshkp->shoptype = sroom->rtype;

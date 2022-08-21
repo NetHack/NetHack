@@ -2552,7 +2552,7 @@ dotrap(struct trap *trap, unsigned trflags)
     }
 
     if (u.usteed)
-        u.usteed->mtrapseen |= (1 << (ttype - 1));
+        mon_learns_traps(u.usteed, ttype);
 
     /*
      * Note:
@@ -3255,7 +3255,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         boolean forcetrap = ((mintrapflags & FORCETRAP) != 0);
         boolean forcebungle = (mintrapflags & FORCEBUNGLE) != 0;
         /* monster has seen such a trap before */
-        boolean already_seen = ((mtmp->mtrapseen & (1 << (tt - 1))) != 0
+        boolean already_seen = (mon_knows_traps(mtmp, tt)
                                 || (tt == HOLE && !mindless(mptr)));
 
         if (mtmp == u.usteed) {
@@ -3270,7 +3270,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                 return Trap_Effect_Finished;
         }
 
-        mtmp->mtrapseen |= (1 << (tt - 1));
+        mon_learns_traps(mtmp, tt);
 
         /* Monster is aggravated by being trapped by you.
            Recognizing who made the trap isn't completely

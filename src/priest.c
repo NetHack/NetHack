@@ -245,7 +245,7 @@ priestini(
         EPRI(priest)->shrpos.x = sx;
         EPRI(priest)->shrpos.y = sy;
         assign_level(&(EPRI(priest)->shrlevel), lvl);
-        priest->mtrapseen = ~0; /* traps are known */
+        mon_learns_traps(priest, ALL_TRAPS); /* traps are known */
         priest->mpeaceful = 1;
         priest->ispriest = 1;
         priest->isminion = 0;
@@ -691,7 +691,7 @@ mk_roamer(struct permonst *ptr, aligntyp alignment, coordxy x, coordxy y,
     EMIN(roamer)->renegade = (coaligned && !peaceful);
     roamer->ispriest = 0;
     roamer->isminion = 1;
-    roamer->mtrapseen = ~0; /* traps are known */
+    mon_learns_traps(roamer, ALL_TRAPS); /* traps are known */
     roamer->mpeaceful = peaceful;
     roamer->msleeping = 0;
     set_malign(roamer); /* peaceful may have changed */

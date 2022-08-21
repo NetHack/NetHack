@@ -595,7 +595,7 @@ find_defensive(struct monst* mtmp, boolean tryescape)
              * about teleport traps.
              */
             if (!noteleport_level(mtmp)
-                || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
+                || !mon_knows_traps(mtmp, TELEP_TRAP)) {
                 g.m.defensive = obj;
                 g.m.has_defense = (mon_has_amulet(mtmp))
                                     ? MUSE_WAN_TELEPORTATION
@@ -609,7 +609,7 @@ find_defensive(struct monst* mtmp, boolean tryescape)
                                  && !mtmp->isgd && !mtmp->ispriest))) {
             /* see WAN_TELEPORTATION case above */
             if (!noteleport_level(mtmp)
-                || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1)))) {
+                || !mon_knows_traps(mtmp, TELEP_TRAP)) {
                 g.m.defensive = obj;
                 g.m.has_defense = MUSE_SCR_TELEPORTATION;
             }
@@ -722,7 +722,7 @@ use_defensive(struct monst* mtmp)
                 makeknown(how);
             /* monster learns that teleportation isn't useful here */
             if (noteleport_level(mtmp))
-                mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
+                mon_learns_traps(mtmp, TELEP_TRAP);
             return 2;
         }
         if ((mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) && !rn2(3)) {
@@ -741,7 +741,7 @@ use_defensive(struct monst* mtmp)
         mbhit(mtmp, rn1(8, 6), mbhitm, bhito, otmp);
         /* monster learns that teleportation isn't useful here */
         if (noteleport_level(mtmp))
-            mtmp->mtrapseen |= (1 << (TELEP_TRAP - 1));
+            mon_learns_traps(mtmp, TELEP_TRAP);
         g.m_using = FALSE;
         return 2;
     case MUSE_SCR_TELEPORTATION: {
@@ -1350,7 +1350,7 @@ find_offensive(struct monst* mtmp)
             && !Teleport_control
             /* same hack as MUSE_WAN_TELEPORTATION_SELF */
             && (!noteleport_level(mtmp)
-                || !(mtmp->mtrapseen & (1 << (TELEP_TRAP - 1))))
+                || !mon_knows_traps(mtmp, TELEP_TRAP))
             /* do try to move hero to a more vulnerable spot */
             && (onscary(u.ux, u.uy, mtmp)
                 || (hero_behind_chokepoint(mtmp) && mon_has_friends(mtmp))

@@ -45,7 +45,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
             return TRUE;
         /* will get here if lifesaved */
     }
-    mtmp->mtrapseen |= (1 << (TRAPPED_DOOR - 1));
+    mon_learns_traps(mtmp, TRAPPED_DOOR);
     return FALSE;
 }
 
@@ -1945,7 +1945,7 @@ undesirable_disp(
 
     /* Monsters avoid a trap if they've seen that type before */
     } else if (trap && rn2(40)
-               && (mtmp->mtrapseen & (1 << (trap->ttyp - 1))) != 0) {
+               && mon_knows_traps(mtmp, trap->ttyp)) {
         return TRUE;
     }
 
