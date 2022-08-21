@@ -324,12 +324,19 @@ mkbox_cnts(struct obj *box)
 int
 rndmonnum(void)
 {
+    return rndmonnum_adj(0, 0);
+}
+
+/* select a random, common monster type, with adjusted difficulty */
+int
+rndmonnum_adj(int minadj, int maxadj)
+{
     register struct permonst *ptr;
     register int i;
     unsigned short excludeflags;
 
     /* Plan A: get a level-appropriate common monster */
-    ptr = rndmonst();
+    ptr = rndmonst_adj(minadj, maxadj);
     if (ptr)
         return monsndx(ptr);
 
@@ -965,8 +972,9 @@ mksobj(int otyp, boolean init, boolean artif)
                 break;
             case FIGURINE:
                 tryct = 0;
+                /* figurines are slightly harder monsters */
                 do
-                    otmp->corpsenm = rndmonnum();
+                    otmp->corpsenm = rndmonnum_adj(5, 10);
                 while (is_human(&mons[otmp->corpsenm]) && tryct++ < 30);
                 blessorcurse(otmp, 4);
                 break;
