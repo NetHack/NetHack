@@ -1011,7 +1011,7 @@ if a pet gelatinous cube eats a container, treat it the same as when a hostile
 	one does:  the container is destroyed but its conters are engulfed
 when breaking a wand of sleep hits the hero with the explosion, don't describe
 	that as "the sleep ray hits you"
-expose fuz tester to wizard-mode as #fuzzer extended command
+expose fuzz tester to wizard-mode as #debugfuzzer extended command
 monsters which cannot move due to boulders or walls try to escape
 intelligent monsters see and remember when others trigger traps
 

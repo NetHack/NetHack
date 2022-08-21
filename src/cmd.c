@@ -1539,13 +1539,13 @@ wiz_panic(void)
     return ECMD_OK;
 }
 
-/* #fuzzer command - fuztest the program */
+/* #debugfuzzer command - fuzztest the program */
 static int
 wiz_fuzzer(void)
 {
-    pline("The fuz tester will make NetHack execute random keypresses.");
+    pline("The fuzz tester will make NetHack execute random keypresses.");
     pline("There is no conventional way out of this mode.");
-    if (paranoid_query(TRUE, "Do you want to start fuz testing?"))
+    if (paranoid_query(TRUE, "Do you want to start fuzz testing?"))
         iflags.debug_fuzzer = TRUE; /* Thoth, take the reins */
     return ECMD_OK;
 }
@@ -2504,6 +2504,8 @@ struct ext_func_tab extcmdlist[] = {
               doclose, 0, NULL },
     { M('C'), "conduct", "list voluntary challenges you have maintained",
               doconduct, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
+    { '\0',   "debugfuzzer", "start the fuzz tester",
+              wiz_fuzzer, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { M('d'), "dip", "dip an object into something",
               dodip, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { '>',    "down", "go down a staircase",
@@ -2531,8 +2533,6 @@ struct ext_func_tab extcmdlist[] = {
               dofire, 0, NULL },
     { M('f'), "force", "force a lock",
               doforce, AUTOCOMPLETE, NULL },
-    { '\0',   "fuzzer", "start the fuz tester",
-              wiz_fuzzer, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { ';',    "glance", "show what type of thing a map symbol corresponds to",
               doquickwhatis, IFBURIED | GENERALCMD, NULL },
     { '?',    "help", "give a help message",
