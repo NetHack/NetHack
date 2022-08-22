@@ -1015,6 +1015,7 @@ expose fuzz tester to wizard-mode as #debugfuzzer extended command
 monsters which cannot move due to boulders or walls try to escape
 intelligent monsters see and remember when others trigger traps
 random figurines are of harder monsters
+monsters can blind you with a camera
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

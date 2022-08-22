@@ -1150,6 +1150,7 @@ rnd_defensive_item(struct monst* mtmp)
 #define MUSE_WAN_TELEPORTATION 15
 #define MUSE_POT_SLEEPING 16
 #define MUSE_SCR_EARTH 17
+#define MUSE_CAMERA 18
 /*#define MUSE_WAN_UNDEAD_TURNING 20*/ /* also a defensive item so don't
                                      * redefine; nonconsecutive value is ok */
 
@@ -1401,6 +1402,14 @@ find_offensive(struct monst* mtmp)
             && (!In_endgame(&u.uz) || Is_earthlevel(&u.uz))) {
             g.m.offensive = obj;
             g.m.has_offense = MUSE_SCR_EARTH;
+        }
+        nomore(MUSE_CAMERA);
+        if (obj->otyp == EXPENSIVE_CAMERA
+            && (!Blind || hates_light(g.youmonst.data))
+            && dist2(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy) <= 2
+            && obj->spe > 0 && !rn2(6)) {
+            g.m.offensive = obj;
+            g.m.has_offense = MUSE_CAMERA;
         }
 #if 0
         nomore(MUSE_SCR_FIRE);
@@ -1708,6 +1717,22 @@ use_offensive(struct monst* mtmp)
 
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     } /* case MUSE_SCR_EARTH */
+    case MUSE_CAMERA: {
+        if (Hallucination)
+            verbalize("Say cheese!");
+        else
+            pline("%s takes a picture of you with %s!",
+                  Monnam(mtmp), an(xname(otmp)));
+        g.m_using = TRUE;
+        if (!Blind) {
+            You("are blinded by the flash of light!");
+            make_blinded(Blinded + (long) rnd(1 + 50), FALSE);
+        }
+        lightdamage(otmp, TRUE, 5);
+        g.m_using = FALSE;
+        otmp->spe--;
+        return 1;
+    } /* case MUSE_CAMERA */
 #if 0
     case MUSE_SCR_FIRE: {
         boolean vis = cansee(mtmp->mx, mtmp->my);
@@ -2482,6 +2507,8 @@ searches_for_item(struct monst* mon, struct obj* obj)
         if (Is_container(obj) && !(Is_mbag(obj) && obj->cursed)
             && !obj->olocked)
             return TRUE;
+        if (typ == EXPENSIVE_CAMERA)
+            return (obj->spe > 0);
         break;
     case FOOD_CLASS:
         if (typ == CORPSE)
