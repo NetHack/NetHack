@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1647472699 2022/03/16 23:18:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.86 $ */
+/* NetHack 3.7	windows.c	$NHDT-Date: 1661202202 2022/08/22 21:03:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1256,9 +1256,9 @@ dump_putstr(winid win UNUSED, int attr UNUSED, const char *str)
 }
 
 static winid
-dump_create_nhwindow(int dummy)
+dump_create_nhwindow(int type UNUSED)
 {
-    return dummy;
+    return WIN_ERR;
 }
 
 /*ARGUSED*/

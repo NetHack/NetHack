@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1011 $ $NHDT-Date: 1660588881 2022/08/15 18:41:21 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1021 $ $NHDT-Date: 1661202204 2022/08/22 21:03:24 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1363,6 +1363,8 @@ when using --nethackrc=file on the command line (currently only implemented
 using 'o'pen as a synonym for #loot of a container at the hero's location did
 	not work if the hero was in a pit
 update '?' menu to reflect change to 'O' command
+end of game with DUMPLOG could panic due to perm_invent handling, even when
+	the persistent inventory window wasn't in use
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

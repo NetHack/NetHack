@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1660588881 2022/08/15 18:41:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.418 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1661202200 2022/08/22 21:03:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3219,11 +3219,15 @@ display_pickinv(
     if (lets && !*lets)
         lets = 0; /* simplify tests: (lets) instead of (lets && *lets) */
 
-    if (!iflags.perm_invent
+#ifdef DUMPLOG
+    if (iflags.in_dumplog) {
+        win = 0; /* passed to dump_putstr() which ignores it... */
+    } else
+#endif
+    if (lets || xtra_choice || wizid || want_reply
 #ifdef TTY_PERM_INVENT
         || !g.in_sync_perminvent
 #endif
-        || (lets || xtra_choice || wizid || want_reply)
         || WIN_INVEN == WIN_ERR) {
         /* partial inventory in perm_invent setting; don't operate on
            full inventory window, use an alternate one instead; create
