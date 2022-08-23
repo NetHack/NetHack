@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1021 $ $NHDT-Date: 1661202204 2022/08/22 21:03:24 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1023 $ $NHDT-Date: 1661295667 2022/08/23 23:01:07 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1365,6 +1365,9 @@ using 'o'pen as a synonym for #loot of a container at the hero's location did
 update '?' menu to reflect change to 'O' command
 end of game with DUMPLOG could panic due to perm_invent handling, even when
 	the persistent inventory window wasn't in use
+with color Off and the screen symbol for ice the same as for floor, the black
+	and white ice was supposed to be rendered in inverse video but that
+	got broken by the symbols and glyphs overhaul
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

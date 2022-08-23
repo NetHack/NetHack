@@ -1,4 +1,4 @@
-/* NetHack 3.7	symbols.c	$NHDT-Date: 1654759698 2022/06/09 07:28:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	symbols.c	$NHDT-Date: 1661295669 2022/08/23 23:01:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
 /* Copyright (c) NetHack Development Team 2020.                   */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -708,7 +708,7 @@ savedsym_add(const char *name, const char *val, int which_set)
         free(tmp->val);
         tmp->val = dupstr(val);
     } else {
-        tmp = (struct _savedsym *)alloc(sizeof(struct _savedsym));
+        tmp = (struct _savedsym *) alloc(sizeof *tmp);
         tmp->name = dupstr(name);
         tmp->val = dupstr(val);
         tmp->which_set = which_set;
@@ -741,8 +741,14 @@ parsesymbols(register char *opts, int which_set)
     const struct symparse *symp;
     boolean is_glyph = FALSE;
 
+    /*
+     * FIXME:
+     *  The parsing here (and next) yields incorrect results for
+     *  "S_sample=','" or "S_sample=':'".
+     */
+
     if ((op = index(opts, ',')) != 0) {
-        *op++ = 0;
+        *op++ = '\0';
         if (!parsesymbols(op, which_set))
             return FALSE;
     }
@@ -770,14 +776,11 @@ parsesymbols(register char *opts, int which_set)
         return FALSE;
     if (symp) {
         if (symp->range && symp->range != SYM_CONTROL) {
-#ifdef ENHANCED_SYMBOLS
-            int glyph;
-#endif
-
             if (g.symset[which_set].handling == H_UTF8
                 || (lowc(strval[0]) == 'u' && strval[1] == '+')) {
 #ifdef ENHANCED_SYMBOLS
                 char buf[BUFSZ];
+                int glyph;
 
                 Snprintf(buf, sizeof buf, "%s:%s", opts, strval);
                 glyphrep_to_custom_map_entries(buf, &glyph);

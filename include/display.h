@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1652719570 2022/05/16 16:46:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.71 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1661295667 2022/08/23 23:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -979,6 +979,8 @@ enum glyph_offsets {
 #define MG_BW_LAVA 0x00100  /* 'black & white lava': highlight lava if it
                              * can't be distinguished from water by color */
 #define MG_BW_ICE  0x00200  /* similar for ice vs floor */
+#define MG_BW_SINK 0x00200  /* identical for sink vs fountain [note: someday
+                             * this may become a distinct flag */
 #define MG_NOTHING 0x00400  /* char represents GLYPH_NOTHING */
 #define MG_UNEXPL  0x00800  /* char represents GLYPH_UNEXPLORED */
 #define MG_MALE    0x01000  /* represents a male mon or statue of one */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1657918092 2022/07/15 20:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.190 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1661295668 2022/08/23 23:01:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2479,8 +2479,8 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         glyph_map *gmap = &glyphmap[glyph];
-        gmap->glyphflags = 0U;
 
+        gmap->glyphflags = 0U;
         /*
          *  Map the glyph to a character and color.
          *
@@ -2599,6 +2599,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
                 zap_color((offset >> 2));
         } else if ((offset = (glyph - GLYPH_CMAP_B_OFF)) >= 0) {
             int cmap = S_grave + offset;
+
             gmap->sym.symidx = cmap + SYM_OFF_P;
             cmap_color(cmap);
             if (!iflags.use_color) {
@@ -2610,14 +2611,21 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
                         || g.showsyms[gmap->sym.symidx]
                                == g.showsyms[S_water + SYM_OFF_P])) {
                     gmap->glyphflags |= MG_BW_LAVA;
+
                 /* similar for floor [what about empty doorway?] and ice */
-                } else if (offset == S_ice
+                } else if (cmap == S_ice
                            && (g.showsyms[gmap->sym.symidx]
                                    == g.showsyms[S_room + SYM_OFF_P]
                                || g.showsyms[gmap->sym.symidx]
                                       == g.showsyms[S_darkroom
                                                     + SYM_OFF_P])) {
                     gmap->glyphflags |= MG_BW_ICE;
+
+                /* and for fountain vs sink */
+                } else if (cmap == S_sink
+                           && (g.showsyms[gmap->sym.symidx]
+                               == g.showsyms[S_fountain + SYM_OFF_P])) {
+                    gmap->glyphflags |= MG_BW_SINK;
                 }
             } else if (has_rogue_color) {
                 color = cmap_to_roguecolor(cmap);

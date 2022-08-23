@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1656014602 2022/06/23 20:03:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.306 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1661295670 2022/08/23 23:01:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -4258,7 +4258,7 @@ tty_print_glyph(
     if (((special & MG_PET) != 0 && iflags.hilite_pet)
         || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
         || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
-        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK)) != 0
             && iflags.use_inverse)) {
         term_start_attr(ATR_INVERSE);
         inverse_on = TRUE;
