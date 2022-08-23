@@ -14,7 +14,7 @@ static void wall_cleanup(coordxy, coordxy, coordxy, coordxy);
 static boolean okay(coordxy, coordxy, coordxy);
 static void maze0xy(coord *);
 static boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
-                                coordxy, coordxy, boolean, d_level *);
+                                coordxy, xint16, boolean, d_level *);
 static void baalz_fixup(void);
 static void setup_waterlevel(void);
 static void unsetup_waterlevel(void);

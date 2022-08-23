@@ -601,7 +601,7 @@ extern void losedogs(void);
 extern void mon_arrive(struct monst *, int);
 extern void mon_catchup_elapsed_time(struct monst *, long);
 extern void keepdogs(boolean);
-extern void migrate_to_level(struct monst *, coordxy, coordxy, coord *);
+extern void migrate_to_level(struct monst *, xint16, xint16, coord *);
 extern void discard_migrations(void);
 extern int dogfood(struct monst *, struct obj *);
 extern boolean tamedog(struct monst *, struct obj *);
@@ -626,7 +626,7 @@ extern boolean ship_object(struct obj *, coordxy, coordxy, boolean);
 extern void obj_delivery(boolean);
 extern void deliver_obj_to_mon(struct monst *mtmp, int, unsigned long);
 extern schar down_gate(coordxy, coordxy);
-extern void impact_drop(struct obj *, coordxy, coordxy, coordxy);
+extern void impact_drop(struct obj *, coordxy, coordxy, xint16);
 
 /* ### dothrow.c ### */
 
@@ -806,7 +806,7 @@ extern const char *ceiling(coordxy, coordxy);
 extern struct engr *engr_at(coordxy, coordxy);
 extern boolean sengr_at(const char *, coordxy, coordxy, boolean);
 extern void u_wipe_engr(int);
-extern void wipe_engr_at(coordxy, coordxy, coordxy, boolean);
+extern void wipe_engr_at(coordxy, coordxy, xint16, boolean);
 extern void read_engr_at(coordxy, coordxy);
 extern void make_engr_at(coordxy, coordxy, const char *, long, xint16);
 extern void del_engr_at(coordxy, coordxy);
@@ -1406,10 +1406,10 @@ extern void makemaz(const char *);
 extern void mazexy(coord *);
 extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *);
 extern void bound_digging(void);
-extern void mkportal(coordxy, coordxy, coordxy, coordxy);
+extern void mkportal(coordxy, coordxy, xint16, xint16);
 extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
 extern void place_lregion(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy,
-                          coordxy, coordxy, d_level *);
+                          coordxy, xint16, d_level *);
 extern void fixup_special(void);
 extern void fumaroles(void);
 extern void movebubbles(void);
@@ -1561,7 +1561,7 @@ extern void killed(struct monst *);
 extern void xkilled(struct monst *, int);
 extern void mon_to_stone(struct monst *);
 extern void m_into_limbo(struct monst *);
-extern void migrate_mon(struct monst *, coordxy, coordxy);
+extern void migrate_mon(struct monst *, xint16, xint16);
 extern void mnexto(struct monst *, unsigned);
 extern void deal_with_overcrowding(struct monst *);
 extern void maybe_mnexto(struct monst *);

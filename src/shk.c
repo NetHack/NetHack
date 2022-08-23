@@ -63,9 +63,9 @@ static struct damage *find_damage(struct monst *);
 static void discard_damage_struct(struct damage *);
 static void discard_damage_owned_by(struct monst *);
 static void shk_fixes_damage(struct monst *);
-static coordxy *litter_getpos(int *, coordxy, coordxy, struct monst *);
-static void litter_scatter(coordxy *, int, coordxy, coordxy, struct monst *);
-static void litter_newsyms(coordxy *, coordxy, coordxy);
+static xint16 *litter_getpos(int *, coordxy, coordxy, struct monst *);
+static void litter_scatter(xint16 *, int, coordxy, coordxy, struct monst *);
+static void litter_newsyms(xint16 *, coordxy, coordxy);
 static int repair_damage(struct monst *, struct damage *, boolean);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
@@ -3669,7 +3669,7 @@ shk_fixes_damage(struct monst *shkp)
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
 
-static coordxy *
+static xint16 *
 litter_getpos(int *k, coordxy x, coordxy y, struct monst *shkp)
 {
     static xint16 litter[9];

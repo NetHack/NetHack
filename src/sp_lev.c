@@ -57,7 +57,7 @@ static unsigned int sp_amask_to_amask(unsigned int sp_amask);
 static void create_monster(monster *, struct mkroom *);
 static void create_object(object *, struct mkroom *);
 static void create_altar(altar *, struct mkroom *);
-static boolean search_door(struct mkroom *, coordxy *, coordxy *, coordxy, int);
+static boolean search_door(struct mkroom *, coordxy *, coordxy *, xint16, int);
 static void create_corridor(corridor *);
 static struct mkroom *build_room(room *, struct mkroom *);
 static void light_region(region *);
@@ -1304,7 +1304,7 @@ get_location_coord(
     *y = c.y;
     get_location(x, y, c.getloc_flags | (c.is_random ? NO_LOC_WARN : 0),
                  croom);
-    
+
     if (*x == -1 && *y == -1 && c.is_random)
         get_location(x, y, humidity, croom);
 }

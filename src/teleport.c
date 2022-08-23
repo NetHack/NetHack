@@ -902,7 +902,7 @@ level_tele(void)
             }
             if (wizard && !strcmp(buf, "?")) {
                 schar destlev;
-                coordxy destdnum;
+                xint16 destdnum;
 
  levTport_menu:
                 destlev = 0;
