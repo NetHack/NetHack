@@ -4381,7 +4381,7 @@ selection_free(struct selectionvar* sel, boolean freesel)
         if (freesel)
             free((genericptr_t) sel);
         else
-            sel->wid = sel->hei = 0;
+            (void) memset((genericptr_t) sel, 0, sizeof *sel);
     }
 }
 
@@ -4390,8 +4390,7 @@ selection_clone(struct selectionvar* sel)
 {
     struct selectionvar *tmps = (struct selectionvar *) alloc(sizeof *tmps);
 
-    tmps->wid = sel->wid;
-    tmps->hei = sel->hei;
+    *tmps = *sel;
     tmps->map = dupstr(sel->map);
 
     return tmps;
