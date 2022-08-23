@@ -4464,17 +4464,22 @@ selection_filter_mapchar(struct selectionvar* ov,  xint16 typ, int lit)
     return ret;
 }
 
-void
+struct selectionvar *
 selection_filter_percent(struct selectionvar* ov, int percent)
 {
     int x, y;
+    struct selectionvar *ret;
 
     if (!ov)
-        return;
+        return NULL;
+
+    ret = selection_new();
+
     for (x = 0; x < ov->wid; x++)
         for (y = 0; y < ov->hei; y++)
-            if (selection_getpoint(x, y, ov) && (rn2(100) >= percent))
-                selection_setpoint(x, y, ov, 0);
+            if (selection_getpoint(x, y, ov) && (rn2(100) < percent))
+                selection_setpoint(x, y, ret, 1);
+    return ret;
 }
 
 int

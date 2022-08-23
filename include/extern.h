@@ -2585,7 +2585,7 @@ extern boolean pm_good_location(coordxy, coordxy, struct permonst *);
 extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *, long);
 extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
 extern struct selectionvar * selection_not(struct selectionvar *);
-extern void selection_filter_percent(struct selectionvar *, int);
+extern struct selectionvar *selection_filter_percent(struct selectionvar *, int);
 extern int selection_rndcoord(struct selectionvar *, coordxy *, coordxy *,
                               boolean);
 extern void selection_do_grow(struct selectionvar *, int);

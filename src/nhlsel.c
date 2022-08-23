@@ -5,6 +5,11 @@
 #include "hack.h"
 #include "sp_lev.h"
 
+
+struct selectionvar *l_selection_check(lua_State *, int);
+static struct selectionvar *l_selection_push_new(lua_State *);
+static void l_selection_push_copy(lua_State *, struct selectionvar *);
+
 /* lua_CFunction prototypes */
 static int l_selection_new(lua_State *);
 static int l_selection_clone(lua_State *);
@@ -80,8 +85,9 @@ l_selection_to(lua_State *L, int index)
 }
 #endif
 
+/* push a new selection into lua stack, return the selectionvar */
 static struct selectionvar *
-l_selection_push(lua_State *L)
+l_selection_push_new(lua_State *L)
 {
     struct selectionvar *tmp = selection_new();
     struct selectionvar
@@ -97,11 +103,26 @@ l_selection_push(lua_State *L)
     return sel;
 }
 
+/* push a copy of selectionvar tmp to lua stack */
+static void
+l_selection_push_copy(lua_State *L, struct selectionvar *tmp)
+{
+    struct selectionvar
+        *sel = (struct selectionvar *) lua_newuserdata(L, sizeof(struct selectionvar));
+
+    luaL_getmetatable(L, "selection");
+    lua_setmetatable(L, -2);
+
+    *sel = *tmp;
+    sel->map = dupstr(tmp->map);
+}
+
+
 /* local sel = selection.new(); */
 static int
 l_selection_new(lua_State *L)
 {
-    (void) l_selection_push(L);
+    (void) l_selection_push_new(L);
     return 1;
 }
 
@@ -230,7 +251,7 @@ l_selection_and(lua_State *L)
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
-    struct selectionvar *selr = l_selection_push(L);
+    struct selectionvar *selr = l_selection_push_new(L);
 
     for (x = 0; x < selr->wid; x++)
         for (y = 0; y < selr->hei; y++) {
@@ -250,7 +271,7 @@ l_selection_or(lua_State *L)
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
-    struct selectionvar *selr = l_selection_push(L);
+    struct selectionvar *selr = l_selection_push_new(L);
 
     for (x = 0; x < selr->wid; x++)
         for (y = 0; y < selr->hei; y++) {
@@ -270,7 +291,7 @@ l_selection_xor(lua_State *L)
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
-    struct selectionvar *selr = l_selection_push(L);
+    struct selectionvar *selr = l_selection_push_new(L);
 
     for (x = 0; x < selr->wid; x++)
         for (y = 0; y < selr->hei; y++) {
@@ -291,7 +312,7 @@ l_selection_sub(lua_State *L)
     int x,y;
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
-    struct selectionvar *selr = l_selection_push(L);
+    struct selectionvar *selr = l_selection_push_new(L);
 
     for (x = 0; x < selr->wid; x++) {
         for (y = 0; y < selr->hei; y++) {
@@ -311,15 +332,15 @@ l_selection_sub(lua_State *L)
 static int
 l_selection_filter_percent(lua_State *L)
 {
-    struct selectionvar *ret;
-    int p;
+    int argc = lua_gettop(L);
+    struct selectionvar *sel = l_selection_check(L, 1);
+    int p = (int) luaL_checkinteger(L, 2);
+    struct selectionvar *tmp;
 
-    (void) l_selection_check(L, 1);
-    p = (int) luaL_checkinteger(L, 2);
-    lua_pop(L, 1);
-    (void) l_selection_clone(L);
-    ret = l_selection_check(L, 2);
-    selection_filter_percent(ret, p);
+    tmp = selection_filter_percent(sel, p);
+    lua_pop(L, argc);
+    l_selection_push_copy(L, tmp);
+    selection_free(tmp, TRUE);
 
     return 1;
 }
@@ -538,23 +559,15 @@ l_selection_filter_mapchar(lua_State *L)
     char *mapchr = dupstr(luaL_checkstring(L, 2));
     coordxy typ = check_mapchr(mapchr);
     int lit = (int) luaL_optinteger(L, 3, -2); /* TODO: special lit values */
-    struct selectionvar *tmp, *tmp2;
+    struct selectionvar *tmp;
 
     if (typ == INVALID_TYPE)
         nhl_error(L, "Erroneous map char");
 
-    if (argc > 1)
-        lua_pop(L, argc - 1);
-
-    tmp = l_selection_push(L);
-    tmp2 = selection_filter_mapchar(sel, typ, lit);
-
-    free(tmp->map);
-    tmp->map = tmp2->map;
-    tmp2->map = NULL;
-    selection_free(tmp2, TRUE);
-
-    lua_remove(L, 1);
+    tmp = selection_filter_mapchar(sel, typ, lit);
+    lua_pop(L, argc);
+    l_selection_push_copy(L, tmp);
+    selection_free(tmp, TRUE);
 
     if (mapchr)
         free(mapchr);
