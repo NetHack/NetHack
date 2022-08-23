@@ -682,12 +682,21 @@ curses_update_inventory(int arg)
         return;
 
     if (!arg) {
+         /* if perm_invent is just being toggled on, we need to run the
+            update twice; the first time creates the window and organizes
+            the screen to fit it in, the second time populates it;
+            needed if we're called from docrt() because the "organizes
+            the screen" part calls docrt() and that skips recursive calls */
+         boolean no_inv_win_yet = !curses_get_nhwin(INV_WIN);
+
         /* Update inventory sidebar.  NetHack uses normal menu functions
            when gathering the inventory, and we don't want to change the
            underlying code.  So instead, track if an inventory update is
            being performed with a static variable. */
         inv_update = 1;
         curs_update_invt(0);
+        if (no_inv_win_yet)
+            curs_update_invt(0);
         inv_update = 0;
     } else {
         /* perform scrolling operations on persistent inventory window */

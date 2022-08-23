@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1655932898 2022/06/22 21:21:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.569 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1661218575 2022/08/23 01:36:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.601 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8292,20 +8292,6 @@ doset(void) /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         docrt();
-        /*
-         * docrt() calls update_inventory() but
-         * (*windowprocs.win_update_inventory)(0) for curses ends up
-         * calling back to docrt() after creating its perm_invent
-         * window.  That call back has become a no-op because of the
-         * program_state.in_docrt flag.  So call update_inventory()
-         * explicitly in case perm_invent was toggled.  It's only
-         * needed if perm_invent was off and is now on but won't kill
-         * anybody if done when not necessary.
-         * Note:  doset_simple() doesn't need this because it doesn't
-         * offer a chance to toggle perm_invent.
-         */
-        if (iflags.perm_invent)
-            update_inventory();
     }
     if (g.context.botl || g.context.botlx) {
         bot();
@@ -8313,13 +8299,14 @@ doset(void) /* changing options via menu by Per Liboriussen */
     return ECMD_OK;
 }
 
-/* doset('O' command) menu entries for compound options */
+/* doset(#optionsfull command) menu entries for compound options */
 static void
-doset_add_menu(winid win,          /* window to add to */
-               const char *option, /* option name */
-               int idx,            /* index in allopt[] */
-               int indexoffset)    /* value to add to index in allopt[],
-                                      or zero if option cannot be changed */
+doset_add_menu(
+    winid win,          /* window to add to */
+    const char *option, /* option name */
+    int idx,            /* index in allopt[] */
+    int indexoffset)    /* value to add to index in allopt[],
+                         * or zero if option cannot be changed */
 {
     const char *value = "unknown"; /* current value */
     char buf[BUFSZ], buf2[BUFSZ];
