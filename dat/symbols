@@ -256,6 +256,7 @@ start: IBMgraphics
 	S_corr: \xb0			# meta-0, light shading
 	S_litcorr: \xb1			# meta-1, medium shading
 	S_fountain: \xf4		# meta-t, integral top half
+	S_sink: \xf4			# meta-t, integral top half
 	S_pool: \xf7			# meta-w, approx. equals
 	S_ice: \xfa			# meta-z, centered dot
 	S_lava: \xf7			# meta-w, approx. equals
