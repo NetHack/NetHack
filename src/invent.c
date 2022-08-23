@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1661202200 2022/08/22 21:03:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.423 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1661240719 2022/08/23 07:45:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5479,7 +5479,7 @@ sync_perminvent(void)
         if (WINDOWPORT(tty))
             perm_invent_toggled(TRUE); /* TRUE means negated */
 #endif
-        (void) doredraw();
+        docrt();
         return;
     }
 

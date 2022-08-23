@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1654931286 2022/06/11 07:08:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.187 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1661240721 2022/08/23 07:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.195 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -68,7 +68,7 @@ dosave(void)
             exit_nhwindows("Be seeing you...");
             nh_terminate(EXIT_SUCCESS);
         } else
-            (void) doredraw();
+            docrt();
     }
     return ECMD_OK;
 }

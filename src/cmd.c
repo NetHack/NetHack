@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1658993634 2022/07/28 07:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.597 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1661240704 2022/08/23 07:45:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.616 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2086,7 +2086,7 @@ wiz_intrinsic(void)
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
-        doredraw();
+        docrt();
     } else
         pline(unavailcmd, ecname_from_fn(wiz_intrinsic));
     return ECMD_OK;
@@ -4795,8 +4795,10 @@ dxdy_moveok(void)
 boolean
 redraw_cmd(char c)
 {
-    return (boolean) (g.Cmd.commands[(uchar)c]
-                      && g.Cmd.commands[(uchar)c]->ef_funct == doredraw);
+    uchar uc = (uchar) c;
+    const struct ext_func_tab *cmd = g.Cmd.commands[uc];
+
+    return (boolean) (cmd && cmd->ef_funct == doredraw);
 }
 
 /*
