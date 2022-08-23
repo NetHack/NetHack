@@ -1803,6 +1803,7 @@ eliminate scimitar skill and have scimitars use saber skill
 simplified configuration options menu
 rudimentary key rebinding in game options
 experimental #saveoptions command to allow saving configuration settings
+mouse buttons can be bound to extended commands
 
 
 Platform- and/or Interface-Specific New Features

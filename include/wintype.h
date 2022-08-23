@@ -135,6 +135,7 @@ typedef struct gi {
 /* nh_poskey() modifier types */
 #define CLICK_1 1
 #define CLICK_2 2
+#define NUM_MOUSE_BUTTONS 2
 
 /* invalid winid */
 #define WIN_ERR ((winid) -1)

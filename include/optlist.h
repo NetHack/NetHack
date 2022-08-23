@@ -162,8 +162,6 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(checkpoint, Advanced, 0, opt_out, set_in_config,
                 Off, No, No, No, NoAlias, (boolean *) 0)
 #endif
-    NHOPTB(clicklook, Advanced, 0, opt_in, set_in_game,
-                Off, Yes, No, No, NoAlias, &iflags.clicklook)
     NHOPTB(cmdassist, Behavior, 0, opt_out, set_in_game,
                 On, Yes, No, No, NoAlias, &iflags.cmdassist)
     NHOPTB(color, Map, 0, opt_in, set_in_game,

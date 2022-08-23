@@ -105,6 +105,7 @@ static boolean can_do_extcmd(const struct ext_func_tab *);
 static int dotravel(void);
 static int dotravel_target(void);
 static int doclicklook(void);
+static int domouseaction(void);
 static int doterrain(void);
 static int wiz_wish(void);
 static int wiz_identify(void);
@@ -2692,7 +2693,7 @@ struct ext_func_tab extcmdlist[] = {
               doterrain, IFBURIED | AUTOCOMPLETE, NULL },
     { '\0',   "therecmdmenu",
               "menu of commands you can do from here to adjacent spot",
-              dotherecmdmenu, AUTOCOMPLETE | GENERALCMD, NULL },
+              dotherecmdmenu, AUTOCOMPLETE | GENERALCMD | MOUSECMD, NULL },
     { 't',    "throw", "throw something",
               dothrow, 0, NULL },
     { '\0',   "timeout", "look at timeout queue and hero's timed intrinsics",
@@ -2831,7 +2832,8 @@ struct ext_func_tab extcmdlist[] = {
             do_run_southwest, MOVEMENTCMD | CMD_M_PREFIX, NULL },
 
     /* internal commands: only used by game core, not available for user */
-    { '\0', "clicklook", NULL, doclicklook, INTERNALCMD, NULL },
+    { '\0', "clicklook", NULL, doclicklook, INTERNALCMD | MOUSECMD, NULL },
+    { '\0', "mouseaction", NULL, domouseaction, INTERNALCMD | MOUSECMD, NULL },
     { '\0', "altdip", NULL, dip_into, INTERNALCMD, NULL },
     { '\0', "altadjust", NULL, adjust_split, INTERNALCMD, NULL },
     { '\0', "altunwield", NULL, remarm_swapwep, INTERNALCMD, NULL },
@@ -3170,6 +3172,43 @@ key2extcmddesc(uchar key)
 }
 
 boolean
+bind_mousebtn(int btn, const char *command)
+{
+    struct ext_func_tab *extcmd;
+
+    if (btn < 1 || btn > NUM_MOUSE_BUTTONS) {
+        config_error_add("Wrong mouse button, valid are 1-%i", NUM_MOUSE_BUTTONS);
+        return FALSE;
+    }
+    btn--;
+
+    /* special case: "nothing" is reserved for unbinding */
+    if (!strcmpi(command, "nothing")) {
+        g.Cmd.mousebtn[btn] = (struct ext_func_tab *) 0;
+        return TRUE;
+    }
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++) {
+        if (strcmpi(command, extcmd->ef_txt))
+            continue;
+        if (!(extcmd->flags & MOUSECMD))
+            continue;
+        g.Cmd.mousebtn[btn] = extcmd;
+#if 0 /* silently accept key binding for unavailable command (!SHELL,&c) */
+        if ((extcmd->flags & CMD_NOT_AVAILABLE) != 0) {
+            char buf[BUFSZ];
+
+            Sprintf(buf, cmdnotavail, extcmd->ef_txt);
+            config_error_add("%s", buf);
+        }
+#endif
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+boolean
 bind_key(uchar key, const char *command)
 {
     struct ext_func_tab *extcmd;
@@ -3227,6 +3266,9 @@ commands_init(void)
     for (extcmd = extcmdlist; extcmd->ef_txt; extcmd++)
         if (extcmd->key)
             g.Cmd.commands[extcmd->key] = extcmd;
+
+    (void) bind_mousebtn(1, "therecmdmenu");
+    (void) bind_mousebtn(2, "clicklook");
 
     /* number_pad */
     (void) bind_key(C('l'), "redraw");
@@ -5203,8 +5245,20 @@ dotherecmdmenu(void)
 {
     char ch;
     int dir, click;
+    coordxy x = g.clicklook_cc.x;
+    coordxy y = g.clicklook_cc.y;
 
     iflags.getdir_click = CLICK_1 | CLICK_2; /* allow 'far' click */
+
+    if (isok(x, y)) {
+        if (x == u.ux && y == u.uy)
+            ch = here_cmd_menu();
+        else
+            ch = there_cmd_menu(x, y, iflags.getdir_click);
+        g.clicklook_cc.x = g.clicklook_cc.y = -1;
+        return (ch && ch != '\033') ? ECMD_TIME : ECMD_OK;
+    }
+
     dir = getdir((const char *) 0);
     click = iflags.getdir_click;
     iflags.getdir_click = 0;
@@ -5731,30 +5785,25 @@ here_cmd_menu(void)
     return '\0';
 }
 
-/*
- * convert a MAP window position into a movement key usable with movecmd()
- */
-const char *
+void
 click_to_cmd(coordxy x, coordxy y, int mod)
 {
-    static char cmd[4];
+    g.clicklook_cc.x = x;
+    g.clicklook_cc.y = y;
+
+    if (g.Cmd.mousebtn[mod-1])
+        cmdq_add_ec(CQ_CANNED, g.Cmd.mousebtn[mod-1]->ef_funct);
+}
+
+static int
+domouseaction(void)
+{
+    coordxy x, y;
     struct obj *o;
     int dir;
 
-    cmd[0] = cmd[1] = '\0';
-    if (!iflags.herecmd_menu && iflags.clicklook && mod == CLICK_2) {
-        g.clicklook_cc.x = x;
-        g.clicklook_cc.y = y;
-        cmdq_add_ec(CQ_CANNED, doclicklook);
-        return cmd;
-    }
-    if (iflags.herecmd_menu && isok(x, y)) {
-        (void) there_cmd_menu(x, y, mod);
-        return cmd;
-    }
-
-    x -= u.ux;
-    y -= u.uy;
+    x = g.clicklook_cc.x - u.ux;
+    y = g.clicklook_cc.y - u.uy;
 
     if (flags.travelcmd) {
         if (abs(x) <= 1 && abs(y) <= 1) {
@@ -5763,30 +5812,30 @@ click_to_cmd(coordxy x, coordxy y, int mod)
             iflags.travelcc.x = u.tx = u.ux + x;
             iflags.travelcc.y = u.ty = u.uy + y;
             cmdq_add_ec(CQ_CANNED, dotravel_target);
-            return cmd;
+            return ECMD_OK;
         }
 
         if (x == 0 && y == 0) {
             /* here */
             if (IS_FOUNTAIN(levl[u.ux][u.uy].typ)
                 || IS_SINK(levl[u.ux][u.uy].typ)) {
-                cmd[0] = cmd_from_func(mod == CLICK_1 ? dodrink : dodip);
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, dodrink);
+                return ECMD_OK;
             } else if (IS_THRONE(levl[u.ux][u.uy].typ)) {
-                cmd[0] = cmd_from_func(dosit);
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, dosit);
+                return ECMD_OK;
             } else if (On_stairs_up(u.ux, u.uy)) {
-                cmd[0] = cmd_from_func(doup);
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, doup);
+                return ECMD_OK;
             } else if (On_stairs_dn(u.ux, u.uy)) {
-                cmd[0] = cmd_from_func(dodown);
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, dodown);
+                return ECMD_OK;
             } else if ((o = vobj_at(u.ux, u.uy)) != 0) {
-                cmd[0] = cmd_from_func(Is_container(o) ? doloot : dopickup);
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, Is_container(o) ? doloot : dopickup);
+                return ECMD_OK;
             } else {
-                cmd[0] = cmd_from_func(donull); /* just rest */
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, donull); /* just rest */
+                return ECMD_OK;
             }
         }
 
@@ -5795,25 +5844,23 @@ click_to_cmd(coordxy x, coordxy y, int mod)
         dir = xytod(x, y);
         if (!m_at(u.ux + x, u.uy + y)
             && !test_move(u.ux, u.uy, x, y, TEST_MOVE)) {
-            cmd[1] = cmd_from_func(move_funcs[dir][MV_WALK]);
-            cmd[2] = '\0';
-
             if (IS_DOOR(levl[u.ux + x][u.uy + y].typ)) {
                 /* slight assistance to player: choose kick/open for them */
                 if (levl[u.ux + x][u.uy + y].doormask & D_LOCKED) {
-                    cmd[0] = cmd_from_func(dokick);
-                    return cmd;
+                    cmdq_add_ec(CQ_CANNED, dokick);
+                    return ECMD_OK;
                 }
                 if (levl[u.ux + x][u.uy + y].doormask & D_CLOSED) {
-                    cmd[0] = cmd_from_func(doopen);
-                    return cmd;
+                    cmdq_add_ec(CQ_CANNED, doopen);
+                    return ECMD_OK;
                 }
             }
             if (levl[u.ux + x][u.uy + y].typ <= SCORR) {
-                cmd[0] = cmd_from_func(dosearch);
-                cmd[1] = 0;
-                return cmd;
+                cmdq_add_ec(CQ_CANNED, dosearch);
+                return ECMD_OK;
             }
+            cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
+            return ECMD_OK;
         }
     } else {
         /* convert without using floating point, allowing sloppy clicking */
@@ -5830,21 +5877,15 @@ click_to_cmd(coordxy x, coordxy y, int mod)
 
         if (x == 0 && y == 0) {
             /* map click on player to "rest" command */
-            cmd[0] = cmd_from_func(donull);
-            return cmd;
+            cmdq_add_ec(CQ_CANNED, donull);
+            return ECMD_OK;
         }
         dir = xytod(x, y);
     }
 
     /* move, attack, etc. */
-    cmd[1] = 0;
-    if (mod == CLICK_1) {
-        cmd[0] = cmd_from_func(move_funcs[dir][MV_WALK]);
-    } else {
-        cmd[0] = cmd_from_func(move_funcs[dir][MV_RUN]);
-    }
-
-    return cmd;
+    cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
+    return ECMD_OK;
 }
 
 /* gather typed digits into a number in *count; return the next non-digit */
@@ -6077,8 +6118,8 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
 #endif /*ALTMETA*/
     } else if (sym == 0) {
         /* click event */
-        readchar_queue = click_to_cmd(*x, *y, *mod);
-        sym = *readchar_queue++;
+        g.clicklook_cc.x = g.clicklook_cc.y = -1;
+        click_to_cmd(*x, *y, *mod);
     }
     g.program_state.getting_a_command = 0; /* next readchar() will be for an
                                             * ordinary char unless parse()
@@ -6183,7 +6224,7 @@ static int
 doclicklook(void)
 {
     if (!isok(g.clicklook_cc.x, g.clicklook_cc.y))
-        return 0;
+        return ECMD_OK;
 
     g.context.move = FALSE;
     (void) do_look(2, &g.clicklook_cc);

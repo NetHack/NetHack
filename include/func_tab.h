@@ -19,6 +19,7 @@
 #define CMD_MOVE_PREFIXES  (CMD_M_PREFIX | CMD_gGF_PREFIX)
 #define PREFIXCMD    0x0200 /* prefix command, requires another one after it */
 #define MOVEMENTCMD  0x0400 /* used to move hero/cursor */
+#define MOUSECMD     0x0800 /* cmd allowed to be bound to mouse button */
 
 /* flags for extcmds_match() */
 #define ECM_NOFLAGS       0

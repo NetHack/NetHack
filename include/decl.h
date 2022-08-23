@@ -506,6 +506,7 @@ struct cmd {
     const char *dirchars;      /* current movement/direction characters */
     const char *alphadirchars; /* same as dirchars if !numpad */
     const struct ext_func_tab *commands[256]; /* indexed by input character */
+    const struct ext_func_tab *mousebtn[NUM_MOUSE_BUTTONS];
     char spkeys[NUM_NHKF];
     char extcmd_char;      /* key that starts an extended command ('#') */
 };

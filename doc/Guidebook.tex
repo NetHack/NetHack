@@ -3779,9 +3779,9 @@ Set exceptions to the {{\it pickup\_types\/}}
 option. See the ``Configuring Autopickup Exceptions'' section.
 %.lp
 \item[\bb{BINDINGS}]
-Change the key bindings of some special keys, menu accelerators, or
-extended commands. You can specify multiple bindings. Format is key
-followed by the command, separated by a colon.
+Change the key bindings of some special keys, menu accelerators,
+extended commands, or mouse buttons. You can specify multiple bindings.
+Format is key followed by the command, separated by a colon.
 See the ``Changing Key Bindings`` section for more information.
 
 %.lp ""
@@ -4086,10 +4086,6 @@ Synonym for ``{\tt role}'' to pick the type of your character
 \item[\ib{checkpoint}]
 Save game state after each level change, for possible recovery after
 program crash (default on).  Persistent.
-%.lp
-\item[\ib{clicklook}]
-Allows looking at things on the screen by navigating the mouse
-over them and clicking the right mouse button (default off).
 %.lp
 \item[\ib{cmdassist}]
 Have the game provide some additional command assistance for new
@@ -5379,11 +5375,11 @@ autopickup.
 
 %.pg
 It is possible to change the default key bindings of some special commands,
-menu accelerator keys, and extended commands, by using BIND stanzas in the
+menu accelerator keys, extended commands, by using BIND stanzas in the
 configuration file. Format is key, followed by the command to bind to,
 separated by a colon. The key can be a single character (``{\tt x}''),
 a control key (``{\tt \^{}X}'', ``{\tt C-x}''), a meta key (``{\tt M-x}''),
-or a three-digit decimal ASCII code.
+a mouse button, or a three-digit decimal ASCII code.
 
 %.pg
 For example:
@@ -5407,6 +5403,11 @@ The menu control or accelerator keys can also be rebound via OPTIONS lines
 in the configuration file.
 You cannot bind object symbols or selection letters into menu accelerators.
 Some interfaces only support some of the menu accelerators.
+
+%.lp "Mouse buttons"
+\item[\tb{Mouse buttons}]
+You can bind ``mouse1'' or ``mouse2'' to ``{\tt nothing}'',
+``{\tt therecmdmenu}'', ``{\tt clicklook}'', or ``{\tt mouseaction}''.
 
 %.lp "Special command keys"
 \item[\tb{Special command keys}]
