@@ -10,7 +10,6 @@ static int l_selection_new(lua_State *);
 static int l_selection_clone(lua_State *);
 static int l_selection_getpoint(lua_State *);
 static int l_selection_setpoint(lua_State *);
-static int l_selection_not(lua_State *);
 static int l_selection_filter_percent(lua_State *);
 static int l_selection_rndcoord(lua_State *);
 static boolean params_sel_2coords(lua_State *, struct selectionvar **,
@@ -32,7 +31,6 @@ static int l_selection_not(lua_State *);
 static int l_selection_and(lua_State *);
 static int l_selection_or(lua_State *);
 static int l_selection_xor(lua_State *);
-static int l_selection_not(lua_State *);
 /* There doesn't seem to be a point in having a l_selection_add since it would
  * do the same thing as l_selection_or. The addition operator is mapped to
  * l_selection_or. */
