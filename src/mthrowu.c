@@ -893,8 +893,7 @@ breathwep_name(int typ)
 int
 breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
 {
-    /* if new breath types are added, change AD_ACID to max type */
-    int typ = (mattk->adtyp == AD_RBRE) ? rnd(AD_ACID) : mattk->adtyp ;
+    int typ = get_atkdam_type(mattk->adtyp);
 
     if (m_lined_up(mtarg, mtmp)) {
         if (mtmp->mcan) {

@@ -1416,4 +1416,16 @@ mons_see_trap(struct trap *ttmp)
     }
 }
 
+int
+get_atkdam_type(int adtyp)
+{
+    if (adtyp == AD_RBRE) {
+        static const int rnd_breath_typ[] = {
+            AD_MAGM, AD_FIRE, AD_COLD, AD_SLEE,
+            AD_DISN, AD_ELEC, AD_DRST, AD_ACID };
+        return rnd_breath_typ[rn2(SIZE(rnd_breath_typ))];
+    }
+    return adtyp;
+}
+
 /*mondata.c*/

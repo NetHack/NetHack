@@ -1657,6 +1657,7 @@ extern boolean resist_conflict(struct monst *);
 extern boolean mon_knows_traps(struct monst *, int);
 extern void mon_learns_traps(struct monst *, int);
 extern void mons_see_trap(struct trap *);
+extern int get_atkdam_type(int);
 
 /* ### monmove.c ### */
 
