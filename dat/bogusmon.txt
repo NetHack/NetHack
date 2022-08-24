@@ -86,10 +86,17 @@ steam dragon
 omnibus
 slinky
 maxotaur
+millitaur
 octahedron
 dungeon core
 quale
 holloway
+chiasmus
+giant tetrapod
+voussoir
+barking spider
+frog cloud
+toothsayer
 
 # Quendor (Zork, &c.)
 grue
