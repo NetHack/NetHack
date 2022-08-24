@@ -50,6 +50,7 @@ explode(
     char hallu_buf[BUFSZ], killr_buf[BUFSZ];
     short exploding_wand_typ = 0;
     boolean you_exploding = (olet == MON_EXPLODE && type >= 0);
+    boolean didmsg = FALSE;
 
     if (olet == WAND_CLASS) { /* retributive strike */
         /* 'type' is passed as (wand's object type * -1); save
@@ -324,9 +325,14 @@ explode(
             str = "explosion";
             generic = TRUE;
         }
-        if (!Deaf && olet != SCROLL_CLASS)
+        if (!Deaf && olet != SCROLL_CLASS) {
             You_hear("a blast.");
+            didmsg = TRUE;
+        }
     }
+
+    if (!Deaf && !didmsg)
+        pline("Boom!");
 
     if (dam) {
         for (i = 0; i < 3; i++) {
