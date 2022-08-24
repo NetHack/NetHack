@@ -4019,7 +4019,22 @@ sanity_check(void)
 }
 
 #ifdef DEBUG_MIGRATING_MONS
+static int QSORTCALLBACK migrsort_cmp(const genericptr, const genericptr);
 static void list_migrating_mons(d_level *);
+
+static int QSORTCALLBACK
+migrsort_cmp(const genericptr vptr1, const genericptr vptr2)
+{
+    const struct monst *m1 = *(const struct monst **) vptr1,
+                       *m2 = *(const struct monst **) vptr2;
+    int d1 = m1->mux, l1 = m1->muy, d2 = m2->mux, l2 = m2->muy;
+
+    if (d1 < d2 || (d1 == d2 && l1 < l2))
+        return -1;
+    if (d1 > d2 || (d1 == d2 && l1 > l2))
+        return 1;
+    return 0; /* tie => same destination */
+}
 
 /* called by #migratemons; might turn it into separate wizard mode command */
 static void
@@ -4028,10 +4043,11 @@ list_migrating_mons(
 {
     winid win = WIN_ERR;
     boolean showit = FALSE;
-    int n, xyloc;
+    unsigned n;
+    int xyloc;
     coordxy x, y;
     char c, prmpt[10], xtra[10], buf[BUFSZ];
-    struct monst *mtmp;
+    struct monst *mtmp, **marray;
     int here = 0, nxtlv = 0, other = 0;
 
     for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
@@ -4078,8 +4094,12 @@ list_migrating_mons(
             }
             putstr(win, 0, buf);
             putstr(win, 0, "");
-            /* TODO? make multiple passes in order to show mons in
-               destination order */
+            /* collect the migrating monsters into an array; for 'o' and 'a'
+               where multiple destination levels might be present, sort by
+               the destination; no sorting needed for 'c' and 'n' but it's
+               simpler to use the array than to have separate traversal */
+            marray = (struct monst **) alloc((n + 1) * sizeof *marray);
+            n = 0;
             for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
                 if (c == 'a')
                     showit = TRUE;
@@ -4091,21 +4111,30 @@ list_migrating_mons(
                 else
                     showit = (c == 'o');
 
-                if (showit) {
-                    Sprintf(buf, "  %s", minimal_monnam(mtmp, FALSE));
-                    /* minimal_monnam() appends map coordinates; strip that */
-                    (void) strsubst(buf, " <0,0>", "");
-                    if (c == 'o' || c == 'a')
-                        Sprintf(eos(buf), " to %d:%d", mtmp->mux, mtmp->muy);
-                    xyloc = mtmp->mtrack[0].x; /* (for legibility) */
-                    if (xyloc == MIGR_EXACT_XY) {
-                        x = mtmp->mtrack[1].x;
-                        y = mtmp->mtrack[1].y;
-                        Sprintf(eos(buf), " at <%d,%d>", (int) x, (int) y);
-                    }
-                    putstr(win, 0, buf);
-                }
+                if (showit)
+                    marray[n++] = mtmp;;
             }
+            marray[n] = (struct monst *) 0;
+            if (n > 1 && c != 'c' && c != 'n')
+                qsort((genericptr_t) marray, (size_t) n, sizeof *marray,
+                      migrsort_cmp); /* sort elements [0] through [n-1] */
+            for (n = 0; (mtmp = marray[n]) != 0; ++n) {
+                Sprintf(buf, "  %s", minimal_monnam(mtmp, FALSE));
+                /* minimal_monnam() appends map coordinates; strip that */
+                (void) strsubst(buf, " <0,0>", "");
+                if (has_mgivenname(mtmp)) /* if mtmp is named, include that */
+                    Sprintf(eos(buf), " named %s", MGIVENNAME(mtmp));
+                if (c == 'o' || c == 'a')
+                    Sprintf(eos(buf), " to %d:%d", mtmp->mux, mtmp->muy);
+                xyloc = mtmp->mtrack[0].x; /* (for legibility) */
+                if (xyloc == MIGR_EXACT_XY) {
+                    x = mtmp->mtrack[1].x;
+                    y = mtmp->mtrack[1].y;
+                    Sprintf(eos(buf), " at <%d,%d>", (int) x, (int) y);
+                }
+                putstr(win, 0, buf);
+            }
+            free((genericptr_t) marray);
             display_nhwindow(win, FALSE);
             destroy_nhwindow(win);
         } else if (c != 'q') {
