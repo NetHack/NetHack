@@ -4070,6 +4070,12 @@ optfn_windowborders(
         }
         return retval;
     }
+    if (req == get_cnf_val) {
+        if (!opts)
+            return optn_err;
+        Sprintf(opts, "%i", iflags.wc2_windowborders);
+        return optn_ok;
+    }
     if (req == do_handler) {
         return handler_windowborders();
     }
