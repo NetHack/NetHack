@@ -4325,7 +4325,10 @@ start_engulf(struct monst *mdef)
         tmp_at(DISP_ALWAYS, mon_to_glyph(&g.youmonst, rn2_on_display_rng));
         tmp_at(mdef->mx, mdef->my);
     }
-    You("engulf %s!", mon_nam(mdef));
+    if (digests(g.youmonst.data))
+        You("swallow %s whole!", mon_nam(mdef));
+    else
+        You("engulf %s!", mon_nam(mdef));
     delay_output();
     delay_output();
 }
@@ -4349,9 +4352,12 @@ gulpum(struct monst *mdef, struct attack *mattk)
 #endif
     register int tmp;
     register int dam = d((int) mattk->damn, (int) mattk->damd);
-    boolean fatal_gulp;
+    boolean fatal_gulp, u_digest = digests(g.youmonst.data);
     struct obj *otmp;
     struct permonst *pd = mdef->data;
+    const char *expel_verb = u_digest ? "regurgitate"
+                               : enfolds(g.youmonst.data) ? "release"
+                                 : "expel";
 
     /* Not totally the same as for real monsters.  Specifically, these
      * don't take multiple moves.  (It's just too hard, for too little
@@ -4364,7 +4370,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
     if (!engulf_target(&g.youmonst, mdef))
         return MM_MISS;
 
-    if (u.uhunger < 1500 && !u.uswallow) {
+    if (!(u_digest && u.uhunger >= 1500) && !u.uswallow) {
         if (!flaming(g.youmonst.data)) {
             for (otmp = mdef->minvent; otmp; otmp = otmp->nobj)
                 (void) snuff_lit(otmp);
@@ -4374,7 +4380,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
-            You("engulf it, then expel it.");
+            You("%s it, then %s it.", u_digest ? "swallow" : "engulf",
+                expel_verb);
             if (canspotmon(mdef))
                 pline("It turns into %s.", a_monnam(mdef));
             else
@@ -4388,7 +4395,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                          && (is_rider(pd) || (pd == &mons[PM_MEDUSA]
                                               && !Stone_resistance)));
 
-        if ((mattk->adtyp == AD_DGST && !Slow_digestion) || fatal_gulp)
+        if (mattk->adtyp == AD_DGST && (!Slow_digestion || fatal_gulp))
             eating_conducts(pd);
 
         if (fatal_gulp && !is_rider(pd)) { /* petrification */
@@ -4397,8 +4404,9 @@ gulpum(struct monst *mdef, struct attack *mattk)
 
             if (!type_is_pname(pd))
                 mnam = an(mnam);
-            You("englut %s.", mon_nam(mdef));
-            Sprintf(kbuf, "swallowing %s whole", mnam);
+            You("%s %s.", u_digest ? "englut" : "engulf", mon_nam(mdef));
+            Sprintf(kbuf, "%s %s%s", u_digest ? "swallowing" : "engulfing",
+                    mnam, u_digest ? " whole" : "");
             instapetrify(kbuf);
         } else {
             start_engulf(mdef);
@@ -4476,8 +4484,11 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         dam = 0;
                         pline("%s seems unharmed.", Monnam(mdef));
                     }
-                } else
-                    pline("%s is pummeled with your debris!", Monnam(mdef));
+                } else {
+                    pline("%s is %s!", Monnam(mdef),
+                          enfolds(g.youmonst.data) ? "being squashed"
+                            : "pummeled with your debris");
+                }
                 break;
             case AD_ACID:
                 pline("%s is covered with your goo!", Monnam(mdef));
@@ -4546,9 +4557,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
                 if (DEADMONSTER(mdef)) /* not lifesaved */
                     return MM_DEF_DIED;
             }
-            You("%s %s!", digests(g.youmonst.data) ? "regurgitate" : "expel",
-                mon_nam(mdef));
-            if (Slow_digestion || is_animal(g.youmonst.data)) {
+            You("%s %s!", expel_verb, mon_nam(mdef));
+            if ((Slow_digestion || is_animal(g.youmonst.data)) && u_digest) {
                 pline("Obviously, you didn't like %s taste.",
                       s_suffix(mon_nam(mdef)));
             }
