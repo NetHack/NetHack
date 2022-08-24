@@ -4280,6 +4280,24 @@ parseautocomplete(char *autocomplete, boolean condition)
     wait_synch();
 }
 
+/* save&clear the mouse button actions, or restore the saved ones */
+void
+lock_mouse_buttons(boolean savebtns)
+{
+    static const struct ext_func_tab *mousebtn[NUM_MOUSE_BUTTONS] = { 0 };
+    int i;
+
+    if (savebtns) {
+        for (i = 0; i < NUM_MOUSE_BUTTONS; i++) {
+            mousebtn[i] = g.Cmd.mousebtn[i];
+            g.Cmd.mousebtn[i] = NULL;
+        }
+    } else {
+        for (i = 0; i < NUM_MOUSE_BUTTONS; i++)
+            g.Cmd.mousebtn[i] = mousebtn[i];
+    }
+}
+
 /* called at startup and after number_pad is twiddled */
 void
 reset_commands(boolean initial)

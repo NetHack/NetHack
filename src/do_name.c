@@ -751,6 +751,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 #ifdef MAC
     lock_mouse_cursor(TRUE);
 #endif
+    lock_mouse_buttons(TRUE);
     for (;;) {
         if (show_goal_msg) {
             pline("Move cursor to %s:", goal);
@@ -769,7 +770,8 @@ getpos(coord *ccp, boolean force, const char *goal)
                 c = cmdq->key;
             } else {
                 cmdq_clear(CQ_CANNED);
-                return -1;
+                result = -1;
+                goto exitgetpos;
             }
             free(cmdq);
         } else {
@@ -1036,9 +1038,11 @@ getpos(coord *ccp, boolean force, const char *goal)
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
+ exitgetpos:
 #ifdef MAC
     lock_mouse_cursor(FALSE);
 #endif
+    lock_mouse_buttons(FALSE);
     if (msg_given)
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
