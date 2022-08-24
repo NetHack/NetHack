@@ -4087,7 +4087,7 @@ list_migrating_mons(
                     showit = (c == 'c');
                 else if (mtmp->mux == nextlevl->dnum
                          && mtmp->muy == nextlevl->dlevel)
-                    showit = (c = 'n');
+                    showit = (c == 'n');
                 else
                     showit = (c == 'o');
 
