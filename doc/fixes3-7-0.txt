@@ -1823,6 +1823,7 @@ curses: 'windowborders' can be set to 3 or 4 to suppress perm_invent borders
 curses: if panictrace is triggered, reset the terminal before giving backtrace
 curses: if a message is marked urgent, override message suppression initiated
 	by user having typed ESC at previous More>> prompt
+curses: implement a dialog for the windowborders option
 Qt: the "paper doll" inventory subset can be controlled via the "Qt Settings"
 	dialog box ("Preferences..." on OSX)
 Qt: draw a border around each tile in the paper doll inventory; when BUC is

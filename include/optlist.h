@@ -642,7 +642,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(whatis_moveskip, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &iflags.getloc_moveskip)
     NHOPTC(windowborders, Advanced, 9, opt_in, set_in_game,
-                Yes, Yes, No, No, NoAlias, "0 (off), 1 (on), 2 (auto)")
+                Yes, Yes, No, Yes, NoAlias, "0 (off), 1 (on), 2 (auto)")
 #ifdef WINCHAIN
     NHOPTC(windowchain, Advanced, WINTYPELEN, opt_in, set_in_sysconf,
                 No, Yes, No, No, NoAlias, "window processor to use")

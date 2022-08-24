@@ -332,6 +332,7 @@ static int handler_msgtype(void);
 #ifndef NO_VERBOSE_GRANULARITY
 static int handler_verbose(int optidx);
 #endif
+static int handler_windowborders(void);
 
 static boolean is_wc_option(const char *);
 static boolean wc_supported(const char *);
@@ -4069,11 +4070,8 @@ optfn_windowborders(
         }
         return retval;
     }
-    if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%i", iflags.wc2_windowborders);
-        return optn_ok;
+    if (req == do_handler) {
+        return handler_windowborders();
     }
     if (req == get_val) {
         if (!opts)
@@ -5728,6 +5726,41 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 #endif
 
+static int
+handler_windowborders(void)
+{
+    winid tmpwin;
+    anything any;
+    int i;
+    const char *mode_name;
+    menu_item *mode_pick = (menu_item *) 0;
+    int clr = 0;
+    static const char *windowborders_text[] = {
+        "Off, never show borders",
+        "On, always show borders",
+        "Auto, on if display is at least (24+2)x(80+2)",
+        "On, except forced off for perm_invent",
+        "Auto, except forced off for perm_invent"
+    };
+
+    tmpwin = create_nhwindow(NHW_MENU);
+    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+    for (i = 0; i < SIZE(windowborders_text); i++) {
+        mode_name = windowborders_text[i];
+        any.a_int = i + 1;
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
+                 0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(tmpwin, "Select window borders mode:");
+    if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
+        iflags.wc2_windowborders = mode_pick->item.a_int - 1;
+        free((genericptr_t) mode_pick);
+    }
+    destroy_nhwindow(tmpwin);
+    return optn_ok;
+}
+
 /*
  **********************************
  *
@@ -6657,7 +6690,7 @@ parsebindings(char *bindings)
         if (!parsebindings(bind))
             ret = FALSE;
     }
-    
+
     /* parse a single binding: first split around : */
     if (! (bind = index(bindings, ':')))
         return FALSE; /* it's not a binding */
