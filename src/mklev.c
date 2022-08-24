@@ -292,7 +292,7 @@ makerooms(void)
 
     /* make rooms until satisfied */
     /* rnd_rect() will returns 0 if no more rects are available... */
-    while (g.nroom < MAXNROFROOMS && rnd_rect()) {
+    while (g.nroom < (MAXNROFROOMS-1) && rnd_rect()) {
         if (g.nroom >= (MAXNROFROOMS / 6) && rn2(2) && !tried_vault) {
             tried_vault = TRUE;
             if (create_vault()) {
