@@ -5469,6 +5469,9 @@ there_cmd_menu_next2u(
         mcmd_addmenu(win, MCMD_MOVE_DIR, "Move on the trap"), ++K;
     }
 
+    if (levl[x][y].glyph == objnum_to_glyph(BOULDER))
+        mcmd_addmenu(win, MCMD_MOVE_DIR, "Push the boulder"), ++K;
+
     mtmp = m_at(x, y);
     if (mtmp && !canspotmon(mtmp))
         mtmp = 0;
