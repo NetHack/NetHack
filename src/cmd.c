@@ -5541,15 +5541,18 @@ there_cmd_menu_next2u(
     if (mtmp && (mtmp->mpeaceful || mtmp->mtame)) {
         Sprintf(buf, "Talk to %s", mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_TALK, buf), ++K;
-    }
-    if (mtmp) {
+
+        Sprintf(buf, "Swap places with %s", mon_nam(mtmp));
+        mcmd_addmenu(win, MCMD_MOVE_DIR, buf), ++K;
+
         Sprintf(buf, "%s %s",
                 !has_mgivenname(mtmp) ? "Name" : "Rename",
                 mon_nam(mtmp));
         mcmd_addmenu(win, MCMD_NAME, buf), ++K;
     }
 
-    if (mtmp || glyph_is_invisible(glyph_at(x, y))) {
+    if ((mtmp && !(mtmp->mpeaceful || mtmp->mtame))
+        || glyph_is_invisible(glyph_at(x, y))) {
         Sprintf(buf, "Attack %s", mtmp ? mon_nam(mtmp) : "unseen creature");
         mcmd_addmenu(win, MCMD_ATTACK_NEXT2U, buf), ++K;
         /* attacking overrides any other automatic action */
