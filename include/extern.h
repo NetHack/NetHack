@@ -491,6 +491,7 @@ extern void heal_legs(int);
 
 extern char *dxdy_to_dist_descr(coordxy, coordxy, boolean);
 extern char *coord_desc(coordxy, coordxy, char *, char);
+extern void auto_describe(coordxy, coordxy);
 extern boolean getpos_menu(coord *, int);
 extern int getpos(coord *, boolean, const char *);
 extern void getpos_sethilite(void(*f)(int), boolean(*d)(coordxy,coordxy));

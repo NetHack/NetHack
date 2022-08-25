@@ -16,7 +16,6 @@ static void gloc_filter_init(void);
 static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
-static void auto_describe(int, int);
 static void truncate_to_map(int *, int *, schar, schar);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
@@ -553,8 +552,8 @@ coord_desc(coordxy x, coordxy y, char *outbuf, char cmode)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-static void
-auto_describe(int cx, int cy)
+void
+auto_describe(coordxy cx, coordxy cy)
 {
     coord cc;
     int sym = 0;

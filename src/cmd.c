@@ -6277,7 +6277,7 @@ doclicklook(void)
         return ECMD_OK;
 
     g.context.move = FALSE;
-    (void) do_look(2, &g.clicklook_cc);
+    auto_describe(g.clicklook_cc.x, g.clicklook_cc.y);
 
     return ECMD_OK;
 }
