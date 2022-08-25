@@ -129,9 +129,7 @@ static int wiz_intrinsic(void);
 static int wiz_show_wmodes(void);
 static int wiz_show_stats(void);
 static int wiz_rumor_check(void);
-#ifdef DEBUG_MIGRATING_MONS
 static int wiz_migrate_mons(void);
-#endif
 
 static void makemap_unmakemon(struct monst *, boolean);
 static void makemap_remove_mons(void);
@@ -162,6 +160,8 @@ static char readchar_core(coordxy *, coordxy *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
 static boolean help_dir(char, uchar, const char *);
+static int QSORTCALLBACK migrsort_cmp(const genericptr, const genericptr);
+static void list_migrating_mons(d_level *);
 
 static void handler_rebind_keys_add(boolean);
 static boolean bind_key_fn(uchar, int (*)(void));
@@ -2564,10 +2564,13 @@ struct ext_func_tab extcmdlist[] = {
               dolook, IFBURIED, NULL },
     { M('l'), "loot", "loot a box on the floor",
               doloot, AUTOCOMPLETE | CMD_M_PREFIX, NULL },
-#ifdef DEBUG_MIGRATING_MONS
-    { '\0',   "migratemons", "migrate N random monsters",
-              wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+    { '\0',   "migratemons",
+#ifdef DEBUG_MIGRATING_MONSTERS
+              "show migrating monsters and migrate N random ones",
+#else
+              "show migrating monsters",
 #endif
+              wiz_migrate_mons, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { M('m'), "monster", "use monster's special ability",
               domonability, IFBURIED | AUTOCOMPLETE, NULL },
     { M('n'), "name", "same as call; name a monster or object or object type",
@@ -4018,22 +4021,24 @@ sanity_check(void)
     trap_sanity_check();
 }
 
-#ifdef DEBUG_MIGRATING_MONS
-static int QSORTCALLBACK migrsort_cmp(const genericptr, const genericptr);
-static void list_migrating_mons(d_level *);
-
+/* qsort() comparison routine for use in list_migrating_mons() */
 static int QSORTCALLBACK
 migrsort_cmp(const genericptr vptr1, const genericptr vptr2)
 {
     const struct monst *m1 = *(const struct monst **) vptr1,
                        *m2 = *(const struct monst **) vptr2;
-    int d1 = m1->mux, l1 = m1->muy, d2 = m2->mux, l2 = m2->muy;
+    int d1 = (int) m1->mux, l1 = (int) m1->muy,
+        d2 = (int) m2->mux, l2 = (int) m2->muy;
 
-    if (d1 < d2 || (d1 == d2 && l1 < l2))
-        return -1;
-    if (d1 > d2 || (d1 == d2 && l1 > l2))
-        return 1;
-    return 0; /* tie => same destination */
+    /* if different branches, sort by dungeon number */
+    if (d1 != d2)
+        return d1 - d2;
+    /* within same branch, sort by level number */
+    if (l1 != l2)
+        return l1 - l2;
+    /* same destination level:  use a tie-breaker to force stable sort;
+       monst->m_id is unsigned so we need more than just simple subtraction */
+    return (m1->m_id < m2->m_id) ? -1 : (m1->m_id > m2->m_id);
 }
 
 /* called by #migratemons; might turn it into separate wizard mode command */
@@ -4096,8 +4101,8 @@ list_migrating_mons(
             putstr(win, 0, "");
             /* collect the migrating monsters into an array; for 'o' and 'a'
                where multiple destination levels might be present, sort by
-               the destination; no sorting needed for 'c' and 'n' but it's
-               simpler to use the array than to have separate traversal */
+               the destination; 'c' and 'n' don't need to be sorted but we
+               do that anyway to get the same tie-breaker as 'o' and 'a' */
             marray = (struct monst **) alloc((n + 1) * sizeof *marray);
             n = 0;
             for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
@@ -4114,8 +4119,8 @@ list_migrating_mons(
                 if (showit)
                     marray[n++] = mtmp;;
             }
-            marray[n] = (struct monst *) 0;
-            if (n > 1 && c != 'c' && c != 'n')
+            marray[n] = (struct monst *) 0; /* mark end for traversal loop */
+            if (n > 1)
                 qsort((genericptr_t) marray, (size_t) n, sizeof *marray,
                       migrsort_cmp); /* sort elements [0] through [n-1] */
             for (n = 0; (mtmp = marray[n]) != 0; ++n) {
@@ -4144,28 +4149,43 @@ list_migrating_mons(
     }
 }
 
+/* #migratemons command */
 static int
 wiz_migrate_mons(void)
 {
+#ifdef DEBUG_MIGRATING_MONS
     int mcount;
-    char inbuf[BUFSZ] = DUMMY;
+    char inbuf[BUFSZ];
     struct permonst *ptr;
     struct monst *mtmp;
+#endif
     d_level tolevel;
 
     if (Is_stronghold(&u.uz))
         assign_level(&tolevel, &valley_level);
-    else
+    else if (!Is_botlevel(&u.uz))
         get_level(&tolevel, depth(&u.uz) + 1);
+    else
+        tolevel.dnum = 0, tolevel.dlevel = 0;
 
     list_migrating_mons(&tolevel);
 
-    getlin("How many random monsters to migrate to next level? [0]", inbuf);
+#ifdef DEBUG_MIGRATING_MONS
+    inbuf[0] = '\033', inbuf[1] = '\0';
+    if (tolevel.dnum || tolevel.dlevel)
+        getlin("How many random monsters to migrate to next level? [0]",
+               inbuf);
+    else
+        pline("Can't get there from here.");
     if (*inbuf == '\033')
         return ECMD_OK;
+
     mcount = atoi(inbuf);
-    if (mcount < 0 || mcount > (COLNO * ROWNO) || Is_botlevel(&u.uz))
-        return ECMD_OK;
+    if (mcount < 1)
+        mcount = 0;
+    else if (mcount > ((COLNO - 1) * ROWNO))
+        mcount = (COLNO - 1) * ROWNO;
+
     while (mcount > 0) {
         ptr = rndmonst();
         mtmp = makemon(ptr, 0, 0, MM_NOMSG);
@@ -4174,9 +4194,9 @@ wiz_migrate_mons(void)
                              (coord *) 0);
         mcount--;
     }
+#endif /* DEBUG_MIGRATING_MONS */
     return ECMD_OK;
 }
-#endif /* DEBUG_MIGRATING_MONS */
 
 static struct {
     int nhkf;

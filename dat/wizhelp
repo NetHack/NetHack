@@ -11,6 +11,7 @@ Debug-Mode Quick Reference:
 
 #levelchange    == set hero's experience level
 #lightsources   == show mobile light sources
+#migratemons    == show migrating monsters; optionally create some
 #panic          == panic test (warning: current game will be terminated)
 #polyself       == polymorph self
 #stats          == show memory statistics
