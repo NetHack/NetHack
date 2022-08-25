@@ -100,10 +100,11 @@ enum roomtype_types {
 
 #define IS_ROOM_PTR(x)      ((x) >= g.rooms && (x) < g.rooms + MAXNROFROOMS)
 #define IS_ROOM_INDEX(x)    ((x) >= 0 && (x) < MAXNROFROOMS)
-#define IS_SUBROOM_PTR(x)   ((x) >= g.subrooms && (x) < g.subrooms + MAXNROFROOMS)
-#define IS_SUBROOM_INDEX(x) ((x) > MAXNROFROOMS && (x) < (MAXNROFROOMS * 2))
-#define ROOM_INDEX(x)       ((x) -g.rooms)
-#define SUBROOM_INDEX(x)    ((x) -g.subrooms)
+#define IS_SUBROOM_PTR(x) \
+    ((x) >= g.subrooms && (x) < g.subrooms + MAXNROFROOMS)
+#define IS_SUBROOM_INDEX(x) ((x) > MAXNROFROOMS && (x) <= (MAXNROFROOMS * 2))
+#define ROOM_INDEX(x)       ((x) - g.rooms)
+#define SUBROOM_INDEX(x)    ((x) - g.subrooms)
 #define IS_LAST_ROOM_PTR(x) (ROOM_INDEX(x) == g.nroom)
 #define IS_LAST_SUBROOM_PTR(x) (!g.nsubroom || SUBROOM_INDEX(x) == g.nsubroom)
 
