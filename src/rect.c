@@ -128,6 +128,16 @@ intersect(NhRect* r1, NhRect* r2, NhRect* r3)
     return TRUE;
 }
 
+/* Put the rectangle containing both r1 and r2 into r3 */
+void
+rect_bounds(NhRect r1, NhRect r2, NhRect *r3)
+{
+    r3->lx = min(r1.lx, r2.lx);
+    r3->ly = min(r1.ly, r2.ly);
+    r3->hx = max(r1.hx, r2.hx);
+    r3->hy = max(r1.hy, r2.hy);
+}
+
 /*
  * Remove a rectangle from the list of free NhRect.
  */

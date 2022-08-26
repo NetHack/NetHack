@@ -234,7 +234,7 @@ l_selection_not(lua_State *L)
     if (argc == 0) {
         (void) l_selection_new(L);
         sel = l_selection_check(L, 1);
-        selection_not(sel);
+        selection_clear(sel, 1);
     } else {
         sel = l_selection_check(L, 1);
         (void) l_selection_clone(L);
@@ -252,9 +252,12 @@ l_selection_and(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
+    NhRect rect;
 
-    for (x = 0; x < selr->wid; x++)
-        for (y = 0; y < selr->hei; y++) {
+    rect_bounds(sela->bounds, selb->bounds, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++) {
             int val = selection_getpoint(x, y, sela) & selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
@@ -272,9 +275,12 @@ l_selection_or(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
+    NhRect rect;
 
-    for (x = 0; x < selr->wid; x++)
-        for (y = 0; y < selr->hei; y++) {
+    rect_bounds(sela->bounds, selb->bounds, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++) {
             int val = selection_getpoint(x, y, sela) | selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
@@ -292,9 +298,12 @@ l_selection_xor(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
+    NhRect rect;
 
-    for (x = 0; x < selr->wid; x++)
-        for (y = 0; y < selr->hei; y++) {
+    rect_bounds(sela->bounds, selb->bounds, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++) {
             int val = selection_getpoint(x, y, sela) ^ selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
@@ -313,15 +322,17 @@ l_selection_sub(lua_State *L)
     struct selectionvar *sela = l_selection_check(L, 1);
     struct selectionvar *selb = l_selection_check(L, 2);
     struct selectionvar *selr = l_selection_push_new(L);
+    NhRect rect;
 
-    for (x = 0; x < selr->wid; x++) {
-        for (y = 0; y < selr->hei; y++) {
+    rect_bounds(sela->bounds, selb->bounds, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++) {
             coordxy a_pt = selection_getpoint(x, y, sela);
             coordxy b_pt = selection_getpoint(x, y, selb);
             int val = (a_pt ^ b_pt) & a_pt;
             selection_setpoint(x, y, selr, val);
         }
-    }
 
     lua_remove(L, 1);
     lua_remove(L, 1);
@@ -817,11 +828,13 @@ l_selection_iterate(lua_State *L)
     int argc = lua_gettop(L);
     struct selectionvar *sel = (struct selectionvar *) 0;
     int x, y;
+    NhRect rect;
 
     if (argc == 2 && lua_type(L, 2) == LUA_TFUNCTION) {
         sel = l_selection_check(L, 1);
-        for (y = 0; y < sel->hei; y++)
-            for (x = 1; x < sel->wid; x++)
+        selection_getbounds(sel, &rect);
+        for (y = rect.ly; y <= rect.hy; y++)
+            for (x = max(1,rect.lx); x <= rect.hx; x++)
                 if (selection_getpoint(x, y, sel)) {
                     lua_pushvalue(L, 2);
                     lua_pushinteger(L, x - g.xstart);

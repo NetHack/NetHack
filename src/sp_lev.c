@@ -123,6 +123,7 @@ static const char *get_mkroom_name(int);
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
+static void selection_recalc_bounds(struct selectionvar *);
 static lua_Integer get_table_intarray_entry(lua_State *, int, int);
 static struct sp_coder *sp_level_coder_init(void);
 
@@ -4365,6 +4366,10 @@ selection_new(void)
 
     tmps->wid = COLNO;
     tmps->hei = ROWNO;
+    tmps->bounds_dirty = FALSE;
+    tmps->bounds.lx = COLNO;
+    tmps->bounds.ly = ROWNO;
+    tmps->bounds.hx = tmps->bounds.hy = 0;
     tmps->map = (char *) alloc((COLNO * ROWNO) + 1);
     (void) memset(tmps->map, 1, (COLNO * ROWNO));
     tmps->map[(COLNO * ROWNO)] = '\0';
@@ -4385,6 +4390,24 @@ selection_free(struct selectionvar* sel, boolean freesel)
     }
 }
 
+/* clear selection, setting all locations to value val */
+void
+selection_clear(struct selectionvar *sel, int val)
+{
+    (void) memset(sel->map, 1 + val, (COLNO * ROWNO));
+    if (val) {
+        sel->bounds.lx = 0;
+        sel->bounds.ly = 0;
+        sel->bounds.hx = COLNO - 1;
+        sel->bounds.hy = ROWNO - 1;
+    } else {
+        sel->bounds.lx = COLNO;
+        sel->bounds.ly = ROWNO;
+        sel->bounds.hx = sel->bounds.hy = 0;
+    }
+    sel->bounds_dirty = FALSE;
+}
+
 struct selectionvar *
 selection_clone(struct selectionvar* sel)
 {
@@ -4394,6 +4417,98 @@ selection_clone(struct selectionvar* sel)
     tmps->map = dupstr(sel->map);
 
     return tmps;
+}
+
+/* get boundary rect of selection sel into b */
+void
+selection_getbounds(struct selectionvar *sel, NhRect *b)
+{
+    if (!sel || !b)
+        return;
+
+    selection_recalc_bounds(sel);
+
+    if (sel->bounds.lx >= sel->wid) {
+        b->lx = 0;
+        b->ly = 0;
+        b->hx = COLNO - 1;
+        b->hy = ROWNO - 1;
+    } else {
+        b->lx = sel->bounds.lx;
+        b->ly = sel->bounds.ly;
+        b->hx = sel->bounds.hx;
+        b->hy = sel->bounds.hy;
+    }
+}
+
+/* recalc the boundary of selection, if necessary */
+static void
+selection_recalc_bounds(struct selectionvar *sel)
+{
+    coordxy x, y;
+    NhRect r;
+
+    if (!sel->bounds_dirty)
+        return;
+
+    sel->bounds.lx = COLNO;
+    sel->bounds.ly = ROWNO;
+    sel->bounds.hx = sel->bounds.hy = 0;
+
+    r.lx = r.ly = r.hx = r.hy = -1;
+
+    /* left */
+    for (x = 0; x < sel->wid; x++) {
+        for (y = 0; y < sel->hei; y++) {
+            if (selection_getpoint(x, y, sel)) {
+                r.lx = x;
+                break;
+            }
+        }
+        if (r.lx > -1)
+            break;
+    }
+
+    if (r.lx > -1) {
+        /* right */
+        for (x = sel->wid-1; x >= r.lx; x--) {
+            for (y = 0; y < sel->hei; y++) {
+                if (selection_getpoint(x, y, sel)) {
+                    r.hx = x;
+                    break;
+                }
+            }
+            if (r.hx > -1)
+                break;
+        }
+
+        /* top */
+        for (y = 0; y < sel->hei; y++) {
+            for (x = r.lx; x <= r.hx; x++) {
+                if (selection_getpoint(x, y, sel)) {
+                    r.ly = y;
+                    break;
+                }
+            }
+            if (r.ly > -1)
+                break;
+        }
+
+        /* bottom */
+        for (y = sel->hei-1; y >= r.ly; y--) {
+            for (x = r.lx; x <= r.hx; x++) {
+                if (selection_getpoint(x, y, sel)) {
+                    r.hy = y;
+                    break;
+                }
+            }
+            if (r.hy > -1)
+                break;
+        }
+        sel->bounds = r;
+    }
+
+    sel->bounds_dirty = FALSE;
 }
 
 coordxy
@@ -4414,6 +4529,15 @@ selection_setpoint(coordxy x, coordxy y, struct selectionvar* sel, int c)
         return;
     if (x < 0 || y < 0 || x >= sel->wid || y >= sel->hei)
         return;
+
+    if (c && !sel->bounds_dirty) {
+        if (sel->bounds.lx > x) sel->bounds.lx = x;
+        if (sel->bounds.ly > y) sel->bounds.ly = y;
+        if (sel->bounds.hx < x) sel->bounds.hx = x;
+        if (sel->bounds.hy < y) sel->bounds.hy = y;
+    } else {
+        sel->bounds_dirty = TRUE;
+    }
 
     sel->map[sel->wid * y + x] = (char) (c + 1);
 }
@@ -4436,14 +4560,17 @@ selection_filter_mapchar(struct selectionvar* ov,  xint16 typ, int lit)
 {
     int x, y;
     struct selectionvar *ret;
+    NhRect rect;
 
     if (!ov)
         return NULL;
 
     ret = selection_new();
 
-    for (x = 1; x < ret->wid; x++)
-        for (y = 0; y < ret->hei; y++)
+    selection_getbounds(ov, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
             if (selection_getpoint(x, y, ov)
                 && match_maptyps(typ, levl[x][y].typ)) {
                 switch (lit) {
@@ -4469,16 +4596,20 @@ selection_filter_percent(struct selectionvar* ov, int percent)
 {
     int x, y;
     struct selectionvar *ret;
+    NhRect rect;
 
     if (!ov)
         return NULL;
 
     ret = selection_new();
 
-    for (x = 0; x < ov->wid; x++)
-        for (y = 0; y < ov->hei; y++)
+    selection_getbounds(ov, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
             if (selection_getpoint(x, y, ov) && (rn2(100) < percent))
                 selection_setpoint(x, y, ret, 1);
+
     return ret;
 }
 
@@ -4488,16 +4619,19 @@ selection_rndcoord(struct selectionvar* ov, coordxy *x, coordxy *y, boolean remo
     int idx = 0;
     int c;
     int dx, dy;
+    NhRect rect;
 
-    for (dx = 1; dx < ov->wid; dx++)
-        for (dy = 0; dy < ov->hei; dy++)
+    selection_getbounds(ov, &rect);
+
+    for (dx = rect.lx; dx <= rect.hx; dx++)
+        for (dy = rect.ly; dy <= rect.hy; dy++)
             if (selection_getpoint(dx, dy, ov))
                 idx++;
 
     if (idx) {
         c = rn2(idx);
-        for (dx = 1; dx < ov->wid; dx++)
-            for (dy = 0; dy < ov->hei; dy++)
+        for (dx = rect.lx; dx <= rect.hx; dx++)
+            for (dy = rect.ly; dy <= rect.hy; dy++)
                 if (selection_getpoint(dx, dy, ov)) {
                     if (!c) {
                         *x = dx;
@@ -4526,6 +4660,7 @@ selection_do_grow(struct selectionvar* ov, int dir)
 {
     coordxy x, y;
     struct selectionvar *tmp;
+    NhRect rect;
 
     if (!ov)
         return;
@@ -4535,8 +4670,10 @@ selection_do_grow(struct selectionvar* ov, int dir)
     if (dir == W_RANDOM)
         dir = random_wdir();
 
-    for (x = 1; x < ov->wid; x++)
-        for (y = 0; y < ov->hei; y++) {
+    selection_getbounds(ov, &rect);
+
+    for (x = max(0, rect.lx-1); x <= min(COLNO-1, rect.hx+1); x++)
+        for (y = max(0, rect.ly-1); y <= min(ROWNO-1, rect.hy+1); y++) {
             /* note:  dir is a mask of multiple directions, but the only
                way to specify diagonals is by including the two adjacent
                orthogonal directions, which effectively specifies three-
@@ -4557,8 +4694,10 @@ selection_do_grow(struct selectionvar* ov, int dir)
             }
         }
 
-    for (x = 1; x < ov->wid; x++)
-        for (y = 0; y < ov->hei; y++)
+    selection_getbounds(tmp, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
             if (selection_getpoint(x, y, tmp))
                 selection_setpoint(x, y, ov, 1);
 
@@ -4943,13 +5082,15 @@ selection_iterate(
     genericptr_t arg)
 {
     coordxy x, y;
+    NhRect rect;
 
     if (!ov)
         return;
 
-    /* yes, this is very naive, but it's not _that_ expensive. */
-    for (x = 0; x < ov->wid; x++)
-        for (y = 0; y < ov->hei; y++)
+    selection_getbounds(ov, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
             if (isok(x,y) && selection_getpoint(x, y, ov))
                 (*func)(x, y, arg);
 }
@@ -5278,6 +5419,7 @@ lspo_replace_terrain(lua_State *L)
     lua_Integer x1, y1, x2, y2;
     int chance;
     int tolit;
+    NhRect rect;
 
     create_des_coder();
 
@@ -5325,7 +5467,7 @@ lspo_replace_terrain(lua_State *L)
         freesel = TRUE;
 
         if (x1 == -1 && y1 == -1 && x2 == -1 && y2 == -1) {
-            (void) selection_not(sel);
+            (void) selection_clear(sel, 1);
         } else {
             coordxy rx1, ry1, rx2, ry2;
             rx1 = x1, ry1 = y1, rx2 = x2, ry2 = y2;
@@ -5337,8 +5479,10 @@ lspo_replace_terrain(lua_State *L)
         }
     }
 
-    for (y = 0; y <= sel->hei; y++)
-        for (x = 1; x < sel->wid; x++)
+    selection_getbounds(sel, &rect);
+
+    for (x = max(1, rect.lx); x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
             if (selection_getpoint(x, y,sel)) {
                 if (mf) {
                     if (mapfrag_match(mf, x, y) && (rn2(100)) < chance)
@@ -6059,7 +6203,7 @@ set_wallprop_in_selection(lua_State *L, int prop)
     } else if (argc == 0) {
         freesel = TRUE;
         sel = selection_new();
-        selection_not(sel);
+        selection_clear(sel, 1);
     }
 
     if (sel) {

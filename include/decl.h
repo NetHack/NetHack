@@ -399,6 +399,8 @@ E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct selectionvar {
     int wid, hei;
+    boolean bounds_dirty;
+    NhRect bounds; /* use selection_getbounds() */
     char *map;
 };
 
