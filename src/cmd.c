@@ -15,6 +15,9 @@
 #define NR_OF_EOFS 20
 #endif
 #endif
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+static int wiz_display_macros(void);
+#endif
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
 extern int doapply(void);            /**/
@@ -2744,6 +2747,10 @@ struct ext_func_tab extcmdlist[] = {
 #endif
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+    { '\0',   "wizdispmacros", "validate the display macro ranges",
+              wiz_display_macros, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+#endif
     { '\0',   "wizfliplevel", "flip the level",
               wiz_flip_level, IFBURIED | WIZMODECMD, NULL },
     { C('g'), "wizgenesis", "create a monster",
@@ -3991,6 +3998,79 @@ wiz_show_stats(void)
     destroy_nhwindow(win);
     return ECMD_OK;
 }
+
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+/* the #wizdispmacros command
+ * Verify that the display macros are correct */
+static int
+wiz_display_macros(void)
+{
+    char buf[BUFSZ];
+    winid win;
+    int test, trouble = 0, no_glyph = NO_GLYPH, max_glyph = MAX_GLYPH;
+    static const char *const display_issues = "Display macro issues:";
+
+    win = create_nhwindow(NHW_TEXT);
+
+    for (int glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+        /* glyph_is_cmap / glyph_to_cmap() */
+        if (glyph_is_cmap(glyph)) {
+            test = glyph_to_cmap(glyph);
+            /* check for MAX_GLYPH return */
+            if (test == no_glyph) {
+                if (!trouble++)
+                    putstr(win, 0, display_issues);
+                Sprintf(buf,
+                        "glyph_is_cmap() / glyph_to_cmap(glyph=%d)"
+                        " sync failure, returned NO_GLYPH (%d)",
+                        glyph, test);
+                 putstr(win, 0, buf);
+            }
+            /* check against defsyms array subscripts */
+            if (test < 0 || test >= SIZE(defsyms)) {
+                if (!trouble++)
+                    putstr(win, 0, display_issues);
+                Sprintf(buf, "glyph_to_cmap(glyph=%d) returns %d"
+                        " exceeds defsyms[%d] bounds (MAX_GLYPH = %d)",
+                        glyph, test, SIZE(defsyms), max_glyph);
+                putstr(win, 0, buf);
+            }
+        }
+        /* glyph_is_monster / glyph_to_mon */
+        if (glyph_is_monster(glyph)) {
+            test = glyph_to_mon(glyph);
+            /* check against mons array subscripts */
+            if (test < 0 || test >= NUMMONS) {
+                if (!trouble++)
+                    putstr(win, 0, display_issues);
+                Sprintf(buf, "glyph_to_mon(glyph=%d) returns %d"
+                        " exceeds mons[%d] bounds",
+                        glyph, test, NUMMONS);
+                putstr(win, 0, buf);
+            }
+        }
+        /* glyph_is_object / glyph_to_obj */
+        if (glyph_is_object(glyph)) {
+            test = glyph_to_obj(glyph);
+            /* check against objects array subscripts */
+            if (test < 0 || test > NUM_OBJECTS) {
+                if (!trouble++)
+                    putstr(win, 0, display_issues);
+                Sprintf(buf, "glyph_to_obj(glyph=%d) returns %d"
+                        " exceeds objects[%d] bounds",
+                        glyph, test, NUM_OBJECTS);
+                putstr(win, 0, buf);
+            }
+        }
+    }
+    if (!trouble)
+        putstr(win, 0, "No display macro issues detected");
+    putstr(win, 0, buf);
+    display_nhwindow(win, FALSE);
+    destroy_nhwindow(win);
+    return ECMD_OK;
+}
+#endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
