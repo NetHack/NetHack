@@ -729,11 +729,9 @@ enum glyph_offsets {
                     ? (S_altar)                                        \
                     : glyph_is_cmap_b(glyph)                           \
                       ? (((glyph) - GLYPH_CMAP_B_OFF) + S_grave)       \
-                      : glyph_is_cmap_zap(glyph)                       \
-                        ? (((glyph) - GLYPH_ZAP_OFF) + S_vbeam)        \
-                        : glyph_is_cmap_c(glyph)                       \
-                          ? (((glyph) - GLYPH_CMAP_C_OFF) + S_digbeam) \
-                          : NO_GLYPH)
+                      : glyph_is_cmap_c(glyph)                         \
+                        ? (((glyph) - GLYPH_CMAP_C_OFF) + S_digbeam)   \
+                        : NO_GLYPH)
 
 #define glyph_to_swallow(glyph) \
     (glyph_is_swallow(glyph) ? (((glyph) - GLYPH_SWALLOW_OFF) & 0x7) : 0)
