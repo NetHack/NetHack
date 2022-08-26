@@ -4590,14 +4590,6 @@ readobjnam(char *bp, struct obj *no_wish)
     d.otmp = d.typ ? mksobj(d.typ, TRUE, FALSE) : mkobj(d.oclass, FALSE);
     d.typ = d.otmp->otyp, d.oclass = d.otmp->oclass; /* what we actually got */
 
-    if (d.islit && (d.typ == OIL_LAMP || d.typ == MAGIC_LAMP
-                    || d.typ == BRASS_LANTERN
-                    || Is_candle(d.otmp) || d.typ == POT_OIL)) {
-        place_object(d.otmp, u.ux, u.uy); /* make it viable light source */
-        begin_burn(d.otmp, FALSE);
-        obj_extract_self(d.otmp); /* now release it for caller's use */
-    }
-
     /* if player specified a reasonable count, maybe honor it;
        quantity for gold is handled elsewhere and d.cnt is 0 for it here */
     if (d.otmp->globby) {
@@ -4642,6 +4634,14 @@ readobjnam(char *bp, struct obj *no_wish)
                         /* WEAPON_CLASS test excludes gems, gray stones */
                         || (d.oclass == WEAPON_CLASS && is_ammo(d.otmp))))))
             d.otmp->quan = (long) d.cnt;
+    }
+
+    if (d.islit && (d.typ == OIL_LAMP || d.typ == MAGIC_LAMP
+                    || d.typ == BRASS_LANTERN
+                    || Is_candle(d.otmp) || d.typ == POT_OIL)) {
+        place_object(d.otmp, u.ux, u.uy); /* make it viable light source */
+        begin_burn(d.otmp, FALSE);
+        obj_extract_self(d.otmp); /* now release it for caller's use */
     }
 
     if (d.spesgn == 0) {
