@@ -15,7 +15,7 @@ function initlev()
    des.teleport_region({ region = {POS.x,POS.y,POS.x,POS.y}, region_islev = true, dir="both" });
    des.finalize_level();
    for k, v in pairs(nh.stairways()) do
-      des.terrain(v.x - 1, v.y, ".");
+      des.terrain(v.x, v.y, ".");
    end
 end
 
