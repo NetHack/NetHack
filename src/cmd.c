@@ -4065,7 +4065,6 @@ wiz_display_macros(void)
     }
     if (!trouble)
         putstr(win, 0, "No display macro issues detected");
-    putstr(win, 0, buf);
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;
