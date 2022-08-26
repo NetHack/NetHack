@@ -910,24 +910,15 @@ fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
  *  - determination of what files are "very old"
  */
 
-/* TIME_type: type of the argument to time(); we actually use &(time_t) */
-#if defined(BSD) && !defined(POSIX_TYPES)
-#define TIME_type long *
-#else
+/* TIME_type: type of the argument to time(); we actually use &(time_t);
+   you might need to define either or both of these to 'long *' in *conf.h */
+#ifndef TIME_type
 #define TIME_type time_t *
 #endif
-/* LOCALTIME_type: type of the argument to localtime() */
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) \
-    || (defined(BSD) && !defined(POSIX_TYPES))
-#define LOCALTIME_type long *
-#else
+#ifndef LOCALTIME_type
 #define LOCALTIME_type time_t *
 #endif
 
-#if defined(AMIGA) && !defined(AZTEC_C) && !defined(__SASC_60) \
-    && !defined(_DCC) && !defined(__GNUC__)
-extern struct tm *localtime(time_t *);
-#endif
 static struct tm *getlt(void);
 
 /* Sets the seed for the random number generator */
@@ -1088,12 +1079,8 @@ yyyymmddhhmmss(time_t date)
     if (date == 0)
         lt = getlt();
     else
-#if (defined(ULTRIX) && !(defined(ULTRIX_PROTO) || defined(NHSTDC))) \
-    || defined(BSD)
-        lt = localtime((long *) (&date));
-#else
-        lt = localtime(&date);
-#endif
+        lt = localtime((LOCALTIME_type) &date);
+
     /* just in case somebody's localtime supplies (year % 100)
        rather than the expected (year - 1900) */
     if (lt->tm_year < 70)

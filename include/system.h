@@ -534,22 +534,13 @@ E genericptr_t realloc(genericptr_t, size_t);
 
 /* time functions */
 
-#ifndef LATTICE
-#if !(defined(ULTRIX_PROTO) && defined(__GNUC__))
+#ifdef NEED_TIME_DECL
+E time_t time(time_t *);
+#endif
+#ifdef NEED_LOCALTIME_DECL
 E struct tm *localtime(const time_t *);
 #endif
-#endif
-
-#if defined(ULTRIX) || (defined(BSD) && defined(POSIX_TYPES))          \
-    || defined(SYSV) || defined(MICRO) || defined(VMS) || defined(MAC) \
-    || (defined(HPUX) && defined(_POSIX_SOURCE))
-E time_t time(time_t *);
-#else
-E long time(time_t *);
-#endif /* ULTRIX */
-
-#ifdef VMS
-/* used in makedefs.c, but missing from gcc-vms's <time.h> */
+#ifdef NEED_CTIME_DECL
 E char *ctime(const time_t *);
 #endif
 

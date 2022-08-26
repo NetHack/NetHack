@@ -296,6 +296,16 @@
 #include <time.h>
 #endif
 
+/* these might be needed for include/system.h;
+   default comes from system's time.h */
+/* #define NEED_TIME_DECL 1 */
+/* #define NEED_LOCALTIME_DECL 1 */
+/* #define NEED_CTIME_DECL 1 */
+/* these might be needed for src/hacklib.c;
+   default is 'time_t *' */
+/* #define TIME_type long * */
+/* #define LOCALTIME_type long * */
+
 #define HLOCK "perm" /* an empty file used for locking purposes */
 
 #define tgetch getchar
