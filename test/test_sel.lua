@@ -467,6 +467,20 @@ function test_sel_iterate()
    is_map_at(5,5, "L");
    is_map_at(7,5, "L");
    is_map_at(9,5, "L");
+
+end
+
+function test_sel_bounds()
+   local __func__ = "test_sel_bounds";
+   local sel = selection.new();
+   sel:set(5, 5);
+   sel:set(7, 5);
+   sel:set(5, 6);
+
+   local rect = sel:bounds();
+   if (rect.lx ~= (5 + 1) or rect.ly ~= 5 or rect.hx ~= (7 + 1) or rect.hy ~= 6) then
+      error(string.format("selection bounds error:(%i,%i-%i,%i)", rect.lx, rect.ly, rect.hx, rect.hy));
+   end
 end
 
 nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
@@ -487,3 +501,4 @@ test_sel_filter_mapchar();
 test_sel_flood();
 test_sel_match();
 test_sel_iterate();
+test_sel_bounds();

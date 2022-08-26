@@ -17,6 +17,7 @@ static int l_selection_getpoint(lua_State *);
 static int l_selection_setpoint(lua_State *);
 static int l_selection_filter_percent(lua_State *);
 static int l_selection_rndcoord(lua_State *);
+static int l_selection_getbounds(lua_State *);
 static boolean params_sel_2coords(lua_State *, struct selectionvar **,
                                   coordxy *, coordxy *, coordxy *, coordxy *);
 static int l_selection_line(lua_State *);
@@ -379,6 +380,23 @@ l_selection_rndcoord(lua_State *L)
     lua_newtable(L);
     nhl_add_table_entry_int(L, "x", x);
     nhl_add_table_entry_int(L, "y", y);
+    return 1;
+}
+
+/* local rect = sel:bounds(); */
+static int
+l_selection_getbounds(lua_State *L)
+{
+    struct selectionvar *sel = l_selection_check(L, 1);
+    NhRect rect;
+
+    selection_getbounds(sel, &rect);
+    lua_settop(L, 0);
+    lua_newtable(L);
+    nhl_add_table_entry_int(L, "lx", rect.lx);
+    nhl_add_table_entry_int(L, "ly", rect.ly);
+    nhl_add_table_entry_int(L, "hx", rect.hx);
+    nhl_add_table_entry_int(L, "hy", rect.hy);
     return 1;
 }
 
@@ -875,6 +893,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "ellipse", l_selection_ellipse },
     { "gradient", l_selection_gradient },
     { "iterate", l_selection_iterate },
+    { "bounds", l_selection_getbounds },
     { NULL, NULL }
 };
 

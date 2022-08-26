@@ -891,6 +891,16 @@ Example:
 
 Alias for <<_fillrect>>.
 
+=== bounds
+
+Get the bounding box for the selection. Returns a table with lx, ly, hx, hy integer fields.
+
+Example:
+
+ local rect = sel:bounds();
+ local s = string.format("(%i,%i)-(%i,%i)", rect.lx, rect.ly, rect.hx, rect.hy));
+
+
 === circle
 
 Example:
