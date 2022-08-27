@@ -4001,7 +4001,7 @@ wiz_show_stats(void)
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 /* the #wizdispmacros command
- * Verify that the display macros are correct */
+ * Verify that some display macros are returning sane values */
 static int
 wiz_display_macros(void)
 {
@@ -4028,8 +4028,10 @@ wiz_display_macros(void)
             }
             if (glyph_is_cmap_zap(glyph)
                 && !(test >= S_vbeam && test <= S_rslant)) {
+                if (!trouble++)
+                    putstr(win, 0, display_issues);
                 Sprintf(buf,
-                        "glyph_is_zap(glyph=%d) returned non-zap cmap %d",
+                        "glyph_is_cmap_zap(glyph=%d) returned non-zap cmap %d",
                         glyph, test);
                  putstr(win, 0, buf);
             }
