@@ -4026,6 +4026,13 @@ wiz_display_macros(void)
                         glyph, test);
                  putstr(win, 0, buf);
             }
+            if (glyph_is_cmap_zap(glyph)
+                && !(test >= S_vbeam && test <= S_rslant)) {
+                Sprintf(buf,
+                        "glyph_is_zap(glyph=%d) returned non-zap cmap %d",
+                        glyph, test);
+                 putstr(win, 0, buf);
+            }
             /* check against defsyms array subscripts */
             if (test < 0 || test >= SIZE(defsyms)) {
                 if (!trouble++)
