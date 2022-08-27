@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1658093068 2022/07/17 21:24:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.493 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1661633977 2022/08/27 20:59:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.502 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6186,8 +6186,9 @@ maybe_finish_sokoban(void)
 
             /* log the completion event regardless of whether or not
                any normal in-game feedback has just been given */
-            livelog_printf(LL_MINORAC | LL_DUMP, "completed sokoban %d",
-                           sokonum);
+            livelog_printf(LL_MINORAC | LL_DUMP,
+                           "completed %d%s Sokoban level",
+                           sokonum, ordin(sokonum));
         }
     }
 }
