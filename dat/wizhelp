@@ -9,6 +9,8 @@ Debug-Mode Quick Reference:
 ^W  ==  make a wish for an item or a trap or a limited subset of terrain
 ^X  ==  show status, attributes, and characteristics (extended enlightenment)
 
+#debugfuzzer    == set game to run on autopilot; keeps going until failure;
+                   escalates impossible warnings to panic
 #levelchange    == set hero's experience level
 #lightsources   == show mobile light sources
 #migratemons    == show migrating monsters; optionally create some
@@ -22,15 +24,23 @@ Debug-Mode Quick Reference:
 #wizborn        == show monster birth/death/geno/extinct stats
 #wizfliplevel   == transpose the current dungeon level
 #wizintrinsic   == set selected intrinsic timeouts
+#wizkill        == remove monster(s) from play
+#wizloaddes     == load and execute a special level description lua script
+#wizloadlua     == load and execute a lua script
 #wizmakemap     == recreate the current dungeon level
 #wizrumorcheck  == validate rumor indexing; also show first, second, and last
                    random engravings, epitaphs, and hallucinatory monsters
 #wizseenv       == show map locations' seen vectors
 #wizsmell       == smell a monster
+#wiztelekinesis == magically shove a monster
 #wizwhere       == show dungeon placement of all special levels
 #wmode          == show wall modes
 
 Options:
+debug_hunger    == disable hero's hunger
+debug_mongen    == disable random monster generation
+debug_overwrite_stairs
+                == allows stairs to be replaced by other terrain
 monpolycontrol  == prompt for new form whenever any monster changes shape
 sanity_check    == evaluate monsters, objects, and map prior to each turn
 wizweight       == augment object descriptions with their objects' weight
