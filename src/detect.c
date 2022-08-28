@@ -35,6 +35,16 @@ static int reveal_terrain_getglyph(coordxy, coordxy, int, unsigned, int, int);
    that aren't used are compile-/link-/load-time initialized to 0 */
 static struct trap dummytrap;
 
+/* data for enhanced feedback from findone() */
+struct found_things {
+    uchar num_sdoors;
+    uchar num_scorrs;
+    uchar num_traps;
+    uchar num_mons;
+    uchar num_invis;
+    uchar num_cleared_invis;
+};
+
 /* wildcard class for clear_stale_map - this used to be used as a getobj()
    input but it's no longer used for that function */
 #define ALL_CLASSES (MAXOCLASSES + 1)
@@ -1542,7 +1552,7 @@ cvt_sdoor_to_door(struct rm *lev)
 /* find something at one location; it should find all somethings there
    since it is used for magical detection rather than physical searching */
 static void
-findone(coordxy zx, coordxy zy, genericptr_t num)
+findone(coordxy zx, coordxy zy, genericptr_t whatfound)
 {
     register struct trap *ttmp;
     register struct monst *mtmp;
@@ -1558,13 +1568,13 @@ findone(coordxy zx, coordxy zy, genericptr_t num)
         cvt_sdoor_to_door(&levl[zx][zy]); /* .typ = DOOR */
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
-        (*(int *) num)++;
+        ((struct found_things *) whatfound)->num_sdoors++;
     } else if (levl[zx][zy].typ == SCORR) {
         levl[zx][zy].typ = CORR;
         unblock_point(zx, zy);
         magic_map_background(zx, zy, 0);
         newsym(zx, zy);
-        (*(int *) num)++;
+        ((struct found_things *) whatfound)->num_scorrs++;
     }
 
     if ((ttmp = t_at(zx, zy)) != 0 && !ttmp->tseen
@@ -1572,7 +1582,7 @@ findone(coordxy zx, coordxy zy, genericptr_t num)
         && ttmp->ttyp != STATUE_TRAP) {
         ttmp->tseen = 1;
         newsym(zx, zy);
-        (*(int *) num)++;
+        ((struct found_things *) whatfound)->num_traps++;
     }
 
     if ((mtmp = m_at(zx, zy)) != 0
@@ -1580,18 +1590,20 @@ findone(coordxy zx, coordxy zy, genericptr_t num)
         && (!canspotmon(mtmp) || mtmp->mundetected || M_AP_TYPE(mtmp))) {
         if (M_AP_TYPE(mtmp)) {
             seemimic(mtmp);
-            (*(int *) num)++;
+            ((struct found_things *) whatfound)->num_mons++;
         } else if (mtmp->mundetected && (is_hider(mtmp->data)
                                          || hides_under(mtmp->data)
                                          || mtmp->data->mlet == S_EEL)) {
             mtmp->mundetected = 0;
             newsym(zx, zy);
-            (*(int *) num)++;
+            ((struct found_things *) whatfound)->num_mons++;
         }
-        if (!canspotmon(mtmp) && !glyph_is_invisible(levl[zx][zy].glyph))
+        if (!canspotmon(mtmp) && !glyph_is_invisible(levl[zx][zy].glyph)) {
             map_invisible(zx, zy);
+            ((struct found_things *) whatfound)->num_invis++;
+        }
     } else if (unmap_invisible(zx, zy)) {
-        (*(int *) num)++;
+        ((struct found_things *) whatfound)->num_cleared_invis++;
     }
 }
 
@@ -1662,10 +1674,41 @@ int
 findit(void)
 {
     int num = 0;
+    struct found_things found = {0};
 
     if (u.uswallow)
         return 0;
-    do_clear_area(u.ux, u.uy, BOLT_LIM, findone, (genericptr_t) &num);
+    do_clear_area(u.ux, u.uy, BOLT_LIM, findone, (genericptr_t) &found);
+
+    if (found.num_sdoors)
+        You("reveal %ssecret door%s!", found.num_sdoors == 1 ? "a " : "",
+            found.num_sdoors == 1 ? "" : "s");
+    num += found.num_sdoors;
+
+    if (found.num_scorrs)
+        You("reveal %ssecret corridor%s!", found.num_scorrs == 1 ? "a " : "",
+            found.num_scorrs == 1 ? "" : "s");
+    num += found.num_scorrs;
+
+    if (found.num_traps)
+        You("reveal %strap%s!", found.num_traps == 1 ? "a " : "",
+            found.num_traps == 1 ? "" : "s");
+    num += found.num_traps;
+
+    if (found.num_mons)
+        You("reveal %shidden monster%s!", found.num_mons == 1 ? "a " : "",
+            found.num_mons == 1 ? "" : "s");
+    num += found.num_mons;
+
+    if (found.num_invis)
+        You("detect %sinvisible monster%s!", found.num_invis == 1 ? "an " : "",
+            found.num_invis == 1 ? "" : "s");
+    num += found.num_invis;
+
+    if (!num && found.num_cleared_invis)
+        You_feel("less paranoid.");
+    num += found.num_cleared_invis;
+
     return num;
 }
 
