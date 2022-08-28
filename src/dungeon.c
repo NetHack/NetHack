@@ -1975,6 +1975,14 @@ level_difficulty(void)
     return res;
 }
 
+/* within same branch, or else main dungeon <-> gehennom */
+#define dlev_in_current_branch(dlev) \
+    (dlev.dnum == u.uz.dnum \
+     || (u.uz.dnum == valley_level.dnum \
+         && dlev.dnum == medusa_level.dnum) \
+     || (u.uz.dnum == medusa_level.dnum \
+         && dlev.dnum == valley_level.dnum))
+
 /* Take one word and try to match it to a level.
  * Recognized levels are as shown by print_dungeon().
  */
@@ -1982,7 +1990,7 @@ schar
 lev_by_name(const char *nam)
 {
     schar lev = 0;
-    s_level *slev = (s_level *)0;
+    s_level *slev = (s_level *) 0;
     d_level dlev;
     const char *p;
     int idx, idxtoo;
@@ -2017,12 +2025,7 @@ lev_by_name(const char *nam)
 
     if (mseen || slev) {
         idx = ledger_no(&dlev);
-        if ((dlev.dnum == u.uz.dnum
-             /* within same branch, or else main dungeon <-> gehennom */
-             || (u.uz.dnum == valley_level.dnum
-                 && dlev.dnum == medusa_level.dnum)
-             || (u.uz.dnum == medusa_level.dnum
-                 && dlev.dnum == valley_level.dnum))
+        if (dlev_in_current_branch(dlev)
             && (/* either wizard mode or else seen and not forgotten */
                 wizard
                 || (g.level_info[idx].flags & (VISITED))
@@ -2048,12 +2051,15 @@ lev_by_name(const char *nam)
                     idx = idxtoo;
                 dlev.dnum = ledger_to_dnum(idx);
                 dlev.dlevel = ledger_to_dlev(idx);
-                lev = depth(&dlev);
+                if (dlev_in_current_branch(dlev))
+                    lev = depth(&dlev);
             }
         }
     }
     return lev;
 }
+
+#undef dlev_in_current_branch
 
 static boolean
 unplaced_floater(struct dungeon *dptr)
