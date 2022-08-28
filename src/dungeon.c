@@ -1977,10 +1977,10 @@ level_difficulty(void)
 
 /* within same branch, or else main dungeon <-> gehennom */
 #define dlev_in_current_branch(dlev) \
-    (dlev.dnum == u.uz.dnum \
-     || (u.uz.dnum == valley_level.dnum \
-         && dlev.dnum == medusa_level.dnum) \
-     || (u.uz.dnum == medusa_level.dnum \
+    (dlev.dnum == u.uz.dnum                     \
+     || (u.uz.dnum == valley_level.dnum         \
+         && dlev.dnum == medusa_level.dnum)     \
+     || (u.uz.dnum == medusa_level.dnum         \
          && dlev.dnum == valley_level.dnum))
 
 /* Take one word and try to match it to a level.
@@ -2026,10 +2026,10 @@ lev_by_name(const char *nam)
     if (mseen || slev) {
         idx = ledger_no(&dlev);
         if (dlev_in_current_branch(dlev)
-            && (/* either wizard mode or else seen and not forgotten */
-                wizard
-                || (g.level_info[idx].flags & (VISITED))
-                       == VISITED)) {
+            /* either wizard mode or else seen and not forgotten;
+               note: used to be '(flags & (FORGOTTEN|VISITED)) == VISITED'
+               back when amnesia could cause levels to be forgotten */
+            && (wizard || (g.level_info[idx].flags & (VISITED)) == VISITED)) {
             lev = depth(&dlev);
         }
     } else { /* not a specific level; try branch names */
@@ -2042,11 +2042,9 @@ lev_by_name(const char *nam)
             idxtoo = (idx >> 8) & 0x00FF;
             idx &= 0x00FF;
             /* either wizard mode, or else _both_ sides of branch seen */
-            if (wizard
-                || (((g.level_info[idx].flags & (VISITED))
-                     == VISITED)
-                    && ((g.level_info[idxtoo].flags & (VISITED))
-                        == VISITED))) {
+            if (wizard || (((g.level_info[idx].flags & (VISITED)) == VISITED)
+                           && ((g.level_info[idxtoo].flags & (VISITED))
+                               == VISITED))) {
                 if (ledger_to_dnum(idxtoo) == u.uz.dnum)
                     idx = idxtoo;
                 dlev.dnum = ledger_to_dnum(idx);
