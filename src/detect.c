@@ -1751,7 +1751,7 @@ mfind0(struct monst *mtmp, boolean via_warning)
         if (mtmp->mundetected && (is_hider(mtmp->data)
                                   || hides_under(mtmp->data)
                                   || mtmp->data->mlet == S_EEL)) {
-            if (via_warning) {
+            if (via_warning && found_something) {
                 Your("danger sense causes you to take a second %s.",
                      Blind ? "to check nearby" : "look close by");
                 display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
