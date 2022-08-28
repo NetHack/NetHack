@@ -354,7 +354,10 @@ extern char *curses_fmt_attrs(char *);
  **********************************
  */
 boolean
-parseoptions(register char *opts, boolean tinitial, boolean tfrom_file)
+parseoptions(
+    register char *opts,
+    boolean tinitial,
+    boolean tfrom_file)
 {
     char *op;
     boolean negated, got_match = FALSE, pfx_match = FALSE;
@@ -6242,6 +6245,17 @@ initoptions_init(void)
     memcpy(allopt, allopt_init, sizeof(allopt));
     determine_ambiguities();
 
+    /* if windowtype has been specified on the command line, set it up
+       early so windowtype-specific options use it as their base; we will
+       set it again in initoptions_finish() so that NETHACKOPTIONS and
+       .nethrackrc can't override it (command line takes precedence) */
+    if (g.cmdline_windowsys) {
+        config_error_init(FALSE, "command line", FALSE);
+        choose_windows(g.cmdline_windowsys);
+        config_error_done();
+        /* do not free g.cmdline_windowsys yet */
+    }
+
 #ifdef ENHANCED_SYMBOLS
     /* make any symbol parsing quicker */
     if (!glyphid_cache_status())
@@ -6450,6 +6464,14 @@ initoptions_finish(void)
         config_error_init(FALSE, envname, FALSE);
         (void) parseoptions(xtraopts, TRUE, FALSE);
         config_error_done();
+    }
+
+    /* after .nethackrc and NETHACKOPTIONS so that cmdline takes precedence */
+    if (g.cmdline_windowsys) {
+        config_error_init(FALSE, "command line", FALSE);
+        choose_windows(g.cmdline_windowsys);
+        config_error_done();
+        free((genericptr_t) g.cmdline_windowsys), g.cmdline_windowsys = NULL;
     }
 
     if (g.cmdline_rcfile)
@@ -9511,4 +9533,3 @@ enhance_menu_text(
 #endif /* OPTION_LISTS_ONLY */
 
 /*options.c*/
-

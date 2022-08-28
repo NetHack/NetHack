@@ -1369,6 +1369,10 @@ end of game with DUMPLOG could panic due to perm_invent handling, even when
 with color Off and the screen symbol for ice the same as for floor, the black
 	and white ice was supposed to be rendered in inverse video but that
 	got broken by the symbols and glyphs overhaul
+command line processing interleaved with options file processing is complex:
+	a recent change to make 'color' show up for tty in the short options
+	menu resulted in 'nethack --windowtype:X11' running X11 with ascii map
+	('NETHACKOPTIONS=windowtype:X11 nethack' continued to default to tiles)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

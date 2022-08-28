@@ -1087,6 +1087,7 @@ struct instance_globals {
     boolean opt_from_file;
     boolean opt_need_redraw; /* for doset() */
     boolean opt_need_glyph_reset;
+    char *cmdline_windowsys; /* set in unixmain.c */
     /* use menucolors to show colors in the pick-a-color menu */
     boolean save_menucolors; /* copy of iflags.use_menu_colors */
     struct menucoloring *save_colorings; /* copy of g.menu_colorings */

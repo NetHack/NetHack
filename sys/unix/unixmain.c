@@ -376,7 +376,7 @@ lopt(
     return p;
 }
 
-/* caveat: argv elements might be arbitrary long */
+/* caveat: argv elements might be arbitrarily long */
 static void
 process_options(int argc, char *argv[])
 {
@@ -478,14 +478,6 @@ process_options(int argc, char *argv[])
                 if ((i = str2race(argv[0])) >= 0)
                     flags.initrace = i;
             }
-            break;
-        case 'w': /* windowtype: "-wfoo" or "-w[indowtype]=foo"
-                   * or "-w[indowtype]:foo" or "-w[indowtype] foo" */
-            arg = lopt(arg,
-                       (ArgValRequired | ArgNamOneLetter | ArgErrComplain),
-                       "-windowtype", origarg, &argc, &argv);
-            if (arg)
-                choose_windows(arg);
             break;
         case '@':
             flags.randomall = 1;
@@ -666,6 +658,15 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
                 opt_terminate();
                 /*NOTREACHED*/
             }
+            break;
+        case 'w': /* windowtype: "-wfoo" or "-w[indowtype]=foo"
+                   * or "-w[indowtype]:foo" or "-w[indowtype] foo" */
+            arg = lopt(arg,
+                       (ArgValRequired | ArgNamOneLetter | ArgErrComplain),
+                       "-windowtype", origarg, &argc, &argv);
+            if (g.cmdline_windowsys)
+                free((genericptr_t) g.cmdline_windowsys);
+            g.cmdline_windowsys = arg ? dupstr(arg) : NULL;
             break;
         default:
             break;

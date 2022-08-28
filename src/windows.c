@@ -311,8 +311,7 @@ choose_windows(const char *s)
     if (tmps)
         free((genericptr_t) tmps) /*, tmps = 0*/ ;
 
-    if (windowprocs.win_raw_print == def_raw_print
-            || WINDOWPORT(safestartup))
+    if (windowprocs.win_raw_print == def_raw_print || WINDOWPORT(safestartup))
         nh_terminate(EXIT_SUCCESS);
 }
 

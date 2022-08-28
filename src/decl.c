@@ -528,6 +528,7 @@ const struct instance_globals g_init = {
     FALSE, /* opt_from_file */
     FALSE, /* opt_need_redraw */
     FALSE, /* opt_need_glyph_reset */
+    NULL, /* cmdline_windowsys */
     FALSE, /* save_menucolors */
     (struct menucoloring *) 0, /* save_colorings */
     (struct menucoloring *) 0, /* color_colorings */
