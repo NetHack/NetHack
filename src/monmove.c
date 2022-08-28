@@ -1403,8 +1403,8 @@ m_move(register struct monst* mtmp, register int after)
 
         cnt = mfndpos(mtmp, poss, info, flag);
         if (cnt == 0) {
-            if (find_defensive(mtmp, TRUE))
-                (void) use_defensive(mtmp);
+            if (find_defensive(mtmp, TRUE) && use_defensive(mtmp))
+                return MMOVE_DONE;
             return MMOVE_NOMOVES;
         }
         chcnt = 0;
