@@ -457,8 +457,6 @@ pgetchar(void) /* courtesy of aeb@cwi.nl */
 {
     register int ch = '\0';
 
-    if (g.occupation)
-        return '\0';
     if (iflags.debug_fuzzer)
         return randomkey();
     ch = nhgetch();
