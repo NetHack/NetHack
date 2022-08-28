@@ -786,6 +786,7 @@ dump_everything(
     putstr(0, 0, pbuf);
     putstr(0, 0, "");
 
+    /* info about current game state */
     dump_map();
     putstr(0, 0, do_statusline1());
     putstr(0, 0, do_statusline2());
@@ -793,13 +794,15 @@ dump_everything(
 
     dump_plines();
     putstr(0, 0, "");
-    show_gamelog((how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
-    putstr(0, 0, "");
     putstr(0, 0, "Inventory:");
     (void) display_inventory((char *) 0, TRUE);
     container_contents(g.invent, TRUE, TRUE, FALSE);
     enlightenment((BASICENLIGHTENMENT | MAGICENLIGHTENMENT),
                   (how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
+    putstr(0, 0, "");
+
+    /* overview of the game up to this point */
+    show_gamelog((how >= PANICKED) ? ENL_GAMEOVERALIVE : ENL_GAMEOVERDEAD);
     putstr(0, 0, "");
     list_vanquished('d', FALSE); /* 'd' => 'y' */
     putstr(0, 0, "");
