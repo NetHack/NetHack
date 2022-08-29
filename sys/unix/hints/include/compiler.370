@@ -51,7 +51,7 @@ endif   # clang
 #CXX=clang++ -std=gnu++11
 
 CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
-CFLAGS+=-Wall -Wextra \
+CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
@@ -67,7 +67,7 @@ CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
 
 CCXXFLAGS = -g -I../include -DNOTPARMDECL
-CCXXFLAGS+=-Wall -Wextra \
+CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
         -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CCXXFLAGS+=-pedantic
 CCXXFLAGS+=-Wmissing-declarations
