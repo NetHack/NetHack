@@ -3429,7 +3429,20 @@ get_table_objtype(lua_State *L)
 int
 lspo_object(lua_State *L)
 {
-    static object zeroobject = { DUMMY };
+    static object zeroobject = {
+	    { 0 },   /* Str_or_len name */
+	    0,       /* corpsenm */
+	    0, 0,    /* id, spe */
+	    0,       /* coord */
+	    0, 0,    /* coordxy x,y */
+	    0, 0,    /* class, containment */
+	    0,       /* curse_state */
+	    0,       /* quan */
+	    0,       /* buried */
+	    0,       /* lit */
+	    0, 0, 0, 0, 0, 0, 0, 0, /* eroded, locked, trapped, recharged,
+				       invis, greased, broken, achievment */
+    };
 #if 0
     int nparams = 0;
 #endif

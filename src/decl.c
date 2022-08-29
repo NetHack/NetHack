@@ -140,10 +140,6 @@ const char *ARGV0;
 
 #define IVMAGIC 0xdeadbeef
 
-#ifdef GCC_WARN
-#pragma GCC diagnostic ignored "-Wmissing-braces"
-#endif
-
 const struct Role urole_init_data = {
     { "Undefined", 0 },
     { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
@@ -206,38 +202,45 @@ const struct instance_globals g_init = {
 
     /* botl.c */
     0,  /* mrank_sz */
-    UNDEFINED_VALUES, /* blstats */
+    { { { NULL, NULL, 0L, FALSE, FALSE, 0, 0U, { 0 }, NULL, 0, 0, 0
+#ifdef STATUS_HILITES
+	  , UNDEFINED_PTR, UNDEFINED_PTR
+#endif
+	} }
+    }, /* blstats */
     FALSE, /* blinit */
     FALSE, /* update_all */
-    UNDEFINED_VALUES, /* valset */
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, /* valset */
 #ifdef STATUS_HILITES
-    0, /* bl_hilite_moves */
+    0L, /* bl_hilite_moves */
 #endif
-    UNDEFINED_VALUES, /* cond_hilites */
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0 }, /* cond_hilites */
     0, /* now_or_before_idx */
     0, /* condmenu_sortorder */
 
     /* cmd.c */
     UNDEFINED_VALUES, /* Cmd */
-    UNDEFINED_VALUES, /* clicklook_cc */
+    { 0, 0 }, /* clicklook_cc */
     WIN_ERR, /* en_win */
     FALSE, /* en_via_menu */
     UNDEFINED_VALUE, /* last_command_count */
-    NULL, /* ext_tlist */
+    UNDEFINED_VALUE, /* ext_tlist */
 
     /* dbridge.c */
-    UNDEFINED_VALUES, /* occupants */
+    { { 0 } }, /* occupants */
 
     /* decl.c */
     UNDEFINED_PTR, /* occupation */
     UNDEFINED_PTR, /* afternmv */
-    UNDEFINED_PTR, /* hname */
+    NULL, /* hname */
     0, /* hackpid */
     UNDEFINED_VALUES, /* chosen_windowtype */
     DUMMY, /* bases */
     0, /* multi */
     UNDEFINED_VALUES, /* command_line */
-    0, /* command_count */
+    0L, /* command_count */
     NULL, /* multi_reason */
     /* multi_reason usually points to a string literal (when not Null)
        but multireasonbuf[] is available for when it needs to be dynamic */
@@ -251,7 +254,7 @@ const struct instance_globals g_init = {
     (ROWNO - 1) & ~1, /* y_maze_max */
     UNDEFINED_VALUE, /* otg_temp */
     0, /* in_doagain */
-    NULL, /* stairs */
+    UNDEFINED_PTR, /* stairs */
     DUMMY, /* smeq */
     0, /* doorindex */
     0, /* done_money */
@@ -273,44 +276,44 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* dungeons */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* updest */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* dndest */
-    { 0, 0} , /* inv_pos */
+    { 0, 0 } , /* inv_pos */
     FALSE, /* defer_see_monsters */
     FALSE, /* in_mklev */
     FALSE, /* stoned */
     FALSE, /* unweapon */
     FALSE, /* mrg_to_wielded */
-    NULL, /* plinemsg_types */
+    UNDEFINED_PTR, /* plinemsg_types */
     UNDEFINED_VALUES, /* toplines */
-    DUMMY, /* bhitpos */
+    { 0, 0 }, /* bhitpos */
     FALSE, /* in_steed_dismounting */
-    DUMMY, /* doors */
-    NULL, /* menu_colorings */
-    DUMMY, /* lastseentyp */
+    { { 0, 0 } }, /* doors */
+    UNDEFINED_PTR, /* menu_colorings */
+    { { 0 } }, /* lastseentyp */
     DUMMY, /* spl_book */
     UNDEFINED_VALUES, /* level_info */
-    NULL, /* ftrap */
-    NULL, /* current_wand */
-    NULL, /* thrownobj */
-    NULL, /* kickedobj */
+    UNDEFINED_PTR, /* ftrap */
+    UNDEFINED_PTR, /* current_wand */
+    UNDEFINED_PTR, /* thrownobj */
+    UNDEFINED_PTR, /* kickedobj */
     DUMMY, /* dungeon_topology */
     DUMMY, /* killer */
     DUMMY, /* rooms */
-    NULL, /* subrooms */
+    UNDEFINED_PTR, /* subrooms */
     UNDEFINED_VALUES, /* level */
     1L, /* moves; misnamed turn counter */
     1L << 3, /* hero_seq: sequence number for hero movement, 'moves*8 + n'
               * where n is usually 1, sometimes 2 when Fast/Very_fast, maybe
               * higher if polymorphed into something that's even faster */
     0L, /* wailmsg */
-    NULL, /* migrating_objs */
-    NULL, /* billobjs */
+    UNDEFINED_PTR, /* migrating_objs */
+    UNDEFINED_PTR, /* billobjs */
 #if defined(MICRO) || defined(WIN32)
     UNDEFINED_VALUES, /* hackdir */
 #endif /* MICRO || WIN32 */
     DUMMY, /* youmonst */
-    NULL, /* invent */
+    UNDEFINED_PTR, /* invent */
     DUMMY, /* context */
-    DUMMY, /* fqn_prefix */
+    { NULL }, /* fqn_prefix */
     DUMMY, /* tc_gbl_data */
 #if defined(UNIX) || defined(VMS)
     0, /* locknum */
@@ -330,7 +333,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* did_dig_msg */
 
     /* display.c */
-    UNDEFINED_VALUES, /* gbuf */
+    { { 0 } }, /* gbuf */
     UNDEFINED_VALUES, /* gbuf_start */
     UNDEFINED_VALUES, /* gbug_stop */
 
@@ -342,7 +345,7 @@ const struct instance_globals g_init = {
     { 0, 0 }, /* save_dlevel */
 
     /* do_name.c */
-    NULL, /* gloc_filter_map */
+    UNDEFINED_PTR, /* gloc_filter_map */
     UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
 
     /* do_wear.c */
@@ -351,26 +354,26 @@ const struct instance_globals g_init = {
     /* dog.c */
     0,  /* petname_used */
     UNDEFINED_VALUE, /* gtyp */
-    UNDEFINED_VALUE, /* gx */
-    UNDEFINED_VALUE, /* gy */
+    0, /* gx */
+    0, /* gy */
     DUMMY, /* dogname */
     DUMMY, /* catname */
     DUMMY, /* horsename */
     UNDEFINED_VALUE, /* preferred_pet */
-    NULL, /* mydogs */
-    NULL, /* migrating_mons */
-    NULL, /* apelist */
+    UNDEFINED_PTR, /* mydogs */
+    UNDEFINED_PTR, /* migrating_mons */
+    UNDEFINED_PTR, /* apelist */
     UNDEFINED_VALUES, /* mvitals */
 
     /* dokick.c */
     UNDEFINED_PTR, /* maploc */
     UNDEFINED_VALUES, /* nowhere */
-    UNDEFINED_PTR, /* gate_str */
+    NULL, /* gate_str */
 
     /* symbols.c */
     DUMMY, /* symset */
 #ifdef ENHANCED_SYMBOLS
-    DUMMY, /* symset_customizations */
+    { { 0 } }, /* symset_customizations */
 #endif
     0,     /* currentgraphics */
     DUMMY, /* showsyms */
@@ -382,21 +385,21 @@ const struct instance_globals g_init = {
 
     /* dungeon.c */
     0, /* n_dgns */
-    NULL, /* branches */
-    NULL, /* mapseenchn */
+    UNDEFINED_PTR, /* branches */
+    UNDEFINED_PTR, /* mapseenchn */
 
     /* eat.c */
     FALSE, /* force_save_hs */
     NULL, /* eatmbuf */
 
     /* end.c */
-    UNDEFINED_VALUES,
-    UNDEFINED_VALUES,
-    UNDEFINED_VALUES,
-    VANQ_MLVL_MNDX,
+    UNDEFINED_VALUES, /* gems */
+    UNDEFINED_VALUES, /* amulets */
+    UNDEFINED_VALUES, /* valuables */
+    VANQ_MLVL_MNDX,   /* vanq_sortmode */
 
     /* extralev.c */
-    UNDEFINED_VALUES,
+    UNDEFINED_VALUES, /* r */
 
     /* files.c */
     NULL, /* cmdline_rcfile */
@@ -421,13 +424,13 @@ const struct instance_globals g_init = {
     /* hack.c */
     UNDEFINED_VALUES, /* tmp_anything */
     UNDEFINED_VALUE, /* wc */
-    NULL, /* travelmap */
+    UNDEFINED_PTR, /* travelmap */
 
     /* invent.c */
     51, /* lastinvr */
     0, /* sortloogmode */
     NULL, /* invbuf */
-    0, /* inbufsize */
+    0U, /* invbufsize */
     WIN_ERR, /* cached_pickinv_win */
     0,       /* core_invent_state */
     0,       /* in_sync_perminvent */
@@ -438,7 +441,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* only (coord) */
 
     /* light.c */
-    NULL, /* light_source */
+    UNDEFINED_PTR, /* light_base */
 
     /* lock.c */
     UNDEFINED_VALUES,
@@ -455,10 +458,10 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* mhitu_dieroll */
 
     /* mklev.c */
-    UNDEFINED_VALUES, /* luathemes[] */
+    { UNDEFINED_PTR }, /* luathemes[] */
     UNDEFINED_VALUE, /* vault_x */
     UNDEFINED_VALUE, /* vault_y */
-    UNDEFINED_VALUE, /* made_branch */
+    FALSE, /* made_branch */
 
     /* mkmap.c */
     UNDEFINED_PTR, /* new_locations */
@@ -477,7 +480,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* ymin */
     UNDEFINED_VALUE, /* xmax */
     UNDEFINED_VALUE, /* ymax */
-    0, /* ransacked */
+    FALSE, /* ransacked */
 
     /* mkobj.c */
     FALSE, /* mkcorpstat_norevive */
@@ -486,14 +489,14 @@ const struct instance_globals g_init = {
     FALSE, /* vamp_rise_msg */
     FALSE, /* disintegested */
     FALSE, /* zombify */
-    NULL, /* animal_list */
+    UNDEFINED_PTR, /* animal_list */
     UNDEFINED_VALUE, /* animal_list_count */
     FALSE, /* somebody_can_move */
 
     /* mthrowu.c */
     UNDEFINED_VALUE, /* mesg_given */
-    NULL, /* mtarget */
-    NULL, /* marcher */
+    UNDEFINED_PTR, /* mtarget */
+    UNDEFINED_PTR, /* marcher */
 
     /* muse.c */
     FALSE, /* m_using */
@@ -537,24 +540,24 @@ const struct instance_globals g_init = {
     0,  /* oldcap */
     (struct obj *) 0, /* current_container */
     UNDEFINED_VALUE, /* abort_looting */
-    UNDEFINED_VALUE, /* val_for_n_or_more */
+    0L, /* val_for_n_or_more */
     UNDEFINED_VALUES, /* valid_menu_classes */
-    UNDEFINED_VALUE, /* class_filter */
-    UNDEFINED_VALUE, /* bucx_filter */
-    UNDEFINED_VALUE, /* shop_filter */
-    UNDEFINED_VALUE, /* picked_filter */
-    UNDEFINED_VALUE, /* loot_reset_justpicked */
+    FALSE, /* class_filter */
+    FALSE, /* bucx_filter */
+    FALSE, /* shop_filter */
+    FALSE, /* picked_filter */
+    FALSE, /* loot_reset_justpicked */
 
     /* pline.c */
-    0, /* pline_flags */
+    0U, /* pline_flags */
     UNDEFINED_VALUES, /* prevmsg */
 #ifdef DUMPLOG
-    0, /* saved_pline_index */
-    UNDEFINED_VALUES,
+    0U, /* saved_pline_index */
+    { NULL },
 #endif
-    (char *) 0, /* you_buf */
+    NULL, /* you_buf */
     0, /* you_buf_siz */
-    NULL, /* gamelog */
+    UNDEFINED_PTR, /* gamelog */
 
     /* polyself.c */
     0, /* sex_change_ok */
@@ -580,7 +583,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* known */
 
     /* region.c */
-    NULL, /* regions */
+    UNDEFINED_PTR, /* regions */
     0, /* n_regions */
     0, /* max_regions */
     FALSE, /* gas_cloud_diss_within */
@@ -588,9 +591,9 @@ const struct instance_globals g_init = {
 
     /* restore.c */
     0, /* n_ids_mapped */
-    0, /* id_map */
+    UNDEFINED_PTR, /* id_map */
     UNDEFINED_PTR, /* oldfruit */
-    UNDEFINED_VALUE, /* omoves */
+    0L, /* omoves */
 
     /* rip.c */
     UNDEFINED_PTR, /* rip */
@@ -603,20 +606,20 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* rfilter */
 
     /* rumors.c */
-    0, /* true_rumor_size */
-    0, /* false_rumor_size */
-    UNDEFINED_VALUE, /* true_rumor_start*/
-    UNDEFINED_VALUE, /* false_rumor_start*/
-    UNDEFINED_VALUE, /* true_rumor_end */
-    UNDEFINED_VALUE, /* false_rumor_end */
+    0L, /* true_rumor_size */
+    0L, /* false_rumor_size */
+    0UL, /* true_rumor_start*/
+    0UL, /* false_rumor_start*/
+    0L, /* true_rumor_end */
+    0L, /* false_rumor_end */
     0, /* oracle_flag */
-    0, /* oracle_cnt */
-    NULL, /* oracle_loc */
+    0U, /* oracle_cnt */
+    UNDEFINED_PTR, /* oracle_loc */
 
     /* save.c */
     TRUE, /* havestate*/
-    0, /* ustuck_id */
-    0, /* usteed_id */
+    0U, /* ustuck_id */
+    0U, /* usteed_id */
     (struct obj *) 0, /* looseball */
     (struct obj *) 0, /* loosechain */
     { 0, 0 }, /* uz_save */
@@ -626,13 +629,13 @@ const struct instance_globals g_init = {
     SELL_NORMAL, /* sell_how */
     FALSE, /* auto_credit */
     UNDEFINED_VALUES, /* repo */
-    UNDEFINED_VALUE, /* followmsg */
+    0L, /* followmsg */
 
     /* sp_lev.c */
     NULL, /* lev_message */
-    NULL, /* lregions */
+    UNDEFINED_PTR, /* lregions */
     0, /* num_lregions */
-    NULL, /* coder */
+    UNDEFINED_PTR, /* coder */
     UNDEFINED_VALUE, /* xstart */
     UNDEFINED_VALUE, /* ystart */
     UNDEFINED_VALUE, /* xsize */
@@ -642,24 +645,24 @@ const struct instance_globals g_init = {
 
     /* spells.c */
     0, /* spl_sortmode */
-    NULL, /* spl_orderindx */
+    UNDEFINED_PTR, /* spl_orderindx */
 
     /* steal.c */
-    0, /* stealoid */
-    0, /* stealmid */
+    0U, /* stealoid */
+    0U, /* stealmid */
 
     /* teleport.c */
 
     /* timeout.c */
     UNDEFINED_PTR, /* timer_base */
-    1, /* timer_id */
+    1UL, /* timer_id */
 
     /* topten.c */
     WIN_ERR, /* toptenwin */
 
     /* trap.c */
-    { 0, 0, FALSE },
-    UNDEFINED_VALUES,
+    { 0, 0, FALSE }, /* acid_ctx */
+    { UNDEFINED_PTR, 0, 0 }, /* launchplace */
 
     /* u_init.c */
     STRANGE_OBJECT, /* nocreate */
@@ -668,12 +671,12 @@ const struct instance_globals g_init = {
     STRANGE_OBJECT, /* nocreate4 */
 
     /* uhitm.c */
-    UNDEFINED_VALUE, /* override_confirmation */
+    FALSE, /* override_confirmation */
 
     /* vision.c */
-    NULL, /* viz_array */
-    NULL, /* viz_rmin */
-    NULL, /* viz_rmax */
+    UNDEFINED_PTR, /* viz_array */
+    UNDEFINED_PTR, /* viz_rmin */
+    UNDEFINED_PTR, /* viz_rmax */
     FALSE, /* vision_full_recalc */
     0, /* seethru */
 
@@ -681,11 +684,11 @@ const struct instance_globals g_init = {
     UNDEFINED_PTR, /* propellor */
 
     /* windows.c */
-    NULL, /* last_winchoice */
+    UNDEFINED_PTR, /* last_winchoice */
 
     /* zap.c */
     UNDEFINED_VALUE, /* poly_zap */
-    UNDEFINED_VALUE,  /* obj_zapped */
+    FALSE,  /* obj_zapped */
 
     /* new */
     DUMMY,   /* lua_ver[LUA_VER_BUFSIZ] */
