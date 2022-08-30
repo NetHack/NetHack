@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1654070576 2022/06/01 08:02:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.255 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1661896581 2022/08/30 21:56:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -273,7 +273,7 @@ const struct instance_globals g_init = {
     0, /* tby */
     UNDEFINED_PTR, /* sp_levchn */
     { 0, 0, STRANGE_OBJECT, FALSE }, /* m_shot */
-    UNDEFINED_VALUES, /* dungeons */
+    { { UNDEFINED_VALUES } }, /* dungeons */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* updest */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* dndest */
     { 0, 0 } , /* inv_pos */
@@ -289,17 +289,17 @@ const struct instance_globals g_init = {
     { { 0, 0 } }, /* doors */
     UNDEFINED_PTR, /* menu_colorings */
     { { 0 } }, /* lastseentyp */
-    DUMMY, /* spl_book */
-    UNDEFINED_VALUES, /* level_info */
+    { DUMMY }, /* spl_book */
+    { UNDEFINED_VALUES }, /* level_info */
     UNDEFINED_PTR, /* ftrap */
     UNDEFINED_PTR, /* current_wand */
     UNDEFINED_PTR, /* thrownobj */
     UNDEFINED_PTR, /* kickedobj */
-    DUMMY, /* dungeon_topology */
+    { DUMMY }, /* dungeon_topology */
     DUMMY, /* killer */
-    DUMMY, /* rooms */
+    { DUMMY }, /* rooms */
     UNDEFINED_PTR, /* subrooms */
-    UNDEFINED_VALUES, /* level */
+    { { { UNDEFINED_VALUES } } }, /* level */
     1L, /* moves; misnamed turn counter */
     1L << 3, /* hero_seq: sequence number for hero movement, 'moves*8 + n'
               * where n is usually 1, sometimes 2 when Fast/Very_fast, maybe
@@ -333,7 +333,7 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUE, /* did_dig_msg */
 
     /* display.c */
-    { { 0 } }, /* gbuf */
+    { { { 0 } } }, /* gbuf */
     UNDEFINED_VALUES, /* gbuf_start */
     UNDEFINED_VALUES, /* gbug_stop */
 
@@ -363,7 +363,7 @@ const struct instance_globals g_init = {
     UNDEFINED_PTR, /* mydogs */
     UNDEFINED_PTR, /* migrating_mons */
     UNDEFINED_PTR, /* apelist */
-    UNDEFINED_VALUES, /* mvitals */
+    { UNDEFINED_VALUES }, /* mvitals */
 
     /* dokick.c */
     UNDEFINED_PTR, /* maploc */
@@ -371,7 +371,7 @@ const struct instance_globals g_init = {
     NULL, /* gate_str */
 
     /* symbols.c */
-    DUMMY, /* symset */
+    { DUMMY }, /* symset */
 #ifdef ENHANCED_SYMBOLS
     { { 0 } }, /* symset_customizations */
 #endif
@@ -393,13 +393,13 @@ const struct instance_globals g_init = {
     NULL, /* eatmbuf */
 
     /* end.c */
-    UNDEFINED_VALUES, /* gems */
-    UNDEFINED_VALUES, /* amulets */
-    UNDEFINED_VALUES, /* valuables */
+    { UNDEFINED_VALUES }, /* gems */
+    { UNDEFINED_VALUES }, /* amulets */
+    { UNDEFINED_VALUES }, /* valuables */
     VANQ_MLVL_MNDX,   /* vanq_sortmode */
 
     /* extralev.c */
-    UNDEFINED_VALUES, /* r */
+    { { UNDEFINED_VALUES } }, /* r */
 
     /* files.c */
     NULL, /* cmdline_rcfile */
@@ -600,11 +600,11 @@ const struct instance_globals g_init = {
     UNDEFINED_PTR, /* rip */
 
     /* role.c */
-    UNDEFINED_VALUES, /* urole */
+    { UNDEFINED_VALUES }, /* urole */
     UNDEFINED_VALUES, /* urace */
     UNDEFINED_VALUES, /* role_pa */
     UNDEFINED_VALUE, /* role_post_attrib */
-    UNDEFINED_VALUES, /* rfilter */
+    { UNDEFINED_VALUES }, /* rfilter */
 
     /* rumors.c */
     0L, /* true_rumor_size */
