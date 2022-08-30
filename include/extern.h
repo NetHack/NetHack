@@ -2610,6 +2610,8 @@ extern void selection_do_gradient(struct selectionvar *, long, long, long,
 extern int lspo_reset_level(lua_State *);
 extern int lspo_finalize_level(lua_State *);
 extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
+extern void cvt_to_abscoord(coordxy *, coordxy *);
+extern void cvt_to_relcoord(coordxy *, coordxy *);
 extern int nhl_abs_coord(lua_State *);
 extern void update_croom(void);
 extern const char *get_trapname_bytype(int);

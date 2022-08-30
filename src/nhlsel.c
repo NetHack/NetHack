@@ -839,7 +839,10 @@ l_selection_gradient(lua_State *L)
     return 1;
 }
 
-/* sel:iterate(function(x,y) ... end); */
+/* sel:iterate(function(x,y) ... end);
+ * The x, y coordinates passed to the function are map- or room-relative
+ * rather than absolute, unless there has been no previous map or room defined.
+ */
 static int
 l_selection_iterate(lua_State *L)
 {
@@ -854,9 +857,11 @@ l_selection_iterate(lua_State *L)
         for (y = rect.ly; y <= rect.hy; y++)
             for (x = max(1,rect.lx); x <= rect.hx; x++)
                 if (selection_getpoint(x, y, sel)) {
+                    coordxy tmpx = x, tmpy = y;
+                    cvt_to_relcoord(&tmpx, &tmpy);
                     lua_pushvalue(L, 2);
-                    lua_pushinteger(L, x - g.xstart);
-                    lua_pushinteger(L, y - g.ystart);
+                    lua_pushinteger(L, tmpx);
+                    lua_pushinteger(L, tmpy);
                     if (nhl_pcall(L, 2, 0)) {
                         impossible("Lua error: %s", lua_tostring(L, -1));
                         /* abort the loops to prevent possible error cascade */
