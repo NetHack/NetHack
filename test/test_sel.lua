@@ -40,7 +40,7 @@ function sel_are_equal(sela, selb, msg)
 end
 
 function is_map_at(x,y, mapch, lit)
-   local rm = nh.getmap(x + 1, y); -- + 1 == g.xstart
+   local rm = nh.getmap(x, y); 
    if rm.mapchr ~= mapch then
       error("Terrain at (" .. x .. "," .. y .. ") is not \"" .. mapch .. "\", but \"" .. rm.mapchr .. "\"");
    end

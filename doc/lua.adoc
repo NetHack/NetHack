@@ -6,13 +6,16 @@
 
 Functions exposed from the NetHack core. They are all in the `nh` table.
 
+All core functions involving xy coordinates interpret these as relative to the
+last defined map or room.
+
 === abscoord
 
-Convert a room-relative coordinate to map-absolute.
+Convert a room- or map-relative coordinate to absolute.
 Can accept one table with x and y keys (and in that case, returns similar),
 or two integer values (and returns two integer values)
-des-routines tend to use relative coordinates, nh and obj use absolute.
-(This mess is still very much in need of improvement.)
+des, nh, and obj routines all treat inputs as relative coordinates, but this is
+here in case an absolute one is needed for some reason (debugging?).
 
 Example:
 
@@ -384,6 +387,9 @@ Example:
 == Special level functions
 
 Functions for creating special levels. They are in the `des` table.
+
+All special level functions involving xy coordinates interpret these as relative
+to the last defined map or room.
 
 === altar
 

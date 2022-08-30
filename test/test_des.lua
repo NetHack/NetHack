@@ -3,7 +3,7 @@
 -- reset_level is only needed here, not in normal special level scripts.
 
 function is_map_at(x,y, mapch, lit)
-   local rm = nh.getmap(x + 1, y); -- + 1 == g.xstart
+   local rm = nh.getmap(x, y);
    if rm.mapchr ~= mapch then
       error("Terrain at (" .. x .. "," .. y .. ") is not \"" .. mapch .. "\", but \"" .. rm.mapchr .. "\"");
    end
@@ -29,7 +29,7 @@ function check_loc_flag(x, y, flag, value)
 end
 
 function check_trap_at(x,y, name)
-   local t = nh.gettrap(x + 1, y); -- + 1 == g.xstart
+   local t = nh.gettrap(x, y);
    if (t.ttyp_name ~= name) then
       error("Trap at " .. x .. "," .. y .. " is " .. t.ttyp_name .. ", not " .. name);
    end
@@ -211,10 +211,10 @@ LTL]])
 FFF
 F.F
 FFF]] })
-   for x = 60, 62 do
-      for y = 5, 7 do
+   for x = 0,2 do
+      for y = 0,2 do
          local nam = "iron bars";
-         if (x == 61 and y == 6) then
+         if (x == 1 and y == 1) then
              nam = "room";
          end
          check_loc_name(x, y, nam);
@@ -224,10 +224,10 @@ FFF]] })
 ...
 .T.
 ...]] })
-   for x = 60, 62 do
-      for y = 5, 7 do
+   for x = 0, 2 do
+      for y = 0, 2 do
          local nam = "room";
-         if (x == 61 and y == 6) then
+         if (x == 1 and y == 1) then
              nam = "tree";
          end
          check_loc_name(x, y, nam);
@@ -244,50 +244,50 @@ III]] })
                 des.terrain(0,0, "L");
                 des.terrain(map.width-1,map.height-1, "T");
    end});
-   check_loc_name(30, 5, "lava pool");
-   check_loc_name(32, 7, "tree");
+   check_loc_name(0, 0, "lava pool");
+   check_loc_name(2, 2, "tree");
 end
 
 function test_feature()
    des.reset_level();
    des.level_init({ style = "solidfill", fg = ".", lit = 1 });
    des.feature("fountain", 40, 08);
-   check_loc_name(40 + 1, 08, "fountain");
+   check_loc_name(40, 08, "fountain");
    des.feature("sink", {41, 08});
-   check_loc_name(41 + 1, 08, "sink");
+   check_loc_name(41, 08, "sink");
    des.feature({ type = "pool", x = 42, y = 08 });
-   check_loc_name(42 + 1, 08, "pool");
+   check_loc_name(42, 08, "pool");
    des.feature({ type = "sink", coord = {43, 08} });
-   check_loc_name(43 + 1, 08, "sink");
+   check_loc_name(43, 08, "sink");
 
    des.feature({ type = "throne", coord = {44, 08}, looted=true });
-   check_loc_name(44 + 1, 08, "throne");
-   check_loc_flag(44 + 1, 08, "looted", true);
+   check_loc_name(44, 08, "throne");
+   check_loc_flag(44, 08, "looted", true);
 
    des.feature({ type = "throne", coord = {44, 08}, looted=false });
-   check_loc_name(44 + 1, 08, "throne");
-   check_loc_flag(44 + 1, 08, "looted", false);
+   check_loc_name(44, 08, "throne");
+   check_loc_flag(44, 08, "looted", false);
 
    des.feature({ type = "tree", coord = {45, 08}, looted=true, swarm=false });
-   check_loc_name(45 + 1, 08, "tree");
-   check_loc_flag(45 + 1, 08, "looted", true);
-   check_loc_flag(45 + 1, 08, "swarm", false);
+   check_loc_name(45, 08, "tree");
+   check_loc_flag(45, 08, "looted", true);
+   check_loc_flag(45, 08, "swarm", false);
 
    des.feature({ type = "tree", coord = {45, 08}, looted=false, swarm=true });
-   check_loc_name(45 + 1, 08, "tree");
-   check_loc_flag(45 + 1, 08, "looted", false);
-   check_loc_flag(45 + 1, 08, "swarm", true);
+   check_loc_name(45, 08, "tree");
+   check_loc_flag(45, 08, "looted", false);
+   check_loc_flag(45, 08, "swarm", true);
 
    des.feature({ type = "fountain", coord = {46, 08}, looted=false, warned=true });
-   check_loc_name(46 + 1, 08, "fountain");
-   check_loc_flag(46 + 1, 08, "looted", false);
-   check_loc_flag(46 + 1, 08, "warned", true);
+   check_loc_name(46, 08, "fountain");
+   check_loc_flag(46, 08, "looted", false);
+   check_loc_flag(46, 08, "warned", true);
 
    des.feature({ type = "sink", coord = {47, 08}, pudding=false, dishwasher=true, ring=true });
-   check_loc_name(47 + 1, 08, "sink");
-   check_loc_flag(47 + 1, 08, "pudding", false);
-   check_loc_flag(47 + 1, 08, "dishwasher", true);
-   check_loc_flag(47 + 1, 08, "ring", true);
+   check_loc_name(47, 08, "sink");
+   check_loc_flag(47, 08, "pudding", false);
+   check_loc_flag(47, 08, "dishwasher", true);
+   check_loc_flag(47, 08, "ring", true);
 end
 
 function test_gold()

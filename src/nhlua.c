@@ -172,7 +172,7 @@ void
 nhl_error(lua_State *L, const char *msg)
 {
     lua_Debug ar;
-    char buf[BUFSZ];
+    char buf[BUFSZ*2];
 
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "lS", &ar);
@@ -389,6 +389,7 @@ nhl_gettrap(lua_State *L)
     }
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
             struct trap *ttmp = t_at(x,y);
@@ -439,7 +440,8 @@ nhl_deltrap(lua_State *L)
     }
     x = (coordxy) lx;
     y = (coordxy) ly;
-    
+    cvt_to_abscoord(&x, &y);
+
     if (isok(x, y)) {
         struct trap *ttmp = t_at(x,y);
 
@@ -452,6 +454,11 @@ nhl_deltrap(lua_State *L)
 /* get parameters (XX,YY) or ({ x = XX, y = YY }) or ({ XX, YY }),
    and set the x and y values.
    return TRUE if there are such params in the stack.
+   Note that this does not adjust the values of x and y at all from what is
+   specified in the level file; so, it returns absolute coordinates rather than
+   map-relative coordinates. Callers of this function must decide if they want
+   to interpret the values as absolute or as map-relative, and adjust
+   accordingly.
  */
 boolean
 nhl_get_xy_params(lua_State *L, lua_Integer *x, lua_Integer *y)
@@ -487,23 +494,9 @@ nhl_getmap(lua_State *L)
         nhl_error(L, "Incorrect arguments");
         return 0;
     }
-    if (g.in_mklev) {
-        /* xstart and ystart are set by the des.map() command to give
-         * coordinates relative to the 0,0 of that map. It can be quite useful
-         * to check what terrain is on a given space. But without compensating
-         * for the change in xstart and ystart here, this will lead to results
-         * like des.terrain(4,6,'L') and then nh.getmap(4,6) not being lava.
-         *
-         * Only valid during mklev, because xstart and ystart are not saved
-         * with the level and can change during the level creating process when
-         * additional des.map() are executed. They will not necessarily be the
-         * same later. */
-        x += g.xstart;
-        y += g.ystart;
-    }
-
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
             char buf[BUFSZ];
@@ -1177,6 +1170,7 @@ nhl_timer_has_at(lua_State *L)
 
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (isok(x, y)) {
         when = spot_time_expires(x, y, timertype);
@@ -1205,6 +1199,7 @@ nhl_timer_peek_at(lua_State *L)
 
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (timer_is_pos(timertype) && isok(x, y))
         when = spot_time_expires(x, y, timertype);
@@ -1230,6 +1225,7 @@ nhl_timer_stop_at(lua_State *L)
 
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (timer_is_pos(timertype) && isok(x, y))
         spot_stop_timers(x, y, timertype);
@@ -1254,6 +1250,7 @@ nhl_timer_start_at(lua_State *L)
 
     x = (coordxy) lx;
     y = (coordxy) ly;
+    cvt_to_abscoord(&x, &y);
 
     if (timer_is_pos(timertype) && isok(x, y)) {
         long where = ((long) x << 16) | (long) y;

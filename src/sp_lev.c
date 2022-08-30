@@ -1150,11 +1150,15 @@ rndtrap(void)
 }
 
 /*
- * Coordinates in special level files are handled specially:
+ * Translate a given coordinate from a special level definition into an actual
+ * location on the map.
  *
- *      if x or y is < 0, we generate a random coordinate.
- *      The "humidity" flag is used to ensure that engravings aren't
- *      created underwater, or eels on dry land.
+ * If x or y is negative, we generate a random coordinate within the area. If
+ * not negative, they are interpreted as relative to the last defined map or
+ * room, and are output as absolute g.level.locations coordinates.
+ *
+ * The "humidity" flag is used to ensure that engravings aren't created
+ * underwater, or eels on dry land.
  */
 static void
 get_location(
@@ -3085,6 +3089,12 @@ get_table_montype(lua_State *L, int *mgender)
     return ret;
 }
 
+/* Get x and y values from a table (which the caller has already checked for the
+ * existence of), handling both a table with x= and y= specified and a table
+ * with coord= specified.
+ * Returns absolute rather than map-relative coordinates; the caller of this
+ * function must decide if it wants to interpret the coordinates as map-relative
+ * and adjust accordingly. */
 static void
 get_table_xy_or_coord(lua_State *L, lua_Integer *x, lua_Integer *y)
 {
@@ -5224,7 +5234,56 @@ l_table_getset_feature_flag(
     }
 }
 
-/* convert relative coordinate to map-absolute.
+/* guts of nhl_abs_coord; convert a coordinate relative to a map or room into an
+ * absolute coordinate in g.level.locations.
+ *
+ * If there is no enclosing map or room, the coordinates are assumed to be
+ * absolute already.
+ *
+ * Part of the reason this is a function is to make it clearer in the calling
+ * code that this conversion is what is intended.
+ *
+ * NOTE: if the coordinates are going to get passed to one of the get_location
+ * family of functions, this should NOT be called; get_location already makes
+ * an adjustment like this. (What this function supports which get_location
+ * doesn't is the input coordinates being negative. get_location will treat that
+ * as "level designer wants a random coordinate".) */
+void
+cvt_to_abscoord(coordxy *x, coordxy *y)
+{
+    /* since commit 99715e0, xstart and ystart are only relevant in mklev when
+     * maps are being used, and 0 otherwise. It is possible in the future that
+     * map positions and dimensions can be saved and retrieved outside of mklev
+     * which would reintroduce nonzero xstart/ystart/xsiz/ysiz, but this is not
+     * currently implemented, so this function can be assumed to have no effect
+     * outside of mklev.
+     */
+    if (g.coder && g.coder->croom) {
+        *x += g.coder->croom->lx;
+        *y += g.coder->croom->ly;
+    }
+    else {
+        *x += g.xstart;
+        *y += g.ystart;
+    }
+}
+
+/* inverse of cvt_to_abscoord; turn an absolute g.level.locations coordinate
+ * into one relative to the current map or room. */
+void
+cvt_to_relcoord(coordxy *x, coordxy *y)
+{
+    if (g.coder && g.coder->croom) {
+        *x -= g.coder->croom->lx;
+        *y -= g.coder->croom->ly;
+    }
+    else {
+        *x -= g.xstart;
+        *y -= g.ystart;
+    }
+}
+
+/* convert map-relative coordinate to absolute.
   local ax,ay = nh.abscoord(rx, ry);
   local pt = nh.abscoord({ x = 10, y = 5 });
  */
@@ -5237,16 +5296,14 @@ nhl_abs_coord(lua_State *L)
     if (argc == 2) {
         x = (coordxy) lua_tointeger(L, 1);
         y = (coordxy) lua_tointeger(L, 2);
-        x += g.xstart;
-        y += g.ystart;
+        cvt_to_abscoord(&x, &y);
         lua_pushinteger(L, x);
         lua_pushinteger(L, y);
         return 2;
     } else if (argc == 1 && lua_type(L, 1) == LUA_TTABLE) {
         x = (coordxy) get_table_int(L, "x");
         y = (coordxy) get_table_int(L, "y");
-        x += g.xstart;
-        y += g.ystart;
+        cvt_to_abscoord(&x, &y);
         lua_newtable(L);
         nhl_add_table_entry_int(L, "x", x);
         nhl_add_table_entry_int(L, "y", y);

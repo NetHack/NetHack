@@ -363,6 +363,8 @@ l_obj_at(lua_State *L)
 
         x = (coordxy) luaL_checkinteger(L, 1);
         y = (coordxy) luaL_checkinteger(L, 2);
+        cvt_to_abscoord(&x, &y);
+
         lua_pop(L, 2);
         (void) l_obj_push(L, g.level.objects[x][y]);
         return 1;
@@ -386,6 +388,8 @@ l_obj_placeobj(lua_State *L)
 
     x = (coordxy) luaL_checkinteger(L, 2);
     y = (coordxy) luaL_checkinteger(L, 3);
+    cvt_to_abscoord(&x, &y);
+
     lua_pop(L, 3);
 
     if (lobj_is_ok(lo)) {
@@ -569,6 +573,7 @@ l_obj_bury(lua_State *L)
     } else if (argc == 3) {
         x = (coordxy) lua_tointeger(L, 2);
         y = (coordxy) lua_tointeger(L, 3);
+        cvt_to_abscoord(&x, &y);
     } else
         nhl_error(L, "l_obj_bury: Wrong args");
 
@@ -617,7 +622,7 @@ l_obj_register(lua_State *L)
     luaL_setfuncs(L, l_obj_meta, 0);
     /* metatable.__index points at the object method table. */
     lua_pushvalue(L, -2);
-    lua_setfield(L, -2, "__index"); 
+    lua_setfield(L, -2, "__index");
 
     /* Don't let lua code mess with the real metatable.
        Instead offer a fake one that only contains __gc. */
