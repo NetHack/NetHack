@@ -1248,6 +1248,7 @@ save_currentstate(void)
 {
     NHFILE *nhfp;
 
+    g.program_state.in_checkpoint++;
     if (flags.ins_chkpt) {
         /* write out just-attained level, with pets and everything */
         nhfp = currentlevel_rewrite();
@@ -1262,6 +1263,7 @@ save_currentstate(void)
 
     /* write out non-level state */
     savestateinlock();
+    g.program_state.in_checkpoint--;
 }
 #endif
 

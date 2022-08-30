@@ -184,8 +184,10 @@ remember_topl(void)
         cw->datlen[idx] = (short) len;
     }
     Strcpy(cw->data[idx], g.toplines);
-    *g.toplines = '\0';
-    cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
+    if (!g.program_state.in_checkpoint) {
+        *g.toplines = '\0';
+        cw->maxcol = cw->maxrow = (idx + 1) % cw->rows;
+    }
 }
 
 void
@@ -360,13 +362,16 @@ extern char erase_char; /* from xxxtty.c; don't need kill_char */
 
 /* returns a single keystroke; also sets 'yn_number' */
 char
-tty_yn_function(const char *query, const char *resp, char def)
+tty_yn_function(
+    const char *query,
+    const char *resp,
+    char def)
 {
     /*
      * Generic yes/no function.  'def' is the default (returned by space
      * or return; 'esc' returns 'q', or 'n', or the default, depending on
-     * what's in the string.  The 'query' string is printed before the user
-     * is asked about the string.
+     * what's in the expected-response string.  The 'query' string is
+     * printed before the user is asked about the string.
      *
      * If resp is NULL, any single character is accepted and returned.
      * If not-NULL, only characters in it are allowed (exceptions:  the
@@ -548,8 +553,8 @@ static char **snapshot_mesgs = 0;
 /* collect currently available message history data into a sequential array;
    optionally, purge that data from the active circular buffer set as we go */
 static void
-msghistory_snapshot(boolean purge) /* clear message history buffer
-                                      as we copy it */
+msghistory_snapshot(
+    boolean purge) /* clear message history buffer as we copy it */
 {
     char *mesg;
     int i, inidx, outidx;

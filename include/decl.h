@@ -83,34 +83,36 @@ E NEARDATA char tune[6];
 
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 
+/* structure for 'program_state'; not saved and restored */
 struct sinfo {
-    int gameover;  /* self explanatory? */
-    int stopprint; /* inhibit further end of game disclosure */
+    int gameover;               /* self explanatory? */
+    int stopprint;              /* inhibit further end of game disclosure */
 #ifdef HANGUPHANDLING
-    volatile int done_hup; /* SIGHUP or moral equivalent received
-                            * -- no more screen output */
-    int preserve_locks;    /* don't remove level files prior to exit */
+    volatile int done_hup;      /* SIGHUP or moral equivalent received
+                                 * -- no more screen output */
+    int preserve_locks;         /* don't remove level files prior to exit */
 #endif
     int something_worth_saving; /* in case of panic */
     int panicking;              /* `panic' is in progress */
     int exiting;                /* an exit handler is executing */
-    int saving;
-    int restoring;
-    int in_moveloop;
-    int in_impossible;
-    int in_docrt;               /* in docrt() */
-    int in_self_recover;
+    int saving;                 /* creating a save file */
+    int restoring;              /* reloading a save file */
+    int in_moveloop;            /* normal gameplay in progress */
+    int in_impossible;          /* reportig a warning */
+    int in_docrt;               /* in docrt(): redrawing the whole screen */
+    int in_self_recover;        /* processsing orphaned level files */
+    int in_checkpoint;          /* saving insurance checkpoint */
     int in_parseoptions;        /* in parseoptions */
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
 #ifdef PANICLOG
-    int in_paniclog;
+    int in_paniclog;            /* writing a panicloc entry */
 #endif
-    int wizkit_wishing;
+    int wizkit_wishing;         /* starting wizard mode game w/ WIZKIT file */
     /* getting_a_command:  only used for ALTMETA config to process ESC, but
        present and updated unconditionally; set by parse() when requesting
        next command keystroke, reset by readchar() as it returns a key */
-    int getting_a_command;
+    int getting_a_command;      /* next key pressed will be entering a cmnd */
 };
 
 /* Flags for controlling uptodate */
@@ -854,7 +856,7 @@ struct instance_globals {
 #ifdef MICRO
     char levels[PATHLEN]; /* where levels are */
 #endif /* MICRO */
-    struct sinfo program_state;
+    struct sinfo program_state; /* flags describing game's current state */
 
     /* detect.c */
 
