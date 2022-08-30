@@ -560,8 +560,6 @@ ckmailstatus(void)
 
 #if defined(SIMPLE_MAIL) || defined(SERVER_ADMIN_MSG)
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
 void
 read_simplemail(char *mbox, boolean adminmsg)
 {
@@ -571,9 +569,6 @@ read_simplemail(char *mbox, boolean adminmsg)
 #ifdef SIMPLE_MAIL
     struct flock fl = { 0 };
 #endif
-    const char *msgfrom = adminmsg
-        ? "The voice of %s booms through the caverns:"
-        : "This message is from '%s'.";
 
     if (!mb)
         goto bail;
@@ -589,34 +584,47 @@ read_simplemail(char *mbox, boolean adminmsg)
     /* Allow this call to block. */
     if (!adminmsg
 #ifdef SIMPLE_MAIL
-        && fcntl (fileno (mb), F_SETLKW, &fl) == -1
+        && fcntl(fileno(mb), F_SETLKW, &fl) == -1
 #endif
         )
         goto bail;
 
     while (fgets(curline, 128, mb) != NULL) {
+        const char *endpunct;
+        int msglen;
+
         if (!adminmsg) {
 #ifdef SIMPLE_MAIL
             fl.l_type = F_UNLCK;
-            fcntl (fileno(mb), F_UNLCK, &fl);
+            fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
             pline("There is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
         }
         msg = strchr(curline, ':');
 
-        if (!msg)
+        /* if incorrectly formatted, or message is empty (':' and '\n' take
+           up 2 chars, so must have at least 3 to be nonempty), give up */
+        if (!msg || (msglen = (int) strlen(msg)) < 3)
             goto bail;
 
         *msg = '\0';
-        msg++;
-        msg[strlen(msg) - 1] = '\0'; /* kill newline */
+        msg++, msglen--;
+        msg[msglen - 1] = '\0'; /* kill newline */
 
-        pline(msgfrom, curline);
-        if (adminmsg)
-            verbalize("%s", msg);
-        else
-            pline("It reads: \"%s\".", msg);
+        /* supply ending punctuation only if the message doesn't have any */
+        endpunct = "";
+        if (!index(".!?", msg[msglen - 2]))
+            endpunct = ".";
+
+        if (adminmsg) {
+            urgent_pline("The voice of %s booms through the caverns:",
+                         curline);
+        } else {
+            pline("This message is from '%s'.", curline);
+            pline("It reads:");
+        }
+        pline("\"%s\"%s", msg, endpunct);
 
         seen_one_already = TRUE;
 #ifdef SIMPLE_MAIL
@@ -645,8 +653,6 @@ read_simplemail(char *mbox, boolean adminmsg)
     if (!adminmsg)
         pline("It appears to be all gibberish.");
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 #endif /* SIMPLE_MAIL */
 
