@@ -1374,6 +1374,9 @@ command line processing interleaved with options file processing is complex:
 	a recent change to make 'color' show up for tty in the short options
 	menu resulted in 'nethack --windowtype:X11' running X11 with ascii map
 	('NETHACKOPTIONS=windowtype:X11 nethack' continued to default to tiles)
+when the Astral level got created, any fake player character monsters that
+	were seen or sensed when created were reported as "<mon> suddenly
+	appears!" rather than be treated as part of level's initial population
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
