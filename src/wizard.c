@@ -563,6 +563,9 @@ nasty(struct monst *summoner)
     coord bypos;
     int i, j, count, census, tmp, makeindex,
         s_cls, m_cls, difcap, trylimit, castalign;
+    /* when a monster casts the "summon nasties" spell, it gives feedback;
+       when random post-Wizard harassment casts that, we give feedback */
+    unsigned mmflags = summoner ? MM_NOMSG : NO_MM_FLAGS;
 
 #define MAXNASTIES 10 /* more than this can be created */
 
@@ -623,7 +626,7 @@ nasty(struct monst *summoner)
                 /* this honors genocide but overrides extinction; it ignores
                    inside-hell-only (G_HELL) & outside-hell-only (G_NOHELL) */
                 if ((mtmp = makemon(&mons[makeindex], bypos.x, bypos.y,
-                                    NO_MM_FLAGS)) != 0) {
+                                    mmflags)) != 0) {
                     mtmp->msleeping = mtmp->mpeaceful = mtmp->mtame = 0;
                     set_malign(mtmp);
                 } else {
@@ -631,8 +634,7 @@ nasty(struct monst *summoner)
                        unlike direct choice, not forced to be hostile [why?];
                        limit spellcasters to inhibit chain summoning */
                     if ((mtmp = makemon((struct permonst *) 0,
-                                        bypos.x, bypos.y,
-                                        MM_NOMSG)) != 0) {
+                                        bypos.x, bypos.y, mmflags)) != 0) {
                         m_cls = mtmp->data->mlet;
                         if ((difcap > 0 && mtmp->data->difficulty >= difcap
                              && attacktype(mtmp->data, AT_MAGC))
