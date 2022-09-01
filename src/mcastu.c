@@ -409,22 +409,26 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             impossible("bad wizard cloning?");
         break;
     case MGC_SUMMON_MONS: {
-        int count;
+        int count = nasty(mtmp);
 
-        count = nasty(mtmp); /* summon something nasty */
-        if (mtmp->iswiz) {
+        if (!count) {
+            ; /* nothing was created? */
+        } else if (mtmp->iswiz) {
             verbalize("Destroy the thief, my pet%s!", plur(count));
         } else {
-            const char *mappear = (count == 1) ? "A monster appears"
-                                               : "Monsters appear";
+            boolean one = (count == 1);
+            const char *mappear = one ? "A monster appears"
+                                      : "Monsters appear";
 
             /* messages not quite right if plural monsters created but
                only a single monster is seen */
             if (Invis && !perceives(mtmp->data)
                 && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-                pline("%s around a spot near you!", mappear);
+                pline("%s %s a spot near you!", mappear,
+                      one ? "at" : "around");
             else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-                pline("%s around your displaced image!", mappear);
+                pline("%s %s your displaced image!", mappear,
+                      one ? "by" : "around");
             else
                 pline("%s from nowhere!", mappear);
         }
