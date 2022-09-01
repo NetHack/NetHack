@@ -74,7 +74,6 @@
         void            strbuf_reserve  (strbuf *, int)
         void            strbuf_empty    (strbuf *)
         void            strbuf_nl_to_crlf (strbuf_t *)
-        char *          nonconst        (const char *, char *)
         int             swapbits        (int, int, int)
         void            shuffle_int_array (int *, int)
         void            nh_snprintf     (const char *, int, char *, size_t,
@@ -1269,19 +1268,6 @@ strbuf_nl_to_crlf(strbuf_t *strbuf)
                 }
         }
     }
-}
-
-char *
-nonconst(const char *str, char *buf, size_t bufsz)
-{
-    char *retval = emptystr;
-
-    if (str && buf)
-        if (strlen(str) <= (bufsz - 1)) {
-            Strcpy(buf, str);
-            retval = buf;
-        }
-    return retval;
 }
 
 /* swapbits(val, bita, bitb) swaps bit a with bit b in val */
