@@ -4127,7 +4127,8 @@ migrsort_cmp(const genericptr vptr1, const genericptr vptr2)
     return (m1->m_id < m2->m_id) ? -1 : (m1->m_id > m2->m_id);
 }
 
-/* called by #migratemons; might turn it into separate wizard mode command */
+/* called by #migratemons; displays count of migrating monsters, optionally
+   displays them as well */
 static void
 list_migrating_mons(
     d_level *nextlevl) /* default destination for wiz_migrate_mons() */
@@ -4203,7 +4204,7 @@ list_migrating_mons(
                     showit = (c == 'o');
 
                 if (showit)
-                    marray[n++] = mtmp;;
+                    marray[n++] = mtmp;
             }
             marray[n] = (struct monst *) 0; /* mark end for traversal loop */
             if (n > 1)
