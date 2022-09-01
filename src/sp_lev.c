@@ -3782,10 +3782,11 @@ lspo_mineralize(lua_State *L)
     create_des_coder();
 
     lcheck_param_table(L);
-    gem_prob = get_table_int_opt(L, "gem_prob", 0);
-    gold_prob = get_table_int_opt(L, "gold_prob", 0);
-    kelp_moat = get_table_int_opt(L, "kelp_moat", 0);
-    kelp_pool = get_table_int_opt(L, "kelp_pool", 0);
+    /* -1 produces default mineralize behavior */
+    gem_prob = get_table_int_opt(L, "gem_prob", -1);
+    gold_prob = get_table_int_opt(L, "gold_prob", -1);
+    kelp_moat = get_table_int_opt(L, "kelp_moat", -1);
+    kelp_pool = get_table_int_opt(L, "kelp_pool", -1);
 
     mineralize(kelp_pool, kelp_moat, gold_prob, gem_prob, TRUE);
 
