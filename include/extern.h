@@ -1057,7 +1057,6 @@ extern void strbuf_append(strbuf_t *, const char *);
 extern void strbuf_reserve(strbuf_t *, int);
 extern void strbuf_empty(strbuf_t *);
 extern void strbuf_nl_to_crlf(strbuf_t *);
-extern char *nonconst(const char *, char *, size_t);
 extern int swapbits(int, int, int);
 extern void shuffle_int_array(int *, int);
 /* note: the snprintf CPP wrapper includes the "fmt" argument in "..."
