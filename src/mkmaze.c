@@ -18,7 +18,7 @@ static boolean put_lregion_here(coordxy, coordxy, coordxy, coordxy, coordxy,
 static void baalz_fixup(void);
 static void setup_waterlevel(void);
 static void unsetup_waterlevel(void);
-static void check_ransacked(char *);
+static void check_ransacked(const char *);
 static void migr_booty_item(int, const char *);
 static void migrate_orc(struct monst *, unsigned long);
 static void shiny_orc_stuff(struct monst *);
@@ -228,8 +228,8 @@ fix_wall_spines(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 
             /* set the locations TRUE if rock or wall or out of bounds */
             loc_f = within_bounded_area(x, y, /* for baalz insect */
-                                        g.bughack.inarea.x1, g.bughack.inarea.y1,
-                                        g.bughack.inarea.x2, g.bughack.inarea.y2)
+                                     g.bughack.inarea.x1, g.bughack.inarea.y1,
+                                     g.bughack.inarea.x2, g.bughack.inarea.y2)
                        ? iswall
                        : iswall_or_stone;
             locale[0][0] = (*loc_f)(x - 1, y - 1);
@@ -631,7 +631,7 @@ fixup_special(void)
 }
 
 static void
-check_ransacked(char * s)
+check_ransacked(const char *s)
 {
     /* this kludge only works as long as orctown is minetn-1 */
     g.ransacked = (u.uz.dnum == mines_dnum && !strcmp(s, "minetn-1"));
@@ -641,7 +641,7 @@ check_ransacked(char * s)
 static const char *const orcfruit[] = { "paddle cactus", "dwarven root" };
 
 static void
-migrate_orc(struct monst* mtmp, unsigned long mflags)
+migrate_orc(struct monst *mtmp, unsigned long mflags)
 {
     int nlev, max_depth, cur_depth;
     d_level dest;
@@ -702,6 +702,7 @@ shiny_orc_stuff(struct monst* mtmp)
             add_to_minv(mtmp, otmp);
     }
 }
+
 static void
 migr_booty_item(int otyp, const char* gang)
 {

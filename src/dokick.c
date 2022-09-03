@@ -1433,9 +1433,10 @@ drop_to(coord *cc, schar loc, coordxy x, coordxy y)
 
 /* player or missile impacts location, causing objects to fall down */
 void
-impact_drop(struct obj *missile, /* caused impact, won't drop itself */
-            coordxy x, coordxy y,    /* location affected */
-            xint16 dlev)          /* if !0 send to dlev near player */
+impact_drop(
+    struct obj *missile,  /* caused impact, won't drop itself */
+    coordxy x, coordxy y, /* location affected */
+    xint16 dlev)          /* if !0 send to dlev near player */
 {
     schar toloc;
     register struct obj *obj, *obj2;

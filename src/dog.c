@@ -886,13 +886,15 @@ discard_migrations(void)
             *oprev = otmp->nobj; /* remove otmp from migrating_objs */
             otmp->nobj = 0;
             otmp->where = OBJ_FREE;
+            otmp->owornmask = 0L; /* overloaded for destination usage;
+                                   * obfree() will complain if nonzero */
             obfree(otmp, (struct obj *) 0); /* releases any contents too */
         }
     }
 }
 
-/* return quality of food; the lower the better */
-/* fungi will eat even tainted food */
+/* returns the quality of an item of food; the lower the better;
+   fungi and ghouls will eat even tainted food */
 int
 dogfood(struct monst *mon, struct obj *obj)
 {
