@@ -14,6 +14,7 @@ static schar get_map(int, int, schar);
 static void pass_one(schar, schar);
 static void pass_two(schar, schar);
 static void pass_three(schar, schar);
+static void join_map_cleanup(void);
 static void join_map(schar, schar);
 static void finish_map(schar, schar, boolean, boolean, boolean);
 static void remove_room(unsigned);
@@ -26,6 +27,7 @@ init_map(schar bg_typ)
 
     for (i = 1; i < COLNO; i++)
         for (j = 0; j < ROWNO; j++) {
+            levl[i][j].roomno = NO_ROOM;
             levl[i][j].typ = bg_typ;
             levl[i][j].lit = FALSE;
         }
@@ -240,6 +242,19 @@ flood_fill_rm(
         g.max_ry = sy;
 }
 
+/* join_map uses temporary rooms; clean up after it */
+static void
+join_map_cleanup(void)
+{
+    coordxy x, y;
+
+    for (x = 1; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++)
+            levl[x][y].roomno = NO_ROOM;
+    g.nroom = g.nsubroom = 0;
+    g.rooms[g.nroom].hx = g.subrooms[g.nsubroom].hx = -1;
+}
+
 static void
 join_map(schar bg_typ, schar fg_typ)
 {
@@ -311,6 +326,7 @@ join_map(schar bg_typ, schar fg_typ)
         }
         croom2++; /* always increment the next room */
     }
+    join_map_cleanup();
 }
 
 static void
@@ -349,6 +365,10 @@ finish_map(
 }
 
 /*
+ * TODO: If we really want to remove rooms after a map is plopped down
+ * in a special level, this needs to be rewritten - the maps may have
+ * holes in them ("x" mapchar), leaving parts of rooms still on the map.
+ *
  * When level processed by join_map is overlaid by a MAP, some rooms may no
  * longer be valid.  All rooms in the region lx <= x < hx, ly <= y < hy are
  * removed.  Rooms partially in the region are truncated.  This function
