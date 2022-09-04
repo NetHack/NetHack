@@ -271,6 +271,7 @@ safe_typename(int otyp)
         || !OBJ_NAME(objects[otyp])) {
         res = nextobuf();
         Sprintf(res, "glorkum[%d]", otyp);
+        impossible("safe_typename: %s", res);
     } else {
         /* force it to be treated as fully discovered */
         save_nameknown = objects[otyp].oc_name_known;
@@ -834,6 +835,7 @@ xname_flags(
     }
     default:
         Sprintf(buf, "glorkum %d %d %d", obj->oclass, typ, obj->spe);
+        impossible("xname_flags: %s", buf);
         break;
     }
     if (pluralize) {
