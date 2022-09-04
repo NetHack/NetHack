@@ -6814,6 +6814,7 @@ static const struct attr_names {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
+    { "italic", ATR_ITALIC },
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },

@@ -748,6 +748,9 @@ curses_convert_attr(int attr)
     case ATR_INVERSE:
         curses_attr = A_REVERSE;
         break;
+    case ATR_ITALIC:
+        curses_attr = A_ITALIC;
+        break;
     default:
         curses_attr = A_NORMAL;
     }
