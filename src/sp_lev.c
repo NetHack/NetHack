@@ -5559,7 +5559,9 @@ lspo_replace_terrain(lua_State *L)
                     if (mapfrag_match(mf, x, y) && (rn2(100)) < chance)
                         (void) set_levltyp_lit(x, y, totyp, tolit);
                 } else {
-                    if (levl[x][y].typ == fromtyp && rn2(100) < chance)
+                    if (((fromtyp == MATCH_WALL && IS_STWALL(levl[x][y].typ))
+                         || levl[x][y].typ == fromtyp)
+                        && rn2(100) < chance)
                         (void) set_levltyp_lit(x, y, totyp, tolit);
                 }
             }
