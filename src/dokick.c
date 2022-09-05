@@ -905,6 +905,9 @@ dokick(void)
         default:
             break;
         }
+    } else if (sobj_at(BOULDER, u.ux, u.uy) && !Passes_walls) {
+        pline("There's not enough room to kick in here.");
+        no_kick = TRUE;
     }
 
     if (no_kick) {
