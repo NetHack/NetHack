@@ -155,10 +155,16 @@ static void misc_stats(winid, long *, long *);
 static void you_sanity_check(void);
 static boolean accept_menu_prefix(const struct ext_func_tab *);
 static void reset_cmd_vars(boolean);
+
 static void mcmd_addmenu(winid, int, const char *);
-static char here_cmd_menu(void);
-static char there_cmd_menu(coordxy, coordxy, int);
+static int there_cmd_menu_self(winid, coordxy, coordxy, int *);
+static int there_cmd_menu_next2u(winid, coordxy, coordxy, int, int *);
+static int there_cmd_menu_far(winid, coordxy, coordxy, int);
+static int there_cmd_menu_common(winid, coordxy, coordxy, int, int *);
 static void act_on_act(int, coordxy, coordxy);
+static char there_cmd_menu(coordxy, coordxy, int);
+static char here_cmd_menu(void);
+
 static char readchar_core(coordxy *, coordxy *, int *);
 static char *parse(void);
 static void show_direction_keys(winid, char, boolean);
@@ -5494,7 +5500,7 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
     stairway *stway = stairway_at(x, y);
     struct trap *ttmp;
 
-    if (!u_at(x,y))
+    if (!u_at(x, y))
         return K;
 
     if ((IS_FOUNTAIN(typ) || IS_SINK(typ)) && can_reach_floor(FALSE)) {
@@ -5692,14 +5698,17 @@ there_cmd_menu_far(winid win, coordxy x, coordxy y, int mod)
 static int
 there_cmd_menu_common(
     winid win,
-    coordxy x UNUSED, coordxy y UNUSED,
+    coordxy x, coordxy y,
     int mod,
     int *act UNUSED)
 {
     int K = 0;
 
     if (mod == CLICK_1 || mod == CLICK_2) { /* ignore iflags.clicklook here */
-        mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
+        /* for self, only include "look at map symbol" if it isn't the
+           ordinary hero symbol (steed, invisible w/o see invisible, ?) */
+        if (!u_at(x, y) || Upolyd || glyph_at(x, y) != hero_glyph)
+            mcmd_addmenu(win, MCMD_LOOK_AT, "Look at map symbol"), ++K;
     }
     return K;
 }
@@ -5795,7 +5804,7 @@ act_on_act(
         cmdq_add_ec(CQ_CANNED, do_reqmenu);
         cmdq_add_ec(CQ_CANNED, doloot);
         cmdq_add_dir(CQ_CANNED, dx, dy, 0);
-        cmdq_add_key(CQ_CANNED, 'y'); /* "Do you want to remove the saddle ..." */
+        cmdq_add_key(CQ_CANNED, 'y'); /* "Do you want to remove saddle? */
         break;
     case MCMD_APPLY_SADDLE:
         if ((otmp = carrying(SADDLE)) != 0) {
@@ -5815,7 +5824,7 @@ act_on_act(
     case MCMD_NAME:
         cmdq_add_ec(CQ_CANNED, docallcmd);
         cmdq_add_key(CQ_CANNED, 'm'); /* name a monster */
-        cmdq_add_dir(CQ_CANNED, dx, dy, 0); /* getpos() will use u.ux+dx,u.uy+dy */
+        cmdq_add_dir(CQ_CANNED, dx, dy, 0); /* getpos() uses u.ux+dx,u.uy+dy */
         break;
     case MCMD_QUAFF:
         cmdq_add_ec(CQ_CANNED, dodrink);
