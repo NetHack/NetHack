@@ -5455,6 +5455,7 @@ enum menucmd {
     MCMD_MONABILITY,
     MCMD_PICKUP,
     MCMD_LOOT,
+    MCMD_TIP,
     MCMD_EAT,
     MCMD_DROP,
     MCMD_REST,
@@ -5542,6 +5543,9 @@ there_cmd_menu_self(winid win, coordxy x, coordxy y, int *act UNUSED)
         if (Is_container(otmp)) {
             Sprintf(buf, "Loot %s", doname(otmp));
             mcmd_addmenu(win, MCMD_LOOT, buf), ++K;
+
+            Sprintf(buf, "Tip %s", doname(otmp));
+            mcmd_addmenu(win, MCMD_TIP, buf), ++K;
         }
         if (otmp->oclass == FOOD_CLASS) {
             Sprintf(buf, "Eat %s", doname(otmp));
@@ -5842,6 +5846,10 @@ act_on_act(
         break;
     case MCMD_LOOT:
         cmdq_add_ec(CQ_CANNED, doloot);
+        break;
+    case MCMD_TIP:
+        cmdq_add_ec(CQ_CANNED, dotip);
+        cmdq_add_key(CQ_CANNED, 'y'); /* "There is foo here; tip it?" */
         break;
     case MCMD_EAT:
         cmdq_add_ec(CQ_CANNED, doeat);
