@@ -326,8 +326,7 @@ wield_ok(struct obj *obj)
     if (obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
-    if (obj->oclass == WEAPON_CLASS
-        || (obj->oclass == TOOL_CLASS && is_weptool(obj)))
+    if (obj->oclass == WEAPON_CLASS || is_weptool(obj))
         return GETOBJ_SUGGEST;
 
     return GETOBJ_DOWNPLAY;
