@@ -66,6 +66,7 @@ struct {
 #define PCHAR_TILES
 #include "defsym.h"
 #undef PCHAR_TILES
+   { 0, 0, 0 }
 };
 
 enum {MON_GLYPH, OBJ_GLYPH, OTH_GLYPH, TERMINATOR = -1};
@@ -1430,7 +1431,7 @@ acceptable_tilename(int glyph_set, int idx, const char *encountered,
     };
 
     if (glyph_set == OTH_GLYPH) {
-        if (idx >= 0 && idx < SIZE(altlabels)) {
+        if (idx >= 0 && idx < (SIZE(altlabels) - 1)) {
             if (!strcmp(altlabels[idx].tilelabel, encountered))
                 return TRUE;
         }
