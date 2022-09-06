@@ -41,6 +41,7 @@ static char *spellretention(int, char *);
 static int throwspell(void);
 static void cast_protection(void);
 static void spell_backfire(int);
+static boolean spelleffects_check(int, int *, int *);
 static const char *spelltypemnemonic(int);
 static boolean can_center_spell_location(coordxy, coordxy);
 static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
@@ -734,6 +735,38 @@ getspell(int* spell_no)
                        spell_no);
 }
 
+/* #wizcast - cast any spell even without knowing it */
+int
+dowizcast(void)
+{
+    winid win;
+    menu_item *selected;
+    anything any;
+    int i, n;
+
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+    any = cg.zeroany;
+
+    for (i = 0; i < MAXSPELL; i++) {
+        n = (SPE_DIG + i);
+        if (n >= SPE_BLANK_PAPER)
+            break;
+        any.a_int = n;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, 0, OBJ_NAME(objects[n]), MENU_ITEMFLAGS_NONE);
+    }
+    end_menu(win, "Cast which spell?");
+    n = select_menu(win, PICK_ONE, &selected);
+    destroy_nhwindow(win);
+    if (n > 0) {
+        i = selected[0].item.a_int;
+        free((genericptr_t) selected);
+        return spelleffects(i, FALSE, TRUE);
+    }
+    return ECMD_OK;
+}
+
+
 /* the #cast command -- cast a spell */
 int
 docast(void)
@@ -741,7 +774,7 @@ docast(void)
     int spell_no;
 
     if (getspell(&spell_no))
-        return spelleffects(g.spl_book[spell_no].sp_id, FALSE);
+        return spelleffects(g.spl_book[spell_no].sp_id, FALSE, FALSE);
     return ECMD_OK;
 }
 
@@ -891,18 +924,13 @@ spell_backfire(int spell)
     return;
 }
 
-/* hero casts a spell of type spell_otyp, eg. SPE_SLEEP.
-   hero must know the spell. */
-int
-spelleffects(int spell_otyp, boolean atme)
+static boolean
+spelleffects_check(int spell, int *res, int *energy)
 {
-    int spell = spell_idx(spell_otyp);
-    int energy, damage, chance, n, intell;
-    int otyp, skill, role_skill, res = ECMD_OK;
+    int chance;
     boolean confused = (Confusion != 0);
-    boolean physical_damage = FALSE;
-    struct obj *pseudo;
-    coord cc;
+
+    *energy = 0;
 
     /*
      * Reject attempting to cast while stunned or with no free hands.
@@ -914,14 +942,15 @@ spelleffects(int spell_otyp, boolean atme)
      * place in getspell(), we don't get called.)
      */
     if ((spell == UNKNOWN_SPELL) || rejectcasting()) {
-        return ECMD_OK; /* no time elapses */
+        *res = ECMD_OK; /* no time elapses */
+        return TRUE;
     }
 
     /*
      *  Note: dotele() also calculates energy use and checks nutrition
      *  and strength requirements; if any of these change, update it too.
      */
-    energy = SPELL_LEV_PW(spellev(spell)); /* 5 <= energy <= 35 */
+    *energy = SPELL_LEV_PW(spellev(spell)); /* 5 <= energy <= 35 */
 
     /*
      * Spell casting no longer affects knowledge of the spell. A
@@ -931,11 +960,12 @@ spelleffects(int spell_otyp, boolean atme)
         Your("knowledge of this spell is twisted.");
         pline("It invokes nightmarish images in your mind...");
         spell_backfire(spell);
-        u.uen -= rnd(energy);
+        u.uen -= rnd(*energy);
         if (u.uen < 0)
             u.uen = 0;
         g.context.botl = 1;
-        return ECMD_TIME;
+        *res = ECMD_TIME;
+        return TRUE;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
         You("strain to recall the spell.");
     } else if (spellknow(spell) <= KEEN / 40) { /* 500 turns left */
@@ -948,13 +978,16 @@ spelleffects(int spell_otyp, boolean atme)
 
     if (u.uhunger <= 10 && spellid(spell) != SPE_DETECT_FOOD) {
         You("are too hungry to cast that spell.");
-        return ECMD_OK;
+        *res = ECMD_OK;
+        return TRUE;
     } else if (ACURR(A_STR) < 4 && spellid(spell) != SPE_RESTORE_ABILITY) {
         You("lack the strength to cast spells.");
-        return ECMD_OK;
+        *res = ECMD_OK;
+        return TRUE;
     } else if (check_capacity(
                 "Your concentration falters while carrying so much stuff.")) {
-        return ECMD_TIME;
+        *res = ECMD_TIME;
+        return TRUE;
     }
 
     /* if the cast attempt is already going to fail due to insufficient
@@ -962,7 +995,7 @@ spelleffects(int spell_otyp, boolean atme)
        in and no turn will be consumed; however, when it does kick in,
        the attempt may fail due to lack of energy after the draining, in
        which case a turn will be used up in addition to the energy loss */
-    if (u.uhave.amulet && u.uen >= energy) {
+    if (u.uhave.amulet && u.uen >= *energy) {
         You_feel("the amulet draining your energy away.");
         /* this used to be 'energy += rnd(2 * energy)' (without 'res'),
            so if amulet-induced cost was more than u.uen, nothing
@@ -970,14 +1003,14 @@ spelleffects(int spell_otyp, boolean atme)
            and player could just try again (and again and again...);
            now we drain some energy immediately, which has a
            side-effect of not increasing the hunger aspect of casting */
-        u.uen -= rnd(2 * energy);
+        u.uen -= rnd(2 * *energy);
         if (u.uen < 0)
             u.uen = 0;
         g.context.botl = 1;
-        res = ECMD_TIME; /* time is used even if spell doesn't get cast */
+        *res = ECMD_TIME; /* time is used even if spell doesn't get cast */
     }
 
-    if (energy > u.uen) {
+    if (*energy > u.uen) {
         /*
          * Hero has insufficient energy/power to cast the spell.
          * Augment the message when current energy is at maximum.
@@ -989,12 +1022,12 @@ spelleffects(int spell_otyp, boolean atme)
          */
         You("don't have enough energy to cast that spell%s.",
             (u.uen < u.uenmax) ? "" /* not at full energy => normal message */
-            : (energy > u.uenpeak) ? " yet" /* haven't ever had enough */
+            : (*energy > u.uenpeak) ? " yet" /* haven't ever had enough */
               : " anymore"); /* once had enough but have lost some since */
-        return res;
+        return TRUE;
     } else {
         if (spellid(spell) != SPE_DETECT_FOOD) {
-            int hungr = energy * 2;
+            int hungr = *energy * 2;
 
             /* If hero is a wizard, their current intelligence
              * (bonuses + temporary + current)
@@ -1009,7 +1042,7 @@ spelleffects(int spell_otyp, boolean atme)
              * b) Wizards have spent their life at magic and
              * understand quite well how to cast spells.
              */
-            intell = acurr(A_INT);
+            int intell = acurr(A_INT);
             if (!Role_if(PM_WIZARD))
                 intell = 10;
             switch (intell) {
@@ -1046,16 +1079,34 @@ spelleffects(int spell_otyp, boolean atme)
     chance = percent_success(spell);
     if (confused || (rnd(100) > chance)) {
         You("fail to cast the spell correctly.");
-        u.uen -= energy / 2;
+        u.uen -= *energy / 2;
         g.context.botl = 1;
-        return ECMD_TIME;
+        *res = ECMD_TIME;
+        return TRUE;
     }
+    return FALSE;
+}
+
+/* hero casts a spell of type spell_otyp, eg. SPE_SLEEP.
+   hero must know the spell (unless force is TRUE). */
+int
+spelleffects(int spell_otyp, boolean atme, boolean force)
+{
+    int spell = force ? spell_otyp : spell_idx(spell_otyp);
+    int energy = 0, damage, n;
+    int otyp, skill, role_skill, res = ECMD_OK;
+    boolean physical_damage = FALSE;
+    struct obj *pseudo;
+    coord cc;
+
+    if (!force && spelleffects_check(spell, &res, &energy))
+        return res;
 
     u.uen -= energy;
     g.context.botl = 1;
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
-    pseudo = mksobj(spellid(spell), FALSE, FALSE);
+    pseudo = mksobj(force ? spell : spellid(spell), FALSE, FALSE);
     pseudo->blessed = pseudo->cursed = 0;
     pseudo->quan = 20L; /* do not let useup get it */
     /*

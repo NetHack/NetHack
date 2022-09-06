@@ -1720,6 +1720,9 @@ Debug mode only.
 Bury objects under and around you.
 Autocompletes.
 Debug mode only.
+.lp #wizcast
+Cast any spell.
+Debug mode only.
 .lp #wizdetect
 Reveal hidden things (secret doors or traps or unseen monsters)
 within a modest radius.

@@ -2749,6 +2749,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_debug_cmd_bury, IFBURIED | AUTOCOMPLETE | WIZMODECMD,
               NULL },
 #endif
+    { '\0',   "wizcast", "cast any spell",
+              dowizcast, IFBURIED | WIZMODECMD, NULL },
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)

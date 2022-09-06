@@ -1922,7 +1922,7 @@ jump(int magic) /* 0=Physical, otherwise skill level */
 
     /* attempt "jumping" spell if hero has no innate jumping ability */
     if (!magic && !Jumping && known_spell(SPE_JUMPING) >= spe_Fresh)
-        return spelleffects(SPE_JUMPING, FALSE);
+        return spelleffects(SPE_JUMPING, FALSE, FALSE);
 
     if (!magic && (nolimbs(g.youmonst.data) || slithy(g.youmonst.data))) {
         /* normally (nolimbs || slithy) implies !Jumping,

@@ -22,6 +22,7 @@ Debug-Mode Quick Reference:
 #vanquished     == disclose counts of dead monsters sorted in various ways
 #vision         == show vision array
 #wizborn        == show monster birth/death/geno/extinct stats
+#wizcast        == cast any spell
 #wizfliplevel   == transpose the current dungeon level
 #wizintrinsic   == set selected intrinsic timeouts
 #wizkill        == remove monster(s) from play
