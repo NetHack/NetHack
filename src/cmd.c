@@ -1952,7 +1952,10 @@ static int
 wiz_intrinsic(void)
 {
     if (wizard) {
-        extern const struct propname propertynames[]; /* timeout.c */
+        extern const struct propname {
+            int prop_num;
+            const char *prop_name;
+        } propertynames[]; /* timeout.c */
         static const char wizintrinsic[] = "#wizintrinsic";
         static const char fmt[] = "You are%s %s.";
         winid win;

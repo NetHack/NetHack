@@ -60,9 +60,4 @@ typedef struct fe {
     Bitfield(needs_fixup, 1); /* does arg need to be patched? */
 } timer_element;
 
-struct propname {
-    int prop_num;
-    const char *prop_name;
-};
-
 #endif /* TIMEOUT_H */

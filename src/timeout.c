@@ -21,7 +21,10 @@ static void cleanup_burn(ANY_P *, long);
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */
-const struct propname propertynames[] = {
+const struct propname {
+    int prop_num;
+    const char *prop_name;
+} propertynames[] = {
     { INVULNERABLE, "invulnerable" },
     { STONED, "petrifying" },
     { SLIMED, "becoming slime" },
