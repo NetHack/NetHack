@@ -62,7 +62,7 @@ struct {
     int idx;
     const char *tilelabel;
     const char *expectedlabel;
-} altlabels[MAXPCHARS] = {
+} altlabels[MAXPCHARS + 1] = {
 #define PCHAR_TILES
 #include "defsym.h"
 #undef PCHAR_TILES

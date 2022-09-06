@@ -66,10 +66,15 @@ const struct symdef def_warnsyms[WARNCOUNT] = {
  *  parsing other.txt because some of the useful tile names don't exist
  *  within NetHack itself.
  */
-const struct symdef defsyms[MAXPCHARS] = {
+const struct symdef defsyms[MAXPCHARS + 1] = {
 #define PCHAR_DRAWING
 #include "defsym.h"
 #undef PCHAR_DRAWING
+    { 0, NULL
+#ifdef TEXTCOLOR
+              , NO_COLOR
+#endif
+    }
 };
 
 /* default rogue level symbols */
@@ -130,7 +135,7 @@ def_char_is_furniture(char ch)
     int i;
     boolean furniture = FALSE;
 
-    for (i = 0; i < SIZE(defsyms); ++i) {
+    for (i = 0; i < MAXPCHARS; ++i) {
         if (!furniture) {
             if (!strncmp(defsyms[i].explanation, first_furniture, 5))
                 furniture = TRUE;

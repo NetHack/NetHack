@@ -160,7 +160,7 @@ struct symset_customization {
 };
 #endif /* ENHANCED_SYMBOLS */
 
-extern const struct symdef defsyms[MAXPCHARS]; /* defaults */
+extern const struct symdef defsyms[MAXPCHARS + 1]; /* defaults */
 #define WARNCOUNT 6 /* number of different warning levels */
 extern const struct symdef def_warnsyms[WARNCOUNT];
 #define SYMHANDLING(ht) (g.symset[g.currentgraphics].handling == (ht))

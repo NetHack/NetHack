@@ -710,6 +710,7 @@ enum glyph_offsets {
     ((glyph) >= GLYPH_CMAP_STONE_OFF \
      && (glyph) < (GLYPH_CMAP_C_OFF + ((S_goodpos - S_digbeam) + 1)))
 
+/* final MAXPCHARS is legal array index because of trailing fencepost entry */
 #define glyph_to_cmap(glyph) \
     (((glyph) == GLYPH_CMAP_STONE_OFF)                                  \
       ? S_stone                                                         \
@@ -733,7 +734,7 @@ enum glyph_offsets {
                         ? (((glyph) - GLYPH_CMAP_C_OFF) + S_digbeam)    \
                         : glyph_is_cmap_zap(glyph)                      \
                           ? ((((glyph) - GLYPH_ZAP_OFF) % 4) + S_vbeam) \
-                          : NO_GLYPH)
+                          : MAXPCHARS)
 
 #define glyph_to_swallow(glyph) \
     (glyph_is_swallow(glyph) ? (((glyph) - GLYPH_SWALLOW_OFF) & 0x7) : 0)
@@ -779,6 +780,7 @@ enum glyph_offsets {
      || glyph_is_ridden_monster(glyph) || glyph_is_detected_monster(glyph))
 #define glyph_is_invisible(glyph) ((glyph) == GLYPH_INVISIBLE)
 
+/* final NUMMONS is legal array index because of trailing fencepost entry */
 #define glyph_to_mon(glyph) \
        (glyph_is_normal_female_monster(glyph)                  \
          ? ((glyph) - GLYPH_MON_FEM_OFF)                       \
@@ -796,7 +798,7 @@ enum glyph_offsets {
                      ? ((glyph) - GLYPH_RIDDEN_FEM_OFF)        \
                      : glyph_is_ridden_male_monster(glyph)     \
                        ? ((glyph) - GLYPH_RIDDEN_MALE_OFF)     \
-                       : NO_GLYPH)
+                       : NUMMONS)
 
 #define obj_is_piletop(obj) \
     ((obj)->where == OBJ_FLOOR                                  \
@@ -876,6 +878,7 @@ enum glyph_offsets {
                 ? (GLYPH_BODY_OFF)))                            \
          : ((int) (obj)->otyp + GLYPH_OBJ_OFF))))
 
+/* final NUM_OBJECTS is legal array idx because of trailing fencepost entry */
 #define glyph_to_obj(glyph) \
     (glyph_is_body(glyph) ? CORPSE                              \
      : glyph_is_statue(glyph) ? STATUE                          \
@@ -883,7 +886,7 @@ enum glyph_offsets {
            ? ((glyph) - (glyph_is_normal_piletop_obj(glyph)     \
                            ? GLYPH_OBJ_PILETOP_OFF              \
                            : GLYPH_OBJ_OFF))                    \
-           : NO_GLYPH)
+           : NUM_OBJECTS)
 
 #define glyph_to_body_corpsenm(glyph) \
     (glyph_is_body_piletop(glyph)                       \

@@ -1075,90 +1075,92 @@ tmp_at(coordxy x, coordxy y)
         break;
     }
 
-    if (!tglyph)
+    if (!tglyph) {
         panic("tmp_at: tglyph not initialized");
+    } else {
+        switch (x) {
+        case DISP_CHANGE:
+            tglyph->glyph = y;
+            break;
 
-    switch (x) {
-    case DISP_CHANGE:
-        tglyph->glyph = y;
-        break;
+        case DISP_END:
+            if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
+                register int i;
 
-    case DISP_END:
-        if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
-            register int i;
-
-            /* Erase (reset) from source to end */
-            for (i = 0; i < tglyph->sidx; i++)
-                newsym(tglyph->saved[i].x, tglyph->saved[i].y);
-        } else if (tglyph->style == DISP_TETHER) {
-            int i;
-
-            if (y == BACKTRACK && tglyph->sidx > 1) {
-                /* backtrack */
-                for (i = tglyph->sidx - 1; i > 0; i--) {
+                /* Erase (reset) from source to end */
+                for (i = 0; i < tglyph->sidx; i++)
                     newsym(tglyph->saved[i].x, tglyph->saved[i].y);
-                    show_glyph(tglyph->saved[i - 1].x,
-                               tglyph->saved[i - 1].y, tglyph->glyph);
-                    flush_screen(0);   /* make sure it shows up */
-                    delay_output();
+            } else if (tglyph->style == DISP_TETHER) {
+                int i;
+
+                if (y == BACKTRACK && tglyph->sidx > 1) {
+                    /* backtrack */
+                    for (i = tglyph->sidx - 1; i > 0; i--) {
+                        newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+                        show_glyph(tglyph->saved[i - 1].x,
+                                   tglyph->saved[i - 1].y, tglyph->glyph);
+                        flush_screen(0); /* make sure it shows up */
+                        delay_output();
+                    }
+                    tglyph->sidx = 1;
                 }
+                for (i = 0; i < tglyph->sidx; i++)
+                    newsym(tglyph->saved[i].x, tglyph->saved[i].y);
+            } else {              /* DISP_FLASH or DISP_ALWAYS */
+                if (tglyph->sidx) /* been called at least once */
+                    newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+            }
+            /* tglyph->sidx = 0; -- about to be freed, so not necessary */
+            tmp = tglyph->prev;
+            if (tglyph != &tgfirst)
+                free((genericptr_t) tglyph);
+            tglyph = tmp;
+            break;
+
+        default: /* do it */
+            if (!isok(x, y))
+                break;
+            if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
+                if (tglyph->style != DISP_ALL && !cansee(x, y))
+                    break;
+                if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
+                    break; /* too many locations */
+                /* save pos for later erasing */
+                tglyph->saved[tglyph->sidx].x = x;
+                tglyph->saved[tglyph->sidx].y = y;
+                tglyph->sidx += 1;
+            } else if (tglyph->style == DISP_TETHER) {
+                if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
+                    break; /* too many locations */
+                if (tglyph->sidx) {
+                    int px, py;
+
+                    px = tglyph->saved[tglyph->sidx - 1].x;
+                    py = tglyph->saved[tglyph->sidx - 1].y;
+                    show_glyph(px, py, tether_glyph(px, py));
+                }
+                /* save pos for later use or erasure */
+                tglyph->saved[tglyph->sidx].x = x;
+                tglyph->saved[tglyph->sidx].y = y;
+                tglyph->sidx += 1;
+            } else { /* DISP_FLASH/ALWAYS */
+                if (tglyph
+                        ->sidx) { /* not first call, so reset previous pos */
+                    newsym(tglyph->saved[0].x, tglyph->saved[0].y);
+                    tglyph->sidx = 0; /* display is presently up to date */
+                }
+                if (!cansee(x, y) && tglyph->style != DISP_ALWAYS)
+                    break;
+                tglyph->saved[0].x = x;
+                tglyph->saved[0].y = y;
                 tglyph->sidx = 1;
             }
-            for (i = 0; i < tglyph->sidx; i++)
-                newsym(tglyph->saved[i].x, tglyph->saved[i].y);
-        } else {              /* DISP_FLASH or DISP_ALWAYS */
-            if (tglyph->sidx) /* been called at least once */
-                newsym(tglyph->saved[0].x, tglyph->saved[0].y);
-        }
-        /* tglyph->sidx = 0; -- about to be freed, so not necessary */
-        tmp = tglyph->prev;
-        if (tglyph != &tgfirst)
-            free((genericptr_t) tglyph);
-        tglyph = tmp;
-        break;
 
-    default: /* do it */
-        if (!isok(x, y))
+            show_glyph(x, y, tglyph->glyph); /* show it */
+            flush_screen(0);                 /* make sure it shows up */
             break;
-        if (tglyph->style == DISP_BEAM || tglyph->style == DISP_ALL) {
-            if (tglyph->style != DISP_ALL && !cansee(x, y))
-                break;
-            if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
-                break; /* too many locations */
-            /* save pos for later erasing */
-            tglyph->saved[tglyph->sidx].x = x;
-            tglyph->saved[tglyph->sidx].y = y;
-            tglyph->sidx += 1;
-        } else if (tglyph->style == DISP_TETHER) {
-            if (tglyph->sidx >= TMP_AT_MAX_GLYPHS)
-                break; /* too many locations */
-            if (tglyph->sidx) {
-                int px, py;
-
-                px = tglyph->saved[tglyph->sidx-1].x;
-                py = tglyph->saved[tglyph->sidx-1].y;
-                show_glyph(px, py, tether_glyph(px, py));
-            }
-            /* save pos for later use or erasure */
-            tglyph->saved[tglyph->sidx].x = x;
-            tglyph->saved[tglyph->sidx].y = y;
-            tglyph->sidx += 1;
-        } else {                /* DISP_FLASH/ALWAYS */
-            if (tglyph->sidx) { /* not first call, so reset previous pos */
-                newsym(tglyph->saved[0].x, tglyph->saved[0].y);
-                tglyph->sidx = 0; /* display is presently up to date */
-            }
-            if (!cansee(x, y) && tglyph->style != DISP_ALWAYS)
-                break;
-            tglyph->saved[0].x = x;
-            tglyph->saved[0].y = y;
-            tglyph->sidx = 1;
-        }
-
-        show_glyph(x, y, tglyph->glyph); /* show it */
-        flush_screen(0);                 /* make sure it shows up */
-        break;
-    } /* end case */
+        } /* end switch */
+    }
 }
 
 /*
