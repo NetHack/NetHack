@@ -1207,7 +1207,7 @@ static boolean
 watchman_canseeu(struct monst *mtmp)
 {
     if (is_watch(mtmp->data) && mtmp->mcansee && m_canseeu(mtmp)
-        && couldsee(mtmp->mx, mtmp->my) && mtmp->mpeaceful)
+        && mtmp->mpeaceful)
         return TRUE;
     return FALSE;
 }
