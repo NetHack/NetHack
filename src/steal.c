@@ -567,7 +567,7 @@ stealamulet(struct monst* mtmp)
     }
 
     if (!otmp) {
-        /* if we didn't find any quest arifact, find another valuable item */
+        /* if we didn't find any quest artifact, find another valuable item */
         if (u.uhave.amulet) {
             real = AMULET_OF_YENDOR;
             fake = FAKE_AMULET_OF_YENDOR;
@@ -595,7 +595,7 @@ stealamulet(struct monst* mtmp)
     }
 
     if (otmp) { /* we have something to snatch */
-        /* take off outer gear if we're targetting [hypothetical]
+        /* take off outer gear if we're targeting [hypothetical]
            quest artifact suit, shirt, gloves, or rings */
         if ((otmp == uarm || otmp == uarmu) && uarmc)
             remove_worn_item(uarmc, FALSE);
@@ -680,7 +680,7 @@ mdrop_obj(
     coordxy omx = mon->mx, omy = mon->my;
     long unwornmask = obj->owornmask;
     /* call distant_name() for its possible side-effects even if the result
-       might not be printed, and do it before extracing obj from minvent */
+       might not be printed, and do it before extracting obj from minvent */
     char *obj_name = distant_name(obj, doname);
 
     extract_from_minvent(mon, obj, FALSE, TRUE);

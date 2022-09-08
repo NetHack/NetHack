@@ -5342,7 +5342,7 @@ destroy_item(int osym, int dmgtyp)
      * rehumanization could also drop hero onto a trap, and there's no
      * straightforward way to defer that.  Things could be improved by
      * redoing this to use two passes, first to collect a list or array
-     * of o_id and quantity of what is targetted for destruction,
+     * of o_id and quantity of what is targeted for destruction,
      * second pass to handle the destruction.]
      */
     bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */

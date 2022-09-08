@@ -1140,7 +1140,7 @@ query_objlist(const char *qstr,        /* query string */
 int
 query_category(const char *qstr,      /* query string */
                struct obj *olist,     /* the list to pick from */
-               int qflags,            /* behaviour modification flags */
+               int qflags,            /* behavior modification flags */
                menu_item **pick_list, /* return list of items picked */
                int how)               /* type of query */
 {
@@ -2113,12 +2113,12 @@ doloot_core(void)
                 looted_mon = TRUE;
         }
         /* always use a turn when choosing a direction is impaired,
-           even if you've successfully targetted a saddled creature
+           even if you've successfully targeted a saddled creature
            and then answered "no" to the "remove its saddle?" prompt */
         if (Confusion || Stunned)
             timepassed = 1;
 
-        /* Preserve pre-3.3.1 behaviour for containers.
+        /* Preserve pre-3.3.1 behavior for containers.
          * Adjust this if-block to allow container looting
          * from one square away to change that in the future.
          */

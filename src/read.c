@@ -3105,7 +3105,7 @@ create_particular_creation(struct _create_particular_data* d)
             mtmp->mundetected = 1;
         if (d->sleeping)
             mtmp->msleeping = 1;
-        /* iff asking for 'hidden', show locaton of every created monster
+        /* iff asking for 'hidden', show location of every created monster
            that can't be seen--whether that's due to successfully hiding
            or vision issues (line-of-sight, invisibility, blindness) */
         if (d->hidden && !canspotmon(mtmp)) {

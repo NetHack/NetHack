@@ -847,7 +847,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                 getpos_help(force, goal);
             else /* ^R */
                 docrt(); /* redraw */
-            /* update message window to reflect that we're still targetting */
+            /* update message window to reflect that we're still targeting */
             show_goal_msg = TRUE;
             msg_given = TRUE;
         } else if (c == g.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
@@ -1328,7 +1328,7 @@ do_oname(struct obj *obj)
            the text had been trodden upon, sometimes picking
            punctuation instead of an arbitrary letter;
            unfortunately, we have to cover the possibility of
-           it targetting spaces so failing to make any change
+           it targeting spaces so failing to make any change
            (we know that it must eventually target a nonspace
            because buf[] matches a valid artifact name) */
         Strcpy(bufcpy, buf);

@@ -824,7 +824,7 @@ gulpmm(
          *  removes it when they match.  So magr is still at mdef's
          *  former spot these days.
          *
-         *  We still potentially do one fixup:  if the gulp targetted
+         *  We still potentially do one fixup:  if the gulp targeted
          *  an inhospitable location, magr will return to its previous
          *  spot instead of staying.
          */

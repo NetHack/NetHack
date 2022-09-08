@@ -357,7 +357,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, NoAlias, "edit menu colors")
     NHOPTC(menuinvertmode, Advanced, 5, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias,
-                "experimental behaviour of menu inverts")
+                "experimental behavior of menu inverts")
     NHOPTC(menustyle, Advanced, MENUTYPELEN, opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
                 "user interface for object selection")

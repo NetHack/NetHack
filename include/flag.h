@@ -184,7 +184,7 @@ struct debug_flags {
 /*
  * Stuff that really isn't option or platform related and does not
  * get saved and restored.  They are set and cleared during the game
- * to control the internal behaviour of various NetHack functions
+ * to control the internal behavior of various NetHack functions
  * and probably warrant a structure of their own elsewhere some day.
  */
 struct instance_flags {

@@ -14,7 +14,7 @@
 struct spell {
     short sp_id;  /* spell id (== object.otyp) */
     xint16 sp_lev; /* power level */
-    int sp_know;  /* knowlege of spell */
+    int sp_know;  /* knowledge of spell */
 };
 
 enum spellknowledge {

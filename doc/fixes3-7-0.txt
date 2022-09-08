@@ -258,7 +258,7 @@ if the Wizard of Yendor fled up the stairs on level 1, the game would behave
 	as if he was still in play, but he wouldn't be on migrating monsters
 	list so couldn't be brought back and wouldn't appear on Plane of Earth
 	(stale non-zero value for context.no_of_wizards)
-if a mind flayer's psychic blast targetted a hidden monster, feedback named
+if a mind flayer's psychic blast targeted a hidden monster, feedback named
 	the monster but it wasn't brought out of hiding
 hero poly'd into a mind flayer who used #monster to emit a psychic blast was
 	able to harm mindless monsters with it
@@ -298,7 +298,7 @@ make gasp/exclamation message from peaceful monsters be more verbose to
 when make was invoked with -j makedefs instances could end up running in
 	parallel and could trample on each other's temp files; default to
 	using mkstemp(); allow a port runtime library implementation that lacks
-	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behaviour;
+	mkstemp() to define HAS_NO_MKSTEMP to revert to the old behavior;
 	provide a work-alike mkstemp() implementation for windows visual studio
 	in mdlib.c so there is no requirement to define HAS_NO_MKSTEMP there
 make piranhas faster and give them extra bite attack
@@ -411,7 +411,7 @@ curses interface failed to honor menu_xxx option settings for menu interaction
 during engraving, spaces were counted instead of non-spaces [later: affected
 	code is gone, removed when engraving was converted into an occupation]
 when an explosion scatters objects, make any that fly over sinks stop there
-output message when changing fastmove mode while cursor targetting
+output message when changing fastmove mode while cursor targeting
 messages when Minetown watchmen become angry could report "you see an angry
 	guard approaching" even if he was invisible and hero can't see invis
 when autopickup is on but disabled due to being inside a shop, have ^X say so
@@ -1210,7 +1210,7 @@ when picking up a thrown weapon while quiver is empty, don't put it into the
 using bhitpos in flooreffects to handle erosion damage broke its original use
 	of tracking wand zaps if a teleportation zap hit an object; subsequent
 	zap traversal was done from object's landing spot rather than from its
-	zap hit spot, resulting in scrambled wand targetting
+	zap hit spot, resulting in scrambled wand targeting
 restore previous behavior of the 'altmeta' option (only wait for a second
 	character when getting a command keystroke, not other key input)
 baby gold dragons weren't able to grow into adult gold dragons

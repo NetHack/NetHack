@@ -241,7 +241,7 @@ target_on(int mask, struct monst *mtmp)
         else if ((otmp = on_ground(otyp)))
             return STRAT(STRAT_GROUND, otmp->ox, otmp->oy, mask);
         else if ((mtmp2 = other_mon_has_arti(mtmp, otyp)) != 0
-                 /* when seeking the Amulet, avoid targetting the Wizard
+                 /* when seeking the Amulet, avoid targeting the Wizard
                     or temple priests (to protect Moloch's high priest) */
                  && (otyp != AMULET_OF_YENDOR
                      || (!mtmp2->iswiz && !inhistemple(mtmp2))))

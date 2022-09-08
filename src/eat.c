@@ -637,7 +637,7 @@ eat_brains(struct monst *magr, struct monst *mdef,
             exercise(A_WIS, TRUE);
             *dmg_p += xtra_dmg;
         }
-        /* targetting another mind flayer or your own underlying species
+        /* targeting another mind flayer or your own underlying species
            is cannibalism */
         (void) maybe_cannibal(monsndx(pd), TRUE);
 

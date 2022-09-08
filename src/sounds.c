@@ -898,7 +898,7 @@ domonnoise(register struct monst* mtmp)
                 pline_msg = "threatens you.";
             break;
         }
-        /* Generic peaceful humanoid behaviour. */
+        /* Generic peaceful humanoid behavior. */
         if (mtmp->mflee)
             pline_msg = "wants nothing to do with you.";
         else if (mtmp->mhp < mtmp->mhpmax / 4)

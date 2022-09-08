@@ -5297,7 +5297,7 @@ untrap(
     }
 }
 
-/* for magic unlocking; returns true if targetted monster (which might
+/* for magic unlocking; returns true if targeted monster (which might
    be hero) gets untrapped; the trap remains intact */
 boolean
 openholdingtrap(
@@ -5389,7 +5389,7 @@ openholdingtrap(
     return TRUE;
 }
 
-/* for magic locking; returns true if targetted monster (which might
+/* for magic locking; returns true if targeted monster (which might
    be hero) gets hit by a trap (might avoid actually becoming trapped) */
 boolean
 closeholdingtrap(
@@ -5430,7 +5430,7 @@ closeholdingtrap(
     return result;
 }
 
-/* for magic unlocking; returns true if targetted monster (which might
+/* for magic unlocking; returns true if targeted monster (which might
    be hero) gets hit by a trap (target might avoid its effect) */
 boolean
 openfallingtrap(

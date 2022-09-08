@@ -893,7 +893,7 @@ init_CapMons(void)
      * CapMons[] init doesn't kick in until needed.  To force this name
      * dump, set DEBUGFILES to "CapMons" in your environment (or in
      * sysconf) prior to starting nethack, wish for a statue of an Archon
-     * and drop it if held, then step away and apply a stethscope towards
+     * and drop it if held, then step away and apply a stethoscope towards
      * it to trigger a message that passes "Archon" to the() which will
      * then call CapitalMon() which in turn will call init_CapMons().
      */

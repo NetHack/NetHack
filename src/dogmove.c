@@ -445,7 +445,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
     omy = mtmp->my;
 
     /* If we are carrying something then we drop it (perhaps near @).
-     * Note: if apport == 1 then our behaviour is independent of udist.
+     * Note: if apport == 1 then our behavior is independent of udist.
      * Use udist+1 so steed won't cause divide by zero.
      */
     if (droppables(mtmp)) {

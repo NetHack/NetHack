@@ -1480,7 +1480,7 @@ unmakemon(
 
     /* if count has reached the limit of 255, we don't know whether
        that just happened when creating this monster or the threshold
-       had already been reached and further incrments were suppressed;
+       had already been reached and further increments were suppressed;
        assume the latter */
     if (countbirth && g.mvitals[mndx].born > 0 && g.mvitals[mndx].born < 255)
         g.mvitals[mndx].born -= 1;

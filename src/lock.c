@@ -794,7 +794,7 @@ doopen_indir(coordxy x, coordxy y)
         return ECMD_TIME;
 
     /* when choosing a direction is impaired, use a turn
-       regardless of whether a door is successfully targetted */
+       regardless of whether a door is successfully targeted */
     if (Confusion || Stunned)
         res = ECMD_TIME;
 
@@ -954,7 +954,7 @@ doclose(void)
         return ECMD_TIME;
 
     /* when choosing a direction is impaired, use a turn
-       regardless of whether a door is successfully targetted */
+       regardless of whether a door is successfully targeted */
     if (Confusion || Stunned)
         res = ECMD_TIME;
 

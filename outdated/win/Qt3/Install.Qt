@@ -76,7 +76,7 @@ with the following additional steps:
       something as challenging to compile as NetHack before you can
       already build a Qtopia application for your target device.
 
-   2. If you are cross-compiling (eg. targetting an ARM-based handheld),
+   2. If you are cross-compiling (eg. targeting an ARM-based handheld),
       be sure to follow the steps for cross-compiling in the Makefile.src
       and Makefile.utl files.
 
