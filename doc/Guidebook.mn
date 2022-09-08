@@ -1495,7 +1495,7 @@ Default key is \(oqR\(cq.
 Repeat the previous command.
 Default key is \(oq\(haA\(cq.
 .lp "#reqmenu "
-Prefix key to modify the behaviour or request menu from some commands.
+Prefix key to modify the behavior or request menu from some commands.
 Prevents autopickup when used with movement commands.
 Default key is \(oqm\(cq.
 .lp "#retravel"

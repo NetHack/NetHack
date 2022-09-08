@@ -347,7 +347,7 @@ m_sees_sleepy_soldier(struct monst *mtmp)
     return FALSE;
 }
 
-/* Select a defensive item/action for a monster.  Returns TRUE iff one is
+/* Select a defensive item/action for a monster.  Returns TRUE if one is
    found. */
 boolean
 find_defensive(struct monst* mtmp, boolean tryescape)
@@ -1256,7 +1256,7 @@ mon_has_friends(struct monst *mtmp)
     return FALSE;
 }
 
-/* Select an offensive item/action for a monster.  Returns TRUE iff one is
+/* Select an offensive item/action for a monster.  Returns TRUE if one is
  * found.
  */
 boolean
@@ -1280,7 +1280,7 @@ find_offensive(struct monst* mtmp)
         && !uwep && !uarmu && !uarm && !uarmh
         && !uarms && !uarmg && !uarmc && !uarmf)
         return FALSE;
-    /* all offensive items require orthogonal or diagonal targetting */
+    /* all offensive items require orthogonal or diagonal targeting */
     if (!lined_up(mtmp))
         return FALSE;
 
@@ -1959,7 +1959,7 @@ find_misc(struct monst* mtmp)
             && u_at(mtmp->mux, mtmp->muy)
             && next2u(mtmp->mx, mtmp->my)
             /* don't bother if it can't work (this doesn't
-               prevent cursed weapons from being targetted) */
+               prevent cursed weapons from being targeted) */
             && (canletgo(uwep, "")
                 || (u.twoweap && canletgo(uswapwep, "")))) {
             g.m.misc = obj;

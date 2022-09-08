@@ -1342,7 +1342,7 @@ Is_branchlev(d_level *lev)
     return (branch *) 0;
 }
 
-/* returns True iff the branch 'lev' is in a branch which builds up */
+/* returns True if the branch 'lev' is in a branch which builds up */
 boolean
 builds_up(d_level *lev)
 {

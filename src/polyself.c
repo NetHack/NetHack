@@ -1627,7 +1627,7 @@ dohide(void)
                   && touch_petrifies(&mons[otmp->corpsenm]);
              otmp = otmp->nexthere)
             ct += otmp->quan;
-        /* otmp will be Null iff the entire pile consists of 'trice corpses */
+        /* otmp will be Null if the entire pile consists of 'trice corpses */
         if (!otmp && !Stone_resistance) {
             char kbuf[BUFSZ];
             const char *corpse_name = cxname(otop);
@@ -2062,7 +2062,7 @@ polysense(void)
     }
 }
 
-/* True iff hero's role or race has been genocided */
+/* True if hero's role or race has been genocided */
 boolean
 ugenocided(void)
 {

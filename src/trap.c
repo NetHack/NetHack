@@ -4364,7 +4364,7 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
     return FALSE;
 }
 
-/*  return TRUE iff player relocated */
+/*  return TRUE if player relocated */
 boolean
 drown(void)
 {
@@ -5297,12 +5297,12 @@ untrap(
     }
 }
 
-/* for magic unlocking; returns true if targetted monster (which might
+/* for magic unlocking; returns true if targeted monster (which might
    be hero) gets untrapped; the trap remains intact */
 boolean
 openholdingtrap(
     struct monst *mon,
-    boolean *noticed) /* set to true iff hero notices the effect; */
+    boolean *noticed) /* set to true if hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     char buf[BUFSZ], whichbuf[20];
@@ -5389,12 +5389,12 @@ openholdingtrap(
     return TRUE;
 }
 
-/* for magic locking; returns true if targetted monster (which might
+/* for magic locking; returns true if targeted monster (which might
    be hero) gets hit by a trap (might avoid actually becoming trapped) */
 boolean
 closeholdingtrap(
     struct monst *mon,
-    boolean *noticed) /* set to true iff hero notices the effect; */
+    boolean *noticed) /* set to true if hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     unsigned dotrapflags;
@@ -5430,13 +5430,13 @@ closeholdingtrap(
     return result;
 }
 
-/* for magic unlocking; returns true if targetted monster (which might
+/* for magic unlocking; returns true if targeted monster (which might
    be hero) gets hit by a trap (target might avoid its effect) */
 boolean
 openfallingtrap(
     struct monst *mon,
     boolean trapdoor_only,
-    boolean *noticed) /* set to true iff hero notices the effect; */
+    boolean *noticed) /* set to true if hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     boolean ishero = (mon == &g.youmonst), result;

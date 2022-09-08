@@ -84,7 +84,7 @@ on_msg(struct obj *otmp)
 }
 
 /* putting on or taking off an item which confers stealth;
-   give feedback and discover it iff stealth state is changing */
+   give feedback and discover it if stealth state is changing */
 static
 void
 toggle_stealth(
@@ -118,7 +118,7 @@ toggle_stealth(
 
 /* putting on or taking off an item which confers displacement, or gaining
    or losing timed displacement after eating a displacer beast corpse or tin;
-   give feedback and discover it iff displacement state is changing *and*
+   give feedback and discover it if displacement state is changing *and*
    hero is able to see self (or sense monsters); for timed, 'obj' is Null
    and this is only called for the message */
 void
@@ -1605,7 +1605,7 @@ count_worn_stuff(struct obj **which, /* caller wants this when count is 1 */
     else if (uarmu)
         MOREWORN(uarmu, Narmorpieces);
     if (!accessorizing)
-        *which = otmp; /* default item iff Narmorpieces is 1 */
+        *which = otmp; /* default item if Narmorpieces is 1 */
 
     otmp = 0;
     MOREWORN(uleft, Naccessories);
@@ -1613,7 +1613,7 @@ count_worn_stuff(struct obj **which, /* caller wants this when count is 1 */
     MOREWORN(uamul, Naccessories);
     MOREWORN(ublindf, Naccessories);
     if (accessorizing)
-        *which = otmp; /* default item iff Naccessories is 1 */
+        *which = otmp; /* default item if Naccessories is 1 */
 #undef MOREWORN
 }
 
@@ -2131,7 +2131,7 @@ accessory_or_armor_on(struct obj *obj)
                 res = !uarmg->bknown;
                 set_bknown(uarmg, 1);
                 You("cannot remove your %s to put on the ring.", c_gloves);
-                /* uses move iff we learned gloves are cursed */
+                /* uses move if we learned gloves are cursed */
                 return res ? ECMD_TIME : ECMD_OK;
             }
             if (uwep) {
@@ -2144,7 +2144,7 @@ accessory_or_armor_on(struct obj *obj)
                         hand = makeplural(hand);
                     You("cannot free your weapon %s to put on the ring.",
                         hand);
-                    /* uses move iff we learned weapon is cursed */
+                    /* uses move if we learned weapon is cursed */
                     return res ? ECMD_TIME : ECMD_OK;
                 }
             }

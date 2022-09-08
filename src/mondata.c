@@ -169,7 +169,7 @@ resists_magm(struct monst* mon)
     return FALSE;
 }
 
-/* True iff monster is resistant to light-induced blindness */
+/* True if monster is resistant to light-induced blindness */
 boolean
 resists_blnd(struct monst* mon)
 {
@@ -206,7 +206,7 @@ resists_blnd(struct monst* mon)
     return FALSE;
 }
 
-/* True iff monster can be blinded by the given attack;
+/* True if monster can be blinded by the given attack;
    note: may return True when mdef is blind (e.g. new cream-pie attack)
    magr can be NULL.
 */
@@ -351,7 +351,7 @@ mon_hates_light(struct monst *mon)
     return (boolean) hates_light(mon->data);
 }
 
-/* True iff the type of monster pass through iron bars */
+/* True if the type of monster pass through iron bars */
 boolean
 passes_bars(struct permonst *mptr)
 {

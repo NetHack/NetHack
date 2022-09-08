@@ -968,7 +968,7 @@ enum glyph_offsets {
         || glyph_is_obj_piletop(glyph))
 #endif
 
-/* mgflags for altering map_glyphinfo() internal behaviour */
+/* mgflags for altering map_glyphinfo() internal behavior */
 #define MG_FLAG_NORMAL     0x00
 #define MG_FLAG_NOOVERRIDE 0x01 /* disregard accessibility override values */
 

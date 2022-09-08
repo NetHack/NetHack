@@ -304,7 +304,7 @@ savegamestate(NHFILE* nhfp)
        pointers into invent (uwep, uarmg, uamul, &c) are set to Null too */
     saveobjchn(nhfp, &g.invent);
 
-    /* save ball and chain if they happen to be in an unusal state */
+    /* save ball and chain if they happen to be in an unusual state */
     save_bc(nhfp);
 
     saveobjchn(nhfp, &g.migrating_objs); /* frees objs and sets to Null */
@@ -728,7 +728,7 @@ save_stairs(NHFILE* nhfp)
                 bwrite(nhfp->fd, (genericptr_t) stway, sizeof *stway);
             }
             if (use_relative) {
-                /* reset staiway dlevel back to absolute */
+                /* reset stairway dlevel back to absolute */
                 stway->tolev.dlevel += u.uz.dlevel;
             }
         }

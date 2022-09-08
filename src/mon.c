@@ -2108,7 +2108,7 @@ mm_2way_aggression(struct monst *magr, struct monst *mdef)
 
 /* Monster against monster special attacks; for the specified monster
    combinations, this allows one monster to attack another adjacent one
-   in the absence of Conflict.  There is no provision for targetting
+   in the absence of Conflict.  There is no provision for targeting
    other monsters; just hand to hand fighting when they happen to be
    next to each other. */
 static long
@@ -3181,7 +3181,7 @@ xkilled(
     newsym(x, y);
 
  cleanup:
-    /* punish bad behaviour */
+    /* punish bad behavior */
     if (is_human(mdat)
         && (!always_hostile(mdat) && mtmp->malign <= 0)
         && (mndx < PM_ARCHEOLOGIST || mndx > PM_WIZARD)

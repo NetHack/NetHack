@@ -1755,8 +1755,8 @@ find_trap(struct trap *trap)
     exercise(A_WIS, TRUE);
     feel_newsym(trap->tx, trap->ty);
 
-    /* The "Hallucination ||" is to preserve 3.6.1 behaviour, but this
-       behaviour might need a rework in the hallucination case
+    /* The "Hallucination ||" is to preserve 3.6.1 behavior, but this
+       behavior might need a rework in the hallucination case
        (e.g. to not prompt if any trap glyph appears on the square). */
     if (Hallucination ||
         levl[trap->tx][trap->ty].glyph != trap_to_glyph(trap)) {

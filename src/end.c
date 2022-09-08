@@ -1455,7 +1455,7 @@ really_done(int how)
             tmp += 1000L * (long) ((deepest > 30) ? 10 : deepest - 20);
         nowrap_add(u.urexp, tmp);
 
-        /* ascension gives a score bonus iff offering to original deity */
+        /* ascension gives a score bonus if offering to original deity */
         if (how == ASCENDED && u.ualign.type == u.ualignbase[A_ORIGINAL]) {
             /* retaining original alignment: score *= 2;
                converting, then using helm-of-OA to switch back: *= 1.5 */

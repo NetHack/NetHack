@@ -34,7 +34,7 @@ enum ms_sounds {
     MS_IMITATE  = 20,   /* imitates others (leocrotta) */
     MS_WERE     = 21,   /* lycanthrope in human form */
     MS_ORC      = 22,   /* intelligent brutes */
-                        /* from here onward, can speach can be comprehended */
+                        /* from here onward, can speech can be comprehended */
     MS_HUMANOID = 23,   /* generic traveling companion */
     MS_ARREST   = 24,   /* "Stop in the name of the law!" (Kops) */
     MS_SOLDIER  = 25,   /* army and watchmen expressions */

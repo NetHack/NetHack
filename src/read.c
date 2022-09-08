@@ -2464,7 +2464,7 @@ do_class_genocide(void)
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
     int ll_done = 0;
     char buf[BUFSZ] = DUMMY;
-    boolean gameover = FALSE; /* true iff killed self */
+    boolean gameover = FALSE; /* true if killed self */
 
     for (j = 0;; j++) {
         if (j >= 5) {
@@ -3105,7 +3105,7 @@ create_particular_creation(struct _create_particular_data* d)
             mtmp->mundetected = 1;
         if (d->sleeping)
             mtmp->msleeping = 1;
-        /* iff asking for 'hidden', show locaton of every created monster
+        /* if asking for 'hidden', show location of every created monster
            that can't be seen--whether that's due to successfully hiding
            or vision issues (line-of-sight, invisibility, blindness) */
         if (d->hidden && !canspotmon(mtmp)) {

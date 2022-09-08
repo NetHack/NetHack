@@ -184,7 +184,7 @@ struct debug_flags {
 /*
  * Stuff that really isn't option or platform related and does not
  * get saved and restored.  They are set and cleared during the game
- * to control the internal behaviour of various NetHack functions
+ * to control the internal behavior of various NetHack functions
  * and probably warrant a structure of their own elsewhere some day.
  */
 struct instance_flags {
@@ -267,7 +267,7 @@ struct instance_flags {
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
-    boolean tux_penalty;      /* True iff hero is a monk and wearing a suit */
+    boolean tux_penalty;      /* True if hero is a monk and wearing a suit */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES

@@ -494,7 +494,7 @@ ohitmon(
     return 0;
 }
 
-/* hero catches gem thrown by mon iff poly'd into unicorn; might drop it */
+/* hero catches gem thrown by mon if poly'd into unicorn; might drop it */
 static boolean
 ucatchgem(
     struct obj *gem,   /* caller has verified gem->oclass */
@@ -1232,7 +1232,7 @@ hit_bars(
     }
 }
 
-/* TRUE iff thrown/kicked/rolled object doesn't pass through iron bars */
+/* TRUE if thrown/kicked/rolled object doesn't pass through iron bars */
 boolean
 hits_bars(
     struct obj **obj_p,   /* *obj_p will be set to NULL if object breaks */

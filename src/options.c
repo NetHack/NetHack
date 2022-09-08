@@ -1092,7 +1092,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
          *      DISCLOSE_SPECIAL_WITHOUT_PROMPT  ...to set up sort order.
          *
          * Those setting values can be used in the option
-         * string as a prefix to get the desired behaviour.
+         * string as a prefix to get the desired behavior.
          *
          * For backward compatibility, no prefix is required,
          * and the presence of a i,a,g,v, or c without a prefix

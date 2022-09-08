@@ -1787,7 +1787,7 @@ doseduce(struct monst *mon)
     struct obj *ring, *nring;
     boolean fem = (mon->data == &mons[PM_AMOROUS_DEMON]
                    && Mgender(mon) == FEMALE); /* otherwise incubus */
-    boolean seewho, naked; /* True iff no armor */
+    boolean seewho, naked; /* True if no armor */
     int attr_tot, tried_gloves = 0;
     char qbuf[QBUFSZ], Who[QBUFSZ];
 

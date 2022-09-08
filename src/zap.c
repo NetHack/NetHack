@@ -119,7 +119,7 @@ learnwand(struct obj *obj)
                examining inventory after regaining sight (bypassing xname) */
             if (!Blind)
                 obj->dknown = 1;
-            /* make the discovery iff we know what we're manipulating */
+            /* make the discovery if we know what we're manipulating */
             if (obj->dknown)
                 makeknown(obj->otyp);
         }
@@ -2713,7 +2713,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             learn_it = TRUE;
             unpunish();
         }
-        /* invent is hit iff hero doesn't escape from a trap */
+        /* invent is hit if hero doesn't escape from a trap */
         if (!u.utrap || !openholdingtrap(&g.youmonst, &learn_it)) {
             boxlock_invent(obj);
             /* trigger previously escaped trapdoor */
@@ -2722,7 +2722,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         break;
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
-        /* similar logic to opening; invent is hit iff no trap triggered */
+        /* similar logic to opening; invent is hit if no trap triggered */
         if (u.utrap || !closeholdingtrap(&g.youmonst, &learn_it)) {
             boxlock_invent(obj);
         }
@@ -5342,7 +5342,7 @@ destroy_item(int osym, int dmgtyp)
      * rehumanization could also drop hero onto a trap, and there's no
      * straightforward way to defer that.  Things could be improved by
      * redoing this to use two passes, first to collect a list or array
-     * of o_id and quantity of what is targetted for destruction,
+     * of o_id and quantity of what is targeted for destruction,
      * second pass to handle the destruction.]
      */
     bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */

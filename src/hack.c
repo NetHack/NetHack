@@ -1400,11 +1400,11 @@ is_valid_travelpt(coordxy x, coordxy y)
 }
 
 /* try to escape being stuck in a trapped state by walking out of it;
-   return true iff moving should continue to intended destination
+   return true if moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
 trapmove(
-    coordxy x, coordxy y, /* targetted destination, <u.ux+u.dx,u.uy+u.dy> */
+    coordxy x, coordxy y, /* targeted destination, <u.ux+u.dx,u.uy+u.dy> */
     struct trap *desttrap) /* nonnull if another trap at <x,y> */
 {
     boolean anchored = FALSE;
@@ -1947,7 +1947,7 @@ domove_fight_empty(coordxy x, coordxy y)
         if (boulder) {
             Strcpy(buf, ansimpleoname(boulder));
         } else if (Underwater && !is_pool(x, y)) {
-            /* Underwater, targetting non-water; the map just shows blank
+            /* Underwater, targeting non-water; the map just shows blank
                because you don't see remembered terrain while underwater;
                although the hero can attack an adjacent monster this way,
                assume he can't reach out far enough to distinguish terrain */

@@ -990,7 +990,7 @@ makelevel(void)
  *      Place deposits of minerals (gold and misc gems) in the stone
  *      surrounding the rooms on the map.
  *      Also place kelp in water.
- *      mineralize(-1, -1, -1, -1, FALSE); => "default" behaviour
+ *      mineralize(-1, -1, -1, -1, FALSE); => "default" behavior
  */
 void
 mineralize(int kelp_pool, int kelp_moat, int goldprob, int gemprob,
