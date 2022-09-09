@@ -834,6 +834,9 @@ cant_squeeze_thru(struct monst *mon)
     int amt;
     struct permonst *ptr = mon->data;
 
+    if ((mon == &g.youmonst) ? Passes_walls : passes_walls(ptr))
+        return 0;
+
     /* too big? */
     if (bigmonst(ptr)
         && !(amorphous(ptr) || is_whirly(ptr) || noncorporeal(ptr)
@@ -842,7 +845,7 @@ cant_squeeze_thru(struct monst *mon)
 
     /* lugging too much junk? */
     amt = (mon == &g.youmonst) ? inv_weight() + weight_cap()
-                             : curr_mon_load(mon);
+                               : curr_mon_load(mon);
     if (amt > 600)
         return 2;
 

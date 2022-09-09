@@ -3977,8 +3977,8 @@ Key to jump to the first page in a menu.
 Default \(oq\(ha\(cq.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
-Values are \(lqnone\(rq, \(lqbold\(rq, \(lqdim\(rq, \(lqunderline\(rq,
-\(lqblink\(rq, or \(lqinverse\(rq.
+Values are \(lqnone\(rq, \(lqbold\(rq, \(lqdim\(rq, \(lqitalic\(rq,
+\(lqunderline\(rq, \(lqblink\(rq, or \(lqinverse\(rq.
 Not all ports can actually display all types.
 .lp menu_invert_all
 Key to invert all items in a menu.
@@ -5092,7 +5092,7 @@ orange, light-green, yellow, light-blue, light-magenta, light-cyan, and white.
 And \f(CRno-color\fP, the default foreground color, which isn't necessarily
 the same as any of the other colors.
 .lp ""
-Allowed attributes are none, bold, dim, underline, blink, and inverse.
+Allowed attributes are none, bold, dim, italic, underline, blink, and inverse.
 \(lqNormal\(rq is a synonym for \(lqnone\(rq.
 Note that the platform used may interpret the attributes any way it
 wants.

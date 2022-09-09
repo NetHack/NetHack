@@ -838,7 +838,9 @@ fill_ordinary_room(struct mkroom *croom)
                 impossible("trycnt overflow4");
                 break;
             }
-            (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
+            if (somexyspace(croom, &pos)) {
+                (void) mkobj_at(RANDOM_CLASS, pos.x, pos.y, TRUE);
+            }
         }
     }
 }

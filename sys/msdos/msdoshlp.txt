@@ -101,7 +101,7 @@ OPTIONS=VIDEOCOLORS
 		(defaults.nh only)
 		This option is only provided because some people on
 		r.g.r.n mentioned how they liked to modify the color
-		values from the default ANSI.SYS behaviour, and were
+		values from the default ANSI.SYS behavior, and were
 		"upset" to find out that they could no longer do so
 		under 3.1.2.  The color map is as accurate as possible
 		on standard PC video hardware as it stands, and any

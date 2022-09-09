@@ -230,7 +230,7 @@ display_text_window(struct xwindow *wp, boolean blocking)
     if (num_args)
         XtSetValues(wp->w, args, num_args);
 
-    /* We want the user to acknowlege. */
+    /* We want the user to acknowledge. */
     if (blocking) {
         (void) x_event(EXIT_ON_EXIT);
         nh_XtPopdown(wp->popup);

@@ -4283,7 +4283,7 @@ char NetHackQtYnDialog::Exec()
 }
 void NetHackQtYnDialog::keyPressEvent(QKeyEvent* event)
 {
-    // Don't want QDialog's Return/Esc behaviour
+    // Don't want QDialog's Return/Esc behavior
     event->ignore();
 }
 
