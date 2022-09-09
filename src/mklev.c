@@ -1478,7 +1478,7 @@ mktrap(
                 return;
             if (mktrapflags & MKTRAP_MAZEFLAG)
                 mazexy(&m);
-            else if (!somexy(croom, &m))
+            else if (!somexyspace(croom, &m))
                 return;
         } while (occupied(m.x, m.y)
                  || (avoid_boulder && sobj_at(BOULDER, m.x, m.y)));
@@ -1778,7 +1778,7 @@ find_okay_roompos(struct mkroom *croom, coord *crd)
     do {
         if (++tryct > 200)
             return FALSE;
-        if (!somexy(croom, crd))
+        if (!somexyspace(croom, crd))
             return FALSE;
     } while (occupied(crd->x, crd->y) || bydoor(crd->x, crd->y));
     return TRUE;
