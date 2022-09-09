@@ -1686,7 +1686,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
                     (u.uhitinc < 0) ? "increasing"
                     : (u.uhitinc < 4 * g.urole.spelarmr / 5)
                       ? "partly offsetting"
-                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offseting"
+                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offsetting"
                         : "overcoming");
         you_have(buf, "");
     }

@@ -3555,7 +3555,7 @@ floorfood(
             otmp = (struct obj *) 0;
         }
     }
-    /* reseting 'getobj_else' here isn't essential; it will be cleared the
+    /* resetting 'getobj_else' here isn't essential; it will be cleared the
        next time it needs to be used */
     getobj_else = 0;
     return otmp;

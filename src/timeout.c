@@ -2496,7 +2496,7 @@ timer_stats(const char* hdrfmt, char *hdrbuf, long *count, long *size)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* reset all timers that are marked for reseting */
+/* reset all timers that are marked for resetting */
 void
 relink_timers(boolean ghostly)
 {

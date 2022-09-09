@@ -578,7 +578,7 @@ m_initinv(register struct monst *mtmp)
     if (Is_rogue_level(&u.uz))
         return;
     /*
-     *  Soldiers get armour & rations - armour approximates their ac.
+     *  Soldiers get armor & rations - armor approximates their ac.
      *  Nymphs may get mirror or potion of object detection.
      */
     switch (ptr->mlet) {

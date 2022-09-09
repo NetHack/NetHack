@@ -88,7 +88,7 @@ static boolean spell_aim_step(genericptr_t, coordxy, coordxy);
  *      See percent_success() below for more comments.
  *
  *  uarmbon, uarmsbon, uarmhbon, uarmgbon, uarmfbon:
- *      Fighters find body armour & shield a little less limiting.
+ *      Fighters find body armor & shield a little less limiting.
  *      Headgear, Gauntlets and Footwear are not role-specific (but
  *      still have an effect, except helm of brilliance, which is designed
  *      to permit magic-use).
