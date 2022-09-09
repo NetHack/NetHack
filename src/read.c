@@ -2464,7 +2464,7 @@ do_class_genocide(void)
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
     int ll_done = 0;
     char buf[BUFSZ] = DUMMY;
-    boolean gameover = FALSE; /* true if killed self */
+    boolean gameover = FALSE; /* true iff killed self */
 
     for (j = 0;; j++) {
         if (j >= 5) {

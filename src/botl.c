@@ -2870,7 +2870,7 @@ parse_condition(char (*s)[QBUFSZ], int sidx)
          * the conditions that player wants represented, but
          * now we parse out *how* they will be represented.
          *
-         * Only 1 colour is allowed, but potentially multiple
+         * Only 1 color is allowed, but potentially multiple
          * attributes are allowed.
          *
          * We have the following additional array offsets to

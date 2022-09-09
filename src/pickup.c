@@ -1560,7 +1560,7 @@ lift_object(
     }
     /* override weight consideration for loadstone picked up by anybody
        and for boulder picked up by hero poly'd into a giant; override
-       availability of open inventory slot if not already carrying one */
+       availability of open inventory slot iff not already carrying one */
     if (obj->otyp == LOADSTONE
         || (obj->otyp == BOULDER && throws_rocks(g.youmonst.data))) {
         if (inv_cnt(FALSE) < 52 || !carrying(obj->otyp)
@@ -2756,7 +2756,7 @@ int
 use_container(
     struct obj **objp,
     int held,
-    boolean more_containers) /* True if #loot multiple and this isn't last */
+    boolean more_containers) /* True iff #loot multiple and this isn't last */
 {
     struct obj *otmp, *obj = *objp;
     boolean quantum_cat, cursed_mbag, loot_out, loot_in, loot_in_first,

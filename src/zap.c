@@ -119,7 +119,7 @@ learnwand(struct obj *obj)
                examining inventory after regaining sight (bypassing xname) */
             if (!Blind)
                 obj->dknown = 1;
-            /* make the discovery if we know what we're manipulating */
+            /* make the discovery iff we know what we're manipulating */
             if (obj->dknown)
                 makeknown(obj->otyp);
         }
@@ -2713,7 +2713,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             learn_it = TRUE;
             unpunish();
         }
-        /* invent is hit if hero doesn't escape from a trap */
+        /* invent is hit iff hero doesn't escape from a trap */
         if (!u.utrap || !openholdingtrap(&g.youmonst, &learn_it)) {
             boxlock_invent(obj);
             /* trigger previously escaped trapdoor */
@@ -2722,7 +2722,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         break;
     case WAN_LOCKING:
     case SPE_WIZARD_LOCK:
-        /* similar logic to opening; invent is hit if no trap triggered */
+        /* similar logic to opening; invent is hit iff no trap triggered */
         if (u.utrap || !closeholdingtrap(&g.youmonst, &learn_it)) {
             boxlock_invent(obj);
         }

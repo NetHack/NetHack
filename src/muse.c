@@ -347,7 +347,7 @@ m_sees_sleepy_soldier(struct monst *mtmp)
     return FALSE;
 }
 
-/* Select a defensive item/action for a monster.  Returns TRUE if one is
+/* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
 find_defensive(struct monst* mtmp, boolean tryescape)
@@ -1256,7 +1256,7 @@ mon_has_friends(struct monst *mtmp)
     return FALSE;
 }
 
-/* Select an offensive item/action for a monster.  Returns TRUE if one is
+/* Select an offensive item/action for a monster.  Returns TRUE iff one is
  * found.
  */
 boolean

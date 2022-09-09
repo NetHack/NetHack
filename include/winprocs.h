@@ -241,7 +241,7 @@ extern
 #define WC2_STATUSLINES   0x0400L /* 11 switch between 2|3 lines of status */
 #define WC2_WINDOWBORDERS 0x0800L /* 12 display borders on nh windows   */
 #define WC2_PETATTR       0x1000L /* 13 attributes for hilite_pet       */
-#define WC2_GUICOLOR      0x2000L /* 14 display colours outside map win */
+#define WC2_GUICOLOR      0x2000L /* 14 display colors outside map win */
 /* pline() can overload the display attributes argument passed to putstr()
    with one or more flags and at most one of bold/blink/inverse/&c */
 #define WC2_URGENT_MESG   0x4000L /* 15 putstr(WIN_MESSAGE) supports urgency

@@ -4364,7 +4364,7 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
     return FALSE;
 }
 
-/*  return TRUE if player relocated */
+/*  return TRUE iff player relocated */
 boolean
 drown(void)
 {
@@ -5302,7 +5302,7 @@ untrap(
 boolean
 openholdingtrap(
     struct monst *mon,
-    boolean *noticed) /* set to true if hero notices the effect; */
+    boolean *noticed) /* set to true iff hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     char buf[BUFSZ], whichbuf[20];
@@ -5394,7 +5394,7 @@ openholdingtrap(
 boolean
 closeholdingtrap(
     struct monst *mon,
-    boolean *noticed) /* set to true if hero notices the effect; */
+    boolean *noticed) /* set to true iff hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     unsigned dotrapflags;
@@ -5436,7 +5436,7 @@ boolean
 openfallingtrap(
     struct monst *mon,
     boolean trapdoor_only,
-    boolean *noticed) /* set to true if hero notices the effect; */
+    boolean *noticed) /* set to true iff hero notices the effect; */
 {                     /* otherwise left with its previous value intact */
     struct trap *t;
     boolean ishero = (mon == &g.youmonst), result;

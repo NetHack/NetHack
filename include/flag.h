@@ -267,7 +267,7 @@ struct instance_flags {
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
     boolean toptenwin;        /* ending list in window instead of stdout */
-    boolean tux_penalty;      /* True if hero is a monk and wearing a suit */
+    boolean tux_penalty;      /* True iff hero is a monk and wearing a suit */
     boolean use_background_glyph; /* use background glyph when appropriate */
     boolean use_menu_color;   /* use color in menus; only if wc_color */
 #ifdef STATUS_HILITES
@@ -375,7 +375,7 @@ struct instance_flags {
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
     boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
-    boolean wc2_guicolor;       /* allow colours in gui (outside map) */
+    boolean wc2_guicolor;       /* allow colors in gui (outside map) */
     int wc_mouse_support;       /* allow mouse support */
     int wc2_term_cols;		/* terminal width, in characters */
     int wc2_term_rows;		/* terminal height, in characters */

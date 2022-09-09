@@ -1403,7 +1403,7 @@ is_valid_travelpt(coordxy x, coordxy y)
 }
 
 /* try to escape being stuck in a trapped state by walking out of it;
-   return true if moving should continue to intended destination
+   return true iff moving should continue to intended destination
    (all failures and most successful escapes leave hero at original spot) */
 static boolean
 trapmove(

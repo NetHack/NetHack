@@ -833,7 +833,7 @@ fix_petrification(void)
  * intrinsic_possible() instead of givit(), but we're not that nice.
  */
 
-/* intrinsic_possible() returns TRUE if a monster can give an intrinsic. */
+/* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
 static int
 intrinsic_possible(int type, struct permonst *ptr)
 {

@@ -2351,7 +2351,7 @@ static const char *const hallu_gods[] = {
 };
 
 /* hallucination handling for priest/minion names: select a random god
-   if character is hallucinating */
+   iff character is hallucinating */
 const char *
 halu_gname(aligntyp alignment)
 {

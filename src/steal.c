@@ -267,7 +267,7 @@ steal(struct monst* mtmp, char* objnambuf)
     struct obj *otmp;
     int tmp, could_petrify, armordelay, olddelay, icnt,
         named = 0, retrycnt = 0;
-    boolean monkey_business, /* true if an animal is doing the thievery */
+    boolean monkey_business, /* true iff an animal is doing the thievery */
             was_doffing, was_punished = Punished;
 
     if (objnambuf)

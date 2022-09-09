@@ -1510,7 +1510,7 @@ mbirth_limit(int mndx)
 }
 
 /* used for wand/scroll/spell of create monster */
-/* returns TRUE if you know monsters have been created */
+/* returns TRUE iff you know monsters have been created */
 boolean
 create_critters(
     int cnt,
