@@ -553,6 +553,7 @@ invault(void)
                     "Most likely all your gold was stolen from this vault.");
                 verbalize("Please drop that gold and follow me.");
             }
+            EGD(guard)->dropgoldcnt++;
         }
         EGD(guard)->gdx = gx;
         EGD(guard)->gdy = gy;
@@ -908,12 +909,20 @@ gd_move(struct monst *grd)
     u_carry_gold = (umoney > 0L || hidden_gold(TRUE) > 0L);
     if (egrd->fcend == 1) {
         if (u_in_vault && (u_carry_gold || um_dist(grd->mx, grd->my, 1))) {
-            if (egrd->warncnt == 3 && !Deaf)
-                verbalize("I repeat, %sfollow me!",
-                          u_carry_gold
-                              ? (!umoney ? "drop that hidden gold and "
-                                         : "drop that gold and ")
-                              : "");
+            if (egrd->warncnt == 3 && !Deaf) {
+                char buf[BUFSZ];
+
+                Sprintf(buf, "%sfollow me!",
+                        u_carry_gold ? (!umoney ? "drop that hidden gold and "
+                                                : "drop that gold and ")
+                                     : "");
+                if (egrd->dropgoldcnt || !u_carry_gold)
+                    verbalize("I repeat, %s", buf);
+                else
+                    verbalize("%s", upstart(buf));
+                if (u_carry_gold)
+                    egrd->dropgoldcnt++;
+            }
             if (egrd->warncnt == 7) {
                 m = grd->mx;
                 n = grd->my;

@@ -281,7 +281,7 @@ fill_zoo(struct mkroom* sroom)
         }
         i = 100;
         do { /* don't place throne on top of stairs */
-            (void) somexy(sroom, &mm);
+            (void) somexyspace(sroom, &mm);
             tx = mm.x;
             ty = mm.y;
         } while (occupied((coordxy) tx, (coordxy) ty) && --i > 0);
@@ -294,7 +294,7 @@ fill_zoo(struct mkroom* sroom)
         if (sroom->irregular) {
             /* center might not be valid, so put queen elsewhere */
             if ((int) levl[tx][ty].roomno != rmno || levl[tx][ty].edge) {
-                (void) somexy(sroom, &mm);
+                (void) somexyspace(sroom, &mm);
                 tx = mm.x;
                 ty = mm.y;
             }
@@ -403,7 +403,7 @@ fill_zoo(struct mkroom* sroom)
     case COURT: {
         struct obj *chest, *gold;
         levl[tx][ty].typ = THRONE;
-        (void) somexy(sroom, &mm);
+        (void) somexyspace(sroom, &mm);
         gold = mksobj(GOLD_PIECE, TRUE, FALSE);
         gold->quan = (long) rn1(50 * level_difficulty(), 10);
         gold->owt = weight(gold);
@@ -667,6 +667,10 @@ inside_room(struct mkroom* croom, coordxy x, coordxy y)
                       && y >= croom->ly - 1 && y <= croom->hy + 1);
 }
 
+/* return a coord c inside mkroom croom, but not in a subroom.
+   returns TRUE if any such space found.
+   can return a non-accessible location, eg. inside a wall
+   if a themed room is not irregular, but has some non-room terrain */
 boolean
 somexy(struct mkroom* croom,coord * c)
 {
@@ -716,6 +720,7 @@ somexy(struct mkroom* croom,coord * c)
     return TRUE;
 }
 
+/* like somexy(), but returns an accessible location */
 boolean
 somexyspace(struct mkroom* croom, coord *c)
 {

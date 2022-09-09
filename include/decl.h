@@ -817,7 +817,8 @@ struct instance_globals {
     char toplines[TBUFSZ];
     coord bhitpos; /* place where throw or zap hits or stops */
     boolean in_steed_dismounting;
-    coord doors[DOORMAX];
+    int doors_alloc; /* doors-array allocated size */
+    coord *doors; /* array of door locations */
     struct menucoloring *menu_colorings;
     schar lastseentyp[COLNO][ROWNO]; /* last seen/touched dungeon typ */
     struct spell spl_book[MAXSPELL + 1];

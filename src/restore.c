@@ -1068,7 +1068,11 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
         mread(nhfp->fd, (genericptr_t)&g.updest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.dndest, sizeof(dest_area));
         mread(nhfp->fd, (genericptr_t)&g.level.flags, sizeof(g.level.flags));
-        mread(nhfp->fd, (genericptr_t)g.doors, sizeof(g.doors));
+        if (g.doors)
+            free(g.doors);
+        mread(nhfp->fd, (genericptr_t) &g.doors_alloc, sizeof (g.doors_alloc));
+        g.doors = (coord *) alloc(g.doors_alloc * sizeof (coord));
+        mread(nhfp->fd, (genericptr_t) g.doors, g.doors_alloc * sizeof (coord));
     }
     rest_rooms(nhfp); /* No joke :-) */
     if (g.nroom)

@@ -400,7 +400,7 @@ extern struct nomakedefs_s nomakedefs;
 
 #define MAXNROFROOMS 40 /* max number of rooms per level */
 #define MAX_SUBROOMS 24 /* max # of subrooms in a given room */
-#define DOORMAX 120     /* max number of doors per level */
+#define DOORINC 120     /* number of doors per level, increment */
 
 #define BUFSZ 256  /* for getlin buffers */
 #define QBUFSZ 128 /* for building question text */
