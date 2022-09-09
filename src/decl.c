@@ -286,7 +286,8 @@ const struct instance_globals g_init = {
     UNDEFINED_VALUES, /* toplines */
     { 0, 0 }, /* bhitpos */
     FALSE, /* in_steed_dismounting */
-    { { 0, 0 } }, /* doors */
+    0, /* doors_alloc */
+    NULL, /* doors */
     UNDEFINED_PTR, /* menu_colorings */
     { { 0 } }, /* lastseentyp */
     { DUMMY }, /* spl_book */

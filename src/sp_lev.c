@@ -1071,7 +1071,7 @@ shared_with_room(int x, int y, struct mkroom *droom)
 static void
 maybe_add_door(int x, int y, struct mkroom* droom)
 {
-    if (droom->hx >= 0 && g.doorindex < DOORMAX
+    if (droom->hx >= 0
         && ((!droom->irregular && inside_room(droom, x, y))
             || (int) levl[x][y].roomno == (droom - g.rooms) + ROOMOFFSET
             || shared_with_room(x, y, droom))) {
