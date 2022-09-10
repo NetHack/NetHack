@@ -1928,6 +1928,7 @@ revive_corpse(struct obj *corpse)
     struct obj *container = (struct obj *) 0;
     int container_where = 0;
     boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
+    coordxy corpsex, corpsey;
 
     where = corpse->where;
     is_uwep = (corpse == uwep);
@@ -1936,6 +1937,7 @@ revive_corpse(struct obj *corpse)
                                chewed ? "bite-covered" : (const char *) 0,
                                CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
+    get_obj_location(corpse, &corpsex, &corpsey, CONTAINED_TOO | BURIED_TOO);
 
     if (where == OBJ_CONTAINED) {
         struct monst *mtmp2;
@@ -1959,7 +1961,7 @@ revive_corpse(struct obj *corpse)
             break;
 
         case OBJ_FLOOR:
-            if (cansee(mtmp->mx, mtmp->my)) {
+            if (cansee(corpsex, corpsey) || canseemon(mtmp)) {
                 const char *effect = "";
 
                 if (mtmp->data == &mons[PM_DEATH])
@@ -1969,18 +1971,23 @@ revive_corpse(struct obj *corpse)
                 else if (mtmp->data == &mons[PM_FAMINE])
                     effect = " in a ring of withered crops";
 
-                pline("%s rises from the dead%s!",
-                      chewed ? Adjmonnam(mtmp, "bite-covered")
-                             : Monnam(mtmp), effect);
+                if (canseemon(mtmp)) {
+                    pline("%s rises from the dead%s!",
+                          chewed ? Adjmonnam(mtmp, "bite-covered")
+                                 : Monnam(mtmp), effect);
+                } else {
+                    pline("%s disappears%s!", The(cname), effect);
+                }
             }
             break;
 
         case OBJ_MINVENT: /* probably a nymph's */
             if (cansee(mtmp->mx, mtmp->my)) {
                 if (canseemon(mcarry))
-                    pline("Startled, %s drops %s as it revives!",
-                          mon_nam(mcarry), an(cname));
-                else
+                    pline("Startled, %s drops %s as it %s!",
+                          mon_nam(mcarry), an(cname),
+                          canspotmon(mtmp) ? "revives" : "disappears");
+                else if (canspotmon(mtmp))
                     pline("%s suddenly appears!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
                                  : Monnam(mtmp));
@@ -1988,20 +1995,23 @@ revive_corpse(struct obj *corpse)
             break;
         case OBJ_CONTAINED: {
             char sackname[BUFSZ];
+            /* Could use x_monnam(..., AUGMENT_IT) but that'd say "someone"
+               for humanoid monsters, which seems like a distinction the hero
+               doesn't have knowledge to make here. */
+            const char *mnam = canspotmon(mtmp) ? Amonnam(mtmp) : Something;
 
-            if (container_where == OBJ_MINVENT && cansee(mtmp->mx, mtmp->my)
-                && mcarry && canseemon(mcarry) && container) {
-                pline("%s writhes out of %s!", Amonnam(mtmp),
-                      yname(container));
+
+            if (container_where == OBJ_MINVENT && mcarry && canseemon(mcarry)
+                && container) {
+                pline("%s writhes out of %s!", mnam, yname(container));
             } else if (container_where == OBJ_INVENT && container) {
                 Strcpy(sackname, an(xname(container)));
-                pline("%s %s out of %s in your pack!",
-                      Blind ? Something : Amonnam(mtmp),
+                pline("%s %s out of %s in your pack!", mnam,
                       locomotion(mtmp->data, "writhes"), sackname);
             } else if (container_where == OBJ_FLOOR && container
-                       && cansee(mtmp->mx, mtmp->my)) {
+                       && cansee(corpsex, corpsey)) {
                 Strcpy(sackname, an(xname(container)));
-                pline("%s escapes from %s!", Amonnam(mtmp), sackname);
+                pline("%s escapes from %s!", mnam, sackname);
             }
             break;
         }
@@ -2013,7 +2023,8 @@ revive_corpse(struct obj *corpse)
 
                     ttmp = t_at(mtmp->mx, mtmp->my);
                     ttmp->tseen = TRUE;
-                    pline("%s claws itself out of the ground!", Amonnam(mtmp));
+                    pline("%s claws itself out of the ground!",
+                          canspotmon(mtmp) ? Amonnam(mtmp) : Something);
                     newsym(mtmp->mx, mtmp->my);
                 } else if (distu(mtmp->mx, mtmp->my) < 5*5)
                     You_hear("scratching noises.");
