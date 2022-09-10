@@ -16,7 +16,7 @@ struct mkroom {
     schar needfill;       /* sp_lev: does the room need filling? */
     boolean needjoining;  /* sp_lev: should the room connect to others? */
     schar doorct;         /* door count */
-    schar fdoor;          /* index for the first door of the room */
+    int   fdoor;          /* index for the first door of the room */
     schar nsubrooms;      /* number of subrooms */
     boolean irregular;    /* true if room is non-rectangular */
     schar roomnoidx;
