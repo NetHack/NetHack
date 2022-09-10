@@ -787,6 +787,8 @@ name_to_monplus(
             { "woodland nymph", PM_WOOD_NYMPH, NEUTRAL },
             { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for
                                                     * polyself */
+            { "halfling zombie", PM_HOBBIT_ZOMBIE, NEUTRAL },
+            { "halfling mummy", PM_HOBBIT_MUMMY, NEUTRAL },
             { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for
                                               * ^G/#wizgenesis */
             /* prefix used to workaround duplicate monster names for

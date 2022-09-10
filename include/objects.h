@@ -954,7 +954,7 @@ OBJECT(OBJ("Bell of Opening", "silver bell"),
            FOOD_CLASS, prob, delay, wt, nutrition / 20 + 5, 0, 0, 0, 0, \
            nutrition, color, sn)
 /* All types of food (except tins & corpses) must have a delay of at least 1.
- * Delay on corpses is computed and is weight dependant.
+ * Delay on corpses is computed and is weight dependent.
  * Domestic pets prefer tripe rations above all others.
  * Fortune cookies can be read, using them up without ingesting them.
  * Carrots improve your vision.
@@ -975,7 +975,7 @@ FOOD("meat stick",            0,  1,  1, 0, FLESH,   5, CLR_BROWN,
                                                         MEAT_STICK),
 FOOD("huge chunk of meat",    0, 20,400, 0, FLESH,2000, CLR_BROWN,
                                                         HUGE_CHUNK_OF_MEAT),
-/* special case because it's not mergable */
+/* special case because it's not mergeable */
 OBJECT(OBJ("meat ring", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, FLESH),
        0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN, MEAT_RING),
