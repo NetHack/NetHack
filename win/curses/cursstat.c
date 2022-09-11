@@ -1398,8 +1398,8 @@ static nhstat prevtime;
 static nhstat prevscore;
 #endif
 
-extern const char *hu_stat[];   /* from eat.c */
-extern const char *enc_stat[];  /* from botl.c */
+extern const char *const hu_stat[];   /* from eat.c */
+extern const char *const enc_stat[];  /* from botl.c */
 
 /* If the statuscolors patch isn't enabled, have some default colors for status problems
    anyway */

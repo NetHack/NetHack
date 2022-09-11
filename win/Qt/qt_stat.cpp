@@ -76,6 +76,9 @@
 
 extern "C" {
 #include "hack.h"
+
+extern const char *const enc_stat[]; /* from botl.c */
+extern const char *const hu_stat[]; /* from eat.c */
 }
 
 #include "qt_pre.h"
@@ -89,9 +92,6 @@ extern "C" {
 #include "qt_set.h"
 #include "qt_str.h"
 #include "qt_xpms.h"
-
-extern const char *enc_stat[]; /* from botl.c */
-extern const char *hu_stat[]; /* from eat.c */
 
 extern int qt_compact_mode;
 

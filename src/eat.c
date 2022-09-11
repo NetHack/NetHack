@@ -66,8 +66,10 @@ static int tin_ok(struct obj *);
     ((otyp) == LEMBAS_WAFER || (otyp) == CRAM_RATION)
 
 /* see hunger states in hack.h - texts used on bottom line */
-const char *hu_stat[] = { "Satiated", "        ", "Hungry  ", "Weak    ",
-                          "Fainting", "Fainted ", "Starved " };
+const char *const hu_stat[] = {
+    "Satiated", "        ", "Hungry  ", "Weak    ",
+    "Fainting", "Fainted ", "Starved "
+};
 
 /* used by getobj() callback routines eat_ok()/offer_ok()/tin_ok() to
    indicate whether player was given an opportunity to eat or offer or

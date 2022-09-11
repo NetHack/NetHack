@@ -1225,8 +1225,8 @@ adjust_status_fancy(struct xwindow *wp, const char *str)
 }
 
 /* Fancy ================================================================== */
-extern const char *hu_stat[];  /* from eat.c */
-extern const char *enc_stat[]; /* from botl.c */
+extern const char *const hu_stat[];  /* from eat.c */
+extern const char *const enc_stat[]; /* from botl.c */
 
 struct X_status_value {
     /* we have to cast away 'const' when assigning new names */

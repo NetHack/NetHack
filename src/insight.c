@@ -35,8 +35,8 @@ static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
 static int set_vanq_order(void);
 static int num_extinct(void);
 
-extern const char *hu_stat[];  /* hunger status from eat.c */
-extern const char *enc_stat[]; /* encumbrance status from botl.c */
+extern const char *const hu_stat[];  /* hunger status from eat.c */
+extern const char *const enc_stat[]; /* encumbrance status from botl.c */
 
 static const char You_[] = "You ", are[] = "are ", were[] = "were ",
                   have[] = "have ", had[] = "had ", can[] = "can ",
