@@ -55,7 +55,7 @@ static void wishcmdassist(int);
 static const char are_blinded_by_the_flash[] =
     "are blinded by the flash!";
 
-const char *const flash_types[] =       /* also used in buzzmu(mcastu.c) */
+static const char *const flash_types[] =
     {
         "magic missile", /* Wands must be 0-9 */
         "bolt of fire", "bolt of cold", "sleep ray", "death ray",
