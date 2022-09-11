@@ -98,7 +98,7 @@ if [ ! -d djgpp/djgpp-patch ]; then
     cd djgpp-patch
     if [ "$(uname)" = "Darwin" ]; then
 	#Mac
-	curl http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+	curl --output djlsr205.zip http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
     else
 	wget --quiet --no-hsts http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
     fi
