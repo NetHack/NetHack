@@ -208,7 +208,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
                 sum = damageum(mon, uattk, specialdmg);
                 (void) passive(mon, uarmf, (boolean) (sum > 0),
                                (sum != 2), AT_KICK, FALSE);
-                if (sum == 2)
+                if ((sum & MM_DEF_DIED))
                     break; /* Defender died */
             } else {
                 missum(mon, uattk, (tmp + armorpenalty > kickdieroll));
