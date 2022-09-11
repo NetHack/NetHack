@@ -108,7 +108,7 @@ static char empty_optstr[] = { '\0' };
 boolean duplicate, using_alias;
 static boolean give_opt_msg = TRUE;
 
-static boolean got_from_config[OPTCOUNT];
+static boolean opt_set_in_config[OPTCOUNT];
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
     "General", "Behavior", "Map", "Status", "Advanced"
@@ -497,7 +497,7 @@ parseoptions(
             optresult = (*allopt[matchidx].optfn)(allopt[matchidx].idx,
                                                   do_set, negated, opts, op);
             if (optresult == optn_ok)
-                got_from_config[matchidx] = TRUE;
+                opt_set_in_config[matchidx] = TRUE;
         }
     }
 
@@ -8066,13 +8066,9 @@ doset_simple_menu(void)
             if (allopt[k].has_handler && allopt[k].optfn) {
                 reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler, FALSE,
                                            empty_optstr, empty_optstr);
-                /*
-                 * FIXME:  got_from_config[] is used to control the
-                 * save-options routine but its name is misleading when
-                 * options that have been set interactively are included.
-                 */
+                /* if player eventually saves options, include this one */
                 if (reslt == optn_ok)
-                    got_from_config[k] = TRUE;
+                    opt_set_in_config[k] = TRUE;
             } else {
                 Sprintf(buf, "Set %s to what?", allopt[k].name);
                 getlin(buf, abuf);
@@ -8093,21 +8089,6 @@ doset_simple_menu(void)
             preference_update(allopt[k].name);
 
         free((genericptr_t) pick_list), pick_list = (menu_item *) 0;
-
-        /* some option choices warrant immediate update before caller
-           calls us again */
-        if (g.opt_need_glyph_reset) {
-            reset_glyphmap(gm_optionchange);
-        }
-        if (g.opt_need_redraw) {
-            check_gold_symbol();
-            reglyph_darkroom();
-            docrt();
-            flush_screen(1);
-        }
-        if (g.context.botl || g.context.botlx) {
-            bot();
-        }
     }
     /* tear down this instance of the menu; if pick_cnt is 1, caller
        will immediately call us back to put up another instance */
@@ -8130,9 +8111,26 @@ doset_simple(void)
         return doset();
     }
 
+    /* select and change one option at a time, then reprocess the menu
+       with updated settings to offer chance for further change */
     give_opt_msg = FALSE;
     do {
         pickedone = doset_simple_menu();
+
+        /* some option choices warrant immediate updating beyond the
+           option value itself */
+        if (g.opt_need_glyph_reset) {
+            reset_glyphmap(gm_optionchange);
+        }
+        if (g.opt_need_redraw) {
+            check_gold_symbol();
+            reglyph_darkroom();
+            docrt();
+            flush_screen(1);
+        }
+        if (g.context.botl || g.context.botlx) {
+            bot();
+        }
     } while (pickedone > 0);
     give_opt_msg = TRUE;
     return ECMD_OK;
@@ -8978,7 +8976,7 @@ all_options_strbuf(strbuf_t *sbuf)
     strbuf_append(sbuf, tmp);
 
     for (i = 0; (name = allopt[i].name) != 0; i++) {
-        if (!got_from_config[i])
+        if (!opt_set_in_config[i])
             continue;
         switch (allopt[i].opttyp) {
         case BoolOpt:
