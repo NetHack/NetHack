@@ -1380,6 +1380,9 @@ command line processing interleaved with options file processing is complex:
 when the Astral level got created, any fake player character monsters that
 	were seen or sensed when created were reported as "<mon> suddenly
 	appears!" rather than be treated as part of level's initial population
+tipping contents of one container directly into another allowed transferring
+	wands of cancellation and bags of holding or tricks that were inside
+	a sack, box, or chest into a bag of holding without blowing it up
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

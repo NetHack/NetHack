@@ -4006,7 +4006,7 @@ doapply(void)
     case SACK:
     case BAG_OF_HOLDING:
     case OILSKIN_SACK:
-        res = use_container(&obj, 1, FALSE);
+        res = use_container(&obj, TRUE, FALSE);
         break;
     case BAG_OF_TRICKS:
         (void) bagotricks(obj, FALSE, (int *) 0);

@@ -31,10 +31,10 @@ static int lift_object(struct obj *, struct obj *, long *, boolean);
 static boolean mbag_explodes(struct obj *, int);
 static boolean is_boh_item_gone(void);
 static void do_boh_explosion(struct obj *, boolean);
-static long boh_loss(struct obj *, int);
+static long boh_loss(struct obj *, boolean);
 static int in_container(struct obj *);
 static int out_container(struct obj *);
-static long mbag_item_gone(int, struct obj *, boolean);
+static long mbag_item_gone(boolean, struct obj *, boolean);
 static int stash_ok(struct obj *);
 static void explain_container_prompt(boolean);
 static int traditional_loot(boolean);
@@ -1958,7 +1958,7 @@ do_loot_cont(
         g.abort_looting = TRUE;
         return ECMD_TIME;
     }
-    return use_container(cobjp, 0, (boolean) (cindex < ccount));
+    return use_container(cobjp, FALSE, (boolean) (cindex < ccount));
 }
 
 /* #loot extended command */
@@ -2308,9 +2308,8 @@ is_boh_item_gone(void)
     return (boolean) (!rn2(13));
 }
 
-/* Scatter most of Bag of holding contents around.
-   Some items will be destroyed with the same chance as looting a cursed bag.
- */
+/* Scatter most of Bag of holding contents around.  Some items will be
+   destroyed with the same chance as looting a cursed bag. */
 static void
 do_boh_explosion(struct obj *boh, boolean on_floor)
 {
@@ -2329,7 +2328,7 @@ do_boh_explosion(struct obj *boh, boolean on_floor)
 }
 
 static long
-boh_loss(struct obj *container, int held)
+boh_loss(struct obj *container, boolean held)
 {
     /* sometimes toss objects if a cursed magic bag */
     if (Is_mbag(container) && container->cursed && Has_contents(container)) {
@@ -2598,7 +2597,7 @@ removed_from_icebox(struct obj *obj)
 
 /* an object inside a cursed bag of holding is being destroyed */
 static long
-mbag_item_gone(int held, struct obj *item, boolean silent)
+mbag_item_gone(boolean held, struct obj *item, boolean silent)
 {
     struct monst *shkp;
     long loss = 0L;
@@ -2755,7 +2754,7 @@ stash_ok(struct obj *obj)
 int
 use_container(
     struct obj **objp,
-    int held,
+    boolean held,
     boolean more_containers) /* True iff #loot multiple and this isn't last */
 {
     struct obj *otmp, *obj = *objp;
@@ -3436,7 +3435,7 @@ static void
 tipcontainer(struct obj *box) /* or bag */
 {
     coordxy ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
-    boolean empty_it = TRUE, maybeshopgoods;
+    boolean held = FALSE, maybeshopgoods;
     struct obj *targetbox = (struct obj *) 0;
     boolean cancelled = FALSE;
 
@@ -3469,14 +3468,14 @@ tipcontainer(struct obj *box) /* or bag */
     if (targetbox && tipcontainer_checks(targetbox, TRUE) != TIPCHECK_OK)
         return;
 
-    if (empty_it) {
+    {
         struct obj *otmp, *nobj;
         boolean terse, highdrop = !can_reach_floor(TRUE),
                 altarizing = IS_ALTAR(levl[ox][oy].typ),
                 cursed_mbag = (Is_mbag(box) && box->cursed);
-        int held = carried(box) || (targetbox && carried(targetbox));
         long loss = 0L;
 
+        held = carried(box) || (targetbox && carried(targetbox));
         if (u.uswallow)
             highdrop = altarizing = FALSE;
         terse = !(highdrop || altarizing || costly_spot(box->ox, box->oy));
@@ -3494,6 +3493,7 @@ tipcontainer(struct obj *box) /* or bag */
             pline("%s out%c",
               box->cobj->nobj ? "Objects spill" : "An object spills",
               terse ? ':' : '.');
+
         for (otmp = box->cobj; otmp; otmp = nobj) {
             nobj = otmp->nobj;
             obj_extract_self(otmp);
@@ -3507,14 +3507,27 @@ tipcontainer(struct obj *box) /* or bag */
                 terse = FALSE;
                 continue;
             }
-
             if (maybeshopgoods) {
                 addtobill(otmp, FALSE, FALSE, TRUE);
                 iflags.suppress_price++; /* doname formatting */
             }
 
             if (targetbox) {
-                (void) add_to_container(targetbox, otmp);
+                if (Is_mbag(targetbox) && mbag_explodes(otmp, 0)) {
+                    /* explicitly mention what item is triggering explosion */
+                    urgent_pline(
+                   "As %s %s inside, you are blasted by a magical explosion!",
+                                 doname(otmp), otense(otmp, "tumble"));
+                    do_boh_explosion(targetbox, held);
+                    nobj = 0; /* stop tipping; want loop to exit 'normally' */
+                    if (!held)
+                        useup(targetbox);
+                    else
+                        useupf(targetbox, targetbox->quan);
+                    targetbox = 0; /* it's gone */
+                } else {
+                    (void) add_to_container(targetbox, otmp);
+                }
             } else if (highdrop) {
                 /* might break or fall down stairs; handles altars itself */
                 hitfloor(otmp, TRUE);
@@ -3544,7 +3557,8 @@ tipcontainer(struct obj *box) /* or bag */
         if (held)
             (void) encumber_msg();
     }
-    if (carried(box) || (targetbox && carried(targetbox)))
+
+    if (held)
         update_inventory();
 }
 
@@ -3600,7 +3614,9 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
              clr, "", MENU_ITEMFLAGS_NONE);
 
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (Is_container(otmp) && (otmp != box)) {
+        if (Is_container(otmp) && otmp != box
+            /* don't include any container that's known to be locked */
+            && (!otmp->olocked || !otmp->lknown)) {
             any = cg.zeroany;
             any.a_obj = otmp;
             add_menu(win, &nul_glyphinfo, &any, otmp->invlet, 0,
