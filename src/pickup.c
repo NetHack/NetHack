@@ -3520,7 +3520,7 @@ tipcontainer(struct obj *box) /* or bag */
                                  doname(otmp), otense(otmp, "tumble"));
                     do_boh_explosion(targetbox, held);
                     nobj = 0; /* stop tipping; want loop to exit 'normally' */
-                    if (!held)
+                    if (held)
                         useup(targetbox);
                     else
                         useupf(targetbox, targetbox->quan);
