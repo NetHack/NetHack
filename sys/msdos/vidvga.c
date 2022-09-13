@@ -141,6 +141,9 @@ extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_text_intense; /* text mode intense attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
 extern boolean inmap;           /* in the map window */
+#ifdef USE_TILES
+extern glyph_map glyphmap[MAX_GLYPH];
+#endif
 
 /*
  * Global Variables
@@ -480,16 +483,14 @@ vga_redrawmap(boolean clearfirst)
                                   y + TOP_MAP_ROW, map[y][x].attr);
             } else {
                 t = map[y][x].glyph;
-                if (!(clearfirst && t == cmap_to_glyph(S_stone))) {
-                    if (!iflags.over_view) {
-                        read_planar_tile(t, &planecell);
-                        if (map[y][x].special)
-                            decal_planar(&planecell, map[y][x].special);
-                        vga_DisplayCell(&planecell, x - clipx, y + TOP_MAP_ROW);
-                    } else {
-                        read_planar_tile_O(t, &planecell_O);
-                        vga_DisplayCell_O(&planecell_O, x, y + TOP_MAP_ROW);
-                    }
+                if (!iflags.over_view) {
+                    read_planar_tile(t, &planecell);
+                    if (map[y][x].special)
+                        decal_planar(&planecell, map[y][x].special);
+                    vga_DisplayCell(&planecell, x - clipx, y + TOP_MAP_ROW);
+                } else {
+                    read_planar_tile_O(t, &planecell_O);
+                    vga_DisplayCell_O(&planecell_O, x, y + TOP_MAP_ROW);
                 }
             }
         }
@@ -675,34 +676,26 @@ read_tile_indexes(unsigned glyph, unsigned char (*indexes)[TILE_X])
 {
     const struct TileImage *tile;
     unsigned x, y;
-    int row, col, ry, tilenum = 0;
+    int tilenum;
 
     /* We don't have enough colors to show the statues */
-    if (glyph >= GLYPH_STATUE_OFF) {
+    if (glyph_is_statue(glyph)) {
         glyph = GLYPH_OBJ_OFF + STATUE;
     }
 
-    row = currow;
-    col = curcol;
-    if ((col < 0 || col >= COLNO)
-        || (row < TOP_MAP_ROW || row >= (ROWNO + TOP_MAP_ROW)))
-        return;
-    ry = row - TOP_MAP_ROW;
     /* Get the tile from the image */
-    tilenum = map[ry][col].tileidx;
+    tilenum = glyphmap[glyph].tileidx;
     tile = get_tile(tilenum);
 
     /* Map to a 16 bit palette; assume colors laid out as in default tileset */
     for (y = 0; y < TILE_Y && y < tile->height; ++y) {
         for (x = 0; x < TILE_X && x < tile->width; ++x) {
+            static const unsigned char color_to_16[] = {
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 14, 15,
+                13, 1, 1, 1, 1, 15, 1, 15, 15, 15, 15, 1, 0
+            };
             unsigned i = tile->indexes[y * tile->width + x];
-            if (i == 28) {
-                i = 0;
-            } else if (i == 16) {
-                i = 13;
-            } else if (i > 15) {
-                i = 15;
-            }
+            i = (i < SIZE(color_to_16)) ? color_to_16[i] : 15;
             indexes[y][x] = i;
         }
     }
