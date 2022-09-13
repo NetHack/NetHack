@@ -22,6 +22,7 @@ void
 roguejoin(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int horiz)
 {
     register coordxy x, y, middle;
+
     if (horiz) {
         middle = x1 + rn2(x2 - x1 + 1);
         for (x = min(x1, middle); x <= max(x1, middle); x++)
@@ -188,6 +189,7 @@ miniwalk(coordxy x, coordxy y)
         }
         miniwalk(x, y);
     }
+#undef doorhere
 }
 
 void
@@ -272,6 +274,7 @@ makeroguerooms(void)
             if (here.doortable & UP)
                 impossible("up end of %d, %d never connected?", x, y);
         }
+#undef here
 }
 
 void
