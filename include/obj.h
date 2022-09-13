@@ -9,6 +9,11 @@
 /* #define obj obj_nh */ /* uncomment for SCO UNIX, which has a conflicting
                           * typedef for "obj" in <sys/types.h> */
 
+/* start with incomplete types in case these aren't defined yet;
+   basic pointers to them don't need to know their details */
+struct obj;
+struct monst;
+
 union vptrs {
     struct obj *v_nexthere;   /* floor location lists */
     struct obj *v_ocontainer; /* point back to container */

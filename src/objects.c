@@ -2,8 +2,6 @@
 /* Copyright (c) Mike Threepoint, 1989.                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
-struct monst { struct monst *dummy; };  /* lint: struct obj's union */
-
 #include "config.h"
 #include "obj.h"
 

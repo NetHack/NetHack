@@ -6,6 +6,11 @@
 #ifndef MONST_H
 #define MONST_H
 
+/* start with incomplete types in case these aren't defined yet;
+   basic pointers to them don't need to know their details */
+struct monst;
+struct obj;
+
 #ifndef MEXTRA_H
 #include "mextra.h"
 #endif
