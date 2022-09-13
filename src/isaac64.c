@@ -7,11 +7,25 @@
  * Changes for NetHack:
  *      include config.h;
  *      skip rest of file if USE_ISAAC64 isn't defined there;
+ *      yn() hackery;
  *      re-do 'inline' handling.
  */
 #include "config.h"
 
 #ifdef USE_ISAAC64
+/*
+ * OSX <math.h> declares yn() in a section labelled
+ * "POSIX/UNIX extensions to the C standard".
+ *
+ * Even when yn() is not a macro, expansion of nethack's yn() macro
+ * would break it.  Matters for 'onefile' lint checking where contents
+ * of hack.h will be visible even though we only include config.h.
+ */
+#ifdef yn
+#undef yn
+#define _isaac64_hide_yn
+#endif
+
 #include <math.h>
 #include <string.h>
 #include "isaac64.h"
@@ -171,6 +185,17 @@ uint64_t isaac64_next_uint(isaac64_ctx *_ctx,uint64_t _n){
   while(((d+_n-1)&ISAAC64_MASK)<d);
   return v;
 }
+
+#ifdef _isaac64_hide_yn
+/* 'onefile' support; restore nethack's yn() macro;
+   this could be made more robust but doesn't need that */
+#ifdef yn
+#undef yn /* in case <math.h> defines yn() as a macro */
+#endif
+#define yn(query) yn_function(query, ynchars, 'n', TRUE)
+#undef _isaac64_hide_yn
+#endif
+
 #endif /* USE_ISAAC64 */
 
 /*isaac64.c*/
