@@ -2547,7 +2547,8 @@ dealloc_obj(struct obj *obj)
 int
 hornoplenty(
     struct obj *horn,
-    boolean tipping) /* caller emptying entire contents; affects shop mesgs */
+    boolean tipping, /* caller emptying entire contents; affects shop mesgs */
+    struct obj *targetbox) /* if non-Null, container to tip into */
 {
     int objcount = 0;
 
@@ -2597,6 +2598,14 @@ hornoplenty(
                                           : "Oops!  %s to the floor!",
                                       The(aobjnam(obj, "slip")), (char *) 0);
             nhUse(obj);
+        } else if (targetbox) {
+            add_to_container(targetbox, obj);
+            /* add to container doesn't update the weight */
+            targetbox->owt = weight(targetbox);
+            /* item still in magic horn was weightless; when it's now in
+               a carried container, hero's encumbrance could change */
+            if (carried(targetbox))
+                (void) encumber_msg();
         } else {
             /* assumes this is taking place at hero's location */
             if (!can_reach_floor(TRUE)) {

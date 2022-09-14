@@ -4115,7 +4115,7 @@ doapply(void)
         res = do_play_instrument(obj);
         break;
     case HORN_OF_PLENTY: /* not a musical instrument */
-        (void) hornoplenty(obj, FALSE);
+        (void) hornoplenty(obj, FALSE, (struct obj *) 0);
         break;
     case LAND_MINE:
     case BEARTRAP:

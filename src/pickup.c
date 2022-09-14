@@ -42,7 +42,7 @@ static int menu_loot(int, boolean);
 static int tip_ok(struct obj *);
 static int count_containers(struct obj *);
 static struct obj *tipcontainer_gettarget(struct obj *, boolean *);
-static int tipcontainer_checks(struct obj *, boolean);
+static int tipcontainer_checks(struct obj *, struct obj *, boolean);
 static char in_or_out_menu(const char *, struct obj *, boolean, boolean,
                            boolean, boolean);
 static boolean able_to_loot(coordxy, coordxy, boolean);
@@ -3463,9 +3463,9 @@ tipcontainer(struct obj *box) /* or bag */
        to reduce the chance of exhausting shk's billing capacity. */
     maybeshopgoods = !carried(box) && costly_spot(box->ox, box->oy);
 
-    if (tipcontainer_checks(box, FALSE) != TIPCHECK_OK)
+    if (tipcontainer_checks(box, targetbox, FALSE) != TIPCHECK_OK)
         return;
-    if (targetbox && tipcontainer_checks(targetbox, TRUE) != TIPCHECK_OK)
+    if (targetbox && tipcontainer_checks(targetbox, NULL, TRUE) != TIPCHECK_OK)
         return;
 
     {
@@ -3588,16 +3588,22 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
     char buf[BUFSZ];
     menu_item *pick_list = (menu_item *) 0;
     struct obj dummyobj, *otmp;
-    int n_conts = count_containers(g.invent);
+    int n_conts;
     int clr = 0;
 
-    /* we're carrying the box, don't count it as possible target */
-    if (box->where == OBJ_INVENT)
+    /* if tipping a known bag of tricks, don't prompt for destination */
+    if (box->otyp == BAG_OF_TRICKS && box->dknown
+        && objects[box->otyp].oc_name_known)
+        return (struct obj *) 0;
+
+    n_conts = count_containers(g.invent);
+    /* when we're carrying the box, don't count it as possible target;
+       note: 'box' might be a horn so not be included in the count */
+    if (carried(box) && Is_container(box))
         n_conts--;
 
     if (n_conts < 1) {
-        if (cancelled)
-            *cancelled = FALSE;
+        *cancelled = FALSE;
         return (struct obj *) 0;
     }
 
@@ -3613,15 +3619,22 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
              clr, "", MENU_ITEMFLAGS_NONE);
 
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
-        if (Is_container(otmp) && otmp != box
-            /* don't include any container that's known to be locked */
-            && (!otmp->olocked || !otmp->lknown)) {
+    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+        if (otmp == box)
+            continue;
+        /* bag of tricks passes Is_container() test; don't include it if
+           it is known to be a bag of tricks */
+        if (otmp->otyp == BAG_OF_TRICKS && otmp->dknown
+            && objects[otmp->otyp].oc_name_known)
+            continue;
+        /* include any container unless it's known to be locked */
+        if (Is_container(otmp) && !(otmp->olocked && otmp->lknown)) {
             any = cg.zeroany;
             any.a_obj = otmp;
             add_menu(win, &nul_glyphinfo, &any, otmp->invlet, 0,
                      ATR_NONE, clr, doname(otmp), MENU_ITEMFLAGS_NONE);
         }
+    }
 
     Sprintf(buf, "Where to tip the contents of %s", doname(box));
     end_menu(win, buf);
@@ -3633,8 +3646,7 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
         otmp = pick_list[1].item.a_obj;
     if (pick_list)
         free((genericptr_t) pick_list);
-    if (cancelled)
-        *cancelled = (n == -1);
+    *cancelled = (boolean) (n == -1);
     if (otmp && otmp != &dummyobj)
         return otmp;
 
@@ -3645,7 +3657,10 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
    Returns one of TIPCHECK_foo values.
    If allowempty if TRUE, return TIPCHECK_OK instead of TIPCHECK_EMPTY. */
 static int
-tipcontainer_checks(struct obj *box, boolean allowempty)
+tipcontainer_checks(
+    struct obj *box,       /* container player wants to tip */
+    struct obj *targetbox, /* destination (used here for horn of plenty) */
+    boolean allowempty)    /* affects result when box is empty */
 {
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
@@ -3657,7 +3672,7 @@ tipcontainer_checks(struct obj *box, boolean allowempty)
     }
 
     if (box->olocked) {
-        pline("It's locked.");
+        pline("%s is locked.", upstart(thesimpleoname(box)));
         return TIPCHECK_LOCKED;
 
     } else if (box->otrapped) {
@@ -3672,10 +3687,17 @@ tipcontainer_checks(struct obj *box, boolean allowempty)
         return TIPCHECK_TRAPPED;
 
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {
-        boolean bag = box->otyp == BAG_OF_TRICKS;
+        int res = TIPCHECK_OK;
+        boolean bag = (box->otyp == BAG_OF_TRICKS);
         int old_spe = box->spe, seen = 0;
-        boolean maybeshopgoods = !carried(box) && costly_spot(box->ox, box->oy);
+        boolean maybeshopgoods = (!carried(box)
+                                  && costly_spot(box->ox, box->oy));
         coordxy ox = u.ux, oy = u.uy;
+
+        if (targetbox
+            && ((res = tipcontainer_checks(targetbox, NULL, TRUE))
+                != TIPCHECK_OK))
+            return res;
 
         if (get_obj_location(box, &ox, &oy, 0))
             box->ox = ox, box->oy = oy;
@@ -3686,7 +3708,7 @@ tipcontainer_checks(struct obj *box, boolean allowempty)
            (if the latter occurs, force the former...) */
         do {
             if (!(bag ? bagotricks(box, TRUE, &seen)
-                      : hornoplenty(box, TRUE)))
+                      : hornoplenty(box, TRUE, targetbox)))
                 break;
         } while (box->spe > 0);
 
@@ -3703,7 +3725,7 @@ tipcontainer_checks(struct obj *box, boolean allowempty)
         }
         if (maybeshopgoods && !box->no_charge)
             subfrombill(box, shop_keeper(*in_rooms(ox, oy, SHOPBASE)));
-        return TIPCHECK_CANNOT;
+        return TIPCHECK_CANNOT; /* actually means 'already done' */
 
     } else if (SchroedingersBox(box)) {
         char yourbuf[BUFSZ];
