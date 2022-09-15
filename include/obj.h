@@ -128,14 +128,14 @@ struct obj {
                           * they have no locks */
     Bitfield(pickup_prev, 1); /* was picked up previously */
 #if 0
-    /* 3 free bits */
-#else
     /* not implemented */
     Bitfield(tknown, 1); /* trap status known for chests */
     Bitfield(eknown, 1); /* effect known for wands zapped or rings worn when
                           * not seen yet after being picked up while blind
                           * [maybe for remaining stack of used potion too] */
     /* 1 free bit */
+#else
+    /* 3 free bits */
 #endif
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */
