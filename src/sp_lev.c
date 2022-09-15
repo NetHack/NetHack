@@ -6056,7 +6056,8 @@ lspo_region(lua_State *L)
             lua_getfield(L, 1, "contents");
             if (lua_type(L, -1) == LUA_TFUNCTION) {
                 lua_remove(L, -2);
-                if (nhl_pcall(L, 0, 0)){
+                l_push_mkroom_table(L, troom);
+                if (nhl_pcall(L, 1, 0)){
                     impossible("Lua error: %s", lua_tostring(L, -1));
                 }
             } else
@@ -6662,6 +6663,25 @@ TODO: g.coder->croom needs to be updated
     }
 
     return 0;
+}
+
+struct selectionvar *
+selection_from_mkroom(struct mkroom *croom)
+{
+    struct selectionvar *sel = selection_new();
+    coordxy x, y;
+
+    if (!croom && g.coder && g.coder->croom)
+        croom = g.coder->croom;
+    if (!croom)
+        return sel;
+
+    for (y = croom->ly; y <= croom->hy; y++)
+        for (x = croom->lx; x <= croom->hx; x++)
+            if (isok(x, y) && !levl[x][y].edge
+                && levl[x][y].roomno == (croom - g.rooms) + ROOMOFFSET)
+                selection_setpoint(x, y, sel, 1);
+    return sel;
 }
 
 void

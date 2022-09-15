@@ -17,6 +17,7 @@ static int l_selection_getpoint(lua_State *);
 static int l_selection_setpoint(lua_State *);
 static int l_selection_filter_percent(lua_State *);
 static int l_selection_rndcoord(lua_State *);
+static int l_selection_room(lua_State *);
 static int l_selection_getbounds(lua_State *);
 static boolean params_sel_2coords(lua_State *, struct selectionvar **,
                                   coordxy *, coordxy *, coordxy *, coordxy *);
@@ -380,6 +381,28 @@ l_selection_rndcoord(lua_State *L)
     lua_newtable(L);
     nhl_add_table_entry_int(L, "x", x);
     nhl_add_table_entry_int(L, "y", y);
+    return 1;
+}
+
+/* local s = selection.room(); */
+static int
+l_selection_room(lua_State *L)
+{
+    struct selectionvar *sel;
+    int argc = lua_gettop(L);
+    struct mkroom *croom = NULL;
+
+    if (argc == 1) {
+        int i = luaL_checkinteger(L, -1);
+
+        croom = (i >= 0 && i < g.nroom) ? &g.rooms[i] : NULL;
+    }
+
+    sel = selection_from_mkroom(croom);
+
+    l_selection_push_copy(L, sel);
+    selection_free(sel, TRUE);
+
     return 1;
 }
 
@@ -899,6 +922,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "gradient", l_selection_gradient },
     { "iterate", l_selection_iterate },
     { "bounds", l_selection_getbounds },
+    { "room", l_selection_room },
     { NULL, NULL }
 };
 

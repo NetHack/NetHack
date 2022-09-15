@@ -1070,6 +1070,20 @@ Example:
  local coord = selection.rndcoord(sel);
  local coord = selection.rndcoord(sel, 1);
 
+
+=== room
+
+Create a selection of locations inside the (current) room.
+
+Example:
+
+ des.room({ type = "ordinary", contents = function(rm)
+   local sel = selection.room();
+   des.terrain(sel, "I");
+ end
+ });
+
+
 === set
 
 Set the value for location (x,y) in the selection.

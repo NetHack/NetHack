@@ -2612,6 +2612,7 @@ extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
 extern void cvt_to_abscoord(coordxy *, coordxy *);
 extern void cvt_to_relcoord(coordxy *, coordxy *);
 extern int nhl_abs_coord(lua_State *);
+extern struct selectionvar *selection_from_mkroom(struct mkroom *);
 extern void update_croom(void);
 extern const char *get_trapname_bytype(int);
 extern void l_register_des(lua_State *);
