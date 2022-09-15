@@ -6670,16 +6670,18 @@ selection_from_mkroom(struct mkroom *croom)
 {
     struct selectionvar *sel = selection_new();
     coordxy x, y;
+    unsigned rmno;
 
     if (!croom && g.coder && g.coder->croom)
         croom = g.coder->croom;
     if (!croom)
         return sel;
 
+    rmno = (unsigned)((croom - g.rooms) + ROOMOFFSET);
     for (y = croom->ly; y <= croom->hy; y++)
         for (x = croom->lx; x <= croom->hx; x++)
             if (isok(x, y) && !levl[x][y].edge
-                && levl[x][y].roomno == (croom - g.rooms) + ROOMOFFSET)
+                && levl[x][y].roomno == rmno)
                 selection_setpoint(x, y, sel, 1);
     return sel;
 }
