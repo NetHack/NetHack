@@ -95,7 +95,7 @@ static struct allopt_t allopt[SIZE(allopt_init)];
 /* use rest of file */
 
 extern char configfile[]; /* for messages */
-extern struct symparse loadsyms[];
+extern const struct symparse loadsyms[];
 #if defined(TOS) && defined(TEXTCOLOR)
 extern boolean colors_changed;  /* in tos.c */
 #endif
