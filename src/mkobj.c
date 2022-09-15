@@ -2556,6 +2556,10 @@ hornoplenty(
         impossible("bad horn o' plenty");
     } else if (horn->spe < 1) {
         pline1(nothing_happens);
+        if (!horn->cknown) {
+            horn->cknown = 1;
+            update_inventory();
+        }
     } else {
         struct obj *obj;
         const char *what;
@@ -2604,8 +2608,10 @@ hornoplenty(
             targetbox->owt = weight(targetbox);
             /* item still in magic horn was weightless; when it's now in
                a carried container, hero's encumbrance could change */
-            if (carried(targetbox))
+            if (carried(targetbox)) {
                 (void) encumber_msg();
+                update_inventory(); /* for contents count or wizweight */
+            }
         } else {
             /* assumes this is taking place at hero's location */
             if (!can_reach_floor(TRUE)) {

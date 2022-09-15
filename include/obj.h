@@ -121,10 +121,22 @@ struct obj {
     Bitfield(in_use, 1); /* for magic items before useup items */
     Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
     Bitfield(cknown, 1); /* for containers (including statues): the contents
-                          * are known; also applicable to tins */
-    Bitfield(lknown, 1); /* locked/unlocked status is known */
+                          * are known; also applicable to tins; also applies
+                          * to horn of plenty but only for empty/non-empty */
+    Bitfield(lknown, 1); /* locked/unlocked status is known; assigned for bags
+                          * and for horn of plenty (when tipping) even though
+                          * they have no locks */
     Bitfield(pickup_prev, 1); /* was picked up previously */
+#if 0
     /* 3 free bits */
+#else
+    /* not implemented */
+    Bitfield(tknown, 1); /* trap status known for chests */
+    Bitfield(eknown, 1); /* effect known for wands zapped or rings worn when
+                          * not seen yet after being picked up while blind
+                          * [maybe for remaining stack of used potion too] */
+    /* 1 free bit */
+#endif
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */
 #define leashmon corpsenm /* gets m_id of attached pet */

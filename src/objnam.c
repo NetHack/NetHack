@@ -1144,10 +1144,12 @@ doname_base(
            (when that is known, suffix of "(n:0)" will be appended,
            making the prefix be redundant; note that 'known' flag
            isn't set when emptiness gets discovered because then
-           charging magic would yield known number of new charges) */
-        && ((obj->otyp == BAG_OF_TRICKS)
-             ? (obj->spe == 0 && !obj->known)
-             /* not bag of tricks: empty if container which has no contents */
+           charging magic would yield known number of new charges);
+           horn of plenty isn't a container but is close enough */
+        && ((obj->otyp == BAG_OF_TRICKS || obj->otyp == HORN_OF_PLENTY)
+             ? (obj->spe == 0 && !known)
+             /* not a bag of tricks or horn of plenty: it's empty if
+                it is a container that has no contents */
              : ((Is_container(obj) || obj->otyp == STATUE)
                 && !Has_contents(obj))))
         Strcat(prefix, "empty ");
