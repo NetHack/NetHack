@@ -2371,9 +2371,10 @@ set_mimic_sym(register struct monst *mtmp)
 
 /* release monster from bag of tricks; return number of monsters created */
 int
-bagotricks(struct obj *bag,
-           boolean tipping, /* caller emptying entire contents; affects shop handling */
-           int *seencount)  /* secondary output */
+bagotricks(
+    struct obj *bag,
+    boolean tipping, /* caller emptying entirely; affects shop handling */
+    int *seencount)  /* secondary output */
 {
     int moncount = 0;
 

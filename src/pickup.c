@@ -40,7 +40,6 @@ static void explain_container_prompt(boolean);
 static int traditional_loot(boolean);
 static int menu_loot(int, boolean);
 static int tip_ok(struct obj *);
-static int count_containers(struct obj *);
 static struct obj *tipcontainer_gettarget(struct obj *, boolean *);
 static int tipcontainer_checks(struct obj *, struct obj *, boolean);
 static char in_or_out_menu(const char *, struct obj *, boolean, boolean,
@@ -3445,6 +3444,11 @@ tipcontainer(struct obj *box) /* or bag */
     if (get_obj_location(box, &ox, &oy, 0))
         box->ox = ox, box->oy = oy;
 
+    /*
+     * TODO?
+     *  if 'box' is known to be empty or known to be locked, give up
+     *  before choosing 'targetbox'.
+     */
     targetbox = tipcontainer_gettarget(box, &cancelled);
     if (cancelled)
         return;
@@ -3562,78 +3566,93 @@ tipcontainer(struct obj *box) /* or bag */
         update_inventory();
 }
 
-/* Returns number of containers in object chain,
-   does not recurse into containers */
+#if 0
+static int count_target_containers(struct obj *, struct obj *);
+
+/* returns number of containers in object chain; does not recurse into
+   containers; skips bags of tricks when they're known */
 static int
-count_containers(struct obj *otmp)
+count_target_containers(
+    struct obj *olist,   /* list of objects (invent) */
+    struct obj *excludo) /* particular object to exclude if found in list */
 {
     int ret = 0;
 
-    while (otmp) {
-        if (Is_container(otmp))
+    while (olist) {
+        if (olist != excludo && Is_container(olist)
+            /* include bag of tricks when not known to be such */
+            && (box->otyp != BAG_OF_TRICKS || !box->dknown
+                || !objects[box->otyp].oc_name_known))
             ret++;
-        otmp = otmp->nobj;
+        olist = olist->nobj;
     }
     return ret;
 }
+#endif
 
-/* ask user for a carried container where they want box to be emptied
-   cancelled is TRUE if user cancelled the menu pick. */
+/* ask user for a carried container where they want box to be emptied;
+   cancelled is TRUE if user cancelled the menu pick; hands aren't required
+   when tipping to the floor but are when tipping into another container */
 static struct obj *
-tipcontainer_gettarget(struct obj *box, boolean *cancelled)
+tipcontainer_gettarget(
+    struct obj *box,
+    boolean *cancelled)
 {
-    int n;
+    int n, n_conts;
     winid win;
     anything any;
     char buf[BUFSZ];
     menu_item *pick_list = (menu_item *) 0;
     struct obj dummyobj, *otmp;
-    int n_conts;
+    boolean hands_available = TRUE, exclude_it;
     int clr = 0;
 
-    /* if tipping a known bag of tricks, don't prompt for destination */
-    if (box->otyp == BAG_OF_TRICKS && box->dknown
-        && objects[box->otyp].oc_name_known)
-        return (struct obj *) 0;
+#if 0   /* [skip potential early return so that menu response is needed
+         *  regardless of whether other containers are being carried] */
+    int n_conts = count_target_containers(g.invent, box);
 
-    n_conts = count_containers(g.invent);
-    /* when we're carrying the box, don't count it as possible target;
-       note: 'box' might be a horn so not be included in the count */
-    if (carried(box) && Is_container(box))
-        n_conts--;
-
-    if (n_conts < 1) {
+    if (n_conts < 1 || !u_handsy()) {
+        if (n_conts >= 1)
+            pline("Tipping contents to floor only...");
         *cancelled = FALSE;
         return (struct obj *) 0;
     }
+#endif
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
 
+    dummyobj = cg.zeroobj; /* lint suppression; only its address matters */
     any = cg.zeroany;
     any.a_obj = &dummyobj;
-    add_menu(win, &nul_glyphinfo, &any, '-', 0, ATR_NONE,
-             clr, "on the floor", MENU_ITEMFLAGS_SELECTED);
-
+    /* tip to floor does not require free hands */
+    add_menu(win, &nul_glyphinfo, &any, '-', 0, ATR_NONE, clr,
+             /* [TODO? vary destination string depending on surface()] */
+             "on the floor", MENU_ITEMFLAGS_SELECTED);
     any = cg.zeroany;
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+             "", MENU_ITEMFLAGS_NONE);
 
+    n_conts = 0;
     for (otmp = g.invent; otmp; otmp = otmp->nobj) {
         if (otmp == box)
             continue;
-        /* bag of tricks passes Is_container() test; don't include it if
-           it is known to be a bag of tricks */
-        if (otmp->otyp == BAG_OF_TRICKS && otmp->dknown
-            && objects[otmp->otyp].oc_name_known)
+        /* skip non-containers; bag of tricks passes Is_container() test,
+           only include it if it isn't known to be a bag of tricks */
+        if (!Is_container(otmp)
+            || (otmp->otyp == BAG_OF_TRICKS && otmp->dknown
+                && objects[otmp->otyp].oc_name_known))
             continue;
-        /* include any container unless it's known to be locked */
-        if (Is_container(otmp) && !(otmp->olocked && otmp->lknown)) {
-            any = cg.zeroany;
-            any.a_obj = otmp;
-            add_menu(win, &nul_glyphinfo, &any, otmp->invlet, 0,
-                     ATR_NONE, clr, doname(otmp), MENU_ITEMFLAGS_NONE);
-        }
+        if (!n_conts++)
+            hands_available = u_handsy(); /* might issue message */
+        /* container-to-container tip requires free hands;
+           exclude container as possible target when known to be locked */
+        exclude_it = !hands_available || (otmp->olocked && otmp->lknown);
+        any = cg.zeroany;
+        any.a_obj = !exclude_it ? otmp : 0;
+        Sprintf(buf, "%s%s", !exclude_it ? "" : "    ", doname(otmp));
+        add_menu(win, &nul_glyphinfo, &any, !exclude_it ? otmp->invlet : 0, 0,
+                 ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     }
 
     Sprintf(buf, "Where to tip the contents of %s", doname(box));
@@ -3641,16 +3660,19 @@ tipcontainer_gettarget(struct obj *box, boolean *cancelled)
     n = select_menu(win, PICK_ONE, &pick_list);
     destroy_nhwindow(win);
 
-    otmp = (n <= 0) ? (struct obj *) 0 : pick_list[0].item.a_obj;
-    if (n > 1 && otmp == &dummyobj)
-        otmp = pick_list[1].item.a_obj;
-    if (pick_list)
+    otmp = 0;
+    if (pick_list) {
+        otmp = pick_list[0].item.a_obj;
+        /* PICK_ONE with a preselected item might return 2;
+           if so, choose the one that wasn't preselected */
+        if (n > 1 && otmp == &dummyobj)
+            otmp = pick_list[1].item.a_obj;
+        if (otmp == &dummyobj)
+            otmp = 0;
         free((genericptr_t) pick_list);
+    }
     *cancelled = (boolean) (n == -1);
-    if (otmp && otmp != &dummyobj)
-        return otmp;
-
-    return (struct obj *) 0;
+    return otmp;
 }
 
 /* Perform check on box if we can tip it.
@@ -3662,6 +3684,16 @@ tipcontainer_checks(
     struct obj *targetbox, /* destination (used here for horn of plenty) */
     boolean allowempty)    /* affects result when box is empty */
 {
+    /* undiscovered bag of tricks is acceptable as a container-to-container
+       destination but it can't receive items; it has to be opened in
+       preparation so apply it once before even trying to tip source box */
+    if (targetbox && targetbox->otyp == BAG_OF_TRICKS) {
+        int seencount = 0;
+
+        bagotricks(targetbox, FALSE, &seencount);
+        return TIPCHECK_CANNOT;
+    }
+
     /* caveat: this assumes that cknown, lknown, olocked, and otrapped
        fields haven't been overloaded to mean something special for the
        non-standard "container" horn of plenty */
@@ -3689,7 +3721,7 @@ tipcontainer_checks(
     } else if (box->otyp == BAG_OF_TRICKS || box->otyp == HORN_OF_PLENTY) {
         int res = TIPCHECK_OK;
         boolean bag = (box->otyp == BAG_OF_TRICKS);
-        int old_spe = box->spe, seen = 0;
+        int old_spe = box->spe, seen, totseen;
         boolean maybeshopgoods = (!carried(box)
                                   && costly_spot(box->ox, box->oy));
         coordxy ox = u.ux, oy = u.uy;
@@ -3706,17 +3738,17 @@ tipcontainer_checks(
             addtobill(box, FALSE, FALSE, TRUE);
         /* apply this bag/horn until empty or monster/object creation fails
            (if the latter occurs, force the former...) */
+        seen = totseen = 0;
         do {
             if (!(bag ? bagotricks(box, TRUE, &seen)
                       : hornoplenty(box, TRUE, targetbox)))
                 break;
+            totseen += seen;
         } while (box->spe > 0);
 
         if (box->spe < old_spe) {
-            if (bag)
-                pline((seen == 0) ? "Nothing seems to happen."
-                                  : (seen == 1) ? "A monster appears."
-                                                : "Monsters appear!");
+            if (bag && !totseen)
+                pline("Nothing seems to happen.");
             /* check_unpaid wants to see a non-zero charge count */
             box->spe = old_spe;
             check_unpaid_usage(box, TRUE);
@@ -3742,7 +3774,7 @@ tipcontainer_checks(
 
     } else if (!allowempty && !Has_contents(box)) {
         box->cknown = 1;
-        pline("It's empty.");
+        pline("%s is empty.", upstart(thesimpleoname(box)));
         return TIPCHECK_EMPTY;
 
     }
