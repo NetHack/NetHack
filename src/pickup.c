@@ -2314,6 +2314,7 @@ do_boh_explosion(struct obj *boh, boolean on_floor)
 {
     struct obj *otmp, *nobj;
 
+    boh->in_use = 1; /* in case scatter() leads to bones creation */
     for (otmp = boh->cobj; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (is_boh_item_gone()) {
@@ -2324,6 +2325,7 @@ do_boh_explosion(struct obj *boh, boolean on_floor)
             (void) scatter(u.ux, u.uy, 4, MAY_HIT | MAY_DESTROY, otmp);
         }
     }
+    /* boh is about to be deleted so no need to reset its in_use flag here */
 }
 
 static long
@@ -2447,6 +2449,7 @@ in_container(struct obj *obj)
             (void) stop_timer(SHRINK_GLOB, obj_to_any(obj));
         }
     } else if (Is_mbag(g.current_container) && mbag_explodes(obj, 0)) {
+        livelog_printf(LL_ACHIEVE, "just blew up %s bag of holding", uhis());
         /* explicitly mention what item is triggering the explosion */
         urgent_pline(
               "As you put %s inside, you are blasted by a magical explosion!",
@@ -2455,9 +2458,8 @@ in_container(struct obj *obj)
         if (was_unpaid)
             addtobill(obj, FALSE, FALSE, TRUE);
         if (obj->otyp == BAG_OF_HOLDING) /* one bag of holding into another */
-            do_boh_explosion(obj, (obj->where == OBJ_FLOOR));
+            do_boh_explosion(obj, (boolean) (obj->where == OBJ_FLOOR));
         obfree(obj, (struct obj *) 0);
-        livelog_printf(LL_ACHIEVE, "just blew up %s bag of holding", uhis());
         /* if carried, shop goods will be flagged 'unpaid' and obfree() will
            handle bill issues, but if on floor, we need to put them on bill
            before deleting them (non-shop items will be flagged 'no_charge') */
@@ -3434,7 +3436,7 @@ static void
 tipcontainer(struct obj *box) /* or bag */
 {
     coordxy ox = u.ux, oy = u.uy; /* #tip only works at hero's location */
-    boolean held = FALSE, maybeshopgoods;
+    boolean srcheld = FALSE, dstheld = FALSE, maybeshopgoods;
     struct obj *targetbox = (struct obj *) 0;
     boolean cancelled = FALSE;
 
@@ -3479,7 +3481,8 @@ tipcontainer(struct obj *box) /* or bag */
                 cursed_mbag = (Is_mbag(box) && box->cursed);
         long loss = 0L;
 
-        held = carried(box) || (targetbox && carried(targetbox));
+        srcheld = carried(box);
+        dstheld = (targetbox && carried(targetbox));
         if (u.uswallow)
             highdrop = altarizing = FALSE;
         terse = !(highdrop || altarizing || costly_spot(box->ox, box->oy));
@@ -3506,7 +3509,7 @@ tipcontainer(struct obj *box) /* or bag */
             if (box->otyp == ICE_BOX) {
                 removed_from_icebox(otmp); /* resume rotting for corpse */
             } else if (cursed_mbag && is_boh_item_gone()) {
-                loss += mbag_item_gone(held, otmp, FALSE);
+                loss += mbag_item_gone(srcheld, otmp, FALSE);
                 /* abbreviated drop format is no longer appropriate */
                 terse = FALSE;
                 continue;
@@ -3518,17 +3521,33 @@ tipcontainer(struct obj *box) /* or bag */
 
             if (targetbox) {
                 if (Is_mbag(targetbox) && mbag_explodes(otmp, 0)) {
+                    livelog_printf(LL_ACHIEVE,
+                                 "just blew up %s bag of holding via tipping",
+                                   uhis());
                     /* explicitly mention what item is triggering explosion */
                     urgent_pline(
                    "As %s %s inside, you are blasted by a magical explosion!",
                                  doname(otmp), otense(otmp, "tumble"));
-                    do_boh_explosion(targetbox, held);
-                    nobj = 0; /* stop tipping; want loop to exit 'normally' */
-                    if (held)
+
+                    /* if putting one bag of holding into another, first
+                       blow up the one going in, then (below) blow up the
+                       one it's going into */
+                    if (otmp->otyp == BAG_OF_HOLDING) /* BoH into another */
+                        do_boh_explosion(otmp, !srcheld);
+                    /* always delete the item which triggered the explosion */
+                    obfree(otmp, (struct obj *) 0); /* where==OBJ_FREE */
+
+                    /* [assumes targetbox is carried, otherwise shop bill
+                       handling becomes necessary here] */
+                    do_boh_explosion(targetbox, !dstheld);
+                    if (dstheld)
                         useup(targetbox);
                     else
                         useupf(targetbox, targetbox->quan);
                     targetbox = 0; /* it's gone */
+                    nobj = 0; /* stop tipping; want loop to exit 'normally' */
+
+                    losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
                 } else {
                     (void) add_to_container(targetbox, otmp);
                 }
@@ -3558,11 +3577,11 @@ tipcontainer(struct obj *box) /* or bag */
         box->owt = weight(box); /* mbag_item_gone() doesn't update this */
         if (targetbox)
             targetbox->owt = weight(targetbox);
-        if (held)
+        if (srcheld || dstheld)
             (void) encumber_msg();
     }
 
-    if (held)
+    if (srcheld || dstheld)
         update_inventory();
 }
 
@@ -3590,7 +3609,7 @@ count_target_containers(
 }
 #endif
 
-/* ask user for a carried container where they want box to be emptied;
+/* ask user for a carried container into which they want box to be emptied;
    cancelled is TRUE if user cancelled the menu pick; hands aren't required
    when tipping to the floor but are when tipping into another container */
 static struct obj *
