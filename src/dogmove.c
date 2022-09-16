@@ -502,7 +502,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
                             mtmp->weapon_check = NEED_HTH_WEAPON;
                             (void) mon_wield_item(mtmp);
                         }
-                        m_dowear(mtmp, FALSE);
+                        check_gear_next_turn(mtmp);
                     }
                 }
             }

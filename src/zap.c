@@ -178,7 +178,8 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (disguised_mimic)
                 seemimic(mtmp);
             mon_adjust_speed(mtmp, -1, otmp);
-            m_dowear(mtmp, FALSE); /* might want speed boots */
+            check_gear_next_turn(mtmp); /* might want speed boots */
+
             if (engulfing_u(mtmp) && is_whirly(mtmp->data)) {
                 You("disrupt %s!", mon_nam(mtmp));
                 pline("A huge hole opens up...");
@@ -191,7 +192,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             if (disguised_mimic)
                 seemimic(mtmp);
             mon_adjust_speed(mtmp, 1, otmp);
-            m_dowear(mtmp, FALSE); /* might want speed boots */
+            check_gear_next_turn(mtmp); /* might want speed boots */
         }
         if (mtmp->mtame)
             helpful_gesture = TRUE;

@@ -1145,7 +1145,7 @@ extract_from_minvent(
         mon->misc_worn_check &= ~unwornmask;
         /* give monster a chance to wear other equipment on its next
            move instead of waiting until it picks something up */
-        mon->misc_worn_check |= I_SPECIAL;
+        check_gear_next_turn(mon);
     }
     obj_no_longer_held(obj);
     if (unwornmask & W_WEP) {
