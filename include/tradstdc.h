@@ -47,8 +47,6 @@
  * USE_VARARGS means use the <varargs.h> facilities.  Again, this should only
  * be done if the library supports it.  ANSI is *not* required for this.
  * Otherwise, the kludgy old methods are used.
- * The defaults are USE_STDARG for ANSI compilers, and USE_OLDARGS for
- * others.
  */
 
 /* #define USE_VARARGS */ /* use <varargs.h> instead of <stdarg.h> */
@@ -58,15 +56,15 @@
 #define USE_VARARGS
 #endif
 
-#if defined(NHSTDC) || defined(ULTRIX_PROTO) || defined(MAC)
-#if !defined(USE_VARARGS) && !defined(USE_OLDARGS) && !defined(USE_STDARG)
+#if !defined(USE_STDARG) && !defined(USE_VARARGS) && !defined(USE_OLDARGS)
+/* the old VARARGS and OLDARGS stuff is still here, but since we're
+   requiring C99 these days it's unlikely to be useful */
 #define USE_STDARG
-#endif
 #endif
 
 #ifdef NEED_VARARGS /* only define these if necessary */
 /*
- * These have changed since 3.4.3.  VA_END() now provides an explicit
+ * These changed in 3.6.0.  VA_END() provides a hidden
  * closing brace to complement VA_DECL()'s hidden opening brace, so code
  * started with VA_DECL() needs an extra opening brace to complement
  * the explicit final closing brace.  This was done so that the source
@@ -74,11 +72,11 @@
  * function whose opening brace was missing; there are now visible and
  * invisible braces at beginning and end.  Sample usage:
  void foo VA_DECL(int, arg)  --macro expansion has a hidden opening brace
- {  --new, explicit opening brace (actually introduces a nested block)
+ {  --explicit opening brace (actually introduces a nested block)
  VA_START(bar);
  ...code for foo...
- VA_END();  --expansion now provides a closing brace for the nested block
- }  --existing closing brace, still pairs with the hidden one in VA_DECL()
+ VA_END();  --expansion provides a closing brace for the nested block
+ }  --closing brace, pairs with the hidden one in VA_DECL()
  * Reading the code--or using source browsing tools which match braces--
  * results in seeing a matched set of braces.  Usage of VA_END() is
  * potentially trickier, but nethack uses it in a straightforward manner.
@@ -158,7 +156,8 @@ typedef const char *vA;
 
    [nethack's core doesn't use VA_NEXT() so doesn't use VA_SHIFT()
    either, and this definition is just retained for completeness.
-   lev_comp does use VA_NEXT(), but it passes all 'argX' arguments.]
+   lev_comp does use VA_NEXT(), but it passes all 'argX' arguments.
+   Note: as of 3.7.0, lev_comp doesn't exist anymore.]
  */
 #define VA_SHIFT()                                                    \
     (arg1 = arg2, arg2 = arg3, arg3 = arg4, arg4 = arg5, arg5 = arg6, \
