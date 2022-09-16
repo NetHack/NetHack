@@ -921,7 +921,7 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
  * Called after returning from ! or ^Z
  */
 void
-gettty()
+gettty(void)
 {
 #ifndef TEXTCOLOR
     int k;
@@ -963,7 +963,7 @@ settty(const char* s)
 
 /* called by init_nhwindows() and resume_nhwindows() */
 void
-setftty()
+setftty(void)
 {
     start_screen();
 }
@@ -985,7 +985,7 @@ tty_number_pad(int state)
 }
 
 void
-tty_start_screen()
+tty_start_screen(void)
 {
     if (iflags.num_pad)
         tty_number_pad(1); /* make keypad send digits */
@@ -1000,7 +1000,7 @@ tty_start_screen()
 }
 
 void
-tty_end_screen()
+tty_end_screen(void)
 {
     clear_screen();
     really_move_cursor();
@@ -1055,7 +1055,7 @@ consoletty_open(int mode)
 }
 
 void
-consoletty_exit()
+consoletty_exit(void)
 {
     /* go back to using the safe routines */
     safe_routines();
@@ -1086,13 +1086,13 @@ process_keystroke(
 }
 
 int
-consoletty_kbhit()
+consoletty_kbhit(void)
 {
     return keyboard_handling.pNHkbhit(console.hConIn, &ir);
 }
 
 int
-tgetch()
+tgetch(void)
 {
     int mod;
     coord cc;
@@ -1159,7 +1159,7 @@ static void set_console_cursor(int x, int y)
 }
 
 static void
-really_move_cursor()
+really_move_cursor(void)
 {
 #ifdef PORT_DEBUG
     char oldtitle[BUFSZ], newtitle[BUFSZ];
@@ -2025,7 +2025,7 @@ static int CALLBACK EnumFontCallback(
  * correctly, then it will change the font to a known good font.
  */
 void
-check_and_set_font()
+check_and_set_font(void)
 {
     if (!check_font_widths()) {
         raw_print("WARNING: glyphs too wide in console font."
@@ -2039,7 +2039,7 @@ check_and_set_font()
  */
 boolean
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
-check_font_widths()
+check_font_widths(void)
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
 check_font_widths(void)
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */

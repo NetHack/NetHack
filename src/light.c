@@ -47,8 +47,8 @@ static void write_ls(NHFILE *, light_source *);
 static int maybe_write_ls(NHFILE *, int, boolean);
 
 /* imported from vision.c, for small circles */
-extern coordxy circle_data[];
-extern coordxy circle_start[];
+extern const coordxy circle_data[];
+extern const coordxy circle_start[];
 
 
 /* Create a new light source.  Caller (and extern.h) doesn't need to know
@@ -138,7 +138,7 @@ do_light_sources(seenV **cs_rows)
 {
     coordxy x, y, min_x, max_x, max_y;
     int offset;
-    coordxy *limits;
+    const coordxy *limits;
     short at_hero_range = 0;
     light_source *ls;
     seenV *row;

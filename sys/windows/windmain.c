@@ -239,7 +239,7 @@ test_portable_config(
 
 static char portable_device_path[MAX_PATH];
 
-const char *get_portable_device()
+const char *get_portable_device(void)
 {
     return (const char *) portable_device_path;
 }
@@ -361,7 +361,7 @@ update_file(
 
 }
 
-void copy_sysconf_content()
+void copy_sysconf_content(void)
 {
     /* Using the SYSCONFPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
@@ -381,7 +381,7 @@ void copy_sysconf_content()
 
 }
 
-void copy_config_content()
+void copy_config_content(void)
 {
     /* Using the CONFIGPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[CONFIGPREFIX] = TRUE;
@@ -397,7 +397,7 @@ void copy_config_content()
 }
 
 void
-copy_hack_content()
+copy_hack_content(void)
 {
     nhassert(fqn_prefix_locked[HACKPREFIX]);
 
@@ -988,7 +988,7 @@ fakeconsole(void)
 #endif
     return has_fakeconsole;
 }
-void freefakeconsole()
+void freefakeconsole(void)
 {
     if (has_fakeconsole) {
         FreeConsole();
