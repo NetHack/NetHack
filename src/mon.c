@@ -5172,8 +5172,7 @@ usmellmon(struct permonst* mdat)
    and potentially re-equip gear at the start of its next move;
    this hides the details of that */
 void
-check_gear_next_turn(mon)
-struct monst *mon;
+check_gear_next_turn(struct monst *mon)
 {
     mon->misc_worn_check |= I_SPECIAL;
 }
