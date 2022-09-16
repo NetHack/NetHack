@@ -504,8 +504,8 @@ clonewiz(void)
 
 /* also used by newcham() */
 int
-pick_nasty(int difcap) /* if non-zero, try to make difficulty be lower
-                          than this */
+pick_nasty(
+    int difcap) /* if non-zero, try to make difficulty be lower than this */
 {
     int alt, res = nasties[rn2(SIZE(nasties))];
 
@@ -783,7 +783,7 @@ wizdead(void)
     }
 }
 
-const char *const random_insult[] = {
+static const char *const random_insult[] = {
     "antic",      "blackguard",   "caitiff",    "chucklehead",
     "coistrel",   "craven",       "cretin",     "cur",
     "dastard",    "demon fodder", "dimwit",     "dolt",
@@ -794,7 +794,7 @@ const char *const random_insult[] = {
     "wittol",     "worm",         "wretch",
 };
 
-const char *const random_malediction[] = {
+static const char *const random_malediction[] = {
     "Hell shall soon claim thy remains,", "I chortle at thee, thou pathetic",
     "Prepare to die, thou", "Resistance is useless,",
     "Surrender or die, thou", "There shall be no mercy, thou",
