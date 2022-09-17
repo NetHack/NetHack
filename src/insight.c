@@ -1444,7 +1444,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
     if (Sleep_resistance)
         you_are("sleep resistant", from_what(SLEEP_RES));
     if (Disint_resistance)
-        you_are("disintegration-resistant", from_what(DISINT_RES));
+        you_are("disintegration resistant", from_what(DISINT_RES));
     if (u_adtyp_resistance_obj(AD_DISN))
         enl_msg("Your items ", "are", "were",
                 " protected from disintegration", item_what(AD_DISN));
