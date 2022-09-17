@@ -8,7 +8,10 @@
  *  contributed much to the cause.
  */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS
+#endif
+
 #include "hack.h"
 
 #ifdef MSDOS

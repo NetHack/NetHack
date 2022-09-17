@@ -4,7 +4,10 @@
 /* NetHack may be freely redistributed.  See license for details. */
 /* tty.c - (VMS) version */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS
+#endif
+
 #include "hack.h"
 #include "wintty.h"
 #include "tcap.h"

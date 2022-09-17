@@ -9,7 +9,10 @@
  * arnold@ucsf-cgl, wcs@bo95b, cbcephus!pds and others.
  */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS
+#endif
+
 #include "hack.h"
 
 /*

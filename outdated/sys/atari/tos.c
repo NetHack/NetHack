@@ -5,7 +5,10 @@
  *  TOS system functions.
  */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS
+#endif
+
 #include "hack.h"
 
 #ifdef TTY_GRAPHICS
