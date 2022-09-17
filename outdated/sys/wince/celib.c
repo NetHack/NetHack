@@ -2,10 +2,7 @@
 /* Copyright (C) 2001 by Alex Kompel 	 */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef NEED_VARARGS
 #define NEED_VARARGS
-#endif
-
 #include "hack.h"
 #include <fcntl.h>
 // #include "wceconf.h"

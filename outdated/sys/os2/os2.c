@@ -6,10 +6,7 @@
  *  OS/2 system functions.
  */
 
-#ifndef NEED_VARARGS
 #define NEED_VARARGS
-#endif
-
 #include "hack.h"
 
 #ifdef OS2

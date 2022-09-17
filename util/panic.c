@@ -8,10 +8,7 @@
  *      mode for the makedefs / drg code.
  */
 
-#ifndef NEED_VARARGS
 #define NEED_VARARGS
-#endif
-
 #include "config.h"
 
 #ifdef AZTEC

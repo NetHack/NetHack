@@ -6,10 +6,7 @@
  *  System related functions for MSDOS, OS/2, TOS
  */
 
-#ifndef NEED_VARARGS
 #define NEED_VARARGS
-#endif
-
 #include "hack.h"
 #include "wintty.h"
 

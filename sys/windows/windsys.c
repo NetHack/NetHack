@@ -14,10 +14,7 @@
 #include "win10.h"
 #include "winos.h"
 
-#ifndef NEED_VARARGS
 #define NEED_VARARGS
-#endif
-
 #include "hack.h"
 #include <dos.h>
 #ifndef __BORLANDC__

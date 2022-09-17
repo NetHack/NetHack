@@ -19,10 +19,7 @@
 #endif
 
 #ifdef WIN32
-#ifndef NEED_VARARGS
 #define NEED_VARARGS /* Uses ... */
-#endif
-
 #include "win32api.h"
 #include "winos.h"
 #include "hack.h"
