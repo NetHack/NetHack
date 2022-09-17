@@ -3,7 +3,9 @@
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS
+#endif
 
 #include "hack.h"
 #include "dlb.h"

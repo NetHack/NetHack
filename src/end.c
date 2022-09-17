@@ -3,7 +3,9 @@
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#ifndef NEED_VARARGS
 #define NEED_VARARGS /* comment line for pre-compiled headers */
+#endif
 
 #include "hack.h"
 #ifndef NO_SIGNAL
