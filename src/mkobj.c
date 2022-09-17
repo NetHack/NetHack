@@ -423,11 +423,11 @@ splitobj(struct obj *obj, long num)
        be tracking the original */
     if (otmp->where == OBJ_LUAFREE)
         otmp->where = OBJ_FREE;
+    if (obj->unpaid)
+        splitbill(obj, otmp);
     copy_oextra(otmp, obj);
     if (has_omid(otmp))
         free_omid(otmp); /* only one association with m_id*/
-    if (obj->unpaid)
-        splitbill(obj, otmp);
     if (obj->timed)
         obj_split_timers(obj, otmp);
     if (obj_sheds_light(obj))
