@@ -8817,7 +8817,8 @@ option_help(void)
     winid datawin;
 
     datawin = create_nhwindow(NHW_TEXT);
-    Sprintf(buf, "Set options as OPTIONS=<options> in %s", configfile);
+    Snprintf(buf, sizeof buf,
+             "Set options as OPTIONS=<options> in %s", configfile);
     opt_intro[CONFIG_SLOT] = (const char *) buf;
     for (i = 0; opt_intro[i]; i++)
         putstr(datawin, 0, opt_intro[i]);
