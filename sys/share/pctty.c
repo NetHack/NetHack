@@ -6,9 +6,9 @@
 /* tty.c - (PC) version */
 
 #ifndef NEED_VARARGS
-#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers */
+#define NEED_VARARGS /* Uses ... */ /* comment line for pre-compiled headers \
 #endif
-
+                                       */
 #include "hack.h"
 #include "wintty.h"
 
