@@ -50,3 +50,8 @@ function monkfoodshop()
    end
    return "food shop";
 end
+
+-- pline with variable number of arguments
+function pline(fmt, ...)
+   nh.pline(string.format(fmt, table.unpack({...})));
+end

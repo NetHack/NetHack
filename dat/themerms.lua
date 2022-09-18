@@ -14,8 +14,15 @@
 --     the room only gets what you define in here.
 --   - use type = "themed" to force a room that's never converted
 --     to a special room, such as a shop or a temple.
--- core calls themerooms_generate() multiple times per level
--- to generate a single themed room.
+--
+-- for each level, the core first calls pre_themerooms_generate(),
+-- then it calls themerooms_generate() multiple times until it decides
+-- enough rooms have been generated, and then it calls
+-- post_themerooms_generate().  The lua state is persistent through
+-- the gameplay, but not across saves, so remember to reset any variables.
+
+
+local buried_treasure = { };
 
 themeroom_fills = {
 
@@ -74,7 +81,12 @@ themeroom_fills = {
 
    -- Buried treasure
    function(rm)
-      des.object({ id = "chest", buried = true, contents = function()
+      des.object({ id = "chest", buried = true, contents = function(otmp)
+                      local xobj = otmp:totable();
+                      -- keep track of the last buried treasure
+                      if (xobj.NO_OBJ == nil) then
+                         buried_treasure = { x = xobj.ox, y = xobj.oy };
+                      end
                       for i = 1, d(3,4) do
                          des.object();
                       end
@@ -649,6 +661,7 @@ function is_eligible(room, mkrm)
    return true
 end
 
+-- called repeatedly until the core decides there are enough rooms
 function themerooms_generate()
    local pick = 1;
    local total_frequency = 0;
@@ -675,6 +688,34 @@ function themerooms_generate()
       themerooms[pick].contents();
    elseif (t == "function") then
       themerooms[pick]();
+   end
+end
+
+-- called before any rooms are generated
+function pre_themerooms_generate()
+   -- reset the buried treasure location
+   buried_treasure = { };
+end
+
+-- called after all rooms have been generated
+function post_themerooms_generate()
+   if (buried_treasure.x ~= nil) then
+      local floors = selection.negate():filter_mapchar(".");
+      local pos = floors:rndcoord(0);
+      local tx = buried_treasure.x - pos.x - 1;
+      local ty = buried_treasure.y - pos.y;
+      local dig = "";
+      if (tx == 0 and ty == 0) then
+         dig = " here";
+      else
+         if (tx < 0 or tx > 0) then
+            dig = string.format(" %i %s", math.abs(tx), (tx > 0) and "east" or "west");
+         end
+         if (ty < 0 or ty > 0) then
+            dig = dig .. string.format(" %i %s", math.abs(ty), (ty > 0) and "south" or "north");
+         end
+      end
+      des.engraving({ coord = pos, type = "burn", text = "Dig" .. dig });
    end
 end
 
@@ -706,3 +747,4 @@ function themeroom_fill(rm)
       themeroom_fills[pick](rm);
    end
 end
+

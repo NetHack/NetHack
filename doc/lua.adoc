@@ -651,6 +651,7 @@ Example:
  des.non_passwall(selection);
  des.non_passwall();
 
+
 === object
 
 Create an object. The table parameter accepts the following:
@@ -682,7 +683,7 @@ Create an object. The table parameter accepts the following:
 | male        | boolean  | Is statue male?
 | female      | boolean  | Is statue female?
 | laid_by_you | boolean  | Is an egg laid by you?
-| contents    | function | Container contents
+| contents    | function | Container contents. The container object is given as a parameter. See <<Obj>> class.
 |===
 
 Example:
@@ -694,7 +695,8 @@ Example:
  des.object("scimitar", {6, 7});
  des.object({ class = "%" });
  des.object({ id = "boulder", x = 03, y = 12});
- des.object({ id = "chest", coord = {03, 12}, locked = true, contents = function() des.object("rock"); end });
+ des.object({ id = "chest", coord = {03, 12}, locked = true, contents = function(obj) des.object("rock"); end });
+
 
 === random_corridors
 

@@ -289,6 +289,13 @@ makerooms(void)
 
     if (themes) {
         create_des_coder();
+        iflags.in_lua = g.in_mk_themerooms = TRUE;
+        g.themeroom_failed = FALSE;
+        lua_getglobal(themes, "pre_themerooms_generate");
+        if ( nhl_pcall(themes, 0, 0)){
+            impossible("Lua error: %s", lua_tostring(themes, -1));
+        }
+        iflags.in_lua = g.in_mk_themerooms = FALSE;
     }
 
     /* make rooms until satisfied */
@@ -321,6 +328,15 @@ makerooms(void)
         }
     }
     if (themes) {
+        reset_xystart_size();
+        iflags.in_lua = g.in_mk_themerooms = TRUE;
+        g.themeroom_failed = FALSE;
+        lua_getglobal(themes, "post_themerooms_generate");
+        if ( nhl_pcall(themes, 0, 0)){
+            impossible("Lua error: %s", lua_tostring(themes, -1));
+        }
+        iflags.in_lua = g.in_mk_themerooms = FALSE;
+
         wallification(1, 0, COLNO - 1, ROWNO - 1);
         free(g.coder);
         g.coder = NULL;
