@@ -235,17 +235,19 @@ ifdef WANT_WIN_QT
 LINK = $(CXX)
 ifdef WANT_WIN_QT5
 # Qt5 requires C++11
-QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
-WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig \
+		pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig \
+		pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif    # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
-QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore -I $(QTDIR)/include/QtMultimedia
+QTCXXFLAGS += -std=c++17 -I $(QTDIR)/include -I $(QTDIR)/include/QtCore \
+		-I $(QTDIR)/include/QtMultimedia
 MOC = moc
 MOCPATH = $(QTDIR)/share/qt/libexec/moc
-WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui -framework QtWidgets -framework QtMultimedia
+WINLIB += -F $(QTDIR)/Frameworks -framework QtCore -framework QtGui \
+		-framework QtWidgets -framework QtMultimedia
 endif    # WANT_WIN_QT6
-WINSRC += $(WINQTSRC)
-WINOBJ0 += $(WINQTOBJ)
 VARDATND0 += nhtiles.bmp rip.xpm nhsplash.xpm
 # XXX if /Developer/qt exists and QTDIR not set, use that
 ifndef QTDIR
@@ -257,7 +259,7 @@ LINK=$(CC)
 endif	# !WANT_WIN_QT
 
 # prevent duplicate tile.o in WINOBJ
-WINOBJ = $(sort $(WINOBJ0))
+WINOBJ = $(WINOBJ0) $(sort $(XTRAOBJ))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
 

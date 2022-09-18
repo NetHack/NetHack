@@ -207,9 +207,12 @@ REGEXOBJ = $(TARGETPFX)posixregex.o
 #REGEXOBJ = $(TARGETPFX)cppregex.o
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
-# combination of windowing systems.  Also set windowing systems in config.h.
-# Note that if you are including multiple tiled window systems, you don't
-# want two copies of tile.o, so comment out all but the first.
+# combination of windowing systems.  Also set matching USE_x_GRAPHICS in
+# config.h.  Note that if you are building for any window system which
+# uses tiles, uncomment '#$(TARGETPFX)tile.o' (by removing the '#') in that
+# system's WINxOBJ (WINX11OBJ or WINQTOBJ or WINQT3OBJ).  If you are building
+# nethack with support for multiple window systems, only uncomment that for
+# one of them to avoid duplicate tile.o.
 #
 # files for a straight tty port using no native windowing system
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
@@ -236,14 +239,14 @@ WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 WINX11OBJ = $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
 	$(TARGETPFX)winmap.o $(TARGETPFX)winmenu.o $(TARGETPFX)winmesg.o \
 	$(TARGETPFX)winmisc.o $(TARGETPFX)winstat.o $(TARGETPFX)wintext.o \
-	$(TARGETPFX)winval.o $(TARGETPFX)tile.o
+	$(TARGETPFX)winval.o #$(TARGETPFX)tile.o
 #
 # Files for a Qt 3 interface (renamed since nethack 3.6.x)
 #
 #WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
 #	../win/Qt3/qt3tableview.cpp
 #WINQT3OBJ = $(TARGETPFX)qt3_win.o $(TARGETPFX)qt3_clust.o \
-	$(TARGETPFX)qt3tableview.o $(TARGETPFX)tile.o
+	$(TARGETPFX)qt3tableview.o #$(TARGETPFX)tile.o
 # empty values for 'make depend'
 WINQT3SRC =
 WINQT3OBJ =
@@ -263,7 +266,7 @@ WINQTSRC = ../win/Qt/qt_bind.cpp ../win/Qt/qt_click.cpp \
 	../win/Qt/qt_plsel.cpp ../win/Qt/qt_rip.cpp ../win/Qt/qt_set.cpp \
 	../win/Qt/qt_stat.cpp ../win/Qt/qt_str.cpp ../win/Qt/qt_streq.cpp \
 	../win/Qt/qt_svsel.cpp ../win/Qt/qt_win.cpp ../win/Qt/qt_xcmd.cpp \
-	../win/Qt/qt_yndlg.cpp $(WINQTMOC)
+	../win/Qt/qt_yndlg.cpp $(WINQTMOC) tile.c
 WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_clust.o $(TARGETPFX)qt_delay.o \
 	$(TARGETPFX)qt_glyph.o $(TARGETPFX)qt_icon.o \
@@ -272,7 +275,7 @@ WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_msg.o $(TARGETPFX)qt_plsel.o $(TARGETPFX)qt_rip.o \
 	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
 	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
-	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o
+	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o #$(TARGETPFX)tile.o
 
 # Files for Shim windowing interface for libnh -- doesn't do anything,
 # just passes along the API calls to the library
