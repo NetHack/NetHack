@@ -4624,6 +4624,10 @@ mhitm_knockback(struct monst *magr,
               || (mattk->aatyp == AT_WEAP && !weapon_used))))
         return FALSE;
 
+    /* needs a solid physical hit */
+    if (unsolid(magr->data))
+        return FALSE;
+
     /* the attack must have hit */
     /* mon-vs-mon code path doesn't set up hitflags */
     if ((u_agr || u_def) && !(*hitflags & MM_HIT))
