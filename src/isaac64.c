@@ -12,7 +12,6 @@
 #include "config.h"
 
 #ifdef USE_ISAAC64
-#include <math.h>
 #include <string.h>
 #include "isaac64.h"
 
