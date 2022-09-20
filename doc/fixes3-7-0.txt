@@ -1021,6 +1021,8 @@ better feedback from detect unseen
 make public server admin messages use urgent_pline
 cannot kick while squeezed on top of a boulder
 room stocking would put multiple items on the same spot
+splitting a stack of named, shop-owned objects while perm_invent is enabled
+	produced impossible "unpaid_cost: object wasn't on any bill."
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
