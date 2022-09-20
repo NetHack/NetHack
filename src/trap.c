@@ -403,6 +403,10 @@ hole_destination(d_level *dst)
     dst->dlevel = dunlev(&u.uz);
     do {
         dst->dlevel++;
+        if (Is_sanctum(dst)) {
+            dst->dlevel--;
+            break;
+        }
     } while (!rn2(4) && dst->dlevel < bottom);
 }
 
