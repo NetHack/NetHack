@@ -1937,7 +1937,8 @@ revive_corpse(struct obj *corpse)
                                chewed ? "bite-covered" : (const char *) 0,
                                CXN_SINGULAR));
     mcarry = (where == OBJ_MINVENT) ? corpse->ocarry : 0;
-    get_obj_location(corpse, &corpsex, &corpsey, CONTAINED_TOO | BURIED_TOO);
+    (void) get_obj_location(corpse, &corpsex, &corpsey,
+                            CONTAINED_TOO | BURIED_TOO);
 
     if (where == OBJ_CONTAINED) {
         struct monst *mtmp2;
@@ -1974,7 +1975,8 @@ revive_corpse(struct obj *corpse)
                 if (canseemon(mtmp)) {
                     pline("%s rises from the dead%s!",
                           chewed ? Adjmonnam(mtmp, "bite-covered")
-                                 : Monnam(mtmp), effect);
+                                 : Monnam(mtmp),
+                          effect);
                 } else {
                     pline("%s disappears%s!", The(cname), effect);
                 }
@@ -2000,15 +2002,15 @@ revive_corpse(struct obj *corpse)
                doesn't have knowledge to make here. */
             const char *mnam = canspotmon(mtmp) ? Amonnam(mtmp) : Something;
 
-
-            if (container_where == OBJ_MINVENT && mcarry && canseemon(mcarry)
-                && container) {
+            if (!container) {
+                impossible("reviving corpse from non-existent container");
+            } else if (mcarry && canseemon(mcarry)) {
                 pline("%s writhes out of %s!", mnam, yname(container));
-            } else if (container_where == OBJ_INVENT && container) {
+            } else if (container_where == OBJ_INVENT) {
                 Strcpy(sackname, an(xname(container)));
                 pline("%s %s out of %s in your pack!", mnam,
                       locomotion(mtmp->data, "writhes"), sackname);
-            } else if (container_where == OBJ_FLOOR && container
+            } else if (container_where == OBJ_FLOOR
                        && cansee(corpsex, corpsey)) {
                 Strcpy(sackname, an(xname(container)));
                 pline("%s escapes from %s!", mnam, sackname);
