@@ -580,15 +580,18 @@ fall_through(
     if (Is_stronghold(&u.uz)) {
         find_hell(&dtmp);
     } else {
-        int dist = newlevel - dunlev(&u.uz);
+        int dist;
 
         if (t) {
             dtmp.dnum = t->dst.dnum;
-            dtmp.dlevel = t->dst.dlevel;
+            /* don't fall beyond the bottom, in case this came from a bones
+               file with different dungeon size  */
+            dtmp.dlevel = min(t->dst.dlevel, bottom);
             dist = dtmp.dlevel - dunlev(&u.uz);
         } else {
             dtmp.dnum = u.uz.dnum;
             dtmp.dlevel = newlevel;
+            dist = newlevel - dunlev(&u.uz);
         }
         if (dist > 1)
             You("fall down a %s%sshaft!", dist > 3 ? "very " : "",
