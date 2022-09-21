@@ -985,11 +985,17 @@ savetrapchn(NHFILE* nhfp, register struct trap* trap)
     register struct trap *trap2;
 
     while (trap) {
+        boolean use_relative = (g.program_state.restoring != REST_GSTATE
+                                && trap->dst.dnum == u.uz.dnum);
         trap2 = trap->ntrap;
+        if (use_relative)
+            trap->dst.dlevel -= u.uz.dlevel; /* make it relative */
         if (perform_bwrite(nhfp)) {
             if (nhfp->structlevel)
                 bwrite(nhfp->fd, (genericptr_t) trap, sizeof *trap);
         }
+        if (use_relative)
+            trap->dst.dlevel += u.uz.dlevel; /* reset back to absolute */
         if (release_data(nhfp))
             dealloc_trap(trap);
         trap = trap2;
