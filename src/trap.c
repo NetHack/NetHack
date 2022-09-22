@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1661633977 2022/08/27 20:59:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.502 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1663890450 2022/09/22 23:47:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -389,6 +389,12 @@ dng_bottom(d_level *lev)
         /* deepest reached < qlocate implies current < qlocate */
         if (dunlev_reached(lev) < qlocate_depth)
             bottom = qlocate_depth; /* early cut-off */
+    } else if (Inhell) {
+        /* if the invocation hasn't been performed yet, the vibrating square
+           level is effectively the bottom of Gehennom; the sanctum level is
+           out of reach until after the invocation */
+        if (!u.uevent.invoked)
+            bottom -= 1;
     }
     return bottom;
 }
@@ -401,13 +407,11 @@ hole_destination(d_level *dst)
 
     dst->dnum = u.uz.dnum;
     dst->dlevel = dunlev(&u.uz);
-    do {
+    while (dst->dlevel < bottom) {
         dst->dlevel++;
-        if (Is_sanctum(dst)) {
-            dst->dlevel--;
+        if (rn2(4))
             break;
-        }
-    } while (!rn2(4) && dst->dlevel < bottom);
+    }
 }
 
 struct trap *
@@ -518,11 +522,8 @@ d_level *
 clamp_hole_destination(d_level *dlev)
 {
     int bottom = dng_bottom(dlev);
-    dlev->dlevel = min(dlev->dlevel, bottom);
-    if (In_hell(dlev) && !u.uevent.invoked
-        && dlev->dlevel == bottom)
-        dlev->dlevel--;
 
+    dlev->dlevel = min(dlev->dlevel, bottom);
     return dlev;
 }
 
@@ -534,7 +535,7 @@ fall_through(
     d_level dtmp;
     char msgbuf[BUFSZ];
     const char *dont_fall = 0;
-    int newlevel, bottom = dng_bottom(&u.uz);
+    int newlevel;
     struct trap *t = (struct trap *) 0;
 
     /* we'll fall even while levitating in Sokoban; otherwise, if we
@@ -563,10 +564,7 @@ fall_through(
              || (!Can_fall_thru(&u.uz) && !levl[u.ux][u.uy].candig)
              || ((Flying || is_clinger(g.youmonst.data)
                   || (ceiling_hider(g.youmonst.data) && u.uundetected))
-                 && !(ftflags & TOOKPLUNGE))
-             /* this is no longer a very useful test because newlevel isn't
-                the real destination we're aiming for, if t != 0 */
-             || (Inhell && !u.uevent.invoked && newlevel == bottom)) {
+                 && !(ftflags & TOOKPLUNGE))) {
         dont_fall = "don't fall in.";
     } else if (g.youmonst.data->msize >= MZ_HUGE) {
         dont_fall = "don't fit through.";
