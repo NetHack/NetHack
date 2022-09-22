@@ -1329,9 +1329,12 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * Stormbringer it's "killed by Stormbringer" instead of "killed by an orc".
  */
 boolean
-artifact_hit(struct monst *magr, struct monst *mdef, struct obj *otmp,
-             int *dmgptr,
-             int dieroll) /* needed for Magicbane and vorpal blades */
+artifact_hit(
+    struct monst *magr, /* attacker; might be Null if 'mdef' is youmonst */
+    struct monst *mdef, /* defender */
+    struct obj *otmp,   /* artifact weapon */
+    int *dmgptr,        /* output */
+    int dieroll)        /* needed for Magicbane and vorpal blades */
 {
     boolean youattack = (magr == &g.youmonst);
     boolean youdefend = (mdef == &g.youmonst);
