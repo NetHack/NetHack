@@ -1145,8 +1145,11 @@ dodown(void)
     }
     if (trap && Is_stronghold(&u.uz)) {
         goto_hell(FALSE, TRUE);
-    } else if (trap) {
-        goto_level(&(trap->dst), FALSE, FALSE, FALSE);
+    } else if (trap && trap->dst.dlevel != -1) {
+        d_level tdst;
+        assign_level(&tdst, &(trap->dst));
+        (void) clamp_hole_destination(&tdst);
+        goto_level(&tdst, FALSE, FALSE, FALSE);
     } else {
         g.at_ladder = (boolean) (levl[u.ux][u.uy].typ == LADDER);
         next_level(!trap);
