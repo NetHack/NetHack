@@ -1822,7 +1822,7 @@ goto_level(
 
     /* fall damage? */
     if (do_fall_dmg) {
-        int dmg = d(dist, 6);
+        int dmg = d(max(dist, 1), 6);
 
         dmg = Maybe_Half_Phys(dmg);
         losehp(dmg, "falling down a mine shaft", KILLED_BY);
