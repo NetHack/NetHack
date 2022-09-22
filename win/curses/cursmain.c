@@ -1024,7 +1024,7 @@ void
 curses_delay_output(void)
 {
 #ifdef TIMED_DELAY
-    if (flags.nap) {
+    if (flags.nap && !iflags.debug_fuzzer) {
         /* refreshing the whole display is a waste of time,
          * but that's why we're here */
         refresh();

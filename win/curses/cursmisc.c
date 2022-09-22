@@ -39,7 +39,10 @@ curses_read_char(void)
     /* cancel message suppression; all messages have had a chance to be read */
     curses_got_input();
 
-    ch = getch();
+    if (iflags.debug_fuzzer)
+        ch = randomkey();
+    else
+        ch = getch();
 #if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
     tmpch = ch;
 #endif

@@ -297,7 +297,7 @@ curses_character_input_dialog(
 #ifdef PDCURSES
         answer = wgetch(message_window);
 #else
-        answer = getch();
+        answer = curses_read_char();
 #endif
         if (answer == ERR) {
             answer = def;
@@ -1487,7 +1487,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     menu_display_page(menu, win, curpage, selectors, groupaccels);
 
     while (!dismiss) {
-        curletter = getch();
+        curletter = curses_read_char();
 
         if (curletter == ERR) {
             num_selected = -1;
