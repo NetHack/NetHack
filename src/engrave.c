@@ -842,9 +842,9 @@ doengrave(void)
         break;
 
     case WEAPON_CLASS:
-        if (is_art(otmp, ART_FIRE_BRAND))
-            type = BURN;
-        else if (is_blade(otmp)) {
+        if (is_art(otmp, ART_FIRE_BRAND)) {
+            type = BURN; /* doesn't dull weapon */
+        } else if (is_blade(otmp)) {
             if ((int) otmp->spe > -3)
                 type = ENGRAVE;
             else
@@ -1140,7 +1140,7 @@ engrave(void)
                        || g.context.engraving.type == HEADSTONE);
     boolean dulling_wep, marker;
     char *endc; /* points at character 1 beyond the last character to engrave
-                   this action */
+                 * this action */
     int i, space_left;
 
     if (g.context.engraving.pos.x != u.ux
@@ -1387,7 +1387,11 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* to support '#stats' wizard-mode command */
 void
-engr_stats(const char *hdrfmt, char *hdrbuf, long *count, long *size)
+engr_stats(
+    const char *hdrfmt,
+    char *hdrbuf,
+    long *count,
+    long *size)
 {
     struct engr *ep;
 
