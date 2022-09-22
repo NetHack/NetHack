@@ -979,7 +979,8 @@ menu_drop(int retry)
                 if (!otmp2 || !otmp2->bypass)
                     continue;
                 /* found next selected invent item */
-                n_dropped += ((menudrop_split(otmp, pick_list[i].count) == ECMD_TIME) ? 1 : 0);
+                n_dropped += (menudrop_split(otmp, pick_list[i].count)
+                              == ECMD_TIME) ? 1 : 0;
             }
             bypass_objlist(g.invent, FALSE); /* reset g.invent to normal */
             free((genericptr_t) pick_list);
@@ -1099,7 +1100,9 @@ dodown(void)
             if (flags.autodig && !g.context.nopick && uwep && is_pick(uwep)) {
                 return use_pick_axe2(uwep);
             } else {
-                You_cant("go down here.");
+                You_cant("go down here%s.",
+                         (trap && trap->ttyp == VIBRATING_SQUARE) ? " yet"
+                                                                  : "");
                 return ECMD_OK;
             }
         }
