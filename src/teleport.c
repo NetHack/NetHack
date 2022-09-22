@@ -1540,6 +1540,7 @@ mlevel_tele_trap(
                 return Trap_Effect_Finished;
             } else {
                 assign_level(&tolevel, &trap->dst);
+                (void) clamp_hole_destination(&tolevel);
             }
         } else if (tt == MAGIC_PORTAL) {
             if (In_endgame(&u.uz) && (mon_has_amulet(mtmp)
