@@ -512,6 +512,20 @@ maketrap(coordxy x, coordxy y, int typ)
     return ttmp;
 }
 
+/* limit the destination of a hole or trapdoor to the furthest level you
+   should be able to fall to */
+d_level *
+clamp_hole_destination(d_level *dlev)
+{
+    int bottom = dng_bottom(dlev);
+    dlev->dlevel = min(dlev->dlevel, bottom);
+    if (In_hell(dlev) && !u.uevent.invoked
+        && dlev->dlevel == bottom)
+        dlev->dlevel--;
+
+    return dlev;
+}
+
 void
 fall_through(
     boolean td, /* td == TRUE : trap door or hole */
@@ -585,20 +599,15 @@ fall_through(
         int dist;
 
         if (t) {
-            dtmp.dnum = t->dst.dnum;
+            assign_level(&dtmp, &t->dst);
             /* don't fall beyond the bottom, in case this came from a bones
                file with different dungeon size  */
-            bottom = dng_bottom(&t->dst);
-            dtmp.dlevel = min(t->dst.dlevel, bottom);
-            if (In_hell(&t->dst) && !u.uevent.invoked
-                && dtmp.dlevel == bottom)
-                dtmp.dlevel--;
+            (void) clamp_hole_destination(&dtmp);
         } else {
             dtmp.dnum = u.uz.dnum;
             dtmp.dlevel = newlevel;
         }
-        /* XXX: dist won't be accurate if dtmp.dnum may not match u.uz.dnum */
-        dist = dtmp.dlevel - dunlev(&u.uz);
+        dist = depth(&dtmp) - depth(&u.uz);
         if (dist > 1)
             You("fall down a %s%sshaft!", dist > 3 ? "very " : "",
                 dist > 2 ? "deep " : "");
