@@ -1386,6 +1386,7 @@ when the Astral level got created, any fake player character monsters that
 tipping contents of one container directly into another allowed transferring
 	wands of cancellation and bags of holding or tricks that were inside
 	a sack, box, or chest into a bag of holding without blowing it up
+prevent random traps from being created inside the shops in the tourist quest
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
