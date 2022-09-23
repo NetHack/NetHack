@@ -1024,6 +1024,11 @@ room stocking would put multiple items on the same spot
 splitting a stack of named, shop-owned objects while perm_invent is enabled
 	produced impossible "unpaid_cost: object wasn't on any bill."
 more consistent feedback if a reviving corpse becomes an unseen monster
+improve consistency between applying a key and explicitly opening a door:
+	if in a pit, you're told "you can't" and no time elapses; if there
+	isn't any door in the direction supplied, you're told "no door" and
+	time elapses if you discover the non-door's terrain type but doesn't
+	if you already knew the type there
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

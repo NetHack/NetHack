@@ -341,9 +341,9 @@ autokey(boolean opening) /* True: key, pick, or card; False: key or pick */
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* for doapply(); if player gives a direction or resumes an interrupted
-   previous attempt then it costs hero a move even if nothing ultimately
-   happens; when told "can't do that" before being asked for direction
-   or player cancels with ESC while giving direction, it doesn't */
+   previous attempt then it usually costs hero a move even if nothing
+   ultimately happens; when told "can't do that" before being asked for
+   direction or player cancels with ESC while giving direction, it doesn't */
 #define PICKLOCK_LEARNED_SOMETHING (-1) /* time passes */
 #define PICKLOCK_DID_NOTHING 0          /* no time passes */
 #define PICKLOCK_DID_SOMETHING 1
@@ -353,8 +353,8 @@ int
 pick_lock(
     struct obj *pick,
     coordxy rx, coordxy ry, /* coordinates of door/container, for autounlock:
-                         * does not prompt for direction if these are set */
-    struct obj *container) /* container, for autounlock */
+                             * doesn't prompt for direction if these are set */
+    struct obj *container)  /* container, for autounlock */
 {
     struct obj dummypick;
     int picktyp, c, ch;
@@ -535,12 +535,16 @@ pick_lock(
                 There("doesn't seem to be any sort of lock here.");
             return PICKLOCK_LEARNED_SOMETHING; /* decided against all boxes */
         }
-    } else { /* pick the lock in a door */
+
+    /* not the hero's location; pick the lock in an adjacent door */
+    } else {
         struct monst *mtmp;
 
         if (u.utrap && u.utraptype == TT_PIT) {
             You_cant("reach over the edge of the pit.");
-            return PICKLOCK_LEARNED_SOMETHING;
+            /* this used to return PICKLOCK_LEARNED_SOMETHING but the
+               #open command doesn't use a turn for similar situation */
+            return PICKLOCK_DID_NOTHING;
         }
 
         door = &levl[cc.x][cc.y];
@@ -562,11 +566,20 @@ pick_lock(
             return PICKLOCK_LEARNED_SOMETHING;
         }
         if (!IS_DOOR(door->typ)) {
+            int res = PICKLOCK_DID_NOTHING, oldglyph = door->glyph;
+            schar oldlastseentyp = g.lastseentyp[cc.x][cc.y];
+
+            /* this is probably only relevant when blind */
+            feel_location(cc.x, cc.y);
+            if (door->glyph != oldglyph
+                || g.lastseentyp[cc.x][cc.y] != oldlastseentyp)
+                res = PICKLOCK_LEARNED_SOMETHING;
+
             if (is_drawbridge_wall(cc.x, cc.y) >= 0)
                 You("%s no lock on the drawbridge.", Blind ? "feel" : "see");
             else
                 You("%s no door there.", Blind ? "feel" : "see");
-            return PICKLOCK_LEARNED_SOMETHING;
+            return res;
         }
         switch (door->doormask) {
         case D_NODOOR:
@@ -800,7 +813,8 @@ doopen_indir(coordxy x, coordxy y)
 
     door = &levl[cc.x][cc.y];
     portcullis = (is_drawbridge_wall(cc.x, cc.y) >= 0);
-    if (Blind) {
+    /* this used to be 'if (Blind)' but using a key skips that so we do too */
+    {
         int oldglyph = door->glyph;
         schar oldlastseentyp = g.lastseentyp[cc.x][cc.y];
 
