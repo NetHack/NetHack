@@ -389,7 +389,7 @@ dng_bottom(d_level *lev)
         /* deepest reached < qlocate implies current < qlocate */
         if (dunlev_reached(lev) < qlocate_depth)
             bottom = qlocate_depth; /* early cut-off */
-    } else if (Inhell) {
+    } else if (In_hell(lev)) {
         /* if the invocation hasn't been performed yet, the vibrating square
            level is effectively the bottom of Gehennom; the sanctum level is
            out of reach until after the invocation */
