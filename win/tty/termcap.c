@@ -1299,6 +1299,11 @@ static char *
 s_atr2str(int n)
 {
     switch (n) {
+    case ATR_ITALIC:
+        /* if italic isn't available, fall through to underline */
+        if (ZH && *ZH)
+            return ZH;
+        /*FALLTHRU*/
     case ATR_BLINK:
     case ATR_ULINE:
         if (n == ATR_BLINK) {
@@ -1323,10 +1328,6 @@ s_atr2str(int n)
         if (MH && *MH)
             return MH;
         break;
-    case ATR_ITALIC:
-        if (ZH && *ZH)
-            return ZH;
-        break;
     }
     return nulstr;
 }
@@ -1335,6 +1336,11 @@ static char *
 e_atr2str(int n)
 {
     switch (n) {
+    case ATR_ITALIC:
+        /* send ZR unless we didn't have ZH and substituted US */
+        if (ZR && *ZR && ZH && *ZH)
+            return ZR;
+        /*FALLTHRU*/
     case ATR_ULINE:
         if (nh_UE && *nh_UE)
             return nh_UE;
@@ -1348,10 +1354,6 @@ e_atr2str(int n)
     case ATR_INVERSE:
         if (ME && *ME)
             return ME;
-        break;
-    case ATR_ITALIC:
-        if (ZR && *ZR)
-            return ZR;
         break;
     }
     return nulstr;
