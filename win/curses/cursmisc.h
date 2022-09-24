@@ -8,6 +8,7 @@
 
 /* Global declarations */
 
+int curses_getch(void);
 int curses_read_char(void);
 void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
 void curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff);

@@ -26,6 +26,18 @@ static int curs_y = -1;
 static int parse_escape_sequence(void);
 
 
+int
+curses_getch(void)
+{
+    int ch;
+
+    if (iflags.debug_fuzzer)
+        ch = randomkey();
+    else
+        ch = getch();
+    return ch;
+}
+
 /* Read a character of input from the user */
 
 int
@@ -39,10 +51,7 @@ curses_read_char(void)
     /* cancel message suppression; all messages have had a chance to be read */
     curses_got_input();
 
-    if (iflags.debug_fuzzer)
-        ch = randomkey();
-    else
-        ch = getch();
+    ch = curses_getch();
 #if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
     tmpch = ch;
 #endif

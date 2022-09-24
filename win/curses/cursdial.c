@@ -1487,7 +1487,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     menu_display_page(menu, win, curpage, selectors, groupaccels);
 
     while (!dismiss) {
-        curletter = curses_read_char();
+        curletter = curses_getch();
 
         if (curletter == ERR) {
             num_selected = -1;
