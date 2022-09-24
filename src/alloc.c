@@ -19,7 +19,7 @@ extern int FITSint_(LUA_INTEGER, const char *, int);
 #define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)
 extern unsigned FITSuint_(unsigned long long, const char *, int);
 
-char *fmt_ptr(const genericptr);
+char *fmt_ptr(const genericptr) NONNULL;
 
 #ifdef MONITOR_HEAP
 #undef alloc
@@ -32,8 +32,8 @@ static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
 #endif
 
-long *alloc(unsigned int);
-long *re_alloc(long *, unsigned int);
+long *alloc(unsigned int) NONNULL;
+long *re_alloc(long *, unsigned int) NONNULL;
 extern void panic(const char *, ...);
 
 long *
@@ -221,7 +221,8 @@ char *
 dupstr_n(const char *string, unsigned int *lenout)
 {
     size_t len = strlen(string);
-    if(len >= LARGEST_INT)
+
+    if (len >= LARGEST_INT)
         panic("string too long");
     *lenout = (unsigned int) len;
     return strcpy((char *) alloc(len + 1), string);

@@ -10,7 +10,7 @@
 #if 0
 extern long *alloc(unsigned int);
 #endif
-extern char *fmt_ptr(const void *);
+extern char *fmt_ptr(const void *) NONNULL;
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */

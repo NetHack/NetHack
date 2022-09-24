@@ -404,6 +404,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #if __GNUC__ >= 3
 #define UNUSED __attribute__((unused))
 #define NORETURN __attribute__((noreturn))
+#define NONNULL __attribute__((returns_nonnull))
 #if !defined(__linux__) || defined(GCC_URWARN)
 /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
    discarding the result by casting to (void) is not accepted as a 'use' */
@@ -421,6 +422,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #ifndef NORETURN
 #define NORETURN
+#endif
+#ifndef NONNULL
+#define NONNULL
 #endif
 
 #endif /* TRADSTDC_H */
