@@ -4,11 +4,114 @@
 
 #include "hack.h"
 
+static int explosionmask(struct monst *, uchar, char);
+
 /* Note: Arrays are column first, while the screen is row first */
 static const int explosion[3][3] = {
         { S_expl_tl, S_expl_ml, S_expl_bl },
         { S_expl_tc, S_expl_mc, S_expl_bc },
         { S_expl_tr, S_expl_mr, S_expl_br } };
+
+/* what to do at [x+i][y+j] for i=-1,0,1 and j=-1,0,1 */
+enum explode_action {
+    EXPL_NONE = 0, /* not specified yet or no shield effect needed */
+    EXPL_MON  = 1, /* monster is affected */
+    EXPL_HERO = 2, /* hero is affected */
+    EXPL_SKIP = 4  /* don't apply shield effect (out of bounds) */
+};
+
+/* check if shield effects are needed for location affected by explosion */
+static int
+explosionmask(
+    struct monst *m, /* target monster (might be youmonst) */
+    uchar adtyp,     /* damage type */
+    char olet)       /* object class (only matters for AD_DISN) */
+{
+    int res = EXPL_NONE;
+
+    if (m == &g.youmonst) {
+        switch (adtyp) {
+        case AD_PHYS:
+            /* leave 'res' with EXPL_NONE */
+            break;
+        case AD_MAGM:
+            if (Antimagic)
+                res = EXPL_HERO;
+            break;
+        case AD_FIRE:
+            if (Fire_resistance)
+                res = EXPL_HERO;
+            break;
+        case AD_COLD:
+            if (Cold_resistance)
+                res = EXPL_HERO;
+            break;
+        case AD_DISN:
+            if ((olet == WAND_CLASS)
+                ? (nonliving(m->data) || is_demon(m->data))
+                : Disint_resistance)
+                res = EXPL_HERO;
+            break;
+        case AD_ELEC:
+            if (Shock_resistance)
+                res = EXPL_HERO;
+            break;
+        case AD_DRST:
+            if (Poison_resistance)
+                res = EXPL_HERO;
+            break;
+        case AD_ACID:
+            if (Acid_resistance)
+                res = EXPL_HERO;
+            break;
+        default:
+            impossible("explosion type %d?", adtyp);
+            break;
+        }
+
+    } else {
+        /* 'm' is a monster */
+        switch (adtyp) {
+        case AD_PHYS:
+            break;
+        case AD_MAGM:
+            if (resists_magm(m))
+                res = EXPL_MON;
+            break;
+        case AD_FIRE:
+            if (resists_fire(m))
+                res = EXPL_MON;
+            break;
+        case AD_COLD:
+            if (resists_cold(m))
+                res = EXPL_MON;
+            break;
+        case AD_DISN:
+            if ((olet == WAND_CLASS)
+                ? (nonliving(m->data) || is_demon(m->data)
+                   || is_vampshifter(m))
+                : !!resists_disint(m))
+                res = EXPL_MON;
+            break;
+        case AD_ELEC:
+            if (resists_elec(m))
+                res = EXPL_MON;
+            break;
+        case AD_DRST:
+            if (resists_poison(m))
+                res = EXPL_MON;
+            break;
+        case AD_ACID:
+            if (resists_acid(m))
+                res = EXPL_MON;
+            break;
+        default:
+            impossible("explosion type %d?", adtyp);
+            break;
+        }
+    }
+    return res;
+}
 
 /* Note: I had to choose one of three possible kinds of "type" when writing
  * this function: a wand type (like in zap.c), an adtyp, or an object type.
@@ -29,7 +132,8 @@ static const int explosion[3][3] = {
  */
 void
 explode(
-    coordxy x, coordxy y, /* explosion's location; adjacent spots are also affected */
+    coordxy x, coordxy y, /* explosion's location;
+                           * adjacent spots are also affected */
     int type,     /* same as in zap.c; -(wand typ) for some WAND_CLASS */
     int dam,      /* damage amount */
     char olet,    /* object class or BURNING_OIL or MON_EXPLODE */
@@ -44,7 +148,8 @@ explode(
     struct monst *mtmp, *mdef = 0;
     uchar adtyp;
     int explmask[3][3]; /* 0=normal explosion, 1=do shieldeff, 2=do nothing */
-    boolean shopdamage = FALSE, generic = FALSE, physical_dmg = FALSE,
+    coordxy xx, yy;
+    boolean shopdamage = FALSE, generic = FALSE,
             do_hallu = FALSE, inside_engulfer, grabbed, grabbing;
     coord grabxy;
     char hallu_buf[BUFSZ], killr_buf[BUFSZ];
@@ -183,95 +288,34 @@ explode(
     any_shield = visible = FALSE;
     for (i = 0; i < 3; i++)
         for (j = 0; j < 3; j++) {
-            if (!isok(i + x - 1, j + y - 1)) {
-                explmask[i][j] = 2;
+            xx = x + i - 1;
+            yy = y + j - 1;
+            if (!isok(xx, yy)) {
+                explmask[i][j] = EXPL_SKIP;
                 continue;
-            } else
-                explmask[i][j] = 0;
+            }
+            explmask[i][j] = EXPL_NONE;
 
-            if (u_at(i + x - 1, j + y - 1)) {
-                switch (adtyp) {
-                case AD_PHYS:
-                    explmask[i][j] = 0;
-                    break;
-                case AD_MAGM:
-                    explmask[i][j] = !!Antimagic;
-                    break;
-                case AD_FIRE:
-                    explmask[i][j] = !!Fire_resistance;
-                    break;
-                case AD_COLD:
-                    explmask[i][j] = !!Cold_resistance;
-                    break;
-                case AD_DISN:
-                    explmask[i][j] = (olet == WAND_CLASS)
-                                         ? !!(nonliving(g.youmonst.data)
-                                              || is_demon(g.youmonst.data))
-                                         : !!Disint_resistance;
-                    break;
-                case AD_ELEC:
-                    explmask[i][j] = !!Shock_resistance;
-                    break;
-                case AD_DRST:
-                    explmask[i][j] = !!Poison_resistance;
-                    break;
-                case AD_ACID:
-                    explmask[i][j] = !!Acid_resistance;
-                    physical_dmg = TRUE;
-                    break;
-                default:
-                    impossible("explosion type %d?", adtyp);
-                    break;
-                }
+            if (u_at(xx, yy)) {
+                explmask[i][j] = explosionmask(&g.youmonst, adtyp, olet);
             }
             /* can be both you and mtmp if you're swallowed or riding */
-            mtmp = m_at(i + x - 1, j + y - 1);
-            if (!mtmp && u_at(i + x - 1, j + y - 1))
+            mtmp = m_at(xx, yy);
+            if (!mtmp && u_at(xx, yy))
                 mtmp = u.usteed;
+            if (mtmp && DEADMONSTER(mtmp))
+                mtmp = 0;
             if (mtmp) {
-                if (DEADMONSTER(mtmp))
-                    explmask[i][j] = 2;
-                else
-                    switch (adtyp) {
-                    case AD_PHYS:
-                        break;
-                    case AD_MAGM:
-                        explmask[i][j] |= resists_magm(mtmp);
-                        break;
-                    case AD_FIRE:
-                        explmask[i][j] |= resists_fire(mtmp);
-                        break;
-                    case AD_COLD:
-                        explmask[i][j] |= resists_cold(mtmp);
-                        break;
-                    case AD_DISN:
-                        explmask[i][j] |= (olet == WAND_CLASS)
-                                              ? (nonliving(mtmp->data)
-                                                 || is_demon(mtmp->data)
-                                                 || is_vampshifter(mtmp))
-                                              : resists_disint(mtmp);
-                        break;
-                    case AD_ELEC:
-                        explmask[i][j] |= resists_elec(mtmp);
-                        break;
-                    case AD_DRST:
-                        explmask[i][j] |= resists_poison(mtmp);
-                        break;
-                    case AD_ACID:
-                        explmask[i][j] |= resists_acid(mtmp);
-                        break;
-                    default:
-                        impossible("explosion type %d?", adtyp);
-                        break;
-                    }
+                explmask[i][j] |= explosionmask(mtmp, adtyp, olet);
             }
-            if (mtmp && cansee(i + x - 1, j + y - 1) && !canspotmon(mtmp))
-                map_invisible(i + x - 1, j + y - 1);
+
+            if (mtmp && cansee(xx, yy) && !canspotmon(mtmp))
+                map_invisible(xx, yy);
             else if (!mtmp)
-                (void) unmap_invisible(i + x - 1, j + y - 1);
-            if (cansee(i + x - 1, j + y - 1))
+                (void) unmap_invisible(xx, yy);
+            if (cansee(xx, yy))
                 visible = TRUE;
-            if (explmask[i][j] == 1)
+            if ((explmask[i][j] & (EXPL_MON | EXPL_HERO)) != 0)
                 any_shield = TRUE;
         }
 
@@ -279,11 +323,13 @@ explode(
         /* Start the explosion */
         for (i = 0; i < 3; i++)
             for (j = 0; j < 3; j++) {
-                if (explmask[i][j] == 2)
+                if (explmask[i][j] == EXPL_SKIP)
                     continue;
+                xx = x + i - 1;
+                yy = y + j - 1;
                 tmp_at(starting ? DISP_BEAM : DISP_CHANGE,
                        explosion_to_glyph(expltype, explosion[i][j]));
-                tmp_at(i + x - 1, j + y - 1);
+                tmp_at(xx, yy);
                 starting = 0;
             }
         curs_on_u(); /* will flush screen and output */
@@ -292,13 +338,15 @@ explode(
             for (k = 0; k < SHIELD_COUNT; k++) {
                 for (i = 0; i < 3; i++)
                     for (j = 0; j < 3; j++) {
-                        if (explmask[i][j] == 1)
+                        xx = x + i - 1;
+                        yy = y + j - 1;
+                        if ((explmask[i][j] & (EXPL_MON | EXPL_HERO)) != 0)
                             /*
                              * Bypass tmp_at() and send the shield glyphs
                              * directly to the buffered screen.  tmp_at()
                              * will clean up the location for us later.
                              */
-                            show_glyph(i + x - 1, j + y - 1,
+                            show_glyph(xx, yy,
                                        cmap_to_glyph(shield_static[k]));
                     }
                 curs_on_u(); /* will flush screen and output */
@@ -308,10 +356,12 @@ explode(
             /* Cover last shield glyph with blast symbol. */
             for (i = 0; i < 3; i++)
                 for (j = 0; j < 3; j++) {
-                    if (explmask[i][j] == 1)
-                        show_glyph(
-                            i + x - 1, j + y - 1,
-                            explosion_to_glyph(expltype, explosion[i][j]));
+                    xx = x + i - 1;
+                    yy = y + j - 1;
+                    if ((explmask[i][j] & (EXPL_MON | EXPL_HERO)) != 0)
+                        show_glyph(xx, yy,
+                                   explosion_to_glyph(expltype,
+                                                      explosion[i][j]));
                 }
 
         } else { /* delay a little bit. */
@@ -334,37 +384,42 @@ explode(
     if (!Deaf && !didmsg)
         pline("Boom!");
 
+    /* apply effects to monsters and floor objects first, in case the
+       damage to the hero is fatal and leaves bones */
     if (dam) {
         for (i = 0; i < 3; i++) {
             for (j = 0; j < 3; j++) {
-                if (explmask[i][j] == 2)
+                if (explmask[i][j] == EXPL_SKIP)
                     continue;
-                if (u_at(i + x - 1, j + y - 1)) {
-                    uhurt = (explmask[i][j] == 1) ? 1 : 2;
+                xx = x + i - 1;
+                yy = y + j - 1;
+                if (u_at(xx, yy)) {
+                    uhurt = ((explmask[i][j] & EXPL_HERO) != 0) ? 1 : 2;
                     /* If the player is attacking via polyself into something
                      * with an explosion attack, leave them (and their gear)
                      * unharmed, to avoid punishing them from using such
                      * polyforms creatively */
                     if (!g.context.mon_moving && you_exploding)
                         uhurt = 0;
-                }
-                /* for inside_engulfer, only <u.ux,u.uy> is affected */
-                else if (inside_engulfer)
+                } else if (inside_engulfer) {
+                    /* for inside_engulfer, only <u.ux,u.uy> is affected */
                     continue;
+                }
                 idamres = idamnonres = 0;
-                /* Affect the floor unless the player caused the explosion from
-                 * inside their engulfer. */
+                /* Affect the floor unless the player caused the explosion
+                 * from inside their engulfer. */
                 if (!(u.uswallow && !g.context.mon_moving))
-                    (void) zap_over_floor((coordxy) (i + x - 1),
-                                          (coordxy) (j + y - 1), type,
+                    (void) zap_over_floor(xx, yy, type,
                                           &shopdamage, exploding_wand_typ);
 
-                mtmp = m_at(i + x - 1, j + y - 1);
-                if (!mtmp && u_at(i + x - 1, j + y - 1))
+                mtmp = m_at(xx, yy);
+                if (!mtmp && u_at(xx, yy))
                     mtmp = u.usteed;
                 if (!mtmp)
                     continue;
                 if (do_hallu) {
+                    int tryct = 0;
+
                     /* replace "gas spore" with a different description
                        for each target (we can't distinguish personal names
                        like "Barney" here in order to suppress "the" below,
@@ -372,7 +427,7 @@ explode(
                     do {
                         Sprintf(hallu_buf, "%s explosion",
                                 s_suffix(rndmonnam((char *) 0)));
-                    } while (*hallu_buf != lowc(*hallu_buf));
+                    } while (*hallu_buf != lowc(*hallu_buf) && ++tryct < 20);
                     str = hallu_buf;
                 }
                 if (engulfing_u(mtmp)) {
@@ -435,7 +490,7 @@ explode(
                         }
                         pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
                     }
-                } else if (cansee(i + x - 1, j + y - 1)) {
+                } else if (cansee(xx, yy)) {
                     if (mtmp->m_ap_type)
                         seemimic(mtmp);
                     pline("%s is caught in the %s!", Monnam(mtmp), str);
@@ -451,7 +506,7 @@ explode(
                 idamnonres += destroy_mitem(mtmp, RING_CLASS, (int) adtyp);
                 idamnonres += destroy_mitem(mtmp, WAND_CLASS, (int) adtyp);
 
-                if (explmask[i][j] == 1) {
+                if ((explmask[i][j] & EXPL_MON) != 0) {
                     golemeffects(mtmp, (int) adtyp, dam + idamres);
                     mtmp->mhp -= idamnonres;
                 } else {
@@ -462,8 +517,8 @@ explode(
                     int mdam = dam;
 
                     if (resist(mtmp, olet, 0, FALSE)) {
-                        /* inside_engulfer: <i+x-1,j+y-1> == <u.ux,u.uy> */
-                        if (cansee(i + x - 1, j + y - 1) || inside_engulfer)
+                        /* inside_engulfer: <xx,yy> == <u.ux,u.uy> */
+                        if (cansee(xx, yy) || inside_engulfer)
                             pline("%s resists the %s!", Monnam(mtmp), str);
                         mdam = (dam + 1) / 2;
                     }
@@ -539,7 +594,7 @@ explode(
         if (Invulnerable) {
             damu = 0;
             You("are unharmed!");
-        } else if (adtyp == AD_PHYS || physical_dmg)
+        } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE) {
             (void) burnarmor(&g.youmonst);

@@ -1034,6 +1034,7 @@ if a bones file contains a doppelganger imitating a unique monster, a game
 	having already been created so it won't be created if/when the time
 	for that arrives (the doppelganger will change its shape normally,
 	not be stuck in the unique monster's form)
+when mounted hero got hit by an explosion, hero and steed shared resistances
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
