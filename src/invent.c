@@ -5437,7 +5437,7 @@ prepare_perminvent(winid window)
 
     if (!done_setting_perminv_flags) {
         /*TEMPORARY*/
-        char *envtmp = nh_getenv("TTYINV");
+        char *envtmp = !g.program_state.gameover ? nh_getenv("TTYINV") : 0;
         /* default for non-tty includes gold, for tty excludes gold;
            if non-tty specifies any value, gold will be excluded unless
            that value includes the show-gold bit (1) */
