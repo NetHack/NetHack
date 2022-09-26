@@ -726,7 +726,7 @@ merged(struct obj **potmp, struct obj **pobj)
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
         if (!has_oname(otmp) && has_oname(obj))
-            otmp = *potmp = oname(otmp, ONAME(obj), ONAME_NO_FLAGS);
+            otmp = *potmp = oname(otmp, ONAME(obj), ONAME_SKIP_INVUPD);
         obj_extract_self(obj);
 
         if (obj->pickup_prev && otmp->where == OBJ_INVENT)

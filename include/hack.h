@@ -408,6 +408,8 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
                                   * or m_initweap() (lawful Angel) */
 /* flag congrolling potential livelog event of finding an artifact */
 #define ONAME_KNOW_ARTI  0x0100U /* hero is already aware of this artifact */
+/* flag for suppressing perm_invent update when name gets assigned */
+#define ONAME_SKIP_INVUPD 0x0200U /* don't call update_inventory() */
 
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */

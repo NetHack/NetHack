@@ -1358,11 +1358,12 @@ struct obj *
 oname(
     struct obj *obj,  /* item to assign name to */
     const char *name, /* name to assign */
-    unsigned oflgs)   /* flags for artifact creation; otherwise ignored */
+    unsigned oflgs)   /* flags, mostly for artifact creation */
 {
     int lth;
     char buf[PL_PSIZ];
-    boolean via_naming = (oflgs & ONAME_VIA_NAMING) != 0;
+    boolean via_naming = (oflgs & ONAME_VIA_NAMING) != 0,
+            skip_inv_update = (oflgs & ONAME_SKIP_INVUPD) != 0;
 
     lth = *name ? (int) (strlen(name) + 1) : 0;
     if (lth > PL_PSIZ) {
@@ -1405,7 +1406,7 @@ oname(
                                ansimpleoname(obj), bare_artifactname(obj));
         }
     }
-    if (carried(obj))
+    if (carried(obj) && !skip_inv_update)
         update_inventory();
     return obj;
 }

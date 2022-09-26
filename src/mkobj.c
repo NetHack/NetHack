@@ -359,7 +359,7 @@ copy_oextra(struct obj *obj2, struct obj *obj1)
     if (!obj2->oextra)
         obj2->oextra = newoextra();
     if (has_oname(obj1))
-        oname(obj2, ONAME(obj1), ONAME_NO_FLAGS);
+        oname(obj2, ONAME(obj1), ONAME_SKIP_INVUPD);
     if (has_omonst(obj1)) {
         if (!OMONST(obj2))
             newomonst(obj2);
@@ -427,7 +427,7 @@ splitobj(struct obj *obj, long num)
         splitbill(obj, otmp);
     copy_oextra(otmp, obj);
     if (has_omid(otmp))
-        free_omid(otmp); /* only one association with m_id*/
+        free_omid(otmp); /* only one association with m_id */
     if (obj->timed)
         obj_split_timers(obj, otmp);
     if (obj_sheds_light(obj))
