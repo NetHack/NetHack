@@ -389,7 +389,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifdef __clang__
 /* clang's gcc emulation is sufficient for nethack's usage */
 #ifndef __GNUC__
-#define __GNUC__ 4
+#define __GNUC__ 5 /* high enough for returns_nonnull */
 #endif
 #endif
 
@@ -404,13 +404,15 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #if __GNUC__ >= 3
 #define UNUSED __attribute__((unused))
 #define NORETURN __attribute__((noreturn))
-#define NONNULL __attribute__((returns_nonnull))
 #if !defined(__linux__) || defined(GCC_URWARN)
 /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
    discarding the result by casting to (void) is not accepted as a 'use' */
 #define __warn_unused_result__ /*empty*/
 #define warn_unused_result /*empty*/
 #endif
+#endif
+#if __GNUC__ >= 5
+#define NONNULL __attribute__((returns_nonnull))
 #endif
 #endif
 
