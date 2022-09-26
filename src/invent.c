@@ -3378,9 +3378,11 @@ display_pickinv(
                 continue;
             if (doing_perm_invent) {
                 /* when showing equipment in use, gold shouldn't be excluded
-                   just because !show_gold is set; it might be quivered */
+                   just because !show_gold is set; it might be quivered;
+                   tool_being_used() matches lit lamps/candles and active
+                   leashes, neither of which set owornmask */
                 if (inuse_only) {
-                    if (!otmp->owornmask) {
+                    if (!otmp->owornmask && !tool_being_used(otmp)) {
                         skipped_noninuse = TRUE;
                         continue;
                     }
