@@ -5745,7 +5745,7 @@ handler_windowborders(void)
     const char *mode_name;
     menu_item *mode_pick = (menu_item *) 0;
     int clr = 0;
-    static const char *windowborders_text[] = {
+    static const char *const windowborders_text[] = {
         "Off, never show borders",
         "On, always show borders",
         "Auto, on if display is at least (24+2)x(80+2)",
@@ -5759,8 +5759,10 @@ handler_windowborders(void)
     for (i = 0; i < SIZE(windowborders_text); i++) {
         mode_name = windowborders_text[i];
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i,
-                 0, ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
+        /* index 'i' matches the numeric setting for windowborders,
+           so allow corresponding digit as group accellerator */
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'a' + i, '0' + i,
+                 ATR_NONE, clr, mode_name, MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Select window borders mode:");
     if (select_menu(tmpwin, PICK_ONE, &mode_pick) > 0) {
