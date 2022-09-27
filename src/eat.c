@@ -3791,4 +3791,16 @@ Popeye(int threat)
     return FALSE;
 }
 
+/* the hero has swallowed a monster whole as a purple worm or similar, and has
+   finished digesting its corpse (called via g.afternmv) */
+int
+Finish_digestion(void)
+{
+    if (g.corpsenm_digested != NON_PM) {
+        cpostfx(g.corpsenm_digested);
+        g.corpsenm_digested = NON_PM;
+    }
+    return 0;
+}
+
 /*eat.c*/

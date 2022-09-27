@@ -674,6 +674,7 @@ const struct instance_globals g_init = {
 
     /* uhitm.c */
     FALSE, /* override_confirmation */
+    NON_PM, /* corpsenm_digested */
 
     /* vision.c */
     UNDEFINED_PTR, /* viz_array */

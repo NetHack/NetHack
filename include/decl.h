@@ -1257,6 +1257,7 @@ struct instance_globals {
     /* uhitm.c */
     boolean override_confirmation; /* Used to flag attacks caused by
                                     * Stormbringer's maliciousness. */
+    short corpsenm_digested; /* monster type being digested, set by gulpum */
 
     /* vision.c */
     seenV **viz_array; /* used in cansee() and couldsee() macros */

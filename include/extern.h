@@ -775,6 +775,7 @@ extern void set_tin_variety(struct obj *, int);
 extern int tin_variety_txt(char *, int *);
 extern void tin_details(struct obj *, int, char *);
 extern boolean Popeye(int);
+extern int Finish_digestion(void);
 
 /* ### end.c ### */
 
