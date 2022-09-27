@@ -2014,7 +2014,7 @@ fprefx(struct obj *otmp)
         goto give_feedback;
     case MEATBALL:
     case MEAT_STICK:
-    case HUGE_CHUNK_OF_MEAT:
+    case ENORMOUS_MEATBALL:
     case MEAT_RING:
         goto give_feedback;
     case CLOVE_OF_GARLIC:

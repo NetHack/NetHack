@@ -3084,6 +3084,8 @@ static const struct alt_spellings {
     { "lembas", LEMBAS_WAFER },
     { "cookie", FORTUNE_COOKIE },
     { "pie", CREAM_PIE },
+    { "huge meatball", ENORMOUS_MEATBALL }, /* likely conflated name */
+    { "huge chunk of meat", ENORMOUS_MEATBALL }, /* original name */
     { "marker", MAGIC_MARKER },
     { "hook", GRAPPLING_HOOK },
     { "grappling iron", GRAPPLING_HOOK },
@@ -3174,7 +3176,7 @@ rnd_otyp_by_namedesc(
                type ooze/pudding/slime don't match glob of same since that
                ought to match "corpse/egg/figurine of type" too but won't */
             || (check_of
-                && i != BELL_OF_OPENING && i != HUGE_CHUNK_OF_MEAT
+                && i != BELL_OF_OPENING
                 && (i < minglob || i > maxglob)
                 && (of = strstri(zn, " of ")) != 0
                 && wishymatch(name, of + 4, FALSE)) /* partial name */
