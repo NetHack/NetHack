@@ -4449,8 +4449,9 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         && !(g.mvitals[monsndx(pd)].mvflags & G_NOCORPSE)) {
                         /* nutrition only if there can be a corpse */
                         u.uhunger += (pd->cnutrit + 1) / 2;
-                    } else
+                    } else {
                         tmp = 0;
+                    }
                     Sprintf(msgbuf, "You totally digest %s.", mon_nam(mdef));
                     if (tmp != 0) {
                         /* setting afternmv = end_engulf is tempting,
@@ -4464,6 +4465,9 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         nomul(-tmp);
                         g.multi_reason = "digesting something";
                         g.nomovemsg = msgbuf;
+                        /* possible intrinsic once totally digested */
+                        g.corpsenm_digested = monsndx(pd);
+                        g.afternmv = Finish_digestion;
                     } else
                         pline1(msgbuf);
                     if (pd == &mons[PM_GREEN_SLIME]) {
