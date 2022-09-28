@@ -2471,10 +2471,8 @@ do_class_genocide(void)
             pline1(thats_enough_tries);
             return;
         }
-        do {
-            getlin("What class of monsters do you wish to genocide?", buf);
-            (void) mungspaces(buf);
-        } while (!*buf);
+        getlin("What class of monsters do you wish to genocide?", buf);
+        (void) mungspaces(buf);
         /* choosing "none" preserves genocideless conduct */
         if (*buf == '\033' || !strcmpi(buf, "none")
             || !strcmpi(buf, "nothing")) {
