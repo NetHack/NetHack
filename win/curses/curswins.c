@@ -176,12 +176,18 @@ curses_refresh_nethack_windows(void)
         touchwin(stdscr);
         refresh();
     } else {
-        touchwin(status_window);
-        wnoutrefresh(status_window);
-        touchwin(map_window);
-        wnoutrefresh(map_window);
-        touchwin(message_window);
-        wnoutrefresh(message_window);
+        if (status_window != NULL) {
+            touchwin(status_window);
+            wnoutrefresh(status_window);
+        }
+        if (map_window != NULL) {
+            touchwin(map_window);
+            wnoutrefresh(map_window);
+        }
+        if (message_window != NULL) {
+            touchwin(message_window);
+            wnoutrefresh(message_window);
+        }
         if (inv_window) {
             touchwin(inv_window);
             wnoutrefresh(inv_window);

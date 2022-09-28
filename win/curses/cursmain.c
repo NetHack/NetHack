@@ -855,7 +855,11 @@ curses_raw_print(const char *str)
 #ifdef PDCURSES
     /* WINDOW *win = curses_get_nhwin(MESSAGE_WIN); */
 
-    curses_message_win_puts(str, FALSE);
+    if (iflags.window_inited) {
+        curses_message_win_puts(str, FALSE);
+    } else {
+        puts(str);
+    }
 #else
     puts(str);
 #endif
