@@ -313,7 +313,7 @@ makerooms(void)
                 iflags.in_lua = g.in_mk_themerooms = TRUE;
                 g.themeroom_failed = FALSE;
                 lua_getglobal(themes, "themerooms_generate");
-                if ( nhl_pcall(themes, 0, 0)){
+                if (nhl_pcall(themes, 0, 0)) {
                     impossible("Lua error: %s", lua_tostring(themes, -1));
                 }
                 iflags.in_lua = g.in_mk_themerooms = FALSE;
@@ -949,7 +949,7 @@ makelevel(void)
             if (check_room(&g.vault_x, &w, &g.vault_y, &h, TRUE)) {
  fill_vault:
                 add_room(g.vault_x, g.vault_y, g.vault_x + w, g.vault_y + h,
-                        TRUE, VAULT, FALSE);
+                         TRUE, VAULT, FALSE);
                 g.level.flags.has_vault = 1;
                 ++room_threshold;
                 g.rooms[g.nroom - 1].needfill = FILL_NORMAL;
