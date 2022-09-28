@@ -2463,7 +2463,7 @@ do_class_genocide(void)
 {
     int i, j, immunecnt, gonecnt, goodcnt, class, feel_dead = 0;
     int ll_done = 0;
-    char buf[BUFSZ] = DUMMY;
+    char buf[BUFSZ] = DUMMY, promptbuf[QBUFSZ];
     boolean gameover = FALSE; /* true iff killed self */
 
     for (j = 0;; j++) {
@@ -2471,10 +2471,11 @@ do_class_genocide(void)
             pline1(thats_enough_tries);
             return;
         }
-        do {
-            getlin("What class of monsters do you wish to genocide?", buf);
-            (void) mungspaces(buf);
-        } while (!*buf);
+        Strcpy(promptbuf, "What class of monsters do you want to genocide?");
+        if (iflags.cmdassist && j > 0)
+            Strcat(promptbuf, " [type the symbol representing a class]");
+        getlin(promptbuf, buf);
+        (void) mungspaces(buf);
         /* choosing "none" preserves genocideless conduct */
         if (*buf == '\033' || !strcmpi(buf, "none")
             || !strcmpi(buf, "nothing")) {
@@ -2631,7 +2632,7 @@ do_genocide(int how)
 /* 3 = forced genocide of player */
 /* 5 (4 | 1) = normal genocide from throne */
 {
-    char buf[BUFSZ] = DUMMY;
+    char buf[BUFSZ] = DUMMY, promptbuf[QBUFSZ];
     register int i, killplayer = 0;
     register int mndx;
     register struct permonst *ptr;
@@ -2652,8 +2653,10 @@ do_genocide(int how)
                 pline1(thats_enough_tries);
                 return;
             }
-            getlin("What monster do you want to genocide? [type the name]",
-                   buf);
+            Strcpy(promptbuf, "What monster do you want to genocide?");
+            if (iflags.cmdassist && i > 0)
+                Strcat(promptbuf, " [type the name of a monster]");
+            getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* choosing "none" preserves genocideless conduct */
             if (*buf == '\033' || !strcmpi(buf, "none")
