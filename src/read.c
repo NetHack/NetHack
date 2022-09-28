@@ -2473,7 +2473,8 @@ do_class_genocide(void)
         }
         Strcpy(promptbuf, "What class of monsters do you want to genocide?");
         if (iflags.cmdassist && j > 0)
-            Strcat(promptbuf, " [type the symbol representing a class]");
+            Strcat(promptbuf,
+                   " [type the symbol or name representing a class]");
         getlin(promptbuf, buf);
         (void) mungspaces(buf);
         /* choosing "none" preserves genocideless conduct */
@@ -2653,9 +2654,9 @@ do_genocide(int how)
                 pline1(thats_enough_tries);
                 return;
             }
-            Strcpy(promptbuf, "What monster do you want to genocide?");
+            Strcpy(promptbuf, "What type of monster do you want to genocide?");
             if (iflags.cmdassist && i > 0)
-                Strcat(promptbuf, " [type the name of a monster]");
+                Strcat(promptbuf, " [enter the name of a type of monster]");
             getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* choosing "none" preserves genocideless conduct */
