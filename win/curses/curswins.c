@@ -252,13 +252,7 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
         break;
     case MAP_WIN:
         mapwin = win;
-
-        if ((width < COLNO) || (height < ROWNO)) {
-            map_clipped = TRUE;
-        } else {
-            map_clipped = FALSE;
-        }
-
+        map_clipped = (width < COLNO || height < ROWNO);
         break;
     }
 
@@ -656,17 +650,15 @@ curses_draw_map(int sx, int sy, int ex, int ey)
 
         if (sx > 0 && sbsx == 0)
             ++sbsx;
-        if (ex < ROWNO - 1 && sbex == ROWNO - 1)
+        if (ex < COLNO - 1 && sbex == COLNO - 1)
             --sbex;
 
         for (count = 0; count < sbsx; count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_back);
         }
-
         for (count = sbsx; count <= sbex; count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_bar);
         }
-
         for (count = sbex + 1; count <= (ex - sx); count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_back);
         }
@@ -685,11 +677,9 @@ curses_draw_map(int sx, int sy, int ex, int ey)
         for (count = 0; count < sbsy; count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_back);
         }
-
         for (count = sbsy; count <= sbey; count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_bar);
         }
-
         for (count = sbey + 1; count <= (ey - sy); count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_back);
         }
