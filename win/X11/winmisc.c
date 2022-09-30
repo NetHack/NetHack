@@ -1885,7 +1885,7 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 init_extended_commands_popup(void)
 {
-    int i, j, num_commands;
+    int i, num_commands;
     int *matches;
     int ecmflags = ECM_NO1CHARCMD;
 
@@ -1894,19 +1894,18 @@ init_extended_commands_popup(void)
 
     num_commands = extcmds_match(NULL, ecmflags, &matches);
 
-    j = num_commands;
-    command_list = (const char **) alloc((unsigned) (j * sizeof (char *) + 1));
-    command_indx = (short *) alloc((unsigned) (j * sizeof (short) + 1));
+    i = num_commands + 1; /* room for each extcmd, plus terminator */
+    command_list = (const char **) alloc((unsigned) (i * sizeof(char *)));
+    command_indx = (short *) alloc((unsigned) (i * sizeof(short)));
 
-    for (i = j = 0; i < num_commands; i++) {
+    for (i = 0; i < num_commands; i++) {
         struct ext_func_tab *ec = extcmds_getentry(matches[i]);
 
-        command_indx[j] = matches[i];
-        command_list[j++] = ec->ef_txt;
+        command_indx[i] = matches[i];
+        command_list[i] = ec->ef_txt;
     }
-    command_list[j] = (char *) 0;
-    command_indx[j] = -1;
-    num_commands = j;
+    command_list[i] = (char *) 0;
+    command_indx[i] = -1;
 
     extended_command_popup =
         make_menu("extended_commands", "Extended Commands",
