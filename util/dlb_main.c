@@ -154,6 +154,8 @@ eos(char *s)
 #define UNUSED_if_no_DLB UNUSED
 #endif
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
 {
@@ -481,6 +483,8 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 #ifdef DLB
 #ifdef DLBLIB

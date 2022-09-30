@@ -92,7 +92,7 @@ dumpit(void)
                 DD.flags.rogue_like ? " rogue_like" : "",
                 DD.flags.maze_like ? " maze_like" : "",
                 DD.flags.hellish ? " hellish" : "");
-        getchar();
+        (void) getchar();
     }
     fprintf(stderr, "\nSpecial levels:\n");
     for (x = g.sp_levchn; x; x = x->next) {
@@ -103,7 +103,7 @@ dumpit(void)
                 x->flags.maze_like ? " maze_like" : "",
                 x->flags.hellish ? " hellish" : "",
                 x->flags.town ? " town" : "");
-        getchar();
+        (void) getchar();
     }
     fprintf(stderr, "\nBranches:\n");
     for (br = g.branches; br; br = br->next) {
@@ -120,9 +120,9 @@ dumpit(void)
                 br->end1.dnum, br->end1.dlevel, br->end2.dnum,
                 br->end2.dlevel, br->end1_up ? "end1 up" : "end1 down");
     }
-    getchar();
+    (void) getchar();
     fprintf(stderr, "\nDone\n");
-    getchar();
+    (void) getchar();
 }
 #endif
 
