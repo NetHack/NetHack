@@ -27,6 +27,7 @@ static struct permonst *morguemon(void);
 static struct permonst *squadmon(void);
 static void save_room(NHFILE *, struct mkroom *);
 static void rest_room(NHFILE *, struct mkroom *);
+static boolean invalid_shop_shape(struct mkroom *sroom);
 
 #define sq(x) ((x) * (x))
 
@@ -150,6 +151,10 @@ mkshop(void)
 
  gottype:
     for (sroom = &g.rooms[0];; sroom++) {
+        /* return from this loop: cannot find any eligible room to be a shop
+         * continue: sroom is ineligible
+         * break: sroom is eligible
+         */
         if (sroom->hx < 0)
             return;
         if (sroom - g.rooms >= g.nroom) {
@@ -160,8 +165,12 @@ mkshop(void)
             continue;
         if (has_dnstairs(sroom) || has_upstairs(sroom))
             continue;
-        if (sroom->doorct == 1 || (wizard && ep && sroom->doorct != 0))
-            break;
+        if (sroom->doorct == 1 || (wizard && ep && sroom->doorct != 0)) {
+            if (invalid_shop_shape(sroom))
+                continue;
+            else
+                break;
+        }
     }
     if (!sroom->rlit) {
         coordxy x, y;
@@ -1007,6 +1016,72 @@ cmap_to_type(int sym)
         break; /* not a cmap symbol? */
     }
     return typ;
+}
+
+/* With the introduction of themed rooms, there are certain room shapes that may
+ * generate a door, the square just inside the door, and only one other ROOM
+ * square touching that one. E.g.
+ *   ---
+ * ---..
+ * +....
+ * ---..
+ *   ---
+ * This means that if the room becomes a shop, the shopkeeper will move between
+ * those two squares nearest the door without ever allowing the player to get
+ * past them.
+ * Before approving sroom as a shop, check for this circumstance, and if it
+ * exists, don't consider it as valid for a shop.
+ *
+ * Note that the invalidity of the shape derives from the position of its door
+ * already being chosen. It's quite possible that if the door were somewhere
+ * else on the perimeter of this room, it would work fine as a shop.*/
+static boolean
+invalid_shop_shape(struct mkroom *sroom)
+{
+    coordxy x, y;
+    coordxy doorx = g.doors[sroom->fdoor].x;
+    coordxy doory = g.doors[sroom->fdoor].y;
+    coordxy insidex, insidey, insidect = 0;
+
+    /* First, identify squares inside the room and next to the door. */
+    for (x = max(doorx - 1, sroom->lx);
+         x <= min(doorx + 1, sroom->hx); x++) {
+        for (y = max(doory - 1, sroom->ly);
+             y <= min(doory + 1, sroom->hy); y++) {
+            if (levl[x][y].typ == ROOM) {
+                insidex = x;
+                insidey = y;
+                insidect++;
+            }
+        }
+    }
+    if (insidect < 1) {
+        impossible("invalid_shop_shape: no squares inside door?");
+        return TRUE;
+    }
+    /* if insidect > 1, then the shopkeeper already has alternate
+     * squares to move to so we don't need to check further. */
+    if (insidect == 1) {
+        /* But if it is 1, scan all adjacent squares for other squares
+         * that are part of this room. */
+        insidect = 0;
+        for (x = max(insidex - 1, sroom->lx);
+             x <= min(insidex + 1, sroom->hx); x++) {
+            for (y = max(insidey - 1, sroom->ly);
+                 y <= min(insidey + 1, sroom->hy); y++) {
+                if (x == insidex && y == insidey)
+                    continue;
+                if (levl[x][y].typ == ROOM)
+                    insidect++;
+            }
+        }
+        if (insidect == 1) {
+            /* shopkeeper standing just inside the door can only move
+             * to one other square; this cannot be a shop. */
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 /*mkroom.c*/
