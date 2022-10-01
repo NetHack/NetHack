@@ -1876,7 +1876,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 
     if (u.uswallow) {
         if (!aflag)
-            pline("What are you looking for?  The exit?");
+            Norep("What are you looking for?  The exit?");
     } else {
         int fund = (uwep && uwep->oartifact
                     && spec_ability(uwep, SPFX_SEARCH)) ? uwep->spe : 0;
