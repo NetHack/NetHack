@@ -1,4 +1,4 @@
-/* NetHack 3.7	engrave.c	$NHDT-Date: 1612055954 2021/01/31 01:19:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.102 $ */
+/* NetHack 3.7	engrave.c	$NHDT-Date: 1664616835 2022/10/01 09:33:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.131 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -540,10 +540,10 @@ doengrave(void)
     const char *eloc; /* Where the engraving is (ie dust/floor/...) */
     char *sp;         /* Place holder for space count of engr text */
     size_t len;          /* # of nonspace chars of new engraving text */
-    struct engr *oep = engr_at(u.ux, u.uy);
-    /* The current engraving */
+    struct engr *oep = engr_at(u.ux, u.uy); /* The current engraving */
     struct obj *otmp; /* Object selected with which to engrave */
     char *writer;
+    boolean frosted, adding;
 
     g.multi = 0;              /* moves consumed */
     g.nomovemsg = (char *) 0; /* occupation end message */
@@ -577,6 +577,7 @@ doengrave(void)
     } else {
         writer = yname(otmp);
     }
+    frosted = is_ice(u.ux, u.uy);
 
     /* There's no reason you should be able to write with a wand
      * while both your hands are tied up.
@@ -649,7 +650,7 @@ doengrave(void)
     case SCROLL_CLASS:
     case SPBOOK_CLASS:
         pline("%s would get %s.", Yname2(otmp),
-              is_ice(u.ux, u.uy) ? "all frosty" : "too dirty");
+              frosted ? "all frosty" : "too dirty");
         ptext = FALSE;
         break;
     case RANDOM_CLASS: /* This should mean fingers */
@@ -785,7 +786,7 @@ doengrave(void)
                              ? "You feel tremors."
                              : IS_GRAVE(levl[u.ux][u.uy].typ)
                                  ? "Chips fly out from the headstone."
-                                 : is_ice(u.ux, u.uy)
+                                 : frosted
                                     ? "Ice chips fly up from the ice surface!"
                                     : (g.level.locations[u.ux][u.uy].typ
                                        == DRAWBRIDGE_DOWN)
@@ -878,14 +879,14 @@ doengrave(void)
                         You("wipe out the message here.");
                     else
                         pline("%s %s.", Yobjnam2(otmp, "get"),
-                              is_ice(u.ux, u.uy) ? "frosty" : "dusty");
+                              frosted ? "frosty" : "dusty");
                     dengr = TRUE;
                 } else {
                     pline("%s can't wipe out this engraving.", Yname2(otmp));
                 }
             } else {
                 pline("%s %s.", Yobjnam2(otmp, "get"),
-                      is_ice(u.ux, u.uy) ? "frosty" : "dusty");
+                      frosted ? "frosty" : "dusty");
             }
             break;
         default:
@@ -948,7 +949,7 @@ doengrave(void)
         if (!IS_GRAVE(levl[u.ux][u.uy].typ))
             You(
     "are not going to get anywhere trying to write in the %s with your dust.",
-                is_ice(u.ux, u.uy) ? "frost" : "dust");
+                frosted ? "frost" : "dust");
         useup(otmp);
         otmp = 0; /* wand is now gone */
         ptext = FALSE;
@@ -988,7 +989,9 @@ doengrave(void)
                 if (!Blind) {
                     You("wipe out the message that was %s here.",
                         (oep->engr_type == DUST)
-                            ? "written in the dust"
+                            ? (frosted
+                                ? "written in the frost"
+                                : "written in the dust")
                             : (oep->engr_type == ENGR_BLOOD)
                                 ? "scrawled in blood"
                                 : "written");
@@ -1000,8 +1003,8 @@ doengrave(void)
                 }
             } else if (type == DUST || type == MARK || type == ENGR_BLOOD) {
                 You("cannot wipe out the message that is %s the %s here.",
-                    oep->engr_type == BURN
-                        ? (is_ice(u.ux, u.uy) ? "melted into" : "burned into")
+                    (oep->engr_type == BURN)
+                        ? (frosted ? "melted into" : "burned into")
                         : "engraved in",
                     surface(u.ux, u.uy));
                 return ECMD_TIME;
@@ -1017,32 +1020,31 @@ doengrave(void)
     }
 
     eloc = surface(u.ux, u.uy);
+    adding = (oep && !eow);
     switch (type) {
     default:
-        everb = (oep && !eow ? "add to the weird writing on"
-                             : "write strangely on");
+        everb = adding ? "add to the weird writing on" : "write strangely on";
         break;
     case DUST:
-        everb = (oep && !eow ? "add to the writing in" : "write in");
-        eloc = is_ice(u.ux, u.uy) ? "frost" : "dust";
+        everb = adding ? "add to the writing in" : "write in";
+        eloc = frosted ? "frost" : "dust";
         break;
     case HEADSTONE:
-        everb = (oep && !eow ? "add to the epitaph on" : "engrave on");
+        everb = adding ? "add to the epitaph on" : "engrave on";
         break;
     case ENGRAVE:
-        everb = (oep && !eow ? "add to the engraving in" : "engrave in");
+        everb = adding ? "add to the engraving in" : "engrave in";
         break;
     case BURN:
-        everb = (oep && !eow
-                     ? (is_ice(u.ux, u.uy) ? "add to the text melted into"
-                                           : "add to the text burned into")
-                     : (is_ice(u.ux, u.uy) ? "melt into" : "burn into"));
+        everb = adding ? (frosted ? "add to the text melted into"
+                                  : "add to the text burned into")
+                       : (frosted ? "melt into" : "burn into");
         break;
     case MARK:
-        everb = (oep && !eow ? "add to the graffiti on" : "scribble on");
+        everb = adding ? "add to the graffiti on" : "scribble on";
         break;
     case ENGR_BLOOD:
-        everb = (oep && !eow ? "add to the scrawl on" : "scrawl on");
+        everb = adding ? "add to the scrawl on" : "scrawl on";
         break;
     }
 
@@ -1250,7 +1252,8 @@ engrave(void)
         finishverb = "your weird engraving";
         break;
     case DUST:
-        finishverb = "writing in the dust";
+        finishverb = is_ice(u.ux, u.uy) ? "writing in the frost"
+                     : "writing in the dust";
         break;
     case HEADSTONE:
     case ENGRAVE:

@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1023 $ $NHDT-Date: 1661295667 2022/08/23 23:01:07 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1046 $ $NHDT-Date: 1664616859 2022/10/01 09:34:19 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1035,6 +1035,8 @@ if a bones file contains a doppelganger imitating a unique monster, a game
 	for that arrives (the doppelganger will change its shape normally,
 	not be stuck in the unique monster's form)
 when mounted hero got hit by an explosion, hero and steed shared resistances
+removing an engraving from frost (ie, written with fingers on ice) reported
+	"you wipe out the message that was written in the _dust_"
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
