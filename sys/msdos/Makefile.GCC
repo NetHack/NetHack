@@ -35,8 +35,16 @@ GAMEDIR =../binary
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=../../pdcurses
+ifdef WANT_WIN_CURSES
+ADD_CURSES=Y
+ifdef WANT_DOSVGA
+PDCURSES_TOP=../lib/pdcurmod
+PDCDOS = $(PDCURSES_TOP)/dosvga
+else
+PDCURSES_TOP=../lib/pdcurses
+PDCDOS = $(PDCURSES_TOP)/dos
+endif
+endif
 
 #---------------------------------------------------------------
 ifeq "$(LUA_VERSION)" "5.3.5"
@@ -341,7 +349,6 @@ PDCURSES_CURSES_H	= $(PDCURSES_TOP)/curses.h
 PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 PDCSRC                  = $(PDCURSES_TOP)/pdcurses
-PDCDOS               = $(PDCURSES_TOP)/dos
 PDCLIBOBJS1 = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o            \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
 	$(O)getch.o
@@ -365,6 +372,7 @@ PDCLIB = $(O)pdcurses.a
 PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCDOS)
 else
 PDCLIB = 
+PDCINCL =
 endif
 
 #==========================================
@@ -429,12 +437,15 @@ endif
 #
 ifeq "$(ADD_CURSES)" "Y"
 CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+ifdef WANT_DOSVGA
+CURSESDEF += -DCURSES_UNICODE -DPDC_WIDE
+endif
 else
 CURSESDEF=
 CURSESLIB=
 endif
 
-INCLDIR=-I../include -I../sys/msdos $(LUAINCL)
+INCLDIR=$(PDCINCL) -I../include -I../sys/msdos $(LUAINCL)
 
 # Debugging
 #cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
@@ -510,20 +521,20 @@ $(OBJ)/%.o : $(TTY)/%.c
 #==========================================
 
 $(OBJ)/%.o : $(WCURSES)/%.c
-	$(CC) -DPDC_NCMOUSE $(PDCINCL) $(cflags) -o$@  $<
+	$(CC) -DPDC_NCMOUSE $(cflags) -o$@  $<
 
 #==========================================
 # Rules for files in PDCurses
 #==========================================
 
 $(OBJ)/%.o : $(PDCURSES_TOP)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 $(OBJ)/%.o : $(PDCSRC)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 $(OBJ)/%.o : $(PDCDOS)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 #==========================================
 # Rules for LUA files
