@@ -91,6 +91,12 @@ if [ ! -d "pdcurses" ]; then
 	git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
 fi
 
+#  PDCursesMod
+if [ ! -d "pdcursesmod" ]; then
+	echo "Getting ../pdcursesmod from https://github.com/Bill-Gray/PDCursesMod.git" ; \
+	git clone --depth 1 https://github.com/Bill-Gray/PDCursesMod.git pdcursesmod
+fi
+
 if [ ! -d djgpp/djgpp-patch ]; then
     echo "Getting djlsr205.zip" ;
     cd djgpp

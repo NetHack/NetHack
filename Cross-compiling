@@ -428,6 +428,7 @@ Using the cross-compiler, build the following targets:
     c) Additional optional library packages/obj files as required
 
           lib/pdcurses/...
+          or lib/pdcursesmod/...
 
                    from sources: addch.c, addchstr.c, addstr.c, attr.c, beep.c,
                                  bkgd.c, border.c, clear.c, color.c, delch.c,
@@ -461,6 +462,8 @@ Cross-compiler pre-built binary downloads:
            http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
        and pdcurses from:
            https://github.com/wmcbrine/PDCurses.git
+       or pdcursesmod from:
+           https://github.com/Bill-Gray/PDCursesMod.git
 
     - A shell script to download that djgpp cross-compiler and associated
       pieces for either linux or macOS is available:

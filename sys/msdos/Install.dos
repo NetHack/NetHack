@@ -43,6 +43,8 @@ II. There once was a time when people built NetHack right on their DOS machine.
         http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
     and pdcurses from:
         https://github.com/wmcbrine/PDCurses.git
+    or pdcursesmod from:
+        https://github.com/Bill-Gray/PDCursesMod.git
     and Lua from:
         http://www.lua.org/ftp/lua-5.4.4.tar.gz
 
@@ -81,6 +83,12 @@ II. There once was a time when people built NetHack right on their DOS machine.
 
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+
+    Add WANT_DOSVGA for a curses build that supports higher resolutions and
+    external fonts:
+
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 all
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 package
 
     Result: The "make package" target will bundle all of the necessary
             components to run NetHack on msdos into a folder:
