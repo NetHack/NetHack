@@ -1037,6 +1037,11 @@ if a bones file contains a doppelganger imitating a unique monster, a game
 when mounted hero got hit by an explosion, hero and steed shared resistances
 removing an engraving from frost (ie, written with fingers on ice) reported
 	"you wipe out the message that was written in the _dust_"
+orc hero starts with poison resistance but orc monsters lacked that
+orc hero has maximum 18/50 strength but hero poly'd into an orc got 18/100
+hero with exceptional strength (18/01..18/100) retained that when polymorphed
+	into any monster lacking the strongmonst attribute
+give hero poly'd into a giant 19 strength instead of 18/100
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

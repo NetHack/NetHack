@@ -760,8 +760,36 @@ polymon(int mntmp)
     /* New stats for monster, to last only as long as polymorphed.
      * Currently only strength gets changed.
      */
-    if (strongmonst(&mons[mntmp]))
-        ABASE(A_STR) = AMAX(A_STR) = STR18(100);
+    if (strongmonst(&mons[mntmp]) && !is_elf(&mons[mntmp])) {
+        /* ettins, titans and minotaurs don't pass the is_giant() test;
+           giant mummies and giant zombies do but we throttle those;
+           Lord Surtur and Cyclops pass the test but can't be poly'd into */
+        boolean live_H = is_giant(&mons[mntmp]) && !is_undead(&mons[mntmp]);
+        int newStr = live_H ? STR19(19) : STR18(100);
+
+        /* hero orcs are limited to 18/50 for maximum strength, so treat
+           hero poly'd into an orc the same; goblins, orc shamans, and orc
+           zombies don't have strongmonst() attribute so won't get here;
+           hobgoblins and orc mummies do get here and are limited to 18/50
+           like normal orcs; however, Uruk-hai retain 18/100 strength;
+           hero gnomes are also limited to 18/50; hero elves are limited to
+           18/00 so we treat strongmonst elves (elf-noble, elven monarch)
+           as if they're not (in 'if' above, so they don't get here) */
+        if ((is_orc(&mons[mntmp])
+             && !strstri(pmname(&mons[mntmp], NEUTRAL), "Uruk"))
+            || is_gnome(&mons[mntmp]))
+            newStr = STR18(50);
+
+        ABASE(A_STR) = AMAX(A_STR) = newStr;
+    } else {
+        /* not a strongmonst(); if hero has exceptional strength, remove it
+           (note: removal is temporary until returning to original form);
+           we don't attempt to enforce lower maximum for wimpy forms;
+           we do avoid boosting current strength to 18 if presently less */
+        AMAX(A_STR) = 18; /* same as STR18(0) */
+        if (ABASE(A_STR) > AMAX(A_STR))
+            ABASE(A_STR) = AMAX(A_STR);
+    }
 
     if (Stone_resistance && Stoned) { /* parnes@eniac.seas.upenn.edu */
         make_stoned(0L, "You no longer seem to be petrifying.", 0,
