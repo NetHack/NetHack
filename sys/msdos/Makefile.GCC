@@ -40,9 +40,9 @@ GAMEDIR =../binary
 
 #---------------------------------------------------------------
 ifeq "$(LUA_VERSION)" "5.3.5"
-LUAVER=5.3.5
+LUAVER=535
 else
-LUAVER=5.4.4
+LUAVER=544
 endif
 #---------------------------------------------------------------
 # Location of LUA
@@ -56,7 +56,7 @@ endif
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua$(subst .,, $(LUAVER))
+LUATOP=../lib/lua$(LUAVER)
 #
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
@@ -310,11 +310,10 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua$(subst .,, $(LUAVER))s.a
-LUADLL   = $(O)lua$(subst .,, $(LUAVER)).a
+LUALIB   = $(O)lua$(LUAVER)s.a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
-LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+LUATARGETS = lua.exe luac.exe $(LUALIB)
 
 LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
@@ -890,16 +889,12 @@ $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 #=============================================================
 
 lua.exe: $(O)lua.o $(LUALIB) 
-	$(link) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
+	$(CC) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
 
-luac.exe: $(O)luac.o $(O)lua$(subst .,, $(LUAVER))s.a
-	$(link) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
+luac.exe: $(O)luac.o $(O)lua$(LUAVER)s.a
+	$(CC) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-$(O)lua$(subst .,, $(LUAVER)).a: $(LUAOBJFILES)
-	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
-
-$(O)lua$(subst .,, $(LUAVER))s.a: $(LUAOBJFILES)
+$(O)lua$(LUAVER)s.a: $(LUAOBJFILES)
 	ar rcS $@ $(LUAOBJFILES1)
 	ar rcS $@ $(LUAOBJFILES2)
 	ar rcs $@ $(LUAOBJFILES3)
