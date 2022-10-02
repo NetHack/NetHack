@@ -1,0 +1,24 @@
+The following files are copied verbatim from the Terminus font package,
+version 4.49, available at https://sourceforge.net/projects/terminus-font/ .
+They are distributed under the SIL Open Font License, Version 1.1.
+
+* ter-u16b.bdf
+* ter-u16v.bdf
+* ter-u20b.bdf
+* ter-u24b.bdf
+* ter-u28b.bdf
+* ter-u32b.bdf
+
+The program makefont.rb is distributed under the NetHack license, and can be
+used to generate the binary font files. Because no port of Ruby is available
+for MS-DOS, the binary font files are provided precompiled. They are also
+distributed under the SIL Open Font License.
+
+* ter-u16b.psf
+* ter-u16v.psf
+* ter-u20b.psf
+* ter-u24b.psf
+* ter-u28b.psf
+* ter-u32b.psf
+
+OFL.TXT contains the text of the SIL Open Font License.

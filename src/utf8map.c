@@ -60,11 +60,11 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
     uval = unicode_val(findwhat->unicode_val);
     if (unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
 #ifdef NO_PARSING_SYMSET
-        set_map_u(gm, utf8str,
+        set_map_u(gm, uval, utf8str,
                   (findwhat->color != 0L) ? findwhat->color : 0L);
 #endif
         add_custom_urep_entry(known_handling[H_UTF8], glyph,
-                              utf8str, findwhat->color, UNICODESET);
+                              uval, utf8str, findwhat->color, UNICODESET);
     }
 }
 
@@ -217,7 +217,7 @@ unicode_val(const char *cp)
 }
 
 int
-set_map_u(glyph_map *gm, const uint8 *utf8str, long ucolor)
+set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str, long ucolor)
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
@@ -237,6 +237,7 @@ set_map_u(glyph_map *gm, const uint8 *utf8str, long ucolor)
             gm->u->u256coloridx = clridx;
         else
             gm->u->u256coloridx = 0;
+        gm->u->utf32ch = utf32ch;
         return 1;
     }
     return 0;
@@ -475,7 +476,7 @@ glyphrep(const char *op)
 
 int
 add_custom_urep_entry(const char *customization_name, int glyphidx,
-                      const uint8 *utf8str, long ucolor,
+                      uint32 utf32ch, const uint8 *utf8str, long ucolor,
                       enum graphics_sets which_set)
 {
     static uint32_t closecolor = 0;
@@ -505,6 +506,7 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
                     details->content.urep.u.u256coloridx = clridx;
                 else
                     details->content.urep.u.u256coloridx = 0;
+                details->content.urep.u.utf32ch = utf32ch;
                 return 1;
             }
             prev = details;
@@ -522,6 +524,7 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
         newdetails->content.urep.u.u256coloridx = clridx;
     else
         newdetails->content.urep.u.u256coloridx = 0;
+    newdetails->content.urep.u.utf32ch = utf32ch;
     newdetails->next = (struct customization_detail *) 0;
     if (!details && prev) {
         prev->next = newdetails;
@@ -1071,7 +1074,7 @@ to_unicode_callback(int glyph UNUSED, struct find_struct *findwhat)
     uval = unicode_val(findwhat->unicode_val);
     if (unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
 #ifdef NO_PARSING_SYMSET
-        set_map_u(gm, utf8str,
+        set_map_u(gm, uval, utf8str,
                   (findwhat->color != 0L) ? findwhat->color : 0L);
 #else
 

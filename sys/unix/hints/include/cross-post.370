@@ -38,6 +38,16 @@ dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
 	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
+ifdef WANT_DOSVGA
+	cp ../sys/msdos/fonts/ter-u16b.psf $(TARGETPFX)pkg/TER-U16B.PSF
+	cp ../sys/msdos/fonts/ter-u16v.psf $(TARGETPFX)pkg/TER-U16V.PSF
+	cp ../sys/msdos/fonts/ter-u18b.psf $(TARGETPFX)pkg/TER-U18B.PSF
+	cp ../sys/msdos/fonts/ter-u20b.psf $(TARGETPFX)pkg/TER-U20B.PSF
+	cp ../sys/msdos/fonts/ter-u22b.psf $(TARGETPFX)pkg/TER-U22B.PSF
+	cp ../sys/msdos/fonts/ter-u24b.psf $(TARGETPFX)pkg/TER-U24B.PSF
+	cp ../sys/msdos/fonts/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
+	cp ../sys/msdos/fonts/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
+endif
 	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
 	-touch $(TARGETPFX)pkg/RECORD
 	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
@@ -180,13 +190,13 @@ $(TARGETPFX)touch.o : $(PDCTOP)/pdcurses/touch.c
 $(TARGETPFX)util.o : $(PDCTOP)/pdcurses/util.c
 $(TARGETPFX)window.o : $(PDCTOP)/pdcurses/window.c
 $(TARGETPFX)debug.o : $(PDCTOP)/pdcurses/debug.c
-$(TARGETPFX)pdcclip.o : $(PDCTOP)/dos/pdcclip.c
-$(TARGETPFX)pdcdisp.o : $(PDCTOP)/dos/pdcdisp.c
-$(TARGETPFX)pdcgetsc.o : $(PDCTOP)/dos/pdcgetsc.c
-$(TARGETPFX)pdckbd.o : $(PDCTOP)/dos/pdckbd.c
-$(TARGETPFX)pdcscrn.o : $(PDCTOP)/dos/pdcscrn.c
-$(TARGETPFX)pdcsetsc.o : $(PDCTOP)/dos/pdcsetsc.c
-$(TARGETPFX)pdcutil.o : $(PDCTOP)/dos/pdcutil.c
+$(TARGETPFX)pdcclip.o : $(PDCPORT)/pdcclip.c
+$(TARGETPFX)pdcdisp.o : $(PDCPORT)/pdcdisp.c
+$(TARGETPFX)pdcgetsc.o : $(PDCPORT)/pdcgetsc.c
+$(TARGETPFX)pdckbd.o : $(PDCPORT)/pdckbd.c
+$(TARGETPFX)pdcscrn.o : $(PDCPORT)/pdcscrn.c
+$(TARGETPFX)pdcsetsc.o : $(PDCPORT)/pdcsetsc.c
+$(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
 endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section
