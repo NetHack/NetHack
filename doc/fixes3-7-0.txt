@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1046 $ $NHDT-Date: 1664616859 2022/10/01 09:34:19 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1048 $ $NHDT-Date: 1664739714 2022/10/02 19:41:54 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1042,6 +1042,7 @@ orc hero has maximum 18/50 strength but hero poly'd into an orc got 18/100
 hero with exceptional strength (18/01..18/100) retained that when polymorphed
 	into any monster lacking the strongmonst attribute
 give hero poly'd into a giant 19 strength instead of 18/100
+wait for a response after displaying wishing help; affects X11
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
