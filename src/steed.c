@@ -1,4 +1,4 @@
-/* NetHack 3.7	steed.c	$NHDT-Date: 1646171628 2022/03/01 21:53:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1664837604 2022/10/03 22:53:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -445,6 +445,13 @@ landing_spot(
     boolean found = FALSE;
     struct trap *t;
 
+    /*
+     * TODO:
+     *  for reason==DISMOUNT_KNOCKED, prefer the spot directly behind
+     *  current position relative to the attacker; first need to figure
+     *  how to obtain attacker information...
+     */
+
     /* avoid known traps (i == 0) and boulders, but allow them as a backup */
     if (reason != DISMOUNT_BYCHOICE || Stunned || Confusion || Fumbling)
         i = 1;
@@ -498,18 +505,21 @@ dismount_steed(
     /* Sanity check */
     if (!mtmp) /* Just return silently */
         return;
-    u.usteed = 0; /* affects Fly test; could hypothetically affect Lev */
+    u.usteed = 0; /* affects Fly test; could hypothetically affect Lev;
+                   * also affects u_locomotion() */
     ufly = Flying ? TRUE : FALSE;
     ulev = Levitation ? TRUE : FALSE;
+    verb = u_locomotion("fall"); /* only used for _FELL and _KNOCKED */
     u.usteed = mtmp;
 
     /* Check the reason for dismounting */
     otmp = which_armor(mtmp, W_SADDLE);
     switch (reason) {
     case DISMOUNT_THROWN:
+        verb = "are thrown";
+        /*FALLTHRU*/
+    case DISMOUNT_KNOCKED:
     case DISMOUNT_FELL:
-        verb = (reason == DISMOUNT_THROWN) ? "are thrown"
-            : u_locomotion("fall");
         You("%s off of %s!", verb, mon_nam(mtmp));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);

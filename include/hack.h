@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1652861829 2022/05/18 08:17:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1664837602 2022/10/03 22:53:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,10 +75,11 @@ enum dismount_types {
     DISMOUNT_GENERIC  = 0,
     DISMOUNT_FELL     = 1,
     DISMOUNT_THROWN   = 2,
-    DISMOUNT_POLY     = 3,
-    DISMOUNT_ENGULFED = 4,
-    DISMOUNT_BONES    = 5,
-    DISMOUNT_BYCHOICE = 6
+    DISMOUNT_KNOCKED  = 3, /* hero hit for knockback effect */
+    DISMOUNT_POLY     = 4,
+    DISMOUNT_ENGULFED = 5,
+    DISMOUNT_BONES    = 6,
+    DISMOUNT_BYCHOICE = 7
 };
 
 /* polyself flags */
