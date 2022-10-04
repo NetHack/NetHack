@@ -164,6 +164,11 @@ MSDOS_TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 PDCINCL += -I$(PDCPORT)
 PDC_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
 			-Wno-missing-prototypes
+FONTTARGETS = ../sys/msdos/fonts/ter-u16b.psf ../sys/msdos/fonts/ter-u16v.psf \
+		../sys/msdos/fonts/ter-u18b.psf ../sys/msdos/fonts/ter-u20b.psf \
+		../sys/msdos/fonts/ter-u22b.psf ../sys/msdos/fonts/ter-u24b.psf \
+		../sys/msdos/fonts/ter-u28b.psf ../sys/msdos/fonts/ter-u32b.psf
+LUABIN = ../lib/lua-$(LUA_VERSION)/src/lua
 LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
 override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations \
 			-Wmissing-prototypes -pedantic -Wmissing-declarations \
@@ -193,7 +198,7 @@ override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
 override PREGAME += mkdir -p $(TARGETDIR) ; make $(TARGETPFX)exceptn.o ;
-override CLEANMORE += rm -f -r $(TARGETDIR) ;
+override CLEANMORE += rm -f -r $(TARGETDIR) ; rm -f -r $(FONTTARGETS) ;
 VARDATND += nhtiles.bmp
 #
 ifdef WANT_WIN_CURSES

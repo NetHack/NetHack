@@ -209,4 +209,4 @@ for i = 1, next_pos-1 do
     outfile:write("\xFF")
 end
 
-outfile.close()
+outfile:close()

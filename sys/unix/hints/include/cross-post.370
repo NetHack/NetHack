@@ -24,9 +24,32 @@ $(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+
+FONTDIR = ../sys/msdos/fonts
+$(FONTDIR)/ter-u16b.psf: $(FONTDIR)/ter-u16b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u16b.bdf $@
+$(FONTDIR)/ter-u16v.psf: $(FONTDIR)/ter-u16v.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u16v.bdf $@
+$(FONTDIR)/ter-u18b.psf: $(FONTDIR)/ter-u18b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u18b.bdf $@
+$(FONTDIR)/ter-u20b.psf: $(FONTDIR)/ter-u20b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u20b.bdf $@
+$(FONTDIR)/ter-u22b.psf: $(FONTDIR)/ter-u22b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u22b.bdf $@
+$(FONTDIR)/ter-u24b.psf: $(FONTDIR)/ter-u24b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u24b.bdf $@
+$(FONTDIR)/ter-u28b.psf: $(FONTDIR)/ter-u28b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u28b.bdf $@
+$(FONTDIR)/ter-u32b.psf: $(FONTDIR)/ter-u32b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u32b.bdf $@
 #
-.PHONY: dospkg
-dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
+.PHONY: dodata dospkg dosfonts
+ifdef WANT_DOSVGA
+dosfonts: $(FONTTARGETS)
+else
+dosfonts:
+endif
+dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
@@ -52,6 +75,12 @@ endif
 	-touch $(TARGETPFX)pkg/RECORD
 	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
 	@echo msdos package zip file $(TARGETPFX)NH370DOS.ZIP
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+
 endif  # CROSS_TO_MSDOS
 
 ifdef CROSS_TO_WASM
