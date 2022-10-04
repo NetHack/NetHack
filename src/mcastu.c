@@ -465,11 +465,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             dmg = mtmp->m_lev - 6;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
-            losestr(rnd(dmg));
-            if (u.uhp < 1)
-                done_in_by(mtmp, DIED);
-            else if (Upolyd && u.mh < 1)
-                rehumanize();
+            losestr(rnd(dmg), (const char *) 0, 0);
         }
         dmg = 0;
         break;

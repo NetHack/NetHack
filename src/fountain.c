@@ -292,7 +292,7 @@ drinkfountain(void)
                 losehp(rnd(4), "unrefrigerated sip of juice", KILLED_BY_AN);
                 break;
             }
-            losestr(rn1(4, 3));
+            losestr(rn1(4, 3), "contaminated water", KILLED_BY);
             losehp(rnd(10), "contaminated water", KILLED_BY);
             exercise(A_CON, FALSE);
             break;
