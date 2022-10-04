@@ -1,4 +1,4 @@
-/* NetHack 3.7	sounds.c	$NHDT-Date: 1600933442 2020/09/24 07:44:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.7	sounds.c	$NHDT-Date: 1664920994 2022/10/04 22:03:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.123 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -949,10 +949,15 @@ domonnoise(register struct monst* mtmp)
         else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
-                pline_msg =
-                    (mtmp->mhpmax - mtmp->mhp >= 10)
-                        ? "complains about unpleasant dungeon conditions."
-                        : "asks you about the One Ring.";
+                /* 3.7: the 'complains' message used to be given if the
+                   hobbit's current hit points were at 10 below max or
+                   less, but their max is normally less than 10 so it
+                   would almost never occur */
+                pline_msg = (mtmp->mhp < mtmp->mhpmax
+                             && (mtmp->mhpmax <= 10
+                                 || mtmp->mhp <= mtmp->mhpmax - 10))
+                            ? "complains about unpleasant dungeon conditions."
+                            : "asks you about the One Ring.";
                 break;
             case PM_ARCHEOLOGIST:
                 pline_msg =
