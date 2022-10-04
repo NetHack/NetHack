@@ -3421,7 +3421,7 @@ tty_select_menu(winid window, int how, menu_item **menu_list)
 char
 tty_message_menu(char let, int how, const char *mesg)
 {
-    HUPSKIP();
+    HUPSKIP_RESULT('\033');
     /* "menu" without selection; use ordinary pline, no more() */
     if (how == PICK_NONE) {
         pline("%s", mesg);
