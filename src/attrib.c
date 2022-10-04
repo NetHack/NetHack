@@ -211,19 +211,24 @@ gainstr(struct obj *otmp, int incr, boolean givemsg)
 
 /* may kill you; cause may be poison or monster like 'a' */
 void
-losestr(int num)
+losestr(int num, const char *knam, schar k_format)
 {
     int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
     int ustr = ABASE(A_STR) - num;
 
+    /* in case HP loss kills the hero once Str hits the minimum */
+    if (!knam || !*knam) {
+        knam = "terminal frailty";
+        k_format = KILLED_BY;
+    }
+
     while (ustr < 3) {
         ++ustr;
         --num;
+        losehp(6, knam, k_format);
         if (Upolyd) {
-            u.mh -= 6;
             u.mhmax -= 6;
         } else {
-            u.uhp -= 6;
             setuhpmax(u.uhpmax - 6);
         }
         g.context.botl = TRUE;
