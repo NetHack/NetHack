@@ -222,7 +222,7 @@ losestr(int num, const char *knam, schar k_format)
         k_format = KILLED_BY;
     }
 
-    while (ustr < 3) {
+    while (ustr < ATTRMIN(A_STR)) {
         ++ustr;
         --num;
         losehp(6, knam, k_format);
