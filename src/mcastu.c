@@ -468,6 +468,8 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             losestr(rnd(dmg));
             if (u.uhp < 1)
                 done_in_by(mtmp, DIED);
+            else if (Upolyd && u.mh < 1)
+                rehumanize();
         }
         dmg = 0;
         break;
