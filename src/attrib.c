@@ -241,6 +241,14 @@ losestr(int num, const char *knam, schar k_format)
     (void) adjattrib(A_STR, -num, 1);
 }
 
+/* combined strength loss and damage from some poisons */
+void
+poison_strdmg(int strloss, int dmg, const char *knam, schar k_format)
+{
+    losestr(strloss, knam, k_format);
+    losehp(dmg, knam, k_format);
+}
+
 static const struct poison_effect_message {
     void (*delivery_func)(const char *, ...);
     const char *effect_msg;
