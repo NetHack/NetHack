@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1664966382 2022/10/05 10:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1664979333 2022/10/05 14:15:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -962,11 +962,9 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             newsym(mon->mx, mon->my);
         } else {
             /* steed is hurtling, move hero which will also move steed */
-            coordxy oldx = u.ux, oldy = u.uy;
-
+            u.ux0 = u.ux, u.uy0 = u.uy;
             u_on_newpos(x, y);
-            /* for some reason u.ux0,u.uy0 haven't been reliable here */
-            newsym(oldx, oldy); /* update old position */
+            newsym(u.ux0, u.uy0); /* update old position */
             vision_recalc(0); /* new location => different lines of sight */
         }
         flush_screen(1);
