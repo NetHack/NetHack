@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1664837605 2022/10/03 22:53:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.364 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1664966387 2022/10/05 10:39:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4611,12 +4611,22 @@ mhitm_knockback(
     int *hitflags,        /* modified if magr or mdef dies */
     boolean weapon_used)  /* True: via weapon hit */
 {
+    struct obj *otmp;
     boolean u_agr = (magr == &g.youmonst);
     boolean u_def = (mdef == &g.youmonst);
+    boolean was_u = FALSE;
 
     /* 1/6 chance of attack knocking back a monster */
     if (rn2(6))
         return FALSE;
+
+    /* if hero is stuck to a cursed saddle, knock the steed back */
+    if (u_def && u.usteed
+        && (otmp = which_armor(u.usteed, W_SADDLE)) != 0 && otmp->cursed) {
+        mdef = u.usteed;
+        was_u = TRUE;
+        u_def = FALSE;
+    }
 
     /* monsters must be alive */
     if ((!u_agr && DEADMONSTER(magr))
@@ -4650,22 +4660,23 @@ mhitm_knockback(
 
     /* give the message */
     if (u_def || canseemon(mdef)) {
+        char magrbuf[BUFSZ], mdefbuf[BUFSZ];
         boolean dosteed = u_def && u.usteed;
 
+        Strcpy(magrbuf, u_agr ? "You" : Monnam(magr));
+        Strcpy(mdefbuf, (u_def || was_u) ? "you" : y_monnam(mdef));
+        if (was_u)
+            Snprintf(eos(mdefbuf), sizeof mdefbuf - strlen(mdefbuf),
+                     " and %s", y_monnam(u.usteed));
         /*
          * uhitm: You knock the gnome back with a powerful blow!
          * mhitu: The red dragon knocks you back with a forceful blow!
          * mhitm: The fire giant knocks the gnome back with a forceful strike!
-         *
-         * TODO?  if saddle is cursed, knock both hero and steed back?
          */
-        pline("%s knock%s %s %s with a %s %s!",
-              u_agr ? "You" : Monnam(magr),
-              u_agr ? "" : "s",
-              u_def ? "you" : y_monnam(mdef),
+        pline("%s %s %s %s with a %s %s!",
+              magrbuf, vtense(magrbuf, "knock"), mdefbuf,
               dosteed ? "out of your saddle" : "back",
-              rn2(2) ? "forceful" : "powerful",
-              rn2(2) ? "blow" : "strike");
+              rn2(2) ? "forceful" : "powerful", rn2(2) ? "blow" : "strike");
     } else if (u_agr) {
         /* hero knocks unseen foe back; noticed by touch */
         You("knock %s back!", some_mon_nam(mdef));
@@ -4678,6 +4689,7 @@ mhitm_knockback(
         else
             hurtle(u.ux - magr->mx, u.uy - magr->my, rnd(2), FALSE);
 
+        set_apparxy(magr); /* update magr's idea of where you are */
         if (!rn2(4))
             make_stunned((HStun & TIMEOUT) + (long) rnd(2) + 1L, TRUE);
     } else {
@@ -4685,10 +4697,15 @@ mhitm_knockback(
         coordxy y = u_agr ? u.uy : magr->my;
 
         mhurtle(mdef, mdef->mx - x, mdef->my - y, rnd(2));
-        if (DEADMONSTER(mdef))
+        if (DEADMONSTER(mdef) && !was_u) {
             *hitflags |= MM_DEF_DIED;
-        else if (!rn2(4))
+        } else if (!rn2(4)) {
             mdef->mstun = 1;
+            /* if steed and hero were knocked back, update attacker's idea
+               of where hero is */
+            if (mdef == u.usteed)
+                set_apparxy(magr);
+        }
     }
     if (!u_agr) {
         if (DEADMONSTER(magr))

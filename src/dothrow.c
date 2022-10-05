@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1645298658 2022/02/19 19:24:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1664966382 2022/10/05 10:39:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.249 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -955,10 +955,22 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
         && m_in_out_region(mon, x, y)) {
         int res;
 
-        remove_monster(mon->mx, mon->my);
-        newsym(mon->mx, mon->my);
-        place_monster(mon, x, y);
-        newsym(mon->mx, mon->my);
+        if (mon != u.usteed) {
+            remove_monster(mon->mx, mon->my);
+            newsym(mon->mx, mon->my);
+            place_monster(mon, x, y);
+            newsym(mon->mx, mon->my);
+        } else {
+            /* steed is hurtling, move hero which will also move steed */
+            coordxy oldx = u.ux, oldy = u.uy;
+
+            u_on_newpos(x, y);
+            /* for some reason u.ux0,u.uy0 haven't been reliable here */
+            newsym(oldx, oldy); /* update old position */
+            vision_recalc(0); /* new location => different lines of sight */
+        }
+        flush_screen(1);
+        delay_output();
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
@@ -967,9 +979,6 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             || res == Trap_Caught_Mon
             || res == Trap_Moved_Mon)
             return FALSE;
-
-        flush_screen(1);
-        delay_output();
         return TRUE;
     }
     if ((mtmp = m_at(x, y)) != 0) {
