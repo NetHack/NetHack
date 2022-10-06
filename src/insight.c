@@ -729,14 +729,15 @@ basics_enlightenment(int mode UNUSED, int final)
             Sprintf(buf, " Your wallet contain%s %ld %s", !final ? "s" : "ed",
                     umoney, currency(umoney));
         }
-        if (hmoney) {
-            Sprintf(eos(buf),
-                    ", %s you %s %ld %s stashed away in your pack",
-                    umoney ? "and" : "but", !final ? "have" : "had",
-                    hmoney, umoney ? "more" : currency(hmoney));
-        }
-        Strcat(buf, ".");
+        Strcat(buf, hmoney ? "," : ".");
         enlght_out(buf);
+
+        if (hmoney) {
+            Sprintf(buf, "%ld %s stashed away in your pack",
+                    hmoney, umoney ? "more" : currency(hmoney));
+            enl_msg(umoney ? "and you " : "but you ", "have ", "had ", buf,
+                    "");
+        }
     }
 
     if (flags.pickup) {
