@@ -2022,6 +2022,7 @@ split cleaning-up on gd_move() into separate function (pr #791 by argrath)
 from xNetHack:  better handling for monsters putting on equipment; fixes
 	issue #843:  "Mon dies.  Mon puts on <armor>.  The seemingly dead Mon
 	rises as a vampire."
+provide Unicode support to DOS Curses port (pr #889 by chasonr)
 
 
 Code Cleanup and Reorganization
