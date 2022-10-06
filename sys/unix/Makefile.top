@@ -143,6 +143,10 @@ include/nhlua.h: $(TOPLUALIB)
 lib/lua-$(LUA_VERSION)/src/lua.h:
 	@echo "Please do 'make fetch-lua' to obtain lua-$(LUA_VERSION)"
 	@false
+luabin:
+	( cd $(LUATOP) \
+	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
+
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:
 	git submodule init submodules/lua

@@ -85,10 +85,16 @@ if [ ! -d djgpp/cwsdpmi ]; then
     rm csdpmi7b.zip
 fi
 
-#  PDCurses
+#  PDCurses (non-Unicode build uses this)
 if [ ! -d "pdcurses" ]; then
 	echo "Getting ../pdcurses from https://github.com/wmcbrine/PDCurses.git" ; \
 	git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
+fi
+
+#  PDCursesMod (Unicode build uses this)
+if [ ! -d "pdcursesmod" ]; then
+	echo "Getting ../pdcursesmod from https://github.com/Bill-Gray/PDCursesMod.git" ; \
+	git clone --depth 1 https://github.com/Bill-Gray/PDCursesMod.git pdcursesmod
 fi
 
 if [ ! -d djgpp/djgpp-patch ]; then
@@ -107,6 +113,24 @@ if [ ! -d djgpp/djgpp-patch ]; then
     unzip -p djlsr205.zip src/libc/go32/exceptn.S >src/libc/go32/exceptn.S
     patch -p0 -l -i ../../../sys/msdos/exceptn.S.patch
     cd ../../
+fi
+
+FONT_VERSION="4.49"
+FONT_FILE="terminus-font-$FONT_VERSION"
+FONT_RFILE="$FONT_FILE.1.tar.gz"
+FONT_URL="https://sourceforge.net/projects/terminus-font/files/$FONT_FILE/$FONT_RFILE"
+
+#  fonts
+if [ ! -d "$FONT_FILE" ]; then
+    echo "Getting terminus fonts"
+    if [ "$(uname)" = "Darwin" ]; then
+	#Mac
+	curl -L $FONT_URL --output $FONT_RFILE
+    else
+	wget --quiet --no-hsts $FONT_URL
+    fi
+    tar -xvf $FONT_RFILE
+    rm $FONT_RFILE
 fi
 
 cd ../

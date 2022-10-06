@@ -41,10 +41,20 @@ II. There once was a time when people built NetHack right on their DOS machine.
         https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/ 
     a DOS-extender (for including in msdos packaging) from:
         http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
-    and pdcurses from:
-        https://github.com/wmcbrine/PDCurses.git
     and Lua from:
         http://www.lua.org/ftp/lua-5.4.4.tar.gz
+
+    If you want the DOSVGA build, to support higher resolutions and Unicode
+    symbols, you also need:
+        pdcursesmod from:
+            https://github.com/Bill-Gray/PDCursesMod.git
+            (Name this lib/pdcurmod for the native build)
+        Terminus fonts from:
+            https://sourceforge.net/projects/terminus-font/files/terminus-font-4.49/terminus-font-4.49.1.tar.gz
+            (Name this lib/terminus for the native build)
+    If not, you also need:
+        pdcurses from:
+            https://github.com/wmcbrine/PDCurses.git
 
     - A shell script to download the above-mentioned djgpp cross-compiler and
       associated support pieces for either linux or macOS is available:
@@ -81,6 +91,12 @@ II. There once was a time when people built NetHack right on their DOS machine.
 
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+
+    Add WANT_DOSVGA for a curses build that supports higher resolutions,
+    external fonts and Unicode symbols:
+
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 all
+        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 package
 
     Result: The "make package" target will bundle all of the necessary
             components to run NetHack on msdos into a folder:

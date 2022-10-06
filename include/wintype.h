@@ -80,6 +80,7 @@ struct classic_representation {
 struct unicode_representation {
     uint32 ucolor;
     uint16 u256coloridx;
+    uint32 utf32ch;
     uint8 *utf8str;
 };
 

@@ -74,9 +74,18 @@ ifdef BUILD_PDCURSES
 # PD Curses library
 #===============-=================================================
 ifdef WANT_WIN_CURSES
+ifdef WANT_DOSVGA
+PDCTOP = ../lib/pdcursesmod
+PDCPORT = $(PDCTOP)/dosvga
+PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
+		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" \
+		-D"PDC_WIDE" -D"CURSES_UNICODE"
+else
 PDCTOP = ../lib/pdcurses
-PDCURSESDEF= -I../lib/pdcurses -I../lib/pdcurses/dos \
+PDCPORT = $(PDCTOP)/dos
+PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+endif # WANT_DOSVGA
 PDCLIBOBJ1= $(TARGETPFX)addch.o $(TARGETPFX)addchstr.o \
 		$(TARGETPFX)addstr.o $(TARGETPFX)attr.o \
 		$(TARGETPFX)beep.o $(TARGETPFX)bkgd.o \
@@ -152,9 +161,17 @@ MSDOS_TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 	-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
 	-Wmissing-parameter-type -Wold-style-definition -Wstrict-prototypes \
 	-DGCC_WARN
-PDCINCL += -I$(PDCTOP)/dos
+PDCINCL += -I$(PDCPORT)
 PDC_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
 			-Wno-missing-prototypes
+FONTVER = terminus-font-4.49.1
+FONTTOP = ../lib/$(FONTVER)
+FONTDIR = ../sys/msdos/fonts
+FONTTARGETS = $(FONTDIR)/ter-u16b.psf $(FONTDIR)/ter-u16v.psf \
+		$(FONTDIR)/ter-u18b.psf $(FONTDIR)/ter-u20b.psf \
+		$(FONTDIR)/ter-u22b.psf $(FONTDIR)/ter-u24b.psf \
+		$(FONTDIR)/ter-u28b.psf $(FONTDIR)/ter-u32b.psf
+LUABIN = ../lib/lua-$(LUA_VERSION)/src/lua
 LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
 override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations \
 			-Wmissing-prototypes -pedantic -Wmissing-declarations \
@@ -184,12 +201,12 @@ override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
 override PREGAME += mkdir -p $(TARGETDIR) ; make $(TARGETPFX)exceptn.o ;
-override CLEANMORE += rm -f -r $(TARGETDIR) ;
+override CLEANMORE += rm -f -r $(TARGETDIR) ; rm -f -r $(FONTTARGETS) ;
 VARDATND += nhtiles.bmp
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
-$(TARGETPFX)%.o : $(PDCTOP)/dos/%.c
+$(TARGETPFX)%.o : $(PDCPORT)/%.c
 	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 #

@@ -1065,7 +1065,9 @@ apply_customizations_to_symset(enum graphics_sets which_set)
         details = g.sym_customizations[UNICODESET].details;
         while (details) {
             gm = &glyphmap[details->content.urep.glyphidx];
-            (void) set_map_u(gm, details->content.urep.u.utf8str,
+            (void) set_map_u(gm,
+                             details->content.urep.u.utf32ch,
+                             details->content.urep.u.utf8str,
                              details->content.urep.u.ucolor);
             details = details->next;
         }

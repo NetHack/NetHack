@@ -35,14 +35,22 @@ GAMEDIR =../binary
 #    of your PDCurses C files which must already be resident on 
 #    your machine.
 #
-#ADD_CURSES=Y
-#PDCURSES_TOP=../../pdcurses
+ifdef WANT_WIN_CURSES
+ADD_CURSES=Y
+ifdef WANT_DOSVGA
+PDCURSES_TOP=../lib/pdcurmod
+PDCDOS = $(PDCURSES_TOP)/dosvga
+else
+PDCURSES_TOP=../lib/pdcurses
+PDCDOS = $(PDCURSES_TOP)/dos
+endif
+endif
 
 #---------------------------------------------------------------
 ifeq "$(LUA_VERSION)" "5.3.5"
-LUAVER=5.3.5
+LUAVER=535
 else
-LUAVER=5.4.4
+LUAVER=544
 endif
 #---------------------------------------------------------------
 # Location of LUA
@@ -56,8 +64,13 @@ endif
 #    successfully build NetHack-3.7.
 #
 ADD_LUA=Y
-LUATOP=../lib/lua$(subst .,, $(LUAVER))
+LUATOP=../lib/lua$(LUAVER)
 #
+
+#---------------------------------------------------------------
+# Location of terminus-fonts
+#
+FONTTOP=../lib/terminus
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
@@ -193,7 +206,8 @@ VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o
 
 MAKESRC	    = makedefs.c
 
-MAKEDEFSOBJS    = $(O)makedefs.o  $(O)monst.o	 $(O)objects.o
+MAKEDEFSOBJS = $(O)makedefs.o $(O)monst.o $(O)objects.o $(O)alloc.o \
+               $(O)date.o $(O)panic.o
 
 RECOVOBJS   = $(O)recover.o
 
@@ -255,14 +269,14 @@ DLBOBJ = $(O)dlb.o
 
 
 VOBJ01 = $(O)allmain.o  $(O)alloc.o    $(O)apply.o    $(O)artifact.o $(O)attrib.o
-VOBJ02 = $(O)ball.o     $(O)bones.o    $(O)botl.o     $(O)cmd.o      $(O)dbridge.o
+VOBJ02 = $(O)ball.o     $(O)bones.o    $(O)botl.o     $(O)cmd.o      $(O)date.o    $(O)dbridge.o
 VOBJ03 = $(O)decl.o     $(O)detect.o   $(O)dig.o      $(O)display.o  $(O)do.o
 VOBJ04 = $(O)do_name.o  $(O)do_wear.o  $(O)dog.o      $(O)dogmove.o  $(O)dokick.o
 VOBJ05 = $(O)dothrow.o  $(O)drawing.o  $(O)dungeon.o  $(O)eat.o      $(O)end.o
 VOBJ06 = $(O)engrave.o  $(O)exper.o    $(O)explode.o  $(O)extralev.o $(O)files.o
-VOBJ07 = $(O)fountain.o $(O)getline.o  $(O)hack.o     $(O)hacklib.o  $(O)invent.o
+VOBJ07 = $(O)fountain.o $(O)getline.o  $(O)hack.o     $(O)hacklib.o  $(O)insight.o $(O)invent.o
 VOBJ08 = $(O)isaac64.o  $(O)lock.o     $(O)mail.o     $(O)main.o     $(O)makemon.o
-VOBJ09 = $(O)mcastu.o   $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mkmap.o
+VOBJ09 = $(O)mcastu.o   $(O)mdlib.o    $(O)mhitm.o    $(O)mhitu.o    $(O)minion.o   $(O)mkmap.o
 VOBJ10 = $(O)mklev.o    $(O)mkmaze.o   $(O)mkobj.o    $(O)mkroom.o   $(O)mon.o
 VOBJ11 = $(O)mondata.o  $(O)monmove.o  $(O)monst.o    $(O)mplayer.o  $(O)mthrowu.o
 VOBJ12 = $(O)muse.o     $(O)music.o    $(O)o_init.o   $(O)objects.o  $(O)objnam.o
@@ -273,7 +287,7 @@ VOBJ16 = $(O)rnd.o      $(O)role.o     $(O)rumors.o   $(O)save.o     $(O)sfstruc
 VOBJ17 = $(O)shk.o      $(O)shknam.o   $(O)sit.o      $(O)sounds.o   $(O)sp_lev.o
 VOBJ18 = $(O)spell.o    $(O)steal.o    $(O)steed.o    $(O)symbols.o  $(O)sys.o
 VOBJ19 = $(O)teleport.o $(O)termcap.o  $(O)timeout.o  $(O)topl.o     $(O)topten.o
-VOBJ20 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)vault.o
+VOBJ20 = $(O)track.o    $(O)trap.o     $(O)u_init.o   $(O)uhitm.o    $(O)utf8map.o  $(O)vault.o
 VOBJ21 = $(O)vision.o   $(O)weapon.o   $(O)were.o     $(O)wield.o    $(O)windows.o
 VOBJ22 = $(O)wintty.o   $(O)wizard.o   $(O)worm.o     $(O)worn.o     $(O)write.o
 VOBJ23 = $(O)zap.o      $(O)light.o    $(O)dlb.o
@@ -309,13 +323,12 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
-LUALIB   = $(O)lua$(subst .,, $(LUAVER))s.a
-LUADLL   = $(O)lua$(subst .,, $(LUAVER)).a
+LUALIB   = $(O)lua$(LUAVER)s.a
 LUAINCL  = -I$(LUASRC)
 #LUAFLAGS = unix added -lm here?
-LUATARGETS = lua.exe luac.exe $(LUADLL) $(LUALIB)
+LUATARGETS = lua.exe luac.exe $(LUALIB)
 
-LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
+LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lcode.c    \
 		lcorolib.c lctype.c ldblib.c ldebug.c ldo.c      \
 		ldump.c lfunc.c lgc.c linit.c liolib.c llex.c    \
 		lmathlib.c lmem.c loadlib.c lobject.c lopcodes.c \
@@ -323,7 +336,7 @@ LUASRCFILES =   lapi.c lauxlib.c lbaselib.c lbitlib.c lcode.c    \
 		ltable.c ltablib.c ltm.c lundump.c lutf8lib.c    \
 		lvm.c lzio.c
 
-LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o $(O)lbitlib.o  \
+LUAOBJFILES1 =  $(O)lapi.o $(O)lauxlib.o $(O)lbaselib.o \
 		$(O)lcode.o $(O)lcorolib.o $(O)lctype.o $(O)ldblib.o   \
 		$(O)ldebug.o $(O)ldo.o $(O)ldump.o $(O)lfunc.o
 LUAOBJFILES2 =	$(O)lgc.o $(O)linit.o $(O)liolib.o $(O)llex.o          \
@@ -341,7 +354,6 @@ PDCURSES_CURSES_H	= $(PDCURSES_TOP)/curses.h
 PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)/curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 PDCSRC                  = $(PDCURSES_TOP)/pdcurses
-PDCDOS               = $(PDCURSES_TOP)/dos
 PDCLIBOBJS1 = $(O)addch.o $(O)addchstr.o $(O)addstr.o $(O)attr.o $(O)beep.o            \
 	$(O)bkgd.o $(O)border.o $(O)clear.o $(O)color.o $(O)delch.o $(O)deleteln.o     \
 	$(O)getch.o
@@ -365,6 +377,7 @@ PDCLIB = $(O)pdcurses.a
 PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCDOS)
 else
 PDCLIB = 
+PDCINCL =
 endif
 
 #==========================================
@@ -429,12 +442,15 @@ endif
 #
 ifeq "$(ADD_CURSES)" "Y"
 CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+ifdef WANT_DOSVGA
+CURSESDEF += -DCURSES_UNICODE -DPDC_WIDE
+endif
 else
 CURSESDEF=
 CURSESLIB=
 endif
 
-INCLDIR=-I../include -I../sys/msdos $(LUAINCL)
+INCLDIR=$(PDCINCL) -I../include -I../sys/msdos $(LUAINCL)
 
 # Debugging
 #cflags = -pg -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
@@ -510,20 +526,20 @@ $(OBJ)/%.o : $(TTY)/%.c
 #==========================================
 
 $(OBJ)/%.o : $(WCURSES)/%.c
-	$(CC) -DPDC_NCMOUSE $(PDCINCL) $(cflags) -o$@  $<
+	$(CC) -DPDC_NCMOUSE $(cflags) -o$@  $<
 
 #==========================================
 # Rules for files in PDCurses
 #==========================================
 
 $(OBJ)/%.o : $(PDCURSES_TOP)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 $(OBJ)/%.o : $(PDCSRC)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 $(OBJ)/%.o : $(PDCDOS)/%.c
-	$(CC) $(PDCINCL) $(cflags)  -o$@  $<
+	$(CC) $(cflags)  -o$@  $<
 
 #==========================================
 # Rules for LUA files
@@ -558,7 +574,7 @@ recover: $(U)recover.exe
 	@$(subst /,\,if exist $(U)recover.exe copy $(U)recover.exe $(GAMEDIR))
 	@$(subst /,\,if exist $(DOC)/recover.txt copy $(DOC)/recover.txt $(GAMEDIR))
 
-$(O)install.tag: $(O)dat.tag $(GAMEFILE)
+$(O)install.tag: $(O)dat.tag $(O)fonts.tag $(GAMEFILE)
 ifeq ($(USE_DLB),Y)
 	@$(subst /,\,copy $(DAT)/nhdat $(GAMEDIR))
 	@$(subst /,\,copy $(DAT)/license $(GAMEDIR))
@@ -577,13 +593,16 @@ endif
 	@$(subst /,\,copy $(SSHR)/NetHack.cnf  $(GAMEDIR)/defaults.nh)
 	-@$(subst /,\,touch $(GAMEDIR)/record)
 	@$(subst /,\,copy $(DOC)/guideb*.txt  $(GAMEDIR))
-	@$(subst /,\,copy ../sys/windows/sysconf  $(GAMEDIR))
+	@$(subst /,\,copy $(MSYS)/sysconf  $(GAMEDIR))
 	@$(subst /,\,if not exist $(GAMEDIR)/sysconf touch $(GAMEDIR)/sysconf)
 	@$(subst /,\,if exist $(DOC)/nethack.txt copy $(DOC)/nethack.txt $(GAMEDIR))
 ifdef CWSDPMI
 	@$(subst /,\,if exist $(CWSDPMI) copy $(CWSDPMI) $(GAMEDIR))
 else
 	@$(subst /,\,echo Could not find a copy of CWSDPMI.EXE to put into $(GAMEDIR))
+endif
+ifdef WANT_DOSVGA
+	@$(subst /,\,copy $(MSYS)/fonts/*.psf  $(GAMEDIR))
 endif
 	@$(subst /,\,echo install done > $@)
 
@@ -688,8 +707,10 @@ $(SRC)/tile.c: $(U)tilemap.exe
 	@$(subst /,\,$(U)tilemap.exe)
 	@echo A new $@ has been created
 
-$(U)tilemap.exe: $(O)tilemap.o
-	$(LINK) $(LFLAGS) -o$@ $(O)tilemap.o
+TILEMAPOBJS = $(O)tilemap.o $(O)monst.o $(O)objects.o $(O)drawing.o
+
+$(U)tilemap.exe: $(TILEMAPOBJS)
+	$(LINK) $(LFLAGS) -o$@ $(TILEMAPOBJS)
 
 $(O)tilemap.o: $(WSHR)/tilemap.c $(HACK_H) $(TILE_H)
 	$(CC) $(cflags) -I$(WSHR) -I$(MSYS) -o$@ $(WSHR)/tilemap.c
@@ -882,80 +903,17 @@ $(U)dlb_main.exe: $(DLBOBJS)
 $(O)dlb_main.o: $(U)dlb_main.c $(INCL)/config.h $(DLB_H)
 	$(CC) $(cflags) -o$@ $(U)dlb_main.c
 
-#==========================================
-#  Housekeeping.
-#==========================================
-
-clean:
-	$(subst /,\,if exist $(O)*.o del $(O)*.o)
-	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
-	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
-	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
-	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
-	$(subst /,\,if exist $(O)sp_lev.tag del $(O)sp_lev.tag)
-	$(subst /,\,if exist $(O)thintile.tag del $(O)thintile.tag)
-	$(subst /,\,if exist $(O)utility.tag del $(O)utility.tag)
-	$(subst /,\,if exist temp.a del temp.a)
-
-spotless: clean
-
-	$(subst /,\,if exist $(U)makedefs.exe del $(U)makedefs.exe)
-	$(subst /,\,if exist $(U)recover.exe del $(U)recover.exe)
-	$(subst /,\,if exist $(U)tilemap.exe del $(U)tilemap.exe)
-	$(subst /,\,if exist $(U)tile2bmp.exe del $(U)tile2bmp.exe)
-	$(subst /,\,if exist $(U)tile2bin.exe del $(U)tile2bin.exe)
-	$(subst /,\,if exist $(U)til2bin2.exe del $(U)til2bin2.exe)
-	$(subst /,\,if exist $(U)thintile.exe del $(U)thintile.exe)
-	$(subst /,\,if exist $(U)dlb_main.exe del $(U)dlb_main.exe)
-	$(subst /,\,if exist $(INCL)/onames.h del $(INCL)/onames.h)
-	$(subst /,\,if exist $(INCL)/pm.h del $(INCL)/pm.h)
-	$(subst /,\,if exist $(INCL)/date.h del $(INCL)/date.h)
-	$(subst /,\,if exist $(SRC)/monstr.c del $(SRC)/monstr.c)
-	$(subst /,\,if exist $(SRC)/tile.c del $(SRC)/tile.c)
-	$(subst /,\,if exist $(DAT)/options del $(DAT)/options)
-	$(subst /,\,if exist $(DAT)/data del $(DAT)/data)
-	$(subst /,\,if exist $(DAT)/rumors del $(DAT)/rumors)
-	$(subst /,\,if exist $(DAT)/oracles del $(DAT)/oracles)
-	$(subst /,\,if exist $(DAT)/bogusmon del $(DAT)/bogusmon)
-	$(subst /,\,if exist $(DAT)/engrave del $(DAT)/engrave)
-	$(subst /,\,if exist $(DAT)/epitaph del $(DAT)/epitaph)
-	$(subst /,\,if exist $(DAT)/dlb.lst del $(DAT)/dlb.lst)
-	$(subst /,\,if exist $(DAT)/nhdat del $(DAT)/nhdat)
-	$(subst /,\,if exist $(TILE_BMP) del $(TILE_BMP))
-	$(subst /,\,if exist $(WSHR)/monthin.txt del $(WSHR)/monthin.txt)
-	$(subst /,\,if exist $(WSHR)/objthin.txt del $(WSHR)/objthin.txt)
-	$(subst /,\,if exist $(WSHR)/oththin.txt del $(WSHR)/oththin.txt)
-
-#==========================================
-# Create directory for holding object files
-#==========================================
-
-$(O)obj.tag:
-	-$(subst /,\,@if not exist $(OBJ)/*.* mkdir $(OBJ))
-	@$(subst /,\,@echo directory created > $@)
-
-#===========================================
-# Work around some djgpp long file name woes
-#===========================================
-
-$(PATCHLEV_H):
-	@$(subst /,\,if not exist $@ copy $(INCL)/patchlevel.h $(INCL)/patchlev.h)
-
 #=============================================================
 # LUA
 #=============================================================
 
 lua.exe: $(O)lua.o $(LUALIB) 
-	$(link) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
+	$(CC) $(LFLAGS) -o$@ $(O)lua.o $(LUALIB)
 
-luac.exe: $(O)luac.o $(O)lua$(subst .,, $(LUAVER))s.a
-	$(link) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
+luac.exe: $(O)luac.o $(O)lua$(LUAVER)s.a
+	$(CC) $(LFLAGSU) -o$@ $(O)luac.o $(LUALIB)
 
-$(O)lua$(subst .,, $(LUAVER)).a: $(LUAOBJFILES)
-	$(cc) -shared -Wl,--export-all-symbols \
-		-Wl,--add-stdcall-alias -o $@ $<
-
-$(O)lua$(subst .,, $(LUAVER))s.a: $(LUAOBJFILES)
+$(O)lua$(LUAVER)s.a: $(LUAOBJFILES)
 	ar rcS $@ $(LUAOBJFILES1)
 	ar rcS $@ $(LUAOBJFILES2)
 	ar rcs $@ $(LUAOBJFILES3)
@@ -964,12 +922,34 @@ $(O)lua.o: $(LUASRC)/lua.c
 $(O)luac.o: $(LUASRC)/luac.c
 
 #==========================================
+#  Fonts for Unicode support
+#==========================================
+
+ifdef WANT_DOSVGA
+$(O)fonts.tag: lua.exe $(MSYS)/fonts/makefont.lua
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16b.bdf $(MSYS)/fonts/ter-u16b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16v.bdf $(MSYS)/fonts/ter-u16v.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u18b.bdf $(MSYS)/fonts/ter-u18b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u20b.bdf $(MSYS)/fonts/ter-u20b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u22b.bdf $(MSYS)/fonts/ter-u22b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u24b.bdf $(MSYS)/fonts/ter-u24b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u28b.bdf $(MSYS)/fonts/ter-u28b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u32b.bdf $(MSYS)/fonts/ter-u32b.psf
+	@echo Fonts done >$(O)fonts.tag
+else
+$(O)fonts.tag:
+	@echo Fonts not needed >$(O)fonts.tag
+endif
+
+#==========================================
 #  Housekeeping.
 #==========================================
 
 clean:
 	$(subst /,\,if exist $(O)*.o del $(O)*.o)
 	$(subst /,\,if exist $(O)dat.tag del $(O)dat.tag)
+	$(subst /,\,if exist $(O)fonts.tag del $(O)fonts.tag)
+	$(subst /,\,if exist $(MSYS)/fonts/*.psf del $(MSYS)/fonts/*.psf)
 	$(subst /,\,if exist $(O)install.tag del $(O)install.tag)
 	$(subst /,\,if exist $(O)$(GAME).lnk del $(O)$(GAME).lnk)
 	$(subst /,\,if exist $(O)obj.tag del $(O)obj.tag)
@@ -1038,14 +1018,14 @@ $(O)tty.o:	 $(HACK_H) $(INCL)/wintty.h $(SSHR)/pctty.c
 $(O)unix.o:	 $(HACK_H) $(SSHR)/pcunix.c
 	$(CC) $(cflags) -o$@ $(SSHR)/pcunix.c
 
-$(O)pcsys.o : $(HACK_H) $(SSHR)/pcsys.c
-	$(CC) $(cflags) -o$@ $(SSHR)/pcsys.c
+#$(O)pcsys.o : $(HACK_H) $(SSHR)/pcsys.c
+#	$(CC) $(cflags) -o$@ $(SSHR)/pcsys.c
 
 $(O)posixreg.o : $(HACK_H) $(SSHR)/posixreg.c
 	$(CC) $(cflags) -o$@ $(SSHR)/posixreg.c
 
-$(O)cppregex.o : $(HACK_H) $(SSHR)/cppregex.cpp
-	gpp $(cflags) -std=c++11 -o$@ $(SSHR)/cppregex.cpp
+#$(O)cppregex.o : $(HACK_H) $(SSHR)/cppregex.cpp
+#	gpp $(cflags) -std=c++11 -o$@ $(SSHR)/cppregex.cpp
 
 $(O)pmatchre.o : $(HACK_H) $(SSHR)/pmatchre.c
 	$(CC) $(cflags) -o$@ $(SSHR)/pmatchre.c
