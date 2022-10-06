@@ -281,6 +281,10 @@ vidvesa.c                vidvga.c
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
 
+sys/msdos/fonts:
+(files for MSDOS version)
+README.txt    makefont.lua
+
 sys/share:
 (Berkeley random number file, which may be included in any version)
 random.c
