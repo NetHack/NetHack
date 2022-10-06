@@ -718,18 +718,25 @@ basics_enlightenment(int mode UNUSED, int final)
                 (u.uac < 0) ? "best" : "worst");
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
-    /* gold; similar to doprgold(#seegold) but without shop billing info;
-       same amount as shown on status line which ignores container contents */
+    /* gold; similar to doprgold (#showgold) but without shop billing info;
+       includes container contents, unlike status line but like doprgold */
     {
-        static const char Your_wallet[] = "Your wallet ";
-        long umoney = money_cnt(g.invent);
+        long umoney = money_cnt(g.invent), hmoney = hidden_gold(final);
 
         if (!umoney) {
-            enl_msg(Your_wallet, "is ", "was ", "empty", "");
+            Sprintf(buf, " Your wallet %s empty", !final ? "is" : "was");
         } else {
-            Sprintf(buf, "%ld %s", umoney, currency(umoney));
-            enl_msg(Your_wallet, "contains ", "contained ", buf, "");
+            Sprintf(buf, " Your wallet contain%s %ld %s", !final ? "s" : "ed",
+                    umoney, currency(umoney));
         }
+        if (hmoney) {
+            Sprintf(eos(buf),
+                    ", %s you %s %ld %s stashed away in your pack",
+                    umoney ? "and" : "but", !final ? "have" : "had",
+                    hmoney, umoney ? "more" : currency(hmoney));
+        }
+        Strcat(buf, ".");
+        enlght_out(buf);
     }
 
     if (flags.pickup) {
