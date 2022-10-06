@@ -66,6 +66,11 @@ endif
 ADD_LUA=Y
 LUATOP=../lib/lua$(LUAVER)
 #
+
+#---------------------------------------------------------------
+# Location of terminus-fonts
+#
+FONTTOP=../lib/terminus
 #==============================================================================
 # This marks the end of the BUILD DECISIONS section.
 #==============================================================================
@@ -922,14 +927,14 @@ $(O)luac.o: $(LUASRC)/luac.c
 
 ifdef WANT_DOSVGA
 $(O)fonts.tag: lua.exe $(MSYS)/fonts/makefont.lua
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u16b.bdf $(MSYS)/fonts/ter-u16b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u16v.bdf $(MSYS)/fonts/ter-u16v.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u18b.bdf $(MSYS)/fonts/ter-u18b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u20b.bdf $(MSYS)/fonts/ter-u20b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u22b.bdf $(MSYS)/fonts/ter-u22b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u24b.bdf $(MSYS)/fonts/ter-u24b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u28b.bdf $(MSYS)/fonts/ter-u28b.psf
-	lua $(MSYS)/fonts/makefont.lua $(MSYS)/fonts/ter-u32b.bdf $(MSYS)/fonts/ter-u32b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16b.bdf $(MSYS)/fonts/ter-u16b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16v.bdf $(MSYS)/fonts/ter-u16v.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u18b.bdf $(MSYS)/fonts/ter-u18b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u20b.bdf $(MSYS)/fonts/ter-u20b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u22b.bdf $(MSYS)/fonts/ter-u22b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u24b.bdf $(MSYS)/fonts/ter-u24b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u28b.bdf $(MSYS)/fonts/ter-u28b.psf
+	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u32b.bdf $(MSYS)/fonts/ter-u32b.psf
 	@echo Fonts done >$(O)fonts.tag
 else
 $(O)fonts.tag:

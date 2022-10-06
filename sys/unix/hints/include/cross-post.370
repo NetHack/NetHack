@@ -24,24 +24,22 @@ $(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
-
-FONTDIR = ../sys/msdos/fonts
-$(FONTDIR)/ter-u16b.psf: $(FONTDIR)/ter-u16b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u16b.bdf $@
-$(FONTDIR)/ter-u16v.psf: $(FONTDIR)/ter-u16v.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u16v.bdf $@
-$(FONTDIR)/ter-u18b.psf: $(FONTDIR)/ter-u18b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u18b.bdf $@
-$(FONTDIR)/ter-u20b.psf: $(FONTDIR)/ter-u20b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u20b.bdf $@
-$(FONTDIR)/ter-u22b.psf: $(FONTDIR)/ter-u22b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u22b.bdf $@
-$(FONTDIR)/ter-u24b.psf: $(FONTDIR)/ter-u24b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u24b.bdf $@
-$(FONTDIR)/ter-u28b.psf: $(FONTDIR)/ter-u28b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u28b.bdf $@
-$(FONTDIR)/ter-u32b.psf: $(FONTDIR)/ter-u32b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
-	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTDIR)/ter-u32b.bdf $@
+$(FONTDIR)/ter-u16b.psf: $(FONTTOP)/ter-u16b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u16b.bdf $@
+$(FONTDIR)/ter-u16v.psf: $(FONTTOP)/ter-u16v.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u16v.bdf $@
+$(FONTDIR)/ter-u18b.psf: $(FONTTOP)/ter-u18b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u18b.bdf $@
+$(FONTDIR)/ter-u20b.psf: $(FONTTOP)/ter-u20b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u20b.bdf $@
+$(FONTDIR)/ter-u22b.psf: $(FONTTOP)/ter-u22b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u22b.bdf $@
+$(FONTDIR)/ter-u24b.psf: $(FONTTOP)/ter-u24b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u24b.bdf $@
+$(FONTDIR)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u28b.bdf $@
+$(FONTDIR)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(FONTDIR)/makefont.lua $(LUABIN)
+	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u32b.bdf $@
 #
 .PHONY: dodata dospkg dosfonts
 ifdef WANT_DOSVGA
