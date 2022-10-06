@@ -117,11 +117,12 @@ fi
 
 FONT_VERSION="4.49"
 FONT_FILE="terminus-font-$FONT_VERSION"
-FONT_RFILE="$FONT_FILE.1.tar.gz"
+FONT_LFILE="$FONT_FILE.1"
+FONT_RFILE="$FONT_LFILE.tar.gz"
 FONT_URL="https://sourceforge.net/projects/terminus-font/files/$FONT_FILE/$FONT_RFILE"
 
 #  fonts
-if [ ! -d "$FONT_FILE" ]; then
+if [ ! -d "$FONT_LFILE" ]; then
     echo "Getting terminus fonts"
     if [ "$(uname)" = "Darwin" ]; then
 	#Mac
