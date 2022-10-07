@@ -454,7 +454,7 @@ Cross-compiler used:     Andrew Wu's djgpp cross-compiler
 Cross-compiler url:      https://github.com/andrewwutw/build-djgpp
 Cross-compiler pre-built binary downloads:
     https://github.com/andrewwutw/build-djgpp/releases
-    https://github.com/andrewwutw/build-djgpp/releases
+
     Cross-compiler bits tested:
            https://github.com/andrewwutw/build-djgpp
        and the pre-built binary for your platform from:
