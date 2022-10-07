@@ -154,8 +154,12 @@ curses_init_nhwindows(int *argcp UNUSED,
                       char **argv UNUSED)
 {
 #ifdef PDCURSES
-    static char pdc_font[BUFSZ] = "";
     char window_title[BUFSZ];
+#endif
+#ifdef CURSES_UNICODE
+#ifdef PDCURSES
+    static char pdc_font[BUFSZ] = "";
+#endif
 #endif
 
 #ifdef CURSES_UNICODE
