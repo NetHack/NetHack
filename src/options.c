@@ -775,6 +775,7 @@ optfn_autounlock(
         newflags = 0;
         sep = index(op, '+') ? '+' : ' ';
         while (op) {
+            boolean matched = FALSE;
             op = trimspaces(op); /* might have leading space */
             if ((nxt = index(op, sep)) != 0) {
                 *nxt++ = '\0';
@@ -782,13 +783,14 @@ optfn_autounlock(
                                       * plus sign removal */
             }
             if (str_start_is("none", op, TRUE))
-                negated = TRUE;
-            for (i = 0; i < SIZE(unlocktypes); ++i) {
+                negated = TRUE, matched = TRUE;
+            for (i = 0; i < SIZE(unlocktypes) && !matched; ++i) {
                 if (str_start_is(unlocktypes[i][0], op, TRUE)
                     /* fuzzymatch() doesn't match leading substrings but
                        this allows "apply_key" and "applykey" to match
                        "apply-key"; "apply key" too if part of foo+bar */
                     || fuzzymatch(op, unlocktypes[i][0], " -_", TRUE)) {
+                    matched = TRUE;
                     switch (*op) {
                     case 'n':
                         negated = TRUE;
@@ -806,11 +808,15 @@ optfn_autounlock(
                         newflags |= AUTOUNLOCK_FORCE;
                         break;
                     default:
-                        config_error_add("Invalid value for \"%s\": \"%s\"",
-                                         allopt[optidx].name, op);
-                        return optn_silenterr;
+                        matched = FALSE;
+                        break;
                     }
                 }
+            }
+            if (!matched) {
+                config_error_add("Invalid value for \"%s\": \"%s\"",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
             }
             op = nxt;
         }
