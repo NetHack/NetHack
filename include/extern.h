@@ -1604,6 +1604,9 @@ extern void pacify_guards(void);
 extern void decide_to_shapeshift(struct monst *, int);
 extern boolean vamp_stone(struct monst *);
 extern void check_gear_next_turn(struct monst *);
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+extern int mstrength(struct permonst *ptr);
+#endif
 
 /* ### mondata.c ### */
 

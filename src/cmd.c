@@ -17,6 +17,7 @@
 #endif
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 static int wiz_display_macros(void);
+static int wiz_check_mdifficulty(void);
 #endif
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
@@ -2756,6 +2757,8 @@ struct ext_func_tab extcmdlist[] = {
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+    { '\0',   "wizcheckmdifficulty", "validate the difficulty levels of monsters",
+              wiz_check_mdifficulty, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizdispmacros", "validate the display macro ranges",
               wiz_display_macros, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
@@ -4082,6 +4085,39 @@ wiz_display_macros(void)
     }
     if (!trouble)
         putstr(win, 0, "No display macro issues detected");
+    display_nhwindow(win, FALSE);
+    destroy_nhwindow(win);
+    return ECMD_OK;
+}
+#endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
+
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+/* the #wizcheckmdifficulty command */
+static int
+wiz_check_mdifficulty(void)
+{
+    char buf[BUFSZ];
+    winid win;
+    int mhardcoded = 0, mcalculated = 0, trouble = 0, cnt = 0, mdiff = 0;
+    struct permonst *ptr;
+    static const char *const display_issues = "Review of monster difficulties:";
+
+    win = create_nhwindow(NHW_TEXT);
+    for (ptr = &mons[0]; ptr->mlet; ptr++, cnt++) {
+        mcalculated = mstrength(ptr);
+        mhardcoded = (int) ptr->difficulty;
+        mdiff = mhardcoded - mcalculated;
+        if (mdiff) {
+            trouble++;
+            Snprintf(buf, sizeof buf,
+                     "%-18s [%4d]: calculated: %2d, hardcoded: %2d (%+d)",
+                     ptr->pmnames[NEUTRAL], cnt, mcalculated, mhardcoded,
+                     mdiff);
+            putstr(win, 0, buf);
+	}
+    }
+    if (!trouble)
+        putstr(win, 0, "No monster difficulty discrepencies were detected");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;

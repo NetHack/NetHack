@@ -30,6 +30,10 @@ static struct permonst *accept_newcham_form(struct monst *, int);
 static void kill_eggs(struct obj *);
 static void pacify_guard(struct monst *);
 
+#ifdef DEBUG
+int mstrength(struct permonst *ptr);
+#endif
+
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
      || (g.level.flags.graveyard && is_undead(mdat) && rn2(3)))
@@ -5177,4 +5181,63 @@ check_gear_next_turn(struct monst *mon)
     mon->misc_worn_check |= I_SPECIAL;
 }
 
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+/* This routine is designed to return an integer value which represents
+ * an approximation of monster strength.  It uses a similar method of
+ * determination as "experience()" to arrive at the strength.
+ */
+int
+mstrength(struct permonst *ptr)
+{
+    int i, tmp2, n, tmp = ptr->mlevel;
+
+    if(tmp > 49)        /* special fixed hp monster */
+        tmp = 2*(tmp - 6) / 4;
+
+/*  For creation in groups */
+    n = (!!(ptr->geno & G_SGROUP));
+    n += (!!(ptr->geno & G_LGROUP)) << 1;
+
+/*  For ranged attacks */
+    if (ranged_attk(ptr)) n++;
+
+/*  For higher ac values */
+    n += (ptr->ac < 4);
+    n += (ptr->ac < 0);
+
+/*  For very fast monsters */
+    n += (ptr->mmove >= 18);
+
+/*  For each attack and "special" attack */
+    for(i = 0; i < NATTK; i++) {
+
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+    }
+
+/*  For each "special" damage type */
+    for(i = 0; i < NATTK; i++) {
+
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+        || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
+            n += 2;
+        else if (strcmp(ptr->pmnames[NEUTRAL], "grid bug")) n += (tmp2 != AD_PHYS);
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
+
+/*  Leprechauns are special cases.  They have many hit dice so they
+    can hit and are hard to kill, but they don't really do much damage. */
+    if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun")) n -= 2;
+
+/*  Finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if(n == 0) tmp--;
+    else if(n >= 6) tmp += ( n / 2 );
+    else tmp += ( n / 3 + 1);
+
+    return((tmp >= 0) ? tmp : 0);
+}
+#endif  /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || DEBUG */
 /*mon.c*/
