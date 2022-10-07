@@ -2065,7 +2065,6 @@ slippery_ice_fumbling(void)
             || resists_cold(&g.youmonst) || Flying
             || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
             || is_whirly(g.youmonst.data)) {
-            pline("skates!");
             on_ice = FALSE;
         } else if (!rn2(Cold_resistance ? 3 : 2)) {
             HFumbling |= FROMOUTSIDE;
