@@ -1312,6 +1312,9 @@ extern void release_runtime_info(void);
 #ifdef ENHANCED_SYMBOLS
 extern void dump_glyphids(void);
 #endif
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) || defined(MAKEDEFS_C)
+extern int mstrength(struct permonst *);
+#endif
 
 /* ### mhitm.c ### */
 
@@ -1604,9 +1607,6 @@ extern void pacify_guards(void);
 extern void decide_to_shapeshift(struct monst *, int);
 extern boolean vamp_stone(struct monst *);
 extern void check_gear_next_turn(struct monst *);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-extern int mstrength(struct permonst *ptr);
-#endif
 
 /* ### mondata.c ### */
 
