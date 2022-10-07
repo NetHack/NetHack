@@ -30,7 +30,7 @@ static struct permonst *accept_newcham_form(struct monst *, int);
 static void kill_eggs(struct obj *);
 static void pacify_guard(struct monst *);
 
-#ifdef DEBUG
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 int mstrength(struct permonst *ptr);
 #endif
 
