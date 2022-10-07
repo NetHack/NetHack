@@ -235,7 +235,6 @@ steps:
     cd ../..
     make fetch-lua
     sh sys/msdos/fetch-cross-compiler.sh
-    make LUA_VERSION=5.4.4 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
     make LUA_VERSION=5.4.4 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
