@@ -1312,7 +1312,7 @@ extern void release_runtime_info(void);
 #ifdef ENHANCED_SYMBOLS
 extern void dump_glyphids(void);
 #endif
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) || defined(MAKEDEFS_C)
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 extern int mstrength(struct permonst *);
 #endif
 
