@@ -453,11 +453,11 @@ Using the cross-compiler, build the following targets:
 Cross-compiler used:     Andrew Wu's djgpp cross-compiler
 Cross-compiler url:      https://github.com/andrewwutw/build-djgpp
 Cross-compiler pre-built binary downloads:
-    https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/
+    https://github.com/andrewwutw/build-djgpp/releases/download/v3.3/
     Cross-compiler bits tested:
            https://github.com/andrewwutw/build-djgpp
        and the pre-built binary for your platform from:
-           https://github.com/andrewwutw/build-djgpp/releases/download/v3.0/
+           https://github.com/andrewwutw/build-djgpp/releases/download/v3.3/
        and a DOS-extender (for including in msdos packaging) from
            http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
        and pdcurses from:
