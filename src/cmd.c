@@ -4100,7 +4100,7 @@ wiz_check_mdifficulty(void)
     winid win;
     int mhardcoded = 0, mcalculated = 0, trouble = 0, cnt = 0, mdiff = 0;
     struct permonst *ptr;
-    static const char *const display_issues = "Review of monster difficulties:";
+    static const char *const window_title = "Review of monster difficulties:";
 
     win = create_nhwindow(NHW_TEXT);
     for (ptr = &mons[0]; ptr->mlet; ptr++, cnt++) {
@@ -4108,7 +4108,8 @@ wiz_check_mdifficulty(void)
         mhardcoded = (int) ptr->difficulty;
         mdiff = mhardcoded - mcalculated;
         if (mdiff) {
-            trouble++;
+            if (!trouble++)
+                putstr(win, 0, window_title);
             Snprintf(buf, sizeof buf,
                      "%-18s [%4d]: calculated: %2d, hardcoded: %2d (%+d)",
                      ptr->pmnames[NEUTRAL], cnt, mcalculated, mhardcoded,
