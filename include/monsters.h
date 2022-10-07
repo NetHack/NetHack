@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1648318980 2022/03/26 18:23:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1665130023 2022/10/07 08:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1707,8 +1707,8 @@
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_NOTAKE | M1_OMNIVORE,
         M2_STRONG, 0, 4, CLR_GREEN, GUARDIAN_NAGA_HATCHLING),
     MON("red naga", S_NAGA, LVL(6, 12, 4, 0, -4), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 4), ATTK(AT_BREA, AD_FIRE, 2, 6), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 4), ATTK(AT_BREA, AD_FIRE, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_FIRE | MR_POISON,
         MR_FIRE | MR_POISON, M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE
                                  | M1_OVIPAROUS | M1_NOTAKE | M1_OMNIVORE,
@@ -1722,19 +1722,25 @@
             | M1_NOTAKE | M1_CARNIVORE,
         M2_STRONG, 0, 10, CLR_BLACK, BLACK_NAGA),
     MON("golden naga", S_NAGA, LVL(10, 14, 2, 70, 5), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_MAGC, AD_SPEL, 4, 6), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_MAGC, AD_SPEL, 4, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_POISON, MR_POISON,
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_OVIPAROUS | M1_NOTAKE
             | M1_OMNIVORE,
         M2_STRONG, 0, 13, HI_GOLD, GOLDEN_NAGA),
+    /* 3.7: guardian naga used to have three attacks: bite, spit, hug
+       but in order for the hug to succeed the two preceding attacks had
+       to have hit, and its not possible to both bite and spit, hence
+       the hug never hit; change to spit, bite, touch, hug; if the bite
+       and touch hit, the hug will too */
     MON("guardian naga", S_NAGA, LVL(12, 16, 0, 50, 7), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PLYS, 1, 6), ATTK(AT_SPIT, AD_DRST, 1, 6),
-          ATTK(AT_HUGS, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_SPIT, AD_DRST, 1, 6), ATTK(AT_BITE, AD_PLYS, 1, 6),
+          ATTK(AT_TUCH, AD_PHYS, 0, 0), ATTK(AT_HUGS, AD_WRAP, 2, 4),
+          NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_POISON, MR_POISON,
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_OVIPAROUS | M1_POIS
             | M1_NOTAKE | M1_OMNIVORE,
-        M2_STRONG, 0, 16, CLR_GREEN, GUARDIAN_NAGA),
+        M2_STRONG, 0, 17, CLR_GREEN, GUARDIAN_NAGA),
     /*
      * Ogres
      */

@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1664966387 2022/10/05 10:39:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1665130027 2022/10/07 08:07:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.366 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1648,8 +1648,8 @@ m_slips_free(struct monst *mdef, struct attack *mattk)
     if (obj && (obj->greased || obj->otyp == OILSKIN_CLOAK)
         && (!obj->cursed || rn2(3))) {
         You("%s %s %s %s!",
-            mattk->adtyp == AD_WRAP ? "slip off of"
-                                    : "grab, but cannot hold onto",
+            (mattk->adtyp == AD_WRAP) ? "slip off of"
+                                      : "grab, but cannot hold onto",
             s_suffix(mon_nam(mdef)), obj->greased ? "greased" : "slippery",
             /* avoid "slippery slippery cloak"
                for undiscovered oilskin cloak */
@@ -2844,10 +2844,12 @@ mhitm_ad_stck(
 }
 
 void
-mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_wrap(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    struct permonst *pd = mdef->data;
+    struct permonst *pd = mdef->data, *pa = magr->data;
+    boolean coil = slithy(pa) && (pa->mlet == S_SNAKE || pa->mlet == S_NAGA);
 
     if (magr == &g.youmonst) {
         /* uhitm */
@@ -2856,7 +2858,8 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 if (m_slips_free(mdef, mattk)) {
                     mhm->damage = 0;
                 } else {
-                    You("swing yourself around %s!", mon_nam(mdef));
+                    You("%s yourself around %s!",
+                        coil ? "coil" : "swing", mon_nam(mdef));
                     set_ustuck(mdef);
                 }
             } else if (u.ustuck == mdef) {
@@ -2869,9 +2872,13 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     pline("%s is being crushed.", Monnam(mdef));
             } else {
                 mhm->damage = 0;
-                if (Verbose(4, mhitm_ad_wrap1))
-                    You("brush against %s %s.", s_suffix(mon_nam(mdef)),
-                        mbodypart(mdef, LEG));
+                if (Verbose(4, mhitm_ad_wrap1)) {
+                    if (coil)
+                        You("brush against %s.", mon_nam(mdef));
+                    else
+                        You("brush against %s %s.", s_suffix(mon_nam(mdef)),
+                            mbodypart(mdef, LEG));
+                }
             }
         } else
             mhm->damage = 0;
@@ -2883,8 +2890,8 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     mhm->damage = 0;
                 } else {
                     set_ustuck(magr); /* before message, for botl update */
-                    urgent_pline("%s swings itself around you!",
-                                 Monnam(magr));
+                    urgent_pline("%s %s itself around you!",
+                                 Some_Monnam(magr), coil ? "coils" : "swings");
                 }
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious) {
@@ -2904,9 +2911,13 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 }
             } else {
                 mhm->damage = 0;
-                if (Verbose(4, mhitm_ad_wrap2))
-                    pline("%s brushes against your %s.", Monnam(magr),
-                          body_part(LEG));
+                if (Verbose(4, mhitm_ad_wrap2)) {
+                    if (coil)
+                        pline("%s brushes against you.", Monnam(magr));
+                    else
+                        pline("%s brushes against your %s.", Monnam(magr),
+                              body_part(LEG));
+                }
             }
         } else
             mhm->damage = 0;
@@ -2918,8 +2929,9 @@ mhitm_ad_wrap(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_plys(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_plys(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     boolean negated = mhitm_mgc_atk_negated(magr, mdef);
 
@@ -4170,8 +4182,9 @@ mhitm_ad_ssex(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_adtyping(struct monst *magr, struct attack *mattk, struct monst *mdef,
-               struct mhitm_data *mhm)
+mhitm_adtyping(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     switch (mattk->adtyp) {
     case AD_STUN: mhitm_ad_stun(magr, mattk, mdef, mhm); break;
