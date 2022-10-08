@@ -1041,7 +1041,8 @@ hitmu(register struct monst *mtmp, register struct attack *mattk)
 
     mhitm_adtyping(mtmp, mattk, &g.youmonst, &mhm);
 
-    (void) mhitm_knockback(mtmp, &g.youmonst, mattk, &mhm.hitflags, (MON_WEP(mtmp) != 0));
+    (void) mhitm_knockback(mtmp, &g.youmonst, mattk, &mhm.hitflags,
+                           (MON_WEP(mtmp) != 0));
 
     if (mhm.done)
         return mhm.hitflags;
@@ -2147,7 +2148,10 @@ mayberem(struct monst *mon,
  *  damage applies.
  */
 static int
-passiveum(struct permonst *olduasmon, struct monst *mtmp, struct attack *mattk)
+passiveum(
+    struct permonst *olduasmon,
+    struct monst *mtmp,
+    struct attack *mattk)
 {
     int i, tmp;
     struct attack *oldu_mattk = 0;

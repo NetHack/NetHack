@@ -2880,7 +2880,10 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
  * revive one, the disoriented creature becomes a zombie
  */
 boolean
-cant_revive(int* mtype, boolean revival, struct obj* from_obj)
+cant_revive(
+    int *mtype,
+    boolean revival,
+    struct obj *from_obj)
 {
     /* SHOPKEEPERS can be revived now */
     if (*mtype == PM_GUARD || (*mtype == PM_SHOPKEEPER && !revival)
@@ -2902,7 +2905,9 @@ cant_revive(int* mtype, boolean revival, struct obj* from_obj)
 }
 
 static boolean
-create_particular_parse(char* str, struct _create_particular_data* d)
+create_particular_parse(
+    char *str,
+    struct _create_particular_data *d)
 {
     int gender_name_var = NEUTRAL;
     char *bufp = str;
@@ -3015,7 +3020,8 @@ create_particular_parse(char* str, struct _create_particular_data* d)
 }
 
 static boolean
-create_particular_creation(struct _create_particular_data* d)
+create_particular_creation(
+    struct _create_particular_data *d)
 {
     struct permonst *whichpm = NULL;
     int i, mx, my, firstchoice = NON_PM;
