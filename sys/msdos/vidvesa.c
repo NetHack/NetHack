@@ -1047,7 +1047,7 @@ vesa_Init(void)
 
     vesa_mode = 0xFFFF; /* might want an 8 bit mode after loading tiles */
     vesa_detect();
-    if (vesa_mode == 0xFFFF) {
+    if (vesa_mode == 0xFFFF || (vesa_pixel_size == 8 && get_palette() == NULL)) {
         raw_printf("%s (%d)", "Reverting to TTY mode, no VESA mode available.",
                    tilefailure);
         wait_synch();
