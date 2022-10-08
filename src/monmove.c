@@ -779,6 +779,9 @@ dochug(register struct monst* mtmp)
                 newsym(mtmp->mx, mtmp->my);
             break;
         case MMOVE_MOVED: /* monster moved */
+            /* if confused grabber has wandered off, let go */
+            if (mtmp == u.ustuck && !next2u(mtmp->mx, mtmp->my))
+                unstuck(mtmp);
             /* Maybe it stepped on a trap and fell asleep... */
             if (helpless(mtmp))
                 return 0;
@@ -788,17 +791,11 @@ dochug(register struct monst* mtmp)
                             || attacktype(mdat, AT_WEAP)
                             || find_offensive(mtmp)))
                 break;
-            /* engulfer/grabber checks */
-            if (mtmp == u.ustuck) {
-                /* a monster that's digesting you can move at the
-                 * same time -dlc
-                 */
-                if (u.uswallow)
-                    return mattacku(mtmp);
-                /* if confused grabber has wandered off, let go */
-                if (!next2u(mtmp->mx, mtmp->my))
-                    unstuck(mtmp);
-            }
+            /* a monster that's digesting you can move at the
+             * same time -dlc
+             */
+            if (engulfing_u(mtmp))
+                return mattacku(mtmp);
             return 0;
         case MMOVE_DIED: /* monster died */
             return 1;
