@@ -1855,6 +1855,7 @@ simplified configuration options menu
 rudimentary key rebinding in game options
 experimental #saveoptions command to allow saving configuration settings
 mouse buttons can be bound to extended commands
+hero poly'd into purple worm can gain intrinsics from digesting whole monster
 
 
 Platform- and/or Interface-Specific New Features
