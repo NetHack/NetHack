@@ -16,13 +16,14 @@
 #include "vesa.h"
 #include "wintty.h"
 #include "tileset.h"
+#include "font.h"
 
 #define FIRST_TEXT_COLOR 240
 
 extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
 struct VesaCharacter {
     int colour;
-    int chr;
+    uint32 chr;
 };
 
 static unsigned long vesa_SetWindow(int window, unsigned long offset);
@@ -47,13 +48,13 @@ static boolean vesa_SetHardPalette(const struct Pixel *);
 static boolean vesa_SetSoftPalette(const struct Pixel *);
 static void vesa_DisplayCell(int, int, int);
 static unsigned vesa_FindMode(unsigned long mode_addr, unsigned bits);
-static void vesa_WriteChar(int, int, int, int);
-static void vesa_WriteCharXY(int, int, int, int);
+static void vesa_WriteChar(uint32, int, int, int);
+static void vesa_WriteCharXY(uint32, int, int, int);
 static void vesa_WriteCharTransparent(int, int, int, int);
 static void vesa_WriteTextRow(int pixx, int pixy,
                               struct VesaCharacter const *t_row, unsigned t_row_width);
 static boolean vesa_GetCharPixel(int, unsigned, unsigned);
-static unsigned char vesa_GetCharPixelRow(int, unsigned, unsigned);
+static unsigned char vesa_GetCharPixelRow(uint32, unsigned, unsigned);
 static unsigned long vesa_DoublePixels(unsigned long);
 static unsigned long vesa_TriplePixels(unsigned long);
 static void vesa_WriteStr(const char *, int, int, int, int);
@@ -81,7 +82,7 @@ static unsigned char __far *font;
 
 static struct map_struct {
     int glyph;
-    int ch;
+    uint32 ch;
     int attr;
     unsigned special;
     short int tileidx;
@@ -151,6 +152,7 @@ static unsigned vesa_char_width = 8, vesa_char_height = 16;
 static unsigned vesa_oview_width, vesa_oview_height;
 static unsigned char **vesa_tiles;
 static unsigned char **vesa_oview_tiles;
+static struct BitmapFont *vesa_font;
 
 #ifdef SIMULATE_CURSOR
 static unsigned long *undercursor;
@@ -670,11 +672,16 @@ vesa_xputc(char ch, int attr)
 void
 vesa_xputg(const glyph_info *glyphinfo)
 {
-    int glyphnum = glyphinfo->glyph, ch = glyphinfo->ttychar;
+    int glyphnum = glyphinfo->glyph;
+    uint32 ch = (uchar) glyphinfo->ttychar;
     unsigned special = glyphinfo->gm.glyphflags;
     int col, row;
     int attr;
     int ry;
+
+    if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
+        ch = glyphinfo->gm.u->utf32ch;
+    }
 
     row = currow;
     col = curcol;
@@ -689,7 +696,7 @@ vesa_xputg(const glyph_info *glyphinfo)
     attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     map[ry][col].attr = attr;
     if (iflags.traditional_view) {
-        vesa_WriteChar((unsigned char) ch, col, row, attr);
+        vesa_WriteChar(ch, col, row, attr);
     } else {
         if ((col >= clipx) && (col <= clipxmax)
         &&  (ry >= clipy) && (ry <= clipymax)) {
@@ -1011,6 +1018,7 @@ vesa_Init(void)
     unsigned i;
     unsigned num_pixels, num_oview_pixels;
     const char *tile_file;
+    const char *font_name;
     int tilefailure = 0;
 
     if (inited) return;
@@ -1090,22 +1098,48 @@ vesa_Init(void)
         vesa_oview_height = (unsigned) iflags.wc_tile_height;
     }
 
-    /* Use the map font size to set the font size */
-    /* Supported sizes are 8x16, 16x32, 24x48 and 32x64 */
-    vesa_char_height = iflags.wc_fontsiz_map;
-    if (vesa_char_height <= 0 || vesa_char_height > vesa_y_res / 30) {
-        vesa_char_height = vesa_y_res / 30;
-    }
-    if (vesa_char_height < 32) {
-        vesa_char_height = 16;
-    } else if (vesa_char_height < 48) {
-        vesa_char_height = 32;
-    } else if (vesa_char_height < 64) {
-        vesa_char_height = 48;
+    /* Load a font of size appropriate to the screen size */
+    if (vesa_x_res >= 1280 && vesa_y_res >= 960)
+        font_name = "ter-u32b.psf";
+    else if (vesa_x_res >= 1120 && vesa_y_res >= 840)
+        font_name = "ter-u28b.psf";
+    else if (vesa_x_res >= 960 && vesa_y_res >= 720)
+        font_name = "ter-u24b.psf";
+    else if (vesa_x_res >= 880 && vesa_y_res >= 660)
+        font_name = "ter-u22b.psf";
+    else if (vesa_x_res >= 800 && vesa_y_res >= 600)
+        font_name = "ter-u20b.psf";
+    else if (vesa_x_res >= 720 && vesa_y_res >= 540)
+        font_name = "ter-u18b.psf";
+    else
+        font_name = "ter-u16v.psf";
+    if (iflags.wc_font_map != NULL && iflags.wc_font_map[0] != '\0')
+        font_name = iflags.wc_font_map;
+    free_font(vesa_font);
+    vesa_font = load_font(font_name);
+    /* if load_font fails, vesa_font is NULL and we'll fall back to the font
+       defined in ROM */
+    if (vesa_font != NULL) {
+        vesa_char_width = vesa_font->width;
+        vesa_char_height = vesa_font->height;
     } else {
-        vesa_char_height = 64;
+        /* Use the map font size to set the font size */
+        /* Supported sizes are 8x16, 16x32, 24x48 and 32x64 */
+        vesa_char_height = iflags.wc_fontsiz_map;
+        if (vesa_char_height <= 0 || vesa_char_height > vesa_y_res / 30) {
+            vesa_char_height = vesa_y_res / 30;
+        }
+        if (vesa_char_height < 32) {
+            vesa_char_height = 16;
+        } else if (vesa_char_height < 48) {
+            vesa_char_height = 32;
+        } else if (vesa_char_height < 64) {
+            vesa_char_height = 48;
+        } else {
+            vesa_char_height = 64;
+        }
+        vesa_char_width = vesa_char_height / 2;
     }
-    vesa_char_width = vesa_char_height / 2;
 
     /* Process tiles for the current video mode */
     vesa_tiles = (unsigned char **) alloc(total_tiles_used * sizeof(void *));
@@ -1508,7 +1542,7 @@ vesa_FindMode(unsigned long mode_addr, unsigned bits)
  *
  */
 static void
-vesa_WriteChar(int chr, int col, int row, int colour)
+vesa_WriteChar(uint32 chr, int col, int row, int colour)
 {
     int pixx, pixy;
 
@@ -1527,7 +1561,7 @@ vesa_WriteChar(int chr, int col, int row, int colour)
  * transparency
  */
 static void
-vesa_WriteCharXY(int chr, int pixx, int pixy, int colour)
+vesa_WriteCharXY(uint32 chr, int pixx, int pixy, int colour)
 {
     /* Flush if cache is full or if not contiguous to the last character */
     if (chr_cache_size >= SIZE(chr_cache)) {
@@ -1604,7 +1638,7 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
         /* Second loop: draw one raster line of one character */
         x = 0;
         for (i = 0; i < t_row_width; ++i) {
-            int chr = t_row[i].chr;
+            uint32 chr = t_row[i].chr;
             int colour = t_row[i].colour + FIRST_TEXT_COLOR;
             /* Preprocess the foreground color */
             if (vesa_pixel_bytes == 1) {
@@ -1655,8 +1689,9 @@ vesa_GetCharPixel(int ch, unsigned x, unsigned y)
 }
 
 static unsigned char
-vesa_GetCharPixelRow(int ch, unsigned x, unsigned y)
+vesa_GetCharPixelRow(uint32 ch, unsigned x, unsigned y)
 {
+    unsigned fnt_width;
     unsigned x1;
     unsigned char fnt;
     size_t offset;
@@ -1664,30 +1699,38 @@ vesa_GetCharPixelRow(int ch, unsigned x, unsigned y)
     if (x >= vesa_char_width) return 0;
     if (y >= vesa_char_height) return 0;
 
+    fnt_width = (vesa_char_width + 7) / 8;
     x1 = x / 8;
 
-    const unsigned char __far *fp;
+    if (vesa_font != NULL) {
+        const unsigned char *fp;
 
-    if (ch < 0 || 255 < ch) return FALSE;
-    offset = ch * 16 + (y * 16 / vesa_char_height);
-    fp = font;
-    fnt = READ_ABSOLUTE((fp + offset));
+        offset = y * fnt_width + x1;
+        fp = get_font_glyph(vesa_font, ch, SYMHANDLING(H_UTF8));
+        fnt = fp[offset];
+    } else {
+        const unsigned char __far *fp;
 
-    if (vesa_char_width != 8) {
-        unsigned long fnt2 = fnt;
-        unsigned width = vesa_char_width;
-        if (width % 3 == 0) {
-            fnt2 = vesa_TriplePixels(fnt2);
-            width /= 3;
+        if (255 < ch) return 0;
+        offset = (ch * vesa_char_height + y) * fnt_width + x1;
+        fp = font;
+        fnt = READ_ABSOLUTE((fp + offset));
+
+        if (vesa_char_width != 8) {
+            unsigned long fnt2 = fnt;
+            unsigned width = vesa_char_width;
+            if (width % 3 == 0) {
+                fnt2 = vesa_TriplePixels(fnt2);
+                width /= 3;
+            }
+            while (width > 8) {
+                fnt2 = vesa_DoublePixels(fnt2);
+                width /= 2;
+            }
+            fnt2 <<= 32 - vesa_char_width;
+            fnt = (unsigned char)(fnt2 >> (24 - 8 * x1));
         }
-        while (width > 8) {
-            fnt2 = vesa_DoublePixels(fnt2);
-            width /= 2;
-        }
-        fnt2 <<= 32 - vesa_char_width;
-        fnt = (unsigned char)(fnt2 >> (24 - 8 * x1));
     }
-
     return fnt;
 }
 
