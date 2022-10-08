@@ -3645,7 +3645,7 @@ maybe_wail(void)
 }
 
 void
-losehp(int n, const char *knam, boolean k_format)
+losehp(int n, const char *knam, schar k_format)
 {
 #if 0   /* code below is prepared to handle negative 'loss' so don't add this
          * until we've verified that no callers intentionally rely on that */

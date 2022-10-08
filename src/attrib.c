@@ -211,19 +211,24 @@ gainstr(struct obj *otmp, int incr, boolean givemsg)
 
 /* may kill you; cause may be poison or monster like 'a' */
 void
-losestr(int num)
+losestr(int num, const char *knam, schar k_format)
 {
     int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
     int ustr = ABASE(A_STR) - num;
 
-    while (ustr < 3) {
+    /* in case HP loss kills the hero once Str hits the minimum */
+    if (!knam || !*knam) {
+        knam = "terminal frailty";
+        k_format = KILLED_BY;
+    }
+
+    while (ustr < ATTRMIN(A_STR)) {
         ++ustr;
         --num;
+        losehp(6, knam, k_format);
         if (Upolyd) {
-            u.mh -= 6;
             u.mhmax -= 6;
         } else {
-            u.uhp -= 6;
             setuhpmax(u.uhpmax - 6);
         }
         g.context.botl = TRUE;
@@ -234,6 +239,14 @@ losestr(int num)
             losexp(NULL); /* won't be fatal when no 'drainer' is supplied */
     }
     (void) adjattrib(A_STR, -num, 1);
+}
+
+/* combined strength loss and damage from some poisons */
+void
+poison_strdmg(int strloss, int dmg, const char *knam, schar k_format)
+{
+    losestr(strloss, knam, k_format);
+    losehp(dmg, knam, k_format);
 }
 
 static const struct poison_effect_message {

@@ -1815,9 +1815,9 @@ eatcorpse(struct obj *otmp)
         tp++;
         pline("Ecch - that must have been poisonous!");
         if (!Poison_resistance) {
-            losestr(rnd(4));
-            losehp(rnd(15), !glob ? "poisonous corpse" : "poisonous glob",
-                   KILLED_BY_AN);
+            poison_strdmg(rnd(4), rnd(15),
+                          !glob ? "poisonous corpse" : "poisonous glob",
+                          KILLED_BY_AN);
         } else
             You("seem unaffected by the poison.");
 
@@ -2753,8 +2753,7 @@ doeat(void)
         if (otmp->oclass == WEAPON_CLASS && otmp->opoisoned) {
             pline("Ecch - that must have been poisonous!");
             if (!Poison_resistance) {
-                losestr(rnd(4));
-                losehp(rnd(15), xname(otmp), KILLED_BY_AN);
+                poison_strdmg(rnd(4), rnd(15), xname(otmp), KILLED_BY_AN);
             } else
                 You("seem unaffected by the poison.");
         } else if (!nodelicious) {
