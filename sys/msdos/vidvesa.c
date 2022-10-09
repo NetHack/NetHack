@@ -22,7 +22,7 @@
 
 extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
 struct VesaCharacter {
-    int colour;
+    uint32 colour;
     uint32 chr;
 };
 
@@ -48,8 +48,8 @@ static boolean vesa_SetHardPalette(const struct Pixel *);
 static boolean vesa_SetSoftPalette(const struct Pixel *);
 static void vesa_DisplayCell(int, int, int);
 static unsigned vesa_FindMode(unsigned long mode_addr, unsigned bits);
-static void vesa_WriteChar(uint32, int, int, int);
-static void vesa_WriteCharXY(uint32, int, int, int);
+static void vesa_WriteChar(uint32, int, int, uint32);
+static void vesa_WriteCharXY(uint32, int, int, uint32);
 static void vesa_WriteCharTransparent(int, int, int, int);
 static void vesa_WriteTextRow(int pixx, int pixy,
                               struct VesaCharacter const *t_row, unsigned t_row_width);
@@ -83,7 +83,7 @@ static unsigned char __far *font;
 static struct map_struct {
     int glyph;
     uint32 ch;
-    int attr;
+    uint32 attr;
     unsigned special;
     short int tileidx;
 } map[ROWNO][COLNO]; /* track the glyphs */
@@ -676,11 +676,16 @@ vesa_xputg(const glyph_info *glyphinfo)
     uint32 ch = (uchar) glyphinfo->ttychar;
     unsigned special = glyphinfo->gm.glyphflags;
     int col, row;
-    int attr;
+    uint32_t attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     int ry;
 
     if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         ch = glyphinfo->gm.u->utf32ch;
+        if (vesa_pixel_size > 8 && glyphinfo->gm.u->ucolor != 0) {
+            /* FIXME: won't display black (0,0,0) correctly, but the background
+               is usually black anyway */
+            attr = glyphinfo->gm.u->ucolor | 0x80000000;
+        }
     }
 
     row = currow;
@@ -693,7 +698,6 @@ vesa_xputg(const glyph_info *glyphinfo)
     map[ry][col].ch = ch;
     map[ry][col].special = special;
     map[ry][col].tileidx = glyphinfo->gm.tileidx;
-    attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     map[ry][col].attr = attr;
     if (iflags.traditional_view) {
         vesa_WriteChar(ch, col, row, attr);
@@ -1071,6 +1075,9 @@ vesa_Init(void)
     vesa_SwitchMode(vesa_mode);
     vesa_SetViewPort();
     windowprocs.win_cliparound = vesa_cliparound;
+    if (vesa_pixel_size > 8) {
+        windowprocs.wincap2 |= WC2_U_24BITCOLOR;
+    }
 #ifdef USE_TILES
     paletteptr = get_palette();
     iflags.tile_view = TRUE;
@@ -1367,8 +1374,12 @@ vesa_detect(void)
     }
 
     /* Scan the mode list for an acceptable mode */
+    /* Choose the widest bit-width, even if the tile set can handle 8 bits,
+       so that Unicode symbols can display in their colors */
+#ifndef ENHANCED_SYMBOLS
     if (get_palette() != NULL && vesa_mode == 0xFFFF)
         vesa_mode = vesa_FindMode(mode_addr,  8);
+#endif
     if (vesa_mode == 0xFFFF)
         vesa_mode = vesa_FindMode(mode_addr, 32);
     if (vesa_mode == 0xFFFF)
@@ -1542,7 +1553,7 @@ vesa_FindMode(unsigned long mode_addr, unsigned bits)
  *
  */
 static void
-vesa_WriteChar(uint32 chr, int col, int row, int colour)
+vesa_WriteChar(uint32 chr, int col, int row, uint32 colour)
 {
     int pixx, pixy;
 
@@ -1561,7 +1572,7 @@ vesa_WriteChar(uint32 chr, int col, int row, int colour)
  * transparency
  */
 static void
-vesa_WriteCharXY(uint32 chr, int pixx, int pixy, int colour)
+vesa_WriteCharXY(uint32 chr, int pixx, int pixy, uint32 colour)
 {
     /* Flush if cache is full or if not contiguous to the last character */
     if (chr_cache_size >= SIZE(chr_cache)) {
@@ -1639,12 +1650,17 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
         x = 0;
         for (i = 0; i < t_row_width; ++i) {
             uint32 chr = t_row[i].chr;
-            int colour = t_row[i].colour + FIRST_TEXT_COLOR;
+            uint32 colour = t_row[i].colour;
             /* Preprocess the foreground color */
-            if (vesa_pixel_bytes == 1) {
-                fg[0] = colour;
+            if (colour & 0x80000000) {
+                fg[0] =  colour        & 0xFF;
+                fg[1] = (colour >>  8) & 0xFF;
+                fg[2] = (colour >> 16) & 0xFF;
+                fg[3] = 0;
+            } else if (vesa_pixel_bytes == 1) {
+                fg[0] = colour + FIRST_TEXT_COLOR;
             } else {
-                unsigned long pix = vesa_palette[colour];
+                unsigned long pix = vesa_palette[colour + FIRST_TEXT_COLOR];
                 fg[0] =  pix        & 0xFF;
                 fg[1] = (pix >>  8) & 0xFF;
                 fg[2] = (pix >> 16) & 0xFF;
