@@ -271,12 +271,13 @@ README.md  libtest.c  run.sh
 sys/msdos:
 (files for MSDOS version)
 Install.dos              Makefile.GCC             exceptn.S.patch
-fetch-cross-compiler.sh  msdos.c                  msdoshlp.txt
-nhlua.h                  pckeys.c                 pctiles.c
-pctiles.h                pcvideo.h                portio.h
-setup.bat                sysconf                  tile2bin.c
-vesa.h                   video.c                  vidtxt.c
-vidvesa.c                vidvga.c
+fetch-cross-compiler.sh  font.c                   font.h
+msdos.c                  msdoshlp.txt             nhlua.h
+pckeys.c                 pctiles.c                pctiles.h
+pcvideo.h                portio.h                 setup.bat
+sysconf                  tile2bin.c               vesa.h
+video.c                  vidtxt.c                 vidvesa.c
+vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
