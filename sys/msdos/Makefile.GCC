@@ -202,7 +202,7 @@ U  = $(UTIL)/
 #  Utility Objects.
 #==========================================
 
-VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o
+VGAOBJ      = $(O)vidvga.o $(O)vidvesa.o $(O)font.o
 
 MAKESRC	    = makedefs.c
 
@@ -601,9 +601,7 @@ ifdef CWSDPMI
 else
 	@$(subst /,\,echo Could not find a copy of CWSDPMI.EXE to put into $(GAMEDIR))
 endif
-ifdef WANT_DOSVGA
 	@$(subst /,\,copy $(MSYS)/fonts/*.psf  $(GAMEDIR))
-endif
 	@$(subst /,\,echo install done > $@)
 
 #==========================================
@@ -925,7 +923,6 @@ $(O)luac.o: $(LUASRC)/luac.c
 #  Fonts for Unicode support
 #==========================================
 
-ifdef WANT_DOSVGA
 $(O)fonts.tag: lua.exe $(MSYS)/fonts/makefont.lua
 	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16b.bdf $(MSYS)/fonts/ter-u16b.psf
 	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u16v.bdf $(MSYS)/fonts/ter-u16v.psf
@@ -936,10 +933,6 @@ $(O)fonts.tag: lua.exe $(MSYS)/fonts/makefont.lua
 	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u28b.bdf $(MSYS)/fonts/ter-u28b.psf
 	lua $(MSYS)/fonts/makefont.lua $(FONTTOP)/ter-u32b.bdf $(MSYS)/fonts/ter-u32b.psf
 	@echo Fonts done >$(O)fonts.tag
-else
-$(O)fonts.tag:
-	@echo Fonts not needed >$(O)fonts.tag
-endif
 
 #==========================================
 #  Housekeeping.
@@ -1051,6 +1044,9 @@ $(O)vidvesa.o : $(HACK_H)  $(MSYS)/pcvideo.h $(MSYS)/portio.h $(TILE_H) $(MSYS)/
 
 $(O)vidtxt.o : $(HACK_H)  $(MSYS)/pcvideo.h $(MSYS)/portio.h $(TILE_H) $(MSYS)/vidtxt.c
 #	$(CC) $(cflags) -o$@ -I$(MSYS) $(MSYS)/vidtxt.c
+
+$(O)font.o : $(HACK_H)  $(MSYS)/font.h $(MSYS)/font.c
+	$(CC) $(cflags) -I$(MSYS) -I$(WSHR) -o$@ $(MSYS)/font.c
 
 $(O)stubvid.o : $(HACK_H) $(MSYS)/pcvideo.h $(MSYS)/video.c
 	$(CC) $(cflags) -I$(MSYS) -DSTUBVIDEO -o$@ $(MSYS)/video.c
