@@ -6,6 +6,7 @@
 ifdef CROSS_TO_MSDOS
 #
 $(TARGETPFX)msdos.o : ../sys/msdos/msdos.c $(HACK_H)
+$(TARGETPFX)font.o : ../sys/msdos/font.c ../sys/msdos/font.h $(HACK_H)
 $(TARGETPFX)pckeys.o : ../sys/msdos/pckeys.c $(HACK_H)
 $(TARGETPFX)pctiles.o : ../sys/msdos/pctiles.c ../sys/msdos/portio.h $(HACK_H)
 $(TARGETPFX)video.o : ../sys/msdos/video.c ../sys/msdos/portio.h $(HACK_H)
@@ -14,7 +15,7 @@ $(TARGETPFX)vidtxt.o : ../sys/msdos/vidtxt.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidvga.o : ../sys/msdos/vidvga.c ../sys/msdos/portio.h \
 		../win/share/tile.h ../include/tileset.h $(HACK_H)
 $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
-		../win/share/tile.h ../include/tileset.h $(HACK_H)
+		../win/share/tile.h ../include/tileset.h ../sys/msdos/font.h $(HACK_H)
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
@@ -42,11 +43,7 @@ $(FONTDIR)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(FONTDIR)/makefont.lua $(LUABI
 	$(LUABIN) $(FONTDIR)/makefont.lua $(FONTTOP)/ter-u32b.bdf $@
 #
 .PHONY: dodata dospkg dosfonts
-ifdef WANT_DOSVGA
 dosfonts: $(FONTTARGETS)
-else
-dosfonts:
-endif
 dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
 	mkdir -p $(TARGETPFX)pkg
@@ -59,7 +56,6 @@ dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
 	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
-ifdef WANT_DOSVGA
 	cp ../sys/msdos/fonts/ter-u16b.psf $(TARGETPFX)pkg/TER-U16B.PSF
 	cp ../sys/msdos/fonts/ter-u16v.psf $(TARGETPFX)pkg/TER-U16V.PSF
 	cp ../sys/msdos/fonts/ter-u18b.psf $(TARGETPFX)pkg/TER-U18B.PSF
@@ -68,7 +64,6 @@ ifdef WANT_DOSVGA
 	cp ../sys/msdos/fonts/ter-u24b.psf $(TARGETPFX)pkg/TER-U24B.PSF
 	cp ../sys/msdos/fonts/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
 	cp ../sys/msdos/fonts/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
-endif
 	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
 	-touch $(TARGETPFX)pkg/RECORD
 	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
