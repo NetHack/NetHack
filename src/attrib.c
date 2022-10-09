@@ -192,6 +192,7 @@ adjattrib(
     return TRUE;
 }
 
+/* strength gain */
 void
 gainstr(struct obj *otmp, int incr, boolean givemsg)
 {
@@ -209,30 +210,35 @@ gainstr(struct obj *otmp, int incr, boolean givemsg)
                      givemsg ? -1 : 1);
 }
 
-/* may kill you; cause may be poison or monster like 'a' */
+/* strength loss, may kill you; cause may be poison or monster like 'a' */
 void
 losestr(int num, const char *knam, schar k_format)
 {
     int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
-    int ustr = ABASE(A_STR) - num;
+    int ustr = ABASE(A_STR) - num, amt, dmg;
 
-    /* in case HP loss kills the hero once Str hits the minimum */
-    if (!knam || !*knam) {
-        knam = "terminal frailty";
-        k_format = KILLED_BY;
-    }
-
+    dmg = 0;
     while (ustr < ATTRMIN(A_STR)) {
         ++ustr;
         --num;
-        losehp(6, knam, k_format);
+        amt = rn1(4, 3); /* (0..(4-1))+3 => 3..6; used to use flat 6 here */
+        dmg += amt;
         if (Upolyd) {
-            u.mhmax -= 6;
+            u.mhmax -= min(amt, u.mhmax - 1);
         } else {
-            setuhpmax(u.uhpmax - 6);
+            setuhpmax(u.uhpmax - amt);
         }
         g.context.botl = TRUE;
     }
+    if (dmg) {
+        /* in case damage is fatal and caller didn't supply killer reason */
+        if (!knam || !*knam) {
+            knam = "terminal frailty";
+            k_format = KILLED_BY;
+        }
+        losehp(dmg, knam, k_format);
+    }
+
     if (u.uhpmax < uhpmin) {
         setuhpmax(min(olduhpmax, uhpmin));
         if (!Drain_resistance)
