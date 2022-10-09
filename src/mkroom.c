@@ -1041,7 +1041,7 @@ invalid_shop_shape(struct mkroom *sroom)
     coordxy x, y;
     coordxy doorx = g.doors[sroom->fdoor].x;
     coordxy doory = g.doors[sroom->fdoor].y;
-    coordxy insidex, insidey, insidect = 0;
+    coordxy insidex = 0, insidey = 0, insidect = 0;
 
     /* First, identify squares inside the room and next to the door. */
     for (x = max(doorx - 1, sroom->lx);
