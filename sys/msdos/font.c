@@ -21,7 +21,7 @@ load_font(const char *filename)
     uint32 magic;
     uint32 version;
     uint32 headersize;
-    uint32 flags;
+    uint32 fontflags;
     uint32 length;
     uint32 charsize;
     uint32 height;
@@ -43,7 +43,7 @@ load_font(const char *filename)
     if (version != 0) goto error;
     headersize = read_u32(header +  8);
     if (headersize < sizeof(header)) goto error;
-    flags      = read_u32(header + 12);
+    fontflags  = read_u32(header + 12);
     length     = read_u32(header + 16);
     charsize   = read_u32(header + 20);
     height     = read_u32(header + 24);
@@ -77,7 +77,7 @@ load_font(const char *filename)
         fseek(fp, charsize - memsize, SEEK_CUR);
     }
 
-    if (flags & 0x01) {
+    if (fontflags & 0x01) {
         /* Read the Unicode table */
         char buf[128], buf2[128+1];
         unsigned bufsize, strsize;
