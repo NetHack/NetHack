@@ -373,10 +373,12 @@ vga_xputg(const glyph_info *glyphinfo)
     int attr;
     int ry;
 
+#ifdef ENHANCED_SYMBOLS
     if (psf_font != NULL && SYMHANDLING(H_UTF8) && glyphinfo->gm.u
             && glyphinfo->gm.u->utf8str) {
         ch = glyphinfo->gm.u->utf32ch;
     }
+#endif
 
     /* If statue glyph, map to the generic statue */
 #if 0

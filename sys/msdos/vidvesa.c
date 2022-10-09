@@ -679,6 +679,7 @@ vesa_xputg(const glyph_info *glyphinfo)
     uint32_t attr = (g_attribute == 0) ? attrib_gr_normal : g_attribute;
     int ry;
 
+#ifdef ENHANCED_SYMBOLS
     if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
         ch = glyphinfo->gm.u->utf32ch;
         if (vesa_pixel_size > 8 && glyphinfo->gm.u->ucolor != 0) {
@@ -687,6 +688,7 @@ vesa_xputg(const glyph_info *glyphinfo)
             attr = glyphinfo->gm.u->ucolor | 0x80000000;
         }
     }
+#endif
 
     row = currow;
     col = curcol;
@@ -1075,9 +1077,11 @@ vesa_Init(void)
     vesa_SwitchMode(vesa_mode);
     vesa_SetViewPort();
     windowprocs.win_cliparound = vesa_cliparound;
+#ifdef ENHANCED_SYMBOLS
     if (vesa_pixel_size > 8) {
         windowprocs.wincap2 |= WC2_U_24BITCOLOR;
     }
+#endif
 #ifdef USE_TILES
     paletteptr = get_palette();
     iflags.tile_view = TRUE;
