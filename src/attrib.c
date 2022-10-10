@@ -223,27 +223,38 @@ losestr(int num, const char *knam, schar k_format)
         --num;
         amt = rn1(4, 3); /* (0..(4-1))+3 => 3..6; used to use flat 6 here */
         dmg += amt;
-        if (Upolyd) {
-            u.mhmax -= min(amt, u.mhmax - 1);
-        } else {
-            setuhpmax(u.uhpmax - amt);
-        }
-        g.context.botl = TRUE;
     }
     if (dmg) {
+        boolean waspolyd = Upolyd;
+
         /* in case damage is fatal and caller didn't supply killer reason */
         if (!knam || !*knam) {
             knam = "terminal frailty";
             k_format = KILLED_BY;
         }
         losehp(dmg, knam, k_format);
-    }
 
-    if (u.uhpmax < uhpmin) {
+        if (Upolyd) {
+            /* if still polymorhed, reduce you-as-monst maxHP; never below 1 */
+            u.mhmax -= min(dmg, u.mhmax - 1);
+        } else if (waspolyd) {
+            ; /* rehumanization was triggered; don't reduce no-polyd HP */
+        } else {
+            /* not polymorphed; reduce max HP, but not below below uhpmin */
+            if (u.uhpmax > uhpmin)
+                setuhpmax(max(u.uhpmax - dmg, uhpmin));
+        }
+        g.context.botl = TRUE;
+    }
+#if 0   /* only possible if uhpmax was already less than uhpmin */
+    if (!Upolyd && u.uhpmax < uhpmin) {
         setuhpmax(min(olduhpmax, uhpmin));
         if (!Drain_resistance)
             losexp(NULL); /* won't be fatal when no 'drainer' is supplied */
     }
+#else
+    nhUse(olduhpmax);
+#endif
     (void) adjattrib(A_STR, -num, 1);
 }
 
