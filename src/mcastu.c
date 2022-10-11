@@ -42,8 +42,7 @@ static int m_cure_self(struct monst *, int);
 static void cast_wizard_spell(struct monst *, int, int);
 static void cast_cleric_spell(struct monst *, int, int);
 static boolean is_undirected_spell(unsigned int, int);
-static boolean
-spell_would_be_useless(struct monst *, unsigned int, int);
+static boolean spell_would_be_useless(struct monst *, unsigned int, int);
 
 /* feedback when frustrated monster couldn't cast a spell */
 static void
@@ -173,10 +172,11 @@ choose_clerical_spell(int spellnum)
  * 0: unsuccessful spell
  */
 int
-castmu(register struct monst *mtmp,
-       register struct attack *mattk,
-       boolean thinks_it_foundyou,
-       boolean foundyou)
+castmu(
+    register struct monst *mtmp,   /* caster */
+    register struct attack *mattk, /* caster's current attack */
+    boolean thinks_it_foundyou,    /* might be mistaken if displaced */
+    boolean foundyou)              /* knows hero's precise location */
 {
     int dmg, ml = mtmp->m_lev;
     int ret;
@@ -347,6 +347,7 @@ m_cure_self(struct monst *mtmp, int dmg)
 void
 touch_of_death(void)
 {
+    static const char touchodeath[] = "touch of death";
     int dmg = 50 + d(8, 6);
     int drain = dmg / 2;
 
@@ -354,15 +355,18 @@ touch_of_death(void)
 
     if (drain >= u.uhpmax) {
         g.killer.format = KILLED_BY_AN;
-        Strcpy(g.killer.name, "touch of death");
+        Strcpy(g.killer.name, touchodeath);
         done(DIED);
     } else {
         u.uhpmax -= drain;
-        losehp(dmg, "touch of death", KILLED_BY_AN);
+        losehp(dmg, touchodeath, KILLED_BY_AN);
     }
 }
 
-/* monster wizard and cleric spellcasting functions */
+/*
+ * Monster wizard and cleric spellcasting functions.
+ */
+
 /*
    If dmg is zero, then the monster is not casting at you.
    If the monster is intentionally not casting at you, we have previously
@@ -463,6 +467,8 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         } else {
             You("suddenly feel weaker!");
             dmg = mtmp->m_lev - 6;
+            if (dmg < 1) /* paranoia since only chosen when m_lev is high */
+                dmg = 1;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
             losestr(rnd(dmg), (const char *) 0, 0);
@@ -615,7 +621,8 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
             if (!enexto(&bypos, mtmp->mux, mtmp->muy, mtmp->data))
                 break;
             if ((pm = mkclass(let, 0)) != 0
-                && (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY|MM_NOMSG)) != 0) {
+                && (mtmp2 = makemon(pm, bypos.x, bypos.y, MM_ANGRY | MM_NOMSG))
+                   != 0) {
                 success = TRUE;
                 mtmp2->msleeping = mtmp2->mpeaceful = mtmp2->mtame = 0;
                 set_malign(mtmp2);
@@ -678,6 +685,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
             int num_eyes = eyecount(g.youmonst.data);
+
             pline("Scales cover your %s!", (num_eyes == 1)
                                                ? body_part(EYE)
                                                : makeplural(body_part(EYE)));
@@ -694,17 +702,16 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
             monstseesu(M_SEEN_MAGR);
             if (g.multi >= 0)
                 You("stiffen briefly.");
-            nomul(-1);
-            g.multi_reason = "paralyzed by a monster";
+            dmg = 1; /* to produce nomul(-1), not actual damage */
         } else {
             if (g.multi >= 0)
                 You("are frozen in place!");
             dmg = 4 + (int) mtmp->m_lev;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
-            nomul(-dmg);
-            g.multi_reason = "paralyzed by a monster";
         }
+        nomul(-dmg);
+        g.multi_reason = "paralyzed by a monster";
         g.nomovemsg = 0;
         dmg = 0;
         break;

@@ -216,7 +216,12 @@ losestr(int num, const char *knam, schar k_format)
 {
     int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
     int ustr = ABASE(A_STR) - num, amt, dmg;
+    boolean waspolyd = Upolyd;
 
+    if (num <= 0 || ABASE(A_STR) < ATTRMIN(A_STR)) {
+        impossible("losestr: %d - %d", ABASE(A_STR), num);
+        return;
+    }
     dmg = 0;
     while (ustr < ATTRMIN(A_STR)) {
         ++ustr;
@@ -225,8 +230,6 @@ losestr(int num, const char *knam, schar k_format)
         dmg += amt;
     }
     if (dmg) {
-        boolean waspolyd = Upolyd;
-
         /* in case damage is fatal and caller didn't supply killer reason */
         if (!knam || !*knam) {
             knam = "terminal frailty";
@@ -237,10 +240,9 @@ losestr(int num, const char *knam, schar k_format)
         if (Upolyd) {
             /* if still polymorhed, reduce you-as-monst maxHP; never below 1 */
             u.mhmax -= min(dmg, u.mhmax - 1);
-        } else if (waspolyd) {
-            ; /* rehumanization was triggered; don't reduce no-polyd HP */
-        } else {
-            /* not polymorphed; reduce max HP, but not below below uhpmin */
+        } else if (!waspolyd) {
+            /* not polymorphed now and didn't rehumanize when taking damage;
+               reduce max HP, but not below below uhpmin */
             if (u.uhpmax > uhpmin)
                 setuhpmax(max(u.uhpmax - dmg, uhpmin));
         }
@@ -255,7 +257,10 @@ losestr(int num, const char *knam, schar k_format)
 #else
     nhUse(olduhpmax);
 #endif
-    (void) adjattrib(A_STR, -num, 1);
+    /* 'num' chould have been reduced to 0 in the minimum strength loop;
+       '(Upolyd || !waspolyd)' is True unless damage caused rehumanization */
+    if (num > 0 && (Upolyd || !waspolyd))
+        (void) adjattrib(A_STR, -num, 1);
 }
 
 /* combined strength loss and damage from some poisons */
