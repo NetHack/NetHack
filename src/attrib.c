@@ -308,11 +308,12 @@ poisontell(int typ,         /* which attribute */
 
 /* called when an attack or trap has poisoned hero (used to be in mon.c) */
 void
-poisoned(const char *reason,    /* controls what messages we display */
-         int typ,
-         const char *pkiller,   /* for score+log file if fatal */
-         int fatal,             /* if fatal is 0, limit damage to adjattrib */
-         boolean thrown_weapon) /* thrown weapons are less deadly */
+poisoned(
+    const char *reason,    /* controls what messages we display */
+    int typ,
+    const char *pkiller,   /* for score+log file if fatal */
+    int fatal,             /* if fatal is 0, limit damage to adjattrib */
+    boolean thrown_weapon) /* thrown weapons are less deadly */
 {
     int i, loss, kprefix = KILLED_BY_AN;
     boolean blast = !strcmp(reason, "blast");
