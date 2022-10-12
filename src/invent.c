@@ -4496,20 +4496,21 @@ doprgold(void)
     long hmoney = hidden_gold(FALSE);
 
     if (Verbose(1, doprgold)) {
-        if (!umoney && !hmoney)
-            Your("wallet is empty.");
-        else if (umoney && !hmoney)
-            Your("wallet contains %ld %s.", umoney, currency(umoney));
-        else if (!umoney && hmoney)
-            Your("wallet is empty, but there %s %ld %s stashed away in "
-                 "your pack.",
-                 (hmoney == 1) ?  "is" : "are",
-                 hmoney, currency(hmoney));
-        else if (umoney && hmoney)
-            Your("wallet contains %ld %s, and there %s %ld more stashed "
-                 "away in your pack.", umoney, currency(umoney),
-                 (hmoney == 1) ? "is" : "are",
-                 hmoney);
+        char buf[BUFSZ];
+
+        if (!umoney) {
+            Strcpy(buf, "Your wallet is empty");
+        } else {
+            Sprintf(buf, "Your wallet contains %ld %s",
+                    umoney, currency(umoney));
+        }
+        if (hmoney) {
+            Sprintf(eos(buf),
+                    ", %s you have %ld %s stashed away in your pack",
+                    umoney ? "and" : "but", hmoney,
+                    umoney ? "more" : currency(hmoney));
+        }
+        pline("%s.", buf);
     } else {
         long total = umoney + hmoney;
         if (total)
