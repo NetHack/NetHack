@@ -260,14 +260,16 @@ cause_known(
 
 /* format a characteristic value, accommodating Strength's strangeness */
 static char *
-attrval(int attrindx, int attrvalue,
-        char resultbuf[]) /* should be at least [7] to hold "18/100\0" */
+attrval(
+    int attrindx,
+    int attrvalue,
+    char resultbuf[]) /* should be at least [7] to hold "18/100\0" */
 {
     if (attrindx != A_STR || attrvalue <= 18)
         Sprintf(resultbuf, "%d", attrvalue);
     else if (attrvalue > STR18(100)) /* 19 to 25 */
         Sprintf(resultbuf, "%d", attrvalue - 100);
-    else /* simplify "18/ **" to be "18/100" */
+    else /* simplify "18/\**" to be "18/100" */
         Sprintf(resultbuf, "18/%02d", attrvalue - 18);
     return resultbuf;
 }
