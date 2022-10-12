@@ -101,3 +101,6 @@ end
 for i = 1, 4 do
    des.monster("xorn", spacelocs:rndcoord(1))
 end
+-- next to leader, so possibly tricky to pick up if not ready for quest yet;
+-- there's no protection against a xorn eating these tins; BUC state is random
+des.object({ id="tin", coord = {29, 9}, quantity=2, montype="spinach" })

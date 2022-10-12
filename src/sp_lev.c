@@ -3551,12 +3551,22 @@ lspo_object(lua_State *L)
         || tmpobj.id == CORPSE || tmpobj.id == TIN
         || tmpobj.id == FIGURINE) {
         struct permonst *pm = NULL;
+        boolean nonpmobj = FALSE;
         int i;
         char *montype = get_table_str_opt(L, "montype", NULL);
 
         if (montype) {
-            if (strlen(montype) == 1
-                && def_char_to_monclass(*montype) != MAXMCLASSES) {
+            if ((tmpobj.id == TIN && (!strcmpi(montype, "spinach")
+                /* id="tin",montype="empty" produces an empty tin */
+                                      || !strcmpi(montype, "empty")))
+                /* id="egg",montype="empty" produces a generic, unhatchable
+                   egg rather than an "empty egg" */
+                || (tmpobj.id == EGG && !strcmpi(montype, "empty"))) {
+                tmpobj.corpsenm = NON_PM;
+                tmpobj.spe = !strcmpi(montype, "spinach") ? 1 : 0;
+                nonpmobj = TRUE;
+            } else if (strlen(montype) == 1
+                       && def_char_to_monclass(*montype) != MAXMCLASSES) {
                 pm = mkclass(def_char_to_monclass(*montype),
                              G_NOGEN | G_IGNORE);
             } else {
@@ -3573,7 +3583,7 @@ lspo_object(lua_State *L)
             free((genericptr_t) montype);
             if (pm)
                 tmpobj.corpsenm = monsndx(pm);
-            else
+            else if (!nonpmobj)
                 nhl_error(L, "Unknown montype");
         }
         if (tmpobj.id == STATUE || tmpobj.id == CORPSE) {
@@ -3588,7 +3598,7 @@ lspo_object(lua_State *L)
             tmpobj.spe = lflags;
         } else if (tmpobj.id == EGG) {
             tmpobj.spe = get_table_boolean_opt(L, "laid_by_you", 0) ? 1 : 0;
-        } else {
+        } else if (!nonpmobj) { /* tmpobj.spe is already set for nonpmobj */
             tmpobj.spe = 0;
         }
     }
