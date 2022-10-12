@@ -40,10 +40,8 @@ struct attribs {
     schar a[A_MAX];
 };
 
-#define ATTRMAX(x)                                        \
-    ((x == A_STR && Upolyd && strongmonst(g.youmonst.data)) \
-         ? STR18(100)                                     \
-         : g.urace.attrmax[x])
+#define ATTRMAX(x) \
+    ((x == A_STR && Upolyd) ? uasmon_maxStr() : g.urace.attrmax[x])
 #define ATTRMIN(x) (g.urace.attrmin[x])
 
 #endif /* ATTRIB_H */
