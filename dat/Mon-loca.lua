@@ -57,6 +57,14 @@ des.object()
 des.object()
 des.object()
 des.object()
+-- since vegetarian monks shouldn't eat giant corpses, give a chance for
+-- Str boost that isn't throttled by exercise restrictions;
+-- make a modest effort (Elbereth only) to prevent xorns from eating the tins
+local tinplace = selection.negate():filter_mapchar('.')
+local tinloc = tinplace:rndcoord(0)
+des.object({ id="tin", coord=tinloc, quantity=2, buc="blessed",
+             montype="spinach" })
+des.engraving({ coord=tinloc, type="burn", text="Elbereth" })
 -- Random traps
 des.trap()
 des.trap()

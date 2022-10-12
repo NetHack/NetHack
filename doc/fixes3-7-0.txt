@@ -1856,6 +1856,7 @@ rudimentary key rebinding in game options
 experimental #saveoptions command to allow saving configuration settings
 mouse buttons can be bound to extended commands
 hero poly'd into purple worm can gain intrinsics from digesting whole monster
+add some tins of spinach to monk's quest (vegan => no Str from giant corpses)
 
 
 Platform- and/or Interface-Specific New Features
