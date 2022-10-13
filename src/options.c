@@ -792,9 +792,6 @@ optfn_autounlock(
                     || fuzzymatch(op, unlocktypes[i][0], " -_", TRUE)) {
                     matched = TRUE;
                     switch (*op) {
-                    case 'n':
-                        negated = TRUE;
-                        break;
                     case 'u':
                         newflags |= AUTOUNLOCK_UNTRAP;
                         break;
