@@ -1410,6 +1410,8 @@ tipping contents of one container directly into another allowed transferring
 prevent random traps from being created inside the shops in the tourist quest
 if hero's steed got hit by knockback effect, impossible "no monster to remove"
 	would occur (plus more warnings if 'sanity_check' was On)
+the #saveoptions command included options changed via doset_simple() but not
+	ones changed via full doset()
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

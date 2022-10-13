@@ -4879,8 +4879,8 @@ handler_autounlock(int optidx)
         free((genericptr_t) window_pick);
     } else if (n == 0) { /* nothing was picked but menu wasn't cancelled */
         /* something that was preselected got unselected, leaving nothing;
-           treat that as picking 'none' (even though 'none' might be what
-           got unselected) */
+           treat that as picking 'none' (even though 'none' is no longer
+           among the choices) */
         flags.autounlock = 0;
     }
     destroy_nhwindow(tmpwin);
@@ -5703,8 +5703,8 @@ handler_verbose(int optidx)
                 flags.verbose = !flags.verbose;
             } else {
                 Sprintf(buf,
-                    "Set verbose_suppressor[%d] (%ld) to what new decimal value ?",
-                    j, verbosity_suppressions[j]);
+               "Set verbose_suppressor[%d] (%ld) to what new decimal value ?",
+                        j, verbosity_suppressions[j]);
                 abuf[0] = '\0';
                 getlin(buf, abuf);
                 if (abuf[0] == '\033')
@@ -8330,6 +8330,9 @@ doset(void) /* changing options via menu by Per Liboriussen */
                     reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler,
                                                FALSE, empty_optstr,
                                                empty_optstr);
+                    /* if player eventually saves options, include this one */
+                    if (reslt == optn_ok)
+                        opt_set_in_config[k] = TRUE;
                 } else {
                     char abuf[BUFSZ];
 
@@ -8992,7 +8995,8 @@ all_options_strbuf(strbuf_t *sbuf)
                - verbose */
             buf2 = get_option_value(name, TRUE);
             if (buf2) {
-                Sprintf(tmp, "OPTIONS=%s:%s\n", name, buf2);
+                Snprintf(tmp, sizeof tmp - 1, "OPTIONS=%s:%s", name, buf2);
+                Strcat(tmp, "\n"); /* guaranteed to fit */
                 strbuf_append(sbuf, tmp);
             }
             break;
