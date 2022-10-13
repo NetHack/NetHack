@@ -2000,11 +2000,13 @@ do_write_config_file(void)
         wait_synch();
         pline("Some settings are not saved!");
         wait_synch();
-        pline("All manual customization and comments are removed from the file!");
+        pline(
+           "All manual customization and comments are removed from the file!");
         wait_synch();
     }
 #define overwrite_prompt "Overwrite config file %.*s?"
-    Sprintf(tmp, overwrite_prompt, (int)(BUFSZ - sizeof overwrite_prompt - 2), configfile);
+    Sprintf(tmp, overwrite_prompt,
+            (int) (BUFSZ - sizeof overwrite_prompt - 2), configfile);
 #undef overwrite_prompt
     if (!paranoid_query(TRUE, tmp))
         return ECMD_OK;
@@ -2021,7 +2023,8 @@ do_write_config_file(void)
         fclose(fp);
         strbuf_empty(&buf);
         if (wrote != len)
-            pline("An error occurred, wrote only partial data (%lu/%lu).", wrote, len);
+            pline("An error occurred, wrote only partial data (%lu/%lu).",
+                  wrote, len);
     }
     return ECMD_OK;
 }
