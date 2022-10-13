@@ -8240,23 +8240,11 @@ doset(void) /* changing options via menu by Per Liboriussen */
              "Compounds (selecting will prompt for new value):",
              MENU_ITEMFLAGS_NONE);
 
-    /* deliberately put playmode, name, role+race+gender+align first */
-    doset_add_menu(tmpwin, "playmode", fmtstr_doset, opt_playmode, 0);
-    doset_add_menu(tmpwin, "name", fmtstr_doset, opt_name, 0);
-    doset_add_menu(tmpwin, "role", fmtstr_doset, opt_role, 0);
-    doset_add_menu(tmpwin, "race", fmtstr_doset, opt_race, 0);
-    doset_add_menu(tmpwin, "gender", fmtstr_doset, opt_gender, 0);
-    doset_add_menu(tmpwin, "align", fmtstr_doset, opt_align, 0);
-
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
             if (allopt[i].opttyp != CompOpt)
                 continue;
             if ((int) allopt[i].setwhere == pass) {
-                if (!strcmp(name, "playmode")  || !strcmp(name, "name")
-                    || !strcmp(name, "role")   || !strcmp(name, "race")
-                    || !strcmp(name, "gender") || !strcmp(name, "align"))
-                    continue;
                 if ((is_wc_option(name) && !wc_supported(name))
                     || (is_wc2_option(name) && !wc2_supported(name)))
                     continue;

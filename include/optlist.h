@@ -93,11 +93,44 @@ static int optfn_##a(int, int, boolean, char *, char *);
 /* C:nm, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc */
 /* P:pfx, ln, opt_*, setwhere?, negateok?, valok?, dupok?, hndlr? Alias, desc*/
 
-    NHOPTB(acoustics, Advanced, 0, opt_out, set_in_game,
-                On, Yes, No, No, NoAlias, &flags.acoustics)
+    /*
+     * Most of the options are in alphabetical order; a few are forced
+     * to the top of list so that doset() will list them first and
+     * all_options_str() with gather then first to write to the top of
+     * a new RC file by #saveoptions.
+     *
+     * windowtype comes first because its value can affect how wc_ and
+     * wc2_ options are processed; playmode (for players who can't or
+     * don't know how to specify a command line) and name (ditto, more
+     * or less) come next; then role, race, gender, align.  Those will
+     * be at the top of the file for #saveoptions constructed RC file.
+     */
+    NHOPTC(windowtype, Advanced, WINTYPELEN, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "windowing system to use (should be specified first)")
+    NHOPTC(playmode, Advanced, 8, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "normal play, non-scoring explore mode, or debug mode")
+    NHOPTC(name, Advanced, PL_NSIZ, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "your character's name (e.g., name:Merlin-W)")
+    NHOPTC(role, Advanced, PL_CSIZ, opt_in, set_gameview,
+                No, Yes, No, No, "character",
+                "your starting role (e.g., Barbarian, Valkyrie)")
+    NHOPTC(race, Advanced, PL_CSIZ, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "your starting race (e.g., Human, Elf)")
+    NHOPTC(gender, Advanced, 8, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "your starting gender (male or female)")
     NHOPTC(align, Advanced, 8, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "your starting alignment (lawful, neutral, or chaotic)")
+    /* end of special ordering; remainder of entries are in alphabetical order
+     */
+    NHOPTB(acoustics, Advanced, 0, opt_out, set_in_game,
+                On, Yes, No, No, NoAlias, &flags.acoustics)
+ /* NHOPTC(align) -- moved to top */
     NHOPTC(align_message, Advanced, 20, opt_in, set_gameview,
                 Yes, Yes, No, Yes, NoAlias, "message window alignment")
     NHOPTC(align_status, Advanced, 20, opt_in, set_gameview,
@@ -236,9 +269,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias, "name of a fruit you enjoy eating")
     NHOPTB(fullscreen, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, NoAlias, &iflags.wc2_fullscreen)
-    NHOPTC(gender, Advanced, 8, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
-                "your starting gender (male or female)")
+ /* NHOPTC(gender) -- moved to top */
     NHOPTC(glyph, Advanced, 40, opt_in, set_in_game,
                 No, Yes, Yes, No, NoAlias,
                 "set representation of a glyph to a unicode value and color")
@@ -383,9 +414,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(msghistory, Advanced, 5, opt_in, set_gameview,
                 Yes, Yes, No, No, NoAlias,
                 "number of top line messages to save")
-    NHOPTC(name, Advanced, PL_NSIZ, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
-                "your character's name (e.g., name:Merlin-W)")
+ /* NHOPTC(name) -- moved to top */
 #ifdef NEWS
     NHOPTB(news, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, NoAlias, &iflags.news)
@@ -442,9 +471,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(player_selection, Advanced, 12, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "choose character via dialog or prompts")
-    NHOPTC(playmode, Advanced, 8, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
-                "normal play, non-scoring explore mode, or debug mode")
+ /* NHOPTC(playmode) -- moved to top */
     NHOPTB(popup_dialog, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &iflags.wc_popup_dialog)
     NHOPTB(preload_tiles, Advanced, 0, opt_out, set_in_config, /* MSDOS only */
@@ -453,9 +480,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 Off, Yes, No, No, NoAlias, &flags.pushweapon)
     NHOPTB(quick_farsight, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &flags.quick_farsight)
-    NHOPTC(race, Advanced, PL_CSIZ, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
-                "your starting race (e.g., Human, Elf)")
+ /* NHOPTC(race) -- moved to top */
 #ifdef MICRO
     NHOPTB(rawio, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, NoAlias, &iflags.rawio)
@@ -468,9 +493,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(roguesymset, Advanced, 70, opt_in, set_in_game,
                 No, Yes, No, Yes, NoAlias,
                 "load a set of rogue display symbols from symbols file")
-    NHOPTC(role, Advanced, PL_CSIZ, opt_in, set_gameview,
-                No, Yes, No, No, "character",
-                "your starting role (e.g., Barbarian, Valkyrie)")
+ /* NHOPTC(role) -- moved to top */
     NHOPTC(runmode, Advanced, sizeof "teleport", opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
                 "display frequency when `running' or `travelling'")
@@ -650,9 +673,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(windowcolors, Advanced, 80, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "the foreground/background colors of windows")
-    NHOPTC(windowtype, Advanced, WINTYPELEN, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
-                "windowing system to use (should be specified first)")
+ /* NHOPTC(windowtype) -- moved to top */
     NHOPTB(wizmgender, Advanced, 0, opt_in, set_wizonly,
                 Off, Yes, No, No, NoAlias, &iflags.wizmgender)
     NHOPTB(wizweight, Advanced, 0, opt_in, set_wizonly,
