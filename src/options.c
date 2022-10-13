@@ -193,7 +193,6 @@ static NEARDATA const char *msgwind[][3] = { /* 'msg_window' settings */
 #endif
 /* autounlock settings */
 static NEARDATA const char *unlocktypes[][2] = {
-    { "none",      "" },
     { "untrap",    "(might fail)" },
     { "apply-key", "" },
     { "kick",      "(doors only)" },
@@ -776,18 +775,22 @@ optfn_autounlock(
         newflags = 0;
         sep = index(op, '+') ? '+' : ' ';
         while (op) {
+            boolean matched = FALSE;
             op = trimspaces(op); /* might have leading space */
             if ((nxt = index(op, sep)) != 0) {
                 *nxt++ = '\0';
                 op = trimspaces(op); /* might have trailing space after
                                       * plus sign removal */
             }
-            for (i = 0; i < SIZE(unlocktypes); ++i)
-                if (!strncmpi(op, unlocktypes[i][0], Strlen(op))
+            if (str_start_is("none", op, TRUE))
+                negated = TRUE, matched = TRUE;
+            for (i = 0; i < SIZE(unlocktypes) && !matched; ++i) {
+                if (str_start_is(unlocktypes[i][0], op, TRUE)
                     /* fuzzymatch() doesn't match leading substrings but
                        this allows "apply_key" and "applykey" to match
                        "apply-key"; "apply key" too if part of foo+bar */
                     || fuzzymatch(op, unlocktypes[i][0], " -_", TRUE)) {
+                    matched = TRUE;
                     switch (*op) {
                     case 'n':
                         negated = TRUE;
@@ -805,11 +808,16 @@ optfn_autounlock(
                         newflags |= AUTOUNLOCK_FORCE;
                         break;
                     default:
-                        config_error_add("Invalid value for \"%s\": \"%s\"",
-                                         allopt[optidx].name, op);
-                        return optn_silenterr;
+                        matched = FALSE;
+                        break;
                     }
                 }
+            }
+            if (!matched) {
+                config_error_add("Invalid value for \"%s\": \"%s\"",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            }
             op = nxt;
         }
         if (negated && newflags != 0) {
@@ -832,13 +840,13 @@ optfn_autounlock(
 
             *opts = '\0';
             if (flags.autounlock & AUTOUNLOCK_UNTRAP)
-                Sprintf(eos(opts), "%s%s", p, unlocktypes[1][0]), p = plus;
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[0][0]), p = plus;
             if (flags.autounlock & AUTOUNLOCK_APPLY_KEY)
-                Sprintf(eos(opts), "%s%s", p, unlocktypes[2][0]), p = plus;
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[1][0]), p = plus;
             if (flags.autounlock & AUTOUNLOCK_KICK)
-                Sprintf(eos(opts), "%s%s", p, unlocktypes[3][0]), p = plus;
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[2][0]), p = plus;
             if (flags.autounlock & AUTOUNLOCK_FORCE)
-                Sprintf(eos(opts), "%s%s", p, unlocktypes[4][0]); /*no more p*/
+                Sprintf(eos(opts), "%s%s", p, unlocktypes[3][0]); /*no more p*/
         }
         return optn_ok;
     }
@@ -4856,38 +4864,21 @@ handler_autounlock(int optidx)
     for (i = 0; i < SIZE(unlocktypes); ++i) {
         Sprintf(buf, "%-10.10s%c%.40s",
                 unlocktypes[i][0], sep, unlocktypes[i][1]);
-        presel = !i ? !flags.autounlock : (flags.autounlock & (1 << (i - 1)));
+        presel = (flags.autounlock & (1 << i));
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, *unlocktypes[i][0], 0,
                  ATR_NONE, clr, buf,
-                 ((presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE)
-                  | (!i ? MENU_ITEMFLAGS_SKIPINVERT : 0)));
+                 (presel ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE));
     }
     Sprintf(buf, "Select '%.20s' actions:", optname);
     end_menu(tmpwin, buf);
     n = select_menu(tmpwin, PICK_ANY, &window_pick);
     if (n > 0) {
-        int k;
-        boolean wasnone = !flags.autounlock;
-        unsigned newflags = 0, noflags = 0;
+        unsigned newflags = 0;
 
-        for (i = 0; i < n; ++i) {
-            k = window_pick[i].item.a_int - 1;
-            if (k)
-                newflags |= (1 << (k - 1));
-            else
-                noflags = 1;
-        }
-        /* wasnone: 'none' is preselected;
-           !wasnone: don't force it to be unselected */
-        if (newflags && noflags && !wasnone) {
-            config_error_add(
-                     "Invalid value combination for \"%s\": 'none' with some",
-                             optname);
-            res = optn_silenterr;
-        } else {
-            flags.autounlock = newflags;
-        }
+        for (i = 0; i < n; ++i)
+            newflags |= (1 << (window_pick[i].item.a_int - 1));
+        flags.autounlock = newflags;
         free((genericptr_t) window_pick);
     } else if (n == 0) { /* nothing was picked but menu wasn't cancelled */
         /* something that was preselected got unselected, leaving nothing;
