@@ -17,7 +17,7 @@
 #endif
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 static int wiz_display_macros(void);
-static int wiz_check_mdifficulty(void);
+static int wiz_mon_diff(void);
 #endif
 
 #ifdef DUMB /* stuff commented out in extern.h, but needed here */
@@ -2757,8 +2757,6 @@ struct ext_func_tab extcmdlist[] = {
     { C('e'), "wizdetect", "reveal hidden things within a small radius",
               wiz_detect, IFBURIED | WIZMODECMD, NULL },
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-    { '\0',   "wizcheckmdifficulty", "validate the difficulty levels of monsters",
-              wiz_check_mdifficulty, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizdispmacros", "validate the display macro ranges",
               wiz_display_macros, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
 #endif
@@ -2783,6 +2781,10 @@ struct ext_func_tab extcmdlist[] = {
               wiz_makemap, IFBURIED | WIZMODECMD, NULL },
     { C('f'), "wizmap", "map the level",
               wiz_map, IFBURIED | WIZMODECMD, NULL },
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+    { '\0',   "wizmondiff", "validate the difficulty ratings of monsters",
+              wiz_mon_diff, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+#endif
     { '\0',   "wizrumorcheck", "verify rumor boundaries",
               wiz_rumor_check, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizseenv", "show map locations' seen vectors",
@@ -3695,8 +3697,12 @@ count_obj(struct obj *chain, long *total_count, long *total_size,
 DISABLE_WARNING_FORMAT_NONLITERAL  /* RESTORE_WARNING follows show_wiz_stats */
 
 static void
-obj_chain(winid win, const char *src, struct obj *chain, boolean force,
-          long *total_count, long *total_size)
+obj_chain(
+    winid win,
+    const char *src,
+    struct obj *chain,
+    boolean force,
+    long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0L, size = 0L;
@@ -3712,8 +3718,11 @@ obj_chain(winid win, const char *src, struct obj *chain, boolean force,
 }
 
 static void
-mon_invent_chain(winid win, const char *src, struct monst *chain,
-                 long *total_count, long *total_size)
+mon_invent_chain(
+    winid win,
+    const char *src,
+    struct monst *chain,
+    long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0, size = 0;
@@ -3731,8 +3740,10 @@ mon_invent_chain(winid win, const char *src, struct monst *chain,
 }
 
 static void
-contained_stats(winid win, const char *src, long *total_count,
-                long *total_size)
+contained_stats(
+    winid win,
+    const char *src,
+    long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count = 0, size = 0;
@@ -3785,8 +3796,12 @@ size_monst(struct monst *mtmp, boolean incl_wsegs)
 }
 
 static void
-mon_chain(winid win, const char *src, struct monst *chain,
-          boolean force, long *total_count, long *total_size)
+mon_chain(
+    winid win,
+    const char *src,
+    struct monst *chain,
+    boolean force,
+    long *total_count, long *total_size)
 {
     char buf[BUFSZ];
     long count, size;
@@ -3808,7 +3823,9 @@ mon_chain(winid win, const char *src, struct monst *chain,
 }
 
 static void
-misc_stats(winid win, long *total_count, long *total_size)
+misc_stats(
+    winid win,
+    long *total_count, long *total_size)
 {
     char buf[BUFSZ], hdrbuf[QBUFSZ];
     long count, size;
@@ -4010,6 +4027,8 @@ wiz_show_stats(void)
     return ECMD_OK;
 }
 
+RESTORE_WARNING_FORMAT_NONLITERAL
+
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 /* the #wizdispmacros command
  * Verify that some display macros are returning sane values */
@@ -4031,9 +4050,8 @@ wiz_display_macros(void)
             if (test == no_glyph) {
                 if (!trouble++)
                     putstr(win, 0, display_issues);
-                Sprintf(buf,
-                        "glyph_is_cmap() / glyph_to_cmap(glyph=%d)"
-                        " sync failure, returned NO_GLYPH (%d)",
+                Sprintf(buf, "glyph_is_cmap() / glyph_to_cmap(glyph=%d)"
+                             " sync failure, returned NO_GLYPH (%d)",
                         glyph, test);
                  putstr(win, 0, buf);
             }
@@ -4051,7 +4069,7 @@ wiz_display_macros(void)
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_cmap(glyph=%d) returns %d"
-                        " exceeds defsyms[%d] bounds (MAX_GLYPH = %d)",
+                             " exceeds defsyms[%d] bounds (MAX_GLYPH = %d)",
                         glyph, test, SIZE(defsyms), max_glyph);
                 putstr(win, 0, buf);
             }
@@ -4064,7 +4082,7 @@ wiz_display_macros(void)
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_mon(glyph=%d) returns %d"
-                        " exceeds mons[%d] bounds",
+                             " exceeds mons[%d] bounds",
                         glyph, test, NUMMONS);
                 putstr(win, 0, buf);
             }
@@ -4077,14 +4095,14 @@ wiz_display_macros(void)
                 if (!trouble++)
                     putstr(win, 0, display_issues);
                 Sprintf(buf, "glyph_to_obj(glyph=%d) returns %d"
-                        " exceeds objects[%d] bounds",
+                             " exceeds objects[%d] bounds",
                         glyph, test, NUM_OBJECTS);
                 putstr(win, 0, buf);
             }
         }
     }
     if (!trouble)
-        putstr(win, 0, "No display macro issues detected");
+        putstr(win, 0, "No display macro issues detected.");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;
@@ -4092,15 +4110,22 @@ wiz_display_macros(void)
 #endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
 
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-/* the #wizcheckmdifficulty command */
+/* the #wizmondiff command */
 static int
-wiz_check_mdifficulty(void)
+wiz_mon_diff(void)
 {
+    static const char window_title[] = "Review of monster difficulty ratings"
+                                       " [index:level]:";
     char buf[BUFSZ];
     winid win;
     int mhardcoded = 0, mcalculated = 0, trouble = 0, cnt = 0, mdiff = 0;
+    int mlev;
     struct permonst *ptr;
-    static const char *const window_title = "Review of monster difficulties:";
+
+    /*
+     * Possible extension:  choose between showing discrepancies,
+     * showing all monsters, or monsters within a particular class.
+     */
 
     win = create_nhwindow(NHW_TEXT);
     for (ptr = &mons[0]; ptr->mlet; ptr++, cnt++) {
@@ -4110,22 +4135,23 @@ wiz_check_mdifficulty(void)
         if (mdiff) {
             if (!trouble++)
                 putstr(win, 0, window_title);
+            mlev = (int) ptr->mlevel;
+            if (mlev > 50) /* hack for named demons */
+                mlev = 50;
             Snprintf(buf, sizeof buf,
-                     "%-18s [%4d]: calculated: %2d, hardcoded: %2d (%+d)",
-                     ptr->pmnames[NEUTRAL], cnt, mcalculated, mhardcoded,
-                     mdiff);
+                     "%-18s [%3d:%2d]: calculated: %2d, hardcoded: %2d (%+d)",
+                     ptr->pmnames[NEUTRAL], cnt, mlev,
+                     mcalculated, mhardcoded, mdiff);
             putstr(win, 0, buf);
 	}
     }
     if (!trouble)
-        putstr(win, 0, "No monster difficulty discrepencies were detected");
+        putstr(win, 0, "No monster difficulty discrepencies were detected.");
     display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
     return ECMD_OK;
 }
 #endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG) */
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 you_sanity_check(void)
