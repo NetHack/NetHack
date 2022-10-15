@@ -166,11 +166,11 @@ PDC_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
 			-Wno-missing-prototypes
 FONTVER = terminus-font-4.49.1
 FONTTOP = ../lib/$(FONTVER)
-FONTDIR = ../sys/msdos/fonts
-FONTTARGETS = $(FONTDIR)/ter-u16b.psf $(FONTDIR)/ter-u16v.psf \
-		$(FONTDIR)/ter-u18b.psf $(FONTDIR)/ter-u20b.psf \
-		$(FONTDIR)/ter-u22b.psf $(FONTDIR)/ter-u24b.psf \
-		$(FONTDIR)/ter-u28b.psf $(FONTDIR)/ter-u32b.psf
+DOSFONT = ../sys/msdos/fonts
+FONTTARGETS = $(DOSFONT)/ter-u16b.psf $(DOSFONT)/ter-u16v.psf \
+		$(DOSFONT)/ter-u18b.psf $(DOSFONT)/ter-u20b.psf \
+		$(DOSFONT)/ter-u22b.psf $(DOSFONT)/ter-u24b.psf \
+		$(DOSFONT)/ter-u28b.psf $(DOSFONT)/ter-u32b.psf
 LUABIN = ../lib/lua-$(LUA_VERSION)/src/lua
 LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
 override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations \
