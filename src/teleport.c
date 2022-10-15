@@ -40,7 +40,8 @@ noteleport_level(struct monst* mon)
 }
 
 /* this is an approximation of onscary() that doesn't use any 'struct monst'
-   fields aside from 'monst->data' */
+   fields aside from 'monst->data'; used primarily for new monster creation
+   and monster teleport destination, not for ordinary monster movement */
 static boolean
 goodpos_onscary(
     coordxy x, coordxy y,
@@ -60,10 +61,11 @@ goodpos_onscary(
     /* engraved Elbereth doesn't work in Gehennom or the end-game */
     if (Inhell || In_endgame(&u.uz))
         return FALSE;
-    /* creatures who don't (or can't) fear a written Elbereth */
+    /* creatures who don't (or can't) fear a written Elbereth and weren't
+       caught by the minions check */
     if (mptr == &mons[PM_MINOTAUR] || !haseyes(mptr))
         return FALSE;
-    return sengr_at("Elbereth", x, y, TRUE);
+    return sengr_at("Elbereth", x, y, TRUE) ? TRUE : FALSE;
 }
 
 /*

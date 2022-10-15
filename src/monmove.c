@@ -167,8 +167,10 @@ dochugw(
 }
 
 boolean
-onscary(coordxy x, coordxy y, struct monst* mtmp)
+onscary(coordxy x, coordxy y, struct monst *mtmp)
 {
+    struct engr *ep;
+
     /* creatures who are directly resistant to magical scaring:
      * humans aren't monsters
      * uniques have ascended their base monster instincts
@@ -208,14 +210,15 @@ onscary(coordxy x, coordxy y, struct monst* mtmp)
      * Elbereth doesn't work in Gehennom, the Elemental Planes, or the
      * Astral Plane; the influence of the Valar only reaches so far.
      */
-    return (sengr_at("Elbereth", x, y, TRUE)
-            && (u_at(x, y) || (Displaced && mtmp->mux == x && mtmp->muy == y))
+    return ((ep = sengr_at("Elbereth", x, y, TRUE)) != 0
+            && (u_at(x, y)
+                || (Displaced && mtmp->mux == x && mtmp->muy == y)
+                || (ep->guardobjects && vobj_at(x, y)))
             && !(mtmp->isshk || mtmp->isgd || !mtmp->mcansee
                  || mtmp->mpeaceful || mtmp->data->mlet == S_HUMAN
                  || mtmp->data == &mons[PM_MINOTAUR]
                  || Inhell || In_endgame(&u.uz)));
 }
-
 
 /* regenerate lost hit points */
 void
