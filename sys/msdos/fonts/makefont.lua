@@ -94,65 +94,81 @@ bwidth = nil
 glyph = nil
 bitmap = false
 
-if arg[2] == nil or arg[3] ~= nil then
-    io.stderr:write("Usage: " .. arg[0] .. " <input-bdf> <output-psf>\n")
+if #arg < 2 then
+    io.stderr:write("Usage: " .. arg[0] .. " <input-bdf> [<input-bdf>...] <output-psf>\n")
     os.exit(1)
 end
 
-fp = io.open(arg[1], "r")
+for inp = 1, #arg-1 do
 
-while true do
-    line = fp:read()
-    if (line == fail) then
-        break
+    fp = io.open(arg[inp], "r")
+    if fp == nil then
+        io.stderr:write("Could not open: " .. arg[inp] .. "\n")
+        os.exit(1)
     end
-    if start_with(line, 'FONTBOUNDINGBOX ') then
-        -- Width and height of a glyph
-        rec = split(line)
-        width = rec[2]
-        height = rec[3]
-        bwidth = math.floor((width + 7) / 8)
-    elseif start_with(line, 'STARTCHAR ') then
-        -- A glyph begins here
-        glyph = new_glyph(width, height)
-    elseif start_with(line, 'ENCODING ') then
-        -- This line provides the Unicode code point
-        rec = split(line)
-        glyph.code[#glyph.code+1] = tonumber(rec[2])
-    elseif start_with(line, 'BITMAP') then
-        -- Bitmap data appears on following lines
-        bitmap = true
-    elseif start_with(line, 'ENDCHAR') then
-        -- End of bitmap data
-        -- Position will be according to IBM437 if the code point is in IBM437,
-        -- else matching any prior occurrence if the same glyph has appeared
-        -- before, else as a new glyph
-        pos = ibm437_rev[glyph.code[1]] or font_by_bytes[glyph.bytes]
-        if pos == nil then
-            pos = next_pos
-            next_pos = next_pos + 1
+
+    while true do
+        line = fp:read()
+        if (line == fail) then
+            break
         end
-        if font[pos] == nil then
-            font[pos] = glyph
-            font_by_bytes[glyph.bytes] = pos
-        else
-            for i = 1, #glyph.code do
-                font[pos].code[#font[pos].code+1] = glyph.code[i]
+        if start_with(line, 'FONTBOUNDINGBOX ') then
+            -- Width and height of a glyph
+            rec = split(line)
+            if inp == 1 then
+                -- First input file sets the dimensions
+                width = tonumber(rec[2])
+                height = tonumber(rec[3])
+                bwidth = math.floor((width + 7) / 8)
+            else
+                -- Any others must match, or an error results
+                if width ~= tonumber(rec[2]) or height ~= tonumber(rec[3]) then
+                    io.stderr:write(arg[inp] .. " bounding box does not match that of " .. arg[1] .. "\n")
+                    os.exit(1)
+                end
+            end
+        elseif start_with(line, 'STARTCHAR ') then
+            -- A glyph begins here
+            glyph = new_glyph(width, height)
+        elseif start_with(line, 'ENCODING ') then
+            -- This line provides the Unicode code point
+            rec = split(line)
+            glyph.code[#glyph.code+1] = tonumber(rec[2])
+        elseif start_with(line, 'BITMAP') then
+            -- Bitmap data appears on following lines
+            bitmap = true
+        elseif start_with(line, 'ENDCHAR') then
+            -- End of bitmap data
+            -- Position will be according to IBM437 if the code point is in
+            -- IBM437, else matching any prior occurrence if the same glyph has
+            -- appeared before, else as a new glyph
+            pos = ibm437_rev[glyph.code[1]] or font_by_bytes[glyph.bytes]
+            if pos == nil then
+                pos = next_pos
+                next_pos = next_pos + 1
+            end
+            if font[pos] == nil then
+                font[pos] = glyph
+                font_by_bytes[glyph.bytes] = pos
+            else
+                for i = 1, #glyph.code do
+                    font[pos].code[#font[pos].code+1] = glyph.code[i]
+                end
+            end
+            font_by_code[glyph.code[1]] = pos
+            glyph = nil
+            bitmap = false
+        elseif bitmap then
+            -- Hex data after BITMAP and before ENDCHAR
+            for i = 1, bwidth do
+                byte = string.sub(line, i*2-1, i*2)
+                glyph.bytes = glyph.bytes .. string.char(tonumber(byte, 16))
             end
         end
-        font_by_code[glyph.code[1]] = pos
-        glyph = nil
-        bitmap = false
-    elseif bitmap then
-        -- Hex data after BITMAP and before ENDCHAR
-        for i = 1, bwidth do
-            byte = string.sub(line, i*2-1, i*2)
-            glyph.bytes = glyph.bytes .. string.char(tonumber(byte, 16))
-        end
     end
-end
 
-fp:close()
+    fp:close()
+end
 
 -- The provided BDFs code positions 16 and 17 differently from what NetHack
 -- expects
@@ -182,7 +198,7 @@ for i = 1, 256 do
     end
 end
 
-outfile = io.open(arg[2], "wb")
+outfile = io.open(arg[#arg], "wb")
 
 -- Write the PSF header
 outfile:write("\x72\xB5\x4A\x86")           -- magic
