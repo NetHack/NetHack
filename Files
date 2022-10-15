@@ -284,7 +284,8 @@ nhico.uu  nhpif.uu
 
 sys/msdos/fonts:
 (files for MSDOS version)
-README.txt    makefont.lua
+README.txt    makefont.lua  nh-u16b.bdf   nh-u16v.bdf   nh-u18b.bdf
+nh-u20b.bdf   nh-u22b.bdf   nh-u24b.bdf   nh-u28b.bdf   nh-u32b.bdf
 
 sys/share:
 (Berkeley random number file, which may be included in any version)
