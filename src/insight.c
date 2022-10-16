@@ -898,7 +898,7 @@ status_enlightenment(int mode, int final)
      *     should be discernible to the hero hence to the player)
     \*/
     enlght_out(""); /* separator after title or characteristics */
-    enlght_out(final ? "Final Status:" : "Current Status:");
+    enlght_out(final ? "Final Status:" : "Status:");
 
     Strcpy(youtoo, You_);
     /* not a traditional status but inherently obvious to player; more
@@ -1416,7 +1416,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
      *  Attributes
     \*/
     enlght_out("");
-    enlght_out(final ? "Final Attributes:" : "Current Attributes:");
+    enlght_out(final ? "Final Attributes:" : "Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
