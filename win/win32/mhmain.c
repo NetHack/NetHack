@@ -35,8 +35,11 @@ static void register_main_window_class(void);
 static int menuid2mapmode(int menuid);
 static int mapmode2menuid(int map_mode);
 static void nhlock_windows(BOOL lock);
-static char *nh_compose_ascii_screenshot();
-static void mswin_apply_window_style_all();
+static char *nh_compose_ascii_screenshot(void);
+#ifdef ENHANCED_SYMBOLS
+static WCHAR *nh_compose_unicode_screenshot(void);
+#endif
+static void mswin_apply_window_style_all(void);
 // returns strdup() created pointer - callee assumes the ownership
 
 HWND
@@ -871,42 +874,79 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IDM_SETTING_SCREEN_TO_CLIPBOARD: {
-        char *p;
+        char *p = NULL;
+#ifdef ENHANCED_SYMBOLS
+        WCHAR *wp = NULL;
+#endif
+        unsigned chr_size = 1;
         size_t len;
         HANDLE hglbCopy;
-        char *p_copy;
 
-        p = nh_compose_ascii_screenshot();
-        if (!p)
-            return 0;
-        len = strlen(p);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            wp = nh_compose_unicode_screenshot();
+            if (!wp)
+                return 0;
+            len = wcslen(wp);
+            chr_size = sizeof(WCHAR);
+        } else
+#endif
+        {
+            p = nh_compose_ascii_screenshot();
+            if (!p)
+                return 0;
+            len = strlen(p);
+        }
 
         if (!OpenClipboard(hWnd)) {
             NHMessageBox(hWnd, TEXT("Cannot open clipboard"),
                          MB_OK | MB_ICONERROR);
             free(p);
+#ifdef ENHANCED_SYMBOLS
+            free(wp);
+#endif
             return 0;
         }
 
         EmptyClipboard();
 
-        hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(char));
+        hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * chr_size);
         if (hglbCopy == NULL) {
             CloseClipboard();
             free(p);
+#ifdef ENHANCED_SYMBOLS
+            free(wp);
+#endif
             return FALSE;
         }
 
-        p_copy = (char *) GlobalLock(hglbCopy);
-        strncpy(p_copy, p, len);
-        p_copy[len] = 0; // null character
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            WCHAR *p_copy = (WCHAR *) GlobalLock(hglbCopy);
+            wcsncpy(p_copy, wp, len);
+            p_copy[len] = 0; // null character
+        } else
+#endif
+        {
+            char *p_copy = (char *) GlobalLock(hglbCopy);
+            strncpy(p_copy, p, len);
+            p_copy[len] = 0; // null character
+        }
         GlobalUnlock(hglbCopy);
 
-        SetClipboardData(SYMHANDLING(H_IBM) ? CF_OEMTEXT : CF_TEXT, hglbCopy);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8))
+            SetClipboardData(CF_UNICODETEXT, hglbCopy);
+        else
+#endif
+            SetClipboardData(SYMHANDLING(H_IBM) ? CF_OEMTEXT : CF_TEXT, hglbCopy);
 
         CloseClipboard();
 
         free(p);
+#ifdef ENHANCED_SYMBOLS
+        free(wp);
+#endif
     } break;
 
     case IDM_SETTING_SCREEN_TO_FILE: {
@@ -1276,3 +1316,57 @@ nh_compose_ascii_screenshot(void)
     free(text);
     return retval;
 }
+
+#ifdef ENHANCED_SYMBOLS
+// returns malloc() created pointer - callee assumes the ownership
+static WCHAR *
+nh_compose_unicode_screenshot(void)
+{
+    WCHAR *retval;
+    PMSNHMsgGetText text;
+    PMSNHMsgGetWideText wtext;
+    size_t retsize;
+    const size_t max_size = 3 * TEXT_BUFFER_SIZE;
+
+    retval = (WCHAR *) malloc(max_size * sizeof(WCHAR));
+    retsize = 0;
+
+    text =
+        (PMSNHMsgGetText) malloc(sizeof(MSNHMsgGetText) + TEXT_BUFFER_SIZE);
+    text->max_size =
+        TEXT_BUFFER_SIZE
+        - 1; /* make sure we always have 0 at the end of the buffer */
+
+    wtext =
+        (PMSNHMsgGetWideText) malloc(sizeof(MSNHMsgGetWideText)
+                                     + TEXT_BUFFER_SIZE * sizeof(WCHAR));
+    wtext->max_size =
+        TEXT_BUFFER_SIZE
+        - 1; /* make sure we always have 0 at the end of the buffer */
+
+    ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
+    retsize += MultiByteToWideChar(CP_ACP, 0,
+                                   text->buffer, strlen(text->buffer),
+                                   retval + retsize, max_size - retsize);
+
+    ZeroMemory(wtext->buffer, TEXT_BUFFER_SIZE * sizeof(WCHAR));
+    SendMessage(mswin_hwnd_from_winid(WIN_MAP), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETWIDETEXT, (LPARAM) wtext);
+    wcsncpy(retval + retsize, wtext->buffer, max_size - retsize - 1);
+    retsize += wcslen(retval + retsize);
+
+    ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+    SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
+    retsize += MultiByteToWideChar(CP_ACP, 0,
+                                   text->buffer, strlen(text->buffer),
+                                   retval + retsize, max_size - retsize);
+    retval[retsize] = L'\0';
+
+    free(text);
+    free(wtext);
+    return retval;
+}
+#endif

@@ -765,6 +765,36 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
     } break;
 
+#ifdef ENHANCED_SYMBOLS
+    case MSNH_MSG_GETWIDETEXT: {
+        PMSNHMsgGetWideText msg_data = (PMSNHMsgGetWideText) lParam;
+        size_t index;
+        int col, row;
+
+        index = 0;
+        for (row = 0; row < ROWNO; row++) {
+            for (col = 0; col < COLNO; col++) {
+                glyph_info *glyphinfo;
+                uint32 ch;
+                if (index >= msg_data->max_size)
+                    break;
+                glyphinfo = &data->map[col][row];
+                if (glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
+                    ch = glyphinfo->gm.u->utf32ch;
+                } else {
+                    ch = glyphinfo->ttychar;
+                }
+                winos_ascii_to_wide(msg_data->buffer + index, ch);
+                index += wcslen(msg_data->buffer + index);
+            }
+            if (index >= msg_data->max_size - 1)
+                break;
+            msg_data->buffer[index++] = '\r';
+            msg_data->buffer[index++] = '\n';
+        }
+    } break;
+#endif
+
     case MSNH_MSG_RANDOM_INPUT:
         nhassert(0); // unexpected
         break;
