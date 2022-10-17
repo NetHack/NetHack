@@ -988,9 +988,26 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (!GetSaveFileName(&ofn))
             return FALSE;
 
-        text = nh_compose_ascii_screenshot();
-        if (!text)
-            return FALSE;
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            text = NULL;
+            wtext = nh_compose_unicode_screenshot();
+            if (!wtext)
+                return FALSE;
+            tlen = wcslen(wtext);
+        } else
+#endif
+        {
+            text = nh_compose_ascii_screenshot();
+            if (!text)
+                return FALSE;
+
+            tlen = strlen(text);
+            wtext = (wchar_t *) malloc(tlen * sizeof(wchar_t));
+            if (!wtext)
+                panic("out of memory");
+            MultiByteToWideChar(NH_CODEPAGE, 0, text, -1, wtext, tlen);
+        }
 
         pFile = _tfopen(filename, TEXT("wt+,ccs=UTF-8"));
         if (!pFile) {
@@ -998,14 +1015,10 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             _stprintf(buf, TEXT("Cannot open %s for writing!"), filename);
             NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
             free(text);
+            free(wtext);
             return FALSE;
         }
 
-        tlen = strlen(text);
-        wtext = (wchar_t *) malloc(tlen * sizeof(wchar_t));
-        if (!wtext)
-            panic("out of memory");
-        MultiByteToWideChar(NH_CODEPAGE, 0, text, -1, wtext, tlen);
         fwrite(wtext, tlen * sizeof(wchar_t), 1, pFile);
         fclose(pFile);
         free(text);
