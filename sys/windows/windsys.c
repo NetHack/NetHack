@@ -543,10 +543,26 @@ winos_ascii_to_wide_str(const unsigned char * src, WCHAR * dst, size_t dstLength
     return dst;
 }
 
-WCHAR
-winos_ascii_to_wide(const unsigned char c)
+void
+winos_ascii_to_wide(WCHAR dst[3], UINT32 c)
 {
-    return cp437[c];
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8)) {
+        if (c <= 0xFFFF) {
+            dst[0] = (WCHAR) c;
+            dst[1] = L'\0';
+        } else {
+            /* UTF-16 surrogate pair */
+            dst[0] = (WCHAR) ((c >> 10) + 0xD7C0);
+            dst[1] = (WCHAR) ((c & 0x3FF) + 0xDC00);
+            dst[2] = L'\0';
+        }
+    } else
+#endif
+    {
+        dst[0] = cp437[c];
+        dst[1] = L'\0';
+    }
 }
 
 BOOL winos_font_support_cp437(HFONT hFont)
