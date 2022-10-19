@@ -85,20 +85,14 @@ throw_obj(struct obj *obj, int shotlimit)
     schar skill;
     long wep_mask;
     boolean twoweap, weakmultishot;
+    int res = ECMD_TIME;
+    struct obj_split save_osplit = g.context.objsplit;
 
     /* ask "in what direction?" */
     if (!getdir((char *) 0)) {
-        /* No direction specified, so cancel the throw;
-         * might need to undo an object split.
-         * We used to use freeinv(obj),addinv(obj) here, but that can
-         * merge obj into another stack--usually quiver--even if it hadn't
-         * been split from there (possibly triggering a panic in addinv),
-         * and freeinv+addinv potentially has other side-effects.
-         */
-        if (obj->o_id == g.context.objsplit.parent_oid
-            || obj->o_id == g.context.objsplit.child_oid)
-            (void) unsplitobj(obj);
-        return ECMD_CANCEL; /* no time passes */
+        /* No direction specified, so cancel the throw */
+        res = ECMD_CANCEL; /* no time passes */
+        goto unsplit_stack;
     }
 
     /*
@@ -109,24 +103,31 @@ throw_obj(struct obj *obj, int shotlimit)
      * If the gold is in quiver, throw one coin at a time,
      * possibly using a sling.
      */
-    if (obj->oclass == COIN_CLASS && obj != uquiver)
+    if (obj->oclass == COIN_CLASS && obj != uquiver) {
+        /* throw_gold will unsplit the stack itself if necessary and may have
+           freed the object, so don't route through unsplit_stack here */
         return throw_gold(obj); /* check */
+    }
 
     if (!canletgo(obj, "throw")) {
-        return ECMD_OK;
+        res = ECMD_OK;
+        goto unsplit_stack;
     }
     if (is_art(obj, ART_MJOLLNIR) && obj != uwep) {
         pline("%s must be wielded before it can be thrown.", The(xname(obj)));
-        return ECMD_OK;
+        res = ECMD_OK;
+        goto unsplit_stack;
     }
     if ((is_art(obj, ART_MJOLLNIR) && ACURR(A_STR) < STR19(25))
         || (obj->otyp == BOULDER && !throws_rocks(g.youmonst.data))) {
         pline("It's too heavy.");
-        return ECMD_TIME;
+        res = ECMD_TIME;
+        goto unsplit_stack;
     }
     if (!u.dx && !u.dy && !u.dz) {
         You("cannot throw an object at yourself.");
-        return ECMD_OK;
+        res = ECMD_OK;
+        goto unsplit_stack;
     }
     u_wipe_engr(2);
     if (!uarmg && obj->otyp == CORPSE && touch_petrifies(&mons[obj->corpsenm])
@@ -141,7 +142,8 @@ throw_obj(struct obj *obj, int shotlimit)
     }
     if (welded(obj)) {
         weldmsg(obj);
-        return ECMD_TIME;
+        res = ECMD_TIME;
+        goto unsplit_stack;
     }
     if (is_wet_towel(obj))
         dry_a_towel(obj, -1, FALSE);
@@ -242,6 +244,9 @@ throw_obj(struct obj *obj, int shotlimit)
             if (otmp->owornmask)
                 remove_worn_item(otmp, FALSE);
             oldslot = obj->nobj;
+            /* obj will leave inventory and may be freed by throwit, don't
+               try to unsplit it from potential parent stack below */
+            obj = (struct obj *) 0;
         }
         freeinv(otmp);
         throwit(otmp, wep_mask, twoweap, oldslot);
@@ -251,7 +256,22 @@ throw_obj(struct obj *obj, int shotlimit)
     g.m_shot.o = STRANGE_OBJECT;
     g.m_shot.s = FALSE;
 
-    return ECMD_TIME;
+ unsplit_stack:
+    /* might need to undo an object split.
+     * We used to use freeinv(obj),addinv(obj) here, but that can
+     * merge obj into another stack--usually quiver--even if it hadn't
+     * been split from there (possibly triggering a panic in addinv),
+     * and freeinv+addinv potentially has other side-effects.
+     */
+    if (obj && obj != uquiver
+        && (obj->o_id == save_osplit.parent_oid
+            || obj->o_id == save_osplit.child_oid)) {
+        /* futureproofing: objsplit will have been affected if partial stack
+           was thrown; objects will have been split off stack to throw. */
+        g.context.objsplit = save_osplit;
+        (void) unsplitobj(obj);
+    }
+    return res;
 }
 
 /* common to dothrow() and dofire() */
