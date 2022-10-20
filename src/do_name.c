@@ -775,7 +775,10 @@ getpos(coord *ccp, boolean force, const char *goal)
             free(cmdq);
         } else {
             c = readchar_poskey(&tx, &ty, &sidx);
-            if (!g.in_doagain)
+            /* remember_getpos is normally False because reusing the
+               current positioning during ^A is almost never the right
+               thing to do, but caller could set it if that was needed */
+            if (iflags.remember_getpos && !g.in_doagain)
                 cmdq_add_key(CQ_REPEAT, c);
         }
 
