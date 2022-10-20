@@ -729,14 +729,17 @@ basics_enlightenment(int mode UNUSED, int final)
             Sprintf(buf, " Your wallet contain%s %ld %s", !final ? "s" : "ed",
                     umoney, currency(umoney));
         }
-        Strcat(buf, hmoney ? "," : ".");
+        /* terminate the wallet line if appropriate, otherwise add an
+           introduction to subsequent continuation; output now either way */
+        Strcat(buf, !hmoney ? "." : !umoney ? ", but" : ", and");
         enlght_out(buf);
 
+        /* put contained gold on its own line to avoid excessive width; it's
+           phrased as a continuation of the wallet line so not capitalized */
         if (hmoney) {
             Sprintf(buf, "%ld %s stashed away in your pack",
                     hmoney, umoney ? "more" : currency(hmoney));
-            enl_msg(umoney ? "and you " : "but you ", "have ", "had ", buf,
-                    "");
+            enl_msg("you ", "have ", "had ", buf, "");
         }
     }
 
