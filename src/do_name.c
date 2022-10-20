@@ -782,7 +782,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else {
             c = readchar_poskey(&tx, &ty, &sidx);
             /* remember_getpos is normally False because reusing the
-               current positioning during ^A is almost never the right
+               cursor positioning during ^A is almost never the right
                thing to do, but caller could set it if that was needed */
             if (iflags.remember_getpos && !g.in_doagain)
                 cmdq_add_key(CQ_REPEAT, c);
