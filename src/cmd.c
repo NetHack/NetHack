@@ -4869,7 +4869,7 @@ rhack(char *cmd)
                             down = (key == '>' || tlist->ef_funct == dodown);
 
                     pline(
-                  "The '%s' prefix should be followed by a movement command%s.",
+                "The '%s' prefix should be followed by a movement command%s.",
                           which, (up || down) ? " other than up or down" : "");
                 }
                 res = ECMD_FAIL;
@@ -4886,7 +4886,8 @@ rhack(char *cmd)
                 if (!g.in_doagain && func != do_repeat && func != doextcmd) {
                     if (!prefix_seen)
                         cmdq_clear(CQ_REPEAT);
-                    cmdq_add_ec(CQ_REPEAT, ((struct ext_func_tab *) tlist)->ef_funct);
+                    cmdq_add_ec(CQ_REPEAT,
+                                ((struct ext_func_tab *) tlist)->ef_funct);
                 } else {
                     if (func == doextcmd) {
                         cmdq_clear(CQ_REPEAT);
@@ -4900,7 +4901,8 @@ rhack(char *cmd)
                 if (g.ext_tlist) {
                     tlist = g.ext_tlist, g.ext_tlist = NULL;
                     /* Add the command post-execution */
-                    cmdq_add_ec(CQ_REPEAT, ((struct ext_func_tab *) tlist)->ef_funct);
+                    cmdq_add_ec(CQ_REPEAT,
+                                ((struct ext_func_tab *) tlist)->ef_funct);
                     /* shift the command to first */
                     cmdq_shift(CQ_REPEAT);
                 }
@@ -4982,8 +4984,9 @@ rhack(char *cmd)
 #if 1
         nhUse(c1);
 #else
-        /* note: since prefix keys became actual commnads, we can no longer get
-           here with 'prefix_seen' set so this never calls help_dir() anymore */
+        /* note: since prefix keys became actual commnads, we can no longer
+           get here with 'prefix_seen' set so this never calls help_dir()
+           anymore */
         if (!prefix_seen
             || !help_dir(c1, prefix_seen->key, "Invalid direction key!"))
 #endif
@@ -6418,6 +6421,7 @@ dotravel(void)
     iflags.getloc_travelmode = TRUE;
     if (iflags.menu_requested) {
         int gf = iflags.getloc_filter;
+
         iflags.getloc_filter = GFILTER_VIEW;
         if (!getpos_menu(&cc, GLOC_INTERESTING)) {
             iflags.getloc_filter = gf;
@@ -6482,7 +6486,11 @@ doclicklook(void)
  *   window port causing a buffer overflow there.
  */
 char
-yn_function(const char *query, const char *resp, char def, boolean addcmdq)
+yn_function(
+    const char *query,
+    const char *resp,
+    char def,
+    boolean addcmdq)
 {
     char res = '\033', qbuf[QBUFSZ];
     struct _cmd_queue cq, *cmdq;

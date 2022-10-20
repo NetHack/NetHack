@@ -42,10 +42,13 @@ nextmbuf(void)
  * parameter value 0 = initialize, 1 = highlight, 2 = done
  */
 static void (*getpos_hilitefunc)(int) = (void (*)(int)) 0;
-static boolean (*getpos_getvalid)(coordxy, coordxy) = (boolean (*)(coordxy, coordxy)) 0;
+static boolean
+    (*getpos_getvalid)(coordxy, coordxy) = (boolean (*)(coordxy, coordxy)) 0;
 
 void
-getpos_sethilite(void (*gp_hilitef)(int), boolean (*gp_getvalidf)(coordxy, coordxy))
+getpos_sethilite(
+    void (*gp_hilitef)(int),
+    boolean (*gp_getvalidf)(coordxy, coordxy))
 {
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
@@ -71,7 +74,10 @@ static const char *const gloc_filtertxt[NUM_GFILTER] = {
 };
 
 static void
-getpos_help_keyxhelp(winid tmpwin, const char *k1, const char *k2, int gloc)
+getpos_help_keyxhelp(
+    winid tmpwin,
+    const char *k1, const char *k2,
+    int gloc)
 {
     char sbuf[BUFSZ], fbuf[QBUFSZ];
     const char *move_cursor_to = "move the cursor to ",
@@ -263,11 +269,11 @@ cmp_coord_distu(const void *a, const void *b)
 }
 
 #define IS_UNEXPLORED_LOC(x,y) \
-    (isok((x), (y))                                     \
-     && glyph_is_unexplored(levl[(x)][(y)].glyph)   \
+    (isok((x), (y))                                             \
+     && glyph_is_unexplored(levl[(x)][(y)].glyph)               \
      && !levl[(x)][(y)].seenv)
 
-#define GLOC_SAME_AREA(x,y)                                     \
+#define GLOC_SAME_AREA(x,y) \
     (isok((x), (y))                                             \
      && (selection_getpoint((x),(y), g.gloc_filter_map)))
 
@@ -1060,9 +1066,9 @@ getpos(coord *ccp, boolean force, const char *goal)
 
 /* allocate space for a monster's name; removes old name if there is one */
 void
-new_mgivenname(struct monst *mon,
-               int lth) /* desired length (caller handles adding 1
-                           for terminator) */
+new_mgivenname(
+    struct monst *mon,
+    int lth) /* desired length (caller handles adding 1 for terminator) */
 {
     if (lth) {
         /* allocate mextra if necessary; otherwise get rid of old name */
@@ -1090,9 +1096,9 @@ free_mgivenname(struct monst *mon)
 
 /* allocate space for an object's name; removes old name if there is one */
 void
-new_oname(struct obj *obj,
-          int lth) /* desired length (caller handles adding 1
-                      for terminator) */
+new_oname(
+    struct obj *obj,
+    int lth) /* desired length (caller handles adding 1 for terminator) */
 {
     if (lth) {
         /* allocate oextra if necessary; otherwise get rid of old name */
