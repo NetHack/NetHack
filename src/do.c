@@ -941,7 +941,7 @@ menu_drop(int retry)
         bypass_objlist(g.invent, FALSE); /* clear bypass bit for invent */
         while ((otmp = nxt_unbypassed_obj(g.invent)) != 0) {
             if (drop_everything || all_categories || allow_category(otmp))
-                n_dropped += ((drop(otmp) == ECMD_TIME) ? 1 : 0);
+                n_dropped += ((drop(otmp) & ECMD_TIME) != 0) ? 1 : 0;
         }
         /* we might not have dropped everything (worn armor, welded weapon,
            cursed loadstones), so reset any remaining inventory to normal */
@@ -950,7 +950,8 @@ menu_drop(int retry)
         /* drop the just picked item automatically, if only one stack */
         otmp = find_justpicked(g.invent);
         if (otmp)
-            n_dropped += ((menudrop_split(otmp, justpicked_quan) == ECMD_TIME) ? 1 : 0);
+            n_dropped += ((menudrop_split(otmp, justpicked_quan) & ECMD_TIME)
+                          != 0) ? 1 : 0;
     } else {
         /* should coordinate with perm invent, maybe not show worn items */
         n = query_objlist("What would you like to drop?", &g.invent,
@@ -979,8 +980,8 @@ menu_drop(int retry)
                 if (!otmp2 || !otmp2->bypass)
                     continue;
                 /* found next selected invent item */
-                n_dropped += (menudrop_split(otmp, pick_list[i].count)
-                              == ECMD_TIME) ? 1 : 0;
+                n_dropped += ((menudrop_split(otmp, pick_list[i].count)
+                               & ECMD_TIME) != 0) ? 1 : 0;
             }
             bypass_objlist(g.invent, FALSE); /* reset g.invent to normal */
             free((genericptr_t) pick_list);
