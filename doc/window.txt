@@ -1,4 +1,4 @@
-NetHack 3.7  window.txt	$NHDT-Date: 1643491505 2022/01/29 21:25:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $
+NetHack 3.7  window.txt	$NHDT-Date: 1666390558 2022/10/21 22:15:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $
 
 Introduction
 
@@ -55,6 +55,18 @@ for example.  In the tty window-port, windows of type NHW_TEXT can
 page using the DEF_PAGER, if DEF_PAGER is defined.  There exists an
 assumption that the font for text windows is monospaced.  The help
 files are all formatted accordingly.
+
+NHW_MAP is a persistent window which uses tty-style character cell
+column and row as x,y coordinates (even for tiled map).  The y or row
+coordinate runs from 0 through ROWNO-1 inclusive.  The x or column
+coordinate runs from _1_ through COLNO-1; column 0 is used by the core
+for internal bookkeeping and not drawn on the screen.  Most levels
+leave some rows and/or columns unused but the core still passes data
+(typically 'unexplored' or 'solid stone') for them and those should
+be rendered to the screen.  The exception is map column 0.  The map
+window does not need to include room for that; if it does, that column
+should be drawn as <space> for text map or the tile specified for
+GLYPH_NOTHING for tiled map.
 
 "window" is always of type winid.  This is currently implemented as an
 integer, but doesn't necessarily have to be done that way.  There are
