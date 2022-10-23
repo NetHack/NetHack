@@ -58,8 +58,9 @@ files are all formatted accordingly.
 
 NHW_MAP is a persistent window which uses tty-style character cell
 column and row as x,y coordinates (even for tiled map).  The y or row
-coordinate runs from 0 through ROWNO-1 inclusive.  The x or column
-coordinate runs from _1_ through COLNO-1; column 0 is used by the core
+coordinate runs from 0 through ROWNO-1 inclusive, with 0 at the top
+and +(ROWNO-1) at the bottom.  The x or column coordinate runs from
+_1_ through COLNO-1, left to right.  Column 0 is used by the core
 for internal bookkeeping and not drawn on the screen.  Most levels
 leave some rows and/or columns unused but the core still passes data
 (typically 'unexplored' or 'solid stone') for them and those should
