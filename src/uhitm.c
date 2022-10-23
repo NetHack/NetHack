@@ -4616,6 +4616,12 @@ m_is_steadfast(struct monst *mtmp)
 
     if (is_art(otmp, ART_GIANTSLAYER))
         return TRUE;
+
+    /* steadfast if carrying any loadstone (and not floating or flying) */
+    for (otmp = is_u ? g.invent : mtmp->minvent; otmp; otmp = otmp->nobj)
+        if (otmp->otyp == LOADSTONE)
+            return TRUE;
+
     return FALSE;
 }
 
