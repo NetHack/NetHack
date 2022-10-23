@@ -703,7 +703,7 @@ mdrop_obj(
        throws rider, possibly inflicting fatal damage and producing bones; this
        is why we had to call extract_from_minvent() with do_intrinsics=FALSE */
     if (!DEADMONSTER(mon) && unwornmask)
-        update_mon_intrinsics(mon, obj, FALSE, TRUE);
+        update_mon_extrinsics(mon, obj, FALSE, TRUE);
 }
 
 /* some monsters bypass the normal rules for moving between levels or

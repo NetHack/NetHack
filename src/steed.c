@@ -147,7 +147,7 @@ put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
     mtmp->misc_worn_check |= W_SADDLE;
     saddle->owornmask = W_SADDLE;
     saddle->leashmon = mtmp->m_id;
-    update_mon_intrinsics(mtmp, saddle, TRUE, FALSE);
+    update_mon_extrinsics(mtmp, saddle, TRUE, FALSE);
 }
 
 /*** Riding the monster ***/
