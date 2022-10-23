@@ -345,10 +345,9 @@ mon_adjust_speed(
      ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
      : 0)
 
-/* armor put on or taken off; might be magical variety
-   [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
+/* armor put on or taken off; might be magical variety */
 void
-update_mon_intrinsics(
+update_mon_extrinsics(
     struct monst *mon,
     struct obj *obj,   /* armor being worn or taken off */
     boolean on,
@@ -719,7 +718,7 @@ m_dowear_type(
             mon->mcanmove = 0;
     }
     if (old) {
-        update_mon_intrinsics(mon, old, FALSE, creation);
+        update_mon_extrinsics(mon, old, FALSE, creation);
 
         /* owornmask was cleared above but artifact_light() expects it */
         old->owornmask = oldmask;
@@ -749,7 +748,7 @@ m_dowear_type(
                 pline("%s is shining %s.", Something, adesc);
         }
     }
-    update_mon_intrinsics(mon, best, TRUE, creation);
+    update_mon_extrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
     if (!creation && (sawmon ^ canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
@@ -1136,9 +1135,9 @@ void
 extract_from_minvent(
     struct monst *mon,
     struct obj *obj,
-    boolean do_intrinsics,  /* whether to call update_mon_intrinsics */
+    boolean do_extrinsics,  /* whether to call update_mon_extrinsics */
     boolean silently)       /* doesn't affect all possible messages,
-                             * just update_mon_intrinsics's */
+                             * just update_mon_extrinsics's */
 {
     long unwornmask = obj->owornmask;
 
@@ -1161,8 +1160,8 @@ extract_from_minvent(
     obj_extract_self(obj);
     obj->owornmask = 0L;
     if (unwornmask) {
-        if (!DEADMONSTER(mon) && do_intrinsics) {
-            update_mon_intrinsics(mon, obj, FALSE, silently);
+        if (!DEADMONSTER(mon) && do_extrinsics) {
+            update_mon_extrinsics(mon, obj, FALSE, silently);
         }
         mon->misc_worn_check &= ~unwornmask;
         /* give monster a chance to wear other equipment on its next
