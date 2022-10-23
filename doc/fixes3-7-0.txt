@@ -1046,6 +1046,8 @@ give hero poly'd into a giant 19 strength instead of 18/100
 wait for a response after displaying wishing help; affects X11
 guardian nagas' constriction attack could never hit because the two preceding
 	attacks must both hit and those were mutually exclusive: bite and spit
+explicitly throwing 1 for non-gold stack of more than 1 and then canceling at
+	direction prompt left a pair of stacks of 1 and N-1 with same invlet
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
