@@ -49,6 +49,7 @@ typedef struct mswin_nethack_map_window {
     POINT map_orig;             /* map origin point */
 
     HFONT hMapFont;             /* font for ASCII mode */
+    HFONT hMapFontUnicode;      /* font for Unicode mode */
     boolean bUnicodeFont;       /* font supports unicode page 437 */
 
     int tileWidth;              /* width of tile in pixels at 96 dpi */
@@ -251,6 +252,12 @@ mswin_map_layout(HWND hWnd, LPSIZE map_size)
         data->hMapFont = font;
 
         data->bUnicodeFont = winos_font_support_cp437(data->hMapFont);
+
+        // Same as above, but with ANSI_CHARSET for IBM and Unicode modes
+        lgfnt.lfCharSet = ANSI_CHARSET;
+        if (data->hMapFontUnicode)
+            DeleteObject(data->hMapFontUnicode);
+        data->hMapFontUnicode = CreateFontIndirect(&lgfnt);
 
         // set tile size to match font metrics
 
@@ -626,6 +633,8 @@ MapWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         if (data->hMapFont)
             DeleteObject(data->hMapFont);
+        if (data->hMapFontUnicode)
+            DeleteObject(data->hMapFontUnicode);
         if (data->hBackBuffer)
             DeleteBitmap(data->hBackBuffer);
         if (data->backBufferDC)
@@ -755,6 +764,36 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             msg_data->buffer[index++] = '\n';
         }
     } break;
+
+#ifdef ENHANCED_SYMBOLS
+    case MSNH_MSG_GETWIDETEXT: {
+        PMSNHMsgGetWideText msg_data = (PMSNHMsgGetWideText) lParam;
+        size_t index;
+        int col, row;
+
+        index = 0;
+        for (row = 0; row < ROWNO; row++) {
+            for (col = 0; col < COLNO; col++) {
+                glyph_info *glyphinfo;
+                uint32 ch;
+                if (index >= msg_data->max_size)
+                    break;
+                glyphinfo = &data->map[col][row];
+                if (glyphinfo->gm.u && glyphinfo->gm.u->utf8str) {
+                    ch = glyphinfo->gm.u->utf32ch;
+                } else {
+                    ch = glyphinfo->ttychar;
+                }
+                winos_ascii_to_wide(msg_data->buffer + index, ch);
+                index += wcslen(msg_data->buffer + index);
+            }
+            if (index >= msg_data->max_size - 1)
+                break;
+            msg_data->buffer[index++] = '\r';
+            msg_data->buffer[index++] = '\n';
+        }
+    } break;
+#endif
 
     case MSNH_MSG_RANDOM_INPUT:
         nhassert(0); // unexpected
@@ -911,9 +950,11 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
 {
     if (data->map[i][j].glyph >= 0) {
 
-        char ch;
-        WCHAR wch;
+        glyph_info *glyphinfo;
+        uint32 ch;
+        WCHAR wch[3];
         int color;
+        uint32 rgbcolor;
 //        unsigned special;
 //        int mgch;
         HBRUSH back_brush;
@@ -925,12 +966,23 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
         FillRect(data->backBufferDC, rect, blackBrush);
         DeleteObject(blackBrush);
 
-    #if (VERSION_MAJOR < 4) && (VERSION_MINOR < 4) && (PATCHLEVEL < 2)
-        nhglyph2charcolor(data->map[i][j], &ch, &color);
-        OldFg = SetTextColor(hDC, nhcolor_to_RGB(color));
-    #else
-        ch = (char) data->map[i][j].ttychar;
-        color = (int) data->map[i][j].gm.sym.color;
+        glyphinfo = &data->map[i][j];
+        ch = glyphinfo->ttychar;
+        color = (int) glyphinfo->gm.sym.color;
+        rgbcolor = nhcolor_to_RGB(color);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)
+            && glyphinfo->gm.u
+            && glyphinfo->gm.u->utf8str) {
+            ch = glyphinfo->gm.u->utf32ch;
+            if (glyphinfo->gm.u->ucolor != 0) {
+                rgbcolor = RGB(
+                        (glyphinfo->gm.u->ucolor >> 16) & 0xFF,
+                        (glyphinfo->gm.u->ucolor >>  8) & 0xFF,
+                        (glyphinfo->gm.u->ucolor >>  0) & 0xFF);
+            }
+        }
+#endif
         if (((data->map[i][j].gm.glyphflags & MG_PET) && iflags.hilite_pet)
             || ((data->map[i][j].gm.glyphflags & (MG_DETECT | MG_BW_LAVA))
                 && iflags.use_inverse)) {
@@ -946,21 +998,23 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
                 break;
             default:
                 OldFg =
-                    SetTextColor(data->backBufferDC, nhcolor_to_RGB(color));
+                    SetTextColor(data->backBufferDC, rgbcolor);
             }
         } else {
-            OldFg = SetTextColor(data->backBufferDC, nhcolor_to_RGB(color));
+            OldFg = SetTextColor(data->backBufferDC, rgbcolor);
         }
-    #endif
-        if (data->bUnicodeFont) {
-            wch = winos_ascii_to_wide(ch);
-            if (wch == 0x2591 || wch == 0x2592) {
+        if (data->bUnicodeFont || SYMHANDLING(H_UTF8)) {
+            winos_ascii_to_wide(wch, ch);
+            if (wch[0] == 0x2591 || wch[0] == 0x2592) {
                 int intensity = 80;
                 HBRUSH brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
                 FillRect(data->backBufferDC, rect, brush);
                 DeleteObject(brush);
-                intensity = (wch == 0x2591 ? 100 : 200);
-                brush = CreateSolidBrush(RGB(intensity, intensity, intensity));
+                intensity = (wch[0] == 0x2591 ? 1 : 2);
+                brush = CreateSolidBrush(RGB(
+                            GetRValue(rgbcolor)*intensity/2,
+                            GetGValue(rgbcolor)*intensity/2,
+                            GetBValue(rgbcolor)*intensity/2));
                 RECT smallRect = {0};
                 smallRect.left = rect->left + 1;
                 smallRect.top = rect->top + 1;
@@ -969,12 +1023,15 @@ paintGlyph(PNHMapWindow data, int i, int j, RECT * rect)
                 FillRect(data->backBufferDC, &smallRect, brush);
                 DeleteObject(brush);
             } else {
-                DrawTextW(data->backBufferDC, &wch, 1, rect,
+                SelectObject(data->backBufferDC, data->hMapFontUnicode);
+                DrawTextW(data->backBufferDC, wch, -1, rect,
                     DT_CENTER | DT_VCENTER | DT_NOPREFIX
                     | DT_SINGLELINE);
             }
         } else {
-            DrawTextA(data->backBufferDC, &ch, 1, rect,
+            char ch8 = (char) ch;
+            SelectObject(data->backBufferDC, data->hMapFont);
+            DrawTextA(data->backBufferDC, &ch8, 1, rect,
                         DT_CENTER | DT_VCENTER | DT_NOPREFIX
                             | DT_SINGLELINE);
         }

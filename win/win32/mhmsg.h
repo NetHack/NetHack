@@ -22,6 +22,9 @@
 #define MSNH_MSG_GETTEXT 111
 #define MSNH_MSG_UPDATE_STATUS 112
 #define MSNH_MSG_RANDOM_INPUT 113
+#ifdef ENHANCED_SYMBOLS
+#define MSNH_MSG_GETWIDETEXT 114
+#endif
 
 typedef struct mswin_nhmsg_add_wnd {
     winid wid;
@@ -70,6 +73,13 @@ typedef struct mswin_nhmsg_get_text {
     size_t max_size;
     char buffer[TEXT_BUFFER_SIZE];
 } MSNHMsgGetText, *PMSNHMsgGetText;
+
+#ifdef ENHANCED_SYMBOLS
+typedef struct mswin_nhmsg_get_wide_text {
+    size_t max_size;
+    WCHAR buffer[TEXT_BUFFER_SIZE];
+} MSNHMsgGetWideText, *PMSNHMsgGetWideText;
+#endif
 
 typedef struct mswin_nhmsg_update_status {
     struct mswin_status_lines * status_lines;
