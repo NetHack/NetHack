@@ -1042,8 +1042,9 @@ static void
 break_armor(void)
 {
     register struct obj *otmp;
+    struct permonst *uptr = g.youmonst.data;
 
-    if (breakarm(g.youmonst.data)) {
+    if (breakarm(uptr)) {
         if ((otmp = uarm) != 0) {
             if (donning(otmp))
                 cancel_don();
@@ -1057,7 +1058,9 @@ break_armor(void)
             (void) Armor_gone();
             useup(otmp);
         }
-        if ((otmp = uarmc) != 0) {
+        if ((otmp = uarmc) != 0
+            /* mummy wrapping adapts to small and very big sizes */
+            && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
             if (otmp->oartifact) {
                 Your("%s falls off!", cloak_simple_name(otmp));
                 (void) Cloak_off();
@@ -1072,8 +1075,8 @@ break_armor(void)
             Your("shirt rips to shreds!");
             useup(uarmu);
         }
-    } else if (sliparm(g.youmonst.data)) {
-        if ((otmp = uarm) != 0 && racial_exception(&g.youmonst, otmp) < 1) {
+    } else if (sliparm(uptr)) {
+        if ((otmp = uarm) != 0 && racial_exception(uptr, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
             Your("armor falls around you!");
@@ -1084,8 +1087,10 @@ break_armor(void)
             (void) Armor_gone();
             dropp(otmp);
         }
-        if ((otmp = uarmc) != 0) {
-            if (is_whirly(g.youmonst.data))
+        if ((otmp = uarmc) != 0
+            /* mummy wrapping adapts to small and very big sizes */
+            && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(uptr))) {
+            if (is_whirly(uptr))
                 Your("%s falls, unsupported!", cloak_simple_name(otmp));
             else
                 You("shrink out of your %s!", cloak_simple_name(otmp));
@@ -1093,7 +1098,7 @@ break_armor(void)
             dropp(otmp);
         }
         if ((otmp = uarmu) != 0) {
-            if (is_whirly(g.youmonst.data))
+            if (is_whirly(uptr))
                 You("seep right through your shirt!");
             else
                 You("become much too small for your shirt!");
@@ -1101,13 +1106,13 @@ break_armor(void)
             dropp(otmp);
         }
     }
-    if (has_horns(g.youmonst.data)) {
+    if (has_horns(uptr)) {
         if ((otmp = uarmh) != 0) {
             if (is_flimsy(otmp) && !donning(otmp)) {
                 char hornbuf[BUFSZ];
 
                 /* Future possibilities: This could damage/destroy helmet */
-                Sprintf(hornbuf, "horn%s", plur(num_horns(g.youmonst.data)));
+                Sprintf(hornbuf, "horn%s", plur(num_horns(uptr)));
                 Your("%s %s through %s.", hornbuf, vtense(hornbuf, "pierce"),
                      yname(otmp));
             } else {
@@ -1120,7 +1125,7 @@ break_armor(void)
             }
         }
     }
-    if (nohands(g.youmonst.data) || verysmall(g.youmonst.data)) {
+    if (nohands(uptr) || verysmall(uptr)) {
         if ((otmp = uarmg) != 0) {
             if (donning(otmp))
                 cancel_don();
@@ -1145,16 +1150,16 @@ break_armor(void)
             dropp(otmp);
         }
     }
-    if (nohands(g.youmonst.data) || verysmall(g.youmonst.data)
-        || slithy(g.youmonst.data) || g.youmonst.data->mlet == S_CENTAUR) {
+    if (nohands(uptr) || verysmall(uptr)
+        || slithy(uptr) || uptr->mlet == S_CENTAUR) {
         if ((otmp = uarmf) != 0) {
             if (donning(otmp))
                 cancel_don();
-            if (is_whirly(g.youmonst.data))
+            if (is_whirly(uptr))
                 Your("boots fall away!");
             else
                 Your("boots %s off your feet!",
-                     verysmall(g.youmonst.data) ? "slide" : "are pushed");
+                     verysmall(uptr) ? "slide" : "are pushed");
             (void) Boots_off();
             dropp(otmp);
         }
@@ -1163,7 +1168,7 @@ break_armor(void)
        it/them on (should also come off if head is too tiny or too huge,
        but putting accessories on doesn't reject those cases [yet?]);
        amulet stays worn */
-    if ((otmp = ublindf) != 0 && !has_head(g.youmonst.data)) {
+    if ((otmp = ublindf) != 0 && !has_head(uptr)) {
         int l;
         const char *eyewear = simpleonames(otmp); /* blindfold|towel|lenses */
 

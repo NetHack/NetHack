@@ -1876,16 +1876,16 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
         return 0;
     }
 
-    which = is_cloak(otmp)
-                ? c_cloak
-                : is_shirt(otmp)
-                    ? c_shirt
-                    : is_suit(otmp)
-                        ? c_suit
-                        : 0;
+    which = is_cloak(otmp) ? c_cloak
+            : is_shirt(otmp) ? c_shirt
+              : is_suit(otmp) ? c_suit
+                : 0;
     if (which && cantweararm(g.youmonst.data)
         /* same exception for cloaks as used in m_dowear() */
-        && (which != c_cloak || g.youmonst.data->msize != MZ_SMALL)
+        && (which != c_cloak
+            || ((otmp->otyp != MUMMY_WRAPPING)
+                ? g.youmonst.data->msize != MZ_SMALL
+                : !WrappingAllowed(g.youmonst.data)))
         && (racial_exception(&g.youmonst, otmp) < 1)) {
         if (noisy)
             pline_The("%s will not fit on your body.", which);

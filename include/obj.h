@@ -411,6 +411,12 @@ struct obj {
 #define is_art(o,art) ((o) && (o)->oartifact == (art))
 #define u_wield_art(art) is_art(uwep, art)
 
+/* mummy wrappings are more versatile sizewise than other cloaks */
+#define WrappingAllowed(mptr) \
+    (humanoid(mptr) && (mptr)->msize >= MZ_SMALL && (mptr)->msize <= MZ_HUGE \
+     && !noncorporeal(mptr) && (mptr)->mlet != S_CENTAUR                     \
+     && (mptr) != &mons[PM_WINGED_GARGOYLE] && (mptr) != &mons[PM_MARILITH])
+
 /* Flags for get_obj_location(). */
 #define CONTAINED_TOO 0x1
 #define BURIED_TOO 0x2
