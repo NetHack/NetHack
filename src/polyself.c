@@ -1076,7 +1076,7 @@ break_armor(void)
             useup(uarmu);
         }
     } else if (sliparm(uptr)) {
-        if ((otmp = uarm) != 0 && racial_exception(uptr, otmp) < 1) {
+        if ((otmp = uarm) != 0 && racial_exception(&g.youmonst, otmp) < 1) {
             if (donning(otmp))
                 cancel_don();
             Your("armor falls around you!");
