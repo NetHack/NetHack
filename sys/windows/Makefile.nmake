@@ -1843,6 +1843,7 @@ clean:
 #   * "-o $@ " is removed
 #   * win/X11/Window.o commented due to conflict with pdcurses
 #   * commented out $(TARGETPFX)tile.o: tile.c $(HACK_H)
+#   * commented out $(TARGETPFX)cppregex.o because it has its own rule already
 #   * commented out the lines starting with
 #	$(TARGET_CC) so the rules in this Makefile will be used instead
 #   * add compile recipe for nhlua.c to add -wd4324 to suppress a
@@ -1979,8 +1980,8 @@ $(TARGETPFX)winval.o: ..\win\X11\winval.c $(HACK_H) $(INCL)\winX.h
 #$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)winshim.o: ..\win\shim\winshim.c $(HACK_H)
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\shim\winshim.c
-$(TARGETPFX)cppregex.o: ..\sys\share\cppregex.cpp $(CONFIG_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\sys\share\cppregex.cpp
+#$(TARGETPFX)cppregex.o: ..\sys\share\cppregex.cpp $(CONFIG_H)
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\sys\share\cppregex.cpp
 $(TARGETPFX)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h ..\win\Qt\qt_click.h ..\win\Qt\qt_delay.h \
