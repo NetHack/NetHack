@@ -4625,7 +4625,7 @@ m_is_steadfast(struct monst *mtmp)
     otmp = is_u ? g.invent : mtmp.minvent; //we already used otmp so i'm just going to reuse it. this SHOULD make it have "mtmp"'s inventory as something I can iterate over... I think
     //this should iterate through the entire inventory, i see a similar thing done elsewhere in the code, i'm guessing nobj is "next object" in a linked list
     for(otmp;otmp;otmp->nobj)
-        if ((obj->otyp == LOADSTONE || obj->blessed))
+        if ((obj->otyp == LOADSTONE && obj->blessed))
             return TRUE;
     return FALSE;
 }
