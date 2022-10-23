@@ -1306,6 +1306,8 @@ hmon_hitmon(
         tmp = (get_dmg_bonus && !mon_is_shade) ? 1 : 0;
         if (mon_is_shade && !hittxt
             && thrown != HMON_THROWN && thrown != HMON_KICKED)
+            /* this gives "harmlessly passes through" feedback even when
+               hero doesn't see it happen; presumably sensed by touch? */
             hittxt = shade_miss(&g.youmonst, mon, obj, FALSE, TRUE);
     }
 
@@ -1591,8 +1593,12 @@ shade_aware(struct obj *obj)
 /* used for hero vs monster and monster vs monster; also handles
    monster vs hero but that won't happen because hero can't be a shade */
 boolean
-shade_miss(struct monst *magr, struct monst *mdef, struct obj *obj,
-           boolean thrown, boolean verbose)
+shade_miss(
+    struct monst *magr,
+    struct monst *mdef,
+    struct obj *obj,
+    boolean thrown,
+    boolean verbose)
 {
     const char *what, *whose, *target;
     boolean youagr = (magr == &g.youmonst), youdef = (mdef == &g.youmonst);
@@ -3427,8 +3433,9 @@ do_stone_mon(struct monst *magr, struct attack *mattk UNUSED,
 }
 
 void
-mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_phys(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pa = magr->data;
     struct permonst *pd = mdef->data;
@@ -3556,11 +3563,12 @@ mhitm_ad_phys(struct monst *magr, struct attack *mattk, struct monst *mdef,
     } else {
         /* mhitm */
         struct obj *mwep = MON_WEP(magr);
+        boolean vis = canseemon(magr) && canseemon(mdef);
 
         if (mattk->aatyp != AT_WEAP && mattk->aatyp != AT_CLAW)
             mwep = 0;
 
-        if (shade_miss(magr, mdef, mwep, FALSE, TRUE)) {
+        if (shade_miss(magr, mdef, mwep, FALSE, vis)) {
             mhm->damage = 0;
         } else if (mattk->aatyp == AT_KICK && thick_skinned(pd)) {
             /* [no 'kicking boots' check needed; monsters with kick attacks

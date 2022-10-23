@@ -9,8 +9,8 @@
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-static int hitmm(struct monst *, struct monst *, struct attack *, struct obj *,
-                 int);
+static int hitmm(struct monst *, struct monst *, struct attack *,
+                 struct obj *, int);
 static int gazemm(struct monst *, struct monst *, struct attack *);
 static int gulpmm(struct monst *, struct monst *, struct attack *);
 static int explmm(struct monst *, struct monst *, struct attack *);
@@ -556,9 +556,14 @@ mattackm(register struct monst *magr, register struct monst *mdef)
 
 /* Returns the result of mdamagem(). */
 static int
-hitmm(register struct monst *magr, register struct monst *mdef,
-      struct attack *mattk, struct obj *mwep, int dieroll)
+hitmm(
+    struct monst *magr,
+    struct monst *mdef,
+    struct attack *mattk,
+    struct obj *mwep,
+    int dieroll)
 {
+    int compat;
     boolean weaponhit = (mattk->aatyp == AT_WEAP
                          || (mattk->aatyp == AT_CLAW && mwep)),
             silverhit = (weaponhit && mwep
@@ -566,47 +571,47 @@ hitmm(register struct monst *magr, register struct monst *mdef,
 
     pre_mm_attack(magr, mdef);
 
-    if (g.vis) {
-        int compat;
-        char buf[BUFSZ];
+    compat = !magr->mcan ? could_seduce(magr, mdef, mattk) : 0;
+    if (!compat && shade_miss(magr, mdef, mwep, FALSE, g.vis))
+        return MM_MISS; /* bypass mdamagem() */
 
-        if ((compat = could_seduce(magr, mdef, mattk)) && !magr->mcan) {
-            Sprintf(buf, "%s %s", Monnam(magr),
+    if (g.vis) {
+        char buf[BUFSZ], magr_name[BUFSZ];
+
+        Strcpy(magr_name, Monnam(magr));
+        if (compat) {
+            Sprintf(buf, "%s %s", magr_name,
                     mdef->mcansee ? "smiles at" : "talks to");
             pline("%s %s %s.", buf, mon_nam(mdef),
-                  compat == 2 ? "engagingly" : "seductively");
-        } else if (shade_miss(magr, mdef, mwep, FALSE, TRUE)) {
-            return MM_MISS; /* bypass mdamagem() */
+                  (compat == 2) ? "engagingly" : "seductively");
         } else {
-            char magr_name[BUFSZ];
-
-            Strcpy(magr_name, Monnam(magr));
             buf[0] = '\0';
             switch (mattk->aatyp) {
             case AT_BITE:
-                Snprintf(buf, sizeof(buf), "%s bites", magr_name);
+                Snprintf(buf, sizeof buf, "%s bites", magr_name);
                 break;
             case AT_STNG:
-                Snprintf(buf, sizeof(buf), "%s stings", magr_name);
+                Snprintf(buf, sizeof buf, "%s stings", magr_name);
                 break;
             case AT_BUTT:
-                Snprintf(buf, sizeof(buf), "%s butts", magr_name);
+                Snprintf(buf, sizeof buf, "%s butts", magr_name);
                 break;
             case AT_TUCH:
-                Snprintf(buf, sizeof(buf), "%s touches", magr_name);
+                Snprintf(buf, sizeof buf, "%s touches", magr_name);
                 break;
             case AT_TENT:
-                Snprintf(buf, sizeof(buf), "%s tentacles suck", s_suffix(magr_name));
+                Snprintf(buf, sizeof buf, "%s tentacles suck",
+                         s_suffix(magr_name));
                 break;
             case AT_HUGS:
                 if (magr != u.ustuck) {
-                    Snprintf(buf, sizeof(buf), "%s squeezes", magr_name);
+                    Snprintf(buf, sizeof buf, "%s squeezes", magr_name);
                     break;
                 }
                 /*FALLTHRU*/
             default:
                 if (!weaponhit || !mwep || !mwep->oartifact)
-                    Snprintf(buf, sizeof(buf), "%s hits", magr_name);
+                    Snprintf(buf, sizeof buf, "%s hits", magr_name);
                 break;
             }
             if (*buf)
