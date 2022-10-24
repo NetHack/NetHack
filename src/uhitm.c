@@ -4625,10 +4625,14 @@ m_is_steadfast(struct monst *mtmp)
     if (is_art(otmp, ART_GIANTSLAYER))
         return TRUE;
 
-    /* steadfast if carrying any loadstone (and not floating or flying) */
+    /* steadfast if carrying any loadstone (and not floating or flying);
+       when mounted and steed is target of knockback, check the rider
+       for a loadstone too */
     for (otmp = is_u ? g.invent : mtmp->minvent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == LOADSTONE)
             return TRUE;
+    if (u.usteed && mtmp == u.usteed && carrying(LOADSTONE))
+        return TRUE;
 
     return FALSE;
 }
@@ -4642,6 +4646,7 @@ mhitm_knockback(
     int *hitflags,        /* modified if magr or mdef dies */
     boolean weapon_used)  /* True: via weapon hit */
 {
+    char magrbuf[BUFSZ], mdefbuf[BUFSZ];
     struct obj *otmp;
     boolean u_agr = (magr == &g.youmonst);
     boolean u_def = (mdef == &g.youmonst);
@@ -4686,12 +4691,21 @@ mhitm_knockback(
         return FALSE;
 
     /* steadfast defender cannot be pushed around */
-    if (m_is_steadfast(mdef))
+    if (m_is_steadfast(mdef)) {
+        if (u_def || (u.usteed && mdef == u.usteed)) {
+            mdefbuf[0] = '\0';
+            if (u.usteed)
+                Snprintf(mdefbuf, sizeof mdefbuf, "and %s ",
+                         y_monnam(u.usteed));
+            You("%sdon't budge.", mdefbuf);
+        } else if (canseemon(mdef)) {
+            pline("%s doesn't budge.", Monnam(mdef));
+        }
         return FALSE;
+    }
 
     /* give the message */
     if (u_def || canseemon(mdef)) {
-        char magrbuf[BUFSZ], mdefbuf[BUFSZ];
         boolean dosteed = u_def && u.usteed;
 
         Strcpy(magrbuf, u_agr ? "You" : Monnam(magr));
