@@ -580,7 +580,7 @@ hitmm(
 
         Strcpy(magr_name, Monnam(magr));
         if (compat) {
-            Sprintf(buf, "%s %s", magr_name,
+            Snprintf(buf, sizeof buf, "%s %s", magr_name,
                     mdef->mcansee ? "smiles at" : "talks to");
             pline("%s %s %s.", buf, mon_nam(mdef),
                   (compat == 2) ? "engagingly" : "seductively");
