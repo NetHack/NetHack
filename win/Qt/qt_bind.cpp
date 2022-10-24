@@ -703,7 +703,7 @@ char NetHackQtBind::qt_yn_function(const char *question_,
     int result = -1;
 
     if (choices) {
-        QString choicebuf((int) strlen(choices) + 1, QChar('\0'));
+        QString choicebuf;
         for (const char *p = choices; *p; ++p) {
             if (*p == '\033') // <esc> and anything beyond is hidden
                 break;
