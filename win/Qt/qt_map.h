@@ -34,12 +34,12 @@ private:
         unsigned short &Glyph(int x, int y) {
             return glyph[y][x];
         }
-        unsigned short glyphttychar[ROWNO][COLNO];
-        unsigned short &Glyphttychar(int x, int y) {
+        char32_t glyphttychar[ROWNO][COLNO];
+        char32_t &Glyphttychar(int x, int y) {
             return glyphttychar[y][x];
         }
-        unsigned short glyphcolor[ROWNO][COLNO];
-        unsigned short &Glyphcolor(int x, int y) {
+        uint32 glyphcolor[ROWNO][COLNO];
+        uint32 &Glyphcolor(int x, int y) {
             return glyphcolor[y][x];
         }
         unsigned int glyphflags[ROWNO][COLNO];
