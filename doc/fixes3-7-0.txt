@@ -1665,6 +1665,8 @@ X11: with 'slow' resource set to False, the pop up yn_function didn't always
 X11: (possibly X11+OSX): if persistent inventory was displayed at time of
 	end-of-game prompting, prompting would stall until that window was
 	manually dismissed
+X11: (possibly X11+OSX): try harder to resize the getlin() prompt, if needed,
+	when prompt text changes
 X11: set all selectable menu lines to the same length, left justified
 X11: initializing the get-extended-command widget modified memory beyond what
 	it dynamically allocated
