@@ -2635,11 +2635,13 @@ doborn(void)
     putstr(datawin, 0, "died born");
     for (i = LOW_PM; i < NUMMONS; i++)
         if (g.mvitals[i].born || g.mvitals[i].died
-            || (g.mvitals[i].mvflags & G_GONE)) {
+            || (g.mvitals[i].mvflags & G_GONE) != 0) {
             Sprintf(buf, fmt,
                     g.mvitals[i].died, g.mvitals[i].born,
-                    ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
-                    ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
+                    ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E'
+                    : ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G'
+                      : ((g.mvitals[i].mvflags & G_GONE) != 0) ? 'X'
+                        : ' ',
                     mons[i].pmnames[NEUTRAL]);
             putstr(datawin, 0, buf);
             nborn += g.mvitals[i].born;
@@ -2676,8 +2678,10 @@ list_vanquished(char defquery, boolean ask)
     boolean dumping; /* for DUMPLOG; doesn't need to be conditional */
 
     dumping = (defquery == 'd');
-    if (dumping)
+    if (dumping) {
         defquery = 'y';
+        ask = FALSE; /* redundant; caller passes False with defquery=='d' */
+    }
 
     /* get totals first */
     ntypes = 0;
