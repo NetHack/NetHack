@@ -1481,11 +1481,7 @@ const glyph_info nul_glyphinfo = {
 extern glyph_map glyphmap[MAX_GLYPH]; /* from tile.c */
 #else
 glyph_map glyphmap[MAX_GLYPH] = {
-    { 0U, { 0, 0}, 0, 0
-#ifdef ENHANCED_SYMBOLS
-      , 0
-#endif
-    }
+    { 0U, { 0, 0}, 0, 0 }
 };
 #endif
 
