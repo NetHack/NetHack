@@ -131,7 +131,7 @@ dosh(void)
 #endif /* MICRO */
 
 /*
- * Add a backslash to any name not ending in /, \ or :	 There must
+ * Add a backslash to any name not ending in /, \ or : There must
  * be room for the \
  */
 void

@@ -1,5 +1,5 @@
 /* NetHack 3.7	win10.c	$NHDT-Date: 1596498318 2020/08/03 23:45:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
-/* Copyright (C) 2018 by Bart House 	 */
+/* Copyright (C) 2018 by Bart House */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "win10.h"

@@ -25,7 +25,7 @@
  * produces a binary only 6 blocks long, as opposed to the 137-block one
  * produced by an ordinary link).  To set up the VMS symbol to run the
  * program ("run uudecode filename" won't work), do:
- *		uudecode :== "$disk:[directory]uudecode.exe"
+ *              uudecode :== "$disk:[directory]uudecode.exe"
  * and don't forget the leading "$" or it still won't work.  The binaries
  * produced by this program are in VMS "stream-LF" format; this makes no
  * difference to VMS when running decoded executables, nor to VMS unzip,
@@ -45,7 +45,7 @@
  */
 
 #ifndef lint
-static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
+static char sccsid[] = "@(#)uudecode.c 5.5 (Berkeley) 7/6/88";
 #endif /* not lint */
 
 #ifdef __MSDOS__ /* For Turbo C */

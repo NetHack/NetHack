@@ -4143,7 +4143,7 @@ wiz_mon_diff(void)
                      ptr->pmnames[NEUTRAL], cnt, mlev,
                      mcalculated, mhardcoded, mdiff);
             putstr(win, 0, buf);
-	}
+        }
     }
     if (!trouble)
         putstr(win, 0, "No monster difficulty discrepencies were detected.");

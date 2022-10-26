@@ -26,8 +26,8 @@ struct nomakedefs_s nomakedefs = {
        comp.sources.games/91SfKYg_xzI/dGnR3JnspFkJ */
     "Tue, 28-Jul-87 13:18:57 EDT",
     "Version 1.0, built Jul 28 13:18:57 1987.",
-    (const char *) 0,	/* git_sha */
-    (const char *) 0,	/* git_branch */
+    (const char *) 0,   /* git_sha */
+    (const char *) 0,   /* git_branch */
     "1.0.0-0",
     "NetHack Version 1.0.0-0 - last build Tue Jul 28 13:18:57 1987.",
     0x01010000UL,

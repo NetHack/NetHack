@@ -7,8 +7,8 @@
  * by nethack.
  *
  * Assumptions:
- * 	+ Two dimensional byte arrays are in row order and are not padded
- *	  between rows (x11_colormap[][]).
+ *      + Two dimensional byte arrays are in row order and are not padded
+ *        between rows (x11_colormap[][]).
  */
 #include "hack.h" /* for MAX_GLYPH */
 #include "tile.h"

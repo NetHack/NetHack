@@ -18,7 +18,7 @@
  *     _MSC_VER is defined automatically by Microsoft C.
  *     __BORLANDC__ is defined automatically by Borland C.
  *     __SC__ is defined automatically by Symantec C.
- *	Note: 3.6.x was not verified with Symantec C.
+ *     Note: 3.6.x was not verified with Symantec C.
  */
 
 #define CONFIG_FILE "defaults.nh"
@@ -43,10 +43,10 @@
  * Screen control options
  *
  * You may uncomment:
- *		       ANSI_DEFAULT
- *		  or   TERMLIB
- *		  or   ANSI_DEFAULT and TERMLIB
- *		  or   NO_TERMS
+ *    ANSI_DEFAULT
+ *    or   TERMLIB
+ *    or   ANSI_DEFAULT and TERMLIB
+ *    or   NO_TERMS
  */
 
 /* # define TERMLIB */ /* enable use of termcap file /etc/termcap */
@@ -61,7 +61,7 @@
 
 #ifdef NO_TERMS     /* if NO_TERMS select one screen package below */
 #define SCREEN_BIOS /* Use bios calls for all screen control */
-/* #define SCREEN_DJGPPFAST */ /* Use djgpp fast screen routines	*/
+/* #define SCREEN_DJGPPFAST */ /* Use djgpp fast screen routines */
 #endif
 
 /* # define PC9800 */ /* Allows NetHack to run on NEC PC-9800 machines */
@@ -76,7 +76,7 @@
 #ifndef SUPPRESS_GRAPHICS
 #if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
 #ifdef USE_TILES
-#define SCREEN_VGA /* Include VGA	  graphics routines in the build */
+#define SCREEN_VGA /* Include VGA graphics routines in the build */
 #define SCREEN_VESA
 #endif
 #endif
@@ -96,7 +96,7 @@
 
 #define MAIL /* Allows for fake mail daemon to deliver mail */
              /* in the MSDOS version.  (For AMIGA MAIL see  */
-             /* amiconf.h).	In the future this will be the */
+             /* amiconf.h).  In the future this will be the */
              /* hook for mail reader implementation.        */
 
 /* The following is needed for prototypes of certain functions */
@@ -215,9 +215,9 @@
 #define VROOMM /* Borland's VROOMM overlay system */
 #endif
 #if !defined(STKSIZ)
-#define STKSIZ 5 * 1024 /* Use a default of 5K stack for Borland C	*/
+#define STKSIZ 5 * 1024 /* Use a default of 5K stack for Borland C      */
                         /* This macro is used in any file that contains */
-                        /* a main() function.				*/
+                        /* a main() function.                           */
 #endif
 #define PC_LOCKING
 #endif
@@ -288,7 +288,7 @@
                            */
 #endif
 #else
-/* djgpp C compiler	*/
+/* djgpp C compiler */
 #if defined(SCREEN_BIOS)
 #undef SCREEN_BIOS
 #endif

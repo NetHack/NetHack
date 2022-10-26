@@ -1,5 +1,5 @@
 /* NetHack 3.7	Window.c	$NHDT-Date: 1596498371 2020/08/03 23:46:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -130,40 +130,40 @@ Resize(Widget w)
 
 WindowClassRec windowClassRec = {
     { /* core fields */
-      /* superclass		*/ (WidgetClass) &widgetClassRec,
-      /* class_name		*/ nhStr("Window"),
-      /* widget_size		*/ sizeof(WindowRec),
-      /* class_initialize		*/ 0,
-      /* class_part_initialize	*/ 0,
-      /* class_inited		*/ FALSE,
-      /* initialize		*/ 0,
-      /* initialize_hook		*/ 0,
-      /* realize			*/ XtInheritRealize,
-      /* actions			*/ actions,
-      /* num_actions		*/ XtNumber(actions),
-      /* resources		*/ resources,
-      /* num_resources		*/ XtNumber(resources),
-      /* xrm_class		*/ NULLQUARK,
-      /* compress_motion		*/ TRUE,
-      /* compress_exposure	*/ TRUE,
-      /* compress_enterleave	*/ TRUE,
-      /* visible_interest		*/ FALSE,
-      /* destroy			*/ 0,
-      /* resize			*/ Resize,
-      /* expose			*/ Redisplay,
-      /* set_values		*/ 0,
-      /* set_values_hook		*/ 0,
-      /* set_values_almost	*/ XtInheritSetValuesAlmost,
-      /* get_values_hook		*/ 0,
-      /* accept_focus		*/ 0,
-      /* version			*/ XtVersion,
-      /* callback_private		*/ 0,
-      /* tm_table			*/ translations,
-      /* query_geometry		*/ XtInheritQueryGeometry,
-      /* display_accelerator	*/ XtInheritDisplayAccelerator,
-      /* extension		*/ 0 },
+      /* superclass             */ (WidgetClass) &widgetClassRec,
+      /* class_name             */ nhStr("Window"),
+      /* widget_size            */ sizeof(WindowRec),
+      /* class_initialize       */ 0,
+      /* class_part_initialize  */ 0,
+      /* class_inited           */ FALSE,
+      /* initialize             */ 0,
+      /* initialize_hook        */ 0,
+      /* realize                */ XtInheritRealize,
+      /* actions                */ actions,
+      /* num_actions            */ XtNumber(actions),
+      /* resources              */ resources,
+      /* num_resources          */ XtNumber(resources),
+      /* xrm_class              */ NULLQUARK,
+      /* compress_motion        */ TRUE,
+      /* compress_exposure      */ TRUE,
+      /* compress_enterleave    */ TRUE,
+      /* visible_interest       */ FALSE,
+      /* destroy                */ 0,
+      /* resize                 */ Resize,
+      /* expose                 */ Redisplay,
+      /* set_values             */ 0,
+      /* set_values_hook        */ 0,
+      /* set_values_almost      */ XtInheritSetValuesAlmost,
+      /* get_values_hook        */ 0,
+      /* accept_focus           */ 0,
+      /* version                */ XtVersion,
+      /* callback_private       */ 0,
+      /* tm_table               */ translations,
+      /* query_geometry         */ XtInheritQueryGeometry,
+      /* display_accelerator    */ XtInheritDisplayAccelerator,
+      /* extension              */ 0 },
     { /* window fields */
-      /* empty			*/ 0 }
+      /* empty                  */ 0 }
 };
 
 WidgetClass windowWidgetClass = (WidgetClass) &windowClassRec;

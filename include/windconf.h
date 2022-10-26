@@ -5,7 +5,7 @@
 #ifndef WINDCONF_H
 #define WINDCONF_H
 
-/* #define SHELL */	/* nt use of pcsys routines caused a hang */
+/* #define SHELL */    /* nt use of pcsys routines caused a hang */
 
 #define TEXTCOLOR /* Color text */
 
@@ -213,7 +213,7 @@ typedef SSIZE_T ssize_t;
 
 #ifndef M
 #define M(c) ((char) (0x80 | (c)))
-/* #define M(c)		((c) - 128) */
+/* #define M(c) ((c) - 128) */
 #endif
 
 #ifndef C

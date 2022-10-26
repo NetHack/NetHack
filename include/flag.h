@@ -378,10 +378,10 @@ struct instance_flags {
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
     boolean wc2_guicolor;       /* allow colours in gui (outside map) */
     int wc_mouse_support;       /* allow mouse support */
-    int wc2_term_cols;		/* terminal width, in characters */
-    int wc2_term_rows;		/* terminal height, in characters */
+    int wc2_term_cols;          /* terminal width, in characters */
+    int wc2_term_rows;          /* terminal height, in characters */
     int wc2_statuslines;        /* default = 2, curses can handle 3 */
-    int wc2_windowborders;	/* display borders on NetHack windows */
+    int wc2_windowborders;      /* display borders on NetHack windows */
     int wc2_petattr;            /* text attributes for pet */
 #ifdef WIN32
 #define MAX_ALTKEYHANDLING 25

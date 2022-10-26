@@ -9,7 +9,7 @@
 #include <string.h>
 #endif
 
-#define DATAPREFIX 4		/* see decl.h */
+#define DATAPREFIX 4        /* see decl.h */
 
 #ifdef DLB
 /*

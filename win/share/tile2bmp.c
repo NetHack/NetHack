@@ -5,8 +5,8 @@
 /*
  * Edit History:
  *
- *	Initial Creation			M.Allison   1994/01/11
- *	256 colour bmp and statue support	M.Allison   2015/04/19
+ *      Initial Creation                        M.Allison   1994/01/11
+ *      256 colour bmp and statue support       M.Allison   2015/04/19
  *
  */
 
@@ -258,7 +258,7 @@ main(int argc, char *argv[])
             initflag = 1;
         }
         set_grayscale(pass == 3);
-        /*		printf("Colormap initialized\n"); */
+        /* printf("Colormap initialized\n"); */
         while (read_text_tile(tilepixels)) {
             build_bmptile(tilepixels);
             tilecount++;

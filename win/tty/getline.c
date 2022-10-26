@@ -242,8 +242,8 @@ xwaitforspace(register const char *s) /* chars allowed besides return */
  * Return TRUE if we've extended the string at base.  Otherwise return FALSE.
  * Assumptions:
  *
- *	+ we don't change the characters that are already in base
- *	+ base has enough room to hold our string
+ *      + we don't change the characters that are already in base
+ *      + base has enough room to hold our string
  */
 static boolean
 ext_cmd_getlin_hook(char *base)

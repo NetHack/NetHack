@@ -1483,7 +1483,7 @@ extern glyph_map glyphmap[MAX_GLYPH]; /* from tile.c */
 glyph_map glyphmap[MAX_GLYPH] = {
     { 0U, { 0, 0}, 0
 #ifdef ENHANCED_SYMBOLS
-	    , 0
+            , 0
 #endif
     }
 };

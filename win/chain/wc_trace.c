@@ -1,5 +1,5 @@
 /* NetHack 3.7	wc_trace.c	$NHDT-Date: 1596498324 2020/08/03 23:45:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
-/* Copyright (c) Kenneth Lorber, 2012				  */
+/* Copyright (c) Kenneth Lorber, 2012                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
@@ -50,8 +50,8 @@ void trace_putmixed(void *,winid, int, const char *);
 void trace_display_file(void *,const char *, boolean);
 void trace_start_menu(void *,winid, unsigned long);
 void trace_add_menu(void *,winid, const glyph_info *, const ANY_P *,
-		                         char, char, int, int,
-					                          const char *, unsigned int);
+                    char, char, int, int,
+                    const char *, unsigned int);
 void trace_end_menu(void *,winid, const char *);
 int trace_select_menu(void *,winid, int, MENU_ITEM_P **);
 char trace_message_menu(void *,char, int, const char *);
@@ -65,7 +65,7 @@ void trace_cliparound(void *,int, int);
 void trace_update_positionbar(void *,char *);
 #endif
 void trace_print_glyph(void *,winid, coordxy, coordxy,
-		                            const glyph_info *, const glyph_info *);
+                            const glyph_info *, const glyph_info *);
 void trace_raw_print(void *,const char *);
 void trace_raw_print_bold(void *,const char *);
 int trace_nhgetch(void *);
@@ -96,9 +96,9 @@ void trace_putmsghistory(void *,const char *, boolean);
 void trace_status_init(void *);
 void trace_status_finish(void *);
 void trace_status_enablefield(void *,int, const char *, const char *,
-		                                boolean);
+                              boolean);
 void trace_status_update(void *,int, genericptr_t, int, int, int,
-		                           unsigned long *);
+                         unsigned long *);
 
 boolean trace_can_suspend(void *);
 

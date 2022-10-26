@@ -257,7 +257,7 @@ setftty(void)
     /* Should use (ECHO|CRMOD) here instead of ECHO */
     if ((unsigned) (curttyb.echoflgs & ECHO) != ef) {
         curttyb.echoflgs &= ~ECHO;
-        /*		curttyb.echoflgs |= ef; */
+        /* curttyb.echoflgs |= ef; */
         change++;
     }
     if ((unsigned) (curttyb.cbrkflgs & CBRKMASK) != cf) {

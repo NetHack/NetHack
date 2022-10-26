@@ -725,7 +725,7 @@ vesa_xputg(const glyph_info *glyphinfo)
  * These include:
  *
  * vesa_gotoloc(x,y)    - Moves the "cursor" on screen to the specified x
- *			 and y character cell location.  This routine
+ *                       and y character cell location.  This routine
  *                       determines the location where screen writes
  *                       will occur next, it does not change the location
  *                       of the player on the NetHack level.
@@ -862,7 +862,7 @@ vesa_redrawmap(void)
 void
 vesa_userpan(enum vga_pan_direction pan)
 {
-    /*	pline("Into userpan"); */
+    /* pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
 
@@ -918,7 +918,7 @@ vesa_userpan(enum vga_pan_direction pan)
 void
 vesa_overview(boolean on)
 {
-    /*	vesa_HideCursor(); */
+    /* vesa_HideCursor(); */
     if (on) {
         iflags.over_view = TRUE;
         clipx = 0;
@@ -951,9 +951,9 @@ vesa_overview(boolean on)
 void
 vesa_traditional(boolean on)
 {
-    /*	vesa_HideCursor(); */
+    /* vesa_HideCursor(); */
     if (on) {
-        /*		switch_symbols(FALSE); */
+        /* switch_symbols(FALSE); */
         iflags.traditional_view = TRUE;
         clipx = 0;
         clipxmax = COLNO - 1;
@@ -1054,7 +1054,7 @@ vesa_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /*	clear_screen()	*/ /* not vesa_clear_screen() */
+        /* clear_screen() */ /* not vesa_clear_screen() */
         return;
     }
 #endif
@@ -1070,7 +1070,7 @@ vesa_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /*	clear_screen()	*/ /* not vesa_clear_screen() */
+        /* clear_screen() */ /* not vesa_clear_screen() */
         return;
     }
 

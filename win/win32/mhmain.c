@@ -1,5 +1,5 @@
 /* NetHack 3.7	mhmain.c	$NHDT-Date: 1596498352 2020/08/03 23:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -766,8 +766,8 @@ VOID CALLBACK FuzzTimerProc(
         BOOL gen_alt = (rn2(50) == 0) && isalpha(c);
 
         if (!iflags.debug_fuzzer) {
-        	KillTimer(hwnd, IDT_FUZZ_TIMER);
-        	return;
+            KillTimer(hwnd, IDT_FUZZ_TIMER);
+            return;
         }
 
         if (!GetFocus())
@@ -775,17 +775,17 @@ VOID CALLBACK FuzzTimerProc(
 
         ZeroMemory(input, sizeof(input));
         if (gen_alt) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+            i_pos++;
         }
 
         if (HIBYTE(k) & 1) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+            i_pos++;
         }
 
         input[i_pos].type = INPUT_KEYBOARD;
@@ -794,16 +794,16 @@ VOID CALLBACK FuzzTimerProc(
         i_pos++;
 
         if (HIBYTE(k) & 1) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+            i_pos++;
         }
         if (gen_alt) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+            i_pos++;
         }
         SendInput(i_pos, input, sizeof(input[0]));
 }

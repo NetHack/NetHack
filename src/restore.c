@@ -1484,7 +1484,7 @@ validate(NHFILE* nhfp, const char *name)
     } else {
         if (nhfp->structlevel)
             rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
-        minit();		/* ZEROCOMP */
+        minit();        /* ZEROCOMP */
         if (rlen == 0) {
             if (verbose) {
                 pline("File \"%s\" is empty during save file feature check?", name);

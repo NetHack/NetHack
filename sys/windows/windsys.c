@@ -180,7 +180,7 @@ void nt_regularize(char* s) /* normalize file name */
 char *getxxx(void)
 {
 char     szFullPath[MAX_PATH] = "";
-HMODULE  hInst = NULL;  	/* NULL gets the filename of this module */
+HMODULE  hInst = NULL;  /* NULL gets the filename of this module */
 
 GetModuleFileName(hInst, szFullPath, sizeof(szFullPath));
 return &szFullPath[0];
@@ -621,7 +621,7 @@ windows_early_options(const char *window_opt)
 }
 
 /*
- * Add a backslash to any name not ending in /, \ or :	 There must
+ * Add a backslash to any name not ending in /, \ or : There must
  * be room for the \
  */
 void

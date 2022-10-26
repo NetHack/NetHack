@@ -204,9 +204,9 @@ const struct instance_globals g_init = {
     0,  /* mrank_sz */
     { { { NULL, NULL, 0L, FALSE, FALSE, 0, 0U, { 0 }, NULL, 0, 0, 0
 #ifdef STATUS_HILITES
-	  , UNDEFINED_PTR, UNDEFINED_PTR
+            , UNDEFINED_PTR, UNDEFINED_PTR
 #endif
-	} }
+    } }
     }, /* blstats */
     FALSE, /* blinit */
     FALSE, /* update_all */
@@ -474,7 +474,7 @@ const struct instance_globals g_init = {
 
     /* mkmaze.c */
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0},
-	    FALSE, FALSE, 0, 0, { 0 } }, /* bughack */
+            FALSE, FALSE, 0, 0, { 0 } }, /* bughack */
     UNDEFINED_PTR, /* bbubbles */
     UNDEFINED_PTR, /* ebubbles */
     UNDEFINED_PTR, /* wportal */

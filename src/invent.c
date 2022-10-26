@@ -3245,7 +3245,7 @@ display_pickinv(
         sparse = ((wri_info.fromcore.invmode & InvSparse) != 0);
         inuse_only = ((wri_info.fromcore.invmode & InvInUse) != 0);
         doing_perm_invent = TRUE;
-	nhUse(sparse);
+        nhUse(sparse);
     }
     /*
      * Exit early if no inventory -- but keep going if we are doing

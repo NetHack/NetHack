@@ -361,17 +361,17 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
  * provides all the subclasses that seem reasonable, and sets up for all
  * prefixes being null.  Port code can set those that it wants.
  */
-#define HACKPREFIX	0	/* shared, RO */
-#define LEVELPREFIX	1	/* per-user, RW */
-#define SAVEPREFIX	2	/* per-user, RW */
-#define BONESPREFIX	3	/* shared, RW */
-#define DATAPREFIX	4	/* dungeon/dlb; must match value in dlb.c */
-#define SCOREPREFIX	5	/* shared, RW */
-#define LOCKPREFIX	6	/* shared, RW */
-#define SYSCONFPREFIX	7	/* shared, RO */
-#define CONFIGPREFIX	8
-#define TROUBLEPREFIX	9	/* shared or per-user, RW (append-only) */
-#define PREFIX_COUNT	10
+#define HACKPREFIX      0  /* shared, RO */
+#define LEVELPREFIX     1  /* per-user, RW */
+#define SAVEPREFIX      2  /* per-user, RW */
+#define BONESPREFIX     3  /* shared, RW */
+#define DATAPREFIX      4  /* dungeon/dlb; must match value in dlb.c */
+#define SCOREPREFIX     5  /* shared, RW */
+#define LOCKPREFIX      6  /* shared, RW */
+#define SYSCONFPREFIX   7  /* shared, RO */
+#define CONFIGPREFIX    8
+#define TROUBLEPREFIX   9  /* shared or per-user, RW (append-only) */
+#define PREFIX_COUNT   10
 /* used in files.c; xxconf.h can override if needed */
 #ifndef FQN_MAX_FILENAME
 #define FQN_MAX_FILENAME 512
@@ -698,7 +698,7 @@ struct enum_dump {
     const char *nm;
 };
 
-typedef long cmdcount_nht;	/* Command counts */
+typedef long cmdcount_nht;    /* Command counts */
 
 enum {
     CQ_CANNED = 0, /* internal canned sequence */
@@ -1260,9 +1260,9 @@ struct instance_globals {
     short corpsenm_digested; /* monster type being digested, set by gulpum */
 
     /* vision.c */
-    seenV **viz_array; /* used in cansee() and couldsee() macros */
-    coordxy *viz_rmin;			/* min could see indices */
-    coordxy *viz_rmax;			/* max could see indices */
+    seenV **viz_array;   /* used in cansee() and couldsee() macros */
+    coordxy *viz_rmin;   /* min could see indices */
+    coordxy *viz_rmax;   /* max could see indices */
     boolean vision_full_recalc;
     int seethru; /* 'bubble' debugging: clouds and water don't block light */
 

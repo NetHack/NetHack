@@ -117,7 +117,7 @@ restore_artifacts(NHFILE *nhfp)
         mread(nhfp->fd, (genericptr_t) artiexist, sizeof artiexist);
         mread(nhfp->fd, (genericptr_t) artidisco, sizeof artidisco);
     }
-    hack_artifacts();	/* redo non-saved special cases */
+    hack_artifacts();   /* redo non-saved special cases */
 }
 
 const char *

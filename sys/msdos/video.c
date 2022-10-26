@@ -1,13 +1,13 @@
 /* NetHack 3.7	video.c	$NHDT-Date: 1596498277 2020/08/03 23:44:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $ */
-/*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001	    */
+/*   Copyright (c) NetHack PC Development Team 1993, 1994, 2001     */
 /*   NetHack may be freely redistributed.  See license for details. */
-/*								    */
+
 /*
  * video.c - Hardware video support front-ends
  *
  *Edit History:
- *     Initial Creation 	     M. Allison      1993/04/04
- *     Add djgpp support	     K. Smolkowski   1993/04/26
+ *     Initial Creation              M. Allison      1993/04/04
+ *     Add djgpp support             K. Smolkowski   1993/04/26
  *     Add txt/graphics mode support M. Allison      1993/10/30
  *     Add graphics mode cursor sim. M. Allison      1994/02/19
  *     Add hooks for decals on vga   M. Allison      2001/04/07
@@ -527,25 +527,25 @@ gr_finish(void)
  * as those in win/tty).
  *
  * xputs - Writes a c null terminated string at the current location.
- *	   Depending on compile options, this could just be a series
- *	   of repeated calls to xputc() for each character.
+ *         Depending on compile options, this could just be a series
+ *         of repeated calls to xputc() for each character.
  *
  * xputc - Writes a single character at the current location. Since
- *	   various places in the code assume that control characters
- *	   can be used to control, we are forced to interpret some of
- *	   the more common ones, in order to keep things looking correct.
+ *         various places in the code assume that control characters
+ *         can be used to control, we are forced to interpret some of
+ *         the more common ones, in order to keep things looking correct.
  *
  * xputg - If using a graphics mode display mechanism (such as VGA, this
- *	   routine is used to display a graphical representation of a
- *	   NetHack glyph at the current location.  For more information on
- *	   NetHack glyphs refer to the comments in include/display.h.
+ *         routine is used to display a graphical representation of a
+ *         NetHack glyph at the current location.  For more information on
+ *         NetHack glyphs refer to the comments in include/display.h.
  *
  * NOTES:
- *	   wintty.h uses macros to redefine common output functions
- *	   such as puts, putc, putchar, so that they get steered into
- *	   either xputs (for strings) or xputc (for single characters).
- *	   References to puts, putc, and putchar in other source files
- *	   (that include wintty.h) are actually using these routines.
+ *         wintty.h uses macros to redefine common output functions
+ *         such as puts, putc, putchar, so that they get steered into
+ *         either xputs (for strings) or xputc (for single characters).
+ *         References to puts, putc, and putchar in other source files
+ *         (that include wintty.h) are actually using these routines.
  */
 
 void
@@ -683,30 +683,30 @@ HideCursor(void)
 
 #ifdef TEXTCOLOR
 /*
- * CLR_BLACK		0
- * CLR_RED		1
- * CLR_GREEN		2
- * CLR_BROWN		3	low-intensity yellow
- * CLR_BLUE 		4
- * CLR_MAGENTA		5
- * CLR_CYAN 		6
- * CLR_GRAY 		7	low-intensity white
- * NO_COLOR		8
- * CLR_ORANGE		9
- * CLR_BRIGHT_GREEN 	10
- * CLR_YELLOW		11
- * CLR_BRIGHT_BLUE	12
- * CLR_BRIGHT_MAGENTA	13
- * CLR_BRIGHT_CYAN	14
- * CLR_WHITE		15
- * CLR_MAX		16
- * BRIGHT		8
+ * CLR_BLACK            0
+ * CLR_RED              1
+ * CLR_GREEN            2
+ * CLR_BROWN            3       low-intensity yellow
+ * CLR_BLUE             4
+ * CLR_MAGENTA          5
+ * CLR_CYAN             6
+ * CLR_GRAY             7       low-intensity white
+ * NO_COLOR             8
+ * CLR_ORANGE           9
+ * CLR_BRIGHT_GREEN     10
+ * CLR_YELLOW           11
+ * CLR_BRIGHT_BLUE      12
+ * CLR_BRIGHT_MAGENTA   13
+ * CLR_BRIGHT_CYAN      14
+ * CLR_WHITE            15
+ * CLR_MAX              16
+ * BRIGHT               8
  */
 
 #ifdef VIDEOSHADES
 /* assign_videoshades() is prototyped in extern.h */
 /* assign_videocolors() is prototyped in extern.h */
-/* assign_video()	is prototyped in extern.h */
+/* assign_video()       is prototyped in extern.h */
 
 int shadeflag; /* shades are initialized */
 int colorflag; /* colors are initialized */
@@ -832,8 +832,8 @@ assign_videoshades(char *choiceptr)
 /*
  * Process defaults.nh OPTIONS=videocolors:xxx
  * Left to right assignments for:
- *	red green brown blue magenta cyan orange br.green yellow
- *	br.blue br.mag br.cyan
+ *      red green brown blue magenta cyan orange br.green yellow
+ *      br.blue br.mag br.cyan
  *
  * Default Mapping (BIOS): 4-2-6-1-5-3-12-10-14-9-13-11
  */
@@ -913,8 +913,8 @@ convert_uchars(char *bufp,  /* current pointer */
  *    where (current) legitimate values are:
  *
  *    autodetect (attempt to determine the adapter type)
- *    default	 (force use of the default video method for environment)
- *    vga	 (use vga adapter code)
+ *    default    (force use of the default video method for environment)
+ *    vga        (use vga adapter code)
  */
 int
 assign_video(char *sopt)
@@ -922,8 +922,8 @@ assign_video(char *sopt)
     /*
      * debug
      *
-     *	printf("video is %s",sopt);
-     *	getch();
+     *  printf("video is %s",sopt);
+     *  getch();
      */
     iflags.grmode = 0;
     iflags.hasvesa = 0;
@@ -966,7 +966,7 @@ assign_video(char *sopt)
 #endif
         /*
          * Auto-detect Priorities (arbitrary for now):
-         *	VESA, VGA
+         *    VESA, VGA
          */
         if (iflags.hasvesa) iflags.usevesa = 1;
         else if (iflags.hasvga) {

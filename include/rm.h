@@ -9,7 +9,7 @@
 /*
  * The dungeon presentation graphics code and data structures were rewritten
  * and generalized for NetHack's release 2 by Eric S. Raymond (eric@snark)
- * building on Don G Kneller's MS-DOS implementation.	See drawing.c for
+ * building on Don G Kneller's MS-DOS implementation. See drawing.c for
  * the code that permits the user to set the contents of the symbol structure.
  *
  * The door representation was changed by Ari

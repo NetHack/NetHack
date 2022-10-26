@@ -186,7 +186,7 @@ static int viewport_size = 40;
 /* static char masktable[8]={0x80,0x40,0x20,0x10,0x08,0x04,0x02,0x01}; */
 /* static char bittable[8]= {0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80}; */
 #if 0
-static char defpalette[] = {	/* Default VGA palette         */
+static char defpalette[] = { /* Default VGA palette         */
         0x00, 0x00, 0x00,
         0x00, 0x00, 0xaa,
         0x00, 0xaa, 0x00,
@@ -214,7 +214,7 @@ int vp2[SCREENPLANES] = { 1, 2, 4, 8 };
 static struct planar_cell_struct planecell;
 static struct overview_planar_cell_struct planecell_O;
 
-/* static int  g_attribute;	*/ /* Current attribute to use */
+/* static int  g_attribute; */ /* Current attribute to use */
 
 void
 vga_get_scr_size(void)
@@ -424,7 +424,7 @@ vga_xputg(const glyph_info *glyphinfo)
  * These include:
  *
  * vga_gotoloc(x,y)     - Moves the "cursor" on screen to the specified x
- *			 and y character cell location.  This routine
+ *                       and y character cell location.  This routine
  *                       determines the location where screen writes
  *                       will occur next, it does not change the location
  *                       of the player on the NetHack level.
@@ -513,7 +513,7 @@ vga_userpan(enum vga_pan_direction pan)
 {
     int x;
 
-    /*	pline("Into userpan"); */
+    /* pline("Into userpan"); */
     if (iflags.over_view || iflags.traditional_view)
         return;
     if (pan == pan_left)
@@ -530,7 +530,7 @@ vga_userpan(enum vga_pan_direction pan)
 void
 vga_overview(boolean on)
 {
-    /*	vga_HideCursor(); */
+    /* vga_HideCursor(); */
     if (on) {
         iflags.over_view = TRUE;
         clipx = 0;
@@ -547,9 +547,9 @@ vga_overview(boolean on)
 void
 vga_traditional(boolean on)
 {
-    /*	vga_HideCursor(); */
+    /* vga_HideCursor(); */
     if (on) {
-        /*		switch_symbols(FALSE); */
+        /* switch_symbols(FALSE); */
         iflags.traditional_view = TRUE;
         clipx = 0;
         clipxmax = CO - 1;
@@ -762,7 +762,7 @@ vga_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /*	clear_screen()	*/ /* not vga_clear_screen() */
+        /* clear_screen() */ /* not vga_clear_screen() */
         return;
     }
 #endif
@@ -868,7 +868,7 @@ vga_NoBorder(int bc)
         regs.h.al = (char)0x01;
         regs.h.bh = (char)bc;
         regs.h.bl = 0;
-        (void) int86(VIDEO_BIOS, &regs, &regs);	
+        (void) int86(VIDEO_BIOS, &regs, &regs);
 }
 #endif
 
@@ -918,9 +918,9 @@ vga_detect(void)
     /*
      * debug
      *
-     *	printf("vga_detect returned al=%02x, bh=%02x, bl=%02x\n",
-     *			(int)regs.h.al, (int)regs.h.bh, (int)regs.h.bl);
-     *	getch();
+     *  printf("vga_detect returned al=%02x, bh=%02x, bl=%02x\n",
+     *         (int)regs.h.al, (int)regs.h.bh, (int)regs.h.bl);
+     *  getch();
      */
     if ((int) regs.h.al == 0x1a) {
         if (((int) regs.h.bl == 8) || ((int) regs.h.bl == 7)) {
@@ -947,7 +947,7 @@ vga_WriteChar(uint32 chr, int col, int row, int colour)
     int vplane;
     unsigned char bitmap[ROWS_PER_CELL];
 
-    /*	if (chr < ' ') chr = ' ';  */ /* assumes ASCII set */
+    /* if (chr < ' ') chr = ' ';  */ /* assumes ASCII set */
     vga_GetBitmap(chr, bitmap);
 
     x = min(col, (CO - 1));         /* min() used protection from callers */
@@ -1312,8 +1312,8 @@ vga_DrawCursor(void)
     char __far *tmp1;
     char __far *tmp2;
     unsigned char first, second;
-    /*	char on[2] =  {0xFF,0xFF}; */
-    /*	char off[2] = {0x00,0x00}; */
+    /* char on[2] =  {0xFF,0xFF}; */
+    /* char off[2] = {0x00,0x00}; */
     boolean isrogue = Is_rogue_level(&u.uz);
     boolean singlebyte =
         (isrogue || iflags.over_view || iflags.traditional_view || !inmap);

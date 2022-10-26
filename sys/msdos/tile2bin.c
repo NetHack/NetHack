@@ -5,10 +5,10 @@
 /*
  * Edit History:
  *
- *	Initial Creation			M.Allison	93/10/21
- *	ifndef MONITOR_HEAP for heaputil.c	P.Winner	94/03/12
- *      added Borland C _stklen variable	Y.Sapir		94/05/01
- *	fixed to use text tiles from win/share	M.Allison	95/01/31
+ *    Initial Creation                          M.Allison    1993/10/21
+ *    ifndef MONITOR_HEAP for heaputil.c        P.Winner     1994/03/12
+ *    added Borland C _stklen variable          Y.Sapir      1994/05/01
+ *    fixed to use text tiles from win/share    M.Allison    1995/01/31
  *
  */
 

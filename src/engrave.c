@@ -1385,7 +1385,7 @@ rest_engravings(NHFILE *nhfp)
         }
         ep->nxt_engr = head_engr;
         head_engr = ep;
-        ep->engr_txt = (char *) (ep + 1);	/* Andreas Bormann */
+        ep->engr_txt = (char *) (ep + 1);    /* Andreas Bormann */
         /* mark as finished for bones levels -- no problem for
          * normal levels as the player must have finished engraving
          * to be able to move again */

@@ -1,5 +1,5 @@
 /* NetHack 3.7	dgn_file.h	$NHDT-Date: 1596498533 2020/08/03 23:48:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
-/* Copyright (c) 1989 by M. Stephenson				  */
+/* Copyright (c) 1989 by M. Stephenson                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef DGN_FILE_H
@@ -43,7 +43,7 @@ struct tmpbranch {
 };
 
 /*
- *	Values for type for tmpbranch structure.
+ *    Values for type for tmpbranch structure.
  */
 #define TBR_STAIR 0   /* connection with both ends having a staircase */
 #define TBR_NO_UP 1   /* connection with no up staircase */
@@ -51,7 +51,7 @@ struct tmpbranch {
 #define TBR_PORTAL 3  /* portal connection */
 
 /*
- *	Flags that map into the dungeon flags bitfields.
+ *    Flags that map into the dungeon flags bitfields.
  */
 #define TOWN 1 /* levels only */
 #define HELLISH 2
@@ -66,7 +66,7 @@ struct tmpbranch {
 #define D_ALIGN_MASK 0x70
 
 /*
- *	Max number of prototype levels and branches.
+ *    Max number of prototype levels and branches.
  */
 #define LEV_LIMIT 50
 #define BRANCH_LIMIT 32

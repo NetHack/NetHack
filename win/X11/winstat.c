@@ -1,5 +1,5 @@
 /* NetHack 3.7	winstat.c	$NHDT-Date: 1649269127 2022/04/06 18:18:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -179,7 +179,7 @@ static const char *fancy_status_hilite_colors[] = {
     "magenta3",
     "dark cyan",
     "web gray",
-    "",	/* NO_COLOR */
+    "",          /* NO_COLOR */
     "orange",
     "green3",
     "goldenrod",
@@ -1750,11 +1750,11 @@ apply_hilite_attributes(struct X_status_value *sv, int attributes)
  * the other.  So only do our update when we update the second line.
  *
  * Information on the first line:
- *	name, characteristics, alignment, score
+ *      name, characteristics, alignment, score
  *
  * Information on the second line:
- *	dlvl, gold, hp, power, ac, {level & exp or HD **}, time,
- *	status * (stone, slime, strngl, foodpois, termill,
+ *      dlvl, gold, hp, power, ac, {level & exp or HD **}, time,
+ *      status * (stone, slime, strngl, foodpois, termill,
  *                hunger, encumbrance, lev, fly, ride,
  *                blind, deaf, stun, conf, hallu)
  *
@@ -1912,8 +1912,8 @@ update_fancy_status_field(int i, int color, int attributes)
             /*
              * There is a possible infinite loop that occurs with:
              *
-             * 	impossible->pline->flush_screen->bot->bot{1,2}->
-             * 	putstr->adjust_status->update_other->impossible
+             *  impossible->pline->flush_screen->bot->bot{1,2}->
+             *  putstr->adjust_status->update_other->impossible
              *
              * Break out with this.
              */
@@ -2306,12 +2306,12 @@ static int characteristics_indices[11 - 2] = {
 /*
  * Produce a form that looks like the following:
  *
- *		  title
+ *                title
  *               location
- * col1_indices[0]	col2_indices[0]      col3_indices[0]
- * col1_indices[1]	col2_indices[1]      col3_indices[1]
+ * col1_indices[0]      col2_indices[0]      col3_indices[0]
+ * col1_indices[1]      col2_indices[1]      col3_indices[1]
  *    ...                  ...                  ...
- * col1_indices[5]	col2_indices[5]      col3_indices[5]
+ * col1_indices[5]      col2_indices[5]      col3_indices[5]
  *
  * The status conditions are managed separately and appear to the right
  * of this form.

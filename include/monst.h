@@ -41,7 +41,7 @@ enum wpn_chk_flags {
  * PICK_NONE, PICK_ONE, PICK_ANY (wintype.h)  0, 1, 2
  * MINV_NOLET  If set, don't display inventory letters on monster's inventory.
  * MINV_ALL    If set, display all items in monster's inventory, otherwise
- *	       just display wielded weapons and worn items.
+ *             just display wielded weapons and worn items.
  */
 #define MINV_PICKMASK 0x03 /* 1|2 */
 #define MINV_NOLET    0x04

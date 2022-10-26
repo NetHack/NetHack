@@ -1,5 +1,5 @@
 /* NetHack 3.7	winval.c	$NHDT-Date: 1611697183 2021/01/26 21:39:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -149,7 +149,7 @@ get_value_width(Widget w)
 }
 
 /* Swap foreground and background colors (this is the best I can do with */
-/* a label widget, unless I can get some init hook in there).		 */
+/* a label widget, unless I can get some init hook in there).            */
 void
 hilight_value(Widget w)
 {

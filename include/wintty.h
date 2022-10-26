@@ -1,5 +1,5 @@
 /* NetHack 3.7	wintty.h	$NHDT-Date: 1656014599 2022/06/23 20:03:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $ */
-/* Copyright (c) David Cohrs, 1991,1992				  */
+/* Copyright (c) David Cohrs, 1991,1992                           */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef WINTTY_H
