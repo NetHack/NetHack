@@ -287,7 +287,7 @@
  *      commenting it out.
  */
 
-/* #define ENHANCED_SYMBOLS */
+#define ENHANCED_SYMBOLS
 
 /*
  *      If COMPRESS is defined, it should contain the full path name of your
