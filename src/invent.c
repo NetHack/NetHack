@@ -1285,15 +1285,17 @@ nxtobj(struct obj *obj, int type, boolean by_nexthere)
     return otmp;
 }
 
+/* return inventory object of type 'type' if hero has one, otherwise Null */
 struct obj *
 carrying(int type)
 {
     register struct obj *otmp;
 
+    /* this could be replaced by 'return m_carrying(&g.youmonst, type);' */
     for (otmp = g.invent; otmp; otmp = otmp->nobj)
         if (otmp->otyp == type)
-            return  otmp;
-    return (struct obj *) 0;
+            break;
+    return otmp;
 }
 
 /* Fictional and not-so-fictional currencies.

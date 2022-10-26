@@ -1182,22 +1182,23 @@ lined_up(register struct monst* mtmp)
     return m_lined_up(&g.youmonst, mtmp) ? TRUE : FALSE;
 }
 
-/* check if a monster is carrying a particular item */
+/* check if a monster is carrying an item of a particular type */
 struct obj *
-m_carrying(struct monst* mtmp, int type)
+m_carrying(struct monst *mtmp, int type)
 {
     register struct obj *otmp;
 
-    for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
+    for (otmp = (mtmp == &g.youmonst) ? g.invent : mtmp->minvent; otmp;
+         otmp = otmp->nobj)
         if (otmp->otyp == type)
-            return otmp;
-    return (struct obj *) 0;
+            break;
+    return otmp;
 }
 
 void
 hit_bars(
     struct obj **objp,    /* *objp will be set to NULL if object breaks */
-    coordxy objx, coordxy objy,   /* hero's spot (when wielded) or missile's spot */
+    coordxy objx, coordxy objy, /* hero's (when wielded) or missile's spot */
     coordxy barsx, coordxy barsy, /* adjacent spot where bars are located */
     unsigned breakflags)  /* breakage control */
 {

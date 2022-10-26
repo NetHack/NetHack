@@ -4611,26 +4611,29 @@ missum(
         wakeup(mdef, TRUE);
 }
 
+/* check whether equipment protects against knockback */
 static boolean
 m_is_steadfast(struct monst *mtmp)
 {
     boolean is_u = (mtmp == &g.youmonst);
     struct obj *otmp = is_u ? uwep : MON_WEP(mtmp);
 
-    /* must be on the ground */
-    if (is_u ? (Flying || Levitation)
-             : (is_flyer(mtmp->data) || is_floater(mtmp->data)))
+    /* must be on the ground (or in water) */
+    if ((is_u ? (Flying || Levitation)
+              : (is_flyer(mtmp->data) || is_floater(mtmp->data)))
+        || Is_airlevel(&u.uz) /* air or cloud */
+        || (Is_waterlevel(&u.uz) && !is_pool(u.ux, u.uy))) /* air bubble */
         return FALSE;
 
     if (is_art(otmp, ART_GIANTSLAYER))
         return TRUE;
 
     /* steadfast if carrying any loadstone (and not floating or flying);
-       when mounted and steed is target of knockback, check the rider
-       for a loadstone too */
-    for (otmp = is_u ? g.invent : mtmp->minvent; otmp; otmp = otmp->nobj)
-        if (otmp->otyp == LOADSTONE)
-            return TRUE;
+       'is_u' test not needed here; m_carrying() is 'youmonst' aware */
+    if (m_carrying(mtmp, LOADSTONE))
+        return TRUE;
+    /* when mounted and steed is target of knockback, check the rider for
+       a loadstone too (Giantslayer's protection doesn't extend to steed) */
     if (u.usteed && mtmp == u.usteed && carrying(LOADSTONE))
         return TRUE;
 
