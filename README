@@ -106,14 +106,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     At the time of the most recent official release, NetHack 3.6, it had
     been tested to run/compile on:
 
-        Intel Pentium or better running Linux, BSDI, or
-                Windows 10 to 11
-        Intel 80386 or greater boxes running Linux, or BSDI
-        macOS 10.11 (El Capitan) to 12 (Monterey)  (follow the instructions
-                in sys/unix, not sys/mac)
-        OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
+        Intel Pentium or better running Linux, BSDI
+        Intel Pentium or better running Windows 10 or 11
+        Intel-based, or Apple M1 or M2 Macs running macOS 10.11 (El Capitan)
+            to 12 (Monterey)  (follow the instructions in sys/unix)
         Intel 80386 or greater running MS-DOS with DPMI
-                built via Linux-hosted djgpp cross-compiler
+            built via djgpp compiler (native or Linux-hosted cross-compiler)
+        OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Previous versions of NetHack were tested and known to run on the
     following systems, but it is unknown if they can still build and
