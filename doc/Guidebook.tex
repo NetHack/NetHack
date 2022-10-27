@@ -1953,17 +1953,18 @@ the `Alt' key can be used in this fashion.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
-option to have {\it NetHack\/} combine them into meta\+key.
+option to have {\it NetHack\/} combine them into {\tt meta+<key>}.
 (This combining action only takes place when NetHack is expecting a
 command to execute, not when accepting input to name something or to
 make a wish.)
 
 %.pg
-Unlike control characters, where \^x and \^X denote the same thing,
-meta characters are case-sensitive:  M-x and M-X represent different things.
-Some commands which can be run via a meta character require that the
-letter be capitalized because the lower-case equivalent is used for
-another command, so the three key combination meta+shift+letter is needed.
+Unlike control characters, where {\tt \^{}x} and {\tt \^{}X} denote the same
+thing, meta characters are case-sensitive:  {\tt M-x} and {\tt M-X}
+represent different things.  Some commands which can be run via a meta
+character require that the letter be capitalized because the lower-case
+equivalent is used for another command, so the three key combination
+{\tt meta+Shift+letter} is needed.
 
 %.BR 1
 \blist{}
@@ -2171,9 +2172,9 @@ A trap usually won't appear on your map until you trigger it by moving
 onto it, you see someone else trigger it, or you discover it with
 the `{\tt s}' (search) command (multiple attempts are often needed;
 if your luck is poor, many attempts might be needed).
-{\it Wands of secret door detection\/} and {\it spell of detect unseen\/}
-also reveal traps within a modest radius but only if the trap is also
-within line-of-sight (whether you can see at the time or not).
+{\it Wands of secret door detection\/} and the spell of {\it detect unseen}
+also reveal traps within a modest radius but only if the trap is also within
+line-of-sight (whether you can see at the time or not).
 There is also other magic which can reveal traps.
 
 %.pg
@@ -2193,11 +2194,14 @@ Other traps can send you to different locations.
 Teleporters send you elsewhere on the same dungeon level.
 Level teleporters send you to a random dungeon level, the destination
 chosen from a few levels lower all the way to the top.
+These traps choose a new destination each time they're activated.
 Trap doors and holes also send you to another level, but one which is
 always below the current level.
 Usually that will be the next level down but it can be farther.
-All of these traps choose a new destination each time they're activated.
-Magic portals also send you to a different level but behave differently.
+Unlike (level) teleporters, the destination level of a particular trap door
+or hole is persistent, so falling into one will bring you to the same level
+each time---though not necessarily the same spot on the level.
+Magic portals behave similarly, but with some additional variation.
 Some portals are two-way and their remote destination is always the same:
 another portal which can take you back.
 Others are one-way and send you to a specific destination level but not
@@ -2205,7 +2209,7 @@ necessarily to a specific location there.
 
 %.pg
 There is a special multi-level branch of the dungeon with pre-mapped levels
-based on the classic computer game ``{\tt Sokoban}.''
+based on the classic computer game ``{\it Sokoban}.''
 In that game, you operate as a warehouse worker who pushes crates around
 obstacles to position them at designated locations.
 In NetHack, the goal is to push boulders into pits or holes until those
@@ -2412,7 +2416,7 @@ spot or a tame one's spot.
 
 %.\" getting away from "Movement feedback" here; oh well...
 %.pg
-The {\tt nopickup} command prefix (default `{\tt m}' is
+The {\tt nopickup} command prefix (default `{\tt m}') is
 also the move-without-attacking prefix and can be used to try to step
 onto a visible monster's spot without the move being considered an attack
 (see the {\it Fighting\/} subsection of {\it Monsters\/} below).
@@ -3049,8 +3053,8 @@ A mail daemon may run up and deliver mail to you as a %
 To use this feature on versions where {\it NetHack\/}
 mail delivery is triggered by electronic mail appearing in your system mailbox,
 you must let {\it NetHack\/} know where to look for new mail by setting the
-``MAIL'' environment variable to the file name of your mailbox.
-You may also want to set the ``MAILREADER'' environment variable to the
+{\tt MAIL} environment variable to the file name of your mailbox.
+You may also want to set the {\tt MAILREADER} environment variable to the
 file name of your favorite reader, so {\it NetHack\/} can shell to it when you
 read the scroll.
 On versions of {\it NetHack\/} where mail is randomly
@@ -3538,7 +3542,7 @@ in which you might accomplish them.
 \blist{\leftmargin \achwidth \topsep 1mm \itemsep 0mm}
 %.PL Shop
 \item[{\tt <Rank>}]
-Attained rank title <Rank>.
+Attained rank title {\it Rank}.
 \item[{\tt Shop}]
 Entered a shop.
 \item[{\tt Temple}]
@@ -3599,7 +3603,7 @@ Achievements are recorded and subsequently reported in the order in which
 they happen during your current game rather than the order listed here.
 
 %.pg
-There are nine {\it <Rank>\/} titles for each role, bestowed at experience
+There are nine {\it Rank} titles for each role, bestowed at experience
 levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.
 The one for experience level 1 is not recorded as an achievement.
 Losing enough levels to revert to lower rank(s) does not discard the
@@ -3631,7 +3635,7 @@ the Castle level's drawbridge or can be given to you via prayer boon.
 
 %.pg
 {\it Blind\/} and {\it Nudist\/} are also conducts, and they can only be
-enabled by setting the correspondingly named option in NETHACKOPTIONS
+enabled by setting the correspondingly named option in {\tt NETHACKOPTIONS}
 or run-time configuration file prior to game start.
 In the case of {\it Blind\/}, the option also enforces the conduct.
 They aren't really significant accomplishments unless/until you make
@@ -3652,7 +3656,7 @@ behaves.
 Options may be set in a number of ways.  Within the game, the `{\tt O}'
 command allows you to view all options and change most of them.
 You can also set options automatically by placing them in a configuration
-file, or in the ``NETHACKOPTIONS'' environment variable.
+file, or in the ``{\tt NETHACKOPTIONS}'' environment variable.
 Some versions of {\it NetHack\/} also have front-end programs that allow
 you to set options before starting the game or a global configuration
 for system administrators.
@@ -3899,7 +3903,7 @@ Here is an example of configuration file contents:
 %.BR 2
 
 %.hn 2
-\subsection*{Using the NETHACKOPTIONS environment variable}
+\subsection*{Using the {\tt NETHACKOPTIONS} environment variable}
 
 %.pg
 The NETHACKOPTIONS variable is a comma-separated list of initial
@@ -6185,8 +6189,8 @@ display of the customizations, such as the Enhanced symset.
 
 %.pg
 {\it NetHack\/} can be set up to use only standard ASCII characters for making
-maps of the dungeons. This makes the MS-DOS versions of {\it NetHack\/}
-completely
+maps of the dungeons. This makes even the MS-DOS versions of {\it NetHack}
+(which use special line-drawing characters by default) completely
 accessible to the blind who use speech and/or Braille access technologies.
 Players will require a good working knowledge of their screen-reader's
 review features, and will have to know how to navigate horizontally and
@@ -6201,16 +6205,16 @@ gives you the row and column of your review cursor and the PC cursor.
 These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 %.pg
-{\it NetHack\/} can also be compiled with support for sending the game messages
-to an external program, such as a text-to-speech synthesizer. If the
-``{\tt \#version}'' extended command shows ``external program as a
+{\it NetHack\/} can also be compiled with support for sending the game
+messages to an external program, such as a text-to-speech synthesizer. If
+the ``{\tt \#version}'' extended command shows ``external program as a
 message handler'', your {\it NetHack\/}
 has been compiled with the capability. When compiling {\it NetHack\/}
 from source
-on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it.
+on Linux and other POSIX systems, define {\tt MSGHANDLER\/} to enable it.
 To use
-the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
-executable, which will be executed with the game message as the program's
+the capability, set the environment variable {\tt NETHACK\_MSGHANDLER\/} to
+an executable, which will be executed with the game message as the program's
 only parameter.
 %.pg
 
