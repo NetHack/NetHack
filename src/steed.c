@@ -512,11 +512,11 @@ landing_spot(
                 ++viable;
                 distance = distu(x, y);
                 if (min_distance < 0 /* no viable candidate yet */
-                    /* or better than pending candidate (note: distance
-                       is never less than min_distance because we're
-                       limiting search to radius 1; j==0 won't get here
-                       because 'min_distance < 0' will always pass for it) */
-                    || (distance < min_distance || (best_j != -1 && j == 0))
+                    /* or better than pending candidate (note: orthogonal
+                       spots are distance 1 and diagonal ones distance 2;
+                       treating one as better than the other is arbitary
+                       and not wanted for DISMOUNT_KNOCKED) */
+                    || (best_j == -1) ? (distance < min_distance) : (j < 3)
                     /* or equally good, maybe substitute this one */
                     || (distance == min_distance && !rn2(viable))) {
                     /* traps avoided on pass 0; boulders avoided on 0 and 1 */
