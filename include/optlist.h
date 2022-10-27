@@ -96,7 +96,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     /*
      * Most of the options are in alphabetical order; a few are forced
      * to the top of list so that doset() will list them first and
-     * all_options_str() with gather then first to write to the top of
+     * all_options_str() with gather them first to write to the top of
      * a new RC file by #saveoptions.
      *
      * windowtype comes first because its value can affect how wc_ and
