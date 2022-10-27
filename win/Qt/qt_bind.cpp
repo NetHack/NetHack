@@ -1040,6 +1040,9 @@ struct window_procs Qt_procs = {
 #ifdef SELECTSAVED
      | WC2_SELECTSAVED
 #endif
+#ifdef ENHANCED_SYMBOLS
+     | WC2_U_UTF8STR | WC2_U_24BITCOLOR
+#endif
      | WC2_STATUSLINES),
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
