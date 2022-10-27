@@ -4732,10 +4732,15 @@ mhitm_knockback(
 
     /* do the actual knockback effect */
     if (u_def) {
+        /* normally dx,dy indicates direction hero is throwing, zapping, &c
+           but here it is used to pass the preferred direction for dismount
+           to dismount_steed (used for DISMOUNT_KNOCKED only) */
+        u.dx = sgn(u.ux - magr->mx); /* [sgn() is superfluous here] */
+        u.dy = sgn(u.uy - magr->my); /* [ditto] */
         if (u.usteed)
             dismount_steed(DISMOUNT_KNOCKED);
         else
-            hurtle(u.ux - magr->mx, u.uy - magr->my, rnd(2), FALSE);
+            hurtle(u.dx, u.dy, rnd(2), FALSE);
 
         set_apparxy(magr); /* update magr's idea of where you are */
         if (!rn2(4))

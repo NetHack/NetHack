@@ -440,49 +440,111 @@ landing_spot(
     int reason,
     int forceit)
 {
-    int i = 0, distance, min_distance = -1;
+    coord cc, try[8]; /* 8: the 8 spots adjacent to the hero's spot */
+    int i, j, best_j, clockwise_j, counterclk_j,
+        n, viable, distance, min_distance = -1;
     coordxy x, y;
-    boolean found = FALSE;
+    boolean found, impaird, kn_trap, boulder;
     struct trap *t;
 
+    (void) memset((genericptr_t) try, 0, sizeof try);
+    n = 0;
+    j = xytod(u.dx, u.dy);
+    if (reason == DISMOUNT_KNOCKED && j != DIR_ERR) {
+        /* we'll check preferred location first; if viable it'll be picked */
+        best_j = j;
+        try[0].x = u.dx, try[0].y = u.dy;
+        /* the two next best locations are checked second and third */
+        i = rn2(2);
+        clockwise_j = (j + 1) % N_DIRS;
+        dtoxy(&cc, clockwise_j);
+        try[1 + i].x = cc.x, try[1 + i].y = cc.y; /* [1] or [2] */
+        counterclk_j = (j + N_DIRS - 1) % N_DIRS;
+        dtoxy(&cc, counterclk_j);
+        try[2 - i].x = cc.x, try[2 - i].y = cc.y; /* [2] or [1] */
+        n = 3;
+        debugpline3("knock from saddle: best %s, next %s or %s",
+                    directionname(best_j),
+                    directionname(clockwise_j), directionname(counterclk_j));
+    } else {
+        best_j = clockwise_j = counterclk_j = -1;
+    }
+    for (j = 0; j < N_DIRS; ++j) {
+        /* fortunately NODIAG() handling isn't needed for DISMOUNT_KNOCKED
+           because hero can only ride when humanoid */
+        if (j == best_j || j == clockwise_j || j == counterclk_j)
+            continue;
+        /* j==0 is W, j==1 NW, j==2 N, j==3 NE, ..., around to j==7 SW;
+           so odd j values are diagonal directions here */
+        if (reason == DISMOUNT_POLY && NODIAG(u.umonnum) && (j % 1) != 0)
+            continue;
+        dtoxy(&cc, j);
+        try[n++] = cc;
+    }
+
     /*
-     * TODO:
-     *  for reason==DISMOUNT_KNOCKED, prefer the spot directly behind
-     *  current position relative to the attacker; first need to figure
-     *  how to obtain attacker information...
+     * Up to three passes;
+     * i==0: voluntary dismount without impairment avoids known traps and
+     *       boulders;
+     * i==1: voluntary dismount with impairment or knocked out of saddle
+     *       avoids boulders but allows known traps;
+     * i==2: other, allow traps and boulders.
+     *
+     * Fallback to i==1 if nothing appropriate was found for i==0 and
+     * to i==2 as last resort.
      */
+    impaird = (Stunned || Confusion || Fumbling);
+    viable = 0;
+    found = FALSE;
+    for (i = (reason == DISMOUNT_BYCHOICE && !impaird) ? 0
+             : ((reason == DISMOUNT_BYCHOICE && impaird)
+                || reason == DISMOUNT_KNOCKED) ? 1
+               : 2;
+         i <= 2 && !found; ++i) {
+        for (j = 0; j < n; ++j) {
+            x = u.ux + try[j].x;
+            y = u.uy + try[j].y;
+            if (!isok(x, y) || u_at(x, y)) /* [note: u_at() can't happen] */
+                continue;
 
-    /* avoid known traps (i == 0) and boulders, but allow them as a backup */
-    if (reason != DISMOUNT_BYCHOICE || Stunned || Confusion || Fumbling)
-        i = 1;
-    for (; !found && i < 2; ++i) {
-        for (x = u.ux - 1; x <= u.ux + 1; x++)
-            for (y = u.uy - 1; y <= u.uy + 1; y++) {
-                if (!isok(x, y) || u_at(x, y))
-                    continue;
-
-                if (accessible(x, y) && !MON_AT(x, y)
-                    && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
-                    distance = distu(x, y);
-                    if (min_distance < 0 || distance < min_distance
-                        || (distance == min_distance && rn2(2))) {
-                        if (i > 0 || (((t = t_at(x, y)) == 0 || !t->tseen)
-                                      && (!sobj_at(BOULDER, x, y)
-                                          || throws_rocks(g.youmonst.data)))) {
-                            spot->x = x;
-                            spot->y = y;
-                            min_distance = distance;
-                            found = TRUE;
-                        }
+            if (accessible(x, y) && !MON_AT(x, y)
+                && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
+                ++viable;
+                distance = distu(x, y);
+                if (min_distance < 0 /* no viable candidate yet */
+                    /* or better than pending candidate (note: distance
+                       is never less than min_distance because we're
+                       limiting search to radius 1; j==0 won't get here
+                       because 'min_distance < 0' will always pass for it) */
+                    || (distance < min_distance || (best_j != -1 && j == 0))
+                    /* or equally good, maybe substitute this one */
+                    || (distance == min_distance && !rn2(viable))) {
+                    /* traps avoided on pass 0; boulders avoided on 0 and 1 */
+                    kn_trap = i == 0 && ((t = t_at(x, y)) != 0 && t->tseen
+                                         && t->ttyp != VIBRATING_SQUARE);
+                    boulder = i <= 1 && (sobj_at(BOULDER, x, y)
+                                         && !throws_rocks(g.youmonst.data));
+                    if (!kn_trap && !boulder) {
+                        spot->x = x;
+                        spot->y = y;
+                        min_distance = distance;
+                        found = TRUE;
+                        if (best_j != -1 && j < 3)
+                            /* since best_j is first candidate (j==0), j==1
+                               and j==2 can only get here when best_j was
+                               not viable; 50:50 chance for clockwise_j to
+                               come before counterclk_j so each has same
+                               chance to be next after best_j */
+                            break;
                     }
                 }
             }
+        }
     }
 
     /* If we didn't find a good spot and forceit is on, try enexto(). */
-    if (forceit && min_distance < 0
-        && !enexto(spot, u.ux, u.uy, g.youmonst.data))
-        return FALSE;
+    if (forceit && !found)
+        found = enexto(spot, u.ux, u.uy, g.youmonst.data);
 
     return found;
 }
@@ -618,7 +680,7 @@ dismount_steed(
             if (enexto(&cc, u.ux, u.uy, mtmp->data))
                 rloc_to(mtmp, cc.x, cc.y);
             else /* evidently no room nearby; move steed elsewhere */
-                (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
+                (void) rloc(mtmp, RLOC_ERR | RLOC_NOMSG);
             return;
         }
 
@@ -658,12 +720,11 @@ dismount_steed(
              *
              * Clearly this is not the best way to do it.  A full fix would
              * involve having these functions not call pickup() at all,
-             * instead
-             * calling them first and calling pickup() afterwards.  But it
-             * would take a lot of work to keep this change from having any
-             * unforeseen side effects (for instance, you would no longer be
-             * able to walk onto a square with a hole, and autopickup before
-             * falling into the hole).
+             * instead calling them first and calling pickup() afterwards.
+             * But it would take a lot of work to keep this change from
+             * having any unforeseen side effects (for instance, you would
+             * no longer be able to walk onto a square with a hole, and
+             * autopickup before falling into the hole).
              */
             /* [ALI] No need to move the player if the steed died. */
             if (!DEADMONSTER(mtmp)) {

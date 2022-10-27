@@ -5433,7 +5433,7 @@ void
 confdir(boolean force_impairment)
 {
     if (force_impairment || u_maybe_impaired()) {
-        register coordxy x = NODIAG(u.umonnum) ? dirs_ord[rn2(4)] : rn2(N_DIRS);
+        int x = NODIAG(u.umonnum) ? (int) dirs_ord[rn2(4)] : rn2(N_DIRS);
 
         u.dx = xdir[x];
         u.dy = ydir[x];
