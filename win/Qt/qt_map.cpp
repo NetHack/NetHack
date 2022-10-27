@@ -78,7 +78,7 @@ extern int qt_compact_mode;
 namespace nethack_qt_ {
 
 #ifdef TEXTCOLOR
-static const QPen& nhcolor_to_pen(int c)
+static const QPen nhcolor_to_pen(uint32_t c)
 {
     static QPen *pen = (QPen *) 0;
     if (!pen) {
@@ -107,7 +107,17 @@ static const QPen& nhcolor_to_pen(int c)
         pen[16] = QColor(Qt::black);
     }
 
-    return pen[c];
+#ifdef ENHANCED_SYMBOLS
+    if (c & 0x80000000) {
+        return QColor(
+            (c >> 16) & 0xFF,
+            (c >>  8) & 0xFF,
+            (c >>  0) & 0xFF);
+    } else
+#endif
+    {
+        return pen[c];
+    }
 }
 #endif
 
@@ -183,11 +193,13 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
-		unsigned short color = Glyphcolor(i, j);
-		unsigned short ch = Glyphttychar(i, j);
+		uint32 color = Glyphcolor(i, j);
+		char32_t ch = Glyphttychar(i, j);
 		unsigned special = Glyphflags(i, j);
 /*		unsigned short tileidx = Glyphtileidx(i, j); */
-		ch = cp437(ch);
+        if (SYMHANDLING(H_IBM)) {
+            ch = cp437(ch);
+        }
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
 #else
@@ -546,8 +558,18 @@ void NetHackQtMapViewport::PrintGlyph(int x, int y,
                                       const glyph_info *glyphinfo)
 {
     Glyph(x, y) = (unsigned short) glyphinfo->glyph;
-    Glyphttychar(x, y) = (unsigned short) glyphinfo->ttychar;
-    Glyphcolor(x, y) = (unsigned short) glyphinfo->gm.sym.color;
+    Glyphttychar(x, y) = (char32_t) glyphinfo->ttychar;
+    Glyphcolor(x, y) = (uint32) glyphinfo->gm.sym.color;
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8)
+        && glyphinfo->gm.u
+        && glyphinfo->gm.u->utf8str) {
+        Glyphttychar(x, y) = glyphinfo->gm.u->utf32ch;
+        if (glyphinfo->gm.u->ucolor != 0) {
+            Glyphcolor(x, y) = glyphinfo->gm.u->ucolor | 0x80000000;
+        }
+    }
+#endif
     Glyphflags(x, y) = glyphinfo->gm.glyphflags;
     Glyphtileidx(x, y) = (unsigned short) glyphinfo->gm.tileidx;
     Changed(x, y);
@@ -866,7 +888,7 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 		char32_t ch;
 		unsigned special;
 #else
-		int color = Glyphcolor(i,j);
+		uint32 color = Glyphcolor(i,j);
 		char32_t ch = Glyphttychar(i,j);
 		unsigned special = Glyphflags(i,j);
 #endif
@@ -902,8 +924,6 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
-		int color = Glyphcolor(i,j);
-		int ch = Glyphttychar(i,j);
 		unsigned special = Glyphflags(i,j);
 		unsigned short tileidx = Glyphtileidx(i,j);
 
@@ -1021,6 +1041,16 @@ void NetHackQtMapWindow::PrintGlyph(int x,int y, const glyph_info *glyphinfo)
     Glyph(x,y)=glyphinfo->glyph;
     Glyphttychar(x,y)=glyphinfo->ttychar;
     Glyphcolor(x,y)=glyphinfo->color;
+#ifdef ENHANCED_SYMBOLS
+    if (SYMHANDLING(H_UTF8)
+        && glyphinfo->gm.u
+        && glyphinfo->gm.u->utf8str) {
+        Glyphttychar(x, y) = glyphinfo->gm.u->utf32ch;
+        if (glyphinfo->gm.u->ucolor != 0) {
+            Glyphcolor(x, y) = glyphinfo->gm.u->ucolor | 0x80000000;
+        }
+    }
+#endif
     Glyphflags(x,y)=glyphinfo->glyphflags;
     Glyphtileidx(x,y)=glyphinfo->tileidx;
     Changed(x,y);
