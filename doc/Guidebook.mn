@@ -1560,9 +1560,9 @@ configuration file.
 Use the shell command \(oq\f(CRexit\fP\(cq to return to the game.
 Default key is \(oq!\(cq.
 .lp "#showgold"
-Report the gold in your inventory and if you are inside a shop,
-report any credit or debt you have in that shop.
-Does not report on any gold inside containers you're carrying.
+Report the gold in your inventory, including gold you know about in
+containers you're carrying.  If you are inside a shop, report any credit
+or debt you have in that shop.
 Default key is \(oq$\(cq.
 .lp #showspells
 List and reorder known spells.
@@ -2112,9 +2112,8 @@ where it was obtained; other shopkeepers won't honor it.
 find a \(lqcredit card\(rq in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
 .pg
-The \(oq$\(cq command, which reports the amount of gold you are carrying
-(in inventory, not inside bags or boxes), will also show current shop
-debt or credit, if any.
+The \(oq$\(cq command, which reports the amount of gold you are carrying,
+will also show current shop debt or credit, if any.
 The \(lqIu\(rq command lists unpaid items
 (those which still belong to the shop) if you are carrying any.
 The \(lqIx\(rq command shows an inventory-like display of any unpaid
