@@ -516,7 +516,7 @@ landing_spot(
                        spots are distance 1 and diagonal ones distance 2;
                        treating one as better than the other is arbitary
                        and not wanted for DISMOUNT_KNOCKED) */
-                    || (best_j == -1) ? (distance < min_distance) : (j < 3)
+                    || ((best_j == -1) ? (distance < min_distance) : (j < 3))
                     /* or equally good, maybe substitute this one */
                     || (distance == min_distance && !rn2(viable))) {
                     /* traps avoided on pass 0; boulders avoided on 0 and 1 */
