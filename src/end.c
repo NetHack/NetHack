@@ -836,8 +836,9 @@ disclose(int how, boolean taken)
         ask = should_query_disclose_option('i', &defquery);
         c = ask ? yn_function(qbuf, ynqchars, defquery, TRUE) : defquery;
         if (c == 'y') {
-            /* caller has already ID'd everything */
-            (void) display_inventory((char *) 0, FALSE);
+            /* caller has already ID'd everything; we pass 'want_reply=True'
+               to force display_pickinv() to avoid using WIN_INVENT */
+            (void) display_inventory((char *) 0, TRUE);
             container_contents(g.invent, TRUE, TRUE, FALSE);
         }
         if (c == 'q')
