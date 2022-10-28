@@ -34,12 +34,11 @@ const struct worn {
 
 /* This only allows for one blocking item per property */
 #define w_blocks(o, m) \
-    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC))                          \
-         ? INVIS                                                            \
-         : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) && !Role_if(PM_WIZARD)) \
-               ? CLAIRVOYANT                                                \
-               : 0)
-/* note: monsters don't have clairvoyance, so your role
+    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC) != 0L) ? INVIS        \
+     : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) != 0L                   \
+        && !Role_if(PM_WIZARD)) ? CLAIRVOYANT                           \
+       : 0)
+/* note: monsters don't have clairvoyance, so dependency on hero's role here
    has no significant effect on their use of w_blocks() */
 
 /* Updated to use the extrinsic and blocked fields. */
