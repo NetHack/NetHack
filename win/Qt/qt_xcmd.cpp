@@ -335,7 +335,11 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
         }
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(group, SIGNAL(idPressed(int)), this, SLOT(Button(int)));
+#else
     connect(group, SIGNAL(buttonPressed(int)), this, SLOT(Button(int)));
+#endif
 
     bl->activate();
     xl->activate();
