@@ -829,8 +829,13 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     // order changed: was Again, Get, Kick, Throw, Fire, Drop, Eat, Rest
     //                now Again, PickUp, Drop, Kick, Throw, Fire, Eat, Rest
     QSignalMapper* sm = new QSignalMapper(this);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(sm, SIGNAL(mappedString(const QString&)),
+            this, SLOT(doKeys(const QString&)));
+#else
     connect(sm, SIGNAL(mapped(const QString&)),
             this, SLOT(doKeys(const QString&)));
+#endif
     AddToolButton(toolbar, sm, "Again", do_repeat, QPixmap(again_xpm));
     // this used to be called "Get" which is confusing to experienced players
     AddToolButton(toolbar, sm, "Pick up", dopickup, QPixmap(pickup_xpm));
