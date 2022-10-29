@@ -1616,7 +1616,8 @@ Qt: {maybe just Qt+OSX:} when viewing a text window ('V' to look at 'history'
 	for instance), clicking on [Search], entering a search target in the
 	resulting popup and clicking on [Okay] or typing <return>, the text
 	window got pushed underneath the main window so seemed to go away
-Qt: use idPressed signal instead of buttonPressed for recent Qt
+Qt: use idPressed signal instead of buttonPressed and mappedString instead
+	of mapped for recent Qt (pr #913 by chasonr)
 Qt+OSX: fix control key (fixed all except for ^V); handle ^V as a shortcut key
 Qt+OSX: rename menu entry "nethack->Preferences..." for invoking nethack's
 	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
