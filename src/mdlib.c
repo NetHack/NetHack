@@ -746,11 +746,11 @@ opt_out_words(
     char *word;
 
     while (*str) {
-        word = index(str, ' ');
+        word = strchr(str, ' ');
 #if 0
         /* treat " (" as unbreakable space */
         if (word && *(word + 1) == '(')
-            word = index(word + 1,  ' ');
+            word = strchr(word + 1,  ' ');
 #endif
         if (word)
             *word = '\0';

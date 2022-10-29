@@ -163,7 +163,7 @@ build_environment_path(
 
     strcpy_s(path, path_size, root_path);
 
-    char * colon = index(path, ';');
+    char * colon = strchr(path, ';');
     if (colon != NULL) path[0] = '\0';
 
     if (strlen(path) == 0) return;

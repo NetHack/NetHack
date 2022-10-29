@@ -1587,7 +1587,7 @@ nhl_loadlua(lua_State *L, const char *fname)
         bufin -= ct, cnt += ct, ct = 0;
 
         while (cnt > 0) {
-            if ((nl = index(bufin, '\n')) != 0) {
+            if ((nl = strchr(bufin, '\n')) != 0) {
                 /* normal case, newline is present */
                 ct = (long) (nl - bufin + 1L); /* +1: keep the newline */
                 for (p = bufin; p <= nl; ++p)

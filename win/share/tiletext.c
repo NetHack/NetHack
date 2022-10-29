@@ -344,7 +344,7 @@ fopen_text_file(const char *filename, const char *type)
         return FALSE;
     }
 
-    p = rindex(filename, '/');
+    p = strrchr(filename, '/');
     if (p)
         p++;
     else

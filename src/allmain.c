@@ -894,10 +894,10 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
     }
 
     if (match) {
-        const char *extended_opt = index(userea, ':');
+        const char *extended_opt = strchr(userea, ':');
 
         if (!extended_opt)
-            extended_opt = index(userea, '=');
+            extended_opt = strchr(userea, '=');
         switch(e_arg) {
         case ARG_DEBUG:
             if (extended_opt) {
@@ -970,7 +970,7 @@ debug_fields(const char *opts)
     char *op;
     boolean negated = FALSE;
 
-    while ((op = index(opts, ',')) != 0) {
+    while ((op = strchr(opts, ',')) != 0) {
         *op++ = 0;
         /* recurse */
         debug_fields(op);

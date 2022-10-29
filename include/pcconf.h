@@ -226,13 +226,6 @@
 #define HLOCK "NHPERM"
 #endif
 
-#ifndef index
-#define index strchr
-#endif
-#ifndef rindex
-#define rindex strrchr
-#endif
-
 #ifndef AMIGA
 #include <time.h>
 #endif

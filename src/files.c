@@ -219,7 +219,7 @@ fname_encode(
             (void) sprintf(op, "%c%02X", quotechar, *sp);
             op += 3;
             cnt += 3;
-        } else if ((index(legal, *sp) != 0) || (index(hexdigits, *sp) != 0)) {
+        } else if ((strchr(legal, *sp) != 0) || (strchr(hexdigits, *sp) != 0)) {
             *op++ = *sp;
             *op = '\0';
             cnt++;
@@ -491,7 +491,7 @@ set_levelfile_name(char *file, int lev)
 {
     char *tf;
 
-    tf = rindex(file, '.');
+    tf = strrchr(file, '.');
     if (!tf)
         tf = eos(file);
     Sprintf(tf, ".%d", lev);
@@ -711,7 +711,7 @@ set_bonestemp_name(void)
 {
     char *tf;
 
-    tf = rindex(g.lock, '.');
+    tf = strrchr(g.lock, '.');
     if (!tf)
         tf = eos(g.lock);
     Sprintf(tf, ".bn");
@@ -976,7 +976,7 @@ set_error_savefile(void)
 {
 #ifdef VMS
     {
-        char *semi_colon = rindex(g.SAVEF, ';');
+        char *semi_colon = strrchr(g.SAVEF, ';');
 
         if (semi_colon)
             *semi_colon = '\0';
@@ -1726,7 +1726,7 @@ make_lockname(const char *filename, char *lockname)
 #endif
 #ifdef VMS
     {
-        char *semi_colon = rindex(lockname, ';');
+        char *semi_colon = strrchr(lockname, ';');
         if (semi_colon)
             *semi_colon = '\0';
     }
@@ -2123,7 +2123,7 @@ fopen_config_file(const char *filename, int src)
         Strcpy(tmp_config, "NetHack.cnf");
     else
         Sprintf(tmp_config, "%s%s%s", envp,
-                !index(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
+                !strchr(":]>/", envp[strlen(envp) - 1]) ? "/" : "",
                 "NetHack.cnf");
     set_configfile_name(tmp_config);
     if ((fp = fopen(configfile, "r")) != (FILE *) 0)
@@ -2251,7 +2251,7 @@ adjust_prefix(char *bufp, int prefixid)
         return;
 #endif
     /* Backward compatibility, ignore trailing ;n */
-    if ((ptr = index(bufp, ';')) != 0)
+    if ((ptr = strchr(bufp, ';')) != 0)
         *ptr = '\0';
     if (strlen(bufp) > 0) {
         g.fqn_prefix[prefixid] = (char *) alloc(strlen(bufp) + 2);
@@ -2329,7 +2329,7 @@ is_config_section(
     if (*a++ != '[')
         return (char *) 0;
     /* last character should be close bracket, ignoring any comment */
-    z = index(a, ']');
+    z = strchr(a, ']');
     if (!z)
         return (char *) 0;
     /* comment, if present, can be preceded by spaces */
@@ -2385,8 +2385,8 @@ find_optparam(const char *buf)
 {
     char *bufp, *altp;
 
-    bufp = index(buf, '=');
-    altp = index(buf, ':');
+    bufp = strchr(buf, '=');
+    altp = strchr(buf, ':');
     if (!bufp || (altp && altp < bufp))
         bufp = altp;
 
@@ -2485,7 +2485,7 @@ parse_config_line(char *origbuf)
     } else if (match_varname(buf, "SAVE", 4)) {
         char *ptr;
 
-        if ((ptr = index(bufp, ';')) != 0) {
+        if ((ptr = strchr(bufp, ';')) != 0) {
             *ptr = '\0';
         }
 
@@ -2991,7 +2991,7 @@ config_erradd(const char *buf)
     /* if buf[] doesn't end in a period, exclamation point, or question mark,
        we'll include a period (in the message, not appended to buf[]) */
     punct = eos((char *) buf) - 1; /* eos(buf)-1 is valid; cast away const */
-    punct = index(".!?", *punct) ? "" : ".";
+    punct = strchr(".!?", *punct) ? "" : ".";
 
     if (!g.program_state.config_error_ready) {
         /* either very early, where pline() will use raw_print(), or
@@ -3130,7 +3130,7 @@ parse_conf_buf(struct _cnf_parser_state *p, boolean (*proc)(char *arg))
 {
     p->cont = FALSE;
     p->pbreak = FALSE;
-    p->ep = index(p->inbuf, '\n');
+    p->ep = strchr(p->inbuf, '\n');
     if (p->skip) { /* in case previous line was too long */
         if (p->ep)
             p->skip = FALSE; /* found newline; next line is normal */
@@ -3713,7 +3713,7 @@ testinglog(const char *filenm,   /* ad hoc file name */
     if (!filenm)
         return;
     Strcpy(fnbuf, filenm);
-    if (index(fnbuf, '.') == 0)
+    if (strchr(fnbuf, '.') == 0)
         Strcat(fnbuf, ".log");
     lfile = fopen_datafile(fnbuf, "a", TROUBLEPREFIX);
     if (lfile) {
@@ -4021,7 +4021,7 @@ debugcore(const char *filename, boolean wildcards)
 
 /* strip filename's path if present */
 #ifdef UNIX
-    if ((p = rindex(filename, '/')) != 0)
+    if ((p = strrchr(filename, '/')) != 0)
         filename = p + 1;
 #endif
 #ifdef VMS
@@ -4402,10 +4402,10 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 char *st = &line[7]; /* 7 from "%title " */
                 char *p1, *p2;
 
-                if ((p1 = index(st, '(')) != 0) {
+                if ((p1 = strchr(st, '(')) != 0) {
                     *p1++ = '\0';
                     (void) mungspaces(st);
-                    if ((p2 = index(p1, ')')) != 0) {
+                    if ((p2 = strchr(p1, ')')) != 0) {
                         *p2 = '\0';
                         passagecnt = atoi(p1);
                         scope = TITLESCOPE;
@@ -4487,11 +4487,11 @@ read_tribute(const char *tribsection, const char *tribtitle,
                 display_nhwindow(tribwin, FALSE);
                 /* put the final attribution line into message history,
                    analogous to the summary line from long quest messages */
-                if (index(lastline, '['))
+                if (strchr(lastline, '['))
                     mungspaces(lastline); /* to remove leading spaces */
                 else /* construct one if necessary */
                     Sprintf(lastline, "[%s, by Terry Pratchett]", tribtitle);
-                if ((p = rindex(lastline, ']')) != 0)
+                if ((p = strrchr(lastline, ']')) != 0)
                     Sprintf(p, "; passage #%d]", targetpassage);
                 putmsghistory(lastline, FALSE);
                 grasped = TRUE;

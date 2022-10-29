@@ -201,7 +201,7 @@ shkgone(struct monst* mtmp)
 
         /* Make sure bill is set only when the
            dead shk is the resident shk. */
-        if ((p = index(u.ushops, eshk->shoproom)) != 0) {
+        if ((p = strchr(u.ushops, eshk->shoproom)) != 0) {
             setpaid(mtmp);
             eshk->bill_p = (struct bill_x *) 0;
             /* remove eshk->shoproom from u.ushops */
@@ -562,7 +562,7 @@ u_entered_shop(char* enterstring)
         return;
 
     if (!(shkp = shop_keeper(*enterstring))) {
-        if (!index(empty_shops, *enterstring)
+        if (!strchr(empty_shops, *enterstring)
             && in_rooms(u.ux, u.uy, SHOPBASE)
                    != in_rooms(u.ux0, u.uy0, SHOPBASE))
             deserted_shop(enterstring);
@@ -576,7 +576,7 @@ u_entered_shop(char* enterstring)
     if (!inhishop(shkp)) {
         /* dump core when referenced */
         eshkp->bill_p = (struct bill_x *) -1000;
-        if (!index(empty_shops, *enterstring))
+        if (!strchr(empty_shops, *enterstring))
             deserted_shop(enterstring);
         Strcpy(empty_shops, u.ushops);
         u.ushops[0] = '\0';
@@ -825,7 +825,7 @@ inhishop(register struct monst* mtmp)
 {
     struct eshk *eshkp = ESHK(mtmp);
 
-    return (index(in_rooms(mtmp->mx, mtmp->my, SHOPBASE), eshkp->shoproom)
+    return (strchr(in_rooms(mtmp->mx, mtmp->my, SHOPBASE), eshkp->shoproom)
             && on_level(&eshkp->shoplevel, &u.uz));
 }
 
@@ -1734,7 +1734,7 @@ paybill(
         mtmp2 = mtmp->nmon;
         eshkp = ESHK(mtmp);
         local = on_level(&eshkp->shoplevel, &u.uz);
-        if (local && index(u.ushops, eshkp->shoproom)) {
+        if (local && strchr(u.ushops, eshkp->shoproom)) {
             /* inside this shk's shop [there might be more than one
                resident shk if hero is standing in a breech of a shared
                wall, so give priority to one who's also owed money] */
@@ -3568,7 +3568,7 @@ repairable_damage(struct damage *dam, struct monst *shkp)
             return FALSE;
     }
     /* does it belong to shkp? */
-    if (!index(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom))
+    if (!strchr(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom))
         return FALSE;
 
     return TRUE;
@@ -3622,7 +3622,7 @@ discard_damage_owned_by(struct monst *shkp)
     while (dam) {
         coordxy x = dam->place.x, y = dam->place.y;
 
-        if (index(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom)) {
+        if (strchr(in_rooms(x, y, SHOPBASE), ESHK(shkp)->shoproom)) {
             dam2 = dam->next;
             if (prevdam)
                 prevdam->next = dam2;

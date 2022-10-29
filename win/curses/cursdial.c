@@ -183,7 +183,7 @@ curses_line_input_dialog(
            [Note: wgetnstr() treats <escape> as an ordinary character
            so user has to type <escape><return> for it to behave the
            way we want it to.] */
-        if (input[0] != '\033' && index(input, '\033') != 0)
+        if (input[0] != '\033' && strchr(input, '\033') != 0)
              input[0] = '\0';
     } while (--trylim > 0 && !input[0]);
     curs_set(0);
@@ -344,7 +344,7 @@ curses_character_input_dialog(
             break;
         }
 
-        if (choices != NULL && answer != '\0' && index(choices, answer))
+        if (choices != NULL && answer != '\0' && strchr(choices, answer))
             break;
     }
     curs_set(0);

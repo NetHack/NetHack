@@ -1724,7 +1724,7 @@ goto_level(
             mesg = halu_fam_msgs[which];
         else
             mesg = fam_msgs[which];
-        if (mesg && index(mesg, '%')) {
+        if (mesg && strchr(mesg, '%')) {
             Sprintf(buf, mesg, !Blind ? "looks" : "seems");
             mesg = buf;
         }

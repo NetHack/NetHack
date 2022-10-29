@@ -134,7 +134,7 @@ main(int argc, char **argv)
         struct passwd *user;
         char dnbuf[100], *index(), *strcat(), *strcpy();
 
-        sl = index(dest, '/');
+        sl = strchr(dest, '/');
         if (sl == NULL) {
             fprintf(stderr, "Illegal ~user\n");
             exit(3);

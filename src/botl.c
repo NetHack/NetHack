@@ -2257,7 +2257,7 @@ has_ltgt_percentnumber(const char *str)
     const char *s = str;
 
     while (*s) {
-        if (!index("<>=-+0123456789%", *s))
+        if (!strchr("<>=-+0123456789%", *s))
             return FALSE;
         s++;
     }
@@ -2282,7 +2282,7 @@ splitsubfields(char *str, char ***sfarr, int maxsf)
 
     maxsf = (maxsf == 0) ? MAX_SUBFIELDS : min(maxsf, MAX_SUBFIELDS);
 
-    if (index(str, '+') || index(str, '&')) {
+    if (strchr(str, '+') || strchr(str, '&')) {
         char *c = str;
 
         sf = 0;
@@ -3580,7 +3580,7 @@ status_hilite_menu_add(int origfld)
                 goto choose_value;
             }
             /* restore suffix for use in color and attribute prompts */
-            if (!index(numstart, '%'))
+            if (!strchr(numstart, '%'))
                 Strcat(numstart, "%");
 
         /* reject negative values except for AC and >-1; reject 0 for < */

@@ -719,7 +719,7 @@ getspell(int* spell_no)
             ilet = yn_function(qbuf, (char *) 0, '\0', TRUE);
             if (ilet == '*' || ilet == '?')
                 break; /* use menu mode */
-            if (index(quitchars, ilet))
+            if (strchr(quitchars, ilet))
                 return FALSE;
 
             idx = spell_let_to_idx(ilet);

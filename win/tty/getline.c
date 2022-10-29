@@ -224,7 +224,7 @@ xwaitforspace(register const char *s) /* chars allowed besides return */
                 morc = '\033';
                 break;
             }
-            if ((s && index(s, c)) || c == x || (x == '\n' && c == '\r')) {
+            if ((s && strchr(s, c)) || c == x || (x == '\n' && c == '\r')) {
                 morc = (char) c;
                 break;
             }

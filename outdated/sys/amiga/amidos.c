@@ -149,7 +149,7 @@ char *path;
 
         strncpy(fileName, path, sizeof(fileName) - 1);
         fileName[31] = 0;
-        if (colon = index(fileName, ':'))
+        if (colon = strchr(fileName, ':'))
             colon[1] = '\0';
         else
             fileName[0] = '\0';
@@ -511,6 +511,6 @@ register char *s;
 {
     register char *lp;
 
-    while ((lp = index(s, ':')) || (lp = index(s, '/')))
+    while ((lp = strchr(s, ':')) || (lp = strchr(s, '/')))
         *lp = '_';
 }

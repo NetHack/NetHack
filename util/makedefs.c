@@ -931,7 +931,7 @@ padline(char *line, unsigned padlength)
     unsigned len = (unsigned) strlen(line); /* includes newline */
 
     if (len <= padlength) {
-        endp = index(line, '\n'); /* fgetline() guarantees a newline even if
+        endp = strchr(line, '\n'); /* fgetline() guarantees a newline even if
                                    * the input file's last line lacks one */
 
         /* this is safe provided that padlength+1 is less than the allocation
@@ -1021,7 +1021,7 @@ do_rnd_access_file(
        matches a regular entry (bogusmon "grue"), that entry will become
        more likely to be picked than normal but it's nothing to worry about */
     Strcpy(buf, deflt_content);
-    if (!index(buf, '\n')) /* lines from the file include trailing newline +*/
+    if (!strchr(buf, '\n')) /* lines from the file include trailing newline +*/
         Strcat(buf, "\n"); /* so make sure that the default one does too    */
     (void) fputs(xcrypt(padline(buf, padlength)), ofp);
 
@@ -1259,7 +1259,7 @@ do_date(void)
     Strcpy(cbuf, ctime(&clocktim));
 #endif /* REPRODUCIBLE_BUILD */
 
-    if ((c = index(cbuf, '\n')) != 0)
+    if ((c = strchr(cbuf, '\n')) != 0)
         *c = '\0'; /* strip off the '\n' */
 #ifdef NHSTDC
     ul_sfx = "UL";
@@ -1360,14 +1360,14 @@ get_gitinfo(char *githash, char *gitbranch)
 
     /* read the gitinfo file */
     while ((line = fgetline(gifp)) != 0) {
-        strval = index(line, '=');
+        strval = strchr(line, '=');
         if (strval && strlen(strval) < (BUFSZ-1)) {
             opt = line;
             *strval++ = '\0';
             /* strip off the '\n' */
-            if ((c = index(strval, '\n')) != 0)
+            if ((c = strchr(strval, '\n')) != 0)
                 *c = '\0';
-            if ((c = index(opt, '\n')) != 0)
+            if ((c = strchr(opt, '\n')) != 0)
                 *c = '\0';
             /* strip leading and trailing white space */
             while (*strval == ' ' || *strval == '\t')
@@ -2222,7 +2222,7 @@ fgetline(FILE *fd)
                 free((genericptr_t) c), c = NULL;
             }
             break; /* either with or without added newline, we're done */
-        } else if (index(c, '\n')) {
+        } else if (strchr(c, '\n')) {
             /* normal case: we have a full line */
             break;
         }

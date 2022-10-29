@@ -102,10 +102,10 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
     register char c;
 
     *itemcount = 0;
-    ilets[iletct] = '\0'; /* terminate ilets so that index() will work */
+    ilets[iletct] = '\0'; /* terminate ilets so that strchr() will work */
     while (otmp) {
         c = def_oc_syms[(int) otmp->oclass].sym;
-        if (!index(ilets, c) && (!filter || (*filter)(otmp)))
+        if (!strchr(ilets, c) && (!filter || (*filter)(otmp)))
             ilets[iletct++] = c, ilets[iletct] = '\0';
         *itemcount += 1;
         otmp = here ? otmp->nexthere : otmp->nobj;
@@ -208,12 +208,12 @@ query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
                 goto ask_again;
             } else if (sym == 'm') {
                 m_seen = TRUE;
-            } else if (index("uBUCXP", sym)) {
+            } else if (strchr("uBUCXP", sym)) {
                 add_valid_menu_class(sym); /* 'u' or 'B','U','C','X','P' */
                 filtered = TRUE;
             } else {
                 oc_of_sym = def_char_to_objclass(sym);
-                if (index(ilets, sym)) {
+                if (strchr(ilets, sym)) {
                     add_valid_menu_class(oc_of_sym);
                     oclasses[oclassct++] = oc_of_sym;
                     oclasses[oclassct] = '\0';
@@ -401,7 +401,7 @@ n_or_more(struct obj *obj)
 boolean
 menu_class_present(int c)
 {
-    return (c && index(g.valid_menu_classes, c)) ? TRUE : FALSE;
+    return (c && strchr(g.valid_menu_classes, c)) ? TRUE : FALSE;
 }
 
 void
@@ -460,7 +460,7 @@ allow_category(struct obj *obj)
      * is also specified since player has explicitly requested coins.
      */
     if (obj->oclass == COIN_CLASS && g.class_filter)
-        return index(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
+        return strchr(g.valid_menu_classes, COIN_CLASS) ? TRUE : FALSE;
 
     if (Role_if(PM_CLERIC) && !obj->bknown)
         set_bknown(obj, 1);
@@ -485,7 +485,7 @@ allow_category(struct obj *obj)
      */
 
     /* if class is expected but obj's class is not in the list, reject */
-    if (g.class_filter && !index(g.valid_menu_classes, obj->oclass))
+    if (g.class_filter && !strchr(g.valid_menu_classes, obj->oclass))
         return FALSE;
     /* if unpaid is expected and obj isn't unpaid, reject (treat a container
        holding any unpaid object as unpaid even if isn't unpaid itself) */
@@ -509,7 +509,7 @@ allow_category(struct obj *obj)
         }
 
         /* if its category is not in the list, reject */
-        if (!index(g.valid_menu_classes, bucx))
+        if (!strchr(g.valid_menu_classes, bucx))
             return FALSE;
     }
     if (g.picked_filter && !obj->pickup_prev)
@@ -524,8 +524,8 @@ static boolean
 allow_cat_no_uchain(struct obj *obj)
 {
     if (obj != uchain
-        && ((index(g.valid_menu_classes, 'u') && obj->unpaid)
-            || index(g.valid_menu_classes, obj->oclass)))
+        && ((strchr(g.valid_menu_classes, 'u') && obj->unpaid)
+            || strchr(g.valid_menu_classes, obj->oclass)))
         return TRUE;
     return FALSE;
 }
@@ -765,7 +765,7 @@ pickup(int what) /* should be a long */
             obj2 = FOLLOW(obj, traverse_how);
             if (bycat ? !allow_category(obj)
                       : (!selective && oclasses[0]
-                         && !index(oclasses, obj->oclass)))
+                         && !strchr(oclasses, obj->oclass)))
                 continue;
 
             lcount = -1L;
@@ -865,7 +865,7 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
         return FALSE;
 
     /* check for pickup_types */
-    pickit = (!*otypes || index(otypes, otmp->oclass));
+    pickit = (!*otypes || strchr(otypes, otmp->oclass));
 
     /* check for autopickup exceptions */
     ape = check_autopickup_exceptions(otmp);
@@ -1758,7 +1758,7 @@ pick_obj(struct obj *otmp)
         /* sets obj->unpaid if necessary */
         addtobill(otmp, TRUE, FALSE, FALSE);
         Strcpy(u.ushops, saveushops);
-        robshop = otmp->unpaid && !index(u.ushops, *fakeshop);
+        robshop = otmp->unpaid && !strchr(u.ushops, *fakeshop);
     }
 
     result = addinv(otmp);

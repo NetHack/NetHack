@@ -108,7 +108,7 @@ wipeout_text(
                 continue;
 
             /* rub out unreadable & small punctuation marks */
-            if (index("?.,'`-|_", *s)) {
+            if (strchr("?.,'`-|_", *s)) {
                 *s = ' ';
                 continue;
             }
@@ -1073,7 +1073,7 @@ doengrave(void)
         if (*sp == ' ')
             len -= 1;
 
-    if (len == 0 || index(ebuf, '\033')) {
+    if (len == 0 || strchr(ebuf, '\033')) {
         if (zapwand) {
             if (!Blind)
                 pline("%s, then %s.", Tobjnam(otmp, "glow"),
@@ -1086,7 +1086,7 @@ doengrave(void)
     }
 
     /* A single `x' is the traditional signature of an illiterate person */
-    if (len != 1 || (!index(ebuf, 'x') && !index(ebuf, 'X')))
+    if (len != 1 || (!strchr(ebuf, 'x') && !strchr(ebuf, 'X')))
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by engraving \"%s\"",
                            ebuf);

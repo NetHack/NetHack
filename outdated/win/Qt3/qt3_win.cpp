@@ -4799,11 +4799,11 @@ void NetHackQtBind::qt_display_file(const char *filename, BOOLEAN_P must_exist)
 	    complain = must_exist;
 	} else {
 	    while (dlb_fgets(buf, BUFSZ, f)) {
-		if ((cr = index(buf, '\n')) != 0) *cr = 0;
+		if ((cr = strchr(buf, '\n')) != 0) *cr = 0;
 #ifdef MSDOS
-		if ((cr = index(buf, '\r')) != 0) *cr = 0;
+		if ((cr = strchr(buf, '\r')) != 0) *cr = 0;
 #endif
-		if (index(buf, '\t') != 0) (void) tabexpand(buf);
+		if (strchr(buf, '\t') != 0) (void) tabexpand(buf);
 		window->PutStr(ATR_NONE, buf);
 	    }
 	    window->Display(FALSE);
@@ -4981,7 +4981,7 @@ char NetHackQtBind::qt_yn_function(const char *question, const char *choices, CH
 	if (choices) {
 	    char *cb, choicebuf[QBUFSZ];
 	    Strcpy(choicebuf, choices);
-	    if ((cb = index(choicebuf, '\033')) != 0) {
+	    if ((cb = strchr(choicebuf, '\033')) != 0) {
 		// anything beyond <esc> is hidden
 		*cb = '\0';
 	    }
@@ -4991,8 +4991,8 @@ char NetHackQtBind::qt_yn_function(const char *question, const char *choices, CH
 	    if (def) Sprintf(eos(message), " (%c)", def);
 	    Strcat(message, " ");
 	    // escape maps to 'q' or 'n' or default, in that order
-	    yn_esc_map = (index(choices, 'q') ? 'q' :
-		     (index(choices, 'n') ? 'n' : def));
+	    yn_esc_map = (strchr(choices, 'q') ? 'q' :
+		     (strchr(choices, 'n') ? 'n' : def));
 	} else {
 	    Strcpy(message, question);
 	}
@@ -5024,7 +5024,7 @@ char NetHackQtBind::qt_yn_function(const char *question, const char *choices, CH
 	    char ch=NetHackQtBind::qt_nhgetch();
 	    if (ch=='\033') {
 		result=yn_esc_map;
-	    } else if (choices && !index(choices,ch)) {
+	    } else if (choices && !strchr(choices,ch)) {
 		if (def && (ch==' ' || ch=='\r' || ch=='\n')) {
 		    result=def;
 		} else {

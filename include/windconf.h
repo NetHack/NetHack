@@ -185,8 +185,6 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #define NO_SIGNAL
-#define index strchr
-#define rindex strrchr
 
 /* Time stuff */
 #include <time.h>

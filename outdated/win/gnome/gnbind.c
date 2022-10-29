@@ -1032,7 +1032,7 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
     if (choices) {
         char *cb, choicebuf[QBUFSZ];
         Strcpy(choicebuf, choices);
-        if ((cb = index(choicebuf, '\033')) != 0) {
+        if ((cb = strchr(choicebuf, '\033')) != 0) {
             /* anything beyond <esc> is hidden */
             *cb = '\0';
         }
@@ -1044,13 +1044,13 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
         Strcat(message, " ");
         /* escape maps to 'q' or 'n' or default, in that order */
         yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+            (strchr(choices, 'q') ? 'q' : (strchr(choices, 'n') ? 'n' : def));
     } else {
         Strcpy(message, question);
     }
 
     gnome_putstr(WIN_MESSAGE, ATR_BOLD, message);
-    if (mainWnd != NULL && choices && !index(choices, ch)) {
+    if (mainWnd != NULL && choices && !strchr(choices, ch)) {
         return (ghack_yes_no_dialog(question, choices, def));
     }
 
@@ -1059,7 +1059,7 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
         ch = gnome_nhgetch();
         if (ch == '\033') {
             result = yn_esc_map;
-        } else if (choices && !index(choices, ch)) {
+        } else if (choices && !strchr(choices, ch)) {
             /* FYI: ch==-115 is for KP_ENTER */
             if (def
                 && (ch == ' ' || ch == '\r' || ch == '\n' || ch == -115)) {

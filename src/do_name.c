@@ -816,7 +816,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             cy = ty;
             break;
         }
-        if ((cp = index(pick_chars, c)) != 0) {
+        if ((cp = strchr(pick_chars, c)) != 0) {
             /* '.' => 0, ',' => 1, ';' => 2, ':' => 3 */
             result = pick_chars_def[(int) (cp - pick_chars)].ret;
             break;
@@ -916,7 +916,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                   iflags.getloc_moveskip ? "S" : "Not s");
             msg_given = TRUE;
             goto nxtc;
-        } else if ((cp = index(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
+        } else if ((cp = strchr(mMoOdDxX, c)) != 0) { /* 'm|M', 'o|O', &c */
             /* nearest or farthest monster or object or door or unexplored */
             int gtmp = (int) (cp - mMoOdDxX), /* 0..7 */
                 gloc = gtmp >> 1;             /* 0..3 */
@@ -945,7 +945,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             cy = garr[gloc][gidx[gloc]].y;
             goto nxtc;
         } else {
-            if (!index(quitchars, c)) {
+            if (!strchr(quitchars, c)) {
                 char matching[MAXPCHARS];
                 int pass, lo_x, lo_y, hi_x, hi_y, k = 0;
 
@@ -2322,7 +2322,7 @@ bogusmon(char *buf, char *code)
     get_rnd_text(BOGUSMONFILE, buf, rn2_on_display_rng, MD_PAD_BOGONS);
     if (!*mnam) {
         Strcpy(buf, "bogon");
-    } else if (index(bogon_codes, *mnam)) { /* strip prefix if present */
+    } else if (strchr(bogon_codes, *mnam)) { /* strip prefix if present */
         if (code)
             *code = *mnam;
         ++mnam;
@@ -2362,7 +2362,7 @@ bogon_is_pname(char code)
 {
     if (!code)
         return FALSE;
-    return index("-+=", code) ? TRUE : FALSE;
+    return strchr("-+=", code) ? TRUE : FALSE;
 }
 
 /* name of a Rogue player */
@@ -2375,7 +2375,7 @@ roguename(void)
         for (i = opts; *i; i++)
             if (!strncmp("name=", i, 5)) {
                 char *j;
-                if ((j = index(i + 5, ',')) != 0)
+                if ((j = strchr(i + 5, ',')) != 0)
                     *j = (char) 0;
                 return i + 5;
             }

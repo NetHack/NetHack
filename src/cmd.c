@@ -1431,7 +1431,7 @@ wiz_flip_level(void)
     if (wizard) {
         char c = yn_function(prmpt, choices, '\0', TRUE);
 
-        if (c && index(choices, c)) {
+        if (c && strchr(choices, c)) {
             c -= '0';
 
             if (!c)
@@ -4451,8 +4451,8 @@ parseautocomplete(char *autocomplete, boolean condition)
     register char *autoc;
 
     /* break off first autocomplete from the rest; parse the rest */
-    if ((autoc = index(autocomplete, ',')) != 0
-        || (autoc = index(autocomplete, ':')) != 0) {
+    if ((autoc = strchr(autocomplete, ',')) != 0
+        || (autoc = strchr(autocomplete, ':')) != 0) {
         *autoc++ = '\0';
         parseautocomplete(autoc, condition);
     }
@@ -5228,7 +5228,7 @@ getdir(const char *s)
     } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
 
-        if (!index(quitchars, dirsym)) {
+        if (!strchr(quitchars, dirsym)) {
             help_requested = (dirsym == g.Cmd.spkeys[NHKF_GETDIR_HELP]);
             if (help_requested || iflags.cmdassist) {
                 did_help = help_dir((s && *s == '^') ? dirsym : '\0',
@@ -5378,9 +5378,9 @@ help_dir(
         sym = highc(sym); /* @A-Z[ (note: letter() accepts '@') */
         ctrl = (sym - 'A') + 1; /* 0-27 (note: 28-31 aren't applicable) */
         if ((explain = dowhatdoes_core(ctrl, buf2)) != 0
-            && (!index(wiz_only_list, sym) || wizard)) {
+            && (!strchr(wiz_only_list, sym) || wizard)) {
             Sprintf(buf, "Are you trying to use ^%c%s?", sym,
-                    index(wiz_only_list, sym) ? ""
+                    strchr(wiz_only_list, sym) ? ""
                         : " as specified in the Guidebook");
             putstr(win, 0, buf);
             putstr(win, 0, "");
@@ -6186,7 +6186,7 @@ get_count(
             backspaced = TRUE;
         } else if (key == g.Cmd.spkeys[NHKF_ESC]) {
             break;
-        } else if (!allowchars || index(allowchars, key)) {
+        } else if (!allowchars || strchr(allowchars, key)) {
             *count = (cmdcount_nht) cnt;
             if ((long) *count != cnt)
                 impossible("get_count: cmdcount_nht");

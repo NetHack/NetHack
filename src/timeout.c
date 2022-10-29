@@ -274,7 +274,7 @@ choke_dialogue(void)
         } else {
             const char *str = choke_texts[SIZE(choke_texts) - i];
 
-            if (index(str, '%'))
+            if (strchr(str, '%'))
                 urgent_pline(str, hcolor(NH_BLUE));
             else
                 urgent_pline("%s", str);
@@ -335,7 +335,7 @@ levitation_dialogue(void)
     if (((HLevitation & TIMEOUT) % 2L) && i > 0L && i <= SIZE(levi_texts)) {
         const char *s = levi_texts[SIZE(levi_texts) - i];
 
-        if (index(s, '%')) {
+        if (strchr(s, '%')) {
             boolean danger = (is_pool_or_lava(u.ux, u.uy)
                               && !Is_waterlevel(&u.uz));
 
@@ -377,7 +377,7 @@ slime_dialogue(void)
         if (nolimbs(g.youmonst.data) && strstri(buf, "limbs"))
             (void) strsubst(buf, "limbs", "extremities");
 
-        if (index(buf, '%')) {
+        if (strchr(buf, '%')) {
             if (i == 4L) {  /* "you are turning green" */
                 if (!Blind) /* [what if you're already green?] */
                     urgent_pline(buf, hcolor(NH_GREEN));

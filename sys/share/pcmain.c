@@ -198,7 +198,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             /* sysconf should be searched for in this location */
             envp = nh_getenv("COMMONPROGRAMFILES");
             if (envp) {
-                if ((sptr = index(envp, ';')) != 0)
+                if ((sptr = strchr(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
                     g.fqn_prefix[SYSCONFPREFIX] =
@@ -241,7 +241,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
              * overridden */
             envp = nh_getenv("USERPROFILE");
             if (envp) {
-                if ((sptr = index(envp, ';')) != 0)
+                if ((sptr = strchr(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
                     g.fqn_prefix[CONFIGPREFIX] =

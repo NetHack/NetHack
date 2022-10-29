@@ -228,7 +228,7 @@ rumor_check(void)
         (void) dlb_fseek(rumors, (long) g.true_rumor_start, SEEK_SET);
         ftell_rumor_start = dlb_ftell(rumors);
         (void) dlb_fgets(line, sizeof line, rumors);
-        if ((endp = index(line, '\n')) != 0)
+        if ((endp = strchr(line, '\n')) != 0)
             *endp = 0;
         Sprintf(rumor_buf, "T %06ld %s", ftell_rumor_start,
                 xcrypt(line, xbuf));
@@ -237,7 +237,7 @@ rumor_check(void)
         while (dlb_fgets(line, sizeof line, rumors)
                && dlb_ftell(rumors) < g.true_rumor_end)
             continue;
-        if ((endp = index(line, '\n')) != 0)
+        if ((endp = strchr(line, '\n')) != 0)
             *endp = 0;
         Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
         putstr(tmpwin, 0, rumor_buf);
@@ -246,7 +246,7 @@ rumor_check(void)
         (void) dlb_fseek(rumors, (long) g.false_rumor_start, SEEK_SET);
         ftell_rumor_start = dlb_ftell(rumors);
         (void) dlb_fgets(line, sizeof line, rumors);
-        if ((endp = index(line, '\n')) != 0)
+        if ((endp = strchr(line, '\n')) != 0)
             *endp = 0;
         Sprintf(rumor_buf, "F %06ld %s", ftell_rumor_start,
                 xcrypt(line, xbuf));
@@ -255,7 +255,7 @@ rumor_check(void)
         while (dlb_fgets(line, sizeof line, rumors)
                && dlb_ftell(rumors) < g.false_rumor_end)
             continue;
-        if ((endp = index(line, '\n')) != 0)
+        if ((endp = strchr(line, '\n')) != 0)
             *endp = 0;
         Sprintf(rumor_buf, "  %6s %s", "", xcrypt(line, xbuf));
         putstr(tmpwin, 0, rumor_buf);
@@ -329,7 +329,7 @@ others_check(
             putstr(tmpwin, 0, xbuf);
             /* show the bad line; we don't know whether it has been
                encrypted via xcrypt() so show it both ways */
-            if ((endp = index(line, '\n')) != 0)
+            if ((endp = strchr(line, '\n')) != 0)
                 *endp = 0;
             putstr(tmpwin, 0, "- first line, as is");
             putstr(tmpwin, 0, line);
@@ -349,19 +349,19 @@ others_check(
             goto closeit;
         }
         ++entrycount;
-        if ((endp = index(line, '\n')) != 0)
+        if ((endp = strchr(line, '\n')) != 0)
             *endp = 0;
         putstr(tmpwin, 0, xcrypt(line, xbuf));
         if (!dlb_fgets(line, sizeof line, fh)) {
             putstr(tmpwin, 0, "(no second entry)");
         } else {
             ++entrycount;
-            if ((endp = index(line, '\n')) != 0)
+            if ((endp = strchr(line, '\n')) != 0)
                 *endp = 0;
             putstr(tmpwin, 0, xcrypt(line, xbuf));
             while (dlb_fgets(line, sizeof line, fh)) {
                 ++entrycount;
-                if ((endp = index(line, '\n')) != 0)
+                if ((endp = strchr(line, '\n')) != 0)
                     *endp = 0;
                 (void) xcrypt(line, xbuf);
             }
@@ -467,7 +467,7 @@ get_rnd_line(
         (void) dlb_fseek(fh, startpos, SEEK_SET);
         (void) dlb_fgets(buf, bufsiz, fh);
     }
-    if ((newl = index(buf, '\n')) != 0)
+    if ((newl = strchr(buf, '\n')) != 0)
         *newl = '\0';
     /* decrypt line; make sure that our intermediate buffer is big enough */
     xbufp = (strlen(buf) <= sizeof xbuf - 1) ? &xbuf[0]
@@ -660,7 +660,7 @@ outoracle(boolean special, boolean delphi)
         putstr(tmpwin, 0, "");
 
         while (dlb_fgets(line, COLNO, oracles) && strcmp(line, "---\n")) {
-            if ((endp = index(line, '\n')) != 0)
+            if ((endp = strchr(line, '\n')) != 0)
                 *endp = 0;
             putstr(tmpwin, 0, xcrypt(line, xbuf));
         }
@@ -858,12 +858,12 @@ init_CapMons(void)
                gender and/or to distinguish an individual from a type
                (code is a single punctuation character when present) */
             while (dlb_fgets(hline, sizeof hline, bogonfile)) {
-                if ((endp = index(hline, '\n')) != 0)
+                if ((endp = strchr(hline, '\n')) != 0)
                     *endp = '\0'; /* strip newline */
                 (void) xcrypt(hline, xbuf);
                 unpadline(xbuf);
 
-                if (!xbuf[0] || !index(bogon_codes, xbuf[0]))
+                if (!xbuf[0] || !strchr(bogon_codes, xbuf[0]))
                     code = '\0', startp = &xbuf[0]; /* ordinary */
                 else
                     code = xbuf[0], startp = &xbuf[1]; /* special */

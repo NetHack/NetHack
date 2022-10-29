@@ -881,7 +881,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
             }
             if (!flooreffects(stmp->obj, x, y, "land")) {
                 if (obj_left_shop
-                    && index(u.urooms, *in_rooms(u.ux, u.uy, SHOPBASE))) {
+                    && strchr(u.urooms, *in_rooms(u.ux, u.uy, SHOPBASE))) {
                     /* At the moment this only takes on gold. While it is
                        simple enough to call addtobill for other items that
                        leave the shop due to scatter(), by default the hero

@@ -1657,9 +1657,9 @@ rloco(register struct obj* obj)
     } else {
         if (costly_spot(otx, oty)
             && (!costly_spot(tx, ty)
-                || !index(in_rooms(tx, ty, 0), *in_rooms(otx, oty, 0)))) {
+                || !strchr(in_rooms(tx, ty, 0), *in_rooms(otx, oty, 0)))) {
             if (costly_spot(u.ux, u.uy)
-                && index(u.urooms, *in_rooms(otx, oty, 0)))
+                && strchr(u.urooms, *in_rooms(otx, oty, 0)))
                 addtobill(obj, FALSE, FALSE, FALSE);
             else
                 (void) stolen_value(obj, otx, oty, FALSE, FALSE);

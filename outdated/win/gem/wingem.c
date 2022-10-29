@@ -736,9 +736,9 @@ boolean complain;
 
         datawin = Gem_create_nhwindow(NHW_TEXT);
         while (dlb_fgets(buf, BUFSZ, f)) {
-            if ((cr = index(buf, '\n')) != 0)
+            if ((cr = strchr(buf, '\n')) != 0)
                 *cr = 0;
-            if (index(buf, '\t') != 0)
+            if (strchr(buf, '\t') != 0)
                 (void) tabexpand(buf);
             Gem_putstr(datawin, 0, buf);
         }

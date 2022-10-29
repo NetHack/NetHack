@@ -364,7 +364,7 @@ convert_line(char *in_line, char *out_line)
                 case 'I':
                 case 'j': /* his/her */
                 case 'J':
-                    if (index("dlno", lowc(*(c - 1))))
+                    if (strchr("dlno", lowc(*(c - 1))))
                         qtext_pronoun(*(c - 1), *c);
                     else
                         --c; /* default action */
@@ -568,7 +568,7 @@ com_pager_core(
     /* switch from by_pline to by_window if line has multiple segments or
        is unreasonably long (the latter ought to checked after formatting
        conversions rather than before...) */
-    if (output == 0 && (index(text, '\n') || strlen(text) >= BUFSZ - 1)) {
+    if (output == 0 && (strchr(text, '\n') || strlen(text) >= BUFSZ - 1)) {
         output = 2;
 
         /*

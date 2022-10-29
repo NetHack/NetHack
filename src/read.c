@@ -405,7 +405,7 @@ doread(void)
             int ln = (int) strlen(mesg);
 
             /* we will be displaying a sentence; need ending punctuation */
-            if (ln > 0 && !index(".!?", mesg[ln - 1]))
+            if (ln > 0 && !strchr(".!?", mesg[ln - 1]))
                 endpunct = ".";
             pline("It reads:");
         }

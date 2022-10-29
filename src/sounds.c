@@ -150,15 +150,15 @@ temple_priest_sound(struct monst *mtmp)
 
         do {
             msg = temple_msg[rn2(SIZE(temple_msg) - 1 + hallu)];
-            if (index(msg, '*') && speechless)
+            if (strchr(msg, '*') && speechless)
                 continue;
-            if (index(msg, '#') && in_sight)
+            if (strchr(msg, '#') && in_sight)
                 continue;
             break; /* msg is acceptable */
         } while (++trycount < 50);
         while (!letter(*msg))
             ++msg; /* skip control flags */
-        if (index(msg, '%')) {
+        if (strchr(msg, '%')) {
             DISABLE_WARNING_FORMAT_NONLITERAL
             You_hear(msg, halu_gname(EPRI(mtmp)->shralign));
             RESTORE_WARNING_FORMAT_NONLITERAL
@@ -305,7 +305,7 @@ dosounds(void)
             return;
         }
         if (tended_shop(sroom)
-            && !index(u.ushops, (int) (ROOM_INDEX(sroom) + ROOMOFFSET))) {
+            && !strchr(u.ushops, (int) (ROOM_INDEX(sroom) + ROOMOFFSET))) {
             static const char *const shop_msg[3] = {
                 "someone cursing shoplifters.",
                 "the chime of a cash register.", "Neiman and Marcus arguing!",

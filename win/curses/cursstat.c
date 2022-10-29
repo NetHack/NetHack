@@ -552,7 +552,7 @@ draw_horizontal(boolean border)
             case BL_SCORE:
 #ifdef SCORE_ON_BOTL
                 if ((sho_score & 2) != 0) { /* strip "S:" prefix */
-                    if ((colon = index(text, ':')) != 0)
+                    if ((colon = strchr(text, ':')) != 0)
                         text = strcat(strcpy(sbuf, " "), colon + 1);
                     else
                         sho_score = 0;
@@ -857,7 +857,7 @@ draw_vertical(boolean border)
                 /* most status_vals_long[] are "long-text : value" and
                    unlike horizontal status's abbreviated "ab:value",
                    we highlight just the value portion */
-                p = (fld != BL_TITLE) ? index(text, ':') : 0;
+                p = (fld != BL_TITLE) ? strchr(text, ':') : 0;
                 p = !p ? text : p + 1;
                 while (*p == ' ')
                     ++p;
@@ -872,7 +872,7 @@ draw_vertical(boolean border)
                     *p = savedch;
                     text = p; /* rest of field */
                     if ((fld == BL_HPMAX || fld == BL_ENEMAX)
-                        && (p = index(text, ')')) != 0) {
+                        && (p = strchr(text, ')')) != 0) {
                         savedch = *p;
                         *p = '\0';
                     } else
@@ -1152,7 +1152,7 @@ curs_vert_status_vals(int win_width)
         } else {
             text = status_vals[fldidx];
             if (fldidx != BL_TITLE && fldidx != BL_LEVELDESC) {
-                if ((colon = index(text, ':')) != 0)
+                if ((colon = strchr(text, ':')) != 0)
                     text = colon + 1;
             }
             lbl = status_fieldnm[fldidx];

@@ -371,7 +371,7 @@ parseoptions(
     using_alias = FALSE;
     g.opt_initial = tinitial;
     g.opt_from_file = tfrom_file;
-    if ((op = index(opts, ',')) != 0) {
+    if ((op = strchr(opts, ',')) != 0) {
         *op++ = 0;
         if (!parseoptions(op, g.opt_initial, g.opt_from_file))
             retval = FALSE;
@@ -533,7 +533,7 @@ parseoptions(
 
         if (opts) {
             Snprintf(pfxbuf, sizeof pfxbuf, "%s", opts);
-            if ((pfxp = index(pfxbuf, ':')) != 0)
+            if ((pfxp = strchr(pfxbuf, ':')) != 0)
                 *pfxp = '\0';
             config_error_add("bad option suffix variation '%s'", pfxbuf);
         }
@@ -773,11 +773,11 @@ optfn_autounlock(
             return optn_ok;
         }
         newflags = 0;
-        sep = index(op, '+') ? '+' : ' ';
+        sep = strchr(op, '+') ? '+' : ' ';
         while (op) {
             boolean matched = FALSE;
             op = trimspaces(op); /* might have leading space */
-            if ((nxt = index(op, sep)) != 0) {
+            if ((nxt = strchr(op, sep)) != 0) {
                 *nxt++ = '\0';
                 op = trimspaces(op); /* might have trailing space after
                                       * plus sign removal */
@@ -1139,7 +1139,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
                 c = 'v'; /* killed -> vanquished */
             if (c == 'd')
                 c = 'o'; /* dungeon -> overview */
-            dop = index(disclosure_options, c);
+            dop = strchr(disclosure_options, c);
             if (dop) {
                 idx = (int) (dop - disclosure_options);
                 if (idx < 0 || idx > NUM_DISCLOSURE_OPTIONS - 1) {
@@ -1157,7 +1157,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
                     prefix_val = -1;
                 } else
                     flags.end_disclose[idx] = DISCLOSE_YES_WITHOUT_PROMPT;
-            } else if (index(valid_settings, c)) {
+            } else if (strchr(valid_settings, c)) {
                 prefix_val = c;
             } else if (c == ' ') {
                 ; /* do nothing */
@@ -2459,7 +2459,7 @@ optfn_paranoid_confirmation(
                        "paranoid_confirm:whichone wheretwo whothree"
                        and "paranoid_confirm:" prefix has already
                        been stripped off by the time we get here */
-                    pp = index(op, ' ');
+                    pp = strchr(op, ' ');
                     if (pp)
                         *pp = '\0';
                     /* we aren't matching option names but match_optname()
@@ -2747,7 +2747,7 @@ optfn_pickup_types(int optidx, int req, boolean negated, char *opts, char *op)
                    the old value (above) as a default action */
             }
             if (use_menu) {
-                if (wizard && !index(ocl, VENOM_SYM))
+                if (wizard && !strchr(ocl, VENOM_SYM))
                     strkitten(ocl, VENOM_SYM);
                 (void) choose_classes_menu("Autopickup what?", 1, TRUE, ocl,
                                            tbuf);
@@ -2766,7 +2766,7 @@ optfn_pickup_types(int optidx, int req, boolean negated, char *opts, char *op)
                 oc_sym = def_char_to_objclass(*op);
                 /* make sure all are valid obj symbols occurring once */
                 if (oc_sym != MAXOCLASSES
-                    && !index(flags.pickup_types, oc_sym)) {
+                    && !strchr(flags.pickup_types, oc_sym)) {
                     flags.pickup_types[num] = (char) oc_sym;
                     flags.pickup_types[++num] = '\0';
                 } else
@@ -3234,7 +3234,7 @@ optfn_sortdiscoveries(
     if (req == get_val || req == get_cnf_val) {
         extern const char *const disco_orders_descr[]; /* o_init.c */
         extern const char disco_order_let[];
-        const char *p = index(disco_order_let, flags.discosort);
+        const char *p = strchr(disco_order_let, flags.discosort);
 
         if (!p)
             flags.discosort = 'o', p = disco_order_let;
@@ -3963,7 +3963,7 @@ optfn_whatis_coord(int optidx, int req, boolean negated, char *opts, char *op)
                                        GPCOORDS_SCREEN,  '\0' };
             char c = lowc(*op);
 
-            if (c && index(gpcoords, c))
+            if (c && strchr(gpcoords, c))
                 iflags.getpos_coords = c;
             else {
                 config_error_add("Unknown %s parameter '%s'",
@@ -4433,7 +4433,7 @@ int pfxfn_verbose(int optidx UNUSED, int req, boolean negated,
     if (req == do_set) {
         if (opts) {
             if (!strncmp(opts, "verbose", 7)) {
-                p = index("01234", *(opts + 7));
+                p = strchr("01234", *(opts + 7));
                 if (p && *p == '\0')  /* plain verbose, not verboseN */
                     param_optional = TRUE;
                 if ((op = string_for_opt(opts, param_optional)) != empty_optstr) {
@@ -5774,8 +5774,8 @@ string_for_opt(char *opts, boolean val_optional)
 {
     char *colon, *equals;
 
-    colon = index(opts, ':');
-    equals = index(opts, '=');
+    colon = strchr(opts, ':');
+    equals = strchr(opts, '=');
     if (!colon || (equals && equals < colon))
         colon = equals;
 
@@ -5846,8 +5846,8 @@ determine_ambiguities(void)
 static int
 length_without_val(const char *user_string, int len)
 {
-    const char *p = index(user_string, ':'),
-               *q = index(user_string, '=');
+    const char *p = strchr(user_string, ':'),
+               *q = strchr(user_string, '=');
 
     if (!p || (q && q < p))
         p = q;
@@ -6025,23 +6025,23 @@ escapes(const char *cp, /* might be 'tp', updating in place */
             ++cp;
 
         /* remaining cases are all for backslash; we know cp[1] is not \0 */
-        } else if (index(dec, cp[1])) {
+        } else if (strchr(dec, cp[1])) {
             ++cp; /* move past backslash to first digit */
             do {
                 cval = (cval * 10) + (*cp - '0');
-            } while (*++cp && index(dec, *cp) && ++dcount < 3);
+            } while (*++cp && strchr(dec, *cp) && ++dcount < 3);
         } else if ((cp[1] == 'o' || cp[1] == 'O') && cp[2]
-                   && index(oct, cp[2])) {
+                   && strchr(oct, cp[2])) {
             cp += 2; /* move past backslash and 'O' */
             do {
                 cval = (cval * 8) + (*cp - '0');
-            } while (*++cp && index(oct, *cp) && ++dcount < 3);
+            } while (*++cp && strchr(oct, *cp) && ++dcount < 3);
         } else if ((cp[1] == 'x' || cp[1] == 'X') && cp[2]
-                   && (dp = index(hex, cp[2])) != 0) {
+                   && (dp = strchr(hex, cp[2])) != 0) {
             cp += 2; /* move past backslash and 'X' */
             do {
                 cval = (cval * 16) + ((int) (dp - hex) / 2);
-            } while (*++cp && (dp = index(hex, *cp)) != 0 && ++dcount < 2);
+            } while (*++cp && (dp = strchr(hex, *cp)) != 0 && ++dcount < 2);
         } else { /* C-style character escapes */
             switch (*++cp) {
             case '\\':
@@ -6332,7 +6332,7 @@ initoptions_init(void)
     if ((opts = nh_getenv("TERM"))
         /* [could also check "xterm" which emulates vtXXX by default] */
         && !strncmpi(opts, "vt", 2)
-        && AS && AE && index(AS, '\016') && index(AE, '\017')) {
+        && AS && AE && strchr(AS, '\016') && strchr(AE, '\017')) {
         if (!g.symset[PRIMARYSET].explicitly)
             load_symset("DECGraphics", PRIMARYSET);
         switch_symbols(TRUE);
@@ -6555,7 +6555,7 @@ change_inv_order(char *op)
     int retval = 1;
 
     num = 0;
-    if (!index(op, GOLD_SYM))
+    if (!strchr(op, GOLD_SYM))
         buf[num++] = COIN_CLASS;
 
     for (sp = op; *sp; sp++) {
@@ -6566,14 +6566,14 @@ change_inv_order(char *op)
             config_error_add("Not an object class '%c'", *sp);
             retval = 0;
             fail = TRUE;
-        } else if (!index(flags.inv_order, oc_sym)) {
+        } else if (!strchr(flags.inv_order, oc_sym)) {
             /* VENOM_CLASS, RANDOM_CLASS, and ILLOBJ_CLASS are excluded
                because they aren't in def_inv_order[] so don't make it
-               into flags.inv_order, hence always fail this index() test */
+               into flags.inv_order, hence always fail this strchr() test */
             config_error_add("Object class '%c' not allowed", *sp);
             retval = 0;
             fail = TRUE;
-        } else if (index(sp + 1, *sp)) {
+        } else if (strchr(sp + 1, *sp)) {
             config_error_add("Duplicate object class '%c'", *sp);
             retval = 0;
             fail = TRUE;
@@ -6586,7 +6586,7 @@ change_inv_order(char *op)
 
     /* fill in any omitted classes, using previous ordering */
     for (sp = flags.inv_order; *sp; sp++)
-        if (!index(buf, *sp))
+        if (!strchr(buf, *sp))
             (void) strkitten(&buf[num++], *sp);
     buf[MAXOCLASSES - 1] = '\0';
 
@@ -6690,17 +6690,17 @@ parsebindings(char *bindings)
 
     /* look for first comma, then decide whether it is the key being bound
        or a list element separator; if it's a key, find separator beyond it */
-    if ((bind = index(bindings, ',')) != 0) {
+    if ((bind = strchr(bindings, ',')) != 0) {
         /* at start so it represents a key */
         if (bind == bindings)
-            bind = index(bind + 1, ',');
+            bind = strchr(bind + 1, ',');
 
         /* to get here, bind is non-Null and not equal to bindings,
            so it is greater than bindings and bind[-1] is valid; check
            whether current comma happens to be for "\,:cmd" or "',':cmd"
            (":cmd" part is assumed if the comma has expected quoting) */
         else if (bind[-1] == '\\' || (bind[-1] == '\'' && bind[1] == '\''))
-            bind = index(bind + 2, ',');
+            bind = strchr(bind + 2, ',');
     }
     /* if a comma separator has been found, break off first binding from rest;
        parse the rest and then handle this first one when recursion returns */
@@ -6711,7 +6711,7 @@ parsebindings(char *bindings)
     }
 
     /* parse a single binding: first split around : */
-    if (! (bind = index(bindings, ':')))
+    if (! (bind = strchr(bindings, ':')))
         return FALSE; /* it's not a binding */
     *bind++ = 0;
 
@@ -7336,14 +7336,14 @@ add_menu_coloring(char *tmpstr) /* never Null but could be empty */
     (void) strncpy(str, tmpstr, sizeof str - 1);
     str[sizeof str - 1] = '\0';
 
-    if ((cs = index(str, '=')) == 0) {
+    if ((cs = strchr(str, '=')) == 0) {
         config_error_add("Malformed MENUCOLOR");
         return FALSE;
     }
 
     tmps = cs + 1; /* advance past '=' */
     mungspaces(tmps);
-    if ((amp = index(tmps, '&')) != 0)
+    if ((amp = strchr(tmps, '&')) != 0)
         *amp = '\0';
 
     c = match_str2clr(tmps);
@@ -7539,7 +7539,7 @@ add_menu_cmd_alias(char from_ch, char to_ch)
 char
 get_menu_cmd_key(char ch)
 {
-    char *found = index(g.mapped_menu_op, ch);
+    char *found = strchr(g.mapped_menu_op, ch);
 
     if (found) {
         int idx = (int) (found - g.mapped_menu_op);
@@ -7556,7 +7556,7 @@ get_menu_cmd_key(char ch)
 char
 map_menu_cmd(char ch)
 {
-    char *found = index(g.mapped_menu_cmds, ch);
+    char *found = strchr(g.mapped_menu_cmds, ch);
 
     if (found) {
         int idx = (int) (found - g.mapped_menu_cmds);
@@ -8732,7 +8732,7 @@ sym_val(const char *strval) /* up to 4*BUFSZ-1 long; only first few
 
         /* if backslash, handle single or double quote or second backslash */
         } else if (strval[1] == '\\' && strval[2] && strval[3] == '\''
-            && index("'\"\\", strval[2]) && !strval[4]) {
+            && strchr("'\"\\", strval[2]) && !strval[4]) {
             buf[0] = strval[2];
 
         /* not simple quote or basic backslash;
@@ -8743,7 +8743,7 @@ sym_val(const char *strval) /* up to 4*BUFSZ-1 long; only first few
             /* +1: skip opening single quote */
             (void) strncpy(tmp, strval + 1, sizeof tmp - 1);
             tmp[sizeof tmp - 1] = '\0';
-            if ((p = rindex(tmp, '\'')) != 0) {
+            if ((p = strrchr(tmp, '\'')) != 0) {
                 *p = '\0';
                 escapes(tmp, buf);
             } /* else buf[0] stays '\0' */
@@ -9112,7 +9112,7 @@ choose_classes_menu(const char *prompt,
             impossible("choose_classes_menu: invalid category %d", category);
         }
         if (way && *class_select) { /* Selections there already */
-            if (index(class_select, *class_list)) {
+            if (strchr(class_select, *class_list)) {
                 selected = TRUE;
             }
         }

@@ -5371,7 +5371,7 @@ openholdingtrap(
         trapdescr = trapname(t->ttyp, FALSE);
     if (!which)
         which = t->tseen ? the_your[t->madeby_u]
-                         : index(vowels, *trapdescr) ? "an" : "a";
+                         : strchr(vowels, *trapdescr) ? "an" : "a";
     if (*which)
         which = strcat(strcpy(whichbuf, which), " ");
 

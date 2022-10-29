@@ -6,6 +6,15 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#ifdef NOT_C99
+#ifdef NEED_INDEX
+#define strchr index
+#endif
+#ifdef NEED_RINDX
+#define strrchr rindex
+#endif
+#endif /* NOT_C99 */
+
 #if !defined(WIN32)
 #if !defined(__cplusplus) && !defined(__GO32__)
 #define E extern
@@ -414,6 +423,7 @@ E char *strcat(char *, const char *);
 E char *strncat(char *, const char *, size_t);
 E char *strpbrk(const char *, const char *);
 
+#ifdef NOT_C99
 #if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(VMS) \
     || defined(HPUX)
 E char *strchr(const char *, int);
@@ -421,6 +431,7 @@ E char *strrchr(const char *, int);
 #else /* BSD */
 E char *index(const char *, int);
 E char *rindex(const char *, int);
+#endif
 #endif
 
 E int strcmp(const char *, const char *);
@@ -440,9 +451,11 @@ E int strlen(const char *);
 
 #endif /* !_XtIntrinsic_h_ && !POSIX_TYPES */
 
+#ifdef NOT_C99
 #if defined(ULTRIX) && defined(__GNUC__)
 E char *index(const char *, int);
 E char *rindex(const char *, int);
+#endif
 #endif
 
 /* Old varieties of BSD have char *sprintf().

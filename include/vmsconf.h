@@ -262,9 +262,6 @@ typedef __mode_t mode_t;
 
 #include "system.h"
 
-#define index strchr
-#define rindex strrchr
-
 /* Use the high quality random number routines. */
 #ifndef USE_ISAAC64
 # if defined(RANDOM)

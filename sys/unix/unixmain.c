@@ -336,8 +336,8 @@ lopt(
         return (char *) 0;
     }
 
-    if ((p = index(arg, '=')) == 0)
-        p = index(arg, ':');
+    if ((p = strchr(arg, '=')) == 0)
+        p = strchr(arg, ':');
     if (p && opttype == ArgValDisallowed)
         goto loptnotallowed;
 
@@ -831,7 +831,7 @@ whoami(void)
 
         if (s && *s) {
             (void) strncpy(g.plname, s, sizeof g.plname - 1);
-            if (index(g.plname, '-'))
+            if (strchr(g.plname, '-'))
                 return TRUE;
         }
     }
@@ -897,7 +897,7 @@ wd_message(void)
         if (sysopt.wizards && sysopt.wizards[0]) {
             char *tmp = build_english_list(sysopt.wizards);
             pline("Only user%s %s may access debug (wizard) mode.",
-                  index(sysopt.wizards, ' ') ? "s" : "", tmp);
+                  strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
             free(tmp);
         } else
             pline("Entering explore/discovery mode instead.");

@@ -1662,7 +1662,7 @@ poly_obj(struct obj *obj, int id)
     }
 
     /* keep special fields (including charges on wands) */
-    if (index(charged_objs, otmp->oclass))
+    if (strchr(charged_objs, otmp->oclass))
         otmp->spe = obj->spe;
     otmp->recharged = obj->recharged;
 

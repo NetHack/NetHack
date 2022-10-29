@@ -298,7 +298,7 @@ char *str;
     char *ptr;
     char drive;
 
-    if ((ptr = index(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0) {
         drive = toupper(*(ptr - 1));
 #ifdef OS2_32BITAPI
         DosSetDefaultDisk((ULONG)(drive - 'A' + 1));

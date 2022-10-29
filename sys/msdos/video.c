@@ -766,11 +766,11 @@ assign_videoshades(char *choiceptr)
     cvalue[0] = choices;
 
     /* find the next ' ' or tab */
-    cptr = index(cvalue[0], '-');
+    cptr = strchr(cvalue[0], '-');
     if (!cptr)
-        cptr = index(cvalue[0], ' ');
+        cptr = strchr(cvalue[0], ' ');
     if (!cptr)
-        cptr = index(cvalue[0], '\t');
+        cptr = strchr(cvalue[0], '\t');
     if (!cptr)
         return 0;
     *cptr = '\0';
@@ -780,11 +780,11 @@ assign_videoshades(char *choiceptr)
     } while (isspace(*cptr) || (*cptr == '-'));
     cvalue[1] = cptr;
 
-    cptr = index(cvalue[1], '-');
+    cptr = strchr(cvalue[1], '-');
     if (!cptr)
-        cptr = index(cvalue[0], ' ');
+        cptr = strchr(cvalue[0], ' ');
     if (!cptr)
-        cptr = index(cvalue[0], '\t');
+        cptr = strchr(cvalue[0], '\t');
     if (!cptr)
         return 0;
     *cptr = '\0';

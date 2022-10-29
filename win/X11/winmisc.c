@@ -24,7 +24,7 @@
 #include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xaw/List.h>
-#include <X11/Xos.h> /* for index() */
+#include <X11/Xos.h> /* for strchr() */
 #include <X11/Xatom.h>
 
 #ifdef PRESERVE_NO_SYSV
@@ -181,13 +181,13 @@ ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(params);
     nhUse(num_params);
 
-    (void) memset(rolechars, '\0', sizeof rolechars); /* for index() */
+    (void) memset(rolechars, '\0', sizeof rolechars); /* for strchr() */
     for (i = 0; roles[i].name.m; ++i) {
         ch = lowc(*roles[i].name.m);
         /* if (flags.female && roles[i].name.f) ch = lowc(*roles[i].name.f);
          */
         /* this supports at most two roles with the same first letter */
-        if (index(rolechars, ch))
+        if (strchr(rolechars, ch))
             ch = highc(ch);
         rolechars[i] = ch;
     }
@@ -196,15 +196,15 @@ ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(rolechars, ch);
+    mark = strchr(rolechars, ch);
     if (!mark)
-        mark = index(rolechars, lowc(ch));
+        mark = strchr(rolechars, lowc(ch));
     if (!mark)
-        mark = index(rolechars, highc(ch));
+        mark = strchr(rolechars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such class */
@@ -227,11 +227,11 @@ race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(params);
     nhUse(num_params);
 
-    (void) memset(racechars, '\0', sizeof racechars); /* for index() */
+    (void) memset(racechars, '\0', sizeof racechars); /* for strchr() */
     for (i = 0; races[i].noun; ++i) {
         ch = lowc(*races[i].noun);
         /* this supports at most two races with the same first letter */
-        if (index(racechars, ch))
+        if (strchr(racechars, ch))
             ch = highc(ch);
         racechars[i] = ch;
     }
@@ -240,15 +240,15 @@ race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(racechars, ch);
+    mark = strchr(racechars, ch);
     if (!mark)
-        mark = index(racechars, lowc(ch));
+        mark = strchr(racechars, lowc(ch));
     if (!mark)
-        mark = index(racechars, highc(ch));
+        mark = strchr(racechars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such race */
@@ -275,13 +275,13 @@ gend_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(gendchars, ch);
+    mark = strchr(gendchars, ch);
     if (!mark)
-        mark = index(gendchars, lowc(ch));
+        mark = strchr(gendchars, lowc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such gender */
@@ -308,13 +308,13 @@ algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(algnchars, ch);
+    mark = strchr(algnchars, ch);
     if (!mark)
-        mark = index(algnchars, highc(ch));
+        mark = strchr(algnchars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such alignment */
@@ -1787,7 +1787,7 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     } else if (ch == '?') {
         extend_help((Widget) 0, (XtPointer) 0, (XtPointer) 0);
         return;
-    } else if (index("\033\n\r", ch)) {
+    } else if (strchr("\033\n\r", ch)) {
         if (ch == '\033') {
             /* unselect while still visible */
             if (extended_cmd_selected >= 0)
@@ -2191,7 +2191,7 @@ make_menu(const char *popup_name, const char *popup_label,
     XSetWMProtocols(XtDisplay(popup), XtWindow(popup), &wm_delete_window, 1);
 
     /* during role selection, highlight "random" as pre-selected choice */
-    if (right_callback == ps_random && index(ps_randchars, '\n'))
+    if (right_callback == ps_random && strchr(ps_randchars, '\n'))
         swap_fg_bg(right);
 
     return popup;

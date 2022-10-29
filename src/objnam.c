@@ -439,7 +439,7 @@ fruit_from_name(
                compromise and use 'fname_k >= k' instead of '>',
                accepting 1 char length discrepancy without risking
                false match (I hope...) */
-            if (fname_k >= k && (p = index(&fnamebuf[k], ' ')) != 0) {
+            if (fname_k >= k && (p = strchr(&fnamebuf[k], ' ')) != 0) {
                 *p = '\0'; /* truncate at 1st space past length of f->fname */
                 altfname = makesingular(fnamebuf);
                 k = Strlen(altfname); /* actually revised 'fname_k' */
@@ -1231,9 +1231,9 @@ doname_base(
                are described as slippery when hero has slippery fingers */
             if (obj == uarmg && Glib) /* just appended "(something)",
                                        * change to "(something; slippery)" */
-                Strcpy(rindex(bp, ')'), "; slippery)");
+                Strcpy(strrchr(bp, ')'), "; slippery)");
             else if (!Blind && obj->lamplit && artifact_light(obj))
-                Sprintf(rindex(bp, ')'), ", %s lit)",
+                Sprintf(strrchr(bp, ')'), ", %s lit)",
                         arti_light_description(obj));
         }
         /*FALLTHRU*/
@@ -1840,21 +1840,21 @@ just_an(char *outbuf, const char *str)
     c0 = lowc(*str);
     if (!str[1] || str[1] == ' ') {
         /* single letter; might be used for named fruit or a musical note */
-        Strcpy(outbuf, index("aefhilmnosx", c0) ? "an " : "a ");
+        Strcpy(outbuf, strchr("aefhilmnosx", c0) ? "an " : "a ");
     } else if (!strncmpi(str, "the ", 4) || !strcmpi(str, "molten lava")
                || !strcmpi(str, "iron bars") || !strcmpi(str, "ice")) {
         ; /* no article */
     } else {
         /* normal case is "an <vowel>" or "a <consonant>" */
-        if ((index(vowels, c0) /* some exceptions warranting "a <vowel>" */
+        if ((strchr(vowels, c0) /* some exceptions warranting "a <vowel>" */
              /* 'wun' initial sound */
-             && (strncmpi(str, "one", 3) || (str[3] && !index("-_ ", str[3])))
+             && (strncmpi(str, "one", 3) || (str[3] && !strchr("-_ ", str[3])))
              /* long 'u' initial sound */
              && strncmpi(str, "eu", 2) /* "eucalyptus leaf" */
              && strncmpi(str, "uke", 3) && strncmpi(str, "ukulele", 7)
              && strncmpi(str, "unicorn", 7) && strncmpi(str, "uranium", 7)
              && strncmpi(str, "useful", 6)) /* "useful tool" */
-            || (c0 == 'x' && !index(vowels, lowc(str[1]))))
+            || (c0 == 'x' && !strchr(vowels, lowc(str[1]))))
             Strcpy(outbuf, "an ");
         else
             Strcpy(outbuf, "a ");
@@ -1920,13 +1920,13 @@ the(const char* str)
         int l;
 
         /* some objects have capitalized adjectives in their names */
-        if (((tmp = rindex(str, ' ')) != 0 || (tmp = rindex(str, '-')) != 0)
+        if (((tmp = strrchr(str, ' ')) != 0 || (tmp = strrchr(str, '-')) != 0)
             && (tmp[1] < 'A' || tmp[1] > 'Z')) {
             /* insert "the" unless we have an apostrophe (where we assume
                we're dealing with "Unique's corpse" when "Unique" wasn't
                caught by CapitalMon() above) */
-            insert_the = !index(str, '\'');
-        } else if (tmp && index(str, ' ') < tmp) { /* has spaces */
+            insert_the = !strchr(str, '\'');
+        } else if (tmp && strchr(str, ' ') < tmp) { /* has spaces */
             /* it needs an article if the name contains "of" */
             tmp = strstri(str, " of ");
             named = strstri(str, " named ");
@@ -2261,7 +2261,7 @@ vtense(const char* subj, const char* verb)
         if (!strncmpi(subj, "a ", 2) || !strncmpi(subj, "an ", 3))
             goto sing;
         spot = (const char *) 0;
-        for (sp = subj; (sp = index(sp, ' ')) != 0; ++sp) {
+        for (sp = subj; (sp = strchr(sp, ' ')) != 0; ++sp) {
             if (!strncmpi(sp, " of ", 4) || !strncmpi(sp, " from ", 6)
                 || !strncmpi(sp, " called ", 8) || !strncmpi(sp, " named ", 7)
                 || !strncmpi(sp, " labeled ", 9)) {
@@ -2279,7 +2279,7 @@ vtense(const char* subj, const char* verb)
          * Guess at a few other special cases that makeplural creates.
          */
         if ((lowc(*spot) == 's' && spot != subj
-             && !index("us", lowc(*(spot - 1))))
+             && !strchr("us", lowc(*(spot - 1))))
             || !BSTRNCMPI(subj, spot - 3, "eeth", 4)
             || !BSTRNCMPI(subj, spot - 3, "feet", 4)
             || !BSTRNCMPI(subj, spot - 1, "ia", 2)
@@ -2316,13 +2316,13 @@ vtense(const char* subj, const char* verb)
         Strcasecpy(buf, "is");
     } else if (!strcmpi(buf, "have")) {
         Strcasecpy(bspot - 1, "s");
-    } else if (index("zxs", lowc(*bspot))
+    } else if (strchr("zxs", lowc(*bspot))
                || (len >= 2 && lowc(*bspot) == 'h'
-                   && index("cs", lowc(*(bspot - 1))))
+                   && strchr("cs", lowc(*(bspot - 1))))
                || (len == 2 && lowc(*bspot) == 'o')) {
         /* Ends in z, x, s, ch, sh; add an "es" */
         Strcasecpy(bspot + 1, "es");
-    } else if (lowc(*bspot) == 'y' && !index(vowels, lowc(*(bspot - 1)))) {
+    } else if (lowc(*bspot) == 'y' && !strchr(vowels, lowc(*(bspot - 1)))) {
         /* like "y" case in makeplural */
         Strcasecpy(bspot, "ies");
     } else {
@@ -2480,7 +2480,7 @@ singplur_compound(char *str)
     for (p = str; *p; ++p) {
         /* substring starting at p can only match if *p is found
            within compound_start[] */
-        if (!index(compound_start, *p))
+        if (!strchr(compound_start, *p))
             continue;
 
         /* check current substring against all words in the compound[] list */
@@ -2609,7 +2609,7 @@ makeplural(const char* oldstr)
         if (len >= 3 && !strcmpi(spot - 2, "erf")) {
             /* avoid "nerf" -> "nerves", "serf" -> "serves" */
             ; /* fall through to default (append 's') */
-        } else if (index("lr", lo_c) || index(vowels, lo_c)) {
+        } else if (strchr("lr", lo_c) || strchr(vowels, lo_c)) {
             /* [aeioulr]f to [aeioulr]ves */
             Strcasecpy(spot, "ves");
             goto bottom;
@@ -2676,8 +2676,8 @@ makeplural(const char* oldstr)
         goto bottom;
     }
     /* Ends in z, x, s, ch, sh; add an "es" */
-    if (index("zxs", lo_c)
-        || (len >= 2 && lo_c == 'h' && index("cs", lowc(*(spot - 1)))
+    if (strchr("zxs", lo_c)
+        || (len >= 2 && lo_c == 'h' && strchr("cs", lowc(*(spot - 1)))
             /* 21st century k-sound */
             && !(len >= 4 && lowc(*(spot - 1)) == 'c' && ch_ksound(str)))
         /* Kludge to get "tomatoes" and "potatoes" right */
@@ -2687,7 +2687,7 @@ makeplural(const char* oldstr)
         goto bottom;
     }
     /* Ends in y preceded by consonant (note: also "qu") change to "ies" */
-    if (lo_c == 'y' && !index(vowels, lowc(*(spot - 1)))) {
+    if (lo_c == 'y' && !strchr(vowels, lowc(*(spot - 1)))) {
         Strcasecpy(spot, "ies"); /* y -> ies */
         goto bottom;
     }
@@ -2774,8 +2774,8 @@ makesingular(const char* oldstr)
                 goto bottom;
             }
             /* wolves, but f to ves isn't fully reversible */
-            if (p - 4 >= bp && (index("lr", lowc(*(p - 4)))
-                                || index(vowels, lowc(*(p - 4))))
+            if (p - 4 >= bp && (strchr("lr", lowc(*(p - 4)))
+                                || strchr(vowels, lowc(*(p - 4))))
                 && !BSTRCMPI(bp, p - 3, "ves")) {
                 if (!BSTRCMPI(bp, p - 6, "cloves")
                     || !BSTRCMPI(bp, p - 6, "nerves"))
@@ -2826,7 +2826,7 @@ makesingular(const char* oldstr)
         }
         /* balactheria -> balactherium */
         if (p - 4 >= bp && !strcmpi(p - 2, "ia")
-            && index("lr", lowc(*(p - 3))) && lowc(*(p - 4)) == 'e') {
+            && strchr("lr", lowc(*(p - 3))) && lowc(*(p - 4)) == 'e') {
             Strcasecpy(p - 1, "um"); /* a -> um */
         }
 
@@ -3767,7 +3767,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
 static void
 readobjnam_parse_charges(struct _readobjnam_data *d)
 {
-    if (strlen(d->bp) > 1 && (d->p = rindex(d->bp, '(')) != 0) {
+    if (strlen(d->bp) > 1 && (d->p = strrchr(d->bp, '(')) != 0) {
         boolean keeptrailingchars = TRUE;
         int idx = 0;
 

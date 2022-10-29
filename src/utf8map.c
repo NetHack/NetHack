@@ -206,11 +206,11 @@ unicode_val(const char *cp)
     if (cp && *cp) {
         cval = dcount = 0;
         if ((unicode = ((*cp == 'U' || *cp == 'u') && cp[1] == '+')) && cp[2]
-            && (dp = index(hex, cp[2])) != 0) {
+            && (dp = strchr(hex, cp[2])) != 0) {
             cp += 2; /* move past the 'U' and '+' */
             do {
                 cval = (cval * 16) + ((int) (dp - hex) / 2);
-            } while (*++cp && (dp = index(hex, *cp)) != 0 && ++dcount < 7);
+            } while (*++cp && (dp = strchr(hex, *cp)) != 0 && ++dcount < 7);
         }
     }
     return cval;

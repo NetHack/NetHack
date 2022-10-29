@@ -234,7 +234,7 @@ curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
             ret = '\n';
         /* msgtype=stop should require space/enter rather than any key,
            as we want to prevent YASD from direction keys. */
-    } while (!index(resp, (char) ret));
+    } while (!strchr(resp, (char) ret));
     if (oldcrsr >= 0)
         (void) curs_set(oldcrsr);
 

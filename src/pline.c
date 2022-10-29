@@ -113,7 +113,7 @@ vpline(const char *line, va_list the_args)
     if (g.program_state.wizkit_wishing)
         return;
 
-    if (index(line, '%')) {
+    if (strchr(line, '%')) {
 #if !defined(NO_VSNPRINTF)
         vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
@@ -475,7 +475,7 @@ vraw_printf(const char *line, va_list the_args)
 {
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
-    if (index(line, '%')) {
+    if (strchr(line, '%')) {
 #if !defined(NO_VSNPRINTF)
         (void) vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #else

@@ -604,7 +604,7 @@ dodiscovered(void) /* free after Robert Viduya */
     long sortindx;  // should be ptrdiff_t, but we don't require that exists
     boolean alphabetized, alphabyclass, lootsort;
 
-    if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
+    if (!flags.discosort || !(p = strchr(disco_order_let, flags.discosort)))
         flags.discosort = 'o';
 
     if (iflags.menu_requested) {
@@ -614,7 +614,7 @@ dodiscovered(void) /* free after Robert Viduya */
     alphabyclass = (flags.discosort == 'c');
     alphabetized = (flags.discosort == 'a' || alphabyclass);
     lootsort = (flags.discosort == 's');
-    sortindx = index(disco_order_let, flags.discosort) - disco_order_let;
+    sortindx = strchr(disco_order_let, flags.discosort) - disco_order_let;
 
     tmpwin = create_nhwindow(NHW_MENU);
     Sprintf(buf, "Discoveries, %s", disco_orders_descr[sortindx]);
@@ -637,7 +637,7 @@ dodiscovered(void) /* free after Robert Viduya */
 
     /* several classes are omitted from packorder; one is of interest here */
     Strcpy(classes, flags.inv_order);
-    if (!index(classes, VENOM_CLASS))
+    if (!strchr(classes, VENOM_CLASS))
         (void) strkitten(classes, VENOM_CLASS); /* append char to string */
 
     ct = uniq_ct + arti_ct;
@@ -743,7 +743,7 @@ doclassdisco(void)
     boolean traditional, alphabetized, lootsort;
     int clr = 0;
 
-    if (!flags.discosort || !(p = index(disco_order_let, flags.discosort)))
+    if (!flags.discosort || !(p = strchr(disco_order_let, flags.discosort)))
         flags.discosort = 'o';
 
     if (iflags.menu_requested) {
@@ -788,7 +788,7 @@ doclassdisco(void)
     /* collect classes with discoveries, in packorder ordering; several
        classes are omitted from packorder and one is of interest here */
     Strcpy(allclasses, flags.inv_order);
-    if (!index(allclasses, VENOM_CLASS))
+    if (!strchr(allclasses, VENOM_CLASS))
         (void) strkitten(allclasses, VENOM_CLASS); /* append char to string */
     /* construct discosyms[] */
     for (s = allclasses; *s; ++s) {
@@ -797,7 +797,7 @@ doclassdisco(void)
         for (i = g.bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
             if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
-                if (!index(discosyms, c)) {
+                if (!strchr(discosyms, c)) {
                     Sprintf(eos(discosyms), "%c", c);
                     if (!traditional) {
                         any.a_int = c;
@@ -829,7 +829,7 @@ doclassdisco(void)
         Sprintf(allclasses_plustwo, "%s%c%c", allclasses, 'u', 'a');
         for (s = allclasses_plustwo, xtras = 0; *s; ++s) {
             c = (*s == 'u' || *s == 'a') ? *s : def_oc_syms[(int) *s].sym;
-            if (!index(discosyms, c)) {
+            if (!strchr(discosyms, c)) {
                 if (!xtras++)
                     (void) strkitten(discosyms, '\033');
                 (void) strkitten(discosyms, c);

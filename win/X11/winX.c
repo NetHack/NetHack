@@ -815,7 +815,7 @@ load_default_resources(void)
             ++numdefs;
         }
         linelen += strlen(inbuf);
-        if (!index(inbuf, '\n'))
+        if (!strchr(inbuf, '\n'))
             continue;
         if (linelen > longlen)
             longlen = linelen;
@@ -2128,7 +2128,7 @@ yn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     }
 
     if (!yn_choices /* accept any input */
-        || (yn_no_default && (ch == '\033' || index(yn_quitchars, ch)))) {
+        || (yn_no_default && (ch == '\033' || strchr(yn_quitchars, ch)))) {
         yn_return = ch;
     } else {
         if (!yn_preserve_case)
@@ -2137,9 +2137,9 @@ yn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         if (ch == '\033') {
             yn_getting_num = FALSE;
             yn_return = yn_esc_map;
-        } else if (index(yn_quitchars, ch)) {
+        } else if (strchr(yn_quitchars, ch)) {
             yn_return = yn_def;
-        } else if (index(yn_choices, ch)) {
+        } else if (strchr(yn_choices, ch)) {
             if (ch == '#') {
                 if (yn_getting_num) { /* don't select again */
                     X11_nhbell();
@@ -2235,7 +2235,7 @@ X11_yn_function_core(
                 yn_preserve_case = TRUE;
                 break;
             }
-        if ((cb = index(choicebuf, '\033')) != 0)
+        if ((cb = strchr(choicebuf, '\033')) != 0)
             *cb = '\0';
         /* ques [choices] (def) */
         int ln = ((int) strlen(ques)        /* prompt text */
@@ -2252,8 +2252,8 @@ X11_yn_function_core(
         Strcat(buf, " ");
 
         /* escape maps to 'q' or 'n' or default, in that order */
-        yn_esc_map = (index(choices, 'q') ? 'q'
-                      : index(choices, 'n') ? 'n'
+        yn_esc_map = (strchr(choices, 'q') ? 'q'
+                      : strchr(choices, 'n') ? 'n'
                         : def);
     } else {
         int ln = ((int) strlen(ques)        /* prompt text */

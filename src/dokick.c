@@ -598,7 +598,7 @@ really_kick_object(coordxy x, coordxy y)
         obj_extract_self(g.kickedobj);
         newsym(x, y);
         if (costly && (!costly_spot(u.ux, u.uy)
-                       || !index(u.urooms, *in_rooms(x, y, SHOPBASE))))
+                       || !strchr(u.urooms, *in_rooms(x, y, SHOPBASE))))
             addtobill(g.kickedobj, FALSE, FALSE, FALSE);
         if (!flooreffects(g.kickedobj, u.ux, u.uy, "fall")) {
             place_object(g.kickedobj, u.ux, u.uy);
@@ -1501,7 +1501,7 @@ impact_drop(
         if (costly) {
             price += stolen_value(obj, x, y,
                                   (costly_spot(u.ux, u.uy)
-                                   && index(u.urooms,
+                                   && strchr(u.urooms,
                                             *in_rooms(x, y, SHOPBASE))),
                                   TRUE);
             /* set obj->no_charge to 0 */
@@ -1629,7 +1629,7 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
             (void) stolen_value(
                 otmp, ox, oy,
                 (costly_spot(u.ux, u.uy)
-                 && index(u.urooms, *in_rooms(ox, oy, SHOPBASE))),
+                 && strchr(u.urooms, *in_rooms(ox, oy, SHOPBASE))),
                 FALSE);
         }
         /* set otmp->no_charge to 0 */

@@ -457,7 +457,7 @@ chdrive(char *str)
     union REGS inregs;
     char drive;
 
-    if ((ptr = index(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0) {
         drive = toupper(*(ptr - 1));
         inregs.h.ah = SELECTDISK;
         inregs.h.dl = drive - 'A';

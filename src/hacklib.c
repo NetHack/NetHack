@@ -210,7 +210,7 @@ trimspaces(char *txt)
 char *
 strip_newline(char *str)
 {
-    char *p = rindex(str, '\n');
+    char *p = strrchr(str, '\n');
 
     if (p) {
         if (p > str && *(p - 1) == '\r')
@@ -283,7 +283,7 @@ str_lines_maxlen(const char *str)
 
     s1 = str;
     while (s1 && *s1) {
-        s2 = index(s1, '\n');
+        s2 = strchr(s1, '\n');
         if (s2) {
             len = (int) (s2 - s1);
             s1 = s2 + 1;
@@ -400,14 +400,14 @@ ing_suffix(const char *s)
     if ((p >= &buf[3] && !strcmpi(p - 3, " on"))
         || (p >= &buf[4] && !strcmpi(p - 4, " off"))
         || (p >= &buf[5] && !strcmpi(p - 5, " with"))) {
-        p = rindex(buf, ' ');
+        p = strrchr(buf, ' ');
         Strcpy(onoff, p);
         *p = '\0';
     }
     if (p >= &buf[2] && !strcmpi(p - 2, "er")) { /* slither + ing */
         /* nothing here */
-    } else if (p >= &buf[3] && !index(vowel, *(p - 1))
-        && index(vowel, *(p - 2)) && !index(vowel, *(p - 3))) {
+    } else if (p >= &buf[3] && !strchr(vowel, *(p - 1))
+        && strchr(vowel, *(p - 2)) && !strchr(vowel, *(p - 3))) {
         /* tip -> tipp + ing */
         *p = *(p - 1);
         *(p + 1) = '\0';
@@ -530,7 +530,7 @@ stripchars(char *bp, const char *stuff_to_strip, const char *orig)
 
     if (s) {
         while (*orig && i < (BUFSZ - 1)) {
-            if (!index(stuff_to_strip, *orig)) {
+            if (!strchr(stuff_to_strip, *orig)) {
                 *s++ = *orig;
                 i++;
             }
@@ -757,10 +757,10 @@ pmatch_internal(const char *patrn, const char *strng,
         /* fuzzy match variant of pmatch; particular characters are ignored */
         do {
             s = *strng++;
-        } while (index(sk, s));
+        } while (strchr(sk, s));
         do {
             p = *patrn++;
-        } while (index(sk, p));
+        } while (strchr(sk, p));
     }
     if (!p)                           /* end of pattern */
         return (boolean) (s == '\0'); /* matches iff end of string too */
@@ -881,9 +881,9 @@ fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
     register char c1, c2;
 
     do {
-        while ((c1 = *s1++) != '\0' && index(ignore_chars, c1) != 0)
+        while ((c1 = *s1++) != '\0' && strchr(ignore_chars, c1) != 0)
             continue;
-        while ((c2 = *s2++) != '\0' && index(ignore_chars, c2) != 0)
+        while ((c2 = *s2++) != '\0' && strchr(ignore_chars, c2) != 0)
             continue;
         if (!c1 || !c2)
             break; /* stop when end of either string is reached */

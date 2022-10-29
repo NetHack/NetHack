@@ -2548,9 +2548,9 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
                 S_LIZARD, S_EEL, S_GOLEM, S_GHOST, S_DEMON, S_HUMAN, '\0'
             };
 
-            if ((punct = index(punctclasses, mcls1)) != 0)
+            if ((punct = strchr(punctclasses, mcls1)) != 0)
                 mcls1 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
-            if ((punct = index(punctclasses, mcls2)) != 0)
+            if ((punct = strchr(punctclasses, mcls2)) != 0)
                 mcls2 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
         }
         res = mcls1 - mcls2; /* class */

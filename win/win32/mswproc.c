@@ -362,9 +362,9 @@ prompt_for_player_selection(void)
         /* tty_putstr(BASE_WINDOW, 0, prompt); */
         do {
             /* pick4u = lowc(readchar()); */
-            if (index(quitchars, pick4u))
+            if (strchr(quitchars, pick4u))
                 pick4u = 'y';
-        } while (!index(ynqchars, pick4u));
+        } while (!strchr(ynqchars, pick4u));
         if ((int) strlen(prompt) + 1 < CO) {
             /* Echo choice and move back down line */
             /* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline,
@@ -1555,10 +1555,10 @@ mswin_yn_function(const char *question, const char *choices, char def)
     if (choices) {
         char *cb, choicebuf[QBUFSZ];
 
-        allow_num = (index(choices, '#') != 0);
+        allow_num = (strchr(choices, '#') != 0);
 
         Strcpy(choicebuf, choices);
-        if ((cb = index(choicebuf, '\033')) != 0) {
+        if ((cb = strchr(choicebuf, '\033')) != 0) {
             /* anything beyond <esc> is hidden */
             *cb = '\0';
         }
@@ -1570,7 +1570,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
         Strcat(message, " ");
         /* escape maps to 'q' or 'n' or default, in that order */
         yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+            (strchr(choices, 'q') ? 'q' : (strchr(choices, 'n') ? 'n' : def));
     } else {
         Strcpy(message, question);
         Strcat(message, " ");
@@ -1597,17 +1597,17 @@ mswin_yn_function(const char *question, const char *choices, char def)
 
         digit_ok = allow_num && digit(ch);
         if (ch == '\033') {
-            if (index(choices, 'q'))
+            if (strchr(choices, 'q'))
                 ch = 'q';
-            else if (index(choices, 'n'))
+            else if (strchr(choices, 'n'))
                 ch = 'n';
             else
                 ch = def;
             break;
-        } else if (index(quitchars, ch)) {
+        } else if (strchr(quitchars, ch)) {
             ch = def;
             break;
-        } else if (!index(choices, ch) && !digit_ok) {
+        } else if (!strchr(choices, ch) && !digit_ok) {
             mswin_nhbell();
             ch = (char) 0;
             /* and try again... */
@@ -1634,7 +1634,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
                     digit_string[0] = z;
                     mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
                     n_len++;
-                } else if (z == 'y' || index(quitchars, z)) {
+                } else if (z == 'y' || strchr(quitchars, z)) {
                     if (z == '\033')
                         value = -1; /* abort */
                     z = '\n';       /* break */
@@ -2705,29 +2705,29 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
         if (strlen(++colorstring) != 6)
             return;
 
-        red_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value = (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                            - hexadecimals);
         ++colorstring;
         red_value *= 16;
-        red_value += (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value += (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
         ++colorstring;
 
-        green_value = (int) (index(hexadecimals,
+        green_value = (int) (strchr(hexadecimals,
                                    tolower((uchar) *colorstring))
                              - hexadecimals);
         ++colorstring;
         green_value *= 16;
-        green_value += (int) (index(hexadecimals,
+        green_value += (int) (strchr(hexadecimals,
                                     tolower((uchar) *colorstring))
                               - hexadecimals);
         ++colorstring;
 
-        blue_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        blue_value = (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
         ++colorstring;
         blue_value *= 16;
-        blue_value += (int) (index(hexadecimals,
+        blue_value += (int) (strchr(hexadecimals,
                                    tolower((uchar) *colorstring))
                              - hexadecimals);
         ++colorstring;

@@ -511,7 +511,7 @@ stdio_wait_synch(void)
 
     fprintf(stdout, "--More--");
     (void) fflush(stdout);
-    while (!index(valid, nhgetch()))
+    while (!strchr(valid, nhgetch()))
         ;
 }
 

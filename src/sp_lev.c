@@ -237,7 +237,7 @@ mapfrag_fromstr(char *str)
     mf->hei = 0;
     tmps = mf->data;
     while (tmps && *tmps) {
-        char *s1 = index(tmps, '\n');
+        char *s1 = strchr(tmps, '\n');
 
         if (mf->hei > MAP_Y_LIM) {
             free(mf->data);

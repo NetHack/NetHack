@@ -535,7 +535,7 @@ pick_nasty(
         alt = big_to_little(res);
     if (alt != res && (g.mvitals[alt].mvflags & G_GENOD) == 0) {
         const char *mnam = mons[alt].pmnames[NEUTRAL],
-                   *lastspace = rindex(mnam, ' ');
+                   *lastspace = strrchr(mnam, ' ');
 
         /* only non-juveniles can become alternate choice */
         if (strncmp(mnam, "baby ", 5)

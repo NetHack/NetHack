@@ -1613,7 +1613,7 @@ mpickstuff(struct monst *mtmp, const char *str)
 
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
         if (!str ? searches_for_item(mtmp, otmp)
-                 : !!(index(str, otmp->oclass))) {
+                 : !!(strchr(str, otmp->oclass))) {
             if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
                 /* let a handful of corpse types thru to can_carry() */
                 && !touch_petrifies(&mons[otmp->corpsenm])

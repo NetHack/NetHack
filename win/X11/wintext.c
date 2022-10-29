@@ -384,7 +384,7 @@ append_text_buffer(struct text_buffer *tb, const char *str, boolean concat)
     if (tb->num_lines) { /* not first --- append a newline */
         char appchar = '\n';
 
-        if (concat && !index("!.?'\")", tb->text[tb->text_last - 1])) {
+        if (concat && !strchr("!.?'\")", tb->text[tb->text_last - 1])) {
             appchar = ' ';
             tb->num_lines--; /* offset increment at end of function */
         }
@@ -398,7 +398,7 @@ append_text_buffer(struct text_buffer *tb, const char *str, boolean concat)
         if (length) {
             /* Remove all newlines. Otherwise we have a confused line count. */
             copy = (tb->text + tb->text_last);
-            while ((copy = index(copy, '\n')) != (char *) 0)
+            while ((copy = strchr(copy, '\n')) != (char *) 0)
                 *copy = ' ';
         }
 

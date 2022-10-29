@@ -5,7 +5,7 @@
 
 /* This file collects some Unix dependencies */
 
-#include "hack.h" /* mainly for index() which depends on BSD */
+#include "hack.h" /* mainly for strchr() which depends on BSD */
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -218,8 +218,8 @@ regularize(char *s)
 {
     register char *lp;
 
-    while ((lp = index(s, '.')) != 0 || (lp = index(s, '/')) != 0
-           || (lp = index(s, ' ')) != 0)
+    while ((lp = strchr(s, '.')) != 0 || (lp = strchr(s, '/')) != 0
+           || (lp = strchr(s, ' ')) != 0)
         *lp = '_';
 #if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) \
     && !defined(__APPLE__)

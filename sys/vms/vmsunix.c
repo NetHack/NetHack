@@ -392,8 +392,8 @@ check_user_string(const char *userlist)
             return TRUE;
         /* doesn't match full word, but maybe we got a false hit when
            looking for "jane" in the list "janedoe jane" so keep going */
-        p = index(sptr + 1, ' ');
-        q = index(sptr + 1, ',');
+        p = strchr(sptr + 1, ' ');
+        q = strchr(sptr + 1, ',');
         if (!p || (q && q < p))
             p = q;
         if (!p)

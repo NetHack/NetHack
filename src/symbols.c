@@ -434,12 +434,12 @@ parse_sym_line(char *buf, int which_set)
        separating space slips through; for handling or set description,
        symbol set creator is responsible for preceding '#' with a space
        and that comment itself doesn't contain " #") */
-    if ((commentp = rindex(buf, '#')) != 0 && commentp[-1] == ' ')
+    if ((commentp = strrchr(buf, '#')) != 0 && commentp[-1] == ' ')
         commentp[-1] = '\0';
 
     /* find the '=' or ':' */
-    bufp = index(buf, '=');
-    altp = index(buf, ':');
+    bufp = strchr(buf, '=');
+    altp = strchr(buf, ':');
     if (!bufp || (altp && altp < bufp))
         bufp = altp;
     if (!bufp) {
@@ -747,7 +747,7 @@ parsesymbols(register char *opts, int which_set)
      *  "S_sample=','" or "S_sample=':'".
      */
 
-    if ((op = index(opts, ',')) != 0) {
+    if ((op = strchr(opts, ',')) != 0) {
         *op++ = '\0';
         if (!parsesymbols(op, which_set))
             return FALSE;
@@ -755,9 +755,9 @@ parsesymbols(register char *opts, int which_set)
 
     /* S_sample:string */
     symname = opts;
-    strval = index(opts, ':');
+    strval = strchr(opts, ':');
     if (!strval)
-        strval = index(opts, '=');
+        strval = strchr(opts, '=');
     if (!strval)
         return FALSE;
     *strval++ = '\0';
@@ -813,7 +813,7 @@ match_sym(char *buf)
         { "S_explode8", "S_expl_bc" }, { "S_explode9", "S_expl_br" },
     };
     size_t len = strlen(buf);
-    const char *p = index(buf, ':'), *q = index(buf, '=');
+    const char *p = strchr(buf, ':'), *q = strchr(buf, '=');
     const struct symparse *sp = loadsyms;
 
     if (!p || (q && q < p))

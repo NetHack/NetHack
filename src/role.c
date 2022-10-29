@@ -1623,12 +1623,12 @@ plnamesuffix(void)
 
         /* Look for tokens delimited by '-' */
         sptr = g.plname + g.plnamelen;
-        if ((eptr = index(sptr, '-')) != (char *) 0)
+        if ((eptr = strchr(sptr, '-')) != (char *) 0)
             *eptr++ = '\0';
         while (eptr) {
             /* Isolate the next token */
             sptr = eptr;
-            if ((eptr = index(sptr, '-')) != (char *) 0)
+            if ((eptr = strchr(sptr, '-')) != (char *) 0)
                 *eptr++ = '\0';
 
             /* Try to match it to something */
@@ -1705,7 +1705,7 @@ role_selection_prolog(int which, winid where)
         /* distinct female name [caveman/cavewoman, priest/priestess] */
         if (gend == 1)
             /* female specified; replace male role name with female one */
-            Sprintf(index(buf, ':'), ": %s", roles[r].name.f);
+            Sprintf(strchr(buf, ':'), ": %s", roles[r].name.f);
         else if (gend < 0)
             /* gender unspecified; append slash and female role name */
             Sprintf(eos(buf), "/%s", roles[r].name.f);

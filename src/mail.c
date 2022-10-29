@@ -493,7 +493,7 @@ readmail(struct obj *otmp UNUSED)
     const char *const it_reads = "It reads:  \"";
 
     i = rn2(SIZE(junk_templates));
-    if (index(junk_templates[i], '%')) {
+    if (strchr(junk_templates[i], '%')) {
         if (i == 0) {
             recipient = DEVTEAM_EMAIL;
             delivery = subst_delivery;
@@ -614,7 +614,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
 
         /* supply ending punctuation only if the message doesn't have any */
         endpunct = "";
-        if (!index(".!?", msg[msglen - 2]))
+        if (!strchr(".!?", msg[msglen - 2]))
             endpunct = ".";
 
         if (adminmsg) {

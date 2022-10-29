@@ -124,7 +124,7 @@ error VA_DECL(const char *, line)
 {  /* opening brace for vprogerror(), nested block for USE_OLDARG error() */
 	char pbuf[BUFSZ];
 
-	if(index(line, '%')) {
+	if(strchr(line, '%')) {
 		Vsprintf(pbuf,line,VA_ARGS);
 		line = pbuf;
 	}

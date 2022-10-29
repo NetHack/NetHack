@@ -288,7 +288,7 @@ update_topl(register const char *bp)
                 break;
         if (tl == otl) {
             /* Eek!  A huge token.  Try splitting after it. */
-            tl = index(otl, ' ');
+            tl = strchr(otl, ' ');
             if (!tl)
                 break; /* No choice but to spit it out whole. */
         }
@@ -396,7 +396,7 @@ tty_yn_function(
     if (resp) {
         char *rb, respbuf[QBUFSZ];
 
-        allow_num = (index(resp, '#') != 0);
+        allow_num = (strchr(resp, '#') != 0);
         Strcpy(respbuf, resp);
         /* normally we force lowercase, but if any uppercase letters
            are present in the allowed response, preserve case;
@@ -407,7 +407,7 @@ tty_yn_function(
                 break;
             }
         /* any acceptable responses that follow <esc> aren't displayed */
-        if ((rb = index(respbuf, '\033')) != 0)
+        if ((rb = strchr(respbuf, '\033')) != 0)
             *rb = '\0';
         (void) strncpy(prompt, query, QBUFSZ - 1);
         prompt[QBUFSZ - 1] = '\0';
@@ -461,18 +461,18 @@ tty_yn_function(
         }
         digit_ok = allow_num && digit(q);
         if (q == '\033') {
-            if (index(resp, 'q'))
+            if (strchr(resp, 'q'))
                 q = 'q';
-            else if (index(resp, 'n'))
+            else if (strchr(resp, 'n'))
                 q = 'n';
             else
                 q = def;
             break;
-        } else if (index(quitchars, q)) {
+        } else if (strchr(quitchars, q)) {
             q = def;
             break;
         }
-        if (!index(resp, q) && !digit_ok) {
+        if (!strchr(resp, q) && !digit_ok) {
             tty_nhbell();
             q = (char) 0;
         } else if (q == '#' || digit_ok) {
@@ -498,7 +498,7 @@ tty_yn_function(
                         break; /* overflow: try again */
                     digit_string[0] = z;
                     addtopl(digit_string), n_len++;
-                } else if (z == 'y' || index(quitchars, z)) {
+                } else if (z == 'y' || strchr(quitchars, z)) {
                     if (z == '\033')
                         value = -1; /* abort */
                     z = '\n';       /* break */

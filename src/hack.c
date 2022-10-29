@@ -2917,7 +2917,7 @@ monstinroom(struct permonst *mdat, int roomno)
         if (DEADMONSTER(mtmp))
             continue;
         if (mtmp->data == mdat
-            && index(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET))
+            && strchr(in_rooms(mtmp->mx, mtmp->my, 0), roomno + ROOMOFFSET))
             return mtmp;
     }
     return (struct monst *) 0;
@@ -2969,19 +2969,19 @@ in_rooms(register coordxy x, register coordxy y, register int typewanted)
     for (x = min_x; x <= max_x; x += step) {
         lev = &levl[x][min_y];
         y = 0;
-        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !strchr(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
         y += step;
         if (y > max_y_offset)
             continue;
-        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !strchr(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
         y += step;
         if (y > max_y_offset)
             continue;
-        if ((rno = lev[y].roomno) >= ROOMOFFSET && !index(ptr, rno)
+        if ((rno = lev[y].roomno) >= ROOMOFFSET && !strchr(ptr, rno)
             && goodtype(rno))
             *(--ptr) = rno;
     }
@@ -3034,11 +3034,11 @@ move_update(register boolean newlev)
     for (ptr1 = u.urooms, ptr2 = u.uentered,
          ptr3 = u.ushops, ptr4 = u.ushops_entered; *ptr1; ptr1++) {
         c = *ptr1;
-        if (!index(u.urooms0, c))
+        if (!strchr(u.urooms0, c))
             *ptr2++ = c;
         if (IS_SHOP(c - ROOMOFFSET)) {
             *ptr3++ = c;
-            if (!index(u.ushops0, c))
+            if (!strchr(u.ushops0, c))
                 *ptr4++ = c;
         }
     }
@@ -3046,7 +3046,7 @@ move_update(register boolean newlev)
 
     /* filter u.ushops0 -> u.ushops_left */
     for (ptr1 = u.ushops0, ptr2 = u.ushops_left; *ptr1; ptr1++)
-        if (!index(u.ushops, *ptr1))
+        if (!strchr(u.ushops, *ptr1))
             *ptr2++ = *ptr1;
     *ptr2 = '\0';
 }

@@ -3153,7 +3153,7 @@ seen_string(xint16 x, const char *obj)
         return "no";
     /* an() returns too much.  index is ok in this case */
     case 1:
-        return index(vowels, *obj) ? "an" : "a";
+        return strchr(vowels, *obj) ? "an" : "a";
     case 2:
         return "some";
     case 3:

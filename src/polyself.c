@@ -1947,7 +1947,7 @@ mbodypart(struct monst *mon, int part)
     }
     if ((part == HAND || part == HANDED)
         && (humanoid(mptr) && attacktype(mptr, AT_CLAW)
-            && !index(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
+            && !strchr(not_claws, mptr->mlet) && mptr != &mons[PM_STONE_GOLEM]
             && mptr != &mons[PM_AMOROUS_DEMON]))
         return (part == HAND) ? "claw" : "clawed";
     if ((mptr == &mons[PM_MUMAK] || mptr == &mons[PM_MASTODON])

@@ -197,7 +197,7 @@ pri_move(struct monst *priest)
                 Your("displaced image doesn't fool %s!", mon_nam(priest));
             (void) mattacku(priest);
             return 0;
-        } else if (index(u.urooms, temple)) {
+        } else if (strchr(u.urooms, temple)) {
             /* chase player if inside temple & can see him */
             if (priest->mcansee && m_canseeu(priest)) {
                 gx = u.ux;

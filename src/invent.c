@@ -87,7 +87,7 @@ loot_classify(Loot *sort_item, struct obj *obj)
     seen = obj->dknown ? TRUE : FALSE,
     /* class order */
     classorder = flags.sortpack ? flags.inv_order : def_srt_order;
-    p = index(classorder, oclass);
+    p = strchr(classorder, oclass);
     if (p)
         k = 1 + (int) (p - classorder);
     else
@@ -1706,7 +1706,7 @@ getobj(
                 cntgiven = TRUE;
             }
         }
-        if (index(quitchars, ilet)) {
+        if (strchr(quitchars, ilet)) {
             if (Verbose(1, getobj1))
                 pline1(Never_mind);
             return (struct obj *) 0;
@@ -2014,7 +2014,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         getlin(qbuf, buf);
         if (buf[0] == '\033')
             return 0;
-        if (index(buf, 'i')) {
+        if (strchr(buf, 'i')) {
             char ailets[1+26+26+1+5+1]; /* $ + a-z + A-Z + # + slop + \0 */
             struct obj *otmp;
 
@@ -2022,8 +2022,8 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             ailets[0] = '\0';
             if (ofilter)
                 for (otmp = g.invent; otmp; otmp = otmp->nobj)
-                    /* index() check: limit overflow items to one '#' */
-                    if ((*ofilter)(otmp) && !index(ailets, otmp->invlet))
+                    /* strchr() check: limit overflow items to one '#' */
+                    if ((*ofilter)(otmp) && !strchr(ailets, otmp->invlet))
                         (void) strkitten(ailets, otmp->invlet);
             if (display_inventory(ailets, TRUE) == '\033')
                 return 0;
@@ -2050,9 +2050,9 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
             continue;
         oc_of_sym = def_char_to_objclass(sym);
         if (takeoff && oc_of_sym != MAXOCLASSES) {
-            if (index(extra_removeables, oc_of_sym)) {
+            if (strchr(extra_removeables, oc_of_sym)) {
                 ; /* skip rest of takeoff checks */
-            } else if (!index(removeables, oc_of_sym)) {
+            } else if (!strchr(removeables, oc_of_sym)) {
                 pline("Not applicable.");
                 return 0;
             } else if (oc_of_sym == ARMOR_CLASS && !wearing_armor()) {
@@ -2081,7 +2081,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (sym == 'u') {
             add_valid_menu_class('u');
             ckfn = ckunpaid;
-        } else if (index("BUCXP", sym)) {
+        } else if (strchr("BUCXP", sym)) {
             add_valid_menu_class(sym); /* 'B','U','C','X', or 'P' */
             ckfn = ckvalidcat;
         } else if (sym == 'm') {
@@ -2089,7 +2089,7 @@ ggetobj(const char *word, int (*fn)(OBJ_P), int mx,
         } else if (oc_of_sym == MAXOCLASSES) {
             You("don't have any %c's.", sym);
         } else {
-            if (!index(olets, oc_of_sym)) {
+            if (!strchr(olets, oc_of_sym)) {
                 add_valid_menu_class(oc_of_sym);
                 olets[oletct++] = oc_of_sym;
                 olets[oletct] = '\0';
@@ -3373,7 +3373,7 @@ display_pickinv(
         int tmpglyph;
         glyph_info tmpglyphinfo = nul_glyphinfo;
 
-        if (lets && !index(lets, otmp->invlet))
+        if (lets && !strchr(lets, otmp->invlet))
             continue;
         if (!flags.sortpack || otmp->oclass == *invlet) {
             if (wizid && !not_fully_identified(otmp))
@@ -3520,7 +3520,7 @@ display_inventory(const char *lets, boolean want_reply)
             for (otmp = g.invent; otmp; otmp = otmp->nobj)
                 if (otmp->invlet == cmdq->key
                     && (!lets || !*lets
-                        || index(lets, def_oc_syms[(int)otmp->oclass].sym))) {
+                        || strchr(lets, def_oc_syms[(int)otmp->oclass].sym))) {
                     free(cmdq);
                     return otmp->invlet;
                 }
@@ -3839,7 +3839,7 @@ this_type_only(struct obj *obj)
     } else if (obj->oclass == COIN_CLASS) {
         /* if filtering by bless/curse state, gold is classified as
            either unknown or uncursed based on user option setting */
-        if (g.this_type && index("BUCX", g.this_type))
+        if (g.this_type && strchr("BUCX", g.this_type))
             res = (g.this_type == (flags.goldX ? 'X' : 'U'));
     } else {
         switch (g.this_type) {
@@ -3953,9 +3953,9 @@ dotypeinv(void)
             *extra_types++ = 'X';
         if (!jcnt)
             *extra_types++ = 'P';
-        *extra_types = '\0'; /* for index() */
+        *extra_types = '\0'; /* for strchr() */
         for (i = 0; i < MAXOCLASSES; i++)
-            if (!index(types, def_oc_syms[i].sym)) {
+            if (!strchr(types, def_oc_syms[i].sym)) {
                 *extra_types++ = def_oc_syms[i].sym;
                 *extra_types = '\0';
             }
@@ -3992,7 +3992,7 @@ dotypeinv(void)
         goto doI_done;
     }
 
-    if (index("BUCXP", c))
+    if (strchr("BUCXP", c))
         oclass = c; /* not a class but understood by this_type_only() */
     else
         oclass = def_char_to_objclass(c); /* change to object class */
@@ -4034,13 +4034,13 @@ dotypeinv(void)
     }
 
     if (traditional) {
-        if (index(types, c) > index(types, '\033')) {
+        if (strchr(types, c) > strchr(types, '\033')) {
             You("have no %sobjects%s.", before, after);
             goto doI_done;
         }
         g.this_type = oclass; /* extra input for this_type_only() */
     }
-    if (index("BUCXP", c)) {
+    if (strchr("BUCXP", c)) {
         /* the before and after phrases for "you have no..." can both be
            treated as mutually-exclusive suffices when creating a title */
         Sprintf(title, "Items %s", (before && *before) ? before : after);
@@ -4704,7 +4704,7 @@ useupf(struct obj *obj, long numused)
     else
         otmp = obj;
     if (costly_spot(otmp->ox, otmp->oy)) {
-        if (index(u.urooms, *in_rooms(otmp->ox, otmp->oy, 0)))
+        if (strchr(u.urooms, *in_rooms(otmp->ox, otmp->oy, 0)))
             addtobill(otmp, FALSE, FALSE, FALSE);
         else
             (void) stolen_value(otmp, otmp->ox, otmp->oy, FALSE, FALSE);
@@ -4740,7 +4740,7 @@ let_to_name(char let, boolean unpaid, boolean showsym)
 
     if (oclass)
         class_name = names[oclass];
-    else if ((pos = index(oth_symbols, let)) != 0)
+    else if ((pos = strchr(oth_symbols, let)) != 0)
         class_name = oth_names[pos - oth_symbols];
     else
         class_name = names[0];
@@ -4972,7 +4972,7 @@ adjust_split(void)
                         GC_ECHOFIRST | GC_CONDHIST);
         /* \033 is in quitchars[] so we need to check for it separately
            in order to treat it as cancel rather than as accept */
-        if (!let || let == '\033' || !index(quitchars, let)) {
+        if (!let || let == '\033' || !strchr(quitchars, let)) {
             pline1(Never_mind);
             return ECMD_CANCEL;
         }
@@ -5081,7 +5081,7 @@ doorganize_core(struct obj *obj)
             if (let == '\033')
                 goto noadjust;
         }
-        if (index(quitchars, let)
+        if (strchr(quitchars, let)
             /* adjusting to same slot is meaningful since all
                compatible stacks get collected along the way,
                but splitting to same slot is not */
@@ -5099,9 +5099,9 @@ doorganize_core(struct obj *obj)
             goto noadjust;
         }
         /* letter() classifies '@' as one; compactify() can put '-' in lets;
-           the only thing of interest that index() might find is '$' or '#'
+           the only thing of interest that strchr() might find is '$' or '#'
            since letter() catches everything else that we put into lets[] */
-        if ((letter(let) && let != '@') || (index(lets, let) && let != '-'))
+        if ((letter(let) && let != '@') || (strchr(lets, let) && let != '-'))
             break; /* got one */
         if (trycnt == 5)
             goto noadjust;

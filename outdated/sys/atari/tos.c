@@ -229,7 +229,7 @@ char *str;
     char *ptr;
     char drive;
 
-    if ((ptr = index(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0) {
         drive = toupper(*(ptr - 1));
         (void) Dsetdrv(drive - 'A');
     }

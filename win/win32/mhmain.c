@@ -405,7 +405,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (GetNHApp()->regNetHackMode && ((lParam & 1 << 29) != 0)) {
             unsigned char c = (unsigned char) (wParam & 0xFF);
             unsigned char scancode = (lParam >> 16) & 0xFF;
-            if (index(extendedlist, tolower(c)) != 0) {
+            if (strchr(extendedlist, tolower(c)) != 0) {
                 NHEVENT_KBD(M(tolower(c)));
             } else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {
                 NHEVENT_KBD(M('?'));

@@ -248,7 +248,7 @@ readentry(FILE* rfile, struct toptenentry* tt)
         if (!fgets(inbuf, sizeof inbuf, rfile)) {
             /* sscanf will fail and tt->points will be set to 0 */
             *inbuf = '\0';
-        } else if (!index(inbuf, '\n')) {
+        } else if (!strchr(inbuf, '\n')) {
             Strcpy(&inbuf[sizeof inbuf - 2], "\n");
             discardexcess(rfile);
         }
@@ -963,7 +963,7 @@ outentry(int rank, struct toptenentry* t1, boolean so)
                 !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
                 t1->maxlvl);
         /* fixup for closing paren in "escaped... with...Amulet)[max..." */
-        if ((bp = index(linebuf, ')')) != 0)
+        if ((bp = strchr(linebuf, ')')) != 0)
             *bp = (t1->deathdnum == astral_level.dnum) ? '\0' : ' ';
         second_line = FALSE;
     } else if (!strncmp("ascended", t1->death, 8)) {
@@ -1110,7 +1110,7 @@ score_wanted(
         return 1;
 
     for (i = 0; i < playerct; i++) {
-        if (players[i][0] == '-' && index("pr", players[i][1])
+        if (players[i][0] == '-' && strchr("pr", players[i][1])
             && players[i][2] == 0 && i + 1 < playerct) {
             const char *arg = players[i + 1];
             if ((players[i][1] == 'p'
@@ -1255,7 +1255,7 @@ prscore(int argc, char **argv)
                 }
                 Strcat(pbuf, players[i]);
                 if (i < playerct - 1) {
-                    if (players[i][0] == '-' && index("pr", players[i][1])
+                    if (players[i][0] == '-' && strchr("pr", players[i][1])
                         && players[i][2] == 0)
                         Strcat(pbuf, " ");
                     else
@@ -1377,7 +1377,7 @@ static void
 nsb_mung_line(p)
 char *p;
 {
-    while ((p = index(p, ' ')) != 0)
+    while ((p = strchr(p, ' ')) != 0)
         *p = '|';
 }
 
@@ -1385,7 +1385,7 @@ static void
 nsb_unmung_line(p)
 char *p;
 {
-    while ((p = index(p, '|')) != 0)
+    while ((p = strchr(p, '|')) != 0)
         *p = ' ';
 }
 #endif /* NO_SCAN_BRACK */

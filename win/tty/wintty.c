@@ -637,9 +637,9 @@ tty_player_selection(void)
         tty_putstr(BASE_WINDOW, 0, prompt);
         do {
             pick4u = lowc(readchar());
-            if (index(quitchars, pick4u))
+            if (strchr(quitchars, pick4u))
                 pick4u = 'y';
-        } while (!index(ynaqchars, pick4u));
+        } while (!strchr(ynaqchars, pick4u));
         if ((int) strlen(prompt) + 1 < CO) {
             /* Echo choice and move back down line */
             tty_putsym(BASE_WINDOW, (int) strlen(prompt) + 1, echoline,
@@ -2039,11 +2039,11 @@ process_menu_window(winid window, struct WinDesc *cw)
                            accelerator; including it in gacc allows gold to
                            be selected via group when not on current page */
                         || curr->gselector == GOLD_SYM)
-                    && !index(gacc, curr->gselector)
+                    && !strchr(gacc, curr->gselector)
                     && (cw->how == PICK_ANY
                         || gcnt[GSELIDX(curr->gselector)] == 1)) {
                     *rp++ = curr->gselector;
-                    *rp = '\0'; /* re-terminate for index() */
+                    *rp = '\0'; /* re-terminate for strchr() */
                 }
     }
     resp_len = 0; /* lint suppression */
@@ -2101,7 +2101,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                        entries, so we don't rely on curr->identifier here) */
                     attr_n = 0; /* whole line */
                     if (curr->str[0] && curr->str[1] == ' '
-                        && curr->str[2] && index("-+#", curr->str[2])
+                        && curr->str[2] && strchr("-+#", curr->str[2])
                         && curr->str[3] == ' ')
                         /* [0]=letter, [1]==space, [2]=[-+#], [3]=space */
                         attr_n = 4; /* [4:N]=entry description */
@@ -2198,7 +2198,7 @@ process_menu_window(winid window, struct WinDesc *cw)
         }
 
         really_morc = morc; /* (only used with MENU_EXPLICIT_CHOICE) */
-        if ((rp = index(resp, morc)) != 0 && rp < resp + resp_len)
+        if ((rp = strchr(resp, morc)) != 0 && rp < resp + resp_len)
             /* explicit menu selection; don't override it if it also
                happens to match a mapped menu command (such as ':' to
                look inside a container vs ':' to search) */
@@ -2220,7 +2220,7 @@ process_menu_window(winid window, struct WinDesc *cw)
             /* special case: '0' is also the default ball class;
                some menus use digits as potential group accelerators
                but their entries don't rely on counts */
-            if (!counting && index(gacc, morc))
+            if (!counting && strchr(gacc, morc))
                 goto group_accel;
 
             count = (count * 10L) + (long) (morc - '0');
@@ -2373,11 +2373,11 @@ process_menu_window(winid window, struct WinDesc *cw)
             morc = really_morc;
         /*FALLTHRU*/
         default:
-            if (cw->how == PICK_NONE || !index(resp, morc)) {
+            if (cw->how == PICK_NONE || !strchr(resp, morc)) {
                 /* unacceptable input received */
                 tty_nhbell();
                 break;
-            } else if (index(gacc, morc)) {
+            } else if (strchr(gacc, morc)) {
  group_accel:
                 /* group accelerator; for the PICK_ONE case, we know that
                    it matches exactly one item in order to be in gacc[] */
@@ -2820,7 +2820,7 @@ compress_str(const char *str)
     /* compress out consecutive spaces if line is too long;
        topline wrapping converts space at wrap point into newline,
        we reverse that here */
-    if ((int) strlen(str) >= CO || index(str, '\n')) {
+    if ((int) strlen(str) >= CO || strchr(str, '\n')) {
         const char *in_str = str;
         char c, *outstr = cbuf, *outend = &cbuf[sizeof cbuf - 1];
         boolean was_space = TRUE; /* True discards all leading spaces;
@@ -2919,7 +2919,7 @@ tty_putstr(winid window, int attr, const char *str)
             *ob = '\0';
         if (!cw->cury && (int) strlen(str) >= CO) {
             /* the characters before "St:" are unnecessary */
-            nb = index(str, ':');
+            nb = strchr(str, ':');
             if (nb && nb > str + 2)
                 str = nb - 2;
         }
@@ -3102,13 +3102,13 @@ tty_display_file(const char *fname, boolean complain)
                     wins[datawin]->offy = 0;
             }
             while (dlb_fgets(buf, BUFSZ, f)) {
-                if ((cr = index(buf, '\n')) != 0)
+                if ((cr = strchr(buf, '\n')) != 0)
                     *cr = 0;
 #ifdef MSDOS
-                if ((cr = index(buf, '\r')) != 0)
+                if ((cr = strchr(buf, '\r')) != 0)
                     *cr = 0;
 #endif
-                if (index(buf, '\t') != 0)
+                if (strchr(buf, '\t') != 0)
                     (void) tabexpand(buf);
                 empty = FALSE;
                 tty_putstr(datawin, 0, buf);
@@ -4838,7 +4838,7 @@ tty_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
         break;
     case BL_GOLD:
         /* \GXXXXNNNN counts as 1 [moot since we use decode_mixed() above] */
-        if ((p = index(status_vals[fldidx], '\\')) != 0 && p[1] == 'G')
+        if ((p = strchr(status_vals[fldidx], '\\')) != 0 && p[1] == 'G')
             tty_status[NOW][fldidx].lth -= (10 - 1);
         break;
     case BL_CAP:
@@ -5139,7 +5139,7 @@ shrink_dlvl(int lvl)
 {
     /* try changing Dlvl: to Dl: */
     char buf[BUFSZ];
-    char *levval = index(status_vals[BL_LEVELDESC], ':');
+    char *levval = strchr(status_vals[BL_LEVELDESC], ':');
 
     if (levval) {
         dlvl_shrinklvl = lvl;

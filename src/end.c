@@ -517,7 +517,7 @@ done_in_by(struct monst *mtmp, int how)
          */
         if (sscanf(g.multireasonbuf, "%u:%c", &reasonmid, &reasondummy) == 2
             && mtmp->m_id == reasonmid) {
-            if ((p = index(g.multireasonbuf, ' ')) != 0)
+            if ((p = strchr(g.multireasonbuf, ' ')) != 0)
                 *p = '\0';
         }
     }
@@ -686,7 +686,7 @@ should_query_disclose_option(int category, char *defquery)
     char disclose, *dop;
 
     *defquery = 'n';
-    if ((dop = index(disclosure_options, category)) != 0) {
+    if ((dop = strchr(disclosure_options, category)) != 0) {
         idx = (int) (dop - disclosure_options);
         if (idx < 0 || idx >= NUM_DISCLOSURE_OPTIONS) {
             impossible(

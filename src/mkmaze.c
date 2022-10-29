@@ -1009,8 +1009,8 @@ makemaz(const char *s)
     if (wizard && *protofile && sp && sp->rndlevs) {
         char *ep = getenv("SPLEVTYPE"); /* not nh_getenv */
         if (ep) {
-            /* rindex always succeeds due to code in prior block */
-            int len = (int) ((rindex(protofile, '-') - protofile) + 1);
+            /* strrchr always succeeds due to code in prior block */
+            int len = (int) ((strrchr(protofile, '-') - protofile) + 1);
 
             while (ep && *ep) {
                 if (!strncmp(ep, protofile, len)) {
@@ -1020,7 +1020,7 @@ makemaz(const char *s)
                         Sprintf(protofile + len, "%d", pick);
                     break;
                 } else {
-                    ep = index(ep, ',');
+                    ep = strchr(ep, ',');
                     if (ep)
                         ++ep;
                 }
