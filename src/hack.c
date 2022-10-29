@@ -1906,7 +1906,7 @@ domove_fight_empty(coordxy x, coordxy y)
     /* specifying 'F' with no monster wastes a turn */
     if (g.context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(glyph) && !g.context.nopick)) {
+        || (glyph_is_invisible(glyph) && !m_at(x, y) && !g.context.nopick)) {
         struct obj *boulder = 0;
         boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
                 solid = (off_edge || (!accessible(x, y)
@@ -2444,6 +2444,9 @@ domove_core(void)
     }
 
     if (displaceu && mtmp) {
+        boolean noticed_it = (canspotmon(mtmp) || glyph_is_invisible(glyph)
+                              || glyph_is_warning(glyph));
+
         remove_monster(u.ux, u.uy);
         place_monster(mtmp, u.ux0, u.uy0);
         newsym(u.ux, u.uy);
@@ -2451,7 +2454,10 @@ domove_core(void)
         /* monst still knows where hero is */
         mtmp->mux = u.ux, mtmp->muy = u.uy;
 
-        pline("%s swaps places with you...", Monnam(mtmp));
+        pline("%s swaps places with you...",
+              !noticed_it ? Something : Monnam(mtmp));
+        if (!canspotmon(mtmp))
+            map_invisible(u.ux0, u.uy0);
         /* monster chose to swap places; hero doesn't get any credit
            or blame if something bad happens to it */
         g.context.mon_moving = 1;
