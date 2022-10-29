@@ -1162,24 +1162,38 @@ christen_monst(struct monst *mtmp, const char *name)
 }
 
 /* check whether user-supplied name matches or nearly matches an unnameable
-   monster's name; if so, give alternate reject message for do_mgivenname() */
+   monster's name, or is an attempt to delete the monster's name; if so, give
+   alternate reject message for do_mgivenname() */
 static boolean
 alreadynamed(struct monst *mtmp, char *monnambuf, char *usrbuf)
 {
     char pronounbuf[10], *p;
 
-    if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
-        /* catch trying to name "the Oracle" as "Oracle" */
-        || (!strncmpi(monnambuf, "the ", 4)
-            && fuzzymatch(usrbuf, monnambuf + 4, " -_", TRUE))
-        /* catch trying to name "invisible Orcus" as "Orcus" */
-        || ((p = strstri(monnambuf, "invisible ")) != 0
-            && fuzzymatch(usrbuf, p + 10, " -_", TRUE))
-        /* catch trying to name "the {priest,Angel} of Crom" as "Crom" */
-        || ((p = strstri(monnambuf, " of ")) != 0
-            && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
-        pline("%s is already called %s.",
-              upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+    if (!*usrbuf) { /* attempt to erase existing name */
+        boolean name_not_title = (has_mgivenname(mtmp)
+                                  || type_is_pname(mtmp->data)
+                                  || mtmp->isshk);
+        pline("%s would rather keep %s existing %s.", upstart(monnambuf),
+              is_rider(mtmp->data) ? "its" : mhis(mtmp),
+              name_not_title ? "name" : "title");
+        return TRUE;
+    } else if (fuzzymatch(usrbuf, monnambuf, " -_", TRUE)
+               /* catch trying to name "the Oracle" as "Oracle" */
+               || (!strncmpi(monnambuf, "the ", 4)
+                   && fuzzymatch(usrbuf, monnambuf + 4, " -_", TRUE))
+               /* catch trying to name "invisible Orcus" as "Orcus" */
+               || ((p = strstri(monnambuf, "invisible ")) != 0
+                   && fuzzymatch(usrbuf, p + 10, " -_", TRUE))
+               /* catch trying to name "the priest of Crom" as "Crom" */
+               || ((p = strstri(monnambuf, " of ")) != 0
+                   && fuzzymatch(usrbuf, p + 4, " -_", TRUE))) {
+        if (is_rider(mtmp->data)) {
+            /* avoid gendered pronoun for riders */
+            pline("%s is already called that.", upstart(monnambuf));
+        } else {
+            pline("%s is already called %s.",
+                  upstart(strcpy(pronounbuf, mhe(mtmp))), monnambuf);
+        }
         return TRUE;
     } else if (mtmp->data == &mons[PM_JUIBLEX]
                && strstri(monnambuf, "Juiblex")
@@ -1249,11 +1263,9 @@ do_mgivenname(void)
      * Shopkeepers, temple priests and other minions use alternate
      * name formatting routines which ignore any user-supplied name.
      *
-     * Don't say the name is being rejected if it happens to match
-     * the existing name.
-     *
-     * TODO: should have an alternate message when the attempt is to
-     * remove existing name without assigning a new one.
+     * Don't say a new name is being rejected if it happens to match
+     * the existing name, or if the player is trying to remove the
+     * monster's existing name without assigning a new one.
      */
     if ((mtmp->data->geno & G_UNIQ) && !mtmp->ispriest) {
         if (!alreadynamed(mtmp, monnambuf, buf))
@@ -1267,8 +1279,9 @@ do_mgivenname(void)
                || mtmp->data == &mons[PM_GHOST]) {
         if (!alreadynamed(mtmp, monnambuf, buf))
             pline("%s will not accept the name %s.", upstart(monnambuf), buf);
-    } else
+    } else {
         (void) christen_monst(mtmp, buf);
+    }
 }
 
 /*
