@@ -2317,8 +2317,8 @@ free_config_sections(void)
    with spaces optional; returns pointer to "anything-except..." (with
    trailing " ] #..." stripped) if ok, otherwise Null */
 static char *
-is_config_section(char *str) /* trailing spaces will be stripped,
-                                ']' too iff result is good */
+is_config_section(
+    char *str) /* trailing spaces are stripped, ']' too iff result is good */
 {
     char *a, *c, *z;
 
@@ -2332,7 +2332,8 @@ is_config_section(char *str) /* trailing spaces will be stripped,
     z = index(a, ']');
     if (!z)
         return (char *) 0;
-    for (c = z + 1; *c && *c != '#'; ++c)
+    /* comment, if present, can be preceded by spaces */
+    for (c = z + 1; *c == ' '; ++c)
         continue;
     if (*c && *c != '#')
         return (char *) 0;
