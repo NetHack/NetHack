@@ -70,7 +70,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
     }
 }
 
-/* convert a level based random selection into a specific mage spell;
+/* convert a level-based random selection into a specific mage spell;
    inappropriate choices will be screened out by spell_would_be_useless() */
 static int
 choose_magic_spell(int spellval)
@@ -124,7 +124,7 @@ choose_magic_spell(int spellval)
     }
 }
 
-/* convert a level based random selection into a specific cleric spell */
+/* convert a level-based random selection into a specific cleric spell */
 static int
 choose_clerical_spell(int spellnum)
 {

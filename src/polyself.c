@@ -339,7 +339,7 @@ newman(void)
 
     /*
      * New hit points:
-     *  remove level-gain based HP from any extra HP accumulated
+     *  remove "level gain"-based HP from any extra HP accumulated
      *  (the "extra" might actually be negative);
      *  modify the extra, retaining {80%, 90%, 100%, or 110%};
      *  add in newly generated set of level-gain HP.

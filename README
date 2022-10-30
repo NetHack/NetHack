@@ -153,7 +153,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Stride 460 running UniStride 2.1
         Sun-3s, -4s, and -386is running SunOS 3.x
         Sun-3s and -386is running SunOS 4.x
-        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
+        "Sun SPARC"-based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Valid Logic Systems SCALD-System
 
     Previous versions, using a cross-compiler hosted on another platform,

@@ -478,7 +478,7 @@ new_angle(struct rm *lev, unsigned char *sv, int row, int col)
  *      + After the monster move, before input from the player. [moveloop()]
  *      + At end of moveloop. [moveloop() ??? not sure why this is here]
  *      + Right before something is printed. [pline()]
- *      + Right before we do a vision based operation. [do_clear_area()]
+ *      + Right before we do a vision-based operation. [do_clear_area()]
  *      + screen redraw, so we can renew all positions in sight. [docrt()]
  *      + When toggling temporary blindness, in case additional events
  *        impacted by vision occur during the same move [make_blinded()]

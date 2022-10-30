@@ -5,7 +5,7 @@
 /*
  *  WIN32 system functions.
  * 
- *  Included in both console and window based clients on the windows platform.
+ *  Included in both console-based and window-based clients on the windows platform.
  *
  *  Initial Creation: Michael Allison - January 31/93
  *

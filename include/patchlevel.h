@@ -371,7 +371,7 @@
  *  NetHack 3.2.0, April 11, 1996
  *  enhancements to the windowing systems including "tiles" or icons to
  *      visually represent monsters and objects (courtesy Warwick Allison)
- *  window based menu system introduced for inventory and selection
+ *  window-based menu system introduced for inventory and selection
  *  moving light sources besides the player
  *  improved #untrap (courtesy Helge Hafting)
  *  spellcasting logic changes to balance spellcasting towards magic-using
