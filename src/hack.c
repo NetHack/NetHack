@@ -1684,7 +1684,10 @@ domove_bump_mon(struct monst *mtmp, int glyph)
    sets displaceu, if hero and monster could swap places instead.
 */
 static boolean
-domove_attackmon_at(struct monst *mtmp, coordxy x, coordxy y, boolean *displaceu)
+domove_attackmon_at(
+    struct monst *mtmp,
+    coordxy x, coordxy y,
+    boolean *displaceu)
 {
     /* only attack if we know it's there */
     /* or if we used the 'F' command to fight blindly */
@@ -1899,9 +1902,10 @@ domove_fight_empty(coordxy x, coordxy y)
     int glyph = !off_edge ? glyph_at(x, y) : GLYPH_UNEXPLORED;
 
     if (off_edge)
-        x = y = 0; /* for forcefight against the edge of the map; make
-                    * sure 'bad' coordinates are within array bounds in
-                    * case a bounds check gets overlooked */
+        x = 0, y = 1; /* for forcefight against the edge of the map; make
+                       * sure 'bad' coordinates are within array bounds in
+                       * case a bounds check gets overlooked; avoid <0,0>
+                       * because m_at() might find a vault guard there */
 
     /* specifying 'F' with no monster wastes a turn */
     if (g.context.forcefight

@@ -160,7 +160,7 @@ attack_checks(
 
     /* cache the shown glyph;
        cases which might change it (by placing or removing
-       'rembered, unseen monster' glyph or revealing a mimic)
+       'remembered, unseen monster' glyph or revealing a mimic)
        always return without further reference to this */
     glyph = glyph_at(g.bhitpos.x, g.bhitpos.y);
 
