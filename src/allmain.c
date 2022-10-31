@@ -1053,7 +1053,7 @@ dump_enums(void)
     static const char *const titles[NUM_ENUM_DUMPS] =
         { "monnums", "objects_nums" , "misc_object_nums" };
 
-    struct enum_dump omdump[] = {
+    static struct enum_dump omdump[] = {
             { LAST_GEM, "LAST_GEM" },
             { NUM_GLASS_GEMS, "NUM_GLASS_GEMS" },
             { MAXSPELL, "MAXSPELL" },
