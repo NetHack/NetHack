@@ -686,7 +686,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
      */
 
     NHOPTP(cond_, Advanced, 0, opt_in, set_hidden,
-                No, No, Yes, Yes, NoAlias, "prefix for cond_ options")
+                Yes, No, Yes, Yes, NoAlias, "prefix for cond_ options")
     NHOPTP(font, Advanced, 0, opt_in, set_hidden,
                 Yes, Yes, Yes, No, NoAlias, "prefix for font options")
 #if defined(MICRO) && !defined(AMIGA)

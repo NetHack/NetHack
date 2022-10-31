@@ -197,6 +197,7 @@ extern const char *bl_idx_to_fldname(int);
 extern void condopt(int, boolean *, boolean);
 extern int parse_cond_option(boolean, char *);
 extern void cond_menu(void);
+extern boolean opt_next_cond(int, char *);
 #ifdef STATUS_HILITES
 extern void status_eval_next_unhilite(void);
 extern void reset_status_hilites(void);

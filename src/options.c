@@ -300,6 +300,7 @@ static unsigned int longest_option_name(int, int);
 static int doset_simple_menu(void);
 static void doset_add_menu(winid, const char *, const char *, int, int);
 static int handle_add_list_remove(const char *, int);
+static void all_options_conds(strbuf_t *);
 static void all_options_menucolors(strbuf_t *);
 static void all_options_msgtypes(strbuf_t *);
 static void all_options_apes(strbuf_t *);
@@ -324,7 +325,7 @@ static int handler_sortloot(void);
 static int handler_symset(int);
 static int handler_whatis_coord(void);
 static int handler_whatis_filter(void);
-/* next few are not allopts[] entries, so will only be called
+/* next few are not allopt[] entries, so will only be called
    directly from doset, not from individual optfn's */
 static int handler_autopickup_exception(void);
 static int handler_menu_colors(void);
@@ -4224,30 +4225,36 @@ optfn_windowtype(int optidx, int req, boolean negated UNUSED,
  */
 
 static int
-pfxfn_cond_(int optidx UNUSED, int req, boolean negated,
-            char *opts, char *op UNUSED)
+pfxfn_cond_(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op UNUSED)
 {
-    int reslt;
-
     if (req == do_init) {
         condopt(0, (boolean *) 0, 0); /* make the choices match defaults */
         return optn_ok;
     }
     if (req == do_set) {
-        if ((reslt = parse_cond_option(negated, opts)) != 0) {
-            switch (reslt) {
-            case 3:
-                config_error_add("Ambiguous condition option %s", opts);
-                break;
-            case 1:
-            case 2:
-            default:
-                config_error_add("Unknown condition option %s (%d)", opts,
-                                 reslt);
-                break;
-            }
-            return optn_err;
+        int reslt = parse_cond_option(negated, opts);
+
+        switch (reslt) {
+        case 0:
+            opt_set_in_config[optidx] = TRUE;
+            break;
+        case 3:
+            config_error_add("Ambiguous condition option %s", opts);
+            break;
+        case 1:
+        case 2:
+        default:
+            config_error_add("Unknown condition option %s (%d)", opts, reslt);
+            break;
         }
+        if (reslt != 0)
+            return optn_err;
+        /* [FIXME?  redraw seems like overkill; botl update should suffice] */
         g.opt_need_redraw = TRUE;
         return optn_ok;
     }
@@ -4418,8 +4425,13 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
 #endif
 
 #ifndef NO_VERBOSE_GRANULARITY
-int pfxfn_verbose(int optidx UNUSED, int req, boolean negated,
-           char *opts, char *op)
+int
+pfxfn_verbose(
+    int optidx UNUSED,
+    int req,
+     boolean negated,
+    char *opts,
+    char *op)
 {
     long ltmp = 0;
     int reslt;
@@ -7838,19 +7850,27 @@ optfn_o_message_types(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_o_status_cond(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op UNUSED)
+optfn_o_status_cond(
+    int optidx UNUSED,
+    int req,
+    boolean negated UNUSED,
+    char *opts,
+    char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
+        ; /* setting status condition options goes through pfxfn_cond_() */
     }
-    if (req == get_val || req == get_cnf_val) {
-        if (!opts)
+    if (req == get_val) {
+        if (!opts) /* opts[] is used as an output argument */
             return optn_err;
         Sprintf(opts, n_currently_set, count_cond());
         return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        ; /* handled inline by all_options_stringbuf() */
     }
     if (req == do_handler) {
         cond_menu();
@@ -8879,6 +8899,34 @@ option_help(void)
     return;
 }
 
+static void
+all_options_conds(strbuf_t *sbuf)
+{
+    char tmp[BUFSZ], buf[BUFSZ];
+    int idx = 0;
+
+    tmp[0] = '\0';
+    while (opt_next_cond(idx, buf)) {
+        /* 75: room for about 5 conditions, with enough space for player
+           to edit the resulting file manually and insert '!' */
+        if (idx == 0 || Strlen(tmp) + 1 + Strlen(buf) >= 75) {
+            if (idx > 0) {
+                /* finish off previous line */
+                Strcat(tmp, ",");
+                Strcat(tmp, "\\\n"); /* backslash+newline */
+                strbuf_append(sbuf, tmp);
+            }
+            Sprintf(tmp, "%-8s%s", (idx == 0) ? "OPTIONS=" : " ", buf);
+        } else {
+            Sprintf(eos(tmp), ",%s", buf);
+        }
+        ++idx;
+    }
+    /* finish off final line */
+    Strcat(tmp, "\n");
+    strbuf_append(sbuf, tmp);
+}
+
 /* append menucolor lines to strbuf */
 static void
 all_options_menucolors(strbuf_t *sbuf)
@@ -8892,7 +8940,7 @@ all_options_menucolors(strbuf_t *sbuf)
         return;
 
     /* reverse the order */
-    arr = (struct menucoloring **)alloc(ncolors * sizeof(struct menucoloring *));
+    arr = (struct menucoloring **) alloc(ncolors * sizeof *arr);
     while (tmp) {
         arr[i++] = tmp;
         tmp = tmp->next;
@@ -8992,6 +9040,11 @@ all_options_strbuf(strbuf_t *sbuf)
             break;
         }
     }
+
+    /* cond_xyz are closer to regular options than the other 'other opts'
+       so put them next */
+    if (opt_set_in_config[opt_o_status_cond])
+        all_options_conds(sbuf);
 
     get_changed_key_binds(sbuf);
     savedsym_strbuf(sbuf);
