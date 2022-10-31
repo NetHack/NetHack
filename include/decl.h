@@ -437,15 +437,16 @@ struct breadcrumbs {
 E const char *ARGV0;
 #endif
 
-enum earlyarg {ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
+enum earlyarg {
+    ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS
 #ifndef NODUMPENUMS
     , ARG_DUMPENUMS
+#endif
 #ifdef ENHANCED_SYMBOLS
     , ARG_DUMPGLYPHIDS
 #endif
-#endif /* NODUMPENUMS */
 #ifdef WIN32
-    ,ARG_WINDOWS
+    , ARG_WINDOWS
 #endif
 };
 

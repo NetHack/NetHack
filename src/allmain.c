@@ -21,6 +21,9 @@ static void regen_pw(int);
 static void regen_hp(int);
 static void interrupt_multi(const char *);
 static void debug_fields(const char *);
+#ifndef NODUMPENUMS
+static void dump_enums(void);
+#endif
 
 void
 early_init(void)
@@ -838,17 +841,17 @@ interrupt_multi(const char *msg)
  */
 
 static const struct early_opt earlyopts[] = {
-    {ARG_DEBUG, "debug", 5, TRUE},
-    {ARG_VERSION, "version", 4, TRUE},
-    {ARG_SHOWPATHS, "showpaths", 9, FALSE},
+    { ARG_DEBUG, "debug", 5, TRUE },
+    { ARG_VERSION, "version", 4, TRUE },
+    { ARG_SHOWPATHS, "showpaths", 9, FALSE },
 #ifndef NODUMPENUMS
-    {ARG_DUMPENUMS, "dumpenums", 9, FALSE},
-#ifdef ENHANCED_SYMBOLS
-    {ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE},
+    { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
 #endif
-#endif /* NODUMPENUMS */
+#ifdef ENHANCED_SYMBOLS
+    { ARG_DUMPGLYPHIDS, "dumpglyphids", 12, FALSE },
+#endif
 #ifdef WIN32
-    {ARG_WINDOWS, "windows", 4, TRUE},
+    { ARG_WINDOWS, "windows", 4, TRUE },
 #endif
 };
 
@@ -922,28 +925,25 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             early_version_info(insert_into_pastebuf);
             return 2;
         }
-        case ARG_SHOWPATHS: {
+        case ARG_SHOWPATHS:
             return 2;
-        }
 #ifndef NODUMPENUMS
-        case ARG_DUMPENUMS: {
+        case ARG_DUMPENUMS:
             dump_enums();
             return 2;
-        }
+#endif
 #ifdef ENHANCED_SYMBOLS
-        case ARG_DUMPGLYPHIDS: {
+        case ARG_DUMPGLYPHIDS:
             dump_glyphids();
             return 2;
-        }
 #endif
-#endif /* NODUMPENUMS */
 #ifdef WIN32
-        case ARG_WINDOWS: {
+        case ARG_WINDOWS:
             if (extended_opt) {
                 extended_opt++;
                 return windows_early_options(extended_opt);
             }
-        }
+        /*FALLTHRU*/
 #endif
         default:
             break;
@@ -1028,55 +1028,61 @@ timet_delta(time_t etim, time_t stim) /* end and start times */
     return (long) difftime(etim, stim);
 }
 
-#ifndef NODUMPENUMS
+#if !defined(NODUMPENUMS) || defined(ENHANCED_SYMBOLS)
+/* monsdump[] and objdump[] are also used in utf8map.c */
 #define DUMP_ENUMS
 struct enum_dump monsdump[] = {
 #include "monsters.h"
-        { NUMMONS, "NUMMONS" },
+    { NUMMONS, "NUMMONS" },
 };
 struct enum_dump objdump[] = {
 #include "objects.h"
-        { NUM_OBJECTS, "NUM_OBJECTS" },
+    { NUM_OBJECTS, "NUM_OBJECTS" },
 };
 #undef DUMP_ENUMS
 
-void
+#ifndef NODUMPENUMS
+static void
 dump_enums(void)
 {
-    int i, j;
     enum enum_dumps {
         monsters_enum,
         objects_enum,
         objects_misc_enum,
         NUM_ENUM_DUMPS
     };
-    static const char *const titles[NUM_ENUM_DUMPS] =
-        { "monnums", "objects_nums" , "misc_object_nums" };
-
-    static struct enum_dump omdump[] = {
-            { LAST_GEM, "LAST_GEM" },
-            { NUM_GLASS_GEMS, "NUM_GLASS_GEMS" },
-            { MAXSPELL, "MAXSPELL" },
+    static const char *const titles[NUM_ENUM_DUMPS] = {
+        "monnums", "objects_nums" , "misc_object_nums"
     };
-    struct enum_dump *ed[NUM_ENUM_DUMPS] = { monsdump, objdump, omdump };
+    static const struct enum_dump omdump[] = {
+        { LAST_GEM, "LAST_GEM" },
+        { NUM_GLASS_GEMS, "NUM_GLASS_GEMS" },
+        { MAXSPELL, "MAXSPELL" },
+    };
+    static const struct enum_dump *const ed[NUM_ENUM_DUMPS] = {
+        monsdump, objdump, omdump
+    };
     static const char *const pfx[NUM_ENUM_DUMPS] = { "PM_", "", "" };
-    int szd[NUM_ENUM_DUMPS] = { SIZE(monsdump), SIZE(objdump), SIZE(omdump) };
+    static int szd[NUM_ENUM_DUMPS] = {
+        SIZE(monsdump), SIZE(objdump), SIZE(omdump)
+    };
+    int i, j;
 
     for (i = 0; i < NUM_ENUM_DUMPS; ++ i) {
         raw_printf("enum %s = {", titles[i]);
         for (j = 0; j < szd[i]; ++j) {
             raw_printf("    %s%s = %i%s",
                        (j == szd[i] - 1) ? "" : pfx[i],
-                       ed[i]->nm,
-                       ed[i]->val,
+                       ed[i][j].nm,
+                       ed[i][j].val,
                        (j == szd[i] - 1) ? "" : ",");
-            ed[i]++;
        }
         raw_print("};");
         raw_print("");
     }
     raw_print("");
 }
+#endif /* NODUMPENUMS */
 
 #ifdef ENHANCED_SYMBOLS
 void
@@ -1085,6 +1091,6 @@ dump_glyphids(void)
     dump_all_glyphids(stdout);
 }
 #endif /* ENHANCED_SYMBOLS */
-#endif /* NODUMPENUMS */
+#endif /* !NODUMPENUMS || ENHANCED_SYMBOLS */
 
 /*allmain.c*/

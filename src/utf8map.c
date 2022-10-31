@@ -15,7 +15,7 @@ extern const char *known_handling[];        /* symbols.c */
 #ifdef ENHANCED_SYMBOLS
 
 #define Fprintf (void) fprintf
-enum reserved_activities {res_nothing, res_dump_glyphids, res_fill_cache};
+enum reserved_activities { res_nothing, res_dump_glyphids, res_fill_cache };
 enum things_to_find { find_nothing, find_pm, find_oc, find_cmap, find_glyph };
 struct find_struct {
     enum things_to_find findtype;
@@ -36,7 +36,8 @@ struct glyphid_cache_t {
 };
 struct glyphid_cache_t *glyphid_cache;
 struct find_struct glyphcache_find, to_custom_symbol_find;
-static void to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat);
+static void to_custom_symset_entry_callback(int glyph,
+                                            struct find_struct *findwhat);
 static int unicode_val(const char *cp);
 static int parse_id(const char *id, struct find_struct *findwhat);
 static int glyph_find_core(const char *id, struct find_struct *findwhat);
@@ -475,9 +476,13 @@ glyphrep(const char *op)
 }
 
 int
-add_custom_urep_entry(const char *customization_name, int glyphidx,
-                      uint32 utf32ch, const uint8 *utf8str, long ucolor,
-                      enum graphics_sets which_set)
+add_custom_urep_entry(
+    const char *customization_name,
+    int glyphidx,
+    uint32 utf32ch,
+    const uint8 *utf8str,
+    long ucolor,
+    enum graphics_sets which_set)
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
@@ -492,8 +497,8 @@ add_custom_urep_entry(const char *customization_name, int glyphidx,
         gdc->custtype = custom_ureps;
         gdc->details = 0;
     }
-    details = find_matching_symset_customization(customization_name, custom_symbols,
-                                                 which_set);
+    details = find_matching_symset_customization(customization_name,
+                                                 custom_symbols, which_set);
     if (details) {
         while (details) {
             if (details->content.urep.glyphidx == glyphidx) {
@@ -1100,8 +1105,10 @@ glyphs_to_unicode(const char *id, const char *unicode_val, long clr)
 
 #if 0
 struct customization_detail *
-find_display_urep_customization(const char *customization_name, int glyphidx,
-                                enum graphics_sets which_set)
+find_display_urep_customization(
+    const char *customization_name,
+    int glyphidx,
+    enum graphics_sets which_set)
 {
     struct symset_customization *gdc = &g.sym_customizations[which_set];
     struct customization_detail *urepdetails;

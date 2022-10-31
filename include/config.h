@@ -277,6 +277,9 @@
  *      uncommented to define NODUMPENUMS. Doing so will disable the
  *          nethack --dumpenums
  *      command line option.
+ *      Note:  the extra memory is also used by when ENHANCED_SYMBOLS is
+ *      defined, so defining both ENHANCED_SYMBOLS and NODUMPENUMS will limit
+ *      the amount of memory and code reduction offered by the latter.
  */
 /* #define NODUMPENUMS */
 
