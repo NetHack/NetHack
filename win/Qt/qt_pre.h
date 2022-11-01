@@ -15,7 +15,7 @@
 #undef min
 #undef max
 
-#ifdef NO_C99
+#ifdef NOT_C99
 #ifdef NEED_INDEX
 #undef index
 #endif
