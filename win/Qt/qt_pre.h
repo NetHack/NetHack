@@ -9,13 +9,20 @@
 #undef C            // conflicts with Qt6 header
 #undef Invisible
 #undef Warning
-#undef index
 #undef msleep
-#undef rindex
 #undef wizard
 #undef yn
 #undef min
 #undef max
+
+#ifdef NO_C99
+#ifdef NEED_INDEX
+#undef index
+#endif
+#ifdef NEED_RINDX
+#undef rindex
+#endif
+#endif
 
 #if defined(__cplusplus)
 
