@@ -7870,7 +7870,7 @@ optfn_o_status_cond(
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        ; /* handled inline by all_options_stringbuf() */
+        ; /* handled inline by all_options_strbuf() via all_options_conds() */
     }
     if (req == do_handler) {
         cond_menu();
@@ -8902,29 +8902,30 @@ option_help(void)
 static void
 all_options_conds(strbuf_t *sbuf)
 {
-    char tmp[BUFSZ], buf[BUFSZ];
+    char buf[BUFSZ], nextcond[BUFSZ];
     int idx = 0;
 
-    tmp[0] = '\0';
-    while (opt_next_cond(idx, buf)) {
+    buf[0] = '\0';
+    while (opt_next_cond(idx, nextcond)) {
         /* 75: room for about 5 conditions, with enough space for player
-           to edit the resulting file manually and insert '!' */
-        if (idx == 0 || Strlen(tmp) + 1 + Strlen(buf) >= 75) {
-            if (idx > 0) {
-                /* finish off previous line */
-                Strcat(tmp, ",");
-                Strcat(tmp, "\\\n"); /* backslash+newline */
-                strbuf_append(sbuf, tmp);
-            }
-            Sprintf(tmp, "%-8s%s", (idx == 0) ? "OPTIONS=" : " ", buf);
+           to edit resulting file manually and insert '!' in front of them */
+        if (idx == 0) {
+            Strcpy(buf, "OPTIONS=");
+        } else if (Strlen(buf) + 1 + Strlen(nextcond) >= 75) {
+            /* finish off previous line */
+            Strcat(buf, ",\\\n"); /* comma and backslash+newline */
+            strbuf_append(sbuf, buf);
+            /* indent continuation line */
+            Sprintf(buf, "%8s", " "); /* 8: strlen("OPTIONS=") */
         } else {
-            Sprintf(eos(tmp), ",%s", buf);
+            Strcat(buf, ",");
         }
+        Strcat(buf, nextcond);
         ++idx;
     }
     /* finish off final line */
-    Strcat(tmp, "\n");
-    strbuf_append(sbuf, tmp);
+    Strcat(buf, "\n");
+    strbuf_append(sbuf, buf);
 }
 
 /* append menucolor lines to strbuf */
