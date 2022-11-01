@@ -1050,6 +1050,9 @@ explicitly throwing 1 for non-gold stack of more than 1 and then canceling at
 	direction prompt left a pair of stacks of 1 and N-1 with same invlet
 some attack damage which shouldn't affect shades operated as intended when
 	hero could see it happen but erroneously affected them when not seen
+phrasing of the "you can't" message when attempting to name any monster
+	defined with a unique name or title sounded strange when rejecting
+	<space> to remove the existing name without assigning a new one
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
