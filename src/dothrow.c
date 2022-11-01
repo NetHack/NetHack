@@ -33,8 +33,10 @@ static boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 /* g.thrownobj (decl.c) tracks an object until it lands */
 
 int
-multishot_class_bonus(int pm, struct obj *ammo,
-                      struct obj *launcher) /* can be NULL */
+multishot_class_bonus(
+    int pm,
+    struct obj *ammo,
+    struct obj *launcher) /* can be NULL */
 {
     int multishot = 0;
     schar skill = objects[ammo->otyp].oc_skill;
@@ -182,7 +184,7 @@ throw_obj(struct obj *obj, int shotlimit)
         multishot += multishot_class_bonus(Role_switch, obj, uwep);
 
         /* ...or using their race's special bow; no bonus for spears */
-        if (!weakmultishot)
+        if (!weakmultishot) {
             switch (Race_switch) {
             case PM_ELF:
                 if (obj->otyp == ELVEN_ARROW && uwep
@@ -204,6 +206,15 @@ throw_obj(struct obj *obj, int shotlimit)
             default:
                 break; /* No bonus */
             }
+
+            /* when launcher is own quest artifact, give extra +1 with any
+               type of ammo appropriate for that launcher (compensates for
+               elven and orcish rangers loss of bonus for use of racial bow
+               plus racial arrows if they switch to the Longbow of Diana) */
+            if (uwep && is_quest_artifact(uwep)
+                && ammo_and_launcher(obj, uwep))
+                ++multishot;
+        }
 
         /* crossbows are slow to load and probably shouldn't allow multiple
            shots at all, but that would result in players never using them;
@@ -1969,11 +1980,10 @@ thitmonst(
                 if ((Race_if(PM_ELF) || Role_if(PM_SAMURAI))
                     && (!Upolyd || your_race(g.youmonst.data))
                     && objects[uwep->otyp].oc_skill == P_BOW) {
-                    tmp++;
-                    if (Race_if(PM_ELF) && uwep->otyp == ELVEN_BOW)
-                        tmp++;
-                    else if (Role_if(PM_SAMURAI) && uwep->otyp == YUMI)
-                        tmp++;
+                    ++tmp;
+                    if ((Race_if(PM_ELF) && uwep->otyp == ELVEN_BOW)
+                        || (Role_if(PM_SAMURAI) && uwep->otyp == YUMI))
+                        ++tmp;
                 }
             }
         } else { /* thrown non-ammo or applied polearm/grapnel */

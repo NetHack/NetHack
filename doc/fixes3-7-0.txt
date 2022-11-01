@@ -1869,6 +1869,8 @@ mouse buttons can be bound to extended commands
 hero poly'd into purple worm can gain intrinsics from digesting whole monster
 add some tins of spinach to monk's quest (vegan => no Str from giant corpses)
 very large humanoids can wear mummy wrappings
+for ranger characters, shooting any type of arrow while wielding the Longbow
+	of Diana gets an extra +1 to multi-shot
 
 
 Platform- and/or Interface-Specific New Features
