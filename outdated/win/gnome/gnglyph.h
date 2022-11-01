@@ -10,7 +10,9 @@
 
 /* the prototypes in system headers contain useless argument names
    that trigger spurious warnings if gcc's `-Wshadow' option is used */
+#ifdef index
 #undef index
+#endif
 #define index _hide_index_
 #define time _hide_time_
 
@@ -18,7 +20,6 @@
 #include <gdk/gdk.h>
 
 #undef index
-#define index strchr
 #undef time
 
 extern short glyph2tile[]; /* From tile.c */

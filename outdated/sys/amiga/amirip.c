@@ -58,7 +58,6 @@ static xoff, yoff; /* image centering */
 #undef red
 #undef green
 #undef blue
-#undef index
 #ifdef _DCC
 #include <clib/graphics_protos.h>
 #include <clib/intuition_protos.h>
