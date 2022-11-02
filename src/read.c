@@ -1071,18 +1071,48 @@ display_stinking_cloud_positions(int state)
     }
 }
 
+/* getobj callback for armor object to enchant */
+static int
+armor_enchant_ok(struct obj* obj)
+{
+    if (!obj)
+        return GETOBJ_EXCLUDE;
+
+    if (obj->owornmask & W_ARMOR)
+        return GETOBJ_SUGGEST;
+
+    if (obj->oclass == ARMOR_CLASS)
+        return GETOBJ_EXCLUDE_INACCESS;
+
+    return GETOBJ_EXCLUDE_SELECTABLE;
+}
+
 static void
 seffect_enchant_armor(struct obj **sobjp)
 {
     struct obj *sobj = *sobjp;
+    int otyp = sobj->otyp;
     register schar s;
     boolean special_armor;
     boolean same_color;
-    struct obj *otmp = some_armor(&g.youmonst);
     boolean sblessed = sobj->blessed;
     boolean scursed = sobj->cursed;
     boolean confused = (Confusion != 0);
     boolean old_erodeproof, new_erodeproof;
+    boolean already_known = (sobj->oclass == SPBOOK_CLASS /* spell */
+                             || objects[otyp].oc_name_known);
+    struct obj *otmp;
+
+    if (!already_known) {
+        pline("This is an enchant armor scroll.");
+        learnscroll(sobj);
+    }
+
+    otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
+    while (otmp && !(otmp->owornmask & W_ARMOR)) {
+        You("can only target worn armor.");
+        otmp = getobj("enchant", armor_enchant_ok, GETOBJ_NOFLAGS);
+    }
 
     if (!otmp) {
         strange_feeling(sobj, !Blind
@@ -1209,7 +1239,6 @@ seffect_enchant_armor(struct obj **sobjp)
         s = otmp->spe - oldspe; /* cap_spe() might have throttled 's' */
         if (s) /* skip if it got changed to 0 */
             adj_abon(otmp, s); /* adjust armor bonus for Dex or Int+Wis */
-        g.known = otmp->known;
         /* update shop bill to reflect new higher price */
         if (s > 0 && otmp->unpaid)
             alter_cost(otmp, 0L);
