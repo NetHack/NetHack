@@ -5812,8 +5812,8 @@ string_for_env_opt(const char *optname, char *opts, boolean val_optional)
 static void
 bad_negation(const char *optname, boolean with_parameter)
 {
-    pline_The("%s option may not %sbe negated.", optname,
-              with_parameter ? "both have a value and " : "");
+    config_error_add("The %s option may not %sbe negated.", optname,
+                     with_parameter ? "both have a value and " : "");
 }
 
 /* go through all of the options and set the minmatch value
