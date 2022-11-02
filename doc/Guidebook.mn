@@ -1,8 +1,7 @@
 .\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ $NHDT-Date: 1655461129 2022/06/17 10:18:49 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
-.\" Guidebook.mn currently does *not* fully adhere to these guidelines.
-.\"|||
+.\"+--
 .\"| o Never include empty or blank lines in a roff document.  Instead,  use
 .\"|   the empty request (a line consisting of a dot only) or a line comment
 .\"|   .\" if a structuring element is needed.
@@ -13,7 +12,9 @@
 .\"|   is handled differently depending on whether it terminates an abbrevi-
 .\"|   ation or a sentence.  To distinguish both cases, do a line break  af-
 .\"|   ter each sentence.
-.\"|||
+.\"+--
+.\" Guidebook.mn has been updated to adhere to the first two guidelines
+.\" but does not yet fully honor the third.  New changes should do so.
 .\"
 .
 .\" Usage:
