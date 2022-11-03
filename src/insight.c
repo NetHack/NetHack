@@ -2485,19 +2485,22 @@ show_gamelog(int final)
  *      Vanquished monsters.
  */
 
-static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
-    "traditional: by monster level, by internal monster index",
-    "by monster toughness, by internal monster index",
-    "alphabetically, first unique monsters, then others",
-    "alphabetically, unique monsters and others intermixed",
-    "by monster class, high to low level within class",
-    "by monster class, low to high level within class",
-    "by count, high to low, by internal index within tied count",
-    "by count, low to high, by internal index within tied count",
+/* the two uppercase choices are implemented but suppressed from menu */
+static const char *vanqorders[NUM_VANQ_ORDER_MODES][2] = {
+    { "t", "traditional: by monster level, by internal monster index" },
+    { "d", "by monster difficulty rating, by internal monster index" },
+    { "a", "alphabetically, first unique monsters, then others" },
+    { "A", "alphabetically, unique monsters and others intermixed" },
+    { "C", "by monster class, high to low level within class" },
+    { "c", "by monster class, low to high level within class" },
+    { "n", "by count, high to low, by internal index within tied count" },
+    { "z", "by count, low to high, by internal index within tied count" },
 };
 
 static int QSORTCALLBACK
-vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
+vanqsort_cmp(
+    const genericptr vptr1,
+    const genericptr vptr2)
 {
     int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,
         mlev1, mlev2, mstr1, mstr2, uniq1, uniq2, died1, died2, res;
@@ -2508,12 +2511,14 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
     default:
     case VANQ_MLVL_MNDX:
         /* sort by monster level */
-        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+        mlev1 = mons[indx1].mlevel;
+        mlev2 = mons[indx2].mlevel;
         res = mlev2 - mlev1; /* mlevel high to low */
         break;
     case VANQ_MSTR_MNDX:
         /* sort by monster toughness */
-        mstr1 = mons[indx1].difficulty, mstr2 = mons[indx2].difficulty;
+        mstr1 = mons[indx1].difficulty;
+        mstr2 = mons[indx2].difficulty;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
@@ -2525,8 +2530,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].pmnames[NEUTRAL],
-                name2 = mons[indx2].pmnames[NEUTRAL];
+        name1 = mons[indx1].pmnames[NEUTRAL];
+        name2 = mons[indx2].pmnames[NEUTRAL];
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -2535,7 +2540,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
            if 'char' happens to be unsigned, (mlet1 - mlet2) would yield
            an inappropriate result when mlet2 is greater than mlet1,
            so force our copies (mcls1, mcls2) to be signed */
-        mcls1 = (schar) mons[indx1].mlet, mcls2 = (schar) mons[indx2].mlet;
+        mcls1 = (schar) mons[indx1].mlet;
+        mcls2 = (schar) mons[indx2].mlet;
         /* S_ANT through S_ZRUTY correspond to lowercase monster classes,
            S_ANGEL through S_ZOMBIE correspond to uppercase, and various
            punctuation characters are used for classes beyond those */
@@ -2555,7 +2561,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
         }
         res = mcls1 - mcls2; /* class */
         if (res == 0) {
-            mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+            mlev1 = mons[indx1].mlevel;
+            mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
             if (g.vanq_sortmode == VANQ_MCLS_HTOL)
                 res = -res; /* mlevel high to low */
@@ -2563,7 +2570,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
         break;
     case VANQ_COUNT_H_L:
     case VANQ_COUNT_L_H:
-        died1 = g.mvitals[indx1].died, died2 = g.mvitals[indx2].died;
+        died1 = g.mvitals[indx1].died;
+        died2 = g.mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
         if (g.vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
@@ -2592,10 +2600,10 @@ set_vanq_order(void)
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 vanqorders[i],
-                 (i == g.vanq_sortmode)
-                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
+                 ATR_NONE, clr, vanqorders[i][1],
+                 (i == g.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
+                                        : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Sort order for vanquished monster counts");
 
@@ -2616,7 +2624,7 @@ set_vanq_order(void)
 int
 dovanquished(void)
 {
-    list_vanquished('a', FALSE);
+    list_vanquished(iflags.menu_requested ? 'a' : 'y', FALSE);
     return ECMD_OK;
 }
 
@@ -2706,15 +2714,16 @@ list_vanquished(char defquery, boolean ask)
         if (c == 'q')
             done_stopprint++;
         if (c == 'y' || c == 'a') {
-            if (c == 'a') { /* ask player to choose sort order */
+            if (c == 'a' && ntypes > 1) { /* ask player to choose sort order */
                 /* choose value for vanq_sortmode via menu; ESC cancels list
                    of vanquished monsters but does not set 'done_stopprint' */
                 if (set_vanq_order() < 0)
                     return;
             }
             uniq_header = (g.vanq_sortmode == VANQ_ALPHA_SEP);
-            class_header = (g.vanq_sortmode == VANQ_MCLS_LTOH
-                            || g.vanq_sortmode == VANQ_MCLS_HTOL);
+            class_header = ((g.vanq_sortmode == VANQ_MCLS_LTOH
+                             || g.vanq_sortmode == VANQ_MCLS_HTOL)
+                            && ntypes > 1);
 
             klwin = create_nhwindow(NHW_MENU);
             putstr(klwin, 0, "Vanquished creatures:");

@@ -1874,6 +1874,7 @@ add some tins of spinach to monk's quest (vegan => no Str from giant corpses)
 very large humanoids can wear mummy wrappings
 for ranger characters, shooting any type of arrow while wielding the Longbow
 	of Diana gets an extra +1 to multi-shot
+change the #vanquished command from debug-only to general user command
 
 
 Platform- and/or Interface-Specific New Features

@@ -1795,9 +1795,25 @@ In some circumstances it can also be used to rescue trapped monsters.
 Go up a staircase. Default key is `{\tt <}'.
 %.lp
 \item[\tb{\#vanquished}]
-List vanquished monsters.
+List vanquished monsters by type and count.
+\\
+%.lp ""
+Note that the vanquished monsters list includes all monsters killed by
+traps and each other as well as by you, and omits any which got removed
+from the game without being killed (perhaps by genocide, or by a mollified
+shopkeeper dismissing summoned Kops).
+\\
+%.lp ""
+Using the ``request menu'' prefix prior to \#vanquished brings up
+a menu of sort orders available.
+Whichever one is picked is remembered for subsequent \#vanquished commands
+during the current play session but not saved and restored across sessions.
+During end-of-game disclosure, when asked whether to show vanquished
+monsters answering `{\tt a}' will let you choose from the sort menu.
+\\
+%.lp ""
 Autocompletes.
-Debug mode only.
+Default key is `{\tt M-V}'.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack\/}.
@@ -2040,6 +2056,9 @@ equivalent is used for another command, so the three key combination
 %.lp
 \item[\tb{M-v}]
 {\tt\#version}
+%.lp
+\item[\tb{M-V}]
+{\tt\#vanquished}
 %.lp
 \item[\tb{M-w}]
 {\tt\#wipe}

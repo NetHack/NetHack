@@ -1672,9 +1672,22 @@ In some circumstances it can also be used to rescue trapped monsters.
 Go up a staircase.
 Default key is \(oq<\(cq.
 .lp #vanquished
-List vanquished monsters.
+List vanquished monsters by type and count.
+.lp ""
+Note that the vanquished monsters list includes all monsters killed by
+traps and each other as well as by you, and omits any which got removed
+from the game without being killed (perhaps by genocide, or by a mollified
+shopkeeper dismissing summoned Kops).
+.lp ""
+Using the \(lqrequest menu\(rq prefix prior to #vanquished brings up
+a menu of sorting orders available.
+Whichever one is picked is remembered for subsequent #vanquished commands
+during the current play session but not saved and restored across sessions.
+During end-of-game disclosure, when asked whether to show vanquished
+monsters answering \(oq\f(CRa\fP\(cq will let you choose from the sort menu.
+.lp ""
 Autocompletes.
-Debug mode only.
+Default key is \(oqM-V\(cq.
 .lp "#version "
 Print compile time options for this version of NetHack.
 .lp ""
@@ -1875,6 +1888,8 @@ option is enabled)
 #untrap
 .lp M-v
 #version
+.lp M-V
+#vanquished
 .lp M-w
 #wipe
 .lp M-X

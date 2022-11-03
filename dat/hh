@@ -140,6 +140,7 @@ M-s   sit       sit down
 M-t   turn      turn undead if role allows that
 M-T   tip       upend a container to dump out its contents
 M-u   untrap    untrap something
+M-V   vanquished list number and type of vanquished monsters
 M-v   version   print compile time options for this version
 M-w   wipe      wipe off your face
 M-X   explore   switch from regular play to non-scoring explore mode

@@ -19,7 +19,6 @@ Debug-Mode Quick Reference:
 #stats          == show memory statistics
 #terrain        == show current level (more options than in normal play)
 #timeout        == look at timeout queue and hero's timed intrinsics
-#vanquished     == disclose counts of dead monsters sorted in various ways
 #vision         == show vision array
 #wizborn        == show monster birth/death/geno/extinct stats
 #wizcast        == cast any spell

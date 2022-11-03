@@ -2724,8 +2724,8 @@ struct ext_func_tab extcmdlist[] = {
     { '<',    "up", "go up a staircase",
               /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
-    { '\0',   "vanquished", "list vanquished monsters",
-              dovanquished, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
+    { M('V'), "vanquished", "list vanquished monsters",
+              dovanquished, IFBURIED | AUTOCOMPLETE | CMD_M_PREFIX, NULL },
     { M('v'), "version",
               "list compile time options for this version of NetHack",
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
