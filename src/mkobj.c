@@ -761,7 +761,7 @@ static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
 void
 clear_dknown(struct obj *obj)
 {
-    obj->dknown = strchr(dknowns, obj->oclass) ? 0 : 1;
+    obj->dknown = index(dknowns, obj->oclass) ? 0 : 1;
     if ((obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD)
         || obj->otyp == SHIELD_OF_REFLECTION
         || objects[obj->otyp].oc_merge)
@@ -2107,7 +2107,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     register struct obj *otmp2;
 
     if (!isok(x, y)) { /* validate location */
-        void (*func)(const char *, ...) PRINTF_F(1, 2);
+        void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;

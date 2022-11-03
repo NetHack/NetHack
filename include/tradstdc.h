@@ -401,6 +401,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #if (__GNUC__ >= 2) && !defined(USE_OLDARGS)
 #define PRINTF_F(f, v) __attribute__((format(printf, f, v)))
 #endif
+#if (__GNUC__ > 3) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
+#define PRINTF_F_PTR(f, v) PRINTF_F(f, v)
+#endif
 #if __GNUC__ >= 3
 #define UNUSED __attribute__((unused))
 #define NORETURN __attribute__((noreturn))
@@ -418,6 +421,9 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 
 #ifndef PRINTF_F
 #define PRINTF_F(f, v)
+#endif
+#ifndef PRINTF_F_PTR
+#define PRINTF_F_PTR(f, v)
 #endif
 #ifndef UNUSED
 #define UNUSED
