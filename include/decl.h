@@ -234,10 +234,15 @@ extern const int shield_static[];
 
 #include "spell.h"
 
-extern const struct class_sym def_oc_syms[MAXOCLASSES]; /* default class symbols */
-extern uchar oc_syms[MAXOCLASSES];                      /* current class symbols */
-extern const struct class_sym def_monsyms[MAXMCLASSES]; /* default class symbols */
-extern uchar monsyms[MAXMCLASSES];                      /* current class symbols */
+/* default object class symbols */
+extern const struct class_sym def_oc_syms[MAXOCLASSES];
+/* current object class symbols */
+extern uchar oc_syms[MAXOCLASSES];
+
+/* default mon class symbols */
+extern const struct class_sym def_monsyms[MAXMCLASSES];
+/* current mon class symbols */
+extern uchar monsyms[MAXMCLASSES];
 
 #include "obj.h"
 extern NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
