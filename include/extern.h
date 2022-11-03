@@ -2657,6 +2657,7 @@ extern int num_spells(void);
 extern long somegold(long);
 extern void stealgold(struct monst *);
 extern void thiefdead(void);
+extern boolean unresponsive(void);
 extern void remove_worn_item(struct obj *, boolean);
 extern int steal(struct monst *, char *);
 extern int mpickobj(struct monst *, struct obj *);

@@ -137,6 +137,20 @@ thiefdead(void)
     }
 }
 
+/* checks whether hero can be responsive to seduction attempts; similar to
+   Unaware but also includes paralysis */
+boolean
+unresponsive(void)
+{
+    if (gm.multi >= 0)
+        return FALSE;
+
+    return (unconscious() || is_fainted()
+            || (gm.multi_reason
+                && (!strncmp(gm.multi_reason, "frozen", 6)
+                    || !strncmp(gm.multi_reason, "paralyzed", 9))));
+}
+
 /* called via (*ga.afternmv)() when hero finishes taking off armor that
    was slated to be stolen but the thief died in the interim */
 static int
@@ -406,9 +420,10 @@ steal(struct monst* mtmp, char* objnambuf)
             armordelay = objects[otmp->otyp].oc_delay;
             if (olddelay > 0 && olddelay < armordelay)
                 armordelay = olddelay;
-            if (monkey_business) {
-                /* animals usually don't have enough patience
-                   to take off items which require extra time */
+            if (monkey_business || unresponsive()) {
+                /* animals usually don't have enough patience to take off
+                   items which require extra time; unconscious or paralyzed
+                   hero can't be charmed into taking off his own armor */
                 if (armordelay >= 1 && !olddelay && rn2(10))
                     goto cant_take;
                 remove_worn_item(otmp, TRUE);
@@ -419,9 +434,6 @@ steal(struct monst* mtmp, char* objnambuf)
                 boolean seen = canspotmon(mtmp);
 
                 otmp->cursed = 0;
-                /* can't charm you without first waking you */
-                if (Unaware)
-                    unmul((char *) 0);
                 slowly = (armordelay >= 1 || gm.multi < 0);
                 if (flags.female)
                     urgent_pline("%s charms you.  You gladly %s your %s.",

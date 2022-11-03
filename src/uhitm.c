@@ -1764,7 +1764,7 @@ steal_it(struct monst *mdef, struct attack *mattk)
 
     /* look for worn body armor */
     ustealo = (struct obj *) 0;
-    if (could_seduce(&gy.youmonst, mdef, mattk)) {
+    if (could_seduce(&gy.youmonst, mdef, mattk) && mdef->mcanmove) {
         /* find armor, and move it to end of inventory in the process */
         minvent_ptr = &mdef->minvent;
         while ((otmp = *minvent_ptr) != 0)
