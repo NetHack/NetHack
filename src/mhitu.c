@@ -1824,7 +1824,7 @@ doseduce(struct monst *mon)
               mhe(mon), mon->mcan ? "severe " : "");
         return 0;
     }
-    if (unconscious()) {
+    if (unresponsive()) {
         pline("%s seems dismayed at your lack of response.", Monnam(mon));
         return 0;
     }
