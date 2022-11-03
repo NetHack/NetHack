@@ -3518,9 +3518,9 @@ wizterrainwish(struct _readobjnam_data *d)
     return (struct obj *) 0;
 }
 
-#define UNDEFINED 0
-#define EMPTY 1
-#define SPINACH 2
+#define TIN_UNDEFINED 0
+#define TIN_EMPTY 1
+#define TIN_SPINACH 2
 
 static void
 readobjnam_init(char *bp, struct _readobjnam_data *d)
@@ -3539,7 +3539,7 @@ readobjnam_init(char *bp, struct _readobjnam_data *d)
     d->tvariety = RANDOM_TIN;
     d->mgend = -1; /* not specified, aka random */
     d->mntmp = NON_PM;
-    d->contents = UNDEFINED;
+    d->contents = TIN_UNDEFINED;
     d->oclass = 0;
     d->actualn = d->dn = d->un = 0;
     d->wetness = 0;
@@ -3687,7 +3687,7 @@ readobjnam_preparse(struct _readobjnam_data *d)
         } else if (!strncmpi(d->bp, "diluted ", l = 8)) {
             d->isdiluted = 1;
         } else if (!strncmpi(d->bp, "empty ", l = 6)) {
-            d->contents = EMPTY;
+            d->contents = TIN_EMPTY;
         } else if (!strncmpi(d->bp, "small ", l = 6)) { /* glob sizes */
             /* "small" might be part of monster name (mimic, if wishing
                for its corpse) rather than prefix for glob size; when
@@ -3865,7 +3865,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
     }
     if ((d->p = strstri(d->bp, " of spinach")) != 0) {
         *d->p = 0;
-        d->contents = SPINACH;
+        d->contents = TIN_SPINACH;
     }
     /* real vs fake is only useful for wizard mode but we'll accept its
        parsing in normal play (result is never real Amulet for that case) */
@@ -3968,7 +3968,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             && !strstri(d->bp, "finger ")) {
             if ((d->p = strstri(d->bp, "tin of ")) != 0) {
                 if (!strcmpi(d->p + 7, "spinach")) {
-                    d->contents = SPINACH;
+                    d->contents = TIN_SPINACH;
                     d->mntmp = NON_PM;
                 } else {
                     d->tmp = tin_variety_txt(d->p + 7, &d->tinv);
@@ -4354,7 +4354,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
         return 6; /*goto retry;*/
     }
     if (!strcmpi(d->bp, "spinach")) {
-        d->contents = SPINACH;
+        d->contents = TIN_SPINACH;
         d->typ = TIN;
         return 2; /*goto typfnd;*/
     }
@@ -4682,9 +4682,9 @@ readobjnam(char *bp, struct obj *no_wish)
     switch (d.typ) {
     case TIN:
         d.otmp->spe = 0; /* default: not spinach */
-        if (d.contents == EMPTY) {
+        if (d.contents == TIN_EMPTY) {
             d.otmp->corpsenm = NON_PM;
-        } else if (d.contents == SPINACH) {
+        } else if (d.contents == TIN_SPINACH) {
             d.otmp->corpsenm = NON_PM;
             d.otmp->spe = 1; /* spinach after all */
         }
@@ -4862,7 +4862,7 @@ readobjnam(char *bp, struct obj *no_wish)
             d.otmp->otrapped = (d.trapped == 1);
     }
     /* empty for containers rather than for tins */
-    if (d.contents == EMPTY) {
+    if (d.contents == TIN_EMPTY) {
         if (d.otmp->otyp == BAG_OF_TRICKS || d.otmp->otyp == HORN_OF_PLENTY) {
             if (d.otmp->spe > 0)
                 d.otmp->spe = 0;

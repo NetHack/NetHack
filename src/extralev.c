@@ -8,10 +8,10 @@
 
 #include "hack.h"
 
-#define UP 1
-#define DOWN 2
-#define LEFT 4
-#define RIGHT 8
+#define XL_UP 1
+#define XL_DOWN 2
+#define XL_LEFT 4
+#define XL_RIGHT 8
 
 static void roguejoin(coordxy, coordxy, coordxy, coordxy, int);
 static void roguecorr(coordxy, coordxy, int);
@@ -48,8 +48,8 @@ roguecorr(coordxy x, coordxy y, int dir)
 {
     register coordxy fromx, fromy, tox, toy;
 
-    if (dir == DOWN) {
-        g.r[x][y].doortable &= ~DOWN;
+    if (dir == XL_DOWN) {
+        g.r[x][y].doortable &= ~XL_DOWN;
         if (!g.r[x][y].real) {
             fromx = g.r[x][y].rlx;
             fromy = g.r[x][y].rly;
@@ -71,7 +71,7 @@ roguecorr(coordxy x, coordxy y, int dir)
             return;
         }
         y++;
-        g.r[x][y].doortable &= ~UP;
+        g.r[x][y].doortable &= ~XL_UP;
         if (!g.r[x][y].real) {
             tox = g.r[x][y].rlx;
             toy = g.r[x][y].rly;
@@ -90,8 +90,8 @@ roguecorr(coordxy x, coordxy y, int dir)
         }
         roguejoin(fromx, fromy, tox, toy, FALSE);
         return;
-    } else if (dir == RIGHT) {
-        g.r[x][y].doortable &= ~RIGHT;
+    } else if (dir == XL_RIGHT) {
+        g.r[x][y].doortable &= ~XL_RIGHT;
         if (!g.r[x][y].real) {
             fromx = g.r[x][y].rlx;
             fromy = g.r[x][y].rly;
@@ -113,7 +113,7 @@ roguecorr(coordxy x, coordxy y, int dir)
             return;
         }
         x++;
-        g.r[x][y].doortable &= ~LEFT;
+        g.r[x][y].doortable &= ~XL_LEFT;
         if (!g.r[x][y].real) {
             tox = g.r[x][y].rlx;
             toy = g.r[x][y].rly;
@@ -147,16 +147,16 @@ miniwalk(coordxy x, coordxy y)
     while (1) {
         q = 0;
 #define doorhere (g.r[x][y].doortable)
-        if (x > 0 && (!(doorhere & LEFT))
+        if (x > 0 && (!(doorhere & XL_LEFT))
             && (!g.r[x - 1][y].doortable || !rn2(10)))
             dirs[q++] = 0;
-        if (x < 2 && (!(doorhere & RIGHT))
+        if (x < 2 && (!(doorhere & XL_RIGHT))
             && (!g.r[x + 1][y].doortable || !rn2(10)))
             dirs[q++] = 1;
-        if (y > 0 && (!(doorhere & UP))
+        if (y > 0 && (!(doorhere & XL_UP))
             && (!g.r[x][y - 1].doortable || !rn2(10)))
             dirs[q++] = 2;
-        if (y < 2 && (!(doorhere & DOWN))
+        if (y < 2 && (!(doorhere & XL_DOWN))
             && (!g.r[x][y + 1].doortable || !rn2(10)))
             dirs[q++] = 3;
         /* Rogue levels aren't just 3 by 3 mazes; they have some extra
@@ -167,24 +167,24 @@ miniwalk(coordxy x, coordxy y)
         dir = dirs[rn2(q)];
         switch (dir) { /* Move in direction */
         case 0:
-            doorhere |= LEFT;
+            doorhere |= XL_LEFT;
             x--;
-            doorhere |= RIGHT;
+            doorhere |= XL_RIGHT;
             break;
         case 1:
-            doorhere |= RIGHT;
+            doorhere |= XL_RIGHT;
             x++;
-            doorhere |= LEFT;
+            doorhere |= XL_LEFT;
             break;
         case 2:
-            doorhere |= UP;
+            doorhere |= XL_UP;
             y--;
-            doorhere |= DOWN;
+            doorhere |= XL_DOWN;
             break;
         case 3:
-            doorhere |= DOWN;
+            doorhere |= XL_DOWN;
             y++;
-            doorhere |= UP;
+            doorhere |= XL_UP;
             break;
         }
         miniwalk(x, y);
@@ -265,13 +265,13 @@ makeroguerooms(void)
     /* Now, add connecting corridors. */
     for (y = 0; y < 3; y++)
         for (x = 0; x < 3; x++) {
-            if (here.doortable & DOWN)
-                roguecorr(x, y, DOWN);
-            if (here.doortable & RIGHT)
-                roguecorr(x, y, RIGHT);
-            if (here.doortable & LEFT)
+            if (here.doortable & XL_DOWN)
+                roguecorr(x, y, XL_DOWN);
+            if (here.doortable & XL_RIGHT)
+                roguecorr(x, y, XL_RIGHT);
+            if (here.doortable & XL_LEFT)
                 impossible("left end of %d, %d never connected?", x, y);
-            if (here.doortable & UP)
+            if (here.doortable & XL_UP)
                 impossible("up end of %d, %d never connected?", x, y);
         }
 #undef here
