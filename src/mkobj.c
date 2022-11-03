@@ -761,7 +761,7 @@ static const char dknowns[] = { WAND_CLASS,   RING_CLASS, POTION_CLASS,
 void
 clear_dknown(struct obj *obj)
 {
-    obj->dknown = index(dknowns, obj->oclass) ? 0 : 1;
+    obj->dknown = strchr(dknowns, obj->oclass) ? 0 : 1;
     if ((obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD)
         || obj->otyp == SHIELD_OF_REFLECTION
         || objects[obj->otyp].oc_merge)
