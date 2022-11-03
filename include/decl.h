@@ -6,8 +6,6 @@
 #ifndef DECL_H
 #define DECL_H
 
-#define E extern
-
 /* max size of a windowtype option */
 #define WINTYPELEN 16
 
@@ -79,7 +77,7 @@ struct dgn_topology { /* special dungeon levels for speed */
 
 #include "quest.h"
 
-E NEARDATA char tune[6];
+extern NEARDATA char tune[6];
 
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 
@@ -161,15 +159,15 @@ typedef struct {
     struct fieldlevel_content style;
 } NHFILE;
 
-E const char quitchars[];
-E const char vowels[];
-E const char ynchars[];
-E const char ynqchars[];
-E const char ynaqchars[];
-E const char ynNaqchars[];
-E NEARDATA long yn_number;
+extern const char quitchars[];
+extern const char vowels[];
+extern const char ynchars[];
+extern const char ynqchars[];
+extern const char ynaqchars[];
+extern const char ynNaqchars[];
+extern NEARDATA long yn_number;
 
-E const char disclosure_options[];
+extern const char disclosure_options[];
 
 struct kinfo {
     struct kinfo *next; /* chain of delayed killers */
@@ -231,31 +229,31 @@ struct multishot {
     boolean s;
 };
 
-E NEARDATA boolean has_strong_rngseed;
-E const int shield_static[];
+extern NEARDATA boolean has_strong_rngseed;
+extern const int shield_static[];
 
 #include "spell.h"
 
-E const struct class_sym def_oc_syms[MAXOCLASSES]; /* default class symbols */
-E uchar oc_syms[MAXOCLASSES];                      /* current class symbols */
-E const struct class_sym def_monsyms[MAXMCLASSES]; /* default class symbols */
-E uchar monsyms[MAXMCLASSES];                      /* current class symbols */
+extern const struct class_sym def_oc_syms[MAXOCLASSES]; /* default class symbols */
+extern uchar oc_syms[MAXOCLASSES];                      /* current class symbols */
+extern const struct class_sym def_monsyms[MAXMCLASSES]; /* default class symbols */
+extern uchar monsyms[MAXMCLASSES];                      /* current class symbols */
 
 #include "obj.h"
-E NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
+extern NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
     *uarmu, /* under-wear, so to speak */
     *uskin, *uamul, *uleft, *uright, *ublindf, *uwep, *uswapwep, *uquiver;
 
-E NEARDATA struct obj *uchain; /* defined only when punished */
-E NEARDATA struct obj *uball;
+extern NEARDATA struct obj *uchain; /* defined only when punished */
+extern NEARDATA struct obj *uball;
 
 #include "engrave.h"
-E struct engr *head_engr;
+extern struct engr *head_engr;
 
 #include "you.h"
-E NEARDATA struct you u;
-E NEARDATA time_t ubirthday;
-E NEARDATA struct u_realtime urealtime;
+extern NEARDATA struct you u;
+extern NEARDATA time_t ubirthday;
+extern NEARDATA struct u_realtime urealtime;
 
 struct mvitals {
     uchar born;
@@ -269,7 +267,7 @@ struct c_color_names {
         *const c_blue, *const c_purple, *const c_white, *const c_orange;
 };
 
-E NEARDATA const struct c_color_names c_color_names;
+extern NEARDATA const struct c_color_names c_color_names;
 
 #define NH_BLACK c_color_names.c_black
 #define NH_AMBER c_color_names.c_amber
@@ -284,7 +282,7 @@ E NEARDATA const struct c_color_names c_color_names;
 #define NH_ORANGE c_color_names.c_orange
 
 /* The names of the colors used for gems, etc. */
-E const char *c_obj_colors[];
+extern const char *c_obj_colors[];
 
 struct c_common_strings {
     const char *const c_nothing_happens, *const c_thats_enough_tries,
@@ -294,7 +292,7 @@ struct c_common_strings {
         *const c_fakename[2];
 };
 
-E const struct c_common_strings c_common_strings;
+extern const struct c_common_strings c_common_strings;
 
 #define nothing_happens c_common_strings.c_nothing_happens
 #define thats_enough_tries c_common_strings.c_thats_enough_tries
@@ -311,10 +309,10 @@ E const struct c_common_strings c_common_strings;
 #define fakename c_common_strings.c_fakename
 
 /* material strings */
-E const char *materialnm[];
+extern const char *materialnm[];
 
 /* empty string that is non-const for parameter use */
-E char emptystr[];
+extern char emptystr[];
 
 /* Monster name articles */
 #define ARTICLE_NONE 0
@@ -332,9 +330,9 @@ E char emptystr[];
 #define AUGMENT_IT 0x20 /* use "someone" or "something" instead of "it" */
 
 /* Window system stuff */
-E NEARDATA winid WIN_MESSAGE;
-E NEARDATA winid WIN_STATUS;
-E NEARDATA winid WIN_MAP, WIN_INVEN;
+extern NEARDATA winid WIN_MESSAGE;
+extern NEARDATA winid WIN_STATUS;
+extern NEARDATA winid WIN_MAP, WIN_INVEN;
 
 /* pline (et al) for a single string argument (suppress compiler warning) */
 #define pline1(cstr) pline("%s", cstr)
@@ -346,7 +344,7 @@ E NEARDATA winid WIN_MAP, WIN_INVEN;
 #define panic1(cstr) panic("%s", cstr)
 
 #ifndef TCAP_H
-E struct tc_gbl_data {   /* also declared in tcap.h */
+extern struct tc_gbl_data {   /* also declared in tcap.h */
     char *tc_AS, *tc_AE; /* graphics start and end (tty font swapping) */
     int tc_LI, tc_CO;    /* lines and columns */
 } tc_gbl_data;
@@ -385,19 +383,19 @@ E struct tc_gbl_data {   /* also declared in tcap.h */
 #endif
 
 #ifdef WIN32
-E boolean fqn_prefix_locked[PREFIX_COUNT];
+extern boolean fqn_prefix_locked[PREFIX_COUNT];
 #endif
 #ifdef PREFIXES_IN_USE
-E const char *fqn_prefix_names[PREFIX_COUNT];
+extern const char *fqn_prefix_names[PREFIX_COUNT];
 #endif
 
 struct restore_info {
     const char *name;
     int mread_flags;
 };
-E struct restore_info restoreinfo;
+extern struct restore_info restoreinfo;
 
-E NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
+extern NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
 
 struct selectionvar {
     int wid, hei;
@@ -434,7 +432,7 @@ struct breadcrumbs {
     boolean in_effect;
 };
 #ifdef PANICTRACE
-E const char *ARGV0;
+extern const char *ARGV0;
 #endif
 
 enum earlyarg {
@@ -1289,7 +1287,7 @@ struct instance_globals {
     unsigned long magic; /* validate that structure layout is preserved */
 };
 
-E struct instance_globals g;
+extern struct instance_globals g;
 
 struct const_globals {
     const struct obj zeroobj;      /* used to zero out a struct obj */
@@ -1297,9 +1295,7 @@ struct const_globals {
     const anything zeroany;        /* used to zero out union any */
 };
 
-E const struct const_globals cg;
-
-#undef E
+extern const struct const_globals cg;
 
 #endif /* DECL_H */
 
