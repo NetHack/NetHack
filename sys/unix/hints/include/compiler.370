@@ -133,10 +133,6 @@ CCXXFLAGS+=-Wno-deprecated-declarations
 endif  # WANT_WIN_QT
 endif  # clang-specific ends here
 
-# enable some optional code in various NetHack source files
-CFLAGS+=-DGCC_WARN
-CCXXFLAGS+=-DGCC_WARN
-
 ifdef MAKEFILE_SRC
 ifdef WANT_WIN_QT
 # when switching from Qt5 to Qt6 or vice versa, any old .moc files will be

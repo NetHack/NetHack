@@ -58,10 +58,8 @@ typedef enum orient_type
     UNDEFINED
 } orient;
 
-#ifdef GCC_WARN
 int wprintw(WINDOW *, const char *, ...) PRINTF_F(2, 3);
 int mvwprintw(WINDOW *, int, int, const char *, ...) PRINTF_F(4, 5);
-#endif
 
 /* cursmain.c */
 
