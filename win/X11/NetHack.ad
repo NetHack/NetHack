@@ -2,7 +2,7 @@
 ! Copyright (c) 2017 by Pasi Kallinen
 ! NetHack may be freely redistributed.  See license for details.
 
-#define NETHACK_FONT       -*-fixed-medium-*-*-*-15-*-*-*-*-*-*-*
+#define NETHACK_FONT       -*-fixed-medium-*-*-*-15-*-*-*-*-*-iso10646-*
 #define NETHACK_CLR_FG     grey
 #define NETHACK_CLR_BG     black
 #define NETHACK_CLR_QUIT   red
