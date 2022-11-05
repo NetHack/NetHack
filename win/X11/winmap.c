@@ -1589,10 +1589,9 @@ X11_draw_image_string(Display *display, Drawable d,
                       const X11_map_symbol *string, int length)
 {
 #ifdef ENHANCED_SYMBOLS
-    /* FIXME: This doesn't support the supplemental planes.  Xorg provides
-       the functions X{mb,wc,utf8}DrawImageString that ought to provide such
-       support, but I couldn't get it to work, for no reason that I could
-       understand. */
+    /* This doesn't support the supplementary planes. The basic Xlib seems
+       to load only PCF fonts, and these cannot contain characters encoded
+       above 0xFFFF. */
     XChar2b wstr[COLNO+1];
     int i;
 
@@ -1826,7 +1825,7 @@ X11_set_map_font(struct xwindow *wp)
 
     /* Substitute "iso10646-1" for the registry name and encoding */
     len = (size_t) (p - font_name);
-    if (dashes != 0 || len  + 11 > sizeof(unicode_font)) {
+    if (dashes != 0 || len + 11 > sizeof(unicode_font)) {
         return;
     }
 
@@ -1854,7 +1853,11 @@ X11_get_map_font_struct(struct xwindow *wp)
 {
 #ifdef ENHANCED_SYMBOLS
     struct map_info_t *map_info = wp->map_information;
-    return map_info->text_map.font;
+    XFontStruct *fs = map_info->text_map.font;
+    if (fs == NULL) {
+        fs = WindowFontStruct(wp->w);
+    }
+    return fs;
 #else
     return WindowFont(wp->w);
 #endif
@@ -1885,6 +1888,11 @@ destroy_map_window(struct xwindow *wp)
 #else
         XtReleaseGC(wp->w, text_map->copy_gc);
         XtReleaseGC(wp->w, text_map->inv_copy_gc);
+#endif
+
+        /* Free the font structure if we allocated one */
+#ifdef ENHANCED_SYMBOLS
+        XFreeFont(XtDisplay(wp->w), text_map->font);
 #endif
 
         /* Free malloc'ed space. */
