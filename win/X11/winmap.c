@@ -56,6 +56,18 @@ extern int total_tiles_used, Tile_corr;
 
 #define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
+static X11_map_symbol glyph_char(const glyph_info *glyphinfo);
+static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
+                      X11_color color, boolean inverted);
+#ifdef ENHANCED_SYMBOLS
+static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
+static void X11_set_map_font(struct xwindow *wp);
+#endif
+static void X11_draw_image_string(Display *display, Drawable d,
+                                  GC gc, int x, int y,
+                                  const X11_map_symbol *string, int length);
+static Font X11_get_map_font(struct xwindow *wp);
+static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
 static boolean init_tiles(struct xwindow *);
 static void set_button_values(Widget, int, int, unsigned);
 static void map_check_size_change(struct xwindow *);
@@ -104,19 +116,18 @@ X11_print_glyph(
         }
     }
     {
-        uchar ch;
-        register unsigned char *ch_ptr;
-        int color, och;
+        X11_map_symbol ch;
+        register X11_map_symbol *ch_ptr;
+        X11_color color;
         unsigned special;
 #ifdef TEXTCOLOR
         int colordif;
-        register unsigned char *co_ptr;
+        register X11_color *co_ptr;
 #endif
 
         color = glyphinfo->gm.sym.color;
         special = glyphinfo->gm.glyphflags;
-        och = glyphinfo->ttychar;
-        ch = (uchar) och;
+        ch = glyph_char(glyphinfo);
 
         if (special != map_info->tile_map.glyphs[y][x].glyphflags) {
             map_info->tile_map.glyphs[y][x].glyphflags = special;
@@ -137,8 +148,17 @@ X11_print_glyph(
                     || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
                         && iflags.use_inverse))
                       ? CLR_MAX : 0;
-        if (*co_ptr != (uchar) (color + colordif)) {
-            *co_ptr = (uchar) (color + colordif);
+        color += colordif;
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL && glyphinfo->gm.u->ucolor != 0) {
+            color = glyphinfo->gm.u->ucolor | 0x80000000;
+            if (colordif != 0) {
+                color |= 0x40000000;
+            }
+        }
+#endif
+        if (*co_ptr != color) {
+            *co_ptr = color;
             if (!map_info->is_tile)
                 update_bbox = TRUE;
         }
@@ -151,6 +171,83 @@ X11_print_glyph(
         if (x > map_info->t_stop[y])
             map_info->t_stop[y] = x;
     }
+}
+
+static X11_map_symbol
+glyph_char(const glyph_info *glyphinfo)
+{
+#ifdef ENHANCED_SYMBOLS
+    /* CP437 to Unicode mapping according to the Unicode Consortium */
+    static const uint16 cp437[256] = {
+        0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
+        0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
+        0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
+        0x2191, 0x2193, 0x2192, 0x2190, 0x221F, 0x2194, 0x25B2, 0x25BC,
+        0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+        0x0028, 0x0029, 0x002a, 0x002b, 0x002c, 0x002d, 0x002e, 0x002f,
+        0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+        0x0038, 0x0039, 0x003a, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f,
+        0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+        0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f,
+        0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+        0x0058, 0x0059, 0x005a, 0x005b, 0x005c, 0x005d, 0x005e, 0x005f,
+        0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067,
+        0x0068, 0x0069, 0x006a, 0x006b, 0x006c, 0x006d, 0x006e, 0x006f,
+        0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077,
+        0x0078, 0x0079, 0x007a, 0x007b, 0x007c, 0x007d, 0x007e, 0x2302,
+        0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
+        0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
+        0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
+        0x00ff, 0x00d6, 0x00dc, 0x00a2, 0x00a3, 0x00a5, 0x20a7, 0x0192,
+        0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
+        0x00bf, 0x2310, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
+        0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
+        0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
+        0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
+        0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
+        0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
+        0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
+        0x03b1, 0x00df, 0x0393, 0x03c0, 0x03a3, 0x03c3, 0x00b5, 0x03c4,
+        0x03a6, 0x0398, 0x03a9, 0x03b4, 0x221e, 0x03c6, 0x03b5, 0x2229,
+        0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
+        0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
+    };
+    /* Display DECgraphics as Unicode */
+    static const uint16 decgraphics[128] = {
+        0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007,
+        0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
+        0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017,
+        0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
+        0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+        0x0028, 0x0029, 0x002A, 0x2192, 0x2190, 0x2191, 0x2193, 0x002F,
+        0x2588, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+        0x0038, 0x0039, 0x003A, 0x003B, 0x003C, 0x003D, 0x003E, 0x003F,
+        0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+        0x0048, 0x0049, 0x004A, 0x004B, 0x004C, 0x004D, 0x004E, 0x004F,
+        0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+        0x0058, 0x0059, 0x005A, 0x005B, 0x005C, 0x005D, 0x005E, 0x005F,
+        0x2666, 0x2592, 0x0062, 0x0063, 0x0064, 0x0065, 0x00B0, 0x00B1,
+        0x2591, 0x00A4, 0x2518, 0x2510, 0x250C, 0x2514, 0x253C, 0x23BA,
+        0x23BB, 0x2500, 0x23BC, 0x23BD, 0x251C, 0x2524, 0x2534, 0x252C,
+        0x2502, 0x2264, 0x2265, 0x03C0, 0x2260, 0x00A3, 0x00B7, 0x007F
+    };
+    X11_map_symbol och;
+
+    if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL && glyphinfo->gm.u->utf8str != NULL) {
+        och = glyphinfo->gm.u->utf32ch;
+    } else {
+        och = (uchar) glyphinfo->ttychar;
+        if (SYMHANDLING(H_IBM)) {
+            och = cp437[och];
+        } else if ((SYMHANDLING(H_DEC) || SYMHANDLING(H_CURS)) && och >= 0x80) {
+            och = decgraphics[och & 0x7F];
+        }
+    }
+
+    return och;
+#else
+    return (char) glyphinfo->ttychar;
+#endif
 }
 
 #ifdef CLIPPING
@@ -995,7 +1092,7 @@ get_char_info(struct xwindow *wp)
     struct map_info_t *map_info = wp->map_information;
     struct text_map_info_t *text_map = &map_info->text_map;
 
-    fs = WindowFontStruct(wp->w);
+    fs = X11_get_map_font_struct(wp);
     text_map->square_width = fs->max_bounds.width;
     text_map->square_height = fs->max_bounds.ascent + fs->max_bounds.descent;
     text_map->square_ascent = fs->max_bounds.ascent;
@@ -1352,43 +1449,37 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
 #ifdef TEXTCOLOR
         {
-            register char *c_ptr;
-            char *t_ptr;
-            int cur_col, color, win_ystart;
-            boolean cur_inv;
+            register X11_color *c_ptr;
+            X11_map_symbol *t_ptr;
+            int cur_col, win_ystart;
+            X11_color color;
+            GC gc;
 
             for (row = start_row; row <= stop_row; row++) {
                 win_ystart =
                     text_map->square_ascent + (row * text_map->square_height);
 
-                t_ptr = (char *) &(text_map->text[row][start_col]);
-                c_ptr = (char *) &(text_map->colors[row][start_col]);
+                t_ptr = &(text_map->text[row][start_col]);
+                c_ptr = &(text_map->colors[row][start_col]);
                 cur_col = start_col;
                 while (cur_col <= stop_col) {
                     color = *c_ptr++;
-                    cur_inv = inverted;
                     count = 1;
                     while ((cur_col + count) <= stop_col && *c_ptr == color) {
                         count++;
                         c_ptr++;
                     }
-                    if (color >= CLR_MAX) {
-                        color -= CLR_MAX;
-                        cur_inv = !cur_inv;
-                    }
 
-                    XDrawImageString(XtDisplay(wp->w), XtWindow(wp->w),
-                                     iflags.use_color
-                                        ? (cur_inv
-                                           ? text_map->inv_color_gcs[color]
-                                           : text_map->color_gcs[color])
-                                        : (cur_inv
-                                           ? text_map->inv_copy_gc
-                                           : text_map->copy_gc),
-                                     text_map->square_lbearing
-                                         + (text_map->square_width
-                                            * (cur_col - COL0_OFFSET)),
-                                     win_ystart, t_ptr, count);
+                    gc = X11_make_gc(wp, text_map, color, inverted);
+                    X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
+                                          gc,
+                                          text_map->square_lbearing
+                                              + (text_map->square_width
+                                                 * (cur_col - COL0_OFFSET)),
+                                          win_ystart, t_ptr, count);
+#ifdef ENHANCED_SYMBOLS
+                    X11_free_gc(wp, gc, color);
+#endif
 
                     /* move text pointer and column count */
                     t_ptr += count;
@@ -1413,18 +1504,116 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
             for (row = start_row, win_row = win_start_row; row <= stop_row;
                  row++, win_row++) {
-                XDrawImageString(XtDisplay(wp->w), XtWindow(wp->w),
-                                 inverted ? text_map->inv_copy_gc
-                                          : text_map->copy_gc,
-                                 win_xstart,
-                                 text_map->square_ascent
-                                    + (win_row * text_map->square_height),
-                                 (char *) &(text_map->text[row][start_col]),
-                                 count);
+                X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
+                                      inverted ? text_map->inv_copy_gc
+                                               : text_map->copy_gc,
+                                      win_xstart,
+                                      text_map->square_ascent
+                                         + (win_row * text_map->square_height),
+                                      &(text_map->text[row][start_col]),
+                                      count);
             }
         }
 #endif  /* ?TEXTCOLOR */
     }
+}
+
+#ifdef TEXTCOLOR
+static GC
+X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
+            X11_color color, boolean inverted)
+{
+    boolean cur_inv = inverted;
+    GC gc;
+
+#ifdef ENHANCED_SYMBOLS
+    if ((color & 0x80000000) != 0) {
+        /* We need a new GC */
+        if ((color & 0x40000000) != 0) {
+            cur_inv = !cur_inv;
+        }
+        if (iflags.use_color) {
+            Arg arg[1];
+            XGCValues values;
+            Pixel fgpixel, bgpixel;
+
+            /* FIXME: Does this still work when the display does not support
+               true color? */
+            fgpixel = color & 0xFFFFFF;
+            XtSetArg(arg[0], XtNbackground, &bgpixel);
+            XtGetValues(wp->w, arg, 1);
+            if (cur_inv) {
+                values.foreground = bgpixel;
+                values.background = fgpixel;
+            } else {
+                values.foreground = fgpixel;
+                values.background = bgpixel;
+            }
+            values.function = GXcopy;
+            values.font = X11_get_map_font(wp);
+            gc = XtGetGC(wp->w,
+                         GCFunction | GCForeground | GCBackground | GCFont,
+                         &values);
+        } else {
+            gc = (cur_inv ? text_map->inv_copy_gc : text_map->copy_gc);
+        }
+    } else
+#endif
+    {
+        if (color >= CLR_MAX) {
+            color -= CLR_MAX;
+            cur_inv = !cur_inv;
+        }
+        gc = iflags.use_color
+           ? (cur_inv
+              ? text_map->inv_color_gcs[color]
+              : text_map->color_gcs[color])
+           : (cur_inv
+              ? text_map->inv_copy_gc
+              : text_map->copy_gc);
+    }
+    return gc;
+}
+
+#ifdef ENHANCED_SYMBOLS
+static void
+X11_free_gc(struct xwindow *wp, GC gc, X11_color color)
+{
+    if ((color & 0x80000000) != 0 && iflags.use_color) {
+        /* X11_make_gc allocated a new GC */
+        XtReleaseGC(wp->w, gc);
+    }
+}
+#endif
+#endif /* TEXTCOLOR */
+
+static void
+X11_draw_image_string(Display *display, Drawable d,
+                      GC gc, int x, int y,
+                      const X11_map_symbol *string, int length)
+{
+#ifdef ENHANCED_SYMBOLS
+    /* This doesn't support the supplementary planes. The basic Xlib seems
+       to load only PCF fonts, and these cannot contain characters encoded
+       above 0xFFFF. */
+    XChar2b wstr[COLNO+1];
+    int i;
+
+    if (length > COLNO) {
+        length = COLNO;
+    }
+    for (i = 0; i < length; ++i) {
+        uint32 ch = string[i];
+        if (ch > 0xFFFF || (0xD800 <= ch && ch <= 0xDFFF)) {
+            ch = 0xFFFD;
+        }
+        wstr[i].byte1 = ch >> 8;
+        wstr[i].byte2 = ch & 0xFF;
+    }
+    XDrawImageString16(display, d, gc, x, y, wstr, length);
+#else /* !ENHANCED_SYMBOLS */
+    XDrawImageString(display, d, gc, x, y, (char *) string, length);
+#endif /* ?ENHANCED_SYMBOLS */
 }
 
 /* Adjust the number of rows and columns on the given map window */
@@ -1458,7 +1647,7 @@ init_text(struct xwindow *wp)
     map_all_unexplored(map_info);
 
     get_char_info(wp);
-    get_text_gc(wp, WindowFont(wp->w));
+    get_text_gc(wp, X11_get_map_font(wp));
 }
 
 static char map_translations[] = "#override\n\
@@ -1552,6 +1741,9 @@ create_map_window(
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
+#ifdef ENHANCED_SYMBOLS
+    X11_set_map_font(wp);
+#endif
 
     map_info->viewport_width = map_info->viewport_height = 0;
 
@@ -1600,6 +1792,83 @@ create_map_window(
     map_all_unexplored(map_info);
 }
 
+#ifdef ENHANCED_SYMBOLS
+static void
+X11_set_map_font(struct xwindow *wp)
+{
+    struct map_info_t *map_info = wp->map_information;
+    XFontStruct *fs;
+    Atom font_atom;
+    const char *font_name;
+    unsigned dashes;
+    const char *p;
+    size_t len;
+    char unicode_font[BUFSZ];
+    Font font_id;
+
+    /* Query the configured font for the map */
+    fs = WindowFontStruct(wp->w);
+    map_info->text_map.font = fs;
+    if (!XGetFontProperty(fs, XA_FONT, &font_atom)) {
+        return;
+    }
+    font_name = XGetAtomName(XtDisplay(wp->w), font_atom);
+    if (font_name == NULL) {
+        return;
+    }
+
+    /* Proceed to the registry name */
+    dashes = 13;
+    p = font_name;
+    while (dashes != 0) {
+        const char *q = strchr(p, '-');
+        if (q == NULL) {
+            break;
+        }
+        p = q + 1;
+        --dashes;
+    }
+
+    /* Substitute "iso10646-1" for the registry name and encoding */
+    len = (size_t) (p - font_name);
+    if (dashes != 0 || len + 11 > sizeof(unicode_font)) {
+        return;
+    }
+
+    memcpy(unicode_font, font_name, len);
+    strcpy(unicode_font + len, "iso10646-1");
+    font_name = unicode_font;
+
+    font_id = XLoadFont(XtDisplay(wp->w), font_name);
+    map_info->text_map.font = XQueryFont(XtDisplay(wp->w), font_id);
+    if (map_info->text_map.font == NULL) {
+        /* Fallback in case no iso10646 */
+        map_info->text_map.font = fs;
+    }
+}
+#endif
+
+static Font
+X11_get_map_font(struct xwindow *wp)
+{
+    return X11_get_map_font_struct(wp)->fid;
+}
+
+static XFontStruct *
+X11_get_map_font_struct(struct xwindow *wp)
+{
+#ifdef ENHANCED_SYMBOLS
+    struct map_info_t *map_info = wp->map_information;
+    XFontStruct *fs = map_info->text_map.font;
+    if (fs == NULL) {
+        fs = WindowFontStruct(wp->w);
+    }
+    return fs;
+#else
+    return WindowFontStruct(wp->w);
+#endif
+}
+
 /*
  * Destroy this map window.
  */
@@ -1625,6 +1894,11 @@ destroy_map_window(struct xwindow *wp)
 #else
         XtReleaseGC(wp->w, text_map->copy_gc);
         XtReleaseGC(wp->w, text_map->inv_copy_gc);
+#endif
+
+        /* Free the font structure if we allocated one */
+#ifdef ENHANCED_SYMBOLS
+        XFreeFont(XtDisplay(wp->w), text_map->font);
 #endif
 
         /* Free malloc'ed space. */
