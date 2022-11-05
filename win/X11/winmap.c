@@ -57,12 +57,15 @@ extern int total_tiles_used, Tile_corr;
 #define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
 static X11_map_symbol glyph_char(const glyph_info *glyphinfo);
-static GC X11_make_gc(Widget w, struct text_map_info_t *text_map,
+static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
                       X11_color color, boolean inverted);
-static void X11_free_gc(Widget w, GC gc, X11_color color);
+static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
 static void X11_draw_image_string(Display *display, Drawable d,
                                   GC gc, int x, int y,
                                   const X11_map_symbol *string, int length);
+static void X11_set_map_font(struct xwindow *wp);
+static Font X11_get_map_font(struct xwindow *wp);
+static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
 static boolean init_tiles(struct xwindow *);
 static void set_button_values(Widget, int, int, unsigned);
 static void map_check_size_change(struct xwindow *);
@@ -1087,7 +1090,7 @@ get_char_info(struct xwindow *wp)
     struct map_info_t *map_info = wp->map_information;
     struct text_map_info_t *text_map = &map_info->text_map;
 
-    fs = WindowFontStruct(wp->w);
+    fs = X11_get_map_font_struct(wp);
     text_map->square_width = fs->max_bounds.width;
     text_map->square_height = fs->max_bounds.ascent + fs->max_bounds.descent;
     text_map->square_ascent = fs->max_bounds.ascent;
@@ -1465,14 +1468,14 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                         c_ptr++;
                     }
 
-                    gc = X11_make_gc(wp->w, text_map, color, inverted);
+                    gc = X11_make_gc(wp, text_map, color, inverted);
                     X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
                                           gc,
                                           text_map->square_lbearing
                                               + (text_map->square_width
                                                  * (cur_col - COL0_OFFSET)),
                                           win_ystart, t_ptr, count);
-                    X11_free_gc(wp->w, gc, color);
+                    X11_free_gc(wp, gc, color);
 
                     /* move text pointer and column count */
                     t_ptr += count;
@@ -1513,7 +1516,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
 #ifdef TEXTCOLOR
 static GC
-X11_make_gc(Widget w, struct text_map_info_t *text_map,
+X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
             X11_color color, boolean inverted)
 {
     boolean cur_inv = inverted;
@@ -1534,7 +1537,7 @@ X11_make_gc(Widget w, struct text_map_info_t *text_map,
                true color? */
             fgpixel = color & 0xFFFFFF;
             XtSetArg(arg[0], XtNbackground, &bgpixel);
-            XtGetValues(w, arg, 1);
+            XtGetValues(wp->w, arg, 1);
             if (cur_inv) {
                 values.foreground = bgpixel;
                 values.background = fgpixel;
@@ -1543,8 +1546,8 @@ X11_make_gc(Widget w, struct text_map_info_t *text_map,
                 values.background = bgpixel;
             }
             values.function = GXcopy;
-            values.font = WindowFont(w);
-            gc = XtGetGC(w,
+            values.font = X11_get_map_font(wp);
+            gc = XtGetGC(wp->w,
                          GCFunction | GCForeground | GCBackground | GCFont,
                          &values);
         } else {
@@ -1569,12 +1572,12 @@ X11_make_gc(Widget w, struct text_map_info_t *text_map,
 }
 
 static void
-X11_free_gc(Widget w, GC gc, X11_color color)
+X11_free_gc(struct xwindow *wp, GC gc, X11_color color)
 {
 #ifdef ENHANCED_SYMBOLS
     if ((color & 0x80000000) != 0 && iflags.use_color) {
         /* X11_make_gc allocated a new GC */
-        XtReleaseGC(w, gc);
+        XtReleaseGC(wp->w, gc);
     }
 #endif
 }
@@ -1641,7 +1644,7 @@ init_text(struct xwindow *wp)
     map_all_unexplored(map_info);
 
     get_char_info(wp);
-    get_text_gc(wp, WindowFont(wp->w));
+    get_text_gc(wp, X11_get_map_font(wp));
 }
 
 static char map_translations[] = "#override\n\
@@ -1735,6 +1738,7 @@ create_map_window(
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
+    X11_set_map_font(wp);
 
     map_info->viewport_width = map_info->viewport_height = 0;
 
@@ -1781,6 +1785,79 @@ create_map_window(
     }
 
     map_all_unexplored(map_info);
+}
+
+static void
+X11_set_map_font(struct xwindow *wp)
+{
+#ifdef ENHANCED_SYMBOLS
+    struct map_info_t *map_info = wp->map_information;
+    XFontStruct *fs;
+    Atom font_atom;
+    const char *font_name;
+    unsigned dashes;
+    const char *p;
+    size_t len;
+    char unicode_font[BUFSZ];
+    Font font_id;
+
+    /* Query the configured font for the map */
+    fs = WindowFontStruct(wp->w);
+    map_info->text_map.font = fs;
+    if (!XGetFontProperty(fs, XA_FONT, &font_atom)) {
+        return;
+    }
+    font_name = XGetAtomName(XtDisplay(wp->w), font_atom);
+    if (font_name == NULL) {
+        return;
+    }
+
+    /* Proceed to the registry name */
+    dashes = 13;
+    p = font_name;
+    while (dashes != 0) {
+        const char *q = strchr(p, '-');
+        if (q == NULL) {
+            break;
+        }
+        p = q + 1;
+        --dashes;
+    }
+
+    /* Substitute "iso10646-1" for the registry name and encoding */
+    len = (size_t) (p - font_name);
+    if (dashes != 0 || len  + 11 > sizeof(unicode_font)) {
+        return;
+    }
+
+    memcpy(unicode_font, font_name, len);
+    strcpy(unicode_font + len, "iso10646-1");
+    font_name = unicode_font;
+
+    font_id = XLoadFont(XtDisplay(wp->w), font_name);
+    map_info->text_map.font = XQueryFont(XtDisplay(wp->w), font_id);
+    if (map_info->text_map.font == NULL) {
+        /* Fallback in case no iso10646 */
+        map_info->text_map.font = fs;
+    }
+#endif
+}
+
+static Font
+X11_get_map_font(struct xwindow *wp)
+{
+    return X11_get_map_font_struct(wp)->fid;
+}
+
+static XFontStruct *
+X11_get_map_font_struct(struct xwindow *wp)
+{
+#ifdef ENHANCED_SYMBOLS
+    struct map_info_t *map_info = wp->map_information;
+    return map_info->text_map.font;
+#else
+    return WindowFont(wp->w);
+#endif
 }
 
 /*

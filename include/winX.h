@@ -64,6 +64,10 @@ struct text_map_info_t {
         square_height, /*   we can calculate the correct */
         square_ascent, /*   placement of changes.        */
         square_lbearing;
+
+#ifdef ENHANCED_SYMBOLS
+    XFontStruct *font;
+#endif
 };
 
 struct tile_glyph_info_t {
