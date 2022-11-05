@@ -59,11 +59,13 @@ extern int total_tiles_used, Tile_corr;
 static X11_map_symbol glyph_char(const glyph_info *glyphinfo);
 static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
                       X11_color color, boolean inverted);
+#ifdef ENHANCED_SYMBOLS
 static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
+static void X11_set_map_font(struct xwindow *wp);
+#endif
 static void X11_draw_image_string(Display *display, Drawable d,
                                   GC gc, int x, int y,
                                   const X11_map_symbol *string, int length);
-static void X11_set_map_font(struct xwindow *wp);
 static Font X11_get_map_font(struct xwindow *wp);
 static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
 static boolean init_tiles(struct xwindow *);
@@ -1475,7 +1477,9 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                                               + (text_map->square_width
                                                  * (cur_col - COL0_OFFSET)),
                                           win_ystart, t_ptr, count);
+#ifdef ENHANCED_SYMBOLS
                     X11_free_gc(wp, gc, color);
+#endif
 
                     /* move text pointer and column count */
                     t_ptr += count;
@@ -1516,7 +1520,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
 #ifdef TEXTCOLOR
 static GC
-X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
+X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
             X11_color color, boolean inverted)
 {
     boolean cur_inv = inverted;
@@ -1571,16 +1575,16 @@ X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
     return gc;
 }
 
+#ifdef ENHANCED_SYMBOLS
 static void
 X11_free_gc(struct xwindow *wp, GC gc, X11_color color)
 {
-#ifdef ENHANCED_SYMBOLS
     if ((color & 0x80000000) != 0 && iflags.use_color) {
         /* X11_make_gc allocated a new GC */
         XtReleaseGC(wp->w, gc);
     }
-#endif
 }
+#endif
 #endif /* TEXTCOLOR */
 
 static void
@@ -1737,7 +1741,9 @@ create_map_window(
 
     map_info = wp->map_information =
         (struct map_info_t *) alloc(sizeof (struct map_info_t));
+#ifdef ENHANCED_SYMBOLS
     X11_set_map_font(wp);
+#endif
 
     map_info->viewport_width = map_info->viewport_height = 0;
 
@@ -1786,10 +1792,10 @@ create_map_window(
     map_all_unexplored(map_info);
 }
 
+#ifdef ENHANCED_SYMBOLS
 static void
 X11_set_map_font(struct xwindow *wp)
 {
-#ifdef ENHANCED_SYMBOLS
     struct map_info_t *map_info = wp->map_information;
     XFontStruct *fs;
     Atom font_atom;
@@ -1839,8 +1845,8 @@ X11_set_map_font(struct xwindow *wp)
         /* Fallback in case no iso10646 */
         map_info->text_map.font = fs;
     }
-#endif
 }
+#endif
 
 static Font
 X11_get_map_font(struct xwindow *wp)
@@ -1859,7 +1865,7 @@ X11_get_map_font_struct(struct xwindow *wp)
     }
     return fs;
 #else
-    return WindowFont(wp->w);
+    return WindowFontStruct(wp->w);
 #endif
 }
 
