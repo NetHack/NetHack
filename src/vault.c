@@ -413,7 +413,7 @@ invault(void)
            otherwise the hero wouldn't be able to push one to follow the
            guard out of the vault because that guard would be in its way */
         if ((otmp = sobj_at(BOULDER, guard->mx, guard->my)) != 0) {
-            void (*func)(const char *, ...) PRINTF_F(1, 2);
+            void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
             const char *bname = simpleonames(otmp);
             int bcnt = 0;
 

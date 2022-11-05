@@ -12,6 +12,7 @@
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
 
+#include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>

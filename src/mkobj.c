@@ -2107,7 +2107,7 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
     register struct obj *otmp2;
 
     if (!isok(x, y)) { /* validate location */
-        void (*func)(const char *, ...) PRINTF_F(1, 2);
+        void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;
