@@ -302,6 +302,18 @@ can_blnd(
     return TRUE;
 }
 
+/* returns True if monster can attack at range */
+boolean
+ranged_attk(struct permonst* ptr)
+{
+    int i;
+
+    for (i = 0; i < NATTK; i++)
+        if (DISTANCE_ATTK_TYPE(ptr->mattk[i].aatyp))
+            return TRUE;
+    return FALSE;
+}
+
 /* True if specific monster is especially affected by silver weapons */
 boolean
 mon_hates_silver(struct monst *mon)

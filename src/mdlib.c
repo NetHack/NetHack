@@ -62,7 +62,6 @@ int case_insensitive_comp(const char *, const char *);
 static void make_version(void);
 static char *eos(char *);
 int mstrength(struct permonst *);
-boolean ranged_attk(struct permonst *);
 
 #if 0
 static char *mdlib_strsubst(char *, const char *, const char *);
@@ -314,6 +313,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
  *      transfer relevant generated monstr values to include/monsters.h;
  *      delete src/monstr.c.
  */
+static boolean mdlib_ranged_attk(struct permonst *);
 
  /*
  * This routine is designed to return an integer value which represents
@@ -333,7 +333,7 @@ mstrength(struct permonst* ptr)
     n += (!!(ptr->geno & G_LGROUP)) << 1;
 
     /* for ranged attacks */
-    if (ranged_attk(ptr))
+    if (mdlib_ranged_attk(ptr))
         n++;
 
     /* for higher ac values */
@@ -379,14 +379,17 @@ mstrength(struct permonst* ptr)
 }
 
 /* returns True if monster can attack at range */
-boolean
-ranged_attk(struct permonst* ptr)
+static boolean
+mdlib_ranged_attk(register struct permonst* ptr)
 {
-    int i;
+    register int i, j;
+    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
 
-    for (i = 0; i < NATTK; i++)
-        if (DISTANCE_ATTK_TYPE(ptr->mattk[i].aatyp))
+    for (i = 0; i < NATTK; i++) {
+        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP
+            || (j < 32 && (atk_mask & (1 << j)) != 0))
             return TRUE;
+    }
     return FALSE;
 }
 #endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || DEBUG || MAKEDEFS_C */
