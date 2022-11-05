@@ -1312,9 +1312,6 @@ extern void release_runtime_info(void);
 #ifdef ENHANCED_SYMBOLS
 extern void dump_glyphids(void);
 #endif
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
-extern int mstrength(struct permonst *);
-#endif
 
 /* ### mhitm.c ### */
 
@@ -1663,6 +1660,9 @@ extern boolean mon_knows_traps(struct monst *, int);
 extern void mon_learns_traps(struct monst *, int);
 extern void mons_see_trap(struct trap *);
 extern int get_atkdam_type(int);
+#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+extern int mstrength(struct permonst *);
+#endif
 
 /* ### monmove.c ### */
 

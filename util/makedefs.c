@@ -54,7 +54,6 @@
 #define RUMOR_FILE "rumors"
 #define DGN_I_FILE "dungeon.def"
 #define DGN_O_FILE "dungeon.pdf"
-#define MON_STR_C "monstr.c"
 #if 0
 #define QTXT_I_FILE "quest.txt"
 #define QTXT_O_FILE "quest.dat"
@@ -292,10 +291,6 @@ do_makedefs(char *options)
         case 'e':
         case 'E':
             do_dungeon();
-            break;
-        case 'm':
-        case 'M':
-            do_monstr();
             break;
         case 'v':
         case 'V':
@@ -1866,72 +1861,6 @@ do_dungeon(void)
 #ifdef HAS_NO_MKSTEMP
     delete_file(DATA_TEMPLATE, "grep.tmp");
 #endif
-    return;
-}
-
-/* not quite obsolete but no longer needed to build nethack */
-void
-do_monstr(void)
-{
-    struct permonst *ptr;
-    int i;
-
-    /* Don't break anything for ports that haven't been updated. */
-    printf("DEPRECATION WARNINGS:\n");
-    printf("'makedefs -m' is deprecated.  Remove all references\n");
-    printf("  to it from the build process.\n");
-    printf("'monstr.c' is deprecated.  Remove all references to\n");
-    printf("  it from the build process.\n");
-    printf("monstr[] is deprecated.  Replace monstr[x] with\n");
-    printf("  mons[x].difficulty\n");
-    printf("monstr_init() is deprecated.  Remove all references to it.\n");
-
-    /*
-     * create the source file, "monstr.c"
-     */
-    filename[0] = '\0';
-#ifdef FILE_PREFIX
-    Strcat(filename, file_prefix);
-#endif
-    Sprintf(eos(filename), SOURCE_TEMPLATE, MON_STR_C);
-    if (!(ofp = fopen(filename, WRTMODE))) {
-        perror(filename);
-        makedefs_exit(EXIT_FAILURE);
-        /*NOTREACHED*/
-    }
-    Fprintf(ofp, "%s", Dont_Edit_Code);
-    Fprintf(ofp, "#include \"config.h\"\n");
-    Fprintf(ofp, "\nconst int monstrXXX[] = {\n");
-    Fprintf(ofp, "0};\n");
-    Fprintf(ofp, "/*\n");
-    Fprintf(ofp, "DEPRECATION WARNINGS:\n");
-    Fprintf(ofp, "'makedefs -m' is deprecated.  Remove all references\n");
-    Fprintf(ofp, "  to it from the build process.\n");
-    Fprintf(ofp, "'monstr.c' is deprecated.  Remove all references to\n");
-    Fprintf(ofp, "  it from the build process.\n");
-    Fprintf(ofp, "monstr[] is deprecated.  Replace monstr[x] with\n");
-    Fprintf(ofp, "  mons[x].difficulty\n");
-    Fprintf(ofp,
-            "monstr_init() is deprecated.  Remove all references to it.\n");
-    Fprintf(ofp, "*/\n");
-
-    /* output derived monstr values as a comment */
-    Fprintf(ofp, "\n\n/*\n * default mons[].difficulty values\n *\n");
-    for (ptr = &mons[0]; ptr->mlet; ptr++) {
-        i = mstrength(ptr);
-        Fprintf(ofp, "%-24s %2u\n", ptr->pmnames[NEUTRAL], (unsigned) i);
-    }
-    Fprintf(ofp, " *\n */\n\n");
-
-    Fprintf(ofp, "\nvoid monstr_init(void);\n");
-    Fprintf(ofp, "\nvoid\n");
-    Fprintf(ofp, "monstr_init(void)\n");
-    Fprintf(ofp, "{\n");
-    Fprintf(ofp, "    return;\n");
-    Fprintf(ofp, "}\n");
-    Fprintf(ofp, "\n/*monstr.c*/\n");
-
-    Fclose(ofp);
     return;
 }
 

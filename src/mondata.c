@@ -314,6 +314,101 @@ ranged_attk(struct permonst* ptr)
     return FALSE;
 }
 
+#if defined(MAKEDEFS_C) \
+    || (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+/*
+ * In 3.4.3 and earlier, this code was used to construct monstr[] array
+ * in generated file src/monstr.c.  It wasn't used in 3.6.  For 3.7 it
+ * has been reincarnated as a way to generate default monster strength
+ * values:
+ *      add new monster(s) to include/monsters.h with placeholder value
+ *          for the monstr field;
+ *      run 'makedefs -m' to create src/monstr.c; ignore the complaints
+ *          about it being deprecated;
+ *      transfer relevant generated monstr values to include/monsters.h;
+ *      delete src/monstr.c.
+ */
+static boolean mstrength_ranged_attk(struct permonst *);
+
+ /*
+ * This routine is designed to return an integer value which represents
+ * an approximation of monster strength.  It uses a similar method of
+ * determination as "experience()" to arrive at the strength.
+ */
+int
+mstrength(struct permonst* ptr)
+{
+    int i, tmp2, n, tmp = ptr->mlevel;
+
+    if (tmp > 49) /* special fixed hp monster */
+        tmp = 2 * (tmp - 6) / 4;
+
+    /* for creation in groups */
+    n = (!!(ptr->geno & G_SGROUP));
+    n += (!!(ptr->geno & G_LGROUP)) << 1;
+
+    /* for ranged attacks */
+    if (mstrength_ranged_attk(ptr))
+        n++;
+
+    /* for higher ac values */
+    n += (ptr->ac < 4);
+    n += (ptr->ac < 0);
+
+    /* for very fast monsters */
+    n += (ptr->mmove >= 18);
+
+    /* for each attack and "special" attack */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+    }
+
+    /* for each "special" damage type */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+            || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
+            n += 2;
+        else if (strcmp(ptr->pmnames[NEUTRAL], "grid bug"))
+            n += (tmp2 != AD_PHYS);
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
+
+    /* Leprechauns are special cases.  They have many hit dice so they
+       can hit and are hard to kill, but they don't really do much damage. */
+    if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun"))
+        n -= 2;
+
+    /* finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if (n == 0)
+        tmp--;
+    else if (n >= 6)
+        tmp += (n / 2);
+    else
+        tmp += (n / 3 + 1);
+
+    return (tmp >= 0) ? tmp : 0;
+}
+
+/* returns True if monster can attack at range */
+static boolean
+mstrength_ranged_attk(register struct permonst* ptr)
+{
+    register int i, j;
+    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
+
+    for (i = 0; i < NATTK; i++) {
+        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP
+            || (j < 32 && (atk_mask & (1 << j)) != 0))
+            return TRUE;
+    }
+    return FALSE;
+}
+#endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || DEBUG || MAKEDEFS_C */
+
 /* True if specific monster is especially affected by silver weapons */
 boolean
 mon_hates_silver(struct monst *mon)
