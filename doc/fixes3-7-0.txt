@@ -2047,6 +2047,7 @@ from xNetHack:  better handling for monsters putting on equipment; fixes
 add Unicode support to DOS Curses port (pr #889 by chasonr)
 add Unicode support to Win32 (pr #903 by chasonr)
 add Unicode support to Qt (pr #910 by chasonr)
+add Unicode support to X11 (pr #923 by chasonr)
 
 
 Code Cleanup and Reorganization
