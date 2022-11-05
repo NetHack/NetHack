@@ -1308,6 +1308,7 @@ extern int buzzmu(struct monst *, struct attack *);
 
 extern void runtime_info_init(void);
 extern const char *do_runtime_info(int *);
+extern boolean ranged_attk(struct permonst *);
 extern void release_runtime_info(void);
 #ifdef ENHANCED_SYMBOLS
 extern void dump_glyphids(void);
@@ -1620,7 +1621,6 @@ extern boolean resists_drli(struct monst *);
 extern boolean resists_magm(struct monst *);
 extern boolean resists_blnd(struct monst *);
 extern boolean can_blnd(struct monst *, struct monst *, uchar, struct obj *);
-extern boolean ranged_attk(struct permonst *);
 extern boolean mon_hates_silver(struct monst *);
 extern boolean hates_silver(struct permonst *);
 extern boolean mon_hates_blessings(struct monst *);
