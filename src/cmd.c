@@ -1955,16 +1955,12 @@ static int
 wiz_intrinsic(void)
 {
     if (wizard) {
-        extern const struct propname {
-            int prop_num;
-            const char *prop_name;
-        } propertynames[]; /* timeout.c */
         static const char wizintrinsic[] = "#wizintrinsic";
         static const char fmt[] = "You are%s %s.";
         winid win;
         anything any;
         char buf[BUFSZ];
-        int i, j, n, p, amt, typ;
+        int i, j, n, amt, typ, p = 0;
         long oldtimeout, newtimeout;
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
@@ -1982,8 +1978,7 @@ wiz_intrinsic(void)
             add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                      MENU_ITEMFLAGS_NONE);
         }
-        for (i = 0; (propname = propertynames[i].prop_name) != 0; ++i) {
-            p = propertynames[i].prop_num;
+        for (i = 0; (propname = property_by_index(i, &p)) != 0; ++i) {
             if (p == HALLUC_RES) {
                 /* Grayswandir vs hallucination; ought to be redone to
                    use u.uprops[HALLUC].blocked instead of being treated
@@ -2014,7 +2009,7 @@ wiz_intrinsic(void)
 
         for (j = 0; j < n; ++j) {
             i = pick_list[j].item.a_int - 1; /* -1: reverse +1 above */
-            p = propertynames[i].prop_num;
+            propname = property_by_index(i, &p);
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
             amt = (pick_list[j].count == -1L) ? DEFAULT_TIMEOUT_INCR
                                               : (int) pick_list[j].count;
@@ -2087,7 +2082,7 @@ wiz_intrinsic(void)
                 if (p != GLIB)
                     incr_itimeout(&u.uprops[p].intrinsic, amt);
                 g.context.botl = 1; /* have pline() do a status update */
-                pline("Timeout for %s %s %d.", propertynames[i].prop_name,
+                pline("Timeout for %s %s %d.", propname,
                       oldtimeout ? "increased by" : "set to", amt);
                 break;
             }

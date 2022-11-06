@@ -2749,6 +2749,7 @@ extern void substitute_tiles(d_level *);
 
 /* ### timeout.c ### */
 
+extern const char *property_by_index(int, int *);
 extern void burn_away_slime(void);
 extern void nh_timeout(void);
 extern void fall_asleep(int, boolean);

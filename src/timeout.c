@@ -21,7 +21,7 @@ static void cleanup_burn(ANY_P *, long);
 
 /* used by wizard mode #timeout and #wizintrinsic; order by 'interest'
    for timeout countdown, where most won't occur in normal play */
-const struct propname {
+static const struct propname {
     int prop_num;
     const char *prop_name;
 } propertynames[] = {
@@ -104,6 +104,17 @@ const struct propname {
     { LIFESAVED, "life will be saved" },
     {  0, 0 },
 };
+
+const char *
+property_by_index(int idx, int *propertynum)
+{
+    if (!(idx >= 0 && idx < SIZE(propertynames) - 1))
+        idx = SIZE(propertynames) - 1;
+
+    if (propertynum)
+        *propertynum = propertynames[idx].prop_num;
+    return propertynames[idx].prop_name;
+}
 
 /* He is being petrified - dialogue by inmet!tower */
 static NEARDATA const char *const stoned_texts[] = {
