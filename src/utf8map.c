@@ -65,7 +65,7 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
                   (findwhat->color != 0L) ? findwhat->color : 0L);
 #endif
         add_custom_urep_entry(known_handling[H_UTF8], glyph,
-                              uval, utf8str, findwhat->color, UNICODESET);
+                              uval, utf8str, findwhat->color, g.symset_which_set);
     }
 }
 
