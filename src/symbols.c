@@ -332,6 +332,10 @@ clear_symsetentry(int which_set, boolean name_too)
             free((genericptr_t) g.symset[which_set].name);
         g.symset[which_set].name = (char *) 0;
     }
+#ifdef ENHANCED_SYMBOLS
+    free_all_glyphmap_u();
+    purge_custom_entries(which_set);
+#endif
 }
 
 boolean symset_is_compatible(enum symset_handling_types handling, unsigned long wincap2)
@@ -462,7 +466,11 @@ parse_sym_line(char *buf, int which_set)
     symp = match_sym(buf);
     if (!symp && buf[0] == 'G' && buf[1] == '_') {
 #ifdef ENHANCED_SYMBOLS
-        is_glyph = match_glyph(buf);
+        if (g.chosen_symset_start) {
+            is_glyph = match_glyph(buf);
+        } else {
+            is_glyph = TRUE; /* report error only once */
+        }
 #else
         enhanced_unavailable = TRUE;
 #endif
@@ -608,7 +616,9 @@ parse_sym_line(char *buf, int which_set)
                 }
 #ifdef ENHANCED_SYMBOLS
             } else {
-                glyphrep_to_custom_map_entries(buf, &glyph);
+                if (g.chosen_symset_start) {
+                    glyphrep_to_custom_map_entries(buf, &glyph);
+                }
 #endif
             }
         }
@@ -1058,11 +1068,11 @@ apply_customizations_to_symset(enum graphics_sets which_set)
     struct customization_detail *details;
 
     if (g.symset[which_set].handling == H_UTF8
-        && g.sym_customizations[UNICODESET].count
-        && g.sym_customizations[UNICODESET].details) {
+        && g.sym_customizations[which_set].count
+        && g.sym_customizations[which_set].details) {
         /* These UTF-8 customizations get applied to the glyphmap array,
            not to symset entries */
-        details = g.sym_customizations[UNICODESET].details;
+        details = g.sym_customizations[which_set].details;
         while (details) {
             gm = &glyphmap[details->content.urep.glyphidx];
             (void) set_map_u(gm,
