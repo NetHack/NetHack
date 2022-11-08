@@ -2017,6 +2017,9 @@ lev_by_name(const char *nam)
                 nam = " to Vlad's tower"; /* branch to... */
             else
                 nam = "valley";
+        } else if (!strcmpi(nam, "delphi")) {
+            /* Oracle says "welcome to Delphi" so recognize that name too */ 
+            nam = "oracle";
         }
 
         if ((slev = find_level(nam)) != 0)
