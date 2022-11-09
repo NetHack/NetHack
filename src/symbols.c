@@ -7,6 +7,7 @@
 
 static void savedsym_add(const char *, const char *, int);
 static struct _savedsym *savedsym_find(const char *, int);
+void purge_custom_entries(enum graphics_sets which_set);
 
 extern const uchar def_r_oc_syms[MAXOCLASSES];      /* drawing.c */
 
@@ -1057,7 +1058,6 @@ struct customization_detail *find_matching_symset_customization(
     enum graphics_sets which_set);
 struct customization_detail *find_display_urep_customization(
     const char *customization_name, int glyphidx, enum graphics_sets which_set);
-void purge_custom_entries(enum graphics_sets which_set);
 extern glyph_map glyphmap[MAX_GLYPH];
 static void shuffle_customizations(void);
 
@@ -1090,18 +1090,51 @@ apply_customizations_to_symset(enum graphics_sets which_set)
 static void
 shuffle_customizations(void)
 {
-    int i;
-    struct unicode_representation *tmp_u[2][NUM_OBJECTS];
+    static const int offsets[2] = { GLYPH_OBJ_OFF, GLYPH_OBJ_PILETOP_OFF };
+    int j;
 
-    for (i = 0; i < NUM_OBJECTS; i++) {
-        tmp_u[0][i] =
-            glyphmap[objects[i].oc_descr_idx + GLYPH_OBJ_OFF].u;
-        tmp_u[1][i] =
-            glyphmap[objects[i].oc_descr_idx + GLYPH_OBJ_PILETOP_OFF].u;
-    }
-    for (i = 0; i < NUM_OBJECTS; i++) {
-        glyphmap[i + GLYPH_OBJ_OFF].u = tmp_u[0][i];
-        glyphmap[i + GLYPH_OBJ_PILETOP_OFF].u = tmp_u[1][i];
+    for (j = 0; j < SIZE(offsets); j++) {
+        glyph_map *obj_glyphs = glyphmap + offsets[j];
+        int i;
+        struct unicode_representation *tmp_u[NUM_OBJECTS];
+        int duplicate[NUM_OBJECTS];
+
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            duplicate[i] = -1;
+        }
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            int idx = objects[i].oc_descr_idx;
+
+            /*
+             * Shuffling gem appearances can cause the same oc_descr_idx to
+             * appear more than once. Detect this condition and ensure that
+             * each pointer points to a unique allocation.
+             */
+            if (duplicate[idx] >= 0) {
+                /* Current structure already appears in tmp_u */
+                struct unicode_representation *other = tmp_u[duplicate[idx]];
+
+                tmp_u[i] = (struct unicode_representation *) alloc(sizeof *tmp_u[i]);
+                *tmp_u[i] = *other;
+                if (other->utf8str != NULL) {
+                    tmp_u[i]->utf8str = (uint8 *) dupstr((const char *) other->utf8str);
+                }
+            } else {
+                tmp_u[i] = obj_glyphs[idx].u;
+                if (obj_glyphs[idx].u != NULL)  {
+                    duplicate[idx] = i;
+                    obj_glyphs[idx].u = NULL;
+                }
+            }
+        }
+        for (i = 0; i < NUM_OBJECTS; i++) {
+            /* Some glyphmaps may not have been transferred */
+            if (obj_glyphs[i].u != NULL) {
+                free(obj_glyphs[i].u->utf8str);
+                free(obj_glyphs[i].u);
+            }
+            obj_glyphs[i].u = tmp_u[i];
+        }
     }
 }
 
