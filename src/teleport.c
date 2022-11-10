@@ -1338,14 +1338,14 @@ rloc_to_core(
     if (domsg && (canspotmon(mtmp) || appearmsg)) {
         int du = distu(x, y), olddu;
         const char *next = (du <= 2) ? " next to you" : 0, /* next2u() */
-                   *near = (du <= BOLT_LIM * BOLT_LIM) ? " close by" : 0;
+                   *nearu = (du <= BOLT_LIM * BOLT_LIM) ? " close by" : 0;
 
         mtmp->mstrategy &= ~STRAT_APPEARMSG; /* one chance only */
         if (telemsg && (couldsee(x, y) || sensemon(mtmp))) {
             pline("%s vanishes and reappears%s.",
                   Monnam(mtmp),
                   next ? next
-                  : near ? near
+                  : nearu ? nearu
                     : ((olddu = distu(oldx, oldy)) == du) ? ""
                       : (du < olddu) ? " closer to you"
                         : " farther away");
@@ -1354,7 +1354,7 @@ rloc_to_core(
                   appearmsg ? Amonnam(mtmp) : Monnam(mtmp),
                   appearmsg ? "suddenly " : "",
                   !Blind ? "appears" : "arrives",
-                  next ? next : near ? near : "");
+                  next ? next : nearu ? nearu : "");
         }
     }
 
