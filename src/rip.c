@@ -5,12 +5,14 @@
 
 #include "hack.h"
 
+/* Defining TEXT_TOMBSTONE causes genl_outrip() to exist, but it doesn't
+   necessarily have to be used by a binary with mulitple window-ports */
+
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) \
-    || defined(MSWIN_GRAPHICS) || defined(DUMPLOG) \
-    || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS)
+    || defined(DUMPLOG) || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS)
 #define TEXT_TOMBSTONE
 #endif
-#if defined(mac) || defined(__BEOS__) || defined(WIN32_GRAPHICS)
+#if defined(mac) || defined(__BEOS__)
 #ifndef TEXT_TOMBSTONE
 #define TEXT_TOMBSTONE
 #endif

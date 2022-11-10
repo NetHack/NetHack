@@ -34,9 +34,6 @@ extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
 extern void ami_wininit_data(int);
 #endif
-#ifdef WIN32_GRAPHICS
-extern struct window_procs win32_procs;
-#endif
 #ifdef GNOME_GRAPHICS
 /*#include "winGnome.h"*/
 extern struct window_procs Gnome_procs;
@@ -121,9 +118,6 @@ static struct win_choices {
       ami_wininit_data CHAINR(0) }, /* Old font version of the game */
     { &amiv_procs,
       ami_wininit_data CHAINR(0) }, /* Tile version of the game */
-#endif
-#ifdef WIN32_GRAPHICS
-    { &win32_procs, 0 CHAINR(0) },
 #endif
 #ifdef GNOME_GRAPHICS
     { &Gnome_procs, 0 CHAINR(0) },
