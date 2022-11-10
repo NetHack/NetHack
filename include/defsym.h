@@ -63,62 +63,57 @@
 
 #if defined(PCHAR_S_ENUM)
 /* sym.h */
-#define PCHAR(idx, ch, sym, desc, clr) \
-        sym = idx,
-#define PCHAR2(idx, ch, sym, tilenm, desc, clr) \
-        sym = idx,
+#define PCHAR(idx, ch, sym, desc, clr) sym = idx,
 
 #elif defined(PCHAR_PARSE)
 /* symbols.c */
-#define PCHAR(idx, ch, sym, desc, clr) \
-    { SYM_PCHAR, sym, #sym },
-#define PCHAR2(idx, ch, sym, tilenm, desc, clr) \
-    { SYM_PCHAR, sym, #sym },
+#define PCHAR(idx, ch, sym, desc, clr) { SYM_PCHAR, sym, #sym },
 
 #elif defined(PCHAR_DRAWING)
 /* drawing.c */
-#define PCHAR(idx, ch, sym, desc, clr) \
-    { ch, desc, clr },
-#define PCHAR2(idx, ch, sym, tilenm, desc, clr) \
-    { ch, desc, clr },
+#define PCHAR(idx, ch, sym, desc, clr) { ch, desc, clr },
 
 #elif defined(PCHAR_TILES)
 /* win/share/tilemap.c */
-#define PCHAR(idx, ch, sym, desc, clr) \
-    { sym, desc, desc },
-#define PCHAR2(idx, ch, sym, tilenm, desc, clr) \
-    { sym, tilenm, desc },
+#define PCHAR(idx, ch, sym, desc, clr) { sym, desc, desc },
 #endif
 
-    PCHAR2( 0, ' ',  S_stone, "dark part of a room", "stone",  CLR(NO_COLOR))
-    PCHAR2( 1, '|',  S_vwall, "vertical wall", "wall",  CLR(CLR_GRAY))
-    PCHAR2( 2, '-',  S_hwall, "horizontal wall", "wall",  CLR(CLR_GRAY))
+/* PCHAR with extra arg */
+#if defined(PCHAR_TILES)
+#define PCHAR2(idx, ch, sym, tilenm, desc, clr) { sym, tilenm, desc },
+#else
+#define PCHAR2(idx, ch, sym, tilenm, desc, clr) PCHAR(idx, ch, sym, desc, clr)
+#endif
+
+    PCHAR2( 0, ' ',  S_stone,  "dark part of a room", "stone",  CLR(NO_COLOR))
+    PCHAR2( 1, '|',  S_vwall,  "vertical wall", "wall",  CLR(CLR_GRAY))
+    PCHAR2( 2, '-',  S_hwall,  "horizontal wall", "wall",  CLR(CLR_GRAY))
     PCHAR2( 3, '-',  S_tlcorn, "top left corner wall", "wall",  CLR(CLR_GRAY))
     PCHAR2( 4, '-',  S_trcorn, "top right corner wall", "wall",  CLR(CLR_GRAY))
-    PCHAR2( 5, '-',  S_blcorn,
-           "bottom left corner wall", "wall", CLR(CLR_GRAY))
-    PCHAR2( 6, '-',  S_brcorn,
-           "bottom right corner wall", "wall", CLR(CLR_GRAY))
+    PCHAR2( 5, '-',  S_blcorn, "bottom left corner wall",
+                               "wall", CLR(CLR_GRAY))
+    PCHAR2( 6, '-',  S_brcorn, "bottom right corner wall",
+                               "wall", CLR(CLR_GRAY))
     PCHAR2( 7, '-',  S_crwall, "cross wall", "wall", CLR(CLR_GRAY))
     PCHAR2( 8, '-',  S_tuwall, "tuwall", "wall", CLR(CLR_GRAY))
     PCHAR2( 9, '-',  S_tdwall, "tdwall", "wall", CLR(CLR_GRAY))
     PCHAR2(10, '|',  S_tlwall, "tlwall", "wall", CLR(CLR_GRAY))
     PCHAR2(11, '|',  S_trwall, "trwall", "wall", CLR(CLR_GRAY))
     /* start cmap A                                                      */
-    PCHAR2(12, '.',  S_ndoor, "no door", "doorway", CLR(CLR_GRAY))
-    PCHAR2(13, '-',  S_vodoor,
-           "vertical open door", "open door", CLR(CLR_BROWN))
-    PCHAR2(14, '|',  S_hodoor,
-           "horizontal open door", "open door", CLR(CLR_BROWN))
-    PCHAR2(15, '+',  S_vcdoor,
-           "vertical closed door", "closed door", CLR(CLR_BROWN))
-    PCHAR2(16, '+',  S_hcdoor,
-           "horizontal closed door", "closed door", CLR(CLR_BROWN))
-    PCHAR( 17, '#',  S_bars, "iron bars", CLR(HI_METAL))
-    PCHAR( 18, '#',  S_tree, "tree", CLR(CLR_GREEN))
-    PCHAR( 19, '.',  S_room, "floor of a room", CLR(CLR_GRAY))
+    PCHAR2(12, '.',  S_ndoor,  "no door", "doorway", CLR(CLR_GRAY))
+    PCHAR2(13, '-',  S_vodoor, "vertical open door",
+                               "open door", CLR(CLR_BROWN))
+    PCHAR2(14, '|',  S_hodoor, "horizontal open door",
+                               "open door", CLR(CLR_BROWN))
+    PCHAR2(15, '+',  S_vcdoor, "vertical closed door",
+                               "closed door", CLR(CLR_BROWN))
+    PCHAR2(16, '+',  S_hcdoor, "horizontal closed door",
+                               "closed door", CLR(CLR_BROWN))
+    PCHAR( 17, '#',  S_bars,   "iron bars", CLR(HI_METAL))
+    PCHAR( 18, '#',  S_tree,   "tree", CLR(CLR_GREEN))
+    PCHAR( 19, '.',  S_room,   "floor of a room", CLR(CLR_GRAY))
     PCHAR( 20, '.',  S_darkroom, "dark part of a room", CLR(CLR_BLACK))
-    PCHAR2(21, '#',  S_corr, "dark corridor", "corridor", CLR(CLR_GRAY))
+    PCHAR2(21, '#',  S_corr,   "dark corridor", "corridor", CLR(CLR_GRAY))
     PCHAR( 22, '#',  S_litcorr, "lit corridor", CLR(CLR_GRAY))
     PCHAR2(23, '<',  S_upstair, "up stairs", "staircase up", CLR(CLR_GRAY))
     PCHAR2(24, '>',  S_dnstair, "down stairs", "staircase down", CLR(CLR_GRAY))
@@ -129,15 +124,15 @@
     PCHAR( 29, '<',  S_brupladder, "branch ladder up", CLR(CLR_YELLOW))
     PCHAR( 30, '>',  S_brdnladder, "branch ladder down", CLR(CLR_YELLOW))
     /* end cmap A */
-    PCHAR( 31, '_',  S_altar, "altar", CLR(CLR_GRAY))
+    PCHAR( 31, '_',  S_altar,  "altar", CLR(CLR_GRAY))
     /* start cmap B */
-    PCHAR( 32, '|',  S_grave, "grave", CLR(CLR_WHITE))
+    PCHAR( 32, '|',  S_grave,  "grave", CLR(CLR_WHITE))
     PCHAR2(33, '\\', S_throne, "throne", "opulent throne", CLR(HI_GOLD))
-    PCHAR( 34, '{',  S_sink, "sink", CLR(CLR_WHITE))
+    PCHAR( 34, '{',  S_sink,   "sink", CLR(CLR_WHITE))
     PCHAR( 35, '{',  S_fountain, "fountain", CLR(CLR_BRIGHT_BLUE))
-    PCHAR2(36, '}',  S_pool, "pool", "water", CLR(CLR_BLUE))
-    PCHAR( 37, '.',  S_ice, "ice", CLR(CLR_CYAN))
-    PCHAR( 38, '}',  S_lava, "molten lava", CLR(CLR_RED))
+    PCHAR2(36, '}',  S_pool,   "pool", "water", CLR(CLR_BLUE))
+    PCHAR( 37, '.',  S_ice,    "ice", CLR(CLR_CYAN))
+    PCHAR( 38, '}',  S_lava,   "molten lava", CLR(CLR_RED))
     PCHAR2(39, '.',  S_vodbridge, "vertical open drawbridge",
                                   "lowered drawbridge", CLR(CLR_BROWN))
     PCHAR2(40, '.',  S_hodbridge, "horizontal open drawbridge",
@@ -146,9 +141,9 @@
                                   "raised drawbridge", CLR(CLR_BROWN))
     PCHAR2(42, '#',  S_hcdbridge, "horizontal closed drawbridge",
                                   "raised drawbridge", CLR(CLR_BROWN))
-    PCHAR( 43, ' ',  S_air, "air", CLR(CLR_CYAN))
-    PCHAR( 44, '#',  S_cloud, "cloud", CLR(CLR_GRAY))
-    PCHAR( 45, '}',  S_water, "water", CLR(CLR_BLUE))
+    PCHAR( 43, ' ',  S_air,    "air", CLR(CLR_CYAN))
+    PCHAR( 44, '#',  S_cloud,  "cloud", CLR(CLR_GRAY))
+    PCHAR( 45, '}',  S_water,  "water", CLR(CLR_BLUE))
     /* end dungeon characters                                          */
     /*                                                                 */
     /* begin traps                                                     */
@@ -160,7 +155,7 @@
     PCHAR( 50, '^',  S_bear_trap, "bear trap", CLR(HI_METAL))
     PCHAR( 51, '^',  S_land_mine, "land mine", CLR(CLR_RED))
     PCHAR( 52, '^',  S_rolling_boulder_trap, "rolling boulder trap",
-                     CLR(CLR_GRAY))
+                                             CLR(CLR_GRAY))
     PCHAR( 53, '^',  S_sleeping_gas_trap, "sleeping gas trap", CLR(HI_ZAP))
     PCHAR( 54, '^',  S_rust_trap, "rust trap", CLR(CLR_BLUE))
     PCHAR( 55, '^',  S_fire_trap, "fire trap", CLR(CLR_ORANGE))
@@ -169,14 +164,14 @@
     PCHAR( 58, '^',  S_hole, "hole", CLR(CLR_BROWN))
     PCHAR( 59, '^',  S_trap_door, "trap door", CLR(CLR_BROWN))
     PCHAR( 60, '^',  S_teleportation_trap, "teleportation trap",
-                     CLR(CLR_MAGENTA))
+                                           CLR(CLR_MAGENTA))
     PCHAR( 61, '^',  S_level_teleporter, "level teleporter", CLR(CLR_MAGENTA))
     PCHAR( 62, '^',  S_magic_portal, "magic portal", CLR(CLR_BRIGHT_MAGENTA))
     PCHAR( 63, '"',  S_web, "web", CLR(CLR_GRAY))
     PCHAR( 64, '^',  S_statue_trap, "statue trap", CLR(CLR_GRAY))
     PCHAR( 65, '^',  S_magic_trap, "magic trap", CLR(HI_ZAP))
     PCHAR2(66, '^',  S_anti_magic_trap, "anti magic trap", "anti-magic field",
-                     CLR(HI_ZAP))
+                                        CLR(HI_ZAP))
     PCHAR( 67, '^',  S_polymorph_trap, "polymorph trap", CLR(CLR_BRIGHT_GREEN))
     PCHAR( 68, '~',  S_vibrating_square, "vibrating square", CLR(CLR_MAGENTA))
     PCHAR( 69, '^',  S_trapped_door, "trapped door", CLR(CLR_ORANGE))
@@ -261,13 +256,11 @@
 
 #if defined(MONSYMS_S_ENUM)
 /* sym.h */
-#define MONSYM(idx, ch, basename, sym, desc) \
-    sym = idx,
+#define MONSYM(idx, ch, basename, sym, desc) sym = idx,
 
 #elif defined(MONSYMS_DEFCHAR_ENUM)
 /* sym.h */
-#define MONSYM(idx, ch, basename, sym,  desc) \
-    DEF_##basename = ch,
+#define MONSYM(idx, ch, basename, sym,  desc) DEF_##basename = ch,
 
 #elif defined(MONSYMS_PARSE)
 /* symbols.c */
@@ -276,8 +269,7 @@
 
 #elif defined(MONSYMS_DRAWING)
 /* drawing.c */
-#define MONSYM(idx, ch, basename, sym, desc) \
-    { DEF_##basename, "", desc },
+#define MONSYM(idx, ch, basename, sym, desc) { DEF_##basename, "", desc },
 #endif
 
     MONSYM( 1, 'a', ANT, S_ANT,   "ant or other insect")
@@ -354,8 +346,8 @@
     MONSYM(60, ']', MIMIC_DEF, S_MIMIC_DEF, "mimic")
 
 #undef MONSYM
-#endif /* MONSYMS_S_ENUM || MONSYMS_DEFCHAR_ENUM || MONSYMS_PARSE */
-       /* || MONSYMS_DRAWING */
+#endif /* MONSYMS_S_ENUM || MONSYMS_DEFCHAR_ENUM || MONSYMS_PARSE
+        * || MONSYMS_DRAWING */
 
 #if defined(OBJCLASS_S_ENUM) || defined(OBJCLASS_DEFCHAR_ENUM) \
         || defined(OBJCLASS_CLASS_ENUM) || defined(OBJCLASS_PARSE) \
@@ -371,7 +363,7 @@
         name:     used in object_detect()
         explain:  used in do_look()
 
-    OBJCLASS7(idx, ch, basename, sname, sym, name, explain)
+    OBJCLASS2(idx, ch, basename, sname, sym, name, explain)
         idx:      index used in enum
         ch:       default character
         basename: unadorned base name of objclass, used
@@ -387,62 +379,64 @@
 /* objclass.h */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
     basename##_CLASS = idx,
-#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
-    basename##_CLASS = idx,
 
 #elif defined(OBJCLASS_DEFCHAR_ENUM)
 /* objclass.h */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
     basename##_SYM = ch,
-#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
-    sname = ch,
 
 #elif defined(OBJCLASS_S_ENUM)
 /* objclass.h */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
-    sym = idx,
-#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
     sym = idx,
 
 #elif defined(OBJCLASS_PARSE)
 /* symbols.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
     { SYM_OC, sym + SYM_OFF_O, #sym },
-#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
-    { SYM_OC, sym + SYM_OFF_O, #sym },
 
 #elif defined(OBJCLASS_DRAWING)
 /* drawing.c */
 #define OBJCLASS(idx, ch, basename, sym, name, explain) \
     { basename##_SYM, name, explain },
-#define OBJCLASS7(idx, ch, basename, sname, sym, name, explain) \
+#endif
+
+/* OBJCLASS with extra arg */
+#if defined(OBJCLASS_DEFCHAR_ENUM)
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
+    sname = ch,
+#elif defined(OBJCLASS_DRAWING)
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
     { sname, name, explain },
+#else
+#define OBJCLASS2(idx, ch, basename, sname, sym, name, explain) \
+    OBJCLASS(idx, ch, basename, sym, name, explain)
 #endif
 
     OBJCLASS( 1,  ']', ILLOBJ, S_strange_obj, "illegal objects",
-                           "strange object")
+                                              "strange object")
     OBJCLASS( 2,  ')', WEAPON, S_weapon, "weapons", "weapon")
-    OBJCLASS( 3,  '[', ARMOR, S_armor, "armor", "suit or piece of armor")
-    OBJCLASS( 4,  '=', RING, S_ring, "rings", "ring")
+    OBJCLASS( 3,  '[', ARMOR,  S_armor, "armor", "suit or piece of armor")
+    OBJCLASS( 4,  '=', RING,   S_ring, "rings", "ring")
     OBJCLASS( 5,  '"', AMULET, S_amulet, "amulets", "amulet")
-    OBJCLASS( 6,  '(', TOOL, S_tool, "tools",
-                           "useful item (pick-axe, key, lamp...)")
-    OBJCLASS( 7,  '%', FOOD, S_food, "food", "piece of food")
+    OBJCLASS( 6,  '(', TOOL,   S_tool, "tools",
+                                       "useful item (pick-axe, key, lamp...)")
+    OBJCLASS( 7,  '%', FOOD,   S_food, "food", "piece of food")
     OBJCLASS( 8,  '!', POTION, S_potion, "potions", "potion")
     OBJCLASS( 9,  '?', SCROLL, S_scroll, "scrolls", "scroll")
     OBJCLASS(10,  '+', SPBOOK, S_book, "spellbooks", "spellbook")
-    OBJCLASS(11,  '/', WAND, S_wand, "wands", "wand")
-    OBJCLASS7(12, '$', COIN, GOLD_SYM, S_coin, "coins", "pile of coins")
-    OBJCLASS(13,  '*', GEM, S_gem, "rocks", "gem or rock")
-    OBJCLASS(14,  '`', ROCK, S_rock, "large stones", "boulder or statue")
-    OBJCLASS(15,  '0', BALL, S_ball, "iron balls", "iron ball")
-    OBJCLASS(16,  '_', CHAIN, S_chain, "chains", "iron chain")
-    OBJCLASS(17,  '.', VENOM, S_venom, "venoms", "splash of venom")
+    OBJCLASS(11,  '/', WAND,   S_wand, "wands", "wand")
+    OBJCLASS2(12, '$', COIN,   GOLD_SYM, S_coin, "coins", "pile of coins")
+    OBJCLASS(13,  '*', GEM,    S_gem, "rocks", "gem or rock")
+    OBJCLASS(14,  '`', ROCK,   S_rock, "large stones", "boulder or statue")
+    OBJCLASS(15,  '0', BALL,   S_ball, "iron balls", "iron ball")
+    OBJCLASS(16,  '_', CHAIN,  S_chain, "chains", "iron chain")
+    OBJCLASS(17,  '.', VENOM,  S_venom, "venoms", "splash of venom")
 
 #undef OBJCLASS
-#undef OBJCLASS7
-#endif /* OBJCLASS_S_ENUM || OBJCLASS_DEFCHAR_ENUM || OBJCLASS_CLASS_ENUM */
-       /* || OBJCLASS_PARSE || OBJCLASS_DRAWING */
+#undef OBJCLASS2
+#endif /* OBJCLASS_S_ENUM || OBJCLASS_DEFCHAR_ENUM || OBJCLASS_CLASS_ENUM
+        * || OBJCLASS_PARSE || OBJCLASS_DRAWING */
 
 #undef CLR
 

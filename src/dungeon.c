@@ -2018,7 +2018,7 @@ lev_by_name(const char *nam)
             else
                 nam = "valley";
         } else if (!strcmpi(nam, "delphi")) {
-            /* Oracle says "welcome to Delphi" so recognize that name too */ 
+            /* Oracle says "welcome to Delphi" so recognize that name too */
             nam = "oracle";
         }
 
