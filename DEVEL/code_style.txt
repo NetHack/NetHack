@@ -163,6 +163,13 @@ wrapped in an additional set of parentheses for clarity:
         /* body */
     }
 
+Variable names to avoid
+-----------------------
+
+    near, far    Some compilers and cross-compilers that target old
+                 processors with segmented architectures may treat
+                 those as keywords. It is safest to just avoid them.
+
 Spaces in Expressions
 ---------------------
 
