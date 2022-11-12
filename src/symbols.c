@@ -1155,7 +1155,7 @@ purge_custom_entries(enum graphics_sets which_set)
 {
     struct symset_customization *gdc = &g.sym_customizations[which_set];
     struct customization_detail *details = gdc->details, *next;
-    if (details) {
+    while (details) {
         next = details->next;
         if (gdc->custtype == custom_ureps) {
             if (details->content.urep.u.utf8str)
