@@ -71,10 +71,12 @@ static struct icon_info {
     const char *name;
     unsigned char *bits;
     unsigned width, height;
-} icon_data[] = { { "nh72", nh72icon_bits, nh72icon_width, nh72icon_height },
-                  { "nh56", nh56icon_bits, nh56icon_width, nh56icon_height },
-                  { "nh32", nh32icon_bits, nh32icon_width, nh32icon_height },
-                  { (const char *) 0, (unsigned char *) 0, 0, 0 } };
+} icon_data[] = {
+    { "nh72", nh72icon_bits, nh72icon_width, nh72icon_height },
+    { "nh56", nh56icon_bits, nh56icon_width, nh56icon_height },
+    { "nh32", nh32icon_bits, nh32icon_width, nh32icon_height },
+    { (const char *) 0, (unsigned char *) 0, 0, 0 }
+};
 
 /*
  * Private global variables (shared among the window port files).
@@ -82,14 +84,14 @@ static struct icon_info {
 struct xwindow window_list[MAX_WINDOWS];
 AppResources appResources;
 void (*input_func)(Widget, XEvent *, String *, Cardinal *);
-int click_x, click_y, click_button; /* Click position on a map window   */
-                                    /* (filled by set_button_values()). */
+int click_x, click_y, click_button; /* Click position on a map window
+                                     * (filled by set_button_values()). */
 int updated_inventory; /* used to indicate perm_invent updating */
 
 static void X11_error_handler(String) NORETURN;
 static int X11_io_error_handler(Display *);
 
-static int (*old_error_handler) (Display *, XErrorEvent *);
+static int (*old_error_handler)(Display *, XErrorEvent *);
 
 #if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
 #if XtSpecificationRelease >= 6
@@ -398,10 +400,11 @@ XtConvertArgRec const nhcolorConvertArgs[] = {
  * Return True if something close was found.
  */
 Boolean
-nhApproxColor(Screen *screen,    /* screen to use */
-              Colormap colormap, /* the colormap to use */
-              char *str,         /* color name */
-              XColor *color)     /* the X color structure; changed only if successful */
+nhApproxColor(
+    Screen *screen,    /* screen to use */
+    Colormap colormap, /* the colormap to use */
+    char *str,         /* color name */
+    XColor *color)     /* the X color structure; changed only if successful */
 {
     int ncells;
     long cdiff = 16777216; /* 2^24; hopefully our map is smaller */
@@ -430,10 +433,10 @@ nhApproxColor(Screen *screen,    /* screen to use */
         XQueryColors(DisplayOfScreen(screen), colormap, table, ncells);
     }
 
-/* go thru cells and look for the one with smallest diff        */
-/* diff is calculated abs(reddiff)+abs(greendiff)+abs(bluediff) */
-/* a more knowledgeable color person might improve this -dlc    */
-try_again:
+    /* go thru cells and look for the one with smallest diff;
+       diff is calculated abs(reddiff)+abs(greendiff)+abs(bluediff);
+       a more knowledgeable color person might improve this -dlc */
+ try_again:
     for (i = 0; i < ncells; i++) {
         if (table[i].flags == tmp.flags) {
             j = (int) table[i].red - (int) tmp.red;
@@ -473,9 +476,11 @@ try_again:
 }
 
 Boolean
-nhCvtStringToPixel(Display *dpy, XrmValuePtr args, Cardinal *num_args,
-                   XrmValuePtr fromVal, XrmValuePtr toVal,
-                   XtPointer *closure_ret)
+nhCvtStringToPixel(
+    Display *dpy,
+    XrmValuePtr args, Cardinal *num_args,
+    XrmValuePtr fromVal, XrmValuePtr toVal,
+    XtPointer *closure_ret)
 {
     String str = (String) fromVal->addr;
     XColor screenColor;
@@ -564,9 +569,10 @@ nhCvtStringToPixel(Display *dpy, XrmValuePtr args, Cardinal *num_args,
 
 /* Ask the WM for window frame size */
 void
-get_window_frame_extents(Widget w,
-                         long *top, long *bottom,
-                         long *left, long *right)
+get_window_frame_extents(
+    Widget w,
+    long *top, long *bottom,
+    long *left, long *right)
 {
     XEvent event;
     Display *dpy = XtDisplay(w);
@@ -577,6 +583,8 @@ get_window_frame_extents(Widget w,
     unsigned long nbytes;
     unsigned char *data = 0;
     long *extents;
+
+    *top = *bottom = *left = *right = 0L;
 
     prop = XInternAtom(dpy, "_NET_FRAME_EXTENTS", True);
     if (prop == None) {
@@ -591,9 +599,11 @@ get_window_frame_extents(Widget w,
          * and also a smaller amount to the left every time it gets
          * updated.  Caveat:  amount determined by trial and error and
          * could change depending upon monitor resolution....
+         *
+         * This hack could be improved by implementing the anti-creep
+         * value as an X resource so that player can adjust it.
          */
-        *top = 22;
-        *left = 0;
+        *top = 22L;
 #endif
         return;
     }
@@ -607,18 +617,23 @@ get_window_frame_extents(Widget w,
     }
 
     extents = (long *) data;
-
-    *left = extents[0];
-    *right = extents[1];
-    *top = extents[2];
-    *bottom = extents[3];
+    if (extents) {
+        *left = extents[0];
+        *right = extents[1];
+        *top = extents[2];
+        *bottom = extents[3];
+    }
 }
 
 void
-get_widget_window_geometry(Widget w, int *x, int *y, int *width, int *height)
+get_widget_window_geometry(
+    Widget w,
+    int *x, int *y,
+    int *width, int *height)
 {
     long top, bottom, left, right;
     Arg args[5];
+
     XtSetArg(args[0], nhStr(XtNx), x);
     XtSetArg(args[1], nhStr(XtNy), y);
     XtSetArg(args[2], nhStr(XtNwidth), width);
@@ -682,11 +697,12 @@ load_boldfont(struct xwindow *wp, Widget w)
 #ifdef TEXTCOLOR
 /* ARGSUSED */
 static void
-nhFreePixel(XtAppContext app,
-            XrmValuePtr toVal,
-            XtPointer closure,
-            XrmValuePtr args,
-            Cardinal *num_args)
+nhFreePixel(
+    XtAppContext app,
+    XrmValuePtr toVal,
+    XtPointer closure,
+    XrmValuePtr args,
+    Cardinal *num_args)
 {
     Screen *screen;
     Colormap colormap;
@@ -743,8 +759,9 @@ static String *default_resource_data = 0, /* NULL-terminated arrays */
 
 /* caller found "#define"; parse into macro name and its expansion value */
 static boolean
-new_resource_macro(String inbuf, /* points past '#define' rather than to start of buffer */
-                   unsigned numdefs) /* array slot to fill */
+new_resource_macro(
+    String inbuf, /* points past '#define' rather than to start of buffer */
+    unsigned numdefs) /* array slot to fill */
 {
     String p, q;
 
