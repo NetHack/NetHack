@@ -1658,6 +1658,8 @@ X11_exit_nhwindows(const char *dummy)
 
     release_getline_widgets();
     release_yn_widgets();
+
+    x_inited = FALSE;
 }
 
 #ifdef X11_HANGUP_SIGNAL
