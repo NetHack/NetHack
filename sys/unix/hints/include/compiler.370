@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  compiler.370 $NHDT-Date: 1637992237 2021/11/27 05:50:37 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  compiler.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -132,25 +132,6 @@ endif  # clang++ greater than or equal to 14
 CCXXFLAGS+=-Wno-deprecated-declarations
 endif  # WANT_WIN_QT
 endif  # clang-specific ends here
-
-ifdef MAKEFILE_SRC
-ifdef WANT_WIN_QT
-# when switching from Qt5 to Qt6 or vice versa, any old .moc files will be
-# incompatible; get rid of them in case user hasn't run 'make spotless';
-# object files are incompatable with Qt library, so get rid of them too;
-# Qt*.h-t are empty timestamp files and at most one should exist
-QTany_H = Qt*.h-t
-ifdef WANT_WIN_QT6
-# Qt 6 builds and runs (with a couple of warnings) but needs more testing
-QTn_H = Qt6.h-t
-else
-# Qt 5 is currently the default version for nethack 3.7.x's Qt interface
-QTn_H = Qt5.h-t
-endif
-$(QTn_H) ::
-	@if test ! -f $@; then ( rm -f $(QTany_H) *.moc qt_*.o; touch $@ ); fi;
-endif #WANT_WIN_QT
-endif #MAKFILE_SRC
 
 #end of compiler.370
 #------------------------------------------------------------------------------

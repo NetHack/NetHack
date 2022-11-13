@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.370 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+# NetHack 3.7  linux.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -86,15 +86,9 @@ endif
 
 #-INCLUDE compiler.370
 
-ifdef WANT_WIN_TTY
-USE_CURSESLIB=1
-endif
+# multiw-3.370 must come after compiler.370
 
-ifdef WANT_WIN_CURSES
-ifneq "$(USE_CURSESLIB)" "1"
-USE_CURSESLIB=1
-endif
-endif
+#-INCLUDE multiw-3.370
 
 ifeq "$(USE_CURSESLIB)" "1"
 # default
