@@ -50,7 +50,7 @@ awaken_monsters(int distance)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
-        if ((distm = distu(mtmp->mx, mtmp->my)) < distance) {
+        if ((distm = mdistu(mtmp)) < distance) {
             mtmp->msleeping = 0;
             mtmp->mcanmove = 1;
             mtmp->mfrozen = 0;
@@ -79,7 +79,7 @@ put_monsters_to_sleep(int distance)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
-        if (distu(mtmp->mx, mtmp->my) < distance
+        if (mdistu(mtmp) < distance
             && sleep_monst(mtmp, d(10, 10), TOOL_CLASS)) {
             mtmp->msleeping = 1; /* 10d10 turns + wake_nearby to rouse */
             slept_monst(mtmp);
@@ -101,7 +101,7 @@ charm_snakes(int distance)
         if (DEADMONSTER(mtmp))
             continue;
         if (mtmp->data->mlet == S_SNAKE && mtmp->mcanmove
-            && distu(mtmp->mx, mtmp->my) < distance) {
+            && mdistu(mtmp) < distance) {
             was_peaceful = mtmp->mpeaceful;
             mtmp->mpeaceful = 1;
             mtmp->mavenge = 0;
@@ -134,7 +134,7 @@ calm_nymphs(int distance)
         if (DEADMONSTER(mtmp))
             continue;
         if (mtmp->data->mlet == S_NYMPH && mtmp->mcanmove
-            && distu(mtmp->mx, mtmp->my) < distance) {
+            && mdistu(mtmp) < distance) {
             mtmp->msleeping = 0;
             mtmp->mpeaceful = 1;
             mtmp->mavenge = 0;
@@ -170,7 +170,7 @@ awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
                 Norep("%s the rattle of battle gear being readied.",
                       "You hear");  /* Deaf-aware */
         } else if ((distm = ((bugler == &g.youmonst)
-                                 ? distu(mtmp->mx, mtmp->my)
+                                 ? mdistu(mtmp)
                                  : dist2(bugler->mx, bugler->my, mtmp->mx,
                                          mtmp->my))) < distance) {
             mtmp->msleeping = 0;
@@ -204,7 +204,7 @@ charm_monsters(int distance)
         if (DEADMONSTER(mtmp))
             continue;
 
-        if (distu(mtmp->mx, mtmp->my) <= distance) {
+        if (mdistu(mtmp) <= distance) {
             /* a shopkeeper can't be tamed but tamedog() pacifies an angry
                one; do that even if mtmp resists in order to behave the same
                as a non-cursed scroll of taming or spell of charm monster */

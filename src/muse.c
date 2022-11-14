@@ -133,7 +133,7 @@ precheck(struct monst* mon, struct obj* obj)
                            ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
             You_hear("a zap and an explosion %s.",
-                     (distu(mon->mx, mon->my) <= range * range)
+                     (mdistu(mon) <= range * range)
                         ? "nearby" : "in the distance");
         }
         m_useup(mon, obj);
@@ -164,7 +164,7 @@ mzapwand(
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
-        You_hear("a %s zap.", (distu(mtmp->mx, mtmp->my) <= range * range)
+        You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
                                  ? "nearby" : "distant");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
@@ -192,8 +192,8 @@ mplayhorn(
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
         You_hear("a horn being played %s.",
-                 (distu(mtmp->mx, mtmp->my) <= range * range)
-                 ? "nearby" : "in the distance");
+                 (mdistu(mtmp) <= range * range)
+                    ? "nearby" : "in the distance");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
     } else if (self) {
         otmp->dknown = 1;
@@ -2063,7 +2063,7 @@ mloot_container(
         takeout_count = 4;
         break;
     }
-    howfar = distu(mon->mx, mon->my);
+    howfar = mdistu(mon);
     nearby = (howfar <= 7 * 7);
     contnr_nam[0] = mpronounbuf[0] = '\0';
     if (vismon) {

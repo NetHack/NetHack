@@ -2035,7 +2035,7 @@ revive_corpse(struct obj *corpse)
                     pline("%s claws itself out of the ground!",
                           canspotmon(mtmp) ? Amonnam(mtmp) : Something);
                     newsym(mtmp->mx, mtmp->my);
-                } else if (distu(mtmp->mx, mtmp->my) < 5*5)
+                } else if (mdistu(mtmp) < 5*5)
                     You_hear("scratching noises.");
                 break;
             }

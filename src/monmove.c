@@ -33,8 +33,7 @@ mb_trapped(struct monst *mtmp, boolean canseeit)
             pline("KABOOM!!  You see a door explode.");
         else if (!Deaf)
             You_hear("a %s explosion.",
-                     (distu(mtmp->mx, mtmp->my) > 7 * 7) ? "distant"
-                                                         : "nearby");
+                     (mdistu(mtmp) > 7 * 7) ? "distant" : "nearby");
     }
     wake_nearto(mtmp->mx, mtmp->my, 7 * 7);
     mtmp->mstun = 1;
@@ -153,7 +152,7 @@ dochugw(
         /* monster is hostile and can attack (or hallu distorts knowledge) */
         && (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
         /* it's close enough to be a threat */
-        && distu(mtmp->mx, mtmp->my) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
+        && mdistu(mtmp) <= (BOLT_LIM + 1) * (BOLT_LIM + 1)
         /* and either couldn't see it before, or it was too far away */
         && (!already_saw_mon || !couldsee(x, y)
             || distu(x, y) > (BOLT_LIM + 1) * (BOLT_LIM + 1))
@@ -257,7 +256,7 @@ disturb(register struct monst *mtmp)
      *  Aggravate or mon is (dog or human) or
      *      (1/7 and mon is not mimicing furniture or object)
      */
-    if (couldsee(mtmp->mx, mtmp->my) && distu(mtmp->mx, mtmp->my) <= 100
+    if (couldsee(mtmp->mx, mtmp->my) && mdistu(mtmp) <= 100
         && (!Stealth || (mtmp->data == &mons[PM_ETTIN] && rn2(10)))
         && (!(mtmp->data->mlet == S_NYMPH
               || mtmp->data == &mons[PM_JABBERWOCK]
@@ -477,7 +476,7 @@ mind_blast(register struct monst* mtmp)
 
     if (canseemon(mtmp))
         pline("%s concentrates.", Monnam(mtmp));
-    if (distu(mtmp->mx, mtmp->my) > BOLT_LIM * BOLT_LIM) {
+    if (mdistu(mtmp) > BOLT_LIM * BOLT_LIM) {
         You("sense a faint wave of psychic energy.");
         return;
     }
