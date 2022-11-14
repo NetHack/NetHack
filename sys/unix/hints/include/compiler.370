@@ -147,9 +147,9 @@ CCXX=clang++ -std=c++17
 endif  # clang++ greater than or equal to 14
 endif  # CPLUSPLUS_NEED17
 endif  # end of clang++-specific section
+CXX=$(CCXX)
 endif  # CPLUSPLUS_NEEDED
 
-CXX=$(CCXX)
 endif   # MAKEFILE_SRC
 
 #end of compiler.370
