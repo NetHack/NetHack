@@ -14,7 +14,7 @@ extern char *fmt_ptr(const void *) NONNULL;
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 
 /* ### allmain.c ### */
 
@@ -782,9 +782,11 @@ extern void done1(int);
 extern int done2(void);
 extern void done_in_by(struct monst *, int);
 extern void done_object_cleanup(void);
-#endif /* !MAKEDEFS_C && MDLIB_C */
+#endif /* !MAKEDEFS_C && MDLIB_C && !CPPREGEX_C */
+#if !defined(CPPREGEX_C)
 extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
-#if !defined(MAKEDEFS_C) && !defined(MDLIB_C)
+#endif
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 extern void done(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
 extern void nh_terminate(int) NORETURN;
@@ -1377,7 +1379,7 @@ extern void clear_level_structures(void);
 extern void level_finalize_topology(void);
 extern void mklev(void);
 #ifdef SPECIALIZATION
-extern void topologize(struct mkroom *, boolean));
+extern void topologize(struct mkroom *, boolean);
 #else
 extern void topologize(struct mkroom *);
 #endif
@@ -1855,6 +1857,7 @@ extern char *stripdigits(char *);
 extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
+#endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 
 /* ### nhregex.c ### */
 
@@ -1863,6 +1866,8 @@ extern boolean regex_compile(const char *, struct nhregex *);
 extern char *regex_error_desc(struct nhregex *, char *);
 extern boolean regex_match(const char *, struct nhregex *);
 extern void regex_free(struct nhregex *);
+
+#if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 
 /* ### consoletty.c ### */
 

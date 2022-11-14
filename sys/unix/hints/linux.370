@@ -20,40 +20,6 @@
 #        multiw-1.370 contains sections 1 to 2
 #-INCLUDE multiw-1.370
 
-# 3. If you set WANT_WIN_QT, you need to
-#  A) set QTDIR either here or in the environment  to point to the Qt5
-#     Library installation root.
-#  B) set XPMLIB to point to the Xpm library
-ifndef WANT_WIN_QT
-ifdef WANT_WIN_ALL
-WANT_WIN_QT=1
-endif
-ifdef WANT_WIN_QT5
-ifndef WANT_WIN_QT
-WANT_WIN_QT=1
-endif   # not WANT_WIN_QT
-endif   # WANT_WIN_QT5
-ifdef WANT_WIN_QT6
-ifndef WANT_WIN_QT
-WANT_WIN_QT=1
-endif   # not WANT_WIN_QT
-endif   # WANT_WIN_QT6
-endif   # not WANT_WIN_QT
-
-ifdef WANT_WIN_QT
-ifndef WANT_WIN_QT5
-ifndef WANT_WIN_QT6
-WANT_WIN_QT5=1
-endif   # not WANT_WIN_QT6
-endif   # not WANT_WIN_QT5
-ifdef WANT_WIN_QT5
-QTDIR=/usr
-endif  # WANT_WIN_QT5
-ifdef WANT_WIN_QT6
-#if your Qt6 is elsewhere, change this to match
-QTDIR=/usr/local/qt6
-endif   # WANT_WIN_QT6
-endif  # WANT_WIN_QT
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -68,17 +34,6 @@ GAMEGRP  = games
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-ifeq "$(GIT)" "1"
-ifndef GITSUBMODULES
-GITSUBMODULES=1
-endif
-endif
-ifeq "$(git)" "1"
-ifndef GITSUBMODULES
-GITSUBMODULES=1
-endif
-endif
-
 #-INCLUDE multiw-2.370
 
 # compiler.370 contains compiler detection and adjustments common
@@ -86,8 +41,19 @@ endif
 
 #-INCLUDE compiler.370
 
-# multiw-3.370 must come after compiler.370
+ifdef WANT_WIN_QT
+ifdef WANT_WIN_QT5
+QTDIR=/usr
+endif  # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+#if your Qt6 is elsewhere, change this to match
+QTDIR=/usr/local/qt6
+endif   # WANT_WIN_QT6
+endif  # WANT_WIN_QT
 
+# multiw-3.370 must come after compiler.370
+# and after QTDIR is defined.
+#
 #-INCLUDE multiw-3.370
 
 ifeq "$(USE_CURSESLIB)" "1"

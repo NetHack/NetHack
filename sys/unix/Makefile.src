@@ -202,7 +202,7 @@ TARGET_LIBS = $(LIBS)
 CPPFLAGS =
 
 # file for regular expression matching
-REGEXOBJ = $(TARGETPFX)posixregex.o
+REGEXOBJ ?= $(TARGETPFX)posixregex.o
 #REGEXOBJ = $(TARGETPFX)pmatchregex.o
 #REGEXOBJ = $(TARGETPFX)cppregex.o
 
@@ -906,6 +906,7 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ tile.c
 $(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)

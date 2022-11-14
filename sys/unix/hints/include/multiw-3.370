@@ -39,6 +39,32 @@ USE_CURSESLIB=1
 endif
 endif
 
+ifeq "$(GIT)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(git)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(CPPREGEX)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifeq "$(cppregex)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
 #end of hints/include/multiw-3.370
 #------------------------------------------------------------------------------
 

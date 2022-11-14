@@ -3,14 +3,19 @@
 /* Copyright (c) Sean Hunt  2015.                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+extern "C" {
+#include "config.h"
+#define CPPREGEX_C
+#include "extern.h"
+} // extern "C"
+
 #include <regex>
 #include <memory>
-
-/* nhregex interface documented in sys/share/posixregex.c */
+#include <cstring>
 
 extern "C" { // rest of file
 
-#include "config.h"
+/* nhregex interface documented in sys/share/posixregex.c */
 
 extern const char regex_id[] = "cppregex";
 
@@ -76,7 +81,7 @@ regex_free(struct nhregex *re)
 {
     delete re;
 }
-
+#undef CPPREGEX_C
 } // extern "C"
 
 /*cppregex.cpp*/
