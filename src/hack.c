@@ -154,9 +154,9 @@ moverock(void)
     register coordxy rx, ry, sx, sy;
     struct obj *otmp;
     struct trap *ttmp;
-    struct monst *mtmp;
+    struct monst *mtmp, *shkp;
     const char *what;
-    boolean firstboulder = TRUE;
+    boolean costly, firstboulder = TRUE;
     int res = 0;
 
     sx = u.ux + u.dx, sy = u.uy + u.dy; /* boulder starting position */
@@ -243,6 +243,8 @@ moverock(void)
                 || doorless_door(rx, ry)) && !sobj_at(BOULDER, rx, ry)) {
             ttmp = t_at(rx, ry);
             mtmp = m_at(rx, ry);
+            costly = (!otmp->no_charge && costly_spot(sx, sy)
+                      && shop_keeper(*in_rooms(sx, sy, SHOPBASE)));
 
             /* KMH -- Sokoban doesn't let you push boulders diagonally */
             if (Sokoban && u.dx && u.dy) {
@@ -353,7 +355,7 @@ moverock(void)
                               (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole",
                               surface(rx, ry));
                     deltrap(ttmp);
-                    delobj(otmp);
+                    useupf(otmp, 1L);
                     bury_objs(rx, ry);
                     levl[rx][ry].wall_info &= ~W_NONDIGGABLE;
                     levl[rx][ry].candig = 1;
@@ -380,6 +382,8 @@ moverock(void)
                     if (ttmp->ttyp == TELEP_TRAP) {
                         (void) rloco(otmp);
                     } else {
+                        if (costly)
+                            addtobill(otmp, FALSE, FALSE, FALSE);
                         obj_extract_self(otmp);
                         add_to_migration(otmp);
                         get_level(&dest, newlev);
@@ -443,6 +447,14 @@ moverock(void)
                 feel_location(sx, sy);
             } else {
                 newsym(sx, sy);
+            }
+            /* maybe adjust bill if boulder was pushed across shop boundary */
+            if (costly && !costly_spot(rx, ry)) {
+                addtobill(otmp, FALSE, FALSE, FALSE);
+            } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
+                       && (shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
+                       && onbill(otmp, shkp, TRUE)) {
+                subfrombill(otmp, shkp);
             }
         } else {
  nopushmsg:

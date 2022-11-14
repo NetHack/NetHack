@@ -29,7 +29,6 @@ static const char the_contents_of[] = "the contents of ";
 static void append_honorific(char *);
 static long addupbill(struct monst *);
 static void pacify_shk(struct monst *, boolean);
-static struct bill_x *onbill(struct obj *, struct monst *, boolean);
 static struct monst *next_shkp(struct monst *, boolean);
 static long shop_debt(struct eshk *);
 static char *shk_owns(char *, struct obj *);
@@ -868,8 +867,8 @@ tended_shop(struct mkroom* sroom)
     return !mtmp ? FALSE : (boolean) inhishop(mtmp);
 }
 
-static struct bill_x *
-onbill(struct obj* obj, struct monst* shkp, boolean silent)
+struct bill_x *
+onbill(struct obj *obj, struct monst *shkp, boolean silent)
 {
     if (shkp) {
         register struct bill_x *bp = ESHK(shkp)->bill_p;
