@@ -826,9 +826,14 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
     struct obj *otmp;
 
     if (mtmp->mcan) {
-        if (!Deaf)
-            pline("A dry rattle comes from %s throat.",
-                  s_suffix(mon_nam(mtmp)));
+        if (!Deaf && distu(mtmp->mx, mtmp->my) < BOLT_LIM * BOLT_LIM) {
+            if (canspotmon(mtmp)) {
+                pline("A dry rattle comes from %s throat.",
+                      s_suffix(mon_nam(mtmp)));
+            } else {
+                You_hear("a dry rattle nearby.");
+            }
+        }
         return MM_MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
