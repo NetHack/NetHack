@@ -134,7 +134,7 @@ boulder_hits_pool(
 
         /* boulder is now gone */
         if (pushing)
-            delobj(otmp);
+            useupf(otmp, otmp->quan);
         else
             obfree(otmp, (struct obj *) 0);
         return TRUE;

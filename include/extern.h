@@ -2481,6 +2481,7 @@ extern void shopper_financial_report(void);
 extern int inhishop(struct monst *);
 extern struct monst *shop_keeper(char);
 extern boolean tended_shop(struct mkroom *);
+struct bill_x *onbill(struct obj *, struct monst *, boolean);
 extern boolean is_unpaid(struct obj *);
 extern void delete_contents(struct obj *);
 extern void obfree(struct obj *, struct obj *);
