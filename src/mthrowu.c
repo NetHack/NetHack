@@ -826,7 +826,7 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
     struct obj *otmp;
 
     if (mtmp->mcan) {
-        if (!Deaf && distu(mtmp->mx, mtmp->my) < BOLT_LIM * BOLT_LIM) {
+        if (!Deaf && mdistu(mtmp) < BOLT_LIM * BOLT_LIM) {
             if (canspotmon(mtmp)) {
                 pline("A dry rattle comes from %s throat.",
                       s_suffix(mon_nam(mtmp)));

@@ -3650,8 +3650,7 @@ shk_fixes_damage(struct monst *shkp)
     if (!dam)
         return;
 
-    shk_closeby = (distu(shkp->mx, shkp->my)
-                   <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
+    shk_closeby = (mdistu(shkp) <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
 
     if (canseemon(shkp))
         pline("%s whispers %s.", Shknam(shkp),
@@ -4221,7 +4220,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
             }
             if (!inhishop(tmp_shk))
                 continue;
-            shk_distance = distu(tmp_shk->mx, tmp_shk->my);
+            shk_distance = mdistu(tmp_shk);
             if (shk_distance > nearest_shk)
                 continue;
             if ((shk_distance == nearest_shk) && picks) {

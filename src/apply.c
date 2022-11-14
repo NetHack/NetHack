@@ -3288,8 +3288,7 @@ use_pole(struct obj *obj, boolean autohit)
     cc.y = u.uy;
     if (!find_poleable_mon(&cc, min_range, max_range) && hitm
         && !DEADMONSTER(hitm) && sensemon(hitm)
-        && distu(hitm->mx, hitm->my) <= max_range
-        && distu(hitm->mx, hitm->my) >= min_range) {
+        && mdistu(hitm) <= max_range && mdistu(hitm) >= min_range) {
         cc.x = hitm->mx;
         cc.y = hitm->my;
     }
