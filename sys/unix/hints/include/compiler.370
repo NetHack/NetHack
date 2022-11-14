@@ -127,23 +127,22 @@ else   # g++ or clang++ ?
 CCXX=clang++ -std=c++11
 # get the version of clang++
 CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+CLANGPPGTEQ11 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 11)
 CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
 ifeq "$(CLANGPPGTEQ9)" "1"
 #CCXXFLAGS+=-Wformat-overflow
-CCXXFLAGS+=-Wno-deprecated-copy
-endif  # clang++ greater than or equal to 9
-ifeq "$(CLANGPPGTEQ14)" "1"
+endif
+ifdef CPLUSPLUS_NEED_DEPSUPPRESS
+CCXXFLAGS+=-Wno-deprecated
 CCXXFLAGS+=-Wno-deprecated-declarations
-endif  # clang++ greater than or equal to 14
+endif  # CPLUSPLUS_NEED_DEPSUPPRESS
 # The clang++ linker seems to have trouble linking if the following isn't
 # included when compiling the C files by clang..
 CFLAGS+=-fPIC
 ifdef CPLUSPLUS_NEED17
 ifeq "$(CLANGPPGTEQ14)" "1"
-$(info greaterthanorequalto14)
 CCXX=clang++ -std=c++20
 else
-$(info not greaterthanorequalto14)
 CCXX=clang++ -std=c++17
 endif  # clang++ greater than or equal to 14
 endif  # CPLUSPLUS_NEED17
