@@ -18,8 +18,14 @@ nethack \- Exploring The Mazes of Menace
 .hy 0
 .B nethack
 [
-.B \-d
+.BR \-d | \-\-directory
 .I directory
+]
+.\" '.B token newline .I token' will include a space between the two tokens;
+.\" '.BI|BR token token' will not.
+[
+.BR \-w | \-\-windowtype
+.I interface
 ]
 [
 .B \-n
@@ -33,31 +39,59 @@ nethack \- Exploring The Mazes of Menace
 .I race
 ]
 [
-.B \-[DX]
-]
-[
 .B \-u
 .I playername
 ]
+.\" -[DX] used to be before -u but on Windows and MS-DOS, '-u wizard'
+.\" needs to be present before -D in order for it to be allowed, so show
+.\" -[DX} after '-u playername' even though this man page is for Unix.
+[
+.B \-[DX]
+]
+[
+.B \-\@
+]
 [
 .B \-dec
-]
-[
+|
 .B \-ibm
 ]
+.PP
+Also
 [
-.BR \-\-showpaths
-]
-[
-.BR \-\-version [ :paste ]
+.BR \-A | \-Arc
+|
+.BR \-B | \-Bar
+|
+.BR \-C | \-Cav
+|
+.BR \-H | \-Hea
+|
+.BR \-K | \-Kni
+|
+.BR \-M | \-Mon
+|
+.BR \-P | \-Pri
+|
+.BR \-R | \-Rog
+|
+.BR \-Ran
+|
+.BR \-S | \-Sam
+|
+.BR \-T | \-Tou
+|
+.BR \-V | \-Val
+|
+.BR \-W | \-Wiz
 ]
 .PP
 .B nethack
 [
-.B \-d
+.BR \-d | \-\-directory
 .I directory
 ]
-.B \-s
+.BR \-s | \-\-scores
 [
 .B \-v
 ]
@@ -71,6 +105,14 @@ nethack \- Exploring The Mazes of Menace
 ]
 [
 .I playernames
+]
+.PP
+.B nethack
+[
+.BR \-\-showpaths
+]
+[
+.BR \-\-version [ :paste ]
 ]
 .ad
 .hy 14
@@ -117,7 +159,7 @@ The ? command provides a description of these options and syntax.
 .B \-dec
 and
 .B \-ibm
-command line options are equivalent to the
+command line options are mutually exclusive and are equivalent to the
 .B decgraphics
 and
 .B ibmgraphics
@@ -130,7 +172,7 @@ graphics characters), options may also be included in a configuration
 file.
 The default is located in your home directory and
 named .nethackrc on Unix systems.  On other systems, the default may be
-different, usually NetHack.cnf.  On DOS or Windows, the name is
+different, usually NetHack.cnf.  On MS-DOS or Windows, the name is
 defaults.nh, while on the Macintosh or BeOS, it is NetHack Defaults.
 The configuration file's location may be specified by setting NETHACKOPTIONS
 to a string consisting of an @ character followed by the filename.
@@ -151,11 +193,11 @@ A
 suffix can be used to specify the profession, race, alignment and/or gender
 of the character.  The full syntax of the playername that includes a
 suffix is "name-ppp-rrr-aaa-ggg".  "ppp" are at least the first three letters
-of the profession (this can also be specified using a separate 
+of the profession (this can also be specified using a separate
 .B \-p
 .I profession
 option).  "rrr" are at least the first three letters of the character's
-race (this can also be specified using a separate 
+race (this can also be specified using a separate
 .B \-r
 .I race
 option).  "aaa" are at least the first three letters of the character's
@@ -178,12 +220,92 @@ Likewise,
 .I race
 can be used to explicitly request that a race be chosen.
 .PP
-Leaving out any of these characteristics will result in you being prompted
+.\" Note: 'BR -A | -Arc' produces "-A|-Arc" (no spaces);
+.\" '-A | -Arc' newline '|' newline '-B | -Bar' produces "-A|-Arc | -B|-Bar"
+The
+.BR \-A | \-Arc
+|
+.BR \-B | \-Bar
+|
+.BR \-C | \-Cav
+|
+.BR \-H | \-Hea
+|
+.BR \-K | \-Kni
+|
+.BR \-M | \-Mon
+|
+.BR \-P | \-Pri
+|
+.BR \-R | \-Rog
+|
+.BR \-Ran
+|
+.BR \-S | \-Sam
+|
+.BR \-T | \-Tou
+|
+.BR \-V | \-Val
+|
+.BR \-W | \-Wiz
+options for role selection are maintained for compatibility with older
+versions of the program.
+They are mutually exclusive and the single-letter form must be uppercase.
+.I Ranger
+has no single-letter choice because
+.B \-R
+is already used for the
+.I Rogue
+role.
+.PP
+.B \-\@
+choose any omitted characteristics (profession/role, race, gender,
+alignment) randomly without prompting.
+Otherwise, leaving out any of these characteristics will result in you
+being prompted
 during the game startup for the information.
 .PP
+The
+.B \-n
+option suppresses printing of any news from the game administrator.
 .PP
 The
-.B \-s
+.B \-D
+or
+.B \-X
+option will start the game in a special non-scoring discovery mode.
+.B \-D
+will, if the player is the game administrator, start in debugging (wizard)
+mode instead.
+.\" TODO? describe "WIZARDS=x y z" line from SYSCF/sysconf.
+.PP
+The
+.BR \-d " or " \-\-directory
+option, which must be the first argument if it appears,
+supplies a directory which is to serve as the playground.
+It overrides the value from NETHACKDIR, HACKDIR,
+or the directory specified by the game administrator during compilation
+(usually /usr/games/lib/nethackdir).
+This option is usually only useful to the game administrator.
+The playground must contain several auxiliary files such as help files,
+the list of top scorers, and a subdirectory
+.I save
+where games are saved.
+.PP
+The
+.BR \-w " or " \-\-windowtype
+.I
+interface
+option can be used to specify which interface to use if the program
+has been built with support for more than one.
+Specifying a value on the command line overrides any value
+specified in the run-time configuration file.
+NetHack's #version command shows available interfaces.
+.PP
+Some options provide feedback and then exit rather than play the game.
+.PP
+The
+.BR \-s " or " \-\-scores
 option alone will print out the list of your scores on the current version.
 An immediately following
 .B \-v
@@ -199,32 +321,6 @@ It may also be followed by one or more player names to print the scores of the
 players mentioned, by 'all' to print out all scores, or by a number to print
 that many top scores.
 .PP
-The
-.B \-n
-option suppresses printing of any news from the game administrator.
-.PP
-The
-.B \-D
-or
-.B \-X
-option will start the game in a special non-scoring discovery mode.
-.B \-D
-will, if the player is the game administrator, start in debugging (wizard)
-mode instead.
-.PP
-The
-.B \-d
-option, which must be the first argument if it appears,
-supplies a directory which is to serve as the playground.
-It overrides the value from NETHACKDIR, HACKDIR,
-or the directory specified by the game administrator during compilation
-(usually /usr/games/lib/nethackdir).
-This option is usually only useful to the game administrator.
-The playground must contain several auxiliary files such as help files,
-the list of top scorers, and a subdirectory
-.I save
-where games are saved.
-.PP
 .B \-\-showpaths
 can be used to cause NetHack to show where it is expecting
 to find various configuration files.
@@ -234,10 +330,10 @@ can be used to cause NetHack to show the version information it
 was compiled with, then exit. That will include the
 .I git
 commit hash if the information was available when the game was compiled.
-On some platforms, such as windows and macosx, a variation 
+On some platforms, such as Windows and macOS, a variation
 .B \-\-version:paste
 can be used to cause NetHack to show the version information, then exit,
-while also leaving a copy of the version information in the paste buffer 
+while also leaving a copy of the version information in the paste buffer
 or clipboard for potential insertion into things like bug reports.
 .SH AUTHORS
 .PP
