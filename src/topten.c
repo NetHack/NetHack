@@ -1146,10 +1146,13 @@ prscore(int argc, char **argv)
     boolean match_found = FALSE;
     register int i;
     char pbuf[BUFSZ];
+    unsigned ln = 0;
     int uid = -1;
     const char *player0;
 
-    if (argc < 2 || strncmp(argv[1], "-s", 2)) {
+    if (argc < 2 || (ln = Strlen(argv[1])) < 2
+        || (strncmp(argv[1], "-s", 2)
+            && (ln < 4 || strncmp(argv[1], "--scores", ln)))) {
         raw_printf("prscore: bad arguments (%d)", argc);
         return;
     }
@@ -1177,11 +1180,12 @@ prscore(int argc, char **argv)
         init_done = TRUE;
     }
 
-    if (!argv[1][2]) { /* plain "-s" */
+    /* 'ln' is 2 for -s, longer for --scores */
+    if (!argv[1][ln]) { /* plain "-s" */
         argc--;
         argv++;
     } else
-        argv[1] += 2;
+        argv[1] += ln;
 
     if (argc > 1 && !strcmp(argv[1], "-v")) {
         current_ver = FALSE;
