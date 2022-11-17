@@ -112,9 +112,6 @@ fightm(register struct monst *mtmp)
 {
     register struct monst *mon, *nmon;
     int result, has_u_swallowed;
-#ifdef LINT
-    nmon = 0;
-#endif
     /* perhaps the monster will resist Conflict */
     if (resist_conflict(mtmp))
         return 0;

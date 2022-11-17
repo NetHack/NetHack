@@ -136,9 +136,7 @@ int has_colors(void);
 
 #if defined(TTY_GRAPHICS) && ((!defined(SYSV) && !defined(HPUX)) \
                               || defined(UNIXPC) || defined(SVR4))
-#ifndef LINT
 extern /* it is defined in libtermlib (libtermcap) */
-#endif
     short ospeed; /* terminal baudrate; set by gettty */
 #else
 short ospeed = 0; /* gets around "not defined" error message */

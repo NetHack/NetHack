@@ -39,18 +39,6 @@ extern void panic(const char *, ...);
 long *
 alloc(unsigned int lth)
 {
-#ifdef LINT
-    /*
-     * a ridiculous definition, suppressing
-     *  "possible pointer alignment problem" for (long *) malloc()
-     * from lint
-     */
-    long dummy = ftell(stderr);
-
-    if (lth)
-        dummy = 0; /* make sure arg is used */
-    return &dummy;
-#else
     register genericptr_t ptr;
 
     ptr = malloc(lth);
@@ -59,18 +47,12 @@ alloc(unsigned int lth)
         panic("Memory allocation failure; cannot get %u bytes", lth);
 #endif
     return (long *) ptr;
-#endif
 }
 
 /* realloc() call that might get substituted by nhrealloc(p,n,file,line) */
 long *
 re_alloc(long *oldptr, unsigned int newlth)
 {
-    /*
-     * If LINT support ever gets resurrected,
-     * we'll probably need some hackery here.
-     */
-
     long *newptr = (long *) realloc((genericptr_t) oldptr, (size_t) newlth);
 #ifndef MONITOR_HEAP
     /* "extend to":  assume it won't ever fail if asked to shrink */

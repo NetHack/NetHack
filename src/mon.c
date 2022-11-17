@@ -4660,9 +4660,7 @@ newcham(
     /* set level and hit points */
     newmonhp(mtmp, monsndx(mdat));
     /* new hp: same fraction of max as before */
-#ifndef LINT
     mtmp->mhp = (int) (((long) hpn * (long) mtmp->mhp) / (long) hpd);
-#endif
     /* sanity check (potential overflow) */
     if (mtmp->mhp < 0 || mtmp->mhp > mtmp->mhpmax)
         mtmp->mhp = mtmp->mhpmax;
