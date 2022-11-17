@@ -731,6 +731,7 @@ scores_only(int argc, char **argv, const char *dir)
     panictrace_setsignals(TRUE);
 #endif
 #endif
+    (void) whoami(); /* set up default plname[] */
 
     prscore(argc, argv);
 
