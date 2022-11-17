@@ -4366,11 +4366,7 @@ end_engulf(void)
 static int
 gulpum(struct monst *mdef, struct attack *mattk)
 {
-#ifdef LINT /* static char msgbuf[BUFSZ]; */
-    char msgbuf[BUFSZ];
-#else
     static char msgbuf[BUFSZ]; /* for g.nomovemsg */
-#endif
     register int tmp;
     register int dam = d((int) mattk->damn, (int) mattk->damd);
     boolean fatal_gulp, u_digest = digests(g.youmonst.data);

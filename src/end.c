@@ -365,9 +365,7 @@ done2(void)
             done_stopprint++;
     }
 #endif
-#ifndef LINT
     done(QUIT);
-#endif
     return ECMD_OK;
 }
 

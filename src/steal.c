@@ -25,11 +25,7 @@ equipname(register struct obj* otmp)
 long
 somegold(long lmoney)
 {
-#ifdef LINT /* long conv. ok */
-    int igold = 0;
-#else
     int igold = (lmoney >= (long) LARGEST_INT) ? LARGEST_INT : (int) lmoney;
-#endif
 
     if (igold < 50)
         ; /* all gold */

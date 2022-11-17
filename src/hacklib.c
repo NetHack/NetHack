@@ -79,12 +79,6 @@
         void            nh_snprintf     (const char *, int, char *, size_t,
                                          const char *, ...)
 =*/
-#ifdef LINT
-#define Static /* pacify lint */
-#else
-#define Static static
-#endif
-
 static boolean pmatch_internal(const char *, const char *, boolean,
                                const char *);
 
@@ -371,7 +365,7 @@ strcasecpy(char *dst, const char *src)
 char *
 s_suffix(const char *s)
 {
-    Static char buf[BUFSZ];
+    static char buf[BUFSZ];
 
     Strcpy(buf, s);
     if (!strcmpi(buf, "it")) /* it -> its */
@@ -495,7 +489,7 @@ tabexpand(
 char *
 visctrl(char c)
 {
-    Static char visctrl_bufs[VISCTRL_NBUF][5];
+    static char visctrl_bufs[VISCTRL_NBUF][5];
     static int nbuf = 0;
     register int i = 0;
     char *ccc = visctrl_bufs[nbuf];
@@ -638,7 +632,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL  /* one compiler complains about
 char *
 sitoa(int n)
 {
-    Static char buf[13];
+    static char buf[13];
 
     Sprintf(buf, (n < 0) ? "%d" : "+%d", n);
     return buf;
@@ -1015,7 +1009,7 @@ getyear(void)
 char *
 yymmdd(time_t date)
 {
-    Static char datestr[10];
+    static char datestr[10];
     struct tm *lt;
 
     if (date == 0)

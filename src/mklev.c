@@ -49,13 +49,6 @@ static void mk_knox_portal(coordxy, coordxy);
 static int QSORTCALLBACK
 mkroom_cmp(const genericptr vx, const genericptr vy)
 {
-#ifdef LINT
-    /* lint complains about possible pointer alignment problems, but we know
-       that vx and vy are always properly aligned. Hence, the following
-       bogus definition:
-    */
-    return (vx == vy) ? 0 : -1;
-#else
     register const struct mkroom *x, *y;
 
     x = (const struct mkroom *) vx;
@@ -63,7 +56,6 @@ mkroom_cmp(const genericptr vx, const genericptr vy)
     if (x->lx < y->lx)
         return -1;
     return (x->lx > y->lx);
-#endif /* LINT */
 }
 
 /* Return TRUE if a door placed at (x, y) which otherwise passes okdoor()
