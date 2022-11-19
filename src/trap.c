@@ -1264,8 +1264,8 @@ trapeffect_sqky_board(
                 ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
             You_hear("%s squeak %s.", trapnote(trap, FALSE),
-                     (distu(mtmp->mx, mtmp->my) <= range * range)
-                     ? "nearby" : "in the distance");
+                     (mdistu(mtmp) <= range * range)
+                        ? "nearby" : "in the distance");
         }
         /* wake up nearby monsters */
         wake_nearto(mtmp->mx, mtmp->my, 40);
@@ -2456,8 +2456,8 @@ trapeffect_vibrating_square(
                 /* notice something (hearing uses a larger threshold
                    for 'nearby') */
                 You_see("the ground vibrate %s.",
-                        (distu(mtmp->mx, mtmp->my) <= 2 * 2)
-                        ? "nearby" : "in the distance");
+                        (mdistu(mtmp) <= 2 * 2)
+                           ? "nearby" : "in the distance");
             }
         }
     }
@@ -2860,7 +2860,7 @@ launch_obj(
                 You_hear("someone bowling.");
             } else {
                 You_hear("rumbling %s.", (distu(x1, y1) <= 4 * 4) ? "nearby"
-                                         : "in the distance");
+                                           : "in the distance");
             }
 
         }

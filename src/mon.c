@@ -1053,7 +1053,7 @@ movemon_singlemon(struct monst *mtmp)
          *  have died if it returns 1.
          */
         if (cansee(mtmp->mx, mtmp->my)
-            && (distu(mtmp->mx, mtmp->my) <= BOLT_LIM * BOLT_LIM)
+            && (mdistu(mtmp) <= BOLT_LIM * BOLT_LIM)
             && fightm(mtmp))
             return FALSE; /* mon might have died */
     }
@@ -2988,7 +2988,7 @@ set_ustuck(struct monst *mtmp)
     if (iflags.sanity_check || iflags.debug_fuzzer) {
         if (mtmp && !next2u(mtmp->mx, mtmp->my))
             impossible("Sticking to %s at distu %d?",
-                       mon_nam(mtmp), distu(mtmp->mx, mtmp->my));
+                       mon_nam(mtmp), mdistu(mtmp));
     }
 
     g.context.botl = 1;
@@ -4212,7 +4212,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
             } else if (mon->data == &mons[PM_FOG_CLOUD]
                        && mon->mhp == mon->mhpmax && !rn2(4)
                        && (!canseemon(mon)
-                           || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM)) {
+                           || mdistu(mon) > BOLT_LIM * BOLT_LIM)) {
                 /* if a fog cloud, maybe change to wolf or vampire bat;
                    those are more likely to take damage--at least when
                    tame--and then switch back to vampire; they'll also
@@ -4234,7 +4234,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
         } else {
             if (mon->mhp >= 9 * mon->mhpmax / 10 && !rn2(6)
                 && (!canseemon(mon)
-                    || distu(mon->mx, mon->my) > BOLT_LIM * BOLT_LIM))
+                    || mdistu(mon) > BOLT_LIM * BOLT_LIM))
                 dochng = TRUE; /* 'ptr' stays Null */
         }
     }

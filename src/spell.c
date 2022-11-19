@@ -302,7 +302,7 @@ deadbook(struct obj* book2)
                 && cansee(mtmp->mx, mtmp->my)) {
                 mtmp->mpeaceful = TRUE;
                 if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
-                    && distu(mtmp->mx, mtmp->my) < 4)
+                    && mdistu(mtmp) < 4)
                     if (mtmp->mtame) {
                         if (mtmp->mtame < 20)
                             mtmp->mtame++;

@@ -47,15 +47,14 @@
           /* OR 2b. hero is using a telepathy inducing */  \
           /*        object and in range                */  \
           || (Unblind_telepat                              \
-              && (distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM)))))
+              && (mdistu(mon) <= (BOLT_LIM * BOLT_LIM)))))
 
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
    lava, but presumeably any monster there is on top so not sensed */
 #define _sensemon(mon) \
-    (   (!u.uswallow || (mon) == u.ustuck)                                 \
-     && (!Underwater || (distu((mon)->mx, (mon)->my) <= 2                  \
-                         && is_pool((mon)->mx, (mon)->my)))                \
+    (   (!u.uswallow || (mon) == u.ustuck)                                   \
+     && (!Underwater || (mdistu(mon) <= 2 && is_pool((mon)->mx, (mon)->my))) \
      && (Detect_monsters || tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))   )
 
 /*
@@ -63,7 +62,7 @@
  * vicinity, and a glyph representing the warning level is displayed.
  */
 #define _mon_warning(mon) \
-    (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
+    (Warning && !(mon)->mpeaceful && (mdistu(mon) < 100)     \
      && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))
 
 /*
@@ -149,7 +148,7 @@
      && ((cansee((mon)->mx, (mon)->my)                                  \
           && (See_invisible || Detect_monsters))                        \
          || (!Blind && (HTelepat & ~INTRINSIC)                          \
-             && distu((mon)->mx, (mon)->my) <= (BOLT_LIM * BOLT_LIM))))
+             && mdistu(mon) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
  * is_safemon(mon)
