@@ -2173,4 +2173,5 @@ switch to a flags arg on newcham() in place of the pair of boolean args
 replace some old 'time_t' hackery in system.h and hacklib.c with something
 	less obtrusive in unixconf.h
 remove the per dungeon level door limit
+remove various '#if LINT' hacks used to suppress warnings from pre-ANSI 'lint'
 
