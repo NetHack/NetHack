@@ -1053,6 +1053,7 @@ some attack damage which shouldn't affect shades operated as intended when
 phrasing of the "you can't" message when attempting to name any monster
 	defined with a unique name or title sounded strange when rejecting
 	<space> to remove the existing name without assigning a new one
+some instances of using up or stealing shop-owned boulder didn't charge for it
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
