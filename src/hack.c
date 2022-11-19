@@ -452,8 +452,9 @@ moverock(void)
             if (costly && !costly_spot(rx, ry)) {
                 addtobill(otmp, FALSE, FALSE, FALSE);
             } else if (!costly && costly_spot(rx, ry) && otmp->unpaid
-                       && (shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
-                       && onbill(otmp, shkp, TRUE)) {
+                       && ((shkp = shop_keeper(*in_rooms(rx, ry, SHOPBASE)))
+                           != 0)
+                       && onshopbill(otmp, shkp, TRUE)) {
                 subfrombill(otmp, shkp);
             }
         } else {

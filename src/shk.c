@@ -29,6 +29,7 @@ static const char the_contents_of[] = "the contents of ";
 static void append_honorific(char *);
 static long addupbill(struct monst *);
 static void pacify_shk(struct monst *, boolean);
+static struct bill_x *onbill(struct obj *, struct monst *, boolean);
 static struct monst *next_shkp(struct monst *, boolean);
 static long shop_debt(struct eshk *);
 static char *shk_owns(char *, struct obj *);
@@ -82,7 +83,9 @@ static const char *cad(boolean);
                     obj->quan <= bp->bquan
  */
 
-static const char *const angrytexts[] = { "quite upset", "ticked off", "furious" };
+static const char *const angrytexts[] = {
+    "quite upset", "ticked off", "furious"
+};
 
 /*
  *  Transfer money from inventory to monster when paying
@@ -879,12 +882,21 @@ onbill(struct obj *obj, struct monst *shkp, boolean silent)
                 if (!obj->unpaid)
                     pline("onbill: paid obj on bill?");
                 return bp;
-            } else
+            } else {
                 bp++;
+            }
     }
     if (obj->unpaid && !silent)
         pline("onbill: unpaid obj not on bill?");
     return (struct bill_x *) 0;
+}
+
+/* used outside of shk.c when caller wants to know whether item is on bill
+   but doesn't need to know any details about the bill itself */
+boolean
+onshopbill(struct obj *obj, struct monst *shkp, boolean silent)
+{
+    return onbill(obj, shkp, silent) ? TRUE : FALSE;
 }
 
 /* check whether an object or any of its contents belongs to a shop */
