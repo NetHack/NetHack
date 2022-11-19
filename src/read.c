@@ -698,7 +698,13 @@ charge_ok(struct obj* obj)
                 && !objects[MAGIC_LAMP].oc_name_known)) {
             return GETOBJ_SUGGEST;
         }
-        return objects[obj->otyp].oc_charged ? GETOBJ_SUGGEST : GETOBJ_EXCLUDE;
+        /* suggest chargeable tools only if discovered, to prevent leaking
+           info (e.g. revealing if an unidentified 'flute' is magic or not) */
+        if (objects[obj->otyp].oc_charged) {
+            return (obj->dknown && objects[obj->otyp].oc_name_known)
+                     ? GETOBJ_SUGGEST : GETOBJ_DOWNPLAY;
+        }
+        return GETOBJ_EXCLUDE;
     }
     /* why are weapons/armor considered charged anyway?
      * make them selectable even so for "feeling of loss" message */
