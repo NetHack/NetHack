@@ -36,6 +36,7 @@ static void consume_arg(int, int *, char ***);
 static void consume_two_args(int, int *, char ***);
 static void early_options(int *, char ***, char **);
 static void opt_terminate(void) NORETURN;
+static void opt_usage(const char *) NORETURN;
 static void opt_showpaths(const char *);
 static void scores_only(int, char **, const char *) NORETURN;
 
@@ -571,6 +572,12 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
 
     config_error_init(FALSE, "command line", FALSE);
 
+    /* treat "nethack ?" as a request for usage info; due to shell
+       processing, player likely has to use "nethack \?" or "nethack '?'"
+       [won't work if used as "nethack -dpath ?" or "nethack -d path ?"] */
+    if (*argc_p > 1 && !strcmp((*argv_p)[1], "?"))
+        opt_usage(*hackdir_p); /* doesn't return */
+
     /*
      * Both *argc_p and *argv_p account for the program name as (*argv_p)[0];
      * local argc and argv impicitly discard that (by starting 'ndx' at 1).
@@ -617,6 +624,12 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
 #endif /* CHDIR */
             }
             break;
+        case 'h':
+        case '?':
+            if (lopt(arg, ArgValDisallowed, "-help", origarg, &argc, &argv)
+                || lopt(arg, ArgValDisallowed, "-?", origarg, &argc, &argv))
+                opt_usage(*hackdir_p); /* doesn't return */
+            break;
         case 'n':
             oldargc = argc;
             if (!strcmp(arg, "-no-nethackrc")) /* no abbreviation allowed */
@@ -653,6 +666,10 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
                 /*NOTREACHED*/
             }
             break;
+        case 'u':
+            if (lopt(arg, ArgValDisallowed, "-usage", origarg, &argc, &argv))
+                opt_usage(*hackdir_p);
+            break;
         case 'v':
             if (argcheck(argc, argv, ARG_VERSION) == 2) {
                 opt_terminate();
@@ -687,6 +704,20 @@ opt_terminate(void)
 
     nh_terminate(EXIT_SUCCESS);
     /*NOTREACHED*/
+}
+
+static void
+opt_usage(const char *hackdir)
+{
+#ifdef CHDIR
+    chdirx(hackdir, TRUE);
+#else
+    nhUse(hackdir);
+#endif
+    dlb_init();
+
+    genl_display_file(USAGEHELP, TRUE);
+    opt_terminate();
 }
 
 /* show the sysconf file name, playground directory, run-time configuration

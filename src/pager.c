@@ -32,6 +32,9 @@ static void dispfile_optionfile(void);
 static void dispfile_optmenu(void);
 static void dispfile_license(void);
 static void dispfile_debughelp(void);
+#ifndef HIDE_USAGE
+static void dispfile_usagehelp(void);
+#endif
 static void hmenu_doextversion(void);
 static void hmenu_dohistory(void);
 static void hmenu_dowhatis(void);
@@ -2355,6 +2358,14 @@ dispfile_debughelp(void)
     display_file(DEBUGHELP, TRUE);
 }
 
+#ifndef HIDE_USAGE
+static void
+dispfile_usagehelp(void)
+{
+    display_file(USAGEHELP, TRUE);
+}
+#endif
+
 static void
 hmenu_doextversion(void)
 {
@@ -2389,6 +2400,7 @@ static void
 domenucontrols(void)
 {
     winid cwin = create_nhwindow(NHW_TEXT);
+
     show_menu_controls(cwin, FALSE);
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);
@@ -2411,6 +2423,9 @@ static const struct {
     { dokeylist, "Full list of keyboard commands." },
     { hmenu_doextlist, "List of extended commands." },
     { domenucontrols, "List menu control keys." },
+#ifndef HIDE_USAGE
+    { dispfile_usagehelp, "Description of NetHack's command line." },
+#endif
     { dispfile_license, "The NetHack license." },
     { docontact, "Support information." },
 #ifdef PORT_HELP

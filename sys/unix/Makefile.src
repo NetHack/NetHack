@@ -1191,7 +1191,7 @@ $(TARGETPFX)vision.o: vision.c $(HACK_H)
 $(TARGETPFX)weapon.o: weapon.c $(HACK_H)
 $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)
-$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wintty.h
+$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/dlb.h ../include/wintty.h
 $(TARGETPFX)wizard.o: wizard.c $(HACK_H)
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)

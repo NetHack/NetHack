@@ -422,6 +422,15 @@
 #endif /* CHDIR */
 
 /*
+ * Define HIDE_USAGE to keep the "description of command line" out of
+ * the help menu if players have no access to a command line or if that
+ * is radically different from the description for UNIX in dat/usagehlp
+ * (a better solution for that would be a separate file and different
+ * value for USAGEHELP in global.h).
+ */
+/* #define HIDE_USAGE */ /* */
+
+/*
  * Section 3:   Definitions that may vary with system type.
  *              For example, both schar and uchar should be short ints on
  *              the AT&T 3B2/3B5/etc. family.
