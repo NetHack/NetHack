@@ -35,6 +35,7 @@ extern "C" {
 #endif
 #include "qt_post.h"
 #include "qt_icon.h"
+#include "qt_str.h"
 
 namespace nethack_qt_ {
 
@@ -106,7 +107,7 @@ void NetHackQtLabelledIcon::setLabel(const QString& t, long v, long cv,
     if (v==NoNum) {
 	buf = "";
     } else {
-	buf = QString::asprintf("%ld", v);
+	buf = nh_qsprintf("%ld", v);
     }
     setLabel(t + buf + tail, cv < prev_value);
     prev_value=cv;

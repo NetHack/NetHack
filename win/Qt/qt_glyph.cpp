@@ -63,10 +63,10 @@ NetHackQtGlyphs::NetHackQtGlyphs()
 
     if (!tile_file) {
         tilesok = FALSE;
-        QString msg = QString::asprintf("Cannot load '%s'.",
-                                        user_tiles ? tile_list[0]
-                                          // mismatched quotes match format
-                                          : "nhtiles.bmp' or 'x11tiles");
+        QString msg = nh_qsprintf("Cannot load '%s'.",
+                                  user_tiles ? tile_list[0]
+                                    // mismatched quotes match format
+                                    : "nhtiles.bmp' or 'x11tiles");
         QMessageBox::warning(0, "IO Error", msg);
     } else {
         if (img.width() % tiles_per_row) {

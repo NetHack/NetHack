@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
+#include <cstdarg>
 #include "qt_str.h"
 
 namespace nethack_qt_ {
@@ -78,6 +79,22 @@ int cp437(int ch)
         0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,
     };
     return cp437table[(unsigned char)ch];
+}
+
+QString
+nh_qsprintf(const char *format, ...)
+{
+    QString msg;
+    std::va_list args;
+
+    va_start(args, format);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+    msg = QString::vasprintf(format, args);
+#else
+    msg.vsprintf(format, args);
+#endif
+    va_end(args);
+    return msg;
 }
 
 } // namespace nethack_qt_
