@@ -19,6 +19,13 @@ extern QString nh_capitalize_words(const QString& str);
 // Map symbol conversion
 extern int cp437(int ch);
 
+// sprintf
+extern QString nh_qsprintf(const char *format, ...)
+#if defined(__GNUC__) && (__GNUC__ >= 2)
+    __attribute__((format(printf, 1, 2)))
+#endif
+;
+
 } // namespace nethack_qt_
 
 #endif

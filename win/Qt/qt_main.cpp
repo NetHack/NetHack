@@ -13,7 +13,7 @@ extern "C" {
 #include <QtGui/QtGui>
 #if QT_VERSION >= 0x060000
 #include <QtGui/QShortcut>
-#else
+#elif QT_VERSION >= 0x050000
 #include <QtWidgets/QShortcut>
 #endif
 
@@ -463,7 +463,7 @@ aboutMsg()
         *p = '\0';
     /* it's also long; break it into two pieces */
     (void) strsubst(vbuf, " - ", "\n- ");
-    QString msg = QString::asprintf(
+    QString msg = nh_qsprintf(
         // format
         "NetHack-Qt is a version of NetHack built using" // no newline
 #ifdef KDE
@@ -1034,7 +1034,7 @@ void NetHackQtMainWindow::doQuit(bool)
     // nethack's #quit command itself) but this routine is unconditional
     // in case someone wants to change that
 #ifdef MACOS
-    QString info = QString::asprintf("This will end your NetHack session.%s",
+    QString info = nh_qsprintf("This will end your NetHack session.%s",
                  !g.program_state.something_worth_saving ? ""
                  : "\n(Cancel quitting and use the Save command"
                    "\nto save your current game.)");

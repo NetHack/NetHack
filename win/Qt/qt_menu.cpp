@@ -383,8 +383,8 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
     QFontMetrics fm(table->font());
     QString col0width_str = "";
     if (biggestcount > 0L)
-        col0width_str = QString::asprintf("%*ld", std::max(countdigits, 1),
-                                          biggestcount);
+        col0width_str = nh_qsprintf("%*ld", std::max(countdigits, 1),
+                                    biggestcount);
     int col0width_int = (int) fm.QFM_WIDTH(col0width_str) + MENU_WIDTH_SLOP;
     if (col0width_int > table->columnWidth(0))
 	WidenColumn(0, col0width_int);
@@ -427,7 +427,7 @@ void NetHackQtMenuWindow::PadMenuColumns(bool split_descr)
             QString Amt = "";
             long amt = count(row); // fetch item(row,0) as a number
             if (amt > 0L)
-                Amt = QString::asprintf("%*ld", countdigits, amt);
+                Amt = nh_qsprintf("%*ld", countdigits, amt);
             cnt->setText(Amt);
         }
 
@@ -470,8 +470,7 @@ void NetHackQtMenuWindow::UpdateCountColumn(long newcount)
     } else {
         biggestcount = std::max(biggestcount, newcount);
         QString num;
-        num = QString::asprintf("%*ld", std::max(countdigits, 1),
-                                biggestcount);
+        num = nh_qsprintf("%*ld", std::max(countdigits, 1), biggestcount);
         int numlen = (int) num.length();
         if (numlen % 2)
             ++numlen;
@@ -903,7 +902,7 @@ void NetHackQtMenuWindow::ToggleSelect(int row, bool already_toggled)
                 amt = count(row); // fetch item(row,0) as a number
                 QString Amt = "";
                 if (amt > 0L)
-                    Amt = QString::asprintf("%*ld", countdigits, amt);
+                    Amt = nh_qsprintf("%*ld", countdigits, amt);
                 countfield->setText(Amt); // store right-justified value
             }
             ClearCount(); // blank out 'countstr' and reset 'counting'

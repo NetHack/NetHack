@@ -11,6 +11,7 @@ extern "C" {
 #include "qt_pre.h"
 #include <QtGui/QtGui>
 #include <QtCore/QStringList>
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
 #if QT_VERSION < 0x050000
 #include <QtGui/QSoundEffect>
 #elif QT_VERSION < 0x060000
@@ -21,6 +22,7 @@ extern "C" {
 #include <QtWidgets/QtWidgets>
 #include <QSoundEffect>
 #endif  /* QT_VERSION */
+#endif /* USER_SOUNDS && !QT_NO_SOUND */
 #include "qt_post.h"
 #include "qt_bind.h"
 #include "qt_click.h"
@@ -446,7 +448,7 @@ void NetHackQtBind::qt_display_file(const char *filename, boolean must_exist)
     }
 
     if (complain) {
-	QString message = QString::asprintf("File not found: %s\n",filename);
+	QString message = nh_qsprintf("File not found: %s\n",filename);
 	QMessageBox::warning(NULL, "File Error", message, QMessageBox::Ignore);
     }
 }
@@ -1118,7 +1120,9 @@ struct window_procs Qt_procs = {
 #ifndef WIN32
 extern "C" void play_usersound(const char *, int);
 
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
 QSoundEffect *effect = NULL;
+#endif
 
 /* called from core, sounds.c */
 void
