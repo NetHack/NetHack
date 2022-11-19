@@ -81,6 +81,10 @@ sys_early_init(void)
 #ifdef WIN32
     sysopt.portable_device_paths = 0;
 #endif
+
+    /* help menu */
+    sysopt.hideusage = 0;
+
     return;
 }
 

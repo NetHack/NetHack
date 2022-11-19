@@ -2577,6 +2577,9 @@ parse_config_line(char *origbuf)
         }
         sysopt.seduce = n;
         sysopt_seduce_set(sysopt.seduce);
+    } else if (in_sysconf && match_varname(buf, "HIDEUSAGE", 9)) {
+        n = !!atoi(bufp);
+        sysopt.hideusage = n;
     } else if (in_sysconf && match_varname(buf, "MAXPLAYERS", 10)) {
         n = atoi(bufp);
         /* XXX to get more than 25, need to rewrite all lock code */

@@ -69,8 +69,8 @@ nethack --windowtype:Iii
 nethack -n
   don't show the 'news' file is one is present in nethack's directory.
 
-nethack --nethackrc:File
-  use File instead of the default run-time configuration file (which is
+nethack --nethackrc:RC-file
+  use RC-file instead of the default run-time configuration file (which is
   usually '~/.nethackrc'); the file name should include full path unless
   located in nethack's directory;
 nethack --no-nethackrc

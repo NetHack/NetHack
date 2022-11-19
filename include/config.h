@@ -202,6 +202,9 @@
  *              PERS_IS_UID  (0 or 1 - person is name or (numeric) userid)
  *            Can force incubi/succubi behavior to be toned down to nymph-like:
  *              SEDUCE       (0 or 1 - runtime disable/enable SEDUCE option)
+ *            Can hide the entry for displaying command line usage from
+ *            the help menu if players don't have access to command lines:
+ *              HIDEUSAGE    (0 or 1 - runtime show/hide command line usage)
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
  *              GDBPATH      (the path to the system gdb(1) program)
@@ -421,14 +424,6 @@
  */
 #endif /* CHDIR */
 
-/*
- * Define HIDE_USAGE to keep the "description of command line" out of
- * the help menu if players have no access to a command line or if that
- * is radically different from the description for UNIX in dat/usagehlp
- * (a better solution for that would be a separate file and different
- * value for USAGEHELP in global.h).
- */
-/* #define HIDE_USAGE */ /* */
 
 /*
  * Section 3:   Definitions that may vary with system type.
