@@ -702,21 +702,15 @@ enum optset_restrictions {
 
 /* Cast to int, but limit value to range. */
 #define LIMIT_TO_RANGE_INT(lo, hi, var) \
-    (int) (                             \
-        (var) < (lo) ? (lo) : (         \
-            (var) > (hi) ? (hi) :       \
-            (var)                       \
-        )                               \
-    )
+    ((int) ((var) < (lo) ? (lo) : (var) > (hi) ? (hi) : (var)))
 
-#define ARM_BONUS(obj)                      \
-    (objects[(obj)->otyp].a_ac + (obj)->spe \
+#define ARM_BONUS(obj) \
+    (objects[(obj)->otyp].a_ac + (obj)->spe                             \
      - min((int) greatest_erosion(obj), objects[(obj)->otyp].a_ac))
 
 #define makeknown(x) discover_object((x), TRUE, TRUE)
-#define distu(xx, yy) dist2((int)(xx), (int)(yy), (int) u.ux, (int) u.uy)
-#define mdistu(mon) \
-    dist2((int) (mon)->mx, (int) (mon)->my, (int) u.ux, (int) u.uy)
+#define distu(xx, yy) dist2((int) (xx), (int) (yy), (int) u.ux, (int) u.uy)
+#define mdistu(mon) distu((mon)->mx, (mon)->my)
 #define onlineu(xx, yy) online2((int)(xx), (int)(yy), (int) u.ux, (int) u.uy)
 
 #define rn1(x, y) (rn2(x) + (y))
