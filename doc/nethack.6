@@ -9,13 +9,17 @@
 .ds Nr \\$2
 ..
 .NB $NHDT-Branch: NetHack-3.7 $
-.NR $NHDT-Revision: 1.23 $
+.NR $NHDT-Revision: 1.27 $
 .ds Na Robert Patrick Rankin
 .SH NAME
 nethack \- Exploring The Mazes of Menace
 .SH SYNOPSIS
 .na
 .hy 0
+.\" Some options ordering is explicit (-d first, -u before -D), others
+.\" have been arranged to fit within an 80-column page with nearly full
+.\" lines while avoiding splitting "[" and "-opt ]" or "[ -opt" and "]"
+.\" across line boundaries.  It would be better to do that with 'roff magic.
 .B nethack
 [
 .BR \-d | \-\-directory
@@ -27,8 +31,25 @@ nethack \- Exploring The Mazes of Menace
 .BR \-w | \-\-windowtype
 .I interface
 ]
+.br 1
+[
+.BI \-\-nethackrc: RC-file
+|
+.B \-\-no\-nethackrc
+]
 [
 .B \-n
+]
+[
+.BR \-dec " | " \-ibm
+]
+.br 1
+[
+.B \-u
+.I playername
+]
+[
+.BR \-X " | " \-D
 ]
 [
 .B \-p
@@ -39,22 +60,7 @@ nethack \- Exploring The Mazes of Menace
 .I race
 ]
 [
-.B \-u
-.I playername
-]
-.\" -[DX] used to be before -u but on Windows and MS-DOS, '-u wizard'
-.\" needs to be present before -D in order for it to be allowed, so show
-.\" -[DX} after '-u playername' even though this man page is for Unix.
-[
-.B \-[DX]
-]
-[
 .B \-\@
-]
-[
-.B \-dec
-|
-.B \-ibm
 ]
 .PP
 Also
@@ -95,6 +101,7 @@ Also
 [
 .B \-v
 ]
+.br 1
 [
 .B \-p
 .I profession
@@ -108,6 +115,11 @@ Also
 ]
 .PP
 .B nethack
+[
+.B \-\-usage
+|
+.B \-\-help
+]
 [
 .BR \-\-showpaths
 ]
@@ -259,25 +271,26 @@ is already used for the
 role.
 .PP
 .B \-\@
-choose any omitted characteristics (profession/role, race, gender,
-alignment) randomly without prompting.
+tells nethack to choose any omitted characteristics (profession/role, race,
+gender, alignment) randomly without prompting.
 Otherwise, leaving out any of these characteristics will result in you
-being prompted
-during the game startup for the information.
+being prompted during game startup for the information.
 .PP
 The
 .B \-n
 option suppresses printing of any news from the game administrator.
 .PP
 The
-.B \-D
-or
 .B \-X
-option will start the game in a special non-scoring discovery mode.
+option will start the game in a special non-scoring discovery mode
+(also known as explore mode).
 .B \-D
-will, if the player is the game administrator, start in debugging (wizard)
-mode instead.
-.\" TODO? describe "WIZARDS=x y z" line from SYSCF/sysconf.
+will start the game in debug mode (also known as wizard mode),
+if the player is allowed, otherwise if will switch to
+.BR \-X
+instead.
+Control of who is allowed to use debug mode is done via the
+.RI "\(lq" WIZARDS= "\(rq line in nethack's " sysconf " file."
 .PP
 The
 .BR \-d " or " \-\-directory
@@ -302,7 +315,20 @@ Specifying a value on the command line overrides any value
 specified in the run-time configuration file.
 NetHack's #version command shows available interfaces.
 .PP
-Some options provide feedback and then exit rather than play the game.
+The
+.BI \-\-nethackrc: RC-file
+option will use
+.I RC-file
+instead of the default run-time configuration file
+.RI "(typically " \(ti/.nethackrc ")"
+and the
+.B \-\-no\-nethackrc
+option can be used to skip any run-time configuration file.
+.PP
+.\" extra blank line
+.br 1
+.PP
+Some options provide feedback and then exit rather than play the game:
 .PP
 The
 .BR \-s " or " \-\-scores
@@ -320,6 +346,12 @@ to print the scores of particular roles and races only.
 It may also be followed by one or more player names to print the scores of the
 players mentioned, by 'all' to print out all scores, or by a number to print
 that many top scores.
+.PP
+.BR \-\-usage " or " \-\-help
+will display information similar to this manual page, then exit.
+Use
+.RB \(oq "nethack \-\-usage | more" \(cq
+to read it a page at a time.
 .PP
 .B \-\-showpaths
 can be used to cause NetHack to show where it is expecting
