@@ -2722,7 +2722,10 @@ obj_sanity_check(void)
 static void
 objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
 {
-    struct obj *obj;
+    struct obj *obj, *otmp;
+    struct monst *shkp;
+    boolean costly;
+    const char *why;
 
     for (obj = objlist; obj; obj = obj->nobj) {
         if (obj->where != wheretype)
@@ -2734,6 +2737,50 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                               mesg, (struct monst *) 0);
             check_contained(obj, mesg);
         }
+        why = (const char *) 0;
+        if (obj->no_charge && obj->unpaid) {
+            why = "%s obj both unpaid and no_charge! %s %s: %s";
+        } else if (obj->unpaid) {
+            /* unpaid is only applicable for directly carried objects and
+               for objects inside carried containers */
+            otmp = obj;
+            while (otmp->where == OBJ_CONTAINED)
+                otmp = otmp->ocontainer;
+            if (otmp != obj)
+                obj->ox = otmp->ox, obj->oy = otmp->oy;
+
+            if (otmp->where != OBJ_INVENT)
+                why = "%s unpaid obj not carried! %s %s: %s";
+            else if ((costly = costly_spot(obj->ox, obj->oy)) == FALSE)
+                why = "%s unpaid obj not inside shop! %s %s: %s";
+            else if ((shkp = shop_keeper(*in_rooms(obj->ox, obj->oy,
+                                                   SHOPBASE))) == 0)
+                why = "%s unpaid obj inside untended shop! %s %s: %s";
+            else if (!onshopbill(obj, shkp, TRUE))
+                why = "%s unpaid obj not on shop bill! %s %s: %s";
+        } else if (obj->no_charge) {
+            /* no_charge is only applicable for floor objects in shops and
+               for objects inside floor containers in shops */
+            otmp = obj;
+            while (otmp->where == OBJ_CONTAINED)
+                otmp = otmp->ocontainer;
+            if (otmp != obj)
+                (void) get_obj_location(otmp, &obj->ox, &obj->oy, BURIED_TOO);
+
+            if (otmp->where != OBJ_FLOOR)
+                why = "%s no_charge obj not on floor! %s %s: %s";
+            else if ((costly = costly_spot(obj->ox, obj->oy)) == FALSE)
+                why = "%s no_charge obj not inside shop! %s %s: %s";
+            else if ((shkp = shop_keeper(*in_rooms(obj->ox, obj->oy,
+                                                   SHOPBASE))) == 0)
+                why = "%s no_charge obj inside untended shop! %s %s: %s";
+            else if (onshopbill(obj, shkp, TRUE))
+                why = "%s no_charge obj on shop bill! %s %s: %s";
+            if (why)
+                insane_object(obj, why, mesg, (struct monst *) 0);
+        } /* unpaid and/or no_charge */
+        if (why)
+            insane_object(obj, why, mesg, (struct monst *) 0);
         if (obj->owornmask) {
             char maskbuf[40];
             boolean bc_ok = FALSE;

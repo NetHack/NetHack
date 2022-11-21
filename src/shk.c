@@ -863,31 +863,32 @@ shop_keeper(char rmno)
 }
 
 boolean
-tended_shop(struct mkroom* sroom)
+tended_shop(struct mkroom *sroom)
 {
     struct monst *mtmp = sroom->resident;
 
     return !mtmp ? FALSE : (boolean) inhishop(mtmp);
 }
 
-struct bill_x *
+static struct bill_x *
 onbill(struct obj *obj, struct monst *shkp, boolean silent)
 {
     if (shkp) {
-        register struct bill_x *bp = ESHK(shkp)->bill_p;
-        register int ct = ESHK(shkp)->billct;
+        struct bill_x *bp;
+        int ct;
 
-        while (--ct >= 0)
+        for (ct = ESHK(shkp)->billct, bp = ESHK(shkp)->bill_p;
+             ct > 0; --ct, ++bp) {
             if (bp->bo_id == obj->o_id) {
                 if (!obj->unpaid)
-                    pline("onbill: paid obj on bill?");
+                    impossible("onbill: paid obj on bill?");
                 return bp;
-            } else {
-                bp++;
             }
+        }
     }
     if (obj->unpaid && !silent)
-        pline("onbill: unpaid obj not on bill?");
+        impossible("onbill: unpaid obj %s?",
+                   shkp ? "without shopkeeper" : "not on shk's bill");
     return (struct bill_x *) 0;
 }
 
