@@ -2282,14 +2282,12 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
 static boolean
 mbag_explodes(struct obj *obj, int depthin)
 {
-    /* these won't cause an explosion when they're empty */
-    if ((obj->otyp == WAN_CANCELLATION || obj->otyp == BAG_OF_TRICKS)
-        && obj->spe <= 0)
+    /* won't cause an explosion when it's empty */
+    if (obj->otyp == BAG_OF_TRICKS && obj->spe <= 0)
         return FALSE;
 
     /* odds: 1/1, 2/2, 3/4, 4/8, 5/16, 6/32, 7/64, 8/128, 9/128, 10/128,... */
-    if ((Is_mbag(obj) || obj->otyp == WAN_CANCELLATION)
-        && (rn2(1 << (depthin > 7 ? 7 : depthin)) <= depthin))
+    if (Is_mbag(obj) && (rn2(1 << (depthin > 7 ? 7 : depthin)) <= depthin))
         return TRUE;
     else if (Has_contents(obj)) {
         struct obj *otmp;
@@ -2484,6 +2482,11 @@ in_container(struct obj *obj)
 
         losehp(d(6, 6), "magical explosion", KILLED_BY_AN);
         g.current_container = 0; /* baggone = TRUE; */
+    } else if (Is_mbag(g.current_container) &&
+               obj->otyp == WAN_CANCELLATION && obj->spe > 0) {
+        /* cancel bag because wand of cancellation was inserted */
+        cancel_item(g.current_container);
+        obj->spe--;
     }
 
     if (g.current_container) {

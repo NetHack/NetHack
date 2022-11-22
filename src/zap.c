@@ -1238,6 +1238,13 @@ cancel_item(struct obj *obj)
                 obj->odiluted = 0; /* same as any other water */
             }
             break;
+        case TOOL_CLASS:
+            /* A BoH turns into a sack when cancelled.  (The same thing
+               happens to the bag when a wand of cancellation is placed
+               into it.) */
+            if (otyp = BAG_OF_HOLDING)
+                obj->otyp = SACK;
+            break;
         }
     }
     /* cancelling a troll's corpse prevents it from reviving (on its own;
