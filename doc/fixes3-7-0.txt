@@ -1422,6 +1422,8 @@ if hero's steed got hit by knockback effect, impossible "no monster to remove"
 the #saveoptions command included options changed via doset_simple() but not
 	ones changed via full doset()
 fix 'nethack --scores' as alias for 'nethack -s'
+adding command line 'nethack --usage' broke 'nethack -u name' (however,
+	'nethack -uname' still worked for names other than "sage")
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support

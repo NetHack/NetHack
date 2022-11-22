@@ -343,7 +343,7 @@ lopt(
         goto loptnotallowed;
 
     l = (int) (p ? (long) (p - arg) : (long) strlen(arg));
-    if (!strncmp(arg, optname, l)) {
+    if ((l > 2 || oneletterok) && !strncmp(arg, optname, l)) {
         /* "-windowtype[=foo]" */
         if (p)
             ++p; /* past '=' or ':' */
@@ -356,6 +356,10 @@ lopt(
         /* "-w..." but not "-w[indowtype[=foo]]" */
         if (!p) {
             p = &arg[2]; /* past 'w' of "-wfoo" */
+#if 0 /* -x:value could work but is not supported (callers don't expect it) */
+        } else if (p == arg + 2) {
+            ++p; /* past ':' of "-w:foo" */
+#endif
         } else {
             /* "-w...=foo" but not "-w[indowtype]=foo" */
             goto loptbail;
