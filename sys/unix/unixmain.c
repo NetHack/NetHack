@@ -631,7 +631,8 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
         case 'h':
         case '?':
             if (lopt(arg, ArgValDisallowed, "-help", origarg, &argc, &argv)
-                || lopt(arg, ArgValDisallowed, "-?", origarg, &argc, &argv))
+                || lopt(arg, ArgValDisallowed | ArgNamOneLetter, "-?",
+                        origarg, &argc, &argv))
                 opt_usage(*hackdir_p); /* doesn't return */
             break;
         case 'n':
