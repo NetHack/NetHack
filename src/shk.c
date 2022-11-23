@@ -888,7 +888,7 @@ onbill(struct obj *obj, struct monst *shkp, boolean silent)
     }
     if (obj->unpaid && !silent)
         impossible("onbill: unpaid obj %s?",
-                   shkp ? "without shopkeeper" : "not on shk's bill");
+                   !shkp ? "without shopkeeper" : "not on shk's bill");
     return (struct bill_x *) 0;
 }
 
