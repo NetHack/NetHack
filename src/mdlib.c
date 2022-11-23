@@ -55,8 +55,8 @@ static boolean date_via_env = FALSE;
 
 extern unsigned long md_ignored_features(void);
 char *mdlib_version_string(char *, const char *);
-char *version_id_string(char *, int, const char *);
-char *bannerc_string(char *, int, const char *);
+char *version_id_string(char *, size_t, const char *);
+char *bannerc_string(char *, size_t, const char *);
 int case_insensitive_comp(const char *, const char *);
 
 static void make_version(void);
@@ -300,7 +300,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 #endif  /* MAKEDEFS_C */
 
 char *
-version_id_string(char *outbuf, int bufsz, const char *build_date)
+version_id_string(char *outbuf, size_t bufsz, const char *build_date)
 {
     char subbuf[64], versbuf[64];
     char statusbuf[64];
@@ -333,7 +333,7 @@ version_id_string(char *outbuf, int bufsz, const char *build_date)
 /* still within #if MAKDEFS_C || FOR_RUNTIME */
 
 char *
-bannerc_string(char *outbuf, int bufsz, const char *build_date)
+bannerc_string(char *outbuf, size_t bufsz, const char *build_date)
 {
     char subbuf[64], versbuf[64];
 
@@ -814,10 +814,10 @@ case_insensitive_comp(const char *s1, const char *s2)
     for (;; s1++, s2++) {
         u1 = (uchar) *s1;
         if (isupper(u1))
-            u1 = tolower(u1);
+            u1 = (uchar) tolower(u1);
         u2 = (uchar) *s2;
         if (isupper(u2))
-            u2 = tolower(u2);
+            u2 = (uchar) tolower(u2);
         if (u1 == '\0' || u1 != u2)
             break;
     }

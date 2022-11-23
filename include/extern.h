@@ -1028,7 +1028,7 @@ extern int rounddiv(long, int);
 extern int dist2(coordxy, coordxy, coordxy, coordxy);
 extern int isqrt(int);
 extern int distmin(coordxy, coordxy, coordxy, coordxy);
-extern boolean online2(int, int, int, int);
+extern boolean online2(coordxy, coordxy, coordxy, coordxy);
 extern boolean pmatch(const char *, const char *);
 extern boolean pmatchi(const char *, const char *);
 extern boolean pmatchz(const char *, const char *);

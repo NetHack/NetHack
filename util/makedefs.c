@@ -1077,11 +1077,11 @@ do_rumors(void)
             true_rumor_size, true_rumor_offset, false_rumor_count,
             false_rumor_size, false_rumor_offset, eof_offset);
     /* record the current position; true rumors will start here */
-    true_rumor_offset = ftell(tfp);
+    true_rumor_offset = (unsigned long) ftell(tfp);
 
-    false_rumor_offset = read_rumors_file(".tru", &true_rumor_count,
-                                          &true_rumor_size, true_rumor_offset,
-                                          MD_PAD_RUMORS);
+    false_rumor_offset = (unsigned long) read_rumors_file(".tru", &true_rumor_count,
+                                             &true_rumor_size, true_rumor_offset,
+                                             MD_PAD_RUMORS);
     if (!false_rumor_offset)
         goto rumors_failure;
 
@@ -1241,11 +1241,21 @@ do_date(void)
                     (unsigned long) clocktim);
             (void) fflush(stderr);
         }
+#if !defined(NOSTRFTIME)
+        if (!strftime(cbuf, sizeof cbuf, "%c", gmtime(&clocktim)))
+            cbuf[0] = '\0';
+#else
         Strcpy(cbuf, asctime(gmtime(&clocktim)));
+#endif  /* NOSTRFTIME */
     }
 #else
     /* ordinary build: use current date+time */
+#if !defined(NOSTRFTIME)
+    if (!strftime(cbuf, sizeof cbuf, "%c", localtime(&clocktim)))
+        cbuf[0] = '\0';
+#else
     Strcpy(cbuf, ctime(&clocktim));
+#endif /* NOSTRFTIME */
 #endif /* REPRODUCIBLE_BUILD */
 
     if ((c = strchr(cbuf, '\n')) != 0)
@@ -1979,7 +1989,7 @@ do_objs(void)
     for (i = 0; !i || objects[i].oc_class != ILLOBJ_CLASS; i++) {
         SpinCursor(3);
 
-        objects[i].oc_name_idx = objects[i].oc_descr_idx = i; /* init */
+        objects[i].oc_name_idx = objects[i].oc_descr_idx = (short) i;
         if (!(objnam = tmpdup(OBJ_NAME(objects[i]))))
             continue;
 

@@ -721,7 +721,7 @@ isqrt(int val)
 
 /* are two points lined up (on a straight line)? */
 boolean
-online2(int x0, int y0, int x1, int y1)
+online2(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
 {
     int dx = x0 - x1, dy = y0 - y1;
     /*  If either delta is zero then they're on an orthogonal line,

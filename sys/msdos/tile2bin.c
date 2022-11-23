@@ -190,7 +190,12 @@ main(int argc, char *argv[])
 #endif
 
     strncpy(tibheader.ident, "NetHack 3.7 MSDOS Port binary tile file", 80);
+#if !defined(NOSTRFTIME)
+    if (!strftime(tibheader.timestamp,
+                  sizeof tibheader.timestamp, "%c", newtime))
+#else
     strncpy(tibheader.timestamp, asctime(newtime), 24);
+#endif
     tibheader.timestamp[25] = '\0';
     tibheader.tilecount = tilecount;
     tibheader.numcolors = num_colors;
