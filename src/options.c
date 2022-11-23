@@ -3455,12 +3455,16 @@ optfn_suppress_alert(int optidx, int req, boolean negated,
     return optn_ok;
 }
 
-extern const char *known_handling[];     /* symbols.c */
-extern const char *known_restrictions[]; /* symbols.c */
+extern const char *const known_handling[];     /* symbols.c */
+extern const char *const known_restrictions[]; /* symbols.c */
 
 static int
-optfn_symset(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
-             char *op)
+optfn_symset(
+    int optidx UNUSED,
+    int req,
+    boolean negated UNUSED,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -3478,7 +3482,8 @@ optfn_symset(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
                 if (g.symset[PRIMARYSET].handling) {
 #ifndef ENHANCED_SYMBOLS
                     if (g.symset[PRIMARYSET].handling == H_UTF8) {
-                        config_error_add("Unavailable symset handler \"%s\" for %s",
+                        config_error_add(
+                                   "Unavailable symset handler \"%s\" for %s",
                                          known_handling[H_UTF8], op);
                         load_symset("default", PRIMARYSET);
                     }
@@ -3495,7 +3500,8 @@ optfn_symset(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s",
-                g.symset[PRIMARYSET].name ? g.symset[PRIMARYSET].name : "default");
+                g.symset[PRIMARYSET].name ? g.symset[PRIMARYSET].name
+                                          : "default");
         if (g.currentgraphics == PRIMARYSET && g.symset[PRIMARYSET].name)
             Strcat(opts, ", active");
         if (g.symset[PRIMARYSET].handling) {
@@ -3508,7 +3514,8 @@ optfn_symset(int optidx UNUSED, int req, boolean negated UNUSED, char *opts,
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s",
-                g.symset[PRIMARYSET].name ? g.symset[PRIMARYSET].name : "default");
+                g.symset[PRIMARYSET].name ? g.symset[PRIMARYSET].name
+                                          : "default");
         return optn_ok;
     }
     if (req == do_handler) {

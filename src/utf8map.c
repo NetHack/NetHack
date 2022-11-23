@@ -10,7 +10,7 @@ extern const struct symparse loadsyms[];
 extern struct enum_dump monsdump[];
 extern struct enum_dump objdump[];
 extern glyph_map glyphmap[MAX_GLYPH];
-extern const char *known_handling[];        /* symbols.c */
+extern const char *const known_handling[];        /* symbols.c */
 
 #ifdef ENHANCED_SYMBOLS
 
@@ -65,7 +65,8 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
                   (findwhat->color != 0L) ? findwhat->color : 0L);
 #endif
         add_custom_urep_entry(known_handling[H_UTF8], glyph,
-                              uval, utf8str, findwhat->color, g.symset_which_set);
+                              uval, utf8str, findwhat->color,
+                              g.symset_which_set);
     }
 }
 
@@ -1053,8 +1054,9 @@ test_glyphnames(void)
 static void
 just_find_callback(int glyph UNUSED, struct find_struct *findwhat UNUSED)
 {
-    /* nothing */
+    return;
 }
+
 static int
 find_glyphs(const char *id)
 {
@@ -1086,6 +1088,7 @@ to_unicode_callback(int glyph UNUSED, struct find_struct *findwhat)
 #endif
     }
 }
+
 int
 glyphs_to_unicode(const char *id, const char *unicode_val, long clr)
 {

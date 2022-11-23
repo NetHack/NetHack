@@ -3475,8 +3475,8 @@ read_wizkit(void)
 
 /* ----------  BEGIN SYMSET FILE HANDLING ----------- */
 
-extern const char *known_handling[];     /* symbols.c */
-extern const char *known_restrictions[]; /* symbols.c */
+extern const char *const known_handling[];     /* symbols.c */
+extern const char *const known_restrictions[]; /* symbols.c */
 
 static
 FILE *
