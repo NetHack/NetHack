@@ -4633,8 +4633,8 @@ Acceptable values are \f(CR2\fP and \f(CR3\fP (default is \f(CR2\fP).
 When set to \f(CR3\fP, the \f(CRtty\fP interface moves some fields around and
 mainly shows status conditions on their own line.
 A display capable of showing at least 25 lines is recommended.
-The value can be toggled back and forth during the game with the \(oqO\(cq
-command.
+The value can be toggled back and forth during the game with the
+\(oq\f(CRO\fP\(cq command.
 .lp ""
 The \f(CRcurses\fP interface does likewise if the
 .op align_status
@@ -4651,6 +4651,11 @@ original format, with the status window spread out vertically.
 A value of \f(CR2\fP makes status be slightly condensed, moving some
 fields to different lines to eliminate one whole line, reducing the
 height needed.
+(If NetHack has been built using a version of \f(CRQt\fP
+older than \f(CRqt-5.9\fP,
+.op statuslines
+can only be set in the run-time configuration file or via NETHACKOPTIONS,
+not during play with the \(oq\f(CRO\fP\(cq command.)
 .lp "term_cols\ \ \fIand\fP"
 .lp term_rows
 Curses interface only.
