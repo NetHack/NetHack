@@ -84,14 +84,22 @@ struct obj {
 #define NOBJ_STATES 9
     xint16 timed; /* # of fuses (timers) attached to this obj */
 
-    Bitfield(cursed, 1);
+    Bitfield(cursed, 1);    /* uncursed when neither cursed nor blessed */
     Bitfield(blessed, 1);
-    Bitfield(unpaid, 1);    /* on some bill */
-    Bitfield(no_charge, 1); /* if shk shouldn't charge for this */
-    Bitfield(known, 1);     /* exact nature known */
-    Bitfield(dknown, 1);    /* color or text known */
-    Bitfield(bknown, 1);    /* blessing or curse known */
-    Bitfield(rknown, 1);    /* rustproof or not known */
+    Bitfield(unpaid, 1);    /* owned by shop; valid for objects in hero's
+                             * inventory or inside containers there;
+                             * not used for items on the floor */
+    Bitfield(no_charge, 1); /* if shk shouldn't charge for this; valid for
+                             * items on shop floor or in containers there;
+                             * implicit for items at any other location
+                             * unless carried and explicitly flagged unpaid */
+    Bitfield(known, 1);     /* exact nature known (for instance, charge count
+                             * or enchantment); many items have this preset if
+                             * they lack anything interesting to discover */
+    Bitfield(dknown, 1);    /* description known (item seen "up close");
+                             * some types of items always have dknown set */
+    Bitfield(bknown, 1);    /* BUC (blessed/uncursed/cursed) known */
+    Bitfield(rknown, 1);    /* rustproofing status known */
 
     Bitfield(oeroded, 2);  /* rusted/burnt weapon/armor */
     Bitfield(oeroded2, 2); /* corroded/rotted weapon/armor */
