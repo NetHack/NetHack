@@ -191,8 +191,8 @@ main(int argc, char *argv[])
 
     strncpy(tibheader.ident, "NetHack 3.7 MSDOS Port binary tile file", 80);
 #if !defined(NOSTRFTIME)
-    if (!strftime(tibheader.timestamp,
-                  sizeof tibheader.timestamp, "%c", newtime))
+    (void) strftime(tibheader.timestamp,
+                  sizeof tibheader.timestamp, "%c", newtime);
 #else
     strncpy(tibheader.timestamp, asctime(newtime), 24);
 #endif
