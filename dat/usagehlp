@@ -110,8 +110,9 @@ nethack -s -p Ppp -r Rrr
   if both '-p' and '-r' are used, scores that match either will be shown
   rather than scores that match both;
 nethack -s -v
-  show scores only for the current version if the high scores file (record)
-  also contains entries for any older versions; when -v is used, it should
+  show scores for all versions present in the high scores file (record)
+  if scores for any older versions are present; by default, only scores
+  for current version of nethack are shown; when -v is used, it should
   immediately follow -s or --scores, preceding any name(s) or -p or -r;
 nethack -dDir -s
 nethack --directory:Dir -s
