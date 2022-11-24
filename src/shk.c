@@ -862,6 +862,32 @@ shop_keeper(char rmno)
     return shkp;
 }
 
+/* find the shopkeeper who owns 'obj'; needed to handle shared shop walls */
+struct monst *
+find_objowner(
+    struct obj *obj,
+    coordxy x, coordxy y) /* caller passes obj's location since obj->ox,oy
+                           * might be stale; don't update coordinates here
+                           * because if we're called duing sanity checking
+                           * they shouldn't be modified */
+{
+    struct monst *shkp, *deflt_shkp = 0;
+    char *roomindx, *where = in_rooms(x, y, SHOPBASE);
+
+    /* conceptually object could be inside up to four rooms simultaneously;
+       in practice it will usually be one room but can sometimes be two;
+       check shk and bill for each room rather than just the first;
+       fallback to the first shk if obj isn't on the relevant bill(s) */
+    for (roomindx = where; *roomindx; ++roomindx)
+        if ((shkp = shop_keeper(*roomindx)) != 0) {
+            if (onshopbill(obj, shkp, TRUE))
+                return shkp;
+            if (!deflt_shkp)
+                deflt_shkp = shkp;
+        }
+    return deflt_shkp;
+}
+
 boolean
 tended_shop(struct mkroom *sroom)
 {
@@ -4384,7 +4410,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
 
 /* called in dokick.c when we kick an object that might be in a store */
 boolean
-costly_spot(register coordxy x, register coordxy y)
+costly_spot(coordxy x, coordxy y)
 {
     struct monst *shkp;
     struct eshk *eshkp;
@@ -4397,6 +4423,24 @@ costly_spot(register coordxy x, register coordxy y)
     eshkp = ESHK(shkp);
     return  (boolean) (inside_shop(x, y)
                        && !(x == eshkp->shk.x && y == eshkp->shk.y));
+}
+
+/* called by sanity checking when an unpaid or no_charge item is not at a
+   costly_spot; it might still be within the boundary of the shop; if so,
+   those flags are still valid */
+boolean
+costly_adjacent(
+    struct monst *shkp,
+    coordxy x, coordxy y)
+{
+    struct eshk *eshkp;
+
+    if (!shkp || !inhishop(shkp) || !isok(x, y))
+        return FALSE;
+    eshkp = ESHK(shkp);
+    /* adjacent if <x,y> is a shop wall spot, including door;
+       also treat "free spot" one step inside the door as adjacent */
+    return (levl[x][y].edge || (x == eshkp->shk.x && y == eshkp->shk.y));
 }
 
 /* called by dotalk(sounds.c) when #chatting; returns obj if location

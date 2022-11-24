@@ -13,6 +13,7 @@ static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
 static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
+static void shop_obj_sanity(struct obj *, const char *);
 static void mon_obj_sanity(struct monst *, const char *);
 static void insane_obj_bits(struct obj *, struct monst *);
 static boolean nomerge_exception(struct obj *);
@@ -2722,10 +2723,7 @@ obj_sanity_check(void)
 static void
 objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
 {
-    struct obj *obj, *otmp;
-    struct monst *shkp;
-    boolean costly;
-    const char *why;
+    struct obj *obj;
 
     for (obj = objlist; obj; obj = obj->nobj) {
         if (obj->where != wheretype)
@@ -2737,50 +2735,9 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
                               mesg, (struct monst *) 0);
             check_contained(obj, mesg);
         }
-        why = (const char *) 0;
-        if (obj->no_charge && obj->unpaid) {
-            why = "%s obj both unpaid and no_charge! %s %s: %s";
-        } else if (obj->unpaid) {
-            /* unpaid is only applicable for directly carried objects and
-               for objects inside carried containers */
-            otmp = obj;
-            while (otmp->where == OBJ_CONTAINED)
-                otmp = otmp->ocontainer;
-            if (otmp != obj)
-                obj->ox = otmp->ox, obj->oy = otmp->oy;
-
-            if (otmp->where != OBJ_INVENT)
-                why = "%s unpaid obj not carried! %s %s: %s";
-            else if ((costly = costly_spot(obj->ox, obj->oy)) == FALSE)
-                why = "%s unpaid obj not inside shop! %s %s: %s";
-            else if ((shkp = shop_keeper(*in_rooms(obj->ox, obj->oy,
-                                                   SHOPBASE))) == 0)
-                why = "%s unpaid obj inside untended shop! %s %s: %s";
-            else if (!onshopbill(obj, shkp, TRUE))
-                why = "%s unpaid obj not on shop bill! %s %s: %s";
-        } else if (obj->no_charge) {
-            /* no_charge is only applicable for floor objects in shops and
-               for objects inside floor containers in shops */
-            otmp = obj;
-            while (otmp->where == OBJ_CONTAINED)
-                otmp = otmp->ocontainer;
-            if (otmp != obj)
-                (void) get_obj_location(otmp, &obj->ox, &obj->oy, BURIED_TOO);
-
-            if (otmp->where != OBJ_FLOOR)
-                why = "%s no_charge obj not on floor! %s %s: %s";
-            else if ((costly = costly_spot(obj->ox, obj->oy)) == FALSE)
-                why = "%s no_charge obj not inside shop! %s %s: %s";
-            else if ((shkp = shop_keeper(*in_rooms(obj->ox, obj->oy,
-                                                   SHOPBASE))) == 0)
-                why = "%s no_charge obj inside untended shop! %s %s: %s";
-            else if (onshopbill(obj, shkp, TRUE))
-                why = "%s no_charge obj on shop bill! %s %s: %s";
-            if (why)
-                insane_object(obj, why, mesg, (struct monst *) 0);
-        } /* unpaid and/or no_charge */
-        if (why)
-            insane_object(obj, why, mesg, (struct monst *) 0);
+        if (obj->unpaid || obj->no_charge) {
+            shop_obj_sanity(obj, mesg);
+        }
         if (obj->owornmask) {
             char maskbuf[40];
             boolean bc_ok = FALSE;
@@ -2817,6 +2774,63 @@ objlist_sanity(struct obj *objlist, int wheretype, const char *mesg)
             || (obj->otyp == BOULDER && obj->next_boulder))
             insane_obj_bits(obj, (struct monst *) 0);
     }
+}
+
+/* check obj->unpaid and obj->no_charge for shop sanity; caller has
+   verified that at least one of them is set */
+static void
+shop_obj_sanity(struct obj *obj, const char *mesg)
+{
+    struct obj *otop;
+    struct monst *shkp;
+    const char *why;
+    boolean costly;
+    coordxy x = 0, y = 0;
+
+    /* if contained, get top-most container; we needs its location */
+    otop = obj;
+    while (otop->where == OBJ_CONTAINED)
+        otop = otop->ocontainer;
+    /* get obj's or its container's location; do not update obj->ox,oy
+       or otop->ox,oy because that would cause sanity checking to
+       produce side-effects that won't occur when not sanity checking;
+       no need for CONTAINED_TOO because we have a top level container */
+    (void) get_obj_location(otop, &x, &y, BURIED_TOO);
+
+    /* these will always be needed for the normal case, so don't bother
+       waiting until we find an insanity to fetch them */
+    shkp = find_objowner(obj, x, y);
+    costly = costly_spot(x, y) || costly_adjacent(shkp, x, y);
+
+    why = (const char *) 0;
+    if (obj->no_charge && obj->unpaid) {
+        why = "%s obj both unpaid and no_charge! %s %s: %s";
+    } else if (obj->unpaid) {
+        /* unpaid is only applicable for directly carried objects and
+           for objects inside carried containers */
+        if (otop->where != OBJ_INVENT)
+            why = "%s unpaid obj not carried! %s %s: %s";
+        else if (!costly)
+            why = "%s unpaid obj not inside tended shop! %s %s: %s";
+        else if (!shkp)
+            why = "%s unpaid obj inside untended shop! %s %s: %s";
+        else if (!onshopbill(obj, shkp, TRUE))
+            why = "%s unpaid obj not on shop bill! %s %s: %s";
+    } else if (obj->no_charge) {
+        /* no_charge is only applicable for floor objects in shops
+           and for objects inside floor containers in shops */
+        if (otop->where != OBJ_FLOOR)
+            why = "%s no_charge obj not on floor! %s %s: %s";
+        else if (!costly)
+            why = "%s no_charge obj not inside tended shop! %s %s: %s";
+        else if (!shkp)
+            why = "%s no_charge obj inside untended shop! %s %s: %s";
+        else if (onshopbill(obj, shkp, TRUE))
+            why = "%s no_charge obj on shop bill! %s %s: %s";
+    }
+    if (why)
+        insane_object(obj, why, mesg, (struct monst *) 0);
+    return;
 }
 
 /* sanity check for objects carried by all monsters in specified list */
