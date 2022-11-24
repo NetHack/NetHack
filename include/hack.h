@@ -709,9 +709,9 @@ enum optset_restrictions {
      - min((int) greatest_erosion(obj), objects[(obj)->otyp].a_ac))
 
 #define makeknown(x) discover_object((x), TRUE, TRUE)
-#define distu(xx, yy) dist2((coordxy) (xx), (coordxy) (yy), (coordxy) u.ux, (coordxy) u.uy)
+#define distu(xx, yy) dist2((coordxy) (xx), (coordxy) (yy), u.ux, u.uy)
 #define mdistu(mon) distu((mon)->mx, (mon)->my)
-#define onlineu(xx, yy) online2((coordxy)(xx), (coordxy)(yy), (coordxy) u.ux, (coordxy) u.uy)
+#define onlineu(xx, yy) online2((coordxy)(xx), (coordxy)(yy), u.ux, u.uy)
 
 #define rn1(x, y) (rn2(x) + (y))
 
