@@ -1300,7 +1300,7 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
 static void
 evaluate_and_notify_windowport(boolean *valsetlist, int idx)
 {
-    int i, updated = 0, notpresent = 0;
+    int i, updated = 0, notpresent UNUSED = 0;
 
     /*
      *  Now pass the changed values to window port.
