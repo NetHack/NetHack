@@ -9,14 +9,14 @@
 
 int debuggable = 0; /* 1 if we can debug or show a call trace */
 
-void vms_exit(int);
-void vms_abort(void);
+ATTRNORETURN void vms_exit(int);
+ATTRNORETURN void vms_abort(void);
 
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
 extern void VDECL(lib$signal, (unsigned, ...));
 
 /* terminate, converting Unix-style exit code into VMS status code */
-void
+ATTRNORETURN void
 vms_exit(int status)
 {
     /* convert non-zero to failure, zero to success */
@@ -25,7 +25,7 @@ vms_exit(int status)
 }
 
 /* put the user into the debugger; used for abort() when in wizard mode */
-void
+ATTRNORETURN void
 vms_abort(void)
 {
     if (debuggable)

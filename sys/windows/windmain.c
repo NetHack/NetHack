@@ -89,6 +89,8 @@ static struct stat hbuf;
 
 extern char orgdir[];
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 get_known_folder_path(
     const KNOWNFOLDERID * folder_id,
@@ -127,6 +129,8 @@ create_directory(const char * path)
     if (FAILED(hr) && hr != ERROR_ALREADY_EXISTS)
         error("Unable to create directory '%s'", path);
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 int
 build_known_folder_path(
@@ -1149,6 +1153,8 @@ eraseoldlocks(void)
     return (1);   /* success! */
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 int
 getlock(void)
 {
@@ -1287,6 +1293,8 @@ file_exists(const char* path)
     }
     return TRUE;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* 
   file_newer returns TRUE if the file at a_path is newer then the file

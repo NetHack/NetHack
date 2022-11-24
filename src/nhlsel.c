@@ -145,6 +145,8 @@ l_selection_clone(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* selection.set(sel, x, y); */
 /* selection.set(sel, x, y, value); */
 /* local sel = selection.set(); */
@@ -207,6 +209,7 @@ l_selection_getpoint(lua_State *L)
     lua_remove(L, 1); /* sel */
     if (!nhl_get_xy_params(L, &ix, &iy)) {
         nhl_error(L, "l_selection_getpoint: Incorrect params");
+        /*NOTREACHED*/
         return 0;
     }
     x = (coordxy) ix;
@@ -223,6 +226,8 @@ l_selection_getpoint(lua_State *L)
     lua_pushnumber(L, val);
     return 1;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* local s = selection.negate(sel); */
 /* local s = selection.negate(); */

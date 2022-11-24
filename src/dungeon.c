@@ -264,6 +264,8 @@ Fread(genericptr_t ptr, int size, int nitems, dlb *stream)
 }
 #endif
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static xint16
 dname_to_dnum(const char *s)
 {
@@ -277,6 +279,8 @@ dname_to_dnum(const char *s)
     /*NOT REACHED*/
     return (xint16) 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 s_level *
 find_level(const char *s)
@@ -317,6 +321,8 @@ find_branch(const char *s, /* dungeon name */
     return i;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /*
  * Find the "parent" by searching the prototype branch list for the branch
  * listing, then figuring out to which dungeon it belongs.
@@ -341,6 +347,8 @@ parent_dnum(const char *s, /* dungeon name */
     /*NOT REACHED*/
     return (xint16) 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * Return a starting point and number of successive positions a level
@@ -592,6 +600,8 @@ possible_places(int idx,      /* prototype index */
     return count;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* Pick the nth TRUE entry in the given boolean array. */
 static xint16
 pick_level(boolean *map, /* an array MAXLEVEL+1 in size */
@@ -602,8 +612,11 @@ pick_level(boolean *map, /* an array MAXLEVEL+1 in size */
         if (map[i] && !nth--)
             return i;
     panic("pick_level:  ran out of valid levels");
+    /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 #ifdef DDEBUG
 static void indent(int);
@@ -1271,6 +1284,8 @@ maxledgerno(void)
                     + g.dungeons[g.n_dgns - 1].num_dunlevs);
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* return the dungeon that this ledgerno exists in */
 xint16
 ledger_to_dnum(xint16 ledgerno)
@@ -1288,6 +1303,8 @@ ledger_to_dnum(xint16 ledgerno)
     /*NOT REACHED*/
     return (xint16) 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* return the level of the dungeon this ledgerno exists in */
 xint16

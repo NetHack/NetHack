@@ -168,7 +168,7 @@ l_nhcore_call(int callidx)
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
-void
+ATTRNORETURN void
 nhl_error(lua_State *L, const char *msg)
 {
     lua_Debug ar;
@@ -188,7 +188,6 @@ nhl_error(lua_State *L, const char *msg)
 #endif
     (void) lua_error(L);
     /*NOTREACHED*/
-    /* UNREACHABLE_CODE */
 }
 
 RESTORE_WARNING_UNREACHABLE_CODE
@@ -208,6 +207,8 @@ lcheck_param_table(lua_State *L)
 
     luaL_checktype(L, 1, LUA_TTABLE);
 }
+
+DISABLE_WARNING_UNREACHABLE_CODE
 
 schar
 get_table_mapchr(lua_State *L, const char *name)
@@ -256,6 +257,8 @@ nhl_get_timertype(lua_State *L, int idx)
         nhl_error(L, "Unknown timer type");
     return ret;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 void
 nhl_add_table_entry_int(lua_State *L, const char *name, lua_Integer value)
@@ -375,6 +378,8 @@ splev_typ2chr(schar typ)
     return 'x';
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* local t = nh.gettrap(x,y); */
 /* local t = nh.gettrap({ x = 10, y = 10 }); */
 static int
@@ -385,6 +390,7 @@ nhl_gettrap(lua_State *L)
 
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "Incorrect arguments");
+        /*NOTREACHED*/
         return 0;
     }
     x = (coordxy) lx;
@@ -436,6 +442,7 @@ nhl_deltrap(lua_State *L)
 
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "Incorrect arguments");
+        /*NOTREACHED*/
         return 0;
     }
     x = (coordxy) lx;
@@ -450,6 +457,8 @@ nhl_deltrap(lua_State *L)
     }
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* get parameters (XX,YY) or ({ x = XX, y = YY }) or ({ XX, YY }),
    and set the x and y values.
@@ -574,8 +583,6 @@ nhl_getmap(lua_State *L)
     }
 }
 
-RESTORE_WARNING_CONDEXPR_IS_CONSTANT
-
 /* impossible("Error!") */
 static int
 nhl_impossible(lua_State *L)
@@ -664,6 +671,7 @@ nhl_getlin(lua_State *L)
     }
 
     nhl_error(L, "Wrong args");
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -688,6 +696,7 @@ nhl_menu(lua_State *L)
 
     if (argc < 2 || argc > 4) {
         nhl_error(L, "Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -873,6 +882,8 @@ nhl_level_difficulty(lua_State *L)
     }
     return 1;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* get mandatory integer value from table */
 int
@@ -1150,6 +1161,8 @@ nhl_debug_flags(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* does location at x,y have timer? */
 /* local has_melttimer = nh.has_timer_at(x,y, "melt-ice"); */
 /* local has_melttimer = nh.has_timer_at({x=4,y=7}, "melt-ice"); */
@@ -1165,6 +1178,7 @@ nhl_timer_has_at(lua_State *L)
     lua_pop(L, 1); /* remove timertype */
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "nhl_timer_has_at: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -1194,6 +1208,7 @@ nhl_timer_peek_at(lua_State *L)
     lua_pop(L, 1); /* remove timertype */
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "nhl_timer_peek_at: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -1220,6 +1235,7 @@ nhl_timer_stop_at(lua_State *L)
     lua_pop(L, 1); /* remove timertype */
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "nhl_timer_stop_at: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -1245,6 +1261,7 @@ nhl_timer_start_at(lua_State *L)
     lua_pop(L, 2); /* remove when and timertype */
     if (!nhl_get_xy_params(L, &lx, &ly)) {
         nhl_error(L, "nhl_timer_start_at: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -1261,6 +1278,8 @@ nhl_timer_start_at(lua_State *L)
     }
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static const struct luaL_Reg nhl_functions[] = {
     {"test", nhl_test},
@@ -1357,6 +1376,8 @@ nhl_push_anything(lua_State *L, int anytype, void *src)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static int
 nhl_meta_u_index(lua_State *L)
 {
@@ -1417,6 +1438,7 @@ nhl_meta_u_index(lua_State *L)
     }
 
     nhl_error(L, "Unknown u table index");
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -1424,8 +1446,11 @@ static int
 nhl_meta_u_newindex(lua_State *L)
 {
     nhl_error(L, "Cannot set u table values");
+    /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static int
 nhl_u_clear_inventory(lua_State *L UNUSED)
@@ -1790,7 +1815,7 @@ get_lua_version(void)
     return (const char *) g.lua_ver;
 }
 
-RESTORE_WARNINGS
+RESTORE_WARNING_CONDEXPR_IS_CONSTANT
 
 /***
  *** SANDBOX / HARDENING CODE
@@ -2297,6 +2322,8 @@ nhl_alloc(void *ud, void *ptr, size_t osize, size_t nsize)
     return re_alloc(ptr, nsize);
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static int
 nhl_panic(lua_State *L)
 {
@@ -2305,8 +2332,11 @@ nhl_panic(lua_State *L)
     if (msg == NULL)
         msg = "error object is not a string";
     panic("unprotected error in call to Lua API (%s)\n", msg);
+    /*NOTREACHED*/
     return 0; /* return to Lua to abort */
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* called when lua issues a warning message; the text of the message
    is passed to us in pieces across multiple function calls */

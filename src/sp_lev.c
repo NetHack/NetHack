@@ -2988,6 +2988,8 @@ l_push_mkroom_table(lua_State *L, struct mkroom *tmpr)
     nhl_add_table_entry_str(L, "type", get_mkroom_name(tmpr->rtype));
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* message("What a strange feeling!"); */
 int
 lspo_message(lua_State *L)
@@ -3000,6 +3002,7 @@ lspo_message(lua_State *L)
 
     if (argc < 1) {
         nhl_error(L, "Wrong parameters");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -3023,6 +3026,8 @@ lspo_message(lua_State *L)
 
     return 0;  /* number of results */
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static int
 get_table_align(lua_State *L)
@@ -3295,6 +3300,8 @@ lspo_monster(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* the hash key 'name' is an integer or "random",
    or if not existent, also return rndval */
 static lua_Integer
@@ -3321,6 +3328,7 @@ get_table_int_or_random(lua_State *L, const char *name, int rndval)
         else
             Strcat(buf, "<Null>");
         nhl_error(L, buf);
+        /*NOTREACHED*/
         lua_pop(L, 1);
         return 0;
     }
@@ -3328,6 +3336,8 @@ get_table_int_or_random(lua_State *L, const char *name, int rndval)
     lua_pop(L, 1);
     return ret;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static int
 get_table_buc(lua_State *L)
@@ -4300,6 +4310,8 @@ lspo_trap(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* gold(500, 3,5); */
 /* gold(500, {5, 6}); */
 /* gold({ amount = 500, x = 2, y = 5 });*/
@@ -4333,6 +4345,7 @@ lspo_gold(lua_State *L)
         x = gx, y = gy;
     } else {
         nhl_error(L, "Wrong parameters");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -4348,6 +4361,8 @@ lspo_gold(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* corridor({ srcroom=1, srcdoor=2, srcwall="north", destroom=2, destdoor=1, destwall="west" });*/
 int
@@ -5312,6 +5327,8 @@ cvt_to_relcoord(coordxy *x, coordxy *y)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* convert map-relative coordinate to absolute.
   local ax,ay = nh.abscoord(rx, ry);
   local pt = nh.abscoord({ x = 10, y = 5 });
@@ -5339,6 +5356,7 @@ nhl_abs_coord(lua_State *L)
         return 1;
     } else {
         nhl_error(L, "nhl_abs_coord: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 }
@@ -5416,6 +5434,8 @@ lspo_feature(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * [lit_state: 1 On, 0 Off, -1 random, -2 leave as-is]
@@ -5701,6 +5721,8 @@ ensure_way_out(void)
     selection_free(ov, TRUE);
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 static lua_Integer
 get_table_intarray_entry(lua_State *L, int tableidx, int entrynum)
 {
@@ -5746,6 +5768,7 @@ get_table_region(
     lua_pop(L, 1);
     if (arrlen != 4) {
         nhl_error(L, "Not a region");
+        /*NOTREACHED*/
         lua_pop(L, 1);
         return 0;
     }
@@ -5784,6 +5807,7 @@ get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
                 ret = TRUE;
             } else {
                 nhl_error(L, "Not a coordinate");
+                /*NOTREACHED*/
                 return FALSE;
             }
         } else {
@@ -5792,6 +5816,7 @@ get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
             lua_pop(L, 1);
             if (arrlen != 2) {
                 nhl_error(L, "Not a coordinate");
+                /*NOTREACHED*/
                 return FALSE;
             }
 
@@ -5806,6 +5831,8 @@ get_coord(lua_State *L, int i, lua_Integer *x, lua_Integer *y)
     }
     return ret;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
 levregion_add(lev_region* lregion)
@@ -5944,6 +5971,8 @@ add_doors_to_room(struct mkroom *croom)
                 maybe_add_door(x, y, croom);
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* region(selection, lit); */
 /* region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL,
             irregular=BOOL, filled=NN [ , contents = FUNCTION ] }); */
@@ -6005,6 +6034,7 @@ lspo_region(lua_State *L)
         return 0;
     } else {
         nhl_error(L, "Wrong parameters");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -6086,6 +6116,8 @@ lspo_region(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* drawbridge({ dir="east", state="closed", x=05,y=08 }); */
 /* drawbridge({ dir="east", state="closed", coord={05,08} }); */
@@ -6427,6 +6459,8 @@ lspo_finalize_level(lua_State *L UNUSED)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* map({ x = 10, y = 10, map = [[...]] }); */
 /* map({ coord = {10, 10}, map = [[...]] }); */
 /* map({ halign = "center", valign = "center", map = [[...]] }); */
@@ -6489,6 +6523,7 @@ TODO: g.coder->croom needs to be updated
 
     if (!mf) {
         nhl_error(L, "Map data error");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -6681,6 +6716,8 @@ TODO: g.coder->croom needs to be updated
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 struct selectionvar *
 selection_from_mkroom(struct mkroom *croom)

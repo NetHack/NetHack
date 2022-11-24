@@ -1537,6 +1537,8 @@ tty_exit_nhwindows(const char *str)
     iflags.window_inited = 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 winid
 tty_create_nhwindow(int type)
 {
@@ -1650,6 +1652,8 @@ tty_create_nhwindow(int type)
 
     return newid;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
 erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)

@@ -394,6 +394,17 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 
 /*
+ * Give first priority to standard
+ */
+#ifndef ATTRNORETURN
+#if defined(__STDC_VERSION__) || defined(__cplusplus)
+#if (__STDC_VERSION__ > 202300L) || defined(__cplusplus)
+#define ATTRNORETURN [[noreturn]]
+#endif
+#endif
+#endif
+
+/*
  * Allow gcc2 to check parameters of printf-like calls with -Wformat;
  * append this to a prototype declaration (see pline() in extern.h).
  */
@@ -406,7 +417,11 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #if __GNUC__ >= 3
 #define UNUSED __attribute__((unused))
+#ifndef ATTRNORETURN
+#ifndef NORETURN
 #define NORETURN __attribute__((noreturn))
+#endif
+#endif
 #if (!defined(__linux__) && !defined(MACOS)) || defined(GCC_URWARN)
 /* disable gcc's __attribute__((__warn_unused_result__)) since explicitly
    discarding the result by casting to (void) is not accepted as a 'use' */
@@ -419,6 +434,12 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #endif
 
+#ifdef _MSC_VER
+#ifndef ATTRNORETURN
+#define ATTRNORETURN __declspec(noreturn)
+#endif
+#endif
+
 #ifndef PRINTF_F
 #define PRINTF_F(f, v)
 #endif
@@ -428,11 +449,15 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifndef UNUSED
 #define UNUSED
 #endif
+#ifndef ATTRNORETURN
+#define ATTRNORETURN
+#endif
 #ifndef NORETURN
 #define NORETURN
 #endif
 #ifndef NONNULL
 #define NONNULL
 #endif
+
 
 #endif /* TRADSTDC_H */

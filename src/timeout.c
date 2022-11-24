@@ -2316,6 +2316,8 @@ write_timer(NHFILE* nhfp, timer_element* timer)
     }
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /*
  * Return TRUE if the object will stay on the level when the level is
  * saved.
@@ -2336,6 +2338,7 @@ obj_is_local(struct obj* obj)
         return mon_is_local(obj->ocarry);
     }
     panic("obj_is_local");
+    /*NOTREACHED*/
     return FALSE;
 }
 
@@ -2376,8 +2379,11 @@ timer_is_local(timer_element* timer)
         return mon_is_local(timer->arg.a_monst);
     }
     panic("timer_is_local");
+    /*NOTREACHED*/
     return FALSE;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * Part of the save routine.  Count up the number of timers that would

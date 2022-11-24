@@ -596,7 +596,7 @@ fixup_death(int how)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 /*VARARGS1*/
-void
+ATTRNORETURN void
 panic VA_DECL(const char *, str)
 {
     VA_START(str);
@@ -1780,7 +1780,7 @@ container_contents(
 }
 
 /* should be called with either EXIT_SUCCESS or EXIT_FAILURE */
-void
+ATTRNORETURN void
 nh_terminate(int status)
 {
     g.program_state.in_moveloop = 0; /* won't be returning to normal play */

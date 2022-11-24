@@ -765,6 +765,8 @@ same_race(struct permonst* pm1, struct permonst* pm2)
     return FALSE;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* return an index into the mons array */
 int
 monsndx(struct permonst* ptr)
@@ -775,10 +777,13 @@ monsndx(struct permonst* ptr)
     if (i < LOW_PM || i >= NUMMONS) {
         panic("monsndx - could not index monster (%s)",
               fmt_ptr((genericptr_t) ptr));
+        /*NOTREACHED*/
         return NON_PM; /* will not get here */
     }
     return i;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* for handling alternate spellings */
 struct alt_spl {

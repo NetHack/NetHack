@@ -784,12 +784,12 @@ extern void done_in_by(struct monst *, int);
 extern void done_object_cleanup(void);
 #endif /* !MAKEDEFS_C && MDLIB_C && !CPPREGEX_C */
 #if !defined(CPPREGEX_C)
-extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
+ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #endif
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 extern void done(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
-extern void nh_terminate(int) NORETURN;
+ATTRNORETURN extern void nh_terminate(int) NORETURN;
 extern void delayed_killer(int, int, const char *);
 extern struct kinfo *find_delayed_killer(int);
 extern void dealloc_killer(struct kinfo *);
@@ -1830,7 +1830,7 @@ extern void nhl_done(lua_State *);
 extern boolean nhl_loadlua(lua_State *, const char *);
 extern int nhl_pcall(lua_State *, int, int);
 extern boolean load_lua(const char *, nhl_sandbox_info *);
-extern void nhl_error(lua_State *, const char *) NORETURN;
+ATTRNORETURN extern void nhl_error(lua_State *, const char *) NORETURN;
 extern void lcheck_param_table(lua_State *);
 extern schar get_table_mapchr(lua_State *, const char *);
 extern schar get_table_mapchr_opt(lua_State *, const char *, schar);
@@ -2072,7 +2072,7 @@ extern void msmsg(const char *, ...) PRINTF_F(1, 2);
 extern void gettty(void);
 extern void settty(const char *);
 extern void setftty(void);
-extern void error(const char *, ...) PRINTF_F(1, 2) NORETURN;
+ATTRNORETURN extern void error(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #if defined(TIMED_DELAY) && defined(_MSC_VER)
 extern void msleep(unsigned);
 #endif
@@ -3000,7 +3000,7 @@ extern void settty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void error (const char *, ...) PRINTF_F(1, 2) NORETURN;
+ATTRNORETURN extern void error(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #ifdef ENHANCED_SYMBOLS
 extern void tty_utf8graphics_fixup(void);
 #endif
@@ -3152,8 +3152,8 @@ extern boolean authorize_wizard_mode(void);
 
 /* ### vmsmisc.c ### */
 
-extern void vms_abort(void) NORETURN;
-extern void vms_exit(int) NORETURN;
+ATTRNORETURN extern void vms_abort(void) NORETURN;
+ATTRNORETURN extern void vms_exit(int) NORETURN;
 #ifdef PANICTRACE
 extern void vms_traceback(int);
 #endif
@@ -3167,7 +3167,7 @@ extern void shuttty(const char *);
 extern void setftty(void);
 extern void intron(void);
 extern void introff(void);
-extern void error (const char *, ...) PRINTF_F(1, 2) NORETURN;
+ATTRNORETURN extern void error (const char *, ...) PRINTF_F(1, 2) NORETURN;
 #ifdef TIMED_DELAY
 extern void msleep(unsigned);
 #endif
