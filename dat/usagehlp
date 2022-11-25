@@ -2,11 +2,8 @@ This is a terse description of nethack's command line arguments.
 It is oriented toward UNIX (including descendants such as linux and
 macOS) and might not be accurate for other platforms.
 
-This text is available in the menu for the game's '?' command or can be
-viewed via 'nethack --usage | more' at the shell prompt.
-
-In all cases, if there is a save file for the chosen character name then
-it will be restored, otherwise a new game using that name will start.
+When starting play, if there is a save file for the chosen character name
+then it will be restored, otherwise a new game using that name will begin.
 
 nethack
   with no arguments; uses character name from run-time configuration file's
@@ -67,7 +64,7 @@ nethack --windowtype:Iii
   supports mswin only.  MS-DOS is tty only.
 
 nethack -n
-  don't show the 'news' file is one is present in nethack's directory.
+  don't show the 'news' file if one is present in nethack's directory.
 
 nethack --nethackrc:RC-file
   use RC-file instead of the default run-time configuration file (which is
@@ -90,15 +87,14 @@ they're listed separately for readability.
 Other options which perform some action and then exit rather than play
 the game:
 
-nethack --usage
-nethack --help
-  show this text; 'nethack ?' and 'nethack -?' might also work but the
-  question mark will need to be quoted to prevent the shell from attempting
-  filename matching.
-
 nethack -s
 nethack --scores
   show scores for the default character; optional additional arguments:
+nethack -s -v
+  show scores for all versions present in the high scores file (record)
+  if it contains scores for any older versions; by default, only scores
+  for current version of nethack are shown; when '-v' is used, it should
+  immediately follow -s or --scores, preceding any name(s) or -p or -r;
 nethack -s character-name [character-name2 [character-name3 [...]]]
   show scores for one or more specific character names (might not be
   effective if PERS_IS_UID=1 is specified in nethack's sysconf file);
@@ -109,14 +105,9 @@ nethack -s -p Ppp -r Rrr
   show scores for specific roles or races; multiple instances can be used;
   if both '-p' and '-r' are used, scores that match either will be shown
   rather than scores that match both;
-nethack -s -v
-  show scores for all versions present in the high scores file (record)
-  if scores for any older versions are present; by default, only scores
-  for current version of nethack are shown; when -v is used, it should
-  immediately follow -s or --scores, preceding any name(s) or -p or -r;
 nethack -dDir -s
 nethack --directory:Dir -s
-  as above; alternative directory, if specified, should come first.
+  as above; alternate directory, if specified, should come first.
 
 nethack --version
 nethack --version:paste
@@ -130,4 +121,14 @@ nethack --showpaths
   list expected locations for various files and directorys, then exit;
   includes the name and location for the run-time configuration file which
   can vary from platform to platform.
+
+nethack --usage
+nethack --help
+  show this text; 'nethack -?' and 'nethack ?' also work but the question
+  mark may need to be quoted to prevent the shell from intercepting it.
+
+*******
+
+This text is available during play in the menu for the game's '?' command
+or can be viewed via 'nethack --usage | more' at the shell prompt.
 
