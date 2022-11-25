@@ -34,7 +34,7 @@ struct glyphid_cache_t {
     int glyphnum;
     char *id;
 };
-struct glyphid_cache_t *glyphid_cache;
+static struct glyphid_cache_t *glyphid_cache;
 struct find_struct glyphcache_find, to_custom_symbol_find;
 static void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
@@ -44,6 +44,8 @@ static int glyph_find_core(const char *id, struct find_struct *findwhat);
 static char *fix_glyphname(char *str);
 static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
+static int glyphid_sort_compare(const void *p1, const void *p2);
+static int glyphid_search_compare(const void *p1, const void *p2);
 
 static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
@@ -335,6 +337,26 @@ void fill_glyphid_cache(void)
             glyphid_cache = (struct glyphid_cache_t *) 0;
         }
     }
+    if (glyphid_cache) {
+        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+            if (glyphid_cache[glyph].id != NULL) {
+                lcase(glyphid_cache[glyph].id);
+            }
+        }
+        qsort(glyphid_cache, MAX_GLYPH, sizeof(glyphid_cache[0]),
+              glyphid_sort_compare);
+    }
+}
+
+static int
+glyphid_sort_compare(const void *p1, const void *p2)
+{
+    const struct glyphid_cache_t *elem1 = (const struct glyphid_cache_t *) p1;
+    const struct glyphid_cache_t *elem2 = (const struct glyphid_cache_t *) p2;
+    const char *id1 = elem1->id ? elem1->id : "";
+    const char *id2 = elem2->id ? elem2->id : "";
+
+    return strcmp(id1, id2);
 }
 
 void free_glyphid_cache(void)
@@ -601,18 +623,28 @@ parse_id(const char *id, struct find_struct *findwhat)
         }
     }
     if (is_G || filling_cache || dump_ids) {
-        /* individual matching glyph entries */
-        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-            if (!filling_cache && id && glyphid_cache) {
-                if (!glyphid_cache[glyph].id) /* skipped during cache fill */
-                    continue;
-                if (!strcmpi(id, glyphid_cache[glyph].id)) {
-                    findwhat->findtype = find_glyph;
-                    findwhat->val = glyph;
-                    findwhat->loadsyms_offset = 0;
-                    return 1;
-                }
+        if (!filling_cache && id && glyphid_cache) {
+            char *id_l;
+            const struct glyphid_cache_t *gptr;
+
+            id_l = dupstr(id);
+            lcase(id_l);
+            gptr = (const struct glyphid_cache_t *)
+                    bsearch(id_l, glyphid_cache, MAX_GLYPH,
+                            sizeof(glyphid_cache[0]),
+                            glyphid_search_compare);
+            free(id_l);
+            if (gptr != NULL) {
+                findwhat->findtype = find_glyph;
+                findwhat->val = gptr->glyphnum;
+                findwhat->loadsyms_offset = 0;
+                return 1;
             } else {
+                return 0;
+            }
+        } else {
+            /* individual matching glyph entries */
+            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 skip_base = FALSE;
                 skip_this_one = FALSE;
                 buf[0][0] = buf[1][0] = buf[2][0] = buf[3][0] = buf[4][0] =
@@ -700,6 +732,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                                  (i == SCR_BLANK_PAPER) ? "blank scroll"
                                  : (i == SPE_BLANK_PAPER)
                                      ? "blank spellbook"
+                                     : (i == SLIME_MOLD)
+                                     ? "slime mold"
                                      : obj_descr[i].oc_name);
                         Snprintf(buf[1], sizeof buf[1], "%s%s%s",
                                  glyph_is_normal_piletop_obj(glyph)
@@ -839,8 +873,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                         }
                     }
                 }
-            } /* not glyphid_cache */
-        }
+            }
+        } /* not glyphid_cache */
     } else if (is_S) {
         /* cmap entries */
         for (i = 0; i < cmap_count; ++i) {
@@ -876,6 +910,16 @@ parse_id(const char *id, struct find_struct *findwhat)
     findwhat->val = 0;
     findwhat->loadsyms_offset = 0;
     return 0;
+}
+
+static int
+glyphid_search_compare(const void *p1, const void *p2)
+{
+    const char *key = (const char *) p1;
+    const struct glyphid_cache_t *elem = (const struct glyphid_cache_t *) p2;
+    const char *str = elem->id ? elem->id : "";
+
+    return strcmp(key, str);
 }
 
 static struct {
