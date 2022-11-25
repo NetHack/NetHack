@@ -1031,7 +1031,19 @@ do_symset(boolean rogueflag)
 
     if (gs.symset[which_set].name) {
         /* non-default symbols */
-        if (read_sym_file(which_set)) {
+        int ok;
+#ifdef ENHANCED_SYMBOLS
+        if (!glyphid_cache_status()) {
+            fill_glyphid_cache();
+        }
+#endif
+        ok = read_sym_file(which_set);
+#ifdef ENHANCED_SYMBOLS
+        if (glyphid_cache_status()) {
+            free_glyphid_cache();
+        }
+#endif
+        if (ok) {
             ready_to_switch = TRUE;
         } else {
             clear_symsetentry(which_set, TRUE);
