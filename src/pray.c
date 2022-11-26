@@ -2016,8 +2016,13 @@ pray_revive(void)
 int
 dopray(void)
 {
-    /* Confirm accidental slips of Alt-P */
-    if (ParanoidPray && yn("Are you sure you want to pray?") != 'y')
+    /*
+     * If ParanoidPray is set, confirm prayer to avoid accidental slips
+     * of Alt+p.
+     * YN(): don't save response in do-again buffer since if it is 'y',
+     * ^A would bypass confirmation, or if 'n', ^A would be pointless.
+     */
+    if (ParanoidPray && YN("Are you sure you want to pray?") != 'y')
         return ECMD_OK;
 
     if (!u.uconduct.gnostic++)
@@ -2033,7 +2038,13 @@ dopray(void)
         return ECMD_OK;
 
     if (wizard && g.p_type >= 0) {
-        if (yn("Force the gods to be pleased?") == 'y') {
+        static const char forcesuccess[] = "Force the gods to be pleased?";
+
+        /* if we asked "are you sure?" above we suppressed the response
+           from the do-again buffer, so need to suppress this response too;
+           otherwise subsequent ^A would use this answer for "are you sure?"
+           and bypass confirmation */
+        if ((ParanoidPray ? YN(forcesuccess) : yn(forcesuccess)) == 'y') {
             u.ublesscnt = 0;
             if (u.uluck < 0)
                 u.uluck = 0;

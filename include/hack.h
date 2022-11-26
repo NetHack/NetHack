@@ -453,6 +453,8 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define nyaq(query) yn_function(query, ynaqchars, 'n', TRUE)
 #define nyNaq(query) yn_function(query, ynNaqchars, 'n', TRUE)
 #define ynNaq(query) yn_function(query, ynNaqchars, 'y', TRUE)
+/* YN() is same as yn() except doesn't save the response in do-again buffer */
+#define YN(query) yn_function(query, ynchars, 'n', FALSE)
 
 /* Macros for scatter */
 #define VIS_EFFECTS 0x01 /* display visual effects */
