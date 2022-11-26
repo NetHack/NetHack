@@ -1574,8 +1574,8 @@ getobj(
                     return NULL;
                 }
             }
-            if (!otmp)        /* didn't find what we were looking for, */
-                cmdq_clear(CQ_CANNED); /* so discard any other queued commands  */
+            if (!otmp)             /* didn't find what we were looking for, */
+                cmdq_clear(CQ_CANNED); /* so discard any other queued cmnds */
             else if (cntgiven) {
                 /* if stack is smaller than count, drop the whole stack */
                 if (cnt < 1 || otmp->quan <= cnt)
@@ -1791,15 +1791,23 @@ getobj(
             }
         }
         if (cntgiven && !strcmp(word, "throw")) {
+            static const char only_one[] = "can only throw one at a time";
+            boolean coins;
+
             /* permit counts for throwing gold, but don't accept counts
                for other things since the throw code will split off a
                single item anyway; if populating quiver, 'word' will be
                "ready" or "fire" and this restriction doesn't apply */
-            if (cnt == 0)
+            if (cnt == 0L || !otmp)
                 return (struct obj *) 0;
-            if (cnt > 1 && (ilet != def_oc_syms[COIN_CLASS].sym
-                && !(otmp && otmp->oclass == COIN_CLASS))) {
-                You("can only throw one item at a time.");
+            coins = (otmp->oclass == COIN_CLASS);
+            if (cnt > 1L && (!coins || cnt > otmp->quan)) {
+                if (cnt > otmp->quan)
+                    You("only have %ld%s%s.", otmp->quan,
+                        (!coins && otmp->quan > 1L) ? " and " : "",
+                        (!coins && otmp->quan > 1L) ? only_one : "");
+                else
+                    You("%s.", only_one);
                 continue;
             }
         }
