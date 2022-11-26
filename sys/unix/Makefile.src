@@ -246,7 +246,7 @@ WINX11OBJ = $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
 #WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
 #	../win/Qt3/qt3tableview.cpp
 #WINQT3OBJ = $(TARGETPFX)qt3_win.o $(TARGETPFX)qt3_clust.o \
-	$(TARGETPFX)qt3tableview.o #$(TARGETPFX)tile.o
+#	$(TARGETPFX)qt3tableview.o #$(TARGETPFX)tile.o
 # empty values for 'make depend'
 WINQT3SRC =
 WINQT3OBJ =
