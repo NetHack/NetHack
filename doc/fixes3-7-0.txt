@@ -1057,6 +1057,7 @@ some instances of using up or stealing shop-owned boulder didn't charge for it
 when hero hears an unseen monster reading a scroll, only describe the monster
 	acccurately if hero is not hallucinating and monster is same species
 	as hero's current form
+don't allow monsters to disarm hero with bullwhip if hero is engulfed
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -1963,6 +1963,7 @@ find_misc(struct monst* mtmp)
             && next2u(mtmp->mx, mtmp->my)
             /* don't bother if it can't work (this doesn't
                prevent cursed weapons from being targeted) */
+            && !u.uswallow
             && (canletgo(uwep, "")
                 || (u.twoweap && canletgo(uswapwep, "")))) {
             g.m.misc = obj;
