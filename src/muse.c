@@ -48,7 +48,7 @@ static boolean green_mon(struct monst *);
  * anything (i.e. it teleported) and 1 if it's dead.
  */
 static int
-precheck(struct monst* mon, struct obj* obj)
+precheck(struct monst *mon, struct obj *obj)
 {
     boolean vis;
 
@@ -219,53 +219,55 @@ mplayhorn(
     otmp->spe -= 1; /* use a charge */
 }
 
+/* see or hear a monster reading a scroll;
+   when scroll hasn't been seen, its label is revealed unless hero is deaf */
 static void
-mreadmsg(struct monst* mtmp, struct obj* otmp)
+mreadmsg(struct monst *mtmp, struct obj *otmp)
 {
-    boolean vismon = canseemon(mtmp);
     char onambuf[BUFSZ];
-    short saverole;
-    unsigned savebknown;
+    boolean vismon = canseemon(mtmp);
 
     if (!vismon && Deaf)
         return; /* no feedback */
 
-    otmp->dknown = 1; /* seeing or hearing it read reveals its label */
-    /* shouldn't be able to hear curse/bless status of unseen scrolls;
-       for priest characters, bknown will always be set during naming */
-    savebknown = otmp->bknown;
-    saverole = Role_switch;
-    if (!vismon) {
-        otmp->bknown = 0;
-        if (Role_if(PM_CLERIC))
-            Role_switch = 0;
-    }
-    Strcpy(onambuf, singular(otmp, doname));
-    Role_switch = saverole;
-    otmp->bknown = savebknown;
+    otmp->dknown = 1; /* seeing or hearing scroll read reveals its label */
+    Strcpy(onambuf, singular(otmp, vismon ? doname : ansimpleoname));
 
-    if (vismon)
+    if (vismon) {
+        /* directly see the monster reading the scroll */
         pline("%s reads %s!", Monnam(mtmp), onambuf);
-    else
-        You_hear("%s reading %s.",
-                 x_monnam(mtmp, ARTICLE_A, (char *) 0,
-                          (SUPPRESS_IT | SUPPRESS_INVISIBLE | SUPPRESS_SADDLE),
-                          FALSE),
-                 onambuf);
+    } else {
+        boolean m_is_like_u = (!Hallucination
+                               && same_race(g.youmonst.data, mtmp->data));
+        /* describe the unseen monster accurately if it is similar to the
+           hero's current form (unless hallucinating), else use "someone" */
+        int mflags = (SUPPRESS_INVISIBLE | SUPPRESS_SADDLE
+                      | (m_is_like_u ? SUPPRESS_IT : AUGMENT_IT));
 
+        /* monster can't be seen; hero might be blind or monster might
+           be at a spot that isn't in view or might be invisible; remember
+           it if the spot is within line of sight and relatively close */
+        if (couldsee(mtmp->mx, mtmp->my) && mdistu(mtmp) <= 10 * 10)
+            map_invisible(mtmp->mx, mtmp->my);
+
+        You_hear("%s reading %s.",
+                 x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
+                 onambuf);
+    }
     if (mtmp->mconf)
         pline("Being confused, %s mispronounces the magic words...",
               vismon ? mon_nam(mtmp) : mhe(mtmp));
 }
 
 static void
-mquaffmsg(struct monst* mtmp, struct obj* otmp)
+mquaffmsg(struct monst *mtmp, struct obj *otmp)
 {
     if (canseemon(mtmp)) {
         otmp->dknown = 1;
         pline("%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
-    } else if (!Deaf)
+    } else if (!Deaf) {
         You_hear("a chugging sound.");
+    }
 }
 
 /* Defines for various types of stuff.  The order in which monsters prefer
@@ -301,7 +303,7 @@ mquaffmsg(struct monst* mtmp, struct obj* otmp)
  */
 
 static boolean
-m_use_healing(struct monst* mtmp)
+m_use_healing(struct monst *mtmp)
 {
     struct obj *obj;
 
@@ -942,8 +944,8 @@ use_defensive(struct monst* mtmp)
         } else {
             if (vismon)
                 pline("%s escapes upstairs!", Monnam(mtmp));
-            migrate_to_level(mtmp, ledger_no(&(stway->tolev)), MIGR_STAIRS_DOWN,
-                             (coord *) 0);
+            migrate_to_level(mtmp, ledger_no(&(stway->tolev)),
+                             MIGR_STAIRS_DOWN, (coord *) 0);
         }
         return 2;
     case MUSE_DOWNSTAIRS:
@@ -1656,7 +1658,8 @@ use_offensive(struct monst* mtmp)
     case MUSE_FROST_HORN:
         mplayhorn(mtmp, otmp, FALSE);
         g.m_using = TRUE;
-        buzz(BZ_M_WAND(BZ_OFS_AD((otmp->otyp == FROST_HORN) ? AD_COLD : AD_FIRE)),
+        buzz(BZ_M_WAND(BZ_OFS_AD((otmp->otyp == FROST_HORN) ? AD_COLD
+                                                            : AD_FIRE)),
              rn1(6, 6), mtmp->mx, mtmp->my, sgn(mtmp->mux - mtmp->mx),
              sgn(mtmp->muy - mtmp->my));
         g.m_using = FALSE;
@@ -2646,7 +2649,7 @@ mon_consume_unstone(
     struct monst *mon,
     struct obj *obj,
     boolean by_you,
-    boolean stoning) /* True: stop petrification, False: cure stun && confusion */
+    boolean stoning) /* T: stop petrification, F: cure stun && confusion */
 {
     boolean vis = canseemon(mon), tinned = obj->otyp == TIN,
             food = obj->otyp == CORPSE || tinned,

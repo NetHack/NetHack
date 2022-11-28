@@ -2132,7 +2132,7 @@ ansimpleoname(struct obj* obj)
     int otyp = obj->otyp;
 
     /* prefix with "the" if a unique item, or a fake one imitating same,
-       has been formatted with its actual name (we let typename() handle
+       has been formatted with its actual name (we let minimal_xname() handle
        any `known' and `dknown' checking necessary) */
     if (otyp == FAKE_AMULET_OF_YENDOR)
         otyp = AMULET_OF_YENDOR;

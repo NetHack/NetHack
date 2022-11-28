@@ -1054,6 +1054,9 @@ phrasing of the "you can't" message when attempting to name any monster
 	defined with a unique name or title sounded strange when rejecting
 	<space> to remove the existing name without assigning a new one
 some instances of using up or stealing shop-owned boulder didn't charge for it
+when hero hears an unseen monster reading a scroll, only describe the monster
+	acccurately if hero is not hallucinating and monster is same species
+	as hero's current form
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
