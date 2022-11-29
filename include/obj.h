@@ -87,8 +87,10 @@ struct obj {
     Bitfield(cursed, 1);    /* uncursed when neither cursed nor blessed */
     Bitfield(blessed, 1);
     Bitfield(unpaid, 1);    /* owned by shop; valid for objects in hero's
-                             * inventory or inside containers there;
-                             * not used for items on the floor */
+                             * inventory or inside containers there; also,
+                             * used for items on the floor only on the shop
+                             * boundary (including "free spot") or if moved
+                             * from there to inside by wall repairs */
     Bitfield(no_charge, 1); /* if shk shouldn't charge for this; valid for
                              * items on shop floor or in containers there;
                              * implicit for items at any other location

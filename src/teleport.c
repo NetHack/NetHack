@@ -1655,15 +1655,37 @@ rloco(register struct obj* obj)
     } else if (otx == 0 && oty == 0) {
         ; /* fell through a trap door; no update of old loc needed */
     } else {
-        if (costly_spot(otx, oty)
-            && (!costly_spot(tx, ty)
-                || !strchr(in_rooms(tx, ty, 0), *in_rooms(otx, oty, 0)))) {
-            if (costly_spot(u.ux, u.uy)
-                && strchr(u.urooms, *in_rooms(otx, oty, 0)))
-                addtobill(obj, FALSE, FALSE, FALSE);
-            else
+        struct monst *shkp = find_objowner(obj, otx, oty);
+        boolean objinshop = shkp && costly_spot(otx, oty),
+                onboundary = shkp && costly_adjacent(shkp, otx, oty);
+
+        /*
+         * If object starts inside shop or is unpaid and on shop boundary:
+         * if hero is outside the shop, treat this as theft;
+         * otherwise, if it arrives inside same shop, remove it from bill;
+         * otherwise, if it arrives on the boundary, add it to bill;
+         * if it arrives outside the shop, treat this as a theft.
+         * Billing routines deal with obj->no_charge.
+         */
+        if (objinshop || (obj->unpaid && onboundary)) {
+            char h = *in_rooms(u.ux, u.uy, SHOPBASE),
+                 oo = *in_rooms(otx, oty, 0);
+            boolean hinshop = h && strchr(in_rooms(shkp->mx, shkp->my, 0), h);
+
+            if (hinshop && costly_spot(tx, ty)
+                /* verify that it's the same shop */
+                && oo && strchr(in_rooms(tx, ty, 0), oo)) {
+                if (obj->unpaid)
+                    subfrombill(obj, shkp);
+            } else if (hinshop && costly_adjacent(shkp, tx, ty)
+                       && oo && strchr(in_rooms(tx, ty, 0), oo)) {
+                if (!obj->unpaid)
+                    addtobill(obj, FALSE, FALSE, FALSE);
+            } else {
                 (void) stolen_value(obj, otx, oty, FALSE, FALSE);
+            }
         }
+
         newsym(otx, oty); /* update old location */
     }
     place_object(obj, tx, ty);

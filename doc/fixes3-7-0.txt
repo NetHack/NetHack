@@ -1058,6 +1058,8 @@ when hero hears an unseen monster reading a scroll, only describe the monster
 	acccurately if hero is not hallucinating and monster is same species
 	as hero's current form
 don't allow monsters to disarm hero with bullwhip if hero is engulfed
+teleporting an object out of a shop put it on the shop bill instead of dealing
+	with robbery
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1883,6 +1885,8 @@ very large humanoids can wear mummy wrappings
 for ranger characters, shooting any type of arrow while wielding the Longbow
 	of Diana gets an extra +1 to multi-shot
 change the #vanquished command from debug-only to general user command
+have 'I u' mention whether there are any unpaid items on the floor (unusual
+	but not impossible); it doesn't itemize them or show shop price
 
 
 Platform- and/or Interface-Specific New Features

@@ -395,8 +395,10 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
 /* container is kicked, dropped, thrown or otherwise impacted by player.
  * Assumes container is on floor.  Checks contents for possible damage. */
 void
-container_impact_dmg(struct obj *obj, coordxy x,
-                     coordxy y) /* coordinates where object was before the impact, not after */
+container_impact_dmg(
+    struct obj *obj,
+    coordxy x, /* coordinates where object was */
+    coordxy y) /* before the impact, not after */
 {
     struct monst *shkp;
     struct obj *otmp, *otmp2;
@@ -504,7 +506,7 @@ really_kick_object(coordxy x, coordxy y)
             return 1;
         }
         if (trap->ttyp == STATUE_TRAP) {
-            activate_statue_trap(trap, x,y, FALSE);
+            activate_statue_trap(trap, x, y, FALSE);
             return 1;
         }
     }

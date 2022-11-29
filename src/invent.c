@@ -30,7 +30,7 @@ static char display_pickinv(const char *, const char *, const char *,
                             boolean, long *);
 static char display_used_invlets(char);
 static boolean this_type_only(struct obj *);
-static void dounpaid(void);
+static void dounpaid(int);
 static struct obj *find_unpaid(struct obj *, struct obj **);
 static void menu_identify(int);
 static boolean tool_being_used(struct obj *);
@@ -3732,7 +3732,7 @@ count_contents(
 }
 
 static void
-dounpaid(void)
+dounpaid(int floorcount)
 {
     winid win;
     struct obj *otmp, *marker, *contnr;
@@ -3744,7 +3744,7 @@ dounpaid(void)
     count = count_unpaid(g.invent);
     otmp = marker = contnr = (struct obj *) 0;
 
-    if (count == 1) {
+    if (count == 1 && !floorcount) {
         otmp = find_unpaid(g.invent, &marker);
         contnr = unknwn_contnr_contents(otmp);
     }
@@ -3825,10 +3825,30 @@ dounpaid(void)
         }
     }
 
-    putstr(win, 0, "");
-    putstr(win, 0,
-           xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
-    display_nhwindow(win, FALSE);
+    if (count > 0) {
+        putstr(win, 0, "");
+        putstr(win, 0,
+               xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
+    }
+
+    if (floorcount > 0) {
+        char buf[BUFSZ];
+        const char *floorverb = (floorcount > 1) ? "are" : "is";
+
+        if (!count) {
+            You(
+             "aren't carrying any unpaid items but there %s %d on the floor.",
+                floorverb, floorcount);
+        } else {
+            putstr(win, 0, "");
+            Sprintf(buf, "(There %s %d more unpaid object%s on the floor.)",
+                    floorverb, floorcount, plur(floorcount));
+            putstr(win, 0, buf);
+        }
+    }
+
+    if (count > 0)
+        display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
 }
 
@@ -3989,8 +4009,10 @@ dotypeinv(void)
         goto doI_done;
     }
     if (c == 'u' || (c == 'U' && unpaid_count && !ucnt)) {
-        if (unpaid_count)
-            dounpaid();
+        int floorcount = count_unpaid(fobj);
+
+        if (unpaid_count || floorcount)
+            dounpaid(floorcount);
         else
             You("are not carrying any unpaid objects.");
         goto doI_done;

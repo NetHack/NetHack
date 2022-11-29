@@ -2784,7 +2784,7 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
     struct obj *otop;
     struct monst *shkp;
     const char *why;
-    boolean costly;
+    boolean costly, costlytoo;
     coordxy x = 0, y = 0;
 
     /* if contained, get top-most container; we needs its location */
@@ -2800,17 +2800,22 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
     /* these will always be needed for the normal case, so don't bother
        waiting until we find an insanity to fetch them */
     shkp = find_objowner(obj, x, y);
-    costly = costly_spot(x, y) || costly_adjacent(shkp, x, y);
+    costly = costly_spot(x, y);
+    costlytoo = costly_adjacent(shkp, x, y);
 
     why = (const char *) 0;
     if (obj->no_charge && obj->unpaid) {
         why = "%s obj both unpaid and no_charge! %s %s: %s";
     } else if (obj->unpaid) {
-        /* unpaid is only applicable for directly carried objects and
-           for objects inside carried containers */
-        if (otop->where != OBJ_INVENT)
+        /* unpaid is only applicable for directly carried objects, for
+           objects inside carried containers, and for floor items outside
+           the shop proper but within the shop boundary (walls, door, "free
+           spot") and for objects moved from such spots into the shop proper
+           by repair of shop walls */
+        if (otop->where != OBJ_INVENT
+            && (otop->where != OBJ_FLOOR || (!costly && !costlytoo)))
             why = "%s unpaid obj not carried! %s %s: %s";
-        else if (!costly)
+        else if (!costly && !costlytoo)
             why = "%s unpaid obj not inside tended shop! %s %s: %s";
         else if (!shkp)
             why = "%s unpaid obj inside untended shop! %s %s: %s";
