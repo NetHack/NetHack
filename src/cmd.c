@@ -1908,14 +1908,14 @@ DISABLE_WARNING_CONDEXPR_IS_CONSTANT
 static int
 wiz_smell(void)
 {
+    struct monst *mtmp; /* monster being smelled */
+    struct permonst *mptr;
     int ans = 0;
-    int mndx;  /* monster index */
-    coord cc;  /* screen pos of unknown glyph */
-    int glyph; /* glyph at selected position */
+    coord cc; /* screen pos to sniff */
+    boolean is_you;
 
     cc.x = u.ux;
     cc.y = u.uy;
-    mndx = 0; /* gcc -Wall lint */
     if (!olfaction(gy.youmonst.data)) {
         You("are incapable of detecting odors in your present form.");
         return ECMD_OK;
@@ -1928,18 +1928,29 @@ wiz_smell(void)
         if (ans < 0 || cc.x < 0) {
             return ECMD_CANCEL; /* done */
         }
-        /* Convert the glyph at the selected position to a mndxbol. */
-        glyph = glyph_at(cc.x, cc.y);
-        if (glyph_is_monster(glyph))
-            mndx = glyph_to_mon(glyph);
-        else
-            mndx = 0;
+        is_you = FALSE;
+        if (u_at(cc.x, cc.y)) {
+            if (u.usteed) {
+                mptr = u.usteed->data;
+            } else {
+                mptr = gy.youmonst.data;
+                is_you = TRUE;
+            }
+        } else if ((mtmp = m_at(cc.x, cc.y)) && canspotmon(mtmp)) {
+            mptr = mtmp->data;
+        } else {
+            mptr = (struct permonst *) 0;
+        }
         /* Is it a monster? */
-        if (mndx) {
-            if (!usmellmon(&mons[mndx]))
-                pline("That monster seems to give off no smell.");
-        } else
-            pline("That is not a monster.");
+        if (mptr) {
+            if (is_you)
+                You("surreptitiously sniff under your %s.", body_part(ARM));
+            if (!usmellmon(mptr))
+                pline("%s to give off no smell.",
+                      is_you ? "You seem" : "That monster seems");
+        } else {
+            You("see no monster there.");
+        }
     } while (TRUE);
     return ECMD_OK;
 }
