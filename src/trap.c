@@ -4146,10 +4146,13 @@ water_damage(
         wet_a_towel(obj, -rnd(7 - obj->spe), TRUE);
         return ER_NOTHING;
     } else if (obj->greased) {
-        if (!rn2(2))
+        if (!rn2(2)) {
             obj->greased = 0;
-        if (carried(obj))
-            update_inventory();
+            if (carried(obj)) {
+                pline_The("grease on %s washes off.", yname(obj));
+                update_inventory();
+            }
+        }
         return ER_GREASED;
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
