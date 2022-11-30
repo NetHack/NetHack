@@ -1062,6 +1062,9 @@ teleporting an object out of a shop put it on the shop bill instead of dealing
 	with robbery
 map browsing during gold detection didn't describe fake gold marking traps
 	when detection was via cursed scroll
+if hero's action caused engulfer to expel swallowed hero, it might do so onto
+	a level teleporter and then have its memory accessed after being
+	freed when current level was saved in order to load destination level
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
