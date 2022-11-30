@@ -4128,6 +4128,8 @@ water_damage(
     const char *ostr,
     boolean force)
 {
+    boolean in_invent = carried(obj), described = FALSE;
+
     if (!obj)
         return ER_NOTHING;
 
@@ -4148,20 +4150,24 @@ water_damage(
     } else if (obj->greased) {
         if (!rn2(2)) {
             obj->greased = 0;
-            if (carried(obj)) {
+            if (in_invent) {
                 pline_The("grease on %s washes off.", yname(obj));
+                described = TRUE; /* used to modify potion feedback */
                 update_inventory();
             }
+            /* ungreased potions of acid will always be destroyed by water */
+            if (obj->otyp == POT_ACID)
+                goto pot_acid;
         }
         return ER_GREASED;
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
-        if (carried(obj))
+        if (in_invent)
             pline("Some %s gets into your %s!", hliquid("water"), ostr);
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
-        if (carried(obj)) {
+        if (in_invent) {
             pline_The("%s slides right off your %s.", hliquid("water"), ostr);
             makeknown(obj->otyp);
         }
@@ -4183,23 +4189,29 @@ water_damage(
             || obj->otyp == SCR_MAIL
 #endif
            ) return 0;
-        if (carried(obj))
+        if (in_invent)
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
         obj->spe = 0;
-        if (carried(obj))
+        if (in_invent)
             update_inventory();
         return ER_DAMAGED;
     } else if (obj->oclass == SPBOOK_CLASS) {
         if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
+            /*
+             * FIXME?
+             *  This might be given when hero can't see or feel it.
+             *  The book can't be inside a container but it could get
+             *  dunked away from hero if laying on ice which melts.
+             */
             pline("Steam rises from %s.", the(xname(obj)));
             return 0;
         } else if (obj->otyp == SPE_BLANK_PAPER) {
             return 0;
         }
-        if (carried(obj))
+        if (in_invent)
             pline("Your %s %s.", ostr, vtense(ostr, "fade"));
 
         if (obj->otyp == SPE_NOVEL) {
@@ -4208,36 +4220,53 @@ water_damage(
         }
 
         obj->otyp = SPE_BLANK_PAPER;
+        /* same re-init as over-reading or polymorph; matters if it gets
+           polymorphed into non-blank; doesn't matter if eventually written
+           on since that replaces it with new book and studied count of 0 */
+        if (obj->spestudied)
+            obj->spestudied = rn2(obj->spestudied);
         obj->dknown = 0;
-        if (carried(obj))
+        if (in_invent)
             update_inventory();
         return ER_DAMAGED;
     } else if (obj->oclass == POTION_CLASS) {
         if (obj->otyp == POT_ACID) {
             char *bufp;
-            boolean one = (obj->quan == 1L), update = carried(obj),
-                    exploded = FALSE;
+            boolean one, exploded;
 
-            if (Blind && !carried(obj))
+ pot_acid:
+            one = (obj->quan == 1L);
+            exploded = FALSE;
+
+            if (Blind && !in_invent)
                 obj->dknown = 0;
             if (ga.acid_ctx.ctx_valid)
                 exploded = ((obj->dknown ? ga.acid_ctx.dkn_boom
                                          : ga.acid_ctx.unk_boom) > 0);
-            /* First message is
-             * "a [potion|<color> potion|potion of acid] explodes"
-             * depending on obj->dknown (potion has been seen) and
-             * objects[POT_ACID].oc_name_known (fully discovered),
-             * or "some {plural version} explode" when relevant.
-             * Second and subsequent messages for same chain and
-             * matching dknown status are
-             * "another [potion|<color> &c] explodes" or plural
-             * variant.
-             */
-            bufp = simpleonames(obj);
-            pline("%s %s %s!", /* "A potion explodes!" */
-                  !exploded ? (one ? "A" : "Some")
-                            : (one ? "Another" : "More"),
+            if (described) {
+                /* just gave "The grease washes off your potion of acid."
+                   or "...your <color> potion." (or just "...your potion.");
+                   don't re-describe potion here; if we used "It explodes!"
+                   then "it" might be misconstrued as applying to "grease" */
+                pline_The("potion%s %s!",
+                          plur(obj->quan), otense(obj, "explode"));
+            } else {
+                /* First message is
+                 * "a [potion|<color> potion|potion of acid] explodes"
+                 * depending on obj->dknown (potion has been seen) and
+                 * objects[POT_ACID].oc_name_known (fully discovered),
+                 * or "some {plural version} explode" when relevant.
+                 * Second and subsequent messages for same chain and
+                 * matching dknown status are
+                 * "another [potion|<color> &c] explodes" or plural
+                 * variant.
+                 */
+                bufp = simpleonames(obj);
+                pline("%s%s %s!", /* "A potion explodes!" */
+                      !exploded ? (one ? "A " : "Some ")
+                                : (one ? "Another " : "More "),
                   bufp, vtense(bufp, "explode"));
+            }
             if (ga.acid_ctx.ctx_valid) {
                 if (obj->dknown)
                     ga.acid_ctx.dkn_boom++;
@@ -4246,26 +4275,26 @@ water_damage(
             }
             setnotworn(obj);
             delobj(obj);
-            if (update)
+            if (in_invent)
                 update_inventory();
             return ER_DESTROYED;
         } else if (obj->odiluted) {
-            if (carried(obj))
+            if (in_invent)
                 pline("Your %s %s further.", ostr, vtense(ostr, "dilute"));
 
             obj->otyp = POT_WATER;
             obj->dknown = 0;
             obj->blessed = obj->cursed = 0;
             obj->odiluted = 0;
-            if (carried(obj))
+            if (in_invent)
                 update_inventory();
             return ER_DAMAGED;
         } else if (obj->otyp != POT_WATER) {
-            if (carried(obj))
+            if (in_invent)
                 pline("Your %s %s.", ostr, vtense(ostr, "dilute"));
 
             obj->odiluted++;
-            if (carried(obj))
+            if (in_invent)
                 update_inventory();
             return ER_DAMAGED;
         }
