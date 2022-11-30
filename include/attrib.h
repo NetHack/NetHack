@@ -41,7 +41,7 @@ struct attribs {
 };
 
 #define ATTRMAX(x) \
-    ((x == A_STR && Upolyd) ? uasmon_maxStr() : g.urace.attrmax[x])
-#define ATTRMIN(x) (g.urace.attrmin[x])
+    ((x == A_STR && Upolyd) ? uasmon_maxStr() : gu.urace.attrmax[x])
+#define ATTRMIN(x) (gu.urace.attrmin[x])
 
 #endif /* ATTRIB_H */

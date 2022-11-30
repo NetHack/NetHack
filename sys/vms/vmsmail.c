@@ -285,10 +285,10 @@ parse_brdcst(char *buf) /* called by parse_next_broadcast() */
     if (txt && strlen(txt) > BUFSZ - 50)
         txt[BUFSZ - 50] = '\0';
 
-    msg.message_typ = typ;  /* simple index */
+    msgm.message_typ = typ;  /* simple index */
     msg.display_txt = txt;  /* text for daemon to pline() */
     msg.object_nam = nam;   /* 'name' for mail scroll */
-    msg.response_cmd = cmd; /* command to spawn when scroll read */
+    msgr.response_cmd = cmd; /* command to spawn when scroll read */
     return &msg;
 }
 

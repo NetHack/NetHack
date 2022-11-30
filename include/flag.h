@@ -189,7 +189,7 @@ struct debug_flags {
  */
 struct instance_flags {
     boolean debug_fuzzer;  /* fuzz testing */
-    boolean defer_plname;  /* X11 hack: askname() might not set g.plname */
+    boolean defer_plname;  /* X11 hack: askname() might not set gp.plname */
     boolean herecmd_menu;  /* use menu when mouseclick on yourself */
     boolean invis_goldsym; /* gold symbol is ' '? */
     boolean in_lua;        /* executing a lua script */

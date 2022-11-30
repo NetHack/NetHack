@@ -101,7 +101,7 @@ setuwep(struct obj *obj)
     struct obj *olduwep = uwep;
 
     if (obj == uwep)
-        return; /* necessary to not set g.unweapon */
+        return; /* necessary to not set gu.unweapon */
     /* This message isn't printed in the caller because it happens
      * *whenever* Sunsword is unwielded, from whatever cause.
      */
@@ -114,18 +114,18 @@ setuwep(struct obj *obj)
     if (uwep == obj
         && (u_wield_art(ART_OGRESMASHER)
             || is_art(olduwep, ART_OGRESMASHER)))
-        g.context.botl = 1;
+        gc.context.botl = 1;
     /* Note: Explicitly wielding a pick-axe will not give a "bashing"
      * message.  Wielding one via 'a'pplying it will.
      * 3.2.2:  Wielding arbitrary objects will give bashing message too.
      */
     if (obj) {
-        g.unweapon = (obj->oclass == WEAPON_CLASS)
+        gu.unweapon = (obj->oclass == WEAPON_CLASS)
                        ? is_launcher(obj) || is_ammo(obj) || is_missile(obj)
                              || (is_pole(obj) && !u.usteed)
                        : !is_weptool(obj) && !is_wet_towel(obj);
     } else
-        g.unweapon = TRUE; /* for "bare hands" message */
+        gu.unweapon = TRUE; /* for "bare hands" message */
 }
 
 static boolean
@@ -152,7 +152,7 @@ const char *
 empty_handed(void)
 {
     return uarmg ? "empty handed" /* gloves imply hands */
-           : humanoid(g.youmonst.data)
+           : humanoid(gy.youmonst.data)
              /* hands but no weapon and no gloves */
              ? "bare handed"
                /* alternate phrasing for paws or lack of hands */
@@ -258,7 +258,7 @@ ready_weapon(struct obj *wep)
         }
     }
     if ((had_wep != (uwep != 0)) && condtests[bl_bareh].enabled)
-        g.context.botl = 1;
+        gc.context.botl = 1;
     return res;
 }
 
@@ -342,8 +342,8 @@ dowield(void)
     int result;
 
     /* May we attempt this? */
-    g.multi = 0;
-    if (cantwield(g.youmonst.data)) {
+    gm.multi = 0;
+    if (cantwield(gy.youmonst.data)) {
         pline("Don't be ridiculous!");
         return ECMD_FAIL;
     }
@@ -357,21 +357,21 @@ dowield(void)
  already_wielded:
         You("are already wielding that!");
         if (is_weptool(wep) || is_wet_towel(wep))
-            g.unweapon = FALSE; /* [see setuwep()] */
+            gu.unweapon = FALSE; /* [see setuwep()] */
         return ECMD_FAIL;
     } else if (welded(uwep)) {
         weldmsg(uwep);
         /* previously interrupted armor removal mustn't be resumed */
         reset_remarm();
         /* if player chose a partial stack but can't wield it, undo split */
-        if (wep->o_id && wep->o_id == g.context.objsplit.child_oid)
+        if (wep->o_id && wep->o_id == gc.context.objsplit.child_oid)
             unsplitobj(wep);
         return ECMD_FAIL;
-    } else if (wep->o_id && wep->o_id == g.context.objsplit.child_oid) {
+    } else if (wep->o_id && wep->o_id == gc.context.objsplit.child_oid) {
         /* if wep is the result of supplying a count to getobj()
            we don't want to split something already wielded; for
            any other item, we need to give it its own inventory slot */
-        if (uwep && uwep->o_id == g.context.objsplit.parent_oid) {
+        if (uwep && uwep->o_id == gc.context.objsplit.parent_oid) {
             unsplitobj(wep);
             /* wep was merged back to uwep, already_wielded uses wep */
             wep = uwep;
@@ -451,8 +451,8 @@ doswapweapon(void)
     int result = 0;
 
     /* May we attempt this? */
-    g.multi = 0;
-    if (cantwield(g.youmonst.data)) {
+    gm.multi = 0;
+    if (cantwield(gy.youmonst.data)) {
         pline("Don't be ridiculous!");
         return ECMD_FAIL;
     }
@@ -506,7 +506,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
 
     /* Since the quiver isn't in your hands, don't check cantwield(), */
     /* will_weld(), touch_petrifies(), etc. */
-    g.multi = 0;
+    gm.multi = 0;
     /* forget last splitobj() before calling getobj() with GETOBJ_ALLOWCNT */
     clear_splitobjs();
 
@@ -526,11 +526,11 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             You("already have no ammunition readied!");
         }
         return ECMD_OK;
-    } else if (newquiver->o_id == g.context.objsplit.child_oid) {
+    } else if (newquiver->o_id == gc.context.objsplit.child_oid) {
         /* if newquiver is the result of supplying a count to getobj()
            we don't want to split something already in the quiver;
            for any other item, we need to give it its own inventory slot */
-        if (uquiver && uquiver->o_id == g.context.objsplit.parent_oid) {
+        if (uquiver && uquiver->o_id == gc.context.objsplit.parent_oid) {
             unsplitobj(newquiver);
             goto already_quivered;
         } else if (newquiver->oclass == COIN_CLASS) {
@@ -704,7 +704,7 @@ wield_tool(struct obj *obj,
         }
         return FALSE;
     }
-    if (cantwield(g.youmonst.data)) {
+    if (cantwield(gy.youmonst.data)) {
         You_cant("hold %s strongly enough.", more_than_1 ? "them" : "it");
         return FALSE;
     }
@@ -741,7 +741,7 @@ wield_tool(struct obj *obj,
     if (u.twoweap)
         untwoweapon();
     if (obj->oclass != WEAPON_CLASS)
-        g.unweapon = TRUE;
+        gu.unweapon = TRUE;
     return TRUE;
 }
 
@@ -750,13 +750,13 @@ can_twoweapon(void)
 {
     struct obj *otmp;
 
-    if (!could_twoweap(g.youmonst.data)) {
+    if (!could_twoweap(gy.youmonst.data)) {
         if (Upolyd)
             You_cant("use two weapons in your current form.");
         else
             pline("%s aren't able to use two weapons at once.",
-                  makeplural((flags.female && g.urole.name.f)
-                             ? g.urole.name.f : g.urole.name.m));
+                  makeplural((flags.female && gu.urole.name.f)
+                             ? gu.urole.name.f : gu.urole.name.m));
     } else if (!uwep || !uswapwep) {
         const char *hand_s = body_part(HAND);
 
@@ -848,7 +848,7 @@ uwepgone(void)
                 pline("%s shining.", Tobjnam(uwep, "stop"));
         }
         setworn((struct obj *) 0, W_WEP);
-        g.unweapon = TRUE;
+        gu.unweapon = TRUE;
         update_inventory();
     }
 }

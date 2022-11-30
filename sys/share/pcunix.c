@@ -50,12 +50,12 @@ uptodate(int fd)
 #else
 #if (defined(MICRO)) && !defined(NO_FSTAT)
     if(fstat(fd, &buf)) {
-        if(g.moves > 1) pline("Cannot get status of saved level? ");
+        if(gm.moves > 1) pline("Cannot get status of saved level? ");
         else pline("Cannot get status of saved game.");
         return(0);
     } 
     if(comp_times(buf.st_mtime)) { 
-        if(g.moves > 1) pline("Saved level is out of date.");
+        if(gm.moves > 1) pline("Saved level is out of date.");
         else pline("Saved game is out of date. ");
         /* This problem occurs enough times we need to give the player
          * some more information about what causes it, and how to fix.
@@ -85,14 +85,14 @@ eraseoldlocks(void)
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(g.lock, i);
-        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
+        set_levelfile_name(gl.lock, i);
+        (void) unlink(fqname(gl.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(g.lock, 0);
+    set_levelfile_name(gl.lock, 0);
 #ifdef HOLD_LOCKFILE_OPEN
     really_close();
 #endif
-    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
+    if (unlink(fqname(gl.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return (1);   /* success! */
 }
@@ -118,9 +118,9 @@ getlock(void)
     }
 
     /* regularize(lock); */ /* already done in pcmain */
-    Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0));
-    set_levelfile_name(g.lock, 0);
-    fq_lock = fqname(g.lock, LEVELPREFIX, 1);
+    Sprintf(tbuf, "%s", fqname(gl.lock, LEVELPREFIX, 0));
+    set_levelfile_name(gl.lock, 0);
+    fq_lock = fqname(gl.lock, LEVELPREFIX, 1);
     if ((fd = open(fq_lock, 0)) == -1) {
         if (errno == ENOENT)
             goto gotlock; /* no such file */
@@ -217,8 +217,8 @@ gotlock:
 #endif
         error("cannot creat file (%s.)", fq_lock);
     } else {
-        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
-            != sizeof(g.hackpid)) {
+        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
+            != sizeof(gh.hackpid)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
             chdirx(orgdir, 0);
 #endif

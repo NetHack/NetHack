@@ -39,10 +39,10 @@ struct shclass {
     const char *const *shknms; /* list of shopkeeper names for this type */
 };
 
-/* the normal rooms on the current level are described in g.rooms[0..n] for
+/* the normal rooms on the current level are described in gr.rooms[0..n] for
  * some n<MAXNROFROOMS
- * the vault, if any, is described by g.rooms[n+1]
- * the next g.rooms entry has hx -1 as a flag
+ * the vault, if any, is described by gr.rooms[n+1]
+ * the next gr.rooms entry has hx -1 as a flag
  * there is at most one non-vault special room on a level
  */
 
@@ -87,7 +87,7 @@ enum roomtype_types {
 #define SHARED      1 /* indicates normal shared boundary */
 #define SHARED_PLUS 2 /* indicates shared boundary - extra adjacent-square
                        * searching required */
-#define ROOMOFFSET  3 /* (levl[x][y].roomno - ROOMOFFSET) gives g.rooms[] index,
+#define ROOMOFFSET  3 /* (levl[x][y].roomno - ROOMOFFSET) gives gr.rooms[] index,
                        * for inside-squares and non-shared boundaries */
 
 /* Values for needfill */
@@ -98,14 +98,14 @@ enum roomtype_types {
 #define FILL_LVFLAGS 2 /* special rooms only; set the room's rtype and level
                           flags as appropriate, but do not put anything in it */
 
-#define IS_ROOM_PTR(x)      ((x) >= g.rooms && (x) < g.rooms + MAXNROFROOMS)
+#define IS_ROOM_PTR(x)      ((x) >= gr.rooms && (x) < gr.rooms + MAXNROFROOMS)
 #define IS_ROOM_INDEX(x)    ((x) >= 0 && (x) < MAXNROFROOMS)
 #define IS_SUBROOM_PTR(x) \
-    ((x) >= g.subrooms && (x) < g.subrooms + MAXNROFROOMS)
+    ((x) >= gs.subrooms && (x) < gs.subrooms + MAXNROFROOMS)
 #define IS_SUBROOM_INDEX(x) ((x) > MAXNROFROOMS && (x) <= (MAXNROFROOMS * 2))
-#define ROOM_INDEX(x)       ((x) - g.rooms)
-#define SUBROOM_INDEX(x)    ((x) - g.subrooms)
-#define IS_LAST_ROOM_PTR(x) (ROOM_INDEX(x) == g.nroom)
-#define IS_LAST_SUBROOM_PTR(x) (!g.nsubroom || SUBROOM_INDEX(x) == g.nsubroom)
+#define ROOM_INDEX(x)       ((x) - gr.rooms)
+#define SUBROOM_INDEX(x)    ((x) - gs.subrooms)
+#define IS_LAST_ROOM_PTR(x) (ROOM_INDEX(x) == gn.nroom)
+#define IS_LAST_SUBROOM_PTR(x) (!gn.nsubroom || SUBROOM_INDEX(x) == gn.nsubroom)
 
 #endif /* MKROOM_H */

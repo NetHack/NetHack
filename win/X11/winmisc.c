@@ -349,11 +349,11 @@ plsel_dialog_acceptvalues(void)
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
 
-    (void) strncpy(g.plname, (char *) s, sizeof g.plname - 1);
-    g.plname[sizeof g.plname - 1] = '\0';
-    (void) mungspaces(g.plname);
-    if (strlen(g.plname) < 1)
-        (void) strcpy(g.plname, "Mumbles");
+    (void) strncpy(gp.plname, (char *) s, sizeof gp.plname - 1);
+    gp.plname[sizeof gp.plname - 1] = '\0';
+    (void) mungspaces(gp.plname);
+    if (strlen(gp.plname) < 1)
+        (void) strcpy(gp.plname, "Mumbles");
     iflags.renameinprogress = FALSE;
 }
 
@@ -473,7 +473,7 @@ X11_player_selection_randomize(void)
 {
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
-    int ro, ra, al, ge;
+    int ro, ra, al, gend;
     boolean choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
@@ -520,12 +520,12 @@ X11_player_selection_randomize(void)
         }
     }
 
-    ge = flags.initgend;
-    if (ge == ROLE_NONE) {
-        ge = rn2(ROLE_GENDERS);
+    gend = flags.initgend;
+    if (gend == ROLE_NONE) {
+        gend = rn2(ROLE_GENDERS);
     }
-    while (!validgend(ro, ra, ge)) {
-        ge = rn2(ROLE_GENDERS);
+    while (!validgend(ro, ra, gend)) {
+        gend = rn2(ROLE_GENDERS);
     }
 
     al = flags.initalign;
@@ -536,7 +536,7 @@ X11_player_selection_randomize(void)
         al = rn2(ROLE_ALIGNS);
     }
 
-    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(ge + 1));
+    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(gend + 1));
     XawToggleSetCurrent(plsel_align_radios[0], i2xtp(al + 1));
     XawToggleSetCurrent(plsel_race_radios[0], i2xtp(ra + 1));
     XawToggleSetCurrent(plsel_role_radios[0], i2xtp(ro + 1));
@@ -776,8 +776,8 @@ X11_create_player_selection_name(Widget form)
     XtSetArg(args[num_args], nhStr(XtNeditType),
              !plsel_ask_name ? XawtextRead : XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), g.plname); num_args++;
-    XtSetArg(args[num_args], XtNinsertPosition, strlen(g.plname)); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), gp.plname); num_args++;
+    XtSetArg(args[num_args], XtNinsertPosition, strlen(gp.plname)); num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(plsel_input_accelerators)); num_args++;
     plsel_name_input = XtCreateManagedWidget("name_input",
@@ -1217,7 +1217,7 @@ X11_player_selection_dialog(void)
     if (plsel_align_radios)
         free(plsel_align_radios);
 
-    if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+    if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
         clearlocks();
         X11_exit_nhwindows((char *) 0);
         nh_terminate(0);
@@ -1291,7 +1291,7 @@ X11_player_selection_prompts(void)
         XtDestroyWidget(popup);
         free((genericptr_t) choices), choices = 0;
 
-        if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+        if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
             clearlocks();
             X11_exit_nhwindows((char *) 0);
             nh_terminate(0);
@@ -1360,7 +1360,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1428,7 +1428,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1494,7 +1494,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1516,15 +1516,15 @@ void
 X11_player_selection(void)
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
-        if (!*g.plname) {
+        if (!*gp.plname) {
 #ifdef UNIX
             char *defplname = get_login_name();
 #else
             char *defplname = (char *)0;
 #endif
-            (void) strncpy(g.plname, defplname ? defplname : "Mumbles",
-                           sizeof g.plname - 1);
-            g.plname[sizeof g.plname - 1] = '\0';
+            (void) strncpy(gp.plname, defplname ? defplname : "Mumbles",
+                           sizeof gp.plname - 1);
+            gp.plname[sizeof gp.plname - 1] = '\0';
             iflags.renameinprogress = TRUE;
         }
         X11_player_selection_dialog();

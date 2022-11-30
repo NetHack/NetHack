@@ -817,17 +817,17 @@ void NetHackQtStatusWindow::updateStats()
 	buf = nh_capitalize_words(pmname(&mons[u.umonnum],
                                   ::flags.female ? FEMALE : MALE));
     } else {
-	buf = rank_of(u.ulevel, g.pl_character[0], ::flags.female);
+	buf = rank_of(u.ulevel, gp.pl_character[0], ::flags.female);
     }
     QString buf2;
     char buf3[BUFSZ];
-    buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, g.plname)),
+    buf2 = nh_qsprintf("%s the %s", upstart(strcpy(buf3, gp.plname)),
                        buf.toLatin1().constData());
     name.setLabel(buf2, NetHackQtLabelledIcon::NoNum, u.ulevel);
 
     if (!describe_level(buf3, 0)) {
 	Sprintf(buf3, "%s, level %d",
-                g.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
+                gd.dungeons[u.uz.dnum].dname, ::depth(&u.uz));
     }
     dlevel.setLabel(buf3);
 
@@ -885,7 +885,7 @@ void NetHackQtStatusWindow::updateStats()
     ac.setLabel("AC:", (long) u.uac);
     // gold prefix used to be "Au:", tty uses "$:"; never too wide to fit;
     // practical limit due to carrying capacity limit is less than 300K
-    long goldamt = money_cnt(g.invent);
+    long goldamt = money_cnt(gi.invent);
     goldamt = std::max(goldamt, 0L); // sanity; core's botl() does likewise
     goldamt = std::min(goldamt, 99999999L); // ditto
     gold.setLabel("Gold:", goldamt);
@@ -925,7 +925,7 @@ void NetHackQtStatusWindow::updateStats()
     if (::flags.time) {
         // hypothetically Time could grow to enough digits to have trouble
         // fitting, but it's not worth worrying about
-        time.setLabel("Time:", (long) g.moves);
+        time.setLabel("Time:", (long) gm.moves);
     } else {
         time.setLabel("");
     }

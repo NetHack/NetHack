@@ -120,11 +120,11 @@ vision_init(void)
     }
 
     /* Start out with cs0 as our current array */
-    g.viz_array = cs_rows0;
-    g.viz_rmin = cs_rmin0;
-    g.viz_rmax = cs_rmax0;
+    gv.viz_array = cs_rows0;
+    gv.viz_rmin = cs_rmin0;
+    gv.viz_rmax = cs_rmax0;
 
-    g.vision_full_recalc = 0;
+    gv.vision_full_recalc = 0;
     (void) memset((genericptr_t) could_see, 0, sizeof(could_see));
 
     /* Initialize the vision algorithm (currently C). */
@@ -145,8 +145,8 @@ does_block(int x, int y, struct rm *lev)
 
 #ifdef DEBUG
     /* set DEBUGFILES=seethru in environment to see through bubbles */
-    if (g.seethru == 0) { /* init once */
-        g.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
+    if (gs.seethru == 0) { /* init once */
+        gs.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
     }
 #endif
 
@@ -157,17 +157,17 @@ does_block(int x, int y, struct rm *lev)
         return 1;
 
 #ifdef DEBUG
-    if (g.seethru != 1) {
+    if (gs.seethru != 1) {
 #endif
     if (lev->typ == CLOUD || IS_WATERWALL(lev->typ)
         || (Underwater && is_moat(x, y)))
         return 1;
 #ifdef DEBUG
-    } /* g.seethru */
+    } /* gs.seethru */
 #endif
 
     /* Boulders block light. */
-    for (obj = g.level.objects[x][y]; obj; obj = obj->nexthere)
+    for (obj = gl.level.objects[x][y]; obj; obj = obj->nexthere)
         if (obj->otyp == BOULDER)
             return 1;
 
@@ -177,19 +177,19 @@ does_block(int x, int y, struct rm *lev)
         return 1;
 
 #ifdef DEBUG
-    if (g.seethru != 1) {
+    if (gs.seethru != 1) {
 #endif
     /* Clouds (poisonous or not) block light. */
-    for (i = 0; i < g.n_regions; i++) {
+    for (i = 0; i < gn.n_regions; i++) {
         /* Ignore regions with ttl == 0 - expire_gas_cloud must unblock its
          * points prior to being removed itself. */
-        if (g.regions[i]->ttl > 0 && g.regions[i]->visible
-            && inside_region(g.regions[i], x, y)) {
+        if (gr.regions[i]->ttl > 0 && gr.regions[i]->visible
+            && inside_region(gr.regions[i], x, y)) {
             return 1;
         }
     }
 #ifdef DEBUG
-    } /* g.seethru */
+    } /* gs.seethru */
 #endif
 
     return 0;
@@ -209,9 +209,9 @@ vision_reset(void)
     register struct rm *lev;
 
     /* Start out with cs0 as our current array */
-    g.viz_array = cs_rows0;
-    g.viz_rmin = cs_rmin0;
-    g.viz_rmax = cs_rmax0;
+    gv.viz_array = cs_rows0;
+    gv.viz_rmin = cs_rmin0;
+    gv.viz_rmax = cs_rmax0;
 
     (void) memset((genericptr_t) could_see, 0, sizeof(could_see));
 
@@ -255,7 +255,7 @@ vision_reset(void)
     }
 
     iflags.vision_inited = 1; /* vision is ready */
-    g.vision_full_recalc = 1;   /* we want to run vision_recalc() */
+    gv.vision_full_recalc = 1;   /* we want to run vision_recalc() */
 }
 
 /*
@@ -270,7 +270,7 @@ get_unused_cs(seenV ***rows, coordxy **rmin, coordxy **rmax)
     register int row;
     register coordxy *nrmin, *nrmax;
 
-    if (g.viz_array == cs_rows0) {
+    if (gv.viz_array == cs_rows0) {
         *rows = cs_rows1;
         *rmin = cs_rmin1;
         *rmax = cs_rmax1;
@@ -314,12 +314,12 @@ rogue_vision(seenV **next, coordxy *rmin, coordxy *rmax)
     /* If in a lit room, we are able to see to its boundaries. */
     /* If dark, set COULD_SEE so various spells work -dlc */
     if (rnum >= 0) {
-        for (zy = g.rooms[rnum].ly - 1; zy <= g.rooms[rnum].hy + 1; zy++) {
-            rmin[zy] = start = g.rooms[rnum].lx - 1;
-            rmax[zy] = stop = g.rooms[rnum].hx + 1;
+        for (zy = gr.rooms[rnum].ly - 1; zy <= gr.rooms[rnum].hy + 1; zy++) {
+            rmin[zy] = start = gr.rooms[rnum].lx - 1;
+            rmax[zy] = stop = gr.rooms[rnum].hx + 1;
 
             for (zx = start; zx <= stop; zx++) {
-                if (g.rooms[rnum].rlit) {
+                if (gr.rooms[rnum].rlit) {
                     next[zy][zx] = COULD_SEE | IN_SIGHT;
                     levl[zx][zy].seenv = SVALL; /* see the walls */
                 } else
@@ -523,8 +523,8 @@ vision_recalc(int control)
     const seenV *sv;   /* ptr to seen angle bits */
     int oldseenv;      /* previous seenv value */
 
-    g.vision_full_recalc = 0; /* reset flag */
-    if (g.in_mklev || !iflags.vision_inited)
+    gv.vision_full_recalc = 0; /* reset flag */
+    if (gi.in_mklev || !iflags.vision_inited)
         return;
 
     /*
@@ -558,15 +558,15 @@ vision_recalc(int control)
          * anything, so we only need update positions we used to be able
          * to see.
          */
-        temp_array = g.viz_array; /* set g.viz_array so newsym() will work */
-        g.viz_array = next_array;
+        temp_array = gv.viz_array; /* set gv.viz_array so newsym() will work */
+        gv.viz_array = next_array;
 
         for (row = 0; row < ROWNO; row++) {
             old_row = temp_array[row];
 
             /* Find the min and max positions on the row. */
-            start = min(g.viz_rmin[row], next_rmin[row]);
-            stop = max(g.viz_rmax[row], next_rmax[row]);
+            start = min(gv.viz_rmin[row], next_rmin[row]);
+            stop = max(gv.viz_rmax[row], next_rmax[row]);
 
             for (col = start; col <= stop; col++)
                 if (old_row[col] & IN_SIGHT)
@@ -699,8 +699,8 @@ vision_recalc(int control)
     /*
      * Make the viz_array the new array so that cansee() will work correctly.
      */
-    temp_array = g.viz_array;
-    g.viz_array = next_array;
+    temp_array = gv.viz_array;
+    gv.viz_array = next_array;
 
     /*
      * The main update loop.  Here we do two things:
@@ -726,8 +726,8 @@ vision_recalc(int control)
         old_row = temp_array[row];
 
         /* Find the min and max positions on the row. */
-        start = min(g.viz_rmin[row], next_rmin[row]);
-        stop = max(g.viz_rmax[row], next_rmax[row]);
+        start = min(gv.viz_rmin[row], next_rmin[row]);
+        stop = max(gv.viz_rmax[row], next_rmax[row]);
         lev = &levl[start][row];
 
         sv = &seenv_matrix[dy + 1][start < u.ux ? 0 : (start > u.ux ? 2 : 1)];
@@ -828,14 +828,14 @@ vision_recalc(int control)
     /* This newsym() caused a crash delivering msg about failure to open
      * dungeon file init_dungeons() -> panic() -> done(11) ->
      * vision_recalc(2) -> newsym() -> crash!  u.ux and u.uy are 0 and
-     * g.program_state.panicking == 1 under those circumstances
+     * gp.program_state.panicking == 1 under those circumstances
      */
-    if (!g.program_state.panicking)
+    if (!gp.program_state.panicking)
         newsym(u.ux, u.uy); /* Make sure the hero shows up! */
 
     /* Set the new min and max pointers. */
-    g.viz_rmin = next_rmin;
-    g.viz_rmax = next_rmax;
+    gv.viz_rmin = next_rmin;
+    gv.viz_rmax = next_rmax;
 
     recalc_mapseen();
 }
@@ -850,10 +850,10 @@ block_point(int x, int y)
 {
 #ifdef DEBUG
     /* set DEBUGFILES=seethru in environment to see through clouds & water */
-    if (g.seethru == 0) { /* init once */
-        g.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
+    if (gs.seethru == 0) { /* init once */
+        gs.seethru = (wizard && explicitdebug("seethru")) ? 1 : -1;
     }
-    if (g.seethru == 1) {
+    if (gs.seethru == 1) {
         if (!does_block(x, y, &levl[x][y]))
             return;
     }
@@ -870,8 +870,8 @@ block_point(int x, int y)
      * was out of night-vision range of the hero.  Suddenly the hero should
      * see the lit room.
      */
-    if (g.viz_array[y][x])
-        g.vision_full_recalc = 1;
+    if (gv.viz_array[y][x])
+        gv.vision_full_recalc = 1;
 }
 
 /*
@@ -886,8 +886,8 @@ unblock_point(int x, int y)
 
     /* recalc light sources here? */
 
-    if (g.viz_array[y][x])
-        g.vision_full_recalc = 1;
+    if (gv.viz_array[y][x])
+        gv.vision_full_recalc = 1;
 }
 
 /*==========================================================================*\
@@ -2088,7 +2088,7 @@ do_clear_area(
 
         if (range > MAX_RADIUS || range < 1)
             panic("do_clear_area:  illegal range %d", range);
-        if (g.vision_full_recalc)
+        if (gv.vision_full_recalc)
             vision_recalc(0); /* recalc vision if dirty */
         limits = circle_ptr(range);
         if ((max_y = (srow + range)) >= ROWNO)

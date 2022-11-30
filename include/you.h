@@ -23,8 +23,8 @@ struct RoleName {
 struct RoleAdvance {
     /* "fix" is the fixed amount, "rnd" is the random amount */
     xint16 infix, inrnd; /* at character initialization */
-    xint16 lofix, lornd; /* gained per level <  g.urole.xlev */
-    xint16 hifix, hirnd; /* gained per level >= g.urole.xlev */
+    xint16 lofix, lornd; /* gained per level <  gu.urole.xlev */
+    xint16 hifix, hirnd; /* gained per level >= gu.urole.xlev */
 };
 
 struct u_have {
@@ -228,8 +228,8 @@ struct Role {
 };
 
 extern const struct Role roles[]; /* table of available roles */
-#define Role_if(X) (g.urole.mnum == (X))
-#define Role_switch (g.urole.mnum)
+#define Role_if(X) (gu.urole.mnum == (X))
+#define Role_switch (gu.urole.mnum)
 
 /* used during initialization for race, gender, and alignment
    as well as for character class */
@@ -278,8 +278,8 @@ struct Race {
 };
 
 extern const struct Race races[]; /* Table of available races */
-#define Race_if(X) (g.urace.mnum == (X))
-#define Race_switch (g.urace.mnum)
+#define Race_if(X) (gu.urace.mnum == (X))
+#define Race_switch (gu.urace.mnum)
 
 /*** Unified structure specifying gender information ***/
 struct Gender {

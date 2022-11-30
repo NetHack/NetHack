@@ -49,7 +49,7 @@ static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
 {
 #ifdef NO_PARSING_SYMSET
-    glyph_map *gm = &glyphmap[glyph];
+    glyph_map *gmap = &glyphmap[glyph];
 #endif
     uint8 utf8str[6] = { 0, 0, 0, 0, 0, 0 };
     int uval;
@@ -61,12 +61,12 @@ to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
     uval = unicode_val(findwhat->unicode_val);
     if (unicodeval_to_utf8str(uval, utf8str, sizeof utf8str)) {
 #ifdef NO_PARSING_SYMSET
-        set_map_u(gm, uval, utf8str,
+        set_map_u(gmap, uval, utf8str,
                   (findwhat->color != 0L) ? findwhat->color : 0L);
 #endif
         add_custom_urep_entry(known_handling[H_UTF8], glyph,
                               uval, utf8str, findwhat->color,
-                              g.symset_which_set);
+                              gs.symset_which_set);
     }
 }
 
@@ -139,13 +139,13 @@ glyphrep_to_custom_map_entries(const char *op, int *glyphptr)
 static int32_t
 rgbstr_to_int32(const char *rgbstr)
 {
-    int r, gn, b, milestone = 0;
+    int r, g, b, milestone = 0;
     char *cp, *c_r,*c_g,*c_b;
     int32_t rgb = 0;
     char buf[BUFSZ];
     boolean dash = FALSE;
 
-    r = gn = b = 0;
+    r = g = b = 0;
     c_g = c_b = (char *) 0;
     Snprintf(buf, sizeof buf, "%s", rgbstr);
     c_r = cp = buf;
@@ -174,9 +174,9 @@ rgbstr_to_int32(const char *rgbstr)
             && (strlen(c_g) > 0 && strlen(c_g) < 4)
             && (strlen(c_b) > 0 && strlen(c_b) < 4)) {
         r = atoi(c_r);
-        gn = atoi(c_g);
+        g = atoi(c_g);
         b = atoi(c_b);
-        rgb = (r << 16) | (gn << 8) | (b << 0);
+        rgb = (r << 16) | (g << 8) | (b << 0);
         return rgb;
     }
     return -1L;
@@ -219,27 +219,27 @@ unicode_val(const char *cp)
 }
 
 int
-set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str, long ucolor)
+set_map_u(glyph_map *gmap, uint32 utf32ch, const uint8 *utf8str, long ucolor)
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
 
-    if (gm) {
-        if (gm->u == 0) {
-            gm->u = (struct unicode_representation *) alloc(sizeof *gm->u);
-            gm->u->utf8str = 0;
+    if (gmap) {
+        if (gmap->u == 0) {
+            gmap->u = (struct unicode_representation *) alloc(sizeof *gmap->u);
+            gmap->u->utf8str = 0;
         }
-        if (gm->u->utf8str != 0) {
-            free(gm->u->utf8str);
-            gm->u->utf8str = 0;
+        if (gmap->u->utf8str != 0) {
+            free(gmap->u->utf8str);
+            gmap->u->utf8str = 0;
         }
-        gm->u->utf8str = (uint8 *) dupstr((const char *) utf8str);
-        gm->u->ucolor = ucolor;
+        gmap->u->utf8str = (uint8 *) dupstr((const char *) utf8str);
+        gmap->u->ucolor = ucolor;
         if (closest_color(ucolor, &closecolor, &clridx))
-            gm->u->u256coloridx = clridx;
+            gmap->u->u256coloridx = clridx;
         else
-            gm->u->u256coloridx = 0;
-        gm->u->utf32ch = utf32ch;
+            gmap->u->u256coloridx = 0;
+        gmap->u->utf32ch = utf32ch;
         return 1;
     }
     return 0;
@@ -390,15 +390,15 @@ mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *retflags)
 
     while (*str && put < (buf + bufsz) - 1) {
         if (*str == '\\') {
-            int dcount, so, gv;
+            int dcount, so, ggv;
             const char *save_str;
 
             save_str = str++;
             switch (*str) {
             case 'G': /* glyph value \GXXXXNNNN*/
-                if ((dcount = decode_glyph(str + 1, &gv))) {
+                if ((dcount = decode_glyph(str + 1, &ggv))) {
                     str += (dcount + 1);
-                    map_glyphinfo(0, 0, gv, 0, &glyphinfo);
+                    map_glyphinfo(0, 0, ggv, 0, &glyphinfo);
                     if (glyphinfo.gm.u && glyphinfo.gm.u->utf8str) {
                         uint8 *ucp = glyphinfo.gm.u->utf8str;
 
@@ -408,7 +408,7 @@ mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *retflags)
                             *retflags = 1;
                     } else {
                         so = glyphinfo.gm.sym.symidx;
-                        *put++ = g.showsyms[so];
+                        *put++ = gs.showsyms[so];
                         if (retflags)
                             *retflags = 0;
                     }
@@ -488,7 +488,7 @@ add_custom_urep_entry(
     static uint32_t closecolor = 0;
     static int clridx = 0;
     int retval = 0;
-    struct symset_customization *gdc = &g.sym_customizations[which_set];
+    struct symset_customization *gdc = &gs.sym_customizations[which_set];
     struct customization_detail *details, *prev = 0, *newdetails = 0,
                                           *lastdetail = 0;
 
@@ -983,9 +983,9 @@ color_distance(uint32_t rgb1, uint32_t rgb2)
 
     int rmean = (r1 + r2) / 2;
     int r = r1 - r2;
-    int gr = g1 - g2;
+    int g = g1 - g2;
     int b = b1 - b2;
-    return ((((512 + rmean) * r * r) >> 8) + 4 * gr * gr
+    return ((((512 + rmean) * r * r) >> 8) + 4 * g * g
                  + (((767 - rmean) * b * b) >> 8));
 }
 
@@ -1113,7 +1113,7 @@ find_display_urep_customization(
     int glyphidx,
     enum graphics_sets which_set)
 {
-    struct symset_customization *gdc = &g.sym_customizations[which_set];
+    struct symset_customization *gdc = &gs.sym_customizations[which_set];
     struct customization_detail *urepdetails;
 
     if ((gdc->custtype == custom_ureps)

@@ -55,7 +55,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
             point_msg = "all around, then curses";
         else if ((Invis && !perceives(mtmp->data)
                   && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-                 || is_obj_mappear(&g.youmonst, STRANGE_OBJECT)
+                 || is_obj_mappear(&gy.youmonst, STRANGE_OBJECT)
                  || u.uundetected)
             point_msg = "and curses in your general direction";
         else if (Displaced && (mtmp->mux != u.ux || mtmp->muy != u.uy))
@@ -64,7 +64,7 @@ cursetxt(struct monst *mtmp, boolean undirected)
             point_msg = "at you, then curses";
 
         pline("%s points %s.", Monnam(mtmp), point_msg);
-    } else if ((!(g.moves % 4) || !rn2(4))) {
+    } else if ((!(gm.moves % 4) || !rn2(4))) {
         if (!Deaf)
             Norep("You hear a mumbled curse.");   /* Deaf-aware */
     }
@@ -354,8 +354,8 @@ touch_of_death(void)
     You_feel("drained...");
 
     if (drain >= u.uhpmax) {
-        g.killer.format = KILLED_BY_AN;
-        Strcpy(g.killer.name, touchodeath);
+        gk.killer.format = KILLED_BY_AN;
+        Strcpy(gk.killer.name, touchodeath);
         done(DIED);
     } else {
         u.uhpmax -= drain;
@@ -387,7 +387,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
     switch (spellnum) {
     case MGC_DEATH_TOUCH:
         pline("Oh no, %s's using the touch of death!", mhe(mtmp));
-        if (nonliving(g.youmonst.data) || is_demon(g.youmonst.data)) {
+        if (nonliving(gy.youmonst.data) || is_demon(gy.youmonst.data)) {
             You("seem no deader than before.");
         } else if (!Antimagic && rn2(mtmp->m_lev) > 12) {
             if (Hallucination) {
@@ -405,7 +405,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         dmg = 0;
         break;
     case MGC_CLONE_WIZ:
-        if (mtmp->iswiz && g.context.no_of_wizards == 1) {
+        if (mtmp->iswiz && gc.context.no_of_wizards == 1) {
             pline("Double Trouble...");
             clonewiz();
             dmg = 0;
@@ -454,7 +454,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_MAGR);
             pline("A field of force surrounds you!");
-        } else if (!destroy_arm(some_armor(&g.youmonst))) {
+        } else if (!destroy_arm(some_armor(&gy.youmonst))) {
             Your("skin itches.");
         }
         dmg = 0;
@@ -568,11 +568,11 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         if (Half_spell_damage)
             dmg = (dmg + 1) / 2;
         burn_away_slime();
-        (void) burnarmor(&g.youmonst);
+        (void) burnarmor(&gy.youmonst);
         destroy_item(SCROLL_CLASS, AD_FIRE);
         destroy_item(POTION_CLASS, AD_FIRE);
         destroy_item(SPBOOK_CLASS, AD_FIRE);
-        ignite_items(g.invent);
+        ignite_items(gi.invent);
         (void) burn_floor_objects(u.ux, u.uy, TRUE, FALSE);
         break;
     case CLC_LIGHTNING: {
@@ -684,7 +684,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     case CLC_BLIND_YOU:
         /* note: resists_blnd() doesn't apply here */
         if (!Blinded) {
-            int num_eyes = eyecount(g.youmonst.data);
+            int num_eyes = eyecount(gy.youmonst.data);
 
             pline("Scales cover your %s!", (num_eyes == 1)
                                                ? body_part(EYE)
@@ -700,19 +700,19 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
         if (Antimagic || Free_action) {
             shieldeff(u.ux, u.uy);
             monstseesu(M_SEEN_MAGR);
-            if (g.multi >= 0)
+            if (gm.multi >= 0)
                 You("stiffen briefly.");
             dmg = 1; /* to produce nomul(-1), not actual damage */
         } else {
-            if (g.multi >= 0)
+            if (gm.multi >= 0)
                 You("are frozen in place!");
             dmg = 4 + (int) mtmp->m_lev;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
         }
         nomul(-dmg);
-        g.multi_reason = "paralyzed by a monster";
-        g.nomovemsg = 0;
+        gm.multi_reason = "paralyzed by a monster";
+        gn.nomovemsg = 0;
         dmg = 0;
         break;
     case CLC_CONFUSE_YOU:
@@ -829,7 +829,7 @@ spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
         if (!mcouldseeu && (spellnum == MGC_SUMMON_MONS
                             || (!mtmp->iswiz && spellnum == MGC_CLONE_WIZ)))
             return TRUE;
-        if ((!mtmp->iswiz || g.context.no_of_wizards > 1)
+        if ((!mtmp->iswiz || gc.context.no_of_wizards > 1)
             && spellnum == MGC_CLONE_WIZ)
             return TRUE;
         /* aggravation (global wakeup) when everyone is already active */
@@ -878,7 +878,7 @@ buzzmu(register struct monst *mtmp, register struct attack *mattk)
             pline("%s zaps you with a %s!", Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
         buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn, mtmp->mx,
-             mtmp->my, sgn(g.tbx), sgn(g.tby));
+             mtmp->my, sgn(gt.tbx), sgn(gt.tby));
         return MM_HIT;
     }
     return MM_MISS;

@@ -62,7 +62,7 @@ extern int amii_numcolors;
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
 
-/* Recalculate g.level.objects[x][y], since this info was not saved. */
+/* Recalculate gl.level.objects[x][y], since this info was not saved. */
 static void
 find_lev_obj(void)
 {
@@ -72,7 +72,7 @@ find_lev_obj(void)
 
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            g.level.objects[x][y] = (struct obj *) 0;
+            gl.level.objects[x][y] = (struct obj *) 0;
 
     /*
      * Reverse the entire fobj chain, which is necessary so that we can
@@ -87,7 +87,7 @@ find_lev_obj(void)
     }
     /* fobj should now be empty */
 
-    /* Set g.level.objects (as well as reversing the chain back again) */
+    /* Set gl.level.objects (as well as reversing the chain back again) */
     while ((otmp = fobjtmp) != 0) {
         fobjtmp = otmp->nobj;
         place_object(otmp, otmp->ox, otmp->oy);
@@ -110,7 +110,7 @@ inven_inuse(boolean quietly)
 {
     register struct obj *otmp, *otmp2;
 
-    for (otmp = g.invent; otmp; otmp = otmp2) {
+    for (otmp = gi.invent; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->in_use) {
             if (!quietly)
@@ -126,7 +126,7 @@ restlevchn(NHFILE* nhfp)
     int cnt = 0;
     s_level *tmplev, *x;
 
-    g.sp_levchn = (s_level *) 0;
+    gs.sp_levchn = (s_level *) 0;
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &cnt, sizeof(int));
 
@@ -135,10 +135,10 @@ restlevchn(NHFILE* nhfp)
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t) tmplev, sizeof(s_level));
 
-        if (!g.sp_levchn)
-            g.sp_levchn = tmplev;
+        if (!gs.sp_levchn)
+            gs.sp_levchn = tmplev;
         else {
-            for (x = g.sp_levchn; x->next; x = x->next)
+            for (x = gs.sp_levchn; x->next; x = x->next)
                 ;
             x->next = tmplev;
         }
@@ -166,10 +166,10 @@ restdamage(NHFILE* nhfp)
             mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof *tmp_dam);
 
         if (ghostly)
-            tmp_dam->when += (g.moves - g.omoves);
+            tmp_dam->when += (gm.moves - go.omoves);
 
-        tmp_dam->next = g.level.damagelist;
-        g.level.damagelist = tmp_dam;
+        tmp_dam->next = gl.level.damagelist;
+        gl.level.damagelist = tmp_dam;
     } while (--counter > 0);
 }
 
@@ -264,7 +264,7 @@ restobjchn(NHFILE* nhfp, boolean frozen)
          * immediately after old player died.
          */
         if (ghostly && !frozen && !age_is_relative(otmp))
-            otmp->age = g.moves - g.omoves + otmp->age;
+            otmp->age = gm.moves - go.omoves + otmp->age;
 
         /* get contents of a container or statue */
         if (Has_contents(otmp)) {
@@ -279,12 +279,12 @@ restobjchn(NHFILE* nhfp, boolean frozen)
             otmp->bypass = 0;
         if (!ghostly) {
             /* fix the pointers */
-            if (otmp->o_id == g.context.victual.o_id)
-                g.context.victual.piece = otmp;
-            if (otmp->o_id == g.context.tin.o_id)
-                g.context.tin.tin = otmp;
-            if (otmp->o_id == g.context.spbook.o_id)
-                g.context.spbook.book = otmp;
+            if (otmp->o_id == gc.context.victual.o_id)
+                gc.context.victual.piece = otmp;
+            if (otmp->o_id == gc.context.tin.o_id)
+                gc.context.tin.tin = otmp;
+            if (otmp->o_id == gc.context.spbook.o_id)
+                gc.context.spbook.book = otmp;
         }
         otmp2 = otmp;
     }
@@ -437,8 +437,8 @@ restmonchn(NHFILE* nhfp)
             restpriest(mtmp, ghostly);
 
         if (!ghostly) {
-            if (mtmp->m_id == g.context.polearm.m_id)
-                g.context.polearm.hitmon = mtmp;
+            if (mtmp->m_id == gc.context.polearm.m_id)
+                gc.context.polearm.hitmon = mtmp;
         }
         mtmp2 = mtmp;
     }
@@ -486,7 +486,7 @@ ghostfruit(register struct obj* otmp)
 {
     register struct fruit *oldf;
 
-    for (oldf = g.oldfruit; oldf; oldf = oldf->nextf)
+    for (oldf = go.oldfruit; oldf; oldf = oldf->nextf)
         if (oldf->fid == otmp->spe)
             break;
 
@@ -526,13 +526,13 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
             return FALSE;
     }
 
-    newgamecontext = g.context; /* copy statically init'd context */
+    newgamecontext = gc.context; /* copy statically init'd context */
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &g.context, sizeof (struct context_info));
-    g.context.warntype.species = (g.context.warntype.speciesidx >= LOW_PM)
-                                  ? &mons[g.context.warntype.speciesidx]
+        mread(nhfp->fd, (genericptr_t) &gc.context, sizeof (struct context_info));
+    gc.context.warntype.species = (gc.context.warntype.speciesidx >= LOW_PM)
+                                  ? &mons[gc.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
-    /* g.context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
+    /* gc.context.victual.piece, .tin.tin, .spellbook.book, and .polearm.hitmon
        are pointers which get set to Null during save and will be recovered
        via corresponding o_id or m_id while objs or mons are being restored */
 
@@ -570,7 +570,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
 #endif
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) &u, sizeof(struct you));
-    g.youmonst.cham = u.mcham;
+    gy.youmonst.cham = u.mcham;
 
     if (nhfp->structlevel)
         mread(nhfp->fd, (genericptr_t) timebuf, 14);
@@ -604,8 +604,8 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
         iflags.deferred_X = FALSE;
         iflags.perm_invent = defer_perm_invent;
         flags = newgameflags;
-        g.context = newgamecontext;
-        g.youmonst = cg.zeromonst;
+        gc.context = newgamecontext;
+        gy.youmonst = cg.zeromonst;
         return FALSE;
     }
     /* in case hangup save occurred in midst of level change */
@@ -616,7 +616,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     restore_timers(nhfp, RANGE_GLOBAL, 0L);
     restore_light_sources(nhfp);
 
-    g.invent = restobjchn(nhfp, FALSE);
+    gi.invent = restobjchn(nhfp, FALSE);
 
     /* restore dangling (not on floor or in inventory) ball and/or chain */
     bc_obj = restobjchn(nhfp, FALSE);
@@ -628,11 +628,11 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
             setworn(bc_obj, bc_obj->owornmask);
         bc_obj = nobj;
     }
-    g.migrating_objs = restobjchn(nhfp, FALSE);
-    g.migrating_mons = restmonchn(nhfp);
+    gm.migrating_objs = restobjchn(nhfp, FALSE);
+    gm.migrating_mons = restmonchn(nhfp);
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.mvitals, sizeof g.mvitals);
+        mread(nhfp->fd, (genericptr_t) gm.mvitals, sizeof gm.mvitals);
     }
 
     /*
@@ -640,10 +640,10 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
      * side-effects too early in the game.
      * Disable see_monsters() here, re-enable it at the top of moveloop()
      */
-    g.defer_see_monsters = TRUE;
+    gd.defer_see_monsters = TRUE;
 
     /* this comes after inventory has been loaded */
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (otmp->owornmask)
             setworn(otmp, otmp->owornmask);
 
@@ -655,17 +655,17 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     uwep = 0;      /* clear it and have setuwep() reinit */
     setuwep(otmp); /* (don't need any null check here) */
     if (!uwep || uwep->otyp == PICK_AXE || uwep->otyp == GRAPPLING_HOOK)
-        g.unweapon = TRUE;
+        gu.unweapon = TRUE;
 
     restore_dungeon(nhfp);
     restlevchn(nhfp);
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) &g.moves, sizeof g.moves);
+        mread(nhfp->fd, (genericptr_t) &gm.moves, sizeof gm.moves);
         /* hero_seq isn't saved and restored because it can be recalculated */
-        g.hero_seq = g.moves << 3; /* normally handled in moveloop() */
-        mread(nhfp->fd, (genericptr_t) &g.quest_status,
+        gh.hero_seq = gm.moves << 3; /* normally handled in moveloop() */
+        mread(nhfp->fd, (genericptr_t) &gq.quest_status,
               sizeof (struct q_score));
-        mread(nhfp->fd, (genericptr_t) g.spl_book,
+        mread(nhfp->fd, (genericptr_t) gs.spl_book,
               (MAXSPELL + 1) * sizeof (struct spell));
     }
     restore_artifacts(nhfp);
@@ -679,11 +679,11 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
             mread(nhfp->fd, (genericptr_t) steedid, sizeof *steedid);
     }
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.pl_character, sizeof g.pl_character);
-        mread(nhfp->fd, (genericptr_t) g.pl_fruit, sizeof g.pl_fruit);
+        mread(nhfp->fd, (genericptr_t) gp.pl_character, sizeof gp.pl_character);
+        mread(nhfp->fd, (genericptr_t) gp.pl_fruit, sizeof gp.pl_fruit);
     }
-    freefruitchn(g.ffruit); /* clean up fruit(s) made by initoptions() */
-    g.ffruit = loadfruitchn(nhfp);
+    freefruitchn(gf.ffruit); /* clean up fruit(s) made by initoptions() */
+    gf.ffruit = loadfruitchn(nhfp);
 
     restnames(nhfp);
     restore_msghistory(nhfp);
@@ -751,9 +751,9 @@ dorecover(NHFILE* nhfp)
     int rtmp;
 
     /* suppress map display if some part of the code tries to update that */
-    g.program_state.restoring = REST_GSTATE;
+    gp.program_state.restoring = REST_GSTATE;
 
-    get_plname_from_file(nhfp, g.plname);
+    get_plname_from_file(nhfp, gp.plname);
     getlev(nhfp, 0, (xint8) 0);
     if (!restgamestate(nhfp, &stuckid, &steedid)) {
         NHFILE tnhfp;
@@ -767,7 +767,7 @@ dorecover(NHFILE* nhfp)
            is not really affiliated with an open file */
         close_nhfile(nhfp);
         (void) delete_savefile();
-        g.program_state.restoring = 0;
+        gp.program_state.restoring = 0;
         return 0;
     }
     restlevelstate(stuckid, steedid);
@@ -778,7 +778,7 @@ dorecover(NHFILE* nhfp)
     if (rtmp < 2)
         return rtmp; /* dorecover called recursively */
 
-    g.program_state.restoring = REST_LEVELS;
+    gp.program_state.restoring = REST_LEVELS;
 
     /* these pointers won't be valid while we're processing the
      * other levels, but they'll be reset again by restlevelstate()
@@ -802,7 +802,7 @@ dorecover(NHFILE* nhfp)
 #endif
     clear_nhwindow(WIN_MESSAGE);
     You("return to level %d in %s%s.", depth(&u.uz),
-        g.dungeons[u.uz.dnum].dname,
+        gd.dungeons[u.uz.dnum].dname,
         flags.debug ? " while in debug mode"
                     : flags.explore ? " while in explore mode" : "");
     curs(WIN_MAP, 1, 1);
@@ -837,20 +837,20 @@ dorecover(NHFILE* nhfp)
     restoreinfo.mread_flags = 0;
     rewind_nhfile(nhfp);        /* return to beginning of file */
     (void) validate(nhfp, (char *) 0);
-    get_plname_from_file(nhfp, g.plname);
+    get_plname_from_file(nhfp, gp.plname);
 
     getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
     restlevelstate(stuckid, steedid);
-    g.program_state.something_worth_saving = 1; /* useful data now exists */
+    gp.program_state.something_worth_saving = 1; /* useful data now exists */
 
     if (!wizard && !discover)
         (void) delete_savefile();
     if (Is_rogue_level(&u.uz))
         assign_graphics(ROGUESET);
     reset_glyphmap(gm_levelchange);
-    max_rank_sz(); /* to recompute g.mrank_sz (botl.c) */
-    init_oclass_probs(); /* recompute g.oclass_prob_totals[] */
+    max_rank_sz(); /* to recompute gm.mrank_sz (botl.c) */
+    init_oclass_probs(); /* recompute go.oclass_prob_totals[] */
 
     if ((uball && !uchain) || (uchain && !uball)) {
         impossible("restgamestate: lost ball & chain");
@@ -870,20 +870,20 @@ dorecover(NHFILE* nhfp)
        but before docrt(). */
     reglyph_darkroom();
     vision_reset();
-    g.vision_full_recalc = 1; /* recompute vision (not saved) */
+    gv.vision_full_recalc = 1; /* recompute vision (not saved) */
 
     run_timers(); /* expire all timers that have gone off while away */
-    g.program_state.restoring = 0; /* affects bot() so clear before docrt() */
+    gp.program_state.restoring = 0; /* affects bot() so clear before docrt() */
 
-    if (g.early_raw_messages && !g.program_state.beyond_savefile_load) {
+    if (ge.early_raw_messages && !gp.program_state.beyond_savefile_load) {
         /*
          * We're about to obliterate some potentially important
          * startup messages, so give the player a chance to see them.
          */
-        g.early_raw_messages = 0;
+        ge.early_raw_messages = 0;
         wait_synch();
     }
-    g.program_state.beyond_savefile_load = 1;
+    gp.program_state.beyond_savefile_load = 1;
 
     docrt();
     clear_nhwindow(WIN_MESSAGE);
@@ -913,7 +913,7 @@ rest_stairs(NHFILE* nhfp)
         if (nhfp->structlevel) {
             mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
         }
-        if (g.program_state.restoring != REST_GSTATE
+        if (gp.program_state.restoring != REST_GSTATE
             && stway.tolev.dnum == u.uz.dnum) {
             /* stairway dlevel is relative, make it absolute */
             stway.tolev.dlevel += u.uz.dlevel;
@@ -999,7 +999,7 @@ trickery(char *reason)
     pline("Strange, this map is not as I remember it.");
     pline("Somebody is trying some trickery here...");
     pline("This game is void.");
-    Strcpy(g.killer.name, reason ? reason : "");
+    Strcpy(gk.killer.name, reason ? reason : "");
     done(TRICKED);
 }
 
@@ -1029,7 +1029,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
      * information is available when restoring the objects.
      */
     if (ghostly)
-        g.oldfruit = loadfruitchn(nhfp);
+        go.oldfruit = loadfruitchn(nhfp);
 
     /* First some sanity checks */
     if (nhfp->structlevel)
@@ -1056,31 +1056,31 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
             pline1(trickbuf);
         trickery(trickbuf);
     }
-    restcemetery(nhfp, &g.level.bonesinfo);
+    restcemetery(nhfp, &gl.level.bonesinfo);
     rest_levl(nhfp,
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.lastseentyp, sizeof(g.lastseentyp));
-        mread(nhfp->fd, (genericptr_t) &g.omoves, sizeof(g.omoves));
+        mread(nhfp->fd, (genericptr_t) gl.lastseentyp, sizeof(gl.lastseentyp));
+        mread(nhfp->fd, (genericptr_t) &go.omoves, sizeof(go.omoves));
     }
-    elapsed = g.moves - g.omoves;
+    elapsed = gm.moves - go.omoves;
 
     if (nhfp->structlevel) {
         rest_stairs(nhfp);
-        mread(nhfp->fd, (genericptr_t)&g.updest, sizeof(dest_area));
-        mread(nhfp->fd, (genericptr_t)&g.dndest, sizeof(dest_area));
-        mread(nhfp->fd, (genericptr_t)&g.level.flags, sizeof(g.level.flags));
-        if (g.doors)
-            free(g.doors);
-        mread(nhfp->fd, (genericptr_t) &g.doors_alloc, sizeof (g.doors_alloc));
-        g.doors = (coord *) alloc(g.doors_alloc * sizeof (coord));
-        mread(nhfp->fd, (genericptr_t) g.doors, g.doors_alloc * sizeof (coord));
+        mread(nhfp->fd, (genericptr_t)&gu.updest, sizeof(dest_area));
+        mread(nhfp->fd, (genericptr_t)&gd.dndest, sizeof(dest_area));
+        mread(nhfp->fd, (genericptr_t)&gl.level.flags, sizeof(gl.level.flags));
+        if (gd.doors)
+            free(gd.doors);
+        mread(nhfp->fd, (genericptr_t) &gd.doors_alloc, sizeof (gd.doors_alloc));
+        gd.doors = (coord *) alloc(gd.doors_alloc * sizeof (coord));
+        mread(nhfp->fd, (genericptr_t) gd.doors, gd.doors_alloc * sizeof (coord));
     }
     rest_rooms(nhfp); /* No joke :-) */
-    if (g.nroom)
-        g.doorindex = g.rooms[g.nroom - 1].fdoor + g.rooms[g.nroom - 1].doorct;
+    if (gn.nroom)
+        gd.doorindex = gr.rooms[gn.nroom - 1].fdoor + gr.rooms[gn.nroom - 1].doorct;
     else
-        g.doorindex = 0;
+        gd.doorindex = 0;
 
     restore_timers(nhfp, RANGE_LEVEL, elapsed);
     restore_light_sources(nhfp);
@@ -1089,19 +1089,19 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     /* rest_worm(fd); */    /* restore worm information */
     rest_worm(nhfp);    /* restore worm information */
 
-    g.ftrap = 0;
+    gf.ftrap = 0;
     for (;;) {
         trap = newtrap();
         if (nhfp->structlevel)
             mread(nhfp->fd, (genericptr_t)trap, sizeof(struct trap));
         if (trap->tx != 0) {
-            if (g.program_state.restoring != REST_GSTATE
+            if (gp.program_state.restoring != REST_GSTATE
                 && trap->dst.dnum == u.uz.dnum) {
                 /* convert relative destination to absolute */
                 trap->dst.dlevel += u.uz.dlevel;
             }
-            trap->ntrap = g.ftrap;
-            g.ftrap = trap;
+            trap->ntrap = gf.ftrap;
+            gf.ftrap = trap;
         } else
             break;
     }
@@ -1111,14 +1111,14 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     find_lev_obj();
     /* restobjchn()'s `frozen' argument probably ought to be a callback
        routine so that we can check for objects being buried under ice */
-    g.level.buriedobjlist = restobjchn(nhfp, FALSE);
-    g.billobjs = restobjchn(nhfp, FALSE);
+    gl.level.buriedobjlist = restobjchn(nhfp, FALSE);
+    gb.billobjs = restobjchn(nhfp, FALSE);
     rest_engravings(nhfp);
 
     /* reset level.monsters for new level */
     for (x = 0; x < COLNO; x++)
         for (y = 0; y < ROWNO; y++)
-            g.level.monsters[x][y] = (struct monst *) 0;
+            gl.level.monsters[x][y] = (struct monst *) 0;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
@@ -1155,7 +1155,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     rest_bubbles(nhfp); /* for water and air; empty marker on other levels */
 
     if (ghostly) {
-        stairway *stway = g.stairs;
+        stairway *stway = gs.stairs;
         while (stway) {
             if (!stway->isladder && !stway->up
                 && stway->tolev.dnum == u.uz.dnum)
@@ -1164,7 +1164,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
         }
 
         /* Now get rid of all the temp fruits... */
-        freefruitchn(g.oldfruit), g.oldfruit = 0;
+        freefruitchn(go.oldfruit), go.oldfruit = 0;
 
         if (lev > ledger_no(&medusa_level)
             && lev < ledger_no(&stronghold_level) && !stway) {
@@ -1192,7 +1192,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
             case BR_STAIR:
             case BR_NO_END1:
             case BR_NO_END2:
-                stway = g.stairs;
+                stway = gs.stairs;
                 while (stway) {
                     if (stway->tolev.dnum != u.uz.dnum)
                         break;
@@ -1202,7 +1202,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
                     assign_level(&(stway->tolev), &ltmp);
                 break;
             case BR_PORTAL: /* max of 1 portal per level */
-                for (trap = g.ftrap; trap; trap = trap->ntrap)
+                for (trap = gf.ftrap; trap; trap = trap->ntrap)
                     if (trap->ttyp == MAGIC_PORTAL)
                         break;
                 if (!trap)
@@ -1214,7 +1214,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
             struct trap *ttmp = 0;
 
             /* Remove any dangling portals. */
-            for (trap = g.ftrap; trap; trap = ttmp) {
+            for (trap = gf.ftrap; trap; trap = ttmp) {
                 ttmp = trap->ntrap;
                 if (trap->ttyp == MAGIC_PORTAL)
                     deltrap(trap);
@@ -1313,11 +1313,11 @@ clear_id_mapping(void)
 {
     struct bucket *curr;
 
-    while ((curr = g.id_map) != 0) {
-        g.id_map = curr->next;
+    while ((curr = gi.id_map) != 0) {
+        gi.id_map = curr->next;
         free((genericptr_t) curr);
     }
-    g.n_ids_mapped = 0;
+    gn.n_ids_mapped = 0;
 }
 
 /* Add a mapping to the ID map. */
@@ -1326,18 +1326,18 @@ add_id_mapping(unsigned int gid, unsigned int nid)
 {
     int idx;
 
-    idx = g.n_ids_mapped % N_PER_BUCKET;
+    idx = gn.n_ids_mapped % N_PER_BUCKET;
     /* idx is zero on first time through, as well as when a new bucket is */
     /* needed */
     if (idx == 0) {
         struct bucket *gnu = (struct bucket *) alloc(sizeof(struct bucket));
-        gnu->next = g.id_map;
-        g.id_map = gnu;
+        gnu->next = gi.id_map;
+        gi.id_map = gnu;
     }
 
-    g.id_map->map[idx].gid = gid;
-    g.id_map->map[idx].nid = nid;
-    g.n_ids_mapped++;
+    gi.id_map->map[idx].gid = gid;
+    gi.id_map->map[idx].nid = nid;
+    gn.n_ids_mapped++;
 }
 
 /*
@@ -1351,11 +1351,11 @@ lookup_id_mapping(unsigned int gid, unsigned int *nidp)
     int i;
     struct bucket *curr;
 
-    if (g.n_ids_mapped)
-        for (curr = g.id_map; curr; curr = curr->next) {
+    if (gn.n_ids_mapped)
+        for (curr = gi.id_map; curr; curr = curr->next) {
             /* first bucket might not be totally full */
-            if (curr == g.id_map) {
-                i = g.n_ids_mapped % N_PER_BUCKET;
+            if (curr == gi.id_map) {
+                i = gn.n_ids_mapped % N_PER_BUCKET;
                 if (i == 0)
                     i = N_PER_BUCKET;
             } else
@@ -1396,7 +1396,7 @@ reset_oattached_mids(boolean ghostly)
 
 #ifdef SELECTSAVED
 /* put up a menu listing each character from this player's saved games;
-   returns 1: use g.plname[], 0: new game, -1: quit */
+   returns 1: use gp.plname[], 0: new game, -1: quit */
 int
 restore_menu(
     winid bannerwin) /* if not WIN_ERR, clear window and show copyright in menu */
@@ -1408,7 +1408,7 @@ restore_menu(
     int k, clet, ch = 0; /* ch: 0 => new game */
     int clr = 0;
 
-    *g.plname = '\0';
+    *gp.plname = '\0';
     saved = get_saved_games(); /* array of character names */
     if (saved && *saved) {
         tmpwin = create_nhwindow(NHW_MENU);
@@ -1444,7 +1444,7 @@ restore_menu(
         if (select_menu(tmpwin, PICK_ONE, &chosen_game) > 0) {
             ch = chosen_game->item.a_int;
             if (ch > 0)
-                Strcpy(g.plname, saved[ch - 1]);
+                Strcpy(gp.plname, saved[ch - 1]);
             else if (ch < 0)
                 ++ch; /* -1 -> 0 (new game), -2 -> -1 (quit) */
             free((genericptr_t) chosen_game);

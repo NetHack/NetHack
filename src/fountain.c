@@ -40,7 +40,7 @@ dowatersnakes(void)
     register int num = rn1(5, 2);
     struct monst *mtmp;
 
-    if (!(g.mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
+    if (!(gm.mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
         if (!Blind)
             pline("An endless stream of %s pours forth!",
                   Hallucination ? makeplural(rndmonnam(NULL)) : "snakes");
@@ -61,7 +61,7 @@ dowaterdemon(void)
 {
     struct monst *mtmp;
 
-    if (!(g.mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
+    if (!(gm.mvitals[PM_WATER_DEMON].mvflags & G_GONE)) {
         if ((mtmp = makemon(&mons[PM_WATER_DEMON], u.ux, u.uy,
                             MM_NOMSG)) != 0) {
             if (!Blind)
@@ -89,7 +89,7 @@ dowaternymph(void)
 {
     register struct monst *mtmp;
 
-    if (!(g.mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
+    if (!(gm.mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
         && (mtmp = makemon(&mons[PM_WATER_NYMPH], u.ux, u.uy,
                            MM_NOMSG)) != 0) {
         if (!Blind)
@@ -141,7 +141,7 @@ gush(coordxy x, coordxy y, genericptr_t poolcnt)
     levl[x][y].typ = POOL, levl[x][y].flags = 0;
     /* No kelp! */
     del_engr_at(x, y);
-    water_damage_chain(g.level.objects[x][y], TRUE);
+    water_damage_chain(gl.level.objects[x][y], TRUE);
 
     if ((mtmp = m_at(x, y)) != 0)
         (void) minliquid(mtmp);
@@ -218,7 +218,7 @@ dryup(coordxy x, coordxy y, boolean isyou)
         /* replace the fountain with ordinary floor */
         levl[x][y].typ = ROOM, levl[x][y].flags = 0;
         levl[x][y].blessedftn = 0;
-        g.level.flags.nfountains--;
+        gl.level.flags.nfountains--;
         /* The location is seen if the hero/monster is invisible
            or felt if the hero is blind. */
         newsym(x, y);
@@ -247,7 +247,7 @@ drinkfountain(void)
         for (ii = 0; ii < A_MAX; ii++)
             if (ABASE(ii) < AMAX(ii)) {
                 ABASE(ii) = AMAX(ii);
-                g.context.botl = 1;
+                gc.context.botl = 1;
             }
         /* gain ability, blessed if "natural" luck is high */
         i = rn2(A_MAX); /* start at a random attribute */
@@ -310,7 +310,7 @@ drinkfountain(void)
             morehungry(rn1(20, 11));
             exercise(A_CON, FALSE);
             /* this is more severe than rndcurse() */
-            for (obj = g.invent; obj; obj = obj->nobj)
+            for (obj = gi.invent; obj; obj = obj->nobj)
                 if (obj->oclass != COIN_CLASS && !obj->cursed && !rn2(5)) {
                     curse(obj);
                     ++buc_changed;
@@ -422,7 +422,7 @@ dipfountain(register struct obj *obj)
         update_inventory();
         levl[u.ux][u.uy].typ = ROOM, levl[u.ux][u.uy].flags = 0;
         newsym(u.ux, u.uy);
-        g.level.flags.nfountains--;
+        gl.level.flags.nfountains--;
         if (in_town(u.ux, u.uy))
             (void) angry_guards(FALSE);
         return;
@@ -483,13 +483,13 @@ dipfountain(register struct obj *obj)
     case 28: /* Strange feeling */
         pline("An urge to take a bath overwhelms you.");
         {
-            long money = money_cnt(g.invent);
+            long money = money_cnt(gi.invent);
             struct obj *otmp;
             if (money > 10) {
                 /* Amount to lose.  Might get rounded up as fountains don't
                  * pay change... */
                 money = somegold(money) / 10;
-                for (otmp = g.invent; otmp && money > 0; otmp = otmp->nobj)
+                for (otmp = gi.invent; otmp && money > 0; otmp = otmp->nobj)
                     if (otmp->oclass == COIN_CLASS) {
                         int denomination = objects[otmp->otyp].oc_cost;
                         long coin_loss =
@@ -537,11 +537,11 @@ breaksink(coordxy x, coordxy y)
 {
     if (cansee(x, y) || u_at(x, y))
         pline_The("pipes break!  Water spurts out!");
-    g.level.flags.nsinks--;
+    gl.level.flags.nsinks--;
     levl[x][y].typ = FOUNTAIN, levl[x][y].looted = 0;
     levl[x][y].blessedftn = 0;
     SET_FOUNTAIN_LOOTED(x, y);
-    g.level.flags.nfountains++;
+    gl.level.flags.nfountains++;
     newsym(x, y);
 }
 
@@ -572,7 +572,7 @@ drinksink(void)
         /* boiling water burns considered fire damage */
         break;
     case 3:
-        if (g.mvitals[PM_SEWER_RAT].mvflags & G_GONE)
+        if (gm.mvitals[PM_SEWER_RAT].mvflags & G_GONE)
             pline_The("sink seems quite dirty.");
         else {
             mtmp = makemon(&mons[PM_SEWER_RAT], u.ux, u.uy, MM_NOMSG);
@@ -614,7 +614,7 @@ drinksink(void)
         break;
     case 7:
         pline_The("%s moves as though of its own will!", hliquid("water"));
-        if ((g.mvitals[PM_WATER_ELEMENTAL].mvflags & G_GONE)
+        if ((gm.mvitals[PM_WATER_ELEMENTAL].mvflags & G_GONE)
             || !makemon(&mons[PM_WATER_ELEMENTAL], u.ux, u.uy, MM_NOMSG))
             pline("But it quiets down.");
         break;

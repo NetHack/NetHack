@@ -68,7 +68,7 @@ use_saddle(struct obj* otmp)
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        if (!(poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))) {
+        if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
                     an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
@@ -156,8 +156,8 @@ put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
 boolean
 can_ride(struct monst* mtmp)
 {
-    return (mtmp->mtame && humanoid(g.youmonst.data)
-            && !verysmall(g.youmonst.data) && !bigmonst(g.youmonst.data)
+    return (mtmp->mtame && humanoid(gy.youmonst.data)
+            && !verysmall(gy.youmonst.data) && !bigmonst(gy.youmonst.data)
             && (!Underwater || is_swimmer(mtmp->data)));
 }
 
@@ -226,8 +226,8 @@ mount_steed(
             return (FALSE);
     }
 
-    if (Upolyd && (!humanoid(g.youmonst.data) || verysmall(g.youmonst.data)
-                   || bigmonst(g.youmonst.data) || slithy(g.youmonst.data))) {
+    if (Upolyd && (!humanoid(gy.youmonst.data) || verysmall(gy.youmonst.data)
+                   || bigmonst(gy.youmonst.data) || slithy(gy.youmonst.data))) {
         You("won't fit on a saddle.");
         return (FALSE);
     }
@@ -352,11 +352,11 @@ mount_steed(
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
-        g.unweapon = FALSE;
+        gu.unweapon = FALSE;
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
     return TRUE;
 }
 
@@ -523,7 +523,7 @@ landing_spot(
                     kn_trap = i == 0 && ((t = t_at(x, y)) != 0 && t->tseen
                                          && t->ttyp != VIBRATING_SQUARE);
                     boulder = i <= 1 && (sobj_at(BOULDER, x, y)
-                                         && !throws_rocks(g.youmonst.data));
+                                         && !throws_rocks(gy.youmonst.data));
                     if (!kn_trap && !boulder) {
                         spot->x = x;
                         spot->y = y;
@@ -544,7 +544,7 @@ landing_spot(
 
     /* If we didn't find a good spot and forceit is on, try enexto(). */
     if (forceit && !found)
-        found = enexto(spot, u.ux, u.uy, g.youmonst.data);
+        found = enexto(spot, u.ux, u.uy, gy.youmonst.data);
 
     return found;
 }
@@ -731,11 +731,11 @@ dismount_steed(
                 /* Keep steed here, move the player to cc;
                  * teleds() clears u.utrap
                  */
-                g.in_steed_dismounting = TRUE;
+                gi.in_steed_dismounting = TRUE;
                 teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
                 if (sobj_at(BOULDER, cc.x, cc.y))
                     sokoban_guilt();
-                g.in_steed_dismounting = FALSE;
+                gi.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */
                 if (save_utrap)
@@ -777,17 +777,17 @@ dismount_steed(
 
     /* usually return the hero to the surface */
     if (reason != DISMOUNT_ENGULFED && reason != DISMOUNT_BONES) {
-        g.in_steed_dismounting = TRUE;
+        gi.in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
-        g.in_steed_dismounting = FALSE;
-        g.context.botl = TRUE;
+        gi.in_steed_dismounting = FALSE;
+        gc.context.botl = TRUE;
         (void) encumber_msg();
-        g.vision_full_recalc = 1;
+        gv.vision_full_recalc = 1;
     } else
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
-        g.unweapon = TRUE;
+        gu.unweapon = TRUE;
     return;
 }
 
@@ -864,7 +864,7 @@ place_monster(struct monst* mon, int x, int y)
                    mon->mstate, buf);
         return;
     }
-    if ((othermon = g.level.monsters[x][y]) != 0) {
+    if ((othermon = gl.level.monsters[x][y]) != 0) {
         describe_level(buf, 0);
         monnm = minimal_monnam(mon, FALSE);
         othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
@@ -872,7 +872,7 @@ place_monster(struct monst* mon, int x, int y)
                    monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
-    g.level.monsters[x][y] = mon;
+    gl.level.monsters[x][y] = mon;
     mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
                      | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }

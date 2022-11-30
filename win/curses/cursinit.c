@@ -742,9 +742,9 @@ curses_init_options(void)
     set_option_mod_status("eight_bit_tty", set_in_config);
 
     /* If we don't have a symset defined, load the curses symset by default */
-    if (!g.symset[PRIMARYSET].explicitly)
+    if (!gs.symset[PRIMARYSET].explicitly)
         load_symset("curses", PRIMARYSET);
-    if (!g.symset[ROGUESET].explicitly)
+    if (!gs.symset[ROGUESET].explicitly)
         load_symset("default", ROGUESET);
 
 #ifdef PDCURSES

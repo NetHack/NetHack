@@ -133,49 +133,49 @@ getpos_help(boolean force, const char *goal)
     putstr(tmpwin, 0, sbuf);
     putstr(tmpwin, 0, "Or enter a background symbol (ex. '<').");
     Sprintf(sbuf, "Use '%s' to move the cursor on yourself.",
-           visctrl(g.Cmd.spkeys[NHKF_GETPOS_SELF]));
+           visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SELF]));
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_MON_PREV]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_NEXT]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MON_PREV]),
                              GLOC_MONS);
     }
     if (goal && !strcmp(goal, "a monster"))
         goto skip_non_mons;
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_OBJ_NEXT]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_OBJ_PREV]),
                              GLOC_OBJS);
     }
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MAP) != 0) {
         /* these are primarily useful when choosing a travel
            destination for the '_' command */
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_DOOR_NEXT]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_DOOR_PREV]),
                              GLOC_DOOR);
         getpos_help_keyxhelp(tmpwin,
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
-                             visctrl(g.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_UNEX_NEXT]),
+                             visctrl(gc.Cmd.spkeys[NHKF_GETPOS_UNEX_PREV]),
                              GLOC_EXPLORE);
         getpos_help_keyxhelp(tmpwin,
-                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
-                          visctrl(g.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
+                          visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_NEXT]),
+                          visctrl(gc.Cmd.spkeys[NHKF_GETPOS_INTERESTING_PREV]),
                              GLOC_INTERESTING);
     }
     Sprintf(sbuf, "Use '%s' to change fast-move mode to %s.",
-            visctrl(g.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
+            visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]),
             fastmovemode[!iflags.getloc_moveskip]);
     putstr(tmpwin, 0, sbuf);
     if (!iflags.terrainmode || (iflags.terrainmode & TER_DETECT) == 0) {
         Sprintf(sbuf, "Use '%s' to toggle menu listing for possible targets.",
-                visctrl(g.Cmd.spkeys[NHKF_GETPOS_MENU]));
+                visctrl(gc.Cmd.spkeys[NHKF_GETPOS_MENU]));
         putstr(tmpwin, 0, sbuf);
         Sprintf(sbuf,
                 "Use '%s' to change the mode of limiting possible targets.",
-                visctrl(g.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
+                visctrl(gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]));
         putstr(tmpwin, 0, sbuf);
     }
     if (!iflags.terrainmode) {
@@ -183,24 +183,24 @@ getpos_help(boolean force, const char *goal)
 
         if (getpos_getvalid) {
             Sprintf(sbuf, "Use '%s' or '%s' to move to valid locations.",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_NEXT]),
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_VALID_PREV]));
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
             Sprintf(sbuf, "Use '%s' to display valid locations.",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
         Sprintf(sbuf, "Use '%s' to toggle automatic description.",
-                visctrl(g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+                visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         putstr(tmpwin, 0, sbuf);
         if (iflags.cmdassist) { /* assisting the '/' command, I suppose... */
             Sprintf(sbuf,
                     (iflags.getpos_coords == GPCOORDS_NONE)
         ? "(Set 'whatis_coord' option to include coordinates with '%s' text.)"
         : "(Reset 'whatis_coord' option to omit coordinates from '%s' text.)",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]));
         }
  skip_non_mons:
         /* disgusting hack; the alternate selection characters work for any
@@ -209,12 +209,12 @@ getpos_help(boolean force, const char *goal)
         doing_what_is = (goal == what_is_an_unknown_object);
         if (doing_what_is) {
             Sprintf(kbuf, "'%s' or '%s' or '%s' or '%s'",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]),
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_O]),
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]),
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]),
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
         } else {
-            Sprintf(kbuf, "'%s'", visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
+            Sprintf(kbuf, "'%s'", visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
         }
         Snprintf(sbuf, sizeof(sbuf),
                  "Type a %s when you are at the right place.", kbuf);
@@ -222,20 +222,20 @@ getpos_help(boolean force, const char *goal)
         if (doing_what_is) {
             Sprintf(sbuf,
       "  '%s' describe current spot, show 'more info', move to another spot.",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_V]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot,%s move to another spot;",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]),
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]),
                     flags.help && !force ? " prompt if 'more info'," : "");
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot, move to another spot;",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_Q]));
             putstr(tmpwin, 0, sbuf);
             Sprintf(sbuf,
                     "  '%s' describe current spot, stop looking at things;",
-                    visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
+                    visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK_O]));
             putstr(tmpwin, 0, sbuf);
         }
     }
@@ -275,7 +275,7 @@ cmp_coord_distu(const void *a, const void *b)
 
 #define GLOC_SAME_AREA(x,y) \
     (isok((x), (y))                                             \
-     && (selection_getpoint((x),(y), g.gloc_filter_map)))
+     && (selection_getpoint((x),(y), gg.gloc_filter_map)))
 
 static int
 gloc_filter_classify_glyph(int glyph)
@@ -308,11 +308,11 @@ gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
     if (!levl[x][y].seenv)
         return FALSE;
 
-    if (glyph == g.gloc_filter_floodfill_match_glyph)
+    if (glyph == gg.gloc_filter_floodfill_match_glyph)
         return TRUE;
 
     if (gloc_filter_classify_glyph(glyph)
-        == gloc_filter_classify_glyph(g.gloc_filter_floodfill_match_glyph))
+        == gloc_filter_classify_glyph(gg.gloc_filter_floodfill_match_glyph))
         return TRUE;
 
     return FALSE;
@@ -321,18 +321,18 @@ gloc_filter_floodfill_matcharea(coordxy x, coordxy y)
 static void
 gloc_filter_floodfill(coordxy x, coordxy y)
 {
-    g.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
+    gg.gloc_filter_floodfill_match_glyph = back_to_glyph(x, y);
 
     set_selection_floodfillchk(gloc_filter_floodfill_matcharea);
-    selection_floodfill(g.gloc_filter_map, x, y, FALSE);
+    selection_floodfill(gg.gloc_filter_map, x, y, FALSE);
 }
 
 static void
 gloc_filter_init(void)
 {
     if (iflags.getloc_filter == GFILTER_AREA) {
-        if (!g.gloc_filter_map) {
-            g.gloc_filter_map = selection_new();
+        if (!gg.gloc_filter_map) {
+            gg.gloc_filter_map = selection_new();
         }
         /* special case: if we're in a doorway, try to figure out which
            direction we're moving, and use that side of the doorway */
@@ -351,9 +351,9 @@ gloc_filter_init(void)
 static void
 gloc_filter_done(void)
 {
-    if (g.gloc_filter_map) {
-        selection_free(g.gloc_filter_map, TRUE);
-        g.gloc_filter_map = (struct selectionvar *) 0;
+    if (gg.gloc_filter_map) {
+        selection_free(gg.gloc_filter_map, TRUE);
+        gg.gloc_filter_map = (struct selectionvar *) 0;
 
     }
 }
@@ -716,7 +716,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 
     /* temporary? if we have a queued direction, return the adjacent spot
        in that direction */
-    if (!g.in_doagain) {
+    if (!gi.in_doagain) {
         if ((cmdq = cmdq_pop()) != 0) {
             cq = *cmdq;
             free((genericptr_t) cmdq);
@@ -732,18 +732,18 @@ getpos(coord *ccp, boolean force, const char *goal)
     }
 
     for (i = 0; i < SIZE(pick_chars_def); i++)
-        pick_chars[i] = g.Cmd.spkeys[pick_chars_def[i].nhkf];
+        pick_chars[i] = gc.Cmd.spkeys[pick_chars_def[i].nhkf];
     pick_chars[SIZE(pick_chars_def)] = '\0';
 
     for (i = 0; i < SIZE(mMoOdDxX_def); i++)
-        mMoOdDxX[i] = g.Cmd.spkeys[mMoOdDxX_def[i]];
+        mMoOdDxX[i] = gc.Cmd.spkeys[mMoOdDxX_def[i]];
     mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
 
     if (!goal)
         goal = "desired location";
     if (Verbose(0, getpos1)) {
         pline("(For instructions type a '%s')",
-              visctrl(g.Cmd.spkeys[NHKF_GETPOS_HELP]));
+              visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
     }
     cx = ccp->x;
@@ -769,7 +769,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 
         rushrun = FALSE;
 
-        g.program_state.getting_a_command = 1;
+        gp.program_state.getting_a_command = 1;
         if ((cmdq = cmdq_pop()) != 0) {
             if (cmdq->typ == CMDQ_KEY) {
                 c = cmdq->key;
@@ -784,7 +784,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             /* remember_getpos is normally False because reusing the
                cursor positioning during ^A is almost never the right
                thing to do, but caller could set it if that was needed */
-            if (iflags.remember_getpos && !g.in_doagain)
+            if (iflags.remember_getpos && !gi.in_doagain)
                 cmdq_add_key(CQ_REPEAT, c);
         }
 
@@ -798,7 +798,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         if (iflags.autodescribe)
             msg_given = FALSE;
 
-        if (c == g.Cmd.spkeys[NHKF_ESC]) {
+        if (c == gc.Cmd.spkeys[NHKF_ESC]) {
             cx = cy = -10;
             msg_given = TRUE; /* force clear */
             result = -1;
@@ -851,15 +851,15 @@ getpos(coord *ccp, boolean force, const char *goal)
             goto nxtc;
         }
 
-        if (c == g.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
-            if (c == g.Cmd.spkeys[NHKF_GETPOS_HELP])
+        if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
+            if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP])
                 getpos_help(force, goal);
             else /* ^R */
                 docrt(); /* redraw */
             /* update message window to reflect that we're still targeting */
             show_goal_msg = TRUE;
             msg_given = TRUE;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
                    && getpos_hilitefunc) {
             if (!hilite_state) {
                 (*getpos_hilitefunc)(0);
@@ -867,7 +867,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                 hilite_state = TRUE;
             }
             goto nxtc;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
                   Verbose(0, getpos2) ? "of features under cursor " : "",
@@ -876,7 +876,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                 show_goal_msg = TRUE;
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_LIMITVIEW]) {
             static const char *const view_filters[NUM_GFILTER] = {
                 "Not limiting targets",
                 "Limiting targets to those in sight",
@@ -894,7 +894,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             pline("%s.", view_filters[iflags.getloc_filter]);
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_MENU]) {
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MENU]) {
             iflags.getloc_usemenu = !iflags.getloc_usemenu;
             pline("%s a menu to show possible targets%s.",
                   iflags.getloc_usemenu ? "Using" : "Not using",
@@ -902,7 +902,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                       ? " for 'm|M', 'o|O', 'd|D', and 'x|X'" : "");
             msg_given = TRUE;
             goto nxtc;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_SELF]) {
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SELF]) {
             /* reset 'm&M', 'o&O', &c; otherwise, there's no way for player
                to achieve that except by manually cycling through all spots */
             for (i = 0; i < NUM_GLOCS; i++)
@@ -910,7 +910,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             cx = u.ux;
             cy = u.uy;
             goto nxtc;
-        } else if (c == g.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_MOVESKIP]) {
             iflags.getloc_moveskip = !iflags.getloc_moveskip;
             pline("%skipping over similar terrain when fastmoving the cursor.",
                   iflags.getloc_moveskip ? "S" : "Not s");
@@ -957,7 +957,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                         || sidx == S_ndoor)
                         continue;
                     if (c == defsyms[sidx].sym
-                        || c == (int) g.showsyms[sidx]
+                        || c == (int) gs.showsyms[sidx]
                         /* have '^' match webs and vibrating square or any
                            other trap that uses something other than '^' */
                         || (c == '^' && is_cmap_trap(sidx)))
@@ -981,7 +981,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                     goto foundc;
                                 /* next, try glyph that's remembered here
                                    (might be trap or object) */
-                                if (g.level.flags.hero_memory
+                                if (gl.level.flags.hero_memory
                                     /* !terrainmode: don't move to remembered
                                        trap or object if not currently shown */
                                     && !iflags.terrainmode) {
@@ -991,7 +991,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                         goto foundc;
                                 }
                                 /* last, try actual terrain here (shouldn't
-                                   we be using g.lastseentyp[][] instead?) */
+                                   we be using gl.lastseentyp[][] instead?) */
                                 if (levl[tx][ty].seenv) {
                                     k = back_to_glyph(tx, ty);
                                     if (glyph_is_cmap(k)
@@ -1023,7 +1023,7 @@ getpos(coord *ccp, boolean force, const char *goal)
                                 visctrl(cmd_from_func(do_move_south)),
                                 visctrl(cmd_from_func(do_move_north)),
                                 visctrl(cmd_from_func(do_move_east)),
-                                visctrl(g.Cmd.spkeys[NHKF_GETPOS_PICK]));
+                                visctrl(gc.Cmd.spkeys[NHKF_GETPOS_PICK]));
                     pline("Unknown direction: '%s' (%s).", visctrl((char) c),
                           note);
                     msg_given = TRUE;
@@ -1229,7 +1229,7 @@ do_mgivenname(void)
             mtmp = u.usteed;
         } else {
             pline("This %s creature is called %s and cannot be renamed.",
-                  beautiful(), g.plname);
+                  beautiful(), gp.plname);
             return;
         }
     } else
@@ -1521,7 +1521,7 @@ docallcmd(void)
     any.a_char = 'm'; /* group accelerator 'C' */
     add_menu(win, &nul_glyphinfo, &any, abc ? 0 : any.a_char, 'C',
              ATR_NONE, clr, "a monster", MENU_ITEMFLAGS_NONE);
-    if (g.invent) {
+    if (gi.invent) {
         /* we use y and n as accelerators so that we can accept user's
            response keyed to old "name an individual object?" prompt */
         any.a_char = 'i'; /* group accelerator 'y' */
@@ -1692,7 +1692,7 @@ namefloorobj(void)
        been moved off the hero's '@' yet, but there's no way to adjust
        the help text once getpos() has started */
     Sprintf(buf, "object on map (or '.' for one %s you)",
-            (u.uundetected && hides_under(g.youmonst.data))
+            (u.uundetected && hides_under(gy.youmonst.data))
               ? "over" : "under");
     if (getpos(&cc, FALSE, buf) < 0 || cc.x <= 0)
         return;
@@ -1724,9 +1724,9 @@ namefloorobj(void)
         char tmpbuf[BUFSZ];
 
         /* straight role name */
-        unames[0] = ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
-                     ? g.urole.name.f
-                     : g.urole.name.m;
+        unames[0] = ((Upolyd ? u.mfemale : flags.female) && gu.urole.name.f)
+                     ? gu.urole.name.f
+                     : gu.urole.name.m;
         /* random rank title for hero's role
 
            note: the 30 is hardcoded in xlev_to_rank, so should be
@@ -1775,7 +1775,7 @@ const char *
 rndghostname(void)
 {
     return rn2(7) ? ghostnames[rn2(SIZE(ghostnames))]
-                  : (const char *) g.plname;
+                  : (const char *) gp.plname;
 }
 
 /*
@@ -1834,10 +1834,10 @@ x_monnam(
     boolean name_at_start, has_adjectives, insertbuf2;
     char *bp, buf2[BUFSZ];
 
-    if (mtmp == &g.youmonst)
+    if (mtmp == &gy.youmonst)
         return strcpy(buf, "you"); /* ignore article, "invisible", &c */
 
-    if (g.program_state.gameover)
+    if (gp.program_state.gameover)
         suppress |= SUPPRESS_HALLUCINATION;
     if (article == ARTICLE_YOUR && !mtmp->mtame)
         article = ARTICLE_THE;
@@ -1845,7 +1845,7 @@ x_monnam(
     do_hallu = Hallucination && !(suppress & SUPPRESS_HALLUCINATION);
     do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
     do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
-            && !g.program_state.gameover && mtmp != u.usteed
+            && !gp.program_state.gameover && mtmp != u.usteed
             && !engulfing_u(mtmp) && !(suppress & SUPPRESS_IT);
     do_saddle = !(suppress & SUPPRESS_SADDLE);
     do_name = !(suppress & SUPPRESS_NAME) || type_is_pname(mdat);
@@ -2229,7 +2229,7 @@ minimal_monnam(struct monst *mon, boolean ckloc)
                 fmt_ptr((genericptr_t) mon->data),
                 fmt_ptr((genericptr_t) &mons[NUMMONS]));
     } else if (ckloc && ptr == &mons[PM_LONG_WORM] && mon->mx
-               && g.level.monsters[mon->mx][mon->my] != mon) {
+               && gl.level.monsters[mon->mx][mon->my] != mon) {
         Sprintf(outbuf, "%s <%d,%d>",
                 pmname(&mons[PM_LONG_WORM_TAIL], Mgender(mon)),
                 mon->mx, mon->my);
@@ -2250,7 +2250,7 @@ Mgender(struct monst *mtmp)
 {
     int mgender = MALE;
 
-    if (mtmp == &g.youmonst) {
+    if (mtmp == &gy.youmonst) {
         if (Upolyd ? u.mfemale : flags.female)
             mgender = FEMALE;
     } else if (mtmp->female) {
@@ -2452,7 +2452,7 @@ const char *
 hliquid(
     const char *liquidpref) /* use as-is when not hallucintg (unless empty) */
 {
-    boolean hallucinate = Hallucination && !g.program_state.gameover;
+    boolean hallucinate = Hallucination && !gp.program_state.gameover;
 
     if (hallucinate || !liquidpref || !*liquidpref) {
         int indx, count = SIZE(hliquids);

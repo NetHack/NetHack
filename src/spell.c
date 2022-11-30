@@ -4,7 +4,7 @@
 
 #include "hack.h"
 
-/* spellmenu arguments; 0 thru n-1 used as g.spl_book[] index when swapping */
+/* spellmenu arguments; 0 thru n-1 used as gs.spl_book[] index when swapping */
 #define SPELLMENU_CAST (-2)
 #define SPELLMENU_VIEW (-1)
 #define SPELLMENU_SORT (MAXSPELL) /* special menu entry */
@@ -18,9 +18,9 @@
    initialization; spell memory is decremented at the end of each turn,
    including the turn on which the spellbook is read; without the extra
    increment, the hero used to get cheated out of 1 turn of retention */
-#define incrnknow(spell, x) (g.spl_book[spell].sp_know = KEEN + (x))
+#define incrnknow(spell, x) (gs.spl_book[spell].sp_know = KEEN + (x))
 
-#define spellev(spell) g.spl_book[spell].sp_lev
+#define spellev(spell) gs.spl_book[spell].sp_lev
 #define spellname(spell) OBJ_NAME(objects[spellid(spell)])
 #define spellet(spell) \
     ((char) ((spell < 26) ? ('a' + spell) : ('A' + spell - 26)))
@@ -192,7 +192,7 @@ confused_book(struct obj* spellbook)
         gone = TRUE;
     } else {
         You("find yourself reading the %s line over and over again.",
-            spellbook == g.context.spbook.book ? "next" : "first");
+            spellbook == gc.context.spbook.book ? "next" : "first");
     }
     return gone;
 }
@@ -231,7 +231,7 @@ deadbook(struct obj* book2)
             return;
         }
 
-        for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
             if (otmp->otyp == CANDELABRUM_OF_INVOCATION && otmp->spe == 7
                 && otmp->lamplit) {
                 if (!otmp->cursed)
@@ -240,7 +240,7 @@ deadbook(struct obj* book2)
                     arti_cursed = TRUE;
             }
             if (otmp->otyp == BELL_OF_OPENING
-                && (g.moves - otmp->age) < 5L) { /* you rang it recently */
+                && (gm.moves - otmp->age) < 5L) { /* you rang it recently */
                 if (!otmp->cursed)
                     arti2_primed = TRUE;
                 else
@@ -287,7 +287,7 @@ deadbook(struct obj* book2)
             set_malign(mtmp);
         }
         /* next handle the affect on things you're carrying */
-        (void) unturn_dead(&g.youmonst);
+        (void) unturn_dead(&gy.youmonst);
         /* last place some monsters around you */
         mm.x = u.ux;
         mm.y = u.uy;
@@ -331,8 +331,8 @@ deadbook(struct obj* book2)
 void
 book_cursed(struct obj *book)
 {
-    if (book->cursed && g.multi >= 0
-        && g.occupation == learn && g.context.spbook.book == book) {
+    if (book->cursed && gm.multi >= 0
+        && go.occupation == learn && gc.context.spbook.book == book) {
         pline("%s shut!", Tobjnam(book, "slam"));
         set_bknown(book, 1);
         stop_occupation();
@@ -348,24 +348,24 @@ learn(void)
     short booktype;
     char splname[BUFSZ];
     boolean costly = TRUE;
-    struct obj *book = g.context.spbook.book;
+    struct obj *book = gc.context.spbook.book;
 
     /* JDS: lenses give 50% faster reading; 33% smaller read time */
-    if (g.context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2))
-        g.context.spbook.delay++;
+    if (gc.context.spbook.delay && ublindf && ublindf->otyp == LENSES && rn2(2))
+        gc.context.spbook.delay++;
     if (Confusion) { /* became confused while learning */
         (void) confused_book(book);
-        g.context.spbook.book = 0; /* no longer studying */
-        g.context.spbook.o_id = 0;
-        nomul(g.context.spbook.delay); /* remaining delay is uninterrupted */
-        g.multi_reason = "reading a book";
-        g.nomovemsg = 0;
-        g.context.spbook.delay = 0;
+        gc.context.spbook.book = 0; /* no longer studying */
+        gc.context.spbook.o_id = 0;
+        nomul(gc.context.spbook.delay); /* remaining delay is uninterrupted */
+        gm.multi_reason = "reading a book";
+        gn.nomovemsg = 0;
+        gc.context.spbook.delay = 0;
         return 0;
     }
-    if (g.context.spbook.delay) {
-        /* not if (g.context.spbook.delay++), so at end delay == 0 */
-        g.context.spbook.delay++;
+    if (gc.context.spbook.delay) {
+        /* not if (gc.context.spbook.delay++), so at end delay == 0 */
+        gc.context.spbook.delay++;
         return 1; /* still busy */
     }
     exercise(A_WIS, TRUE); /* you're studying. */
@@ -410,8 +410,8 @@ learn(void)
             /* reset spestudied as if polymorph had taken place */
             book->spestudied = rn2(book->spestudied);
         } else {
-            g.spl_book[i].sp_id = booktype;
-            g.spl_book[i].sp_lev = objects[booktype].oc_level;
+            gs.spl_book[i].sp_id = booktype;
+            gs.spl_book[i].sp_lev = objects[booktype].oc_level;
             incrnknow(i, 1);
             book->spestudied++;
             if (!i)
@@ -427,15 +427,15 @@ learn(void)
     if (book->cursed) { /* maybe a demon cursed it */
         if (cursed_book(book)) {
             useup(book);
-            g.context.spbook.book = 0;
-            g.context.spbook.o_id = 0;
+            gc.context.spbook.book = 0;
+            gc.context.spbook.o_id = 0;
             return 0;
         }
     }
     if (costly)
         check_unpaid(book);
-    g.context.spbook.book = 0;
-    g.context.spbook.o_id = 0;
+    gc.context.spbook.book = 0;
+    gc.context.spbook.o_id = 0;
     return 0;
 }
 
@@ -455,12 +455,12 @@ study_book(register struct obj* spellbook)
         int dullbook = rnd(25) - ACURR(A_WIS);
 
         /* adjust chance if hero stayed awake, got interrupted, retries */
-        if (g.context.spbook.delay && spellbook == g.context.spbook.book)
+        if (gc.context.spbook.delay && spellbook == gc.context.spbook.book)
             dullbook -= rnd(objects[booktype].oc_level);
 
         if (dullbook > 0) {
             eyes = body_part(EYE);
-            if (eyecount(g.youmonst.data) > 1)
+            if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
             pline("This book is so dull that you can't keep your %s open.",
                   eyes);
@@ -470,10 +470,10 @@ study_book(register struct obj* spellbook)
         }
     }
 
-    if (g.context.spbook.delay && !confused
-        && spellbook == g.context.spbook.book
+    if (gc.context.spbook.delay && !confused
+        && spellbook == gc.context.spbook.book
         /* handle the sequence: start reading, get interrupted, have
-           g.context.spbook.book become erased somehow, resume reading it */
+           gc.context.spbook.book become erased somehow, resume reading it */
         && booktype != SPE_BLANK_PAPER) {
         You("continue your efforts to %s.",
             (booktype == SPE_NOVEL) ? "read the novel" : "memorize the spell");
@@ -512,20 +512,20 @@ study_book(register struct obj* spellbook)
         switch (objects[booktype].oc_level) {
         case 1:
         case 2:
-            g.context.spbook.delay = -objects[booktype].oc_delay;
+            gc.context.spbook.delay = -objects[booktype].oc_delay;
             break;
         case 3:
         case 4:
-            g.context.spbook.delay = -(objects[booktype].oc_level - 1)
+            gc.context.spbook.delay = -(objects[booktype].oc_level - 1)
                                    * objects[booktype].oc_delay;
             break;
         case 5:
         case 6:
-            g.context.spbook.delay =
+            gc.context.spbook.delay =
                 -objects[booktype].oc_level * objects[booktype].oc_delay;
             break;
         case 7:
-            g.context.spbook.delay = -8 * objects[booktype].oc_delay;
+            gc.context.spbook.delay = -8 * objects[booktype].oc_delay;
             break;
         default:
             impossible("Unknown spellbook level %d, book %d;",
@@ -580,10 +580,10 @@ study_book(register struct obj* spellbook)
         if (too_hard) {
             boolean gone = cursed_book(spellbook);
 
-            nomul(g.context.spbook.delay); /* study time */
-            g.multi_reason = "reading a book";
-            g.nomovemsg = 0;
-            g.context.spbook.delay = 0;
+            nomul(gc.context.spbook.delay); /* study time */
+            gm.multi_reason = "reading a book";
+            gn.nomovemsg = 0;
+            gc.context.spbook.delay = 0;
             if (gone || !rn2(3)) {
                 if (!gone)
                     pline_The("spellbook crumbles to dust!");
@@ -596,10 +596,10 @@ study_book(register struct obj* spellbook)
             if (!confused_book(spellbook)) {
                 spellbook->in_use = FALSE;
             }
-            nomul(g.context.spbook.delay);
-            g.multi_reason = "reading a book";
-            g.nomovemsg = 0;
-            g.context.spbook.delay = 0;
+            nomul(gc.context.spbook.delay);
+            gm.multi_reason = "reading a book";
+            gn.nomovemsg = 0;
+            gc.context.spbook.delay = 0;
             return 1;
         }
         spellbook->in_use = FALSE;
@@ -608,9 +608,9 @@ study_book(register struct obj* spellbook)
             spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
     }
 
-    g.context.spbook.book = spellbook;
-    if (g.context.spbook.book)
-        g.context.spbook.o_id = g.context.spbook.book->o_id;
+    gc.context.spbook.book = spellbook;
+    if (gc.context.spbook.book)
+        gc.context.spbook.o_id = gc.context.spbook.book->o_id;
     set_occupation(learn, "studying", 0);
     return 1;
 }
@@ -620,9 +620,9 @@ study_book(register struct obj* spellbook)
 void
 book_disappears(struct obj* obj)
 {
-    if (obj == g.context.spbook.book) {
-        g.context.spbook.book = (struct obj *) 0;
-        g.context.spbook.o_id = 0;
+    if (obj == gc.context.spbook.book) {
+        gc.context.spbook.book = (struct obj *) 0;
+        gc.context.spbook.o_id = 0;
     }
 }
 
@@ -632,10 +632,10 @@ book_disappears(struct obj* obj)
 void
 book_substitution(struct obj* old_obj, struct obj* new_obj)
 {
-    if (old_obj == g.context.spbook.book) {
-        g.context.spbook.book = new_obj;
-        if (g.context.spbook.book)
-            g.context.spbook.o_id = g.context.spbook.book->o_id;
+    if (old_obj == gc.context.spbook.book) {
+        gc.context.spbook.book = new_obj;
+        if (gc.context.spbook.book)
+            gc.context.spbook.o_id = gc.context.spbook.book->o_id;
     }
 }
 
@@ -665,7 +665,7 @@ rejectcasting(void)
     if (Stunned) {
         You("are too impaired to cast a spell.");
         return TRUE;
-    } else if (!can_chant(&g.youmonst)) {
+    } else if (!can_chant(&gy.youmonst)) {
         You("are unable to chant the incantation.");
         return TRUE;
     } else if (!freehand()) {
@@ -774,7 +774,7 @@ docast(void)
     int spell_no;
 
     if (getspell(&spell_no))
-        return spelleffects(g.spl_book[spell_no].sp_id, FALSE, FALSE);
+        return spelleffects(gs.spl_book[spell_no].sp_id, FALSE, FALSE);
     return ECMD_OK;
 }
 
@@ -963,7 +963,7 @@ spelleffects_check(int spell, int *res, int *energy)
         u.uen -= rnd(*energy);
         if (u.uen < 0)
             u.uen = 0;
-        g.context.botl = 1;
+        gc.context.botl = 1;
         *res = ECMD_TIME;
         return TRUE;
     } else if (spellknow(spell) <= KEEN / 200) { /* 100 turns left */
@@ -1006,7 +1006,7 @@ spelleffects_check(int spell, int *res, int *energy)
         u.uen -= rnd(2 * *energy);
         if (u.uen < 0)
             u.uen = 0;
-        g.context.botl = 1;
+        gc.context.botl = 1;
         *res = ECMD_TIME; /* time is used even if spell doesn't get cast */
     }
 
@@ -1080,7 +1080,7 @@ spelleffects_check(int spell, int *res, int *energy)
     if (confused || (rnd(100) > chance)) {
         You("fail to cast the spell correctly.");
         u.uen -= *energy / 2;
-        g.context.botl = 1;
+        gc.context.botl = 1;
         *res = ECMD_TIME;
         return TRUE;
     }
@@ -1103,7 +1103,7 @@ spelleffects(int spell_otyp, boolean atme, boolean force)
         return res;
 
     u.uen -= energy;
-    g.context.botl = 1;
+    gc.context.botl = 1;
     exercise(A_WIS, TRUE);
     /* pseudo is a temporary "false" object containing the spell stats */
     pseudo = mksobj(force ? spell : spellid(spell), FALSE, FALSE);
@@ -1391,14 +1391,14 @@ tport_spell(int what)
             save_tport.tport_indx = MAXSPELL;
         } else if (what == UNHIDESPELL) {
             /*assert( save_tport.savespell.sp_id == SPE_TELEPORT_AWAY );*/
-            g.spl_book[save_tport.tport_indx] = save_tport.savespell;
+            gs.spl_book[save_tport.tport_indx] = save_tport.savespell;
             save_tport.tport_indx = MAXSPELL; /* burn bridge... */
         } else if (what == ADD_SPELL) {
-            save_tport.savespell = g.spl_book[i];
+            save_tport.savespell = gs.spl_book[i];
             save_tport.tport_indx = i;
-            g.spl_book[i].sp_id = SPE_TELEPORT_AWAY;
-            g.spl_book[i].sp_lev = objects[SPE_TELEPORT_AWAY].oc_level;
-            g.spl_book[i].sp_know = KEEN;
+            gs.spl_book[i].sp_id = SPE_TELEPORT_AWAY;
+            gs.spl_book[i].sp_lev = objects[SPE_TELEPORT_AWAY].oc_level;
+            gs.spl_book[i].sp_know = KEEN;
             return REMOVESPELL; /* operation needed to reverse */
         }
     } else { /* spellid(i) == SPE_TELEPORT_AWAY */
@@ -1406,12 +1406,12 @@ tport_spell(int what)
             save_tport.tport_indx = MAXSPELL;
         } else if (what == REMOVESPELL) {
             /*assert( i == save_tport.tport_indx );*/
-            g.spl_book[i] = save_tport.savespell;
+            gs.spl_book[i] = save_tport.savespell;
             save_tport.tport_indx = MAXSPELL;
         } else if (what == HIDE_SPELL) {
-            save_tport.savespell = g.spl_book[i];
+            save_tport.savespell = gs.spl_book[i];
             save_tport.tport_indx = i;
-            g.spl_book[i].sp_id = NO_SPELL;
+            gs.spl_book[i].sp_id = NO_SPELL;
             return UNHIDESPELL; /* operation needed to reverse */
         }
     }
@@ -1427,8 +1427,8 @@ losespells(void)
     int n, nzap, i;
 
     /* in case reading has been interrupted earlier, discard context */
-    g.context.spbook.book = 0;
-    g.context.spbook.o_id = 0;
+    gc.context.spbook.book = 0;
+    gc.context.spbook.o_id = 0;
     /* count the number of known spells */
     for (n = 0; n < MAXSPELL; ++n)
         if (spellid(n) == NO_SPELL)
@@ -1534,17 +1534,17 @@ spell_cmp(const genericptr vptr1, const genericptr vptr2)
     /*
      * gather up all of the possible parameters except spell name
      * in advance, even though some might not be needed:
-     *  indx. = spl_orderindx[] index into g.spl_book[];
-     *  otyp. = g.spl_book[] index into objects[];
+     *  indx. = spl_orderindx[] index into gs.spl_book[];
+     *  otyp. = gs.spl_book[] index into objects[];
      *  levl. = spell level;
      *  skil. = skill group aka spell class.
      */
     int indx1 = *(int *) vptr1, indx2 = *(int *) vptr2,
-        otyp1 = g.spl_book[indx1].sp_id, otyp2 = g.spl_book[indx2].sp_id,
+        otyp1 = gs.spl_book[indx1].sp_id, otyp2 = gs.spl_book[indx2].sp_id,
         levl1 = objects[otyp1].oc_level, levl2 = objects[otyp2].oc_level,
         skil1 = objects[otyp1].oc_skill, skil2 = objects[otyp2].oc_skill;
 
-    switch (g.spl_sortmode) {
+    switch (gs.spl_sortmode) {
     case SORTBY_LETTER:
         return indx1 - indx2;
     case SORTBY_ALPHA:
@@ -1595,40 +1595,40 @@ sortspells(void)
     int n;
 #endif
 
-    if (g.spl_sortmode == SORTBY_CURRENT)
+    if (gs.spl_sortmode == SORTBY_CURRENT)
         return;
     for (n = 0; n < MAXSPELL && spellid(n) != NO_SPELL; ++n)
         continue;
     if (n < 2)
         return; /* not enough entries to need sorting */
 
-    if (!g.spl_orderindx) {
+    if (!gs.spl_orderindx) {
         /* we haven't done any sorting yet; list is in casting order */
-        if (g.spl_sortmode == SORTBY_LETTER /* default */
-            || g.spl_sortmode == SORTRETAINORDER)
+        if (gs.spl_sortmode == SORTBY_LETTER /* default */
+            || gs.spl_sortmode == SORTRETAINORDER)
             return;
         /* allocate enough for full spellbook rather than just N spells */
-        g.spl_orderindx = (int *) alloc(MAXSPELL * sizeof(int));
+        gs.spl_orderindx = (int *) alloc(MAXSPELL * sizeof(int));
         for (i = 0; i < MAXSPELL; i++)
-            g.spl_orderindx[i] = i;
+            gs.spl_orderindx[i] = i;
     }
 
-    if (g.spl_sortmode == SORTRETAINORDER) {
+    if (gs.spl_sortmode == SORTRETAINORDER) {
         struct spell tmp_book[MAXSPELL];
 
-        /* sort g.spl_book[] rather than spl_orderindx[];
+        /* sort gs.spl_book[] rather than spl_orderindx[];
            this also updates the index to reflect the new ordering (we
            could just free it since that ordering becomes the default) */
         for (i = 0; i < MAXSPELL; i++)
-            tmp_book[i] = g.spl_book[g.spl_orderindx[i]];
+            tmp_book[i] = gs.spl_book[gs.spl_orderindx[i]];
         for (i = 0; i < MAXSPELL; i++)
-            g.spl_book[i] = tmp_book[i], g.spl_orderindx[i] = i;
-        g.spl_sortmode = SORTBY_LETTER; /* reset */
+            gs.spl_book[i] = tmp_book[i], gs.spl_orderindx[i] = i;
+        gs.spl_sortmode = SORTBY_LETTER; /* reset */
         return;
     }
 
     /* usual case, sort the index rather than the spells themselves */
-    qsort((genericptr_t) g.spl_orderindx, n, sizeof *g.spl_orderindx, spell_cmp);
+    qsort((genericptr_t) gs.spl_orderindx, n, sizeof *gs.spl_orderindx, spell_cmp);
     return;
 }
 
@@ -1660,7 +1660,7 @@ spellsortmenu(void)
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, let, 0,
                  ATR_NONE, clr, spl_sortchoices[i],
-                 (i == g.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                 (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "View known spells list sorted");
 
@@ -1669,10 +1669,10 @@ spellsortmenu(void)
     if (n > 0) {
         choice = selected[0].item.a_int - 1;
         /* skip preselected entry if we have more than one item chosen */
-        if (n > 1 && choice == g.spl_sortmode)
+        if (n > 1 && choice == gs.spl_sortmode)
             choice = selected[1].item.a_int - 1;
         free((genericptr_t) selected);
-        g.spl_sortmode = choice;
+        gs.spl_sortmode = choice;
         return TRUE;
     }
     return FALSE;
@@ -1700,17 +1700,17 @@ dovspell(void)
                 if (!dospellmenu(qbuf, splnum, &othnum))
                     break;
 
-                spl_tmp = g.spl_book[splnum];
-                g.spl_book[splnum] = g.spl_book[othnum];
-                g.spl_book[othnum] = spl_tmp;
+                spl_tmp = gs.spl_book[splnum];
+                gs.spl_book[splnum] = gs.spl_book[othnum];
+                gs.spl_book[othnum] = spl_tmp;
             }
         }
     }
-    if (g.spl_orderindx) {
-        free((genericptr_t) g.spl_orderindx);
-        g.spl_orderindx = 0;
+    if (gs.spl_orderindx) {
+        free((genericptr_t) gs.spl_orderindx);
+        gs.spl_orderindx = 0;
     }
-    g.spl_sortmode = SORTBY_LETTER; /* 0 */
+    gs.spl_sortmode = SORTBY_LETTER; /* 0 */
     return ECMD_OK;
 }
 
@@ -1722,7 +1722,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 static boolean
 dospellmenu(
     const char *prompt,
-    int splaction, /* SPELLMENU_CAST, SPELLMENU_VIEW, or g.spl_book[] index */
+    int splaction, /* SPELLMENU_CAST, SPELLMENU_VIEW, or gs.spl_book[] index */
     int *spell_no)
 {
     winid tmpwin;
@@ -1760,7 +1760,7 @@ dospellmenu(
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              iflags.menu_headings, clr, buf, MENU_ITEMFLAGS_NONE);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
-        splnum = !g.spl_orderindx ? i : g.spl_orderindx[i];
+        splnum = !gs.spl_orderindx ? i : gs.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),
                 spelltypemnemonic(spell_skilltype(spellid(splnum))),
                 100 - percent_success(splnum),
@@ -1828,17 +1828,17 @@ percent_success(int spell)
 
     /* Calculate intrinsic ability (splcaster) */
 
-    splcaster = g.urole.spelbase;
-    special = g.urole.spelheal;
-    statused = ACURR(g.urole.spelstat);
+    splcaster = gu.urole.spelbase;
+    special = gu.urole.spelheal;
+    statused = ACURR(gu.urole.spelstat);
 
     if (uarm && is_metallic(uarm) && !paladin_bonus)
-        splcaster += (uarmc && uarmc->otyp == ROBE) ? g.urole.spelarmr / 2
-                                                    : g.urole.spelarmr;
+        splcaster += (uarmc && uarmc->otyp == ROBE) ? gu.urole.spelarmr / 2
+                                                    : gu.urole.spelarmr;
     else if (uarmc && uarmc->otyp == ROBE)
-        splcaster -= g.urole.spelarmr;
+        splcaster -= gu.urole.spelarmr;
     if (uarms)
-        splcaster += g.urole.spelshld;
+        splcaster += gu.urole.spelshld;
 
     if (!paladin_bonus) {
         if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
@@ -1849,8 +1849,8 @@ percent_success(int spell)
             splcaster += uarmfbon;
     }
 
-    if (spellid(spell) == g.urole.spelspec)
-        splcaster += g.urole.spelsbon;
+    if (spellid(spell) == gu.urole.spelspec)
+        splcaster += gu.urole.spelsbon;
 
     /* `healing spell' bonus */
     if (spellid(spell) == SPE_HEALING || spellid(spell) == SPE_EXTRA_HEALING
@@ -1908,7 +1908,7 @@ percent_success(int spell)
      * player's role-specific spell.
      */
     if (uarms && weight(uarms) > (int) objects[SMALL_SHIELD].oc_weight) {
-        if (spellid(spell) == g.urole.spelspec) {
+        if (spellid(spell) == gu.urole.spelspec) {
             chance /= 2;
         } else {
             chance /= 4;
@@ -1992,8 +1992,8 @@ initialspell(struct obj* obj)
         /* initial inventory shouldn't contain duplicate spellbooks */
         impossible("Spell %s already known.", OBJ_NAME(objects[otyp]));
     } else {
-        g.spl_book[i].sp_id = otyp;
-        g.spl_book[i].sp_lev = objects[otyp].oc_level;
+        gs.spl_book[i].sp_id = otyp;
+        gs.spl_book[i].sp_lev = objects[otyp].oc_level;
         incrnknow(i, 0);
     }
     return;
@@ -2046,8 +2046,8 @@ force_learn_spell(short otyp)
     }
     /* for a going-stale or forgotten spell the sp_id and sp_lev assignments
        are redundant but harmless; for an unknown spell, they're essential */
-    g.spl_book[i].sp_id = otyp;
-    g.spl_book[i].sp_lev = objects[otyp].oc_level;
+    gs.spl_book[i].sp_id = otyp;
+    gs.spl_book[i].sp_lev = objects[otyp].oc_level;
     incrnknow(i, 0); /* set spl_book[i].sp_know to KEEN; unlike when learning
                       * a spell by reading its book, we don't need to add 1 */
     return spellet(i);

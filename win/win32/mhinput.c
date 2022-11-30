@@ -39,7 +39,7 @@ mswin_have_input(void)
     return
 #ifdef SAFERHANGUP
         /* we always have input (ESC) if hangup was requested */
-        g.program_state.done_hup ||
+        gp.program_state.done_hup ||
 #endif
         (nhi_read_pos != nhi_write_pos);
 }
@@ -69,7 +69,7 @@ mswin_input_pop(void)
 
 #ifdef SAFERHANGUP
     /* always return ESC when hangup was requested */
-    if (g.program_state.done_hup) {
+    if (gp.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
         hangup_event.ei.kbd.ch = '\033';
@@ -98,7 +98,7 @@ mswin_input_peek(void)
 
 #ifdef SAFERHANGUP
     /* always return ESC when hangup was requested */
-    if (g.program_state.done_hup) {
+    if (gp.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
         hangup_event.ei.kbd.ch = '\033';

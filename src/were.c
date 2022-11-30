@@ -197,11 +197,11 @@ you_unwere(boolean purify)
         You_feel("purified.");
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
-    if (!Unchanging && is_were(g.youmonst.data)
+    if (!Unchanging && is_were(gy.youmonst.data)
         && (!controllable_poly
             || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
         rehumanize();
-    else if (is_were(g.youmonst.data) && !u.mtimedone)
+    else if (is_were(gy.youmonst.data) && !u.mtimedone)
         u.mtimedone = rn1(200, 200); /* 40% of initial were change */
 }
 

@@ -78,8 +78,8 @@ give_may_advance_msg(int skill)
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
 
-    if (!g.context.enhance_tip) {
-        g.context.enhance_tip = TRUE;
+    if (!gc.context.enhance_tip) {
+        gc.context.enhance_tip = TRUE;
         pline("(Use the #enhance command to advance them.)");
     }
 }
@@ -405,7 +405,7 @@ special_dmgval(
         }
 
     /* when no gloves we check for silver rings (blessed rings ignored) */
-    } else if ((left_ring || right_ring) && magr == &g.youmonst) {
+    } else if ((left_ring || right_ring) && magr == &gy.youmonst) {
         if (left_ring && uleft) {
             if (objects[uleft->otyp].oc_material == SILVER
                 && mon_hates_silver(mdef)) {
@@ -513,7 +513,7 @@ select_rwep(struct monst *mtmp)
 
     char mlet = mtmp->data->mlet;
 
-    g.propellor = (struct obj *) &cg.zeroobj;
+    gp.propellor = (struct obj *) &cg.zeroobj;
     Oselect(EGG);      /* cockatrice egg */
     if (mlet == S_KOP) /* pies are first choice for Kops */
         Oselect(CREAM_PIE);
@@ -545,7 +545,7 @@ select_rwep(struct monst *mtmp)
                     || !mon_hates_silver(mtmp))) {
                 if ((otmp = oselect(mtmp, pwep[i])) != 0
                     && (otmp == mwep || !mweponly)) {
-                    g.propellor = otmp; /* force the monster to wield it */
+                    gp.propellor = otmp; /* force the monster to wield it */
                     return otmp;
                 }
             }
@@ -566,41 +566,41 @@ select_rwep(struct monst *mtmp)
             for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj)
                 if (otmp->oclass == GEM_CLASS
                     && (otmp->otyp != LOADSTONE || !otmp->cursed)) {
-                    g.propellor = m_carrying(mtmp, SLING);
+                    gp.propellor = m_carrying(mtmp, SLING);
                     return otmp;
                 }
         }
 
         /* KMH -- This belongs here so darts will work */
-        g.propellor = (struct obj *) &cg.zeroobj;
+        gp.propellor = (struct obj *) &cg.zeroobj;
 
         prop = objects[rwep[i]].oc_skill;
         if (prop < 0) {
             switch (-prop) {
             case P_BOW:
-                g.propellor = oselect(mtmp, YUMI);
-                if (!g.propellor)
-                    g.propellor = oselect(mtmp, ELVEN_BOW);
-                if (!g.propellor)
-                    g.propellor = oselect(mtmp, BOW);
-                if (!g.propellor)
-                    g.propellor = oselect(mtmp, ORCISH_BOW);
+                gp.propellor = oselect(mtmp, YUMI);
+                if (!gp.propellor)
+                    gp.propellor = oselect(mtmp, ELVEN_BOW);
+                if (!gp.propellor)
+                    gp.propellor = oselect(mtmp, BOW);
+                if (!gp.propellor)
+                    gp.propellor = oselect(mtmp, ORCISH_BOW);
                 break;
             case P_SLING:
-                g.propellor = oselect(mtmp, SLING);
+                gp.propellor = oselect(mtmp, SLING);
                 break;
             case P_CROSSBOW:
-                g.propellor = oselect(mtmp, CROSSBOW);
+                gp.propellor = oselect(mtmp, CROSSBOW);
             }
-            if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != g.propellor
+            if ((otmp = MON_WEP(mtmp)) && mwelded(otmp) && otmp != gp.propellor
                 && mtmp->weapon_check == NO_WEAPON_WANTED)
-                g.propellor = 0;
+                gp.propellor = 0;
         }
         /* propellor = obj, propellor to use
          * propellor = &cg.zeroobj, doesn't need a propellor
          * propellor = 0, needed one and didn't have one
          */
-        if (g.propellor != 0) {
+        if (gp.propellor != 0) {
             /* Note: cannot use m_carrying for loadstones, since it will
              * always select the first object of a type, and maybe the
              * monster is carrying two but only the first is unthrowable.
@@ -757,7 +757,7 @@ mon_wield_item(struct monst *mon)
         break;
     case NEED_RANGED_WEAPON:
         (void) select_rwep(mon);
-        obj = g.propellor;
+        obj = gp.propellor;
         break;
     case NEED_PICK_AXE:
         obj = m_carrying(mon, PICK_AXE);
@@ -960,7 +960,7 @@ finish_towel_change(struct obj *obj, int newspe)
     /* if hero is wielding this towel, don't give "you begin bashing with
        your [wet] towel" message if it's wet, do give one if it's dry */
     if (obj == uwep)
-        g.unweapon = !is_wet_towel(obj);
+        gu.unweapon = !is_wet_towel(obj);
 
     /* description might change: "towel" vs "moist towel" vs "wet towel" */
     if (carried(obj))
@@ -1170,7 +1170,7 @@ enhance_weapon_skill(void)
     int clr = 0;
 
     /* player knows about #enhance, don't show tip anymore */
-    g.context.enhance_tip = TRUE;
+    gc.context.enhance_tip = TRUE;
 
     if (wizard && yn("Advance skills without practice?") == 'y')
         speedy = TRUE;
@@ -1636,7 +1636,7 @@ skill_init(const struct def_skill *class_skill)
     }
 
     /* Set skill for all weapons in inventory to be basic */
-    for (obj = g.invent; obj; obj = obj->nobj) {
+    for (obj = gi.invent; obj; obj = obj->nobj) {
         /* don't give skill just because of carried ammo, wait until
            we see the relevant launcher (prevents an archeologist's
            touchstone from inadvertently providing skill in sling) */
@@ -1673,7 +1673,7 @@ skill_init(const struct def_skill *class_skill)
         P_SKILL(P_BARE_HANDED_COMBAT) = P_BASIC;
 
     /* Roles that start with a horse know how to ride it */
-    if (g.urole.petnum == PM_PONY)
+    if (gu.urole.petnum == PM_PONY)
         P_SKILL(P_RIDING) = P_BASIC;
 
     /*
@@ -1692,7 +1692,7 @@ skill_init(const struct def_skill *class_skill)
 
     /* each role has a special spell; allow at least basic for its type
        (despite the function name, this works for spell skills too) */
-    unrestrict_weapon_skill(spell_skilltype(g.urole.spelspec));
+    unrestrict_weapon_skill(spell_skilltype(gu.urole.spelspec));
 }
 
 void

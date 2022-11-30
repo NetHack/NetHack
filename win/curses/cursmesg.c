@@ -77,7 +77,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     }
 #endif
 
-    if (curs_mesg_suppress_seq == g.hero_seq) {
+    if (curs_mesg_suppress_seq == gh.hero_seq) {
         return; /* user has typed ESC to avoid seeing remaining messages. */
     }
 
@@ -89,19 +89,19 @@ curses_message_win_puts(const char *message, boolean recursed)
         my = border_space;
 
     if (strcmp(message, "#") == 0) {    /* Extended command or Count: */
-        if ((strcmp(g.toplines, "#") != 0)
+        if ((strcmp(gt.toplines, "#") != 0)
             /* Bottom of message window */
             && (my >= (height - 1 + border_space)) && (height != 1)) {
             scroll_window(MESSAGE_WIN);
             mx = width;
             my--;
-            Strcpy(g.toplines, message);
+            Strcpy(gt.toplines, message);
         }
         return;
     }
 
     if (!recursed) {
-        strcpy(g.toplines, message);
+        strcpy(gt.toplines, message);
         mesg_add_line(message);
     }
 
@@ -118,7 +118,7 @@ curses_message_win_puts(const char *message, boolean recursed)
                     this turn unless an urgent message is being delivered */
                 if (curses_more() == '\033'
                     && !curs_mesg_no_suppress) {
-                    curs_mesg_suppress_seq = g.hero_seq;
+                    curs_mesg_suppress_seq = gh.hero_seq;
                     return;
                 }
                 /* turn_lines reset to 0 by more()->block()->got_input() */
@@ -321,7 +321,7 @@ curses_last_messages(void)
         if (mesg && mesg->str && *mesg->str)
             curses_message_win_puts(mesg->str, TRUE);
     }
-    curses_message_win_puts(g.toplines, TRUE);
+    curses_message_win_puts(gt.toplines, TRUE);
     --last_messages;
 
     if (border)
@@ -681,7 +681,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         case '\n':
             (void) strncpy(answer, p_answer, buffer);
             answer[buffer - 1] = '\0';
-            Strcpy(g.toplines, tmpbuf);
+            Strcpy(gt.toplines, tmpbuf);
             mesg_add_line(tmpbuf);
 #if 1
             /* position at end of current line so next message will be
@@ -818,7 +818,7 @@ mesg_add_line(const char *mline)
             current_mesg->str = dupstr(mline);
         }
     }
-    current_mesg->turn = g.hero_seq;
+    current_mesg->turn = gh.hero_seq;
 
     if (num_messages == 0) {
         /* very first message; set up head */
@@ -934,7 +934,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
         initd = TRUE;
 #ifdef DUMPLOG
         /* this suffices; there's no need to scrub g.saved_pline[] pointers */
-        g.saved_pline_index = 0;
+        gs.saved_pline_index = 0;
 #endif
     }
 
@@ -944,7 +944,7 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
            however, we aren't only called when restoring history;
            core uses putmsghistory() for other stuff during play
            and those messages should have a normal turn value */
-        last_mesg->turn = restoring_msghist ? (1L << 3) : g.hero_seq;
+        last_mesg->turn = restoring_msghist ? (1L << 3) : gh.hero_seq;
 #ifdef DUMPLOG
         dumplogmsg(last_mesg->str);
 #endif

@@ -405,7 +405,7 @@ extern struct nomakedefs_s nomakedefs;
 
 #define BUFSZ 256  /* for getlin buffers */
 #define QBUFSZ 128 /* for building question text */
-#define TBUFSZ 300 /* g.toplines[] buffer max msg: 3 81char names */
+#define TBUFSZ 300 /* gt.toplines[] buffer max msg: 3 81char names */
 /* plus longest prefix plus a few extra words */
 
 /* COLBUFSZ is the larger of BUFSZ and COLNO */

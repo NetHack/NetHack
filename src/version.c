@@ -257,8 +257,8 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
-    { ":LUAVERSION:", (const char *) g.lua_ver },
-    { ":LUACOPYRIGHT:", (const char *) g.lua_copyright },
+    { ":LUAVERSION:", (const char *) gl.lua_ver },
+    { ":LUACOPYRIGHT:", (const char *) gl.lua_copyright },
 };
 
 /*
@@ -272,7 +272,7 @@ insert_rtoption(char *buf)
 {
     int i;
 
-    if (!g.lua_ver[0])
+    if (!gl.lua_ver[0])
         get_lua_version();
 
     for (i = 0; i < SIZE(rt_opts); ++i) {

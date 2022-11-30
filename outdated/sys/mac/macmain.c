@@ -43,12 +43,12 @@ main(void)
     windowprocs = mac_procs;
     InitMac();
 
-    g.hname = "Mac Hack";
+    gh.hname = "Mac Hack";
     hackpid = getpid();
 
     setrandom();
     initoptions();
-    init_nhwindows(&argc, (char **) &g.hname);
+    init_nhwindows(&argc, (char **) &gh.hname);
 
     /*
      * It seems you really want to play.
@@ -102,7 +102,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
@@ -225,9 +225,9 @@ process_openfile(short src_vol, long src_dir, Str255 fName, OSType ftype)
             Handle name = Get1Resource('STR ', PLAYER_NAME_RES_ID);
             if (name) {
                 Str255 save_f_p;
-                P2C(*(StringHandle) name, g.plname);
+                P2C(*(StringHandle) name, gp.plname);
                 set_savefile_name(TRUE);
-                C2P(fqname(g.SAVEF, SAVEPREFIX, 0), save_f_p);
+                C2P(fqname(gs.SAVEF, SAVEPREFIX, 0), save_f_p);
                 force_hdelete(theDirs.dataRefNum, theDirs.dataDirID,
                               save_f_p);
 

@@ -40,7 +40,7 @@ find_tool(int tooltyp)
 {
     struct obj *o;
 
-    for (o = g.invent; o; o = o->nobj) {
+    for (o = gi.invent; o; o = o->nobj) {
         if ((tooltyp == LEASH && o->otyp == LEASH && o->leashmon)
             // OIL_LAMP is used for candles, lamps, lantern, candelabrum too
             || (tooltyp == OIL_LAMP && o->lamplit))

@@ -29,7 +29,7 @@ explosionmask(
 {
     int res = EXPL_NONE;
 
-    if (m == &g.youmonst) {
+    if (m == &gy.youmonst) {
         switch (adtyp) {
         case AD_PHYS:
             /* leave 'res' with EXPL_NONE */
@@ -208,7 +208,7 @@ explode(
        so might get hit by double damage */
     grabbed = grabbing = FALSE;
     if (u.ustuck && !u.uswallow) {
-        if (Upolyd && sticks(g.youmonst.data))
+        if (Upolyd && sticks(gy.youmonst.data))
             grabbing = TRUE;
         else
             grabbed = TRUE;
@@ -230,9 +230,9 @@ explode(
      */
 
     if (olet == MON_EXPLODE && !you_exploding) {
-        /* when explode() is called recursively, g.killer.name might change so
+        /* when explode() is called recursively, gk.killer.name might change so
            we need to retain a copy of the current value for this explosion */
-        str = strcpy(killr_buf, g.killer.name);
+        str = strcpy(killr_buf, gk.killer.name);
         do_hallu = (Hallucination
                     && (strstri(str, "'s explosion")
                         || strstri(str, "s' explosion")));
@@ -297,7 +297,7 @@ explode(
             explmask[i][j] = EXPL_NONE;
 
             if (u_at(xx, yy)) {
-                explmask[i][j] = explosionmask(&g.youmonst, adtyp, olet);
+                explmask[i][j] = explosionmask(&gy.youmonst, adtyp, olet);
             }
             /* can be both you and mtmp if you're swallowed or riding */
             mtmp = m_at(xx, yy);
@@ -399,7 +399,7 @@ explode(
                      * with an explosion attack, leave them (and their gear)
                      * unharmed, to avoid punishing them from using such
                      * polyforms creatively */
-                    if (!g.context.mon_moving && you_exploding)
+                    if (!gc.context.mon_moving && you_exploding)
                         uhurt = 0;
                 } else if (inside_engulfer) {
                     /* for inside_engulfer, only <u.ux,u.uy> is affected */
@@ -408,7 +408,7 @@ explode(
                 idamres = idamnonres = 0;
                 /* Affect the floor unless the player caused the explosion
                  * from inside their engulfer. */
-                if (!(u.uswallow && !g.context.mon_moving))
+                if (!(u.uswallow && !gc.context.mon_moving))
                     (void) zap_over_floor(xx, yy, type,
                                           &shopdamage, exploding_wand_typ);
 
@@ -543,7 +543,7 @@ explode(
                                   && completelyburns(mtmp->data))
                                  ? XKILL_NOCORPSE : 0);
 
-                    if (!g.context.mon_moving) {
+                    if (!gc.context.mon_moving) {
                         xkilled(mtmp, XKILL_GIVEMSG | xkflg);
                     } else if (mdef && mtmp == mdef) {
                         /* 'mdef' killed self trying to cure being turned
@@ -565,7 +565,7 @@ explode(
                             adtyp = AD_RBRE; /* no corpse */
                         monkilled(mtmp, "", (int) adtyp);
                     }
-                } else if (!g.context.mon_moving) {
+                } else if (!gc.context.mon_moving) {
                     /* all affected monsters, even if mdef is set */
                     setmangry(mtmp, TRUE);
                 }
@@ -597,8 +597,8 @@ explode(
         } else if (adtyp == AD_PHYS || adtyp == AD_ACID)
             damu = Maybe_Half_Phys(damu);
         if (adtyp == AD_FIRE) {
-            (void) burnarmor(&g.youmonst);
-            ignite_items(g.invent);
+            (void) burnarmor(&gy.youmonst);
+            ignite_items(gi.invent);
         }
         destroy_item(SCROLL_CLASS, (int) adtyp);
         destroy_item(SPBOOK_CLASS, (int) adtyp);
@@ -619,7 +619,7 @@ explode(
                 u.mh -= damu;
             else
                 u.uhp -= damu;
-            g.context.botl = 1;
+            gc.context.botl = 1;
         }
 
         /* You resisted the damage, lets not keep that to ourselves */
@@ -632,21 +632,21 @@ explode(
             } else {
                 if (olet == MON_EXPLODE) {
                     if (generic) /* explosion was unseen; str=="explosion", */
-                        ;        /* g.killer.name=="gas spore's explosion". */
-                    else if (str != g.killer.name && str != hallu_buf)
-                        Strcpy(g.killer.name, str);
-                    g.killer.format = KILLED_BY_AN;
+                        ;        /* gk.killer.name=="gas spore's explosion". */
+                    else if (str != gk.killer.name && str != hallu_buf)
+                        Strcpy(gk.killer.name, str);
+                    gk.killer.format = KILLED_BY_AN;
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
-                    g.killer.format = NO_KILLER_PREFIX;
-                    Snprintf(g.killer.name, sizeof g.killer.name,
+                    gk.killer.format = NO_KILLER_PREFIX;
+                    Snprintf(gk.killer.name, sizeof gk.killer.name,
                              "caught %sself in %s own %s", uhim(),
                              uhis(), str);
                 } else {
-                    g.killer.format = (!strcmpi(str, "tower of flame")
+                    gk.killer.format = (!strcmpi(str, "tower of flame")
                                      || !strcmpi(str, "fireball"))
                                         ? KILLED_BY_AN
                                         : KILLED_BY;
-                    Strcpy(g.killer.name, str);
+                    Strcpy(gk.killer.name, str);
                 }
                 if (iflags.last_msg == PLNMSG_CAUGHT_IN_EXPLOSION
                     || iflags.last_msg == PLNMSG_TOWER_OF_FLAME) /*seffects()*/
@@ -728,7 +728,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
     if (shop_origin)
         credit_report(shkp, 0, TRUE);   /* establish baseline, without msgs */
 
-    while ((otmp = (individual_object ? obj : g.level.objects[sx][sy])) != 0) {
+    while ((otmp = (individual_object ? obj : gl.level.objects[sx][sy])) != 0) {
         if (otmp == uball || otmp == uchain) {
             boolean waschain = (otmp == uchain);
             pline_The("chain shatters!");
@@ -814,20 +814,20 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
     while (farthest-- > 0) {
         for (stmp = schain; stmp; stmp = stmp->next) {
             if ((stmp->range-- > 0) && (!stmp->stopped)) {
-                g.thrownobj = stmp->obj; /* mainly in case it kills hero */
-                g.bhitpos.x = stmp->ox + stmp->dx;
-                g.bhitpos.y = stmp->oy + stmp->dy;
-                typ = levl[g.bhitpos.x][g.bhitpos.y].typ;
-                if (!isok(g.bhitpos.x, g.bhitpos.y)) {
-                    g.bhitpos.x -= stmp->dx;
-                    g.bhitpos.y -= stmp->dy;
+                gt.thrownobj = stmp->obj; /* mainly in case it kills hero */
+                gb.bhitpos.x = stmp->ox + stmp->dx;
+                gb.bhitpos.y = stmp->oy + stmp->dy;
+                typ = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
+                if (!isok(gb.bhitpos.x, gb.bhitpos.y)) {
+                    gb.bhitpos.x -= stmp->dx;
+                    gb.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
                 } else if (!ZAP_POS(typ)
-                           || closed_door(g.bhitpos.x, g.bhitpos.y)) {
-                    g.bhitpos.x -= stmp->dx;
-                    g.bhitpos.y -= stmp->dy;
+                           || closed_door(gb.bhitpos.x, gb.bhitpos.y)) {
+                    gb.bhitpos.x -= stmp->dx;
+                    gb.bhitpos.y -= stmp->dy;
                     stmp->stopped = TRUE;
-                } else if ((mtmp = m_at(g.bhitpos.x, g.bhitpos.y)) != 0) {
+                } else if ((mtmp = m_at(gb.bhitpos.x, gb.bhitpos.y)) != 0) {
                     if (scflags & MAY_HITMON) {
                         stmp->range--;
                         if (ohitmon(mtmp, stmp->obj, 1, FALSE)) {
@@ -835,16 +835,16 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                             stmp->stopped = TRUE;
                         }
                     }
-                } else if (u_at(g.bhitpos.x, g.bhitpos.y)) {
+                } else if (u_at(gb.bhitpos.x, gb.bhitpos.y)) {
                     if (scflags & MAY_HITYOU) {
                         int hitvalu, hitu;
 
-                        if (g.multi)
+                        if (gm.multi)
                             nomul(0);
                         hitvalu = 8 + stmp->obj->spe;
-                        if (bigmonst(g.youmonst.data))
+                        if (bigmonst(gy.youmonst.data))
                             hitvalu++;
-                        hitu = thitu(hitvalu, dmgval(stmp->obj, &g.youmonst),
+                        hitu = thitu(hitvalu, dmgval(stmp->obj, &gy.youmonst),
                                      &stmp->obj, (char *) 0);
                         if (!stmp->obj)
                             stmp->stopped = TRUE;
@@ -855,15 +855,15 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                     }
                 } else {
                     if (scflags & VIS_EFFECTS) {
-                        /* tmp_at(g.bhitpos.x, g.bhitpos.y); */
+                        /* tmp_at(gb.bhitpos.x, gb.bhitpos.y); */
                         /* delay_output(); */
                     }
                 }
-                stmp->ox = g.bhitpos.x;
-                stmp->oy = g.bhitpos.y;
+                stmp->ox = gb.bhitpos.x;
+                stmp->oy = gb.bhitpos.y;
                 if (IS_SINK(levl[stmp->ox][stmp->oy].typ))
                     stmp->stopped = TRUE;
-                g.thrownobj = (struct obj *) 0;
+                gt.thrownobj = (struct obj *) 0;
             }
         }
     }
@@ -906,8 +906,8 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
         newsym(x, y);
     }
     newsym(sx, sy);
-    if (u_at(sx, sy) && u.uundetected && hides_under(g.youmonst.data))
-        (void) hideunder(&g.youmonst);
+    if (u_at(sx, sy) && u.uundetected && hides_under(gy.youmonst.data))
+        (void) hideunder(&gy.youmonst);
     if (((mtmp = m_at(sx, sy)) != 0) && mtmp->mtrapped)
         mtmp->mtrapped = 0;
     maybe_unhide_at(sx, sy);
@@ -1021,15 +1021,15 @@ mon_explodes(struct monst *mon, struct attack *mattk)
 
     /* This might end up killing you, too; you never know...
      * also, it is used in explode() messages */
-    Sprintf(g.killer.name, "%s explosion",
+    Sprintf(gk.killer.name, "%s explosion",
             s_suffix(pmname(mon->data, Mgender(mon))));
-    g.killer.format = KILLED_BY_AN;
+    gk.killer.format = KILLED_BY_AN;
 
     explode(mon->mx, mon->my, type, dmg, MON_EXPLODE,
             adtyp_to_expltype(mattk->adtyp));
 
     /* reset killer */
-    g.killer.name[0] = '\0';
+    gk.killer.name[0] = '\0';
 }
 
 /*explode.c*/

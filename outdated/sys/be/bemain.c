@@ -88,7 +88,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
@@ -132,14 +132,14 @@ whoami(void)
      */
     char *s;
 
-    if (*g.plname)
+    if (*gp.plname)
         return;
     if (s = nh_getenv("USER")) {
-        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
+        (void) strncpy(gp.plname, s, sizeof(gp.plname) - 1);
         return;
     }
     if (s = nh_getenv("LOGNAME")) {
-        (void) strncpy(g.plname, s, sizeof(g.plname) - 1);
+        (void) strncpy(gp.plname, s, sizeof(gp.plname) - 1);
         return;
     }
 }
@@ -177,11 +177,11 @@ process_options(int argc, char **argv)
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -236,15 +236,15 @@ getlock(void)
 {
     int fd;
 
-    Sprintf(g.lock, "%d%s", getuid(), g.plname);
-    regularize(g.lock);
-    set_levelfile_name(g.lock, 0);
-    fd = creat(g.lock, FCMASK);
+    Sprintf(gl.lock, "%d%s", getuid(), gp.plname);
+    regularize(gl.lock);
+    set_levelfile_name(gl.lock, 0);
+    fd = creat(gl.lock, FCMASK);
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid))
-            != sizeof(g.hackpid)) {
+        if (write(fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid))
+            != sizeof(gh.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {

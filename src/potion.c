@@ -95,7 +95,7 @@ make_confused(long xtime, boolean talk)
             You_feel("less %s now.", Hallucination ? "trippy" : "confused");
     }
     if ((xtime && !old) || (!xtime && old))
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
 
     set_itimeout(&HConfusion, xtime);
 }
@@ -118,11 +118,11 @@ make_stunned(long xtime, boolean talk)
             if (u.usteed)
                 You("wobble in the saddle.");
             else
-                You("%s...", stagger(g.youmonst.data, "stagger"));
+                You("%s...", stagger(gy.youmonst.data, "stagger"));
         }
     }
     if ((!xtime && old) || (xtime && !old))
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
 
     set_itimeout(&HStun, xtime);
 }
@@ -156,7 +156,7 @@ make_sick(long xtime,
         }
         set_itimeout(&Sick, xtime);
         u.usick_type |= type;
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     } else if (old && (type & u.usick_type)) {
         /* was sick, now not */
         u.usick_type &= ~type;
@@ -169,7 +169,7 @@ make_sick(long xtime,
                 You_feel("cured.  What a relief!");
             Sick = 0L; /* set_itimeout(&Sick, 0L) */
         }
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     }
 
     kptr = find_delayed_killer(SICK);
@@ -199,7 +199,7 @@ make_slimed(long xtime, const char *msg)
 #endif
     set_itimeout(&Slimed, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -207,9 +207,9 @@ make_slimed(long xtime, const char *msg)
         dealloc_killer(find_delayed_killer(SLIMED));
         /* fake appearance is set late in turn-to-slime countdown */
         if (U_AP_TYPE == M_AP_MONSTER
-            && g.youmonst.mappearance == PM_GREEN_SLIME) {
-            g.youmonst.m_ap_type = M_AP_NOTHING;
-            g.youmonst.mappearance = 0;
+            && gy.youmonst.mappearance == PM_GREEN_SLIME) {
+            gy.youmonst.m_ap_type = M_AP_NOTHING;
+            gy.youmonst.mappearance = 0;
         }
     }
 }
@@ -226,7 +226,7 @@ make_stoned(long xtime, const char *msg, int killedby, const char *killername)
 #endif
     set_itimeout(&Stoned, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
         if (msg)
             pline("%s", msg);
     }
@@ -245,7 +245,7 @@ make_vomiting(long xtime, boolean talk)
         talk = FALSE;
 
     set_itimeout(&Vomiting, xtime);
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
     if (!xtime && old)
         if (talk)
             You_feel("much less nauseated now.");
@@ -281,11 +281,11 @@ make_blinded(long xtime, boolean talk)
     } else if (old && !xtime) {
         /* clearing temporary blindness without toggling blindness */
         if (talk) {
-            if (!haseyes(g.youmonst.data)) {
+            if (!haseyes(gy.youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
                 eyes = body_part(EYE);
-                if (eyecount(g.youmonst.data) != 1)
+                if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, "itch"));
             } else { /* Eyes of the Overworld */
@@ -307,11 +307,11 @@ make_blinded(long xtime, boolean talk)
     } else if (!old && xtime) {
         /* setting temporary blindness without toggling blindness */
         if (talk) {
-            if (!haseyes(g.youmonst.data)) {
+            if (!haseyes(gy.youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
                 eyes = body_part(EYE);
-                if (eyecount(g.youmonst.data) != 1)
+                if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, "twitch"));
             } else { /* Eyes of the Overworld */
@@ -335,8 +335,8 @@ toggle_blindness(void)
     boolean Stinging = (uwep && (EWarn_of_mon & W_WEP) != 0L);
 
     /* blindness has just been toggled */
-    g.context.botl = TRUE; /* status conditions need update */
-    g.vision_full_recalc = 1; /* vision has changed */
+    gc.context.botl = TRUE; /* status conditions need update */
+    gv.vision_full_recalc = 1; /* vision has changed */
     /* this vision recalculation used to be deferred until moveloop(),
        but that made it possible for vision irregularities to occur
        (cited case was force bolt hitting an adjacent potion of blindness
@@ -394,12 +394,12 @@ make_hallucinated(
 
         /* clearing temporary hallucination without toggling vision */
         if (!changed && !HHallucination && old && talk) {
-            if (!haseyes(g.youmonst.data)) {
+            if (!haseyes(gy.youmonst.data)) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blind) {
                 const char *eyes = body_part(EYE);
 
-                if (eyecount(g.youmonst.data) != 1)
+                if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your(eyemsg, eyes, vtense(eyes, "itch"));
             } else { /* Grayswandir */
@@ -427,7 +427,7 @@ make_hallucinated(
         (eg. Qt windowport's equipped items display) */
         update_inventory();
 
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
         if (talk)
             pline(message, verb);
     }
@@ -446,7 +446,7 @@ make_deaf(long xtime, boolean talk)
 
     set_itimeout(&HDeaf, xtime);
     if ((xtime != 0L) ^ (old != 0L)) {
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
         if (talk)
             You(old ? "can hear again." : "are unable to hear anything.");
     }
@@ -456,7 +456,7 @@ make_deaf(long xtime, boolean talk)
 void
 make_glib(int xtime)
 {
-    g.context.botl |= (!Glib ^ !!xtime);
+    gc.context.botl |= (!Glib ^ !!xtime);
     set_itimeout(&Glib, xtime);
     /* may change "(being worn)" to "(being worn; slippery)" or vice versa */
     if (uarmg)
@@ -491,8 +491,8 @@ ghost_from_bottle(void)
     if (Verbose(3, ghost_from_bottle))
         You("are frightened to death, and unable to move.");
     nomul(-3);
-    g.multi_reason = "being frightened to death";
-    g.nomovemsg = "You regain your composure.";
+    gm.multi_reason = "being frightened to death";
+    gn.nomovemsg = "You regain your composure.";
 }
 
 /* getobj callback for object to drink from, which also does double duty as
@@ -585,14 +585,14 @@ dodrink(void)
     otmp->in_use = TRUE; /* you've opened the stopper */
 
     if (objdescr_is(otmp, "milky")
-        && !(g.mvitals[PM_GHOST].mvflags & G_GONE)
-        && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_GHOST].born))) {
+        && !(gm.mvitals[PM_GHOST].mvflags & G_GONE)
+        && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_GHOST].born))) {
         ghost_from_bottle();
         useup(otmp);
         return ECMD_TIME;
     } else if (objdescr_is(otmp, "smoky")
-               && !(g.mvitals[PM_DJINNI].mvflags & G_GONE)
-               && !rn2(POTION_OCCUPANT_CHANCE(g.mvitals[PM_DJINNI].born))) {
+               && !(gm.mvitals[PM_DJINNI].mvflags & G_GONE)
+               && !rn2(POTION_OCCUPANT_CHANCE(gm.mvitals[PM_DJINNI].born))) {
         djinni_from_bottle(otmp);
         useup(otmp);
         return ECMD_TIME;
@@ -606,17 +606,17 @@ dopotion(struct obj *otmp)
     int retval;
 
     otmp->in_use = TRUE;
-    g.potion_nothing = g.potion_unkn = 0;
+    gp.potion_nothing = gp.potion_unkn = 0;
     if ((retval = peffects(otmp)) >= 0)
         return retval ? ECMD_TIME : ECMD_OK;
 
-    if (g.potion_nothing) {
-        g.potion_unkn++;
+    if (gp.potion_nothing) {
+        gp.potion_unkn++;
         You("have a %s feeling for a moment, then it passes.",
             Hallucination ? "normal" : "peculiar");
     }
     if (otmp->dknown && !objects[otmp->otyp].oc_name_known) {
-        if (!g.potion_unkn) {
+        if (!gp.potion_unkn) {
             makeknown(otmp->otyp);
             more_experienced(0, 10);
         } else
@@ -631,7 +631,7 @@ dopotion(struct obj *otmp)
 static void
 peffect_restore_ability(struct obj *otmp)
 {
-    g.potion_unkn++;
+    gp.potion_unkn++;
     if (otmp->cursed) {
         pline("Ulch!  This makes you feel mediocre!");
         return;
@@ -653,7 +653,7 @@ peffect_restore_ability(struct obj *otmp)
                WEAK or worse, but that's handled via ATEMP(A_STR) now */
             if (ABASE(i) < lim) {
                 ABASE(i) = lim;
-                g.context.botl = 1;
+                gc.context.botl = 1;
                 /* only first found if not blessed */
                 if (!otmp->blessed)
                     break;
@@ -679,10 +679,10 @@ static void
 peffect_hallucination(struct obj *otmp)
 {
     if (Halluc_resistance) {
-        g.potion_nothing++;
+        gp.potion_nothing++;
         return;
     } else if (Hallucination) {
-        g.potion_nothing++;
+        gp.potion_nothing++;
     }
     (void) make_hallucinated(itimeout_incr(HHallucination,
                                            rn1(200, 600 - 300 * bcsign(otmp))),
@@ -705,8 +705,8 @@ peffect_water(struct obj *otmp)
         newuhs(FALSE);
         return;
     }
-    g.potion_unkn++;
-    if (mon_hates_blessings(&g.youmonst) /* undead or demon */
+    gp.potion_unkn++;
+    if (mon_hates_blessings(&gy.youmonst) /* undead or demon */
         || u.ualign.type == A_CHAOTIC) {
         if (otmp->blessed) {
             pline("This burns like %s!", hliquid("acid"));
@@ -714,7 +714,7 @@ peffect_water(struct obj *otmp)
             if (u.ulycn >= LOW_PM) {
                 Your("affinity to %s disappears!",
                      makeplural(mons[u.ulycn].pmnames[NEUTRAL]));
-                if (g.youmonst.data == &mons[u.ulycn])
+                if (gy.youmonst.data == &mons[u.ulycn])
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */
             }
@@ -753,7 +753,7 @@ peffect_water(struct obj *otmp)
 static void
 peffect_booze(struct obj *otmp)
 {
-    g.potion_unkn++;
+    gp.potion_unkn++;
     pline("Ooph!  This tastes like %s%s!",
           otmp->odiluted ? "watered down " : "",
           Hallucination ? "dandelion wine" : "liquid fire");
@@ -769,8 +769,8 @@ peffect_booze(struct obj *otmp)
     exercise(A_WIS, FALSE);
     if (otmp->cursed) {
         You("pass out.");
-        g.multi = -rnd(15);
-        g.nomovemsg = "You awake with a headache.";
+        gm.multi = -rnd(15);
+        gn.nomovemsg = "You awake with a headache.";
     }
 }
 
@@ -778,7 +778,7 @@ static void
 peffect_enlightenment(struct obj *otmp)
 {
     if (otmp->cursed) {
-        g.potion_unkn++;
+        gp.potion_unkn++;
         You("have an uneasy feeling...");
         exercise(A_WIS, FALSE);
     } else {
@@ -801,7 +801,7 @@ peffect_invisibility(struct obj *otmp)
         return;
     }
     if (Invis || Blind || BInvis) {
-        g.potion_nothing++;
+        gp.potion_nothing++;
     } else {
         self_invis_message();
     }
@@ -821,7 +821,7 @@ peffect_see_invisible(struct obj *otmp)
 {
     int msg = Invisible && !Blind;
 
-    g.potion_unkn++;
+    gp.potion_unkn++;
     if (otmp->cursed)
         pline("Yecch!  This tastes %s.",
               Hallucination ? "overripe" : "rotten");
@@ -851,7 +851,7 @@ peffect_see_invisible(struct obj *otmp)
     newsym(u.ux, u.uy);   /* see yourself! */
     if (msg && !Blind) {  /* Blind possible if polymorphed */
         You("can see through yourself, but you are visible!");
-        g.potion_unkn--;
+        gp.potion_unkn--;
     }
 }
 
@@ -869,8 +869,8 @@ peffect_paralysis(struct obj *otmp)
             Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        g.multi_reason = "frozen by a potion";
-        g.nomovemsg = You_can_move_again;
+        gm.multi_reason = "frozen by a potion";
+        gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
 }
@@ -894,8 +894,8 @@ peffect_monster_detection(struct obj *otmp)
         int i, x, y;
 
         if (Detect_monsters)
-            g.potion_nothing++;
-        g.potion_unkn++;
+            gp.potion_nothing++;
+        gp.potion_unkn++;
         /* after a while, repeated uses become less effective */
         if ((HDetect_monsters & TIMEOUT) >= 300L)
             i = 1;
@@ -909,13 +909,13 @@ peffect_monster_detection(struct obj *otmp)
                     newsym(x, y);
                 }
                 if (MON_AT(x, y))
-                    g.potion_unkn = 0;
+                    gp.potion_unkn = 0;
             }
         }
         /* if swallowed or underwater, fall through to uncursed case */
         if (!u.uswallow && !Underwater) {
             see_monsters();
-            if (g.potion_unkn)
+            if (gp.potion_unkn)
                 You_feel("lonely.");
             return 0;
         }
@@ -991,11 +991,11 @@ peffect_confusion(struct obj *otmp)
     if (!Confusion) {
         if (Hallucination) {
             pline("What a trippy feeling!");
-            g.potion_unkn++;
+            gp.potion_unkn++;
         } else
             pline("Huh, What?  Where am I?");
     } else
-        g.potion_nothing++;
+        gp.potion_nothing++;
     make_confused(itimeout_incr(HConfusion,
                                 rn1(7, 16 - 8 * bcsign(otmp))),
                   FALSE);
@@ -1006,9 +1006,9 @@ peffect_gain_ability(struct obj *otmp)
 {
     if (otmp->cursed) {
         pline("Ulch!  That potion tasted foul!");
-        g.potion_unkn++;
+        gp.potion_unkn++;
     } else if (Fixed_abil) {
-        g.potion_nothing++;
+        gp.potion_nothing++;
     } else {      /* If blessed, increase all; if not, try up to */
         int itmp; /* 6 times to find one which can be increased. */
         int ii, i = -1;   /* increment to 0 */
@@ -1031,7 +1031,7 @@ peffect_speed(struct obj *otmp)
     /* skip when mounted; heal_legs() would heal steed's legs */
     if (is_speed && Wounded_legs && !otmp->cursed && !u.usteed) {
         heal_legs(0);
-        g.potion_unkn++;
+        gp.potion_unkn++;
         return;
     }
 
@@ -1039,7 +1039,7 @@ peffect_speed(struct obj *otmp)
         You("are suddenly moving %sfaster.", Fast ? "" : "much ");
     } else {
         Your("%s get new energy.", makeplural(body_part(LEG)));
-        g.potion_unkn++;
+        gp.potion_unkn++;
     }
     exercise(A_DEX, TRUE);
     incr_itimeout(&HFast, rn1(10, 100 + 60 * bcsign(otmp)));
@@ -1049,7 +1049,7 @@ static void
 peffect_blindness(struct obj *otmp)
 {
     if (Blind)
-        g.potion_nothing++;
+        gp.potion_nothing++;
     make_blinded(itimeout_incr(Blinded,
                                rn1(200, 250 - 125 * bcsign(otmp))),
                  (boolean) !Blind);
@@ -1061,7 +1061,7 @@ static void
 peffect_gain_level(struct obj *otmp)
 {
     if (otmp->cursed) {
-        g.potion_unkn++;
+        gp.potion_unkn++;
         /* they went up a level */
         if ((ledger_no(&u.uz) == 1 && u.uhave.amulet)
             || Can_rise_up(u.ux, u.uy, &u.uz)) {
@@ -1160,7 +1160,7 @@ peffect_levitation(struct obj *otmp)
            that cursed effect yields "you float down" on next turn.
            Blessed and uncursed get one extra turn duration. */
     } else /* already levitating, or can't levitate */
-        g.potion_nothing++;
+        gp.potion_nothing++;
 
     if (otmp->cursed) {
         stairway *stway;
@@ -1175,7 +1175,7 @@ peffect_levitation(struct obj *otmp)
             (void) doup();
             /* in case we're already Levitating, which would have
                resulted in incrementing 'nothing' */
-            g.potion_nothing = 0; /* not nothing after all */
+            gp.potion_nothing = 0; /* not nothing after all */
         } else if (has_ceiling(&u.uz)) {
             int dmg = rnd(!uarmh ? 10 : !is_metallic(uarmh) ? 6 : 3);
 
@@ -1183,7 +1183,7 @@ peffect_levitation(struct obj *otmp)
                 ceiling(u.ux, u.uy));
             losehp(Maybe_Half_Phys(dmg), "colliding with the ceiling",
                    KILLED_BY);
-            g.potion_nothing = 0; /* not nothing after all */
+            gp.potion_nothing = 0; /* not nothing after all */
         }
     } else if (otmp->blessed) {
         /* at this point, timeout is already at least 1 */
@@ -1232,7 +1232,7 @@ peffect_gain_energy(struct obj *otmp)
         u.uen = u.uenmax;
     else if (u.uen <= 0)
         u.uen = 0;
-    g.context.botl = 1;
+    gc.context.botl = 1;
     exercise(A_WIS, TRUE);
 }
 
@@ -1242,7 +1242,7 @@ peffect_oil(struct obj *otmp)
     boolean good_for_you = FALSE, vulnerable;
 
     if (otmp->lamplit) {
-        if (likes_fire(g.youmonst.data)) {
+        if (likes_fire(gy.youmonst.data)) {
             pline("Ahh, a refreshing drink.");
             good_for_you = TRUE;
         } else {
@@ -1291,7 +1291,7 @@ peffect_acid(struct obj *otmp)
     }
     if (Stoned)
         fix_petrification();
-    g.potion_unkn++; /* holy/unholy water can burn like acid too */
+    gp.potion_unkn++; /* holy/unholy water can burn like acid too */
 }
 
 static void
@@ -1433,7 +1433,7 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
         make_vomiting(0L, TRUE);
         make_sick(0L, (char *) 0, TRUE, SICK_ALL);
     }
-    g.context.botl = 1;
+    gc.context.botl = 1;
     return;
 }
 
@@ -1599,7 +1599,7 @@ void
 potionhit(struct monst *mon, struct obj *obj, int how)
 {
     const char *botlnam = bottlename();
-    boolean isyou = (mon == &g.youmonst);
+    boolean isyou = (mon == &gy.youmonst);
     int distance, tx, ty;
     struct obj *saddle = (struct obj *) 0;
     boolean hit_saddle = FALSE, your_fault = (how <= POTHIT_HERO_THROW);
@@ -1637,7 +1637,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                                           FALSE)));
             } else if (has_head(mon->data)) {
                 Sprintf(buf, "%s %s", s_suffix(mnam),
-                        (g.notonhead ? "body" : "head"));
+                        (gn.notonhead ? "body" : "head"));
             } else {
                 Strcpy(buf, mnam);
             }
@@ -1869,7 +1869,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
 
     /* Note: potionbreathe() does its own docall() */
     if ((distance == 0 || (distance < 3 && !rn2((1+ACURR(A_DEX))/2)))
-        && (!breathless(g.youmonst.data) || haseyes(g.youmonst.data)))
+        && (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data)))
         potionbreathe(obj);
     else if (obj->dknown && cansee(tx, ty))
         trycall(obj);
@@ -1882,7 +1882,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
            when inside a tended shop */
         if (!shkp) /* if shkp was killed, unpaid ought to cleared already */
             obj->unpaid = 0;
-        else if (g.context.mon_moving) /* obj thrown by monster */
+        else if (gc.context.mon_moving) /* obj thrown by monster */
             subfrombill(obj, shkp);
         else /* obj thrown by hero */
             (void) stolen_value(obj, u.ux, u.uy, (boolean) shkp->mpeaceful,
@@ -1914,12 +1914,12 @@ potionbreathe(struct obj *obj)
     case POT_RESTORE_ABILITY:
     case POT_GAIN_ABILITY:
         if (obj->cursed) {
-            if (!breathless(g.youmonst.data)) {
+            if (!breathless(gy.youmonst.data)) {
                 pline("Ulch!  That potion smells terrible!");
-            } else if (haseyes(g.youmonst.data)) {
+            } else if (haseyes(gy.youmonst.data)) {
                 const char *eyes = body_part(EYE);
 
-                if (eyecount(g.youmonst.data) != 1)
+                if (eyecount(gy.youmonst.data) != 1)
                     eyes = makeplural(eyes);
                 Your("%s %s!", eyes, vtense(eyes, "sting"));
             }
@@ -1931,7 +1931,7 @@ potionbreathe(struct obj *obj)
                     ABASE(i)++;
                     /* only first found if not blessed */
                     isdone = !(obj->blessed);
-                    g.context.botl = 1;
+                    gc.context.botl = 1;
                 }
                 if (++i >= A_MAX)
                     i = 0;
@@ -1940,24 +1940,24 @@ potionbreathe(struct obj *obj)
         break;
     case POT_FULL_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, g.context.botl = 1;
+            u.mh++, gc.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, g.context.botl = 1;
+            u.uhp++, gc.context.botl = 1;
         cureblind = TRUE;
         /*FALLTHRU*/
     case POT_EXTRA_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, g.context.botl = 1;
+            u.mh++, gc.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, g.context.botl = 1;
+            u.uhp++, gc.context.botl = 1;
         if (!obj->cursed)
             cureblind = TRUE;
         /*FALLTHRU*/
     case POT_HEALING:
         if (Upolyd && u.mh < u.mhmax)
-            u.mh++, g.context.botl = 1;
+            u.mh++, gc.context.botl = 1;
         if (u.uhp < u.uhpmax)
-            u.uhp++, g.context.botl = 1;
+            u.uhp++, gc.context.botl = 1;
         if (obj->blessed)
             cureblind = TRUE;
         if (cureblind) {
@@ -1979,7 +1979,7 @@ potionbreathe(struct obj *obj)
                 else
                     u.uhp -= 5;
             }
-            g.context.botl = 1;
+            gc.context.botl = 1;
             exercise(A_CON, FALSE);
         }
         break;
@@ -2005,8 +2005,8 @@ potionbreathe(struct obj *obj)
         if (!Free_action) {
             pline("%s seems to be holding you.", Something);
             nomul(-rnd(5));
-            g.multi_reason = "frozen by a potion";
-            g.nomovemsg = You_can_move_again;
+            gm.multi_reason = "frozen by a potion";
+            gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
             You("stiffen momentarily.");
@@ -2016,8 +2016,8 @@ potionbreathe(struct obj *obj)
         if (!Free_action && !Sleep_resistance) {
             You_feel("rather tired.");
             nomul(-rnd(5));
-            g.multi_reason = "sleeping off a magical draught";
-            g.nomovemsg = You_can_move_again;
+            gm.multi_reason = "sleeping off a magical draught";
+            gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else {
             You("yawn.");
@@ -2041,11 +2041,11 @@ potionbreathe(struct obj *obj)
         break;
     case POT_WATER:
         if (u.umonnum == PM_GREMLIN) {
-            (void) split_mon(&g.youmonst, (struct monst *) 0);
+            (void) split_mon(&gy.youmonst, (struct monst *) 0);
         } else if (u.ulycn >= LOW_PM) {
             /* vapor from [un]holy water will trigger
                transformation but won't cure lycanthropy */
-            if (obj->blessed && g.youmonst.data == &mons[u.ulycn])
+            if (obj->blessed && gy.youmonst.data == &mons[u.ulycn])
                 you_unwere(FALSE);
             else if (obj->cursed && !Upolyd)
                 you_were();
@@ -2417,7 +2417,7 @@ potion_dip(struct obj *obj, struct obj *potion)
             pline("%sThey explode!", !Deaf ? "BOOM!  " : "");
             wake_nearto(u.ux, u.uy, (BOLT_LIM + 1) * (BOLT_LIM + 1));
             exercise(A_STR, FALSE);
-            if (!breathless(g.youmonst.data) || haseyes(g.youmonst.data))
+            if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
                 potionbreathe(obj);
             useupall(obj);
             losehp(amt + rnd(9), /* not physical damage */
@@ -2760,15 +2760,15 @@ split_mon(
     reason[0] = '\0';
     if (mtmp)
         Sprintf(reason, " from %s heat",
-                (mtmp == &g.youmonst) ? the_your[1]
+                (mtmp == &gy.youmonst) ? the_your[1]
                                     : (const char *) s_suffix(mon_nam(mtmp)));
 
-    if (mon == &g.youmonst) {
+    if (mon == &gy.youmonst) {
         mtmp2 = cloneu();
         if (mtmp2) {
             mtmp2->mhpmax = u.mhmax / 2;
             u.mhmax -= mtmp2->mhpmax;
-            g.context.botl = 1;
+            gc.context.botl = 1;
             You("multiply%s!", reason);
         }
     } else {

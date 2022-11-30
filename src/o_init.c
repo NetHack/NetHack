@@ -52,7 +52,7 @@ setgemprobs(d_level* dlev)
                                                 : ledger_no(dlev);
     else
         lev = 0;
-    first = g.bases[GEM_CLASS];
+    first = gb.bases[GEM_CLASS];
 
     for (j = 0; j < 9 - lev / 3; j++)
         objects[first + j].oc_prob = 0;
@@ -67,9 +67,9 @@ setgemprobs(d_level* dlev)
         objects[j].oc_prob = (171 + j - first) / (LAST_GEM + 1 - first);
 
     /* recompute GEM_CLASS total oc_prob - including rocks/stones */
-    for (j = g.bases[GEM_CLASS]; j < g.bases[GEM_CLASS + 1]; j++)
+    for (j = gb.bases[GEM_CLASS]; j < gb.bases[GEM_CLASS + 1]; j++)
         sum += objects[j].oc_prob;
-    g.oclass_prob_totals[GEM_CLASS] = sum;
+    go.oclass_prob_totals[GEM_CLASS] = sum;
 }
 
 /* shuffle descriptions on objects o_low to o_high */
@@ -127,7 +127,7 @@ init_objects(void)
      * reported by mikew@semike
      */
     for (i = 0; i <= MAXOCLASSES; i++)
-        g.bases[i] = 0;
+        gb.bases[i] = 0;
     /* initialize object descriptions */
     for (i = 0; i < NUM_OBJECTS; i++)
         objects[i].oc_name_idx = objects[i].oc_descr_idx = i;
@@ -150,7 +150,7 @@ init_objects(void)
         last = first + 1;
         while (last < NUM_OBJECTS && objects[last].oc_class == oclass)
             last++;
-        g.bases[(int) oclass] = first;
+        gb.bases[(int) oclass] = first;
 
         if (oclass == GEM_CLASS) {
             setgemprobs((d_level *) 0);
@@ -180,13 +180,13 @@ init_objects(void)
     }
     /* extra entry allows deriving the range of a class via
        bases[class] through bases[class+1]-1 for all classes */
-    g.bases[MAXOCLASSES] = NUM_OBJECTS;
+    gb.bases[MAXOCLASSES] = NUM_OBJECTS;
     /* hypothetically someone might remove all objects of some class,
        or be adding a new class and not populated it yet, leaving gaps
        in bases[]; guarantee that there are no such gaps */
     for (last = MAXOCLASSES - 1; last >= 0; --last)
-        if (!g.bases[last])
-            g.bases[last] = g.bases[last + 1];
+        if (!gb.bases[last])
+            gb.bases[last] = gb.bases[last + 1];
 
     /* check objects[].oc_name_known */
     for (i = 0; i < NUM_OBJECTS; ++i) {
@@ -216,7 +216,7 @@ init_objects(void)
 }
 
 /* Compute the total probability of each object class.
- * Assumes g.bases[] has already been set. */
+ * Assumes gb.bases[] has already been set. */
 void
 init_oclass_probs(void)
 {
@@ -225,20 +225,20 @@ init_oclass_probs(void)
     int oclass;
     for (oclass = 0; oclass < MAXOCLASSES; ++oclass) {
         sum = 0;
-        for (i = g.bases[oclass]; i < g.bases[oclass + 1]; ++i) {
+        for (i = gb.bases[oclass]; i < gb.bases[oclass + 1]; ++i) {
             sum += objects[i].oc_prob;
         }
         if (sum <= 0 && oclass != ILLOBJ_CLASS
-            && g.bases[oclass] != g.bases[oclass + 1]) {
+            && gb.bases[oclass] != gb.bases[oclass + 1]) {
             impossible("zero or negative probability total for oclass %d",
                        oclass);
             /* gracefully fail by setting all members of this class to 1 */
-            for (i = g.bases[oclass]; i < g.bases[oclass + 1]; ++i) {
+            for (i = gb.bases[oclass]; i < gb.bases[oclass + 1]; ++i) {
                 objects[i].oc_prob = 1;
                 sum++;
             }
         }
-        g.oclass_prob_totals[oclass] = sum;
+        go.oclass_prob_totals[oclass] = sum;
     }
 }
 
@@ -266,14 +266,14 @@ obj_shuffle_range(
         break;
     case POTION_CLASS:
         /* potion of water has the only fixed description */
-        *lo_p = g.bases[POTION_CLASS];
+        *lo_p = gb.bases[POTION_CLASS];
         *hi_p = POT_WATER - 1;
         break;
     case AMULET_CLASS:
     case SCROLL_CLASS:
     case SPBOOK_CLASS:
         /* exclude non-magic types and also unique ones */
-        *lo_p = g.bases[ocls];
+        *lo_p = gb.bases[ocls];
         for (i = *lo_p; objects[i].oc_class == ocls; i++)
             if (objects[i].oc_unique || !objects[i].oc_magic)
                 break;
@@ -283,8 +283,8 @@ obj_shuffle_range(
     case WAND_CLASS:
     case VENOM_CLASS:
         /* entire class */
-        *lo_p = g.bases[ocls];
-        *hi_p = g.bases[ocls + 1] - 1;
+        *lo_p = gb.bases[ocls];
+        *hi_p = gb.bases[ocls + 1] - 1;
         break;
     }
 
@@ -312,7 +312,7 @@ shuffle_all(void)
 
     /* do whole classes (amulets, &c) */
     for (idx = 0; idx < SIZE(shuffle_classes); idx++) {
-        obj_shuffle_range(g.bases[(int) shuffle_classes[idx]], &first, &last);
+        obj_shuffle_range(gb.bases[(int) shuffle_classes[idx]], &first, &last);
         shuffle(first, last, TRUE);
     }
     /* do type ranges (helms, &c) */
@@ -356,8 +356,8 @@ savenames(NHFILE* nhfp)
 
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t)g.bases, sizeof g.bases);
-            bwrite(nhfp->fd, (genericptr_t)g.disco, sizeof g.disco);
+            bwrite(nhfp->fd, (genericptr_t)gb.bases, sizeof gb.bases);
+            bwrite(nhfp->fd, (genericptr_t)gd.disco, sizeof gd.disco);
             bwrite(nhfp->fd, (genericptr_t)objects,
                    sizeof(struct objclass) * NUM_OBJECTS);
         }
@@ -388,8 +388,8 @@ restnames(NHFILE* nhfp)
     unsigned int len = 0;
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) g.bases, sizeof g.bases);
-        mread(nhfp->fd, (genericptr_t) g.disco, sizeof g.disco);
+        mread(nhfp->fd, (genericptr_t) gb.bases, sizeof gb.bases);
+        mread(nhfp->fd, (genericptr_t) gd.disco, sizeof gd.disco);
         mread(nhfp->fd, (genericptr_t) objects,
                 sizeof(struct objclass) * NUM_OBJECTS);
     }
@@ -419,10 +419,10 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
            uname'd) or the next open slot; one or the other will be found
            before we reach the next class...
          */
-        for (dindx = g.bases[acls]; g.disco[dindx] != 0; dindx++)
-            if (g.disco[dindx] == oindx)
+        for (dindx = gb.bases[acls]; gd.disco[dindx] != 0; dindx++)
+            if (gd.disco[dindx] == oindx)
                 break;
-        g.disco[dindx] = oindx;
+        gd.disco[dindx] = oindx;
 
         if (mark_as_known) {
             objects[oindx].oc_name_known = 1;
@@ -430,7 +430,7 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
                 exercise(A_WIS, TRUE);
         }
         /* !in_moveloop => initial inventory, gameover => final disclosure */
-        if (g.program_state.in_moveloop && !g.program_state.gameover) {
+        if (gp.program_state.in_moveloop && !gp.program_state.gameover) {
             if (objects[oindx].oc_class == GEM_CLASS)
                 gem_learned(oindx); /* could affect price of unpaid gems */
             update_inventory();
@@ -447,17 +447,17 @@ undiscover_object(int oindx)
         register boolean found = FALSE;
 
         /* find the object; shift those behind it forward one slot */
-        for (dindx = g.bases[acls]; dindx < NUM_OBJECTS && g.disco[dindx] != 0
+        for (dindx = gb.bases[acls]; dindx < NUM_OBJECTS && gd.disco[dindx] != 0
                                   && objects[dindx].oc_class == acls;
              dindx++)
             if (found)
-                g.disco[dindx - 1] = g.disco[dindx];
-            else if (g.disco[dindx] == oindx)
+                gd.disco[dindx - 1] = gd.disco[dindx];
+            else if (gd.disco[dindx] == oindx)
                 found = TRUE;
 
         /* clear last slot */
         if (found)
-            g.disco[dindx - 1] = 0;
+            gd.disco[dindx - 1] = 0;
         else
             impossible("named object not in disco");
 
@@ -512,7 +512,7 @@ sortloot_descr(int otyp,char * outbuf)
     o.corpsenm = NON_PM; /* suppress statue and figurine details */
     /* but suppressing fruit details leads to "bad fruit #0" */
     if (otyp == SLIME_MOLD)
-        o.spe = g.context.current_fruit;
+        o.spe = gc.context.current_fruit;
 
     (void) memset((genericptr_t) &sl_cookie, 0, sizeof sl_cookie);
     sl_cookie.obj = (struct obj *) 0;
@@ -645,9 +645,9 @@ dodiscovered(void) /* free after Robert Viduya */
     for (s = classes; *s; s++) {
         oclass = *s;
         prev_class = oclass + 1; /* forced different from oclass */
-        for (i = g.bases[(int) oclass];
+        for (i = gb.bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
-            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
+            if ((dis = gd.disco[i]) != 0 && interesting_to_discover(dis)) {
                 ct++;
                 if (oclass != prev_class) {
                     if ((alphabyclass || lootsort) && sorted_ct) {
@@ -794,9 +794,9 @@ doclassdisco(void)
     for (s = allclasses; *s; ++s) {
         oclass = *s;
         c = def_oc_syms[(int) oclass].sym;
-        for (i = g.bases[(int) oclass];
+        for (i = gb.bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i)
-            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
+            if ((dis = gd.disco[i]) != 0 && interesting_to_discover(dis)) {
                 if (!strchr(discosyms, c)) {
                     Sprintf(eos(discosyms), "%c", c);
                     if (!traditional) {
@@ -901,8 +901,8 @@ doclassdisco(void)
                   : "alphabetical order");
         putstr(tmpwin, 0, buf); /* skip iflags.menu_headings */
         sorted_ct = 0;
-        for (i = g.bases[(int) oclass]; i <= g.bases[oclass + 1] - 1; ++i) {
-            if ((dis = g.disco[i]) != 0 && interesting_to_discover(dis)) {
+        for (i = gb.bases[(int) oclass]; i <= gb.bases[oclass + 1] - 1; ++i) {
+            if ((dis = gd.disco[i]) != 0 && interesting_to_discover(dis)) {
                 ++ct;
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
                 if (lootsort)
@@ -964,9 +964,9 @@ rename_disco(void)
     for (s = flags.inv_order; *s; s++) {
         oclass = *s;
         prev_class = oclass + 1; /* forced different from oclass */
-        for (i = g.bases[(int) oclass];
+        for (i = gb.bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; i++) {
-            dis = g.disco[i];
+            dis = gd.disco[i];
             if (!dis || !interesting_to_discover(dis))
                 continue;
             ct++;

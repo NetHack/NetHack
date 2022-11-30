@@ -695,7 +695,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("Who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("Who are you?", gp.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }
@@ -1243,7 +1243,7 @@ void
 mswin_update_inventory(int arg)
 {
     logDebug("mswin_update_inventory(%d)\n", arg);
-    if (iflags.perm_invent && g.program_state.something_worth_saving
+    if (iflags.perm_invent && gp.program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -1937,12 +1937,12 @@ mswin_outrip(winid wid, int how, time_t when)
     }
 
     /* Put name on stone */
-    Sprintf(buf, "%s", g.plname);
+    Sprintf(buf, "%s", gp.plname);
     buf[STONE_LINE_LEN] = 0;
     putstr(wid, 0, buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", g.done_money);
+    Sprintf(buf, "%ld Au", gd.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     putstr(wid, 0, buf);
 
@@ -2829,7 +2829,7 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
-    if (g.program_state.exiting && !strcmp(text, "\n"))
+    if (gp.program_state.exiting && !strcmp(text, "\n"))
         text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);

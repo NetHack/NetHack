@@ -581,10 +581,10 @@ SanePositions(void)
     rmsg.top = rbase.bottom + 2;
     rmsg.bottom = rmsg.top + height;
     rmsg.left = rbase.left;
-    rmsg.right = rbase.right;
+    rmsgr.right = rbase.right;
     RetrievePosition(kMessageWindow, &rmsg.top, &rmsg.left);
     if (RetrieveSize(kMessageWindow, rmsg.top, rmsg.left, &height, &width)) {
-        rmsg.right = rmsg.left + width;
+        rmsgr.right = rmsg.left + width;
         rmsg.bottom = rmsg.top + height;
     }
     SetWindowBounds(theWindows[NHW_MESSAGE].its_window, kWindowContentRgn,

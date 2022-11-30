@@ -366,7 +366,7 @@ mplayer_talk(register struct monst* mtmp)
     if (mtmp->mpeaceful)
         return; /* will drop to humanoid talk */
 
-    verbalize("Talk? -- %s", mtmp->data == &mons[g.urole.mnum]
+    verbalize("Talk? -- %s", mtmp->data == &mons[gu.urole.mnum]
                                 ? same_class_msg[rn2(3)]
                                 : other_class_msg[rn2(3)]);
 }

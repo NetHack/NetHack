@@ -21,9 +21,9 @@
  *  couldsee()  - Returns true if the hero has a clear line of sight to
  *                the location.
  */
-#define cansee(x, y) ((g.viz_array[y][x] & IN_SIGHT) != 0)
-#define couldsee(x, y) ((g.viz_array[y][x] & COULD_SEE) != 0)
-#define templit(x, y) ((g.viz_array[y][x] & TEMP_LIT) != 0)
+#define cansee(x, y) ((gv.viz_array[y][x] & IN_SIGHT) != 0)
+#define couldsee(x, y) ((gv.viz_array[y][x] & COULD_SEE) != 0)
+#define templit(x, y) ((gv.viz_array[y][x] & TEMP_LIT) != 0)
 
 /*
  *  The following assume the monster is not blind.

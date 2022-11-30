@@ -501,7 +501,7 @@ Gem_player_selection()
 void
 Gem_askname()
 {
-    strncpy(g.plname, mar_ask_name(), PL_NSIZ);
+    strncpy(gp.plname, mar_ask_name(), PL_NSIZ);
 }
 
 void
@@ -1078,7 +1078,7 @@ time_t when;
     }
     /* Follows same algorithm as genl_outrip() */
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%s", g.plname);
+    Sprintf(rip_line[NAME_LINE], "%s", gp.plname);
     /* Put $ on stone */
     Sprintf(rip_line[GOLD_LINE], "%ld Au", done_money);
     /* Put together death description */

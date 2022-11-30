@@ -246,7 +246,7 @@ m_initweap(register struct monst *mtmp)
                 break;
             }
             if (mm == PM_ELVEN_MONARCH) {
-                if (rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
+                if (rn2(3) || (gi.in_mklev && Is_earthlevel(&u.uz)))
                     (void) mongets(mtmp, PICK_AXE);
                 if (!rn2(50))
                     (void) mongets(mtmp, CRYSTAL_BALL);
@@ -717,7 +717,7 @@ m_initinv(register struct monst *mtmp)
         break;
     case S_GIANT:
         if (ptr == &mons[PM_MINOTAUR]) {
-            if (!rn2(3) || (g.in_mklev && Is_earthlevel(&u.uz)))
+            if (!rn2(3) || (gi.in_mklev && Is_earthlevel(&u.uz)))
                 (void) mongets(mtmp, WAN_DIGGING);
         } else if (is_giant(ptr)) {
             for (cnt = rn2((int) (mtmp->m_lev / 2)); cnt; cnt--) {
@@ -787,7 +787,7 @@ m_initinv(register struct monst *mtmp)
         }
         break;
     case S_GNOME:
-        if (!rn2((In_mines(&u.uz) && g.in_mklev) ? 20 : 60)) {
+        if (!rn2((In_mines(&u.uz) && gi.in_mklev) ? 20 : 60)) {
             otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE, TRUE, FALSE);
             otmp->quan = 1;
             otmp->owt = weight(otmp);
@@ -821,7 +821,7 @@ clone_mon(struct monst *mon,
     struct monst *m2;
 
     /* may be too weak or have been extinguished for population control */
-    if (mon->mhp <= 1 || (g.mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
+    if (mon->mhp <= 1 || (gm.mvitals[monsndx(mon->data)].mvflags & G_EXTINCT))
         return (struct monst *) 0;
 
     if (x == 0) {
@@ -885,7 +885,7 @@ clone_mon(struct monst *mon,
     }
 
     /* not all clones caused by player are tame or peaceful */
-    if (!g.context.mon_moving && mon->mpeaceful) {
+    if (!gc.context.mon_moving && mon->mpeaceful) {
         if (mon->mtame)
             m2->mtame = rn2(max(2 + u.uluck, 2)) ? mon->mtame : 0;
         else if (mon->mpeaceful)
@@ -935,23 +935,23 @@ propagate(int mndx, boolean tally, boolean ghostly)
     boolean gone, result;
     int lim = mbirth_limit(mndx);
 
-    gone = (g.mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
-    result = ((int) g.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
+    gone = (gm.mvitals[mndx].mvflags & G_GONE) != 0; /* geno'd|extinct */
+    result = ((int) gm.mvitals[mndx].born < lim && !gone) ? TRUE : FALSE;
 
     /* if it's unique, don't ever make it again */
     if ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
-        g.mvitals[mndx].mvflags |= G_EXTINCT;
+        gm.mvitals[mndx].mvflags |= G_EXTINCT;
 
-    if (g.mvitals[mndx].born < 255 && tally && (!ghostly || result))
-        g.mvitals[mndx].born++;
-    if ((int) g.mvitals[mndx].born >= lim
+    if (gm.mvitals[mndx].born < 255 && tally && (!ghostly || result))
+        gm.mvitals[mndx].born++;
+    if ((int) gm.mvitals[mndx].born >= lim
         && !(mons[mndx].geno & G_NOGEN)
-        && !(g.mvitals[mndx].mvflags & G_EXTINCT)) {
+        && !(gm.mvitals[mndx].mvflags & G_EXTINCT)) {
         if (wizard) {
             debugpline1("Automatically extinguished %s.",
                         makeplural(mons[mndx].pmnames[NEUTRAL]));
         }
-        g.mvitals[mndx].mvflags |= G_EXTINCT;
+        gm.mvitals[mndx].mvflags |= G_EXTINCT;
     }
     return result;
 }
@@ -1060,7 +1060,7 @@ makemon_rnd_goodpos(
     do {
         nx = rn1(COLNO - 3, 2);
         ny = rn2(ROWNO);
-        good = (!g.in_mklev && cansee(nx,ny)) ? FALSE
+        good = (!gi.in_mklev && cansee(nx,ny)) ? FALSE
                                               : goodpos(nx, ny, mon, gpflags);
     } while ((++tryct < 50) && !good);
 
@@ -1071,7 +1071,7 @@ makemon_rnd_goodpos(
         coordxy xofs = nx;
         coordxy yofs = ny;
         coordxy dx,dy;
-        int bl = (g.in_mklev || Blind) ? 1 : 0;
+        int bl = (gi.in_mklev || Blind) ? 1 : 0;
 
         for ( ; bl < 2; bl++) {
             if (!bl)
@@ -1086,7 +1086,7 @@ makemon_rnd_goodpos(
                         goto gotgood;
                 }
             if (bl == 0 && (!mon || mon->data->mmove)) {
-                stairway *stway = g.stairs;
+                stairway *stway = gs.stairs;
                 /* all map positions are visible (or not good),
                    try to pick something logical */
                 while (stway) {
@@ -1113,7 +1113,7 @@ makemon_rnd_goodpos(
 /*
  * called with [x,y] = coordinates;
  *      [0,0] means anyplace
- *      [u.ux,u.uy] means: near player (if !g.in_mklev)
+ *      [u.ux,u.uy] means: near player (if !gi.in_mklev)
  *
  *      In case we make a monster group, only return the one at [x,y].
  */
@@ -1150,7 +1150,7 @@ makemon(
             return (struct monst *) 0;
         x = cc.x;
         y = cc.y;
-    } else if (byyou && !g.in_mklev) {
+    } else if (byyou && !gi.in_mklev) {
         if (!enexto_core(&cc, u.ux, u.uy, ptr, gpflags)
             && !enexto_core(&cc, u.ux, u.uy, ptr, gpflags & ~GP_CHECKSCARY))
             return (struct monst *) 0;
@@ -1177,9 +1177,9 @@ makemon(
         mndx = monsndx(ptr);
         /* if you are to make a specific monster and it has
            already been genocided, return */
-        if (g.mvitals[mndx].mvflags & G_GENOD)
+        if (gm.mvitals[mndx].mvflags & G_GENOD)
             return (struct monst *) 0;
-        if (wizard && (g.mvitals[mndx].mvflags & G_EXTINCT)) {
+        if (wizard && (gm.mvitals[mndx].mvflags & G_EXTINCT)) {
             debugpline1("Explicitly creating extinct monster %s.",
                         mons[mndx].pmnames[NEUTRAL]);
         }
@@ -1225,7 +1225,7 @@ makemon(
     mtmp->m_id = next_ident();
     set_mon_data(mtmp, ptr); /* mtmp->data = ptr; */
     if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
-        g.quest_status.leader_m_id = mtmp->m_id;
+        gq.quest_status.leader_m_id = mtmp->m_id;
     mtmp->mnum = mndx;
 
     /* set up level and hit points */
@@ -1242,9 +1242,9 @@ makemon(
        but for ones which can be random, it has already been chosen
        (in role_init(), for possible use by the quest pager code) */
     else if (ptr->msound == MS_LEADER && quest_info(MS_LEADER) == mndx)
-        mtmp->female = g.quest_status.ldrgend;
+        mtmp->female = gq.quest_status.ldrgend;
     else if (ptr->msound == MS_NEMESIS && quest_info(MS_NEMESIS) == mndx)
-        mtmp->female = g.quest_status.nemgend;
+        mtmp->female = gq.quest_status.nemgend;
 
     /* female used to be set randomly here even for neuters on the
        grounds that it was ignored, but after corpses were changed to
@@ -1273,7 +1273,7 @@ makemon(
         break;
     case S_SPIDER:
     case S_SNAKE:
-        if (g.in_mklev)
+        if (gi.in_mklev)
             if (x && y)
                 (void) mkobj_at(RANDOM_CLASS, x, y, TRUE);
         (void) hideunder(mtmp);
@@ -1332,8 +1332,8 @@ makemon(
             allow_minvent = FALSE;
     } else if (mndx == PM_WIZARD_OF_YENDOR) {
         mtmp->iswiz = TRUE;
-        g.context.no_of_wizards++;
-        if (g.context.no_of_wizards == 1 && Is_earthlevel(&u.uz))
+        gc.context.no_of_wizards++;
+        if (gc.context.no_of_wizards == 1 && Is_earthlevel(&u.uz))
             mitem = SPE_DIG;
     } else if (mndx == PM_GHOST && !(mmflags & MM_NONAME)) {
         mtmp = christen_monst(mtmp, rndghostname());
@@ -1347,7 +1347,7 @@ makemon(
     if (mitem && allow_minvent)
         (void) mongets(mtmp, mitem);
 
-    if (g.in_mklev) {
+    if (gi.in_mklev) {
         if ((is_ndemon(ptr) || mndx == PM_WUMPUS
              || mndx == PM_LONG_WORM || mndx == PM_GIANT_EEL)
             && !u.uhave.amulet && rn2(5))
@@ -1430,10 +1430,10 @@ makemon(
             mtmp->mstrategy |= STRAT_APPEARMSG;
     }
 
-    if (allow_minvent && g.migrating_objs)
+    if (allow_minvent && gm.migrating_objs)
         deliver_obj_to_mon(mtmp, 1, DF_NONE); /* in case of waiting items */
 
-    if (!g.in_mklev) {
+    if (!gi.in_mklev) {
         newsym(mtmp->mx, mtmp->my); /* make sure the mon shows up */
         if (!(mmflags & MM_NOMSG)) {
             char mbuf[BUFSZ], *what = 0;
@@ -1460,7 +1460,7 @@ makemon(
                       exclaim ? '!' : '.');
         }
         /* if discernable and a threat, stop fiddling while Rome burns */
-        if (g.occupation)
+        if (go.occupation)
             (void) dochugw(mtmp, FALSE);
 
         /* TODO: unify with teleport appears msg */
@@ -1482,10 +1482,10 @@ unmakemon(
        that just happened when creating this monster or the threshold
        had already been reached and further increments were suppressed;
        assume the latter */
-    if (countbirth && g.mvitals[mndx].born > 0 && g.mvitals[mndx].born < 255)
-        g.mvitals[mndx].born -= 1;
+    if (countbirth && gm.mvitals[mndx].born > 0 && gm.mvitals[mndx].born < 255)
+        gm.mvitals[mndx].born -= 1;
     if ((mon->data->geno & G_UNIQ) != 0)
-        g.mvitals[mndx].mvflags &= ~G_EXTINCT;
+        gm.mvitals[mndx].mvflags &= ~G_EXTINCT;
 
     mon->mhp = 0; /* let discard_minvent() know that mon isn't being kept */
     /* uncreate any artifact that the monster was provided with; unlike
@@ -1553,7 +1553,7 @@ uncommon(int mndx)
 {
     if (mons[mndx].geno & (G_NOGEN | G_UNIQ))
         return TRUE;
-    if (g.mvitals[mndx].mvflags & G_GONE)
+    if (gm.mvitals[mndx].mvflags & G_GONE)
         return TRUE;
     if (Inhell)
         return (boolean) (mons[mndx].maligntyp > A_NEUTRAL);
@@ -1573,11 +1573,11 @@ align_shift(register struct permonst *ptr)
     static NEARDATA s_level *lev;
     register int alshift;
 
-    if (oldmoves != g.moves) {
+    if (oldmoves != gm.moves) {
         lev = Is_special(&u.uz);
-        oldmoves = g.moves;
+        oldmoves = gm.moves;
     }
-    switch ((lev) ? lev->flags.align : g.dungeons[u.uz.dnum].flags.align) {
+    switch ((lev) ? lev->flags.align : gd.dungeons[u.uz.dnum].flags.align) {
     default: /* just in case */
     case AM_NONE:
         alshift = 0;
@@ -1684,7 +1684,7 @@ mk_gen_ok(int mndx, unsigned mvflagsmask, unsigned genomask)
 {
     struct permonst *ptr = &mons[mndx];
 
-    if (g.mvitals[mndx].mvflags & mvflagsmask)
+    if (gm.mvitals[mndx].mvflags & mvflagsmask)
         return FALSE;
     if (ptr->geno & genomask)
         return FALSE;
@@ -1780,7 +1780,7 @@ mkclass_aligned(char class, int spc, /* special mons[].geno handling */
                    against picking the next demon resulted in incubus
                    being picked nearly twice as often as sucubus);
                    we need the '+1' in case the entire set is too high
-                   level (really low g.level hero) */
+                   level (really low gl.level hero) */
                 nums[last] = k + 1 - (adj_lev(&mons[last]) > (u.ulevel * 2));
                 num += nums[last];
             }
@@ -1844,7 +1844,7 @@ adj_lev(register struct permonst *ptr)
         /* does not depend on other strengths, but does get stronger
          * every time he is killed
          */
-        tmp = ptr->mlevel + g.mvitals[PM_WIZARD_OF_YENDOR].died;
+        tmp = ptr->mlevel + gm.mvitals[PM_WIZARD_OF_YENDOR].died;
         if (tmp > 49)
             tmp = 49;
         return tmp;
@@ -1945,12 +1945,12 @@ grow_up(struct monst *mtmp, struct monst *victim)
         /* new form might force gender change */
         fem = is_male(ptr) ? 0 : is_female(ptr) ? 1 : mtmp->female;
 
-        if (g.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
+        if (gm.mvitals[newtype].mvflags & G_GENOD) { /* allow G_EXTINCT */
             if (canspotmon(mtmp))
                 pline("As %s grows up into %s, %s %s!", mon_nam(mtmp),
                       an(pmname(ptr, Mgender(mtmp))), mhe(mtmp),
                       nonliving(ptr) ? "expires" : "dies");
-            set_mon_data(mtmp, ptr); /* keep g.mvitals[] accurate */
+            set_mon_data(mtmp, ptr); /* keep gm.mvitals[] accurate */
             mondied(mtmp);
             return (struct permonst *) 0;
         } else if (canspotmon(mtmp)) {
@@ -2226,7 +2226,7 @@ set_mimic_sym(register struct monst *mtmp)
     /* only valid for INSIDE of room */
     roomno = levl[mx][my].roomno - ROOMOFFSET;
     if (roomno >= 0)
-        rt = g.rooms[roomno].rtype;
+        rt = gr.rooms[roomno].rtype;
 #ifdef SPECIALIZATION
     else if (IS_ROOM(typ))
         rt = OROOM, roomno = 0;
@@ -2236,7 +2236,7 @@ set_mimic_sym(register struct monst *mtmp)
 
     if (OBJ_AT(mx, my)) {
         ap_type = M_AP_OBJECT;
-        appear = g.level.objects[mx][my]->otyp;
+        appear = gl.level.objects[mx][my]->otyp;
     } else if (IS_DOOR(typ) || IS_WALL(typ) || typ == SDOOR || typ == SCORR) {
         ap_type = M_AP_FURNITURE;
         /*
@@ -2256,7 +2256,7 @@ set_mimic_sym(register struct monst *mtmp)
             appear = Is_rogue_level(&u.uz) ? S_hwall : S_hcdoor;
         else
             appear = Is_rogue_level(&u.uz) ? S_vwall : S_vcdoor;
-    } else if (g.level.flags.is_maze_lev
+    } else if (gl.level.flags.is_maze_lev
                && !(In_mines(&u.uz) && in_town(u.ux, u.uy))
                && !In_sokoban(&u.uz) && rn2(2)) {
         ap_type = M_AP_OBJECT;
@@ -2336,7 +2336,7 @@ set_mimic_sym(register struct monst *mtmp)
         && (appear == STATUE || appear == FIGURINE
             || appear == CORPSE || appear == EGG || appear == TIN)) {
         int mndx = rndmonnum(),
-            nocorpse_ndx = (g.mvitals[mndx].mvflags & G_NOCORPSE) != 0;
+            nocorpse_ndx = (gm.mvitals[mndx].mvflags & G_NOCORPSE) != 0;
 
         if (appear == CORPSE && nocorpse_ndx)
             mndx = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
@@ -2348,7 +2348,7 @@ set_mimic_sym(register struct monst *mtmp)
         MCORPSENM(mtmp) = mndx;
     } else if (ap_type == M_AP_OBJECT && appear == SLIME_MOLD) {
         newmcorpsenm(mtmp);
-        MCORPSENM(mtmp) = g.context.current_fruit;
+        MCORPSENM(mtmp) = gc.context.current_fruit;
         /* if no objects of this fruit type have been created yet,
            context.current_fruit is available for re-use when the player
            assigns a new fruit name; override that--having a mimic as the

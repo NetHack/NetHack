@@ -275,10 +275,10 @@ typedef struct sortloot_item Loot;
 
 #define MATCH_WARN_OF_MON(mon) \
     (Warn_of_mon                                                        \
-     && ((g.context.warntype.obj & (mon)->data->mflags2) != 0           \
-         || (g.context.warntype.polyd & (mon)->data->mflags2) != 0      \
-         || (g.context.warntype.species                                 \
-             && (g.context.warntype.species == (mon)->data))))
+     && ((gc.context.warntype.obj & (mon)->data->mflags2) != 0           \
+         || (gc.context.warntype.polyd & (mon)->data->mflags2) != 0      \
+         || (gc.context.warntype.species                                 \
+             && (gc.context.warntype.species == (mon)->data))))
 
 typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
@@ -415,7 +415,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */
 #define FM_MIGRATE 0x02 /* search the migrating monster chain */
-#define FM_MYDOGS 0x04  /* search g.mydogs */
+#define FM_MYDOGS 0x04  /* search gm.mydogs */
 #define FM_EVERYWHERE (FM_FMON | FM_MIGRATE | FM_MYDOGS)
 
 /* Flags to control pick_[race,role,gend,align] routines in role.c */

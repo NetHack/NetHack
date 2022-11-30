@@ -104,7 +104,7 @@ setworn(struct obj *obj, long mask)
         if (obj && (obj->owornmask & W_ARMOR) != 0L)
             u.uroleplay.nudist = FALSE;
         /* tux -> tuxedo -> "monkey suit" -> monk's suit */
-        iflags.tux_penalty = (uarm && Role_if(PM_MONK) && g.urole.spelarmr);
+        iflags.tux_penalty = (uarm && Role_if(PM_MONK) && gu.urole.spelarmr);
     }
     update_inventory();
 }
@@ -263,7 +263,7 @@ mon_adjust_speed(
     struct obj *obj)   /* item to make known if effect can be seen */
 {
     struct obj *otmp;
-    boolean give_msg = !g.in_mklev, petrify = FALSE;
+    boolean give_msg = !gi.in_mklev, petrify = FALSE;
     unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
@@ -369,11 +369,11 @@ update_mon_extrinsics(
             mon->minvis = !mon->invis_blkd;
             break;
         case FAST: {
-            boolean save_in_mklev = g.in_mklev;
+            boolean save_in_mklev = gi.in_mklev;
             if (silently)
-                g.in_mklev = TRUE;
+                gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
-            g.in_mklev = save_in_mklev;
+            gi.in_mklev = save_in_mklev;
             break;
         }
         /* properties handled elsewhere */
@@ -411,11 +411,11 @@ update_mon_extrinsics(
             mon->minvis = mon->perminvis;
             break;
         case FAST: {
-            boolean save_in_mklev = g.in_mklev;
+            boolean save_in_mklev = gi.in_mklev;
             if (silently)
-                g.in_mklev = TRUE;
+                gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
-            g.in_mklev = save_in_mklev;
+            gi.in_mklev = save_in_mklev;
             break;
         }
         case FIRE_RES:
@@ -763,7 +763,7 @@ m_dowear_type(
 struct obj *
 which_armor(struct monst *mon, long flag)
 {
-    if (mon == &g.youmonst) {
+    if (mon == &gy.youmonst) {
         switch (flag) {
         case W_ARM:
             return uarm;
@@ -818,7 +818,7 @@ clear_bypass(struct obj *objchn)
 
 /* all objects with their bypass bit set should now be reset to normal;
    this can be a relatively expensive operation so is only called if
-   g.context.bypasses is set */
+   gc.context.bypasses is set */
 void
 clear_bypasses(void)
 {
@@ -827,15 +827,15 @@ clear_bypasses(void)
     /*
      * 'Object' bypass is also used for one monster function:
      * polymorph control of long worms.  Activated via setting
-     * g.context.bypasses even if no specific object has been
+     * gc.context.bypasses even if no specific object has been
      * bypassed.
      */
 
     clear_bypass(fobj);
-    clear_bypass(g.invent);
-    clear_bypass(g.migrating_objs);
-    clear_bypass(g.level.buriedobjlist);
-    clear_bypass(g.billobjs);
+    clear_bypass(gi.invent);
+    clear_bypass(gm.migrating_objs);
+    clear_bypass(gl.level.buriedobjlist);
+    clear_bypass(gb.billobjs);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
@@ -848,14 +848,14 @@ clear_bypasses(void)
         if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp))
             MCORPSENM(mtmp) = NON_PM;
     }
-    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         clear_bypass(mtmp->minvent);
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
     /* this is a no-op since mydogs is only non-Null during level change or
        final ascension and we aren't called at those times, but be thorough */
-    for (mtmp = g.mydogs; mtmp; mtmp = mtmp->nmon)
+    for (mtmp = gm.mydogs; mtmp; mtmp = mtmp->nmon)
         clear_bypass(mtmp->minvent);
     /* ball and chain can be "floating", not on any object chain (when
        hero is swallowed by an engulfing monster, for instance) */
@@ -864,14 +864,14 @@ clear_bypasses(void)
     if (uchain)
         uchain->bypass = 0;
 
-    g.context.bypasses = FALSE;
+    gc.context.bypasses = FALSE;
 }
 
 void
 bypass_obj(struct obj *obj)
 {
     obj->bypass = 1;
-    g.context.bypasses = TRUE;
+    gc.context.bypasses = TRUE;
 }
 
 /* set or clear the bypass bit in a list of objects */
@@ -881,7 +881,7 @@ bypass_objlist(
     boolean on) /* TRUE => set, FALSE => clear */
 {
     if (on && objchain)
-        g.context.bypasses = TRUE;
+        gc.context.bypasses = TRUE;
     while (objchain) {
         objchain->bypass = on ? 1 : 0;
         objchain = objchain->nobj;

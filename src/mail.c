@@ -153,7 +153,7 @@ md_start(coord *startp)
     int lax;          /* if TRUE, pick a position in sight. */
     int dd;           /* distance to current point */
     int max_distance; /* max distance found so far */
-    stairway *stway = g.stairs;
+    stairway *stway = gs.stairs;
 
     /*
      * If blind and not telepathic, then it doesn't matter what we pick ---
@@ -184,23 +184,23 @@ md_start(coord *startp)
      * position that could be seen.  What we really ought to be doing is
      * finding a path from a stairwell...
      *
-     * The arrays g.viz_rmin[] and g.viz_rmax[] are set even when blind.  These
+     * The arrays gv.viz_rmin[] and gv.viz_rmax[] are set even when blind.  These
      * are the LOS limits for each row.
      */
     lax = 0; /* be picky */
     max_distance = -1;
  retry:
     for (row = 0; row < ROWNO; row++) {
-        if (g.viz_rmin[row] < g.viz_rmax[row]) {
+        if (gv.viz_rmin[row] < gv.viz_rmax[row]) {
             /* There are valid positions on this row. */
-            dd = distu(g.viz_rmin[row], row);
+            dd = distu(gv.viz_rmin[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = g.viz_rmin[row];
+                    startp->x = gv.viz_rmin[row];
 
-                } else if (enexto(&testcc, (coordxy) g.viz_rmin[row], row,
+                } else if (enexto(&testcc, (coordxy) gv.viz_rmin[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -208,14 +208,14 @@ md_start(coord *startp)
                     *startp = testcc;
                 }
             }
-            dd = distu(g.viz_rmax[row], row);
+            dd = distu(gv.viz_rmax[row], row);
             if (dd > max_distance) {
                 if (lax) {
                     max_distance = dd;
                     startp->y = row;
-                    startp->x = g.viz_rmax[row];
+                    startp->x = gv.viz_rmax[row];
 
-                } else if (enexto(&testcc, (coordxy) g.viz_rmax[row], row,
+                } else if (enexto(&testcc, (coordxy) gv.viz_rmax[row], row,
                                   (struct permonst *) 0)
                            && !cansee(testcc.x, testcc.y)
                            && couldsee(testcc.x, testcc.y)) {
@@ -403,7 +403,7 @@ newmail(struct mail_info *info)
         goto go_back;
 
     message_seen = TRUE;
-    verbalize("%s, %s!  %s.", Hello(md), g.plname, info->display_txt);
+    verbalize("%s, %s!  %s.", Hello(md), gp.plname, info->display_txt);
 
     if (info->message_typ) {
         struct obj *obj = mksobj(SCR_MAIL, FALSE, FALSE);
@@ -442,7 +442,7 @@ ckmailstatus(void)
         return;
     if (mustgetmail < 0) {
 #if defined(AMIGA) || defined(MSDOS) || defined(TOS)
-        mustgetmail = (g.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
+        mustgetmail = (gm.moves < 2000) ? (100 + rn2(2000)) : (2000 + rn2(3000));
 #endif
         return;
     }
@@ -528,12 +528,12 @@ ckmailstatus(void)
 
     if (!mailbox || u.uswallow || !flags.biff
 #ifdef MAILCKFREQ
-        || g.moves < laststattime + MAILCKFREQ
+        || gm.moves < laststattime + MAILCKFREQ
 #endif
         )
         return;
 
-    laststattime = g.moves;
+    laststattime = gm.moves;
     if (stat(mailbox, &nmstat)) {
 #ifdef PERMANENT_MAILBOX
         pline("Cannot get status of MAIL=\"%s\" anymore.", mailbox);
@@ -663,8 +663,8 @@ ck_server_admin_msg(void)
     static struct stat ost,nst;
     static long lastchk = 0;
 
-    if (g.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
-    lastchk = g.moves;
+    if (gm.moves < lastchk + SERVER_ADMIN_MSG_CKFREQ) return;
+    lastchk = gm.moves;
 
     if (!stat(SERVER_ADMIN_MSG, &nst)) {
         if (nst.st_mtime > ost.st_mtime)

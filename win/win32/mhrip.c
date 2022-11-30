@@ -227,7 +227,7 @@ NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetNHApp()->hMainWnd = NULL;
         DestroyWindow(hWnd);
         SetFocus(GetNHApp()->hMainWnd);
-        g.program_state.stopprint++;
+        gp.program_state.stopprint++;
         return TRUE;
 
     case WM_DESTROY:

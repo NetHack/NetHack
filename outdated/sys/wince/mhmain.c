@@ -826,7 +826,7 @@ mswin_layout_main_window(HWND changed_child)
         /* show command window only if it exists and
            the game is ready (plname is set) */
         if (GetNHApp()->bCmdPad && cmd_size.cx > 0 && cmd_size.cy > 0
-            && *g.plname) {
+            && *gp.plname) {
             MoveWindow(GetNHApp()->hCmdWnd, cmd_org.x, cmd_org.y, cmd_size.cx,
                        cmd_size.cy, TRUE);
             ShowWindow(GetNHApp()->hCmdWnd, SW_SHOW);

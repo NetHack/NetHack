@@ -39,7 +39,7 @@ static int pickup_checks(void);
 static boolean doorless_door(coordxy, coordxy);
 static void maybe_wail(void);
 
-#define IS_SHOP(x) (g.rooms[x].rtype >= SHOPBASE)
+#define IS_SHOP(x) (gr.rooms[x].rtype >= SHOPBASE)
 
 /* XXX: if more sources of water walking than just boots are added,
    cause_known(insight.c) should be externified and used for this */
@@ -59,33 +59,33 @@ static void maybe_wail(void);
 anything *
 uint_to_any(unsigned ui)
 {
-    g.tmp_anything = cg.zeroany;
-    g.tmp_anything.a_uint = ui;
-    return &g.tmp_anything;
+    gt.tmp_anything = cg.zeroany;
+    gt.tmp_anything.a_uint = ui;
+    return &gt.tmp_anything;
 }
 
 anything *
 long_to_any(long lng)
 {
-    g.tmp_anything = cg.zeroany;
-    g.tmp_anything.a_long = lng;
-    return &g.tmp_anything;
+    gt.tmp_anything = cg.zeroany;
+    gt.tmp_anything.a_long = lng;
+    return &gt.tmp_anything;
 }
 
 anything *
 monst_to_any(struct monst *mtmp)
 {
-    g.tmp_anything = cg.zeroany;
-    g.tmp_anything.a_monst = mtmp;
-    return &g.tmp_anything;
+    gt.tmp_anything = cg.zeroany;
+    gt.tmp_anything.a_monst = mtmp;
+    return &gt.tmp_anything;
 }
 
 anything *
 obj_to_any(struct obj *obj)
 {
-    g.tmp_anything = cg.zeroany;
-    g.tmp_anything.a_obj = obj;
-    return &g.tmp_anything;
+    gt.tmp_anything = cg.zeroany;
+    gt.tmp_anything.a_obj = obj;
+    return &gt.tmp_anything;
 }
 
 boolean
@@ -96,7 +96,7 @@ revive_nasty(coordxy x, coordxy y, const char *msg)
     coord cc;
     boolean revived = FALSE;
 
-    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp2) {
+    for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp2) {
         otmp2 = otmp->nexthere;
         if (otmp->otyp == CORPSE
             && (is_rider(&mons[otmp->corpsenm])
@@ -123,7 +123,7 @@ revive_nasty(coordxy x, coordxy y, const char *msg)
     return revived;
 }
 
-#define squeezeablylightinvent() (!g.invent || inv_weight() <= -850)
+#define squeezeablylightinvent() (!gi.invent || inv_weight() <= -850)
 
 /* can hero move onto a spot containing one or more boulders?
    used for m<dir> and travel and during boulder push failure */
@@ -138,11 +138,11 @@ could_move_onto_boulder(coordxy sx, coordxy sy)
         return FALSE;
     /* can if a giant, unless doing so allows hero to pass into a
        diagonal squeeze at the same time */
-    if (throws_rocks(g.youmonst.data))
+    if (throws_rocks(gy.youmonst.data))
         return (!u.dx || !u.dy || !(IS_ROCK(levl[u.ux][sy].typ)
                                     && IS_ROCK(levl[sx][u.uy].typ)));
     /* can if tiny (implies carrying very little else couldn't move at all) */
-    if (verysmall(g.youmonst.data))
+    if (verysmall(gy.youmonst.data))
         return TRUE;
     /* can squeeze to spot if carrying extremely little, otherwise can't */
     return squeezeablylightinvent();
@@ -180,7 +180,7 @@ moverock(void)
         firstboulder = FALSE;
 
         /* make sure that this boulder is visible as the top object */
-        if (otmp != g.level.objects[sx][sy])
+        if (otmp != gl.level.objects[sx][sy])
             movobj(otmp, sx, sy);
 
         rx = u.ux + 2 * u.dx; /* boulder destination position */
@@ -191,11 +191,11 @@ moverock(void)
            poly'd into a giant or squeezes under/beside it if small/light
            enough but is a no-op in other circumstances unless move attempt
            reveals an unseen boulder or lack of remembered, unseen monster */
-        if (g.context.nopick) {
+        if (gc.context.nopick) {
             int oldglyph = glyph_at(sx, sy); /* before feel_location() */
 
             feel_location(sx, sy); /* same for all 3 if/else-if/else cases */
-            if (throws_rocks(g.youmonst.data)) {
+            if (throws_rocks(gy.youmonst.data)) {
                 /* player has used 'm<dir>' to move, so step to boulder's
                    spot without pushing it; hero is poly'd into a giant,
                    so exotic forms of locomotion are out, but might be
@@ -214,7 +214,7 @@ moverock(void)
                 /* use a move if hero learns something; see test_move() for
                    how/why 'context.door_opened' is being dragged into this */
                 if (glyph_at(sx, sy) != oldglyph)
-                    g.context.door_opened = g.context.move = TRUE;
+                    gc.context.door_opened = gc.context.move = TRUE;
                 res = -1; /* don't move to <sx,sy>, so no soko guilt */
             }
             goto moverock_done; /* stop further push attempts */
@@ -231,7 +231,7 @@ moverock(void)
             res = -1;
             goto moverock_done;
         }
-        if (verysmall(g.youmonst.data) && !u.usteed) {
+        if (verysmall(gy.youmonst.data) && !u.usteed) {
             if (Blind)
                 feel_location(sx, sy);
             pline("You're too small to push that %s.", xname(otmp));
@@ -332,7 +332,7 @@ moverock(void)
                        the pit will temporarily be seen even
                        if this is one among multiple boulders */
                     if (!Blind)
-                        g.viz_array[ry][rx] |= IN_SIGHT;
+                        gv.viz_array[ry][rx] |= IN_SIGHT;
                     if (!flooreffects(otmp, rx, ry, "fall")) {
                         place_object(otmp, rx, ry);
                     }
@@ -421,15 +421,15 @@ moverock(void)
                 if (!u.usteed) {
                     /* FIXME: also remember boulder->o_id and override
                        lastmovetime if this is a different boulder */
-                    if (g.moves > lastmovetime + 2 || g.moves < lastmovetime)
+                    if (gm.moves > lastmovetime + 2 || gm.moves < lastmovetime)
                         pline("With %s effort you move %s.",
-                              throws_rocks(g.youmonst.data) ? "little"
+                              throws_rocks(gy.youmonst.data) ? "little"
                                                             : "great",
                               what);
                     exercise(A_STR, TRUE);
                 } else
                     pline("%s moves %s.", upstart(y_monnam(u.usteed)), what);
-                lastmovetime = g.moves;
+                lastmovetime = gm.moves;
             }
 
             /* Move the boulder *after* the message. */
@@ -463,7 +463,7 @@ moverock(void)
             if (Blind)
                 feel_location(sx, sy);
  cannot_push:
-            if (throws_rocks(g.youmonst.data)) {
+            if (throws_rocks(gy.youmonst.data)) {
                 boolean
                     canpickup = (!Sokoban
                                  /* similar exception as in can_lift():
@@ -473,7 +473,7 @@ moverock(void)
                                     unless already carrying at least one */
                               && (inv_cnt(FALSE) < 52 || !carrying(BOULDER))),
                     willpickup = (canpickup
-                                  && (flags.pickup && !g.context.nopick)
+                                  && (flags.pickup && !gc.context.nopick)
                                   && autopick_testobj(otmp, TRUE));
 
                 if (u.usteed && P_SKILL(P_RIDING) < P_BASIC) {
@@ -517,7 +517,7 @@ moverock(void)
     res = 0;
 
  moverock_done:
-    for (otmp = g.level.objects[sx][sy]; otmp; otmp = otmp->nexthere)
+    for (otmp = gl.level.objects[sx][sy]; otmp; otmp = otmp->nexthere)
         if (otmp->otyp == BOULDER)
             otmp->next_boulder = 0; /* resume normal xname() for this obj */
 
@@ -537,8 +537,8 @@ still_chewing(coordxy x, coordxy y)
     struct obj *boulder = sobj_at(BOULDER, x, y);
     const char *digtxt = (char *) 0, *dmgtxt = (char *) 0;
 
-    if (g.context.digging.down) /* not continuing previous dig (w/ pick-axe) */
-        (void) memset((genericptr_t) &g.context.digging, 0,
+    if (gc.context.digging.down) /* not continuing previous dig (w/ pick-axe) */
+        (void) memset((genericptr_t) &gc.context.digging, 0,
                       sizeof (struct dig_info));
 
     if (!boulder
@@ -554,23 +554,23 @@ still_chewing(coordxy x, coordxy y)
         nomul(0);
         return 1;
     } else if (lev->typ == IRONBARS
-               && metallivorous(g.youmonst.data) && u.uhunger > 1500) {
+               && metallivorous(gy.youmonst.data) && u.uhunger > 1500) {
         /* finishing eating via 'morehungry()' doesn't handle choking */
         You("are too full to eat the bars.");
         nomul(0);
         return 1;
-    } else if (!g.context.digging.chew
-               || g.context.digging.pos.x != x
-               || g.context.digging.pos.y != y
-               || !on_level(&g.context.digging.level, &u.uz)) {
-        g.context.digging.down = FALSE;
-        g.context.digging.chew = TRUE;
-        g.context.digging.warned = FALSE;
-        g.context.digging.pos.x = x;
-        g.context.digging.pos.y = y;
-        assign_level(&g.context.digging.level, &u.uz);
+    } else if (!gc.context.digging.chew
+               || gc.context.digging.pos.x != x
+               || gc.context.digging.pos.y != y
+               || !on_level(&gc.context.digging.level, &u.uz)) {
+        gc.context.digging.down = FALSE;
+        gc.context.digging.chew = TRUE;
+        gc.context.digging.warned = FALSE;
+        gc.context.digging.pos.x = x;
+        gc.context.digging.pos.y = y;
+        assign_level(&gc.context.digging.level, &u.uz);
         /* solid rock takes more work & time to dig through */
-        g.context.digging.effort =
+        gc.context.digging.effort =
             (IS_ROCK(lev->typ) && !IS_TREE(lev->typ) ? 30 : 60) + u.udaminc;
         You("start chewing %s %s.",
             (boulder || IS_TREE(lev->typ) || lev->typ == IRONBARS)
@@ -587,10 +587,10 @@ still_chewing(coordxy x, coordxy y)
                             : "door");
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
-    } else if ((g.context.digging.effort += (30 + u.udaminc)) <= 100) {
+    } else if ((gc.context.digging.effort += (30 + u.udaminc)) <= 100) {
         if (Verbose(1, still_chewing))
             You("%s chewing on the %s.",
-                g.context.digging.chew ? "continue" : "begin",
+                gc.context.digging.chew ? "continue" : "begin",
                 boulder
                     ? "boulder"
                     : IS_TREE(lev->typ)
@@ -600,7 +600,7 @@ still_chewing(coordxy x, coordxy y)
                             : (lev->typ == IRONBARS)
                                 ? "bars"
                                 : "door");
-        g.context.digging.chew = TRUE;
+        gc.context.digging.chew = TRUE;
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     }
@@ -631,7 +631,7 @@ still_chewing(coordxy x, coordxy y)
             || sobj_at(BOULDER, x, y)) {
             block_point(x, y); /* delobj will unblock the point */
             /* reset dig state */
-            (void) memset((genericptr_t) &g.context.digging, 0,
+            (void) memset((genericptr_t) &gc.context.digging, 0,
                           sizeof (struct dig_info));
             return 1;
         }
@@ -642,9 +642,9 @@ still_chewing(coordxy x, coordxy y)
             dmgtxt = "damage";
         }
         digtxt = "chew a hole in the wall.";
-        if (g.level.flags.is_maze_lev) {
+        if (gl.level.flags.is_maze_lev) {
             lev->typ = ROOM;
-        } else if (g.level.flags.is_cavernous_lev && !in_town(x, y)) {
+        } else if (gl.level.flags.is_cavernous_lev && !in_town(x, y)) {
             lev->typ = CORR;
         } else {
             lev->typ = DOOR;
@@ -654,7 +654,7 @@ still_chewing(coordxy x, coordxy y)
         digtxt = "chew through the tree.";
         lev->typ = ROOM;
     } else if (lev->typ == IRONBARS) {
-        if (metallivorous(g.youmonst.data)) { /* should always be True here */
+        if (metallivorous(gy.youmonst.data)) { /* should always be True here */
             /* arbitrary amount; unlike proper eating, nutrition is
                bestowed in a lump sum at the end */
             int nut = (int) objects[HEAVY_IRON_BALL].oc_weight;
@@ -703,7 +703,7 @@ still_chewing(coordxy x, coordxy y)
         You1(digtxt); /* after newsym */
     if (dmgtxt)
         pay_for_damage(dmgtxt, FALSE);
-    (void) memset((genericptr_t) &g.context.digging, 0,
+    (void) memset((genericptr_t) &gc.context.digging, 0,
                   sizeof (struct dig_info));
     return 0;
 }
@@ -751,7 +751,7 @@ dosinkfall(void)
         losehp(Maybe_Half_Phys(dmg), fell_on_sink, NO_KILLER_PREFIX);
         exercise(A_DEX, FALSE);
         selftouch("Falling, you");
-        for (obj = g.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
+        for (obj = gl.level.objects[u.ux][u.uy]; obj; obj = obj->nexthere)
             if (obj->oclass == WEAPON_CLASS || is_weptool(obj)) {
                 You("fell on %s.", doname(obj));
                 losehp(Maybe_Half_Phys(rnd(3)), fell_on_sink,
@@ -842,7 +842,7 @@ cant_squeeze_thru(struct monst *mon)
     int amt;
     struct permonst *ptr = mon->data;
 
-    if ((mon == &g.youmonst) ? Passes_walls : passes_walls(ptr))
+    if ((mon == &gy.youmonst) ? Passes_walls : passes_walls(ptr))
         return 0;
 
     /* too big? */
@@ -852,13 +852,13 @@ cant_squeeze_thru(struct monst *mon)
         return 1;
 
     /* lugging too much junk? */
-    amt = (mon == &g.youmonst) ? inv_weight() + weight_cap()
+    amt = (mon == &gy.youmonst) ? inv_weight() + weight_cap()
                                : curr_mon_load(mon);
     if (amt > 600)
         return 2;
 
     /* Sokoban restriction applies to hero only */
-    if (mon == &g.youmonst && Sokoban)
+    if (mon == &gy.youmonst && Sokoban)
         return 3;
 
     /* can squeeze through */
@@ -869,7 +869,7 @@ boolean
 invocation_pos(coordxy x, coordxy y)
 {
     return (boolean) (Invocation_lev(&u.uz)
-                      && x == g.inv_pos.x && y == g.inv_pos.y);
+                      && x == gi.inv_pos.x && y == gi.inv_pos.y);
 }
 
 /* return TRUE if (dx,dy) is an OK place to move;
@@ -885,7 +885,7 @@ test_move(
     struct rm *tmpr = &levl[x][y];
     struct rm *ust;
 
-    g.context.door_opened = FALSE;
+    gc.context.door_opened = FALSE;
     /*
      *  Check for physical obstacles.  First, the place we are going.
      */
@@ -904,22 +904,22 @@ test_move(
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if (mode == DO_MOVE
-                && (dmgtype(g.youmonst.data, AD_RUST)
-                    || dmgtype(g.youmonst.data, AD_CORR)
-                    || metallivorous(g.youmonst.data))
+                && (dmgtype(gy.youmonst.data, AD_RUST)
+                    || dmgtype(gy.youmonst.data, AD_CORR)
+                    || metallivorous(gy.youmonst.data))
                 && still_chewing(x, y)) {
                 return FALSE;
             }
-            if (!(Passes_walls || passes_bars(g.youmonst.data))) {
+            if (!(Passes_walls || passes_bars(gy.youmonst.data))) {
                 if (mode == DO_MOVE && flags.mention_walls)
                     You("cannot pass through the bars.");
                 return FALSE;
             }
-        } else if (tunnels(g.youmonst.data) && !needspick(g.youmonst.data)) {
+        } else if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)) {
             /* Eat the rock. */
             if (mode == DO_MOVE && still_chewing(x, y))
                 return FALSE;
-        } else if (flags.autodig && !g.context.run && !g.context.nopick
+        } else if (flags.autodig && !gc.context.run && !gc.context.nopick
                    && uwep && is_pick(uwep)) {
             /* MRKR: Automatic digging when wielding the appropriate tool */
             if (mode == DO_MOVE)
@@ -957,27 +957,27 @@ test_move(
                 feel_location(x, y);
             if (Passes_walls) {
                 ; /* do nothing */
-            } else if (can_ooze(&g.youmonst)) {
+            } else if (can_ooze(&gy.youmonst)) {
                 if (mode == DO_MOVE)
                     You("ooze under the door.");
             } else if (Underwater) {
                 if (mode == DO_MOVE)
                     pline("There is an obstacle there.");
                 return FALSE;
-            } else if (tunnels(g.youmonst.data)
-                       && !needspick(g.youmonst.data)) {
+            } else if (tunnels(gy.youmonst.data)
+                       && !needspick(gy.youmonst.data)) {
                 /* Eat the door. */
                 if (mode == DO_MOVE && still_chewing(x, y))
                     return FALSE;
             } else {
                 if (mode == DO_MOVE) {
-                    if (amorphous(g.youmonst.data))
+                    if (amorphous(gy.youmonst.data))
                         You(
    "try to ooze under the door, but can't squeeze your possessions through.");
-                    if (flags.autoopen && !g.context.run
+                    if (flags.autoopen && !gc.context.run
                         && !Confusion && !Stunned && !Fumbling) {
-                        g.context.door_opened
-                        = g.context.move
+                        gc.context.door_opened
+                        = gc.context.move
                           = (doopen_indir(x, y) == ECMD_TIME ? 1 : 0);
                     } else if (x == ux || y == uy) {
                         if (Blind || Stunned || ACURR(A_DEX) < 10
@@ -994,7 +994,7 @@ test_move(
                                we haven't opened a door but we're going to
                                return False and without having 'door_opened'
                                set, 'move' would get reset by caller */
-                            g.context.door_opened = g.context.move = TRUE;
+                            gc.context.door_opened = gc.context.move = TRUE;
                             /* since we've just lied about successfully
                                moving, we need to manually stop running */
                             nomul(0);
@@ -1020,10 +1020,10 @@ test_move(
             }
         }
     }
-    if (dx && dy && bad_rock(g.youmonst.data, ux, y)
-        && bad_rock(g.youmonst.data, x, uy)) {
+    if (dx && dy && bad_rock(gy.youmonst.data, ux, y)
+        && bad_rock(gy.youmonst.data, x, uy)) {
         /* Move at a diagonal. */
-        switch (cant_squeeze_thru(&g.youmonst)) {
+        switch (cant_squeeze_thru(&gy.youmonst)) {
         case 3:
             if (mode == DO_MOVE)
                 You("cannot pass that way.");
@@ -1048,7 +1048,7 @@ test_move(
     /* Pick travel path that does not require crossing a trap.
      * Avoid water and lava using the usual running rules.
      * (but not u.ux/u.uy because findtravelpath walks toward u.ux/u.uy) */
-    if (g.context.run == 8 && (mode != DO_MOVE) && !u_at(x, y)) {
+    if (gc.context.run == 8 && (mode != DO_MOVE) && !u_at(x, y)) {
         struct trap *t = t_at(x, y);
 
         if (t && t->tseen && t->ttyp != VIBRATING_SQUARE)
@@ -1083,7 +1083,7 @@ test_move(
     }
 
     if (sobj_at(BOULDER, x, y) && (Sokoban || !Passes_walls)) {
-        if (mode != TEST_TRAV && g.context.run >= 2
+        if (mode != TEST_TRAV && gc.context.run >= 2
             && !(Blind || Hallucination) && !could_move_onto_boulder(x, y)) {
             if (mode == DO_MOVE && flags.mention_walls)
                 pline("A boulder blocks your path.");
@@ -1091,7 +1091,7 @@ test_move(
         }
         if (mode == DO_MOVE) {
             /* tunneling monsters will chew before pushing */
-            if (tunnels(g.youmonst.data) && !needspick(g.youmonst.data)
+            if (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data)
                 && !Sokoban) {
                 if (still_chewing(x, y))
                     return FALSE;
@@ -1108,8 +1108,8 @@ test_move(
             if (sobj_at(BOULDER, ux, uy) && !Sokoban) {
                 if (!Passes_walls
                     && !could_move_onto_boulder(ux, uy)
-                    && !(tunnels(g.youmonst.data)
-                         && !needspick(g.youmonst.data))
+                    && !(tunnels(gy.youmonst.data)
+                         && !needspick(gy.youmonst.data))
                     && !carrying(PICK_AXE) && !carrying(DWARVISH_MATTOCK)
                     && !((obj = carrying(WAN_DIGGING))
                          && !objects[obj->otyp].oc_name_known))
@@ -1128,16 +1128,16 @@ test_move(
  * A shortest path is returned.  If guess is TRUE, consider various
  * inaccessible locations as valid intermediate path points.
  * Returns TRUE if a path was found.
- * g.travelmap keeps track of map locations we've moved through
+ * gt.travelmap keeps track of map locations we've moved through
  * this travel session. It will be cleared once the travel stops.
  */
 static boolean
 findtravelpath(int mode)
 {
-    if (!g.travelmap)
-        g.travelmap = selection_new();
+    if (!gt.travelmap)
+        gt.travelmap = selection_new();
     /* if travel to adjacent, reachable location, use normal movement rules */
-    if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && g.context.travel1
+    if ((mode == TRAVP_TRAVEL || mode == TRAVP_VALID) && gc.context.travel1
         /* was '&& distmin(u.ux, u.uy, u.tx, u.ty) == 1' */
         && next2u(u.tx, u.ty) /* one step away */
         /* handle restricted diagonals */
@@ -1153,7 +1153,7 @@ findtravelpath(int mode)
             return TRUE;
         }
         if (mode == TRAVP_TRAVEL)
-            g.context.run = 8;
+            gc.context.run = 8;
     }
     if (u.tx != u.ux || u.ty != u.uy) {
         coordxy travel[COLNO][ROWNO];
@@ -1241,7 +1241,7 @@ findtravelpath(int mode)
                     if (!isok(nx, ny)
                         || ((mode == TRAVP_GUESS) && !couldsee(nx, ny)))
                         continue;
-                    if ((!Passes_walls && !can_ooze(&g.youmonst)
+                    if ((!Passes_walls && !can_ooze(&gy.youmonst)
                          && closed_door(x, y))
                         || (sobj_at(BOULDER, x, y)
                             && !could_move_onto_boulder(x, y))
@@ -1267,21 +1267,21 @@ findtravelpath(int mode)
                         if (nx == ux && ny == uy) {
                             if (mode == TRAVP_TRAVEL || mode == TRAVP_VALID) {
                                 boolean visited =
-                                    selection_getpoint(x, y, g.travelmap);
+                                    selection_getpoint(x, y, gt.travelmap);
                                 u.dx = x - ux;
                                 u.dy = y - uy;
                                 if (mode == TRAVP_TRAVEL
                                     && ((x == u.tx && y == u.ty) || visited)) {
                                     nomul(0);
                                     /* reset run so domove run checks work */
-                                    g.context.run = 8;
+                                    gc.context.run = 8;
                                     if (visited)
                                         You("stop, unsure which way to go.");
                                     else
                                         iflags.travelcc.x
                                         = iflags.travelcc.y = 0;
                                 }
-                                selection_setpoint(u.ux, u.uy, g.travelmap, 1);
+                                selection_setpoint(u.ux, u.uy, gt.travelmap, 1);
                                 return TRUE;
                             }
                         } else if (!travel[nx][ny]) {
@@ -1350,7 +1350,7 @@ findtravelpath(int mode)
                 u.dx = sgn(u.tx - u.ux);
                 u.dy = sgn(u.ty - u.uy);
                 if (test_move(u.ux, u.uy, u.dx, u.dy, TEST_MOVE)) {
-                    selection_setpoint(u.ux, u.uy, g.travelmap, 1);
+                    selection_setpoint(u.ux, u.uy, gt.travelmap, 1);
                     return TRUE;
                 }
                 goto found;
@@ -1560,7 +1560,7 @@ trapmove(
 boolean
 u_rooted(void)
 {
-    if (!g.youmonst.data->mmove) {
+    if (!gy.youmonst.data->mmove) {
         You("are rooted %s.",
             Levitation || Is_airlevel(&u.uz) || Is_waterlevel(&u.uz)
                 ? "in place"
@@ -1578,7 +1578,7 @@ check_buried_zombies(coordxy x, coordxy y)
     struct obj *otmp;
     long t;
 
-    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+    for (otmp = gl.level.buriedobjlist; otmp; otmp = otmp->nobj) {
         if (otmp->otyp == CORPSE && otmp->timed
             && otmp->ox >= x - 1 && otmp->ox <= x + 1
             && otmp->oy >= y - 1 && otmp->oy <= y + 1
@@ -1598,14 +1598,14 @@ u_locomotion(const char *def)
 
     return Levitation ? (capitalize ? "Float" : "float")
         : Flying ? (capitalize ? "Fly" : "fly")
-        : locomotion(g.youmonst.data, def);
+        : locomotion(gy.youmonst.data, def);
 }
 
 /* Return a simplified floor solid/liquid state based on hero's state */
 static schar
 u_simple_floortyp(coordxy x, coordxy y)
 {
-    boolean u_in_air = (Levitation || Flying || !grounded(g.youmonst.data));
+    boolean u_in_air = (Levitation || Flying || !grounded(gy.youmonst.data));
 
     if (is_waterwall(x, y))
         return WATER; /* wall of water, fly/lev does not matter */
@@ -1639,19 +1639,19 @@ swim_move_danger(coordxy x, coordxy y)
                continue to move over lava if already doing so */
             || (is_lava(x, y) && !Known_lwalking && !is_lava(u.ux, u.uy))
             || liquid_wall) {
-            if (g.context.nopick) {
+            if (gc.context.nopick) {
                 /* moving with m-prefix */
-                g.context.swim_tip = TRUE;
+                gc.context.swim_tip = TRUE;
                 return FALSE;
             } else if (ParanoidSwim || liquid_wall) {
                 You("avoid %s into the %s.",
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
-                if (!g.context.swim_tip) {
+                if (!gc.context.swim_tip) {
                     pline(
                         "(Use '%s' prefix to step in if you really want to.)",
                           visctrl(cmd_from_func(do_reqmenu)));
-                    g.context.swim_tip = TRUE;
+                    gc.context.swim_tip = TRUE;
                 }
                 return TRUE;
             }
@@ -1671,7 +1671,7 @@ domove_bump_mon(struct monst *mtmp, int glyph)
      * attack_check(), which still wastes a turn, but prints a
      * different message and makes the player remember the monster.
      */
-    if (g.context.nopick && !g.context.travel
+    if (gc.context.nopick && !gc.context.travel
         && (canspotmon(mtmp) || glyph_is_invisible(glyph)
             || glyph_is_warning(glyph))) {
         if (M_AP_TYPE(mtmp) && !Protection_from_shape_changers
@@ -1704,7 +1704,7 @@ domove_attackmon_at(
      * This is different from ceiling hiders, who aren't handled in
      * do_attack().
      */
-    if (g.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
+    if (gc.context.forcefight || !mtmp->mundetected || sensemon(mtmp)
         || ((hides_under(mtmp->data) || mtmp->data->mlet == S_EEL)
             && !is_safemon(mtmp))) {
         /* target monster might decide to switch places with you... */
@@ -1717,8 +1717,8 @@ domove_attackmon_at(
                            && (NODIAG(u.umonnum)
                                || (bad_rock(mtmp->data, x, u.uy0)
                                    && bad_rock(mtmp->data, u.ux0, y))
-                               || (bad_rock(g.youmonst.data, u.ux0, y)
-                                   && bad_rock(g.youmonst.data, x, u.uy0))))
+                               || (bad_rock(gy.youmonst.data, u.ux0, y)
+                                   && bad_rock(gy.youmonst.data, x, u.uy0))))
                       && goodpos(u.ux0, u.uy0, mtmp, GP_ALLOW_U));
         /* if not displacing, try to attack; note that it might evade;
            also, we don't attack tame when _safepet_ */
@@ -1732,7 +1732,7 @@ domove_attackmon_at(
 static boolean
 domove_fight_ironbars(coordxy x, coordxy y)
 {
-    if (g.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
+    if (gc.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
         struct obj *obj = uwep;
         unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV);
 
@@ -1759,7 +1759,7 @@ domove_fight_web(coordxy x, coordxy y)
 {
     struct trap *trap = t_at(x, y);
 
-    if (g.context.forcefight && trap && trap->ttyp == WEB
+    if (gc.context.forcefight && trap && trap->ttyp == WEB
         && trap->tseen && uwep) {
         if (u_wield_art(ART_STING)) {
             /* guaranteed success */
@@ -1878,7 +1878,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
                 if (!u.uconduct.killer++)
                     livelog_printf(LL_CONDUCT, "killed for the first time");
                 mndx = monsndx(mtmp->data);
-                tmp = experience(mtmp, (int) g.mvitals[mndx].died);
+                tmp = experience(mtmp, (int) gm.mvitals[mndx].died);
                 more_experienced(tmp, 0);
                 newexplevel(); /* will decide if you go up */
             }
@@ -1916,11 +1916,11 @@ domove_fight_empty(coordxy x, coordxy y)
                        * because m_at() might find a vault guard there */
 
     /* specifying 'F' with no monster wastes a turn */
-    if (g.context.forcefight
+    if (gc.context.forcefight
         /* remembered an 'I' && didn't use a move command */
-        || (glyph_is_invisible(glyph) && !m_at(x, y) && !g.context.nopick)) {
+        || (glyph_is_invisible(glyph) && !m_at(x, y) && !gc.context.nopick)) {
         struct obj *boulder = 0;
-        boolean explo = (Upolyd && attacktype(g.youmonst.data, AT_EXPL)),
+        boolean explo = (Upolyd && attacktype(gy.youmonst.data, AT_EXPL)),
                 solid = (off_edge || (!accessible(x, y)
                                       || IS_FURNITURE(levl[x][y].typ)));
         char buf[BUFSZ];
@@ -1942,7 +1942,7 @@ domove_fight_empty(coordxy x, coordxy y)
 
             /* force fight at boulder/statue or wall/door while wielding
                pick:  start digging to break the boulder or wall */
-            if (g.context.forcefight
+            if (gc.context.forcefight
                 /* can we dig? */
                 && uwep && dig_typ(uwep, x, y)
                 /* should we dig? */
@@ -1998,7 +1998,7 @@ domove_fight_empty(coordxy x, coordxy y)
         nomul(0);
         if (explo) {
             struct attack *attk
-                        = attacktype_fordmg(g.youmonst.data, AT_EXPL, AD_ANY);
+                        = attacktype_fordmg(gy.youmonst.data, AT_EXPL, AD_ANY);
 
             /* no monster has been attacked so we have bypassed explum() */
             wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as explum() */
@@ -2074,9 +2074,9 @@ slippery_ice_fumbling(void)
 
     if (on_ice) {
         if ((uarmf && objdescr_is(uarmf, "snow boots"))
-            || resists_cold(&g.youmonst) || Flying
-            || is_floater(g.youmonst.data) || is_clinger(g.youmonst.data)
-            || is_whirly(g.youmonst.data)) {
+            || resists_cold(&gy.youmonst) || Flying
+            || is_floater(gy.youmonst.data) || is_clinger(gy.youmonst.data)
+            || is_whirly(gy.youmonst.data)) {
             on_ice = FALSE;
         } else if (!rn2(Cold_resistance ? 3 : 2)) {
             HFumbling |= FROMOUTSIDE;
@@ -2109,7 +2109,7 @@ impaired_movement(coordxy *x, coordxy *y)
             confdir(TRUE);
             *x = u.ux + u.dx;
             *y = u.uy + u.dy;
-        } while (!isok(*x, *y) || bad_rock(g.youmonst.data, *x, *y));
+        } while (!isok(*x, *y) || bad_rock(gy.youmonst.data, *x, *y));
     }
     return FALSE;
 }
@@ -2139,12 +2139,12 @@ avoid_moving_on_liquid(
     if ((levl[x][y].typ == levl[u.ux][u.uy].typ
          /* or you are using shift-dir running and the transition isn't
             dangerous... */
-         || (g.context.run < 2 && (!is_lava(x, y) || in_air))
-         || g.context.travel)
+         || (gc.context.run < 2 && (!is_lava(x, y) || in_air))
+         || gc.context.travel)
         /* and you know you won't fall in */
         && (in_air || Known_lwalking || (is_pool(x, y) && Known_wwalking))
         && !IS_WATERWALL(levl[x][y].typ)) {
-        /* XXX: should send 'is_clinger(g.youmonst.data)' here once clinging
+        /* XXX: should send 'is_clinger(gy.youmonst.data)' here once clinging
            polyforms are allowed to move over water */
         return FALSE; /* liquid is safe to traverse */
     } else if (is_pool_or_lava(x, y) && levl[x][y].seenv) {
@@ -2161,15 +2161,15 @@ avoid_moving_on_liquid(
 static boolean
 avoid_running_into_trap_or_liquid(coordxy x, coordxy y)
 {
-    boolean would_stop = (g.context.run >= 2);
-    if (!g.context.run)
+    boolean would_stop = (gc.context.run >= 2);
+    if (!gc.context.run)
         return FALSE;
 
     if (avoid_moving_on_trap(x,y, would_stop)
         || (Blind && avoid_moving_on_liquid(x,y, would_stop))) {
         nomul(0);
         if (would_stop)
-            g.context.move = 0;
+            gc.context.move = 0;
         return would_stop;
     }
     return FALSE;
@@ -2180,7 +2180,7 @@ static boolean
 move_out_of_bounds(coordxy x, coordxy y)
 {
     if (!isok(x, y)) {
-        if (g.context.forcefight)
+        if (gc.context.forcefight)
             return domove_fight_empty(x, y);
 
         if (flags.mention_walls) {
@@ -2199,7 +2199,7 @@ move_out_of_bounds(coordxy x, coordxy y)
                 directionname(xytod(dx, dy)));
         }
         nomul(0);
-        g.context.move = 0;
+        gc.context.move = 0;
         return TRUE;
     }
     return FALSE;
@@ -2238,7 +2238,7 @@ escape_from_sticky_mon(coordxy x, coordxy y)
         if (!next2u(u.ustuck->mx, u.ustuck->my)) {
             /* perhaps it fled (or was teleported or ... ) */
             set_ustuck((struct monst *) 0);
-        } else if (sticks(g.youmonst.data)) {
+        } else if (sticks(gy.youmonst.data)) {
             /* When polymorphed into a sticking monster,
              * u.ustuck means it's stuck to you, not you to it.
              */
@@ -2288,12 +2288,12 @@ domove(void)
 {
         coordxy ux1 = u.ux, uy1 = u.uy;
 
-        g.domove_succeeded = 0L;
+        gd.domove_succeeded = 0L;
         domove_core();
-        /* g.domove_succeeded is available to make assessments now */
-        if ((g.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
+        /* gd.domove_succeeded is available to make assessments now */
+        if ((gd.domove_succeeded & (DOMOVE_RUSH | DOMOVE_WALK)) != 0)
             maybe_smudge_engr(ux1, uy1, u.ux, u.uy);
-        g.domove_attempting = 0L;
+        gd.domove_attempting = 0L;
 }
 
 static void
@@ -2310,10 +2310,10 @@ domove_core(void)
     boolean cause_delay = FALSE,        /* dragging ball will skip a move */
             displaceu = FALSE;          /* involuntary swap */
 
-    if (g.context.travel) {
+    if (gc.context.travel) {
         if (!findtravelpath(TRAVP_TRAVEL))
             (void) findtravelpath(TRAVP_GUESS);
-        g.context.travel1 = 0;
+        gc.context.travel1 = 0;
     }
 
     if (carrying_too_much())
@@ -2354,13 +2354,13 @@ domove_core(void)
             /* Don't attack if you're running, and can see it */
             /* It's fine to displace pets, though */
             /* We should never get here if forcefight */
-            if (g.context.run && ((!Blind && mon_visible(mtmp)
+            if (gc.context.run && ((!Blind && mon_visible(mtmp)
                                  && ((M_AP_TYPE(mtmp) != M_AP_FURNITURE
                                       && M_AP_TYPE(mtmp) != M_AP_OBJECT)
                                      || Protection_from_shape_changers))
                                 || sensemon(mtmp))) {
                 nomul(0);
-                g.context.move = 0;
+                gc.context.move = 0;
                 return;
             }
         }
@@ -2368,8 +2368,8 @@ domove_core(void)
 
     u.ux0 = u.ux;
     u.uy0 = u.uy;
-    g.bhitpos.x = x;
-    g.bhitpos.y = y;
+    gb.bhitpos.x = x;
+    gb.bhitpos.y = y;
     tmpr = &levl[x][y];
     glyph = glyph_at(x, y);
 
@@ -2377,7 +2377,7 @@ domove_core(void)
         /* don't stop travel when displacing pets; if the
            displace fails for some reason, do_attack() in uhitm.c
            will stop travel rather than domove */
-        if (!is_safemon(mtmp) || g.context.forcefight)
+        if (!is_safemon(mtmp) || gc.context.forcefight)
             nomul(0);
 
         if (domove_bump_mon(mtmp, glyph))
@@ -2411,7 +2411,7 @@ domove_core(void)
         boolean moved = trapmove(x, y, trap);
 
         if (!u.utrap) {
-            g.context.botl = TRUE;
+            gc.context.botl = TRUE;
             reset_utrap(TRUE); /* might resume levitation or flight */
         }
         /* might not have escaped, or did escape but remain in same spot */
@@ -2420,8 +2420,8 @@ domove_core(void)
     }
 
     if (!test_move(u.ux, u.uy, x - u.ux, y - u.uy, DO_MOVE)) {
-        if (!g.context.door_opened) {
-            g.context.move = 0;
+        if (!gc.context.door_opened) {
+            gc.context.move = 0;
             nomul(0);
         }
         return;
@@ -2429,7 +2429,7 @@ domove_core(void)
 
     /* Is it dangerous to swim in water or lava? */
     if (swim_move_danger(x, y)) {
-        g.context.move = 0;
+        gc.context.move = 0;
         nomul(0);
         return;
      }
@@ -2472,10 +2472,10 @@ domove_core(void)
             map_invisible(u.ux0, u.uy0);
         /* monster chose to swap places; hero doesn't get any credit
            or blame if something bad happens to it */
-        g.context.mon_moving = 1;
+        gc.context.mon_moving = 1;
         if (!minliquid(mtmp))
             (void) mintrap(mtmp, NO_TRAP_FLAGS);
-        g.context.mon_moving = 0;
+        gc.context.mon_moving = 0;
 
     /*
      * If safepet at destination then move the pet to the hero's
@@ -2502,8 +2502,8 @@ domove_core(void)
     u_on_newpos(u.ux, u.uy);
 
     reset_occupations();
-    if (g.context.run) {
-        if (g.context.run < 8)
+    if (gc.context.run) {
+        if (gc.context.run < 8)
             if (IS_DOOR(tmpr->typ) || IS_ROCK(tmpr->typ)
                 || IS_FURNITURE(tmpr->typ))
                 nomul(0);
@@ -2512,9 +2512,9 @@ domove_core(void)
     if (!Levitation && !Flying && !Stealth)
         check_buried_zombies(u.ux, u.uy);
 
-    if (hides_under(g.youmonst.data) || g.youmonst.data->mlet == S_EEL
+    if (hides_under(gy.youmonst.data) || gy.youmonst.data->mlet == S_EEL
         || u.dx || u.dy)
-        (void) hideunder(&g.youmonst);
+        (void) hideunder(&gy.youmonst);
 
     /*
      * Mimics (or whatever) become noticeable if they move and are
@@ -2523,14 +2523,14 @@ domove_core(void)
      */
     if ((u.dx || u.dy) && (U_AP_TYPE == M_AP_OBJECT
                            || U_AP_TYPE == M_AP_FURNITURE))
-        g.youmonst.m_ap_type = M_AP_NOTHING;
+        gy.youmonst.m_ap_type = M_AP_NOTHING;
 
     check_leash(u.ux0, u.uy0);
 
     if (u.ux0 != u.ux || u.uy0 != u.uy) {
         /* let caller know so that an evaluation may take place */
-        g.domove_succeeded |=
-                (g.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
+        gd.domove_succeeded |=
+                (gd.domove_attempting & (DOMOVE_RUSH | DOMOVE_WALK));
         u.umoved = TRUE;
         /* Clean old position -- vision_recalc() will print our new one. */
         newsym(u.ux0, u.uy0);
@@ -2549,8 +2549,8 @@ domove_core(void)
     /* must come after we finished picking up, in spoteffects() */
     if (cause_delay) {
         nomul(-2);
-        g.multi_reason = "dragging an iron ball";
-        g.nomovemsg = "";
+        gm.multi_reason = "dragging an iron ball";
+        gn.nomovemsg = "";
     }
 
     runmode_delay_output();
@@ -2561,13 +2561,13 @@ domove_core(void)
 void
 runmode_delay_output(void)
 {
-    if ((g.context.run || g.multi) && flags.runmode != RUN_TPORT) {
+    if ((gc.context.run || gm.multi) && flags.runmode != RUN_TPORT) {
         /* for tport mode, don't display anything until we've stopped;
            for normal (leap) mode, update display every 7th step
            (relative to turn counter; ought to be to start of running);
            for walk and crawl (visual debugging) modes, update the
            display after every step */
-        if (flags.runmode != RUN_LEAP || !(g.moves % 7L)) {
+        if (flags.runmode != RUN_LEAP || !(gm.moves % 7L)) {
             /* moveloop() suppresses time_botl when running */
             iflags.time_botl = flags.time;
             curs_on_u();
@@ -2604,7 +2604,7 @@ overexert_hp(void)
 
     if (*hp > 1) {
         *hp -= 1;
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     } else {
         You("pass out from exertion!");
         exercise(A_CON, FALSE);
@@ -2620,10 +2620,10 @@ overexertion(void)
        position, but is now called by do_attack() so that it doesn't
        execute if you decline to attack a peaceful monster */
     gethungry();
-    if ((g.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
+    if ((gm.moves % 3L) != 0L && near_capacity() >= HVY_ENCUMBER) {
         overexert_hp();
     }
-    return (boolean) (g.multi < 0); /* might have fainted (forced to sleep) */
+    return (boolean) (gm.multi < 0); /* might have fainted (forced to sleep) */
 }
 
 void
@@ -2688,7 +2688,7 @@ switch_terrain(void)
             You("start flying.");
     }
     if ((!!Levitation ^ was_levitating) || (!!Flying ^ was_flying))
-        g.context.botl = TRUE; /* update Lev/Fly status condition */
+        gc.context.botl = TRUE; /* update Lev/Fly status condition */
 }
 
 /* set or clear u.uinwater */
@@ -2735,7 +2735,7 @@ pooleffects(boolean newspot)             /* true if called by spoteffects */
             set_uinwater(0); /* u.uinwater = 0; leave the water */
             if (was_underwater) { /* restore vision */
                 docrt();
-                g.vision_full_recalc = 1;
+                gv.vision_full_recalc = 1;
             }
         }
     }
@@ -2816,7 +2816,7 @@ spoteffects(boolean pick)
     check_special_room(FALSE);
     if (IS_SINK(levl[u.ux][u.uy].typ) && Levitation)
         dosinkfall();
-    if (!g.in_steed_dismounting) { /* if dismounting, check again later */
+    if (!gi.in_steed_dismounting) { /* if dismounting, check again later */
         boolean pit;
 
         /* if levitation is due to time out at the end of this
@@ -2951,7 +2951,7 @@ in_rooms(register coordxy x, register coordxy y, register int typewanted)
 
 #define goodtype(rno) \
     (!typewanted                                                   \
-     || (typefound = g.rooms[rno - ROOMOFFSET].rtype) == typewanted  \
+     || (typefound = gr.rooms[rno - ROOMOFFSET].rtype) == typewanted  \
      || (typewanted == SHOPBASE && typefound > SHOPBASE))
 
     switch (rno = levl[x][y].roomno) {
@@ -3021,7 +3021,7 @@ in_town(coordxy x, coordxy y)
      * See if (x,y) is in a room with subrooms, if so, assume it's the
      * town.  If there are no subrooms, the whole level is in town.
      */
-    for (sroom = &g.rooms[0]; sroom->hx > 0; sroom++) {
+    for (sroom = &gr.rooms[0]; sroom->hx > 0; sroom++) {
         if (sroom->nsubrooms > 0) {
             has_subrooms = TRUE;
             if (inside_room(sroom, x, y))
@@ -3084,10 +3084,10 @@ check_special_room(boolean newlev)
     if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
         return; /* no entrance messages necessary */
 
-    if (!g.context.achieveo.minetn_reached
+    if (!gc.context.achieveo.minetn_reached
         && In_mines(&u.uz) && in_town(u.ux, u.uy)) {
         record_achievement(ACH_TOWN);
-        g.context.achieveo.minetn_reached = TRUE;
+        gc.context.achieveo.minetn_reached = TRUE;
     }
 
     /* Did we just enter a shop? */
@@ -3095,7 +3095,7 @@ check_special_room(boolean newlev)
         u_entered_shop(u.ushops_entered);
 
     for (ptr = &u.uentered[0]; *ptr; ptr++) {
-        int roomno = *ptr - ROOMOFFSET, rt = g.rooms[roomno].rtype;
+        int roomno = *ptr - ROOMOFFSET, rt = gr.rooms[roomno].rtype;
         boolean msg_given = TRUE;
 
         /* Did we just enter some other special room? */
@@ -3147,10 +3147,10 @@ check_special_room(boolean newlev)
 
             if (oracle) {
                 if (!oracle->mpeaceful)
-                    verbalize("You're in Delphi, %s.", g.plname);
+                    verbalize("You're in Delphi, %s.", gp.plname);
                 else
                     verbalize("%s, %s, welcome to Delphi!",
-                              Hello((struct monst *) 0), g.plname);
+                              Hello((struct monst *) 0), gp.plname);
             } else
                 msg_given = FALSE;
             break;
@@ -3167,30 +3167,30 @@ check_special_room(boolean newlev)
             room_discovered(roomno);
 
         if (rt != 0) {
-            g.rooms[roomno].rtype = OROOM;
+            gr.rooms[roomno].rtype = OROOM;
             if (!search_special(rt)) {
                 /* No more room of that type */
                 switch (rt) {
                 case COURT:
-                    g.level.flags.has_court = 0;
+                    gl.level.flags.has_court = 0;
                     break;
                 case SWAMP:
-                    g.level.flags.has_swamp = 0;
+                    gl.level.flags.has_swamp = 0;
                     break;
                 case MORGUE:
-                    g.level.flags.has_morgue = 0;
+                    gl.level.flags.has_morgue = 0;
                     break;
                 case ZOO:
-                    g.level.flags.has_zoo = 0;
+                    gl.level.flags.has_zoo = 0;
                     break;
                 case BARRACKS:
-                    g.level.flags.has_barracks = 0;
+                    gl.level.flags.has_barracks = 0;
                     break;
                 case TEMPLE:
-                    g.level.flags.has_temple = 0;
+                    gl.level.flags.has_temple = 0;
                     break;
                 case BEEHIVE:
-                    g.level.flags.has_beehive = 0;
+                    gl.level.flags.has_beehive = 0;
                     break;
                 }
             }
@@ -3236,8 +3236,8 @@ pickup_checks(void)
         }
     }
     if (is_pool(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data)
-            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(gy.youmonst.data)
+            || is_clinger(gy.youmonst.data) || (Flying && !Breathless)) {
             You("cannot dive into the %s to pick things up.",
                 hliquid("water"));
             return 0;
@@ -3247,11 +3247,11 @@ pickup_checks(void)
         }
     }
     if (is_lava(u.ux, u.uy)) {
-        if (Wwalking || is_floater(g.youmonst.data)
-            || is_clinger(g.youmonst.data) || (Flying && !Breathless)) {
+        if (Wwalking || is_floater(gy.youmonst.data)
+            || is_clinger(gy.youmonst.data) || (Flying && !Breathless)) {
             You_cant("reach the bottom to pick things up.");
             return 0;
-        } else if (!likes_lava(g.youmonst.data)) {
+        } else if (!likes_lava(gy.youmonst.data)) {
             You("would burn to a crisp trying to pick things up.");
             return 0;
         }
@@ -3310,8 +3310,8 @@ dopickup(void)
 {
     int count, tmpcount, ret;
 
-    count = (int) g.command_count;
-    g.multi = 0; /* always reset */
+    count = (int) gc.command_count;
+    gm.multi = 0; /* always reset */
 
     if ((ret = pickup_checks()) >= 0) {
         return ret ? ECMD_TIME : ECMD_OK;
@@ -3343,7 +3343,7 @@ lookaround(void)
         return;
     }
 
-    if (Blind || g.context.run == 0)
+    if (Blind || gc.context.run == 0)
         return;
     for (x = u.ux - 1; x <= u.ux + 1; x++)
         for (y = u.uy - 1; y <= u.uy + 1; y++) {
@@ -3363,8 +3363,8 @@ lookaround(void)
                 && mon_visible(mtmp)) {
                 /* running movement and not a hostile monster */
                 /* OR it blocks our move direction and we're not traveling */
-                if ((g.context.run != 1 && !is_safemon(mtmp))
-                    || (infront && !g.context.travel)) {
+                if ((gc.context.run != 1 && !is_safemon(mtmp))
+                    || (infront && !gc.context.travel)) {
                     if (flags.mention_walls)
                         pline("%s blocks your path.",
                               upstart(a_monnam(mtmp)));
@@ -3380,8 +3380,8 @@ lookaround(void)
                 continue;
 
             /* stop for traps, sometimes */
-            if (avoid_moving_on_trap(x, y, (infront && g.context.run > 1))) {
-                if (g.context.run == 1)
+            if (avoid_moving_on_trap(x, y, (infront && gc.context.run > 1))) {
+                if (gc.context.run == 1)
                     goto bcorr; /* if you must */
                 if (infront)
                     goto stop;
@@ -3396,7 +3396,7 @@ lookaround(void)
                 /* ignore if diagonal */
                 if (x != u.ux && y != u.uy)
                     continue;
-                if (g.context.run != 1 && !g.context.travel) {
+                if (gc.context.run != 1 && !gc.context.travel) {
                     if (flags.mention_walls)
                         You("stop in front of the door.");
                     goto stop;
@@ -3408,8 +3408,8 @@ lookaround(void)
  bcorr:
                 if (levl[u.ux][u.uy].typ != ROOM) {
                     /* running or traveling */
-                    if (g.context.run == 1 || g.context.run == 3
-                        || g.context.run == 8) {
+                    if (gc.context.run == 1 || gc.context.run == 3
+                        || gc.context.run == 8) {
                         /* distance from x,y to location we're moving to */
                         i = dist2(x, y, u.ux + u.dx, u.uy + u.dy);
                         /* ignore if not on or directly adjacent to it */
@@ -3437,9 +3437,9 @@ lookaround(void)
                     goto stop;
                 continue;
             } else { /* e.g. objects or trap or stairs */
-                if (g.context.run == 1)
+                if (gc.context.run == 1)
                     goto bcorr;
-                if (g.context.run == 8)
+                if (gc.context.run == 8)
                     continue;
                 if (mtmp)
                     continue; /* d */
@@ -3452,12 +3452,12 @@ lookaround(void)
             return;
         } /* end for loops */
 
-    if (corrct > 1 && g.context.run == 2) {
+    if (corrct > 1 && gc.context.run == 2) {
         if (flags.mention_walls)
             pline_The("corridor widens here.");
         goto stop;
     }
-    if ((g.context.run == 1 || g.context.run == 3 || g.context.run == 8)
+    if ((gc.context.run == 1 || gc.context.run == 3 || gc.context.run == 8)
         && !noturn && !m0 && i0
         && (corrct == 1 || (corrct == 2 && i0 == 1))) {
         /* make sure that we do not turn too far */
@@ -3509,7 +3509,7 @@ boolean
 crawl_destination(coordxy x, coordxy y)
 {
     /* is location ok in general? */
-    if (!goodpos(x, y, &g.youmonst, 0))
+    if (!goodpos(x, y, &gy.youmonst, 0))
         return FALSE;
 
     /* orthogonal movement is unrestricted when destination is ok */
@@ -3525,9 +3525,9 @@ crawl_destination(coordxy x, coordxy y)
     if (IS_DOOR(levl[x][y].typ) && (!doorless_door(x, y) || block_door(x, y)))
         return FALSE;
     /* finally, are we trying to squeeze through a too-narrow gap? */
-    return !(bad_rock(g.youmonst.data, u.ux, y)
-             && bad_rock(g.youmonst.data, x, u.uy)
-             && cant_squeeze_thru(&g.youmonst));
+    return !(bad_rock(gy.youmonst.data, u.ux, y)
+             && bad_rock(gy.youmonst.data, x, u.uy)
+             && cant_squeeze_thru(&gy.youmonst));
 }
 
 /* something like lookaround, but we are not running */
@@ -3561,33 +3561,33 @@ end_running(boolean and_travel)
 {
     /* moveloop() suppresses time_botl when context.run is non-zero; when
        running stops, update 'time' even if other botl status is unchanged */
-    if (flags.time && g.context.run)
+    if (flags.time && gc.context.run)
         iflags.time_botl = TRUE;
-    g.context.run = 0;
+    gc.context.run = 0;
     /* 'context.mv' isn't travel but callers who want to end travel
        all clear it too */
     if (and_travel)
-        g.context.travel = g.context.travel1 = g.context.mv = 0;
-    if (g.travelmap) {
-        selection_free(g.travelmap, TRUE);
-        g.travelmap = NULL;
+        gc.context.travel = gc.context.travel1 = gc.context.mv = 0;
+    if (gt.travelmap) {
+        selection_free(gt.travelmap, TRUE);
+        gt.travelmap = NULL;
     }
     /* cancel multi */
-    if (g.multi > 0)
-        g.multi = 0;
+    if (gm.multi > 0)
+        gm.multi = 0;
 }
 
 void
 nomul(int nval)
 {
-    if (g.multi < nval)
+    if (gm.multi < nval)
         return;              /* This is a bug fix by ab@unido */
-    g.context.botl |= (g.multi >= 0);
+    gc.context.botl |= (gm.multi >= 0);
     u.uinvulnerable = FALSE; /* Kludge to avoid ctrl-C bug -dlc */
     u.usleep = 0;
-    g.multi = nval;
+    gm.multi = nval;
     if (nval == 0)
-        g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
+        gm.multi_reason = NULL, gm.multireasonbuf[0] = '\0';
     end_running(TRUE);
     cmdq_clear(CQ_CANNED);
 }
@@ -3596,32 +3596,32 @@ nomul(int nval)
 void
 unmul(const char *msg_override)
 {
-    g.context.botl = TRUE;
-    g.multi = 0; /* caller will usually have done this already */
+    gc.context.botl = TRUE;
+    gm.multi = 0; /* caller will usually have done this already */
     if (msg_override)
-        g.nomovemsg = msg_override;
-    else if (!g.nomovemsg)
-        g.nomovemsg = You_can_move_again;
-    if (*g.nomovemsg) {
-        pline("%s", g.nomovemsg);
+        gn.nomovemsg = msg_override;
+    else if (!gn.nomovemsg)
+        gn.nomovemsg = You_can_move_again;
+    if (*gn.nomovemsg) {
+        pline("%s", gn.nomovemsg);
         /* follow "you survived that attempt on your life" with a message
            about current form if it's not the default; primarily for
            life-saving while turning into green slime but is also a reminder
            if life-saved while poly'd and Unchanging (explore or wizard mode
            declining to die since can't be both Unchanging and Lifesaved) */
-        if (Upolyd && !strncmpi(g.nomovemsg, "You survived that ", 18))
+        if (Upolyd && !strncmpi(gn.nomovemsg, "You survived that ", 18))
             You("are %s.",
                 an(pmname(&mons[u.umonnum], Ugender))); /* (ignore Hallu) */
     }
-    g.nomovemsg = 0;
+    gn.nomovemsg = 0;
     u.usleep = 0;
-    g.multi_reason = NULL, g.multireasonbuf[0] = '\0';
-    if (g.afternmv) {
-        int (*f)(void) = g.afternmv;
+    gm.multi_reason = NULL, gm.multireasonbuf[0] = '\0';
+    if (ga.afternmv) {
+        int (*f)(void) = ga.afternmv;
 
         /* clear afternmv before calling it (to override the
            encumbrance hack for levitation--see weight_cap()) */
-        g.afternmv = (int (*)(void)) 0;
+        ga.afternmv = (int (*)(void)) 0;
         (void) (*f)();
         /* for finishing Armor/Boots/&c_on() */
         update_inventory();
@@ -3635,15 +3635,15 @@ maybe_wail(void)
                               SHOCK_RES, FIRE_RES, SLEEP_RES, DISINT_RES,
                               TELEPORT_CONTROL, STEALTH, FAST, INVIS };
 
-    if (g.moves <= g.wailmsg + 50)
+    if (gm.moves <= gw.wailmsg + 50)
         return;
 
-    g.wailmsg = g.moves;
+    gw.wailmsg = gm.moves;
     if (Role_if(PM_WIZARD) || Race_if(PM_ELF) || Role_if(PM_VALKYRIE)) {
         const char *who;
         int i, powercnt;
 
-        who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ? g.urole.name.m
+        who = (Role_if(PM_WIZARD) || Role_if(PM_VALKYRIE)) ? gu.urole.name.m
                                                            : "Elf";
         if (u.uhp == 1) {
             pline("%s is about to die.", who);
@@ -3672,7 +3672,7 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 #endif
-    g.context.botl = TRUE; /* u.uhp or u.mh is changing */
+    gc.context.botl = TRUE; /* u.uhp or u.mh is changing */
     end_running(TRUE);
     if (Upolyd) {
         u.mh -= n;
@@ -3689,9 +3689,9 @@ losehp(int n, const char *knam, schar k_format)
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */
     if (u.uhp < 1) {
-        g.killer.format = k_format;
-        if (g.killer.name != knam) /* the thing that killed you */
-            Strcpy(g.killer.name, knam ? knam : "");
+        gk.killer.format = k_format;
+        if (gk.killer.name != knam) /* the thing that killed you */
+            Strcpy(gk.killer.name, knam ? knam : "");
         urgent_pline("You die...");
         done(DIED);
     } else if (n > 0 && u.uhp * 10 < u.uhpmax) {
@@ -3708,7 +3708,7 @@ weight_cap(void)
        confer are enabled at the start rather than the end; that
        causes message sequencing issues for boots of levitation
        so defer their encumbrance benefit until they're fully worn */
-    if (g.afternmv == Boots_on && (ELevitation & W_ARMF) != 0L) {
+    if (ga.afternmv == Boots_on && (ELevitation & W_ARMF) != 0L) {
         ELevitation &= ~W_ARMF;
         float_vs_flight(); /* in case Levitation is blocking Flying */
     }
@@ -3719,14 +3719,14 @@ weight_cap(void)
     carrcap = 25 * (ACURRSTR + ACURR(A_CON)) + 50;
     if (Upolyd) {
         /* consistent with can_carry() in mon.c */
-        if (g.youmonst.data->mlet == S_NYMPH)
+        if (gy.youmonst.data->mlet == S_NYMPH)
             carrcap = MAX_CARR_CAP;
-        else if (!g.youmonst.data->cwt)
-            carrcap = (carrcap * (long) g.youmonst.data->msize) / MZ_HUMAN;
-        else if (!strongmonst(g.youmonst.data)
-                 || (strongmonst(g.youmonst.data)
-                     && (g.youmonst.data->cwt > WT_HUMAN)))
-            carrcap = (carrcap * (long) g.youmonst.data->cwt / WT_HUMAN);
+        else if (!gy.youmonst.data->cwt)
+            carrcap = (carrcap * (long) gy.youmonst.data->msize) / MZ_HUMAN;
+        else if (!strongmonst(gy.youmonst.data)
+                 || (strongmonst(gy.youmonst.data)
+                     && (gy.youmonst.data->cwt > WT_HUMAN)))
+            carrcap = (carrcap * (long) gy.youmonst.data->cwt / WT_HUMAN);
     }
 
     if (Levitation || Is_airlevel(&u.uz) /* pugh@cornell */
@@ -3757,18 +3757,18 @@ weight_cap(void)
 int
 inv_weight(void)
 {
-    register struct obj *otmp = g.invent;
+    register struct obj *otmp = gi.invent;
     register int wt = 0;
 
     while (otmp) {
         if (otmp->oclass == COIN_CLASS)
             wt += (int) (((long) otmp->quan + 50L) / 100L);
-        else if (otmp->otyp != BOULDER || !throws_rocks(g.youmonst.data))
+        else if (otmp->otyp != BOULDER || !throws_rocks(gy.youmonst.data))
             wt += otmp->owt;
         otmp = otmp->nobj;
     }
-    g.wc = weight_cap();
-    return (wt - g.wc);
+    gw.wc = weight_cap();
+    return (wt - gw.wc);
 }
 
 /*
@@ -3782,9 +3782,9 @@ calc_capacity(int xtra_wt)
 
     if (wt <= 0)
         return UNENCUMBERED;
-    if (g.wc <= 1)
+    if (gw.wc <= 1)
         return OVERLOADED;
-    cap = (wt * 2 / g.wc) + 1;
+    cap = (wt * 2 / gw.wc) + 1;
     return min(cap, OVERLOADED);
 }
 
@@ -3799,7 +3799,7 @@ max_capacity(void)
 {
     int wt = inv_weight();
 
-    return (wt - (2 * g.wc));
+    return (wt - (2 * gw.wc));
 }
 
 boolean
@@ -3818,7 +3818,7 @@ check_capacity(const char *str)
 int
 inv_cnt(boolean incl_gold)
 {
-    register struct obj *otmp = g.invent;
+    register struct obj *otmp = gi.invent;
     register int ct = 0;
 
     while (otmp) {

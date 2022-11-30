@@ -646,7 +646,7 @@ plselInitDialog(struct plsel_data * data)
 
     /* set player name */
     control_t * name_box = &data->controls[psc_name_box];
-    SetDlgItemText(data->dialog, name_box->id, NH_A2W(g.plname, wbuf, sizeof(wbuf)));
+    SetDlgItemText(data->dialog, name_box->id, NH_A2W(gp.plname, wbuf, sizeof(wbuf)));
 
     plselRandomize(data);
 

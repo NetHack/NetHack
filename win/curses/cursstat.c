@@ -147,7 +147,7 @@ curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
 
     if (fldidx != BL_FLUSH) {
         if (fldidx < 0 || fldidx >= MAXBLSTATS) {
-            g.context.botlx = g.context.botl = FALSE; /* avoid another bot() */
+            gc.context.botlx = gc.context.botl = FALSE; /* avoid another bot() */
             panic("curses_status_update(%d)", fldidx);
         }
         changed_fields |= (1 << fldidx);
@@ -1848,7 +1848,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     wmove(win, y, x);
 
     get_playerrank(rank);
-    sprintf(buf, "%s the %s", g.plname, rank);
+    sprintf(buf, "%s the %s", gp.plname, rank);
 
     /* Use the title as HP bar (similar to hitpointbar) */
     draw_bar(TRUE, hp, hpmax, buf);
@@ -1878,7 +1878,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     wprintw(win, "%s", buf);
 
-    print_statdiff("$", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff("$", &prevau, money_cnt(gi.invent), STAT_GOLD);
 
     /* HP/Pw use special coloring rules */
     attr_t hpattr, pwattr;
@@ -1916,7 +1916,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
 
     curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
@@ -1933,9 +1933,9 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     char race[BUFSZ];
-    Strcpy(race, g.urace.adj);
+    Strcpy(race, gu.urace.adj);
     race[0] = highc(race[0]);
-    wprintw(win, "%s the %s %s%s%s", g.plname,
+    wprintw(win, "%s the %s %s%s%s", gp.plname,
             (u.ualign.type == A_CHAOTIC ? "Chaotic" :
              u.ualign.type == A_NEUTRAL ? "Neutral" : "Lawful"),
             Upolyd ? "" : race, Upolyd ? "" : " ",
@@ -1989,7 +1989,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "Pw:");
     draw_bar(FALSE, u.uen, u.uenmax, NULL);
 
-    print_statdiff(" $", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff(" $", &prevau, money_cnt(gi.invent), STAT_GOLD);
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
@@ -1997,7 +1997,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 #endif /* SCORE_ON_BOTL */
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
 
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 
@@ -2054,7 +2054,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     int ranklen = strlen(rank);
-    int namelen = strlen(g.plname);
+    int namelen = strlen(gp.plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
     if (!iflags.hitpointbar)
@@ -2071,7 +2071,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
-    sprintf(buf, "%-*s the %-*s", namelen, g.plname, ranklen, rank);
+    sprintf(buf, "%-*s the %-*s", namelen, gp.plname, ranklen, rank);
     draw_bar(TRUE, hp, hpmax, buf);
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);
@@ -2105,7 +2105,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         wprintw(win, "%d", depth(&u.uz));
     wmove(win, y++, x);
 
-    print_statdiff("Gold:          ", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff("Gold:          ", &prevau, money_cnt(gi.invent), STAT_GOLD);
     wmove(win, y++, x);
 
     /* HP/Pw use special coloring rules */
@@ -2150,7 +2150,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     if (flags.time) {
-        print_statdiff("Time:          ", &prevtime, g.moves, STAT_TIME);
+        print_statdiff("Time:          ", &prevtime, gm.moves, STAT_TIME);
         wmove(win, y++, x);
     }
 

@@ -1066,7 +1066,7 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
 
     /* Put name on stone */
     (void) snprintf(rip_line[NAME_LINE], STONE_LINE_LEN + 1,
-                    "%.*s", STONE_LINE_LEN, g.plname);
+                    "%.*s", STONE_LINE_LEN, gp.plname);
 
     /* Put $ on stone;
        to keep things safe and relatively simple, impose an arbitrary
@@ -1078,7 +1078,7 @@ void NetHackQtTextWindow::UseRIP(int how, time_t when)
        (simplest case: ~300K four times in a blessed bag of holding, so
        ~1.2M; in addition to the hassle of getting such a thing set up,
        it would need many gold-rich bones levels or wizard mode wishing) */
-    long cash = std::max(g.done_money, 0L);
+    long cash = std::max(gd.done_money, 0L);
     /* force less that 10 digits to satisfy elaborate format checking;
        it's arbitrary but still way, way more than could ever be needed */
     if (cash < 0)

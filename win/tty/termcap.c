@@ -489,7 +489,7 @@ tty_start_screen(void)
     utf8graphics_mode_callback = tty_utf8graphics_fixup;
 #endif
 
-    if (g.Cmd.num_pad)
+    if (gc.Cmd.num_pad)
         tty_number_pad(1); /* make keypad send digits */
 }
 

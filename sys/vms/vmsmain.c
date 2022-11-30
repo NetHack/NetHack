@@ -45,9 +45,9 @@ main(int argc, char *argv[])
     early_init();
 
     atexit(byebye);
-    g.hname = argv[0];
-    g.hname = vms_basename(g.hname); /* name used in 'usage' type messages */
-    g.hackpid = getpid();
+    gh.hname = argv[0];
+    gh.hname = vms_basename(gh.hname); /* name used in 'usage' type messages */
+    gh.hackpid = getpid();
     (void) umask(0);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -156,7 +156,7 @@ main(int argc, char *argv[])
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        g.locknum = 0;
+        gl.locknum = 0;
     } else {
         /* suppress interrupts while processing lock file */
         (void) signal(SIGQUIT, SIG_IGN);
@@ -164,14 +164,14 @@ main(int argc, char *argv[])
     }
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when g.locknum == 0)
-     * or if there are too many active games (when g.locknum > 0).
+     * in progress for current character name (when gl.locknum == 0)
+     * or if there are too many active games (when gl.locknum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !g.locknum) or on first available of alock, block,
+     * name (for !gl.locknum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for g.locknum > 0).
+     * (for gl.locknum > 0).
      */
     getlock();
 
@@ -191,7 +191,7 @@ main(int argc, char *argv[])
  */
 attempt_restore:
     if ((nhfp = restore_saved_game()) != 0) {
-        const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
+        const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
@@ -227,7 +227,7 @@ attempt_restore:
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!g.locknum) {
+                if (!gl.locknum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -270,11 +270,11 @@ process_options(int argc, char *argv[])
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -328,10 +328,10 @@ process_options(int argc, char *argv[])
     }
 
     if (argc > 1)
-        g.locknum = atoi(argv[1]);
+        gl.locknum = atoi(argv[1]);
 #ifdef MAX_NR_OF_PLAYERS
-    if (!g.locknum || g.locknum > MAX_NR_OF_PLAYERS)
-        g.locknum = MAX_NR_OF_PLAYERS;
+    if (!gl.locknum || gl.locknum > MAX_NR_OF_PLAYERS)
+        gl.locknum = MAX_NR_OF_PLAYERS;
 #endif
 }
 
@@ -379,8 +379,8 @@ whoami(void)
      */
     register char *s;
 
-    if (!*g.plname && (s = nh_getenv("USER")))
-        (void) lcase(strncpy(g.plname, s, sizeof(g.plname) - 1));
+    if (!*gp.plname && (s = nh_getenv("USER")))
+        (void) lcase(strncpy(gp.plname, s, sizeof(gp.plname) - 1));
 }
 
 static void
@@ -401,7 +401,7 @@ byebye(void)
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
     hup = (void (*)(int) ) signal(SIGHUP, SIG_IGN);
-    if (!g.program_state.exiting++ && hup != (void (*)(int) ) SIG_DFL
+    if (!gp.program_state.exiting++ && hup != (void (*)(int) ) SIG_DFL
         && hup != (void (*)(int) ) SIG_IGN) {
         (*hup)(SIGHUP);
     }
@@ -425,7 +425,7 @@ genericptr_t mechargs)     /* [0] is argc, [1..argc] are the real args */
     if (condition == SS$_ACCVIO /* access violation */
         || (condition >= SS$_ASTFLT && condition <= SS$_TBIT)
         || (condition >= SS$_ARTRES && condition <= SS$_INHCHME)) {
-        g.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
+        gp.program_state.done_hup = TRUE; /* pretend hangup has been attempted */
 #if (NH_DEVEL_STATUS == NH_STATUS_RELEASED)
         if (wizard)
 #endif

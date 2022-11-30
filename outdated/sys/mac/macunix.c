@@ -24,16 +24,16 @@ getlock(void)
     int fd;
     int pid = getpid(); /* Process ID */
 
-    Sprintf(g.lock, "%d%s", getuid(), g.plname);
-    set_levelfile_name(g.lock, 0);
+    Sprintf(gl.lock, "%d%s", getuid(), gp.plname);
+    set_levelfile_name(gl.lock, 0);
 
-    if ((fd = open(g.lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {
-        raw_printf("Could not lock the game %s.", g.lock);
+    if ((fd = open(gl.lock, O_RDWR | O_EXCL | O_CREAT, LEVL_TYPE)) == -1) {
+        raw_printf("Could not lock the game %s.", gl.lock);
         panic("Another game in progress?");
     }
 
     if (write(fd, (char *) &pid, sizeof(pid)) != sizeof(pid)) {
-        raw_printf("Could not lock the game %s.", g.lock);
+        raw_printf("Could not lock the game %s.", gl.lock);
         panic("Disk locked?");
     }
     close(fd);

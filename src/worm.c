@@ -213,13 +213,13 @@ worm_move(struct monst *worm)
     seg->nseg = new_seg;    /* attach it to the end of the list */
     wheads[wnum] = new_seg; /* move the end pointer */
 
-    if (wgrowtime[wnum] <= g.moves) {
+    if (wgrowtime[wnum] <= gm.moves) {
         int whplimit, whpcap, prev_mhp, wsegs = count_wsegs(worm);
 
         /* first set up for the next time to grow */
         if (!wgrowtime[wnum]) {
             /* new worm; usually grow a tail segment on its next turn */
-            wgrowtime[wnum] = g.moves + rnd(5);
+            wgrowtime[wnum] = gm.moves + rnd(5);
         } else {
             int mmove = mcalcmove(worm, FALSE),
                 /* prior to 3.7.0, next-grow increment was 3..17 but since
@@ -232,7 +232,7 @@ worm_move(struct monst *worm)
                                     * speed of 3, effective value is 8..48 */
 
             incr = (incr * NORMAL_SPEED) / max(mmove, 1);
-            wgrowtime[wnum] = g.moves + incr;
+            wgrowtime[wnum] = gm.moves + incr;
         }
 
         /* increase HP based on number of segments; if it has shrunk, it
@@ -434,7 +434,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     /* Sometimes the tail end dies. */
     if (!new_worm) {
         place_worm_seg(worm, x, y); /* place the "head" segment back */
-        if (g.context.mon_moving) {
+        if (gc.context.mon_moving) {
             if (canspotmon(worm))
                 pline("Part of %s tail has been cut off.",
                       s_suffix(mon_nam(worm)));
@@ -468,7 +468,7 @@ cutworm(struct monst *worm, coordxy x, coordxy y,
     /* Place the new monster at all the segment locations. */
     place_wsegs(new_worm, worm);
 
-    if (g.context.mon_moving)
+    if (gc.context.mon_moving)
         pline("%s is cut in half.", Monnam(worm));
     else
         You("cut %s in half.", mon_nam(worm));
@@ -672,9 +672,9 @@ sanity_check_worm(struct monst *worm)
         x = curr->wx, y = curr->wy;
         if (!isok(x, y))
             impossible("worm seg not isok <%d,%d>", x, y);
-        else if (g.level.monsters[x][y] != worm)
+        else if (gl.level.monsters[x][y] != worm)
             impossible("mon (%s) at seg location is not worm (%s)",
-                       fmt_ptr((genericptr_t) g.level.monsters[x][y]),
+                       fmt_ptr((genericptr_t) gl.level.monsters[x][y]),
                        fmt_ptr((genericptr_t) worm));
 
         curr = curr->nseg;

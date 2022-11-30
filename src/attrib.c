@@ -184,10 +184,10 @@ adjattrib(
         return FALSE;
     }
 
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
     if (msgflg <= 0)
         You_feel("%s%s!", (incr > 1 || incr < -1) ? "very " : "", attrstr);
-    if (g.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
+    if (gp.program_state.in_moveloop && (ndx == A_STR || ndx == A_CON))
         (void) encumber_msg();
     return TRUE;
 }
@@ -246,7 +246,7 @@ losestr(int num, const char *knam, schar k_format)
             if (u.uhpmax > uhpmin)
                 setuhpmax(max(u.uhpmax - dmg, uhpmin));
         }
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     }
 #if 0   /* only possible if uhpmax was already less than uhpmin */
     if (!Upolyd && u.uhpmax < uhpmin) {
@@ -354,7 +354,7 @@ poisoned(
         loss = 6 + d(4, 6);
         if (u.uhp <= loss) {
             u.uhp = -1;
-            g.context.botl = TRUE;
+            gc.context.botl = TRUE;
             pline_The("poison was deadly...");
         } else {
             /* survived, but with severe reaction */
@@ -383,8 +383,8 @@ poisoned(
     }
 
     if (u.uhp < 1) {
-        g.killer.format = kprefix;
-        Strcpy(g.killer.name, pkiller);
+        gk.killer.format = kprefix;
+        Strcpy(gk.killer.name, pkiller);
         /* "Poisoned by a poisoned ___" is redundant */
         done(strstri(pkiller, "poison") ? DIED : POISONING);
     }
@@ -407,7 +407,7 @@ stone_luck(boolean parameter) /* So I can't think up of a good name.  So sue me.
     register struct obj *otmp;
     register long bonchance = 0;
 
-    for (otmp = g.invent; otmp; otmp = otmp->nobj)
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if (confers_luck(otmp)) {
             if (otmp->cursed)
                 bonchance -= otmp->quan;
@@ -457,13 +457,13 @@ restore_attrib(void)
         if (ATEMP(i) != equilibrium && ATIME(i) != 0) {
             if (!(--(ATIME(i)))) { /* countdown for change */
                 ATEMP(i) += (ATEMP(i) > 0) ? -1 : 1;
-                g.context.botl = TRUE;
+                gc.context.botl = TRUE;
                 if (ATEMP(i)) /* reset timer */
                     ATIME(i) = 100 / ACURR(A_CON);
             }
         }
     }
-    if (g.context.botl)
+    if (gc.context.botl)
         (void) encumber_msg();
 }
 
@@ -497,14 +497,14 @@ exercise(int i, boolean inc_or_dec)
                                                                       : "Con",
                     (inc_or_dec) ? "inc" : "dec", AEXE(i));
     }
-    if (g.moves > 0 && (i == A_STR || i == A_CON))
+    if (gm.moves > 0 && (i == A_STR || i == A_CON))
         (void) encumber_msg();
 }
 
 static void
 exerper(void)
 {
-    if (!(g.moves % 10)) {
+    if (!(gm.moves % 10)) {
         /* Hunger Checks */
         int hs = (u.uhunger > 1000) ? SATIATED
                  : (u.uhunger > 150) ? NOT_HUNGRY
@@ -551,7 +551,7 @@ exerper(void)
     }
 
     /* status checks */
-    if (!(g.moves % 5)) {
+    if (!(gm.moves % 5)) {
         debugpline0("exerper: Status checks");
         if ((HClairvoyant & (INTRINSIC | TIMEOUT)) && !BClairvoyant)
             exercise(A_WIS, TRUE);
@@ -586,11 +586,11 @@ exerchk(void)
     /*  Check out the periodic accumulations */
     exerper();
 
-    if (g.moves >= g.context.next_attrib_check) {
-        debugpline1("exerchk: ready to test. multi = %ld.", g.multi);
+    if (gm.moves >= gc.context.next_attrib_check) {
+        debugpline1("exerchk: ready to test. multi = %ld.", gm.multi);
     }
     /*  Are we ready for a test? */
-    if (g.moves >= g.context.next_attrib_check && !g.multi) {
+    if (gm.moves >= gc.context.next_attrib_check && !gm.multi) {
         debugpline0("exerchk: testing.");
         /*
          *      Law of diminishing returns (Part II):
@@ -654,9 +654,9 @@ exerchk(void)
                platform-dependent rounding/truncation for negative vals */
             AEXE(i) = (abs(ax) / 2) * mod_val;
         }
-        g.context.next_attrib_check += rn1(200, 800);
+        gc.context.next_attrib_check += rn1(200, 800);
         debugpline1("exerchk: next check at %ld.",
-                    g.context.next_attrib_check);
+                    gc.context.next_attrib_check);
     }
 }
 
@@ -667,9 +667,9 @@ init_attr(int np)
     register int i, x, tryct;
 
     for (i = 0; i < A_MAX; i++) {
-        ABASE(i) = AMAX(i) = g.urole.attrbase[i];
+        ABASE(i) = AMAX(i) = gu.urole.attrbase[i];
         ATEMP(i) = ATIME(i) = 0;
-        np -= g.urole.attrbase[i];
+        np -= gu.urole.attrbase[i];
     }
 
     /* 3.7: the x -= ... calculation used to have an off by 1 error that
@@ -678,7 +678,7 @@ init_attr(int np)
     while (np > 0 && tryct < 100) {
         x = rn2(100);
         for (i = 0; i < A_MAX; ++i)
-            if ((x -= g.urole.attrdist[i]) < 0)
+            if ((x -= gu.urole.attrdist[i]) < 0)
                 break;
         if (i >= A_MAX || ABASE(i) >= ATTRMAX(i)) {
             tryct++;
@@ -694,7 +694,7 @@ init_attr(int np)
     while (np < 0 && tryct < 100) { /* for redistribution */
         x = rn2(100);
         for (i = 0; i < A_MAX; ++i)
-            if ((x -= g.urole.attrdist[i]) < 0)
+            if ((x -= gu.urole.attrdist[i]) < 0)
                 break;
         if (i >= A_MAX || ABASE(i) <= ATTRMIN(i)) {
             tryct++;
@@ -848,7 +848,7 @@ is_innate(int propidx)
            ignore innateness if equipment is going to claim responsibility */
         && !u.uprops[propidx].extrinsic)
         return FROM_ROLE;
-    if (propidx == BLINDED && !haseyes(g.youmonst.data))
+    if (propidx == BLINDED && !haseyes(gy.youmonst.data))
         return FROM_FORM;
     return FROM_NONE;
 }
@@ -1026,30 +1026,30 @@ newhp(void)
 
     if (u.ulevel == 0) {
         /* Initialize hit points */
-        hp = g.urole.hpadv.infix + g.urace.hpadv.infix;
-        if (g.urole.hpadv.inrnd > 0)
-            hp += rnd(g.urole.hpadv.inrnd);
-        if (g.urace.hpadv.inrnd > 0)
-            hp += rnd(g.urace.hpadv.inrnd);
-        if (g.moves <= 1L) { /* initial hero; skip for polyself to new man */
+        hp = gu.urole.hpadv.infix + gu.urace.hpadv.infix;
+        if (gu.urole.hpadv.inrnd > 0)
+            hp += rnd(gu.urole.hpadv.inrnd);
+        if (gu.urace.hpadv.inrnd > 0)
+            hp += rnd(gu.urace.hpadv.inrnd);
+        if (gm.moves <= 1L) { /* initial hero; skip for polyself to new man */
             /* Initialize alignment stuff */
             u.ualign.type = aligns[flags.initalign].value;
-            u.ualign.record = g.urole.initrecord;
+            u.ualign.record = gu.urole.initrecord;
         }
         /* no Con adjustment for initial hit points */
     } else {
-        if (u.ulevel < g.urole.xlev) {
-            hp = g.urole.hpadv.lofix + g.urace.hpadv.lofix;
-            if (g.urole.hpadv.lornd > 0)
-                hp += rnd(g.urole.hpadv.lornd);
-            if (g.urace.hpadv.lornd > 0)
-                hp += rnd(g.urace.hpadv.lornd);
+        if (u.ulevel < gu.urole.xlev) {
+            hp = gu.urole.hpadv.lofix + gu.urace.hpadv.lofix;
+            if (gu.urole.hpadv.lornd > 0)
+                hp += rnd(gu.urole.hpadv.lornd);
+            if (gu.urace.hpadv.lornd > 0)
+                hp += rnd(gu.urace.hpadv.lornd);
         } else {
-            hp = g.urole.hpadv.hifix + g.urace.hpadv.hifix;
-            if (g.urole.hpadv.hirnd > 0)
-                hp += rnd(g.urole.hpadv.hirnd);
-            if (g.urace.hpadv.hirnd > 0)
-                hp += rnd(g.urace.hpadv.hirnd);
+            hp = gu.urole.hpadv.hifix + gu.urace.hpadv.hifix;
+            if (gu.urole.hpadv.hirnd > 0)
+                hp += rnd(gu.urole.hpadv.hirnd);
+            if (gu.urace.hpadv.hirnd > 0)
+                hp += rnd(gu.urace.hpadv.hirnd);
         }
         if (ACURR(A_CON) <= 3)
             conplus = -2;
@@ -1102,10 +1102,10 @@ setuhpmax(int newmax)
         u.uhpmax = newmax;
         if (u.uhpmax > u.uhppeak)
             u.uhppeak = u.uhpmax;
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     }
     if (u.uhp > u.uhpmax)
-        u.uhp = u.uhpmax, g.context.botl = TRUE;
+        u.uhp = u.uhpmax, gc.context.botl = TRUE;
 }
 
 schar
@@ -1124,7 +1124,7 @@ acurr(int x)
 #endif
     } else if (x == A_CHA) {
         if (tmp < 18
-            && (g.youmonst.data->mlet == S_NYMPH
+            && (gy.youmonst.data->mlet == S_NYMPH
                 || u.umonnum == PM_AMOROUS_DEMON))
             return (schar) 18;
     } else if (x == A_CON) {
@@ -1216,7 +1216,7 @@ uchangealign(int newalign,
     u.ublessed = 0; /* lose divine protection */
     /* You/Your/pline message with call flush_screen(), triggering bot(),
        so the actual data change needs to come before the message */
-    g.context.botl = TRUE; /* status line needs updating */
+    gc.context.botl = TRUE; /* status line needs updating */
     if (reason == 0) {
         /* conversion via altar */
         livelog_printf(LL_ALIGNMENT, "permanently converted to %s",

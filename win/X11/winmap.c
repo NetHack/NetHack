@@ -64,7 +64,7 @@ static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
 static void X11_set_map_font(struct xwindow *wp);
 #endif
 static void X11_draw_image_string(Display *display, Drawable d,
-                                  GC gc, int x, int y,
+                                  GC ggc, int x, int y,
                                   const X11_map_symbol *string, int length);
 static Font X11_get_map_font(struct xwindow *wp);
 static XFontStruct *X11_get_map_font_struct(struct xwindow *wp);
@@ -1024,7 +1024,7 @@ static void
 map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
 {
     int x, y;
-    glyph_info gi;
+    glyph_info ginfo;
     short unexp_idx, nothg_idx;
  /* unsigned short g_stone = cmap_to_glyph(S_stone); */
     unsigned short g_unexp = GLYPH_UNEXPLORED, g_nothg = GLYPH_NOTHING;
@@ -1035,10 +1035,10 @@ map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
     mgunexp = glyph2ttychar(GLYPH_UNEXPLORED);
     mgnothg = glyph2ttychar(GLYPH_NOTHING);
 
-    map_glyphinfo(0, 0, g_unexp, 0, &gi);
-    unexp_idx = gi.gm.tileidx;
-    map_glyphinfo(0, 0, g_nothg, 0, &gi);
-    nothg_idx = gi.gm.tileidx;
+    map_glyphinfo(0, 0, g_unexp, 0, &ginfo);
+    unexp_idx = ginfo.gm.tileidx;
+    map_glyphinfo(0, 0, g_nothg, 0, &ginfo);
+    nothg_idx = ginfo.gm.tileidx;
 
     /*
      * Tiles map tracks glyphs.
@@ -1453,7 +1453,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
             X11_map_symbol *t_ptr;
             int cur_col, win_ystart;
             X11_color color;
-            GC gc;
+            GC ggc;
 
             for (row = start_row; row <= stop_row; row++) {
                 win_ystart =
@@ -1470,15 +1470,15 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                         c_ptr++;
                     }
 
-                    gc = X11_make_gc(wp, text_map, color, inverted);
+                    ggc = X11_make_gc(wp, text_map, color, inverted);
                     X11_draw_image_string(XtDisplay(wp->w), XtWindow(wp->w),
-                                          gc,
+                                          ggc,
                                           text_map->square_lbearing
                                               + (text_map->square_width
                                                  * (cur_col - COL0_OFFSET)),
                                           win_ystart, t_ptr, count);
 #ifdef ENHANCED_SYMBOLS
-                    X11_free_gc(wp, gc, color);
+                    X11_free_gc(wp, ggc, color);
 #endif
 
                     /* move text pointer and column count */
@@ -1524,7 +1524,7 @@ X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
             X11_color color, boolean inverted)
 {
     boolean cur_inv = inverted;
-    GC gc;
+    GC ggc;
 
 #ifdef ENHANCED_SYMBOLS
     if ((color & 0x80000000) != 0) {
@@ -1551,11 +1551,11 @@ X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
             }
             values.function = GXcopy;
             values.font = X11_get_map_font(wp);
-            gc = XtGetGC(wp->w,
+            ggc = XtGetGC(wp->w,
                          GCFunction | GCForeground | GCBackground | GCFont,
                          &values);
         } else {
-            gc = (cur_inv ? text_map->inv_copy_gc : text_map->copy_gc);
+            ggc = (cur_inv ? text_map->inv_copy_gc : text_map->copy_gc);
         }
     } else
 #endif
@@ -1564,7 +1564,7 @@ X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
             color -= CLR_MAX;
             cur_inv = !cur_inv;
         }
-        gc = iflags.use_color
+        ggc = iflags.use_color
            ? (cur_inv
               ? text_map->inv_color_gcs[color]
               : text_map->color_gcs[color])
@@ -1572,16 +1572,16 @@ X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
               ? text_map->inv_copy_gc
               : text_map->copy_gc);
     }
-    return gc;
+    return ggc;
 }
 
 #ifdef ENHANCED_SYMBOLS
 static void
-X11_free_gc(struct xwindow *wp, GC gc, X11_color color)
+X11_free_gc(struct xwindow *wp, GC ggc, X11_color color)
 {
     if ((color & 0x80000000) != 0 && iflags.use_color) {
         /* X11_make_gc allocated a new GC */
-        XtReleaseGC(wp->w, gc);
+        XtReleaseGC(wp->w, ggc);
     }
 }
 #endif
@@ -1589,7 +1589,7 @@ X11_free_gc(struct xwindow *wp, GC gc, X11_color color)
 
 static void
 X11_draw_image_string(Display *display, Drawable d,
-                      GC gc, int x, int y,
+                      GC ggc, int x, int y,
                       const X11_map_symbol *string, int length)
 {
 #ifdef ENHANCED_SYMBOLS
@@ -1610,9 +1610,9 @@ X11_draw_image_string(Display *display, Drawable d,
         wstr[i].byte1 = ch >> 8;
         wstr[i].byte2 = ch & 0xFF;
     }
-    XDrawImageString16(display, d, gc, x, y, wstr, length);
+    XDrawImageString16(display, d, ggc, x, y, wstr, length);
 #else /* !ENHANCED_SYMBOLS */
-    XDrawImageString(display, d, gc, x, y, (char *) string, length);
+    XDrawImageString(display, d, ggc, x, y, (char *) string, length);
 #endif /* ?ENHANCED_SYMBOLS */
 }
 
@@ -1988,7 +1988,7 @@ x_event(int exit_condition)
                 inptr = (inptr + 1) % INBUF_SIZE;
                 /* pkey(retval); */
                 keep_going = FALSE;
-            } else if (g.program_state.done_hup) {
+            } else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
@@ -2007,7 +2007,7 @@ x_event(int exit_condition)
                     /* pkey(retval); */
                 }
                 keep_going = FALSE;
-            } else if (g.program_state.done_hup) {
+            } else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;

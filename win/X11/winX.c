@@ -957,8 +957,8 @@ X11_putstr(winid window, int attr, const char *str)
 
     switch (wp->type) {
     case NHW_MESSAGE:
-        (void) strncpy(g.toplines, str, TBUFSZ); /* for Norep(). */
-        g.toplines[TBUFSZ - 1] = 0;
+        (void) strncpy(gt.toplines, str, TBUFSZ); /* for Norep(). */
+        gt.toplines[TBUFSZ - 1] = 0;
         append_message(wp, str);
         break;
 #ifndef STATUS_HILITES
@@ -1272,7 +1272,7 @@ X11_update_inventory(int arg)
 
     if (iflags.perm_invent) {
         /* skip any calls to update_inventory() before in_moveloop starts */
-        if (g.program_state.in_moveloop || g.program_state.gameover) {
+        if (gp.program_state.in_moveloop || gp.program_state.gameover) {
             updated_inventory = 1; /* hack to avoid mapping&raising window */
             if (!arg) {
                 (void) display_inventory((char *) 0, FALSE);
@@ -1754,7 +1754,7 @@ X11_hangup(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 X11_bail(const char *mesg)
 {
-    g.program_state.something_worth_saving = 0;
+    gp.program_state.something_worth_saving = 0;
     clearlocks();
     X11_exit_nhwindows(mesg);
     nh_terminate(EXIT_SUCCESS);
@@ -1771,7 +1771,7 @@ askname_delete(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(num_params);
 
     nh_XtPopdown(w);
-    (void) strcpy(g.plname, "Mumbles"); /* give them a name... ;-) */
+    (void) strcpy(gp.plname, "Mumbles"); /* give them a name... ;-) */
     exit_x_event = TRUE;
 }
 
@@ -1796,11 +1796,11 @@ askname_done(Widget w, XtPointer client_data, XtPointer call_data)
     }
 
     /* Truncate name if necessary */
-    if (len >= sizeof g.plname - 1)
-        len = sizeof g.plname - 1;
+    if (len >= sizeof gp.plname - 1)
+        len = sizeof gp.plname - 1;
 
-    (void) strncpy(g.plname, s, len);
-    g.plname[len] = '\0';
+    (void) strncpy(gp.plname, s, len);
+    gp.plname[len] = '\0';
     XtFree(s);
 
     nh_XtPopdown(XtParent(dialog));
@@ -1848,7 +1848,7 @@ X11_askname(void)
                           (XtCallbackProc) 0);
 
     SetDialogPrompt(dialog, nhStr("What is your name?")); /* set prompt */
-    SetDialogResponse(dialog, g.plname, PL_NSIZ); /* set default answer */
+    SetDialogResponse(dialog, gp.plname, PL_NSIZ); /* set default answer */
 
     XtRealizeWidget(popup);
     positionpopup(popup, TRUE); /* center,bottom */
@@ -1997,7 +1997,7 @@ X11_getlin(
     /* we get here after the popup has exited;
        put prompt and response into the message window (and into
        core's dumplog history) unless play hasn't started yet */
-    if (g.program_state.in_moveloop || g.program_state.gameover) {
+    if (gp.program_state.in_moveloop || gp.program_state.gameover) {
         /* single space has meaning (to remove a previously applied name) so
            show it clearly; don't care about legibility of multiple spaces */
         const char *visanswer = !input[0] ? "<empty>"
@@ -2511,12 +2511,12 @@ highlight_yn(boolean init)
         Arg args[2];
         XGCValues vals;
         unsigned long fg_bg = (GCForeground | GCBackground);
-        GC gc = (xmap->map_information->is_tile
+        GC ggc = (xmap->map_information->is_tile
                     ? xmap->map_information->tile_map.white_gc
                     : xmap->map_information->text_map.copy_gc);
 
         (void) memset((genericptr_t) &vals, 0, sizeof vals);
-        if (XGetGCValues(XtDisplay(xmap->w), gc, fg_bg, &vals)) {
+        if (XGetGCValues(XtDisplay(xmap->w), ggc, fg_bg, &vals)) {
             XtSetArg(args[0], XtNforeground, vals.foreground);
             XtSetArg(args[1], XtNbackground, vals.background);
             XtSetValues(yn_label, args, TWO);

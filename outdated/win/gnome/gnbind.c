@@ -354,7 +354,7 @@ gnome_askname()
 
     /* Ask for a name and stuff the response into plname, a nethack global */
     ret = ghack_ask_string_dialog("What is your name?", "gandalf",
-                                  "GnomeHack", g.plname);
+                                  "GnomeHack", gp.plname);
 
     /* Quit if they want to quit... */
     if (ret == -1) {
@@ -907,7 +907,7 @@ gnome_nhgetch()
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
     while (g_numKeys == 0) {
-        if (g.program_state.done_hup)
+        if (gp.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -945,7 +945,7 @@ gnome_nh_poskey(int *x, int *y, int *mod)
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
     while (g_numKeys == 0 && g_numClicks == 0) {
-        if (g.program_state.done_hup)
+        if (gp.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -1169,7 +1169,7 @@ gnome_outrip(winid wid, int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(buf, "%s\n", g.plname);
+    Sprintf(buf, "%s\n", gp.plname);
     Strcat(ripString, buf);
 
     /* Put $ on stone */

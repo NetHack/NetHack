@@ -16,7 +16,7 @@ take_gold(void)
     struct obj *otmp, *nobj;
     int lost_money = 0;
 
-    for (otmp = g.invent; otmp; otmp = nobj) {
+    for (otmp = gi.invent; otmp; otmp = nobj) {
         nobj = otmp->nobj;
         if (otmp->oclass == COIN_CLASS) {
             lost_money = 1;
@@ -28,7 +28,7 @@ take_gold(void)
         You_feel("a strange sensation.");
     } else {
         You("notice you have no gold!");
-        g.context.botl = 1;
+        gc.context.botl = 1;
     }
 }
 
@@ -69,7 +69,7 @@ throne_sit_effect(void)
             make_blinded(0L, TRUE);
             make_sick(0L, (char *) 0, FALSE, SICK_ALL);
             heal_legs(0);
-            g.context.botl = 1;
+            gc.context.botl = 1;
             break;
         case 5:
             take_gold();
@@ -113,7 +113,7 @@ throne_sit_effect(void)
             break;
         case 10:
             if (Luck < 0 || (HSee_invisible & INTRINSIC)) {
-                if (g.level.flags.nommap) {
+                if (gl.level.flags.nommap) {
                     pline("A terrible drone fills your head!");
                     make_confused((HConfusion & TIMEOUT) + (long) rnd(30),
                                   FALSE);
@@ -126,7 +126,7 @@ throne_sit_effect(void)
                 if (!Blind) {
                     Your("vision becomes clear.");
                 } else {
-                    int num_of_eyes = eyecount(g.youmonst.data);
+                    int num_of_eyes = eyecount(gy.youmonst.data);
                     const char *eye = body_part(EYE);
 
                     /* note: 1 eye case won't actually happen--can't
@@ -161,7 +161,7 @@ throne_sit_effect(void)
             break;
         case 12:
             You("are granted an insight!");
-            if (g.invent) {
+            if (gi.invent) {
                 /* rn2(5) agrees w/seffects() */
                 identify_pack(rn2(5), FALSE);
             }
@@ -176,7 +176,7 @@ throne_sit_effect(void)
             break;
         }
     } else {
-        if (is_prince(g.youmonst.data) || u.uevent.uhand_of_elbereth)
+        if (is_prince(gy.youmonst.data) || u.uevent.uhand_of_elbereth)
             You_feel("very comfortable here.");
         else
             You_feel("somehow out of place...");
@@ -205,14 +205,14 @@ lay_an_egg(void)
     } else if (u.uhunger < (int) objects[EGG].oc_nutrition) {
         You("don't have enough energy to lay an egg.");
         return ECMD_OK;
-    } else if (eggs_in_water(g.youmonst.data)) {
+    } else if (eggs_in_water(gy.youmonst.data)) {
         if (!(Underwater || Is_waterlevel(&u.uz))) {
             pline("A splash tetra you are not.");
             return ECMD_OK;
         }
         if (Upolyd
-            && (g.youmonst.data == &mons[PM_GIANT_EEL]
-                || g.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
+            && (gy.youmonst.data == &mons[PM_GIANT_EEL]
+                || gy.youmonst.data == &mons[PM_ELECTRIC_EEL])) {
             You("yearn for the Sargasso Sea.");
             return ECMD_OK;
         }
@@ -224,7 +224,7 @@ lay_an_egg(void)
     /* this sets hatch timers if appropriate */
     set_corpsenm(uegg, egg_type_from_parent(u.umonnum, FALSE));
     uegg->known = uegg->dknown = 1;
-    You("%s an egg.", eggs_in_water(g.youmonst.data) ? "spawn" : "lay");
+    You("%s an egg.", eggs_in_water(gy.youmonst.data) ? "spawn" : "lay");
     dropy(uegg);
     stackobj(uegg);
     morehungry((int) objects[EGG].oc_nutrition);
@@ -243,7 +243,7 @@ dosit(void)
         You("are already sitting on %s.", mon_nam(u.usteed));
         return ECMD_OK;
     }
-    if (u.uundetected && is_hider(g.youmonst.data) && u.umonnum != PM_TRAPPER)
+    if (u.uundetected && is_hider(gy.youmonst.data) && u.umonnum != PM_TRAPPER)
         u.uundetected = 0; /* no longer on the ceiling */
 
     if (!can_reach_floor(FALSE)) {
@@ -254,7 +254,7 @@ dosit(void)
         else
             You("are sitting on air.");
         return ECMD_OK;
-    } else if (u.ustuck && !sticks(g.youmonst.data)) {
+    } else if (u.ustuck && !sticks(gy.youmonst.data)) {
         /* holding monster is next to hero rather than beneath, but
            hero is in no condition to actually sit at has/her own spot */
         if (humanoid(u.ustuck->data))
@@ -271,10 +271,10 @@ dosit(void)
         && !(uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
         register struct obj *obj;
 
-        obj = g.level.objects[u.ux][u.uy];
-        if (g.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
+        obj = gl.level.objects[u.ux][u.uy];
+        if (gy.youmonst.data->mlet == S_DRAGON && obj->oclass == COIN_CLASS) {
             You("coil up around your %shoard.",
-                (obj->quan + money_cnt(g.invent) < u.ulevel * 1000)
+                (obj->quan + money_cnt(gi.invent) < u.ulevel * 1000)
                 ? "meager " : "");
         } else if (obj->otyp == TOWEL) {
             pline("It's probably not a good time for a picnic...");
@@ -322,12 +322,12 @@ dosit(void)
             dotrap(trap, VIASITTING);
         }
     } else if ((Underwater || Is_waterlevel(&u.uz))
-                && !eggs_in_water(g.youmonst.data)) {
+                && !eggs_in_water(gy.youmonst.data)) {
         if (Is_waterlevel(&u.uz))
             There("are no cushions floating nearby.");
         else
             You("sit down on the muddy bottom.");
-    } else if (is_pool(u.ux, u.uy) && !eggs_in_water(g.youmonst.data)) {
+    } else if (is_pool(u.ux, u.uy) && !eggs_in_water(gy.youmonst.data)) {
  in_water:
         You("sit in the %s.", hliquid("water"));
         if (!rn2(10) && uarm)
@@ -337,7 +337,7 @@ dosit(void)
     } else if (IS_SINK(typ)) {
         You(sit_message, defsyms[S_sink].explanation);
         Your("%s gets wet.",
-             humanoid(g.youmonst.data) ? "rump" : "underside");
+             humanoid(gy.youmonst.data) ? "rump" : "underside");
     } else if (IS_ALTAR(typ)) {
         You(sit_message, defsyms[S_altar].explanation);
         altar_wrath(u.ux, u.uy);
@@ -351,7 +351,7 @@ dosit(void)
         /* must be WWalking */
         You(sit_message, hliquid("lava"));
         burn_away_slime();
-        if (likes_lava(g.youmonst.data)) {
+        if (likes_lava(gy.youmonst.data)) {
             pline_The("%s feels warm.", hliquid("lava"));
             return ECMD_TIME;
         }
@@ -367,7 +367,7 @@ dosit(void)
     } else if (IS_THRONE(typ)) {
         You(sit_message, defsyms[S_throne].explanation);
         throne_sit_effect();
-    } else if (lays_eggs(g.youmonst.data)) {
+    } else if (lays_eggs(gy.youmonst.data)) {
         return lay_an_egg();
     } else {
         pline("Having fun sitting on the %s?", surface(u.ux, u.uy));
@@ -394,7 +394,7 @@ rndcurse(void)
         You(mal_aura, "you");
     }
 
-    for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+    for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
         /* gold isn't subject to being cursed or blessed */
         if (otmp->oclass == COIN_CLASS)
             continue;
@@ -404,7 +404,7 @@ rndcurse(void)
         for (cnt = rnd(6 / ((!!Antimagic) + (!!Half_spell_damage) + 1));
              cnt > 0; cnt--) {
             onum = rnd(nobj);
-            for (otmp = g.invent; otmp; otmp = otmp->nobj) {
+            for (otmp = gi.invent; otmp; otmp = otmp->nobj) {
                 /* as above */
                 if (otmp->oclass == COIN_CLASS)
                     continue;

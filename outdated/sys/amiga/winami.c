@@ -437,10 +437,10 @@ amii_askname()
         amii_getlin("Who are you?", plnametmp);
     } while (strlen(plnametmp) == 0);
 
-    strncpy(g.plname, plnametmp, PL_NSIZ - 1); /* Avoid overflowing plname[] */
-    g.plname[PL_NSIZ - 1] = 0;
+    strncpy(gp.plname, plnametmp, PL_NSIZ - 1); /* Avoid overflowing plname[] */
+    gp.plname[PL_NSIZ - 1] = 0;
 
-    if (*g.plname == '\33') {
+    if (*gp.plname == '\33') {
         clearlocks();
         exit_nhwindows(NULL);
         nh_terminate(0);
@@ -474,9 +474,9 @@ amii_player_selection()
 #if 0 /* Don't query the user ... instead give random character -jhsa */
 
 #if 0 /* OBSOLETE */
-    if( *g.pl_character ){
-	g.pl_character[ 0 ] = toupper( g.pl_character[ 0 ] );
-	if( strchr( pl_classes, g.pl_character[ 0 ] ) )
+    if( *gp.pl_character ){
+	gp.pl_character[ 0 ] = toupper( gp.pl_character[ 0 ] );
+	if( strchr( pl_classes, gp.pl_character[ 0 ] ) )
 	    return;
     }
 #endif
@@ -530,19 +530,19 @@ amii_player_selection()
 	    case VANILLAKEY:
 		if( strchr( pl_classes, toupper( code ) ) )
 		{
-		    g.pl_character[0] = toupper( code );
+		    gp.pl_character[0] = toupper( code );
 		    aredone = 1;
 		}
 		else if( code == ' ' || code == '\n' || code == '\r' )
 		{
 		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
-		    strcpy( g.pl_character, roles[ rnd( 11 ) ] );
+		    strcpy( gp.pl_character, roles[ rnd( 11 ) ] );
 #endif
 		    aredone = 1;
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );
-		    RandomWindow( g.pl_character );
+		    RandomWindow( gp.pl_character );
 		    return;
 		}
 		else if( code == 'q' || code == 'Q' )
@@ -562,15 +562,15 @@ amii_player_selection()
 		case 1: /* Random Character */
 		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
-		    strcpy( g.pl_character, roles[ rnd( 11 ) ] );
+		    strcpy( gp.pl_character, roles[ rnd( 11 ) ] );
 #endif
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );
-		    RandomWindow( g.pl_character );
+		    RandomWindow( gp.pl_character );
 		    return;
 
 		default:
-		    g.pl_character[0] = gd->GadgetID;
+		    gp.pl_character[0] = gd->GadgetID;
 		    break;
 		}
 		aredone = 1;

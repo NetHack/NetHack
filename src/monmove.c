@@ -121,7 +121,7 @@ watch_on_duty(register struct monst* mtmp)
             }
         } else if (is_digging()) {
             /* chewing, wand/spell of digging are checked elsewhere */
-            watch_dig(mtmp, g.context.digging.pos.x, g.context.digging.pos.y,
+            watch_dig(mtmp, gc.context.digging.pos.x, gc.context.digging.pos.y,
                       FALSE);
         }
     }
@@ -138,7 +138,7 @@ dochugw(
 {
     coordxy x = mtmp->mx, y = mtmp->my; /* 'mtmp's location before dochug() */
     /* skip canspotmon() if occupation is Null */
-    boolean already_saw_mon = (chug && g.occupation) ? canspotmon(mtmp) : 0;
+    boolean already_saw_mon = (chug && go.occupation) ? canspotmon(mtmp) : 0;
     int rd = chug ? dochug(mtmp) : 0;
 
     /*
@@ -148,7 +148,7 @@ dochugw(
      */
 
     /* check whether hero notices monster and stops current activity */
-    if (g.occupation && !rd
+    if (go.occupation && !rd
         /* monster is hostile and can attack (or hallu distorts knowledge) */
         && (Hallucination || (!mtmp->mpeaceful && !noattacks(mtmp->data)))
         /* it's close enough to be a threat */
@@ -224,7 +224,7 @@ void
 mon_regen(struct monst *mon, boolean digest_meal)
 {
     if (mon->mhp < mon->mhpmax
-        && (g.moves % 20 == 0 || regenerates(mon->data)))
+        && (gm.moves % 20 == 0 || regenerates(mon->data)))
         mon->mhp++;
     if (mon->mspec_used)
         mon->mspec_used--;
@@ -282,7 +282,7 @@ release_hero(struct monst *mon)
     if (mon == u.ustuck) {
         if (u.uswallow) {
             expels(mon, mon->data, TRUE);
-        } else if (!sticks(g.youmonst.data)) {
+        } else if (!sticks(gy.youmonst.data)) {
             unstuck(mon); /* let go */
             You("get released!");
         }
@@ -294,7 +294,7 @@ find_pmmonst(int pm)
 {
     struct monst *mtmp = 0;
 
-    if ((g.mvitals[pm].mvflags & G_GENOD) == 0)
+    if ((gm.mvitals[pm].mvflags & G_GENOD) == 0)
         for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
             if (DEADMONSTER(mtmp))
                 continue;
@@ -498,8 +498,8 @@ mind_blast(register struct monst* mtmp)
                         /* hero has no way to hide as monster but
                             check for that theoretical case anyway */
                         && U_AP_TYPE != M_AP_MONSTER) {
-                g.youmonst.m_ap_type = M_AP_NOTHING;
-                g.youmonst.mappearance = 0;
+                gy.youmonst.m_ap_type = M_AP_NOTHING;
+                gy.youmonst.mappearance = 0;
                 newsym(u.ux, u.uy);
             }
             pline("It locks on to your %s!",
@@ -662,7 +662,7 @@ dochug(register struct monst* mtmp)
             pline("%s whispers at thin air.",
                   cansee(mtmp->mux, mtmp->muy) ? Monnam(mtmp) : "It");
 
-            if (is_demon(g.youmonst.data)) {
+            if (is_demon(gy.youmonst.data)) {
                 /* "Good hunting, brother" */
                 if (!tele_restrict(mtmp))
                     (void) rloc(mtmp, RLOC_MSG);
@@ -733,7 +733,7 @@ dochug(register struct monst* mtmp)
        to move. Movement itself is handled by the m_move() function. */
     if (!nearby || mtmp->mflee || scared || mtmp->mconf || mtmp->mstun
         || (mtmp->minvis && !rn2(3))
-        || (mdat->mlet == S_LEPRECHAUN && !findgold(g.invent)
+        || (mdat->mlet == S_LEPRECHAUN && !findgold(gi.invent)
             && (findgold(mtmp->minvent) || rn2(2)))
         || (is_wanderer(mdat) && !rn2(4)) || (Conflict && !mtmp->iswiz)
         || (!mtmp->mcansee && !rn2(4)) || mtmp->mpeaceful) {
@@ -846,7 +846,7 @@ static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
 boolean
 itsstuck(register struct monst* mtmp)
 {
-    if (sticks(g.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
+    if (sticks(gy.youmonst.data) && mtmp == u.ustuck && !u.uswallow) {
         pline("%s cannot escape from you!", Monnam(mtmp));
         return TRUE;
     }
@@ -866,8 +866,8 @@ should_displace(
     coord *poss, /* coord poss[9] */
     long *info,  /* long info[9] */
     int cnt,
-    coordxy gx,
-    coordxy gy)
+    coordxy ggx,
+    coordxy ggy)
 {
     int shortest_with_displacing = -1;
     int shortest_without_displacing = -1;
@@ -878,7 +878,7 @@ should_displace(
     for (i = 0; i < cnt; i++) {
         nx = poss[i].x;
         ny = poss[i].y;
-        ndist = dist2(nx, ny, gx, gy);
+        ndist = dist2(nx, ny, ggx, ggy);
         if (MON_AT(nx, ny) && (info[i] & ALLOW_MDISP) && !(info[i] & ALLOW_M)
             && !undesirable_disp(mtmp, nx, ny)) {
             if (shortest_with_displacing == -1
@@ -939,7 +939,7 @@ leppie_avoidance(struct monst *mtmp)
     if (mtmp->data == &mons[PM_LEPRECHAUN]
         && ((lepgold = findgold(mtmp->minvent))
             && (lepgold->quan
-                > ((ygold = findgold(g.invent)) ? ygold->quan : 0L))))
+                > ((ygold = findgold(gi.invent)) ? ygold->quan : 0L))))
         return TRUE;
 
     return FALSE;
@@ -1074,7 +1074,7 @@ int
 m_move(register struct monst* mtmp, register int after)
 {
     int appr, etmp;
-    coordxy gx, gy, nix, niy;
+    coordxy ggx, ggy, nix, niy;
     xint16 chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
     boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
@@ -1142,7 +1142,7 @@ m_move(register struct monst* mtmp, register int after)
          */
         if ((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) && intruder
             && (intruder != mtmp)) {
-            g.notonhead = (intruder->mx != tx || intruder->my != ty);
+            gn.notonhead = (intruder->mx != tx || intruder->my != ty);
             if (mattackm(mtmp, intruder) == 2)
                 return MMOVE_DIED;
             mmoved = MMOVE_MOVED;
@@ -1199,20 +1199,20 @@ m_move(register struct monst* mtmp, register int after)
         return MMOVE_MOVED;
     omx = mtmp->mx;
     omy = mtmp->my;
-    gx = mtmp->mux;
-    gy = mtmp->muy;
+    ggx = mtmp->mux;
+    ggy = mtmp->muy;
     appr = mtmp->mflee ? -1 : 1;
     if (mtmp->mconf || engulfing_u(mtmp)) {
         appr = 0;
     } else {
         boolean should_see = (couldsee(omx, omy)
-                              && (levl[gx][gy].lit || !levl[omx][omy].lit)
-                              && (dist2(omx, omy, gx, gy) <= 36));
+                              && (levl[ggx][ggy].lit || !levl[omx][omy].lit)
+                              && (dist2(omx, omy, ggx, ggy) <= 36));
 
         if (!mtmp->mcansee
             || (should_see && Invis && !perceives(ptr) && rn2(11))
-            || is_obj_mappear(&g.youmonst, STRANGE_OBJECT) || u.uundetected
-            || (is_obj_mappear(&g.youmonst, GOLD_PIECE) && !likes_gold(ptr))
+            || is_obj_mappear(&gy.youmonst, STRANGE_OBJECT) || u.uundetected
+            || (is_obj_mappear(&gy.youmonst, GOLD_PIECE) && !likes_gold(ptr))
             || (mtmp->mpeaceful && !mtmp->isshk) /* allow shks to follow */
             || ((monsndx(ptr) == PM_STALKER || ptr->mlet == S_BAT
                  || ptr->mlet == S_LIGHT) && !rn2(3)))
@@ -1230,8 +1230,8 @@ m_move(register struct monst* mtmp, register int after)
 
             cp = gettrack(omx, omy);
             if (cp) {
-                gx = cp->x;
-                gy = cp->y;
+                ggx = cp->x;
+                ggy = cp->y;
             }
         }
     }
@@ -1239,7 +1239,7 @@ m_move(register struct monst* mtmp, register int after)
     if ((!mtmp->mpeaceful || !rn2(10)) && (!Is_rogue_level(&u.uz))) {
         boolean in_line = (lined_up(mtmp)
              && (distmin(mtmp->mx, mtmp->my, mtmp->mux, mtmp->muy)
-                 <= (throws_rocks(g.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
+                 <= (throws_rocks(gy.youmonst.data) ? 20 : ACURRSTR / 2 + 1)));
 
         if (appr != 1 || !in_line) {
             /* Monsters in combat won't pick stuff up, avoiding the
@@ -1324,9 +1324,9 @@ m_move(register struct monst* mtmp, register int after)
                     /* ignore obj if there's a trap and monster knows it */
                     if ((ttmp = t_at(xx, yy)) != 0
                         && mon_knows_traps(mtmp, ttmp->ttyp)) {
-                        if (gx == xx && gy == yy) {
-                            gx = mtmp->mux;
-                            gy = mtmp->muy;
+                        if (ggx == xx && ggy == yy) {
+                            ggx = mtmp->mux;
+                            ggy = mtmp->muy;
                         }
                         continue;
                     }
@@ -1358,9 +1358,9 @@ m_move(register struct monst* mtmp, register int after)
                             oomy = min(ROWNO - 1, omy + minr);
                             lmx = max(1, omx - minr);
                             lmy = max(0, omy - minr);
-                            gx = otmp->ox;
-                            gy = otmp->oy;
-                            if (gx == omx && gy == omy) {
+                            ggx = otmp->ox;
+                            ggy = otmp->oy;
+                            if (ggx == omx && ggy == omy) {
                                 mmoved = MMOVE_DONE; /* actually unnecessary */
                                 goto postmov;
                             }
@@ -1377,8 +1377,8 @@ m_move(register struct monst* mtmp, register int after)
 
         if (minr < SQSRCHRADIUS && appr == -1) {
             if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
-                gx = mtmp->mux;
-                gy = mtmp->muy;
+                ggx = mtmp->mux;
+                ggy = mtmp->muy;
             } else
                 appr = 1;
         }
@@ -1409,9 +1409,9 @@ m_move(register struct monst* mtmp, register int after)
         chcnt = 0;
         jcnt = min(MTSZ, cnt - 1);
         chi = -1;
-        nidist = dist2(nix, niy, gx, gy);
+        nidist = dist2(nix, niy, ggx, ggy);
         /* allow monsters be shortsighted on some levels for balance */
-        if (!mtmp->mpeaceful && g.level.flags.shortsighted
+        if (!mtmp->mpeaceful && gl.level.flags.shortsighted
             && nidist > (couldsee(nix, niy) ? 144 : 36) && appr == 1)
             appr = 0;
         if (is_unicorn(ptr) && noteleport_level(mtmp)) {
@@ -1421,7 +1421,7 @@ m_move(register struct monst* mtmp, register int after)
                     avoid = TRUE;
         }
         better_with_displacing =
-            should_displace(mtmp, poss, info, cnt, gx, gy);
+            should_displace(mtmp, poss, info, cnt, ggx, ggy);
         for (i = 0; i < cnt; i++) {
             if (avoid && (info[i] & NOTONL))
                 continue;
@@ -1439,7 +1439,7 @@ m_move(register struct monst* mtmp, register int after)
                             goto nxti;
             }
 
-            nearer = ((ndist = dist2(nx, ny, gx, gy)) < nidist);
+            nearer = ((ndist = dist2(nx, ny, ggx, ggy)) < nidist);
 
             if ((appr == 1 && nearer) || (appr == -1 && !nearer)
                 || (!appr && !rn2(++chcnt)) || (mmoved == MMOVE_NOTHING)) {
@@ -1809,7 +1809,7 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
 
     mtmp2 = m_at(x, y);
 
-    g.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
+    gn.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
     /* note: mstatus returns 0 if mtmp2 is nonexistent */
     mstatus = mattackm(mtmp, mtmp2);
 
@@ -1819,7 +1819,7 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
     if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
         && mtmp2->movement >= NORMAL_SPEED) {
         mtmp2->movement -= NORMAL_SPEED;
-        g.notonhead = 0;
+        gn.notonhead = 0;
         mstatus = mattackm(mtmp2, mtmp); /* return attack */
         if (mstatus & MM_DEF_DIED)
             return MMOVE_DIED;
@@ -1863,7 +1863,7 @@ set_apparxy(register struct monst* mtmp)
     boolean notseen, notthere, gotu;
     int disp;
     coordxy mx = mtmp->mux, my = mtmp->muy;
-    long umoney = money_cnt(g.invent);
+    long umoney = money_cnt(gi.invent);
 
     /*
      * do cheapest and/or most likely tests first
@@ -1983,8 +1983,8 @@ stuff_prevents_passage(struct monst* mtmp)
 {
     struct obj *chain, *obj;
 
-    if (mtmp == &g.youmonst) {
-        chain = g.invent;
+    if (mtmp == &gy.youmonst) {
+        chain = gi.invent;
     } else {
         chain = mtmp->minvent;
     }
@@ -2027,7 +2027,7 @@ can_ooze(struct monst* mtmp)
 boolean
 can_fog(struct monst* mtmp)
 {
-    if (!(g.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
+    if (!(gm.mvitals[PM_FOG_CLOUD].mvflags & G_GENOD) && is_vampshifter(mtmp)
         && !Protection_from_shape_changers && !stuff_prevents_passage(mtmp))
         return TRUE;
     return FALSE;

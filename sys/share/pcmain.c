@@ -128,11 +128,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #ifdef TOS
     long clock_time;
     if (*argv[0]) { /* only a CLI can give us argv[0] */
-        g.hname = argv[0];
+        gh.hname = argv[0];
         run_from_desktop = FALSE;
     } else
 #endif
-        g.hname = "NetHack"; /* used for syntax messages */
+        gh.hname = "NetHack"; /* used for syntax messages */
 
     choose_windows(DEFAULT_WINDOW_SYS);
 
@@ -182,17 +182,17 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         int fd;
         boolean have_syscf = FALSE;
 
-        (void) strncpy(g.hackdir, dir, PATHLEN - 1);
-        g.hackdir[PATHLEN - 1] = '\0';
+        (void) strncpy(gh.hackdir, dir, PATHLEN - 1);
+        gh.hackdir[PATHLEN - 1] = '\0';
 #ifdef NOCWD_ASSUMPTIONS
         {
             int prefcnt;
 
-            g.fqn_prefix[0] = (char *) alloc(strlen(g.hackdir) + 2);
-            Strcpy(g.fqn_prefix[0], g.hackdir);
-            append_slash(g.fqn_prefix[0]);
+            gf.fqn_prefix[0] = (char *) alloc(strlen(gh.hackdir) + 2);
+            Strcpy(gf.fqn_prefix[0], gh.hackdir);
+            append_slash(gf.fqn_prefix[0]);
             for (prefcnt = 1; prefcnt < PREFIX_COUNT; prefcnt++)
-                g.fqn_prefix[prefcnt] = g.fqn_prefix[0];
+                gf.fqn_prefix[prefcnt] = gf.fqn_prefix[0];
 
 #if defined(MSDOS)
             /* sysconf should be searched for in this location */
@@ -201,11 +201,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 if ((sptr = strchr(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
-                    g.fqn_prefix[SYSCONFPREFIX] =
+                    gf.fqn_prefix[SYSCONFPREFIX] =
                         (char *) alloc(strlen(envp) + 10);
-                    Strcpy(g.fqn_prefix[SYSCONFPREFIX], envp);
-                    append_slash(g.fqn_prefix[SYSCONFPREFIX]);
-                    Strcat(g.fqn_prefix[SYSCONFPREFIX], "NetHack\\");
+                    Strcpy(gf.fqn_prefix[SYSCONFPREFIX], envp);
+                    append_slash(gf.fqn_prefix[SYSCONFPREFIX]);
+                    Strcat(gf.fqn_prefix[SYSCONFPREFIX], "NetHack\\");
                 }
             }
 
@@ -226,7 +226,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 /* No SYSCF_FILE where there should be one, and
                    without an installer, a user may not be able
                    to place one there. So, let's try somewhere else... */
-                g.fqn_prefix[SYSCONFPREFIX] = g.fqn_prefix[0];
+                gf.fqn_prefix[SYSCONFPREFIX] = gf.fqn_prefix[0];
 
                 /* Is there a SYSCF_FILE there? */
                 fd = open(fqname(SYSCF_FILE, SYSCONFPREFIX, 0), O_RDONLY);
@@ -244,10 +244,10 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                 if ((sptr = strchr(envp, ';')) != 0)
                     *sptr = '\0';
                 if (strlen(envp) > 0) {
-                    g.fqn_prefix[CONFIGPREFIX] =
+                    gf.fqn_prefix[CONFIGPREFIX] =
                         (char *) alloc(strlen(envp) + 2);
-                    Strcpy(g.fqn_prefix[CONFIGPREFIX], envp);
-                    append_slash(g.fqn_prefix[CONFIGPREFIX]);
+                    Strcpy(gf.fqn_prefix[CONFIGPREFIX], envp);
+                    append_slash(gf.fqn_prefix[CONFIGPREFIX]);
                 }
             }
 #endif
@@ -283,11 +283,11 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (iflags.BIOS && iflags.use_color)
         set_colors();
 #endif
-    if (!g.hackdir[0])
+    if (!gh.hackdir[0])
 #if !defined(LATTICE) && !defined(AMIGA)
-        Strcpy(g.hackdir, orgdir);
+        Strcpy(gh.hackdir, orgdir);
 #else
-        Strcpy(g.hackdir, HACKDIR);
+        Strcpy(gh.hackdir, HACKDIR);
 #endif
     if (argc > 1) {
         if (argcheck(argc, argv, ARG_VERSION) == 2)
@@ -314,7 +314,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             }
             if (!*dir)
                 error("Flag -d must be followed by a directory name.");
-            Strcpy(g.hackdir, dir);
+            Strcpy(gh.hackdir, dir);
         }
         if (argc > 1) {
             /*
@@ -323,7 +323,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
              */
             if (!strncmp(argv[1], "-s", 2)) {
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-                chdirx(g.hackdir, 0);
+                chdirx(gh.hackdir, 0);
 #endif
 #ifdef SYSCF
                 initoptions();
@@ -363,7 +363,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * code parallel to other ports.
  */
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
-    chdirx(g.hackdir, 1);
+    chdirx(gh.hackdir, 1);
 #endif
 
 #if defined(MSDOS)
@@ -411,21 +411,21 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
  * overwritten without confirmation when a user starts up
  * another game with the same player name.
  */
-    Strcpy(g.lock, g.plname);
-    regularize(g.lock);
+    Strcpy(gl.lock, gp.plname);
+    regularize(gl.lock);
     getlock();
 #else        /* What follows is !PC_LOCKING */
 #ifdef AMIGA /* We'll put the bones & levels in the user specified directory \
                 -jhsa */
-    Strcat(g.lock, g.plname);
-    Strcat(g.lock, ".99");
+    Strcat(gl.lock, gp.plname);
+    Strcat(gl.lock, ".99");
 #else
     /* I'm not sure what, if anything, is left here, but old MFLOPPY had
      * conflicts with set_lock_and_bones() in files.c.
      */
-    Strcpy(g.lock, g.plname);
-    Strcat(g.lock, ".99");
-    regularize(g.lock); /* is this necessary? */
+    Strcpy(gl.lock, gp.plname);
+    Strcat(gl.lock, ".99");
+    regularize(gl.lock); /* is this necessary? */
                       /* not compatible with full path a la AMIGA */
 #endif
 #endif /* PC_LOCKING */
@@ -436,9 +436,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     if (!nhfp) {
         raw_print("Cannot create lock file");
     } else {
-        g.hackpid = 1;
+        gh.hackpid = 1;
         if (nhfp->structlevel)
-            write(nhfp->fd, (genericptr_t) &g.hackpid, sizeof(g.hackpid));
+            write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid));
         close_nhfile(nhfp);
     }
 
@@ -475,7 +475,7 @@ attempt_restore:
                 if (yn("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
-                    nh_compress(fqname(g.SAVEF, SAVEPREFIX, 0));
+                    nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
                 }
             }
         }
@@ -549,11 +549,11 @@ process_options(int argc, char *argv[])
 #endif
         case 'u':
             if (argv[0][2])
-                (void) strncpy(g.plname, argv[0] + 2, sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0] + 2, sizeof(gp.plname) - 1);
             else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(g.plname, argv[0], sizeof(g.plname) - 1);
+                (void) strncpy(gp.plname, argv[0], sizeof(gp.plname) - 1);
             } else
                 raw_print("Player name expected after -u");
             break;
@@ -650,12 +650,12 @@ nhusage(void)
      */
     (void) Sprintf(buf2, "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
                          "[maxrank] [name]...\n       or",
-                   g.hname);
+                   gh.hname);
     ADD_USAGE(buf2);
 
     (void) Sprintf(
         buf2, "\n%s [-d dir] [-u name] [-r race] [-p profession] [-[DX]]",
-        g.hname);
+        gh.hname);
     ADD_USAGE(buf2);
 #ifdef NEWS
     ADD_USAGE(" [-n]");
@@ -715,7 +715,7 @@ port_help(void)
 boolean
 authorize_wizard_mode(void)
 {
-    if (!strcmp(g.plname, WIZARD_NAME))
+    if (!strcmp(gp.plname, WIZARD_NAME))
         return TRUE;
     return FALSE;
 }

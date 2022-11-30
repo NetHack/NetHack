@@ -76,11 +76,11 @@ veryold(int fd)
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(g.lock, i);
-        (void) delete (g.lock);
+        set_levelfile_name(gl.lock, i);
+        (void) delete (gl.lock);
     }
-    set_levelfile_name(g.lock, 0);
-    if (delete (g.lock))
+    set_levelfile_name(gl.lock, 0);
+    if (delete (gl.lock))
         return 0; /* cannot remove it */
     return 1;     /* success! */
 }
@@ -105,46 +105,46 @@ getlock(void)
         error("Quitting.");
     }
 
-    /* default value of g.lock[] is "1lock" where '1' gets changed to
+    /* default value of gl.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
-    if (!g.locknum)
-        Sprintf(g.lock, "_%u%s", (unsigned) getuid(), g.plname);
+    if (!gl.locknum)
+        Sprintf(gl.lock, "_%u%s", (unsigned) getuid(), gp.plname);
 
-    regularize(g.lock);
-    set_levelfile_name(g.lock, 0);
-    if (g.locknum > 25)
-        g.locknum = 25;
+    regularize(gl.lock);
+    set_levelfile_name(gl.lock, 0);
+    if (gl.locknum > 25)
+        gl.locknum = 25;
 
     do {
-        if (g.locknum)
-            g.lock[0] = 'a' + i++;
+        if (gl.locknum)
+            gl.lock[0] = 'a' + i++;
 
-        if ((fd = open(g.lock, 0, 0)) == -1) {
+        if ((fd = open(gl.lock, 0, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
-            perror(g.lock);
+            perror(gl.lock);
             unlock_file(HLOCK);
-            error("Cannot open %s", g.lock);
+            error("Cannot open %s", gl.lock);
         }
 
         if (veryold(fd)) /* if true, this closes fd and unlinks lock */
             goto gotlock;
         (void) close(fd);
-    } while (i < g.locknum);
+    } while (i < gl.locknum);
 
     unlock_file(HLOCK);
-    error(g.locknum ? "Too many hacks running now."
+    error(gl.locknum ? "Too many hacks running now."
                   : "There is a game in progress under your name.");
 
  gotlock:
-    fd = creat(g.lock, FCMASK);
+    fd = creat(gl.lock, FCMASK);
     unlock_file(HLOCK);
     if (fd == -1) {
         error("cannot creat lock file.");
     } else {
-        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
-            != sizeof(g.hackpid)) {
+        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
+            != sizeof(gh.hackpid)) {
             error("cannot write lock");
         }
         if (close(fd) == -1) {
@@ -595,7 +595,7 @@ vms_get_saved_games(const char *savetemplate, /* wildcarded save file name in na
     char *charname, wildcard[255 + 1], filename[255 + 1];
     genericptr_t context = 0;
 
-    Strcpy(wildcard, savetemplate); /* plname_from_file overwrites g.SAVEF */
+    Strcpy(wildcard, savetemplate); /* plname_from_file overwrites gs.SAVEF */
     in.mbz = 0; /* class and type; leave them unspecified */
     in.len = (unsigned short) strlen(wildcard);
     in.adr = wildcard;

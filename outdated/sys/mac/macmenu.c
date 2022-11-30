@@ -493,8 +493,8 @@ mac_askname()
     SetPortDialogPort(askdialog);
 
     /* Initialize the name text item */
-    ask_restring(g.plname, str);
-    if (g.plname[0]) {
+    ask_restring(gp.plname, str);
+    if (gp.plname[0]) {
         GetDialogItem(askdialog, RSRC_ASK_NAME, &type, &handle, &rect);
         SetDialogItemText(handle, str);
     }
@@ -502,8 +502,8 @@ mac_askname()
 	{
 	Str32 pName;
 		pName [0] = 0;
-		if (g.plname && g.plname [0]) {
-			strcpy ((char *) pName, g.plname);
+		if (gp.plname && gp.plname [0]) {
+			strcpy ((char *) pName, gp.plname);
 			c2pstr ((char *) pName);
 		} else {
 			Handle h;
@@ -548,7 +548,7 @@ mac_askname()
     if (flags.initrole >= 0)
         currrole = flags.initrole;
     /* Check for backward compatibility */
-    else if ((currrole = str2role(g.pl_character)) < 0)
+    else if ((currrole = str2role(gp.pl_character)) < 0)
         currrole = randrole(FALSE);
 
     /* Initialize the race popup menu */
@@ -735,8 +735,8 @@ mac_askname()
     GetDialogItemText(handle, str);
     if (str[0] > PL_NSIZ - 1)
         str[0] = PL_NSIZ - 1;
-    BlockMove(&str[1], g.plname, str[0]);
-    g.plname[str[0]] = '\0';
+    BlockMove(&str[1], gp.plname, str[0]);
+    gp.plname[str[0]] = '\0';
 
     /* Destroy the dialog */
     for (i = RSRC_ASK_ROLE; i <= RSRC_ASK_MODE; i++) {
@@ -758,14 +758,14 @@ mac_askname()
         break;
     case 2: /* Debug */
         wizard = 1;
-        strcpy(g.plname, WIZARD_NAME);
+        strcpy(gp.plname, WIZARD_NAME);
         break;
     default: /* Quit */
         ExitToShell();
     }
 
     /* Process the role */
-    strcpy(g.pl_character, roles[currrole].name.m);
+    strcpy(gp.pl_character, roles[currrole].name.m);
     flags.initrole = currrole;
 
     /* Process the race */

@@ -199,7 +199,7 @@ enum ms_sounds {
    passed to mkclass() as if it dealt with mons[].geno bits */
 #define G_IGNORE        0x8000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
-/* for g.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
+/* for gm.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
 #define G_KNOWN         0x04 /* have been encountered */
 #define G_GENOD         0x02 /* have been genocided */
 #define G_EXTINCT       0x01 /* population control; create no more */

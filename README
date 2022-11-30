@@ -46,9 +46,10 @@ process. Among them:
 
  *  Add support to make the game restartable without exit (a.k.a. "play again"
     support). Toward that end, many previously scattered and separate variables
-    have been gathered into a central 'g' structure in decl.h/decl.c. That
-    will benefit the porting effort to some platforms that are under
-    consideration.
+    have been gathered into central 'ga' through 'gv' structures in
+    decl.h/decl.c. That central ability to reinitialize the variables will
+    benefit the porting effort to some platforms that are under consideration
+    where "play again" is typical.
 
 Here are some other general notes on the changes in NetHack 3.7 that were not
 considered spoilers:

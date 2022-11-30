@@ -356,7 +356,7 @@ bc_order(void)
         || u.uswallow)
         return BCPOS_DIFFER;
 
-    for (obj = g.level.objects[uball->ox][uball->oy]; obj;
+    for (obj = gl.level.objects[uball->ox][uball->oy]; obj;
          obj = obj->nexthere) {
         if (obj == uchain)
             return BCPOS_CHAIN;
@@ -771,7 +771,7 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
 
     if (near_capacity() > SLT_ENCUMBER && dist2(x, y, u.ux, u.uy) <= 2) {
         You("cannot %sdrag the heavy iron ball.",
-            g.invent ? "carry all that and also " : "");
+            gi.invent ? "carry all that and also " : "");
         nomul(0);
         return FALSE;
     }
@@ -936,7 +936,7 @@ drop_ball(coordxy x, coordxy y)
             u.ux = x - u.dx;
             u.uy = y - u.dy;
         }
-        g.vision_full_recalc = 1; /* hero has moved, recalculate vision later */
+        gv.vision_full_recalc = 1; /* hero has moved, recalculate vision later */
 
         if (Blind) {
             /* drop glyph under the chain */
@@ -966,7 +966,7 @@ litter(void)
     struct obj *otmp, *nextobj = 0;
     int capacity = weight_cap();
 
-    for (otmp = g.invent; otmp; otmp = nextobj) {
+    for (otmp = gi.invent; otmp; otmp = nextobj) {
         nextobj = otmp->nobj;
         if (otmp != uball && rnd(capacity) <= (int) otmp->owt) {
             if (canletgo(otmp, "")) {

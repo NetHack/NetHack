@@ -884,7 +884,7 @@ void buffer_fill_to_end(cell_t * buffer, cell_t * fill, int x, int y)
     while (dst != sentinel)
         *dst++ = *fill;
 
-    if ((iflags.debug.immediateflips || !g.program_state.in_moveloop)
+    if ((iflags.debug.immediateflips || !gp.program_state.in_moveloop)
         && buffer == console.back_buffer)
         back_buffer_flip();
 }
@@ -900,7 +900,7 @@ static void buffer_clear_to_end_of_line(cell_t * buffer, int x, int y)
     while (dst != sentinel)
         *dst++ = clear_cell;
 
-    if (iflags.debug.immediateflips || !g.program_state.in_moveloop)
+    if (iflags.debug.immediateflips || !gp.program_state.in_moveloop)
         back_buffer_flip();
 }
 
@@ -912,7 +912,7 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
     cell_t * dst = buffer + (console.width * pos.Y) + pos.X;
     *dst = *cell;
 
-    if ((iflags.debug.immediateflips || !g.program_state.in_moveloop)
+    if ((iflags.debug.immediateflips || !gp.program_state.in_moveloop)
         && buffer == console.back_buffer)
         back_buffer_flip();
 }
@@ -1071,7 +1071,7 @@ process_keystroke(
     int ch;
 
 #ifdef QWERTZ_SUPPORT
-    if (g.Cmd.swap_yz)
+    if (gc.Cmd.swap_yz)
         numberpad |= 0x10;
 #endif
     ch = keyboard_handling.pProcessKeystroke(
@@ -1103,11 +1103,11 @@ tgetch(void)
     if (iflags.debug_fuzzer)
         return randomkey();
 #ifdef QWERTZ_SUPPORT
-    if (g.Cmd.swap_yz)
+    if (gc.Cmd.swap_yz)
         numpad |= 0x10;
 #endif
 
-    return (g.program_state.done_hup)
+    return (gp.program_state.done_hup)
                ? '\033'
                : keyboard_handling.pCheckInput(
                    console.hConIn, &ir, &count, numpad, 0, &mod, &cc);
@@ -1132,10 +1132,10 @@ console_poskey(coordxy *x, coordxy *y, int *mod)
         return poskey;
     }
 #ifdef QWERTZ_SUPPORT
-    if (g.Cmd.swap_yz)
+    if (gc.Cmd.swap_yz)
         numpad |= 0x10;
 #endif
-    ch = (g.program_state.done_hup)
+    ch = (gp.program_state.done_hup)
              ? '\033'
              : keyboard_handling.pCheckInput(
                    console.hConIn, &ir, &count, numpad, 1, mod, &cc);
@@ -2104,8 +2104,8 @@ check_font_widths(void)
     boolean used[256];
     memset(used, 0, sizeof(used));
     for (int i = 0; i < SYM_MAX; i++) {
-        used[g.primary_syms[i]] = TRUE;
-        used[g.rogue_syms[i]] = TRUE;
+        used[gp.primary_syms[i]] = TRUE;
+        used[gr.rogue_syms[i]] = TRUE;
     }
 
     int wcUsedCount = 0;

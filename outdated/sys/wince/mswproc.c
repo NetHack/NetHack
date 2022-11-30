@@ -646,7 +646,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("who are you?", gp.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }
@@ -1927,7 +1927,7 @@ NHSPhoneDialogSetup(HWND hDlg, UINT nToolBarId, BOOL is_edit,
 
         rtDlg.bottom -= rtOK.bottom - rtOK.top;
         ShowWindow(hOK, SW_HIDE);
-        SetWindowPos(hDlg, HWND_TOP, 0, 0, rtDlg.right - rtDlg.left,
+        SetWindowPos(hDlg, HWND_TOP, 0, 0, rtDlgr.right - rtDlg.left,
                      rtDlg.bottom - rtDlg.top,
                      SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER);
     }
