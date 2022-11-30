@@ -713,7 +713,7 @@ read_tile_indexes(unsigned glyph, unsigned char (*indexes)[TILE_X])
 }
 
 static void
-decal_planar(struct planar_cell_struct *gp UNUSED, unsigned special)
+decal_planar(struct planar_cell_struct *gpcs UNUSED, unsigned special)
 {
     if (special & MG_CORPSE) {
     } else if (special & MG_INVIS) {
@@ -1022,7 +1022,7 @@ vga_GetBitmap(uint32 chr, unsigned char *bitmap)
  *
  */
 static void
-vga_DisplayCell(struct planar_cell_struct *gp, int col, int row)
+vga_DisplayCell(struct planar_cell_struct *gpcs, int col, int row)
 {
     int i, pixx, pixy;
     char __far *tmp_s; /* source pointer */
@@ -1037,10 +1037,10 @@ vga_DisplayCell(struct planar_cell_struct *gp, int col, int row)
             tmp_d = screentable[i + pixy];
             tmp_d += pixx;
             /*
-             * memcpy((void *)tmp,(void *)gp->plane[vplane].image[i],
+             * memcpy((void *)tmp,(void *)gpcs->plane[vplane].image[i],
              *         BYTES_PER_CELL);
              */
-            tmp_s = gp->plane[vplane].image[i];
+            tmp_s = gpcs->plane[vplane].image[i];
             WRITE_ABSOLUTE(tmp_d, (*tmp_s));
             ++tmp_s;
             ++tmp_d;
@@ -1051,7 +1051,7 @@ vga_DisplayCell(struct planar_cell_struct *gp, int col, int row)
 }
 
 static void
-vga_DisplayCell_O(struct overview_planar_cell_struct *gp, int col, int row)
+vga_DisplayCell_O(struct overview_planar_cell_struct *gpcs, int col, int row)
 {
     int i, pixx, pixy;
     char __far *tmp_s; /* source pointer */
@@ -1066,10 +1066,10 @@ vga_DisplayCell_O(struct overview_planar_cell_struct *gp, int col, int row)
             tmp_d = screentable[i + pixy];
             tmp_d += pixx;
             /*
-             * memcpy((void *)tmp,(void *)gp->plane[vplane].image[i],
+             * memcpy((void *)tmp,(void *)gpcs->plane[vplane].image[i],
              *         BYTES_PER_CELL);
              */
-            tmp_s = gp->plane[vplane].image[i];
+            tmp_s = gpcs->plane[vplane].image[i];
             WRITE_ABSOLUTE(tmp_d, (*tmp_s));
         }
     }
