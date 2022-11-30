@@ -924,7 +924,7 @@ static void
 display_trap_map(struct trap *ttmp, int cursed_src)
 {
     struct monst *mon;
-    int door, glyph, ter_typ = TER_DETECT | TER_TRP;
+    int door, glyph, ter_typ = TER_DETECT | ( cursed_src ? TER_OBJ : TER_TRP );
     coord cc;
 
     cls();
