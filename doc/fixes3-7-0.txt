@@ -1060,6 +1060,8 @@ when hero hears an unseen monster reading a scroll, only describe the monster
 don't allow monsters to disarm hero with bullwhip if hero is engulfed
 teleporting an object out of a shop put it on the shop bill instead of dealing
 	with robbery
+map browsing during gold detection didn't describe fake gold marking traps
+	when detection was via cursed scroll
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
