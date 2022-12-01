@@ -924,7 +924,7 @@ static void
 display_trap_map(struct trap *ttmp, int cursed_src)
 {
     struct monst *mon;
-    int door, glyph, ter_typ = TER_DETECT | TER_TRP;
+    int door, glyph, ter_typ = TER_DETECT | ( cursed_src ? TER_OBJ : TER_TRP );
     coord cc;
 
     cls();
@@ -963,7 +963,7 @@ display_trap_map(struct trap *ttmp, int cursed_src)
     }
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
 
-    browse_map(ter_typ, "trap of interest");
+    browse_map(ter_typ, cursed_src ? "gold" : "trap of interest");
 
     map_redisplay();
 }
