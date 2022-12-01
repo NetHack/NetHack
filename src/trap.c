@@ -4117,6 +4117,7 @@ acid_damage(struct obj* obj)
 }
 
 /* Get an object wet and damage it appropriately.
+ *   "obj": if null, returns ER_NOTHING
  *   "ostr", if present, is used instead of the object name in some
  *     messages.
  *   "force" means not to roll luck to protect some objects.
@@ -4128,7 +4129,7 @@ water_damage(
     const char *ostr,
     boolean force)
 {
-    boolean in_invent = carried(obj), described = FALSE;
+    boolean in_invent = obj && carried(obj), described = FALSE;
 
     if (!obj)
         return ER_NOTHING;
