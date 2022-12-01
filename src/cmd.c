@@ -1936,7 +1936,7 @@ wiz_smell(void)
                 mptr = gy.youmonst.data;
                 is_you = TRUE;
             }
-        } else if ((mtmp = m_at(cc.x, cc.y)) && canspotmon(mtmp)) {
+        } else if ((mtmp = m_at(cc.x, cc.y)) != (struct monst *) 0) {
             mptr = mtmp->data;
         } else {
             mptr = (struct permonst *) 0;
@@ -1949,7 +1949,7 @@ wiz_smell(void)
                 pline("%s to give off no smell.",
                       is_you ? "You seem" : "That monster seems");
         } else {
-            You("see no monster there.");
+            pline("That is not a monster.");
         }
     } while (TRUE);
     return ECMD_OK;
