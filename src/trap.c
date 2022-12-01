@@ -1644,7 +1644,8 @@ trapeffect_pit(
                             x_monnam(u.usteed, steed_article, "poor",
                                      SUPPRESS_SADDLE, FALSE));
             } else if (iflags.menu_requested && already_known) {
-                You("carefully %s into the pit.", u_locomotion("lower yourself"));
+                You("carefully %s into the pit.",
+                    u_locomotion("lower yourself"));
                 deliberate = TRUE;
             } else if (conj_pit) {
                 You("move into an adjacent pit.");

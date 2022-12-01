@@ -2702,7 +2702,8 @@ set_uinwater(int in_out)
    leaving a pool of water/lava, and by moveloop to check for staying on one;
    returns true to skip rest of spoteffects */
 boolean
-pooleffects(boolean newspot)             /* true if called by spoteffects */
+pooleffects(
+    boolean newspot) /* true if called by spoteffects */
 {
     /* check for leaving water */
     if (u.uinwater) {
@@ -2848,10 +2849,9 @@ spoteffects(boolean pick)
             /*
              * dotrap on a fire trap calls melt_ice() which triggers
              * spoteffects() (again) which can trigger the same fire
-             * trap (again). Use static spottrap to prevent that.
-             * We track spottraptyp because some traps morph
-             * (landmine to pit) and any new trap type
-             * should get triggered.
+             * trap (again).  Use static spottrap to prevent that.
+             * We track spottraptyp because some traps morph (landmine
+             * to pit) and any new trap type should get triggered.
              */
             if (!spottrap || spottraptyp != trap->ttyp) {
                 spottrap = trap;

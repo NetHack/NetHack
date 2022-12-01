@@ -1275,7 +1275,9 @@ wiz_kill(void)
     int ans;
     char c, qbuf[QBUFSZ];
     const char *prompt = "Pick first monster to slay";
-    boolean save_verbose = flags.verbose;
+    boolean save_verbose = flags.verbose,
+            save_autodescribe = iflags.autodescribe;
+    d_level uarehere = u.uz;
 
     cc.x = u.ux, cc.y = u.uy;
     for (;;) {
@@ -1283,8 +1285,10 @@ wiz_kill(void)
         prompt = "Next monster";
 
         flags.verbose = FALSE;
+        iflags.autodescribe = TRUE;
         ans = getpos(&cc, TRUE, "a monster");
         flags.verbose = save_verbose;
+        iflags.autodescribe = save_autodescribe;
         if (ans < 0 || cc.x < 1)
             break;
 
@@ -1350,6 +1354,10 @@ wiz_kill(void)
                 monkilled(mtmp, (char *) 0, AD_PHYS);
                 gc.context.mon_moving = FALSE;
             }
+            /* end targetting loop if an engulfer dropped hero onto a level-
+               changing trap */
+            if (u.utotype || !on_level(&u.uz, &uarehere))
+                break;
         } else {
             There("is no monster there.");
             break;
