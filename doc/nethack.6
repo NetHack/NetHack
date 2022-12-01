@@ -138,7 +138,8 @@ The standard tty display and command structure resemble rogue.
 .PP
 Other, more graphical display options exist for most platforms.
 .PP
-To get started you really only need to know two commands.  The command
+To get started you really only need to know two commands.
+The command
 .B ?
 will give you a list of the available commands (as well as other information)
 and the command
@@ -148,9 +149,11 @@ will identify the things you see on the screen.
 To win the game (as opposed to merely playing to beat other people's high
 scores) you must locate the Amulet of Yendor which is somewhere below
 the 20th level of the dungeon and get it out.
-Few people achieve this; most never do.  Those who have done so go down
-in history as heroes among heroes - and then they find ways of making the
-game even harder.  See the
+Few people achieve this; most never do.
+Those who have done so go down
+in history as heroes among heroes \(em and then they find ways of making the
+game even harder.
+See the
 .I Guidebook
 section on Conduct if this game has gotten too easy for you.
 .PP
@@ -382,12 +385,14 @@ A number of these miscreants are immortalized in the historical
 roll of dishonor and various other places.
 .PP
 The resulting mess is now called NetHack, to denote its
-development by the Usenet.  Andries Brouwer has made this request for the
+development by the Usenet.
+Andries Brouwer has made this request for the
 distinction, as he may eventually release a new version of his own.
 .SH FILES
 .PP
 Run-time configuration options were discussed above and use a platform
-specific name for a file in a platform specific location.  For Unix, the
+specific name for a file in a platform specific location.
+For Unix, the
 name is '.nethackrc' in the user's home directory.
 
 .br
@@ -399,8 +404,11 @@ files.
 
 .br
 .DT
+.\" continuation lines begin with <backslash><space><tab>
 .ta \w'cmdhelp, opthelp, wizhelp\ \ \ 'u
 nethack		The program itself.
+.br
+Guidebook\ |\ Guidebook.txt	NetHack's user manual.
 .br
 data, oracles, rumors	Data files used by NetHack.
 .br
@@ -410,19 +418,24 @@ engrave, epitaph, tribute	Still more data files.
 .br
 symbols	Data file holding sets of specifications
 .br
-	for how to display monsters, objects, and
+\ 	for how to display monsters, objects, and
 .br
-	map features.
+\ 	map features.
 .br
 options	Data file containing a description of the
-	build-time option settings.
 .br
-help, hh, cmdhelp	Help data files.
+\ 	build-time option settings.
 .br
-opthelp, optmenu, wizhelp	More help data files.
+help,\ hh,\ cmdhelp	Help data files.
+('cmdhelp' is obsolete.)
+.br
+opthelp,\ optmenu,\ wizhelp	More help data files.
+.br
+keyhelp,\ usagehlp	Even more help data files.
 .br
 *.lua	Predefined special levels, dungeon control
-	for special levels, quest texts
+.br
+\ 	for special levels, quest texts.
 .br
 history	A short history of NetHack.
 .br
@@ -432,55 +445,62 @@ record	The list of top scorers.
 .br
 logfile	An extended list of games played
 .br
-	(optional).
+\ 	(optional).
 .br
 xlogfile	A more detailed version of 'logfile'
 .br
-	(also optional).
+\ 	(also optional).
 .br
 paniclog	Record of exceptional conditions
 .br
-	discovered during program execution.
+\ 	discovered during program execution.
 .br
 xlock.nn	Description of dungeon level 'nn' of
 .br
-	active game 'x' if there's a limit on the
+\ 	active game 'x' if there's a limit on the
 .br
-	number of simultaneously active games.
+\ 	number of simultaneously active games.
 .br
 UUcccccc.nn	Alternate form for dungeon level 'nn'
 .br
-	of active game by user 'UU' playing
+\ 	of active game by user 'UU' playing
 .br
-	character named 'cccccc' when there's no
+\ 	character named 'cccccc' when there's no
 .br
-	limit on number of active games.
+\ 	limit on number of active games.
 .br
 perm	Lock file for xlock.0 or UUcccccc.0.
 .br
-bonesDD.nn	Descriptions of the ghost and belongings
+bonD0.nn	Descriptions of the ghost and belongings
 .br
-	of a deceased adventurer who met his
+\ 	of a deceased adventurer who met his or
 .br
-	or her demise on level 'nn'.
+\ 	her demise on level 'nn'.
+A subsequent
 .br
-.\"following line should contain <space><tab>
- 	
+\ 	character might encounter this old level.
+.br
+.\"following line should contain <backslash><space><tab>
+\ 	
 .br
 save/	A subdirectory containing saved games.
 .br
-.\"following line should contain <space><tab>
- 	
+.\"following line should contain <backslash><space><tab>
+\ 	
 .br
 sysconf	System-wide options.  Required if
 .br
-	program is built with 'SYSCF' option
+\ 	program is built with 'SYSCF' option
 .br
-	enabled, ignored if not.
+\ 	enabled, ignored if not.
 .br
 
 The location of 'sysconf' is specified at build time and can't be changed
 except by updating source file "config.h" and rebuilding the program.
+.br
+
+NetHack's Guidebook might not be present if whoever packaged or installed
+the program distribution neglected to include it.
 .br
 
 In a perfect world, 'paniclog' would remain empty.
@@ -501,13 +521,11 @@ MAIL	Mailbox file.
 .br
 MAILREADER	Replacement for default reader
 .br
-	(probably /bin/mail or /usr/ucb/mail).
+\ 	(probably /bin/mail or /usr/ucb/mail).
 .br
 NETHACKDIR or HACKDIR	Playground.
 .br
-NETHACKOPTIONS	String predefining several NetHack
-.br
-	options.
+NETHACKOPTIONS	String predefining several NetHack options.
 .br
 
 If the same option is specified in both NETHACKOPTIONS and .nethackrc,
