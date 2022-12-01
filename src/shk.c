@@ -872,19 +872,28 @@ find_objowner(
                            * they shouldn't be modified */
 {
     struct monst *shkp, *deflt_shkp = 0;
-    char *roomindx, *where = in_rooms(x, y, SHOPBASE);
 
-    /* conceptually object could be inside up to four rooms simultaneously;
-       in practice it will usually be one room but can sometimes be two;
-       check shk and bill for each room rather than just the first;
-       fallback to the first shk if obj isn't on the relevant bill(s) */
-    for (roomindx = where; *roomindx; ++roomindx)
-        if ((shkp = shop_keeper(*roomindx)) != 0) {
+    if (obj->where == OBJ_ONBILL) {
+        /* used up item; bill obj coordinates are useless and so are x,y */
+        for (shkp = next_shkp(fmon, TRUE); shkp;
+             shkp = next_shkp(shkp->nmon, TRUE))
             if (onshopbill(obj, shkp, TRUE))
                 return shkp;
-            if (!deflt_shkp)
-                deflt_shkp = shkp;
-        }
+    } else {
+        char *roomindx, *where = in_rooms(x, y, SHOPBASE);
+
+        /* conceptually object could be inside up to 4 rooms simultaneously;
+           in practice it will usually be one room but can sometimes be two;
+           check shk and bill for each room rather than just the first;
+           fallback to the first shk if obj isn't on the relevant bill(s) */
+        for (roomindx = where; *roomindx; ++roomindx)
+            if ((shkp = shop_keeper(*roomindx)) != 0) {
+                if (onshopbill(obj, shkp, TRUE))
+                    return shkp;
+                if (!deflt_shkp)
+                    deflt_shkp = shkp;
+            }
+    }
     return deflt_shkp;
 }
 

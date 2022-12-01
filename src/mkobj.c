@@ -2800,6 +2800,8 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
     /* these will always be needed for the normal case, so don't bother
        waiting until we find an insanity to fetch them */
     shkp = find_objowner(obj, x, y);
+    if (shkp && obj->where == OBJ_ONBILL)
+        x = shkp->mx, y = shkp->my;
     costly = costly_spot(x, y);
     costlytoo = costly_adjacent(shkp, x, y);
 
@@ -2808,11 +2810,13 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
         why = "%s obj both unpaid and no_charge! %s %s: %s";
     } else if (obj->unpaid) {
         /* unpaid is only applicable for directly carried objects, for
-           objects inside carried containers, and for floor items outside
-           the shop proper but within the shop boundary (walls, door, "free
-           spot") and for objects moved from such spots into the shop proper
-           by repair of shop walls */
+           objects inside carried containers, for used up items on the
+           billobjs list, and for floor items outside the shop proper
+           but within the shop boundary (walls, door, "free spot") and
+           for objects moved from such spots into the shop proper by
+           repair of shop walls */
         if (otop->where != OBJ_INVENT
+            && obj->where != OBJ_ONBILL /* when on bill, obj==otop */
             && (otop->where != OBJ_FLOOR || (!costly && !costlytoo)))
             why = "%s unpaid obj not carried! %s %s: %s";
         else if (!costly && !costlytoo)
