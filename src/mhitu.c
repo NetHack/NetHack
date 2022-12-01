@@ -11,6 +11,8 @@ static NEARDATA struct obj *mon_currwep = (struct obj *) 0;
 static void missmu(struct monst *, boolean, struct attack *);
 static void mswings(struct monst *, struct obj *, boolean);
 static void wildmiss(struct monst *, struct attack *);
+static void calc_mattacku_vars(struct monst *, boolean *, boolean *,
+                               boolean *, boolean *);
 static void summonmu(struct monst *, boolean);
 static int hitmu(struct monst *, struct attack *);
 static int gulpmu(struct monst *, struct attack *);
@@ -378,6 +380,18 @@ getmattk(struct monst *magr, struct monst *mdef,
     return attk;
 }
 
+/* calc some variables needed for mattacku() */
+static void
+calc_mattacku_vars(struct monst *mtmp,
+                   boolean *ranged, boolean *range2,
+                   boolean *foundyou, boolean *youseeit)
+{
+    *ranged = (mdistu(mtmp) > 3);
+    *range2 = !monnear(mtmp, mtmp->mux, mtmp->muy);
+    *foundyou = u_at(mtmp->mux, mtmp->muy);
+    *youseeit = canseemon(mtmp);
+}
+
 /*
  * mattacku: monster attacks you
  *      returns 1 if monster dies (e.g. "yellow light"), 0 otherwise
@@ -404,11 +418,10 @@ mattacku(register struct monst *mtmp)
      *     excessively verbose miss feedback when monster can do multiple
      *     attacks and would miss the same wrong spot each time.)
      */
-    boolean ranged = (mdistu(mtmp) > 3),
-            range2 = !monnear(mtmp, mtmp->mux, mtmp->muy),
-            foundyou = u_at(mtmp->mux, mtmp->muy),
-            youseeit = canseemon(mtmp),
+    boolean ranged, range2, foundyou, youseeit,
             skipnonmagc = FALSE;
+
+    calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
 
     if (!ranged)
         nomul(0);
@@ -652,6 +665,8 @@ mattacku(register struct monst *mtmp)
     gs.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
 
     for (i = 0; i < NATTK; i++) {
+        /* recalc in case attack moved hero */
+        calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
         sum[i] = MM_MISS;
         if (i > 0 && foundyou /* previous attack might have moved hero */
             && (mtmp->mux != u.ux || mtmp->muy != u.uy))
