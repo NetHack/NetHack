@@ -963,7 +963,7 @@ display_trap_map(struct trap *ttmp, int cursed_src)
     }
     You_feel("%s.", cursed_src ? "very greedy" : "entrapped");
 
-    browse_map(ter_typ, "trap of interest");
+    browse_map(ter_typ, cursed_src ? "gold" : "trap of interest");
 
     map_redisplay();
 }
