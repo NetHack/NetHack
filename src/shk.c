@@ -4628,15 +4628,15 @@ price_quote(register struct obj* first_obj)
     } else if (cnt == 1) {
         if (!cost) {
             /* "<doname(obj)>, no charge" */
-            pline("%s!", upstart(buf)); /* buf still contains the string */
+            verbalize("%s!", upstart(buf)); /* buf contains the string */
         } else {
             /* print cost in slightly different format, so can't reuse buf;
                cost and contentsonly are already set up */
             Sprintf(buf, "%s%s", contentsonly ? the_contents_of : "",
                     doname(first_obj));
-            pline("%s, price %ld %s%s%s", upstart(buf), cost, currency(cost),
-                  (first_obj->quan > 1L) ? " each" : "",
-                  contentsonly ? "." : shk_embellish(first_obj, cost));
+            verbalize("%s, price %ld %s%s%s", upstart(buf), cost,
+                      currency(cost), (first_obj->quan > 1L) ? " each" : "",
+                      contentsonly ? "." : shk_embellish(first_obj, cost));
         }
     }
     destroy_nhwindow(tmpwin);
