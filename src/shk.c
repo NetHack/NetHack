@@ -4582,7 +4582,7 @@ shop_object(register coordxy x, register coordxy y)
             break;
     /* note: otmp might have ->no_charge set, but that's ok */
     return (otmp && costly_spot(x, y)
-            && NOTANGRY(shkp) && !helpless(shkp))
+            && NOTANGRY(shkp) && !muteshk(shkp))
                ? otmp
                : (struct obj *) 0;
 }
