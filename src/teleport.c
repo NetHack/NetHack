@@ -1110,11 +1110,18 @@ level_tele(void)
                   Verbose(2, level_tele)
                       ? "You materialize on a different level!"
                       : (char *) 0);
+#if 0   /* always wait until end of turn to change level, otherwise code
+         * that references monsters as this call stack unwinds won't be
+         * able to access them reliably; the do-the-change-now code here
+         * dates from when reading a scroll of teleportation wouldn't
+         * always make the scroll become discovered but that's no longer
+         * the case so it shouldn't be needed anymore */
 
     /* in case player just read a scroll and is about to be asked to
        call it something, we can't defer until the end of the turn */
     if (u.utotype && !gc.context.mon_moving)
         deferred_goto();
+#endif
 }
 
 void
