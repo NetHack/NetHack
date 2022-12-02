@@ -2975,7 +2975,7 @@ stolen_value(
         u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 
-    if (!billable(&shkp, obj, roomno, FALSE)) {
+    if (!billable(&shkp, obj, roomno, TRUE)) {
         /* things already on the bill yield a not-billable result, so
            we need to check bill before deciding that shk doesn't care */
         if ((bp = onbill(obj, shkp, FALSE)) != 0) {
