@@ -1,5 +1,8 @@
 #!/bin/sh
-set -x
+
+if [ ! -z "${TF_BUILD}" ]; then
+	set -x
+fi
 
 if [ -z "$CI_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/lib/djgpp
