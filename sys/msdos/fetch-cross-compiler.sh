@@ -119,7 +119,7 @@ if [ ! -d djgpp/djgpp-patch ]; then
 	else
 	        echo "##vso[task.logissue type=warning;]Trouble downloading djgpp-patch"    
     	fi
-	exit 0
+	exit 121
     fi
     mkdir -p src/libc/go32
     unzip -p djlsr205.zip src/libc/go32/exceptn.S >src/libc/go32/exceptn.S
