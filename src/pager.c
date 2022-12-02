@@ -1719,11 +1719,21 @@ look_all(
                        in a fixed-width font it if finds at least one */
                     putstr(win, 0, "    "); /* separator */
                 }
+                (void) coord_desc(x, y, coordbuf, cmode);
+                /* this format wrinkle makes the commas of <x,y> line up;
+                   it isn't needed when all the y values have same number
+                   of digits but looks better when there is a mixture of 1
+                   and 2 digit values; done unconditionally because we
+                   would need two passes over the map to determine whether
+                   y width is uniform or a mixture; x width is not a factor
+                   because the result gets right-justified by %8s */
+                if (cmode == GPCOORDS_MAP && y < 10)
+                    (void) strsubst(coordbuf, ",", ", ");
                 /* prefix: "coords  C  " where 'C' is mon or obj symbol */
                 Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
                                   : (cmode == GPCOORDS_MAP) ? "%8s  "
                                       : "%12s  ",
-                        coord_desc(x, y, coordbuf, cmode));
+                        coordbuf);
                 Sprintf(eos(outbuf), "%s  ", encglyph(glyph));
                 /* guard against potential overflow */
                 lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
