@@ -66,7 +66,7 @@ fi
 
 if [ ! -d djgpp/i586-pc-msdosdjgpp ]; then
     tar xjf "$DJGPP_FILE"
-    rm -f $DJGPP_FILE
+    #rm -f $DJGPP_FILE
 fi
 
 # DOS-extender for use with djgpp
@@ -105,10 +105,22 @@ if [ ! -d djgpp/djgpp-patch ]; then
     if [ "$(uname)" = "Darwin" ]; then
 	#Mac
 	curl --output djlsr205.zip http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+        export cmdstatus=$?
     else
 	wget --quiet --no-hsts http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+        export cmdstatus=$?
     fi
     ls -l
+    if [ $cmdstatus -eq 0 ]; then
+	    echo "fetch of djgpp-patch was successful"
+    else
+	if [ -z "${TF_BUILD}" ]; then
+		echo "Unable to complete the build, exiting..."
+	else
+	        echo "##vso[task.logissue type=warning;]Trouble downloading djgpp-patch"    
+    	fi
+	exit 0
+    fi
     mkdir -p src/libc/go32
     unzip -p djlsr205.zip src/libc/go32/exceptn.S >src/libc/go32/exceptn.S
     patch -p0 -l -i ../../../sys/msdos/exceptn.S.patch
