@@ -120,6 +120,7 @@ if [ ! -d djgpp/djgpp-patch ]; then
 	if [ -z "${TF_BUILD}" ]; then
 		echo "Unable to complete the build, exiting..."
 	else
+		set +x
 	        echo "##vso[task.logissue type=warning;]Trouble downloading djgpp-patch"    
     	fi
 	exit 121
