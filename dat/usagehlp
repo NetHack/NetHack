@@ -1,6 +1,6 @@
 This is a terse description of nethack's command line arguments.
-It is oriented toward UNIX (including descendants such as linux and
-macOS) and might not be accurate for other platforms.
+It is oriented toward UNIX (including descendants such as linux and macOS)
+and might not be accurate for other platforms.
 
 When starting play, if there is a save file for the chosen character name
 then it will be restored, otherwise a new game using that name will begin.
@@ -17,7 +17,8 @@ nethack -u character-name [-X or -D]
        -X must be uppercase; character starts with a wand of wishing and
        player may opt to be life-saved and keep going if character dies;
   '-D' run in debug mode also known as wizard mode; -D must be uppercase;
-       if player is not allowed then nethack will switch to -X.
+       if player is not allowed then nethack will switch to -X; if player
+       is allowed, character name will be changed to "wizard".
 
   A character name may have a suffix specifying any or all of role, race,
   gender, and alignment such as -u Conan-Bar-Hum-Mal-Neu or -u Tim-Wiz.
