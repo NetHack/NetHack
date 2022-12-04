@@ -178,7 +178,7 @@ next_shkp(register struct monst *shkp, boolean withbill)
 
 /* called in mon.c */
 void
-shkgone(struct monst* mtmp)
+shkgone(struct monst *mtmp)
 {
     struct eshk *eshk = ESHK(mtmp);
     struct mkroom *sroom = &gr.rooms[eshk->shoproom - ROOMOFFSET];
@@ -215,7 +215,7 @@ shkgone(struct monst* mtmp)
 }
 
 void
-set_residency(register struct monst* shkp, register boolean zero_out)
+set_residency(struct monst *shkp, boolean zero_out)
 {
     if (on_level(&(ESHK(shkp)->shoplevel), &u.uz))
         gr.rooms[ESHK(shkp)->shoproom - ROOMOFFSET].resident =
@@ -223,7 +223,7 @@ set_residency(register struct monst* shkp, register boolean zero_out)
 }
 
 void
-replshk(register struct monst* mtmp, register struct monst* mtmp2)
+replshk(struct monst *mtmp, struct monst *mtmp2)
 {
     gr.rooms[ESHK(mtmp2)->shoproom - ROOMOFFSET].resident = mtmp2;
     if (inhishop(mtmp) && *u.ushops == ESHK(mtmp)->shoproom) {
@@ -233,7 +233,7 @@ replshk(register struct monst* mtmp, register struct monst* mtmp2)
 
 /* do shopkeeper specific structure munging -dlc */
 void
-restshk(struct monst* shkp, boolean ghostly)
+restshk(struct monst *shkp, boolean ghostly)
 {
     if (u.uz.dlevel) {
         struct eshk *eshkp = ESHK(shkp);
@@ -250,19 +250,54 @@ restshk(struct monst* shkp, boolean ghostly)
     }
 }
 
-/* Clear the unpaid bit on a single object and its contents. */
+/* Clear the unpaid and no_charge bits on a single object and its contents. */
 static void
-clear_unpaid_obj(struct monst* shkp, struct obj* otmp)
+clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
 {
     if (Has_contents(otmp))
         clear_unpaid(shkp, otmp->cobj);
     if (onbill(otmp, shkp, TRUE))
         otmp->unpaid = 0;
+
+    if (otmp->no_charge) {
+        struct monst *rm_shkp;
+        int rno;
+        coordxy x, y;
+
+        /*
+         * Clear no_charge if
+         *  not located somewhere that we expect no_charge (which is
+         *    floor [of shop] or inside container [on shop floor])
+         *  or can't find object's map coordinates (should never happen
+         *    for floor or contained; conceivable if on shop bill somehow
+         *    but would have failed the floor-or-contained test since
+         *    containers get emptied before going onto bill)
+         *  or fails location sanity check (should always be good when
+         *    location successfully found)
+         *  or not inside any room
+         *  or the room isn't a shop
+         *  or the shop has no shopkeeper (deserted)
+         *  or shopkeeper is the current one (to avoid clearing no_charge
+         *    for items located in some rival's shop).
+         *
+         * no_charge items in a shop which is only temporarily deserted
+         * become owned by the shop now and will be for-sale once the shk
+         * returns.
+         */
+        if ((otmp->where != OBJ_FLOOR && otmp->where != OBJ_CONTAINED)
+            || !get_obj_location(otmp, &x, &y, OBJ_CONTAINED | OBJ_BURIED)
+            || !isok(x, y)
+            || (rno = levl[x][y].roomno) < ROOMOFFSET
+            || !IS_SHOP(rno - ROOMOFFSET)
+            || (rm_shkp = gr.rooms[rno - ROOMOFFSET].resident) == 0
+            || rm_shkp == shkp)
+            otmp->no_charge = 0;
+    }
 }
 
 /* Clear the unpaid bit on all of the objects in the list. */
 static void
-clear_unpaid(struct monst* shkp, struct obj* list)
+clear_unpaid(struct monst *shkp, struct obj *list)
 {
     while (list) {
         clear_unpaid_obj(shkp, list);
@@ -272,7 +307,7 @@ clear_unpaid(struct monst* shkp, struct obj* list)
 
 /* either you paid or left the shop or the shopkeeper died */
 void
-setpaid(register struct monst* shkp)
+setpaid(register struct monst *shkp)
 {
     register struct obj *obj;
     register struct monst *mtmp;
@@ -302,11 +337,11 @@ setpaid(register struct monst* shkp)
 }
 
 static long
-addupbill(register struct monst* shkp)
+addupbill(struct monst *shkp)
 {
-    register int ct = ESHK(shkp)->billct;
-    register struct bill_x *bp = ESHK(shkp)->bill_p;
-    register long total = 0L;
+    int ct = ESHK(shkp)->billct;
+    struct bill_x *bp = ESHK(shkp)->bill_p;
+    long total = 0L;
 
     while (ct--) {
         total += bp->price * bp->bquan;
@@ -316,10 +351,10 @@ addupbill(register struct monst* shkp)
 }
 
 static void
-call_kops(register struct monst* shkp, register boolean nearshop)
+call_kops(struct monst *shkp, boolean nearshop)
 {
     /* Keystone Kops srt@ucla */
-    register boolean nokops;
+    boolean nokops;
 
     if (!shkp)
         return;
@@ -373,9 +408,9 @@ call_kops(register struct monst* shkp, register boolean nearshop)
 
 /* x,y is strictly inside shop */
 char
-inside_shop(register coordxy x, register coordxy y)
+inside_shop(coordxy x, coordxy y)
 {
-    register char rno;
+    char rno;
 
     rno = levl[x][y].roomno;
     if ((rno < ROOMOFFSET) || levl[x][y].edge || !IS_SHOP(rno - ROOMOFFSET))
