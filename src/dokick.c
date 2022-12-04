@@ -491,8 +491,8 @@ really_kick_object(coordxy x, coordxy y)
     boolean costly, isgold, slide = FALSE;
 
     /* gk.kickedobj should always be set due to conditions of call */
-    if (!gk.kickedobj || gk.kickedobj->otyp == BOULDER || gk.kickedobj == uball
-        || gk.kickedobj == uchain)
+    if (!gk.kickedobj || gk.kickedobj->otyp == BOULDER
+        || gk.kickedobj == uball || gk.kickedobj == uchain)
         return 0;
 
     if ((trap = t_at(x, y)) != 0) {
@@ -577,9 +577,16 @@ really_kick_object(coordxy x, coordxy y)
         || closed_door(x + u.dx, y + u.dy))
         range = 1;
 
-    costly = (!(gk.kickedobj->no_charge && !Has_contents(gk.kickedobj))
-              && (shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) != 0
-              && costly_spot(x, y));
+    /* 3.7: this used to skip 'costly' handling if kickedobj->no_charge
+       was set but that optimization could result in no_charge staying set
+       for objects kicked out of the shop */
+    shkp = find_objowner(gk.kickedobj, x, y);
+    costly = (shkp && (costly_spot(x, y) || (costly_adjacent(shkp, x, y)
+                                             && gk.kickedobj->unpaid)));
+    /* 3.7: give feedback about the item being kicked; some follow-on
+       messages refer to "it" */
+    Norep("You kick %s.",
+          !isgold ? singular(gk.kickedobj, doname) : doname(gk.kickedobj));
 
     if (IS_ROCK(levl[x][y].typ) || closed_door(x, y)) {
         if ((!martial() && rn2(20) > ACURR(A_DEX))
@@ -600,8 +607,12 @@ really_kick_object(coordxy x, coordxy y)
         obj_extract_self(gk.kickedobj);
         newsym(x, y);
         if (costly && (!costly_spot(u.ux, u.uy)
-                       || !strchr(u.urooms, *in_rooms(x, y, SHOPBASE))))
-            addtobill(gk.kickedobj, FALSE, FALSE, FALSE);
+                       || !strchr(u.urooms, *in_rooms(x, y, SHOPBASE)))) {
+            if (!gk.kickedobj->no_charge)
+                addtobill(gk.kickedobj, FALSE, FALSE, FALSE);
+            else /* don't leave no_charge set when outside shop */
+                gk.kickedobj->no_charge = 0;
+        }
         if (!flooreffects(gk.kickedobj, u.ux, u.uy, "fall")) {
             place_object(gk.kickedobj, u.ux, u.uy);
             stackobj(gk.kickedobj);
@@ -682,8 +693,18 @@ really_kick_object(coordxy x, coordxy y)
         pline("Whee!  %s %s across the %s.", Doname2(gk.kickedobj),
               otense(gk.kickedobj, "slide"), surface(x, y));
 
-    if (costly && !isgold)
+#if 0   /* now that 'costly' above includes no_charge items, this would
+         * clear their no_charge state (while declining to add to bill)
+         * and then costly handling below would end up charging for them
+         *
+         * [fixme?  if there is anything which won't break when kicked
+         * but will be used up with hitting a monster, suppressing this
+         * results in the used-up item not being charged for]
+         */
+
+    if (costly && !isgold) /* && !gk.kickedobj->no_charge) */
         addtobill(gk.kickedobj, FALSE, FALSE, TRUE);
+#endif
     obj_extract_self(gk.kickedobj);
     (void) snuff_candle(gk.kickedobj);
     newsym(x, y);
@@ -709,8 +730,11 @@ really_kick_object(coordxy x, coordxy y)
         return 1;
 
     bhitroom = *in_rooms(gb.bhitpos.x, gb.bhitpos.y, SHOPBASE);
+    /* if obj is marked no_charge, stolen_value() won't blame hero for
+       theft but will clear that flag */
     if (costly && (!costly_spot(gb.bhitpos.x, gb.bhitpos.y)
                    || *in_rooms(x, y, SHOPBASE) != bhitroom)) {
+        /* kicked from inside shop to somewhere outside shop */
         if (isgold)
             costly_gold(x, y, gk.kickedobj->quan, FALSE);
         else
