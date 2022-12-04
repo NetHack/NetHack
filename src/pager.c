@@ -1726,9 +1726,10 @@ look_all(
                    and 2 digit values; done unconditionally because we
                    would need two passes over the map to determine whether
                    y width is uniform or a mixture; x width is not a factor
-                   because the result gets right-justified by %8s */
+                   because the result gets right-justified by %8s; adding
+                   a trailing space effectively pushes non-space text left */
                 if (cmode == GPCOORDS_MAP && y < 10)
-                    (void) strsubst(coordbuf, ",", ", ");
+                    (void) strkitten(coordbuf, ' ');
                 /* prefix: "coords  C  " where 'C' is mon or obj symbol */
                 Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
                                   : (cmode == GPCOORDS_MAP) ? "%8s  "
