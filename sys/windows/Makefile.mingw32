@@ -294,7 +294,7 @@ DLLDEF = $(COMMONDEF) -D_WINDOWS -D_USRDLL -D_WINDLL
 CONSOLEDEF = $(COMMONDEF) -D_CONSOLE
 
 # To build util targets
-CFLAGSU = $(CFLAGS) $(DLBFLG)
+CFLAGSU = $(CFLAGS) $(CONSOLEDEF) $(DLBFLG)
 
 LIBS = -lcomctl32 -lgdi32 -lole32 -lshell32 -luuid -lwinmm -lbcrypt
 
