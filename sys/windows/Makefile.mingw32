@@ -291,10 +291,10 @@ endif
 
 COMMONDEF = -DWIN32 -DWINVER=0x0601 -D_WIN32_WINNT=0x0601
 DLLDEF = $(COMMONDEF) -D_WINDOWS -D_USRDLL -D_WINDLL
-CONSOLEDEF = $(COMMONDEF) -D_CONSOLE -DWIN32CON
+CONSOLEDEF = $(COMMONDEF) -D_CONSOLE
 
 # To build util targets
-CFLAGSU = $(CFLAGS) $(CONSOLEDEF) $(DLBFLG) -DMSWIN_GRAPHICS
+CFLAGSU = $(CFLAGS) $(DLBFLG)
 
 LIBS = -lcomctl32 -lgdi32 -lole32 -lshell32 -luuid -lwinmm -lbcrypt
 
@@ -792,7 +792,7 @@ CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS)
 #==========================================
 # nethack
 #==========================================
-CFLAGSNH = $(CFLAGSU) -DNO_TILE_C -DSAFEPROCS -D_LIB
+CFLAGSNH = $(CFLAGSU) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
 
 ONH = $(O)nethack
 
