@@ -723,7 +723,7 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   nhlobj nhlsel nhlua ntsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region restore rip rnd role rumors \
-	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed stubs symbols sys \
+	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed symbols sys \
 	   teleport timeout topten track trap u_init uhitm utf8map vault version vision \
 	   weapon were wield windmain windows windsys wizard worm worn write zap)
 
@@ -763,9 +763,6 @@ $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 
 $(ONHW)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
-
-$(ONHW)/stubs.o: $(MSWSYS)/stubs.c $(NHLUAH) | $(ONHW)
-	$(cc) $(CFLAGSW) -DTTYSTUB $< -o$@
 
 $(ONHW)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -834,9 +831,6 @@ $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 
 $(ONH)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
-
-$(ONH)/stubs.o: $(MSWSYS)/stubs.c $(NHLUAH) | $(ONH)
-	$(cc) $(CFLAGSNH) -DGUISTUB $< -o$@
 
 $(ONH)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
