@@ -14,8 +14,8 @@ extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...);
 extern unsigned long md_ignored_features(void);
 extern char *mdlib_version_string(char *, const char *);
-extern char *version_id_string(char *, int, const char *);
-extern char *bannerc_string(char *, int, const char *);
+extern char *version_id_string(char *, size_t, const char *);
+extern char *bannerc_string(char *, size_t, const char *);
 extern int case_insensitive_comp(const char *, const char *);
 
 /* nomakedefs_populated: flag for whether 'nomakedefs' should be freed */
