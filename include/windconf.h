@@ -29,7 +29,7 @@
 #define DUMPLOG_MSG_COUNT 50
 
 #define USER_SOUNDS
-#define TTY_SOUND_ESCCODES
+/* #define TTY_SOUND_ESCCODES */
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 

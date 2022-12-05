@@ -15,6 +15,12 @@
   <PropertyGroup>
     <OutDir>$(BinDir)</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalOptions>/Gs /Oi- /w44774 %(AdditionalOptions)</AdditionalOptions>
@@ -167,9 +173,6 @@
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)random.c" />
     <ClCompile Include="$(SysWindDir)ntsound.c" />
-    <ClCompile Include="$(SysWindDir)stubs.c">
-      <PreprocessorDefinitions>TTYSTUB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="$(SysWindDir)windmain.c" />
     <ClCompile Include="$(SysWindDir)windsys.c" />
     <ClCompile Include="$(SysWindDir)win10.c" />

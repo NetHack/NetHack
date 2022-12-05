@@ -715,7 +715,7 @@ optfn_altkeyhandling(
     if (req == do_set) {
         /* altkeyhandling:string */
 
-#if defined(WIN32) && defined(TTY_GRAPHICS)
+#if defined(WIN32CON) && defined(TTY_GRAPHICS)
         if (op == empty_optstr || negated)
             return optn_err;
         set_altkeyhandling(op);
@@ -739,7 +739,7 @@ optfn_altkeyhandling(
 #endif
         return optn_ok;
     }
-#ifdef WIN32
+#ifdef WIN32CON
     if (req == do_handler) {
         return set_keyhandling_via_option();
     }
@@ -3399,7 +3399,7 @@ optfn_statuslines(int optidx, int req, boolean negated, char *opts, char *op)
     return optn_ok;
 }
 
-#ifdef WIN32
+#ifdef WIN32CON
 static int
 optfn_subkeyvalue(int optidx UNUSED, int req, boolean negated UNUSED,
                   char *opts, char *op UNUSED)
@@ -3423,7 +3423,7 @@ optfn_subkeyvalue(int optidx UNUSED, int req, boolean negated UNUSED,
     }
     return optn_ok;
 }
-#endif /* WIN32 */
+#endif /* WIN32CON */
 
 static int
 optfn_suppress_alert(int optidx, int req, boolean negated,

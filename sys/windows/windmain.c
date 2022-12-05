@@ -32,7 +32,9 @@ extern void nethack_exit(int) NORETURN;
 extern void mswin_destroy_reg(void);
 #endif
 #ifdef TTY_GRAPHICS
+#ifdef WIN32CON
 extern void backsp(void);
+#endif
 #endif
 extern void clear_screen(void);
 
@@ -49,11 +51,13 @@ extern void (*cursesgraphics_mode_callback)(void);
 extern void (*utf8graphics_mode_callback)(void);
 #endif
 
+#ifdef WIN32CON
 #ifdef _MSC_VER
 #ifdef kbhit
 #undef kbhit
 #endif
 #include <conio.h.>
+#endif
 #endif
 
 #ifdef PC_LOCKING
@@ -65,9 +69,13 @@ int windows_nh_poskey(int *, int *, int *);
 void windows_raw_print(const char *);
 char windows_yn_function(const char *, const char *, char);
 static void windows_getlin(const char *, char *);
+
+#ifdef WIN32CON
 extern int windows_console_custom_nhgetch(void);
 void safe_routines(void);
 int tty_self_recover_prompt(void);
+#endif
+
 int other_self_recover_prompt(void);
 
 char orgdir[PATHLEN];
@@ -78,8 +86,11 @@ int windows_startup_state = 0;    /* we flag whether to continue with this */
 extern int redirect_stdout;       /* from sys/share/pcsys.c */
 extern int GUILaunched;
 HANDLE hStdOut;
+char default_window_sys[] =
 #if defined(MSWIN_GRAPHICS)
-char default_window_sys[] = "mswin";
+            "mswin";
+#elif defined(TTY_GRAPHICS)
+            "tty";
 #endif
 #ifdef WANT_GETHDATE
 static struct stat hbuf;
@@ -437,11 +448,14 @@ mingw_main(int argc, char *argv[])
     _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
 #endif
 
+#ifdef WIN32CON
     /*
      * Get a set of valid safe windowport function
      * pointers during early startup initialization.
      */
     safe_routines();
+#endif /* WIN32CON */
+
     early_init();
 #ifdef _MSC_VER
 #ifdef DEBUG
@@ -556,13 +570,17 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     iflags.use_background_glyph = FALSE;
     if (WINDOWPORT(mswin))
         iflags.use_background_glyph = TRUE;
+#ifdef WIN32CON
     if (WINDOWPORT(tty))
         consoletty_open(1);
+#endif
 
     init_nhwindows(&argc, argv);
 
+#ifdef WIN32CON
     if (WINDOWPORT(tty))
         toggle_mouse_support();
+#endif
 
     if (gs.symset[PRIMARYSET].handling
         && !symset_is_compatible(gs.symset[PRIMARYSET].handling,
@@ -760,12 +778,14 @@ process_options(int argc, char * argv[])
 
                 nethack_exit(EXIT_SUCCESS);
             }
+#ifdef MSWIN_GRAPHICS
             if (GUILaunched) {
                 if (!strncmpi(argv[1], "-clearreg", 6)) { /* clear registry */
                     mswin_destroy_reg();
                     nethack_exit(EXIT_SUCCESS);
                 }
             }
+#endif
             /* Don't initialize the full window system just to print usage */
             if (!strncmp(argv[1], "-?", 2) || !strncmp(argv[1], "/?", 2)) {
                 nhusage();
@@ -902,6 +922,7 @@ nhusage(void)
 #undef ADD_USAGE
 }
 
+#ifdef WIN32CON
 void
 safe_routines(void)
 {
@@ -914,6 +935,7 @@ safe_routines(void)
     if (!GUILaunched)
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
 }
+#endif
 
 #ifdef PORT_HELP
 void
@@ -937,8 +959,8 @@ authorize_wizard_mode(void)
 
 #if defined(WIN32) && !defined(WIN32CON)
 static char exenamebuf[PATHLEN];
-extern HANDLE hConIn;
-extern HANDLE hConOut;
+HANDLE hConIn;
+HANDLE hConOut;
 boolean has_fakeconsole;
 
 char *
@@ -1166,7 +1188,9 @@ getlock(void)
     const char *fq_lock;
 #define OOPS_BUFSZ 512
     char oops[OOPS_BUFSZ];
+#ifdef WIN32CON
     boolean istty = WINDOWPORT(tty);
+#endif
 
     /* we ignore QUIT and INT at this point */
     if (!lock_file(HLOCK, LOCKPREFIX, 10)) {
@@ -1197,9 +1221,11 @@ getlock(void)
 
     (void) nhclose(fd);
 
+#ifdef WIN32CON
     if (WINDOWPORT(tty))
         prompt_result = tty_self_recover_prompt();
     else
+#endif
         prompt_result = other_self_recover_prompt();
     /*
      * prompt_result == 1  means recover old game.
@@ -1212,8 +1238,10 @@ getlock(void)
                     : (prompt_result == 1)
                         ? "recover the old game"
                         : "not start a new game");
+#ifdef WIN32CON
     if (istty)
         clear_screen();
+#endif
     raw_printf("%s", oops);
     if (prompt_result == 1) {          /* recover */
         if (recover_savefile()) {
@@ -1231,8 +1259,10 @@ getlock(void)
         }
     } else if (prompt_result < 0) {    /* destroy old game */
         if (eraseoldlocks()) {
+#ifdef WIN32CON
             if (istty)
                 clear_screen(); /* display gets fouled up otherwise */
+#endif
             goto gotlock;
         } else {
             unlock_file(HLOCK);
@@ -1320,6 +1350,7 @@ file_newer(const char* a_path, const char* b_path)
     return FALSE;
 }
 
+#ifdef WIN32CON
 /*
  * returns:
  *     1 if game should be recovered
@@ -1391,6 +1422,7 @@ tty_self_recover_prompt(void)
     }
     return retval;
 }
+#endif
 
 int
 other_self_recover_prompt(void)
