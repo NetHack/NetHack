@@ -106,7 +106,7 @@ struct window_procs tty_procs = {
 #ifdef MSDOS
      | WC_TILED_MAP | WC_ASCII_MAP
 #endif
-#if defined(WIN32)
+#if defined(WIN32CON)
      | WC_MOUSE_SUPPORT
 #endif
      | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
@@ -120,7 +120,7 @@ struct window_procs tty_procs = {
 #endif
      | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
      | WC2_U_UTF8STR
-#if !defined(NO_TERMS) || defined(WIN32)
+#if !defined(NO_TERMS) || defined(WIN32CON)
      | WC2_U_24BITCOLOR
 #endif
     ),
@@ -555,7 +555,7 @@ tty_preference_update(const char *pref)
         new_status_window();
     }
 
-#if defined(WIN32)
+#if defined(WIN32CON)
     consoletty_preference_update(pref);
 #else
     genl_preference_update(pref);
@@ -1531,7 +1531,7 @@ tty_exit_nhwindows(const char *str)
 #ifndef NO_TERMS    /*(until this gets added to the window interface)*/
     tty_shutdown(); /* cleanup termcap/terminfo/whatever */
 #endif
-#ifdef WIN32
+#ifdef WIN32CON
     consoletty_exit();
 #endif
     iflags.window_inited = 0;
@@ -4085,7 +4085,7 @@ end_glyphout(void)
 #endif
 }
 
-#ifndef WIN32
+#ifndef WIN32CON
 void
 g_putch(int in_ch)
 {
@@ -4125,7 +4125,7 @@ g_putch(int in_ch)
 
     return;
 }
-#endif /* !WIN32 */
+#endif /* !WIN32CON */
 
 #if defined(ENHANCED_SYMBOLS) && defined(UNIX)
 void

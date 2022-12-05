@@ -48,6 +48,7 @@ extern int GUILaunched;
 extern boolean getreturn_enabled;
 int redirect_stdout;
 
+#ifdef WIN32CON
 typedef HWND(WINAPI *GETCONSOLEWINDOW)();
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
@@ -66,6 +67,21 @@ extern void safe_routines(void);
 
 int def_kbhit(void);
 int (*nt_kbhit)() = def_kbhit;
+#endif /* WIN32CON */
+
+#ifndef WIN32CON
+/* this is used as a printf() replacement when the window
+ * system isn't initialized yet
+ */
+void msmsg
+VA_DECL(const char *, fmt)
+{
+    VA_START(fmt);
+    VA_INIT(fmt, const char *);
+    VA_END();
+    return;
+}
+#endif
 
 char
 switchar(void)
@@ -187,8 +203,10 @@ return &szFullPath[0];
 }
 #endif
 
+#ifdef MSWIN_GRAPHICS
 extern void mswin_raw_print_flush(void);
 extern void mswin_raw_print(const char *);
+#endif
 
 /* fatal error */
 /*VARARGS1*/
@@ -211,8 +229,10 @@ VA_DECL(const char *, s)
         Strcat(buf, "\n");
         raw_printf(buf);
     }
+#ifdef MSWIN_GRAPHICS
     if (windowprocs.win_raw_print == mswin_raw_print)
         mswin_raw_print_flush();
+#endif
     VA_END();
     exit(EXIT_FAILURE);
 }
@@ -233,8 +253,10 @@ win32_abort(void)
             exit_nhwindows((char *) 0);
         iflags.window_inited = FALSE;
     }
+#ifdef WIN32CON
     if (!WINDOWPORT(mswin) && !WINDOWPORT(safestartup))
         safe_routines();
+#endif
     if (wizard) {
         raw_print("Execute debug breakpoint wizard?");
         if ((c = nhgetch()) == 'y' || c == 'Y')
@@ -368,6 +390,7 @@ void port_insert_pastebuf(char *buf)
     return;
 }
 
+#ifdef WIN32CON
 static HWND
 GetConsoleHandle(void)
 {
@@ -405,7 +428,7 @@ GetConsoleHwnd(void)
     /*       printf("%d iterations\n", iterations); */
     return hwndFound;
 }
-
+#endif /* WIN32CON */
 #endif
 
 #ifdef RUNTIME_PORT_ID
@@ -447,12 +470,14 @@ nethack_exit(int code)
      */
 
 
+#ifdef WIN32CON
     if (!GUILaunched) {
         windowprocs = *get_safe_procs(1);
         /* use our custom version which works
            a little cleaner than the stdio one */
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
     }
+#endif
     if (getreturn_enabled) {
         raw_print("\n");
         wait_synch();
@@ -460,6 +485,7 @@ nethack_exit(int code)
     exit(code);
 }
 
+#ifdef WIN32CON
 #undef kbhit
 #include <conio.h>
 
@@ -488,13 +514,16 @@ getreturn(const char *str)
     in_getreturn = FALSE;
     return;
 }
+#endif
 
 /* nethack_enter_windows() is called from main immediately after
    initializing the window port */
 void nethack_enter_windows(void)
 {
+#ifdef WIN32CON
     if (WINDOWPORT(tty))
         nethack_enter_consoletty();
+#endif
 }
 
 /* CP437 to Unicode mapping according to the Unicode Consortium */

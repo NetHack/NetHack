@@ -12,6 +12,7 @@ Systos
 SysBe
 nethack
 *.o
+*.tag
 tiles.bmp
 *.moc
 *.lnk
@@ -21,4 +22,9 @@ o
 nhdat*
 date.nmk
 tilemappings.lst
+objgui/*
+objtty/*
+objutil/*
+objlua/*
+objpdc/*
 

@@ -561,7 +561,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #endif
     NHOPTC(statuslines, Status, 20, opt_in, set_in_game,
                 No, Yes, No, No, NoAlias, "2 or 3 lines for status display")
-#ifdef WIN32
+#ifdef WIN32CON
     NHOPTC(subkeyvalue, Advanced, 7, opt_in, set_in_config,
                 No, Yes, Yes, No, NoAlias, "override keystroke value")
 #endif

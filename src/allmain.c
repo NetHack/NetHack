@@ -426,7 +426,7 @@ moveloop_core(void)
     gc.context.move = 1;
 
     if (gm.multi >= 0 && go.occupation) {
-#if defined(MICRO) || defined(WIN32)
+#if defined(MICRO) || defined(WIN32CON)
         mvl_abort_lev = 0;
         if (kbhit()) {
             char ch;

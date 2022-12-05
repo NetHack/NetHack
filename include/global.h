@@ -254,7 +254,7 @@ typedef uchar nhsym;
 #endif
 
 #if defined(X11_GRAPHICS) || defined(QT_GRAPHICS) || defined(GNOME_GRAPHICS) \
-    || defined(WIN32)
+    || defined(MSWIN_GRAPHICS)
 #ifndef NO_TILE_C
 #ifndef USE_TILES
 #define USE_TILES /* glyphmap[] with prefilled tile mappings will be available */
