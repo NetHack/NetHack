@@ -509,16 +509,15 @@ add_custom_urep_entry(
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
-    int retval = 0;
     struct symset_customization *gdc = &gs.sym_customizations[which_set];
-    struct customization_detail *details, *prev = 0, *newdetails = 0,
-                                          *lastdetail = 0;
+    struct customization_detail *details, *newdetails = 0;
 
 
     if (!gdc->details) {
         gdc->customization_name = dupstr(customization_name);
         gdc->custtype = custom_ureps;
         gdc->details = 0;
+        gdc->details_end = 0;
     }
     details = find_matching_symset_customization(customization_name,
                                                  custom_symbols, which_set);
@@ -537,7 +536,6 @@ add_custom_urep_entry(
                 details->content.urep.u.utf32ch = utf32ch;
                 return 1;
             }
-            prev = details;
             details = details->next;
         }
     }
@@ -554,23 +552,14 @@ add_custom_urep_entry(
         newdetails->content.urep.u.u256coloridx = 0;
     newdetails->content.urep.u.utf32ch = utf32ch;
     newdetails->next = (struct customization_detail *) 0;
-    if (!details && prev) {
-        prev->next = newdetails;
-        retval = 1;
-    } else if (!gdc->details) {
+    if (gdc->details == NULL) {
         gdc->details = newdetails;
-        retval = 1;
     } else {
-        lastdetail = gdc->details;
-        while (lastdetail) {
-            prev = lastdetail;
-            lastdetail = lastdetail->next;
-        }
-        prev->next = newdetails;
-        retval = 1;
+        gdc->details_end->next = newdetails;
     }
+    gdc->details_end = newdetails;
     gdc->count++;
-    return retval;
+    return 1;
 }
 
 static int

@@ -157,6 +157,7 @@ struct symset_customization {
     int count;
     int custtype;
     struct customization_detail *details;
+    struct customization_detail *details_end;
 };
 #endif /* ENHANCED_SYMBOLS */
 

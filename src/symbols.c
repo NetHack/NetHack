@@ -1200,6 +1200,7 @@ purge_custom_entries(enum graphics_sets which_set)
         details = next;
     }
     gdc->details = 0;
+    gdc->details_end = 0;
     if (gdc->customization_name) {
         free((genericptr_t) gdc->customization_name);
         gdc->customization_name = 0;
