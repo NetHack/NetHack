@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.h	$NHDT-Date: 1615759956 2021/03/14 22:12:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $ */
+/* NetHack 3.7	trap.h	$NHDT-Date: 1670316586 2022/12/06 08:49:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -24,12 +24,12 @@ struct trap {
     Bitfield(tseen, 1);
     Bitfield(once, 1);
     Bitfield(madeby_u, 1); /* So monsters may take offence when you trap
-                              them.  Recognizing who made the trap isn't
-                              completely unreasonable, everybody has
-                              their own style.  This flag is also needed
-                              when you untrap a monster.  It would be too
-                              easy to make a monster peaceful if you could
-                              set a trap for it and then untrap it. */
+                            * them.  Recognizing who made the trap isn't
+                            * completely unreasonable, everybody has
+                            * their own style.  This flag is also needed
+                            * when you untrap a monster.  It would be too
+                            * easy to make a monster peaceful if you could
+                            * set a trap for it and then untrap it. */
     union vlaunchinfo vl;
 #define launch_otyp vl.v_launch_otyp
 #define launch2 vl.v_launch2
