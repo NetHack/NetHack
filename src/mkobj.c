@@ -2463,6 +2463,11 @@ add_to_migration(struct obj *obj)
     if (obj->where != OBJ_FREE)
         panic("add_to_migration: obj not free");
 
+    if (obj->unpaid) /* caller should have changed unpaid item to stolen */
+        impossible("unpaid object migrating to another level? [%s]",
+                   simpleonames(obj));
+    obj->no_charge = 0; /* was only relevant while inside a shop */
+
     /* lock picking context becomes stale if it's for this object */
     if (Is_container(obj))
         maybe_reset_pick(obj);
@@ -2830,7 +2835,7 @@ shop_obj_sanity(struct obj *obj, const char *mesg)
            and for objects inside floor containers in shops */
         if (otop->where != OBJ_FLOOR)
             why = "%s no_charge obj not on floor! %s %s: %s";
-        else if (!costly)
+        else if (!costly && !costlytoo)
             why = "%s no_charge obj not inside tended shop! %s %s: %s";
         else if (!shkp)
             why = "%s no_charge obj inside untended shop! %s %s: %s";
