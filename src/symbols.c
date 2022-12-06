@@ -835,6 +835,10 @@ match_sym(char *buf)
     const char *p = strchr(buf, ':'), *q = strchr(buf, '=');
     const struct symparse *sp = loadsyms;
 
+    /* G_ lines will never match here */
+    if ((buf[0] == 'G' || buf[0] == 'g') && buf[1] == '_')
+        return (struct symparse *) 0;
+
     if (!p || (q && q < p))
         p = q;
     if (p) {
