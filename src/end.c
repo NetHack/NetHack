@@ -1433,6 +1433,10 @@ really_done(int how)
         Sprintf(pbuf, "%s, ", gp.plname);
         formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
+        /* if grave creation succeeded, mark it as empty ('disturbed') so it
+           won't produce a zombie, etc, when dug up: corpse is aboveground. */
+        if (IS_GRAVE(levl[u.ux][u.uy].typ))
+            levl[u.ux][u.uy].disturbed = 1;
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
 

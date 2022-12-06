@@ -926,6 +926,12 @@ dig_up_grave(coord *cc)
         You("have violated the sanctity of this grave!");
     }
 
+    if (levl[dig_x][dig_y].disturbed) {
+        /* grave already produced a corpse: either corpse was generated on the
+           surface to begin with (bones), or hero disturbed the grave */
+        goto empty_grave;
+    }
+
     switch (rn2(5)) {
     case 0:
     case 1:
@@ -946,8 +952,10 @@ dig_up_grave(coord *cc)
         (void) makemon(mkclass(S_MUMMY, 0), dig_x, dig_y, MM_NOMSG);
         break;
     default:
-        /* No corpse */
-        pline_The("grave seems unused.  Strange....");
+ empty_grave:
+        pline_The("grave seems to be empty.");
+        if (!levl[dig_x][dig_y].disturbed)
+            pline("Strange....");
         break;
     }
     levl[dig_x][dig_y].typ = ROOM, levl[dig_x][dig_y].flags = 0;

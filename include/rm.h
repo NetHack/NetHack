@@ -331,7 +331,7 @@ struct rm {
 /* horizonal applies to walls, doors (including sdoor); also to iron bars
    even though they don't have separate symbols for horizontal and vertical */
 #define blessedftn horizontal /* a fountain that grants attribs */
-#define disturbed  horizontal /* a grave that has been disturbed */
+#define disturbed  horizontal /* a grave without a corpse in it */
 
 struct damage {
     struct damage *next;
