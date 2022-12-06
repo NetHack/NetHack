@@ -119,7 +119,7 @@ nethack --version:paste
   or web contact form, then exit.
 
 nethack --showpaths
-  list expected locations for various files and directorys, then exit;
+  list expected locations for various files and directories, then exit;
   includes the name and location for the run-time configuration file which
   can vary from platform to platform.
 
