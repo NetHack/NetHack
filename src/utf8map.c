@@ -581,7 +581,7 @@ parse_id(const char *id, struct find_struct *findwhat)
         pm_count = 0, oc_count = 0, cmap_count = 0;
     boolean skip_base = FALSE, skip_this_one, dump_ids = FALSE,
             filling_cache = FALSE, is_S = FALSE, is_G = FALSE;
-    char buf[5][QBUFSZ];
+    char buf[4][QBUFSZ];
 
     if (findwhat->findtype == find_nothing && findwhat->restype) {
         if (findwhat->restype == res_dump_glyphids) {
@@ -647,129 +647,123 @@ parse_id(const char *id, struct find_struct *findwhat)
             for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 skip_base = FALSE;
                 skip_this_one = FALSE;
-                buf[0][0] = buf[1][0] = buf[2][0] = buf[3][0] = buf[4][0] =
-                    '\0';
+                buf[0][0] = buf[1][0] = buf[2][0] = buf[3][0] = '\0';
                 if (glyph_is_monster(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_mon(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_mon(glyph)].nm;
                     if (glyph_is_normal_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "male_");
+                        buf2 = "male_";
                     } else if (glyph_is_normal_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "female_");
+                        buf2 = "female_";
                     } else if (glyph_is_ridden_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "ridden_male_");
+                        buf2 = "ridden_male_";
                     } else if (glyph_is_ridden_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "ridden_female_");
+                        buf2 = "ridden_female_";
                     } else if (glyph_is_detected_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "detected_male_");
+                        buf2 = "detected_male_";
                     } else if (glyph_is_detected_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "detected_female_");
+                        buf2 = "detected_female_";
                     } else if (glyph_is_male_pet(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "pet_male_");
+                        buf2 = "pet_male_";
                     } else if (glyph_is_female_pet(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "pet_female_");
+                        buf2 = "pet_female_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
                 } else if (glyph_is_body(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_body_corpsenm(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
                     if (glyph_is_body_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "piletop_body_");
+                        buf2 = "piletop_body_";
                     } else {
-                        Snprintf(buf[2], sizeof buf[2], "body_");
+                        buf2 = "body_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
                 } else if (glyph_is_statue(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_statue_corpsenm(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
                     if (glyph_is_fem_statue_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2],
-                                 "piletop_statue_of_female_");
+                        buf2 = "piletop_statue_of_female_";
                     } else if (glyph_is_fem_statue(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "statue_of_female_");
+                        buf2 = "statue_of_female_";
                     } else if (glyph_is_male_statue_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2],
-                                 "piletop_statue_of_male_");
+                        buf2 = "piletop_statue_of_male_";
                     } else if (glyph_is_male_statue(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "statue_of_male_");
+                        buf2 = "statue_of_male_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
                 } else if (glyph_is_object(glyph)) {
                     i = glyph_to_obj(glyph);
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = "";
                     if (((i > SCR_STINKING_CLOUD) && (i < SCR_MAIL))
                         || ((i > WAN_LIGHTNING) && (i < GOLD_PIECE)))
                         skip_this_one = TRUE;
                     if (!skip_this_one) {
                         if ((i >= WAN_LIGHT) && (i <= WAN_LIGHTNING))
-                            Snprintf(buf[2], sizeof buf[2], "wand of ");
+                            buf2 = "wand of ";
                         else if ((i >= SPE_DIG) && (i < SPE_BLANK_PAPER))
-                            Snprintf(buf[2], sizeof buf[2], "spellbook of ");
+                            buf2 = "spellbook of ";
                         else if ((i >= SCR_ENCHANT_ARMOR)
                                  && (i <= SCR_STINKING_CLOUD))
-                            Snprintf(buf[2], sizeof buf[2], "scroll of ");
+                            buf2 = "scroll of ";
                         else if ((i >= POT_GAIN_ABILITY) && (i <= POT_WATER))
-                            Snprintf(buf[2], sizeof buf[2], "%s",
-                                     (i == POT_WATER) ? "flask of n"
-                                                      : "potion of ");
+                            buf2 = (i == POT_WATER) ? "flask of n"
+                                                    : "potion of ";
                         else if ((i >= RIN_ADORNMENT)
                                  && (i <= RIN_PROTECTION_FROM_SHAPE_CHAN))
-                            Snprintf(buf[2], sizeof buf[2], "ring of ");
+                            buf2 = "ring of ";
                         else if (i == LAND_MINE)
-                            Snprintf(buf[2], sizeof buf[2], "unset ");
-                        Snprintf(buf[3], sizeof buf[3], "%s",
-                                 (i == SCR_BLANK_PAPER) ? "blank scroll"
+                            buf2 = "unset ";
+                        buf3 = (i == SCR_BLANK_PAPER) ? "blank scroll"
                                  : (i == SPE_BLANK_PAPER)
                                      ? "blank spellbook"
                                      : (i == SLIME_MOLD)
                                      ? "slime mold"
-                                     : obj_descr[i].oc_name);
+                                     : obj_descr[i].oc_name;
                         Snprintf(buf[1], sizeof buf[1], "%s%s%s",
                                  glyph_is_normal_piletop_obj(glyph)
                                      ? "piletop_"
                                      : "",
-                                 buf[2], buf[3]);
+                                 buf2, buf3);
                     }
                 } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
                            || glyph_is_swallow(glyph)
                            || glyph_is_explosion(glyph)) {
                     int cmap = -1;
 
-                    buf[2][0] =
-                        '\0'; /* buf[2] will hold the distinguishing prefix */
-                    buf[3][0] = '\0'; /* buf[3] will hold the base name */
-                    buf[4][0] =
-                        '\0'; /* buf[4] will hold the distinguishing suffix */
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    /* buf4 will hold the distinguishing suffix */
+                    const char *buf2 = "";
+                    const char *buf3 = "";
+                    const char *buf4 = "";
                     if (glyph == GLYPH_CMAP_OFF) {
                         cmap = S_stone;
-                        Strcpy(buf[3], "stone substrate");
+                        buf3 = "stone substrate";
                         skip_base = TRUE;
                     } else if (glyph_is_cmap_gehennom(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_GEH_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_gehennom");
+                        buf4 = "_gehennom";
                     } else if (glyph_is_cmap_knox(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_KNOX_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_knox");
+                        buf4 = "_knox";
                     } else if (glyph_is_cmap_main(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_MAIN_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_main");
+                        buf4 = "_main";
                     } else if (glyph_is_cmap_mines(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_MINES_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_mines");
+                        buf4 = "_mines";
                     } else if (glyph_is_cmap_sokoban(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_SOKO_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_sokoban");
+                        buf4 = "_sokoban";
                     } else if (glyph_is_cmap_a(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_A_OFF) + S_ndoor;
                     } else if (glyph_is_cmap_altar(glyph)) {
@@ -782,8 +776,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                         if (j != altar_other) {
                             Snprintf(buf[2], sizeof buf[2], "%s_",
                                      altar_text[j]);
+                            buf2 = buf[2];
                         } else {
-                            Strcpy(buf[3], "altar other");
+                            buf3 = "altar other";
                             skip_base = TRUE;
                         }
                     } else if (glyph_is_cmap_b(glyph)) {
@@ -799,7 +794,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                                  loadsyms[cmap + cmap_offset].name + 2);
                         Snprintf(buf[3], sizeof buf[3], "%s zap %s",
                                  zap_texts[j / 4], fix_glyphname(buf[2]));
-                        buf[2][0] = '\0';
+                        buf3 = buf[3];
+                        buf2 = "";
                         skip_base = TRUE;
                     } else if (glyph_is_cmap_c(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
@@ -815,6 +811,7 @@ parse_id(const char *id, struct find_struct *findwhat)
                         i = cmap - S_sw_tl;
                         Snprintf(buf[3], sizeof buf[3], "%s %s %s", "swallow",
                                  monsdump[mnum].nm, swallow_texts[cmap]);
+                        buf3 = buf[3];
                         skip_base = TRUE;
                     } else if (glyph_is_explosion(glyph)) {
                         int expl;
@@ -834,24 +831,27 @@ parse_id(const char *id, struct find_struct *findwhat)
                         i = cmap - S_expl_tl;
                         Snprintf(buf[2], sizeof buf[2], "%s ",
                                  expl_type_texts[expl]);
+                        buf2 = buf[2];
                         Snprintf(buf[3], sizeof buf[3], "%s%s", "expl_",
                                  expl_texts[i]);
+                        buf3 = buf[3];
                         skip_base = TRUE;
                     }
                     if (!skip_base) {
                         if (cmap >= 0 && cmap < MAXPCHARS) {
                             Snprintf(buf[3], sizeof buf[3], "%s",
                                      loadsyms[cmap + cmap_offset].name + 2);
+                            buf3 = buf[3];
                         }
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s%s", buf[2], buf[3],
-                             buf[4]);
+                    Snprintf(buf[1], sizeof buf[1], "%s%s%s", buf2, buf3,
+                             buf4);
                 } else if (glyph_is_invisible(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "invisible");
+                    Snprintf(buf[1], sizeof buf[1], "invisible");
                 } else if (glyph_is_nothing(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "nothing");
+                    Snprintf(buf[1], sizeof buf[1], "nothing");
                 } else if (glyph_is_unexplored(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "unexplored");
+                    Snprintf(buf[1], sizeof buf[1], "unexplored");
                 } else if (glyph_is_warning(glyph)) {
                     j = glyph - GLYPH_WARNING_OFF;
                     Snprintf(buf[1], sizeof buf[1], "%s%d", "warning", j);
