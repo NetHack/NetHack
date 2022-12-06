@@ -783,9 +783,6 @@ $(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS) | $(ONHW)
 $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 	$(cc) $(CPPFLAGSW) $< -o$@
 
-$(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
-	$(cc) $(CPPFLAGSNH) $< -o$@
-
 $(ONHW)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
