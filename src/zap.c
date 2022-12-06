@@ -2434,7 +2434,8 @@ dozap(void)
         if ((damage = zapyourself(obj, TRUE)) != 0) {
             char buf[BUFSZ];
 
-            Sprintf(buf, "zapped %sself with a wand", uhim());
+            Sprintf(buf, "zapped %sself with %s",
+                    uhim(), an(killer_xname(obj)));
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
     } else {
@@ -5256,9 +5257,9 @@ destroy_one_item(struct obj *obj, int osym, int dmgtyp)
         break;
     }
 
-    if (chargeit)
+    if (chargeit) {
         recharge(obj, 0);
-    else if (!skip) {
+    } else if (!skip) {
         if (obj->in_use)
             --quan; /* one will be used up elsewhere */
         for (i = cnt = 0L; i < quan; i++)
