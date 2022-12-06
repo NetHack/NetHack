@@ -60,6 +60,13 @@ INTERNET_AVAILABLE = N
 GIT_AVAILABLE = N
 
 #
+#---------------------------------------------------------------
+# Do you want to turn on the same gcc warnings as on Unix builds?
+#
+
+GCC_EXTRA_WARNINGS = N
+
+#
 #===============================================
 #======= End of Modification Section ===========
 #===============================================
@@ -287,6 +294,20 @@ ifeq "$(USE_DLB)" "Y"
 DLBFLG = -DDLB
 else
 DLBFLG =
+endif
+
+ifeq "$(GCC_EXTRA_WARNINGS)" "Y"
+#
+# These match the warnings enabled on the linux.370 and macOS.370 hints builds
+#
+CFLAGSXTRA = -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type \
+		-Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -pedantic \
+		-Wmissing-declarations -Wformat-nonliteral -Wunreachable-code \
+		-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
+		-Wmissing-prototypes -Wold-style-definition -Wstrict-prototypes
+CPPFLAGSXTRA = -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type \
+		-Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings -pedantic \
+		-Wmissing-declarations -Wformat-nonliteral -Wunreachable-code
 endif
 
 COMMONDEF = -DWIN32 -DWINVER=0x0601 -D_WIN32_WINNT=0x0601
@@ -727,7 +748,8 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   teleport timeout topten track trap u_init uhitm utf8map vault version vision \
 	   weapon were wield windmain windows windsys wizard worm worn write zap)
 
-CFLAGSW = $(CFLAGS) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS
+CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS
+CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS
 
 ONHW = $(O)nethackw
 NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
@@ -759,7 +781,10 @@ $(ONHW)/date.o: $(SRC)/date.c $(NHWOBJS) | $(ONHW)
 	$(cc) $(CFLAGSW) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
-	$(cc) $(CFLAGSW) $< -o$@
+	$(cc) $(CPPFLAGSW) $< -o$@
+
+$(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
+	$(cc) $(CPPFLAGSNH) $< -o$@
 
 $(ONHW)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -792,7 +817,8 @@ CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS)
 #==========================================
 # nethack
 #==========================================
-CFLAGSNH = $(CFLAGSU) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
+CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
+CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
 
 ONH = $(O)nethack
 
@@ -827,7 +853,7 @@ $(ONH)/date.o: $(SRC)/date.c $(NHOBJS) $(NHRES) | $(ONH)
 	$(cc) $(CFLAGSNH) $(GITHASH) $(GITBRANCH) $< -o$@
 
 $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
-	$(cc) $(CFLAGSNH) $< -o$@
+	$(cc) $(CPPFLAGSNH) $< -o$@
 
 $(ONH)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@

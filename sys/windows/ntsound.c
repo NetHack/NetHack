@@ -17,7 +17,7 @@
 #ifdef USER_SOUNDS
 
 void
-play_usersound(const char* filename, int volume)
+play_usersound(const char* filename, int volume UNUSED)
 {
     /*    pline("play_usersound: %s (%d).", filename, volume); */
     (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT);

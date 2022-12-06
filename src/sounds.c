@@ -1400,13 +1400,6 @@ tiphat(void)
 
 #ifdef USER_SOUNDS
 
-#if defined(WIN32) || defined(QT_GRAPHICS)
-extern void play_usersound(const char *, int);
-#endif
-#if defined(TTY_SOUND_ESCCODES)
-extern void play_usersound_via_idx(int, int);
-#endif
-
 typedef struct audio_mapping_rec {
     struct nhregex *regex;
     char *filename;

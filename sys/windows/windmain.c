@@ -100,6 +100,28 @@ static struct stat hbuf;
 
 extern char orgdir[];
 
+int get_known_folder_path(const KNOWNFOLDERID * folder_id,
+                      char * path, size_t path_size);
+void create_directory(const char * path);
+int build_known_folder_path(const KNOWNFOLDERID * folder_id,
+                      char * path, size_t path_size, boolean versioned);
+void build_environment_path(const char * env_str, const char * folder,
+                      char * path, size_t path_size);
+boolean folder_file_exists(const char * folder, const char * file_name);
+boolean test_portable_config(const char *executable_path,
+             char *portable_device_path, size_t portable_device_path_size);
+void set_default_prefix_locations(const char *programPath);
+void copy_sysconf_content(void);
+void copy_config_content(void);
+void copy_hack_content(void);
+#ifdef PORT_HELP
+void port_help(void);
+#endif
+void windows_raw_print(const char* str);
+
+
+
+
 DISABLE_WARNING_UNREACHABLE_CODE
 
 int
@@ -125,7 +147,8 @@ get_known_folder_path(
         // silently handle this problem
         return FALSE;
     } else if (err != 0) {
-        error("Failed folder (%u) path string conversion, unexpected err = %d", folder_id->Data1, err);
+        error("Failed folder (%lu) path string conversion, unexpected err = %d",
+              folder_id->Data1, err);
         return FALSE;
     }
 
@@ -156,7 +179,7 @@ build_known_folder_path(
     strcat(path, "\\NetHack\\");
     create_directory(path);
     if (versioned) {
-        Sprintf(eos(path), "%d.%d\\", 
+        Sprintf(eos(path), "%d.%d\\",
                     VERSION_MAJOR, VERSION_MINOR);
         create_directory(path);
     }
@@ -226,7 +249,7 @@ test_portable_config(
          */
 
         *portable_device_path = '\0';
-        lth = sizeof tmppath - strlen(sysconf); 
+        lth = sizeof tmppath - strlen(sysconf);
         (void) strncpy(tmppath, executable_path, lth - 1);
         tmppath[lth - 1] = '\0';
         (void) strcat(tmppath, sysconf);
@@ -260,14 +283,14 @@ const char *get_portable_device(void)
 }
 
 void
-set_default_prefix_locations(const char *programPath)
+set_default_prefix_locations(const char *programPath UNUSED)
 {
     static char executable_path[MAX_PATH];
     static char profile_path[MAX_PATH];
     static char versioned_profile_path[MAX_PATH];
     static char versioned_user_data_path[MAX_PATH];
     static char versioned_global_data_path[MAX_PATH];
-    static char versioninfo[20];
+/*    static char versioninfo[20] UNUSED; */
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
@@ -594,7 +617,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             load_symset("RogueEpyx", ROGUESET);
     }
     /* Has the callback for the symset been invoked? Config file processing to
-       load a symset runs too early to accomplish that because 
+       load a symset runs too early to accomplish that because
        the various *graphics_mode_callback pointers don't get set until
        term_start_screen, unfortunately */
 #if defined(TERMLIB) || defined(CURSES_GRAPHICS)
@@ -1005,7 +1028,7 @@ fakeconsole(void)
         }
         has_fakeconsole = TRUE;
     }
-    
+
     /* Obtain handles for the standard Console I/O devices */
     hConIn = GetStdHandle(STD_INPUT_HANDLE);
     hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -1135,14 +1158,15 @@ windows_nhbell(void)
 
 /*ARGSUSED*/
 int
-windows_nh_poskey(int *x, int *y, int *mod)
+windows_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
 {
     return '\033';
 }
 
 /*ARGSUSED*/
 char
-windows_yn_function(const char* query, const char* resp, char def)
+windows_yn_function(const char* query UNUSED, const char* resp UNUSED,
+                    char def UNUSED)
 {
     return '\033';
 }
@@ -1329,7 +1353,7 @@ file_exists(const char* path)
 
 RESTORE_WARNING_UNREACHABLE_CODE
 
-/* 
+/*
   file_newer returns TRUE if the file at a_path is newer then the file
   at b_path.  If a_path does not exist, it returns FALSE.  If b_path
   does not exist, it returns TRUE.

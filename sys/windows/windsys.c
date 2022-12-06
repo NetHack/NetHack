@@ -4,7 +4,7 @@
 
 /*
  *  WIN32 system functions.
- * 
+ *
  *  Included in both console-based and window-based clients on the windows platform.
  *
  *  Initial Creation: Michael Allison - January 31/93
@@ -49,14 +49,22 @@ extern boolean getreturn_enabled;
 int redirect_stdout;
 
 #ifdef WIN32CON
-typedef HWND(WINAPI *GETCONSOLEWINDOW)();
+typedef HWND(WINAPI *GETCONSOLEWINDOW)(void);
+#ifdef WIN32CON
 static HWND GetConsoleHandle(void);
 static HWND GetConsoleHwnd(void);
+#endif
 #if !defined(TTY_GRAPHICS)
 extern void backsp(void);
 #endif
 int windows_console_custom_nhgetch(void);
 extern void safe_routines(void);
+int windows_early_options(const char *window_opt);
+unsigned long sys_random_seed(void);
+#if 0
+static int max_filename(void);
+#endif
+
 
 /* The function pointer nt_kbhit contains a kbhit() equivalent
  * which varies depending on which window port is active.
@@ -66,7 +74,7 @@ extern void safe_routines(void);
  */
 
 int def_kbhit(void);
-int (*nt_kbhit)() = def_kbhit;
+int (*nt_kbhit)(void) = def_kbhit;
 #endif /* WIN32CON */
 
 #ifndef WIN32CON
@@ -157,6 +165,7 @@ chdrive(char* str)
     }
 }
 
+#if 0
 static int
 max_filename(void)
 {
@@ -170,6 +179,7 @@ max_filename(void)
     else
         return 0;
 }
+#endif
 
 int
 def_kbhit(void)
@@ -208,6 +218,8 @@ extern void mswin_raw_print_flush(void);
 extern void mswin_raw_print(const char *);
 #endif
 
+DISABLE_WARNING_FORMAT_NONLITERAL
+
 /* fatal error */
 /*VARARGS1*/
 void error
@@ -236,6 +248,8 @@ VA_DECL(const char *, s)
     VA_END();
     exit(EXIT_FAILURE);
 }
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 Delay(int ms)
@@ -317,7 +331,7 @@ void
 interject(int interjection_type)
 {
     if (interjection_type >= 0 && interjection_type < INTERJECTION_TYPES)
-        msmsg(interjection_buf[interjection_type]);
+        msmsg("%s", interjection_buf[interjection_type]);
 }
 
 #ifdef RUNTIME_PASTEBUF_SUPPORT
@@ -328,22 +342,23 @@ void port_insert_pastebuf(char *buf)
      * to accomplish this.
      */
 
-    HGLOBAL hglbCopy; 
+    HGLOBAL hglbCopy;
     WCHAR *w, w2[2];
-    int cc, rc, abytes;
+    /* int cc; */
+    int rc, abytes;
     LPWSTR lpwstrCopy;
     HANDLE hresult;
 
     if (!buf)
-        return; 
- 
-    cc = strlen(buf);
+        return;
+
+    /* cc = strlen(buf); */
     /* last arg=0 means "tell me the size of the buffer that I need" */
     rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w2, 0);
     if (!rc) return;
 
     abytes = rc * sizeof(WCHAR);
-    w = (WCHAR *)alloc(abytes);     
+    w = (WCHAR *)alloc(abytes);
     /* Housekeeping need: +free(w) */
 
     rc = MultiByteToWideChar(GetConsoleOutputCP(), 0, buf, -1, w, rc);
@@ -357,18 +372,18 @@ void port_insert_pastebuf(char *buf)
     }
     /* Housekeeping need: +CloseClipboard(), free(w) */
 
-    EmptyClipboard(); 
+    EmptyClipboard();
 
     /* allocate global mem obj to hold the text */
- 
+
     hglbCopy = GlobalAlloc(GMEM_MOVEABLE, abytes);
-    if (hglbCopy == NULL) { 
-        CloseClipboard(); 
+    if (hglbCopy == NULL) {
+        CloseClipboard();
         free(w);
         return;
-    } 
+    }
     /* Housekeeping need: +GlobalFree(hglbCopy), CloseClipboard(), free(w) */
- 
+
     lpwstrCopy = (LPWSTR)GlobalLock(hglbCopy);
     /* Housekeeping need: +GlobalUnlock(hglbCopy), GlobalFree(hglbCopy),
                             CloseClipboard(), free(w) */
@@ -384,8 +399,8 @@ void port_insert_pastebuf(char *buf)
         GlobalFree(hglbCopy); /* only needed if clipboard didn't accept data */
     }
     /* Housekeeping need: CloseClipboard(), free(w) */
- 
-    CloseClipboard(); 
+
+    CloseClipboard();
     free(w);
     return;
 }
@@ -566,8 +581,10 @@ WCHAR *
 winos_ascii_to_wide_str(const unsigned char * src, WCHAR * dst, size_t dstLength)
 {
     size_t i = 0;
-    while(i < dstLength - 1 && src[i] != 0)
-        dst[i++] = cp437[src[i]];
+    while(i < dstLength - 1 && src[i] != 0) {
+        dst[i] = cp437[src[i]];
+        i++;
+    }
     dst[i] = 0;
     return dst;
 }
@@ -644,7 +661,8 @@ windows_early_options(const char *window_opt)
         return 1;
     } else {
         raw_printf(
-            "-%swindows:cursorblink is the only supported option.\n");
+            "-%s windows:cursorblink is the only supported option.\n",
+            window_opt);
     }
     return 0;
 }
@@ -690,10 +708,10 @@ sys_random_seed(void)
 
     status = BCryptOpenAlgorithmProvider(&hRa, BCRYPT_RNG_ALGORITHM,
                                          (LPCWSTR) 0, 0);
-    if (hRa && status == STATUS_SUCCESS) {
+    if (hRa && status == (NTSTATUS) STATUS_SUCCESS) {
         status = BCryptGenRandom(hRa, (PUCHAR) &ourseed,
                                  (ULONG) sizeof ourseed, 0);
-        if (status == STATUS_SUCCESS) {
+        if (status == (NTSTATUS) STATUS_SUCCESS) {
             BCryptCloseAlgorithmProvider(hRa,0);
             has_strong_rngseed = TRUE;
             Plan_B = FALSE;
@@ -726,7 +744,7 @@ nt_assert_failed(const char *expression, const char *filepath, int line)
 
     if (IsDebuggerPresent()) {
         char message[BUFSIZ];
-        snprintf(message, sizeof(message), 
+        snprintf(message, sizeof(message),
             "nhassert(%s) failed in file '%s' at line %d",
             expression, filename, line);
         OutputDebugStringA(message);

@@ -2571,6 +2571,12 @@ extern int add_sound_mapping(const char *);
 extern void play_sound_for_message(const char *);
 extern void maybe_play_sound(const char *);
 extern void release_sound_mappings(void);
+#if defined(WIN32) || defined(QT_GRAPHICS)
+extern void play_usersound(const char *, int);
+#endif
+#if defined(TTY_SOUND_ESCCODES)
+extern void play_usersound_via_idx(int, int);
+#endif
 #endif /* USER SOUNDS */
 
 /* ### sp_lev.c ### */
