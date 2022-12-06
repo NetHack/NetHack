@@ -32,10 +32,10 @@ strategy:
       imageName: 'windows-latest'
       toolchainName: vs
       buildTargetName: all
-#    windows-mingw:
-#      imageName: 'windows-2019'
-#      toolchainName: mingw
-#      buildTargetName: all
+    windows-mingw:
+      imageName: 'windows-2019'
+      toolchainName: mingw
+      buildTargetName: all
     linux_focal_cross_msdos:
       imageName: 'ubuntu-20.04'
       toolchainName: cross

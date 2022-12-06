@@ -430,12 +430,15 @@ extern const char *known_restrictions[]; /* symbols.c */
  * to help MinGW decide which entry point to choose. If both main and
  * WinMain exist, the resulting executable won't work correctly.
  */
-int
-#ifndef __MINGW32__ 
-main(int argc, char *argv[])
+
+#if defined(__MINGW32__) && defined(MSWIN_GRAPHICS)
+#define MAIN mingw_main
 #else
-mingw_main(int argc, char *argv[])
+#define MAIN main
 #endif
+
+int
+MAIN(int argc, char *argv[])
 {
     boolean resuming = FALSE; /* assume new game */
     NHFILE *nhfp;
