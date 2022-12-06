@@ -917,6 +917,10 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     if (levl[u.ux][u.uy].typ != levl[ox][oy].typ)
         switch_terrain();
 
+    /* might be entering a special room (treasure zoo, thrown room, &c) that
+       has a first-time entry message, or leaving shop with unpaid goods */
+    check_special_room(FALSE);
+
     if (is_pool(x, y) && !u.uinwater) {
         if ((Is_waterlevel(&u.uz) && is_waterwall(x,y))
             || !(Levitation || Flying || Wwalking)) {
