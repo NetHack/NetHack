@@ -2435,7 +2435,7 @@ dozap(void)
             char buf[BUFSZ];
 
             Sprintf(buf, "zapped %sself with %s",
-                    uhim(), an(killer_xname(obj)));
+                    uhim(), killer_xname(obj));
             losehp(Maybe_Half_Phys(damage), buf, NO_KILLER_PREFIX);
         }
     } else {
