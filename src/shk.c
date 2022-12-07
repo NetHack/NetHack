@@ -63,9 +63,9 @@ static struct damage *find_damage(struct monst *);
 static void discard_damage_struct(struct damage *);
 static void discard_damage_owned_by(struct monst *);
 static void shk_fixes_damage(struct monst *);
-static xint16 *litter_getpos(int *, coordxy, coordxy, struct monst *);
-static void litter_scatter(xint16 *, int, coordxy, coordxy, struct monst *);
-static void litter_newsyms(xint16 *, coordxy, coordxy);
+static uint8 litter_getpos(uint8 *, coordxy, coordxy, struct monst *);
+static void litter_scatter(uint8 *, coordxy, coordxy, struct monst *);
+static void litter_newsyms(uint8 *, coordxy, coordxy);
 static int repair_damage(struct monst *, struct damage *, boolean);
 static void sub_one_frombill(struct obj *, struct monst *);
 static void add_one_tobill(struct obj *, boolean, struct monst *);
@@ -3745,23 +3745,27 @@ shk_fixes_damage(struct monst *shkp)
     discard_damage_struct(dam);
 }
 
-#define LITTER_UPDATE 0x01
-#define LITTER_OPEN   0x02
-#define LITTER_INSHOP 0x04
+#define LITTER_UPDATE 0x01U
+#define LITTER_OPEN   0x02U
+#define LITTER_INSHOP 0x04U
 #define horiz(i) ((i % 3) - 1)
 #define vert(i) ((i / 3) - 1)
 
-static xint16 *
-litter_getpos(int *k, coordxy x, coordxy y, struct monst *shkp)
+/* find eligible spots to move items from a gap in a shop's wall that is
+   being repaired; this guarantees that items will end up inside shkp's
+   shop (possibly in the "free spot" or even in doorway or an adjacent
+   wall gap), but if they are in a gap in a wall shared by two shops
+   they might have started in the other shop */
+static uint8
+litter_getpos(
+    uint8 *litter, /* array of 9 uint8's */
+    coordxy x, coordxy y,
+    struct monst *shkp)
 {
-    static xint16 litter[9];
     int i, ix, iy;
+    uint8 k = 0; /* number of adjacent shop spots */
 
-    (void) memset((genericptr_t) litter, 0, sizeof litter);
-
-    if (!k) return litter;
-
-    *k = 0; /* number of adjacent shop spots */
+    (void) memset((genericptr_t) litter, 0, 9 * sizeof *litter);
 
     if (gl.level.objects[x][y] && !IS_ROOM(levl[x][y].typ)) {
         for (i = 0; i < 9; i++) {
@@ -3772,30 +3776,33 @@ litter_getpos(int *k, coordxy x, coordxy y, struct monst *shkp)
             litter[i] = LITTER_OPEN;
             if (inside_shop(ix, iy) == ESHK(shkp)->shoproom) {
                 litter[i] |= LITTER_INSHOP;
-                ++(*k);
+                ++k;
             }
         }
     }
-    return litter;
+    return k;
 }
 
+/* move items from a gap in a shop's wall that is being repaired;
+   litter[] guarantees that items will end up inside shkp's shop, but
+   if the wall being repaired is shared by two shops the items might
+   have started in the other shop */
 static void
 litter_scatter(
-    xint16 *litter,
-    int k,
+    uint8 *litter,
     coordxy x, coordxy y,
     struct monst *shkp)
 {
     struct obj *otmp;
 
-    /* placement below assumes there is always at least one adjacent
-       spot; the 'k' check guards against getting stuck in an infinite
-       loop if some irregularly shaped room breaks that assumption */
-    if (k > 0) {
+    /* placement below assumes there is always at least one adjacent spot
+       that's inside the shop; caller guarantees that */
+    {
         /* Scatter objects haphazardly into the shop */
         if (Punished && !u.uswallow
             && ((uchain->ox == x && uchain->oy == y)
-                || (uball->ox == x && uball->oy == y))) {
+                || (uball->where == OBJ_FLOOR
+                    && uball->ox == x && uball->oy == y))) {
             /*
              * Either the ball or chain is in the repair location.
              * Take the easy way out and put ball&chain under hero.
@@ -3811,7 +3818,7 @@ litter_scatter(
             unplacebc(); /* pick 'em up */
             placebc();   /* put 'em down */
         }
-        while ((otmp = gl.level.objects[x][y]) != 0)
+        while ((otmp = gl.level.objects[x][y]) != 0) {
             /* Don't mess w/ boulders -- just merge into wall */
             if (otmp->otyp == BOULDER || otmp->otyp == ROCK) {
                 obj_extract_self(otmp);
@@ -3834,15 +3841,42 @@ litter_scatter(
                     ix = shkp->mx;
                     iy = shkp->my;
                 }
+                /* if the wall being repaired is shared by two adjacent
+                   shops, <ix,iy> might be in a different shop than the
+                   one that is billing for otmp or decided it was free;
+                   control of the item goes to the shk repairing the wall
+                   but otmp->no_charge isn't recalculated for new shop */
+                if (otmp->unpaid) {
+                    struct monst *oshk = shkp;
+
+                    /* !costly_spot() happens if otmp is moved from wall
+                       to shop's "free spot", still costly_adjacent() and
+                       still unpaid/on-bill; otherwise, it is being moved
+                       all the way into the shop so take it off the bill */
+                    if (costly_spot(ix, iy)
+                        && ((onbill(otmp, oshk, TRUE)
+                             || ((oshk = find_objowner(otmp, ix, iy)) != 0
+                                 && onbill(otmp, oshk, FALSE)))))
+                        subfrombill(otmp, oshk);
+                }
+                if (otmp->no_charge) {
+                    /* not strictly necessary; destination is inside a
+                       shop so existing no_charge remains relevant */
+                    if (!costly_spot(ix, iy)
+                        && !costly_adjacent(shkp, ix, iy))
+                        otmp->no_charge = 0;
+                }
+
                 remove_object(otmp);
                 place_object(otmp, ix, iy);
                 litter[i] |= LITTER_UPDATE;
             }
+        } /* while level.objects[x][y] != 0 */
     }
 }
 
 static void
-litter_newsyms(xint16 *litter, coordxy x, coordxy y)
+litter_newsyms(uint8 *litter, coordxy x, coordxy y)
 {
     int i;
 
@@ -3868,10 +3902,10 @@ repair_damage(
     boolean catchup)
 {
     coordxy x, y;
-    xint16 *litter;
+    uint8 litter[9];
     struct obj *otmp;
     struct trap *ttmp;
-    int k, disposition = 1;
+    int disposition = 1;
     boolean seeit, stop_picking = FALSE;
 
     if (!repairable_damage(tmp_dam, shkp))
@@ -3935,8 +3969,8 @@ repair_damage(
     else /* not a door; set rm.wall_info or whatever old flags are relevant */
         levl[x][y].flags = tmp_dam->flags;
 
-    litter = litter_getpos(&k, x, y, shkp);
-    litter_scatter(litter, k, x, y, shkp);
+    if (litter_getpos(litter, x, y, shkp))
+        litter_scatter(litter, x, y, shkp);
 
     /* needed if hero has line-of-sight to the former gap from outside
        the shop but is farther than one step away; once the light inside
