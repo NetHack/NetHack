@@ -26,7 +26,7 @@ nethack \- Exploring The Mazes of Menace
 .I directory
 ]
 .\" '.B token newline .I token' will include a space between the two tokens;
-.\" '.BI|BR token token' will not.
+.\" '.BI token token' will not.  Likewise for .BR, .RB, &c.
 [
 .BR \-w | \-\-windowtype
 .I interface
@@ -182,15 +182,24 @@ run-time options described there,
 and are provided purely for convenience on systems
 supporting multiple types of terminals.)
 .PP
-Because the option list can be very long (particularly when specifying
-graphics characters), options may also be included in a configuration
-file.
+Because the option list can be very long,
+options may also be included in a configuration file.
 The default is located in your home directory and
-named .nethackrc on Unix systems.  On other systems, the default may be
-different, usually NetHack.cnf.  On MS-DOS or Windows, the name is
-defaults.nh, while on the Macintosh or BeOS, it is NetHack Defaults.
-The configuration file's location may be specified by setting NETHACKOPTIONS
-to a string consisting of an @ character followed by the filename.
+named .nethackrc on UNIX systems (including descendants such as
+linux, NetBSD, and macOS).
+On Windows, the name is also .nethackrc but the location can vary
+(see
+.B \-\-showpaths
+below).
+On other systems, the default may be different, possibly NetHack.cnf.
+On MS-DOS, the name is defaults.nh in NetHack's directory (folder),
+while
+.\" on the Macintosh or BeOS, it is \(lqNetHack Defaults\(rq, and
+on VMS|OpenVMS it is nethack.ini in your home directory.
+The default configuration file may be overridden via the
+.BI \-\-nethackrc: "rc-file"
+command line option or by setting NETHACKOPTIONS in your environment
+to a string consisting of an @ character followed by the path and filename.
 .PP
 The
 .B \-u
@@ -224,11 +233,11 @@ character's gender.  Any of the parts of the suffix may be left out.
 can be used to determine the character profession, also known as the role.
 You can specify either the male or female name for the character role, or
 the first three characters of the role as an abbreviation.
-.B "\-p \@"
-has been retained to explicitly request that a random role be chosen.
-It may need to be quoted with a backslash (\\@) if @
-is the "kill" character (see "stty") for the terminal, in order
-to prevent the current input line from being cleared.
+.\" .B "\-p \@"
+.\" has been retained to explicitly request that a random role be chosen.
+.\" It may need to be quoted with a backslash (\\@) if @
+.\" is the "kill" character (see "stty") for the terminal, in order
+.\" to prevent the current input line from being cleared.
 .PP
 Likewise,
 .B \-r
@@ -339,30 +348,29 @@ option alone will print out the list of your scores on the current version.
 An immediately following
 .B \-v
 reports on all versions present in the score file.
-The
-.B \-s
+.RB \(oq \-s | \-s\~\-v \(cq
 may also be followed by arguments
 .B \-p
+.I profession
 and
 .B \-r
+.I race
 to print the scores of particular roles and races only.
-It may also be followed by one or more player names to print the scores of the
+Either can be specified multiple times to include more than one role
+or more than one race.
+When both are specified, score entries which match either the role or the
+race (or both) are printed rather than just entries which match both.
+.RB \(oq \-s | \-s\~\-v \(cq
+may be followed by one or more player names to print the scores of the
 players mentioned, by 'all' to print out all scores, or by a number to print
 that many top scores.
-.PP
-.BR \-\-usage " or " \-\-help
-will display information similar to this manual page, then exit.
-Use
-.RB \(oq "nethack \-\-usage | more" \(cq
-to read it a page at a time.
-.PP
-.B \-\-showpaths
-can be used to cause NetHack to show where it is expecting
-to find various configuration files.
+Combining names with role or race or both will report entries which match
+any of those rather than just the ones which match all.
 .PP
 .B \-\-version
 can be used to cause NetHack to show the version information it
-was compiled with, then exit. That will include the
+was compiled with, then exit.
+That will include the
 .I git
 commit hash if the information was available when the game was compiled.
 On some platforms, such as Windows and macOS, a variation
@@ -370,6 +378,19 @@ On some platforms, such as Windows and macOS, a variation
 can be used to cause NetHack to show the version information, then exit,
 while also leaving a copy of the version information in the paste buffer
 or clipboard for potential insertion into things like bug reports.
+.PP
+.B \-\-showpaths
+can be used to cause NetHack to show where it is expecting
+to find various files.
+Among other things it shows the path to and name for the player's
+run-time configuration file, a text file which can be editted to
+customize aspects of how the game operates.
+.PP
+.BR \-\-usage " or " \-\-help
+will display information similar to this manual page, then exit.
+Use
+.RB \(oq "nethack \-\-usage | more" \(cq
+to read it a page at a time.
 .SH AUTHORS
 .PP
 Jay Fenlason (+ Kenny Woodland, Mike Thome and Jon Payne) wrote the
@@ -412,7 +433,7 @@ Guidebook\ |\ Guidebook.txt	NetHack's user manual.
 .br
 data, oracles, rumors	Data files used by NetHack.
 .br
-bogusmon 	another data file.
+bogusmon 	Another data file.
 .br
 engrave, epitaph, tribute	Still more data files.
 .br
