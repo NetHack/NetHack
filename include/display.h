@@ -250,9 +250,9 @@
         ((int) U_AP_TYPE == M_AP_NOTHING)                               \
         ? hero_glyph                                                    \
         : ((int) U_AP_TYPE == M_AP_FURNITURE)                           \
-          ? cmap_to_glyph((int) gy.youmonst.mappearance)                 \
+          ? cmap_to_glyph((int) gy.youmonst.mappearance)                \
           : ((int) U_AP_TYPE == M_AP_OBJECT)                            \
-            ? objnum_to_glyph((int) gy.youmonst.mappearance)             \
+            ? objnum_to_glyph((int) gy.youmonst.mappearance)            \
             /* else U_AP_TYPE == M_AP_MONSTER */                        \
             : monnum_to_glyph((int) gy.youmonst.mappearance, Ugender)))
 
