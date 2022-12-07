@@ -2997,11 +2997,17 @@ stolen_value(
     boolean silent)
 {
     long value = 0L, gvalue = 0L, billamt = 0L;
-    char roomno = *in_rooms(x, y, SHOPBASE);
+    char roomno;
     struct bill_x *bp;
-    struct monst *shkp = 0;
+    struct monst *shkp;
     boolean was_unpaid;
     long c_count = 0L, u_count = 0L;
+
+    if ((shkp = find_objowner(obj, x, y)) != (struct monst *) 0) {
+        roomno = ESHK(shkp)->shoproom;
+    } else {
+        roomno = *in_rooms(x, y, SHOPBASE);
+    }
 
     /* gather information for message(s) prior to manipulating bill */
     was_unpaid = obj->unpaid ? TRUE : FALSE;
@@ -3010,6 +3016,7 @@ stolen_value(
         u_count = count_contents(obj, TRUE, FALSE, FALSE, FALSE);
     }
 
+    shkp = (struct monst *) 0;
     if (!billable(&shkp, obj, roomno, TRUE)) {
         /* things already on the bill yield a not-billable result, so
            we need to check bill before deciding that shk doesn't care */
