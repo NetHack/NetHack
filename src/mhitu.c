@@ -418,7 +418,7 @@ mattacku(register struct monst *mtmp)
      *     excessively verbose miss feedback when monster can do multiple
      *     attacks and would miss the same wrong spot each time.)
      */
-    boolean ranged, range2, foundyou, youseeit,
+    boolean ranged, range2, foundyou, firstfoundyou, youseeit,
             skipnonmagc = FALSE;
 
     calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
@@ -663,12 +663,13 @@ mattacku(register struct monst *mtmp)
     }
 
     gs.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
+    firstfoundyou = foundyou;
 
     for (i = 0; i < NATTK; i++) {
         /* recalc in case attack moved hero */
         calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
         sum[i] = MM_MISS;
-        if (i > 0 && foundyou /* previous attack might have moved hero */
+        if (i > 0 && firstfoundyou /* previous attack might have moved hero */
             && (mtmp->mux != u.ux || mtmp->muy != u.uy))
             continue; /* fill in sum[] with 'miss' but skip other actions */
         mon_currwep = (struct obj *) 0;
