@@ -523,22 +523,22 @@ ucatchgem(
 }
 
 #define MT_FLIGHTCHECK(pre,forcehit) \
-    (/* missile hits edge of screen */                                  \
-     !isok(gb.bhitpos.x + dx, gb.bhitpos.y + dy)                          \
-     /* missile hits the wall */                                        \
-     || IS_ROCK(levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ)           \
-     /* missile hit closed door */                                      \
-     || closed_door(gb.bhitpos.x + dx, gb.bhitpos.y + dy)                 \
-     /* missile might hit iron bars */                                  \
-     /* the random chance for small objects hitting bars is */          \
-     /* skipped when reaching them at point blank range */              \
-     || (levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ == IRONBARS       \
-         && hits_bars(&singleobj,                                       \
-                      gb.bhitpos.x, gb.bhitpos.y,                         \
-                      gb.bhitpos.x + dx, gb.bhitpos.y + dy,               \
-                      ((pre) ? 0 : forcehit), 0))                       \
-     /* Thrown objects "sink" */                                        \
-     || (!(pre) && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))         \
+    (/* missile hits edge of screen */                                 \
+     !isok(gb.bhitpos.x + dx, gb.bhitpos.y + dy)                       \
+     /* missile hits the wall */                                       \
+     || IS_ROCK(levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ)        \
+     /* missile hit closed door */                                     \
+     || closed_door(gb.bhitpos.x + dx, gb.bhitpos.y + dy)              \
+     /* missile might hit iron bars */                                 \
+     /* the random chance for small objects hitting bars is */         \
+     /* skipped when reaching them at point blank range */             \
+     || (levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ == IRONBARS    \
+         && hits_bars(&singleobj,                                      \
+                      gb.bhitpos.x, gb.bhitpos.y,                      \
+                      gb.bhitpos.x + dx, gb.bhitpos.y + dy,            \
+                      ((pre) ? 0 : forcehit), 0))                      \
+     /* Thrown objects "sink" */                                       \
+     || (!(pre) && IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ))      \
      )
 
 void

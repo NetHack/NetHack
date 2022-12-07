@@ -475,13 +475,13 @@ pm_to_cham(int mndx)
 }
 
 /* for deciding whether corpse will carry along full monster data */
-#define KEEPTRAITS(mon)                                                 \
-    ((mon)->isshk || (mon)->mtame || unique_corpstat((mon)->data)       \
-     || is_reviver((mon)->data)                                         \
-        /* normally quest leader will be unique, */                     \
-        /* but he or she might have been polymorphed  */                \
+#define KEEPTRAITS(mon)                                                  \
+    ((mon)->isshk || (mon)->mtame || unique_corpstat((mon)->data)        \
+     || is_reviver((mon)->data)                                          \
+        /* normally quest leader will be unique, */                      \
+        /* but he or she might have been polymorphed  */                 \
      || (mon)->m_id == gq.quest_status.leader_m_id                       \
-        /* special cancellation handling for these */                   \
+        /* special cancellation handling for these */                    \
      || (dmgtype((mon)->data, AD_SEDU) || dmgtype((mon)->data, AD_SSEX)))
 
 /* Creates a monster corpse, a "special" corpse, or nothing if it doesn't

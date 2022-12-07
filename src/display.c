@@ -1814,14 +1814,14 @@ show_glyph(coordxy x, coordxy y, int glyph)
  * Reset the changed glyph borders so that none of the 3rd screen has
  * changed.
  */
-#define reset_glyph_bbox()               \
-    {                                    \
-        int i;                           \
-                                         \
-        for (i = 0; i < ROWNO; i++) {    \
+#define reset_glyph_bbox()                \
+    {                                     \
+        int i;                            \
+                                          \
+        for (i = 0; i < ROWNO; i++) {     \
             gg.gbuf_start[i] = COLNO - 1; \
             gg.gbuf_stop[i] = 0;          \
-        }                                \
+        }                                 \
     }
 
 static gbuf_entry nul_gbuf = {
@@ -2410,7 +2410,7 @@ int wallcolors[sokoban_walls + 1] = {
 #endif
 
 #if 0
-#define is_objpile(x, y)                         \
+#define is_objpile(x, y)                          \
     (!Hallucination && gl.level.objects[(x)][(y)] \
      && gl.level.objects[(x)][(y)]->nexthere)
 #endif
