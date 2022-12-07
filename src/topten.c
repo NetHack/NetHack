@@ -177,7 +177,7 @@ topten_print_bold(const char *x)
 }
 
 int
-observable_depth(d_level* lev)
+observable_depth(d_level *lev)
 {
 #if 0
     /* if we ever randomize the order of the elemental planes, we
@@ -202,7 +202,7 @@ observable_depth(d_level* lev)
 
 /* throw away characters until current record has been entirely consumed */
 static void
-discardexcess(FILE* rfile)
+discardexcess(FILE *rfile)
 {
     int c;
 
@@ -214,10 +214,10 @@ discardexcess(FILE* rfile)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 static void
-readentry(FILE* rfile, struct toptenentry* tt)
+readentry(FILE *rfile, struct toptenentry *tt)
 {
     char inbuf[SCANBUFSZ], s1[SCANBUFSZ], s2[SCANBUFSZ], s3[SCANBUFSZ],
-        s4[SCANBUFSZ], s5[SCANBUFSZ], s6[SCANBUFSZ];
+         s4[SCANBUFSZ], s5[SCANBUFSZ], s6[SCANBUFSZ];
 
 #ifdef NO_SCAN_BRACK /* Version_ Pts DgnLevs_ Hp___ Died__Born id */
     static const char fmt[] = "%d %d %d %ld %d %d %d %d %d %d %ld %ld %d%*c";
@@ -295,7 +295,7 @@ readentry(FILE* rfile, struct toptenentry* tt)
 }
 
 static void
-writeentry(FILE* rfile, struct toptenentry* tt)
+writeentry(FILE *rfile, struct toptenentry *tt)
 {
     static const char fmt32[] = "%c%c ";        /* role,gender */
     static const char fmt33[] = "%s %s %s %s "; /* role,race,gndr,algn */
@@ -334,7 +334,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* as tab is never used in eg. gp.plname or death, no need to mangle those. */
 static void
-writexlentry(FILE* rfile, struct toptenentry* tt, int how)
+writexlentry(FILE *rfile, struct toptenentry *tt, int how)
 {
 #define Fprintf (void) fprintf
 #define XLOG_SEP '\t' /* xlogfile field separator. */
@@ -600,7 +600,7 @@ encode_extended_conducts(char *buf)
 #endif /* XLOGFILE */
 
 static void
-free_ttlist(struct toptenentry* tt)
+free_ttlist(struct toptenentry *tt)
 {
     struct toptenentry *ttnext;
 
@@ -931,7 +931,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* so>0: standout line; so=0: ordinary line */
 static void
-outentry(int rank, struct toptenentry* t1, boolean so)
+outentry(int rank, struct toptenentry *t1, boolean so)
 {
     boolean second_line = TRUE;
     char linebuf[BUFSZ];
@@ -1110,6 +1110,38 @@ score_wanted(
     if (sysopt.pers_is_uid && !playerct && t1->uid == uid)
         return 1;
 
+    /*
+     * FIXME:
+     *  This selection produces a union (OR) of criteria rather than
+     *  an intersection (AND).  So
+     *    nethack -s -u igor -p Cav -r Hum
+     *  will list all entries for name igor regardless of role or race
+     *  plus all entries for cave dwellers regardless of name or race
+     *  plus all entries for humans regardless of name or role.
+     *
+     *  It would be more useful if it only chose human cave dwellers
+     *  named igor.  That would be pretty straightforward if only one
+     *  instance of each of the criteria were possible, but
+     *    nethack -s -u igor -u ayn -p Cav -p Pri -r Hum -r Dwa
+     *  should list human cave dwellers named igor and human cave
+     *  dwellers named ayn plus dwarven cave dwellers named igor and
+     *  dwarven cave dwellers named ayn plus human priest[esse]s named
+     *  igor and human priest[esse]s named ayn (the combination of
+     *  dwarven priest[esse]s doesn't occur but the selection can test
+     *  entries without being aware of such; it just won't find any
+     *  matches for that).  An extra initial pass of the command line
+     *  to collect all criteria before testing any entry is needed to
+     *  accomplish this.  And we might need to drop support for
+     *  pre-3.3.0 entries (old elf role) depending on how the criteria
+     *  matching is performed.
+     *
+     *  It also ought to extended to handle
+     *    nethack -s -u igor-Cav-Hum
+     *  Alignment and gender could be useful too but no one has ever
+     *  clamored for them.  Presumably if they care they postprocess
+     *  with some custom tool.
+     */
+
     for (i = 0; i < playerct; i++) {
         arg = players[i];
         if (arg[0] == '-' && arg[1] == 'u' && arg[2] != '\0')
@@ -1193,7 +1225,8 @@ prscore(int argc, char **argv)
     } else { /* concatenated arg string; use up "-s" but keep argc,argv */
         argv[1] += 2;
     }
-    /* -v doesn't take a version number arg; it means 'current vers only';
+    /* -v doesn't take a version number arg; it means 'all versions present
+       in the file' instead of the default of only the current version;
        unlike -s, we don't accept "-v<anything>" for non-empty <anything> */
     if (argc > 1 && !strcmp(argv[1], "-v")) {
         current_ver = FALSE;
@@ -1368,7 +1401,7 @@ get_rnd_toptenentry(void)
  * to an object (for statues or morgue corpses).
  */
 struct obj *
-tt_oname(struct obj* otmp)
+tt_oname(struct obj *otmp)
 {
     struct toptenentry *tt;
     if (!otmp)
