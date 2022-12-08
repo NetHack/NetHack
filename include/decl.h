@@ -777,6 +777,11 @@ struct instance_globals_b {
     /* files.c */
     char bones[BONESSIZE];
 
+    /* hack.c */
+    unsigned bldrpush_oid; /* id of last boulder pushed */
+    long bldrpushtime;     /* turn that a message was given for pushing
+                            * a boulder; used in lieu of Norep() */
+
     /* mkmaze.c */
     lev_region bughack; /* for preserving the insect legs when wallifying
                          * baalz level */

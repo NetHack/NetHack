@@ -232,6 +232,9 @@ const struct instance_globals_b g_init_b = {
     UNDEFINED_PTR, /* branches */
     /* files.c */
     BONESINIT, /* bones */
+    /* hack.c */
+    0U, /* bldrpush_oid - last boulder pushed */
+    0L, /* bldrpushtime - turn message was given about pushing that boulder */
     /* mkmaze.c */
     { {COLNO, ROWNO, 0, 0}, {COLNO, ROWNO, 0, 0},
             FALSE, FALSE, 0, 0, { 0 } }, /* bughack */

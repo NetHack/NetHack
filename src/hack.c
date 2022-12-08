@@ -414,22 +414,33 @@ moverock(void)
             }
 
             {
-                /* note: reset to zero after save/restore cycle */
-                static NEARDATA long lastmovetime;
+                boolean givemesg, easypush;
  dopush:
-                what = the(xname(otmp));
+                /* give boulder pushing feedback if this is a different
+                   boulder than the last one pushed or if it's been at
+                   least 2 turns since we last pushed this boulder;
+                   unlike with Norep(), intervening messages don't cause
+                   it to repeat, only doing something else in the meantime */
+                if (otmp->o_id != gb.bldrpush_oid) {
+                    gb.bldrpushtime = gm.moves + 1L;
+                    gb.bldrpush_oid = otmp->o_id;
+                }
+                givemesg = (gm.moves > gb.bldrpushtime + 2L
+                            || gm.moves < gb.bldrpushtime);
+                what = givemesg ? the(xname(otmp)) : 0;
                 if (!u.usteed) {
-                    /* FIXME: also remember boulder->o_id and override
-                       lastmovetime if this is a different boulder */
-                    if (gm.moves > lastmovetime + 2 || gm.moves < lastmovetime)
+                    easypush = throws_rocks(gy.youmonst.data);
+                    if (givemesg)
                         pline("With %s effort you move %s.",
-                              throws_rocks(gy.youmonst.data) ? "little"
-                                                            : "great",
-                              what);
-                    exercise(A_STR, TRUE);
-                } else
-                    pline("%s moves %s.", upstart(y_monnam(u.usteed)), what);
-                lastmovetime = gm.moves;
+                              easypush ? "little" : "great", what);
+                    if (!easypush)
+                        exercise(A_STR, TRUE);
+                } else {
+                    if (givemesg)
+                        pline("%s moves %s.",
+                              upstart(y_monnam(u.usteed)), what);
+                }
+                gb.bldrpushtime = gm.moves;
             }
 
             /* Move the boulder *after* the message. */
