@@ -191,30 +191,32 @@ LUA_MAY_PROCEED=Y
 !ENDIF  # LUA_MAY_PROCEED
 
 # Now, pdcurses
+PDCDIST=pdcursesmod
 !IF "$(INTERNET_AVAILABLE)" == "Y"
 !IF "$(GIT_AVAILABLE)" == "Y"
-PDCURSES_TOP=$(SUBM)\pdcurses
+PDCURSES_TOP=$(SUBM)\$(PDCDIST)
 ADD_CURSES=Y
 !ELSE  # GIT_AVAILABLE
-PDCURSES_TOP=$(LIBDIR)\pdcurses
+PDCURSES_TOP=$(LIBDIR)\$(PDCDIST)
 ADD_CURSES=Y
 !ENDIF # GIT_AVAILABLE
 !ELSE  # INTERNET_AVAILABLE is not Y below
-# Your Makefile settings do not allow pdcurses to be obtained by
+# Your Makefile settings do not allow pdcurses or pdcursesmod to be obtained by
 # git or by download. Check to see if it is available at one of
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
 #
-!IF EXIST("$(SUBM)\pdcurses\curses.h")
-PDCURSES_TOP=$(SUBM)\pdcurses
+!IF EXIST("$(SUBM)\$(PDCDIST)\curses.h")
+PDCURSES_TOP=$(SUBM)\$(PDCDIST)
 ADD_CURSES=Y
-!ELSEIF EXIST("$(LIBDIR)\pdcurses\curses.h")
-PDCURSES_TOP=$(LIBDIR)\pdcurses
+!ELSEIF EXIST("$(LIBDIR)\$(PDCDIST)\curses.h")
+PDCURSES_TOP=$(LIBDIR)\$(PDCDIST)
 ADD_CURSES=Y
 !ENDIF  # pdcurses sources available somewhere
 !IF "$(ADD_CURSES)" == "Y"
-!MESSAGE Your Makefile settings do not allow pdcurses to be obtained by
-!MESSAGE git or by download, but a copy of pdcurses was found in $(PDCURSES_TOP),
+!MESSAGE Your Makefile settings do not allow pdcurses or pdcursesmod to be
+!MESSAGE obtained by git or by download, but a copy of pdcurses was
+!MESSAGE found in $(PDCURSES_TOP),
 !MESSAGE so that will be used.
 !ENDIF  # ADD_CURSES == Y
 !ENDIF  # INTERNET_AVAILABLE
@@ -391,8 +393,11 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 !ENDIF
 #===============-=================================================
 # PDCurses build macros
-# Source for the NetHack repository submodule in ../submodules/PDCurses
+# Source for the NetHack repository submodule in
+#        ../submodules/pdcurses
+#    or  ../submodules/pdcursesmod
 # is https://github.com/wmcbrine/PDCurses.git
+# or https://github.com/Bill-Gray/PDCursesMod
 #=================================================================
 !IF "$(ADD_CURSES)" == "Y"
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
@@ -413,10 +418,9 @@ PDCLIBOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $(OP
 PDCOBJS = $(OPDC)pdcclip.o $(OPDC)pdcdisp.o $(OPDC)pdcgetsc.o $(OPDC)pdckbd.o $(OPDC)pdcscrn.o \
 	$(OPDC)pdcsetsc.o $(OPDC)pdcutil.o
 
-PDCLIB = $(LIBDIR)\pdcurses-$(TARGET_CPU).lib
+PDCLIB = $(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib
 
 PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
-
 !ELSE
 PDCLIB =
 PDCDEP =
@@ -498,7 +502,8 @@ WINDHDR = $(MSWSYS)\win10.h $(MSWSYS)\winos.h $(MSWSYS)\win32api.h
 #
 
 !IF "$(ADD_CURSES)" == "Y"
-CURSESDEF=-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
+CURSESDEF1=-D"CURSES_GRAPHICS"
+CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
 CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o $(OTTY)cursmain.o \
 	   $(OTTY)cursmesg.o $(OTTY)cursmisc.o $(OTTY)cursstat.o $(OTTY)curswins.o
 !ELSE
@@ -511,7 +516,7 @@ CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o $(OTTY)cursmain
 # - TTY
 #
 
-TTYDEF=  -D"_CONSOLE" -DWIN32CON $(CURSESDEF)
+TTYDEF=  -D"_CONSOLE" -DWIN32CON $(CURSESDEF1)
 
 RANDOMTTY = $(OTTY)random.o
 MDLIBTTY  = $(OTTY)mdlib.o
@@ -1006,20 +1011,21 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJTTY)}.o:
-	$(Q)$(CC) -DPDC_NCMOUSE $(PDCINCL) $(CFLAGS) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) -DPDC_NCMOUSE $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for files in PDCurses
 #==========================================
 
+#
 {$(PDCURSES_TOP)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 $(PDCINCL) $(CFLAGS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 $(PDCINCL) $(CFLAGS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 $(PDCINCL) $(CFLAGS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
@@ -1058,14 +1064,15 @@ $(LUASRC)\lua.h:
 #
 #aka PDCDEP
 $(PDCURSES_TOP)\curses.h:
-	git submodule init ../submodules/pdcurses
-	git submodule update --remote ../submodules/pdcurses
+	git submodule init ../submodules/$(PDCDIST)
+	git submodule update --remote ../submodules/$(PDCDIST)
 
 !ELSE  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
 CURLLUADST=lua-5.4.4.tar.gz
 
-CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
+#CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
+CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.5.zip
 CURLPDCDST=pdcurses.zip
 
 $(LUASRC)\lua.h:
@@ -1076,8 +1083,8 @@ $(LUASRC)\lua.h:
 $(PDCURSES_TOP)\curses.h:
 	cd $(LIBDIR)
 	curl -L $(CURLPDCSRC) -o $(CURLPDCDST)
-	if not exist pdcurses\*.* mkdir pdcurses
-	tar -C pdcurses --strip-components=1 -xvf $(CURLPDCDST)
+	if not exist $(PDCDIST)\*.* mkdir $(PDCDIST)
+	tar -C $(PDCDIST) --strip-components=1 -xvf $(CURLPDCDST)
 	cd ..\src
 !ENDIF  # GIT_AVAILABLE
 !ELSE   # INTERNET_AVAILABLE
@@ -1473,15 +1480,16 @@ fetch-actual-Lua:
 fetch-pdcurses:
 	@if not exist $(LIBDIR)\*.* mkdir $(LIBDIR)
 	cd $(LIBDIR)
-	curl -L -R https://codeload.github.com/wmcbrine/PDCurses/zip/master -o pdcurses.zip
-	powershell -command "Expand-Archive -Path .\pdcurses.zip -DestinationPath ./pdcurses-temp"
-	if exist .\pdcurses\* rd .\pdcurses /s /Q
-	move .\pdcurses-temp\PDCurses-master .
-	ren PDCurses-master pdcurses
-	if exist .\pdcurses-temp\* rd .\pdcurses-temp /s /Q
-	if exist .\pdcurses.zip del .\pdcurses.zip
+#	curl -L -R https://codeload.github.com/wmcbrine/PDCurses/zip/master -o pdcurses.zip
+	curl -L -R https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.5.zip -o $(PDCDIST).zip
+	powershell -command "Expand-Archive -Path .\$(PDCDIST).zip -DestinationPath ./$(PDCDIST)-temp"
+	if exist .\$(PDCDIST)\* rd .\$(PDCDIST) /s /Q
+	move .\$(PDCDIST)-temp\PDCurses-master .
+	ren PDCurses-master $(PDCDIST)
+	if exist .\$(PDCDIST)-temp\* rd .\$(PDCDIST)-temp /s /Q
+	if exist .\$(PDCDIST).zip del .\$(PDCDIST).zip
 	cd ..\src
-	@echo pdcurses has been fetched into $(LIBDIR)\pdcurses
+	@echo $(PDCDIST) has been fetched into $(LIBDIR)\$(PDCDIST)
 
 #==========================================
 # DLB utility and nhdatNNN file creation
@@ -1685,13 +1693,13 @@ $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 # PDCurses
 #===============================================================================
 
-$(LIBDIR)\pdcurses-$(TARGET_CPU).lib : $(PDCLIBOBJS) $(PDCOBJS)
+$(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib : $(PDCLIBOBJS) $(PDCOBJS)
 	@echo Building library $@ from $**
 	@$(librarian) -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
 
-$(OPDC)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c
-	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(TTYDEF) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
-		-Fo$@ $(PDCWINCON)\pdcscrn.c
+#$(OPDC)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c
+#	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
+#		-Fo$@ $(PDCWINCON)\pdcscrn.c
 
 #===============================================================================
 # LUA
@@ -1806,10 +1814,10 @@ $(OUTL)mdlib.o: $(SRC)\mdlib.c
 
 $(OUTL)panic.o:  $(U)panic.c $(CONFIG_H)
 	$(Q)$(CC) $(CFLAGS) -Fo$@ $(U)panic.c
-#$(OTTY)panic.o:  $(U)panic.c $(CONFIG_H)
-#	$(Q)$(CC) $(CFLAGS) $(TTYDEF) -Fo$@ $(U)panic.c
-#$(OGUI)panic.o:  $(U)panic.c $(CONFIG_H)
-#	$(Q)$(CC) $(CFLAGS) $(GUIDEF) -Fo$@ $(U)panic.c
+$(OTTY)panic.o:  $(U)panic.c $(CONFIG_H)
+	$(Q)$(CC) $(CFLAGS) $(TTYDEF) -Fo$@ $(U)panic.c
+$(OGUI)panic.o:  $(U)panic.c $(CONFIG_H)
+	$(Q)$(CC) $(CFLAGS) $(GUIDEF) -Fo$@ $(U)panic.c
 
 #$(OUTL)drawing_host.o: drawing.c $(CONFIG_H)
 #	$(Q)$(CC) $(CFLAGS) $(CROSSCOMPILE) -Fo$@ drawing.c
@@ -1891,11 +1899,11 @@ spotless: clean
 	if exist $(DAT)\bogusmon        del $(DAT)\bogusmon
 	if exist $(DAT)\porthelp	del $(DAT)\porthelp
 	if exist nhdat$(NHV).	        del nhdat$(NHV).
-	if exist objutldir.tag          del objutldir.tag
-	if exist objttydir.tag          del objttydir.tag
-	if exist objguidir.tag          del objguidir.tag
-	if exist objluadir.tag          del objluadir.tag
-	if exist objpdcdir.tag          del objpdcdir.tag
+	if exist outldir.tag            del outldir.tag
+	if exist ottydir.tag            del ottydir.tag
+	if exist oguidir.tag            del oguidir.tag
+	if exist oluadir.tag            del oluadir.tag
+	if exist opdcdir.tag            del opdcdir.tag
 	if exist libdir.tag             del libdir.tag
 	if exist gamedir.tag            del gamedir.tag
 	if exist $(MSWIN)\mnsel.bmp     del $(MSWIN)\mnsel.bmp
