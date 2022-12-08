@@ -36,6 +36,8 @@ static char *shk_owns(char *, struct obj *);
 static char *mon_owns(char *, struct obj *);
 static void clear_unpaid_obj(struct monst *, struct obj *);
 static void clear_unpaid(struct monst *, struct obj *);
+static void clear_no_charge_obj(struct monst *, struct obj *);
+static void clear_no_charge(struct monst *, struct obj *);
 static long check_credit(long, struct monst *);
 static void pay(long, struct monst *);
 static long get_cost(struct obj *, struct monst *);
@@ -250,7 +252,7 @@ restshk(struct monst *shkp, boolean ghostly)
     }
 }
 
-/* Clear the unpaid and no_charge bits on a single object and its contents. */
+/* clear the unpaid bit on a single object and its contents */
 static void
 clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
 {
@@ -258,7 +260,26 @@ clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
         clear_unpaid(shkp, otmp->cobj);
     if (onbill(otmp, shkp, TRUE))
         otmp->unpaid = 0;
+}
 
+/* clear the unpaid bit on all of the objects in the list */
+static void
+clear_unpaid(struct monst *shkp, struct obj *list)
+{
+    while (list) {
+        clear_unpaid_obj(shkp, list);
+        list = list->nobj;
+    }
+}
+
+/* clear the no_charge bit on a single object and its contents */
+static void
+clear_no_charge_obj(
+    struct monst *shkp, /* if null, clear regardless of shop */
+    struct obj *otmp)
+{
+    if (Has_contents(otmp))
+        clear_no_charge(shkp, otmp->cobj);
     if (otmp->no_charge) {
         struct monst *rm_shkp;
         int rno;
@@ -266,7 +287,8 @@ clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
 
         /*
          * Clear no_charge if
-         *  not located somewhere that we expect no_charge (which is
+         *  shkp is Null (clear all items on specified list)
+         *  or not located somewhere that we expect no_charge (which is
          *    floor [of shop] or inside container [on shop floor])
          *  or can't find object's map coordinates (should never happen
          *    for floor or contained; conceivable if on shop bill somehow
@@ -284,7 +306,8 @@ clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
          * become owned by the shop now and will be for-sale once the shk
          * returns.
          */
-        if ((otmp->where != OBJ_FLOOR && otmp->where != OBJ_CONTAINED)
+        if (!shkp
+            || (otmp->where != OBJ_FLOOR && otmp->where != OBJ_CONTAINED)
             || !get_obj_location(otmp, &x, &y, OBJ_CONTAINED | OBJ_BURIED)
             || !isok(x, y)
             || (rno = levl[x][y].roomno) < ROOMOFFSET
@@ -295,12 +318,14 @@ clear_unpaid_obj(struct monst *shkp, struct obj *otmp)
     }
 }
 
-/* Clear the unpaid bit on all of the objects in the list. */
+/* clear the no_charge bit on all of the objects in the list */
 static void
-clear_unpaid(struct monst *shkp, struct obj *list)
+clear_no_charge(struct monst *shkp, struct obj *list)
 {
     while (list) {
-        clear_unpaid_obj(shkp, list);
+        /* handle first element of list and any contents it may have */
+        clear_no_charge_obj(shkp, list);
+        /* move on to next element of list */
         list = list->nobj;
     }
 }
@@ -314,15 +339,21 @@ setpaid(register struct monst *shkp)
 
     clear_unpaid(shkp, gi.invent);
     clear_unpaid(shkp, fobj);
-    clear_unpaid(shkp, gl.level.buriedobjlist);
+    if (gl.level.buriedobjlist)
+        clear_unpaid(shkp, gl.level.buriedobjlist);
     if (gt.thrownobj)
         clear_unpaid_obj(shkp, gt.thrownobj);
     if (gk.kickedobj)
         clear_unpaid_obj(shkp, gk.kickedobj);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(shkp, mtmp->minvent);
+        if (mtmp->minvent)
+            clear_unpaid(shkp, mtmp->minvent);
     for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon)
-        clear_unpaid(shkp, mtmp->minvent);
+        if (mtmp->minvent)
+            clear_unpaid(shkp, mtmp->minvent);
+
+    /* clear obj->no_charge for all obj in shkp's shop */
+    clear_no_charge(shkp, fobj);
 
     while ((obj = gb.billobjs) != 0) {
         obj_extract_self(obj);
@@ -903,7 +934,7 @@ find_objowner(
     struct obj *obj,
     coordxy x, coordxy y) /* caller passes obj's location since obj->ox,oy
                            * might be stale; don't update coordinates here
-                           * because if we're called duing sanity checking
+                           * because if we're called during sanity checking
                            * they shouldn't be modified */
 {
     struct monst *shkp, *deflt_shkp = 0;
@@ -1176,12 +1207,13 @@ rile_shk(struct monst *shkp)
 {
     NOTANGRY(shkp) = FALSE; /* make angry */
     if (!ESHK(shkp)->surcharge) {
+        register long surcharge;
         register struct bill_x *bp = ESHK(shkp)->bill_p;
         register int ct = ESHK(shkp)->billct;
 
         ESHK(shkp)->surcharge = TRUE;
         while (ct-- > 0) {
-            register long surcharge = (bp->price + 2L) / 3L;
+            surcharge = (bp->price + 2L) / 3L;
             bp->price += surcharge;
             bp++;
         }
@@ -1258,7 +1290,7 @@ make_happy_shoppers(boolean silentkops)
 }
 
 void
-hot_pursuit(register struct monst *shkp)
+hot_pursuit(struct monst *shkp)
 {
     if (!shkp->isshk)
         return;
@@ -1266,6 +1298,11 @@ hot_pursuit(register struct monst *shkp)
     rile_shk(shkp);
     (void) strncpy(ESHK(shkp)->customer, gp.plname, PL_NSIZ);
     ESHK(shkp)->following = 1;
+
+    /* shopkeeper networking:  clear obj->no_charge for all obj on the
+       floor of this level (including inside containers on floor), even
+       those that are in other shopkeepers' shops */
+    clear_no_charge((struct monst *) NULL, fobj);
 }
 
 /* Used when the shkp is teleported or falls (ox == 0) out of his shop, or
