@@ -58,8 +58,9 @@ nhlib.lua     opthelp       optmenu       oracle.lua    oracles.txt
 orcus.lua     quest.lua     rumors.fal    rumors.tru    sanctum.lua
 soko1-1.lua   soko1-2.lua   soko2-1.lua   soko2-2.lua   soko3-1.lua
 soko3-2.lua   soko4-1.lua   soko4-2.lua   symbols       themerms.lua
-tower1.lua    tower2.lua    tower3.lua    tribute       valley.lua
-water.lua     wizard1.lua   wizard2.lua   wizard3.lua   wizhelp
+tower1.lua    tower2.lua    tower3.lua    tribute       usagehlp
+valley.lua    water.lua     wizard1.lua   wizard2.lua   wizard3.lua
+wizhelp
 
 doc:
 (files for all versions)
@@ -254,7 +255,7 @@ write.c     zap.c
 
 submodules:
 (files in top directory)
-lua       pdcurses
+lua          pdcurses     pdcursesmod
 
 sys/libnh:
 (files in top directory)
