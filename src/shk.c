@@ -1154,7 +1154,7 @@ angry_shk_exists(void)
 
 /* remove previously applied surcharge from all billed items */
 static void
-pacify_shk(register struct monst* shkp, boolean clear_surcharge)
+pacify_shk(struct monst *shkp, boolean clear_surcharge)
 {
     NOTANGRY(shkp) = TRUE; /* make peaceful */
     if (clear_surcharge && ESHK(shkp)->surcharge) {
@@ -1172,7 +1172,7 @@ pacify_shk(register struct monst* shkp, boolean clear_surcharge)
 
 /* add aggravation surcharge to all billed items */
 static void
-rile_shk(register struct monst* shkp)
+rile_shk(struct monst *shkp)
 {
     NOTANGRY(shkp) = FALSE; /* make angry */
     if (!ESHK(shkp)->surcharge) {
@@ -1190,7 +1190,7 @@ rile_shk(register struct monst* shkp)
 
 /* wakeup and/or unparalyze shopkeeper */
 static void
-rouse_shk(struct monst* shkp, boolean verbosely)
+rouse_shk(struct monst *shkp, boolean verbosely)
 {
     if (helpless(shkp)) {
         /* greed induced recovery... */
@@ -1204,7 +1204,7 @@ rouse_shk(struct monst* shkp, boolean verbosely)
 }
 
 void
-make_happy_shk(register struct monst* shkp, register boolean silentkops)
+make_happy_shk(struct monst *shkp, boolean silentkops)
 {
     boolean wasmad = ANGRY(shkp);
     struct eshk *eshkp = ESHK(shkp);
@@ -1258,7 +1258,7 @@ make_happy_shoppers(boolean silentkops)
 }
 
 void
-hot_pursuit(register struct monst* shkp)
+hot_pursuit(register struct monst *shkp)
 {
     if (!shkp->isshk)
         return;
@@ -1273,8 +1273,10 @@ hot_pursuit(register struct monst* shkp)
    the shop.  These conditions must be checked by the calling function. */
 /*ARGSUSED*/
 void
-make_angry_shk(struct monst* shkp, coordxy ox UNUSED, coordxy oy UNUSED)
-/* <ox,oy> predate 'noit_Monnam()', let alone Shknam() */
+make_angry_shk(
+    struct monst *shkp,
+    coordxy ox UNUSED, coordxy oy UNUSED)
+    /* <ox,oy> predate 'noit_Monnam()', let alone Shknam() */
 {
     struct eshk *eshkp = ESHK(shkp);
 
@@ -1298,7 +1300,7 @@ static const char
 
 /* delivers the cheapest item on the list */
 static long
-cheapest_item(register struct monst* shkp)
+cheapest_item(struct monst *shkp)
 {
     register int ct = ESHK(shkp)->billct;
     register struct bill_x *bp = ESHK(shkp)->bill_p;
@@ -4123,9 +4125,8 @@ shk_move(struct monst *shkp)
         } else {
             uondoor = u_at(eshkp->shd.x, eshkp->shd.y);
             if (uondoor) {
-                badinv =
-                    (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
-                     || (Fast && (sobj_at(PICK_AXE, u.ux, u.uy)
+                badinv = (carrying(PICK_AXE) || carrying(DWARVISH_MATTOCK)
+                          || (Fast && (sobj_at(PICK_AXE, u.ux, u.uy)
                                   || sobj_at(DWARVISH_MATTOCK, u.ux, u.uy))));
                 if (satdoor && badinv)
                     return 0;
@@ -4146,7 +4147,7 @@ shk_move(struct monst *shkp)
     }
 
     z = move_special(shkp, inhishop(shkp), appr, uondoor, avoid, omx, omy,
-		    gtx, gty);
+                     gtx, gty);
     if (z > 0)
         after_shk_move(shkp);
 
@@ -4155,7 +4156,7 @@ shk_move(struct monst *shkp)
 
 /* called after shopkeeper moves, in case themove causes re-entry into shop */
 void
-after_shk_move(struct monst* shkp)
+after_shk_move(struct monst *shkp)
 {
     struct eshk *eshkp = ESHK(shkp);
 
