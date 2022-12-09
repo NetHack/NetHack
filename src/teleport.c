@@ -1286,7 +1286,7 @@ rloc_pos_ok(
  */
 static void
 rloc_to_core(
-    struct monst* mtmp,
+    struct monst *mtmp,
     coordxy x, coordxy y,
     unsigned rlocflags)
 {
@@ -1370,6 +1370,25 @@ rloc_to_core(
        the latter only happens if you've attacked them with polymorph */
     if (resident_shk && !inhishop(mtmp))
         make_angry_shk(mtmp, oldx, oldy);
+
+    /* if a monster carrying shop goods teleports out of the shop, blame
+       it on the hero; chance of an unpaid item is vanishingly small, but
+       no_charge is easily possible and needs to be cleared if not in shop;
+       a for-sale item is ordinary here--shk won't notice it leaving; if
+       mtmp teleports from one shop into another, no_charge status sticks
+       and an item on the first shk's bill stays there */
+    if (mtmp->minvent && !costly_spot(x, y)) {
+        struct obj *otmp;
+        struct monst *shkp = find_objowner(mtmp->minvent, oldx, oldy);
+        boolean peaceful = !shkp || shkp->mpeaceful;
+
+        for (otmp = mtmp->minvent; otmp; otmp = otmp->nobj) {
+            if (otmp->no_charge)
+                otmp->no_charge = 0;
+            else if (shkp && onshopbill(otmp, shkp, TRUE))
+                stolen_value(otmp, oldx, oldy, peaceful, FALSE);
+        }
+    }
 
     /* if hero is busy, maybe stop occupation */
     if (go.occupation)
