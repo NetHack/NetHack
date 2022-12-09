@@ -30,7 +30,7 @@ static char display_pickinv(const char *, const char *, const char *,
                             boolean, long *);
 static char display_used_invlets(char);
 static boolean this_type_only(struct obj *);
-static void dounpaid(int);
+static void dounpaid(int, int, int);
 static struct obj *find_unpaid(struct obj *, struct obj **);
 static void menu_identify(int);
 static boolean tool_being_used(struct obj *);
@@ -3732,19 +3732,22 @@ count_contents(
 }
 
 static void
-dounpaid(int floorcount)
+dounpaid(
+    int count,       /* unpaid items in inventory */
+    int floorcount,  /* unpaid items on floor (rare) */
+    int buriedcount) /* unpaid items under the floor (extremely rare) */
 {
     winid win;
     struct obj *otmp, *marker, *contnr;
     char ilet;
     char *invlet = flags.inv_order;
-    int classcount, count, num_so_far;
+    int classcount, num_so_far, xtracount;
     long cost, totcost;
 
-    count = count_unpaid(gi.invent);
     otmp = marker = contnr = (struct obj *) 0;
+    xtracount = floorcount + buriedcount;
 
-    if (count == 1 && !floorcount) {
+    if (count == 1 && !xtracount) {
         otmp = find_unpaid(gi.invent, &marker);
         contnr = unknwn_contnr_contents(otmp);
     }
@@ -3831,18 +3834,31 @@ dounpaid(int floorcount)
                xprname((struct obj *) 0, "Total:", '*', FALSE, totcost, 0L));
     }
 
-    if (floorcount > 0) {
+    /* an unpaid item can be on the floor if dropped on the shop boundary
+       (then possibly moved all the way into the shop during wall repair);
+       one can be buried if it started that way and a pit was dug at its
+       spot then filled by a boulder (or perhaps a theme room with a pool
+       and an unpaid item moved into that by wall repair, then freezing) */
+    if (xtracount > 0) { /* floorcount + buriedcount > 0 */
         char buf[BUFSZ];
-        const char *floorverb = (floorcount > 1) ? "are" : "is";
+        const char
+            *floorverb = (xtracount > 1) ? "are" : "is",
+            /* "under the floor" might actually be "under the floor
+               beneath a wall" when shop repair is involved but that seems
+               too nit-picky to bother trying to handle here (even more
+               extreme description-wise:  "under the floor beneath the
+               door/doorway") */
+            *where = (buriedcount == 0) ? "on the floor"
+                     : (floorcount == 0) ? "under the floor"
+                       : "on or under the floor";
 
         if (!count) {
-            You(
-             "aren't carrying any unpaid items but there %s %d on the floor.",
-                floorverb, floorcount);
+            You("aren't carrying any unpaid items but there %s %d %s.",
+                floorverb, xtracount, where);
         } else {
             putstr(win, 0, "");
-            Sprintf(buf, "(There %s %d more unpaid object%s on the floor.)",
-                    floorverb, floorcount, plur(floorcount));
+            Sprintf(buf, "(There %s %d more unpaid object%s %s.)",
+                    floorverb, xtracount, plur(xtracount), where);
             putstr(win, 0, buf);
         }
     }
@@ -3850,6 +3866,7 @@ dounpaid(int floorcount)
     if (count > 0)
         display_nhwindow(win, FALSE);
     destroy_nhwindow(win);
+    return;
 }
 
 
@@ -3896,7 +3913,8 @@ dotypeinv(void)
     int n, i = 0;
     char *extra_types, types[BUFSZ], title[QBUFSZ];
     const char *before = "", *after = "";
-    int class_count, oclass, unpaid_count, itemcount;
+    int class_count, oclass, itemcount,
+        any_unpaid, u_carried, u_floor, u_buried;
     int bcnt, ccnt, ucnt, xcnt, ocnt, jcnt;
     boolean billx = *u.ushops && doinvbill(0);
     menu_item *pick_list;
@@ -3909,7 +3927,10 @@ dotypeinv(void)
         goto doI_done;
     }
     title[0] = '\0';
-    unpaid_count = count_unpaid(gi.invent);
+    u_carried = count_unpaid(gi.invent);
+    u_floor = count_unpaid(fobj);
+    u_buried = count_unpaid(gl.level.buriedobjlist);
+    any_unpaid = u_carried + u_floor + u_buried;
     tally_BUCX(gi.invent, FALSE, &bcnt, &ucnt, &ccnt, &xcnt, &ocnt, &jcnt);
 
     if (flags.menu_style != MENU_TRADITIONAL) {
@@ -3943,9 +3964,9 @@ dotypeinv(void)
         class_count = collect_obj_classes(types, gi.invent, FALSE,
                                           (boolean (*)(OBJ_P)) 0,
                                           &itemcount);
-        if (unpaid_count || billx || (bcnt + ccnt + ucnt + xcnt) != 0 || jcnt)
+        if (any_unpaid || billx || (bcnt + ccnt + ucnt + xcnt) != 0 || jcnt)
             types[class_count++] = ' ';
-        if (unpaid_count)
+        if (any_unpaid)
             types[class_count++] = 'u';
         if (billx)
             types[class_count++] = 'x';
@@ -3963,7 +3984,7 @@ dotypeinv(void)
         /* add everything not already included; user won't see these */
         extra_types = eos(types);
         *extra_types++ = '\033';
-        if (!unpaid_count)
+        if (!any_unpaid)
             *extra_types++ = 'u';
         if (!billx)
             *extra_types++ = 'x';
@@ -3992,7 +4013,7 @@ dotypeinv(void)
             }
         } else {
             /* only one thing to itemize */
-            if (unpaid_count)
+            if (any_unpaid)
                 c = 'u';
             else if (billx)
                 c = 'x';
@@ -4005,14 +4026,12 @@ dotypeinv(void)
             (void) doinvbill(1);
         else
             pline("No used-up objects%s.",
-                  unpaid_count ? " on your shopping bill" : "");
+                  any_unpaid ? " on your shopping bill" : "");
         goto doI_done;
     }
-    if (c == 'u' || (c == 'U' && unpaid_count && !ucnt)) {
-        int floorcount = count_unpaid(fobj);
-
-        if (unpaid_count || floorcount)
-            dounpaid(floorcount);
+    if (c == 'u' || (c == 'U' && any_unpaid && !ucnt)) {
+        if (any_unpaid)
+            dounpaid(u_carried, u_floor, u_buried);
         else
             You("are not carrying any unpaid objects.");
         goto doI_done;

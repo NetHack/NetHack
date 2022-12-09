@@ -510,6 +510,11 @@ mpickobj(struct monst *mtmp, struct obj *otmp)
         gt.thrownobj = 0;
     else if (otmp == gk.kickedobj)
         gk.kickedobj = 0;
+    /* an unpaid item can be on the floor; if a monster picks it up, take
+       it off the shop bill */
+    if (otmp->unpaid || (Has_contents(otmp) && count_unpaid(otmp->cobj))) {
+        subfrombill(otmp, find_objowner(otmp, otmp->ox, otmp->oy));
+    }
     /* don't want hidden light source inside the monster; assumes that
        engulfers won't have external inventories; whirly monsters cause
        the light to be extinguished rather than letting it shine thru */
