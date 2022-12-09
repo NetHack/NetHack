@@ -148,17 +148,12 @@ extern void perror(const char *);
 #ifdef POSIX_TYPES
 extern void qsort(genericptr_t, size_t, size_t,
              int (*)(const genericptr, const genericptr));
-extern genericptr_t bsearch(const genericptr, const genericptr, size_t, size_t,
-             int (*)(const genericptr, const genericptr));
 #else
 #if defined(BSD) || defined(ULTRIX)
 extern int qsort();
-extern genericptr_t bsearch();
 #else
 #if !defined(LATTICE) && !defined(AZTEC_50)
 extern void qsort(genericptr_t, size_t, size_t,
-             int (*)(const genericptr, const genericptr));
-extern genericptr_t bsearch(const genericptr, const genericptr, size_t, size_t,
              int (*)(const genericptr, const genericptr));
 #endif
 #endif
