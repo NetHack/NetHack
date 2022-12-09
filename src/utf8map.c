@@ -659,7 +659,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else if (glyph_is_female_pet(glyph)) {
                         buf2 = "pet_female_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_body(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
@@ -670,7 +672,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else {
                         buf2 = "body_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_statue(glyph)) {
                     /* buf2 will hold the distinguishing prefix */
                     /* buf3 will hold the base name */
@@ -685,7 +689,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                     } else if (glyph_is_male_statue(glyph)) {
                         buf2 = "statue_of_male_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf2, buf3);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_object(glyph)) {
                     i = glyph_to_obj(glyph);
                     /* buf2 will hold the distinguishing prefix */
@@ -717,11 +723,11 @@ parse_id(const char *id, struct find_struct *findwhat)
                                      : (i == SLIME_MOLD)
                                      ? "slime mold"
                                      : obj_descr[i].oc_name;
-                        Snprintf(buf[1], sizeof buf[1], "%s%s%s",
-                                 glyph_is_normal_piletop_obj(glyph)
-                                     ? "piletop_"
-                                     : "",
-                                 buf2, buf3);
+                        Strcpy(buf[0], "G_");
+                        if (glyph_is_normal_piletop_obj(glyph))
+                            Strcat(buf[0], "piletop_");
+                        Strcat(buf[0], buf2);
+                        Strcat(buf[0], buf3);
                     }
                 } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
                            || glyph_is_swallow(glyph)
@@ -798,8 +804,10 @@ parse_id(const char *id, struct find_struct *findwhat)
                         cmap = glyph_to_swallow(glyph);
                         mnum = j / ((S_sw_br - S_sw_tl) + 1);
                         i = cmap - S_sw_tl;
-                        Snprintf(buf[3], sizeof buf[3], "%s %s %s", "swallow",
-                                 monsdump[mnum].nm, swallow_texts[cmap]);
+                        Strcpy(buf[3], "swallow ");
+                        Strcat(buf[3], monsdump[mnum].nm);
+                        Strcat(buf[3], " ");
+                        Strcat(buf[3], swallow_texts[cmap]);
                         buf3 = buf[3];
                         skip_base = TRUE;
                     } else if (glyph_is_explosion(glyph)) {
@@ -828,26 +836,27 @@ parse_id(const char *id, struct find_struct *findwhat)
                     }
                     if (!skip_base) {
                         if (cmap >= 0 && cmap < MAXPCHARS) {
-                            Snprintf(buf[3], sizeof buf[3], "%s",
-                                     loadsyms[cmap + cmap_offset].name + 2);
-                            buf3 = buf[3];
+                            buf3 = loadsyms[cmap + cmap_offset].name + 2;
                         }
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s%s", buf2, buf3,
-                             buf4);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
+                    Strcat(buf[0], buf4);
                 } else if (glyph_is_invisible(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "invisible");
+                    Strcpy(buf[0], "G_invisible");
                 } else if (glyph_is_nothing(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "nothing");
+                    Strcpy(buf[0], "G_nothing");
                 } else if (glyph_is_unexplored(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "unexplored");
+                    Strcpy(buf[0], "G_unexplored");
                 } else if (glyph_is_warning(glyph)) {
                     j = glyph - GLYPH_WARNING_OFF;
-                    Snprintf(buf[1], sizeof buf[1], "%s%d", "warning", j);
+                    Snprintf(buf[0], sizeof buf[0], "G_%s%d", "warning", j);
                 }
+                if (memchr(buf[0], '\0', sizeof buf[0]) == NULL)
+                    panic("parse_id: buf[0] overflowed\n");
                 if (!skip_this_one) {
-                    Snprintf(buf[0], sizeof buf[0], "G_%s",
-                             fix_glyphname(buf[1]));
+                    fix_glyphname(buf[0]+2);
                     if (dump_ids) {
                         Fprintf(fp, "(%04d) %s\n", glyph, buf[0]);
                     } else if (filling_cache) {
