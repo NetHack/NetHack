@@ -635,15 +635,15 @@ xname_flags(
             Strcat(buf, actualn);
         } else if (un) {
             if (is_boots(obj))
-                Strcat(buf, "boots");
+                Strcat(buf, boots_simple_name(obj));
             else if (is_gloves(obj))
-                Strcat(buf, "gloves");
+                Strcat(buf, gloves_simple_name(obj));
             else if (is_cloak(obj))
-                Strcpy(buf, "cloak");
+                Strcpy(buf, cloak_simple_name(obj));
             else if (is_helmet(obj))
-                Strcpy(buf, "helmet");
+                Strcpy(buf, helm_simple_name(obj));
             else if (is_shield(obj))
-                Strcpy(buf, "shield");
+                Strcpy(buf, shield_simple_name(obj));
             else
                 Strcpy(buf, "armor");
             Strcat(buf, " called ");
