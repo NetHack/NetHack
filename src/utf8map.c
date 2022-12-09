@@ -35,7 +35,13 @@ struct glyphid_cache_t {
     char *id;
 };
 static struct glyphid_cache_t *glyphid_cache;
+static unsigned glyphid_cache_lsize;
+static size_t glyphid_cache_size;
 struct find_struct glyphcache_find, to_custom_symbol_find;
+static void init_glyph_cache(void);
+static void add_glyph_to_cache(int glyphnum, const char *id);
+static int find_glyph_in_cache(const char *id);
+static uint32 glyph_hash(const char *id);
 static void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
 static int unicode_val(const char *cp);
@@ -44,8 +50,6 @@ static int glyph_find_core(const char *id, struct find_struct *findwhat);
 static char *fix_glyphname(char *str);
 static int32_t rgbstr_to_int32(const char *rgbstr);
 boolean closest_color(uint32_t lcolor, uint32_t *closecolor, int *clridx);
-static int glyphid_sort_compare(const void *p1, const void *p2);
-static int glyphid_search_compare(const void *p1, const void *p2);
 
 static void
 to_custom_symset_entry_callback(int glyph, struct find_struct *findwhat)
@@ -316,15 +320,10 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
 
 void fill_glyphid_cache(void)
 {
-    int glyph, reslt = 0;
+    int reslt = 0;
 
     if (!glyphid_cache) {
-        glyphid_cache = (struct glyphid_cache_t *) alloc(
-            MAX_GLYPH * sizeof(struct glyphid_cache_t));
-        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-            glyphid_cache[glyph].glyphnum = 0;
-            glyphid_cache[glyph].id = (char *) 0;
-        }
+        init_glyph_cache();
     }
     if (glyphid_cache) {
         glyphcache_find = zero_find;
@@ -337,26 +336,37 @@ void fill_glyphid_cache(void)
             glyphid_cache = (struct glyphid_cache_t *) 0;
         }
     }
-    if (glyphid_cache) {
-        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-            if (glyphid_cache[glyph].id != NULL) {
-                lcase(glyphid_cache[glyph].id);
-            }
-        }
-        qsort(glyphid_cache, MAX_GLYPH, sizeof(glyphid_cache[0]),
-              glyphid_sort_compare);
-    }
 }
 
-static int
-glyphid_sort_compare(const void *p1, const void *p2)
-{
-    const struct glyphid_cache_t *elem1 = (const struct glyphid_cache_t *) p1;
-    const struct glyphid_cache_t *elem2 = (const struct glyphid_cache_t *) p2;
-    const char *id1 = elem1->id ? elem1->id : "";
-    const char *id2 = elem2->id ? elem2->id : "";
+/*
+ * The glyph ID cache is a simple double-hash table.
+ * The cache size is a power of two, and two hashes are derived from the
+ * cache ID. The first is a location in the table, and the second is an
+ * offset. On any collision, the second hash is added to the first until
+ * a match or an empty bucket is found.
+ * The second hash is an odd number, which is necessary and sufficient
+ * to traverse the entire table.
+ */
 
-    return strcmp(id1, id2);
+static void
+init_glyph_cache(void)
+{
+    size_t glyph;
+
+    /* Cache size of power of 2 not less than 2*MAX_GLYPH */
+    glyphid_cache_lsize = 0;
+    glyphid_cache_size = 1;
+    while (glyphid_cache_size < 2*MAX_GLYPH) {
+        ++glyphid_cache_lsize;
+        glyphid_cache_size <<= 1;
+    }
+
+    glyphid_cache = (struct glyphid_cache_t *) alloc(
+        glyphid_cache_size * sizeof(struct glyphid_cache_t));
+    for (glyph = 0; glyph < glyphid_cache_size; ++glyph) {
+        glyphid_cache[glyph].glyphnum = 0;
+        glyphid_cache[glyph].id = (char *) 0;
+    }
 }
 
 void free_glyphid_cache(void)
@@ -373,6 +383,73 @@ void free_glyphid_cache(void)
     }
     free(glyphid_cache);
     glyphid_cache = (struct glyphid_cache_t *) 0;
+}
+
+static void
+add_glyph_to_cache(int glyphnum, const char *id)
+{
+    uint32 hash = glyph_hash(id);
+    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash2 = (size_t)
+            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+    size_t i = hash1;
+    unsigned count = 0;
+
+    do {
+        ++count;
+        if (glyphid_cache[i].id == NULL) {
+            /* Empty bucket found */
+            glyphid_cache[i].id = dupstr(id);
+            glyphid_cache[i].glyphnum = glyphnum;
+            return;
+        }
+        /* For speed, assume that no ID occurs twice */
+        i = (i + hash2) & (glyphid_cache_size - 1);
+    } while (i != hash1);
+    /* This should never happen */
+    panic("glyphid_cache full");
+}
+
+static int
+find_glyph_in_cache(const char *id)
+{
+    uint32 hash = glyph_hash(id);
+    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash2 = (size_t)
+            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+    size_t i = hash1;
+    unsigned count = 0;
+
+    do {
+        ++count;
+        if (glyphid_cache[i].id == NULL) {
+            /* Empty bucket found */
+            return -1;
+        }
+        if (strcmpi(id, glyphid_cache[i].id) == 0) {
+            /* Match found */
+            return glyphid_cache[i].glyphnum;
+        }
+        i = (i + hash2) & (glyphid_cache_size - 1);
+    } while (i != hash1);
+    return -1;
+}
+
+static uint32
+glyph_hash(const char *id)
+{
+    uint32 hash = 0;
+    size_t i;
+
+    for (i = 0; id[i] != '\0'; ++i) {
+        char ch = id[i];
+        if ('A' <= ch && ch <= 'Z') {
+            ch += 'a' - 'A';
+        }
+        hash = (hash << 1) | (hash >> 31);
+        hash ^= ch;
+    }
+    return hash;
 }
 
 boolean
@@ -613,19 +690,10 @@ parse_id(const char *id, struct find_struct *findwhat)
     }
     if (is_G || filling_cache || dump_ids) {
         if (!filling_cache && id && glyphid_cache) {
-            char *id_l;
-            const struct glyphid_cache_t *gptr;
-
-            id_l = dupstr(id);
-            lcase(id_l);
-            gptr = (const struct glyphid_cache_t *)
-                    bsearch(id_l, glyphid_cache, MAX_GLYPH,
-                            sizeof(glyphid_cache[0]),
-                            glyphid_search_compare);
-            free(id_l);
-            if (gptr != NULL) {
+            int val = find_glyph_in_cache(id);
+            if (val >= 0) {
                 findwhat->findtype = find_glyph;
-                findwhat->val = gptr->glyphnum;
+                findwhat->val = val;
                 findwhat->loadsyms_offset = 0;
                 return 1;
             } else {
@@ -854,14 +922,13 @@ parse_id(const char *id, struct find_struct *findwhat)
                     Snprintf(buf[0], sizeof buf[0], "G_%s%d", "warning", j);
                 }
                 if (memchr(buf[0], '\0', sizeof buf[0]) == NULL)
-                    panic("parse_id: buf[0] overflowed\n");
+                    panic("parse_id: buf[0] overflowed");
                 if (!skip_this_one) {
                     fix_glyphname(buf[0]+2);
                     if (dump_ids) {
                         Fprintf(fp, "(%04d) %s\n", glyph, buf[0]);
                     } else if (filling_cache) {
-                        glyphid_cache[glyph].glyphnum = glyph;
-                        glyphid_cache[glyph].id = dupstr(buf[0]);
+                        add_glyph_to_cache(glyph, buf[0]);
                     } else if (id) {
                         if (!strcmpi(id, buf[0])) {
                             findwhat->findtype = find_glyph;
@@ -908,16 +975,6 @@ parse_id(const char *id, struct find_struct *findwhat)
     findwhat->val = 0;
     findwhat->loadsyms_offset = 0;
     return 0;
-}
-
-static int
-glyphid_search_compare(const void *p1, const void *p2)
-{
-    const char *key = (const char *) p1;
-    const struct glyphid_cache_t *elem = (const struct glyphid_cache_t *) p2;
-    const char *str = elem->id ? elem->id : "";
-
-    return strcmp(key, str);
 }
 
 static struct {
