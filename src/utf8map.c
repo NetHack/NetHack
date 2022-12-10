@@ -363,6 +363,7 @@ void
 free_all_glyphmap_u(void)
 {
     int glyph;
+    int x, y;
 
     for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         if (glyphmap[glyph].u) {
@@ -372,6 +373,12 @@ free_all_glyphmap_u(void)
             }
             free(glyphmap[glyph].u);
             glyphmap[glyph].u = 0;
+        }
+    }
+    /* Prevent use after free from gg.gbuf */
+    for (y = 0; y < ROWNO; ++y) {
+        for (x = 0; x < COLNO; ++x) {
+            gg.gbuf[y][x].glyphinfo.gm.u = NULL;
         }
     }
 }
