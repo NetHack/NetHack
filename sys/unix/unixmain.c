@@ -114,12 +114,12 @@ main(int argc, char *argv[])
     if (!dir)
         dir = nh_getenv("HACKDIR");
 #endif /* CHDIR */
-    /* handle -dalthackdir, -s <score stuff>, --version, --showpaths */
-    early_options(&argc, &argv, &dir);
 #ifdef ENHANCED_SYMBOLS
     if (argcheck(argc, argv, ARG_DUMPGLYPHIDS) == 2)
         exit(EXIT_SUCCESS);
 #endif
+    /* handle -dalthackdir, -s <score stuff>, --version, --showpaths */
+    early_options(&argc, &argv, &dir);
 #ifdef CHDIR
     /*
      * Change directories before we initialize the window system so

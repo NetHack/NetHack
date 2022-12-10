@@ -835,6 +835,10 @@ match_sym(char *buf)
     const char *p = strchr(buf, ':'), *q = strchr(buf, '=');
     const struct symparse *sp = loadsyms;
 
+    /* G_ lines will never match here */
+    if ((buf[0] == 'G' || buf[0] == 'g') && buf[1] == '_')
+        return (struct symparse *) 0;
+
     if (!p || (q && q < p))
         p = q;
     if (p) {
@@ -1031,7 +1035,19 @@ do_symset(boolean rogueflag)
 
     if (gs.symset[which_set].name) {
         /* non-default symbols */
-        if (read_sym_file(which_set)) {
+        int ok;
+#ifdef ENHANCED_SYMBOLS
+        if (!glyphid_cache_status()) {
+            fill_glyphid_cache();
+        }
+#endif
+        ok = read_sym_file(which_set);
+#ifdef ENHANCED_SYMBOLS
+        if (glyphid_cache_status()) {
+            free_glyphid_cache();
+        }
+#endif
+        if (ok) {
             ready_to_switch = TRUE;
         } else {
             clear_symsetentry(which_set, TRUE);
@@ -1184,6 +1200,7 @@ purge_custom_entries(enum graphics_sets which_set)
         details = next;
     }
     gdc->details = 0;
+    gdc->details_end = 0;
     if (gdc->customization_name) {
         free((genericptr_t) gdc->customization_name);
         gdc->customization_name = 0;

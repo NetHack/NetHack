@@ -34,8 +34,14 @@ struct glyphid_cache_t {
     int glyphnum;
     char *id;
 };
-struct glyphid_cache_t *glyphid_cache;
+static struct glyphid_cache_t *glyphid_cache;
+static unsigned glyphid_cache_lsize;
+static size_t glyphid_cache_size;
 struct find_struct glyphcache_find, to_custom_symbol_find;
+static void init_glyph_cache(void);
+static void add_glyph_to_cache(int glyphnum, const char *id);
+static int find_glyph_in_cache(const char *id);
+static uint32 glyph_hash(const char *id);
 static void to_custom_symset_entry_callback(int glyph,
                                             struct find_struct *findwhat);
 static int unicode_val(const char *cp);
@@ -314,15 +320,10 @@ glyph_find_core(const char *id, struct find_struct *findwhat)
 
 void fill_glyphid_cache(void)
 {
-    int glyph, reslt = 0;
+    int reslt = 0;
 
     if (!glyphid_cache) {
-        glyphid_cache = (struct glyphid_cache_t *) alloc(
-            MAX_GLYPH * sizeof(struct glyphid_cache_t));
-        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-            glyphid_cache[glyph].glyphnum = 0;
-            glyphid_cache[glyph].id = (char *) 0;
-        }
+        init_glyph_cache();
     }
     if (glyphid_cache) {
         glyphcache_find = zero_find;
@@ -334,6 +335,37 @@ void fill_glyphid_cache(void)
             free_glyphid_cache();
             glyphid_cache = (struct glyphid_cache_t *) 0;
         }
+    }
+}
+
+/*
+ * The glyph ID cache is a simple double-hash table.
+ * The cache size is a power of two, and two hashes are derived from the
+ * cache ID. The first is a location in the table, and the second is an
+ * offset. On any collision, the second hash is added to the first until
+ * a match or an empty bucket is found.
+ * The second hash is an odd number, which is necessary and sufficient
+ * to traverse the entire table.
+ */
+
+static void
+init_glyph_cache(void)
+{
+    size_t glyph;
+
+    /* Cache size of power of 2 not less than 2*MAX_GLYPH */
+    glyphid_cache_lsize = 0;
+    glyphid_cache_size = 1;
+    while (glyphid_cache_size < 2*MAX_GLYPH) {
+        ++glyphid_cache_lsize;
+        glyphid_cache_size <<= 1;
+    }
+
+    glyphid_cache = (struct glyphid_cache_t *) alloc(
+        glyphid_cache_size * sizeof(struct glyphid_cache_t));
+    for (glyph = 0; glyph < glyphid_cache_size; ++glyph) {
+        glyphid_cache[glyph].glyphnum = 0;
+        glyphid_cache[glyph].id = (char *) 0;
     }
 }
 
@@ -351,6 +383,69 @@ void free_glyphid_cache(void)
     }
     free(glyphid_cache);
     glyphid_cache = (struct glyphid_cache_t *) 0;
+}
+
+static void
+add_glyph_to_cache(int glyphnum, const char *id)
+{
+    uint32 hash = glyph_hash(id);
+    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash2 = (size_t)
+            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+    size_t i = hash1;
+
+    do {
+        if (glyphid_cache[i].id == NULL) {
+            /* Empty bucket found */
+            glyphid_cache[i].id = dupstr(id);
+            glyphid_cache[i].glyphnum = glyphnum;
+            return;
+        }
+        /* For speed, assume that no ID occurs twice */
+        i = (i + hash2) & (glyphid_cache_size - 1);
+    } while (i != hash1);
+    /* This should never happen */
+    panic("glyphid_cache full");
+}
+
+static int
+find_glyph_in_cache(const char *id)
+{
+    uint32 hash = glyph_hash(id);
+    size_t hash1 = (size_t) (hash & (glyphid_cache_size - 1));
+    size_t hash2 = (size_t)
+            (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
+    size_t i = hash1;
+
+    do {
+        if (glyphid_cache[i].id == NULL) {
+            /* Empty bucket found */
+            return -1;
+        }
+        if (strcmpi(id, glyphid_cache[i].id) == 0) {
+            /* Match found */
+            return glyphid_cache[i].glyphnum;
+        }
+        i = (i + hash2) & (glyphid_cache_size - 1);
+    } while (i != hash1);
+    return -1;
+}
+
+static uint32
+glyph_hash(const char *id)
+{
+    uint32 hash = 0;
+    size_t i;
+
+    for (i = 0; id[i] != '\0'; ++i) {
+        char ch = id[i];
+        if ('A' <= ch && ch <= 'Z') {
+            ch += 'a' - 'A';
+        }
+        hash = (hash << 1) | (hash >> 31);
+        hash ^= ch;
+    }
+    return hash;
 }
 
 boolean
@@ -494,16 +589,15 @@ add_custom_urep_entry(
 {
     static uint32_t closecolor = 0;
     static int clridx = 0;
-    int retval = 0;
     struct symset_customization *gdc = &gs.sym_customizations[which_set];
-    struct customization_detail *details, *prev = 0, *newdetails = 0,
-                                          *lastdetail = 0;
+    struct customization_detail *details, *newdetails = 0;
 
 
     if (!gdc->details) {
         gdc->customization_name = dupstr(customization_name);
         gdc->custtype = custom_ureps;
         gdc->details = 0;
+        gdc->details_end = 0;
     }
     details = find_matching_symset_customization(customization_name,
                                                  custom_symbols, which_set);
@@ -522,7 +616,6 @@ add_custom_urep_entry(
                 details->content.urep.u.utf32ch = utf32ch;
                 return 1;
             }
-            prev = details;
             details = details->next;
         }
     }
@@ -539,23 +632,14 @@ add_custom_urep_entry(
         newdetails->content.urep.u.u256coloridx = 0;
     newdetails->content.urep.u.utf32ch = utf32ch;
     newdetails->next = (struct customization_detail *) 0;
-    if (!details && prev) {
-        prev->next = newdetails;
-        retval = 1;
-    } else if (!gdc->details) {
+    if (gdc->details == NULL) {
         gdc->details = newdetails;
-        retval = 1;
     } else {
-        lastdetail = gdc->details;
-        while (lastdetail) {
-            prev = lastdetail;
-            lastdetail = lastdetail->next;
-        }
-        prev->next = newdetails;
-        retval = 1;
+        gdc->details_end->next = newdetails;
     }
+    gdc->details_end = newdetails;
     gdc->count++;
-    return retval;
+    return 1;
 }
 
 static int
@@ -566,7 +650,7 @@ parse_id(const char *id, struct find_struct *findwhat)
         pm_count = 0, oc_count = 0, cmap_count = 0;
     boolean skip_base = FALSE, skip_this_one, dump_ids = FALSE,
             filling_cache = FALSE, is_S = FALSE, is_G = FALSE;
-    char buf[5][QBUFSZ];
+    char buf[4][QBUFSZ];
 
     if (findwhat->findtype == find_nothing && findwhat->restype) {
         if (findwhat->restype == res_dump_glyphids) {
@@ -608,141 +692,144 @@ parse_id(const char *id, struct find_struct *findwhat)
         }
     }
     if (is_G || filling_cache || dump_ids) {
-        /* individual matching glyph entries */
-        for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-            if (!filling_cache && id && glyphid_cache) {
-                if (!glyphid_cache[glyph].id) /* skipped during cache fill */
-                    continue;
-                if (!strcmpi(id, glyphid_cache[glyph].id)) {
-                    findwhat->findtype = find_glyph;
-                    findwhat->val = glyph;
-                    findwhat->loadsyms_offset = 0;
-                    return 1;
-                }
+        if (!filling_cache && id && glyphid_cache) {
+            int val = find_glyph_in_cache(id);
+            if (val >= 0) {
+                findwhat->findtype = find_glyph;
+                findwhat->val = val;
+                findwhat->loadsyms_offset = 0;
+                return 1;
             } else {
+                return 0;
+            }
+        } else {
+            /* individual matching glyph entries */
+            for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
                 skip_base = FALSE;
                 skip_this_one = FALSE;
-                buf[0][0] = buf[1][0] = buf[2][0] = buf[3][0] = buf[4][0] =
-                    '\0';
+                buf[0][0] = buf[1][0] = buf[2][0] = buf[3][0] = '\0';
                 if (glyph_is_monster(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_mon(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_mon(glyph)].nm;
                     if (glyph_is_normal_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "male_");
+                        buf2 = "male_";
                     } else if (glyph_is_normal_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "female_");
+                        buf2 = "female_";
                     } else if (glyph_is_ridden_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "ridden_male_");
+                        buf2 = "ridden_male_";
                     } else if (glyph_is_ridden_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "ridden_female_");
+                        buf2 = "ridden_female_";
                     } else if (glyph_is_detected_male_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "detected_male_");
+                        buf2 = "detected_male_";
                     } else if (glyph_is_detected_female_monster(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "detected_female_");
+                        buf2 = "detected_female_";
                     } else if (glyph_is_male_pet(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "pet_male_");
+                        buf2 = "pet_male_";
                     } else if (glyph_is_female_pet(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "pet_female_");
+                        buf2 = "pet_female_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_body(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_body_corpsenm(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_body_corpsenm(glyph)].nm;
                     if (glyph_is_body_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "piletop_body_");
+                        buf2 = "piletop_body_";
                     } else {
-                        Snprintf(buf[2], sizeof buf[2], "body_");
+                        buf2 = "body_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_statue(glyph)) {
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
-                    Snprintf(buf[3], sizeof buf[3], "%s",
-                             monsdump[glyph_to_statue_corpsenm(glyph)].nm);
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = monsdump[glyph_to_statue_corpsenm(glyph)].nm;
                     if (glyph_is_fem_statue_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2],
-                                 "piletop_statue_of_female_");
+                        buf2 = "piletop_statue_of_female_";
                     } else if (glyph_is_fem_statue(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "statue_of_female_");
+                        buf2 = "statue_of_female_";
                     } else if (glyph_is_male_statue_piletop(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2],
-                                 "piletop_statue_of_male_");
+                        buf2 = "piletop_statue_of_male_";
                     } else if (glyph_is_male_statue(glyph)) {
-                        Snprintf(buf[2], sizeof buf[2], "statue_of_male_");
+                        buf2 = "statue_of_male_";
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s", buf[2], buf[3]);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
                 } else if (glyph_is_object(glyph)) {
                     i = glyph_to_obj(glyph);
-                    /* buf[2] will hold the distinguishing prefix */
-                    /* buf[3] will hold the base name */
-                    buf[2][0] = '\0';
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    const char *buf2 = "";
+                    const char *buf3 = "";
                     if (((i > SCR_STINKING_CLOUD) && (i < SCR_MAIL))
                         || ((i > WAN_LIGHTNING) && (i < GOLD_PIECE)))
                         skip_this_one = TRUE;
                     if (!skip_this_one) {
                         if ((i >= WAN_LIGHT) && (i <= WAN_LIGHTNING))
-                            Snprintf(buf[2], sizeof buf[2], "wand of ");
+                            buf2 = "wand of ";
                         else if ((i >= SPE_DIG) && (i < SPE_BLANK_PAPER))
-                            Snprintf(buf[2], sizeof buf[2], "spellbook of ");
+                            buf2 = "spellbook of ";
                         else if ((i >= SCR_ENCHANT_ARMOR)
                                  && (i <= SCR_STINKING_CLOUD))
-                            Snprintf(buf[2], sizeof buf[2], "scroll of ");
+                            buf2 = "scroll of ";
                         else if ((i >= POT_GAIN_ABILITY) && (i <= POT_WATER))
-                            Snprintf(buf[2], sizeof buf[2], "%s",
-                                     (i == POT_WATER) ? "flask of n"
-                                                      : "potion of ");
+                            buf2 = (i == POT_WATER) ? "flask of n"
+                                                    : "potion of ";
                         else if ((i >= RIN_ADORNMENT)
                                  && (i <= RIN_PROTECTION_FROM_SHAPE_CHAN))
-                            Snprintf(buf[2], sizeof buf[2], "ring of ");
+                            buf2 = "ring of ";
                         else if (i == LAND_MINE)
-                            Snprintf(buf[2], sizeof buf[2], "unset ");
-                        Snprintf(buf[3], sizeof buf[3], "%s",
-                                 (i == SCR_BLANK_PAPER) ? "blank scroll"
+                            buf2 = "unset ";
+                        buf3 = (i == SCR_BLANK_PAPER) ? "blank scroll"
                                  : (i == SPE_BLANK_PAPER)
                                      ? "blank spellbook"
-                                     : obj_descr[i].oc_name);
-                        Snprintf(buf[1], sizeof buf[1], "%s%s%s",
-                                 glyph_is_normal_piletop_obj(glyph)
-                                     ? "piletop_"
-                                     : "",
-                                 buf[2], buf[3]);
+                                     : (i == SLIME_MOLD)
+                                     ? "slime mold"
+                                     : obj_descr[i].oc_name;
+                        Strcpy(buf[0], "G_");
+                        if (glyph_is_normal_piletop_obj(glyph))
+                            Strcat(buf[0], "piletop_");
+                        Strcat(buf[0], buf2);
+                        Strcat(buf[0], buf3);
                     }
                 } else if (glyph_is_cmap(glyph) || glyph_is_cmap_zap(glyph)
                            || glyph_is_swallow(glyph)
                            || glyph_is_explosion(glyph)) {
                     int cmap = -1;
 
-                    buf[2][0] =
-                        '\0'; /* buf[2] will hold the distinguishing prefix */
-                    buf[3][0] = '\0'; /* buf[3] will hold the base name */
-                    buf[4][0] =
-                        '\0'; /* buf[4] will hold the distinguishing suffix */
+                    /* buf2 will hold the distinguishing prefix */
+                    /* buf3 will hold the base name */
+                    /* buf4 will hold the distinguishing suffix */
+                    const char *buf2 = "";
+                    const char *buf3 = "";
+                    const char *buf4 = "";
                     if (glyph == GLYPH_CMAP_OFF) {
                         cmap = S_stone;
-                        Strcpy(buf[3], "stone substrate");
+                        buf3 = "stone substrate";
                         skip_base = TRUE;
                     } else if (glyph_is_cmap_gehennom(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_GEH_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_gehennom");
+                        buf4 = "_gehennom";
                     } else if (glyph_is_cmap_knox(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_KNOX_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_knox");
+                        buf4 = "_knox";
                     } else if (glyph_is_cmap_main(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_MAIN_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_main");
+                        buf4 = "_main";
                     } else if (glyph_is_cmap_mines(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_MINES_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_mines");
+                        buf4 = "_mines";
                     } else if (glyph_is_cmap_sokoban(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_SOKO_OFF) + S_vwall;
-                        Snprintf(buf[4], sizeof buf[4], "%s", "_sokoban");
+                        buf4 = "_sokoban";
                     } else if (glyph_is_cmap_a(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_A_OFF) + S_ndoor;
                     } else if (glyph_is_cmap_altar(glyph)) {
@@ -755,8 +842,9 @@ parse_id(const char *id, struct find_struct *findwhat)
                         if (j != altar_other) {
                             Snprintf(buf[2], sizeof buf[2], "%s_",
                                      altar_text[j]);
+                            buf2 = buf[2];
                         } else {
-                            Strcpy(buf[3], "altar other");
+                            buf3 = "altar other";
                             skip_base = TRUE;
                         }
                     } else if (glyph_is_cmap_b(glyph)) {
@@ -772,7 +860,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                                  loadsyms[cmap + cmap_offset].name + 2);
                         Snprintf(buf[3], sizeof buf[3], "%s zap %s",
                                  zap_texts[j / 4], fix_glyphname(buf[2]));
-                        buf[2][0] = '\0';
+                        buf3 = buf[3];
+                        buf2 = "";
                         skip_base = TRUE;
                     } else if (glyph_is_cmap_c(glyph)) {
                         cmap = (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
@@ -786,8 +875,11 @@ parse_id(const char *id, struct find_struct *findwhat)
                         cmap = glyph_to_swallow(glyph);
                         mnum = j / ((S_sw_br - S_sw_tl) + 1);
                         i = cmap - S_sw_tl;
-                        Snprintf(buf[3], sizeof buf[3], "%s %s %s", "swallow",
-                                 monsdump[mnum].nm, swallow_texts[cmap]);
+                        Strcpy(buf[3], "swallow ");
+                        Strcat(buf[3], monsdump[mnum].nm);
+                        Strcat(buf[3], " ");
+                        Strcat(buf[3], swallow_texts[cmap]);
+                        buf3 = buf[3];
                         skip_base = TRUE;
                     } else if (glyph_is_explosion(glyph)) {
                         int expl;
@@ -807,36 +899,39 @@ parse_id(const char *id, struct find_struct *findwhat)
                         i = cmap - S_expl_tl;
                         Snprintf(buf[2], sizeof buf[2], "%s ",
                                  expl_type_texts[expl]);
+                        buf2 = buf[2];
                         Snprintf(buf[3], sizeof buf[3], "%s%s", "expl_",
                                  expl_texts[i]);
+                        buf3 = buf[3];
                         skip_base = TRUE;
                     }
                     if (!skip_base) {
                         if (cmap >= 0 && cmap < MAXPCHARS) {
-                            Snprintf(buf[3], sizeof buf[3], "%s",
-                                     loadsyms[cmap + cmap_offset].name + 2);
+                            buf3 = loadsyms[cmap + cmap_offset].name + 2;
                         }
                     }
-                    Snprintf(buf[1], sizeof buf[1], "%s%s%s", buf[2], buf[3],
-                             buf[4]);
+                    Strcpy(buf[0], "G_");
+                    Strcat(buf[0], buf2);
+                    Strcat(buf[0], buf3);
+                    Strcat(buf[0], buf4);
                 } else if (glyph_is_invisible(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "invisible");
+                    Strcpy(buf[0], "G_invisible");
                 } else if (glyph_is_nothing(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "nothing");
+                    Strcpy(buf[0], "G_nothing");
                 } else if (glyph_is_unexplored(glyph)) {
-                    Snprintf(buf[1], sizeof buf[1], "%s", "unexplored");
+                    Strcpy(buf[0], "G_unexplored");
                 } else if (glyph_is_warning(glyph)) {
                     j = glyph - GLYPH_WARNING_OFF;
-                    Snprintf(buf[1], sizeof buf[1], "%s%d", "warning", j);
+                    Snprintf(buf[0], sizeof buf[0], "G_%s%d", "warning", j);
                 }
+                if (memchr(buf[0], '\0', sizeof buf[0]) == NULL)
+                    panic("parse_id: buf[0] overflowed");
                 if (!skip_this_one) {
-                    Snprintf(buf[0], sizeof buf[0], "G_%s",
-                             fix_glyphname(buf[1]));
+                    fix_glyphname(buf[0]+2);
                     if (dump_ids) {
                         Fprintf(fp, "(%04d) %s\n", glyph, buf[0]);
                     } else if (filling_cache) {
-                        glyphid_cache[glyph].glyphnum = glyph;
-                        glyphid_cache[glyph].id = dupstr(buf[0]);
+                        add_glyph_to_cache(glyph, buf[0]);
                     } else if (id) {
                         if (!strcmpi(id, buf[0])) {
                             findwhat->findtype = find_glyph;
@@ -846,8 +941,8 @@ parse_id(const char *id, struct find_struct *findwhat)
                         }
                     }
                 }
-            } /* not glyphid_cache */
-        }
+            }
+        } /* not glyphid_cache */
     } else if (is_S) {
         /* cmap entries */
         for (i = 0; i < cmap_count; ++i) {
