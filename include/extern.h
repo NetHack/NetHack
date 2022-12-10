@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1657918089 2022/07/15 20:48:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1132 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1670662098 2022/12/10 08:48:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1204 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -154,8 +154,8 @@ extern void lift_covet_and_placebc(int);
 #endif
 extern void set_bc(int);
 extern void move_bc(int, int, coordxy, coordxy, coordxy, coordxy);
-extern boolean drag_ball(coordxy, coordxy, int *, coordxy *, coordxy *, coordxy *,
-                         coordxy *, boolean *, boolean);
+extern boolean drag_ball(coordxy, coordxy, int *, coordxy *, coordxy *,
+                         coordxy *, coordxy *, boolean *, boolean);
 extern void drop_ball(coordxy, coordxy);
 extern void drag_down(void);
 extern void bc_sanity_check(void);
@@ -648,8 +648,8 @@ extern int breaks(struct obj *, coordxy, coordxy);
 extern void release_camera_demon(struct obj *, coordxy, coordxy);
 extern void breakobj(struct obj *, coordxy, coordxy, boolean, boolean);
 extern boolean breaktest(struct obj *);
-extern boolean walk_path(coord *, coord *, boolean(*)(void *, coordxy, coordxy),
-                         genericptr_t);
+extern boolean walk_path(coord *, coord *,
+                         boolean(*)(void *, coordxy, coordxy), genericptr_t);
 extern boolean hurtle_jump(genericptr_t, coordxy, coordxy);
 extern boolean hurtle_step(genericptr_t, coordxy, coordxy);
 
@@ -1411,9 +1411,10 @@ extern void mazexy(coord *);
 extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *);
 extern void bound_digging(void);
 extern void mkportal(coordxy, coordxy, xint16, xint16);
-extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy);
-extern void place_lregion(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, coordxy,
-                          coordxy, xint16, d_level *);
+extern boolean bad_location(coordxy, coordxy, coordxy, coordxy, coordxy,
+                            coordxy);
+extern void place_lregion(coordxy, coordxy, coordxy, coordxy, coordxy,
+                          coordxy, coordxy, coordxy, xint16, d_level *);
 extern void fixup_special(void);
 extern void fumaroles(void);
 extern void movebubbles(void);
@@ -1774,9 +1775,12 @@ extern int spitmm(struct monst *, struct attack *, struct monst *);
 extern int breamm(struct monst *, struct attack *, struct monst *);
 extern void m_useupall(struct monst *, struct obj *);
 extern void m_useup(struct monst *, struct obj *);
-extern void m_throw(struct monst *, coordxy, coordxy, coordxy, coordxy, int, struct obj *);
-extern void hit_bars(struct obj **, coordxy, coordxy, coordxy, coordxy, unsigned);
-extern boolean hits_bars(struct obj **, coordxy, coordxy, coordxy, coordxy, int, int);
+extern void m_throw(struct monst *, coordxy, coordxy, coordxy, coordxy,
+                    int, struct obj *);
+extern void hit_bars(struct obj **, coordxy, coordxy, coordxy, coordxy,
+                     unsigned);
+extern boolean hits_bars(struct obj **, coordxy, coordxy, coordxy, coordxy,
+                         int, int);
 
 /* ### muse.c ### */
 
@@ -2593,8 +2597,8 @@ extern boolean mapfrag_match(struct mapfragment *, int, int);
 extern void flip_level(int, boolean);
 extern void flip_level_rnd(int, boolean);
 extern boolean check_room(coordxy *, coordxy *, coordxy *, coordxy *, boolean);
-extern boolean create_room(coordxy, coordxy, coordxy, coordxy, coordxy, coordxy, xint16,
-                           xint16);
+extern boolean create_room(coordxy, coordxy, coordxy, coordxy,
+                           coordxy, coordxy, xint16, xint16);
 extern boolean dig_corridor(coord *, coord *, boolean, schar, schar);
 extern void fill_special_room(struct mkroom *);
 extern void wallify_map(coordxy, coordxy, coordxy, coordxy);
@@ -2606,19 +2610,22 @@ extern void selection_clear(struct selectionvar *, int);
 extern struct selectionvar *selection_clone(struct selectionvar *);
 extern void selection_getbounds(struct selectionvar *, NhRect *);
 extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
-extern void selection_floodfill(struct selectionvar *, coordxy, coordxy, boolean);
+extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
+                                boolean);
 extern boolean pm_good_location(coordxy, coordxy, struct permonst *);
-extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *, long);
+extern void get_location_coord(coordxy *, coordxy *, int, struct mkroom *,
+                               long);
 extern void selection_setpoint(coordxy, coordxy, struct selectionvar *, int);
 extern struct selectionvar * selection_not(struct selectionvar *);
-extern struct selectionvar *selection_filter_percent(struct selectionvar *, int);
+extern struct selectionvar *selection_filter_percent(struct selectionvar *,
+                                                     int);
 extern int selection_rndcoord(struct selectionvar *, coordxy *, coordxy *,
                               boolean);
 extern void selection_do_grow(struct selectionvar *, int);
 extern void selection_do_line(coordxy, coordxy, coordxy, coordxy,
                               struct selectionvar *);
-extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy, schar, schar,
-                                  struct selectionvar *);
+extern void selection_do_randline(coordxy, coordxy, coordxy, coordxy,
+                                  schar, schar, struct selectionvar *);
 extern struct selectionvar *selection_filter_mapchar(struct selectionvar *,
                                                      xint16, int);
 extern void set_floodfillchk_match_under(coordxy);
@@ -2818,7 +2825,8 @@ extern boolean grease_protect(struct obj *, const char *, struct monst *);
 extern struct trap *maketrap(coordxy, coordxy, int);
 extern d_level *clamp_hole_destination(d_level *);
 extern void fall_through(boolean, unsigned);
-extern struct monst *animate_statue(struct obj *, coordxy, coordxy, int, int *);
+extern struct monst *animate_statue(struct obj *, coordxy, coordxy,
+                                    int, int *);
 extern struct monst *activate_statue_trap(struct trap *, coordxy, coordxy,
                                           boolean);
 extern void set_utrap(unsigned, unsigned);
@@ -3054,7 +3062,8 @@ void free_all_glyphmap_u(void);
 int add_custom_urep_entry(const char *symset_name, int glyphidx,
                           uint32 utf32ch, const uint8 *utf8str, long ucolor,
                           enum graphics_sets which_set);
-int set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str, long ucolor);
+int set_map_u(glyph_map *gm, uint32 utf32ch, const uint8 *utf8str,
+              long ucolor);
 #endif /* ENHANCED_SYMBOLS */
 
 /* ### vault.c ### */
