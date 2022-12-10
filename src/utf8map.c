@@ -393,10 +393,8 @@ add_glyph_to_cache(int glyphnum, const char *id)
     size_t hash2 = (size_t)
             (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
     size_t i = hash1;
-    unsigned count = 0;
 
     do {
-        ++count;
         if (glyphid_cache[i].id == NULL) {
             /* Empty bucket found */
             glyphid_cache[i].id = dupstr(id);
@@ -418,10 +416,8 @@ find_glyph_in_cache(const char *id)
     size_t hash2 = (size_t)
             (((hash >> glyphid_cache_lsize) & (glyphid_cache_size - 1)) | 1);
     size_t i = hash1;
-    unsigned count = 0;
 
     do {
-        ++count;
         if (glyphid_cache[i].id == NULL) {
             /* Empty bucket found */
             return -1;
