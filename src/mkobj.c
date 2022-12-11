@@ -2159,6 +2159,29 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
         obj_timer_checks(otmp, x, y, 0);
 }
 
+/* tear down the object pile at <x,y> and create it again, so that any
+   boulders which are present get forced to the top */
+void
+recreate_pile_at(coordxy x, coordxy y)
+{
+    struct obj *otmp, *next_obj, *reversed = 0;
+
+    /* remove all objects at <x,y>, saving a reversed temporary list */
+    for (otmp = gl.level.objects[x][y]; otmp; otmp = next_obj) {
+        next_obj = otmp->nexthere;
+        remove_object(otmp); /* obj_extract_self() for floor */
+        otmp->nobj = reversed;
+        reversed = otmp;
+    }
+    /* pile at <tx,ty> is now empty; create new one, re-reversing to restore
+       original order; place_object() handles making boulders be on top */
+    for (otmp = reversed; otmp; otmp = next_obj) {
+        next_obj = otmp->nobj;
+        otmp->nobj = 0; /* obj->where is OBJ_FREE */
+        place_object(otmp, x, y);
+    }
+}
+
 #define ROT_ICE_ADJUSTMENT 2 /* rotting on ice takes 2 times as long */
 
 /* If ice was affecting any objects correct that now

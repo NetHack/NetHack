@@ -1481,6 +1481,7 @@ extern void set_bknown(struct obj *, unsigned);
 extern boolean is_flammable(struct obj *);
 extern boolean is_rottable(struct obj *);
 extern void place_object(struct obj *, coordxy, coordxy);
+extern void recreate_pile_at(coordxy, coordxy);
 extern void remove_object(struct obj *);
 extern void discard_minvent(struct monst *, boolean);
 extern void obj_extract_self(struct obj *);

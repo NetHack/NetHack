@@ -1853,12 +1853,12 @@ poly_obj(struct obj *obj, int id)
 static int
 stone_to_flesh_obj(struct obj *obj)
 {
-    int res = 1; /* affected object by default */
     struct permonst *ptr;
     struct monst *mon, *shkp;
     struct obj *item;
     coordxy oox, ooy;
     boolean smell = FALSE, golem_xform = FALSE;
+    int res = 1; /* affected object by default */
 
     if (objects[obj->otyp].oc_material != MINERAL
         && objects[obj->otyp].oc_material != GEMSTONE)
@@ -2263,16 +2263,26 @@ bhito(struct obj *obj, struct obj *otmp)
 /* returns nonzero if something was hit */
 int
 bhitpile(
-    struct obj *obj, /* wand or fake spellbook for type of zap */
+    struct obj *obj,            /* wand or fake spellbook for type of zap */
     int (*fhito)(OBJ_P, OBJ_P), /* callback for each object being hit */
-    coordxy tx, coordxy ty,  /* target location */
-    schar zz)        /* direction for up/down zaps */
+    coordxy tx, coordxy ty,     /* target location */
+    schar zz)                   /* direction for up/down zaps */
 {
-    int hitanything = 0;
     register struct obj *otmp, *next_obj;
+    boolean hidingunder, first;
+    int prevotyp, hitanything = 0;
+
+    if (!gl.level.objects[tx][ty])
+        return 0;
+
+    /* if hiding underneath an object and zapping up or down, the top item
+       is either the only thing hit (up) or is skipped (down) */
+    hidingunder = (zz != 0 && u.uundetected && hides_under(gy.youmonst.data));
+    first = TRUE;
 
     if (obj->otyp == SPE_FORCE_BOLT || obj->otyp == WAN_STRIKING) {
         struct trap *t = t_at(tx, ty);
+        struct obj *topofpile = gl.level.objects[tx][ty];
 
         /* We can't settle for the default calling sequence of
            bhito(otmp) -> break_statue(otmp) -> activate_statue_trap(ox,oy)
@@ -2282,20 +2292,48 @@ bhitpile(
         if (t && t->ttyp == STATUE_TRAP
             && activate_statue_trap(t, tx, ty, TRUE))
             learnwand(obj);
+        /* assume zapping up or down while hiding under the top item can
+           still activate the trap even if it's below (when zapping up)
+           or above (when zapping down) */
+        if (gl.level.objects[tx][ty] != topofpile)
+            first = FALSE; /* top item was statue which activated */
     }
 
     gp.poly_zapped = -1;
     for (otmp = gl.level.objects[tx][ty]; otmp; otmp = next_obj) {
         next_obj = otmp->nexthere;
-        /* for zap downwards, don't hit object poly'd hero is hiding under */
-        if (zz > 0 && u.uundetected && otmp == gl.level.objects[u.ux][u.uy]
-            && hides_under(gy.youmonst.data))
-            continue;
-
+        if (hidingunder) {
+            if (first) {
+                first = FALSE; /* reset for next item */
+                if (zz < 0) /* down when hiding-under skips first item */
+                    continue;
+            } else {
+                /* !first */
+                if (zz > 0) /* up when hiding-under skips rest of pile */
+                    continue;
+            }
+        }
         hitanything += (*fhito)(otmp, obj);
     }
+
     if (gp.poly_zapped >= 0)
         create_polymon(gl.level.objects[tx][ty], gp.poly_zapped);
+
+    /* when boulders are present they're expected to be on top; with
+       multiple boulders it's possible for some to have been changed into
+       non-boulders (polymorph, stone-to-flesh) while ones beneath resist,
+       so re-stack pile if there are any non-boulders above boulders */
+    prevotyp = BOULDER;
+    for (otmp = gl.level.objects[tx][ty]; otmp; otmp = otmp->nexthere) {
+        if (otmp->otyp == BOULDER && prevotyp != BOULDER) {
+            recreate_pile_at(tx, ty);
+            break;
+        }
+        prevotyp = otmp->otyp;
+    }
+
+    if (hidingunder) /* pile might have been destroyed or dispersed */
+        maybe_unhide_at(tx, ty);
 
     return hitanything;
 }
