@@ -2305,11 +2305,11 @@ bhitpile(
         if (hidingunder) {
             if (first) {
                 first = FALSE; /* reset for next item */
-                if (zz < 0) /* down when hiding-under skips first item */
+                if (zz > 0) /* down when hiding-under skips first item */
                     continue;
             } else {
                 /* !first */
-                if (zz > 0) /* up when hiding-under skips rest of pile */
+                if (zz < 0) /* up when hiding-under skips rest of pile */
                     continue;
             }
         }
