@@ -614,11 +614,16 @@ doengrave(void)
                 surface(u.ux, u.uy));
             return ECMD_OK;
         } else if (!levl[u.ux][u.uy].disturbed) {
-            You("disturb the undead!");
+            struct permonst *undeadtyp;
             levl[u.ux][u.uy].disturbed = 1;
-            (void) makemon(&mons[PM_GHOUL], u.ux, u.uy, NO_MM_FLAGS);
-            exercise(A_WIS, FALSE);
-            return ECMD_TIME;
+            /* list of possible monsters is consistent with dig_up_grave() */
+            undeadtyp = mkclass((rn2(2) ? S_ZOMBIE : S_MUMMY), 0);
+            if (undeadtyp) {
+                You("disturb the undead!");
+                makemon(undeadtyp, u.ux, u.uy, NO_MM_FLAGS);
+                exercise(A_WIS, FALSE);
+                return ECMD_TIME;
+            }
         }
     }
 

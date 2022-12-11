@@ -901,6 +901,7 @@ static void
 dig_up_grave(coord *cc)
 {
     struct obj *otmp;
+    struct permonst *undeadtyp;
     coordxy dig_x, dig_y;
 
     if (!cc) {
@@ -940,16 +941,22 @@ dig_up_grave(coord *cc)
             otmp->age -= (TAINT_AGE + 1); /* this is an *OLD* corpse */
         break;
     case 2:
+        undeadtyp = mkclass(S_ZOMBIE, 0);
+        if (!undeadtyp)
+            goto empty_grave;
         if (!Blind)
             pline(Hallucination ? "Dude!  The living dead!"
                                 : "The grave's owner is very upset!");
-        (void) makemon(mkclass(S_ZOMBIE, 0), dig_x, dig_y, MM_NOMSG);
+        (void) makemon(undeadtyp, dig_x, dig_y, MM_NOMSG);
         break;
     case 3:
+        undeadtyp = mkclass(S_MUMMY, 0);
+        if (!undeadtyp)
+            goto empty_grave;
         if (!Blind)
             pline(Hallucination ? "I want my mummy!"
                                 : "You've disturbed a tomb!");
-        (void) makemon(mkclass(S_MUMMY, 0), dig_x, dig_y, MM_NOMSG);
+        (void) makemon(undeadtyp, dig_x, dig_y, MM_NOMSG);
         break;
     default:
  empty_grave:
