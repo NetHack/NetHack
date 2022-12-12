@@ -103,6 +103,11 @@ extern void interject(int);
  */
 
 #ifdef __MINGW32__
+#define MD_USE_TMPFILE_S
+#if !defined(__cplusplus)
+extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
+#endif
+#
 #ifdef strncasecmp
 #undef strncasecmp
 #endif
@@ -115,6 +120,7 @@ extern void interject(int);
 #endif
 
 #ifdef _MSC_VER
+#define MD_USE_TMPFILE_S
 #define HAS_STDINT
 #if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */

@@ -35,6 +35,10 @@
 #define SpinCursor(x)
 #endif
 
+#ifdef MD_USE_TMPFILE_S
+#include <errno.h>
+#endif
+
 #define Fprintf (void) fprintf
 #define Fclose (void) fclose
 #define Unlink (void) unlink
@@ -374,30 +378,44 @@ getfp(const char* template, const char* tag, const char* mode, int flg)
 {
     char *name = name_file(template, tag);
     FILE *rv = (FILE *) 0;
-#ifndef HAS_NO_MKSTEMP
     boolean istemp = (flg & FLG_TEMPFILE) != 0;
+#ifdef MD_USE_TMPFILE_S
+    errno_t err;
+#endif
+#if !defined(HAS_NO_MKSTEMP) && !defined(MD_USE_TMPFILE_S)
     char tmpfbuf[MAXFNAMELEN];
     int tmpfd;
+#endif
 
+#if !defined(HAS_NO_MKSTEMP) || defined(MD_USE_TMPFILE_S)
     if (istemp) {
+#ifdef MD_USE_TMPFILE_S
+        err = tmpfile_s(&rv);
+#if defined(MSDOS) || defined(WIN32)
+        if (!err && (!strcmp(mode, WRTMODE) || !strcmp(mode, RDTMODE))) {
+           _setmode(fileno(rv), O_TEXT);
+        }
+#endif
+#else  /* !MD_USE_TMPFILE_S */
         (void) snprintf(tmpfbuf, sizeof tmpfbuf, DATA_TEMPLATE, "mdXXXXXX");
         tmpfd = mkstemp(tmpfbuf);
         if (tmpfd >= 0) {
             rv = fdopen(tmpfd, WRTMODE); /* temp file is always read+write */
             Unlink(tmpfbuf);
         }
-    }
-    else
-#else
-        flg; // unused
-#endif
-    rv = fopen(name, mode);
+#endif  /* ?MD_USE_TMPFILE_S */
+    } else
+#endif  /* !HAS_NO_MKSTEMP || MD_USE_TMPFILE_S */
+     rv = fopen(name, mode);
+
     if (!rv) {
-        Fprintf(stderr, "Can't open '%s'.\n",
+        Fprintf(stderr, "Can't open '%s' (mode=%s).\n",
 #ifndef HAS_NO_MKSTEMP
+#if !defined(MD_USE_TMPFILE_S)
                 istemp ? tmpfbuf :
 #endif
-                 name);
+#endif
+                 name, mode);
         makedefs_exit(EXIT_FAILURE);
         /*NOTREACHED*/
     }
