@@ -114,6 +114,9 @@ extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
 #ifdef strcasecmp
 #undef strcasecmp
 /* https://sourceforge.net/p/mingw-w64/wiki2/gnu%20printf/ */
+#ifdef __USE_MINGW_ANSI_STDIO
+#undef __USE_MINGW_ANSI_STDIO
+#endif
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
 /* extern int getlock(void); */
