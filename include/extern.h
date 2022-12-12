@@ -1021,6 +1021,7 @@ extern char *tabexpand(char *);
 extern char *visctrl(char);
 extern char *strsubst(char *, const char *, const char *);
 extern int strNsubst(char *, const char *, const char *, int);
+extern const char *findword(const char *, const char *, int, boolean);
 extern const char *ordin(int);
 extern char *sitoa(int);
 extern int sgn(int);

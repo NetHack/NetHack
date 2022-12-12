@@ -819,6 +819,9 @@ str2race(const char *str)
         /* Does it match the noun? */
         if (!strncmpi(str, races[i].noun, len))
             return i;
+        /* check adjective too */
+        if (races[i].adj && !strncmpi(str, races[i].adj, len))
+            return i;
         /* Or the filecode? */
         if (!strcmpi(str, races[i].filecode))
             return i;
@@ -1603,20 +1606,25 @@ plnamesuffix(void)
     /* some generic user names will be ignored in favor of prompting */
     if (sysopt.genericusers) {
         if (*sysopt.genericusers == '*') {
-            *gp.plname = '\0';
+            gp.plname[0] = '\0';
         } else {
-            i = (int) strlen(gp.plname);
-            if ((sptr = strstri(sysopt.genericusers, gp.plname)) != 0
-                && (sptr == sysopt.genericusers || sptr[-1] == ' ')
-                && (sptr[i] == ' ' || sptr[i] == '\0'))
-                *gp.plname = '\0'; /* call askname() */
+            /* need to ignore appended '-role-race-gender-alignment';
+               'plnamelen' is non-zero when dealing with plname[] value that
+               contains a username with dash(es) in it and is usually 0 */
+            i = ((eptr = strchr(gp.plname + gp.plnamelen, '-')) != 0)
+                ? (int) (eptr - gp.plname)
+                : Strlen(gp.plname);
+            /* look for plname[] in the 'genericusers' space-separated list */
+            if (findword(sysopt.genericusers, gp.plname, i, FALSE))
+                /* it's generic; remove it so that askname() will be called */
+                gp.plname[0] = '\0';
         }
-        if (!*gp.plname)
+        if (!gp.plname[0])
             gp.plnamelen = 0;
     }
 
     do {
-        if (!*gp.plname) {
+        if (!gp.plname[0]) {
             askname(); /* fill gp.plname[] if necessary, or set defer_plname */
             gp.plnamelen = 0; /* plname[] might have -role-race-&c attached */
         }
@@ -1641,7 +1649,7 @@ plnamesuffix(void)
             else if ((i = str2align(sptr)) != ROLE_NONE)
                 flags.initalign = i;
         }
-    } while (!*gp.plname && !iflags.defer_plname);
+    } while (!gp.plname[0] && !iflags.defer_plname);
 
     /* commas in the gp.plname confuse the record file, convert to spaces */
     (void) strNsubst(gp.plname, ",", " ", 0);
