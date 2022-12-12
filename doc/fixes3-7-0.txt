@@ -1678,6 +1678,12 @@ user_sounds: move the message hook from inside individual window display ports
 	issue that the curses port on Windows not working with user_sounds
 Windows: update for new status condition fields
 Windows: include commented-out 'PORTABLE_DEVICE_PATHS' in sysconf.template
+Windows: When there was no interesting background in get_bk_glyph()
+	in display.c, a default value of GLYPH_UNEXPLORED was returned to
+	the caller and then passed on to the interface; the graphical
+	Windows version, NetHackW.exe, was trying to use the tile mapped to
+	GLYPH_UNEXPLORED as a background tile to merge with the
+	foreground tile, so check for GLYPH_UNEXPLORED and bypass that
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
