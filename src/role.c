@@ -2101,7 +2101,7 @@ character_race(short pmindex)
 void
 genl_player_selection(void)
 {
-    if (genl_player_setup())
+    if (genl_player_setup(0))
         return;
 
     /* player cancelled role/race/&c selection, so quit */
@@ -2113,7 +2113,8 @@ genl_player_selection(void)
 /* ['#else' far below] */
 
 static boolean reset_role_filtering(void);
-static winid plsel_startmenu(void);
+static winid plsel_startmenu(int, int);
+static int maybe_skip_seps(int, int);
 static void setup_rolemenu(winid, boolean, int, int, int);
 static void setup_racemenu(winid, boolean, int, int, int);
 static void setup_gendmenu(winid, boolean, int, int, int);
@@ -2127,7 +2128,7 @@ static void setup_algnmenu(winid, boolean, int, int, int);
 
 /* guts of tty's player_selection() */
 int
-genl_player_setup(void)
+genl_player_setup(int screenheight)
 {
     char pbuf[QBUFSZ];
     anything any;
@@ -2137,7 +2138,9 @@ genl_player_setup(void)
     menu_item *selected = 0;
     int clr = 0;
     char pick4u = 'n';
+    int result = 0; /* assume failure (player chooses to 'quit') */
 
+    gp.program_state.in_role_selection++; /* affects tty menu cleanup */
     /* Used to avoid "Is this ok?" if player has already specified all
      * four facets of role.
      * Note that rigid_role_checks might force any unspecified facets to
@@ -2183,13 +2186,13 @@ genl_player_setup(void)
             pick4u = yn_function(prompt, (char *) 0, '\0', FALSE);
             pick4u = lowc(pick4u);
             if (pick4u == '\033' || pick4u == 'q') /* handle [q] */
-                return 0;
-            if (pick4u == ' ' || pick4u == '\n') /* default is 'y' */
-                pick4u = 'y';
-            else if (pick4u == '@') /* similar to '-@' on command line */
-                pick4u = 'a';
+                goto setup_done;
+            if (pick4u == ' ' || pick4u == '\n' || pick4u == '\r')
+                pick4u = 'y'; /* default */
+            else if (pick4u == '@' || pick4u == '*')
+                pick4u = 'a'; /* similar to '-@' on command line */
             /* TODO? handle response of '?' */
-        } while (pick4u != 'y' && pick4u != 'a' && pick4u != 'n'); /* [yna] */
+        } while (pick4u != 'y' && pick4u != 'n' && pick4u != 'a'); /* [yna] */
 
 #else /* slightly simpler but more likely to end up being wrapped */
 
@@ -2203,7 +2206,7 @@ genl_player_setup(void)
            user's <space> and <return> to 'y', <escape> to 'q' */
         pick4u = yn_function(prompt, ynaqchars, 'y', FALSE);
         if (pick4u != 'y' && pick4u != 'a' && pick4u != 'n')
-            return 0; /* bail */
+            goto setup_done; /* bail */
 #endif
     }
 
@@ -2225,15 +2228,19 @@ genl_player_setup(void)
                         k = randrole(FALSE);
                     }
                 } else {
+                    /* 'excess' is used to try to avoid tty pagination */
+                    int excess = maybe_skip_seps(screenheight, RS_ROLE);
+
                     /* prompt for a role */
-                    win = plsel_startmenu();
+                    win = plsel_startmenu(screenheight, RS_ROLE);
                     /* populate the menu with role choices */
                     setup_rolemenu(win, TRUE, RACE, GEND, ALGN);
                     /* add miscellaneous menu entries */
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
                     any = cg.zeroany; /* separator, not a choice */
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                    if (excess < 1 || excess > 2)
+                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
                     role_menu_extra(RS_RACE, win, FALSE);
                     role_menu_extra(RS_GENDER, win, FALSE);
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -2263,7 +2270,7 @@ genl_player_setup(void)
                     destroy_nhwindow(win), win = WIN_ERR;
 
                     if (choice == ROLE_NONE) {
-                        return 0; /* selected quit */
+                        goto setup_done; /* selected quit */
                     } else if (choice == RS_menu_arg(RS_ALGNMNT)) {
                         ALGN = k = ROLE_NONE;
                         nextpick = RS_ALGNMNT;
@@ -2320,7 +2327,7 @@ genl_player_setup(void)
                     }
                     /* Permit the user to pick, if there is more than one */
                     if (n > 1) {
-                        win = plsel_startmenu();
+                        win = plsel_startmenu(screenheight, RS_RACE);
                         any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with role choices */
                         setup_racemenu(win, TRUE, ROLE, GEND, ALGN);
@@ -2348,7 +2355,7 @@ genl_player_setup(void)
                         destroy_nhwindow(win), win = WIN_ERR;
 
                         if (choice == ROLE_NONE) {
-                            return 0; /* selected quit */
+                            goto setup_done; /* selected quit */
                         } else if (choice == RS_menu_arg(RS_ALGNMNT)) {
                             ALGN = k = ROLE_NONE;
                             nextpick = RS_ALGNMNT;
@@ -2409,7 +2416,7 @@ genl_player_setup(void)
                     }
                     /* Permit the user to pick, if there is more than one */
                     if (n > 1) {
-                        win = plsel_startmenu();
+                        win = plsel_startmenu(screenheight, RS_GENDER);
                         any = cg.zeroany; /* zero out all bits */
                         /* populate the menu with gender choices */
                         setup_gendmenu(win, TRUE, ROLE, RACE, ALGN);
@@ -2437,7 +2444,7 @@ genl_player_setup(void)
                         destroy_nhwindow(win), win = WIN_ERR;
 
                         if (choice == ROLE_NONE) {
-                            return 0; /* selected quit */
+                            goto setup_done; /* selected quit */
                         } else if (choice == RS_menu_arg(RS_ALGNMNT)) {
                             ALGN = k = ROLE_NONE;
                             nextpick = RS_ALGNMNT;
@@ -2496,7 +2503,7 @@ genl_player_setup(void)
                     }
                     /* Permit the user to pick, if there is more than one */
                     if (n > 1) {
-                        win = plsel_startmenu();
+                        win = plsel_startmenu(screenheight, RS_ALGNMNT);
                         any = cg.zeroany; /* zero out all bits */
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
@@ -2522,7 +2529,7 @@ genl_player_setup(void)
                         destroy_nhwindow(win), win = WIN_ERR;
 
                         if (choice == ROLE_NONE) {
-                            return 0; /* selected quit */
+                            goto setup_done; /* selected quit */
                         } else if (choice == RS_menu_arg(RS_GENDER)) {
                             GEND = k = ROLE_NONE;
                             nextpick = RS_GENDER;
@@ -2572,29 +2579,8 @@ genl_player_setup(void)
      */
     getconfirmation = (picksomething && pick4u != 'a' && !flags.randomall);
     while (getconfirmation) {
-        win = plsel_startmenu();
+        win = plsel_startmenu(screenheight, RS_filter); /* filter: not ROLE */
         any = cg.zeroany; /* zero out all bits */
-#if 0
-        start_menu(win, MENU_BEHAVE_STANDARD);
-        any.a_int = 0;
-        char plbuf[QBUFSZ];
-        if (!roles[ROLE].name.f
-            && ((roles[ROLE].allow & ROLE_GENDMASK)
-                == (ROLE_MALE | ROLE_FEMALE)))
-            Sprintf(plbuf, " %s", genders[GEND].adj);
-        else
-            *plbuf = '\0'; /* omit redundant gender */
-        Snprintf(pbuf, sizeof pbuf, "%s, %s%s %s %s", gp.plname,
-                 aligns[ALGN].adj, plbuf, races[RACE].adj,
-                 (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
-                                                   : roles[ROLE].name.m);
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, pbuf,
-                 MENU_ITEMFLAGS_NONE);
-        /* blank separator */
-        any.a_int = 0;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
-#endif
         /* [ynaq] menu choices */
         any.a_int = 1;
         add_menu(win, &nul_glyphinfo, &any, 'y', 0,
@@ -2621,7 +2607,7 @@ genl_player_setup(void)
 
         switch (choice) {
         default: /* 'q' or ESC */
-            return 0; /* quit */
+            goto setup_done; /* quit */
             break;
         case 3: { /* 'a' */
             /*
@@ -2631,11 +2617,11 @@ genl_player_setup(void)
              */
             int saveROLE, saveRACE, saveGEND, saveALGN;
 
-            iflags.renameinprogress = TRUE;
+            iflags.renameinprogress = TRUE; /* affects main() in unixmain.c */
             /* plnamesuffix() can change any or all of ROLE, RACE,
                GEND, ALGN; we'll override that and honor only the name */
             saveROLE = ROLE, saveRACE = RACE, saveGEND = GEND, saveALGN = ALGN;
-            *gp.plname = '\0';
+            gp.plname[0] = '\0';
             plnamesuffix(); /* calls askname() when gp.plname[] is empty */
             ROLE = saveROLE, RACE = saveRACE, GEND = saveGEND, ALGN = saveALGN;
             break; /* getconfirmation is still True */
@@ -2653,10 +2639,13 @@ genl_player_setup(void)
             getconfirmation = FALSE;
             break;
         }
-    }
-
+    } /* while 'getconfirmation' */
     /* Success! */
-    return 1;
+    result = 1;
+
+ setup_done:
+    gp.program_state.in_role_selection--;
+    return result;
 }
 
 static boolean
@@ -2713,9 +2702,41 @@ reset_role_filtering(void)
     return (n > 0) ? TRUE : FALSE;
 }
 
+/* the change in format when this extended role selection was converted from
+   tty-only to tty+curses+? made the role selection menu require two pages
+   on a traditional 24-line tty; that wasn't fair to tty, so squeeze out
+   some blank separator lines from the menu if that will make it fit on one */
+static int
+maybe_skip_seps(int rows, int aspect)
+{
+    int i, n = 0;
+
+    /* not much point to generalizing this to other aspects */
+    if (aspect != RS_ROLE)
+        return 0;
+    /*
+     * If there are one or two excess lines, setup_rolemenu() will omit
+     * the separator between 'random' and 'pick race first'.  If there are
+     * two, plsel_startmenu() will omit the one between role info so far
+     * ("<role> <race> ...") and the set of role entries.
+     */
+
+    n += 4; /* title and ensuing separator, role info so far and separator */
+    for (i = 0; roles[i].name.m; ++i)
+        if (ok_role(i, RACE, GEND, ALGN) && ok_race(i, RACE, GEND, ALGN)
+            && ok_gend(i, RACE, GEND, ALGN) && ok_align(i, RACE, GEND, ALGN))
+            ++n;
+    n += 2; /* 'random' and separator */
+    n += 5; /* race 1st, gender 1st, alignment 1st, reset filter, quit */
+    n += 1; /* footer/prompt */
+    if (rows > 0 && n > rows)
+        return n - rows;
+    return 0;
+}
+
 /* start a menu; show role aspects specified so far as a header line */
 static winid
-plsel_startmenu(void)
+plsel_startmenu(int ttyrows, int aspect)
 {
     char qbuf[QBUFSZ];
     winid win;
@@ -2730,7 +2751,7 @@ plsel_startmenu(void)
     rolename = (ROLE < 0) ? "<role>"
                : (GEND == 1 && roles[ROLE].name.f) ? roles[ROLE].name.f
                  : roles[ROLE].name.m;
-    if (!*gp.plname || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
+    if (!gp.plname[0] || ROLE < 0 || RACE < 0 || GEND < 0 || ALGN < 0) {
         /* "<role> <race.noun> <gender> <alignment>" */
         Sprintf(qbuf, "%.20s %.20s %.20s %.20s",
                 rolename,
@@ -2755,8 +2776,9 @@ plsel_startmenu(void)
     any = cg.zeroany;
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              qbuf, MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "", MENU_ITEMFLAGS_NONE);
+    if (maybe_skip_seps(ttyrows, aspect) != 2)
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                 "", MENU_ITEMFLAGS_NONE);
     return win;
 }
 
@@ -2930,7 +2952,7 @@ setup_algnmenu(
 #else /* !TTY_GRAPHICS */
 
 int
-genl_player_setup(void)
+genl_player_setup(int screenheight UNUSED)
 {
     return 0;
 }

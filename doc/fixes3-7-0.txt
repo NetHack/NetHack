@@ -1534,6 +1534,7 @@ curses: if a menu of objects contains at least one iron ball, and player is
 	not already in the midst of entering a count, recognize '0' as a
 	group accelerator rather than the start of a count
 curses: obey timed_delay option
+curses: support tty-style extended role/race/&c selection at start of new game
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

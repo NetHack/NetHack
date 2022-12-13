@@ -101,6 +101,7 @@ struct sinfo {
     int in_self_recover;        /* processsing orphaned level files */
     int in_checkpoint;          /* saving insurance checkpoint */
     int in_parseoptions;        /* in parseoptions */
+    int in_role_selection;      /* role/race/&c selection menus in progress */
     int config_error_ready;     /* config_error_add is ready, available */
     int beyond_savefile_load;   /* set when past savefile loading */
 #ifdef PANICLOG

@@ -575,7 +575,7 @@ tty_preference_update(const char *pref)
 void
 tty_player_selection(void)
 {
-    if (genl_player_setup())
+    if (genl_player_setup(ttyDisplay->rows))
         return;
 
     bail((char *) 0);
@@ -1859,14 +1859,22 @@ tty_dismiss_nhwindow(winid window)
     case NHW_MENU:
     case NHW_TEXT:
         if (cw->active) {
+            /* skip erasure if window_inited has been reset to 0 during
+               final run-down in case this is the end-of-game window;
+               the contents of that window should remain shown even when
+               the window itself has gone away */
             if (iflags.window_inited) {
-                /* otherwise dismissing the text endwin after other windows
-                 * are dismissed tries to redraw the map and panics.  since
-                 * the whole reason for dismissing the other windows was to
-                 * leave the ending window on the screen, we don't want to
-                 * erase it anyway.
-                 */
-                erase_menu_or_text(window, cw, FALSE);
+                boolean clearscreen = FALSE; /* just erase the menu */
+
+                /* during role/race/&c selection, menus are put up on top
+                   of the base window; we don't track what was there so
+                   can't refresh--force the screen to be cleared instead
+                   (affects dismissal of 'reset role filtering' menu if
+                   screen height forces that to need a second page) */
+                if (gp.program_state.in_role_selection)
+                    clearscreen = TRUE;
+
+                erase_menu_or_text(window, cw, clearscreen);
             }
             cw->active = 0;
         }

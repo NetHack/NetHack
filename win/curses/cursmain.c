@@ -275,7 +275,7 @@ void
 curses_player_selection(void)
 {
 #if 1
-    if (genl_player_setup())
+    if (genl_player_setup(0))
         return; /* success */
 
     /* quit/cancel */
