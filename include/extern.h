@@ -2417,6 +2417,8 @@ extern void role_init(void);
 extern const char *Hello(struct monst *);
 extern const char *Goodbye(void);
 extern const struct Race *character_race(short);
+extern void genl_player_selection(void);
+extern int genl_player_setup(void);
 
 /* ### rumors.c ### */
 

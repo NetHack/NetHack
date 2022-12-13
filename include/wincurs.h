@@ -154,7 +154,7 @@ extern int curses_read_char(void);
 extern void curses_toggle_color_attr(WINDOW *win, int color, int attr,
                                      int onoff);
 extern void curses_menu_color_attr(WINDOW *, int, int, int);
-extern void curses_bail(const char *mesg);
+ATTRNORETURN extern void curses_bail(const char *mesg) NORETURN;
 extern winid curses_get_wid(int type);
 extern char *curses_copy_of(const char *s);
 extern int curses_num_lines(const char *str, int width);

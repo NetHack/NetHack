@@ -365,6 +365,8 @@ curses_init_nhcolors(void)
 #endif
 }
 
+#if 0   /* curses_choose_character + curses_character_dialog no longer used */
+
 /* Allow player to pick character's role, race, gender, and alignment.
    Borrowed from the Gnome window port. */
 void
@@ -675,6 +677,7 @@ curses_choose_character(void)
             flags.initalign = sel;
         }
     }
+    return;
 }
 
 /* Prompt user for character race, role, alignment, or gender */
@@ -730,6 +733,8 @@ curses_character_dialog(const char **choices, const char *prompt)
     free((genericptr_t) selected);
     return ret;
 }
+
+#endif /* 0 */
 
 /* Initialize and display options appropriately */
 void

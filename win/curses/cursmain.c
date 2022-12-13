@@ -270,14 +270,21 @@ curses_init_nhwindows(int *argcp UNUSED,
     curses_display_splash_window();
 }
 
-/* Do a window-port specific player type selection. If player_selection()
-   offers a Quit option, it is its responsibility to clean up and terminate
-   the process. You need to fill in pl_character[0].
-*/
+/* Use the general role/race/&c selection originally implemented for tty. */
 void
 curses_player_selection(void)
 {
+#if 1
+    if (genl_player_setup())
+        return; /* success */
+
+    /* quit/cancel */
+    curses_bail((const char *) NULL);
+    /*NOTREACHED*/
+#else
+    /* still present cursinit.c but no longer used */
     curses_choose_character();
+#endif
 }
 
 
