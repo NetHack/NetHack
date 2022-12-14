@@ -115,16 +115,16 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 No, Yes, No, No, NoAlias,
                 "your character's name (e.g., name:Merlin-W)")
     NHOPTC(role, Advanced, PL_CSIZ, opt_in, set_gameview,
-                No, Yes, No, No, "character",
+                Yes, Yes, No, No, "character",
                 "your starting role (e.g., Barbarian, Valkyrie)")
     NHOPTC(race, Advanced, PL_CSIZ, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
+                Yes, Yes, No, No, NoAlias,
                 "your starting race (e.g., Human, Elf)")
     NHOPTC(gender, Advanced, 8, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
+                Yes, Yes, No, No, NoAlias,
                 "your starting gender (male or female)")
-    NHOPTC(align, Advanced, 8, opt_in, set_gameview,
-                No, Yes, No, No, NoAlias,
+    NHOPTC(alignment, Advanced, 8, opt_in, set_gameview,
+                Yes, Yes, No, No, "align",
                 "your starting alignment (lawful, neutral, or chaotic)")
     /* end of special ordering; remainder of entries are in alphabetical order
      */

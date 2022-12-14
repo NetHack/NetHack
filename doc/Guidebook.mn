@@ -3671,12 +3671,16 @@ applies only to new games.
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
 Persistent.
-.lp align
-Your starting alignment (align:lawful, align:neutral, or align:chaotic).
+.lp alignment
+Your starting alignment (\f(CRalign:lawful\fP, \f(CRalign:neutral\fP, or
+\f(CRalign:chaotic\fP).
 You may specify just the first letter.
-The default is to randomly pick an appropriate alignment.
-If you prefix the value with \(oq!\(cq or \(lqno\(rq, you will
-exclude that alignment from being picked randomly.
+Many roles and the non-human races restrict which alignments are allowed.
+See
+.op role
+for a description of how to use negation to exclude choices.
+.lp ""
+Default is random.
 Cannot be set with the \(oqO\(cq command.
 Persistent.
 .lp autodescribe
@@ -3877,14 +3881,21 @@ You should set this to something you find more appetizing than slime mold.
 Apples, oranges, pears, bananas, and melons
 already exist in NetHack, so don't use those.
 .lp gender
-Your starting gender (gender:male or gender:female).
+Your starting gender (\f(CRgender:male\fP or \f(CRgender:female\fP).
 You may specify just the first letter.
 Although you can
-still denote your gender using the \(lqmale\(rq and \(lqfemale\(rq
-options, the \(lqgender\(rq option will take precedence.
-The default is to randomly pick an appropriate gender.
-If you prefix the value with \(oq!\(cq or \(lqno\(rq, you will
-exclude that gender from being picked randomly.
+still denote your gender using either of the deprecated
+.op male
+and
+.op female
+options, if the
+.op gender
+option is also present it will take precedence.
+See
+.op role
+for a description of how to use negation to exclude choices.
+.lp ""
+Default is random.
 Cannot be set with the \(oqO\(cq command.
 Persistent.
 .lp "goldX   "
@@ -4287,23 +4298,50 @@ It does not affect the clairvoyance spell where pausing to examine revealed
 objects or monsters is less intrusive.
 Default is off.  Persistent.
 .lp "race    "
-Selects your race (for example, \(lqrace:human\(rq).
+Selects your race (for example, \f(CRrace:human\fP).
+Choices are \f(CRhuman\fP, \f(CRdwarf\fP, \f(CRelf\fP, \f(CRgnome\fP, and
+\f(CRorc\fP but most roles restrict which of the non-human races are allowed.
+See
+.op role
+for a description of how to use negation to exclude choices.
+.lp ""
 Default is random.
-If you prefix the value with \(oq!\(cq or \(lqno\(rq, you will
-exclude that race from being picked randomly.
 Cannot be set with the \(oqO\(cq command.
 Persistent.
 .lp rest_on_space
 Make the space bar a synonym for the \(oq.\(cq (#wait) command (default off).
 Persistent.
 .lp "role    "
-Pick your type of character (for example \(lqrole:Samurai\(rq);
-synonym for \(lqcharacter\(rq.
-See \(lqname\(rq for an alternate method of specifying your role.
-Normally only the first letter of the value is examined; \(oqr\(cq is an
-exception with \(lqRogue\(rq, \(lqRanger\(rq, and \(lqrandom\(rq values.
-If you prefix the value with \(oq!\(cq or \(lqno\(rq, you will
-exclude that role from being picked randomly.
+Pick your type of character (for example, \f(CRrole:Samurai\fP);
+synonym for
+.op character.
+See
+.op name
+for an alternate method of specifying your role.
+.\" Normally only the first letter of the value is examined; \(oqr\(cq is an
+.\" exception with \(lqRogue\(rq, \(lqRanger\(rq, and \(lqrandom\(rq values.
+.lp ""
+This option can also be used to limit selection when role is chosen
+randomly.
+Use a space-separated list of roles and either negate each one or negate
+the option itself instead.
+Negation is accomplished in the same manner as with \fIboolean options\fP,
+by prefixing the option or its value(s) with \(oq!\(cq or \(lqno\(rq.
+.BR 0
+Examples:
+.sd
+.ft CR \" constant-width Roman
+OPTIONS=role:!arc !bar !kni
+OPTIONS=!role:arc bar kni
+.ft \" revert to previous font
+.ed
+There can be multiple instances of the
+.op role
+option if they're all negations.
+.\" Only one positive value is allowed, and if present, it overrides any
+.\" negations.
+.lp ""
+Default is \f(CRrandom\fP.
 Cannot be set with the \(oqO\(cq command.
 Persistent.
 .lp roguesymset

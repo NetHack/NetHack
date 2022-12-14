@@ -575,7 +575,12 @@ check_misc_menu_command(char *opts, char *op UNUSED)
  */
 
 static int
-optfn_align(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_alignment(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -7463,38 +7468,84 @@ count_menucolors(void)
     return count;
 }
 
+/* parse 'role' or 'race' or 'gender' or 'alignment' */
 static boolean
-parse_role_opts(int optidx, boolean negated, const char *fullname,
-                char *opts, char **opp)
+parse_role_opts(
+    int optidx,
+    boolean negated,
+    const char *fullname,
+    char *opts,
+    char **opp)
 {
     char *op = *opp;
+    boolean ok = FALSE;
 
-    if (negated) {
-        bad_negation(fullname, FALSE);
-    } else if ((op = string_for_env_opt(fullname, opts, FALSE))
-                                        != empty_optstr) {
-        boolean val_negated = FALSE;
+    /*
+     * Accepts multiple forms
+     *  role:priest       -- play as priest
+     *  race:!orc         -- any race other than orc
+     *  role:!cav !mon    -- any role other than caveman/cavewoman or monk
+     *  !role:tour        -- any role other than tourist
+     *  !role:tou rog wiz -- any role other than tourist or rogue or wizard
+     * TODO: add support for
+     *  role:arc bar kni  -- only role archeologist or barbarian or knight
+     * Rejected:
+     *  role:sam !val     -+ invalid; need either positive or negative subset
+     *  !role:!sam        +- not a mixture of the two and not dual negation.
+     */
+    if ((op = string_for_env_opt(fullname, opts, FALSE)) != empty_optstr) {
+        char *sp;
+        boolean val_negated, prev_negated = FALSE, first = TRUE;
 
-        while ((*op == '!') || !strncmpi(op, "no", 2)) {
-            if (*op == '!')
-                op++;
-            else
-                op += 2;
-            val_negated = !val_negated;
-        }
-        if (val_negated) {
-            if (!setrolefilter(op)) {
-                config_error_add("Unknown negated parameter '%s'", op);
+        while (*op) {
+            val_negated = FALSE;
+            while ((*op == '!') || !strncmpi(op, "no", 2)) {
+                val_negated = !val_negated;
+                op += (*op == '!') ? 1 : (op[2] != '-') ? 2 : 3;
+            }
+            if (!*op) {
+                config_error_add("Negated nothing for '%s'", fullname);
                 return FALSE;
             }
-        } else {
-            if (duplicate && !allopt[optidx].dupeok)
-                complain_about_duplicate(optidx);
-            *opp = op;
-            return TRUE;
+            if (!first) {
+                if ((val_negated ^ prev_negated)
+                    || (negated && val_negated)) {
+                    config_error_add("Invalid mixed negation for '%s%s'",
+                                     negated ? "!" : "", fullname);
+                    return FALSE;
+                } else if (!negated && !val_negated) {
+                    config_error_add(
+                    "Multiple role values only allowed when list is negated");
+                    return FALSE;
+                }
+            }
+            first = FALSE;
+            prev_negated = val_negated;
+
+            sp = strchr(op, ' ');
+            if (sp)
+                *sp = '\0';
+            if (val_negated || negated) {
+                if (!setrolefilter(op)) {
+                    config_error_add("Invalid '%s'", fullname);
+                    return FALSE;
+                }
+            } else {
+                if (duplicate && !allopt[optidx].dupeok)
+                    complain_about_duplicate(optidx);
+                *opp = op;
+                ok = TRUE;
+            }
+
+            if (sp) {
+                *sp = ' ';
+                op = sp + 1;
+            } else {
+                op += strlen(op); /* break; */
+            }
         }
     }
-    return FALSE;
+    return ok;
 }
 
 /* Check if character c is illegal as a menu command key */
