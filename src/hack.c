@@ -462,8 +462,10 @@ moverock(void)
                            != 0)
                        && onshopbill(otmp, shkp, TRUE)) {
                 subfrombill(otmp, shkp);
-            } else if (otmp->unpaid && !*in_rooms(rx, ry, SHOPBASE)
-                       && *in_rooms(sx, sy, SHOPBASE)) {
+            } else if (otmp->unpaid
+                       && (shkp = find_objowner(otmp, sx, sy)) != 0
+                       && !strchr(in_rooms(rx, ry, SHOPBASE),
+                                  ESHK(shkp)->shoproom)) {
                 /* once the boulder is fully out of the shop, so that it's
                  * impossible to change your mind and push it back in without
                  * leaving and triggering Kops, switch it to stolen_value */
