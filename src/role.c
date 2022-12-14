@@ -1613,7 +1613,7 @@ plnamesuffix(void)
                contains a username with dash(es) in it and is usually 0 */
             i = ((eptr = strchr(gp.plname + gp.plnamelen, '-')) != 0)
                 ? (int) (eptr - gp.plname)
-                : Strlen(gp.plname);
+                : (int) Strlen(gp.plname);
             /* look for plname[] in the 'genericusers' space-separated list */
             if (findword(sysopt.genericusers, gp.plname, i, FALSE))
                 /* it's generic; remove it so that askname() will be called */
