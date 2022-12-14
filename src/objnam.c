@@ -621,34 +621,21 @@ xname_flags(
         if (is_boots(obj) || is_gloves(obj))
             Strcpy(buf, "pair of ");
 
-        if (obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD
-            && !dknown) {
-            Strcpy(buf, "shield");
-            break;
-        }
-        if (obj->otyp == SHIELD_OF_REFLECTION && !dknown) {
-            Strcpy(buf, "smooth shield");
-            break;
+        if (!dknown) {
+            if (obj->otyp >= ELVEN_SHIELD && obj->otyp <= ORCISH_SHIELD) {
+                Strcpy(buf, "shield");
+                break;
+            } else if (obj->otyp == SHIELD_OF_REFLECTION) {
+                Strcpy(buf, "smooth shield");
+                break;
+            }
         }
 
-        if (nn) {
+        if (nn)
             Strcat(buf, actualn);
-        } else if (un) {
-            if (is_boots(obj))
-                Strcat(buf, boots_simple_name(obj));
-            else if (is_gloves(obj))
-                Strcat(buf, gloves_simple_name(obj));
-            else if (is_cloak(obj))
-                Strcpy(buf, cloak_simple_name(obj));
-            else if (is_helmet(obj))
-                Strcpy(buf, helm_simple_name(obj));
-            else if (is_shield(obj))
-                Strcpy(buf, shield_simple_name(obj));
-            else
-                Strcpy(buf, "armor");
-            Strcat(buf, " called ");
-            Strcat(buf, un);
-        } else
+        else if (un)
+            Sprintf(eos(buf), "%s called %s", armor_simple_name(obj), un);
+        else
             Strcat(buf, dn);
         break;
     case FOOD_CLASS:
@@ -3071,6 +3058,7 @@ static const struct alt_spellings {
     { "gauntlets of ogre power", GAUNTLETS_OF_POWER },
     { "gauntlets of giant strength", GAUNTLETS_OF_POWER },
     { "elven chain mail", ELVEN_MITHRIL_COAT },
+    { "silver shield", SHIELD_OF_REFLECTION },
     { "potion of sleep", POT_SLEEPING },
     { "scroll of recharging", SCR_CHARGING },
     { "recharging", SCR_CHARGING },
@@ -4979,6 +4967,42 @@ Japanese_item_name(int i)
         j++;
     }
     return (const char *) 0;
+}
+
+const char *
+armor_simple_name(struct obj *armor)
+{
+    const char *result = 0;
+    unsigned armcat = objects[armor->otyp].oc_armcat;
+
+    switch (armcat) {
+    case ARM_SUIT:
+        result = suit_simple_name(armor);
+        break;
+    case ARM_CLOAK:
+        result = cloak_simple_name(armor);
+        break;
+    case ARM_HELM:
+        result = helm_simple_name(armor);
+        break;
+    case ARM_GLOVES:
+        result = gloves_simple_name(armor);
+        break;
+    case ARM_BOOTS:
+        result = boots_simple_name(armor);
+        break;
+    case ARM_SHIELD:
+        result = shield_simple_name(armor);
+        break;
+    case ARM_SHIRT:
+        result = shirt_simple_name(armor);
+        break;
+    default:
+        result = simpleonames(armor);
+        impossible("unknown armor category (%s => %u)", result, armcat);
+        break;
+    }
+    return result;
 }
 
 const char *

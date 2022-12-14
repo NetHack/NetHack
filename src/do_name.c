@@ -1489,6 +1489,9 @@ call_ok(struct obj *obj)
     if (!obj || !objtyp_is_callable(obj->otyp))
         return GETOBJ_EXCLUDE;
 
+    if (!interesting_to_discover(obj->otyp))
+        return GETOBJ_DOWNPLAY;
+
     return GETOBJ_SUGGEST;
 }
 

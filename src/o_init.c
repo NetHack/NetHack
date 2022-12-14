@@ -8,7 +8,6 @@
 static void setgemprobs(d_level *);
 static void shuffle(int, int, boolean);
 static void shuffle_all(void);
-static boolean interesting_to_discover(int);
 static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *oclass_to_name(char, char *);
 
@@ -447,8 +446,9 @@ undiscover_object(int oindx)
         register boolean found = FALSE;
 
         /* find the object; shift those behind it forward one slot */
-        for (dindx = gb.bases[acls]; dindx < NUM_OBJECTS && gd.disco[dindx] != 0
-                                  && objects[dindx].oc_class == acls;
+        for (dindx = gb.bases[acls];
+             dindx < NUM_OBJECTS && gd.disco[dindx] != 0
+                 && objects[dindx].oc_class == acls;
              dindx++)
             if (found)
                 gd.disco[dindx - 1] = gd.disco[dindx];
@@ -467,7 +467,7 @@ undiscover_object(int oindx)
     }
 }
 
-static boolean
+boolean
 interesting_to_discover(int i)
 {
     /* Pre-discovered objects are now printed with a '*' */
