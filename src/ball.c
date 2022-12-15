@@ -22,7 +22,7 @@ static struct breadcrumbs bcpbreadcrumbs = {0}, bcubreadcrumbs = {0};
 void
 ballrelease(boolean showmsg)
 {
-    if (carried(uball)) {
+    if (carried(uball) && !welded(uball)) {
         if (showmsg)
             pline("Startled, you drop the iron ball.");
         if (uwep == uball)
@@ -43,6 +43,9 @@ void
 ballfall(void)
 {
     boolean gets_hit;
+
+    if (uball && carried(uball) && welded(uball))
+        return;
 
     gets_hit = (((uball->ox != u.ux) || (uball->oy != u.uy))
                 && ((uwep == uball) ? FALSE : (boolean) rn2(5)));
@@ -996,7 +999,7 @@ drag_down(void)
      */
     forward = carried(uball) && (uwep == uball || !uwep || !rn2(3));
 
-    if (carried(uball))
+    if (carried(uball) && !welded(uball))
         You("lose your grip on the iron ball.");
 
     cls();  /* previous level is still displayed although you

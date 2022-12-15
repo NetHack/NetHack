@@ -595,6 +595,19 @@ canletgo(struct obj *obj, const char *word)
             Norep("You cannot %s %s you are wearing.", word, something);
         return FALSE;
     }
+    if (obj == uwep && welded(uwep)) {
+        /* no weldmsg(), so uwep->bknown might become set silently
+           if word is "" */
+        if (*word) {
+            const char *hand = body_part(HAND);
+
+            if (bimanual(uwep))
+                hand = makeplural(hand);
+            Norep("You cannot %s %s welded to your %s.", word, something,
+                  hand);
+        }
+        return FALSE;
+    }
     if (obj->otyp == LOADSTONE && obj->cursed) {
         /* getobj() kludge sets corpsenm to user's specified count
            when refusing to split a stack of cursed loadstones */
@@ -1612,7 +1625,8 @@ goto_level(
                 You("fall down the %s.", ga.at_ladder ? "ladder" : "stairs");
                 if (Punished) {
                     drag_down();
-                    ballrelease(FALSE);
+                    if (!welded(uball))
+                        ballrelease(FALSE);
                 }
                 /* falling off steed has its own losehp() call */
                 if (u.usteed)
@@ -1632,7 +1646,7 @@ goto_level(
     } else { /* trap door or level_tele or In_endgame */
         u_on_rndspot((up ? 1 : 0) | (was_in_W_tower ? 2 : 0));
         if (falling) {
-            if (Punished)
+            if (Punished && !welded(uball))
                 ballfall();
             selftouch("Falling, you");
             do_fall_dmg = TRUE;

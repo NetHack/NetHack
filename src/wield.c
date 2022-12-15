@@ -1030,11 +1030,15 @@ void
 weldmsg(struct obj *obj)
 {
     long savewornmask;
+    const char *hand = body_part(HAND);
 
+    if (bimanual(obj))
+        hand = makeplural(hand);
     savewornmask = obj->owornmask;
-    pline("%s welded to your %s!", Yobjnam2(obj, "are"),
-          bimanual(obj) ? (const char *) makeplural(body_part(HAND))
-                        : body_part(HAND));
+    obj->owornmask = 0L; /* suppress doname()'s "(weapon in hand)";
+                          * Yobjnam2() doesn't actually need this because
+                          * it is based on xname() rather than doname() */
+    pline("%s welded to your %s!", Yobjnam2(obj, "are"), hand);
     obj->owornmask = savewornmask;
 }
 

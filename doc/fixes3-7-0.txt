@@ -1068,6 +1068,8 @@ if hero's action caused engulfer to expel swallowed hero, it might do so onto
 throwing recoil while levitating could send hero out of shop while carrying
 	unpaid items, triggering sanity check warnings; once outside, taking
 	a step other than back into the shop was treated as a robbery
+if punished and iron ball was cursed and wielded--so welded to hand--falling
+	when doors would drop it instead of keeping it welded
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
