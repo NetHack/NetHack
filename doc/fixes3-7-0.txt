@@ -1070,6 +1070,8 @@ throwing recoil while levitating could send hero out of shop while carrying
 	a step other than back into the shop was treated as a robbery
 if punished and iron ball was cursed and wielded--so welded to hand--falling
 	when doors would drop it instead of keeping it welded
+if player's run-time config file had OPTIONS=role:Val and the environment had
+	NETHACKOPTIONS='role:!Val' the hero would be a Val instead of !Val
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

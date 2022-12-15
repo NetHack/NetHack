@@ -7477,6 +7477,7 @@ parse_role_opts(
     char *opts,
     char **opp)
 {
+    static char role_random[] = "random"; /* not 'const' but never modified */
     char *op = *opp;
     boolean ok = FALSE;
 
@@ -7535,6 +7536,8 @@ parse_role_opts(
                     complain_about_duplicate(optidx);
                 *opp = op;
                 ok = TRUE;
+                /* don't return yet; value might be a list which follows
+                   this with something else, making it invalid */
             }
 
             if (sp) {
@@ -7543,6 +7546,15 @@ parse_role_opts(
             } else {
                 op += strlen(op); /* break; */
             }
+        }
+
+        if (!ok) {
+            /* '!ok' without config_error_add() implies a valid negation;
+               in case NETHACKOPTIONS=role:!Val overrides config file
+               OPTIONS=role:Val we need a positive result which will yield
+               someting other than ROLE_NONE from str2role(),str2race(),&c */
+            *opp = role_random;
+            ok = TRUE;
         }
     }
     return ok;
