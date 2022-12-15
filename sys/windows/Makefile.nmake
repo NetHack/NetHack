@@ -851,7 +851,9 @@ scall  =
 #      but variadic argument ‘position’ has type ‘type’
 # 4820 padding in struct
 ctmpflags = $(ctmpflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44777 -wd4820
+!IF ($(VSVER) >= 2019)
 ctmpflags = $(ctmpflags) -w44774
+!ENDIF
 !ENDIF
 
 #More verbose warning output options below
