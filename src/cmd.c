@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1661240704 2022/08/23 07:45:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.616 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1671222065 2022/12/16 20:21:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.650 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6558,7 +6558,7 @@ paranoid_query(boolean be_paranoid, const char *prompt)
     if (be_paranoid) {
         char pbuf[BUFSZ], qbuf[QBUFSZ], ans[BUFSZ];
         const char *promptprefix = "",
-                *responsetype = ParanoidConfirm ? "(yes|no)" : "(yes) [no]";
+                *responsetype = ParanoidConfirm ? "[yes|no]" : "[yes|n] (n)";
         int k, trylimit = 6; /* 1 normal, 5 more with "Yes or No:" prefix */
 
         copynchars(pbuf, prompt, BUFSZ - 1);
@@ -6585,9 +6585,9 @@ paranoid_query(boolean be_paranoid, const char *prompt)
                 break;
             promptprefix = "\"Yes\" or \"No\": ";
         } while (ParanoidConfirm && strcmpi(ans, "no") && --trylimit);
-    } else
+    } else {
         confirmed_ok = (yn(prompt) == 'y');
-
+    }
     return confirmed_ok;
 }
 
