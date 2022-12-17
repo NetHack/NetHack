@@ -479,7 +479,8 @@ extern void deferred_goto(void);
 extern boolean revive_corpse(struct obj *);
 extern void revive_mon(union any *, long);
 extern void zombify_mon(union any *, long);
-extern boolean cmd_safety_prevention(const char *, const char *, int *);
+extern boolean cmd_safety_prevention(const char *, const char *,
+                                     const char *, int *);
 extern int donull(void);
 extern int dowipe(void);
 extern void legs_in_no_shape(const char *, boolean);

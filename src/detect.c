@@ -1948,7 +1948,7 @@ dosearch0(int aflag) /* intrinsic autosearch vs explicit searching */
 int
 dosearch(void)
 {
-    if (cmd_safety_prevention("another search",
+    if (cmd_safety_prevention("Searching", "another search",
                           "You already found a monster.",
                           &ga.already_found_flag))
         return ECMD_OK;

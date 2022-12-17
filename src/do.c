@@ -13,6 +13,7 @@ static void dosinkring(struct obj *);
 static int drop(struct obj *);
 static int menudrop_split(struct obj *, long);
 static boolean engulfer_digests_food(struct obj *);
+static boolean danger_uprops(void);
 static int wipeoff(void);
 static int menu_drop(int);
 static NHFILE *currentlevel_rewrite(void);
@@ -2132,19 +2133,34 @@ zombify_mon(anything *arg, long timeout)
     }
 }
 
-boolean
-cmd_safety_prevention(const char *cmddesc, const char *act, int *flagcounter)
+/* return TRUE if hero properties are dangerous to hero */
+static boolean
+danger_uprops(void)
 {
-    if (flags.safe_wait && !iflags.menu_requested
-        && !gm.multi && monster_nearby()) {
+    return (((Stoned && !Stone_resistance)
+             || Slimed
+             || ((Sick & SICK_NONVOMITABLE) && !Sick_resistance)));
+}
+
+boolean
+cmd_safety_prevention(const char *ucverb, const char *cmddesc,
+                      const char *act, int *flagcounter)
+{
+    if (flags.safe_wait && !iflags.menu_requested && !gm.multi) {
         char buf[QBUFSZ];
 
         buf[0] = '\0';
         if (iflags.cmdassist || !(*flagcounter)++)
             Sprintf(buf, "  Use '%s' prefix to force %s.",
                     visctrl(cmd_from_func(do_reqmenu)), cmddesc);
-        Norep("%s%s", act, buf);
-        return TRUE;
+
+        if (monster_nearby()) {
+            Norep("%s%s", act, buf);
+            return TRUE;
+        } else if (danger_uprops()) {
+            Norep("%s doesn't feel like a good idea right now.", ucverb);
+            return TRUE;
+        }
     }
     *flagcounter = 0;
     return FALSE;
@@ -2155,7 +2171,7 @@ cmd_safety_prevention(const char *cmddesc, const char *act, int *flagcounter)
 int
 donull(void)
 {
-    if (cmd_safety_prevention("a no-op (to rest)",
+    if (cmd_safety_prevention("Waiting", "a no-op (to rest)",
                           "Are you waiting to get hit?",
                           &gd.did_nothing_flag))
         return ECMD_OK;
