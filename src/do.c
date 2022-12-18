@@ -2137,9 +2137,10 @@ zombify_mon(anything *arg, long timeout)
 static boolean
 danger_uprops(void)
 {
-    return (((Stoned && !Stone_resistance)
-             || Slimed
-             || ((Sick & SICK_NONVOMITABLE) && !Sick_resistance)));
+    return ((Stoned && !Stone_resistance)
+            || Slimed
+            || Strangled
+            || (Sick && !Sick_resistance));
 }
 
 boolean

@@ -174,8 +174,8 @@ revival via undead turning of corpse carried by hero said "your <mon> corpse
 	comes alive" even when revived monster was undead
 prevent searching or waiting next to a hostile monster if boolean option
 	safe_wait is on - override with 'm'
-prevent searching or waiting if hero is slimed, stoning, or deadly ill
-	if safe_wait is on - override with 'm'
+prevent searching or waiting if hero is slimed, stoning, strangled,
+	or deadly ill if safe_wait is on - override with 'm'
 allow random mimics to show up mimicing more furniture than just stairs
 scatter exploding bag of holding contents instead of outright deleting them
 male hero poly'd into nymph chooses charm vs seduce message based on being
