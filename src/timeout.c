@@ -851,14 +851,21 @@ fall_asleep(int how_long, boolean wakeup_msg)
     stop_occupation();
     nomul(how_long);
     gm.multi_reason = "sleeping";
-    /* generally don't notice sounds while sleeping */
+#if 0   /* this was broken; the fix for 'how_long' will result in changed
+         * behavior for sounds that don't go through You_hear() so needs
+         * testing */
+    /* You_hear() produces "You dream that you hear ..." when sleeping;
+       other sound messages will either honor or ignore Deaf */
     if (wakeup_msg && gm.multi == how_long) {
         /* caller can follow with a direct call to Hear_again() if
            there's a need to override this when wakeup_msg is true */
-        incr_itimeout(&HDeaf, how_long);
+        /* 3.7: how_long is negative so wasn't actually incrementing the
+           deafness timeout when it used to be passed as-is */
+        incr_itimeout(&HDeaf, abs(how_long));
         gc.context.botl = TRUE;
         ga.afternmv = Hear_again; /* this won't give any messages */
     }
+#endif
     /* early wakeup from combat won't be possible until next monster turn */
     u.usleep = gm.moves;
     gn.nomovemsg = wakeup_msg ? "You wake up." : You_can_move_again;

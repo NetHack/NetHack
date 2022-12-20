@@ -351,7 +351,7 @@ You_hear(const char *line, ...)
     va_list the_args;
     char *tmp;
 
-    if (Deaf || !flags.acoustics)
+    if ((Deaf && !Unaware) || !flags.acoustics)
         return;
     va_start(the_args, line);
     if (Underwater)
