@@ -660,19 +660,12 @@ dismount_steed(
             /* still no spot; last resort is any spot within bounds */
             (void) enexto(&steedcc, u.ux, u.uy, &mons[PM_GHOST]);
     }
-    if (!m_at(steedcc.x, steedcc.y)) {
-        if (mtmp->mhp < 1) /* make sure it isn't negative so that */
-            mtmp->mhp = 0; /* ++mhp produces a positive value     */
-        mtmp->mhp++; /* force at least one hit point, possibly resurrecting
-                      * to avoid impossible("placing defunct monst on map") */
-        place_monster(mtmp, steedcc.x, steedcc.y);
-        mtmp->mhp--; /* take the extra hit point away: cancel resurrection
-                      * if former steed has died */
-    } else {
-        impossible("Dismounting: can't place former steed on map.");
-    }
 
     if (!DEADMONSTER(mtmp)) {
+        gi.in_steed_dismounting++;
+        place_monster(mtmp, steedcc.x, steedcc.y);
+        gi.in_steed_dismounting--;
+
         /* if for bones, there's no reason to place the hero;
            we want to make room for potential ghost, so move steed */
         if (reason == DISMOUNT_BONES) {
@@ -855,7 +848,7 @@ place_monster(struct monst* mon, int x, int y)
                    minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
         x = y = 0;
     }
-    if (mon == u.usteed
+    if ((mon == u.usteed && !gi.in_steed_dismounting)
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
         describe_level(buf, 0);

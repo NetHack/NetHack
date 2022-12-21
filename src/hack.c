@@ -2897,7 +2897,8 @@ spoteffects(boolean pick)
                                     : (time_left < 10L) ? 1
                                       : 0]);
     }
-    if ((mtmp = m_at(u.ux, u.uy)) && !u.uswallow) {
+
+    if ((mtmp = m_at(u.ux, u.uy)) != 0 && !u.uswallow) {
         mtmp->mundetected = mtmp->msleeping = 0;
         switch (mtmp->data->mlet) {
         case S_PIERCER:

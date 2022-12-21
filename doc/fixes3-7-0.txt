@@ -1075,6 +1075,8 @@ if punished and iron ball was cursed and wielded--so welded to hand--falling
 if player's run-time config file had OPTIONS=role:Val and the environment had
 	NETHACKOPTIONS='role:!Val' the hero would be a Val instead of !Val
 sleeping or unconscious hero attacked by Medusa would meet her gaze
+if a trap killed both the hero's steed and the hero an impossible "dmonsfree:
+	N+1 removed doesn't match N pending" warning could occur
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

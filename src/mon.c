@@ -2465,6 +2465,11 @@ m_detach(
         mtmp->mstate |= MON_DETACH;
         iflags.purge_monsters++;
     }
+
+    /* hero is thrown from his steed when it dies or gets genocided */
+    if (mtmp == u.usteed)
+        dismount_steed(DISMOUNT_GENERIC);
+    return;
 }
 
 /* give a life-saved monster a reasonable mhpmax value in case it has
@@ -2636,10 +2641,6 @@ mondead(struct monst *mtmp)
     if (mtmp->isgd && !grddead(mtmp))
         return;
 
-    /* Player is thrown from his steed when it dies */
-    if (mtmp == u.usteed)
-        dismount_steed(DISMOUNT_GENERIC);
-
     mptr = mtmp->data; /* save this for m_detach() */
     /* restore chameleon, lycanthropes to true form at death */
     if (mtmp->cham >= LOW_PM) {
@@ -2740,6 +2741,7 @@ mondead(struct monst *mtmp)
 
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
+
     m_detach(mtmp, mptr);
     return;
 }
@@ -2834,9 +2836,6 @@ mongone(struct monst* mdef)
        his temporary corridor to/from the vault has been removed */
     if (mdef->isgd && !grddead(mdef))
         return;
-    /* hero is thrown from his steed when it disappears */
-    if (mdef == u.usteed)
-        dismount_steed(DISMOUNT_GENERIC);
     /* stuck to you? release */
     unstuck(mdef);
     /* drop special items like the Amulet so that a dismissed Kop or nurse
