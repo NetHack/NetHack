@@ -771,7 +771,7 @@ characteristics_enlightenment(int mode, int final)
     char buf[BUFSZ];
 
     enlght_out("");
-    Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
+    Sprintf(buf, "%sCharacteristics:", !final ? "" : "Final ");
     enlght_out(buf);
 
     /* bottom line order */
