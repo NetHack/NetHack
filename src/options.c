@@ -85,8 +85,22 @@ enum window_option_types {
     TEXT_OPTION
 };
 
-enum {optn_silenterr = -1, optn_err = 0, optn_ok};
-enum requests {do_nothing, do_init, do_set, do_handler, get_val, get_cnf_val};
+enum optn_result {
+    optn_silenterr = -1, optn_err = 0, optn_ok
+};
+enum requests {
+    do_nothing, do_init, do_set, do_handler, get_val, get_cnf_val
+};
+/* these aren't the same as set_xxx in optlist.h */
+enum option_phases {
+    builtin_opt,  /* compiled-in default value of an option */
+    syscf_opt,    /* sysconf setting of an option, overrides builtin */
+    rc_file_opt,  /* player's run-time config file setting, overrides syscf */
+    environ_opt,  /* player's environment NETHACKOPTIONS, overrides rc_file */
+    cmdline_opt,  /* program invocation command-line, overrides environ */
+    play_opt,     /* 'O' command, interactively set so overrides all */
+    num_opt_phases
+};
 
 static struct allopt_t allopt[SIZE(allopt_init)];
 
@@ -105,10 +119,11 @@ extern char ttycolors[CLR_MAX]; /* in sys/msdos/video.c */
 #endif
 
 static char empty_optstr[] = { '\0' };
-boolean duplicate, using_alias;
+static boolean duplicate, using_alias;
 static boolean give_opt_msg = TRUE;
 
 static boolean opt_set_in_config[OPTCOUNT];
+static char *roleoptvals[4][num_opt_phases]; /* 4: role,race,gend,algn */
 
 static NEARDATA const char *OptS_type[OptS_Advanced+1] = {
     "General", "Behavior", "Map", "Status", "Advanced"
@@ -281,6 +296,10 @@ static void complain_about_duplicate(int);
 static int length_without_val(const char *, int len);
 static void determine_ambiguities(void);
 static int check_misc_menu_command(char *, char *);
+static int opt2roleopt(int);
+static char *getoptstr(int, int);
+static void saveoptstr(int, const char *);
+static void unsaveoptstr(int, int);
 static int shared_menu_optfn(int, int, boolean, char *, char *);
 static int spcfn_misc_menu_cmd(int, int, boolean, char *, char *);
 
@@ -295,7 +314,8 @@ static boolean test_regex_pattern(const char *, const char *);
 static boolean add_menu_coloring_parsed(const char *, int, int);
 static void free_one_menu_coloring(int);
 static int count_menucolors(void);
-static boolean parse_role_opts(int, boolean, const char *, char *, char **);
+static boolean parse_role_opt(int, boolean, const char *, char *, char **);
+static char *get_cnf_role_opt(int);
 static unsigned int longest_option_name(int, int);
 static int doset_simple_menu(void);
 static void doset_add_menu(winid, const char *, const char *, int, int);
@@ -396,10 +416,7 @@ parseoptions(
     }
     negated = FALSE;
     while ((*opts == '!') || !strncmpi(opts, "no", 2)) {
-        if (*opts == '!')
-            opts++;
-        else
-            opts += 2;
+        opts += (*opts == '!') ? 1 : (opts[2] != '-') ? 2 : 3;
         negated = !negated;
     }
     optlen = (int) strlen(opts);
@@ -566,6 +583,141 @@ check_misc_menu_command(char *opts, char *op UNUSED)
     return -1;
 }
 
+static int roleopt2opt[4] = {
+    opt_role, opt_race, opt_gender, opt_alignment
+};
+
+/* role => 0, race => 1, gender => 2, alignment =>3 */
+static int
+opt2roleopt(int roleopt)
+{
+    switch (roleopt) {
+    case opt_role:
+        return 0;
+    case opt_race:
+        return 1;
+    case opt_gender:
+        return 2;
+    case opt_alignment:
+        return 3;
+    default:
+        break;
+    }
+    return 0;
+}
+
+/* fetch saved option string for a particular option phase */
+static char *
+getoptstr(int optidx, int ophase)
+{
+    int roleoptindx = opt2roleopt(optidx);
+
+    if (ophase == num_opt_phases) { /* any source */
+        int phase;
+
+        /* find non-Null, in order optvals[][play_opt], [cmdline_opt],
+           [environ_opt], [rc_file_opt], [syscf_opt], [builtin_opt] */
+        for (phase = num_opt_phases; phase >= 0; --phase)
+            if (roleoptvals[roleoptindx][phase]) {
+                ophase = phase;
+                break;
+            }
+    }
+    return roleoptvals[roleoptindx][ophase];
+}
+
+/* to track some unparsed option settings in case #saveoptions needs them */
+static void
+saveoptstr(int optidx, const char *optstr)
+{
+    int phase = go.opt_phase, roleoptindx = opt2roleopt(optidx);
+    const char *p = strchr(optstr, ':'), *q = strchr(optstr, '=');
+
+    /* strip away "optname:" from optname:optstr */
+    if (!p || (q && q < p))
+        p = q;
+    if (p)
+        optstr = p + 1;
+
+    if (roleoptvals[roleoptindx][phase])
+        free((genericptr_t) roleoptvals[roleoptindx][phase]);
+    roleoptvals[roleoptindx][phase] = dupstr(optstr);
+}
+
+/* discard specific saved option string */
+static void
+unsaveoptstr(int optidx, int ophase)
+{
+    int roleoptindx = opt2roleopt(optidx);
+
+    if (roleoptvals[roleoptindx][ophase])
+        free((genericptr_t) roleoptvals[roleoptindx][ophase]),
+        roleoptvals[roleoptindx][ophase] = 0;
+}
+
+/* discard all saved option strings */
+void
+freeroleoptvals(void)
+{
+    int i, j;
+
+    for (i = 0; i < 4; ++i)
+        for (j = 0; j < num_opt_phases; ++j)
+            unsaveoptstr(roleopt2opt[i], j);
+}
+
+#if 0   /* not needed */
+
+/* put roleoptvals[][] into save file; will be needed if #saveoptions
+   takes place after restore */
+void
+saveoptvals(NHFILE *nhfp)
+{
+    if (perform_bwrite(nhfp)) {
+        char *val;
+        unsigned len;
+        int i, j;
+
+        for (i = 0; i < 4; ++i)
+            for (j = 0; j < num_opt_phases; ++j) {
+                val = roleoptvals[i][j];
+                len = val ? Strlen(val) + 1 : 0;
+                if (nhfp->structlevel) {
+                    bwrite(nhfp->fd, (genericptr_t) &len, sizeof len);
+                    if (val)
+                        bwrite(nhfp->fd, (genericptr_t) val, len);
+                }
+            }
+    }
+    if (release_data(nhfp))
+        freeroleoptvals();
+}
+
+/* get roleoptvals[][] from save file */
+void
+restoptvals(NHFILE *nhfp)
+{
+    char *val;
+    unsigned len;
+    int i, j;
+
+    if (nhfp->structlevel) {
+        for (i = 0; i < 4; ++i)
+            for (j = 0; j < num_opt_phases; ++j) {
+                /* len includes terminating '\0' for non-Null values */
+                mread(nhfp->fd, (genericptr_t) &len, sizeof len);
+                if (len) {
+                    val = roleoptvals[i][j] = (char *) alloc(len);
+                    mread(nhfp->fd, (genericptr_t) val, len);
+                } else {
+                    roleoptvals[i][j] = NULL;
+                }
+            }
+    }
+}
+
+#endif /* 0 */
+
 /*
  **********************************
  *
@@ -586,19 +738,28 @@ optfn_alignment(
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
+        /* alignment:string */
+        if (!parse_role_opt(optidx, negated, allopt[optidx].name, opts, &op))
+            return optn_silenterr;
+
+        if (*op != '!') {
             if ((flags.initalign = str2align(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
             }
-        } else
-            return optn_silenterr;
+            saveoptstr(optidx, rolestring(flags.initalign, aligns, adj));
+        }
         return optn_ok;
     }
-    if (req == get_val || req == get_cnf_val) {
+    if (req == get_val) {
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initalign, aligns, adj));
+        return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        op = get_cnf_role_opt(optidx);
+        Strcpy(opts, op ? op : "none");
         return optn_ok;
     }
     return optn_ok;
@@ -1423,27 +1584,40 @@ optfn_fruit(int optidx UNUSED, int req, boolean negated,
 }
 
 static int
-optfn_gender(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_gender(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
         /* gender:string */
-        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
+        if (!parse_role_opt(optidx, negated, allopt[optidx].name, opts, &op))
+            return optn_silenterr;
+
+        if (*op != '!') {
             if ((flags.initgend = str2gend(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
-            } else
-                flags.female = flags.initgend;
-        } else
-            return optn_silenterr;
+            }
+            flags.female = flags.initgend;
+            saveoptstr(optidx, rolestring(flags.initgend, genders, adj));
+        }
         return optn_ok;
     }
-    if (req == get_val || req == get_cnf_val) {
+    if (req == get_val) {
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initgend, genders, adj));
+        return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        op = get_cnf_role_opt(optidx);
+        Strcpy(opts, op ? op : "none");
         return optn_ok;
     }
     return optn_ok;
@@ -2906,27 +3080,40 @@ optfn_playmode(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_race(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_race(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
         /* race:string */
-        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
+        if (!parse_role_opt(optidx, negated, allopt[optidx].name, opts, &op))
+            return optn_silenterr;
+
+        if (*op != '!') {
             if ((flags.initrace = str2race(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
-            } else /* Backwards compatibility */
-                gp.pl_race = *op;
-        } else
-            return optn_silenterr;
+            }
+            gp.pl_race = *op; /* Backwards compatibility */
+            saveoptstr(optidx, rolestring(flags.initrace, races, noun));
+        }
         return optn_ok;
     }
-    if (req == get_val || req == get_cnf_val) {
+    if (req == get_val) {
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initrace, races, noun));
+        return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        op = get_cnf_role_opt(optidx);
+        Strcpy(opts, op ? op : "none");
         return optn_ok;
     }
     return optn_ok;
@@ -2961,7 +3148,8 @@ optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s",
-                gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name : "default");
+                gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name
+                                         : "default");
         if (gc.currentgraphics == ROGUESET && gs.symset[ROGUESET].name)
             Strcat(opts, ", active");
         return optn_ok;
@@ -2973,26 +3161,40 @@ optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_role(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_role(
+    int optidx,
+    int req,
+    boolean negated,
+    char *opts,
+    char *op)
 {
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
-        if (parse_role_opts(optidx, negated, allopt[optidx].name, opts, &op)) {
+        /* role:string */
+        if (!parse_role_opt(optidx, negated, allopt[optidx].name, opts, &op))
+            return optn_silenterr;
+
+        if (*op != '!') {
             if ((flags.initrole = str2role(op)) == ROLE_NONE) {
                 config_error_add("Unknown %s '%s'", allopt[optidx].name, op);
                 return optn_err;
-            } else /* Backwards compatibility */
-                nmcpy(gp.pl_character, op, PL_NSIZ);
-        } else
-            return optn_silenterr;
+            }
+            nmcpy(gp.pl_character, op, PL_NSIZ); /* Backwards compat */
+            saveoptstr(optidx, rolestring(flags.initrole, roles, name.m));
+        }
         return optn_ok;
     }
-    if (req == get_val || req == get_cnf_val) {
+    if (req == get_val) {
         if (!opts)
             return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initrole, roles, name.m));
+        return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        op = get_cnf_role_opt(optidx);
+        Strcpy(opts, op ? op : "none");
         return optn_ok;
     }
     return optn_ok;
@@ -3063,9 +3265,9 @@ optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
         while (*op) {
             int inum = 1;
 
-            negated = (*op == '!');
+            negated = (*op == '!') || !strncmpi(op, "no", 2);
             if (negated)
-                op++;
+                op += (*op == '!') ? 1 : (op[2] != '-') ? 2 : 3;
 
             if (digit(*op)) {
                 inum = atoi(op);
@@ -6209,11 +6411,22 @@ txt2key(char *txt)
 void
 initoptions(void)
 {
-#ifdef SYSCF_FILE
     int i;
-#endif
 
+    go.opt_phase = builtin_opt;
     initoptions_init();
+    /*
+     * Call each option function with an init flag and give it a chance
+     * to make any preparations that it might require.  We do this
+     * whether or not the option itself is ever specified; that's
+     * irrelevant for the init call.  Doing this allows the prep code for
+     * option settings to remain adjacent to, and in the same function as,
+     * the code that processes those options.
+     */
+    for (i = 0; i < OPTCOUNT; ++i) {
+        if (allopt[i].optfn)
+            (*allopt[i].optfn)(i, do_init, FALSE, empty_optstr, empty_optstr);
+    }
 #ifdef SYSCF
 /* someday there may be other SYSCF alternatives besides text file */
 #ifdef SYSCF_FILE
@@ -6221,19 +6434,8 @@ initoptions(void)
     assure_syscf_file();
     config_error_init(TRUE, SYSCF_FILE, FALSE);
 
-    /* Call each option function with an init flag and give it a chance
-       to make any preparations that it might require. We do this
-       whether or not the option itself is ever specified; that's
-       irrelevant for the init call. Doing this allows the prep code for
-       option settings to remain adjacent to, and in the same function as,
-       the code that processes those options */
-
-    for (i = 0; i < OPTCOUNT; ++i) {
-        if (allopt[i].optfn)
-            (*allopt[i].optfn)(i, do_init, FALSE, empty_optstr, empty_optstr);
-    }
-
     /* ... and _must_ parse correctly. */
+    go.opt_phase = syscf_opt;
     if (!read_config_file(SYSCF_FILE, set_in_sysconf)) {
         if (config_error_done() && !iflags.initoptions_noterminate)
             nh_terminate(EXIT_FAILURE);
@@ -6284,6 +6486,7 @@ initoptions_init(void)
     init_random(rn2);
     init_random(rn2_on_display_rng);
 
+    go.opt_phase = builtin_opt;
     for (i = 0; allopt[i].name; i++) {
         if (allopt[i].addr)
             *(allopt[i].addr) = allopt[i].initval;
@@ -6463,6 +6666,7 @@ initoptions_finish(void)
        messages, if any were to be delivered while accessing the file,
        from potentially overflowing buffers */
     if (nameval && (int) strlen(nameval) >= BUFSZ / 2) {
+        go.opt_phase = rc_file_opt;
         config_error_init(TRUE, namesrc, FALSE);
         config_error_add(
                    "nethackrc file name \"%.40s\"... too long; using default",
@@ -6476,6 +6680,7 @@ initoptions_finish(void)
     config_error_done();
     if (xtraopts) {
         /* NETHACKOPTIONS is present and not a file name */
+        go.opt_phase = environ_opt;
         config_error_init(FALSE, envname, FALSE);
         (void) parseoptions(xtraopts, TRUE, FALSE);
         config_error_done();
@@ -6483,6 +6688,7 @@ initoptions_finish(void)
 
     /* after .nethackrc and NETHACKOPTIONS so that cmdline takes precedence */
     if (gc.cmdline_windowsys) {
+        go.opt_phase = cmdline_opt;
         config_error_init(FALSE, "command line", FALSE);
         choose_windows(gc.cmdline_windowsys);
         config_error_done();
@@ -7470,15 +7676,20 @@ count_menucolors(void)
 
 /* parse 'role' or 'race' or 'gender' or 'alignment' */
 static boolean
-parse_role_opts(
+parse_role_opt(
     int optidx,
     boolean negated,
     const char *fullname,
     char *opts,
     char **opp)
 {
-    static char role_random[] = "random"; /* not 'const' but never modified */
-    char *op = *opp;
+    static char neg_opt[] = "!"; /* not 'const' but never modified */
+    char *preval, *op = *opp;
+    int which = (optidx == opt_role) ? RS_ROLE
+                : (optidx == opt_race) ? RS_RACE
+                  : (optidx == opt_gender) ? RS_GENDER
+                    : (optidx == opt_alignment) ? RS_ALGNMNT
+                      : RS_filter; /* none of the above */
     boolean ok = FALSE;
 
     /*
@@ -7498,13 +7709,16 @@ parse_role_opts(
         char *sp;
         boolean val_negated, prev_negated = FALSE, first = TRUE;
 
+        mungspaces(op);
         while (*op) {
+            if (*op == ' ')
+                ++op;
             val_negated = FALSE;
-            while ((*op == '!') || !strncmpi(op, "no", 2)) {
+            while (*op == '!' || !strncmpi(op, "no", 2)) {
                 val_negated = !val_negated;
                 op += (*op == '!') ? 1 : (op[2] != '-') ? 2 : 3;
             }
-            if (!*op) {
+            if (!*op || *op == ' ') {
                 config_error_add("Negated nothing for '%s'", fullname);
                 return FALSE;
             }
@@ -7523,21 +7737,43 @@ parse_role_opts(
             first = FALSE;
             prev_negated = val_negated;
 
+            /* hide rest of list, if any */
             sp = strchr(op, ' ');
             if (sp)
                 *sp = '\0';
+
+            preval = getoptstr(optidx, go.opt_phase);
             if (val_negated || negated) {
+                char negbuf[BUFSZ];
+
+                /* for negative value, clear filter if there is a prior
+                   value from a different phase; for same phase, duplicates
+                   are allowed and setrolefilter() merges them */
+                if (!preval || *preval != '!')
+                    clearrolefilter(which);
                 if (!setrolefilter(op)) {
-                    config_error_add("Invalid '%s'", fullname);
+                    config_error_add("Invalid %s '%s'", fullname, op);
                     return FALSE;
                 }
+                saveoptstr(optidx, rolefilterstring(negbuf, which));
+                *opp = neg_opt;
             } else {
-                if (duplicate && !allopt[optidx].dupeok)
-                    complain_about_duplicate(optidx);
+                /* for positive value, allow duplicate if prior value
+                   was a negative one or came from a different phase;
+                   reject if prior value was positive and from same phase */
+                if (duplicate) {
+                    if (preval && *preval == '!') {
+                        complain_about_duplicate(optidx);
+                        return FALSE;
+                    }
+                }
+                /* save raw string value; caller will validate it and
+                   if it's ok, replace it with canonical form */
+                saveoptstr(optidx, op);
                 *opp = op;
                 ok = TRUE;
-                /* don't return yet; value might be a list which follows
-                   this with something else, making it invalid */
+                /* don't return yet; value might be a list that follows
+                   this with something else which might make it invalid */
             }
 
             if (sp) {
@@ -7547,17 +7783,27 @@ parse_role_opts(
                 op += strlen(op); /* break; */
             }
         }
-
-        if (!ok) {
-            /* '!ok' without config_error_add() implies a valid negation;
-               in case NETHACKOPTIONS=role:!Val overrides config file
-               OPTIONS=role:Val we need a positive result which will yield
-               someting other than ROLE_NONE from str2role(),str2race(),&c */
-            *opp = role_random;
-            ok = TRUE;
-        }
+        /* '!ok' without config_error_add() implies a valid negation */
+        ok = TRUE;
     }
     return ok;
+}
+
+/* fetch a saved role|race|gender|alignment value suitable for writing into
+   a new run-time config file */
+static char *
+get_cnf_role_opt(int optidx)
+{
+    int phase;
+    char *op = 0;
+
+    for (phase = num_opt_phases - 1; phase >= 0 && !op; --phase) {
+        if (phase == cmdline_opt || phase == environ_opt
+            || phase == builtin_opt)
+            continue;
+        op = getoptstr(optidx, phase);
+    }
+    return op;
 }
 
 /* Check if character c is illegal as a menu command key */
@@ -8191,6 +8437,7 @@ doset_simple(void)
         return doset();
     }
 
+    go.opt_phase = play_opt;
     /* select and change one option at a time, then reprocess the menu
        with updated settings to offer chance for further change */
     give_opt_msg = FALSE;
@@ -8241,6 +8488,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
         return doset_simple();
     }
 
+    go.opt_phase = play_opt;
     /* if we offer '?' as a choice and it is the only thing chosen,
        we'll end up coming back here after showing the explanatory text */
  rerun:

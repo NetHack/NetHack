@@ -271,7 +271,7 @@ save_gamelog(NHFILE *nhfp)
 }
 
 static void
-savegamestate(NHFILE* nhfp)
+savegamestate(NHFILE *nhfp)
 {
     unsigned long uid;
 
@@ -327,14 +327,17 @@ savegamestate(NHFILE* nhfp)
     save_oracles(nhfp);
     if (gu.ustuck_id) {
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &gu.ustuck_id, sizeof gu.ustuck_id);
+            bwrite(nhfp->fd, (genericptr_t) &gu.ustuck_id,
+                   sizeof gu.ustuck_id);
     }
     if (gu.usteed_id) {
         if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &gu.usteed_id, sizeof gu.usteed_id);
+            bwrite(nhfp->fd, (genericptr_t) &gu.usteed_id,
+                   sizeof gu.usteed_id);
     }
     if (nhfp->structlevel) {
-        bwrite(nhfp->fd, (genericptr_t) gp.pl_character, sizeof gp.pl_character);
+        bwrite(nhfp->fd, (genericptr_t) gp.pl_character,
+               sizeof gp.pl_character);
         bwrite(nhfp->fd, (genericptr_t) gp.pl_fruit, sizeof gp.pl_fruit);
     }
     savefruitchn(nhfp);
@@ -1205,6 +1208,7 @@ freedynamicdata(void)
     free_dungeons();
     free_CapMons();
     free_rect();
+    freeroleoptvals(); /* saveoptvals(&tnhfp) */
 
     /* some pointers in iflags */
     if (iflags.wc_font_map)

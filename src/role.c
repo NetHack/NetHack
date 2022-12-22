@@ -1307,14 +1307,71 @@ gotrolefilter(void)
     return FALSE;
 }
 
-void
-clearrolefilter(void)
+/* create a string like " !Bar !Kni" or " !chaotic" that can be
+   put back into an RC file by #saveoptions */
+char *
+rolefilterstring(char *outbuf, int which)
 {
     int i;
 
-    for (i = 0; i < SIZE(roles); ++i)
-        gr.rfilter.roles[i] = FALSE;
-    gr.rfilter.mask = 0;
+    outbuf[0] = outbuf[1] = '\0';
+    switch (which) {
+    case RS_ROLE:
+        for (i = 0; i < SIZE(roles); ++i) {
+            if (gr.rfilter.roles[i])
+                Sprintf(eos(outbuf), " !%.3s", roles[i].name.m);
+        }
+        break;
+    case RS_RACE:
+        for (i = 0; i < SIZE(races); ++i) {
+            if ((gr.rfilter.mask & races[i].selfmask) != 0)
+                Sprintf(eos(outbuf), " !%s", races[i].noun);
+        }
+        break;
+    case RS_GENDER:
+        for (i = 0; i < SIZE(genders); ++i) {
+            if ((gr.rfilter.mask & genders[i].allow) != 0)
+                Sprintf(eos(outbuf), " !%s", genders[i].adj);
+        }
+        break;
+    case RS_ALGNMNT:
+        for (i = 0; i < SIZE(aligns); ++i) {
+            if ((gr.rfilter.mask & aligns[i].allow) != 0)
+                Sprintf(eos(outbuf), " !%s", aligns[i].adj);
+        }
+        break;
+    default:
+        impossible("rolefilterstring: bad role aspect (%d)", which);
+        Strcpy(outbuf, " ?");
+        break;
+    }
+    /* constructed with a leading space; drop it */
+    return &outbuf[1];
+}
+
+void
+clearrolefilter(int which)
+{
+    int i;
+
+    switch (which) {
+    case RS_filter:
+        gr.rfilter.mask = 0; /* clear race, gender, and alignment filters */
+        /*FALLTHRU*/
+    case RS_ROLE:
+        for (i = 0; i < SIZE(roles); ++i)
+            gr.rfilter.roles[i] = FALSE;
+        break;
+    case RS_RACE:
+        gr.rfilter.mask &= ~ROLE_RACEMASK;
+        break;
+    case RS_GENDER:
+        gr.rfilter.mask &= ~ROLE_GENDMASK;
+        break;
+    case RS_ALGNMNT:
+        gr.rfilter.mask &= ~ROLE_ALIGNMASK;
+        break;
+    }
 }
 
 static char *
@@ -2690,7 +2747,7 @@ reset_role_filtering(void)
     n = select_menu(win, PICK_ANY, &selected);
 
     if (n >= 0) { /* n==0: clear current filters and don't set new ones */
-        clearrolefilter();
+        clearrolefilter(RS_filter);
         for (i = 0; i < n; i++)
             setrolefilter(selected[i].item.a_string);
 
