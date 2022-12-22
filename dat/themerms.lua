@@ -160,6 +160,18 @@ themeroom_fills = {
       end
    end,
 
+   -- Storeroom
+   function(rm)
+      local locs = selection.room():percentage(30);
+      local func = function(x,y)
+         if (percent(25)) then
+            des.object("chest");
+         else
+            des.monster({ class = "m", appear_as = "obj:chest" });
+         end
+      end;
+      locs:iterate(func);
+   end,
 };
 
 themerooms = {
