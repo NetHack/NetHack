@@ -1,4 +1,4 @@
-/* NetHack 3.7	steed.c	$NHDT-Date: 1664837604 2022/10/03 22:53:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1671838909 2022/12/23 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -456,10 +456,10 @@ landing_spot(
         try[0].x = u.dx, try[0].y = u.dy;
         /* the two next best locations are checked second and third */
         i = rn2(2);
-        clockwise_j = (j + 1) % N_DIRS;
+        clockwise_j = DIR_RIGHT(j); /* (j + 1) % 8 */
         dtoxy(&cc, clockwise_j);
         try[1 + i].x = cc.x, try[1 + i].y = cc.y; /* [1] or [2] */
-        counterclk_j = (j + N_DIRS - 1) % N_DIRS;
+        counterclk_j = DIR_LEFT(j); /* (j + 8 - 1) % 8 */
         dtoxy(&cc, counterclk_j);
         try[2 - i].x = cc.x, try[2 - i].y = cc.y; /* [2] or [1] */
         n = 3;
