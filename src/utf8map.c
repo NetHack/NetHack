@@ -371,14 +371,14 @@ init_glyph_cache(void)
 
 void free_glyphid_cache(void)
 {
-    int glyph;
+    size_t idx;
 
     if (!glyphid_cache)
         return;
-    for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
-        if (glyphid_cache[glyph].id) {
-            free(glyphid_cache[glyph].id);
-            glyphid_cache[glyph].id = (char *) 0;
+    for (idx = 0; idx < glyphid_cache_size; ++idx) {
+        if (glyphid_cache[idx].id) {
+            free(glyphid_cache[idx].id);
+            glyphid_cache[idx].id = (char *) 0;
         }
     }
     free(glyphid_cache);
