@@ -4524,10 +4524,7 @@ mergable(
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 
-    if (obj->known == otmp->known || !objects[otmp->otyp].oc_uses_known) {
-        return (boolean) objects[obj->otyp].oc_merge;
-    } else
-        return FALSE;
+    return (obj->known == otmp->known) ? TRUE : FALSE;
 }
 
 /* the #showgold command */

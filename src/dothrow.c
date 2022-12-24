@@ -13,13 +13,15 @@ static int throw_ok(struct obj *);
 static void autoquiver(void);
 static struct obj *find_launcher(struct obj *);
 static int gem_accept(struct monst *, struct obj *);
+static boolean harmless_missile(struct obj *);
+static boolean toss_up(struct obj *, boolean);
+static void sho_obj_return_to_u(struct obj * obj);
+static struct obj *return_throw_to_inv(struct obj *, long, boolean,
+                                       struct obj *);
 static void tmiss(struct obj *, struct monst *, boolean);
 static int throw_gold(struct obj *);
 static void check_shop_obj(struct obj *, coordxy, coordxy, boolean);
-static boolean harmless_missile(struct obj *);
 static void breakmsg(struct obj *, boolean);
-static boolean toss_up(struct obj *, boolean);
-static void sho_obj_return_to_u(struct obj * obj);
 static boolean mhurtle_step(genericptr_t, coordxy, coordxy);
 
 /* uwep might already be removed from inventory so test for W_WEP instead;
@@ -1413,7 +1415,7 @@ void
 throwit(struct obj *obj,
     long wep_mask,       /* used to re-equip returning boomerang */
     boolean twoweap,     /* used to restore twoweapon mode if
-                            wielded weapon returns */
+                          * wielded weapon returns */
     struct obj *oldslot) /* for thrown-and-return used with !fixinv */
 {
     register struct monst *mon;
@@ -1485,12 +1487,7 @@ throwit(struct obj *obj,
             && !impaired) {
             pline("%s the %s and returns to your hand!", Tobjnam(obj, "hit"),
                   ceiling(u.ux, u.uy));
-            obj = addinv_before(obj, oldslot);
-            (void) encumber_msg();
-            if (obj->owornmask & W_QUIVER) /* in case addinv() autoquivered */
-                setuqwep((struct obj *) 0);
-            setuwep(obj);
-            set_twoweap(twoweap); /* u.twoweap = twoweap */
+            obj = return_throw_to_inv(obj, wep_mask, twoweap, oldslot);
         } else if (u.dz < 0) {
             (void) toss_up(obj, rn2(5) && !Underwater);
         } else if (u.dz > 0 && u.usteed && obj->oclass == POTION_CLASS
@@ -1507,17 +1504,11 @@ throwit(struct obj *obj,
     } else if (obj->otyp == BOOMERANG && !Underwater) {
         if (Is_airlevel(&u.uz) || Levitation)
             hurtle(-u.dx, -u.dy, 1, TRUE);
-        iflags.returning_missile = 0; /* doesn't return if it hits monster */
         mon = boomhit(obj, u.dx, u.dy);
+        iflags.returning_missile = 0; /* has returned or isn't going to */
         if (mon == &gy.youmonst) { /* the thing was caught */
             exercise(A_DEX, TRUE);
-            obj = addinv_before(obj, oldslot);
-            (void) encumber_msg();
-            if (wep_mask && !(obj->owornmask & wep_mask)) {
-                setworn(obj, wep_mask);
-                /* moot; can no longer two-weapon with missile(s) */
-                set_twoweap(twoweap); /* u.twoweap = twoweap */
-            }
+            obj = return_throw_to_inv(obj, wep_mask, twoweap, oldslot);
             clear_thrownobj = TRUE;
             goto throwit_return;
         }
@@ -1766,6 +1757,59 @@ throwit(struct obj *obj,
     if (clear_thrownobj)
         gt.thrownobj = (struct obj *) 0;
     return;
+}
+
+static struct obj *
+return_throw_to_inv(
+    struct obj *obj,
+    long wep_mask,
+    boolean twoweap,
+    struct obj *oldslot)
+{
+    struct obj *otmp = NULL;
+
+    /* if 'obj' is from a stack split, we can put it back by undoing split
+       so there's no chance of merging with some other compatable stack */
+    if (obj->o_id == gc.context.objsplit.parent_oid
+        || obj->o_id == gc.context.objsplit.child_oid) {
+        obj->nobj = gi.invent;
+        gi.invent = obj;
+        obj->where = OBJ_INVENT;
+        otmp = unsplitobj(obj);
+        if (!otmp) {
+            gi.invent = obj->nobj;
+            obj->nobj = 0;
+            obj->where = OBJ_FREE;
+        } else {
+            obj = otmp;
+        }
+    }
+
+    /* if 'obj' wasn't from a stack split or if it wouldn't merge back
+       (maybe new erosion damage?) then it needs to be added to invent;
+       don't merge with any other stack even if there is a compatable one
+       (others with similar erosion?) */
+    if (!otmp) {
+        obj->nomerge = 1;
+        obj = addinv_before(obj, oldslot);
+        obj->nomerge = 0;
+
+        /* in case addinv() autoquivered */
+        if ((obj->owornmask & (W_WEP | W_SWAPWEP)) != 0
+            && (obj->owornmask & W_QUIVER) != 0)
+            setuqwep((struct obj *) 0);
+
+        if ((wep_mask & W_WEP) && !uwep)
+            setuwep(obj);
+        else if ((wep_mask & W_SWAPWEP) && !uswapwep)
+            setuswapwep(obj);
+        else if ((wep_mask & W_QUIVER) && !uquiver)
+            setuqwep(obj);
+    }
+
+    (void) encumber_msg();
+    set_twoweap(twoweap); /* u.twoweap = twoweap */
+    return obj;
 }
 
 /* an object may hit a monster; various factors adjust chance of hitting */
