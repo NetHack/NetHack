@@ -3667,6 +3667,12 @@ Some of the options listed may be inactive in your dungeon.
 Some options are persistent, and are saved and reloaded along with
 the game.  Changing a persistent option in the configuration file
 applies only to new games.
+.
+.\" .lp usage:
+.\" Option names which are 8 or more characters long don't need to be quoted.
+.\" Ones less that 8 should be enclosed within double quotes and padded with
+.\" trailing spaces.
+.
 .lp acoustics
 Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
@@ -3681,7 +3687,7 @@ See
 for a description of how to use negation to exclude choices.
 .lp ""
 Default is random.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
 .lp autodescribe
 Automatically describe the terrain under cursor when asked to get a location
@@ -3689,7 +3695,7 @@ on the map (default true).
 The
 .op whatis_coord
 option controls whether the description includes map coordinates.
-.lp autodig
+.lp "autodig "
 Automatically dig if you are wielding a digging tool and moving into a place
 that can be dug (default false).
 Persistent.
@@ -3757,18 +3763,18 @@ destroy some of its contents or damage your weapon or both.
 .lp ""
 The default is Apply-Key.
 Persistent.
-.lp blind
+.lp "blind   "
 Start the character permanently blind (default false).
 Persistent.
-.lp bones
+.lp "bones  "
 Allow saving and loading bones files (default true).
 Persistent.
-.lp boulder
+.lp "boulder "
 Set the character used to display boulders (default is the \(lqlarge rock\(rq
 class symbol, \(oq\`\(cq).
-.lp catname
+.lp "catname "
 Name your starting cat (for example \(lqcatname:Morris\(rq).
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp character
 Synonym for \(lqrole\(rq to pick the type of your character
 (for example \(lqcharacter:Monk\(rq).
@@ -3845,10 +3851,10 @@ Note that the vanquished monsters list includes all monsters killed by
 traps and each other as well as by you.
 And the dungeon overview shows all levels you had visited but does not
 reveal things about them that you hadn't discovered.
-.lp dogname
+.lp "dogname "
 Name your starting dog (for example \(lqdogname:Fang\(rq).
-Cannot be set with the \(oqO\(cq command.
-.lp extmenu
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
+.lp "extmenu "
 Changes the extended commands interface to pop-up a menu of available
 commands.
 It is keystroke compatible with the traditional interface except that it
@@ -3859,14 +3865,14 @@ For the X11 interface, which always uses a menu for choosing an extended
 command, it controls whether the menu shows all available commands (on)
 or just the subset of commands which have traditionally been considered
 extended ones (off).
-.lp female
-An obsolete synonym for \(lqgender:female\(rq.
-Cannot be set with the \(oqO\(cq command.
+.lp "female  "
+An obsolete synonym for \(lq\f(CRgender:female\fP\(rq.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp fireassist
 This option controls what happens when you attempt the \(oqf\(cq (fire)
 and don't have an appropriate launcher, such as a bow or a sling, wielded.
 If on, you will automatically wield the launcher. Default is on.
-.lp fixinv
+.lp "fixinv  "
 An object's inventory letter sticks to it when it's dropped (default on).
 If this is off, dropping an object shifts all the remaining inventory letters.
 Persistent.
@@ -3880,7 +3886,7 @@ Basically a nostalgic whimsy that NetHack uses from time to time.
 You should set this to something you find more appetizing than slime mold.
 Apples, oranges, pears, bananas, and melons
 already exist in NetHack, so don't use those.
-.lp gender
+.lp "gender  "
 Your starting gender (\f(CRgender:male\fP or \f(CRgender:female\fP).
 You may specify just the first letter.
 Although you can
@@ -3896,7 +3902,7 @@ See
 for a description of how to use negation to exclude choices.
 .lp ""
 Default is random.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
 .lp "goldX   "
 When filtering objects based on bless/curse state (BUCX), whether to
@@ -3939,8 +3945,8 @@ Show a hit point bar graph behind your name and title.
 Only available for TTY and Windows GUI, and only when statushilites is on.
 .lp horsename
 Name your starting horse (for example \(lqhorsename:Trigger\(rq).
-Cannot be set with the \(oqO\(cq command.
-.lp ignintr
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
+.lp "ignintr "
 Ignore interrupt signals, including breaks (default off).  Persistent.
 .lp implicit_uncursed
 Omit \(lquncursed\(rq from object descriptions when it can be deduced from
@@ -3948,13 +3954,13 @@ other aspects of the description (default on).
 Persistent.
 .lp ""
 If you use menu coloring, you may want to turn this off.
-.lp legacy
+.lp "legacy  "
 Display an introductory message when starting the game (default on).
 Persistent.
 .lp lit_corridor
 Show corridor squares seen by night vision or a light source held by your
 character as lit (default off).  Persistent.
-.lp lootabc
+.lp "lootabc "
 When using a menu to interact with a container,
 use the old \(oqa\(cq, \(oqb\(cq, and \(oqc\(cq keyboard shortcuts
 rather than the mnemonics \(oqo\(cq, \(oqi\(cq, and \(oqb\(cq
@@ -3963,12 +3969,13 @@ Persistent.
 .lp "mail    "
 Enable mail delivery during the game (default on).  Persistent.
 .lp "male    "
-An obsolete synonym for \(lqgender:male\(rq.
-Cannot be set with the \(oqO\(cq command.
+An obsolete synonym for \(lq\f(CRgender:male\fP\(rq.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp mention_decor
 Give feedback when walking onto various dungeon features such as stairs,
 fountains, or altars which are ordinarily only described when covered
 by one or more objects (default off).
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
 .lp mention_walls
 Give feedback when walking against a wall (default off).
@@ -4078,7 +4085,7 @@ is the same as specifying 0.
 .lp msghistory
 The number of top line messages to keep (and be able to recall
 with \(oq\(haP\(cq) (default 20).
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp msg_window
 Allows you to change the way recalled messages are displayed.
 Currently it is only supported for tty (all four choices) and for curses
@@ -4102,12 +4109,12 @@ the role (that is, by suffixing one of
 If
 .op "\-@"
 is used for the role, then a random one will be automatically chosen.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp "news    "
 Read the NetHack news file, if present (default on).
 Since the news is shown at the beginning of the game, there's no point
 in setting this with the \(oqO\(cq command.
-.lp nudist
+.lp "nudist  "
 Start the character with no armor (default false).  Persistent.
 .lp "null    "
 Send padding nulls to the terminal (default on).  Persistent.
@@ -4193,7 +4200,7 @@ such as \(lqparanoid_confirmation:attack pray Remove\(rq.
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.
 .\" petattr is a wincap option but we'll document it here...
-.lp petattr
+.lp "petattr "
 Specifies one or more text highlighting attributes to use when showing
 pets on the map.
 Effectively a superset of the
@@ -4222,14 +4229,14 @@ they might require being separated by plus signs (such as \(lqb+k\(rq,
 which works already).
 When using the \(oqn\(cq choice, it should be specified on its own,
 not in combination with any of the other letters.
-.lp pettype
+.lp "pettype "
 Specify the type of your initial pet, if you are playing a character class
 that uses multiple types of pets; or choose to have no initial pet at all.
 Possible values are \(lqcat\(rq, \(lqdog\(rq, \(lqhorse\(rq, and \(lqnone\(rq.
 If the choice is not allowed for the role you are currently playing,
 it will be silently ignored.
 For example, \(lqhorse\(rq will only be honored when playing a knight.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp pickup_burden
 When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
@@ -4306,7 +4313,7 @@ See
 for a description of how to use negation to exclude choices.
 .lp ""
 Default is random.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
 .lp rest_on_space
 Make the space bar a synonym for the \(oq.\(cq (#wait) command (default off).
@@ -4342,17 +4349,17 @@ option if they're all negations.
 .\" negations.
 .lp ""
 Default is \f(CRrandom\fP.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 Persistent.
 .lp roguesymset
 This option may be used to select one of the named symbol sets found
 within \(lqsymbols\(rq to alter the symbols displayed on the screen
 on the rogue level.
-.lp rlecomp
+.lp "rlecomp "
 When writing out a save file, perform run length compression of the map.
 Not all ports support run length compression. It has no
 effect on reading an existing save file.
-.lp runmode
+.lp "runmode "
 Controls the amount of screen updating for the map window when engaged
 in multi-turn movement (running via shift+direction or control+direction
 and so forth, or via the travel command or mouse click).
@@ -4382,13 +4389,13 @@ Prevents you from waiting or searching when next to a hostile monster
 .lp sanity_check
 Evaluate monsters, objects, and map prior to each turn (default off).
 Debug mode only.
-.lp scores
+.lp "scores  "
 Control what parts of the score list you are shown at the end (for example
 \(lqscores:5 top scores/4 around my score/own scores\(rq).
 Only the first letter of each category (\(oqt\(cq, \(oqa\(cq, or \(oqo\(cq)
 is necessary.
 Persistent.
-.lp showexp
+.lp "showexp "
 Show your accumulated experience points on bottom line (default off).
 Persistent.
 .lp showrace
@@ -4445,7 +4452,7 @@ default.
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
 Persistent.
-.lp sparkle
+.lp "sparkle "
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).
 Persistent.
@@ -4462,7 +4469,7 @@ Allow updates to the status lines at the bottom of the screen (default true).
 This option may be set to a NetHack version level to suppress
 alert notification messages about feature changes for that
 and prior versions (for example \(lqsuppress_alert:3.3.1\(rq).
-.lp symset
+.lp "symset  "
 This option may be used to select one of the named symbol sets found within
 \(lqsymbols\(rq to alter the symbols displayed on the screen.
 Use \(lqsymset:default\(rq to explicitly select the default symbols.
@@ -4485,7 +4492,7 @@ Put the ending display in a NetHack window instead of on stdout (default off).
 Setting this option makes the score list visible when a windowing version
 of NetHack is started without a parent window, but it no longer leaves
 the score list around after game end on a terminal or emulating window.
-.lp travel
+.lp "travel  "
 Allow the travel command via mouse click (default on).
 Turning this option off will prevent the game from attempting unintended
 moves if you make inadvertent mouse clicks on the map window.
@@ -4494,7 +4501,7 @@ Persistent.
 ." .lp travel_debug
 ." Display intended path during each step of travel (default off).
 ." Debug mode only.
-.lp verbose
+.lp "verbose "
 Provide more commentary during the game (default on).  Persistent.
 .lp whatis_coord
 When using the \(oq/\(cq or \(oq;\(cq commands to look around on the map with
@@ -4547,7 +4554,7 @@ move by skipping the same glyphs.
 When the program has been built to support multiple interfaces,
 select which one to use, such as \(lqtty\(rq or \(lqX11\(rq
 (default depends on build-time settings; use \(lq#version\(rq to check).
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp ""
 When used, it should be the first option set since its value might
 enable or disable the availability of various other options.
@@ -4598,7 +4605,7 @@ Setting
 to \fITrue\fP forces
 .op tiled_map
 to be \fIFalse\fP.
-.lp color
+.lp "color   "
 If NetHack can, it should display color if it can for different monsters,
 objects, and dungeon features (default on).
 .lp eight_bit_tty
@@ -4629,7 +4636,7 @@ If NetHack can, it should use this size font for text windows.
 .lp fullscreen
 If NetHack can, it should try and display on the entire screen rather than
 in a window.
-.lp guicolor
+.lp "guicolor "
 Use color text and/or highlighting attributes when displaying some
 non-map data (such as menu selector letters).
 Curses interface only; default is on.
@@ -4647,7 +4654,7 @@ If NetHack can, it should preload tiles into memory.
 For example, in the protected mode MS-DOS version, control whether tiles
 get pre-loaded into RAM at the start of the game.  Doing so
 enhances performance of the tile graphics, but uses more memory. (default on).
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp scroll_amount
 If NetHack can, it should scroll the display by this number of cells
 when the hero reaches the scroll_margin.
@@ -4787,11 +4794,12 @@ to customize and change the port behavior.
 Select an alternate way to handle keystrokes (Win32 tty NetHack only).
 The name of the handling type is one of \(lqdefault\(rq, \(lqray\(rq,
 \(lq340\(rq.
-.lp altmeta
-On Amiga, this option controls whether typing \(lqAlt\(rq plus another key
-functions as a meta-shift for that key (default on).
-.lp altmeta
-On other (non-Amiga) systems where this option is available, it can be
+.\" .lp "altmeta "
+.\" On Amiga, this option controls whether typing \(lqAlt\(rq plus another key
+.\" functions as a meta-shift for that key (default on).
+.lp "altmeta "
+.\" On other (non-Amiga) systems where this option is available, it can be
+On systems where this option is available, it can be
 set to tell NetHack to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
 .lp ""
@@ -4821,7 +4829,7 @@ Force raw (non-cbreak) mode for faster output and more
 bulletproof input (MS-DOS sometimes treats \(oq\(haP\(cq as a printer toggle
 without it) (default off, OS/2, PC, and ST NetHack only).
 Note:  DEC Rainbows hang if this is turned on.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp subkeyvalue
 (Win32 tty NetHack only).
 May be used to alter the value of keystrokes that the operating system
@@ -4830,7 +4838,7 @@ OPTIONS=subkeyvalue:171/92
 will return 92 to NetHack, if 171 was originally going to be returned.
 You can use multiple subkeyvalue assignments in the configuration file
 if needed.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp video
 Set the video mode used (PC NetHack only).
 Values are \(lqautodetect\(rq, \(lqdefault\(rq, \(lqvga\(rq, or \(lqvesa\(rq.
@@ -4841,7 +4849,7 @@ in 16 colors, a mode that is compatible with all VGA hardware. Third party
 tilesets will probably not work.
 Setting \(lqautodetect\(rq attempts \(lqvesa\(rq, then \(lqvga\(rq, and
 finally sets \(lqdefault\(rq if neither of those modes works.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp video_height
 Set the VGA mode resolution height (MS-DOS only, with video:vesa)
 .lp video_width
@@ -4852,13 +4860,13 @@ Set the color palette for PC systems using NO_TERMS
 The order of colors is red, green, brown, blue, magenta, cyan,
 bright.white, bright.red, bright.green, yellow, bright.blue,
 bright.magenta, and bright.cyan.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .lp videoshades
 Set the intensity level of the three gray scales available
 (default dark normal light, PC NetHack only).
 If the game display is difficult to read, try adjusting these scales;
 if this does not correct the problem, try !color.
-Cannot be set with the \(oqO\(cq command.
+Cannot be set with the \(oq\f(CRO\fP\(cq command.
 .hn 2
 Regular Expressions
 .pg
