@@ -4246,6 +4246,7 @@ options, the ``{\it gender\/}'' option will take precedence.
 See {\it role\/}
 for a description of how to use negation to exclude choices.
 %.lp ""
+\\
 Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
@@ -4713,6 +4714,7 @@ Choices are {\tt human}, {\tt dwarf}, {\tt elf}, {\tt gnome}, and
 See {\it role\/}
 for a description of how to use negation to exclude choices.
 %.lp ""
+\\
 Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
@@ -4727,13 +4729,13 @@ See ``{\it name\/}'' for an alternate method of specifying your role.
 %.\" Normally only the first letter of the
 %.\" value is examined; `r' is an exception with ``{\tt Rogue}'',
 %.\" ``{\tt Ranger}'', and ``{\tt random}'' values.
-+.lp ""
+%.lp ""
 This option can also be used to limit selection when role is chosen
 randomly.
 Use a space-separated list of roles and either negate each one or negate
 the option itself instead.
-Negation is accomplished in the same manner as with {\it boolean options},
-by prefixing the option or its value(s) with `{\tt !|' or ``{\tt no}''.
+Negation is accomplished in the same manner as with {\it boolean options\/},
+by prefixing the option or its value(s) with `{\tt \verb+!+}' or ``{\tt no}''.
 %.BR 0
 \\
 Examples:
@@ -4741,14 +4743,14 @@ Examples:
 \begin{verbatim}
 OPTIONS=role:!arc !bar !kni
 OPTIONS=!role:arc bar kni
-\begin{verbatim}
-\\
+\end{verbatim}
 There can be multiple instances of the {\it role\/}
 option if they're all negations.
 %.\" Only one positive value is allowed, and if present, it overrides any
 %.\" negations.
 %.lp ""
-Default is \f(CRrandom\fP.
+\\
+Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{roguesymset}]
@@ -5276,7 +5278,6 @@ or ports to customize and change the port behavior.
 \item[\ib{altkeyhandling}]
 Select an alternate way to handle keystrokes ({\it Win32 tty\/ NetHack\/} only).
 The name of the handling type is one of {\it default}, {\it ray}, {\it 340}
-%.lp
 %.\" \item[\ib{altmeta}]
 %.\" On Amiga, this option controls whether typing ``Alt'' plus another key
 %.\" functions as a meta-shift for that key (default on).
