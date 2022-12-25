@@ -1759,12 +1759,15 @@ throwit(struct obj *obj,
     return;
 }
 
+/* handle a throw-and-return missile coming back into inventory; makes sure
+   that if it was wielded, it will be re-wielded; if it was split off of a
+   stack (boomerang), don't let it merge with a different compatible stack */
 static struct obj *
 return_throw_to_inv(
-    struct obj *obj,
-    long wep_mask,
-    boolean twoweap,
-    struct obj *oldslot)
+    struct obj *obj,     /* object to add to invent */
+    long wep_mask,       /* its owornmask before it was removed from invent */
+    boolean twoweap,     /* True if hero was dual-wielding before removal */
+    struct obj *oldslot) /* following item in invent in case of '!fixinv' */
 {
     struct obj *otmp = NULL;
 
@@ -1795,8 +1798,8 @@ return_throw_to_inv(
         obj->nomerge = 0;
 
         /* in case addinv() autoquivered */
-        if ((obj->owornmask & (W_WEP | W_SWAPWEP)) != 0
-            && (obj->owornmask & W_QUIVER) != 0)
+        if ((obj->owornmask & W_QUIVER) != 0
+            && ((obj->owornmask | wep_mask) & (W_WEP | W_SWAPWEP)) != 0)
             setuqwep((struct obj *) 0);
 
         if ((wep_mask & W_WEP) && !uwep)
@@ -1805,10 +1808,14 @@ return_throw_to_inv(
             setuswapwep(obj);
         else if ((wep_mask & W_QUIVER) && !uquiver)
             setuqwep(obj);
+
+        /* in case the throw ended dual-wielding, reinstate it after
+           successful catch (not needed for boomerang split/unsplit) */
+        if (twoweap && !u.twoweap)
+            set_twoweap(TRUE); /* u.twoweap = TRUE */
     }
 
     (void) encumber_msg();
-    set_twoweap(twoweap); /* u.twoweap = twoweap */
     return obj;
 }
 
