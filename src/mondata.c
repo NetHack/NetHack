@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1624322866 2021/06/22 00:47:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1672003297 2022/12/25 21:21:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -317,24 +317,18 @@ ranged_attk(struct permonst* ptr)
 #if defined(MAKEDEFS_C) \
     || (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
 /*
- * In 3.4.3 and earlier, this code was used to construct monstr[] array
- * in generated file src/monstr.c.  It wasn't used in 3.6.  For 3.7 it
- * has been reincarnated as a way to generate default monster strength
- * values:
- *      add new monster(s) to include/monsters.h with placeholder value
- *          for the monstr field;
- *      run 'makedefs -m' to create src/monstr.c; ignore the complaints
- *          about it being deprecated;
- *      transfer relevant generated monstr values to include/monsters.h;
- *      delete src/monstr.c.
+ * If adding a new monster, include a guestimate for difficulty,
+ * build the program, then run it in wizard mode and use the
+ * #mondifficulty command.  If it reports a discrepancy, update
+ * the monsters array with the more accurate value (or possibly
+ * modify the 'mstrength()' algorithm to generate the guessed one).
  */
 static boolean mstrength_ranged_attk(struct permonst *);
 
- /*
- * This routine is designed to return an integer value which represents
- * an approximation of monster strength.  It uses a similar method of
- * determination as "experience()" to arrive at the strength.
- */
+
+/* This routine is designed to return an integer value which represents
+   an approximation of monster strength.  It uses a similar method of
+   determination as "experience()" to arrive at the strength. */
 int
 mstrength(struct permonst* ptr)
 {
@@ -364,6 +358,13 @@ mstrength(struct permonst* ptr)
         n += (tmp2 > 0);
         n += (tmp2 == AT_MAGC);
         n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+        if (tmp2 == AT_EXPL) {
+            int tmp3 = ptr->mattk[i].adtyp;
+            /* {freezing,flaming,shocking} spheres are fairly weak but
+               can destroy equipment; {yellow,black} lights can't */
+            n += ((tmp3 == AD_COLD || tmp3 == AD_FIRE) ? 3
+                  : (tmp3 == AD_ELEC) ? 5 : 0);
+        }
     }
 
     /* for each "special" damage type */
@@ -384,11 +385,11 @@ mstrength(struct permonst* ptr)
 
     /* finally, adjust the monster level  0 <= n <= 24 (approx.) */
     if (n == 0)
-        tmp--;
-    else if (n >= 6)
-        tmp += (n / 2);
-    else
+        tmp -= 1;
+    else if (n < 6)
         tmp += (n / 3 + 1);
+    else
+        tmp += (n / 2);
 
     return (tmp >= 0) ? tmp : 0;
 }
