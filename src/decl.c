@@ -803,7 +803,6 @@ const struct instance_globals_v g_init_v = {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, /* valset */
     /* end.c */
     { UNDEFINED_VALUES }, /* valuables */
-    VANQ_MLVL_MNDX,   /* vanq_sortmode */
     /* mhitm.c */
     FALSE, /* vis */
     /* mklev.c */

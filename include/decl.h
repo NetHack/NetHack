@@ -561,14 +561,14 @@ struct trapinfo {
 };
 
 enum vanq_order_modes {
-    VANQ_MLVL_MNDX = 0,
-    VANQ_MSTR_MNDX,
-    VANQ_ALPHA_SEP,
-    VANQ_ALPHA_MIX,
-    VANQ_MCLS_HTOL,
-    VANQ_MCLS_LTOH,
-    VANQ_COUNT_H_L,
-    VANQ_COUNT_L_H,
+    VANQ_MLVL_MNDX = 0, /* t - traditional: by monster level */
+    VANQ_MSTR_MNDX,     /* d - by difficulty rating */
+    VANQ_ALPHA_SEP,     /* a - alphabetical, first uniques, then ordinary */
+    VANQ_ALPHA_MIX,     /* A - alpha with uniques and ordinary intermixed */
+    VANQ_MCLS_HTOL,     /* C - by class, high to low within class */
+    VANQ_MCLS_LTOH,     /* c - by class, low to high within class */
+    VANQ_COUNT_H_L,     /* n - by count, high to low */
+    VANQ_COUNT_L_H,     /* z - by count, low to high */
 
     NUM_VANQ_ORDER_MODES
 };
@@ -1562,7 +1562,6 @@ struct instance_globals_v {
 
     /* end.c */
     struct val_list valuables[3];
-    int vanq_sortmode;
 
     /* mhitm.c */
     boolean vis;

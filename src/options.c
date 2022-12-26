@@ -3460,8 +3460,10 @@ optfn_sortdiscoveries(
 }
 
 static int
-optfn_sortloot(int optidx, int req, boolean negated UNUSED,
-               char *opts, char *op)
+optfn_sortloot(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     int i;
 
@@ -3500,6 +3502,62 @@ optfn_sortloot(int optidx, int req, boolean negated UNUSED,
     }
     if (req == do_handler) {
         return handler_sortloot();
+    }
+    return optn_ok;
+}
+
+static int
+optfn_sortvanquished(
+    int optidx, int req,
+    boolean negated,
+    char *opts, char *op)
+{
+    extern const char *const vanqorders[][3]; /* insight.c */
+    static const char vanqmodes[] = "tdaACcnz";
+    const char *optname = allopt[optidx].name;
+
+    if (req == do_init) {
+        flags.vanq_sortmode = VANQ_MLVL_MNDX; /* 0 => 't' */
+        return optn_ok;
+    }
+    if (req == do_set) {
+        op = string_for_env_opt(allopt[optidx].name, opts, FALSE);
+        if (negated) {
+            flags.vanq_sortmode = VANQ_MLVL_MNDX; /* 0 => 't' */
+        } else if (op != empty_optstr) {
+            const char *p;
+            int vndx = 0;
+
+            if ((p = strchr(vanqmodes, *op)) != 0) {
+                vndx = (int) (p - vanqmodes);
+            } else if (strchr("01234567", *op)) {
+                vndx = *op - '0';
+            } else {
+                config_error_add("Unknown %s parameter '%s'", optname, op);
+                return optn_silenterr;
+            }
+            flags.vanq_sortmode = (uchar) vndx;
+        } else
+            return optn_err;
+        return optn_ok;
+    }
+    if (req == get_val || req == get_cnf_val) {
+        Strcpy(opts, vanqorders[flags.vanq_sortmode][0]);
+        if (req == get_val)
+            Sprintf(eos(opts), ": %s", vanqorders[flags.vanq_sortmode][1]);
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        uchar prev_sortmode = flags.vanq_sortmode;
+
+        /* return handler_sortvanquished(); */
+        (void) set_vanq_order(); /* insight.c */
+        pline("'%s' %s \"%s: %s\".", optname,
+              (flags.vanq_sortmode == prev_sortmode)
+                 ? "not changed, still"
+                 : "changed to",
+              vanqorders[flags.vanq_sortmode][0],
+              vanqorders[flags.vanq_sortmode][1]);
     }
     return optn_ok;
 }

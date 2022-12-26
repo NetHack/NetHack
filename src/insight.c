@@ -32,7 +32,6 @@ static void weapon_insight(int);
 static void attributes_enlightenment(int, int);
 static void show_achievements(int);
 static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
-static int set_vanq_order(void);
 static int num_extinct(void);
 
 extern const char *const hu_stat[];  /* hunger status from eat.c */
@@ -2486,15 +2485,23 @@ show_gamelog(int final)
  */
 
 /* the two uppercase choices are implemented but suppressed from menu */
-static const char *vanqorders[NUM_VANQ_ORDER_MODES][2] = {
-    { "t", "traditional: by monster level, by internal monster index" },
-    { "d", "by monster difficulty rating, by internal monster index" },
-    { "a", "alphabetically, first unique monsters, then others" },
-    { "A", "alphabetically, unique monsters and others intermixed" },
-    { "C", "by monster class, high to low level within class" },
-    { "c", "by monster class, low to high level within class" },
-    { "n", "by count, high to low, by internal index within tied count" },
-    { "z", "by count, low to high, by internal index within tied count" },
+const char *const vanqorders[NUM_VANQ_ORDER_MODES][3] = {
+    { "t", "traditional: by monster level",
+           "traditional: by monster level, by internal monster index" },
+    { "d", "by monster difficulty rating",
+           "by monster difficulty rating, by internal monster index" },
+    { "a", "alphabetically, unique monsters separate",
+           "alphabetically, first unique monsters, then others" },
+    { "A", "alphabetically, unique monsters intermixed",
+           "alphabetically, unique monsters and others intermixed" },
+    { "C", "by monster class, high to low level in class",
+           "by monster class, high to low level within class" },
+    { "c", "by monster class, low to high level in class",
+           "by monster class, low to high level within class" },
+    { "n", "by count, high to low",
+           "by count, high to low, by internal index within tied count" },
+    { "z", "by count, low to high",
+           "by count, low to high, by internal index within tied count" },
 };
 
 static int QSORTCALLBACK
@@ -2507,7 +2514,7 @@ vanqsort_cmp(
     const char *name1, *name2, *punct;
     schar mcls1, mcls2;
 
-    switch (gv.vanq_sortmode) {
+    switch (flags.vanq_sortmode) {
     default:
     case VANQ_MLVL_MNDX:
         /* sort by monster level */
@@ -2564,7 +2571,7 @@ vanqsort_cmp(
             mlev1 = mons[indx1].mlevel;
             mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
-            if (gv.vanq_sortmode == VANQ_MCLS_HTOL)
+            if (flags.vanq_sortmode == VANQ_MCLS_HTOL)
                 res = -res; /* mlevel high to low */
         }
         break;
@@ -2573,7 +2580,7 @@ vanqsort_cmp(
         died1 = gm.mvitals[indx1].died;
         died2 = gm.mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
-        if (gv.vanq_sortmode == VANQ_COUNT_L_H)
+        if (flags.vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
         break;
     }
@@ -2584,7 +2591,7 @@ vanqsort_cmp(
 }
 
 /* returns -1 if cancelled via ESC */
-static int
+int
 set_vanq_order(void)
 {
     winid tmpwin;
@@ -2601,8 +2608,8 @@ set_vanq_order(void)
             continue;
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
-                 ATR_NONE, clr, vanqorders[i][1],
-                 (i == gv.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
+                 ATR_NONE, clr, vanqorders[i][2],
+                 (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Sort order for vanquished monster counts");
@@ -2612,12 +2619,12 @@ set_vanq_order(void)
     if (n > 0) {
         choice = selected[0].item.a_int - 1;
         /* skip preselected entry if we have more than one item chosen */
-        if (n > 1 && choice == gv.vanq_sortmode)
+        if (n > 1 && choice == flags.vanq_sortmode)
             choice = selected[1].item.a_int - 1;
         free((genericptr_t) selected);
-        gv.vanq_sortmode = choice;
+        flags.vanq_sortmode = choice;
     }
-    return (n < 0) ? -1 : gv.vanq_sortmode;
+    return (n < 0) ? -1 : flags.vanq_sortmode;
 }
 
 /* #vanquished command */
@@ -2709,7 +2716,7 @@ list_vanquished(char defquery, boolean ask)
 
         c = ask ? yn_function(
                             "Do you want an account of creatures vanquished?",
-                             ynaqchars, defquery, TRUE)
+                              ynaqchars, defquery, TRUE)
                 : defquery;
         if (c == 'q')
             done_stopprint++;
@@ -2720,9 +2727,9 @@ list_vanquished(char defquery, boolean ask)
                 if (set_vanq_order() < 0)
                     return;
             }
-            uniq_header = (gv.vanq_sortmode == VANQ_ALPHA_SEP);
-            class_header = ((gv.vanq_sortmode == VANQ_MCLS_LTOH
-                             || gv.vanq_sortmode == VANQ_MCLS_HTOL)
+            uniq_header = (flags.vanq_sortmode == VANQ_ALPHA_SEP);
+            class_header = ((flags.vanq_sortmode == VANQ_MCLS_LTOH
+                             || flags.vanq_sortmode == VANQ_MCLS_HTOL)
                             && ntypes > 1);
 
             klwin = create_nhwindow(NHW_MENU);
@@ -2795,7 +2802,16 @@ list_vanquished(char defquery, boolean ask)
             display_nhwindow(klwin, TRUE);
             destroy_nhwindow(klwin);
         }
-    } else if (defquery == 'a') {
+
+    /*
+     * For end-of-game disclosure, we're only called when some monsters
+     * were vanquished and won't reach these 'else-if's.
+     *
+     * If no monsters have been vanquished, we're either called for game
+     * still in progress, so use present tense via pline(), or for dumplog
+     * which needs putstr() and past tense.
+     */
+    } else if (!gp.program_state.gameover) {
         /* #dovanquished rather than final disclosure, so pline() is ok */
         pline("No creatures have been vanquished.");
 #ifdef DUMPLOG

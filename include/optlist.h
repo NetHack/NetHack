@@ -537,6 +537,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 "sort object selection lists by description")
     NHOPTB(sortpack, Advanced, 0, opt_out, set_in_game,
                 On, Yes, No, No, NoAlias, &flags.sortpack)
+    NHOPTC(sortvanquished, Advanced, 0, opt_in, set_in_game,
+                Yes, Yes, No, Yes, NoAlias,
+                "preferred order when displaying vanquished monsters")
     NHOPTB(sparkle, Map, 0, opt_out, set_in_game,
                 On, Yes, No, No, NoAlias, &flags.sparkle)
     NHOPTB(splash_screen, Advanced, 0, opt_out, set_in_config,

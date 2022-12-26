@@ -251,6 +251,13 @@ sortloot      preferred order when examining a set of objects           [n]
               none -- no sorting
               loot -- sort piles of objects on floor and in containers
               full -- 'loot' plus objects in inventory
+sortvanquished preferred order when viewing vanquished monsters list    [t]
+              t -- traditional, order by monster level
+              d -- order by monster difficulty rating
+              a -- alphabetical, first any unique monsters then others
+              c -- order by class, low to high level within each class
+              n -- order by count, high to low
+              z -- order by count, low to high
 statushilites whether to display status highlights (when non-zero) and  [0]
               also how many turns to display temporary highlights (for
               'up', 'down', and 'changed' hilite_status rules)
