@@ -1801,13 +1801,15 @@ List vanquished monsters by type and count.
 Note that the vanquished monsters list includes all monsters killed by
 traps and each other as well as by you, and omits any which got removed
 from the game without being killed (perhaps by genocide, or by a mollified
-shopkeeper dismissing summoned Kops).
+shopkeeper dismissing summoned Kops) or were already corpses when placed
+on the map.
 \\
 %.lp ""
 Using the ``request menu'' prefix prior to \#vanquished brings up
-a menu of sort orders available.
-Whichever one is picked is remembered for subsequent \#vanquished commands
-during the current play session but not saved and restored across sessions.
+a menu of sorting orders available (provided that the vanquished monsters
+list contains at least two types of monsters).
+Whichever ordering is picked gets assigned to the {\it sortvanquished}
+option so is remembered for subsequent \#vanquished requests.
 During end-of-game disclosure, when asked whether to show vanquished
 monsters answering `{\tt a}' will let you choose from the sort menu.
 \\
@@ -4825,20 +4827,18 @@ Persistent.
 \\
 %.lp ""
 The possible values are:
-%.PS o
-%.PL o
+\\
+%.PS
 {\tt o} --- list object types by class, in discovery order within each class;
 default;
-%.PL s
+\\
 {\tt s} --- list object types by {\it sortloot\/}
 classification: by class, by sub-class within class for classes which
 have substantial groupings (like helmets, boots, gloves, and so forth
 for armor), with object types partly-discovered via assigned name coming
 before fully identified types;
 \\
-%.PL c
 {\tt c} --- list by class, alphabetically within each class;\\
-%.PL a
 {\tt a} --- list alphabetically across all classes.\\
 %.PE
 Can be interactively set via the `{\tt O}' command or via using
@@ -4850,6 +4850,7 @@ Controls the sorting behavior of pickup lists for inventory
 and \#loot commands and some others.  Persistent.
 \\
 The possible values are:
+\\
 %.sd
 %.si
 {\tt full} --- always sort the lists;\\
@@ -4862,6 +4863,45 @@ The possible values are:
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
 Persistent.
+%.lp
+\item[\tb{sortvanquisted}]
+Controls the sorting behavior for the output of the \#vanquished command.
+Persistent.
+\\
+%.lp ""
+The possible values are:
+\\
+%.PS
+{\tt t} ---
+traditional: order by monster level; ties are broken by internal
+monster index;
+default;
+\\
+{\tt d} ---
+order by monster difficulty rating; ties broken by internal index;
+\\
+{\tt a} ---
+order alphabetically, first any unique monsters then all the others;
+\\
+%note: 'A' and 'C' can be set in RC file or NETHACKOPTIONS but not by 'O'
+% {\tt A} ---
+% order alphabetically, unique monsters intermixed with other monsters;
+% \\
+% {\tt C} ---
+% order by monster class, by high to low level within each class;
+% \\
+{\tt c} ---
+order by monster class, by low to high level within each class;
+\\
+{\tt n} ---
+order by count, high to low; ties are broken by internal monster index;
+\\
+{\tt z} ---
+order by count, low to high; ties broken by internal index.
+\\
+%.PE
+Can be interactively set via the `{\tt m O}' command or via using
+the `{\tt m}' prefix before the \#vanquished command.
 %.lp
 \item[\ib{sparkle}]
 Display a sparkly effect when a monster (including yourself) is hit by an
