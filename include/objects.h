@@ -60,7 +60,7 @@
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
   { sn, #sn }
-#define MARKER(tag,sn) { tag, #sn },
+#define MARKER(tag,sn) /*empty*/
 
 #else
 #error Unproductive inclusion of objects.h
