@@ -582,7 +582,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_GLASS_GOLEM:
         num = d(2, 4); /* very low chance of creating all glass gems */
         while (num--)
-            obj = mksobj_at((LAST_GEM + rnd(NUM_GLASS_GEMS)),
+            obj = mksobj_at(FIRST_GLASS_GEM + rn2(NUM_GLASS_GEMS),
                             x, y, TRUE, FALSE);
         free_mgivenname(mtmp);
         break;

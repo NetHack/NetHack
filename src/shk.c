@@ -2201,32 +2201,32 @@ get_cost(
                 (((int) ubirthday % obj->otyp) >= obj->otyp / 2);
 
             /* all gems are priced high - real or not */
-            switch (obj->otyp - LAST_GEM) {
-            case 1: /* white */
+            switch (obj->otyp - FIRST_GLASS_GEM) {
+            case 0: /* white */
                 i = pseudorand ? DIAMOND : OPAL;
                 break;
-            case 2: /* blue */
+            case 1: /* blue */
                 i = pseudorand ? SAPPHIRE : AQUAMARINE;
                 break;
-            case 3: /* red */
+            case 2: /* red */
                 i = pseudorand ? RUBY : JASPER;
                 break;
-            case 4: /* yellowish brown */
+            case 3: /* yellowish brown */
                 i = pseudorand ? AMBER : TOPAZ;
                 break;
-            case 5: /* orange */
+            case 4: /* orange */
                 i = pseudorand ? JACINTH : AGATE;
                 break;
-            case 6: /* yellow */
+            case 5: /* yellow */
                 i = pseudorand ? CITRINE : CHRYSOBERYL;
                 break;
-            case 7: /* black */
+            case 6: /* black */
                 i = pseudorand ? BLACK_OPAL : JET;
                 break;
-            case 8: /* green */
+            case 7: /* green */
                 i = pseudorand ? EMERALD : JADE;
                 break;
-            case 9: /* violet */
+            case 8: /* violet */
                 i = pseudorand ? AMETHYST : FLUORITE;
                 break;
             default:
@@ -2458,7 +2458,7 @@ set_cost(register struct obj* obj, register struct monst* shkp)
             /* different shop keepers give different prices */
             if (objects[obj->otyp].oc_material == GEMSTONE
                 || objects[obj->otyp].oc_material == GLASS) {
-                tmp = ((obj->otyp - FIRST_GEM) % (6 - shkp->m_id % 3));
+                tmp = ((obj->otyp - FIRST_REAL_GEM) % (6 - shkp->m_id % 3));
                 tmp = (tmp + 3) * obj->quan;
                 divisor = 1L;
             }

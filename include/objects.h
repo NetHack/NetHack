@@ -32,6 +32,7 @@
 #define OBJ(name,desc)  name, desc
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt, \
                cost,sdam,ldam,oc1,oc2,nut,color,sn)  { obj }
+#define MARKER(tag,sn) /*empty*/
 
 #elif defined(OBJECTS_INIT)
 #define COLOR_FIELD(X) X,
@@ -45,18 +46,21 @@
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
   { 0, 0, (char *) 0, bits, prp, sym, dly, COLOR_FIELD(color) prob, wt, \
     cost, sdam, ldam, oc1, oc2, nut }
+#define MARKER(tag,sn) /*empty*/
 
 #elif defined(OBJECTS_ENUM)
 #define OBJ(name,desc)
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
     sn
+#define MARKER(tag,sn) tag = sn,
 
 #elif defined(DUMP_ENUMS)
 #define OBJ(name,desc)
 #define OBJECT(obj,bits,prp,sym,prob,dly,wt,        \
                cost,sdam,ldam,oc1,oc2,nut,color,sn) \
   { sn, #sn }
+#define MARKER(tag,sn) { tag, #sn },
 
 #else
 #error Unproductive inclusion of objects.h
@@ -767,6 +771,7 @@ RING("protection from shape changers", "shiny",
            power, AMULET_CLASS, prob, 0, 20, 150, 0, 0, 0, 0, 20, HI_METAL, sn)
 AMULET("amulet of ESP",                "circular", TELEPAT, 120,
                                                         AMULET_OF_ESP),
+MARKER(FIRST_AMULET, AMULET_OF_ESP)
 AMULET("amulet of life saving",       "spherical", LIFESAVED, 75,
                                                         AMULET_OF_LIFE_SAVING),
 AMULET("amulet of strangulation",          "oval", STRANGLED, 115,
@@ -804,6 +809,7 @@ OBJECT(OBJ("Amulet of Yendor", /* note: description == name */
        BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, MITHRIL),
        0, AMULET_CLASS, 0, 0, 20, 30000, 0, 0, 0, 0, 20, HI_METAL,
                                                 AMULET_OF_YENDOR),
+MARKER(LAST_AMULET, AMULET_OF_YENDOR)
 #undef AMULET
 
 /* tools ... */
@@ -1204,6 +1210,7 @@ SCROLL("blank paper", "unlabeled",  0,  28,  60, SCR_BLANK_PAPER),
 #define PAPER LEATHER /* override enum for use in SPELL() expansion */
 SPELL("dig",             "parchment",
       P_MATTER_SPELL,      20,  6, 5, 1, RAY, HI_LEATHER, SPE_DIG),
+MARKER(FIRST_SPELL, SPE_DIG)
 /* magic missile ... finger of death must be in this order; see buzz() */
 SPELL("magic missile",   "vellum",
       P_ATTACK_SPELL,      45,  2, 2, 1, RAY, HI_LEATHER, SPE_MAGIC_MISSILE),
@@ -1329,7 +1336,8 @@ SPELL("freeze sphere",   "hardcover",
 #endif
 /* books with fixed descriptions
  */
-SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER, SPE_BLANK_PAPER),
+SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER,
+                                                        SPE_BLANK_PAPER),
 /* tribute book for 3.6 */
 OBJECT(OBJ("novel", "paperback"),
        BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),
@@ -1340,6 +1348,10 @@ OBJECT(OBJ("Book of the Dead", "papyrus"),
        BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
        0, SPBOOK_CLASS, 0, 0, 20, 10000, 0, 0, 0, 7, 20, HI_PAPER,
                                                         SPE_BOOK_OF_THE_DEAD),
+/* LAST_SPELL is used to compute MAXSPELL and should probably be
+   SPE_BLANK_PAPER-1 since there's no need for spl_book[] slots for
+   blank, novel, and Book of the Dead */
+MARKER(LAST_SPELL, SPE_BOOK_OF_THE_DEAD)
 #undef SPELL
 
 /* wands ... */
@@ -1424,6 +1436,7 @@ COIN("gold piece", 1000, GOLD, 1, GOLD_PIECE),
            0, GEM_CLASS, prob, 0, wt, gval, sdam, ldam, 0, 0, nutr, color, sn)
 GEM("dilithium crystal", "white",  2, 1, 4500, 15,  5, GEMSTONE, CLR_WHITE,
                                                         DILITHIUM_CRYSTAL),
+MARKER(FIRST_REAL_GEM, DILITHIUM_CRYSTAL)
 GEM("diamond",           "white",  3, 1, 4000, 15, 10, GEMSTONE, CLR_WHITE,
                                                         DIAMOND),
 GEM("ruby",                "red",  4, 1, 3500, 15,  9, GEMSTONE, CLR_RED,
@@ -1466,8 +1479,10 @@ GEM("agate",            "orange", 12, 1,  200, 15,  6, GEMSTONE, CLR_ORANGE,
                                                         AGATE),
 GEM("jade",              "green", 10, 1,  300, 15,  6, GEMSTONE, CLR_GREEN,
                                                         JADE),
+MARKER(LAST_REAL_GEM, JADE)
 GEM("worthless piece of white glass", "white",
     77, 1, 0, 6, 5, GLASS, CLR_WHITE, WORTHLESS_WHITE_GLASS),
+MARKER(FIRST_GLASS_GEM, WORTHLESS_WHITE_GLASS)
 GEM("worthless piece of blue glass", "blue",
     77, 1, 0, 6, 5, GLASS, CLR_BLUE, WORTHLESS_BLUE_GLASS),
 GEM("worthless piece of red glass", "red",
@@ -1484,6 +1499,7 @@ GEM("worthless piece of green glass", "green",
     77, 1, 0, 6, 5, GLASS, CLR_GREEN, WORTHLESS_GREEN_GLASS),
 GEM("worthless piece of violet glass", "violet",
     77, 1, 0, 6, 5, GLASS, CLR_MAGENTA, WORTHLESS_VIOLET_GLASS),
+MARKER(LAST_GLASS_GEM, WORTHLESS_VIOLET_GLASS)
 
 /* Placement note: there is a wishable subrange for
  * "gray stones" in the o_ranges[] array in objnam.c
@@ -1548,6 +1564,7 @@ OBJECT(OBJ(NoDes, NoDes),
 
 #undef OBJ
 #undef OBJECT
+#undef MARKER
 #undef HARDGEM
 #undef NoDes
 

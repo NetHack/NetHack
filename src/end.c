@@ -979,8 +979,9 @@ get_valuables(struct obj *list) /* inventory or container contents */
                 ga.amulets[i].typ = obj->otyp;
             } else
                 ga.amulets[i].count += obj->quan; /* always adds one */
-        } else if (obj->oclass == GEM_CLASS && obj->otyp < LUCKSTONE) {
-            i = min(obj->otyp, LAST_GEM + 1) - FIRST_GEM;
+        } else if (obj->oclass == GEM_CLASS && obj->otyp <= LAST_GLASS_GEM) {
+            /* last+1: combine all glass gems into one slot */
+            i = min(obj->otyp, LAST_REAL_GEM + 1) - FIRST_REAL_GEM;
             if (!gg.gems[i].count) {
                 gg.gems[i].count = obj->quan;
                 gg.gems[i].typ = obj->otyp;
@@ -1613,7 +1614,8 @@ really_done(int how)
 
                 if (count == 0L)
                     continue;
-                if (objects[typ].oc_class != GEM_CLASS || typ <= LAST_GEM) {
+                if (objects[typ].oc_class != GEM_CLASS
+                    || typ <= LAST_REAL_GEM) {
                     otmp = mksobj(typ, FALSE, FALSE);
                     discover_object(otmp->otyp, TRUE, FALSE);
                     otmp->known = 1;  /* for fake amulets */

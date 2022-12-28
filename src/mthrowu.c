@@ -501,12 +501,11 @@ ucatchgem(
     struct monst *mon)
 {
     /* won't catch rock or gray stone; catch (then drop) worthless glass */
-    if (gem->otyp <= LAST_GEM + NUM_GLASS_GEMS
-        && is_unicorn(gy.youmonst.data)) {
+    if (gem->otyp <= LAST_GLASS_GEM && is_unicorn(gy.youmonst.data)) {
         char *gem_xname = xname(gem),
              *mon_s_name = s_suffix(mon_nam(mon));
 
-        if (gem->otyp > LAST_GEM) {
+        if (gem->otyp >= FIRST_GLASS_GEM) {
             You("catch the %s.", gem_xname);
             You("are not interested in %s junk.", mon_s_name);
             makeknown(gem->otyp);
