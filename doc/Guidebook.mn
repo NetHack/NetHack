@@ -4455,7 +4455,7 @@ default.
 .lp sortpack
 Sort the pack contents by type when displaying inventory (default on).
 Persistent.
-.lp sortvanquisted
+.lp sortvanquished
 Controls the sorting behavior for the output of the #vanquished command.
 Persistent.
 .lp ""
