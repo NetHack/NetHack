@@ -789,11 +789,11 @@ parse_id(const char *id, struct find_struct *findwhat)
                         else if (i == LAND_MINE)
                             buf2 = "unset ";
                         buf3 = (i == SCR_BLANK_PAPER) ? "blank scroll"
-                                 : (i == SPE_BLANK_PAPER)
-                                     ? "blank spellbook"
-                                     : (i == SLIME_MOLD)
-                                     ? "slime mold"
-                                     : obj_descr[i].oc_name;
+                               : (i == SPE_BLANK_PAPER) ? "blank spellbook"
+                                 : (i == SLIME_MOLD) ? "slime mold"
+                                   : obj_descr[i].oc_name
+                                     ? obj_descr[i].oc_name
+                                     : obj_descr[i].oc_descr;
                         Strcpy(buf[0], "G_");
                         if (glyph_is_normal_piletop_obj(glyph))
                             Strcat(buf[0], "piletop_");

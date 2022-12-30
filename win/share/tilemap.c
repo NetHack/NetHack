@@ -120,10 +120,10 @@ struct tilemap_t {
 
 #define MAX_TILENAM 30
     /* List of tiles encountered and their usage */
- struct tiles_used {
+struct tiles_used {
     int tilenum;
-     enum tilesrc src;
-     int file_entry;
+    enum tilesrc src;
+    int file_entry;
     char tilenam[MAX_TILENAM];
     char references[120];
 };
@@ -642,8 +642,10 @@ init_tilemap(void)
             GLYPH_STATUE_MALE_OFF);
     Fprintf(tilemap_file, "GLYPH_STATUE_FEM_OFF = %d\n",
             GLYPH_STATUE_FEM_OFF);
-    Fprintf(tilemap_file, "GLYPH_OBJ_PILETOP_OFF = %d\n", GLYPH_OBJ_PILETOP_OFF);
-    Fprintf(tilemap_file, "GLYPH_BODY_PILETOP_OFF = %d\n", GLYPH_BODY_PILETOP_OFF);
+    Fprintf(tilemap_file, "GLYPH_OBJ_PILETOP_OFF = %d\n",
+            GLYPH_OBJ_PILETOP_OFF);
+    Fprintf(tilemap_file, "GLYPH_BODY_PILETOP_OFF = %d\n",
+            GLYPH_BODY_PILETOP_OFF);
     Fprintf(tilemap_file, "GLYPH_STATUE_MALE_PILETOP_OFF = %d\n",
             GLYPH_STATUE_MALE_PILETOP_OFF);
     Fprintf(tilemap_file, "GLYPH_STATUE_FEM_PILETOP_OFF = %d\n",
@@ -657,22 +659,22 @@ init_tilemap(void)
         tilemap[i].tilenum = -1;
     }
 
-    corpsetile = NUMMONS +                                 /* MON_MALE */
-                 NUMMONS +                                 /* MON_FEM */
-                 NUM_INVIS_TILES +                         /* INVIS */
-                 CORPSE;                                   /* within OBJ */
+    corpsetile = NUMMONS                                   /* MON_MALE */
+               + NUMMONS                                   /* MON_FEM */
+               + NUM_INVIS_TILES                           /* INVIS */
+               + CORPSE;                                   /* within OBJ */
 
-    swallowbase = NUMMONS +                                /* MON_MALE */
-                  NUMMONS +                                /* MON_FEM */
-                  NUM_INVIS_TILES +                        /* INVIS */
-                  NUM_OBJECTS +                            /* Objects */
-                  1 +                                      /* Stone */
-                  ((S_trwall - S_vwall) + 1) +             /* main walls */
-                  ((S_brdnladder - S_ndoor) + 1) +         /* cmap A */
-                  5 +                                      /* 5 altar tiles */
-                  (S_arrow_trap + MAXTCHARS - S_grave) +   /* cmap B */
-                  (NUM_ZAP << 2)  +                        /* zaps */
-                  ((S_goodpos - S_digbeam) + 1);           /* cmap C */
+    swallowbase = NUMMONS                                  /* MON_MALE */
+                + NUMMONS                                  /* MON_FEM */
+                + NUM_INVIS_TILES                          /* INVIS */
+                + NUM_OBJECTS                              /* Objects */
+                + 1                                        /* Stone */
+                + ((S_trwall - S_vwall) + 1)               /* main walls */
+                + ((S_brdnladder - S_ndoor) + 1)           /* cmap A */
+                + (4 + 1)                                  /* 5 altar tiles */
+                + (S_arrow_trap + MAXTCHARS - S_grave)     /* cmap B */
+                + (NUM_ZAP << 2)                           /* zaps */
+                + ((S_goodpos - S_digbeam) + 1);           /* cmap C */
 
     /* add number compiled out */
     for (i = 0; conditionals[i].sequence != TERMINATOR; i++) {
@@ -809,7 +811,7 @@ init_tilemap(void)
         Snprintf(tilemap[GLYPH_OBJ_PILETOP_OFF + i].name,
                  sizeof tilemap[GLYPH_OBJ_PILETOP_OFF + i].name,
                  "%s %s (onum=%d)",
-                 "piletop" ,tilename(OBJ_GLYPH, file_entry, 0), i);
+                 "piletop", tilename(OBJ_GLYPH, file_entry, 0), i);
         add_tileref(tilenum, GLYPH_OBJ_OFF + i,
                     objects_file, file_entry,
                     tilemap[GLYPH_OBJ_OFF + i].name, "");
@@ -1318,6 +1320,7 @@ main(int argc UNUSED, char *argv[] UNUSED)
     int i, tilenum;
     char filename[30];
     FILE *ofp;
+    const char *enhanced;
     const char indent[] = "    ";
 
 #if defined(OBTAIN_TILEMAP)
@@ -1327,6 +1330,11 @@ main(int argc UNUSED, char *argv[] UNUSED)
 
     init_tilemap();
 
+#ifdef ENHANCED_SYMBOLS
+    enhanced = ", utf8rep";
+#else
+    enhanced = "";
+#endif
     /*
      * create the source file, "tile.c"
      */
@@ -1340,39 +1348,35 @@ main(int argc UNUSED, char *argv[] UNUSED)
     Fprintf(ofp, "\n#include \"hack.h\"\n");
     Fprintf(ofp, "\n#ifdef USE_TILES\n");
     Fprintf(ofp, "\nint total_tiles_used = %d,\n", laststatuetile + 1);
-    Fprintf(ofp, "%sTile_corr = %d,\n", indent, TILE_corr);       /* X11 references it */
+    Fprintf(ofp, "%sTile_corr = %d,\n", indent, TILE_corr); /* X11 uses it */
     Fprintf(ofp, "%sTile_stone = %d,\n",  indent, TILE_stone);
     Fprintf(ofp, "%sTile_unexplored = %d;\n",  indent, TILE_unexplored);
     Fprintf(ofp, "int maxmontile = %d,\n", lastmontile);
     Fprintf(ofp, "%smaxobjtile = %d,\n", indent, lastobjtile);
     Fprintf(ofp, "%smaxothtile = %d;\n\n", indent, lastothtile);
-    Fprintf(ofp, 
-      "/* glyph, ttychar, { glyphflags, {color, symidx}, ovidx, tileidx, 0 } */\n");
+    Fprintf(ofp, "/* glyph, ttychar, { %s%s } */\n",
+            "glyphflags, {color, symidx}, ovidx, tileidx", enhanced);
+#ifdef ENHANCED_SYMBOLS
+    enhanced = ", 0"; /* replace ", utf8rep" since we're done with that */
+#endif
     Fprintf(ofp, "const glyph_info nul_glyphinfo = { \n");
     Fprintf(ofp, "%sNO_GLYPH, ' ',\n", indent);
-    Fprintf(ofp, "%s%s{  /* glyph_map */\n", indent, indent);
-    Fprintf(ofp, "%s%s%sMG_UNEXPL, { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X },\n",
-            indent, indent, indent);
-#ifdef ENHANCED_SYMBOLS
-    Fprintf(ofp, "%s%s%s%d, 0\n", indent, indent, indent,
-            TILE_unexplored);
-#else
-    Fprintf(ofp, "%s%s%s%d\n", indent, indent, indent,
-            TILE_unexplored);
-#endif
-    Fprintf(ofp, "%s%s}\n", indent, indent);
+    Fprintf(ofp, "%s%s/* glyph_map */\n", indent, indent);
+    Fprintf(ofp, "%s%s{ %s, %d%s }\n", indent, indent,
+            "MG_UNEXPL, { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X }",
+            TILE_unexplored, enhanced);
     Fprintf(ofp, "};\n");
     Fprintf(ofp, "\nglyph_map glyphmap[MAX_GLYPH] = {\n");
 
     for (i = 0; i < MAX_GLYPH; i++) {
         tilenum = tilemap[i].tilenum;
+        if (tilenum < 0) { /* will be -1 if not assigned a real value */
+            panic("tilemap: glyph %d maps to tile %d.", i, tilenum);
+            /*NOTREACHED*/
+        }
         Fprintf(ofp,
-#ifdef ENHANCED_SYMBOLS
-                "    { 0U, { 0, 0 }, %4d, 0 },   /* [%04d] %s:%03d %s */\n",
-#else
-                "    { 0U, { 0, 0 }, %4d},   /* [%04d] %s:%03d %s */\n",
-#endif
-                tilenum, i,
+                "    { 0U, { 0, 0 }, %4d%s },   /* [%04d] %s:%03d %s */\n",
+                tilenum, enhanced, i,
                 tilesrc_texts[tilelist[tilenum]->src],
                 tilelist[tilenum]->file_entry,
                 tilemap[i].name);
@@ -1393,8 +1397,11 @@ RESTORE_WARNINGS
 #endif /* TILETEXT */
 
 boolean
-acceptable_tilename(int glyph_set, int idx, const char *encountered,
-                    const char *expected)
+acceptable_tilename(
+    int glyph_set,
+    int idx,
+    const char *encountered,
+    const char *expected)
 {
     int i;
     size_t a, b;
@@ -1532,11 +1539,14 @@ free_tilerefs(void)
 
 #endif
 
-    DISABLE_WARNING_FORMAT_NONLITERAL
+DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-nh_snprintf(const char *func UNUSED, int line UNUSED, char *str, size_t size,
-            const char *fmt, ...)
+nh_snprintf(
+    const char *func UNUSED,
+    int line UNUSED,
+    char *str, size_t size,
+    const char *fmt, ...)
 {
     va_list ap;
     int n;
