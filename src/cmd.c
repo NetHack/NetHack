@@ -1918,7 +1918,7 @@ wiz_smell(void)
 {
     struct monst *mtmp; /* monster being smelled */
     struct permonst *mptr;
-    int ans = 0;
+    int ans, glyph;
     coord cc; /* screen pos to sniff */
     boolean is_you;
 
@@ -1949,15 +1949,22 @@ wiz_smell(void)
         } else {
             mptr = (struct permonst *) 0;
         }
+        /* Buglet: mapping or unmapping "remembered, unseen monster" should
+           cause time to elapse; since we're in wizmode, don't bother */
+        glyph = glyph_at(cc.x, cc.y);
         /* Is it a monster? */
         if (mptr) {
             if (is_you)
                 You("surreptitiously sniff under your %s.", body_part(ARM));
             if (!usmellmon(mptr))
-                pline("%s to give off no smell.",
+                pline("%s to not give off any smell.",
                       is_you ? "You seem" : "That monster seems");
+            if (!glyph_is_monster(glyph))
+                map_invisible(cc.x, cc.y);
         } else {
-            pline("That is not a monster.");
+            You("don't smell any monster there.");
+            if (glyph_is_invisible(glyph))
+                unmap_invisible(cc.x, cc.y);
         }
     } while (TRUE);
     return ECMD_OK;
