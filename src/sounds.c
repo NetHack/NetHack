@@ -608,7 +608,9 @@ domonnoise(register struct monst* mtmp)
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
         return ECMD_OK;
-    if (is_silent(ptr))
+    if (is_silent(ptr)
+        /* shk_chat can handle nonverbal monsters */
+        && !mtmp->isshk)
         return ECMD_OK;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
@@ -617,13 +619,16 @@ domonnoise(register struct monst* mtmp)
     /* make sure it's your role's quest guardian; adjust if not */
     else if (msound == MS_GUARDIAN && ptr != &mons[gu.urole.guardnum])
         msound = mons[genus(monsndx(ptr), 1)].msound;
+    /* even polymorphed, shopkeepers retain their minds and capitalist bent */
+    else if (mtmp->isshk)
+        msound = MS_SELL;
     /* some normally non-speaking types can/will speak if hero is similar */
     else if (msound == MS_ORC
              && ((same_race(ptr, gy.youmonst.data)        /* current form, */
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
-    /* silliness, with slight chance to interfere with shopping */
+    /* silliness; formerly had a slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
         msound = MS_SELL;
 
@@ -645,7 +650,7 @@ domonnoise(register struct monst* mtmp)
         quest_chat(mtmp);
         break;
     case MS_SELL: /* pitch, pay, total */
-        if (!Hallucination || (mtmp->isshk && !rn2(2))) {
+        if (!Hallucination || is_silent(ptr) || (mtmp->isshk && !rn2(2))) {
             shk_chat(mtmp);
         } else {
             /* approximation of GEICO's advertising slogan (it actually
