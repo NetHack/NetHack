@@ -1077,6 +1077,7 @@ if player's run-time config file had OPTIONS=role:Val and the environment had
 sleeping or unconscious hero attacked by Medusa would meet her gaze
 if a trap killed both the hero's steed and the hero an impossible "dmonsfree:
 	N+1 removed doesn't match N pending" warning could occur
+prevent paralyzed hero from helping nymph or succubus remove worn armor
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
