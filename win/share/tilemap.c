@@ -1371,7 +1371,10 @@ main(int argc UNUSED, char *argv[] UNUSED)
     for (i = 0; i < MAX_GLYPH; i++) {
         tilenum = tilemap[i].tilenum;
         if (tilenum < 0) { /* will be -1 if not assigned a real value */
-            panic("tilemap: glyph %d maps to tile %d.", i, tilenum);
+            Fprintf(stderr, "ERROR: glyph %d maps to tile %d.\n", i, tilenum);
+            (void) fclose(ofp);
+            unlink(filename);
+            exit(EXIT_FAILURE);
             /*NOTREACHED*/
         }
         Fprintf(ofp,
