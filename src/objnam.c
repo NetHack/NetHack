@@ -1,4 +1,4 @@
-/* NetHack 3.6	objnam.c	$NHDT-Date: 1583315888 2020/03/04 09:58:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.293 $ */
+/* NetHack 3.6	objnam.c	$NHDT-Date: 1672682745 2023/01/02 18:05:45 $  $NHDT-Branch: releasebits-3.6 $:$NHDT-Revision: 1.259 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1684,7 +1684,7 @@ const char *str;
         return strcpy(buf, "an []");
     }
     (void) just_an(buf, str);
-    return strcat(buf, str);
+    return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
 }
 
 char *
@@ -1752,9 +1752,7 @@ const char *str;
         Strcpy(buf, "the ");
     else
         buf[0] = '\0';
-    Strcat(buf, str);
-
-    return buf;
+    return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
 }
 
 char *
