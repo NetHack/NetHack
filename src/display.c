@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1661295668 2022/08/23 23:01:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.192 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1672561294 2023/01/01 08:21:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -364,11 +364,11 @@ unmap_invisible(coordxy x, coordxy y)
 /*
  * unmap_object()
  *
- * Remove something from the map when the hero realizes it's not there any
- * more.  Replace it with background or known trap, but not with any other
- * If this is used for detection, a full screen update is imminent anyway;
- * if this is used to get rid of an invisible monster notation, we might have
- * to call newsym().
+ * Remove something from the map when the hero realizes it's not there
+ * anymore.  Replace it with background or known trap, but not with
+ * any other remembered object.  If this is used for detection, a full
+ * screen update is imminent anyway; if this is used to get rid of an
+ * invisible monster notation, we might have to call newsym().
  */
 void
 unmap_object(register coordxy x, register coordxy y)
