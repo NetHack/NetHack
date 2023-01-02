@@ -193,22 +193,32 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
-		uint32 color = Glyphcolor(i, j);
-		char32_t ch = Glyphttychar(i, j);
-		unsigned special = Glyphflags(i, j);
-/*		unsigned short tileidx = Glyphtileidx(i, j); */
-        if (SYMHANDLING(H_IBM)) {
-            ch = cp437(ch);
-        }
+                uint32 color = Glyphcolor(i, j);
+                char32_t ch = Glyphttychar(i, j);
+                unsigned special = Glyphflags(i, j);
+                uint32 framecolor = GlyphFramecolor(i, j);
+/*              unsigned short tileidx = Glyphtileidx(i, j); */
+                if (SYMHANDLING(H_IBM)) {
+                    ch = cp437(ch);
+                }
+                if (framecolor != NO_COLOR) {
+                     painter.fillRect(i*qt_settings->glyphs().width(),
+                                    j*qt_settings->glyphs().height(),
+                                    qt_settings->glyphs().width()-1,
+                                    qt_settings->glyphs().height()-1,
+                                    nhcolor_to_pen(framecolor).color());
+                }
+                    
 #ifdef TEXTCOLOR
-		painter.setPen( nhcolor_to_pen(color) );
+
+                 painter.setPen( nhcolor_to_pen(color) );
 #else
-		painter.setPen( Qt::green );
+                 painter.setPen( Qt::green );
 #endif
-		if (!DrawWalls(painter, i * gW, j * gH, gW, gH, ch)) {
-		    painter.drawText(i * gW, j * gH, gW, gH, Qt::AlignCenter,
+                if (!DrawWalls(painter, i * gW, j * gH, gW, gH, ch)) {
+                    painter.drawText(i * gW, j * gH, gW, gH, Qt::AlignCenter,
                                      QString(QChar(ch)).left(1));
-		}
+                }
 #ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i * gW, j * gH),
@@ -218,17 +228,25 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                     painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
                 }
+                if (framecolor != NO_COLOR) {
+                   painter.setPen( nhcolor_to_pen(framecolor) );
+                   painter.drawRect(i*qt_settings->glyphs().width(),
+                                    j*qt_settings->glyphs().height(),
+                                    qt_settings->glyphs().width()-1,
+                                    qt_settings->glyphs().height()-1);
+                }
 #endif
             }
         }
 
-	painter.setFont(font());
+        painter.setFont(font());
     } else { // tiles
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
                 unsigned short g = Glyph(i,j);
 		unsigned special = Glyphflags(i, j);
 		unsigned tileidx = Glyphtileidx(i, j);
+                uint32 framecolor = GlyphFramecolor(i, j);
 
                 glyphs.drawCell(painter, g, tileidx, i, j);
 
@@ -239,6 +257,13 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                            && ::iflags.hilite_pile) {
                     painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
+                }
+                if (framecolor != NO_COLOR) {
+                   painter.setPen( nhcolor_to_pen(framecolor) );
+                   painter.drawRect(i*qt_settings->glyphs().width(),
+                                    j*qt_settings->glyphs().height(),
+                                    qt_settings->glyphs().width()-1,
+                                    qt_settings->glyphs().height()-1);
                 }
 	    }
 	}
@@ -513,6 +538,7 @@ void NetHackQtMapViewport::Clear()
         Glyph(0, j) = GLYPH_NOTHING;
         Glyphttychar(0, j) = ' ';
         Glyphcolor(0, j) = NO_COLOR;
+        GlyphFramecolor(0, j) = NO_COLOR;
         Glyphflags(0, j) = 0U;
         Glyphtileidx(0, j) = ::glyphmap[GLYPH_NOTHING].tileidx;
 
@@ -520,6 +546,7 @@ void NetHackQtMapViewport::Clear()
             Glyph(i, j) = GLYPH_UNEXPLORED;
             Glyphttychar(i, j) = ' ';
             Glyphcolor(i, j) = NO_COLOR;
+            GlyphFramecolor(i, j) = NO_COLOR;
             Glyphflags(i, j) = 0U;
             Glyphtileidx(i, j) = ::glyphmap[GLYPH_UNEXPLORED].tileidx;
         }
@@ -555,11 +582,13 @@ void NetHackQtMapViewport::CursorTo(int x,int y)
 }
 
 void NetHackQtMapViewport::PrintGlyph(int x, int y,
-                                      const glyph_info *glyphinfo)
+                                      const glyph_info *glyphinfo,
+                                      const glyph_info *bkglyphinfo)
 {
     Glyph(x, y) = (unsigned short) glyphinfo->glyph;
     Glyphttychar(x, y) = (char32_t) glyphinfo->ttychar;
     Glyphcolor(x, y) = (uint32) glyphinfo->gm.sym.color;
+    GlyphFramecolor(x, y) = (uint32) bkglyphinfo->framecolor;
 #ifdef ENHANCED_SYMBOLS
     if (SYMHANDLING(H_UTF8)
         && glyphinfo->gm.u
@@ -677,9 +706,10 @@ void NetHackQtMapWindow2::ClipAround(int x,int y)
 }
 
 void NetHackQtMapWindow2::PrintGlyph(int x,int y,
-                                     const glyph_info *glyphinfo)
+                                     const glyph_info *glyphinfo,
+                                     const glyph_info *bkglyphinfo)
 {
-    m_viewport->PrintGlyph(x, y, glyphinfo);
+    m_viewport->PrintGlyph(x, y, glyphinfo, bkglyphinfo);
 }
 
 #if 0 //RLC
@@ -802,6 +832,7 @@ void NetHackQtMapWindow::Clear()
     for (int j = 0; j < ROWNO; ++j) {
         Glyph(0, j) = GLYPH_NOTHING;
         Glyphcolor(0, j) = NO_COLOR;
+        GlyphFramecolor(0, j) = NO_COLOR;
         Glyphttychar(0, j) = ' ';
         Glyphflags(0, j) = 0;
         Glyphtileidx(0, j) = ::glyphmap[GLYPH_NOTHING].tileidx;
@@ -809,6 +840,7 @@ void NetHackQtMapWindow::Clear()
         for (int i = 1; i < COLNO; ++i) {
             Glyph(i, j) = GLYPH_UNEXPLORED;
             Glyphcolor(i, j) = NO_COLOR;
+            GlyphFramecolor(i, j) = NO_COLOR;
             Glyphttychar(i, j) = ' ';
             Glyphflags(i, j) = 0;
             Glyphtileidx(i, j) = ::glyphmap[GLYPH_UNEXPLORED].tileidx;
@@ -883,15 +915,18 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
-#if 0
-		int color;
-		char32_t ch;
-		unsigned special;
-#else
 		uint32 color = Glyphcolor(i,j);
+                uint32 framecolor = GlyphFramecolor(i,j);
 		char32_t ch = Glyphttychar(i,j);
 		unsigned special = Glyphflags(i,j);
-#endif
+
+                if (framecolor != NO_COLOR) {
+                    painter.fillRect(i*qt_settings->glyphs().width(),
+                                     j*qt_settings->glyphs().height(),
+                                     qt_settings->glyphs().width()-1,
+                                     qt_settings->glyphs().height()-1,
+                                     nhcolor_to_pen(framecolor).color());
+                }               
 		painter.setPen( Qt::green );
 #ifdef TEXTCOLOR
 		painter.setPen( nhcolor_to_pen(color) );
@@ -916,16 +951,24 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
                                        pile_annotation);
                 }
 #endif
-	    }
-	}
+                if (framecolor != NO_COLOR) {
+                    painter.setPen( nhcolor_to_pen(framecolor) );
+                    painter.drawRect(i*qt_settings->glyphs().width(),
+                                     j*qt_settings->glyphs().height(),
+                                     qt_settings->glyphs().width()-1,
+                                     qt_settings->glyphs().height()-1);
+                }
+            }
+        }
 
-	painter.setFont(font());
+        painter.setFont(font());
     } else {
 	for (int j=garea.top(); j<=garea.bottom(); j++) {
 	    for (int i=garea.left(); i<=garea.right(); i++) {
 		unsigned short g=Glyph(i,j);
 		unsigned special = Glyphflags(i,j);
 		unsigned short tileidx = Glyphtileidx(i,j);
+                uint32 framecolor = GlyphFramecolor(i,j);
 
                 qt_settings->glyphs().drawCell(painter, g, tileidx, i, j);
 #ifdef TEXTCOLOR
@@ -940,6 +983,13 @@ void NetHackQtMapWindow::paintEvent(QPaintEvent* event)
                                        pile_annotation);
                 }
 #endif
+                if (framecolor != NO_COLOR) {
+                    painter.setPen( nhcolor_to_pen(framecolor) );
+                    painter.drawRect(i*qt_settings->glyphs().width(),
+                                     j*qt_settings->glyphs().height(),
+                                     qt_settings->glyphs().width()-1,
+                                     qt_settings->glyphs().height()-1);
+                }
 	    }
 	}
     }
@@ -1041,6 +1091,7 @@ void NetHackQtMapWindow::PrintGlyph(int x,int y, const glyph_info *glyphinfo)
     Glyph(x,y)=glyphinfo->glyph;
     Glyphttychar(x,y)=glyphinfo->ttychar;
     Glyphcolor(x,y)=glyphinfo->color;
+    GlyphFramecolor(x,y)=bkglyphinfo->framecolor;
 #ifdef ENHANCED_SYMBOLS
     if (SYMHANDLING(H_UTF8)
         && glyphinfo->gm.u
