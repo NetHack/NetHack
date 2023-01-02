@@ -22,7 +22,7 @@
 
 extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
 struct VesaCharacter {
-    uint32 colour;
+    uint32 colour, bgcolour;
     uint32 chr;
 };
 
@@ -86,6 +86,7 @@ static struct map_struct {
     uint32 attr;
     unsigned special;
     short int tileidx;
+    int framecolor;
 } map[ROWNO][COLNO]; /* track the glyphs */
 
 #define vesa_clearmap()                                         \
@@ -95,6 +96,7 @@ static struct map_struct {
             for (x = 0; x < COLNO; ++x) {                       \
                 map[y][x].glyph = GLYPH_UNEXPLORED;             \
                 map[y][x].ch = glyph2ttychar(GLYPH_UNEXPLORED); \
+		map[y][x].framecolor = NO_COLOR;                \
                 map[y][x].attr = 0;                             \
                 map[y][x].special = 0;                          \
                 map[y][x].tileidx = Tile_unexplored;            \
@@ -667,10 +669,10 @@ vesa_xputc(char ch, int attr)
     vesa_gotoloc(col, row);
 }
 
-#if defined(USE_TILES)
+#if defined(TILES_IN_GLYPHMAP)
 /* Place tile represent. a glyph at current location */
 void
-vesa_xputg(const glyph_info *glyphinfo)
+vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
 {
     int glyphnum = glyphinfo->glyph;
     uint32 ch = (uchar) glyphinfo->ttychar;
@@ -701,6 +703,11 @@ vesa_xputg(const glyph_info *glyphinfo)
     map[ry][col].special = special;
     map[ry][col].tileidx = glyphinfo->gm.tileidx;
     map[ry][col].attr = attr;
+
+    if (bkglyphinfo->framecolor != NO_COLOR) {
+        map[ry][col].framecolor = bkglyphinfo->framecolor;
+    }
+
     if (iflags.traditional_view) {
         vesa_WriteChar(ch, col, row, attr);
     } else {
@@ -717,7 +724,7 @@ vesa_xputg(const glyph_info *glyphinfo)
         ++col;
     vesa_gotoloc(col, row);
 }
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 
 /*
  * Cursor location manipulation, and location information fetching
@@ -738,7 +745,7 @@ vesa_gotoloc(int col, int row)
     currow = min(row, LI - 1);
 }
 
-#if defined(USE_TILES) && defined(CLIPPING)
+#if defined(TILES_IN_GLYPHMAP) && defined(CLIPPING)
 static void
 vesa_cliparound(int x, int y)
 {
@@ -857,7 +864,8 @@ vesa_redrawmap(void)
 
     free(p_row);
 }
-#endif /* USE_TILES && CLIPPING */
+#endif /* TILES_IN_GLYPHMAP && CLIPPING */
+
 
 void
 vesa_userpan(enum vga_pan_direction pan)
@@ -1030,7 +1038,7 @@ vesa_Init(void)
     if (inited) return;
     inited = TRUE;
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     /*
      * Attempt to open the required tile files. If we can't
      * don't perform the video mode switch, use TTY code instead.
@@ -1082,7 +1090,7 @@ vesa_Init(void)
         windowprocs.wincap2 |= WC2_U_24BITCOLOR;
     }
 #endif
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     paletteptr = get_palette();
     iflags.tile_view = TRUE;
     iflags.over_view = FALSE;
@@ -1626,6 +1634,8 @@ vesa_flush_text(void)
     chr_cache_size = 0;
 }
 
+extern uint32 curframecolor;   /* video.c */
+
 static void
 vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
                   unsigned t_row_width)
@@ -1637,6 +1647,7 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
     unsigned long offset = pixy * (unsigned long)vesa_scan_line + pixx * vesa_pixel_bytes;
     unsigned char fg[4], bg[4];
 
+#if 0
     /* Preprocess the background color */
     if (vesa_pixel_bytes == 1) {
         bg[0] = BACKGROUND_VESA_COLOR;
@@ -1647,6 +1658,7 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
         bg[2] = (pix >> 16) & 0xFF;
         bg[3] = (pix >> 24) & 0xFF;
     }
+#endif
 
     /* First loop: draw one raster line of all row entries */
     for (py = 0; py < (int) vesa_char_height; ++py) {
@@ -1655,6 +1667,17 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
         for (i = 0; i < t_row_width; ++i) {
             uint32 chr = t_row[i].chr;
             uint32 colour = t_row[i].colour;
+
+            /* background color */
+            if (vesa_pixel_bytes == 1) {
+                bg[0] = BACKGROUND_VESA_COLOR;
+            } else {
+                unsigned long pix = vesa_palette[t_row[i].bgcolour];
+                bg[0] =  pix        & 0xFF;
+                bg[1] = (pix >>  8) & 0xFF;
+                bg[2] = (pix >> 16) & 0xFF;
+                bg[3] = (pix >> 24) & 0xFF;
+            }
             /* Preprocess the foreground color */
             if (colour & 0x80000000) {
                 fg[0] =  colour        & 0xFF;
@@ -1910,7 +1933,7 @@ vesa_SetHardPalette(const struct Pixel *palette)
 
     /* First, try the VESA palette function */
     /* Set the tile set and text colors */
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     for (i = 0; i < FIRST_TEXT_COLOR; ++i) {
         p2[i*4 + 0] = palette[i].b >> shift;
         p2[i*4 + 1] = palette[i].g >> shift;
@@ -1937,7 +1960,7 @@ vesa_SetHardPalette(const struct Pixel *palette)
     /* If that didn't work, use the original BIOS function */
     if (regs.x.ax != 0x004F) {
         /* Set the tile set and text colors */
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
         for (i = 0; i < FIRST_TEXT_COLOR; ++i) {
             p2[i*3 + 0] = palette[i].r >> shift;
             p2[i*3 + 1] = palette[i].g >> shift;
@@ -1976,7 +1999,7 @@ vesa_SetSoftPalette(const struct Pixel *palette)
     unsigned i;
 
     /* Set the tile set and text colors */
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     if (palette != NULL) {
         p = palette;
         for (i = 0; i < FIRST_TEXT_COLOR; ++i) {

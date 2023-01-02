@@ -58,7 +58,7 @@ unsigned long sys_random_seed(void);
 static char *getdta(void);
 #endif
 static unsigned int dos_ioctl(int, int, unsigned);
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern boolean pckeys(unsigned char, unsigned char); /* pckeys.c */
 #endif
 
@@ -281,7 +281,7 @@ BIOSgetch(void)
             else
                 ch = kpad[scan - KEYPADLO].normal;
         }
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
         /* Check for special interface manipulation keys */
         if (pckeys(scan, shift)) {
             ch = 0xFF;

@@ -92,6 +92,7 @@ struct DisplayDesc {
     short curx, cury; /* current cursor position on the screen */
 #ifdef TEXTCOLOR
     int color; /* current color */
+    uint32 framecolor; /* current background color */
 #endif
     int attrs;         /* attributes in effect */
     int toplin;        /* flag for topl stuff */
@@ -153,8 +154,8 @@ E void tty_shutdown(void);
 #endif
 E int xputc(int);
 E void xputs(const char *);
-#if defined(SCREEN_VGA) || defined(SCREEN_8514)
-E void xputg(const glyph_info *);
+#if defined(SCREEN_VGA) || defined(SCREEN_8514) || defined(SCREEN_VESA)
+E void xputg(const glyph_info *, const glyph_info *);
 #endif
 E void cl_end(void);
 E void clear_screen(void);
@@ -188,6 +189,7 @@ E void term_end_raw_bold(void);
 #ifdef TEXTCOLOR
 E void term_end_color(void);
 E void term_start_color(int color);
+E void term_start_bgcolor(int color);
 #endif /* TEXTCOLOR */
 #ifdef ENHANCED_SYMBOLS
 extern void term_start_24bitcolor(struct unicode_representation *);

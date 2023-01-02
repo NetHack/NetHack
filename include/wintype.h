@@ -101,6 +101,7 @@ typedef struct glyph_map_entry {
 typedef struct gi {
     int glyph;            /* the display entity */
     int ttychar;
+    uint32 framecolor;
     glyph_map gm;
 } glyph_info;
 #define GLYPH_INFO_P struct gi
@@ -212,6 +213,22 @@ struct win_request_info_t {
 typedef struct win_request_info_t win_request_info;
 
 /* #define CORE_INVENT */
+
+/* In a binary with multiple window interfaces linked in, this is
+ * a structure to track certain interface capabilities that cannot be
+ * statically done at compile time. Some of them can be toggled and
+ * the core needs to know if they are active or not at the time.
+ */
+
+enum win_display_modes {
+    wdmode_traditional = 0,
+    wdmode_tiled
+};
+
+struct win_settings {
+    enum win_display_modes wdmode;
+    uint32 map_frame_color;
+};
 
 /* clang-format on */
 

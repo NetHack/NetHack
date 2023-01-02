@@ -63,7 +63,7 @@ void MyFreeBitMap(struct BitMap *bmp);
 extern void display_map(struct Window *);
 #endif
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern int maxmontile, maxobjtile, maxothtile; /* from tile.c */
 #define MAXMONTILE maxmontile
 #define MAXOBJTILE maxobjtile

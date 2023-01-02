@@ -129,7 +129,7 @@ static int swallow_to_glyph(int, int);
 static void display_warning(struct monst *);
 
 static int check_pos(coordxy, coordxy, int);
-static int get_bk_glyph(coordxy x, coordxy y);
+static void get_bkglyph_and_framecolor(coordxy x, coordxy y, int *, uint32 *);
 static int tether_glyph(coordxy, coordxy);
 static void mimic_light_blocking(struct monst *);
 #ifdef UNBUFFERED_GLYPHINFO
@@ -1444,7 +1444,7 @@ see_traps(void)
 /*  glyph, ttychar, { glyphflags, { sym.color, sym.symidx },
                       tileidx, u } */
 static glyph_info no_ginfo = {
-    NO_GLYPH, ' ', { MG_BADXY, { NO_COLOR, 0 }, 0
+    NO_GLYPH, ' ', NO_COLOR, { MG_BADXY, { NO_COLOR, 0 }, 0
 #ifdef ENHANCED_SYMBOLS
                                                  , 0
 #endif
@@ -1459,13 +1459,13 @@ static glyph_info ginfo;
 #define Glyphinfo_at(x, y, glyph) glyphinfo_at(x, y, glyph)
 #endif
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern const glyph_info nul_glyphinfo; /* tile.c */
 #else
 /* glyph, ttychar, { glyphflags, { sym.color, sym.symidx },
                      tileidx, 0} */
 const glyph_info nul_glyphinfo = {
-    NO_GLYPH, ' ',
+    NO_GLYPH, ' ', NO_COLOR,
         {  /* glyph_map */
             MG_UNEXPL,
             { NO_COLOR, SYM_UNEXPLORED + SYM_OFF_X },
@@ -1477,7 +1477,7 @@ const glyph_info nul_glyphinfo = {
 };
 #endif
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern glyph_map glyphmap[MAX_GLYPH]; /* from tile.c */
 #else
 glyph_map glyphmap[MAX_GLYPH] = {
@@ -1590,7 +1590,7 @@ redraw_map(void)
     for (y = 0; y < ROWNO; ++y)
         for (x = 1; x < COLNO; ++x) {
             glyph = glyph_at(x, y); /* not levl[x][y].glyph */
-            bkglyphinfo.glyph = get_bk_glyph(x, y);
+            get_bkglyph_and_framecolor(x, y, &bkglyphinfo.glyph, &bkglyphinfo.framecolor);
             print_glyph(WIN_MAP, x, y,
                         Glyphinfo_at(x, y, glyph), &bkglyphinfo);
         }
@@ -1826,7 +1826,7 @@ show_glyph(coordxy x, coordxy y, int glyph)
 
 static gbuf_entry nul_gbuf = {
     0,                                 /* gnew */
-    { GLYPH_UNEXPLORED, (unsigned) ' ', /* glyphinfo.glyph */
+    { GLYPH_UNEXPLORED, (unsigned) ' ', NO_COLOR, /* glyphinfo.glyph */
         /* glyphinfo.gm */
         { MG_UNEXPL, { (unsigned) NO_COLOR, 0 }, 0
 #ifdef ENHANCED_SYMBOLS
@@ -1906,8 +1906,10 @@ row_refresh(coordxy start, coordxy stop, coordxy y)
     for (x = start; x <= stop; x++) {
         gptr = &gg.gbuf[y][x];
         glyph = gptr->glyphinfo.glyph;
-        if (force || glyph != GLYPH_UNEXPLORED) {
-            bkglyphinfo.glyph = get_bk_glyph(x, y);
+        get_bkglyph_and_framecolor(x, y, &bkglyphinfo.glyph,
+                                   &bkglyphinfo.framecolor);
+        if (force || glyph != GLYPH_UNEXPLORED
+            || bkglyphinfo.framecolor != NO_COLOR) {
             print_glyph(WIN_MAP, x, y,
                         Glyphinfo_at(x, y, glyph), &bkglyphinfo);
         }
@@ -1943,6 +1945,7 @@ flush_screen(int cursor_on_u)
     static int delay_flushing = 0;
     register coordxy x, y;
     glyph_info bkglyphinfo = nul_glyphinfo;
+    int bkglyph;
 
     /* 3.7: don't update map, status, or perm_invent during save/restore */
     if (suppress_map_output())
@@ -1969,13 +1972,16 @@ flush_screen(int cursor_on_u)
     for (y = 0; y < ROWNO; y++) {
         register gbuf_entry *gptr = &gg.gbuf[y][x = gg.gbuf_start[y]];
 
-        for (; x <= gg.gbuf_stop[y]; gptr++, x++)
-            if (gptr->gnew) {
-                map_glyphinfo(x, y, get_bk_glyph(x, y), 0, &bkglyphinfo);
+        for (; x <= gg.gbuf_stop[y]; gptr++, x++) {
+            get_bkglyph_and_framecolor(x, y, &bkglyph, &bkglyphinfo.framecolor);
+            if (gptr->gnew
+                || (gw.wsettings.map_frame_color != NO_COLOR && bkglyphinfo.framecolor != NO_COLOR)) {
+                map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
                 print_glyph(WIN_MAP, x, y,
                             Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
                 gptr->gnew = 0;
             }
+        }
     }
     reset_glyph_bbox();
 
@@ -2204,22 +2210,21 @@ glyphinfo_at(coordxy x, coordxy y, int glyph)
 #endif
 
 /*
- * This will be used to get the glyph for the background so that
- * it can potentially be merged into graphical window ports to
- * improve the appearance of stuff on dark room squares and the
- * plane of air etc.
- *
- * Until that is working correctly in the branch, however, for now
- * we just return NO_GLYPH as an indicator to ignore it.
- *
+ * Get the glyph for the background so that it can potentially
+ * be merged into graphical window ports to improve the appearance
+ * of stuff on dark room squares and the plane of air etc.
  * [This should be using background as recorded for #overview rather
  * than current data from the map.]
+ *
+ * Also get the frame color to use for highlighting the map location
+ * for some purpose.
+ *
  */
 
-static int
-get_bk_glyph(coordxy x, coordxy y)
+static void
+get_bkglyph_and_framecolor(coordxy x, coordxy y, int *bkglyph, uint32 *framecolor)
 {
-    int idx, bkglyph = GLYPH_UNEXPLORED;
+    int idx, tmp_bkglyph = GLYPH_UNEXPLORED;
     struct rm *lev = &levl[x][y];
 
     if (iflags.use_background_glyph && lev->seenv != 0
@@ -2267,14 +2272,18 @@ get_bk_glyph(coordxy x, coordxy y)
                 idx = (flags.dark_room && iflags.use_color)
                          ? DARKROOMSYM : S_stone;
         }
-
         if (idx != S_room)
-            bkglyph = cmap_to_glyph(idx);
+            tmp_bkglyph = cmap_to_glyph(idx);
     }
-    return bkglyph;
+    if (gw.wsettings.map_frame_color != NO_COLOR && framecolor && mapxy_valid(x, y))
+        *framecolor = gw.wsettings.map_frame_color;
+    else
+        *framecolor = NO_COLOR;
+
+    *bkglyph = tmp_bkglyph;
 }
 
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
 #define HAS_ROGUE_IBM_GRAPHICS \
     (gc.currentgraphics == ROGUESET && SYMHANDLING(H_IBM) && !iflags.grmode)
 #else

@@ -51,6 +51,8 @@ struct text_map_info_t {
     X11_map_symbol text[ROWNO][COLNO];  /* Actual displayed screen. */
 #ifdef TEXTCOLOR
     X11_color colors[ROWNO][COLNO];     /* Color of each character. */
+    X11_color framecolors[ROWNO][COLNO];  /* Color of background
+                                                 behind text */
     GC color_gcs[CLR_MAX],              /* GC for each color */
         inv_color_gcs[CLR_MAX];         /* GC for each inverse color */
 #define copy_gc color_gcs[NO_COLOR]
@@ -74,6 +76,7 @@ struct tile_glyph_info_t {
     unsigned short glyph;
     unsigned short tileidx;
     unsigned glyphflags;
+    uint32 framecolor;
 };
 
 struct tile_map_info_t {

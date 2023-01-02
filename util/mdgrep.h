@@ -200,10 +200,10 @@ static struct grep_var grep_vars[] = { { "0", 0 },
 #else
                                        { "USER_SOUNDS", 0 },
 #endif
-#if defined(USE_TILES)
-                                       { "USE_TILES", 1 },
+#if defined(TILES_IN_GLYPHMAP)
+                                       { "TILES_IN_GLYPHMAP", 1 },
 #else
-                                       { "USE_TILES", 0 },
+                                       { "TILES_IN_GLYPHMAP", 0 },
 #endif
 #if defined(VAR_PLAYGROUND)
                                        { "VAR_PLAYGROUND", 1 },

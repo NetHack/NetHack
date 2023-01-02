@@ -11,7 +11,7 @@ static void shuffle_all(void);
 static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *oclass_to_name(char, char *);
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern glyph_map glyphmap[MAX_GLYPH];
 static void shuffle_tiles(void);
 
@@ -39,7 +39,7 @@ shuffle_tiles(void)
         glyphmap[i + GLYPH_OBJ_PILETOP_OFF].tileidx = tmp_tilemap[1][i];
     }
 }
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 
 static void
 setgemprobs(d_level* dlev)
@@ -208,7 +208,7 @@ init_objects(void)
 
     /* shuffle descriptions */
     shuffle_all();
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     shuffle_tiles();
 #endif
     objects[WAN_NOTHING].oc_dir = rn2(2) ? NODIR : IMMEDIATE;
@@ -403,7 +403,7 @@ restnames(NHFILE* nhfp)
             }
         }
     }
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
     shuffle_tiles();
 #endif
 }

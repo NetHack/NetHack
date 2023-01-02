@@ -86,6 +86,7 @@ typedef struct {
     WORD attr;
     long color24;
     int color256idx;
+    const char *bkcolorseq;
     const char *colorseq;
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
 } cell_t;
@@ -170,6 +171,7 @@ struct console_t {
     WORD foreground;
     WORD attr;
     int current_nhcolor;
+    int current_nhbkcolor;
     int current_nhattr[ATR_INVERSE+1];
     COORD cursor;
     HANDLE hConOut;
@@ -210,6 +212,7 @@ struct console_t {
     (FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED), /* foreground */
     0,                                                     /* attr */
     0,                                                     /* current_nhcolor */
+    0,                                                     /* current_nhbkcolor */
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
     {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE},
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
@@ -313,6 +316,7 @@ static INPUT_RECORD bogus_key;
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
 long customcolors[CLR_MAX];
 const char *esc_seq_colors[CLR_MAX];
+const char *esc_seq_bkcolors[CLR_MAX];
 
 struct rgbvalues {
     int idx;
@@ -471,6 +475,8 @@ rgbtable_to_long(struct rgbvalues *tbl)
 static void
 init_custom_colors(void)
 {
+    char bkcolorbuf[32];
+
     customcolors[CLR_BLACK] = rgbtable_to_long(&rgbtable[131]);
     customcolors[CLR_RED] = rgbtable_to_long(&rgbtable[5]);
     customcolors[CLR_GREEN] = rgbtable_to_long(&rgbtable[31]);
@@ -507,6 +513,40 @@ init_custom_colors(void)
     esc_seq_colors[CLR_BRIGHT_BLUE] = "\x1b[34m\x1b[94m";
     esc_seq_colors[CLR_BRIGHT_MAGENTA] = "\x1b[35m\x1b[95m";
     esc_seq_colors[CLR_BRIGHT_CYAN] = "\x1b[36m\x1b[96m";
+
+     /* Sprintf(tmp, "\033[%dm", ((color % 8) + 40)); */
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BLACK % 8) + 40));
+    esc_seq_bkcolors[CLR_BLACK] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_RED % 8) + 40));
+    esc_seq_bkcolors[CLR_RED] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_GREEN % 8) + 40));
+    esc_seq_bkcolors[CLR_GREEN] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_YELLOW % 8) + 40));
+    esc_seq_bkcolors[CLR_YELLOW] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BLUE % 8) + 40));
+    esc_seq_bkcolors[CLR_BLUE] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_MAGENTA % 8) + 40));
+    esc_seq_bkcolors[CLR_MAGENTA] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_CYAN % 8) + 40));
+    esc_seq_bkcolors[CLR_CYAN] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_WHITE % 8) + 40));
+    esc_seq_bkcolors[CLR_WHITE] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BROWN % 8) + 40));
+    esc_seq_bkcolors[CLR_BROWN] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_GRAY % 8) + 40));
+    esc_seq_bkcolors[CLR_GRAY] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((NO_COLOR % 8) + 40));
+    esc_seq_bkcolors[NO_COLOR] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_ORANGE % 8) + 40));
+    esc_seq_bkcolors[CLR_ORANGE] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_BLUE % 8) + 40));
+    esc_seq_bkcolors[CLR_BRIGHT_BLUE] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_GREEN % 8) + 40));
+    esc_seq_bkcolors[CLR_BRIGHT_GREEN] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_MAGENTA % 8) + 40));
+    esc_seq_bkcolors[CLR_BRIGHT_MAGENTA] = dupstr(bkcolorbuf);
+    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_CYAN % 8) + 40));
+    esc_seq_bkcolors[CLR_BRIGHT_CYAN] = dupstr(bkcolorbuf);
 }
 
 void emit_start_bold(void);
@@ -715,18 +755,20 @@ DWORD error_result;
 /* Console buffer flipping support */
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
 enum do_flags {
-    do_utf8_content = 1,
-    do_wide_content = 2,
-    do_colorseq = 4,
-    do_color24 = 8,
-    do_newattr = 16
+    do_utf8_content = 0x01,
+    do_wide_content = 0x02,
+    do_colorseq     = 0x04,
+    do_color24      = 0x08,
+    do_newattr      = 0x10,
+    do_bkcolorseq   = 0x20,
 };
 enum did_flags {
-    did_utf8_content = 1,
-    did_wide_content = 2,
-    did_colorseq = 4,
-    did_color24 = 8,
-    did_newattr = 16
+    did_utf8_content = 0x01,
+    did_wide_content = 0x02,
+    did_colorseq     = 0x04,
+    did_color24      = 0x08,
+    did_newattr      = 0x10,
+    did_bkcolorseq   = 0x20,
 };
 
 static void
@@ -753,6 +795,8 @@ back_buffer_flip(void)
                 do_anything |= do_colorseq;
             if (back->attr != front->attr)
                 do_anything |= do_newattr;
+            if (back->bkcolorseq != front->bkcolorseq)
+                do_anything |= do_bkcolorseq;
 #ifdef UTF8_FROM_CORE
             if (!SYMHANDLING(H_UTF8)) {
                 if (console.has_unicode
@@ -800,7 +844,15 @@ back_buffer_flip(void)
                     WriteConsoleA(console.hConOut, back->colorseq,
                                   (int) strlen(back->colorseq), &unused,
                                   &reserved);
-                } else {
+                }
+                if (back->bkcolorseq) {
+                    did_anything |= did_bkcolorseq;
+                    WriteConsoleA(console.hConOut, back->bkcolorseq,
+                                  (int) strlen(back->bkcolorseq), &unused,
+                                  &reserved);
+                }
+                if ((did_anything | (did_colorseq | did_bkcolorseq | did_color24)) == 0) {
+                    did_anything &= ~(did_bkcolorseq | did_color24);
                     did_anything |= did_colorseq;
                     emit_default_color();
                 }
@@ -1276,6 +1328,7 @@ xputc_core(int ch)
         /* this causes way too much performance degradation */
         /* cell.color24 = customcolors[console.current_nhcolor]; */
         cell.colorseq = esc_seq_colors[console.current_nhcolor];
+        cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
         cell.attr = console.attr;
         // if (console.color24)
         //    __debugbreak();
@@ -1370,6 +1423,7 @@ g_putch(int in_ch)
 #else
     cell.attr = console.attr;
     cell.colorseq = esc_seq_colors[console.current_nhcolor];
+    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx = 0;
     wch[1] = 0;
@@ -1416,6 +1470,7 @@ g_pututf8(uint8 *sequence)
     cell_t cell;
     cell.attr = console.attr;
     cell.colorseq = esc_seq_colors[console.current_nhcolor];
+    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx =console.color256idx ? console.color256idx : 0;
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
@@ -1719,6 +1774,17 @@ term_start_color(int color)
 }
 
 void
+term_start_bgcolor(int color)
+{
+#ifdef TEXTCOLOR
+    if (color >= 0 && color < CLR_MAX) {
+        console.current_nhbkcolor = color;
+    } else
+#endif
+    console.current_nhbkcolor = NO_COLOR;
+}
+
+void
 term_end_color(void)
 {
 #ifdef TEXTCOLOR
@@ -1728,6 +1794,7 @@ term_end_color(void)
     console.attr = (console.foreground | console.background);
 #endif /* ! VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhcolor = NO_COLOR;
+    console.current_nhbkcolor = NO_COLOR;
 }
 
 void
@@ -1849,7 +1916,7 @@ tty_utf8graphics_fixup(void)
         /* the locale */
         if (console.localestr)
             free(console.localestr);
-        console.localestr = strdup(setlocale(LC_ALL, ".UTF8"));
+        console.localestr = dupstr(setlocale(LC_ALL, ".UTF8"));
         /* the code page */
         SetConsoleOutputCP(65001);
         console.code_page = GetConsoleOutputCP();
@@ -1917,7 +1984,7 @@ tty_ibmgraphics_fixup(void)
     if (localestr) {
         if (console.localestr)
             free(console.localestr);
-        console.localestr = strdup(localestr);
+        console.localestr = dupstr(localestr);
     }
     set_known_good_console_font();
     /* the console mode */
@@ -2201,7 +2268,7 @@ restore_original_console_font(void)
         if (tmplocalestr) {
             if (console.localestr)
                 free(console.localestr);
-            console.localestr = strdup(tmplocalestr);
+            console.localestr = dupstr(tmplocalestr);
         }
         success = SetConsoleOutputCP(console.orig_code_page);
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
@@ -2455,7 +2522,7 @@ void nethack_enter_consoletty(void)
     if (localestr) {
         if (console.localestr)
             free(console.localestr);
-        console.localestr = strdup(localestr);
+        console.localestr = dupstr(localestr);
     }
     console.code_page = console.orig_code_page;
     if (console.has_unicode) {

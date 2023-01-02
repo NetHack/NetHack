@@ -669,8 +669,8 @@ typedef unsigned char uchar;
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES
-# ifndef USE_TILES
-#  define USE_TILES
+# ifndef TILES_IN_GLYPHMAP
+#  define TILES_IN_GLYPHMAP
 # endif
 #endif
 

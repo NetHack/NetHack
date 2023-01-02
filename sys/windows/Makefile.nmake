@@ -2003,6 +2003,7 @@ clean:
 #   * -c (which is included in cflagsBuild) substituted with -Fo$@
 #   * "-o $@ " is removed
 #   * win/X11/Window.o commented due to conflict with pdcurses
+#   * win/share/cppregex.o commented out due to earlier rule
 #   * commented out $(TARGETPFX)tile.o: tile.c $(HACK_H)
 #   * commented out $(TARGETPFX)cppregex.o because it has its own rule already
 #   * $(TARGETPFX) becomes $(OTTY) in 1st batch with $(TTYDEF)

@@ -185,7 +185,7 @@ static char winpanicstr[] = "Bad window id %d";
 char defmorestr[] = "--More--";
 
 #ifdef CLIPPING
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
 boolean clipping = FALSE; /* clipping on? */
 int clipx = 0, clipxmax = 0;
 int clipy = 0, clipymax = 0;
@@ -196,7 +196,7 @@ static int clipy = 0, clipymax = 0;
 #endif
 #endif /* CLIPPING */
 
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
 extern void adjust_cursor_flags(struct WinDesc *);
 #endif
 
@@ -835,7 +835,7 @@ tty_create_nhwindow(int type)
             iflags.wc2_statuslines = 2;
         newwin->offx = 0;
         rowoffset = ttyDisplay->rows - iflags.wc2_statuslines;
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
         if (iflags.grmode) {
             newwin->offy = rowoffset;
         } else
@@ -1946,7 +1946,7 @@ tty_curs(winid window,
 
     print_vt_code2(AVTC_SELECT_WINDOW, window);
 
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
     adjust_cursor_flags(cw);
 #endif
     cw->curx = --x; /* column 0 is never used */
@@ -3291,7 +3291,7 @@ docorner(register int xmin, register int ymax, int ystart_between_menu_pages)
 #ifdef CLIPPING
         if (y < (int) cw->offy || y + clipy > ROWNO)
             continue; /* only refresh board */
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
         if (iflags.tile_view)
             row_refresh((xmin / 2) + clipx - ((int) cw->offx / 2), COLNO - 1,
                         y + clipy - (int) cw->offy);
@@ -3441,7 +3441,7 @@ tty_print_glyph(
     winid window,
     coordxy x, coordxy y,
     const glyph_info *glyphinfo,
-    const glyph_info *bkglyphinfo UNUSED)
+    const glyph_info *bkglyphinfo)
 {
     boolean inverse_on = FALSE, colordone = FALSE, glyphdone = FALSE;
     int ch, color;
@@ -3508,7 +3508,13 @@ tty_print_glyph(
        BW_LAVA and BW_ICE won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
-    if (((special & MG_PET) != 0 && iflags.hilite_pet)
+    if (iflags.use_color
+        && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
+#ifdef TEXTCOLOR
+        ttyDisplay->framecolor = bkglyphinfo->framecolor;
+        term_start_bgcolor(bkglyphinfo->framecolor);
+#endif
+    } else if (((special & MG_PET) != 0 && iflags.hilite_pet)
         || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
         || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
         || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK)) != 0
@@ -3517,9 +3523,9 @@ tty_print_glyph(
         inverse_on = TRUE;
     }
 
-#if defined(USE_TILES) && defined(MSDOS)
+#if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
     if (iflags.grmode && iflags.tile_view) {
-        xputg(glyphinfo);
+        xputg(glyphinfo, bkglyphinfo);
         glyphdone = TRUE;
     }
 #endif
@@ -3542,9 +3548,9 @@ tty_print_glyph(
         /* turn off color as well, turning off ATR_INVERSE may have done
           this already and if so, we won't know the current state unless
           we do it explicitly */
-        if (ttyDisplay->color != NO_COLOR) {
+        if (ttyDisplay->color != NO_COLOR || ttyDisplay->framecolor != NO_COLOR) {
             term_end_color();
-            ttyDisplay->color = NO_COLOR;
+            ttyDisplay->color = ttyDisplay->framecolor = NO_COLOR;
         }
 #endif
 #ifdef ENHANCED_SYMBOLS
@@ -3557,6 +3563,16 @@ tty_print_glyph(
     wins[window]->curx++; /* one character over */
     ttyDisplay->curx++;   /* the real cursor moved too */
 }
+
+#ifdef NO_TERMS  /* termcap.o isn't linked in */
+#if !defined(MSDOS) && !defined(WIN32)
+void
+term_start_bgcolor(int color)
+{
+    /* placeholder for now */
+}
+#endif  /* !MSDOS && !WIN32 */
+#endif  /* NO_TERMS */
 
 void
 tty_raw_print(const char *str)

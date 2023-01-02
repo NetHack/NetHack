@@ -360,6 +360,7 @@ const struct instance_globals_g g_init_g = {
     { { { 0 } } }, /* gbuf */
     UNDEFINED_VALUES, /* gbuf_start */
     UNDEFINED_VALUES, /* gbug_stop */
+
     /* do_name.c */
     UNDEFINED_PTR, /* gloc_filter_map */
     UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
@@ -834,6 +835,9 @@ const struct instance_globals_w g_init_w = {
     UNDEFINED_VALUE, /* wc */
     /* mkmaze.c */
     UNDEFINED_PTR, /* wportal */
+    /* new */
+    { wdmode_traditional, NO_COLOR },       /* wsettings */
+
     TRUE, /* havestate*/
     IVMAGIC  /* w_magic used to validate that structure layout has been preserved */
 };

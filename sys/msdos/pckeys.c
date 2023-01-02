@@ -9,7 +9,7 @@
 #include "hack.h"
 
 #ifdef MSDOS
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 #include "wintty.h"
 #include "pcvideo.h"
 
@@ -126,7 +126,7 @@ refresh(void)
         vesa_refresh();
 #endif
 }
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 #endif /* MSDOS */
 
 /*pckeys.c*/

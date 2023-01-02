@@ -12,7 +12,7 @@
 
 #include "hack.h"
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 
 #if defined(__GO32__) || defined(__DJGPP__)
 #include <unistd.h>
@@ -247,6 +247,6 @@ ReadPackedTileFile(int tilenum, char (*pta)[TILE_X])
     return 0;
 }
 #endif
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 
 /* pctiles.c */

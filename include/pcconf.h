@@ -75,7 +75,7 @@
  */
 #ifndef SUPPRESS_GRAPHICS
 #if (defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)) && !defined(PC9800)
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 #define SCREEN_VGA /* Include VGA graphics routines in the build */
 #define SCREEN_VESA
 #endif

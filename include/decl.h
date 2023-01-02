@@ -830,7 +830,7 @@ struct instance_globals_c {
     char *config_section_current;
     boolean chosen_symset_start;
     boolean chosen_symset_end;
- 
+
     /* invent.c */
     /* for perm_invent when operating on a partial inventory display, so that
        persistent one doesn't get shrunk during filtering for item selection
@@ -1602,6 +1602,9 @@ struct instance_globals_w {
 
     /* mkmaze.c */
     struct trap *wportal;
+
+    /* new */
+    struct win_settings wsettings;      /* wintype.h */
 
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */

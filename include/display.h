@@ -1003,9 +1003,9 @@ extern const int explodecolors[];
 extern int wallcolors[];
 #endif
 
-/* If USE_TILES is defined during build, this comes from the generated
- * tile.c, complete with appropriate tile references in the initialization.
- * Otherwise, it comes from display.c.
+/* If TILES_IN_GLYPHMAP is defined during build, this is defined
+ * in the generated tile.c, complete with appropriate tile references in
+ * the initialization.  Otherwise, it gets defined in display.c.
  */
 extern const glyph_info nul_glyphinfo;
 

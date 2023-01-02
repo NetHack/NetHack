@@ -129,10 +129,10 @@ extern void curs_destroy_all_wins(void);
 #ifdef ENHANCED_SYMBOLS
 extern void curses_putch(winid wid, int x, int y, int ch,
                          struct unicode_representation *u, int color,
-                         int attrs);
+                         int framecolor, int attrs);
 #else
 extern void curses_putch(winid wid, int x, int y, int ch, int color,
-                         int attrs);
+                         int framecolor, int attrs);
 #endif
 extern void curses_get_window_size(winid wid, int *height, int *width);
 extern boolean curses_window_has_border(winid wid);

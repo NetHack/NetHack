@@ -78,9 +78,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     { m, OptS_##sec, 0, b, opt_##a, s, OthrOpt, n, v, d, No, c,         \
       (boolean *) 0, &optfn_##a, al, z, (const char *) 0, On, On, 0 },
 
-/* this is not reliable because USE_TILES might be defined in a
-   multi-interface binary but not apply to the current interface */
-#ifdef USE_TILES
+/* this is not reliable because TILES_IN_GLYPHMAP might be defined
+ * in a multi-interface binary but not apply to the current interface */
+#ifdef TILES_IN_GLYPHMAP
 #define tiled_map_Def On
 #define ascii_map_Def Off
 #else

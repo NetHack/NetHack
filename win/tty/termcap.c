@@ -1438,6 +1438,14 @@ term_start_color(int color)
     if (color < CLR_MAX && hilites[color] && *hilites[color])
         xputs(hilites[color]);
 }
+
+void
+term_start_bgcolor(int color)
+{
+    char tmp[8];
+    Sprintf(tmp, "\033[%dm", ((color % 8) + 40));
+    xputs(tmp);
+}
 #endif /* TEXTCOLOR */
 
 #ifdef ENHANCED_SYMBOLS

@@ -229,7 +229,7 @@ assign_graphics(int whichset)
             gs.showsyms[i] = go.ov_rogue_syms[i] ? go.ov_rogue_syms[i]
                                            : gr.rogue_syms[i];
 
-#if defined(MSDOS) && defined(USE_TILES)
+#if defined(MSDOS) && defined(TILES_IN_GLYPHMAP)
         if (iflags.grmode)
             tileview(FALSE);
 #endif
@@ -242,7 +242,7 @@ assign_graphics(int whichset)
             gs.showsyms[i] = go.ov_primary_syms[i] ? go.ov_primary_syms[i]
                                              : gp.primary_syms[i];
 
-#if defined(MSDOS) && defined(USE_TILES)
+#if defined(MSDOS) && defined(TILES_IN_GLYPHMAP)
         if (iflags.grmode)
             tileview(TRUE);
 #endif

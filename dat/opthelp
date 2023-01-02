@@ -106,7 +106,7 @@ altmeta        For unix and VMS, treat two character sequence
                "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [False]
                obtains a command from player's keyboard.
 
-Boolean option if USE_TILES was set at compile time (MSDOS protected mode):
+Boolean option if TILES_IN_GLYPHMAP set at compile time (MSDOS):
 preload_tiles  control whether tiles get pre-loaded into RAM at    [True]
                the start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.

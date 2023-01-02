@@ -6,6 +6,8 @@
 #include "hack.h"
 
 static char *nextmbuf(void);
+static void getpos_getvalids_selection(struct selectionvar *, boolean (*)(coordxy, coordxy));
+static void selection_force_newsyms(struct selectionvar *);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
 static int QSORTCALLBACK cmp_coord_distu(const void *, const void *);
@@ -50,8 +52,50 @@ getpos_sethilite(
     void (*gp_hilitef)(int),
     boolean (*gp_getvalidf)(coordxy, coordxy))
 {
+    boolean was_valid = (getpos_getvalid != NULL);
+    struct selectionvar *sel = selection_new();
+
+    getpos_getvalids_selection(sel, getpos_getvalid);
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
+    getpos_getvalids_selection(sel, getpos_getvalid);
+    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE : NO_COLOR;
+    if ((boolean) (getpos_getvalid != NULL) != was_valid)
+        selection_force_newsyms(sel);
+    selection_free(sel, TRUE);
+}
+
+boolean
+mapxy_valid(coordxy x, coordxy y)
+{
+    if (getpos_getvalid)
+        return (*getpos_getvalid)(x, y);
+    return FALSE;
+}
+
+static void
+getpos_getvalids_selection(struct selectionvar *sel, boolean (*validf)(coordxy, coordxy))
+{
+    coordxy x, y;
+
+    if (!sel || !validf)
+        return;
+
+    for (x = 1; x < sel->wid; x++)
+        for (y = 0; y < sel->hei; y++)
+            if ((*validf)(x, y))
+                selection_setpoint(x, y, sel, 1);
+}
+
+static void
+selection_force_newsyms(struct selectionvar *sel)
+{
+    coordxy x, y;
+
+    for (x = 1; x < sel->wid; x++)
+        for (y = 0; y < sel->hei; y++)
+            if (selection_getpoint(x, y, sel))
+                newsym_force(x, y);
 }
 
 static const char *const gloc_descr[NUM_GLOCS][4] = {
@@ -1058,8 +1102,7 @@ getpos(coord *ccp, boolean force, const char *goal)
     for (i = 0; i < NUM_GLOCS; i++)
         if (garr[i])
             free((genericptr_t) garr[i]);
-    getpos_hilitefunc = (void (*)(int)) 0;
-    getpos_getvalid = (boolean (*)(coordxy, coordxy)) 0;
+    getpos_sethilite(NULL, NULL);
     u.dx = udx, u.dy = udy, u.dz = udz;
     return result;
 }

@@ -460,11 +460,11 @@ cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DSUPPRESS_GRAPHICS
 LFLAGS =
 
 # Debugging
-#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+#cflags = -g -c $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DTILES_IN_GLYPHMAP
 #LFLAGS = -g
 
 #    Normal
-cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DUSE_TILES
+cflags = -c -O $(INCLDIR) $(DLBFLG) $(CURSESDEF) -DTILES_IN_GLYPHMAP
 LFLAGS =
 
 #==========================================

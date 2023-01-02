@@ -132,6 +132,7 @@ int attrib_text_normal;      /* text mode normal attribute */
 int attrib_gr_normal;        /* graphics mode normal attribute */
 int attrib_text_intense;     /* text mode intense attribute */
 int attrib_gr_intense;       /* graphics mode intense attribute */
+uint32 curframecolor = NO_COLOR;   /* current background text color */
 boolean traditional = FALSE; /* traditonal TTY character mode */
 boolean inmap = FALSE;       /* in the map window */
 #ifdef TEXTCOLOR
@@ -165,7 +166,7 @@ clear_screen(void)
 #endif
 #ifdef SCREEN_VESA
     } else if (iflags.usevesa) {
-        vesa_clear_screen(BACKGROUND_VGA_COLOR);
+        vesa_clear_screen(BACKGROUND_VESA_COLOR);
 #endif
     }
 }
@@ -302,12 +303,14 @@ term_end_attr(int attr)
     default:
         g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
     }
+    curframecolor = NO_COLOR;
 }
 
 void
 term_end_color(void)
 {
     g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
+    curframecolor = NO_COLOR;
 }
 
 void
@@ -368,6 +371,19 @@ term_start_color(int color)
         }
     }
 #endif
+}
+
+void
+term_start_bgcolor(int bgcolor)
+{
+    // pline("before bgcolor = %d, curframecolor = %d", bgcolor, curframecolor);
+#ifdef TEXTCOLOR
+    if (!monoflag) {
+        if (bgcolor >= 0 && bgcolor < CLR_MAX)
+	    curframecolor = bgcolor;
+    }
+#endif
+    // pline("after  bgcolor = %d, curframecolor = %d", bgcolor, curframecolor);
 }
 
 void
@@ -577,8 +593,12 @@ xputc(int ch) /* write out character (and attribute) */
     char attribute;
 
     i = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
-
     attribute = (char) ((g_attribute == 0) ? i : g_attribute);
+
+    if (curframecolor != NO_COLOR) {
+        attribute |= ((ttycolors[curframecolor]) << 4);
+    }
+
     if (!iflags.grmode) {
         txt_xputc(ch, attribute);
 #ifdef SCREEN_VGA
@@ -594,17 +614,17 @@ xputc(int ch) /* write out character (and attribute) */
 }
 
 /* write out a glyph picture at current location */
-void xputg(const glyph_info *glyphinfo)
+void xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo)
 {
     if (!iflags.grmode || !iflags.tile_view) {
         (void) xputc((char) glyphinfo->ttychar);
 #ifdef SCREEN_VGA
     } else if (iflags.grmode && iflags.usevga) {
-        vga_xputg(glyphinfo);
+        vga_xputg(glyphinfo, bkglyphinfo);
 #endif
 #ifdef SCREEN_VESA
     } else if (iflags.grmode && iflags.usevesa) {
-        vesa_xputg(glyphinfo);
+        vesa_xputg(glyphinfo, bkglyphinfo);
 #endif
     }
 }
