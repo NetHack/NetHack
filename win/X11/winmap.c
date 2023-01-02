@@ -87,7 +87,7 @@ X11_print_glyph(
     winid window,
     coordxy x, coordxy y,
     const glyph_info *glyphinfo,
-    const glyph_info *bkglyphinfo UNUSED)
+    const glyph_info *bkglyphinfo)
 {
     struct map_info_t *map_info;
     boolean update_bbox = FALSE;
@@ -113,6 +113,11 @@ X11_print_glyph(
             *t_ptr = glyphinfo->gm.tileidx;
             if (map_info->is_tile)
                 update_bbox = TRUE;
+        }
+
+        if (map_info->tile_map.glyphs[y][x].framecolor != bkglyphinfo->framecolor) {
+            map_info->tile_map.glyphs[y][x].framecolor = bkglyphinfo->framecolor;
+            update_bbox = TRUE;
         }
     }
     {
@@ -161,6 +166,10 @@ X11_print_glyph(
             *co_ptr = color;
             if (!map_info->is_tile)
                 update_bbox = TRUE;
+        }
+        if (map_info->text_map.framecolors[y][x] != bkglyphinfo->framecolor) {
+            map_info->text_map.framecolors[y][x] = bkglyphinfo->framecolor;
+            update_bbox = TRUE;
         }
 #endif
     }
@@ -1049,10 +1058,12 @@ map_all_unexplored(struct map_info_t *map_info) /* [was map_all_stone()] */
             tile_map->glyphs[y][x].glyph = !x ? g_nothg : g_unexp;
             tile_map->glyphs[y][x].glyphflags = 0;
             tile_map->glyphs[y][x].tileidx = !x ? nothg_idx : unexp_idx;
+            tile_map->glyphs[y][x].framecolor = NO_COLOR;
 
             text_map->text[y][x] = (uchar) (!x ? mgnothg : mgunexp);
 #ifdef TEXTCOLOR
             text_map->colors[y][x] = NO_COLOR;
+            text_map->framecolors[y][x] = NO_COLOR;
 #endif
         }
 }
@@ -1424,6 +1435,13 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                     XSetClipMask(dpy, tile_map->black_gc, None);
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
+                }
+                if (tile_map->glyphs[row][cur_col].framecolor != NO_COLOR) {
+                    XDrawRectangle(dpy, XtWindow(wp->w),
+                                   map_info->text_map.color_gcs[tile_map->glyphs[row][cur_col].framecolor],
+                                   dest_x, dest_y,
+                                   tile_map->square_width - 1 ,
+                                   tile_map->square_height - 1);
                 }
             }
         }
