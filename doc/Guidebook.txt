@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  December 26, 2022
+                                  December 28, 2022
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1446,7 +1446,7 @@
                Jump to another location.  Autocompletes.   Default  key  is
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1710,7 +1710,7 @@
                Do  a  shell escape, switching from NetHack to a subprocess.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2172,7 +2172,7 @@
           the door's lock.  Alternatively, you  can  break  a  closed  door
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2238,7 +2238,7 @@
           teleporters send you to a random dungeon level,  the  destination
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2304,7 +2304,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2370,7 +2370,7 @@
           carrying, will also show current shop debt  or  credit,  if  any.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2568,7 +2568,7 @@
           very useful under certain circumstances.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2634,7 +2634,7 @@
           it is the one who moved rather than you.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2700,7 +2700,7 @@
           extremely obvious, you will be asked what you want to  call  this
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2832,7 +2832,7 @@
           (such as the aklys, lucern hammer, and bec-de-corbin) are defined
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2898,7 +2898,7 @@
           at most 2 arrows are shot even if you could have fired 3.  If you
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -2964,7 +2964,7 @@
           use.   To  wield  two  weapons,  you need to use the "#twoweapon"
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3030,7 +3030,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3096,7 +3096,7 @@
           vegetarian  players  can,  but  with some rather unpleasant side-
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3162,7 +3162,7 @@
           warned,  however, for this is often unwise.  Other types of wands
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3228,7 +3228,7 @@
           attempt backfires.  Reading a cursed spellbook or one with mystic
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3294,7 +3294,7 @@
           Amulets.   Other  tools  (such  as  pick-axe)  can  be wielded as
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3360,7 +3360,7 @@
           tile  weapons  (if  you  have a sling).  In the most desperate of
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3426,7 +3426,7 @@
           ception  is  that  if the object gets covered by the "remembered,
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3558,7 +3558,7 @@
           teachers prior to the start of the game and isn't counted.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3624,7 +3624,7 @@
           Mines      - Entered the Gnomish Mines.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3690,7 +3690,7 @@
           the Castle level's drawbridge or can be given to you  via  prayer
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3756,7 +3756,7 @@
           valid  after  a  CHOOSE  directive  and  their  names  are   case
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4020,7 +4020,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4086,7 +4086,7 @@
             Apply-Key - if carrying a key or other unlocking  tool,  prompt
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4218,7 +4218,7 @@
             killed by traps and each other as well  as  by  you.   And  the
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4350,7 +4350,7 @@
             Ignore  interrupt  signals,  including  breaks  (default  off).
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4416,7 +4416,7 @@
             the  selected  object  class(es).   Combination  starts  with a
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4482,7 +4482,7 @@
             Key to select all items on this page of a menu.  Default `,'.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4548,7 +4548,7 @@
             Read the NetHack news file, if present (default on).  Since the
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4614,7 +4614,7 @@
             attack      - require   "yes"   rather   than  `y'  to  confirm
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4746,7 +4746,7 @@
             entirely.  Requesting it  when  not  allowed  or  not  possible
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4812,7 +4812,7 @@
             This option may be used to select one of the named symbol  sets
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -4929,7 +4929,7 @@
             Sort  the  pack contents by type when displaying inventory (de-
             fault on).  Persistent.
 
-          sortvanquisted
+          sortvanquished
             Controls the sorting behavior for the output of the #vanquished
             command.  Persistent.
 
@@ -4944,7 +4944,7 @@
             c - order by monster class, by low to high  level  within  each
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5010,7 +5010,7 @@
             Put the ending display in a NetHack window instead of on stdout
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5076,7 +5076,7 @@
             target.  (default off)
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5142,7 +5142,7 @@
             some  cases,  characters  can  be  augmented  with line-drawing
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5208,7 +5208,7 @@
             rather than in a window.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5274,7 +5274,7 @@
             mainly  shows  status  conditions on their own line.  A display
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5406,7 +5406,7 @@
           platforms or ports to customize and change the port behavior.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5472,7 +5472,7 @@
             tect", "default", "vga", or "vesa".  Setting "vesa" will  cause
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5538,7 +5538,7 @@
             to  be  used as a pattern to match against the singular form of
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5604,7 +5604,7 @@
             ject symbols or selection letters into menu accelerators.  Some
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5736,7 +5736,7 @@
             When asked for a location, the key to choose the location, skip
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5802,7 +5802,7 @@
             pattern matching facility:
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5868,7 +5868,7 @@
             shown in red, and lines with  " cursed "  followed  by  "(being
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6132,7 +6132,7 @@
           the meta bit in the symbol value, and the  ^  prefix  causes  the
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6528,7 +6528,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6660,7 +6660,7 @@
           on this list.  If you score higher  than  someone  else  on  this
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6726,7 +6726,7 @@
           mode instead.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6858,7 +6858,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -6990,7 +6990,7 @@
           dows CE port for 3.4.1.
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -7056,7 +7056,7 @@
           beloved community patches. Many bugs were fixed and some code was
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -7122,7 +7122,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -7188,7 +7188,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
@@ -7254,7 +7254,7 @@
 
 
 
-          NetHack 3.7                                     December 26, 2022
+          NetHack 3.7                                     December 28, 2022
 
 
 
