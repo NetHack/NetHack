@@ -2137,14 +2137,16 @@ bhito(struct obj *obj, struct obj *otmp)
                         You_hear("a crumbling sound.");
                 }
             } else {
-                int oox = obj->ox;
-                int ooy = obj->oy;
-                if (gc.context.mon_moving
-                        ? !breaks(obj, obj->ox, obj->oy)
-                        : !hero_breaks(obj, obj->ox, obj->oy, 0))
+                int oox = obj->ox, ooy = obj->oy;
+
+                if (gc.context.mon_moving ? !breaks(obj, oox, ooy)
+                                          : !hero_breaks(obj, oox, ooy, 0))
                     maybelearnit = FALSE; /* nothing broke */
                 else
-                    newsym_force(oox,ooy);
+                    /* obj broke; force redisplay in case it was the only--
+                       or last--item under non-breaking pile-top; top item
+                       here might now be a lone object rather than a pile */
+                    newsym_force(oox, ooy);
                 res = 0;
             }
             if (maybelearnit)
