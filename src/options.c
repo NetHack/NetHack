@@ -6525,10 +6525,17 @@ initoptions_init(void)
        set it again in initoptions_finish() so that NETHACKOPTIONS and
        .nethrackrc can't override it (command line takes precedence) */
     if (gc.cmdline_windowsys) {
+        nmcpy(gc.chosen_windowtype, gc.cmdline_windowsys, WINTYPELEN);
         config_error_init(FALSE, "command line", FALSE);
         choose_windows(gc.cmdline_windowsys);
         config_error_done();
-        /* do not free gc.cmdline_windowsys yet */
+        /* do not free gc.cmdline_windowsys yet unless it was rejected;
+           keeping it in that situation would complain about it twice */
+        if (!windowprocs.name
+            || strcmpi(windowprocs.name, gc.cmdline_windowsys) != 0) {
+            free((genericptr_t) gc.cmdline_windowsys),
+            gc.cmdline_windowsys = NULL;
+        }
     }
 
 #ifdef ENHANCED_SYMBOLS
