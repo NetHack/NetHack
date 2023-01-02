@@ -23,9 +23,11 @@ void curses_del_wid(winid wid);
 void curs_destroy_all_wins(void);
 #ifdef ENHANCED_SYMBOLS
 void curses_putch(winid wid, int x, int y, int ch,
-                  struct unicode_representation *ur, int color, int attrs);
+                  struct unicode_representation *ur, int color,
+                  int framecolor, int attrs);
 #else
-void curses_putch(winid wid, int x, int y, int ch, int color, int attrs);
+void curses_putch(winid wid, int x, int y, int ch, int color,
+                  int framecolor, int attrs);
 #endif
 void curses_get_window_xy(winid wid, int *x, int *y);
 boolean curses_window_has_border(winid wid);

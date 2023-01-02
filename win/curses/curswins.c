@@ -35,6 +35,7 @@ typedef struct nhwd {
 typedef struct nhchar {
     int ch;                     /* character */
     int color;                  /* color info for character */
+    int framecolor;                /* background color info for character */
     int attr;                   /* attributes of character */
     struct unicode_representation *unicode_representation;
 } nethack_char;
@@ -370,9 +371,9 @@ void
 #ifdef ENHANCED_SYMBOLS
 curses_putch(winid wid, int x, int y, int ch,
              struct unicode_representation *unicode_representation,
-             int color, int attr)
+             int color, int framecolor, int attr)
 #else
-curses_putch(winid wid, int x, int y, int ch, int color, int attr)
+curses_putch(winid wid, int x, int y, int ch, int color, int framecolor, int attr)
 #endif
 {
     static boolean map_initted = FALSE;
@@ -396,6 +397,7 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
     --x; /* map column [0] is not used; draw column [1] in first screen col */
     map[y][x].ch = ch;
     map[y][x].color = color;
+    map[y][x].framecolor = framecolor;
     map[y][x].attr = attr;
 #ifdef ENHANCED_SYMBOLS
     map[y][x].unicode_representation = unicode_representation;
@@ -595,10 +597,39 @@ is_main_window(winid wid)
 /* Unconditionally write a single character to a window at the given
 coordinates without a refresh.  Currently only used for the map. */
 
+static int
+get_framecolor(int nhcolor, int framecolor)
+{
+    boolean hicolor = (COLORS >= 16), adj_framecolor = framecolor;
+    static int framecolors[16][8] = {
+        { 0, 16, 8, 32, 17, 40, 48, 0 },    { 1, 18, 9, 33, 19, 41, 49, 1 },
+        { 2, 20, 10, 34, 21, 42, 50, 2 },   { 3, 22, 11, 35, 23, 43, 51, 3 },
+        { 4, 24, 12, 36, 25, 44, 52, 4 },   { 5, 26, 13, 37, 27, 45, 53, 5 },
+        { 6, 28, 14, 38, 29, 46, 54, 6 },   { 0, 30, 15, 72, 31, 88, 56, 0 },
+        { 0, 30, 15, 39, 31, 47, 55, 0 },   { 1, 18, 9, 73, 19, 89, 57, 121 },
+        { 2, 20, 10, 74, 21, 90, 58, 122 }, { 2, 22, 11, 75, 23, 91, 59, 123 },
+        { 4, 24, 12, 76, 25, 44, 60, 124 }, { 5, 26, 13, 77, 27, 93, 61, 125 },
+        { 6, 28, 14, 78, 29, 94, 62, 126 }, { 0, 30, 15, 79, 31, 95, 63, 127 },
+    };
+
+    if (framecolor < 16 && framecolor >= 8)
+        adj_framecolor = framecolor - 8;
+    return ((nhcolor < (hicolor ? 16 : 8) && adj_framecolor < 8)
+                ? framecolors[nhcolor][adj_framecolor]
+                : nhcolor);
+}
+
 static void
 write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
-    curses_toggle_color_attr(win, nch.color, nch.attr, ON);
+    int curscolor = nch.color, cursattr = nch.attr;
+
+    if (nch.framecolor != NO_COLOR) {
+        curscolor = get_framecolor(nch.color, nch.framecolor);
+        if (nch.attr == A_REVERSE)
+            cursattr = A_NORMAL; /* hilited pet looks odd otherwise */
+    }
+    curses_toggle_color_attr(win, curscolor, cursattr, ON);
 #if defined(CURSES_UNICODE) && defined(ENHANCED_SYMBOLS)
     if ((nch.unicode_representation && nch.unicode_representation->utf8str)
         || SYMHANDLING(H_IBM)) {
@@ -670,7 +701,7 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 #else
         mvwaddch(win, y, x, nch.ch);
 #endif
-    curses_toggle_color_attr(win, nch.color, nch.attr, OFF);
+    curses_toggle_color_attr(win, curscolor, cursattr, OFF);
 }
 
 

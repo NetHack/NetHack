@@ -812,7 +812,7 @@ curses_print_glyph(
     winid wid,
     coordxy x, coordxy y,
     const glyph_info *glyphinfo,
-    const glyph_info *bkglyphinfo UNUSED)
+    const glyph_info *bkglyphinfo)
 {
     int glyph;
     int ch;
@@ -861,12 +861,15 @@ curses_print_glyph(
     if (SYMHANDLING(H_UTF8)
         && glyphinfo->gm.u
         && glyphinfo->gm.u->utf8str) {
-        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color, attr);
+        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color,
+                     bkglyphinfo->framecolor, attr);
     } else {
-        curses_putch(wid, x, y, ch, NULL, color, attr);
+        curses_putch(wid, x, y, ch, NULL, color,
+                     bkglyphinfo->framecolor, attr);
     }
 #else
-    curses_putch(wid, x, y, ch, color, attr);
+    curses_putch(wid, x, y, ch, color,
+                 bkglyphinfo->framecolor, attr);
 #endif
 }
 
