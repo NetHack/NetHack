@@ -2275,12 +2275,18 @@ get_bkglyph_and_framecolor(coordxy x, coordxy y, int *bkglyph, uint32 *framecolo
         if (idx != S_room)
             tmp_bkglyph = cmap_to_glyph(idx);
     }
-    if (gw.wsettings.map_frame_color != NO_COLOR && framecolor && mapxy_valid(x, y))
+    *bkglyph = tmp_bkglyph;
+#if 0
+    /* this guard should be unnecessary */
+    if (!framecolor) {
+        impossible("null framecolor passed to get_bkglyph_and_framecolor");
+        return;
+    }
+#endif
+    if (gw.wsettings.map_frame_color != NO_COLOR && mapxy_valid(x, y))
         *framecolor = gw.wsettings.map_frame_color;
     else
         *framecolor = NO_COLOR;
-
-    *bkglyph = tmp_bkglyph;
 }
 
 #if defined(TILES_IN_GLYPHMAP) && defined(MSDOS)
