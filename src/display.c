@@ -1684,16 +1684,18 @@ show_glyph(coordxy x, coordxy y, int glyph)
          *  This assumes an ordering of the offsets.  See display.h for
          *  the definition.
          */
-
-        if ((offset = (glyph - GLYPH_NOTHING_OFF)) >= 0) {
+        if (glyph < 0 || glyph >= MAX_GLYPH) {
+            /* invalid location and also invalid glyph */
+            text = "invalid";
+        } else if ((offset = (glyph - GLYPH_NOTHING_OFF)) >= 0) {
             text = "nothing";
         } else if ((offset = (glyph - GLYPH_UNEXPLORED_OFF)) >= 0) {
             text = "unexplored";
-        } else if ((offset = (glyph - GLYPH_STATUE_FEM_PILETOP_OFF))) {
+        } else if ((offset = (glyph - GLYPH_STATUE_FEM_PILETOP_OFF)) >= 0) {
             text = "statue of a female monster at top of a pile";
-        } else if ((offset = (glyph - GLYPH_STATUE_MALE_PILETOP_OFF))) {
+        } else if ((offset = (glyph - GLYPH_STATUE_MALE_PILETOP_OFF)) >= 0) {
             text = "statue of a male monster at top of a pile";
-        } else if ((offset = (glyph - GLYPH_BODY_PILETOP_OFF))) {
+        } else if ((offset = (glyph - GLYPH_BODY_PILETOP_OFF)) >= 0) {
             text = "body at top of a pile";
         } else if ((offset = (glyph - GLYPH_OBJ_PILETOP_OFF))) {
             text = "object at top of a pile";
@@ -1765,14 +1767,13 @@ show_glyph(coordxy x, coordxy y, int glyph)
         } else if ((offset = (glyph - GLYPH_MON_MALE_OFF)) >= 0) {
             text = "male monster";
         }
-        impossible("show_glyph:  bad pos %d %d with glyph %d [%s %d].", x, y,
-                   glyph, text, offset);
+        impossible("show_glyph:  bad pos <%d,%d> with glyph %d [%s %d].",
+                   x, y, glyph, text, offset);
         return;
-    }
-
-    if (glyph >= MAX_GLYPH) {
-        impossible("show_glyph:  bad glyph %d [max %d] at (%d,%d).", glyph,
-                   MAX_GLYPH, x, y);
+    } else if (glyph < 0 || glyph >= MAX_GLYPH) {
+        /* valid location but invalid glyph */
+        impossible("show_glyph:  bad glyph %d [max %d] at <%d,%d>.",
+                   glyph, MAX_GLYPH, x, y);
         return;
     }
 #ifndef UNBUFFERED_GLYPHINFO
