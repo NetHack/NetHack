@@ -1592,7 +1592,7 @@ use_lamp(struct obj *obj)
         return;
     }
     if (Underwater) {
-        pline(!Is_candle(obj) ? "This is not a diving lamp"
+        pline(!Is_candle(obj) ? "This is not a diving lamp."
                               : "Sorry, fire and water don't mix.");
         return;
     }

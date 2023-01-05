@@ -329,16 +329,11 @@ moveloop_core(void)
 /* XXX This should be recoded to use something like regions - a list of
  * things that are active and need to be handled that is dynamically
  * maintained and not a list of special cases. */
-                /* underwater and waterlevel vision are done here */
+                /* vision will be updated as bubbles move */
                 if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                     movebubbles();
                 else if (Is_firelevel(&u.uz))
                     fumaroles();
-                else if (Underwater)
-                    under_water(0);
-                /* vision while buried done here */
-                else if (u.uburied)
-                    under_ground(0);
 
                 /* when immobile, count is in turns */
                 if (gm.multi < 0) {
@@ -390,6 +385,12 @@ moveloop_core(void)
         /* when/if hero escapes from lava, he can't just stay there */
         else if (!u.umoved)
             (void) pooleffects(FALSE);
+
+        /* vision while buried or underwater is updated here */
+        if (Underwater)
+            under_water(0);
+        else if (u.uburied)
+            under_ground(0);
 
     } /* actual time passed */
 
