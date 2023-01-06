@@ -283,11 +283,7 @@ nh_snprintf(const char *func UNUSED, int line UNUSED, char *str, size_t size,
     int n;
 
     va_start(ap, fmt);
-#ifdef NO_VSNPRINTF
-    n = vsprintf(str, fmt, ap);
-#else
     n = vsnprintf(str, size, fmt, ap);
-#endif
     va_end(ap);
 
     if (n < 0 || (size_t)n >= size) { /* is there a problem? */

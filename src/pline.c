@@ -99,9 +99,7 @@ vpline(const char *line, va_list the_args)
     char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
     int msgtyp;
-#if !defined(NO_VSNPRINTF)
     int vlen = 0;
-#endif
     boolean no_repeat;
 
     if (!line || !*line)
@@ -114,7 +112,6 @@ vpline(const char *line, va_list the_args)
         return;
 
     if (strchr(line, '%')) {
-#if !defined(NO_VSNPRINTF)
         vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
         if (vlen >= (int) sizeof pbuf)
@@ -122,9 +119,6 @@ vpline(const char *line, va_list the_args)
                   "pline", sizeof pbuf, vlen);
 #else
         nhUse(vlen);
-#endif
-#else
-        Vsprintf(pbuf, line, the_args);
 #endif
         line = pbuf;
     }
@@ -476,11 +470,7 @@ vraw_printf(const char *line, va_list the_args)
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
     if (strchr(line, '%')) {
-#if !defined(NO_VSNPRINTF)
         (void) vsnprintf(pbuf, sizeof(pbuf), line, the_args);
-#else
-        Vsprintf(pbuf, line, the_args);
-#endif
         line = pbuf;
     }
     if ((int) strlen(line) > BUFSZ - 1) {
@@ -508,11 +498,7 @@ impossible(const char *s, ...)
         panic("impossible called impossible");
 
     gp.program_state.in_impossible = 1;
-#if !defined(NO_VSNPRINTF)
     (void) vsnprintf(pbuf, sizeof(pbuf), s, the_args);
-#else
-    Vsprintf(pbuf, s, the_args);
-#endif
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
@@ -609,12 +595,9 @@ config_error_add(const char *str, ...)
 static void
 vconfig_error_add(const char *str, va_list the_args)
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
-#if !defined(NO_VSNPRINTF)
     int vlen = 0;
-#endif
     char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
-#if !defined(NO_VSNPRINTF)
     vlen = vsnprintf(buf, sizeof buf, str, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
@@ -622,9 +605,6 @@ vconfig_error_add(const char *str, va_list the_args)
               "config_error_add", sizeof buf, vlen);
 #else
     nhUse(vlen);
-#endif
-#else
-    Vsprintf(buf, str, the_args);
 #endif
     buf[BUFSZ - 1] = '\0';
     config_erradd(buf);

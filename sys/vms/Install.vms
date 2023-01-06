@@ -151,11 +151,7 @@ Notes:
     work with 3.7.0. The scoreboard file (RECORD) from 3.6.x or 3.4.x or
     3.3.x will work.
 
-2.  If pline.c fails to compile, edit vmsconf.h and uncomment
-    #define NO_VSNPRINTF
-    to avoid calling a C library routine that wasn't available on older
-    versions of VMS.  (Note:  in the distributed sources, this has already
-    been uncommented.)
+2.  Ancient C libs will not work; vsnprintf is required.
 
 3.  To specify user-preference options in your environment, define the
     logical name NETHACKOPTIONS to have the value of a quoted string

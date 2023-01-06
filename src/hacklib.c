@@ -1337,11 +1337,7 @@ nh_snprintf(
     int n;
 
     va_start(ap, fmt);
-#ifdef NO_VSNPRINTF
-    n = vsprintf(str, fmt, ap);
-#else
     n = vsnprintf(str, size, fmt, ap);
-#endif
     va_end(ap);
     if (n < 0 || (size_t) n >= size) { /* is there a problem? */
         impossible("snprintf %s: func %s, file line %d",
