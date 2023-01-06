@@ -1209,6 +1209,8 @@ freedynamicdata(void)
     free_CapMons();
     free_rect();
     freeroleoptvals(); /* saveoptvals(&tnhfp) */
+    cmdq_clear(CQ_CANNED);
+    cmdq_clear(CQ_REPEAT);
 
     /* some pointers in iflags */
     if (iflags.wc_font_map)
