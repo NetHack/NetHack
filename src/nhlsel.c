@@ -291,6 +291,7 @@ l_selection_or(lua_State *L)
             int val = selection_getpoint(x, y, sela) | selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
+    selr->bounds = rect;
 
     lua_remove(L, 1);
     lua_remove(L, 1);
