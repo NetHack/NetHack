@@ -9,9 +9,9 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                                     case means the Control key, not a caret)
  >  down                m<dir>:   move without picking up objects/fighting
                         F<dir>:   fight even if you don't sense a monster
-                If the number_pad option is set, the number keys move instead.
-                Depending on the platform, Shift number (on the numberpad),
-                Meta number, or Alt number will invoke the YUHJKLBN commands.
+                If the number_pad option is set, the digit keys move instead.
+                Depending on the platform, Shift digit (on the numberpad),
+                Meta digit, or Alt digit will invoke the YUHJKLBN commands.
                 Control <dir> may or may not work when number_pad is enabled,
                 depending on the platform's capabilities.
                 Digit '5' acts as 'G' prefix, unless number_pad is set to 2
@@ -22,111 +22,135 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                 used but 'y' and 'z' are swapped.
 
 General commands:
-?       help    display one of several informative texts
-#quit   quit    end the game without saving current game
-S       save    save the game (to be continued later) and exit
-                [to restore, play again and use the same character name]
-!       sh      escape to some SHELL (if allowed; 'exit' to resume play)
-^Z      suspend suspend the game (independent of your current suspend char)
+?     help      display one of several informative texts
+#quit quit      end the game without saving current game
+S     save      save the game (to be continued later) and exit
+                [to restore, play again and use the same character name;
+                use #quit to quit without saving]
+!     sh        escape to some SHELL (if allowed; 'exit' to resume play)
+^Z    suspend   suspend the game (independent of your current suspend char)
                 [on UNIX(tm)-based systems, use the 'fg' command to resume]
-O       options set options
-/       what-is tell what a map symbol represents
-\       known   display list of what's been discovered
-v       version display version number
-V       history display game history
-^A      again   redo the previous command (^A denotes the keystroke CTRL-A)
-^R      redraw  redraw the screen
-^P      prevmsg repeat previous message (subsequent ^P's repeat earlier ones)
+O     options   set options
+/     what-is   tell what a map symbol represents
+\     known     display list of what's been discovered
+v     version   display version number
+V     history   display game history
+^A    again     redo the previous command
+^R    redraw    redraw the screen
+^P    prevmsg   repeat previous message (consecutive ^P's repeat earlier ones)
 #               introduces an extended command (#? for a list of them)
-&       what-does describe the command a keystroke invokes
+&     what-does describe the command a keystroke invokes
+
+Control characters are depicted as '^' followed by a letter.  Depress Ctrl
+or Control like a shift key then type the letter.  Control characters are
+case-insensitive; ^D is the same as ^d, Ctrl+d is same as Ctrl+Shift+d.
+There are a few non-letter control characters; nethack uses ^[ as a synonym
+for Escape (or vice versa) but none of the others.
 
 Game commands:
-^D      kick    kick (a door, or something else)
-^T      'port   teleport (if you can)
-^X      show    show your attributes
-a       apply   apply or use a tool (pick-axe, key, camera, etc.)
-A       armor   take off all armor
-c       close   close a door
-C       call    name a monster, an individual object, or a type of object
-d       drop    drop an object.  d7a:  drop seven items of object 'a'
-D       Drop    drop selected types of objects
-e       eat     eat something
-E       engrave write a message in the dust on the floor  (E-  use fingers)
-f       fire    fire ammunition from quiver
-F       fight   followed by direction, fight a monster
-i       invent  list your inventory (all objects you are carrying)
-I       Invent  list selected parts of your inventory
-                Iu: list unpaid objects
-                Ix: list unpaid but used up items
-                I$: count your money
-o       open    open a door
-p       pay     pay your bill (in a shop)
-P       puton   put on an accessory (ring, amulet, etc)
-q       quaff   drink something (potion, water, etc)
-Q       quiver  select ammunition for quiver (use '#quit' to quit)
-r       read    read a scroll or spellbook
-R       remove  remove an accessory (ring, amulet, etc)
-s       search  search for secret doors, hidden traps and monsters
-t       throw   throw or shoot a weapon
-T       takeoff take off some armor
-w       wield   wield a weapon  (w-  wield nothing)
-W       wear    put on some armor
-x       xchange swap wielded and secondary weapons
-X       twoweapon toggle two-weapon combat (use '#explore' for explore mode)
-z       zap     zap a wand  (use y instead of z if number_pad is -1)
-Z       Zap     cast a spell  (use Y instead of Z if number_pad is -1)
-<       up      go up the stairs
->       down    go down the stairs
-^       trap_id identify a previously found trap
-),[,=,",(       ask for current items of specified symbol in use
-*               ask for combination of ),[,=,",( all at once
-$       gold    count your gold
-+       spells  list the spells you know; also rearrange them if desired
-`       classkn display known items for one class of objects
-_       travel  move via a shortest-path algorithm to a point on the map
-.       rest    wait a moment
-,       pickup  pick up all you can carry
+^D    kick      kick (a door, or something else)
+^T    Tport     teleport (if you can)
+^X    show      show your attributes
+a     apply     apply or use a tool (pick-axe, key, camera, etc.)
+A     takeoffall  choose multiple items of armor, accessories, and weapons
+                to take off, remove, unwield (uses same amount of game time
+                as removing them individually with T,R,w- would take)
+c     close     close a door
+C     call      name a monster, an individual object, or a type of object
+d     drop      drop an object.  d7a:  drop seven items of object 'a'
+D     Drop      drop selected types of objects
+e     eat       eat something
+E     engrave   write a message in the dust on the floor  (E-  use fingers)
+f     fire      fire ammunition from quiver
+F     fight     followed by direction, fight a monster
+i     invent    list your inventory (all objects you are carrying)
+I     Invent    list selected parts of your inventory; for example
+                  I(  list all tools, or  I"  list all amulets
+                  IB  list all items known to be blessed
+                  IU  uncursed, or  IC  cursed, or  IX  unknown bless state
+                  Iu  when in a shop, list unpaid objects being carried
+                  Ix  in a shop, list any fees and used-up shop-owned items
+o     open      open a door
+p     pay       pay your bill (in a shop)
+P     puton     put on an accessory (ring, amulet, etc; can be used to wear
+                armor too, but armor items aren't listed as likely candidates)
+q     quaff     drink something (potion, water, etc)
+Q     quiver    select ammunition for quiver (use '#quit' to quit)
+r     read      read a scroll or spellbook
+R     remove    remove an accessory (ring, amulet, etc; can be used to take
+                off armor too)
+s     search    search for secret doors, hidden traps and monsters
+t     throw     throw or shoot a weapon
+T     takeoff   take off some armor; can be used to remove accessories too,
+                but those aren't listed as likely candidates)
+w     wield     wield a weapon  (w-  wield nothing to unwield current weapon)
+W     wear      wear an item of armor; can be used to put on accessories too,
+                but those aren't listed as likely candidates)
+x     xchange   swap wielded and secondary weapons
+X     twoweapon toggle two-weapon combat if role allows that
+z     zap       zap a wand  (use y instead of z if number_pad is -1)
+Z     Zap       cast a spell  (use Y instead of Z if number_pad is -1)
+<     up        go up the stairs
+>     down      go down the stairs
+^     trap_id   identify a previously found trap
+),[,=,",(       show current items of specified symbol in use
+*               show combination of ),[,=,",( all at once
+$     gold      count your gold
++     spells    list the spells you know; also rearrange them if desired
+`     classkn   display known items for one class of objects
+_     travel    move via a shortest-path algorithm to a point on the map
+.     rest      wait a moment
+,     pickup    pick up all you can carry
 @               toggle "pickup" (auto pickup) option on and off
-:       look    look at what is here
-;       farlook look at what is somewhere else by selecting a map symbol
+:     look      look at what is here
+;     farlook   look at what is somewhere else by selecting a map location
+                (for a monster on top of one or more objects, only describes
+                that monster; for a pile of objects, only describes top one)
 
-Keyboards that have a meta key can also use these extended commands
-via the meta modifier instead of the # prefix:
+Keyboards that have a meta key (some use Alt for that, so typing Alt as a
+shift plus 'e' would generate 'M-e') can also use these extended commands
+via the meta modifier as an alternative to using the # prefix.  Unlike
+control characters, meta characters are case-sensitive so M-a is different
+from M-A.  Type the latter with two keys used as shifts, Meta+Shift+a.
 
 M-?             display extended command help (if the platform allows this)
-M-2     twoweapon toggle two-weapon combat (unless number_pad is enabled)
-M-a     adjust  adjust inventory letters
-M-A     annotate add a one-line note to the current dungeon level (see M-O)
-M-c     chat    talk to someone
-M-C     conduct view optional challenges
-M-d     dip     dip an object into something
-M-e     enhance advance or check weapon and spell skills
-M-f     force   force a lock
-M-i     invoke  invoke an object's special powers
-M-j     jump    jump to another location
-M-l     loot    loot a box on the floor
-M-m     monster use a monster's special ability
-M-n     name    name a monster, an individual object, or a type of object
-M-N     name    synonym for M-n
-M-o     offer   offer a sacrifice to the gods
-M-O     overview display information about visited levels and annotations
-M-p     pray    pray to the gods for help
-M-q     quit    stop playing
-M-r     rub     rub a lamp or a stone
-M-R     ride    mount or dismount saddled steed
-M-s     sit     sit down
-M-t     turn    turn undead
-M-T     tip     upend a container to dump out its contents
-M-u     untrap  untrap something
-M-v     version print compile time options for this version
-M-w     wipe    wipe off your face
+M-2   twoweapon toggle two-weapon combat (unless number_pad is enabled)
+M-a   adjust    adjust inventory letters
+M-A   annotate  add a one-line note to the current dungeon level (see M-O)
+M-c   chat      talk to someone
+M-C   conduct   view optional challenges
+M-d   dip       dip an object into something
+M-e   enhance   show weapon and spell skills, can improve them if eligible
+M-f   force     force a lock
+M-i   invoke    invoke an object's special powers
+M-j   jump      jump to another location
+M-l   loot      loot a box on the floor
+M-m   monster   when polymorphed, use monster's special ability
+M-n   name      name a monster, an individual object, or a type of object
+M-N   name      synonym for M-n  (both are the same as C)
+M-o   offer     offer a sacrifice to the gods
+M-O   overview  display information about visited levels and annotations
+M-p   pray      pray to the gods for help
+M-q   quit      stop playing without saving game (use S to save and exit)
+M-r   rub       rub a lamp or a stone
+M-R   ride      mount or dismount saddled steed
+M-s   sit       sit down
+M-t   turn      turn undead if role allows that
+M-T   tip       upend a container to dump out its contents
+M-u   untrap    untrap something
+M-v   version   print compile time options for this version
+M-w   wipe      wipe off your face
+M-X   explore   switch from regular play to non-scoring explore mode
 
-If the "number_pad" option is on, these additional variants are available:
+If the 'number_pad' option is on, keys usually used for movement can be
+used for various commands:
 
 n               followed by number of times to repeat the next command
-h       help    display one of several informative texts, like '?'
-j       jump    jump to another location
-k       kick    kick something (usually a door)
-l       loot    loot a box on the floor
-N       name    name an item or type of object
-u       untrap  untrap something (usually a trapped object)
+h     help      display one of several informative texts, like '?'
+j     jump      jump to another location
+k     kick      kick something (usually a door)
+l     loot      loot a box on the floor
+N     name      name an item or type of object
+u     untrap    untrap something (usually a trapped object)
+
+Additional commands are available in debug mode (also known as wizard mode).

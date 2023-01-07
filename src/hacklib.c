@@ -1,4 +1,4 @@
-/* NetHack 3.6	hacklib.c	$NHDT-Date: 1672682745 2023/01/02 18:05:45 $  $NHDT-Branch: releasebits-3.6 $:$NHDT-Revision: 1.74 $ */
+/* NetHack 3.6	hacklib.c	$NHDT-Date: 1552639487 2019/03/15 08:44:47 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.67 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* Copyright (c) Robert Patrick Rankin, 1991                      */
@@ -23,7 +23,6 @@
         char *          strip_newline   (char *)
         char *          stripchars      (char *, const char *, const char *)
         char *          eos             (char *)
-        unsigned        Strlen_         (const char *str, const char *, int)
         boolean         str_end_is      (const char *, const char *)
         char *          strkitten       (char *,char)
         void            copynchars      (char *,const char *,int)
@@ -211,20 +210,6 @@ register char *s;
     while (*s)
         s++; /* s += strlen(s); */
     return s;
-}
-
-/* like strlen(3) but returns unsigned and panics if string is unreasonably long */
-unsigned
-Strlen_(str, file, line)
-const char *str;
-const char *file;
-int line;
-{
-    size_t len = strnlen(str, LARGEST_INT);
-
-    if (len == LARGEST_INT)
-        panic("%s:%d string too long", file, line);
-    return (unsigned) len;
 }
 
 /* determine whether 'str' ends in 'chkstr' */

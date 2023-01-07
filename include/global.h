@@ -1,4 +1,4 @@
-/* NetHack 3.6	global.h	$NHDT-Date: 1672682728 2023/01/02 18:05:28 $  $NHDT-Branch: releasebits-3.6 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.6	global.h	$NHDT-Date: 1557510460 2019/05/10 17:47:40 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.72 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -265,7 +265,6 @@ typedef uchar nhsym;
 #define Sprintf (void) sprintf
 #define Strcat (void) strcat
 #define Strcpy (void) strcpy
-#define Strlen(s) Strlen_(s,__func__,__LINE__)
 #ifdef NEED_VARARGS
 #define Vprintf (void) vprintf
 #define Vfprintf (void) vfprintf

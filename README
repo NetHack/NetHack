@@ -16,27 +16,8 @@ that file.  Some entries might be considered "spoilers", particularly in the
 
 Below you will find some other general notes that were not considered
 spoilers:
- *  during engraving, spaces were counted instead of non-space
- *  avoid potential buffer overflow in append_str()
- *  resolve missing dependency in NetHack.sln
- *  code in include/tradstdc.h was trying to suppress warn_unused result by
- *      defining warn_unused_result to an empty string and that began causing
- *  a build error within a system-supplied header file cdefs.h when using
- *      ubuntu impish 21.10; disable that for any Linux unless GCC_URWARN is
- *      defined to force it back into effect
- *  update_inventory() after leash goes slack
- *  windows: added winflexbison to travis-ci configuration to permit full build of
- *      levcomp and dgncomp
- *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
- *      abort
- *  windows: the console.rc file had outdated information stating 3.6.3 when the
- *      official 3.6.6 binary was built.
- *  windows: switch from using keyhandling dll's to incorporating the three 
- *      variations (default, ray, 340) in sys/winnt/nttty.c
- *  curses: cherry-picked selectsaved code from 3.7 for menu of save files
- *  NetHackW: fix delayed rendering of cursor when using farlook
- *  player assigned name for monsters, specific objects, or object types could be
- *      longer than what was intented to be allowed; for 'curses', much longer
+
+ *  
  
                         - - - - - - - - - - -
 
@@ -184,6 +165,6 @@ In our own patches, we will assume that your code is synchronized with ours.
 
                   -- Good luck, and happy Hacking --
 
-# $NHDT-Date: 1672682727 2023/01/02 18:05:27 $ $NHDT-Branch: releasebits-3.6 $:$NHDT-Revision: 1.83 $
+# $NHDT-Date: 1672610729 2023/01/01 22:05:29 $ $NHDT-Branch: releasebits-3.6 $:$NHDT-Revision: 1.81 $
 # Copyright (c) 2012 by Michael Allison
 # NetHack may be freely redistributed.  See license for details.
