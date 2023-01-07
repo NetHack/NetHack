@@ -74,6 +74,7 @@ new_light_core(coordxy x, coordxy y, int range, int type, anything *id)
 
     ls = (light_source *) alloc(sizeof *ls);
 
+    (void) memset((genericptr_t) ls, 0, sizeof (light_source));
     ls->next = gl.light_base;
     ls->x = x;
     ls->y = y;
