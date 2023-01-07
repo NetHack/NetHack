@@ -458,6 +458,8 @@ alloc_doors(void)
     if (!gd.doors || gd.doorindex >= gd.doors_alloc) {
         int c = gd.doors_alloc + DOORINC;
         coord *doortmp = (coord *) alloc(c * sizeof(coord));
+
+        (void) memset((genericptr_t) doortmp, 0, c * sizeof(coord));
         if (gd.doors) {
             (void) memcpy(doortmp, gd.doors, gd.doors_alloc * sizeof(coord));
             free(gd.doors);

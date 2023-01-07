@@ -1484,6 +1484,7 @@ stairway_add(coordxy x, coordxy y, boolean up, boolean isladder, d_level *dest)
 {
     stairway *tmp = (stairway *) alloc(sizeof (stairway));
 
+    (void) memset((genericptr_t) tmp, 0, sizeof (stairway));
     tmp->sx = x;
     tmp->sy = y;
     tmp->up = up;
