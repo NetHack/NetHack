@@ -14,9 +14,9 @@
 #include "nhlua.h"
 #endif
 
-#define FITSint(x) FITSint_(x, __func__, (int) __LINE__)
+/*#define FITSint(x) FITSint_(x, __func__, (int) __LINE__)*/
 extern int FITSint_(LUA_INTEGER, const char *, int);
-#define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)
+/*#define FITSuint(x) FITSuint_(x, __func__, (int) __LINE__)*/
 extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 char *fmt_ptr(const genericptr) NONNULL;
@@ -182,7 +182,10 @@ nhfree(genericptr_t ptr, const char *file, int line)
 char *
 nhdupstr(const char *string, const char *file, int line)
 {
-    return strcpy((char *) nhalloc(strlen(string) + 1, file, line), string);
+    /* we've got some info about the caller, so use it instead of __func__ */
+    unsigned len = FITSuint_(strlen(string), file, line);
+
+    return strcpy((char *) nhalloc(len + 1, file, line), string);
 }
 #undef dupstr
 
@@ -194,7 +197,8 @@ nhdupstr(const char *string, const char *file, int line)
 char *
 dupstr(const char *string)
 {
-    unsigned len = FITSuint(strlen(string));
+    unsigned len = FITSuint_(strlen(string), __func__, (int) __LINE__);
+
     return strcpy((char *) alloc(len + 1), string);
 }
 
