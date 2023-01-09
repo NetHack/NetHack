@@ -483,6 +483,18 @@ function test_sel_bounds()
    end
 end
 
+-- test des.map returning a selection
+function test_sel_map()
+   local __func__ = "test_sel_map";
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+
+   local sela = des.map([[LLL]]);
+   sel_has_n_points(sela, 3, __func__);
+   local selb = selection.match("L");
+   sel_are_equal(sela, selb, __func__);
+end
+
 nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
 test_selection_params();
 test_sel_negate();
@@ -502,3 +514,4 @@ test_sel_flood();
 test_sel_match();
 test_sel_iterate();
 test_sel_bounds();
+test_sel_map();

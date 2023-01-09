@@ -51,6 +51,58 @@ function monkfoodshop()
    return "food shop";
 end
 
+-- tweaks to gehennom levels; might add random lava pools or
+-- a lava river.
+-- protected_area is a selection where no changes will be done.
+function hell_tweaks(protected_area)
+   local liquid = "L";
+   local ground = ".";
+   local prot = protected_area:negate();
+
+   -- random pools
+   if (percent(20 + u.depth)) then
+      local pools = selection.new();
+      local maxpools = 5 + math.random(u.depth);
+      for i = 1, maxpools do
+         pools:set();
+      end
+      pools = pools | selection.grow(selection.set(selection.new()), "west")
+      pools = pools | selection.grow(selection.set(selection.new()), "north")
+      pools = pools | selection.grow(selection.set(selection.new()), "random")
+
+      pools = pools & prot;
+
+      if (percent(80)) then
+         local poolground = pools:clone():grow("all") & prot;
+         local pval = math.random(1, 8) * 10;
+         des.terrain(poolground:percentage(pval), ground)
+      end
+      des.terrain(pools, liquid)
+   end
+
+   -- river
+   if (percent(50)) then
+      local floor = selection.match(ground);
+      local a = selection.rndcoord(floor);
+      local b = selection.rndcoord(floor);
+      local lavariver = selection.randline(selection.new(), a.x, a.y, b.x, b.y, 10);
+
+      if (percent(50)) then
+         lavariver = selection.grow(lavariver, "north");
+      end
+      if (percent(50)) then
+         lavariver = selection.grow(lavariver, "west");
+      end
+      if (percent(25)) then
+         local riverbanks = selection.grow(lavariver);
+         riverbanks = riverbanks & prot;
+         des.terrain(selection.percentage(riverbanks, 50), ground);
+      end
+      lavariver = lavariver & prot;
+      des.terrain(lavariver, liquid);
+   end
+end
+
 -- pline with variable number of arguments
 function pline(fmt, ...)
    nh.pline(string.format(fmt, table.unpack({...})));

@@ -1081,6 +1081,7 @@ prevent paralyzed hero from helping nymph or succubus remove worn armor
 when identifying items via menu and more than one pass is needed (so when
 	identifying 3 items and player only picks 1, for instance), issue
 	--More-- because the next menu might cover up the ID message(s)
+slightly more interesting Gehennom filler levels
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

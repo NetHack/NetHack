@@ -243,9 +243,9 @@ III]] })
 ...]], contents = function(map)
                 des.terrain(0,0, "L");
                 des.terrain(map.width-1,map.height-1, "T");
+                check_loc_name(0, 0, "lava pool");
+                check_loc_name(2, 2, "tree");
    end});
-   check_loc_name(0, 0, "lava pool");
-   check_loc_name(2, 2, "tree");
 end
 
 function test_feature()

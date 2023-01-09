@@ -544,7 +544,9 @@ Example:
 === map
 
 Construct a piece of the level from text map. Takes one parameter, either a text string
-describing the map, or a table with multiple parameters.
+describing the map, or a table with multiple parameters. Returns a <<_selection>> where
+the map locations were put down on. If a contents-function is used, the commands following
+the map are not relative to it.
 
 [options="header"]
 |===
@@ -570,6 +572,7 @@ Example:
    des.terrain(0,0, "L");
    des.terrain(map.width-1, map.height-1, "T");
  end });
+ local sel = des.map([[LLL]]);
 
 === mazewalk
 

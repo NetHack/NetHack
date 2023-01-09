@@ -8,7 +8,6 @@
 
 struct selectionvar *l_selection_check(lua_State *, int);
 static struct selectionvar *l_selection_push_new(lua_State *);
-static void l_selection_push_copy(lua_State *, struct selectionvar *);
 
 /* lua_CFunction prototypes */
 static int l_selection_new(lua_State *);
@@ -106,7 +105,7 @@ l_selection_push_new(lua_State *L)
 }
 
 /* push a copy of selectionvar tmp to lua stack */
-static void
+void
 l_selection_push_copy(lua_State *L, struct selectionvar *tmp)
 {
     struct selectionvar
@@ -247,6 +246,7 @@ l_selection_not(lua_State *L)
         (void) l_selection_clone(L);
         sel2 = l_selection_check(L, 2);
         selection_not(sel2);
+        lua_remove(L, 1);
     }
     return 1;
 }
