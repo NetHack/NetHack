@@ -34,7 +34,7 @@ static boolean tried_heaplog = FALSE;
 
 long *alloc(unsigned int) NONNULL;
 long *re_alloc(long *, unsigned int) NONNULL;
-extern void panic(const char *, ...) NORETURN;
+ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 
 long *
 alloc(unsigned int lth)
