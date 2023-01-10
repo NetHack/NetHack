@@ -150,8 +150,9 @@ init_nhwindows(int* argcp, char** argv)
                 ** windows?  Or at least all but WIN_INFO?      -dean
 */
 void
-curses_init_nhwindows(int *argcp UNUSED,
-                      char **argv UNUSED)
+curses_init_nhwindows(
+    int *argcp UNUSED,
+    char **argv UNUSED)
 {
 #ifdef PDCURSES
     char window_title[BUFSZ];
@@ -745,12 +746,12 @@ curses_ctrl_nhwindow(
 
 /*
 mark_synch()    -- Don't go beyond this point in I/O on any channel until
-                   all channels are caught up to here.  Can be an empty call
-                   for the moment
+                   all channels are caught up to here.
 */
 void
 curses_mark_synch(void)
 {
+    curses_refresh_nethack_windows();
 }
 
 /*
@@ -762,6 +763,9 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 void
 curses_wait_synch(void)
 {
+    if (curses_got_output())
+        (void) curses_more();
+    curses_mark_synch();
     /* [do we need 'if (counting) curses_count_window((char *)0);' here?] */
 }
 

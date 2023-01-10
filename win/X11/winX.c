@@ -1334,8 +1334,10 @@ X11_mark_synch(void)
 void
 X11_wait_synch(void)
 {
-    if (x_inited)
+    if (x_inited) {
+        X11_mark_synch();
         XFlush(XtDisplay(toplevel));
+    }
 }
 
 /* Both resume_ and suspend_ are called from ioctl.c and unixunix.c. */

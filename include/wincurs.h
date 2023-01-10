@@ -221,6 +221,7 @@ extern void curses_cleanup(void);
 
 extern void curses_message_win_puts(const char *message, boolean recursed);
 extern void curses_got_input(void);
+extern int curses_got_output(void);
 extern int curses_block(boolean require_tab); /* for MSGTYPE=STOP */
 extern int curses_more(void);
 extern void curses_clear_unhighlight_message_window(void);

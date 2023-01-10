@@ -2351,7 +2351,8 @@ menu_identify(int id_limit)
             for (i = 0; i < n; i++, id_limit--)
                 (void) identify(pick_list[i].item.a_obj);
             free((genericptr_t) pick_list);
-            mark_synch(); /* Before we loop to pop open another menu */
+            if (id_limit)
+                wait_synch(); /* Before we loop to pop open another menu */
             first = 0;
         } else if (n == -2) { /* player used ESC to quit menu */
             break;
@@ -2381,8 +2382,9 @@ count_unidentified(struct obj *objchn)
 
 /* dialog with user to identify a given number of items; 0 means all */
 void
-identify_pack(int id_limit,
-              boolean learning_id) /* T: just read unknown identify scroll */
+identify_pack(
+    int id_limit,
+    boolean learning_id) /* T: just read unknown identify scroll */
 {
     struct obj *obj;
     int n, unid_cnt = count_unidentified(gi.invent);
@@ -2396,7 +2398,7 @@ identify_pack(int id_limit,
         for (obj = gi.invent; obj; obj = obj->nobj) {
             if (not_fully_identified(obj)) {
                 (void) identify(obj);
-                if (unid_cnt == 1)
+                if (--unid_cnt < 1)
                     break;
             }
         }

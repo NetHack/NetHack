@@ -182,9 +182,16 @@ curses_got_input(void)
 }
 
 int
-curses_block(boolean noscroll) /* noscroll - blocking because of msgtype
-                                * = stop/alert else blocking because
-                                * window is full, so need to scroll after */
+curses_got_output(void)
+{
+    return turn_lines;
+}
+
+int
+curses_block(
+    boolean noscroll) /* noscroll - blocking because of MSGTYPE=STOP/ALERT
+                       * else blocking because window is full, so need to
+                       * scroll after */
 {
     static const char resp[] = " \r\n\033"; /* space, enter, esc */
     static int prev_x = -1, prev_y = -1, blink = 0;
