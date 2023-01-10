@@ -1259,6 +1259,7 @@ struct instance_globals_o {
     int (*occupation)(void);
     int occtime;
     int otg_temp; /* used by object_to_glyph() [otg] */
+    struct obj *otg_otmp; /* used by obj_is_piletop() */
     const char *occtxt; /* defined when occupation != NULL */
 
     /* symbols.c */

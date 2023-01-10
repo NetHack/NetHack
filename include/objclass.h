@@ -171,11 +171,12 @@ enum objects_nums {
 };
 
 enum misc_object_nums {
+    NUM_POTIONS    = (LAST_POTION - FIRST_POTION + 1),
+    NUM_REAL_GEMS  = (LAST_REAL_GEM - FIRST_REAL_GEM + 1),
     NUM_GLASS_GEMS = (LAST_GLASS_GEM - FIRST_GLASS_GEM + 1),
-    /* 1st +1: last-first subtraction; 2nd +1: extra empty spl_book[] slot;
-       currently LAST_SPELL includes blank, novel, and DeadBook so this
-       overallocates when used to define spl_book[] array */
-    MAXSPELL = (LAST_SPELL + 1 - FIRST_SPELL + 1),
+    /* LAST_SPELL is SPE_BLANK_PAPER, guaranteeing that spl_book[] will
+       have at least one unused slot at end to be used as a terminator */
+    MAXSPELL       = (LAST_SPELL - FIRST_SPELL + 1),
 };
 
 extern NEARDATA struct objclass objects[NUM_OBJECTS + 1];

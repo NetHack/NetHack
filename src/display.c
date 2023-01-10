@@ -309,12 +309,22 @@ map_trap(register struct trap *trap, register int show)
  *
  * Map the given object.  This routine assumes that the hero can physically
  * see the location of the object.  Update the screen if directed.
+ * [Note: feel_location() -> map_location() -> map_object() contradicts
+ * the claim here that the hero can see obj's <ox,oy>.]
  */
 void
-map_object(register struct obj *obj, register int show)
+map_object(register struct obj *obj, int show)
 {
     register coordxy x = obj->ox, y = obj->oy;
     register int glyph = obj_to_glyph(obj, newsym_rn2);
+
+    /* if this object is already displayed as a generic object, it might
+       become a specific one now */
+    if (glyph_is_generic_object(glyph) && cansee(x, y) && next2u(x, y)
+        && !Hallucination) {
+        obj->dknown = 1;
+        glyph = obj_to_glyph(obj, newsym_rn2);
+    }
 
     if (gl.level.flags.hero_memory) {
         /* MRKR: While hallucinating, statues are seen as random monsters */
@@ -1425,6 +1435,29 @@ see_objects(void)
     update_inventory();
 }
 
+/* mark the top object of each adjacent stack as having been seen, and
+   if it was being displayed as generic, redisplay it as specific */
+void
+see_nearby_objects(void)
+{
+    struct obj *obj;
+    int glyph;
+    coordxy ix, iy, x = u.ux, y = u.uy;
+
+    for (iy = y - 1; iy <= y + 1; ++iy)
+        for (ix = x - 1; ix <= x + 1; ++ix) {
+            if (!isok(ix, iy) || !cansee(ix, iy))
+                continue;
+            if ((obj = vobj_at(ix, iy)) != 0) {
+                obj->dknown = 1; /* adjacent, so close enough to see it */
+                /* operate on remembered glyph rather than current one */
+                glyph = levl[ix][iy].glyph;
+                if (glyph_is_generic_object(glyph))
+                    newsym_force(ix, iy);
+            }
+        }
+}
+
 /*
  * Update hallucinated traps.
  */
@@ -1697,8 +1730,10 @@ show_glyph(coordxy x, coordxy y, int glyph)
             text = "statue of a male monster at top of a pile";
         } else if ((offset = (glyph - GLYPH_BODY_PILETOP_OFF)) >= 0) {
             text = "body at top of a pile";
-        } else if ((offset = (glyph - GLYPH_OBJ_PILETOP_OFF))) {
-            text = "object at top of a pile";
+        } else if ((offset = (glyph - GLYPH_OBJ_PILETOP_OFF)) >= 0) {
+            text = (glyph_is_piletop_generic_obj(glyph)
+                    ? "generic object at top of a pile"
+                    : "object at top of a pile");
         } else if ((offset = (glyph - GLYPH_STATUE_FEM_OFF)) >= 0) {
             text = "statue of female monster";
         } else if ((offset = (glyph - GLYPH_STATUE_MALE_OFF)) >= 0) {
@@ -1745,7 +1780,9 @@ show_glyph(coordxy x, coordxy y, int glyph)
         } else if ((offset = (glyph - GLYPH_CMAP_STONE_OFF)) >= 0) {
             text = "stone";
         } else if ((offset = (glyph - GLYPH_OBJ_OFF)) >= 0) {
-            text = "object";
+            text = (glyph_is_normal_generic_obj(glyph)
+                    ? "generic object"
+                    : "object");
         } else if ((offset = (glyph - GLYPH_RIDDEN_FEM_OFF)) >= 0) {
             text = "ridden female monster";
         } else if ((offset = (glyph - GLYPH_RIDDEN_MALE_OFF)) >= 0) {

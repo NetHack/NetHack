@@ -1082,6 +1082,8 @@ when identifying items via menu and more than one pass is needed (so when
 	identifying 3 items and player only picks 1, for instance), issue
 	--More-- because the next menu might cover up the ID message(s)
 slightly more interesting Gehennom filler levels
+don't reveal color of potions, gems, or spellbooks that haven't been seen up
+	close (seeing faraway monster operate on an object counts as up close)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

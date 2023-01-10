@@ -588,6 +588,7 @@ const struct instance_globals_o g_init_o = {
     UNDEFINED_PTR, /* occupation */
     0, /* occtime */
     UNDEFINED_VALUE, /* otg_temp */
+    NULL, /* otg_otmp */
     NULL, /* occtxt */
     /* symbols.c */
     DUMMY, /* ov_primary_syms */

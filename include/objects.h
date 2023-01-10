@@ -66,10 +66,38 @@
 #error Unproductive inclusion of objects.h
 #endif  /* OBJECTS_DESCR_INIT || OBJECTS_INIT || OBJECTS_ENUM */
 
+#define GENERIC(desc, class, gen_enum) \
+    OBJECT(OBJ(NoDes, desc),                                            \
+           BITS(0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, 0),            \
+           0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLR_GRAY, gen_enum)
+
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
 OBJECT(OBJ("strange object", NoDes),
        BITS(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, 0),
        0, ILLOBJ_CLASS, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, STRANGE_OBJECT),
+/* slots [1] through [MAXOCLASSES-1] are indexed by class; some are
+   used for display purposes, most aren't used; none are actual objects;
+   note that 'real' strange object is in slot [0] but ILLOBJ_CLASS is 1
+   so we add a dummy for it in slot [1] to simplify accessing the rest;
+   there isn't any entry for RANDOM_CLASS (0) */
+GENERIC("strange",    ILLOBJ_CLASS,  GENERIC_ILLOBJ),  /* [1] */
+GENERIC("weapon",     WEAPON_CLASS,  GENERIC_WEAPON),  /* [2] */
+GENERIC("armor",      ARMOR_CLASS,   GENERIC_ARMOR),   /* [3] */
+GENERIC("ring",       RING_CLASS,    GENERIC_RING),    /* [4] */
+GENERIC("amulet",     AMULET_CLASS,  GENERIC_AMULET),  /* [5] */
+GENERIC("tool",       TOOL_CLASS,    GENERIC_TOOL),    /* [6] */
+GENERIC("food",       FOOD_CLASS,    GENERIC_FOOD),    /* [7] */
+GENERIC("potion",     POTION_CLASS,  GENERIC_POTION),  /* [8] */
+GENERIC("scroll",     SCROLL_CLASS,  GENERIC_SCROLL),  /* [9] */
+GENERIC("spellbook",  SPBOOK_CLASS,  GENERIC_SPBOOK),  /* [10] */
+GENERIC("wand",       WAND_CLASS,    GENERIC_WAND),    /* [11] */
+GENERIC("coin",       COIN_CLASS,    GENERIC_COIN),    /* [12] */
+GENERIC("gem",        GEM_CLASS,     GENERIC_GEM),     /* [13] */
+GENERIC("large rock", ROCK_CLASS,    GENERIC_ROCK),    /* [14] bldr+statue */
+GENERIC("iron ball",  BALL_CLASS,    GENERIC_BALL),    /* [15] */
+GENERIC("iron chain", CHAIN_CLASS,   GENERIC_CHAIN),   /* [16] */
+GENERIC("venom",      VENOM_CLASS,   GENERIC_VENOM),   /* [17] */
+#undef GENERIC
 
 /* weapons ... */
 #define WEAPON(name,desc,kn,mg,bi,prob,wt,                          \
@@ -1045,6 +1073,7 @@ FOOD("tin",                  75,  0, 10, 1, METAL,   0, HI_METAL, TIN),
            power, POTION_CLASS, prob, 0, 20, cost, 0, 0, 0, 0, 10, color, sn)
 POTION("gain ability",           "ruby",  1, 0, 42, 300, CLR_RED,
                                                         POT_GAIN_ABILITY),
+MARKER(FIRST_POTION, POT_GAIN_ABILITY)
 POTION("restore ability",        "pink",  1, 0, 40, 100, CLR_BRIGHT_MAGENTA,
                                                         POT_RESTORE_ABILITY),
 POTION("confusion",            "orange",  1, CONFUSION, 42, 100, CLR_ORANGE,
@@ -1097,6 +1126,7 @@ POTION("oil",                   "murky",  0, 0, 30, 250, CLR_BROWN,
  */
 POTION("water",                 "clear",  0, 0, 92, 100, CLR_CYAN,
                                                         POT_WATER),
+MARKER(LAST_POTION, POT_WATER)
 #undef POTION
 
 /* scrolls ... */
@@ -1338,6 +1368,11 @@ SPELL("freeze sphere",   "hardcover",
  */
 SPELL("blank paper", "plain", P_NONE, 18, 0, 0, 0, 0, HI_PAPER,
                                                         SPE_BLANK_PAPER),
+/* LAST_SPELL is used to calculate MAXSPELL, allocation size of spl_book[];
+   by including blank paper, which has no actual spell, we ensure that
+   even if hero learns every spell, spl_book[] will have at least one
+   unused slot at end; an unused slot is needed for use as terminator */
+MARKER(LAST_SPELL, SPE_BLANK_PAPER)
 /* tribute book for 3.6 */
 OBJECT(OBJ("novel", "paperback"),
        BITS(0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, PAPER),
@@ -1348,10 +1383,6 @@ OBJECT(OBJ("Book of the Dead", "papyrus"),
        BITS(0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, P_NONE, PAPER),
        0, SPBOOK_CLASS, 0, 0, 20, 10000, 0, 0, 0, 7, 20, HI_PAPER,
                                                         SPE_BOOK_OF_THE_DEAD),
-/* LAST_SPELL is used to compute MAXSPELL and should probably be
-   SPE_BLANK_PAPER-1 since there's no need for spl_book[] slots for
-   blank, novel, and Book of the Dead */
-MARKER(LAST_SPELL, SPE_BOOK_OF_THE_DEAD)
 #undef SPELL
 
 /* wands ... */
@@ -1488,7 +1519,7 @@ GEM("worthless piece of blue glass", "blue",
 GEM("worthless piece of red glass", "red",
     77, 1, 0, 6, 5, GLASS, CLR_RED, WORTHLESS_RED_GLASS),
 GEM("worthless piece of yellowish brown glass", "yellowish brown",
-    77, 1, 0, 6, 5, GLASS, CLR_BROWN, WORTHLESS_YELLOWISH_BROWN_GLASS),
+    77, 1, 0, 6, 5, GLASS, CLR_BROWN, WORTHLESS_YELLOWBROWN_GLASS),
 GEM("worthless piece of orange glass", "orange",
     76, 1, 0, 6, 5, GLASS, CLR_ORANGE, WORTHLESS_ORANGE_GLASS),
 GEM("worthless piece of yellow glass", "yellow",

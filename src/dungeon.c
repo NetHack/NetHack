@@ -1426,7 +1426,7 @@ void
 u_on_newpos(coordxy x, coordxy y)
 {
     if (!isok(x, y)) { /* validate location */
-        void (*func)(const char *, ...);
+        void (*func)(const char *, ...) PRINTF_F_PTR(1, 2);
 
         func = (x < 0 || y < 0 || x > COLNO - 1 || y > ROWNO - 1) ? panic
                : impossible;
@@ -1445,6 +1445,10 @@ u_on_newpos(coordxy x, coordxy y)
        stale values from previous level */
     if (!on_level(&u.uz, &u.uz0))
         u.ux0 = u.ux, u.uy0 = u.uy;
+    else if (!Blind && !Hallucination)
+        /* still on same level; might have come close enough to
+           generic object(s) to redisplay them as specific objects */
+        see_nearby_objects();
 }
 
 /* place you on a random location when arriving on a level */
