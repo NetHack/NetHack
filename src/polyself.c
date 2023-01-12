@@ -626,7 +626,7 @@ polyself(int psflags)
             if (controllable_poly) {
                 Sprintf(buf, "Become %s?",
                         an(pmname(&mons[mntmp], gvariant)));
-                if (yn(buf) != 'y')
+                if (y_n(buf) != 'y')
                     return;
             }
         }
@@ -1559,7 +1559,7 @@ dogaze(void)
                     Sprintf(qbuf, "Really %s %s?",
                             (adtyp == AD_CONF) ? "confuse" : "attack",
                             mon_nam(mtmp));
-                    if (yn(qbuf) != 'y')
+                    if (y_n(qbuf) != 'y')
                         continue;
                 }
                 setmangry(mtmp, TRUE);

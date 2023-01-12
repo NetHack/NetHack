@@ -697,7 +697,7 @@ attempt_restore:
             if (discover)
                 You("are in non-scoring discovery mode.");
             if (discover || wizard) {
-                if (yn("Do you want to keep the save file?") == 'n')
+                if (y_n("Do you want to keep the save file?") == 'n')
                     (void) delete_savefile();
                 else {
                     nh_compress(fqname(gs.SAVEF, SAVEPREFIX, 0));
@@ -1466,7 +1466,7 @@ other_self_recover_prompt(void)
     c = 'n';
     ct = 0;
     if (iflags.window_inited || WINDOWPORT(curses)) {
-        c = yn("There are files from a game in progress under your name. "
+        c = y_n("There are files from a game in progress under your name. "
                "Recover?");
     } else {
         c = 'n';
@@ -1493,7 +1493,7 @@ other_self_recover_prompt(void)
     }
     if (pl == 1 && (c == 'n' || c == 'N')) {
         /* no to recover */
-        c = yn("Are you sure you wish to destroy the old game, rather than try to "
+        c = y_n("Are you sure you wish to destroy the old game, rather than try to "
                   "recover it? [yn] ");
         pl = 2;
         if (!ismswin && !iscurses) {

@@ -1370,7 +1370,7 @@ use_candle(struct obj **optr)
     if ((q = strstri(qbuf, " to\033")) != 0)
         Strcpy(q, " to ");
     /* last, format final "attach candles to candelabrum?" query */
-    if (yn(safe_qbuf(qbuf, qbuf, "?", otmp, yname, thesimpleoname, "it"))
+    if (y_n(safe_qbuf(qbuf, qbuf, "?", otmp, yname, thesimpleoname, "it"))
         == 'n') {
         use_lamp(obj);
         return;
@@ -2776,7 +2776,7 @@ use_trap(struct obj *otmp)
         You("aren't very skilled at reaching from %s.", mon_nam(u.usteed));
         Sprintf(buf, "Continue your attempt to set %s?",
                 the(trapname(ttyp, FALSE)));
-        if (yn(buf) == 'y') {
+        if (y_n(buf) == 'y') {
             if (chance) {
                 switch (ttyp) {
                 case LANDMINE: /* set it off */

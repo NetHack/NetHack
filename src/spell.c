@@ -543,7 +543,7 @@ study_book(register struct obj* spellbook)
             /* hero has just been told what spell this book is for; it may
                have been undiscovered if spell was learned via divine gift */
             makeknown(booktype);
-            if (yn("Refresh your memory anyway?") == 'n')
+            if (y_n("Refresh your memory anyway?") == 'n')
                 return 0;
         }
 
@@ -565,7 +565,7 @@ study_book(register struct obj* spellbook)
                     Sprintf(qbuf,
                     "This spellbook is %sdifficult to comprehend.  Continue?",
                             (read_ability < 12 ? "very " : ""));
-                    if (yn(qbuf) != 'y') {
+                    if (y_n(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
                         return 1;
                     }

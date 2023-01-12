@@ -70,7 +70,6 @@ extern "C" {
 #undef max
 #undef alloc
 #undef lock
-#undef yn
 
 }
 

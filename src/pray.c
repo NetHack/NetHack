@@ -2044,7 +2044,7 @@ dopray(void)
            from the do-again buffer, so need to suppress this response too;
            otherwise subsequent ^A would use this answer for "are you sure?"
            and bypass confirmation */
-        if ((ParanoidPray ? YN(forcesuccess) : yn(forcesuccess)) == 'y') {
+        if ((ParanoidPray ? YN(forcesuccess) : y_n(forcesuccess)) == 'y') {
             u.ublesscnt = 0;
             if (u.uluck < 0)
                 u.uluck = 0;

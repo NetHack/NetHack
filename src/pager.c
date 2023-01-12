@@ -904,7 +904,7 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
                                (int) (sizeof question - 1
                                       - (strlen(question) + 2)));
                     Strcat(question, "\"?");
-                    if (yn(question) == 'y')
+                    if (y_n(question) == 'y')
                         yes_to_moreinfo = TRUE;
                 }
 
@@ -1868,7 +1868,7 @@ do_supplemental_info(char *name, struct permonst *pm, boolean without_asking)
                 copynchars(eos(question), entrytext,
                     (int) (sizeof question - 1 - (strlen(question) + 2)));
                 Strcat(question, "\"?");
-                if (yn(question) == 'y')
+                if (y_n(question) == 'y')
                 yes_to_moreinfo = TRUE;
             }
             if (yes_to_moreinfo) {

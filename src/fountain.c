@@ -203,7 +203,7 @@ dryup(coordxy x, coordxy y, boolean isyou)
             return;
         }
         if (isyou && wizard) {
-            if (yn("Dry up fountain?") == 'n')
+            if (y_n("Dry up fountain?") == 'n')
                 return;
         }
         /* FIXME: sight-blocking clouds should use block_point() when

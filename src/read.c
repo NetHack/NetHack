@@ -583,7 +583,7 @@ doread(void)
            maintained illiterate conduct so far, and this mail
            scroll didn't come from bones, ask for confirmation */
         if (!u.uconduct.literate) {
-            if (!scroll->spe && yn(
+            if (!scroll->spe && y_n(
              "Reading mail will violate \"illiterate\" conduct.  Read anyway?"
                                    ) != 'y')
                 return ECMD_OK;
@@ -3064,7 +3064,7 @@ create_particular_creation(
             Sprintf(buf, "Creating %s instead; force %s?",
                     mons[d->which].pmnames[NEUTRAL],
                     mons[firstchoice].pmnames[NEUTRAL]);
-            if (yn(buf) == 'y')
+            if (y_n(buf) == 'y')
                 d->which = firstchoice;
         }
         whichpm = &mons[d->which];

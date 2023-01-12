@@ -170,7 +170,7 @@ doride(void)
     if (u.usteed) {
         dismount_steed(DISMOUNT_BYCHOICE);
     } else if (getdir((char *) 0) && isok(u.ux + u.dx, u.uy + u.dy)) {
-        if (wizard && yn("Force the mount to succeed?") == 'y')
+        if (wizard && y_n("Force the mount to succeed?") == 'y')
             forcemount = TRUE;
         return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount)
                 ? ECMD_TIME : ECMD_OK);
@@ -220,7 +220,7 @@ mount_steed(
         legs_in_no_shape("riding", FALSE);
         Sprintf(qbuf, "Heal your leg%s?",
                 ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES) ? "s" : "");
-        if (force && wizard && yn(qbuf) == 'y')
+        if (force && wizard && y_n(qbuf) == 'y')
             heal_legs(0);
         else
             return (FALSE);

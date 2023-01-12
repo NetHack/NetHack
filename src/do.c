@@ -1125,7 +1125,7 @@ dodown(void)
     if (on_level(&valley_level, &u.uz) && !u.uevent.gehennom_entered) {
         You("are standing at the gate to Gehennom.");
         pline("Unspeakable cruelty and harm lurk down there.");
-        if (yn("Are you sure you want to enter?") != 'y')
+        if (y_n("Are you sure you want to enter?") != 'y')
             return ECMD_OK;
         pline("So be it.");
         u.uevent.gehennom_entered = 1; /* don't ask again */
@@ -1145,7 +1145,7 @@ dodown(void)
 
             You("don't fit %s easily.", down_or_thru);
             Sprintf(qbuf, "Try to squeeze %s?", down_or_thru);
-            if (yn(qbuf) == 'y') {
+            if (y_n(qbuf) == 'y') {
                 if (!rn2(3)) {
                     actn = "manage to squeeze";
                     losehp(Maybe_Half_Phys(rnd(4)),
@@ -1223,7 +1223,7 @@ doup(void)
     if (ledger_no(&u.uz) == 1) {
         if (iflags.debug_fuzzer)
             return ECMD_OK;
-        if (yn("Beware, there will be no return!  Still climb?") != 'y')
+        if (y_n("Beware, there will be no return!  Still climb?") != 'y')
             return ECMD_OK;
     }
     if (!next_to_u()) {

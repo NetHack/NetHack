@@ -4611,7 +4611,7 @@ readobjnam(char *bp, struct obj *no_wish)
                 rn1cnt = 6 - d.gsize;
             if (d.cnt > rn1cnt
                 && (!wizard || gp.program_state.wizkit_wishing
-                    || yn("Override glob weight limit?") != 'y'))
+                    || y_n("Override glob weight limit?") != 'y'))
                 d.cnt = rn1cnt;
             d.otmp->owt *= (unsigned) d.cnt;
         }

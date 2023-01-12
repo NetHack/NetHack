@@ -715,7 +715,7 @@ doconsult(struct monst *oracl)
             return ECMD_OK;
         Sprintf(qbuf, "\"Then dost thou desire a major one?\" (%d %s)",
                 major_cost, currency((long) major_cost));
-        if (yn(qbuf) != 'y')
+        if (y_n(qbuf) != 'y')
             return ECMD_OK;
         u_pay = (umoney < (long) major_cost) ? (int) umoney : major_cost;
         break;

@@ -447,13 +447,13 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MMOVE_NOMOVES 4 /* monster has no valid locations to move to */
 
 /*** some utility macros ***/
-#define yn(query) yn_function(query, ynchars, 'n', TRUE)
+#define y_n(query) yn_function(query, ynchars, 'n', TRUE)
 #define ynq(query) yn_function(query, ynqchars, 'q', TRUE)
 #define ynaq(query) yn_function(query, ynaqchars, 'y', TRUE)
 #define nyaq(query) yn_function(query, ynaqchars, 'n', TRUE)
 #define nyNaq(query) yn_function(query, ynNaqchars, 'n', TRUE)
 #define ynNaq(query) yn_function(query, ynNaqchars, 'y', TRUE)
-/* YN() is same as yn() except doesn't save the response in do-again buffer */
+/* YN() is same as y_n() except doesn't save the response in do-again buffer */
 #define YN(query) yn_function(query, ynchars, 'n', FALSE)
 
 /* Macros for scatter */

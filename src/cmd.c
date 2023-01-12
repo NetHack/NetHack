@@ -6604,7 +6604,7 @@ paranoid_query(boolean be_paranoid, const char *prompt)
             promptprefix = "\"Yes\" or \"No\": ";
         } while (ParanoidConfirm && strcmpi(ans, "no") && --trylimit);
     } else {
-        confirmed_ok = (yn(prompt) == 'y');
+        confirmed_ok = (y_n(prompt) == 'y');
     }
     return confirmed_ok;
 }

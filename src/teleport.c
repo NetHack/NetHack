@@ -565,7 +565,7 @@ scrolltele(struct obj* scroll)
         You_feel("disoriented for a moment.");
         /* don't discover the scroll [at least not yet for wizard override];
            disorientation doesn't reveal that this is a teleport attempt */
-        if (!wizard || yn("Override?") != 'y')
+        if (!wizard || y_n("Override?") != 'y')
             return;
     }
     if (((Teleport_control || (scroll && scroll->blessed)) && !Stunned)
@@ -738,7 +738,7 @@ dotele(
 
     if (trap) {
         if (trap->ttyp == LEVEL_TELEP && trap->tseen) {
-            if (yn("There is a level teleporter here. Trigger it?") == 'y') {
+            if (y_n("There is a level teleporter here. Trigger it?") == 'y') {
                 level_tele_trap(trap, FORCETRAP);
                 /* deliberate jumping will always take time even if it doesn't
                  * work */
@@ -749,7 +749,7 @@ dotele(
             trap_once = trap->once; /* trap may get deleted, save this */
             if (trap->once) {
                 pline("This is a vault teleport, usable once only.");
-                if (yn("Jump in?") == 'n') {
+                if (y_n("Jump in?") == 'n') {
                     trap = 0;
                 } else {
                     deltrap(trap);

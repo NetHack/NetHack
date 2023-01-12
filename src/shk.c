@@ -1751,7 +1751,7 @@ dopayobj(
         (void) safe_qbuf(qbuf, (char *) 0, qsfx, obj,
                          (quan == 1L) ? Doname2 : doname, ansimpleoname,
                          (quan == 1L) ? "that" : "those");
-        if (yn(qbuf) == 'n') {
+        if (y_n(qbuf) == 'n') {
             buy = PAY_SKIP;                         /* don't want to buy */
         } else if (quan < bp->bquan && !consumed) { /* partly used goods */
             obj->quan = bp->bquan - save_quan;      /* used up amount */
@@ -4492,7 +4492,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
     Sprintf(qbuf, "%sYou did %ld %s worth of damage!%s  Pay?",
             !animal ? cad(TRUE) : "", cost_of_damage,
             currency(cost_of_damage), !animal ? "\"" : "");
-    if (yn(qbuf) != 'n') {
+    if (y_n(qbuf) != 'n') {
         boolean is_seen, was_seen = canseemon(shkp),
                 was_outside = !inhishop(shkp);
         coordxy sx = shkp->mx, sy = shkp->my;

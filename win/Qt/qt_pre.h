@@ -11,7 +11,6 @@
 #undef Warning
 #undef msleep
 #undef wizard
-#undef yn
 #undef min
 #undef max
 
