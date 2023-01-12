@@ -120,23 +120,13 @@ typedef struct tagRGBQ {
 #define BI_RLE4 2L
 #define BI_BITFIELDS 3L
 #endif /* __GNUC__ */
+#define RGBQUAD_COUNT 256
 
 #pragma pack(1)
 struct tagBMP {
     BITMAPFILEHEADER bmfh;
     BITMAPINFOHEADER bmih;
-#if BITCOUNT == 4
-#define RGBQUAD_COUNT 16
     RGBQUAD bmaColors[RGBQUAD_COUNT];
-#else
-#if (TILE_X == 32)
-#define RGBQUAD_COUNT 256
-#else
-/*#define RGBQUAD_COUNT 16 */
-#define RGBQUAD_COUNT 256
-#endif
-    RGBQUAD bmaColors[RGBQUAD_COUNT];
-#endif
     uchar packtile; /* start */
 } PACK bmp, *newbmp;
 #pragma pack()
@@ -208,12 +198,13 @@ main(int argc, char *argv[])
 
     max_x = 16 * 40;
     max_y = ((16 *  magictileno) / 40) + 16;
-    bmpsize = (sizeof bmp - sizeof bmp.packtile) + (max_y * (max_x * sizeof(uchar)));
+    bmpsize = (sizeof bmp - sizeof bmp.packtile)
+                  + (max_y * (max_x * sizeof(uchar)));
     newbmp = malloc(bmpsize);
     if (!newbmp) {
         printf("memory allocation failure, %d %d, aborting.\n",
                 bmpsize, magictileno);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
     tilecount = 0;
     xoffset = yoffset = 0;
@@ -266,11 +257,7 @@ main(int argc, char *argv[])
             }
             build_bmptile(tilepixels);
             tilecount++;
-#if BITCOUNT == 4
-            xoffset += (TILE_X / 2);
-#else
             xoffset += TILE_X;
-#endif
             if (xoffset >= max_x) {
                 yoffset += TILE_Y;
                 xoffset = 0;
@@ -307,20 +294,11 @@ build_bmih(UNALIGNED_POINTER BITMAPINFOHEADER* pbmih)
     WORD cClrBits;
     int w, h;
     pbmih->biSize = lelong(sizeof(bmp.bmih));
-#if BITCOUNT == 4
-    pbmih->biWidth = lelong(w = max_x * 2);
-#else
     pbmih->biWidth = lelong(w = max_x);
-#endif
     pbmih->biHeight = lelong(h = max_y);
     pbmih->biPlanes = leshort(1);
-#if BITCOUNT == 4
-    pbmih->biBitCount = leshort(4);
-    cClrBits = 4;
-#else
     pbmih->biBitCount = leshort(8);
     cClrBits = 8;
-#endif
     if (cClrBits == 1)
         cClrBits = 1;
     else if (cClrBits <= 4)
@@ -372,16 +350,9 @@ build_bmptile(pixel(*pixels)[TILE_X])
                         tilecount);
             y = (max_y - 1) - (cur_y + yoffset);
             apply_color = cur_color;
-#if BITCOUNT == 4
-            x = (cur_x / 2) + xoffset;
-            newbmp.packtile[y][x] = (cur_x % 2 != 0)
-                                    ? (uchar) (bmp.packtile[y][x] | cur_color)
-                                    : (uchar) (cur_color << 4);
-#else
             x = cur_x + xoffset;
             c = &newbmp->packtile + ((y * max_x) + x);
             *c = (uchar) apply_color;
-#endif
         }
     }
 }
