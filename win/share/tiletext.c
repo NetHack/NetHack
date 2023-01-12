@@ -180,7 +180,7 @@ static boolean
 read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
     static int gidx = 0;
-    int ph, i, j, k, reslt;
+    int ph, i = 0, j, k, reslt;
     char buf[BUFSZ], ttype[BUFSZ], gend[BUFSZ];
     const char *p;
     char *q;
