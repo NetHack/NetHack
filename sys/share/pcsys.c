@@ -29,7 +29,7 @@
 #endif
 
 #if defined(MICRO) || defined(OS2)
-void nethack_exit(int) NORETURN;
+ATTRNORETURN void nethack_exit(int) NORETURN;
 #else
 #define nethack_exit exit
 #endif

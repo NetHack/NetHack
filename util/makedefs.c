@@ -179,9 +179,9 @@ unsigned FITSuint_(unsigned long long, const char *, int);
 
 #include "../src/mdlib.c"
 
-static void makedefs_exit(int) NORETURN;
+ATTRNORETURN static void makedefs_exit(int) NORETURN;
 
-static void
+ATTRNORETURN static void
 makedefs_exit(int how)
 {
 #if 0   /* makedefs doesn't need to do this */

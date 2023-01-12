@@ -27,7 +27,7 @@ char *translate_path_variables(const char *, char *);
 char *exename(void);
 boolean fakeconsole(void);
 void freefakeconsole(void);
-extern void nethack_exit(int) NORETURN;
+ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #if defined(MSWIN_GRAPHICS)
 extern void mswin_destroy_reg(void);
 #endif
@@ -454,6 +454,8 @@ extern const char *known_restrictions[]; /* symbols.c */
  * WinMain exist, the resulting executable won't work correctly.
  */
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 #if defined(__MINGW32__) && defined(MSWIN_GRAPHICS)
 #define MAIN mingw_main
 #else
@@ -734,6 +736,8 @@ attempt_restore:
     /*NOTREACHED*/
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
 process_options(int argc, char * argv[])

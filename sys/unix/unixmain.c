@@ -35,10 +35,10 @@ static void process_options(int, char **);
 static void consume_arg(int, int *, char ***);
 static void consume_two_args(int, int *, char ***);
 static void early_options(int *, char ***, char **);
-static void opt_terminate(void) NORETURN;
-static void opt_usage(const char *) NORETURN;
+ATTRNORETURN static void opt_terminate(void) NORETURN;
+ATTRNORETURN static void opt_usage(const char *) NORETURN;
 static void opt_showpaths(const char *);
-static void scores_only(int, char **, const char *) NORETURN;
+ATTRNORETURN static void scores_only(int, char **, const char *) NORETURN;
 
 #ifdef _M_UNIX
 extern void check_sco_console(void);
@@ -702,7 +702,7 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
 /* for command-line options that perform some immediate action and then
    terminate the program without starting play, like 'nethack --version'
    or 'nethack -s Zelda'; do some cleanup before that termination */
-static void
+ATTRNORETURN static void
 opt_terminate(void)
 {
     config_error_done(); /* free memory allocated by config_error_init() */
@@ -711,7 +711,7 @@ opt_terminate(void)
     /*NOTREACHED*/
 }
 
-static void
+ATTRNORETURN static void
 opt_usage(const char *hackdir)
 {
 #ifdef CHDIR
@@ -744,7 +744,7 @@ opt_showpaths(const char *dir)
 /* handle "-s <score options> [character-names]" to show all the entries
    in the high scores file ('record') belonging to particular characters;
    nethack will end after doing so without starting play */
-static void
+ATTRNORETURN static void
 scores_only(int argc, char **argv, const char *dir)
 {
     /* do this now rather than waiting for final termination, in case there
