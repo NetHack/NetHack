@@ -375,7 +375,7 @@ examine_tilefiles(void)
             }
             (void) fclose(fp2);
             tilecnt[i] = tiles_in_file;
-	}
+        }
     }
 }
 
