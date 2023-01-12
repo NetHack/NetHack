@@ -49,6 +49,12 @@ Z = (195, 195, 195)
   ......JA.JA.....
   ................
 }
+#
+# Contributing artist: NullCGT 27-Dec-2020
+# Female ants are slightly larger than male ants, just like in real
+# life. I could have added wings to the male ants, but I felt that
+# doing so would lead to some confusion.
+#
 # tile 1 (giant ant,female)
 {
   ................
@@ -809,6 +815,13 @@ Z = (195, 195, 195)
   .....PPAA..PPA..
   ................
 }
+#
+# Contributing artist: NullCGT 27-Dec-2020
+# Female wolves are slightly smaller than male wolves.
+# There wasn't a great way to show this without making winter wolves
+# look very similar to winter wolf cubs, so I just made the female
+# wolves tails slightly shorter.
+#
 # tile 41 (wolf,female)
 {
   ................
@@ -847,6 +860,9 @@ Z = (195, 195, 195)
   ...L.LLAA..PP...
   .....LL.........
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female werewolves wear slightly different clothing.
+#
 # tile 43 (werewolf,female)
 {
   ................
@@ -1379,6 +1395,12 @@ Z = (195, 195, 195)
   .....CCA...CA...
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Calico cats are almost exclusively female, so I turned the female cats
+# into calico cats. The other piece of logic behind this choice was that
+# players will probably really enjoy seeing different variants of their
+# pets.
+#
 # tile 71 (housecat,female)
 {
   ................
@@ -1759,6 +1781,9 @@ Z = (195, 195, 195)
   ....LLL.LLL.....
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female hobbits wear slightly different clothing.
+#
 # tile 91 (hobbit,female)
 {
   ................
@@ -1778,6 +1803,13 @@ Z = (195, 195, 195)
   ....LLL.LLL.....
   ................
 }
+# Note from contributing artist: NullCGT 27-Dec-2020
+# Male and female dwarfs are not differentiated in any way whatsoever.
+# According to Terry Pratchett (in Unseen Academicals, if I remember
+# correctly) it is almost impossible to tell what gender a dwarf is,
+# even for fellow dwarfs. I strongly believe that NetHack should follow
+# this tradition.
+#
 # tile 92 (dwarf,male)
 {
   ................
@@ -2519,6 +2551,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female leprechauns are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 131 (leprechaun,female)
 {
   ................
@@ -4761,6 +4797,9 @@ Z = (195, 195, 195)
   ..BF.LLAALLAFB..
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female Aleax wears slightly different clothing.
+#
 # tile 249 (Aleax,female)
 {
   ................
@@ -4875,6 +4914,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female archons are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 255 (Archon,female)
 {
   ................
@@ -5065,6 +5108,10 @@ Z = (195, 195, 195)
   ....CA...C......
   ................
 }
+# Note from contributing artist: NullCGT 27-Dec-2020
+# Centaur tiles have no differentiation because the different types of
+# centaurs are already extremely difficult to tell apart from one another.
+#
 # tile 265 (plains centaur,female)
 {
   ................
@@ -6471,6 +6518,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female gnomes are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 339 (gnome,female)
 {
   ................
@@ -6509,6 +6560,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female gnome leaders are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 341 (gnome leader,female)
 {
   ................
@@ -6585,6 +6640,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female gnome rulers are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 345 (gnome ruler,female)
 {
   ................
@@ -6775,6 +6834,10 @@ Z = (195, 195, 195)
   .....CLJACLJAAAA
   ...LLLLJ.CLLLKAA
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female frost giants are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 355 (frost giant,female)
 {
   .....KJJJJAA....
@@ -6927,6 +6990,9 @@ Z = (195, 195, 195)
   ....CLCACLCAAAAA
   ..LLLLL.LLLLLAA.
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female minotaurs wear slightly different clothing.
+#
 # tile 363 (minotaur,female)
 {
   ................
@@ -7383,6 +7449,10 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female gnome mummies are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 387 (gnome mummy,female)
 {
   ................
@@ -8029,6 +8099,9 @@ Z = (195, 195, 195)
   ....CJJJCLAAAAAA
   ..LLLLL.LLLLLAA.
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female ogre tyrants have slightly different crowns.
+#
 # tile 421 (ogre tyrant,female)
 {
   ...HH.C.HH......
@@ -8219,6 +8292,9 @@ Z = (195, 195, 195)
   ....NAAEBAANN...
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female quantum mechanics have a different hairstyle and no beard.
+#
 # tile 431 (quantum mechanic,female)
 {
   ................
@@ -8238,6 +8314,10 @@ Z = (195, 195, 195)
   ....NAAEBAANN...
   ................
 }
+# Note from contributing artist: NullCGT 27-Dec-2020
+# Male and female genetic engineers look the same, because the genetic
+# engineer tile is perfect.
+#
 # tile 432 (genetic engineer,male)
 {
   ................
@@ -8979,6 +9059,12 @@ Z = (195, 195, 195)
   .J.....LLAA.....
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female barrow wights look like old grandmothers with flyaway hair. I
+# kept the hair color the same and used a similar quantity of pixels so
+# that they look similar enough to the males that you can tell they are
+# barrow wights.
+#
 # tile 471 (barrow wight,female)
 {
   ................
@@ -10157,6 +10243,9 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female humans wear slightly different clothing.
+#
 # tile 533 (human,female)
 {
   ................
@@ -10233,6 +10322,9 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female werejackals wear slightly different clothing.
+#
 # tile 537 (werejackal,female)
 {
   ................
@@ -10271,6 +10363,9 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female werewolves wear slightly different clothing.
+#
 # tile 539 (werewolf,female)
 {
   ................
@@ -10499,6 +10594,9 @@ Z = (195, 195, 195)
   ................
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female elven monarchs have slightly different crowns.
+#
 # tile 551 (elven monarch,female)
 {
   ................
@@ -10613,6 +10711,10 @@ Z = (195, 195, 195)
   .....BPPABPPAAAA
   ....BPPP.BPPPAAA
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female guards are clean-shaven. Although of course not one
+# hundred percent accurate, it's convenient visual shorthand.
+#
 # tile 557 (guard,female)
 {
   ................
@@ -12893,6 +12995,10 @@ Z = (195, 195, 195)
   .....CJJ.JKJ....
   ................
 }
+# Contributing artist: NullCGT 27-Dec-2020
+# Female archeologist tile is a reference to a certain archeologist
+# known for raiding tombs.
+#
 # tile 677 (archeologist,female)
 {
   ................
