@@ -213,6 +213,7 @@ main(int argc, char *argv[])
     if (!newbmp) {
         printf("memory allocation failure, %d %d, aborting.\n",
                 bmpsize, magictileno);
+        exit(1);
     }
     tilecount = 0;
     xoffset = yoffset = 0;
