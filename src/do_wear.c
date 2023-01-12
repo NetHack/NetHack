@@ -2945,10 +2945,10 @@ destroy_arm(register struct obj *atmp)
      * artifact suit over a shirt.  That would be a bug.  Since there
      * aren't any, we'll just look the other way.
      */
-#define DESTROY_ARM(o)                            \
-    ((otmp = (o)) != 0 && (!atmp || atmp == otmp) \
-             && (!obj_resists(otmp, 0, 90))       \
-         ? (otmp->in_use = TRUE)                  \
+#define DESTROY_ARM(o)                             \
+    (((otmp = (o)) != 0 && (!atmp || atmp == otmp) \
+             && (!obj_resists(otmp, 0, 90)))       \
+         ? (otmp->in_use = TRUE)                   \
          : FALSE)
 
     if (DESTROY_ARM(uarmc)) {
