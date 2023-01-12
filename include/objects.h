@@ -1073,7 +1073,6 @@ FOOD("tin",                  75,  0, 10, 1, METAL,   0, HI_METAL, TIN),
            power, POTION_CLASS, prob, 0, 20, cost, 0, 0, 0, 0, 10, color, sn)
 POTION("gain ability",           "ruby",  1, 0, 42, 300, CLR_RED,
                                                         POT_GAIN_ABILITY),
-MARKER(FIRST_POTION, POT_GAIN_ABILITY)
 POTION("restore ability",        "pink",  1, 0, 40, 100, CLR_BRIGHT_MAGENTA,
                                                         POT_RESTORE_ABILITY),
 POTION("confusion",            "orange",  1, CONFUSION, 42, 100, CLR_ORANGE,
@@ -1126,7 +1125,6 @@ POTION("oil",                   "murky",  0, 0, 30, 250, CLR_BROWN,
  */
 POTION("water",                 "clear",  0, 0, 92, 100, CLR_CYAN,
                                                         POT_WATER),
-MARKER(LAST_POTION, POT_WATER)
 #undef POTION
 
 /* scrolls ... */

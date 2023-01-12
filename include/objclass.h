@@ -171,7 +171,6 @@ enum objects_nums {
 };
 
 enum misc_object_nums {
-    NUM_POTIONS    = (LAST_POTION - FIRST_POTION + 1),
     NUM_REAL_GEMS  = (LAST_REAL_GEM - FIRST_REAL_GEM + 1),
     NUM_GLASS_GEMS = (LAST_GLASS_GEM - FIRST_GLASS_GEM + 1),
     /* LAST_SPELL is SPE_BLANK_PAPER, guaranteeing that spl_book[] will

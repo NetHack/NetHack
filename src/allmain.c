@@ -1058,9 +1058,6 @@ dump_enums(void)
     static const struct enum_dump omdump[] = {
         dump_om(FIRST_AMULET),
         dump_om(LAST_AMULET),
-        dump_om(FIRST_POTION),
-        dump_om(LAST_POTION),
-        dump_om(NUM_POTIONS),
         dump_om(FIRST_SPELL),
         dump_om(LAST_SPELL),
         dump_om(MAXSPELL),
