@@ -1217,8 +1217,9 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
         || (fld == BL_HP && iflags.wc2_hitpointbar)) {
         fldmax = curr->idxmax;
         pc = (fldmax == BL_EXP) ? exp_percentage()
-             : (fldmax >= 0) ? percentage(curr, &gb.blstats[idx][fldmax])
-               : 0; /* bullet proofing; can't get here */
+             : (fldmax >= 0 && fldmax < MAXBLSTATS)
+                ? percentage(curr, &gb.blstats[idx][fldmax])
+                : 0; /* bullet proofing; can't get here */
         if (pc != prev->percent_value)
             chg = 1;
         curr->percent_value = pc;
