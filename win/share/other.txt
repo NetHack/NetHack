@@ -1,6 +1,4 @@
 # other.txt - tile defintions for 'other' (walls, furniture, explosions)
-#  Note: if the number of monster tiles, object tiles, or other tiles
-#  changes, 'MAGICTILENO' in tile2bmp.c needs to be updated to match!
 #  Note too: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
 . = (71, 108, 108)
