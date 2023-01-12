@@ -56,7 +56,7 @@ extern char *tilename(int, int);
 /* The numbers in the following calculation are the
    count of tiles present in:
    monsters.txt objects.txt other.txt monsters.txt */
-#define MAGICTILENO (788 + 459 + 237 + 788)
+#define MAGICTILENO (789 + 477 + 240 + 789)
 
 #if BITCOUNT == 4
 #define MAX_X 320 /* 2 per byte, 4 bits per pixel */
@@ -230,7 +230,7 @@ main(int argc, char *argv[])
         exit(1);
     }
     while (pass < 4) {
-        filenum = pass % (sizeof(tilefiles) / sizeof(char *));
+        filenum = pass % (sizeof tilefiles / sizeof (char *));
         if (!fopen_text_file(tilefiles[filenum], RDTMODE)) {
             Fprintf(stderr, "usage: tile2bmp (from the util directory)\n");
             exit(EXIT_FAILURE);
@@ -260,6 +260,11 @@ main(int argc, char *argv[])
         set_grayscale(pass == 3);
         /* printf("Colormap initialized\n"); */
         while (read_text_tile(tilepixels)) {
+            if (tilecount >= MAGICTILENO) {
+                Fprintf(stderr, "tile2bmp: more than %d tiles!\n",
+                        MAGICTILENO);
+                exit(EXIT_FAILURE);
+            }
             build_bmptile(tilepixels);
             tilecount++;
 #if BITCOUNT == 4
@@ -275,7 +280,7 @@ main(int argc, char *argv[])
         (void) fclose_text_file();
         ++pass;
     }
-    fwrite(&bmp, sizeof(bmp), 1, fp);
+    fwrite(&bmp, sizeof bmp, 1, fp);
     fclose(fp);
     Fprintf(stderr, "Total of %d tiles written to %s.\n", tilecount, bmpname);
 
@@ -363,14 +368,15 @@ build_bmptile(pixel(*pixels)[TILE_X])
                     break;
             }
             if (cur_color >= num_colors)
-                Fprintf(stderr, "color not in colormap!\n");
+                Fprintf(stderr, "color not in colormap! (tile #%d)\n",
+                        tilecount);
             y = (MAX_Y - 1) - (cur_y + yoffset);
             apply_color = cur_color;
 #if BITCOUNT == 4
             x = (cur_x / 2) + xoffset;
-            bmp.packtile[y][x] = cur_x % 2
-                                     ? (uchar)(bmp.packtile[y][x] | cur_color)
-                                     : (uchar)(cur_color << 4);
+            bmp.packtile[y][x] = (cur_x % 2 != 0)
+                                    ? (uchar) (bmp.packtile[y][x] | cur_color)
+                                    : (uchar) (cur_color << 4);
 #else
             x = cur_x + xoffset;
             bmp.packtile[y][x] = (uchar) apply_color;
@@ -380,4 +386,3 @@ build_bmptile(pixel(*pixels)[TILE_X])
 }
 
 /*tile2bmp.c*/
-
