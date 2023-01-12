@@ -196,8 +196,8 @@ main(int argc, char *argv[])
     /* count monsters twice for grayscale variation */
     magictileno += tilecnt[0];
 
-    max_x = 16 * 40;
-    max_y = ((16 *  magictileno) / 40) + 16;
+    max_x = TILE_X * max_tiles_in_row;
+    max_y = ((TILE_Y * magictileno) / max_tiles_in_row) + TILE_Y;
     bmpsize = (sizeof bmp - sizeof bmp.packtile)
                   + (max_y * (max_x * sizeof(uchar)));
     newbmp = malloc(bmpsize);
