@@ -556,6 +556,7 @@ the map are not relative to it.
 | halign    | Horizontal alignment on a rough 3x3 grid.
 | valign    | Vertical alignment on a rough 3x3 grid.
 | map       | Multi-line string describing the map. See <<_map_characters>>
+| lit       | Boolean. Are the map grids lit? Default is false.
 | contents  | A function called with one parameter, a table with "width" and "height", the map width and height. All coordinates in the function will be relative to the map.
 |===
 

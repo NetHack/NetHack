@@ -82,16 +82,90 @@ end
 
 --
 
+function rnd_halign()
+   local aligns = { "half-left", "center", "half-right" };
+   return aligns[math.random(1, #aligns)];
+end
+
+function rnd_valign()
+   local aligns = { "top", "center", "bottom" };
+   return aligns[math.random(1, #aligns)];
+end
+
+-- the prefab maps must have contents-function, or populatemaze()
+-- puts the stuff only inside the prefab map.
+local hell_prefabs = {
+   function ()
+      des.map({ halign = rnd_halign(), valign = "center", map = [[
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......
+......]], contents = function() end });
+   end,
+   function ()
+      des.map({ halign = rnd_halign(), valign = "center", map = [[
+xxxxxx.....xxxxxx
+xxxx.........xxxx
+xx.............xx
+xx.............xx
+x...............x
+x...............x
+.................
+.................
+.................
+.................
+.................
+x...............x
+x...............x
+xx.............xx
+xx.............xx
+xxxx.........xxxx
+xxxxxx.....xxxxxx
+]], contents = function() end });
+   end,
+   function ()
+      des.map({ halign = "center", valign = "center", map = [[
+..............................................................
+..............................................................
+..............................................................
+..............................................................
+..............................................................]], contents = function() end });
+   end,
+   function ()
+      des.map({ halign = rnd_halign(), valign = rnd_valign(), lit = true, map = [[
+x.....x
+.......
+.......
+.......
+.......
+.......
+x.....x]], contents = function() end  });
+   end,
+};
+
+function rnd_hell_prefab()
+   local pf = math.random(1, #hell_prefabs);
+   hell_prefabs[pf]();
+end
+
 -- TODO: cold hells? (ice & water instead of lava. sometimes floor = ice)
--- TODO: more hell_tweaks:
---    - replacing walls with iron bars
---    - random prefab areas
---    - replace all walls (in a full level width/height) in a small area
 
 hells = {
    -- 1: "mines" style with lava
    function ()
-      des.level_init({ style = "solidfill", fg = " " });
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
       des.level_init({ style="mines", fg=".", smoothed=true ,joined=true, lit=0, walled=true });
       des.replace_terrain({ fromterrain = " ", toterrain = "L" });
@@ -102,37 +176,50 @@ hells = {
 
    -- 2: mazes like original, with some hell_tweaks
    function ()
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
       des.level_init({ style = "mazegrid", bg = "-" });
-      des.mazewalk(01,10,"east");
+      des.mazewalk({ coord = {01,10}, dir = "east", stocked = false});
       local tmpbounds = selection.match("-");
       local bnds = tmpbounds:bounds();
       local protected_area = selection.fillrect(bnds.lx, bnds.ly + 1, bnds.hx - 2, bnds.hy - 1);
       hell_tweaks(protected_area:negate());
+      if (percent(25)) then
+         rnd_hell_prefab();
+      end
    end,
 
    -- 3: mazes, style 1: wall thick = 1, random wid corr
    function ()
-      des.level_init({ style = "solidfill", fg = " " });
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
       des.level_init({ style = "maze", wallthick = 1 });
    end,
 
-   -- 4: mazes, style 2: replace wall with iron bars of lava
+   -- 4: mazes, style 2: replace wall with iron bars or lava
    function ()
-      des.level_init({ style = "solidfill", fg = " " });
+      local cwid = math.random(4);
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
-      des.level_init({ style = "maze", wallthick = 1 });
+      des.level_init({ style = "maze", wallthick = 1, corrwid = cwid });
       local outside_walls = selection.match(" ");
       local wallterrain = { "F", "L" };
       shuffle(wallterrain);
       des.replace_terrain({ mapfragment = "w", toterrain = wallterrain[1] });
+      if (cwid == 1) then
+         if (wallterrain[1] == "F" and percent(80)) then
+            -- replace some horizontal iron bars walls with floor
+            des.replace_terrain({ mapfragment = ".\nF\n.", toterrain = ".", chance = 25 * math.random(4) });
+         elseif (percent(25)) then
+            rnd_hell_prefab();
+         end
+      end
       des.terrain(outside_walls, " ");  -- return the outside back to solid wall
    end,
 
    -- 5: mazes, thick walls, occasionally lava instead of walls
    function ()
-      des.level_init({ style = "solidfill", fg = " " });
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
       des.level_flags("mazelevel", "noflip");
       des.level_init({ style = "maze", wallthick = 1 + math.random(2), corrwid = math.random(2) });
       if (percent(50)) then
@@ -151,5 +238,4 @@ hells[hellno]();
 des.stair("up")
 des.stair("down")
 
-des.region(selection.area(00,00,77,21),"unlit");
 populatemaze();

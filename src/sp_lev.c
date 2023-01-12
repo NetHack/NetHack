@@ -6494,6 +6494,7 @@ TODO: gc.coder->croom needs to be updated
     boolean has_contents = FALSE;
     int tryct = 0;
     int ox, oy;
+    boolean lit = FALSE;
     struct selectionvar *sel;
 
     create_des_coder();
@@ -6512,6 +6513,7 @@ TODO: gc.coder->croom needs to be updated
         tb = t_or_b2i[get_table_option(L, "valign", "none", top_or_bot)];
         get_table_xy_or_coord(L, &x, &y);
         tmpstr = get_table_str(L, "map");
+        lit = (boolean) get_table_boolean_opt(L, "lit", FALSE);
         lua_getfield(L, 1, "contents");
         if (lua_type(L, -1) == LUA_TFUNCTION) {
             lua_remove(L, -2);
@@ -6677,7 +6679,7 @@ TODO: gc.coder->croom needs to be updated
                     continue;
                 selection_setpoint(x, y, sel, 1);
                 levl[x][y].typ = mptyp;
-                levl[x][y].lit = FALSE;
+                levl[x][y].lit = lit;
                 /* clear out levl: load_common_data may set them */
                 levl[x][y].flags = 0;
                 levl[x][y].horizontal = 0;
