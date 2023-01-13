@@ -269,6 +269,7 @@ main(int argc, char *argv[])
     fwrite(newbmp, bmpsize, 1, fp);
     fclose(fp);
     Fprintf(stderr, "Total of %d tiles written to %s.\n", tilecount, bmpname);
+    free((genericptr_t) newbmp);
 
     exit(EXIT_SUCCESS);
     /*NOTREACHED*/
