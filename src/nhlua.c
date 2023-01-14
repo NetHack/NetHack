@@ -1,4 +1,4 @@
-/* NetHack 3.7	nhlua.c	$NHDT-Date: 1654116350 2022/06/01 20:45:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.84 $ */
+/* NetHack 3.7	nhlua.c	$NHDT-Date: 1673740532 2023/01/14 23:55:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -232,7 +232,7 @@ get_table_mapchr_opt(lua_State *L, const char *name, schar defval)
     xint8 typ;
 
     ter = get_table_str_opt(L, name, emptystr);
-    if (name && *ter) {
+    if (name && ter && *ter) {
         typ = (xint8) check_mapchr(ter);
         if (typ == INVALID_TYPE)
             nhl_error(L, "Erroneous map char");
@@ -2402,7 +2402,7 @@ nhlL_newstate(nhl_sandbox_info *sbi)
 #endif
 
 #ifdef NHL_SANDBOX
-    if (sbi->steps || sbi->perpcall) {
+    if (nud && (sbi->steps || sbi->perpcall)) {
         if (sbi->steps && sbi->perpcall)
             impossible("steps and perpcall both non-zero");
         if (sbi->perpcall) {
