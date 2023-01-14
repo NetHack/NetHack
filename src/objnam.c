@@ -54,6 +54,7 @@ static void readobjnam_parse_charges(struct _readobjnam_data *);
 static int readobjnam_postparse1(struct _readobjnam_data *);
 static int readobjnam_postparse2(struct _readobjnam_data *);
 static int readobjnam_postparse3(struct _readobjnam_data *);
+static const char *Japanese_item_name(int, const char *);
 
 struct Jitem {
     int item;
@@ -73,7 +74,7 @@ struct Jitem {
              && typ != SAPPHIRE && typ != BLACK_OPAL && typ != EMERALD \
              && typ != OPAL)))
 
-static struct Jitem Japanese_items[] = {
+static const struct Jitem Japanese_items[] = {
     { SHORT_SWORD, "wakizashi" },
     { BROADSWORD, "ninja-to" },
     { FLAIL, "nunchaku" },
@@ -88,8 +89,6 @@ static struct Jitem Japanese_items[] = {
     { POT_BOOZE, "sake" },
     { 0, "" }
 };
-
-static const char *Japanese_item_name(int i);
 
 static char *
 strprepend(char *s,const char * pref)
@@ -178,8 +177,13 @@ obj_typename(int otyp)
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp))
-        actualn = Japanese_item_name(otyp);
+    if (Role_if(PM_SAMURAI))
+        actualn = Japanese_item_name(otyp, actualn);
+    /* generic items don't have an actual-name; we shouldn't ever be called
+       for those; pacify static analyzer without resorting to impossible() */
+    if (!actualn)
+        actualn = (otyp > 0 && otyp < MAXOCLASSES) ? "generic" : "object?";
+
     switch (ocl->oc_class) {
     case COIN_CLASS:
         Strcpy(buf, "coin");
@@ -514,8 +518,12 @@ xname_flags(
     boolean known, dknown, bknown;
 
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
-    if (Role_if(PM_SAMURAI) && Japanese_item_name(typ))
-        actualn = Japanese_item_name(typ);
+    if (Role_if(PM_SAMURAI))
+        actualn = Japanese_item_name(typ, actualn);
+    /* generic items don't have an actual-name; we shouldn't ever be called
+       for those; pacify static analyzer without resorting to impossible() */
+    if (!actualn)
+        actualn = (typ > 0 && typ < MAXOCLASSES) ? "generic" : "object?";
     /* As of 3.6.2: this used to be part of 'dn's initialization, but it
        needs to come after possibly overriding 'actualn' */
     if (!dn)
@@ -2374,9 +2382,9 @@ static const char *const as_is[] = {
 /* singularize/pluralize decisions common to both makesingular & makeplural */
 static boolean
 singplur_lookup(
-char *basestr, char *endstring,    /* base string, pointer to eos(string) */
-boolean to_plural,            /* true => makeplural, false => makesingular */
-const char *const *alt_as_is) /* another set like as_is[] */
+    char *basestr, char *endstring,  /* base string, pointer to eos(string) */
+    boolean to_plural,         /* true => makeplural, false => makesingular */
+    const char *const *alt_as_is)    /* another set like as_is[] */
 {
     const struct sing_plur *sp;
     const char *same, *other, *const *as;
@@ -3143,7 +3151,7 @@ rnd_otyp_by_namedesc(
         lo = gb.bases[(uchar) oclass];
         hi = gb.bases[(uchar) oclass + 1] - 1;
     } else {
-        lo = STRANGE_OBJECT + 1;
+        lo = MAXOCLASSES; /* STRANGE_OBJECT + 1; */
         hi = NUM_OBJECTS - 1;
     }
     /* FIXME:
@@ -4324,10 +4332,10 @@ readobjnam_postparse3(struct _readobjnam_data *d)
     d->typ = 0;
 
     if (d->actualn) {
-        struct Jitem *j = Japanese_items;
+        const struct Jitem *j = Japanese_items;
 
         while (j->item) {
-            if (d->actualn && !strcmpi(d->actualn, j->name)) {
+            if (!strcmpi(d->actualn, j->name)) {
                 d->typ = j->item;
                 return 2; /*goto typfnd;*/
             }
@@ -4959,16 +4967,16 @@ rnd_class(int first, int last)
 }
 
 static const char *
-Japanese_item_name(int i)
+Japanese_item_name(int i, const char *ordinaryname)
 {
-    struct Jitem *j = Japanese_items;
+    const struct Jitem *j = Japanese_items;
 
     while (j->item) {
         if (i == j->item)
             return j->name;
         j++;
     }
-    return (const char *) 0;
+    return ordinaryname;
 }
 
 const char *
