@@ -1628,33 +1628,35 @@ save_waterlevel(NHFILE* nhfp)
         unsetup_waterlevel();
 }
 
+/* restoring air bubbles on Plane of Water or clouds on Plane of Air */
 void
-restore_waterlevel(NHFILE* nhfp)
+restore_waterlevel(NHFILE *nhfp)
 {
     struct bubble *b = (struct bubble *) 0, *btmp;
     int i, n = 0;
 
+    gb.bbubbles = (struct bubble *) 0;
     set_wportal();
     if (nhfp->structlevel) {
-        mread(nhfp->fd,(genericptr_t)&n,sizeof(int));
-        mread(nhfp->fd,(genericptr_t)&gx.xmin,sizeof(int));
-        mread(nhfp->fd,(genericptr_t)&gy.ymin,sizeof(int));
-        mread(nhfp->fd,(genericptr_t)&gx.xmax,sizeof(int));
-        mread(nhfp->fd,(genericptr_t)&gy.ymax,sizeof(int));
+        mread(nhfp->fd,(genericptr_t) &n, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &gx.xmin, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &gy.ymin, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &gx.xmax, sizeof (int));
+        mread(nhfp->fd,(genericptr_t) &gy.ymax, sizeof (int));
     }
     for (i = 0; i < n; i++) {
         btmp = b;
-        b = (struct bubble *) alloc(sizeof(struct bubble));
+        b = (struct bubble *) alloc((unsigned) sizeof *b);
         if (nhfp->structlevel)
-            mread(nhfp->fd,(genericptr_t) b, sizeof(struct bubble));
-      if (gb.bbubbles) {
-          btmp->next = b;
-          b->prev = btmp;
-      } else {
-          gb.bbubbles = b;
-          b->prev = (struct bubble *) 0;
-      }
-      mv_bubble(b, 0, 0, TRUE);
+            mread(nhfp->fd, (genericptr_t) b, (unsigned) sizeof *b);
+        if (btmp) {
+            btmp->next = b;
+            b->prev = btmp;
+        } else {
+            gb.bbubbles = b;
+            b->prev = (struct bubble *) 0;
+        }
+        mv_bubble(b, 0, 0, TRUE);
     }
     ge.ebubbles = b;
     if (b) {
