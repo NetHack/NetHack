@@ -858,11 +858,11 @@ cast_protection(void)
                 struct permonst *pm = u.ustuck ? u.ustuck->data : 0;
 
                 rmtyp = levl[u.ux][u.uy].typ;
-                atmosphere = u.uswallow
+                atmosphere = (pm && u.uswallow)
                                 ? ((pm == &mons[PM_FOG_CLOUD]) ? "mist"
-                                   : is_whirly(u.ustuck->data) ? "maelstrom"
+                                   : is_whirly(pm) ? "maelstrom"
                                      : enfolds(pm) ? "folds"
-                                       : is_animal(u.ustuck->data) ? "maw"
+                                       : is_animal(pm) ? "maw"
                                          : "ooze")
                                 : (u.uinwater ? hliquid("water")
                                    : (rmtyp == CLOUD) ? "cloud"
