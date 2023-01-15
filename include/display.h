@@ -180,9 +180,11 @@
  * random_object()
  *
  * Respectively return a random monster or object.
+ * random_object() won't return STRANGE_OBJECT or the generic objects.
+ * -/+ MAXOCLASSES is used to skip it and them.
  */
-#define random_monster(rng) rng(NUMMONS)
-#define random_object(rng) (rng(NUM_OBJECTS - 1) + 1)
+#define random_monster(rng) ((*rng)(NUMMONS))
+#define random_object(rng) ((*rng)(NUM_OBJECTS - MAXOCLASSES) + MAXOCLASSES)
 
 /*
  * what_obj()

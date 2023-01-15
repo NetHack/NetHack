@@ -332,10 +332,11 @@ look_at_object(
 }
 
 static void
-look_at_monster(char *buf,
-                char *monbuf, /* buf: output, monbuf: optional output */
-                struct monst *mtmp,
-                coordxy x, coordxy y)
+look_at_monster(
+    char *buf,
+    char *monbuf, /* buf: output, monbuf: optional output */
+    struct monst *mtmp,
+    coordxy x, coordxy y)
 {
     char *name, monnambuf[BUFSZ], healthbuf[BUFSZ];
     boolean accurate = !Hallucination;
