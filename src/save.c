@@ -344,6 +344,7 @@ savegamestate(NHFILE *nhfp)
     savenames(nhfp);
     save_msghistory(nhfp);
     save_gamelog(nhfp);
+    save_luadata(nhfp);
     if (nhfp->structlevel)
         bflush(nhfp->fd);
     gp.program_state.saving--;

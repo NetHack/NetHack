@@ -688,6 +688,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     restnames(nhfp);
     restore_msghistory(nhfp);
     restore_gamelog(nhfp);
+    restore_luadata(nhfp);
     /* must come after all mons & objs are restored */
     relink_timers(FALSE);
     relink_light_sources(FALSE);

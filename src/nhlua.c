@@ -1030,6 +1030,139 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
+/* set or get variables which are saved and restored along the game.
+   nh.variable("test", 10);
+   local ten = nh.variable("test"); */
+static int
+nhl_variable(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    int typ;
+    const char *key;
+
+    if (!gl.luacore) {
+        nhl_error(L, "nh luacore not inited");
+        return 0;
+    }
+
+    lua_getglobal(gl.luacore, "nh_lua_variables");
+    if (!lua_istable(gl.luacore, -1)) {
+        impossible("nh_lua_variables is not a lua table");
+        return 0;
+    }
+
+    if (argc == 1) {
+        key = luaL_checkstring(L, 1);
+
+        lua_getfield(gl.luacore, -1, key);
+        typ = lua_type(gl.luacore, -1);
+        if (typ == LUA_TSTRING)
+            lua_pushstring(L, lua_tostring(gl.luacore, -1));
+        else if (typ == LUA_TNIL)
+            lua_pushnil(L);
+        else if (typ == LUA_TBOOLEAN)
+            lua_pushboolean(L, lua_toboolean(gl.luacore, -1));
+        else if (typ == LUA_TNUMBER)
+            lua_pushinteger(L, lua_tointeger(gl.luacore, -1));
+        else if (typ == LUA_TTABLE) {
+            lua_getglobal(gl.luacore, "nh_get_variables_string");
+            lua_pushvalue(gl.luacore, -2);
+            nhl_pcall(gl.luacore, 1, 1);
+            luaL_loadstring(L, lua_tostring(gl.luacore, -1));
+            nhl_pcall(L, 0, 1);
+        } else
+            nhl_error(L, "Cannot get variable of that type");
+        return 1;
+    } else if (argc == 2) {
+        /* set nh_lua_variables[key] = value;
+           nh.variable("key", value); */
+        key = luaL_checkstring(L, 1);
+        //pline("SETVAR:%s", key);
+        typ = lua_type(L, -1);
+
+        if (typ == LUA_TSTRING) {
+            lua_pushstring(gl.luacore, lua_tostring(L, -1));
+            lua_setfield(gl.luacore, -2, key);
+        } else if (typ == LUA_TNIL) {
+            lua_pushnil(gl.luacore);
+            lua_setfield(gl.luacore, -2, key);
+        } else if (typ == LUA_TBOOLEAN) {
+            lua_pushboolean(gl.luacore, lua_toboolean(L, -1));
+            lua_setfield(gl.luacore, -2, key);
+        } else if (typ == LUA_TNUMBER) {
+            lua_pushinteger(gl.luacore, lua_tointeger(L, -1));
+            lua_setfield(gl.luacore, -2, key);
+        } else if (typ == LUA_TTABLE) {
+            lua_getglobal(L, "nh_set_variables_string");
+            lua_pushstring(L, key);
+            lua_pushvalue(L, -3); /* copy value to top */
+            nhl_pcall(L, 2, 1);
+            luaL_loadstring(gl.luacore, lua_tostring(L, -1));
+            nhl_pcall(gl.luacore, 0, 0);
+        } else
+            nhl_error(L, "Cannot set variable of that type");
+        return 0;
+    } else
+        nhl_error(L, "Wrong number of arguments");
+    return 1;
+}
+
+/* return nh_lua_variable lua table as a string */
+char *
+get_nh_lua_variables(void)
+{
+    char *key = NULL;
+
+    if (!gl.luacore) {
+        nhl_error(gl.luacore, "nh luacore not inited");
+        return key;
+    }
+
+    lua_getglobal(gl.luacore, "nh_lua_variables");
+    if (!lua_istable(gl.luacore, -1)) {
+        impossible("nh_lua_variables is not a lua table");
+        return key;
+    }
+
+    lua_getglobal(gl.luacore, "get_variables_string");
+    if (lua_type(gl.luacore, -1) == LUA_TFUNCTION) {
+        if (nhl_pcall(gl.luacore, 0, 1)) {
+            impossible("Lua error: %s", lua_tostring(gl.luacore, -1));
+            return key;
+        }
+        key = dupstr(lua_tostring(gl.luacore, -1));
+    }
+    return key;
+}
+
+/* save nh_lua_variables table to file */
+void
+save_luadata(NHFILE *nhfp)
+{
+    char *lua_data = get_nh_lua_variables();
+    long lua_data_len = strlen(lua_data) + 1;
+
+    bwrite(nhfp->fd, (genericptr_t) &lua_data_len, sizeof lua_data_len);
+    bwrite(nhfp->fd, (genericptr_t) lua_data, strlen(lua_data) + 1);
+    free(lua_data);
+}
+
+/* restore nh_lua_variables table from file */
+void
+restore_luadata(NHFILE *nhfp)
+{
+    long lua_data_len;
+    char *lua_data;
+
+    mread(nhfp->fd, (genericptr_t) &lua_data_len, sizeof lua_data_len);
+    lua_data = (char *) alloc(lua_data_len);
+    mread(nhfp->fd, (genericptr_t) lua_data, lua_data_len);
+    if (!gl.luacore)
+        l_nhcore_init();
+    luaL_loadstring(gl.luacore, lua_data);
+    nhl_pcall(gl.luacore, 0, 0);
+}
+
 /* local stairs = stairways(); */
 static int
 nhl_stairways(lua_State *L)
@@ -1319,6 +1452,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"dump_fmtstr", nhl_dump_fmtstr},
 #endif /* DUMPLOG */
     {"dnum_name", nhl_dnum_name},
+    {"variable", nhl_variable},
     {"stairways", nhl_stairways},
     {"pushkey", nhl_pushkey},
     {"doturn", nhl_doturn},

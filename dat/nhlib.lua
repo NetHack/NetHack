@@ -107,3 +107,35 @@ end
 function pline(fmt, ...)
    nh.pline(string.format(fmt, table.unpack({...})));
 end
+
+-- wrapper to make calling from nethack core easier
+function nh_set_variables_string(key, tbl)
+   return "nh_lua_variables[\"" .. key .. "\"]=" .. table_stringify(tbl) .. ";";
+end
+
+-- wrapper to make calling from nethack core easier
+function nh_get_variables_string(tbl)
+   return "return " .. table_stringify(tbl) .. ";";
+end
+
+-- return the (simple) table tbl converted into a string
+function table_stringify(tbl)
+   local str = "";
+   for key, value in pairs(tbl) do
+      local typ = type(value);
+      if (typ == "table") then
+         str = str .. "[\"" .. key .. "\"]=" .. table_stringify(value);
+      elseif (typ == "string") then
+         str = str .. "[\"" .. key .. "\"]=[[" .. value .. "]]";
+      elseif (typ == "boolean") then
+         str = str .. "[\"" .. key .. "\"]=" .. tostring(value);
+      elseif (typ == "number") then
+         str = str .. "[\"" .. key .. "\"]=" .. value;
+      elseif (typ == "nil") then
+         str = str .. "[\"" .. key .. "\"]=nil";
+      end
+      str = str .. ",";
+   end
+   -- pline("table_stringify:(%s)", str);
+   return "{" .. str .. "}";
+end

@@ -376,6 +376,19 @@ Example:
  nh.stop_timer_at({x=5,y=6}, "melt-ice");
 
 
+=== variable
+
+Set or get a global variable. These are persistent, saved and restored along with the game.
+Supports only strings, booleans, numbers, or tables.
+
+Example:
+
+ nh.variable("test", 10);
+ local ten = nh.variable("test");
+ nh.variable("tbl", { a = 1, b = "foo" });
+ local tbl = nh.variable("tbl");
+
+
 === verbalize
 
 Show the text in the message area as if someone said it, obeying eg. hero's deafness.
