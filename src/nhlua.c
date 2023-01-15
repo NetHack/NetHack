@@ -1030,6 +1030,8 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* set or get variables which are saved and restored along the game.
    nh.variable("test", 10);
    local ten = nh.variable("test"); */
@@ -1146,6 +1148,8 @@ save_luadata(NHFILE *nhfp)
     bwrite(nhfp->fd, (genericptr_t) lua_data, strlen(lua_data) + 1);
     free(lua_data);
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* restore nh_lua_variables table from file */
 void
