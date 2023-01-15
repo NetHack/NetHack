@@ -182,7 +182,9 @@ init_objects(void)
         prevoclass = (int) oclass;
     }
     /* extra entry allows deriving the range of a class via
-       bases[class] through bases[class+1]-1 for all classes */
+       bases[class] through bases[class+1]-1 for all classes
+       (except for ILLOBJ_CLASS which is separated from WEAPON_CLASS
+       by generic objects) */
     gb.bases[MAXOCLASSES] = NUM_OBJECTS;
     /* hypothetically someone might remove all objects of some class,
        or be adding a new class and not populated it yet, leaving gaps
@@ -228,13 +230,16 @@ init_oclass_probs(void)
     int oclass;
     for (oclass = 0; oclass < MAXOCLASSES; ++oclass) {
         sum = 0;
+        /* note: for ILLOBJ_CLASS, bases[oclass+1]-1 isn't the last item
+           in the class; but all the generic items have probability 0 so
+           adding them to 'sum' has no impact */
         for (i = gb.bases[oclass]; i < gb.bases[oclass + 1]; ++i) {
             sum += objects[i].oc_prob;
         }
         if (sum <= 0 && oclass != ILLOBJ_CLASS
             && gb.bases[oclass] != gb.bases[oclass + 1]) {
-            impossible("zero or negative probability total for oclass %d",
-                       oclass);
+            impossible("%s (%d) probability total for oclass %d",
+                       !sum ? "zero" : "negative", sum, oclass);
             /* gracefully fail by setting all members of this class to 1 */
             for (i = gb.bases[oclass]; i < gb.bases[oclass + 1]; ++i) {
                 objects[i].oc_prob = 1;

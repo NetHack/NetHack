@@ -850,25 +850,24 @@ enum glyph_offsets {
      || glyph_is_male_statue_piletop(glyph))
 #define glyph_is_statue(glyph) \
     (glyph_is_male_statue(glyph) || glyph_is_fem_statue(glyph))
-/* note: 'strange object' gets [mis?]classified as generic here but that
-   shouldn't impact anything; to do it properly, glyph_is_normal_generic_obj()
-   and glyph_is_piletop_generic_obj() should use '>' rather than '>=', and
-   glyph_is_normal_object() and glyph_is_normal_piletop_obj() should include
-   (glyph == {GLYPH_OBJ_OFF,GLYPH_OBJ_PILETOP_OFF}) to test for object #0 */
+/* generic objects are after strange object (GLYPH_OBJ_OFF) and before
+   other objects (GLYPH_OBJ_OFF + MAXOCLASSES) */
 #define glyph_is_normal_generic_obj(glyph) \
-    ((glyph) >= GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + MAXOCLASSES)
+    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + MAXOCLASSES)
 #define glyph_is_piletop_generic_obj(glyph) \
-    ((glyph) >= GLYPH_OBJ_PILETOP_OFF                           \
+    ((glyph) > GLYPH_OBJ_PILETOP_OFF                            \
      && (glyph) < GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES)
 #define glyph_is_generic_object(glyph) \
     (glyph_is_normal_generic_obj(glyph)                         \
      || glyph_is_piletop_generic_obj(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
-    (((glyph) >= GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES)           \
-     && ((glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
+    ((glyph) == GLYPH_OBJ_PILETOP_OFF                           \
+     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES          \
+         && (glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
-    ((((glyph) >= GLYPH_OBJ_OFF + MAXOCLASSES)                  \
-      && ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS)))             \
+    ((glyph) == GLYPH_OBJ_OFF                                   \
+     || ((glyph) >= GLYPH_OBJ_OFF + MAXOCLASSES                 \
+         && (glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))            \
      || glyph_is_normal_piletop_obj(glyph))
 
 #if 0   /* [note: out of date] */

@@ -296,8 +296,10 @@ object_from_map(int glyph, coordxy x, coordxy y, struct obj **obj_p)
 }
 
 static void
-look_at_object(char *buf, /* output buffer */
-               coordxy x, coordxy y, int glyph)
+look_at_object(
+    char *buf, /* output buffer */
+    coordxy x, coordxy y,
+    int glyph)
 {
     struct obj *otmp = 0;
     boolean fakeobj = object_from_map(glyph, x, y, &otmp);
