@@ -87,14 +87,13 @@ resetobjs(struct obj *ochain, boolean restore)
                 for (top = otmp; top->where == OBJ_CONTAINED;
                      top = top->ocontainer)
                     continue;
-                otmp->no_charge =
-                    (top->where == OBJ_FLOOR
-                     && get_obj_location(top, &ox, &oy, 0)
-                     /* can't use costly_spot() since its
-                        result depends upon hero's location */
-                     && inside_shop(ox, oy)
-                     && *(p = in_rooms(ox, oy, SHOPBASE))
-                     && tended_shop(&gr.rooms[*p - ROOMOFFSET]));
+                otmp->no_charge = (top->where == OBJ_FLOOR
+                                   && get_obj_location(top, &ox, &oy, 0)
+                                   /* can't use costly_spot() since its
+                                      result depends upon hero's location */
+                                   && inside_shop(ox, oy)
+                                   && *(p = in_rooms(ox, oy, SHOPBASE))
+                                   && tended_shop(&gr.rooms[*p - ROOMOFFSET]));
             }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
@@ -196,7 +195,8 @@ void
 sanitize_name(char *namebuf)
 {
     int c;
-    boolean strip_8th_bit = (WINDOWPORT(tty) && !iflags.wc_eight_bit_input);
+    boolean strip_8th_bit = (WINDOWPORT(tty)
+                             && !iflags.wc_eight_bit_input);
 
     /* it's tempting to skip this for single-user platforms, since
        only the current player could have left these bones--except
@@ -388,8 +388,9 @@ remove_mon_from_bones(struct monst *mtmp)
 {
     struct permonst *mptr = mtmp->data;
 
-    if (mtmp->iswiz || mptr == &mons[PM_MEDUSA] || mptr->msound == MS_NEMESIS
-        || mptr->msound == MS_LEADER || mptr == &mons[PM_VLAD_THE_IMPALER]
+    if (mtmp->iswiz || mptr == &mons[PM_MEDUSA]
+        || mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER
+        || mptr == &mons[PM_VLAD_THE_IMPALER]
         || (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
         mongone(mtmp);
 }
@@ -427,7 +428,7 @@ savebones(int how, time_t when, struct obj *corpse)
         return;
     }
 
-make_bones:
+ make_bones:
     unleash_all();
     /* new ghost or other undead isn't punished even if hero was;
        end-of-game disclosure has already had a chance to report the
@@ -452,8 +453,7 @@ make_bones:
         struct obj *otmp;
 
         /* embed your possessions in your statue */
-        otmp =
-            mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, gp.plname);
+        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, gp.plname);
 
         drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
         if (!otmp)
@@ -536,9 +536,9 @@ make_bones:
     /* format name+role,&c, death reason, and date+time;
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
-    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s", gp.plname,
-            gu.urole.filecode, gu.urace.filecode,
-            genders[flags.female].filecode,
+    Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
+            gp.plname, gu.urole.filecode,
+            gu.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
@@ -610,7 +610,7 @@ getbones(void)
         return 0;
     if (nhfp && nhfp->fieldlevel) {
         if (nhfp->style.deflt && !nhfp->fpdef)
-            return 0;
+        return 0;
     }
 
     if (validate(nhfp, gb.bones) != 0) {
@@ -637,8 +637,8 @@ getbones(void)
         if (strcmp(bonesid, oldbonesid) != 0) {
             char errbuf[BUFSZ];
 
-            Sprintf(errbuf, "This is bones level '%s', not '%s'!", oldbonesid,
-                    bonesid);
+            Sprintf(errbuf, "This is bones level '%s', not '%s'!",
+                    oldbonesid, bonesid);
             if (wizard) {
                 pline1(errbuf);
                 ok = FALSE; /* won't die of trickery */
