@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include <fmod_helper.h>
 
 static boolean throne_mon_sound(struct monst *);
 static boolean beehive_mon_sound(struct monst *);

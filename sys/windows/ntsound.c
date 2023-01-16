@@ -1,8 +1,6 @@
-/* NetHack 3.7	ntsound.c	$NHDT-Date: 1596498316 2020/08/03 23:45:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
-/*   Copyright (c) NetHack PC Development Team 1993                 */
-/*   NetHack may be freely redistributed.  See license for details. */
-/*                                                                  */
-/*
+/*   NetHack may be freely redistributed.  See license for details. 
+ *                                                                  
+ *
  * ntsound.c - Windows NT NetHack sound support
  *
  *Edit History:
@@ -10,17 +8,31 @@
  *
  */
 
-#include "win32api.h"
+#include "fmod.h"
+#include "fmod_helper.h"
 #include "hack.h"
-#include <mmsystem.h>
 
 #ifdef USER_SOUNDS
 
+FMOD_SOUND *soundvar;
+FMOD_CHANNEL *channel1;
+FMOD_CHANNEL *channelMus;
+
 void
-play_usersound(const char* filename, int volume UNUSED)
+play_usersound(const char *filename, int volume UNUSED)
 {
-    /*    pline("play_usersound: %s (%d).", filename, volume); */
-    (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT);
+    FMOD_System_CreateSound(systemvar, filename, FMOD_CREATESAMPLE, 0,
+                            &soundvar);
+    if (strstr(filename, "music_") != 0) {
+        FMOD_Channel_Stop(channelMus);
+        FMOD_System_PlaySound(systemvar, soundvar, 0, 0, &channelMus);
+        FMOD_Channel_SetMode(channelMus, FMOD_LOOP_NORMAL);
+        FMOD_Channel_SetVolume(channelMus, .5);
+    } 
+    else {
+        FMOD_Channel_Stop(channel1);
+        FMOD_System_PlaySound(systemvar, soundvar, 0, 0, &channel1);
+    }
 }
 
 #endif /*USER_SOUNDS*/

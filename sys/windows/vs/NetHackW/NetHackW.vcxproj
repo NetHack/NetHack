@@ -37,13 +37,16 @@
     </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;bcrypt.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\tridu\source\repos\NetHack3.7Edit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\tridu\source\repos\NetHack3.7Edit\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(WinWin32Dir)NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\fmod_helper.c" />
     <ClCompile Include="@(Lua)">
       <DisableSpecificWarnings>4701;4702;4244;4310;4774</DisableSpecificWarnings>
       <AdditionalOptions>%(AdditionalOptions) /wd4774</AdditionalOptions>
@@ -289,6 +292,7 @@
     <ClInclude Include="$(IncDir)you.h" />
     <ClInclude Include="$(IncDir)youprop.h" />
     <ClInclude Include="$(vsDir)resource.h" />
+    <ClInclude Include="..\..\..\..\include\fmod_helper.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="$(WinWin32Dir)mnsel.bmp" />

@@ -672,6 +672,8 @@ enum getobj_callback_returns {
  * option setting restrictions
  */
 
+
+
 enum optset_restrictions {
     set_in_sysconf = 0, /* system config file option only */
     set_in_config  = 1, /* config file option only */
