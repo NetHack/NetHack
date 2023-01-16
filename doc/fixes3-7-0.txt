@@ -1084,6 +1084,7 @@ when identifying items via menu and more than one pass is needed (so when
 slightly more interesting Gehennom filler levels
 don't reveal color of potions, gems, or spellbooks that haven't been seen up
 	close (seeing faraway monster operate on an object counts as up close)
+fix freeing a worn object when forced to drop it by falling down stairs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
