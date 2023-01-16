@@ -976,6 +976,7 @@ litter(void)
                 You("drop %s and %s %s down the stairs with you.",
                     yname(otmp), (otmp->quan == 1L) ? "it" : "they",
                     otense(otmp, "fall"));
+                setnotworn(otmp);
                 freeinv(otmp);
                 hitfloor(otmp, FALSE);
             }

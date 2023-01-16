@@ -1084,6 +1084,7 @@ when identifying items via menu and more than one pass is needed (so when
 slightly more interesting Gehennom filler levels
 don't reveal color of potions, gems, or spellbooks that haven't been seen up
 	close (seeing faraway monster operate on an object counts as up close)
+fix freeing a worn object when forced to drop it by falling down stairs
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
@@ -1457,6 +1458,10 @@ adding command line 'nethack --usage' broke 'nethack -u name' (however,
 being hit by a big monster and getting knockback effect could send hero out
 	of a shop (or into its "free spot") while carrying unpaid goods;
 	robbery wasn't noticed until hero eventually moved to a different spot
+hallucination of objects incorrectly included generic objects as candidates
+	for what objects looked like; if an object had its dknown flag set,
+	formatting a generic object in its place was unreliable (Null pointer
+	deference prior to static analyzer fix, odd fake name "generic" after)
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
