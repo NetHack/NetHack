@@ -10,17 +10,23 @@
  *
  */
 
-#include "win32api.h"
+#include "fmod.h"
 #include "hack.h"
-#include <mmsystem.h>
 
 #ifdef USER_SOUNDS
 
+FMOD_SYSTEM *systemvar;
+FMOD_SOUND *soundvar;
+FMOD_CHANNEL *channel = 0; 
+
+
 void
-play_usersound(const char* filename, int volume UNUSED)
+play_usersound(const char *filename, int volume UNUSED)
 {
-    /*    pline("play_usersound: %s (%d).", filename, volume); */
-    (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT);
+    FMOD_System_Create(&systemvar, FMOD_VERSION);
+    FMOD_System_Init(systemvar, 32, FMOD_INIT_NORMAL, NULL);
+    FMOD_System_CreateSound(systemvar, filename, FMOD_CREATESAMPLE, 0, &soundvar);
+    FMOD_System_PlaySound(systemvar, soundvar, 0, 0, NULL);
 }
 
 #endif /*USER_SOUNDS*/
