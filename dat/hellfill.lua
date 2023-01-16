@@ -160,8 +160,6 @@ function rnd_hell_prefab()
    hell_prefabs[pf]();
 end
 
--- TODO: cold hells? (ice & water instead of lava. sometimes floor = ice)
-
 hells = {
    -- 1: "mines" style with lava
    function ()
@@ -227,6 +225,29 @@ hells = {
          des.replace_terrain({ mapfragment = "w", toterrain = "L" });
          des.terrain(outside_walls, " ");  -- return the outside back to solid wall
       end
+   end,
+
+   -- 6: cold maze, with ice and water
+   function ()
+      local cwid = math.random(4);
+      des.level_init({ style = "solidfill", fg = " ", lit = 0 });
+      des.level_flags("mazelevel", "noflip");
+      des.level_init({ style = "maze", wallthick = 1, corrwid = cwid });
+      local outside_walls = selection.match(" ");
+      local icey = selection.negate():percentage(10):grow():filter_mapchar(".");
+      des.terrain(icey, "I");
+      if (cwid == 1 and percent(25)) then
+         rnd_hell_prefab();
+      end
+      if (cwid > 1) then
+         -- turn some ice into wall of water
+         des.terrain(icey:percentage(1), "W");
+      end
+      des.terrain(icey:percentage(5), "P");
+      if (percent(25)) then
+         des.terrain(selection.match("w"), "W"); -- walls of water
+      end
+      des.terrain(outside_walls, " ");  -- return the outside back to solid wall
    end,
 };
 
