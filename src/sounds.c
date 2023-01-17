@@ -1145,7 +1145,7 @@ dochat(void)
         Your("speech is unintelligible underwater.");
         return ECMD_OK;
     }
-    if (!Deaf && !Blind && (otmp = shop_object(u.ux, u.uy)) != (struct obj *) 0) {
+    if (!Deaf && !Blind && (otmp = shop_object(u.ux, u.uy)) != 0) {
         /* standing on something in a shop and chatting causes the shopkeeper
            to describe the price(s).  This can inhibit other chatting inside
            a shop, but that shouldn't matter much.  shop_object() returns an

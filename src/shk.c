@@ -629,7 +629,8 @@ u_entered_shop(char* enterstring)
     if (!*enterstring)
         return;
 
-    if (!(shkp = shop_keeper(*enterstring))) {
+    shkp = shop_keeper(*enterstring);
+    if (!shkp) {
         if (!strchr(empty_shops, *enterstring)
             && in_rooms(u.ux, u.uy, SHOPBASE)
                    != in_rooms(u.ux0, u.uy0, SHOPBASE))
@@ -2574,7 +2575,7 @@ unpaid_cost(
     }
 #endif
     for (shop = u.ushops; *shop; shop++) {
-        if ((shkp = shop_keeper(*shop))) {
+        if ((shkp = shop_keeper(*shop)) != 0) {
             if ((bp = onbill(unp_obj, shkp, TRUE)))
                 amt = unp_obj->quan * bp->price;
             if (include_contents && Has_contents(unp_obj))
@@ -2891,12 +2892,12 @@ append_honorific(char *buf)
 }
 
 void
-splitbill(register struct obj* obj, register struct obj* otmp)
+splitbill(struct obj *obj, struct obj *otmp)
 {
     /* otmp has been split off from obj */
-    register struct bill_x *bp;
-    register long tmp;
-    register struct monst *shkp = shop_keeper(*u.ushops);
+    struct bill_x *bp;
+    long tmp;
+    struct monst *shkp = shop_keeper(*u.ushops);
 
     if (!shkp || !inhishop(shkp)) {
         impossible("splitbill: no resident shopkeeper??");
@@ -3200,7 +3201,9 @@ sellobj_state(int deliberate)
 }
 
 void
-sellobj(register struct obj* obj, coordxy x, coordxy y)
+sellobj(
+    struct obj *obj,
+    coordxy x, coordxy y)
 {
     register struct monst *shkp;
     register struct eshk *eshkp;
@@ -3211,7 +3214,8 @@ sellobj(register struct obj* obj, coordxy x, coordxy y)
 
     if (!*u.ushops) /* do cheapest exclusion test first */
         return;
-    if (!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) || !inhishop(shkp))
+    shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+    if (!shkp || !inhishop(shkp))
         return;
     if (!costly_spot(x, y))
         return;
@@ -3462,9 +3466,6 @@ int
 doinvbill(
     int mode) /* 0: deliver count 1: paged */
 {
-#ifdef __SASC
-    void sasc_bug(struct obj *, unsigned);
-#endif
     struct monst *shkp;
     struct eshk *eshkp;
     struct bill_x *bp, *end_bp;
@@ -3580,11 +3581,14 @@ getprice(register struct obj* obj, boolean shk_buying)
 
 /* shk catches thrown pick-axe */
 struct monst *
-shkcatch(register struct obj* obj, register coordxy x, register coordxy y)
+shkcatch(
+    struct obj *obj,
+    coordxy x, coordxy y)
 {
-    register struct monst *shkp;
+    struct monst *shkp;
 
-    if (!(shkp = shop_keeper(inside_shop(x, y))) || !inhishop(shkp))
+    shkp = shop_keeper(inside_shop(x, y));
+    if (!shkp || !inhishop(shkp))
         return 0;
 
     if (!helpless(shkp)
@@ -4213,7 +4217,7 @@ after_shk_move(struct monst *shkp)
 
 /* for use in levl_follower (mondata.c) */
 boolean
-is_fshk(register struct monst* mtmp)
+is_fshk(struct monst *mtmp)
 {
     return (boolean) (mtmp->isshk && ESHK(mtmp)->following);
 }
@@ -4222,13 +4226,19 @@ is_fshk(register struct monst* mtmp)
 void
 shopdig(register int fall)
 {
-    register struct monst *shkp = shop_keeper(*u.ushops);
+    struct monst *shkp = shop_keeper(*u.ushops);
     int lang;
     const char *grabs = "grabs";
 
     if (!shkp)
         return;
-
+    if (!inhishop(shkp)) {
+        if (Role_if(PM_KNIGHT)) {
+            You_feel("like a common thief.");
+            adjalign(-sgn(u.ualign.type));
+        }
+        return;
+    }
     /* 0 == can't speak, 1 == makes animal noises, 2 == speaks */
     lang = 0;
     if (helpless(shkp) || is_silent(shkp->data))
@@ -4237,14 +4247,6 @@ shopdig(register int fall)
         lang = 1;
     else if (shkp->data->msound >= MS_HUMANOID)
         lang = 2;
-
-    if (!inhishop(shkp)) {
-        if (Role_if(PM_KNIGHT)) {
-            You_feel("like a common thief.");
-            adjalign(-sgn(u.ualign.type));
-        }
-        return;
-    }
 
     if (!fall) {
         if (lang == 2) {
@@ -4574,30 +4576,36 @@ shop_object(register coordxy x, register coordxy y)
     register struct obj *otmp;
     register struct monst *shkp;
 
-    if (!(shkp = shop_keeper(*in_rooms(x, y, SHOPBASE))) || !inhishop(shkp))
+    shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+    if (!shkp || !inhishop(shkp))
         return (struct obj *) 0;
 
     for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp->nexthere)
         if (otmp->oclass != COIN_CLASS)
             break;
     /* note: otmp might have ->no_charge set, but that's ok */
-    return (otmp && costly_spot(x, y)
-            && NOTANGRY(shkp) && !muteshk(shkp))
+    return (otmp && costly_spot(x, y) && NOTANGRY(shkp) && !muteshk(shkp))
                ? otmp
                : (struct obj *) 0;
 }
 
 /* give price quotes for all objects linked to this one (ie, on this spot) */
 void
-price_quote(register struct obj* first_obj)
+price_quote(struct obj *first_obj)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
     char buf[BUFSZ], price[40];
     long cost = 0L;
     int cnt = 0;
     boolean contentsonly = FALSE;
     winid tmpwin;
-    struct monst *shkp = shop_keeper(inside_shop(u.ux, u.uy));
+    struct monst *shkp;
+
+    shkp = shop_keeper(inside_shop(u.ux, u.uy));
+    /* caller has verified that there is a shopkeeper, but the static
+       analyzer doesn't realize it */
+    if (!shkp || !inhishop(shkp))
+        return;
 
     tmpwin = create_nhwindow(NHW_MENU);
     putstr(tmpwin, 0, "Fine goods for sale:");
@@ -4869,7 +4877,8 @@ check_unpaid_usage(struct obj* otmp, boolean altusage)
     if (!otmp->unpaid || !*u.ushops
         || (otmp->spe <= 0 && objects[otmp->otyp].oc_charged))
         return;
-    if (!(shkp = shop_keeper(*u.ushops)) || !inhishop(shkp))
+    shkp = shop_keeper(*u.ushops);
+    if (!shkp || !inhishop(shkp))
         return;
     if ((tmp = cost_per_charge(shkp, otmp, altusage)) == 0L)
         return;
@@ -4908,22 +4917,29 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* for using charges of unpaid objects "used in the normal manner" */
 void
-check_unpaid(struct obj* otmp)
+check_unpaid(struct obj *otmp)
 {
     check_unpaid_usage(otmp, FALSE); /* normal item use */
 }
 
 void
-costly_gold(coordxy x, coordxy y, long amount, boolean silent)
+costly_gold(
+    coordxy x, coordxy y,
+    long amount,
+    boolean silent)
 {
-    register long delta;
-    register struct monst *shkp;
-    register struct eshk *eshkp;
+    long delta;
+    struct monst *shkp;
+    struct eshk *eshkp;
 
     if (!costly_spot(x, y))
         return;
-    /* shkp now guaranteed to exist by costly_spot() */
+    /* shkp is guaranteed to exist after successful costly_spot(), but
+       the static analyzer isn't smart enough to realize that, so follow
+       the shkp assignment with a redundant test that will always fail */
     shkp = shop_keeper(*in_rooms(x, y, SHOPBASE));
+    if (!shkp)
+        return;
 
     eshkp = ESHK(shkp);
     if (eshkp->credit >= amount) {
@@ -4965,7 +4981,8 @@ block_door(register coordxy x, register coordxy y)
     if (roomno != *u.ushops)
         return FALSE;
 
-    if (!(shkp = shop_keeper((char) roomno)) || !inhishop(shkp))
+    shkp = shop_keeper((char) roomno);
+    if (!shkp || !inhishop(shkp))
         return FALSE;
 
     if (shkp->mx == ESHK(shkp)->shk.x && shkp->my == ESHK(shkp)->shk.y
@@ -5000,7 +5017,8 @@ block_entry(register coordxy x, register coordxy y)
     roomno = *in_rooms(x, y, SHOPBASE);
     if (roomno < 0 || !IS_SHOP(roomno))
         return FALSE;
-    if (!(shkp = shop_keeper((char) roomno)) || !inhishop(shkp))
+    shkp = shop_keeper((char) roomno);
+    if (!shkp || !inhishop(shkp))
         return FALSE;
 
     if (ESHK(shkp)->shd.x != u.ux || ESHK(shkp)->shd.y != u.uy)
