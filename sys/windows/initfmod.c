@@ -1,4 +1,4 @@
-#include "fmod_helper.h"
+#include "initfmod.h"
 
 void init_fmod() {
     FMOD_System_Create(&systemvar, FMOD_VERSION);

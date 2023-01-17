@@ -1676,10 +1676,11 @@ o/nethackw/nhlua.o o/nethackw/nhlua.d: ../src/nhlua.c ../include/hack.h \
 o/nethackw/ntsound.o o/nethackw/ntsound.d: ../sys/windows/ntsound.c \
  ../include/fmod.h ../include/fmod_common.h ../include/fmod_codec.h \
  ../include/fmod_dsp.h ../include/fmod_dsp_effects.h \
- ../include/fmod_output.h ../include/hack.h ../include/config.h \
- ../include/config1.h ../include/patchlevel.h ../include/tradstdc.h \
- ../include/integer.h ../include/global.h ../include/coord.h \
- ../include/windconf.h ../include/system.h ../include/nhlua.h \
+ ../include/fmod_output.h ../include/fmod_helper.h ../include/fmod.h \
+ ../include/hack.h ../include/config.h ../include/config1.h \
+ ../include/patchlevel.h ../include/tradstdc.h ../include/integer.h \
+ ../include/global.h ../include/coord.h ../include/windconf.h \
+ ../include/system.h ../include/nhlua.h \
  ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/luaconf.h \
  ../include/../submodules/lua/lualib.h ../include/../submodules/lua/lua.h \
@@ -2342,7 +2343,10 @@ o/nethackw/sounds.o o/nethackw/sounds.d: ../src/sounds.c \
  ../include/engrave.h ../include/you.h ../include/attrib.h \
  ../include/monst.h ../include/mextra.h ../include/skills.h \
  ../include/timeout.h ../include/flag.h ../include/extern.h \
- ../include/winprocs.h ../include/sys.h
+ ../include/winprocs.h ../include/sys.h ../include/fmod_helper.h \
+ ../include/fmod.h ../include/fmod_common.h ../include/fmod_codec.h \
+ ../include/fmod_dsp.h ../include/fmod_dsp_effects.h \
+ ../include/fmod_output.h
 o/nethackw/sp_lev.o o/nethackw/sp_lev.d: ../src/sp_lev.c \
  ../include/hack.h ../include/config.h ../include/config1.h \
  ../include/patchlevel.h ../include/tradstdc.h ../include/integer.h \
@@ -2795,11 +2799,13 @@ o/nethackw/wield.o o/nethackw/wield.d: ../src/wield.c ../include/hack.h \
  ../include/timeout.h ../include/flag.h ../include/extern.h \
  ../include/winprocs.h ../include/sys.h
 o/nethackw/windmain.o o/nethackw/windmain.d: ../sys/windows/windmain.c \
- ../sys/windows/win32api.h ../include/hack.h ../include/config.h \
- ../include/config1.h ../include/patchlevel.h ../include/tradstdc.h \
- ../include/integer.h ../include/global.h ../include/coord.h \
- ../include/windconf.h ../include/system.h ../include/nhlua.h \
- ../include/../submodules/lua/lua.h \
+ ../sys/windows/win32api.h ../include/fmod_helper.h ../include/fmod.h \
+ ../include/fmod_common.h ../include/fmod_codec.h ../include/fmod_dsp.h \
+ ../include/fmod_dsp_effects.h ../include/fmod_output.h ../include/hack.h \
+ ../include/config.h ../include/config1.h ../include/patchlevel.h \
+ ../include/tradstdc.h ../include/integer.h ../include/global.h \
+ ../include/coord.h ../include/windconf.h ../include/system.h \
+ ../include/nhlua.h ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/luaconf.h \
  ../include/../submodules/lua/lualib.h ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/lauxlib.h ../include/warnings.h \
@@ -4720,10 +4726,11 @@ o/nethack/nhlua.o o/nethack/nhlua.d: ../src/nhlua.c ../include/hack.h \
 o/nethack/ntsound.o o/nethack/ntsound.d: ../sys/windows/ntsound.c \
  ../include/fmod.h ../include/fmod_common.h ../include/fmod_codec.h \
  ../include/fmod_dsp.h ../include/fmod_dsp_effects.h \
- ../include/fmod_output.h ../include/hack.h ../include/config.h \
- ../include/config1.h ../include/patchlevel.h ../include/tradstdc.h \
- ../include/integer.h ../include/global.h ../include/coord.h \
- ../include/windconf.h ../include/system.h ../include/nhlua.h \
+ ../include/fmod_output.h ../include/fmod_helper.h ../include/fmod.h \
+ ../include/hack.h ../include/config.h ../include/config1.h \
+ ../include/patchlevel.h ../include/tradstdc.h ../include/integer.h \
+ ../include/global.h ../include/coord.h ../include/windconf.h \
+ ../include/system.h ../include/nhlua.h \
  ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/luaconf.h \
  ../include/../submodules/lua/lualib.h ../include/../submodules/lua/lua.h \
@@ -5378,7 +5385,10 @@ o/nethack/sounds.o o/nethack/sounds.d: ../src/sounds.c ../include/hack.h \
  ../include/engrave.h ../include/you.h ../include/attrib.h \
  ../include/monst.h ../include/mextra.h ../include/skills.h \
  ../include/timeout.h ../include/flag.h ../include/extern.h \
- ../include/winprocs.h ../include/sys.h
+ ../include/winprocs.h ../include/sys.h ../include/fmod_helper.h \
+ ../include/fmod.h ../include/fmod_common.h ../include/fmod_codec.h \
+ ../include/fmod_dsp.h ../include/fmod_dsp_effects.h \
+ ../include/fmod_output.h
 o/nethack/sp_lev.o o/nethack/sp_lev.d: ../src/sp_lev.c ../include/hack.h \
  ../include/config.h ../include/config1.h ../include/patchlevel.h \
  ../include/tradstdc.h ../include/integer.h ../include/global.h \
@@ -5826,11 +5836,13 @@ o/nethack/wield.o o/nethack/wield.d: ../src/wield.c ../include/hack.h \
  ../include/timeout.h ../include/flag.h ../include/extern.h \
  ../include/winprocs.h ../include/sys.h
 o/nethack/windmain.o o/nethack/windmain.d: ../sys/windows/windmain.c \
- ../sys/windows/win32api.h ../include/hack.h ../include/config.h \
- ../include/config1.h ../include/patchlevel.h ../include/tradstdc.h \
- ../include/integer.h ../include/global.h ../include/coord.h \
- ../include/windconf.h ../include/system.h ../include/nhlua.h \
- ../include/../submodules/lua/lua.h \
+ ../sys/windows/win32api.h ../include/fmod_helper.h ../include/fmod.h \
+ ../include/fmod_common.h ../include/fmod_codec.h ../include/fmod_dsp.h \
+ ../include/fmod_dsp_effects.h ../include/fmod_output.h ../include/hack.h \
+ ../include/config.h ../include/config1.h ../include/patchlevel.h \
+ ../include/tradstdc.h ../include/integer.h ../include/global.h \
+ ../include/coord.h ../include/windconf.h ../include/system.h \
+ ../include/nhlua.h ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/luaconf.h \
  ../include/../submodules/lua/lualib.h ../include/../submodules/lua/lua.h \
  ../include/../submodules/lua/lauxlib.h ../include/warnings.h \
