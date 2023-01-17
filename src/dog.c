@@ -898,22 +898,25 @@ discard_migrations(void)
 int
 dogfood(struct monst *mon, struct obj *obj)
 {
-    struct permonst *mptr = mon->data, *fptr = 0;
+    struct permonst *mptr = mon->data, *fptr;
     boolean carni = carnivorous(mptr), herbi = herbivorous(mptr),
             starving, mblind;
+    int fx;
 
     if (is_quest_artifact(obj) || obj_resists(obj, 0, 95))
         return obj->cursed ? TABU : APPORT;
 
     switch (obj->oclass) {
     case FOOD_CLASS:
-        if (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
-            fptr = &mons[obj->corpsenm];
+        fx = (obj->otyp == CORPSE || obj->otyp == TIN || obj->otyp == EGG)
+                ? obj->corpsenm
+                : NUMMONS; /* valid mons[mndx] to pacify static analyzer */
+        fptr = &mons[fx];
 
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
-        if ((obj->otyp == CORPSE || obj->otyp == EGG) && touch_petrifies(fptr)
-            && !resists_ston(mon))
+        if ((obj->otyp == CORPSE || obj->otyp == EGG)
+            && touch_petrifies(fptr) && !resists_ston(mon))
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
             && mon->data == &mons[PM_KILLER_BEE]) {
@@ -938,12 +941,9 @@ dogfood(struct monst *mon, struct obj *obj)
         if (mptr == &mons[PM_GHOUL]) {
             if (obj->otyp == CORPSE)
                 return (peek_at_iced_corpse_age(obj) + 50L <= gm.moves
-                        && fptr != &mons[PM_LIZARD]
-                        && fptr != &mons[PM_LICHEN])
-                           ? DOGFOOD
-                           : (starving && !vegan(fptr))
-                              ? ACCFOOD
-                              : POISON;
+                        && !(fx == PM_LIZARD || fx == PM_LICHEN)) ? DOGFOOD
+                       : (starving && !vegan(fptr)) ? ACCFOOD
+                         : POISON;
             if (obj->otyp == EGG)
                 return stale_egg(obj) ? CADAVER : starving ? ACCFOOD : POISON;
             return TABU;
@@ -960,7 +960,7 @@ dogfood(struct monst *mon, struct obj *obj)
             return carni ? CADAVER : MANFOOD;
         case CORPSE:
             if ((peek_at_iced_corpse_age(obj) + 50L <= gm.moves
-                 && obj->corpsenm != PM_LIZARD && obj->corpsenm != PM_LICHEN
+                 && !(fx == PM_LIZARD || fx == PM_LICHEN)
                  && mptr->mlet != S_FUNGUS)
                 || (acidic(fptr) && !resists_acid(mon))
                 || (poisonous(fptr) && !resists_poison(mon)))
@@ -983,11 +983,9 @@ dogfood(struct monst *mon, struct obj *obj)
             /* turning into slime is preferable to starvation */
             return (starving || slimeproof(mon->data)) ? ACCFOOD : POISON;
         case CLOVE_OF_GARLIC:
-            return (is_undead(mptr) || is_vampshifter(mon))
-                      ? TABU
-                      : (herbi || starving)
-                         ? ACCFOOD
-                         : MANFOOD;
+            return (is_undead(mptr) || is_vampshifter(mon)) ? TABU
+                   : (herbi || starving) ? ACCFOOD
+                     : MANFOOD;
         case TIN:
             return metallivorous(mptr) ? ACCFOOD : MANFOOD;
         case APPLE:
@@ -995,11 +993,11 @@ dogfood(struct monst *mon, struct obj *obj)
         case CARROT:
             return (herbi || mblind) ? DOGFOOD : starving ? ACCFOOD : MANFOOD;
         case BANANA:
-            return (mptr->mlet == S_YETI && herbi)
-                      ? DOGFOOD /* for monkey and ape (tameable), sasquatch */
-                      : (herbi || starving)
-                         ? ACCFOOD
-                         : MANFOOD;
+            /* monkeys and apes (tameable) plus sasquatch prefer these,
+               yetis will only will only eat them if starving */
+            return (mptr->mlet == S_YETI && herbi) ? DOGFOOD
+                   : (herbi || starving) ? ACCFOOD
+                     : MANFOOD;
         default:
             if (starving)
                 return ACCFOOD;
