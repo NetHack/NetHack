@@ -532,6 +532,9 @@ Set flags for this level.
 | noflip        | Prevent flipping the level.
 | noflipx       | Prevent flipping the level horizontally.
 | noflipy       | Prevent flipping the level vertically.
+| hot           | Level is hot. Dungeon flag "hellish" automatically sets this.
+| cold          | Level is cold.
+| temperate     | Level is neither hot nor cold.
 |===
 
 Example:

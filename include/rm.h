@@ -386,6 +386,7 @@ struct levelflags {
                                   normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
                                   rather than ROOM */
+    schar temperature;         /* +1 == hot, -1 == cold */
 };
 
 typedef struct {

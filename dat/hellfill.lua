@@ -231,7 +231,7 @@ hells = {
    function ()
       local cwid = math.random(4);
       des.level_init({ style = "solidfill", fg = " ", lit = 0 });
-      des.level_flags("mazelevel", "noflip");
+      des.level_flags("mazelevel", "noflip", "cold");
       des.level_init({ style = "maze", wallthick = 1, corrwid = cwid });
       local outside_walls = selection.match(" ");
       local icey = selection.negate():percentage(10):grow():filter_mapchar(".");

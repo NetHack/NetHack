@@ -1360,6 +1360,7 @@ goto_level(
     char *annotation;
     int dist = depth(newlevel) - depth(&u.uz);
     boolean do_fall_dmg = FALSE;
+    schar prev_temperature = gl.level.flags.temperature;
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
@@ -1711,8 +1712,7 @@ goto_level(
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
             You_hear("groans and moans everywhere.");
-        } else
-            hellish_smoke_mesg(); /* "It is hot here.  You smell smoke..." */
+        }
 
         record_achievement(ACH_HELL); /* reached Gehennom */
     }
@@ -1759,9 +1759,6 @@ goto_level(
         }
     } else if (In_quest(&u.uz)) {
         onquest(); /* might be reaching locate|goal level */
-    } else if (In_V_tower(&u.uz)) {
-        if (newdungeon && In_hell(&u.uz0))
-            pline_The("heat and smoke are gone.");
     } else if (Is_knox(&u.uz)) {
         /* alarm stops working once Croesus has died */
         if (new || !gm.mvitals[PM_CROESUS].died) {
@@ -1801,6 +1798,17 @@ goto_level(
                                             : "quest_portal_again");
             }
         }
+    }
+
+    if (prev_temperature != gl.level.flags.temperature) {
+        if (gl.level.flags.temperature)
+            hellish_smoke_mesg();
+        else if (prev_temperature > 0)
+            pline_The("heat %s gone.",
+                      In_hell(&u.uz0)
+                      ? "and smoke are" : "is");
+        else if (prev_temperature < 0)
+            You("are out of the cold.");
     }
 
     /* this was originally done earlier; moved here to be logged after
@@ -1858,8 +1866,12 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 void
 hellish_smoke_mesg(void)
 {
-    if (Inhell && !Is_valley(&u.uz))
-        pline("It is hot here.  You %s smoke...",
+    if (gl.level.flags.temperature)
+        pline("It is %s here.",
+              gl.level.flags.temperature > 0 ? "hot" : "cold");
+
+    if (In_hell(&u.uz) && gl.level.flags.temperature > 0)
+        pline("You %s smoke...",
               olfaction(gy.youmonst.data) ? "smell" : "sense");
 }
 
