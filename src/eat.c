@@ -71,6 +71,8 @@ const char *const hu_stat[] = {
     "Fainting", "Fainted ", "Starved "
 };
 
+static const struct victual_info zero_victual;
+
 /* used by getobj() callback routines eat_ok()/offer_ok()/tin_ok() to
    indicate whether player was given an opportunity to eat or offer or
    tin an item on the floor and declined, in order to insert "else"
@@ -285,13 +287,14 @@ static void
 recalc_wt(void)
 {
     struct obj *piece = gc.context.victual.piece;
+
     if (!piece) {
         impossible("recalc_wt without piece");
         return;
     }
     debugpline1("Old weight = %d", piece->owt);
-    debugpline2("Used time = %d, Req'd time = %d", gc.context.victual.usedtime,
-                gc.context.victual.reqtime);
+    debugpline2("Used time = %d, Req'd time = %d",
+                gc.context.victual.usedtime, gc.context.victual.reqtime);
     piece->owt = weight(piece);
     debugpline1("New weight = %d", piece->owt);
 }
@@ -374,10 +377,9 @@ touchfood(struct obj *otmp)
 void
 food_disappears(struct obj *obj)
 {
-    if (obj == gc.context.victual.piece) {
-        gc.context.victual.piece = (struct obj *) 0;
-        gc.context.victual.o_id = 0;
-    }
+    if (obj == gc.context.victual.piece)
+        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+
     if (obj->timed)
         obj_stop_timers(obj);
 }
@@ -409,8 +411,10 @@ do_reset_eat(void)
             gc.context.victual.o_id = gc.context.victual.piece->o_id;
         recalc_wt();
     }
-    gc.context.victual.fullwarn = gc.context.victual.eating =
-        gc.context.victual.doreset = FALSE;
+    gc.context.victual.fullwarn
+        = gc.context.victual.eating
+        = gc.context.victual.doreset
+        = FALSE;
     /* Do not set canchoke to FALSE; if we continue eating the same object
      * we need to know if canchoke was set when they started eating it the
      * previous time.  And if we don't continue eating the same object
@@ -527,10 +531,8 @@ done_eating(boolean message)
         useup(piece);
     else
         useupf(piece, 1L);
-    gc.context.victual.piece = (struct obj *) 0;
-    gc.context.victual.o_id = 0;
-    gc.context.victual.fullwarn = gc.context.victual.eating =
-        gc.context.victual.doreset = FALSE;
+
+    gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
 }
 
 void
@@ -793,10 +795,8 @@ cprefx(register int pm)
            to normal play though because bones creation empties them */
         if (gc.context.victual.piece /* Null for tins */
             && gc.context.victual.piece->otyp == CORPSE /* paranoia */
-            && revive_corpse(gc.context.victual.piece)) {
-            gc.context.victual.piece = (struct obj *) 0;
-            gc.context.victual.o_id = 0;
-        }
+            && revive_corpse(gc.context.victual.piece))
+            gc.context.victual = zero_victual; /* vicutal.piece=0, .o_id=0 */
         return;
     }
     case PM_GREEN_SLIME:
@@ -1500,10 +1500,7 @@ consume_tin(const char *mesg)
         }
 
         /* in case stop_occupation() was called on previous meal */
-        gc.context.victual.piece = (struct obj *) 0;
-        gc.context.victual.o_id = 0;
-        gc.context.victual.fullwarn = gc.context.victual.eating =
-            gc.context.victual.doreset = FALSE;
+        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
 
         You("consume %s %s.", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
 
@@ -2279,9 +2276,8 @@ eatspecial(void)
     set_occupation(eatfood, "eating non-food", 0);
     lesshungry(gc.context.victual.nmod);
     go.occupation = 0;
-    gc.context.victual.piece = (struct obj *) 0;
-    gc.context.victual.o_id = 0;
-    gc.context.victual.eating = 0;
+    gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+
     if (otmp->oclass == COIN_CLASS) {
         if (carried(otmp))
             useupall(otmp);
@@ -2704,9 +2700,8 @@ doeat(void)
         /* Note: gold weighs 1 pt. for each 1000 pieces (see
            pickup.c) so gold and non-gold is consistent. */
         if (otmp->oclass == COIN_CLASS)
-            basenutrit = ((otmp->quan > 200000L)
-                             ? 2000
-                             : (int) (otmp->quan / 100L));
+            basenutrit = ((otmp->quan > 200000L) ? 2000
+                          : (int) (otmp->quan / 100L));
         else if (otmp->oclass == BALL_CLASS || otmp->oclass == CHAIN_CLASS)
             basenutrit = weight(otmp);
         /* oc_nutrition is usually weight anyway */
@@ -2826,8 +2821,7 @@ doeat(void)
 
         if (tmp == 2) {
             /* used up */
-            gc.context.victual.piece = (struct obj *) 0;
-            gc.context.victual.o_id = 0;
+            gc.context.victual = zero_victual; /* vicutal.piece=0, .o_id=0 */
             return ECMD_TIME;
         } else if (tmp)
             dont_start = TRUE;
@@ -2891,9 +2885,10 @@ doeat(void)
      "before rounddiv: victual.reqtime == %d, oeaten == %d, basenutrit == %d",
                 gc.context.victual.reqtime, otmp->oeaten, basenutrit);
 
-    gc.context.victual.reqtime = (basenutrit == 0) ? 0
-                   : rounddiv(gc.context.victual.reqtime * (long) otmp->oeaten,
-                              basenutrit);
+    gc.context.victual.reqtime
+        = (basenutrit == 0) ? 0
+          : rounddiv(gc.context.victual.reqtime * (long) otmp->oeaten,
+                     basenutrit);
 
     debugpline1("after rounddiv: victual.reqtime == %d",
                 gc.context.victual.reqtime);
@@ -3697,7 +3692,7 @@ consume_oeaten(struct obj *obj, int amt)
     /* mustn't let partly-eaten drop all the way to 0 or the item would
        become restored to untouched; set to no bites left */
     if (obj->oeaten == 0) {
-        if (obj == gc.context.victual.piece) /* always true unless wishing... */
+        if (obj == gc.context.victual.piece) /* always true unless wishing */
             gc.context.victual.reqtime = gc.context.victual.usedtime;
         obj->oeaten = 1; /* smallest possible positive value */
     }
@@ -3733,10 +3728,7 @@ cant_finish_meal(struct obj *corpse)
      */
     if (go.occupation == eatfood && gc.context.victual.piece == corpse) {
         /* normally performed by done_eating() */
-        gc.context.victual.piece = (struct obj *) 0;
-        gc.context.victual.o_id = 0;
-        gc.context.victual.fullwarn = gc.context.victual.eating =
-            gc.context.victual.doreset = FALSE;
+        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
 
         if (!corpse->oeaten)
             corpse->oeaten = 1; /* [see consume_oeaten()] */
