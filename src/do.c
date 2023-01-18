@@ -17,6 +17,7 @@ static boolean danger_uprops(void);
 static int wipeoff(void);
 static int menu_drop(int);
 static NHFILE *currentlevel_rewrite(void);
+static void familiar_level_msg(void);
 static void final_level(void);
 
 /* static boolean badspot(coordxy,coordxy); */
@@ -1337,7 +1338,36 @@ u_collide_m(struct monst *mtmp)
     }
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
+static void
+familiar_level_msg(void)
+{
+    static const char *const fam_msgs[4] = {
+        "You have a sense of deja vu.",
+        "You feel like you've been here before.",
+        "This place %s familiar...", 0 /* no message */
+    };
+    static const char *const halu_fam_msgs[4] = {
+        "Whoa!  Everything %s different.",
+        "You are surrounded by twisty little passages, all alike.",
+        "Gee, this %s like uncle Conan's place...", 0 /* no message */
+    };
+    const char *mesg;
+    char buf[BUFSZ];
+    int which = rn2(4);
+
+    if (Hallucination)
+        mesg = halu_fam_msgs[which];
+    else
+        mesg = fam_msgs[which];
+    if (mesg && strchr(mesg, '%')) {
+        DISABLE_WARNING_FORMAT_NONLITERAL
+        Sprintf(buf, mesg, !Blind ? "looks" : "seems");
+        RESTORE_WARNING_FORMAT_NONLITERAL
+        mesg = buf;
+    }
+    if (mesg)
+        pline1(mesg);
+}
 
 void
 goto_level(
@@ -1720,32 +1750,8 @@ goto_level(
     if (Inhell && !Is_valley(&u.uz))
         u.uevent.gehennom_entered = 1;
 
-    if (familiar) {
-        static const char *const fam_msgs[4] = {
-            "You have a sense of deja vu.",
-            "You feel like you've been here before.",
-            "This place %s familiar...", 0 /* no message */
-        };
-        static const char *const halu_fam_msgs[4] = {
-            "Whoa!  Everything %s different.",
-            "You are surrounded by twisty little passages, all alike.",
-            "Gee, this %s like uncle Conan's place...", 0 /* no message */
-        };
-        const char *mesg;
-        char buf[BUFSZ];
-        int which = rn2(4);
-
-        if (Hallucination)
-            mesg = halu_fam_msgs[which];
-        else
-            mesg = fam_msgs[which];
-        if (mesg && strchr(mesg, '%')) {
-            Sprintf(buf, mesg, !Blind ? "looks" : "seems");
-            mesg = buf;
-        }
-        if (mesg)
-            pline1(mesg);
-    }
+    if (familiar)
+        familiar_level_msg();
 
     /* special location arrival messages/events */
     if (In_endgame(&u.uz)) {
@@ -1858,8 +1864,6 @@ goto_level(
     (void) pickup(1);
     return;
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 /* give a message when entering a Gehennom level other than the Valley;
    also given if restoring a game in that situation */
