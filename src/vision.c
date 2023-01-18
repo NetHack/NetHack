@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details.       */
 
 #include "hack.h"
+#include <assert.h>
 
 /* Circles
  * ==================================================================*/
@@ -1129,16 +1130,29 @@ static genericptr_t varg;
  *
  * The last three macros depend on having local pointers row_min, row_max,
  * and rowp being set correctly.
+ *
+ * The assertions are included to pacify a static source code analyzer.
+ * Compile with NDEBUG defined to suppress them.
  */
-#define set_cs(rowp, col) (rowp[col] = COULD_SEE)
-#define good_row(z) ((z) >= 0 && (z) < ROWNO)
-#define set_min(z)      \
-    if (*row_min > (z)) \
-        *row_min = (z)
-#define set_max(z)      \
-    if (*row_max < (z)) \
-        *row_max = (z)
 #define is_clear(row, col) viz_clear_rows[row][col]
+#define good_row(z) ((z) >= 0 && (z) < ROWNO)
+#define set_cs(rowp, col) \
+    do {                                \
+        assert(rowp != NULL);           \
+        rowp[col] = COULD_SEE;          \
+    } while (0)
+#define set_min(z) \
+    do {                                \
+        assert(row_min != NULL);        \
+        if (*row_min > (z))             \
+            *row_min = (z);             \
+    } while (0)
+#define set_max(z) \
+    do {                                \
+        assert(row_max != NULL);        \
+        if (*row_max < (z))             \
+            *row_max = (z);             \
+    } while (0)
 
 /*
  * clear_path()         expanded into 4 macros/functions:
