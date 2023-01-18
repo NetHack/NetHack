@@ -378,7 +378,7 @@ void
 food_disappears(struct obj *obj)
 {
     if (obj == gc.context.victual.piece)
-        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+        gc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
     if (obj->timed)
         obj_stop_timers(obj);
@@ -532,7 +532,7 @@ done_eating(boolean message)
     else
         useupf(piece, 1L);
 
-    gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+    gc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 }
 
 void
@@ -796,7 +796,7 @@ cprefx(register int pm)
         if (gc.context.victual.piece /* Null for tins */
             && gc.context.victual.piece->otyp == CORPSE /* paranoia */
             && revive_corpse(gc.context.victual.piece))
-            gc.context.victual = zero_victual; /* vicutal.piece=0, .o_id=0 */
+            gc.context.victual = zero_victual; /* victual.piece=0, .o_id=0 */
         return;
     }
     case PM_GREEN_SLIME:
@@ -1500,7 +1500,7 @@ consume_tin(const char *mesg)
         }
 
         /* in case stop_occupation() was called on previous meal */
-        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+        gc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
         You("consume %s %s.", tintxts[r].txt, mons[mnum].pmnames[NEUTRAL]);
 
@@ -2276,7 +2276,7 @@ eatspecial(void)
     set_occupation(eatfood, "eating non-food", 0);
     lesshungry(gc.context.victual.nmod);
     go.occupation = 0;
-    gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+    gc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
     if (otmp->oclass == COIN_CLASS) {
         if (carried(otmp))
@@ -2821,7 +2821,7 @@ doeat(void)
 
         if (tmp == 2) {
             /* used up */
-            gc.context.victual = zero_victual; /* vicutal.piece=0, .o_id=0 */
+            gc.context.victual = zero_victual; /* victual.piece=0, .o_id=0 */
             return ECMD_TIME;
         } else if (tmp)
             dont_start = TRUE;
@@ -3728,7 +3728,7 @@ cant_finish_meal(struct obj *corpse)
      */
     if (go.occupation == eatfood && gc.context.victual.piece == corpse) {
         /* normally performed by done_eating() */
-        gc.context.victual = zero_victual; /* vicutal.piece = 0, .o_id = 0 */
+        gc.context.victual = zero_victual; /* victual.piece = 0, .o_id = 0 */
 
         if (!corpse->oeaten)
             corpse->oeaten = 1; /* [see consume_oeaten()] */
