@@ -31,8 +31,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <ProjectGuid>6838ec9d-f25d-4779-9cd7-2edb61e49429</ProjectGuid>
-    <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.15063.0</TargetPlatformMinVersion>
+    <TargetPlatformVersion>10.0.20348.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <PackageCertificateKeyFile>NetHackPackage_StoreKey.pfx</PackageCertificateKeyFile>
     <EntryPointProjectUniqueName>NetHackW\NetHackW.vcxproj</EntryPointProjectUniqueName>
