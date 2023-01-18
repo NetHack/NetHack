@@ -1126,6 +1126,7 @@ shuffle_customizations(void)
 
         for (i = 0; i < NUM_OBJECTS; i++) {
             duplicate[i] = -1;
+            tmp_u[i] = (struct unicode_representation *) 0;
         }
         for (i = 0; i < NUM_OBJECTS; i++) {
             int idx = objects[i].oc_descr_idx;
@@ -1172,9 +1173,10 @@ find_matching_symset_customization(
     enum graphics_sets which_set)
 {
     struct symset_customization *gdc = &gs.sym_customizations[which_set];
+
     if ((gdc->custtype == custtype)
         && (strcmp(customization_name, gdc->customization_name) != 0))
-            return gdc->details;
+        return gdc->details;
     return (struct customization_detail *) 0;
 }
 
