@@ -71,7 +71,7 @@ const char *const hu_stat[] = {
     "Fainting", "Fainted ", "Starved "
 };
 
-static const struct victual_info zero_victual;
+static const struct victual_info zero_victual = { 0 };
 
 /* used by getobj() callback routines eat_ok()/offer_ok()/tin_ok() to
    indicate whether player was given an opportunity to eat or offer or
