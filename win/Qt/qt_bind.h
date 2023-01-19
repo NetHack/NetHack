@@ -36,6 +36,9 @@ private:
 
 public:
         static void qt_Splash();
+
+        /* window interface */
+
 	static void qt_init_nhwindows(int* argc, char** argv);
 	static void qt_player_selection();
 	static void qt_askname();
@@ -90,8 +93,16 @@ public:
 	static int qt_kbhit();
 	static void qt_update_inventory(int);
         static win_request_info *qt_ctrl_nhwindow(winid, int, win_request_info *);
-
 	static QWidget *mainWidget() { return main; }
+#if defined(SND_LIB_QTSOUND) && !defined(QT_NO_SOUND)
+        /* sound interface */
+        static void qtsound_init_nhsound(void);
+        static void qtsound_exit_nhsound(const char *);
+        static void qtsound_achievement(schar, schar, int32_t);
+        static void qtsound_soundeffect(char *, int32_t, int32_t);
+        static void qtsound_hero_playnotes(int32_t instrument, char *str, int32_t volume);
+        static void qtsound_play_usersound(char *, int32_t, int32_t);
+#endif
 
 private:
 	virtual bool notify(QObject *receiver, QEvent *event);

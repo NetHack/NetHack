@@ -2600,6 +2600,9 @@ extern void play_usersound(const char *, int);
 extern void play_usersound_via_idx(int, int);
 #endif
 #endif /* USER SOUNDS */
+extern void assign_soundlib(int);
+extern void activate_chosen_soundlib(void);
+extern void get_soundlib_name(char *dest, int maxlen);
 
 /* ### sp_lev.c ### */
 

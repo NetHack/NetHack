@@ -227,6 +227,7 @@ enum misc_arti_nums {
 #include "region.h"
 #include "trap.h"
 #include "display.h"
+#include "sndprocs.h"
 #include "decl.h"
 #include "timeout.h"
 

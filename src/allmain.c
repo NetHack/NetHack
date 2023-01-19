@@ -58,6 +58,8 @@ moveloop_preamble(boolean resuming)
         change_luck(-1);
     }
 
+    activate_chosen_soundlib();
+
     if (!resuming) { /* new game */
         gc.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */

@@ -743,6 +743,9 @@ struct instance_globals_a {
     /* shk.c */
     boolean auto_credit;
 
+    /* sounds.c */
+    enum soundlib_ids active_soundlib;
+
     /* trap.c */
     /* context for water_damage(), managed by water_damage_chain();
         when more than one stack of potions of acid explode while processing
@@ -851,6 +854,9 @@ struct instance_globals_c {
 
     /* questpgr.c */
     char cvt_buf[CVT_BUF_SIZE];
+
+    /* sounds.c */
+    enum soundlib_ids chosen_soundlib;
 
     /* sp_lev.c */
     struct sp_coder *coder;

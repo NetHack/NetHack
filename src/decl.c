@@ -206,6 +206,9 @@ const struct instance_globals_a g_init_a = {
     UNDEFINED_VALUE, /* abort_looting */
     /* shk.c */
     FALSE, /* auto_credit */
+    /* sounds.c */
+    soundlib_unassigned, /* enum soundlib_ids active_soundlib */
+
     /* trap.c */
     { 0, 0, FALSE }, /* acid_ctx */
     TRUE, /* havestate*/
@@ -284,6 +287,8 @@ const struct instance_globals_c g_init_c = {
     FALSE, /* class_filter */
     /* questpgr.c */
     UNDEFINED_VALUES, /* cvt_buf */
+    /* sounds.c */
+    soundlib_nosound, /* chosen_soundlib */
     UNDEFINED_PTR, /* coder */
     /* uhitm.c */
     NON_PM, /* corpsenm_digested */

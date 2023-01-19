@@ -540,6 +540,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(sortvanquished, Advanced, 0, opt_in, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
                 "preferred order when displaying vanquished monsters")
+    NHOPTC(soundlib, Advanced, WINTYPELEN, opt_in, set_gameview,
+                No, Yes, No, No, NoAlias,
+                "soundlib interface to use (if any)")
     NHOPTB(sparkle, Map, 0, opt_out, set_in_game,
                 On, Yes, No, No, NoAlias, &flags.sparkle)
     NHOPTB(splash_screen, Advanced, 0, opt_out, set_in_config,

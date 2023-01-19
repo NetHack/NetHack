@@ -39,6 +39,15 @@ GAMEDIR = ../binary
 
 #
 #---------------------------------------------------------------
+# Do you want to include any sound libraries? If so leave the
+# appropriate compile macro below uncommented, or add others
+# that are available.
+#
+
+SOUNDLIBDEFS = -DWINDSOUND -DUSER_SOUNDS
+
+#
+#---------------------------------------------------------------
 # Do you want debug information in the executable?
 #
 
@@ -223,6 +232,7 @@ NHV=$(subst ",,$(NHV1))
 # MSWIN   - window port files (win32)
 # WCURSES - window port files (curses)
 # WSHR    - Tile support files
+# SNDSYS  - sound suppport files for win32
 # QT      - QT window support files
 
 INCL    =../include
@@ -231,6 +241,7 @@ DOC     =../doc
 UTIL    =../util
 SRC     =../src
 SSYS    =../sys/share
+SNDSYS  =../sound/windsound
 MSWSYS  =../sys/windows
 TTY     =../win/tty
 MSWIN   =../win/win32
@@ -741,15 +752,15 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   hack hacklib insight invent isaac64 light lock \
 	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
 	   mon mondata monmove monst mplayer mthrowu muse music \
-	   nhlobj nhlsel nhlua ntsound o_init objects objnam options \
+	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region restore rip rnd role rumors \
 	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed symbols sys \
 	   teleport timeout topten track trap u_init uhitm utf8map vault version vision \
 	   weapon were wield windmain windows windsys wizard worm worn write zap)
 
-CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS
-CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS
+CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
 
 ONHW = $(O)nethackw
 NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
@@ -786,6 +797,9 @@ $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
+$(ONHW)/%.o: $(SNDSYS)/%.c $(NHLUAH) | $(ONHW)
+	$(cc) $(CFLAGSW) $< -o$@
+
 $(ONHW)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
@@ -814,8 +828,8 @@ CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS)
 #==========================================
 # nethack
 #==========================================
-CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
-CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON
+CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
+CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
 
 ONH = $(O)nethack
 
@@ -853,6 +867,9 @@ $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 	$(cc) $(CPPFLAGSNH) $< -o$@
 
 $(ONH)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONH)
+	$(cc) $(CFLAGSNH) $< -o$@
+
+$(ONH)/%.o: $(SNDSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)

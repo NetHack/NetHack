@@ -1502,37 +1502,27 @@ sound_matches_message(const char* msg)
 void
 play_sound_for_message(const char* msg)
 {
-    audio_mapping *snd = sound_matches_message(msg);
+    audio_mapping *snd;
 
-    if (snd)
-        play_usersound(snd->filename, snd->volume);
+    if (soundprocs.sound_play_usersound) {
+        snd = sound_matches_message(msg);
+        if (snd)
+            (*soundprocs.sound_play_usersound)(
+            snd->filename, snd->volume, snd->idx);
+    }
 }
 
 void
 maybe_play_sound(const char* msg)
 {
-#if defined(WIN32) || defined(QT_GRAPHICS) || defined(TTY_SOUND_ESCCODES)
-    audio_mapping *snd = sound_matches_message(msg);
+    audio_mapping *snd;
 
-    if (snd
-#if defined(WIN32) || defined(QT_GRAPHICS)
-#ifdef TTY_SOUND_ESCCODES
-        && !iflags.vt_sounddata
-#endif
-#if defined(QT_GRAPHICS)
-        && WINDOWPORT(Qt)
-#endif
-#if defined(WIN32)
-        && (WINDOWPORT(tty) || WINDOWPORT(mswin) || WINDOWPORT(curses))
-#endif
-#endif /* WIN32 || QT_GRAPHICS */
-        )
-        play_usersound(snd->filename, snd->volume);
-#if defined(TTY_GRAPHICS) && defined(TTY_SOUND_ESCCODES)
-    else if (snd && iflags.vt_sounddata && snd->idx >= 0 && WINDOWPORT(tty))
-        play_usersound_via_idx(snd->idx, snd->volume);
-#endif  /* TTY_GRAPHICS && TTY_SOUND_ESCCODES */
-#endif  /* WIN32 || QT_GRAPHICS || TTY_SOUND_ESCCODES */
+    if (soundprocs.sound_play_usersound) {
+        snd = sound_matches_message(msg);
+        if (snd)
+            (*soundprocs.sound_play_usersound)(
+                snd->filename, snd->volume, snd->idx);
+    }
 }
 
 void
@@ -1551,7 +1541,236 @@ release_sound_mappings(void)
     if (sounddir)
         free((genericptr_t) sounddir), sounddir = 0;
 }
-
 #endif /* USER_SOUNDS */
+
+struct sound_procs soundprocs;
+
+#ifdef SND_LIB_QTSOUND
+extern struct sound_procs qtsound_procs;
+#endif
+#ifdef SND_LIB_PORTAUDIO
+extern struct sound_procs portaudio_procs;
+#endif
+#ifdef SND_LIB_OPENAL
+extern struct sound_procs openal_procs;
+#endif
+#ifdef SND_LIB_SDL_MIXER
+extern struct sound_procs sdl_mixer_procs;
+#endif
+#ifdef SND_LIB_MINIAUDIO
+extern struct sound_procs miniaudio_procs;
+#endif
+#ifdef SND_LIB_FMOD
+extern struct sound_procs fmod_procs;
+#endif
+#ifdef SND_LIB_SOUND_ESCCODES
+extern struct sound_procs esccodes_procs;
+#endif
+#ifdef SND_LIB_VISSOUND
+extern struct sound_procs vissound_procs;
+#endif
+#ifdef SND_LIB_WINDSOUND
+extern struct sound_procs windsound_procs;
+#endif
+extern struct sound_procs nosound_procs;
+
+/* The order of these array entries must match the
+   order of the enum soundlib_ids in sndprocs.h */
+
+static struct sound_choices {
+    struct sound_procs *sndprocs;
+} soundlib_choices[] = {
+    { (struct sound_procs *) 0 },
+#ifdef SND_LIB_QTSOUND
+    { &qtsound_procs },
+#endif
+#ifdef SND_LIB_PORTAUDIO
+    { &portaudio_procs },
+#endif
+#ifdef SND_LIB_OPENAL
+    { &openal_procs },
+#endif
+#ifdef SND_LIB_SDL_MIXER
+    { &sdl_mixer_procs },
+#endif
+#ifdef SND_LIB_MINIAUDIO
+    { &miniaudio_procs },
+#endif
+#ifdef SND_LIB_FMOD
+    { &fmod_procs },
+#endif
+#ifdef SND_LIB_SOUND_ESCCODES
+    { &esccodes_procs },
+#endif
+#ifdef SND_LIB_WINDSOUND
+    { &windsound_procs },
+#endif
+#ifdef SND_LIB_VISSOUND
+    { &vissound_procs },
+#endif
+    { &nosound_procs },     /* default, built-in */
+};
+
+void
+activate_chosen_soundlib(void)
+{
+    enum soundlib_ids idx = gc.chosen_soundlib;
+
+    if (idx <= soundlib_unassigned || idx > soundlib_nosound)
+        idx = soundlib_nosound;
+
+    if (ga.active_soundlib != soundlib_unassigned
+            || ga.active_soundlib != idx) {
+        if (soundprocs.sound_exit_nhsound)
+            (*soundprocs.sound_exit_nhsound)("assigning a new sound library");
+        ga.active_soundlib = soundlib_unassigned;
+    }
+    soundprocs = *soundlib_choices[idx].sndprocs;
+    if (soundprocs.sound_init_nhsound)
+        (*soundprocs.sound_init_nhsound)();
+    ga.active_soundlib = soundprocs.soundlib_id;
+}
+
+void
+assign_soundlib(int idx)
+{
+    if (idx <= soundlib_unassigned || idx > soundlib_nosound)
+        idx = soundlib_nosound;
+
+    if (ga.active_soundlib != soundlib_unassigned) {
+        if (soundprocs.sound_exit_nhsound)
+            (*soundprocs.sound_exit_nhsound)("assigning a new sound library");
+        ga.active_soundlib = soundlib_unassigned;
+    }
+    gc.chosen_soundlib = soundlib_choices[idx].sndprocs->soundlib_id;
+}
+
+#if 0
+static void
+choose_soundlib(const char *s)
+{
+    int i;
+    char *tmps = 0;
+
+    for (i = 1; soundlib_choices[i].sndprocs; i++) {
+        if (!strcmpi(s, soundlib_choices[i].sndprocs->soundname)) {
+            assign_soundlib(i);
+            return;
+        }
+    }
+    assign_soundlib((int) soundlib_nosound);
+
+    /* The code below here mimics that in windows.c error handling
+       for choosing Window type */
+
+    /* 50: arbitrary, no real soundlib names are anywhere near that long;
+       used to prevent potential raw_printf() overflow if user supplies a
+       very long string (on the order of 1200 chars) on the command line
+       (config file options can't get that big; they're truncated at 1023) */
+#define SOUNDLIB_NAME_MAXLEN 50
+    if (strlen(s) >= SOUNDLIB_NAME_MAXLEN) {
+        tmps = (char *) alloc(SOUNDLIB_NAME_MAXLEN);
+        (void) strncpy(tmps, s, SOUNDLIB_NAME_MAXLEN - 1);
+        tmps[SOUNDLIB_NAME_MAXLEN - 1] = '\0';
+        s = tmps;
+    }
+#undef SOUNDLIB_NAME_MAXLEN
+
+    if (!soundlib_choices[1].sndprocs) {
+        config_error_add(
+                   "Soundlib type %s not recognized.  The only choice is: %s",
+                   s, soundlib_choices[0].sndprocs->soundname);
+    } else {
+        char buf[BUFSZ];
+        boolean first = TRUE;
+
+        buf[0] = '\0';
+        for (i = 0; soundlib_choices[i].sndprocs; i++) {
+            Sprintf(eos(buf), "%s%s",
+                    first ? "" : ", ", soundlib_choices[i].sndprocs->soundname);
+            first = FALSE;
+        }
+        config_error_add("Soundlib type %s not recognized.  Choices are:  %s",
+                         s, buf);
+    }
+    if (tmps)
+        free((genericptr_t) tmps) /*, tmps = 0*/ ;
+}
+#endif
+
+/* copy up to maxlen-1 characters; 'dest' must be able to hold maxlen;
+   treat comma as alternate end of 'src' */
+void
+get_soundlib_name(char *dest, int maxlen)
+{
+    int count, idx;
+    const char *src;
+
+    idx = ga.active_soundlib;
+    if (idx > soundlib_unassigned && idx <= soundlib_nosound) {
+        src = soundlib_choices[idx].sndprocs->soundname;
+        for (count = 1; count < maxlen; count++) {
+            if (*src == ',' || *src == '\0')
+                break; /*exit on \0 terminator*/
+            *dest++ = *src++;
+        }
+    }
+    *dest = '\0';
+}
+
+/*
+ * The default sound interface
+ *
+ * 3rd party sound_procs should be placed in ../sound/x
+ * and build procedures should reference them there.
+ */
+
+#if 0
+static void nosound_init_nhsound(void);
+static void nosound_exit_nhsound(const char *);
+static void nosound_suspend_nhsound(const char *);
+static void nosound_resume_nhsound(void);
+static void nosound_achievement(schar, schar, int32_t);
+static void nosound_soundeffect(int32_t, int32_t);
+static void nosound_play_usersound(char *, int32_t, int32_t);
+#endif
+
+struct sound_procs nosound_procs = {
+    SOUNDID(nosound),
+    0L,
+    (void (*)(void)) 0,                     /* init_nhsound    */
+    (void (*)(const char *)) 0,             /* exit_nhsound    */
+    (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
+    (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
+    (void (*)(int32_t, char *, int32_t)) 0, /* hero_playnotes  */
+    (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
+};
+
+#if 0
+static void
+nosound_init_nhsound(void)
+{
+}
+
+static void
+nosound_exit_nhsound(const char *reason)
+{
+}
+
+static void
+nosound_achievement(schar ach1, schar ach2, int32_t repeat)
+{
+}
+
+static void
+nosound_soundeffect(int32_t seid, int volume)
+{
+}
+
+static void
+nosound_play_usersound(char *filename, int volume, int idx)
+{
+}
+#endif
 
 /*sounds.c*/

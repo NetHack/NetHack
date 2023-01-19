@@ -443,7 +443,7 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
 	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
 	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
-	$(INCL)\winprocs.h $(INCL)\wintype.h $(INCL)\you.h \
+	$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\wintype.h $(INCL)\you.h \
 	$(INCL)\youprop.h
 
 # all .c that are part of the main NetHack program and are not operating- or
@@ -523,7 +523,7 @@ MDLIBTTY  = $(OTTY)mdlib.o
 DLBOBJTTY = $(OTTY)dlb.o
 REGEXTTY  = $(OTTY)cppregex.o
 LUAOBJTTY = $(OTTY)nhlua.o    $(OTTY)nhlsel.o    $(OTTY)nhlobj.o
-SOUNDTTY  = $(OTTY)ntsound.o
+SOUNDTTY  = $(OTTY)windsound.o
 VVOBJTTY  = $(OTTY)version.o
 
 SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o \
@@ -588,7 +588,7 @@ MDLIBGUI  = $(OGUI)mdlib.o
 DLBOBJGUI = $(OGUI)dlb.o
 REGEXGUI  = $(OGUI)cppregex.o
 LUAOBJGUI = $(OGUI)nhlua.o    $(OGUI)nhlsel.o   $(OGUI)nhlobj.o
-SOUNDGUI  = $(OGUI)ntsound.o
+SOUNDGUI  = $(OGUI)windsound.o
 VVOBJGUI  = $(OGUI)version.o
 
 SOBJGUI   = $(OGUI)windmain.o $(OGUI)windsys.o $(OGUI)win10.o \
@@ -650,6 +650,8 @@ OPTIONS_FILE = $(DAT)\options
 DLBOBJ_HOST = $(OTTY)dlb$(HOST).o
 !ENDIF
 
+SOUNDLIBDEFS = -DSND_LIB_WINDSOUND -DUSER_SOUNDS
+
 #==========================================
 # Header file macros
 #==========================================
@@ -675,7 +677,8 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\trap.h \
-		$(INCL)\flag.h $(INCL)\winprocs.h $(INCL)\sys.h
+		$(INCL)\flag.h $(INCL)\winprocs.h $(INCL)\sndprocs.h \
+		$(INCL)\sys.h
 
 TILE_H      = ..\win\share\tile.h
 
@@ -898,8 +901,8 @@ INCLDIR= /I..\include /I..\sys\windows $(LUAINCL)
 # Util and console builds
 #==========================================
 
-CFLAGS   = $(ctmpflags) $(INCLDIR) $(DLBDEF) -DSAFEPROCS
-CPPFLAGS = $(cpptmpflags) $(INCLDIR) $(DLBDEF) -DSAFEPROCS
+CFLAGS   = $(ctmpflags) $(INCLDIR) $(DLBDEF) -DSAFEPROCS $(SOUNDLIBDEFS)
+CPPFLAGS = $(cpptmpflags) $(INCLDIR) $(DLBDEF) -DSAFEPROCS $(SOUNDLIBDEFS)
 LFLAGS   = $(lflags) $(conlibs) $(MACHINE)
 
 #==========================================
@@ -941,6 +944,16 @@ DLB =
 
 {$(SRC)}.c{$(OBJUTIL)}.o:
 	$(Q)$(CC) $(CFLAGS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+#==========================================
+# Rules for files in sound\wind
+#==========================================
+
+{..\sound\windsound}.c{$(OBJTTY)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+{..\sound\windsound}.c{$(OBJGUI)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for files in sys\share
@@ -1735,14 +1748,14 @@ $(OLUA)lapi.o: $(LUASRC)\lapi.c
 $(OTTY)consoletty.o:   $(MSWSYS)\consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OTTY)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsys.o:  $(MSWSYS)\windsys.c $(WINDHDR) $(HACK_H)
-$(OTTY)ntsound.o: $(MSWSYS)\ntsound.c $(WINDHDR) $(HACK_H)
+$(OTTY)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
 $(OTTY)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
 $(OTTY)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
 
 $(OGUI)consoletty.o:   $(MSWSYS)\consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OGUI)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)
 $(OGUI)windsys.o:  $(MSWSYS)\windsys.c $(WINDHDR) $(HACK_H)
-$(OGUI)ntsound.o: $(MSWSYS)\ntsound.c $(WINDHDR) $(HACK_H)
+$(OGUI)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
 $(OGUI)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
 $(OGUI)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
 
@@ -2046,7 +2059,7 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OTTY)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
@@ -2465,7 +2478,7 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OGUI)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h

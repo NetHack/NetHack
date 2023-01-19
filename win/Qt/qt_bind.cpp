@@ -204,6 +204,14 @@ void NetHackQtBind::qt_init_nhwindows(int *argc, char **argv)
     // 'statuslines' option can be set in config file but not via 'O'
     set_wc2_option_mod_status(WC2_STATUSLINES, set_gameview);
 #endif
+#if defined(SND_LIB_QTSOUND) && !defined(QT_NO_SOUND)
+    /* assign_soundlib() just flags to NetHack which soundlib
+     * should be loaded by activate_chosen_soundlib() shortly.
+     * gc.chosen_soundlib is initialized to soundlib_nosound. 
+     */
+    if (gc.chosen_soundlib == soundlib_nosound)
+        assign_soundlib(soundlib_qtsound);
+#endif
 }
 
 int NetHackQtBind::qt_kbhit()
@@ -1030,6 +1038,50 @@ boolean NetHackQtBind::msgs_initd = false;
 #if 0
 static void Qt_positionbar(char *) {}
 #endif
+
+#if defined(SND_LIB_QTSOUND) && !defined(NO_QT_SOUND)
+void NetHackQtBind::qtsound_init_nhsound(void)
+{
+}
+
+void NetHackQtBind::qtsound_exit_nhsound(const char *reason UNUSED)
+{
+}
+
+void NetHackQtBind::qtsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED)
+{
+}
+
+void NetHackQtBind::qtsound_soundeffect(char *desc UNUSED, int32_t seid UNUSED, int32_t volume UNUSED)
+{
+}
+
+void NetHackQtBind::qtsound_hero_playnotes(int32_t instrument UNUSED, char *str UNUSED, int32_t volume UNUSED)
+{
+}
+#endif
+
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
+QSoundEffect *effect = NULL;
+#endif
+
+void NetHackQtBind::qtsound_play_usersound(char *filename, int32_t volume, int32_t idx UNUSED)
+{
+#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
+    if (!effect)
+        effect = new QSoundEffect(nethack_qt_::NetHackQtBind::mainWidget());
+    if (effect) {
+        effect->setLoopCount(1);
+        effect->setVolume((1.00f * volume) / 100.0f);
+        effect->setSource(QUrl::fromLocalFile(filename));
+        effect->play();
+    }
+#else
+    nhUse(filename);
+    nhUse(volume);
+#endif
+}
+
 } // namespace nethack_qt_
 
 struct window_procs Qt_procs = {
@@ -1117,31 +1169,17 @@ struct window_procs Qt_procs = {
     nethack_qt_::NetHackQtBind::qt_ctrl_nhwindow,
 };
 
-#ifndef WIN32
-extern "C" void play_usersound(const char *, int);
-
-#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
-QSoundEffect *effect = NULL;
-#endif
-
-/* called from core, sounds.c */
-void
-play_usersound(const char *filename, int volume)
-{
-#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
-    if (!effect)
-        effect = new QSoundEffect(nethack_qt_::NetHackQtBind::mainWidget());
-    if (effect) {
-        effect->setLoopCount(1);
-        effect->setVolume((1.00f * volume) / 100.0f);
-        effect->setSource(QUrl::fromLocalFile(filename));
-        effect->play();
-    }
-#else
-    nhUse(filename);
-    nhUse(volume);
-#endif
-}
-#endif /*!WIN32*/
+#if defined(SND_LIB_QTSOUND) && !defined(QT_NO_SOUND)
+struct sound_procs qtsound_procs = {
+    SOUNDID(qtsound),
+    SNDCAP_USERSOUNDS,
+    nethack_qt_::NetHackQtBind::qtsound_init_nhsound,
+    nethack_qt_::NetHackQtBind::qtsound_exit_nhsound,
+    nethack_qt_::NetHackQtBind::qtsound_achievement,
+    nethack_qt_::NetHackQtBind::qtsound_soundeffect,
+    nethack_qt_::NetHackQtBind::qtsound_hero_playnotes,
+    nethack_qt_::NetHackQtBind::qtsound_play_usersound,
+};
+#endif /* SND_LIB_QTSOUND and !QT_NO_SOUND */
 
 //qt_bind.cpp

@@ -2309,6 +2309,7 @@ void
 record_achievement(schar achidx)
 {
     int i, absidx;
+    int repeat_achievement = 0;
 
     absidx = abs(achidx);
     /* valid achievements range from 1 to N_ACH-1; however, ranks can be
@@ -2325,8 +2326,21 @@ record_achievement(schar achidx)
        an attempt to duplicate an achievement can happen if any of Bell,
        Candelabrum, Book, or Amulet is dropped then picked up again */
     for (i = 0; u.uachieved[i]; ++i)
-        if (abs(u.uachieved[i]) == absidx)
-            return; /* already recorded, don't duplicate it */
+        if (abs(u.uachieved[i]) == absidx) {
+            repeat_achievement = 1;
+            break;
+        }
+
+    /*
+     * We do the sound for an achievement, even if it has already been
+     * achieved before. Some players might have set up level-based
+     * theme music or something. We do let the sound interface know
+     * that it's not the original achievement though.
+     */
+    (*soundprocs.sound_achievement)(achidx, 0, repeat_achievement);
+
+    if (repeat_achievement)
+        return; /* already recorded, don't duplicate it */
     u.uachieved[i] = achidx;
 
     /* avoid livelog for achievements recorded during final disclosure:

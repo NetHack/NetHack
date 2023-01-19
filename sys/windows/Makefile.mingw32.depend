@@ -66,6 +66,9 @@ $(ONHW)/cppregex.d: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 $(ONHW)/%.d: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
+$(ONHW)/%.d: $(SNDSYS)/%.c $(NHLUAH) | $(ONHW)
+	$(cce) $(CFLAGSW) $< -o$@
+
 $(ONHW)/%.d: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
@@ -82,6 +85,9 @@ $(ONH)/cppregex.d: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 	$(cce) $(CPPFLAGSNH) $< -o$@
 
 $(ONH)/%.d: $(SSYS)/%.c $(NHLUAH) | $(ONH)
+	$(cce) $(CFLAGSNH) $< -o$@
+
+$(ONH)/%.d: $(SNDSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.d: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)
