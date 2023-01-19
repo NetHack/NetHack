@@ -59,6 +59,7 @@ awaken_monsters(int distance)
                 && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
+                     && !mindless(mtmp->data)
                      && !resist(mtmp, TOOL_CLASS, 0, NOTELL)
                      /* some monsters are immune */
                      && onscary(0, 0, mtmp))
@@ -181,6 +182,7 @@ awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
                 && (mtmp->mstrategy & STRAT_WAITMASK) != 0)
                 mtmp->mstrategy &= ~STRAT_WAITMASK;
             else if (distm < distance / 3
+                     && !mindless(mtmp->data)
                      && !resist(mtmp, TOOL_CLASS, 0, NOTELL)
                      /* some monsters are immune */
                      && onscary(0, 0, mtmp))
