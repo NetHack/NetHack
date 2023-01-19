@@ -54,7 +54,6 @@ static void readobjnam_parse_charges(struct _readobjnam_data *);
 static int readobjnam_postparse1(struct _readobjnam_data *);
 static int readobjnam_postparse2(struct _readobjnam_data *);
 static int readobjnam_postparse3(struct _readobjnam_data *);
-static const char *Japanese_item_name(int, const char *);
 
 struct Jitem {
     int item;
@@ -81,6 +80,7 @@ static const struct Jitem Japanese_items[] = {
     { GLAIVE, "naginata" },
     { LOCK_PICK, "osaku" },
     { WOODEN_HARP, "koto" },
+    { MAGIC_HARP, "magic koto" },
     { KNIFE, "shito" },
     { PLATE_MAIL, "tanko" },
     { HELMET, "kabuto" },
@@ -177,8 +177,11 @@ obj_typename(int otyp)
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
-    if (Role_if(PM_SAMURAI))
+    if (Role_if(PM_SAMURAI)) {
         actualn = Japanese_item_name(otyp, actualn);
+        if (otyp == WOODEN_HARP || otyp == MAGIC_HARP)
+            dn = "koto";
+    }
     /* generic items don't have an actual-name; we shouldn't ever be called
        for those; pacify static analyzer without resorting to impossible() */
     if (!actualn)
@@ -518,8 +521,11 @@ xname_flags(
     boolean known, dknown, bknown;
 
     buf = nextobuf() + PREFIX; /* leave room for "17 -3 " */
-    if (Role_if(PM_SAMURAI))
+    if (Role_if(PM_SAMURAI)) {
         actualn = Japanese_item_name(typ, actualn);
+        if (typ == WOODEN_HARP || typ == MAGIC_HARP)
+            dn = "koto";
+    }
     /* generic items don't have an actual-name; we shouldn't ever be called
        for those; pacify static analyzer without resorting to impossible() */
     if (!actualn)
@@ -4966,7 +4972,7 @@ rnd_class(int first, int last)
     return (first == last) ? first : STRANGE_OBJECT;
 }
 
-static const char *
+const char *
 Japanese_item_name(int i, const char *ordinaryname)
 {
     const struct Jitem *j = Japanese_items;

@@ -9,6 +9,8 @@ static void setgemprobs(d_level *);
 static void shuffle(int, int, boolean);
 static void shuffle_all(void);
 static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
+static char *sortloot_descr(int, char *);
+static char *disco_typename(int);
 static char *oclass_to_name(char, char *);
 
 #ifdef TILES_IN_GLYPHMAP
@@ -418,10 +420,15 @@ restnames(NHFILE* nhfp)
 }
 
 void
-discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
+discover_object(
+    int oindx,
+    boolean mark_as_known,
+    boolean credit_hero)
 {
-    if (!objects[oindx].oc_name_known) {
-        register int dindx, acls = objects[oindx].oc_class;
+    if (!objects[oindx].oc_name_known
+        || (Role_if(PM_SAMURAI)
+            && Japanese_item_name(oindx, (const char *) 0))) {
+        int dindx, acls = objects[oindx].oc_class;
 
         /* Loop thru disco[] 'til we find the target (which may have been
            uname'd) or the next open slot; one or the other will be found
@@ -431,6 +438,11 @@ discover_object(int oindx, boolean mark_as_known, boolean credit_hero)
             if (gd.disco[dindx] == oindx)
                 break;
         gd.disco[dindx] = oindx;
+
+        /* if already known, we forced an item with a Japanese name into
+           disco[] but don't want to exercise wisdom or update perminv */
+        if (objects[oindx].oc_name_known)
+            return;
 
         if (mark_as_known) {
             objects[oindx].oc_name_known = 1;
@@ -479,6 +491,12 @@ undiscover_object(int oindx)
 boolean
 interesting_to_discover(int i)
 {
+    /* most players who don't speak Japanese manage to figure out what
+       gunyoki, osaku, and so forth mean, but treat them as pre-discovered
+       to be disclosed by '\' */
+    if (Role_if(PM_SAMURAI) && Japanese_item_name(i, (const char *) 0))
+        return TRUE;
+
     /* Pre-discovered objects are now printed with a '*' */
     return (boolean) (objects[i].oc_uname != (char *) 0
                       || (objects[i].oc_name_known
@@ -507,7 +525,7 @@ discovered_cmp(const genericptr v1, const genericptr v2)
 }
 
 static char *
-sortloot_descr(int otyp,char * outbuf)
+sortloot_descr(int otyp, char *outbuf)
 {
     Loot sl_cookie;
     struct obj o;
@@ -601,6 +619,38 @@ choose_disco_sort(
     return n;
 }
 
+/* augment obj_typename() with explanation of Japanese item names */
+static char *
+disco_typename(int otyp)
+{
+    char *result = obj_typename(otyp);
+
+    if (Role_if(PM_SAMURAI) && Japanese_item_name(otyp, (const char *) 0)) {
+        char buf[BUFSZ];
+        const char *actualn = (((otyp != MAGIC_HARP && otyp != WOODEN_HARP)
+                                || objects[otyp].oc_name_known)
+                               ? OBJ_NAME(objects[otyp])
+                               /* undiscovered harp (since wooden harp is
+                                  non-magic so pre-discovered, only applies
+                                  to magic harp and will only be seen if
+                                  magic harp has been 'called' something) */
+                               : "harp");
+
+        if (!actualn) { /* won't happen; used to pacify static analyzer */
+            ;
+        } else if (strstri(result, " called")) {
+            Sprintf(buf, " [%s] called", actualn);
+            (void) strsubst(result, " called", buf);
+        } else if (strstri(result, " (")) {
+            Sprintf(buf, " [%s] (", actualn);
+            (void) strsubst(result, " (", buf);
+        } else {
+            Sprintf(eos(result), " [%s]", actualn);
+        }
+    }
+    return result;
+}
+
 /* the #known command - show discovered object types */
 int
 dodiscovered(void) /* free after Robert Viduya */
@@ -684,7 +734,7 @@ dodiscovered(void) /* free after Robert Viduya */
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
                 if (lootsort)
                     (void) sortloot_descr(dis, &buf[2]);
-                Strcat(buf, obj_typename(dis));
+                Strcat(buf, disco_typename(dis));
 
                 if (!alphabetized && !lootsort)
                     putstr(tmpwin, 0, buf);
@@ -916,7 +966,7 @@ doclassdisco(void)
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
                 if (lootsort)
                     (void) sortloot_descr(dis, &buf[2]);
-                Strcat(buf, obj_typename(dis));
+                Strcat(buf, disco_typename(dis));
 
                 if (!alphabetized && !lootsort)
                     putstr(tmpwin, 0, buf);
@@ -994,7 +1044,7 @@ rename_disco(void)
             any.a_int = dis;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, clr,
-                     obj_typename(dis), MENU_ITEMFLAGS_NONE);
+                     disco_typename(dis), MENU_ITEMFLAGS_NONE);
         }
     }
     if (ct == 0) {
