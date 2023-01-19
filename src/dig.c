@@ -279,6 +279,7 @@ dig(void)
         case 1:
             pline("Bang!  You hit with the broad side of %s!",
                   the(xname(uwep)));
+            wake_nearby();
             break;
         default:
             Your("swing misses its mark.");
@@ -476,6 +477,7 @@ dig(void)
 
         if (!gd.did_dig_msg) {
             You("hit the %s with all your might.", d_target[dig_target]);
+            wake_nearby();
             gd.did_dig_msg = TRUE;
         }
     }
@@ -610,6 +612,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 pay_for_damage("ruin", FALSE);
             else
                 add_damage(x, y, madeby_u ? SHOP_PIT_COST : 0L);
+            wake_nearby();
         } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
         } else if (cansee(x, y) && Verbose(0, digactualhole1)) {
@@ -829,6 +832,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              * fills it.  Final outcome:  no hole, no boulder.
              */
             pline("KADOOM!  The boulder falls in!");
+            wake_nearby();
             (void) delfloortrap(ttmp);
         }
         delobj(boulder_here);
@@ -1100,6 +1104,7 @@ use_pick_axe2(struct obj *obj)
                 if (vibrate)
                     losehp(Maybe_Half_Phys(2), "axing a hard object",
                            KILLED_BY);
+                wake_nearby();
             } else if (u.utrap && u.utraptype == TT_PIT && trap
                        && (trap_with_u = t_at(u.ux, u.uy))
                        && is_pit(trap->ttyp)
