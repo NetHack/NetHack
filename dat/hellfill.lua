@@ -257,6 +257,10 @@ hells[hellno]();
 --
 
 des.stair("up")
-des.stair("down")
+if (u.invocation_level) then
+   des.trap("vibrating square");
+else
+   des.stair("down")
+end
 
 populatemaze();

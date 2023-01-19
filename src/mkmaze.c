@@ -970,11 +970,61 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
     }
 }
 
+void
+pick_vibrasquare_location(void)
+{
+    coordxy x, y;
+    stairway *stway;
+    int trycnt = 0;
+#define x_maze_min 2
+#define y_maze_min 2
+/*
+ * Pick a position where the stairs down to Moloch's Sanctum
+ * level will ultimately be created.  At that time, an area
+ * will be altered:  walls removed, moat and traps generated,
+ * boulders destroyed.  The position picked here must ensure
+ * that that invocation area won't extend off the map.
+ *
+ * We actually allow up to 2 squares around the usual edge of
+ * the area to get truncated; see mkinvokearea(mklev.c).
+ */
+#define INVPOS_X_MARGIN (6 - 2)
+#define INVPOS_Y_MARGIN (5 - 2)
+#define INVPOS_DISTANCE 11
+    int x_range = gx.x_maze_max - x_maze_min - 2 * INVPOS_X_MARGIN - 1,
+        y_range = gy.y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
+
+    if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
+        || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
+        debugpline2("gi.inv_pos: maze is too small! (%d x %d)",
+                    gx.x_maze_max, gy.y_maze_max);
+    }
+    gi.inv_pos.x = gi.inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
+    do {
+        x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
+        y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
+        /* we don't want it to be too near the stairs, nor
+           to be on a spot that's already in use (wall|trap) */
+        if (++trycnt > 1000)
+            break;
+    } while (((stway = stairway_find_dir(TRUE)) != 0)
+             && (x == stway->sx || y == stway->sy /*(direct line)*/
+                 || abs(x - stway->sx) == abs(y - stway->sy)
+                 || distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE
+                 || !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
+    gi.inv_pos.x = x;
+    gi.inv_pos.y = y;
+#undef INVPOS_X_MARGIN
+#undef INVPOS_Y_MARGIN
+#undef INVPOS_DISTANCE
+#undef x_maze_min
+#undef y_maze_min
+}
 
 void
 makemaz(const char *s)
 {
-    coordxy x, y;
+    coordxy x;
     char protofile[20];
     s_level *sp = Is_special(&u.uz);
     coord mm;
@@ -1059,52 +1109,8 @@ makemaz(const char *s)
         mazexy(&mm);
         mkstairs(mm.x, mm.y, 0, (struct mkroom *) 0, FALSE); /* down */
     } else { /* choose "vibrating square" location */
-        stairway *stway;
-        int trycnt = 0;
-#define x_maze_min 2
-#define y_maze_min 2
-/*
- * Pick a position where the stairs down to Moloch's Sanctum
- * level will ultimately be created.  At that time, an area
- * will be altered:  walls removed, moat and traps generated,
- * boulders destroyed.  The position picked here must ensure
- * that that invocation area won't extend off the map.
- *
- * We actually allow up to 2 squares around the usual edge of
- * the area to get truncated; see mkinvokearea(mklev.c).
- */
-#define INVPOS_X_MARGIN (6 - 2)
-#define INVPOS_Y_MARGIN (5 - 2)
-#define INVPOS_DISTANCE 11
-        int x_range = gx.x_maze_max - x_maze_min - 2 * INVPOS_X_MARGIN - 1,
-            y_range = gy.y_maze_max - y_maze_min - 2 * INVPOS_Y_MARGIN - 1;
-
-        if (x_range <= INVPOS_X_MARGIN || y_range <= INVPOS_Y_MARGIN
-            || (x_range * y_range) <= (INVPOS_DISTANCE * INVPOS_DISTANCE)) {
-            debugpline2("gi.inv_pos: maze is too small! (%d x %d)",
-                        gx.x_maze_max, gy.y_maze_max);
-        }
-        gi.inv_pos.x = gi.inv_pos.y = 0; /*{occupied() => invocation_pos()}*/
-        do {
-            x = rn1(x_range, x_maze_min + INVPOS_X_MARGIN + 1);
-            y = rn1(y_range, y_maze_min + INVPOS_Y_MARGIN + 1);
-            /* we don't want it to be too near the stairs, nor
-               to be on a spot that's already in use (wall|trap) */
-            if (++trycnt > 1000)
-                break;
-        } while (((stway = stairway_find_dir(TRUE)) != 0)
-                 && (x == stway->sx || y == stway->sy /*(direct line)*/
-                 || abs(x - stway->sx) == abs(y - stway->sy)
-                 || distmin(x, y, stway->sx, stway->sy) <= INVPOS_DISTANCE
-                 || !SPACE_POS(levl[x][y].typ) || occupied(x, y)));
-        gi.inv_pos.x = x;
-        gi.inv_pos.y = y;
+        pick_vibrasquare_location();
         maketrap(gi.inv_pos.x, gi.inv_pos.y, VIBRATING_SQUARE);
-#undef INVPOS_X_MARGIN
-#undef INVPOS_Y_MARGIN
-#undef INVPOS_DISTANCE
-#undef x_maze_min
-#undef y_maze_min
     }
 
     /* place branch stair or portal */

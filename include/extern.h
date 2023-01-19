@@ -1411,6 +1411,7 @@ extern void create_maze(int, int, boolean);
 extern void wallification(coordxy, coordxy, coordxy, coordxy);
 extern void fix_wall_spines(coordxy, coordxy, coordxy, coordxy);
 extern void walkfrom(coordxy, coordxy, schar);
+extern void pick_vibrasquare_location(void);
 extern void makemaz(const char *);
 extern void mazexy(coord *);
 extern void get_level_extends(coordxy *, coordxy *, coordxy *, coordxy *);

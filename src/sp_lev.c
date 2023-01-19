@@ -1776,7 +1776,11 @@ create_trap(spltrap* t, struct mkroom* croom)
     coord tm;
     int mktrap_flags = MKTRAP_MAZEFLAG;
 
-    if (croom) {
+    if (t->type == VIBRATING_SQUARE) {
+        pick_vibrasquare_location();
+        maketrap(gi.inv_pos.x, gi.inv_pos.y, VIBRATING_SQUARE);
+        return;
+    } else if (croom) {
         get_free_room_loc(&x, &y, croom, t->coord);
     } else {
         int trycnt = 0;
