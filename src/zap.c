@@ -3853,6 +3853,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
         if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
             if (!Deaf)
                 pline("Klonk!");
+            wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 20);
             break; /* boomerang falls on sink */
         }
         /* ct==0, initial position, we want next delta to be same;
