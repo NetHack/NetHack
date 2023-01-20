@@ -2337,7 +2337,8 @@ record_achievement(schar achidx)
      * theme music or something. We do let the sound interface know
      * that it's not the original achievement though.
      */
-    (*soundprocs.sound_achievement)(achidx, 0, repeat_achievement);
+    if (soundprocs.sound_achievement)
+        (*soundprocs.sound_achievement)(achidx, 0, repeat_achievement);
 
     if (repeat_achievement)
         return; /* already recorded, don't duplicate it */
