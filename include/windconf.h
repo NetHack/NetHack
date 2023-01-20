@@ -100,9 +100,11 @@ extern void interject(int);
  */
 
 #ifdef __MINGW32__
+#if 0
 #define MD_USE_TMPFILE_S
 #if !defined(__cplusplus)
 extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
+#endif
 #endif
 #
 #ifdef strncasecmp
