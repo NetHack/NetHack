@@ -169,10 +169,10 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)random.c" />
-    <ClCompile Include="$(SysWindDir)ntsound.c" />
     <ClCompile Include="$(SysWindDir)consoletty.c" />
     <ClCompile Include="$(SysWindDir)windmain.c" />
     <ClCompile Include="$(SysWindDir)windsys.c" />
+    <ClCompile Include="$(SndWindDir)windsound.c" />
     <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinTtyDir)getline.c" />
     <ClCompile Include="$(WinTtyDir)topl.c" />
@@ -230,6 +230,7 @@
     <ClInclude Include="$(IncDir)region.h" />
     <ClInclude Include="$(IncDir)rm.h" />
     <ClInclude Include="$(IncDir)skills.h" />
+    <ClInclude Include="$(IncDir)sndprocs.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
     <ClInclude Include="$(IncDir)sym.h" />

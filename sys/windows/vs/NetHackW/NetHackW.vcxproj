@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\config.props" />
   <PropertyGroup Label="Globals">
@@ -172,10 +172,10 @@
     <ClCompile Include="$(SrcDir)zap.c" />
     <ClCompile Include="$(SysShareDir)cppregex.cpp" />
     <ClCompile Include="$(SysShareDir)random.c" />
-    <ClCompile Include="$(SysWindDir)ntsound.c" />
     <ClCompile Include="$(SysWindDir)windmain.c" />
     <ClCompile Include="$(SysWindDir)windsys.c" />
     <ClCompile Include="$(SysWindDir)win10.c" />
+    <ClCompile Include="$(SndWindDir)windsound.c" />
     <ClCompile Include="$(WinShareDir)safeproc.c" />
     <ClCompile Include="$(WinWin32Dir)mhaskyn.c" />
     <ClCompile Include="$(WinWin32Dir)mhdlg.c" />
@@ -264,6 +264,7 @@
     <ClInclude Include="$(IncDir)region.h" />
     <ClInclude Include="$(IncDir)rm.h" />
     <ClInclude Include="$(IncDir)skills.h" />
+    <ClInclude Include="$(IncDir)sndprocs.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
     <ClInclude Include="$(IncDir)sym.h" />
