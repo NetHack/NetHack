@@ -44,7 +44,7 @@ GAMEDIR = ../binary
 # that are available.
 #
 
-SOUNDLIBDEFS = -DWINDSOUND -DUSER_SOUNDS
+SOUNDLIBDEFS = -DSND_LIB_WINDSOUND -DUSER_SOUNDS
 
 #
 #---------------------------------------------------------------
