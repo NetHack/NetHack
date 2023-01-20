@@ -110,10 +110,11 @@ boulder_hits_pool(
                           the(xname(otmp)), fills_up ? "fills" : "falls into",
                           what);
                 } else if (!Deaf) {
-                    if (lava)
+                    if (lava) {
                         Soundeffect(se_sizzling, 100);
-                    else
+                    } else {
                         Soundeffect(se_splash, 100);
+                    }
                     You_hear("a%s splash.", lava ? " sizzling" : "");
                 }
                 wake_nearto(rx, ry, 40);

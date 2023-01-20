@@ -4803,8 +4803,9 @@ zap_over_floor(
                     lev->typ = lava ? ROOM : ICE;
                 }
                 bury_objs(x, y);
-                if (!lava)
+                if (!lava) {
                     Soundeffect(se_soft_crackling, 30);
+                }
                 if (see_it) {
                     if (lava)
                         Norep("The %s cools and solidifies.",

@@ -1321,8 +1321,9 @@ dokick(void)
             } else if (!(gm.maploc->looted & S_LPUDDING) && !rn2(3)
                        && !(gm.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
                 if (Blind) {
-                    if (!Deaf)
+                    if (!Deaf) {
                         Soundeffect(se_gushing_sound, 100);
+                    }
                     You_hear("a gushing sound.");
                 } else {
                     pline("A %s ooze gushes up from the drain!",

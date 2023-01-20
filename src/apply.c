@@ -4210,8 +4210,9 @@ flip_through_book(struct obj *obj)
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (!Deaf) {
-            if (!Hallucination)
+            if (!Hallucination) {
                 Soundeffect(se_rustling_paper, 50);
+            }
             You_hear("the pages make an unpleasant %s sound.",
                      Hallucination ? "chuckling"
                                    : "rustling");

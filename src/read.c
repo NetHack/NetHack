@@ -1350,10 +1350,11 @@ seffect_scare_monster(struct obj **sobjp)
         }
     }
     if (otyp == SCR_SCARE_MONSTER || !ct) {
-        if (confused || scursed)
+        if (confused || scursed) {
             Soundeffect(se_sad_wailing, 50);
-        else
+        } else {
             Soundeffect(se_sad_wailing, 50);
+        }
         You_hear("%s %s.", (confused || scursed) ? "sad wailing"
                  : "maniacal laughter",
                  !ct ? "in the distance" : "close by");
