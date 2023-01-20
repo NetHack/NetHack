@@ -6014,7 +6014,7 @@ there_cmd_menu(coordxy x, coordxy y, int mod)
 
     if (!K) {
         /* no menu options, try to move */
-        if (next2u(x, y) && !test_move(u.ux, u.uy, dx, dy, TEST_MOVE)) {
+        if (next2u(x, y) && test_move(u.ux, u.uy, dx, dy, TEST_MOVE)) {
             int dir = xytod(dx, dy);
 
             cmdq_add_ec(CQ_CANNED, move_funcs[dir][MV_WALK]);
