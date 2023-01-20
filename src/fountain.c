@@ -638,6 +638,10 @@ drinksink(void)
     case 12:
         You_hear("snatches of song from among the sewers...");
         break;
+    case 13:
+        pline("Ew, what a stench!");
+        create_gas_cloud(u.ux, u.uy, 1, 4);
+        break;
     case 19:
         if (Hallucination) {
             pline("From the murky drain, a hand reaches up... --oops--");
