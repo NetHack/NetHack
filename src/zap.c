@@ -2121,6 +2121,7 @@ bhito(struct obj *obj, struct obj *otmp)
                (the sound could be implicit) */
             maybelearnit = cansee(obj->ox, obj->oy) || !Deaf;
             if (obj->otyp == BOULDER) {
+                Soundeffect(se_crumbling_sound, 75);
                 if (cansee(obj->ox, obj->oy))
                     pline_The("boulder falls apart.");
                 else
@@ -4781,6 +4782,7 @@ zap_over_floor(
 
             if (IS_WATERWALL(lev->typ)) {
                 /* For now, don't let WATER freeze. */
+                Soundeffect(se_soft_crackling, 100);
                 if (see_it)
                     pline_The("%s freezes for a moment.", hliquid("water"));
                 else
@@ -4801,6 +4803,8 @@ zap_over_floor(
                     lev->typ = lava ? ROOM : ICE;
                 }
                 bury_objs(x, y);
+                if (!lava)
+                    Soundeffect(se_soft_crackling, 30);
                 if (see_it) {
                     if (lava)
                         Norep("The %s cools and solidifies.",
@@ -4810,9 +4814,9 @@ zap_over_floor(
                     else
                         Norep("The %s freezes.", hliquid("water"));
                     newsym(x, y);
-                } else if (!lava)
+                } else if (!lava) {
                     You_hear("a crackling sound.");
-
+		}
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */

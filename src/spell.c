@@ -224,8 +224,10 @@ deadbook(struct obj* book2)
 
         if (!u.uhave.bell || !u.uhave.menorah) {
             pline("A chill runs down your %s.", body_part(SPINE));
-            if (!u.uhave.bell)
+            if (!u.uhave.bell) {
+                Soundeffect(se_faint_chime, 30);
                 You_hear("a faint chime...");
+            }
             if (!u.uhave.menorah)
                 pline("Vlad's doppelganger is amused.");
             return;

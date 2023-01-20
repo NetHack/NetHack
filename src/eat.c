@@ -2447,12 +2447,14 @@ fpostfx(struct obj *otmp)
             /* Snow White; 'poisoned' applies to [a subset of] weapons,
                not food, so we substitute cursed; fortunately our hero
                won't have to wait for a prince to be rescued/revived */
-            if (Race_if(PM_DWARF) && Hallucination)
+            if (Race_if(PM_DWARF) && Hallucination) {
                 verbalize("Heigh-ho, ho-hum, I think I'll skip work today.");
-            else if (Deaf || !flags.acoustics)
+            } else if (Deaf || !flags.acoustics) {
                 You("fall asleep.");
-            else
+            } else {
+                Soundeffect(se_sinister_laughter, 100);
                 You_hear("sinister laughter as you fall asleep...");
+            }
             fall_asleep(-rn1(11, 20), TRUE);
         }
         break;

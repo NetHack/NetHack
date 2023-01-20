@@ -343,18 +343,22 @@ use_stethoscope(struct obj *obj)
         mstatusline(u.ustuck);
         return res;
     } else if (u.dz) {
-        if (Underwater)
+        if (Underwater) {
+            Soundeffect(se_faint_splashing, 35);
             You_hear("faint splashing.");
-        else if (u.dz < 0 || !can_reach_floor(TRUE))
+        } else if (u.dz < 0 || !can_reach_floor(TRUE)) {
             cant_reach_floor(u.ux, u.uy, (u.dz < 0), TRUE);
-        else if (its_dead(u.ux, u.uy, &res))
+        } else if (its_dead(u.ux, u.uy, &res)) {
             ; /* message already given */
-        else if (Is_stronghold(&u.uz))
+        } else if (Is_stronghold(&u.uz)) {
+            Soundeffect(se_crackling_of_hellfire, 35);
             You_hear("the crackling of hellfire.");
-        else
+        } else {
             pline_The("%s seems healthy enough.", surface(u.ux, u.uy));
+        }
         return res;
     } else if (obj->cursed && !rn2(2)) {
+        Soundeffect(se_heart_beat, 100);
         You_hear("your heart beat.");
         return res;
     }
@@ -366,6 +370,7 @@ use_stethoscope(struct obj *obj)
     rx = u.ux + u.dx;
     ry = u.uy + u.dy;
     if (!isok(rx, ry)) {
+        Soundeffect(se_typing_noise, 100);
         You_hear("a faint typing noise.");
         return ECMD_OK;
     }
@@ -431,6 +436,7 @@ use_stethoscope(struct obj *obj)
     lev = &levl[rx][ry];
     switch (lev->typ) {
     case SDOOR:
+        Soundeffect(se_hollow_sound, 100);
         You_hear(hollow_str, "door");
         cvt_sdoor_to_door(lev); /* ->typ = DOOR */
         feel_newsym(rx, ry);
@@ -3757,6 +3763,7 @@ do_break_wand(struct obj *obj)
         goto discard_broken_wand;
     case WAN_STRIKING:
         /* we want this before the explosion instead of at the very end */
+        Soundeffect(se_wall_of_force, 65);
         pline("A wall of force smashes down around you!");
         dmg = d(1 + obj->spe, 6); /* normally 2d12 */
         /*FALLTHRU*/
@@ -4202,14 +4209,17 @@ flip_through_book(struct obj *obj)
     You("flip through the pages of %s.", thesimpleoname(obj));
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
-        if (!Deaf)
+        if (!Deaf) {
+            if (!Hallucination)
+                Soundeffect(se_rustling_paper, 50);
             You_hear("the pages make an unpleasant %s sound.",
                      Hallucination ? "chuckling"
                                    : "rustling");
-        else if (!Blind)
+        } else if (!Blind) {
             You_see("the pages glow faintly %s.", hcolor(NH_RED));
-        else
+        } else {
             You_feel("the pages tremble.");
+        }
     } else if (Blind) {
         pline("The pages feel %s.",
               Hallucination ? "freshly picked"

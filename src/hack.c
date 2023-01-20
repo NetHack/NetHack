@@ -271,6 +271,7 @@ moverock(void)
                     pline("There's %s on the other side.", a_monnam(mtmp));
                     deliver_part1 = TRUE;
                 } else {
+                    Soundeffect(se_monster_behind_boulder, 50);
                     You_hear("a monster behind %s.", the(xname(otmp)));
                     if (!Deaf)
                         deliver_part1 = TRUE;
@@ -342,6 +343,7 @@ moverock(void)
                     goto moverock_done;
                 case HOLE:
                 case TRAPDOOR:
+                    Soundeffect(se_kerplunk_boulder_gone, 40);
                     if (Blind)
                         pline("Kerplunk!  You no longer feel %s.",
                               the(xname(otmp)));
@@ -3677,6 +3679,7 @@ maybe_wail(void)
                   who);
         }
     } else {
+        Soundeffect(se_wailing_of_the_banshee, 75);
         You_hear(u.uhp == 1 ? "the wailing of the Banshee..."
                             : "the howling of the CwnAnnwn...");
     }

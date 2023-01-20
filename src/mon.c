@@ -1179,8 +1179,10 @@ meatmetal(struct monst *mtmp)
                     if (Verbose(1, meatmetal3))
                         pline("%s eats %s!", Monnam(mtmp), otmpname);
                 } else {
-                    if (Verbose(1, meatmetal4))
+                    if (Verbose(1, meatmetal4)) {
+                        Soundeffect(se_crunching_sound, 50);
                         You_hear("a crunching sound.");
+                    }
                 }
                 mtmp->meating = otmp->owt / 2 + 1;
                 /* Heal up to the object's weight in hp */
@@ -1338,6 +1340,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                 if (otmp->otyp == CORPSE)
                     mon_givit(mtmp, &mons[otmp->corpsenm]);
             } else {
+                Soundeffect(se_slurping_sound, 30);
                 if (Verbose(2, meatobj2))
                     You_hear("a slurping sound.");
             }
@@ -1440,6 +1443,7 @@ meatcorpse(
             if (Verbose(2, meatcorpse1))
                 pline("%s eats %s!", Monnam(mtmp), otmpname);
         } else {
+            Soundeffect(se_masticating_sound, 50); 
             if (Verbose(2, meatcorpse2))
                 You_hear("a masticating sound.");
         }
@@ -3248,10 +3252,13 @@ xkilled(
     } else if (mtmp->mtame) {
         adjalign(-15); /* bad!! */
         /* your god is mighty displeased... */
-        if (!Hallucination)
+        if (!Hallucination) {
+            Soundeffect(se_distant_thunder, 40);
             You_hear("the rumble of distant thunder...");
-        else
+        } else {
+            Soundeffect(se_applause, 40);
             You_hear("the studio audience applaud!");
+	}
         if (!unique_corpstat(mdat)) {
             boolean mname = has_mgivenname(mtmp);
 
@@ -5017,6 +5024,7 @@ angry_guards(boolean silent)
                       buf, vtense(buf, "are"));
             } else {
                 Strcpy(buf, (ct == 1) ? "a guard's" : "guards'");
+                Soundeffect(se_shrill_whistle, 100);
                 You_hear("the shrill sound of %s whistle%s.", buf, plur(ct));
             }
         }

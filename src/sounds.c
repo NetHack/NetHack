@@ -40,9 +40,14 @@ throne_mon_sound(struct monst *mtmp)
         };
         int which = rn2(3) + (Hallucination ? 1 : 0);
 
-        if (which != 2)
+        if (which != 2) {
+            if (which == 0) {
+                Soundeffect(se_courtly_conversation, 30);
+            } else if (which == 1) {
+                Soundeffect(se_sceptor_pounding, 100);
+            }
             You_hear1(throne_msg[which]);
-        else {
+        } else {
             DISABLE_WARNING_FORMAT_NONLITERAL
             pline(throne_msg[2], uhis());
             RESTORE_WARNING_FORMAT_NONLITERAL
@@ -62,12 +67,15 @@ beehive_mon_sound(struct monst *mtmp)
 
         switch (rn2(2) + hallu) {
         case 0:
+            Soundeffect(se_low_buzzing, 30);
             You_hear("a low buzzing.");
             break;
         case 1:
+            Soundeffect(se_angry_drone, 100);
             You_hear("an angry drone.");
             break;
         case 2:
+            Soundeffect(se_bees, 100);
             You_hear("bees in your %sbonnet!",
                      uarmh ? "" : "(nonexistent) ");
             break;
@@ -244,17 +252,20 @@ dosounds(void)
                             gold_in_vault = TRUE;
                 if (vault_occupied(u.urooms)
                     != (ROOM_INDEX(sroom) + ROOMOFFSET)) {
-                    if (gold_in_vault)
+                    if (gold_in_vault) {
                         You_hear(!hallu
                                      ? "someone counting gold coins."
                                      : "the quarterback calling the play.");
-                    else
+                    } else {
+                        Soundeffect(se_someone_searching, 30);
                         You_hear("someone searching.");
+                    }
                     break;
                 }
             }
                 /*FALLTHRU*/
             case 0:
+                Soundeffect(se_guards_footsteps, 30);
                 You_hear("the footsteps of a guard on patrol.");
                 break;
             case 2:

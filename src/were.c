@@ -30,8 +30,10 @@ were_change(struct monst *mon)
                     howler = (char *) 0;
                     break;
                 }
-                if (howler)
+                if (howler) {
+                    Soundeffect(se_canine_howl, 50); 
                     You_hear("a %s howling at the moon.", howler);
+		}
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {

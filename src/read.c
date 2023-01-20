@@ -1349,10 +1349,15 @@ seffect_scare_monster(struct obj **sobjp)
                 ct++; /* pets don't laugh at you */
         }
     }
-    if (otyp == SCR_SCARE_MONSTER || !ct)
+    if (otyp == SCR_SCARE_MONSTER || !ct) {
+        if (confused || scursed)
+            Soundeffect(se_sad_wailing, 50);
+        else
+            Soundeffect(se_sad_wailing, 50);
         You_hear("%s %s.", (confused || scursed) ? "sad wailing"
                  : "maniacal laughter",
                  !ct ? "in the distance" : "close by");
+    }
 }
 
 static void

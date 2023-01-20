@@ -92,10 +92,12 @@ mon_yells(struct monst* mon, const char* shout)
                 nolimbs(mon->data) ? mbodypart(mon, HEAD)
                                    : makeplural(mbodypart(mon, ARM)));
     } else {
-        if (canspotmon(mon))
+        if (canspotmon(mon)) {
             pline("%s yells:", Amonnam(mon));
-        else
+        } else {
+            Soundeffect(se_someone_yells, 75);
             You_hear("someone yell:");
+        }
         verbalize1(shout);
     }
 }
@@ -1625,13 +1627,15 @@ m_move(register struct monst* mtmp, register int after)
                             return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move2)) {
-                            if (canseeit && canspotmon(mtmp))
+                            if (canseeit && canspotmon(mtmp)) {
                                 pline("%s unlocks and opens a door.",
                                       Monnam(mtmp));
-                            else if (canseeit)
+                            } else if (canseeit) {
                                 You_see("a door unlock and open.");
-                            else if (!Deaf)
+                            } else if (!Deaf) {
+                                Soundeffect(se_door_unlock_and_open, 50);
                                 You_hear("a door unlock and open.");
+                            }
                         }
                     }
                 } else if (here->doormask == D_CLOSED && can_open) {
@@ -1641,12 +1645,14 @@ m_move(register struct monst* mtmp, register int after)
                             return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move3)) {
-                            if (canseeit && canspotmon(mtmp))
+                            if (canseeit && canspotmon(mtmp)) {
                                 pline("%s opens a door.", Monnam(mtmp));
-                            else if (canseeit)
+                            } else if (canseeit) {
                                 You_see("a door open.");
-                            else if (!Deaf)
+                            } else if (!Deaf) {
+                                Soundeffect(se_door_open, 100);
                                 You_hear("a door open.");
+                            }
                         }
                     }
                 } else if (here->doormask & (D_LOCKED | D_CLOSED)) {
@@ -1662,13 +1668,15 @@ m_move(register struct monst* mtmp, register int after)
                             return MMOVE_DIED;
                     } else {
                         if (Verbose(2, m_move4)) {
-                            if (canseeit && canspotmon(mtmp))
+                            if (canseeit && canspotmon(mtmp)) {
                                 pline("%s smashes down a door.",
                                       Monnam(mtmp));
-                            else if (canseeit)
+                            } else if (canseeit) {
                                 You_see("a door crash open.");
-                            else if (!Deaf)
+                            } else if (!Deaf) {
+                                Soundeffect(se_door_crash_open, 50);
                                 You_hear("a door crash open.");
+                            }
                         }
                     }
                     /* if it's a shop door, schedule repair */

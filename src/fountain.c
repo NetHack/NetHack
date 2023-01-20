@@ -41,18 +41,22 @@ dowatersnakes(void)
     struct monst *mtmp;
 
     if (!(gm.mvitals[PM_WATER_MOCCASIN].mvflags & G_GONE)) {
-        if (!Blind)
+        if (!Blind) {
             pline("An endless stream of %s pours forth!",
                   Hallucination ? makeplural(rndmonnam(NULL)) : "snakes");
-        else
+        } else {
+            Soundeffect(se_snakes_hissing, 75);
             You_hear("%s hissing!", something);
+        }
         while (num-- > 0)
             if ((mtmp = makemon(&mons[PM_WATER_MOCCASIN], u.ux, u.uy,
                                 MM_NOMSG)) != 0
                 && t_at(mtmp->mx, mtmp->my))
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
-    } else
+    } else {
+        Soundeffect(se_furious_bubbling, 20);
         pline_The("fountain bubbles furiously for a moment, then calms.");
+    }
 }
 
 /* Water demon */
@@ -79,8 +83,10 @@ dowaterdemon(void)
             } else if (t_at(mtmp->mx, mtmp->my))
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
         }
-    } else
+    } else {
+        Soundeffect(se_furious_bubbling, 20);
         pline_The("fountain bubbles furiously for a moment, then calms.");
+    }
 }
 
 /* Water Nymph */
@@ -99,10 +105,14 @@ dowaternymph(void)
         mtmp->msleeping = 0;
         if (t_at(mtmp->mx, mtmp->my))
             (void) mintrap(mtmp, NO_TRAP_FLAGS);
-    } else if (!Blind)
+    } else if (!Blind) {
+        Soundeffect(se_bubble_rising, 50);
+        Soundeffect(se_loud_pop, 50);
         pline("A large bubble rises to the surface and pops.");
-    else
+    } else {
+        Soundeffect(se_loud_pop, 50);
         You_hear("a loud pop.");
+    }
 }
 
 /* Gushing forth along LOS from (u.ux, u.uy) */
@@ -633,9 +643,11 @@ drinksink(void)
         break;
     /* more odd messages --JJB */
     case 11:
+        Soundeffect(se_clanking_pipe, 50);
         You_hear("clanking from the pipes...");
         break;
     case 12:
+        Soundeffect(se_sewer_song, 100);
         You_hear("snatches of song from among the sewers...");
         break;
     case 13:

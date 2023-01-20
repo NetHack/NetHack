@@ -434,6 +434,11 @@ container_impact_dmg(
              * but it's always exactly 1 that breaks */
             if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
                 change_luck(-1);
+            if (otmp->otyp == EGG) {
+                Soundeffect(se_egg_cracking, 25);
+            } else {
+                Soundeffect(se_glass_shattering, 25);
+            }
             You_hear("a muffled %s.", result);
             if (costly) {
                 if (frominv && !otmp->unpaid)
@@ -1089,6 +1094,7 @@ dokick(void)
         if (gm.maploc->typ == SDOOR) {
             if (!Levitation && rn2(30) < avrg_attrib) {
                 cvt_sdoor_to_door(gm.maploc); /* ->typ = DOOR */
+                Soundeffect(se_crash_door, 40);
                 pline("Crash!  %s a secret door!",
                       /* don't "kick open" when it's locked
                          unless it also happens to be trapped */
@@ -1114,6 +1120,7 @@ dokick(void)
         }
         if (gm.maploc->typ == SCORR) {
             if (!Levitation && rn2(30) < avrg_attrib) {
+                Soundeffect(se_crash_door, 40);
                 pline("Crash!  You kick open a secret passage!");
                 exercise(A_DEX, TRUE);
                 gm.maploc->typ = CORR;
@@ -1135,6 +1142,7 @@ dokick(void)
                 gm.maploc->looted = 0; /* don't leave loose ends.. */
                 gm.maploc->typ = ROOM;
                 (void) mkgold((long) rnd(200), x, y);
+                Soundeffect(se_crash_throne_destroyed, 60);
                 if (Blind)
                     pline("CRASH!  You destroy it.");
                 else {
@@ -1303,6 +1311,7 @@ dokick(void)
                 return ECMD_TIME;
             }
             if (rn2(5)) {
+                Soundeffect(se_klunk_pipe, 60);
                 if (!Deaf)
                     pline("Klunk!  The pipes vibrate noisily.");
                 else
@@ -1311,11 +1320,14 @@ dokick(void)
                 return ECMD_TIME;
             } else if (!(gm.maploc->looted & S_LPUDDING) && !rn2(3)
                        && !(gm.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
-                if (Blind)
+                if (Blind) {
+                    if (!Deaf)
+                        Soundeffect(se_gushing_sound, 100);
                     You_hear("a gushing sound.");
-                else
+                } else {
                     pline("A %s ooze gushes up from the drain!",
                           hcolor(NH_BLACK));
+		}
                 (void) makemon(&mons[PM_BLACK_PUDDING], x, y, MM_NOMSG);
                 exercise(A_DEX, TRUE);
                 newsym(x, y);
@@ -1394,10 +1406,12 @@ dokick(void)
             gm.maploc->doormask = D_NODOOR;
             b_trapped("door", FOOT);
         } else if (ACURR(A_STR) > 18 && !rn2(5) && !shopdoor) {
+            Soundeffect(se_kick_door_it_shatters, 50);
             pline("As you kick the door, it shatters to pieces!");
             exercise(A_STR, TRUE);
             gm.maploc->doormask = D_NODOOR;
         } else {
+            Soundeffect(se_kick_door_it_crashes_open, 50);
             pline("As you kick the door, it crashes open!");
             exercise(A_STR, TRUE);
             gm.maploc->doormask = D_BROKEN;
@@ -1682,6 +1696,11 @@ ship_object(struct obj *otmp, coordxy x, coordxy y, boolean shop_floor_obj)
             if (otmp->otyp == EGG && otmp->spe && otmp->corpsenm >= LOW_PM)
                 change_luck((schar) -min(otmp->quan, 5L));
             result = "splat";
+        }
+        if (otmp->otyp == EGG) {
+            Soundeffect(se_egg_splatting, 25);
+        } else {
+            Soundeffect(se_glass_crashing, 25);
         }
         You_hear("a muffled %s.", result);
         obj_extract_self(otmp);
