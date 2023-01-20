@@ -1327,7 +1327,7 @@ dokick(void)
                 } else {
                     pline("A %s ooze gushes up from the drain!",
                           hcolor(NH_BLACK));
-		}
+                }
                 (void) makemon(&mons[PM_BLACK_PUDDING], x, y, MM_NOMSG);
                 exercise(A_DEX, TRUE);
                 newsym(x, y);

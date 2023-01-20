@@ -588,10 +588,10 @@ do_entity(struct entity *etmp)
                 if (e_inview) {
                     pline("%s crushed by the falling portcullis!",
                           E_phrase(etmp, "are"));
-                } else if (!Deaf) { 
+                } else if (!Deaf) {
                     Soundeffect(se_crushing_sound, 100);
                     You_hear("a crushing sound.");
-		}
+                }
                 e_died(etmp,
                        XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG
                                                   : XKILL_NOMSG),

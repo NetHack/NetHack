@@ -4816,7 +4816,7 @@ zap_over_floor(
                     newsym(x, y);
                 } else if (!lava) {
                     You_hear("a crackling sound.");
-		}
+                }
                 if (u_at(x, y)) {
                     if (u.uinwater) { /* not just `if (Underwater)' */
                         /* leave the no longer existent water */

@@ -744,7 +744,7 @@ mattacku(register struct monst *mtmp)
                     } else {
                         if (is_whirly(mtmp->data)) {
                             Soundeffect(se_rushing_wind_noise, 60);
-			}
+                        }
                         You_hear("a %s nearby.",
                                  is_whirly(mtmp->data) ? "rushing noise"
                                                        : "splat");

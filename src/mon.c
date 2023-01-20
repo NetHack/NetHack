@@ -1443,7 +1443,7 @@ meatcorpse(
             if (Verbose(2, meatcorpse1))
                 pline("%s eats %s!", Monnam(mtmp), otmpname);
         } else {
-            Soundeffect(se_masticating_sound, 50); 
+            Soundeffect(se_masticating_sound, 50);
             if (Verbose(2, meatcorpse2))
                 You_hear("a masticating sound.");
         }
@@ -3258,7 +3258,7 @@ xkilled(
         } else {
             Soundeffect(se_applause, 40);
             You_hear("the studio audience applaud!");
-	}
+        }
         if (!unique_corpstat(mdat)) {
             boolean mname = has_mgivenname(mtmp);
 

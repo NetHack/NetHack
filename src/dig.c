@@ -1321,7 +1321,7 @@ mdig_tunnel(struct monst *mtmp)
         if (Verbose(0, mdig_tunnel2) && !rn2(5)) {
             Soundeffect(se_crashing_rock, 75);
             You_hear("crashing rock.");
-	}
+        }
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
         if (gl.level.flags.is_maze_lev) {
