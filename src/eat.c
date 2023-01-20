@@ -96,6 +96,10 @@ is_edible(register struct obj *obj)
     /* above also prevents the Amulet from being eaten, so we must never
        allow fake amulets to be eaten either [which is already the case] */
 
+    if (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]
+        && is_flammable(obj))
+        return TRUE;
+
     if (metallivorous(gy.youmonst.data) && is_metallic(obj)
         && (gy.youmonst.data != &mons[PM_RUST_MONSTER] || is_rustprone(obj)))
         return TRUE;
@@ -520,7 +524,10 @@ done_eating(boolean message)
             pline1(gn.nomovemsg);
         gn.nomovemsg = 0;
     } else if (message)
-        You("finish eating %s.", food_xname(piece, TRUE));
+        You("finish %s %s.",
+            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL])
+            ? "consuming" : "eating",
+            food_xname(piece, TRUE));
 
     if (piece->otyp == CORPSE || piece->globby)
         cpostfx(piece->corpsenm);

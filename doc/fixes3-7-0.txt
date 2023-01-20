@@ -1088,6 +1088,7 @@ fix freeing a worn object when forced to drop it by falling down stairs
 allow setting per-level "temperature": hot, cold, or temperate, currently
 	only affects some messages
 digging is noisy
+polymorphing into fire elemental allows you eat flammable items
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
