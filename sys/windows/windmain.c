@@ -5,16 +5,16 @@
 /* main.c - Windows */
 
 #include "win32api.h" /* for GetModuleFileName */
-
+#include "fmod_helper.h"
 #include "hack.h"
 #ifdef DLB
 #include "dlb.h"
 #endif
+#include <ShlObj.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <sys\stat.h>
-#include <errno.h>
-#include <ShlObj.h>
 
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
@@ -80,36 +80,36 @@ int other_self_recover_prompt(void);
 
 char orgdir[PATHLEN];
 boolean getreturn_enabled;
-int windows_startup_state = 0;    /* we flag whether to continue with this */
-                                  /* 0 = keep starting up, everything is good */
+int windows_startup_state = 0; /* we flag whether to continue with this */
+                               /* 0 = keep starting up, everything is good */
 
-extern int redirect_stdout;       /* from sys/share/pcsys.c */
+extern int redirect_stdout; /* from sys/share/pcsys.c */
 extern int GUILaunched;
 HANDLE hStdOut;
 char default_window_sys[] =
 #if defined(MSWIN_GRAPHICS)
-            "mswin";
+    "mswin";
 #elif defined(TTY_GRAPHICS)
-            "tty";
+    "tty";
 #endif
 #ifdef WANT_GETHDATE
 static struct stat hbuf;
 #endif
 #include <sys/stat.h>
 
-
 extern char orgdir[];
 
-int get_known_folder_path(const KNOWNFOLDERID * folder_id,
-                      char * path, size_t path_size);
-void create_directory(const char * path);
-int build_known_folder_path(const KNOWNFOLDERID * folder_id,
-                      char * path, size_t path_size, boolean versioned);
-void build_environment_path(const char * env_str, const char * folder,
-                      char * path, size_t path_size);
-boolean folder_file_exists(const char * folder, const char * file_name);
+int get_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
+                          size_t path_size);
+void create_directory(const char *path);
+int build_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
+                            size_t path_size, boolean versioned);
+void build_environment_path(const char *env_str, const char *folder,
+                            char *path, size_t path_size);
+boolean folder_file_exists(const char *folder, const char *file_name);
 boolean test_portable_config(const char *executable_path,
-             char *portable_device_path, size_t portable_device_path_size);
+                             char *portable_device_path,
+                             size_t portable_device_path_size);
 void set_default_prefix_locations(const char *programPath);
 void copy_sysconf_content(void);
 void copy_config_content(void);
@@ -117,18 +117,13 @@ void copy_hack_content(void);
 #ifdef PORT_HELP
 void port_help(void);
 #endif
-void windows_raw_print(const char* str);
-
-
-
+void windows_raw_print(const char *str);
 
 DISABLE_WARNING_UNREACHABLE_CODE
 
 int
-get_known_folder_path(
-    const KNOWNFOLDERID * folder_id,
-    char * path
-    , size_t path_size)
+get_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
+                      size_t path_size)
 {
     PWSTR wide_path;
     if (FAILED(SHGetKnownFolderPath(folder_id, 0, NULL, &wide_path))) {
@@ -147,8 +142,9 @@ get_known_folder_path(
         // silently handle this problem
         return FALSE;
     } else if (err != 0) {
-        error("Failed folder (%lu) path string conversion, unexpected err = %d",
-              folder_id->Data1, err);
+        error(
+            "Failed folder (%lu) path string conversion, unexpected err = %d",
+            folder_id->Data1, err);
         return FALSE;
     }
 
@@ -156,7 +152,7 @@ get_known_folder_path(
 }
 
 void
-create_directory(const char * path)
+create_directory(const char *path)
 {
     HRESULT hr = CreateDirectoryA(path, NULL);
 
@@ -167,44 +163,40 @@ create_directory(const char * path)
 RESTORE_WARNING_UNREACHABLE_CODE
 
 int
-build_known_folder_path(
-    const KNOWNFOLDERID * folder_id,
-    char * path,
-    size_t path_size,
-    boolean versioned)
+build_known_folder_path(const KNOWNFOLDERID *folder_id, char *path,
+                        size_t path_size, boolean versioned)
 {
-    if(!get_known_folder_path(folder_id, path, path_size))
+    if (!get_known_folder_path(folder_id, path, path_size))
         return FALSE;
 
     strcat(path, "\\NetHack\\");
     create_directory(path);
     if (versioned) {
-        Sprintf(eos(path), "%d.%d\\",
-                    VERSION_MAJOR, VERSION_MINOR);
+        Sprintf(eos(path), "%d.%d\\", VERSION_MAJOR, VERSION_MINOR);
         create_directory(path);
     }
     return TRUE;
 }
 
 void
-build_environment_path(
-    const char * env_str,
-    const char * folder,
-    char * path,
-    size_t path_size)
+build_environment_path(const char *env_str, const char *folder, char *path,
+                       size_t path_size)
 {
     path[0] = '\0';
 
-    const char * root_path = nh_getenv(env_str);
+    const char *root_path = nh_getenv(env_str);
 
-    if (root_path == NULL) return;
+    if (root_path == NULL)
+        return;
 
     strcpy_s(path, path_size, root_path);
 
-    char * colon = strchr(path, ';');
-    if (colon != NULL) path[0] = '\0';
+    char *colon = strchr(path, ';');
+    if (colon != NULL)
+        path[0] = '\0';
 
-    if (strlen(path) == 0) return;
+    if (strlen(path) == 0)
+        return;
 
     append_slash(path);
 
@@ -215,11 +207,12 @@ build_environment_path(
 }
 
 boolean
-folder_file_exists(const char * folder, const char * file_name)
+folder_file_exists(const char *folder, const char *file_name)
 {
     char path[MAX_PATH];
 
-    if (folder[0] == '\0') return FALSE;
+    if (folder[0] == '\0')
+        return FALSE;
 
     strcpy(path, folder);
     strcat(path, file_name);
@@ -227,10 +220,8 @@ folder_file_exists(const char * folder, const char * file_name)
 }
 
 boolean
-test_portable_config(
-    const char *executable_path,
-    char *portable_device_path,
-    size_t portable_device_path_size)
+test_portable_config(const char *executable_path, char *portable_device_path,
+                     size_t portable_device_path_size)
 {
     int lth = 0;
     const char *sysconf = "sysconf";
@@ -238,14 +229,15 @@ test_portable_config(
     boolean retval = FALSE,
             save_initoptions_noterminate = iflags.initoptions_noterminate;
 
-    if (portable_device_path && folder_file_exists(executable_path, "sysconf")) {
+    if (portable_device_path
+        && folder_file_exists(executable_path, "sysconf")) {
         /*
            There is a sysconf file (not just sysconf.template) present in
-           the exe path, which is not the way NetHack is initially distributed,
-           so assume it means that the admin/installer wants to override
-           something, perhaps set up for a fully-portable configuration that
-           leaves no traces behind elsewhere on this computer's hard drive -
-           delve into that...
+           the exe path, which is not the way NetHack is initially
+           distributed, so assume it means that the admin/installer wants to
+           override something, perhaps set up for a fully-portable
+           configuration that leaves no traces behind elsewhere on this
+           computer's hard drive - delve into that...
          */
 
         *portable_device_path = '\0';
@@ -263,7 +255,7 @@ test_portable_config(
             retval = TRUE;
         (void) config_error_done();
         iflags.initoptions_noterminate = save_initoptions_noterminate;
-        sysopt_release();   /* the real sysconf processing comes later */
+        sysopt_release(); /* the real sysconf processing comes later */
     }
     if (retval) {
         lth = strlen(executable_path);
@@ -277,7 +269,8 @@ test_portable_config(
 
 static char portable_device_path[MAX_PATH];
 
-const char *get_portable_device(void)
+const char *
+get_portable_device(void)
 {
     return (const char *) portable_device_path;
 }
@@ -290,60 +283,60 @@ set_default_prefix_locations(const char *programPath UNUSED)
     static char versioned_profile_path[MAX_PATH];
     static char versioned_user_data_path[MAX_PATH];
     static char versioned_global_data_path[MAX_PATH];
-/*    static char versioninfo[20] UNUSED; */
+    /*    static char versioninfo[20] UNUSED; */
 
     strcpy(executable_path, get_executable_path());
     append_slash(executable_path);
 
-    if (test_portable_config(executable_path,
-                          portable_device_path, sizeof portable_device_path)) {
+    if (test_portable_config(executable_path, portable_device_path,
+                             sizeof portable_device_path)) {
         gf.fqn_prefix[SYSCONFPREFIX] = executable_path;
-        gf.fqn_prefix[CONFIGPREFIX]  = portable_device_path;
-        gf.fqn_prefix[HACKPREFIX]    = portable_device_path;
-        gf.fqn_prefix[SAVEPREFIX]    = portable_device_path;
-        gf.fqn_prefix[LEVELPREFIX]   = portable_device_path;
-        gf.fqn_prefix[BONESPREFIX]   = portable_device_path;
-        gf.fqn_prefix[SCOREPREFIX]   = portable_device_path;
-        gf.fqn_prefix[LOCKPREFIX]    = portable_device_path;
+        gf.fqn_prefix[CONFIGPREFIX] = portable_device_path;
+        gf.fqn_prefix[HACKPREFIX] = portable_device_path;
+        gf.fqn_prefix[SAVEPREFIX] = portable_device_path;
+        gf.fqn_prefix[LEVELPREFIX] = portable_device_path;
+        gf.fqn_prefix[BONESPREFIX] = portable_device_path;
+        gf.fqn_prefix[SCOREPREFIX] = portable_device_path;
+        gf.fqn_prefix[LOCKPREFIX] = portable_device_path;
         gf.fqn_prefix[TROUBLEPREFIX] = portable_device_path;
-        gf.fqn_prefix[DATAPREFIX]    = executable_path;
+        gf.fqn_prefix[DATAPREFIX] = executable_path;
     } else {
-        if(!build_known_folder_path(&FOLDERID_Profile, profile_path,
-            sizeof(profile_path), FALSE))
+        if (!build_known_folder_path(&FOLDERID_Profile, profile_path,
+                                     sizeof(profile_path), FALSE))
             strcpy(profile_path, executable_path);
 
-        if(!build_known_folder_path(&FOLDERID_Profile, versioned_profile_path,
-            sizeof(profile_path), TRUE))
+        if (!build_known_folder_path(&FOLDERID_Profile,
+                                     versioned_profile_path,
+                                     sizeof(profile_path), TRUE))
             strcpy(versioned_profile_path, executable_path);
 
-        if(!build_known_folder_path(&FOLDERID_LocalAppData,
-            versioned_user_data_path, sizeof(versioned_user_data_path), TRUE))
+        if (!build_known_folder_path(&FOLDERID_LocalAppData,
+                                     versioned_user_data_path,
+                                     sizeof(versioned_user_data_path), TRUE))
             strcpy(versioned_user_data_path, executable_path);
 
-        if(!build_known_folder_path(&FOLDERID_ProgramData,
-            versioned_global_data_path, sizeof(versioned_global_data_path), TRUE))
+        if (!build_known_folder_path(
+                &FOLDERID_ProgramData, versioned_global_data_path,
+                sizeof(versioned_global_data_path), TRUE))
             strcpy(versioned_global_data_path, executable_path);
 
         gf.fqn_prefix[SYSCONFPREFIX] = versioned_global_data_path;
-        gf.fqn_prefix[CONFIGPREFIX]  = profile_path;
-        gf.fqn_prefix[HACKPREFIX]    = versioned_profile_path;
-        gf.fqn_prefix[SAVEPREFIX]    = versioned_user_data_path;
-        gf.fqn_prefix[LEVELPREFIX]   = versioned_user_data_path;
-        gf.fqn_prefix[BONESPREFIX]   = versioned_global_data_path;
-        gf.fqn_prefix[SCOREPREFIX]   = versioned_global_data_path;
-        gf.fqn_prefix[LOCKPREFIX]    = versioned_global_data_path;
+        gf.fqn_prefix[CONFIGPREFIX] = profile_path;
+        gf.fqn_prefix[HACKPREFIX] = versioned_profile_path;
+        gf.fqn_prefix[SAVEPREFIX] = versioned_user_data_path;
+        gf.fqn_prefix[LEVELPREFIX] = versioned_user_data_path;
+        gf.fqn_prefix[BONESPREFIX] = versioned_global_data_path;
+        gf.fqn_prefix[SCOREPREFIX] = versioned_global_data_path;
+        gf.fqn_prefix[LOCKPREFIX] = versioned_global_data_path;
         gf.fqn_prefix[TROUBLEPREFIX] = versioned_profile_path;
-        gf.fqn_prefix[DATAPREFIX]    = executable_path;
+        gf.fqn_prefix[DATAPREFIX] = executable_path;
     }
 }
 
 /* copy file if destination does not exist */
 void
-copy_file(
-    const char * dst_folder,
-    const char * dst_name,
-    const char * src_folder,
-    const char * src_name)
+copy_file(const char *dst_folder, const char *dst_name,
+          const char *src_folder, const char *src_name)
 {
     char dst_path[MAX_PATH];
     strcpy(dst_path, dst_folder);
@@ -353,24 +346,21 @@ copy_file(
     strcpy(src_path, src_folder);
     strcat(src_path, src_name);
 
-    if(!file_exists(src_path))
+    if (!file_exists(src_path))
         error("Unable to copy file '%s' as it does not exist", src_path);
 
-    if(file_exists(dst_path))
+    if (file_exists(dst_path))
         return;
 
     BOOL success = CopyFileA(src_path, dst_path, TRUE);
-    if(!success) error("Failed to copy '%s' to '%s'", src_path, dst_path);
+    if (!success)
+        error("Failed to copy '%s' to '%s'", src_path, dst_path);
 }
 
 /* update file copying if it does not exist or src is newer then dst */
 void
-update_file(
-    const char * dst_folder,
-    const char * dst_name,
-    const char * src_folder,
-    const char * src_name,
-    BOOL save_copy)
+update_file(const char *dst_folder, const char *dst_name,
+            const char *src_folder, const char *src_name, BOOL save_copy)
 {
     char dst_path[MAX_PATH];
     strcpy(dst_path, dst_folder);
@@ -385,7 +375,7 @@ update_file(
     strcat(save_path, dst_name);
     strcat(save_path, ".save");
 
-    if(!file_exists(src_path))
+    if (!file_exists(src_path))
         error("Unable to copy file '%s' as it does not exist", src_path);
 
     if (!file_newer(src_path, dst_path))
@@ -395,43 +385,44 @@ update_file(
         CopyFileA(dst_path, save_path, FALSE);
 
     BOOL success = CopyFileA(src_path, dst_path, FALSE);
-    if(!success) error("Failed to update '%s' to '%s'", src_path, dst_path);
-
+    if (!success)
+        error("Failed to update '%s' to '%s'", src_path, dst_path);
 }
 
-void copy_sysconf_content(void)
+void
+copy_sysconf_content(void)
 {
     /* Using the SYSCONFPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
 
     update_file(gf.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
-        gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
+                gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
-//    update_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
-//        gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
+    //    update_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+    //        gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
+              gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
 
     update_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
-        gf.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
-
+                gf.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
 }
 
-void copy_config_content(void)
+void
+copy_config_content(void)
 {
     /* Using the CONFIGPREFIX path, lock it so that it does not change */
     fqn_prefix_locked[CONFIGPREFIX] = TRUE;
 
     /* Keep templates up to date */
     update_file(gf.fqn_prefix[CONFIGPREFIX], CONFIG_TEMPLATE,
-        gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
+                gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
 
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(gf.fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
-        gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
+              gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
 }
 
 void
@@ -441,9 +432,9 @@ copy_hack_content(void)
 
     /* Keep Guidebook and opthelp up to date */
     update_file(gf.fqn_prefix[HACKPREFIX], GUIDEBOOK_FILE,
-        gf.fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
+                gf.fqn_prefix[DATAPREFIX], GUIDEBOOK_FILE, FALSE);
     update_file(gf.fqn_prefix[HACKPREFIX], OPTIONFILE,
-        gf.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
+                gf.fqn_prefix[DATAPREFIX], OPTIONFILE, FALSE);
 }
 extern const char *known_handling[];     /* symbols.c */
 extern const char *known_restrictions[]; /* symbols.c */
@@ -472,8 +463,10 @@ MAIN(int argc, char *argv[])
     char failbuf[BUFSZ];
     int getlock_result = 0;
 
+    init_fmod();
+
 #ifdef _MSC_VER
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
 #ifdef WIN32CON
@@ -616,8 +609,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
                                  windowprocs.wincap2)) {
         /* current symset handling and windowtype are
            not compatible, feature-wise. Use IBM defaults */
-            load_symset("IBMGraphics_2", PRIMARYSET);
-            load_symset("RogueEpyx", ROGUESET);
+        load_symset("IBMGraphics_2", PRIMARYSET);
+        load_symset("RogueEpyx", ROGUESET);
     }
     /* Has the callback for the symset been invoked? Config file processing to
        load a symset runs too early to accomplish that because
@@ -626,7 +619,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
 #if defined(TERMLIB) || defined(CURSES_GRAPHICS)
     if (SYMHANDLING(H_DEC) && decgraphics_mode_callback)
         (*decgraphics_mode_callback)();
-#endif     /* TERMLIB || CURSES */
+#endif /* TERMLIB || CURSES */
 #if 0
 #ifdef CURSES_GRAPHICS
     if (WINDOWPORT(curses))
@@ -719,9 +712,9 @@ attempt_restore:
         if (!iflags.renameinprogress) {
             player_selection();
             if (iflags.renameinprogress) {
-            /* player has renamed the hero while selecting role;
-            discard current lock file and create another for
-            the new character name */
+                /* player has renamed the hero while selecting role;
+                discard current lock file and create another for
+                the new character name */
                 goto attempt_restore;
             }
         }
@@ -730,9 +723,9 @@ attempt_restore:
             You("are in non-scoring discovery mode.");
     }
 
-        // iflags.debug_fuzzer = TRUE;
+    // iflags.debug_fuzzer = TRUE;
 
-        moveloop(resuming);
+    moveloop(resuming);
     nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
@@ -741,7 +734,7 @@ attempt_restore:
 RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
-process_options(int argc, char * argv[])
+process_options(int argc, char *argv[])
 {
     int i;
 
@@ -783,7 +776,7 @@ process_options(int argc, char * argv[])
              */
             argc--;
             argv++;
-            const char * dir = argv[0] + 2;
+            const char *dir = argv[0] + 2;
             if (*dir == '=' || *dir == ':')
                 dir++;
             if (!*dir && argc > 1) {
@@ -931,8 +924,9 @@ nhusage(void)
     /* -role still works for those cases which aren't already taken, but
      * is deprecated and will not be listed here.
      */
-    (void) Sprintf(buf2, "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
-                         "[maxrank] [name]...\n       or",
+    (void) Sprintf(buf2,
+                   "\nUsage:\n%s [-d dir] -s [-r race] [-p profession] "
+                   "[maxrank] [name]...\n       or",
                    gh.hname);
     ADD_USAGE(buf2);
 
@@ -943,8 +937,7 @@ nhusage(void)
 #ifdef NEWS
     ADD_USAGE(" [-n]");
 #endif
-    (void) Sprintf(buf2, "\n       or\n%s [--showpaths]",
-        gh.hname);
+    (void) Sprintf(buf2, "\n       or\n%s [--showpaths]", gh.hname);
     ADD_USAGE(buf2);
     if (!iflags.window_inited)
         raw_printf("%s\n", buf1);
@@ -1045,7 +1038,8 @@ fakeconsole(void)
 #endif
     return has_fakeconsole;
 }
-void freefakeconsole(void)
+void
+freefakeconsole(void)
 {
     if (has_fakeconsole) {
         FreeConsole();
@@ -1062,15 +1056,17 @@ get_executable_path(void)
     {
         TCHAR wbuf[BUFSZ];
         GetModuleFileName((HANDLE) 0, wbuf, BUFSZ);
-        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, path_buffer, sizeof(path_buffer), NULL, NULL);
+        WideCharToMultiByte(CP_ACP, 0, wbuf, -1, path_buffer,
+                            sizeof(path_buffer), NULL, NULL);
     }
 #else
     DWORD length = GetModuleFileName((HANDLE) 0, path_buffer, MAX_PATH);
-    if (length == ERROR_INSUFFICIENT_BUFFER) error("Unable to get module name");
+    if (length == ERROR_INSUFFICIENT_BUFFER)
+        error("Unable to get module name");
     path_buffer[length] = '\0';
 #endif
 
-    char  * seperator = strrchr(path_buffer, PATH_SEPARATOR);
+    char *seperator = strrchr(path_buffer, PATH_SEPARATOR);
     if (seperator)
         *seperator = '\0';
 
@@ -1078,7 +1074,7 @@ get_executable_path(void)
 }
 
 char *
-translate_path_variables(const char* str, char* buf)
+translate_path_variables(const char *str, char *buf)
 {
     const char *src;
     char evar[BUFSZ], *dest, *envp, *eptr = (char *) 0;
@@ -1095,8 +1091,9 @@ translate_path_variables(const char* str, char* buf)
     src = str;
     in_evar = FALSE;
     destcount = ecount = 0;
-    for (ccount = 0; ccount < slen && destcount < (BUFSZ - 1) &&
-                     ecount < (BUFSZ - 1); ++ccount, ++src) {
+    for (ccount = 0;
+         ccount < slen && destcount < (BUFSZ - 1) && ecount < (BUFSZ - 1);
+         ++ccount, ++src) {
         if (*src == '%') {
             if (in_evar) {
                 *eptr = '\0';
@@ -1129,10 +1126,9 @@ translate_path_variables(const char* str, char* buf)
     return buf;
 }
 
-
 /*ARGSUSED*/
 void
-windows_raw_print(const char* str)
+windows_raw_print(const char *str)
 {
     if (str)
         fprintf(stdout, "%s\n", str);
@@ -1142,7 +1138,7 @@ windows_raw_print(const char* str)
 
 /*ARGSUSED*/
 void
-windows_raw_print_bold(const char* str)
+windows_raw_print_bold(const char *str)
 {
     windows_raw_print(str);
     return;
@@ -1153,7 +1149,6 @@ windows_nhgetch(void)
 {
     return getchar();
 }
-
 
 void
 windows_nhbell(void)
@@ -1170,7 +1165,7 @@ windows_nh_poskey(int *x UNUSED, int *y UNUSED, int *mod UNUSED)
 
 /*ARGSUSED*/
 char
-windows_yn_function(const char* query UNUSED, const char* resp UNUSED,
+windows_yn_function(const char *query UNUSED, const char *resp UNUSED,
                     char def UNUSED)
 {
     return '\033';
@@ -1178,7 +1173,7 @@ windows_yn_function(const char* query UNUSED, const char* resp UNUSED,
 
 /*ARGSUSED*/
 static void
-windows_getlin(const char* prompt UNUSED, char* outbuf)
+windows_getlin(const char *prompt UNUSED, char *outbuf)
 {
     Strcpy(outbuf, "\033");
 }
@@ -1243,8 +1238,7 @@ getlock(void)
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        error("Bad directory or name: %s\n%s\n", fq_lock,
-                  strerror(errno));
+        error("Bad directory or name: %s\n%s\n", fq_lock, strerror(errno));
         unlock_file(HLOCK);
         Sprintf(oops, "Cannot open %s", fq_lock);
         raw_print(oops);
@@ -1265,17 +1259,15 @@ getlock(void)
      * prompt_result == 0 should just exit.
      */
     Sprintf(oops, "You chose to %s.",
-                (prompt_result == -1)
-                    ? "destroy the old game and start a new one"
-                    : (prompt_result == 1)
-                        ? "recover the old game"
-                        : "not start a new game");
+            (prompt_result == -1) ? "destroy the old game and start a new one"
+            : (prompt_result == 1) ? "recover the old game"
+                                   : "not start a new game");
 #ifdef WIN32CON
     if (istty)
         clear_screen();
 #endif
     raw_printf("%s", oops);
-    if (prompt_result == 1) {          /* recover */
+    if (prompt_result == 1) { /* recover */
         if (recover_savefile()) {
 #if 0
             if (istty)
@@ -1289,7 +1281,7 @@ getlock(void)
 #endif
             raw_print("Couldn't recover the old game.");
         }
-    } else if (prompt_result < 0) {    /* destroy old game */
+    } else if (prompt_result < 0) { /* destroy old game */
         if (eraseoldlocks()) {
 #ifdef WIN32CON
             if (istty)
@@ -1321,9 +1313,9 @@ gotlock:
 #if defined(CHDIR) && !defined(NOCWD_ASSUMPTIONS)
         chdirx(orgdir, 0);
 #endif
-        Sprintf(oops, "cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n", fq_lock,
-              strerror(ern), " Are you sure that the directory",
-              gf.fqn_prefix[LEVELPREFIX]);
+        Sprintf(oops, "cannot creat file (%s.)\n%s\n%s\"%s\" exists?\n",
+                fq_lock, strerror(ern), " Are you sure that the directory",
+                gf.fqn_prefix[LEVELPREFIX]);
         raw_print(oops);
     } else {
         if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
@@ -1345,7 +1337,7 @@ gotlock:
 #endif /* PC_LOCKING */
 
 boolean
-file_exists(const char* path)
+file_exists(const char *path)
 {
     struct stat sb;
 
@@ -1364,7 +1356,7 @@ RESTORE_WARNING_UNREACHABLE_CODE
   does not exist, it returns TRUE.
  */
 boolean
-file_newer(const char* a_path, const char* b_path)
+file_newer(const char *a_path, const char *b_path)
 {
     struct stat a_sb;
     struct stat b_sb;
@@ -1377,7 +1369,7 @@ file_newer(const char* a_path, const char* b_path)
         return TRUE;
     timediff = difftime(a_sb.st_mtime, b_sb.st_mtime);
 
-    if(timediff > 0)
+    if (timediff > 0)
         return TRUE;
     return FALSE;
 }
@@ -1393,7 +1385,7 @@ tty_self_recover_prompt(void)
 {
     register int c, ci, ct, pl, retval = 0;
     /* for saving/replacing functions, if needed */
-    struct window_procs saved_procs = {0};
+    struct window_procs saved_procs = { 0 };
 
     pl = 1;
     c = 'n';
@@ -1410,7 +1402,7 @@ tty_self_recover_prompt(void)
     raw_print("There are files from a game in progress under your name. ");
     raw_print("Recover? [yn] ");
 
- tty_ask_again:
+tty_ask_again:
 
     while ((ci = nhgetch()) && !(ci == '\n' || ci == 13)) {
         if (ct > 0) {
@@ -1430,7 +1422,8 @@ tty_self_recover_prompt(void)
 
     if (pl == 1 && (c == 'n' || c == 'N')) {
         /* no to recover */
-        raw_print("\n\nAre you sure you wish to destroy the old game rather than try to\n");
+        raw_print("\n\nAre you sure you wish to destroy the old game rather "
+                  "than try to\n");
         raw_print("recover it? [yn] ");
         c = 'n';
         ct = 0;
@@ -1444,9 +1437,9 @@ tty_self_recover_prompt(void)
     } else {
         /* only yes answers get here */
         if (pl == 2)
-            retval = -1;  /* yes, do destroy the old game anyway */
+            retval = -1; /* yes, do destroy the old game anyway */
         else
-            retval = 1;   /* yes, do recover the old game */
+            retval = 1; /* yes, do recover the old game */
     }
     if (saved_procs.name[0]) {
         windowprocs = saved_procs;
@@ -1460,23 +1453,22 @@ int
 other_self_recover_prompt(void)
 {
     register int c, ci, ct, pl, retval = 0;
-    boolean ismswin = WINDOWPORT(mswin),
-            iscurses = WINDOWPORT(curses);
+    boolean ismswin = WINDOWPORT(mswin), iscurses = WINDOWPORT(curses);
 
     pl = 1;
     c = 'n';
     ct = 0;
     if (iflags.window_inited || WINDOWPORT(curses)) {
         c = y_n("There are files from a game in progress under your name. "
-               "Recover?");
+                "Recover?");
     } else {
         c = 'n';
         ct = 0;
         raw_print("There are files from a game in progress under your name. "
-              "Recover? [yn]");
+                  "Recover? [yn]");
     }
 
- other_ask_again:
+other_ask_again:
 
     if (!ismswin && !iscurses) {
         while ((ci = nhgetch()) && !(ci == '\n' || ci == 13)) {
@@ -1494,8 +1486,9 @@ other_self_recover_prompt(void)
     }
     if (pl == 1 && (c == 'n' || c == 'N')) {
         /* no to recover */
-        c = y_n("Are you sure you wish to destroy the old game, rather than try to "
-                  "recover it? [yn] ");
+        c = y_n("Are you sure you wish to destroy the old game, rather than "
+                "try to "
+                "recover it? [yn] ");
         pl = 2;
         if (!ismswin && !iscurses) {
             c = 'n';
@@ -1509,9 +1502,9 @@ other_self_recover_prompt(void)
     } else {
         /* only yes answers get here */
         if (pl == 2)
-            retval = -1;  /* yes, do destroy the old game anyway */
+            retval = -1; /* yes, do destroy the old game anyway */
         else
-            retval = 1;   /* yes, do recover the old game */
+            retval = 1; /* yes, do recover the old game */
     }
     return retval;
 }
