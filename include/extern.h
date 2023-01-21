@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1670662098 2022/12/10 08:48:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1204 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1674294830 2023/01/21 09:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1223 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1449,7 +1449,7 @@ extern struct obj *mkobj(int, boolean) NONNULL;
 extern int rndmonnum_adj(int, int);
 extern int rndmonnum(void);
 extern boolean bogon_is_pname(char);
-extern struct obj *splitobj(struct obj *, long);
+extern struct obj *splitobj(struct obj *, long) NONNULL;
 extern unsigned next_ident(void);
 extern struct obj *unsplitobj(struct obj *);
 extern void clear_splitobjs(void);
