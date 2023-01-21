@@ -47,9 +47,9 @@ static boolean get_valid_jump_position(coordxy, coordxy);
 static boolean get_valid_polearm_position(coordxy, coordxy);
 static boolean find_poleable_mon(coord *, int, int);
 
-static const char Nothing_seems_to_happen[] = "Nothing seems to happen.";
-static const char no_elbow_room[] =
-    "don't have enough elbow-room to maneuver.";
+static const char
+    Nothing_seems_to_happen[] = "Nothing seems to happen.",
+    no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
 static int
 use_camera(struct obj *obj)
@@ -1050,8 +1050,9 @@ use_mirror(struct obj *obj)
     }
     if (Underwater) {
         if (useeit)
-            You(Hallucination ? "give the fish a chance to fix their makeup."
-                              : "reflect the murky water.");
+            You("%s.",
+                Hallucination ? "give the fish a chance to fix their makeup"
+                              : "reflect the murky water");
         return ECMD_TIME;
     }
     if (u.dz) {
@@ -1190,8 +1191,8 @@ use_bell(struct obj **optr)
             && !(gm.mvitals[PM_WOOD_NYMPH].mvflags & G_GONE)
             && !(gm.mvitals[PM_WATER_NYMPH].mvflags & G_GONE)
             && !(gm.mvitals[PM_MOUNTAIN_NYMPH].mvflags & G_GONE)
-            && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy, NO_MINVENT|MM_NOMSG))
-                   != 0) {
+            && (mtmp = makemon(mkclass(S_NYMPH, 0), u.ux, u.uy,
+                               NO_MINVENT | MM_NOMSG)) != 0) {
             You("summon %s!", a_monnam(mtmp));
             if (!obj_resists(obj, 93, 100)) {
                 pline("%s shattered!", Tobjnam(obj, "have"));
@@ -1598,8 +1599,9 @@ use_lamp(struct obj *obj)
         return;
     }
     if (Underwater) {
-        pline(!Is_candle(obj) ? "This is not a diving lamp."
-                              : "Sorry, fire and water don't mix.");
+        pline("%s.",
+              !Is_candle(obj) ? "This is not a diving lamp"
+                              : "Sorry, fire and water don't mix");
         return;
     }
     /* magic lamps with an spe == 0 (wished for) cannot be lit */
