@@ -1193,6 +1193,7 @@ pleased(aligntyp g_align)
                     u.uevent.uheard_tune++;
                     break;
                 } else if (u.uevent.uheard_tune < 2) {
+                    Soundeffect(se_divine_music, 50);
                     You_hear("a divine music...");
                     pline("It sounds like:  \"%s\".", gt.tune);
                     u.uevent.uheard_tune++;
@@ -1720,6 +1721,7 @@ dosacrifice(void)
             offer_too_soon(altaralign);
             return ECMD_TIME;
         }
+        Soundeffect(se_thunderclap, 100);
         You_hear("a nearby thunderclap.");
         if (!otmp->known) {
             You("realize you have made a %s.",

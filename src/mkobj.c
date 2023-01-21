@@ -3497,6 +3497,7 @@ pudding_merge_message(struct obj *otmp, struct obj *otmp2)
                   inpack ? " inside your pack" : "");
         }
     } else {
+        Soundeffect(se_faint_sloshing, 25);
         You_hear("a faint sloshing sound.");
     }
 }

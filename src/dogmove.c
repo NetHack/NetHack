@@ -22,7 +22,6 @@ static long score_targ(struct monst *, struct monst *);
 static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy,
                                   coordxy);
 static boolean could_reach_item(struct monst *, coordxy, coordxy);
-static void quickmimic(struct monst *);
 
 /* pick a carried item for pet to drop */
 struct obj *
@@ -220,8 +219,7 @@ dog_eat(struct monst *mtmp,
         boolean devour)
 {
     register struct edog *edog = EDOG(mtmp);
-    boolean poly, grow, heal, eyes, slimer, deadmimic;
-    int nutrit, res, corpsenm;
+    int nutrit, res;
     long oprice;
     char objnambuf[BUFSZ], *obj_name;
 
@@ -229,16 +227,6 @@ dog_eat(struct monst *mtmp,
     if (edog->hungrytime < gm.moves)
         edog->hungrytime = gm.moves;
     nutrit = dog_nutrition(mtmp, obj);
-
-    deadmimic = (obj->otyp == CORPSE && (obj->corpsenm == PM_SMALL_MIMIC
-                                         || obj->corpsenm == PM_LARGE_MIMIC
-                                         || obj->corpsenm == PM_GIANT_MIMIC));
-    slimer = (obj->otyp == GLOB_OF_GREEN_SLIME);
-    poly = polyfodder(obj);
-    grow = mlevelgain(obj);
-    heal = mhealup(obj);
-    eyes = (obj->otyp == CARROT);
-    corpsenm = (obj->otyp == CORPSE ? obj->corpsenm : NON_PM);
 
     if (devour) {
         if (mtmp->meating > 1)
@@ -306,14 +294,6 @@ dog_eat(struct monst *mtmp,
         Strcpy(objnambuf, xname(obj));
         iflags.suppress_price--;
     }
-    /* some monsters that eat items could eat a container with contents */
-    if (Has_contents(obj))
-        meatbox(mtmp, obj);
-    /* It's a reward if it's DOGFOOD and the player dropped/threw it.
-       We know the player had it if invlet is set. -dlc */
-    if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)
-        edog->apport += (int) (200L / ((long) edog->dropdist + gm.moves
-                                       - edog->droptime));
     if (mtmp->data == &mons[PM_RUST_MONSTER] && obj->oerodeproof) {
         /* The object's rustproofing is gone now */
         if (obj->unpaid)
@@ -326,54 +306,24 @@ dog_eat(struct monst *mtmp,
                 pline("%s spits %s out in disgust!",
                       Monnam(mtmp), obj_name);
         }
-    } else if (obj == uball) {
-        unpunish();
-        delobj(obj); /* we assume this can't be unpaid */
-    } else if (obj == uchain) {
-        unpunish();
     } else {
+        /* It's a reward if it's DOGFOOD and the player dropped/threw it.
+           We know the player had it if invlet is set. -dlc */
+        if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)
+            edog->apport += (int) (200L / ((long) edog->dropdist + gm.moves
+                                           - edog->droptime));
+        m_consume_obj(mtmp, obj);
         if (obj->unpaid) {
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
             oprice = unpaid_cost(obj, TRUE);
             pline("That %s will cost you %ld %s.", objnambuf, oprice,
                   currency(oprice));
-            /* delobj->obfree will handle actual shop billing update */
+            /* m_consume_obj->delobj->obfree will handle actual shop billing update */
         }
-        delobj(obj);
     }
 
-#if 0 /* pet is eating, so slime recovery is not feasible... */
-    /* turning into slime might be cureable */
-    if (slimer && munslime(mtmp, FALSE)) {
-        /* but the cure (fire directed at self) might be fatal */
-        if (DEADMONSTER(mtmp))
-            return 2;
-        slimer = FALSE; /* sliming is avoided, skip polymorph */
-    }
-#endif
-
-    if (poly || slimer) {
-        struct permonst *ptr = slimer ? &mons[PM_GREEN_SLIME] : 0;
-
-        (void) newcham(mtmp, ptr,
-                       cansee(mtmp->mx, mtmp->my) ? NC_SHOW_MSG : 0);
-    }
-
-    /* limit "instant" growth to prevent potential abuse */
-    if (grow && (int) mtmp->m_lev < (int) mtmp->data->mlevel + 15) {
-        if (!grow_up(mtmp, (struct monst *) 0))
-            return 2;
-    }
-    if (heal)
-        mtmp->mhp = mtmp->mhpmax;
-    if ((eyes || heal) && !mtmp->mcansee)
-        mcureblindness(mtmp, canseemon(mtmp));
-    if (deadmimic)
-        quickmimic(mtmp);
-    if (corpsenm != NON_PM)
-        mon_givit(mtmp, &mons[corpsenm]);
-    return 1;
+    return (DEADMONSTER(mtmp)) ? 2 : 1;
 }
 
 static void
@@ -1427,7 +1377,7 @@ finish_meating(struct monst *mtmp)
     }
 }
 
-static void
+void
 quickmimic(struct monst *mtmp)
 {
     int idx = 0, trycnt = 5, spotted, seeloc;

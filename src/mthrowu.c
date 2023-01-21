@@ -377,6 +377,7 @@ ohitmon(
         if (ismimic)
             seemimic(mtmp);
         mtmp->msleeping = 0;
+        Soundeffect(se_splat_egg, 35);
         if (vis) {
             if (otmp->otyp == EGG) {
                 pline("Splat!  %s is hit with %s egg!", Monnam(mtmp),
@@ -830,6 +831,7 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 pline("A dry rattle comes from %s throat.",
                       s_suffix(mon_nam(mtmp)));
             } else {
+                Soundeffect(se_dry_throat_rattle, 50);
                 You_hear("a dry rattle nearby.");
             }
         }
@@ -902,10 +904,12 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
     if (m_lined_up(mtarg, mtmp)) {
         if (mtmp->mcan) {
             if (!Deaf) {
-                if (canseemon(mtmp))
+                if (canseemon(mtmp)) {
                     pline("%s coughs.", Monnam(mtmp));
-                else
+                } else {
+                    Soundeffect(se_cough, 100);
                     You_hear("a cough.");
+                }
             }
             return MM_MISS;
         }
@@ -1217,11 +1221,13 @@ hit_bars(
         *objp = 0; /* object is now gone */
         /* breakage makes its own noises */
         if (obj_type == POT_ACID) {
-            if (cansee(barsx, barsy) && !nodissolve)
+            if (cansee(barsx, barsy) && !nodissolve) {
                 pline_The("iron bars are dissolved!");
-            else
+            } else {
+                Soundeffect(se_angry_snakes, 100);
                 You_hear(Hallucination ? "angry snakes!"
                                        : "a hissing noise.");
+            }
             if (!nodissolve)
                 dissolve_bars(barsx, barsy);
         }

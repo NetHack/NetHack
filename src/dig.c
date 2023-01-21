@@ -92,11 +92,13 @@ mkcavearea(boolean rockit)
     register coordxy i;
     register boolean waslit = rm_waslit();
 
-    if (rockit)
+    if (rockit) {
+        Soundeffect(se_crashing_rock, 100);
         pline("Crash!  The ceiling collapses around you!");
-    else
+    } else {
         pline("A mysterious force %s cave around you!",
               (levl[u.ux][u.uy].typ == CORR) ? "creates a" : "extends the");
+    }
     display_nhwindow(WIN_MESSAGE, TRUE);
 
     for (dist = 1; dist <= 2; dist++) {
@@ -831,6 +833,7 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              * digging makes a hole, but the boulder immediately
              * fills it.  Final outcome:  no hole, no boulder.
              */
+            Soundeffect(se_kadoom_boulder_falls_in, 60);
             pline("KADOOM!  The boulder falls in!");
             wake_nearby();
             (void) delfloortrap(ttmp);
@@ -1066,6 +1069,7 @@ use_pick_axe2(struct obj *obj)
         rx = u.ux + u.dx;
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {
+            Soundeffect(se_clash, 40);
             pline("Clash!");
             return ECMD_TIME;
         }
@@ -1314,8 +1318,10 @@ mdig_tunnel(struct monst *mtmp)
 
     if (IS_WALL(here->typ)) {
         /* KMH -- Okay on arboreal levels (room walls are still stone) */
-        if (Verbose(0, mdig_tunnel2) && !rn2(5))
+        if (Verbose(0, mdig_tunnel2) && !rn2(5)) {
+            Soundeffect(se_crashing_rock, 75);
             You_hear("crashing rock.");
+        }
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
         if (gl.level.flags.is_maze_lev) {

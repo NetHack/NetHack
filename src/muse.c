@@ -132,6 +132,7 @@ precheck(struct monst *mon, struct obj *obj)
             int range = couldsee(mon->mx, mon->my) /* 9 or 5 */
                            ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
+            Soundeffect(se_zap_then_explosion, 100);
             You_hear("a zap and an explosion %s.",
                      (mdistu(mon) <= range * range)
                         ? "nearby" : "in the distance");
@@ -164,6 +165,7 @@ mzapwand(
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
+        Soundeffect(se_zap, 100);
         You_hear("a %s zap.", (mdistu(mtmp) <= range * range)
                                  ? "nearby" : "distant");
         unknow_object(otmp); /* hero loses info when unseen obj is used */
@@ -191,6 +193,7 @@ mplayhorn(
         int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                        ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
+        Soundeffect(se_horn_being_played, 50);
         You_hear("a horn being played %s.",
                  (mdistu(mtmp) <= range * range)
                     ? "nearby" : "in the distance");
@@ -266,6 +269,7 @@ mquaffmsg(struct monst *mtmp, struct obj *otmp)
         otmp->dknown = 1;
         pline("%s drinks %s!", Monnam(mtmp), singular(otmp, doname));
     } else if (!Deaf) {
+        Soundeffect(se_mon_chugging_potion, 25);
         You_hear("a chugging sound.");
     }
 }
@@ -706,10 +710,12 @@ use_defensive(struct monst* mtmp)
             impossible("No need for unicorn horn?");
         return 2;
     case MUSE_BUGLE:
-        if (vismon)
+        if (vismon) {
             pline("%s plays %s!", Monnam(mtmp), doname(otmp));
-        else if (!Deaf)
+        } else if (!Deaf) {
+            Soundeffect(se_bugle_playing_reveille, 100);
             You_hear("a bugle playing reveille!");
+        }
         awaken_soldiers(mtmp);
         return 2;
     case MUSE_WAN_TELEPORTATION_SELF:
@@ -822,9 +828,11 @@ use_defensive(struct monst* mtmp)
                   surface(mtmp->mx, mtmp->my));
             pline("%s %s through...", Monnam(mtmp),
                   is_flyer(mtmp->data) ? "dives" : "falls");
-        } else if (!Deaf)
+        } else if (!Deaf) {
+            Soundeffect(se_crash_through_floor, 100);
             You_hear("%s crash through the %s.", something,
                      surface(mtmp->mx, mtmp->my));
+        }
         /* we made sure that there is a level for mtmp to go to */
         migrate_to_level(mtmp, ledger_no(&u.uz) + 1, MIGR_RANDOM,
                          (coord *) 0);
@@ -1446,6 +1454,7 @@ mbhitm(register struct monst* mtmp, register struct obj* otmp)
         if (hits_you) {
             if (Antimagic) {
                 shieldeff(u.ux, u.uy);
+                Soundeffect(se_boing, 40);
                 pline("Boing!");
             } else if (rnd(20) < 10 + u.uac) {
                 pline_The("wand hits you!");
@@ -1459,6 +1468,7 @@ mbhitm(register struct monst* mtmp, register struct obj* otmp)
             nomul(0);
         } else if (resists_magm(mtmp)) {
             shieldeff(mtmp->mx, mtmp->my);
+            Soundeffect(se_boing, 40);
             pline("Boing!");
         } else if (rnd(20) < 10 + find_mac(mtmp)) {
             tmp = d(2, 12);

@@ -390,6 +390,7 @@ call_kops(struct monst *shkp, boolean nearshop)
     if (!shkp)
         return;
 
+    Soundeffect(se_alarm, 80);
     if (!Deaf)
         pline("An alarm sounds!");
 
@@ -695,12 +696,14 @@ u_entered_shop(char* enterstring)
             pline_The("atmosphere at %s %s seems unwelcoming.",
                       s_suffix(shkname(shkp)), shtypes[rt - SHOPBASE].name);
     } else if (eshkp->robbed) {
-        if (!Deaf)
+        if (!Deaf) {
+            Soundeffect(se_mutter_imprecations, 50);
             pline("%s mutters imprecations against shoplifters.",
                   Shknam(shkp));
-        else
+        } else {
             pline("%s is combing through %s inventory list.",
                   Shknam(shkp), noit_mhis(shkp));
+        }
     } else {
         if (!Deaf && !muteshk(shkp))
             verbalize("%s, %s!  Welcome%s to %s %s!", Hello(shkp), gp.plname,
@@ -3784,11 +3787,13 @@ shk_fixes_damage(struct monst *shkp)
 
     shk_closeby = (mdistu(shkp) <= (BOLT_LIM / 2) * (BOLT_LIM / 2));
 
-    if (canseemon(shkp))
+    if (canseemon(shkp)) {
         pline("%s whispers %s.", Shknam(shkp),
               shk_closeby ? "an incantation" : "something");
-    else if (!Deaf && shk_closeby)
+    } else if (!Deaf && shk_closeby) {
+        Soundeffect(se_mutter_incantation, 100);
         You_hear("someone muttering an incantation.");
+    }
 
     (void) repair_damage(shkp, dam, FALSE);
 
@@ -4442,6 +4447,7 @@ pay_for_damage(const char* dmgstr, boolean cant_mollify)
         if (MON_AT(x, y)) {
             if (!animal) {
                 if (!Deaf && !muteshk(shkp)) {
+                    Soundeffect(se_angry_voice, 75);
                     You_hear("an angry voice:");
                     verbalize("Out of my way, scum!");
                 }

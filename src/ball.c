@@ -902,6 +902,7 @@ drop_ball(coordxy x, coordxy y)
                 break;
             case TT_WEB:
                 pline(pullmsg, "web");
+                Soundeffect(se_destroy_web, 30);
                 pline_The("web is destroyed!");
                 deltrap(t_at(u.ux, u.uy));
                 break;
@@ -1015,6 +1016,7 @@ drag_down(void)
         }
     } else {
         if (rn2(2)) {
+            Soundeffect(se_iron_ball_hits_you, 25);
             pline_The("iron ball smacks into you!");
             losehp(Maybe_Half_Phys(rnd(20)), "iron ball collision",
                    KILLED_BY_AN);

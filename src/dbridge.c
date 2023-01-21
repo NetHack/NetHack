@@ -585,11 +585,13 @@ do_entity(struct entity *etmp)
                 relocates = TRUE;
                 debugpline0("Jump succeeds!");
             } else {
-                if (e_inview)
+                if (e_inview) {
                     pline("%s crushed by the falling portcullis!",
                           E_phrase(etmp, "are"));
-                else if (!Deaf)
+                } else if (!Deaf) {
+                    Soundeffect(se_crushing_sound, 100);
                     You_hear("a crushing sound.");
+                }
                 e_died(etmp,
                        XKILL_NOCORPSE | (e_inview ? XKILL_GIVEMSG
                                                   : XKILL_NOMSG),
@@ -693,8 +695,10 @@ do_entity(struct entity *etmp)
     } else {
         debugpline1("%s on drawbridge square", E_phrase(etmp, "are"));
         if (is_pool(etmp->ex, etmp->ey) && !e_inview)
-            if (!Deaf)
+            if (!Deaf) {
+                Soundeffect(se_splash, 100);
                 You_hear("a splash.");
+            }
         if (e_survives_at(etmp, etmp->ex, etmp->ey)) {
             if (e_inview && !is_flyer(etmp->edata)
                 && !is_floater(etmp->edata))
@@ -745,14 +749,16 @@ close_drawbridge(coordxy x, coordxy y)
     x2 = x;
     y2 = y;
     get_wall_for_db(&x2, &y2);
-    if (cansee(x, y) || cansee(x2, y2))
+    if (cansee(x, y) || cansee(x2, y2)) {
         You_see("a drawbridge %s up!",
                 (((u.ux == x || u.uy == y) && !Underwater)
                  || distu(x2, y2) < distu(x, y))
                     ? "coming"
                     : "going");
-    else /* "5 gears turn" for castle drawbridge tune */
+    } else { /* "5 gears turn" for castle drawbridge tune */
+        Soundeffect(se_chains_rattling_gears_turning, 75);
         You_hear("chains rattling and gears turning.");
+    }
     lev1->typ = DRAWBRIDGE_UP;
     lev2 = &levl[x2][y2];
     lev2->typ = DBWALL;
@@ -772,8 +778,10 @@ close_drawbridge(coordxy x, coordxy y)
     do_entity(&(go.occupants[0]));          /* Do set_entity after first */
     set_entity(x2, y2, &(go.occupants[1])); /* do_entity for worm tail */
     do_entity(&(go.occupants[1]));
-    if (OBJ_AT(x, y) && !Deaf)
+    if (OBJ_AT(x, y) && !Deaf) {
+        Soundeffect(se_smashing_and_crushing, 75);
         You_hear("smashing and crushing.");
+    }
     (void) revive_nasty(x, y, (char *) 0);
     (void) revive_nasty(x2, y2, (char *) 0);
     delallobj(x, y);
@@ -806,11 +814,13 @@ open_drawbridge(coordxy x, coordxy y)
     x2 = x;
     y2 = y;
     get_wall_for_db(&x2, &y2);
-    if (cansee(x, y) || cansee(x2, y2))
+    if (cansee(x, y) || cansee(x2, y2)) {
         You_see("a drawbridge %s down!",
                 (distu(x2, y2) < distu(x, y)) ? "going" : "coming");
-    else /* "5 gears turn" for castle drawbridge tune */
+    } else { /* "5 gears turn" for castle drawbridge tune */
+        Soundeffect(se_gears_turning_chains_rattling, 100);
         You_hear("gears turning and chains rattling.");
+    }
     lev1->typ = DRAWBRIDGE_DOWN;
     lev2 = &levl[x2][y2];
     lev2->typ = DOOR;
@@ -863,17 +873,21 @@ destroy_drawbridge(coordxy x, coordxy y)
         boolean lava = (lev1->drawbridgemask & DB_UNDER) == DB_LAVA;
 
         if (lev1->typ == DRAWBRIDGE_UP) {
-            if (cansee(x2, y2))
+            if (cansee(x2, y2)) {
                 pline_The("portcullis of the drawbridge falls into the %s!",
                           lava ? hliquid("lava") : "moat");
-            else if (!Deaf)
+            } else if (!Deaf) {
+                Soundeffect(se_loud_splash, 100);
                 You_hear("a loud *SPLASH*!");
+            }
         } else {
-            if (cansee(x, y))
+            if (cansee(x, y)) {
                 pline_The("drawbridge collapses into the %s!",
                           lava ? hliquid("lava") : "moat");
-            else if (!Deaf)
+            } else if (!Deaf) {
+                Soundeffect(se_loud_splash, 100);
                 You_hear("a loud *SPLASH*!");
+            }
         }
         lev1->typ = lava ? LAVAPOOL : MOAT;
         lev1->drawbridgemask = 0;
@@ -882,10 +896,12 @@ destroy_drawbridge(coordxy x, coordxy y)
             (void) flooreffects(otmp2, x, y, "fall");
         }
     } else {
-        if (cansee(x, y))
+        if (cansee(x, y)) {
             pline_The("drawbridge disintegrates!");
-        else
+        } else {
+            Soundeffect(se_lound_crash, 100);
             You_hear("a loud *CRASH*!");
+        }
         lev1->typ = ((lev1->drawbridgemask & DB_ICE) ? ICE : ROOM);
         lev1->icedpool = ((lev1->drawbridgemask & DB_ICE) ? ICED_MOAT : 0);
     }
@@ -949,6 +965,7 @@ destroy_drawbridge(coordxy x, coordxy y)
                           E_phrase(etmp1, "are"));
             } else {
                 if (!Deaf && !is_u(etmp1) && !is_pool(x, y)) {
+                    Soundeffect(se_crushing_sound, 75);
                     You_hear("a crushing sound.");
                 } else {
                     debugpline1("%s from shrapnel", E_phrase(etmp1, "die"));

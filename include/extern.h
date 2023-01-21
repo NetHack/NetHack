@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1670662098 2022/12/10 08:48:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1204 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1674294830 2023/01/21 09:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1223 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -621,6 +621,7 @@ extern int dog_nutrition(struct monst *, struct obj *);
 extern int dog_eat(struct monst *, struct obj *, coordxy, coordxy, boolean);
 extern int dog_move(struct monst *, int);
 extern void finish_meating(struct monst *);
+extern void quickmimic(struct monst *);
 
 /* ### dokick.c ### */
 
@@ -1448,7 +1449,7 @@ extern struct obj *mkobj(int, boolean) NONNULL;
 extern int rndmonnum_adj(int, int);
 extern int rndmonnum(void);
 extern boolean bogon_is_pname(char);
-extern struct obj *splitobj(struct obj *, long);
+extern struct obj *splitobj(struct obj *, long) NONNULL;
 extern unsigned next_ident(void);
 extern struct obj *unsplitobj(struct obj *);
 extern void clear_splitobjs(void);
@@ -1542,6 +1543,7 @@ extern int minliquid(struct monst *);
 extern boolean movemon_singlemon(struct monst *);
 extern int movemon(void);
 extern void meatbox(struct monst *, struct obj *);
+extern void m_consume_obj(struct monst *, struct obj *);
 extern int meatmetal(struct monst *);
 extern int meatobj(struct monst *);
 extern int meatcorpse(struct monst *);

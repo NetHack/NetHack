@@ -246,6 +246,7 @@ castmu(
 
     nomul(0);
     if (rn2(ml * 10) < (mtmp->mconf ? 100 : 20)) { /* fumbled attack */
+        Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf)
             pline_The("air crackles around %s.", mon_nam(mtmp));
         return MM_MISS;
@@ -578,6 +579,7 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
     case CLC_LIGHTNING: {
         boolean reflects;
 
+        Soundeffect(se_bolt_of_lightning, 80);
         pline("A bolt of lightning strikes down at you from above!");
         reflects = ureflects("It bounces off your %s%s.", "");
         if (reflects || Shock_resistance) {
@@ -650,11 +652,13 @@ cast_cleric_spell(struct monst *mtmp, int dmg, int spellnum)
                 /* unseen caster summoned seen critter(s) */
                 arg = (newseen == oldseen + 1) ? an(makesingular(what))
                                                : whatbuf;
-                if (!Deaf)
+                if (!Deaf) {
+                    Soundeffect(se_someone_summoning, 100);
                     You_hear("someone summoning something, and %s %s.", arg,
                              vtense(arg, "appear"));
-                else
+                } else {
                     pline("%s %s.", upstart(arg), vtense(arg, "appear"));
+                }
             }
 
         /* seen caster, possibly producing unseen--or just one--critters;

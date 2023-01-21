@@ -252,11 +252,13 @@ do_earthquake(int force)
                     mtmp->mundetected = 0;
                     newsym(x, y);
                     if (ceiling_hider(mtmp->data)) {
-                        if (cansee(x, y))
+                        if (cansee(x, y)) {
                             pline("%s is shaken loose from the ceiling!",
                                   Amonnam(mtmp));
-                        else if (!is_flyer(mtmp->data))
+                        } else if (!is_flyer(mtmp->data)) {
+                            Soundeffect(se_thump, 50);
                             You_hear("a thump.");
+                        }
                     }
                 }
                 if (M_AP_TYPE(mtmp) != M_AP_NOTHING
@@ -365,10 +367,12 @@ do_earthquake(int force)
 
                         mtmp->mtrapped = 1;
                         if (!m_already_trapped) { /* suppress messages */
-                            if (cansee(x, y))
+                            if (cansee(x, y)) {
                                 pline("%s falls into a chasm!", Monnam(mtmp));
-                            else if (humanoid(mtmp->data))
+                            } else if (humanoid(mtmp->data)) {
+                                Soundeffect(se_scream, 50);
                                 You_hear("a scream!");
+                            }
                         }
                         /* Falling is okay for falling down
                            within a pit from jostling too */
@@ -795,13 +799,17 @@ do_play_instrument(struct obj* instr)
                             }
                         }
                     if (tumblers) {
-                        if (gears)
+                        if (gears) {
+                            Soundeffect(se_tumbler_click, 50);
+                            Soundeffect(se_gear_turn, 50);
                             You_hear("%d tumbler%s click and %d gear%s turn.",
                                      tumblers, plur(tumblers), gears,
                                      plur(gears));
-                        else
+                        } else {
+                            Soundeffect(se_tumbler_click, 50);
                             You_hear("%d tumbler%s click.", tumblers,
                                      plur(tumblers));
+                        }
                     } else if (gears) {
                         You_hear("%d gear%s turn.", gears, plur(gears));
                         /* could only get `gears == 5' by playing five

@@ -1023,6 +1023,7 @@ trapeffect_arrow_trap(
 
     if (mtmp == &gy.youmonst) {
         if (trap->once && trap->tseen && !rn2(15)) {
+            Soundeffect(se_loud_click, 100);
             You_hear("a loud click!");
             deltrap(trap);
             newsym(u.ux, u.uy);
@@ -1082,6 +1083,7 @@ trapeffect_dart_trap(
         int oldumort = u.umortality;
 
         if (trap->once && trap->tseen && !rn2(15)) {
+            Soundeffect(se_soft_click, 30);
             You_hear("a soft click.");
             deltrap(trap);
             newsym(u.ux, u.uy);
@@ -1223,6 +1225,12 @@ trapeffect_sqky_board(
     struct trap *trap,
     unsigned trflags)
 {
+    enum sound_effect_entries tsnds[] = {
+        se_squeak_C, se_squeak_D_flat, se_squeak_D,
+        se_squeak_E_flat, se_squeak_E, se_squeak_F,
+        se_squeak_F_sharp, se_squeak_G, se_squeak_G_sharp,
+        se_squeak_A, se_squeak_B_flat, se_squeak_B,
+    };
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
 
@@ -1237,6 +1245,9 @@ trapeffect_sqky_board(
             }
         } else {
             seetrap(trap);
+            if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+                Soundeffect(tsnds[trap->tnote], 50);
+            }
             pline("A board beneath you %s%s%s.",
                   Deaf ? "vibrates" : "squeaks ",
                   Deaf ? "" : trapnote(trap, FALSE),
@@ -1251,6 +1262,9 @@ trapeffect_sqky_board(
         /* stepped on a squeaky board */
         if (in_sight) {
             if (!Deaf) {
+                if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+                    Soundeffect(tsnds[trap->tnote], 50);
+                }
                 pline("A board beneath %s squeaks %s loudly.",
                       mon_nam(mtmp), trapnote(trap, FALSE));
                 seetrap(trap);
@@ -1263,6 +1277,11 @@ trapeffect_sqky_board(
             int range = couldsee(mtmp->mx, mtmp->my) /* 9 or 5 */
                 ? (BOLT_LIM + 1) : (BOLT_LIM - 3);
 
+            if (trap->tnote >= 0 && trap->tnote < SIZE(tsnds)) {
+                Soundeffect(tsnds[trap->tnote],
+                             ((mdistu(mtmp) <= range * range)
+                                ? 40 : 20));
+            }
             You_hear("%s squeak %s.", trapnote(trap, FALSE),
                      (mdistu(mtmp) <= range * range)
                         ? "nearby" : "in the distance");
@@ -1328,8 +1347,10 @@ trapeffect_bear_trap(
                 seetrap(trap);
             } else {
                 if (mptr == &mons[PM_OWLBEAR]
-                    || mptr == &mons[PM_BUGBEAR])
+                    || mptr == &mons[PM_BUGBEAR]) {
+                    Soundeffect(se_roar, 100);
                     You_hear("the roaring of an angry bear!");
+                }
             }
         } else if (forcetrap) {
             if (in_sight) {
@@ -1988,6 +2009,7 @@ trapeffect_web(
         case PM_OWLBEAR: /* Eric Backus */
         case PM_BUGBEAR:
             if (!in_sight) {
+                Soundeffect(se_roar, 60);
                 You_hear("the roaring of a confused bear!");
                 mtmp->mtrapped = 1;
                 break;
@@ -2256,6 +2278,7 @@ trapeffect_landmine(
                   trap->madeby_u ? "the trigger of your mine" : "a trigger");
             if (already_seen && rn2(3))
                 return Trap_Effect_Finished;
+            Soundeffect(se_kaablamm_of_mine, 80);
             pline("KAABLAMM!!!  %s %s%s off!",
                   forcebungle ? "Your inept attempt sets"
                   : "The air currents set",
@@ -2858,12 +2881,13 @@ launch_obj(
             if (cansee(x1, y1)) {
                 You_see("%s start to roll.", an(xname(singleobj)));
             } else if (Hallucination) {
+                Soundeffect(se_someone_bowling, 60);
                 You_hear("someone bowling.");
             } else {
+                Soundeffect(se_rumbling, 60);
                 You_hear("rumbling %s.", (distu(x1, y1) <= 4 * 4) ? "nearby"
                                            : "in the distance");
             }
-
         }
         style &= ~LAUNCH_UNSEEN;
         goto roll;
@@ -3028,6 +3052,7 @@ launch_obj(
                     || IS_ROCK(levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ))
                     bmsg = " as one boulder hits another";
 
+                Soundeffect(se_loud_crash, 80);
                 You_hear("a loud crash%s!",
                          cansee(gb.bhitpos.x, gb.bhitpos.y) ? bmsg : "");
                 obj_extract_self(otmp2);
@@ -3800,6 +3825,7 @@ domagictrap(void)
 
         /* deafness effects */
         if (!Deaf) {
+            Soundeffect(se_deafening_roar_atmospheric, 100);
             You_hear("a deafening roar!");
             incr_itimeout(&HDeaf, rn1(20, 30));
             gc.context.botl = TRUE;
@@ -3820,6 +3846,7 @@ domagictrap(void)
             /* sometimes nothing happens */
             break;
         case 11: /* toggle intrinsic invisibility */
+            Soundeffect(se_low_hum, 100);
             You_hear("a low hum.");
             if (!Invis) {
                 if (!Blind)
@@ -5922,6 +5949,7 @@ b_trapped(const char* item, int bodypart)
     int lvl = level_difficulty(),
         dmg = rnd(5 + (lvl < 5 ? lvl : 2 + lvl / 2));
 
+    Soundeffect(se_kaboom, 80);
     pline("KABOOM!!  %s was booby-trapped!", The(item));
     wake_nearby();
     losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);

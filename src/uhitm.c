@@ -2614,10 +2614,12 @@ mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
             return;
         if (!magr->mcan && !rn2(10)) {
             if (!Deaf) {
-                if (Blind)
+                Soundeffect(se_laughter, 40);
+                if (Blind) {
                     You_hear("laughter.");
-                else
+                } else {
                     pline("%s chuckles.", Monnam(magr));
+                }
             }
             if (u.umonnum == PM_CLAY_GOLEM) {
                 pline("Some writing vanishes from your head!");
@@ -3645,6 +3647,7 @@ mhitm_ad_ston(
                     You_hear("a cough from %s!", mon_nam(magr));
             } else {
                 if (Hallucination && !Blind) {
+                    Soundeffect(se_cockatrice_hiss, 50);
                     You_hear("hissing."); /* You_hear() deals with Deaf */
                     pline("%s appears to be blowing you a kiss...",
                           Monnam(magr));

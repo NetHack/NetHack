@@ -930,7 +930,7 @@ savelife(int how)
           "killed by <something>, while "
        in high scores entry, if any, and in logfile (but not on tombstone) */
     gm.multi_reason = Role_if(PM_TOURIST) ? "being toyed with by Fate"
-                                         : "attempting to cheat Death";
+                                          : "attempting to cheat Death";
 
     if (u.utrap && u.utraptype == TT_LAVA)
         reset_utrap(FALSE);
@@ -992,8 +992,9 @@ get_valuables(struct obj *list) /* inventory or container contents */
  *  as easily use qsort, but we don't care about efficiency here.
  */
 static void
-sort_valuables(struct valuable_data list[],
-               int size) /* max value is less than 20 */
+sort_valuables(
+    struct valuable_data list[],
+    int size) /* max value is less than 20 */
 {
     register int i, j;
     struct valuable_data ltmp;
@@ -1003,12 +1004,11 @@ sort_valuables(struct valuable_data list[],
         if (list[i].count == 0)
             continue;   /* empty slot */
         ltmp = list[i]; /* structure copy */
-        for (j = i; j > 0; --j)
+        for (j = i; j > 0; --j) {
             if (list[j - 1].count >= ltmp.count)
                 break;
-            else {
-                list[j] = list[j - 1];
-            }
+            list[j] = list[j - 1];
+        }
         list[j] = ltmp;
     }
     return;

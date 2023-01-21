@@ -110,6 +110,11 @@ boulder_hits_pool(
                           the(xname(otmp)), fills_up ? "fills" : "falls into",
                           what);
                 } else if (!Deaf) {
+                    if (lava) {
+                        Soundeffect(se_sizzling, 100);
+                    } else {
+                        Soundeffect(se_splash, 100);
+                    }
                     You_hear("a%s splash.", lava ? " sizzling" : "");
                 }
                 wake_nearto(rx, ry, 40);
@@ -224,6 +229,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
         }
         if (*verb) {
             if (Blind && u_at(x, y)) {
+                Soundeffect(se_crashing_boulder, 100);
                 You_hear("a CRASH! beneath you.");
             } else if (!Blind && cansee(x, y)) {
                 pline_The("boulder %s%s.",
@@ -234,6 +240,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
                               : (ttyp == HOLE) ? "plugs a hole"
                                                : "fills a pit");
             } else {
+                Soundeffect(se_boulder_drop, 100);
                 You_hear("a boulder %s.", verb);
             }
         }
@@ -269,11 +276,13 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
     } else if (u_at(x, y) && (t = t_at(x, y)) != 0
                && (uteetering_at_seen_pit(t) || uescaped_shaft(t))) {
         if (is_pit(t->ttyp)) {
-            if (Blind && !Deaf)
+            if (Blind && !Deaf) {
+                Soundeffect(se_item_tumble_downwards, 50);
                 You_hear("%s tumble downwards.", the(xname(obj)));
-            else
+            } else {
                 pline("%s into %s pit.", Tobjnam(obj, "tumble"),
                       the_your[t->madeby_u]);
+            }
         } else if (ship_object(obj, x, y, FALSE)) {
             /* ship_object will print an appropriate "the item falls
              * through the hole" message, so no need to do it here. */
@@ -458,6 +467,7 @@ dosinkring(struct obj *obj)
         pline("Static electricity surrounds the sink.");
         break;
     case RIN_CONFLICT:
+        Soundeffect(se_drain_noises, 50);
         You_hear("loud noises coming from the drain.");
         break;
     case RIN_SUSTAIN_ABILITY: /* KMH */
@@ -569,11 +579,12 @@ dosinkring(struct obj *obj)
             break;
         }
     }
-    if (ideed)
+    if (ideed) {
         trycall(obj);
-    else if (!nosink)
+    } else if (!nosink) {
+        Soundeffect(se_ring_in_drain, 50);
         You_hear("the ring bouncing down the drainpipe.");
-
+    }
     if (!rn2(20) && !nosink) {
         pline_The("sink backs up, leaving %s.", doname(obj));
         obj->in_use = FALSE;
@@ -1741,6 +1752,7 @@ goto_level(
 #ifdef MICRO
             display_nhwindow(WIN_MESSAGE, FALSE);
 #endif
+            Soundeffect(se_groans_and_moans, 25);
             You_hear("groans and moans everywhere.");
         }
 
@@ -1769,6 +1781,7 @@ goto_level(
         /* alarm stops working once Croesus has died */
         if (new || !gm.mvitals[PM_CROESUS].died) {
             You("have penetrated a high security area!");
+            Soundeffect(se_alarm, 100);
             pline("An alarm sounds!");
             for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
                 if (DEADMONSTER(mtmp))
@@ -2066,8 +2079,10 @@ revive_corpse(struct obj *corpse)
                     pline("%s claws itself out of the ground!",
                           canspotmon(mtmp) ? Amonnam(mtmp) : Something);
                     newsym(mtmp->mx, mtmp->my);
-                } else if (mdistu(mtmp) < 5*5)
+                } else if (mdistu(mtmp) < 5*5) {
+                    Soundeffect(se_scratching, 50);
                     You_hear("scratching noises.");
+                }
                 break;
             }
             /*FALLTHRU*/

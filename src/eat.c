@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1654886097 2022/06/10 18:34:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.281 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1674294705 2023/01/21 09:51:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,7 +14,7 @@ static int unfaint(void);
 static const char *food_xname(struct obj *, boolean);
 static void choke(struct obj *);
 static void recalc_wt(void);
-static struct obj *touchfood(struct obj *);
+static struct obj *touchfood(struct obj *) NONNULL;
 static void do_reset_eat(void);
 static void maybe_extend_timed_resist(int);
 static void done_eating(boolean);
@@ -312,7 +312,7 @@ reset_eat(void)
      */
     if (gc.context.victual.eating && !gc.context.victual.doreset) {
         debugpline0("reset_eat...");
-        gc.context.victual.doreset = TRUE;
+        gc.context.victual.doreset = 1;
     }
     return;
 }
@@ -411,14 +411,13 @@ do_reset_eat(void)
     if (gc.context.victual.piece) {
         gc.context.victual.o_id = 0;
         gc.context.victual.piece = touchfood(gc.context.victual.piece);
-        if (gc.context.victual.piece)
-            gc.context.victual.o_id = gc.context.victual.piece->o_id;
+        gc.context.victual.o_id = gc.context.victual.piece->o_id;
         recalc_wt();
     }
     gc.context.victual.fullwarn
         = gc.context.victual.eating
         = gc.context.victual.doreset
-        = FALSE;
+        = 0;
     /* Do not set canchoke to FALSE; if we continue eating the same object
      * we need to know if canchoke was set when they started eating it the
      * previous time.  And if we don't continue eating the same object
@@ -474,7 +473,9 @@ eatfood(void)
 {
     struct obj *food = gc.context.victual.piece;
 
-    if (!food || !(carried(food) || obj_here(food, u.ux, u.uy))) {
+    if (food && !carried(food) && !obj_here(food, u.ux, u.uy))
+        food = 0;
+    if (!food) {
         /* maybe it was stolen? */
         do_reset_eat();
         return 0;
@@ -523,11 +524,12 @@ done_eating(boolean message)
         if (message)
             pline1(gn.nomovemsg);
         gn.nomovemsg = 0;
-    } else if (message)
+    } else if (message) {
         You("finish %s %s.",
-            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL])
-            ? "consuming" : "eating",
+            (gy.youmonst.data == &mons[PM_FIRE_ELEMENTAL]) ? "consuming"
+            : "eating",
             food_xname(piece, TRUE));
+    }
 
     if (piece->otyp == CORPSE || piece->globby)
         cpostfx(piece->corpsenm);
@@ -570,9 +572,11 @@ eating_conducts(struct permonst *pd)
 
 /* handle side-effects of mind flayer's tentacle attack */
 int
-eat_brains(struct monst *magr, struct monst *mdef,
-           boolean visflag,
-           int *dmg_p) /* for dishing out extra damage in lieu of Int loss */
+eat_brains(
+    struct monst *magr,
+    struct monst *mdef,
+    boolean visflag,
+    int *dmg_p) /* for dishing out extra damage in lieu of Int loss */
 {
     struct permonst *pd = mdef->data;
     boolean give_nutrit = FALSE;
@@ -763,7 +767,7 @@ cprefx(register int pm)
             You("turn to stone.");
             done(STONING);
             if (gc.context.victual.piece)
-                gc.context.victual.eating = FALSE;
+                gc.context.victual.eating = 0;
             return; /* lifesaved */
         }
     }
@@ -1922,13 +1926,13 @@ start_eating(struct obj *otmp, boolean already_partly_eaten)
     debugpline1("(original reqtime = %d)", objects[otmp->otyp].oc_delay);
     debugpline1("nmod = %d", gc.context.victual.nmod);
     debugpline1("oeaten = %d", otmp->oeaten);
-    gc.context.victual.fullwarn = gc.context.victual.doreset = FALSE;
-    gc.context.victual.eating = TRUE;
+    gc.context.victual.fullwarn = gc.context.victual.doreset = 0;
+    gc.context.victual.eating = 1;
 
     if (otmp->otyp == CORPSE || otmp->globby) {
         cprefx(gc.context.victual.piece->corpsenm);
         if (!gc.context.victual.piece || !gc.context.victual.eating) {
-            /* rider revived, or died and lifesaved */
+            /* rider revived, or hero died and was lifesaved */
             return;
         }
     }
@@ -2447,12 +2451,14 @@ fpostfx(struct obj *otmp)
             /* Snow White; 'poisoned' applies to [a subset of] weapons,
                not food, so we substitute cursed; fortunately our hero
                won't have to wait for a prince to be rescued/revived */
-            if (Race_if(PM_DWARF) && Hallucination)
+            if (Race_if(PM_DWARF) && Hallucination) {
                 verbalize("Heigh-ho, ho-hum, I think I'll skip work today.");
-            else if (Deaf || !flags.acoustics)
+            } else if (Deaf || !flags.acoustics) {
                 You("fall asleep.");
-            else
+            } else {
+                Soundeffect(se_sinister_laughter, 100);
                 You_hear("sinister laughter as you fall asleep...");
+            }
             fall_asleep(-rn1(11, 20), TRUE);
         }
         break;
@@ -2721,7 +2727,7 @@ doeat(void)
         }
 #endif
         gc.context.victual.nmod = basenutrit;
-        gc.context.victual.eating = TRUE; /* needed for lesshungry() */
+        gc.context.victual.eating = 1; /* needed for lesshungry() */
 
         if (!u.uconduct.food++) {
             ll_conduct++;
@@ -2782,11 +2788,10 @@ doeat(void)
          * they shouldn't be able to choke now.
          */
         if (u.uhs != SATIATED)
-            gc.context.victual.canchoke = FALSE;
+            gc.context.victual.canchoke = 0;
         gc.context.victual.o_id = 0;
         gc.context.victual.piece = touchfood(otmp);
-        if (gc.context.victual.piece)
-            gc.context.victual.o_id = gc.context.victual.piece->o_id;
+        gc.context.victual.o_id = gc.context.victual.piece->o_id;
         /* if there's only one bite left, there sometimes won't be any
            "you finish eating" message when done; use different wording
            for resuming with one bite remaining instead of trying to
@@ -2814,8 +2819,7 @@ doeat(void)
 
     already_partly_eaten = otmp->oeaten ? TRUE : FALSE;
     gc.context.victual.piece = otmp = touchfood(otmp);
-    if (gc.context.victual.piece)
-        gc.context.victual.o_id = gc.context.victual.piece->o_id;
+    gc.context.victual.o_id = gc.context.victual.piece->o_id;
     gc.context.victual.usedtime = 0;
 
     /* Now we need to calculate delay and nutritional info.
@@ -3133,8 +3137,7 @@ lesshungry(int num)
                 choke(gc.context.victual.piece);
                 reset_eat();
             } else
-                choke(go.occupation == opentin ? gc.context.tin.tin
-                                            : (struct obj *) 0);
+                choke((go.occupation == opentin) ? gc.context.tin.tin : 0);
             /* no reset_eat() */
         }
     } else {
@@ -3150,7 +3153,7 @@ lesshungry(int num)
             if (!gc.context.victual.eating) {
                 gm.multi = -2;
             } else {
-                gc.context.victual.fullwarn = TRUE;
+                gc.context.victual.fullwarn = 1;
                 if (gc.context.victual.canchoke
                     && (gc.context.victual.reqtime
                         - gc.context.victual.usedtime) > 1) {
@@ -3287,7 +3290,7 @@ newuhs(boolean incr)
                be fatal (still handled below) by reducing HP if it
                tried to take base strength below minimum of 3 */
             ATEMP(A_STR) = -1; /* temporary loss overrides Fixed_abil */
-            /* defer gc.context.botl status update until after hunger message */
+            /* defer context.botl status update until after hunger message */
         } else if (newhs < WEAK && u.uhs >= WEAK) {
             /* this used to be losestr(-1) which could be abused by
                becoming weak while wearing ring of sustain ability,
@@ -3296,7 +3299,7 @@ newuhs(boolean incr)
                substituting "while polymorphed" for sustain ability and
                "rehumanize" for ring removal might have done that too */
             ATEMP(A_STR) = 0; /* repair of loss also overrides Fixed_abil */
-            /* defer gc.context.botl status update until after hunger message */
+            /* defer context.botl status update until after hunger message */
         }
 
         switch (newhs) {

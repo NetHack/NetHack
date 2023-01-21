@@ -937,14 +937,17 @@ mon_break_armor(struct monst *mon, boolean polyspot)
     if (breakarm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             if ((Is_dragon_scales(otmp) && mdat == Dragon_scales_to_pm(otmp))
-                || (Is_dragon_mail(otmp) && mdat == Dragon_mail_to_pm(otmp)))
+                || (Is_dragon_mail(otmp) && mdat == Dragon_mail_to_pm(otmp))) {
                 ; /* no message here;
                      "the dragon merges with his scaly armor" is odd
                      and the monster's previous form is already gone */
-            else if (vis)
-                pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
-            else
-                You_hear("a cracking sound.");
+            } else {
+                Soundeffect(se_cracking_sound, 100);
+                if (vis)
+                    pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
+                else
+                    You_hear("a cracking sound.");
+            }
             m_useup(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMC)) != 0
@@ -958,6 +961,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                     bypass_obj(otmp);
                 m_lose_armor(mon, otmp);
             } else {
+                Soundeffect(se_ripping_sound, 100);
                 if (vis)
                     pline("%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
@@ -978,6 +982,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         boolean passes_thru_clothes = !(mdat->msize <= MZ_SMALL);
 
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
+            Soundeffect(se_thud, 50);
             if (vis)
                 pline("%s armor falls around %s!", s_suffix(Monnam(mon)),
                       pronoun);
@@ -1027,6 +1032,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             m_lose_armor(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
+            Soundeffect(se_clank, 50);
             if (vis)
                 pline("%s can no longer hold %s shield!", Monnam(mon),
                       ppronoun);
