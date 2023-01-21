@@ -1320,11 +1320,10 @@ dokick(void)
                 return ECMD_TIME;
             } else if (!(gm.maploc->looted & S_LPUDDING) && !rn2(3)
                        && !(gm.mvitals[PM_BLACK_PUDDING].mvflags & G_GONE)) {
+                Soundeffect(se_gushing_sound, 100);
                 if (Blind) {
-                    if (!Deaf) {
-                        Soundeffect(se_gushing_sound, 100);
-                    }
-                    You_hear("a gushing sound.");
+                    if (!Deaf)
+                        You_hear("a gushing sound.");
                 } else {
                     pline("A %s ooze gushes up from the drain!",
                           hcolor(NH_BLACK));
