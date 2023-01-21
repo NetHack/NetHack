@@ -183,7 +183,7 @@ kick_monster(struct monst *mon, coordxy x, coordxy y)
             attknum = 0,
             tmp = find_roll_to_hit(mon, AT_KICK, (struct obj *) 0, &attknum,
                                    &armorpenalty);
-        mon_maybe_wakeup_on_hit(mon);
+        mon_maybe_unparalyze(mon);
 
         for (i = 0; i < NATTK; i++) {
             /* first of two kicks might have provoked counterattack

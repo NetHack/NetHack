@@ -293,13 +293,10 @@ check_caitiff(struct monst *mtmp)
     }
 }
 
-/* wake up monster, maybe unparalyze it */
+/* maybe unparalyze monster */
 void
-mon_maybe_wakeup_on_hit(struct monst *mtmp)
+mon_maybe_unparalyze(struct monst *mtmp)
 {
-    if (mtmp->msleeping)
-        mtmp->msleeping = 0;
-
     if (!mtmp->mcanmove) {
         if (!rn2(10)) {
             mtmp->mcanmove = 1;
@@ -647,7 +644,7 @@ hitum_cleave(
 
         tmp = find_roll_to_hit(mtmp, uattk->aatyp, uwep,
                                &attknum, &armorpenalty);
-        mon_maybe_wakeup_on_hit(mtmp);
+        mon_maybe_unparalyze(mtmp);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
         gb.bhitpos.x = tx, gb.bhitpos.y = ty; /* normally set up by
@@ -685,7 +682,7 @@ hitum(struct monst *mon, struct attack *uattk)
         dieroll = rnd(20),
         mhit = (tmp > dieroll || u.uswallow);
 
-    mon_maybe_wakeup_on_hit(mon);
+    mon_maybe_unparalyze(mon);
 
     /* Cleaver attacks three spots, 'mon' and one on either side of 'mon';
        it can't be part of dual-wielding but we guard against that anyway;
@@ -712,7 +709,7 @@ hitum(struct monst *mon, struct attack *uattk)
                        || !malive || m_at(x, y) != mon)) {
         tmp = find_roll_to_hit(mon, uattk->aatyp, uswapwep, &attknum,
                                &armorpenalty);
-        mon_maybe_wakeup_on_hit(mon);
+        mon_maybe_unparalyze(mon);
         dieroll = rnd(20);
         mhit = (tmp > dieroll || u.uswallow);
         malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk,
@@ -786,7 +783,6 @@ hmon_hitmon(
 
     saved_oname[0] = '\0';
 
-    wakeup(mon, TRUE);
     if (!obj) { /* attack with bare hands */
         long silverhit = 0L; /* armor mask */
 
@@ -816,6 +812,7 @@ hmon_hitmon(
         if ((thrown == HMON_THROWN || thrown == HMON_KICKED) /* not Applied */
             && stone_missile(obj) && passes_rocks(mdat)) {
             hit(mshot_xname(obj), mon, " but does no harm.");
+            wakeup(mon, TRUE);
             return TRUE;
         }
         /* remember obj's name since it might end up being destroyed and
@@ -1509,6 +1506,9 @@ hmon_hitmon(
     if (unpoisonmsg)
         Your("%s %s no longer poisoned.", saved_oname,
              vtense(saved_oname, "are"));
+
+    if (!destroyed)
+        wakeup(mon, TRUE);
 
     return destroyed ? FALSE : TRUE;
 }
@@ -4854,7 +4854,7 @@ hmonas(struct monst *mon)
 
             tmp = find_roll_to_hit(mon, AT_WEAP, weapon, &attknum,
                                    &armorpenalty);
-            mon_maybe_wakeup_on_hit(mon);
+            mon_maybe_unparalyze(mon);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             /* caller must set gb.bhitpos */
@@ -4896,7 +4896,7 @@ hmonas(struct monst *mon)
         /*weaponless:*/
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
-            mon_maybe_wakeup_on_hit(mon);
+            mon_maybe_unparalyze(mon);
             dieroll = rnd(20);
             dhit = (tmp > dieroll || u.uswallow);
             if (dhit) {
@@ -5089,7 +5089,7 @@ hmonas(struct monst *mon)
         case AT_ENGL:
             tmp = find_roll_to_hit(mon, mattk->aatyp, (struct obj *) 0,
                                    &attknum, &armorpenalty);
-            mon_maybe_wakeup_on_hit(mon);
+            mon_maybe_unparalyze(mon);
             if ((dhit = (tmp > rnd(20 + i)))) {
                 wakeup(mon, TRUE);
                 if (mon->data == &mons[PM_SHADE]) {

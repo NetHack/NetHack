@@ -411,7 +411,8 @@ explode(
                  * from inside their engulfer. */
                 if (!(u.uswallow && !gc.context.mon_moving))
                     (void) zap_over_floor(xx, yy, type,
-                                          &shopdamage, exploding_wand_typ);
+                                          &shopdamage, FALSE,
+                                          exploding_wand_typ);
 
                 mtmp = m_at(xx, yy);
                 if (!mtmp && u_at(xx, yy))

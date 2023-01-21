@@ -4393,7 +4393,7 @@ dobuzz(
         gb.bhitpos.x = sx, gb.bhitpos.y = sy;
         /* Fireballs only damage when they explode */
         if (type != ZT_SPELL(ZT_FIRE)) {
-            range += zap_over_floor(sx, sy, type, &shopdamage, 0);
+            range += zap_over_floor(sx, sy, type, &shopdamage, 0, TRUE);
             /* zap with fire -> melt ice -> drown monster, so monster
                found and cached above might not be here any more */
             mon = m_at(sx, sy);
@@ -4480,6 +4480,8 @@ dobuzz(
                         }
                         if (mon_could_move && !mon->mcanmove) /* ZT_SLEEP */
                             slept_monst(mon);
+                        if (abstype != ZT_SLEEP)
+                            wakeup(mon, TRUE);
                     }
                 }
                 range -= 2;
@@ -4698,6 +4700,7 @@ zap_over_floor(
     coordxy x, coordxy y,         /* location */
     int type,                 /* damage type plus {wand|spell|breath} info */
     boolean *shopdamage,      /* extra output if shop door is destroyed */
+    boolean ignoremon,        /* ignore any monster here */
     short exploding_wand_typ) /* supplied when breaking a wand; or POT_OIL
                                * when a lit potion of oil explodes */
 {
@@ -5012,16 +5015,8 @@ zap_over_floor(
             newsym(x, y);
             You("%s of smoke.", !Blind ? "see a puff" : "smell a whiff");
         }
-    if ((mon = m_at(x, y)) != 0) {
-        wakeup(mon, FALSE);
-        if (type >= 0) {
-            setmangry(mon, TRUE);
-            if (mon->ispriest && *in_rooms(mon->mx, mon->my, TEMPLE))
-                ghod_hitsu(mon);
-            if (mon->isshk && !*u.ushops)
-                hot_pursuit(mon);
-        }
-    }
+    if (!ignoremon && (mon = m_at(x, y)) != 0)
+        wakeup(mon, (type >= 0) ? TRUE : FALSE);
     return rangemod;
 }
 

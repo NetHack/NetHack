@@ -1830,8 +1830,6 @@ omon_adj(struct monst *mon, struct obj *obj, boolean mon_notices)
     /* sleeping target is more likely to be hit */
     if (mon->msleeping) {
         tmp += 2;
-        if (mon_notices)
-            mon->msleeping = 0;
     }
     /* ditto for immobilized target */
     if (!mon->mcanmove || !mon->data->mmove) {

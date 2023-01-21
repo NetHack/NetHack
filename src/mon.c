@@ -3789,6 +3789,8 @@ wake_msg(struct monst *mtmp, boolean interesting)
 void
 wakeup(struct monst* mtmp, boolean via_attack)
 {
+    boolean was_sleeping = mtmp->msleeping;
+
     wake_msg(mtmp, via_attack);
     mtmp->msleeping = 0;
     if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
@@ -3802,8 +3804,15 @@ wakeup(struct monst* mtmp, boolean via_attack)
         newsym(mtmp->mx, mtmp->my);
     }
     finish_meating(mtmp);
-    if (via_attack)
+    if (via_attack) {
+        if (was_sleeping)
+            growl(mtmp);
         setmangry(mtmp, TRUE);
+        if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE))
+            ghod_hitsu(mtmp);
+        if (mtmp->isshk && !*u.ushops)
+            hot_pursuit(mtmp);
+    }
 }
 
 /* Wake up nearby monsters without angering them. */
