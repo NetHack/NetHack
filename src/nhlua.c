@@ -1030,9 +1030,7 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
-DISABLE_WARNING_UNREACHABLE_CODE
-
-/* set or get variables which are saved and restored along the game.
+/* set or get variables which are saved and restored along with the game.
    nh.variable("test", 10);
    local ten = nh.variable("test"); */
 static int
@@ -1141,24 +1139,27 @@ get_nh_lua_variables(void)
 void
 save_luadata(NHFILE *nhfp)
 {
-    char *lua_data = get_nh_lua_variables();
-    long lua_data_len = strlen(lua_data) + 1;
+    unsigned lua_data_len;
+    char *lua_data = get_nh_lua_variables(); /* note: '\0' terminated */
 
-    bwrite(nhfp->fd, (genericptr_t) &lua_data_len, sizeof lua_data_len);
-    bwrite(nhfp->fd, (genericptr_t) lua_data, strlen(lua_data) + 1);
+    if (!lua_data)
+        lua_data = emptystr;
+    lua_data_len = Strlen(lua_data) + 1; /* +1: include the terminator */
+    bwrite(nhfp->fd, (genericptr_t) &lua_data_len,
+           (unsigned) sizeof lua_data_len);
+    bwrite(nhfp->fd, (genericptr_t) lua_data, lua_data_len);
     free(lua_data);
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /* restore nh_lua_variables table from file */
 void
 restore_luadata(NHFILE *nhfp)
 {
-    long lua_data_len;
+    unsigned lua_data_len;
     char *lua_data;
 
-    mread(nhfp->fd, (genericptr_t) &lua_data_len, sizeof lua_data_len);
+    mread(nhfp->fd, (genericptr_t) &lua_data_len,
+          (unsigned) sizeof lua_data_len);
     lua_data = (char *) alloc(lua_data_len);
     mread(nhfp->fd, (genericptr_t) lua_data, lua_data_len);
     if (!gl.luacore)
