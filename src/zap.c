@@ -4393,7 +4393,7 @@ dobuzz(
         gb.bhitpos.x = sx, gb.bhitpos.y = sy;
         /* Fireballs only damage when they explode */
         if (type != ZT_SPELL(ZT_FIRE)) {
-            range += zap_over_floor(sx, sy, type, &shopdamage, 0, TRUE);
+            range += zap_over_floor(sx, sy, type, &shopdamage, TRUE, 0);
             /* zap with fire -> melt ice -> drown monster, so monster
                found and cached above might not be here any more */
             mon = m_at(sx, sy);
