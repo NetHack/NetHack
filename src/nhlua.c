@@ -1045,6 +1045,7 @@ nhl_variable(lua_State *L)
 
     if (!gl.luacore) {
         nhl_error(L, "nh luacore not inited");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -1118,6 +1119,7 @@ get_nh_lua_variables(void)
 
     if (!gl.luacore) {
         nhl_error(gl.luacore, "nh luacore not inited");
+        /*NOTREACHED*/
         return key;
     }
 
