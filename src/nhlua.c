@@ -1030,6 +1030,9 @@ nhl_dnum_name(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+/* because nhl_error() does not return */
+
 /* set or get variables which are saved and restored along with the game.
    nh.variable("test", 10);
    local ten = nh.variable("test"); */
@@ -1134,6 +1137,8 @@ get_nh_lua_variables(void)
     }
     return key;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* save nh_lua_variables table to file */
 void
