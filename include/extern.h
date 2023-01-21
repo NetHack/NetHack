@@ -621,6 +621,7 @@ extern int dog_nutrition(struct monst *, struct obj *);
 extern int dog_eat(struct monst *, struct obj *, coordxy, coordxy, boolean);
 extern int dog_move(struct monst *, int);
 extern void finish_meating(struct monst *);
+extern void quickmimic(struct monst *);
 
 /* ### dokick.c ### */
 
@@ -1542,6 +1543,7 @@ extern int minliquid(struct monst *);
 extern boolean movemon_singlemon(struct monst *);
 extern int movemon(void);
 extern void meatbox(struct monst *, struct obj *);
+extern void m_consume_obj(struct monst *, struct obj *);
 extern int meatmetal(struct monst *);
 extern int meatobj(struct monst *);
 extern int meatcorpse(struct monst *);

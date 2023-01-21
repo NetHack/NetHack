@@ -1125,6 +1125,73 @@ meatbox(struct monst *mon, struct obj *otmp)
     (ofood(obj) && (touch_petrifies(&mons[(obj)->corpsenm]) \
                     || (obj)->corpsenm == PM_MEDUSA))
 
+/* monster consumes an object.
+
+   monster may die, polymorph, grow up, heal, etc; meating is not changed.
+   object is extracted from any linked list and freed. */
+void
+m_consume_obj(struct monst *mtmp, struct obj *otmp)
+{
+    boolean ispet = mtmp->mtame;
+
+    /* non-pet: Heal up to the object's weight in hp */
+    if (!ispet && mtmp->mhp < mtmp->mhpmax) {
+        mtmp->mhp += objects[otmp->otyp].oc_weight;
+        if (mtmp->mhp > mtmp->mhpmax)
+            mtmp->mhp = mtmp->mhpmax;
+    }
+    if (Has_contents(otmp))
+        meatbox(mtmp, otmp);
+    if (otmp == uball) {
+        unpunish();
+        delobj(otmp);
+    } else if (otmp == uchain) {
+        unpunish(); /* frees uchain */
+    } else {
+        boolean deadmimic, slimer;
+        int poly, grow, heal, eyes, mstone, vis = canseemon(mtmp);
+        int corpsenm = (otmp->otyp == CORPSE ? otmp->corpsenm : NON_PM);
+
+        deadmimic = (otmp->otyp == CORPSE && (otmp->corpsenm == PM_SMALL_MIMIC
+                                             || otmp->corpsenm == PM_LARGE_MIMIC
+                                             || otmp->corpsenm == PM_GIANT_MIMIC));
+        slimer = (otmp->otyp == GLOB_OF_GREEN_SLIME);
+        poly = polyfodder(otmp);
+        grow = mlevelgain(otmp);
+        heal = mhealup(otmp);
+        eyes = (otmp->otyp == CARROT);
+        mstone = mstoning(otmp);
+        delobj(otmp); /* munch */
+        if (poly || slimer) {
+            struct permonst *ptr = slimer ? &mons[PM_GREEN_SLIME] : 0;
+
+            (void) newcham(mtmp, ptr, vis ? NC_SHOW_MSG : NO_NC_FLAGS);
+        }
+        if (grow) {
+            if ((ispet && (int) mtmp->m_lev < (int) mtmp->data->mlevel + 15)
+                || !ispet)
+                (void) grow_up(mtmp, (struct monst *) 0);
+        }
+        if (mstone) {
+            if (poly_when_stoned(mtmp->data)) {
+                mon_to_stone(mtmp);
+            } else if (!resists_ston(mtmp)) {
+                if (vis)
+                    pline("%s turns to stone!", Monnam(mtmp));
+                monstone(mtmp);
+            }
+        }
+        if (heal)
+            mtmp->mhp = mtmp->mhpmax;
+        if ((eyes || heal) && !mtmp->mcansee)
+            mcureblindness(mtmp, canseemon(mtmp));
+        if (ispet && deadmimic)
+            quickmimic(mtmp);
+        if (corpsenm != NON_PM)
+            mon_givit(mtmp, &mons[corpsenm]);
+    }
+}
+
 /*
  * Maybe eat a metallic object (not just gold).
  * Return value: 0 => nothing happened, 1 => monster ate something,
@@ -1136,9 +1203,8 @@ int
 meatmetal(struct monst *mtmp)
 {
     struct obj *otmp;
-    struct permonst *ptr;
     char *otmpname;
-    int poly, grow, heal, mstone, vis = canseemon(mtmp);
+    int vis = canseemon(mtmp);
 
     /* If a pet, eating is handled separately, in dog.c */
     if (mtmp->mtame)
@@ -1185,56 +1251,9 @@ meatmetal(struct monst *mtmp)
                     }
                 }
                 mtmp->meating = otmp->owt / 2 + 1;
-                /* Heal up to the object's weight in hp */
-                if (mtmp->mhp < mtmp->mhpmax) {
-                    mtmp->mhp += objects[otmp->otyp].oc_weight;
-                    if (mtmp->mhp > mtmp->mhpmax)
-                        mtmp->mhp = mtmp->mhpmax;
-                }
-                /* Currently there shouldn't be any metal object with
-                  contents, but just in case... */
-                if (Has_contents(otmp))
-                    meatbox(mtmp, otmp);
-                if (otmp == uball) {
-                    unpunish();
-                    delobj(otmp);
-                } else if (otmp == uchain) {
-                    unpunish(); /* frees uchain */
-                } else {
-                    /* these can occur via eating metal if it's a tin
-                       [can't be slimed; that could only happen via glob] */
-                    poly = polyfodder(otmp);
-                    grow = mlevelgain(otmp);
-                    heal = mhealup(otmp);
-                    mstone = mstoning(otmp);
-                    delobj(otmp);
-                    ptr = mtmp->data;
-                    if (poly) {
-                        if (newcham(mtmp, (struct permonst *) 0,
-                                    vis ? NC_SHOW_MSG : NO_NC_FLAGS))
-                            ptr = mtmp->data;
-                    } else if (grow) {
-                        ptr = grow_up(mtmp, (struct monst *) 0);
-                    } else if (mstone) {
-                        if (poly_when_stoned(ptr)) {
-                            mon_to_stone(mtmp);
-                            ptr = mtmp->data;
-                        } else if (!resists_ston(mtmp)) {
-                            if (vis)
-                                pline("%s turns to stone!", Monnam(mtmp));
-                            monstone(mtmp);
-                            /* might be life-saved if had a previous shape
-                               which was capable to putting on an amulet */
-                            if (DEADMONSTER(mtmp))
-                                ptr = (struct permonst *) 0;
-                        }
-                    } else if (heal) {
-                        mtmp->mhp = mtmp->mhpmax;
-                        mcureblindness(mtmp, canseemon(mtmp));
-                    }
-                    if (!ptr)
-                        return 2; /* it died */
-                }
+                m_consume_obj(mtmp, otmp);
+                if (DEADMONSTER(mtmp))
+                    return 2;
                 /* Left behind a pile? */
                 if (rnd(25) < 3)
                     (void) mksobj_at(ROCK, mtmp->mx, mtmp->my, TRUE, FALSE);
@@ -1252,7 +1271,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
 {
     struct obj *otmp, *otmp2;
     struct permonst *ptr, *original_ptr = mtmp->data;
-    int poly, grow, heal, eyes, count = 0, ecount = 0, vis = canseemon(mtmp);
+    int count = 0, ecount = 0;
     char buf[BUFSZ], *otmpname;
 
     buf[0] = '\0';
@@ -1337,42 +1356,14 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                 if (otmp->oclass == SCROLL_CLASS
                     && objdescr_is(otmp, "YUM YUM"))
                     pline("Yum%c", otmp->blessed ? '!' : '.');
-                if (otmp->otyp == CORPSE)
-                    mon_givit(mtmp, &mons[otmp->corpsenm]);
             } else {
                 Soundeffect(se_slurping_sound, 30);
                 if (Verbose(2, meatobj2))
                     You_hear("a slurping sound.");
             }
-            /* Heal up to the object's weight in hp */
-            if (mtmp->mhp < mtmp->mhpmax) {
-                mtmp->mhp += objects[otmp->otyp].oc_weight;
-                if (mtmp->mhp > mtmp->mhpmax)
-                    mtmp->mhp = mtmp->mhpmax;
-            }
-            if (Has_contents(otmp))
-                meatbox(mtmp, otmp);
-            /* possibility of being turned to stone or into slime can't
-               reach here (don't touch for cockatrice corpse, engulf rather
-               than eat for tin, cockatrice egg, or glob of green slime) */
-            poly = polyfodder(otmp);
-            grow = mlevelgain(otmp);
-            heal = mhealup(otmp);
-            eyes = (otmp->otyp == CARROT);
-            delobj(otmp); /* munch */
-            ptr = mtmp->data;
-            if (poly) {
-                if (newcham(mtmp, (struct permonst *) 0,
-                            vis ? NC_SHOW_MSG : NO_NC_FLAGS))
-                    ptr = mtmp->data;
-            } else if (grow) {
-                ptr = grow_up(mtmp, (struct monst *) 0);
-            } else if (heal) {
-                mtmp->mhp = mtmp->mhpmax;
-            }
-            if ((eyes || heal) && !mtmp->mcansee)
-                mcureblindness(mtmp, canseemon(mtmp));
+            m_consume_obj(mtmp, otmp);
             /* in case it polymorphed or died */
+            ptr = mtmp->data;
             if (ptr != original_ptr)
                 return !ptr ? 2 : 1;
         }
@@ -1400,7 +1391,6 @@ meatcorpse(
 {
     struct obj *otmp;
     struct permonst *ptr, *original_ptr = mtmp->data, *corpsepm;
-    boolean poly, grow, heal, eyes = FALSE, vis = canseemon(mtmp);
     coordxy x = mtmp->mx, y = mtmp->my;
 
     /* if a pet, eating is handled separately, in dog.c */
@@ -1448,28 +1438,9 @@ meatcorpse(
                 You_hear("a masticating sound.");
         }
 
-        mon_givit(mtmp, &mons[otmp->corpsenm]);
-
-        /* [should include quickmimic but can't handle that unless this
-           gets changed to set mtmp->meating] */
-        poly = polyfodder(otmp);
-        grow = mlevelgain(otmp);
-        heal = mhealup(otmp);
-        eyes = (otmp->otyp == CARROT); /*[always false since not a corpse]*/
-        ptr = original_ptr;
-        delobj(otmp);
-        if (poly) {
-            if (newcham(mtmp, (struct permonst *) 0,
-                        vis ? NC_SHOW_MSG : NO_NC_FLAGS))
-                ptr = mtmp->data;
-        } else if (grow) {
-            ptr = grow_up(mtmp, (struct monst *) 0);
-        } else if (heal) {
-            mtmp->mhp = mtmp->mhpmax;
-        }
-        if ((eyes || heal) && !mtmp->mcansee)
-            mcureblindness(mtmp, canseemon(mtmp));
+        m_consume_obj(mtmp, otmp);
         /* in case it polymorphed or died */
+        ptr = mtmp->data;
         if (ptr != original_ptr)
             return !ptr ? 2 : 1;
 
