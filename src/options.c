@@ -617,7 +617,7 @@ getoptstr(int optidx, int ophase)
 
         /* find non-Null, in order optvals[][play_opt], [cmdline_opt],
            [environ_opt], [rc_file_opt], [syscf_opt], [builtin_opt] */
-        for (phase = num_opt_phases; phase >= 0; --phase)
+        for (phase = num_opt_phases - 1; phase >= 0; --phase)
             if (roleoptvals[roleoptindx][phase]) {
                 ophase = phase;
                 break;
