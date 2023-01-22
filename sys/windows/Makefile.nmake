@@ -139,6 +139,7 @@ QT      = ..\win\Qt      # QT support files
 X11     = ..\win\X11     # X11 support files
 LIBDIR  = ..\lib         # libraries and external bits
 SUBM    = ..\submodules  # NetHack git submodules
+SndWavDir = ..\sound\wav # sound files that get integrated
 
 #==============================================================================
 # Sanity checks for prerequisite Lua and pdcurses
@@ -523,7 +524,7 @@ MDLIBTTY  = $(OTTY)mdlib.o
 DLBOBJTTY = $(OTTY)dlb.o
 REGEXTTY  = $(OTTY)cppregex.o
 LUAOBJTTY = $(OTTY)nhlua.o    $(OTTY)nhlsel.o    $(OTTY)nhlobj.o
-SOUNDTTY  = $(OTTY)windsound.o
+SOUNDTTY  = $(OTTY)windsound.o $(OTTY)sample.o
 VVOBJTTY  = $(OTTY)version.o
 
 SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o \
@@ -651,6 +652,34 @@ DLBOBJ_HOST = $(OTTY)dlb$(HOST).o
 !ENDIF
 
 SOUNDLIBDEFS = -DSND_LIB_WINDSOUND -DUSER_SOUNDS
+
+SNDWAVFILES = $(SndWavDir)\se_squeak_A.wav $(SndWavDir)\se_squeak_B.wav \
+	$(SndWavDir)\se_squeak_B_flat.wav $(SndWavDir)\se_squeak_C.wav \
+	$(SndWavDir)\se_squeak_D.wav $(SndWavDir)\se_squeak_D_flat.wav \
+	$(SndWavDir)\se_squeak_E.wav $(SndWavDir)\se_squeak_E_flat.wav \
+	$(SndWavDir)\se_squeak_F.wav $(SndWavDir)\se_squeak_F_sharp.wav \
+	$(SndWavDir)\se_squeak_G.wav $(SndWavDir)\se_squeak_G_sharp.wav \
+	$(SndWavDir)\sound_Bell.wav $(SndWavDir)\sound_Bugle_A.wav \
+	$(SndWavDir)\sound_Bugle_B.wav $(SndWavDir)\sound_Bugle_C.wav \
+	$(SndWavDir)\sound_Bugle_D.wav $(SndWavDir)\sound_Bugle_E.wav \
+	$(SndWavDir)\sound_Bugle_F.wav $(SndWavDir)\sound_Bugle_G.wav \
+	$(SndWavDir)\sound_Drum_Of_Earthquake.wav \
+	$(SndWavDir)\sound_Fire_Horn.wav $(SndWavDir)\sound_Frost_Horn.wav \
+	$(SndWavDir)\sound_Leather_Drum.wav $(SndWavDir)\sound_Magic_Harp_A.wav \
+	$(SndWavDir)\sound_Magic_Harp_B.wav $(SndWavDir)\sound_Magic_Harp_C.wav \
+	$(SndWavDir)\sound_Magic_Harp_D.wav $(SndWavDir)\sound_Magic_Harp_E.wav \
+	$(SndWavDir)\sound_Magic_Harp_F.wav $(SndWavDir)\sound_Magic_Harp_G.wav \
+	$(SndWavDir)\sound_Tooled_Horn_A.wav $(SndWavDir)\sound_Tooled_Horn_B.wav \
+	$(SndWavDir)\sound_Tooled_Horn_C.wav $(SndWavDir)\sound_Tooled_Horn_D.wav \
+	$(SndWavDir)\sound_Tooled_Horn_E.wav $(SndWavDir)\sound_Tooled_Horn_F.wav \
+	$(SndWavDir)\sound_Tooled_Horn_G.wav $(SndWavDir)\sound_Wooden_Flute_A.wav \
+	$(SndWavDir)\sound_Wooden_Flute_B.wav $(SndWavDir)\sound_Wooden_Flute_C.wav \
+	$(SndWavDir)\sound_Wooden_Flute_D.wav $(SndWavDir)\sound_Wooden_Flute_E.wav \
+	$(SndWavDir)\sound_Wooden_Flute_F.wav $(SndWavDir)\sound_Wooden_Flute_G.wav \
+	$(SndWavDir)\sound_Wooden_Harp_A.wav $(SndWavDir)\sound_Wooden_Harp_B.wav \
+	$(SndWavDir)\sound_Wooden_Harp_C.wav $(SndWavDir)\sound_Wooden_Harp_D.wav \
+	$(SndWavDir)\sound_Wooden_Harp_E.wav $(SndWavDir)\sound_Wooden_Harp_F.wav \
+	$(SndWavDir)\sound_Wooden_Harp_G.wav
 
 #==========================================
 # Header file macros
@@ -946,13 +975,23 @@ DLB =
 	$(Q)$(CC) $(CFLAGS) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
-# Rules for files in sound\wind
+# Rules for files in sound\windsound
 #==========================================
 
 {..\sound\windsound}.c{$(OBJTTY)}.o:
 	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {..\sound\windsound}.c{$(OBJGUI)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+#==========================================
+# Rules for files in sound\sample
+#==========================================
+
+{..\sound\sample}.c{$(OBJTTY)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+{..\sound\sample}.c{$(OBJGUI)}.o:
 	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
@@ -1048,6 +1087,15 @@ DLB =
 
 {$(LUASRC)}.c{$(OBJLUA)}.o:
 	$(Q)$(CC) $(CFLAGS) -wd4701 -wd4702 -wd4774 -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+#===============================================================================
+# Rules for integrated sound files in sound/wav
+#===============================================================================
+
+{$(SndWavDir)}.uu{$(SndWavDir)}.wav:
+	cd $(SndWavDir)
+	..\..\util\uudecode.exe $(@B).uu
+	cd ..\..\src
 
 #==========================================
 #=============== TARGETS ==================
@@ -1254,13 +1302,13 @@ $(OGUI)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc \
 	$(MSWIN)\mnsel.bmp \
 	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico \
-	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp
+	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(SNDWAVFILES)
 	@echo Building resource file $@ from $**
-	@$(rc) -nologo -r -fo$@ -i$(MSWIN) -dNDEBUG $(MSWIN)\NetHackW.rc
+	@$(rc) -nologo -r -fo$@ -i$(MSWIN) -dNDEBUG -I..\sound\wav $(MSWIN)\NetHackW.rc
 
-$(OTTY)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico
+$(OTTY)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico $(SNDWAVFILES)
 	@echo Building resource file $@ from $**
-	@$(rc) -nologo -r -fo$@ -i$(MSWSYS) -dNDEBUG $(MSWSYS)\console.rc
+	@$(rc) -nologo -r -fo$@ -i$(MSWSYS) -dNDEBUG -I..\sound\wav $(MSWSYS)\console.rc
 
 #
 #  Secondary Targets.
@@ -1749,6 +1797,7 @@ $(OTTY)consoletty.o:   $(MSWSYS)\consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OTTY)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsys.o:  $(MSWSYS)\windsys.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
+$(OTTY)sample.o: ..\sound\sample\sample.c $(HACK_H)
 $(OTTY)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
 $(OTTY)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
 
@@ -1893,6 +1942,62 @@ $(DAT)\epitaph: $(U)makedefs.exe $(DAT)\epitaph.txt
 
 $(DAT)\bogusmon: $(U)makedefs.exe $(DAT)\bogusmon.txt
 	$(U)makedefs -s
+
+#===============================================================================
+# Integrated sound files
+#===============================================================================
+$(SndWavDir)se_squeak_A.wav: $(SndWavDir)se_squeak_A.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_B.wav: $(SndWavDir)se_squeak_B.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_B_flat.wav: $(SndWavDir)se_squeak_B_flat.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_C.wav: $(SndWavDir)se_squeak_C.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_D.wav: $(SndWavDir)se_squeak_D.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_D_flat.wav: $(SndWavDir)se_squeak_D_flat.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_E.wav: $(SndWavDir)se_squeak_E.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_E_flat.wav: $(SndWavDir)se_squeak_E_flat.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_F.wav: $(SndWavDir)se_squeak_F.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_F_sharp.wav: $(SndWavDir)se_squeak_F_sharp.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_G.wav: $(SndWavDir)se_squeak_G.uu $(U)uudecode.exe
+$(SndWavDir)se_squeak_G_sharp.wav: $(SndWavDir)se_squeak_G_sharp.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bell.wav: $(SndWavDir)sound_Bell.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_A.wav: $(SndWavDir)sound_Bugle_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_B.wav: $(SndWavDir)sound_Bugle_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_C.wav: $(SndWavDir)sound_Bugle_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_D.wav: $(SndWavDir)sound_Bugle_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_E.wav: $(SndWavDir)sound_Bugle_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_F.wav: $(SndWavDir)sound_Bugle_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Bugle_G.wav: $(SndWavDir)sound_Bugle_G.uu $(U)uudecode.exe
+$(SndWavDir)sound_Drum_Of_Earthquake.wav: $(SndWavDir)sound_Drum_Of_Earthquake.uu $(U)uudecode.exe
+$(SndWavDir)sound_Fire_Horn.wav: $(SndWavDir)sound_Fire_Horn.uu $(U)uudecode.exe
+$(SndWavDir)sound_Frost_Horn.wav: $(SndWavDir)sound_Frost_Horn.uu $(U)uudecode.exe
+$(SndWavDir)sound_Leather_Drum.wav: $(SndWavDir)sound_Leather_Drum.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_A.wav: $(SndWavDir)sound_Magic_Harp_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_B.wav: $(SndWavDir)sound_Magic_Harp_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_C.wav: $(SndWavDir)sound_Magic_Harp_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_D.wav: $(SndWavDir)sound_Magic_Harp_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_E.wav: $(SndWavDir)sound_Magic_Harp_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_F.wav: $(SndWavDir)sound_Magic_Harp_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Harp_G.wav: $(SndWavDir)sound_Magic_Harp_G.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_A.wav: $(SndWavDir)sound_Tooled_Horn_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_B.wav: $(SndWavDir)sound_Tooled_Horn_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_C.wav: $(SndWavDir)sound_Tooled_Horn_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_D.wav: $(SndWavDir)sound_Tooled_Horn_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_E.wav: $(SndWavDir)sound_Tooled_Horn_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_F.wav: $(SndWavDir)sound_Tooled_Horn_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Tooled_Horn_G.wav: $(SndWavDir)sound_Tooled_Horn_G.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_A.wav: $(SndWavDir)sound_Wooden_Flute_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_B.wav: $(SndWavDir)sound_Wooden_Flute_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_C.wav: $(SndWavDir)sound_Wooden_Flute_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_D.wav: $(SndWavDir)sound_Wooden_Flute_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_E.wav: $(SndWavDir)sound_Wooden_Flute_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_F.wav: $(SndWavDir)sound_Wooden_Flute_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Flute_G.wav: $(SndWavDir)sound_Wooden_Flute_G.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_A.wav: $(SndWavDir)sound_Wooden_Harp_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_B.wav: $(SndWavDir)sound_Wooden_Harp_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_C.wav: $(SndWavDir)sound_Wooden_Harp_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_D.wav: $(SndWavDir)sound_Wooden_Harp_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_E.wav: $(SndWavDir)sound_Wooden_Harp_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_F.wav: $(SndWavDir)sound_Wooden_Harp_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Wooden_Harp_G.wav: $(SndWavDir)sound_Wooden_Harp_G.uu $(U)uudecode.exe
 
 #===============================================================================
 # Housekeeping

@@ -82,7 +82,8 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 #ifdef WAVEMUSIC_SOUNDS
     int reslt = 0;
     boolean has_note_variations = FALSE;
-    char resourcename[120], *end_of_res = 0, *c = 0;
+    char resourcename[120], *end_of_res = 0;
+    const char *c = 0;
 
     if (!str)
         return;
