@@ -7,7 +7,12 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "winres.h"
+
+#ifdef __GNUC__
+    #include "winresrc.h"
+#else
+	#include "winres.h"
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
