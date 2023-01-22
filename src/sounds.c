@@ -1753,7 +1753,7 @@ struct sound_procs nosound_procs = {
     (void (*)(const char *)) 0,             /* exit_nhsound    */
     (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
     (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
-    (void (*)(int32_t, char *, int32_t)) 0, /* hero_playnotes  */
+    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes  */
     (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
 };
 

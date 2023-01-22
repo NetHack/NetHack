@@ -24,7 +24,7 @@
  *                            interface function pointer used to invoke it:
  *
  *                             void (*sound_hero_playnotes)(int32_t instrument,
- *                                                 char *str, int32_t volume);
+ *                                             const char *str, int32_t volume);
  *
  *      SNDCAP_ACHIEVEMENTS   Invoked by the core when an in-game achievement
  *                            is reached. The soundlib routines could play
@@ -105,7 +105,7 @@ struct sound_procs {
     void (*sound_exit_nhsound)(const char *);
     void (*sound_achievement)(schar, schar, int32_t);
     void (*sound_soundeffect)(char *desc, int32_t, int32_t volume);
-    void (*sound_hero_playnotes)(int32_t instrument, char *str, int32_t volume);
+    void (*sound_hero_playnotes)(int32_t instrument, const char *str, int32_t volume);
     void (*sound_play_usersound)(char *filename, int32_t volume, int32_t idx);
 };
 

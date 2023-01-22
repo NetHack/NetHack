@@ -1056,7 +1056,7 @@ void NetHackQtBind::qtsound_soundeffect(char *desc UNUSED, int32_t seid UNUSED, 
 {
 }
 
-void NetHackQtBind::qtsound_hero_playnotes(int32_t instrument UNUSED, char *str UNUSED, int32_t volume UNUSED)
+void NetHackQtBind::qtsound_hero_playnotes(int32_t instrument UNUSED, const char *str UNUSED, int32_t volume UNUSED)
 {
 }
 #endif

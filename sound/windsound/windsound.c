@@ -20,7 +20,7 @@ static void windsound_init_nhsound(void);
 static void windsound_exit_nhsound(const char *);
 static void windsound_achievement(schar, schar, int32_t);
 static void windsound_soundeffect(char *, int32_t, int32_t);
-static void windsound_hero_playnotes(int32_t instrument, char *str, int32_t volume);
+static void windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
 static void windsound_play_usersound(char *, int32_t, int32_t);
 
 struct sound_procs windsound_procs = {
@@ -77,7 +77,7 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 #define WAVEMUSIC_SOUNDS
 
 void
-windsound_hero_playnotes(int32_t instrument, char *str, int32_t volume)
+windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 {
 #ifdef WAVEMUSIC_SOUNDS
     int reslt = 0;
