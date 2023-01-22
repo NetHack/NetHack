@@ -506,7 +506,7 @@ do_improvisation(struct obj* instr)
             itmp.otyp -= 1;
             mundane = TRUE;
         }
-
+    Hero_playnotes(obj_to_instr(&itmp), "C", 50);
 
 #define PLAY_NORMAL   0x00
 #define PLAY_STUNNED  0x01
@@ -738,6 +738,7 @@ do_play_instrument(struct obj* instr)
 
         You(!Deaf ? "extract a strange sound from %s!"
                   : "can feel %s emitting vibrations.", the(xname(instr)));
+        Hero_playnotes(obj_to_instr(instr), buf, 50);
 
 
         /* Check if there was the Stronghold drawbridge near
@@ -832,4 +833,47 @@ do_play_instrument(struct obj* instr)
     return ECMD_OK;
 }
 
+enum instruments
+obj_to_instr(struct obj *obj) {
+    enum instruments ret_instr = ins_no_instrument;
+
+#if defined(SND_LIB_INTEGRATED)
+    switch(obj->otyp) {
+        case WOODEN_FLUTE:
+            ret_instr = ins_flute;
+            break;
+        case MAGIC_FLUTE:
+            ret_instr = ins_pan_flute;
+            break;
+        case TOOLED_HORN:
+            ret_instr = ins_english_horn;
+            break;
+        case FROST_HORN:
+            ret_instr = ins_french_horn;
+            break;
+        case FIRE_HORN:
+            ret_instr = ins_baritone_sax;
+            break;
+        case BUGLE:
+            ret_instr = ins_trumpet;
+            break;
+        case WOODEN_HARP:
+            ret_instr = ins_orchestral_harp;
+            break;
+        case MAGIC_HARP:
+            ret_instr = ins_cello;
+        case BELL:
+        case BELL_OF_OPENING:
+            ret_instr = ins_tinkle_bell;
+            break;
+        case DRUM_OF_EARTHQUAKE:
+            ret_instr = ins_taiko_drum;
+            break;
+        case LEATHER_DRUM:
+            ret_instr = ins_melodic_tom;
+            break;
+    }
+#endif
+    return ret_instr;
+}
 /*music.c*/

@@ -126,12 +126,13 @@ extern struct sound_procs soundprocs;
 
 /* subset for NetHack */
 enum instruments {
-    ins_choir_aahs = 53, ins_trumpet = 57, ins_trombone = 58,
-    ins_french_horn = 61, ins_english_horn = 70, ins_piccolo = 73,
+    ins_cello = 43, ins_orchestral_harp = 47, ins_choir_aahs = 53,
+    ins_trumpet = 57, ins_trombone = 58, ins_french_horn = 61,
+    ins_baritone_sax = 68, ins_english_horn = 70, ins_piccolo = 73,
     ins_flute = 74, ins_pan_flute = 76, ins_blown_bottle = 77,
     ins_whistle = 79, ins_tinkle_bell = 113, ins_woodblock = 116,
     ins_taiko_drum = 117, ins_melodic_tom = 118, ins_seashore = 123,
-    ins_fencepost
+    ins_no_instrument
 };
 
 #if 0
@@ -174,11 +175,12 @@ enum instruments_broad {
     ins_guitar_fret_noise = 121, ins_breath_noise = 122, ins_seashore = 123,
     ins_bird_tweet = 124, ins_telephone_ring = 125, ins_helicopter = 126,
     ins_applause = 127, ins_gunshot = 128,
-    ins_fencepost
+    ins_no_instrument
 };
 #endif
 
 enum sound_effect_entries {
+    se_zero_invalid                   = 0,
     se_faint_splashing                = 1,
     se_crackling_of_hellfire          = 2,
     se_heart_beat                     = 3,
@@ -358,6 +360,7 @@ enum sound_effect_entries {
     se_elephant_trumpet               = 177,
     se_snake_rattle                   = 178,
     se_hallu_growl                    = 179,
+    number_of_se_entries
 };
 
 #if defined(SND_LIB_QTSOUND) || defined(SND_LIB_PORTAUDIO) \
@@ -366,6 +369,15 @@ enum sound_effect_entries {
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
         || defined(SND_LIB_WINDSOUND)
 
+#define SND_LIB_INTEGRATED   /* shortcut for conditional code in other files */
+
+#define Play_usersound(filename, vol, idx) \
+    do {                                                                  \
+        if (!Deaf && soundprocs.sound_play_usersound                      \
+            && ((soundprocs.sndcap & SNDCAP_USERSOUNDS) != 0))            \
+            (*soundprocs.sound_play_usersound)((filename), (vol), (idx)); \
+    } while(0)
+
 #define Soundeffect(seid, vol) \
     do {                                                              \
         if (!Deaf && soundprocs.sound_soundeffect                     \
@@ -373,8 +385,19 @@ enum sound_effect_entries {
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol)); \
     } while(0)
 
+#define Hero_playnotes(instrument, str, vol) \
+    do {                                                                    \
+        if (!Deaf && soundprocs.sound_hero_playnotes                        \
+            && ((soundprocs.sndcap & SNDCAP_HEROMUSIC) != 0))               \
+            (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol)); \
+    } while(0)
 #else
+#ifdef SND_LIB_INTEGRATED
+#undef  SND_LIB_INTEGRATED
+#endif
+#define Play_usersound(filename, vol, idx)
 #define Soundeffect(seid, vol)
+#define Hero_playnotes(instrument, str, vol)
 #endif
 
 #endif /* SNDPROCS_H */

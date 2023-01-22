@@ -1813,6 +1813,7 @@ extern boolean munslime(struct monst *, boolean);
 
 extern void awaken_soldiers(struct monst *);
 extern int do_play_instrument(struct obj *);
+enum instruments obj_to_instr(struct obj *);
 
 /* ### nhlsel.c ### */
 
@@ -2605,6 +2606,10 @@ extern void play_usersound_via_idx(int, int);
 extern void assign_soundlib(int);
 extern void activate_chosen_soundlib(void);
 extern void get_soundlib_name(char *dest, int maxlen);
+#ifdef SND_SOUNDEFFECTS_AUTOMAP
+extern char *get_sound_effect_filename(int32_t seidint,
+                                       char *buf, size_t bufsz, int32_t);
+#endif
 
 /* ### sp_lev.c ### */
 
