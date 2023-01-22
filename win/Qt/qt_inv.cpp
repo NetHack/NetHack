@@ -49,12 +49,18 @@ find_tool(int tooltyp)
     return o;
 }
 
-NetHackQtInvUsageWindow::NetHackQtInvUsageWindow(QWidget* parent) :
+NetHackQtInvUsageWindow::NetHackQtInvUsageWindow(QWidget *parent) :
     QWidget(parent)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // needed to enable tool tips
     setMouseTracking(true);
+
+    /*
+     * TODO:
+     *  Add support for clicking on a paperdoll cell and have that
+     *  run itemactions(invent.c) for the object shown in the cell.
+     */
 
     // paperdoll is 6x3 but the indices are column oriented: 0..2x0..5
     for (int x = 0; x <= 2; ++x)
@@ -70,9 +76,12 @@ NetHackQtInvUsageWindow::~NetHackQtInvUsageWindow()
                 free((void *) tips[x][y]), tips[x][y] = NULL;
 }
 
-void NetHackQtInvUsageWindow::drawWorn(QPainter &painter, obj *nhobj,
-                                       int x, int y, // cell index, not pixels
-                                       const char *alttip, int flags)
+void NetHackQtInvUsageWindow::drawWorn(
+    QPainter &painter,
+    obj *nhobj,
+    int x, int y, // cell index, not pixels
+    const char *alttip,
+    int flags)
 {
     short int glyph;
     glyph_info gi;

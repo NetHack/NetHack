@@ -4600,7 +4600,8 @@ reset_commands(boolean initial)
 #endif
             /* FIXME: NHKF_DOINV2 ought to be implemented instead of this */
             c = M('0') & 0xff;
-            gc.Cmd.commands[c] = gc.Cmd.pcHack_compat ? gc.Cmd.commands['I'] : 0;
+            gc.Cmd.commands[c] = gc.Cmd.pcHack_compat ? gc.Cmd.commands['I']
+                                                      : 0;
         }
         /* phone keypad layout (only applicable for num_pad) */
         flagtemp = (iflags.num_pad_mode & 2) ? gc.Cmd.num_pad : FALSE;
