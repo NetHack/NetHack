@@ -153,6 +153,19 @@ x.....x
 .......
 x.....x]], contents = function() end  });
    end,
+   function ()
+      des.map({ halign = rnd_halign(), valign = rnd_valign(), map = [[
+BBBBBBB
+B.....B
+B.....B
+B.....B
+B.....B
+B.....B
+BBBBBBB]], contents = function()
+   des.region({ region={2,2, 2,2}, type="temple", filled=1, irregular=1 });
+   des.altar({ x=3, y=3, align="noalign", type=percent(75) and "altar" or "shrine" });
+      end  });
+   end,
 };
 
 function rnd_hell_prefab()
