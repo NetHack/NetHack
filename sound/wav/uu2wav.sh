@@ -1,0 +1,56 @@
+#
+# decode the uu files in this directory
+#
+uudecode se_squeak_A.uu
+uudecode se_squeak_B.uu
+uudecode se_squeak_B_flat.uu
+uudecode se_squeak_C.uu
+uudecode se_squeak_D.uu
+uudecode se_squeak_D_flat.uu
+uudecode se_squeak_E.uu
+uudecode se_squeak_E_flat.uu
+uudecode se_squeak_F.uu
+uudecode se_squeak_F_sharp.uu
+uudecode se_squeak_G.uu
+uudecode se_squeak_G_sharp.uu
+uudecode sound_Bell.uu
+uudecode sound_Bugle_A.uu
+uudecode sound_Bugle_B.uu
+uudecode sound_Bugle_C.uu
+uudecode sound_Bugle_D.uu
+uudecode sound_Bugle_E.uu
+uudecode sound_Bugle_F.uu
+uudecode sound_Bugle_G.uu
+uudecode sound_Drum_Of_Earthquake.uu
+uudecode sound_Fire_Horn.uu
+uudecode sound_Frost_Horn.uu
+uudecode sound_Leather_Drum.uu
+uudecode sound_Magic_Harp_A.uu
+uudecode sound_Magic_Harp_B.uu
+uudecode sound_Magic_Harp_C.uu
+uudecode sound_Magic_Harp_D.uu
+uudecode sound_Magic_Harp_E.uu
+uudecode sound_Magic_Harp_F.uu
+uudecode sound_Magic_Harp_G.uu
+uudecode sound_Tooled_Horn_A.uu
+uudecode sound_Tooled_Horn_B.uu
+uudecode sound_Tooled_Horn_C.uu
+uudecode sound_Tooled_Horn_D.uu
+uudecode sound_Tooled_Horn_E.uu
+uudecode sound_Tooled_Horn_F.uu
+uudecode sound_Tooled_Horn_G.uu
+uudecode sound_Wooden_Flute_A.uu
+uudecode sound_Wooden_Flute_B.uu
+uudecode sound_Wooden_Flute_C.uu
+uudecode sound_Wooden_Flute_D.uu
+uudecode sound_Wooden_Flute_E.uu
+uudecode sound_Wooden_Flute_F.uu
+uudecode sound_Wooden_Flute_G.uu
+uudecode sound_Wooden_Harp_A.uu
+uudecode sound_Wooden_Harp_B.uu
+uudecode sound_Wooden_Harp_C.uu
+uudecode sound_Wooden_Harp_D.uu
+uudecode sound_Wooden_Harp_E.uu
+uudecode sound_Wooden_Harp_F.uu
+uudecode sound_Wooden_Harp_G.uu
+
