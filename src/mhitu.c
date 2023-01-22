@@ -845,7 +845,7 @@ summonmu(struct monst *mtmp, boolean youseeit)
 
     if (is_demon(mdat)) {
         if (mdat != &mons[PM_BALROG] && mdat != &mons[PM_AMOROUS_DEMON]) {
-            if (!rn2(13))
+            if (!rn2(Inhell ? 10 : 16))
                 (void) msummon(mtmp);
         }
         return; /* no such thing as a demon were creature, so we're done */
