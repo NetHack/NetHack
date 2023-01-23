@@ -1648,9 +1648,9 @@ create_subroom(
     if (h == -1)
         h = rnd(height - 3);
     if (x == -1)
-        x = rnd(width - w - 1) - 1;
+        x = rnd(width - w);
     if (y == -1)
-        y = rnd(height - h - 1) - 1;
+        y = rnd(height - h);
     if (x == 1)
         x = 0;
     if (y == 1)

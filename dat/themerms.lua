@@ -197,7 +197,6 @@ themerooms = {
    end,
 
    -- Room in a room
-   -- FIXME: subroom location is too often left/top?
    function()
       des.room({ type = "ordinary", filled = 1,
                  contents = function()
