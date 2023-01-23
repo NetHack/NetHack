@@ -22,7 +22,6 @@ static void fmod_play_usersound(char *, int32_t, int32_t);
 
 struct sound_procs fmod_procs = {
     SOUNDID(fmod),
-    0L,
     SNDCAP_USERSOUNDS,
     fmod_init_nhsound,
     fmod_exit_nhsound,
