@@ -524,7 +524,7 @@ MDLIBTTY  = $(OTTY)mdlib.o
 DLBOBJTTY = $(OTTY)dlb.o
 REGEXTTY  = $(OTTY)cppregex.o
 LUAOBJTTY = $(OTTY)nhlua.o    $(OTTY)nhlsel.o    $(OTTY)nhlobj.o
-SOUNDTTY  = $(OTTY)windsound.o $(OTTY)sample.o
+SOUNDTTY  = $(OTTY)windsound.o #$(OTTY)sample.o
 VVOBJTTY  = $(OTTY)version.o
 
 SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o \
@@ -1797,7 +1797,7 @@ $(OTTY)consoletty.o:   $(MSWSYS)\consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OTTY)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsys.o:  $(MSWSYS)\windsys.c $(WINDHDR) $(HACK_H)
 $(OTTY)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
-$(OTTY)sample.o: ..\sound\sample\sample.c $(HACK_H)
+#$(OTTY)sample.o: ..\sound\sample\sample.c $(HACK_H)
 $(OTTY)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
 $(OTTY)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
 
