@@ -592,8 +592,9 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
             windowtype = gc.chosen_windowtype;
     }
     choose_windows(windowtype);
-
-#if defined(SND_LIB_WINDSOUND)
+#if defined(SND_LIB_FMOD)
+    assign_soundlib(soundlib_fmod);
+#elif defined(SND_LIB_WINDSOUND)
     assign_soundlib(soundlib_windsound);
 #endif
 
