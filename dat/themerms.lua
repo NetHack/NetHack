@@ -227,6 +227,33 @@ themerooms = {
       });
    end,
 
+   -- Nesting rooms
+   function()
+      des.room({ type = "ordinary", w = 9 + nh.rn2(4), h = 9 + nh.rn2(4), filled = 1,
+                 contents = function(rm)
+                    local wid = math.random(math.floor(rm.width / 2), rm.width - 2);
+                    local hei = math.random(math.floor(rm.height / 2), rm.height - 2);
+                    des.room({ type = "ordinary", w = wid,h = hei, filled = 1,
+                               contents = function()
+                                  des.door({ state="random", wall="all" });
+                                  if (percent(15)) then
+                                     des.door({ state="random", wall="all" });
+                                  end
+                                  if (percent(90)) then
+                                     des.room({ type = "ordinary", filled = 1,
+                                                contents = function()
+                                                   des.door({ state="random", wall="all" });
+                                                   if (percent(15)) then
+                                                      des.door({ state="random", wall="all" });
+                                                   end
+                                                end
+                                     });
+                                  end
+                               end
+                    });
+                 end
+      });
+   end,
    {
       frequency = 6,
       contents = function()
