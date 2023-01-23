@@ -70,7 +70,7 @@ static void fmod_hero_playnotes(int32_t instrument, char *str, int32_t volume)
 
 /* fulfill  SNDCAP_USERSOUNDS */
 static void
-fmod_play_usersound(char *filename, int volume, int idx)
+fmod_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     FMOD_System_CreateSound(systemvar, filename, FMOD_CREATESAMPLE, 0,
                             &soundvar);
