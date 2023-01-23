@@ -614,10 +614,10 @@ doengrave(void)
                 surface(u.ux, u.uy));
             return ECMD_OK;
         } else if (!levl[u.ux][u.uy].disturbed) {
-            You("disturb the undead!");
-            levl[u.ux][u.uy].disturbed = 1;
-            (void) makemon(&mons[PM_GHOUL], u.ux, u.uy, NO_MM_FLAGS);
-            exercise(A_WIS, FALSE);
+            /* disturb the grave: summon a ghoul, same as sometimes
+               happens when kicking; sets levl[ux][uy]->disturbed so
+               that it'll only happen once */
+            disturb_grave(u.ux, u.uy);
             return ECMD_TIME;
         }
     }
@@ -1473,6 +1473,24 @@ make_grave(coordxy x, coordxy y, const char *str)
         str = get_rnd_text(EPITAPHFILE, buf, rn2, MD_PAD_RUMORS);
     make_engr_at(x, y, str, 0L, HEADSTONE);
     return;
+}
+
+/* called when kicking or engraving on a grave's headstone */
+void
+disturb_grave(coordxy x, coordxy y)
+{
+    struct rm *lev = &levl[x][y];
+
+    if (!IS_GRAVE(lev->typ)) {
+        impossible("Disturing grave that isn't a grave? (%d)", lev->typ);
+    } else if (lev->disturbed) {
+        impossible("Disturing already disturbed grave?");
+    } else {
+        You("disturb the undead!");
+        lev->disturbed = 1;
+        (void) makemon(&mons[PM_GHOUL], x, y, NO_MM_FLAGS);
+        exercise(A_WIS, FALSE);
+    }
 }
 
 static const char blind_writing[][21] = {

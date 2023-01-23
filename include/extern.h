@@ -828,6 +828,7 @@ extern void engr_stats(const char *, char *, long *, long *);
 extern void del_engr(struct engr *);
 extern void rloc_engr(struct engr *);
 extern void make_grave(coordxy, coordxy, const char *);
+extern void disturb_grave(coordxy, coordxy);
 
 /* ### exper.c ### */
 

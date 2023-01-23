@@ -874,6 +874,7 @@ kick_ouch(coordxy x, coordxy y, const char *kickobjnam)
             (void) find_drawbridge(&x, &y);
             gm.maploc = &levl[x][y];
         }
+        wake_nearto(x, y, 5 * 5);
     }
     if (!rn2(3))
         set_wounded_legs(RIGHT_SIDE, 5 + rnd(5));
@@ -1098,9 +1099,8 @@ dokick(void)
                 pline("Crash!  %s a secret door!",
                       /* don't "kick open" when it's locked
                          unless it also happens to be trapped */
-                      (gm.maploc->doormask & (D_LOCKED | D_TRAPPED)) == D_LOCKED
-                          ? "Your kick uncovers"
-                          : "You kick open");
+                      ((gm.maploc->doormask & (D_LOCKED | D_TRAPPED))
+                       == D_LOCKED) ? "Your kick uncovers" : "You kick open");
                 exercise(A_DEX, TRUE);
                 if (gm.maploc->doormask & D_TRAPPED) {
                     gm.maploc->doormask = D_NODOOR;
@@ -1217,26 +1217,33 @@ dokick(void)
         if (IS_GRAVE(gm.maploc->typ)) {
             if (Levitation) {
                 kick_dumb(x, y);
-                return ECMD_TIME;
-            }
-            if (rn2(4)) {
+            } else if (rn2(4)) {
+                /* minor injury */
                 kick_ouch(x, y, "");
-                return ECMD_TIME;
-            }
-            exercise(A_WIS, FALSE);
-            if (Role_if(PM_ARCHEOLOGIST) || Role_if(PM_SAMURAI)
-                || ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10))) {
-                adjalign(-sgn(u.ualign.type));
-            }
-            gm.maploc->typ = ROOM;
-            gm.maploc->doormask = 0;
-            (void) mksobj_at(ROCK, x, y, TRUE, FALSE);
-            del_engr_at(x, y);
-            if (Blind)
-                pline("Crack!  %s broke!", Something);
-            else {
-                pline_The("headstone topples over and breaks!");
-                newsym(x, y);
+            } else if (!gm.maploc->disturbed && !rn2(2)) {
+                /* disturb the grave: summon a ghoul (once only), same as
+                   when engraving */
+                disturb_grave(x, y);
+            } else {
+                /* destroy the headstone, implicitly destroying any
+                   not-yet-created contents (including zombie or mummy);
+                   any already created contents will still be buried here */
+                exercise(A_WIS, FALSE);
+                if (Role_if(PM_ARCHEOLOGIST) || Role_if(PM_SAMURAI)
+                    || (u.ualign.type == A_LAWFUL && u.ualign.record > -10))
+                    adjalign(-sgn(u.ualign.type));
+                gm.maploc->typ = ROOM;
+                gm.maploc->emptygrave = 0; /* clear 'flags' */
+                gm.maploc->disturbed = 0; /* clear 'horizontal' */
+                (void) mksobj_at(ROCK, x, y, TRUE, FALSE);
+                del_engr_at(x, y);
+                if (Blind) {
+                    /* [feel this happen if Deaf?] */
+                    pline("Crack!  %s broke!", Something);
+                } else {
+                    pline_The("headstone topples over and breaks!");
+                    newsym(x, y);
+                }
             }
             return ECMD_TIME;
         }

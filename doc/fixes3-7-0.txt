@@ -1094,6 +1094,9 @@ demon gating happens more in Gehennom and less outside it
 intelligent peacefuls avoid digging shop or temple walls
 fix bug making random subrooms never touching the right or bottom
 	wall of the parent room
+if a grave is created with the corpse lying on top (bones), don't find a
+	corpse or release a zombie or mummy when digging it up
+kicking a headstone might summon a ghoul
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
