@@ -359,6 +359,9 @@ done2(void)
 #ifndef NO_SIGNAL
             (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
+            if (soundprocs.sound_exit_nhsound)
+                (*soundprocs.sound_exit_nhsound)("done2");
+
             exit_nhwindows((char *) 0);
             NH_abort();
         } else if (c == 'q')
@@ -608,6 +611,8 @@ panic VA_DECL(const char *, str)
     if (iflags.window_inited) {
         raw_print("\r\nOops...");
         wait_synch(); /* make sure all pending output gets flushed */
+        if (soundprocs.sound_exit_nhsound)
+            (*soundprocs.sound_exit_nhsound)("panic");
         exit_nhwindows((char *) 0);
         iflags.window_inited = 0; /* they're gone; force raw_print()ing */
     }
@@ -1668,6 +1673,11 @@ really_done(int how)
         destroy_nhwindow(endwin);
 
     dump_close_log();
+
+    /* shut down soundlib */
+    if (soundprocs.sound_exit_nhsound)
+        (*soundprocs.sound_exit_nhsound)("really_done");
+
     /*
      * "So when I die, the first thing I will see in Heaven is a score list?"
      *

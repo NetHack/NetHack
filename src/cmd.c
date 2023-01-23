@@ -6331,6 +6331,8 @@ end_of_input(void)
 #endif
         if (gp.program_state.something_worth_saving)
             (void) dosave0();
+    if (soundprocs.sound_exit_nhsound)
+        (*soundprocs.sound_exit_nhsound)("end_of_input");
     if (iflags.window_inited)
         exit_nhwindows((char *) 0);
     clearlocks();
