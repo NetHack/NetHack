@@ -469,6 +469,7 @@ use_whistle(struct obj *obj)
             You_feel("rushing air tickle your %s.", body_part(NOSE));
         else
             You(whistle_str, obj->cursed ? "shrill" : "high");
+        Soundeffect(se_shrill_whistle, 50);
         wake_nearby();
         if (obj->cursed)
             vault_summon_gd();
@@ -490,7 +491,7 @@ use_magic_whistle(struct obj *obj)
             Hallucination ? "normal"
             : (Underwater && !Deaf) ? "strange, high-pitched"
               : "strange");
-
+        Soundeffect(se_shrill_whistle, 80);
         magic_whistled(obj);
     }
 }
