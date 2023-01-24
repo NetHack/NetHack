@@ -574,19 +574,19 @@ do_improvisation(struct obj* instr)
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         You("%sproduce %s music.", !Deaf ? "" : "seem to ",
             Hallucination ? "piped" : "soft");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
         else
             You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (do_spec)
             charm_snakes(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -602,57 +602,57 @@ do_improvisation(struct obj* instr)
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
-                Hero_playnotes(obj_to_instr(&itmp), "C", 50);
                 Sprintf(buf, "using a magical horn on %sself", uhim());
+                Hero_playnotes(obj_to_instr(&itmp), "C", 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
             int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD : AD_FIRE);
 
-            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
+            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             ubuzz(BZ_U_WAND(type), rn1(6, 6));
         }
         makeknown(instr->otyp);
         break;
     case TOOLED_HORN: /* Awaken or scare monsters */
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             You("produce a frightful, grave sound.");
         else
             You("blow into the horn.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             You("extract a loud noise from %s.", yname(instr));
         else
             You("blow into the bugle.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         awaken_soldiers(&gy.youmonst);
         exercise(A_WIS, FALSE);
         break;
     case MAGIC_HARP: /* Charm monsters */
         consume_obj_charge(instr, TRUE);
 
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s very attractive music.", Tobjnam(instr, "produce"));
         else
             You_feel("very soothing vibrations.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s %s.", Yname2(instr),
                   do_spec ? "produces a lilting melody" : "twangs");
         else
             You_feel("soothing vibrations.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -664,8 +664,8 @@ do_improvisation(struct obj* instr)
            mundane is flagged */
         consume_obj_charge(instr, TRUE);
 
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         You("produce a heavy, thunderous rolling!");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
         do_earthquake((u.ulevel - 1) / 3 + 1);
         /* shake up monsters in a much larger radius... */
@@ -674,20 +674,21 @@ do_improvisation(struct obj* instr)
         break;
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
-            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             if (!Deaf) {
                 You("beat a deafening row!");
+                Hero_playnotes(obj_to_instr(&itmp), "CCC", 100);
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {
                 You("pound on the drum.");
             }
             exercise(A_WIS, FALSE);
-        } else
+        } else {
             /* TODO maybe: sound effects for these riffs */
-            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
+            Hero_playnotes(obj_to_instr(&itmp), "CCCCC", 50);
+        }
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         gc.context.botl = TRUE;
         break;

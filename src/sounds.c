@@ -1556,9 +1556,6 @@ release_sound_mappings(void)
 
 struct sound_procs soundprocs;
 
-#ifdef SND_LIB_QTSOUND
-extern struct sound_procs qtsound_procs;
-#endif
 #ifdef SND_LIB_PORTAUDIO
 extern struct sound_procs portaudio_procs;
 #endif
@@ -1586,6 +1583,9 @@ extern struct sound_procs windsound_procs;
 #ifdef SND_LIB_MACSOUND
 extern struct sound_procs macsound_procs;
 #endif
+#ifdef SND_LIB_QTSOUND
+extern struct sound_procs qtsound_procs;
+#endif
 
 struct sound_procs nosound_procs = {
     SOUNDID(nosound),
@@ -1605,9 +1605,6 @@ static struct sound_choices {
     struct sound_procs *sndprocs;
 } soundlib_choices[] = {
     { &nosound_procs },     /* default, built-in */
-#ifdef SND_LIB_QTSOUND
-    { &qtsound_procs },
-#endif
 #ifdef SND_LIB_PORTAUDIO
     { &portaudio_procs },
 #endif
@@ -1634,6 +1631,9 @@ static struct sound_choices {
 #endif
 #ifdef SND_LIB_MACSOUND
     { &macsound_procs },
+#endif
+#ifdef SND_LIB_QTSOUND
+    { &qtsound_procs },
 #endif
 };
 

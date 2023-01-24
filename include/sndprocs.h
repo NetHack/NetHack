@@ -67,9 +67,6 @@
 
 enum soundlib_ids {
     soundlib_nosound,
-#ifdef SND_LIB_QTSOUND
-    soundlib_qtsound,
-#endif
 #ifdef SND_LIB_PORTAUDIO
     soundlib_portaudio,
 #endif
@@ -95,8 +92,12 @@ enum soundlib_ids {
     soundlib_windsound,
 #endif
 #ifdef SND_LIB_MACSOUND
-    soundlib_macsound
+    soundlib_macsound,
 #endif
+#ifdef SND_LIB_QTSOUND
+    soundlib_qtsound,
+#endif
+    soundlib_notused
 };
 
 struct sound_procs {

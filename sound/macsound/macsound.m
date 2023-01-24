@@ -159,7 +159,7 @@ static void macsound_hero_playnotes(int32_t instrument,
                   const char *str, int32_t vol UNUSED)
 {
 #ifdef WAVEMUSIC_SOUNDS
-    uint32_t pseudo_seid;
+    uint32_t pseudo_seid, pseudo_seid_base;
     boolean has_note_variations = FALSE;
     char resourcename[120], *end_of_res = 0;
     const char *c = 0;
@@ -170,91 +170,88 @@ static void macsound_hero_playnotes(int32_t instrument,
     switch(instrument) {
         case ins_tinkle_bell:
             Strcpy(resourcename, "sound_Bell");
-            pseudo_seid = 0;
+            pseudo_seid_base = 0;
             break;
         case ins_taiko_drum:        /* DRUM_OF_EARTHQUAKE */
             Strcpy(resourcename, "sound_Drum_Of_Earthquake");
-            pseudo_seid = 1;
+            pseudo_seid_base = 1;
             break;
         case ins_baritone_sax:      /* FIRE_HORN */
             Strcpy(resourcename, "sound_Fire_Horn");
-            pseudo_seid = 2;
+            pseudo_seid_base = 2;
             break;
         case ins_french_horn:       /* FROST_HORN */
             Strcpy(resourcename, "sound_Frost_Horn");
-            pseudo_seid = 3;
+            pseudo_seid_base = 3;
             break;
         case ins_melodic_tom:       /* LEATHER_DRUM */
             Strcpy(resourcename, "sound_Leather_Drum");
-            pseudo_seid = 4;
+            pseudo_seid_base = 4;
             break;
         case ins_trumpet:           /* BUGLE */
             Strcpy(resourcename, "sound_Bugle");
             has_note_variations = TRUE;
-            pseudo_seid = 5;
+            pseudo_seid_base = 5;
             break;
         case ins_cello:             /* MAGIC_HARP */
             Strcpy(resourcename, "sound_Magic_Harp");
             has_note_variations = TRUE;
-            pseudo_seid = 12;
+            pseudo_seid_base = 12;
         case ins_english_horn:      /* TOOLED_HORN */
             Strcpy(resourcename, "sound_Tooled_Horn");
             has_note_variations = TRUE;
-            pseudo_seid = 19;
+            pseudo_seid_base = 19;
             break;
         case ins_flute:             /* WOODEN_FLUTE */
             Strcpy(resourcename, "sound_Wooden_Flute");
             has_note_variations = TRUE;
-            pseudo_seid = 26;
+            pseudo_seid_base = 26;
             break;
         case ins_orchestral_harp:   /* WOODEN_HARP */
             Strcpy(resourcename, "sound_Wooden_Harp");
             has_note_variations = TRUE;
-            pseudo_seid = 33;
+            pseudo_seid_base = 33;
             break;
         case ins_pan_flute:         /* MAGIC_FLUTE */
              /* wav files for sound_Magic_Flute not added yet */
             Strcpy(resourcename, "sound_Wooden_Flute");
             has_note_variations = TRUE;
-            pseudo_seid = 26;
+            pseudo_seid_base = 26;
             break;
     }
-    pseudo_seid += number_of_se_entries; /* get past se_ entries */
+    pseudo_seid_base += number_of_se_entries; /* get past se_ entries */
 
-    if (has_note_variations) {
-        int i, idx = 0, notecount = strlen(str);
-        static const char *const note_suffixes[]
-                                = { "_A", "_B", "_C", "_D", "_E", "_F", "_G" };
+    int i, idx = 0, notecount = strlen(str);
+    static const char *const note_suffixes[]
+                            = { "_A", "_B", "_C", "_D", "_E", "_F", "_G" };
 
-        end_of_res = eos(resourcename);
-        c = str;
-        for (i = 0; i < notecount; ++i) {
-            if (*c >= 'A' && *c <= 'G') {
+    end_of_res = eos(resourcename);
+    c = str;
+    for (i = 0; i < notecount; ++i) {
+        if (*c >= 'A' && *c <= 'G') {
+            pseudo_seid = pseudo_seid_base;
+            if (has_note_variations) {
                 idx = (*c) - 'A';
                 pseudo_seid += idx;
                 if (pseudo_seid >= SIZE(affiliation))
-			break;
+                    break;
                 Strcpy(end_of_res, note_suffixes[idx]);
-                if (!affiliation[pseudo_seid]) {
-                    affiliate(pseudo_seid, resourcename);
-                }
-                if (affiliation[pseudo_seid]) {
-                    if ([seSound[pseudo_seid] isPlaying])
-                        [seSound[pseudo_seid] stop];
-                    [seSound[pseudo_seid] play];
+            }
+            if (!affiliation[pseudo_seid]) {
+                affiliate(pseudo_seid, resourcename);
+            }
+            if (affiliation[pseudo_seid]) {
+                if ([seSound[pseudo_seid] isPlaying])
+                    [seSound[pseudo_seid] stop];
+                [seSound[pseudo_seid] play];
+                if (i < notecount - 1) {
+                    /* more notes to follow */
+                    msleep(150);
+                    [seSound[pseudo_seid] stop];
                 }
             }
-            c++;
         }
-    } else {
-        if (!affiliation[pseudo_seid]) {
-            affiliate(pseudo_seid, resourcename);
-        }
-        if (affiliation[pseudo_seid]) {
-            if ([seSound[pseudo_seid] isPlaying])
-                [seSound[pseudo_seid] stop];
-            [seSound[pseudo_seid] play];
-        }
+        c++;
     }
 #endif
 }
