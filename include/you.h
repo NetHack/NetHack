@@ -495,7 +495,7 @@ struct you {
  * done.
  */
 struct _hitmon_data {
-    int tmp;  /* damage value? */
+    int dmg;  /* damage */
     int thrown;
     int dieroll;
     struct permonst *mdat;

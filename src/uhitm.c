@@ -763,19 +763,19 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
     long silverhit = 0L; /* armor mask */
 
     if (hmd->mdat == &mons[PM_SHADE]) {
-        hmd->tmp = 0;
+        hmd->dmg = 0;
     } else {
         /* note: 1..2 or 1..4 can be substantiallly increased by
            strength bonus or skill bonus, usually both... */
-        hmd->tmp = rnd(!martial_bonus() ? 2 : 4);
+        hmd->dmg = rnd(!martial_bonus() ? 2 : 4);
         hmd->use_weapon_skill = TRUE;
-        hmd->train_weapon_skill = (hmd->tmp > 1);
+        hmd->train_weapon_skill = (hmd->dmg > 1);
     }
 
     /* Blessed gloves give bonuses when fighting 'bare-handed'.  So do
        silver rings.  Note:  rings are worn under gloves, so you don't
        get both bonuses, and two silver rings don't give double bonus. */
-    hmd->tmp += special_dmgval(&gy.youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
+    hmd->dmg += special_dmgval(&gy.youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
                           &silverhit);
     hmd->barehand_silver_rings = (((silverhit & W_RINGL) ? 1 : 0)
                                   + ((silverhit & W_RINGR) ? 1 : 0));
@@ -789,13 +789,13 @@ hmon_hitmon_weapon_ranged(struct _hitmon_data *hmd, struct monst *mon, struct ob
     /* then do only 1-2 points of damage and don't use or
        train weapon's skill */
     if (hmd->mdat == &mons[PM_SHADE] && !shade_glare(obj))
-        hmd->tmp = 0;
+        hmd->dmg = 0;
     else
-        hmd->tmp = rnd(2);
+        hmd->dmg = rnd(2);
     if (hmd->material == SILVER && mon_hates_silver(mon)) {
         hmd->silvermsg = hmd->silverobj = TRUE;
         /* if it will already inflict dmg, make it worse */
-        hmd->tmp += rnd((hmd->tmp) ? 20 : 10);
+        hmd->dmg += rnd((hmd->dmg) ? 20 : 10);
     }
     if (!hmd->thrown && obj == uwep && obj->otyp == BOOMERANG
         && rnl(4) == 4 - 1) {
@@ -811,7 +811,7 @@ hmon_hitmon_weapon_ranged(struct _hitmon_data *hmd, struct monst *mon, struct ob
             obj = (struct obj *) 0;
         hmd->hittxt = TRUE;
         if (hmd->mdat != &mons[PM_SHADE])
-            hmd->tmp++;
+            hmd->dmg++;
     }
 }
 
@@ -823,9 +823,9 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
 
     /* "normal" weapon usage */
     hmd->use_weapon_skill = TRUE;
-    hmd->tmp = dmgval(obj, mon);
+    hmd->dmg = dmgval(obj, mon);
     /* a minimal hit doesn't exercise proficiency */
-    hmd->train_weapon_skill = (hmd->tmp > 1);
+    hmd->train_weapon_skill = (hmd->dmg > 1);
     /* special attack actions */
     if (!hmd->train_weapon_skill || mon == u.ustuck || u.twoweap
         /* Cleaver can hit up to three targets at once so don't
@@ -836,7 +836,7 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
                /* multi-shot throwing is too powerful here */
                && hmd->hand_to_hand) {
         You("strike %s from behind!", mon_nam(mon));
-        hmd->tmp += rnd(u.ulevel);
+        hmd->dmg += rnd(u.ulevel);
         hmd->hittxt = TRUE;
     } else if (hmd->dieroll == 2 && obj == uwep
                && obj->oclass == WEAPON_CLASS
@@ -874,7 +874,7 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
     }
 
     if (obj->oartifact
-        && artifact_hit(&gy.youmonst, mon, obj, &hmd->tmp, hmd->dieroll)) {
+        && artifact_hit(&gy.youmonst, mon, obj, &hmd->dmg, hmd->dieroll)) {
         /* artifact_hit updates 'tmp' but doesn't inflict any
            damage; however, it might cause carried items to be
            destroyed and they might do so */
@@ -885,7 +885,7 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
             /*return FALSE;*/
         }
         /* perhaps artifact tried to behead a headless monster */
-        if (hmd->tmp == 0) {
+        if (hmd->dmg == 0) {
             hmd->doreturn = TRUE;
             hmd->retval = TRUE;
             return;
@@ -899,7 +899,7 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
     if (artifact_light(obj) && obj->lamplit
         && mon_hates_light(mon))
         hmd->lightobj = TRUE;
-    if (u.usteed && !hmd->thrown && hmd->tmp > 0
+    if (u.usteed && !hmd->thrown && hmd->dmg > 0
         && weapon_type(obj) == P_LANCE && mon != u.ustuck) {
         hmd->jousting = joust(mon, obj);
         /* exercise skill even for minimal damage hits */
@@ -913,11 +913,11 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
                bows with own arrows; they're highly trained */
             if (Role_if(PM_SAMURAI) && obj->otyp == YA
                 && uwep->otyp == YUMI)
-                hmd->tmp++;
+                hmd->dmg++;
             else if (Race_if(PM_ELF) && obj->otyp == ELVEN_ARROW
                      && uwep->otyp == ELVEN_BOW)
-                hmd->tmp++;
-            hmd->train_weapon_skill = (hmd->tmp > 0);
+                hmd->dmg++;
+            hmd->train_weapon_skill = (hmd->dmg > 0);
         }
         if (obj->opoisoned && is_poisonable(obj))
             hmd->ispoisoned = TRUE;
@@ -963,7 +963,7 @@ hmon_hitmon_potion(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
     hmd->hittxt = TRUE;
     /* in case potion effect causes transformation */
     hmd->mdat = mon->data;
-    hmd->tmp = (hmd->mdat == &mons[PM_SHADE]) ? 0 : 1;
+    hmd->dmg = (hmd->mdat == &mons[PM_SHADE]) ? 0 : 1;
 }
 
 static void
@@ -973,7 +973,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
     case BOULDER:         /* 1d20 */
     case HEAVY_IRON_BALL: /* 1d25 */
     case IRON_CHAIN:      /* 1d4+1 */
-        hmd->tmp = dmgval(obj, mon);
+        hmd->dmg = dmgval(obj, mon);
         break;
     case MIRROR:
         if (breaktest(obj)) {
@@ -985,7 +985,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
             hmd->get_dmg_bonus = FALSE;
             hmd->hittxt = TRUE;
         }
-        hmd->tmp = 1;
+        hmd->dmg = 1;
         break;
     case EXPENSIVE_CAMERA:
         You("succeed in destroying %s.  Congratulations!",
@@ -998,7 +998,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         /*return TRUE;*/
     case CORPSE: /* fixed by polder@cs.vu.nl */
         if (touch_petrifies(&mons[obj->corpsenm])) {
-            hmd->tmp = 1;
+            hmd->dmg = 1;
             hmd->hittxt = TRUE;
             You("hit %s with %s.", mon_nam(mon),
                 corpse_xname(obj, (const char *) 0,
@@ -1019,7 +1019,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
             ; /* maybe turn the corpse into a statue? */
 #endif
         }
-        hmd->tmp = (obj->corpsenm >= LOW_PM ? mons[obj->corpsenm].msize
+        hmd->dmg = (obj->corpsenm >= LOW_PM ? mons[obj->corpsenm].msize
                     : 0) + 1;
         break;
 
@@ -1034,7 +1034,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
     case EGG: {
         long cnt = obj->quan;
 
-        hmd->tmp = 1; /* nominal physical damage */
+        hmd->dmg = 1; /* nominal physical damage */
         hmd->get_dmg_bonus = FALSE;
         hmd->hittxt = TRUE; /* message always given */
         /* egg is always either used up or transformed, so next
@@ -1100,7 +1100,7 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         if (is_undead(hmd->mdat) || is_vampshifter(mon)) {
             monflee(mon, d(2, 4), FALSE, TRUE);
         }
-        hmd->tmp = 1;
+        hmd->dmg = 1;
         break;
     case CREAM_PIE:
     case BLINDING_VENOM:
@@ -1132,11 +1132,11 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
             }
             setmangry(mon, TRUE);
             mon->mcansee = 0;
-            hmd->tmp = rn1(25, 21);
-            if (((int) mon->mblinded + hmd->tmp) > 127)
+            hmd->dmg = rn1(25, 21);
+            if (((int) mon->mblinded + hmd->dmg) > 127)
                 mon->mblinded = 127;
             else
-                mon->mblinded += hmd->tmp;
+                mon->mblinded += hmd->dmg;
         } else {
             pline(obj->otyp == CREAM_PIE ? "Splat!" : "Splash!");
             setmangry(mon, TRUE);
@@ -1154,15 +1154,15 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         }
         hmd->hittxt = TRUE;
         hmd->get_dmg_bonus = FALSE;
-        hmd->tmp = 0;
+        hmd->dmg = 0;
         break;
     case ACID_VENOM: /* thrown (or spit) */
         if (resists_acid(mon)) {
             Your("venom hits %s harmlessly.", mon_nam(mon));
-            hmd->tmp = 0;
+            hmd->dmg = 0;
         } else {
             Your("venom burns %s!", mon_nam(mon));
-            hmd->tmp = dmgval(obj, mon);
+            hmd->dmg = dmgval(obj, mon);
         }
         {
             boolean more_than_1 = (obj->quan > 1L);
@@ -1181,10 +1181,10 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
     default:
         /* non-weapons can damage because of their weight */
         /* (but not too much) */
-        hmd->tmp = (obj->owt + 99) / 100;
-        hmd->tmp = (hmd->tmp <= 1) ? 1 : rnd(hmd->tmp);
-        if (hmd->tmp > 6)
-            hmd->tmp = 6;
+        hmd->dmg = (obj->owt + 99) / 100;
+        hmd->dmg = (hmd->dmg <= 1) ? 1 : rnd(hmd->dmg);
+        if (hmd->dmg > 6)
+            hmd->dmg = 6;
         /* wet towel has modest damage bonus beyond its weight,
            based on its wetness */
         if (is_wet_towel(obj)) {
@@ -1195,8 +1195,8 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
                because that would turn towel into a weptool);
                due to low weight, tmp always starts at 1 here, and
                due to wet towel's definition, obj->spe is 1..7 */
-            hmd->tmp += obj->spe * (doubld ? 2 : 1);
-            hmd->tmp = rnd(hmd->tmp); /* wet towel damage not capped at 6 */
+            hmd->dmg += obj->spe * (doubld ? 2 : 1);
+            hmd->dmg = rnd(hmd->dmg); /* wet towel damage not capped at 6 */
             /* usually lose some wetness but defer doing so
                until after hit message */
             hmd->dryit = (rn2(obj->spe + 1) > 0);
@@ -1204,11 +1204,11 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         /* things like silver wands can arrive here so we
            need another silver check; blessed check too */
         if (hmd->material == SILVER && mon_hates_silver(mon)) {
-            hmd->tmp += rnd(20);
+            hmd->dmg += rnd(20);
             hmd->silvermsg = hmd->silverobj = TRUE;
         }
         if (obj->blessed && mon_hates_blessings(mon))
-            hmd->tmp += rnd(4);
+            hmd->dmg += rnd(4);
     }
 }
 
@@ -1248,7 +1248,7 @@ hmon_hitmon_do_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
                 return;
         } else {
             if (hmd->mdat == &mons[PM_SHADE] && !shade_aware(obj)) {
-                hmd->tmp = 0;
+                hmd->dmg = 0;
             } else {
                 hmon_hitmon_misc_obj(hmd, mon, obj);
             }
@@ -1303,10 +1303,10 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
     }
 
     /* apply combined damage+strength and skill bonuses */
-    hmd->tmp += dmgbonus;
+    hmd->dmg += dmgbonus;
     /* don't let penalty, if bonus is negative, turn a hit into a miss */
-    if (hmd->tmp < 1)
-        hmd->tmp = 1;
+    if (hmd->dmg < 1)
+        hmd->dmg = 1;
 }
 
 static void
@@ -1332,7 +1332,7 @@ hmon_hitmon_poison(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
     if (resists_poison(mon))
         hmd->needpoismsg = TRUE;
     else if (rn2(10))
-        hmd->tmp += rnd(6);
+        hmd->dmg += rnd(6);
     else
         hmd->poiskilled = TRUE;
 }
@@ -1340,8 +1340,8 @@ hmon_hitmon_poison(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 static void
 hmon_hitmon_jousting(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 {
-    hmd->tmp += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
-    You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(hmd->tmp) : ".");
+    hmd->dmg += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
+    You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
     /* if this hit just broke the never-hit-with-wielded-weapon conduct
        (handled by caller...), give a livelog message for that now */
     if (u.uconduct.weaphit <= 1)
@@ -1358,7 +1358,7 @@ hmon_hitmon_jousting(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
         useup(obj);
         obj = (struct obj *) 0;
     }
-    if (mhurtle_to_doom(mon, hmd->tmp, &hmd->mdat))
+    if (mhurtle_to_doom(mon, hmd->dmg, &hmd->mdat))
         hmd->already_killed = TRUE;
     hmd->hittxt = TRUE;
 }
@@ -1372,7 +1372,7 @@ hmon_hitmon_stagger(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
         if (canspotmon(mon))
             pline("%s %s from your powerful strike!", Monnam(mon),
                   makeplural(stagger(mon->data, "stagger")));
-        if (mhurtle_to_doom(mon, hmd->tmp, &hmd->mdat))
+        if (mhurtle_to_doom(mon, hmd->dmg, &hmd->mdat))
             hmd->already_killed = TRUE;
         hmd->hittxt = TRUE;
     }
@@ -1381,13 +1381,13 @@ hmon_hitmon_stagger(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
 static void
 hmon_hitmon_pet(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNUSED)
 {
-    if (mon->mtame && hmd->tmp > 0) {
+    if (mon->mtame && hmd->dmg > 0) {
         /* do this even if the pet is being killed (affects revival) */
         abuse_dog(mon); /* reduces tameness */
         /* flee if still alive and still tame; if already suffering from
            untimed fleeing, no effect, otherwise increases timed fleeing */
         if (mon->mtame && !hmd->destroyed)
-            monflee(mon, 10 * rnd(hmd->tmp), FALSE, FALSE);
+            monflee(mon, 10 * rnd(hmd->dmg), FALSE, FALSE);
     }
 }
 
@@ -1427,7 +1427,7 @@ hmon_hitmon_msg_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
         && (!hmd->destroyed
             || (hmd->thrown && gm.m_shot.n > 1 && gm.m_shot.o == obj->otyp))) {
         if (hmd->thrown)
-            hit(mshot_xname(obj), mon, exclam(hmd->tmp));
+            hit(mshot_xname(obj), mon, exclam(hmd->dmg));
         else if (!Verbose(4, hmon_hitmon2))
             You("hit it.");
         else /* hand_to_hand */
@@ -1438,7 +1438,7 @@ hmon_hitmon_msg_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
                            || is_wet_towel(obj))) ? "lash"
                   : Role_if(PM_BARBARIAN) ? "smite"
                     : "hit",
-                mon_nam(mon), canseemon(mon) ? exclam(hmd->tmp) : ".");
+                mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
     }
 }
 
@@ -1516,7 +1516,7 @@ hmon_hitmon(
 {
     struct _hitmon_data hmd;
 
-    hmd.tmp = 0;
+    hmd.dmg = 0;
     hmd.thrown = thrown;
     hmd.dieroll = dieroll;
     hmd.mdat = mon->data;
@@ -1556,18 +1556,18 @@ hmon_hitmon(
      *      set 'use_weapon_skill', bare-handed does.
      */
 
-    if (hmd.tmp > 0)
+    if (hmd.dmg > 0)
         hmon_hitmon_dmg_recalc(&hmd, obj);
 
     if (hmd.ispoisoned)
         hmon_hitmon_poison(&hmd, mon, obj);
 
-    if (hmd.tmp < 1) {
+    if (hmd.dmg < 1) {
         boolean mon_is_shade = (mon->data == &mons[PM_SHADE]);
 
         /* make sure that negative damage adjustment can't result
            in inadvertently boosting the victim's hit points */
-        hmd.tmp = (hmd.get_dmg_bonus && !mon_is_shade) ? 1 : 0;
+        hmd.dmg = (hmd.get_dmg_bonus && !mon_is_shade) ? 1 : 0;
         if (mon_is_shade && !hmd.hittxt
             && thrown != HMON_THROWN && thrown != HMON_KICKED)
             /* this gives "harmlessly passes through" feedback even when
@@ -1577,7 +1577,7 @@ hmon_hitmon(
 
     if (hmd.jousting) {
         hmon_hitmon_jousting(&hmd, mon, obj);
-    } else if (hmd.unarmed && hmd.tmp > 1 && !thrown && !obj && !Upolyd) {
+    } else if (hmd.unarmed && hmd.dmg > 1 && !thrown && !obj && !Upolyd) {
         hmon_hitmon_stagger(&hmd, mon, obj);
     }
 
@@ -1590,9 +1590,9 @@ hmon_hitmon(
             && !hmd.jousting
             /* note: caller has already incremented u.uconduct.weaphit
                so we test for 1; 0 shouldn't be able to happen here... */
-            && hmd.tmp > 0 && u.uconduct.weaphit <= 1)
+            && hmd.dmg > 0 && u.uconduct.weaphit <= 1)
             first_weapon_hit(obj);
-        mon->mhp -= hmd.tmp;
+        mon->mhp -= hmd.dmg;
     }
     /* adjustments might have made tmp become less than what
        a level draining artifact has already done to max HP */
