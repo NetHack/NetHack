@@ -1098,6 +1098,7 @@ if a grave is created with the corpse lying on top (bones), don't find a
 	corpse or release a zombie or mummy when digging it up
 kicking a headstone might summon a ghoul
 eating garlic makes nearby monsters flee
+giants occasionally get a battle axe or a two-handed sword
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
