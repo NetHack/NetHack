@@ -1,4 +1,4 @@
-/* NetHack 3.7	sounds.c	$NHDT-Date: 1664920994 2022/10/04 22:03:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.123 $ */
+/* NetHack 3.7	sounds.c	$NHDT-Date: 1674548234 2023/01/24 08:17:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.134 $ */
 /*      Copyright (c) 1989 Janet Walz, Mike Threepoint */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1640,10 +1640,10 @@ static struct sound_choices {
 void
 activate_chosen_soundlib(void)
 {
-    enum soundlib_ids idx = gc.chosen_soundlib;
+    int idx = gc.chosen_soundlib;
 
     if (idx < soundlib_nosound || idx >= SIZE(soundlib_choices))
-        idx = soundlib_nosound;
+        panic("activate_chosen_soundlib: invalid soundlib (%d)", idx);
 
     if (ga.active_soundlib != soundlib_nosound || idx != soundlib_nosound) {
         if (soundprocs.sound_exit_nhsound)
@@ -1660,9 +1660,10 @@ void
 assign_soundlib(int idx)
 {
     if (idx < soundlib_nosound || idx >= SIZE(soundlib_choices))
-        idx = soundlib_nosound;
+        panic("assign_soundlib: invalid soundlib (%d)", idx);
 
-    gc.chosen_soundlib = (uint32_t) soundlib_choices[idx].sndprocs->soundlib_id;
+    gc.chosen_soundlib
+        = (uint32_t) soundlib_choices[idx].sndprocs->soundlib_id;
 }
 
 #if 0
@@ -1707,7 +1708,8 @@ choose_soundlib(const char *s)
         buf[0] = '\0';
         for (i = 0; soundlib_choices[i].sndprocs; i++) {
             Sprintf(eos(buf), "%s%s",
-                    first ? "" : ", ", soundlib_choices[i].sndprocs->soundname);
+                    first ? "" : ", ",
+                    soundlib_choices[i].sndprocs->soundname);
             first = FALSE;
         }
         config_error_add("Soundlib type %s not recognized.  Choices are:  %s",
@@ -1727,13 +1729,14 @@ get_soundlib_name(char *dest, int maxlen)
     const char *src;
 
     idx = ga.active_soundlib;
-    if (idx >= soundlib_nosound && idx < SIZE(soundlib_choices)) {
-        src = soundlib_choices[idx].sndprocs->soundname;
-        for (count = 1; count < maxlen; count++) {
-            if (*src == ',' || *src == '\0')
-                break; /*exit on \0 terminator*/
-            *dest++ = *src++;
-        }
+    if (idx < soundlib_nosound || idx >= SIZE(soundlib_choices))
+        panic("get_soundlib_name: invalid active_soundlib (%d)", idx);
+
+    src = soundlib_choices[idx].sndprocs->soundname;
+    for (count = 1; count < maxlen; count++) {
+        if (*src == ',' || *src == '\0')
+            break; /*exit on \0 terminator*/
+        *dest++ = *src++;
     }
     *dest = '\0';
 }
@@ -1791,7 +1794,8 @@ struct soundeffect_automapping {
     const char *base_filename;
 };
 
-static const struct soundeffect_automapping se_mappings_init[number_of_se_entries] = {
+static const struct soundeffect_automapping
+                                    se_mappings_init[number_of_se_entries] = {
     { se_zero_invalid,                   "" },
     { se_faint_splashing,                "faint_splashing" },
     { se_crackling_of_hellfire,          "crackling_of_hellfire" },
@@ -1992,10 +1996,12 @@ initialize_semap_basenames(void)
 }
 
 char *
-get_sound_effect_filename(int32_t seidint, char *buf,
-             size_t bufsz,
-             int32_t baseflag) /* non-zero means return without
-                                  directory or extension suffix */
+get_sound_effect_filename(
+    int32_t seidint,
+    char *buf,
+    size_t bufsz,
+    int32_t baseflag) /* non-zero means return without
+                       * directory or extension suffix */
 {
     static const char prefix[] = "se_", suffix[] = ".wav";
     size_t consumes = 0, baselen = 0;
