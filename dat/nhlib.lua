@@ -101,6 +101,17 @@ function hell_tweaks(protected_area)
       lavariver = lavariver & prot;
       des.terrain(lavariver, liquid);
    end
+
+   -- replacing some walls with boulders
+   if (percent(20)) then
+      local amount = 3 * math.random(1, 8);
+      local bwalls = selection.match([[.w.]]):percentage(amount) | selection.match(".\nw\n."):percentage(amount);
+      bwalls = bwalls & prot;
+      bwalls:iterate(function (x,y)
+            des.terrain(x, y, ".");
+            des.object("boulder", x, y);
+      end);
+   end
 end
 
 -- pline with variable number of arguments
