@@ -112,6 +112,15 @@ function hell_tweaks(protected_area)
             des.object("boulder", x, y);
       end);
    end
+
+   -- replacing some walls with iron bars
+   if (percent(20)) then
+      local amount = 3 * math.random(1, 8);
+      local fwalls = selection.match([[.w.]]):percentage(amount) | selection.match(".\nw\n."):percentage(amount);
+      fwalls = fwalls:grow() & selection.match("w") & prot;
+      des.terrain(fwalls, "F");
+   end
+
 end
 
 -- pline with variable number of arguments
