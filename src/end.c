@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1646322468 2022/03/03 15:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1674546299 2023/01/24 07:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1436,7 +1436,7 @@ really_done(int how)
         Sprintf(pbuf, "%s, ", gp.plname);
         formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
-        if (IS_GRAVE(levl[u.ux][u.uy].typ && !was_already_grave))
+        if (IS_GRAVE(levl[u.ux][u.uy].typ) && !was_already_grave)
             levl[u.ux][u.uy].emptygrave = 1; /* corpse isn't buried */
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
