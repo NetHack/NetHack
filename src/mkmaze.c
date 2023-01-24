@@ -178,8 +178,8 @@ wall_cleanup(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
     for (x = x1; x <= x2; x++)
         for (y = y1; y <= y2; y++) {
             if (within_bounded_area(x, y,
-                                    gb.bughack.inarea.x1, gb.bughack.inarea.y1,
-                                    gb.bughack.inarea.x2, gb.bughack.inarea.y2))
+                                  gb.bughack.inarea.x1, gb.bughack.inarea.y1,
+                                  gb.bughack.inarea.x2, gb.bughack.inarea.y2))
                 continue;
             lev = &levl[x][y];
             type = lev->typ;
@@ -228,8 +228,8 @@ fix_wall_spines(coordxy x1, coordxy y1, coordxy x2, coordxy y2)
 
             /* set the locations TRUE if rock or wall or out of bounds */
             loc_f = within_bounded_area(x, y, /* for baalz insect */
-                                     gb.bughack.inarea.x1, gb.bughack.inarea.y1,
-                                     gb.bughack.inarea.x2, gb.bughack.inarea.y2)
+                                   gb.bughack.inarea.x1, gb.bughack.inarea.y1,
+                                   gb.bughack.inarea.x2, gb.bughack.inarea.y2)
                        ? iswall
                        : iswall_or_stone;
             locale[0][0] = (*loc_f)(x - 1, y - 1);
@@ -933,7 +933,7 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
     /* scale maze up if needed */
     if (scale > 2) {
         char tmpmap[COLNO][ROWNO];
-        int rx = 1, ry = 1;
+        int mx, my, dx, dy, rx = 1, ry = 1;
 
         /* back up the existing smaller maze */
         for (x = 1; x < gx.x_maze_max; x++)
@@ -944,19 +944,17 @@ create_maze(int corrwid, int wallthick, boolean rmdeadends)
         /* do the scaling */
         rx = x = 2;
         while (rx < gx.x_maze_max) {
-            int mx = (x % 2) ? corrwid
-                             : ((x == 2 || x == (rdx * 2)) ? 1
-                                                           : wallthick);
+            mx = (x % 2) ? corrwid : (x == 2 || x == rdx * 2) ? 1 : wallthick;
             ry = y = 2;
             while (ry < gy.y_maze_max) {
-                int dx = 0, dy = 0;
-                int my = (y % 2) ? corrwid
-                                 : ((y == 2 || y == (rdy * 2)) ? 1
-                                                               : wallthick);
+                dx = dy = 0;
+                my = (y % 2) ? corrwid
+                     : (y == 2 || y == rdy * 2) ? 1
+                       : wallthick;
                 for (dx = 0; dx < mx; dx++)
                     for (dy = 0; dy < my; dy++) {
-                        if (rx+dx >= gx.x_maze_max
-                            || ry+dy >= gy.y_maze_max)
+                        if (rx + dx >= gx.x_maze_max
+                            || ry + dy >= gy.y_maze_max)
                             break;
                         levl[rx + dx][ry + dy].typ = tmpmap[x][y];
                     }
@@ -1268,7 +1266,9 @@ mazexy(coord *cc)
 }
 
 void
-get_level_extends(coordxy *left, coordxy *top, coordxy *right, coordxy *bottom)
+get_level_extends(
+    coordxy *left, coordxy *top,
+    coordxy *right, coordxy *bottom)
 {
     coordxy x, y;
     unsigned typ;
@@ -1377,7 +1377,7 @@ mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
     struct trap *ttmp = maketrap(x, y, MAGIC_PORTAL);
 
     if (!ttmp) {
-        impossible("portal on top of portal??");
+        impossible("portal on top of portal?");
         return;
     }
     debugpline4("mkportal: at <%d,%d>, to %s, level %d", x, y,
@@ -1456,7 +1456,8 @@ movebubbles(void)
          * Pick up everything inside of a bubble then fill all bubble
          * locations.
          */
-        for (b = up ? gb.bbubbles : ge.ebubbles; b; b = up ? b->next : b->prev) {
+        for (b = up ? gb.bbubbles : ge.ebubbles; b;
+             b = up ? b->next : b->prev) {
             if (b->cons)
                 panic("movebubbles: cons != null");
             for (i = 0, x = b->x; i < (int) b->bm[0]; i++, x++)
@@ -1707,7 +1708,7 @@ setup_waterlevel(void)
     gy.ymin = 1;
     /* use separate statements so that compiler won't complain about min()
        comparing two constants; the alternative is to do this in the
-       preprocessor: #if (20 > ROWNO-1) gy.ymax=ROWNO-1 #else gy.ymax=20 #endif */
+       preprocessor: #if (20 > ROWNO-1) ymax=ROWNO-1 #else ymax=20 #endif */
     gx.xmax = 78;
     gx.xmax = min(gx.xmax, (COLNO - 1) - 1);
     gy.ymax = 20;
