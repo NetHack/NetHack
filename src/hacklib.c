@@ -1157,7 +1157,7 @@ time_from_yyyymmddhhmmss(char *buf)
             t.tm_sec = atoi(s);
             timeresult = mktime(&t);
         }
-        if ((int) timeresult == -1)
+        if (timeresult == (time_t) -1)
             debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
                         buf ? buf : "");
         else
