@@ -1583,7 +1583,20 @@ extern struct sound_procs vissound_procs;
 #ifdef SND_LIB_WINDSOUND
 extern struct sound_procs windsound_procs;
 #endif
-extern struct sound_procs nosound_procs;
+#ifdef SND_LIB_MACSOUND
+extern struct sound_procs macsound_procs;
+#endif
+
+struct sound_procs nosound_procs = {
+    SOUNDID(nosound),
+    0L,
+    (void (*)(void)) 0,                     /* init_nhsound    */
+    (void (*)(const char *)) 0,             /* exit_nhsound    */
+    (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
+    (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
+    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes  */
+    (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
+};
 
 /* The order of these array entries must match the
    order of the enum soundlib_ids in sndprocs.h */
@@ -1591,7 +1604,7 @@ extern struct sound_procs nosound_procs;
 static struct sound_choices {
     struct sound_procs *sndprocs;
 } soundlib_choices[] = {
-    { (struct sound_procs *) 0 },
+    { &nosound_procs },     /* default, built-in */
 #ifdef SND_LIB_QTSOUND
     { &qtsound_procs },
 #endif
@@ -1613,13 +1626,15 @@ static struct sound_choices {
 #ifdef SND_LIB_SOUND_ESCCODES
     { &esccodes_procs },
 #endif
-#ifdef SND_LIB_WINDSOUND
-    { &windsound_procs },
-#endif
 #ifdef SND_LIB_VISSOUND
     { &vissound_procs },
 #endif
-    { &nosound_procs },     /* default, built-in */
+#ifdef SND_LIB_WINDSOUND
+    { &windsound_procs },
+#endif
+#ifdef SND_LIB_MACSOUND
+    { &macsound_procs },
+#endif
 };
 
 void
@@ -1627,33 +1642,27 @@ activate_chosen_soundlib(void)
 {
     enum soundlib_ids idx = gc.chosen_soundlib;
 
-    if (idx <= soundlib_unassigned || idx > soundlib_nosound)
+    if (idx < soundlib_nosound || idx >= SIZE(soundlib_choices))
         idx = soundlib_nosound;
 
-    if (ga.active_soundlib != soundlib_unassigned
-            || ga.active_soundlib != idx) {
+    if (ga.active_soundlib != soundlib_nosound || idx != soundlib_nosound) {
         if (soundprocs.sound_exit_nhsound)
             (*soundprocs.sound_exit_nhsound)("assigning a new sound library");
-        ga.active_soundlib = soundlib_unassigned;
     }
     soundprocs = *soundlib_choices[idx].sndprocs;
     if (soundprocs.sound_init_nhsound)
         (*soundprocs.sound_init_nhsound)();
     ga.active_soundlib = soundprocs.soundlib_id;
+    gc.chosen_soundlib = ga.active_soundlib;
 }
 
 void
 assign_soundlib(int idx)
 {
-    if (idx <= soundlib_unassigned || idx > soundlib_nosound)
+    if (idx < soundlib_nosound || idx >= SIZE(soundlib_choices))
         idx = soundlib_nosound;
 
-    if (ga.active_soundlib != soundlib_unassigned) {
-        if (soundprocs.sound_exit_nhsound)
-            (*soundprocs.sound_exit_nhsound)("assigning a new sound library");
-        ga.active_soundlib = soundlib_unassigned;
-    }
-    gc.chosen_soundlib = soundlib_choices[idx].sndprocs->soundlib_id;
+    gc.chosen_soundlib = (uint32_t) soundlib_choices[idx].sndprocs->soundlib_id;
 }
 
 #if 0
@@ -1718,7 +1727,7 @@ get_soundlib_name(char *dest, int maxlen)
     const char *src;
 
     idx = ga.active_soundlib;
-    if (idx > soundlib_unassigned && idx <= soundlib_nosound) {
+    if (idx >= soundlib_nosound && idx < SIZE(soundlib_choices)) {
         src = soundlib_choices[idx].sndprocs->soundname;
         for (count = 1; count < maxlen; count++) {
             if (*src == ',' || *src == '\0')
@@ -1744,20 +1753,7 @@ static void nosound_resume_nhsound(void);
 static void nosound_achievement(schar, schar, int32_t);
 static void nosound_soundeffect(int32_t, int32_t);
 static void nosound_play_usersound(char *, int32_t, int32_t);
-#endif
 
-struct sound_procs nosound_procs = {
-    SOUNDID(nosound),
-    0L,
-    (void (*)(void)) 0,                     /* init_nhsound    */
-    (void (*)(const char *)) 0,             /* exit_nhsound    */
-    (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
-    (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
-    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes  */
-    (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
-};
-
-#if 0
 static void
 nosound_init_nhsound(void)
 {
@@ -1775,6 +1771,11 @@ nosound_achievement(schar ach1, schar ach2, int32_t repeat)
 
 static void
 nosound_soundeffect(int32_t seid, int volume)
+{
+}
+
+static void
+nosound_hero_playnotes(int32_t instr, const char *notes, int32_t vol)
 {
 }
 

@@ -141,6 +141,7 @@
 		31B8A46121A26AF60055BD01 /* panic.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A42721A267E60055BD01 /* panic.c */; };
 		31B8A46221A26B020055BD01 /* alloc.c in Sources */ = {isa = PBXBuildFile; fileRef = 31B8A36521A238040055BD01 /* alloc.c */; };
 		5439B3BC275AADC600B8FB2F /* date.c in Sources */ = {isa = PBXBuildFile; fileRef = 5439B3BB275AADC600B8FB2F /* date.c */; };
+		543ECF6C297EEF3800A13155 /* macsound.m in Sources */ = {isa = PBXBuildFile; fileRef = 54AEB885297EE7C4005F1B13 /* macsound.m */; };
 		54435B52247999CB00804CB3 /* nhlobj.c in Sources */ = {isa = PBXBuildFile; fileRef = 54435B51247999CB00804CB3 /* nhlobj.c */; };
 		544768AB239949FA004B9739 /* sfstruct.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768A8239949FA004B9739 /* sfstruct.c */; };
 		544768AE23994A17004B9739 /* nhlsel.c in Sources */ = {isa = PBXBuildFile; fileRef = 544768AC23994A17004B9739 /* nhlsel.c */; };
@@ -503,7 +504,17 @@
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
 		5462D14723E7B19200969423 /* insight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insight.c; path = ../../src/insight.c; sourceTree = "<group>"; };
+		548FB9F9297F2B03000D04CF /* sndprocs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sndprocs.h; path = ../../include/sndprocs.h; sourceTree = "<group>"; };
+		548FB9FA297F2BBD000D04CF /* optlist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = optlist.h; path = ../../include/optlist.h; sourceTree = "<group>"; };
+		548FB9FB297F2BBD000D04CF /* hacklib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hacklib.h; path = ../../include/hacklib.h; sourceTree = "<group>"; };
+		548FB9FC297F2BBD000D04CF /* warnings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = warnings.h; path = ../../include/warnings.h; sourceTree = "<group>"; };
+		548FB9FD297F2BBD000D04CF /* defsym.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = defsym.h; path = ../../include/defsym.h; sourceTree = "<group>"; };
+		548FB9FE297F2BBD000D04CF /* fnamesiz.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fnamesiz.h; path = ../../include/fnamesiz.h; sourceTree = "<group>"; };
+		548FB9FF297F2BBD000D04CF /* objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = objects.h; path = ../../include/objects.h; sourceTree = "<group>"; };
+		548FBA00297F2BBD000D04CF /* tile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = tile.h; path = ../../include/tile.h; sourceTree = "<group>"; };
+		548FBA01297F2BBD000D04CF /* monsters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = monsters.h; path = ../../include/monsters.h; sourceTree = "<group>"; };
 		54A3D3EB282C55A900143F8C /* utf8map.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = utf8map.c; path = ../../src/utf8map.c; sourceTree = "<group>"; };
+		54AEB885297EE7C4005F1B13 /* macsound.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macsound.m; path = ../../sound/macsound/macsound.m; sourceTree = "<group>"; };
 		54FB2B4A246310A600397C0E /* symbols.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = symbols.c; path = ../../src/symbols.c; sourceTree = "<group>"; };
 		54FCE8282223261F00F393C8 /* isaac64.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = isaac64.c; path = ../../src/isaac64.c; sourceTree = "<group>"; };
 		BAE8010A27B97760002B3786 /* libnhlua.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libnhlua.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -587,6 +598,8 @@
 		3189576821A1FCC100FB2ABE = {
 			isa = PBXGroup;
 			children = (
+				54AEB886297EE7E9005F1B13 /* sound */,
+				54AEB885297EE7C4005F1B13 /* macsound.m */,
 				BAE8015827B99D44002B3786 /* nhlualib */,
 				2A953FB221A3F404007906E5 /* XCode.xcconfig */,
 				31B8A3F821A23E490055BD01 /* win */,
@@ -748,6 +761,15 @@
 		3189579621A2046700FB2ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
+				548FB9FD297F2BBD000D04CF /* defsym.h */,
+				548FB9FE297F2BBD000D04CF /* fnamesiz.h */,
+				548FB9FB297F2BBD000D04CF /* hacklib.h */,
+				548FBA01297F2BBD000D04CF /* monsters.h */,
+				548FB9FF297F2BBD000D04CF /* objects.h */,
+				548FB9FA297F2BBD000D04CF /* optlist.h */,
+				548FBA00297F2BBD000D04CF /* tile.h */,
+				548FB9FC297F2BBD000D04CF /* warnings.h */,
+				548FB9F9297F2B03000D04CF /* sndprocs.h */,
 				544768B523995488004B9739 /* nhlua.h */,
 				544768B423995447004B9739 /* isaac64.h */,
 				3186A3B721A4B0FD0052BF02 /* align.h */,
@@ -901,6 +923,13 @@
 				31B8A41521A243CC0055BD01 /* libncurses.tbd */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		54AEB886297EE7E9005F1B13 /* sound */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = sound;
 			sourceTree = "<group>";
 		};
 		BAE8015827B99D44002B3786 /* nhlualib */ = {
@@ -1608,6 +1637,7 @@
 				544768AB239949FA004B9739 /* sfstruct.c in Sources */,
 				31B8A3A721A238060055BD01 /* minion.c in Sources */,
 				31B8A3F021A23D420055BD01 /* unixtty.c in Sources */,
+				543ECF6C297EEF3800A13155 /* macsound.m in Sources */,
 				31B8A37F21A238060055BD01 /* extralev.c in Sources */,
 				31B8A39B21A238060055BD01 /* dogmove.c in Sources */,
 				54A3D3EC282C55A900143F8C /* utf8map.c in Sources */,
@@ -1801,7 +1831,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1828,6 +1858,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -1872,6 +1903,9 @@
 					"-DHACKDIR=\\\"$(NH_INSTALL_DIR)\\\"",
 					"-DSECURE",
 					"-DCURSES_GRAPHICS",
+					"-DSND_LIB_MACSOUND",
+					"-DSND_SOUNDEFFECTS_AUTOMAP",
+					"-DUSER_SOUNDS",
 				);
 				SDKROOT = macosx;
 			};
@@ -1886,7 +1920,7 @@
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -1913,6 +1947,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1960,8 +1995,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				INSTALL_PATH = "$(NH_INSTALL_DIR)";
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				"OTHER_LDFLAGS[arch=*]" = "-L${NH_LIB_DIR}/lua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1972,8 +2009,10 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				INSTALL_PATH = "$(NH_INSTALL_DIR)";
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				"OTHER_LDFLAGS[arch=*]" = "-L${NH_LIB_DIR}/lua";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1984,6 +2023,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1993,6 +2034,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -2002,6 +2045,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2011,6 +2056,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -2020,6 +2067,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -2029,6 +2078,8 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -2043,11 +2094,13 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 6978C4Q2VB;
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",
@@ -2077,11 +2130,13 @@
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 6978C4Q2VB;
 				EXECUTABLE_PREFIX = lib;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				OTHER_CFLAGS = (
 					"-DNOMAIL",
 					"-DNOTPARMDECL",

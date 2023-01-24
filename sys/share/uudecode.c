@@ -45,7 +45,7 @@
  */
 
 #ifndef lint
-static char sccsid[] = "@(#)uudecode.c 5.5 (Berkeley) 7/6/88";
+/* static char sccsid[] = "@(#)uudecode.c 5.5 (Berkeley) 7/6/88"; */
 #endif /* not lint */
 
 #ifdef __MSDOS__ /* For Turbo C */
@@ -58,6 +58,10 @@ static char sccsid[] = "@(#)uudecode.c 5.5 (Berkeley) 7/6/88";
 #ifndef WIN32
 #define WIN32
 #endif
+#endif
+
+#if __APPLE__
+#include "config.h"
 #endif
 
 /*
@@ -126,13 +130,13 @@ main(int argc, char **argv)
     }
     (void) sscanf(buf, "begin %o %s", &mode, dest);
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
     /* handle ~user/file format */
     if (dest[0] == '~') {
         char *sl;
         struct passwd *getpwnam();
         struct passwd *user;
-        char dnbuf[100], *index(), *strcat(), *strcpy();
+        char dnbuf[100], *strchr(), *strcat(), *strcpy();
 
         sl = strchr(dest, '/');
         if (sl == NULL) {
@@ -235,7 +239,7 @@ outdec(char *p, FILE *f, int n)
         putc(c3, f);
 }
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
 /*
  * Return the ptr in sp at which the character c appears;
  * NULL if not found

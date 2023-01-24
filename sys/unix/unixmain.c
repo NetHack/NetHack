@@ -102,6 +102,18 @@ main(int argc, char *argv[])
 
     choose_windows(DEFAULT_WINDOW_SYS);
 
+#ifdef SND_LIB_INTEGRATED
+    /* One of the soundlib interfaces was integrated on build.
+     * We can leave a hint here for activate_chosen_soundlib later.
+     * assign_soundlib() just sets an indicator, it doesn't initialize
+     * any soundlib, and the indicator could be overturned before
+     * activate_chosen_soundlib() gets called.
+     */
+#if defined(SND_LIB_MACSOUND) && !defined(SND_LIB_QTSOUND)
+    assign_soundlib(soundlib_macsound);
+#endif
+#endif
+
 #ifdef CHDIR /* otherwise no chdir() */
     /*
      * See if we must change directory to the playground.

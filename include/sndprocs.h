@@ -66,7 +66,7 @@
  */
 
 enum soundlib_ids {
-    soundlib_unassigned = 0,
+    soundlib_nosound,
 #ifdef SND_LIB_QTSOUND
     soundlib_qtsound,
 #endif
@@ -94,7 +94,9 @@ enum soundlib_ids {
 #ifdef SND_LIB_WINDSOUND
     soundlib_windsound,
 #endif
-    soundlib_nosound
+#ifdef SND_LIB_MACSOUND
+    soundlib_macsound
+#endif
 };
 
 struct sound_procs {
@@ -111,7 +113,7 @@ struct sound_procs {
 
 extern struct sound_procs sndprocs;
 
-#define SOUNDID(soundname) #soundname, soundlib_##soundname
+#define SOUNDID(soundname) #soundname, ((enum soundlib_ids) soundlib_##soundname)
 
 /*
  * SOUNDCAP
@@ -367,7 +369,7 @@ enum sound_effect_entries {
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
         || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
-        || defined(SND_LIB_WINDSOUND)
+        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
 
 #define SND_LIB_INTEGRATED   /* shortcut for conditional code in other files */
 
