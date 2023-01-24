@@ -879,8 +879,8 @@ scall  =
 # 4310 a constant value is cast to a smaller type
 # 4706 assignment within conditional
 # 4774 format string is not a string literal (default is off at W4)
-# 4777 format string requires an argument of type ‘type’,
-#      but variadic argument ‘position’ has type ‘type’
+# 4777 format string requires an argument of type 'type',
+#      but variadic argument 'position' has type 'type'
 # 4820 padding in struct
 ctmpflags = $(ctmpflags:-W3=-W4) -wd4100 -wd4244 -wd4245 -wd4310 -wd4706 -w44777 -wd4820
 !IF ($(VSVER) >= 2019)
