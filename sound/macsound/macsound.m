@@ -154,50 +154,6 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 
 #define WAVEMUSIC_SOUNDS
 
-/*
- 0 sound_Bell.wav
- 1 sound_Drum_Of_Earthquake.wav
- 2 sound_Fire_Horn.wav
- 3 sound_Frost_Horn.wav
- 4 sound_Leather_Drum.wav
- 5 sound_Bugle_A.wav
- 6 sound_Bugle_B.wav
- 7 sound_Bugle_C.wav
- 8 sound_Bugle_D.wav
- 9 sound_Bugle_E.wav
-10 sound_Bugle_F.wav
-11 sound_Bugle_G.wav
-12 sound_Magic_Harp_A.wav
-13 sound_Magic_Harp_B.wav
-14 sound_Magic_Harp_C.wav
-15 sound_Magic_Harp_D.wav
-16 sound_Magic_Harp_E.wav
-17 sound_Magic_Harp_F.wav
-18 sound_Magic_Harp_G.wav
-19 sound_Tooled_Horn_A.wav
-20 sound_Tooled_Horn_B.wav
-21 sound_Tooled_Horn_C.wav
-22 sound_Tooled_Horn_D.wav
-23 sound_Tooled_Horn_E.wav
-24 sound_Tooled_Horn_F.wav
-25 sound_Tooled_Horn_G.wav
-26 sound_Wooden_Flute_A.wav
-27 sound_Wooden_Flute_B.wav
-28 sound_Wooden_Flute_C.wav
-29 sound_Wooden_Flute_D.wav
-30 sound_Wooden_Flute_E.wav
-31 sound_Wooden_Flute_F.wav
-32 sound_Wooden_Flute_G.wav
-33 sound_Wooden_Harp_A.wav
-34 sound_Wooden_Harp_B.wav
-35 sound_Wooden_Harp_C.wav
-36 sound_Wooden_Harp_D.wav
-37 sound_Wooden_Harp_E.wav
-38 sound_Wooden_Harp_F.wav
-39 sound_Wooden_Harp_G.wav
-*/
-
-
 /* fulfill SNDCAP_HEROMUSIC */
 static void macsound_hero_playnotes(int32_t instrument,
                   const char *str, int32_t vol UNUSED)
