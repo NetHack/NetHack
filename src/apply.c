@@ -1175,6 +1175,7 @@ use_bell(struct obj **optr)
                         && invocation_pos(u.ux, u.uy)
                         && !On_stairs(u.ux, u.uy));
 
+    Hero_playnotes(obj_to_instr(obj), "C", 100);
     You("ring %s.", the(xname(obj)));
 
     if (Underwater || (u.uswallow && ordinary)) {

@@ -506,7 +506,6 @@ do_improvisation(struct obj* instr)
             itmp.otyp -= 1;
             mundane = TRUE;
         }
-    Hero_playnotes(obj_to_instr(&itmp), "C", 50);
 
 #define PLAY_NORMAL   0x00
 #define PLAY_STUNNED  0x01
@@ -575,6 +574,7 @@ do_improvisation(struct obj* instr)
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         You("%sproduce %s music.", !Deaf ? "" : "seem to ",
             Hallucination ? "piped" : "soft");
         put_monsters_to_sleep(u.ulevel * 5);
@@ -582,6 +582,7 @@ do_improvisation(struct obj* instr)
         break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
         else
@@ -601,12 +602,14 @@ do_improvisation(struct obj* instr)
             if ((damage = zapyourself(instr, TRUE)) != 0) {
                 char buf[BUFSZ];
 
+                Hero_playnotes(obj_to_instr(&itmp), "C", 50);
                 Sprintf(buf, "using a magical horn on %sself", uhim());
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
             int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD : AD_FIRE);
 
+            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
             ubuzz(BZ_U_WAND(type), rn1(6, 6));
@@ -614,6 +617,7 @@ do_improvisation(struct obj* instr)
         makeknown(instr->otyp);
         break;
     case TOOLED_HORN: /* Awaken or scare monsters */
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             You("produce a frightful, grave sound.");
         else
@@ -622,6 +626,7 @@ do_improvisation(struct obj* instr)
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             You("extract a loud noise from %s.", yname(instr));
         else
@@ -632,6 +637,7 @@ do_improvisation(struct obj* instr)
     case MAGIC_HARP: /* Charm monsters */
         consume_obj_charge(instr, TRUE);
 
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s very attractive music.", Tobjnam(instr, "produce"));
         else
@@ -641,6 +647,7 @@ do_improvisation(struct obj* instr)
         break;
     case WOODEN_HARP: /* May calm Nymph */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (!Deaf)
             pline("%s %s.", Yname2(instr),
                   do_spec ? "produces a lilting melody" : "twangs");
@@ -657,6 +664,7 @@ do_improvisation(struct obj* instr)
            mundane is flagged */
         consume_obj_charge(instr, TRUE);
 
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         You("produce a heavy, thunderous rolling!");
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
         do_earthquake((u.ulevel - 1) / 3 + 1);
@@ -666,6 +674,7 @@ do_improvisation(struct obj* instr)
         break;
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
+            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             if (!Deaf) {
                 You("beat a deafening row!");
                 incr_itimeout(&HDeaf, rn1(20, 30));
@@ -674,6 +683,8 @@ do_improvisation(struct obj* instr)
             }
             exercise(A_WIS, FALSE);
         } else
+            /* TODO maybe: sound effects for these riffs */
+            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
@@ -862,6 +873,7 @@ obj_to_instr(struct obj *obj) {
             break;
         case MAGIC_HARP:
             ret_instr = ins_cello;
+            break;
         case BELL:
         case BELL_OF_OPENING:
             ret_instr = ins_tinkle_bell;

@@ -2470,9 +2470,11 @@ extern void freedynamicdata(void);
 extern void store_savefileinfo(NHFILE *);
 extern void store_savefileinfo(NHFILE *);
 extern int nhdatatypes_size(void);
+#if 0
 extern void assignlog(char *, char*, int);
 extern FILE *getlog(NHFILE *);
 extern void closelog(NHFILE *);
+#endif
 
 /* ### sfstruct.c ### */
 

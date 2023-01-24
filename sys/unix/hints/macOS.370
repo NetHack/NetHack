@@ -155,6 +155,21 @@ endif   #CURSES_UNICODE=0
 endif   #CURSES_UNIODE=sys
 endif   #MAKEFILE_SRC
 
+ifdef WANT_MACSOUND
+HAVE_SNDLIB = 1
+SNDCFLAGS+= -DSND_LIB_MACSOUND -DSND_SOUNDEFFECTS_AUTOMAP
+SNDLIBSRC = ../sound/macsound/macsound.m
+SNDLIBOBJ = macsound.o
+LFLAGS += -framework AppKit
+endif
+ 
+# HAVE_SNDLIB could have been set just above, or it could
+# have been set in multiw-2 for Qt. Either way, if it is
+# set, add USER_SOUNDS
+ifeq "$(HAVE_SNDLIB)" "1"
+SNDCFLAGS+= -DUSER_SOUNDS
+endif
+
 CFLAGS+= $(PKGCFLAGS) $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(SNDCFLAGS)    #SNDCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)
@@ -373,11 +388,47 @@ VARDIR=$(HACKDIR)
 #
 #-INCLUDE gbdates-pre.370
 #
+ifdef WANT_MACSOUND
+WAVDIR = ../sound/wav
+SNDWAVS = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C se_squeak_D \
+	se_squeak_D_flat se_squeak_E se_squeak_E_flat se_squeak_F \
+	se_squeak_F_sharp se_squeak_G se_squeak_G_sharp sound_Bell \
+	sound_Bugle_A sound_Bugle_B sound_Bugle_C sound_Bugle_D \
+	sound_Bugle_E sound_Bugle_F sound_Bugle_G \
+	sound_Drum_Of_Earthquake sound_Fire_Horn sound_Frost_Horn \
+	sound_Leather_Drum sound_Magic_Harp_A sound_Magic_Harp_B \
+	sound_Magic_Harp_C sound_Magic_Harp_D sound_Magic_Harp_E \
+	sound_Magic_Harp_F sound_Magic_Harp_G sound_Tooled_Horn_A \
+	sound_Tooled_Horn_B sound_Tooled_Horn_C sound_Tooled_Horn_D \
+	sound_Tooled_Horn_E sound_Tooled_Horn_F sound_Tooled_Horn_G \
+	sound_Wooden_Flute_A sound_Wooden_Flute_B sound_Wooden_Flute_C \
+	sound_Wooden_Flute_D sound_Wooden_Flute_E sound_Wooden_Flute_F \
+	sound_Wooden_Flute_G sound_Wooden_Harp_A sound_Wooden_Harp_B \
+	sound_Wooden_Harp_C sound_Wooden_Harp_D sound_Wooden_Harp_E \
+	sound_Wooden_Harp_F sound_Wooden_Harp_G
+
+WAVS = $(addprefix $(WAVDIR)/, $(addsuffix .wav, $(SNDWAVS)))
+endif
+
 #-POST
 
 #
 #-INCLUDE gbdates-post.370
 #
+
+ifdef WANT_MACSOUND
+$(TARGETPFX)$(SNDLIBOBJ): $(SNDLIBSRC) $(HACK_H)
+	$(CC) $(CFLAGS) -c -o$@ $(SNDLIBSRC)
+$(WAVDIR)/%.wav: ../util/uudecode $(WAVDIR)/%.uu
+	$^
+	mv $(notdir $@) $@
+
+../util/uudecode: uudecode.o
+	$(CC) $(LFLAGS) uudecode.o -o $@
+
+uudecode.o: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) -c -o $@ ../sys/share/uudecode.c
+endif  # WANT_MACSOUND
 
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
