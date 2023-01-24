@@ -231,6 +231,10 @@ gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
 gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
 gnyesno.h   mapbg.xpm
 
+sound/macsound:
+(file in top directory)
+macsound.m
+
 sound/qtsound:
 (file in top directory)
 README.md
