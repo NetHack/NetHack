@@ -178,7 +178,7 @@ BBBBBBB]], contents = function()
 ..........
 ..........
 ..........]], contents = function()
-   local mons = { "D", "H", "L" };
+   local mons = { "Angel", "D", "H", "L" };
    des.monster(mons[math.random(1, #mons)], 4,4);
       end });
    end,
