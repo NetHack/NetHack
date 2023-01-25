@@ -313,7 +313,6 @@ dog_eat(struct monst *mtmp,
         if (dogfood(mtmp, obj) == DOGFOOD && obj->invlet)
             edog->apport += (int) (200L / ((long) edog->dropdist + gm.moves
                                            - edog->droptime));
-        m_consume_obj(mtmp, obj);
         if (obj->unpaid) {
             /* edible item owned by shop has been thrown or kicked
                by hero and caught by tame or food-tameable monst */
@@ -322,6 +321,7 @@ dog_eat(struct monst *mtmp,
                   currency(oprice));
             /* m_consume_obj->delobj->obfree will handle actual shop billing update */
         }
+        m_consume_obj(mtmp, obj);
     }
 
     return (DEADMONSTER(mtmp)) ? 2 : 1;
