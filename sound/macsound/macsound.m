@@ -112,8 +112,8 @@ macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED
 
 }
 
-/* magic number 40 is the current number of sound_ files to include */
-#define EXTRA_SOUNDS 40
+/* magic number 47 is the current number of sound_ files to include */
+#define EXTRA_SOUNDS 47
 
 static int32_t affiliation[number_of_se_entries + EXTRA_SOUNDS] = { 0 };
 static NSString *soundstring[number_of_se_entries + EXTRA_SOUNDS];
@@ -126,7 +126,7 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
 
   /* Supposedly, the following locations are searched in this order:
-   *  1. the application’s main bundle
+   *  1. the application's main bundle
    *  2. ~/Library/Sounds
    *  3. /Library/Sounds
    *  4. /Network/Library/Sounds
@@ -213,8 +213,7 @@ static void macsound_hero_playnotes(int32_t instrument,
             pseudo_seid_base = 33;
             break;
         case ins_pan_flute:         /* MAGIC_FLUTE */
-             /* wav files for sound_Magic_Flute not added yet */
-            Strcpy(resourcename, "sound_Wooden_Flute");
+            Strcpy(resourcename, "sound_Magic_Flute");
             has_note_variations = TRUE;
             pseudo_seid_base = 26;
             break;

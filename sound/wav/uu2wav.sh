@@ -32,6 +32,13 @@ uudecode sound_Magic_Harp_D.uu
 uudecode sound_Magic_Harp_E.uu
 uudecode sound_Magic_Harp_F.uu
 uudecode sound_Magic_Harp_G.uu
+uudecode sound_Magic_Flute_A.uu
+uudecode sound_Magic_Flute_B.uu
+uudecode sound_Magic_Flute_C.uu
+uudecode sound_Magic_Flute_D.uu
+uudecode sound_Magic_Flute_E.uu
+uudecode sound_Magic_Flute_F.uu
+uudecode sound_Magic_Flute_G.uu
 uudecode sound_Tooled_Horn_A.uu
 uudecode sound_Tooled_Horn_B.uu
 uudecode sound_Tooled_Horn_C.uu

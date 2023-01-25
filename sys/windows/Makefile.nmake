@@ -669,6 +669,10 @@ SNDWAVFILES = $(SndWavDir)\se_squeak_A.wav $(SndWavDir)\se_squeak_B.wav \
 	$(SndWavDir)\sound_Magic_Harp_B.wav $(SndWavDir)\sound_Magic_Harp_C.wav \
 	$(SndWavDir)\sound_Magic_Harp_D.wav $(SndWavDir)\sound_Magic_Harp_E.wav \
 	$(SndWavDir)\sound_Magic_Harp_F.wav $(SndWavDir)\sound_Magic_Harp_G.wav \
+	$(SndWavDir)\sound_Magic_Flute_A.wav \
+	$(SndWavDir)\sound_Magic_Flute_B.wav $(SndWavDir)\sound_Magic_Flute_C.wav \
+	$(SndWavDir)\sound_Magic_Flute_D.wav $(SndWavDir)\sound_Magic_Flute_E.wav \
+	$(SndWavDir)\sound_Magic_Flute_F.wav $(SndWavDir)\sound_Magic_Flute_G.wav \
 	$(SndWavDir)\sound_Tooled_Horn_A.wav $(SndWavDir)\sound_Tooled_Horn_B.wav \
 	$(SndWavDir)\sound_Tooled_Horn_C.wav $(SndWavDir)\sound_Tooled_Horn_D.wav \
 	$(SndWavDir)\sound_Tooled_Horn_E.wav $(SndWavDir)\sound_Tooled_Horn_F.wav \
@@ -1977,6 +1981,13 @@ $(SndWavDir)sound_Magic_Harp_D.wav: $(SndWavDir)sound_Magic_Harp_D.uu $(U)uudeco
 $(SndWavDir)sound_Magic_Harp_E.wav: $(SndWavDir)sound_Magic_Harp_E.uu $(U)uudecode.exe
 $(SndWavDir)sound_Magic_Harp_F.wav: $(SndWavDir)sound_Magic_Harp_F.uu $(U)uudecode.exe
 $(SndWavDir)sound_Magic_Harp_G.wav: $(SndWavDir)sound_Magic_Harp_G.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_A.wav: $(SndWavDir)sound_Magic_Flute_A.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_B.wav: $(SndWavDir)sound_Magic_Flute_B.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_C.wav: $(SndWavDir)sound_Magic_Flute_C.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_D.wav: $(SndWavDir)sound_Magic_Flute_D.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_E.wav: $(SndWavDir)sound_Magic_Flute_E.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_F.wav: $(SndWavDir)sound_Magic_Flute_F.uu $(U)uudecode.exe
+$(SndWavDir)sound_Magic_Flute_G.wav: $(SndWavDir)sound_Magic_Flute_G.uu $(U)uudecode.exe
 $(SndWavDir)sound_Tooled_Horn_A.wav: $(SndWavDir)sound_Tooled_Horn_A.uu $(U)uudecode.exe
 $(SndWavDir)sound_Tooled_Horn_B.wav: $(SndWavDir)sound_Tooled_Horn_B.uu $(U)uudecode.exe
 $(SndWavDir)sound_Tooled_Horn_C.wav: $(SndWavDir)sound_Tooled_Horn_C.uu $(U)uudecode.exe

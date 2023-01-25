@@ -409,7 +409,9 @@ SNDWAVS = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C se_squeak_D \
 	sound_Wooden_Flute_D sound_Wooden_Flute_E sound_Wooden_Flute_F \
 	sound_Wooden_Flute_G sound_Wooden_Harp_A sound_Wooden_Harp_B \
 	sound_Wooden_Harp_C sound_Wooden_Harp_D sound_Wooden_Harp_E \
-	sound_Wooden_Harp_F sound_Wooden_Harp_G
+	sound_Wooden_Harp_F sound_Wooden_Harp_G sound_Magic_Flute_A \
+	sound_Magic_Flute_B sound_Magic_Flute_C sound_Magic_Flute_D \
+	sound_Magic_Flute_E sound_Magic_Flute_F sound_Magic_Flute_G
 
 WAVS = $(addprefix $(WAVDIR)/, $(addsuffix .wav, $(SNDWAVS)))
 endif

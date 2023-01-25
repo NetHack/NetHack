@@ -94,8 +94,7 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
             has_note_variations = TRUE;
             break;
         case ins_pan_flute:         /* MAGIC_FLUTE */
-             /* wav files for sound_Magic_Flute not added yet */
-            Strcpy(resourcename, "sound_Wooden_Flute");
+            Strcpy(resourcename, "sound_Magic_Flute");
             has_note_variations = TRUE;
             break;
         case ins_english_horn:      /* TOOLED_HORN */

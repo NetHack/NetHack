@@ -35,6 +35,13 @@ set UU=..\..\util\uudecode.exe
 %UU% sound_Magic_Harp_E.uu
 %UU% sound_Magic_Harp_F.uu
 %UU% sound_Magic_Harp_G.uu
+%UU% sound_Magic_Flute_A.uu
+%UU% sound_Magic_Flute_B.uu
+%UU% sound_Magic_Flute_C.uu
+%UU% sound_Magic_Flute_D.uu
+%UU% sound_Magic_Flute_E.uu
+%UU% sound_Magic_Flute_F.uu
+%UU% sound_Magic_Flute_G.uu
 %UU% sound_Tooled_Horn_A.uu
 %UU% sound_Tooled_Horn_B.uu
 %UU% sound_Tooled_Horn_C.uu

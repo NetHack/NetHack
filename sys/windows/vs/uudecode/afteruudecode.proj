@@ -44,6 +44,13 @@
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Harp_E.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Harp_F.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Harp_G.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_A.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_B.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_C.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_D.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_E.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_F.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Magic_Flute_G.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Tooled_Horn_A.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Tooled_Horn_B.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Tooled_Horn_C.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
