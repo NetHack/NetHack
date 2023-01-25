@@ -1556,6 +1556,10 @@ play_sound_for_message(const char* msg)
 {
     audio_mapping *snd;
 
+    /* we do this check here first, in order to completely
+     * avoid doing the regex search when there won't be a
+     * sound anyway, despite a match.
+     */
     if (soundprocs.sound_play_usersound) {
         snd = sound_matches_message(msg);
         if (snd) {
@@ -1569,6 +1573,10 @@ maybe_play_sound(const char* msg)
 {
     audio_mapping *snd;
 
+    /* we do this check here first, in order to completely
+     * avoid doing the regex search when there won't be a
+     * sound anyway, despite a match.
+     */
     if (soundprocs.sound_play_usersound) {
         snd = sound_matches_message(msg);
         if (snd) {
