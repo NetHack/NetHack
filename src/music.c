@@ -886,6 +886,8 @@ obj_to_instr(struct obj *obj) {
             ret_instr = ins_melodic_tom;
             break;
     }
+#else
+    nhUse(obj);
 #endif
     return ret_instr;
 }
