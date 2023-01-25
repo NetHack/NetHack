@@ -1220,7 +1220,7 @@ cpostfx(int pm)
         /* picks an intrinsic at random and removes it; there's
            no feedback if hero already lacks the chosen ability */
         debugpline0("using attrcurse to strip an intrinsic");
-        attrcurse();
+        (void) attrcurse();
         break;
     case PM_DEATH:
     case PM_PESTILENCE:

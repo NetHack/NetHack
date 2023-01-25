@@ -1548,6 +1548,7 @@ extern void m_consume_obj(struct monst *, struct obj *);
 extern int meatmetal(struct monst *);
 extern int meatobj(struct monst *);
 extern int meatcorpse(struct monst *);
+extern void mon_give_prop(struct monst *, int);
 extern void mon_givit(struct monst *, struct permonst *);
 extern void mpickgold(struct monst *);
 extern boolean mpickstuff(struct monst *, const char *);
@@ -2581,7 +2582,7 @@ extern boolean is_izchak(struct monst *, boolean);
 extern void take_gold(void);
 extern int dosit(void);
 extern void rndcurse(void);
-extern void attrcurse(void);
+extern int attrcurse(void);
 
 /* ### sounds.c ### */
 

@@ -2773,7 +2773,7 @@ mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 rehumanize();
                 return;
             }
-            attrcurse();
+            mon_give_prop(magr, attrcurse());
         }
     } else {
         /* mhitm */
