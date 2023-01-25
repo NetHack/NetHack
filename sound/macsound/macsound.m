@@ -28,11 +28,15 @@ static void macsound_hero_playnotes(int32_t, const char *, int32_t);
 static void macsound_play_usersound(char *, int32_t, int32_t);
 static int affiliate(int32_t seid, const char *soundname);
 
+/*
+ * Sound capabilities that can be enabled:
+ *    SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC
+ *        | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS,
+ */
+
 struct sound_procs macsound_procs = {
     SOUNDID(macsound),
-//    SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC
-//        | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS,
-     SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC | SNDCAP_SOUNDEFFECTS,
+    SNDCAP_HEROMUSIC | SNDCAP_SOUNDEFFECTS,
     macsound_init_nhsound,
     macsound_exit_nhsound,
     macsound_achievement,
