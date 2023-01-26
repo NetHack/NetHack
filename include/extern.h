@@ -22,7 +22,7 @@ extern void early_init(void);
 extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
-extern void display_gamewindows(void);
+extern void init_sound_and_display_gamewindows(void);
 extern void newgame(void);
 extern void welcome(boolean);
 extern int argcheck(int, char **, enum earlyarg);

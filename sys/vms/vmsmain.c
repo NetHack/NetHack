@@ -183,7 +183,7 @@ main(int argc, char *argv[])
      */
     vision_init();
 
-    display_gamewindows();
+    init_sound_and_display_gamewindows();
 
 /*
  * First, try to find and restore a save file for specified character.
