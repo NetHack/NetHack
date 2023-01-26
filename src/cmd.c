@@ -4600,7 +4600,8 @@ reset_commands(boolean initial)
 #endif
             /* FIXME: NHKF_DOINV2 ought to be implemented instead of this */
             c = M('0') & 0xff;
-            gc.Cmd.commands[c] = gc.Cmd.pcHack_compat ? gc.Cmd.commands['I'] : 0;
+            gc.Cmd.commands[c] = gc.Cmd.pcHack_compat ? gc.Cmd.commands['I']
+                                                      : 0;
         }
         /* phone keypad layout (only applicable for num_pad) */
         flagtemp = (iflags.num_pad_mode & 2) ? gc.Cmd.num_pad : FALSE;
@@ -6330,6 +6331,8 @@ end_of_input(void)
 #endif
         if (gp.program_state.something_worth_saving)
             (void) dosave0();
+    if (soundprocs.sound_exit_nhsound)
+        (*soundprocs.sound_exit_nhsound)("end_of_input");
     if (iflags.window_inited)
         exit_nhwindows((char *) 0);
     clearlocks();

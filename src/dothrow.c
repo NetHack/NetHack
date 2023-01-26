@@ -13,7 +13,6 @@ static int throw_ok(struct obj *);
 static void autoquiver(void);
 static struct obj *find_launcher(struct obj *);
 static int gem_accept(struct monst *, struct obj *);
-static boolean harmless_missile(struct obj *);
 static boolean toss_up(struct obj *, boolean);
 static void sho_obj_return_to_u(struct obj * obj);
 static struct obj *return_throw_to_inv(struct obj *, long, boolean,
@@ -1184,7 +1183,7 @@ check_shop_obj(struct obj *obj, coordxy x, coordxy y, boolean broken)
 /* Will 'obj' cause damage if it falls on hero's head when thrown upward?
    Not used to handle things which break when they hit.
    Stone missile hitting hero w/ Passes_walls attribute handled separately. */
-static boolean
+boolean
 harmless_missile(struct obj *obj)
 {
     int otyp = obj->otyp;

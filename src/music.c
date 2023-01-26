@@ -506,7 +506,6 @@ do_improvisation(struct obj* instr)
             itmp.otyp -= 1;
             mundane = TRUE;
         }
-    Hero_playnotes(obj_to_instr(&itmp), "C", 50);
 
 #define PLAY_NORMAL   0x00
 #define PLAY_STUNNED  0x01
@@ -577,6 +576,7 @@ do_improvisation(struct obj* instr)
 
         You("%sproduce %s music.", !Deaf ? "" : "seem to ",
             Hallucination ? "piped" : "soft");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
@@ -586,6 +586,7 @@ do_improvisation(struct obj* instr)
             pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
         else
             You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (do_spec)
             charm_snakes(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -602,6 +603,7 @@ do_improvisation(struct obj* instr)
                 char buf[BUFSZ];
 
                 Sprintf(buf, "using a magical horn on %sself", uhim());
+                Hero_playnotes(obj_to_instr(&itmp), "C", 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
@@ -609,6 +611,7 @@ do_improvisation(struct obj* instr)
 
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
+            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
             ubuzz(BZ_U_WAND(type), rn1(6, 6));
         }
         makeknown(instr->otyp);
@@ -618,6 +621,7 @@ do_improvisation(struct obj* instr)
             You("produce a frightful, grave sound.");
         else
             You("blow into the horn.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
@@ -626,6 +630,7 @@ do_improvisation(struct obj* instr)
             You("extract a loud noise from %s.", yname(instr));
         else
             You("blow into the bugle.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         awaken_soldiers(&gy.youmonst);
         exercise(A_WIS, FALSE);
         break;
@@ -636,6 +641,7 @@ do_improvisation(struct obj* instr)
             pline("%s very attractive music.", Tobjnam(instr, "produce"));
         else
             You_feel("very soothing vibrations.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
@@ -646,6 +652,7 @@ do_improvisation(struct obj* instr)
                   do_spec ? "produces a lilting melody" : "twangs");
         else
             You_feel("soothing vibrations.");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -658,6 +665,7 @@ do_improvisation(struct obj* instr)
         consume_obj_charge(instr, TRUE);
 
         You("produce a heavy, thunderous rolling!");
+        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
         do_earthquake((u.ulevel - 1) / 3 + 1);
         /* shake up monsters in a much larger radius... */
@@ -668,15 +676,19 @@ do_improvisation(struct obj* instr)
         if (!mundane) {
             if (!Deaf) {
                 You("beat a deafening row!");
+                Hero_playnotes(obj_to_instr(&itmp), "CCC", 100);
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {
                 You("pound on the drum.");
             }
             exercise(A_WIS, FALSE);
-        } else
+        } else {
+            /* TODO maybe: sound effects for these riffs */
             You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
+            Hero_playnotes(obj_to_instr(&itmp), "CCCCC", 50);
+        }
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         gc.context.botl = TRUE;
         break;
@@ -862,6 +874,7 @@ obj_to_instr(struct obj *obj) {
             break;
         case MAGIC_HARP:
             ret_instr = ins_cello;
+            break;
         case BELL:
         case BELL_OF_OPENING:
             ret_instr = ins_tinkle_bell;
@@ -873,6 +886,8 @@ obj_to_instr(struct obj *obj) {
             ret_instr = ins_melodic_tom;
             break;
     }
+#else
+    nhUse(obj);
 #endif
     return ret_instr;
 }

@@ -9,6 +9,7 @@ Functions exposed from the NetHack core. They are all in the `nh` table.
 All core functions involving xy coordinates interpret these as relative to the
 last defined map or room.
 
+
 === abscoord
 
 Convert a room- or map-relative coordinate to absolute.
@@ -88,6 +89,7 @@ Example:
 
  local filename = nh.dump_fmtstr("/tmp/nethack.%n.%d.log");
 
+
 === getlin
 
 Asks the player for a text to enter, and returns the entered string.
@@ -102,6 +104,7 @@ Example:
 Get information about the map location.
 Returns a table with the following elements:
 
+[%header]
 |===
 | field name | type     | description
 | glyph      | integer  |
@@ -119,6 +122,7 @@ Returns a table with the following elements:
 | flags      | table    | See below
 |===
 
+[%header]
 |===
 | field name | type     | description
 | nodoor     | boolean  | door
@@ -159,6 +163,7 @@ Example:
 Get trap info at x,y
 Returns a table with the following elements:
 
+[%header]
 |===
 | field name  | type    | description
 | tx, ty      | integer | trap coordinates
@@ -310,6 +315,7 @@ Example:
 
  nh.pushkey("i");
 
+
 === random
 
 Generate a random number.
@@ -319,6 +325,7 @@ Example:
  nh.random(10);  -- returns a number between 0 and 9, inclusive.
  nh.random(1,5); -- same as 1 + nh.random(5);
 
+
 === rn2
 
 Generate a random number.
@@ -326,6 +333,7 @@ Generate a random number.
 Example:
 
  nh.rn2(10); -- returns a number between 0 and 9, inclusive.
+
 
 === s_suffix
 
@@ -397,12 +405,14 @@ Example:
 
  nh.verbalize("Message to say.");
 
+
 == Special level functions
 
 Functions for creating special levels. They are in the `des` table.
 
 All special level functions involving xy coordinates interpret these as relative
 to the last defined map or room.
+
 
 === altar
 
@@ -417,6 +427,7 @@ Example:
  des.altar({ x=6, y=12 });
  des.altar({ coord = {5, 10}, align = "noalign", type = "altar" });
 
+
 === corridor
 
 Create a random corridor from one room to another.
@@ -426,6 +437,7 @@ Create a random corridor from one room to another.
 Example:
 
  des.corridor({ srcroom=1, srcdoor=2, srcwall="north", destroom=2, destdoor=1, destwall="west" });
+
 
 === door
 
@@ -440,20 +452,34 @@ Example:
  des.door({ wall = "north", pos = 3, state = "secret" });
  des.door("nodoor", 1, 2);
 
+
 === drawbridge
+
+Create a drawbridge. Location is where the open drawbridge would be,
+and there should be a wall when moving one step towards the diven direction;
+this is where the portcullis will be placed.
+
+* dir is one of "north", "south", "west", "east", or "random".
+* state is one of "open", "closed", or "random".
 
 Example:
 
  des.drawbridge({ dir="east", state="closed", x=05,y=08 });
  des.drawbridge({ dir="east", state="closed", coord={05,08} });
 
+
 === engraving
+
+Create an engraving.
+
+* type is one of "dust", "engrave", "burn", "mark", or "blood".
 
 Example:
 
  des.engraving({ x = 1, y = 1, type = "burn", text = "Foo" });
  des.engraving({ coord = {1, 1}, type = "burn", text = "Foo" });
  des.engraving({x,y}, "engrave", "Foo");
+
 
 === feature
 
@@ -471,6 +497,7 @@ Example:
  des.feature({ type = "throne", coord = {4, 6}, looted = true });
  des.feature({ type = "tree", coord = {4, 6}, looted = true, swarm = false });
 
+
 === finalize_level
 
 Only used for testing purposes. See also <<_reset_level>>.
@@ -478,6 +505,7 @@ Only used for testing purposes. See also <<_reset_level>>.
 Example:
 
  des.finalize_level();
+
 
 === gold
 
@@ -491,7 +519,10 @@ Example:
  des.gold({ amount = 500, coord = {2, 5} });
  des.gold();
 
+
 === grave
+
+Create a grave.  A missing text results in a random epitaph being used.
 
 Example:
 
@@ -501,7 +532,10 @@ Example:
  des.grave({ text = "Epitaph text" });
  des.grave();
 
+
 === ladder
+
+Create a ladder.
 
 Example:
 
@@ -510,6 +544,7 @@ Example:
  des.ladder("up", {6,10});
  des.ladder({ x=11, y=05, dir="down" });
  des.ladder({ coord={11, 05}, dir="down" });
+
 
 === level_flags
 
@@ -541,6 +576,7 @@ Example:
 
  des.level_flags("noteleport", "mazelevel");
 
+
 === level_init
 
 Initialize the map with a random generator of a certain type.
@@ -551,11 +587,19 @@ Example:
  des.level_init({ style = "mines", fg = ".", bg = "}", smoothed=true, joined=true, lit=0 })
  des.level_init({ style = "maze", corrwid = 3, wallthick = 1, deadends = false });
 
+
 === levregion
+
+Create a region where a stair, a branch stair, or a portal is created,
+or a region which limits teleportation.
+
+* type is one of "stair-down", "stair-up", "portal", "branch", "teleport", "teleport-up", or "teleport-down".
+* name is used for portals as the target level name.
 
 Example:
 
  des.levregion({ region = { x1,y1, x2,y2 }, exclude = { x1,y1, x2,y2 }, type = "portal", name="air" });
+
 
 === map
 
@@ -591,7 +635,14 @@ Example:
  end });
  local sel = des.map([[LLL]]);
 
+
 === mazewalk
+
+Create a maze.
+
+* dir is one of "north", "south", "east", "west", or "random", and tells which direction the maze creation starts. Default is "random".
+* stocked tells whether the maze is stocked with default monsters and objects.
+* typ is the map terrain used for the walkable parts of the maze.
 
 Example:
 
@@ -599,17 +650,24 @@ Example:
  des.mazewalk({ coord = {NN, NN}, typ = ".", dir = "north" });
  des.mazewalk(x,y,dir);
 
+
 === message
+
+Message shown to the player when entering the level for the first time.
 
 Example:
 
  des.message("Foo");
 
+
 === mineralize
+
+Place random gems, gold, and kelp on the level.
 
 Example:
 
  des.mineralize({ gem_prob = 10, gold_prob = 20, kelp_moat = 30, kelp_pool = 40 });
+
 
 === monster
 
@@ -657,14 +715,20 @@ Example:
  des.monster({ id = "giant mimic", appear_as = "obj:boulder" });
  des.monster({ class = "H", peaceful = 0 });
 
+
 === non_diggable
+
+Set walls in an area of the map as non-diggable.  See also: <<_wall_property>>.
 
 Example:
 
  des.non_diggable(selection);
  des.non_diggable();
 
+
 === non_passwall
+
+Set walls in an area of the map as non-passwall, so they can't be phased through.  See also: <<_wall_property>>.
 
 Example:
 
@@ -726,13 +790,17 @@ Example:
 
  des.random_corridors();
 
+
 === region
+
+Create a room region, which can be irregular; use the boundary <<_map_characters,map character>> to restrict the floodfilled area.
 
 Example:
 
  des.region(selection, lit);
  des.region({ x1=NN, y1=NN, x2=NN, y2=NN, lit=BOOL, type=ROOMTYPE, joined=BOOL, irregular=BOOL, filled=NN [ , contents = FUNCTION ] });
  des.region({ region={x1,y1, x2,y2}, type="ordinary" });
+
 
 === replace_terrain
 
@@ -748,6 +816,7 @@ Example:
  des.replace_terrain({ mapfragment=[[...]], toterrain=MAPCHAR });
  des.replace_terrain({ fromterrain=MAPCHAR, toterrain=MAPCHAR });
 
+
 === reset_level
 
 Only used for testing purposes. See also <<_finalize_level>>.
@@ -755,6 +824,7 @@ Only used for testing purposes. See also <<_finalize_level>>.
 Example:
 
  des.reset_level();
+
 
 === room
 
@@ -776,6 +846,7 @@ fields:
 | joined    | Is the room joined to the rest of the level with corridors? Default is true.
 | contents  | A function called with one parameter, a table with room data. See <<_room_contents>>.
 |===
+
 
 ==== room contents
 
@@ -805,7 +876,10 @@ Example:
     des.terrain(room.width, room.height, "T");
  end });
 
+
 === stair
+
+Create stairs.
 
 Example:
 
@@ -816,12 +890,14 @@ Example:
  des.stair("down", 4, 7);
  des.stair("down", {4, 7});
 
+
 === teleport_region
 
 Example:
 
  des.teleport_region({ region = { x1,y1, x2,y2} });
  des.teleport_region({ region = { x1,y1, x2,y2}, region_islev = 1, exclude = { x1,y1, x2,y2}, exclude_islen = 1, dir = "up" });
+
 
 === terrain
 
@@ -833,6 +909,7 @@ Example:
  des.terrain(selection.area(25, 3, 30,6), "C");
  des.terrain({20,11}, ".");
  des.terrain(21,12, ".");
+
 
 === trap
 
@@ -849,12 +926,16 @@ Example:
  des.trap("rust")
  des.trap();
 
+
 === wall_property
+
+Set walls in an area nondiggable or non-passwall. See also: <<_non_diggable>> and <<_non_passwall>>.
 
 Example:
 
  des.wall_property({ x1=0, y1=0, x2=78, y2=20, property="nondiggable" });
  des.wall_property({ region = {1,0, 78,20}, property="nonpasswall" });
+
 
 === wallify
 
@@ -867,6 +948,7 @@ Example:
 == Selection
 
 Selection object can be used to "select" areas of the map with graphic primitives.
+
 
 === new
 
@@ -919,6 +1001,7 @@ Example:
 
 Alias for <<_fillrect>>.
 
+
 === bounds
 
 Get the bounding box for the selection. Returns a table with lx, ly, hx, hy integer fields.
@@ -947,6 +1030,7 @@ Example:
 
  local sel2 = selection.clone(sel);
 
+
 === ellipse
 
 Example:
@@ -956,6 +1040,7 @@ Example:
  local s = selection.ellipse(sel, x, y, radius1, radius2);
  local s = selection.ellipse(sel, x, y, radius1, radius2, filled);
 
+
 === fillrect
 
 Example:
@@ -964,6 +1049,7 @@ Example:
  local s = selection.fillrect(x1,y1, x2,y2);
  s:fillrect(x1,y1, x2,y2);
  selection.area(x1,y1, x2,y2);
+
 
 === filter_mapchar
 
@@ -978,6 +1064,7 @@ Example:
  local s = selection.filter_mapchar(sel, mapchar);
  local s = selection.filter_mapchar(sel, mapchar, lit);
 
+
 === floodfill
 
 Select locations by starting floodfill at (x,y),
@@ -990,6 +1077,7 @@ Example:
  local s = selection.floodfill(x,y);
  local s = selection.floodfill(x,y, true);
 
+
 === get
 
 Get the selection value at (x,y).
@@ -999,6 +1087,7 @@ Example:
  local value = selection.get(sel, x, y);
  local value = selection.get(sel, { x = 10, y = 14 });
 
+
 === gradient
 
 Create a "gradient" of selected positions.
@@ -1006,6 +1095,7 @@ Create a "gradient" of selected positions.
 Example:
 
  local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10, limited = false });
+
 
 === grow
 
@@ -1018,6 +1108,7 @@ Example:
  local s = selection.grow(sel);
  local s = selection.grow(sel, "north");
 
+
 === iterate
 
 Iterate through the selection, calling a function for each set point.
@@ -1025,6 +1116,7 @@ Iterate through the selection, calling a function for each set point.
 Example:
 
  sel:iterate(function(x,y) ... end);
+
 
 === line
 
@@ -1035,6 +1127,7 @@ Example:
  local s = selection.line(sel, x1,y1, x2,y2);
  local s = selection.line(x1,y1, x2,y2);
  s:line(x1,y1, x2,y2);
+
 
 === match
 
@@ -1049,6 +1142,7 @@ Example:
  .L.
  ...]]);
 
+
 === negate
 
 Negate the selection. Alias for "unary minus" and "bitwise not".
@@ -1058,6 +1152,7 @@ Example:
  local s = selection.negate(sel);
  local s = selection.negate();
 
+
 === percentage
 
 Each selected location has a percentage chance of being selected in the new selection.
@@ -1066,12 +1161,14 @@ Example:
 
  local s = selection.percentage(sel, 50);
 
+
 === randline
 
 Example:
 
  local s = selection.randline(sel, x1,y1, x2,y2, roughness);
  local s = selection.randline(x1,y1, x2,y2, roughness);
+
 
 === rect
 
@@ -1080,6 +1177,7 @@ Draw a rectangle.
 Example:
 
  local s = selection.rect(sel, x1,y1, x2,y2);
+
 
 === rndcoord
 
@@ -1118,9 +1216,11 @@ Example:
  local sel = sel:set();
  local sel = selection.set(sel);
 
+
 == Obj
 
 Handling objects via obj-class.
+
 
 === new
 
@@ -1305,6 +1405,7 @@ Example:
 | `"x"`     | "transparent" - used for <<_map>> parts.
 | `"w"`     | "any wall" - see <<_match>>
 |===
+
 
 == Constants
 

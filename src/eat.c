@@ -28,6 +28,7 @@ static void consume_tin(const char *);
 static void start_tin(struct obj *);
 static int eatcorpse(struct obj *);
 static void start_eating(struct obj *, boolean);
+static void garlic_breath(struct monst *);
 static void fprefx(struct obj *);
 static void fpostfx(struct obj *);
 static int bite(void);
@@ -1219,7 +1220,7 @@ cpostfx(int pm)
         /* picks an intrinsic at random and removes it; there's
            no feedback if hero already lacks the chosen ability */
         debugpline0("using attrcurse to strip an intrinsic");
-        attrcurse();
+        (void) attrcurse();
         break;
     case PM_DEATH:
     case PM_PESTILENCE:
@@ -1972,6 +1973,14 @@ eating_glob(struct obj *glob)
     return (go.occupation == eatfood && glob == gc.context.victual.piece);
 }
 
+/* scare nearby monster when hero eats garlic */
+static void
+garlic_breath(struct monst *mtmp)
+{
+    if (olfaction(mtmp->data) && distu(mtmp->mx, mtmp->my) < 7)
+        monflee(mtmp, 0, FALSE, FALSE);
+}
+
 /*
  * Called on "first bite" of (non-corpse) food, after touchfood() has
  * marked it 'partly eaten'.  Used for non-rotten non-tin non-corpse food.
@@ -2030,6 +2039,7 @@ fprefx(struct obj *otmp)
             make_vomiting((long) rn1(gc.context.victual.reqtime, 5), FALSE);
             break;
         }
+        iter_mons(garlic_breath);
         /*FALLTHRU*/
     default:
         if (otmp->otyp == SLIME_MOLD && !otmp->cursed

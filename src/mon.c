@@ -1453,7 +1453,62 @@ meatcorpse(
     return 0;
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
+/* give monster property prop */
+void
+mon_give_prop(struct monst *mtmp, int prop)
+{
+    const char *msg = NULL;
+    unsigned short intrinsic = 0; /* MR_* constant */
+
+    /* Pets don't have all the fields that the hero does, so they can't get all
+       the same intrinsics. If it happens to choose strength gain or teleport
+       control or whatever, ignore it. */
+    switch (prop) {
+    case FIRE_RES:
+        intrinsic = MR_FIRE;
+        msg = "%s shivers slightly.";
+        break;
+    case COLD_RES:
+        intrinsic = MR_COLD;
+        msg = "%s looks quite warm.";
+        break;
+    case SLEEP_RES:
+        intrinsic = MR_SLEEP;
+        msg = "%s looks wide awake.";
+        break;
+    case DISINT_RES:
+        intrinsic = MR_DISINT;
+        msg = "%s looks very firm.";
+        break;
+    case SHOCK_RES:
+        intrinsic = MR_ELEC;
+        msg = "%s crackles with static electricity.";
+        break;
+    case POISON_RES:
+        intrinsic = MR_POISON;
+        msg = "%s looks healthy.";
+        break;
+    default:
+        return; /* can't give it */
+        break;
+    }
+
+    /* Don't give message if it already had this property intrinsically, but
+       still do grant the intrinsic if it only had it from mresists.
+       Do print the message if it only had this property extrinsically, which
+       is why mon_resistancebits isn't used here. */
+    if ((mtmp->data->mresists | mtmp->mintrinsics) & intrinsic)
+        msg = (const char *) 0;
+
+    if (intrinsic)
+        mtmp->mintrinsics |= intrinsic;
+
+    if (canseemon(mtmp) && msg) {
+        DISABLE_WARNING_FORMAT_NONLITERAL
+        pline(msg, Monnam(mtmp));
+        RESTORE_WARNING_FORMAT_NONLITERAL
+    }
+}
 
 /* Maybe give an intrinsic to monster from eating corpse that confers it. */
 void
@@ -1461,8 +1516,6 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
 {
     int prop = corpse_intrinsic(ptr);
     boolean vis = canseemon(mtmp);
-    const char *msg = NULL;
-    unsigned short intrinsic = 0; /* MR_* constant */
 
     if (ptr == &mons[PM_STALKER]) {
         /*
@@ -1501,53 +1554,8 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
     if (!should_givit(prop, ptr))
         return; /* failed die roll */
 
-    /* Pets don't have all the fields that the hero does, so they can't get all
-       the same intrinsics. If it happens to choose strength gain or teleport
-       control or whatever, ignore it. */
-    switch (prop) {
-    case FIRE_RES:
-        intrinsic = MR_FIRE;
-        msg = "%s shivers slightly.";
-        break;
-    case COLD_RES:
-        intrinsic = MR_COLD;
-        msg = "%s looks quite warm.";
-        break;
-    case SLEEP_RES:
-        intrinsic = MR_SLEEP;
-        msg = "%s looks wide awake.";
-        break;
-    case DISINT_RES:
-        intrinsic = MR_DISINT;
-        msg = "%s looks very firm.";
-        break;
-    case SHOCK_RES:
-        intrinsic = MR_ELEC;
-        msg = "%s crackles with static electricity.";
-        break;
-    case POISON_RES:
-        intrinsic = MR_POISON;
-        msg = "%s looks healthy.";
-        break;
-    default:
-        break;
-    }
-
-    /* Don't give message if it already had this property intrinsically, but
-       still do grant the intrinsic if it only had it from mresists.
-       Do print the message if it only had this property extrinsically, which
-       is why mon_resistancebits isn't used here. */
-    if ((mtmp->data->mresists | mtmp->mintrinsics) & intrinsic)
-        msg = (const char *) 0;
-
-    if (intrinsic)
-        mtmp->mintrinsics |= intrinsic;
-
-    if (vis && msg)
-        pline(msg, Monnam(mtmp));
+    mon_give_prop(mtmp, prop);
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 void
 mpickgold(register struct monst* mtmp)

@@ -1092,6 +1092,15 @@ polymorphing into fire elemental allows you eat flammable items
 hitting sleeping monsters will cause them to wake up noisily
 demon gating happens more in Gehennom and less outside it
 intelligent peacefuls avoid digging shop or temple walls
+fix bug making random subrooms never touching the right or bottom
+	wall of the parent room
+if a grave is created with the corpse lying on top (bones), don't find a
+	corpse or release a zombie or mummy when digging it up
+kicking a headstone might summon a ghoul
+eating garlic makes nearby monsters flee
+giants occasionally get a battle axe or a two-handed sword
+give gremlin the property it stole, if possible
+'F'orcefighting with a war hammer has a small chance of breaking iron bars
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

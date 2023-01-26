@@ -539,9 +539,9 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sys.h system.h tcap.h timeout.h tradstdc.h trap.h unixconf.h \
-	vision.h vmsconf.h wintty.h wincurs.h winX.h winprocs.h wintype.h \
-	you.h youprop.h
+	spell.h sndprocs.h sys.h system.h tcap.h timeout.h tradstdc.h \
+	trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h winX.h \
+	winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 
@@ -591,7 +591,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
 	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
-	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) \
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
 	$(TARGETPFX)version.o
 #
 DATE_O = $(TARGETPFX)date.o
@@ -605,7 +605,7 @@ all:	$(GAME)
 pregame:
 	$(PREGAME)
 
-$(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(SYSTEM)
+$(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
@@ -811,7 +811,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/obj.h ../include/engrave.h ../include/you.h \
 		../include/attrib.h ../include/monst.h ../include/mextra.h \
 		../include/skills.h ../include/timeout.h ../include/flag.h \
-		../include/winprocs.h ../include/sys.h
+		../include/winprocs.h ../include/sndprocs.h ../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h

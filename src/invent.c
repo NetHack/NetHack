@@ -1016,8 +1016,11 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * touch_artifact will print its own messages if they are warranted.
  */
 struct obj *
-hold_another_object(struct obj *obj, const char *drop_fmt,
-                    const char *drop_arg, const char *hold_msg)
+hold_another_object(
+    struct obj *obj, /* object to be held */
+    const char *drop_fmt, /* format string for message if it can't be held */
+    const char *drop_arg, /* argument to use when formatting message */
+    const char *hold_msg) /* message to display if successfully held */
 {
     char buf[BUFSZ];
 
@@ -2636,12 +2639,18 @@ enum item_action_actions {
 
 /* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
 static boolean
-item_naming_classification(struct obj *obj, char *onamebuf, char *ocallbuf)
+item_naming_classification(
+    struct obj *obj,
+    char *onamebuf,
+    char *ocallbuf)
 {
-    static const char Name[] = "Name", Rename[] = "Rename or un-name",
-                      /* "re-call" seems a bit weird, but "recall" and
-                         "rename" don't fit for changing a type name */
-                      Call[] = "Call", Recall[] = "Re-call or un-call";
+    static const char
+        Name[] = "Name",
+        Rename[] = "Rename or un-name",
+        Call[] = "Call",
+        /* "re-call" seems a bit weird, but "recall" and
+           "rename" don't fit for changing a type name */
+        Recall[] = "Re-call or un-call";
 
     onamebuf[0] = ocallbuf[0] = '\0';
     if (name_ok(obj) == GETOBJ_SUGGEST) {

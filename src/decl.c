@@ -207,7 +207,7 @@ const struct instance_globals_a g_init_a = {
     /* shk.c */
     FALSE, /* auto_credit */
     /* sounds.c */
-    soundlib_unassigned, /* enum soundlib_ids active_soundlib */
+    soundlib_nosound, /* enum soundlib_ids active_soundlib */
 
     /* trap.c */
     { 0, 0, FALSE }, /* acid_ctx */

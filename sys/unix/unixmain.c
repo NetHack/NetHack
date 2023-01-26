@@ -39,6 +39,9 @@ ATTRNORETURN static void opt_terminate(void) NORETURN;
 ATTRNORETURN static void opt_usage(const char *) NORETURN;
 static void opt_showpaths(const char *);
 ATTRNORETURN static void scores_only(int, char **, const char *) NORETURN;
+#ifdef SND_LIB_INTEGRATED
+uint32_t soundlibchoice = soundlib_nosound;
+#endif
 
 #ifdef _M_UNIX
 extern void check_sco_console(void);
@@ -101,6 +104,20 @@ main(int argc, char *argv[])
     (void) umask(0777 & ~FCMASK);
 
     choose_windows(DEFAULT_WINDOW_SYS);
+
+#ifdef SND_LIB_INTEGRATED
+    /* One of the soundlib interfaces was integrated on build.
+     * We can leave a hint here for activate_chosen_soundlib later.
+     * assign_soundlib() just sets an indicator, it doesn't initialize
+     * any soundlib, and the indicator could be overturned before
+     * activate_chosen_soundlib() gets called. Qt will place its own
+     * hint if qt_init_nhwindow() is invoked.
+     */
+#if defined(SND_LIB_MACSOUND)
+    soundlibchoice = soundlib_macsound;
+    assign_soundlib(soundlibchoice);
+#endif
+#endif
 
 #ifdef CHDIR /* otherwise no chdir() */
     /*

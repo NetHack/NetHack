@@ -328,10 +328,12 @@ struct rm {
 #define drawbridgemask flags /* what's underneath when the span is open */
 #define looted     flags /* used for throne, tree, fountain, sink, door */
 #define icedpool   flags /* used for ice (in case it melts) */
+#define emptygrave flags /* no corpse in grave */
 /* horizonal applies to walls, doors (including sdoor); also to iron bars
    even though they don't have separate symbols for horizontal and vertical */
 #define blessedftn horizontal /* a fountain that grants attribs */
-#define disturbed  horizontal /* a grave that has been disturbed */
+#define disturbed  horizontal /* kicking or engraving on a grave's headstone
+                               * has summoned a ghoul */
 
 struct damage {
     struct damage *next;

@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1646322468 2022/03/03 15:47:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.240 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1674546299 2023/01/24 07:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -359,6 +359,9 @@ done2(void)
 #ifndef NO_SIGNAL
             (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
+            if (soundprocs.sound_exit_nhsound)
+                (*soundprocs.sound_exit_nhsound)("done2");
+
             exit_nhwindows((char *) 0);
             NH_abort();
         } else if (c == 'q')
@@ -608,6 +611,8 @@ panic VA_DECL(const char *, str)
     if (iflags.window_inited) {
         raw_print("\r\nOops...");
         wait_synch(); /* make sure all pending output gets flushed */
+        if (soundprocs.sound_exit_nhsound)
+            (*soundprocs.sound_exit_nhsound)("panic");
         exit_nhwindows((char *) 0);
         iflags.window_inited = 0; /* they're gone; force raw_print()ing */
     }
@@ -1424,12 +1429,15 @@ really_done(int how)
         && !(gm.mvitals[u.umonnum].mvflags & G_NOCORPSE)) {
         /* Base corpse on race when not poly'd since original u.umonnum
            is based on role, and all role monsters are human. */
-        int mnum = !Upolyd ? gu.urace.mnum : u.umonnum;
+        int mnum = !Upolyd ? gu.urace.mnum : u.umonnum,
+            was_already_grave = IS_GRAVE(levl[u.ux][u.uy].typ);
 
         corpse = mk_named_object(CORPSE, &mons[mnum], u.ux, u.uy, gp.plname);
         Sprintf(pbuf, "%s, ", gp.plname);
         formatkiller(eos(pbuf), sizeof pbuf - Strlen(pbuf), how, TRUE);
         make_grave(u.ux, u.uy, pbuf);
+        if (IS_GRAVE(levl[u.ux][u.uy].typ) && !was_already_grave)
+            levl[u.ux][u.uy].emptygrave = 1; /* corpse isn't buried */
     }
     pbuf[0] = '\0'; /* clear grave text; also lint suppression */
 
@@ -1668,6 +1676,11 @@ really_done(int how)
         destroy_nhwindow(endwin);
 
     dump_close_log();
+
+    /* shut down soundlib */
+    if (soundprocs.sound_exit_nhsound)
+        (*soundprocs.sound_exit_nhsound)("really_done");
+
     /*
      * "So when I die, the first thing I will see in Heaven is a score list?"
      *

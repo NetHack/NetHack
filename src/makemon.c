@@ -173,6 +173,8 @@ m_initweap(register struct monst *mtmp)
     case S_GIANT:
         if (rn2(2))
             (void) mongets(mtmp, (mm != PM_ETTIN) ? BOULDER : CLUB);
+        if ((mm != PM_ETTIN) && !rn2(5))
+            (void) mongets(mtmp, rn2(2) ? TWO_HANDED_SWORD : BATTLE_AXE);
         break;
     case S_HUMAN:
         if (is_mercenary(ptr)) {

@@ -113,6 +113,12 @@ endif   #MAKEFILE_SRC
 endif   #HAVE_NCURSESW
 endif   #WANT_WIN_CURSES
 
+# HAVE_SNDLIB could have been set in multiw-2 for Qt.
+# If it is set, add USER_SOUNDS
+ifeq "$(HAVE_SNDLIB)" "1"
+SNDCFLAGS+= -DUSER_SOUNDS
+endif
+
 CFLAGS+= $(WINCFLAGS)	  #WINCFLAGS set from multiw-2.370
 CFLAGS+= $(SNDCFLAGS)     #SNDCFLAGS set from multiw-2.370
 CFLAGS+= $(NHCFLAGS)

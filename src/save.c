@@ -63,6 +63,9 @@ dosave(void)
 #endif
         if (dosave0()) {
             u.uhp = -1; /* universal game's over indicator */
+            if (soundprocs.sound_exit_nhsound)
+                (*soundprocs.sound_exit_nhsound)("dosave");
+
             /* make sure they see the Saving message */
             display_nhwindow(WIN_MESSAGE, TRUE);
             exit_nhwindows("Be seeing you...");

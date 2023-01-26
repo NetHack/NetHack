@@ -66,10 +66,7 @@
  */
 
 enum soundlib_ids {
-    soundlib_unassigned = 0,
-#ifdef SND_LIB_QTSOUND
-    soundlib_qtsound,
-#endif
+    soundlib_nosound,
 #ifdef SND_LIB_PORTAUDIO
     soundlib_portaudio,
 #endif
@@ -94,7 +91,13 @@ enum soundlib_ids {
 #ifdef SND_LIB_WINDSOUND
     soundlib_windsound,
 #endif
-    soundlib_nosound
+#ifdef SND_LIB_MACSOUND
+    soundlib_macsound,
+#endif
+#ifdef SND_LIB_QTSOUND
+    soundlib_qtsound,
+#endif
+    soundlib_notused
 };
 
 struct sound_procs {
@@ -111,7 +114,7 @@ struct sound_procs {
 
 extern struct sound_procs sndprocs;
 
-#define SOUNDID(soundname) #soundname, soundlib_##soundname
+#define SOUNDID(soundname) #soundname, ((enum soundlib_ids) soundlib_##soundname)
 
 /*
  * SOUNDCAP
@@ -336,30 +339,38 @@ enum sound_effect_entries {
     se_canine_whine                   = 153,
     se_canine_yip                     = 154,
     se_canine_howl                    = 155,
-    se_feline_yowl                    = 156,
-    se_feline_meow                    = 157,
-    se_feline_purr                    = 158,
-    se_feline_yip                     = 159,
-    se_feline_mew                     = 160,
-    se_roar                           = 161,
-    se_snarl                          = 162,
-    se_buzz                           = 163,
-    se_squeek                         = 164,
-    se_squawk                         = 165,
-    se_squeal                         = 166,
-    se_screech                        = 167,
-    se_equine_neigh                   = 168,
-    se_equine_whinny                  = 169,
-    se_equine_whicker                 = 170,
-    se_bovine_moo                     = 171,
-    se_bovine_bellow                  = 172,
-    se_wail                           = 173,
-    se_groan                          = 174,
-    se_grunt                          = 175,
-    se_gurgle                         = 176,
-    se_elephant_trumpet               = 177,
-    se_snake_rattle                   = 178,
-    se_hallu_growl                    = 179,
+    se_canine_yowl                    = 156,
+    se_canine_yelp                    = 157,
+    se_feline_meow                    = 158,
+    se_feline_purr                    = 159,
+    se_feline_yip                     = 160,
+    se_feline_mew                     = 161,
+    se_feline_yowl                    = 162,
+    se_feline_yelp                    = 163,
+    se_roar                           = 164,
+    se_snarl                          = 165,
+    se_buzz                           = 166,
+    se_squeek                         = 167,
+    se_squawk                         = 168,
+    se_squeal                         = 169,
+    se_screech                        = 170,
+    se_equine_neigh                   = 171,
+    se_equine_whinny                  = 172,
+    se_equine_whicker                 = 173,
+    se_bovine_moo                     = 174,
+    se_bovine_bellow                  = 175,
+    se_wail                           = 176,
+    se_groan                          = 177,
+    se_grunt                          = 178,
+    se_gurgle                         = 179,
+    se_elephant_trumpet               = 180,
+    se_snake_rattle                   = 181,
+    se_yelp                           = 182,
+    se_jabberwock_burble              = 183,
+    se_shriek                         = 184,
+    se_bone_rattle                    = 185,
+    se_orc_grunt                      = 186,
+    se_avian_screak                   = 187,
     number_of_se_entries
 };
 
@@ -367,7 +378,7 @@ enum sound_effect_entries {
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
         || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
-        || defined(SND_LIB_WINDSOUND)
+        || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
 
 #define SND_LIB_INTEGRATED   /* shortcut for conditional code in other files */
 

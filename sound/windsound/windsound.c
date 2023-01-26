@@ -82,7 +82,8 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 #ifdef WAVEMUSIC_SOUNDS
     int reslt = 0;
     boolean has_note_variations = FALSE;
-    char resourcename[120], *end_of_res = 0, *c = 0;
+    char resourcename[120], *end_of_res = 0;
+    const char *c = 0;
 
     if (!str)
         return;
@@ -93,8 +94,7 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
             has_note_variations = TRUE;
             break;
         case ins_pan_flute:         /* MAGIC_FLUTE */
-             /* wav files for sound_Magic_Flute not added yet */
-            Strcpy(resourcename, "sound_Wooden_Flute");
+            Strcpy(resourcename, "sound_Magic_Flute");
             has_note_variations = TRUE;
             break;
         case ins_english_horn:      /* TOOLED_HORN */
