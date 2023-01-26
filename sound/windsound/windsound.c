@@ -118,6 +118,7 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
         case ins_cello:             /* MAGIC_HARP */
             Strcpy(resourcename, "sound_Magic_Harp");
             has_note_variations = TRUE;
+            break;
         case ins_tinkle_bell:
             Strcpy(resourcename, "sound_Bell");
             break;
