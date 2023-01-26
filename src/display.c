@@ -320,10 +320,18 @@ map_object(register struct obj *obj, int show)
 
     /* if this object is already displayed as a generic object, it might
        become a specific one now */
-    if (glyph_is_generic_object(glyph) && cansee(x, y) && next2u(x, y)
-        && !Hallucination) {
-        obj->dknown = 1;
-        glyph = obj_to_glyph(obj, newsym_rn2);
+    if (glyph_is_generic_object(glyph) && cansee(x, y) && !Hallucination) {
+        /* these 'r' and 'neardist' calculations match distant_name(objnam.c)
+           and see_nearby_objects(below); we assume that this is a lone
+           object or a pile-top, not something below the top of a pile */
+        int r = (u.xray_range > 2) ? u.xray_range : 2,
+            /* neardist produces a small square with rounded corners */
+            neardist = (r * r) * 2 - r; /* same as r*r + r*(r-1) */
+
+        if (distu(x, y) <= neardist) {
+            obj->dknown = 1;
+            glyph = obj_to_glyph(obj, newsym_rn2);
+        }
     }
 
     if (gl.level.flags.hero_memory) {
@@ -1435,26 +1443,37 @@ see_objects(void)
     update_inventory();
 }
 
-/* mark the top object of each adjacent stack as having been seen, and
-   if it was being displayed as generic, redisplay it as specific */
+/* mark the top object of nearby stacks as having been seen, and if
+   that object was being displayed as generic, redisplay it as specific */
 void
 see_nearby_objects(void)
 {
     struct obj *obj;
     int glyph;
     coordxy ix, iy, x = u.ux, y = u.uy;
+    /* these 'r' and 'neardist' calculations match distant_name(objnam.c) */
+    int r = (u.xray_range > 2) ? u.xray_range : 2,
+        /* neardist produces a small square with rounded corners */
+        neardist = (r * r) * 2 - r; /* same as r*r + r*(r-1) */
 
-    for (iy = y - 1; iy <= y + 1; ++iy)
-        for (ix = x - 1; ix <= x + 1; ++ix) {
-            if (!isok(ix, iy) || !cansee(ix, iy))
+    /* [note: this could be optimized to avoid the distu() calculations] */
+    for (iy = y - r; iy <= y + r; ++iy)
+        for (ix = x - r; ix <= x + r; ++ix) {
+            if (!isok(ix, iy))
                 continue;
-            if ((obj = vobj_at(ix, iy)) != 0) {
-                obj->dknown = 1; /* adjacent, so close enough to see it */
-                /* operate on remembered glyph rather than current one */
-                glyph = levl[ix][iy].glyph;
-                if (glyph_is_generic_object(glyph))
-                    newsym_force(ix, iy);
-            }
+            /* skip if no object or the object has already been marked as
+               having been seen up close */
+            if ((obj = vobj_at(ix, iy)) == 0 || obj->dknown)
+                continue;
+            /* skip if the spot can't be seen or is too far (diagonal) */
+            if (!cansee(ix, iy) || distu(ix, iy) > neardist)
+                continue;
+
+            obj->dknown = 1; /* near enough to see it */
+            /* operate on remembered glyph rather than current one */
+            glyph = levl[ix][iy].glyph;
+            if (glyph_is_generic_object(glyph))
+                newsym_force(ix, iy);
         }
 }
 
