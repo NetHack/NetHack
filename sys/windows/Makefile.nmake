@@ -1,5 +1,5 @@
 # NetHack 3.7 Makefile.nmake
-#       Copyright (c) NetHack Development Team 1993-2022
+#       Copyright (c) NetHack Development Team 1993-2023
 #
 #==============================================================================
 # Build Tools Environment
@@ -37,6 +37,16 @@ default : install
 #
 
 GAMEDIR = ..\binary               # Default game build directory
+
+#
+#
+#------------------------------------------------------------------------------
+# Add any sound libraries the you wish to integrate with NetHack, with spaces
+# between them.
+#
+# soundwind uses built-in Microsoft API's, no 3rd party download is required.
+
+SOUND_LIBRARIES = windsound
 
 #
 #------------------------------------------------------------------------------
@@ -524,11 +534,10 @@ MDLIBTTY  = $(OTTY)mdlib.o
 DLBOBJTTY = $(OTTY)dlb.o
 REGEXTTY  = $(OTTY)cppregex.o
 LUAOBJTTY = $(OTTY)nhlua.o    $(OTTY)nhlsel.o    $(OTTY)nhlobj.o
-SOUNDTTY  = $(OTTY)windsound.o #$(OTTY)sample.o
 VVOBJTTY  = $(OTTY)version.o
 
 SOBJTTY   = $(OTTY)windmain.o $(OTTY)windsys.o $(OTTY)win10.o \
-		$(OTTY)safeproc.o $(SOUNDTTY)
+		$(OTTY)safeproc.o
 
 TTYOBJ = $(OTTY)topl.o $(OTTY)getline.o  $(OTTY)wintty.o
 
@@ -589,11 +598,10 @@ MDLIBGUI  = $(OGUI)mdlib.o
 DLBOBJGUI = $(OGUI)dlb.o
 REGEXGUI  = $(OGUI)cppregex.o
 LUAOBJGUI = $(OGUI)nhlua.o    $(OGUI)nhlsel.o   $(OGUI)nhlobj.o
-SOUNDGUI  = $(OGUI)windsound.o
 VVOBJGUI  = $(OGUI)version.o
 
 SOBJGUI   = $(OGUI)windmain.o $(OGUI)windsys.o $(OGUI)win10.o \
-		$(OGUI)safeproc.o $(SOUNDGUI)
+		$(OGUI)safeproc.o
 
 GUIOBJ	= $(OGUI)mhaskyn.o $(OGUI)mhdlg.o \
 	$(OGUI)mhfont.o $(OGUI)mhinput.o $(OGUI)mhmain.o $(OGUI)mhmap.o \
@@ -651,7 +659,36 @@ OPTIONS_FILE = $(DAT)\options
 DLBOBJ_HOST = $(OTTY)dlb$(HOST).o
 !ENDIF
 
-SOUNDLIBDEFS = -DSND_LIB_WINDSOUND -DUSER_SOUNDS
+#===============-=================================================
+# SOUND_LIBRARIES
+#=================================================================
+
+# +-------------------------------+
+# | windsound (uses built-in api) |
+# +-------------------------------+
+#
+SNDTEMP = $(SOUND_LIBRARIES:windsound=)
+!IF "$(SOUND_LIBRARIES)" != "$(SNDTEMP)"
+# SOUND_LIBRARIES included windsound
+SOUND_WINDSOUND=Y
+!MESSAGE Including windsound support
+SOUNDLIBINCL = $(SOUNDLIBINCL)
+SOUNDLIBDEFS = $(SOUNDLIBDEFS) -DSND_LIB_WINDSOUND
+TTYSOUNDOBJS = $(TTYSOUNDOBJS) $(OTTY)windsound.o
+GUISOUNDOBJS = $(GUISOUNDOBJS) $(OGUI)windsound.o
+TTYSOUNDLIBS = $(TTYSOUNDLIBS)
+GUISOUNDLIBS = $(GUIDSOUNDLIBS)
+WINDSOUNDDIR = ..\sound\windsound
+!ENDIF
+SNDTEMP=
+
+#===============-=================================================
+# SOUND Support
+#=================================================================
+
+!IF "$(SOUNDLIBDEFS)" != ""
+SOUNDLIBDEFS = $(SOUNDLIBDEFS) -DUSER_SOUNDS
+!ENDIF
 
 SNDWAVFILES = $(SndWavDir)\se_squeak_A.wav $(SndWavDir)\se_squeak_B.wav \
 	$(SndWavDir)\se_squeak_B_flat.wav $(SndWavDir)\se_squeak_C.wav \
@@ -928,7 +965,7 @@ conlibs     = $(baselibs)
 guilibs     = $(winlibs)
 #
 
-INCLDIR= /I..\include /I..\sys\windows $(LUAINCL)
+INCLDIR= /I..\include /I..\sys\windows $(LUAINCL) $(SOUNDLIBINCL)
 
 #==========================================
 # Util and console builds
@@ -1102,6 +1139,17 @@ DLB =
 	cd ..\..\src
 
 #==========================================
+# Rules for files in sound\windsound
+#==========================================
+
+{$(WINDSOUNDDIR)}.c{$(OBJTTY)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+{$(WINDSOUNDDIR)}.c{$(OBJGUI)}.o:
+	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+
+#==========================================
 #=============== TARGETS ==================
 #==========================================
 
@@ -1198,17 +1246,18 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 # NetHack
 #--------
 #
+
 $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
-			$(ALLOBJTTY) $(CURSESOBJ) $(OTTY)date.o $(OTTY)console.res \
+			$(ALLOBJTTY) $(CURSESOBJ) $(TTYSOUNDOBJS) $(OTTY)date.o $(OTTY)console.res \
 			$(LUALIB) $(PDCLIB) $(TTYOBJ)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
 	$(link) $(LFLAGS) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(OTTY)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(LUALIB) \
+		$(LIBS) $(PDCLIB) $(LUALIB) $(TTYSOUNDLIBS) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJTTY)
 		$(ALLOBJTTY)
-                $(TTYOBJ)
+                $(TTYOBJ) $(TTYSOUNDOBJS)
                 $(CURSESOBJ)
 		$(OTTY)consoletty.o
 		$(OTTY)date.o
@@ -1221,17 +1270,18 @@ $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
 #---------
 #
 $(GAMEDIR)\NetHackW.exe : gamedir.tag $(OGUI)tile.o \
-			$(ALLOBJGUI) $(GAMEOBJGUI) $(GUIOBJ) $(OGUI)date.o \
+			$(ALLOBJGUI) $(GAMEOBJGUI) $(GUIOBJ) $(GUISOUNDOBJS) \
+			$(OGUI)date.o \
 			$(OGUI)NetHackW.res \
 			$(LUALIB)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(LFLAGS) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(LUALIB) \
+		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(LUALIB) $(GUISOUNDLIBS) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJGUI)
 		$(ALLOBJGUI)
-		$(GUIOBJ)
+		$(GUIOBJ) $(GUISOUNDOBJS)
 		$(OGUI)tile.o
 		$(OGUI)date.o
 		$(OGUI)NetHackW.res
@@ -1792,6 +1842,12 @@ $(OLUA)lua.o: $(LUASRC)\lua.c
 #$(OLUA)luac.o: $(LUASRC)\luac.c
 $(OLUA)lapi.o: $(LUASRC)\lapi.c
 	$(Q)$(CC) $(CFLAGS) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -wd4244 -wd4701 -wd4702 -Fo$@ $(LUASRC)\lapi.c
+
+#===================================================================
+# windsound dependencies
+#===================================================================
+
+$(OTTY)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
 
 #===================================================================
 # sys/windows dependencies
