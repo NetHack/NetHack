@@ -44,7 +44,7 @@ GAMEDIR = ..\binary               # Default game build directory
 # Add any sound libraries the you wish to integrate with NetHack, with spaces
 # between them.
 #
-# soundwind uses built-in Microsoft API's, no 3rd party download is required.
+# windsound uses built-in Microsoft API's, no 3rd party download is required.
 
 SOUND_LIBRARIES = windsound
 
