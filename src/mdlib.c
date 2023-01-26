@@ -20,6 +20,7 @@
 #include "sym.h"
 #include "artilist.h"
 #include "dungeon.h"
+#include "sndprocs.h"
 #include "obj.h"
 #include "monst.h"
 #include "you.h"
@@ -88,6 +89,7 @@ extern void free_nomakedefs(void); /* date.c */
 
 void build_options(void);
 static int count_and_validate_winopts(void);
+static int count_and_validate_soundlibopts(void);
 static void opt_out_words(char *, int *);
 static void build_savebones_compat_string(void);
 
@@ -157,6 +159,74 @@ static struct win_information window_opts[] = {
 #endif  /* 0 => retired */
     { 0, 0, FALSE }
 };
+
+#if !defined(MAKEDEFS_C)
+
+struct soundlib_information {
+    enum soundlib_ids id;
+    const char *const text_id;
+    const char *const Url;
+    boolean valid;
+};
+
+/*
+ * soundlibs
+ *
+ * None of these are endorsements or recommendations of one library
+ * or another, in any way. They are just preprocessor conditionals
+ * in the event that glue code for such a library is ever added into
+ * NetHack.
+ */
+static struct soundlib_information soundlib_opts[] = {
+    { soundlib_nosound, "soundlib_nosound", "", FALSE },
+#ifdef SND_LIB_PORTAUDIO
+    { soundlib_portaudio, "soundlib_portaudio",
+        "http://www.portaudio.com/", FALSE },
+#endif
+#ifdef SND_LIB_OPENAL
+    { soundlib_openal, "soundlib_openal",
+        "https://www.openal.org/", FALSE },
+#endif
+#ifdef SND_LIB_SDL_MIXER
+    { soundlib_sdl_mixer, "soundlib_sdl_mixer",
+        "https://github.com/libsdl-org/SDL_mixer/", FALSE },
+#endif
+#ifdef SND_LIB_MINIAUDIO
+    { soundlib_miniaudio, "soundlib_miniaudio",
+        "https://miniaud.io/", FALSE },
+#endif
+#ifdef SND_LIB_FMOD
+    /* proprietary, though a Free Indie License exists.
+     * https://www.fmod.com/licensing#indie-note
+     */
+    { soundlib_fmod, "soundlib_fmod",
+        "https://www.fmod.com/", FALSE },
+#endif
+#ifdef SND_LIB_SOUND_ESCCODES
+    { soundlib_sound_esccodes, "sound_esccodes", "", FALSE },
+#endif
+#ifdef SND_LIB_VISSOUND
+    { soundlib_vissound, "soundlib_vissound", "", FALSE },
+#endif
+#ifdef SND_LIB_WINDSOUND
+    /* Uses Windows WIN32 API */
+    { soundlib_windsound, "soundlib_windsound",
+  "https://learn.microsoft.com/en-us/windows/win32/multimedia/waveform-audio",
+        FALSE },
+#endif
+#ifdef SND_LIB_MACSOUND
+    /* Uses AppKit NSSound */
+    { soundlib_macsound, "soundlib_macsound",
+        "https://developer.apple.com/documentation/appkit/nssound",
+        FALSE },
+#endif
+#ifdef SND_LIB_QTSOUND
+    { soundlib_qtsound, "soundlib_qtsound",
+        "https://doc.qt.io/qt-5/qsoundeffect.html", FALSE },
+#endif
+    { 0, 0, 0, FALSE },
+};
+#endif  /* !MAKEDEFS_C */
 
 /*
  * Use this to explicitly mask out features during version checks.
@@ -594,9 +664,6 @@ static const char *const build_opts[] = {
 #ifdef TIMED_DELAY
     "timed wait for display effects",
 #endif
-#ifdef USER_SOUNDS
-    "user sounds",
-#endif
 #ifdef PREFIXES_IN_USE
     "variable playground",
 #endif
@@ -639,6 +706,21 @@ count_and_validate_winopts(void)
     return cnt;
 }
 
+#if !defined(MAKEDEFS_C)
+static int
+count_and_validate_soundlibopts(void)
+{
+    int i, cnt = 0;
+
+    /* soundlib_opts has a fencepost entry at the end */
+    for (i = 0; i < SIZE(soundlib_opts) - 1; i++) {
+        ++cnt;
+        soundlib_opts[i].valid = TRUE;
+    }
+    return cnt;
+}
+#endif
+
 static void
 opt_out_words(
     char *str,     /* input, but modified during processing */
@@ -675,8 +757,9 @@ build_options(void)
     char buf[COLBUFSZ];
     int i, length, winsyscnt, cnt = 0;
     const char *defwinsys = DEFAULT_WINDOW_SYS;
+#if !defined(MAKEDEFS_C) && defined(FOR_RUNTIME)
+    int soundlibcnt;
 
-#if !defined (MAKEDEFS_C) && defined(FOR_RUNTIME)
 #ifdef WIN32
     defwinsys = GUILaunched ? "mswin" : "tty";
 #endif
@@ -759,6 +842,56 @@ build_options(void)
         Sprintf(buf, "with a default of \"%s\".", defwinsys);
         opt_out_words(buf, &length);
     }
+
+#if !defined(MAKEDEFS_C)
+    cnt = 0;
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    optbuf[0] = '\0';
+    soundlibcnt = count_and_validate_soundlibopts();
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    Sprintf(optbuf, "Supported soundlib%s:",
+            (soundlibcnt > 1) ? "s" : "");
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    optbuf[0] = '\0';
+    length = COLNO + 1; /* force 1st item onto new line */
+
+    for (i = 0; i < SIZE(soundlib_opts) - 1; i++) {
+        if (!soundlib_opts[i].valid)
+            continue;
+        Sprintf(buf, "\"%s\"", soundlib_opts[i].text_id);
+        /*
+         * 1 : foo.
+         * 2 : foo and bar,
+         * 3+: for, bar, and quux,
+         *
+         * 2+ will be followed by " with a default of..."
+         */
+        Strcat(buf, (soundlibcnt == 1) ? "." /* no 'default' */
+                    : (soundlibcnt == 2 && cnt == 0) ? " and"
+                      : (cnt == soundlibcnt - 2) ? ", and"
+#ifdef USER_SOUNDS
+                        : ","
+#else
+                        : "."
+#endif
+        );
+        opt_out_words(buf, &length);
+        cnt++;
+    }
+#ifdef USER_SOUNDS
+    if (cnt > 1) {
+        /* loop ended with a comma; opt_out_words() will insert a space */
+        Sprintf(buf, "user sounds.");
+        opt_out_words(buf, &length);
+    }
+#endif
+#endif  /* !MAKEDEFS_C */
 
     opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
