@@ -1755,7 +1755,7 @@ domove_fight_ironbars(coordxy x, coordxy y)
 {
     if (gc.context.forcefight && levl[x][y].typ == IRONBARS && uwep) {
         struct obj *obj = uwep;
-        unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV);
+        unsigned breakflags = (BRK_BY_HERO | BRK_FROM_INV | BRK_MELEE);
 
         if (breaktest(obj)) {
             if (obj->quan > 1L)

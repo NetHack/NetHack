@@ -595,11 +595,12 @@ enum bodypart_types {
 /* flags for hero_breaks() and hits_bars(); BRK_KNOWN* let callers who have
    already called breaktest() prevent it from being called again since it
    has a random factor which makes it be non-deterministic */
-#define BRK_BY_HERO        1
-#define BRK_FROM_INV       2
-#define BRK_KNOWN2BREAK    4
-#define BRK_KNOWN2NOTBREAK 8
+#define BRK_BY_HERO        0x01
+#define BRK_FROM_INV       0x02
+#define BRK_KNOWN2BREAK    0x04
+#define BRK_KNOWN2NOTBREAK 0x08
 #define BRK_KNOWN_OUTCOME  (BRK_KNOWN2BREAK | BRK_KNOWN2NOTBREAK)
+#define BRK_MELEE          0x10
 
 /* extended command return values */
 #define ECMD_OK     0x00 /* cmd done successfully */
