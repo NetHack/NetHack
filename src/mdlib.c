@@ -861,26 +861,28 @@ build_options(void)
     optbuf[0] = '\0';
     length = COLNO + 1; /* force 1st item onto new line */
 
+#ifdef USER_SOUNDS
+    soundlibcnt += 1;
+#endif
     for (i = 0; i < SIZE(soundlib_opts) - 1; i++) {
+        const char *soundlib;
+
         if (!soundlib_opts[i].valid)
             continue;
-        Sprintf(buf, "\"%s\"", soundlib_opts[i].text_id);
+        soundlib = soundlib_opts[i].text_id;
+        if (!strncmp(soundlib, "soundlib_", 9))
+            soundlib += 9;
+        Sprintf(buf, "\"%s\"", soundlib);
         /*
          * 1 : foo.
-         * 2 : foo and bar,
-         * 3+: for, bar, and quux,
-         *
-         * 2+ will be followed by " with a default of..."
+         * 2 : foo and bar.
+         * 3+: for, bar, and quux.
          */
-        Strcat(buf, (soundlibcnt == 1) ? "." /* no 'default' */
+        Strcat(buf, (soundlibcnt == 1 || cnt == soundlibcnt - 1)
+                    ? "." /* no 'with default' */
                     : (soundlibcnt == 2 && cnt == 0) ? " and"
                       : (cnt == soundlibcnt - 2) ? ", and"
-#ifdef USER_SOUNDS
-                        : ","
-#else
-                        : "."
-#endif
-        );
+                        : ",");
         opt_out_words(buf, &length);
         cnt++;
     }
