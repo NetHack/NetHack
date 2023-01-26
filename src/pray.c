@@ -22,7 +22,7 @@ static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
 static void offer_too_soon(aligntyp);
 static void desecrate_high_altar(aligntyp);
-static void offer_real_amulet(struct obj *, aligntyp);
+static void offer_real_amulet(struct obj *, aligntyp); /* NORETURN */
 static boolean pray_revive(void);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
@@ -1469,6 +1469,9 @@ desecrate_high_altar(aligntyp altaralign)
     god_zaps_you(altaralign);
 }
 
+/* offering the Amulet on a high altar (checked by caller) ends the game;
+   we don't declare this 'NORETURN' because done() can return (if called
+   with some reasons other than ASCENDED and ESCAPED) */
 static void
 offer_real_amulet(struct obj *otmp, aligntyp altaralign)
 {
@@ -1482,16 +1485,16 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         useup(otmp); /* well, it's gone now */
     else
         useupf(otmp, 1L);
+
     You("offer the Amulet of Yendor to %s...", a_gname());
+
     if (altaralign == A_NONE) {
-        /* Moloch's high altar */
+        /* Moloch's high altar at the bottom of Gehennom. */
         if (u.ualign.record > -99)
             u.ualign.record = -99;
-        pline(
-        "An invisible choir chants, and you are bathed in darkness...");
+        pline("An invisible choir chants, and you are bathed in darkness...");
         /*[apparently shrug/snarl can be sensed without being seen]*/
-        pline("%s shrugs and retains dominion over %s,", Moloch,
-                u_gname());
+        pline("%s shrugs and retains dominion over %s,", Moloch, u_gname());
         pline("then mercilessly snuffs out your life.");
         Sprintf(gk.killer.name, "%s indifference", s_suffix(Moloch));
         gk.killer.format = KILLED_BY;
@@ -1502,29 +1505,33 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         /* declined to die in wizard or explore mode */
         pline(cloud_of_smoke, hcolor(NH_BLACK));
         done(ESCAPED);
+        /*NOTREACHED*/
     } else if (u.ualign.type != altaralign) {
-        /* And the opposing team picks you up and
-            carries you off on their shoulders */
+        /* And the opposing team picks you up and carries you off
+           on their shoulders. */
         adjalign(-99);
         pline("%s accepts your gift, and gains dominion over %s...",
-                a_gname(), u_gname());
+              a_gname(), u_gname());
         pline("%s is enraged...", u_gname());
         pline("Fortunately, %s permits you to live...", a_gname());
         pline(cloud_of_smoke, hcolor(NH_ORANGE));
         done(ESCAPED);
-    } else { /* super big win */
+        /*NOTREACHED*/
+    } else {
+        /* You've won the game!  Feedback-wise, it's a bit of a let down. */
         u.uevent.ascended = 1;
         adjalign(10);
-        pline(
-        "An invisible choir sings, and you are bathed in radiance...");
+        pline("An invisible choir sings, and you are bathed in radiance...");
         godvoice(altaralign, "Mortal, thou hast done well!");
         display_nhwindow(WIN_MESSAGE, FALSE);
         verbalize(
-    "In return for thy service, I grant thee the gift of Immortality!");
+          "In return for thy service, I grant thee the gift of Immortality!");
         You("ascend to the status of Demigod%s...",
             flags.female ? "dess" : "");
         done(ASCENDED);
+        /*NOTREACHED*/
     }
+    /*NOTREACHED*/
 }
 
 /* the #offer command - sacrifice something to the gods */
