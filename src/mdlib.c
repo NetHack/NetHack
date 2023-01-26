@@ -89,7 +89,6 @@ extern void free_nomakedefs(void); /* date.c */
 
 void build_options(void);
 static int count_and_validate_winopts(void);
-static int count_and_validate_soundlibopts(void);
 static void opt_out_words(char *, int *);
 static void build_savebones_compat_string(void);
 
@@ -161,6 +160,7 @@ static struct win_information window_opts[] = {
 };
 
 #if !defined(MAKEDEFS_C)
+static int count_and_validate_soundlibopts(void);
 
 struct soundlib_information {
     enum soundlib_ids id;
