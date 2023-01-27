@@ -201,6 +201,7 @@ static void macsound_hero_playnotes(int32_t instrument,
             Strcpy(resourcename, "sound_Magic_Harp");
             has_note_variations = TRUE;
             pseudo_seid_base = 12;
+            break;
         case ins_english_horn:      /* TOOLED_HORN */
             Strcpy(resourcename, "sound_Tooled_Horn");
             has_note_variations = TRUE;
@@ -219,7 +220,7 @@ static void macsound_hero_playnotes(int32_t instrument,
         case ins_pan_flute:         /* MAGIC_FLUTE */
             Strcpy(resourcename, "sound_Magic_Flute");
             has_note_variations = TRUE;
-            pseudo_seid_base = 26;
+            pseudo_seid_base = 40;
             break;
     }
     pseudo_seid_base += number_of_se_entries; /* get past se_ entries */
