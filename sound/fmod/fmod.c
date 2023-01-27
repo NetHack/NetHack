@@ -1,3 +1,4 @@
+/* Copyright (c) Taylor Daley, 2023. */
 /* fmod.c */
 /* NetHack may be freely redistributed.  See license for details. */
 
