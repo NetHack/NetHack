@@ -307,7 +307,9 @@ clear_no_charge_obj(
          * returns.
          */
         if (!shkp
-            || (otmp->where != OBJ_FLOOR && otmp->where != OBJ_CONTAINED)
+            || (otmp->where != OBJ_FLOOR
+                && otmp->where != OBJ_CONTAINED
+                && otmp->where != OBJ_BURIED)
             || !get_obj_location(otmp, &x, &y, OBJ_CONTAINED | OBJ_BURIED)
             || !isok(x, y)
             || (rno = levl[x][y].roomno) < ROOMOFFSET
@@ -354,6 +356,7 @@ setpaid(register struct monst *shkp)
 
     /* clear obj->no_charge for all obj in shkp's shop */
     clear_no_charge(shkp, fobj);
+    clear_no_charge(shkp, gl.level.buriedobjlist);
 
     while ((obj = gb.billobjs) != 0) {
         obj_extract_self(obj);
