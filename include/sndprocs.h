@@ -450,12 +450,6 @@ SoundAchievement(0, sa2_xpleveldown, level);
 
 /*  void (*sound_achievement)(schar, schar, int32_t); */
 
-#define SoundAchievement(arg1, arg2, aflags) \
-    do {                                                                  \
-        if (soundprocs.sound_achievement                                  \
-            && ((soundprocs.sndcap & SNDCAP_ACHIEVEMENTS) != 0))          \
-            (*soundprocs.sound_achievement)((arg1), (arg2), (aflags));    \
-    } while(0)
 #else
 #ifdef SND_LIB_INTEGRATED
 #undef  SND_LIB_INTEGRATED
