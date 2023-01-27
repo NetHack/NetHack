@@ -464,6 +464,9 @@ yelp(register struct monst* mtmp)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
+#ifndef SND_LIB_INTEGRATED
+    nhUse(se);
+#endif
 }
 
 /* the sounds of distressed pets */
@@ -501,6 +504,9 @@ whimper(register struct monst* mtmp)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }
+#ifndef SND_LIB_INTEGRATED
+    nhUse(se);
+#endif
 }
 
 /* pet makes "I'm hungry" noises */
