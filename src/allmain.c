@@ -626,6 +626,9 @@ init_sound_and_display_gamewindows(void)
 
     activate_chosen_soundlib();
 
+    SoundAchievement(0, sa2_splashscreen, 0);
+    /* ToDo: new splash screen invocation will go here */
+
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
         status_initialize(0);

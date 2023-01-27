@@ -371,8 +371,37 @@ enum sound_effect_entries {
     se_bone_rattle                    = 185,
     se_orc_grunt                      = 186,
     se_avian_screak                   = 187,
+    se_paranoid_confirmation          = 188,
+    se_bars_whap                      = 189,
+    se_bars_flapp                     = 190,
+    se_bars_clink                     = 191,
+    se_bars_clonk                     = 192,
     number_of_se_entries
 };
+
+enum achievements_arg2 {
+    sa2_splashscreen, sa2_newgame_nosplash, sa2_restoregame,
+    sa2_xplevelup, sa2_xpleveldown
+};
+
+/*
+Arguments for sound_achievement(schar arg1, schar arg2, int32_t aflags)
+
+Arguments for actual achievements, those in you.h,
+        arg1 = the achievement value.
+        arg2 = 0 (irrelevant).
+      aflags = 0 for first time, 1 for repeat.
+
+These next ones make use of arg2, and aflags may be
+filled with additional int values dependent on arg2.
+arg1 must always be 0 for these.
+
+SoundAchievement(0, sa2_splashscreen, 0);
+SoundAchievement(0, sa2_newgame_nosplash, 0);
+SoundAchievement(0, sa2_restoregame, 0);
+SoundAchievement(0, sa2_levelup, level);
+SoundAchievement(0, sa2_xpleveldown, level);
+*/
 
 #if defined(SND_LIB_QTSOUND) || defined(SND_LIB_PORTAUDIO) \
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
@@ -396,11 +425,36 @@ enum sound_effect_entries {
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol)); \
     } while(0)
 
+#define SoundeffectEvenIfDeaf(seid, vol) \
+    do {                                                              \
+        if (!soundprocs.sound_soundeffect                             \
+            && ((soundprocs.sndcap & SNDCAP_SOUNDEFFECTS) != 0))      \
+            (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol)); \
+    } while(0)
+
 #define Hero_playnotes(instrument, str, vol) \
     do {                                                                    \
         if (!Deaf && soundprocs.sound_hero_playnotes                        \
             && ((soundprocs.sndcap & SNDCAP_HEROMUSIC) != 0))               \
             (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol)); \
+    } while(0)
+
+/*  void (*sound_achievement)(schar, schar, int32_t); */
+
+#define SoundAchievement(arg1, arg2, avals) \
+    do {                                                                  \
+        if (soundprocs.sound_achievement                                  \
+            && ((soundprocs.sndcap & SNDCAP_ACHIEVEMENTS) != 0))          \
+            (*soundprocs.sound_achievement)((arg1), (arg2), (avals));     \
+    } while(0)
+
+/*  void (*sound_achievement)(schar, schar, int32_t); */
+
+#define SoundAchievement(arg1, arg2, aflags) \
+    do {                                                                  \
+        if (soundprocs.sound_achievement                                  \
+            && ((soundprocs.sndcap & SNDCAP_ACHIEVEMENTS) != 0))          \
+            (*soundprocs.sound_achievement)((arg1), (arg2), (aflags));    \
     } while(0)
 #else
 #ifdef SND_LIB_INTEGRATED
@@ -409,6 +463,7 @@ enum sound_effect_entries {
 #define Play_usersound(filename, vol, idx)
 #define Soundeffect(seid, vol)
 #define Hero_playnotes(instrument, str, vol)
+#define SoundAchievement(arg1, arg2, avals)
 #endif
 
 #endif /* SNDPROCS_H */
