@@ -391,7 +391,7 @@ use the following guidelines:
            { &myprefix_procs },
        #endif
 
-8) If the soundlib you are using work across multiple (more than one)
+9) If the soundlib you are using work across multiple (more than one)
    platform, several files related to building for the various
    systems and/or build tools will likely require updates in order
    for them to be able to compile for, and link with, your soundlib
@@ -450,7 +450,7 @@ use the following guidelines:
                         studio, and additional updates to link in the
                         underlying sound library, if it requires one.
 
-9) Look at your soundlib support file in sound/myprefix/myprefix.c
+10) Look at your soundlib support file in sound/myprefix/myprefix.c
    and make sure that all of the calls match the requirements laid out in
    Section VI and VII.
 
