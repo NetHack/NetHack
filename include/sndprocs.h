@@ -425,6 +425,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol)); \
     } while(0)
 
+/* Player's perspective, not the hero's; no Deaf suppression */
 #define SoundeffectEvenIfDeaf(seid, vol) \
     do {                                                              \
         if (!soundprocs.sound_soundeffect                             \
@@ -441,6 +442,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
 
 /*  void (*sound_achievement)(schar, schar, int32_t); */
 
+/* Player's perspective, not the hero's; no Deaf suppression */
 #define SoundAchievement(arg1, arg2, avals) \
     do {                                                                  \
         if (soundprocs.sound_achievement                                  \
