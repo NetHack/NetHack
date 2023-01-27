@@ -230,7 +230,7 @@ assign_soundlib(soundlib_identifier)
 
 activate_chosen_soundlib(void)
 
-    -- If a soundlib is already active, indicated by gc.active_soundlib
+    -- If a soundlib is already active, indicated by ga.active_soundlib
        holding the identifier of one of the added soundlib integrations,
        then the sound_exit_nhsound() is called to turn it off or
        deactivate it.
