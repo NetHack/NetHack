@@ -1,4 +1,4 @@
-/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1583508697 2020/03/06 15:31:37 $  $NHDT-Branch: NetHack-3.6-Mar2020 $:$NHDT-Revision: 1.139 $ */
+/* NetHack 3.6	patchlevel.h	$NHDT-Date: 1674867524 2023/01/28 00:58:44 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.141 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,7 +36,7 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 7, January, 2023
+/*  Patch 7, February ??, 2023
  *
  *  during engraving, spaces were counted instead of non-space (cherry-pick of
  *      4e0a1e04 from NetHack-3.7)
@@ -48,6 +48,8 @@
  *      ubuntu impish 21.10; disable that for any Linux unless GCC_URWARN is
  *      defined to force it back into effect
  *  update_inventory() after leash goes slack
+ *  player assigned name for monsters, specific objects, or object types could be
+        longer than what was intented to be allowed; for 'curses', much longer
  *  windows: added winflexbison to travis-ci configuration to permit full build of
  *      levcomp and dgncomp
  *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
