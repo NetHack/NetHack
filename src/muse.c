@@ -2021,6 +2021,7 @@ find_misc(struct monst* mtmp)
         }
         nomore(MUSE_BAG);
         if (Is_container(obj) && obj->otyp != BAG_OF_TRICKS && !rn2(5)
+            && !SchroedingersBox(obj)
             && !gm.m.has_misc && Has_contents(obj)
             && !obj->olocked && !obj->otrapped) {
             gm.m.misc = obj;
@@ -2062,6 +2063,8 @@ mloot_container(
     /* FIXME: handle cursed bag of holding */
     if (Is_mbag(container) && container->cursed)
         return res; /* 0 */
+    if (SchroedingersBox(container))
+        return res;
 
     switch (rn2(10)) {
     default: /* case 0, 1, 2, 3: */
