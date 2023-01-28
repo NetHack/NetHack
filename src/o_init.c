@@ -1,4 +1,4 @@
-/* NetHack 3.6	o_init.c	$NHDT-Date: 1545383615 2018/12/21 09:13:35 $  $NHDT-Branch: NetHack-3.6.2-beta01 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.6	o_init.c	$NHDT-Date: 1674864731 2023/01/28 00:12:11 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.27 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -10,6 +10,7 @@ STATIC_DCL void FDECL(setgemprobs, (d_level *));
 STATIC_DCL void FDECL(shuffle, (int, int, BOOLEAN_P));
 STATIC_DCL void NDECL(shuffle_all);
 STATIC_DCL boolean FDECL(interesting_to_discover, (int));
+STATIC_DCL void FDECL(disco_append_typename, (char *, int));
 STATIC_DCL char *FDECL(oclass_to_name, (CHAR_P, char *));
 
 static NEARDATA short disco[NUM_OBJECTS] = DUMMY;
@@ -416,6 +417,32 @@ static short uniq_objs[] = {
     BELL_OF_OPENING,
 };
 
+/* append typename(dis) to buf[], possibly truncating in the process */
+STATIC_OVL void
+disco_append_typename(buf, dis)
+char *buf;
+int dis;
+{
+    unsigned len = (unsigned) strlen(buf);
+    char *p, *typnm = obj_typename(dis);
+
+    if (len + (unsigned) strlen(typnm) < BUFSZ) {
+        /* ordinary */
+        Strcat(buf, typnm);
+    } else if ((p = rindex(typnm, '(')) != 0
+               && p > typnm && p[-1] == ' ' && index(p, ')') != 0) {
+        /* typename() returned "really long user-applied name (actual type)"
+           and we want to truncate from "really long user-applied name" while
+           keeping " (actual type)" intact */
+        --p; /* back up to space in front of open paren */
+        (void) strncat(buf, typnm, BUFSZ - 1 - (len + (unsigned) strlen(p)));
+        Strcat(buf, p);
+    } else {
+        /* unexpected; just truncate from end of typename */
+        (void) strncat(buf, typnm, BUFSZ - 1 - len);
+    }
+}
+
 /* the '\' command - show discovered object types */
 int
 dodiscovered() /* free after Robert Viduya */
@@ -459,9 +486,8 @@ dodiscovered() /* free after Robert Viduya */
                            let_to_name(oclass, FALSE, FALSE));
                     prev_class = oclass;
                 }
-                Sprintf(buf, "%s %s",
-                        (objects[dis].oc_pre_discovered ? "*" : " "),
-                        obj_typename(dis));
+                Strcpy(buf, objects[dis].oc_pre_discovered ? "* " : "  ");
+                disco_append_typename(buf, dis);
                 putstr(tmpwin, 0, buf);
             }
         }
@@ -641,9 +667,8 @@ doclassdisco()
         for (i = bases[(int) oclass];
              i < NUM_OBJECTS && objects[i].oc_class == oclass; ++i) {
             if ((dis = disco[i]) != 0 && interesting_to_discover(dis)) {
-                Sprintf(buf, "%s %s",
-                        objects[dis].oc_pre_discovered ? "*" : " ",
-                        obj_typename(dis));
+                Strcpy(buf, objects[dis].oc_pre_discovered ? "* " : "  ");
+                disco_append_typename(buf, dis);
                 putstr(tmpwin, 0, buf);
                 ++ct;
             }
