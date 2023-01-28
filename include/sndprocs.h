@@ -123,6 +123,7 @@ enum instruments_broad {
 #endif
 
 enum sound_effect_entries {
+enum sound_effect_entries {
     se_zero_invalid                   = 0,
     se_faint_splashing                = 1,
     se_crackling_of_hellfire          = 2,
@@ -312,13 +313,13 @@ enum sound_effect_entries {
     se_orc_grunt                      = 186,
     se_avian_screak                   = 187,
     se_paranoid_confirmation          = 188,
-    se_bars_whang                     = 194,
-    se_bars_whap                      = 195,
-    se_bars_flapp                     = 196,
-    se_bars_clink                     = 197,
-    se_bars_clonk                     = 198,
-    se_boomerang_klonk                = 199,
-    se_bang_weapon_side               = 200,
+    se_bars_whang                     = 189,
+    se_bars_whap                      = 190,
+    se_bars_flapp                     = 191,
+    se_bars_clink                     = 192,
+    se_bars_clonk                     = 193,
+    se_boomerang_klonk                = 194,
+    se_bang_weapon_side               = 195,
     number_of_se_entries
 };
 
