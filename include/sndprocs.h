@@ -123,7 +123,6 @@ enum instruments_broad {
 #endif
 
 enum sound_effect_entries {
-enum sound_effect_entries {
     se_zero_invalid                   = 0,
     se_faint_splashing                = 1,
     se_crackling_of_hellfire          = 2,
