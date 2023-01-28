@@ -1235,11 +1235,13 @@ hit_bars(
         }
     } else {
         if (!Deaf) {
+#ifdef SND_LIB_INTEGRATED
             static enum sound_effect_entries se[] = {
                 se_zero_invalid,
                 se_bars_whang, se_bars_whap, se_bars_flapp,
                 se_bars_clink, se_bars_clonk
             };
+#endif
             static const char *const barsounds[] = {
                 "", "Whang", "Whap", "Flapp", "Clink", "Clonk"
             };
