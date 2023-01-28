@@ -312,10 +312,13 @@ enum sound_effect_entries {
     se_orc_grunt                      = 186,
     se_avian_screak                   = 187,
     se_paranoid_confirmation          = 188,
-    se_bars_whap                      = 189,
-    se_bars_flapp                     = 190,
-    se_bars_clink                     = 191,
-    se_bars_clonk                     = 192,
+    se_bars_whang                     = 194,
+    se_bars_whap                      = 195,
+    se_bars_flapp                     = 196,
+    se_bars_clink                     = 197,
+    se_bars_clonk                     = 198,
+    se_boomerang_klonk                = 199,
+    se_bang_weapon_side               = 200,
     number_of_se_entries
 };
 

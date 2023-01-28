@@ -279,6 +279,7 @@ dig(void)
             }
             break;
         case 1:
+            Soundeffect(se_bang_weapon_side, 100);
             pline("Bang!  You hit with the broad side of %s!",
                   the(xname(uwep)));
             wake_nearby();

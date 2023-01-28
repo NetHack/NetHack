@@ -3852,6 +3852,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
         tmp_at(gb.bhitpos.x, gb.bhitpos.y);
         delay_output();
         if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
+            Soundeffect(se_boomerang_klonk, 75);
             if (!Deaf)
                 pline("Klonk!");
             wake_nearto(gb.bhitpos.x, gb.bhitpos.y, 20);

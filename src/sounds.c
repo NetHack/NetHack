@@ -2040,10 +2040,13 @@ static const struct soundeffect_automapping
     { se_orc_grunt,                     "orc_grunt" },
     { se_avian_screak,                  "avian_screak" },
     { se_paranoid_confirmation,         "paranoid_confirmation" },
+    { se_bars_whang,                    "bars_whang" },
     { se_bars_whap,                     "bars_whap" },
     { se_bars_flapp,                    "bars_flapp" },
     { se_bars_clink,                    "bars_clink" },
     { se_bars_clonk,                    "bars_clonk" },
+    { se_boomerang_klonk,               "boomerang_klonk" },
+    { se_bang_weapon_side,              "bang_weapon_side" },
 };
 
 static const char *semap_basenames[SIZE(se_mappings_init)];

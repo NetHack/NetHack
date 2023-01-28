@@ -1234,17 +1234,28 @@ hit_bars(
                 dissolve_bars(barsx, barsy);
         }
     } else {
-        if (!Deaf)
-            pline("%s!", (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
-                         ? "Whang"
-                         : harmless_missile(otmp) ? "Whap"
-                         : is_flimsy(otmp) ? "Flapp"
+        if (!Deaf) {
+            static enum sound_effect_entries se[] = {
+                se_zero_invalid,
+                se_bars_whang, se_bars_whap, se_bars_flapp,
+                se_bars_clink, se_bars_clonk
+            };
+            static const char *const barsounds[] = {
+                "", "Whang", "Whap", "Flapp", "Clink", "Clonk"
+            };
+            int bsindx = (obj_type == BOULDER || obj_type == HEAVY_IRON_BALL)
+                         ? 1
+                         : harmless_missile(otmp) ? 2
+                         : is_flimsy(otmp) ? 3
                          : (otmp->oclass == COIN_CLASS
                             || objects[obj_type].oc_material == GOLD
                             || objects[obj_type].oc_material == SILVER)
-                           ? "Clink"
-                           : "Clonk");
+                           ? 4
+                           : SIZE(barsounds) - 1;
 
+            Soundeffect(se[bsindx], 100);
+            pline("%s!", barsounds[bsindx]);
+        }
         if (!(harmless_missile(otmp) || is_flimsy(otmp)))
             noise = 4 * 4;
 
