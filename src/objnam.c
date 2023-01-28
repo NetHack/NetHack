@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1654557302 2022/06/06 23:15:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.368 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1672829441 2023/01/04 10:50:41 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.386 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -35,6 +35,7 @@ struct _readobjnam_data {
 static char *strprepend(char *, const char *);
 static char *nextobuf(void);
 static void releaseobuf(char *);
+static void xcalled(char *, int, const char *, const char *);
 static char *xname_flags(struct obj *, unsigned);
 static char *minimal_xname(struct obj *);
 static void add_erosion_words(struct obj *, char *);
@@ -187,6 +188,7 @@ obj_typename(int otyp)
     if (!actualn)
         actualn = (otyp > 0 && otyp < MAXOCLASSES) ? "generic" : "object?";
 
+    buf[0] = '\0'; /* redundant */
     switch (ocl->oc_class) {
     case COIN_CLASS:
         Strcpy(buf, "coin");
@@ -217,7 +219,7 @@ obj_typename(int otyp)
         else
             Strcpy(buf, "amulet");
         if (un)
-            Sprintf(eos(buf), " called %s", un);
+            xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
         if (dn)
             Sprintf(eos(buf), " (%s)", dn);
         return buf;
@@ -226,8 +228,8 @@ obj_typename(int otyp)
             Strcpy(buf, actualn);
             if (GemStone(otyp))
                 Strcat(buf, " stone");
-            if (un)
-                Sprintf(eos(buf), " called %s", un);
+            if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
+                xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
             if (dn)
                 Sprintf(eos(buf), " (%s)", dn);
         } else {
@@ -236,7 +238,7 @@ obj_typename(int otyp)
                 Strcat(buf,
                        (ocl->oc_material == MINERAL) ? " stone" : " gem");
             if (un)
-                Sprintf(eos(buf), " called %s", un);
+                xcalled(buf, BUFSZ, "", un);
         }
         return buf;
     }
@@ -247,8 +249,8 @@ obj_typename(int otyp)
         else
             Sprintf(eos(buf), " of %s", actualn);
     }
-    if (un)
-        Sprintf(eos(buf), " called %s", un);
+    if (un) /* 3: length of " (" + ")" which will enclose 'dn' */
+        xcalled(buf, BUFSZ - (dn ? (int) strlen(dn) + 3 : 0), "", un);
     if (dn)
         Sprintf(eos(buf), " (%s)", dn);
     return buf;
@@ -498,6 +500,24 @@ reorder_fruit(boolean forward)
     }
 }
 
+/* add "<pfx> called <sfx>" to end of buf, truncating if necessary */
+static void
+xcalled(
+    char *buf,       /* eos(obuf) or eos(&obuf[PREFIX]) */
+    int siz,         /* BUFSZ or BUFSZ-PREFIX */
+    const char *pfx, /* usually class string, sometimes more specific */
+    const char *sfx) /* user assigned type name */
+{
+    int bufsiz = siz - 1 - (int) strlen(buf),
+        pfxlen = (int) (strlen(pfx) + sizeof " called " - sizeof "");
+
+    if (pfxlen > bufsiz)
+        panic("xcalled: not enough room for prefix (%d > %d)",
+              pfxlen, bufsiz);
+
+    Sprintf(eos(buf), "%s called %.*s", pfx, bufsiz - pfxlen, sfx);
+}
+
 char *
 xname(struct obj* obj)
 {
@@ -530,7 +550,7 @@ xname_flags(
        for those; pacify static analyzer without resorting to impossible() */
     if (!actualn)
         actualn = (typ > 0 && typ < MAXOCLASSES) ? "generic" : "object?";
-    /* As of 3.6.2: this used to be part of 'dn's initialization, but it
+    /* 3.6.2: this used to be part of 'dn's initialization, but it
        needs to come after possibly overriding 'actualn' */
     if (!dn)
         dn = actualn;
@@ -592,7 +612,7 @@ xname_flags(
         else if (nn)
             Strcpy(buf, actualn);
         else if (un)
-            Sprintf(buf, "amulet called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "amulet", un);
         else
             Sprintf(buf, "%s amulet", dn);
         break;
@@ -611,11 +631,9 @@ xname_flags(
             Strcat(buf, dn);
         else if (nn)
             Strcat(buf, actualn);
-        else if (un) {
-            Strcat(buf, dn);
-            Strcat(buf, " called ");
-            Strcat(buf, un);
-        } else
+        else if (un)
+            xcalled(buf, BUFSZ - PREFIX, dn, un);
+        else
             Strcat(buf, dn);
 
         if (typ == FIGURINE && omndx != NON_PM) {
@@ -650,7 +668,7 @@ xname_flags(
         if (nn)
             Strcat(buf, actualn);
         else if (un)
-            Sprintf(eos(buf), "%s called %s", armor_simple_name(obj), un);
+            xcalled(buf, BUFSZ - PREFIX, armor_simple_name(obj), un);
         else
             Strcat(buf, dn);
         break;
@@ -750,8 +768,7 @@ xname_flags(
                 }
                 Strcat(buf, actualn);
             } else {
-                Strcat(buf, " called ");
-                Strcat(buf, un);
+                xcalled(buf, BUFSZ - PREFIX, "", un);
             }
         } else {
             Strcat(buf, dn);
@@ -766,8 +783,7 @@ xname_flags(
             Strcat(buf, " of ");
             Strcat(buf, actualn);
         } else if (un) {
-            Strcat(buf, " called ");
-            Strcat(buf, un);
+            xcalled(buf, BUFSZ - PREFIX, "", un);
         } else if (ocl->oc_magic) {
             Strcat(buf, " labeled ");
             Strcat(buf, dn);
@@ -782,7 +798,7 @@ xname_flags(
         else if (nn)
             Sprintf(buf, "wand of %s", actualn);
         else if (un)
-            Sprintf(buf, "wand called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "wand", un);
         else
             Sprintf(buf, "%s wand", dn);
         break;
@@ -793,7 +809,7 @@ xname_flags(
             else if (nn)
                 Strcpy(buf, actualn);
             else if (un)
-                Sprintf(buf, "novel called %s", un);
+                xcalled(buf, BUFSZ - PREFIX, "novel", un);
             else
                 Sprintf(buf, "%s book", dn);
             break;
@@ -805,7 +821,7 @@ xname_flags(
                 Strcpy(buf, "spellbook of ");
             Strcat(buf, actualn);
         } else if (un) {
-            Sprintf(buf, "spellbook called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
         } else
             Sprintf(buf, "%s spellbook", dn);
         break;
@@ -815,7 +831,7 @@ xname_flags(
         else if (nn)
             Sprintf(buf, "ring of %s", actualn);
         else if (un)
-            Sprintf(buf, "ring called %s", un);
+            xcalled(buf, BUFSZ - PREFIX, "ring", un);
         else
             Sprintf(buf, "%s ring", dn);
         break;
@@ -826,7 +842,7 @@ xname_flags(
             Strcpy(buf, rock);
         } else if (!nn) {
             if (un)
-                Sprintf(buf, "%s called %s", rock, un);
+                xcalled(buf, BUFSZ - PREFIX, rock, un);
             else
                 Sprintf(buf, "%s %s", dn, rock);
         } else {
@@ -879,7 +895,8 @@ xname_flags(
         Strcat(buf, " named ");
  nameit:
         obufp = eos(buf);
-        Strcat(buf, ONAME(obj));
+        (void) strncat(buf, ONAME(obj),
+                       BUFSZ - 1 - PREFIX - (unsigned) strlen(buf));
         /* downcase "The" in "<quest-artifact-item> named The ..." */
         if (obj->oartifact && !strncmp(obufp, "The ", 4))
             *obufp = lowc(*obufp); /* = 't'; */
@@ -1866,7 +1883,7 @@ just_an(char *outbuf, const char *str)
 }
 
 char *
-an(const char* str)
+an(const char *str)
 {
     char *buf = nextobuf();
 
@@ -1875,11 +1892,11 @@ an(const char* str)
         return strcpy(buf, "an []");
     }
     (void) just_an(buf, str);
-    return strcat(buf, str);
+    return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
 }
 
 char *
-An(const char* str)
+An(const char *str)
 {
     char *tmp = an(str);
 
@@ -1950,9 +1967,7 @@ the(const char* str)
         Strcpy(buf, "the ");
     else
         buf[0] = '\0';
-    Strcat(buf, str);
-
-    return buf;
+    return strncat(buf, str, BUFSZ - 1 - Strlen(buf));
 }
 
 char *
@@ -3846,10 +3861,12 @@ readobjnam_postparse1(struct _readobjnam_data *d)
      */
     if ((d->p = strstri(d->bp, " named ")) != 0) {
         *d->p = 0;
+        /* note: if 'name' is too long, oname() will truncate it */
         d->name = d->p + 7;
     }
     if ((d->p = strstri(d->bp, " called ")) != 0) {
         *d->p = 0;
+        /* note: if 'un' is too long, obj lookup just won't match anything */
         d->un = d->p + 8;
         /* "helmet called telepathy" is not "helmet" (a specific type)
          * "shield called reflection" is not "shield" (a general type)

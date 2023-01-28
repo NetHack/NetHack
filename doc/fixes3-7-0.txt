@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1051 $ $NHDT-Date: 1665130022 2022/10/07 08:07:02 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1093 $ $NHDT-Date: 1672605786 2023/01/01 20:43:06 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1101,6 +1101,8 @@ eating garlic makes nearby monsters flee
 giants occasionally get a battle axe or a two-handed sword
 give gremlin the property it stole, if possible
 'F'orcefighting with a war hammer has a small chance of breaking iron bars
+player assigned name for monsters, specific objects, or object types could be
+	longer than what was intented to be allowed; for 'curses', much longer
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
