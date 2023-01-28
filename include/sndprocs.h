@@ -352,7 +352,8 @@ SoundAchievement(0, sa2_xpleveldown, level);
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
         || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
 
-#define SND_LIB_INTEGRATED   /* shortcut for conditional code in other files */
+/* shortcut for conditional code in other files */
+#define SND_LIB_INTEGRATED
 
 #define Play_usersound(filename, vol, idx) \
     do {                                                                      \
@@ -395,14 +396,22 @@ SoundAchievement(0, sa2_xpleveldown, level);
 
 /*  void (*sound_achievement)(schar, schar, int32_t); */
 
-#else
+#ifdef SOUNDLIBONLY
+#undef SOUNDLIBONLY
+#endif
+#define SOUNDLIBONLY
+#else  /*  NO SOUNDLIB SELECTED AFTER THIS */
 #ifdef SND_LIB_INTEGRATED
-#undef  SND_LIB_INTEGRATED
+#undef SND_LIB_INTEGRATED
 #endif
 #define Play_usersound(filename, vol, idx)
 #define Soundeffect(seid, vol)
 #define Hero_playnotes(instrument, str, vol)
 #define SoundAchievement(arg1, arg2, avals)
+#ifdef SOUNDLIBONLY
+#undef SOUNDLIBONLY
+#endif
+#define SOUNDLIBONLY UNUSED
 #endif
 
 #endif /* SNDPROCS_H */
