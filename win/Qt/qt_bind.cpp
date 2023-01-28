@@ -1175,7 +1175,7 @@ struct window_procs Qt_procs = {
 #if defined(SND_LIB_QTSOUND) && !defined(QT_NO_SOUND)
 struct sound_procs qtsound_procs = {
     SOUNDID(qtsound),
-    SNDCAP_USERSOUNDS,
+    SOUND_TRIGGER_USERSOUNDS,
     nethack_qt_::NetHackQtBind::qtsound_init_nhsound,
     nethack_qt_::NetHackQtBind::qtsound_exit_nhsound,
     nethack_qt_::NetHackQtBind::qtsound_achievement,

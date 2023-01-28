@@ -25,7 +25,8 @@ static void windsound_play_usersound(char *, int32_t, int32_t);
 
 struct sound_procs windsound_procs = {
     SOUNDID(windsound),
-    SNDCAP_USERSOUNDS | SNDCAP_SOUNDEFFECTS | SNDCAP_HEROMUSIC,
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_HEROMUSIC,
     windsound_init_nhsound,
     windsound_exit_nhsound,
     windsound_achievement,

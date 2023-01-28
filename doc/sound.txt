@@ -24,63 +24,71 @@ Contents:
 	IV.   Other related routines
 	V.    Game Startup and Soundlib Activation Sequencing
 	VI.   Conventions
-	VII.  Implementation and Multi-window support
+	VII.  Implementation and Multiple Soundlib Support
 
 I.  Sound Trigger Types and Terminology
 
-There are 4 distinct types of sound triggers used by NetHack.
+There are 4 distinct types of sound sound_triggers used by NetHack.
 
-        SNDCAP_USERSOUNDS    User-specified sounds that play based on config
-                             file entries that identify a regular expression
-                             to match against message window text, and identify
-                             an external sound file to load in response.
-                             The sound interface function pointer used to invoke
-                             it:
+    SOUND_TRIGGER_USERSOUNDS      User-specified sounds that play based
+                                  on config file entries that identify a
+                                  regular expression to match against
+                                  message window text, and identify an
+                                  external sound file to load in response.
+                                  The sound interface function pointer
+                                  used to invoke it:
 
-                             void (*sound_play_usersound)(char *filename,
+                                  void (*sound_play_usersound)(char *filename,
                                                int32_t volume, int32_t idx);
 
-        SNDCAP_HEROMUSIC     Invoked by the core when the in-game hero is
-                             playing a tune on an instrument. The sound
-                             interface function pointer used to invoke it:
+    SOUND_TRIGGER_HEROMUSIC      Invoked by the core when the in-game hero,
+                                 or perhaps another creature, is playing
+                                 a tune on an instrument. The sound interface
+                                 function pointer used to invoke it:
 
-                             void (*sound_hero_playnotes)(int32_t instrument,
-                                               const char *str, int32_t volume);
+                                 void (*sound_hero_playnotes)
+                                       (int32_t instrument, const char *str,
+                                        int32_t volume);
 
-        SNDCAP_ACHIEVEMENTS  Invoked by the core when an in-game achievement
-                             is reached. The soundlib routines could play
-                             appropriate theme or mood music in response.
-                             There would need to be a way to map the
-                             achievements to external user-specified sounds.
-                             The sound interface function pointer used to
-                             invoke it:
+    SOUND_TRIGGER_ACHIEVEMENTS   Invoked by the core when an in-game
+                                 achievement is reached. The soundlib routines
+                                 could play appropriate theme or mood music in
+                                 response.
+                                 There needs to be a way to map each
+                                 achievement to a specific external
+                                 sound file or resource. The sound
+                                 interface function pointer used to
+                                 invoke it:
 
-                             void (*sound_achievement)(schar, schar,
+                                 void (*sound_achievement)(schar, schar,
                                                             int32_t);
 
-        SNDCAP_SOUNDEFFECTS  Invoked by the core when something
-                             sound-producing happens in the game. The soundlib
-                             routines could play an appropriate sound effect
-                             in response. They can be public-domain or
-                             suitably licensed stock sounds included with the
-                             game source and made available during the build
-                             process, or (not-yet-implemented) a way to
-                             tie particular sound effects to a user-specified
-                             sound samples in a config file. The sound
-                             interface function pointer used to invoke it:
+    SOUND_TRIGGER_SOUNDEFFECTS   Invoked by the core when something
+                                 sound-producing happens in the game. The
+                                 soundlib routines could play an appropriate
+                                 sound effect in response. They can be
+                                 public-domain or suitably licensed stock
+                                 sounds included with the
+                                 gamesource. The soundeffect must be made
+                                 available during the build process, or
+                                 (not-yet-implemented) a way to tie a
+                                 particular sound effect to a player-specified
+                                 sound samples within the player's config
+                                 file. The sound interface function
+                                 pointer used to invoke it:
 
-                             void (*sound_soundeffect)(char *desc, int32_t,
-                                                                int32_t volume);
+                                 void (*sound_soundeffect)
+                                       (char *desc, int32_t, int32_t volume);
 
-The types of sound triggers supported by a particular sound library
-integration are specified in that library's soundlib file, which is
-usually found in sound/<library_name>/<library_name>.c
-(.m in the case of macound), in the sndcap field of the sound_procs struct:
+The types of sound sound_triggers supported by a particular soundlib
+implementation are specified in that library's soundlib file, which is usually
+found in sound/<library_name>/<library_name>.c (.m in the case of macound), in
+the sound_triggers field of the sound_procs struct:
 
     struct sound_procs {
         const char *soundname;
         enum soundlib_ids soundlib_id;
-        unsigned long sndcap;
+        unsigned long sound_triggers;
         void (*sound_init_nhsound)(void);
         void (*sound_exit_nhsound)(const char *reason);
         void (*sound_achievement)(schar arg1, schar arg2, int32_t avals);
@@ -92,12 +100,13 @@ usually found in sound/<library_name>/<library_name>.c
     };
 
 A sound library integration support file can implement one, two, three or
-four of the sound trigger types. The more types of sound-triggers the sound
+four of the sound trigger types. The more types of sound_triggers the
 soundlib implements, the more full-featured the sound experience will be
 during the game.
 
-The values can be or'd together in the sndcap field initialization.
-SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS
+The values can be or'd together in the sound_triggers field initialization.
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS
 
 
 II.  Interface Specification
@@ -180,7 +189,7 @@ sound_hero_playnotes(int32_t instrument, const char *notestr, int32_t volume);
        be capping the number of notes at 5, but it is not
        recommended that the soundlib integration support functions
        rely on that note count cap as a hard rule.
-    -- A soundlib integration support file that has SNDCAP_HEROMUSIC
+    -- A soundlib integration support file that has SOUND_TRIGGER_HEROMUSIC
        support is expected to play the sound at the volume specified
        by the volume argument (1 - 100, representing percentage of
        possible volume levels), if the underlying sound library supports
@@ -192,10 +201,10 @@ sound_play_usersound(char *filename, int32_t volume, int32_t usidx);
     -- NetHack will call this function when it wants a particular
        external sound file played, based on a regular expression match
        that the player has defined in their config file.
-    -- A soundlib integration support file that has SNDCAP_USERSOUNDS
+    -- A soundlib integration support file that has SOUND_TRIGGER_USERSOUNDS
        support is expected to play the sound file specified by the filename
        argument.
-    -- A soundlib integration support file that has SNDCAP_USERSOUNDS
+    -- A soundlib integration support file that has SOUND_TRIGGER_USERSOUNDS
        support is expected to play the sound at the volume specified
        by the volume argument (1 - 100, representing percentage of
        possible volume levels), if the underlying sound library supports
@@ -276,7 +285,7 @@ contain _only_ soundlib code, and may be replaced completely by other
 soundlib support.
 
 
-VII.  Implementation and Multiple soundlib support
+VII.  Implementation and Multiple Soundlib Support
 
 
 Multiple soundlib routines are supported in the same binary.
@@ -312,8 +321,8 @@ use the following guidelines:
 
        struct sound_procs myprefix_procs = {
            SOUNDID(myprefix),
-           SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC
-              | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS,
+           SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+              | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
            myprefix_init_nhsound,
            myprefix_exit_nhsound,
            myprefix_achievement,
@@ -324,9 +333,9 @@ use the following guidelines:
 
    The first entry in this structure should be the SOUNDID(myprefix)
    where myprefix should be the name of your soundlib port.
-   After that, the next entry is the sndcap mask that identifies
-   what sound triggers your soundlib will actually react to and
-   support. Don't include the sndcap values for functions that are
+   After that, the next entry is the sound_triggers mask that identifies
+   what sound_triggers your soundlib will actually react to and
+   support. Don't include the sound_triggers values for functions that are
    empty, so that the NetHack core code won't bother trying to call
    them. The other entries are the function addresses.
 
@@ -479,8 +488,8 @@ static void sample_play_usersound(char *, int32_t, int32_t);
 
 struct sound_procs sample_procs = {
     SOUNDID(sample),
-    SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC
-        | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS,
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+        | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
     sample_init_nhsound,
     sample_exit_nhsound,
     sample_achievement,
@@ -502,7 +511,7 @@ sample_exit_nhsound(const char *reason)
 
 }
 
-/* fulfill SNDCAP_ACHIEVEMENTS */
+/* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
 static void
 sample_achievement(schar ach1, schar ach2, int32_t avals)
 {
@@ -510,20 +519,20 @@ sample_achievement(schar ach1, schar ach2, int32_t avals)
 
 }
 
-/* fulfill SNDCAP_SOUNDEFFECTS */
+/* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
 static void
 sample_soundeffect(char *desc, int32_t seid, int volume)
 {
 
 }
 
-/* fulfill SNDCAP_HEROMUSIC */
+/* fulfill SOUND_TRIGGER_HEROMUSIC */
 static void sample_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 {
 
 }
 
-/* fulfill  SNDCAP_USERSOUNDS */
+/* fulfill  SOUND_TRIGGER_USERSOUNDS */
 static void
 sample_play_usersound(char *filename, int volume, int usidx)
 {
