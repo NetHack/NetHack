@@ -2217,6 +2217,9 @@ create_object(object* o, struct mkroom* croom)
             otmp->oeroded = (o->eroded % 4);
             otmp->oeroded2 = ((o->eroded >> 2) % 4);
         }
+    } else {
+        otmp->oeroded = otmp->oeroded2 = 0;
+        otmp->oerodeproof = 0;
     }
     if (o->recharged)
         otmp->recharged = (o->recharged % 8);
@@ -2230,6 +2233,9 @@ create_object(object* o, struct mkroom* croom)
         otmp->otrapped = o->trapped;
     if (o->greased)
         otmp->greased = 1;
+    else {
+        otmp->greased = 0;
+    }
 
     if (o->quan > 0 && objects[otmp->otyp].oc_merge) {
         otmp->quan = o->quan;
