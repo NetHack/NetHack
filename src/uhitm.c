@@ -1851,11 +1851,6 @@ joust(struct monst *mon, /* target */
 
 /*
  * Send in a demon pet for the hero.  Exercise wisdom.
- *
- * This function used to be inline to damageum(), but the Metrowerks compiler
- * (DR4 and DR4.5) screws up with an internal error 5 "Expression Too
- * Complex."
- * Pulling it out makes it work.
  */
 static void
 demonpet(void)
