@@ -3819,13 +3819,17 @@ wakeup(struct monst* mtmp, boolean via_attack)
     }
     finish_meating(mtmp);
     if (via_attack) {
+        boolean was_peaceful = mtmp->mpeaceful;
+
         if (was_sleeping)
             growl(mtmp);
         setmangry(mtmp, TRUE);
-        if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE))
-            ghod_hitsu(mtmp);
-        if (mtmp->isshk && !*u.ushops)
-            hot_pursuit(mtmp);
+        if (was_peaceful) {
+            if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE))
+                ghod_hitsu(mtmp);
+            if (mtmp->isshk && !*u.ushops)
+                hot_pursuit(mtmp);
+        }
     }
 }
 
