@@ -296,9 +296,6 @@ struct instance_flags {
     unsigned use_stone;  /* use the stone ppats */
 #endif
 #if defined(MSDOS) || defined(WIN32)
-    boolean hassound;     /* has a sound card */
-    boolean usesound;     /* use the sound card */
-    boolean usepcspeaker; /* use the pc speaker */
     boolean tile_view;
     boolean over_view;
     boolean traditional_view;
