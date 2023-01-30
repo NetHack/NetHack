@@ -39,12 +39,15 @@ GAMEDIR = ../binary
 
 #
 #---------------------------------------------------------------
-# Do you want to include any sound libraries? If so leave the
-# appropriate compile macro below uncommented, or add others
-# that are available.
+# Do you want to include integration with any sound libraries that work with
+# this Makefile?  Add the list below. If you change the list do 'nmake clean'.
 #
+# There is glue in here for the following: windsound fmod
+# Obtaining the 3rd party library, including its .h files, is up to you.
+#
+# windsound uses built-in Microsoft API's, no 3rd party download is required.
 
-SOUNDLIBDEFS = -DSND_LIB_WINDSOUND -DUSER_SOUNDS
+SOUND_LIBRARIES = windsound
 
 #
 #---------------------------------------------------------------
@@ -288,6 +291,12 @@ ifeq "$(MSYSTEM)" "MINGW32"
 rc = windres --target=pe-i386
 else # MINGW64
 rc = windres --target=pe-x86-64
+endif
+
+ifeq "$(MSYSTEM)" "MINGW32"
+arch = x86
+else # MINGW64
+arch = x64
 endif
 
 #
@@ -744,32 +753,106 @@ endif  # GIT_AVAILABLE
 endif  # INTERNET_AVAILABLE
 
 #==========================================
-# nethackw
+# Soundlib Choices
 #==========================================
-COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl cmd cppregex \
-	   dbridge decl detect dig display dlb do do_name do_wear \
-	   dog dogmove dokick dothrow drawing dungeon \
-	   eat end engrave exper explode extralev files fountain \
-	   hack hacklib insight invent isaac64 light lock \
-	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
-	   mon mondata monmove monst mplayer mthrowu muse music \
-	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
-	   pager pickup pline polyself potion pray priest quest questpgr \
-	   random read rect region restore rip rnd role rumors \
-	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed symbols sys \
-	   teleport timeout topten track trap u_init uhitm utf8map vault version vision \
-	   weapon were wield windmain windows windsys wizard worm worn write zap)
 
-CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
-CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+SNDLIBCHOICES = $(strip $(SOUND_LIBRARIES))
 
-ONHW = $(O)nethackw
-NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
-	  mhmsgwnd mhrip mhsplash mhstatus mhtext mswproc tile NetHackW win10)
-NHWOBJS = $(addprefix $(ONHW)/, $(COREOBJS) $(NHWONLY))
-DATEW_O  = $(addsuffix .o, $(addprefix $(ONHW)/, date))
-TILEFILES = $(addprefix $(WSHR)/, monsters.txt objects.txt other.txt)
-BMPS = $(addprefix $(MSWIN)/, $(addsuffix .bmp, mnsel mnselcnt mnunsel petmark pilemark rip splash tiles))
+#
+# windsound
+#
+WINDSOUND = $(findstring windsound, $(SNDLIBCHOICES))
+ifeq "$(WINDSOUND)" "windsound"
+$(info Including windsound integration)
+SOUND_WINDSOUND=Y
+HAVE_SOUNDLIB=Y
+NEED_USERSOUNDS=Y
+NEED_SEAUTOMAP=Y
+NEED_WAV=Y
+#SOUNDLIBINCL +=
+SOUNDLIBDEFS += -DSND_LIB_WINDSOUND
+SOUNDLIBOBJS += windsound
+#WINDSOUNDLIBDIR =
+#SOUNDLIBLIBS +=
+#WINDSOUNDLIBDLL =
+#GAMEDIRDLLS +=
+endif
+
+#
+# fmod
+#
+FMOD = $(findstring fmod, $(SNDLIBCHOICES))
+ifeq "$(FMOD)" "fmod"
+$(info Including fmod integration)
+SOUND_FMOD=Y
+HAVE_SOUNDLIB=Y
+NEED_USERSOUNDS=Y
+NEED_SEAUTOMAP=Y
+NEED_WAV=Y
+FMODROOT = ../lib/fmod/api/core
+SOUNDLIBINCL += -I$(FMODROOT)/inc
+SOUNDLIBDEFS += -DSND_LIB_FMOD
+SOUNDLIBOBJS += fmod
+FMODLIBDIR = $(FMODROOT)/lib/$(arch)
+ifeq "$(arch)" "x86"
+SOUNDLIBLIBS += -L $(FMODLIBDIR)
+FMODLIBDLL = fmod_vc.dll
+SOUNDLIBLIBS += -lfmod
+else
+SOUNDLIBLIBS += -L $(FMODLIBDIR)
+FMODLIBDLL = fmod_vc.dll
+SOUNDLIBLIBS += $(FMODLIBDIR)/$(FMODLIBDLL)
+endif
+FMODDIR = ../sound/fmod
+GAMEDIRDLLS += $(GAMEDIR)/$(FMODLIBDLL)
+ifeq "$(arch)" "x86"
+FMODLINKLIB = $(FMODLIBDIR)/fmod_vc.lib
+else
+#x64 mingw32-x64 builds supposedly can link right with the DLL, no import lib
+FMODLINKLIB = $(FMODLIBDIR)/$(FMODLIBDLL)
+endif
+$(info ---------------------------------------------------------------------)
+$(info ** NOTES for fmod sound library integration **)
+$(info For fmod integration, this Makefile expects:)
+$(info fmod include directory    : $(FMODROOT)/inc)
+$(info fmod library directory    : $(FMODLIBDIR))
+$(info fmod library to link with : $(FMODLINKLIB))
+$(info fmod library dll          : $(FMODLIBDIR)/$(FMODLIBDLL))
+$(info ---------------------------------------------------------------------)
+FMOD_MISSING=
+ifeq (,$(wildcard $(FMODROOT)/inc))
+FMOD_MISSING += $(FMODROOT)\inc
+$(info Error: missing $(FMODROOT)/inc)
+endif
+ifeq (,$(wildcard $(FMODLIBDIR)))
+FMOD_MISSING += $(FMODLIBDIR)
+$(info Error: missing $(FMODLIBDIR))
+endif
+ifeq (,$(wildcard $(FMODLINKLIB)))
+FMOD_MISSING += $(FMODLINKLIB)
+$(info Error: missing $(FMODLINKLIB))
+endif
+ifeq (,$(wildcard $(FMODLIBDIR)/$(FMODLIBDLL)))
+FMOD_MISSING += $(FMODLIBDIR)/$(FMODLIBDLL)
+$(info Error: missing $(FMODLIBDIR)/$(FMODLIBDLL))
+endif
+ifneq "$(FMOD_MISSING)" ""
+$(error Error: Cannot proceed with fmod integration included)
+endif
+endif
+
+#==========================================
+# Soundlib Support
+#==========================================
+
+ifeq "$(HAVE_SOUNDLIB)" "Y"
+ifeq "$(NEED_USERSOUNDS)" "Y"
+SOUNDLIBDEFS += -DUSER_SOUNDS
+endif
+ifeq "$(NEED_SEAUTOMAP)" "Y"
+SOUNDLIBDEFS += -DSND_SOUNDEFFECTS_AUTOMAP
+endif
+ifeq "$(NEED_WAV)" "Y"
 WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	se_squeak_D se_squeak_D_flat se_squeak_E \
 	se_squeak_E_flat se_squeak_F se_squeak_F_sharp \
@@ -792,13 +875,44 @@ WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	sound_Wooden_Harp_E sound_Wooden_Harp_F \
 	sound_Wooden_Harp_G
 WAVS = $(addprefix $(SNDWAVDIR)/, $(addsuffix .wav, $(WAVLIST)))
+endif   # NEED_WAV
+endif   # HAVE_SOUNDLIB
+
+#==========================================
+# nethackw
+#==========================================
+COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl cmd cppregex \
+	   dbridge decl detect dig display dlb do do_name do_wear \
+	   dog dogmove dokick dothrow drawing dungeon \
+	   eat end engrave exper explode extralev files fountain \
+	   hack hacklib insight invent isaac64 light lock \
+	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
+	   mon mondata monmove monst mplayer mthrowu muse music \
+	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
+	   pager pickup pline polyself potion pray priest quest questpgr \
+	   random read rect region restore rip rnd role rumors \
+	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed \
+	   symbols sys teleport timeout topten track trap u_init uhitm utf8map \
+	   vault version vision weapon were wield windmain windows windsys wizard \
+	   worm worn write zap $(SOUNDLIBOBJS))
+
+CFLAGSW = $(CFLAGS) $(CFLAGSXTRA) $(SOUNDLIBINCL) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+CPPFLAGSW = $(CFLAGS) $(CPPFLAGSXTRA) $(COMMONDEF) $(DLBFLG) -DTILES -D_WINDOWS -DMSWIN_GRAPHICS -DSAFEPROCS -DNOTTYGRAPHICS $(SOUNDLIBDEFS)
+
+ONHW = $(O)nethackw
+NHWONLY = $(addsuffix .o, mhaskyn mhdlg mhfont mhinput mhmain mhmap mhmenu \
+	  mhmsgwnd mhrip mhsplash mhstatus mhtext mswproc tile NetHackW win10)
+NHWOBJS = $(addprefix $(ONHW)/, $(COREOBJS) $(NHWONLY))
+DATEW_O  = $(addsuffix .o, $(addprefix $(ONHW)/, date))
+TILEFILES = $(addprefix $(WSHR)/, monsters.txt objects.txt other.txt)
+BMPS = $(addprefix $(MSWIN)/, $(addsuffix .bmp, mnsel mnselcnt mnunsel petmark pilemark rip splash tiles))
 NHWRES = $(ONHW)/winres.o
 NHWTARGETS = $(GAMEDIR)/NetHackW.exe
 
 nethackw: $(NHWTARGETS)
 
 $(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) | $(GAMEDIR)
-	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ -o$@
+	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ $(SOUNDLIBLIBS) -o$@
 
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -820,8 +934,15 @@ $(ONHW)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
-$(ONHW)/%.o: $(SNDSYS)/%.c $(NHLUAH) | $(ONHW)
+ifeq "$(SOUND_WINDSOUND)" "Y"
+$(ONHW)/%.o: ../sound/windsound/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
+endif
+
+ifeq "$(SOUND_FMOD)" "Y"
+$(ONHW)/%.o: ../sound/fmod/%.c $(NHLUAH) | $(ONHW)
+	$(cc) $(CFLAGSW) $< -o$@
+endif
 
 $(ONHW)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
@@ -855,7 +976,7 @@ CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS) $(WAVS)
 #==========================================
 # nethack
 #==========================================
-CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
+CFLAGSNH = $(CFLAGSU) $(CFLAGSXTRA) $(SOUNDLIBINCL) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
 CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CON $(SOUNDLIBDEFS)
 
 ONH = $(O)nethack
@@ -873,7 +994,7 @@ NHTARGET = $(GAMEDIR)/NetHack.exe
 
 nethack: $(NHTARGET)
 
-$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHack.exe: $(NHOBJS) $(NHRES) $(DATE_O) $(LUALIB) $(PDCLIB) $(SOUNDLIBLIBS) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mconsole $^ $(LIBS) -static -lstdc++ -o$@
 
 $(ONH)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONH)
@@ -896,8 +1017,15 @@ $(ONH)/cppregex.o: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
 $(ONH)/%.o: $(SSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
 
-$(ONH)/%.o: $(SNDSYS)/%.c $(NHLUAH) | $(ONH)
+ifeq "$(SOUND_WINDSOUND)" "Y"
+$(ONH)/%.o: ../sound/windsound/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
+endif
+
+ifeq "$(SOUND_FMOD)" "Y"
+$(ONH)/%.o: ../sound/fmod/%.c $(NHLUAH) | $(ONH)
+	$(cc) $(CFLAGSNH) $< -o$@
+endif
 
 $(ONH)/%.o: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $< -o$@
@@ -937,7 +1065,7 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 
 all: install
 
-TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) \
+TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
 	     $(addprefix $(GAMEDIR)/, $(addsuffix .template, sysconf .nethackrc) \
 	     Guidebook.txt NetHack.txt license opthelp record symbols)
 
@@ -963,6 +1091,11 @@ ifneq "$(USE_DLB)" "Y"
 	cp $(DAT)/*.dat $(GAMEDIR)/
 endif
 	@echo NetHack is up to date.
+
+ifdef SOUND_FMOD
+$(GAMEDIR)/$(FMODLIBDLL): $(FMODLIBDIR)/$(FMODLIBDLL)
+        cp $< $@
+endif
 
 $(GAMEDIR)/symbols: $(DAT)/symbols
 	cp $< $@

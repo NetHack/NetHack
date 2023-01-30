@@ -93,10 +93,6 @@
 extern void interject_assistance(int, int, genericptr_t, genericptr_t);
 extern void interject(int);
 
-#if defined(SND_LIB_WINDSOUND)
-#define SND_SOUNDEFFECTS_AUTOMAP
-#endif
-
 /*
  *===============================================
  * Compiler-specific adjustments
