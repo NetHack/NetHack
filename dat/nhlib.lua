@@ -57,6 +57,7 @@ end
 function hell_tweaks(protected_area)
    local liquid = "L";
    local ground = ".";
+   local n_prot = protected_area:numpoints();
    local prot = protected_area:negate();
 
    -- random pools
@@ -82,24 +83,38 @@ function hell_tweaks(protected_area)
 
    -- river
    if (percent(50)) then
-      local floor = selection.match(ground);
-      local a = selection.rndcoord(floor);
-      local b = selection.rndcoord(floor);
-      local lavariver = selection.randline(selection.new(), a.x, a.y, b.x, b.y, 10);
+      local allrivers = selection.new();
+      local reqpts = ((nhc.COLNO * nhc.ROWNO) - n_prot) / 12; -- # of lava pools required
+      local rpts = 0;
+      local rivertries = 0;
 
-      if (percent(50)) then
-         lavariver = selection.grow(lavariver, "north");
-      end
-      if (percent(50)) then
-         lavariver = selection.grow(lavariver, "west");
-      end
-      if (percent(25)) then
-         local riverbanks = selection.grow(lavariver);
+      repeat
+            local floor = selection.match(ground);
+            local a = selection.rndcoord(floor);
+            local b = selection.rndcoord(floor);
+            local lavariver = selection.randline(selection.new(), a.x, a.y, b.x, b.y, 10);
+
+            if (percent(50)) then
+               lavariver = selection.grow(lavariver, "north");
+            end
+            if (percent(50)) then
+               lavariver = selection.grow(lavariver, "west");
+            end
+            allrivers = allrivers | lavariver;
+            allrivers = allrivers & prot;
+
+            rpts = allrivers:numpoints();
+            rivertries = rivertries + 1;
+      until ((rpts > reqpts) or (rivertries > 7));
+
+      if (percent(60)) then
+         local prc = 10 * math.random(1, 6);
+         local riverbanks = selection.grow(allrivers);
          riverbanks = riverbanks & prot;
-         des.terrain(selection.percentage(riverbanks, 50), ground);
+         des.terrain(selection.percentage(riverbanks, prc), ground);
       end
-      lavariver = lavariver & prot;
-      des.terrain(lavariver, liquid);
+
+      des.terrain(allrivers, liquid);
    end
 
    -- replacing some walls with boulders
