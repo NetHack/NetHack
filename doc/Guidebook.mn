@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "December 28, 2022
+.ds f2 "January 30, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4483,6 +4483,8 @@ order by count, low to high; ties broken by internal index.
 .PE
 Can be interactively set via the \(oq\f(CRm O\fP\(cq command or via using
 the \(oq\f(CRm\fP\(cq prefix before the #vanquished command.
+.lp "sounds "
+Allow sounds to be emitted from an integrated sound library (default on).
 .lp "sparkle "
 Display a sparkly effect when a monster (including yourself) is hit by an
 attack to which it is resistant (default on).

@@ -65,9 +65,9 @@ enum opt {
 static struct allopt_t allopt_init[] = {
 #include "optlist.h"
     {(const char *) 0, OptS_Advanced, 0, 0, 0, set_in_sysconf, BoolOpt,
-     No, No, No, No, 0, (boolean *) 0,
+     No, No, No, No, Term_False, 0, (boolean *) 0,
      (int (*)(int, int, boolean, char *, char *)) 0,
-     (char *) 0, (const char *) 0, (const char *) 0, 0, 0, 0}
+     (char *) 0, (const char *) 0, (const char *) 0, 0, 0, 0 }
 };
 #undef NHOPT_PARSE
 
@@ -362,6 +362,7 @@ static boolean wc2_supported(const char *);
 static void wc_set_font_name(int, char *);
 static int wc_set_window_colors(char *);
 static boolean illegal_menu_cmd_key(uchar);
+static const char *term_for_boolean(int, boolean *);
 #ifdef CURSES_GRAPHICS
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
@@ -8565,6 +8566,23 @@ doset_simple(void)
     return ECMD_OK;
 }
 
+static const char *
+term_for_boolean(int idx, boolean *b)
+{
+    int i, f_t = (*b) ? 1: 0;
+    const char *boolean_term;
+    static const char *const booleanterms[2][num_terms] = {
+        { "false", "off", "disabled", },
+        { "true", "on", "enabled", },
+    };
+
+    boolean_term = booleanterms[f_t][0];
+    i = (int) allopt[idx].termpref;
+    if (i > Term_False && i < num_terms)
+        boolean_term = booleanterms[f_t][i];
+    return boolean_term;
+}
+
 /* the #optionsfull command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
@@ -8666,7 +8684,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 any.a_int = (pass == 0) ? 0 : i + 1 + indexoffset;
                 indent = (pass == 0 && !iflags.menu_tab_sep) ? "    " : "";
                 Sprintf(buf, fmtstr_doset, indent,
-                        name, *bool_p ? "true" : "false");
+                        name, term_for_boolean(i, bool_p));
                 if (pass == 0)
                     enhance_menu_text(buf, sizeof buf, pass, bool_p,
                                       &allopt[i]);

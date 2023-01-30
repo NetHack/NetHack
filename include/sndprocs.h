@@ -357,14 +357,14 @@ SoundAchievement(0, sa2_xpleveldown, level);
 
 #define Play_usersound(filename, vol, idx) \
     do {                                                                      \
-        if (!Deaf && soundprocs.sound_play_usersound                          \
+        if (iflags.sounds && !Deaf && soundprocs.sound_play_usersound         \
             && ((soundprocs.sound_triggers & SOUND_TRIGGER_USERSOUNDS) != 0)) \
             (*soundprocs.sound_play_usersound)((filename), (vol), (idx));     \
     } while(0)
 
 #define Soundeffect(seid, vol) \
     do {                                                                      \
-        if (!Deaf && soundprocs.sound_soundeffect                             \
+        if (iflags.sounds && !Deaf && soundprocs.sound_soundeffect            \
           && ((soundprocs.sound_triggers & SOUND_TRIGGER_SOUNDEFFECTS) != 0)) \
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol));         \
     } while(0)
@@ -372,14 +372,14 @@ SoundAchievement(0, sa2_xpleveldown, level);
 /* Player's perspective, not the hero's; no Deaf suppression */
 #define SoundeffectEvenIfDeaf(seid, vol) \
     do {                                                                      \
-        if (!soundprocs.sound_soundeffect                                     \
+        if (iflags.sounds && !soundprocs.sound_soundeffect                    \
           && ((soundprocs.sound_triggers & SOUND_TRIGGER_SOUNDEFFECTS) != 0)) \
             (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol));         \
     } while(0)
 
 #define Hero_playnotes(instrument, str, vol) \
     do {                                                                     \
-        if (!Deaf && soundprocs.sound_hero_playnotes                         \
+        if (iflags.sounds && !Deaf && soundprocs.sound_hero_playnotes        \
             && ((soundprocs.sound_triggers & SOUND_TRIGGER_HEROMUSIC) != 0)) \
             (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol));  \
     } while(0)
@@ -389,7 +389,7 @@ SoundAchievement(0, sa2_xpleveldown, level);
 /* Player's perspective, not the hero's; no Deaf suppression */
 #define SoundAchievement(arg1, arg2, avals) \
     do {                                                                      \
-        if (soundprocs.sound_achievement                                      \
+        if (iflags.sounds && soundprocs.sound_achievement                     \
           && ((soundprocs.sound_triggers & SOUND_TRIGGER_ACHIEVEMENTS) != 0)) \
             (*soundprocs.sound_achievement)((arg1), (arg2), (avals));         \
     } while(0)
