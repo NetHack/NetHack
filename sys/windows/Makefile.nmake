@@ -49,7 +49,7 @@ GAMEDIR = ..\binary               # Default game build directory
 #
 # windsound uses built-in Microsoft API's, no 3rd party download is required.
 
-SOUND_LIBRARIES = windsound fmod
+SOUND_LIBRARIES = windsound
 
 #
 #------------------------------------------------------------------------------
