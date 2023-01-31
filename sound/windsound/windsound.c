@@ -70,10 +70,10 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
         char *mingw_exedir;
 
 	if (!sounddir) {
-	    exedir = mingw_exepath();
-            if (exedir)
-                if (strlen(exedir) < sizeof buf - 30) {
-                    Strcpy(buf, exedir);
+	    mingw_exedir = mingw_exepath();
+            if (mingw_exedir)
+                if (strlen(mingw_exedir) < sizeof buf - 30) {
+                    Strcpy(buf, mingw_exedir);
                     sefnflag = 2; /* 2 = use the directory name already in buf */
                 }
         }
