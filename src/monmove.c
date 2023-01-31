@@ -1319,8 +1319,7 @@ m_move(register struct monst* mtmp, register int after)
                        water location accepts flyers, but they can't reach
                        underwater objects, so being able to move to a spot
                        is insufficient for deciding whether to do so */
-                    if ((is_pool(xx, yy) && !is_swimmer(ptr))
-                        || (is_lava(xx, yy) && !likes_lava(ptr)))
+                    if (!could_reach_item(mtmp, xx, yy))
                         continue;
 
                     /* ignore obj if there's a trap and monster knows it */

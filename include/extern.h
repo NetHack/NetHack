@@ -620,6 +620,7 @@ extern struct obj *droppables(struct monst *);
 extern int dog_nutrition(struct monst *, struct obj *);
 extern int dog_eat(struct monst *, struct obj *, coordxy, coordxy, boolean);
 extern int dog_move(struct monst *, int);
+extern boolean could_reach_item(struct monst *, coordxy, coordxy);
 extern void finish_meating(struct monst *);
 extern void quickmimic(struct monst *);
 
