@@ -2071,13 +2071,18 @@ get_sound_effect_filename(
     int32_t seidint,
     char *buf,
     size_t bufsz,
-    int32_t baseflag) /* non-zero means return without
-                       * directory or extension suffix */
+    int32_t baseflag) /* 0 = soundir + '/' + sound + '.wav'
+                       * 1 = sound only (no dir, no extension) '
+		       * 2 = dir is already in buf incl '/',
+		       *     add sound + ".wav"
+                       */
 {
     static const char prefix[] = "se_", suffix[] = ".wav";
-    size_t consumes = 0, baselen = 0;
+    size_t consumes = 0, baselen = 0, existinglen = 0;
 /*    enum sound_effect_entries seid = (enum sound_effect_entries) seidint; */
     char *ourdir = sounddir;       /* sounddir would get set in files.c */
+    char *cp = buf;
+    boolean needslash = TRUE;
 
     if (!buf || (!ourdir && baseflag == 0))
         return (char *) 0;
@@ -2091,28 +2096,63 @@ get_sound_effect_filename(
         baselen = strlen(semap_basenames[seidint]);
 
     consumes = (sizeof prefix - 1) + baselen;
-    if (baseflag == 0)
-        consumes += (sizeof suffix - 1) + strlen(ourdir);
-    consumes += 1 + 1; /* '\0' and '/' */
-    if (baselen <= 0 || consumes > bufsz)
+    if (baseflag == 0) {
+        consumes += (sizeof suffix - 1) + strlen(ourdir) + 1; /* 1 for '/' */
+    } else if (baseflag == 2) {
+
+	consumes += (sizeof suffix - 1);
+        existinglen = strlen(buf);
+        if (existinglen > 0) {
+            cp = buf + existinglen; /* points at trailing NUL */
+            cp--;                   /* points at last character */
+            if (*cp == '/' || *cp == '\\')
+                needslash = FALSE;
+            cp++;                   /* points back at trailing NUL */
+	}
+	if (needslash)
+            consumes++;  /* for '/' */
+        consumes += (sizeof suffix - 1);
+	consumes += existinglen;
+    }
+    consumes += 1; /* for trailing NUL */
+    /* existinglen could be >= bufsz if caller didn't initialize buf
+     * to properly include a trailing NUL */
+    if (baselen <= 0 || consumes > bufsz || existinglen >= bufsz)
         return (char *) 0;
 
 #if 0
-    if (!baseflag) {
+    if (baseflag == 0) {
         Strcpy(buf, ourdir);
         Strcat(buf, "/");
+    } else if (baseflag == 2) {
+        if (needslash)
+            Strcat(buf, "/");
+    } else if (baseflag == 1) {
+        buf[0] = '\0';
     }
     Strcat(buf, prefix);
     Strcat(buf, semap_basenames[seidint]);
-    if (!baseflag) {
+    if (baseflag == 0 || baseflag == 2) {
         Strcat(buf, suffix);
     }
 #else
-    if (!baseflag)
+    if (baseflag == 0) {
         Snprintf(buf, bufsz , "%s/%s%s%s", ourdir, prefix,
                  semap_basenames[seidint], suffix);
-    else
-        Snprintf(buf, bufsz , "%s%s", prefix, semap_basenames[seidint]);
+    } else if (baseflag == 2) {
+	if (needslash) {
+            *cp = '/';
+	    cp++;
+	    *cp = '\0';
+	    existinglen++;
+        }
+        Snprintf(cp, bufsz - (existinglen + 1) , "%s%s%s",
+                 prefix, semap_basenames[seidint], suffix);
+    } else if (baseflag == 1) {
+	Snprintf(buf, bufsz, "%s%s", prefix, semap_basenames[seidint]);
+    } else {
+        return (char *) 0;
+    }
 #endif
     return buf;
 }

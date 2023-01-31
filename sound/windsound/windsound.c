@@ -56,15 +56,42 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
     int reslt = 0;
+    int32_t sefnflag = 0;
     char buf[PATHLEN];
     const char *filename;
     DWORD fdwsound;
 
     if (seid >= se_squeak_C || seid <= se_squeak_B) {
-        filename = get_sound_effect_filename(seid, buf, sizeof buf, 1);
-        fdwsound = SND_ASYNC | SND_RESOURCE;
+#if defined(__MINGW32__)
+	/* The mingw32 resources don't seem to be able to be retrieved by the
+	 * API PlaySound function with the SND_RESOURCE flag. Use files from
+	 * the file system instead. */
+        extern char *sounddir;   /* in sounds.c, set in files.c */
+        char *exedir;
+
+	if (!sounddir) {
+	    exedir = exepath();
+            if (exedir)
+                if (strlen(exedir) < sizeof buf - 30) {
+                    Strcpy(buf, exedir);
+                    sefnflag = 2; /* 2 = use the directory name already in buf */
+                }
+        }
+        filename = get_sound_effect_filename(seid, buf, sizeof buf, sefnflag);
+        fdwsound = SND_ASYNC | SND_NODEFAULT;
+#else
+        sefnflag = 1;
+	/* sefnflag = 1 means just obtain the soundeffect base name with
+	 * no directory name and no file extension. That's because we're
+	 * going to use the base soundeffect name as the name of a resource
+	 * that's embedded into the .exe file, passing SND_RESOURCE flag to
+	 * Windows API PlaySound().
+         */
+	filename = get_sound_effect_filename(seid, buf, sizeof buf, sefnflag);
+	fdwsound = SND_ASYNC | SND_RESOURCE;
+#endif
     } else {
-        filename = get_sound_effect_filename(seid, buf, sizeof buf, 0);
+        filename = get_sound_effect_filename(seid, buf, sizeof buf, sefnflag);
         fdwsound = SND_ASYNC | SND_NODEFAULT;
     }
 

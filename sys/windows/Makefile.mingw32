@@ -251,7 +251,7 @@ MSWIN   =../win/win32
 WCURSES =../win/curses
 WSHR    =../win/share
 QT      =../win/Qt
-SNDWAVDIR =../sound/wav
+SNDWAVDIR = ../sound/wav
 
 #
 #  Object directory.
@@ -845,14 +845,6 @@ endif
 # Soundlib Support
 #==========================================
 
-ifeq "$(HAVE_SOUNDLIB)" "Y"
-ifeq "$(NEED_USERSOUNDS)" "Y"
-SOUNDLIBDEFS += -DUSER_SOUNDS
-endif
-ifeq "$(NEED_SEAUTOMAP)" "Y"
-SOUNDLIBDEFS += -DSND_SOUNDEFFECTS_AUTOMAP
-endif
-ifeq "$(NEED_WAV)" "Y"
 WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	se_squeak_D se_squeak_D_flat se_squeak_E \
 	se_squeak_E_flat se_squeak_F se_squeak_F_sharp \
@@ -875,7 +867,21 @@ WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	sound_Wooden_Harp_E sound_Wooden_Harp_F \
 	sound_Wooden_Harp_G
 WAVS = $(addprefix $(SNDWAVDIR)/, $(addsuffix .wav, $(WAVLIST)))
+
+ifeq "$(HAVE_SOUNDLIB)" "Y"
+ifeq "$(NEED_USERSOUNDS)" "Y"
+SOUNDLIBDEFS += -DUSER_SOUNDS
+endif
+ifeq "$(NEED_SEAUTOMAP)" "Y"
+SOUNDLIBDEFS += -DSND_SOUNDEFFECTS_AUTOMAP
+endif
+ifeq "$(NEED_WAV)" "Y"
+$(info Built-in sound file integration included)
+#RCFLAGS = --include-dir=$(SNDWAVDIR) --define RCWAV
+WAV = $(WAVS)
 endif   # NEED_WAV
+else
+$(info No soundlib integration)
 endif   # HAVE_SOUNDLIB
 
 #==========================================
@@ -953,8 +959,8 @@ $(ONHW)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
-$(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAVS) $(MSWIN)/NetHack.ico | $(ONHW)
-	$(rc) --include-dir=$(MSWIN) --include-dir=$(SNDWAVDIR) --input=$< -o$@
+$(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
+	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
 
 $(MSWIN)/tiles.bmp: $(U)tile2bmp.exe $(TILEFILES)
 	$< $@
@@ -971,7 +977,7 @@ $(ONHW):
 	@mkdir -p $@
 
 CLEAN_DIR += $(ONHW)
-CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS) $(WAVS)
+CLEAN_FILE += $(NHWTARGETS) $(NHWOBJS) $(NHWRES) $(BMPS) $(WAV)
 
 #==========================================
 # nethack
@@ -1042,8 +1048,8 @@ $(ONH)/%.o: $(TTY)/%.c $(NHLUAH) | $(ONH)
 $(ONH)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONH)
 	$(cc) $(CFLAGSNH) $(PDCINCL) $< -o$@
 
-$(NHRES): $(MSWIN)/NetHack.rc $(WAVS) $(MSWIN)/NetHack.ico | $(ONH)
-	$(rc) --include-dir=$(MSWIN) --include-dir=$(SNDWAVDIR) --input=$< -o$@
+$(NHRES): $(MSWIN)/NetHack.rc $(WAV) $(MSWIN)/NetHack.ico | $(ONH)
+	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
 
 $(ONH):
 	@mkdir -p $@
@@ -1068,6 +1074,10 @@ all: install
 TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
 	     $(addprefix $(GAMEDIR)/, $(addsuffix .template, sysconf .nethackrc) \
 	     Guidebook.txt NetHack.txt license opthelp record symbols)
+
+ifeq "$(HAVE_SOUNDLIB)" "Y"
+TO_INSTALL += $(addprefix $(GAMEDIR)/, $(addsuffix .wav, $(WAVLIST)))
+endif
 
 ifeq "$(USE_LUADLL)" "Y"
 TO_INSTALL += $(LUADLL)
@@ -1113,6 +1123,9 @@ $(GAMEDIR)/%: $(DOC)/%
 	cp $< $@
 
 $(GAMEDIR)/%: $(MSWSYS)/%
+	cp $< $@
+
+$(GAMEDIR)/%: $(SNDWAVDIR)/%
 	cp $< $@
 
 CLEAN_FILE += $(TO_INSTALL)

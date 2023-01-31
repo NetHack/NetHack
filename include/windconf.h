@@ -119,7 +119,8 @@ extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
 /* extern int getlock(void); */
-#endif
+extern char *exepath(void);
+#endif   /* __MINGW32__ */
 
 #ifdef _MSC_VER
 #define MD_USE_TMPFILE_S
