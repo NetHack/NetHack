@@ -11,6 +11,7 @@ static void sanity_check_single_mon(struct monst *, boolean, const char *);
 static struct obj *make_corpse(struct monst *, unsigned);
 static int minliquid_core(struct monst *);
 static void m_calcdistress(struct monst *);
+static boolean can_touch_safely(struct monst *, struct obj *);
 static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
@@ -1679,6 +1680,26 @@ max_mon_load(struct monst* mtmp)
     return (int) maxload;
 }
 
+/* can monster touch object safely? */
+static boolean
+can_touch_safely(struct monst *mtmp, struct obj *otmp)
+{
+    int otyp = otmp->otyp;
+    struct permonst *mdat = mtmp->data;
+
+    if (otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])
+        && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
+        return FALSE;
+    if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
+        return FALSE;
+    if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp)
+        && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
+        return FALSE;
+    if (!touch_artifact(otmp, mtmp))
+        return FALSE;
+    return TRUE;
+}
+
 /* for restricting monsters' object-pickup.
  *
  * to support the new pet behavior, this now returns the max # of objects
@@ -1702,13 +1723,7 @@ can_carry(struct monst* mtmp, struct obj* otmp)
     if (notake(mdat))
         return 0; /* can't carry anything */
 
-    if (otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])
-        && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
-        return 0;
-    if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
-        return 0;
-    if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp)
-        && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
+    if (!can_touch_safely(mtmp, otmp))
         return 0;
 
     /* hostile monsters who like gold will pick up the whole stack;
