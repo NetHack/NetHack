@@ -49,7 +49,7 @@ GAMEDIR = ..\binary               # Default game build directory
 #
 # windsound uses built-in Microsoft API's, no 3rd party download is required.
 
-#SOUND_LIBRARIES = windsound
+SOUND_LIBRARIES = windsound
 
 #
 #------------------------------------------------------------------------------
@@ -797,6 +797,8 @@ SOUNDLIBDEFS = $(SOUNDLIBDEFS) -DUSER_SOUNDS
 !IF "$(NEED_SEAUTOMAP)" == "Y"
 SOUNDLIBDEFS = $(SOUNDLIBDEFS) -DSND_SOUNDEFFECTS_AUTOMAP
 !ENDIF
+WAV = $(WAVS)
+RCFLAGS = $(RCFLAGS) -dRCWAV
 !ENDIF   #HAVE_SOUNDLIB
 
 #==========================================
@@ -1448,17 +1450,16 @@ $(INCL)\nhlua.h:
 tileutil: $(U)gif2txt.exe $(U)gif2tx32.exe $(U)txt2ppm.exe
 	@echo Optional tile development utilities are up to date.
 
-$(OGUI)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc \
-	$(MSWIN)\mnsel.bmp \
-	$(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
+$(OGUI)NetHackW.res: $(SRC)\tiles.bmp $(MSWIN)\NetHackW.rc $(MSWIN)\NetHack.ico \
+	$(MSWIN)\mnsel.bmp $(MSWIN)\mnselcnt.bmp $(MSWIN)\mnunsel.bmp \
 	$(MSWIN)\petmark.bmp $(MSWIN)\pilemark.bmp $(MSWIN)\NetHack.ico \
-	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(WAVS)
+	$(MSWIN)\rip.bmp $(MSWIN)\splash.bmp $(WAV)
 	@echo Building resource file $@ from $**
-	$(rc) -nologo -r -fo$@ -i$(MSWIN) -i$(SndWavDir) -dNDEBUG $(MSWIN)\NetHackW.rc
+	$(rc) -nologo -r -fo$@ -i$(MSWIN) -i$(SndWavDir) -dNDEBUG $(RCFLAGS) $(MSWIN)\NetHackW.rc
 
-$(OTTY)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico $(WAVS)
+$(OTTY)console.res: $(MSWSYS)\console.rc $(MSWSYS)\NetHack.ico $(WAV)
 	@echo Building resource file $@ from $**
-	$(rc) -nologo -r -fo$@ -i$(MSWSYS) -i$(SndWavDir) -dNDEBUG $(MSWSYS)\console.rc
+	$(rc) -nologo -r -fo$@ -i$(MSWSYS) -i$(SndWavDir) -dNDEBUG $(RCFLAGS) $(MSWSYS)\console.rc
 
 #
 #  Secondary Targets.
