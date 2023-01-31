@@ -1085,7 +1085,7 @@ get_executable_path(void)
 
 #ifdef __MINGW32__
 char *
-exepath(void)
+mingw_exepath(void)
 {
     char *p = (char *) 0;
 

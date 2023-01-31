@@ -67,10 +67,10 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 	 * API PlaySound function with the SND_RESOURCE flag. Use files from
 	 * the file system instead. */
         extern char *sounddir;   /* in sounds.c, set in files.c */
-        char *exedir;
+        char *mingw_exedir;
 
 	if (!sounddir) {
-	    exedir = exepath();
+	    exedir = mingw_exepath();
             if (exedir)
                 if (strlen(exedir) < sizeof buf - 30) {
                     Strcpy(buf, exedir);
