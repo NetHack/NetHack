@@ -34,6 +34,8 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
+
 #include "hack.h"
 #include "func_tab.h"
 #include "winX.h"
