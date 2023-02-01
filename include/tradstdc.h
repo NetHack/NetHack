@@ -466,7 +466,7 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  * so it is preferrable to catch it early, during compile.
  */
 #if !defined(X11_BUILD) && !defined(__cplusplus)
-#if defined(__GNUC__) && !defined(__CLANG__)
+#if defined(__GNUC__) && !defined(__clang__)
 #if __GNUC__ >= 12
 extern char *index(const char *s, int c) __attribute__ ((unavailable));
 extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
