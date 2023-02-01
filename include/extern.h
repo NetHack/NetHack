@@ -1553,9 +1553,10 @@ extern int meatcorpse(struct monst *);
 extern void mon_give_prop(struct monst *, int);
 extern void mon_givit(struct monst *, struct permonst *);
 extern void mpickgold(struct monst *);
-extern boolean mpickstuff(struct monst *, const char *);
+extern boolean mpickstuff(struct monst *);
 extern int curr_mon_load(struct monst *);
 extern int max_mon_load(struct monst *);
+extern boolean can_touch_safely(struct monst *, struct obj *);
 extern int can_carry(struct monst *, struct obj *);
 extern long mon_allowflags(struct monst *);
 extern int mfndpos(struct monst *, coord *, long *, long);
@@ -1682,6 +1683,7 @@ extern int mstrength(struct permonst *);
 
 /* ### monmove.c ### */
 
+extern boolean mon_would_take_item(struct monst *, struct obj *);
 extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
 extern void mon_track_add(struct monst *, coordxy, coordxy);

@@ -11,7 +11,6 @@ static void sanity_check_single_mon(struct monst *, boolean, const char *);
 static struct obj *make_corpse(struct monst *, unsigned);
 static int minliquid_core(struct monst *);
 static void m_calcdistress(struct monst *);
-static boolean can_touch_safely(struct monst *, struct obj *);
 static boolean monlineu(struct monst *, int, int);
 static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
@@ -1577,14 +1576,23 @@ mpickgold(register struct monst* mtmp)
     }
 }
 
+/* monster picks up one item stack from the map location they are at */
 boolean
-mpickstuff(struct monst *mtmp, const char *str)
+mpickstuff(struct monst *mtmp)
 {
     register struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
 
     /* prevent shopkeepers from leaving the door of their shop */
     if (mtmp->isshk && inhishop(mtmp))
+        return FALSE;
+
+    /* non-tame monsters normally don't go shopping */
+    if (!mtmp->mtame && *in_rooms(mtmp->mx, mtmp->my, SHOPBASE) && rn2(25))
+        return FALSE;
+
+    /* item in a pool, but monster can't swim */
+    if (!could_reach_item(mtmp, mtmp->mx, mtmp->my))
         return FALSE;
 
     for (otmp = gl.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
@@ -1596,20 +1604,18 @@ mpickstuff(struct monst *mtmp, const char *str)
             continue;
 
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
-        if (!str ? searches_for_item(mtmp, otmp)
-                 : !!(strchr(str, otmp->oclass))) {
+        if (mon_would_take_item(mtmp, otmp)) {
+
             if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
                 /* let a handful of corpse types thru to can_carry() */
                 && !touch_petrifies(&mons[otmp->corpsenm])
                 && otmp->corpsenm != PM_LIZARD
                 && !acidic(&mons[otmp->corpsenm]))
                 continue;
-            if (!touch_artifact(otmp, mtmp))
+            if (!can_touch_safely(mtmp, otmp))
                 continue;
             carryamt = can_carry(mtmp, otmp);
             if (carryamt == 0)
-                continue;
-            if (is_pool(mtmp->mx, mtmp->my))
                 continue;
             /* handle cases where the critter can only get some */
             otmp3 = otmp;
@@ -1681,7 +1687,7 @@ max_mon_load(struct monst* mtmp)
 }
 
 /* can monster touch object safely? */
-static boolean
+boolean
 can_touch_safely(struct monst *mtmp, struct obj *otmp)
 {
     int otyp = otmp->otyp;
