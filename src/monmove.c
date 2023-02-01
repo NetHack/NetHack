@@ -849,6 +849,8 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
 {
     int pctload = (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
 
+    if (otmp == uball || otmp == uchain)
+        return FALSE;
     if (is_unicorn(mtmp->data) && objects[otmp->otyp].oc_material != GEMSTONE)
         return FALSE;
     if (!mindless(mtmp->data) && !is_animal(mtmp->data) && pctload < 75
