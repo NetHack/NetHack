@@ -2615,6 +2615,8 @@ extern void get_soundlib_name(char *dest, int maxlen);
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
 extern char *get_sound_effect_filename(int32_t seidint,
                                        char *buf, size_t bufsz, int32_t);
+extern char *base_soundname_to_filename(char *basename, char *buf,
+                                       size_t bufsz, int32_t baseflag);
 #endif
 
 /* ### sp_lev.c ### */

@@ -1083,9 +1083,8 @@ get_executable_path(void)
     return path_buffer;
 }
 
-#ifdef __MINGW32__
 char *
-mingw_exepath(void)
+windows_exepath(void)
 {
     char *p = (char *) 0;
 
@@ -1093,7 +1092,6 @@ mingw_exepath(void)
         p = path_buffer;
     return p;
 }
-#endif
 
 char *
 translate_path_variables(const char* str, char* buf)

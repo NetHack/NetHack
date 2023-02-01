@@ -92,6 +92,7 @@
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
 extern void interject_assistance(int, int, genericptr_t, genericptr_t);
 extern void interject(int);
+extern char *windows_exepath(void);
 
 /*
  *===============================================
@@ -119,7 +120,6 @@ extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
 #define __USE_MINGW_ANSI_STDIO 1
 #endif
 /* extern int getlock(void); */
-extern char *mingw_exepath(void);
 #endif   /* __MINGW32__ */
 
 #ifdef _MSC_VER

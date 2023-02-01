@@ -93,7 +93,8 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
     if (seid <= se_zero_invalid || seid >= number_of_se_entries)
         return;
     if (!affiliation[seid]) {
-        soundname = get_sound_effect_filename(seid, buf, sizeof buf, 1);
+        soundname = get_sound_effect_filename(seid, buf, sizeof buf,
+                                              sff_base_only);
         if (soundname) {
             affiliate(seid, soundname);
         }
@@ -231,4 +232,3 @@ affiliate(int32_t seid, const char *soundname)
     return 1;
 }
 /* end of macsound.m */
-

@@ -414,4 +414,16 @@ SoundAchievement(0, sa2_xpleveldown, level);
 #define SOUNDLIBONLY UNUSED
 #endif
 
+enum findsound_approaches {
+    findsound_embedded,
+    findsound_soundfile
+};
+
+enum sound_file_flags {
+    sff_default,            /* add dir prefix + '/' + sound + suffix */
+    sff_base_only,          /* base sound name only, no dir, no suffix */
+    sff_havedir_append_rest, /* dir provided, append base sound name + suffix */
+    sff_baseknown_add_rest /* base is already known, add dir and suffix */
+};
+
 #endif /* SNDPROCS_H */
