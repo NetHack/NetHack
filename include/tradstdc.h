@@ -467,14 +467,14 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
  */
 #if defined(__GNUC__) && !defined(__CLANG__)
 #if __GNUC__ >= 12
-inline char *index(const char *s, int c) __attribute__ ((unavailable));
-inline char *rindex(const char *s, int c) __attribute__ ((unavailable));
+extern char *index(const char *s, int c) __attribute__ ((unavailable));
+extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
 #endif
 #endif
 #if defined(__clang__)
 #if __clang_major__ >= 7
-inline char *index(const char *s, int c) __attribute__ ((unavailable));
-inline char *rindex(const char *s, int c) __attribute__ ((unavailable));
+extern char *index(const char *s, int c) __attribute__ ((unavailable));
+extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
 #endif
 #endif
 
