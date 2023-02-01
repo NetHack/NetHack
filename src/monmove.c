@@ -16,6 +16,7 @@ static void mind_blast(struct monst *);
 static boolean holds_up_web(coordxy, coordxy);
 static int count_webbing_walls(coordxy, coordxy);
 static boolean soko_allow_web(struct monst *);
+static boolean m_search_items(struct monst *, coordxy *, coordxy *, schar *, int *);
 static boolean leppie_avoidance(struct monst *);
 static void leppie_stash(struct monst *);
 static boolean m_balks_at_approaching(struct monst *);
@@ -1095,6 +1096,110 @@ maybe_spin_web(struct monst *mtmp)
     }
 }
 
+#define SQSRCHRADIUS 5
+
+static boolean
+m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, int *appr)
+{
+    register int minr = SQSRCHRADIUS; /* not too far away */
+    register struct obj *otmp;
+    register coordxy xx, yy;
+    coordxy oomx, oomy, lmx, lmy;
+    struct trap *ttmp;
+    coordxy omx = mtmp->mx, omy = mtmp->my;
+    struct permonst *ptr = mtmp->data;
+    struct monst *mtoo;
+
+    /* cut down the search radius if it thinks character is closer. */
+    if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
+        && !mtmp->mpeaceful)
+        minr--;
+    /* guards shouldn't get too distracted */
+    if (!mtmp->mpeaceful && is_mercenary(ptr))
+        minr = 1;
+
+    if ((!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
+        oomx = min(COLNO - 1, omx + minr);
+        oomy = min(ROWNO - 1, omy + minr);
+        lmx = max(1, omx - minr);
+        lmy = max(0, omy - minr);
+        for (otmp = fobj; otmp; otmp = otmp->nobj) {
+            /* monsters may pick rocks up, but won't go out of their way
+               to grab them; this might hamper sling wielders, but it cuts
+               down on move overhead by filtering out most common item */
+            if (otmp->otyp == ROCK)
+                continue;
+            /* avoid special items; once hero picks them up, they'll
+               cease being special */
+            if (is_mines_prize(otmp) || is_soko_prize(otmp))
+                continue;
+
+            xx = otmp->ox;
+            yy = otmp->oy;
+            /* Nymphs take everything.  Most other creatures should not
+             * pick up corpses except as a special case like in
+             * searches_for_item().  We need to do this check in
+             * mpickstuff() as well.
+             */
+            if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
+                /* don't get stuck circling around object that's
+                   underneath an immobile or hidden monster;
+                   paralysis victims excluded */
+                if ((mtoo = m_at(xx, yy)) != 0
+                    && (helpless(mtoo) || mtoo->mundetected
+                        || (mtoo->mappearance && !mtoo->iswiz)
+                        || !mtoo->data->mmove))
+                    continue;
+                /* the mfndpos() test for whether to allow a move to a
+                   water location accepts flyers, but they can't reach
+                   underwater objects, so being able to move to a spot
+                   is insufficient for deciding whether to do so */
+                if (!could_reach_item(mtmp, xx, yy))
+                    continue;
+
+                /* ignore obj if there's a trap and monster knows it */
+                if ((ttmp = t_at(xx, yy)) != 0
+                    && mon_knows_traps(mtmp, ttmp->ttyp)) {
+                    if (*ggx == xx && *ggy == yy) {
+                        *ggx = mtmp->mux;
+                        *ggy = mtmp->muy;
+                    }
+                    continue;
+                }
+
+                if (((mon_would_take_item(mtmp, otmp) && (can_carry(mtmp, otmp) > 0))
+                     || (hides_under(ptr) && !cansee(otmp->ox, otmp->oy)))
+                    && can_touch_safely(mtmp, otmp)
+                    /* Don't get stuck circling an Elbereth */
+                    && !onscary(xx, yy, mtmp)) {
+                    minr = distmin(omx, omy, xx, yy);
+                    oomx = min(COLNO - 1, omx + minr);
+                    oomy = min(ROWNO - 1, omy + minr);
+                    lmx = max(1, omx - minr);
+                    lmy = max(0, omy - minr);
+                    *ggx = otmp->ox;
+                    *ggy = otmp->oy;
+                    if (*ggx == omx && *ggy == omy) {
+                        *mmoved = MMOVE_DONE; /* actually unnecessary */
+                        return TRUE;
+                    }
+                }
+            }
+        }
+    }
+
+    if (minr < SQSRCHRADIUS && *appr == -1) {
+        if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
+            *ggx = mtmp->mux;
+            *ggy = mtmp->muy;
+        } else
+            *appr = 1;
+    }
+    return FALSE;
+}
+
+#undef SQSRCHRADIUS
+
 /* Handles the movement of a standard monster. */
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
@@ -1116,7 +1221,6 @@ m_move(register struct monst* mtmp, register int after)
     boolean better_with_displacing = FALSE;
     boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
-    struct monst *mtoo;
     schar mmoved = MMOVE_NOTHING; /* not strictly nec.: chi >= 0 will do */
     long info[9];
     long flag;
@@ -1280,101 +1384,8 @@ m_move(register struct monst* mtmp, register int after)
         }
     }
 
-#define SQSRCHRADIUS 5
-
-    if (getitems) {
-        register int minr = SQSRCHRADIUS; /* not too far away */
-        register struct obj *otmp;
-        register coordxy xx, yy;
-        coordxy oomx, oomy, lmx, lmy;
-        struct trap *ttmp;
-
-        /* cut down the search radius if it thinks character is closer. */
-        if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
-            && !mtmp->mpeaceful)
-            minr--;
-        /* guards shouldn't get too distracted */
-        if (!mtmp->mpeaceful && is_mercenary(ptr))
-            minr = 1;
-
-        if ((!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
-            oomx = min(COLNO - 1, omx + minr);
-            oomy = min(ROWNO - 1, omy + minr);
-            lmx = max(1, omx - minr);
-            lmy = max(0, omy - minr);
-            for (otmp = fobj; otmp; otmp = otmp->nobj) {
-                /* monsters may pick rocks up, but won't go out of their way
-                   to grab them; this might hamper sling wielders, but it cuts
-                   down on move overhead by filtering out most common item */
-                if (otmp->otyp == ROCK)
-                    continue;
-                /* avoid special items; once hero picks them up, they'll
-                   cease being special */
-                if (is_mines_prize(otmp) || is_soko_prize(otmp))
-                    continue;
-
-                xx = otmp->ox;
-                yy = otmp->oy;
-                /* Nymphs take everything.  Most other creatures should not
-                 * pick up corpses except as a special case like in
-                 * searches_for_item().  We need to do this check in
-                 * mpickstuff() as well.
-                 */
-                if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
-                    /* don't get stuck circling around object that's
-                       underneath an immobile or hidden monster;
-                       paralysis victims excluded */
-                    if ((mtoo = m_at(xx, yy)) != 0
-                        && (helpless(mtoo) || mtoo->mundetected
-                            || (mtoo->mappearance && !mtoo->iswiz)
-                            || !mtoo->data->mmove))
-                        continue;
-                    /* the mfndpos() test for whether to allow a move to a
-                       water location accepts flyers, but they can't reach
-                       underwater objects, so being able to move to a spot
-                       is insufficient for deciding whether to do so */
-                    if (!could_reach_item(mtmp, xx, yy))
-                        continue;
-
-                    /* ignore obj if there's a trap and monster knows it */
-                    if ((ttmp = t_at(xx, yy)) != 0
-                        && mon_knows_traps(mtmp, ttmp->ttyp)) {
-                        if (ggx == xx && ggy == yy) {
-                            ggx = mtmp->mux;
-                            ggy = mtmp->muy;
-                        }
-                        continue;
-                    }
-
-                    if (((mon_would_take_item(mtmp, otmp) && (can_carry(mtmp, otmp) > 0))
-                         || (hides_under(ptr) && !cansee(otmp->ox, otmp->oy)))
-                        && can_touch_safely(mtmp, otmp)
-                        /* Don't get stuck circling an Elbereth */
-                        && !onscary(xx, yy, mtmp)) {
-                        minr = distmin(omx, omy, xx, yy);
-                        oomx = min(COLNO - 1, omx + minr);
-                        oomy = min(ROWNO - 1, omy + minr);
-                        lmx = max(1, omx - minr);
-                        lmy = max(0, omy - minr);
-                        ggx = otmp->ox;
-                        ggy = otmp->oy;
-                        if (ggx == omx && ggy == omy) {
-                            mmoved = MMOVE_DONE; /* actually unnecessary */
-                            goto postmov;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (minr < SQSRCHRADIUS && appr == -1) {
-            if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
-                ggx = mtmp->mux;
-                ggy = mtmp->muy;
-            } else
-                appr = 1;
-        }
-    }
+    if (getitems && m_search_items(mtmp, &ggx, &ggy, &mmoved, &appr))
+        goto postmov;
 
     /* don't tunnel if hostile and close enough to prefer a weapon */
     if (can_tunnel && needspick(ptr)
