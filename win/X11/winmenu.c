@@ -34,8 +34,9 @@
 #endif
 
 #define X11_BUILD
-
 #include "hack.h"
+#undef X11_BUILD
+
 #include "winX.h"
 
 static void menu_size_change_handler(Widget, XtPointer, XEvent *,

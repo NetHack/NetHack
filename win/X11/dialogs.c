@@ -80,6 +80,7 @@
 #define X11_BUILD
 #include "config.h" /* #define for const for non __STDC__ compilers */
 #undef X11_BUILD
+
 #include "lint.h"   /* for nethack's nhStr() macro */
 #include "winX.h"   /* to make sure protoypes match corresponding functions */
 

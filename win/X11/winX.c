@@ -16,8 +16,6 @@
 #define SHORT_FILENAMES
 #endif
 
-#define X11_BUILD
-
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
 #include <X11/Shell.h>
@@ -48,7 +46,10 @@
 #undef SHORT_FILENAMES /* hack.h will reset via global.h if necessary */
 #endif
 
+#define X11_BUILD
 #include "hack.h"
+#undef X11_BUILD
+
 #include "winX.h"
 #include "dlb.h"
 #include "xwindow.h"
