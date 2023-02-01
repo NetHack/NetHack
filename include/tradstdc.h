@@ -472,8 +472,10 @@ inline char *rindex(const char *s, int c) __attribute__ ((unavailable));
 #endif
 #endif
 #if defined(__clang__)
+#if __clang_major__ >= 7
 inline char *index(const char *s, int c) __attribute__ ((unavailable));
 inline char *rindex(const char *s, int c) __attribute__ ((unavailable));
+#endif
 #endif
 
 
