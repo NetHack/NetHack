@@ -4883,7 +4883,7 @@ mhitm_knockback(
             hurtle(u.dx, u.dy, rnd(2), FALSE);
 
         set_apparxy(magr); /* update magr's idea of where you are */
-        if (!rn2(4))
+        if (!Stunned && !rn2(4))
             make_stunned((HStun & TIMEOUT) + (long) rnd(2) + 1L, TRUE);
     } else {
         coordxy x = u_agr ? u.ux : magr->mx;
