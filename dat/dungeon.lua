@@ -91,6 +91,7 @@ dungeon = {
       base = 20,
       range = 5,
       flags = { "mazelike", "hellish" },
+      lvlfill = "hellfill",
       alignment = "noalign",
       branches = {
          {

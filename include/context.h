@@ -129,11 +129,11 @@ struct achievement_tracking {
 struct context_info {
     unsigned ident;         /* social security number for each monster */
     unsigned no_of_wizards; /* 0, 1 or 2 (wizard and his shadow) */
-    unsigned run;           /* 0: h (etc), 1: H (etc), 2: fh (etc) */
-                            /* 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF- */
-                            /* 8: travel */
+    unsigned run;           /* 0: h (etc), 1: H (etc), 2: fh (etc),
+                             * 3: FH, 4: ff+, 5: ff-, 6: FF+, 7: FF-,
+                             * 8: travel */
     unsigned startingpet_mid; /* monster id number for initial pet */
-    int current_fruit;      /* fruit->fid corresponding to g.pl_fruit[] */
+    int current_fruit;      /* fruit->fid corresponding to gp.pl_fruit[] */
     int mysteryforce;       /* adjusts how often "mysterious force" kicks in */
     int rndencode;          /* randomized escape sequence introducer */
     int warnlevel;          /* threshold (digit) to warn about unseen mons */

@@ -1,5 +1,5 @@
 /* NetHack 3.7	mhmain.c	$NHDT-Date: 1596498352 2020/08/03 23:45:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.76 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "winMS.h"
@@ -35,8 +35,11 @@ static void register_main_window_class(void);
 static int menuid2mapmode(int menuid);
 static int mapmode2menuid(int map_mode);
 static void nhlock_windows(BOOL lock);
-static char *nh_compose_ascii_screenshot();
-static void mswin_apply_window_style_all();
+static char *nh_compose_ascii_screenshot(void);
+#ifdef ENHANCED_SYMBOLS
+static WCHAR *nh_compose_unicode_screenshot(void);
+#endif
+static void mswin_apply_window_style_all(void);
 // returns strdup() created pointer - callee assumes the ownership
 
 HWND
@@ -402,7 +405,7 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (GetNHApp()->regNetHackMode && ((lParam & 1 << 29) != 0)) {
             unsigned char c = (unsigned char) (wParam & 0xFF);
             unsigned char scancode = (lParam >> 16) & 0xFF;
-            if (index(extendedlist, tolower(c)) != 0) {
+            if (strchr(extendedlist, tolower(c)) != 0) {
                 NHEVENT_KBD(M(tolower(c)));
             } else if (scancode == (SCANLO + SIZE(scanmap)) - 1) {
                 NHEVENT_KBD(M('?'));
@@ -454,16 +457,16 @@ MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
     case WM_CLOSE: {
         /* exit gracefully */
-        if (g.program_state.gameover) {
+        if (gp.program_state.gameover) {
             /* assume the user really meant this, as the game is already
              * over... */
             /* to make sure we still save bones, just set stop printing flag
              */
-            g.program_state.stopprint++;
+            gp.program_state.stopprint++;
             NHEVENT_KBD(
                 '\033'); /* and send keyboard input as if user pressed ESC */
             /* additional code for this is done in menu and rip windows */
-        } else if (!g.program_state.something_worth_saving) {
+        } else if (!gp.program_state.something_worth_saving) {
             /* User exited before the game started, e.g. during splash display
              */
             /* Just get out. */
@@ -763,8 +766,8 @@ VOID CALLBACK FuzzTimerProc(
         BOOL gen_alt = (rn2(50) == 0) && isalpha(c);
 
         if (!iflags.debug_fuzzer) {
-        	KillTimer(hwnd, IDT_FUZZ_TIMER);
-        	return;
+            KillTimer(hwnd, IDT_FUZZ_TIMER);
+            return;
         }
 
         if (!GetFocus())
@@ -772,17 +775,17 @@ VOID CALLBACK FuzzTimerProc(
 
         ZeroMemory(input, sizeof(input));
         if (gen_alt) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+            i_pos++;
         }
 
         if (HIBYTE(k) & 1) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+            i_pos++;
         }
 
         input[i_pos].type = INPUT_KEYBOARD;
@@ -791,16 +794,16 @@ VOID CALLBACK FuzzTimerProc(
         i_pos++;
 
         if (HIBYTE(k) & 1) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_LSHIFT, 0);
+            i_pos++;
         }
         if (gen_alt) {
-        	input[i_pos].type = INPUT_KEYBOARD;
-        	input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-        	input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
-        	i_pos++;
+            input[i_pos].type = INPUT_KEYBOARD;
+            input[i_pos].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+            input[i_pos].ki.wScan = MapVirtualKey(VK_MENU, 0);
+            i_pos++;
         }
         SendInput(i_pos, input, sizeof(input[0]));
 }
@@ -839,7 +842,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     case IDM_SAVE:
         if (iflags.debug_fuzzer)
             break;
-        if (!g.program_state.gameover && !g.program_state.done_hup)
+        if (!gp.program_state.gameover && !gp.program_state.done_hup)
             dosave();
         else
             MessageBeep(0);
@@ -871,42 +874,79 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         break;
 
     case IDM_SETTING_SCREEN_TO_CLIPBOARD: {
-        char *p;
+        char *p = NULL;
+#ifdef ENHANCED_SYMBOLS
+        WCHAR *wp = NULL;
+#endif
+        unsigned chr_size = 1;
         size_t len;
         HANDLE hglbCopy;
-        char *p_copy;
 
-        p = nh_compose_ascii_screenshot();
-        if (!p)
-            return 0;
-        len = strlen(p);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            wp = nh_compose_unicode_screenshot();
+            if (!wp)
+                return 0;
+            len = wcslen(wp);
+            chr_size = sizeof(WCHAR);
+        } else
+#endif
+        {
+            p = nh_compose_ascii_screenshot();
+            if (!p)
+                return 0;
+            len = strlen(p);
+        }
 
         if (!OpenClipboard(hWnd)) {
             NHMessageBox(hWnd, TEXT("Cannot open clipboard"),
                          MB_OK | MB_ICONERROR);
             free(p);
+#ifdef ENHANCED_SYMBOLS
+            free(wp);
+#endif
             return 0;
         }
 
         EmptyClipboard();
 
-        hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * sizeof(char));
+        hglbCopy = GlobalAlloc(GMEM_MOVEABLE, (len + 1) * chr_size);
         if (hglbCopy == NULL) {
             CloseClipboard();
             free(p);
+#ifdef ENHANCED_SYMBOLS
+            free(wp);
+#endif
             return FALSE;
         }
 
-        p_copy = (char *) GlobalLock(hglbCopy);
-        strncpy(p_copy, p, len);
-        p_copy[len] = 0; // null character
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            WCHAR *p_copy = (WCHAR *) GlobalLock(hglbCopy);
+            wcsncpy(p_copy, wp, len);
+            p_copy[len] = 0; // null character
+        } else
+#endif
+        {
+            char *p_copy = (char *) GlobalLock(hglbCopy);
+            strncpy(p_copy, p, len);
+            p_copy[len] = 0; // null character
+        }
         GlobalUnlock(hglbCopy);
 
-        SetClipboardData(SYMHANDLING(H_IBM) ? CF_OEMTEXT : CF_TEXT, hglbCopy);
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8))
+            SetClipboardData(CF_UNICODETEXT, hglbCopy);
+        else
+#endif
+            SetClipboardData(SYMHANDLING(H_IBM) ? CF_OEMTEXT : CF_TEXT, hglbCopy);
 
         CloseClipboard();
 
         free(p);
+#ifdef ENHANCED_SYMBOLS
+        free(wp);
+#endif
     } break;
 
     case IDM_SETTING_SCREEN_TO_FILE: {
@@ -935,7 +975,7 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         ofn.nMaxFile = SIZE(filename);
         ofn.lpstrFileTitle = NULL;
         ofn.nMaxFileTitle = 0;
-        ofn.lpstrInitialDir = NH_A2W(g.hackdir, whackdir, MAX_PATH);
+        ofn.lpstrInitialDir = NH_A2W(gh.hackdir, whackdir, MAX_PATH);
         ofn.lpstrTitle = NULL;
         ofn.Flags = OFN_LONGNAMES | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
         ofn.nFileOffset = 0;
@@ -948,9 +988,26 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (!GetSaveFileName(&ofn))
             return FALSE;
 
-        text = nh_compose_ascii_screenshot();
-        if (!text)
-            return FALSE;
+#ifdef ENHANCED_SYMBOLS
+        if (SYMHANDLING(H_UTF8)) {
+            text = NULL;
+            wtext = nh_compose_unicode_screenshot();
+            if (!wtext)
+                return FALSE;
+            tlen = wcslen(wtext);
+        } else
+#endif
+        {
+            text = nh_compose_ascii_screenshot();
+            if (!text)
+                return FALSE;
+
+            tlen = strlen(text);
+            wtext = (wchar_t *) malloc(tlen * sizeof(wchar_t));
+            if (!wtext)
+                panic("out of memory");
+            MultiByteToWideChar(NH_CODEPAGE, 0, text, -1, wtext, tlen);
+        }
 
         pFile = _tfopen(filename, TEXT("wt+,ccs=UTF-8"));
         if (!pFile) {
@@ -958,14 +1015,10 @@ onWMCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
             _stprintf(buf, TEXT("Cannot open %s for writing!"), filename);
             NHMessageBox(hWnd, buf, MB_OK | MB_ICONERROR);
             free(text);
+            free(wtext);
             return FALSE;
         }
 
-        tlen = strlen(text);
-        wtext = (wchar_t *) malloc(tlen * sizeof(wchar_t));
-        if (!wtext)
-            panic("out of memory");
-        MultiByteToWideChar(NH_CODEPAGE, 0, text, -1, wtext, tlen);
         fwrite(wtext, tlen * sizeof(wchar_t), 1, pFile);
         fclose(pFile);
         free(text);
@@ -1276,3 +1329,57 @@ nh_compose_ascii_screenshot(void)
     free(text);
     return retval;
 }
+
+#ifdef ENHANCED_SYMBOLS
+// returns malloc() created pointer - callee assumes the ownership
+static WCHAR *
+nh_compose_unicode_screenshot(void)
+{
+    WCHAR *retval;
+    PMSNHMsgGetText text;
+    PMSNHMsgGetWideText wtext;
+    size_t retsize;
+    const size_t max_size = 3 * TEXT_BUFFER_SIZE;
+
+    retval = (WCHAR *) malloc(max_size * sizeof(WCHAR));
+    retsize = 0;
+
+    text =
+        (PMSNHMsgGetText) malloc(sizeof(MSNHMsgGetText) + TEXT_BUFFER_SIZE);
+    text->max_size =
+        TEXT_BUFFER_SIZE
+        - 1; /* make sure we always have 0 at the end of the buffer */
+
+    wtext =
+        (PMSNHMsgGetWideText) malloc(sizeof(MSNHMsgGetWideText)
+                                     + TEXT_BUFFER_SIZE * sizeof(WCHAR));
+    wtext->max_size =
+        TEXT_BUFFER_SIZE
+        - 1; /* make sure we always have 0 at the end of the buffer */
+
+    ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+    SendMessage(mswin_hwnd_from_winid(WIN_MESSAGE), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
+    retsize += MultiByteToWideChar(CP_ACP, 0,
+                                   text->buffer, strlen(text->buffer),
+                                   retval + retsize, max_size - retsize);
+
+    ZeroMemory(wtext->buffer, TEXT_BUFFER_SIZE * sizeof(WCHAR));
+    SendMessage(mswin_hwnd_from_winid(WIN_MAP), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETWIDETEXT, (LPARAM) wtext);
+    wcsncpy(retval + retsize, wtext->buffer, max_size - retsize - 1);
+    retsize += wcslen(retval + retsize);
+
+    ZeroMemory(text->buffer, TEXT_BUFFER_SIZE);
+    SendMessage(mswin_hwnd_from_winid(WIN_STATUS), WM_MSNH_COMMAND,
+                (WPARAM) MSNH_MSG_GETTEXT, (LPARAM) text);
+    retsize += MultiByteToWideChar(CP_ACP, 0,
+                                   text->buffer, strlen(text->buffer),
+                                   retval + retsize, max_size - retsize);
+    retval[retsize] = L'\0';
+
+    free(text);
+    free(wtext);
+    return retval;
+}
+#endif

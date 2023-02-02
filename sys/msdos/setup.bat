@@ -125,8 +125,9 @@ echo distribution.
 echo The following files need to exist under the names on the
 echo right in order to build NetHack:
 echo.
-echo  ..\..\dat\data.base        needs to be copied to ..\..\dat\data.bas
-echo  ..\..\include\patchlevel.h needs to be copied to ..\..\include\patchlev.h
+echo  ..\..\dat\data.base           needs to be copied to ..\..\dat\data.bas
+echo  ..\..\include\patchlevel.h    needs to be copied to ..\..\include\patchlev.h
+echo  ..\..\sys\share\posixregex.c  needs to be copied to ..\..\sys\share\posixreg.c
 echo.
 echo setup.bat was unable to perform the necessary changes because at least
 echo one of the files doesn't exist under its short name, and the 

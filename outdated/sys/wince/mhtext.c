@@ -39,7 +39,7 @@ mswin_init_text_window()
 
     ZeroMemory(data, sizeof(NHTextWindow));
     data->window_text = mswin_init_text_buffer(
-        g.program_state.gameover ? FALSE : GetNHApp()->bWrapText);
+        gp.program_state.gameover ? FALSE : GetNHApp()->bWrapText);
     SetWindowLong(ret, GWL_USERDATA, (LONG) data);
     return ret;
 }

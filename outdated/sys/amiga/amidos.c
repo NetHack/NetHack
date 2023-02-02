@@ -149,7 +149,7 @@ char *path;
 
         strncpy(fileName, path, sizeof(fileName) - 1);
         fileName[31] = 0;
-        if (colon = index(fileName, ':'))
+        if (colon = strchr(fileName, ':'))
             colon[1] = '\0';
         else
             fileName[0] = '\0';
@@ -288,7 +288,7 @@ saveDiskPrompt(start)
     BPTR fileLock;
     if (sysflags.asksavedisk) {
         /* Don't prompt if you can find the save file */
-        if (fileLock = Lock(g.SAVEF, SHARED_LOCK)) {
+        if (fileLock = Lock(gs.SAVEF, SHARED_LOCK)) {
             UnLock(fileLock);
 #if defined(TTY_GRAPHICS)
             if (windowprocs.win_init_nhwindows
@@ -303,7 +303,7 @@ saveDiskPrompt(start)
             return 1;
         }
         pline("If save file is on a SAVE disk, put that disk in now.");
-        if (strlen(g.SAVEF) > QBUFSZ - 25 - 22)
+        if (strlen(gs.SAVEF) > QBUFSZ - 25 - 22)
             panic("not enough buffer space for prompt");
 /* THIS IS A HACK */
 #if defined(TTY_GRAPHICS)
@@ -314,7 +314,7 @@ saveDiskPrompt(start)
 #endif
 #if defined(AMII_GRAPHICS)
         if (windowprocs.win_init_nhwindows == amii_procs.win_init_nhwindows) {
-            getlind("File name ?", buf, g.SAVEF);
+            getlind("File name ?", buf, gs.SAVEF);
             clear_nhwindow(WIN_BASE);
         }
 #endif
@@ -323,11 +323,11 @@ saveDiskPrompt(start)
             return 0;
 
         /* Strip any whitespace. Also, if nothing was entered except
-         * whitespace, do not change the value of g.SAVEF.
+         * whitespace, do not change the value of gs.SAVEF.
          */
         for (bp = buf; *bp; bp++) {
             if (!isspace(*bp)) {
-                strncpy(g.SAVEF, bp, PATHLEN);
+                strncpy(gs.SAVEF, bp, PATHLEN);
                 break;
             }
         }
@@ -511,6 +511,6 @@ register char *s;
 {
     register char *lp;
 
-    while ((lp = index(s, ':')) || (lp = index(s, '/')))
+    while ((lp = strchr(s, ':')) || (lp = strchr(s, '/')))
         *lp = '_';
 }

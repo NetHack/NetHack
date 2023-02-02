@@ -1,0 +1,152 @@
+/* NetHack 3.7	attributions.txt	$NHDT-Date: 1652831519 2022/05/17 23:51:59 $
+
+Attributions and credits and modifications for sounds used are listed below.
+
+File: se_squeak_C.wav     
+Source:   https://freesound.org/people/seth-m/sounds/269722/
+Original: download/269722__seth-m__wood-creaks.wav
+By:       https://freesound.org/people/seth-m/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m02.194s to 00h00m02.765s as selection.
+- Saved selection to file named se_squeak_C.wav
+- .571 seconds
+
+
+File: se_squeak_D_flat.wav
+Source:   https://freesound.org/people/AlienXXX/sounds/151346/
+Original: download/151346__alienxxx__creaking-floor-upstairs.wav
+By:       https://freesound.org/people/AlienXXX/
+License:  https://creativecommons.org/licenses/by/4.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m37.641s to 00h00m39.320s as selection.
+- Used Audacity, Effect to change selection pitch to C#/Dflat 3.
+- Saved selection to file named se_squeak_D_flat.wav
+- 1.679 seconds
+
+
+File: se_squeak_D.wav
+Source:   https://freesound.org/people/Talitha5/sounds/321883/
+Original: download/321883__talitha5__floorboard-creaking.mp3
+By:       https://freesound.org/people/Talitha5/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m24.447s to 00h00m225.790s as selection.
+- Saved selection to file named se_squeak_D.wav
+- 2.067 seconds
+
+
+File:se_squeak_E_flat.wav
+Source:   https://freesound.org/people/tosha73/sounds/570864/
+Original: download/570864__tosha73__creaking-boards.wav
+By:       https://freesound.org/people/tosha73/
+License:  https://creativecommons.org/licenses/by/4.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m30.192s to 00h00m30.819s as selection.
+- Saved selection to file named se_squeak_E_flat.wav
+- .627 seconds
+
+
+File: se_squeak_E.wav
+Source:   https://freesound.org/people/Benboncan/sounds/101381/
+Original: download/101381__benboncan__creaking-floorboard.wav
+By:       https://freesound.org/people/Benboncan/
+License:  https://creativecommons.org/licenses/by/4.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m12.892s to 00h00m14.709s as selection.
+- Saved selection to file named se_squeak_E.wav
+- 1.817 seconds
+
+
+File: se_squeak_F.wav
+Source:   https://freesound.org/people/Talitha5/sounds/321883/
+Original: download/321883__talitha5__floorboard-creaking.mp3
+By:       https://freesound.org/people/Talitha5/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m56.926s to 00h00m58.402s as selection.
+- Saved selection to file named se_squeak_F.wav
+- 1.476 seconds.
+
+
+File: se_squeak_F_sharp.wav
+Source:   https://freesound.org/people/seth-m/sounds/269722/
+Original: download/269722__seth-m__wood-creaks.wav
+By:       https://freesound.org/people/seth-m/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m04.361s to 00h00m04.795s as selection.
+- Saved selection to file named se_squeak_F_sharp.wav
+- .434 seconds
+
+
+File: se_squeak_G.wav
+Source:   https://freesound.org/people/Garuda1982/sounds/420856/
+Original: download/420856__garuda1982__floorboards-squeak-field-recording-with-zoom-h2n.wav
+By:       https://freesound.org/people/Garuda1982/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m14.369s to 00h00m15.629s as selection.
+- Saved selection to file named se_squeak_G.wav
+- 1.26 seconds
+
+
+File: se_squeak_G_sharp.wav
+Source:   https://freesound.org/people/seth-m/sounds/269722/
+Original: download/269722__seth-m__wood-creaks.wav
+By:       https://freesound.org/people/seth-m/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m03.331s to 00h00m03.966s as selection.
+- Used Audacity, Effect to change selection pitch to G#/A flat 7
+- Saved selection to file named se_squeak_G_sharp.wav
+- .635 seconds
+
+
+File: se_squeak_A.wav
+Source:   https://freesound.org/people/Greg_Surr/sounds/590161/
+Original: download/590161__greg-surr__creaking-in-room-11.wav
+By:       https://freesound.org/people/Greg_Surr/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m00.209s to 00h00m01.385s as selection.
+- Saved selection to file named se_squeak_A.wav
+- 1.176s
+
+
+File: se_squeak_B_flat.wav
+Source:   https://freesound.org/people/shelbyshark/sounds/487105/
+Original: download/487105__shelbyshark__floorcreak.wav
+By:       https://freesound.org/people/shelbyshark/
+License:  http://creativecommons.org/publicdomain/zero/1.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m02.350s to 00h00m04.576s as selection.
+- Used Audacity, Effect to change selection pitch to A#/Bflat.
+- Saved selection to file named se_squeak_B_flat.wav
+- 2.226 seconds
+
+
+File:se_squeak_B.wav
+Source:   https://freesound.org/people/tosha73/sounds/570864/
+Original: download/570864__tosha73__creaking-boards.wav
+By:       https://freesound.org/people/tosha73/
+License:  https://creativecommons.org/licenses/by/4.0/
+Download Date: January 21, 2023
+Description of modifications made to the original:
+- 00h00m00.000s to 00h00m00.572s as selection.
+- Saved selection to file named se_squeak_B.wav
+- .572 seconds
+
+
+

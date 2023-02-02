@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# NetHack 3.7  compiler.370 $NHDT-Date: 1637992237 2021/11/27 05:50:37 $  $NHDT-Branch: NetHack-3.7 $
+# NetHack 3.7  compiler.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $
 
 # compiler flags:  CCFLAGS is used to construct a value for CFLAGS with
 #	various -I, -D, and -W settings appended below;
@@ -22,22 +22,13 @@ CCFLAGS = -g
 #
 #CC= clang
 #CXX=clang++ -std=gnu++11
+#
+# If these are set on entry, preparation for C++ compiles is affected.
+#    CPLUSPLUS_NEEDED = 1           C++ compile bits included
+#    CPLUSPLUS_NEED17 = 1           C++ -std=c++17 (at least)
+#    CPLUSPLUS_NEED_DEPSUPPRESS = 1 C++ -Wno-deprecated-copy,
+#                                       -Wno-deprecated-declarations
 
-#detection
-CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
-ifeq "$(CCISCLANG)" ""
-ifdef WANT_WIN_QT6
-CXX=g++ -std=c++17
-else
-CXX=g++ -std=gnu++11
-endif
-else
-ifdef WANT_WIN_QT6
-CXX=clang++ -std=c++17
-else
-CXX=clang++ -std=gnu++11
-endif
-endif   # clang
 
 # If you want to override the compiler detection just carried out
 # uncomment one of the following pairs. Note, however, that
@@ -55,8 +46,11 @@ CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
-CFLAGS+=-Wunreachable-code
+
+# these are left out of the C++ flags
 CFLAGS+=-Wformat-nonliteral
+CFLAGS+=-Wunreachable-code
+
 #
 # the following are not allowed in C++
 CFLAGS+=-Wimplicit
@@ -66,18 +60,11 @@ CFLAGS+=-Wmissing-prototypes
 CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
 
-CCXXFLAGS = -g -I../include -DNOTPARMDECL
-CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
-        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
-CCXXFLAGS+=-pedantic
-CCXXFLAGS+=-Wmissing-declarations
-
+#detection of clang vs gcc
+CCISCLANG := $(shell echo `$(CC) --version` | grep clang)
 ifeq "$(CCISCLANG)" ""
 # gcc-specific follows
-CFLAGS+=-Wmissing-parameter-type
-ifdef WANT_WIN_QT
-CCXXFLAGS+= -Wno-deprecated-copy
-endif  # WANT_WIN_QT
+CXX=g++ -std=gnu++11
 # get the version of gcc
 GCCGTEQ9 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 9)
 GCCGTEQ11 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 11)
@@ -85,76 +72,85 @@ GCCGTEQ12 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 12)
 ifeq "$(GCCGTEQ9)" "1"
 # flags present in gcc version greater than or equal to 9 can go here
 CFLAGS+=-Wformat-overflow
-endif  #gcc version greater than or equal to 9
-#still in gcc-specific section here
-# get the version of g++
-GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
-GPPGTEQ11 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 11)
-GPPGTEQ12 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 12)
-ifeq "$(GPPGTEQ9)" "1"
-CCXXFLAGS+=-Wformat-overflow
-ifdef WANT_WIN_QT
-CCXXFLAGS+=-Wno-deprecated-copy
-CCXXFLAGS+=-Wno-deprecated-declarations
-endif  # WANT_WIN_QT
-endif  # g++ version greater than or equal to 9
-ifeq "$(GPPGTEQ11)" "1"
-#the g++ linker will have trouble linker if the following isn't included
-#when compiling the C files.
-ifdef WANT_WIN_QT
-CFLAGS+=-fPIC
-endif  # WANT_WIN_QT
-endif  # g++ version greater than or equal to 11
-ifeq "$(GPPGTEQ12)" "1"
-ifdef WANT_WIN_QT6
-CXX=g++ -std=c++20
-endif  # WANT_WIN_QT6
-endif  # g++ version greater than or equal to 12
+CFLAGS+=-Wmissing-parameter-type
+endif   # GCC greater than or equal to 9
+#ifeq "$(GCCGTEQ11)" "1"
+#endif
+#ifeq "$(GCCGTEQ12)" "1"
+#endif
 # end of gcc-specific
-
-else   # clang-specific follows
-
-# get the version of clang++
-CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
-CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
-ifeq "$(CLANGPPGTEQ9)" "1"
-ifdef WANT_WIN_QT
-CCXXFLAGS+=-Wno-deprecated-copy
-endif  # WANT_WIN_QT
-endif  #clang++ greater than or equal to 9
-
-ifdef WANT_WIN_QT
-ifeq "$(CLANGPPGTEQ14)" "1"
-# The clang++ linker seems to have trouble linker if the following isn't
-# included when compiling the C files by clang..
-CFLAGS+=-fPIC
-endif  # clang++ greater than or equal to 14
-CCXXFLAGS+=-Wno-deprecated-declarations
-endif  # WANT_WIN_QT
+else   # gcc or clang?
+CXX=clang++ -std=gnu++11
+# clang-specific follows
+# none
 endif  # clang-specific ends here
 
-# enable some optional code in various NetHack source files
-CFLAGS+=-DGCC_WARN
-CCXXFLAGS+=-DGCC_WARN
-
 ifdef MAKEFILE_SRC
-ifdef WANT_WIN_QT
-# when switching from Qt5 to Qt6 or vice versa, any old .moc files will be
-# incompatible; get rid of them in case user hasn't run 'make spotless';
-# object files are incompatable with Qt library, so get rid of them too;
-# Qt*.h-t are empty timestamp files and at most one should exist
-QTany_H = Qt*.h-t
-ifdef WANT_WIN_QT6
-# Qt 6 builds and runs (with a couple of warnings) but needs more testing
-QTn_H = Qt6.h-t
-else
-# Qt 5 is currently the default version for nethack 3.7.x's Qt interface
-QTn_H = Qt5.h-t
+ifdef CPLUSPLUS_NEEDED
+CCXXFLAGS = -g -I../include -DNOTPARMDECL
+CCXXFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
+        -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
+CCXXFLAGS+=-pedantic
+CCXXFLAGS+=-Wmissing-declarations
+#detection of clang++ vs g++
+CXXISCLANG := $(shell echo `$(CXX) --version` | grep clang)
+ifeq "$(CXXISCLANG)" ""
+# g++-specific
+CCXX=g++ -std=gnu++11
+# get the version of g++
+GPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+GPPGTEQ11 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 11)
+GPPGTEQ12 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 12)
+ifeq "$(GPPGTEQ9)" "1"
+CCXXFLAGS+=-Wformat-overflow
+ifdef CPLUSPLUS_NEED_DEPSUPPRESS
+CCXXFLAGS+=-Wno-deprecated-copy
+CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # CPLUSPLUS_NEED_DEPSUPPRESS
+endif  # g++ version greater than or equal to 9
+ifeq "$(GPPGTEQ11)" "1"
+# the g++ linker will have trouble linking if the following isn't included
+# when compiling the C files.
+CFLAGS+=-fPIC
+endif  # g++ version greater than or equal to 11
+ifdef CPLUSPLUS_NEED17
+ifeq "$(GPPGTEQ12)" "1"
+CCXX=g++ -std=c++20
+else   # g++ version greater than or equal to 12? (no follows)
+CCXX=g++ -std=c++17
+endif  # g++ version greater than or equal to 12
+endif  # CPLUSPLUS_NEED17
+
+else   # g++ or clang++ ?
+
+# clang++-specific
+CCXX=clang++ -std=c++11
+# get the version of clang++
+CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
+CLANGPPGTEQ11 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 11)
+CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
+ifeq "$(CLANGPPGTEQ9)" "1"
+#CCXXFLAGS+=-Wformat-overflow
 endif
-$(QTn_H) ::
-	@if test ! -f $@; then ( rm -f $(QTany_H) *.moc qt_*.o; touch $@ ); fi;
-endif #WANT_WIN_QT
-endif #MAKFILE_SRC
+ifdef CPLUSPLUS_NEED_DEPSUPPRESS
+CCXXFLAGS+=-Wno-deprecated
+CCXXFLAGS+=-Wno-deprecated-declarations
+endif  # CPLUSPLUS_NEED_DEPSUPPRESS
+# The clang++ linker seems to have trouble linking if the following isn't
+# included when compiling the C files by clang..
+CFLAGS+=-fPIC
+ifdef CPLUSPLUS_NEED17
+ifeq "$(CLANGPPGTEQ14)" "1"
+CCXX=clang++ -std=c++20
+else
+CCXX=clang++ -std=c++17
+endif  # clang++ greater than or equal to 14
+endif  # CPLUSPLUS_NEED17
+endif  # end of clang++-specific section
+CXX=$(CCXX)
+endif  # CPLUSPLUS_NEEDED
+
+endif   # MAKEFILE_SRC
 
 #end of compiler.370
 #------------------------------------------------------------------------------

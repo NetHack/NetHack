@@ -294,7 +294,7 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
             QString btn_lbl = extcmdlist[i].ef_txt;
             if (btn_lbl == "wait")
                 btn_lbl += " (rest)";
-            QString btn_tip = QString::asprintf(" %s ", extcmdlist[i].ef_desc);
+            QString btn_tip = nh_qsprintf(" %s ", extcmdlist[i].ef_desc);
             QPushButton *pb = new QPushButton(btn_lbl, grid);
             pb->setMinimumSize(butw, pb->sizeHint().height());
             // force the button to have fixed width or it can move around a
@@ -335,7 +335,11 @@ NetHackQtExtCmdRequestor::NetHackQtExtCmdRequestor(QWidget *parent) :
         }
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(group, SIGNAL(idPressed(int)), this, SLOT(Button(int)));
+#else
     connect(group, SIGNAL(buttonPressed(int)), this, SLOT(Button(int)));
+#endif
 
     bl->activate();
     xl->activate();

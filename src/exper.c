@@ -47,19 +47,19 @@ newpw(void)
     int en = 0, enrnd, enfix;
 
     if (u.ulevel == 0) {
-        en = g.urole.enadv.infix + g.urace.enadv.infix;
-        if (g.urole.enadv.inrnd > 0)
-            en += rnd(g.urole.enadv.inrnd);
-        if (g.urace.enadv.inrnd > 0)
-            en += rnd(g.urace.enadv.inrnd);
+        en = gu.urole.enadv.infix + gu.urace.enadv.infix;
+        if (gu.urole.enadv.inrnd > 0)
+            en += rnd(gu.urole.enadv.inrnd);
+        if (gu.urace.enadv.inrnd > 0)
+            en += rnd(gu.urace.enadv.inrnd);
     } else {
         enrnd = (int) ACURR(A_WIS) / 2;
-        if (u.ulevel < g.urole.xlev) {
-            enrnd += g.urole.enadv.lornd + g.urace.enadv.lornd;
-            enfix = g.urole.enadv.lofix + g.urace.enadv.lofix;
+        if (u.ulevel < gu.urole.xlev) {
+            enrnd += gu.urole.enadv.lornd + gu.urace.enadv.lornd;
+            enfix = gu.urole.enadv.lofix + gu.urace.enadv.lofix;
         } else {
-            enrnd += g.urole.enadv.hirnd + g.urace.enadv.hirnd;
-            enfix = g.urole.enadv.hifix + g.urace.enadv.hifix;
+            enrnd += gu.urole.enadv.hirnd + gu.urace.enadv.hirnd;
+            enfix = gu.urole.enadv.hifix + gu.urace.enadv.hifix;
         }
         en = enermod(rn1(enrnd, enfix));
     }
@@ -183,19 +183,19 @@ more_experienced(register int exper, register int rexp)
     if (newexp != oldexp) {
         u.uexp = newexp;
         if (flags.showexp)
-            g.context.botl = TRUE;
+            gc.context.botl = TRUE;
         /* even when experience points aren't being shown, experience level
            might be highlighted with a percentage highlight rule and that
            percentage depends upon experience points */
-        if (!g.context.botl && exp_percent_changing())
-            g.context.botl = TRUE;
+        if (!gc.context.botl && exp_percent_changing())
+            gc.context.botl = TRUE;
     }
     /* newrexp will always differ from oldrexp unless they're LONG_MAX */
     if (newrexp != oldrexp) {
         u.urexp = newrexp;
 #ifdef SCORE_ON_BOTL
         if (flags.showscore)
-            g.context.botl = TRUE;
+            gc.context.botl = TRUE;
 #endif
     }
     if (u.urexp >= (Role_if(PM_WIZARD) ? 1000 : 2000))
@@ -213,7 +213,7 @@ losexp(
        wizard mode request to reduce level; never fatal though */
     if (drainer && !strcmp(drainer, "#levelchange"))
         drainer = 0;
-    else if (resists_drli(&g.youmonst))
+    else if (resists_drli(&gy.youmonst))
         return;
 
     /* level-loss message; "Goodbye level 1." is fatal; divine anger
@@ -229,9 +229,9 @@ losexp(
         livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel + 1);
     } else {
         if (drainer) {
-            g.killer.format = KILLED_BY;
-            if (g.killer.name != drainer)
-                Strcpy(g.killer.name, drainer);
+            gk.killer.format = KILLED_BY;
+            if (gk.killer.name != drainer)
+                Strcpy(gk.killer.name, drainer);
             done(DIED);
         }
         /* no drainer or lifesaved */
@@ -273,14 +273,14 @@ losexp(
         u.uexp = newuexp(u.ulevel) - 1;
 
     if (Upolyd) {
-        num = monhp_per_lvl(&g.youmonst);
+        num = monhp_per_lvl(&gy.youmonst);
         u.mhmax -= num;
         u.mh -= num;
         if (u.mh <= 0)
             rehumanize();
     }
 
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
 }
 
 /*
@@ -309,7 +309,7 @@ pluslvl(
     /* increase hit points (when polymorphed, do monster form first
        in order to retain normal human/whatever increase for later) */
     if (Upolyd) {
-        hpinc = monhp_per_lvl(&g.youmonst);
+        hpinc = monhp_per_lvl(&gy.youmonst);
         u.mhmax += hpinc;
         u.mh += hpinc;
     }
@@ -359,7 +359,7 @@ pluslvl(
         if (u.ulevel > u.ulevelpeak)
             u.ulevelpeak = u.ulevel;
     }
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
 }
 
 /* compute a random amount of experience points suitable for the hero's

@@ -6,16 +6,16 @@
 #ifndef PERMONST_H
 #define PERMONST_H
 
-/*	This structure covers all attack forms.
- *	aatyp is the gross attack type (eg. claw, bite, breath, ...)
- *	adtyp is the damage type (eg. physical, fire, cold, spell, ...)
- *	damn is the number of hit dice of damage from the attack.
- *	damd is the number of sides on each die.
+/*     This structure covers all attack forms.
+ *     aatyp is the gross attack type (eg. claw, bite, breath, ...)
+ *     adtyp is the damage type (eg. physical, fire, cold, spell, ...)
+ *     damn is the number of hit dice of damage from the attack.
+ *     damd is the number of sides on each die.
  *
- *	Some attacks can do no points of damage.  Additionally, some can
- *	have special effects *and* do damage as well.  If damn and damd
- *	are set, they may have a special meaning.  For example, if set
- *	for a blinding attack, they determine the amount of time blinded.
+ *     Some attacks can do no points of damage.  Additionally, some can
+ *     have special effects *and* do damage as well.  If damn and damd
+ *     are set, they may have a special meaning.  For example, if set
+ *     for a blinding attack, they determine the amount of time blinded.
  */
 
 struct attack {
@@ -23,12 +23,12 @@ struct attack {
     uchar adtyp, damn, damd;
 };
 
-/*	Max # of attacks for any given monster.
+/*     Max # of attacks for any given monster.
  */
 
 #define NATTK 6
 
-/*	Weight of a human body
+/*     Weight of a human body
  */
 
 #define WT_HUMAN 1450
@@ -58,7 +58,7 @@ struct permonst {
     unsigned long mflags1,      /* boolean bitflags */
         mflags2;                /* more boolean bitflags */
     unsigned short mflags3;     /* yet more boolean bitflags */
-    uchar difficulty;		/* toughness (formerly from  makedefs -m) */
+    uchar difficulty;           /* toughness (formerly from  makedefs -m) */
 #ifdef TEXTCOLOR
     uchar mcolor; /* color to use */
 #endif

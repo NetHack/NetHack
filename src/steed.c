@@ -1,4 +1,4 @@
-/* NetHack 3.7	steed.c	$NHDT-Date: 1646171628 2022/03/01 21:53:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	steed.c	$NHDT-Date: 1671838909 2022/12/23 23:41:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.108 $ */
 /* Copyright (c) Kevin Hugo, 1998-1999. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -27,7 +27,7 @@ can_saddle(struct monst* mtmp)
 {
     struct permonst *ptr = mtmp->data;
 
-    return (index(steeds, ptr->mlet) && (ptr->msize >= MZ_MEDIUM)
+    return (strchr(steeds, ptr->mlet) && (ptr->msize >= MZ_MEDIUM)
             && (!humanoid(ptr) || ptr->mlet == S_CENTAUR) && !amorphous(ptr)
             && !noncorporeal(ptr) && !is_whirly(ptr) && !unsolid(ptr));
 }
@@ -68,7 +68,7 @@ use_saddle(struct obj* otmp)
         char kbuf[BUFSZ];
 
         You("touch %s.", mon_nam(mtmp));
-        if (!(poly_when_stoned(g.youmonst.data) && polymon(PM_STONE_GOLEM))) {
+        if (!(poly_when_stoned(gy.youmonst.data) && polymon(PM_STONE_GOLEM))) {
             Sprintf(kbuf, "attempting to saddle %s",
                     an(pmname(mtmp->data, Mgender(mtmp))));
             instapetrify(kbuf);
@@ -147,7 +147,7 @@ put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
     mtmp->misc_worn_check |= W_SADDLE;
     saddle->owornmask = W_SADDLE;
     saddle->leashmon = mtmp->m_id;
-    update_mon_intrinsics(mtmp, saddle, TRUE, FALSE);
+    update_mon_extrinsics(mtmp, saddle, TRUE, FALSE);
 }
 
 /*** Riding the monster ***/
@@ -156,8 +156,8 @@ put_saddle_on_mon(struct obj* saddle, struct monst* mtmp)
 boolean
 can_ride(struct monst* mtmp)
 {
-    return (mtmp->mtame && humanoid(g.youmonst.data)
-            && !verysmall(g.youmonst.data) && !bigmonst(g.youmonst.data)
+    return (mtmp->mtame && humanoid(gy.youmonst.data)
+            && !verysmall(gy.youmonst.data) && !bigmonst(gy.youmonst.data)
             && (!Underwater || is_swimmer(mtmp->data)));
 }
 
@@ -170,7 +170,7 @@ doride(void)
     if (u.usteed) {
         dismount_steed(DISMOUNT_BYCHOICE);
     } else if (getdir((char *) 0) && isok(u.ux + u.dx, u.uy + u.dy)) {
-        if (wizard && yn("Force the mount to succeed?") == 'y')
+        if (wizard && y_n("Force the mount to succeed?") == 'y')
             forcemount = TRUE;
         return (mount_steed(m_at(u.ux + u.dx, u.uy + u.dy), forcemount)
                 ? ECMD_TIME : ECMD_OK);
@@ -220,14 +220,14 @@ mount_steed(
         legs_in_no_shape("riding", FALSE);
         Sprintf(qbuf, "Heal your leg%s?",
                 ((HWounded_legs & BOTH_SIDES) == BOTH_SIDES) ? "s" : "");
-        if (force && wizard && yn(qbuf) == 'y')
+        if (force && wizard && y_n(qbuf) == 'y')
             heal_legs(0);
         else
             return (FALSE);
     }
 
-    if (Upolyd && (!humanoid(g.youmonst.data) || verysmall(g.youmonst.data)
-                   || bigmonst(g.youmonst.data) || slithy(g.youmonst.data))) {
+    if (Upolyd && (!humanoid(gy.youmonst.data) || verysmall(gy.youmonst.data)
+                   || bigmonst(gy.youmonst.data) || slithy(gy.youmonst.data))) {
         You("won't fit on a saddle.");
         return (FALSE);
     }
@@ -352,11 +352,11 @@ mount_steed(
     }
     /* setuwep handles polearms differently when you're mounted */
     if (uwep && is_pole(uwep))
-        g.unweapon = FALSE;
+        gu.unweapon = FALSE;
     u.usteed = mtmp;
     remove_monster(mtmp->mx, mtmp->my);
     teleds(mtmp->mx, mtmp->my, TELEDS_ALLOW_DRAG);
-    g.context.botl = TRUE;
+    gc.context.botl = TRUE;
     return TRUE;
 }
 
@@ -440,42 +440,111 @@ landing_spot(
     int reason,
     int forceit)
 {
-    int i = 0, distance, min_distance = -1;
+    coord cc, try[8]; /* 8: the 8 spots adjacent to the hero's spot */
+    int i, j, best_j, clockwise_j, counterclk_j,
+        n, viable, distance, min_distance = -1;
     coordxy x, y;
-    boolean found = FALSE;
+    boolean found, impaird, kn_trap, boulder;
     struct trap *t;
 
-    /* avoid known traps (i == 0) and boulders, but allow them as a backup */
-    if (reason != DISMOUNT_BYCHOICE || Stunned || Confusion || Fumbling)
-        i = 1;
-    for (; !found && i < 2; ++i) {
-        for (x = u.ux - 1; x <= u.ux + 1; x++)
-            for (y = u.uy - 1; y <= u.uy + 1; y++) {
-                if (!isok(x, y) || u_at(x, y))
-                    continue;
+    (void) memset((genericptr_t) try, 0, sizeof try);
+    n = 0;
+    j = xytod(u.dx, u.dy);
+    if (reason == DISMOUNT_KNOCKED && j != DIR_ERR) {
+        /* we'll check preferred location first; if viable it'll be picked */
+        best_j = j;
+        try[0].x = u.dx, try[0].y = u.dy;
+        /* the two next best locations are checked second and third */
+        i = rn2(2);
+        clockwise_j = DIR_RIGHT(j); /* (j + 1) % 8 */
+        dtoxy(&cc, clockwise_j);
+        try[1 + i].x = cc.x, try[1 + i].y = cc.y; /* [1] or [2] */
+        counterclk_j = DIR_LEFT(j); /* (j + 8 - 1) % 8 */
+        dtoxy(&cc, counterclk_j);
+        try[2 - i].x = cc.x, try[2 - i].y = cc.y; /* [2] or [1] */
+        n = 3;
+        debugpline3("knock from saddle: best %s, next %s or %s",
+                    directionname(best_j),
+                    directionname(clockwise_j), directionname(counterclk_j));
+    } else {
+        best_j = clockwise_j = counterclk_j = -1;
+    }
+    for (j = 0; j < N_DIRS; ++j) {
+        /* fortunately NODIAG() handling isn't needed for DISMOUNT_KNOCKED
+           because hero can only ride when humanoid */
+        if (j == best_j || j == clockwise_j || j == counterclk_j)
+            continue;
+        /* j==0 is W, j==1 NW, j==2 N, j==3 NE, ..., around to j==7 SW;
+           so odd j values are diagonal directions here */
+        if (reason == DISMOUNT_POLY && NODIAG(u.umonnum) && (j % 1) != 0)
+            continue;
+        dtoxy(&cc, j);
+        try[n++] = cc;
+    }
 
-                if (accessible(x, y) && !MON_AT(x, y)
-                    && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
-                    distance = distu(x, y);
-                    if (min_distance < 0 || distance < min_distance
-                        || (distance == min_distance && rn2(2))) {
-                        if (i > 0 || (((t = t_at(x, y)) == 0 || !t->tseen)
-                                      && (!sobj_at(BOULDER, x, y)
-                                          || throws_rocks(g.youmonst.data)))) {
-                            spot->x = x;
-                            spot->y = y;
-                            min_distance = distance;
-                            found = TRUE;
-                        }
+    /*
+     * Up to three passes;
+     * i==0: voluntary dismount without impairment avoids known traps and
+     *       boulders;
+     * i==1: voluntary dismount with impairment or knocked out of saddle
+     *       avoids boulders but allows known traps;
+     * i==2: other, allow traps and boulders.
+     *
+     * Fallback to i==1 if nothing appropriate was found for i==0 and
+     * to i==2 as last resort.
+     */
+    impaird = (Stunned || Confusion || Fumbling);
+    viable = 0;
+    found = FALSE;
+    for (i = (reason == DISMOUNT_BYCHOICE && !impaird) ? 0
+             : ((reason == DISMOUNT_BYCHOICE && impaird)
+                || reason == DISMOUNT_KNOCKED) ? 1
+               : 2;
+         i <= 2 && !found; ++i) {
+        for (j = 0; j < n; ++j) {
+            x = u.ux + try[j].x;
+            y = u.uy + try[j].y;
+            if (!isok(x, y) || u_at(x, y)) /* [note: u_at() can't happen] */
+                continue;
+
+            if (accessible(x, y) && !MON_AT(x, y)
+                && test_move(u.ux, u.uy, x - u.ux, y - u.uy, TEST_MOVE)) {
+                ++viable;
+                distance = distu(x, y);
+                if (min_distance < 0 /* no viable candidate yet */
+                    /* or better than pending candidate (note: orthogonal
+                       spots are distance 1 and diagonal ones distance 2;
+                       treating one as better than the other is arbitary
+                       and not wanted for DISMOUNT_KNOCKED) */
+                    || ((best_j == -1) ? (distance < min_distance) : (j < 3))
+                    /* or equally good, maybe substitute this one */
+                    || (distance == min_distance && !rn2(viable))) {
+                    /* traps avoided on pass 0; boulders avoided on 0 and 1 */
+                    kn_trap = i == 0 && ((t = t_at(x, y)) != 0 && t->tseen
+                                         && t->ttyp != VIBRATING_SQUARE);
+                    boulder = i <= 1 && (sobj_at(BOULDER, x, y)
+                                         && !throws_rocks(gy.youmonst.data));
+                    if (!kn_trap && !boulder) {
+                        spot->x = x;
+                        spot->y = y;
+                        min_distance = distance;
+                        found = TRUE;
+                        if (best_j != -1 && j < 3)
+                            /* since best_j is first candidate (j==0), j==1
+                               and j==2 can only get here when best_j was
+                               not viable; 50:50 chance for clockwise_j to
+                               come before counterclk_j so each has same
+                               chance to be next after best_j */
+                            break;
                     }
                 }
             }
+        }
     }
 
     /* If we didn't find a good spot and forceit is on, try enexto(). */
-    if (forceit && min_distance < 0
-        && !enexto(spot, u.ux, u.uy, g.youmonst.data))
-        return FALSE;
+    if (forceit && !found)
+        found = enexto(spot, u.ux, u.uy, gy.youmonst.data);
 
     return found;
 }
@@ -498,18 +567,21 @@ dismount_steed(
     /* Sanity check */
     if (!mtmp) /* Just return silently */
         return;
-    u.usteed = 0; /* affects Fly test; could hypothetically affect Lev */
+    u.usteed = 0; /* affects Fly test; could hypothetically affect Lev;
+                   * also affects u_locomotion() */
     ufly = Flying ? TRUE : FALSE;
     ulev = Levitation ? TRUE : FALSE;
+    verb = u_locomotion("fall"); /* only used for _FELL and _KNOCKED */
     u.usteed = mtmp;
 
     /* Check the reason for dismounting */
     otmp = which_armor(mtmp, W_SADDLE);
     switch (reason) {
     case DISMOUNT_THROWN:
+        verb = "are thrown";
+        /*FALLTHRU*/
+    case DISMOUNT_KNOCKED:
     case DISMOUNT_FELL:
-        verb = (reason == DISMOUNT_THROWN) ? "are thrown"
-            : u_locomotion("fall");
         You("%s off of %s!", verb, mon_nam(mtmp));
         if (!have_spot)
             have_spot = landing_spot(&cc, reason, 1);
@@ -588,19 +660,12 @@ dismount_steed(
             /* still no spot; last resort is any spot within bounds */
             (void) enexto(&steedcc, u.ux, u.uy, &mons[PM_GHOST]);
     }
-    if (!m_at(steedcc.x, steedcc.y)) {
-        if (mtmp->mhp < 1) /* make sure it isn't negative so that */
-            mtmp->mhp = 0; /* ++mhp produces a positive value     */
-        mtmp->mhp++; /* force at least one hit point, possibly resurrecting
-                      * to avoid impossible("placing defunct monst on map") */
-        place_monster(mtmp, steedcc.x, steedcc.y);
-        mtmp->mhp--; /* take the extra hit point away: cancel resurrection
-                      * if former steed has died */
-    } else {
-        impossible("Dismounting: can't place former steed on map.");
-    }
 
     if (!DEADMONSTER(mtmp)) {
+        gi.in_steed_dismounting++;
+        place_monster(mtmp, steedcc.x, steedcc.y);
+        gi.in_steed_dismounting--;
+
         /* if for bones, there's no reason to place the hero;
            we want to make room for potential ghost, so move steed */
         if (reason == DISMOUNT_BONES) {
@@ -608,7 +673,7 @@ dismount_steed(
             if (enexto(&cc, u.ux, u.uy, mtmp->data))
                 rloc_to(mtmp, cc.x, cc.y);
             else /* evidently no room nearby; move steed elsewhere */
-                (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
+                (void) rloc(mtmp, RLOC_ERR | RLOC_NOMSG);
             return;
         }
 
@@ -648,23 +713,22 @@ dismount_steed(
              *
              * Clearly this is not the best way to do it.  A full fix would
              * involve having these functions not call pickup() at all,
-             * instead
-             * calling them first and calling pickup() afterwards.  But it
-             * would take a lot of work to keep this change from having any
-             * unforeseen side effects (for instance, you would no longer be
-             * able to walk onto a square with a hole, and autopickup before
-             * falling into the hole).
+             * instead calling them first and calling pickup() afterwards.
+             * But it would take a lot of work to keep this change from
+             * having any unforeseen side effects (for instance, you would
+             * no longer be able to walk onto a square with a hole, and
+             * autopickup before falling into the hole).
              */
             /* [ALI] No need to move the player if the steed died. */
             if (!DEADMONSTER(mtmp)) {
                 /* Keep steed here, move the player to cc;
                  * teleds() clears u.utrap
                  */
-                g.in_steed_dismounting = TRUE;
+                gi.in_steed_dismounting = TRUE;
                 teleds(cc.x, cc.y, TELEDS_ALLOW_DRAG);
                 if (sobj_at(BOULDER, cc.x, cc.y))
                     sokoban_guilt();
-                g.in_steed_dismounting = FALSE;
+                gi.in_steed_dismounting = FALSE;
 
                 /* Put your steed in your trap */
                 if (save_utrap)
@@ -706,17 +770,17 @@ dismount_steed(
 
     /* usually return the hero to the surface */
     if (reason != DISMOUNT_ENGULFED && reason != DISMOUNT_BONES) {
-        g.in_steed_dismounting = TRUE;
+        gi.in_steed_dismounting = TRUE;
         (void) float_down(0L, W_SADDLE);
-        g.in_steed_dismounting = FALSE;
-        g.context.botl = TRUE;
+        gi.in_steed_dismounting = FALSE;
+        gc.context.botl = TRUE;
         (void) encumber_msg();
-        g.vision_full_recalc = 1;
+        gv.vision_full_recalc = 1;
     } else
-        g.context.botl = TRUE;
+        gc.context.botl = TRUE;
     /* polearms behave differently when not mounted */
     if (uwep && is_pole(uwep))
-        g.unweapon = TRUE;
+        gu.unweapon = TRUE;
     return;
 }
 
@@ -784,7 +848,7 @@ place_monster(struct monst* mon, int x, int y)
                    minimal_monnam(mon, TRUE), x, y, mon->mstate, buf);
         x = y = 0;
     }
-    if (mon == u.usteed
+    if ((mon == u.usteed && !gi.in_steed_dismounting)
         /* special case is for convoluted vault guard handling */
         || (DEADMONSTER(mon) && !(mon->isgd && x == 0 && y == 0))) {
         describe_level(buf, 0);
@@ -793,7 +857,7 @@ place_monster(struct monst* mon, int x, int y)
                    mon->mstate, buf);
         return;
     }
-    if ((othermon = g.level.monsters[x][y]) != 0) {
+    if ((othermon = gl.level.monsters[x][y]) != 0) {
         describe_level(buf, 0);
         monnm = minimal_monnam(mon, FALSE);
         othnm = (mon != othermon) ? minimal_monnam(othermon, TRUE) : "itself";
@@ -801,7 +865,7 @@ place_monster(struct monst* mon, int x, int y)
                    monnm, othnm, x, y, othermon->mstate, mon->mstate, buf);
     }
     mon->mx = x, mon->my = y;
-    g.level.monsters[x][y] = mon;
+    gl.level.monsters[x][y] = mon;
     mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
                      | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
 }

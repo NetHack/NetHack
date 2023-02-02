@@ -426,7 +426,8 @@ struct NewScreen NewHackScreen = { 0, 0, WIDTH, SCREENHEIGHT, 3, 0,
  * plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting pl_character.
- * Always called after init_nhwindows() and before display_gamewindows().
+ * Always called after init_nhwindows() and before
+ * init_sound_and_display_gamewindows().
  */
 void
 amii_askname()
@@ -437,10 +438,10 @@ amii_askname()
         amii_getlin("Who are you?", plnametmp);
     } while (strlen(plnametmp) == 0);
 
-    strncpy(g.plname, plnametmp, PL_NSIZ - 1); /* Avoid overflowing plname[] */
-    g.plname[PL_NSIZ - 1] = 0;
+    strncpy(gp.plname, plnametmp, PL_NSIZ - 1); /* Avoid overflowing plname[] */
+    gp.plname[PL_NSIZ - 1] = 0;
 
-    if (*g.plname == '\33') {
+    if (*gp.plname == '\33') {
         clearlocks();
         exit_nhwindows(NULL);
         nh_terminate(0);
@@ -474,9 +475,9 @@ amii_player_selection()
 #if 0 /* Don't query the user ... instead give random character -jhsa */
 
 #if 0 /* OBSOLETE */
-    if( *g.pl_character ){
-	g.pl_character[ 0 ] = toupper( g.pl_character[ 0 ] );
-	if( index( pl_classes, g.pl_character[ 0 ] ) )
+    if( *gp.pl_character ){
+	gp.pl_character[ 0 ] = toupper( gp.pl_character[ 0 ] );
+	if( strchr( pl_classes, gp.pl_character[ 0 ] ) )
 	    return;
     }
 #endif
@@ -528,21 +529,21 @@ amii_player_selection()
 	    switch( class )
 	    {
 	    case VANILLAKEY:
-		if( index( pl_classes, toupper( code ) ) )
+		if( strchr( pl_classes, toupper( code ) ) )
 		{
-		    g.pl_character[0] = toupper( code );
+		    gp.pl_character[0] = toupper( code );
 		    aredone = 1;
 		}
 		else if( code == ' ' || code == '\n' || code == '\r' )
 		{
 		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
-		    strcpy( g.pl_character, roles[ rnd( 11 ) ] );
+		    strcpy( gp.pl_character, roles[ rnd( 11 ) ] );
 #endif
 		    aredone = 1;
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );
-		    RandomWindow( g.pl_character );
+		    RandomWindow( gp.pl_character );
 		    return;
 		}
 		else if( code == 'q' || code == 'Q' )
@@ -562,15 +563,15 @@ amii_player_selection()
 		case 1: /* Random Character */
 		    flags.initrole = randrole(FALSE);
 #if 0 /* OBSOLETE */
-		    strcpy( g.pl_character, roles[ rnd( 11 ) ] );
+		    strcpy( gp.pl_character, roles[ rnd( 11 ) ] );
 #endif
 		    amii_clear_nhwindow( WIN_BASE );
 		    CloseShWindow( cwin );
-		    RandomWindow( g.pl_character );
+		    RandomWindow( gp.pl_character );
 		    return;
 
 		default:
-		    g.pl_character[0] = gd->GadgetID;
+		    gp.pl_character[0] = gd->GadgetID;
 		    break;
 		}
 		aredone = 1;
@@ -1016,10 +1017,10 @@ char def;
     if (resp) {
         char *rb, respbuf[QBUFSZ];
 
-        allow_num = (index(resp, '#') != 0);
+        allow_num = (strchr(resp, '#') != 0);
         Strcpy(respbuf, resp);
         /* any acceptable responses that follow <esc> aren't displayed */
-        if ((rb = index(respbuf, '\033')) != 0)
+        if ((rb = strchr(respbuf, '\033')) != 0)
             *rb = '\0';
         (void) strncpy(prompt, query, QBUFSZ - 1);
         prompt[QBUFSZ - 1] = '\0';
@@ -1062,18 +1063,18 @@ char def;
 #endif /*0*/
         digit_ok = allow_num && isdigit(q);
         if (q == '\033') {
-            if (index(resp, 'q'))
+            if (strchr(resp, 'q'))
                 q = 'q';
-            else if (index(resp, 'n'))
+            else if (strchr(resp, 'n'))
                 q = 'n';
             else
                 q = def;
             break;
-        } else if (index(quitchars, q)) {
+        } else if (strchr(quitchars, q)) {
             q = def;
             break;
         }
-        if (!index(resp, q) && !digit_ok) {
+        if (!strchr(resp, q) && !digit_ok) {
             amii_bell();
             q = (char) 0;
         } else if (q == '#' || digit_ok) {
@@ -1099,7 +1100,7 @@ char def;
                         break; /* overflow: try again */
                     digit_string[0] = z;
                     amii_addtopl(digit_string), n_len++;
-                } else if (z == 'y' || index(quitchars, z)) {
+                } else if (z == 'y' || strchr(quitchars, z)) {
                     if (z == '\033')
                         value = -1; /* abort */
                     z = '\n';       /* break */
@@ -1176,7 +1177,7 @@ boolean complain;
         cw->morestr = (char *) fn;
 
     while (dlb_fgets(buf, sizeof(buf), fp) != NULL) {
-        if (t = index(buf, '\n'))
+        if (t = strchr(buf, '\n'))
             *t = 0;
         amii_putstr(win, 0, buf);
     }
@@ -1362,9 +1363,9 @@ amii_player_selection()
             cursor_on(WIN_MESSAGE);
             pick4u = lowc(WindowGetchar());
             cursor_off(WIN_MESSAGE);
-            if (index(quitchars, pick4u))
+            if (strchr(quitchars, pick4u))
                 pick4u = 'y';
-        } while (!index(ynqchars, pick4u));
+        } while (!strchr(ynqchars, pick4u));
         pbuf[0] = pick4u;
         pbuf[1] = 0;
         amii_addtopl(pbuf);

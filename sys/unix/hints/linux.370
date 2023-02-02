@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.370 $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $
+# NetHack 3.7  linux.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -20,40 +20,6 @@
 #        multiw-1.370 contains sections 1 to 2
 #-INCLUDE multiw-1.370
 
-# 3. If you set WANT_WIN_QT, you need to
-#  A) set QTDIR either here or in the environment  to point to the Qt5
-#     Library installation root.
-#  B) set XPMLIB to point to the Xpm library
-ifndef WANT_WIN_QT
-ifdef WANT_WIN_ALL
-WANT_WIN_QT=1
-endif
-ifdef WANT_WIN_QT5
-ifndef WANT_WIN_QT
-WANT_WIN_QT=1
-endif   # not WANT_WIN_QT
-endif   # WANT_WIN_QT5
-ifdef WANT_WIN_QT6
-ifndef WANT_WIN_QT
-WANT_WIN_QT=1
-endif   # not WANT_WIN_QT
-endif   # WANT_WIN_QT6
-endif   # not WANT_WIN_QT
-
-ifdef WANT_WIN_QT
-ifndef WANT_WIN_QT5
-ifndef WANT_WIN_QT6
-WANT_WIN_QT5=1
-endif   # not WANT_WIN_QT6
-endif   # not WANT_WIN_QT5
-ifdef WANT_WIN_QT5
-QTDIR=/usr
-endif  # WANT_WIN_QT5
-ifdef WANT_WIN_QT6
-#if your Qt6 is elsewhere, change this to match
-QTDIR=/usr/local/qt6
-endif   # WANT_WIN_QT6
-endif  # WANT_WIN_QT
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -68,17 +34,6 @@ GAMEGRP  = games
 # you're reading this in Makefile augmented by hints, that may not be true).
 #
 
-ifeq "$(GIT)" "1"
-ifndef GITSUBMODULES
-GITSUBMODULES=1
-endif
-endif
-ifeq "$(git)" "1"
-ifndef GITSUBMODULES
-GITSUBMODULES=1
-endif
-endif
-
 #-INCLUDE multiw-2.370
 
 # compiler.370 contains compiler detection and adjustments common
@@ -86,15 +41,20 @@ endif
 
 #-INCLUDE compiler.370
 
-ifdef WANT_WIN_TTY
-USE_CURSESLIB=1
-endif
+ifdef WANT_WIN_QT
+ifdef WANT_WIN_QT5
+QTDIR=/usr
+endif  # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+#if your Qt6 is elsewhere, change this to match
+QTDIR=/usr/local/qt6
+endif   # WANT_WIN_QT6
+endif  # WANT_WIN_QT
 
-ifdef WANT_WIN_CURSES
-ifneq "$(USE_CURSESLIB)" "1"
-USE_CURSESLIB=1
-endif
-endif
+# multiw-3.370 must come after compiler.370
+# and after QTDIR is defined.
+#
+#-INCLUDE multiw-3.370
 
 ifeq "$(USE_CURSESLIB)" "1"
 # default
@@ -153,10 +113,20 @@ endif   #MAKEFILE_SRC
 endif   #HAVE_NCURSESW
 endif   #WANT_WIN_CURSES
 
-CFLAGS+= $(WINCFLAGS)	  #WINCFLAGS set from multiw-2.370
+#
+#-INCLUDE multisnd1-pre.370
+#
+
+# WINCFLAGS set from multiw-2.370
+# SNDCFLAGS set from multisnd-pre.370
+CFLAGS+= $(WINCFLAGS)
+CFLAGS+= $(SNDCFLAGS)
 CFLAGS+= $(NHCFLAGS)
 
-CCXXFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
+# WINCFLAGS set from multiw-2.370
+# SNDCFLAGS set from multisnd-pre.370
+CCXXFLAGS+= $(WINCFLAGS)
+CCXXFLAGS+= $(SNDCFLAGS)
 CCXXFLAGS+= $(NHCFLAGS)
 
 VARDATND =
@@ -194,6 +164,10 @@ endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
 LINK = $(CXX)
+ifdef WANT_WIN_QT4
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --cflags)) -DQT_NO_SOUND=1
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config QtGui --libs)
+endif    # WANT_WIN_QT4
 ifdef WANT_WIN_QT5
 QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --cflags))
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
@@ -252,7 +226,7 @@ LINK = $(CC)
 endif	# !WANT_WIN_QT
 
 # prevent duplicate tile.o in WINOBJ
-WINOBJ = $(sort $(WINOBJ0))
+WINOBJ = $(WINOBJ0) $(sort $(XTRAOBJ))
 # prevent duplicates in VARDATND if both X11 and Qt are being supported
 VARDATND += $(sort $(VARDATND0))
 
@@ -341,15 +315,19 @@ GAMEPERM = 0755
 #-INCLUDE gbdates-pre.370
 #
 
+#
+#-INCLUDE multisnd2-pre.370
+#
+
 #-POST
 
 #
 #-INCLUDE gbdates-post.370
 #
+#
+#-INCLUDE multisnd-post.370
+#
 
-#
-#-INCLUDE cross-post.370
-#
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
@@ -359,4 +337,8 @@ $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
+
 #
+#-INCLUDE cross-post.370
+#
+

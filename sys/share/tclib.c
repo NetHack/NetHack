@@ -1,5 +1,5 @@
 /* NetHack 3.7	tclib.c	$NHDT-Date: 1596498287 2020/08/03 23:44:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.10 $ */
-/* Copyright (c) Robert Patrick Rankin, 1995			  */
+/* Copyright (c) Robert Patrick Rankin, 1995                      */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* termcap library implementation */
@@ -102,10 +102,10 @@ tc_store(const char *trm, const char *ent)
     size_t n;
     int k;
 
-    if (!ent || !*ent || !trm || !*trm || (col = index(ent, ':')) == 0)
+    if (!ent || !*ent || !trm || !*trm || (col = strchr(ent, ':')) == 0)
         return 0;
     (void) strcpy(tc_entry, trm);
-    if (((bar = index(ent, '|')) != 0 && bar < col)
+    if (((bar = strchr(ent, '|')) != 0 && bar < col)
         || ((long) (n = strlen(trm)) == (long) (col - ent)
             && strncmp(ent, trm, n) == 0))
         (void) strcat(tc_entry, col);
@@ -171,7 +171,7 @@ tc_find(FILE *fp, const char *term, char *buffer, int bufsiz)
             *op++ = *ip, bufsiz -= 1;
         if (ip[0] == ':' && ip[1] == 't' && ip[2] == 'c' && ip[3] == '=') {
             tc_fetch = &ip[4];
-            if ((ip = index(tc_fetch, ':')) != 0)
+            if ((ip = strchr(tc_fetch, ':')) != 0)
                 *ip = '\0';
             break;
         }
@@ -197,11 +197,11 @@ tc_name(const char *nam, char *ent)
     char *nxt, *lst, *p = ent;
     size_t n = strlen(nam);
 
-    if ((lst = index(p, ':')) == 0)
+    if ((lst = strchr(p, ':')) == 0)
         lst = p + strlen(p);
 
     while (p < lst) {
-        if ((nxt = index(p, '|')) == 0 || nxt > lst)
+        if ((nxt = strchr(p, '|')) == 0 || nxt > lst)
             nxt = lst;
         if ((long) (nxt - p) == (long) n && strncmp(p, nam, n) == 0)
             return lst;
@@ -248,7 +248,7 @@ tgetstr(const char *which, char **outptr)
     if (!p || p[2] != '=')
         return (char *) 0;
     p += 3;
-    if ((q = index(p, ':')) == 0)
+    if ((q = strchr(p, ':')) == 0)
         q = p + strlen(p);
     r = result = *outptr;
     while (p < q) {
@@ -320,7 +320,7 @@ tc_field(const char *field, const char **tc_end)
 
     end = p + strlen(p);
     while (p < end) {
-        if ((p = index(p, ':')) == 0)
+        if ((p = strchr(p, ':')) == 0)
             break;
         ++p;
         if (p[0] == field[0] && p[1] == field[1]
@@ -329,7 +329,7 @@ tc_field(const char *field, const char **tc_end)
     }
     if (tc_end) {
         if (p) {
-            if ((q = index(p + 2, ':')) == 0)
+            if ((q = strchr(p + 2, ':')) == 0)
                 q = end;
         } else
             q = 0;
@@ -395,7 +395,7 @@ tparam(const char *ctl, /* parameter control string */
                        LF from becoming CR+LF, for instance; only
                        makes sense if this is a cursor positioning
                        sequence, but we have no way to check that */
-                    while (index("\004\t\n\013\f\r", *r)) {
+                    while (strchr("\004\t\n\013\f\r", *r)) {
                         if (ac & 1) { /* row */
                             if (!UP || !*UP)
                                 break; /* can't fix */

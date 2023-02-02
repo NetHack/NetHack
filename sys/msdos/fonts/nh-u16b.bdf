@@ -1,0 +1,68 @@
+STARTFONT 2.1
+FONTBOUNDINGBOX 8 16
+STARTPROPERTIES 3
+NOTICE "Additional characters to use with ter-u16b.bdf"
+COPYRIGHT "Copyright 2022 Ray Chason."
+NOTICE "NetHack may be freely redistributed.  See license for details."
+ENDPROPERTIES
+STARTCHAR tripletilde
+ENCODING 8779
+BITMAP
+00
+00
+00
+00
+32
+4C
+00
+32
+4C
+00
+32
+4C
+00
+00
+00
+00
+ENDCHAR
+STARTCHAR uppereighth
+ENCODING 9620
+BITMAP
+FF
+FF
+00
+00
+00
+00
+00
+00
+00
+00
+00
+00
+00
+00
+00
+00
+ENDCHAR
+STARTCHAR righteighth
+ENCODING 9621
+BITMAP
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+01
+ENDCHAR
+ENDFONT

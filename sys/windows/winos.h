@@ -12,8 +12,8 @@ extern const WCHAR cp437[256];
 WCHAR *
 winos_ascii_to_wide_str(const unsigned char * src, WCHAR * dst, size_t dstLength);
 
-WCHAR
-winos_ascii_to_wide(const unsigned char c);
+void
+winos_ascii_to_wide(WCHAR dst[3], UINT32 c);
 
 BOOL winos_font_support_cp437(HFONT hFont);
 

@@ -78,6 +78,9 @@ endif
 WINCFLAGS=
 WINSRC =
 WINOBJ0 =
+SND_CFLAGS=
+XTRASRC =
+XTRAOBJ =
 
 ifdef WANT_WIN_TTY
 WINSRC += $(WINTTYSRC)
@@ -96,12 +99,92 @@ ifdef WANT_WIN_X11
 WINCFLAGS += -DX11_GRAPHICS
 WINSRC += $(WIINX11SRC)
 WINOBJ0 += $(WINX11OBJ)
+XTRASRC += tile.c
+XTRAOBJ += $(TARGETPFX)tile.o
 endif
+
+ifndef WANT_WIN_QT
+ifdef WANT_WIN_ALL
+WANT_WIN_QT=1
+endif
+ifdef WANT_WIN_QT4
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT4
+ifdef WANT_WIN_QT5
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT5
+ifdef WANT_WIN_QT6
+ifndef WANT_WIN_QT
+WANT_WIN_QT=1
+endif   # not WANT_WIN_QT
+endif   # WANT_WIN_QT6
+endif   # not def WANT_WIN_QT
+
+ifdef WANT_WIN_QT
+# WANT_WIN_QT5 is the default
+ifndef WANT_WIN_QT4
+ifndef WANT_WIN_QT5
+ifndef WANT_WIN_QT6
+WANT_WIN_QT5=1
+endif   # not WANT_WIN_QT6
+endif   # not WANT_WIN_QT5
+endif   # not WANT_WIN_QT4
+ifdef WANT_WIN_QT4
+#Slackware 14.2 puts Qt4 here
+#if your Qt4 is elsewhere, change this to match
+QT4DIR=/usr/lib64/qt
+QTDIR=$(QT4DIR)
+endif  # WANT_WIN_QT4
+endif   # WANT_WIN_QT
 
 ifdef WANT_WIN_QT
 WINCFLAGS += -DQT_GRAPHICS
 WINSRC += $(WINQTSRC)
 WINOBJ0 += $(WINQTOBJ)
+SNDCFLAGS += -DSND_LIB_QTSOUND
+HAVE_SNDLIB = 1
+NEEDS_SND_USERSOUNDS = 1
+NEEDS_SND_SEAUTOMAP = 1
+XTRASRC += tile.c
+XTRAOBJ += $(TARGETPFX)tile.o
+#
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif   # CPLUSPLUS_NEEDED
+ifdef WANT_WIN_QT6
+CPLUSPLUS_NEED17 = 1
+CPLUSPLUS_NEED_DEPSUPPRESS = 1
+endif   # WANT_WIN_QT6
+endif   # WANT_WIN_QT
+
+ifeq "$(GIT)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(git)" "1"
+ifndef GITSUBMODULES
+GITSUBMODULES=1
+endif
+endif
+
+ifeq "$(CPPREGEX)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
+endif
+
+ifeq "$(cppregex)" "1"
+REGEXOBJ=$(TARGETPFX)cppregex.o
+ifndef CPLUSPLUS_NEEDED
+CPLUSPLUS_NEEDED = 1
+endif
 endif
 
 #end of hints/include/multiw-2.370

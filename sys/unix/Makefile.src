@@ -91,7 +91,7 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #
 #
 # if you're debugging and want gcc to check as much as possible, use:
-# CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings -DGCC_WARN
+# CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings
 
 # flags may have to be changed as required
 # flags for 286 Xenix:
@@ -202,14 +202,17 @@ TARGET_LIBS = $(LIBS)
 CPPFLAGS =
 
 # file for regular expression matching
-REGEXOBJ = $(TARGETPFX)posixregex.o
+REGEXOBJ ?= $(TARGETPFX)posixregex.o
 #REGEXOBJ = $(TARGETPFX)pmatchregex.o
 #REGEXOBJ = $(TARGETPFX)cppregex.o
 
 # Set the WINSRC, WINOBJ, and WINLIB lines to correspond to your desired
-# combination of windowing systems.  Also set windowing systems in config.h.
-# Note that if you are including multiple tiled window systems, you don't
-# want two copies of tile.o, so comment out all but the first.
+# combination of windowing systems.  Also set matching USE_x_GRAPHICS in
+# config.h.  Note that if you are building for any window system which
+# uses tiles, uncomment '#$(TARGETPFX)tile.o' (by removing the '#') in that
+# system's WINxOBJ (WINX11OBJ or WINQTOBJ or WINQT3OBJ).  If you are building
+# nethack with support for multiple window systems, only uncomment that for
+# one of them to avoid duplicate tile.o.
 #
 # files for a straight tty port using no native windowing system
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
@@ -236,14 +239,14 @@ WINX11SRC = ../win/X11/Window.c ../win/X11/dialogs.c ../win/X11/winX.c \
 WINX11OBJ = $(TARGETPFX)Window.o $(TARGETPFX)dialogs.o $(TARGETPFX)winX.o \
 	$(TARGETPFX)winmap.o $(TARGETPFX)winmenu.o $(TARGETPFX)winmesg.o \
 	$(TARGETPFX)winmisc.o $(TARGETPFX)winstat.o $(TARGETPFX)wintext.o \
-	$(TARGETPFX)winval.o $(TARGETPFX)tile.o
+	$(TARGETPFX)winval.o #$(TARGETPFX)tile.o
 #
 # Files for a Qt 3 interface (renamed since nethack 3.6.x)
 #
 #WINQT3SRC = ../win/Qt3/qt3_win.cpp ../win/Qt3/qt3_clust.cpp \
 #	../win/Qt3/qt3tableview.cpp
 #WINQT3OBJ = $(TARGETPFX)qt3_win.o $(TARGETPFX)qt3_clust.o \
-	$(TARGETPFX)qt3tableview.o $(TARGETPFX)tile.o
+#	$(TARGETPFX)qt3tableview.o #$(TARGETPFX)tile.o
 # empty values for 'make depend'
 WINQT3SRC =
 WINQT3OBJ =
@@ -263,7 +266,7 @@ WINQTSRC = ../win/Qt/qt_bind.cpp ../win/Qt/qt_click.cpp \
 	../win/Qt/qt_plsel.cpp ../win/Qt/qt_rip.cpp ../win/Qt/qt_set.cpp \
 	../win/Qt/qt_stat.cpp ../win/Qt/qt_str.cpp ../win/Qt/qt_streq.cpp \
 	../win/Qt/qt_svsel.cpp ../win/Qt/qt_win.cpp ../win/Qt/qt_xcmd.cpp \
-	../win/Qt/qt_yndlg.cpp $(WINQTMOC)
+	../win/Qt/qt_yndlg.cpp $(WINQTMOC) tile.c
 WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_clust.o $(TARGETPFX)qt_delay.o \
 	$(TARGETPFX)qt_glyph.o $(TARGETPFX)qt_icon.o \
@@ -272,7 +275,7 @@ WINQTOBJ = $(TARGETPFX)qt_bind.o $(TARGETPFX)qt_click.o \
 	$(TARGETPFX)qt_msg.o $(TARGETPFX)qt_plsel.o $(TARGETPFX)qt_rip.o \
 	$(TARGETPFX)qt_set.o $(TARGETPFX)qt_stat.o $(TARGETPFX)qt_str.o \
 	$(TARGETPFX)qt_streq.o $(TARGETPFX)qt_svsel.o $(TARGETPFX)qt_win.o \
-	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o $(TARGETPFX)tile.o
+	$(TARGETPFX)qt_xcmd.o $(TARGETPFX)qt_yndlg.o #$(TARGETPFX)tile.o
 
 # Files for Shim windowing interface for libnh -- doesn't do anything,
 # just passes along the API calls to the library
@@ -536,9 +539,9 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sys.h system.h tcap.h timeout.h tradstdc.h trap.h unixconf.h \
-	vision.h vmsconf.h wintty.h wincurs.h winX.h winprocs.h wintype.h \
-	you.h youprop.h
+	spell.h sndprocs.h sys.h system.h tcap.h timeout.h tradstdc.h \
+	trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h winX.h \
+	winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 
@@ -588,7 +591,7 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)were.o $(TARGETPFX)wield.o $(TARGETPFX)windows.o \
 	$(TARGETPFX)wizard.o $(TARGETPFX)worm.o $(TARGETPFX)worn.o \
 	$(TARGETPFX)write.o $(TARGETPFX)zap.o \
-	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) \
+	$(REGEXOBJ) $(RANDOBJ) $(SYSOBJ) $(WINOBJ) $(HINTOBJ) $(SNDLIBOBJ) \
 	$(TARGETPFX)version.o
 #
 DATE_O = $(TARGETPFX)date.o
@@ -602,7 +605,7 @@ all:	$(GAME)
 pregame:
 	$(PREGAME)
 
-$(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(SYSTEM)
+$(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 	@echo "$(GAME) is up to date."
 
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
@@ -808,7 +811,7 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/obj.h ../include/engrave.h ../include/you.h \
 		../include/attrib.h ../include/monst.h ../include/mextra.h \
 		../include/skills.h ../include/timeout.h ../include/flag.h \
-		../include/winprocs.h ../include/sys.h
+		../include/winprocs.h ../include/sndprocs.h ../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -903,6 +906,7 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ tile.c
 $(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
@@ -1187,7 +1191,7 @@ $(TARGETPFX)vision.o: vision.c $(HACK_H)
 $(TARGETPFX)weapon.o: weapon.c $(HACK_H)
 $(TARGETPFX)were.o: were.c $(HACK_H)
 $(TARGETPFX)wield.o: wield.c $(HACK_H)
-$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/wintty.h
+$(TARGETPFX)windows.o: windows.c $(HACK_H) ../include/dlb.h ../include/wintty.h
 $(TARGETPFX)wizard.o: wizard.c $(HACK_H)
 $(TARGETPFX)worm.o: worm.c $(HACK_H)
 $(TARGETPFX)worn.o: worn.c $(HACK_H)

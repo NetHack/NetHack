@@ -6,6 +6,7 @@
 ifdef CROSS_TO_MSDOS
 #
 $(TARGETPFX)msdos.o : ../sys/msdos/msdos.c $(HACK_H)
+$(TARGETPFX)font.o : ../sys/msdos/font.c ../sys/msdos/font.h $(HACK_H)
 $(TARGETPFX)pckeys.o : ../sys/msdos/pckeys.c $(HACK_H)
 $(TARGETPFX)pctiles.o : ../sys/msdos/pctiles.c ../sys/msdos/portio.h $(HACK_H)
 $(TARGETPFX)video.o : ../sys/msdos/video.c ../sys/msdos/portio.h $(HACK_H)
@@ -14,7 +15,7 @@ $(TARGETPFX)vidtxt.o : ../sys/msdos/vidtxt.c ../sys/msdos/portio.h \
 $(TARGETPFX)vidvga.o : ../sys/msdos/vidvga.c ../sys/msdos/portio.h \
 		../win/share/tile.h ../include/tileset.h $(HACK_H)
 $(TARGETPFX)vidvesa.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
-		../win/share/tile.h ../include/tileset.h $(HACK_H)
+		../win/share/tile.h ../include/tileset.h ../sys/msdos/font.h $(HACK_H)
 $(TARGETPFX)vidstub.o : ../sys/msdos/vidvesa.c ../sys/msdos/portio.h \
 		$(HACK_H)
 $(TARGETPFX)tile.o : tile.c
@@ -24,9 +25,26 @@ $(TARGETPFX)exceptn.o : ../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S
 $(GAMEBIN) : $(HOBJ) $(LUACROSSLIB)
 	$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
 	$(HOBJ) $(WINLIB) $(TARGET_LIBS)
+$(DOSFONT)/ter-u16b.psf: $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16b.bdf $(DOSFONT)/nh-u16b.bdf $@
+$(DOSFONT)/ter-u16v.psf: $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u16v.bdf $(DOSFONT)/nh-u16v.bdf $@
+$(DOSFONT)/ter-u18b.psf: $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u18b.bdf $(DOSFONT)/nh-u18b.bdf $@
+$(DOSFONT)/ter-u20b.psf: $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u20b.bdf $(DOSFONT)/nh-u20b.bdf $@
+$(DOSFONT)/ter-u22b.psf: $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u22b.bdf $(DOSFONT)/nh-u22b.bdf $@
+$(DOSFONT)/ter-u24b.psf: $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u24b.bdf $(DOSFONT)/nh-u24b.bdf $@
+$(DOSFONT)/ter-u28b.psf: $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u28b.bdf $(DOSFONT)/nh-u28b.bdf $@
+$(DOSFONT)/ter-u32b.psf: $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $(DOSFONT)/makefont.lua $(LUABIN)
+	$(LUABIN) $(DOSFONT)/makefont.lua $(FONTTOP)/ter-u32b.bdf $(DOSFONT)/nh-u32b.bdf $@
 #
-.PHONY: dospkg
-dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
+.PHONY: dodata dospkg dosfonts
+dosfonts: $(FONTTARGETS)
+dospkg: dodata dosfonts $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	$(TARGET_STUBEDIT) $(GAMEBIN) minstack=2048K
 	mkdir -p $(TARGETPFX)pkg
 	cp $(GAMEBIN) $(TARGETPFX)pkg/NETHACK.EXE
@@ -38,10 +56,24 @@ dospkg: $(GAMEBIN) $(TARGETPFX)recover.exe ../dat/nhtiles.bmp
 	cp ../sys/share/NetHack.cnf $(TARGETPFX)pkg/NETHACK.CNF
 	cp ../sys/msdos/sysconf $(TARGETPFX)pkg/SYSCONF
 	cp ../doc/nethack.txt $(TARGETPFX)pkg/NETHACK.TXT
+	cp $(DOSFONT)/ter-u16b.psf $(TARGETPFX)pkg/TER-U16B.PSF
+	cp $(DOSFONT)/ter-u16v.psf $(TARGETPFX)pkg/TER-U16V.PSF
+	cp $(DOSFONT)/ter-u18b.psf $(TARGETPFX)pkg/TER-U18B.PSF
+	cp $(DOSFONT)/ter-u20b.psf $(TARGETPFX)pkg/TER-U20B.PSF
+	cp $(DOSFONT)/ter-u22b.psf $(TARGETPFX)pkg/TER-U22B.PSF
+	cp $(DOSFONT)/ter-u24b.psf $(TARGETPFX)pkg/TER-U24B.PSF
+	cp $(DOSFONT)/ter-u28b.psf $(TARGETPFX)pkg/TER-U28B.PSF
+	cp $(DOSFONT)/ter-u32b.psf $(TARGETPFX)pkg/TER-U32B.PSF
 	cp  ../lib/djgpp/cwsdpmi/bin/CWSDPMI.EXE $(TARGETPFX)pkg/CWSDPMI.EXE
 	-touch $(TARGETPFX)pkg/RECORD
 	cd $(TARGETPFX)pkg ; zip -9 ../NH370DOS.ZIP * ; cd ../../..
 	@echo msdos package zip file $(TARGETPFX)NH370DOS.ZIP
+
+$(LUABIN):
+	( cd .. && make luabin && cd src)
+dodata:
+	( cd .. && make dlb && cd src)
+
 endif  # CROSS_TO_MSDOS
 
 ifdef CROSS_TO_WASM
@@ -180,13 +212,13 @@ $(TARGETPFX)touch.o : $(PDCTOP)/pdcurses/touch.c
 $(TARGETPFX)util.o : $(PDCTOP)/pdcurses/util.c
 $(TARGETPFX)window.o : $(PDCTOP)/pdcurses/window.c
 $(TARGETPFX)debug.o : $(PDCTOP)/pdcurses/debug.c
-$(TARGETPFX)pdcclip.o : $(PDCTOP)/dos/pdcclip.c
-$(TARGETPFX)pdcdisp.o : $(PDCTOP)/dos/pdcdisp.c
-$(TARGETPFX)pdcgetsc.o : $(PDCTOP)/dos/pdcgetsc.c
-$(TARGETPFX)pdckbd.o : $(PDCTOP)/dos/pdckbd.c
-$(TARGETPFX)pdcscrn.o : $(PDCTOP)/dos/pdcscrn.c
-$(TARGETPFX)pdcsetsc.o : $(PDCTOP)/dos/pdcsetsc.c
-$(TARGETPFX)pdcutil.o : $(PDCTOP)/dos/pdcutil.c
+$(TARGETPFX)pdcclip.o : $(PDCPORT)/pdcclip.c
+$(TARGETPFX)pdcdisp.o : $(PDCPORT)/pdcdisp.c
+$(TARGETPFX)pdcgetsc.o : $(PDCPORT)/pdcgetsc.c
+$(TARGETPFX)pdckbd.o : $(PDCPORT)/pdckbd.c
+$(TARGETPFX)pdcscrn.o : $(PDCPORT)/pdcscrn.c
+$(TARGETPFX)pdcsetsc.o : $(PDCPORT)/pdcsetsc.c
+$(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
 endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section

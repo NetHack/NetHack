@@ -32,11 +32,10 @@ static void weapon_insight(int);
 static void attributes_enlightenment(int, int);
 static void show_achievements(int);
 static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
-static int set_vanq_order(void);
 static int num_extinct(void);
 
-extern const char *hu_stat[];  /* hunger status from eat.c */
-extern const char *enc_stat[]; /* encumbrance status from botl.c */
+extern const char *const hu_stat[];  /* hunger status from eat.c */
+extern const char *const enc_stat[]; /* encumbrance status from botl.c */
 
 static const char You_[] = "You ", are[] = "are ", were[] = "were ",
                   have[] = "have ", had[] = "had ", can[] = "can ",
@@ -115,14 +114,14 @@ enlght_out(const char *buf)
 {
     int clr = 0;
 
-    if (g.en_via_menu) {
+    if (ge.en_via_menu) {
         anything any;
 
         any = cg.zeroany;
-        add_menu(g.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
+        add_menu(ge.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
                  MENU_ITEMFLAGS_NONE);
     } else
-        putstr(g.en_win, 0, buf);
+        putstr(ge.en_win, 0, buf);
 }
 
 static void
@@ -248,7 +247,7 @@ cause_known(
 
     /* simpler than from_what()/what_gives(); we don't attempt to
        handle artifacts and we deliberately ignore wielded items */
-    for (o = g.invent; o; o = o->nobj) {
+    for (o = gi.invent; o; o = o->nobj) {
         if (!(o->owornmask & mask))
             continue;
         if ((int) objects[o->otyp].oc_oprop == propindx
@@ -260,14 +259,16 @@ cause_known(
 
 /* format a characteristic value, accommodating Strength's strangeness */
 static char *
-attrval(int attrindx, int attrvalue,
-        char resultbuf[]) /* should be at least [7] to hold "18/100\0" */
+attrval(
+    int attrindx,
+    int attrvalue,
+    char resultbuf[]) /* should be at least [7] to hold "18/100\0" */
 {
     if (attrindx != A_STR || attrvalue <= 18)
         Sprintf(resultbuf, "%d", attrvalue);
     else if (attrvalue > STR18(100)) /* 19 to 25 */
         Sprintf(resultbuf, "%d", attrvalue - 100);
-    else /* simplify "18/ **" to be "18/100" */
+    else /* simplify "18/\**" to be "18/100" */
         Sprintf(resultbuf, "18/%02d", attrvalue - 18);
     return resultbuf;
 }
@@ -338,19 +339,19 @@ enlightenment(
 {
     char buf[BUFSZ], tmpbuf[BUFSZ];
 
-    g.en_win = create_nhwindow(NHW_MENU);
-    g.en_via_menu = !final;
-    if (g.en_via_menu)
-        start_menu(g.en_win, MENU_BEHAVE_STANDARD);
+    ge.en_win = create_nhwindow(NHW_MENU);
+    ge.en_via_menu = !final;
+    if (ge.en_via_menu)
+        start_menu(ge.en_win, MENU_BEHAVE_STANDARD);
 
-    Strcpy(tmpbuf, g.plname);
+    Strcpy(tmpbuf, gp.plname);
     *tmpbuf = highc(*tmpbuf); /* same adjustment as bottom line */
     /* as in background_enlightenment, when poly'd we need to use the saved
        gender in u.mfemale rather than the current you-as-monster gender */
     Snprintf(buf, sizeof(buf), "%s the %s's attributes:", tmpbuf,
-             ((Upolyd ? u.mfemale : flags.female) && g.urole.name.f)
-                ? g.urole.name.f
-                : g.urole.name.m);
+             ((Upolyd ? u.mfemale : flags.female) && gu.urole.name.f)
+                ? gu.urole.name.f
+                : gu.urole.name.m);
 
     /* title */
     enlght_out(buf); /* "Conan the Archeologist's attributes:" */
@@ -396,18 +397,18 @@ enlightenment(
     (void) fmt_elapsed_time(buf, final);
     enl_msg("Total elapsed playing time ", "is", "was", buf, "");
 
-    if (!g.en_via_menu) {
-        display_nhwindow(g.en_win, TRUE);
+    if (!ge.en_via_menu) {
+        display_nhwindow(ge.en_win, TRUE);
     } else {
         menu_item *selected = 0;
 
-        end_menu(g.en_win, (char *) 0);
-        if (select_menu(g.en_win, PICK_NONE, &selected) > 0)
+        end_menu(ge.en_win, (char *) 0);
+        if (select_menu(ge.en_win, PICK_NONE, &selected) > 0)
             free((genericptr_t) selected);
-        g.en_via_menu = FALSE;
+        ge.en_via_menu = FALSE;
     }
-    destroy_nhwindow(g.en_win);
-    g.en_win = WIN_ERR;
+    destroy_nhwindow(ge.en_win);
+    ge.en_win = WIN_ERR;
 }
 
 /*ARGSUSED*/
@@ -422,8 +423,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
     /* note that if poly'd, we need to use u.mfemale instead of flags.female
        to access hero's saved gender-as-human/elf/&c rather than current */
     innategend = (Upolyd ? u.mfemale : flags.female) ? 1 : 0;
-    role_titl = (innategend && g.urole.name.f) ? g.urole.name.f
-                                               : g.urole.name.m;
+    role_titl = (innategend && gu.urole.name.f) ? gu.urole.name.f
+                                               : gu.urole.name.m;
     rank_titl = rank_of(u.ulevel, Role_switch, innategend);
 
     enlght_out(""); /* separator after title */
@@ -437,8 +438,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
        the player to know he's not a samurai at the moment... */
     if (Upolyd) {
         char anbuf[20]; /* includes trailing space; [4] suffices */
-        struct permonst *uasmon = g.youmonst.data;
-        boolean altphrasing = vampshifted(&g.youmonst);
+        struct permonst *uasmon = gy.youmonst.data;
+        boolean altphrasing = vampshifted(&gy.youmonst);
 
         tmpbuf[0] = '\0';
         /* here we always use current gender, not saved role gender */
@@ -446,7 +447,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
             Sprintf(tmpbuf, "%s ", genders[flags.female ? 1 : 0].adj);
         if (altphrasing)
             Sprintf(eos(tmpbuf), "%s in ",
-                    pmname(&mons[g.youmonst.cham],
+                    pmname(&mons[gy.youmonst.cham],
                            flags.female ? FEMALE : MALE));
         Snprintf(buf, sizeof(buf), "%s%s%s%s form",
                  !final ? "currently " : "",
@@ -457,8 +458,8 @@ background_enlightenment(int unused_mode UNUSED, int final)
 
     /* report role; omit gender if it's redundant (eg, "female priestess") */
     tmpbuf[0] = '\0';
-    if (!g.urole.name.f
-        && ((g.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
+    if (!gu.urole.name.f
+        && ((gu.urole.allow & ROLE_GENDMASK) == (ROLE_MALE | ROLE_FEMALE)
             || innategend != flags.initgend))
         Sprintf(tmpbuf, "%s ", genders[innategend].adj);
     buf[0] = '\0';
@@ -467,10 +468,10 @@ background_enlightenment(int unused_mode UNUSED, int final)
     if (!strcmpi(rank_titl, role_titl)) {
         /* omit role when rank title matches it */
         Sprintf(eos(buf), "%s, level %d %s%s", an(rank_titl), u.ulevel,
-                tmpbuf, g.urace.noun);
+                tmpbuf, gu.urace.noun);
     } else {
         Sprintf(eos(buf), "%s, a level %d %s%s %s", an(rank_titl), u.ulevel,
-                tmpbuf, g.urace.adj, role_titl);
+                tmpbuf, gu.urace.adj, role_titl);
     }
     you_are(buf, "");
 
@@ -492,7 +493,7 @@ background_enlightenment(int unused_mode UNUSED, int final)
                      way sooner (in other words, didn't start that way) */
                   ? (!final ? "now " : "belatedly ")
                   /* atheist (ignored in very early game) */
-                  : (!u.uconduct.gnostic && g.moves > 1000L)
+                  : (!u.uconduct.gnostic && gm.moves > 1000L)
                      ? "nominally "
                      /* lastly, normal case */
                      : "",
@@ -550,13 +551,13 @@ background_enlightenment(int unused_mode UNUSED, int final)
                  !strncmp(tmpbuf, "Plane", 5) ? "Elemental " : "", tmpbuf);
     } else if (Is_knox(&u.uz)) {
         /* this gives away the fact that the knox branch is only 1 level */
-        Sprintf(buf, "on the %s level", g.dungeons[u.uz.dnum].dname);
+        Sprintf(buf, "on the %s level", gd.dungeons[u.uz.dnum].dname);
         /* TODO? maybe phrase it differently when actually inside the fort,
            if we're able to determine that (not trivial) */
     } else {
         char dgnbuf[QBUFSZ];
 
-        Strcpy(dgnbuf, g.dungeons[u.uz.dnum].dname);
+        Strcpy(dgnbuf, gd.dungeons[u.uz.dnum].dname);
         if (!strncmpi(dgnbuf, "The ", 4))
             *dgnbuf = lowc(*dgnbuf);
         Sprintf(tmpbuf, "level %d",
@@ -572,11 +573,11 @@ background_enlightenment(int unused_mode UNUSED, int final)
     you_are(buf, "");
 
     /* this is shown even if the 'time' option is off */
-    if (g.moves == 1L) {
+    if (gm.moves == 1L) {
         you_have("just started your adventure", "");
     } else {
         /* 'turns' grates on the nerves in this context... */
-        Sprintf(buf, "the dungeon %ld turn%s ago", g.moves, plur(g.moves));
+        Sprintf(buf, "the dungeon %ld turn%s ago", gm.moves, plur(gm.moves));
         /* same phrasing for current and final: "entered" is unconditional */
         enlght_line(You_, "entered ", buf, "");
     }
@@ -716,17 +717,28 @@ basics_enlightenment(int mode UNUSED, int final)
                 (u.uac < 0) ? "best" : "worst");
     enl_msg("Your armor class ", "is ", "was ", buf, "");
 
-    /* gold; similar to doprgold(#seegold) but without shop billing info;
-       same amount as shown on status line which ignores container contents */
+    /* gold; similar to doprgold (#showgold) but without shop billing info;
+       includes container contents, unlike status line but like doprgold */
     {
-        static const char Your_wallet[] = "Your wallet ";
-        long umoney = money_cnt(g.invent);
+        long umoney = money_cnt(gi.invent), hmoney = hidden_gold(final);
 
         if (!umoney) {
-            enl_msg(Your_wallet, "is ", "was ", "empty", "");
+            Sprintf(buf, " Your wallet %s empty", !final ? "is" : "was");
         } else {
-            Sprintf(buf, "%ld %s", umoney, currency(umoney));
-            enl_msg(Your_wallet, "contains ", "contained ", buf, "");
+            Sprintf(buf, " Your wallet contain%s %ld %s", !final ? "s" : "ed",
+                    umoney, currency(umoney));
+        }
+        /* terminate the wallet line if appropriate, otherwise add an
+           introduction to subsequent continuation; output now either way */
+        Strcat(buf, !hmoney ? "." : !umoney ? ", but" : ", and");
+        enlght_out(buf);
+
+        /* put contained gold on its own line to avoid excessive width; it's
+           phrased as a continuation of the wallet line so not capitalized */
+        if (hmoney) {
+            Sprintf(buf, "%ld %s stashed away in your pack",
+                    hmoney, umoney ? "more" : currency(hmoney));
+            enl_msg("you ", "have ", "had ", buf, "");
         }
     }
 
@@ -743,7 +755,7 @@ basics_enlightenment(int mode UNUSED, int final)
                     *ocl ? ocl : "all types", *ocl ? "'" : "");
             if (flags.pickup_thrown && *ocl)
                 Strcat(buf, " plus thrown"); /* show when not 'all types' */
-            if (g.apelist)
+            if (ga.apelist)
                 Strcat(buf, ", with exceptions");
         }
     } else
@@ -758,7 +770,7 @@ characteristics_enlightenment(int mode, int final)
     char buf[BUFSZ];
 
     enlght_out("");
-    Sprintf(buf, "%s Characteristics:", !final ? "Current" : "Final");
+    Sprintf(buf, "%sCharacteristics:", !final ? "" : "Final ");
     enlght_out(buf);
 
     /* bottom line order */
@@ -875,7 +887,7 @@ status_enlightenment(int mode, int final)
                       /* if hero dies while dismounting, u.usteed will still
                          be set; we want to ignore steed in that situation */
                       && !(final == ENL_GAMEOVERDEAD
-                           && !strcmp(g.killer.name, "riding accident")));
+                           && !strcmp(gk.killer.name, "riding accident")));
     const char *steedname = (!Riding ? (char *) 0
                       : x_monnam(u.usteed,
                                  u.usteed->mtame ? ARTICLE_YOUR : ARTICLE_THE,
@@ -888,7 +900,7 @@ status_enlightenment(int mode, int final)
      *     should be discernible to the hero hence to the player)
     \*/
     enlght_out(""); /* separator after title or characteristics */
-    enlght_out(final ? "Final Status:" : "Current Status:");
+    enlght_out(final ? "Final Status:" : "Status:");
 
     Strcpy(youtoo, You_);
     /* not a traditional status but inherently obvious to player; more
@@ -989,16 +1001,16 @@ status_enlightenment(int mode, int final)
         /* from_what() (currently wizard-mode only) checks !haseyes()
            before u.uroleplay.blind, so we should too */
         Sprintf(buf, "%s blind",
-                !haseyes(g.youmonst.data) ? "innately"
+                !haseyes(gy.youmonst.data) ? "innately"
                 : u.uroleplay.blind ? "permanently"
                   /* better phrasing desperately wanted... */
                   : Blindfolded_only ? "deliberately"
                     : "temporarily");
         if (wizard && (Blinded & TIMEOUT) != 0L
-            && !u.uroleplay.blind && haseyes(g.youmonst.data))
+            && !u.uroleplay.blind && haseyes(gy.youmonst.data))
             Sprintf(eos(buf), " (%ld)", (Blinded & TIMEOUT));
         /* !haseyes: avoid "you are innately blind innately" */
-        you_are(buf, !haseyes(g.youmonst.data) ? "" : from_what(BLINDED));
+        you_are(buf, !haseyes(gy.youmonst.data) ? "" : from_what(BLINDED));
     }
     if (Deaf)
         you_are("deaf", from_what(DEAF));
@@ -1051,7 +1063,7 @@ status_enlightenment(int mode, int final)
             Sprintf(eos(buf), " (%u)", u.uswldtim);
         you_are(buf, "");
     } else if (u.ustuck) {
-        boolean ustick = (Upolyd && sticks(g.youmonst.data));
+        boolean ustick = (Upolyd && sticks(gy.youmonst.data));
         int dx = u.ustuck->mx - u.ux, dy = u.ustuck->my - u.uy;
 
         Snprintf(buf, sizeof buf, "%s %s (%s)",
@@ -1179,7 +1191,7 @@ status_enlightenment(int mode, int final)
     /* unlike ring of increase accuracy's effect, the monk's suit penalty
        is too blatant to be restricted to magical enlightenment */
     if (iflags.tux_penalty && !Upolyd) {
-        (void) enlght_combatinc("to hit", -g.urole.spelarmr, final, buf);
+        (void) enlght_combatinc("to hit", -gu.urole.spelarmr, final, buf);
         /* if from_what() ever gets extended from wizard mode to normal
            play, it could be adapted to handle this */
         Sprintf(eos(buf), " due to your %s", suit_simple_name(uarm));
@@ -1406,7 +1418,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
      *  Attributes
     \*/
     enlght_out("");
-    enlght_out(final ? "Final Attributes:" : "Current Attributes:");
+    enlght_out(final ? "Final Attributes:" : "Attributes:");
 
     if (u.uevent.uhand_of_elbereth) {
         static const char *const hofe_titles[3] = { "the Hand of Elbereth",
@@ -1444,7 +1456,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
     if (Sleep_resistance)
         you_are("sleep resistant", from_what(SLEEP_RES));
     if (Disint_resistance)
-        you_are("disintegration-resistant", from_what(DISINT_RES));
+        you_are("disintegration resistant", from_what(DISINT_RES));
     if (u_adtyp_resistance_obj(AD_DISN))
         enl_msg("Your items ", "are", "were",
                 " protected from disintegration", item_what(AD_DISN));
@@ -1481,7 +1493,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         you_can("recognize detrimental food", "");
 
     /*** Vision and senses ***/
-    if (!Blind && (Blinded || !haseyes(g.youmonst.data)))
+    if (!Blind && (Blinded || !haseyes(gy.youmonst.data)))
         you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
     if (See_invisible) {
         if (!Blind)
@@ -1494,32 +1506,32 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         you_are("telepathic", from_what(TELEPAT));
     if (Warning)
         you_are("warned", from_what(WARNING));
-    if (Warn_of_mon && g.context.warntype.obj) {
+    if (Warn_of_mon && gc.context.warntype.obj) {
         Sprintf(buf, "aware of the presence of %s",
-                (g.context.warntype.obj & M2_ORC) ? "orcs"
-                : (g.context.warntype.obj & M2_ELF) ? "elves"
-                : (g.context.warntype.obj & M2_DEMON) ? "demons" : something);
+                (gc.context.warntype.obj & M2_ORC) ? "orcs"
+                : (gc.context.warntype.obj & M2_ELF) ? "elves"
+                : (gc.context.warntype.obj & M2_DEMON) ? "demons" : something);
         you_are(buf, from_what(WARN_OF_MON));
     }
-    if (Warn_of_mon && g.context.warntype.polyd) {
+    if (Warn_of_mon && gc.context.warntype.polyd) {
         Sprintf(buf, "aware of the presence of %s",
-                ((g.context.warntype.polyd & (M2_HUMAN | M2_ELF))
+                ((gc.context.warntype.polyd & (M2_HUMAN | M2_ELF))
                  == (M2_HUMAN | M2_ELF))
                     ? "humans and elves"
-                    : (g.context.warntype.polyd & M2_HUMAN)
+                    : (gc.context.warntype.polyd & M2_HUMAN)
                           ? "humans"
-                          : (g.context.warntype.polyd & M2_ELF)
+                          : (gc.context.warntype.polyd & M2_ELF)
                                 ? "elves"
-                                : (g.context.warntype.polyd & M2_ORC)
+                                : (gc.context.warntype.polyd & M2_ORC)
                                       ? "orcs"
-                                      : (g.context.warntype.polyd & M2_DEMON)
+                                      : (gc.context.warntype.polyd & M2_DEMON)
                                             ? "demons"
                                             : "certain monsters");
         you_are(buf, "");
     }
-    if (Warn_of_mon && g.context.warntype.speciesidx >= LOW_PM) {
+    if (Warn_of_mon && gc.context.warntype.speciesidx >= LOW_PM) {
         Sprintf(buf, "aware of the presence of %s",
-             makeplural(mons[g.context.warntype.speciesidx].pmnames[NEUTRAL]));
+             makeplural(mons[gc.context.warntype.speciesidx].pmnames[NEUTRAL]));
         you_are(buf, from_what(WARN_OF_MON));
     }
     if (Undead_warning)
@@ -1646,7 +1658,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
     }
     /* including this might bring attention to the fact that ceiling
        clinging has inconsistencies... */
-    if (is_clinger(g.youmonst.data)) {
+    if (is_clinger(gy.youmonst.data)) {
         boolean has_lid = has_ceiling(&u.uz);
 
         if (has_lid && !u.uinwater) {
@@ -1684,9 +1696,9 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         if (iflags.tux_penalty && !Upolyd)
             Sprintf(eos(buf), " %s your suit's penalty",
                     (u.uhitinc < 0) ? "increasing"
-                    : (u.uhitinc < 4 * g.urole.spelarmr / 5)
+                    : (u.uhitinc < 4 * gu.urole.spelarmr / 5)
                       ? "partly offsetting"
-                      : (u.uhitinc < g.urole.spelarmr) ? "nearly offsetting"
+                      : (u.uhitinc < gu.urole.spelarmr) ? "nearly offseting"
                         : "overcoming");
         you_have(buf, "");
     }
@@ -1707,7 +1719,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         if (prot)
             you_have(enlght_combatinc("defense", prot, final, buf), "");
     }
-    if ((armpro = magic_negation(&g.youmonst)) > 0) {
+    if ((armpro = magic_negation(&gy.youmonst)) > 0) {
         /* magic cancellation factor, conferred by worn armor */
         static const char *const mc_types[] = {
             "" /*ordinary*/, "warded", "guarded", "protected",
@@ -1756,20 +1768,20 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         && !(final == ENL_GAMEOVERDEAD
              && u.umonnum == PM_GREEN_SLIME && !Unchanging)) {
         /* foreign shape (except were-form which is handled below) */
-        if (!vampshifted(&g.youmonst))
+        if (!vampshifted(&gy.youmonst))
             Sprintf(buf, "polymorphed into %s",
-                    an(pmname(g.youmonst.data,
+                    an(pmname(gy.youmonst.data,
                               flags.female ? FEMALE : MALE)));
         else
             Sprintf(buf, "polymorphed into %s in %s form",
-                    an(pmname(&mons[g.youmonst.cham],
+                    an(pmname(&mons[gy.youmonst.cham],
                               flags.female ? FEMALE : MALE)),
-                    pmname(g.youmonst.data, flags.female ? FEMALE : MALE));
+                    pmname(gy.youmonst.data, flags.female ? FEMALE : MALE));
         if (wizard)
             Sprintf(eos(buf), " (%d)", u.mtimedone);
         you_are(buf, "");
     }
-    if (lays_eggs(g.youmonst.data) && flags.female) /* Upolyd */
+    if (lays_eggs(gy.youmonst.data) && flags.female) /* Upolyd */
         you_can("lay eggs", "");
     if (u.ulycn >= LOW_PM) {
         /* "you are a werecreature [in beast form]" */
@@ -1854,14 +1866,14 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         struct fruit *f;
 
         reorder_fruit(TRUE); /* sort by fruit index, from low to high;
-                              * this modifies the g.ffruit chain, so could
+                              * this modifies the gf.ffruit chain, so could
                               * possibly mask or even introduce a problem,
                               * but it does useful sanity checking */
-        for (f = g.ffruit; f; f = f->nextf) {
+        for (f = gf.ffruit; f; f = f->nextf) {
             Sprintf(buf, "Fruit #%d ", f->fid);
             enl_msg(buf, "is ", "was ", f->fname, "");
         }
-        enl_msg("The current fruit ", "is ", "was ", g.pl_fruit, "");
+        enl_msg("The current fruit ", "is ", "was ", gp.pl_fruit, "");
         Sprintf(buf, "%d", flags.made_fruit);
         enl_msg("The made fruit flag ", "is ", "was ", buf, "");
     }
@@ -1935,7 +1947,7 @@ youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
            for the hypothetical furniture and monster cases */
         bp = eos(strcpy(buf, "mimicking"));
         if (U_AP_TYPE == M_AP_OBJECT) {
-            Sprintf(bp, " %s", an(simple_typename(g.youmonst.mappearance)));
+            Sprintf(bp, " %s", an(simple_typename(gy.youmonst.mappearance)));
         } else if (U_AP_TYPE == M_AP_FURNITURE) {
             Strcpy(bp, " something");
         } else if (U_AP_TYPE == M_AP_MONSTER) {
@@ -1945,15 +1957,15 @@ youhiding(boolean via_enlghtmt, /* englightment line vs topl message */
         }
     } else if (u.uundetected) {
         bp = eos(buf); /* points past "hiding" */
-        if (g.youmonst.data->mlet == S_EEL) {
+        if (gy.youmonst.data->mlet == S_EEL) {
             if (is_pool(u.ux, u.uy))
                 Sprintf(bp, " in the %s", waterbody_name(u.ux, u.uy));
-        } else if (hides_under(g.youmonst.data)) {
-            struct obj *o = g.level.objects[u.ux][u.uy];
+        } else if (hides_under(gy.youmonst.data)) {
+            struct obj *o = gl.level.objects[u.ux][u.uy];
 
             if (o)
                 Sprintf(bp, " underneath %s", ansimpleoname(o));
-        } else if (is_clinger(g.youmonst.data) || Flying) {
+        } else if (is_clinger(gy.youmonst.data) || Flying) {
             /* Flying: 'lurker above' hides on ceiling but doesn't cling */
             Sprintf(bp, " on the %s", ceiling(u.ux, u.uy));
         } else {
@@ -1996,8 +2008,8 @@ show_conduct(int final)
     int ngenocided;
 
     /* Create the conduct window */
-    g.en_win = create_nhwindow(NHW_MENU);
-    putstr(g.en_win, 0, "Voluntary challenges:");
+    ge.en_win = create_nhwindow(NHW_MENU);
+    putstr(ge.en_win, 0, "Voluntary challenges:");
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
@@ -2120,9 +2132,9 @@ show_conduct(int final)
     show_achievements(final);
 
     /* Pop up the window and wait for a key */
-    display_nhwindow(g.en_win, TRUE);
-    destroy_nhwindow(g.en_win);
-    g.en_win = WIN_ERR;
+    display_nhwindow(ge.en_win, TRUE);
+    destroy_nhwindow(ge.en_win);
+    ge.en_win = WIN_ERR;
 }
 
 /*
@@ -2149,8 +2161,8 @@ show_achievements(
     if ((acnt = count_achievements()) == 0)
         return;
 
-    if (g.en_win != WIN_ERR) {
-        awin = g.en_win; /* end of game disclosure window */
+    if (ge.en_win != WIN_ERR) {
+        awin = ge.en_win; /* end of game disclosure window */
         putstr(awin, 0, "");
     } else {
         awin = create_nhwindow(NHW_MENU);
@@ -2286,7 +2298,7 @@ show_achievements(
         } /* switch */
     } /* for */
 
-    if (awin != g.en_win) {
+    if (awin != ge.en_win) {
         display_nhwindow(awin, TRUE);
         destroy_nhwindow(awin);
     }
@@ -2297,6 +2309,7 @@ void
 record_achievement(schar achidx)
 {
     int i, absidx;
+    int repeat_achievement = 0;
 
     absidx = abs(achidx);
     /* valid achievements range from 1 to N_ACH-1; however, ranks can be
@@ -2313,14 +2326,27 @@ record_achievement(schar achidx)
        an attempt to duplicate an achievement can happen if any of Bell,
        Candelabrum, Book, or Amulet is dropped then picked up again */
     for (i = 0; u.uachieved[i]; ++i)
-        if (abs(u.uachieved[i]) == absidx)
-            return; /* already recorded, don't duplicate it */
+        if (abs(u.uachieved[i]) == absidx) {
+            repeat_achievement = 1;
+            break;
+        }
+
+    /*
+     * We do the sound for an achievement, even if it has already been
+     * achieved before. Some players might have set up level-based
+     * theme music or something. We do let the sound interface know
+     * that it's not the original achievement though.
+     */
+    SoundAchievement(achidx, 0, repeat_achievement);
+
+    if (repeat_achievement)
+        return; /* already recorded, don't duplicate it */
     u.uachieved[i] = achidx;
 
     /* avoid livelog for achievements recorded during final disclosure:
        nudist and blind-from-birth; also ascension which is suppressed
        by this gets logged separately in really_done() */
-    if (g.program_state.gameover)
+    if (gp.program_state.gameover)
         return;
 
     if (absidx >= ACH_RNK1 && absidx <= ACH_RNK8) {
@@ -2333,8 +2359,8 @@ record_achievement(schar achidx)
                || achidx == ACH_MINE_PRIZE) {
         /* need to supply extra information for these two */
         short otyp = ((achidx == ACH_SOKO_PRIZE)
-                      ? g.context.achieveo.soko_prize_otyp
-                      : g.context.achieveo.mines_prize_otyp);
+                      ? gc.context.achieveo.soko_prize_otyp
+                      : gc.context.achieveo.mines_prize_otyp);
 
         /* note: OBJ_NAME() works here because both "bag of holding" and
            "amulet of reflection" are fully named in their objects[] entry
@@ -2408,7 +2434,7 @@ int
 do_gamelog(void)
 {
 #ifdef CHRONICLE
-    if (g.gamelog) {
+    if (gg.gamelog) {
         show_gamelog(ENL_GAMEINPROGRESS);
     } else {
         pline("No chronicled events.");
@@ -2445,7 +2471,7 @@ show_gamelog(int final)
     win = create_nhwindow(NHW_TEXT);
     Sprintf(buf, "%s events:", final ? "Major" : "Logged");
     putstr(win, 0, buf);
-    for (llmsg = g.gamelog; llmsg; llmsg = llmsg->next) {
+    for (llmsg = gg.gamelog; llmsg; llmsg = llmsg->next) {
         if (final && !majorevent(llmsg))
             continue;
         if (!final && !wizard && spoilerevent(llmsg))
@@ -2472,35 +2498,48 @@ show_gamelog(int final)
  *      Vanquished monsters.
  */
 
-static const char *vanqorders[NUM_VANQ_ORDER_MODES] = {
-    "traditional: by monster level, by internal monster index",
-    "by monster toughness, by internal monster index",
-    "alphabetically, first unique monsters, then others",
-    "alphabetically, unique monsters and others intermixed",
-    "by monster class, high to low level within class",
-    "by monster class, low to high level within class",
-    "by count, high to low, by internal index within tied count",
-    "by count, low to high, by internal index within tied count",
+/* the two uppercase choices are implemented but suppressed from menu */
+const char *const vanqorders[NUM_VANQ_ORDER_MODES][3] = {
+    { "t", "traditional: by monster level",
+           "traditional: by monster level, by internal monster index" },
+    { "d", "by monster difficulty rating",
+           "by monster difficulty rating, by internal monster index" },
+    { "a", "alphabetically, unique monsters separate",
+           "alphabetically, first unique monsters, then others" },
+    { "A", "alphabetically, unique monsters intermixed",
+           "alphabetically, unique monsters and others intermixed" },
+    { "C", "by monster class, high to low level in class",
+           "by monster class, high to low level within class" },
+    { "c", "by monster class, low to high level in class",
+           "by monster class, low to high level within class" },
+    { "n", "by count, high to low",
+           "by count, high to low, by internal index within tied count" },
+    { "z", "by count, low to high",
+           "by count, low to high, by internal index within tied count" },
 };
 
 static int QSORTCALLBACK
-vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
+vanqsort_cmp(
+    const genericptr vptr1,
+    const genericptr vptr2)
 {
     int indx1 = *(short *) vptr1, indx2 = *(short *) vptr2,
         mlev1, mlev2, mstr1, mstr2, uniq1, uniq2, died1, died2, res;
     const char *name1, *name2, *punct;
     schar mcls1, mcls2;
 
-    switch (g.vanq_sortmode) {
+    switch (flags.vanq_sortmode) {
     default:
     case VANQ_MLVL_MNDX:
         /* sort by monster level */
-        mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+        mlev1 = mons[indx1].mlevel;
+        mlev2 = mons[indx2].mlevel;
         res = mlev2 - mlev1; /* mlevel high to low */
         break;
     case VANQ_MSTR_MNDX:
         /* sort by monster toughness */
-        mstr1 = mons[indx1].difficulty, mstr2 = mons[indx2].difficulty;
+        mstr1 = mons[indx1].difficulty;
+        mstr2 = mons[indx2].difficulty;
         res = mstr2 - mstr1; /* monstr high to low */
         break;
     case VANQ_ALPHA_SEP:
@@ -2512,8 +2551,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
         } /* else both unique or neither unique */
         /*FALLTHRU*/
     case VANQ_ALPHA_MIX:
-        name1 = mons[indx1].pmnames[NEUTRAL],
-                name2 = mons[indx2].pmnames[NEUTRAL];
+        name1 = mons[indx1].pmnames[NEUTRAL];
+        name2 = mons[indx2].pmnames[NEUTRAL];
         res = strcmpi(name1, name2); /* caseblind alhpa, low to high */
         break;
     case VANQ_MCLS_HTOL:
@@ -2522,7 +2561,8 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
            if 'char' happens to be unsigned, (mlet1 - mlet2) would yield
            an inappropriate result when mlet2 is greater than mlet1,
            so force our copies (mcls1, mcls2) to be signed */
-        mcls1 = (schar) mons[indx1].mlet, mcls2 = (schar) mons[indx2].mlet;
+        mcls1 = (schar) mons[indx1].mlet;
+        mcls2 = (schar) mons[indx2].mlet;
         /* S_ANT through S_ZRUTY correspond to lowercase monster classes,
            S_ANGEL through S_ZOMBIE correspond to uppercase, and various
            punctuation characters are used for classes beyond those */
@@ -2535,24 +2575,26 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
                 S_LIZARD, S_EEL, S_GOLEM, S_GHOST, S_DEMON, S_HUMAN, '\0'
             };
 
-            if ((punct = index(punctclasses, mcls1)) != 0)
+            if ((punct = strchr(punctclasses, mcls1)) != 0)
                 mcls1 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
-            if ((punct = index(punctclasses, mcls2)) != 0)
+            if ((punct = strchr(punctclasses, mcls2)) != 0)
                 mcls2 = (schar) (S_ZOMBIE + 1 + (int) (punct - punctclasses));
         }
         res = mcls1 - mcls2; /* class */
         if (res == 0) {
-            mlev1 = mons[indx1].mlevel, mlev2 = mons[indx2].mlevel;
+            mlev1 = mons[indx1].mlevel;
+            mlev2 = mons[indx2].mlevel;
             res = mlev1 - mlev2; /* mlevel low to high */
-            if (g.vanq_sortmode == VANQ_MCLS_HTOL)
+            if (flags.vanq_sortmode == VANQ_MCLS_HTOL)
                 res = -res; /* mlevel high to low */
         }
         break;
     case VANQ_COUNT_H_L:
     case VANQ_COUNT_L_H:
-        died1 = g.mvitals[indx1].died, died2 = g.mvitals[indx2].died;
+        died1 = gm.mvitals[indx1].died;
+        died2 = gm.mvitals[indx2].died;
         res = died2 - died1; /* dead count high to low */
-        if (g.vanq_sortmode == VANQ_COUNT_L_H)
+        if (flags.vanq_sortmode == VANQ_COUNT_L_H)
             res = -res; /* dead count low to high */
         break;
     }
@@ -2563,7 +2605,7 @@ vanqsort_cmp(const genericptr vptr1, const genericptr vptr2)
 }
 
 /* returns -1 if cancelled via ESC */
-static int
+int
 set_vanq_order(void)
 {
     winid tmpwin;
@@ -2579,10 +2621,10 @@ set_vanq_order(void)
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 vanqorders[i],
-                 (i == g.vanq_sortmode)
-                    ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
+                 ATR_NONE, clr, vanqorders[i][2],
+                 (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
+                                        : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "Sort order for vanquished monster counts");
 
@@ -2591,19 +2633,19 @@ set_vanq_order(void)
     if (n > 0) {
         choice = selected[0].item.a_int - 1;
         /* skip preselected entry if we have more than one item chosen */
-        if (n > 1 && choice == g.vanq_sortmode)
+        if (n > 1 && choice == flags.vanq_sortmode)
             choice = selected[1].item.a_int - 1;
         free((genericptr_t) selected);
-        g.vanq_sortmode = choice;
+        flags.vanq_sortmode = choice;
     }
-    return (n < 0) ? -1 : g.vanq_sortmode;
+    return (n < 0) ? -1 : flags.vanq_sortmode;
 }
 
 /* #vanquished command */
 int
 dovanquished(void)
 {
-    list_vanquished('a', FALSE);
+    list_vanquished(iflags.menu_requested ? 'a' : 'y', FALSE);
     return ECMD_OK;
 }
 
@@ -2621,16 +2663,18 @@ doborn(void)
 
     putstr(datawin, 0, "died born");
     for (i = LOW_PM; i < NUMMONS; i++)
-        if (g.mvitals[i].born || g.mvitals[i].died
-            || (g.mvitals[i].mvflags & G_GONE)) {
+        if (gm.mvitals[i].born || gm.mvitals[i].died
+            || (gm.mvitals[i].mvflags & G_GONE) != 0) {
             Sprintf(buf, fmt,
-                    g.mvitals[i].died, g.mvitals[i].born,
-                    ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E' :
-                    ((g.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G' : ' ',
+                    gm.mvitals[i].died, gm.mvitals[i].born,
+                    ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E'
+                    : ((gm.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G'
+                      : ((gm.mvitals[i].mvflags & G_GONE) != 0) ? 'X'
+                        : ' ',
                     mons[i].pmnames[NEUTRAL]);
             putstr(datawin, 0, buf);
-            nborn += g.mvitals[i].born;
-            ndied += g.mvitals[i].died;
+            nborn += gm.mvitals[i].born;
+            ndied += gm.mvitals[i].died;
         }
 
     putstr(datawin, 0, "");
@@ -2648,7 +2692,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 #define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
                                && mndx != PM_HIGH_CLERIC)
 
-#define done_stopprint g.program_state.stopprint
+#define done_stopprint gp.program_state.stopprint
 
 void
 list_vanquished(char defquery, boolean ask)
@@ -2663,13 +2707,15 @@ list_vanquished(char defquery, boolean ask)
     boolean dumping; /* for DUMPLOG; doesn't need to be conditional */
 
     dumping = (defquery == 'd');
-    if (dumping)
+    if (dumping) {
         defquery = 'y';
+        ask = FALSE; /* redundant; caller passes False with defquery=='d' */
+    }
 
     /* get totals first */
     ntypes = 0;
     for (i = LOW_PM; i < NUMMONS; i++) {
-        if ((nkilled = (int) g.mvitals[i].died) == 0)
+        if ((nkilled = (int) gm.mvitals[i].died) == 0)
             continue;
         mindx[ntypes++] = i;
         total_killed += (long) nkilled;
@@ -2684,20 +2730,21 @@ list_vanquished(char defquery, boolean ask)
 
         c = ask ? yn_function(
                             "Do you want an account of creatures vanquished?",
-                             ynaqchars, defquery, TRUE)
+                              ynaqchars, defquery, TRUE)
                 : defquery;
         if (c == 'q')
             done_stopprint++;
         if (c == 'y' || c == 'a') {
-            if (c == 'a') { /* ask player to choose sort order */
+            if (c == 'a' && ntypes > 1) { /* ask player to choose sort order */
                 /* choose value for vanq_sortmode via menu; ESC cancels list
                    of vanquished monsters but does not set 'done_stopprint' */
                 if (set_vanq_order() < 0)
                     return;
             }
-            uniq_header = (g.vanq_sortmode == VANQ_ALPHA_SEP);
-            class_header = (g.vanq_sortmode == VANQ_MCLS_LTOH
-                            || g.vanq_sortmode == VANQ_MCLS_HTOL);
+            uniq_header = (flags.vanq_sortmode == VANQ_ALPHA_SEP);
+            class_header = ((flags.vanq_sortmode == VANQ_MCLS_LTOH
+                             || flags.vanq_sortmode == VANQ_MCLS_HTOL)
+                            && ntypes > 1);
 
             klwin = create_nhwindow(NHW_MENU);
             putstr(klwin, 0, "Vanquished creatures:");
@@ -2707,7 +2754,7 @@ list_vanquished(char defquery, boolean ask)
             qsort((genericptr_t) mindx, ntypes, sizeof *mindx, vanqsort_cmp);
             for (ni = 0; ni < ntypes; ni++) {
                 i = mindx[ni];
-                nkilled = g.mvitals[i].died;
+                nkilled = gm.mvitals[i].died;
                 mlet = mons[i].mlet;
                 if (class_header && mlet != prev_mlet) {
                     Strcpy(buf, def_monsyms[(int) mlet].explain);
@@ -2769,7 +2816,16 @@ list_vanquished(char defquery, boolean ask)
             display_nhwindow(klwin, TRUE);
             destroy_nhwindow(klwin);
         }
-    } else if (defquery == 'a') {
+
+    /*
+     * For end-of-game disclosure, we're only called when some monsters
+     * were vanquished and won't reach these 'else-if's.
+     *
+     * If no monsters have been vanquished, we're either called for game
+     * still in progress, so use present tense via pline(), or for dumplog
+     * which needs putstr() and past tense.
+     */
+    } else if (!gp.program_state.gameover) {
         /* #dovanquished rather than final disclosure, so pline() is ok */
         pline("No creatures have been vanquished.");
 #ifdef DUMPLOG
@@ -2786,7 +2842,7 @@ num_genocides(void)
     int i, n = 0;
 
     for (i = LOW_PM; i < NUMMONS; ++i) {
-        if (g.mvitals[i].mvflags & G_GENOD) {
+        if (gm.mvitals[i].mvflags & G_GENOD) {
             ++n;
             if (UniqCritterIndx(i))
                 impossible("unique creature '%d: %s' genocided?",
@@ -2804,7 +2860,7 @@ num_extinct(void)
     for (i = LOW_PM; i < NUMMONS; ++i) {
         if (UniqCritterIndx(i))
             continue;
-        if ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
+        if ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
             ++n;
     }
     return n;
@@ -2850,7 +2906,7 @@ list_genocided(char defquery, boolean ask)
                    however, they're never reported as extinct, so skip them */
                 if (UniqCritterIndx(i))
                     continue;
-                if (g.mvitals[i].mvflags & G_GONE) {
+                if (gm.mvitals[i].mvflags & G_GONE) {
                     Sprintf(buf, " %s", makeplural(mons[i].pmnames[NEUTRAL]));
                     /*
                      * "Extinct" is unfortunate terminology.  A species
@@ -2858,7 +2914,7 @@ list_genocided(char defquery, boolean ask)
                      * but there might be members of the species still
                      * alive, contradicting the meaning of the word.
                      */
-                    if ((g.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
+                    if ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
                         Strcat(buf, " (extinct)");
                     putstr(klwin, 0, buf);
                 }
@@ -2976,7 +3032,7 @@ mstatusline(struct monst *mtmp)
             Strcat(info, ", single segment");
         } else {
             ++nsegs; /* include head in the segment count */
-            segndx = wseg_at(mtmp, g.bhitpos.x, g.bhitpos.y);
+            segndx = wseg_at(mtmp, gb.bhitpos.x, gb.bhitpos.y);
             Sprintf(eos(info), ", %d%s of %d segments",
                     segndx, ordin(segndx), nsegs);
         }
@@ -3040,7 +3096,7 @@ mstatusline(struct monst *mtmp)
                                      : ", engulfing you")
                      /* !u.uswallow; if both youmonst and ustuck are holders,
                         youmonst wins */
-                     : (!sticks(g.youmonst.data) ? ", holding you"
+                     : (!sticks(gy.youmonst.data) ? ", holding you"
                                                  : ", held by you"));
     }
     if (mtmp == u.usteed) {
@@ -3101,7 +3157,7 @@ ustatusline(void)
         Strcat(info, ", blind");
         if (u.ucreamed) {
             if ((long) u.ucreamed < Blinded || Blindfolded
-                || !haseyes(g.youmonst.data))
+                || !haseyes(gy.youmonst.data))
                 Strcat(info, ", cover");
             Strcat(info, "ed by sticky goop");
         } /* note: "goop" == "glop"; variation is intentional */
@@ -3132,14 +3188,14 @@ ustatusline(void)
     if (Invis)
         Strcat(info, ", invisible");
     if (u.ustuck) {
-        if (sticks(g.youmonst.data))
+        if (sticks(gy.youmonst.data))
             Strcat(info, ", holding ");
         else
             Strcat(info, ", held by ");
         Strcat(info, mon_nam(u.ustuck));
     }
 
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", g.plname,
+    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", gp.plname,
           piousness(FALSE, align_str(u.ualign.type)),
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);

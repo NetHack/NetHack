@@ -29,7 +29,7 @@
 #endif
 
 #if defined(MICRO) || defined(OS2)
-void nethack_exit(int) NORETURN;
+ATTRNORETURN void nethack_exit(int) NORETURN;
 #else
 #define nethack_exit exit
 #endif
@@ -131,7 +131,7 @@ dosh(void)
 #endif /* MICRO */
 
 /*
- * Add a backslash to any name not ending in /, \ or :	 There must
+ * Add a backslash to any name not ending in /, \ or : There must
  * be room for the \
  */
 void

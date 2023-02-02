@@ -50,8 +50,12 @@ struct sysopt {
     /* enable accessibility options */
     int accessibility;
 #ifdef WIN32
-    int portable_device_paths;  /* nethack configuration for a portable device */
+    int portable_device_paths;  /* nethack config for a portable device */
 #endif
+
+    /* nethack's interactive help menu */
+    int hideusage;      /* 0: include 'command-line usage' entry in help menu;
+                         * 1: suppress it */
 };
 
 extern struct sysopt sysopt;

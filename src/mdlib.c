@@ -20,6 +20,7 @@
 #include "sym.h"
 #include "artilist.h"
 #include "dungeon.h"
+#include "sndprocs.h"
 #include "obj.h"
 #include "monst.h"
 #include "you.h"
@@ -55,12 +56,14 @@ static boolean date_via_env = FALSE;
 
 extern unsigned long md_ignored_features(void);
 char *mdlib_version_string(char *, const char *);
-char *version_id_string(char *, int, const char *);
-char *bannerc_string(char *, int, const char *);
+char *version_id_string(char *, size_t, const char *);
+char *bannerc_string(char *, size_t, const char *);
 int case_insensitive_comp(const char *, const char *);
 
 static void make_version(void);
 static char *eos(char *);
+int mstrength(struct permonst *);
+
 #if 0
 static char *mdlib_strsubst(char *, const char *, const char *);
 #endif
@@ -105,7 +108,7 @@ struct win_information {
 static struct win_information window_opts[] = {
 #ifdef TTY_GRAPHICS
     { "tty",
-      /* testing 'USE_TILES' here would bring confusion because it could
+      /* testing 'TILES_IN_GLYPHMAP' here would bring confusion because it could
          apply to another interface such as X11, so check MSDOS explicitly
          instead; even checking TTY_TILES_ESCCODES would probably be
          confusing to most users (and it will already be listed separately
@@ -155,6 +158,75 @@ static struct win_information window_opts[] = {
 #endif  /* 0 => retired */
     { 0, 0, FALSE }
 };
+
+#if !defined(MAKEDEFS_C)
+static int count_and_validate_soundlibopts(void);
+
+struct soundlib_information {
+    enum soundlib_ids id;
+    const char *const text_id;
+    const char *const Url;
+    boolean valid;
+};
+
+/*
+ * soundlibs
+ *
+ * None of these are endorsements or recommendations of one library
+ * or another, in any way. They are just preprocessor conditionals
+ * in the event that glue code for such a library is ever added into
+ * NetHack.
+ */
+static struct soundlib_information soundlib_opts[] = {
+    { soundlib_nosound, "soundlib_nosound", "", FALSE },
+#ifdef SND_LIB_PORTAUDIO
+    { soundlib_portaudio, "soundlib_portaudio",
+        "http://www.portaudio.com/", FALSE },
+#endif
+#ifdef SND_LIB_OPENAL
+    { soundlib_openal, "soundlib_openal",
+        "https://www.openal.org/", FALSE },
+#endif
+#ifdef SND_LIB_SDL_MIXER
+    { soundlib_sdl_mixer, "soundlib_sdl_mixer",
+        "https://github.com/libsdl-org/SDL_mixer/", FALSE },
+#endif
+#ifdef SND_LIB_MINIAUDIO
+    { soundlib_miniaudio, "soundlib_miniaudio",
+        "https://miniaud.io/", FALSE },
+#endif
+#ifdef SND_LIB_FMOD
+    /* proprietary, though a Free Indie License exists.
+     * https://www.fmod.com/licensing#indie-note
+     */
+    { soundlib_fmod, "soundlib_fmod",
+        "https://www.fmod.com/", FALSE },
+#endif
+#ifdef SND_LIB_SOUND_ESCCODES
+    { soundlib_sound_esccodes, "sound_esccodes", "", FALSE },
+#endif
+#ifdef SND_LIB_VISSOUND
+    { soundlib_vissound, "soundlib_vissound", "", FALSE },
+#endif
+#ifdef SND_LIB_WINDSOUND
+    /* Uses Windows WIN32 API */
+    { soundlib_windsound, "soundlib_windsound",
+  "https://learn.microsoft.com/en-us/windows/win32/multimedia/waveform-audio",
+        FALSE },
+#endif
+#ifdef SND_LIB_MACSOUND
+    /* Uses AppKit NSSound */
+    { soundlib_macsound, "soundlib_macsound",
+        "https://developer.apple.com/documentation/appkit/nssound",
+        FALSE },
+#endif
+#ifdef SND_LIB_QTSOUND
+    { soundlib_qtsound, "soundlib_qtsound",
+        "https://doc.qt.io/qt-5/qsoundeffect.html", FALSE },
+#endif
+    { 0, 0, 0, FALSE },
+};
+#endif  /* !MAKEDEFS_C */
 
 /*
  * Use this to explicitly mask out features during version checks.
@@ -281,11 +353,7 @@ nh_snprintf(const char *func UNUSED, int line UNUSED, char *str, size_t size,
     int n;
 
     va_start(ap, fmt);
-#ifdef NO_VSNPRINTF
-    n = vsprintf(str, fmt, ap);
-#else
     n = vsnprintf(str, size, fmt, ap);
-#endif
     va_end(ap);
 
     if (n < 0 || (size_t)n >= size) { /* is there a problem? */
@@ -298,7 +366,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 #endif  /* MAKEDEFS_C */
 
 char *
-version_id_string(char *outbuf, int bufsz, const char *build_date)
+version_id_string(char *outbuf, size_t bufsz, const char *build_date)
 {
     char subbuf[64], versbuf[64];
     char statusbuf[64];
@@ -331,7 +399,7 @@ version_id_string(char *outbuf, int bufsz, const char *build_date)
 /* still within #if MAKDEFS_C || FOR_RUNTIME */
 
 char *
-bannerc_string(char *outbuf, int bufsz, const char *build_date)
+bannerc_string(char *outbuf, size_t bufsz, const char *build_date)
 {
     char subbuf[64], versbuf[64];
 
@@ -596,9 +664,6 @@ static const char *const build_opts[] = {
 #ifdef TIMED_DELAY
     "timed wait for display effects",
 #endif
-#ifdef USER_SOUNDS
-    "user sounds",
-#endif
 #ifdef PREFIXES_IN_USE
     "variable playground",
 #endif
@@ -641,6 +706,21 @@ count_and_validate_winopts(void)
     return cnt;
 }
 
+#if !defined(MAKEDEFS_C)
+static int
+count_and_validate_soundlibopts(void)
+{
+    int i, cnt = 0;
+
+    /* soundlib_opts has a fencepost entry at the end */
+    for (i = 0; i < SIZE(soundlib_opts) - 1; i++) {
+        ++cnt;
+        soundlib_opts[i].valid = TRUE;
+    }
+    return cnt;
+}
+#endif
+
 static void
 opt_out_words(
     char *str,     /* input, but modified during processing */
@@ -649,11 +729,11 @@ opt_out_words(
     char *word;
 
     while (*str) {
-        word = index(str, ' ');
+        word = strchr(str, ' ');
 #if 0
         /* treat " (" as unbreakable space */
         if (word && *(word + 1) == '(')
-            word = index(word + 1,  ' ');
+            word = strchr(word + 1,  ' ');
 #endif
         if (word)
             *word = '\0';
@@ -677,8 +757,9 @@ build_options(void)
     char buf[COLBUFSZ];
     int i, length, winsyscnt, cnt = 0;
     const char *defwinsys = DEFAULT_WINDOW_SYS;
+#if !defined(MAKEDEFS_C) && defined(FOR_RUNTIME)
+    int soundlibcnt;
 
-#if !defined (MAKEDEFS_C) && defined(FOR_RUNTIME)
 #ifdef WIN32
     defwinsys = GUILaunched ? "mswin" : "tty";
 #endif
@@ -762,6 +843,58 @@ build_options(void)
         opt_out_words(buf, &length);
     }
 
+#if !defined(MAKEDEFS_C)
+    cnt = 0;
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    optbuf[0] = '\0';
+    soundlibcnt = count_and_validate_soundlibopts();
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    Sprintf(optbuf, "Supported soundlib%s:",
+            (soundlibcnt > 1) ? "s" : "");
+    opttext[idxopttext] = dupstr(optbuf);
+    if (idxopttext < (MAXOPT - 1))
+        idxopttext++;
+    optbuf[0] = '\0';
+    length = COLNO + 1; /* force 1st item onto new line */
+
+#ifdef USER_SOUNDS
+    soundlibcnt += 1;
+#endif
+    for (i = 0; i < SIZE(soundlib_opts) - 1; i++) {
+        const char *soundlib;
+
+        if (!soundlib_opts[i].valid)
+            continue;
+        soundlib = soundlib_opts[i].text_id;
+        if (!strncmp(soundlib, "soundlib_", 9))
+            soundlib += 9;
+        Sprintf(buf, "\"%s\"", soundlib);
+        /*
+         * 1 : foo.
+         * 2 : foo and bar.
+         * 3+: for, bar, and quux.
+         */
+        Strcat(buf, (soundlibcnt == 1 || cnt == soundlibcnt - 1)
+                    ? "." /* no 'with default' */
+                    : (soundlibcnt == 2 && cnt == 0) ? " and"
+                      : (cnt == soundlibcnt - 2) ? ", and"
+                        : ",");
+        opt_out_words(buf, &length);
+        cnt++;
+    }
+#ifdef USER_SOUNDS
+    if (cnt > 1) {
+        /* loop ended with a comma; opt_out_words() will insert a space */
+        Sprintf(buf, "user sounds.");
+        opt_out_words(buf, &length);
+    }
+#endif
+#endif  /* !MAKEDEFS_C */
+
     opttext[idxopttext] = dupstr(optbuf);
     if (idxopttext < (MAXOPT - 1))
         idxopttext++;
@@ -812,10 +945,10 @@ case_insensitive_comp(const char *s1, const char *s2)
     for (;; s1++, s2++) {
         u1 = (uchar) *s1;
         if (isupper(u1))
-            u1 = tolower(u1);
+            u1 = (uchar) tolower(u1);
         u2 = (uchar) *s2;
         if (isupper(u2))
-            u2 = tolower(u2);
+            u2 = (uchar) tolower(u2);
         if (u1 == '\0' || u1 != u2)
             break;
     }

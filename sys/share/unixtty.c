@@ -136,9 +136,7 @@ int has_colors(void);
 
 #if defined(TTY_GRAPHICS) && ((!defined(SYSV) && !defined(HPUX)) \
                               || defined(UNIXPC) || defined(SVR4))
-#ifndef LINT
 extern /* it is defined in libtermlib (libtermcap) */
-#endif
     short ospeed; /* terminal baudrate; set by gettty */
 #else
 short ospeed = 0; /* gets around "not defined" error message */
@@ -257,7 +255,7 @@ setftty(void)
     /* Should use (ECHO|CRMOD) here instead of ECHO */
     if ((unsigned) (curttyb.echoflgs & ECHO) != ef) {
         curttyb.echoflgs &= ~ECHO;
-        /*		curttyb.echoflgs |= ef; */
+        /* curttyb.echoflgs |= ef; */
         change++;
     }
     if ((unsigned) (curttyb.cbrkflgs & CBRKMASK) != cf) {

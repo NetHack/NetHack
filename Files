@@ -49,17 +49,18 @@ bigrm-1.lua   bigrm-2.lua   bigrm-3.lua   bigrm-4.lua   bigrm-5.lua
 bigrm-6.lua   bigrm-7.lua   bigrm-8.lua   bigrm-9.lua   bigrm-10.lua
 bigrm-11.lua  bogusmon.txt  castle.lua    cmdhelp       data.base
 dungeon.lua   earth.lua     engrave.txt   epitaph.txt   fakewiz1.lua
-fakewiz2.lua  fire.lua      help          hh            history
-juiblex.lua   keyhelp       knox.lua      license       medusa-1.lua
-medusa-2.lua  medusa-3.lua  medusa-4.lua  minefill.lua  minend-1.lua
-minend-2.lua  minend-3.lua  minetn-1.lua  minetn-2.lua  minetn-3.lua
-minetn-4.lua  minetn-5.lua  minetn-6.lua  minetn-7.lua  nhcore.lua
-nhlib.lua     opthelp       optmenu       oracle.lua    oracles.txt
-orcus.lua     quest.lua     rumors.fal    rumors.tru    sanctum.lua
-soko1-1.lua   soko1-2.lua   soko2-1.lua   soko2-2.lua   soko3-1.lua
-soko3-2.lua   soko4-1.lua   soko4-2.lua   symbols       themerms.lua
-tower1.lua    tower2.lua    tower3.lua    tribute       valley.lua
-water.lua     wizard1.lua   wizard2.lua   wizard3.lua   wizhelp
+fakewiz2.lua  fire.lua      hellfill.lua  help          hh
+history       juiblex.lua   keyhelp       knox.lua      license
+medusa-1.lua  medusa-2.lua  medusa-3.lua  medusa-4.lua  minefill.lua
+minend-1.lua  minend-2.lua  minend-3.lua  minetn-1.lua  minetn-2.lua
+minetn-3.lua  minetn-4.lua  minetn-5.lua  minetn-6.lua  minetn-7.lua
+nhcore.lua    nhlib.lua     opthelp       optmenu       oracle.lua
+oracles.txt   orcus.lua     quest.lua     rumors.fal    rumors.tru
+sanctum.lua   soko1-1.lua   soko1-2.lua   soko2-1.lua   soko2-2.lua
+soko3-1.lua   soko3-2.lua   soko4-1.lua   soko4-2.lua   symbols
+themerms.lua  tower1.lua    tower2.lua    tower3.lua    tribute
+usagehlp      valley.lua    water.lua     wizard1.lua   wizard2.lua
+wizard3.lua   wizhelp
 
 doc:
 (files for all versions)
@@ -77,8 +78,8 @@ fixes3-6-3.txt     fixes3-6-4.txt     fixes3-6-5.txt     fixes3-6-6.txt
 fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc           makedefs.6
 makedefs.txt       mn.7               mn.txt             mnh.7
 mnh.txt            nethack.6          nethack.txt        options.txt
-recover.6          recover.txt        tmac.n             tmac.nh
-window.txt
+recover.6          recover.txt        sound.txt          tmac.n
+tmac.nh            window.txt
 
 include:
 (files for X versions)
@@ -94,11 +95,12 @@ lint.h        mail.h        mextra.h      mfndpos.h     micro.h
 mkroom.h      monattk.h     mondata.h     monflag.h     monst.h
 monsters.h    obj.h         objclass.h    objects.h     optlist.h
 patchlevel.h  pcconf.h      permonst.h    prop.h        quest.h
-rect.h        region.h      rm.h          skills.h      sp_lev.h
-spell.h       sym.h         sys.h         system.h      tcap.h
-tileset.h     timeout.h     tradstdc.h    trap.h        unixconf.h
-vision.h      vmsconf.h     warnings.h    winami.h      wincurs.h
-windconf.h    winprocs.h    wintype.h     you.h         youprop.h
+rect.h        region.h      rm.h          skills.h      sndprocs.h
+sp_lev.h      spell.h       sym.h         sys.h         system.h
+tcap.h        tileset.h     timeout.h     tradstdc.h    trap.h
+unixconf.h    vision.h      vmsconf.h     warnings.h    winami.h
+wincurs.h     windconf.h    winprocs.h    wintype.h     you.h
+youprop.h
 
 (file for tty versions)
 wintty.h
@@ -125,10 +127,6 @@ wceconf.h
 (files for various Macintosh versions)
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
 mactty.h      macwin.h      mttypriv.h
-
-outdated/sys:
-(files that are no longer maintained for current game code)
-share
 
 outdated/sys/amiga:
 (files for Amiga versions - untested for 3.7)
@@ -233,6 +231,53 @@ gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
 gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
 gnyesno.h   mapbg.xpm
 
+sound/macsound:
+(file in top directory)
+macsound.m
+
+sound/qtsound:
+(file in top directory)
+README.md
+
+sound/wav:
+(files in top directory)
+README                       attributions.txt
+se_squeak_A.uu               se_squeak_B.uu
+se_squeak_B_flat.uu          se_squeak_C.uu
+se_squeak_D.uu               se_squeak_D_flat.uu
+se_squeak_E.uu               se_squeak_E_flat.uu
+se_squeak_F.uu               se_squeak_F_sharp.uu
+se_squeak_G.uu               se_squeak_G_sharp.uu
+sound_Bell.uu                sound_Bugle_A.uu
+sound_Bugle_B.uu             sound_Bugle_C.uu
+sound_Bugle_D.uu             sound_Bugle_E.uu
+sound_Bugle_F.uu             sound_Bugle_G.uu
+sound_Drum_Of_Earthquake.uu  sound_Fire_Horn.uu
+sound_Frost_Horn.uu          sound_Leather_Drum.uu
+sound_Magic_Flute_A.uu       sound_Magic_Flute_B.uu
+sound_Magic_Flute_C.uu       sound_Magic_Flute_D.uu
+sound_Magic_Flute_E.uu       sound_Magic_Flute_F.uu
+sound_Magic_Flute_G.uu       sound_Magic_Harp_A.uu
+sound_Magic_Harp_B.uu        sound_Magic_Harp_C.uu
+sound_Magic_Harp_D.uu        sound_Magic_Harp_E.uu
+sound_Magic_Harp_F.uu        sound_Magic_Harp_G.uu
+sound_Tooled_Horn_A.uu       sound_Tooled_Horn_B.uu
+sound_Tooled_Horn_C.uu       sound_Tooled_Horn_D.uu
+sound_Tooled_Horn_E.uu       sound_Tooled_Horn_F.uu
+sound_Tooled_Horn_G.uu       sound_Wooden_Flute_A.uu
+sound_Wooden_Flute_B.uu      sound_Wooden_Flute_C.uu
+sound_Wooden_Flute_D.uu      sound_Wooden_Flute_E.uu
+sound_Wooden_Flute_F.uu      sound_Wooden_Flute_G.uu
+sound_Wooden_Harp_A.uu       sound_Wooden_Harp_B.uu
+sound_Wooden_Harp_C.uu       sound_Wooden_Harp_D.uu
+sound_Wooden_Harp_E.uu       sound_Wooden_Harp_F.uu
+sound_Wooden_Harp_G.uu       uu2wav.cmd
+uu2wav.sh
+
+sound/windsound:
+(file in top directory)
+windsound.c
+
 src:
 (files for all versions)
 allmain.c   alloc.c     apply.c     artifact.c  attrib.c    ball.c
@@ -258,7 +303,7 @@ write.c     zap.c
 
 submodules:
 (files in top directory)
-lua       pdcurses
+lua          pdcurses     pdcursesmod
 
 sys/libnh:
 (files in top directory)
@@ -271,15 +316,21 @@ README.md  libtest.c  run.sh
 sys/msdos:
 (files for MSDOS version)
 Install.dos              Makefile.GCC             exceptn.S.patch
-fetch-cross-compiler.sh  msdos.c                  msdoshlp.txt
-nhlua.h                  pckeys.c                 pctiles.c
-pctiles.h                pcvideo.h                portio.h
-setup.bat                sysconf                  tile2bin.c
-vesa.h                   video.c                  vidtxt.c
-vidvesa.c                vidvga.c
+fetch-cross-compiler.sh  font.c                   font.h
+msdos.c                  msdoshlp.txt             nhlua.h
+pckeys.c                 pctiles.c                pctiles.h
+pcvideo.h                portio.h                 setup.bat
+sysconf                  tile2bin.c               vesa.h
+video.c                  vidtxt.c                 vidvesa.c
+vidvga.c
 
 (files for running MSDOS binary under Windows)
 nhico.uu  nhpif.uu
+
+sys/msdos/fonts:
+(files for MSDOS version)
+README.txt    makefont.lua  nh-u16b.bdf   nh-u16v.bdf   nh-u18b.bdf
+nh-u20b.bdf   nh-u22b.bdf   nh-u24b.bdf   nh-u28b.bdf   nh-u32b.bdf
 
 sys/share:
 (Berkeley random number file, which may be included in any version)
@@ -350,8 +401,9 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-compiler.370      cross-post.370    cross-pre.370     gbdates-post.370
-gbdates-pre.370   multiw-1.370      multiw-2.370
+compiler.370       cross-post.370     cross-pre.370      gbdates-post.370
+gbdates-pre.370    multisnd-post.370  multisnd1-pre.370  multisnd2-pre.370
+multiw-1.370       multiw-2.370       multiw-3.370
 
 sys/vms:
 (files for VMS version)
@@ -365,10 +417,9 @@ sys/windows:
 .nethackrc.template      Install.windows          Makefile.mingw32
 Makefile.mingw32.depend  Makefile.nmake           console.rc
 consoletty.c             nethack.def              nhico.uu
-nhsetup.bat              ntsound.c                porthelp
-stubs.c                  sysconf.template         win10.c
-win10.h                  win32api.h               windmain.c
-windsys.c                winos.h
+nhsetup.bat              porthelp                 sysconf.template
+win10.c                  win10.h                  win32api.h
+windmain.c               windsys.c                winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)

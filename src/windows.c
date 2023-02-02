@@ -3,6 +3,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#include "dlb.h"
 #ifdef TTY_GRAPHICS
 #include "wintty.h"
 #endif
@@ -33,9 +34,6 @@ FAIL /* be_win_init doesn't exist? XXX*/
 extern struct window_procs amii_procs;
 extern struct window_procs amiv_procs;
 extern void ami_wininit_data(int);
-#endif
-#ifdef WIN32_GRAPHICS
-extern struct window_procs win32_procs;
 #endif
 #ifdef GNOME_GRAPHICS
 /*#include "winGnome.h"*/
@@ -121,9 +119,6 @@ static struct win_choices {
       ami_wininit_data CHAINR(0) }, /* Old font version of the game */
     { &amiv_procs,
       ami_wininit_data CHAINR(0) }, /* Tile version of the game */
-#endif
-#ifdef WIN32_GRAPHICS
-    { &win32_procs, 0 CHAINR(0) },
 #endif
 #ifdef GNOME_GRAPHICS
     { &Gnome_procs, 0 CHAINR(0) },
@@ -255,11 +250,11 @@ choose_windows(const char *s)
         if (!strcmpi(s, winchoices[i].procs->name)) {
             windowprocs = *winchoices[i].procs;
 
-            if (g.last_winchoice && g.last_winchoice->ini_routine)
-                (*g.last_winchoice->ini_routine)(WININIT_UNDO);
+            if (gl.last_winchoice && gl.last_winchoice->ini_routine)
+                (*gl.last_winchoice->ini_routine)(WININIT_UNDO);
             if (winchoices[i].ini_routine)
                 (*winchoices[i].ini_routine)(WININIT);
-            g.last_winchoice = &winchoices[i];
+            gl.last_winchoice = &winchoices[i];
             return;
         }
     }
@@ -389,7 +384,7 @@ commit_windowchain(void)
                                               p->nextlink->linkdata);
         } else {
             (void) (*p->wincp->chain_routine)(WINCHAIN_INIT, n, p->linkdata,
-                                              g.last_winchoice->procs, 0);
+                                              gl.last_winchoice->procs, 0);
         }
     }
 
@@ -539,7 +534,8 @@ static win_request_info *hup_ctrl_nhwindow(winid, int, win_request_info *);
 
 static struct window_procs hup_procs = {
     WPID(hup), 0L, 0L,
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+      FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE }, /* colors */
     hup_init_nhwindows,
     hup_void_ndecl,                                    /* player_selection */
     hup_void_ndecl,                                    /* askname */
@@ -583,7 +579,7 @@ static struct window_procs hup_procs = {
     hup_void_ndecl,                                   /* status_finish */
     genl_status_enablefield, hup_status_update,
     genl_can_suspend_no,
-    hup_void_fdecl_int,                                /* update_inventory */
+    hup_void_fdecl_int,                               /* update_inventory */
     hup_ctrl_nhwindow,
 };
 
@@ -640,9 +636,10 @@ hup_nhgetch(void)
 
 /*ARGSUSED*/
 static char
-hup_yn_function(const char *prompt UNUSED,
-                const char *resp UNUSED,
-                char deflt)
+hup_yn_function(
+    const char *prompt UNUSED,
+    const char *resp UNUSED,
+    char deflt)
 {
     if (!deflt)
         deflt = '\033';
@@ -679,23 +676,26 @@ hup_create_nhwindow(int type UNUSED)
 
 /*ARGSUSED*/
 static int
-hup_select_menu(winid window UNUSED, int how UNUSED,
-                struct mi **menu_list UNUSED)
+hup_select_menu(
+    winid window UNUSED,
+    int how UNUSED,
+    struct mi **menu_list UNUSED)
 {
     return -1;
 }
 
 /*ARGSUSED*/
 static void
-hup_add_menu(winid window UNUSED,
-             const glyph_info *glyphinfo UNUSED,
-             const anything *identifier UNUSED,
-             char sel UNUSED,
-             char grpsel UNUSED,
-             int attr UNUSED,
-             int clr UNUSED,
-             const char *txt UNUSED,
-             unsigned int itemflags UNUSED)
+hup_add_menu(
+    winid window UNUSED,
+    const glyph_info *glyphinfo UNUSED,
+    const anything *identifier UNUSED,
+    char sel UNUSED,
+    char grpsel UNUSED,
+    int attr UNUSED,
+    int clr UNUSED,
+    const char *txt UNUSED,
+    unsigned int itemflags UNUSED)
 {
     return;
 }
@@ -716,10 +716,11 @@ hup_putstr(winid window UNUSED, int attr UNUSED, const char *text UNUSED)
 
 /*ARGSUSED*/
 static void
-hup_print_glyph(winid window UNUSED,
-                coordxy x UNUSED, coordxy y UNUSED,
-                const glyph_info *glyphinfo UNUSED,
-                const glyph_info *bkglyphinfo UNUSED)
+hup_print_glyph(
+    winid window UNUSED,
+    coordxy x UNUSED, coordxy y UNUSED,
+    const glyph_info *glyphinfo UNUSED,
+    const glyph_info *bkglyphinfo UNUSED)
 {
     return;
 }
@@ -787,9 +788,10 @@ hup_get_color_string(void)
 
 /*ARGSUSED*/
 static void
-hup_status_update(int idx UNUSED, genericptr_t ptr UNUSED, int chg UNUSED,
-                  int pc UNUSED, int color UNUSED,
-                  unsigned long *colormasks UNUSED)
+hup_status_update(
+    int idx UNUSED, genericptr_t ptr UNUSED,
+    int chg UNUSED, int pc UNUSED,
+    int color UNUSED, unsigned long *colormasks UNUSED)
 {
     return;
 }
@@ -826,8 +828,9 @@ hup_void_fdecl_winid(winid window UNUSED)
 
 /*ARGUSED*/
 static void
-hup_void_fdecl_winid_ulong(winid window UNUSED,
-                           unsigned long mbehavior UNUSED)
+hup_void_fdecl_winid_ulong(
+    winid window UNUSED,
+    unsigned long mbehavior UNUSED)
 {
     return;
 }
@@ -891,8 +894,11 @@ genl_status_finish(void)
 }
 
 void
-genl_status_enablefield(int fieldidx, const char *nm, const char *fmt,
-                        boolean enable)
+genl_status_enablefield(
+    int fieldidx,
+    const char *nm,
+    const char *fmt,
+    boolean enable)
 {
     status_fieldfmt[fieldidx] = fmt;
     status_fieldnm[fieldidx] = nm;
@@ -903,9 +909,11 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 
 /* call once for each field, then call with BL_FLUSH to output the result */
 void
-genl_status_update(int idx, genericptr_t ptr, int chg UNUSED,
-                   int percent UNUSED, int color UNUSED,
-                   unsigned long *colormasks UNUSED)
+genl_status_update(
+    int idx,
+    genericptr_t ptr,
+    int chg UNUSED, int percent UNUSED,
+    int color UNUSED, unsigned long *colormasks UNUSED)
 {
     char newbot1[MAXCO], newbot2[MAXCO];
     long cond, *condptr = (long *) ptr;
@@ -1090,11 +1098,12 @@ static FILE *dumplog_file;
 static time_t dumplog_now;
 
 char *
-dump_fmtstr(const char *fmt, char *buf,
-            boolean fullsubs) /* True -> full substitution for file name,
-                                 False -> partial substitution for
-                                          '--showpaths' feedback where there's
-                                          no game in progress when executed */
+dump_fmtstr(
+    const char *fmt,
+    char *buf,
+    boolean fullsubs) /* True -> full substitution for file name,
+                       * False -> partial substitution for '--showpaths'
+                       * feedback where there's no game in progress */
 {
     const char *fp = fmt;
     char *bp = buf;
@@ -1160,13 +1169,13 @@ dump_fmtstr(const char *fmt, char *buf,
                 break;
             case 'n': /* player name */
                 if (fullsubs)
-                    Sprintf(tmpbuf, "%s", *g.plname ? g.plname : "unknown");
+                    Sprintf(tmpbuf, "%s", *gp.plname ? gp.plname : "unknown");
                 else
                     Strcpy(tmpbuf, "{hero name}");
                 break;
             case 'N': /* first character of player name */
                 if (fullsubs)
-                    Sprintf(tmpbuf, "%c", *g.plname ? *g.plname : 'u');
+                    Sprintf(tmpbuf, "%c", *gp.plname ? *gp.plname : 'u');
                 else
                     Strcpy(tmpbuf, "{hero initial}");
                 break;
@@ -1396,7 +1405,7 @@ encglyph(int glyph)
 {
     static char encbuf[20]; /* 10+1 would suffice */
 
-    Sprintf(encbuf, "\\G%04X%04X", g.context.rndencode, glyph);
+    Sprintf(encbuf, "\\G%04X%04X", gc.context.rndencode, glyph);
     return encbuf;
 }
 
@@ -1408,16 +1417,16 @@ decode_glyph(const char *str, int *glyph_ptr)
     const char *dp;
 
     for (; *str && ++dcount <= 4; ++str) {
-        if ((dp = index(hex, *str)) != 0) {
+        if ((dp = strchr(hex, *str)) != 0) {
             retval++;
             rndchk = (rndchk * 16) + ((int) (dp - hex) / 2);
         } else
             break;
     }
-    if (rndchk == g.context.rndencode) {
+    if (rndchk == gc.context.rndencode) {
         *glyph_ptr = dcount = 0;
         for (; *str && ++dcount <= 4; ++str) {
-            if ((dp = index(hex, *str)) != 0) {
+            if ((dp = strchr(hex, *str)) != 0) {
                 retval++;
                 *glyph_ptr = (*glyph_ptr * 16) + ((int) (dp - hex) / 2);
             } else
@@ -1439,17 +1448,17 @@ decode_mixed(char *buf, const char *str)
 
     while (*str) {
         if (*str == '\\') {
-            int dcount, so, gv;
+            int dcount, so, ggv;
             const char *save_str;
 
             save_str = str++;
             switch (*str) {
             case 'G': /* glyph value \GXXXXNNNN*/
-                if ((dcount = decode_glyph(str + 1, &gv))) {
+                if ((dcount = decode_glyph(str + 1, &ggv))) {
                     str += (dcount + 1);
-                    map_glyphinfo(0, 0, gv, 0, &glyphinfo);
+                    map_glyphinfo(0, 0, ggv, 0, &glyphinfo);
                     so = glyphinfo.gm.sym.symidx;
-                    *put++ = g.showsyms[so];
+                    *put++ = gs.showsyms[so];
                     /* 'str' is ready for the next loop iteration and '*str'
                        should not be copied at the end of this iteration */
                     continue;
@@ -1497,6 +1506,27 @@ genl_putmixed(winid window, int attr, const char *str)
 
     /* now send it to the normal putstr */
     putstr(window, attr, decode_mixed(buf, str));
+}
+
+/* possibly called to show usage info during command line processing when
+   an interface hasn't yet been chosen and set up */
+void
+genl_display_file(const char *fname, boolean complain)
+{
+    char buf[BUFSZ];
+    dlb *f = dlb_fopen(fname, "r");
+
+    if (!f) {
+        if (complain) /* send complaint to stdout rather than to stderr */
+            fprintf(stdout, "\nCannot open \"%s\".\n", fname);
+    } else {
+        /* straight copy to stdout, no pagination or other interaction */
+        while (dlb_fgets(buf, BUFSZ, f)) {
+            if (fputs(buf, stdout) < 0)
+                break;
+        }
+        (void) dlb_fclose(f);
+    }
 }
 
 /*

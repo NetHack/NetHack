@@ -58,10 +58,8 @@ typedef enum orient_type
     UNDEFINED
 } orient;
 
-#ifdef GCC_WARN
 int wprintw(WINDOW *, const char *, ...) PRINTF_F(2, 3);
 int mvwprintw(WINDOW *, int, int, const char *, ...) PRINTF_F(4, 5);
-#endif
 
 /* cursmain.c */
 
@@ -131,10 +129,10 @@ extern void curs_destroy_all_wins(void);
 #ifdef ENHANCED_SYMBOLS
 extern void curses_putch(winid wid, int x, int y, int ch,
                          struct unicode_representation *u, int color,
-                         int attrs);
+                         int framecolor, int attrs);
 #else
 extern void curses_putch(winid wid, int x, int y, int ch, int color,
-                         int attrs);
+                         int framecolor, int attrs);
 #endif
 extern void curses_get_window_size(winid wid, int *height, int *width);
 extern boolean curses_window_has_border(winid wid);
@@ -151,11 +149,12 @@ extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
 
 /* cursmisc.c */
 
+extern int curses_getch(void);
 extern int curses_read_char(void);
 extern void curses_toggle_color_attr(WINDOW *win, int color, int attr,
                                      int onoff);
 extern void curses_menu_color_attr(WINDOW *, int, int, int);
-extern void curses_bail(const char *mesg);
+ATTRNORETURN extern void curses_bail(const char *mesg) NORETURN;
 extern winid curses_get_wid(int type);
 extern char *curses_copy_of(const char *s);
 extern int curses_num_lines(const char *str, int width);
@@ -222,6 +221,7 @@ extern void curses_cleanup(void);
 
 extern void curses_message_win_puts(const char *message, boolean recursed);
 extern void curses_got_input(void);
+extern int curses_got_output(void);
 extern int curses_block(boolean require_tab); /* for MSGTYPE=STOP */
 extern int curses_more(void);
 extern void curses_clear_unhighlight_message_window(void);

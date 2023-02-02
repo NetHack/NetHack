@@ -30,8 +30,8 @@ dumplogmsg(const char *line)
      *  The core should take responsibility for that and have
      *  this share it.
      */
-    unsigned indx = g.saved_pline_index; /* next slot to use */
-    char *oldest = g.saved_plines[indx]; /* current content of that slot */
+    unsigned indx = gs.saved_pline_index; /* next slot to use */
+    char *oldest = gs.saved_plines[indx]; /* current content of that slot */
 
     if (!strncmp(line, "Unknown command", 15))
         return;
@@ -42,9 +42,9 @@ dumplogmsg(const char *line)
     } else {
         if (oldest)
             free((genericptr_t) oldest);
-        g.saved_plines[indx] = dupstr(line);
+        gs.saved_plines[indx] = dupstr(line);
     }
-    g.saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
+    gs.saved_pline_index = (indx + 1) % DUMPLOG_MSG_COUNT;
 }
 
 /* called during save (unlike the interface-specific message history,
@@ -56,9 +56,9 @@ dumplogfreemessages(void)
     unsigned i;
 
     for (i = 0; i < DUMPLOG_MSG_COUNT; ++i)
-        if (g.saved_plines[i])
-            free((genericptr_t) g.saved_plines[i]), g.saved_plines[i] = 0;
-    g.saved_pline_index = 0;
+        if (gs.saved_plines[i])
+            free((genericptr_t) gs.saved_plines[i]), gs.saved_plines[i] = 0;
+    gs.saved_pline_index = 0;
 }
 #endif
 
@@ -68,10 +68,10 @@ putmesg(const char *line)
 {
     int attr = ATR_NONE;
 
-    if ((g.pline_flags & URGENT_MESSAGE) != 0
+    if ((gp.pline_flags & URGENT_MESSAGE) != 0
         && (windowprocs.wincap2 & WC2_URGENT_MESG) != 0)
         attr |= ATR_URGENT;
-    if ((g.pline_flags & SUPPRESS_HISTORY) != 0
+    if ((gp.pline_flags & SUPPRESS_HISTORY) != 0
         && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
         attr |= ATR_NOHISTORY;
 
@@ -99,22 +99,19 @@ vpline(const char *line, va_list the_args)
     char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
     int msgtyp;
-#if !defined(NO_VSNPRINTF)
     int vlen = 0;
-#endif
     boolean no_repeat;
 
     if (!line || !*line)
         return;
 #ifdef HANGUPHANDLING
-    if (g.program_state.done_hup)
+    if (gp.program_state.done_hup)
         return;
 #endif
-    if (g.program_state.wizkit_wishing)
+    if (gp.program_state.wizkit_wishing)
         return;
 
-    if (index(line, '%')) {
-#if !defined(NO_VSNPRINTF)
+    if (strchr(line, '%')) {
         vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
         if (vlen >= (int) sizeof pbuf)
@@ -122,9 +119,6 @@ vpline(const char *line, va_list the_args)
                   "pline", sizeof pbuf, vlen);
 #else
         nhUse(vlen);
-#endif
-#else
-        Vsprintf(pbuf, line, the_args);
 #endif
         line = pbuf;
     }
@@ -149,7 +143,7 @@ vpline(const char *line, va_list the_args)
      * Unfortunately, that means Norep() isn't honored (general issue) and
      * that short lines aren't combined into one longer one (tty behavior).
      */
-    if ((g.pline_flags & SUPPRESS_HISTORY) == 0)
+    if ((gp.pline_flags & SUPPRESS_HISTORY) == 0)
         dumplogmsg(line);
 #endif
     /* use raw_print() if we're called too early (or perhaps too late
@@ -162,16 +156,16 @@ vpline(const char *line, va_list the_args)
         goto pline_done;
     }
 
-    no_repeat = (g.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
-    if ((g.pline_flags & OVERRIDE_MSGTYPE) == 0) {
+    no_repeat = (gp.pline_flags & PLINE_NOREPEAT) ? TRUE : FALSE;
+    if ((gp.pline_flags & OVERRIDE_MSGTYPE) == 0) {
         msgtyp = msgtype_type(line, no_repeat);
 #ifdef USER_SOUNDS
         if (msgtyp == MSGTYP_NORMAL || msgtyp == MSGTYP_NOSHOW)
             maybe_play_sound(line);
 #endif
-        if ((g.pline_flags & URGENT_MESSAGE) == 0
+        if ((gp.pline_flags & URGENT_MESSAGE) == 0
             && (msgtyp == MSGTYP_NOSHOW
-                || (msgtyp == MSGTYP_NOREP && !strcmp(line, g.prevmsg))))
+                || (msgtyp == MSGTYP_NOREP && !strcmp(line, gp.prevmsg))))
             /* FIXME: we need a way to tell our caller that this message
              * was suppressed so that caller doesn't set iflags.last_msg
              * for something that hasn't been shown, otherwise a subsequent
@@ -182,7 +176,7 @@ vpline(const char *line, va_list the_args)
             goto pline_done;
     }
 
-    if (g.vision_full_recalc)
+    if (gv.vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
         flush_screen(1); /* %% */
@@ -195,7 +189,7 @@ vpline(const char *line, va_list the_args)
 
     /* this gets cleared after every pline message */
     iflags.last_msg = PLNMSG_UNKNOWN;
-    (void) strncpy(g.prevmsg, line, BUFSZ), g.prevmsg[BUFSZ - 1] = '\0';
+    (void) strncpy(gp.prevmsg, line, BUFSZ), gp.prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
 
@@ -214,9 +208,9 @@ custompline(unsigned pflags, const char *line, ...)
     va_list the_args;
 
     va_start(the_args, line);
-    g.pline_flags = pflags;
+    gp.pline_flags = pflags;
     vpline(line, the_args);
-    g.pline_flags = 0;
+    gp.pline_flags = 0;
     va_end(the_args);
 }
 
@@ -230,9 +224,9 @@ urgent_pline(const char *line, ...)
     va_list the_args;
 
     va_start(the_args, line);
-    g.pline_flags = URGENT_MESSAGE;
+    gp.pline_flags = URGENT_MESSAGE;
     vpline(line, the_args);
-    g.pline_flags = 0;
+    gp.pline_flags = 0;
     va_end(the_args);
 }
 
@@ -242,30 +236,30 @@ Norep(const char *line, ...)
     va_list the_args;
 
     va_start(the_args, line);
-    g.pline_flags = PLINE_NOREPEAT;
+    gp.pline_flags = PLINE_NOREPEAT;
     vpline(line, the_args);
-    g.pline_flags = 0;
+    gp.pline_flags = 0;
     va_end(the_args);
 }
 
 static char *
 You_buf(int siz)
 {
-    if (siz > g.you_buf_siz) {
-        if (g.you_buf)
-            free((genericptr_t) g.you_buf);
-        g.you_buf_siz = siz + 10;
-        g.you_buf = (char *) alloc((unsigned) g.you_buf_siz);
+    if (siz > gy.you_buf_siz) {
+        if (gy.you_buf)
+            free((genericptr_t) gy.you_buf);
+        gy.you_buf_siz = siz + 10;
+        gy.you_buf = (char *) alloc((unsigned) gy.you_buf_siz);
     }
-    return g.you_buf;
+    return gy.you_buf;
 }
 
 void
 free_youbuf(void)
 {
-    if (g.you_buf)
-        free((genericptr_t) g.you_buf), g.you_buf = (char *) 0;
-    g.you_buf_siz = 0;
+    if (gy.you_buf)
+        free((genericptr_t) gy.you_buf), gy.you_buf = (char *) 0;
+    gy.you_buf_siz = 0;
 }
 
 /* `prefix' must be a string literal, not a pointer */
@@ -351,7 +345,7 @@ You_hear(const char *line, ...)
     va_list the_args;
     char *tmp;
 
-    if (Deaf || !flags.acoustics)
+    if ((Deaf && !Unaware) || !flags.acoustics)
         return;
     va_start(the_args, line);
     if (Underwater)
@@ -406,7 +400,7 @@ void
 gamelog_add(long glflags, long gltime, const char *str)
 {
     struct gamelog_line *tmp;
-    struct gamelog_line *lst = g.gamelog;
+    struct gamelog_line *lst = gg.gamelog;
 
     tmp = (struct gamelog_line *) alloc(sizeof (struct gamelog_line));
     tmp->turn = gltime;
@@ -416,7 +410,7 @@ gamelog_add(long glflags, long gltime, const char *str)
     while (lst && lst->next)
         lst = lst->next;
     if (!lst)
-        g.gamelog = tmp;
+        gg.gamelog = tmp;
     else
         lst->next = tmp;
 }
@@ -431,7 +425,7 @@ livelog_printf(long ll_type, const char *line, ...)
     (void) vsnprintf(gamelogbuf, sizeof gamelogbuf, line, the_args);
     va_end(the_args);
 
-    gamelog_add(ll_type, g.moves, gamelogbuf);
+    gamelog_add(ll_type, gm.moves, gamelogbuf);
     strNsubst(gamelogbuf, "\t", "_", 0);
     livelog_add(ll_type, gamelogbuf);
 }
@@ -464,8 +458,8 @@ raw_printf(const char *line, ...)
     va_start(the_args, line);
     vraw_printf(line, the_args);
     va_end(the_args);
-    if (!g.program_state.beyond_savefile_load)
-        g.early_raw_messages++;
+    if (!gp.program_state.beyond_savefile_load)
+        ge.early_raw_messages++;
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL
@@ -475,12 +469,8 @@ vraw_printf(const char *line, va_list the_args)
 {
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
-    if (index(line, '%')) {
-#if !defined(NO_VSNPRINTF)
+    if (strchr(line, '%')) {
         (void) vsnprintf(pbuf, sizeof(pbuf), line, the_args);
-#else
-        Vsprintf(pbuf, line, the_args);
-#endif
         line = pbuf;
     }
     if ((int) strlen(line) > BUFSZ - 1) {
@@ -493,8 +483,8 @@ vraw_printf(const char *line, va_list the_args)
 #if defined(MSGHANDLER)
     execplinehandler(line);
 #endif
-    if (!g.program_state.beyond_savefile_load)
-        g.early_raw_messages++;
+    if (!gp.program_state.beyond_savefile_load)
+        ge.early_raw_messages++;
 }
 
 void
@@ -504,15 +494,11 @@ impossible(const char *s, ...)
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
     va_start(the_args, s);
-    if (g.program_state.in_impossible)
+    if (gp.program_state.in_impossible)
         panic("impossible called impossible");
 
-    g.program_state.in_impossible = 1;
-#if !defined(NO_VSNPRINTF)
+    gp.program_state.in_impossible = 1;
     (void) vsnprintf(pbuf, sizeof(pbuf), s, the_args);
-#else
-    Vsprintf(pbuf, s, the_args);
-#endif
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
@@ -521,7 +507,7 @@ impossible(const char *s, ...)
     pline("%s", pbuf);
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
-    if (g.program_state.something_worth_saving)
+    if (gp.program_state.something_worth_saving)
         Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
     pline("%s", pbuf);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
@@ -529,7 +515,7 @@ impossible(const char *s, ...)
         pline("Alternatively, contact local support: %s", sysopt.support);
     }
 
-    g.program_state.in_impossible = 0;
+    gp.program_state.in_impossible = 0;
 }
 
 RESTORE_WARNING_FORMAT_NONLITERAL
@@ -609,12 +595,9 @@ config_error_add(const char *str, ...)
 static void
 vconfig_error_add(const char *str, va_list the_args)
 {       /* start of vconf...() or of nested block in USE_OLDARG's conf...() */
-#if !defined(NO_VSNPRINTF)
     int vlen = 0;
-#endif
     char buf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
 
-#if !defined(NO_VSNPRINTF)
     vlen = vsnprintf(buf, sizeof buf, str, the_args);
 #if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
     if (vlen >= (int) sizeof buf)
@@ -622,9 +605,6 @@ vconfig_error_add(const char *str, va_list the_args)
               "config_error_add", sizeof buf, vlen);
 #else
     nhUse(vlen);
-#endif
-#else
-    Vsprintf(buf, str, the_args);
 #endif
     buf[BUFSZ - 1] = '\0';
     config_erradd(buf);

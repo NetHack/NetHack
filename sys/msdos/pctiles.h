@@ -10,7 +10,7 @@
  *
  */
 
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 #ifndef TILE_X
 #define TILE_X 16
 #endif
@@ -59,6 +59,6 @@ extern int ReadPlanarTileFile_O(int, struct overview_planar_cell_struct **);
 #ifdef PACKED_FILE
 extern int ReadPackedTileFile(int, char (*)[TILE_X]);
 #endif
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 
 /* pctiles.h */

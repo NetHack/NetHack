@@ -459,7 +459,7 @@ plselInitDialog(HWND hWnd)
     TCHAR wbuf[BUFSZ];
 
     /* set player name */
-    SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(g.plname, wbuf, sizeof(wbuf)));
+    SetDlgItemText(hWnd, IDC_PLSEL_NAME, NH_A2W(gp.plname, wbuf, sizeof(wbuf)));
 
     /* check flags for consistency */
     if (flags.initrole >= 0) {

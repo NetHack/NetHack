@@ -15,7 +15,7 @@ typedef struct {
     int     left; // in desktop coordinate pixel space
 } MonitorInfo;
 
-void win10_init();
+void win10_init(void);
 int win10_monitor_dpi(HWND hWnd);
 double win10_monitor_scale(HWND hWnd);
 void win10_monitor_info(HWND hWnd, MonitorInfo * monitorInfo);

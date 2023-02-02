@@ -5,7 +5,7 @@
 
 /* This file collects some Unix dependencies */
 
-#include "hack.h" /* mainly for index() which depends on BSD */
+#include "hack.h" /* mainly for strchr() which depends on BSD */
 
 #include <errno.h>
 #include <sys/stat.h>
@@ -74,18 +74,18 @@ eraseoldlocks(void)
 {
     register int i;
 
-    g.program_state.preserve_locks = 0; /* not required but shows intent */
+    gp.program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(g.lock, i);
-        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
+        set_levelfile_name(gl.lock, i);
+        (void) unlink(fqname(gl.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(g.lock, 0);
-    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
+    set_levelfile_name(gl.lock, 0);
+    if (unlink(fqname(gl.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return 1;     /* success! */
 }
@@ -115,22 +115,22 @@ getlock(void)
         error("%s", "");
     }
 
-    /* default value of g.lock[] is "1lock" where '1' gets changed to
+    /* default value of gl.lock[] is "1lock" where '1' gets changed to
        'a','b',&c below; override the default and use <uid><charname>
        if we aren't restricting the number of simultaneous games */
-    if (!g.locknum)
-        Sprintf(g.lock, "%u%s", (unsigned) getuid(), g.plname);
+    if (!gl.locknum)
+        Sprintf(gl.lock, "%u%s", (unsigned) getuid(), gp.plname);
 
-    regularize(g.lock);
-    set_levelfile_name(g.lock, 0);
+    regularize(gl.lock);
+    set_levelfile_name(gl.lock, 0);
 
-    if (g.locknum) {
-        if (g.locknum > 25)
-            g.locknum = 25;
+    if (gl.locknum) {
+        if (gl.locknum > 25)
+            gl.locknum = 25;
 
         do {
-            g.lock[0] = 'a' + i++;
-            fq_lock = fqname(g.lock, LEVELPREFIX, 0);
+            gl.lock[0] = 'a' + i++;
+            fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
 
             if ((fd = open(fq_lock, 0)) == -1) {
                 if (errno == ENOENT)
@@ -144,12 +144,12 @@ getlock(void)
             if (veryold(fd) && eraseoldlocks())
                 goto gotlock;
             (void) close(fd);
-        } while (i < g.locknum);
+        } while (i < gl.locknum);
 
         unlock_file(HLOCK);
         error("Too many hacks running now.");
     } else {
-        fq_lock = fqname(g.lock, LEVELPREFIX, 0);
+        fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
         if ((fd = open(fq_lock, 0)) == -1) {
             if (errno == ENOENT)
                 goto gotlock; /* no such file */
@@ -169,7 +169,7 @@ getlock(void)
 
         if (iflags.window_inited) {
             /* this is a candidate for paranoid_confirmation */
-            c = yn(destroy_old_game_prompt);
+            c = y_n(destroy_old_game_prompt);
         } else {
             (void) raw_printf("\n%s [yn] ", destroy_old_game_prompt);
             (void) fflush(stdout);
@@ -202,8 +202,8 @@ gotlock:
     if (fd == -1) {
         error("cannot creat lock file (%s).", fq_lock);
     } else {
-        if (write(fd, (genericptr_t) &g.hackpid, sizeof g.hackpid)
-            != sizeof g.hackpid) {
+        if (write(fd, (genericptr_t) &gh.hackpid, sizeof gh.hackpid)
+            != sizeof gh.hackpid) {
             error("cannot write lock (%s)", fq_lock);
         }
         if (close(fd) == -1) {
@@ -218,8 +218,8 @@ regularize(char *s)
 {
     register char *lp;
 
-    while ((lp = index(s, '.')) != 0 || (lp = index(s, '/')) != 0
-           || (lp = index(s, ' ')) != 0)
+    while ((lp = strchr(s, '.')) != 0 || (lp = strchr(s, '/')) != 0
+           || (lp = strchr(s, ' ')) != 0)
         *lp = '_';
 #if defined(SYSV) && !defined(AIX_31) && !defined(SVR4) && !defined(LINUX) \
     && !defined(__APPLE__)

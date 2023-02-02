@@ -1,8 +1,8 @@
 /* NetHack 3.7	attrib.h	$NHDT-Date: 1596498527 2020/08/03 23:48:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
-/* Copyright 1988, Mike Stephenson				  */
+/* Copyright 1988, Mike Stephenson                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
-/*	attrib.h - Header file for character class processing. */
+/*      attrib.h - Header file for character class processing. */
 
 #ifndef ATTRIB_H
 #define ATTRIB_H
@@ -40,10 +40,8 @@ struct attribs {
     schar a[A_MAX];
 };
 
-#define ATTRMAX(x)                                        \
-    ((x == A_STR && Upolyd && strongmonst(g.youmonst.data)) \
-         ? STR18(100)                                     \
-         : g.urace.attrmax[x])
-#define ATTRMIN(x) (g.urace.attrmin[x])
+#define ATTRMAX(x) \
+    ((x == A_STR && Upolyd) ? uasmon_maxStr() : gu.urace.attrmax[x])
+#define ATTRMIN(x) (gu.urace.attrmin[x])
 
 #endif /* ATTRIB_H */

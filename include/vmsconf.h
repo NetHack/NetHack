@@ -169,11 +169,6 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define FCMASK 0660 /* file creation mask */
 
 /*
- *
- */
-#define NO_VSNPRINTF /* Avoid vsnprintf, use less-safe vsprintf instead. */
-
-/*
  * The remainder of the file should not need to be changed.
  */
 
@@ -261,9 +256,6 @@ typedef __mode_t mode_t;
 #endif
 
 #include "system.h"
-
-#define index strchr
-#define rindex strrchr
 
 /* Use the high quality random number routines. */
 #ifndef USE_ISAAC64

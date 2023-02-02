@@ -53,7 +53,7 @@
  * Some combinations make no sense.  See the installation document.
  */
 #if !defined(NOTTYGRAPHICS)
-#define TTY_GRAPHICS /* good old tty based graphics */
+#define TTY_GRAPHICS /* good old tty-based graphics */
 #endif
 /* #define CURSES_GRAPHICS *//* Curses interface - Karl Garrison*/
 /* #define X11_GRAPHICS */   /* X11 interface */
@@ -98,9 +98,6 @@
 #ifndef DEFAULT_WC_TILED_MAP
 #define DEFAULT_WC_TILED_MAP /* Default to tiles if users doesn't say \
                                 wc_ascii_map */
-#endif
-#ifndef NOUSER_SOUNDS
-#define USER_SOUNDS /* Use sounds */
 #endif
 #ifndef USE_XPM
 #define USE_XPM           /* Use XPM format for images (required) */
@@ -202,6 +199,9 @@
  *              PERS_IS_UID  (0 or 1 - person is name or (numeric) userid)
  *            Can force incubi/succubi behavior to be toned down to nymph-like:
  *              SEDUCE       (0 or 1 - runtime disable/enable SEDUCE option)
+ *            Can hide the entry for displaying command line usage from
+ *            the help menu if players don't have access to command lines:
+ *              HIDEUSAGE    (0 or 1 - runtime show/hide command line usage)
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
  *              GDBPATH      (the path to the system gdb(1) program)
@@ -277,6 +277,9 @@
  *      uncommented to define NODUMPENUMS. Doing so will disable the
  *          nethack --dumpenums
  *      command line option.
+ *      Note:  the extra memory is also used when ENHANCED_SYMBOLS is
+ *      defined, so defining both ENHANCED_SYMBOLS and NODUMPENUMS will limit
+ *      the amount of memory and code reduction offered by the latter.
  */
 /* #define NODUMPENUMS */
 
@@ -417,6 +420,7 @@
  * #define MAX_NR_OF_PLAYERS 6
  */
 #endif /* CHDIR */
+
 
 /*
  * Section 3:   Definitions that may vary with system type.
@@ -662,8 +666,8 @@ typedef unsigned char uchar;
 /* End of Section 4 */
 
 #ifdef TTY_TILES_ESCCODES
-# ifndef USE_TILES
-#  define USE_TILES
+# ifndef TILES_IN_GLYPHMAP
+#  define TILES_IN_GLYPHMAP
 # endif
 #endif
 

@@ -1,5 +1,5 @@
 /* NetHack 3.7	mhinput.c	$NHDT-Date: 1596498350 2020/08/03 23:45:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <assert.h>
@@ -39,7 +39,7 @@ mswin_have_input(void)
     return
 #ifdef SAFERHANGUP
         /* we always have input (ESC) if hangup was requested */
-        g.program_state.done_hup ||
+        gp.program_state.done_hup ||
 #endif
         (nhi_read_pos != nhi_write_pos);
 }
@@ -69,7 +69,7 @@ mswin_input_pop(void)
 
 #ifdef SAFERHANGUP
     /* always return ESC when hangup was requested */
-    if (g.program_state.done_hup) {
+    if (gp.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
         hangup_event.ei.kbd.ch = '\033';
@@ -98,7 +98,7 @@ mswin_input_peek(void)
 
 #ifdef SAFERHANGUP
     /* always return ESC when hangup was requested */
-    if (g.program_state.done_hup) {
+    if (gp.program_state.done_hup) {
         static MSNHEvent hangup_event;
         hangup_event.type = NHEVENT_CHAR;
         hangup_event.ei.kbd.ch = '\033';

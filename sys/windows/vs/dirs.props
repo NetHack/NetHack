@@ -13,6 +13,8 @@
     <DocDir>$(RootDir)doc\</DocDir>
     <IncDir>$(RootDir)include\</IncDir>
     <LuaDir>$(RootDir)submodules\lua\</LuaDir>
+    <SndWavDir>$(RootDir)sound\wav\</SndWavDir>
+    <SndWindDir>$(RootDir)sound\windsound\</SndWindDir>
     <SrcDir>$(RootDir)src\</SrcDir>
     <SysDir>$(RootDir)sys\</SysDir>
     <UtilDir>$(RootDir)util\</UtilDir>

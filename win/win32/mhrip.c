@@ -1,5 +1,5 @@
 /* NetHack 3.7	mhrip.c	$NHDT-Date: 1596498358 2020/08/03 23:45:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "win10.h"
@@ -227,7 +227,7 @@ NHRIPWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GetNHApp()->hMainWnd = NULL;
         DestroyWindow(hWnd);
         SetFocus(GetNHApp()->hMainWnd);
-        g.program_state.stopprint++;
+        gp.program_state.stopprint++;
         return TRUE;
 
     case WM_DESTROY:

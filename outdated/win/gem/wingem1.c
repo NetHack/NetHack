@@ -1647,13 +1647,13 @@ const char *str;
         }
         message_line[mesg_hist - 1] = tmp;
     }
-    strcpy(g.toplines, str);
+    strcpy(gt.toplines, str);
     messages_pro_zug++;
     msg_max++;
 
-    if ((int) strlen(g.toplines) >= msg_width) {
+    if ((int) strlen(gt.toplines) >= msg_width) {
         int pos = msg_width;
-        tmp = g.toplines + msg_width;
+        tmp = gt.toplines + msg_width;
         while (*tmp != ' ' && pos >= 0) {
             tmp--;
             pos--;
@@ -1661,12 +1661,12 @@ const char *str;
         if (pos <= 0)
             pos = msg_width; /* Mar -- Oops, what a word :-) */
         message_age[msg_max] = TRUE;
-        strncpy(message_line[msg_max], g.toplines, pos);
+        strncpy(message_line[msg_max], gt.toplines, pos);
         message_line[msg_max][pos] = 0;
-        rest = strcpy(buf, g.toplines + pos);
+        rest = strcpy(buf, gt.toplines + pos);
     } else {
         message_age[msg_max] = TRUE;
-        strncpy(message_line[msg_max], g.toplines, msg_width);
+        strncpy(message_line[msg_max], gt.toplines, msg_width);
         rest = 0;
     }
 

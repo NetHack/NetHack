@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1652861829 2022/05/18 08:17:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.181 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1664837602 2022/10/03 22:53:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.196 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -75,10 +75,11 @@ enum dismount_types {
     DISMOUNT_GENERIC  = 0,
     DISMOUNT_FELL     = 1,
     DISMOUNT_THROWN   = 2,
-    DISMOUNT_POLY     = 3,
-    DISMOUNT_ENGULFED = 4,
-    DISMOUNT_BONES    = 5,
-    DISMOUNT_BYCHOICE = 6
+    DISMOUNT_KNOCKED  = 3, /* hero hit for knockback effect */
+    DISMOUNT_POLY     = 4,
+    DISMOUNT_ENGULFED = 5,
+    DISMOUNT_BONES    = 6,
+    DISMOUNT_BYCHOICE = 7
 };
 
 /* polyself flags */
@@ -226,6 +227,7 @@ enum misc_arti_nums {
 #include "region.h"
 #include "trap.h"
 #include "display.h"
+#include "sndprocs.h"
 #include "decl.h"
 #include "timeout.h"
 
@@ -274,10 +276,10 @@ typedef struct sortloot_item Loot;
 
 #define MATCH_WARN_OF_MON(mon) \
     (Warn_of_mon                                                        \
-     && ((g.context.warntype.obj & (mon)->data->mflags2) != 0           \
-         || (g.context.warntype.polyd & (mon)->data->mflags2) != 0      \
-         || (g.context.warntype.species                                 \
-             && (g.context.warntype.species == (mon)->data))))
+     && ((gc.context.warntype.obj & (mon)->data->mflags2) != 0           \
+         || (gc.context.warntype.polyd & (mon)->data->mflags2) != 0      \
+         || (gc.context.warntype.species                                 \
+             && (gc.context.warntype.species == (mon)->data))))
 
 typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 
@@ -408,11 +410,13 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
                                   * or m_initweap() (lawful Angel) */
 /* flag congrolling potential livelog event of finding an artifact */
 #define ONAME_KNOW_ARTI  0x0100U /* hero is already aware of this artifact */
+/* flag for suppressing perm_invent update when name gets assigned */
+#define ONAME_SKIP_INVUPD 0x0200U /* don't call update_inventory() */
 
 /* Flags to control find_mid() */
 #define FM_FMON 0x01    /* search the fmon chain */
 #define FM_MIGRATE 0x02 /* search the migrating monster chain */
-#define FM_MYDOGS 0x04  /* search g.mydogs */
+#define FM_MYDOGS 0x04  /* search gm.mydogs */
 #define FM_EVERYWHERE (FM_FMON | FM_MIGRATE | FM_MYDOGS)
 
 /* Flags to control pick_[race,role,gend,align] routines in role.c */
@@ -444,12 +448,14 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define MMOVE_NOMOVES 4 /* monster has no valid locations to move to */
 
 /*** some utility macros ***/
-#define yn(query) yn_function(query, ynchars, 'n', TRUE)
+#define y_n(query) yn_function(query, ynchars, 'n', TRUE)
 #define ynq(query) yn_function(query, ynqchars, 'q', TRUE)
 #define ynaq(query) yn_function(query, ynaqchars, 'y', TRUE)
 #define nyaq(query) yn_function(query, ynaqchars, 'n', TRUE)
 #define nyNaq(query) yn_function(query, ynNaqchars, 'n', TRUE)
 #define ynNaq(query) yn_function(query, ynNaqchars, 'y', TRUE)
+/* YN() is same as y_n() except doesn't save the response in do-again buffer */
+#define YN(query) yn_function(query, ynchars, 'n', FALSE)
 
 /* Macros for scatter */
 #define VIS_EFFECTS 0x01 /* display visual effects */
@@ -589,11 +595,12 @@ enum bodypart_types {
 /* flags for hero_breaks() and hits_bars(); BRK_KNOWN* let callers who have
    already called breaktest() prevent it from being called again since it
    has a random factor which makes it be non-deterministic */
-#define BRK_BY_HERO        1
-#define BRK_FROM_INV       2
-#define BRK_KNOWN2BREAK    4
-#define BRK_KNOWN2NOTBREAK 8
+#define BRK_BY_HERO        0x01
+#define BRK_FROM_INV       0x02
+#define BRK_KNOWN2BREAK    0x04
+#define BRK_KNOWN2NOTBREAK 0x08
 #define BRK_KNOWN_OUTCOME  (BRK_KNOWN2BREAK | BRK_KNOWN2NOTBREAK)
+#define BRK_MELEE          0x10
 
 /* extended command return values */
 #define ECMD_OK     0x00 /* cmd done successfully */
@@ -699,20 +706,16 @@ enum optset_restrictions {
 
 /* Cast to int, but limit value to range. */
 #define LIMIT_TO_RANGE_INT(lo, hi, var) \
-    (int) (                             \
-        (var) < (lo) ? (lo) : (         \
-            (var) > (hi) ? (hi) :       \
-            (var)                       \
-        )                               \
-    )
+    ((int) ((var) < (lo) ? (lo) : (var) > (hi) ? (hi) : (var)))
 
-#define ARM_BONUS(obj)                      \
-    (objects[(obj)->otyp].a_ac + (obj)->spe \
+#define ARM_BONUS(obj) \
+    (objects[(obj)->otyp].a_ac + (obj)->spe                             \
      - min((int) greatest_erosion(obj), objects[(obj)->otyp].a_ac))
 
 #define makeknown(x) discover_object((x), TRUE, TRUE)
-#define distu(xx, yy) dist2((int)(xx), (int)(yy), (int) u.ux, (int) u.uy)
-#define onlineu(xx, yy) online2((int)(xx), (int)(yy), (int) u.ux, (int) u.uy)
+#define distu(xx, yy) dist2((coordxy) (xx), (coordxy) (yy), u.ux, u.uy)
+#define mdistu(mon) distu((mon)->mx, (mon)->my)
+#define onlineu(xx, yy) online2((coordxy)(xx), (coordxy)(yy), u.ux, u.uy)
 
 #define rn1(x, y) (rn2(x) + (y))
 

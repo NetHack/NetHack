@@ -8,15 +8,16 @@
 
 struct selectionvar *l_selection_check(lua_State *, int);
 static struct selectionvar *l_selection_push_new(lua_State *);
-static void l_selection_push_copy(lua_State *, struct selectionvar *);
 
 /* lua_CFunction prototypes */
 static int l_selection_new(lua_State *);
 static int l_selection_clone(lua_State *);
+static int l_selection_numpoints(lua_State *);
 static int l_selection_getpoint(lua_State *);
 static int l_selection_setpoint(lua_State *);
 static int l_selection_filter_percent(lua_State *);
 static int l_selection_rndcoord(lua_State *);
+static int l_selection_room(lua_State *);
 static int l_selection_getbounds(lua_State *);
 static boolean params_sel_2coords(lua_State *, struct selectionvar **,
                                   coordxy *, coordxy *, coordxy *, coordxy *);
@@ -105,7 +106,7 @@ l_selection_push_new(lua_State *L)
 }
 
 /* push a copy of selectionvar tmp to lua stack */
-static void
+void
 l_selection_push_copy(lua_State *L, struct selectionvar *tmp)
 {
     struct selectionvar
@@ -143,6 +144,8 @@ l_selection_clone(lua_State *L)
     tmp->map = dupstr(sel->map);
     return 1;
 }
+
+DISABLE_WARNING_UNREACHABLE_CODE
 
 /* selection.set(sel, x, y); */
 /* selection.set(sel, x, y, value); */
@@ -187,9 +190,30 @@ l_selection_setpoint(lua_State *L)
     else
         crd = SP_COORD_PACK(x,y);
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, crd);
+                       gc.coder ? gc.coder->croom : NULL, crd);
     selection_setpoint(x, y, sel, val);
     lua_settop(L, 1);
+    return 1;
+}
+
+/* local numpoints = selection.numpoints(sel); */
+static int
+l_selection_numpoints(lua_State *L)
+{
+    struct selectionvar *sel = l_selection_check(L, 1);
+    coordxy x, y;
+    int ret = 0;
+    NhRect rect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
+            if (selection_getpoint(x, y, sel))
+                ret++;
+
+    lua_settop(L, 0);
+    lua_pushinteger(L, ret);
     return 1;
 }
 
@@ -206,6 +230,7 @@ l_selection_getpoint(lua_State *L)
     lua_remove(L, 1); /* sel */
     if (!nhl_get_xy_params(L, &ix, &iy)) {
         nhl_error(L, "l_selection_getpoint: Incorrect params");
+        /*NOTREACHED*/
         return 0;
     }
     x = (coordxy) ix;
@@ -215,13 +240,15 @@ l_selection_getpoint(lua_State *L)
         crd = SP_COORD_PACK_RANDOM(0);
     else
         crd = SP_COORD_PACK(x,y);
-    get_location_coord(&x, &y, ANY_LOC, g.coder ? g.coder->croom : NULL, crd);
+    get_location_coord(&x, &y, ANY_LOC, gc.coder ? gc.coder->croom : NULL, crd);
 
     val = selection_getpoint(x, y, sel);
     lua_settop(L, 0);
     lua_pushnumber(L, val);
     return 1;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* local s = selection.negate(sel); */
 /* local s = selection.negate(); */
@@ -241,6 +268,7 @@ l_selection_not(lua_State *L)
         (void) l_selection_clone(L);
         sel2 = l_selection_check(L, 2);
         selection_not(sel2);
+        lua_remove(L, 1);
     }
     return 1;
 }
@@ -285,6 +313,7 @@ l_selection_or(lua_State *L)
             int val = selection_getpoint(x, y, sela) | selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
+    selr->bounds = rect;
 
     lua_remove(L, 1);
     lua_remove(L, 1);
@@ -368,18 +397,40 @@ l_selection_rndcoord(lua_State *L)
     selection_rndcoord(sel, &x, &y, removeit);
     if (!(x == -1 && y == -1)) {
         update_croom();
-        if (g.coder && g.coder->croom) {
-            x -= g.coder->croom->lx;
-            y -= g.coder->croom->ly;
+        if (gc.coder && gc.coder->croom) {
+            x -= gc.coder->croom->lx;
+            y -= gc.coder->croom->ly;
         } else {
-            x -= g.xstart;
-            y -= g.ystart;
+            x -= gx.xstart;
+            y -= gy.ystart;
         }
     }
     lua_settop(L, 0);
     lua_newtable(L);
     nhl_add_table_entry_int(L, "x", x);
     nhl_add_table_entry_int(L, "y", y);
+    return 1;
+}
+
+/* local s = selection.room(); */
+static int
+l_selection_room(lua_State *L)
+{
+    struct selectionvar *sel;
+    int argc = lua_gettop(L);
+    struct mkroom *croom = NULL;
+
+    if (argc == 1) {
+        int i = luaL_checkinteger(L, -1);
+
+        croom = (i >= 0 && i < gn.nroom) ? &gr.rooms[i] : NULL;
+    }
+
+    sel = selection_from_mkroom(croom);
+
+    l_selection_push_copy(L, sel);
+    selection_free(sel, TRUE);
+
     return 1;
 }
 
@@ -449,8 +500,8 @@ l_selection_line(lua_State *L)
         nhl_error(L, "selection.line: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1,y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2,y2));
+    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x1,y1));
+    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x2,y2));
 
     (void) l_selection_clone(L);
     sel = l_selection_check(L, 2);
@@ -469,9 +520,9 @@ l_selection_rect(lua_State *L)
         nhl_error(L, "selection.rect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
                        SP_COORD_PACK(x1, y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
@@ -498,9 +549,9 @@ l_selection_fillrect(lua_State *L)
         nhl_error(L, "selection.fillrect: illegal arguments");
     }
 
-    get_location_coord(&x1, &y1, ANY_LOC, g.coder ? g.coder->croom : NULL,
+    get_location_coord(&x1, &y1, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
                        SP_COORD_PACK(x1, y1));
-    get_location_coord(&x2, &y2, ANY_LOC, g.coder ? g.coder->croom : NULL,
+    get_location_coord(&x2, &y2, ANY_LOC, gc.coder ? gc.coder->croom : NULL,
                        SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
@@ -547,9 +598,9 @@ l_selection_randline(lua_State *L)
     }
 
     get_location_coord(&x1, &y1, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x1, y1));
+                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x1, y1));
     get_location_coord(&x2, &y2, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x2, y2));
+                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x2, y2));
 
     (void) l_selection_clone(L);
     sel = l_selection_check(L, 2);
@@ -667,7 +718,7 @@ l_selection_flood(lua_State *L)
     }
 
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
+                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
 
     if (isok(x, y)) {
         set_floodfillchk_match_under(levl[x][y].typ);
@@ -717,7 +768,7 @@ l_selection_circle(lua_State *L)
     }
 
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
+                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
 
     selection_do_ellipse(sel, x, y, r, r, !filled);
 
@@ -768,7 +819,7 @@ l_selection_ellipse(lua_State *L)
     }
 
     get_location_coord(&x, &y, ANY_LOC,
-                       g.coder ? g.coder->croom : NULL, SP_COORD_PACK(x, y));
+                       gc.coder ? gc.coder->croom : NULL, SP_COORD_PACK(x, y));
 
     selection_do_ellipse(sel, x, y, r1, r2, !filled);
 
@@ -882,6 +933,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "clone", l_selection_clone },
     { "get", l_selection_getpoint },
     { "set", l_selection_setpoint },
+    { "numpoints", l_selection_numpoints },
     { "negate", l_selection_not },
     { "percentage", l_selection_filter_percent },
     { "rndcoord", l_selection_rndcoord },
@@ -899,6 +951,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "gradient", l_selection_gradient },
     { "iterate", l_selection_iterate },
     { "bounds", l_selection_getbounds },
+    { "room", l_selection_room },
     { NULL, NULL }
 };
 

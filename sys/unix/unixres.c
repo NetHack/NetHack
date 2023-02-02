@@ -6,8 +6,8 @@
  * will hide privileges from the caller if so desired.
  *
  * Currently supported UNIX variants:
- *	Linux version 2.1.44 and above
- *	FreeBSD (versions unknown)
+ *      Linux version 2.1.44 and above
+ *      FreeBSD (versions unknown)
  *
  * Note: SunOS and Solaris have no mechanism for retrieving the saved id,
  * so temporarily dropping privileges on these systems is sufficient to

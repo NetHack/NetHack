@@ -1,5 +1,5 @@
 /* NetHack 3.7	mhstatus.c	$NHDT-Date: 1596498360 2020/08/03 23:46:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include <assert.h>
@@ -199,15 +199,17 @@ StatusWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             size_t space_remaining = msg_data->max_size;
 
             for (int line = 0; line < NHSW_LINES; line++) {
-                mswin_status_line *status_line = data->status_lines[line].lines;
+                mswin_status_line *status_line = &data->status_lines->lines[line];
                 for (int i = 0; i < status_line->status_strings.count; i++) {
                     mswin_status_string * status_string = status_line->status_strings.status_strings[i];
-                    if (status_string->space_in_front) {
-                        strncat(msg_data->buffer, " ", space_remaining);
+                    if (status_string->str != NULL) {
+                        if (status_string->space_in_front) {
+                            strncat(msg_data->buffer, " ", space_remaining);
+                            space_remaining = msg_data->max_size - strlen(msg_data->buffer);
+                        }
+                        strncat(msg_data->buffer, status_string->str, space_remaining);
                         space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                     }
-                    strncat(msg_data->buffer, status_string->str, space_remaining);
-                    space_remaining = msg_data->max_size - strlen(msg_data->buffer);
                 }
                 strncat(msg_data->buffer, "\r\n", space_remaining);
                 space_remaining = msg_data->max_size - strlen(msg_data->buffer);

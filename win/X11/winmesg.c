@@ -1,15 +1,15 @@
 /* NetHack 3.7	winmesg.c	$NHDT-Date: 1596498373 2020/08/03 23:46:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * Message window routines.
  *
  * Global functions:
- *	create_message_window()
- *	destroy_message_window()
- *	display_message_window()
- *	append_message()
+ *      create_message_window()
+ *      destroy_message_window()
+ *      display_message_window()
+ *      append_message()
  */
 
 #ifndef SYSV

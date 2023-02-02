@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 64
+#define EDITLEVEL 71
 
 /*
  * Development status possibilities.
@@ -36,7 +36,7 @@
 #define DEBUG
 #endif
 
-#define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2022"
+#define COPYRIGHT_BANNER_A "NetHack, Copyright 1985-2023"
 #define COPYRIGHT_BANNER_B \
     "         By Stichting Mathematisch Centrum and M. Stephenson."
 /* nomakedefs.copyright_banner_c is generated at runtime */
@@ -371,7 +371,7 @@
  *  NetHack 3.2.0, April 11, 1996
  *  enhancements to the windowing systems including "tiles" or icons to
  *      visually represent monsters and objects (courtesy Warwick Allison)
- *  window based menu system introduced for inventory and selection
+ *  window-based menu system introduced for inventory and selection
  *  moving light sources besides the player
  *  improved #untrap (courtesy Helge Hafting)
  *  spellcasting logic changes to balance spellcasting towards magic-using

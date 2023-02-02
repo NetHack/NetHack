@@ -41,6 +41,7 @@
         char *          visctrl         (char)
         char *          strsubst        (char *, const char *, const char *)
         int             strNsubst       (char *,const char *,const char *,int)
+        const char *    findword        (const char *,const char *,int,boolean)
         const char *    ordin           (int)
         char *          sitoa           (int)
         int             sgn             (int)
@@ -79,12 +80,6 @@
         void            nh_snprintf     (const char *, int, char *, size_t,
                                          const char *, ...)
 =*/
-#ifdef LINT
-#define Static /* pacify lint */
-#else
-#define Static static
-#endif
-
 static boolean pmatch_internal(const char *, const char *, boolean,
                                const char *);
 
@@ -210,7 +205,7 @@ trimspaces(char *txt)
 char *
 strip_newline(char *str)
 {
-    char *p = rindex(str, '\n');
+    char *p = strrchr(str, '\n');
 
     if (p) {
         if (p > str && *(p - 1) == '\r')
@@ -283,7 +278,7 @@ str_lines_maxlen(const char *str)
 
     s1 = str;
     while (s1 && *s1) {
-        s2 = index(s1, '\n');
+        s2 = strchr(s1, '\n');
         if (s2) {
             len = (int) (s2 - s1);
             s1 = s2 + 1;
@@ -371,7 +366,7 @@ strcasecpy(char *dst, const char *src)
 char *
 s_suffix(const char *s)
 {
-    Static char buf[BUFSZ];
+    static char buf[BUFSZ];
 
     Strcpy(buf, s);
     if (!strcmpi(buf, "it")) /* it -> its */
@@ -400,14 +395,14 @@ ing_suffix(const char *s)
     if ((p >= &buf[3] && !strcmpi(p - 3, " on"))
         || (p >= &buf[4] && !strcmpi(p - 4, " off"))
         || (p >= &buf[5] && !strcmpi(p - 5, " with"))) {
-        p = rindex(buf, ' ');
+        p = strrchr(buf, ' ');
         Strcpy(onoff, p);
         *p = '\0';
     }
     if (p >= &buf[2] && !strcmpi(p - 2, "er")) { /* slither + ing */
         /* nothing here */
-    } else if (p >= &buf[3] && !index(vowel, *(p - 1))
-        && index(vowel, *(p - 2)) && !index(vowel, *(p - 3))) {
+    } else if (p >= &buf[3] && !strchr(vowel, *(p - 1))
+        && strchr(vowel, *(p - 2)) && !strchr(vowel, *(p - 3))) {
         /* tip -> tipp + ing */
         *p = *(p - 1);
         *(p + 1) = '\0';
@@ -495,7 +490,7 @@ tabexpand(
 char *
 visctrl(char c)
 {
-    Static char visctrl_bufs[VISCTRL_NBUF][5];
+    static char visctrl_bufs[VISCTRL_NBUF][5];
     static int nbuf = 0;
     register int i = 0;
     char *ccc = visctrl_bufs[nbuf];
@@ -530,7 +525,7 @@ stripchars(char *bp, const char *stuff_to_strip, const char *orig)
 
     if (s) {
         while (*orig && i < (BUFSZ - 1)) {
-            if (!index(stuff_to_strip, *orig)) {
+            if (!strchr(stuff_to_strip, *orig)) {
                 *s++ = *orig;
                 i++;
             }
@@ -621,6 +616,30 @@ strNsubst(
     return rcount;
 }
 
+/* search for a word in a space-separated list; returns non-Null if found */
+const char *
+findword(
+    const char *list,   /* string of space-separated words */
+    const char *word,   /* word to try to find */
+    int wordlen,        /* so that it isn't required to be \0 terminated */
+    boolean ignorecase) /* T: case-blind, F: case-sensitive */
+{
+    const char *p = list;
+
+    while (p) {
+        while (*p == ' ')
+            ++p;
+        if (!*p)
+            break;
+        if ((ignorecase ? !strncmpi(p, word, wordlen)
+                        : !strncmp(p, word, wordlen))
+            && (p[wordlen] == '\0' || p[wordlen] == ' '))
+            return p;
+        p = strchr(p + 1, ' ');
+    }
+    return (const char *) 0;
+}
+
 /* return the ordinal suffix of a number */
 const char *
 ordin(int n)               /* note: should be non-negative */
@@ -638,7 +657,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL  /* one compiler complains about
 char *
 sitoa(int n)
 {
-    Static char buf[13];
+    static char buf[13];
 
     Sprintf(buf, (n < 0) ? "%d" : "+%d", n);
     return buf;
@@ -727,7 +746,7 @@ isqrt(int val)
 
 /* are two points lined up (on a straight line)? */
 boolean
-online2(int x0, int y0, int x1, int y1)
+online2(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
 {
     int dx = x0 - x1, dy = y0 - y1;
     /*  If either delta is zero then they're on an orthogonal line,
@@ -757,10 +776,10 @@ pmatch_internal(const char *patrn, const char *strng,
         /* fuzzy match variant of pmatch; particular characters are ignored */
         do {
             s = *strng++;
-        } while (index(sk, s));
+        } while (strchr(sk, s));
         do {
             p = *patrn++;
-        } while (index(sk, p));
+        } while (strchr(sk, p));
     }
     if (!p)                           /* end of pattern */
         return (boolean) (s == '\0'); /* matches iff end of string too */
@@ -881,9 +900,9 @@ fuzzymatch(const char *s1, const char *s2, const char *ignore_chars,
     register char c1, c2;
 
     do {
-        while ((c1 = *s1++) != '\0' && index(ignore_chars, c1) != 0)
+        while ((c1 = *s1++) != '\0' && strchr(ignore_chars, c1) != 0)
             continue;
-        while ((c2 = *s2++) != '\0' && index(ignore_chars, c2) != 0)
+        while ((c2 = *s2++) != '\0' && strchr(ignore_chars, c2) != 0)
             continue;
         if (!c1 || !c2)
             break; /* stop when end of either string is reached */
@@ -1015,7 +1034,7 @@ getyear(void)
 char *
 yymmdd(time_t date)
 {
-    Static char datestr[10];
+    static char datestr[10];
     struct tm *lt;
 
     if (date == 0)
@@ -1138,7 +1157,7 @@ time_from_yyyymmddhhmmss(char *buf)
             t.tm_sec = atoi(s);
             timeresult = mktime(&t);
         }
-        if ((int) timeresult == -1)
+        if (timeresult == (time_t) -1)
             debugpline1("time_from_yyyymmddhhmmss(%s) would have returned -1",
                         buf ? buf : "");
         else
@@ -1318,11 +1337,7 @@ nh_snprintf(
     int n;
 
     va_start(ap, fmt);
-#ifdef NO_VSNPRINTF
-    n = vsprintf(str, fmt, ap);
-#else
     n = vsnprintf(str, size, fmt, ap);
-#endif
     va_end(ap);
     if (n < 0 || (size_t) n >= size) { /* is there a problem? */
         impossible("snprintf %s: func %s, file line %d",

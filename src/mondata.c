@@ -1,4 +1,4 @@
-/* NetHack 3.7	mondata.c	$NHDT-Date: 1624322866 2021/06/22 00:47:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.98 $ */
+/* NetHack 3.7	mondata.c	$NHDT-Date: 1672003297 2022/12/25 21:21:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.119 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -80,7 +80,7 @@ poly_when_stoned(struct permonst *ptr)
 {
     /* non-stone golems turn into stone golems unless latter is genocided */
     return (boolean) (is_golem(ptr) && ptr != &mons[PM_STONE_GOLEM]
-                      && !(g.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD));
+                      && !(gm.mvitals[PM_STONE_GOLEM].mvflags & G_GENOD));
     /* allow G_EXTINCT */
 }
 
@@ -91,7 +91,7 @@ defended(struct monst *mon, int adtyp)
 {
     struct obj *o, otemp;
     int mndx;
-    boolean is_you = (mon == &g.youmonst);
+    boolean is_you = (mon == &gy.youmonst);
 
     /* is 'mon' wielding an artifact that protects against 'adtyp'? */
     o = is_you ? uwep : MON_WEP(mon);
@@ -130,7 +130,7 @@ resists_drli(struct monst *mon)
 
     if (is_undead(ptr) || is_demon(ptr) || is_were(ptr)
         /* is_were() doesn't handle hero in human form */
-        || (mon == &g.youmonst && u.ulycn >= LOW_PM)
+        || (mon == &gy.youmonst && u.ulycn >= LOW_PM)
         || ptr == &mons[PM_DEATH] || is_vampshifter(mon))
         return TRUE;
     return defended(mon, AD_DRLI);
@@ -141,7 +141,7 @@ boolean
 resists_magm(struct monst* mon)
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &g.youmonst);
+    boolean is_you = (mon == &gy.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -154,7 +154,7 @@ resists_magm(struct monst* mon)
     if (o && o->oartifact && defends(AD_MAGM, o))
         return TRUE;
     /* check for magic resistance granted by worn or carried items */
-    o = is_you ? g.invent : mon->minvent;
+    o = is_you ? gi.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -174,7 +174,7 @@ boolean
 resists_blnd(struct monst* mon)
 {
     struct permonst *ptr = mon->data;
-    boolean is_you = (mon == &g.youmonst);
+    boolean is_you = (mon == &gy.youmonst);
     long slotmask;
     struct obj *o;
 
@@ -191,7 +191,7 @@ resists_blnd(struct monst* mon)
     o = is_you ? uwep : MON_WEP(mon);
     if (o && o->oartifact && defends(AD_BLND, o))
         return TRUE;
-    o = is_you ? g.invent : mon->minvent;
+    o = is_you ? gi.invent : mon->minvent;
     slotmask = W_ARMOR | W_ACCESSORY;
     if (!is_you /* assumes monsters don't wield non-weapons */
         || (uwep && (uwep->oclass == WEAPON_CLASS || is_weptool(uwep))))
@@ -217,7 +217,7 @@ can_blnd(
     uchar aatyp,
     struct obj *obj) /* aatyp == AT_WEAP, AT_SPIT */
 {
-    boolean is_you = (mdef == &g.youmonst);
+    boolean is_you = (mdef == &gy.youmonst);
     boolean check_visor = FALSE;
     struct obj *o;
 
@@ -259,7 +259,7 @@ can_blnd(
             return TRUE; /* no defense */
         } else
             return FALSE; /* other objects cannot cause blindness yet */
-        if ((magr == &g.youmonst) && u.uswallow)
+        if ((magr == &gy.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         break;
 
@@ -274,7 +274,7 @@ can_blnd(
         /* e.g. raven: all ublindf, including LENSES, protect */
         if (is_you && ublindf)
             return FALSE;
-        if ((magr == &g.youmonst) && u.uswallow)
+        if ((magr == &gy.youmonst) && u.uswallow)
             return FALSE; /* can't affect eyes while inside monster */
         check_visor = TRUE;
         break;
@@ -292,7 +292,7 @@ can_blnd(
 
     /* check if wearing a visor (only checked if visor might help) */
     if (check_visor) {
-        o = (mdef == &g.youmonst) ? g.invent : mdef->minvent;
+        o = (mdef == &gy.youmonst) ? gi.invent : mdef->minvent;
         for (; o; o = o->nobj)
             if ((o->owornmask & W_ARMH)
                 && objdescr_is(o, "visored helmet"))
@@ -313,6 +313,102 @@ ranged_attk(struct permonst* ptr)
             return TRUE;
     return FALSE;
 }
+
+#if defined(MAKEDEFS_C) \
+    || (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || defined(DEBUG)
+/*
+ * If adding a new monster, include a guestimate for difficulty,
+ * build the program, then run it in wizard mode and use the
+ * #mondifficulty command.  If it reports a discrepancy, update
+ * the monsters array with the more accurate value (or possibly
+ * modify the 'mstrength()' algorithm to generate the guessed one).
+ */
+static boolean mstrength_ranged_attk(struct permonst *);
+
+
+/* This routine is designed to return an integer value which represents
+   an approximation of monster strength.  It uses a similar method of
+   determination as "experience()" to arrive at the strength. */
+int
+mstrength(struct permonst* ptr)
+{
+    int i, tmp2, n, tmp = ptr->mlevel;
+
+    if (tmp > 49) /* special fixed hp monster */
+        tmp = 2 * (tmp - 6) / 4;
+
+    /* for creation in groups */
+    n = (!!(ptr->geno & G_SGROUP));
+    n += (!!(ptr->geno & G_LGROUP)) << 1;
+
+    /* for ranged attacks */
+    if (mstrength_ranged_attk(ptr))
+        n++;
+
+    /* for higher ac values */
+    n += (ptr->ac < 4);
+    n += (ptr->ac < 0);
+
+    /* for very fast monsters */
+    n += (ptr->mmove >= 18);
+
+    /* for each attack and "special" attack */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].aatyp;
+        n += (tmp2 > 0);
+        n += (tmp2 == AT_MAGC);
+        n += (tmp2 == AT_WEAP && (ptr->mflags2 & M2_STRONG));
+        if (tmp2 == AT_EXPL) {
+            int tmp3 = ptr->mattk[i].adtyp;
+            /* {freezing,flaming,shocking} spheres are fairly weak but
+               can destroy equipment; {yellow,black} lights can't */
+            n += ((tmp3 == AD_COLD || tmp3 == AD_FIRE) ? 3
+                  : (tmp3 == AD_ELEC) ? 5 : 0);
+        }
+    }
+
+    /* for each "special" damage type */
+    for (i = 0; i < NATTK; i++) {
+        tmp2 = ptr->mattk[i].adtyp;
+        if ((tmp2 == AD_DRLI) || (tmp2 == AD_STON) || (tmp2 == AD_DRST)
+            || (tmp2 == AD_DRDX) || (tmp2 == AD_DRCO) || (tmp2 == AD_WERE))
+            n += 2;
+        else if (strcmp(ptr->pmnames[NEUTRAL], "grid bug"))
+            n += (tmp2 != AD_PHYS);
+        n += ((int) (ptr->mattk[i].damd * ptr->mattk[i].damn) > 23);
+    }
+
+    /* Leprechauns are special cases.  They have many hit dice so they
+       can hit and are hard to kill, but they don't really do much damage. */
+    if (!strcmp(ptr->pmnames[NEUTRAL], "leprechaun"))
+        n -= 2;
+
+    /* finally, adjust the monster level  0 <= n <= 24 (approx.) */
+    if (n == 0)
+        tmp -= 1;
+    else if (n < 6)
+        tmp += (n / 3 + 1);
+    else
+        tmp += (n / 2);
+
+    return (tmp >= 0) ? tmp : 0;
+}
+
+/* returns True if monster can attack at range */
+static boolean
+mstrength_ranged_attk(register struct permonst* ptr)
+{
+    register int i, j;
+    register int atk_mask = (1 << AT_BREA) | (1 << AT_SPIT) | (1 << AT_GAZE);
+
+    for (i = 0; i < NATTK; i++) {
+        if ((j = ptr->mattk[i].aatyp) >= AT_WEAP
+            || (j < 32 && (atk_mask & (1 << j)) != 0))
+            return TRUE;
+    }
+    return FALSE;
+}
+#endif /* (NH_DEVEL_STATUS != NH_STATUS_RELEASED) || DEBUG || MAKEDEFS_C */
 
 /* True if specific monster is especially affected by silver weapons */
 boolean
@@ -372,7 +468,7 @@ can_blow(struct monst* mtmp)
         && (breathless(mtmp->data) || verysmall(mtmp->data)
             || !has_head(mtmp->data) || mtmp->data->mlet == S_EEL))
         return FALSE;
-    if ((mtmp == &g.youmonst) && Strangled)
+    if ((mtmp == &gy.youmonst) && Strangled)
         return FALSE;
     return TRUE;
 }
@@ -381,7 +477,7 @@ can_blow(struct monst* mtmp)
 boolean
 can_chant(struct monst* mtmp)
 {
-    if ((mtmp == &g.youmonst && Strangled)
+    if ((mtmp == &gy.youmonst && Strangled)
         || is_silent(mtmp->data) || !has_head(mtmp->data)
         || mtmp->data->msound == MS_BUZZ || mtmp->data->msound == MS_BURBLE)
         return FALSE;
@@ -404,10 +500,10 @@ can_be_strangled(struct monst* mon)
        are non-breathing creatures which have higher brain function. */
     if (!has_head(mon->data))
         return FALSE;
-    if (mon == &g.youmonst) {
+    if (mon == &gy.youmonst) {
         /* hero can't be mindless but poly'ing into mindless form can
            confer strangulation protection */
-        nobrainer = mindless(g.youmonst.data);
+        nobrainer = mindless(gy.youmonst.data);
         nonbreathing = Breathless;
     } else {
         nobrainer = mindless(mon->data);
@@ -668,6 +764,8 @@ same_race(struct permonst* pm1, struct permonst* pm2)
     return FALSE;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* return an index into the mons array */
 int
 monsndx(struct permonst* ptr)
@@ -678,10 +776,13 @@ monsndx(struct permonst* ptr)
     if (i < LOW_PM || i >= NUMMONS) {
         panic("monsndx - could not index monster (%s)",
               fmt_ptr((genericptr_t) ptr));
+        /*NOTREACHED*/
         return NON_PM; /* will not get here */
     }
     return i;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* for handling alternate spellings */
 struct alt_spl {
@@ -1170,8 +1271,8 @@ big_little_match(int montyp1, int montyp2)
 const struct permonst *
 raceptr(struct monst* mtmp)
 {
-    if (mtmp == &g.youmonst && !Upolyd)
-        return &mons[g.urace.mnum];
+    if (mtmp == &gy.youmonst && !Upolyd)
+        return &mons[gu.urace.mnum];
     else
         return mtmp->data;
 }

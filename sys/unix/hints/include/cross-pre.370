@@ -74,9 +74,18 @@ ifdef BUILD_PDCURSES
 # PD Curses library
 #===============-=================================================
 ifdef WANT_WIN_CURSES
+ifdef WANT_DOSVGA
+PDCTOP = ../lib/pdcursesmod
+PDCPORT = $(PDCTOP)/dosvga
+PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
+		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" \
+		-D"PDC_WIDE" -D"CURSES_UNICODE"
+else
 PDCTOP = ../lib/pdcurses
-PDCURSESDEF= -I../lib/pdcurses -I../lib/pdcurses/dos \
+PDCPORT = $(PDCTOP)/dos
+PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+endif # WANT_DOSVGA
 PDCLIBOBJ1= $(TARGETPFX)addch.o $(TARGETPFX)addchstr.o \
 		$(TARGETPFX)addstr.o $(TARGETPFX)attr.o \
 		$(TARGETPFX)beep.o $(TARGETPFX)bkgd.o \
@@ -141,26 +150,43 @@ CFLAGS += -DCROSSCOMPILE
 TOOLTOP1 = ../lib/djgpp/bin
 TOOLTOP2 = ../lib/djgpp/i586-pc-msdosdjgpp/bin
 override TARGET_CC = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc
-override TARGET_CXX = $(TOOLTOP2)/g++
+override TARGET_CXX = $(TOOLTOP1)/i586-pc-msdosdjgpp-g++
 override TARGET_AR = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc-ar
 override TARGET_STUBEDIT = ../lib/djgpp/i586-pc-msdosdjgpp/bin/stubedit
 MSDOS_TARGET_CFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
 	$(LUAINCL) -DDLB $(PDCURSESDEF) \
-	-DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
+	-DTILES_IN_GLYPHMAP -DCROSSCOMPILE -DCROSSCOMPILE_TARGET \
+	-DCROSS_TO_MSDOS \
         -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
         -Wformat -Wswitch -Wshadow -Wwrite-strings \
 	-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
-	-Wmissing-parameter-type -Wold-style-definition -Wstrict-prototypes \
-	-DGCC_WARN
-PDCINCL += -I$(PDCTOP)/dos
+	-Wmissing-parameter-type -Wold-style-definition -Wstrict-prototypes
+MSDOS_TARGET_CXXFLAGS = -c -O -I../include -I../sys/msdos -I../win/share \
+        $(LUAINCL) -DDLB $(PDCURSESDEF) \
+        -DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MSDOS \
+        -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
+        -Wformat -Wswitch -Wshadow -Wwrite-strings -Wno-maybe-uninitialized
+PDCINCL += -I$(PDCPORT)
 PDC_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wno-unused-parameter \
 			-Wno-missing-prototypes
+FONTVER = terminus-font-4.49.1
+FONTTOP = ../lib/$(FONTVER)
+DOSFONT = ../sys/msdos/fonts
+FONTTARGETS = $(DOSFONT)/ter-u16b.psf $(DOSFONT)/ter-u16v.psf \
+		$(DOSFONT)/ter-u18b.psf $(DOSFONT)/ter-u20b.psf \
+		$(DOSFONT)/ter-u22b.psf $(DOSFONT)/ter-u24b.psf \
+		$(DOSFONT)/ter-u28b.psf $(DOSFONT)/ter-u32b.psf
+LUABIN = ../lib/lua-$(LUA_VERSION)/src/lua
 LUA_TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS)
 override TARGET_CFLAGS = $(MSDOS_TARGET_CFLAGS) -Wmissing-declarations \
 			-Wmissing-prototypes -pedantic -Wmissing-declarations \
 			-Wformat-nonliteral
-override TARGET_CXXFLAGS = $(TARGET_CFLAGS)
+override TARGET_CXXFLAGS = $(MSDOS_TARGET_CXXFLAGS)
+ifdef CPLUSPLUS_NEEDED
+override TARGET_LINK = $(TOOLTOP1)/i586-pc-msdosdjgpp-g++
+else
 override TARGET_LINK = $(TOOLTOP1)/i586-pc-msdosdjgpp-gcc
+endif
 override TARGET_LFLAGS=
 override TARGET_LIBS += -lpc
 override SYSSRC = ../sys/share/pcmain.c ../sys/msdos/msdos.c \
@@ -168,6 +194,7 @@ override SYSSRC = ../sys/share/pcmain.c ../sys/msdos/msdos.c \
 		../sys/share/pcunix.c ../sys/msdos/video.c \
 		../sys/msdos/vidtxt.c ../sys/msdos/pckeys.c \
 		../sys/msdos/vidvga.c ../sys/msdos/vidvesa.c \
+		../sys/msdos/font.c \
 		../win/share/bmptiles.c ../win/share/giftiles.c \
 		../win/share/tileset.c
 override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
@@ -175,6 +202,7 @@ override SYSOBJ= $(TARGETPFX)pcmain.o $(TARGETPFX)msdos.o \
 		$(TARGETPFX)pcunix.o $(TARGETPFX)video.o \
 		$(TARGETPFX)vidtxt.o $(TARGETPFX)pckeys.o \
 		$(TARGETPFX)vidvga.o $(TARGETPFX)vidvesa.o \
+		$(TARGETPFX)font.o \
 		$(TARGETPFX)bmptiles.o $(TARGETPFX)giftiles.o \
 		$(TARGETPFX)tileset.o $(TARGETPFX)tile.o
 override WINLIB=
@@ -184,12 +212,12 @@ override TOPLUALIB=
 override GAMEBIN = $(TARGETPFX)nethack.exe
 override PACKAGE = dospkg
 override PREGAME += mkdir -p $(TARGETDIR) ; make $(TARGETPFX)exceptn.o ;
-override CLEANMORE += rm -f -r $(TARGETDIR) ;
+override CLEANMORE += rm -f -r $(TARGETDIR) ; rm -f -r $(FONTTARGETS) ;
 VARDATND += nhtiles.bmp
 #
 ifdef WANT_WIN_CURSES
 # rules for pdcurses dos-specific files
-$(TARGETPFX)%.o : $(PDCTOP)/dos/%.c
+$(TARGETPFX)%.o : $(PDCPORT)/%.c
 	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) -o$@  $<
 endif  # WANT_WIN_CURSES
 #
@@ -266,7 +294,6 @@ WASM_CFLAGS += -Wshadow
 WASM_CFLAGS += $(WINCFLAGS)   #WINCFLAGS set from multiw-2.370
 WASM_CFLAGS += -DSYSCF -DSYSCF_FILE=\"/sysconf\" -DSECURE
 WASM_CFLAGS += -g -I../include -DNOTPARMDECL
-WASM_CFLAGS += -DGCC_WARN
 # NetHack sources control
 WASM_CFLAGS += -DDLB
 WASM_CFLAGS += -DHACKDIR=\"$(HACKDIR)\"

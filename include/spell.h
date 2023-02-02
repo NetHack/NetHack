@@ -1,5 +1,5 @@
 /* NetHack 3.7	spell.h	$NHDT-Date: 1646838388 2022/03/09 15:06:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
-/* Copyright 1986, M. Stephenson				  */
+/* Copyright 1986, M. Stephenson                                  */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef SPELL_H
@@ -28,9 +28,9 @@ enum spellknowledge {
 #define ALL_MAP 0x1
 #define ALL_SPELLS 0x2
 
-#define decrnknow(spell) g.spl_book[spell].sp_know--
-#define spellid(spell) g.spl_book[spell].sp_id
-#define spellknow(spell) g.spl_book[spell].sp_know
+#define decrnknow(spell) gs.spl_book[spell].sp_know--
+#define spellid(spell) gs.spl_book[spell].sp_id
+#define spellknow(spell) gs.spl_book[spell].sp_know
 
 /* how much Pw a spell of level lvl costs to cast? */
 #define SPELL_LEV_PW(lvl) ((lvl) * 5)

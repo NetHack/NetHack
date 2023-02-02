@@ -43,7 +43,7 @@
  */
 #define READCHAR 0x00       /* Read Character from Keyboard */
 #define GETKEYFLAGS 0x02    /* Get Keyboard Flags */
-/*#define KEY_DEBUG	 */ /* print values of unexpected key codes - devel*/
+/*#define KEY_DEBUG */      /* print values of unexpected key codes - devel*/
 
 void get_cursor(int *, int *);
 
@@ -58,7 +58,7 @@ unsigned long sys_random_seed(void);
 static char *getdta(void);
 #endif
 static unsigned int dos_ioctl(int, int, unsigned);
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 extern boolean pckeys(unsigned char, unsigned char); /* pckeys.c */
 #endif
 
@@ -201,7 +201,7 @@ static const struct pad {
  * Unlike Ctrl-letter, the Alt-letter keystrokes have no specific ASCII
  * meaning unless assigned one by a keyboard conversion table, so the
  * keyboard BIOS normally does not return a character code when Alt-letter
- * is pressed.	So, to interpret unassigned Alt-letters, we must use a
+ * is pressed.  So, to interpret unassigned Alt-letters, we must use a
  * scan code table to translate the scan code into a letter, then set the
  * "meta" bit for it.  -3.
  */
@@ -281,7 +281,7 @@ BIOSgetch(void)
             else
                 ch = kpad[scan - KEYPADLO].normal;
         }
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
         /* Check for special interface manipulation keys */
         if (pckeys(scan, shift)) {
             ch = 0xFF;
@@ -457,7 +457,7 @@ chdrive(char *str)
     union REGS inregs;
     char drive;
 
-    if ((ptr = index(str, ':')) != (char *) 0) {
+    if ((ptr = strchr(str, ':')) != (char *) 0) {
         drive = toupper(*(ptr - 1));
         inregs.h.ah = SELECTDISK;
         inregs.h.dl = drive - 'A';

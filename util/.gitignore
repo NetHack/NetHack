@@ -17,6 +17,7 @@ tile2x11
 tile2bmp
 tile2beos
 gif2txt
+uudecode
 txt2ppm
 tile2img.ttp
 xpm2ppm.ttp

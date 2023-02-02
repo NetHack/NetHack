@@ -4,6 +4,15 @@
 -- This file contains lua code used by NetHack core.
 -- Is it loaded once, at game start, and kept in memory until game exit.
 
+-- Data in nh_lua_variables table can be set and queried with nh.variable()
+-- This table is saved and restored along with the game.
+nh_lua_variables = {
+};
+
+-- wrapper to simplify calling from nethack core
+function get_variables_string()
+   return "nh_lua_variables=" .. table_stringify(nh_lua_variables) .. ";";
+end
 
 -- This is an example of generating an external file during gameplay,
 -- which is updated periodically.

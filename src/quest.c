@@ -9,7 +9,7 @@
 #include "quest.h"
 
 #define Not_firsttime (on_level(&u.uz0, &u.uz))
-#define Qstat(x) (g.quest_status.x)
+#define Qstat(x) (gq.quest_status.x)
 
 static void on_start(void);
 static void on_locate(void);
@@ -205,7 +205,7 @@ expulsion(boolean seal)
            portal will be deleted as part of arrival on that level.
            If monster movement is in progress, any who haven't moved
            yet will now miss out on a chance to wander through it... */
-        for (t = g.ftrap; t; t = t->ntrap)
+        for (t = gf.ftrap; t; t = t->ntrap)
             if (t->ttyp == MAGIC_PORTAL)
                 break;
         if (t)
@@ -275,7 +275,7 @@ chat_with_leader(struct monst *mtmp)
     } else if (u.uhave.questart) {
         struct obj *otmp;
 
-        for (otmp = g.invent; otmp; otmp = otmp->nobj)
+        for (otmp = gi.invent; otmp; otmp = otmp->nobj)
             if (is_quest_artifact(otmp))
                 break;
 

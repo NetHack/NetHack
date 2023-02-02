@@ -1,6 +1,6 @@
 Debug-Mode Quick Reference:
 
-^E  ==  detect secret doors and traps
+^E  ==  detect secret doors and traps nearby
 ^F  ==  map level; reveals traps and secret corridors but not secret doors
 ^G  ==  create monster by name or class
 ^I  ==  identify items in pack
@@ -13,22 +13,23 @@ Debug-Mode Quick Reference:
                    escalates impossible warnings to panic
 #levelchange    == set hero's experience level
 #lightsources   == show mobile light sources
-#migratemons    == show migrating monsters; optionally create some
+#migratemons    == show migrating monsters; [Opt] potentially create some
 #panic          == panic test (warning: current game will be terminated)
 #polyself       == polymorph self
 #stats          == show memory statistics
 #terrain        == show current level (more options than in normal play)
 #timeout        == look at timeout queue and hero's timed intrinsics
-#vanquished     == disclose counts of dead monsters sorted in various ways
 #vision         == show vision array
 #wizborn        == show monster birth/death/geno/extinct stats
 #wizcast        == cast any spell
+#wizdispmacros  == [Opt] check internal display classifications
 #wizfliplevel   == transpose the current dungeon level
 #wizintrinsic   == set selected intrinsic timeouts
 #wizkill        == remove monster(s) from play
 #wizloaddes     == load and execute a special level description lua script
 #wizloadlua     == load and execute a lua script
 #wizmakemap     == recreate the current dungeon level
+#wizmondiff     == [Opt] check for discrepancies in monster difficulty ratings
 #wizrumorcheck  == validate rumor indexing; also show first, second, and last
                    random engravings, epitaphs, and hallucinatory monsters
 #wizseenv       == show map locations' seen vectors
@@ -45,3 +46,5 @@ debug_overwrite_stairs
 monpolycontrol  == prompt for new form whenever any monster changes shape
 sanity_check    == evaluate monsters, objects, and map prior to each turn
 wizweight       == augment object descriptions with their objects' weight
+
+[Opt] = conditionally available depending upon build-time settings

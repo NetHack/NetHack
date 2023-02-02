@@ -81,8 +81,8 @@ const char *str;
 
         while (isspace(*str))
             str++;
-        strncpy(g.toplines, str, TBUFSZ);
-        g.toplines[TBUFSZ - 1] = 0;
+        strncpy(gt.toplines, str, TBUFSZ);
+        gt.toplines[TBUFSZ - 1] = 0;
 
         /* For initial message to be visible, we need to explicitly position
          * the
@@ -101,15 +101,15 @@ const char *str;
             memcpy(cw->data, &cw->data[1],
                    (iflags.msg_history - 1) * sizeof(char *));
             cw->data[iflags.msg_history - 1] =
-                (char *) alloc(strlen(g.toplines) + 5);
+                (char *) alloc(strlen(gt.toplines) + 5);
             strcpy(cw->data[i = iflags.msg_history - 1] + SOFF
                        + (scrollmsg != 0),
-                   g.toplines);
+                   gt.toplines);
         } else {
             /* Otherwise, allocate a new one and copy the line in */
-            cw->data[cw->maxrow] = (char *) alloc(strlen(g.toplines) + 5);
+            cw->data[cw->maxrow] = (char *) alloc(strlen(gt.toplines) + 5);
             strcpy(cw->data[i = cw->maxrow++] + SOFF + (scrollmsg != 0),
-                   g.toplines);
+                   gt.toplines);
         }
         cw->data[i][SEL_ITEM] = 1;
         cw->data[i][VATTR] = attr + 1;
@@ -182,7 +182,7 @@ const char *str;
                             / w->RPort->TxHeight,
                         totalvis, totalvis);
         }
-        i = strlen(g.toplines + SOFF);
+        i = strlen(gt.toplines + SOFF);
         cw->maxcol = max(cw->maxcol, i);
         cw->vwy = cw->maxrow;
         break;
@@ -191,7 +191,7 @@ const char *str;
         if (cw->data[cw->cury] == NULL)
             panic("NULL pointer for status window");
         ob = &cw->data[cw->cury][j = cw->curx];
-        if (g.context.botlx)
+        if (gc.context.botlx)
             *ob = 0;
 
         /* Display when beam at top to avoid flicker... */

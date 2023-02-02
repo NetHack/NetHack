@@ -70,7 +70,7 @@ static void DoExtension(FILE * fd, int label);
 static boolean ReadColorMap(FILE * fd, int number);
 static void read_header(FILE * fd);
 static int GetCode(FILE * fd, int code_size, int flag);
-static int LWZReadByte(FILE * fd, int flag, int input_code_size);
+static int LWZReadByte(FILE * fd, int flag); /*, int input_code_size);*/
 static void ReadInterleavedImage(FILE * fd, int len, int height);
 static void ReadTileStrip(FILE * fd, int len);
 
@@ -103,7 +103,7 @@ static void
 DoExtension(FILE *fd, int label)
 {
     static char buf[256];
-    char *str;
+    const char *str;
 
     switch (label) {
     case 0x01: /* Plain Text Extension */
@@ -328,7 +328,7 @@ GetCode(FILE *fd, int code_size, int flag)
 }
 
 static int
-LWZReadByte(FILE *fd, int flag, int input_code_size)
+LWZReadByte(FILE *fd, int flag) /*, int input_code_size)*/
 {
     static int fresh = FALSE;
     int code, incode;
@@ -446,7 +446,7 @@ ReadInterleavedImage(FILE *fd, int len, int height)
     int v;
     int xpos = 0, ypos = 0, pass = 0;
 
-    while ((v = LWZReadByte(fd, FALSE, (int) input_code_size)) >= 0) {
+    while ((v = LWZReadByte(fd, FALSE /*, (int) input_code_size*/ )) >= 0) {
         PPM_ASSIGN(image[ypos][xpos], ColorMap[CM_RED][v],
                    ColorMap[CM_GREEN][v], ColorMap[CM_BLUE][v]);
 
@@ -487,8 +487,8 @@ ReadInterleavedImage(FILE *fd, int len, int height)
             break;
     }
 
-fini:
-    if (LWZReadByte(fd, FALSE, (int) input_code_size) >= 0)
+ fini:
+    if (LWZReadByte(fd, FALSE /*, (int) input_code_size*/ ) >= 0)
         Fprintf(stderr, "too much input data, ignoring extra...\n");
 }
 
@@ -498,7 +498,7 @@ ReadTileStrip(FILE *fd, int len)
     int v;
     int xpos = 0, ypos = 0;
 
-    while ((v = LWZReadByte(fd, FALSE, (int) input_code_size)) >= 0) {
+    while ((v = LWZReadByte(fd, FALSE /*, (int) input_code_size*/ )) >= 0) {
         PPM_ASSIGN(image[ypos][xpos], ColorMap[CM_RED][v],
                    ColorMap[CM_GREEN][v], ColorMap[CM_BLUE][v]);
 
@@ -564,7 +564,7 @@ fopen_gif_file(const char *filename, const char *type)
         exit(EXIT_FAILURE);
     }
 
-    if (LWZReadByte(gif_file, TRUE, (int) input_code_size) < 0) {
+    if (LWZReadByte(gif_file, TRUE /*, (int) input_code_size*/ ) < 0) {
         Fprintf(stderr, "error reading image\n");
         exit(EXIT_FAILURE);
     }
@@ -645,9 +645,12 @@ fclose_gif_file(void)
 }
 
 #ifndef AMIGA
-static char *std_args[] = { "tilemap", /* dummy argv[0] */
-                            "monsters.gif", "monsters.txt", "objects.gif",
-                            "objects.txt",  "other.gif",    "other.txt" };
+static const char *const std_args[] = {
+    "tilemap", /* dummy argv[0] */
+    "monsters.gif", "monsters.txt",
+    "objects.gif",  "objects.txt",
+    "other.gif",    "other.txt",
+};
 
 int
 main(int argc, char *argv[])
@@ -656,7 +659,7 @@ main(int argc, char *argv[])
 
     if (argc == 1) {
         argc = SIZE(std_args);
-        argv = std_args;
+        argv = (char **) std_args;
     } else if (argc != 3) {
         Fprintf(stderr, "usage: gif2txt giffile txtfile\n");
         exit(EXIT_FAILURE);

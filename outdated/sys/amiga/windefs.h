@@ -96,11 +96,6 @@ CLIPPING must be defined for the AMIGA version
 #define __asm /* DICE doesn't like __asm */
 #endif
 
-#ifndef __SASC_60
-#undef index
-#define index strchr
-#endif
-
 #ifdef _DCC
 #include <clib/intuition_protos.h>
 #else

@@ -34,12 +34,11 @@ const struct worn {
 
 /* This only allows for one blocking item per property */
 #define w_blocks(o, m) \
-    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC))                          \
-         ? INVIS                                                            \
-         : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) && !Role_if(PM_WIZARD)) \
-               ? CLAIRVOYANT                                                \
-               : 0)
-/* note: monsters don't have clairvoyance, so your role
+    ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC) != 0L) ? INVIS        \
+     : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) != 0L                   \
+        && !Role_if(PM_WIZARD)) ? CLAIRVOYANT                           \
+       : 0)
+/* note: monsters don't have clairvoyance, so dependency on hero's role here
    has no significant effect on their use of w_blocks() */
 
 /* Updated to use the extrinsic and blocked fields. */
@@ -105,7 +104,7 @@ setworn(struct obj *obj, long mask)
         if (obj && (obj->owornmask & W_ARMOR) != 0L)
             u.uroleplay.nudist = FALSE;
         /* tux -> tuxedo -> "monkey suit" -> monk's suit */
-        iflags.tux_penalty = (uarm && Role_if(PM_MONK) && g.urole.spelarmr);
+        iflags.tux_penalty = (uarm && Role_if(PM_MONK) && gu.urole.spelarmr);
     }
     update_inventory();
 }
@@ -258,13 +257,13 @@ mon_set_minvis(struct monst *mon)
 }
 
 void
-mon_adjust_speed(struct monst *mon,
-                 int adjust,      /* positive => increase speed, negative =>
-                                     decrease */
-                 struct obj *obj) /* item to make known if effect can be seen */
+mon_adjust_speed(
+    struct monst *mon,
+    int adjust,        /* positive => increase speed, negative => decrease */
+    struct obj *obj)   /* item to make known if effect can be seen */
 {
     struct obj *otmp;
-    boolean give_msg = !g.in_mklev, petrify = FALSE;
+    boolean give_msg = !gi.in_mklev, petrify = FALSE;
     unsigned int oldspeed = mon->mspeed;
 
     switch (adjust) {
@@ -345,10 +344,9 @@ mon_adjust_speed(struct monst *mon,
      ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
      : 0)
 
-/* armor put on or taken off; might be magical variety
-   [TODO: rename to 'update_mon_extrinsics()' and change all callers...] */
+/* armor put on or taken off; might be magical variety */
 void
-update_mon_intrinsics(
+update_mon_extrinsics(
     struct monst *mon,
     struct obj *obj,   /* armor being worn or taken off */
     boolean on,
@@ -371,11 +369,11 @@ update_mon_intrinsics(
             mon->minvis = !mon->invis_blkd;
             break;
         case FAST: {
-            boolean save_in_mklev = g.in_mklev;
+            boolean save_in_mklev = gi.in_mklev;
             if (silently)
-                g.in_mklev = TRUE;
+                gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
-            g.in_mklev = save_in_mklev;
+            gi.in_mklev = save_in_mklev;
             break;
         }
         /* properties handled elsewhere */
@@ -413,11 +411,11 @@ update_mon_intrinsics(
             mon->minvis = mon->perminvis;
             break;
         case FAST: {
-            boolean save_in_mklev = g.in_mklev;
+            boolean save_in_mklev = gi.in_mklev;
             if (silently)
-                g.in_mklev = TRUE;
+                gi.in_mklev = TRUE;
             mon_adjust_speed(mon, 0, obj);
-            g.in_mklev = save_in_mklev;
+            gi.in_mklev = save_in_mklev;
             break;
         }
         case FIRE_RES:
@@ -533,6 +531,8 @@ find_mac(struct monst *mon)
 void
 m_dowear(struct monst *mon, boolean creation)
 {
+    boolean can_wear_armor;
+
 #define RACE_EXCEPTION TRUE
     /* Note the restrictions here are the same as in dowear in do_wear.c
      * except for the additional restriction on intelligence.  (Players
@@ -548,12 +548,15 @@ m_dowear(struct monst *mon, boolean creation)
         return;
 
     m_dowear_type(mon, W_AMUL, creation, FALSE);
+    can_wear_armor = !cantweararm(mon->data); /* for suit, cloak, shirt */
     /* can't put on shirt if already wearing suit */
-    if (!cantweararm(mon->data) && !(mon->misc_worn_check & W_ARM))
+    if (can_wear_armor && !(mon->misc_worn_check & W_ARM))
         m_dowear_type(mon, W_ARMU, creation, FALSE);
-    /* treating small as a special case allows
-       hobbits, gnomes, and kobolds to wear cloaks */
-    if (!cantweararm(mon->data) || mon->data->msize == MZ_SMALL)
+    /* WrappingAllowed() makes any size between small and huge eligible;
+       treating small as a special case allows hobbits, gnomes, and
+       kobolds to wear all cloaks; large and huge allows giants and such
+       to wear mummy wrappings but not other cloaks */
+    if (can_wear_armor || WrappingAllowed(mon->data))
         m_dowear_type(mon, W_ARMC, creation, FALSE);
     m_dowear_type(mon, W_ARMH, creation, FALSE);
     if (!MON_WEP(mon) || !bimanual(MON_WEP(mon)))
@@ -561,15 +564,19 @@ m_dowear(struct monst *mon, boolean creation)
     m_dowear_type(mon, W_ARMG, creation, FALSE);
     if (!slithy(mon->data) && mon->data->mlet != S_CENTAUR)
         m_dowear_type(mon, W_ARMF, creation, FALSE);
-    if (!cantweararm(mon->data))
+    if (can_wear_armor)
         m_dowear_type(mon, W_ARM, creation, FALSE);
     else
         m_dowear_type(mon, W_ARM, creation, RACE_EXCEPTION);
 }
 
 static void
-m_dowear_type(struct monst *mon, long flag, boolean creation,
-              boolean racialexception)
+m_dowear_type(
+    struct monst *mon,
+    long flag,               /* wornmask value */
+    boolean creation,
+    boolean racialexception) /* small monsters that are allowed for player
+                              * races (gnomes) can wear suits */
 {
     struct obj *old, *best, *obj;
     long oldmask = 0L;
@@ -614,6 +621,14 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
             break;
         case W_ARMC:
             if (!is_cloak(obj))
+                continue;
+            /* mummy wrapping is only cloak allowed when bigger than human */
+            if (mon->data->msize > MZ_HUMAN && obj->otyp != MUMMY_WRAPPING)
+                continue;
+            /* avoid mummy wrapping if it will allow hero to see mon (unless
+               this is a new mummy; an invisible one is feasible via ^G) */
+            if (mon->minvis && w_blocks(obj, W_ARMC) == INVIS
+                && !See_invisible && !creation)
                 continue;
             break;
         case W_ARMH:
@@ -702,7 +717,7 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
             mon->mcanmove = 0;
     }
     if (old) {
-        update_mon_intrinsics(mon, old, FALSE, creation);
+        update_mon_extrinsics(mon, old, FALSE, creation);
 
         /* owornmask was cleared above but artifact_light() expects it */
         old->owornmask = oldmask;
@@ -732,14 +747,15 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
                 pline("%s is shining %s.", Something, adesc);
         }
     }
-    update_mon_intrinsics(mon, best, TRUE, creation);
+    update_mon_extrinsics(mon, best, TRUE, creation);
     /* if couldn't see it but now can, or vice versa, */
     if (!creation && (sawmon ^ canseemon(mon))) {
         if (mon->minvis && !See_invisible) {
             pline("Suddenly you cannot see %s.", nambuf);
             makeknown(best->otyp);
-        } /* else if (!mon->minvis)
-           *     pline("%s suddenly appears!", Amonnam(mon)); */
+        /* } else if (!mon->minvis) {
+         *     pline("%s suddenly appears!", Amonnam(mon)); */
+        }
     }
 }
 #undef RACE_EXCEPTION
@@ -747,7 +763,7 @@ m_dowear_type(struct monst *mon, long flag, boolean creation,
 struct obj *
 which_armor(struct monst *mon, long flag)
 {
-    if (mon == &g.youmonst) {
+    if (mon == &gy.youmonst) {
         switch (flag) {
         case W_ARM:
             return uarm;
@@ -802,7 +818,7 @@ clear_bypass(struct obj *objchn)
 
 /* all objects with their bypass bit set should now be reset to normal;
    this can be a relatively expensive operation so is only called if
-   g.context.bypasses is set */
+   gc.context.bypasses is set */
 void
 clear_bypasses(void)
 {
@@ -811,15 +827,15 @@ clear_bypasses(void)
     /*
      * 'Object' bypass is also used for one monster function:
      * polymorph control of long worms.  Activated via setting
-     * g.context.bypasses even if no specific object has been
+     * gc.context.bypasses even if no specific object has been
      * bypassed.
      */
 
     clear_bypass(fobj);
-    clear_bypass(g.invent);
-    clear_bypass(g.migrating_objs);
-    clear_bypass(g.level.buriedobjlist);
-    clear_bypass(g.billobjs);
+    clear_bypass(gi.invent);
+    clear_bypass(gm.migrating_objs);
+    clear_bypass(gl.level.buriedobjlist);
+    clear_bypass(gb.billobjs);
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp))
             continue;
@@ -832,14 +848,14 @@ clear_bypasses(void)
         if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp))
             MCORPSENM(mtmp) = NON_PM;
     }
-    for (mtmp = g.migrating_mons; mtmp; mtmp = mtmp->nmon) {
+    for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         clear_bypass(mtmp->minvent);
         /* no MCORPSENM(mtmp)==PM_LONG_WORM check here; long worms can't
            be just created by polymorph and migrating at the same time */
     }
     /* this is a no-op since mydogs is only non-Null during level change or
        final ascension and we aren't called at those times, but be thorough */
-    for (mtmp = g.mydogs; mtmp; mtmp = mtmp->nmon)
+    for (mtmp = gm.mydogs; mtmp; mtmp = mtmp->nmon)
         clear_bypass(mtmp->minvent);
     /* ball and chain can be "floating", not on any object chain (when
        hero is swallowed by an engulfing monster, for instance) */
@@ -848,14 +864,14 @@ clear_bypasses(void)
     if (uchain)
         uchain->bypass = 0;
 
-    g.context.bypasses = FALSE;
+    gc.context.bypasses = FALSE;
 }
 
 void
 bypass_obj(struct obj *obj)
 {
     obj->bypass = 1;
-    g.context.bypasses = TRUE;
+    gc.context.bypasses = TRUE;
 }
 
 /* set or clear the bypass bit in a list of objects */
@@ -865,7 +881,7 @@ bypass_objlist(
     boolean on) /* TRUE => set, FALSE => clear */
 {
     if (on && objchain)
-        g.context.bypasses = TRUE;
+        gc.context.bypasses = TRUE;
     while (objchain) {
         objchain->bypass = on ? 1 : 0;
         objchain = objchain->nobj;
@@ -921,17 +937,22 @@ mon_break_armor(struct monst *mon, boolean polyspot)
     if (breakarm(mdat)) {
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
             if ((Is_dragon_scales(otmp) && mdat == Dragon_scales_to_pm(otmp))
-                || (Is_dragon_mail(otmp) && mdat == Dragon_mail_to_pm(otmp)))
+                || (Is_dragon_mail(otmp) && mdat == Dragon_mail_to_pm(otmp))) {
                 ; /* no message here;
                      "the dragon merges with his scaly armor" is odd
                      and the monster's previous form is already gone */
-            else if (vis)
-                pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
-            else
-                You_hear("a cracking sound.");
+            } else {
+                Soundeffect(se_cracking_sound, 100);
+                if (vis)
+                    pline("%s breaks out of %s armor!", Monnam(mon), ppronoun);
+                else
+                    You_hear("a cracking sound.");
+            }
             m_useup(mon, otmp);
         }
-        if ((otmp = which_armor(mon, W_ARMC)) != 0) {
+        if ((otmp = which_armor(mon, W_ARMC)) != 0
+            /* mummy wrapping adapts to small and very big sizes */
+            && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (otmp->oartifact) {
                 if (vis)
                     pline("%s %s falls off!", s_suffix(Monnam(mon)),
@@ -940,6 +961,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                     bypass_obj(otmp);
                 m_lose_armor(mon, otmp);
             } else {
+                Soundeffect(se_ripping_sound, 100);
                 if (vis)
                     pline("%s %s tears apart!", s_suffix(Monnam(mon)),
                           cloak_simple_name(otmp));
@@ -960,6 +982,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
         boolean passes_thru_clothes = !(mdat->msize <= MZ_SMALL);
 
         if ((otmp = which_armor(mon, W_ARM)) != 0) {
+            Soundeffect(se_thud, 50);
             if (vis)
                 pline("%s armor falls around %s!", s_suffix(Monnam(mon)),
                       pronoun);
@@ -969,7 +992,9 @@ mon_break_armor(struct monst *mon, boolean polyspot)
                 bypass_obj(otmp);
             m_lose_armor(mon, otmp);
         }
-        if ((otmp = which_armor(mon, W_ARMC)) != 0) {
+        if ((otmp = which_armor(mon, W_ARMC)) != 0
+            /* mummy wrapping adapts to small and very big sizes */
+            && (otmp->otyp != MUMMY_WRAPPING || !WrappingAllowed(mdat))) {
             if (vis) {
                 if (is_whirly(mon->data))
                     pline("%s %s falls, unsupported!", s_suffix(Monnam(mon)),
@@ -1007,6 +1032,7 @@ mon_break_armor(struct monst *mon, boolean polyspot)
             m_lose_armor(mon, otmp);
         }
         if ((otmp = which_armor(mon, W_ARMS)) != 0) {
+            Soundeffect(se_clank, 50);
             if (vis)
                 pline("%s can no longer hold %s shield!", Monnam(mon),
                       ppronoun);
@@ -1114,9 +1140,9 @@ void
 extract_from_minvent(
     struct monst *mon,
     struct obj *obj,
-    boolean do_intrinsics,  /* whether to call update_mon_intrinsics */
+    boolean do_extrinsics,  /* whether to call update_mon_extrinsics */
     boolean silently)       /* doesn't affect all possible messages,
-                             * just update_mon_intrinsics's */
+                             * just update_mon_extrinsics's */
 {
     long unwornmask = obj->owornmask;
 
@@ -1139,13 +1165,13 @@ extract_from_minvent(
     obj_extract_self(obj);
     obj->owornmask = 0L;
     if (unwornmask) {
-        if (!DEADMONSTER(mon) && do_intrinsics) {
-            update_mon_intrinsics(mon, obj, FALSE, silently);
+        if (!DEADMONSTER(mon) && do_extrinsics) {
+            update_mon_extrinsics(mon, obj, FALSE, silently);
         }
         mon->misc_worn_check &= ~unwornmask;
         /* give monster a chance to wear other equipment on its next
            move instead of waiting until it picks something up */
-        mon->misc_worn_check |= I_SPECIAL;
+        check_gear_next_turn(mon);
     }
     obj_no_longer_held(obj);
     if (unwornmask & W_WEP) {

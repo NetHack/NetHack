@@ -34,13 +34,17 @@ private:
         unsigned short &Glyph(int x, int y) {
             return glyph[y][x];
         }
-        unsigned short glyphttychar[ROWNO][COLNO];
-        unsigned short &Glyphttychar(int x, int y) {
+        char32_t glyphttychar[ROWNO][COLNO];
+        char32_t &Glyphttychar(int x, int y) {
             return glyphttychar[y][x];
         }
-        unsigned short glyphcolor[ROWNO][COLNO];
-        unsigned short &Glyphcolor(int x, int y) {
+        uint32 glyphcolor[ROWNO][COLNO];
+        uint32 &Glyphcolor(int x, int y) {
             return glyphcolor[y][x];
+        }
+        uint32 glyphframecolor[ROWNO][COLNO];
+        uint32 &GlyphFramecolor(int x, int y) {
+            return glyphframecolor[y][x];
         }
         unsigned int glyphflags[ROWNO][COLNO];
         unsigned int &Glyphflags(int x, int y) {
@@ -60,7 +64,7 @@ private:
 	void Clear();
 	void Display(bool block);
 	void CursorTo(int x,int y);
-	void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
+	void PrintGlyph(int x,int y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo);
 	void Changed(int x, int y);
 	void updateTiles();
         void SetupTextmapFont(QPainter &painter);
@@ -83,7 +87,7 @@ public:
 	virtual void CursorTo(int x,int y);
 	virtual void PutStr(int attr, const QString& text);
 	virtual void ClipAround(int x,int y);
-	virtual void PrintGlyph(int x,int y, const glyph_info *glyphinfo);
+	virtual void PrintGlyph(int x,int y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo);
 
 signals:
 	void resized();

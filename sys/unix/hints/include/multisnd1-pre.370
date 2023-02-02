@@ -1,0 +1,39 @@
+#------------------------------------------------------------------------------
+# NetHack 3.7  multisnd1-pre.370 $NHDT-Date: 1597332785 2020/08/13 15:33:05 $  $NHDT-Branch: NetHack-3.7 $
+#
+# If it's cross-platform it belongs in this file.
+# If it's macOS-only, it belongs in macOS.370.
+# If it's linux-only, it belongs in linux.370.
+#
+
+#ifdef WANT_TESTSOUND
+#HAVE_SNDLIB = 1
+#SNDCFLAGS+= -DSND_LIB_TESTSOUND
+## NEEDS_SND_USERSOUNDS
+## NEEDS_SND_SEAUTOMAP
+## NEEDS_WAV
+#SNDLIBSRC = ../sound/testsound/testsound.c
+#SNDLIBOBJ = testsound.o
+#LFLAGS += -lm
+#endif   # WANT_TESTSOUND
+
+# HAVE_SNDLIB or NEEDS_SND_USERSOUNDS or NEEDS_SND_SEAUTOMAP 
+# would have to be set prior to this. Any of them could have
+# been set just above, or they could have been set in
+# multiw-2 for Qt, or they could have been set in macOS.370
+# or linux.370 for something platform-specific.
+# Regardless, if one of those is set, the related preprocessor
+# defines need to be added to SNDCFLAGS here.
+#
+ifeq "$(HAVE_SNDLIB)" "1"
+ifeq "$(NEEDS_SND_USERSOUNDS)" "1"
+SNDCFLAGS+= -DUSER_SOUNDS
+endif   # NEEDS_SND_USERSOUNDS
+ifeq "$(NEEDS_SND_SEAUTOMAP)" "1"
+SNDCFLAGS+= -DSND_SOUNDEFFECTS_AUTOMAP
+endif   # NEEDS_SND_SEAUTOMAP
+endif   # HAVE_SNDLIB
+
+#
+#------------------------------------------------------------------------------
+

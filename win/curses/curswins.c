@@ -3,6 +3,9 @@
 /* Copyright (c) Karl Garrison, 2010. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#if defined(CURSES_UNICODE) && !defined(_XOPEN_SOURCE_EXTENDED)
+#define _XOPEN_SOURCE_EXTENDED 1
+#endif
 #include "curses.h"
 #include "hack.h"
 #include "wincurs.h"
@@ -32,6 +35,7 @@ typedef struct nhwd {
 typedef struct nhchar {
     int ch;                     /* character */
     int color;                  /* color info for character */
+    int framecolor;                /* background color info for character */
     int attr;                   /* attributes of character */
     struct unicode_representation *unicode_representation;
 } nethack_char;
@@ -59,7 +63,7 @@ curses_create_window(int width, int height, orient orientation)
 
     if ((orientation == UP) || (orientation == DOWN) ||
         (orientation == LEFT) || (orientation == RIGHT)) {
-        if (g.invent || (g.moves > 1)) {
+        if (gi.invent || (gm.moves > 1)) {
             map_border = curses_window_has_border(MAP_WIN);
             curses_get_window_xy(MAP_WIN, &mapx, &mapy);
             curses_get_window_size(MAP_WIN, &maph, &mapw);
@@ -94,7 +98,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = (term_rows / 2) - (height / 2);
         break;
     case UP:
-        if (g.invent || (g.moves > 1)) {
+        if (gi.invent || (gm.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -103,7 +107,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = mapy + mapb_offset;
         break;
     case DOWN:
-        if (g.invent || (g.moves > 1)) {
+        if (gi.invent || (gm.moves > 1)) {
             startx = (mapw / 2) - (width / 2) + mapx + mapb_offset;
         } else {
             startx = 0;
@@ -119,7 +123,7 @@ curses_create_window(int width, int height, orient orientation)
         starty = term_rows - height;
         break;
     case RIGHT:
-        if (g.invent || (g.moves > 1)) {
+        if (gi.invent || (gm.moves > 1)) {
             startx = (mapw + mapx + (mapb_offset * 2)) - width;
         } else {
             startx = term_cols - width;
@@ -171,17 +175,23 @@ curses_refresh_nethack_windows(void)
     map_window = curses_get_nhwin(MAP_WIN);
     inv_window = curses_get_nhwin(INV_WIN);
 
-    if ((g.moves <= 1) && !g.invent) {
+    if ((gm.moves <= 1) && !gi.invent) {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);
         refresh();
     } else {
-        touchwin(status_window);
-        wnoutrefresh(status_window);
-        touchwin(map_window);
-        wnoutrefresh(map_window);
-        touchwin(message_window);
-        wnoutrefresh(message_window);
+        if (status_window != NULL) {
+            touchwin(status_window);
+            wnoutrefresh(status_window);
+        }
+        if (map_window != NULL) {
+            touchwin(map_window);
+            wnoutrefresh(map_window);
+        }
+        if (message_window != NULL) {
+            touchwin(message_window);
+            wnoutrefresh(message_window);
+        }
         if (inv_window) {
             touchwin(inv_window);
             wnoutrefresh(inv_window);
@@ -246,13 +256,7 @@ curses_add_nhwin(winid wid, int height, int width, int y, int x,
         break;
     case MAP_WIN:
         mapwin = win;
-
-        if ((width < COLNO) || (height < ROWNO)) {
-            map_clipped = TRUE;
-        } else {
-            map_clipped = FALSE;
-        }
-
+        map_clipped = (width < COLNO || height < ROWNO);
         break;
     }
 
@@ -367,9 +371,9 @@ void
 #ifdef ENHANCED_SYMBOLS
 curses_putch(winid wid, int x, int y, int ch,
              struct unicode_representation *unicode_representation,
-             int color, int attr)
+             int color, int framecolor, int attr)
 #else
-curses_putch(winid wid, int x, int y, int ch, int color, int attr)
+curses_putch(winid wid, int x, int y, int ch, int color, int framecolor, int attr)
 #endif
 {
     static boolean map_initted = FALSE;
@@ -393,6 +397,7 @@ curses_putch(winid wid, int x, int y, int ch, int color, int attr)
     --x; /* map column [0] is not used; draw column [1] in first screen col */
     map[y][x].ch = ch;
     map[y][x].color = color;
+    map[y][x].framecolor = framecolor;
     map[y][x].attr = attr;
 #ifdef ENHANCED_SYMBOLS
     map[y][x].unicode_representation = unicode_representation;
@@ -592,19 +597,111 @@ is_main_window(winid wid)
 /* Unconditionally write a single character to a window at the given
 coordinates without a refresh.  Currently only used for the map. */
 
+static int
+get_framecolor(int nhcolor, int framecolor)
+{
+    boolean hicolor = (COLORS >= 16), adj_framecolor = framecolor;
+    static int framecolors[16][8] = {
+        { 0, 16, 8, 32, 17, 40, 48, 0 },    { 1, 18, 9, 33, 19, 41, 49, 1 },
+        { 2, 20, 10, 34, 21, 42, 50, 2 },   { 3, 22, 11, 35, 23, 43, 51, 3 },
+        { 4, 24, 12, 36, 25, 44, 52, 4 },   { 5, 26, 13, 37, 27, 45, 53, 5 },
+        { 6, 28, 14, 38, 29, 46, 54, 6 },   { 0, 30, 15, 72, 31, 88, 56, 0 },
+        { 0, 30, 15, 39, 31, 47, 55, 0 },   { 1, 18, 9, 73, 19, 89, 57, 121 },
+        { 2, 20, 10, 74, 21, 90, 58, 122 }, { 2, 22, 11, 75, 23, 91, 59, 123 },
+        { 4, 24, 12, 76, 25, 44, 60, 124 }, { 5, 26, 13, 77, 27, 93, 61, 125 },
+        { 6, 28, 14, 78, 29, 94, 62, 126 }, { 0, 30, 15, 79, 31, 95, 63, 127 },
+    };
+
+    if (framecolor < 16 && framecolor >= 8)
+        adj_framecolor = framecolor - 8;
+    return ((nhcolor < (hicolor ? 16 : 8) && adj_framecolor < 8)
+                ? framecolors[nhcolor][adj_framecolor]
+                : nhcolor);
+}
+
 static void
 write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
-    curses_toggle_color_attr(win, nch.color, nch.attr, ON);
+    int curscolor = nch.color, cursattr = nch.attr;
+
+    if (nch.framecolor != NO_COLOR) {
+        curscolor = get_framecolor(nch.color, nch.framecolor);
+        if (nch.attr == A_REVERSE)
+            cursattr = A_NORMAL; /* hilited pet looks odd otherwise */
+    }
+    curses_toggle_color_attr(win, curscolor, cursattr, ON);
+#if defined(CURSES_UNICODE) && defined(ENHANCED_SYMBOLS)
+    if ((nch.unicode_representation && nch.unicode_representation->utf8str)
+        || SYMHANDLING(H_IBM)) {
+        /* CP437 to Unicode mapping according to the Unicode Consortium */
+        static const uint16 cp437[256] = {
+            0x0020, 0x263A, 0x263B, 0x2665, 0x2666, 0x2663, 0x2660, 0x2022,
+            0x25D8, 0x25CB, 0x25D9, 0x2642, 0x2640, 0x266A, 0x266B, 0x263C,
+            0x25BA, 0x25C4, 0x2195, 0x203C, 0x00B6, 0x00A7, 0x25AC, 0x21A8,
+            0x2191, 0x2193, 0x2192, 0x2190, 0x221F, 0x2194, 0x25B2, 0x25BC,
+            0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027,
+            0x0028, 0x0029, 0x002a, 0x002b, 0x002c, 0x002d, 0x002e, 0x002f,
+            0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037,
+            0x0038, 0x0039, 0x003a, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f,
+            0x0040, 0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047,
+            0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f,
+            0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057,
+            0x0058, 0x0059, 0x005a, 0x005b, 0x005c, 0x005d, 0x005e, 0x005f,
+            0x0060, 0x0061, 0x0062, 0x0063, 0x0064, 0x0065, 0x0066, 0x0067,
+            0x0068, 0x0069, 0x006a, 0x006b, 0x006c, 0x006d, 0x006e, 0x006f,
+            0x0070, 0x0071, 0x0072, 0x0073, 0x0074, 0x0075, 0x0076, 0x0077,
+            0x0078, 0x0079, 0x007a, 0x007b, 0x007c, 0x007d, 0x007e, 0x2302,
+            0x00c7, 0x00fc, 0x00e9, 0x00e2, 0x00e4, 0x00e0, 0x00e5, 0x00e7,
+            0x00ea, 0x00eb, 0x00e8, 0x00ef, 0x00ee, 0x00ec, 0x00c4, 0x00c5,
+            0x00c9, 0x00e6, 0x00c6, 0x00f4, 0x00f6, 0x00f2, 0x00fb, 0x00f9,
+            0x00ff, 0x00d6, 0x00dc, 0x00a2, 0x00a3, 0x00a5, 0x20a7, 0x0192,
+            0x00e1, 0x00ed, 0x00f3, 0x00fa, 0x00f1, 0x00d1, 0x00aa, 0x00ba,
+            0x00bf, 0x2310, 0x00ac, 0x00bd, 0x00bc, 0x00a1, 0x00ab, 0x00bb,
+            0x2591, 0x2592, 0x2593, 0x2502, 0x2524, 0x2561, 0x2562, 0x2556,
+            0x2555, 0x2563, 0x2551, 0x2557, 0x255d, 0x255c, 0x255b, 0x2510,
+            0x2514, 0x2534, 0x252c, 0x251c, 0x2500, 0x253c, 0x255e, 0x255f,
+            0x255a, 0x2554, 0x2569, 0x2566, 0x2560, 0x2550, 0x256c, 0x2567,
+            0x2568, 0x2564, 0x2565, 0x2559, 0x2558, 0x2552, 0x2553, 0x256b,
+            0x256a, 0x2518, 0x250c, 0x2588, 0x2584, 0x258c, 0x2590, 0x2580,
+            0x03b1, 0x00df, 0x0393, 0x03c0, 0x03a3, 0x03c3, 0x00b5, 0x03c4,
+            0x03a6, 0x0398, 0x03a9, 0x03b4, 0x221e, 0x03c6, 0x03b5, 0x2229,
+            0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
+            0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
+        };
+        attr_t attr;
+        short pair;
+        wchar_t wch[3];
+        uint32 utf32ch;
+        cchar_t cch;
+
+        if (SYMHANDLING(H_UTF8)) {
+            utf32ch = nch.unicode_representation->utf32ch;
+        } else if (SYMHANDLING(H_IBM)) {
+            utf32ch = cp437[(uint8)nch.ch];
+        } else {
+            utf32ch = (uint8)nch.ch;
+        }
+        if (sizeof(wchar_t) == 2 && utf32ch >= 0x10000) {
+            /* UTF-16 surrogate pair */
+            wch[0] = (wchar_t)((utf32ch >> 10) + 0xD7C0);
+            wch[1] = (wchar_t)((utf32ch & 0x3FF) + 0xDC00);
+            wch[2] = L'\0';
+        } else {
+            wch[0] = (wchar_t)utf32ch;
+            wch[1] = L'\0';
+        }
+        wmove(win, y, x);
+        wattr_get(win, &attr, &pair, NULL);
+        setcchar(&cch, wch, attr, pair, NULL);
+        mvwadd_wch(win, y, x, &cch);
+    } else
+#endif
 #ifdef PDCURSES
-    mvwaddrawch(win, y, x, nch.ch);
+        mvwaddrawch(win, y, x, nch.ch);
 #else
-    if (nch.unicode_representation && nch.unicode_representation->utf8str)
-        mvwprintw(win, y, x, "%s", nch.unicode_representation->utf8str);
-    else
         mvwaddch(win, y, x, nch.ch);
 #endif
-    curses_toggle_color_attr(win, nch.color, nch.attr, OFF);
+    curses_toggle_color_attr(win, curscolor, cursattr, OFF);
 }
 
 
@@ -650,17 +747,15 @@ curses_draw_map(int sx, int sy, int ex, int ey)
 
         if (sx > 0 && sbsx == 0)
             ++sbsx;
-        if (ex < ROWNO - 1 && sbex == ROWNO - 1)
+        if (ex < COLNO - 1 && sbex == COLNO - 1)
             --sbex;
 
         for (count = 0; count < sbsx; count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_back);
         }
-
         for (count = sbsx; count <= sbex; count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_bar);
         }
-
         for (count = sbex + 1; count <= (ex - sx); count++) {
             write_char(mapwin, count + bspace, ey - sy + 1 + bspace, hsb_back);
         }
@@ -679,11 +774,9 @@ curses_draw_map(int sx, int sy, int ex, int ey)
         for (count = 0; count < sbsy; count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_back);
         }
-
         for (count = sbsy; count <= sbey; count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_bar);
         }
-
         for (count = sbey + 1; count <= (ey - sy); count++) {
             write_char(mapwin, ex - sx + 1 + bspace, count + bspace, vsb_back);
         }

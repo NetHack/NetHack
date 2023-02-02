@@ -5,12 +5,14 @@
 
 #include "hack.h"
 
+/* Defining TEXT_TOMBSTONE causes genl_outrip() to exist, but it doesn't
+   necessarily have to be used by a binary with multiple window-ports */
+
 #if defined(TTY_GRAPHICS) || defined(X11_GRAPHICS) || defined(GEM_GRAPHICS) \
-    || defined(MSWIN_GRAPHICS) || defined(DUMPLOG) \
-    || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS)
+    || defined(DUMPLOG) || defined(CURSES_GRAPHICS) || defined(SHIM_GRAPHICS)
 #define TEXT_TOMBSTONE
 #endif
-#if defined(mac) || defined(__BEOS__) || defined(WIN32_GRAPHICS)
+#if defined(mac) || defined(__BEOS__)
 #ifndef TEXT_TOMBSTONE
 #define TEXT_TOMBSTONE
 #endif
@@ -73,7 +75,7 @@ center(int line, char *text)
 {
     register char *ip, *op;
     ip = text;
-    op = &g.rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
+    op = &gr.rip[line][STONE_LINE_CENT - ((strlen(text) + 1) >> 1)];
     while (*ip)
         *op++ = *ip++;
 }
@@ -88,17 +90,17 @@ genl_outrip(winid tmpwin, int how, time_t when)
     int line, year;
     long cash;
 
-    g.rip = dp = (char **) alloc(sizeof(rip_txt));
+    gr.rip = dp = (char **) alloc(sizeof(rip_txt));
     for (x = 0; rip_txt[x]; ++x)
         dp[x] = dupstr(rip_txt[x]);
     dp[x] = (char *) 0;
 
     /* Put name on stone */
-    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, g.plname);
+    Sprintf(buf, "%.*s", (int) STONE_LINE_LEN, gp.plname);
     center(NAME_LINE, buf);
 
     /* Put $ on stone */
-    cash = max(g.done_money, 0L);
+    cash = max(gd.done_money, 0L);
     /* arbitrary upper limit; practical upper limit is quite a bit less */
     if (cash > 999999999L)
         cash = 999999999L;
@@ -152,10 +154,10 @@ genl_outrip(winid tmpwin, int how, time_t when)
         putstr(tmpwin, 0, "");
 
     for (x = 0; rip_txt[x]; x++) {
-        free((genericptr_t) g.rip[x]);
+        free((genericptr_t) gr.rip[x]);
     }
-    free((genericptr_t) g.rip);
-    g.rip = 0;
+    free((genericptr_t) gr.rip);
+    gr.rip = 0;
 }
 
 #endif /* TEXT_TOMBSTONE */

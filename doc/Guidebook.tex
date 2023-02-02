@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{September 08, 2022}
+\date{January 30, 2023}
 
 \maketitle
 
@@ -1130,7 +1130,7 @@ via the ``{\tt \#twoweapon}'' extended command.\\
 %.lp ""
 (In versions prior to 3.6 this keystroke ran the command to switch from normal
 play to ``explore mode'', also known as ``discovery mode'', which has now
-been moved to ``{\tt \#exploremode}'' and M-X.)
+been moved to ``{\tt \#exploremode}'' and {\tt M-X}.)
 %.lp
 \item[\tb{\^{}X}]
 Display basic information about your character.\\
@@ -1604,7 +1604,7 @@ and also `{\tt \^{}L}' if {\it number\verb+_+pad\/} is on.
 \item[\tb{\#remove}]
 Remove an accessory (ring, amulet, etc). Default key is `{\tt R}'.
 %.lp
-\item[{\bb{\#repeat}}]
+\item[{\tb{\#repeat}}]
 Repeat the previous command.
 Default key is~`{\tt \^{}A}'.
 %.lp
@@ -1679,9 +1679,9 @@ Use the shell command `{\tt exit}' to return to the game.
 Default key is `{\tt !}'.
 %.lp
 \item[\tb{\#showgold}]
-Report the gold in your inventory and if you are inside a shop,
-report any credit or debt you have in that shop.
-Does not report on any gold inside containers you're carrying.
+Report the gold in your inventory, including gold you know about in
+containers you're carrying.  If you are inside a shop, report any credit
+or debt you have in that shop.
 Default key is `{\tt \$}'.
 %.lp
 \item[\tb{\#showspells}]
@@ -1795,9 +1795,27 @@ In some circumstances it can also be used to rescue trapped monsters.
 Go up a staircase. Default key is `{\tt <}'.
 %.lp
 \item[\tb{\#vanquished}]
-List vanquished monsters.
+List vanquished monsters by type and count.
+\\
+%.lp ""
+Note that the vanquished monsters list includes all monsters killed by
+traps and each other as well as by you, and omits any which got removed
+from the game without being killed (perhaps by genocide, or by a mollified
+shopkeeper dismissing summoned Kops) or were already corpses when placed
+on the map.
+\\
+%.lp ""
+Using the ``request menu'' prefix prior to \#vanquished brings up
+a menu of sorting orders available (provided that the vanquished monsters
+list contains at least two types of monsters).
+Whichever ordering is picked gets assigned to the {\it sortvanquished}
+option so is remembered for subsequent \#vanquished requests.
+During end-of-game disclosure, when asked whether to show vanquished
+monsters answering `{\tt a}' will let you choose from the sort menu.
+\\
+%.lp ""
 Autocompletes.
-Debug mode only.
+Default key is `{\tt M-V}'.
 %.lp
 \item[\tb{\#version}]
 Print compile time options for this version of {\it NetHack\/}.
@@ -1953,17 +1971,18 @@ the `Alt' key can be used in this fashion.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
-option to have {\it NetHack\/} combine them into meta\+key.
+option to have {\it NetHack\/} combine them into {\tt meta+<key>}.
 (This combining action only takes place when NetHack is expecting a
 command to execute, not when accepting input to name something or to
 make a wish.)
 
 %.pg
-Unlike control characters, where \^x and \^X denote the same thing,
-meta characters are case-sensitive:  M-x and M-X represent different things.
-Some commands which can be run via a meta character require that the
-letter be capitalized because the lower-case equivalent is used for
-another command, so the three key combination meta+shift+letter is needed.
+Unlike control characters, where {\tt \^{}x} and {\tt \^{}X} denote the same
+thing, meta characters are case-sensitive:  {\tt M-x} and {\tt M-X}
+represent different things.  Some commands which can be run via a meta
+character require that the letter be capitalized because the lower-case
+equivalent is used for another command, so the three key combination
+{\tt meta+Shift+letter} is needed.
 
 %.BR 1
 \blist{}
@@ -2039,6 +2058,9 @@ another command, so the three key combination meta+shift+letter is needed.
 %.lp
 \item[\tb{M-v}]
 {\tt\#version}
+%.lp
+\item[\tb{M-V}]
+{\tt\#vanquished}
 %.lp
 \item[\tb{M-w}]
 {\tt\#wipe}
@@ -2171,9 +2193,9 @@ A trap usually won't appear on your map until you trigger it by moving
 onto it, you see someone else trigger it, or you discover it with
 the `{\tt s}' (search) command (multiple attempts are often needed;
 if your luck is poor, many attempts might be needed).
-{\it Wands of secret door detection\/} and {\it spell of detect unseen\/}
-also reveal traps within a modest radius but only if the trap is also
-within line-of-sight (whether you can see at the time or not).
+{\it Wands of secret door detection\/} and the spell of {\it detect unseen}
+also reveal traps within a modest radius but only if the trap is also within
+line-of-sight (whether you can see at the time or not).
 There is also other magic which can reveal traps.
 
 %.pg
@@ -2193,11 +2215,14 @@ Other traps can send you to different locations.
 Teleporters send you elsewhere on the same dungeon level.
 Level teleporters send you to a random dungeon level, the destination
 chosen from a few levels lower all the way to the top.
+These traps choose a new destination each time they're activated.
 Trap doors and holes also send you to another level, but one which is
 always below the current level.
 Usually that will be the next level down but it can be farther.
-All of these traps choose a new destination each time they're activated.
-Magic portals also send you to a different level but behave differently.
+Unlike (level) teleporters, the destination level of a particular trap door
+or hole is persistent, so falling into one will bring you to the same level
+each time---though not necessarily the same spot on the level.
+Magic portals behave similarly, but with some additional variation.
 Some portals are two-way and their remote destination is always the same:
 another portal which can take you back.
 Others are one-way and send you to a specific destination level but not
@@ -2205,7 +2230,7 @@ necessarily to a specific location there.
 
 %.pg
 There is a special multi-level branch of the dungeon with pre-mapped levels
-based on the classic computer game ``{\tt Sokoban}.''
+based on the classic computer game ``{\it Sokoban}.''
 In that game, you operate as a warehouse worker who pushes crates around
 obstacles to position them at designated locations.
 In NetHack, the goal is to push boulders into pits or holes until those
@@ -2307,12 +2332,12 @@ find a ``credit card'' in the dungeon, don't bother trying to use it in
 shops; shopkeepers will not accept it.)
 
 %.pg
-The {\tt \$} command, which reports the amount of gold you are carrying
-(in inventory, not inside bags or boxes), will also show current shop
-debt or credit, if any.  The {\tt Iu} command lists unpaid items
-(those which still belong to the shop) if you are carrying any.
-The {\tt Ix} command shows an inventory-like display of any unpaid
-items which have been used up, along with other shop fees, if any.
+The {\tt \$} command, which reports the amount of gold you are carrying,
+will also show current shop debt or credit, if any.
+The {\tt Iu} command lists unpaid items (those which still belong to the
+shop) if you are carrying any.
+The {\tt Ix} command shows an inventory-like display of any unpaid items
+which have been used up, along with other shop fees, if any.
 
 %.hn 3
 \subsubsection*{Shop idiosyncrasies}
@@ -2412,7 +2437,7 @@ spot or a tame one's spot.
 
 %.\" getting away from "Movement feedback" here; oh well...
 %.pg
-The {\tt nopickup} command prefix (default `{\tt m}' is
+The {\tt nopickup} command prefix (default `{\tt m}') is
 also the move-without-attacking prefix and can be used to try to step
 onto a visible monster's spot without the move being considered an attack
 (see the {\it Fighting\/} subsection of {\it Monsters\/} below).
@@ -3049,8 +3074,8 @@ A mail daemon may run up and deliver mail to you as a %
 To use this feature on versions where {\it NetHack\/}
 mail delivery is triggered by electronic mail appearing in your system mailbox,
 you must let {\it NetHack\/} know where to look for new mail by setting the
-``MAIL'' environment variable to the file name of your mailbox.
-You may also want to set the ``MAILREADER'' environment variable to the
+{\tt MAIL} environment variable to the file name of your mailbox.
+You may also want to set the {\tt MAILREADER} environment variable to the
 file name of your favorite reader, so {\it NetHack\/} can shell to it when you
 read the scroll.
 On versions of {\it NetHack\/} where mail is randomly
@@ -3538,7 +3563,7 @@ in which you might accomplish them.
 \blist{\leftmargin \achwidth \topsep 1mm \itemsep 0mm}
 %.PL Shop
 \item[{\tt <Rank>}]
-Attained rank title <Rank>.
+Attained rank title {\it Rank}.
 \item[{\tt Shop}]
 Entered a shop.
 \item[{\tt Temple}]
@@ -3599,7 +3624,7 @@ Achievements are recorded and subsequently reported in the order in which
 they happen during your current game rather than the order listed here.
 
 %.pg
-There are nine {\it <Rank>\/} titles for each role, bestowed at experience
+There are nine {\it Rank} titles for each role, bestowed at experience
 levels 1, 3, 6, 10, 14, 18, 22, 26, and 30.
 The one for experience level 1 is not recorded as an achievement.
 Losing enough levels to revert to lower rank(s) does not discard the
@@ -3631,7 +3656,7 @@ the Castle level's drawbridge or can be given to you via prayer boon.
 
 %.pg
 {\it Blind\/} and {\it Nudist\/} are also conducts, and they can only be
-enabled by setting the correspondingly named option in NETHACKOPTIONS
+enabled by setting the correspondingly named option in {\tt NETHACKOPTIONS}
 or run-time configuration file prior to game start.
 In the case of {\it Blind\/}, the option also enforces the conduct.
 They aren't really significant accomplishments unless/until you make
@@ -3652,7 +3677,7 @@ behaves.
 Options may be set in a number of ways.  Within the game, the `{\tt O}'
 command allows you to view all options and change most of them.
 You can also set options automatically by placing them in a configuration
-file, or in the ``NETHACKOPTIONS'' environment variable.
+file, or in the ``{\tt NETHACKOPTIONS}'' environment variable.
 Some versions of {\it NetHack\/} also have front-end programs that allow
 you to set options before starting the game or a global configuration
 for system administrators.
@@ -3899,7 +3924,7 @@ Here is an example of configuration file contents:
 %.BR 2
 
 %.hn 2
-\subsection*{Using the NETHACKOPTIONS environment variable}
+\subsection*{Using the {\tt NETHACKOPTIONS} environment variable}
 
 %.pg
 The NETHACKOPTIONS variable is a comma-separated list of initial
@@ -3972,12 +3997,16 @@ Enable messages about what your character hears (default on).
 Note that this has nothing to do with your computer's audio capabilities.
 Persistent.
 %.lp
-\item[\ib{align}]
+\item[\ib{alignment}]
 Your starting alignment ({\tt align:lawful}, {\tt align:neutral},
-or {\tt align:chaotic}).  You may specify just the first letter.
-The default is to randomly pick an appropriate alignment.
-If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
-exclude that alignment from being picked randomly.
+or {\tt align:chaotic}).
+You may specify just the first letter.
+Many roles and the non-human races restrict which alignments are allowed.
+See {\it role\/}
+for a description of how to use negation to exclude choices.
+%.lp ""
+\\
+Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{autodescribe}]
@@ -4211,12 +4240,16 @@ melons already exist in {\it NetHack\/}, so don't use those.
 %.lp
 \item[\ib{gender}]
 Your starting gender ({\tt gender:male} or {\tt gender:female}).
-You may specify just the first letter.  Although you can
-still denote your gender using the ``{\tt male}'' and ``{\tt female}''
-options, the ``{\tt gender}'' option will take precedence.
-The default is to randomly pick an appropriate gender.
-If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
-exclude that gender from being picked randomly.
+You may specify just the first letter.
+Although you can
+still denote your gender using either of the deprecated
+``{\it male\/}'' and ``{\it female\/}''
+options, the ``{\it gender\/}'' option will take precedence.
+See {\it role\/}
+for a description of how to use negation to exclude choices.
+%.lp ""
+\\
+Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{goldX}]
@@ -4678,9 +4711,13 @@ objects or monsters is less intrusive.
 Default is off.  Persistent.
 %.lp
 \item[\ib{race}]
-Selects your race (for example, ``{\tt race:human}'').  Default is random.
-If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
-exclude that race from being picked randomly.
+Choices are {\tt human}, {\tt dwarf}, {\tt elf}, {\tt gnome}, and
+{\tt orc} but most roles restrict which of the non-human races are allowed.
+See {\it role\/}
+for a description of how to use negation to exclude choices.
+%.lp ""
+\\
+Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{rest\verb+_+on\verb+_+space}]
@@ -4689,12 +4726,33 @@ Persistent.
 %.lp
 \item[\ib{role}]
 Pick your type of character (for example, ``{\tt role:Samurai}'');
-synonym for ``{\it character\/}''.  See ``{\it name\/}'' for an alternate method
-of specifying your role.  Normally only the first letter of the
-value is examined; `r' is an exception with ``{\tt Rogue}'', ``{\tt Ranger}'',
-and ``{\tt random}'' values.
-If you prefix the value with `{\tt !}' or ``{\tt no}'', you will
-exclude that role from being picked randomly.
+synonym for ``{\it character\/}''.
+See ``{\it name\/}'' for an alternate method of specifying your role.
+%.\" Normally only the first letter of the
+%.\" value is examined; `r' is an exception with ``{\tt Rogue}'',
+%.\" ``{\tt Ranger}'', and ``{\tt random}'' values.
+%.lp ""
+This option can also be used to limit selection when role is chosen
+randomly.
+Use a space-separated list of roles and either negate each one or negate
+the option itself instead.
+Negation is accomplished in the same manner as with {\it boolean options\/},
+by prefixing the option or its value(s) with `{\tt \verb+!+}' or ``{\tt no}''.
+%.BR 0
+\\
+Examples:
+\\
+\begin{verbatim}
+OPTIONS=role:!arc !bar !kni
+OPTIONS=!role:arc bar kni
+\end{verbatim}
+There can be multiple instances of the {\it role\/}
+option if they're all negations.
+%.\" Only one positive value is allowed, and if present, it overrides any
+%.\" negations.
+%.lp ""
+\\
+Default is random.
 Cannot be set with the `{\tt O}' command.  Persistent.
 %.lp
 \item[\ib{roguesymset}]
@@ -4769,20 +4827,18 @@ Persistent.
 \\
 %.lp ""
 The possible values are:
-%.PS o
-%.PL o
+\\
+%.PS
 {\tt o} --- list object types by class, in discovery order within each class;
 default;
-%.PL s
+\\
 {\tt s} --- list object types by {\it sortloot\/}
 classification: by class, by sub-class within class for classes which
 have substantial groupings (like helmets, boots, gloves, and so forth
 for armor), with object types partly-discovered via assigned name coming
 before fully identified types;
 \\
-%.PL c
 {\tt c} --- list by class, alphabetically within each class;\\
-%.PL a
 {\tt a} --- list alphabetically across all classes.\\
 %.PE
 Can be interactively set via the `{\tt O}' command or via using
@@ -4794,6 +4850,7 @@ Controls the sorting behavior of pickup lists for inventory
 and \#loot commands and some others.  Persistent.
 \\
 The possible values are:
+\\
 %.sd
 %.si
 {\tt full} --- always sort the lists;\\
@@ -4806,6 +4863,48 @@ The possible values are:
 \item[\ib{sortpack}]
 Sort the pack contents by type when displaying inventory (default on).
 Persistent.
+%.lp
+\item[\tb{sortvanquished}]
+Controls the sorting behavior for the output of the \#vanquished command.
+Persistent.
+\\
+%.lp ""
+The possible values are:
+\\
+%.PS
+{\tt t} ---
+traditional: order by monster level; ties are broken by internal
+monster index;
+default;
+\\
+{\tt d} ---
+order by monster difficulty rating; ties broken by internal index;
+\\
+{\tt a} ---
+order alphabetically, first any unique monsters then all the others;
+\\
+%note: 'A' and 'C' can be set in RC file or NETHACKOPTIONS but not by 'O'
+% {\tt A} ---
+% order alphabetically, unique monsters intermixed with other monsters;
+% \\
+% {\tt C} ---
+% order by monster class, by high to low level within each class;
+% \\
+{\tt c} ---
+order by monster class, by low to high level within each class;
+\\
+{\tt n} ---
+order by count, high to low; ties are broken by internal monster index;
+\\
+{\tt z} ---
+order by count, low to high; ties broken by internal index.
+\\
+%.PE
+Can be interactively set via the `{\tt m O}' command or via using
+the `{\tt m}' prefix before the \#vanquished command.
+%.lp
+\item[\ib{sounds}]
+Allow sounds to be emitted from an integrated sound library (default on).
 %.lp
 \item[\ib{sparkle}]
 Display a sparkly effect when a monster (including yourself) is hit by an
@@ -4839,7 +4938,7 @@ Show the elapsed game time in turns on bottom line (default off).  Persistent.
 When pausing momentarily for display effect, such as with explosions and
 moving objects, use a timer rather than sending extra characters to the
 screen.  (Applies to ``tty'' and ``curses'' interfaces only; ``X11'' interface always
-uses a timer based delay.  The default is on if configured into the
+uses a timer-based delay.  The default is on if configured into the
 program.)  Persistent.
 %.lp
 \item[\ib{tombstone}]
@@ -5103,6 +5202,11 @@ original format, with the status window spread out vertically.
 A value of {\tt 2} makes status be slightly condensed, moving some
 fields to different lines to eliminate one whole line, reducing the
 height needed.
+(If NetHack has been built using a version of {\tt Qt}
+older than {\tt qt-5.9},
+{\it statuslines\/}
+can only be set in the run-time configuration file or via NETHACKOPTIONS,
+not during play with the `{\tt O}' command.)
 %.lp
 \item[\ib{term\verb+_+cols} {\normalfont and}]
 %.lp
@@ -5217,13 +5321,13 @@ or ports to customize and change the port behavior.
 \item[\ib{altkeyhandling}]
 Select an alternate way to handle keystrokes ({\it Win32 tty\/ NetHack\/} only).
 The name of the handling type is one of {\it default}, {\it ray}, {\it 340}
+%.\" \item[\ib{altmeta}]
+%.\" On Amiga, this option controls whether typing ``Alt'' plus another key
+%.\" functions as a meta-shift for that key (default on).
 %.lp
 \item[\ib{altmeta}]
-On Amiga, this option controls whether typing ``Alt'' plus another key
-functions as a meta-shift for that key (default on).
-%.lp
-\item[\ib{altmeta}]
-On other (non-Amiga) systems where this option is available, it can be
+%.\" On other (non-Amiga) systems where this option is available, it can be
+On systems where this option is available, it can be
 set to tell {\it NetHack\/} to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
 
@@ -6185,8 +6289,8 @@ display of the customizations, such as the Enhanced symset.
 
 %.pg
 {\it NetHack\/} can be set up to use only standard ASCII characters for making
-maps of the dungeons. This makes the MS-DOS versions of {\it NetHack\/}
-completely
+maps of the dungeons. This makes even the MS-DOS versions of {\it NetHack}
+(which use special line-drawing characters by default) completely
 accessible to the blind who use speech and/or Braille access technologies.
 Players will require a good working knowledge of their screen-reader's
 review features, and will have to know how to navigate horizontally and
@@ -6201,16 +6305,16 @@ gives you the row and column of your review cursor and the PC cursor.
 These co-ordinates are often useful in giving players a better sense of the
 overall location of items on the screen.
 %.pg
-{\it NetHack\/} can also be compiled with support for sending the game messages
-to an external program, such as a text-to-speech synthesizer. If the
-``{\tt \#version}'' extended command shows ``external program as a
+{\it NetHack\/} can also be compiled with support for sending the game
+messages to an external program, such as a text-to-speech synthesizer. If
+the ``{\tt \#version}'' extended command shows ``external program as a
 message handler'', your {\it NetHack\/}
 has been compiled with the capability. When compiling {\it NetHack\/}
 from source
-on Linux and other POSIX systems, define {\it MSGHANDLER\/} to enable it.
+on Linux and other POSIX systems, define {\tt MSGHANDLER\/} to enable it.
 To use
-the capability, set the environment variable {\it NETHACK\_MSGHANDLER\/} to an
-executable, which will be executed with the game message as the program's
+the capability, set the environment variable {\tt NETHACK\_MSGHANDLER\/} to
+an executable, which will be executed with the game message as the program's
 only parameter.
 %.pg
 
@@ -6347,6 +6451,10 @@ Minimum number of points to get an entry in the score file.
 \item[\ib{PERS\verb+_+IS\verb+_+UID}]
 0 or 1 to use user names or numeric userids, respectively, to identify
 unique people for the score file.
+%.lp
+\item[\ib{HIDEUSAGE}]
+0 or 1 to control whether the help menu entry for command
+line usage is shown or suppressed.
 %.lp
 \item[\ib{MAX\verb+_+STATUENAME\verb+_+RANK}]
 Maximum number of score file entries to use for

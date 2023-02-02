@@ -106,7 +106,7 @@ altmeta        For unix and VMS, treat two character sequence
                "ESC c" as M-c (Meta+c, 8th bit set) when nethack  [False]
                obtains a command from player's keyboard.
 
-Boolean option if USE_TILES was set at compile time (MSDOS protected mode):
+Boolean option if TILES_IN_GLYPHMAP set at compile time (MSDOS):
 preload_tiles  control whether tiles get pre-loaded into RAM at    [True]
                the start of the game.  Doing so enhances performance
                of the tile graphics, but uses more memory.
@@ -251,6 +251,13 @@ sortloot      preferred order when examining a set of objects           [n]
               none -- no sorting
               loot -- sort piles of objects on floor and in containers
               full -- 'loot' plus objects in inventory
+sortvanquished preferred order when viewing vanquished monsters list    [t]
+              t -- traditional, order by monster level
+              d -- order by monster difficulty rating
+              a -- alphabetical, first any unique monsters then others
+              c -- order by class, low to high level within each class
+              n -- order by count, high to low
+              z -- order by count, low to high
 statushilites whether to display status highlights (when non-zero) and  [0]
               also how many turns to display temporary highlights (for
               'up', 'down', and 'changed' hilite_status rules)

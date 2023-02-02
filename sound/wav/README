@@ -1,0 +1,63 @@
+January 22, 2023 - sounds
+
+Important: For the included se_* wav files, please refer to the file
+'sound/wav attributions.txt' for the details about the
+source, author, and licensing.
+
+There were old aiif versions of some sound samples distributed
+in uuencoded form in earlier versions of NetHack: bell.uu, bugle.uu,
+erthdrum.uu, firehorn.uu, frsthorn.uu, lethdrum.uu, mgcflute.uu,
+mgcharp.uu, toolhorn.uu, wdnflute.uu and wdnharp.uu.
+
+Those had been removed in commit 217671e00f626e53d314757b4687950466efb360
+in May 2019, at the same time built-in speaker support was removed.
+
+Some of those original files have been converted into wav files starting
+with NetHack 3.7. The pitch variation versions offer a chance for very
+simple tune playback on platforms that offer a basic play-sound function
+call, which many do. There is no need to manipulate the underlying sounds
+with those, although sound library interfaces may certainly produce
+music in more elabote and pleasing ways. Contributions are welcome.
+
+While they make the distribution larger, they offer a more immersive
+experience while playing locally on many platforms or with many
+sound libraries. Also, file/distribution size is not the same
+concern in 2023 that it might have been in 1995 or 2003.
+ 
+This is the note that accompanied those original sound files.
+
+------------------------------------------------------------
+README for the AIFF files:
+
+These files are sound files for the instruments in NetHack.
+There are 11 sounds, one for each distinct instrument.
+The sounds are in 8-bit 22kHz AIFF format, which should be
+readable by a broad range of platforms. Since the sounds
+came from Rolands S-750 sample library (most of them) there
+should be no copyright on them when we treat them like we
+do here (as instruments) - indeed, the sample library I
+got from Roland didn't even bear a (c) symbol.
+
+Some of the sounds are very adequate (Drum of Earthquake,
+Wooden Flute, Magic Harp) while some are less true to the
+original name (how does a Frost Horn sound?) Actually, I
+don't know what a Bugle is (Bugle horn?) so I took a trumpet
+sound for that. Correct me if I'm wrong.
+
+What does this have to do with the main code? Well, nothing
+so far. There are some places that are #ifdef MAC and calls
+mac_speaker; that function takes an object and a tune (in
+capital letters A-G) and plays the tune with the given
+instrument. When playing a specific tune, that tune is of
+course used. For "improvise," I use middle "C."
+
+Ideally, we should do something equal with sound that we
+have with displays, so we can use one common set of calls
+in the main code, and have ports do whatever seems appropriate
+for the available hardware.
+
+Any comment on the sounds or their use is welcome:
+
+						Jon W{tte
+						Mac Team
+						nethack-bugs@nethack.org

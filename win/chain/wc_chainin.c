@@ -1,5 +1,5 @@
 /* NetHack 3.7	wc_chainin.c	$NHDT-Date: 1596498323 2020/08/03 23:45:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
-/* Copyright (c) Kenneth Lorber, 2012				  */
+/* Copyright (c) Kenneth Lorber, 2012                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /* -chainin is an internal processor that changes the flow from window_procs
@@ -559,10 +559,10 @@ chainin_status_enablefield(
 }
 
 void chainin_status_update(
-	int idx,
-	genericptr_t ptr,
-	int chg, int percent, int color,
-	unsigned long *colormasks)
+    int idx,
+    genericptr_t ptr,
+    int chg, int percent, int color,
+    unsigned long *colormasks)
 {
     (*cibase->nprocs->win_status_update)(cibase->ndata, idx, ptr, chg,
                                          percent, color, colormasks);

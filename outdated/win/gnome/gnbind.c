@@ -354,7 +354,7 @@ gnome_askname()
 
     /* Ask for a name and stuff the response into plname, a nethack global */
     ret = ghack_ask_string_dialog("What is your name?", "gandalf",
-                                  "GnomeHack", g.plname);
+                                  "GnomeHack", gp.plname);
 
     /* Quit if they want to quit... */
     if (ret == -1) {
@@ -907,7 +907,7 @@ gnome_nhgetch()
     g_askingQuestion = 1;
     /* Process events until a key press event arrives. */
     while (g_numKeys == 0) {
-        if (g.program_state.done_hup)
+        if (gp.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -945,7 +945,7 @@ gnome_nh_poskey(int *x, int *y, int *mod)
     g_askingQuestion = 0;
     /* Process events until a key or map-click arrives. */
     while (g_numKeys == 0 && g_numClicks == 0) {
-        if (g.program_state.done_hup)
+        if (gp.program_state.done_hup)
             return '\033';
         gtk_main_iteration();
     }
@@ -1032,7 +1032,7 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
     if (choices) {
         char *cb, choicebuf[QBUFSZ];
         Strcpy(choicebuf, choices);
-        if ((cb = index(choicebuf, '\033')) != 0) {
+        if ((cb = strchr(choicebuf, '\033')) != 0) {
             /* anything beyond <esc> is hidden */
             *cb = '\0';
         }
@@ -1044,13 +1044,13 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
         Strcat(message, " ");
         /* escape maps to 'q' or 'n' or default, in that order */
         yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+            (strchr(choices, 'q') ? 'q' : (strchr(choices, 'n') ? 'n' : def));
     } else {
         Strcpy(message, question);
     }
 
     gnome_putstr(WIN_MESSAGE, ATR_BOLD, message);
-    if (mainWnd != NULL && choices && !index(choices, ch)) {
+    if (mainWnd != NULL && choices && !strchr(choices, ch)) {
         return (ghack_yes_no_dialog(question, choices, def));
     }
 
@@ -1059,7 +1059,7 @@ gnome_yn_function(const char *question, const char *choices, CHAR_P def)
         ch = gnome_nhgetch();
         if (ch == '\033') {
             result = yn_esc_map;
-        } else if (choices && !index(choices, ch)) {
+        } else if (choices && !strchr(choices, ch)) {
             /* FYI: ch==-115 is for KP_ENTER */
             if (def
                 && (ch == ' ' || ch == '\r' || ch == '\n' || ch == -115)) {
@@ -1169,7 +1169,7 @@ gnome_outrip(winid wid, int how, time_t when)
     long year;
 
     /* Put name on stone */
-    Sprintf(buf, "%s\n", g.plname);
+    Sprintf(buf, "%s\n", gp.plname);
     Strcat(ripString, buf);
 
     /* Put $ on stone */

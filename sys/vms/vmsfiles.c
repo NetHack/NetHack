@@ -117,13 +117,13 @@ vms_creat(const char *file, unsigned int mode)
 {
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
 
-    if (index(file, ';')) {
+    if (strchr(file, ';')) {
         /* assumes remove or delete, not vms_unlink */
         if (!unlink(file)) {
             (void) sleep(1);
             (void) unlink(file);
         }
-    } else if (!index(file, '.')) {
+    } else if (!strchr(file, '.')) {
         /* force some punctuation to be present */
         file = strcat(strcpy(filnambuf, file), ".");
     }
@@ -142,7 +142,7 @@ vms_open(const char *file, int flags, unsigned int mode)
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     int fd;
 
-    if (!index(file, '.') && !index(file, ';')) {
+    if (!strchr(file, '.') && !strchr(file, ';')) {
         /* force some punctuation to be present to make sure that
            the file name can't accidentally match a logical name */
         file = strcat(strcpy(filnambuf, file), ";0");
@@ -163,7 +163,7 @@ vms_fopen(const char *file, const char *mode)
     char filnambuf[BUFSIZ]; /*(not BUFSZ)*/
     FILE *fp;
 
-    if (!index(file, '.') && !index(file, ';')) {
+    if (!strchr(file, '.') && !strchr(file, ';')) {
         /* force some punctuation to be present to make sure that
            the file name can't accidentally match a logical name */
         file = strcat(strcpy(filnambuf, file), ";0");

@@ -575,7 +575,7 @@ knows_class(char sym)
      *        arrow, and spear limitation below.
      */
 
-    for (ct = g.bases[(uchar) sym]; ct < g.bases[(uchar) sym + 1]; ct++) {
+    for (ct = gb.bases[(uchar) sym]; ct < gb.bases[(uchar) sym + 1]; ct++) {
         /* not flagged as magic but shouldn't be pre-discovered */
         if (ct == CORNUTHAUM || ct == DUNCE_CAP)
             continue;
@@ -646,7 +646,7 @@ u_init(void)
     u.umortality = 0;
     u.ugrave_arise = NON_PM;
 
-    u.umonnum = u.umonster = g.urole.mnum;
+    u.umonnum = u.umonster = gu.urole.mnum;
     u.ulycn = NON_PM;
     set_uasmon();
 
@@ -659,7 +659,7 @@ u_init(void)
 
     init_uhunger();
     for (i = 0; i <= MAXSPELL; i++)
-        g.spl_book[i].sp_id = NO_SPELL;
+        gs.spl_book[i].sp_id = NO_SPELL;
     u.ublesscnt = 300; /* no prayers just yet */
     u.ualignbase[A_CURRENT] = u.ualignbase[A_ORIGINAL] = u.ualign.type =
         aligns[flags.initalign].value;
@@ -729,7 +729,9 @@ u_init(void)
         skill_init(Skill_K);
         break;
     case PM_MONK: {
-        static short M_spell[] = { SPE_HEALING, SPE_PROTECTION, SPE_CONFUSE_MONSTER };
+        static short M_spell[] = {
+            SPE_HEALING, SPE_PROTECTION, SPE_CONFUSE_MONSTER
+        };
 
         Monk[M_BOOK].trotyp = M_spell[rn2(90) / 30]; /* [0..2] */
         ini_inv(Monk);
@@ -743,7 +745,7 @@ u_init(void)
         skill_init(Skill_Mon);
         break;
     }
-    case PM_CLERIC:
+    case PM_CLERIC: /* priest/priestess */
         ini_inv(Priest);
         if (!rn2(10))
             ini_inv(Magicmarker);
@@ -783,6 +785,14 @@ u_init(void)
             ini_inv(Blindfold);
         knows_class(WEAPON_CLASS); /* all weapons */
         knows_class(ARMOR_CLASS);
+        /* in order to assist non-Japanese speakers, pre-discover items
+           that switch to Japanese names when playing as a Samurai */
+        for (i = MAXOCLASSES; i < NUM_OBJECTS; ++i) {
+            if (objects[i].oc_magic) /* skip "magic koto" */
+                continue;
+            if (Japanese_item_name(i, (const char *) 0))
+                knows_object(i);
+        }
         skill_init(Skill_S);
         break;
     case PM_TOURIST:
@@ -1017,9 +1027,9 @@ ini_inv(struct trobj *trop)
              */
             obj = mkobj(trop->trclass, FALSE);
             otyp = obj->otyp;
-            while (otyp == WAN_WISHING || otyp == g.nocreate
-                   || otyp == g.nocreate2 || otyp == g.nocreate3
-                   || otyp == g.nocreate4 || otyp == RIN_LEVITATION
+            while (otyp == WAN_WISHING || otyp == gn.nocreate
+                   || otyp == gn.nocreate2 || otyp == gn.nocreate3
+                   || otyp == gn.nocreate4 || otyp == RIN_LEVITATION
                    /* 'useless' items */
                    || otyp == POT_HALLUCINATION
                    || otyp == POT_ACID
@@ -1060,16 +1070,16 @@ ini_inv(struct trobj *trop)
             case WAN_POLYMORPH:
             case RIN_POLYMORPH:
             case POT_POLYMORPH:
-                g.nocreate = RIN_POLYMORPH_CONTROL;
+                gn.nocreate = RIN_POLYMORPH_CONTROL;
                 break;
             case RIN_POLYMORPH_CONTROL:
-                g.nocreate = RIN_POLYMORPH;
-                g.nocreate2 = SPE_POLYMORPH;
-                g.nocreate3 = POT_POLYMORPH;
+                gn.nocreate = RIN_POLYMORPH;
+                gn.nocreate2 = SPE_POLYMORPH;
+                gn.nocreate3 = POT_POLYMORPH;
             }
             /* Don't have 2 of the same ring or spellbook */
             if (obj->oclass == RING_CLASS || obj->oclass == SPBOOK_CLASS)
-                g.nocreate4 = otyp;
+                gn.nocreate4 = otyp;
         }
         /* Put post-creation object adjustments that don't depend on whether it
          * was UNDEF_TYP or not after this. */
@@ -1079,13 +1089,13 @@ ini_inv(struct trobj *trop)
             && obj->spe <= 0)
             obj->spe = rne(3);
 
-        if (g.urace.mnum != PM_HUMAN) {
+        if (gu.urace.mnum != PM_HUMAN) {
             /* substitute race-specific items; this used to be in
                the 'if (otyp != UNDEF_TYP) { }' block above, but then
                substitutions didn't occur for randomly generated items
                (particularly food) which have racial substitutes */
             for (i = 0; inv_subs[i].race_pm != NON_PM; ++i)
-                if (inv_subs[i].race_pm == g.urace.mnum
+                if (inv_subs[i].race_pm == gu.urace.mnum
                     && otyp == inv_subs[i].item_otyp) {
                     debugpline3("ini_inv: substituting %s for %s%s",
                                 OBJ_NAME(objects[inv_subs[i].subs_otyp]),

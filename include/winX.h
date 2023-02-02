@@ -40,10 +40,19 @@ struct text_buffer {
 /*
  * Information specific to a map window.
  */
+#ifdef ENHANCED_SYMBOLS
+typedef uint32 X11_map_symbol;
+typedef uint32 X11_color;
+#else
+typedef char X11_map_symbol;
+typedef unsigned char X11_color;
+#endif
 struct text_map_info_t {
-    unsigned char text[ROWNO][COLNO]; /* Actual displayed screen. */
+    X11_map_symbol text[ROWNO][COLNO];  /* Actual displayed screen. */
 #ifdef TEXTCOLOR
-    unsigned char colors[ROWNO][COLNO]; /* Color of each character. */
+    X11_color colors[ROWNO][COLNO];     /* Color of each character. */
+    X11_color framecolors[ROWNO][COLNO];  /* Color of background
+                                                 behind text */
     GC color_gcs[CLR_MAX],              /* GC for each color */
         inv_color_gcs[CLR_MAX];         /* GC for each inverse color */
 #define copy_gc color_gcs[NO_COLOR]
@@ -57,12 +66,17 @@ struct text_map_info_t {
         square_height, /*   we can calculate the correct */
         square_ascent, /*   placement of changes.        */
         square_lbearing;
+
+#ifdef ENHANCED_SYMBOLS
+    XFontStruct *font;
+#endif
 };
 
 struct tile_glyph_info_t {
     unsigned short glyph;
     unsigned short tileidx;
     unsigned glyphflags;
+    uint32 framecolor;
 };
 
 struct tile_map_info_t {

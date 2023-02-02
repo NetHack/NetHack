@@ -1,11 +1,11 @@
 /* NetHack 3.7	wintext.c	$NHDT-Date: 1597967808 2020/08/20 23:56:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.22 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * File for dealing with text windows.
  *
- *	+ No global functions.
+ *      + No global functions.
  */
 
 #ifndef SYSV
@@ -28,7 +28,10 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
 #include "hack.h"
+#undef X11_BUILD
+
 #include "winX.h"
 #include "xwindow.h"
 
@@ -194,7 +197,7 @@ display_text_window(struct xwindow *wp, boolean blocking)
 
     if (width > (Dimension) XtScreen(wp->w)->width) { /* too wide for screen */
         /* Back off some amount - we really need to back off the scrollbar */
-        /* width plus some extra.					   */
+        /* width plus some extra.                                          */
         width = XtScreen(wp->w)->width - 20;
     }
     XtSetArg(args[num_args], XtNstring, text_info->text.text);
@@ -293,7 +296,7 @@ create_text_window(struct xwindow *wp)
              XtParseTranslationTable(text_translations));
     num_args++;
 
-    wp->w = XtCreateManagedWidget(g.killer.name[0] && WIN_MAP == WIN_ERR
+    wp->w = XtCreateManagedWidget(gk.killer.name[0] && WIN_MAP == WIN_ERR
                                       ? "tombstone"
                                       : "text_text", /* name */
                                   asciiTextWidgetClass,
@@ -384,7 +387,7 @@ append_text_buffer(struct text_buffer *tb, const char *str, boolean concat)
     if (tb->num_lines) { /* not first --- append a newline */
         char appchar = '\n';
 
-        if (concat && !index("!.?'\")", tb->text[tb->text_last - 1])) {
+        if (concat && !strchr("!.?'\")", tb->text[tb->text_last - 1])) {
             appchar = ' ';
             tb->num_lines--; /* offset increment at end of function */
         }
@@ -398,7 +401,7 @@ append_text_buffer(struct text_buffer *tb, const char *str, boolean concat)
         if (length) {
             /* Remove all newlines. Otherwise we have a confused line count. */
             copy = (tb->text + tb->text_last);
-            while ((copy = index(copy, '\n')) != (char *) 0)
+            while ((copy = strchr(copy, '\n')) != (char *) 0)
                 *copy = ' ';
         }
 
@@ -464,10 +467,10 @@ calculate_rip_text(int how, time_t when)
     long cash;
 
     /* Put name on stone */
-    Sprintf(rip_line[NAME_LINE], "%.16s", g.plname); /* STONE_LINE_LEN */
+    Sprintf(rip_line[NAME_LINE], "%.16s", gp.plname); /* STONE_LINE_LEN */
 
     /* Put $ on stone */
-    cash = max(g.done_money, 0L);
+    cash = max(gd.done_money, 0L);
     /* arbitrary upper limit; practical upper limit is quite a bit less */
     if (cash > 999999999L)
         cash = 999999999L;
@@ -517,7 +520,7 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
     Arg args[8];
     XGCValues values;
     XtGCMask mask;
-    GC gc;
+    GC ggc;
     static Pixmap rip_pixmap = None;
     int i, x, y;
 
@@ -540,10 +543,10 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
     XtGetValues(w, args, 1);
     values.function = GXcopy;
     values.font = WindowFont(w);
-    gc = XtGetGC(w, mask, &values);
+    ggc = XtGetGC(w, mask, &values);
 
     if (rip_pixmap != None) {
-        XCopyArea(dpy, rip_pixmap, XtWindow(w), gc, event->x, event->y,
+        XCopyArea(dpy, rip_pixmap, XtWindow(w), ggc, event->x, event->y,
                   event->width, event->height, event->x, event->y);
     }
 
@@ -554,12 +557,12 @@ rip_exposed(Widget w, XtPointer client_data UNUSED,
         XFontStruct *font = WindowFontStruct(w);
         int width = XTextWidth(font, rip_line[i], len);
 
-        XDrawString(dpy, XtWindow(w), gc, x - width / 2, y, rip_line[i], len);
+        XDrawString(dpy, XtWindow(w), ggc, x - width / 2, y, rip_line[i], len);
         x += appResources.tombtext_dx;
         y += appResources.tombtext_dy;
     }
 
-    XtReleaseGC(w, gc);
+    XtReleaseGC(w, ggc);
 }
 
 /*

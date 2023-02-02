@@ -193,22 +193,22 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
             return;
 
         red_value =
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
         red_value *= 16;
         red_value +=
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
 
         green_value =
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
         green_value *= 16;
         green_value +=
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
 
         blue_value =
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
         blue_value *= 16;
         blue_value +=
-            index(hexadecimals, tolower(*colorstring++)) - hexadecimals;
+            strchr(hexadecimals, tolower(*colorstring++)) - hexadecimals;
 
         *colorptr = RGB(red_value, blue_value, green_value);
     } else {

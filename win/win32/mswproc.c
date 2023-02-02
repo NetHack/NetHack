@@ -1,5 +1,5 @@
 /* NetHack 3.7	mswproc.c	$NHDT-Date: 1613292828 2021/02/14 08:53:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.165 $ */
-/* Copyright (C) 2001 by Alex Kompel 	 */
+/* Copyright (C) 2001 by Alex Kompel */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
@@ -90,6 +90,9 @@ struct window_procs mswin_procs = {
         | WC_SPLASH_SCREEN | WC_POPUP_DIALOG | WC_MOUSE_SUPPORT,
 #ifdef STATUS_HILITES
     WC2_HITPOINTBAR | WC2_FLUSH_STATUS | WC2_RESET_STATUS | WC2_HILITE_STATUS |
+#endif
+#ifdef ENHANCED_SYMBOLS
+     WC2_U_UTF8STR | WC2_U_24BITCOLOR |
 #endif
     0L,
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
@@ -359,9 +362,9 @@ prompt_for_player_selection(void)
         /* tty_putstr(BASE_WINDOW, 0, prompt); */
         do {
             /* pick4u = lowc(readchar()); */
-            if (index(quitchars, pick4u))
+            if (strchr(quitchars, pick4u))
                 pick4u = 'y';
-        } while (!index(ynqchars, pick4u));
+        } while (!strchr(ynqchars, pick4u));
         if ((int) strlen(prompt) + 1 < CO) {
             /* Echo choice and move back down line */
             /* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline,
@@ -692,7 +695,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("Who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("Who are you?", gp.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }
@@ -1240,7 +1243,7 @@ void
 mswin_update_inventory(int arg)
 {
     logDebug("mswin_update_inventory(%d)\n", arg);
-    if (iflags.perm_invent && g.program_state.something_worth_saving
+    if (iflags.perm_invent && gp.program_state.something_worth_saving
         && iflags.window_inited && WIN_INVEN != WIN_ERR)
         display_inventory(NULL, FALSE);
 }
@@ -1552,10 +1555,10 @@ mswin_yn_function(const char *question, const char *choices, char def)
     if (choices) {
         char *cb, choicebuf[QBUFSZ];
 
-        allow_num = (index(choices, '#') != 0);
+        allow_num = (strchr(choices, '#') != 0);
 
         Strcpy(choicebuf, choices);
-        if ((cb = index(choicebuf, '\033')) != 0) {
+        if ((cb = strchr(choicebuf, '\033')) != 0) {
             /* anything beyond <esc> is hidden */
             *cb = '\0';
         }
@@ -1567,7 +1570,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
         Strcat(message, " ");
         /* escape maps to 'q' or 'n' or default, in that order */
         yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+            (strchr(choices, 'q') ? 'q' : (strchr(choices, 'n') ? 'n' : def));
     } else {
         Strcpy(message, question);
         Strcat(message, " ");
@@ -1594,17 +1597,17 @@ mswin_yn_function(const char *question, const char *choices, char def)
 
         digit_ok = allow_num && digit(ch);
         if (ch == '\033') {
-            if (index(choices, 'q'))
+            if (strchr(choices, 'q'))
                 ch = 'q';
-            else if (index(choices, 'n'))
+            else if (strchr(choices, 'n'))
                 ch = 'n';
             else
                 ch = def;
             break;
-        } else if (index(quitchars, ch)) {
+        } else if (strchr(quitchars, ch)) {
             ch = def;
             break;
-        } else if (!index(choices, ch) && !digit_ok) {
+        } else if (!strchr(choices, ch) && !digit_ok) {
             mswin_nhbell();
             ch = (char) 0;
             /* and try again... */
@@ -1631,7 +1634,7 @@ mswin_yn_function(const char *question, const char *choices, char def)
                     digit_string[0] = z;
                     mswin_putstr_ex(WIN_MESSAGE, ATR_BOLD, digit_string, 1);
                     n_len++;
-                } else if (z == 'y' || index(quitchars, z)) {
+                } else if (z == 'y' || strchr(quitchars, z)) {
                     if (z == '\033')
                         value = -1; /* abort */
                     z = '\n';       /* break */
@@ -1934,12 +1937,12 @@ mswin_outrip(winid wid, int how, time_t when)
     }
 
     /* Put name on stone */
-    Sprintf(buf, "%s", g.plname);
+    Sprintf(buf, "%s", gp.plname);
     buf[STONE_LINE_LEN] = 0;
     putstr(wid, 0, buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", g.done_money);
+    Sprintf(buf, "%ld Au", gd.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     putstr(wid, 0, buf);
 
@@ -2702,29 +2705,29 @@ mswin_color_from_string(char *colorstring, HBRUSH *brushptr,
         if (strlen(++colorstring) != 6)
             return;
 
-        red_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value = (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                            - hexadecimals);
         ++colorstring;
         red_value *= 16;
-        red_value += (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        red_value += (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
         ++colorstring;
 
-        green_value = (int) (index(hexadecimals,
+        green_value = (int) (strchr(hexadecimals,
                                    tolower((uchar) *colorstring))
                              - hexadecimals);
         ++colorstring;
         green_value *= 16;
-        green_value += (int) (index(hexadecimals,
+        green_value += (int) (strchr(hexadecimals,
                                     tolower((uchar) *colorstring))
                               - hexadecimals);
         ++colorstring;
 
-        blue_value = (int) (index(hexadecimals, tolower((uchar) *colorstring))
+        blue_value = (int) (strchr(hexadecimals, tolower((uchar) *colorstring))
                             - hexadecimals);
         ++colorstring;
         blue_value *= 16;
-        blue_value += (int) (index(hexadecimals,
+        blue_value += (int) (strchr(hexadecimals,
                                    tolower((uchar) *colorstring))
                              - hexadecimals);
         ++colorstring;
@@ -2826,7 +2829,7 @@ int
 NHMessageBox(HWND hWnd, LPCTSTR text, UINT type)
 {
     TCHAR title[MAX_LOADSTRING];
-    if (g.program_state.exiting && !strcmp(text, "\n"))
+    if (gp.program_state.exiting && !strcmp(text, "\n"))
         text = "Press Enter to exit";
 
     LoadString(GetNHApp()->hApp, IDS_APP_TITLE_SHORT, title, MAX_LOADSTRING);

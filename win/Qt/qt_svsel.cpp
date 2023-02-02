@@ -99,7 +99,11 @@ QLayout: Attempting to add QLayout "" to QDialog "", which already has a layout
     QGroupBox *box = new QGroupBox("Saved Characters", this);
     QVBoxLayout *bgl = new QVBoxLayout();
     QButtonGroup *bg = new QButtonGroup();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+    connect(bg, SIGNAL(idPressed(int)), this, SLOT(done(int)));
+#else
     connect(bg, SIGNAL(buttonPressed(int)), this, SLOT(done(int)));
+#endif
     for (int i = 0; saved[i]; ++i) {
         QPushButton *b = new QPushButton(saved[i]);
         bgl->addWidget(b);

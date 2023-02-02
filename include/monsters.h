@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1648318980 2022/03/26 18:23:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1665130023 2022/10/07 08:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -627,53 +627,61 @@
      * orcs
      */
     MON("goblin", S_ORC, LVL(0, 6, 10, 0, -3), (G_GENO | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(400, 100, MS_ORC, MZ_SMALL), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION, 1, CLR_GRAY,
         GOBLIN),
     MON("hobgoblin", S_ORC, LVL(1, 9, 10, 0, -4), (G_GENO | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1000, 200, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_COLLECT, M3_INFRAVISIBLE | M3_INFRAVISION,
         3, CLR_BROWN, HOBGOBLIN),
-    /* plain "orc" for zombie corpses only; not created at random
+    /* plain "orc" for zombie corpses only; not created at random;
+     * orcs (but not goblins and hobgoblins) are granted poison resistance;
+     * however, their corpses don't confer it
      */
     MON("orc", S_ORC, LVL(1, 9, 10, 0, -3), (G_GENO | G_NOGEN | G_LGROUP),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(850, 150, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(850, 150, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 3, CLR_RED, ORC),
     MON("hill orc", S_ORC, LVL(2, 9, 10, 0, -4), (G_GENO | G_LGROUP | 2),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(1000, 200, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1000, 200, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 4, CLR_YELLOW, HILL_ORC),
     MON("Mordor orc", S_ORC, LVL(3, 5, 10, 0, -5), (G_GENO | G_LGROUP | 1),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(1200, 200, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1200, 200, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 5, CLR_BLUE, MORDOR_ORC),
     MON("Uruk-hai", S_ORC, LVL(3, 7, 10, 0, -4), (G_GENO | G_LGROUP | 1),
-        A(ATTK(AT_WEAP, AD_PHYS, 1, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(1300, 300, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        A(ATTK(AT_WEAP, AD_PHYS, 1, 8),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1300, 300, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 5, CLR_BLACK, URUK_HAI),
     MON("orc shaman", S_ORC, LVL(3, 9, 5, 10, -5), (G_GENO | 1),
-        A(ATTK(AT_MAGC, AD_SPEL, 0, 0), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
-          NO_ATTK),
-        SIZ(1000, 300, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
-        M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_MAGIC,
+        A(ATTK(AT_MAGC, AD_SPEL, 0, 0),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1000, 300, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
+        M2_ORC | M2_GREEDY | M2_JEWELS | M2_MAGIC,
         M3_INFRAVISIBLE | M3_INFRAVISION, 5, HI_ZAP, ORC_SHAMAN),
     MON("orc-captain", S_ORC, LVL(5, 5, 10, 0, -5), (G_GENO | 1),
-        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(1350, 350, MS_ORC, MZ_HUMAN), 0, 0, M1_HUMANOID | M1_OMNIVORE,
+        A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
+        SIZ(1350, 350, MS_ORC, MZ_HUMAN), MR_POISON, 0,
+        M1_HUMANOID | M1_OMNIVORE,
         M2_ORC | M2_STRONG | M2_GREEDY | M2_JEWELS | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 7, HI_LORD, ORC_CAPTAIN),
     /*
@@ -1628,7 +1636,7 @@
                                      NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(850, 75, MS_SILENT, MZ_HUMAN), MR_COLD | MR_SLEEP | MR_POISON, 0,
         M1_BREATHLESS | M1_MINDLESS | M1_HUMANOID | M1_POIS,
-        M2_UNDEAD | M2_HOSTILE | M2_ORC | M2_GREEDY | M2_JEWELS,
+        M2_UNDEAD | M2_HOSTILE | M2_STRONG | M2_ORC | M2_GREEDY | M2_JEWELS,
         M3_INFRAVISION, 6, CLR_GRAY, ORC_MUMMY),
     MON("hobbit mummy", S_MUMMY, LVL(4, 10, 6, 20, -3),
         (G_GENO | G_NOCORPSE | 1), A(ATTK(AT_CLAW, AD_PHYS, 1, 6), NO_ATTK,
@@ -1705,8 +1713,8 @@
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_NOTAKE | M1_OMNIVORE,
         M2_STRONG, 0, 4, CLR_GREEN, GUARDIAN_NAGA_HATCHLING),
     MON("red naga", S_NAGA, LVL(6, 12, 4, 0, -4), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 4), ATTK(AT_BREA, AD_FIRE, 2, 6), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 4), ATTK(AT_BREA, AD_FIRE, 2, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_FIRE | MR_POISON,
         MR_FIRE | MR_POISON, M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE
                                  | M1_OVIPAROUS | M1_NOTAKE | M1_OMNIVORE,
@@ -1720,19 +1728,25 @@
             | M1_NOTAKE | M1_CARNIVORE,
         M2_STRONG, 0, 10, CLR_BLACK, BLACK_NAGA),
     MON("golden naga", S_NAGA, LVL(10, 14, 2, 70, 5), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_MAGC, AD_SPEL, 4, 6), NO_ATTK,
-          NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_MAGC, AD_SPEL, 4, 6),
+          NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_POISON, MR_POISON,
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_OVIPAROUS | M1_NOTAKE
             | M1_OMNIVORE,
         M2_STRONG, 0, 13, HI_GOLD, GOLDEN_NAGA),
+    /* 3.7: guardian naga used to have three attacks: bite, spit, hug
+       but in order for the hug to succeed the two preceding attacks had
+       to have hit, and its not possible to both bite and spit, hence
+       the hug never hit; change to spit, bite, touch, hug; if the bite
+       and touch hit, the hug will too */
     MON("guardian naga", S_NAGA, LVL(12, 16, 0, 50, 7), (G_GENO | 1),
-        A(ATTK(AT_BITE, AD_PLYS, 1, 6), ATTK(AT_SPIT, AD_DRST, 1, 6),
-          ATTK(AT_HUGS, AD_PHYS, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK),
+        A(ATTK(AT_SPIT, AD_DRST, 1, 6), ATTK(AT_BITE, AD_PLYS, 1, 6),
+          ATTK(AT_TUCH, AD_PHYS, 0, 0), ATTK(AT_HUGS, AD_WRAP, 2, 4),
+          NO_ATTK, NO_ATTK),
         SIZ(2600, 400, MS_MUMBLE, MZ_HUGE), MR_POISON, MR_POISON,
         M1_NOLIMBS | M1_SLITHY | M1_THICK_HIDE | M1_OVIPAROUS | M1_POIS
             | M1_NOTAKE | M1_OMNIVORE,
-        M2_STRONG, 0, 16, CLR_GREEN, GUARDIAN_NAGA),
+        M2_STRONG, 0, 17, CLR_GREEN, GUARDIAN_NAGA),
     /*
      * Ogres
      */
@@ -1991,7 +2005,7 @@
         A(ATTK(AT_WEAP, AD_DRLI, 1, 4), ATTK(AT_BREA, AD_SLEE, 2, 25),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_HUMAN, 0, MS_SPELL, MZ_HUMAN), MR_COLD | MR_SLEEP | MR_POISON,
-        0, M1_BREATHLESS | M1_HUMANOID,
+        0, M1_BREATHLESS | M1_HUMANOID | M1_SEE_INVIS,
         M2_NOPOLY | M2_UNDEAD | M2_STALK | M2_STRONG | M2_HOSTILE | M2_MALE
             | M2_COLLECT,
         0, 17, HI_LORD, NAZGUL),
@@ -2246,8 +2260,8 @@
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS,
-        M2_NOPOLY | M2_ELF | M2_STRONG | M2_COLLECT,
-        M3_INFRAVISION | M3_INFRAVISIBLE, 2, HI_DOMESTIC, ELF),
+        M2_NOPOLY | M2_ELF | M2_COLLECT,
+        M3_INFRAVISION | M3_INFRAVISIBLE, 1, HI_DOMESTIC, ELF),
     MON("Woodland-elf", S_HUMAN, LVL(4, 12, 10, 10, -5),
         (G_GENO | G_SGROUP | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), NO_ATTK,
@@ -2734,7 +2748,7 @@
         SIZ(60, 30, MS_SILENT, MZ_SMALL), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,
-        M2_HOSTILE, 0, 6, CLR_RED, PIRANHA),
+        M2_HOSTILE, 0, 7, CLR_RED, PIRANHA),
     MON("shark", S_EEL, LVL(7, 12, 2, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
@@ -2947,7 +2961,7 @@
         M1_TUNNEL | M1_NEEDPICK | M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 22, HI_LORD, LORD_CARNARVON),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, LORD_CARNARVON),
     MON("Pelias", S_HUMAN, LVL(20, 15, 0, 90, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_WEAP, AD_PHYS, 4, 10),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2955,7 +2969,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 22, HI_LORD, PELIAS),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, PELIAS),
     MON("Shaman Karnov", S_HUMAN, LVL(20, 15, 0, 90, 20), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_MAGC, AD_CLRC, 2, 8),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -2963,7 +2977,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 22, HI_LORD, SHAMAN_KARNOV),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, SHAMAN_KARNOV),
 #if 0 /* OBSOLETE -- leaders for 3.1.x/3.2.x elf quest when elf was a role */
     /* Two for elves - one of each sex.
      */
@@ -2995,7 +3009,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 22, HI_LORD, HIPPOCRATES),
+        M3_CLOSE | M3_INFRAVISIBLE, 26, HI_LORD, HIPPOCRATES),
     MON("King Arthur", S_HUMAN, LVL(20, 15, 0, 90, 20), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_WEAP, AD_PHYS, 4, 10),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -3003,7 +3017,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 23, HI_LORD, KING_ARTHUR),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, KING_ARTHUR),
     MON("Grand Master", S_HUMAN, LVL(25, 15, 0, 90, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_CLAW, AD_PHYS, 4, 10), ATTK(AT_KICK, AD_PHYS, 2, 8),
           ATTK(AT_MAGC, AD_CLRC, 2, 8), ATTK(AT_MAGC, AD_CLRC, 2, 8), NO_ATTK,
@@ -3031,7 +3045,7 @@
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS | M1_SWIM | M1_AMPHIBIOUS,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, 22, HI_LORD, ORION),
+        M3_CLOSE | M3_INFRAVISION | M3_INFRAVISIBLE, 24, HI_LORD, ORION),
     /* Note: Master of Thieves is also the Tourist's nemesis.
      */
     MON("Master of Thieves", S_HUMAN, LVL(20, 15, 0, 90, -20),
@@ -3050,7 +3064,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PNAME | M2_PEACEFUL | M2_STRONG | M2_MALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 23, HI_LORD, LORD_SATO),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, LORD_SATO),
     MON("Twoflower", S_HUMAN, LVL(20, 15, 10, 90, 0), (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), NO_ATTK, NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
@@ -3068,7 +3082,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_PEACEFUL | M2_STRONG | M2_FEMALE
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 23, HI_LORD, NORN),
+        M3_CLOSE | M3_INFRAVISIBLE, 24, HI_LORD, NORN),
     MON("Neferet the Green", S_HUMAN, LVL(20, 15, 0, 90, 0),
         (G_NOGEN | G_UNIQ),
         A(ATTK(AT_WEAP, AD_PHYS, 4, 10), ATTK(AT_MAGC, AD_SPEL, 2, 8),
@@ -3077,7 +3091,7 @@
         M1_HUMANOID | M1_OMNIVORE,
         M2_NOPOLY | M2_HUMAN | M2_FEMALE | M2_PNAME | M2_PEACEFUL | M2_STRONG
             | M2_COLLECT | M2_MAGIC,
-        M3_CLOSE | M3_INFRAVISIBLE, 23, CLR_GREEN, NEFERET_THE_GREEN),
+        M3_CLOSE | M3_INFRAVISIBLE, 25, CLR_GREEN, NEFERET_THE_GREEN),
     /*
      * quest nemeses
      */

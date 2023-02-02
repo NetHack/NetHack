@@ -47,7 +47,7 @@ OPTIONS=VIDEO
 
 		ie: OPTIONS=video:autodetect
 
-		Possible values are: AUTODETECT, DEFAULT, VGA
+		Possible values are: AUTODETECT, DEFAULT, VGA, VESA
 
 		AUTODETECT Checks for a supported hi-res video
                            adaptor, and if it detects one, NetHack 
@@ -61,6 +61,9 @@ OPTIONS=VIDEO
                            Any forcing of specific video routines has
                            potential to cause machine lock-ups if 
                            the specified video hardware is not present.	
+
+		VESA       Forces use of VESA specific video routines.
+                           Reverts to TTY mode if no VESA BIOS is found.
 
 OPTIONS=VIDEOSHADES
 		(defaults.nh only)

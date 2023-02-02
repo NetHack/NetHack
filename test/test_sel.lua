@@ -483,6 +483,46 @@ function test_sel_bounds()
    end
 end
 
+-- test des.map returning a selection
+function test_sel_map()
+   local __func__ = "test_sel_map";
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+
+   local sela = des.map([[LLL]]);
+   sel_has_n_points(sela, 3, __func__);
+   local selb = selection.match("L");
+   sel_are_equal(sela, selb, __func__);
+end
+
+function test_sel_numpoints()
+   local __func__ = "test_sel_numpoints";
+   des.reset_level();
+   des.level_init({ style = "solidfill", fg = " " });
+
+   local sela = selection.new();
+   local npts = sela:numpoints();
+   if (npts ~= 0) then
+      error(string.format("numpoints reported %i, should have been 0", npts));
+   end
+
+   des.terrain(5,5, ".");
+
+   local selb = selection.match(".");
+   local npts = selb:numpoints();
+   if (npts ~= 1) then
+      error(string.format("numpoints reported %i, should have been 1", npts));
+   end
+
+   des.terrain(6,5, ".");
+
+   local selc = selection.match(".");
+   local npts = selc:numpoints();
+   if (npts ~= 2) then
+      error(string.format("numpoints reported %i, should have been 2", npts));
+   end
+end
+
 nh.debug_flags({mongen = false, hunger = false, overwrite_stairs = true });
 test_selection_params();
 test_sel_negate();
@@ -502,3 +542,5 @@ test_sel_flood();
 test_sel_match();
 test_sel_iterate();
 test_sel_bounds();
+test_sel_map();
+test_sel_numpoints();

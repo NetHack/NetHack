@@ -124,7 +124,7 @@ doextversion(void)
     /* if extra text (git info) is present, put it on separate line
        but don't wrap on (x86) */
     if (strlen(buf) >= COLNO)
-        p = rindex(buf, '(');
+        p = strrchr(buf, '(');
     if (p && p > buf && p[-1] == ' ' && p[1] != 'x')
         p[-1] = '\0';
     else
@@ -182,7 +182,7 @@ doextversion(void)
             break;
         }
         (void) strip_newline(buf);
-        if (index(buf, '\t') != 0)
+        if (strchr(buf, '\t') != 0)
             (void) tabexpand(buf);
 
         if (*buf && *buf != ' ') {
@@ -195,7 +195,7 @@ doextversion(void)
         if (prolog || !*buf)
             continue;
 
-        if (index(buf, ':'))
+        if (strchr(buf, ':'))
             insert_rtoption(buf);
 
         if (*buf)
@@ -257,8 +257,8 @@ static struct rt_opt {
     const char *token, *value;
 } rt_opts[] = {
     { ":PATMATCH:", regex_id },
-    { ":LUAVERSION:", (const char *) g.lua_ver },
-    { ":LUACOPYRIGHT:", (const char *) g.lua_copyright },
+    { ":LUAVERSION:", (const char *) gl.lua_ver },
+    { ":LUACOPYRIGHT:", (const char *) gl.lua_copyright },
 };
 
 /*
@@ -272,7 +272,7 @@ insert_rtoption(char *buf)
 {
     int i;
 
-    if (!g.lua_ver[0])
+    if (!gl.lua_ver[0])
         get_lua_version();
 
     for (i = 0; i < SIZE(rt_opts); ++i) {
@@ -438,7 +438,7 @@ get_feature_notice_ver(char *str)
             istr[j] = str;
             if (j == 2)
                 break;
-        } else if (index("0123456789", *str) != 0) {
+        } else if (strchr("0123456789", *str) != 0) {
             str++;
         } else
             return 0L;

@@ -5,8 +5,8 @@
 #ifndef MONATTK_H
 #define MONATTK_H
 
-/*	Add new attack types below - ordering affects experience (exper.c).
- *	Attacks > AT_BUTT are worth extra experience.
+/*      Add new attack types below - ordering affects experience (exper.c).
+ *      Attacks > AT_BUTT are worth extra experience.
  */
 #define AT_ANY (-1) /* fake attack; dmgtype_fromattack wildcard */
 #define AT_NONE 0   /* passive monster (ex. acid blob) */
@@ -33,10 +33,10 @@
                                   || (atyp) == AT_MAGC \
                                   || (atyp) == AT_GAZE)
 
-/*	Add new damage types below.
+/*      Add new damage types below.
  *
- *	Note that 1-10 correspond to the types of attack used in buzz().
- *	Please don't disturb the order unless you rewrite the buzz() code.
+ *      Note that 1-10 correspond to the types of attack used in buzz().
+ *      Please don't disturb the order unless you rewrite the buzz() code.
  */
 #define AD_ANY (-1) /* fake damage; attacktype_fordmg wildcard */
 #define AD_PHYS 0   /* ordinary physical */

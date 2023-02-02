@@ -58,7 +58,6 @@ static xoff, yoff; /* image centering */
 #undef red
 #undef green
 #undef blue
-#undef index
 #ifdef _DCC
 #include <clib/graphics_protos.h>
 #include <clib/intuition_protos.h>
@@ -186,12 +185,12 @@ time_t when;
     SetDrMd(rp, JAM1);
 
     /* Put name on stone */
-    Sprintf(buf, "%s", g.plname);
+    Sprintf(buf, "%s", gp.plname);
     buf[STONE_LINE_LEN] = 0;
     tomb_text(buf);
 
     /* Put $ on stone */
-    Sprintf(buf, "%ld Au", g.done_money);
+    Sprintf(buf, "%ld Au", gd.done_money);
     buf[STONE_LINE_LEN] = 0; /* It could be a *lot* of gold :-) */
     tomb_text(buf);
 

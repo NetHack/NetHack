@@ -1,0 +1,135 @@
+This is a terse description of nethack's command line arguments.
+It is oriented toward UNIX (including descendants such as linux and macOS)
+and might not be accurate for other platforms.
+
+When starting play, if there is a save file for the chosen character name
+then it will be restored, otherwise a new game using that name will begin.
+
+nethack
+  with no arguments; uses character name from run-time configuration file's
+  OPTIONS=name:character-name entry, or player's username if none.
+
+nethack -u character-name [-X or -D]
+  '-u character-name' specifies the name to use for this game's character;
+       -u must be lowercase; the space between it and character-name may
+       be omitted;
+  '-X' play in non-scoring explore mode also known as discovery mode;
+       -X must be uppercase; character starts with a wand of wishing and
+       player may opt to be life-saved and keep going if character dies;
+  '-D' run in debug mode also known as wizard mode; -D must be uppercase;
+       if player is not allowed then nethack will switch to -X; if player
+       is allowed, character name will be changed to "wizard".
+
+  A character name may have a suffix specifying any or all of role, race,
+  gender, and alignment such as -u Conan-Bar-Hum-Mal-Neu or -u Tim-Wiz.
+  The components present must be at least three letters long but can be
+  longer; their case doesn't matter.  See also -p and -r, next,
+
+nethack -p Ppp -r Rrr [-@]
+  '-p Ppp' specify role; p for "profession" is used because -r is in use;
+       'Ppp' is three or more letters of the role name such as Val for
+       Valkyrie; unlike -p itself, upper/lower case of Ppp doesn't matter
+  '-r Rrr' specify race or species: Hum[an], Elf, Orc, Dwa[rf], Gno[me];
+  '-@' force non-interactive start; any of role, race, gender, and
+       alignment that is not specified on the command line or in the
+       run-time configuration file gets chosen randomly without prompting;
+       the at-sign might need to be quoted by preceding it with backslash.
+
+  The old form for role is also still accepted:  -A or -Arc[heologist],
+  -B or -Bar[barian], -C or -Cav[eman] or -Cavew[oman], -H or -Hea[ler],
+  -K or -Kni[ght], -M or -Mon[k], -P or -Pri[est] or -Prieste[ss],
+  -Ran[ger], -R or -Rog[ue], -S or -Sam[urai], -T or -Tou[rist],
+  -V or -Val[kyrie], -W or -Wiz[ard].  The single-letter form must be in
+  uppercase, the three or more letter form can be in any case.  There is
+  no single-letter option for the Ranger role.
+
+nethack -DEC[graphics]
+nethack -IBM[graphics]
+  selects the DEC or IBM symbol set to use line-drawing characters on a
+  text map; might be ignored depending on interface, or ineffective or
+  even scrambled depending on display capability; -DECgraphics and
+  -IBMgraphics are mutually exclusive; they can be any case but must use
+  at least three letters.
+
+nethack -wIii
+nethack --windowtype:Iii
+  where 'Iii' represents an interface designation:  tty, curses, X11, or
+  Qt; only useful if the program was built to support more than one
+  interface (the game's '#version' command will disclose that); overrides
+  OPTIONS=windowtype:Iii in run-time configuration file and build-time
+  default; '-w' or '--windowtype' must be lowercase, the interface
+  designation itself may be any case; variations '--windowtype Iii' and
+  '-w Iii' work too.
+
+  On Windows, nethack.exe might support both tty and curses; nethackW.exe
+  supports mswin only.  MS-DOS is tty only.
+
+nethack -n
+  don't show the 'news' file if one is present in nethack's directory.
+
+nethack --nethackrc:RC-file
+  use RC-file instead of the default run-time configuration file (which is
+  usually '~/.nethackrc'); the file name should include full path unless
+  located in nethack's directory;
+nethack --no-nethackrc
+  don't use any run-time configuration file; equivalent to
+  --nethackrc:/dev/null which behaves as if an empty file.
+
+nethack -dDir
+nethack --directory:Dir
+  could be used to override the build-time value of NETHACKDIR with
+  location Dir; if used, it should precede other command line arguments.
+
+The assorted options above can be combined on a single command line;
+they're listed separately for readability.
+
+*******
+
+Other options which perform some action and then exit rather than play
+the game:
+
+nethack -s
+nethack --scores
+  show scores for the default character; optional additional arguments:
+nethack -s -v
+  show scores for all versions present in the high scores file (record)
+  if it contains scores for any older versions; by default, only scores
+  for current version of nethack are shown; when '-v' is used, it should
+  immediately follow -s or --scores, preceding any name(s) or -p or -r;
+nethack -s character-name [character-name2 [character-name3 [...]]]
+  show scores for one or more specific character names (might not be
+  effective if PERS_IS_UID=1 is specified in nethack's sysconf file);
+  character names may be preceded by '-u' but that isn't required;
+  special character-name "all" is used to display all scores that pass
+  other criteria;
+nethack -s -p Ppp -r Rrr
+  show scores for specific roles or races; multiple instances can be used;
+  if both '-p' and '-r' are used, scores that match either will be shown
+  rather than scores that match both;
+nethack -dDir -s
+nethack --directory:Dir -s
+  as above; alternate directory, if specified, should come first.
+
+nethack --version
+nethack --version:paste
+  '--version' display the program's version number and exit;
+  '--version:paste' display version number and also copy it into system
+  pasteboard (should work on macOS and Windows; might not work on other
+  systems) so that it could be copied from there into a subsequent email
+  or web contact form, then exit.
+
+nethack --showpaths
+  list expected locations for various files and directories, then exit;
+  includes the name and location for the run-time configuration file which
+  can vary from platform to platform.
+
+nethack --usage
+nethack --help
+  show this text; 'nethack -?' and 'nethack ?' also work but the question
+  mark may need to be quoted to prevent the shell from intercepting it.
+
+*******
+
+This text is available during play in the menu for the game's '?' command
+or can be viewed via 'nethack --usage | more' at the shell prompt.
+

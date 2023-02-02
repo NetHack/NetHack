@@ -25,7 +25,7 @@
  * produces a binary only 6 blocks long, as opposed to the 137-block one
  * produced by an ordinary link).  To set up the VMS symbol to run the
  * program ("run uudecode filename" won't work), do:
- *		uudecode :== "$disk:[directory]uudecode.exe"
+ *              uudecode :== "$disk:[directory]uudecode.exe"
  * and don't forget the leading "$" or it still won't work.  The binaries
  * produced by this program are in VMS "stream-LF" format; this makes no
  * difference to VMS when running decoded executables, nor to VMS unzip,
@@ -45,7 +45,7 @@
  */
 
 #ifndef lint
-static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
+/* static char sccsid[] = "@(#)uudecode.c 5.5 (Berkeley) 7/6/88"; */
 #endif /* not lint */
 
 #ifdef __MSDOS__ /* For Turbo C */
@@ -58,6 +58,10 @@ static char sccsid[] = "@(#)uudecode.c	5.5 (Berkeley) 7/6/88";
 #ifndef WIN32
 #define WIN32
 #endif
+#endif
+
+#if __APPLE__
+#include "config.h"
 #endif
 
 /*
@@ -126,15 +130,15 @@ main(int argc, char **argv)
     }
     (void) sscanf(buf, "begin %o %s", &mode, dest);
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
     /* handle ~user/file format */
     if (dest[0] == '~') {
         char *sl;
         struct passwd *getpwnam();
         struct passwd *user;
-        char dnbuf[100], *index(), *strcat(), *strcpy();
+        char dnbuf[100], *strchr(), *strcat(), *strcpy();
 
-        sl = index(dest, '/');
+        sl = strchr(dest, '/');
         if (sl == NULL) {
             fprintf(stderr, "Illegal ~user\n");
             exit(3);
@@ -235,7 +239,7 @@ outdec(char *p, FILE *f, int n)
         putc(c3, f);
 }
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
 /*
  * Return the ptr in sp at which the character c appears;
  * NULL if not found

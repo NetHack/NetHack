@@ -9,7 +9,7 @@
 #include <string.h>
 #endif
 
-#define DATAPREFIX 4		/* see decl.h */
+#define DATAPREFIX 4        /* see decl.h */
 
 #ifdef DLB
 /*
@@ -368,7 +368,7 @@ lib_dlb_fgets(char *buf, int len, dlb *dp)
     *bp = '\0';
 
 #if defined(MSDOS) || defined(WIN32)
-    if ((bp = index(buf, '\r')) != 0) {
+    if ((bp = strchr(buf, '\r')) != 0) {
         *bp++ = '\n';
         *bp = '\0';
     }

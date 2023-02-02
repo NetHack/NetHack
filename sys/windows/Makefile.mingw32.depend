@@ -61,13 +61,13 @@ $(ONHW)/%.d: $(SRC)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
 $(ONHW)/cppregex.d: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONHW)
-	$(cce) $(CFLAGSW) $< -o$@
+	$(cce) $(CPPFLAGSW) $< -o$@
 
 $(ONHW)/%.d: $(SSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
-$(ONHW)/stubs.d: $(MSWSYS)/stubs.c $(NHLUAH) | $(ONHW)
-	$(cce) $(CFLAGSW) -DTTYSTUB $< -o$@
+$(ONHW)/%.d: $(SNDSYS)/%.c $(NHLUAH) | $(ONHW)
+	$(cce) $(CFLAGSW) $< -o$@
 
 $(ONHW)/%.d: $(MSWSYS)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
@@ -82,13 +82,13 @@ $(ONH)/%.d: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
 
 $(ONH)/cppregex.d: $(SSYS)/cppregex.cpp $(NHLUAH) | $(ONH)
-	$(cce) $(CFLAGSNH) $< -o$@
+	$(cce) $(CPPFLAGSNH) $< -o$@
 
 $(ONH)/%.d: $(SSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
 
-$(ONH)/stubs.d: $(MSWSYS)/stubs.c $(NHLUAH) | $(ONH)
-	$(cce) $(CFLAGSNH) -DGUISTUB $< -o$@
+$(ONH)/%.d: $(SNDSYS)/%.c $(NHLUAH) | $(ONH)
+	$(cce) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.d: $(MSWSYS)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@

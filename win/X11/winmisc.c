@@ -24,7 +24,7 @@
 #include <X11/Xaw/Viewport.h>
 #include <X11/Xaw/Cardinals.h>
 #include <X11/Xaw/List.h>
-#include <X11/Xos.h> /* for index() */
+#include <X11/Xos.h> /* for strchr() */
 #include <X11/Xatom.h>
 
 #ifdef PRESERVE_NO_SYSV
@@ -34,7 +34,10 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
 #include "hack.h"
+#undef X11_BUILD
+
 #include "func_tab.h"
 #include "winX.h"
 
@@ -181,13 +184,13 @@ ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(params);
     nhUse(num_params);
 
-    (void) memset(rolechars, '\0', sizeof rolechars); /* for index() */
+    (void) memset(rolechars, '\0', sizeof rolechars); /* for strchr() */
     for (i = 0; roles[i].name.m; ++i) {
         ch = lowc(*roles[i].name.m);
         /* if (flags.female && roles[i].name.f) ch = lowc(*roles[i].name.f);
          */
         /* this supports at most two roles with the same first letter */
-        if (index(rolechars, ch))
+        if (strchr(rolechars, ch))
             ch = highc(ch);
         rolechars[i] = ch;
     }
@@ -196,15 +199,15 @@ ps_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(rolechars, ch);
+    mark = strchr(rolechars, ch);
     if (!mark)
-        mark = index(rolechars, lowc(ch));
+        mark = strchr(rolechars, lowc(ch));
     if (!mark)
-        mark = index(rolechars, highc(ch));
+        mark = strchr(rolechars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such class */
@@ -227,11 +230,11 @@ race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(params);
     nhUse(num_params);
 
-    (void) memset(racechars, '\0', sizeof racechars); /* for index() */
+    (void) memset(racechars, '\0', sizeof racechars); /* for strchr() */
     for (i = 0; races[i].noun; ++i) {
         ch = lowc(*races[i].noun);
         /* this supports at most two races with the same first letter */
-        if (index(racechars, ch))
+        if (strchr(racechars, ch))
             ch = highc(ch);
         racechars[i] = ch;
     }
@@ -240,15 +243,15 @@ race_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(racechars, ch);
+    mark = strchr(racechars, ch);
     if (!mark)
-        mark = index(racechars, lowc(ch));
+        mark = strchr(racechars, lowc(ch));
     if (!mark)
-        mark = index(racechars, highc(ch));
+        mark = strchr(racechars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such race */
@@ -275,13 +278,13 @@ gend_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(gendchars, ch);
+    mark = strchr(gendchars, ch);
     if (!mark)
-        mark = index(gendchars, lowc(ch));
+        mark = strchr(gendchars, lowc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such gender */
@@ -308,13 +311,13 @@ algn_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
         /* don't beep */
         return;
     }
-    mark = index(algnchars, ch);
+    mark = strchr(algnchars, ch);
     if (!mark)
-        mark = index(algnchars, highc(ch));
+        mark = strchr(algnchars, highc(ch));
     if (!mark) {
-        if (index(ps_randchars, ch))
+        if (strchr(ps_randchars, ch))
             ps_selected = PS_RANDOM;
-        else if (index(ps_quitchars, ch))
+        else if (strchr(ps_quitchars, ch))
             ps_selected = PS_QUIT;
         else {
             X11_nhbell(); /* no such alignment */
@@ -349,11 +352,11 @@ plsel_dialog_acceptvalues(void)
     XtSetArg(args[0], nhStr(XtNstring), &s);
     XtGetValues(plsel_name_input, args, ONE);
 
-    (void) strncpy(g.plname, (char *) s, sizeof g.plname - 1);
-    g.plname[sizeof g.plname - 1] = '\0';
-    (void) mungspaces(g.plname);
-    if (strlen(g.plname) < 1)
-        (void) strcpy(g.plname, "Mumbles");
+    (void) strncpy(gp.plname, (char *) s, sizeof gp.plname - 1);
+    gp.plname[sizeof gp.plname - 1] = '\0';
+    (void) mungspaces(gp.plname);
+    if (strlen(gp.plname) < 1)
+        (void) strcpy(gp.plname, "Mumbles");
     iflags.renameinprogress = FALSE;
 }
 
@@ -473,7 +476,7 @@ X11_player_selection_randomize(void)
 {
     int nrole = plsel_n_roles;
     int nrace = plsel_n_races;
-    int ro, ra, al, ge;
+    int ro, ra, al, gend;
     boolean choose_race_first;
     boolean picksomething = (flags.initrole == ROLE_NONE
                              || flags.initrace == ROLE_NONE
@@ -520,12 +523,12 @@ X11_player_selection_randomize(void)
         }
     }
 
-    ge = flags.initgend;
-    if (ge == ROLE_NONE) {
-        ge = rn2(ROLE_GENDERS);
+    gend = flags.initgend;
+    if (gend == ROLE_NONE) {
+        gend = rn2(ROLE_GENDERS);
     }
-    while (!validgend(ro, ra, ge)) {
-        ge = rn2(ROLE_GENDERS);
+    while (!validgend(ro, ra, gend)) {
+        gend = rn2(ROLE_GENDERS);
     }
 
     al = flags.initalign;
@@ -536,7 +539,7 @@ X11_player_selection_randomize(void)
         al = rn2(ROLE_ALIGNS);
     }
 
-    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(ge + 1));
+    XawToggleSetCurrent(plsel_gend_radios[0], i2xtp(gend + 1));
     XawToggleSetCurrent(plsel_align_radios[0], i2xtp(al + 1));
     XawToggleSetCurrent(plsel_race_radios[0], i2xtp(ra + 1));
     XawToggleSetCurrent(plsel_role_radios[0], i2xtp(ro + 1));
@@ -776,8 +779,8 @@ X11_create_player_selection_name(Widget form)
     XtSetArg(args[num_args], nhStr(XtNeditType),
              !plsel_ask_name ? XawtextRead : XawtextEdit); num_args++;
     XtSetArg(args[num_args], nhStr(XtNresize), XawtextResizeWidth); num_args++;
-    XtSetArg(args[num_args], nhStr(XtNstring), g.plname); num_args++;
-    XtSetArg(args[num_args], XtNinsertPosition, strlen(g.plname)); num_args++;
+    XtSetArg(args[num_args], nhStr(XtNstring), gp.plname); num_args++;
+    XtSetArg(args[num_args], XtNinsertPosition, strlen(gp.plname)); num_args++;
     XtSetArg(args[num_args], nhStr(XtNaccelerators),
              XtParseAcceleratorTable(plsel_input_accelerators)); num_args++;
     plsel_name_input = XtCreateManagedWidget("name_input",
@@ -1217,7 +1220,7 @@ X11_player_selection_dialog(void)
     if (plsel_align_radios)
         free(plsel_align_radios);
 
-    if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+    if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
         clearlocks();
         X11_exit_nhwindows((char *) 0);
         nh_terminate(0);
@@ -1291,7 +1294,7 @@ X11_player_selection_prompts(void)
         XtDestroyWidget(popup);
         free((genericptr_t) choices), choices = 0;
 
-        if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+        if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
             clearlocks();
             X11_exit_nhwindows((char *) 0);
             nh_terminate(0);
@@ -1360,7 +1363,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1428,7 +1431,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1494,7 +1497,7 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || g.program_state.done_hup) {
+            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1516,15 +1519,15 @@ void
 X11_player_selection(void)
 {
     if (iflags.wc_player_selection == VIA_DIALOG) {
-        if (!*g.plname) {
+        if (!*gp.plname) {
 #ifdef UNIX
             char *defplname = get_login_name();
 #else
             char *defplname = (char *)0;
 #endif
-            (void) strncpy(g.plname, defplname ? defplname : "Mumbles",
-                           sizeof g.plname - 1);
-            g.plname[sizeof g.plname - 1] = '\0';
+            (void) strncpy(gp.plname, defplname ? defplname : "Mumbles",
+                           sizeof gp.plname - 1);
+            gp.plname[sizeof gp.plname - 1] = '\0';
             iflags.renameinprogress = TRUE;
         }
         X11_player_selection_dialog();
@@ -1787,7 +1790,7 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
     } else if (ch == '?') {
         extend_help((Widget) 0, (XtPointer) 0, (XtPointer) 0);
         return;
-    } else if (index("\033\n\r", ch)) {
+    } else if (strchr("\033\n\r", ch)) {
         if (ch == '\033') {
             /* unselect while still visible */
             if (extended_cmd_selected >= 0)
@@ -1885,7 +1888,7 @@ ec_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
 static void
 init_extended_commands_popup(void)
 {
-    int i, j, num_commands;
+    int i, num_commands;
     int *matches;
     int ecmflags = ECM_NO1CHARCMD;
 
@@ -1894,19 +1897,18 @@ init_extended_commands_popup(void)
 
     num_commands = extcmds_match(NULL, ecmflags, &matches);
 
-    j = num_commands;
-    command_list = (const char **) alloc((unsigned) (j * sizeof (char *) + 1));
-    command_indx = (short *) alloc((unsigned) (j * sizeof (short) + 1));
+    i = num_commands + 1; /* room for each extcmd, plus terminator */
+    command_list = (const char **) alloc((unsigned) (i * sizeof(char *)));
+    command_indx = (short *) alloc((unsigned) (i * sizeof(short)));
 
-    for (i = j = 0; i < num_commands; i++) {
+    for (i = 0; i < num_commands; i++) {
         struct ext_func_tab *ec = extcmds_getentry(matches[i]);
 
-        command_indx[j] = matches[i];
-        command_list[j++] = ec->ef_txt;
+        command_indx[i] = matches[i];
+        command_list[i] = ec->ef_txt;
     }
-    command_list[j] = (char *) 0;
-    command_indx[j] = -1;
-    num_commands = j;
+    command_list[i] = (char *) 0;
+    command_indx[i] = -1;
 
     extended_command_popup =
         make_menu("extended_commands", "Extended Commands",
@@ -2192,7 +2194,7 @@ make_menu(const char *popup_name, const char *popup_label,
     XSetWMProtocols(XtDisplay(popup), XtWindow(popup), &wm_delete_window, 1);
 
     /* during role selection, highlight "random" as pre-selected choice */
-    if (right_callback == ps_random && index(ps_randchars, '\n'))
+    if (right_callback == ps_random && strchr(ps_randchars, '\n'))
         swap_fg_bg(right);
 
     return popup;

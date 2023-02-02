@@ -81,8 +81,8 @@ nhmain(int argc, char *argv[])
 
     early_init();
 
-    g.hname = argv[0];
-    g.hackpid = getpid();
+    gh.hname = argv[0];
+    gh.hackpid = getpid();
     (void) umask(0777 & ~FCMASK);
 
     choose_windows(DEFAULT_WINDOW_SYS);
@@ -150,7 +150,7 @@ nhmain(int argc, char *argv[])
             initoptions();
 #endif
 #ifdef PANICTRACE
-            ARGV0 = g.hname; /* save for possible stack trace */
+            ARGV0 = gh.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
             panictrace_setsignals(TRUE);
 #endif
@@ -178,7 +178,7 @@ nhmain(int argc, char *argv[])
 #endif
     initoptions();
 #ifdef PANICTRACE
-    ARGV0 = g.hname; /* save for possible stack trace */
+    ARGV0 = gh.hname; /* save for possible stack trace */
 #ifndef NO_SIGNAL
     panictrace_setsignals(TRUE);
 #endif
@@ -189,7 +189,7 @@ nhmain(int argc, char *argv[])
      * It seems you really want to play.
      */
     u.uhp = 1; /* prevent RIP on early quits */
-    g.program_state.preserve_locks = 1;
+    gp.program_state.preserve_locks = 1;
 #ifndef NO_SIGNAL
     sethanguphandler((SIG_RET_TYPE) hangup);
 #endif
@@ -212,9 +212,9 @@ nhmain(int argc, char *argv[])
 #endif
 
 #ifdef DEF_PAGER
-    if (!(g.catmore = nh_getenv("HACKPAGER"))
-        && !(g.catmore = nh_getenv("PAGER")))
-        g.catmore = DEF_PAGER;
+    if (!(gc.catmore = nh_getenv("HACKPAGER"))
+        && !(gc.catmore = nh_getenv("PAGER")))
+        gc.catmore = DEF_PAGER;
 #endif
 #ifdef MAIL
     getmailstatus();
@@ -223,14 +223,14 @@ nhmain(int argc, char *argv[])
     /* wizard mode access is deferred until here */
     set_playmode(); /* sets plname to "wizard" for wizard mode */
     /* hide any hyphens from plnamesuffix() */
-    g.plnamelen = exact_username ? (int) strlen(g.plname) : 0;
+    gp.plnamelen = exact_username ? (int) strlen(gp.plname) : 0;
     /* strip role,race,&c suffix; calls askname() if plname[] is empty
        or holds a generic user name like "player" or "games" */
     plnamesuffix();
 
     if (wizard) {
         /* use character name rather than lock letter for file names */
-        g.locknum = 0;
+        gl.locknum = 0;
     } else {
 #ifndef NO_SIGNAL
         /* suppress interrupts while processing lock file */
@@ -247,7 +247,7 @@ nhmain(int argc, char *argv[])
      */
     vision_init();
 
-    display_gamewindows();
+    init_sound_and_display_gamewindows();
 
     /*
      * First, try to find and restore a save file for specified character.
@@ -257,22 +257,22 @@ nhmain(int argc, char *argv[])
 
     /*
      * getlock() complains and quits if there is already a game
-     * in progress for current character name (when g.locknum == 0)
-     * or if there are too many active games (when g.locknum > 0).
+     * in progress for current character name (when gl.locknum == 0)
+     * or if there are too many active games (when gl.locknum > 0).
      * When proceeding, it creates an empty <lockname>.0 file to
      * designate the current game.
      * getlock() constructs <lockname> based on the character
-     * name (for !g.locknum) or on first available of alock, block,
+     * name (for !gl.locknum) or on first available of alock, block,
      * clock, &c not currently in use in the playground directory
-     * (for g.locknum > 0).
+     * (for gl.locknum > 0).
      */
-    if (*g.plname) {
+    if (*gp.plname) {
         getlock();
-        g.program_state.preserve_locks = 0; /* after getlock() */
+        gp.program_state.preserve_locks = 0; /* after getlock() */
     }
 
-    if (*g.plname && (nhfp = restore_saved_game()) != 0) {
-        const char *fq_save = fqname(g.SAVEF, SAVEPREFIX, 1);
+    if (*gp.plname && (nhfp = restore_saved_game()) != 0) {
+        const char *fq_save = fqname(gs.SAVEF, SAVEPREFIX, 1);
 
         (void) chmod(fq_save, 0); /* disallow parallel restores */
 #ifndef NO_SIGNAL
@@ -302,7 +302,7 @@ nhmain(int argc, char *argv[])
     }
 
     if (!resuming) {
-        boolean neednewlock = (!*g.plname);
+        boolean neednewlock = (!*gp.plname);
         /* new game:  start by choosing role, race, etc;
            player might change the hero's name while doing that,
            in which case we try to restore under the new name
@@ -311,14 +311,14 @@ nhmain(int argc, char *argv[])
             if (!plsel_once)
                 player_selection();
             plsel_once = TRUE;
-            if (neednewlock && *g.plname)
+            if (neednewlock && *gp.plname)
                 goto attempt_restore;
             if (iflags.renameinprogress) {
                 /* player has renamed the hero while selecting role;
                    if locking alphabetically, the existing lock file
                    can still be used; otherwise, discard current one
                    and create another for the new character name */
-                if (!g.locknum) {
+                if (!gl.locknum) {
                     delete_levelfile(0); /* remove empty lock file */
                     getlock();
                 }
@@ -377,13 +377,13 @@ process_options(int argc, char *argv[])
 #endif
         case 'u':
             if (argv[0][2]) {
-                (void) strncpy(g.plname, argv[0] + 2, sizeof g.plname - 1);
-                g.plnamelen = 0; /* plname[] might have -role-race attached */
+                (void) strncpy(gp.plname, argv[0] + 2, sizeof gp.plname - 1);
+                gp.plnamelen = 0; /* plname[] might have -role-race attached */
             } else if (argc > 1) {
                 argc--;
                 argv++;
-                (void) strncpy(g.plname, argv[0], sizeof g.plname - 1);
-                g.plnamelen = 0;
+                (void) strncpy(gp.plname, argv[0], sizeof gp.plname - 1);
+                gp.plnamelen = 0;
             } else {
                 raw_print("Player name expected after -u");
             }
@@ -443,17 +443,17 @@ process_options(int argc, char *argv[])
 #else
     /* XXX This is deprecated in favor of SYSCF with MAXPLAYERS */
     if (argc > 1)
-        g.locknum = atoi(argv[1]);
+        gl.locknum = atoi(argv[1]);
 #endif
 #ifdef MAX_NR_OF_PLAYERS
     /* limit to compile-time limit */
-    if (!g.locknum || g.locknum > MAX_NR_OF_PLAYERS)
-        g.locknum = MAX_NR_OF_PLAYERS;
+    if (!gl.locknum || gl.locknum > MAX_NR_OF_PLAYERS)
+        gl.locknum = MAX_NR_OF_PLAYERS;
 #endif
 #ifdef SYSCF
     /* let syscf override compile-time limit */
-    if (!g.locknum || (sysopt.maxplayers && g.locknum > sysopt.maxplayers))
-        g.locknum = sysopt.maxplayers;
+    if (!gl.locknum || (sysopt.maxplayers && gl.locknum > sysopt.maxplayers))
+        gl.locknum = sysopt.maxplayers;
 #endif
 }
 
@@ -478,11 +478,11 @@ chdirx(const char *dir, boolean wr)
 #ifdef VAR_PLAYGROUND
         int len = strlen(VAR_PLAYGROUND);
 
-        g.fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
-        Strcpy(g.fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
-        if (g.fqn_prefix[SCOREPREFIX][len - 1] != '/') {
-            g.fqn_prefix[SCOREPREFIX][len] = '/';
-            g.fqn_prefix[SCOREPREFIX][len + 1] = '\0';
+        gf.fqn_prefix[SCOREPREFIX] = (char *) alloc(len + 2);
+        Strcpy(gf.fqn_prefix[SCOREPREFIX], VAR_PLAYGROUND);
+        if (gf.fqn_prefix[SCOREPREFIX][len - 1] != '/') {
+            gf.fqn_prefix[SCOREPREFIX][len] = '/';
+            gf.fqn_prefix[SCOREPREFIX][len + 1] = '\0';
         }
 
 #endif
@@ -504,11 +504,11 @@ chdirx(const char *dir, boolean wr)
      */
     if (wr) {
 #ifdef VAR_PLAYGROUND
-        g.fqn_prefix[LEVELPREFIX] = g.fqn_prefix[SCOREPREFIX];
-        g.fqn_prefix[SAVEPREFIX] = g.fqn_prefix[SCOREPREFIX];
-        g.fqn_prefix[BONESPREFIX] = g.fqn_prefix[SCOREPREFIX];
-        g.fqn_prefix[LOCKPREFIX] = g.fqn_prefix[SCOREPREFIX];
-        g.fqn_prefix[TROUBLEPREFIX] = g.fqn_prefix[SCOREPREFIX];
+        gf.fqn_prefix[LEVELPREFIX] = gf.fqn_prefix[SCOREPREFIX];
+        gf.fqn_prefix[SAVEPREFIX] = gf.fqn_prefix[SCOREPREFIX];
+        gf.fqn_prefix[BONESPREFIX] = gf.fqn_prefix[SCOREPREFIX];
+        gf.fqn_prefix[LOCKPREFIX] = gf.fqn_prefix[SCOREPREFIX];
+        gf.fqn_prefix[TROUBLEPREFIX] = gf.fqn_prefix[SCOREPREFIX];
 #endif
         check_recordfile(dir);
     }
@@ -530,7 +530,7 @@ whoami(void)
      * Note that we trust the user here; it is possible to play under
      * somebody else's name.
      */
-    if (!*g.plname) {
+    if (!*gp.plname) {
         register const char *s;
 
         s = nh_getenv("USER");
@@ -540,8 +540,8 @@ whoami(void)
             s = getlogin();
 
         if (s && *s) {
-            (void) strncpy(g.plname, s, sizeof g.plname - 1);
-            if (index(g.plname, '-'))
+            (void) strncpy(gp.plname, s, sizeof gp.plname - 1);
+            if (strchr(gp.plname, '-'))
                 return TRUE;
         }
     }
@@ -609,7 +609,7 @@ wd_message(void)
         if (sysopt.wizards && sysopt.wizards[0]) {
             char *tmp = build_english_list(sysopt.wizards);
             pline("Only user%s %s may access debug (wizard) mode.",
-                  index(sysopt.wizards, ' ') ? "s" : "", tmp);
+                  strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
             free(tmp);
         } else
             pline("Entering explore/discovery mode instead.");
@@ -648,7 +648,7 @@ check_user_string(const char *optstr)
     if (optstr[0] == '*')
         return TRUE; /* allow any user */
     if (sysopt.check_plname)
-        pwname = g.plname;
+        pwname = gp.plname;
     else if ((pw = get_unix_pw()) != 0)
         pwname = pw->pw_name;
     if (!pwname || !*pwname)
@@ -1041,7 +1041,7 @@ void js_globals_init() {
     });
 
     /* globals */
-    CREATE_GLOBAL(g.plname, "s");
+    CREATE_GLOBAL(gp.plname, "s");
 
     /* window globals */
     CREATE_GLOBAL(WIN_MAP, "i");

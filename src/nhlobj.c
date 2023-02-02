@@ -158,6 +158,8 @@ nhl_obj_u_giveobj(lua_State *L)
     return 0;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* Get a table of object class data. */
 /* local odata = obj.class(otbl.otyp); */
 /* local odata = obj.class(obj.new("rock")); */
@@ -171,6 +173,7 @@ l_obj_objects_to_table(lua_State *L)
 
     if (argc != 1) {
         nhl_error(L, "l_obj_objects_to_table: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -229,6 +232,8 @@ l_obj_objects_to_table(lua_State *L)
 
     return 1;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* Create a lua table representation of the object, unpacking all the
    object fields.
@@ -331,6 +336,8 @@ l_obj_to_table(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* create a new object via wishing routine */
 /* local o = obj.new("rock"); */
 static int
@@ -348,6 +355,7 @@ l_obj_new_readobjnam(lua_State *L)
         return 1;
     } else
         nhl_error(L, "l_obj_new_readobjname: Wrong args");
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -366,10 +374,11 @@ l_obj_at(lua_State *L)
         cvt_to_abscoord(&x, &y);
 
         lua_pop(L, 2);
-        (void) l_obj_push(L, g.level.objects[x][y]);
+        (void) l_obj_push(L, gl.level.objects[x][y]);
         return 1;
     } else
         nhl_error(L, "l_obj_at: Wrong args");
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -400,6 +409,8 @@ l_obj_placeobj(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* Get the next object in the object chain */
 /* local o = obj.at(x, y);
@@ -453,6 +464,8 @@ l_obj_isnull(lua_State *L)
     return 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* does object have a timer of certain type? */
 /* local hastimer = o:has_timer("rot-organic"); */
 static int
@@ -476,6 +489,7 @@ l_obj_timer_has(lua_State *L)
     return 0;
 }
 
+
 /* peek at an object timer. return the turn when timer triggers.
    returns 0 if no such timer attached to the object. */
 /* local timeout = o:peek_timer("hatch-egg"); */
@@ -497,6 +511,7 @@ l_obj_timer_peek(lua_State *L)
         }
     } else
         nhl_error(L, "l_obj_timer_peek: Wrong args");
+    /*NOTREACHED*/
     return 0;
 }
 
@@ -532,6 +547,8 @@ l_obj_timer_stop(lua_State *L)
         nhl_error(L, "l_obj_timer_stop: Wrong args");
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* start an object timer. */
 /* o:start_timer("hatch-egg", 10); */

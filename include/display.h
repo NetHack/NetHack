@@ -19,7 +19,7 @@
  * Returns the head of the list of objects that the player can see
  * at location (x,y).  [Vestige of unimplemented invisible objects.]
  */
-#define vobj_at(x, y) (g.level.objects[x][y])
+#define vobj_at(x, y) (gl.level.objects[x][y])
 
 /*
  * sensemon()
@@ -47,15 +47,14 @@
           /* OR 2b. hero is using a telepathy inducing */  \
           /*        object and in range                */  \
           || (Unblind_telepat                              \
-              && (distu(mon->mx, mon->my) <= (BOLT_LIM * BOLT_LIM)))))
+              && (mdistu(mon) <= (BOLT_LIM * BOLT_LIM)))))
 
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
    lava, but presumeably any monster there is on top so not sensed */
 #define _sensemon(mon) \
-    (   (!u.uswallow || (mon) == u.ustuck)                                 \
-     && (!Underwater || (distu((mon)->mx, (mon)->my) <= 2                  \
-                         && is_pool((mon)->mx, (mon)->my)))                \
+    (   (!u.uswallow || (mon) == u.ustuck)                                   \
+     && (!Underwater || (mdistu(mon) <= 2 && is_pool((mon)->mx, (mon)->my))) \
      && (Detect_monsters || tp_sensemon(mon) || MATCH_WARN_OF_MON(mon))   )
 
 /*
@@ -63,8 +62,8 @@
  * vicinity, and a glyph representing the warning level is displayed.
  */
 #define _mon_warning(mon) \
-    (Warning && !(mon)->mpeaceful && (distu((mon)->mx, (mon)->my) < 100) \
-     && (((int) ((mon)->m_lev / 4)) >= g.context.warnlevel))
+    (Warning && !(mon)->mpeaceful && (mdistu(mon) < 100)     \
+     && (((int) ((mon)->m_lev / 4)) >= gc.context.warnlevel))
 
 /*
  * mon_visible()
@@ -149,7 +148,7 @@
      && ((cansee((mon)->mx, (mon)->my)                                  \
           && (See_invisible || Detect_monsters))                        \
          || (!Blind && (HTelepat & ~INTRINSIC)                          \
-             && distu((mon)->mx, (mon)->my) <= (BOLT_LIM * BOLT_LIM))))
+             && mdistu(mon) <= (BOLT_LIM * BOLT_LIM))))
 
 /*
  * is_safemon(mon)
@@ -181,9 +180,11 @@
  * random_object()
  *
  * Respectively return a random monster or object.
+ * random_object() won't return STRANGE_OBJECT or the generic objects.
+ * -/+ MAXOCLASSES is used to skip it and them.
  */
-#define random_monster(rng) rng(NUMMONS)
-#define random_object(rng) (rng(NUM_OBJECTS - 1) + 1)
+#define random_monster(rng) ((*rng)(NUMMONS))
+#define random_object(rng) ((*rng)(NUM_OBJECTS - MAXOCLASSES) + MAXOCLASSES)
 
 /*
  * what_obj()
@@ -251,11 +252,11 @@
         ((int) U_AP_TYPE == M_AP_NOTHING)                               \
         ? hero_glyph                                                    \
         : ((int) U_AP_TYPE == M_AP_FURNITURE)                           \
-          ? cmap_to_glyph((int) g.youmonst.mappearance)                 \
+          ? cmap_to_glyph((int) gy.youmonst.mappearance)                \
           : ((int) U_AP_TYPE == M_AP_OBJECT)                            \
-            ? objnum_to_glyph((int) g.youmonst.mappearance)             \
+            ? objnum_to_glyph((int) gy.youmonst.mappearance)            \
             /* else U_AP_TYPE == M_AP_MONSTER */                        \
-            : monnum_to_glyph((int) g.youmonst.mappearance, Ugender)))
+            : monnum_to_glyph((int) gy.youmonst.mappearance, Ugender)))
 
 /*
  * NetHack glyphs
@@ -389,7 +390,15 @@ enum glyphmap_change_triggers { gm_nochange, gm_newgame, gm_levelchange,
  * ridden (female)  Represents all female monsters being ridden.
  *                  Count: NUMMONS
  *
- * object           One for each object.
+ * object           One for each type of object.  The first entry is
+ *                  'strange object', the next 1..MAXOCLASSES-1 entries
+ *                  are generic (one for each class, including one for
+ *                  strange object's 'illobj class'), the rest are
+ *                  regular objects.  Some members of the generic
+ *                  subset are used to prevent color of potions, gems,
+ *                  and spellbooks from being revealed when obj->dknown
+ *                  hasn't been set, avoiding a bug which had been
+ *                  present since day one of color support.
  *                  Count: NUM_OBJECTS
  *
  * Stone            Stone
@@ -452,7 +461,8 @@ enum glyphmap_change_triggers { gm_nochange, gm_newgame, gm_levelchange,
  * frosty explosions      A set of nine.
  *                        Count: MAXEXPCHAR
  *
- * warning                A set of six representing the different warning levels.
+ * warning                A set of six representing the different warning
+ *                        levels.
  *                        Count: 6
  *
  * statues (male)         One for each male monster.
@@ -638,7 +648,7 @@ enum glyph_offsets {
 /* The hero's glyph when seen as a monster.
  */
 #define hero_glyph \
-    monnum_to_glyph((Upolyd || !flags.showrace) ? u.umonnum : g.urace.mnum, \
+    monnum_to_glyph((Upolyd || !flags.showrace) ? u.umonnum : gu.urace.mnum, \
                     (Ugender))
 
 /*
@@ -750,7 +760,8 @@ enum glyph_offsets {
 #define glyph_is_normal_female_monster(glyph) \
     ((glyph) >= GLYPH_MON_FEM_OFF && (glyph) < (GLYPH_MON_FEM_OFF + NUMMONS))
 #define glyph_is_normal_monster(glyph) \
-    (glyph_is_normal_male_monster(glyph) || glyph_is_normal_female_monster(glyph))
+    (glyph_is_normal_male_monster(glyph)                \
+     || glyph_is_normal_female_monster(glyph))
 #define glyph_is_female_pet(glyph) \
     ((glyph) >= GLYPH_PET_FEM_OFF && (glyph) < (GLYPH_PET_FEM_OFF + NUMMONS))
 #define glyph_is_male_pet(glyph) \
@@ -800,10 +811,23 @@ enum glyph_offsets {
                        ? ((glyph) - GLYPH_RIDDEN_MALE_OFF)     \
                        : NUMMONS)
 
+/* boulder hides pile except when on top of another boulder;
+   the otg_otmp assignment might occur multiple times in the same
+   expression but there will always be sequence points in between */
 #define obj_is_piletop(obj) \
     ((obj)->where == OBJ_FLOOR                                  \
-        /*&& g.level.objects[(obj)->ox][(obj)->oy]*/            \
-        && g.level.objects[(obj)->ox][(obj)->oy]->nexthere)
+     && (go.otg_otmp = gl.level.objects[(obj)->ox][(obj)->oy]->nexthere) != 0 \
+     && ((obj)->otyp != BOULDER || go.otg_otmp->otyp == BOULDER))
+/* used to hide info such as potion and gem color when not seen yet;
+   stones and rock are excluded for gem class; LAST_SPELL includes blank
+   spellbook but excludes novel and the Book of the Dead */
+#define obj_is_generic(obj) \
+    (!(obj)->dknown                                             \
+     && ((obj)->oclass == POTION_CLASS                          \
+         || ((obj)->otyp >= FIRST_REAL_GEM                      \
+             && ((obj)->otyp <= LAST_GLASS_GEM))                \
+         || ((obj)->otyp >= FIRST_SPELL                         \
+             && ((obj)->otyp <= LAST_SPELL))))
 
 #define glyph_is_body_piletop(glyph) \
     (((glyph) >= GLYPH_BODY_PILETOP_OFF)                        \
@@ -828,17 +852,30 @@ enum glyph_offsets {
      || glyph_is_male_statue_piletop(glyph))
 #define glyph_is_statue(glyph) \
     (glyph_is_male_statue(glyph) || glyph_is_fem_statue(glyph))
+/* generic objects are after strange object (GLYPH_OBJ_OFF) and before
+   other objects (GLYPH_OBJ_OFF + MAXOCLASSES) */
+#define glyph_is_normal_generic_obj(glyph) \
+    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + MAXOCLASSES)
+#define glyph_is_piletop_generic_obj(glyph) \
+    ((glyph) > GLYPH_OBJ_PILETOP_OFF                            \
+     && (glyph) < GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES)
+#define glyph_is_generic_object(glyph) \
+    (glyph_is_normal_generic_obj(glyph)                         \
+     || glyph_is_piletop_generic_obj(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
-    (((glyph) >= GLYPH_OBJ_PILETOP_OFF)                         \
-     && ((glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
+    ((glyph) == GLYPH_OBJ_PILETOP_OFF                           \
+     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES          \
+         && (glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
-    ((((glyph) >= GLYPH_OBJ_OFF)                                \
-      && ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS)))             \
+    ((glyph) == GLYPH_OBJ_OFF                                   \
+     || ((glyph) >= GLYPH_OBJ_OFF + MAXOCLASSES                 \
+         && (glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))            \
      || glyph_is_normal_piletop_obj(glyph))
 
-#if 0
+#if 0   /* [note: out of date] */
 #define glyph_is_object(glyph) \
-  ((((glyph) >= GLYPH_OBJ_OFF) && ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))) \
+  (   (((glyph) >= GLYPH_OBJ_OFF)                                       \
+       && ((glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS)))                    \
    || (((glyph) >= GLYPH_OBJ_PILETOP_OFF)                               \
        && ((glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))            \
    || (((glyph) >= GLYPH_STATUE_MALE_OFF)                               \
@@ -852,15 +889,16 @@ enum glyph_offsets {
    || (((glyph) >= GLYPH_BODY_OFF)                                      \
        && ((glyph) < (GLYPH_BODY_OFF + NUMMONS)))                       \
    || (((glyph) >= GLYPH_BODY_PILETOP_OFF)                              \
-       && ((glyph) < (GLYPH_BODY_PILETOP_OFF + NUMMONS))))
+       && ((glyph) < (GLYPH_BODY_PILETOP_OFF + NUMMONS)))               \
+  )
 #endif
 #define glyph_is_object(glyph) \
-    (glyph_is_normal_object(glyph) || glyph_is_statue(glyph)    \
-     || glyph_is_body(glyph))
+    (glyph_is_normal_object(glyph) || glyph_is_generic_object(glyph)    \
+     || glyph_is_statue(glyph) || glyph_is_body(glyph))
 
 /* briefly used for Qt's "paper doll" inventory which shows map tiles for
    equipped objects; those vary like floor items during hallucination now
-   so this isn't used anywhere */
+   so this isn't used anywhere [note: out of date since generic objs added] */
 #define obj_to_true_glyph(obj)                                  \
     (((obj)->otyp == STATUE)                                    \
      ? ((int) (obj)->corpsenm                                   \
@@ -882,10 +920,14 @@ enum glyph_offsets {
 #define glyph_to_obj(glyph) \
     (glyph_is_body(glyph) ? CORPSE                              \
      : glyph_is_statue(glyph) ? STATUE                          \
-       : glyph_is_normal_object(glyph)                          \
+       : glyph_is_generic_object(glyph)                         \
+         ? ((glyph) - (glyph_is_piletop_generic_obj(glyph)      \
+                       ? GLYPH_OBJ_PILETOP_OFF                  \
+                       : GLYPH_OBJ_OFF))                        \
+         : glyph_is_normal_object(glyph)                        \
            ? ((glyph) - (glyph_is_normal_piletop_obj(glyph)     \
-                           ? GLYPH_OBJ_PILETOP_OFF              \
-                           : GLYPH_OBJ_OFF))                    \
+                         ? GLYPH_OBJ_PILETOP_OFF                \
+                         : GLYPH_OBJ_OFF))                      \
            : NUM_OBJECTS)
 
 #define glyph_to_body_corpsenm(glyph) \
@@ -904,27 +946,21 @@ enum glyph_offsets {
                    ? ((glyph) - GLYPH_STATUE_MALE_OFF)  \
                    : NO_GLYPH)
 
-/* These have the unfortunate side effect of needing a global variable  */
-/* to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
+/* This has the unfortunate side effect of needing a global variable
+   to store a result. 'otg_temp' is defined and declared in decl.{ch}.  */
 #define random_obj_to_glyph(rng) \
-    ((g.otg_temp = random_object(rng)) == CORPSE        \
+    (((go.otg_temp = random_object(rng)) == CORPSE)     \
          ? (random_monster(rng) + GLYPH_BODY_OFF)       \
-         : (g.otg_temp + GLYPH_OBJ_OFF))
+         : (go.otg_temp + GLYPH_OBJ_OFF))
 #define corpse_to_glyph(obj) \
-    ((int) ((obj)->corpsenm + (obj_is_piletop(obj)        \
-                                ? GLYPH_BODY_PILETOP_OFF  \
-                                : GLYPH_BODY_OFF)))
-
-/* Paraphrased rationale from the original commit for the boulder
-   exception: If a boulder is the topmost item on a pile, then it is
-   not mapped to a piletop glyph; mainly because boulders are "solid";
-   boulders dropped by monsters are nearly always over other objects;
-   also done so that special levels such a Sokoban can "hide" items
-   under the boulders. */
+    ((int) ((obj)->corpsenm                             \
+          + (obj_is_piletop(obj) ? GLYPH_BODY_PILETOP_OFF : GLYPH_BODY_OFF)))
+#define generic_obj_to_glyph(obj) \
+    ((int) ((obj)->oclass                               \
+            + (obj_is_piletop(obj) ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF)))
 #define normal_obj_to_glyph(obj) \
-    ((int) ((obj)->otyp + ((obj_is_piletop(obj) && ((obj)->otyp != BOULDER)) \
-                           ? GLYPH_OBJ_PILETOP_OFF                           \
-                           : GLYPH_OBJ_OFF)))
+    ((int) ((obj)->otyp                                 \
+            + (obj_is_piletop(obj) ? GLYPH_OBJ_PILETOP_OFF : GLYPH_OBJ_OFF)))
 
 /* MRKR: Statues now have glyphs corresponding to the monster they    */
 /*       represent and look like monsters when you are hallucinating. */
@@ -943,13 +979,11 @@ enum glyph_offsets {
               : GLYPH_STATUE_MALE_OFF))))
 
 #define obj_to_glyph(obj, rng) \
-    (((obj)->otyp == STATUE)                             \
-        ? statue_to_glyph(obj, rng)                      \
-        : ((Hallucination)                               \
-             ? random_obj_to_glyph(rng)                  \
-             : (((obj)->otyp == CORPSE)                  \
-                  ? corpse_to_glyph(obj)                 \
-                  : normal_obj_to_glyph(obj))))
+    (((obj)->otyp == STATUE) ? statue_to_glyph(obj, rng)            \
+     : (Hallucination) ? random_obj_to_glyph(rng)                   \
+       : ((obj)->otyp == CORPSE) ? corpse_to_glyph(obj)             \
+         : obj_is_generic(obj) ? generic_obj_to_glyph(obj)          \
+           : normal_obj_to_glyph(obj))
 
 #define GLYPH_TRAP_OFF \
     (GLYPH_CMAP_B_OFF + (S_arrow_trap - S_grave))
@@ -964,8 +998,10 @@ enum glyph_offsets {
 
 #if 0
 #define glyph_is_piletop(glyph) \
-    (glyph_is_body_piletop(glyph) || glyph_is_statue_piletop(glyph) \
-        || glyph_is_obj_piletop(glyph))
+    (glyph_is_body_piletop(glyph)           \
+     || glyph_is_statue_piletop(glyph)      \
+     || glyph_is_piletop_generic_obj(glyph) \
+     || glyph_is_obj_piletop(glyph))
 #endif
 
 /* mgflags for altering map_glyphinfo() internal behavior */
@@ -1004,9 +1040,9 @@ extern const int explodecolors[];
 extern int wallcolors[];
 #endif
 
-/* If USE_TILES is defined during build, this comes from the generated
- * tile.c, complete with appropriate tile references in the initialization.
- * Otherwise, it comes from display.c.
+/* If TILES_IN_GLYPHMAP is defined during build, this is defined
+ * in the generated tile.c, complete with appropriate tile references in
+ * the initialization.  Otherwise, it gets defined in display.c.
  */
 extern const glyph_info nul_glyphinfo;
 

@@ -1,5 +1,8 @@
 #!/bin/sh
-set -x
+
+if [ ! -z "${TF_BUILD}" ]; then
+	set -x
+fi
 
 if [ -z "$CI_BUILD_DIR" ]; then
 	export DJGPP_TOP=$(pwd)/lib/djgpp
@@ -66,7 +69,7 @@ fi
 
 if [ ! -d djgpp/i586-pc-msdosdjgpp ]; then
     tar xjf "$DJGPP_FILE"
-    rm -f $DJGPP_FILE
+    #rm -f $DJGPP_FILE
 fi
 
 # DOS-extender for use with djgpp
@@ -85,10 +88,16 @@ if [ ! -d djgpp/cwsdpmi ]; then
     rm csdpmi7b.zip
 fi
 
-#  PDCurses
+#  PDCurses (non-Unicode build uses this)
 if [ ! -d "pdcurses" ]; then
 	echo "Getting ../pdcurses from https://github.com/wmcbrine/PDCurses.git" ; \
 	git clone --depth 1 https://github.com/wmcbrine/PDCurses.git pdcurses
+fi
+
+#  PDCursesMod (Unicode build uses this)
+if [ ! -d "pdcursesmod" ]; then
+	echo "Getting ../pdcursesmod from https://github.com/Bill-Gray/PDCursesMod.git" ; \
+	git clone --depth 1 https://github.com/Bill-Gray/PDCursesMod.git pdcursesmod
 fi
 
 if [ ! -d djgpp/djgpp-patch ]; then
@@ -98,15 +107,47 @@ if [ ! -d djgpp/djgpp-patch ]; then
     cd djgpp-patch
     if [ "$(uname)" = "Darwin" ]; then
 	#Mac
-	curl http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+	curl --output djlsr205.zip http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+        export cmdstatus=$?
     else
 	wget --quiet --no-hsts http://www.mirrorservice.org/sites/ftp.delorie.com/pub/djgpp/current/v2/djlsr205.zip
+        export cmdstatus=$?
     fi
     ls -l
+    if [ $cmdstatus -eq 0 ]; then
+	    echo "fetch of djgpp-patch was successful"
+    else
+	if [ -z "${TF_BUILD}" ]; then
+		echo "Unable to complete the build, exiting..."
+	else
+		set +x
+	        echo "##vso[task.logissue type=warning;]Trouble downloading djgpp-patch"    
+    	fi
+	exit 121
+    fi
     mkdir -p src/libc/go32
     unzip -p djlsr205.zip src/libc/go32/exceptn.S >src/libc/go32/exceptn.S
     patch -p0 -l -i ../../../sys/msdos/exceptn.S.patch
     cd ../../
+fi
+
+FONT_VERSION="4.49"
+FONT_FILE="terminus-font-$FONT_VERSION"
+FONT_LFILE="$FONT_FILE.1"
+FONT_RFILE="$FONT_LFILE.tar.gz"
+FONT_URL="https://sourceforge.net/projects/terminus-font/files/$FONT_FILE/$FONT_RFILE"
+
+#  fonts
+if [ ! -d "$FONT_LFILE" ]; then
+    echo "Getting terminus fonts"
+    if [ "$(uname)" = "Darwin" ]; then
+	#Mac
+	curl -L $FONT_URL --output $FONT_RFILE
+    else
+	wget --quiet --no-hsts $FONT_URL
+    fi
+    tar -xvf $FONT_RFILE
+    rm $FONT_RFILE
 fi
 
 cd ../

@@ -147,7 +147,7 @@ curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
 
     if (fldidx != BL_FLUSH) {
         if (fldidx < 0 || fldidx >= MAXBLSTATS) {
-            g.context.botlx = g.context.botl = FALSE; /* avoid another bot() */
+            gc.context.botlx = gc.context.botl = FALSE; /* avoid another bot() */
             panic("curses_status_update(%d)", fldidx);
         }
         changed_fields |= (1 << fldidx);
@@ -298,8 +298,8 @@ draw_horizontal(boolean border)
 #endif
     int i, j, number_of_lines,
         cap_and_hunger, exp_points, sho_score,
-	/* both height and width get their values set,
-	 * but only width gets used in this function */
+        /* both height and width get their values set,
+         * but only width gets used in this function */
         height UNUSED, width, w, xtra, clen, x, y, t, ex, ey,
         condstart = 0, conddummy = 0;
 #ifdef STATUS_HILITES
@@ -552,7 +552,7 @@ draw_horizontal(boolean border)
             case BL_SCORE:
 #ifdef SCORE_ON_BOTL
                 if ((sho_score & 2) != 0) { /* strip "S:" prefix */
-                    if ((colon = index(text, ':')) != 0)
+                    if ((colon = strchr(text, ':')) != 0)
                         text = strcat(strcpy(sbuf, " "), colon + 1);
                     else
                         sho_score = 0;
@@ -857,7 +857,7 @@ draw_vertical(boolean border)
                 /* most status_vals_long[] are "long-text : value" and
                    unlike horizontal status's abbreviated "ab:value",
                    we highlight just the value portion */
-                p = (fld != BL_TITLE) ? index(text, ':') : 0;
+                p = (fld != BL_TITLE) ? strchr(text, ':') : 0;
                 p = !p ? text : p + 1;
                 while (*p == ' ')
                     ++p;
@@ -872,7 +872,7 @@ draw_vertical(boolean border)
                     *p = savedch;
                     text = p; /* rest of field */
                     if ((fld == BL_HPMAX || fld == BL_ENEMAX)
-                        && (p = index(text, ')')) != 0) {
+                        && (p = strchr(text, ')')) != 0) {
                         savedch = *p;
                         *p = '\0';
                     } else
@@ -1152,7 +1152,7 @@ curs_vert_status_vals(int win_width)
         } else {
             text = status_vals[fldidx];
             if (fldidx != BL_TITLE && fldidx != BL_LEVELDESC) {
-                if ((colon = index(text, ':')) != 0)
+                if ((colon = strchr(text, ':')) != 0)
                     text = colon + 1;
             }
             lbl = status_fieldnm[fldidx];
@@ -1398,8 +1398,8 @@ static nhstat prevtime;
 static nhstat prevscore;
 #endif
 
-extern const char *hu_stat[];   /* from eat.c */
-extern const char *enc_stat[];  /* from botl.c */
+extern const char *const hu_stat[];   /* from eat.c */
+extern const char *const enc_stat[];  /* from botl.c */
 
 /* If the statuscolors patch isn't enabled, have some default colors for status problems
    anyway */
@@ -1848,7 +1848,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
     wmove(win, y, x);
 
     get_playerrank(rank);
-    sprintf(buf, "%s the %s", g.plname, rank);
+    sprintf(buf, "%s the %s", gp.plname, rank);
 
     /* Use the title as HP bar (similar to hitpointbar) */
     draw_bar(TRUE, hp, hpmax, buf);
@@ -1878,7 +1878,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
 
     wprintw(win, "%s", buf);
 
-    print_statdiff("$", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff("$", &prevau, money_cnt(gi.invent), STAT_GOLD);
 
     /* HP/Pw use special coloring rules */
     attr_t hpattr, pwattr;
@@ -1916,7 +1916,7 @@ draw_horizontal(int x, int y, int hp, int hpmax)
         print_statdiff(" Exp:", &prevlevel, u.ulevel, STAT_OTHER);
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
 
     curses_add_statuses(win, FALSE, FALSE, NULL, NULL);
 }
@@ -1933,9 +1933,9 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     char race[BUFSZ];
-    Strcpy(race, g.urace.adj);
+    Strcpy(race, gu.urace.adj);
     race[0] = highc(race[0]);
-    wprintw(win, "%s the %s %s%s%s", g.plname,
+    wprintw(win, "%s the %s %s%s%s", gp.plname,
             (u.ualign.type == A_CHAOTIC ? "Chaotic" :
              u.ualign.type == A_NEUTRAL ? "Neutral" : "Lawful"),
             Upolyd ? "" : race, Upolyd ? "" : " ",
@@ -1989,7 +1989,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
     wprintw(win, "Pw:");
     draw_bar(FALSE, u.uen, u.uenmax, NULL);
 
-    print_statdiff(" $", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff(" $", &prevau, money_cnt(gi.invent), STAT_GOLD);
 
 #ifdef SCORE_ON_BOTL
     if (flags.showscore)
@@ -1997,7 +1997,7 @@ draw_horizontal_new(int x, int y, int hp, int hpmax)
 #endif /* SCORE_ON_BOTL */
 
     if (flags.time)
-        print_statdiff(" T:", &prevtime, g.moves, STAT_TIME);
+        print_statdiff(" T:", &prevtime, gm.moves, STAT_TIME);
 
     curses_add_statuses(win, TRUE, FALSE, &x, &y);
 
@@ -2054,7 +2054,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
 
     get_playerrank(rank);
     int ranklen = strlen(rank);
-    int namelen = strlen(g.plname);
+    int namelen = strlen(gp.plname);
     int maxlen = 19;
 #ifdef STATUS_COLORS
     if (!iflags.hitpointbar)
@@ -2071,7 +2071,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         while ((ranklen + namelen) > maxlen)
             ranklen--; /* Still doesn't fit, strip rank */
     }
-    sprintf(buf, "%-*s the %-*s", namelen, g.plname, ranklen, rank);
+    sprintf(buf, "%-*s the %-*s", namelen, gp.plname, ranklen, rank);
     draw_bar(TRUE, hp, hpmax, buf);
     wmove(win, y++, x);
     wprintw(win, "%s", dungeons[u.uz.dnum].dname);
@@ -2105,7 +2105,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
         wprintw(win, "%d", depth(&u.uz));
     wmove(win, y++, x);
 
-    print_statdiff("Gold:          ", &prevau, money_cnt(g.invent), STAT_GOLD);
+    print_statdiff("Gold:          ", &prevau, money_cnt(gi.invent), STAT_GOLD);
     wmove(win, y++, x);
 
     /* HP/Pw use special coloring rules */
@@ -2150,7 +2150,7 @@ draw_vertical(int x, int y, int hp, int hpmax)
     wmove(win, y++, x);
 
     if (flags.time) {
-        print_statdiff("Time:          ", &prevtime, g.moves, STAT_TIME);
+        print_statdiff("Time:          ", &prevtime, gm.moves, STAT_TIME);
         wmove(win, y++, x);
     }
 

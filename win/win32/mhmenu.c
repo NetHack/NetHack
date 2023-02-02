@@ -349,10 +349,10 @@ MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return FALSE;
 
     case WM_CLOSE:
-        if (g.program_state.gameover) {
+        if (gp.program_state.gameover) {
             data->result = -1;
             data->done = 1;
-            g.program_state.stopprint++;
+            gp.program_state.stopprint++;
             return TRUE;
         } else
             return FALSE;

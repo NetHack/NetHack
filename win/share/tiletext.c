@@ -18,16 +18,19 @@ static int placeholder_init = 0;
 static pixel placeholder[TILE_Y][TILE_X];
 static FILE *tile_file;
 static int tile_set, tile_set_indx;
+static const char *const text_sets[] = {
 #if (TILE_X == 8)
-static const char *text_sets[] = { "monthin.txt", "objthin.txt",
-                                   "oththin.txt" };
+    "monthin.txt", "objthin.txt", "oththin.txt"
 #else
-static const char *text_sets[] = { "monsters.txt", "objects.txt",
-                                   "other.txt" };
+    "monsters.txt", "objects.txt", "other.txt"
 #endif
+};
+
+static char inbuf[BUFSZ];
 
 extern const char *tilename(int, int, int);
 extern boolean acceptable_tilename(int, int, const char *, const char *);
+static int get_next_line(FILE *, boolean);
 static void read_text_colormap(FILE *);
 static boolean write_text_colormap(FILE *);
 static boolean read_txttile(FILE *, pixel (*)[TILE_X]);
@@ -36,8 +39,8 @@ static void write_txttile(FILE *, pixel (*)[TILE_X]);
 enum { MONSTER_SET, OBJECT_SET, OTHER_SET};
 
 /* Ugh.  DICE doesn't like %[A-Z], so we have to spell it out... */
-#define FORMAT_STRING                                                       \
-    "%[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
+#define FORMAT_STRING \
+    "%1[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.] = " \
     "(%d, %d, %d) "
 
 /*
@@ -91,6 +94,36 @@ set_grayscale(int gs)
     grayscale = gs;
 }
 
+/* read next line; repeat until it's a non-comment; populates 'inbuf[]';
+   the buffer might already have data (first line after colormap)  */
+static int
+get_next_line(FILE *txtfile, boolean force)
+{
+    int ch;
+
+    for (;;) {
+        if (force || !inbuf[0]) {
+            /* skip leading whitespace */
+            do {
+                ch = fgetc(txtfile);
+            } while (ch == ' ');
+            ungetc(ch, txtfile);
+            /* get rest of line */
+            if (!fgets(inbuf, BUFSZ, txtfile))
+                break;
+            force = TRUE;
+            /* ignore blank lines;
+               the old fscanf() processing did that, possibly by accident */
+            if (!inbuf[0] || (inbuf[0] == '\n' && !inbuf[1]))
+                continue;
+        }
+        if (inbuf[0] != '#' || !strncmp(inbuf, "# tile ", 7))
+            return 1;
+    }
+    inbuf[0] = '\0';
+    return 0;
+}
+
 static void
 read_text_colormap(FILE *txtfile)
 {
@@ -101,7 +134,9 @@ read_text_colormap(FILE *txtfile)
         color_index[i] = -1;
 
     num_colors = 0;
-    while (fscanf(txtfile, FORMAT_STRING, c, &r, &g, &b) == 4) {
+    while (get_next_line(txtfile, TRUE)) {
+        if (sscanf(inbuf, FORMAT_STRING, c, &r, &g, &b) != 4)
+            break;
         color_index[(int) c[0]] = num_colors;
         ColorMap[CM_RED][num_colors] = r;
         ColorMap[CM_GREEN][num_colors] = g;
@@ -140,22 +175,29 @@ write_text_colormap(FILE *txtfile)
     return TRUE;
 }
 
+/* read one tile from win/share/{monsters,objects,other}.txt */
 static boolean
 read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
 {
-    int ph, i, j, k, reslt;
+    static int gidx = 0;
+    int ph, i = 0, j, k, reslt;
     char buf[BUFSZ], ttype[BUFSZ], gend[BUFSZ];
     const char *p;
-    char c[2], *q;
-    static int gidx = 0;
+    char *q;
+    boolean res = FALSE;
 
     gend[0] = '\0';
-    if (tile_set == MONSTER_SET)
-        reslt = fscanf(txtfile, "# %s %d (%[^,],%[^)])", ttype, &i, buf, gend);
-    else
-        reslt = fscanf(txtfile, "# %s %d (%[^)])", ttype, &i, buf);
+    reslt = 0;
+    if (get_next_line(txtfile, FALSE)) {
+        if (tile_set == MONSTER_SET)
+            reslt = sscanf(inbuf, "# %255s %d (%255[^,],%255[^)])",
+                           ttype, &i, buf, gend);
+        else
+            reslt = sscanf(inbuf, "# %255s %d (%255[^)])",
+                           ttype, &i, buf);
+    }
     if (reslt <= 0)
-        return FALSE;
+        goto done;
 
     if (tile_set == MONSTER_SET && gend[0] == 'f')
         gidx = 1;
@@ -176,6 +218,7 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
         boolean other_mismatch =
             (tile_set == OTHER_SET
              && !acceptable_tilename(tile_set, tile_set_indx, buf, p));
+
         if (tile_set != OTHER_SET || other_mismatch) {
             Fprintf(stderr, "warning: for tile %d (numbered %d) of %s,\n",
                     tile_set_indx, i, text_sets[tile_set]);
@@ -185,31 +228,39 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
     tile_set_indx++;
 
     /* look for non-whitespace at each stage */
-    if (fscanf(txtfile, "%1s", c) < 0) {
+    if (!get_next_line(txtfile, TRUE)) {
         Fprintf(stderr, "unexpected EOF\n");
-        return FALSE;
+        goto done;
     }
-    if (c[0] != '{') {
+    if (inbuf[0] != '{') {
         Fprintf(stderr, "didn't find expected '{'\n");
-        return FALSE;
+        goto done;
     }
+
     for (j = 0; j < TILE_Y; j++) {
+        /* read next line of color indices */
+        if (!get_next_line(txtfile, TRUE)) {
+            Fprintf(stderr, "unexpected EOF\n");
+            goto done;
+        }
+        if ((q = strchr(inbuf, '\n')) == 0)
+            q = &inbuf[strlen(inbuf)]; /* eos(inbuf) */
+        while (q < &inbuf[TILE_X])
+            *q++ = '.';
+        *q = '\0';
+
         for (i = 0; i < TILE_X; i++) {
-            if (fscanf(txtfile, "%1s", c) < 0) {
-                Fprintf(stderr, "unexpected EOF\n");
-                return FALSE;
-            }
-            k = color_index[(int) c[0]];
-            if (grayscale) {
+            k = color_index[(unsigned char) inbuf[i]];
+            if (grayscale && k >= 0) {
                 if (k > (SIZE(graymappings) - 1))
                     Fprintf(stderr, "Gray mapping issue %d > %d.\n", k,
                             SIZE(graymappings) - 1);
                 else
                     k = graymappings[k];
             }
-            if (k == -1)
-                Fprintf(stderr, "color %c not in colormap!\n", c[0]);
-            else {
+            if (k == -1) {
+                Fprintf(stderr, "color %c not in colormap!\n", inbuf[i]);
+            } else {
                 pixels[j][i].r = ColorMap[CM_RED][k];
                 pixels[j][i].g = ColorMap[CM_GREEN][k];
                 pixels[j][i].b = ColorMap[CM_BLUE][k];
@@ -218,25 +269,20 @@ read_txttile(FILE *txtfile, pixel (*pixels)[TILE_X])
     }
     if (ph) {
         /* remember it for later */
-        memcpy(placeholder, pixels, sizeof(placeholder));
+        memcpy(placeholder, pixels, sizeof placeholder);
     }
-    if (fscanf(txtfile, "%1s ", c) < 0) {
+    if (!get_next_line(txtfile, TRUE)) {
         Fprintf(stderr, "unexpected EOF\n");
-        return FALSE;
+        goto done;
     }
-    if (c[0] != '}') {
+    if (inbuf[0] != '}') {
         Fprintf(stderr, "didn't find expected '}'\n");
-        return FALSE;
+        goto done;
     }
-#ifdef _DCC
-    /* DICE again... it doesn't seem to eat whitespace after the } like
-     * it should, so we have to do so manually.
-     */
-    while ((*c = fgetc(txtfile)) != EOF && isspace((uchar) *c))
-        ;
-    ungetc(*c, txtfile);
-#endif
-    return TRUE;
+    res = TRUE;
+ done:
+    inbuf[0] = '\0';
+    return res;
 }
 
 static void
@@ -344,7 +390,7 @@ fopen_text_file(const char *filename, const char *type)
         return FALSE;
     }
 
-    p = rindex(filename, '/');
+    p = strrchr(filename, '/');
     if (p)
         p++;
     else
@@ -386,7 +432,7 @@ fopen_text_file(const char *filename, const char *type)
 boolean
 read_text_tile(pixel (*pixels)[TILE_X])
 {
-    return (read_txttile(tile_file, pixels));
+    return read_txttile(tile_file, pixels);
 }
 
 boolean

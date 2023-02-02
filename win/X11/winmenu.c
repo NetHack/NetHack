@@ -1,17 +1,18 @@
 /* NetHack 3.7	winmenu.c	$NHDT-Date: 1644531504 2022/02/10 22:18:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $ */
-/* Copyright (c) Dean Luick, 1992				  */
+/* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * File for creating menus.
  *
- *	+ Global functions: start_menu, add_menu, end_menu, select_menu
+ *    + Global functions: start_menu, add_menu, end_menu, select_menu
  */
 
 #ifndef SYSV
 #define PRESERVE_NO_SYSV /* X11 include files may define SYSV */
 #endif
 
+#include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
@@ -32,7 +33,10 @@
 #undef PRESERVE_NO_SYSV
 #endif
 
+#define X11_BUILD
 #include "hack.h"
+#undef X11_BUILD
+
 #include "winX.h"
 
 static void menu_size_change_handler(Widget, XtPointer, XEvent *,
@@ -275,7 +279,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                some menus use digits as potential group accelerators
                but their entries don't rely on counts */
             if (!menu_info->counting
-                && index(menu_info->curr_menu.gacc, ch))
+                && strchr(menu_info->curr_menu.gacc, ch))
                 goto group_accel;
             menu_info->menu_count *= 10L;
             menu_info->menu_count += (long) (ch - '0');
@@ -338,7 +342,7 @@ menu_key(Widget w, XEvent *event, String *params, Cardinal *num_params)
                 XtCallCallbacks(hbar, XtNjumpProc, &left);
             }
             return;
-        } else if (index(menu_info->curr_menu.gacc, ch)) {
+        } else if (strchr(menu_info->curr_menu.gacc, ch)) {
  group_accel:
             /* matched a group accelerator */
             if (menu_info->how == PICK_ANY || menu_info->how == PICK_ONE) {
@@ -758,7 +762,7 @@ x11_scroll_perminv(int arg UNUSED) /* arg is always 1 */
            this loop, so handle only one character at a time for !slow */
         if (!appResources.slow)
             break;
-    } while (ch && !index(quitchars, ch));
+    } while (ch && !strchr(quitchars, ch));
 
     return;
 }
@@ -940,11 +944,11 @@ X11_select_menu(winid window, int how, menu_item **menu_list)
         if (n > 0) /* at least one group accelerator found */
             for (ap = gacc, curr = menu_info->new_menu.base; curr;
                  curr = curr->next)
-                if (curr->gselector && !index(gacc, curr->gselector)
+                if (curr->gselector && !strchr(gacc, curr->gselector)
                     && (menu_info->how == PICK_ANY
                         || gcnt[GSELIDX(curr->gselector)] == 1)) {
                     *ap++ = curr->gselector;
-                    *ap = '\0'; /* re-terminate for index() */
+                    *ap = '\0'; /* re-terminate for strchr() */
                 }
     }
     menu_info->new_menu.gacc = copy_of(gacc);

@@ -150,15 +150,39 @@ init_nhwindows(int* argcp, char** argv)
                 ** windows?  Or at least all but WIN_INFO?      -dean
 */
 void
-curses_init_nhwindows(int *argcp UNUSED,
-                      char **argv UNUSED)
+curses_init_nhwindows(
+    int *argcp UNUSED,
+    char **argv UNUSED)
 {
 #ifdef PDCURSES
     char window_title[BUFSZ];
 #endif
+#ifdef CURSES_UNICODE
+#ifdef PDCURSES
+    static char pdc_font[BUFSZ] = "";
+#endif
+#endif
 
 #ifdef CURSES_UNICODE
     setlocale(LC_CTYPE, "");
+#ifdef PDCURSES
+    /* Assume the DOSVGA port of PDCursesMod, or the SDL1 or SDL2 port of
+       either PDCurses or PDCursesMod. Honor the font_map option to set
+       a font.
+       On MS-DOS, if no font_map is set, use ter-u16v.psf if it is present.
+       PDC_FONT has no effect on other PDCurses or PDCursesMod ports. */
+    if (iflags.wc_font_map && iflags.wc_font_map[0]) {
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=%s",
+                 iflags.wc_font_map);
+#ifdef MSDOS
+    } else if (access("ter-u16v.psf", R_OK) >= 0) {
+        Snprintf(pdc_font, sizeof(pdc_font), "PDC_FONT=ter-u16v.psf");
+#endif
+    }
+    if (pdc_font[0] != '\0') {
+        putenv(pdc_font);
+    }
+#endif
 #endif
 
 #ifdef XCURSES
@@ -247,14 +271,21 @@ curses_init_nhwindows(int *argcp UNUSED,
     curses_display_splash_window();
 }
 
-/* Do a window-port specific player type selection. If player_selection()
-   offers a Quit option, it is its responsibility to clean up and terminate
-   the process. You need to fill in pl_character[0].
-*/
+/* Use the general role/race/&c selection originally implemented for tty. */
 void
 curses_player_selection(void)
 {
+#if 1
+    if (genl_player_setup(0))
+        return; /* success */
+
+    /* quit/cancel */
+    curses_bail((const char *) NULL);
+    /*NOTREACHED*/
+#else
+    /* still present cursinit.c but no longer used */
     curses_choose_character();
+#endif
 }
 
 
@@ -274,9 +305,9 @@ curses_askname(void)
         }
 #endif /* SELECTSAVED */
 
-    curses_line_input_dialog("Who are you?", g.plname, PL_NSIZ);
-    (void) mungspaces(g.plname);
-    if (!g.plname[0] || g.plname[0] == '\033')
+    curses_line_input_dialog("Who are you?", gp.plname, PL_NSIZ);
+    (void) mungspaces(gp.plname);
+    if (!gp.plname[0] || gp.plname[0] == '\033')
          goto bail;
 
     iflags.renameallowed = TRUE; /* tty uses this, we don't [yet?] */
@@ -678,7 +709,7 @@ curses_update_inventory(int arg)
     }
 
     /* skip inventory updating during character initialization */
-    if (!g.program_state.in_moveloop && !g.program_state.gameover)
+    if (!gp.program_state.in_moveloop && !gp.program_state.gameover)
         return;
 
     if (!arg) {
@@ -715,12 +746,12 @@ curses_ctrl_nhwindow(
 
 /*
 mark_synch()    -- Don't go beyond this point in I/O on any channel until
-                   all channels are caught up to here.  Can be an empty call
-                   for the moment
+                   all channels are caught up to here.
 */
 void
 curses_mark_synch(void)
 {
+    curses_refresh_nethack_windows();
 }
 
 /*
@@ -732,6 +763,9 @@ wait_synch()    -- Wait until all pending output is complete (*flush*() for
 void
 curses_wait_synch(void)
 {
+    if (curses_got_output())
+        (void) curses_more();
+    curses_mark_synch();
     /* [do we need 'if (counting) curses_count_window((char *)0);' here?] */
 }
 
@@ -782,7 +816,7 @@ curses_print_glyph(
     winid wid,
     coordxy x, coordxy y,
     const glyph_info *glyphinfo,
-    const glyph_info *bkglyphinfo UNUSED)
+    const glyph_info *bkglyphinfo)
 {
     int glyph;
     int ch;
@@ -831,12 +865,15 @@ curses_print_glyph(
     if (SYMHANDLING(H_UTF8)
         && glyphinfo->gm.u
         && glyphinfo->gm.u->utf8str) {
-        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color, attr);
+        curses_putch(wid, x, y, ch, glyphinfo->gm.u, color,
+                     bkglyphinfo->framecolor, attr);
     } else {
-        curses_putch(wid, x, y, ch, NULL, color, attr);
+        curses_putch(wid, x, y, ch, NULL, color,
+                     bkglyphinfo->framecolor, attr);
     }
 #else
-    curses_putch(wid, x, y, ch, color, attr);
+    curses_putch(wid, x, y, ch, color,
+                 bkglyphinfo->framecolor, attr);
 #endif
 }
 
@@ -855,7 +892,11 @@ curses_raw_print(const char *str)
 #ifdef PDCURSES
     /* WINDOW *win = curses_get_nhwin(MESSAGE_WIN); */
 
-    curses_message_win_puts(str, FALSE);
+    if (iflags.window_inited) {
+        curses_message_win_puts(str, FALSE);
+    } else {
+        puts(str);
+    }
 #else
     puts(str);
 #endif
@@ -1024,7 +1065,7 @@ void
 curses_delay_output(void)
 {
 #ifdef TIMED_DELAY
-    if (flags.nap) {
+    if (flags.nap && !iflags.debug_fuzzer) {
         /* refreshing the whole display is a waste of time,
          * but that's why we're here */
         refresh();

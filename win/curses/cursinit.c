@@ -99,7 +99,7 @@ set_window_position(int *winx, int *winy, int *winw, int *winh,
 void
 curses_create_main_windows(void)
 {
-    int min_message_height = 1;
+    int min_message_height UNUSED = 1;
     int message_orientation = 0;
     int status_orientation = 0;
     int border_space = 0;
@@ -364,6 +364,8 @@ curses_init_nhcolors(void)
     }
 #endif
 }
+
+#if 0   /* curses_choose_character + curses_character_dialog no longer used */
 
 /* Allow player to pick character's role, race, gender, and alignment.
    Borrowed from the Gnome window port. */
@@ -675,6 +677,7 @@ curses_choose_character(void)
             flags.initalign = sel;
         }
     }
+    return;
 }
 
 /* Prompt user for character race, role, alignment, or gender */
@@ -731,6 +734,8 @@ curses_character_dialog(const char **choices, const char *prompt)
     return ret;
 }
 
+#endif /* 0 */
+
 /* Initialize and display options appropriately */
 void
 curses_init_options(void)
@@ -742,9 +747,9 @@ curses_init_options(void)
     set_option_mod_status("eight_bit_tty", set_in_config);
 
     /* If we don't have a symset defined, load the curses symset by default */
-    if (!g.symset[PRIMARYSET].explicitly)
+    if (!gs.symset[PRIMARYSET].explicitly)
         load_symset("curses", PRIMARYSET);
-    if (!g.symset[ROGUESET].explicitly)
+    if (!gs.symset[ROGUESET].explicitly)
         load_symset("default", ROGUESET);
 
 #ifdef PDCURSES

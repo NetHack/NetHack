@@ -316,9 +316,9 @@ prompt_for_player_selection(void)
         /* tty_putstr(BASE_WINDOW, 0, prompt); */
         do {
             /* pick4u = lowc(readchar()); */
-            if (index(quitchars, pick4u))
+            if (strchr(quitchars, pick4u))
                 pick4u = 'y';
-        } while (!index(ynqchars, pick4u));
+        } while (!strchr(ynqchars, pick4u));
         if ((int) strlen(prompt) + 1 < CO) {
             /* Echo choice and move back down line */
             /* tty_putsym(BASE_WINDOW, (int)strlen(prompt)+1, echoline,
@@ -646,7 +646,7 @@ mswin_askname(void)
 {
     logDebug("mswin_askname()\n");
 
-    if (mswin_getlin_window("who are you?", g.plname, PL_NSIZ) == IDCANCEL) {
+    if (mswin_getlin_window("who are you?", gp.plname, PL_NSIZ) == IDCANCEL) {
         bail("bye-bye");
         /* not reached */
     }
@@ -1377,7 +1377,7 @@ mswin_yn_function(const char *question, const char *choices, CHAR_P def)
     if (choices) {
         char *cb, choicebuf[QBUFSZ];
         Strcpy(choicebuf, choices);
-        if ((cb = index(choicebuf, '\033')) != 0) {
+        if ((cb = strchr(choicebuf, '\033')) != 0) {
             /* anything beyond <esc> is hidden */
             *cb = '\0';
         }
@@ -1389,7 +1389,7 @@ mswin_yn_function(const char *question, const char *choices, CHAR_P def)
         Strcat(message, " ");
         /* escape maps to 'q' or 'n' or default, in that order */
         yn_esc_map =
-            (index(choices, 'q') ? 'q' : (index(choices, 'n') ? 'n' : def));
+            (strchr(choices, 'q') ? 'q' : (strchr(choices, 'n') ? 'n' : def));
     } else {
         Strcpy(message, question);
     }
@@ -1399,7 +1399,7 @@ mswin_yn_function(const char *question, const char *choices, CHAR_P def)
         char buf[BUFSZ];
         ZeroMemory(buf, sizeof(buf));
         if (choices) {
-            if (!index(choices, '\033'))
+            if (!strchr(choices, '\033'))
                 buf[0] = '\033'; /* make sure ESC is always available */
             strncat(buf, choices, sizeof(buf) - 2);
             NHSPhoneSetKeypadFromString(buf);
@@ -1431,7 +1431,7 @@ mswin_yn_function(const char *question, const char *choices, CHAR_P def)
         ch = mswin_nhgetch();
         if (ch == '\033') {
             result = yn_esc_map;
-        } else if (choices && !index(choices, ch)) {
+        } else if (choices && !strchr(choices, ch)) {
             /* FYI: ch==-115 is for KP_ENTER */
             if (def
                 && (ch == ' ' || ch == '\r' || ch == '\n' || ch == -115)) {
@@ -1927,7 +1927,7 @@ NHSPhoneDialogSetup(HWND hDlg, UINT nToolBarId, BOOL is_edit,
 
         rtDlg.bottom -= rtOK.bottom - rtOK.top;
         ShowWindow(hOK, SW_HIDE);
-        SetWindowPos(hDlg, HWND_TOP, 0, 0, rtDlg.right - rtDlg.left,
+        SetWindowPos(hDlg, HWND_TOP, 0, 0, rtDlgr.right - rtDlg.left,
                      rtDlg.bottom - rtDlg.top,
                      SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER);
     }

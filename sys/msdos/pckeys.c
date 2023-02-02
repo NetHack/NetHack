@@ -9,7 +9,7 @@
 #include "hack.h"
 
 #ifdef MSDOS
-#ifdef USE_TILES
+#ifdef TILES_IN_GLYPHMAP
 #include "wintty.h"
 #include "pcvideo.h"
 
@@ -36,7 +36,7 @@ pckeys(unsigned char scancode, unsigned char shift)
 {
     boolean opening_dialog;
 
-    opening_dialog = g.pl_character[0] ? FALSE : TRUE;
+    opening_dialog = gp.pl_character[0] ? FALSE : TRUE;
     switch (scancode) {
 #ifdef SIMULATE_CURSOR
     case 0x3d: /* F3 = toggle cursor type */
@@ -126,7 +126,7 @@ refresh(void)
         vesa_refresh();
 #endif
 }
-#endif /* USE_TILES */
+#endif /* TILES_IN_GLYPHMAP */
 #endif /* MSDOS */
 
 /*pckeys.c*/

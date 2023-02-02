@@ -42,7 +42,7 @@ public:
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);
         virtual void ClipAround(int x, int y);
-        virtual void PrintGlyph(int x, int y, const glyph_info *glyphinfo);
+        virtual void PrintGlyph(int x, int y, const glyph_info *glyphinfo, const glyph_info *bkglyphinfo);
 	virtual void UseRIP(int how, time_t when);
 
 	int nhid;

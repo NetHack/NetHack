@@ -122,8 +122,8 @@ struct eshk {
     long credit;          /* amount credited to customer */
     long debit;           /* amount of debt for using unpaid items */
     long loan;            /* shop-gold picked (part of debit) */
-    int shoptype;         /* the value of g.rooms[shoproom].rtype */
-    schar shoproom;       /* index in g.rooms; set by inshop() */
+    int shoptype;         /* the value of gr.rooms[shoproom].rtype */
+    schar shoproom;       /* index in gr.rooms; set by inshop() */
     schar unused;         /* to force alignment for stupid compilers */
     boolean following;    /* following customer since he owes us sth */
     boolean surcharge;    /* angry shk inflates prices */

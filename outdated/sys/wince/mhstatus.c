@@ -182,7 +182,7 @@ FormatStatusString(char *text, int format)
     int hp, hpmax;
     int cap = near_capacity();
 
-    Strcpy(text, g.plname);
+    Strcpy(text, gp.plname);
     if ('a' <= text[0] && text[0] <= 'z')
         text[0] += 'A' - 'a';
     text[10] = 0;
@@ -237,7 +237,7 @@ FormatStatusString(char *text, int format)
         hp = 0;
     (void) describe_level(nb = eos(nb));
     Sprintf(nb = eos(nb), "%c:%-2ld HP:%d(%d) Pw:%d(%d) AC:%-2d",
-            showsyms[COIN_CLASS + SYM_OFF_O], money_cnt(g.invent), hp, hpmax,
+            showsyms[COIN_CLASS + SYM_OFF_O], money_cnt(gi.invent), hp, hpmax,
             u.uen, u.uenmax, u.uac);
 
     if (Upolyd)
@@ -253,7 +253,7 @@ FormatStatusString(char *text, int format)
 
     /* forth line */
     if (flags.time)
-        Sprintf(nb = eos(nb), "T:%ld ", g.moves);
+        Sprintf(nb = eos(nb), "T:%ld ", gm.moves);
 
     if (strcmp(hu_stat[u.uhs], "        ")) {
         Strcat(text, hu_stat[u.uhs]);

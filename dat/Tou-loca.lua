@@ -126,16 +126,12 @@ des.object()
 -- Toilet paper
 des.object("blank paper", 71, 12)
 des.object("blank paper", 71, 12)
--- Random traps
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
-des.trap()
+-- Random traps - must avoid the 2 shops
+local validtraps = selection.area(00,00,75,19):filter_mapchar('.')
+validtraps = validtraps - (selection.area(15,03,20,05) + selection.area(62,03,71,04))
+for i = 1,9 do
+   des.trap(validtraps:rndcoord(1))
+end
 -- Random monsters.
 des.monster("giant spider")
 des.monster("giant spider")

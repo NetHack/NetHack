@@ -17,11 +17,11 @@ no_bones_level(d_level *lev)
 {
     s_level *sptr;
 
-    if (ledger_no(&g.save_dlevel))
-        assign_level(lev, &g.save_dlevel);
+    if (ledger_no(&gs.save_dlevel))
+        assign_level(lev, &gs.save_dlevel);
 
     return (boolean) (((sptr = Is_special(lev)) != 0 && !sptr->boneid)
-                      || !g.dungeons[lev->dnum].boneid
+                      || !gd.dungeons[lev->dnum].boneid
                       /* no bones on the last or multiway branch levels
                          in any dungeon (level 1 isn't multiway) */
                       || Is_botlevel(lev)
@@ -93,7 +93,7 @@ resetobjs(struct obj *ochain, boolean restore)
                                       result depends upon hero's location */
                                    && inside_shop(ox, oy)
                                    && *(p = in_rooms(ox, oy, SHOPBASE))
-                                   && tended_shop(&g.rooms[*p - ROOMOFFSET]));
+                                   && tended_shop(&gr.rooms[*p - ROOMOFFSET]));
             }
         } else { /* saving */
             /* do not zero out o_ids for ghost levels anymore */
@@ -268,7 +268,7 @@ drop_upon_death(
     /* all inventory is dropped (for the normal case), even non-droppable
        things like worn armor and accessories, welded weapon, or cursed
        loadstones */
-    while ((otmp = g.invent) != 0) {
+    while ((otmp = gi.invent) != 0) {
         obj_extract_self(otmp);
         /* when turning into green slime, all gear remains held;
            other types "arise from the dead" do aren't holding
@@ -316,7 +316,7 @@ fixuporacle(struct monst *oracle)
 
     oracle->mpeaceful = 1; /* for behavior toward next character */
     o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
-    if (o_ridx >= 0 && g.rooms[o_ridx].rtype == DELPHI)
+    if (o_ridx >= 0 && gr.rooms[o_ridx].rtype == DELPHI)
         return TRUE; /* no fixup needed */
 
     /*
@@ -327,14 +327,14 @@ fixuporacle(struct monst *oracle)
      */
 
     /* find original delphi chamber; should always succeed */
-    for (ridx = 0; ridx < SIZE(g.rooms); ++ridx)
-        if (g.rooms[ridx].orig_rtype == DELPHI)
+    for (ridx = 0; ridx < SIZE(gr.rooms); ++ridx)
+        if (gr.rooms[ridx].orig_rtype == DELPHI)
             break;
 
-    if (o_ridx != ridx && ridx < SIZE(g.rooms)) {
+    if (o_ridx != ridx && ridx < SIZE(gr.rooms)) {
         /* room found and she's not not in it, so try to move her there */
-        cc.x = (g.rooms[ridx].lx + g.rooms[ridx].hx) / 2;
-        cc.y = (g.rooms[ridx].ly + g.rooms[ridx].hy) / 2;
+        cc.x = (gr.rooms[ridx].lx + gr.rooms[ridx].hx) / 2;
+        cc.y = (gr.rooms[ridx].ly + gr.rooms[ridx].hy) / 2;
         if (enexto(&cc, cc.x, cc.y, oracle->data)) {
             rloc_to(oracle, cc.x, cc.y);
             o_ridx = levl[oracle->mx][oracle->my].roomno - ROOMOFFSET;
@@ -344,7 +344,7 @@ fixuporacle(struct monst *oracle)
            same as used to happen before this fixup was introduced] */
     }
     if (ridx == o_ridx) /* if she's in her room, mark it as such */
-        g.rooms[ridx].rtype = DELPHI;
+        gr.rooms[ridx].rtype = DELPHI;
     return TRUE; /* keep oracle in new bones file */
 }
 
@@ -365,7 +365,7 @@ can_make_bones(void)
     }
     if (!Is_branchlev(&u.uz)) {
         /* no bones on non-branches with portals */
-        for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap)
+        for (ttmp = gf.ftrap; ttmp; ttmp = ttmp->ntrap)
             if (ttmp->ttyp == MAGIC_PORTAL)
                 return FALSE;
     }
@@ -415,7 +415,7 @@ savebones(int how, time_t when, struct obj *corpse)
     if (nhfp) {
         close_nhfile(nhfp);
         if (wizard) {
-            if (yn("Bones file already exists.  Replace it?") == 'y') {
+            if (y_n("Bones file already exists.  Replace it?") == 'y') {
                 if (delete_bonesfile(&u.uz))
                     goto make_bones;
                 else
@@ -445,7 +445,7 @@ savebones(int how, time_t when, struct obj *corpse)
 
     /* mark all named fruits as nonexistent; if/when we come to instances
        of any of them we'll mark those as existing (using goodfruit()) */
-    for (f = g.ffruit; f; f = f->nextf)
+    for (f = gf.ffruit; f; f = f->nextf)
         f->fid = -f->fid;
 
     /* dispose of your possessions, usually cursed */
@@ -453,7 +453,7 @@ savebones(int how, time_t when, struct obj *corpse)
         struct obj *otmp;
 
         /* embed your possessions in your statue */
-        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, g.plname);
+        otmp = mk_named_object(STATUE, &mons[u.umonnum], u.ux, u.uy, gp.plname);
 
         drop_upon_death((struct monst *) 0, otmp, u.ux, u.uy);
         if (!otmp)
@@ -465,25 +465,25 @@ savebones(int how, time_t when, struct obj *corpse)
         /* trick makemon() into allowing monster creation
          * on your location
          */
-        g.in_mklev = TRUE;
+        gi.in_mklev = TRUE;
         mtmp = makemon(&mons[PM_GHOST], u.ux, u.uy, MM_NONAME);
-        g.in_mklev = FALSE;
+        gi.in_mklev = FALSE;
         if (!mtmp)
             return;
-        mtmp = christen_monst(mtmp, g.plname);
+        mtmp = christen_monst(mtmp, gp.plname);
         if (corpse)
             (void) obj_attach_mid(corpse, mtmp->m_id);
     } else {
         /* give your possessions to the monster you become */
-        g.in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
+        gi.in_mklev = TRUE; /* use <u.ux,u.uy> as-is */
         mtmp = makemon(&mons[u.ugrave_arise], u.ux, u.uy, NO_MINVENT);
-        g.in_mklev = FALSE;
+        gi.in_mklev = FALSE;
         if (!mtmp) { /* arise-type might have been genocided */
             drop_upon_death((struct monst *) 0, (struct obj *) 0, u.ux, u.uy);
             u.ugrave_arise = NON_PM; /* in case caller cares */
             return;
         }
-        mtmp = christen_monst(mtmp, g.plname);
+        mtmp = christen_monst(mtmp, gp.plname);
         newsym(u.ux, u.uy);
         /* ["Your body rises from the dead as an <mname>..." used
            to be given here, but it has been moved to done() so that
@@ -508,12 +508,12 @@ savebones(int how, time_t when, struct obj *corpse)
         if (mtmp->mtame)
             mtmp->mtame = mtmp->mpeaceful = 0;
     }
-    for (ttmp = g.ftrap; ttmp; ttmp = ttmp->ntrap) {
+    for (ttmp = gf.ftrap; ttmp; ttmp = ttmp->ntrap) {
         ttmp->madeby_u = 0;
         ttmp->tseen = unhideable_trap(ttmp->ttyp);
     }
     resetobjs(fobj, FALSE);
-    resetobjs(g.level.buriedobjlist, FALSE);
+    resetobjs(gl.level.buriedobjlist, FALSE);
 
     /* Hero is no longer on the map. */
     u.ux0 = u.ux, u.uy0 = u.uy;
@@ -525,7 +525,7 @@ savebones(int how, time_t when, struct obj *corpse)
             levl[x][y].seenv = 0;
             levl[x][y].waslit = 0;
             levl[x][y].glyph = GLYPH_UNEXPLORED;
-            g.lastseentyp[x][y] = 0;
+            gl.lastseentyp[x][y] = 0;
         }
 
     /* Attach bones info to the current level before saving. */
@@ -537,8 +537,8 @@ savebones(int how, time_t when, struct obj *corpse)
        gender and alignment reflect final values rather than what the
        character started out as, same as topten and logfile entries */
     Sprintf(newbones->who, "%s-%.3s-%.3s-%.3s-%.3s",
-            g.plname, g.urole.filecode,
-            g.urace.filecode, genders[flags.female].filecode,
+            gp.plname, gu.urole.filecode,
+            gu.urace.filecode, genders[flags.female].filecode,
             aligns[1 - u.ualign.type].filecode);
     formatkiller(newbones->how, sizeof newbones->how, how, TRUE);
     Strcpy(newbones->when, yyyymmddhhmmss(when));
@@ -547,13 +547,13 @@ savebones(int how, time_t when, struct obj *corpse)
     newbones->bonesknown = FALSE;
     /* if current character died on a bones level, the cemetery list
        will have multiple entries, most recent (this dead hero) first */
-    newbones->next = g.level.bonesinfo;
-    g.level.bonesinfo = newbones;
+    newbones->next = gl.level.bonesinfo;
+    gl.level.bonesinfo = newbones;
     /* flag these bones if they are being created in wizard mode;
        they might already be flagged as such, even when we're playing
        in normal mode, if this level came from a previous bones file */
     if (wizard)
-        g.level.flags.wizard_bones = 1;
+        gl.level.flags.wizard_bones = 1;
 
     nhfp = create_bonesfile(&u.uz, &bonesid, whynot);
     if (!nhfp) {
@@ -613,14 +613,14 @@ getbones(void)
         return 0;
     }
 
-    if (validate(nhfp, g.bones) != 0) {
+    if (validate(nhfp, gb.bones) != 0) {
         if (!wizard)
             pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;
     } else {
         ok = TRUE;
         if (wizard) {
-            if (yn("Get bones?") == 'n') {
+            if (y_n("Get bones?") == 'n') {
                 close_nhfile(nhfp);
                 compress_bonesfile();
                 return 0;
@@ -670,7 +670,7 @@ getbones(void)
                     resetobjs(mtmp->minvent, TRUE);
             }
             resetobjs(fobj, TRUE);
-            resetobjs(g.level.buriedobjlist, TRUE);
+            resetobjs(gl.level.buriedobjlist, TRUE);
             fix_shop_damage();
         }
     }
@@ -679,7 +679,7 @@ getbones(void)
     u.uroleplay.numbones++;
 
     if (wizard) {
-        if (yn("Unlink bones?") == 'n') {
+        if (y_n("Unlink bones?") == 'n') {
             compress_bonesfile();
             return ok;
         }
@@ -711,7 +711,7 @@ bones_include_name(const char *name)
     Strcat(buf, "-");
     len = strlen(buf);
 
-    for (bp = g.level.bonesinfo; bp; bp = bp->next) {
+    for (bp = gl.level.bonesinfo; bp; bp = bp->next) {
         if (!strncmp(bp->who, buf, len))
             return TRUE;
     }

@@ -151,7 +151,7 @@ set_levelfile_name(int lev)
 {
     char *tf;
 
-    tf = rindex(lock, '.');
+    tf = strrchr(lock, '.');
     if (!tf)
         tf = lock + strlen(lock);
     (void) sprintf(tf, ".%d", lev);

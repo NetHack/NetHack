@@ -1,5 +1,5 @@
 /* NetHack 3.7	align.h	$NHDT-Date: 1604269810 2020/11/01 22:30:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
-/* Copyright (c) Mike Stephenson, Izchak Miller  1991.		  */
+/* Copyright (c) Mike Stephenson, Izchak Miller  1991.            */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef ALIGN_H
@@ -13,7 +13,7 @@ typedef struct align { /* alignment & record */
 } align;
 
 /* bounds for "record" -- respect initial alignments of 10 */
-#define ALIGNLIM (10L + (g.moves / 200L))
+#define ALIGNLIM (10L + (gm.moves / 200L))
 
 #define A_NONE (-128) /* the value range of type */
 

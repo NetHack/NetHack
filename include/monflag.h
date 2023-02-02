@@ -1,5 +1,5 @@
 /* NetHack 3.7	monflag.h	$NHDT-Date: 1596498549 2020/08/03 23:49:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.21 $ */
-/* Copyright (c) 1989 Mike Threepoint				  */
+/* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifndef MONFLAG_H
@@ -199,7 +199,7 @@ enum ms_sounds {
    passed to mkclass() as if it dealt with mons[].geno bits */
 #define G_IGNORE        0x8000 /* for mkclass(), ignore G_GENOD|G_EXTINCT */
 
-/* for g.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
+/* for gm.mvitals[].mvflags (variant during game), along with G_NOCORPSE */
 #define G_KNOWN         0x04 /* have been encountered */
 #define G_GENOD         0x02 /* have been genocided */
 #define G_EXTINCT       0x01 /* population control; create no more */

@@ -228,7 +228,7 @@ macopen(const char *name, int flags, long fileType)
 				Handle name;
 				Str255 plnamep;
 
-				C2P(g.plname, plnamep);
+				C2P(gp.plname, plnamep);
 				name = (Handle)NewString(plnamep);
 				if (name)
 					replace_resource(name, 'STR ', PLAYER_NAME_RES_ID,

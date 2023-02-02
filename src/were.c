@@ -30,8 +30,10 @@ were_change(struct monst *mon)
                     howler = (char *) 0;
                     break;
                 }
-                if (howler)
+                if (howler) {
+                    Soundeffect(se_canine_howl, 50);
                     You_hear("a %s howling at the moon.", howler);
+                }
             }
         }
     } else if (!rn2(30) || Protection_from_shape_changers) {
@@ -197,11 +199,11 @@ you_unwere(boolean purify)
         You_feel("purified.");
         set_ulycn(NON_PM); /* cure lycanthropy */
     }
-    if (!Unchanging && is_were(g.youmonst.data)
+    if (!Unchanging && is_were(gy.youmonst.data)
         && (!controllable_poly
             || !paranoid_query(ParanoidWerechange, "Remain in beast form?")))
         rehumanize();
-    else if (is_were(g.youmonst.data) && !u.mtimedone)
+    else if (is_were(gy.youmonst.data) && !u.mtimedone)
         u.mtimedone = rn1(200, 200); /* 40% of initial were change */
 }
 

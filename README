@@ -46,9 +46,10 @@ process. Among them:
 
  *  Add support to make the game restartable without exit (a.k.a. "play again"
     support). Toward that end, many previously scattered and separate variables
-    have been gathered into a central 'g' structure in decl.h/decl.c. That
-    will benefit the porting effort to some platforms that are under
-    consideration.
+    have been gathered into central 'ga' through 'gz' structures in
+    decl.h/decl.c. That central ability to reinitialize the variables will
+    benefit the porting effort to some platforms that are under consideration
+    where "play again" is typical.
 
 Here are some other general notes on the changes in NetHack 3.7 that were not
 considered spoilers:
@@ -106,14 +107,13 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
     At the time of the most recent official release, NetHack 3.6, it had
     been tested to run/compile on:
 
-        Intel Pentium or better running Linux, BSDI, or
-                Windows 10 to 11
-        Intel 80386 or greater boxes running Linux, or BSDI
-        macOS 10.11 (El Capitan) to 12 (Monterey)  (follow the instructions
-                in sys/unix, not sys/mac)
-        OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
+        Intel Pentium or better running Linux, BSDI
+        Intel Pentium or better running Windows 10 or 11
+        Intel-based, or Apple M1 or M2 Macs running macOS 10.11 (El Capitan) to
+            13 (Ventura) (follow the instructions in sys/unix/NewInstall.unx)
         Intel 80386 or greater running MS-DOS with DPMI
-                built via Linux-hosted djgpp cross-compiler
+            built via djgpp compiler (native or Linux-hosted cross-compiler)
+        OpenVMS (aka VMS) V8.4 on Alpha and on Integrity/Itanium/IA64
 
     Previous versions of NetHack were tested and known to run on the
     following systems, but it is unknown if they can still build and
@@ -154,7 +154,7 @@ Please read items (1), (2) and (3) BEFORE doing anything with your new code.
         Stride 460 running UniStride 2.1
         Sun-3s, -4s, and -386is running SunOS 3.x
         Sun-3s and -386is running SunOS 4.x
-        Sun SPARC based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
+        "Sun SPARC"-based machine running SunOS 4.x, Solaris 2.x, or Solaris 7
         Valid Logic Systems SCALD-System
 
     Previous versions, using a cross-compiler hosted on another platform,

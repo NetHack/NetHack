@@ -5,7 +5,7 @@
 #ifndef WINDCONF_H
 #define WINDCONF_H
 
-/* #define SHELL */	/* nt use of pcsys routines caused a hang */
+/* #define SHELL */    /* nt use of pcsys routines caused a hang */
 
 #define TEXTCOLOR /* Color text */
 
@@ -27,9 +27,6 @@
 #define DUMPLOG      /* Enable dumplog files */
 /*#define DUMPLOG_FILE "nethack-%n-%d.log"*/
 #define DUMPLOG_MSG_COUNT 50
-
-#define USER_SOUNDS
-#define TTY_SOUND_ESCCODES
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 
@@ -95,6 +92,7 @@
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
 extern void interject_assistance(int, int, genericptr_t, genericptr_t);
 extern void interject(int);
+extern char *windows_exepath(void);
 
 /*
  *===============================================
@@ -103,16 +101,29 @@ extern void interject(int);
  */
 
 #ifdef __MINGW32__
+#if 0
+#define MD_USE_TMPFILE_S
+#if !defined(__cplusplus)
+extern errno_t tmpfile_s(FILE * restrict * restrict streamptr);
+#endif
+#endif
+#
 #ifdef strncasecmp
 #undef strncasecmp
 #endif
 #ifdef strcasecmp
 #undef strcasecmp
+/* https://sourceforge.net/p/mingw-w64/wiki2/gnu%20printf/ */
+#ifdef __USE_MINGW_ANSI_STDIO
+#undef __USE_MINGW_ANSI_STDIO
+#endif
+#define __USE_MINGW_ANSI_STDIO 1
 #endif
 /* extern int getlock(void); */
-#endif
+#endif   /* __MINGW32__ */
 
 #ifdef _MSC_VER
+#define MD_USE_TMPFILE_S
 #define HAS_STDINT
 #if (_MSC_VER > 1000)
 /* Visual C 8 warning elimination */
@@ -185,8 +196,6 @@ typedef SSIZE_T ssize_t;
 #endif
 
 #define NO_SIGNAL
-#define index strchr
-#define rindex strrchr
 
 /* Time stuff */
 #include <time.h>
@@ -213,7 +222,7 @@ typedef SSIZE_T ssize_t;
 
 #ifndef M
 #define M(c) ((char) (0x80 | (c)))
-/* #define M(c)		((c) - 128) */
+/* #define M(c) ((c) - 128) */
 #endif
 
 #ifndef C
@@ -279,7 +288,7 @@ extern int alternative_palette(char *);
 #endif
 
 #define nethack_enter(argc, argv) nethack_enter_windows()
-extern void nethack_exit(int) NORETURN;
+ATTRNORETURN extern void nethack_exit(int) NORETURN;
 extern boolean file_exists(const char *);
 extern boolean file_newer(const char *, const char *);
 #ifndef SYSTEM_H

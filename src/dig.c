@@ -76,7 +76,7 @@ mkcavepos(coordxy x, coordxy y, int dist, boolean waslit, boolean rockit)
         lev->waslit = (rockit ? FALSE : TRUE);
     lev->horizontal = FALSE;
     /* short-circuit vision recalc */
-    g.viz_array[y][x] = (dist < 3) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
+    gv.viz_array[y][x] = (dist < 3) ? (IN_SIGHT | COULD_SEE) : COULD_SEE;
     lev->typ = (rockit ? STONE : ROOM); /* flags set via doormask above */
     if (dist >= 3)
         impossible("mkcavepos called with dist %d", dist);
@@ -92,11 +92,13 @@ mkcavearea(boolean rockit)
     register coordxy i;
     register boolean waslit = rm_waslit();
 
-    if (rockit)
+    if (rockit) {
+        Soundeffect(se_crashing_rock, 100);
         pline("Crash!  The ceiling collapses around you!");
-    else
+    } else {
         pline("A mysterious force %s cave around you!",
               (levl[u.ux][u.uy].typ == CORR) ? "creates a" : "extends the");
+    }
     display_nhwindow(WIN_MESSAGE, TRUE);
 
     for (dist = 1; dist <= 2; dist++) {
@@ -130,7 +132,7 @@ mkcavearea(boolean rockit)
         newsym(u.ux, u.uy); /* in case player is invisible */
     }
 
-    g.vision_full_recalc = 1; /* everything changed */
+    gv.vision_full_recalc = 1; /* everything changed */
 }
 
 /* When digging into location <x,y>, what are you actually digging into? */
@@ -154,7 +156,7 @@ dig_typ(struct obj *otmp, coordxy x, coordxy y)
                      : IS_TREE(levl[x][y].typ)
                         ? (ispick ? DIGTYP_UNDIGGABLE : DIGTYP_TREE)
                         : (ispick && IS_ROCK(levl[x][y].typ)
-                           && (!g.level.flags.arboreal
+                           && (!gl.level.flags.arboreal
                                || IS_WALL(levl[x][y].typ)))
                            ? DIGTYP_ROCK
                            : DIGTYP_UNDIGGABLE);
@@ -163,13 +165,13 @@ dig_typ(struct obj *otmp, coordxy x, coordxy y)
 boolean
 is_digging(void)
 {
-    if (g.occupation == dig) {
+    if (go.occupation == dig) {
         return TRUE;
     }
     return FALSE;
 }
 
-#define BY_YOU (&g.youmonst)
+#define BY_YOU (&gy.youmonst)
 #define BY_OBJECT ((struct monst *) 0)
 
 boolean
@@ -231,7 +233,7 @@ static int
 dig(void)
 {
     struct rm *lev;
-    coordxy dpx = g.context.digging.pos.x, dpy = g.context.digging.pos.y;
+    coordxy dpx = gc.context.digging.pos.x, dpy = gc.context.digging.pos.y;
     boolean ispick = uwep && is_pick(uwep);
     const char *verb = (!uwep || is_pick(uwep)) ? "dig into" : "chop through";
 
@@ -239,15 +241,15 @@ dig(void)
     /* perhaps a nymph stole your pick-axe while you were busy digging */
     /* or perhaps you teleported away */
     if (u.uswallow || !uwep || (!ispick && !is_axe(uwep))
-        || !on_level(&g.context.digging.level, &u.uz)
-        || ((g.context.digging.down ? (dpx != u.ux || dpy != u.uy)
+        || !on_level(&gc.context.digging.level, &u.uz)
+        || ((gc.context.digging.down ? (dpx != u.ux || dpy != u.uy)
                                   : !next2u(dpx, dpy))))
         return 0;
 
-    if (g.context.digging.down) {
+    if (gc.context.digging.down) {
         if (!dig_check(BY_YOU, TRUE, u.ux, u.uy))
             return 0;
-    } else { /* !g.context.digging.down */
+    } else { /* !gc.context.digging.down */
         if (IS_TREE(lev->typ) && !may_dig(dpx, dpy)
             && dig_typ(uwep, dpx, dpy) == DIGTYP_TREE) {
             pline("This tree seems to be petrified.");
@@ -277,8 +279,10 @@ dig(void)
             }
             break;
         case 1:
+            Soundeffect(se_bang_weapon_side, 100);
             pline("Bang!  You hit with the broad side of %s!",
                   the(xname(uwep)));
+            wake_nearby();
             break;
         default:
             Your("swing misses its mark.");
@@ -287,21 +291,21 @@ dig(void)
         return 0;
     }
 
-    g.context.digging.effort +=
+    gc.context.digging.effort +=
         10 + rn2(5) + abon() + uwep->spe - greatest_erosion(uwep) + u.udaminc;
     if (Race_if(PM_DWARF))
-        g.context.digging.effort *= 2;
-    if (g.context.digging.down) {
+        gc.context.digging.effort *= 2;
+    if (gc.context.digging.down) {
         struct trap *ttmp = t_at(dpx, dpy);
 
-        if (g.context.digging.effort > 250 || (ttmp && ttmp->ttyp == HOLE)) {
+        if (gc.context.digging.effort > 250 || (ttmp && ttmp->ttyp == HOLE)) {
             (void) dighole(FALSE, FALSE, (coord *) 0);
-            (void) memset((genericptr_t) &g.context.digging, 0,
-                          sizeof g.context.digging);
+            (void) memset((genericptr_t) &gc.context.digging, 0,
+                          sizeof gc.context.digging);
             return 0; /* done with digging */
         }
 
-        if (g.context.digging.effort <= 50
+        if (gc.context.digging.effort <= 50
             || (ttmp && (ttmp->ttyp == TRAPDOOR || is_pit(ttmp->ttyp)))) {
             return 1;
         } else if (ttmp && (ttmp->ttyp == LANDMINE
@@ -310,13 +314,13 @@ dig(void)
                hero should have used #untrap first */
             dotrap(ttmp, FORCETRAP);
             /* restart completely from scratch if we resume digging */
-            (void) memset((genericptr_t) &g.context.digging, 0,
-                          sizeof g.context.digging);
+            (void) memset((genericptr_t) &gc.context.digging, 0,
+                          sizeof gc.context.digging);
             return 0;
         } else if (ttmp && ttmp->ttyp == BEAR_TRAP && u.utrap) {
             if (rnl(7) > (Fumbling ? 1 : 4)) {
                 char kbuf[BUFSZ];
-                int dmg = dmgval(uwep, &g.youmonst) + dbon();
+                int dmg = dmgval(uwep, &gy.youmonst) + dbon();
 
                 if (dmg < 1)
                     dmg = 1;
@@ -333,7 +337,7 @@ dig(void)
                 reset_utrap(TRUE); /* release from trap, maybe Lev or Fly */
             }
             /* we haven't made any progress toward a pit yet */
-            g.context.digging.effort = 0;
+            gc.context.digging.effort = 0;
             return 0;
         }
 
@@ -344,13 +348,13 @@ dig(void)
 
         /* make pit at <u.ux,u.uy> */
         if (dighole(TRUE, FALSE, (coord *) 0)) {
-            g.context.digging.level.dnum = 0;
-            g.context.digging.level.dlevel = -1;
+            gc.context.digging.level.dnum = 0;
+            gc.context.digging.level.dlevel = -1;
         }
         return 0;
     }
 
-    if (g.context.digging.effort > 100) {
+    if (gc.context.digging.effort > 100) {
         const char *digtxt, *dmgtxt = (const char *) 0;
         struct obj *obj;
         boolean shopedge = *in_rooms(dpx, dpy, SHOPBASE);
@@ -401,9 +405,9 @@ dig(void)
                 add_damage(dpx, dpy, SHOP_WALL_DMG);
                 dmgtxt = "damage";
             }
-            if (g.level.flags.is_maze_lev) {
+            if (gl.level.flags.is_maze_lev) {
                 lev->typ = ROOM, lev->flags = 0;
-            } else if (g.level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
+            } else if (gl.level.flags.is_cavernous_lev && !in_town(dpx, dpy)) {
                 lev->typ = CORR, lev->flags = 0;
             } else {
                 lev->typ = DOOR, lev->doormask = D_NODOOR;
@@ -428,7 +432,7 @@ dig(void)
         if (!does_block(dpx, dpy, &levl[dpx][dpy]))
             unblock_point(dpx, dpy); /* vision:  can see through */
         feel_newsym(dpx, dpy);
-        if (digtxt && !g.context.digging.quiet)
+        if (digtxt && !gc.context.digging.quiet)
             pline1(digtxt); /* after newsym */
         if (dmgtxt)
             pay_for_damage(dmgtxt, FALSE);
@@ -454,10 +458,10 @@ dig(void)
             newsym(dpx, dpy);
         }
  cleanup:
-        g.context.digging.lastdigtime = g.moves;
-        g.context.digging.quiet = FALSE;
-        g.context.digging.level.dnum = 0;
-        g.context.digging.level.dlevel = -1;
+        gc.context.digging.lastdigtime = gm.moves;
+        gc.context.digging.quiet = FALSE;
+        gc.context.digging.level.dnum = 0;
+        gc.context.digging.level.dlevel = -1;
         return 0;
     } else { /* not enough effort has been spent yet */
         static const char *const d_target[6] = { "",        "rock", "statue",
@@ -474,9 +478,10 @@ dig(void)
                    || (dig_target == DIGTYP_ROCK && !IS_ROCK(lev->typ)))
             return 0; /* statue or boulder got taken */
 
-        if (!g.did_dig_msg) {
+        if (!gd.did_dig_msg) {
             You("hit the %s with all your might.", d_target[dig_target]);
-            g.did_dig_msg = TRUE;
+            wake_nearby();
+            gd.did_dig_msg = TRUE;
         }
     }
     return 1;
@@ -511,9 +516,9 @@ furniture_handled(coordxy x, coordxy y, boolean madeby_u)
 int
 holetime(void)
 {
-    if (g.occupation != dig || !*u.ushops)
+    if (go.occupation != dig || !*u.ushops)
         return -1;
-    return ((250 - g.context.digging.effort) / 20);
+    return ((250 - gc.context.digging.effort) / 20);
 }
 
 /* Return typ of liquid to fill a hole with, or ROOM, if no liquid nearby */
@@ -588,11 +593,11 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     else
         Strcpy(surface_type, surface(x, y));
     shopdoor = IS_DOOR(lev->typ) && *in_rooms(x, y, SHOPBASE);
-    oldobjs = g.level.objects[x][y];
+    oldobjs = gl.level.objects[x][y];
     ttmp = maketrap(x, y, ttyp);
     if (!ttmp)
         return;
-    newobjs = g.level.objects[x][y];
+    newobjs = gl.level.objects[x][y];
     ttmp->madeby_u = madeby_u;
     ttmp->tseen = 0;
     if (cansee(x, y))
@@ -610,6 +615,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 pay_for_damage("ruin", FALSE);
             else
                 add_damage(x, y, madeby_u ? SHOP_PIT_COST : 0L);
+            wake_nearby();
         } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
         } else if (cansee(x, y) && Verbose(0, digactualhole1)) {
@@ -624,7 +630,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         if (at_u) {
             if (!wont_fall) {
                 set_utrap(rn1(4, 2), TT_PIT);
-                g.vision_full_recalc = 1; /* vision limits change */
+                gv.vision_full_recalc = 1; /* vision limits change */
             } else
                 reset_utrap(TRUE);
             if (oldobjs != newobjs) /* something unearthed */
@@ -749,7 +755,7 @@ liquid_flow(coordxy x, coordxy y, schar typ, struct trap *ttmp,
     if (fillmsg)
         pline(fillmsg, hliquid(typ == LAVAPOOL ? "lava" : "water"));
     /* handle object damage before hero damage; affects potential bones */
-    if ((objchain = g.level.objects[x][y]) != 0) {
+    if ((objchain = gl.level.objects[x][y]) != 0) {
         if (typ == LAVAPOOL)
             fire_damage_chain(objchain, TRUE, TRUE, x, y);
         else
@@ -828,7 +834,9 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
              * digging makes a hole, but the boulder immediately
              * fills it.  Final outcome:  no hole, no boulder.
              */
+            Soundeffect(se_kadoom_boulder_falls_in, 60);
             pline("KADOOM!  The boulder falls in!");
+            wake_nearby();
             (void) delfloortrap(ttmp);
         }
         delobj(boulder_here);
@@ -901,6 +909,7 @@ static void
 dig_up_grave(coord *cc)
 {
     struct obj *otmp;
+    int what_happens;
     coordxy dig_x, dig_y;
 
     if (!cc) {
@@ -921,12 +930,15 @@ dig_up_grave(coord *cc)
     } else if (Role_if(PM_SAMURAI)) {
         adjalign(-sgn(u.ualign.type));
         You("disturb the honorable dead!");
-    } else if ((u.ualign.type == A_LAWFUL) && (u.ualign.record > -10)) {
-        adjalign(-sgn(u.ualign.type));
+    } else if (u.ualign.type == A_LAWFUL) {
+        if (u.ualign.record > -10)
+            adjalign(-1);
         You("have violated the sanctity of this grave!");
     }
 
-    switch (rn2(5)) {
+    /* -1: force default case for empty grave */
+    what_happens = levl[dig_x][dig_y].emptygrave ? -1 : rn2(5);
+    switch (what_happens) {
     case 0:
     case 1:
         You("unearth a corpse.");
@@ -935,22 +947,24 @@ dig_up_grave(coord *cc)
         break;
     case 2:
         if (!Blind)
-            pline(Hallucination ? "Dude!  The living dead!"
-                                : "The grave's owner is very upset!");
+            pline("%s!", Hallucination ? "Dude!  The living dead"
+                                       : "The grave's owner is very upset");
         (void) makemon(mkclass(S_ZOMBIE, 0), dig_x, dig_y, MM_NOMSG);
         break;
     case 3:
         if (!Blind)
-            pline(Hallucination ? "I want my mummy!"
-                                : "You've disturbed a tomb!");
+            pline("%s!", Hallucination ? "I want my mummy"
+                                       : "You've disturbed a tomb");
         (void) makemon(mkclass(S_MUMMY, 0), dig_x, dig_y, MM_NOMSG);
         break;
     default:
         /* No corpse */
-        pline_The("grave seems unused.  Strange....");
+        pline_The("grave is unoccupied.  Strange...");
         break;
     }
-    levl[dig_x][dig_y].typ = ROOM, levl[dig_x][dig_y].flags = 0;
+    levl[dig_x][dig_y].typ = ROOM;
+    levl[dig_x][dig_y].emptygrave = 0; /* clear 'flags' */
+    levl[dig_x][dig_y].disturbed = 0; /* clear 'horizontal' */
     del_engr_at(dig_x, dig_y);
     newsym(dig_x, dig_y);
     return;
@@ -1055,13 +1069,14 @@ use_pick_axe2(struct obj *obj)
         You("hit yourself with %s.", yname(uwep));
         Sprintf(buf, "%s own %s", uhis(), OBJ_NAME(objects[obj->otyp]));
         losehp(Maybe_Half_Phys(dam), buf, KILLED_BY);
-        g.context.botl = 1;
+        gc.context.botl = 1;
         return ECMD_TIME;
     } else if (u.dz == 0) {
         confdir(FALSE);
         rx = u.ux + u.dx;
         ry = u.uy + u.dy;
         if (!isok(rx, ry)) {
+            Soundeffect(se_clash, 40);
             pline("Clash!");
             return ECMD_TIME;
         }
@@ -1081,8 +1096,8 @@ use_pick_axe2(struct obj *obj)
                 /* you ought to be able to let go; tough luck */
                 /* (maybe `move_into_trap()' would be better) */
                 nomul(-d(2, 2));
-                g.multi_reason = "stuck in a spider web";
-                g.nomovemsg = "You pull free.";
+                gm.multi_reason = "stuck in a spider web";
+                gn.nomovemsg = "You pull free.";
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");
                 wake_nearby();
@@ -1100,6 +1115,7 @@ use_pick_axe2(struct obj *obj)
                 if (vibrate)
                     losehp(Maybe_Half_Phys(2), "axing a hard object",
                            KILLED_BY);
+                wake_nearby();
             } else if (u.utrap && u.utraptype == TT_PIT && trap
                        && (trap_with_u = t_at(u.ux, u.uy))
                        && is_pit(trap->ttyp)
@@ -1127,32 +1143,32 @@ use_pick_axe2(struct obj *obj)
                                                      "chopping at the door",
                                                      "cutting the tree" };
 
-            g.did_dig_msg = FALSE;
-            g.context.digging.quiet = FALSE;
-            if (g.context.digging.pos.x != rx || g.context.digging.pos.y != ry
-                || !on_level(&g.context.digging.level, &u.uz)
-                || g.context.digging.down) {
+            gd.did_dig_msg = FALSE;
+            gc.context.digging.quiet = FALSE;
+            if (gc.context.digging.pos.x != rx || gc.context.digging.pos.y != ry
+                || !on_level(&gc.context.digging.level, &u.uz)
+                || gc.context.digging.down) {
                 if (flags.autodig && dig_target == DIGTYP_ROCK
-                    && !g.context.digging.down
-                    && u_at(g.context.digging.pos.x, g.context.digging.pos.y)
-                    && (g.moves <= g.context.digging.lastdigtime + 2
-                        && g.moves >= g.context.digging.lastdigtime)) {
+                    && !gc.context.digging.down
+                    && u_at(gc.context.digging.pos.x, gc.context.digging.pos.y)
+                    && (gm.moves <= gc.context.digging.lastdigtime + 2
+                        && gm.moves >= gc.context.digging.lastdigtime)) {
                     /* avoid messages if repeated autodigging */
-                    g.did_dig_msg = TRUE;
-                    g.context.digging.quiet = TRUE;
+                    gd.did_dig_msg = TRUE;
+                    gc.context.digging.quiet = TRUE;
                 }
-                g.context.digging.down = g.context.digging.chew = FALSE;
-                g.context.digging.warned = FALSE;
-                g.context.digging.pos.x = rx;
-                g.context.digging.pos.y = ry;
-                assign_level(&g.context.digging.level, &u.uz);
-                g.context.digging.effort = 0;
-                if (!g.context.digging.quiet)
+                gc.context.digging.down = gc.context.digging.chew = FALSE;
+                gc.context.digging.warned = FALSE;
+                gc.context.digging.pos.x = rx;
+                gc.context.digging.pos.y = ry;
+                assign_level(&gc.context.digging.level, &u.uz);
+                gc.context.digging.effort = 0;
+                if (!gc.context.digging.quiet)
                     You("start %s.", d_action[dig_target]);
             } else {
-                You("%s %s.", g.context.digging.chew ? "begin" : "continue",
+                You("%s %s.", gc.context.digging.chew ? "begin" : "continue",
                     d_action[dig_target]);
-                g.context.digging.chew = FALSE;
+                gc.context.digging.chew = FALSE;
             }
             set_occupation(dig, verbing, 0);
         }
@@ -1180,16 +1196,16 @@ use_pick_axe2(struct obj *obj)
               surface(u.ux, u.uy));
         u_wipe_engr(3);
     } else {
-        if (g.context.digging.pos.x != u.ux || g.context.digging.pos.y != u.uy
-            || !on_level(&g.context.digging.level, &u.uz)
-            || !g.context.digging.down) {
-            g.context.digging.chew = FALSE;
-            g.context.digging.down = TRUE;
-            g.context.digging.warned = FALSE;
-            g.context.digging.pos.x = u.ux;
-            g.context.digging.pos.y = u.uy;
-            assign_level(&g.context.digging.level, &u.uz);
-            g.context.digging.effort = 0;
+        if (gc.context.digging.pos.x != u.ux || gc.context.digging.pos.y != u.uy
+            || !on_level(&gc.context.digging.level, &u.uz)
+            || !gc.context.digging.down) {
+            gc.context.digging.chew = FALSE;
+            gc.context.digging.down = TRUE;
+            gc.context.digging.warned = FALSE;
+            gc.context.digging.pos.x = u.ux;
+            gc.context.digging.pos.y = u.uy;
+            assign_level(&gc.context.digging.level, &u.uz);
+            gc.context.digging.effort = 0;
             You("start %s downward.", verbing);
             if (*u.ushops) {
                 shopdig(0);
@@ -1197,7 +1213,7 @@ use_pick_axe2(struct obj *obj)
             }
         } else
             You("continue %s downward.", verbing);
-        g.did_dig_msg = FALSE;
+        gd.did_dig_msg = FALSE;
         set_occupation(dig, verbing, 0);
     }
     return ECMD_TIME;
@@ -1230,7 +1246,7 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
             mtmp = get_iter_mons(watchman_canseeu);
 
         if (mtmp) {
-            if (zap || g.context.digging.warned) {
+            if (zap || gc.context.digging.warned) {
                 verbalize("Halt, vandal!  You're under arrest!");
                 (void) angry_guards(!!Deaf);
             } else {
@@ -1245,7 +1261,7 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
                 else
                     str = "fountain";
                 verbalize("Hey, stop damaging that %s!", str);
-                g.context.digging.warned = TRUE;
+                gc.context.digging.warned = TRUE;
             }
             if (is_digging())
                 stop_occupation();
@@ -1309,13 +1325,15 @@ mdig_tunnel(struct monst *mtmp)
 
     if (IS_WALL(here->typ)) {
         /* KMH -- Okay on arboreal levels (room walls are still stone) */
-        if (Verbose(0, mdig_tunnel2) && !rn2(5))
+        if (Verbose(0, mdig_tunnel2) && !rn2(5)) {
+            Soundeffect(se_crashing_rock, 75);
             You_hear("crashing rock.");
+        }
         if (*in_rooms(mtmp->mx, mtmp->my, SHOPBASE))
             add_damage(mtmp->mx, mtmp->my, 0L);
-        if (g.level.flags.is_maze_lev) {
+        if (gl.level.flags.is_maze_lev) {
             here->typ = ROOM, here->flags = 0;
-        } else if (g.level.flags.is_cavernous_lev
+        } else if (gl.level.flags.is_cavernous_lev
                    && !in_town(mtmp->mx, mtmp->my)) {
             here->typ = CORR, here->flags = 0;
         } else {
@@ -1453,7 +1471,7 @@ zap_dig(void)
 
     /* normal case: digging across the level */
     shopdoor = shopwall = FALSE;
-    maze_dig = g.level.flags.is_maze_lev && !Is_earthlevel(&u.uz);
+    maze_dig = gl.level.flags.is_maze_lev && !Is_earthlevel(&u.uz);
     zx = u.ux + u.dx;
     zy = u.uy + u.dy;
     if (u.utrap && u.utraptype == TT_PIT
@@ -1558,7 +1576,7 @@ zap_dig(void)
                     shopwall = TRUE;
                 }
                 watch_dig((struct monst *) 0, zx, zy, TRUE);
-                if (g.level.flags.is_cavernous_lev && !in_town(zx, zy)) {
+                if (gl.level.flags.is_cavernous_lev && !in_town(zx, zy)) {
                     room->typ = CORR, room->flags = 0;
                 } else {
                     room->typ = DOOR, room->doormask = D_NODOOR;
@@ -1733,7 +1751,7 @@ buried_ball(coord *cc)
      *  criterium (within 2 steps of tethered hero's present location)
      *  it will find an arbitrary one rather than the one which used
      *  to be uball.  Once 3.6.{0,1} save file compatibility is broken,
-     *  we should add g.context.buriedball_oid and then we can find the
+     *  we should add gc.context.buriedball_oid and then we can find the
      *  actual former uball, which might be extra heavy or christened
      *  or not the one buried directly underneath the target spot.
      *
@@ -1745,7 +1763,7 @@ buried_ball(coord *cc)
        of u.utraptype is no longer meaningful; if u.utrap is still set
        then u.utraptype needs to be for buried ball */
     if (!u.utrap || u.utraptype == TT_BURIEDBALL) {
-        for (otmp = g.level.buriedobjlist; otmp; otmp = otmp->nobj) {
+        for (otmp = gl.level.buriedobjlist; otmp; otmp = otmp->nobj) {
             if (otmp->otyp != HEAVY_IRON_BALL)
                 continue;
             /* if found at the target spot, we're done */
@@ -1898,11 +1916,11 @@ bury_objs(int x, int y)
     costly = ((shkp = shop_keeper(*in_rooms(x, y, SHOPBASE)))
               && costly_spot(x, y));
 
-    if (g.level.objects[x][y] != (struct obj *) 0) {
+    if (gl.level.objects[x][y] != (struct obj *) 0) {
         debugpline2("bury_objs: at <%d,%d>", x, y);
     }
-    for (otmp = g.level.objects[x][y]; otmp; otmp = otmp2) {
-        if (costly) {
+    for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp2) {
+        if (costly && !gc.context.mon_moving) {
             loss += stolen_value(otmp, x, y, (boolean) shkp->mpeaceful, TRUE);
             if (otmp->oclass != COIN_CLASS)
                 otmp->no_charge = 1;
@@ -1932,7 +1950,7 @@ unearth_objs(int x, int y)
     cc.x = x;
     cc.y = y;
     bball = buried_ball(&cc);
-    for (otmp = g.level.buriedobjlist; otmp; otmp = otmp2) {
+    for (otmp = gl.level.buriedobjlist; otmp; otmp = otmp2) {
         otmp2 = otmp->nobj;
         if (otmp->ox == x && otmp->oy == y) {
             if (bball && otmp == bball
@@ -2021,8 +2039,8 @@ rot_corpse(anything *arg, long timeout)
             && hides_under(mtmp->data)) {
             mtmp->mundetected = 0;
         } else if (u_at(x, y)
-                   && u.uundetected && hides_under(g.youmonst.data))
-            (void) hideunder(&g.youmonst);
+                   && u.uundetected && hides_under(gy.youmonst.data))
+            (void) hideunder(&gy.youmonst);
         newsym(x, y);
     } else if (in_invent)
         update_inventory();
@@ -2081,27 +2099,27 @@ void
 escape_tomb(void)
 {
     debugpline0("escape_tomb");
-    if ((Teleportation || can_teleport(g.youmonst.data))
+    if ((Teleportation || can_teleport(gy.youmonst.data))
         && (Teleport_control || rn2(3) < Luck+2)) {
         You("attempt a teleport spell.");
         (void) dotele(FALSE);        /* calls unearth_you() */
     } else if (u.uburied) { /* still buried after 'port attempt */
         boolean good;
 
-        if (amorphous(g.youmonst.data) || Passes_walls
-            || noncorporeal(g.youmonst.data)
-            || (unsolid(g.youmonst.data)
-                && g.youmonst.data != &mons[PM_WATER_ELEMENTAL])
-            || (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))) {
+        if (amorphous(gy.youmonst.data) || Passes_walls
+            || noncorporeal(gy.youmonst.data)
+            || (unsolid(gy.youmonst.data)
+                && gy.youmonst.data != &mons[PM_WATER_ELEMENTAL])
+            || (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))) {
             You("%s up through the %s.",
-                (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))
+                (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
                    ? "try to tunnel"
-                   : (amorphous(g.youmonst.data))
+                   : (amorphous(gy.youmonst.data))
                       ? "ooze"
                       : "phase",
                 surface(u.ux, u.uy));
 
-            good = (tunnels(g.youmonst.data) && !needspick(g.youmonst.data))
+            good = (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
                       ? dighole(TRUE, FALSE, (coord *)0) : TRUE;
             if (good)
                 unearth_you();

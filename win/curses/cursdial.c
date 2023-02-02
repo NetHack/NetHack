@@ -183,7 +183,7 @@ curses_line_input_dialog(
            [Note: wgetnstr() treats <escape> as an ordinary character
            so user has to type <escape><return> for it to behave the
            way we want it to.] */
-        if (input[0] != '\033' && index(input, '\033') != 0)
+        if (input[0] != '\033' && strchr(input, '\033') != 0)
              input[0] = '\0';
     } while (--trylim > 0 && !input[0]);
     curs_set(0);
@@ -220,7 +220,7 @@ curses_character_input_dialog(
        re-activate them now that input is being requested */
     curses_got_input();
 
-    if (g.invent || (g.moves > 1)) {
+    if (gi.invent || (gm.moves > 1)) {
         curses_get_window_size(MAP_WIN, &map_height, &map_width);
     } else {
         map_height = term_rows;
@@ -297,7 +297,7 @@ curses_character_input_dialog(
 #ifdef PDCURSES
         answer = wgetch(message_window);
 #else
-        answer = getch();
+        answer = curses_read_char();
 #endif
         if (answer == ERR) {
             answer = def;
@@ -344,7 +344,7 @@ curses_character_input_dialog(
             break;
         }
 
-        if (choices != NULL && answer != '\0' && index(choices, answer))
+        if (choices != NULL && answer != '\0' && strchr(choices, answer))
             break;
     }
     curs_set(0);
@@ -775,7 +775,7 @@ curses_display_nhmenu(
     menu_determine_pages(current_menu);
 
     /* Display pre and post-game menus centered */
-    if ((g.moves <= 1 && !g.invent) || g.program_state.gameover) {
+    if ((gm.moves <= 1 && !gi.invent) || gp.program_state.gameover) {
         win = curses_create_window(current_menu->width,
                                    current_menu->height, CENTER);
     } else { /* Display during-game menus on the right out of the way */
@@ -1018,7 +1018,7 @@ menu_win_size(nhmenu *menu)
     int maxheaderwidth = menu->prompt ? (int) strlen(menu->prompt) : 0;
     nhmenu_item *menu_item_ptr;
 
-    if (g.program_state.gameover) {
+    if (gp.program_state.gameover) {
         /* for final inventory disclosure, use full width */
         maxwidth = term_cols - 2; /* +2: borders assumed */
     } else {
@@ -1487,7 +1487,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
     menu_display_page(menu, win, curpage, selectors, groupaccels);
 
     while (!dismiss) {
-        curletter = getch();
+        curletter = curses_getch();
 
         if (curletter == ERR) {
             num_selected = -1;

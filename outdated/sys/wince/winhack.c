@@ -167,11 +167,11 @@ eraseoldlocks()
      */
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
-        set_levelfile_name(g.lock, i);
-        (void) unlink(fqname(g.lock, LEVELPREFIX, 0));
+        set_levelfile_name(gl.lock, i);
+        (void) unlink(fqname(gl.lock, LEVELPREFIX, 0));
     }
-    set_levelfile_name(g.lock, 0);
-    if (unlink(fqname(g.lock, LEVELPREFIX, 0)))
+    set_levelfile_name(gl.lock, 0);
+    if (unlink(fqname(gl.lock, LEVELPREFIX, 0)))
         return 0; /* cannot remove it */
     return (1);   /* success! */
 }
@@ -187,9 +187,9 @@ getlock()
     int choice;
 
     /* regularize(lock); */ /* already done in pcmain */
-    Sprintf(tbuf, "%s", fqname(g.lock, LEVELPREFIX, 0));
-    set_levelfile_name(g.lock, 0);
-    fq_lock = fqname(g.lock, LEVELPREFIX, 1);
+    Sprintf(tbuf, "%s", fqname(gl.lock, LEVELPREFIX, 0));
+    set_levelfile_name(gl.lock, 0);
+    fq_lock = fqname(gl.lock, LEVELPREFIX, 1);
 
     f = CreateFile(NH_A2W(fq_lock, wbuf, BUFSZ), GENERIC_READ, 0, NULL,
                    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -226,8 +226,8 @@ gotlock:
     if (fd == -1) {
         error("cannot creat lock file (%s.)", fq_lock);
     } else {
-        if (write(fd, (char *) &g.hackpid, sizeof(g.hackpid))
-            != sizeof(g.hackpid)) {
+        if (write(fd, (char *) &gh.hackpid, sizeof(gh.hackpid))
+            != sizeof(gh.hackpid)) {
             error("cannot write lock (%s)", fq_lock);
         }
         if (close(fd) == -1) {

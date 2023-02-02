@@ -194,7 +194,7 @@ bwrite(int fd, const genericptr_t loc, unsigned num)
         }
         if (failed) {
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
-            if (g.program_state.done_hup)
+            if (gp.program_state.done_hup)
                 nh_terminate(EXIT_FAILURE);
             else
 #endif
@@ -230,7 +230,7 @@ mread(int fd, genericptr_t buf, unsigned len)
         } else {
             pline("Read %d instead of %u bytes.", (int) rlen, len);
             display_nhwindow(WIN_MESSAGE, TRUE); /* flush before error() */
-            if (g.program_state.restoring) {
+            if (gp.program_state.restoring) {
                 (void) nhclose(fd);
                 (void) delete_savefile();
                 error("Error restoring old game.");

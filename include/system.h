@@ -6,9 +6,17 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#ifdef NOT_C99
+#ifdef NEED_INDEX
+#define strchr index
+#endif
+#ifdef NEED_RINDX
+#define strrchr rindex
+#endif
+#endif /* NOT_C99 */
+
 #if !defined(WIN32)
 #if !defined(__cplusplus) && !defined(__GO32__)
-#define E extern
 
 /* some old <sys/types.h> may not define off_t and size_t; if your system is
  * one of these, define them by hand below
@@ -80,20 +88,20 @@ typedef long off_t;
 #undef random
 #endif
 #if !defined(__SC__) && !defined(LINUX)
-E long random(void);
+extern long random(void);
 #endif
 #if (!defined(SUNOS4) && !defined(bsdi) && !defined(__FreeBSD__)) \
     || defined(RANDOM)
-E void srandom(unsigned int);
+extern void srandom(unsigned int);
 #else
 #if !defined(bsdi) && !defined(__FreeBSD__)
-E int srandom(unsigned int);
+extern int srandom(unsigned int);
 #endif
 #endif
 #else
 #if defined(MACOS)
-E long lrand48(void);
-E void srand48(long);
+extern long lrand48(void);
+extern void srand48(long);
 #else
 extern long lrand48(void);
 extern void srand48(long);
@@ -103,7 +111,7 @@ extern void srand48(long);
 #if !defined(BSD) || defined(ultrix)
 /* real BSD wants all these to return int */
 #ifndef MICRO
-E void exit(int);
+extern void exit(int);
 #endif /* MICRO */
 /* compensate for some CSet/2 bogosities */
 #if defined(OS2_CSET2) && defined(OS2_CSET2_VER_2)
@@ -122,30 +130,30 @@ E void exit(int);
 #if defined(__STDC__) || !defined(FLEX_SCANNER)
 #ifndef OS2_CSET2
 #ifndef MONITOR_HEAP
-E void free(genericptr_t);
+extern void free(genericptr_t);
 #endif
 #endif
 #endif
 #if !defined(__SASC_60) && !defined(_DCC) && !defined(__SC__)
 #if defined(AMIGA) && !defined(AZTEC_50) && !defined(__GNUC__)
-E int perror(const char *);
+extern int perror(const char *);
 #else
 #if !(defined(ULTRIX_PROTO) && defined(__GNUC__))
-E void perror(const char *);
+extern void perror(const char *);
 #endif
 #endif
 #endif
 #endif
 #ifndef NeXT
 #ifdef POSIX_TYPES
-E void qsort(genericptr_t, size_t, size_t,
+extern void qsort(genericptr_t, size_t, size_t,
              int (*)(const genericptr, const genericptr));
 #else
 #if defined(BSD) || defined(ULTRIX)
-E int qsort();
+extern int qsort();
 #else
 #if !defined(LATTICE) && !defined(AZTEC_50)
-E void qsort(genericptr_t, size_t, size_t,
+extern void qsort(genericptr_t, size_t, size_t,
              int (*)(const genericptr, const genericptr));
 #endif
 #endif
@@ -158,21 +166,21 @@ E void qsort(genericptr_t, size_t, size_t,
 
 #ifdef ULTRIX
 #ifdef ULTRIX_PROTO
-E int lseek(int, off_t, int);
+extern int lseek(int, off_t, int);
 #else
-E long lseek(int, off_t, int);
+extern long lseek(int, off_t, int);
 #endif
 /* Ultrix 3.0 man page mistakenly says it returns an int. */
-E int write(int, char *, int);
-E int link(const char *, const char *);
+extern int write(int, char *, int);
+extern int link(const char *, const char *);
 #else /*!ULTRIX*/
 #if !(defined(bsdi) || defined(VMS))
-E long lseek(int, long, int);
+extern long lseek(int, long, int);
 #if defined(POSIX_TYPES) || defined(__TURBOC__)
-E int write(int, const void *, unsigned);
+extern int write(int, const void *, unsigned);
 #else
 #ifndef __MWERKS__ /* metrowerks defines write via universal headers */
-E int write(int, genericptr_t, unsigned);
+extern int write(int, genericptr_t, unsigned);
 #endif
 #endif /*?(POSIX_TYPES || __TURBOC__)*/
 #endif /*!(bsdi || VMS)*/
@@ -180,13 +188,13 @@ E int write(int, genericptr_t, unsigned);
 
 #ifdef OS2_CSET2 /* IBM CSet/2 */
 #ifdef OS2_CSET2_VER_1
-E int unlink(char *);
+extern int unlink(char *);
 #else
-E int unlink(const char *); /* prototype is ok in ver >= 2 */
+extern int unlink(const char *); /* prototype is ok in ver >= 2 */
 #endif
 #else
 #ifndef __SC__
-E int unlink(const char *);
+extern int unlink(const char *);
 #endif
 #endif
 
@@ -194,111 +202,111 @@ E int unlink(const char *);
 
 #ifdef MAC
 #ifndef __CONDITIONALMACROS__          /* universal headers */
-E int close(int);             /* unistd.h */
-E int read(int, char *, int); /* unistd.h */
-E int chdir(const char *);    /* unistd.h */
-E char *getcwd(char *, int);  /* unistd.h */
+extern int close(int);             /* unistd.h */
+extern int read(int, char *, int); /* unistd.h */
+extern int chdir(const char *);    /* unistd.h */
+extern char *getcwd(char *, int);  /* unistd.h */
 #endif
 
-E int open(const char *, int);
+extern int open(const char *, int);
 #endif
 
 #if defined(MICRO)
-E int close(int);
+extern int close(int);
 #ifndef __EMX__
-E int read(int, genericptr_t, unsigned int);
+extern int read(int, genericptr_t, unsigned int);
 #endif
-E int open(const char *, int, ...);
-E int dup2(int, int);
-E int setmode(int, int);
-E int kbhit(void);
+extern int open(const char *, int, ...);
+extern int dup2(int, int);
+extern int setmode(int, int);
+extern int kbhit(void);
 #if !defined(_DCC)
 #if defined(__TURBOC__)
-E int chdir(const char *);
+extern int chdir(const char *);
 #else
 #ifndef __EMX__
-E int chdir(char *);
+extern int chdir(char *);
 #endif
 #endif
 #ifndef __EMX__
-E char *getcwd(char *, int);
+extern char *getcwd(char *, int);
 #endif
 #endif /* !_DCC */
 #endif
 
 #ifdef ULTRIX
-E int close(int);
-E int atoi(const char *);
-E long atol(const char *);
-E int chdir(const char *);
+extern int close(int);
+extern int atoi(const char *);
+extern long atol(const char *);
+extern int chdir(const char *);
 #if !defined(ULTRIX_CC20) && !defined(__GNUC__)
-E int chmod(const char *, int);
-E mode_t umask(int);
+extern int chmod(const char *, int);
+extern mode_t umask(int);
 #endif
-E int read(int, genericptr_t, unsigned);
+extern int read(int, genericptr_t, unsigned);
 /* these aren't quite right, but this saves including lots of system files */
-E int stty(int, genericptr_t);
-E int gtty(int, genericptr_t);
-E int ioctl(int, int, char *);
-E int isatty(int); /* 1==yes, 0==no, -1==error */
+extern int stty(int, genericptr_t);
+extern int gtty(int, genericptr_t);
+extern int ioctl(int, int, char *);
+extern int isatty(int); /* 1==yes, 0==no, -1==error */
 #include <sys/file.h>
 #if defined(ULTRIX_PROTO) || defined(__GNUC__)
-E int fork(void);
+extern int fork(void);
 #else
-E long fork(void);
+extern long fork(void);
 #endif
 #endif /* ULTRIX */
 
 #ifdef VMS
 #ifndef abs
-E int abs(int);
+extern int abs(int);
 #endif
-E int atexit(void (*)(void));
-E int atoi(const char *);
-E long atol(const char *);
-E int chdir(const char *);
-E int chown(const char *, unsigned, unsigned);
+extern int atexit(void (*)(void));
+extern int atoi(const char *);
+extern long atol(const char *);
+extern int chdir(const char *);
+extern int chown(const char *, unsigned, unsigned);
 #ifdef __DECC_VER
-E int chmod(const char *, mode_t);
-E mode_t umask(mode_t);
+extern int chmod(const char *, mode_t);
+extern mode_t umask(mode_t);
 #else
-E int chmod(const char *, int);
-E int umask(int);
+extern int chmod(const char *, int);
+extern int umask(int);
 #endif
 /* #include <unixio.h> */
-E int close(int);
-E int creat(const char *, unsigned, ...);
-E int delete(const char *);
-E int fstat(/*_ int, stat_t * _*/);
-E int isatty(int); /* 1==yes, 0==no, -1==error */
-E off_t lseek(int, off_t, int);
-E int open(const char *, int, unsigned, ...);
-E int read(int, genericptr_t, unsigned);
-E int rename(const char *, const char *);
-E int stat(/*_ const char *,stat_t * _*/);
-E int write(int, const genericptr, unsigned);
+extern int close(int);
+extern int creat(const char *, unsigned, ...);
+extern int delete(const char *);
+extern int fstat(/*_ int, stat_t * _*/);
+extern int isatty(int); /* 1==yes, 0==no, -1==error */
+extern off_t lseek(int, off_t, int);
+extern int open(const char *, int, unsigned, ...);
+extern int read(int, genericptr_t, unsigned);
+extern int rename(const char *, const char *);
+extern int stat(/*_ const char *,stat_t * _*/);
+extern int write(int, const genericptr, unsigned);
 #endif
 
 #endif /* __SASC_60 */
 
 /* both old & new versions of Ultrix want these, but real BSD does not */
 #ifdef ultrix
-E void abort();
-E void bcopy();
+extern void abort();
+extern void bcopy();
 #ifdef ULTRIX
-E int system(const char *);
+extern int system(const char *);
 #ifndef _UNISTD_H_
-E int execl(const char *, ...);
+extern int execl(const char *, ...);
 #endif
 #endif
 #endif
 #ifdef MICRO
-E void abort(void);
-E void _exit(int);
-E int system(const char *);
+extern void abort(void);
+extern void _exit(int);
+extern int system(const char *);
 #endif
 #if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long fork(void);
+extern long fork(void);
 #endif
 
 #ifdef POSIX_TYPES
@@ -309,89 +317,89 @@ E long fork(void);
 #if defined(NHSTDC) || (defined(VMS) && !defined(ANCIENT_VAXC))
 #if !defined(_AIX32) && !(defined(SUNOS4) && defined(__STDC__))
 /* Solaris unbundled cc (acc) */
-E int memcmp(const void *, const void *, size_t);
-E void *memcpy(void *, const void *, size_t);
-E void *memset(void *, int, size_t);
+extern int memcmp(const void *, const void *, size_t);
+extern void *memcpy(void *, const void *, size_t);
+extern void *memset(void *, int, size_t);
 #endif
 #else
 #ifndef memcmp /* some systems seem to macro these back to b*() */
-E int memcmp();
+extern int memcmp();
 #endif
 #ifndef memcpy
-E char *memcpy();
+extern char *memcpy();
 #endif
 #ifndef memset
-E char *memset();
+extern char *memset();
 #endif
 #endif
 #else
 #ifdef HPUX
-E int memcmp(char *, char *, int);
-E void *memcpy(char *, char *, int);
-E void *memset(char *, int, int);
+extern int memcmp(char *, char *, int);
+extern void *memcpy(char *, char *, int);
+extern void *memset(char *, int, int);
 #endif
 #endif
 #endif /* POSIX_TYPES */
 
 #if defined(MICRO) && !defined(LATTICE)
 #if defined(TOS) && defined(__GNUC__)
-E int memcmp(const void *, const void *, size_t);
-E void *memcpy(void *, const void *, size_t);
-E void *memset(void *, int, size_t);
+extern int memcmp(const void *, const void *, size_t);
+extern void *memcpy(void *, const void *, size_t);
+extern void *memset(void *, int, size_t);
 #else
 #if defined(AZTEC_50) || defined(NHSTDC)
-E int memcmp(const void *, const void *, size_t);
-E void *memcpy(void *, const void *, size_t);
-E void *memset(void *, int, size_t);
+extern int memcmp(const void *, const void *, size_t);
+extern void *memcpy(void *, const void *, size_t);
+extern void *memset(void *, int, size_t);
 #else
-E int memcmp(char *, char *, unsigned int);
-E char *memcpy(char *, char *, unsigned int);
-E char *memset(char *, int, int);
+extern int memcmp(char *, char *, unsigned int);
+extern char *memcpy(char *, char *, unsigned int);
+extern char *memset(char *, int, int);
 #endif /* AZTEC_50 || NHSTDC */
 #endif /* TOS */
 #endif /* MICRO */
 
 #if defined(BSD) && defined(ultrix) /* i.e., old versions of Ultrix */
-E void sleep();
+extern void sleep();
 #endif
 #if defined(ULTRIX) || defined(SYSV)
 extern unsigned int sleep(unsigned int);
 #endif
 #if defined(HPUX)
-E unsigned int sleep(unsigned int);
+extern unsigned int sleep(unsigned int);
 #endif
 #ifdef VMS
-E int sleep(unsigned);
+extern int sleep(unsigned);
 #endif
 
-E char *getenv(const char *);
+extern char *getenv(const char *);
 extern char *getlogin(void);
 #if defined(HPUX) && !defined(_POSIX_SOURCE)
-E long getuid(void);
-E long getgid(void);
-E long getpid(void);
+extern long getuid(void);
+extern long getgid(void);
+extern long getpid(void);
 #else
 #ifdef POSIX_TYPES
-E pid_t getpid(void);
-E uid_t getuid(void);
-E gid_t getgid(void);
+extern pid_t getpid(void);
+extern uid_t getuid(void);
+extern gid_t getgid(void);
 #ifdef VMS
-E pid_t getppid(void);
+extern pid_t getppid(void);
 #endif
 #else          /*!POSIX_TYPES*/
 #ifndef getpid /* Borland C defines getpid() as a macro */
-E int getpid(void);
+extern int getpid(void);
 #endif
 #ifdef VMS
-E int getppid(void);
-E unsigned getuid(void);
-E unsigned getgid(void);
+extern int getppid(void);
+extern unsigned getuid(void);
+extern unsigned getgid(void);
 #endif
 #if defined(ULTRIX) && !defined(_UNISTD_H_)
-E unsigned getuid(void);
-E unsigned getgid(void);
-E int setgid(int);
-E int setuid(int);
+extern unsigned getuid(void);
+extern unsigned getgid(void);
+extern int setgid(int);
+extern int setuid(int);
 #endif
 #endif /*?POSIX_TYPES*/
 #endif /*?(HPUX && !_POSIX_SOURCE)*/
@@ -408,31 +416,33 @@ E int setuid(int);
 #if (defined(ULTRIX) || defined(NeXT)) && defined(__GNUC__)
 #include <strings.h>
 #else
-E char *strcpy(char *, const char *);
-E char *strncpy(char *, const char *, size_t);
-E char *strcat(char *, const char *);
-E char *strncat(char *, const char *, size_t);
-E char *strpbrk(const char *, const char *);
+extern char *strcpy(char *, const char *);
+extern char *strncpy(char *, const char *, size_t);
+extern char *strcat(char *, const char *);
+extern char *strncat(char *, const char *, size_t);
+extern char *strpbrk(const char *, const char *);
 
+#ifdef NOT_C99
 #if defined(SYSV) || defined(MICRO) || defined(MAC) || defined(VMS) \
     || defined(HPUX)
-E char *strchr(const char *, int);
-E char *strrchr(const char *, int);
+extern char *strchr(const char *, int);
+extern char *strrchr(const char *, int);
 #else /* BSD */
-E char *index(const char *, int);
-E char *rindex(const char *, int);
+extern char *index(const char *, int);
+extern char *rindex(const char *, int);
+#endif
 #endif
 
-E int strcmp(const char *, const char *);
-E int strncmp(const char *, const char *, size_t);
+extern int strcmp(const char *, const char *);
+extern int strncmp(const char *, const char *, size_t);
 #if defined(MICRO) || defined(MAC) || defined(VMS)
-E size_t strlen(const char *);
+extern size_t strlen(const char *);
 #else
 #ifdef HPUX
-E unsigned int strlen(char *);
+extern unsigned int strlen(char *);
 #else
 #if !(defined(ULTRIX_PROTO) && defined(__GNUC__))
-E int strlen(const char *);
+extern int strlen(const char *);
 #endif
 #endif /* HPUX */
 #endif /* MICRO */
@@ -440,9 +450,11 @@ E int strlen(const char *);
 
 #endif /* !_XtIntrinsic_h_ && !POSIX_TYPES */
 
+#ifdef NOT_C99
 #if defined(ULTRIX) && defined(__GNUC__)
-E char *index(const char *, int);
-E char *rindex(const char *, int);
+extern char *index(const char *, int);
+extern char *rindex(const char *, int);
+#endif
 #endif
 
 /* Old varieties of BSD have char *sprintf().
@@ -470,10 +482,10 @@ E char *rindex(const char *, int);
 
 #ifndef SPRINTF_PROTO
 #if defined(POSIX_TYPES) || defined(DGUX) || defined(NeXT) || !defined(BSD)
-E int sprintf(char *, const char *, ...);
+extern int sprintf(char *, const char *, ...);
 #else
 #define OLD_SPRINTF
-E char *sprintf();
+extern char *sprintf();
 #endif
 #endif
 #ifdef SPRINTF_PROTO
@@ -486,9 +498,9 @@ E char *sprintf();
 #if !defined(SVR4) && !defined(apollo)
 #if !(defined(ULTRIX_PROTO) && defined(__GNUC__))
 #if !(defined(SUNOS4) && defined(__STDC__)) /* Solaris unbundled cc (acc) */
-E int vsprintf(char *, const char *, va_list);
-E int vfprintf(FILE *, const char *, va_list);
-E int vprintf(const char *, va_list);
+extern int vsprintf(char *, const char *, va_list);
+extern int vfprintf(FILE *, const char *, va_list);
+extern int vprintf(const char *, va_list);
 #endif
 #endif
 #endif
@@ -510,52 +522,50 @@ E int vprintf(const char *, va_list);
 #endif
 
 #ifdef MICRO
-E int tgetent(const char *, const char *);
-E void tputs(const char *, int, int (*)(void));
-E int tgetnum(const char *);
-E int tgetflag(const char *);
-E char *tgetstr(const char *, char **);
-E char *tgoto(const char *, int, int);
+extern int tgetent(const char *, const char *);
+extern void tputs(const char *, int, int (*)(void));
+extern int tgetnum(const char *);
+extern int tgetflag(const char *);
+extern char *tgetstr(const char *, char **);
+extern char *tgoto(const char *, int, int);
 #else
 #if !(defined(HPUX) && defined(_POSIX_SOURCE))
-E int tgetent(char *, const char *);
+extern int tgetent(char *, const char *);
 extern void tputs(const char *, int, int (*)(int));
 #endif
-E int tgetnum(const char *);
-E int tgetflag(const char *);
-E char *tgetstr(const char *, char **);
-E char *tgoto(const char *, int, int);
+extern int tgetnum(const char *);
+extern int tgetflag(const char *);
+extern char *tgetstr(const char *, char **);
+extern char *tgoto(const char *, int, int);
 #endif
 
 #if defined(ALLOC_C) || defined(MAKEDEFS_C) || defined(MDLIB_C)
-E genericptr_t malloc(size_t);
-E genericptr_t realloc(genericptr_t, size_t);
+extern genericptr_t malloc(size_t);
+extern genericptr_t realloc(genericptr_t, size_t);
 #endif
 
 /* time functions */
 
 #ifdef NEED_TIME_DECL
-E time_t time(time_t *);
+extern time_t time(time_t *);
 #endif
 #ifdef NEED_LOCALTIME_DECL
-E struct tm *localtime(const time_t *);
+extern struct tm *localtime(const time_t *);
 #endif
 #ifdef NEED_CTIME_DECL
-E char *ctime(const time_t *);
+extern char *ctime(const time_t *);
 #endif
 
 #ifdef MICRO
 #ifdef abs
 #undef abs
 #endif
-E int abs(int);
+extern int abs(int);
 #ifdef atoi
 #undef atoi
 #endif
-E int atoi(const char *);
+extern int atoi(const char *);
 #endif
-
-#undef E
 
 #endif /*  !__cplusplus && !__GO32__ */
 #endif /* WIN32 */
