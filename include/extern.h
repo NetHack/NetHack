@@ -1559,6 +1559,7 @@ extern int max_mon_load(struct monst *);
 extern boolean can_touch_safely(struct monst *, struct obj *);
 extern int can_carry(struct monst *, struct obj *);
 extern long mon_allowflags(struct monst *);
+extern boolean m_in_air(struct monst *);
 extern int mfndpos(struct monst *, coord *, long *, long);
 extern boolean monnear(struct monst *, coordxy, coordxy);
 extern void dmonsfree(void);

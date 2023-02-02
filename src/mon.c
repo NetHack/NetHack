@@ -153,7 +153,10 @@ sanity_check_single_mon(
         if (ceiling_hider(mptr)
             /* normally !accessible would be overridable with passes_walls,
                but not for hiding on the ceiling */
-            && (!has_ceiling(&u.uz) || !accessible(mx, my)))
+            && (!has_ceiling(&u.uz) ||
+                !(levl[mx][my].typ == POOL
+                  || levl[mx][my].typ == MOAT
+                  || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
                                            : "in solid stone",
@@ -1854,6 +1857,16 @@ mon_allowflags(struct monst* mtmp)
     return allowflags;
 }
 
+/* return TRUE if monster is up in the air/on the ceiling */
+boolean
+m_in_air(struct monst *mtmp)
+{
+    return (is_flyer(mtmp->data)
+            || is_floater(mtmp->data)
+            || (is_clinger(mtmp->data)
+                && has_ceiling(&u.uz) && mtmp->mundetected));
+}
+
 /* return number of acceptable neighbour positions */
 int
 mfndpos(
@@ -1881,11 +1894,11 @@ mfndpos(
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
-    poolok = ((!Is_waterlevel(&u.uz) && !grounded(mdat))
+    poolok = ((!Is_waterlevel(&u.uz) && m_in_air(mon))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be
        simplified, but then adding another floater would be error prone */
-    lavaok = (!grounded(mdat) || likes_lava(mdat));
+    lavaok = (m_in_air(mon) || likes_lava(mdat));
     if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
         lavaok = FALSE;
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
