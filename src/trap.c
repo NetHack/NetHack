@@ -1097,7 +1097,8 @@ trapeffect_dart_trap(
             otmp->opoisoned = 1;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(7, dmgval(otmp, &gy.youmonst), &otmp, "little dart")) {
+        } else if (thitu(7, dmgval(otmp, &gy.youmonst),
+                         &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
                     poisoned("dart", A_CON, "little dart",
@@ -1716,10 +1717,10 @@ trapeffect_pit(
                        plunged
                        ? "deliberately plunged into a pit of iron spikes"
                        : (conj_pit || deliberate)
-                       ? "stepped into a pit of iron spikes"
-                       : adj_pit
-                       ? "stumbled into a pit of iron spikes"
-                       : "fell into a pit of iron spikes",
+                         ? "stepped into a pit of iron spikes"
+                         : adj_pit
+                           ? "stumbled into a pit of iron spikes"
+                           : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                     poisoned("spikes", A_STR,
@@ -2650,7 +2651,7 @@ choose_trapnote(struct trap *ttmp)
 }
 
 static int
-steedintrap(struct trap* trap, struct obj* otmp)
+steedintrap(struct trap *trap, struct obj *otmp)
 {
     struct monst *steed = u.usteed;
     int tt;
@@ -3306,9 +3307,9 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                                 || (tt == HOLE && !mindless(mptr)));
 
         if (mtmp == u.usteed) {
-            /* true when called from dotrap, inescapable is not an option */
+            ; /* true when called from dotrap, inescapable is not an option */
         } else if (Sokoban && (is_pit(tt) || is_hole(tt)) && !trap->madeby_u) {
-            /* nothing here, the trap effects will handle messaging */
+            ; /* nothing here, the trap effects will handle messaging */
         } else if (!forcetrap) {
             if (floor_trigger(tt) && check_in_air(mtmp, mintrapflags)) {
                 return Trap_Effect_Finished;
@@ -3327,6 +3328,18 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
             setmangry(mtmp, FALSE);
 
         trap_result = trapeffect_selector(mtmp, trap, mintrapflags);
+
+        /* mtmp can't stay hiding under an object if trapped in non-pit
+           (mtmp hiding under object at armed bear trap loccation, hero
+           zaps wand of locking or spell of wizard lock at spot triggering
+           the trap and trapping mtmp there) */
+        if (!DEADMONSTER(mtmp) && mtmp->mtrapped) {
+            boolean alreadyspotted = canspotmon(mtmp);
+
+            maybe_unhide_at(mtmp->mx, mtmp->my);
+            if (!alreadyspotted && canseemon(mtmp))
+                pline("%s appears.", Amonnam(mtmp));
+        }
     }
     return trap_result;
 }

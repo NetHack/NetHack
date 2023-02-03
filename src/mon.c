@@ -161,8 +161,7 @@ sanity_check_single_mon(
                        !has_ceiling(&u.uz) ? "without ceiling"
                                            : "in solid stone",
                        msg);
-        if (mtmp->mtrapped && (t = t_at(mx, my)) != 0
-            && !(t->ttyp == PIT || t->ttyp == SPIKED_PIT))
+        if (mtmp->mtrapped && (t = t_at(mx, my)) != 0 && !is_pit(t->ttyp))
             impossible("hiding while trapped in a non-pit (%s)", msg);
     } else if (M_AP_TYPE(mtmp) != M_AP_NOTHING) {
         boolean is_mimic = (mptr->mlet == S_MIMIC);
@@ -4115,7 +4114,7 @@ maybe_unhide_at(coordxy x, coordxy y)
     if ((mtmp = m_at(x, y)) == 0 && u_at(x, y))
         mtmp = &gy.youmonst;
     if (mtmp && mtmp->mundetected
-        && ((hides_under(mtmp->data) && !OBJ_AT(x, y))
+        && ((hides_under(mtmp->data) && (!OBJ_AT(x, y) || mtmp->mtrapped))
             || (mtmp->data->mlet == S_EEL && !is_pool(x, y))))
         (void) hideunder(mtmp);
 }
@@ -4129,11 +4128,11 @@ hideunder(struct monst *mtmp)
     coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
     if (mtmp == u.ustuck) {
-        ; /* can't hide if holding you or held by you */
+        ; /* undetected==FALSE; can't hide if holding you or held by you */
     } else if (is_u ? (u.utrap && u.utraptype != TT_PIT)
-                    : (mtmp->mtrapped && (t = t_at(x, y)) != 0
-                       && !is_pit(t->ttyp))) {
-        ; /* can't hide while stuck in a non-pit trap */
+                    : (mtmp->mtrapped
+                       && (t = t_at(x, y)) != 0 && !is_pit(t->ttyp))) {
+        ; /* undetected==FALSE; can't hide while stuck in a non-pit trap */
     } else if (mtmp->data->mlet == S_EEL) {
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
     } else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
@@ -4200,7 +4199,8 @@ mon_animal_list(boolean construct)
         /* if (n == 0) animal_temp[n++] = NON_PM; */
 
         ga.animal_list = (short *) alloc(n * sizeof *ga.animal_list);
-        (void) memcpy((genericptr_t) ga.animal_list, (genericptr_t) animal_temp,
+        (void) memcpy((genericptr_t) ga.animal_list,
+                      (genericptr_t) animal_temp,
                       n * sizeof *ga.animal_list);
         ga.animal_list_count = n;
     } else { /* release */

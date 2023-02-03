@@ -4884,7 +4884,7 @@ mhitm_knockback(
 
         set_apparxy(magr); /* update magr's idea of where you are */
         if (!Stunned && !rn2(4))
-            make_stunned((HStun & TIMEOUT) + (long) rnd(2) + 1L, TRUE);
+            make_stunned((long) rn1(2, 2), TRUE); /* 0..1 + 2 => 2..3 */
     } else {
         coordxy x = u_agr ? u.ux : magr->mx;
         coordxy y = u_agr ? u.uy : magr->my;
