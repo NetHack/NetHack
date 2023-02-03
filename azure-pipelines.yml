@@ -223,7 +223,7 @@ steps:
     sh setup.sh hints/macos.370
     cd ../..
     make fetch-lua
-    make all
+    make WANT_MACSOUND=1 all
   condition: eq( variables['Agent.OS'], 'Darwin' )
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building mac full build'
