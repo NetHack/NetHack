@@ -991,7 +991,7 @@ decl.o: decl.c $(HACK_H)
 detect.o: detect.c $(HACK_H) ../include/artifact.h
 dig.o: dig.c $(HACK_H)
 display.o: display.c $(HACK_H)
-dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h
+dlb.o: dlb.c $(CONFIG_H) ../include/dlb.h ../include/patchlevel.h
 do.o: do.c $(HACK_H) ../include/lev.h
 do_name.o: do_name.c $(HACK_H)
 do_wear.o: do_wear.c $(HACK_H)
@@ -1058,7 +1058,7 @@ rect.o: rect.c $(HACK_H)
 region.o: region.c $(HACK_H) ../include/lev.h
 restore.o: restore.c $(HACK_H) ../include/lev.h ../include/tcap.h
 rip.o: rip.c $(HACK_H)
-rnd.o: rnd.c $(HACK_H)
+rnd.o: rnd.c $(HACK_H) ../include/isaac64.h ../include/integer.h
 role.o: role.c $(HACK_H)
 rumors.o: rumors.c $(HACK_H) ../include/lev.h ../include/dlb.h
 save.o: save.c $(HACK_H) ../include/lev.h
