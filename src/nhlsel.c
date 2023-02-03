@@ -12,6 +12,7 @@ static struct selectionvar *l_selection_push_new(lua_State *);
 /* lua_CFunction prototypes */
 static int l_selection_new(lua_State *);
 static int l_selection_clone(lua_State *);
+static int l_selection_numpoints(lua_State *);
 static int l_selection_getpoint(lua_State *);
 static int l_selection_setpoint(lua_State *);
 static int l_selection_filter_percent(lua_State *);
@@ -192,6 +193,27 @@ l_selection_setpoint(lua_State *L)
                        gc.coder ? gc.coder->croom : NULL, crd);
     selection_setpoint(x, y, sel, val);
     lua_settop(L, 1);
+    return 1;
+}
+
+/* local numpoints = selection.numpoints(sel); */
+static int
+l_selection_numpoints(lua_State *L)
+{
+    struct selectionvar *sel = l_selection_check(L, 1);
+    coordxy x, y;
+    int ret = 0;
+    NhRect rect;
+
+    selection_getbounds(sel, &rect);
+
+    for (x = rect.lx; x <= rect.hx; x++)
+        for (y = rect.ly; y <= rect.hy; y++)
+            if (selection_getpoint(x, y, sel))
+                ret++;
+
+    lua_settop(L, 0);
+    lua_pushinteger(L, ret);
     return 1;
 }
 
@@ -911,6 +933,7 @@ static const struct luaL_Reg l_selection_methods[] = {
     { "clone", l_selection_clone },
     { "get", l_selection_getpoint },
     { "set", l_selection_setpoint },
+    { "numpoints", l_selection_numpoints },
     { "negate", l_selection_not },
     { "percentage", l_selection_filter_percent },
     { "rndcoord", l_selection_rndcoord },

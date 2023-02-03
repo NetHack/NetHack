@@ -2973,7 +2973,7 @@ create_particular_parse(
         d->saddled = TRUE;
         (void) memset(tmpp, ' ', sizeof "saddled " - 1);
     }
-    /* state -- limited number of possibilitie supported */
+    /* state -- limited number of possibilities supported */
     if ((tmpp = strstri(bufp, "sleeping ")) != 0) {
         d->sleeping = TRUE;
         (void) memset(tmpp, ' ', sizeof "sleeping " - 1);

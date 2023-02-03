@@ -182,6 +182,22 @@ BBBBBBB]], contents = function()
    des.monster(mons[math.random(1, #mons)], 4,4);
       end });
    end,
+
+   function ()
+      des.map({ halign = rnd_halign(), valign = rnd_valign(), map = [[
+.........
+.}}}}}}}.
+.}}---}}.
+.}--.--}.
+.}|...|}.
+.}--.--}.
+.}}---}}.
+.}}}}}}}.
+.........
+]], contents = function(rm)
+   des.monster("L",04,04)
+      end })
+   end,
 };
 
 function rnd_hell_prefab()

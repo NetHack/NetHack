@@ -265,6 +265,7 @@ struct instance_flags {
     boolean perm_invent;      /* keep full inventories up until dismissed */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
+    boolean sounds;           /* master on/off switch for using soundlib */
     boolean status_updates;   /* allow updates to bottom status lines;
                                * disable to avoid excessive noise when using
                                * a screen reader (use ^X to review status) */
@@ -296,9 +297,6 @@ struct instance_flags {
     unsigned use_stone;  /* use the stone ppats */
 #endif
 #if defined(MSDOS) || defined(WIN32)
-    boolean hassound;     /* has a sound card */
-    boolean usesound;     /* use the sound card */
-    boolean usepcspeaker; /* use the pc speaker */
     boolean tile_view;
     boolean over_view;
     boolean traditional_view;

@@ -1153,6 +1153,15 @@ Example:
  local s = selection.negate();
 
 
+=== numpoints
+
+Return the number of points in the selection.
+
+Example:
+
+ local n = sel:numpoints();
+
+
 === percentage
 
 Each selected location has a percentage chance of being selected in the new selection.

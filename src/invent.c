@@ -4756,7 +4756,7 @@ useupf(struct obj *obj, long numused)
         otmp = splitobj(obj, numused);
     else
         otmp = obj;
-    if (costly_spot(otmp->ox, otmp->oy)) {
+    if (!gc.context.mon_moving && costly_spot(otmp->ox, otmp->oy)) {
         if (strchr(u.urooms, *in_rooms(otmp->ox, otmp->oy, 0)))
             addtobill(otmp, FALSE, FALSE, FALSE);
         else

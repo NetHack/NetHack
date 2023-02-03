@@ -1025,11 +1025,11 @@ initoptions()			   /* read the resource file */
 init_nhwindows()		   /* initialize the window system */
 process_options(argc, argv)	   /* process command line options or equiv */
 if(save file is present) {
-  display_gamewindows()		   /* create & display the game windows */
+  init_sound_and_display_gamewindows() /* init sound, create & display */
   dorestore()			   /* restore old game; pline()s are OK */
 } else {
   player_selection()		   /* select a player type using a window */
-  display_gamewindows()		   /* create & display the game windows */
+  init_sound_and_display_gamewindows() /* init sound, create & display  */
 }
 pline("Hello, welcome...");
 
@@ -1044,9 +1044,10 @@ ini_routines have side effects that need to be undone, the old ini_routine (if
 any) will be called with an argument of WININIT_UNDO before the new
 ini_routine (if any) is called (with WININIT).
 
-Display_gamewindows() is a common routine that displays the two standard
-game windows (WIN_MESSAGE, WIN_MAP), and the status display.  It is normally
-called just before the "Hello, welcome" message.
+Init_sound_and_display_gamewindows() is a common routine that initializes
+the soundlib, then displays the standard game windows (WIN_MESSAGE, WIN_MAP,
+etc.), and the status display. It is normally called just before the
+"Hello, welcome" message.
 
 Process_options() is currently still unique to each port.  There may be need
 in the future to make it possible to replace this on a per window-port basis.

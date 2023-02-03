@@ -43,6 +43,8 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
+
+#ifdef RCWAV
 se_squeak_A WAVE "se_squeak_A.wav"
 se_squeak_B WAVE "se_squeak_B.wav"
 se_squeak_B_flat WAVE "se_squeak_B_flat.wav"
@@ -103,5 +105,6 @@ sound_Wooden_Harp_D WAVE "sound_Wooden_Harp_D.wav"
 sound_Wooden_Harp_E WAVE "sound_Wooden_Harp_E.wav"
 sound_Wooden_Harp_F WAVE "sound_Wooden_Harp_F.wav"
 sound_Wooden_Harp_G WAVE "sound_Wooden_Harp_G.wav"
+#endif
 
 /*console.rc*/"

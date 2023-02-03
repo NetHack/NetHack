@@ -22,7 +22,6 @@ static int pet_ranged_attk(struct monst *);
 static long score_targ(struct monst *, struct monst *);
 static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy,
                                   coordxy);
-static boolean could_reach_item(struct monst *, coordxy, coordxy);
 
 /* pick a carried item for pet to drop */
 struct obj *
@@ -1290,7 +1289,7 @@ dog_move(register struct monst *mtmp,
 }
 
 /* check if a monster could pick up objects from a location */
-static boolean
+boolean
 could_reach_item(struct monst *mon, coordxy nx, coordxy ny)
 {
     if ((!is_pool(nx, ny) || is_swimmer(mon->data))

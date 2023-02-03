@@ -1851,11 +1851,6 @@ joust(struct monst *mon, /* target */
 
 /*
  * Send in a demon pet for the hero.  Exercise wisdom.
- *
- * This function used to be inline to damageum(), but the Metrowerks compiler
- * (DR4 and DR4.5) screws up with an internal error 5 "Expression Too
- * Complex."
- * Pulling it out makes it work.
  */
 static void
 demonpet(void)
@@ -4888,7 +4883,7 @@ mhitm_knockback(
             hurtle(u.dx, u.dy, rnd(2), FALSE);
 
         set_apparxy(magr); /* update magr's idea of where you are */
-        if (!rn2(4))
+        if (!Stunned && !rn2(4))
             make_stunned((HStun & TIMEOUT) + (long) rnd(2) + 1L, TRUE);
     } else {
         coordxy x = u_agr ? u.ux : magr->mx;

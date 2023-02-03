@@ -1,0 +1,543 @@
+NetHack 3.7  sound.txt	$NHDT-Date: $  $NHDT-Branch: $:$NHDT-Revision: $
+
+Introduction
+
+This file documents the support for various sound library integration
+interface, or just soundlib for short.
+
+The soundlib support is through a standard interface, separating the
+main NetHack code from soundlib-specific code.  The implementation
+supports multiple soundlib systems in the same binary.  Even if you only
+wish to support one soundlib, you will need to follow the instructions
+to end up with a compiled binary
+
+Copyright 2023, Michael Allison, with acknowledgement and thanks to
+David Cohrs for window.txt that provided the inspiration for the layout
+of this document.
+
+NetHack may be freely redistributed.  See license for details.
+
+Contents:
+	I.    Sound trigger types and terminology
+	II.   Interface Specification
+	III.  Global variables
+	IV.   Other related routines
+	V.    Game Startup and Soundlib Activation Sequencing
+	VI.   Conventions
+	VII.  Implementation and Multiple Soundlib Support
+
+I.  Sound Trigger Types and Terminology
+
+There are 4 distinct types of sound sound_triggers used by NetHack.
+
+    SOUND_TRIGGER_USERSOUNDS      User-specified sounds that play based
+                                  on config file entries that identify a
+                                  regular expression to match against
+                                  message window text, and identify an
+                                  external sound file to load in response.
+                                  The sound interface function pointer
+                                  used to invoke it:
+
+                                  void (*sound_play_usersound)(char *filename,
+                                               int32_t volume, int32_t idx);
+
+    SOUND_TRIGGER_HEROMUSIC      Invoked by the core when the in-game hero,
+                                 or perhaps another creature, is playing
+                                 a tune on an instrument. The sound interface
+                                 function pointer used to invoke it:
+
+                                 void (*sound_hero_playnotes)
+                                       (int32_t instrument, const char *str,
+                                        int32_t volume);
+
+    SOUND_TRIGGER_ACHIEVEMENTS   Invoked by the core when an in-game
+                                 achievement is reached. The soundlib routines
+                                 could play appropriate theme or mood music in
+                                 response.
+                                 There needs to be a way to map each
+                                 achievement to a specific external
+                                 sound file or resource. The sound
+                                 interface function pointer used to
+                                 invoke it:
+
+                                 void (*sound_achievement)(schar, schar,
+                                                            int32_t);
+
+    SOUND_TRIGGER_SOUNDEFFECTS   Invoked by the core when something
+                                 sound-producing happens in the game. The
+                                 soundlib routines could play an appropriate
+                                 sound effect in response. They can be
+                                 public-domain or suitably licensed stock
+                                 sounds included with the
+                                 gamesource. The soundeffect must be made
+                                 available during the build process, or
+                                 (not-yet-implemented) a way to tie a
+                                 particular sound effect to a player-specified
+                                 sound samples within the player's config
+                                 file. The sound interface function
+                                 pointer used to invoke it:
+
+                                 void (*sound_soundeffect)
+                                       (char *desc, int32_t, int32_t volume);
+
+The types of sound sound_triggers supported by a particular soundlib
+implementation are specified in that library's soundlib file, which is usually
+found in sound/<library_name>/<library_name>.c (.m in the case of macound), in
+the sound_triggers field of the sound_procs struct:
+
+    struct sound_procs {
+        const char *soundname;
+        enum soundlib_ids soundlib_id;
+        unsigned long sound_triggers;
+        void (*sound_init_nhsound)(void);
+        void (*sound_exit_nhsound)(const char *reason);
+        void (*sound_achievement)(schar arg1, schar arg2, int32_t avals);
+        void (*sound_soundeffect)(char *desc, int32_t, int32_t volume);
+        void (*sound_hero_playnotes)(int32_t instrument, const char *notestr,
+              int32_t volume);
+        void (*sound_play_usersound)(char *filename, int32_t volume,
+              int32_t usidx);
+    };
+
+A sound library integration support file can implement one, two, three or
+four of the sound trigger types. The more types of sound_triggers the
+soundlib implements, the more full-featured the sound experience will be
+during the game.
+
+The values can be or'd together in the sound_triggers field initialization.
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS
+
+
+II.  Interface Specification
+
+A.  Integration routines:
+
+All functions below are void unless otherwise noted.
+
+sound_init_nhsound(void);
+
+    -- NetHack will call this function when it is ready to enable sound
+       library support. It will do that during start-up, and it might do
+       it if the player has chosen to switch soundlib options.
+
+sound_exit_nhsound(const char *reason);
+
+    -- NetHack will call this function when it wants to turn off the
+       sound library support and make it inactive. It will do that
+       when the game is ending, whether because the game is over or
+       because the player has chosen to save the game. The function
+       might also get called if the player has chosen to switch soundlib
+       options.
+
+sound_achievement(schar arg1, schar arg2, int32_t avals);
+
+    -- NetHack will call this function when it wants to invoke a sound
+       based on an achievement, or an event that has occurred in the
+       game.
+    -- arg1 will contain the achievement value used internal to the
+       game, and if it is non-zero then arg2 should be ignored.
+    -- avals may contain more specific information about the achievement
+       or event that has just occurred.
+       For internal achievements (non-zero arg1), it will be zero if
+       this is the first occurrence of that achievement, or it will be
+       non-zero if this is a repeat occurrence.
+    -- arg2 is only used when arg1 iz zero. arg2 contains event
+       identifiers for various events that occur during the game. The
+       identifiers are from the 'enum achievements_arg2' list in
+       include/sndprocs.h. It is recommended that you look them up
+       there as new ones get added periodically as the game development
+       continues. The identifiers all begin with 'sa2_'.
+       For arg2 events, avals may contain additional integer information
+       specific to that particular event. For other events, it may be
+       meaningless. Those relationships will also be documented in
+       include/sndprocs.h as they develop.
+
+sound_soundeffect(char *desc, int32_t seid, int32_t volume);
+
+    -- NetHack will call this function when it wants to invoke a particular
+       sound effect during the course of a game. The calls are typically
+       hard-coded into the NetHack sources at various appropriate points,
+       and the calls typically use the Soundeffects(desc, seid, volume)
+       macro to do so. They benefit of using the macro is that it does some
+       suitable validation checks before actually invoking the soundlib
+       function.
+    -- desc may hold a text description of the sound effect. Often this
+       field is not set, so the soundlib routine needs to be aware of
+       that and not depend on it holding a description.
+    -- The soundeffects identifiers (seid) are from the
+       'enum sound_effect_entries' list in include/sndprocs.h.
+       It is recommended that you look them up there as new ones get
+       added periodically as game development continues. The identifiers
+       all begin with 'se_'.
+
+sound_hero_playnotes(int32_t instrument, const char *notestr, int32_t volume);
+
+    -- NetHack will call this function when it wants a sequence of notes
+       (A,B,C,D,E,F,G) played, because the hero in the game, or a
+       creature in the game, is playing an instrument.
+    -- instrument specifies the instrument to use. The instrument
+       identifiers are from the 'enum instruments' list in
+       include/sndprocs.h.  It is recommended that you look them up
+       there as new ones get added periodically as game development
+       continues. The identifiers all begin with 'ins_'.
+       Side note: the underlying values associated with those enums
+       match the instrument values in some MIDI specifications. If
+       they match the values for instruments in the underlying sound
+       library or platform API, they may be able to be passed through.
+    -- The sequence of notes is in notestr. At this time, NetHack may
+       be capping the number of notes at 5, but it is not
+       recommended that the soundlib integration support functions
+       rely on that note count cap as a hard rule.
+    -- A soundlib integration support file that has SOUND_TRIGGER_HEROMUSIC
+       support is expected to play the sound at the volume specified
+       by the volume argument (1 - 100, representing percentage of
+       possible volume levels), if the underlying sound library supports
+       volume adjustments. If it doesn't, the volume argument would
+       just have to be ignored.
+
+sound_play_usersound(char *filename, int32_t volume, int32_t usidx);
+
+    -- NetHack will call this function when it wants a particular
+       external sound file played, based on a regular expression match
+       that the player has defined in their config file.
+    -- A soundlib integration support file that has SOUND_TRIGGER_USERSOUNDS
+       support is expected to play the sound file specified by the filename
+       argument.
+    -- A soundlib integration support file that has SOUND_TRIGGER_USERSOUNDS
+       support is expected to play the sound at the volume specified
+       by the volume argument (1 - 100, representing percentage of
+       possible volume levels), if the underlying sound library supports
+       volume adjustments. If it doesn't, the volume argument would
+       just have to be ignored.
+
+
+III.  Global variables
+
+The following global variables are defined in decl.c and are related to
+the soundlib support in some way. They are just being documented here,
+Some of them are expected to be used by the soundlib support file,
+particularly where the core options interface is responsible for
+setting the values.
+
+[TO BE DONE]
+
+soundprocs
+gc.chosen_soundlib
+ga.active_soundlib
+a usersound mappings reference
+
+
+IV.   Other related routines
+
+These are not part of the interface, but mentioned here for your information.
+
+assign_soundlib(soundlib_identifier)
+
+    -- Places a value into gc.chosen_soundlib as a "hint" that the
+       particular soundlib support is compiled in and thus available.
+
+activate_chosen_soundlib(void)
+
+    -- If a soundlib is already active, indicated by ga.active_soundlib
+       holding the identifier of one of the added soundlib integrations,
+       then the sound_exit_nhsound() is called to turn it off or
+       deactivate it.
+    -- The soundlib identified in gc.chosen_soundlib is activated by
+       updating ga.active_soundlib, copying the chosen interface's
+       sound_proc structure into soundprocs, and calling the
+       soundlib interface's sound_init_nhsound() function.
+
+V.   Game Start-up and Soundlib Activation Sequencing
+
+The following is the general order of calls that lead to soundlib
+activation.
+
+    1. assign_soundlib(soundlib_identifier)
+
+       The platform-specific main, or in the case of at least one
+       sound library that is integrated with the full visual/window
+       support (Qt) - the win_init_nhwindows() routine, drops
+       a hint about a supported soundlib by calling assign_soundlib.
+
+    [The window interface has already been enabled by this point,
+     meaning that its win_init_nhwindows() has already been called.
+     That's important because for at least one of the soundlibs (Qt),
+     it is the window interface becoming active, and thus initializing
+     the underlying framework that includes both display and sound,
+     that has caused assign_soundlib() to be called again to indicate
+     that its soundlib interface routines are now the preferred soundlib
+     routines to use. That will have superseded the gc.chosen_soundlib
+     value that the platform's main() may have placed there earlier
+     via its own call to assign_soundlib()]
+
+    2. init_sound_and_display_gamewindows()
+           ->  activate_chosen_soundlib() is called prior to
+               displaying the game windows.
+
+VI.  Conventions
+
+[to be done]
+
+The windsound soundlib is contained in sound/windsound, the macsound
+soundlib is contained in sound/macsound.  The files in these directories
+contain _only_ soundlib code, and may be replaced completely by other
+soundlib support.
+
+
+VII.  Implementation and Multiple Soundlib Support
+
+
+Multiple soundlib routines are supported in the same binary.
+When writing a new set of sound library integration routines
+use the following guidelines:
+
+1) Pick a unique name to identify your soundlib.  The default
+   built-in soundlib uses "nosound". Your name pick should make it
+   obvious which 3rd party sound library you are writing your
+   interface glue-code for.
+2) When declaring your soundlib interface functions, precede the
+   function names with your unique prefix.  For example,
+
+	void myprefix_init_nhsound()
+	{
+	    /* code for initializing the underlying sound library */
+	}
+
+   When/if calling one your own soundlib functions from within your
+   soundlib code (one calling another), we suggest calling the
+   prefixed version to avoid unnecessary overhead of using the
+   soundprocs function pointer.
+
+   We also suggest declaring all functions (not just the interface
+   functions) with the prefix, or declare them static, to avoid
+   unexpected overlaps with other soundlibs. The same applies to
+   file-scope data variables.
+
+3) Declare a structure, "struct sound_procs myprefix_procs", (with your
+   prefix instead of "myprefix") and fill in names of all of your
+   interface functions. All functions specified as part of the interface
+   must be present, even if they have empty function bodies.
+
+       struct sound_procs myprefix_procs = {
+           SOUNDID(myprefix),
+           SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+              | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
+           myprefix_init_nhsound,
+           myprefix_exit_nhsound,
+           myprefix_achievement,
+           myprefix_soundeffect,
+           myprefix_hero_playnotes,
+           myprefix_play_usersound,
+       };
+
+   The first entry in this structure should be the SOUNDID(myprefix)
+   where myprefix should be the name of your soundlib port.
+   After that, the next entry is the sound_triggers mask that identifies
+   what sound_triggers your soundlib will actually react to and
+   support. Don't include the sound_triggers values for functions that are
+   empty, so that the NetHack core code won't bother trying to call
+   them. The other entries are the function addresses.
+
+   Assuming that you followed the convention in (2), you can safely copy
+   the structure definition from the sample skeleton located below in
+   this document and just change the prefix from "sample" to your prefix.
+
+4) Add a new section to the 'enum soundlib_ids' in include/sndprocs.h,
+   just above the entry for 'soundlib_notused'. There are some
+   placeholders for some soundlib possibilities in there already. You
+   can skip this step if your prefix matches one of those, as long as
+   it is unused and you aren't colliding with work already done. Check
+   for a subdirectory in sounds as a reliable indicator of whether it
+   is already being used.
+
+   Enclose your new section in #ifdef preprocessor directive prefixed
+   with "SND_LIB_" (without the quotes) and the uppercase variation of
+   your soundlib name.
+
+       #ifdef SND_LIB_MYPREFIX
+           soundlib_myprefix,
+       #endif
+
+   Again, place that in the enum above the entry for 'soundlib_notused'.
+
+5) Edit mdlib.c and add an entry for your soundlib to the
+   soundlib_information soundlib_opts[] array
+   right above the final "{ 0, 0, 0, FALSE }," entry.
+
+       #ifdef SND_LIB_MYPREFIX
+            { soundlib_myprefix, "soundlib_myprefix",
+                "<url goes here>", FALSE },
+       #endif
+
+
+6) Edit include/sndprocs.h and add yours to the multiline #if defined
+   used to #define SND_LIB_INTEGRATED when none of the active soundlibs
+   and placeholders are defined.
+       #if defined(SND_LIB_QTSOUND) || defined(SND_LIB_PORTAUDIO) \
+            || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
+            || defined(SND_LIB_MINIAUDIO) || defined(SND_LIB_FMOD) \
+            || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
+            || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND) \
+            || defined(SND_LIB_MYPREFIX)
+
+       #define SND_LIB_INTEGRATED
+       [...]
+
+7) Edit sounds.c and add the extern entry for your soundlib's sound_procs
+   struct, enclosed with an #ifdef SND_LIB_MYPREFIX block.
+
+       #ifdef SND_LIB_MYPREFIX
+       extern struct sound_procs myprefix_procs;
+       #endif
+
+
+8) Also while editing sounds.c, add a reference for your myprefix_procs
+   as the last entry in the soundlib_choices[] array initializations,
+   enclosed with and #ifdef SND_LIB_MYPREFIX block.
+
+       #ifdef SND_LIB_MYPREFIX
+           { &myprefix_procs },
+       #endif
+
+9) If the soundlib you are using work across multiple (more than one)
+   platform, several files related to building for the various
+   systems and/or build tools will likely require updates in order
+   for them to be able to compile for, and link with, your soundlib
+   interface support and the underlying sound library it is meant to
+   use. This part often isn't particularly fun. The build tools are
+   all quite different, and many developers only understand the build
+   system for one platform/system better than others. It typically
+   comes down to experience and familiarity.
+
+   Don't be afraid to get assistance with unfamiliar ones.
+
+   Generally speaking, build tools need to know about:
+       - changes that are needed to include C preprocessor defines
+         for enabling the inclusion of your soundlib support on the
+         compiler command line for all NetHack files
+         ( -DSND_LIB_MYPREFIX ).
+       - changes that are needed to include header files supplied
+         by the underlying sound library, so they can be found
+         via include path updates on the compiler command line
+         ( -I../lib/myprefix/inc).
+       - changes that are needed to link in the sound library
+         itself during the linking stage of the build
+         ( -L ../lib/myprefix/lib/myprefix.lib ).
+
+   Here are some known examples of what might have to change
+   at the time of this writing:
+
+       sys/unix/hints/*
+                        These hints files might require updates to
+                        include your new soundlib addition. You can
+                        look at what was done for macsound support
+                        in sys/unix/hints/macOS.370 for inspiration.
+
+       sys/unix/NetHack.xcodeproj/project.pbxproj
+
+                        Will require updates in order to build with
+                        Xcode on macOS.
+
+       sys/windows/Makefile.nmake
+
+                        Will require updates in order to build on
+                        Windows with Visual studio nmake at the command
+                        line.
+
+       sys/windows/Makefile.mingw32
+       sys/windows/Makefile.mingw32.depend
+
+                        Will require updates in order to build on
+                        Windows with mingw32 or MSYS2 using GNU make at
+                        the command line.
+
+       sys/windows/vs/NetHackW/NetHackW.vcxproj
+
+                        Will need an <ClCompile Include="$(SndWindDir)myprefix.c" />
+                        entry added in order to build under visual
+                        studio, and additional updates to link in the
+                        underlying sound library, if it requires one.
+
+10) Look at your soundlib support file in sound/myprefix/myprefix.c
+   and make sure that all of the calls match the requirements laid out in
+   Section VI and VII.
+
+What follows is a sample soundlib interface that can be used as a
+starting template.
+
+-- snip 8< --
+/* sample.c */
+/* NetHack may be freely redistributed.  See license for details. */
+
+#include "hack.h"
+
+/*
+ * Sample sound interface for NetHack
+ *
+ * Replace 'sample' with your soundlib name in this template file.
+ * Should be placed in ../sound/sample/.
+ */
+
+static void sample_init_nhsound(void);
+static void sample_exit_nhsound(const char *);
+static void sample_achievement(schar, schar, int32_t);
+static void sample_soundeffect(char *, int32_t, int32_t);
+static void sample_hero_playnotes(int32_t, const char *, int32_t);
+static void sample_play_usersound(char *, int32_t, int32_t);
+
+struct sound_procs sample_procs = {
+    SOUNDID(sample),
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+        | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
+    sample_init_nhsound,
+    sample_exit_nhsound,
+    sample_achievement,
+    sample_soundeffect,
+    sample_hero_playnotes,
+    sample_play_usersound,
+};
+
+static void
+sample_init_nhsound(void)
+{
+    /* Initialize external sound library */
+}
+
+static void
+sample_exit_nhsound(const char *reason)
+{
+    /* Close / Terminate external sound library */
+
+}
+
+/* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
+static void
+sample_achievement(schar ach1, schar ach2, int32_t avals)
+{
+
+
+}
+
+/* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
+static void
+sample_soundeffect(char *desc, int32_t seid, int volume)
+{
+
+}
+
+/* fulfill SOUND_TRIGGER_HEROMUSIC */
+static void sample_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
+{
+
+}
+
+/* fulfill  SOUND_TRIGGER_USERSOUNDS */
+static void
+sample_play_usersound(char *filename, int volume, int usidx)
+{
+
+}
+
+/* end of sample.c */
+-- >8 --

@@ -16,6 +16,7 @@
 
 #ifdef SND_LIB_WINDSOUND
 
+/* sound interface routines */
 static void windsound_init_nhsound(void);
 static void windsound_exit_nhsound(const char *);
 static void windsound_achievement(schar, schar, int32_t);
@@ -23,9 +24,14 @@ static void windsound_soundeffect(char *, int32_t, int32_t);
 static void windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
 static void windsound_play_usersound(char *, int32_t, int32_t);
 
+/* supporting routines */
+static void adjust_soundargs_for_compiler(int32_t *, DWORD *, char **);
+static void maybe_preinsert_directory(int32_t, char *, char *, size_t);
+
 struct sound_procs windsound_procs = {
     SOUNDID(windsound),
-    SNDCAP_USERSOUNDS | SNDCAP_SOUNDEFFECTS | SNDCAP_HEROMUSIC,
+    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_HEROMUSIC,
     windsound_init_nhsound,
     windsound_exit_nhsound,
     windsound_achievement,
@@ -55,21 +61,25 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
     int reslt = 0;
+    int32_t findsound_approach = sff_base_only;
     char buf[PATHLEN];
     const char *filename;
-    DWORD fdwsound;
+    DWORD fdwsound = SND_NODEFAULT;
+    char *exedir = 0;
 
+    adjust_soundargs_for_compiler(&findsound_approach, &fdwsound, &exedir);
+    maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
+    fdwsound |= SND_ASYNC;
     if (seid >= se_squeak_C || seid <= se_squeak_B) {
-        filename = get_sound_effect_filename(seid, buf, sizeof buf, 1);
-        fdwsound = SND_ASYNC | SND_RESOURCE;
+        filename = get_sound_effect_filename(seid, buf, sizeof buf, findsound_approach);
     } else {
-        filename = get_sound_effect_filename(seid, buf, sizeof buf, 0);
-        fdwsound = SND_ASYNC | SND_NODEFAULT;
+        filename = get_sound_effect_filename(seid, buf, sizeof buf, findsound_approach);
+        fdwsound &= ~(SND_RESOURCE);
+        fdwsound |= SND_FILENAME;
     }
 
     if (filename) {
         reslt = PlaySound(filename, NULL, fdwsound);
-//        (void) sndPlaySound(filename, fdwsound);
     }
 #endif
 }
@@ -82,8 +92,12 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 #ifdef WAVEMUSIC_SOUNDS
     int reslt = 0;
     boolean has_note_variations = FALSE;
-    char resourcename[120], *end_of_res = 0;
+    const char *filename;
+    char resourcename[120], buf[PATHLEN], *end_of_res = 0;
     const char *c = 0;
+    int findsound_approach = sff_base_only;
+    DWORD fdwsound = SND_NODEFAULT;
+    char *exedir = (char *) 0;
 
     if (!str)
         return;
@@ -102,22 +116,23 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
             has_note_variations = TRUE;
             break;
         case ins_french_horn:       /* FROST_HORN */
-            Strcpy(resourcename, "sound_Frost_Horn");  
+            Strcpy(resourcename, "sound_Frost_Horn");
             break;
         case ins_baritone_sax:      /* FIRE_HORN */
-            Strcpy(resourcename, "sound_Fire_Horn");  
+            Strcpy(resourcename, "sound_Fire_Horn");
             break;
         case ins_trumpet:           /* BUGLE */
-            Strcpy(resourcename, "sound_Bugle");  
+            Strcpy(resourcename, "sound_Bugle");
             has_note_variations = TRUE;
             break;
         case ins_orchestral_harp:   /* WOODEN_HARP */
-            Strcpy(resourcename, "sound_Wooden_Harp");  
+            Strcpy(resourcename, "sound_Wooden_Harp");
             has_note_variations = TRUE;
             break;
         case ins_cello:             /* MAGIC_HARP */
             Strcpy(resourcename, "sound_Magic_Harp");
             has_note_variations = TRUE;
+            break;
         case ins_tinkle_bell:
             Strcpy(resourcename, "sound_Bell");
             break;
@@ -128,6 +143,7 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
             Strcpy(resourcename, "sound_Leather_Drum");
             break;
     }
+    adjust_soundargs_for_compiler(&findsound_approach, &fdwsound, &exedir);
     if (has_note_variations) {
         int i, idx = 0, notecount = strlen(str);
         static const char *const note_suffixes[]
@@ -135,20 +151,26 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 
         end_of_res = eos(resourcename);
         c = str;
+        fdwsound |= SND_SYNC;
         for (i = 0; i < notecount; ++i) {
             if (*c >= 'A' && *c <= 'G') {
                 idx = (*c) - 'A';
                 Strcpy(end_of_res, note_suffixes[idx]);
+                maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
+                filename = base_soundname_to_filename(resourcename,
+                                               buf, sizeof buf, findsound_approach);
                 if (i == (notecount - 1))
                     break;  /* drop out of for-loop and play it async below */
-                reslt = PlaySound(resourcename, NULL,
-                                  SND_SYNC | SND_RESOURCE);
+                reslt = PlaySound(buf, NULL, fdwsound);
             }
             c++;
         }
+        fdwsound &= ~(SND_SYNC);
     }
+    fdwsound |= SND_ASYNC;
     /* the final, or only, one is played ASYNC */
-    reslt = PlaySound(resourcename, NULL, SND_ASYNC | SND_RESOURCE);
+    maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
+    reslt = PlaySound(buf, NULL, fdwsound);
 #endif
 }
 
@@ -156,7 +178,73 @@ void
 windsound_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     /*    pline("play_usersound: %s (%d).", filename, volume); */
-    (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT);
+    (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT | SND_FILENAME);
 }
 
+static void adjust_soundargs_for_compiler(
+    int32_t *sefilename_flags,
+    DWORD *fdwsound,
+    char **dirbuf)
+{
+    /* The mingw32 resources don't seem to be able to be retrieved by the
+     * API PlaySound function with the SND_RESOURCE flag. Use files from
+     * the file system instead. */
+
+    enum findsound_approaches approach =
+#if !defined(__MINGW32__)
+        findsound_embedded;
+#else
+        findsound_soundfile;
+#endif
+
+    if (approach == findsound_soundfile) {
+        char *exe_dir;
+
+        if (*sefilename_flags == sff_base_only
+            || *sefilename_flags == sff_baseknown_add_rest) {
+            exe_dir = windows_exepath();
+            if (exe_dir) {
+                *dirbuf = exe_dir;
+                /* switch the sff_base_only to a sff_havedir_append_rest */
+                *sefilename_flags = sff_havedir_append_rest;
+                *fdwsound |= SND_FILENAME;
+            }
+        }
+    } else {
+        if (*sefilename_flags == sff_base_only
+            || *sefilename_flags == sff_baseknown_add_rest) {
+            /* *sefilename_flags = sff_base_only means just obtain the
+             * soundeffect base name with no directory name and no file
+             * extension. That's because we're going to use the base
+             * soundeffect name as the name of a resource that's embedded
+             * into the .exe file, passing SND_RESOURCE flag to
+             * Windows API PlaySound().
+             */
+            *sefilename_flags = sff_base_only;
+            *fdwsound |= SND_RESOURCE;
+        }
+    }
+}
+
+static void
+maybe_preinsert_directory(int32_t findsound_approach, char *exedir, char *buf, size_t sz)
+{
+    int largest_se_basename = 35;
+
+    /* findsound_approach = sff_havdir_append_rest means a directory name will be
+     * inserted into the begining of buf and the remaining parts of the
+     * resource/file name will be appended by
+     * get_sound_effect_filename(seid, buf, sizeof buf, findsound_approach)
+     * when it sees the sff_havedir_append_rest indicator.
+     */
+
+    if (findsound_approach == sff_havedir_append_rest) {
+        if (exedir) {
+            if (strlen(exedir) < (sz - largest_se_basename))
+                Strcpy(buf, exedir);
+            else
+                *buf = '\0';
+        }
+    }
+}
 #endif /* SND_LIB_WINDSOUND */

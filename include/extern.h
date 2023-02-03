@@ -22,7 +22,7 @@ extern void early_init(void);
 extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
-extern void display_gamewindows(void);
+extern void init_sound_and_display_gamewindows(void);
 extern void newgame(void);
 extern void welcome(boolean);
 extern int argcheck(int, char **, enum earlyarg);
@@ -546,7 +546,7 @@ extern const char *pmname(struct permonst *, int);
 #endif
 extern const char *mon_pmname(struct monst *);
 extern const char *obj_pmname(struct obj *);
-boolean mapxy_valid(coordxy x, coordxy y);
+extern boolean mapxy_valid(coordxy, coordxy);
 
 /* ### do_wear.c ### */
 
@@ -620,6 +620,7 @@ extern struct obj *droppables(struct monst *);
 extern int dog_nutrition(struct monst *, struct obj *);
 extern int dog_eat(struct monst *, struct obj *, coordxy, coordxy, boolean);
 extern int dog_move(struct monst *, int);
+extern boolean could_reach_item(struct monst *, coordxy, coordxy);
 extern void finish_meating(struct monst *);
 extern void quickmimic(struct monst *);
 
@@ -1552,11 +1553,13 @@ extern int meatcorpse(struct monst *);
 extern void mon_give_prop(struct monst *, int);
 extern void mon_givit(struct monst *, struct permonst *);
 extern void mpickgold(struct monst *);
-extern boolean mpickstuff(struct monst *, const char *);
+extern boolean mpickstuff(struct monst *);
 extern int curr_mon_load(struct monst *);
 extern int max_mon_load(struct monst *);
+extern boolean can_touch_safely(struct monst *, struct obj *);
 extern int can_carry(struct monst *, struct obj *);
 extern long mon_allowflags(struct monst *);
+extern boolean m_in_air(struct monst *);
 extern int mfndpos(struct monst *, coord *, long *, long);
 extern boolean monnear(struct monst *, coordxy, coordxy);
 extern void dmonsfree(void);
@@ -1681,6 +1684,7 @@ extern int mstrength(struct permonst *);
 
 /* ### monmove.c ### */
 
+extern boolean mon_would_take_item(struct monst *, struct obj *);
 extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
 extern void mon_track_add(struct monst *, coordxy, coordxy);
@@ -2615,6 +2619,7 @@ extern void get_soundlib_name(char *dest, int maxlen);
 extern char *get_sound_effect_filename(int32_t seidint,
                                        char *buf, size_t bufsz, int32_t);
 #endif
+extern char *base_soundname_to_filename(char *, char *, size_t, int32_t);
 
 /* ### sp_lev.c ### */
 

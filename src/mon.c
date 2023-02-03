@@ -153,7 +153,10 @@ sanity_check_single_mon(
         if (ceiling_hider(mptr)
             /* normally !accessible would be overridable with passes_walls,
                but not for hiding on the ceiling */
-            && (!has_ceiling(&u.uz) || !accessible(mx, my)))
+            && (!has_ceiling(&u.uz) ||
+                !(levl[mx][my].typ == POOL
+                  || levl[mx][my].typ == MOAT
+                  || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
                                            : "in solid stone",
@@ -1576,14 +1579,23 @@ mpickgold(register struct monst* mtmp)
     }
 }
 
+/* monster picks up one item stack from the map location they are at */
 boolean
-mpickstuff(struct monst *mtmp, const char *str)
+mpickstuff(struct monst *mtmp)
 {
     register struct obj *otmp, *otmp2, *otmp3;
     int carryamt = 0;
 
     /* prevent shopkeepers from leaving the door of their shop */
     if (mtmp->isshk && inhishop(mtmp))
+        return FALSE;
+
+    /* non-tame monsters normally don't go shopping */
+    if (!mtmp->mtame && *in_rooms(mtmp->mx, mtmp->my, SHOPBASE) && rn2(25))
+        return FALSE;
+
+    /* item in a pool, but monster can't swim */
+    if (!could_reach_item(mtmp, mtmp->mx, mtmp->my))
         return FALSE;
 
     for (otmp = gl.level.objects[mtmp->mx][mtmp->my]; otmp; otmp = otmp2) {
@@ -1595,20 +1607,18 @@ mpickstuff(struct monst *mtmp, const char *str)
             continue;
 
         /* Nymphs take everything.  Most monsters don't pick up corpses. */
-        if (!str ? searches_for_item(mtmp, otmp)
-                 : !!(strchr(str, otmp->oclass))) {
+        if (mon_would_take_item(mtmp, otmp)) {
+
             if (otmp->otyp == CORPSE && mtmp->data->mlet != S_NYMPH
                 /* let a handful of corpse types thru to can_carry() */
                 && !touch_petrifies(&mons[otmp->corpsenm])
                 && otmp->corpsenm != PM_LIZARD
                 && !acidic(&mons[otmp->corpsenm]))
                 continue;
-            if (!touch_artifact(otmp, mtmp))
+            if (!can_touch_safely(mtmp, otmp))
                 continue;
             carryamt = can_carry(mtmp, otmp);
             if (carryamt == 0)
-                continue;
-            if (is_pool(mtmp->mx, mtmp->my))
                 continue;
             /* handle cases where the critter can only get some */
             otmp3 = otmp;
@@ -1679,6 +1689,26 @@ max_mon_load(struct monst* mtmp)
     return (int) maxload;
 }
 
+/* can monster touch object safely? */
+boolean
+can_touch_safely(struct monst *mtmp, struct obj *otmp)
+{
+    int otyp = otmp->otyp;
+    struct permonst *mdat = mtmp->data;
+
+    if (otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])
+        && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
+        return FALSE;
+    if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
+        return FALSE;
+    if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp)
+        && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
+        return FALSE;
+    if (!touch_artifact(otmp, mtmp))
+        return FALSE;
+    return TRUE;
+}
+
 /* for restricting monsters' object-pickup.
  *
  * to support the new pet behavior, this now returns the max # of objects
@@ -1702,13 +1732,7 @@ can_carry(struct monst* mtmp, struct obj* otmp)
     if (notake(mdat))
         return 0; /* can't carry anything */
 
-    if (otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])
-        && !(mtmp->misc_worn_check & W_ARMG) && !resists_ston(mtmp))
-        return 0;
-    if (otyp == CORPSE && is_rider(&mons[otmp->corpsenm]))
-        return 0;
-    if (objects[otyp].oc_material == SILVER && mon_hates_silver(mtmp)
-        && (otyp != BELL_OF_OPENING || !is_covetous(mdat)))
+    if (!can_touch_safely(mtmp, otmp))
         return 0;
 
     /* hostile monsters who like gold will pick up the whole stack;
@@ -1833,6 +1857,16 @@ mon_allowflags(struct monst* mtmp)
     return allowflags;
 }
 
+/* return TRUE if monster is up in the air/on the ceiling */
+boolean
+m_in_air(struct monst *mtmp)
+{
+    return (is_flyer(mtmp->data)
+            || is_floater(mtmp->data)
+            || (is_clinger(mtmp->data)
+                && has_ceiling(&u.uz) && mtmp->mundetected));
+}
+
 /* return number of acceptable neighbour positions */
 int
 mfndpos(
@@ -1860,11 +1894,11 @@ mfndpos(
 
     nodiag = NODIAG(mdat - mons);
     wantpool = (mdat->mlet == S_EEL);
-    poolok = ((!Is_waterlevel(&u.uz) && !grounded(mdat))
+    poolok = ((!Is_waterlevel(&u.uz) && m_in_air(mon))
               || (is_swimmer(mdat) && !wantpool));
     /* note: floating eye is the only is_floater() so this could be
        simplified, but then adding another floater would be error prone */
-    lavaok = (!grounded(mdat) || likes_lava(mdat));
+    lavaok = (m_in_air(mon) || likes_lava(mdat));
     if (mdat == &mons[PM_FLOATING_EYE]) /* prefers to avoid heat */
         lavaok = FALSE;
     thrudoor = ((flag & (ALLOW_WALL | BUSTDOOR)) != 0L);
@@ -3819,13 +3853,17 @@ wakeup(struct monst* mtmp, boolean via_attack)
     }
     finish_meating(mtmp);
     if (via_attack) {
+        boolean was_peaceful = mtmp->mpeaceful;
+
         if (was_sleeping)
             growl(mtmp);
         setmangry(mtmp, TRUE);
-        if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE))
-            ghod_hitsu(mtmp);
-        if (mtmp->isshk && !*u.ushops)
-            hot_pursuit(mtmp);
+        if (was_peaceful) {
+            if (mtmp->ispriest && *in_rooms(mtmp->mx, mtmp->my, TEMPLE))
+                ghod_hitsu(mtmp);
+            if (mtmp->isshk && !*u.ushops)
+                hot_pursuit(mtmp);
+        }
     }
 }
 
@@ -4067,18 +4105,18 @@ restrap(struct monst *mtmp)
     return FALSE;
 }
 
-/* reveal a monster at x,y hiding under an object,
-   if there are no objects there */
+/* reveal a hiding monster at x,y, either under nonexistent object,
+   or an eel out of water. */
 void
 maybe_unhide_at(coordxy x, coordxy y)
 {
     struct monst *mtmp;
 
-    if (OBJ_AT(x, y))
-        return;
     if ((mtmp = m_at(x, y)) == 0 && u_at(x, y))
         mtmp = &gy.youmonst;
-    if (mtmp && mtmp->mundetected && hides_under(mtmp->data))
+    if (mtmp && mtmp->mundetected
+        && ((hides_under(mtmp->data) && !OBJ_AT(x, y))
+            || (mtmp->data->mlet == S_EEL && !is_pool(x, y))))
         (void) hideunder(mtmp);
 }
 

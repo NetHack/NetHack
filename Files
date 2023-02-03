@@ -78,8 +78,8 @@ fixes3-6-3.txt     fixes3-6-4.txt     fixes3-6-5.txt     fixes3-6-6.txt
 fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc           makedefs.6
 makedefs.txt       mn.7               mn.txt             mnh.7
 mnh.txt            nethack.6          nethack.txt        options.txt
-recover.6          recover.txt        tmac.n             tmac.nh
-window.txt
+recover.6          recover.txt        sound.txt          tmac.n
+tmac.nh            window.txt
 
 include:
 (files for X versions)
@@ -401,8 +401,9 @@ unix
 
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
-compiler.370      cross-post.370    cross-pre.370     gbdates-post.370
-gbdates-pre.370   multiw-1.370      multiw-2.370      multiw-3.370
+compiler.370       cross-post.370     cross-pre.370      gbdates-post.370
+gbdates-pre.370    multisnd-post.370  multisnd1-pre.370  multisnd2-pre.370
+multiw-1.370       multiw-2.370       multiw-3.370
 
 sys/vms:
 (files for VMS version)

@@ -846,7 +846,7 @@ do_play_instrument(struct obj* instr)
 }
 
 enum instruments
-obj_to_instr(struct obj *obj) {
+obj_to_instr(struct obj *obj SOUNDLIBONLY) {
     enum instruments ret_instr = ins_no_instrument;
 
 #if defined(SND_LIB_INTEGRATED)
@@ -886,8 +886,6 @@ obj_to_instr(struct obj *obj) {
             ret_instr = ins_melodic_tom;
             break;
     }
-#else
-    nhUse(obj);
 #endif
     return ret_instr;
 }

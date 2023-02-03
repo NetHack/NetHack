@@ -279,6 +279,7 @@ dig(void)
             }
             break;
         case 1:
+            Soundeffect(se_bang_weapon_side, 100);
             pline("Bang!  You hit with the broad side of %s!",
                   the(xname(uwep)));
             wake_nearby();
@@ -1919,7 +1920,7 @@ bury_objs(int x, int y)
         debugpline2("bury_objs: at <%d,%d>", x, y);
     }
     for (otmp = gl.level.objects[x][y]; otmp; otmp = otmp2) {
-        if (costly) {
+        if (costly && !gc.context.mon_moving) {
             loss += stolen_value(otmp, x, y, (boolean) shkp->mpeaceful, TRUE);
             if (otmp->oclass != COIN_CLASS)
                 otmp->no_charge = 1;

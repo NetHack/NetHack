@@ -459,5 +459,26 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #define NONNULL
 #endif
 
+/*
+ * Allow gcc and clang to catch the use of non-C99 functions that
+ * NetHack has replaced with a C99 standard function. The old non-C99
+ * function will cause a link failure on non-Unix platforms,
+ * so it is preferrable to catch it early, during compile.
+ */
+#if !defined(X11_BUILD) && !defined(__cplusplus)
+#if defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ >= 12
+extern char *index(const char *s, int c) __attribute__ ((unavailable));
+extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
+#endif
+#endif
+#if defined(__clang__)
+#if __clang_major__ >= 7
+extern char *index(const char *s, int c) __attribute__ ((unavailable));
+extern char *rindex(const char *s, int c) __attribute__ ((unavailable));
+#endif
+#endif
+#endif
+
 
 #endif /* TRADSTDC_H */

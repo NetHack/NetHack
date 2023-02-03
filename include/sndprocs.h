@@ -5,66 +5,6 @@
 #ifndef SNDPROCS_H
 #define SNDPROCS_H
 
-/*
- *
- *  Types of potential sound supports (all are optional):
- *
- *      SNDCAP_USERSOUNDS     User-specified sounds that play based on config
- *                            file entries that identify a regular expression
- *                            to match against message window text, and identify
- *                            an external sound file to load in response.
- *                            The sound interface function pointer used to invoke
- *                            it:
- *
- *                             void (*sound_play_usersound)(char *filename,
- *                                             int32_t volume, int32_t idx);
- *
- *      SNDCAP_HEROMUSIC      Invoked by the core when the in-game hero is
- *                            playing a tune on an instrument. The sound
- *                            interface function pointer used to invoke it:
- *
- *                             void (*sound_hero_playnotes)(int32_t instrument,
- *                                             const char *str, int32_t volume);
- *
- *      SNDCAP_ACHIEVEMENTS   Invoked by the core when an in-game achievement
- *                            is reached. The soundlib routines could play
- *                            appropriate theme or mood music in response.
- *                            There would need to be a way to map the
- *                            achievements to external user-specified sounds.
- *                            The sound interface function pointer used to
- *                            invoke it:
- *
- *                                void (*sound_achievement)(schar, schar,
- *                                                          int32_t);
- *
- *      SNDCAP_SOUNDEFFECTS   Invoked by the core when something
- *                            sound-producing happens in the game. The soundlib
- *                            routines could play an appropriate sound effect
- *                            in response. They can be public-domain or
- *                            suitably-licensed stock sounds included with the
- *                            game source and made available during the build
- *                            process, or (not-yet-implemented) a way to
- *                            tie particular sound effects to a user-specified
- *                            sound samples in a config file. The sound
- *                            interface function pointer used to invoke it:
- *
- *                               void (*sound_soundeffect)(char *desc, int32_t,
- *                                                              int32_t volume);
- *
- *  Development notes:
- *       - gc.chosen_soundlib holds the soundlib_id that will be initialized
- *         at the appropriate time (startup or after an option change). It
- *         is initialized to soundlib_nosound, so that is what will be used if
- *         the initial value isn't replaced via an assign_soundlib() call
- *         prior to the call to the activate_chosen_soundlib() in
- *         moveloop_preamble() at the start of the game.
- *       - ga.active_soundlib holds the soundlib_id of the active soundlib.
- *         It is initialized to soundlib_unassigned. It will get changed to
- *         reflect the activated soundlib_id once activate_chosen_soundlib()
- *         has been called.
- *
- */
-
 enum soundlib_ids {
     soundlib_nosound,
 #ifdef SND_LIB_PORTAUDIO
@@ -103,7 +43,7 @@ enum soundlib_ids {
 struct sound_procs {
     const char *soundname;
     enum soundlib_ids soundlib_id;
-    unsigned long sndcap; /* capabilities in the port */
+    unsigned long sound_triggers; /* capabilities in the port */
     void (*sound_init_nhsound)(void);
     void (*sound_exit_nhsound)(const char *);
     void (*sound_achievement)(schar, schar, int32_t);
@@ -117,12 +57,12 @@ extern struct sound_procs sndprocs;
 #define SOUNDID(soundname) #soundname, ((enum soundlib_ids) soundlib_##soundname)
 
 /*
- * SOUNDCAP
+ * Types of triggers
  */
-#define SNDCAP_USERSOUNDS   0x0001L
-#define SNDCAP_HEROMUSIC    0x0002L
-#define SNDCAP_ACHIEVEMENTS 0x0004L
-#define SNDCAP_SOUNDEFFECTS 0x0008L
+#define SOUND_TRIGGER_USERSOUNDS   0x0001L
+#define SOUND_TRIGGER_HEROMUSIC    0x0002L
+#define SOUND_TRIGGER_ACHIEVEMENTS 0x0004L
+#define SOUND_TRIGGER_SOUNDEFFECTS 0x0008L
                             /* 28 free bits */
 
 extern struct sound_procs soundprocs;
@@ -371,8 +311,40 @@ enum sound_effect_entries {
     se_bone_rattle                    = 185,
     se_orc_grunt                      = 186,
     se_avian_screak                   = 187,
+    se_paranoid_confirmation          = 188,
+    se_bars_whang                     = 189,
+    se_bars_whap                      = 190,
+    se_bars_flapp                     = 191,
+    se_bars_clink                     = 192,
+    se_bars_clonk                     = 193,
+    se_boomerang_klonk                = 194,
+    se_bang_weapon_side               = 195,
     number_of_se_entries
 };
+
+enum achievements_arg2 {
+    sa2_splashscreen, sa2_newgame_nosplash, sa2_restoregame,
+    sa2_xplevelup, sa2_xpleveldown
+};
+
+/*
+Arguments for sound_achievement(schar arg1, schar arg2, int32_t aflags)
+
+Arguments for actual achievements, those in you.h,
+        arg1 = the achievement value.
+        arg2 = 0 (irrelevant).
+      aflags = 0 for first time, 1 for repeat.
+
+These next ones make use of arg2, and aflags may be
+filled with additional int values dependent on arg2.
+arg1 must always be 0 for these.
+
+SoundAchievement(0, sa2_splashscreen, 0);
+SoundAchievement(0, sa2_newgame_nosplash, 0);
+SoundAchievement(0, sa2_restoregame, 0);
+SoundAchievement(0, sa2_levelup, level);
+SoundAchievement(0, sa2_xpleveldown, level);
+*/
 
 #if defined(SND_LIB_QTSOUND) || defined(SND_LIB_PORTAUDIO) \
         || defined(SND_LIB_OPENAL) || defined(SND_LIB_SDL_MIXER) \
@@ -380,35 +352,78 @@ enum sound_effect_entries {
         || defined(SND_LIB_SOUND_ESCCODES) || defined(SND_LIB_VISSOUND) \
         || defined(SND_LIB_WINDSOUND) || defined(SND_LIB_MACSOUND)
 
-#define SND_LIB_INTEGRATED   /* shortcut for conditional code in other files */
+/* shortcut for conditional code in other files */
+#define SND_LIB_INTEGRATED
 
 #define Play_usersound(filename, vol, idx) \
-    do {                                                                  \
-        if (!Deaf && soundprocs.sound_play_usersound                      \
-            && ((soundprocs.sndcap & SNDCAP_USERSOUNDS) != 0))            \
-            (*soundprocs.sound_play_usersound)((filename), (vol), (idx)); \
+    do {                                                                      \
+        if (iflags.sounds && !Deaf && soundprocs.sound_play_usersound         \
+            && ((soundprocs.sound_triggers & SOUND_TRIGGER_USERSOUNDS) != 0)) \
+            (*soundprocs.sound_play_usersound)((filename), (vol), (idx));     \
     } while(0)
 
 #define Soundeffect(seid, vol) \
-    do {                                                              \
-        if (!Deaf && soundprocs.sound_soundeffect                     \
-            && ((soundprocs.sndcap & SNDCAP_SOUNDEFFECTS) != 0))      \
-            (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol)); \
+    do {                                                                      \
+        if (iflags.sounds && !Deaf && soundprocs.sound_soundeffect            \
+          && ((soundprocs.sound_triggers & SOUND_TRIGGER_SOUNDEFFECTS) != 0)) \
+            (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol));         \
+    } while(0)
+
+/* Player's perspective, not the hero's; no Deaf suppression */
+#define SoundeffectEvenIfDeaf(seid, vol) \
+    do {                                                                      \
+        if (iflags.sounds && !soundprocs.sound_soundeffect                    \
+          && ((soundprocs.sound_triggers & SOUND_TRIGGER_SOUNDEFFECTS) != 0)) \
+            (*soundprocs.sound_soundeffect)(emptystr, (seid), (vol));         \
     } while(0)
 
 #define Hero_playnotes(instrument, str, vol) \
-    do {                                                                    \
-        if (!Deaf && soundprocs.sound_hero_playnotes                        \
-            && ((soundprocs.sndcap & SNDCAP_HEROMUSIC) != 0))               \
-            (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol)); \
+    do {                                                                     \
+        if (iflags.sounds && !Deaf && soundprocs.sound_hero_playnotes        \
+            && ((soundprocs.sound_triggers & SOUND_TRIGGER_HEROMUSIC) != 0)) \
+            (*soundprocs.sound_hero_playnotes)((instrument), (str), (vol));  \
     } while(0)
-#else
+
+/*  void (*sound_achievement)(schar, schar, int32_t); */
+
+/* Player's perspective, not the hero's; no Deaf suppression */
+#define SoundAchievement(arg1, arg2, avals) \
+    do {                                                                      \
+        if (iflags.sounds && soundprocs.sound_achievement                     \
+          && ((soundprocs.sound_triggers & SOUND_TRIGGER_ACHIEVEMENTS) != 0)) \
+            (*soundprocs.sound_achievement)((arg1), (arg2), (avals));         \
+    } while(0)
+
+/*  void (*sound_achievement)(schar, schar, int32_t); */
+
+#ifdef SOUNDLIBONLY
+#undef SOUNDLIBONLY
+#endif
+#define SOUNDLIBONLY
+#else  /*  NO SOUNDLIB SELECTED AFTER THIS */
 #ifdef SND_LIB_INTEGRATED
-#undef  SND_LIB_INTEGRATED
+#undef SND_LIB_INTEGRATED
 #endif
 #define Play_usersound(filename, vol, idx)
 #define Soundeffect(seid, vol)
 #define Hero_playnotes(instrument, str, vol)
+#define SoundAchievement(arg1, arg2, avals)
+#ifdef SOUNDLIBONLY
+#undef SOUNDLIBONLY
 #endif
+#define SOUNDLIBONLY UNUSED
+#endif
+
+enum findsound_approaches {
+    findsound_embedded,
+    findsound_soundfile
+};
+
+enum sound_file_flags {
+    sff_default,            /* add dir prefix + '/' + sound + suffix */
+    sff_base_only,          /* base sound name only, no dir, no suffix */
+    sff_havedir_append_rest, /* dir provided, append base sound name + suffix */
+    sff_baseknown_add_rest /* base is already known, add dir and suffix */
+};
 
 #endif /* SNDPROCS_H */

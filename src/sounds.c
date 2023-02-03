@@ -464,6 +464,9 @@ yelp(register struct monst* mtmp)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 12);
     }
+#ifndef SND_LIB_INTEGRATED
+    nhUse(se);
+#endif
 }
 
 /* the sounds of distressed pets */
@@ -501,6 +504,9 @@ whimper(register struct monst* mtmp)
             nomul(0);
         wake_nearto(mtmp->mx, mtmp->my, mtmp->data->mlevel * 6);
     }
+#ifndef SND_LIB_INTEGRATED
+    nhUse(se);
+#endif
 }
 
 /* pet makes "I'm hungry" noises */
@@ -804,7 +810,7 @@ domonnoise(register struct monst* mtmp)
             } else {
                 Soundeffect(se_feline_mew, 60);
                 pline_msg = "mews.";
-	    }
+            }
             break;
         }
         /*FALLTHRU*/
@@ -868,7 +874,7 @@ domonnoise(register struct monst* mtmp)
         if (!rn2(3)) {
             Soundeffect(se_groan, 60);
             pline_msg = "groans.";
-	}
+        }
         break;
     case MS_GURGLE:
         Soundeffect(se_gurgle, 60);
@@ -2033,6 +2039,14 @@ static const struct soundeffect_automapping
     { se_bone_rattle,                   "bone_rattle" },
     { se_orc_grunt,                     "orc_grunt" },
     { se_avian_screak,                  "avian_screak" },
+    { se_paranoid_confirmation,         "paranoid_confirmation" },
+    { se_bars_whang,                    "bars_whang" },
+    { se_bars_whap,                     "bars_whap" },
+    { se_bars_flapp,                    "bars_flapp" },
+    { se_bars_clink,                    "bars_clink" },
+    { se_bars_clonk,                    "bars_clonk" },
+    { se_boomerang_klonk,               "boomerang_klonk" },
+    { se_bang_weapon_side,              "bang_weapon_side" },
 };
 
 static const char *semap_basenames[SIZE(se_mappings_init)];
@@ -2057,15 +2071,16 @@ get_sound_effect_filename(
     int32_t seidint,
     char *buf,
     size_t bufsz,
-    int32_t baseflag) /* non-zero means return without
-                       * directory or extension suffix */
+    int32_t approach)
 {
     static const char prefix[] = "se_", suffix[] = ".wav";
-    size_t consumes = 0, baselen = 0;
+    size_t consumes = 0, baselen = 0, existinglen = 0;
 /*    enum sound_effect_entries seid = (enum sound_effect_entries) seidint; */
     char *ourdir = sounddir;       /* sounddir would get set in files.c */
+    char *cp = buf;
+    boolean needslash = TRUE;
 
-    if (!buf || (!ourdir && baseflag == 0))
+    if (!buf || (!ourdir && approach == sff_default))
         return (char *) 0;
 
     if (!basenames_initialized) {
@@ -2077,31 +2092,138 @@ get_sound_effect_filename(
         baselen = strlen(semap_basenames[seidint]);
 
     consumes = (sizeof prefix - 1) + baselen;
-    if (baseflag == 0)
-        consumes += (sizeof suffix - 1) + strlen(ourdir);
-    consumes += 1 + 1; /* '\0' and '/' */
-    if (baselen <= 0 || consumes > bufsz)
+    if (approach == sff_default) {
+        consumes += (sizeof suffix - 1) + strlen(ourdir) + 1; /* 1 for '/' */
+    } else if (approach == sff_havedir_append_rest) {
+        /* consumes += (sizeof suffix - 1); */
+        existinglen = strlen(buf);
+        if (existinglen > 0) {
+            cp = buf + existinglen; /* points at trailing NUL */
+            cp--;                   /* points at last character */
+            if (*cp == '/' || *cp == '\\')
+                needslash = FALSE;
+            cp++;                   /* points back at trailing NUL */
+        }
+        if (needslash)
+            consumes++;  /* for '/' */
+        consumes += existinglen;
+        consumes += (sizeof suffix - 1);
+    }
+    consumes += 1; /* for trailing NUL */
+    /* existinglen could be >= bufsz if caller didn't initialize buf
+     * to properly include a trailing NUL */
+    if (baselen <= 0 || consumes > bufsz || existinglen >= bufsz)
         return (char *) 0;
 
 #if 0
-    if (!baseflag) {
+    if (approach == sff_default) {
         Strcpy(buf, ourdir);
         Strcat(buf, "/");
+    } else if (approach == sff_havdir_append_rest) {
+        if (needslash)
+            Strcat(buf, "/");
+    } else if (approach == sff_base_only) {
+        buf[0] = '\0';
+    } else {
+        return (char *) 0;
     }
     Strcat(buf, prefix);
     Strcat(buf, semap_basenames[seidint]);
-    if (!baseflag) {
+    if (approach != sff_base_only) {
         Strcat(buf, suffix);
     }
 #else
-    if (!baseflag)
+    if (approach == sff_default) {
         Snprintf(buf, bufsz , "%s/%s%s%s", ourdir, prefix,
                  semap_basenames[seidint], suffix);
-    else
-        Snprintf(buf, bufsz , "%s%s", prefix, semap_basenames[seidint]);
+    } else if (approach == sff_havedir_append_rest) {
+        if (needslash) {
+            *cp = '/';
+            cp++;
+            *cp = '\0';
+            existinglen++;
+        }
+        Snprintf(cp, bufsz - (existinglen + 1) , "%s%s%s",
+                 prefix, semap_basenames[seidint], suffix);
+    } else if (approach == sff_base_only) {
+        Snprintf(buf, bufsz, "%s%s", prefix, semap_basenames[seidint]);
+    } else {
+        return (char *) 0;
+    }
 #endif
     return buf;
 }
 #endif  /* SND_SOUNDEFFECTS_AUTOMAP */
+
+char *
+base_soundname_to_filename(
+    char *basename,
+    char *buf,
+    size_t bufsz,
+    int32_t approach)
+{
+    static const char suffix[] = ".wav";
+    size_t consumes = 0, baselen = 0, existinglen = 0;
+    char *cp = buf;
+    boolean needslash = TRUE;
+
+    if (!buf)
+        return (char *) 0;
+
+    baselen = strlen(basename);
+    consumes = baselen;
+
+    if (approach == sff_havedir_append_rest) {
+        /* consumes += (sizeof suffix - 1); */
+        existinglen = strlen(buf);
+        if (existinglen > 0) {
+            cp = buf + existinglen; /* points at trailing NUL */
+            cp--;                   /* points at last character */
+            if (*cp == '/' || *cp == '\\')
+                needslash = FALSE;
+            cp++;                   /* points back at trailing NUL */
+        }
+        if (needslash)
+            consumes++;  /* for '/' */
+        consumes += existinglen;
+        consumes += (sizeof suffix - 1);
+    }
+    consumes += 1; /* for trailing NUL */
+    /* existinglen could be >= bufsz if caller didn't initialize buf
+     * to properly include a trailing NUL */
+    if (baselen <= 0 || consumes > bufsz || existinglen >= bufsz)
+        return (char *) 0;
+
+#if 0
+    if (approach == sff_havedir_append_rest) {
+        if (needslash)
+            Strcat(buf, "/");
+    } else if (approach == sff_base_only) {
+        buf[0] = '\0';
+    } else {
+        return (char *) 0;
+    }
+    Strcat(buf, basename);
+    if (approach != sff_base_only) {
+        Strcat(buf, suffix);
+    }
+#else
+    if (approach == sff_havedir_append_rest) {
+        if (needslash) {
+            *cp = '/';
+            cp++;
+            *cp = '\0';
+            existinglen++;
+        }
+        Snprintf(cp, bufsz - (existinglen + 1) , "%s%s",
+                 basename, suffix);
+    } else if (approach == sff_base_only) {
+        Snprintf(buf, bufsz, "%s", basename);
+    } else {
+        return (char *) 0;
+    }
+#endif
+    return buf;
+}
 
 /*sounds.c*/

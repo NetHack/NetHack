@@ -679,7 +679,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      *  new game or before a level restore on a saved game.
      */
     vision_init();
-    display_gamewindows();
+    init_sound_and_display_gamewindows();
     /*
      * First, try to find and restore a save file for specified character.
      * We'll return here if new game player_selection() renames the hero.
@@ -1057,10 +1057,12 @@ void freefakeconsole(void)
 }
 #endif
 
+static boolean path_buffer_set = FALSE;
+static char path_buffer[MAX_PATH];
+
 char *
 get_executable_path(void)
 {
-    static char path_buffer[MAX_PATH];
 
 #ifdef UNICODE
     {
@@ -1078,7 +1080,18 @@ get_executable_path(void)
     if (seperator)
         *seperator = '\0';
 
+    path_buffer_set = TRUE;
     return path_buffer;
+}
+
+char *
+windows_exepath(void)
+{
+    char *p = (char *) 0;
+
+    if (path_buffer_set)
+        p = path_buffer;
+    return p;
 }
 
 char *

@@ -58,8 +58,6 @@ moveloop_preamble(boolean resuming)
         change_luck(-1);
     }
 
-    activate_chosen_soundlib();
-
     if (!resuming) { /* new game */
         gc.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
@@ -622,9 +620,14 @@ stop_occupation(void)
 }
 
 void
-display_gamewindows(void)
+init_sound_and_display_gamewindows(void)
 {
     int menu_behavior = MENU_BEHAVE_STANDARD;
+
+    activate_chosen_soundlib();
+
+    SoundAchievement(0, sa2_splashscreen, 0);
+    /* ToDo: new splash screen invocation will go here */
 
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
@@ -646,8 +649,8 @@ display_gamewindows(void)
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
-     * have to split display_gamewindows into create_gamewindows
-     * and show_gamewindows to get rid of this ifdef...
+     * have to split init_sound_and_display_gamewindows into
+     * create_gamewindows and show_gamewindows to get rid of this ifdef...
      */
     if (!strcmp(windowprocs.name, "mac"))
         SanePositions();

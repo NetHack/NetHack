@@ -818,7 +818,7 @@ doopen_indir(coordxy x, coordxy y)
         int oldglyph = door->glyph;
         schar oldlastseentyp = gl.lastseentyp[cc.x][cc.y];
 
-        feel_location(cc.x, cc.y);
+        newsym(cc.x, cc.y);
         if (door->glyph != oldglyph
             || gl.lastseentyp[cc.x][cc.y] != oldlastseentyp)
             res = ECMD_TIME; /* learned something */

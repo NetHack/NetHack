@@ -1101,6 +1101,10 @@ eating garlic makes nearby monsters flee
 giants occasionally get a battle axe or a two-handed sword
 give gremlin the property it stole, if possible
 'F'orcefighting with a war hammer has a small chance of breaking iron bars
+very rarely random items are generated eroded, erodeproof, or greased
+Nazgul can see invisible
+fix a case where punished iron ball yanked hero on top of a monster
+slightly randomize amount of items and monsters in the mines
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

@@ -30,13 +30,13 @@ static int affiliate(int32_t seid, const char *soundname);
 
 /*
  * Sound capabilities that can be enabled:
- *    SNDCAP_USERSOUNDS | SNDCAP_HEROMUSIC
- *        | SNDCAP_ACHIEVEMENTS |SNDCAP_SOUNDEFFECTS,
+ *    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
+ *        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS,
  */
 
 struct sound_procs macsound_procs = {
     SOUNDID(macsound),
-    SNDCAP_HEROMUSIC | SNDCAP_SOUNDEFFECTS,
+    SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_SOUNDEFFECTS,
     macsound_init_nhsound,
     macsound_exit_nhsound,
     macsound_achievement,
@@ -44,56 +44,6 @@ struct sound_procs macsound_procs = {
     macsound_hero_playnotes,
     macsound_play_usersound,
 };
-
-/*
- *
- *  Types of potential sound supports (all are optionally implemented):
- *
- *      SNDCAP_USERSOUNDS     User-specified sounds that play based on config
- *                            file entries that identify a regular expression
- *                            to match against message window text, and identify
- *                            an external sound file to load in response.
- *                            The sound interface function pointer used to invoke
- *                            it:
- *
- *                             void (*sound_play_usersound)(char *filename,
- *                                             int32_t volume, int32_t idx);
- *
- *      SNDCAP_HEROMUSIC      Invoked by the core when the in-game hero is
- *                            playing a tune on an instrument. The sound
- *                            interface function pointer used to invoke it:
- *
- *                             void (*sound_hero_playnotes)(int32_t instrument,
- *                                                 char *str, int32_t volume);
- *
- *      SNDCAP_ACHIEVEMENTS   Invoked by the core when an in-game achievement
- *                            is reached. The soundlib routines could play
- *                            appropriate theme or mood music in response.
- *                            There would need to be a way to map the
- *                            achievements to external user-specified sounds.
- *                            The sound interface function pointer used to
- *                            invoke it:
- *
- *                                void (*sound_achievement)(schar, schar,
- *                                                          int32_t);
- *
- *      SNDCAP_SOUNDEFFECTS   Invoked by the core when something
- *                            sound-producing happens in the game. The soundlib
- *                            routines could play an appropriate sound effect
- *                            in response. They can be public-domain or
- *                            suitably-licensed stock sounds included with the
- *                            game source and made available during the build
- *                            process, or (not-yet-implemented) a way to
- *                            tie particular sound effects to a user-specified
- *                            sound macsounds in a config file. The sound
- *                            interface function pointer used to invoke it:
- *
- *                               void (*sound_soundeffect)(char *desc, int32_t,
- *                                                              int32_t volume);
- *
- * The routines below would call into your sound library.
- * to fulfill the functionality.
- */
 
 static void
 macsound_init_nhsound(void)
@@ -108,7 +58,7 @@ macsound_exit_nhsound(const char *reason UNUSED)
 
 }
 
-/* fulfill SNDCAP_ACHIEVEMENTS */
+/* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
 static void
 macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED)
 {
@@ -123,7 +73,7 @@ static int32_t affiliation[number_of_se_entries + EXTRA_SOUNDS] = { 0 };
 static NSString *soundstring[number_of_se_entries + EXTRA_SOUNDS];
 static NSSound *seSound[number_of_se_entries + EXTRA_SOUNDS];
 
-/* fulfill SNDCAP_SOUNDEFFECTS */
+/* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
 static void
 macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 {
@@ -143,7 +93,8 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
     if (seid <= se_zero_invalid || seid >= number_of_se_entries)
         return;
     if (!affiliation[seid]) {
-        soundname = get_sound_effect_filename(seid, buf, sizeof buf, 1);
+        soundname = get_sound_effect_filename(seid, buf, sizeof buf,
+                                              sff_base_only);
         if (soundname) {
             affiliate(seid, soundname);
         }
@@ -158,7 +109,7 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 
 #define WAVEMUSIC_SOUNDS
 
-/* fulfill SNDCAP_HEROMUSIC */
+/* fulfill SOUND_TRIGGER_HEROMUSIC */
 static void macsound_hero_playnotes(int32_t instrument,
                   const char *str, int32_t vol UNUSED)
 {
@@ -201,6 +152,7 @@ static void macsound_hero_playnotes(int32_t instrument,
             Strcpy(resourcename, "sound_Magic_Harp");
             has_note_variations = TRUE;
             pseudo_seid_base = 12;
+            break;
         case ins_english_horn:      /* TOOLED_HORN */
             Strcpy(resourcename, "sound_Tooled_Horn");
             has_note_variations = TRUE;
@@ -219,7 +171,7 @@ static void macsound_hero_playnotes(int32_t instrument,
         case ins_pan_flute:         /* MAGIC_FLUTE */
             Strcpy(resourcename, "sound_Magic_Flute");
             has_note_variations = TRUE;
-            pseudo_seid_base = 26;
+            pseudo_seid_base = 40;
             break;
     }
     pseudo_seid_base += number_of_se_entries; /* get past se_ entries */
@@ -259,7 +211,7 @@ static void macsound_hero_playnotes(int32_t instrument,
 #endif
 }
 
-/* fulfill  SNDCAP_USERSOUNDS */
+/* fulfill  SOUND_TRIGGER_USERSOUNDS */
 static void
 macsound_play_usersound(char *filename UNUSED, int volume UNUSED, int idx UNUSED)
 {
@@ -280,4 +232,3 @@ affiliate(int32_t seid, const char *soundname)
     return 1;
 }
 /* end of macsound.m */
-

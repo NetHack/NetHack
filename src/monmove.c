@@ -16,6 +16,7 @@ static void mind_blast(struct monst *);
 static boolean holds_up_web(coordxy, coordxy);
 static int count_webbing_walls(coordxy, coordxy);
 static boolean soko_allow_web(struct monst *);
+static boolean m_search_items(struct monst *, coordxy *, coordxy *, schar *, int *);
 static boolean leppie_avoidance(struct monst *);
 static void leppie_stash(struct monst *);
 static boolean m_balks_at_approaching(struct monst *);
@@ -841,9 +842,41 @@ static NEARDATA const char practical[] = { WEAPON_CLASS, ARMOR_CLASS,
 static NEARDATA const char magical[] = { AMULET_CLASS, POTION_CLASS,
                                          SCROLL_CLASS, WAND_CLASS,
                                          RING_CLASS,   SPBOOK_CLASS, 0 };
-static NEARDATA const char indigestion[] = { BALL_CLASS, ROCK_CLASS, 0 };
-static NEARDATA const char boulder_class[] = { ROCK_CLASS, 0 };
-static NEARDATA const char gem_class[] = { GEM_CLASS, 0 };
+
+/* monster mtmp would love to take object otmp? */
+boolean
+mon_would_take_item(struct monst *mtmp, struct obj *otmp)
+{
+    int pctload = (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
+
+    if (otmp == uball || otmp == uchain)
+        return FALSE;
+    if (is_unicorn(mtmp->data) && objects[otmp->otyp].oc_material != GEMSTONE)
+        return FALSE;
+    if (!mindless(mtmp->data) && !is_animal(mtmp->data) && pctload < 75
+        && searches_for_item(mtmp, otmp))
+        return TRUE;
+    if (likes_gold(mtmp->data) && otmp->otyp == GOLD_PIECE && pctload < 95)
+        return TRUE;
+    if (likes_gems(mtmp->data) && otmp->oclass == GEM_CLASS
+        && objects[otmp->otyp].oc_material != MINERAL && pctload < 85)
+        return TRUE;
+    if (likes_objs(mtmp->data) && strchr(practical, otmp->oclass)
+        && pctload < 75)
+        return TRUE;
+    if (likes_magic(mtmp->data) && strchr(magical, otmp->oclass)
+        && pctload < 85)
+        return TRUE;
+    if (throws_rocks(mtmp->data) && otmp->otyp == BOULDER
+        && pctload < 50 && !Sokoban)
+        return TRUE;
+    if (mtmp->data == &mons[PM_GELATINOUS_CUBE]
+        && otmp->oclass != ROCK_CLASS && otmp->oclass != BALL_CLASS
+        && !(otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])))
+        return TRUE;
+
+    return FALSE;
+}
 
 boolean
 itsstuck(register struct monst* mtmp)
@@ -1065,6 +1098,110 @@ maybe_spin_web(struct monst *mtmp)
     }
 }
 
+#define SQSRCHRADIUS 5
+
+static boolean
+m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, int *appr)
+{
+    register int minr = SQSRCHRADIUS; /* not too far away */
+    register struct obj *otmp;
+    register coordxy xx, yy;
+    coordxy oomx, oomy, lmx, lmy;
+    struct trap *ttmp;
+    coordxy omx = mtmp->mx, omy = mtmp->my;
+    struct permonst *ptr = mtmp->data;
+    struct monst *mtoo;
+
+    /* cut down the search radius if it thinks character is closer. */
+    if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
+        && !mtmp->mpeaceful)
+        minr--;
+    /* guards shouldn't get too distracted */
+    if (!mtmp->mpeaceful && is_mercenary(ptr))
+        minr = 1;
+
+    if ((!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
+        oomx = min(COLNO - 1, omx + minr);
+        oomy = min(ROWNO - 1, omy + minr);
+        lmx = max(1, omx - minr);
+        lmy = max(0, omy - minr);
+        for (otmp = fobj; otmp; otmp = otmp->nobj) {
+            /* monsters may pick rocks up, but won't go out of their way
+               to grab them; this might hamper sling wielders, but it cuts
+               down on move overhead by filtering out most common item */
+            if (otmp->otyp == ROCK)
+                continue;
+            /* avoid special items; once hero picks them up, they'll
+               cease being special */
+            if (is_mines_prize(otmp) || is_soko_prize(otmp))
+                continue;
+
+            xx = otmp->ox;
+            yy = otmp->oy;
+            /* Nymphs take everything.  Most other creatures should not
+             * pick up corpses except as a special case like in
+             * searches_for_item().  We need to do this check in
+             * mpickstuff() as well.
+             */
+            if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
+                /* don't get stuck circling around object that's
+                   underneath an immobile or hidden monster;
+                   paralysis victims excluded */
+                if ((mtoo = m_at(xx, yy)) != 0
+                    && (helpless(mtoo) || mtoo->mundetected
+                        || (mtoo->mappearance && !mtoo->iswiz)
+                        || !mtoo->data->mmove))
+                    continue;
+                /* the mfndpos() test for whether to allow a move to a
+                   water location accepts flyers, but they can't reach
+                   underwater objects, so being able to move to a spot
+                   is insufficient for deciding whether to do so */
+                if (!could_reach_item(mtmp, xx, yy))
+                    continue;
+
+                /* ignore obj if there's a trap and monster knows it */
+                if ((ttmp = t_at(xx, yy)) != 0
+                    && mon_knows_traps(mtmp, ttmp->ttyp)) {
+                    if (*ggx == xx && *ggy == yy) {
+                        *ggx = mtmp->mux;
+                        *ggy = mtmp->muy;
+                    }
+                    continue;
+                }
+
+                if (((mon_would_take_item(mtmp, otmp) && (can_carry(mtmp, otmp) > 0))
+                     || (hides_under(ptr) && !cansee(otmp->ox, otmp->oy)))
+                    && can_touch_safely(mtmp, otmp)
+                    /* Don't get stuck circling an Elbereth */
+                    && !onscary(xx, yy, mtmp)) {
+                    minr = distmin(omx, omy, xx, yy);
+                    oomx = min(COLNO - 1, omx + minr);
+                    oomy = min(ROWNO - 1, omy + minr);
+                    lmx = max(1, omx - minr);
+                    lmy = max(0, omy - minr);
+                    *ggx = otmp->ox;
+                    *ggy = otmp->oy;
+                    if (*ggx == omx && *ggy == omy) {
+                        *mmoved = MMOVE_DONE; /* actually unnecessary */
+                        return TRUE;
+                    }
+                }
+            }
+        }
+    }
+
+    if (minr < SQSRCHRADIUS && *appr == -1) {
+        if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
+            *ggx = mtmp->mux;
+            *ggy = mtmp->muy;
+        } else
+            *appr = 1;
+    }
+    return FALSE;
+}
+
+#undef SQSRCHRADIUS
+
 /* Handles the movement of a standard monster. */
 /* Return values:
  * 0: did not move, but can still attack and do other stuff.
@@ -1079,16 +1216,13 @@ m_move(register struct monst* mtmp, register int after)
     coordxy ggx, ggy, nix, niy;
     xint16 chcnt;
     int chi; /* could be schar except for stupid Sun-2 compiler */
-    boolean likegold = 0, likegems = 0, likeobjs = 0, likemagic = 0,
-            conceals = 0;
-    boolean likerock = 0, can_tunnel = 0;
+    boolean can_tunnel = 0;
     boolean can_open = 0, can_unlock = 0 /*, doorbuster = 0 */;
-    boolean uses_items = 0, setlikes = 0;
+    boolean getitems = FALSE;
     boolean avoid = FALSE;
     boolean better_with_displacing = FALSE;
     boolean sawmon = canspotmon(mtmp); /* before it moved */
     struct permonst *ptr;
-    struct monst *mtoo;
     schar mmoved = MMOVE_NOTHING; /* not strictly nec.: chi >= 0 will do */
     long info[9];
     long flag;
@@ -1248,143 +1382,12 @@ m_move(register struct monst* mtmp, register int after)
              * situation where you toss arrows at it and it has nothing
              * better to do than pick the arrows up.
              */
-            register int pctload =
-                (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
-
-            /* look for gold or jewels nearby */
-            likegold = (likes_gold(ptr) && pctload < 95);
-            likegems = (likes_gems(ptr) && pctload < 85);
-            uses_items = (!mindless(ptr) && !is_animal(ptr) && pctload < 75);
-            likeobjs = (likes_objs(ptr) && pctload < 75);
-            likemagic = (likes_magic(ptr) && pctload < 85);
-            likerock = (throws_rocks(ptr) && pctload < 50 && !Sokoban);
-            conceals = hides_under(ptr);
-            setlikes = TRUE;
+            getitems = TRUE;
         }
     }
 
-#define SQSRCHRADIUS 5
-
-    {
-        register int minr = SQSRCHRADIUS; /* not too far away */
-        register struct obj *otmp;
-        register coordxy xx, yy;
-        coordxy oomx, oomy, lmx, lmy;
-        struct trap *ttmp;
-
-        /* cut down the search radius if it thinks character is closer. */
-        if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
-            && !mtmp->mpeaceful)
-            minr--;
-        /* guards shouldn't get too distracted */
-        if (!mtmp->mpeaceful && is_mercenary(ptr))
-            minr = 1;
-
-        if ((likegold || likegems || likeobjs || likemagic || likerock
-             || conceals) && (!*in_rooms(omx, omy, SHOPBASE)
-                              || (!rn2(25) && !mtmp->isshk))) {
- look_for_obj:
-            oomx = min(COLNO - 1, omx + minr);
-            oomy = min(ROWNO - 1, omy + minr);
-            lmx = max(1, omx - minr);
-            lmy = max(0, omy - minr);
-            for (otmp = fobj; otmp; otmp = otmp->nobj) {
-                /* monsters may pick rocks up, but won't go out of their way
-                   to grab them; this might hamper sling wielders, but it cuts
-                   down on move overhead by filtering out most common item */
-                if (otmp->otyp == ROCK)
-                    continue;
-                /* avoid special items; once hero picks them up, they'll
-                   cease being special */
-                if (is_mines_prize(otmp) || is_soko_prize(otmp))
-                    continue;
-
-                xx = otmp->ox;
-                yy = otmp->oy;
-                /* Nymphs take everything.  Most other creatures should not
-                 * pick up corpses except as a special case like in
-                 * searches_for_item().  We need to do this check in
-                 * mpickstuff() as well.
-                 */
-                if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
-                    /* don't get stuck circling around object that's
-                       underneath an immobile or hidden monster;
-                       paralysis victims excluded */
-                    if ((mtoo = m_at(xx, yy)) != 0
-                        && (helpless(mtoo) || mtoo->mundetected
-                            || (mtoo->mappearance && !mtoo->iswiz)
-                            || !mtoo->data->mmove))
-                        continue;
-                    /* the mfndpos() test for whether to allow a move to a
-                       water location accepts flyers, but they can't reach
-                       underwater objects, so being able to move to a spot
-                       is insufficient for deciding whether to do so */
-                    if ((is_pool(xx, yy) && !is_swimmer(ptr))
-                        || (is_lava(xx, yy) && !likes_lava(ptr)))
-                        continue;
-
-                    /* ignore obj if there's a trap and monster knows it */
-                    if ((ttmp = t_at(xx, yy)) != 0
-                        && mon_knows_traps(mtmp, ttmp->ttyp)) {
-                        if (ggx == xx && ggy == yy) {
-                            ggx = mtmp->mux;
-                            ggy = mtmp->muy;
-                        }
-                        continue;
-                    }
-
-                    if (((likegold && otmp->oclass == COIN_CLASS)
-                         || (likeobjs && strchr(practical, otmp->oclass)
-                             && (otmp->otyp != CORPSE
-                                 || (ptr->mlet == S_NYMPH
-                                     && !is_rider(&mons[otmp->corpsenm]))))
-                         || (likemagic && strchr(magical, otmp->oclass))
-                         || (uses_items && searches_for_item(mtmp, otmp))
-                         || (likerock && otmp->otyp == BOULDER)
-                         || (likegems && otmp->oclass == GEM_CLASS
-                             && objects[otmp->otyp].oc_material != MINERAL)
-                         || (conceals && !cansee(otmp->ox, otmp->oy))
-                         || (ptr == &mons[PM_GELATINOUS_CUBE]
-                             && !strchr(indigestion, otmp->oclass)
-                             && !(otmp->otyp == CORPSE
-                                  && touch_petrifies(&mons[otmp->corpsenm]))))
-                        && touch_artifact(otmp, mtmp)) {
-                        if (can_carry(mtmp, otmp) > 0
-                            && (throws_rocks(ptr) || !sobj_at(BOULDER, xx, yy))
-                            && (!is_unicorn(ptr)
-                                || objects[otmp->otyp].oc_material == GEMSTONE)
-                            /* Don't get stuck circling an Elbereth */
-                            && !onscary(xx, yy, mtmp)) {
-                            minr = distmin(omx, omy, xx, yy);
-                            oomx = min(COLNO - 1, omx + minr);
-                            oomy = min(ROWNO - 1, omy + minr);
-                            lmx = max(1, omx - minr);
-                            lmy = max(0, omy - minr);
-                            ggx = otmp->ox;
-                            ggy = otmp->oy;
-                            if (ggx == omx && ggy == omy) {
-                                mmoved = MMOVE_DONE; /* actually unnecessary */
-                                goto postmov;
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (likegold) {
-            /* don't try to pick up anything else, but use the same loop */
-            uses_items = 0;
-            likegems = likeobjs = likemagic = likerock = conceals = 0;
-            goto look_for_obj;
-        }
-
-        if (minr < SQSRCHRADIUS && appr == -1) {
-            if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
-                ggx = mtmp->mux;
-                ggy = mtmp->muy;
-            } else
-                appr = 1;
-        }
-    }
+    if (getitems && m_search_items(mtmp, &ggx, &ggy, &mmoved, &appr))
+        goto postmov;
 
     /* don't tunnel if hostile and close enough to prefer a weapon */
     if (can_tunnel && needspick(ptr)
@@ -1719,30 +1722,12 @@ m_move(register struct monst* mtmp, register int after)
                 newsym(mtmp->mx, mtmp->my);
         }
         if (OBJ_AT(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
-            /* recompute the likes tests, in case we polymorphed
-             * or if the "likegold" case got taken above */
-            if (setlikes) {
-                int pctload = (curr_mon_load(mtmp) * 100) / max_mon_load(mtmp);
-
-                /* look for gold or jewels nearby */
-                likegold = (likes_gold(ptr) && pctload < 95);
-                likegems = (likes_gems(ptr) && pctload < 85);
-                uses_items =
-                    (!mindless(ptr) && !is_animal(ptr) && pctload < 75);
-                likeobjs = (likes_objs(ptr) && pctload < 75);
-                likemagic = (likes_magic(ptr) && pctload < 85);
-                likerock = (throws_rocks(ptr) && pctload < 50 && !Sokoban);
-                conceals = hides_under(ptr);
-            }
 
             /* Maybe a rock mole just ate some metal object */
             if (metallivorous(ptr)) {
                 if (meatmetal(mtmp) == 2)
                     return MMOVE_DIED; /* it died */
             }
-
-            if (g_at(mtmp->mx, mtmp->my) && likegold)
-                mpickgold(mtmp);
 
             /* Maybe a cube ate just about anything */
             if (ptr == &mons[PM_GELATINOUS_CUBE]) {
@@ -1757,22 +1742,8 @@ m_move(register struct monst* mtmp, register int after)
                     return etmp; /* it died or got forced off the level */
             }
 
-            if (!*in_rooms(mtmp->mx, mtmp->my, SHOPBASE) || !rn2(25)) {
-                boolean picked = FALSE;
-
-                if (likeobjs)
-                    picked |= mpickstuff(mtmp, practical);
-                if (likemagic)
-                    picked |= mpickstuff(mtmp, magical);
-                if (likerock)
-                    picked |= mpickstuff(mtmp, boulder_class);
-                if (likegems)
-                    picked |= mpickstuff(mtmp, gem_class);
-                if (uses_items)
-                    picked |= mpickstuff(mtmp, (char *) 0);
-                if (picked)
-                    mmoved = MMOVE_DONE;
-            }
+            if (mpickstuff(mtmp))
+                mmoved = MMOVE_DONE;
 
             if (mtmp->minvis) {
                 newsym(mtmp->mx, mtmp->my);

@@ -113,18 +113,20 @@ endif   #MAKEFILE_SRC
 endif   #HAVE_NCURSESW
 endif   #WANT_WIN_CURSES
 
-# HAVE_SNDLIB could have been set in multiw-2 for Qt.
-# If it is set, add USER_SOUNDS
-ifeq "$(HAVE_SNDLIB)" "1"
-SNDCFLAGS+= -DUSER_SOUNDS
-endif
+#
+#-INCLUDE multisnd1-pre.370
+#
 
-CFLAGS+= $(WINCFLAGS)	  #WINCFLAGS set from multiw-2.370
-CFLAGS+= $(SNDCFLAGS)     #SNDCFLAGS set from multiw-2.370
+# WINCFLAGS set from multiw-2.370
+# SNDCFLAGS set from multisnd-pre.370
+CFLAGS+= $(WINCFLAGS)
+CFLAGS+= $(SNDCFLAGS)
 CFLAGS+= $(NHCFLAGS)
 
-CCXXFLAGS+= $(WINCFLAGS)  #WINCFLAGS set from multiw-2.370
-CCXXFLAGS+= $(SNDCFLAGS)   #SNDCFLAGS set from multiw-2.370
+# WINCFLAGS set from multiw-2.370
+# SNDCFLAGS set from multisnd-pre.370
+CCXXFLAGS+= $(WINCFLAGS)
+CCXXFLAGS+= $(SNDCFLAGS)
 CCXXFLAGS+= $(NHCFLAGS)
 
 VARDATND =
@@ -313,15 +315,19 @@ GAMEPERM = 0755
 #-INCLUDE gbdates-pre.370
 #
 
+#
+#-INCLUDE multisnd2-pre.370
+#
+
 #-POST
 
 #
 #-INCLUDE gbdates-post.370
 #
+#
+#-INCLUDE multisnd-post.370
+#
 
-#
-#-INCLUDE cross-post.370
-#
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
 	$(AR) rcs $@ $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a
@@ -331,4 +337,8 @@ $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
+
 #
+#-INCLUDE cross-post.370
+#
+
