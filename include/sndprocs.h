@@ -52,7 +52,7 @@ struct sound_procs {
                                  int32_t volume);
     void (*sound_play_usersound)(char *filename, int32_t volume, int32_t idx);
     void (*sound_ambience)(int32_t ambience_action, int32_t ambienceid,
-                           int32_t volume);
+                           int32_t proximity);
 };
 
 extern struct sound_procs sndprocs;
