@@ -1748,7 +1748,7 @@ X11: initializing the get-extended-command widget modified memory beyond what
 sound: add a soundlib interface that consists of a specification
 	documented in doc/sound.txt; default 'nosound' soundlib implementation
 	of the specification in src/sounds.c
-sound: added soundlib_macsound implementation for use on macOS; the
+sound: added 'macsound' soundlib implementation for use on macOS; the
 	interface implementation resides in the objective C file
 	sound/macsound/macsound.m; built on top of the built-in AppKit
 	NSSound, #import <AppKit/AppKit.h>, linked using -framework AppKit.
