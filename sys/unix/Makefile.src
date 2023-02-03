@@ -807,11 +807,11 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/context.h ../include/rm.h ../include/botl.h \
 		../include/rect.h ../include/region.h ../include/trap.h \
 		../include/display.h ../include/vision.h ../include/color.h \
-		../include/decl.h ../include/quest.h ../include/spell.h \
-		../include/obj.h ../include/engrave.h ../include/you.h \
-		../include/attrib.h ../include/monst.h ../include/mextra.h \
-		../include/skills.h ../include/timeout.h ../include/flag.h \
-		../include/winprocs.h ../include/sndprocs.h ../include/sys.h
+		../include/sndprocs.h ../include/decl.h ../include/quest.h \
+		../include/spell.h ../include/obj.h ../include/engrave.h \
+		../include/you.h ../include/attrib.h ../include/monst.h \
+		../include/mextra.h ../include/skills.h ../include/timeout.h \
+		../include/flag.h ../include/winprocs.h ../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -906,7 +906,6 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ tile.c
 $(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
@@ -938,7 +937,8 @@ $(TARGETPFX)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) \
 		../win/Qt/qt_str.h $(QTn_H)
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
 $(TARGETPFX)qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
-		../win/Qt/qt_post.h ../win/Qt/qt_icon.h $(QTn_H)
+		../win/Qt/qt_post.h ../win/Qt/qt_icon.h ../win/Qt/qt_str.h \
+		$(QTn_H)
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
 $(TARGETPFX)qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
@@ -1054,6 +1054,7 @@ qt_xcmd.moc: ../win/Qt/qt_xcmd.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_xcmd.h
 qt_yndlg.moc: ../win/Qt/qt_yndlg.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_yndlg.h
+$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
@@ -1112,10 +1113,10 @@ $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/monsters.h ../include/objclass.h \
 		../include/defsym.h ../include/objects.h ../include/wintype.h \
 		../include/sym.h ../include/artilist.h ../include/dungeon.h \
-		../include/obj.h ../include/monst.h ../include/mextra.h \
-		../include/you.h ../include/attrib.h ../include/prop.h \
-		../include/skills.h ../include/context.h ../include/flag.h \
-		../include/dlb.h
+		../include/sndprocs.h ../include/obj.h ../include/monst.h \
+		../include/mextra.h ../include/you.h ../include/attrib.h \
+		../include/prop.h ../include/skills.h ../include/context.h \
+		../include/flag.h ../include/dlb.h
 $(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)minion.o: minion.c $(HACK_H)
