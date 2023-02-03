@@ -1745,18 +1745,18 @@ X11: (possibly X11+macOS): try harder to resize the getlin() prompt, if needed,
 X11: set all selectable menu lines to the same length, left justified
 X11: initializing the get-extended-command widget modified memory beyond what
 	it dynamically allocated
-sounds: add a soundlib interface that consists of a specification
+sound: add a soundlib interface that consists of a specification
 	documented in doc/sound.txt; default 'nosound' soundlib implementation
 	of the specification in src/sounds.c
-sounds: added soundlib_macsound implementation for use on macOS; the
+sound: added soundlib_macsound implementation for use on macOS; the
 	interface implementation resides in the objective C file
 	sound/macsound/macsound.m; built on top of the built-in AppKit
 	NSSound, #import <AppKit/AppKit.h>, linked using -framework AppKit.
-sounds: added 'windsound' soundlib implementation for use on Windows; the
+sound: added 'windsound' soundlib implementation for use on Windows; the
 	interface implementation resides in the file
 	sound/windsound/windsound.c; built on top of the win32 api,
 	header file mmsystem.h, linked with winmm.
-sounds: add 'qtsound' soundlib implementation for use on any platform
+sound: add 'qtsound' soundlib implementation for use on any platform
 	with Qt; the interface implementation resides win/Qt/qt_bind.cpp;
 	built on top of Qt.
 
