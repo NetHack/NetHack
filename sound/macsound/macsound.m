@@ -26,7 +26,7 @@ static void macsound_achievement(schar, schar, int32_t);
 static void macsound_soundeffect(char *, int32_t, int32_t);
 static void macsound_hero_playnotes(int32_t, const char *, int32_t);
 static void macsound_play_usersound(char *, int32_t, int32_t);
-static void macsounde_ambience(int32_t, int32_t, int32_t);
+static void macsound_ambience(int32_t, int32_t, int32_t);
 
 static int affiliate(int32_t seid, const char *soundname);
 
@@ -71,8 +71,8 @@ macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED
 }
 
 static void
-macsound_ambience(int32_t ambienceid, int32_t ambience_action,
-                int32_t hero_proximity)
+macsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED,
+                int32_t hero_proximity UNUSED)
 {
 }
 
