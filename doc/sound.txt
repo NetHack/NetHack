@@ -84,10 +84,10 @@ There are 4 distinct types of sound sound_triggers used by NetHack.
                                  atmosphere or mood-producing or flavorful.
                                  Unlike the other interface functions, this
                                  one gets called to notify the sound interface
-                                 at the outset (amb_action_begin), at the
-                                 termination (amb_action_end), and
+                                 at the outset (ambience_begin), at the
+                                 termination (ambience_end), and
                                  periodically in-between as needed
-                                 (amb_action_upate), likely with a different
+                                 (ambience_upate), likely with a different
                                  hero proximity value.
 
 
@@ -227,7 +227,8 @@ sound_play_usersound(char *filename, int32_t volume, int32_t usidx);
 sound_ambience(int32_t ambienceid, int32_t ambience_action,
                int32_t hero_proximity);
     -- NetHack will call this function when it wants a particular
-       ambience related sound played in order to provide ambience or flavor.
+       ambience related sound played in order to provide atomosphere
+       or flavor.
     -- The ambienceid is used to identify the particular ambience sound
        being sought. The abienceid identifiers are from the
        'enum ambiences' list in include/sndprocs.h.  It is recommended
