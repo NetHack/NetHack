@@ -4177,6 +4177,8 @@ wiz_mon_diff(void)
 static void
 you_sanity_check(void)
 {
+    struct monst *mtmp;
+
     if (u.uswallow && !u.ustuck) {
         /* this probably ought to be panic() */
         impossible("sanity_check: swallowed by nothing?");
@@ -4186,6 +4188,12 @@ you_sanity_check(void)
         u.uswldtim = 0;
         docrt();
     }
+    if ((mtmp = m_at(u.ux, u.uy)) != 0) {
+        /* u.usteed isn't on the map */
+        if (u.ustuck != mtmp)
+            impossible("sanity_check: you over monster");
+    }
+
     (void) check_invent_gold("invent");
 }
 
