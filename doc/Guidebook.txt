@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  January 30, 2023
+                                  February 3, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1446,7 +1446,7 @@
                Jump to another location.  Autocompletes.   Default  key  is
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1710,7 +1710,7 @@
                Do  a  shell escape, switching from NetHack to a subprocess.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2172,7 +2172,7 @@
           the door's lock.  Alternatively, you  can  break  a  closed  door
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2238,7 +2238,7 @@
           teleporters send you to a random dungeon level,  the  destination
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2304,7 +2304,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2370,7 +2370,7 @@
           carrying, will also show current shop debt  or  credit,  if  any.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2568,7 +2568,7 @@
           very useful under certain circumstances.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2634,7 +2634,7 @@
           it is the one who moved rather than you.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2700,7 +2700,7 @@
           extremely obvious, you will be asked what you want to  call  this
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2766,7 +2766,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2832,7 +2832,7 @@
           (such as the aklys, lucern hammer, and bec-de-corbin) are defined
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2898,7 +2898,7 @@
           at most 2 arrows are shot even if you could have fired 3.  If you
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -2964,7 +2964,7 @@
           use.   To  wield  two  weapons,  you need to use the "#twoweapon"
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3030,7 +3030,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3096,7 +3096,7 @@
           vegetarian  players  can,  but  with some rather unpleasant side-
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3162,7 +3162,7 @@
           warned,  however, for this is often unwise.  Other types of wands
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3228,7 +3228,7 @@
           attempt backfires.  Reading a cursed spellbook or one with mystic
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3294,7 +3294,7 @@
           Amulets.   Other  tools  (such  as  pick-axe)  can  be wielded as
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3360,7 +3360,7 @@
           tile  weapons  (if  you  have a sling).  In the most desperate of
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3426,7 +3426,7 @@
           ception  is  that  if the object gets covered by the "remembered,
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3558,7 +3558,7 @@
           teachers prior to the start of the game and isn't counted.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3624,7 +3624,7 @@
           Mines      - Entered the Gnomish Mines.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3690,7 +3690,7 @@
           the Castle level's drawbridge or can be given to you  via  prayer
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3735,11 +3735,11 @@
           text file and can be created with any text editor.
 
                On  Windows,  it  is  ".nethackrc" in the folder "\%USERPRO-
-          FILE%\NetHack\3.7".  The file may not exist, but it is  a  normal
+          FILE%\NetHack\(rq.  The file may not exist, but it  is  a  normal
           ASCII  text  file can can be created with any text editor.  After
           running NetHack for the first time, you  should  find  a  default
           template  for  the configuration file named ".nethackrc.template"
-          in "\%USERPROFILE%\NetHack\3.7".  If you had not created the con-
+          in "\%USERPROFILE%\NetHack\(rq.  If you had not created the  con-
           figuration  file,  NetHack will create the configuration file for
           you using the default template file.
 
@@ -3756,7 +3756,7 @@
           valid  after  a  CHOOSE  directive  and  their  names  are   case
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4020,7 +4020,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4086,7 +4086,7 @@
             Apply-Key - if carrying a key or other unlocking  tool,  prompt
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4218,7 +4218,7 @@
             killed by traps and each other as well  as  by  you.   And  the
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4350,7 +4350,7 @@
             Ignore  interrupt  signals,  including  breaks  (default  off).
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4416,7 +4416,7 @@
             the  selected  object  class(es).   Combination  starts  with a
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4482,7 +4482,7 @@
             Key to select all items on this page of a menu.  Default `,'.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4548,7 +4548,7 @@
             Read the NetHack news file, if present (default on).  Since the
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4614,7 +4614,7 @@
             attack      - require   "yes"   rather   than  `y'  to  confirm
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4746,7 +4746,7 @@
             entirely.  Requesting it  when  not  allowed  or  not  possible
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4812,7 +4812,7 @@
             This option may be used to select one of the named symbol  sets
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -4944,7 +4944,7 @@
             c - order by monster class, by low to high  level  within  each
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5010,7 +5010,7 @@
             Draw  a  tombstone  graphic  upon  your  death  (default   on).
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5142,7 +5142,7 @@
             or right).
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5208,7 +5208,7 @@
             If NetHack can, it should use this size font for text windows.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5274,7 +5274,7 @@
             Number of lines for traditional below-the-map  status  display.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5472,7 +5472,7 @@
             ments  in the configuration file if needed.  Cannot be set with
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5538,7 +5538,7 @@
           about to autopickup something.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5736,7 +5736,7 @@
             being  asked for a direction, the key to respond as left click.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5802,7 +5802,7 @@
             norep - show  the  message  once,  but  not  again  if no other
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6066,7 +6066,7 @@
                  having 30 points is 50% and 35 points  is  75%.   100%  is
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6396,7 +6396,7 @@
           glyph representations. The customizations can  be  specified  for
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6462,7 +6462,7 @@
           and  other POSIX systems, define MSGHANDLER to enable it.  To use
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6528,7 +6528,7 @@
           ministrator should set up a global configuration; this is a  file
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6594,7 +6594,7 @@
             saved).
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6792,7 +6792,7 @@
           Steve Creps, Eric Hendrickson, Izchak Miller,  Eric  S.  Raymond,
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6858,7 +6858,7 @@
           3.1 for X11.  It drew the map as text rather than graphically but
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6924,7 +6924,7 @@
           tures.  Kevin later  joined  the  NetHack  Development  Team  and
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -6990,7 +6990,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -7056,7 +7056,7 @@
           S. Ray joined the NetHack Development Team.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -7122,7 +7122,7 @@
           some security fixes and a small number of bug fixes.
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -7188,7 +7188,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
@@ -7254,7 +7254,7 @@
 
 
 
-          NetHack 3.7                                      January 30, 2023
+          NetHack 3.7                                      February 3, 2023
 
 
 
