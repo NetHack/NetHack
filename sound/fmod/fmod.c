@@ -18,16 +18,19 @@ static void fmod_achievement(schar, schar, int32_t);
 static void fmod_soundeffect(char *, int32_t, int32_t);
 static void fmod_hero_playnotes(int32_t, char *, int32_t);
 static void fmod_play_usersound(char *, int32_t, int32_t);
+static void fmod_ambience(int32_t ambienceid, int32_t ambience_action,
+                            int32_t hero_proximity);
 
 struct sound_procs fmod_procs = {
-    SOUNDID(fmod),
-    SNDCAP_USERSOUNDS,
+    SOUNDID(fmod),       
+    SOUND_TRIGGER_USERSOUNDS,
     fmod_init_nhsound,
     fmod_exit_nhsound,
     fmod_achievement,
     fmod_soundeffect,
     fmod_hero_playnotes,
     fmod_play_usersound,
+    fmod_ambience,
 };
 
 static void
@@ -50,21 +53,20 @@ fmod_exit_nhsound(const char *reason)
 static void
 fmod_achievement(schar ach1, schar ach2, int32_t repeat)
 {
-
-
+    //  to be added in future
 }
 
 /* fulfill SNDCAP_SOUNDEFFECTS */
 static void
 fmod_soundeffect(char *desc, int32_t seid, int volume)
 {
-
+    //  to be added in future
 }
 
 /* fulfill SNDCAP_HEROMUSIC */
 static void fmod_hero_playnotes(int32_t instrument, char *str, int32_t volume)
 {
-
+    //  to be added in future
 }
 
 /* fulfill  SNDCAP_USERSOUNDS */
@@ -81,6 +83,13 @@ fmod_play_usersound(const char *filename, int32_t volume UNUSED, int32_t idx UNU
         FMOD_Channel_Stop(channel1);
         FMOD_System_PlaySound(systemvar, soundvar, 0, 0, &channel1);
     }
+}
+
+static void
+sample_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
+{
+    //  to be added in future
 }
 
 #endif /* SND_LIB_FMOD  */
