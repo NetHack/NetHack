@@ -546,7 +546,7 @@ extern const char *pmname(struct permonst *, int);
 #endif
 extern const char *mon_pmname(struct monst *);
 extern const char *obj_pmname(struct obj *);
-boolean mapxy_valid(coordxy x, coordxy y);
+extern boolean mapxy_valid(coordxy, coordxy);
 
 /* ### do_wear.c ### */
 
