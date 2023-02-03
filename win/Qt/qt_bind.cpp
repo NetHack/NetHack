@@ -1062,6 +1062,9 @@ void NetHackQtBind::qtsound_soundeffect(char *desc UNUSED, int32_t seid UNUSED, 
 void NetHackQtBind::qtsound_hero_playnotes(int32_t instrument UNUSED, const char *str UNUSED, int32_t volume UNUSED)
 {
 }
+void NetHackQtBind::qtsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED, int32_t proximity UNUSED)
+{
+}
 #endif
 
 #if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
@@ -1182,6 +1185,7 @@ struct sound_procs qtsound_procs = {
     nethack_qt_::NetHackQtBind::qtsound_soundeffect,
     nethack_qt_::NetHackQtBind::qtsound_hero_playnotes,
     nethack_qt_::NetHackQtBind::qtsound_play_usersound,
+    nethack_qt_::NetHackQtBind::qtsound_ambience,
 };
 #endif /* SND_LIB_QTSOUND and !QT_NO_SOUND */
 

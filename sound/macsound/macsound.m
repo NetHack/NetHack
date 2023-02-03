@@ -26,12 +26,15 @@ static void macsound_achievement(schar, schar, int32_t);
 static void macsound_soundeffect(char *, int32_t, int32_t);
 static void macsound_hero_playnotes(int32_t, const char *, int32_t);
 static void macsound_play_usersound(char *, int32_t, int32_t);
+static void macsounde_ambience(int32_t, int32_t, int32_t);
+
 static int affiliate(int32_t seid, const char *soundname);
 
 /*
  * Sound capabilities that can be enabled:
  *    SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
- *        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS,
+ *        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS
+ *        | SOUND_TRIGGER_AMBIENCE,
  */
 
 struct sound_procs macsound_procs = {
@@ -43,6 +46,7 @@ struct sound_procs macsound_procs = {
     macsound_soundeffect,
     macsound_hero_playnotes,
     macsound_play_usersound,
+    macsound_ambience,
 };
 
 static void
@@ -64,6 +68,12 @@ macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED
 {
 
 
+}
+
+static void
+macsound_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
+{
 }
 
 /* magic number 47 is the current number of sound_ files to include */

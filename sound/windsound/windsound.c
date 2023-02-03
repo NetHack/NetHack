@@ -23,6 +23,8 @@ static void windsound_achievement(schar, schar, int32_t);
 static void windsound_soundeffect(char *, int32_t, int32_t);
 static void windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
 static void windsound_play_usersound(char *, int32_t, int32_t);
+static void windsound_ambience(int32_t ambienceid, int32_t ambience_action,
+                               int32_t hero_proximity);
 
 /* supporting routines */
 static void adjust_soundargs_for_compiler(int32_t *, DWORD *, char **);
@@ -31,32 +33,39 @@ static void maybe_preinsert_directory(int32_t, char *, char *, size_t);
 struct sound_procs windsound_procs = {
     SOUNDID(windsound),
     SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_SOUNDEFFECTS
-        | SOUND_TRIGGER_HEROMUSIC,
+        | SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_AMBIENCE,
     windsound_init_nhsound,
     windsound_exit_nhsound,
     windsound_achievement,
     windsound_soundeffect,
     windsound_hero_playnotes,
     windsound_play_usersound,
+    windsound_ambience,
 };
 
-void
+static void
 windsound_init_nhsound(void)
 {
     /* No steps required */
 }
 
-void
+static void
 windsound_exit_nhsound(const char *reason)
 {
 }
 
-void
+static void
 windsound_achievement(schar ach1, schar ach2, int32_t repeat)
 {
 }
 
-void
+static void
+windsound_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
+{
+}
+
+static void
 windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
@@ -86,7 +95,7 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 
 #define WAVEMUSIC_SOUNDS
 
-void
+static void
 windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 {
 #ifdef WAVEMUSIC_SOUNDS
@@ -174,14 +183,15 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 #endif
 }
 
-void
+static void
 windsound_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     /*    pline("play_usersound: %s (%d).", filename, volume); */
     (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT | SND_FILENAME);
 }
 
-static void adjust_soundargs_for_compiler(
+static void
+adjust_soundargs_for_compiler(
     int32_t *sefilename_flags,
     DWORD *fdwsound,
     char **dirbuf)

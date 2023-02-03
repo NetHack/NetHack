@@ -1645,12 +1645,13 @@ extern struct sound_procs qtsound_procs;
 struct sound_procs nosound_procs = {
     SOUNDID(nosound),
     0L,
-    (void (*)(void)) 0,                     /* init_nhsound    */
-    (void (*)(const char *)) 0,             /* exit_nhsound    */
-    (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
-    (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
-    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes  */
-    (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
+    (void (*)(void)) 0,                           /* init_nhsound   */
+    (void (*)(const char *)) 0,                   /* exit_nhsound   */
+    (void (*)(schar, schar, int32_t)) 0,          /* achievement    */
+    (void (*)(char *, int32_t, int32_t)) 0,       /* sound effect   */
+    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes */
+    (void (*)(char *, int32_t, int32_t)) 0,       /* play_usersound */
+    (void (*)(int32_t, int32_t, int32_t)) 0,      /* ambience       */
 };
 
 /* The order of these array entries must match the
@@ -1811,6 +1812,9 @@ static void nosound_resume_nhsound(void);
 static void nosound_achievement(schar, schar, int32_t);
 static void nosound_soundeffect(int32_t, int32_t);
 static void nosound_play_usersound(char *, int32_t, int32_t);
+static void nosound_ambience(int32_t, int32_t, int32_t);
+{
+}
 
 static void
 nosound_init_nhsound(void)
@@ -1839,6 +1843,12 @@ nosound_hero_playnotes(int32_t instr, const char *notes, int32_t vol)
 
 static void
 nosound_play_usersound(char *filename, int volume, int idx)
+{
+}
+
+static void
+nosound_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
 {
 }
 #endif

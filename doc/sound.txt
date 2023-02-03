@@ -52,8 +52,8 @@ There are 4 distinct types of sound sound_triggers used by NetHack.
 
     SOUND_TRIGGER_ACHIEVEMENTS   Invoked by the core when an in-game
                                  achievement is reached. The soundlib routines
-                                 could play appropriate theme or mood music in
-                                 response.
+                                 could play appropriate theme or some fanfare
+                                 in response.
                                  There needs to be a way to map each
                                  achievement to a specific external
                                  sound file or resource. The sound
@@ -77,8 +77,19 @@ There are 4 distinct types of sound sound_triggers used by NetHack.
                                  file. The sound interface function
                                  pointer used to invoke it:
 
-                                 void (*sound_soundeffect)
-                                       (char *desc, int32_t, int32_t volume);
+                                 void (*sound_soundeffect)(char *desc,
+                                               int32_t seid, int32_t volume);
+
+    SOUND_TRIGGER_AMBIENCE       Invoked by the core in response to something
+                                 atmosphere or mood-producing or flavorful.
+                                 Unlike the other interface functions, this
+                                 one gets called to notify the sound interface
+                                 at the outset (amb_action_begin), at the
+                                 termination (amb_action_end), and
+                                 periodically in-between as needed
+                                 (amb_action_upate), likely with a different
+                                 hero proximity value.
+
 
 The types of sound sound_triggers supported by a particular soundlib
 implementation are specified in that library's soundlib file, which is usually
@@ -97,6 +108,8 @@ the sound_triggers field of the sound_procs struct:
               int32_t volume);
         void (*sound_play_usersound)(char *filename, int32_t volume,
               int32_t usidx);
+        void (*sound_ambience)(int32_t ambienceid, int32_t ambience_action,
+               int32_t hero_proximity);
     };
 
 A sound library integration support file can implement one, two, three or
@@ -211,6 +224,29 @@ sound_play_usersound(char *filename, int32_t volume, int32_t usidx);
        volume adjustments. If it doesn't, the volume argument would
        just have to be ignored.
 
+sound_ambience(int32_t ambienceid, int32_t ambience_action,
+               int32_t hero_proximity);
+    -- NetHack will call this function when it wants a particular
+       ambience related sound played in order to provide ambience or flavor.
+    -- The ambienceid is used to identify the particular ambience sound
+       being sought. The abienceid identifiers are from the
+       'enum ambiences' list in include/sndprocs.h.  It is recommended
+       that you look them up there as new ones get added periodically
+       as game development continues. The identifiers all begin
+       with 'amb_'.
+    -- ambience_action. A soundlib integration support file that has
+       SOUND_TRIGGER_AMBIENCE support is expected to commence playing the
+       sound when it receives an ambience_action of ambience_begin. It
+       will receive an ambience_action of ambience_end when it should cease
+       playing the sound. It may receive an ambience_action of
+       ambience_update periodically, anytime the ambience is underway,
+       and it should respond accordingly: perhaps by adjusting the nature
+       of the sound being heard, or possibly by just adjusting the volume.
+    -- hero_proximity could be zero, in which case the ambience being
+       triggered is not impacted by the hero's distance from anything.
+       If the distance of the hero from the source of the ambience does
+       matter, then a distance value will be in hero_proximity.
+
 
 III.  Global variables
 
@@ -322,13 +358,15 @@ use the following guidelines:
        struct sound_procs myprefix_procs = {
            SOUNDID(myprefix),
            SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
-              | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
+              | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS
+              | SOUND_TRIGGER_AMBIENCE,
            myprefix_init_nhsound,
            myprefix_exit_nhsound,
            myprefix_achievement,
            myprefix_soundeffect,
            myprefix_hero_playnotes,
            myprefix_play_usersound,
+           myprefix_ambience),
        };
 
    The first entry in this structure should be the SOUNDID(myprefix)
@@ -485,17 +523,21 @@ static void sample_achievement(schar, schar, int32_t);
 static void sample_soundeffect(char *, int32_t, int32_t);
 static void sample_hero_playnotes(int32_t, const char *, int32_t);
 static void sample_play_usersound(char *, int32_t, int32_t);
+static void sample_ambience(int32_t ambienceid, int32_t ambience_action,
+                            int32_t hero_proximity);
 
 struct sound_procs sample_procs = {
     SOUNDID(sample),
     SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
-        | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS,
+        | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_AMBIENCE
     sample_init_nhsound,
     sample_exit_nhsound,
     sample_achievement,
     sample_soundeffect,
     sample_hero_playnotes,
     sample_play_usersound,
+    sample_ambience,
 };
 
 static void
@@ -537,6 +579,12 @@ static void
 sample_play_usersound(char *filename, int volume, int usidx)
 {
 
+}
+
+static void
+sample_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
+{
 }
 
 /* end of sample.c */

@@ -48,8 +48,11 @@ struct sound_procs {
     void (*sound_exit_nhsound)(const char *);
     void (*sound_achievement)(schar, schar, int32_t);
     void (*sound_soundeffect)(char *desc, int32_t, int32_t volume);
-    void (*sound_hero_playnotes)(int32_t instrument, const char *str, int32_t volume);
+    void (*sound_hero_playnotes)(int32_t instrument, const char *str,
+                                 int32_t volume);
     void (*sound_play_usersound)(char *filename, int32_t volume, int32_t idx);
+    void (*sound_ambience)(int32_t ambience_action, int32_t ambienceid,
+                           int32_t volume);
 };
 
 extern struct sound_procs sndprocs;
@@ -63,7 +66,8 @@ extern struct sound_procs sndprocs;
 #define SOUND_TRIGGER_HEROMUSIC    0x0002L
 #define SOUND_TRIGGER_ACHIEVEMENTS 0x0004L
 #define SOUND_TRIGGER_SOUNDEFFECTS 0x0008L
-                            /* 28 free bits */
+#define SOUND_TRIGGER_AMBIENCE     0x0010L
+                            /* 27 free bits */
 
 extern struct sound_procs soundprocs;
 
@@ -320,6 +324,14 @@ enum sound_effect_entries {
     se_boomerang_klonk                = 194,
     se_bang_weapon_side               = 195,
     number_of_se_entries
+};
+
+enum ambience_actions {
+    ambience_nothing, ambience_begin, ambience_end, ambience_update
+};
+
+enum ambiences {
+    amb_noambience,
 };
 
 enum achievements_arg2 {
