@@ -1232,6 +1232,8 @@ Default key is \(oqZ\(cq.
 .lp "#chat    "
 Talk to someone.
 Default key is \(oqM-c\(cq.
+.lp "#chronicle"
+Show a list of important game events.
 .lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
@@ -1532,6 +1534,10 @@ otherwise \(oq5\(cq when it is set to 2 or 4.
 .lp "#save    "
 Save the game and exit the program.
 Default key is \(oqS\(cq.
+.lp "#saveoptions"
+Save configuration options to the config file.
+This will overwrite the file, removing all comments, so if you have
+manually edited the config file, don't use this.
 .lp "#search  "
 Search for traps and secret doors around you.
 Default key is \(oqs\(cq.
