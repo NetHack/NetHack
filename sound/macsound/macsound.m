@@ -70,11 +70,11 @@ macsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED,
 }
 
 /* magic number 47 is the current number of sound_ files to include */
-#define EXTRA_SOUNDS (47 + number_of_sa2_entries)
+#define EXTRA_SOUNDS 47
 
-static int32_t affiliation[number_of_se_entries + EXTRA_SOUNDS] = { 0 };
-static NSString *soundstring[number_of_se_entries + EXTRA_SOUNDS];
-static NSSound *seSound[number_of_se_entries + EXTRA_SOUNDS];
+static int32_t affiliation[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS] = { 0 };
+static NSString *soundstring[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
+static NSSound *seSound[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
 
 /* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
 static void
@@ -113,14 +113,14 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 #define WAVEMUSIC_SOUNDS
 
 /* This is the number of sound_ files that support WAVEMUSIC_SOUNDS */
-static const int wavemusic_sound_count = 94;
+static const int wavemusic_sound_count = EXTRA_SOUNDS;
 
 /* fulfill SOUND_TRIGGER_HEROMUSIC */
 static void macsound_hero_playnotes(int32_t instrument,
                   const char *str, int32_t vol UNUSED)
 {
 #ifdef WAVEMUSIC_SOUNDS
-    uint32_t pseudo_seid, pseudo_seid_base;
+    uint32_t pseudo_seid, pseudo_seid_base = 0;
     boolean has_note_variations = FALSE;
     char resourcename[120], *end_of_res = 0;
     const char *c = 0;
@@ -217,7 +217,7 @@ static void macsound_hero_playnotes(int32_t instrument,
 #endif
 }
 
-/* #define ACHIEVEMENT_SOUNDS */
+#define ACHIEVEMENT_SOUNDS
 
 /* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
 static void
