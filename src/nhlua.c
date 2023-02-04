@@ -2018,6 +2018,8 @@ static struct e ct_base_iffy[] = {
 };
 
 /* NHL_BASE_UNSAFE - include only if required */
+/* TODO: if NHL_BASE_UNSAFE is ever used, we need to wrap lua_load with
+ * something to forbid mode=="b" */
 static struct e ct_base_unsafe[] = {
     {IFFLAG, "dofile"},
     {IFFLAG, "loadfile"},
