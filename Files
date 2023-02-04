@@ -242,6 +242,7 @@ README.md
 sound/wav:
 (files in top directory)
 README                       attributions.txt
+sa2_xpleveldown.uu           sa2_xplevelup.uu
 se_squeak_A.uu               se_squeak_B.uu
 se_squeak_B_flat.uu          se_squeak_C.uu
 se_squeak_D.uu               se_squeak_D_flat.uu
