@@ -156,6 +156,7 @@ sanity_check_single_mon(
             && (!has_ceiling(&u.uz) ||
                 !(levl[mx][my].typ == POOL
                   || levl[mx][my].typ == MOAT
+                  || levl[mx][my].typ == LAVAPOOL
                   || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
