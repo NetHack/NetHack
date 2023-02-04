@@ -3309,10 +3309,10 @@
 
                Some  tools (such as a blindfold) can be worn and can be put
           on and removed  like  other  accessories  (rings,  amulets);  see
-          Amulets.   Other tools (such as pick-axe) can be wielded as weap-
-          ons in addition to being applied for their usual purpose, and  in
-          some cases (again, pick-axe) become wielded as a weapon even when
-          applied.
+          Amulets.   Other  tools  (such  as  pick-axe)  can  be wielded as
+          weapons in addition to being applied for their usual purpose, and
+          in  some  cases (again, pick-axe) become wielded as a weapon even
+          when applied.
 
                The blind option can be set (prior to game start) to attempt
           to play the entire game without being able to see (a self-imposed
