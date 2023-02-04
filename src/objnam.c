@@ -2139,7 +2139,7 @@ ansimpleoname(struct obj* obj)
        any `known' and `dknown' checking necessary) */
     if (otyp == FAKE_AMULET_OF_YENDOR)
         otyp = AMULET_OF_YENDOR;
-    if (objects[otyp].oc_unique
+    if (objects[otyp].oc_unique && OBJ_NAME(objects[otyp])
         && !strcmp(simpleoname, OBJ_NAME(objects[otyp]))) {
         /* the() will allocate another obuf[]; we want to avoid using two */
         Strcpy(simpleoname, obufp = the(simpleoname));
