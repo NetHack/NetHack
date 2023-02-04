@@ -5887,7 +5887,8 @@ levregion_add(lev_region* lregion)
 /* get params from topmost lua hash:
    - region = {x1,y1,x2,y2}
    - exclude = {x1,y1,x2,y2} (optional)
-   - region_islev=true, exclude_idlev=true (optional) */
+   - region_islev=true, exclude_islev=true (optional)
+   - negative x and y are invalid */
 static void
 l_get_lregion(lua_State *L, lev_region *tmplregion)
 {
@@ -5899,7 +5900,7 @@ l_get_lregion(lua_State *L, lev_region *tmplregion)
     tmplregion->inarea.x2 = x2;
     tmplregion->inarea.y2 = y2;
 
-    x1 = y1 = x2 = y2 = 0;
+    x1 = y1 = x2 = y2 = -1;
     get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
     tmplregion->delarea.x1 = x1;
     tmplregion->delarea.y1 = y1;
@@ -5908,6 +5909,13 @@ l_get_lregion(lua_State *L, lev_region *tmplregion)
 
     tmplregion->in_islev = get_table_boolean_opt(L, "region_islev", 0);
     tmplregion->del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+
+    /* if x1 is still negative, exclude wasn't specified, so we should treat it
+     * as if there is no exclude region at all. Force exclude_islev to true so
+     * the -1,-1,-1,-1 region is safely off the map and won't interfere with
+     * branch or portal placement. */
+    if (x1 < 0)
+        tmplregion->del_islev = TRUE;
 }
 
 /* teleport_region({ region = { x1,y1, x2,y2} }); */

@@ -896,7 +896,7 @@ Example:
 Example:
 
  des.teleport_region({ region = { x1,y1, x2,y2} });
- des.teleport_region({ region = { x1,y1, x2,y2}, region_islev = 1, exclude = { x1,y1, x2,y2}, exclude_islen = 1, dir = "up" });
+ des.teleport_region({ region = { x1,y1, x2,y2}, region_islev = 1, exclude = { x1,y1, x2,y2}, exclude_islev = 1, dir = "up" });
 
 
 === terrain
