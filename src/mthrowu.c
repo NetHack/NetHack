@@ -1259,8 +1259,17 @@ hit_bars(
         if (!(harmless_missile(otmp) || is_flimsy(otmp)))
             noise = 4 * 4;
 
-        if (your_fault && otmp->otyp == WAR_HAMMER) {
-            int chance = (melee_attk ? 40 : 60) - ACURR(A_STR) - otmp->spe;
+        if (your_fault && (otmp->otyp == WAR_HAMMER
+                           || otmp->otyp == HEAVY_IRON_BALL)) {
+            /* iron ball isn't a weapon or wep-tool so doesn't use obj->spe;
+               weight is normally 480 but can be increased by increments
+               of 160 (scrolls of punishment read while already punished) */
+            int spe = ((otmp->otyp == HEAVY_IRON_BALL) /* 3+ for iron ball */
+                       ? ((int) otmp->owt / IRON_BALL_W_INCR)
+                       : otmp->spe);
+            /* chance: used in saving throw for the bars; more likely to
+               break those when 'chance' is _lower_; acurrstr(): 3..25 */
+            int chance = (melee_attk ? 40 : 60) - acurrstr() - spe;
 
             if (!rn2(max(2, chance))) {
                 You("break the bars apart!");
