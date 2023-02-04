@@ -3,7 +3,12 @@
 # $NHDT-Date: 1612127123 2021/01/31 21:05:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $
 #
 # usage:
-#   cd src ; nawk -f depend.awk ../include/*.h list-of-.c/.cpp-files
+#   awk -f depend.awk ../include/*.h list-of-.c/.cpp-files
+#   (might need nawk or gawk instead of plain awk if it is really old)
+# meta usage:
+#   ( cd src ; make all ; cp ../sys/unix/Makefile.src ./Makefile ; \
+#     make depend ; cp ./Makefile ../sys/unix/Makefile.src ; \
+#     cd .. ; sh sys/unix/setup.sh [sys/unix/hints/FOO] )
 #
 # This awk program scans each file in sequence, looking for lines beginning
 # with `#include "' and recording the name inside the quotes.  For .h files,
@@ -129,6 +134,7 @@ function format_dep(target, source,		col, n, i, list, prefix, moc)
   #- printf("\t");  col += 8 - (col % 8);
   #- if (col == 8) { printf("\t"); col += 8 }
   source = depend("", source, 0)
+  sub(" +$", "", source)                #strip trailing spaces, if any
   n = split(source, list, " +")
   #first: leading whitespace yields empty 1st element; not sure why moc
   #files duplicate the target as next element but we need to skip that too
