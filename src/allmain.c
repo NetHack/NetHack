@@ -626,8 +626,12 @@ init_sound_and_display_gamewindows(void)
 
     activate_chosen_soundlib();
 
-    SoundAchievement(0, sa2_splashscreen, 0);
-    /* ToDo: new splash screen invocation will go here */
+    if (iflags.wc_splash_screen && !flags.randomall) {
+        SoundAchievement(0, sa2_splashscreen, 0);
+        /* ToDo: new splash screen invocation will go here */
+    } else {
+        SoundAchievement(0, sa2_newgame_nosplash, 0);
+    }
 
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {

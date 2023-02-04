@@ -788,7 +788,8 @@ WAVS = $(SndWavDir)\se_squeak_A.wav $(SndWavDir)\se_squeak_B.wav \
 	$(SndWavDir)\sound_Wooden_Harp_A.wav $(SndWavDir)\sound_Wooden_Harp_B.wav \
 	$(SndWavDir)\sound_Wooden_Harp_C.wav $(SndWavDir)\sound_Wooden_Harp_D.wav \
 	$(SndWavDir)\sound_Wooden_Harp_E.wav $(SndWavDir)\sound_Wooden_Harp_F.wav \
-	$(SndWavDir)\sound_Wooden_Harp_G.wav
+	$(SndWavDir)\sound_Wooden_Harp_G.wav $(SndWavDir)\sa2_xpleveldown.wav \
+	$(SndWavDir)\sa2_xplevelup.wav
 
 !IF "$(HAVE_SOUNDLIB)" == "Y"
 !IF "$(NEED_USERSOUNDS)" == "Y"
@@ -2145,6 +2146,8 @@ $(SndWavDir)\sound_Wooden_Harp_D.wav: $(SndWavDir)\sound_Wooden_Harp_D.uu $(U)uu
 $(SndWavDir)\sound_Wooden_Harp_E.wav: $(SndWavDir)\sound_Wooden_Harp_E.uu $(U)uudecode.exe
 $(SndWavDir)\sound_Wooden_Harp_F.wav: $(SndWavDir)\sound_Wooden_Harp_F.uu $(U)uudecode.exe
 $(SndWavDir)\sound_Wooden_Harp_G.wav: $(SndWavDir)\sound_Wooden_Harp_G.uu $(U)uudecode.exe
+$(SndWavDir)\sa2_xpleveldown.wav: $(SndWavDir)\sa2_xpleveldown.uu $(U)uudecode.exe
+$(SndWavDir)\sa2_xplevelup.wav: $(SndWavDir)\sa2_xplevelup.uu $(U)uudecode.exe
 
 #===============================================================================
 # Housekeeping

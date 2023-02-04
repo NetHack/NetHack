@@ -39,7 +39,8 @@ static int affiliate(int32_t seid, const char *soundname);
 
 struct sound_procs macsound_procs = {
     SOUNDID(macsound),
-    SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_SOUNDEFFECTS,
+    SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_ACHIEVEMENTS,
     macsound_init_nhsound,
     macsound_exit_nhsound,
     macsound_achievement,
@@ -62,14 +63,6 @@ macsound_exit_nhsound(const char *reason UNUSED)
 
 }
 
-/* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
-static void
-macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED)
-{
-
-
-}
-
 static void
 macsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED,
                 int32_t hero_proximity UNUSED)
@@ -77,7 +70,7 @@ macsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED,
 }
 
 /* magic number 47 is the current number of sound_ files to include */
-#define EXTRA_SOUNDS 47
+#define EXTRA_SOUNDS (47 + number_of_sa2_entries)
 
 static int32_t affiliation[number_of_se_entries + EXTRA_SOUNDS] = { 0 };
 static NSString *soundstring[number_of_se_entries + EXTRA_SOUNDS];
@@ -118,6 +111,9 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 }
 
 #define WAVEMUSIC_SOUNDS
+
+/* This is the number of sound_ files that support WAVEMUSIC_SOUNDS */
+static const int wavemusic_sound_count = 94;
 
 /* fulfill SOUND_TRIGGER_HEROMUSIC */
 static void macsound_hero_playnotes(int32_t instrument,
@@ -217,6 +213,62 @@ static void macsound_hero_playnotes(int32_t instrument,
             }
         }
         c++;
+    }
+#endif
+}
+
+/* #define ACHIEVEMENT_SOUNDS */
+
+/* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
+static void
+macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED)
+{
+#ifdef ACHIEVEMENT_SOUNDS
+    char resourcename[120];
+    uint32_t pseudo_seid, pseudo_seid_base;
+
+    if (ach1 == 0 && ach2 == 0)
+        return;
+
+    resourcename[0] = '\0';
+    pseudo_seid_base = 0;
+    if (ach1 == 0) {
+        int sa2 = (int) ach2;
+
+        if (sa2 > sa2_zero_invalid && sa2 < number_of_sa2_entries) {
+            switch(sa2) {
+                case sa2_splashscreen:
+                    Strcpy(resourcename, "sa2_splashscreen");
+                    break;
+                case sa2_newgame_nosplash:
+                    Strcpy(resourcename, "sa2_newgame_nosplash");
+                    break;
+                case sa2_restoregame:
+                    Strcpy(resourcename, "sa2_restoregame");
+                    break;
+                case sa2_xplevelup:
+                    Strcpy(resourcename, "sa2_xplevelup");
+                    break;
+                case sa2_xpleveldown:
+                    Strcpy(resourcename, "sa2_xpleveldown");
+                    break;
+            }
+            if (resourcename[0] == '\0')
+                return;
+
+            /* get past se_ entries and the wavemusic entries */
+            pseudo_seid_base += (number_of_se_entries + wavemusic_sound_count);
+
+            pseudo_seid = pseudo_seid_base + sa2;
+            if (!affiliation[pseudo_seid]) {
+                affiliate(pseudo_seid, resourcename);
+            }
+            if (affiliation[pseudo_seid]) {
+                if ([seSound[pseudo_seid] isPlaying])
+                    [seSound[pseudo_seid] stop];
+                [seSound[pseudo_seid] play];
+            }
+        }
     }
 #endif
 }

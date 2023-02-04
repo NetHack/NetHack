@@ -335,8 +335,8 @@ enum ambiences {
 };
 
 enum achievements_arg2 {
-    sa2_splashscreen, sa2_newgame_nosplash, sa2_restoregame,
-    sa2_xplevelup, sa2_xpleveldown
+    sa2_zero_invalid, sa2_splashscreen, sa2_newgame_nosplash, sa2_restoregame,
+    sa2_xplevelup, sa2_xpleveldown, number_of_sa2_entries
 };
 
 /*

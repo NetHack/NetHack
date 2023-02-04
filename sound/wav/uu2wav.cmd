@@ -63,6 +63,8 @@ set UU=..\..\util\uudecode.exe
 %UU% sound_Wooden_Harp_E.uu
 %UU% sound_Wooden_Harp_F.uu
 %UU% sound_Wooden_Harp_G.uu
+%UU% sa2_xpleveldown.uu
+%UU% sa2_xplevelup.uu
 
 set UU=
 

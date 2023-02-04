@@ -105,6 +105,8 @@ sound_Wooden_Harp_D WAVE "sound_Wooden_Harp_D.wav"
 sound_Wooden_Harp_E WAVE "sound_Wooden_Harp_E.wav"
 sound_Wooden_Harp_F WAVE "sound_Wooden_Harp_F.wav"
 sound_Wooden_Harp_G WAVE "sound_Wooden_Harp_G.wav"
+sa2_xpleveldown WAVE "sa2_xpleveldown.wav"
+sa2_xplevelup WAVE "sa2_xplevelup.wav"
 #endif
 
 /*console.rc*/"

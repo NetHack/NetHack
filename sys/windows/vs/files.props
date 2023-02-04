@@ -212,6 +212,8 @@
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_E.uu"/>
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_F.uu"/>
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_G.uu"/>
+    <UUFiles Include = "$(SndWavDir)sa2_xpleveldown.uu"/>
+    <UUFiles Include = "$(SndWavDir)sa2_xplevelup.uu"/>
   </ItemGroup>
   <ItemGroup>
     <IconFiles Include = "$(WinWin32Dir)nethack.ico"/>

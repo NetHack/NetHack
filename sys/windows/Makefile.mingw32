@@ -865,7 +865,8 @@ WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	sound_Wooden_Harp_A sound_Wooden_Harp_B \
 	sound_Wooden_Harp_C sound_Wooden_Harp_D \
 	sound_Wooden_Harp_E sound_Wooden_Harp_F \
-	sound_Wooden_Harp_G
+	sound_Wooden_Harp_G sa2_xplevelup sa2_xpleveldown
+
 WAVS = $(addprefix $(SNDWAVDIR)/, $(addsuffix .wav, $(WAVLIST)))
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
