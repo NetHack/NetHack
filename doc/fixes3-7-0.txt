@@ -1964,6 +1964,7 @@ add 'sortvanquished' option to be able to set the preferred sort order without
 have 'I u' mention whether there are any unpaid items on the floor (unusual
 	but not impossible); it doesn't itemize them or show shop price
 add items given a Japanese name when playing as a Samurai to discoveries list
+make music improvisations more varied and interesting, as well as useful
 
 
 Platform- and/or Interface-Specific New Features
