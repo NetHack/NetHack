@@ -5,6 +5,7 @@
 #include "hack.h"
 
 static int explosionmask(struct monst *, uchar, char);
+static void engulfer_explosion_msg(uchar, char);
 
 /* Note: Arrays are column first, while the screen is row first */
 static const int explosion[3][3] = {
@@ -111,6 +112,70 @@ explosionmask(
         }
     }
     return res;
+}
+
+static void
+engulfer_explosion_msg(uchar adtyp, char olet)
+{
+    const char *adj = (char *) 0;
+
+    if (digests(u.ustuck->data)) {
+        switch (adtyp) {
+        case AD_FIRE:
+            adj = "heartburn";
+            break;
+        case AD_COLD:
+            adj = "chilly";
+            break;
+        case AD_DISN:
+            if (olet == WAND_CLASS)
+                adj = "irradiated by pure energy";
+            else
+                adj = "perforated";
+            break;
+        case AD_ELEC:
+            adj = "shocked";
+            break;
+        case AD_DRST:
+            adj = "poisoned";
+            break;
+        case AD_ACID:
+            adj = "an upset stomach";
+            break;
+        default:
+            adj = "fried";
+            break;
+        }
+        pline("%s gets %s!", Monnam(u.ustuck), adj);
+    } else {
+        switch (adtyp) {
+        case AD_FIRE:
+            adj = "toasted";
+            break;
+        case AD_COLD:
+            adj = "chilly";
+            break;
+        case AD_DISN:
+            if (olet == WAND_CLASS)
+                adj = "overwhelmed by pure energy";
+            else
+                adj = "perforated";
+            break;
+        case AD_ELEC:
+            adj = "shocked";
+            break;
+        case AD_DRST:
+            adj = "intoxicated";
+            break;
+        case AD_ACID:
+            adj = "burned";
+            break;
+        default:
+            adj = "fried";
+            break;
+        }
+        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
+    }
 }
 
 /* Note: I had to choose one of three possible kinds of "type" when writing
@@ -433,65 +498,7 @@ explode(
                     str = hallu_buf;
                 }
                 if (engulfing_u(mtmp)) {
-                    const char *adj = (char *) 0;
-
-                    if (digests(u.ustuck->data)) {
-                        switch (adtyp) {
-                        case AD_FIRE:
-                            adj = "heartburn";
-                            break;
-                        case AD_COLD:
-                            adj = "chilly";
-                            break;
-                        case AD_DISN:
-                            if (olet == WAND_CLASS)
-                                adj = "irradiated by pure energy";
-                            else
-                                adj = "perforated";
-                            break;
-                        case AD_ELEC:
-                            adj = "shocked";
-                            break;
-                        case AD_DRST:
-                            adj = "poisoned";
-                            break;
-                        case AD_ACID:
-                            adj = "an upset stomach";
-                            break;
-                        default:
-                            adj = "fried";
-                            break;
-                        }
-                        pline("%s gets %s!", Monnam(u.ustuck), adj);
-                    } else {
-                        switch (adtyp) {
-                        case AD_FIRE:
-                            adj = "toasted";
-                            break;
-                        case AD_COLD:
-                            adj = "chilly";
-                            break;
-                        case AD_DISN:
-                            if (olet == WAND_CLASS)
-                                adj = "overwhelmed by pure energy";
-                            else
-                                adj = "perforated";
-                            break;
-                        case AD_ELEC:
-                            adj = "shocked";
-                            break;
-                        case AD_DRST:
-                            adj = "intoxicated";
-                            break;
-                        case AD_ACID:
-                            adj = "burned";
-                            break;
-                        default:
-                            adj = "fried";
-                            break;
-                        }
-                        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
-                    }
+                    engulfer_explosion_msg(adtyp, olet);
                 } else if (cansee(xx, yy)) {
                     if (mtmp->m_ap_type)
                         seemimic(mtmp);
