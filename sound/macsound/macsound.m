@@ -76,9 +76,15 @@ static int32_t affiliation[number_of_se_entries + number_of_sa2_entries + EXTRA_
 static NSString *soundstring[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
 static NSSound *seSound[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
 
+#ifdef SND_SOUNDEFFECS_AUTOMAP
+#define AUTOMAPONLY
+#else
+#define AUTOMAPONLY UNUSED
+#endif
+
 /* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
 static void
-macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
+macsound_soundeffect(char *desc AUTOMAPONLY, int32_t seid AUTOMAPONLY, int vol AUTOMAPONLY)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
 
@@ -92,6 +98,10 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 
     char buf[1024];
     const char *soundname;
+    float fvolume = (float) vol / 100.00;
+
+    if (fvolume < 0.1 || fvolume > 1.0)
+        fvolume = 1.0;
 
     if (seid <= se_zero_invalid || seid >= number_of_se_entries)
         return;
@@ -105,6 +115,8 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
     if (affiliation[seid]) {
         if ([seSound[seid] isPlaying])
             [seSound[seid] stop];
+        if ([seSound[seid] volume] != fvolume)
+            [seSound[seid] setVolume:fvolume];
         [seSound[seid] play];
     }
 #endif
@@ -112,18 +124,28 @@ macsound_soundeffect(char *desc UNUSED, int32_t seid, int volume UNUSED)
 
 #define WAVEMUSIC_SOUNDS
 
+#ifdef WAVEMUSIC_SOUNDS
+#define WAVEMUSICONLY
+#else
+#define WAVEMUSICONLY UNUSED
+#endif
+
 /* This is the number of sound_ files that support WAVEMUSIC_SOUNDS */
 static const int wavemusic_sound_count = EXTRA_SOUNDS;
 
 /* fulfill SOUND_TRIGGER_HEROMUSIC */
-static void macsound_hero_playnotes(int32_t instrument,
-                  const char *str, int32_t vol UNUSED)
+static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
+                  const char *str WAVEMUSICONLY, int32_t vol WAVEMUSICONLY)
 {
 #ifdef WAVEMUSIC_SOUNDS
     uint32_t pseudo_seid, pseudo_seid_base = 0;
     boolean has_note_variations = FALSE;
     char resourcename[120], *end_of_res = 0;
     const char *c = 0;
+    float fvolume = (float) vol / 100.00;
+
+    if (fvolume < 0.1 || fvolume > 1.0)
+        fvolume = 1.0;
 
     if (!str)
         return;
@@ -204,6 +226,8 @@ static void macsound_hero_playnotes(int32_t instrument,
             if (affiliation[pseudo_seid]) {
                 if ([seSound[pseudo_seid] isPlaying])
                     [seSound[pseudo_seid] stop];
+                if ([seSound[pseudo_seid] volume] != fvolume)
+                    [seSound[pseudo_seid] setVolume:fvolume];
                 [seSound[pseudo_seid] play];
                 if (i < notecount - 1) {
                     /* more notes to follow */
@@ -281,15 +305,15 @@ macsound_play_usersound(char *filename UNUSED, int volume UNUSED, int idx UNUSED
 }
 
 static int
-affiliate(int32_t seid, const char *soundname)
+affiliate(int32_t id, const char *soundname)
 {
-    if (!soundname || seid <= se_zero_invalid || seid >= SIZE(affiliation))
+    if (!soundname || id <= se_zero_invalid || id >= SIZE(affiliation))
         return 0;
 
-    if (!affiliation[seid]) {
-        affiliation[seid] = seid;
-        soundstring[seid] = [NSString stringWithUTF8String:soundname];
-        seSound[seid] = [NSSound soundNamed:soundstring[seid]];
+    if (!affiliation[id]) {
+        affiliation[id] = id;
+        soundstring[id] = [NSString stringWithUTF8String:soundname];
+        seSound[id] = [NSSound soundNamed:soundstring[id]];
     }
     return 1;
 }
