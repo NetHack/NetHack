@@ -76,7 +76,7 @@ static int32_t affiliation[number_of_se_entries + number_of_sa2_entries + EXTRA_
 static NSString *soundstring[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
 static NSSound *seSound[number_of_se_entries + number_of_sa2_entries + EXTRA_SOUNDS];
 
-#ifdef SND_SOUNDEFFECS_AUTOMAP
+#ifdef SND_SOUNDEFFECTS_AUTOMAP
 #define AUTOMAPONLY
 #else
 #define AUTOMAPONLY UNUSED
@@ -243,9 +243,15 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
 
 #define ACHIEVEMENT_SOUNDS
 
+#ifdef ACHIEVEMENT_SOUNDS
+#define ACHIEVEONLY
+#else
+#define ACHIEVEONLY UNUSED
+#endif
+
 /* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
 static void
-macsound_achievement(schar ach1 UNUSED, schar ach2 UNUSED, int32_t repeat UNUSED)
+macsound_achievement(schar ach1 ACHIEVEONLY, schar ach2 ACHIEVEONLY, int32_t repeat ACHIEVEONLY)
 {
 #ifdef ACHIEVEMENT_SOUNDS
     char resourcename[120];
