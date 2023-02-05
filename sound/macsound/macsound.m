@@ -84,7 +84,7 @@ static NSSound *seSound[number_of_se_entries + number_of_sa2_entries + EXTRA_SOU
 
 /* fulfill SOUND_TRIGGER_SOUNDEFFECTS */
 static void
-macsound_soundeffect(char *desc AUTOMAPONLY, int32_t seid AUTOMAPONLY, int vol AUTOMAPONLY)
+macsound_soundeffect(char *desc UNUSED, int32_t seid AUTOMAPONLY, int vol AUTOMAPONLY)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
 
@@ -251,7 +251,9 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
 
 /* fulfill SOUND_TRIGGER_ACHIEVEMENTS */
 static void
-macsound_achievement(schar ach1 ACHIEVEONLY, schar ach2 ACHIEVEONLY, int32_t repeat ACHIEVEONLY)
+macsound_achievement(schar ach1 ACHIEVEONLY,
+schar ach2 ACHIEVEONLY,
+int32_t moreinfo UNUSED)
 {
 #ifdef ACHIEVEMENT_SOUNDS
     char resourcename[120];
