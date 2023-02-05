@@ -99,6 +99,7 @@ mk_mplayer_armor(struct monst* mon, short typ)
     if (typ == STRANGE_OBJECT)
         return;
     obj = mksobj(typ, FALSE, FALSE);
+    obj->oeroded = obj->oeroded2 = 0;
     if (!rn2(3))
         obj->oerodeproof = 1;
     if (!rn2(3))
@@ -254,6 +255,7 @@ mk_mplayer(struct permonst *ptr, coordxy x, coordxy y, boolean special)
 
         if (weapon != STRANGE_OBJECT) {
             otmp = mksobj(weapon, TRUE, FALSE);
+            otmp->oeroded = otmp->oeroded2 = 0;
             otmp->spe = (special ? rn1(5, 4) : rn2(4));
             if (!rn2(3))
                 otmp->oerodeproof = 1;

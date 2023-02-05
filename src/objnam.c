@@ -4829,6 +4829,8 @@ readobjnam(char *bp, struct obj *no_wish)
 
     /* set eroded and erodeproof */
     if (erosion_matters(d.otmp)) {
+        /* wished-for item shouldn't be eroded unless specified */
+        d.otmp->oeroded = d.otmp->oeroded2 = 0;
         if (d.eroded && (is_flammable(d.otmp) || is_rustprone(d.otmp)))
             d.otmp->oeroded = d.eroded;
         if (d.eroded2 && (is_corrodeable(d.otmp) || is_rottable(d.otmp)))

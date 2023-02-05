@@ -213,6 +213,8 @@ mk_artifact(
             otmp = mksobj((int) a->otyp, TRUE, FALSE);
 
         if (otmp) {
+            /* prevent erosion from generating */
+            otmp->oeroded = otmp->oeroded2 = 0;
             otmp = oname(otmp, a->name, ONAME_NO_FLAGS);
             otmp->oartifact = m;
             /* set existence and reason for creation bits */
@@ -1819,6 +1821,7 @@ arti_invoke(struct obj *obj)
             otmp->blessed = obj->blessed;
             otmp->cursed = obj->cursed;
             otmp->bknown = obj->bknown;
+            otmp->oeroded = otmp->oeroded2 = 0;
             if (obj->blessed) {
                 if (otmp->spe < 0)
                     otmp->spe = 0;
