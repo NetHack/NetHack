@@ -167,6 +167,7 @@ struct context_info {
     struct tribute_info tribute;
     struct novel_tracking novel;
     struct achievement_tracking achieveo;
+    char jingle[5 + 1];
 };
 
 #endif /* CONTEXT_H */
