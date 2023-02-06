@@ -1105,6 +1105,8 @@ very rarely random items are generated eroded, erodeproof, or greased
 Nazgul can see invisible
 fix a case where punished iron ball yanked hero on top of a monster
 slightly randomize amount of items and monsters in the mines
+dying in a wall spot (temporary gap or via Passes_walls) shared by two shops
+	could result in "place_object: \"<item>\" [0] off map <0,0>" warnings
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

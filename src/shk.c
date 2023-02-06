@@ -1910,21 +1910,29 @@ paybill(
     return taken;
 }
 
+/* decide whether a shopkeeper will take possession of dying hero's invent;
+   when this returns True, it should call set_repo_loc() before returning;
+   when it returns False, it should not do such because that might have
+   already been called for some shopkeeper */
 static boolean
-inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
+inherits(
+    struct monst *shkp,
+    int numsk,
+    int croaked,
+    boolean silently)
 {
     long loss = 0L;
     long umoney;
     struct eshk *eshkp = ESHK(shkp);
     boolean take = FALSE, taken = FALSE;
-    unsigned save_minvis = shkp->minvis;
     int roomno = *u.ushops;
     char takes[BUFSZ];
 
     /* not strictly consistent; affects messages and prevents next player
-       (if bones are saved) from blundering into or being ambused by an
+       (if bones are saved) from blundering into or being ambushed by an
        invisible shopkeeper */
-    shkp->minvis = 0;
+    shkp->minvis = shkp->perminvis = 0;
+
     /* The simplifying principle is that first-come
        already took everything you had. */
     if (numsk > 1) {
@@ -1937,13 +1945,12 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
                   helpless(shkp) ? "wakes up, " : "",
                   takes, !inhishop(shkp) ? "disappears" : "sighs");
         }
-        rouse_shk(shkp, FALSE); /* wake shk for bones */
         taken = (roomno == eshkp->shoproom);
         goto skip;
     }
 
-    /* get one case out of the way: you die in the shop, the */
-    /* shopkeeper is peaceful, nothing stolen, nothing owed. */
+    /* get one case out of the way: you die in the shop, the
+       shopkeeper is peaceful, nothing stolen, nothing owed */
     if (roomno == eshkp->shoproom && inhishop(shkp) && !eshkp->billct
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
@@ -1951,7 +1958,6 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
         if (taken && !silently)
             pline("%s gratefully inherits all your possessions.",
                   Shknam(shkp));
-        set_repo_loc(shkp);
         goto clear;
     }
 
@@ -1985,8 +1991,6 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
             if (!silently)
                 pline("%s %s all your possessions.", Shknam(shkp), takes);
             taken = TRUE;
-            /* where to put player's invent (after disclosure) */
-            set_repo_loc(shkp);
         } else {
             money2mon(shkp, loss);
             gc.context.botl = 1;
@@ -2008,31 +2012,45 @@ inherits(struct monst* shkp, int numsk, int croaked, boolean silently)
             home_shk(shkp, FALSE);
     }
  clear:
-    shkp->minvis = save_minvis;
-    setpaid(shkp);
+    setpaid(shkp); /* clear this shk's bill */
+    /* where to put player's invent (after disclosure) */
+    if (taken)
+        set_repo_loc(shkp);
     return taken;
 }
 
 static void
-set_repo_loc(struct monst* shkp)
+set_repo_loc(struct monst *shkp)
 {
-    register coordxy ox, oy;
+    coordxy ox, oy;
     struct eshk *eshkp = ESHK(shkp);
 
+    /* when multiple shopkeepers are present, we might get called more
+       than once; don't override previous setting */
+    if (gr.repo.shopkeeper)
+        return;
+
+    /* savebones() sets u.ux,u.uy to 0,0 to remove hero from map but that
+       takes place after finish_paybill() has been called so we expect
+       u.ux,u.uy to be valid; however, there has been a report of
+       impossible "place_object: \"<item>\" off map <0,0>" when hero died
+       in a gap in a shop's wall (in Minetown, so multiple shopkeepers in
+       play, and prior to adding 'if (gr.repo.shopkeeper) return' above) */
+    ox = u.ux ? u.ux : u.ux0;
+    oy = u.ux ? u.uy : u.uy0; /* [testing u.ux when setting oy is correct] */
+
     /* if you're not in this shk's shop room, or if you're in its doorway
-        or entry spot, then your gear gets dumped all the way inside */
-    if (*u.ushops != eshkp->shoproom || IS_DOOR(levl[u.ux][u.uy].typ)
-        || u_at(eshkp->shk.x, eshkp->shk.y)) {
-        /* shk.x,shk.y is the position immediately in
-         * front of the door -- move in one more space
-         */
+       or entry spot or one of its walls (temporary gap or Passes_walls),
+       then your gear gets dumped all the way inside */
+    if (*u.ushops != eshkp->shoproom || costly_adjacent(shkp, ox, oy)) {
+        /* shk.x,shk.y is the position immediately in front of the door;
+           move in one more space */
         ox = eshkp->shk.x;
         oy = eshkp->shk.y;
         ox += sgn(ox - eshkp->shd.x);
         oy += sgn(oy - eshkp->shd.y);
-    } else { /* already inside this shk's shop */
-        ox = u.ux;
-        oy = u.uy;
+    } else {
+        ; /* already inside this shk's shop so use ox,oy as-is */
     }
     /* finish_paybill will deposit invent here */
     gr.repo.location.x = ox;
@@ -2048,10 +2066,22 @@ finish_paybill(void)
     struct monst *shkp = gr.repo.shopkeeper;
     int ox = gr.repo.location.x, oy = gr.repo.location.y;
 
-#if 0 /* don't bother */
-    if (ox == 0 && oy == 0)
-        impossible("finish_paybill: no location");
-#endif
+    /*
+     * If set_repo_loc() didn't get called for some reason (good luck
+     * untangling inherits() to figure out why...), ox,oy will be 0,0
+     * and shkp will be Null.  Fix coordinates if that happens.
+     */
+
+    if (!isok(ox, oy)) {
+        /* this used to be suppressed as "don't bother" (too late to matter)
+           but that led to "place_object: \"<item>\" off map <0,0>" warning */
+        if (shkp)
+            impossible("finish_paybill: bad location <%d,%d>.", ox, oy);
+        /* force a valid location */
+        ox = u.ux ? u.ux : u.ux0;
+        oy = u.ux ? u.uy : u.uy0; /* [note: testing u.ux when setting oy
+                                   *  is correct here]*/
+    }
     /* normally done by savebones(), but that's too late in this case */
     unleash_all();
     /* if hero has any gold left, take it into shopkeeper's possession */
@@ -2067,7 +2097,7 @@ finish_paybill(void)
 
 /* find obj on one of the lists */
 static struct obj *
-bp_to_obj(register struct bill_x* bp)
+bp_to_obj(register struct bill_x *bp)
 {
     register struct obj *obj;
     register unsigned int id = bp->bo_id;
