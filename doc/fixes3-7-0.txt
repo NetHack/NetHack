@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1051 $ $NHDT-Date: 1665130022 2022/10/07 08:07:02 $
+DT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1051 $ $NHDT-Date: 1665130022 2022/10/07 08:07:02 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1107,6 +1107,9 @@ fix a case where punished iron ball yanked hero on top of a monster
 slightly randomize amount of items and monsters in the mines
 dying in a wall spot (temporary gap or via Passes_walls) shared by two shops
 	could result in "place_object: \"<item>\" [0] off map <0,0>" warnings
+a monster capable of using a polymorph trap to deliberately change form could
+	do so when trapped in an adjacent web or pit; if that happened, the
+	monster remained flagged as 'trapped' and wouldn't be able to move
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
