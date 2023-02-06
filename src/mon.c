@@ -1989,6 +1989,8 @@ mfndpos(
                     || (m_at(x, ny) && m_at(nx, y) && worm_cross(x, y, nx, ny)
                         && !m_at(nx, ny) && (nx != u.ux || ny != u.uy))))
                 continue;
+            if ((!lavaok || !(flag & ALLOW_WALL)) && ntyp == LAVAWALL)
+                continue;
             if ((poolok || is_pool(nx, ny) == wantpool)
                 && (lavaok || !is_lava(nx, ny))) {
                 int dispx, dispy;

@@ -133,6 +133,7 @@ start: Blank
         S_kop: \032
         S_land_mine: \032
         S_lava: \032
+        S_lavawall: \032
         S_leprechaun: \032
         S_level_teleporter: \032
         S_lich: \032
@@ -260,6 +261,7 @@ start: IBMgraphics
 	S_pool: \xf7			# meta-w, approx. equals
 	S_ice: \xfa			# meta-z, centered dot
 	S_lava: \xf7			# meta-w, approx. equals
+	S_lavawall: \xf7		# meta-w, approx. equals
 	S_vodbridge: \xfa		# meta-z, centered dot
 	S_hodbridge: \xfa		# meta-z, centered dot
 	S_water: \xf7			# meta-w, approx. equals
@@ -519,6 +521,7 @@ start: DECgraphics
 	S_pool: \xe0			# meta-\, diamond
 	S_ice: \xfe			# meta-~, centered dot
 	S_lava: \xe0			# meta-\, diamond
+	S_lavawall: \xe0		# meta-\, diamond
 	S_vodbridge: \xfe		# meta-~, centered dot
 	S_hodbridge: \xfe		# meta-~, centered dot
 	S_water: \xe0			# meta-\, diamond
@@ -591,6 +594,7 @@ start: Enhanced1
 	S_pool: U+224b                      # TRIPLE TILDE
 	S_ice: U+00b7                       # MIDDLE DOT
 	S_lava: U+224b                      # TRIPLE TILDE
+	S_lavawall: U+2248                  # ALMOST EQUAL TO
 	S_vodbridge: U+00b7                 # MIDDLE DOT
 	S_hodbridge: U+00b7                 # MIDDLE DOT
 	S_water: U+2248                     # ALMOST EQUAL TO

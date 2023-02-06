@@ -2153,6 +2153,9 @@ back_to_glyph(coordxy x, coordxy y)
     case LAVAPOOL:
         idx = S_lava;
         break;
+    case LAVAWALL:
+        idx = S_lavawall;
+        break;
     case ICE:
         idx = S_ice;
         break;
@@ -2316,6 +2319,9 @@ get_bkglyph_and_framecolor(coordxy x, coordxy y, int *bkglyph, uint32 *framecolo
         case LAVAPOOL:
            idx = S_lava;
            break;
+        case LAVAWALL:
+            idx = S_lavawall;
+            break;
         default:
            idx = S_room;
            break;
@@ -2889,6 +2895,7 @@ static const char *const type_names[MAX_TYPE] = {
     "STONE", "VWALL", "HWALL", "TLCORNER", "TRCORNER", "BLCORNER", "BRCORNER",
     "CROSSWALL", "TUWALL", "TDWALL", "TLWALL", "TRWALL", "DBWALL", "TREE",
     "SDOOR", "SCORR", "POOL", "MOAT", "WATER", "DRAWBRIDGE_UP", "LAVAPOOL",
+    "LAVAWALL",
     "IRON_BARS", "DOOR", "CORR", "ROOM", "STAIRS", "LADDER", "FOUNTAIN",
     "THRONE", "SINK", "GRAVE", "ALTAR", "ICE", "DRAWBRIDGE_DOWN", "AIR",
     "CLOUD"

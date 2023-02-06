@@ -2931,6 +2931,7 @@ recalc_mapseen(void)
                     mptr->feat.water = count;
                 break;
             case LAVAPOOL:
+            case LAVAWALL:
                 count = mptr->feat.lava + 1;
                 if (count <= 3)
                     mptr->feat.lava = count;

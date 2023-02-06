@@ -65,7 +65,7 @@ is_lava(coordxy x, coordxy y)
     if (!isok(x, y))
         return FALSE;
     ltyp = levl[x][y].typ;
-    if (ltyp == LAVAPOOL
+    if (ltyp == LAVAPOOL || ltyp == LAVAWALL
         || (ltyp == DRAWBRIDGE_UP
             && (levl[x][y].drawbridgemask & DB_UNDER) == DB_LAVA))
         return TRUE;

@@ -338,6 +338,7 @@ const struct {
                 { '}', MOAT },
                 { 'P', POOL },
                 { 'L', LAVAPOOL },
+                { 'Z', LAVAWALL },
                 { 'I', ICE },
                 { 'W', WATER },
                 { 'T', TREE },

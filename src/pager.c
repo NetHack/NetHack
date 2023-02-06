@@ -519,6 +519,9 @@ waterbody_name(coordxy x, coordxy y)
             return "limitless water"; /* even if hallucinating */
         Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
         return pooltype;
+    } else if (ltyp == LAVAWALL) {
+        Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("lava"));
+        return pooltype;
     }
     /* default; should be unreachable */
     return "water"; /* don't hallucinate this as some other liquid */

@@ -1078,7 +1078,7 @@ test_move(
         /* FIXME: should be using lastseentyp[x][y] rather than seen vector
          */
         if ((levl[x][y].seenv && is_pool_or_lava(x, y)) /* known pool/lava */
-            && (IS_WATERWALL(levl[x][y].typ) /* never enter wall of water */
+            && ((IS_WATERWALL(levl[x][y].typ) || levl[x][y].typ == LAVAWALL) /* never enter wall of liquid */
                 /* don't enter pool or lava (must be one of the two to
                    get here) unless flying or levitating or have known
                    water-walking for pool or known lava-walking and
@@ -1630,6 +1630,8 @@ u_simple_floortyp(coordxy x, coordxy y)
 
     if (is_waterwall(x, y))
         return WATER; /* wall of water, fly/lev does not matter */
+    if (levl[x][y].typ == LAVAWALL)
+        return LAVAWALL; /* wall of lava, fly/lev does not matter */
     if (!u_in_air) {
         if (is_pool(x, y))
             return POOL;
@@ -1644,7 +1646,8 @@ static boolean
 swim_move_danger(coordxy x, coordxy y)
 {
     schar newtyp = u_simple_floortyp(x, y);
-    boolean liquid_wall = IS_WATERWALL(newtyp);
+    boolean liquid_wall = IS_WATERWALL(newtyp)
+        || newtyp == LAVAWALL;
 
     if ((newtyp != u_simple_floortyp(u.ux, u.uy))
         && !Stunned && !Confusion && levl[x][y].seenv
@@ -2164,7 +2167,7 @@ avoid_moving_on_liquid(
          || gc.context.travel)
         /* and you know you won't fall in */
         && (in_air || Known_lwalking || (is_pool(x, y) && Known_wwalking))
-        && !IS_WATERWALL(levl[x][y].typ)) {
+        && !(IS_WATERWALL(levl[x][y].typ) || levl[x][y].typ == LAVAWALL)) {
         /* XXX: should send 'is_clinger(gy.youmonst.data)' here once clinging
            polyforms are allowed to move over water */
         return FALSE; /* liquid is safe to traverse */
@@ -2679,7 +2682,8 @@ switch_terrain(void)
 {
     struct rm *lev = &levl[u.ux][u.uy];
     boolean blocklev = (IS_ROCK(lev->typ) || closed_door(u.ux, u.uy)
-                        || IS_WATERWALL(lev->typ)),
+                        || IS_WATERWALL(lev->typ)
+                        || lev->typ == LAVAWALL),
             was_levitating = !!Levitation, was_flying = !!Flying;
 
     if (blocklev) {

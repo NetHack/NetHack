@@ -3291,12 +3291,13 @@ wizterrainwish(struct _readobjnam_data *d)
         madeterrain = TRUE;
 
     /* also matches "molten lava" */
-    } else if (!BSTRCMPI(bp, p - 4, "lava")) {
-        lev->typ = LAVAPOOL;
+    } else if (!BSTRCMPI(bp, p - 4, "lava")
+               || !BSTRCMPI(bp, p - 12, "wall of lava")) {
+        lev->typ = !BSTRCMPI(bp, p - 12, "wall of lava") ? LAVAWALL : LAVAPOOL;
         lev->flags = 0;
         del_engr_at(x, y);
         pline("A pool of molten lava.");
-        if (!(Levitation || Flying))
+        if (!(Levitation || Flying) || lev->typ == LAVAWALL)
             pooleffects(FALSE);
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 3, "ice")) {

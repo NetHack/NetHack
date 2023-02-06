@@ -1012,6 +1012,9 @@ cmap_to_type(int sym)
     case S_water:
         typ = WATER;
         break;
+    case S_lavawall:
+        typ = LAVAWALL;
+        break;
     default:
         break; /* not a cmap symbol? */
     }

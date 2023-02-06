@@ -3524,7 +3524,7 @@ bhit(coordxy ddx, coordxy ddy, int range,  /* direction and range */
         typ = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
 
         /* WATER aka "wall of water" stops items */
-        if (IS_WATERWALL(typ)) {
+        if (IS_WATERWALL(typ) || typ == LAVAWALL) {
             if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
                 break;
         }
@@ -4780,8 +4780,8 @@ zap_over_floor(
         break; /* ZT_FIRE */
 
     case ZT_COLD:
-        if (is_pool(x, y) || is_lava(x, y)) {
-            boolean lava = is_lava(x, y),
+        if (is_pool(x, y) || is_lava(x, y) || levl[x][y].typ == LAVAWALL) {
+            boolean lava = (is_lava(x, y) || levl[x][y].typ == LAVAWALL),
                     moat = is_moat(x, y);
 
             if (IS_WATERWALL(lev->typ)) {
