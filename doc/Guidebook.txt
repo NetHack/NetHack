@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  February 04, 2023
+                                  February 07, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1446,7 +1446,7 @@
                Invoke  an object's special powers.  Autocompletes.  Default
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1842,7 +1842,7 @@
                Untrap something (trap, door, or chest).  Default key is `M-
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -1974,7 +1974,7 @@
                Map the level.  Autocompletes.  Debug  mode  only.   Default
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2040,7 +2040,7 @@
           character require that the  letter  be  capitalized  because  the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2304,7 +2304,7 @@
           to  the  next  level.   There  are  some  exceptions though.  For
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2370,7 +2370,7 @@
           something.   Credit  can  be used to pay for purchases, but it is
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2502,7 +2502,7 @@
           And  monsters  represented  by lower-case letters aren't randomly
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2568,7 +2568,7 @@
           sters  with you.  Like you, your pet needs food to survive.  Dogs
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2700,7 +2700,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2766,7 +2766,7 @@
           be displayed even when that can be deduced from other attributes.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2832,7 +2832,7 @@
           to taking off other worn items.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2898,7 +2898,7 @@
           ber  of items that the character has a chance to fire varies from
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3030,7 +3030,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3096,7 +3096,7 @@
           give you special powers when you eat them.  A good rule of  thumb
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3228,7 +3228,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3294,7 +3294,7 @@
           tools  have  a limited number of uses, akin to wand charges.  For
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3309,10 +3309,10 @@
 
                Some  tools (such as a blindfold) can be worn and can be put
           on and removed  like  other  accessories  (rings,  amulets);  see
-          Amulets.   Other  tools  (such  as  pick-axe)  can  be wielded as
-          weapons in addition to being applied for their usual purpose, and
-          in  some  cases (again, pick-axe) become wielded as a weapon even
-          when applied.
+          Amulets.   Other tools (such as pick-axe) can be wielded as weap-
+          ons in addition to being applied for their usual purpose, and  in
+          some cases (again, pick-axe) become wielded as a weapon even when
+          applied.
 
                The blind option can be set (prior to game start) to attempt
           to play the entire game without being able to see (a self-imposed
@@ -3360,7 +3360,7 @@
           They  are  also a far more efficient way of carrying your riches.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3426,7 +3426,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3624,7 +3624,7 @@
           ments  representing  progress  toward  ultimate ascension, if any
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3690,7 +3690,7 @@
           those levels since doing so is  not  necessary  to  complete  the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3756,7 +3756,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4020,7 +4020,7 @@
           as a file name.  If it  does  start  with  `/',  the  at-sign  is
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4086,7 +4086,7 @@
             quiver  sack  or make ready some suitable weapon.  Note that it
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4218,7 +4218,7 @@
             Asking refers to picking one of the orderings from a menu.  The
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4350,7 +4350,7 @@
             Visually distinguish piles of objects from  individual  objects
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4416,7 +4416,7 @@
             sistent.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4482,7 +4482,7 @@
             Do not clear the screen before drawing menus, and  align  menus
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4614,7 +4614,7 @@
             containing  the  symbols  for  the  various  object types.  Any
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4746,7 +4746,7 @@
             topickup  on  in  order  to  have autopickup_exception settings
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4812,7 +4812,7 @@
             onym for character.   See  name  for  an  alternate  method  of
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -4944,7 +4944,7 @@
             loot - only sort the lists that don't  use  inventory  letters,
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5208,7 +5208,7 @@
             If NetHack can, it should use a font by the chosen name for the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5406,7 +5406,7 @@
             dows  but  have room for two additional lines of inventory plus
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5472,7 +5472,7 @@
             PC, and ST NetHack only).
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5538,7 +5538,7 @@
             Set  the  intensity  level  of  the three gray scales available
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5604,7 +5604,7 @@
           any  corpse  from  autopickup.   The  last example results in the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5670,7 +5670,7 @@
             the getpos.pick.once key (default `,') or the  getpos.pick  key
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5736,7 +5736,7 @@
             When  asked  for  a  location,  and  using  one  of the next or
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5802,7 +5802,7 @@
             location.  Default is `z'.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5868,7 +5868,7 @@
                  attribute  - the  attribute  to use for lines matching the
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -5934,7 +5934,7 @@
             pattern.   Each  SOUND  entry is broken down into the following
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6066,7 +6066,7 @@
                  ue  changes.  This attribute times out after statushilites
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6288,6 +6288,7 @@
           K  S_kop                  (Keystone Kop)
           ^  S_land_mine            (land mine)
           }  S_lava                 (molten lava)
+          }  S_lavawall             (wall of lava)
           l  S_leprechaun           (leprechaun)
           ^  S_level_teleporter     (level teleporter)
           L  S_lich                 (lich)
@@ -6326,11 +6327,10 @@
           #  S_sink                 (sink)
           ^  S_sleeping_gas_trap    (sleeping gas trap)
           S  S_snake                (snake)
-          s  S_spider               (arachnid or centipede)
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6340,6 +6340,7 @@
 
 
 
+          s  S_spider               (arachnid or centipede)
           ^  S_spiked_pit           (spiked pit)
           ^  S_squeaky_board        (squeaky board)
           0  S_ss1                  (magic shield 1 of 4)
@@ -6392,11 +6393,10 @@
           w  S_worm                 (worm)
           ~  S_worm_tail            (long worm tail)
           W  S_wraith               (wraith)
-          x  S_xan                  (xan or other extraordinary insect)
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6406,6 +6406,7 @@
 
 
 
+          x  S_xan                  (xan or other extraordinary insect)
           X  S_xorn                 (xorn)
           Y  S_yeti                 (apelike creature)
           Z  S_zombie               (zombie)
@@ -6461,8 +6462,7 @@
 
 
 
-
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6528,7 +6528,7 @@
             geting.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6594,7 +6594,7 @@
             save file content in ascii text.
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6792,7 +6792,7 @@
           Mathematisch   Centrum  (now  Centrum  Wiskunde  &  Informatica),
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6858,7 +6858,7 @@
           Ken  Arromdee,  David Cohrs, Jean-Christophe Collet, Kevin Darcy,
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -6990,7 +6990,7 @@
           Walz, and Paul Winner, released 3.3.0 in December 1999 and  3.3.1
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -7056,7 +7056,7 @@
           stable version that provided continued enjoyment by the community
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -7122,7 +7122,7 @@
           NetHack 3.6, hindered by limited  access.  Kevin  Smolkowski  has
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -7188,7 +7188,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -7254,7 +7254,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
@@ -7320,7 +7320,7 @@
 
 
 
-          NetHack 3.7                                     February 04, 2023
+          NetHack 3.7                                     February 07, 2023
 
 
 
