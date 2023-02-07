@@ -96,9 +96,10 @@ mon_yells(struct monst* mon, const char* shout)
         if (canspotmon(mon)) {
             pline("%s yells:", Amonnam(mon));
         } else {
-            Soundeffect(se_someone_yells, 75);
+            /* Soundeffect(se_someone_yells, 75); */
             You_hear("someone yell:");
         }
+        SetVoice(mon, 0, 80, 0);
         verbalize1(shout);
     }
 }
@@ -404,6 +405,7 @@ monflee(
                     pline("%s flees from the painful light of %s.",
                           Monnam(mtmp), lsrc);
                 } else {
+                    SetVoice(mtmp, 0, 80, 0);
                     verbalize("Bright light!");
                 }
             } else {
@@ -1313,8 +1315,10 @@ m_move(register struct monst* mtmp, register int after)
 
 #ifdef MAIL_STRUCTURES
     if (ptr == &mons[PM_MAIL_DAEMON]) {
-        if (!Deaf && canseemon(mtmp))
+        if (!Deaf && canseemon(mtmp)) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("I'm late!");
+        }
         mongone(mtmp);
         return MMOVE_DIED;
     }

@@ -26,6 +26,7 @@
         char *          stripdigits     (char *)
         unsigned        Strlen_         (const char *str, const char *, int)
         char *          eos             (char *)
+        const char *    c_eos           (const char *)
         boolean         str_start_is    (const char *, const char *, boolean)
         boolean         str_end_is      (const char *, const char *)
         int             str_lines_maxlen (const char *)
@@ -218,6 +219,14 @@ strip_newline(char *str)
 /* return the end of a string (pointing at '\0') */
 char *
 eos(register char *s)
+{
+    while (*s)
+        s++; /* s += strlen(s); */
+    return s;
+}
+
+const char *
+c_eos(const char *s)
 {
     while (*s)
         s++; /* s += strlen(s); */

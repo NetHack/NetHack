@@ -1251,6 +1251,7 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
             mtmp = get_iter_mons(watchman_canseeu);
 
         if (mtmp) {
+            SetVoice(mtmp, 0, 80, 0);
             if (zap || gc.context.digging.warned) {
                 verbalize("Halt, vandal!  You're under arrest!");
                 (void) angry_guards(!!Deaf);

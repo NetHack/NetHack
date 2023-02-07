@@ -116,12 +116,12 @@ zoo_mon_sound(struct monst *mtmp)
 {
     if ((mtmp->msleeping || is_animal(mtmp->data))
         && mon_in_room(mtmp, ZOO)) {
-        int hallu = Hallucination ? 1 : 0;
+        int hallu = Hallucination ? 1 : 0, selection = rn2(2) + hallu;
         static const char *const zoo_msg[3] = {
             "a sound reminiscent of an elephant stepping on a peanut.",
             "a sound reminiscent of a seal barking.", "Doctor Dolittle!",
         };
-        You_hear1(zoo_msg[rn2(2) + hallu]);
+        You_hear1(zoo_msg[selection]);
         return TRUE;
     }
     return FALSE;
@@ -523,6 +523,7 @@ beg(register struct monst* mtmp)
     } else if (mtmp->data->msound >= MS_HUMANOID) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
+        SetVoice(mtmp, 0, 80, 0);
         verbalize("I'm hungry.");
     } else {
         /* this is pretty lame but is better than leaving out the block
@@ -1058,9 +1059,10 @@ domonnoise(register struct monst* mtmp)
         }
     } break;
     case MS_ARREST:
-        if (mtmp->mpeaceful)
+        if (mtmp->mpeaceful) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
-        else {
+        } else {
             static const char *const arrest_msg[3] = {
                 "Anything you say can be used against you.",
                 "You're under arrest!", "Stop in the name of the Law!",
@@ -1151,6 +1153,7 @@ domonnoise(register struct monst* mtmp)
     if (pline_msg) {
         pline("%s %s", Monnam(mtmp), pline_msg);
     } else if (mtmp->mcan && verbl_msg_mcan) {
+        SetVoice(mtmp, 0, 80, 0);
         verbalize1(verbl_msg_mcan);
     } else if (verbl_msg) {
         /* more 3.6 tribute */
@@ -1158,9 +1161,11 @@ domonnoise(register struct monst* mtmp)
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
             char tmpbuf[BUFSZ];
-
             pline1(ucase(strcpy(tmpbuf, verbl_msg)));
+            SetVoice((struct monst *) 0, 0, 80, voice_death); 
+            sound_speak(tmpbuf);
         } else {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize1(verbl_msg);
         }
     }
@@ -1652,6 +1657,7 @@ struct sound_procs nosound_procs = {
     (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes */
     (void (*)(char *, int32_t, int32_t)) 0,       /* play_usersound */
     (void (*)(int32_t, int32_t, int32_t)) 0,      /* ambience       */
+    (void (*)(char *, int32_t, int32_t, int32_t, int32_t)) 0, /* verbal */
 };
 
 /* The order of these array entries must match the
@@ -1813,8 +1819,8 @@ static void nosound_achievement(schar, schar, int32_t);
 static void nosound_soundeffect(int32_t, int32_t);
 static void nosound_play_usersound(char *, int32_t, int32_t);
 static void nosound_ambience(int32_t, int32_t, int32_t);
-{
-}
+static void nosound_verbal(char *text, int32_t gender, int32_t tone,
+                           int32_t vol, int32_t moreinfo);
 
 static void
 nosound_init_nhsound(void)
@@ -1849,6 +1855,12 @@ nosound_play_usersound(char *filename, int volume, int idx)
 static void
 nosound_ambience(int32_t ambienceid, int32_t ambience_action,
                 int32_t hero_proximity)
+{
+}
+
+static void
+nosound_verbal(char *text, int32_t gender, int32_t tone,
+               int32_t vol, int32_t moreinfo)
 {
 }
 #endif
@@ -2234,6 +2246,70 @@ base_soundname_to_filename(
     }
 #endif
     return buf;
+}
+
+#ifdef SND_SPEECH
+#define SPEECHONLY
+#else
+#define SPEECHONLY UNUSED
+#endif
+
+void
+set_voice(struct monst *mtmp SPEECHONLY, int32_t tone SPEECHONLY, int32_t volume SPEECHONLY, int32_t moreinfo SPEECHONLY)
+{
+#ifdef SND_SPEECH
+    int32_t gender = (mtmp && mtmp->female) ? FEMALE : MALE;
+
+    if (gv.voice.nameid)
+        free((genericptr_t) gv.voice.nameid);
+    gv.voice.gender = gender;
+    gv.voice.serialno = mtmp ? mtmp->m_id 
+                             : ((moreinfo & voice_talking_artifact) != 0)  ? 3
+                                 : ((moreinfo & voice_deity) != 0) ? 4 : 2;
+    gv.voice.tone = tone;
+    gv.voice.volume = volume;
+    gv.voice.moreinfo = moreinfo;
+    gv.voice.nameid = (const char *) 0;
+    gp.pline_flags |= PLINE_SPEECH; 
+#endif
+}
+
+void
+sound_speak(const char *text SPEECHONLY)
+{
+#ifdef SND_SPEECH
+    const char *cp1, *cp2;
+    char *cpdst;
+    char buf[BUFSZ + BUFSZ];
+
+    if (!text || (text && *text == '\0'))
+        return;
+    if (iflags.voices && soundprocs.sound_verbal
+        && (soundprocs.sound_triggers & SOUND_TRIGGER_VERBAL)) {
+        cp1 = text;
+        cpdst = buf;
+        cp2 = c_eos(cp1);
+        cp2--;  /* last non-NUL */
+        *cpdst = '\0';
+        if ((gp.pline_flags & PLINE_VERBALIZE) != 0) {
+            if (*cp1 == '"')
+                cp1++;
+            if (*cp2 == '"')
+                cp2--;
+        }
+        /* cp1 -> 1st, cp2 -> last non-nul) */
+        if ((unsigned)(cp2 - cp1) < (sizeof buf - 1U)) {
+            while (cp1 <= cp2) {
+                *cpdst = *cp1;
+                cp1++;
+                cpdst++;
+            }
+            *cpdst = '\0';
+        }
+        (*soundprocs.sound_verbal)(buf, gv.voice.gender, gv.voice.tone,
+                                   gv.voice.volume, gv.voice.moreinfo); 
+    }
+#endif
 }
 
 /*sounds.c*/

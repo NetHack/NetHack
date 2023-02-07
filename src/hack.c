@@ -3172,6 +3172,7 @@ check_special_room(boolean newlev)
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
 
             if (oracle) {
+                SetVoice(oracle, 0, 80, 0);
                 if (!oracle->mpeaceful)
                     verbalize("You're in Delphi, %s.", gp.plname);
                 else

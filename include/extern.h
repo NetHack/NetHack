@@ -1012,6 +1012,7 @@ extern char *strip_newline(char *);
 extern char *stripchars(char *, const char *, const char *);
 extern char *stripdigits(char *);
 extern char *eos(char *);
+extern const char *c_eos(const char *);
 extern unsigned Strlen_(const char *, const char *, int);
 extern boolean str_start_is(const char *, const char *, boolean);
 extern boolean str_end_is(const char *, const char *);
@@ -2620,6 +2621,8 @@ extern char *get_sound_effect_filename(int32_t seidint,
                                        char *buf, size_t bufsz, int32_t);
 #endif
 extern char *base_soundname_to_filename(char *, char *, size_t, int32_t);
+extern void set_voice(struct monst *, int32_t, int32_t, int32_t); 
+extern void sound_speak(const char *);
 
 /* ### sp_lev.c ### */
 

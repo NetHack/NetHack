@@ -825,6 +825,7 @@ const struct instance_globals_v g_init_v = {
     UNDEFINED_PTR, /* viz_rmin */
     UNDEFINED_PTR, /* viz_rmax */
     FALSE, /* vision_full_recalc */
+    UNDEFINED_VALUES,  /* voice */
     TRUE, /* havestate*/
     IVMAGIC  /* v_magic to validate that structure layout has been preserved */
 };

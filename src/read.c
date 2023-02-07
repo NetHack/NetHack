@@ -2733,6 +2733,7 @@ do_genocide(
                      */
                     if (Verbose(3, do_genocide))
                         pline("A thunderous voice booms through the caverns:");
+                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize("No, mortal!  That will not be done.");
                 }
                 continue;

@@ -104,6 +104,7 @@ precheck(struct monst *mon, struct obj *obj)
                 pline("%s speaks.", vis ? Monnam(mtmp) : Something);
                 /* I suspect few players will be upset that monsters */
                 /* can't wish for wands of death here.... */
+                SetVoice(mtmp, 0, 80, 0);
                 if (rn2(2)) {
                     verbalize("You freed me!");
                     mtmp->mpeaceful = 1;
@@ -1730,11 +1731,13 @@ use_offensive(struct monst *mtmp)
         return (DEADMONSTER(mtmp)) ? 1 : 2;
     } /* case MUSE_SCR_EARTH */
     case MUSE_CAMERA: {
-        if (Hallucination)
+        if (Hallucination) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Say cheese!");
-        else
+        } else {
             pline("%s takes a picture of you with %s!",
                   Monnam(mtmp), an(xname(otmp)));
+        }
         gm.m_using = TRUE;
         if (!Blind) {
             You("are blinded by the flash of light!");

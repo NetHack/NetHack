@@ -3937,8 +3937,10 @@ mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
             mhm->damage = 0;
         } else {
             if (Role_if(PM_HEALER)) {
-                if (!Deaf && !(gm.moves % 5))
+                if (!Deaf && !(gm.moves % 5)) {
+                    SetVoice(magr, 0, 80, 0);
                     verbalize("Doc, I can't help you unless you cooperate.");
+                }
                 mhm->damage = 0;
             } else
                 hitmsg(magr, mattk);
@@ -4090,8 +4092,11 @@ mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
             mhm->done = TRUE;
             return;
         }
-        if (Verbose(4, mhitm_ad_dgst) && !Deaf)
+        if (Verbose(4, mhitm_ad_dgst) && !Deaf) {
+            /* Soundeffect? */
+            SetVoice(magr, 0, 80, 0);
             verbalize("Burrrrp!");
+        }
         mhm->damage = mdef->mhp;
         /* Use up amulet of life saving */
         if ((obj = mlifesaver(mdef)) != 0)

@@ -1409,11 +1409,15 @@ use_candle(struct obj **optr)
             pline_The("new %s magically %s!", s, vtense(s, "ignite"));
         else if (!otmp->lamplit && was_lamplit)
             pline("%s out.", (obj->quan > 1L) ? "They go" : "It goes");
-        if (obj->unpaid)
+        if (obj->unpaid) {
+            struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
+            SetVoice(shkp, 0, 80, 0);
             verbalize("You %s %s, you bought %s!",
                       otmp->lamplit ? "burn" : "use",
                       (obj->quan > 1L) ? "them" : "it",
                       (obj->quan > 1L) ? "them" : "it");
+        }
         if (obj->quan < 7L && otmp->spe == 7)
             pline("%s now has seven%s candles attached.", The(xname(otmp)),
                   otmp->lamplit ? " lit" : "");
@@ -1563,8 +1567,11 @@ catch_lit(struct obj *obj)
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
         if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
+            struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
             /* if it catches while you have it, then it's your tough luck */
             check_unpaid(obj);
+            SetVoice(shkp, 0, 80, 0);
             verbalize("That's in addition to the cost of %s %s, of course.",
                       yname(obj),
                       (obj->quan == 1L) ? "itself" : "themselves");
@@ -1640,7 +1647,9 @@ use_lamp(struct obj *obj)
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
                 const char *ithem = (obj->quan > 1L) ? "them" : "it";
+                struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
+                SetVoice(shkp, 0, 80, 0);
                 verbalize("You burn %s, you bought %s!", ithem, ithem);
                 bill_dummy_object(obj);
             }
@@ -1685,10 +1694,13 @@ light_cocktail(struct obj **optr)
         Blind ? "" : "  It gives off a dim light.");
 
     if (obj->unpaid && costly_spot(u.ux, u.uy)) {
+        struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
         /* Normally, we shouldn't both partially and fully charge
          * for an item, but (Yendorian Fuel) Taxes are inevitable...
          */
         check_unpaid(obj);
+        SetVoice(shkp, 0, 80, 0);
         verbalize("That's in addition to the cost of the potion, of course.");
         bill_dummy_object(obj);
     }
@@ -2141,12 +2153,20 @@ use_tinning_kit(struct obj *obj)
         /* Mark tinned tins. No spinach allowed... */
         set_tin_variety(can, HOMEMADE_TIN);
         if (carried(corpse)) {
-            if (corpse->unpaid)
+            if (corpse->unpaid) {
+                struct monst *shkp = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
+                SetVoice(shkp, 0, 80, 0);
                 verbalize(you_buy_it);
+            }
             useup(corpse);
         } else {
-            if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge)
+            if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge) {
+                struct monst *shkp = shop_keeper(*in_rooms(corpse->ox,
+                                                 corpse->oy, SHOPBASE));
+                SetVoice(shkp, 0, 80, 0);
                 verbalize(you_buy_it);
+            }
             useupf(corpse, 1L);
         }
         (void) hold_another_object(can, "You make, but cannot pick up, %s.",

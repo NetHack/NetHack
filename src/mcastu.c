@@ -419,6 +419,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         if (!count) {
             ; /* nothing was created? */
         } else if (mtmp->iswiz) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Destroy the thief, my pet%s!", plur(count));
         } else {
             boolean one = (count == 1);

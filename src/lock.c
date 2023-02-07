@@ -552,11 +552,13 @@ pick_lock(
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
             && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
             if (picktyp == CREDIT_CARD
-                && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
+                && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE])) {
+                SetVoice(mtmp, 0, 80, 0);
                 verbalize("No checks, no credit, no problem.");
-            else
+            } else {
                 pline("I don't think %s would appreciate that.",
                       mon_nam(mtmp));
+            }
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {
             /* "The door actually was a <mimic>!" */

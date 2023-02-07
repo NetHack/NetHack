@@ -277,6 +277,7 @@ struct instance_flags {
     long hilite_delta;        /* number of moves to leave a temp hilite lit */
     long unhilite_deadline; /* time when oldest temp hilite should be unlit */
 #endif
+    boolean voices;           /* enable text-to-speech or other talking */
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */

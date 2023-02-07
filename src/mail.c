@@ -332,6 +332,7 @@ md_rush(struct monst *md,
         if (fx == tx && fy == ty)
             break;
 
+        SetVoice(md, 0, 80, 0);
         if ((mon = m_at(fx, fy)) != 0) /* save monster at this position */
             verbalize1(md_exclamations());
         else if (u_at(fx, fy))
@@ -363,6 +364,7 @@ md_rush(struct monst *md,
         remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
+        SetVoice(md, 0, 80, 0);
         verbalize("This place's too crowded.  I'm outta here.");
         remove_monster(fx, fy);
 
@@ -403,6 +405,7 @@ newmail(struct mail_info *info)
         goto go_back;
 
     message_seen = TRUE;
+    SetVoice(md, 0, 80, 0);
     verbalize("%s, %s!  %s.", Hello(md), gp.plname, info->display_txt);
 
     if (info->message_typ) {
@@ -413,8 +416,10 @@ newmail(struct mail_info *info)
         if (info->response_cmd)
             new_omailcmd(obj, info->response_cmd);
 
-        if (!next2u(md->mx, md->my))
+        if (!next2u(md->mx, md->my)) {
+            SetVoice(md, 0, 80, 0);
             verbalize("Catch!");
+        }
         display_nhwindow(WIN_MESSAGE, FALSE);
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);

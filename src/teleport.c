@@ -1016,6 +1016,7 @@ level_tele(void)
         }
         if (newlev <= -10) {
             You("arrive in heaven.");
+            SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Thou art early, but we'll admit thee.");
             gk.killer.format = NO_KILLER_PREFIX;
             Strcpy(gk.killer.name, "went to heaven prematurely");

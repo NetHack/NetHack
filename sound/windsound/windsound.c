@@ -25,6 +25,9 @@ static void windsound_hero_playnotes(int32_t instrument, const char *str, int32_
 static void windsound_play_usersound(char *, int32_t, int32_t);
 static void windsound_ambience(int32_t ambienceid, int32_t ambience_action,
                                int32_t hero_proximity);
+static void windsound_verbal(char *text, int32_t gender, int32_t tone,
+                             int32_t vol, int32_t moreinfo);
+
 
 /* supporting routines */
 static void adjust_soundargs_for_compiler(int32_t *, DWORD *, char **);
@@ -34,7 +37,7 @@ struct sound_procs windsound_procs = {
     SOUNDID(windsound),
     SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_SOUNDEFFECTS
         | SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_AMBIENCE
-        | SOUND_TRIGGER_ACHIEVEMENTS,
+        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_VERBAL,
     windsound_init_nhsound,
     windsound_exit_nhsound,
     windsound_achievement,
@@ -42,6 +45,7 @@ struct sound_procs windsound_procs = {
     windsound_hero_playnotes,
     windsound_play_usersound,
     windsound_ambience,
+    windsound_verbal,
 };
 
 static void
@@ -110,7 +114,13 @@ windsound_achievement(schar ach1, schar ach2, int32_t repeat)
 
 static void
 windsound_ambience(int32_t ambienceid, int32_t ambience_action,
-                int32_t hero_proximity)
+                   int32_t hero_proximity)
+{
+}
+
+static void
+windsound_verbal(char *text, int32_t gender, int32_t tone,
+                 int32_t vol, int32_t moreinfo)
 {
 }
 

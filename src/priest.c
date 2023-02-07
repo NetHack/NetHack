@@ -464,6 +464,7 @@ intemple(int roomno)
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
+            SetVoice(priest, 0, 80, 0);
             verbalize1(msg1);
             if (msg2)
                 verbalize1(msg2);
@@ -586,6 +587,7 @@ priest_talk(struct monst *priest)
             priest->mcanmove = 1;
         }
         priest->mpeaceful = 0;
+        SetVoice(priest, 0, 80, 0);
         verbalize1(cranky_msg[rn2(3)]);
         return;
     }
@@ -593,6 +595,7 @@ priest_talk(struct monst *priest)
     /* you desecrated the temple and now you want to chat? */
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
+        SetVoice(priest, 0, 80, 0);
         verbalize(
               "Begone!  Thou desecratest this holy place with thy presence.");
         priest->mpeaceful = 0;
@@ -621,18 +624,22 @@ priest_talk(struct monst *priest)
         pline("%s asks you for a contribution for the temple.",
               Monnam(priest));
         if ((offer = bribe(priest)) == 0) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou shalt regret thine action!");
             if (coaligned)
                 adjalign(-1);
         } else if (offer < (u.ulevel * 200)) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
+                SetVoice(priest, 0, 80, 0);
                 verbalize("Cheapskate.");
             } else {
+                SetVoice(priest, 0, 80, 0);
                 verbalize("I thank thee for thy contribution.");
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < (u.ulevel * 400)) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou art indeed a pious individual.");
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
@@ -648,6 +655,7 @@ priest_talk(struct monst *priest)
                    && (!(HProtection & INTRINSIC)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou hast been rewarded for thy devotion.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
@@ -656,6 +664,7 @@ priest_talk(struct monst *priest)
             } else
                 u.ublessed++;
         } else {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thy selfless generosity is deeply appreciated.");
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (gm.moves - u.ucleansed) > 5000L) {

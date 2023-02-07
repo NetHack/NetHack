@@ -660,10 +660,12 @@ god_zaps_you(aligntyp resp_god)
         }
         if (Is_astralevel(&u.uz) || Is_sanctum(&u.uz)) {
             /* one more try for high altars */
+            SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Thou cannot escape my wrath, mortal!");
             summon_minion(resp_god, FALSE);
             summon_minion(resp_god, FALSE);
             summon_minion(resp_god, FALSE);
+            SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Destroy %s, my servants!", uhim());
         }
     }
@@ -715,6 +717,7 @@ angrygods(aligntyp resp_god)
                   ? "hast strayed from the path"
                   : "art arrogant",
               gy.youmonst.data->mlet == S_HUMAN ? "mortal" : "creature");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou must relearn thy lessons!");
         (void) adjattrib(A_WIS, -1, FALSE);
         losexp((char *) 0);
@@ -735,6 +738,7 @@ angrygods(aligntyp resp_god)
     case 7:
     case 8:
         godvoice(resp_god, (char *) 0);
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou durst %s me?",
                   (on_altar() && (a_align(u.ux, u.uy) != resp_god))
                       ? "scorn"
@@ -811,6 +815,7 @@ gcrownu(void)
     switch (u.ualign.type) {
     case A_LAWFUL:
         u.uevent.uhand_of_elbereth = 1;
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("I crown thee...  The Hand of Elbereth!");
         livelog_printf(LL_DIVINEGIFT,
                        "was crowned \"The Hand of Elbereth\" by %s",
@@ -821,6 +826,7 @@ gcrownu(void)
         in_hand = u_wield_art(ART_VORPAL_BLADE);
         already_exists = exist_artifact(LONG_SWORD,
                                         artiname(ART_VORPAL_BLADE));
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou shalt be my Envoy of Balance!");
         livelog_printf(LL_DIVINEGIFT, "became %s Envoy of Balance",
                        s_suffix(u_gname()));
@@ -832,6 +838,7 @@ gcrownu(void)
         what = (((already_exists && !in_hand) || class_gift != STRANGE_OBJECT)
                 ? "take lives"
                 : "steal souls");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou art chosen to %s for My Glory!", what);
         livelog_printf(LL_DIVINEGIFT, "was chosen to %s for the Glory of %s",
                        what, u_gname());
@@ -1187,9 +1194,11 @@ pleased(aligntyp g_align)
             if (!u.uevent.uopened_dbridge && !u.uevent.gehennom_entered) {
                 if (u.uevent.uheard_tune < 1) {
                     godvoice(g_align, (char *) 0);
+                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize("Hark, %s!", (gy.youmonst.data->mlet == S_HUMAN)
                                                ? "mortal"
                                                : "creature");
+                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize(
                        "To enter the castle, thou must play the right tune!");
                     u.uevent.uheard_tune++;
@@ -1293,6 +1302,7 @@ pleased(aligntyp g_align)
                     u.ublessed++;
                 pline(msg, "my protection");
             }
+            SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Use it wisely in my name!");
             break;
         }
@@ -1525,6 +1535,7 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
         pline("An invisible choir sings, and you are bathed in radiance...");
         godvoice(altaralign, "Mortal, thou hast done well!");
         display_nhwindow(WIN_MESSAGE, FALSE);
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize(
           "In return for thy service, I grant thee the gift of Immortality!");
         You("ascend to the status of Demigod%s...",
@@ -2472,6 +2483,7 @@ altar_wrath(coordxy x, coordxy y)
                     : "Despite your deafness, you seem to hear",
               align_gname(altaralign),
               !Deaf ? "?) whispers" : " say");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou shalt pay, infidel!");
         /* higher luck is more likely to be reduced; as it approaches -5
            the chance to lose another point drops down, eventually to 0 */

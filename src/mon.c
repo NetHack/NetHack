@@ -3710,6 +3710,7 @@ peacefuls_respond(struct monst *mtmp)
             buf[0] = '\0';
             if (humanoid(mon->data) || mon->isshk || mon->ispriest) {
                 if (is_watch(mon->data)) {
+                    SetVoice(mon, 0, 80, 0);
                     verbalize("Halt!  You're under arrest!");
                     (void) angry_guards(!!Deaf);
                 } else {

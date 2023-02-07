@@ -241,6 +241,7 @@ summon_minion(aligntyp alignment, boolean talk)
             else
                 You_feel("%s booming voice:",
                          s_suffix(align_gname(alignment)));
+            SetVoice(mon, 0, 80, 0);
             verbalize("Thou shalt pay for thine indiscretion!");
             if (canspotmon(mon))
                 pline("%s appears before you.", Amonnam(mon));
@@ -464,6 +465,7 @@ lose_guardian_angel(struct monst *mon) /* if null, angel hasn't been created yet
         if (canspotmon(mon)) {
             if (!Deaf) {
                 pline("%s rebukes you, saying:", Monnam(mon));
+                SetVoice(mon, 0, 80, 0);
                 verbalize("Since you desire conflict, have some more!");
             } else {
                 pline("%s vanishes!", Monnam(mon));
@@ -496,6 +498,7 @@ gain_guardian_angel(void)
             pline("A voice booms:");
         else
             You_feel("a booming voice:");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thy desire for conflict shall be fulfilled!");
         /* send in some hostile angels instead */
         lose_guardian_angel((struct monst *) 0);
@@ -504,6 +507,7 @@ gain_guardian_angel(void)
             pline("A voice whispers:");
         else
             You_feel("a soft voice:");
+        SetVoice((struct monst *) 0, 0, 80, voice_deity);
         verbalize("Thou hast been worthy of me!");
         mm.x = u.ux;
         mm.y = u.uy;

@@ -90,6 +90,9 @@ There are 4 distinct types of sound sound_triggers used by NetHack.
                                  (ambience_upate), likely with a different
                                  hero proximity value.
 
+    SOUND_TRIGGER_VERBAL         Invoked by the core when someone (or something)
+                                 is speaking.
+
 
 The types of sound sound_triggers supported by a particular soundlib
 implementation are specified in that library's soundlib file, which is usually
@@ -109,17 +112,20 @@ the sound_triggers field of the sound_procs struct:
         void (*sound_play_usersound)(char *filename, int32_t volume,
               int32_t usidx);
         void (*sound_ambience)(int32_t ambienceid, int32_t ambience_action,
-               int32_t hero_proximity);
+              int32_t hero_proximity);
+        void (*sound_verbal)(char *text, int32_t gender, int32_t tone,
+              int32_t vol, int32_t moreinfo);
     };
 
-A sound library integration support file can implement one, two, three or
-four of the sound trigger types. The more types of sound_triggers the
+A sound library integration support file can implement one, two, three, four,
+five, or six of the sound trigger types. The more types of sound_triggers the
 soundlib implements, the more full-featured the sound experience will be
 during the game.
 
 The values can be or'd together in the sound_triggers field initialization.
     SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
         | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_SOUNDEFFECTS
+        | SOUND_TRIGGER_AMBIENCE | SOUND_TRIGGER_VERBAL
 
 
 II.  Interface Specification
@@ -248,6 +254,18 @@ sound_ambience(int32_t ambienceid, int32_t ambience_action,
        If the distance of the hero from the source of the ambience does
        matter, then a distance value will be in hero_proximity.
 
+sound_verbal(char *text, int32_t gender, int32_t tone, int32_t vol,
+             int32_t moreinfo);
+    -- NetHack will call this function when it wants to pass text of
+       spoken language by a character or creature within the game.
+    -- text is a transcript of what has been spoken.
+    -- gender indicates MALE or FEMALE or NEUTRAL (either MALE
+       or FEMALE) voice.
+    -- tone indicates the tone of the voice.
+    -- vol is the volume (1% - 100%) for the sound.
+    -- moreinfo is used to provide additional information to the soundlib.
+    -- there may be some accessibility uses for this function.
+
 
 III.  Global variables
 
@@ -264,6 +282,11 @@ gc.chosen_soundlib
 ga.active_soundlib
 a usersound mappings reference
 
+iflags.sounds is the master on/off swith to control whether any audio
+is produced by the soundlib interface
+
+iflags.voice is the master on/off switch for voices produced by
+the soundlib interface.
 
 IV.   Other related routines
 
@@ -360,14 +383,15 @@ use the following guidelines:
            SOUNDID(myprefix),
            SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_HEROMUSIC
               | SOUND_TRIGGER_ACHIEVEMENTS |SOUND_TRIGGER_SOUNDEFFECTS
-              | SOUND_TRIGGER_AMBIENCE,
+              | SOUND_TRIGGER_AMBIENCE | SOUND_TRIGGER_VERBAL,
            myprefix_init_nhsound,
            myprefix_exit_nhsound,
            myprefix_achievement,
            myprefix_soundeffect,
            myprefix_hero_playnotes,
            myprefix_play_usersound,
-           myprefix_ambience),
+           myprefix_ambience,
+           myprefix_verbal),
        };
 
    The first entry in this structure should be the SOUNDID(myprefix)
@@ -526,6 +550,8 @@ static void sample_hero_playnotes(int32_t, const char *, int32_t);
 static void sample_play_usersound(char *, int32_t, int32_t);
 static void sample_ambience(int32_t ambienceid, int32_t ambience_action,
                             int32_t hero_proximity);
+static void (*sound_verbal)(char *text, int32_t gender, int32_t tone,
+              int32_t vol, int32_t moreinfo);
 
 struct sound_procs sample_procs = {
     SOUNDID(sample),
@@ -539,6 +565,7 @@ struct sound_procs sample_procs = {
     sample_hero_playnotes,
     sample_play_usersound,
     sample_ambience,
+    sample_verbal
 };
 
 static void
@@ -585,6 +612,12 @@ sample_play_usersound(char *filename, int volume, int usidx)
 static void
 sample_ambience(int32_t ambienceid, int32_t ambience_action,
                 int32_t hero_proximity)
+{
+}
+
+static void
+sample_verbal(char *text, int32_t gender, int32_t tone,
+              int32_t vol, int32_t moreinfo)
 {
 }
 

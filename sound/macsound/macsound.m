@@ -11,6 +11,12 @@
 /* #import <Foundation/Foundation.h> */
 #import <AppKit/AppKit.h>
 
+#define SPEECH_SOUNDS
+#ifdef SPEECH_SOUNDS
+#import <AVFoundation/AVFoundation.h>
+#endif
+
+
 /*
  * Sample sound interface for NetHack
  *
@@ -27,8 +33,10 @@ static void macsound_soundeffect(char *, int32_t, int32_t);
 static void macsound_hero_playnotes(int32_t, const char *, int32_t);
 static void macsound_play_usersound(char *, int32_t, int32_t);
 static void macsound_ambience(int32_t, int32_t, int32_t);
-
+static void macsound_verbal(char *, int32_t, int32_t, int32_t, int32_t);
 static int affiliate(int32_t seid, const char *soundname);
+
+
 
 /*
  * Sound capabilities that can be enabled:
@@ -40,7 +48,10 @@ static int affiliate(int32_t seid, const char *soundname);
 struct sound_procs macsound_procs = {
     SOUNDID(macsound),
     SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_SOUNDEFFECTS
-        | SOUND_TRIGGER_ACHIEVEMENTS,
+        | SOUND_TRIGGER_ACHIEVEMENTS
+#ifdef SND_SPEECH
+        | SOUND_TRIGGER_VERBAL,
+#endif
     macsound_init_nhsound,
     macsound_exit_nhsound,
     macsound_achievement,
@@ -48,6 +59,7 @@ struct sound_procs macsound_procs = {
     macsound_hero_playnotes,
     macsound_play_usersound,
     macsound_ambience,
+    macsound_verbal,
 };
 
 static void
@@ -310,6 +322,36 @@ static void
 macsound_play_usersound(char *filename UNUSED, int volume UNUSED, int idx UNUSED)
 {
 
+}
+
+#ifdef SND_SPEECH
+#define SPEECHONLY
+#else
+#define SPEECHONLY UNUSED
+#endif
+
+static void
+macsound_verbal(char *text SPEECHONLY, int32_t gndr SPEECHONLY, int32_t tone_of_voice UNUSED, int32_t vol UNUSED, int32_t moreinfo UNUSED)
+{
+#ifdef SND_SPEECH
+    NSMutableString *speechstring;
+    AVSpeechUtterance *text2speechutt;
+    AVSpeechSynthesizer *synthesizer;
+ 
+    synthesizer = [[AVSpeechSynthesizer alloc]init];
+    speechstring = [NSMutableString stringWithUTF8String:text];
+    text2speechutt = [AVSpeechUtterance speechUtteranceWithString:speechstring];
+    text2speechutt.rate = 0.50f;
+    text2speechutt.pitchMultiplier = 0.8f;
+    text2speechutt.postUtteranceDelay = 0.2f;
+    text2speechutt.volume = (float) vol / 100;
+    if (gndr > 0)
+        text2speechutt.voice = [AVSpeechSynthesisVoice voiceWithIdentifier:@"com.apple.ttsbundle.siri_female_en-GB_compact"];
+    else
+        text2speechutt.voice = [AVSpeechSynthesisVoice voiceWithIdentifier:@"com.apple.ttsbundle.siri_male_en-GB_compact"];
+
+    [synthesizer speakUtterance:text2speechutt];
+#endif  /* SND_SPEECH */
 }
 
 static int

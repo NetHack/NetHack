@@ -546,6 +546,7 @@ outrumor(
               (!rn2(4) ? "offhandedly "
                        : (!rn2(3) ? "casually "
                                   : (rn2(2) ? "nonchalantly " : ""))));
+        SetVoice((struct monst *) 0, 0, 80, voice_oracle);
         verbalize1(line);
         /* [WIS exercized by getrumor()] */
         return;

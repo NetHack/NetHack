@@ -6557,6 +6557,12 @@ yn_function(
         else
             cmdq_clear(CQ_CANNED); /* 'res' is ESC */
     } else {
+#ifdef SND_SPEECH
+        if ((gp.pline_flags & PLINE_SPEECH) != 0) {
+            sound_speak(query);
+            gp.pline_flags &= ~PLINE_SPEECH;
+        }
+#endif
         res = (*windowprocs.win_yn_function)(query, resp, def);
         if (addcmdq)
             cmdq_add_key(CQ_REPEAT, res);

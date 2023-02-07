@@ -164,6 +164,9 @@ SNDCFLAGS+= -DSND_LIB_MACSOUND
 SNDLIBSRC = ../sound/macsound/macsound.m
 SNDLIBOBJ = macsound.o
 LFLAGS += -framework AppKit
+#ifdef WANT_SPEECH
+LFLAGS += -framework AVFoundation
+#endif
 endif
 
 #

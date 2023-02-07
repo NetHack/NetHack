@@ -1316,8 +1316,10 @@ do_mgivenname(void)
     } else if (mtmp->isshk
                && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
-        if (!alreadynamed(mtmp, monnambuf, buf))
+        if (!alreadynamed(mtmp, monnambuf, buf)) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+        }
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST]) {
         if (!alreadynamed(mtmp, monnambuf, buf))

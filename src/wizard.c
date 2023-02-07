@@ -738,6 +738,7 @@ resurrect(void)
         set_malign(mtmp);
         if (!Deaf) {
             pline("A voice booms out...");
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("So thou thought thou couldst %s me, fool.", verb);
         }
     }
@@ -810,21 +811,26 @@ cuss(struct monst *mtmp)
     if (Deaf)
         return;
     if (mtmp->iswiz) {
-        if (!rn2(5)) /* typical bad guy action */
+        if (!rn2(5)) { /* typical bad guy action */
             pline("%s laughs fiendishly.", Monnam(mtmp));
-        else if (u.uhave.amulet && !rn2(SIZE(random_insult)))
+        } else if (u.uhave.amulet && !rn2(SIZE(random_insult))) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Relinquish the amulet, %s!",
                       random_insult[rn2(SIZE(random_insult))]);
-        else if (u.uhp < 5 && !rn2(2)) /* Panic */
+        } else if (u.uhp < 5 && !rn2(2)) { /* Panic */
+            SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? "Even now thy life force ebbs, %s!"
                              : "Savor thy breath, %s, it be thy last!",
                       random_insult[rn2(SIZE(random_insult))]);
-        else if (mtmp->mhp < 5 && !rn2(2)) /* Parthian shot */
+        } else if (mtmp->mhp < 5 && !rn2(2)) { /* Parthian shot */
+            SetVoice(mtmp, 0, 80, 0);
             verbalize(rn2(2) ? "I shall return." : "I'll be back.");
-        else
+        } else {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("%s %s!",
                       random_malediction[rn2(SIZE(random_malediction))],
                       random_insult[rn2(SIZE(random_insult))]);
+        }
     } else if (is_lminion(mtmp)
                && !(mtmp->isminion && EMIN(mtmp)->renegade)) {
         com_pager("angel_cuss"); /* TODO: the Hallucination msg */

@@ -1866,6 +1866,7 @@ doseduce(struct monst *mon)
                                  " looks pretty.  May I have it?\"", ring,
                                  xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
+                SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
                     continue;
             } else
@@ -1896,6 +1897,7 @@ doseduce(struct monst *mon)
                                  " looks pretty.  Would you wear it for me?\"",
                                  ring, xname, simpleonames, "ring");
                 makeknown(RIN_ADORNMENT);
+                SetVoice(mon, 0, 80, 0);
                 if (y_n(qbuf) == 'n')
                     continue;
             } else {
@@ -1969,6 +1971,7 @@ doseduce(struct monst *mon)
     if (uarm || uarmc) {
         if (!Deaf) {
             if (!(ld() && mon->female)) {
+                SetVoice(mon, 0, 80, 0);
                 verbalize("You're such a %s; I wish...",
                           flags.female ? "sweet lady" : "nice guy");
             } else {
@@ -2112,6 +2115,7 @@ doseduce(struct monst *mon)
         if (cost > umoney)
             cost = umoney;
         if (!cost) {
+            SetVoice(mon, 0, 80, 0);
             verbalize("It's on the house!");
         } else {
             pline("%s takes %ld %s for services rendered!", noit_Monnam(mon),
@@ -2146,6 +2150,7 @@ mayberem(struct monst *mon,
     if (Deaf) {
         pline("%s takes off your %s.", seducer, str);
     } else if (rn2(20) < ACURR(A_CHA)) {
+        SetVoice(mon, 0, 80, 0); /* y_n a.k.a. yn_function is set up for this */
         Sprintf(qbuf, "\"Shall I remove your %s, %s?\"", str,
                 (!rn2(2) ? "lover" : !rn2(2) ? "dear" : "sweetheart"));
         if (y_n(qbuf) == 'n')
@@ -2155,6 +2160,7 @@ mayberem(struct monst *mon,
 
         Sprintf(hairbuf, "let me run my fingers through your %s",
                 body_part(HAIR));
+        SetVoice(mon, 0, 80, 0);
         verbalize("Take off your %s; %s.", str,
                   (obj == uarm)
                      ? "let's get a little closer"

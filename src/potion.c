@@ -2720,6 +2720,7 @@ djinni_from_bottle(struct obj *obj)
         chance = (chance == 0) ? rn2(4) : 4;
     /* 0,1,2,3,4:  b=80%,5,5,5,5; nc=20%,20,20,20,20; c=5%,5,5,5,80 */
 
+    SetVoice(mtmp, 0, 80, 0);
     switch (chance) {
     case 0:
         verbalize("I am in your debt.  I will grant one wish!");

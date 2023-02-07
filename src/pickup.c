@@ -2196,6 +2196,7 @@ reverse_loot(void)
             coffers = otmp;
 
         if (coffers) {
+            SetVoice((struct monst *) 0, 0, 80, 0);
             verbalize("Thank you for your contribution to reduce the debt.");
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);

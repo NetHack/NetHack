@@ -327,6 +327,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
                 if (!robbed)
                     make_happy_shk(mtmp, FALSE);
             } else {
+                SetVoice(mtmp, 0, 80, 0);
                 if (mtmp->mpeaceful) {
                     ESHK(mtmp)->credit += value;
                     You("have %ld %s in credit.", ESHK(mtmp)->credit,
@@ -335,6 +336,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
                     verbalize("Thanks, scum!");
             }
         } else if (mtmp->ispriest) {
+            SetVoice(mtmp, 0, 80, 0);
             if (mtmp->mpeaceful)
                 verbalize("Thank you for your contribution.");
             else
@@ -346,6 +348,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
                out of the vault.  If he did do that, player
                could try fighting, then weasle out of being
                killed by throwing his/her gold when losing. */
+            SetVoice(mtmp, 0, 80, 0);
             verbalize(umoney ? "Drop the rest and follow me."
                       : hidden_gold(TRUE)
                         ? "You still have hidden gold.  Drop it now."
@@ -373,13 +376,16 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
             }
 
             if (!mtmp->mpeaceful) {
+                SetVoice(mtmp, 0, 80, 0);
                 if (goldreqd)
                     verbalize("That's not enough, coward!");
                 else /* unbribeable (watchman) */
                     verbalize("I don't take bribes from scum like you!");
             } else if (was_angry) {
+                SetVoice(mtmp, 0, 80, 0);
                 verbalize("That should do.  Now beat it!");
             } else {
+                SetVoice(mtmp, 0, 80, 0);
                 verbalize("Thanks for the tip, %s.",
                           flags.female ? "lady" : "buddy");
             }

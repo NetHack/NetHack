@@ -662,6 +662,8 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(video_height, Advanced, 10, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias, "video height")
 #endif
+    NHOPTB(voices, Advanced, 0, opt_in, set_in_game,
+                Off, Yes, No, No, NoAlias, &iflags.voices, Term_Off)
 #ifdef TTY_TILES_ESCCODES
     NHOPTB(vt_tiledata, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, NoAlias, &iflags.vt_tiledata, Term_False)
