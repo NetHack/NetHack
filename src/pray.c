@@ -1535,16 +1535,18 @@ offer_real_amulet(struct obj *otmp, aligntyp altaralign)
     /*NOTREACHED*/
 }
 
+/* possibly convert an altar's alignment or the hero's alignment */
 static void
-offer_different_alignment_altar(struct obj *otmp, aligntyp altaralign)
+offer_different_alignment_altar(
+    struct obj *otmp,
+    aligntyp altaralign)
 {
     /* Is this a conversion ? */
     /* An unaligned altar in Gehennom will always elicit rejection. */
     if (ugod_is_angry() || (altaralign == A_NONE && Inhell)) {
         if (u.ualignbase[A_CURRENT] == u.ualignbase[A_ORIGINAL]
             && altaralign != A_NONE) {
-            You("have a strong feeling that %s is angry...",
-                u_gname());
+            You("have a strong feeling that %s is angry...", u_gname());
             consume_offering(otmp);
             pline("%s accepts your allegiance.", a_gname());
 
@@ -1564,8 +1566,7 @@ offer_different_alignment_altar(struct obj *otmp, aligntyp altaralign)
         }
     } else {
         consume_offering(otmp);
-        You("sense a conflict between %s and %s.", u_gname(),
-            a_gname());
+        You("sense a conflict between %s and %s.", u_gname(), a_gname());
         if (rn2(8 + u.ulevel) > 5) {
             struct monst *pri;
             boolean shrine;
@@ -1580,11 +1581,9 @@ offer_different_alignment_altar(struct obj *otmp, aligntyp altaralign)
             newsym(u.ux, u.uy); /* in case Invisible to self */
             if (!Blind)
                 pline_The("altar glows %s.",
-                            hcolor((u.ualign.type == A_LAWFUL)
-                                    ? NH_WHITE
-                                    : u.ualign.type
-                                        ? NH_BLACK
-                                        : (const char *) "gray"));
+                          hcolor((u.ualign.type == A_LAWFUL) ? NH_WHITE
+                                 : u.ualign.type ? NH_BLACK
+                                   : (const char *) "gray"));
 
             if (rnl(u.ulevel) > 6 && u.ualign.record > 0
                 && rnd(u.ualign.record) > (3 * ALIGNLIM) / 4)
@@ -1594,8 +1593,7 @@ offer_different_alignment_altar(struct obj *otmp, aligntyp altaralign)
                 && !p_coaligned(pri))
                 angry_priest();
         } else {
-            pline("Unluckily, you feel the power of %s decrease.",
-                    u_gname());
+            pline("Unluckily, you feel the power of %s decrease.", u_gname());
             change_luck(-1);
             exercise(A_WIS, FALSE);
             if (rnl(u.ulevel) > 6 && u.ualign.record > 0
@@ -1835,16 +1833,14 @@ dosacrifice(void)
         desecrate_high_altar(altaralign);
     } else if (value < 0) { /* don't think the gods are gonna like this... */
         gods_upset(altaralign);
+    } else if (u.ualign.type != altaralign) {
+        /* Sacrificing at an altar of a different alignment */
+        offer_different_alignment_altar(otmp, altaralign);
+        return ECMD_TIME;
     } else {
         int saved_anger = u.ugangr;
         int saved_cnt = u.ublesscnt;
         int saved_luck = u.uluck;
-
-        /* Sacrificing at an altar of a different alignment */
-        if (u.ualign.type != altaralign) {
-            offer_different_alignment_altar(otmp, altaralign);
-            return ECMD_TIME;
-        }
 
         consume_offering(otmp);
         /* OK, you get brownie points. */
