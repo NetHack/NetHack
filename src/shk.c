@@ -1943,8 +1943,8 @@ inherits(
     long loss = 0L;
     long umoney;
     struct eshk *eshkp = ESHK(shkp);
-    boolean take = FALSE, taken = FALSE;
-    int roomno = *u.ushops;
+    boolean take = FALSE, taken = FALSE,
+            uinshop = (strchr(u.ushops, eshkp->shoproom) != (char *) 0);
     char takes[BUFSZ];
 
     /* not strictly consistent; affects messages and prevents next player
@@ -1964,13 +1964,13 @@ inherits(
                   helpless(shkp) ? "wakes up, " : "",
                   takes, !inhishop(shkp) ? "disappears" : "sighs");
         }
-        taken = (roomno == eshkp->shoproom);
+        taken = uinshop;
         goto skip;
     }
 
     /* get one case out of the way: you die in the shop, the
        shopkeeper is peaceful, nothing stolen, nothing owed */
-    if (roomno == eshkp->shoproom && inhishop(shkp) && !eshkp->billct
+    if (uinshop && inhishop(shkp) && !eshkp->billct
         && !eshkp->robbed && !eshkp->debit && NOTANGRY(shkp)
         && !eshkp->following && u.ugrave_arise < LOW_PM) {
         taken = (gi.invent != 0);
@@ -1981,7 +1981,7 @@ inherits(
     }
 
     if (eshkp->billct || eshkp->debit || eshkp->robbed) {
-        if (roomno == eshkp->shoproom && inhishop(shkp))
+        if (uinshop && inhishop(shkp))
             loss = addupbill(shkp) + eshkp->debit;
         if (loss < eshkp->robbed)
             loss = eshkp->robbed;
@@ -1999,7 +1999,7 @@ inherits(
             Strcat(takes, "comes and ");
         Strcat(takes, "takes");
 
-        if (loss > umoney || !loss || roomno == eshkp->shoproom) {
+        if (loss > umoney || !loss || uinshop) {
             eshkp->robbed -= umoney;
             if (eshkp->robbed < 0L)
                 eshkp->robbed = 0L;
@@ -2061,7 +2061,7 @@ set_repo_loc(struct monst *shkp)
     /* if you're not in this shk's shop room, or if you're in its doorway
        or entry spot or one of its walls (temporary gap or Passes_walls),
        then your gear gets dumped all the way inside */
-    if (*u.ushops != eshkp->shoproom || costly_adjacent(shkp, ox, oy)) {
+    if (!strchr(u.ushops, eshkp->shoproom) || costly_adjacent(shkp, ox, oy)) {
         /* shk.x,shk.y is the position immediately in front of the door;
            move in one more space */
         ox = eshkp->shk.x;
