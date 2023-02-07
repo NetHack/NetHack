@@ -624,13 +624,14 @@ deserted_shop(/*const*/ char* enterstring)
           !n ? "deserted" : "untended");
 }
 
+/* called from check_special_room(hack.c) */
 void
-u_entered_shop(char* enterstring)
+u_entered_shop(char *enterstring)
 {
-    register int rt;
-    register struct monst *shkp;
-    register struct eshk *eshkp;
     static char empty_shops[5];
+    struct monst *shkp;
+    struct eshk *eshkp;
+    int rt;
 
     if (!*enterstring)
         return;
@@ -638,8 +639,8 @@ u_entered_shop(char* enterstring)
     shkp = shop_keeper(*enterstring);
     if (!shkp) {
         if (!strchr(empty_shops, *enterstring)
-            && in_rooms(u.ux, u.uy, SHOPBASE)
-                   != in_rooms(u.ux0, u.uy0, SHOPBASE))
+            && (in_rooms(u.ux, u.uy, SHOPBASE)
+                != in_rooms(u.ux0, u.uy0, SHOPBASE)))
             deserted_shop(enterstring);
         Strcpy(empty_shops, u.ushops);
         u.ushops[0] = '\0';
@@ -911,15 +912,20 @@ shopper_financial_report(void)
         }
 }
 
+/* 1: shopkeeper is currently in her shop or its boundary; 0: not */
 int
-inhishop(register struct monst* mtmp)
+inhishop(struct monst *shkp)
 {
-    struct eshk *eshkp = ESHK(mtmp);
+    char *shkrooms;
+    struct eshk *eshkp = ESHK(shkp);
 
-    return (strchr(in_rooms(mtmp->mx, mtmp->my, SHOPBASE), eshkp->shoproom)
-            && on_level(&eshkp->shoplevel, &u.uz));
+    if (!on_level(&eshkp->shoplevel, &u.uz))
+        return FALSE;
+    shkrooms = in_rooms(shkp->mx, shkp->my, SHOPBASE);
+    return (strchr(shkrooms, eshkp->shoproom) != 0);
 }
 
+/* return the shopkeeper for rooms[rmno-2]; returns Null if there isn't one */
 struct monst *
 shop_keeper(char rmno)
 {
@@ -4279,7 +4285,7 @@ shk_move(struct monst *shkp)
     return z;
 }
 
-/* called after shopkeeper moves, in case themove causes re-entry into shop */
+/* called after shopkeeper moves, in case move causes re-entry into shop */
 void
 after_shk_move(struct monst *shkp)
 {
@@ -4288,7 +4294,9 @@ after_shk_move(struct monst *shkp)
     if (eshkp->bill_p == (struct bill_x *) -1000 && inhishop(shkp)) {
         /* reset bill_p, need to re-calc player's occupancy too */
         eshkp->bill_p = &eshkp->bill[0];
-        check_special_room(FALSE);
+        /* only re-check occupancy if game hasn't just ended */
+        if (!gp.program_state.gameover)
+            check_special_room(FALSE);
     }
 }
 
@@ -4301,7 +4309,7 @@ is_fshk(struct monst *mtmp)
 
 /* You are digging in the shop. */
 void
-shopdig(register int fall)
+shopdig(int fall)
 {
     struct monst *shkp = shop_keeper(*u.ushops);
     int lang;
