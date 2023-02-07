@@ -50,8 +50,9 @@ struct sound_procs macsound_procs = {
     SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_SOUNDEFFECTS
         | SOUND_TRIGGER_ACHIEVEMENTS
 #ifdef SND_SPEECH
-        | SOUND_TRIGGER_VERBAL,
+        | SOUND_TRIGGER_VERBAL
 #endif
+    |0,
     macsound_init_nhsound,
     macsound_exit_nhsound,
     macsound_achievement,
