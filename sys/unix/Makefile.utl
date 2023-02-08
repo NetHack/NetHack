@@ -354,6 +354,11 @@ tileedit: tileedit.o $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
 	$(CXXLINK) -o tileedit -L$(QTDIR)/lib tileedit.o $(TEXT_IO) -lqt
 
+uudecode: uudecode.o
+	$(CLINK) $(LFLAGS) -o uudecode uudecode.o $(LIBS)
+uudecode.o: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) -c -o uudecode.o ../sys/share/uudecode.c
+
 # using dependencies like
 #	../src/foo::
 #		@( cd ../src ; $(MAKE) foo )
@@ -408,4 +413,4 @@ clean:
 spotless: clean
 	-rm -f makedefs recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
-		tilemap tileedit tile2bmp
+		tilemap tileedit tile2bmp uudecode
