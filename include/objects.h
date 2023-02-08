@@ -67,8 +67,8 @@
 #endif  /* OBJECTS_DESCR_INIT || OBJECTS_INIT || OBJECTS_ENUM */
 
 #define GENERIC(desc, class, gen_enum) \
-    OBJECT(OBJ(NoDes, desc),                                            \
-           BITS(0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, 0),            \
+    OBJECT(OBJ("generic " desc, desc),                                  \
+           BITS(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, 0),            \
            0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLR_GRAY, gen_enum)
 
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
