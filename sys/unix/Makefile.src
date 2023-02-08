@@ -461,8 +461,9 @@ AT = $(AT_V$(QUIETCC))
 # verbosity-adjacent; these will already have 'real' values if hints have
 # set up cross-compiling, in which case these assignments will be no-ops
 PREGAME=@true
-CLEANMORE=@true
 PACKAGE=@true
+# Other hints add to this without an override, so don't completely overwrite it
+CLEANMORE+= true;
 
 
 MAKEDEFS = ../util/makedefs
