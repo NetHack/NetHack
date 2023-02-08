@@ -447,7 +447,14 @@ SoundAchievement(0, sa2_xpleveldown, level);
 #undef SOUNDLIBONLY
 #endif
 #define SOUNDLIBONLY
-#else  /*  NO SOUNDLIB SELECTED AFTER THIS */
+#ifdef SND_SPEECH
+#define VOICEONLY
+#else
+#define VOICEONLY UNUSED
+#endif
+
+#else  /*  NO SOUNDLIB IS INTEGRATED AFTER THIS */
+
 #ifdef SND_LIB_INTEGRATED
 #undef SND_LIB_INTEGRATED
 #endif
@@ -461,7 +468,15 @@ SoundAchievement(0, sa2_xpleveldown, level);
 #undef SOUNDLIBONLY
 #endif
 #define SOUNDLIBONLY UNUSED
+#ifdef SND_SPEECH
+#undef SND_SPEECH
 #endif
+#ifdef VOICEONLY
+#undef VOICEONLY
+#endif
+#define VOICEONLY UNUSED
+
+#endif  /* No SOUNDLIB */
 
 enum findsound_approaches {
     findsound_embedded,
