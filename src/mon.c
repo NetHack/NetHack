@@ -4128,10 +4128,15 @@ void
 maybe_unhide_at(coordxy x, coordxy y)
 {
     struct monst *mtmp;
+    boolean undetected = FALSE;
 
-    if ((mtmp = m_at(x, y)) == 0 && u_at(x, y))
+    if ((mtmp = m_at(x, y)) == 0 && u_at(x, y)) {
         mtmp = &gy.youmonst;
-    if (mtmp && mtmp->mundetected
+        undetected = u.uundetected;
+    } else {
+        undetected = mtmp->mundetected;
+    }
+    if (mtmp && undetected
         && ((hides_under(mtmp->data) && (!OBJ_AT(x, y) || mtmp->mtrapped))
             || (mtmp->data->mlet == S_EEL && !is_pool(x, y))))
         (void) hideunder(mtmp);
