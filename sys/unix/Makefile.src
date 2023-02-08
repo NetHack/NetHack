@@ -462,9 +462,6 @@ AT = $(AT_V$(QUIETCC))
 # set up cross-compiling, in which case these assignments will be no-ops
 PREGAME=@true
 PACKAGE=@true
-# Other hints add to this without an override, so don't completely overwrite it
-CLEANMORE+= true;
-
 
 MAKEDEFS = ../util/makedefs
 
@@ -755,7 +752,7 @@ tags: $(CSOURCES)
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
 	-rm -f monstr.c vis_tab.c ../include/vis_tab.h #obsolete generated files
-	$(CLEANMORE)
+	true; $(CLEANMORE)
 
 spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*

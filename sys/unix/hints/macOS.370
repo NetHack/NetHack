@@ -394,9 +394,7 @@ ifdef MAKEFILE_SRC
 abspath := $(abspath $(lastword $(MAKEFILE_LIST)))
 ABSBUNDLEPATH := $(dir $(abspath))
 #$(info ABSBUNDLEPATH=$(ABSBUNDLEPATH)bundle)
-endif  # MAKEFILE_SRC
 
-ifdef MAKEFILE_SRC
 ifdef WANT_BUNDLE
 #
 # bundle
