@@ -8572,13 +8572,13 @@ term_for_boolean(int idx, boolean *b)
     int i, f_t = (*b) ? 1: 0;
     const char *boolean_term;
     static const char *const booleanterms[2][num_terms] = {
-        { "false", "off", "disabled", },
-        { "true", "on", "enabled", },
+        { "false", "off", "disabled", "excluded from build" },
+        { "true", "on", "enabled", "included"},
     };
 
     boolean_term = booleanterms[f_t][0];
     i = (int) allopt[idx].termpref;
-    if (i > Term_False && i < num_terms)
+    if (i > Term_False && i < num_terms && i < SIZE(booleanterms[0]))
         boolean_term = booleanterms[f_t][i];
     return boolean_term;
 }
