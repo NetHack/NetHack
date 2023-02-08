@@ -2974,11 +2974,13 @@ have a limited number of uses, akin to wand charges.  For example, lamps burn
 out after a while.  Other tools are containers, which objects can
 be placed into or taken out of.
 .pg
+.hy 0
 Some tools (such as a blindfold) can be \fIworn\fP and can be put on and
 removed like other accessories (rings, amulets); see \fIAmulets\fP.
 Other tools (such as pick-axe) can be wielded as weapons in addition to
 being applied for their usual purpose, and in some cases (again, pick-axe)
 become wielded as a weapon even when applied.
+.hy 2
 .pg
 .\" Mentioned here because of the old method of attempting "Zen" conduct:
 .\" restart until there's a blindfold in starting inventory and put it on
