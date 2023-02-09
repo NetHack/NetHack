@@ -4133,7 +4133,7 @@ maybe_unhide_at(coordxy x, coordxy y)
     if ((mtmp = m_at(x, y)) == 0 && u_at(x, y)) {
         mtmp = &gy.youmonst;
         undetected = u.uundetected;
-    } else {
+    } else if (mtmp) {
         undetected = mtmp->mundetected;
     }
     if (mtmp && undetected
