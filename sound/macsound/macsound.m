@@ -152,7 +152,7 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
 {
 #ifdef WAVEMUSIC_SOUNDS
     uint32_t pseudo_seid, pseudo_seid_base = 0;
-    boolean has_note_variations = FALSE;
+    BOOL has_note_variations = false;
     char resourcename[120], *end_of_res = 0;
     const char *c = 0;
     float fvolume = (float) vol / 100.00;
@@ -186,32 +186,32 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
             break;
         case ins_trumpet:           /* BUGLE */
             Strcpy(resourcename, "sound_Bugle");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 5;
             break;
         case ins_cello:             /* MAGIC_HARP */
             Strcpy(resourcename, "sound_Magic_Harp");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 12;
             break;
         case ins_english_horn:      /* TOOLED_HORN */
             Strcpy(resourcename, "sound_Tooled_Horn");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 19;
             break;
         case ins_flute:             /* WOODEN_FLUTE */
             Strcpy(resourcename, "sound_Wooden_Flute");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 26;
             break;
         case ins_orchestral_harp:   /* WOODEN_HARP */
             Strcpy(resourcename, "sound_Wooden_Harp");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 33;
             break;
         case ins_pan_flute:         /* MAGIC_FLUTE */
             Strcpy(resourcename, "sound_Magic_Flute");
-            has_note_variations = TRUE;
+            has_note_variations = true;
             pseudo_seid_base = 40;
             break;
     }
