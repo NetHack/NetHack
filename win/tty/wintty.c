@@ -4000,8 +4000,13 @@ tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-tty_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
-                  int color, unsigned long *colormasks)
+tty_status_update(
+    int fldidx,
+    genericptr_t ptr,
+    int chg UNUSED,
+    int percent,
+    int color,
+    unsigned long *colormasks)
 {
     int attrmask;
     long *condptr = (long *) ptr;
