@@ -386,11 +386,11 @@ VARDIR=$(HACKDIR)
 #-INCLUDE multisnd2-pre.370
 #
 
-ifndef MAKEFILE_UTL
+ifdef MAKEFILE_TOP
 .PHONY: bundle
 endif
 ifdef MAKEFILE_SRC
-.PHONY: updatescript
+.PHONY: buildbundle bundledir updatescript
 abspath := $(abspath $(lastword $(MAKEFILE_LIST)))
 ABSBUNDLEPATH := $(dir $(abspath))
 #$(info ABSBUNDLEPATH=$(ABSBUNDLEPATH)bundle)
@@ -422,13 +422,21 @@ BUNDLE_INFOPLIST     = $(BUNDLE_CONTENTSDIR)/Info.plist
 BUNDLE_GAME          = $(BUNDLE_MACOSDIR)/$(GAME)
 BUNDLE = bundle
 ifdef NEEDS_WAV
-BUNDLEWAVS = $(addprefix $(BUNDLE_RESOURCESDIR)/, $(addsuffix .wav, $(SNDWAVS)))
-BUNDLE_WAV = bundlewav
+BUNDLEWAVS = $(addsuffix .wav, $(SNDWAVS))
 endif
-BUNDLELIST = $(BUNDLE_TOP) $(BUNDLE_CONTENTSDIR) $(BUNDLE_FRAMEWORKSDIR) \
-		$(BUNDLE_MACOSDIR) $(BUNDLE_PKGINFODIR) $(BUNDLE_PLUGINSDIR) \
-		$(BUNDLE_RESOURCESDIR) $(BUNDLE_SHAREDFRAMEWORKSDIR) \
-		$(BUNDLE_INFOPLIST) $(BUNDLE_GAME) $(BUNDLE_WAV)
+
+RESOURCES_LIST = $(BUNDLEWAVS)
+
+BUNDLE_ADD_TO_RESOURCES = $(addprefix $(BUNDLE_RESOURCESDIR)/, $(RESOURCES_LIST))
+
+MACOS_LIST = $(notdir $(GAMEBIN)) NetHackGuidebook.applescript \
+		NetHackRecover.applescript NetHackTerm.applescript 
+
+BUNDLE_ADD_TO_MACOS = $(addprefix $(BUNDLE_MACOSDIR)/, $(MACOS_LIST))
+
+# win/macosx/NetHackGuidebook.applescript
+# win/macosx/NetHackRecover.applescript
+# win/macosx/NetHackTerm.applescript 
 endif   # WANT_BUNDLE
 #
 # We include the bundle outside of a WANT_BUNDLE block because
@@ -461,20 +469,33 @@ endif  # WANT_LIBNH
 #
 ifdef MAKEFILE_TOP
 bundle: update
-	( cd src ; $(MAKE) WANT_BUNDLE=1 bundle )
+	( cd src ; $(MAKE) WANT_BUNDLE=1 buildbundle )
 
 endif   # MAKEFILE_TOP
 ifdef WANT_BUNDLE
 ifdef MAKEFILE_SRC
 
-bundle: $(BUNDLELIST) $(BUNDLE_GAME) $(BUNDLE_WAV) updatescript
+BUNDLEDIRS = $(BUNDLE_TOP) $(BUNDLE_CONTENTSDIR) $(BUNDLE_FRAMEWORKSDIR) \
+		$(BUNDLE_MACOSDIR) $(BUNDLE_PKGINFODIR) $(BUNDLE_PLUGINSDIR) \
+		$(BUNDLE_RESOURCESDIR) $(BUNDLE_SHAREDFRAMEWORKSDIR)
+
+BUNDLELIST = $(BUNDLE_INFOPLIST) $(BUNDLE_ADD_TO_MACOS) $(BUNDLE_ADD_TO_RESOURCES)
+
+buildbundle: bundledir $(BUNDLEDIRS) $(BUNDLELIST) updatescript
 	@echo $(GAME) bundle : $(ABSBUNDLEPATH)$(BUNDLE_TOP)
 	@echo $(GAME)   game : $(ABSBUNDLEPATH)$(BUNDLE_GAME)
 
-$(BUNDLE_RESOURCESDIR)/%.wav: ../sound/wav/%.wav | $(BUNDLE_RESOURCESDIR)
+$(BUNDLE_RESOURCESDIR)/%: ../sound/wav/% | $(BUNDLE_RESOURCESDIR)
 	cp $< $@
 
-bundlewav: $(BUNDLEWAVS)
+$(BUNDLE_MACOSDIR)/%: ../win/macosx/% | $(BUNDLE_MACOSDIR)
+	cp $< $@
+
+$(BUNDLE_MACOSDIR)/%: $(dir $(GAMEBIN))/% | $(BUNDLE_MACOSDIR)
+	cp $< $@
+
+bundledir:
+		mkdir -p bundle
 
 $(BUNDLE_TOP):
 		mkdir -p $@
@@ -499,12 +520,6 @@ $(BUNDLE_RESOURCESDIR): $(BUNDLE_CONTENTSDIR)
 
 $(BUNDLE_SHAREDFRAMEWORKSDIR): $(BUNDLE_CONTENTSDIR)
 		mkdir -p $@
-
-$(BUNDLE_GAME): $(BUNDLE_MACOSDIR) $(GAMEBIN)
-		cp $(GAMEBIN) $@
-#ifdef WANT_SHARE_INSTALL
-#		chmod $(GAMEPERM) $@
-#endif
 
 $(BUNDLE_INFOPLIST): ../sys/unix/hints/macosx.sh
 		( cd .. && sys/unix/hints/macosx.sh infoplist >src/$@ && cd src)
