@@ -924,6 +924,7 @@ menu_drop(int retry)
             } else if (pick_list[i].item.a_int == 'P') {
                 justpicked_quan = max(0, pick_list[i].count);
                 drop_justpicked = TRUE;
+                drop_everything = FALSE;
                 add_valid_menu_class(pick_list[i].item.a_int);
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
