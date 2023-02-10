@@ -425,18 +425,16 @@ ifdef NEEDS_WAV
 BUNDLEWAVS = $(addsuffix .wav, $(SNDWAVS))
 endif
 
-RESOURCES_LIST = $(BUNDLEWAVS)
+IMAGESLIST = nethack.icns
+
+RESOURCES_LIST = $(BUNDLEWAVS) $(IMAGESLIST)
 
 BUNDLE_ADD_TO_RESOURCES = $(addprefix $(BUNDLE_RESOURCESDIR)/, $(RESOURCES_LIST))
 
-MACOS_LIST = $(notdir $(GAMEBIN)) NetHackGuidebook.applescript \
-		NetHackRecover.applescript NetHackTerm.applescript 
+MACOS_LIST = $(notdir $(GAMEBIN)) NetHackGuidebook.applescript NetHackRecover.applescript NetHackTerm.applescript
 
 BUNDLE_ADD_TO_MACOS = $(addprefix $(BUNDLE_MACOSDIR)/, $(MACOS_LIST))
 
-# win/macosx/NetHackGuidebook.applescript
-# win/macosx/NetHackRecover.applescript
-# win/macosx/NetHackTerm.applescript 
 endif   # WANT_BUNDLE
 #
 # We include the bundle outside of a WANT_BUNDLE block because
@@ -494,6 +492,7 @@ $(BUNDLE_MACOSDIR)/%: ../win/macosx/% | $(BUNDLE_MACOSDIR)
 $(BUNDLE_MACOSDIR)/%: $(dir $(GAMEBIN))/% | $(BUNDLE_MACOSDIR)
 	cp $< $@
 
+
 bundledir:
 		mkdir -p bundle
 
@@ -533,6 +532,13 @@ ifneq "$(SHELLDIR)" ""
 	  rm -f $(GAME).tmp; \
 	fi;
 endif
+
+# We can't use a general rule because the file name of the .uu does not match the
+# uudecode target file name in this case (nhicns.uu to nethack.icns)
+../win/share/nethack.icns: ../util/uudecode ../win/share/nhicns.uu
+	../util/uudecode ../win/share/nhicns.uu
+	mv $(notdir $@) $@
+
 endif   # MAKEFILE_SRC
 endif   # WANT_BUNDLE
 
