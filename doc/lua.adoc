@@ -1090,11 +1090,23 @@ Example:
 
 === gradient
 
-Create a "gradient" of selected positions.
+Create a "gradient" of selected positions, radiating outward from a center point
+or line.
+x and y are required; x2 and y2 are not required. If they are provided and are
+different from x and y, the center of the gradient will be a line; otherwise it
+will be a point source at (x,y).
+type is either "radial" or "square"; defaults to "radial" if not provided.
+mindist is not required and is 0 by default. Points within (mindist) tiles of
+the center will always be added to the selection.
+maxdist is required. Points more than (maxdist) tiles from the center will never
+be added to the selection.
+For any given point between mindist and maxdist, there is a random chance it
+will be added to the selection; this chance starts at 100% at mindist and
+decreases linearly to 0% at maxdist.
 
 Example:
 
- local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10, limited = false });
+ local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10 });
 
 
 === grow

@@ -4989,13 +4989,14 @@ line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
     return dist;
 }
 
+/* guts of l_selection_gradient */
 void
 selection_do_gradient(
     struct selectionvar *ov,
     long x, long y,
     long x2,long y2,
     long gtyp,
-    long mind, long maxd, long limit)
+    long mind, long maxd)
 {
     long dx, dy, dofs;
 
@@ -5017,10 +5018,8 @@ selection_do_gradient(
         for (dx = 0; dx < COLNO; dx++)
             for (dy = 0; dy < ROWNO; dy++) {
                 long d0 = line_dist_coord(x, y, x2, y2, dx, dy);
-                if (d0 >= mind && (!limit || d0 <= maxd)) {
-                    if (d0 - mind > rn2(dofs))
-                        selection_setpoint(dx, dy, ov, 1);
-                }
+                if (d0 <= mind || (d0 <= maxd && d0 - mind < rn2(dofs)))
+                    selection_setpoint(dx, dy, ov, 1);
             }
         break;
     }
@@ -5034,10 +5033,8 @@ selection_do_gradient(
                 long d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                 long d0 = min(d5, min(max(d1, d2), max(d3, d4)));
 
-                if (d0 >= mind && (!limit || d0 <= maxd)) {
-                    if (d0 - mind > rn2(dofs))
-                        selection_setpoint(dx, dy, ov, 1);
-                }
+                if (d0 <= mind || (d0 <= maxd && d0 - mind < rn2(dofs)))
+                    selection_setpoint(dx, dy, ov, 1);
             }
         break;
     } /*case*/
