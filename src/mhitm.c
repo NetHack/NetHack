@@ -784,8 +784,13 @@ gulpmm(
                using that would be excessively verbose */
             pline("%s expels %s.", Monnam(magr),
                   canspotmon(mdef) ? "it" : something);
-            if (canspotmon(mdef))
-                pline("It turns into %s.", a_monnam(mdef));
+            if (canspotmon(mdef)) {
+                pline("It turns into %s.",
+                      x_monnam(mdef, ARTICLE_A, (char *) 0,
+                               (SUPPRESS_NAME | SUPPRESS_IT
+                                | SUPPRESS_INVISIBLE), FALSE));
+                
+            }
         }
         return MM_HIT; /* bypass mdamagem() */
     }
