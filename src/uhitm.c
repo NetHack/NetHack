@@ -4587,10 +4587,17 @@ gulpum(struct monst *mdef, struct attack *mattk)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
             You("%s it, then %s it.", u_digest ? "swallow" : "engulf",
                 expel_verb);
-            if (canspotmon(mdef))
-                pline("It turns into %s.", a_monnam(mdef));
-            else
+            if (canspotmon(mdef)) {
+                /* Avoiding a_monnam here: if the target is named, it gives us
+                   a sequence like "You bite Dracula.  You swallow it, then
+                   regurgitate it.  It turns into Dracula." */
+                pline("It turns into %s.",
+                      x_monnam(mdef, ARTICLE_A, (char *) 0,
+                               (SUPPRESS_NAME | SUPPRESS_IT
+                                | SUPPRESS_INVISIBLE), FALSE));
+            } else {
                 map_invisible(mdef->mx, mdef->my);
+            }
             return MM_HIT;
         }
 
