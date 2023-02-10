@@ -1515,8 +1515,11 @@ X11_error_handler(String str)
 {
     nhUse(str);
     hangup(1);
-    nh_terminate(EXIT_FAILURE);
+#ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
+    end_of_input();
+#endif
     /*NOTREACHED*/
+    nh_terminate(EXIT_FAILURE);
 }
 
 static int
@@ -1524,6 +1527,10 @@ X11_io_error_handler(Display *display)
 {
     nhUse(display);
     hangup(1);
+#ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
+    end_of_input();
+#endif
+    /*NOREACHED*/ /* but not declared NORETURN */
     return 0;
 }
 

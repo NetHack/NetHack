@@ -6317,7 +6317,8 @@ hangup(
        must continue running longer before attempting a hangup save. */
     gp.program_state.done_hup++;
     /* defer hangup iff game appears to be in progress */
-    if (gp.program_state.in_moveloop && gp.program_state.something_worth_saving)
+    if (gp.program_state.in_moveloop
+        && gp.program_state.something_worth_saving)
         return;
 #endif /* SAFERHANGUP */
     end_of_input();
