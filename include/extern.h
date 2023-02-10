@@ -2673,7 +2673,7 @@ extern void set_floodfillchk_match_under(coordxy);
 extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
                                  int);
 extern void selection_do_gradient(struct selectionvar *, long, long, long,
-                                  long, long, long, long, long);
+                                  long, long, long, long);
 extern int lspo_reset_level(lua_State *);
 extern int lspo_finalize_level(lua_State *);
 extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
