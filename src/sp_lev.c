@@ -4961,18 +4961,18 @@ selection_do_ellipse(
     }
 }
 
-/* distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
+/* square of distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
 static long
 line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
 {
     long px = x2 - x1;
     long py = y2 - y1;
     long s = px * px + py * py;
-    long x, y, dx, dy, dist = 0;
+    long x, y, dx, dy, distsq = 0;
     float lu = 0;
 
     if (x1 == x2 && y1 == y2)
-        return isqrt(dist2(x1, y1, x3, y3));
+        return dist2(x1, y1, x3, y3);
 
     lu = ((x3 - x1) * px + (y3 - y1) * py) / (float) s;
     if (lu > 1)
@@ -4984,9 +4984,9 @@ line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
     y = y1 + lu * py;
     dx = x - x3;
     dy = y - y3;
-    dist = isqrt(dx * dx + dy * dy);
+    distsq = dx * dx + dy * dy;
 
-    return dist;
+    return distsq;
 }
 
 /* guts of l_selection_gradient */
@@ -5006,7 +5006,7 @@ selection_do_gradient(
         maxd = tmp;
     }
 
-    dofs = maxd - mind;
+    dofs = maxd * maxd - mind * mind;
     if (dofs < 1)
         dofs = 1;
 
@@ -5018,7 +5018,8 @@ selection_do_gradient(
         for (dx = 0; dx < COLNO; dx++)
             for (dy = 0; dy < ROWNO; dy++) {
                 long d0 = line_dist_coord(x, y, x2, y2, dx, dy);
-                if (d0 <= mind || (d0 <= maxd && d0 - mind < rn2(dofs)))
+                if (d0 <= mind * mind
+                    || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs)))
                     selection_setpoint(dx, dy, ov, 1);
             }
         break;
@@ -5033,7 +5034,8 @@ selection_do_gradient(
                 long d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                 long d0 = min(d5, min(max(d1, d2), max(d3, d4)));
 
-                if (d0 <= mind || (d0 <= maxd && d0 - mind < rn2(dofs)))
+                if (d0 <= mind * mind
+                    || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs)))
                     selection_setpoint(dx, dy, ov, 1);
             }
         break;
