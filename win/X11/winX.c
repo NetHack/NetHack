@@ -82,11 +82,14 @@ static struct icon_info {
 struct xwindow window_list[MAX_WINDOWS];
 AppResources appResources;
 void FDECL((*input_func), (Widget, XEvent *, String *, Cardinal *));
-int click_x, click_y, click_button; /* Click position on a map window   */
-                                    /* (filled by set_button_values()). */
+int click_x, click_y, click_button; /* Click position on a map window
+                                     * (filled by set_button_values()). */
 int updated_inventory;
 
-static int (*old_error_handler) (Display *, XErrorEvent *);
+static void FDECL(X11_error_handler, (String)) NORETURN;
+static int FDECL(X11_io_error_handler, (Display *));
+
+static int FDECL((*old_error_handler), (Display *, XErrorEvent *));
 
 #if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
 #if XtSpecificationRelease >= 6
@@ -1477,6 +1480,33 @@ XErrorEvent *error;
     return 0;
 }
 
+static void
+X11_error_handler(str)
+String str;
+{
+    nhUse(str);
+    hangup(1);
+#ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
+    end_of_input();
+#endif
+    /*NOTREACHED*/
+    nh_terminate(EXIT_FAILURE);
+}
+
+static int
+X11_io_error_handler(display)
+Display *display;
+{
+    nhUse(display);
+    hangup(1);
+#ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
+    end_of_input();
+#endif
+    /*NOREACHED*/ /* but not declared NORETURN */
+    return 0;
+}
+
+
 void
 X11_init_nhwindows(argcp, argv)
 int *argcp;
@@ -1490,6 +1520,12 @@ char **argv;
     /* Init windows to nothing. */
     for (i = 0; i < MAX_WINDOWS; i++)
         window_list[i].type = NHW_NONE;
+
+    /* force high scores display to be shown in a window, and don't allow
+       that to be toggled off via 'O' (note: 'nethack -s' won't reach here;
+       its output goes to stdout and could be redirected into a file) */
+    iflags.toptenwin = TRUE;
+    set_option_mod_status("toptenwin", SET_IN_FILE);
 
     /* add another option that can be set */
     set_wc_option_mod_status(WC_TILED_MAP, SET_IN_GAME);
@@ -1507,7 +1543,7 @@ char **argv;
     savuid = geteuid();
     (void) seteuid(getuid());
 
-    XSetIOErrorHandler((XIOErrorHandler) hangup);
+    XSetIOErrorHandler(X11_io_error_handler);
 
     num_args = 0;
     XtSetArg(args[num_args], XtNallowShellResize, True); num_args++;
@@ -2572,7 +2608,7 @@ init_standard_windows()
     set_message_slider(&window_list[message_win]);
 
     /* attempt to catch fatal X11 errors before the program quits */
-    (void) XtAppSetErrorHandler(app_context, (XtErrorHandler) hangup);
+    (void) XtAppSetErrorHandler(app_context, X11_error_handler);
 
     highlight_yn(TRUE); /* switch foreground and background */
 
