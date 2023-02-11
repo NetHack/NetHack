@@ -407,7 +407,16 @@ SYSSHARE=../sys/share/
 tags: $(UTILSRCS)
 	@ctags -tw $(UTILSRCS)
 
-clean:
+# note:	3.6 copied tile.h from win/share/ to include/ and if someone
+#	switches branches from 3.6 to 3.7 without executing 'make spotless'
+#	first, the old tile.h sticks around and gets found during compile
+#	instead of current one; various tile utilities won't build in that
+#	mis-configuration so allow 'make clean' and 'make spotless' in 3.7
+#	to fix things up by deleting the out of date file (if present)
+clean-fixup:
+	-rm -f ../include/tile.h
+
+clean: clean-fixup
 	-rm -f *.o
 
 spotless: clean
