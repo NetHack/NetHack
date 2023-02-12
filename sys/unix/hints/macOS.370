@@ -388,12 +388,13 @@ VARDIR=$(HACKDIR)
 
 ifdef MAKEFILE_TOP
 .PHONY: bundle
+
 endif
 ifdef MAKEFILE_SRC
 .PHONY: buildbundle bundledir updatescript
-abspath := $(abspath $(lastword $(MAKEFILE_LIST)))
+abspath := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 ABSBUNDLEPATH := $(dir $(abspath))
-#$(info ABSBUNDLEPATH=$(ABSBUNDLEPATH)bundle)
+$(info ABSBUNDLEPATH=$(ABSBUNDLEPATH))
 
 ifdef WANT_BUNDLE
 #
@@ -410,7 +411,10 @@ ifdef WANT_BUNDLE
 #                 Resources/
 #                 SharedFrameWorks/
 #
-BUNDLE_TOP = bundle/$(GAME).app
+BUNDLE_NAME = NetHackTerm
+BUNDLE_GAMENAME = NetHack
+BUNDLE_PARENTDIR = $(ABSBUNDLEPATH)bundle
+BUNDLE_TOP = $(BUNDLE_PARENTDIR)/$(BUNDLE_NAME).app
 BUNDLE_CONTENTSDIR   = $(BUNDLE_TOP)/Contents
 BUNDLE_FRAMEWORKSDIR = $(BUNDLE_CONTENTSDIR)/Frameworks
 BUNDLE_MACOSDIR      = $(BUNDLE_CONTENTSDIR)/MacOS
@@ -419,19 +423,20 @@ BUNDLE_PLUGINSDIR    = $(BUNDLE_CONTENTSDIR)/PlugIns
 BUNDLE_RESOURCESDIR  = $(BUNDLE_CONTENTSDIR)/Resources
 BUNDLE_SHAREDFRAMEWORKSDIR = $(BUNDLE_CONTENTSDIR)/SharedFrameworks
 BUNDLE_INFOPLIST     = $(BUNDLE_CONTENTSDIR)/Info.plist
-BUNDLE_GAME          = $(BUNDLE_MACOSDIR)/$(GAME)
-BUNDLE = bundle
+BUNDLE_GAME          = $(BUNDLE_MACOSDIR)/$(BUNDLE_GAMENAME)
+BUNDLE_LAUNCHER      = $(BUNDLE_MACOSDIR)/$(BUNDLE_NAME)
 ifdef NEEDS_WAV
 BUNDLEWAVS = $(addsuffix .wav, $(SNDWAVS))
 endif
 
-IMAGESLIST = nethack.icns
+IMAGESLIST = $(BUNDLE_NAME).icns
 
 RESOURCES_LIST = $(BUNDLEWAVS) $(IMAGESLIST)
 
 BUNDLE_ADD_TO_RESOURCES = $(addprefix $(BUNDLE_RESOURCESDIR)/, $(RESOURCES_LIST))
 
-MACOS_LIST = $(notdir $(GAMEBIN)) NetHackGuidebook.applescript NetHackRecover.applescript NetHackTerm.applescript
+MACOS_LIST = $(BUNDLE_GAMENAME)
+# NetHackGuidebook.applescript NetHackRecover.applescript NetHackTerm.applescript
 
 BUNDLE_ADD_TO_MACOS = $(addprefix $(BUNDLE_MACOSDIR)/, $(MACOS_LIST))
 
@@ -440,7 +445,7 @@ endif   # WANT_BUNDLE
 # We include the bundle outside of a WANT_BUNDLE block because
 # it is unlikely that anyone will use 'make WANT_BUNDLE=1 clean'
 #
-CLEANMORE += rm -rf bundle ;
+CLEANMORE += rm -rf ../bundle ;
 endif   # MAKEFILE_SRC
 
 #
@@ -473,15 +478,15 @@ endif   # MAKEFILE_TOP
 ifdef WANT_BUNDLE
 ifdef MAKEFILE_SRC
 
-BUNDLEDIRS = $(BUNDLE_TOP) $(BUNDLE_CONTENTSDIR) $(BUNDLE_FRAMEWORKSDIR) \
+BUNDLEDIRS = $(BUNDLE_PARENTDIR) $(BUNDLE_TOP) $(BUNDLE_CONTENTSDIR) $(BUNDLE_FRAMEWORKSDIR) \
 		$(BUNDLE_MACOSDIR) $(BUNDLE_PKGINFODIR) $(BUNDLE_PLUGINSDIR) \
 		$(BUNDLE_RESOURCESDIR) $(BUNDLE_SHAREDFRAMEWORKSDIR)
 
-BUNDLELIST = $(BUNDLE_INFOPLIST) $(BUNDLE_ADD_TO_MACOS) $(BUNDLE_ADD_TO_RESOURCES)
+BUNDLELIST = $(BUNDLE_INFOPLIST) $(BUNDLE_LAUNCHER) $(BUNDLE_ADD_TO_MACOS) $(BUNDLE_ADD_TO_RESOURCES)
 
 buildbundle: bundledir $(BUNDLEDIRS) $(BUNDLELIST) updatescript
-	@echo $(GAME) bundle : $(ABSBUNDLEPATH)$(BUNDLE_TOP)
-	@echo $(GAME)   game : $(ABSBUNDLEPATH)$(BUNDLE_GAME)
+	@echo $(GAME) bundle : $(BUNDLE_TOP)
+	@echo $(GAME)   game : $(BUNDLE_GAME)
 
 $(BUNDLE_RESOURCESDIR)/%: ../sound/wav/% | $(BUNDLE_RESOURCESDIR)
 	cp $< $@
@@ -493,10 +498,10 @@ $(BUNDLE_MACOSDIR)/%: $(dir $(GAMEBIN))/% | $(BUNDLE_MACOSDIR)
 	cp $< $@
 
 
-bundledir:
-		mkdir -p bundle
+$(BUNDLE_PARENTDIR):
+		mkdir -p $@
 
-$(BUNDLE_TOP):
+$(BUNDLE_TOP): $(BUNDLE_PARENTDIR)
 		mkdir -p $@
 
 $(BUNDLE_CONTENTSDIR): $(BUNDLE_TOP)
@@ -520,14 +525,58 @@ $(BUNDLE_RESOURCESDIR): $(BUNDLE_CONTENTSDIR)
 $(BUNDLE_SHAREDFRAMEWORKSDIR): $(BUNDLE_CONTENTSDIR)
 		mkdir -p $@
 
-$(BUNDLE_INFOPLIST): ../sys/unix/hints/macosx.sh
-		( cd .. && sys/unix/hints/macosx.sh infoplist >src/$@ && cd src)
+$(BUNDLE_GAME): nethack
+	cp nethack $@
+
+$(BUNDLE_INFOPLIST):
+	@echo '<?xml version="1.0" encoding="UTF-8"?>' >$@
+	@echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >>$@
+	@echo '<plist version="1.0">' >>$@
+	@echo '<dict>' >>$@
+	@echo '<key>CFBundleInfoDictionaryVersion</key>' >>$@
+	@echo '<string>6.0</string>' >>$@
+	@echo '<key>CFBundleDevelopmentRegion</key>' >>$@
+	@echo '<string>en</string>' >>$@
+	@echo '<key>CFBundlePackageType</key>' >>$@
+	@echo '<string>APPL</string>' >>$@
+	@echo '<key>CFBundleGetInfoString</key>' >>$@
+	@echo '<string>$(BUNDLE_GAMENAME) 3.7 for MacOS</string>' >>$@
+	@echo '<key>CFBundleIdentifier</key>' >>$@
+	@echo '<string>org.nethack.macos</string>' >>$@
+	@echo '<key>CFBundleExecutable</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleIconFile</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleDisplayName</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleName</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleVersion</key>' >>$@
+	@echo '<string>3.7.0b73</string>' >>$@
+	@echo '<key>CFBundleShortVersionString</key>' >>$@
+	@echo '<string>3.7.0</string>' >>$@
+	@echo '<key>NSHumanReadableCopyright</key>' >>$@
+	@echo '<string>©By Stichting Mathematisch Centrum and M. Stephenson 1985-2023</string>' >>$@
+#	@echo '<key>CFBundleSignature</key>' >>$@
+#	@echo '<string>????</string>' >>$@
+	@echo '<key>LSApplicationCategoryType</key>' >>$@
+#	@echo '<string>public.app-category.role-playing-games</string>' >>$@
+	@echo '<string>public.app-category.adventure-games</string>' >>$@
+	@echo '</dict>' >>$@
+	@echo '</plist>' >>$@
+#		../sys/unix/hints/macosx.sh infoplist >$@
+
+$(BUNDLE_LAUNCHER):
+	@echo '#!/bin/sh' >$@
+	@echo 'dir=$$(dirname $$0)' >>$@
+	@echo 'open -a Terminal file://$${dir}/$(BUNDLE_GAMENAME)' >>$@
+	chmod +x $@
 
 updatescript:
 ifneq "$(SHELLDIR)" ""
 	if test -f $(SHELLDIR)/$(GAME); then \
 	  cp $(SHELLDIR)/$(GAME) $(GAME).tmp; \
-	  sed -i '' 's;\$$HACKDIR/$(GAME);$(ABSBUNDLEPATH)$(BUNDLE_GAME);' $(SHELLDIR)/$(GAME) ; \
+	  sed -i '' 's;\$$HACKDIR/$(GAME);$(BUNDLE_GAME);' $(SHELLDIR)/$(GAME) ; \
 	  diff -u $(GAME).tmp $(SHELLDIR)/$(GAME) | grep "="; \
 	  rm -f $(GAME).tmp; \
 	fi;
@@ -535,9 +584,9 @@ endif
 
 # We can't use a general rule because the file name of the .uu does not match the
 # uudecode target file name in this case (nhicns.uu to nethack.icns)
-../win/share/nethack.icns: ../util/uudecode ../win/share/nhicns.uu
+$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) ../util/uudecode ../win/share/nhicns.uu
 	../util/uudecode ../win/share/nhicns.uu
-	mv $(notdir $@) $@
+	mv nethack.icns $@
 
 endif   # MAKEFILE_SRC
 endif   # WANT_BUNDLE
