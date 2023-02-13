@@ -45,7 +45,7 @@
 
 extern char *FDECL(tilename, (int, int));
 
-#define MAGICTILENO (340 + 440 + 231 + 340)
+#define MAGICTILENO (394 + 456 + 232 + 394)
 
 #if BITCOUNT == 4
 #define MAX_X 320 /* 2 per byte, 4 bits per pixel */
@@ -160,7 +160,7 @@ static void FDECL(build_bmfh, (BITMAPFILEHEADER *));
 static void FDECL(build_bmih, (BITMAPINFOHEADER *));
 static void FDECL(build_bmptile, (pixel(*) [TILE_X]));
 
-char *tilefiles[] = {
+const char *tilefiles[] = {
 #if (TILE_X == 32)
     "../win/share/mon32.txt", "../win/share/obj32.txt",
     "../win/share/oth32.txt",
