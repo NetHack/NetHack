@@ -1350,6 +1350,10 @@ clean:
 	if exist $(O)sp_lev.tag   del $(O)sp_lev.tag
 	if exist $(O)uudecode.MAP del $(O)uudecode.MAP
 	if exist $(O)uudecode.PDB del $(O)uudecode.PDB
+	if exist $(SRC)\tiles.bmp del $(SRC)\tiles.bmp
+	if exist $(O)console.res  del $(O)console.res
+	if exist $(O)NetHack.res  del $(O)NetHack.res
+	if exist $(O)NetHackW.res del $(O)NetHackW.res
 	rem
 	rem defer to the steps in ..\win\win32\levstuff.mak
 	rem 
