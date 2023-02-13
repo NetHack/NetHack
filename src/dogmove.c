@@ -260,7 +260,7 @@ dog_eat(struct monst *mtmp,
         obj = splitobj(obj, 1L);
     if (obj->unpaid)
         iflags.suppress_price++;
-    if (is_pool(x, y) && !Underwater) {
+    if (is_pool(mtmp->mx, mtmp->my) && !Underwater) {
         /* Don't print obj */
         /* TODO: Reveal presence of sea monster (especially sharks) */
     } else {
