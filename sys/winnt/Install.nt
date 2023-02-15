@@ -67,9 +67,10 @@ The Visual Studio 2017 NetHack solution file can be found here:
     win\win32\vs2017\NetHack.sln
 
 You can use that same win\win32\vs2017\NetHack.sln with Visual Studio 2019,
-but you may have to retarget the projects.
-Note: If you already built NetHack previously with the older version,
-manually delete the following subfolders of win\win32\vs2017:
+but you likely have to retarget the projects. The same would apply if you are
+trying to build using an even more recent version of Visual Studio as well.
+Note: If you already built NetHack previously with an older version of
+Visual Studio, manually delete the following subfolders of win\win32\vs2017:
         <DIR>          obj
         <DIR>          symbols
 
