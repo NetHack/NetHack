@@ -36,7 +36,7 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
-/*  Patch 7, February ??, 2023
+/*  Patch 7, February 17, 2023
  *
  *  during engraving, spaces were counted instead of non-space (cherry-pick of
  *      4e0a1e04 from NetHack-3.7)
