@@ -202,7 +202,7 @@ struct keyboard_handling_t {
     int (*pCheckInput)(HANDLE, INPUT_RECORD *, DWORD *, boolean,
                                    int, int *, coord *);
 } keyboard_handling = {
-    no_keyhandling,
+    (char *) no_keyhandling,
     default_processkeystroke,
     default_kbhit,
     default_checkinput
