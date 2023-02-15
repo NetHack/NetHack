@@ -70,7 +70,6 @@ You can use that same win\win32\vs2017\NetHack.sln with Visual Studio 2019,
 but you may have to retarget the projects.
 Note: If you already built NetHack previously with the older version,
 manually delete the following subfolders of win\win32\vs2017:
-        <DIR>          Images
         <DIR>          obj
         <DIR>          symbols
 
