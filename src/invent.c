@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1661240719 2022/08/23 07:45:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.424 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1672827802 2023/01/04 10:23:22 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.439 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2569,17 +2569,21 @@ prinv(const char *prefix, struct obj *obj, long quan)
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 char *
-xprname(struct obj *obj,
-        const char *txt, /* text to print instead of obj */
-        char let,        /* inventory letter */
-        boolean dot,     /* append period; (dot && cost => Iu) */
-        long cost,       /* cost (for inventory of unpaid or expended items) */
-        long quan)       /* if non-0, print this quantity, not obj->quan */
+xprname(
+    struct obj *obj,
+    const char *txt, /* text to print instead of obj */
+    char let,        /* inventory letter */
+    boolean dot,     /* append period; (dot && cost => Iu) */
+    long cost,       /* cost (for inventory of unpaid or expended items) */
+    long quan)       /* if non-0, print this quantity, not obj->quan */
 {
     static char li[BUFSZ];
+    char suffix[80]; /* plenty of room for count and hallucinatory currency */
+    int sfxlen, txtlen; /* signed int for %*s formatting */
+    const char *fmt;
     boolean use_invlet = (flags.invlet_constant
                           && let != CONTAINED_SYM && let != HANDS_SYM);
-    long savequan = 0;
+    long savequan = 0L;
 
     if (quan && obj) {
         savequan = obj->quan;
@@ -2591,18 +2595,33 @@ xprname(struct obj *obj,
      *  *  Then obj == null and we are printing a total amount.
      *  >  Then the object is contained and doesn't have an inventory letter.
      */
-    if (cost != 0 || let == '*') {
+    fmt = "%c - %.*s%s";
+    if (!txt)
+        txt = doname(obj);
+    txtlen = (int) strlen(txt);
+
+    if (cost != 0L || let == '*') {
         /* if dot is true, we're doing Iu, otherwise Ix */
-        Sprintf(li,
-                iflags.menu_tab_sep ? "%c - %s\t%6ld %s"
-                                    : "%c - %-45s %6ld %s",
-                (dot && use_invlet ? obj->invlet : let),
-                (txt ? txt : doname(obj)), cost, currency(cost));
+        if (dot && use_invlet)
+            let = obj->invlet;
+        Sprintf(suffix, "%c%6ld %.50s", iflags.menu_tab_sep ? '\t' : ' ',
+                cost, currency(cost));
+        if (!iflags.menu_tab_sep) {
+            fmt = "%c - %-45.*s%s";
+            if (txtlen < 45)
+                txtlen = 45;
+        }
     } else {
         /* ordinary inventory display or pickup message */
-        Sprintf(li, "%c - %s%s", (use_invlet ? obj->invlet : let),
-                (txt ? txt : doname(obj)), (dot ? "." : ""));
+        if (use_invlet)
+            let = obj->invlet;
+        Strcpy(suffix, dot ? "." : "");
     }
+    sfxlen = (int) strlen(suffix);
+    if (txtlen > BUFSZ - 1 - (4 + sfxlen)) /* 4: "c - " prefix */
+        txtlen = BUFSZ - 1 - (4 + sfxlen);
+    Sprintf(li, fmt, let, txtlen, txt, suffix);
+
     if (savequan)
         obj->quan = savequan;
 

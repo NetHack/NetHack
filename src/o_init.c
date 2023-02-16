@@ -1,4 +1,4 @@
-/* NetHack 3.7	o_init.c	$NHDT-Date: 1646950588 2022/03/10 22:16:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
+/* NetHack 3.7	o_init.c	$NHDT-Date: 1672829455 2023/01/04 10:50:55 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.68 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -11,6 +11,7 @@ static void shuffle_all(void);
 static int QSORTCALLBACK discovered_cmp(const genericptr, const genericptr);
 static char *sortloot_descr(int, char *);
 static char *disco_typename(int);
+static void disco_append_typename(char *, int);
 static char *oclass_to_name(char, char *);
 
 #ifdef TILES_IN_GLYPHMAP
@@ -651,6 +652,30 @@ disco_typename(int otyp)
     return result;
 }
 
+/* append typename(dis) to buf[], possibly truncating in the process */
+static void
+disco_append_typename(char *buf, int dis)
+{
+    unsigned len = (unsigned) strlen(buf);
+    char *p, *typnm = disco_typename(dis);
+
+    if (len + (unsigned) strlen(typnm) < BUFSZ) {
+        /* ordinary */
+        Strcat(buf, typnm);
+    } else if ((p = strrchr(typnm, '(')) != 0
+               && p > typnm && p[-1] == ' ' && strchr(p, ')') != 0) {
+        /* typename() returned "really long user-applied name (actual type)"
+           and we want to truncate from "really long user-applied name" while
+           keeping " (actual type)" intact */
+        --p; /* back up to space in front of open paren */
+        (void) strncat(buf, typnm, BUFSZ - 1 - (len + (unsigned) strlen(p)));
+        Strcat(buf, p);
+    } else {
+        /* unexpected; just truncate from end of typename */
+        (void) strncat(buf, typnm, BUFSZ - 1 - len);
+    }
+}
+
 /* the #known command - show discovered object types */
 int
 dodiscovered(void) /* free after Robert Viduya */
@@ -734,7 +759,7 @@ dodiscovered(void) /* free after Robert Viduya */
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
                 if (lootsort)
                     (void) sortloot_descr(dis, &buf[2]);
-                Strcat(buf, disco_typename(dis));
+                disco_append_typename(buf, dis);
 
                 if (!alphabetized && !lootsort)
                     putstr(tmpwin, 0, buf);
@@ -966,7 +991,7 @@ doclassdisco(void)
                 Strcpy(buf,  objects[dis].oc_pre_discovered ? "* " : "  ");
                 if (lootsort)
                     (void) sortloot_descr(dis, &buf[2]);
-                Strcat(buf, disco_typename(dis));
+                disco_append_typename(buf, dis);
 
                 if (!alphabetized && !lootsort)
                     putstr(tmpwin, 0, buf);
