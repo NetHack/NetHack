@@ -72,7 +72,34 @@
 /****************************************************************************/
 /* Version 3.6.x */
 
+/*  Patch 7, February 16, 2023
+ *
+ *  during engraving, spaces were counted instead of non-space (cherry-pick of
+ *      4e0a1e04 from NetHack-3.7)
+ *  avoid potential buffer overflow in append_str()
+ *  resolve missing dependency in NetHack.sln
+ *  code in include/tradstdc.h was trying to suppress warn_unused result by
+ *      defining warn_unused_result to an empty string and that began causing
+ *  a build error within a system-supplied header file cdefs.h when using
+ *      ubuntu impish 21.10; disable that for any Linux unless GCC_URWARN is
+ *      defined to force it back into effect
+ *  update_inventory() after leash goes slack
+ *  player assigned name for monsters, specific objects, or object types could be
+        longer than what was intented to be allowed; for 'curses', much longer
+ *  windows: added winflexbison to travis-ci configuration to permit full build of
+ *      levcomp and dgncomp
+ *  windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
+ *      abort
+ *  windows: the console.rc file had outdated information stating 3.6.3 when the
+ *      official 3.6.6 binary was built.
+ *  windows: switch from using keyhandling dll's to incorporating the three
+ *      variations (default, ray, 340) in sys/winnt/nttty.c
+ *  curses: cherry-picked selectsaved code from 3.7 for menu of save files
+ *  NetHackW: fix delayed rendering of cursor when using farlook
+ */
+
 /*  Patch 6, March 8, 2020
+ *
  *  invalid status highlight color could be maliciously used to corrupt memory
  *  formatting corpse names used internal buffers differently from formatting
  *      other objects and could potentially clobber memory
@@ -92,7 +119,7 @@
  *  fix potential buffer overflow in pline(), raw_printf(), and config_error_add()
  *  fix potential buffer overflow in choose_windows()
  *  use vsnprintf instead of vsprintf in pline.c where possible
- *  Windows: incldues a fix from a 3.6.4 post-release update where
+ *  Windows: includes a fix from a 3.6.4 post-release update where
  *      OPTIONS=map_mode:fit_to_screen could cause a game start failure
  *  Windows: users with C-locale unmappable names could get game start failure
  */
