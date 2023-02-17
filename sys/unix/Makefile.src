@@ -44,7 +44,7 @@ SHELL=/bin/sh
 #LINK=$(CC)
 
 # If we're cross-compiling, a hints file will override this
-# to a uniq target directory, but otherwise it just goes in
+# to a unique target directory, but otherwise it just goes in
 # ../src
 TARGETPFX=
 
@@ -68,6 +68,11 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #SYSOBJ = $(TARGETPFX)bemain.o $(TARGETPFX)unixtty.o $(TARGETPFX)ioctl.o
 
 
+# NetHack 3.7 began introducing C99 code.
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# CSTD = -std=c99
+
 # if you are using gcc as your compiler:
 #	uncomment the CC definition below if it's not in your environment
 #	if you get setcgtty() warnings during execution, you are feeding gcc
@@ -90,6 +95,11 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # CC = arm-linux-gcc
 #
 #
+# The gcc compiler switch for accepting C99 code. Because gcc had extensions in
+# earlier versions, a number of C99 features were already compiling cleanly, but
+# not all (e.g., 'for' loop initial declarations).
+# CSTD = -std=c99
+
 # if you're debugging and want gcc to check as much as possible, use:
 # CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings
 
@@ -189,7 +199,7 @@ MOCPATH ?= $(QTDIR)/bin/$(MOC)
 # If we're cross-compiling these will get overridden elsewhere, likely via
 # a hints file. TARGETPFX was set above earlier.
 TARGET_CC = $(CC)
-TARGET_CFLAGS = $(CFLAGS)
+TARGET_CFLAGS = $(CFLAGS) $(CSTD)
 TARGET_LINK = $(LINK)
 TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
@@ -674,11 +684,11 @@ $(LUALIB) ../include/nhlua.h:
 # special rules, to force update of makedefs, real dependencies should be
 # below in the 'make depend' output.
 monst.o:
-	$(CC) $(CFLAGS) -c -o $@ monst.c
+	$(CC) $(CFLAGS) $(CSTD) -c -o $@ monst.c
 	@rm -f $(MAKEDEFS)
 
 objects.o:
-	$(CC) $(CFLAGS) -c -o $@ objects.c
+	$(CC) $(CFLAGS) $(CSTD) -c -o $@ objects.c
 	@rm -f $(MAKEDEFS)
 
 # outdated Qt 3 windowport meta-object-compiler output
