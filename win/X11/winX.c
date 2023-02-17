@@ -16,6 +16,14 @@
 #define SHORT_FILENAMES
 #endif
 
+/* Can't use #ifdef LINUX because no header files have been processed yet.
+ * This is needed to ensure the prototype for seteuid() is picked up when
+ * the header files are processed.
+ */
+#ifdef __linux__
+#define _POSIX_C_SOURCE 200809
+#endif
+
 #include <X11/Intrinsic.h>
 #include <X11/StringDefs.h>
 #include <X11/Shell.h>
