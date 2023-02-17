@@ -1112,6 +1112,7 @@ dying in a wall spot (temporary gap or via Passes_walls) shared by two shops
 a monster capable of using a polymorph trap to deliberately change form could
 	do so when trapped in an adjacent web or pit; if that happened, the
 	monster remained flagged as 'trapped' and wouldn't be able to move
+give feedback when some types of damage are avoided due to MC (aka negation)
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository

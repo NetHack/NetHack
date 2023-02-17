@@ -967,7 +967,8 @@ mdamagem(struct monst *magr, struct monst *mdef,
     if (!mhm.damage)
         return mhm.hitflags;
 
-    if ((mdef->mhp -= mhm.damage) < 1) {
+    mdef->mhp -= mhm.damage;
+    if (mdef->mhp < 1) {
         if (m_at(mdef->mx, mdef->my) == magr) { /* see gulpmm() */
             remove_monster(mdef->mx, mdef->my);
             mdef->mhp = 1; /* otherwise place_monster will complain */

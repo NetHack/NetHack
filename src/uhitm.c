@@ -8,7 +8,7 @@
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
-static boolean mhitm_mgc_atk_negated(struct monst *, struct monst *);
+static boolean mhitm_mgc_atk_negated(struct monst *, struct monst *, boolean);
 static boolean known_hitum(struct monst *, struct obj *, int *, int, int,
                            struct attack *, int);
 static boolean theft_petrifies(struct obj *);
@@ -16,21 +16,35 @@ static void steal_it(struct monst *, struct attack *);
 static boolean hitum_cleave(struct monst *, struct attack *);
 static boolean hitum(struct monst *, struct attack *);
 static void hmon_hitmon_barehands(struct _hitmon_data *, struct monst *);
-static void hmon_hitmon_weapon_ranged(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_weapon_melee(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_weapon(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_potion(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_misc_obj(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_do_hit(struct _hitmon_data *, struct monst *, struct obj *);
+static void hmon_hitmon_weapon_ranged(struct _hitmon_data *, struct monst *,
+                                      struct obj *);
+static void hmon_hitmon_weapon_melee(struct _hitmon_data *, struct monst *,
+                                     struct obj *);
+static void hmon_hitmon_weapon(struct _hitmon_data *, struct monst *,
+                               struct obj *);
+static void hmon_hitmon_potion(struct _hitmon_data *, struct monst *,
+                               struct obj *);
+static void hmon_hitmon_misc_obj(struct _hitmon_data *, struct monst *,
+                                 struct obj *);
+static void hmon_hitmon_do_hit(struct _hitmon_data *, struct monst *,
+                               struct obj *);
 static void hmon_hitmon_dmg_recalc(struct _hitmon_data *, struct obj *);
-static void hmon_hitmon_poison(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_jousting(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_stagger(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_pet(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_splitmon(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_msg_hit(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_msg_silver(struct _hitmon_data *, struct monst *, struct obj *);
-static void hmon_hitmon_msg_lightobj(struct _hitmon_data *, struct monst *, struct obj *);
+static void hmon_hitmon_poison(struct _hitmon_data *, struct monst *,
+                               struct obj *);
+static void hmon_hitmon_jousting(struct _hitmon_data *, struct monst *,
+                                 struct obj *);
+static void hmon_hitmon_stagger(struct _hitmon_data *, struct monst *,
+                                struct obj *);
+static void hmon_hitmon_pet(struct _hitmon_data *, struct monst *,
+                            struct obj *);
+static void hmon_hitmon_splitmon(struct _hitmon_data *, struct monst *,
+                                 struct obj *);
+static void hmon_hitmon_msg_hit(struct _hitmon_data *, struct monst *,
+                                struct obj *);
+static void hmon_hitmon_msg_silver(struct _hitmon_data *, struct monst *,
+                                   struct obj *);
+static void hmon_hitmon_msg_lightobj(struct _hitmon_data *, struct monst *,
+                                     struct obj *);
 static boolean hmon_hitmon(struct monst *, struct obj *, int, int);
 static int joust(struct monst *, struct obj *);
 static void demonpet(void);
@@ -48,15 +62,30 @@ static boolean shade_aware(struct obj *);
 #define PROJECTILE(obj) ((obj) && is_ammo(obj))
 
 static boolean
-mhitm_mgc_atk_negated(struct monst *magr, struct monst *mdef)
+mhitm_mgc_atk_negated(
+    struct monst *magr, struct monst *mdef,
+    boolean verbosely) /* give mesg if magical cancellation prevents damage */
 {
-    int armpro = magic_negation(mdef);
-    boolean negated = !(rn2(10) >= 3 * armpro);
+    int armpro;
+    boolean negated;
 
-    /* since hero can't be cancelled, only defender's armor applies */
-    if (magr == &gy.youmonst)
-        return negated;
-    return magr->mcan || negated;
+    /* mcan doesn't apply to youmonst; hero can't be cancelled */
+    if (magr != &gy.youmonst && magr->mcan)
+        return TRUE; /* no message if attacker has been cancelled */
+
+    armpro = magic_negation(mdef);
+    negated = !(rn2(10) >= 3 * armpro);
+    if (negated) {
+        /* attack has been thwarted by negation, aka magical cancellation */
+        if (verbosely) {
+            if (mdef == &gy.youmonst)
+                You("avoid harm.");
+            else if (gv.vis && canseemon(mdef))
+                pline("%s avoids harm.", Monnam(mdef));
+        }
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* multi_reason is usually a literal string; here we generate one that
@@ -2123,7 +2152,8 @@ mhitm_ad_dcay(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 return;
             }
             mhm->done = TRUE;
-            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->hitflags = (MM_DEF_DIED
+                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
             return;
         }
         erode_armor(mdef, ERODE_ROT);
@@ -2133,10 +2163,11 @@ mhitm_ad_dcay(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_dren(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_dren(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2163,7 +2194,7 @@ mhitm_ad_drli(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2240,7 +2271,7 @@ mhitm_ad_fire(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
     struct permonst *pd = mdef->data;
 
     if (magr == &gy.youmonst) {
@@ -2303,8 +2334,9 @@ mhitm_ad_fire(
             if ((int) magr->m_lev > rn2(20))
                 ignite_items(gi.invent);
             burn_away_slime();
-        } else
+        } else {
             mhm->damage = 0;
+        }
     } else {
         /* mhitm */
         if (negated) {
@@ -2351,7 +2383,7 @@ mhitm_ad_cold(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2407,7 +2439,7 @@ mhitm_ad_elec(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2579,10 +2611,11 @@ mhitm_ad_sgld(
 
 
 void
-mhitm_ad_tlpt(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_tlpt(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2809,10 +2842,11 @@ mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_drst(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_drst(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
     struct permonst *pa = magr->data;
 
     if (magr == &gy.youmonst) {
@@ -2972,7 +3006,7 @@ mhitm_ad_stck(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
     struct permonst *pd = mdef->data;
 
     if (magr == &gy.youmonst) {
@@ -3082,7 +3116,7 @@ mhitm_ad_plys(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3124,10 +3158,11 @@ mhitm_ad_plys(
 }
 
 void
-mhitm_ad_slee(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm UNUSED)
+mhitm_ad_slee(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3165,11 +3200,13 @@ mhitm_ad_slee(struct monst *magr, struct attack *mattk, struct monst *mdef,
     }
 }
 
+/* slime */
 void
-mhitm_ad_slim(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_slim(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
     struct permonst *pd = mdef->data;
 
     if (magr == &gy.youmonst) {
@@ -3238,15 +3275,16 @@ mhitm_ad_slim(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_ench(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm UNUSED)
+mhitm_ad_ench(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
         /* there's no msomearmor() function, so just do damage */
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+        boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
 
         hitmsg(magr, mattk);
         /* uncancelled is sufficient enough; please
@@ -3289,7 +3327,7 @@ mhitm_ad_slow(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (defended(mdef, AD_SLOW))
         return;
@@ -3360,10 +3398,11 @@ mhitm_ad_conf(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_poly(struct monst *magr, struct attack *mattk,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_poly(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3845,7 +3884,7 @@ mhitm_ad_were(
             return;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        boolean negated = mhitm_mgc_atk_negated(magr, mdef);
+        boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
 
         hitmsg(magr, mattk);
         if (!negated && !rn2(4) && u.ulycn == NON_PM
