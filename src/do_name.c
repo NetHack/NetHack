@@ -6,7 +6,8 @@
 #include "hack.h"
 
 static char *nextmbuf(void);
-static void getpos_getvalids_selection(struct selectionvar *, boolean (*)(coordxy, coordxy));
+static void getpos_getvalids_selection(struct selectionvar *,
+                                       boolean (*)(coordxy, coordxy));
 static void selection_force_newsyms(struct selectionvar *);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
@@ -19,6 +20,7 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void truncate_to_map(int *, int *, schar, schar);
+static void getpos_refresh(int *);
 static char *name_from_player(char *, const char *, const char *);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
@@ -60,7 +62,8 @@ getpos_sethilite(
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
     getpos_getvalids_selection(sel, getpos_getvalid);
-    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE : NO_COLOR;
+    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE
+                                                             : NO_COLOR;
     if ((boolean) (getpos_getvalid != NULL) != was_valid)
         selection_force_newsyms(sel);
     selection_free(sel, TRUE);
@@ -75,7 +78,9 @@ mapxy_valid(coordxy x, coordxy y)
 }
 
 static void
-getpos_getvalids_selection(struct selectionvar *sel, boolean (*validf)(coordxy, coordxy))
+getpos_getvalids_selection(
+    struct selectionvar *sel,
+    boolean (*validf)(coordxy, coordxy))
 {
     coordxy x, y;
 
@@ -233,7 +238,7 @@ getpos_help(boolean force, const char *goal)
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
-            Sprintf(sbuf, "Use '%s' to display valid locations.",
+            Sprintf(sbuf, "Use '%s' to toggle marking of valid locations.",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
@@ -620,7 +625,7 @@ auto_describe(coordxy cx, coordxy cy)
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
-                      ? " (illegal)" : "",
+                      ? " (invalid target)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
@@ -714,6 +719,23 @@ truncate_to_map(int *cx, int *cy, schar dx, schar dy)
     *cy += dy;
 }
 
+enum hilite_states {
+    Hilite_Inactive = 0,  /* no highlighting of valid target spots */
+    Hilite_Active = 1,    /* '$' has just highlighted valid target spots */
+    Hilite_Passive = 2,   /* second '$' will unhighlight */
+};
+
+/* called when ^R typed or for SHOWVALID if second '$' typed to explicitly
+   reverse previous '$' for highlighting valid target spots */
+static void
+getpos_refresh(int *hilite_statep)
+{
+    if (*hilite_statep == Hilite_Active)
+        (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+    docrt(); /* redraw everything */
+    *hilite_statep = Hilite_Inactive;
+}
+
 /* have the player use movement keystrokes to position the cursor at a
    particular map location, then use one of [.,:;] to pick the spot */
 int
@@ -748,10 +770,10 @@ getpos(coord *ccp, boolean force, const char *goal)
     int result = 0;
     int cx, cy, i, c;
     int sidx;
-    coordxy tx = u.ux, ty = u.uy;
+    coordxy tx = u.ux, ty = u.uy, vx = 0, vy = 0;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
-    boolean hilite_state = FALSE;
+    int hilite_state = Hilite_Inactive;
     coord *garr[NUM_GLOCS] = DUMMY;
     int gcount[NUM_GLOCS] = DUMMY;
     int gidx[NUM_GLOCS] = DUMMY;
@@ -808,7 +830,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
-        } else if (iflags.autodescribe && !msg_given && !hilite_state) {
+        } else if (iflags.autodescribe && !msg_given) {
             auto_describe(cx, cy);
         }
 
@@ -833,9 +855,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                 cmdq_add_key(CQ_REPEAT, c);
         }
 
-        if (hilite_state) {
-            (*getpos_hilitefunc)(2);
-            hilite_state = FALSE;
+        /* update SHOWVALID if it is in use */
+        if (hilite_state == Hilite_Active) {
+            /* 'valid spot' glyph gets reset to whatever it was covering */
+            (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+            hilite_state = Hilite_Passive;
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
         }
@@ -897,20 +921,33 @@ getpos(coord *ccp, boolean force, const char *goal)
         }
 
         if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
+            /* '?' will redraw twice, first when removing popup text window
+               after showing the help text, then to reset highlighting */
             if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP])
                 getpos_help(force, goal);
-            else /* ^R */
-                docrt(); /* redraw */
+            /* ^R: docrt(), hilite_state = Hilite_Inactive */
+            getpos_refresh(&hilite_state);
             /* update message window to reflect that we're still targeting */
             show_goal_msg = TRUE;
-            msg_given = TRUE;
-        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
-                   && getpos_hilitefunc) {
-            if (!hilite_state) {
-                (*getpos_hilitefunc)(0);
-                (*getpos_hilitefunc)(1);
-                hilite_state = TRUE;
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]) {
+            if (getpos_hilitefunc) {
+                if (hilite_state == Hilite_Inactive
+                    || (hilite_state == Hilite_Passive
+                        && (cx != vx || cy != vy))) {
+                    /* toggling 'showvalid' on */
+                    (*getpos_hilitefunc)(0); /* tmp_at(DISP_start) */
+                    (*getpos_hilitefunc)(1); /* update appropriate spots */
+                    hilite_state = Hilite_Active;
+                    vx = cx, vy = cy;
+                } else {
+                    /* 'showvalid' was on, toggle it off:
+                       docrt(), hilite_state = Hilite_Inactive */
+                    getpos_refresh(&hilite_state);
+                    vx = vy = 0;
+                }
+                curs(WIN_MAP, cx, cy);
             }
+            show_goal_msg = TRUE; /* we're still targeting */
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;

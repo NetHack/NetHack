@@ -1489,6 +1489,9 @@ hallucination of objects incorrectly included generic objects as candidates
 	for what objects looked like; if an object had its dknown flag set,
 	formatting a generic object in its place was unreliable (Null pointer
 	deference prior to static analyzer fix, odd fake name "generic" after)
+some actions that ask the user to pick a location allow typing '$' to show
+	valid spots, accept typing a second '$' prior to moving the cursor to
+	toggle the highlights off; ^R already did that; moving the cursor too
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
