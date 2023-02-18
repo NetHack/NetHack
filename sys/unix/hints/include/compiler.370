@@ -151,15 +151,36 @@ CXX=$(CCXX)
 endif  # CPLUSPLUS_NEEDED
 endif   # MAKEFILE_SRC
 
-ifeq "$(c99)" "1"
-WANT_C99=1
+ifeq "$(c89)" "1"
+HAVECSTD=c89
 endif
-ifeq "$(C99)" "1"
-WANT_C99=1
+ifeq "$(C89)" "1"
+HAVECSTD=c89
 endif
 
-ifeq "$(WANT_C99)" "1"
-CSTD = -std=c99
+ifeq "$(c99)" "1"
+HAVECSTD=c99
+endif
+ifeq "$(C99)" "1"
+HAVECSTD=c99
+endif
+
+ifeq "$(c11)" "1"
+HAVECSTD=c11
+endif
+ifeq "$(C11)" "1"
+HAVECSTD=c11
+endif
+
+ifeq "$(c23)" "1"
+HAVECSTD=c2x
+endif
+ifeq "$(C23)" "1"
+HAVECSTD=c2x
+endif
+
+ifneq "$(HAVECSTD)" ""
+CSTD = -std=$(HAVECSTD)
 endif
 
 #end of compiler.370
