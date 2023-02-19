@@ -195,7 +195,7 @@ ODATE = $(OBJDIR)/date.o
 MAKEOBJS = makedefs.o $(OMONOBJ) $(ODATE) $(OALLOC)
 
 # object files for recovery utility
-RECOVOBJS = recover.o
+RECOVOBJS = $(TARGETPFX)recover.o
 
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
@@ -266,11 +266,11 @@ lintdgn:
 
 #	dependencies for recover
 #
-recover: $(RECOVOBJS)
-	$(CLINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
+$(TARGETPFX)recover: $(RECOVOBJS)
+	$(TARGET_CLINK) $(TARGET_LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
 
-recover.o: recover.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c recover.c -o $@
+$(TARGETPFX)recover.o: recover.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) -c recover.c -o $@
 
 
 #	dependencies for dlb

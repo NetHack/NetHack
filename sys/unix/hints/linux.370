@@ -258,7 +258,7 @@ endif  # WANT_LIBNH
 
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+HACKDIR=$(PREFIX)/games/lib/nethackdir
 SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
