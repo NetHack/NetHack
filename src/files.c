@@ -1393,7 +1393,7 @@ docompress_file(const char *filename, boolean uncomp)
 #ifdef COMPRESS_OPTIONS
     {
         /* we can't guarantee there's only one additional option, sigh */
-        char *opt, opts[sizeof COMPRESS_OPTIONS];
+        char *opt;
         boolean inword = FALSE;
 
         opt = strcpy(opts, COMPRESS_OPTIONS);
