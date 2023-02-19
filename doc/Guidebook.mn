@@ -4529,6 +4529,9 @@ screen.
 uses a timer-based delay.
 The default is on if configured into the program.)
 Persistent.
+.lp "tips    "
+Show some helpful tips during gameplay (default on).
+Persistent.
 .lp tombstone
 Draw a tombstone graphic upon your death (default on).
 Persistent.

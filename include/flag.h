@@ -34,6 +34,7 @@ struct flag {
     boolean friday13;        /* it's Friday the 13th */
     boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
+    boolean tips;            /* show helpful hints? */
     boolean ignintr;         /* ignore interrupts */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */

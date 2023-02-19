@@ -1641,6 +1641,32 @@ u_simple_floortyp(coordxy x, coordxy y)
     return ROOM;
 }
 
+/* maybe show a helpful gameplay tip? */
+void
+handle_tip(int tip)
+{
+    if (!flags.tips)
+        return;
+
+    if (tip >= 0 && tip < NUM_TIPS && !gc.context.tips[tip]) {
+        gc.context.tips[tip] = TRUE;
+        switch (tip) {
+        case TIP_ENHANCE:
+            pline("(Use the #enhance command to advance them.)");
+            break;
+        case TIP_SWIM:
+            pline("(Use '%s' prefix to step in if you really want to.)",
+                  visctrl(cmd_from_func(do_reqmenu)));
+            break;
+        case TIP_GETPOS:
+            l_nhcore_call(NHCORE_GETPOS_TIP);
+            break;
+        default:
+            impossible("Unknown tip in handle_tip(%i)", tip);
+        }
+    }
+}
+
 /* Is it dangerous for hero to move to x,y due to water or lava? */
 static boolean
 swim_move_danger(coordxy x, coordxy y)
@@ -1665,18 +1691,13 @@ swim_move_danger(coordxy x, coordxy y)
             || liquid_wall) {
             if (gc.context.nopick) {
                 /* moving with m-prefix */
-                gc.context.swim_tip = TRUE;
+                gc.context.tips[TIP_SWIM] = TRUE;
                 return FALSE;
             } else if (ParanoidSwim || liquid_wall) {
                 You("avoid %s into the %s.",
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
-                if (!gc.context.swim_tip) {
-                    pline(
-                        "(Use '%s' prefix to step in if you really want to.)",
-                          visctrl(cmd_from_func(do_reqmenu)));
-                    gc.context.swim_tip = TRUE;
-                }
+                handle_tip(TIP_SWIM);
                 return TRUE;
             }
         }

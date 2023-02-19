@@ -77,11 +77,7 @@ give_may_advance_msg(int skill)
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
-
-    if (!gc.context.enhance_tip) {
-        gc.context.enhance_tip = TRUE;
-        pline("(Use the #enhance command to advance them.)");
-    }
+    handle_tip(TIP_ENHANCE);
 }
 
 /* weapon's skill category name for use as generalized description of weapon;
@@ -1170,7 +1166,7 @@ enhance_weapon_skill(void)
     int clr = 0;
 
     /* player knows about #enhance, don't show tip anymore */
-    gc.context.enhance_tip = TRUE;
+    gc.context.tips[TIP_ENHANCE] = TRUE;
 
     if (wizard && y_n("Advance skills without practice?") == 'y')
         speedy = TRUE;

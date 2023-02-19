@@ -49,6 +49,7 @@ static int nhl_pline(lua_State *);
 static int nhl_verbalize(lua_State *);
 static int nhl_parse_config(lua_State *);
 static int nhl_menu(lua_State *);
+static int nhl_text(lua_State *);
 static int nhl_getlin(lua_State *);
 static int nhl_makeplural(lua_State *);
 static int nhl_makesingular(lua_State *);
@@ -80,6 +81,7 @@ static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "restore_old_game",
     "moveloop_turn",
     "game_exit",
+    "getpos_tip",
 };
 static boolean nhcore_call_available[NUM_NHCORE_CALLS];
 
@@ -769,6 +771,53 @@ nhl_menu(lua_State *L)
     return 1;
 }
 
+/* text("foo\nbar\nbaz") */
+static int
+nhl_text(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc > 0) {
+        menu_item *picks = (menu_item *) 0;
+        winid tmpwin;
+        anything any = cg.zeroany;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+        while (lua_gettop(L) > 0) {
+            char *ostr = dupstr(luaL_checkstring(L, 1));
+            char *ptr, *str = ostr;
+            char *lstr = str + strlen(str) - 1;
+
+            do {
+                char *nlp = strchr(str, '\n');
+
+                if (nlp && (nlp - str) <= 76) {
+                    ptr = nlp;
+                } else {
+                    ptr = str + 76;
+                    if (ptr > lstr)
+                        ptr = lstr;
+                }
+                while ((ptr > str) && !(*ptr == ' ' || *ptr == '\n'))
+                    ptr--;
+                *ptr = '\0';
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, 0,
+                         str, MENU_ITEMFLAGS_NONE);
+                str = ptr + 1;
+            } while (*str && str <= lstr);
+            lua_pop(L, 1);
+            free(ostr);
+        }
+
+        end_menu(tmpwin, (char *) 0);
+        (void) select_menu(tmpwin, PICK_NONE, &picks);
+        destroy_nhwindow(tmpwin);
+    }
+    return 0;
+}
+
 /* makeplural("zorkmid") */
 static int
 nhl_makeplural(lua_State *L)
@@ -1448,6 +1497,7 @@ static const struct luaL_Reg nhl_functions[] = {
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},
+    {"text", nhl_text},
     {"getlin", nhl_getlin},
 
     {"makeplural", nhl_makeplural},

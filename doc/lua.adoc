@@ -384,6 +384,15 @@ Example:
  nh.stop_timer_at({x=5,y=6}, "melt-ice");
 
 
+=== text
+
+Show long texts in a menu window. Wordwraps automatically.
+
+Example:
+
+ nh.text("long long long string\nwith newlines too.");
+
+
 === variable
 
 Set or get a global variable. These are persistent, saved and restored along with the game.

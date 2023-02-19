@@ -1977,6 +1977,8 @@ have 'I u' mention whether there are any unpaid items on the floor (unusual
 	but not impossible); it doesn't itemize them or show shop price
 add items given a Japanese name when playing as a Samurai to discoveries list
 make music improvisations more varied and interesting, as well as useful
+give a helpful tip when first entering "farlook" mode
+add a boolean option tips to disable all of the helpful tips
 
 
 Platform- and/or Interface-Specific New Features

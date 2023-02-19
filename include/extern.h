@@ -966,6 +966,7 @@ extern int wiz_debug_cmd_traveldisplay(void);
 extern boolean u_rooted(void);
 extern boolean u_maybe_impaired(void);
 extern const char *u_locomotion(const char *);
+extern void handle_tip(int);
 extern void domove(void);
 extern void runmode_delay_output(void);
 extern void overexert_hp(void);

@@ -806,6 +806,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         mMoOdDxX[i] = gc.Cmd.spkeys[mMoOdDxX_def[i]];
     mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
 
+    handle_tip(TIP_GETPOS);
+
     if (!goal)
         goal = "desired location";
     if (Verbose(0, getpos1)) {

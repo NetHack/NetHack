@@ -65,6 +65,19 @@ function mk_dgl_extrainfo()
     end
 end
 
+-- Show a helpful tip when player first uses getpos()
+function show_getpos_tip()
+   nh.text([[
+Tip: Farlooking or selecting a map location
+
+You are now in a "farlook" mode - the movement keys move the cursor,
+not your character.  Game time does not advance.  This mode is used
+to look around the map, or to select a location on it.
+
+When in this mode, you can press ESC to return to normal game mode,
+and pressing ? will show the key help.
+]]);
+end
 
 -- Callback functions
 nhcore = {
@@ -81,5 +94,8 @@ nhcore = {
 
     -- game_exit is called when the game exits (quit, saved, ...)
     -- game_exit = function() end,
+
+    -- getpos_tip is called the first time the code enters getpos()
+    getpos_tip = show_getpos_tip,
 };
 
