@@ -1324,7 +1324,11 @@ free_saved_games(char **saved)
 #ifdef COMPRESS /* external compression */
 
 static void
-redirect(const char *filename, const char *mode, FILE *stream, boolean uncomp)
+redirect(
+    const char *filename,
+    const char *mode,
+    FILE *stream,
+    boolean uncomp)
 {
     if (freopen(filename, mode, stream) == (FILE *) 0) {
         const char *details;
@@ -1389,11 +1393,10 @@ docompress_file(const char *filename, boolean uncomp)
 #ifdef COMPRESS_OPTIONS
     {
         /* we can't guarantee there's only one additional option, sigh */
-        char *opt;
+        char *opt, opts[sizeof COMPRESS_OPTIONS];
         boolean inword = FALSE;
 
-        Strcpy(opts, COMPRESS_OPTIONS);
-        opt = opts;
+        opt = strcpy(opts, COMPRESS_OPTIONS);
         while (*opt) {
             if ((*opt == ' ') || (*opt == '\t')) {
                 if (inword) {
@@ -1459,8 +1462,10 @@ docompress_file(const char *filename, boolean uncomp)
         return;
     }
 #ifndef NO_SIGNAL
+    i = 0; /* wait() will update this, hopefully just setting it back to 0 */
     (void) signal(SIGINT, SIG_IGN);
     (void) signal(SIGQUIT, SIG_IGN);
+    /* wait() returns child's pid or -1, sets 'i' to child's exit status */
     (void) wait((int *) &i);
     (void) signal(SIGINT, (SIG_RET_TYPE) done1);
     if (wizard)
