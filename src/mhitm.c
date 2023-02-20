@@ -789,7 +789,6 @@ gulpmm(
                       x_monnam(mdef, ARTICLE_A, (char *) 0,
                                (SUPPRESS_NAME | SUPPRESS_IT
                                 | SUPPRESS_INVISIBLE), FALSE));
-                
             }
         }
         return MM_HIT; /* bypass mdamagem() */
