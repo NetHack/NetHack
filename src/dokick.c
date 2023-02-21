@@ -1137,9 +1137,11 @@ dokick(void)
         return ECMD_TIME;
     }
     (void) unmap_invisible(x, y);
-    if (is_pool(x, y) ^ !!u.uinwater) {
+    if ((is_pool(x, y) || gm.maploc->typ == LAVAWALL) ^ !!u.uinwater) {
         /* objects normally can't be removed from water by kicking */
-        You("splash some %s around.", hliquid("water"));
+        You("splash some %s around.",
+            hliquid(is_pool(x, y) ? "water" : "lava"));
+        /* pretend the kick is fast enough for lava not to burn */
         return ECMD_TIME;
     }
 
