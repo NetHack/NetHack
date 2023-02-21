@@ -16,10 +16,19 @@
 #EXPLORERS=*
 #SHELLERS=
 
+# If the user name is found in this list, prompt for username instead.
+# Uses the same syntax as the WIZARDS option above.
+# A public server should probably disable this.
+GENERICUSERS=play player game games nethack nethacker
+
+# Use the character name for matching WIZARDS, EXPLORERS and SHELLERS,
+# instead of the user's login name.
+#CHECK_PLNAME=1
+
 # Limit the number of simultaneous games.  (Setting a limit has a side-effect
 # of changing the file names for the games in progress.  With no limit, they
 # are named NNNcccccc.*, when NNN is a decimal formatting of the users's UIC
-# value (group * 65536 + member; orinarily formatted as a pair of numbers
+# value (group * 65536 + member; ordinarily formatted as a pair of numbers
 # expressed in octal, [group,member]) and cccccc is the character name.
 # With a limit, they are named Llock.*, where L is a single letter.)
 # Limit is documented to be 25 even though 26 is easily feasible....
@@ -35,6 +44,11 @@
 # Uncomment the next line to disable the SEDUCE option, causing succubi and
 # incubi to use nymphs' charm behavior rather than their own seduce behavior.
 #SEDUCE=0
+
+# Uncomment the next line to enable some accessibility features such
+# as S_hero_override and S_pet_override symbols for screen readers
+# in the user config file.
+#ACCESSIBILITY=1
 
 # Uncomment to disable savefile UID checking.
 #CHECK_SAVE_UID=0
@@ -52,8 +66,59 @@
 # numeric (1) user id.
 #PERS_IS_UID=1
 
+# Help menu control; 0 - include "command line usage" entry in help menu;
+# 1 - suppress it from the menu.  Does not affect 'nethack --usage' when
+# player has access to the command line.  The usage feedback describes
+# command line handling for UNIX so enabling it won't be much use here.
+HIDEUSAGE=1
+
 # Maximum number of score file entries to use for random statue names
 #MAX_STATUENAME_RANK=10
+
+# Use "Live logging" for important events (achievements, wishes, etc)
+# Only available if NetHack was compiled with LIVELOG.
+# Only really meaningful for public servers.
+# See the log in-game with #chronicle -command.
+# Bitmask for kinds of things you want to log - combine the following values
+# as desired.
+# 0x0000 - No live logging (default)
+# 0x0001 - Wishes
+# 0x0002 - Significant achievements (complete sokoban, perform invocation, etc)
+# 0x0004 - Kill, destroy or bribe a unique monster.
+# 0x0008 - Significant religious events (sacrifice gifts, crowning)
+# 0x0010 - Life-saving
+# 0x0020 - Break conduct - see also LLC_TURNS below.
+# 0x0040 - Artifact obtained (#name Sting, dip for Excalibur)
+# 0x0080 - Genocides
+# 0x0100 - Murder of tame pet
+# 0x0200 - Changed alignment temporarily or permanently
+# 0x0400 - Log URL for dumplog if ascended
+# 0x0800 - Log dumplog url for all games
+# 0x1000 - Log 'minor' achievements - can be spammy
+# 0x2000 - Spoiler event; can include in livelog but hidden from #chronicle
+# 0x4000 - Include as 'major' event in dumplog; can be hidden from livelog
+# 0x8000 - Livelog debug msgs (currently only 'enter new level')
+#LIVELOG=0x1FFF
+
+# Show debugging information originating from these source files.
+# Use '*' for all, or list source files separated by spaces.
+# Only available if game has been compiled with DEBUG, and can be
+# overridden via DEBUGFILES environment variable.
+#DEBUGFILES=*
+
+# Save end of game dump log to this file.
+# Only available if NetHack was compiled with DUMPLOG
+# Allows following placeholders:
+#   %% literal '%'
+#   %v version (eg. "3.7.0-0")
+#   %u game UID
+#   %t game start time, UNIX timestamp format
+#   %T current time, UNIX timestamp format
+#   %d game start time, YYYYMMDDhhmmss format
+#   %D current time, YYYYMMDDhhmmss format
+#   %n player name
+#   %N first character of player name
+#DUMPLOGFILE=/tmp/nethack.%n.%d.log
 
 # Number of bones file pools.
 # The pool you belong to is determined at game start. You will
@@ -62,12 +127,6 @@
 # Changing this might make existing bones inaccessible.
 # Disabled by setting to 0, or commenting out.
 #BONES_POOLS=10
-
-# Show debugging information originating from these source files.
-# Use '*' for all, or list source files separated by spaces.
-# Only available if game has been compiled with DEBUG, and can be
-# overridden via DEBUGFILES environment variable.
-#DEBUGFILES=*
 
 # Try to get more info in case of a program bug or crash.  Only used
 # if the program is built with the PANICTRACE compile-time option enabled.
@@ -83,10 +142,22 @@ PANICTRACE_GDB=1
 #PANICTRACE_LIBC=
 #--
 
+# 'portable_device_paths' is only supported for Windows.  Starting with
+# 3.6.3, nethack on Windows treats the folder containing nethack.exe and
+# nethackW.exe as read-only and puts data files which are generated or
+# modified during play or by the user in assorted folders derived from
+# user name.  3.6.4 added PORTABLE_DEVICE_PATHS to allow reverting to
+# the old behavior of having the run-time configuration file and other
+# data in the same directory as the executable so that the whole thing
+# can be moved from one machine to another (flash drive or perhaps cloud)
+# without updating folder paths.
+#PORTABLE_DEVICE_PATHS=0
+
 # Ordinary run-time options can be set here to override the builtin-in
-# default values.  Unlike the SYSCF values above, individual users can
-# still choose their own option settings via NETHACKOPTIONS in their
-# environment or via sys$login:nethack.ini run-time configuration file.
+# default values.  Unlike all the SYSCF values above, individual users
+# can override the overridden options set here by choosing their own
+# option settings via NETHACKOPTIONS in their environment or via
+# sys$login:nethack.ini run-time configuration file.
 #OPTIONS=!autopickup,fruit:tomato,symset:DECgraphics
 
 #eof
