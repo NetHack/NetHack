@@ -2284,12 +2284,16 @@ tty_putstr(winid window, int attr, const char *str)
         }
         break;
     }
+    return;
 }
 
 void
-tty_display_file(const char *fname, boolean complain)
+tty_display_file(
+    const char *fname, /* name of file to display */
+    boolean complain)  /* whether to report problem if file can't be opened */
 {
 #ifdef DEF_PAGER /* this implies that UNIX is defined */
+    /* FIXME:  this won't work if fname is inside a dlb container */
     {
         /* use external pager; this may give security problems */
         int fd = open(fname, O_RDONLY);
@@ -2297,7 +2301,7 @@ tty_display_file(const char *fname, boolean complain)
         if (fd < 0) {
             if (complain)
                 pline("Cannot open %s.", fname);
-            else
+            else /* [is this refresh actually necessary?] */
                 docrt();
             return;
         }
@@ -2337,10 +2341,11 @@ tty_display_file(const char *fname, boolean complain)
                 tty_mark_synch();
                 tty_raw_print("");
                 perror(fname);
-                tty_wait_synch();
+                tty_wait_synch(); /* "Hit <space> to continue: " */
+                if (u.ux) /* if hero is on map, refresh the screen */
+                    docrt();
                 pline("Cannot open \"%s\".", fname);
-            } else if (u.ux)
-                docrt();
+            }
         } else {
             winid datawin = tty_create_nhwindow(NHW_TEXT);
             boolean empty = TRUE;
@@ -2376,6 +2381,7 @@ tty_display_file(const char *fname, boolean complain)
         }
     }
 #endif /* DEF_PAGER */
+    return;
 }
 
 void
