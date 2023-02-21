@@ -921,7 +921,7 @@ newsym(coordxy x, coordxy y)
             } else if (glyph_is_invisible(lev->glyph)) {
                 map_invisible(x, y);
             } else
-                _map_location(x, y, 1); /* map the location */\
+                _map_location(x, y, 1); /* map the location */
         }
 
     /* Can't see the location. */
