@@ -1353,7 +1353,7 @@ seffect_scare_monster(struct obj **sobjp)
         if (confused || scursed) {
             Soundeffect(se_sad_wailing, 50);
         } else {
-            Soundeffect(se_sad_wailing, 50);
+            Soundeffect(se_maniacal_laughter, 50);
         }
         You_hear("%s %s.", (confused || scursed) ? "sad wailing"
                  : "maniacal laughter",
