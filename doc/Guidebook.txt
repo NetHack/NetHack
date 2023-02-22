@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
              (Edited and expanded for 3.7 by Mike Stephenson and others)
 
-                                  February 19, 2023
+                                  February 21, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1512,7 +1512,7 @@
                n', and `M-N'.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1710,7 +1710,7 @@
                Show the armor currently worn.  Default key is `['.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1842,7 +1842,7 @@
                combat, or it will be automatically turned off.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -1974,7 +1974,7 @@
                Default key is `^V'.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2040,7 +2040,7 @@
           thing, meta characters are case-sensitive:  M-x and M-X represent
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2172,7 +2172,7 @@
           them straight on, horizontally or vertically.   Doorways  without
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2238,7 +2238,7 @@
           harmful to  your  pet(s)  as  well.   Monsters,  including  pets,
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2304,7 +2304,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2370,7 +2370,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2436,7 +2436,7 @@
           rows  or 25 gold pieces will each count as 1 rather than as 7 and
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2502,7 +2502,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2568,7 +2568,7 @@
           `m' command to move without  fighting;  likewise,  if  you  don't
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2700,7 +2700,7 @@
           Strained,  Overtaxed,  or  Overloaded will be shown on the bottom
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2766,7 +2766,7 @@
           curse state provided that you can see them land.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2832,7 +2832,7 @@
           taneously as primary and secondary; use the `X' command to engage
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2898,7 +2898,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -2964,7 +2964,7 @@
           level, the bonus is higher.  A successful hit  has  a  chance  to
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3030,7 +3030,7 @@
           armor.  Each suit of armor which exists in AD&D  gives  the  same
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3096,7 +3096,7 @@
           eating  you  will  faint, and eventually die of starvation.  Some
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3228,7 +3228,7 @@
           gloves are cursed, rings cannot be put on and any  already  being
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3294,7 +3294,7 @@
           `r' (read).  The `+' command lists each spell you know along with
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3360,7 +3360,7 @@
           off) which are normally for armor can be  used  for  amulets  and
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3426,7 +3426,7 @@
           scribed as uncursed even if you turn  off  the  implicit_uncursed
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3492,7 +3492,7 @@
           wafers, cram rations, food rations (gunyoki), K-rations,  and  C-
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3558,7 +3558,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3624,7 +3624,7 @@
           decline.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3690,7 +3690,7 @@
           the Novel, there's no way to wish for this opportunity.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3756,7 +3756,7 @@
           figuration file, NetHack will create the configuration  file  for
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3822,7 +3822,7 @@
             must be writable.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4020,7 +4020,7 @@
           as  a  file  name.   If  it  does  start with `/', the at-sign is
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4086,7 +4086,7 @@
             quiver sack or make ready some suitable weapon.  Note  that  it
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4218,7 +4218,7 @@
             Asking refers to picking one of the orderings from a menu.  The
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4284,7 +4284,7 @@
             text query with possible menu letters. Default is off.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4350,7 +4350,7 @@
             Visually distinguish piles of objects from  individual  objects
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4416,7 +4416,7 @@
             sistent.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4482,7 +4482,7 @@
             Do not clear the screen before drawing menus, and  align  menus
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4614,7 +4614,7 @@
             containing  the  symbols  for  the  various  object types.  Any
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4746,7 +4746,7 @@
             topickup  on  in  order  to  have autopickup_exception settings
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4812,7 +4812,7 @@
             onym for character.   See  name  for  an  alternate  method  of
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4878,7 +4878,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -4944,7 +4944,7 @@
             loot - only sort the lists that don't  use  inventory  letters,
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5010,7 +5010,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5406,7 +5406,7 @@
             (80+2+26+2) is needed to show borders if align_status is set to
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5472,7 +5472,7 @@
             character to complete  the  two  character  sequence.   Type  a
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5490,15 +5490,6 @@
             the  keyboard  (allowing  the use of arrow keys to move) on ma-
             chines with an IBM PC compatible BIOS ROM (default  off,  OS/2,
             PC, and ST NetHack only).
-
-          flush
-            (default off, Amiga NetHack only).
-
-          MACgraphics
-            (default on, Mac NetHack only).
-
-          page_wait
-            (default on, Mac NetHack only).
 
           rawio
             Force  raw (non-cbreak) mode for faster output and more bullet-
@@ -5535,19 +5526,6 @@
             Set  the  VGA  mode  resolution  width   (MS-DOS   only,   with
             video:vesa)
 
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              85
-
-
-
           videocolors
             Set  the  color  palette for PC systems using NO_TERMS (default
             4-2-6-1-5-3-15-12-10-14-9-13-11, (PC NetHack only).  The  order
@@ -5557,11 +5535,23 @@
             command.
 
           videoshades
-            Set the intensity level of the three gray scales available (de-
-            fault dark normal light, PC NetHack only).  If the game display
-            is difficult to read, try adjusting these scales; if this  does
-            not  correct  the  problem, try !color.  Cannot be set with the
-            `O' command.
+            Set the intensity level of  the  three  gray  scales  available
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              85
+
+
+
+            (default dark normal light, PC NetHack only).  If the game dis-
+            play is difficult to read, try adjusting these scales; if  this
+            does  not  correct the problem, try !color.  Cannot be set with
+            the `O' command.
 
           9.7.  Regular Expressions
 
@@ -5603,8 +5593,18 @@
             effect  if you save and then restore your game.  autopickup_ex-
             ception rules and not saved with the game.
 
+          Here are some examples:
 
-          NetHack 3.7                                     February 19, 2023
+                 autopickup_exception="<*arrow"
+                 autopickup_exception=">*corpse"
+                 autopickup_exception=">* cursed*"
+
+               The first example above will result  in  autopickup  of  any
+          type  of  arrow.   The second example results in the exclusion of
+          any corpse from autopickup.  The  last  example  results  in  the
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -5614,16 +5614,7 @@
 
 
 
-          Here are some examples:
-
-                 autopickup_exception="<*arrow"
-                 autopickup_exception=">*corpse"
-                 autopickup_exception=">* cursed*"
-
-               The first example above will result  in  autopickup  of  any
-          type  of  arrow.   The second example results in the exclusion of
-          any corpse from autopickup.  The last example results in the  ex-
-          clusion of items known to be cursed from autopickup.
+          exclusion of items known to be cursed from autopickup.
 
           9.9.  Changing Key Bindings
 
@@ -5668,18 +5659,6 @@
             Prefix key to start a count, to  repeat  a  command  this  many
             times.  With number_pad only.  Default is `n'.
 
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              87
-
-
-
           getdir.help
             When  asked for a direction, the key to show the help.  Default
             is `?'.
@@ -5689,6 +5668,18 @@
             mouse  click.  You will be asked to pick a location.  Use move-
             ment keystrokes to move the cursor around the  map,  then  type
             the  getpos.pick.once  key (default `,') or the getpos.pick key
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              87
+
+
+
             (default `.')  to finish as  if  performing  a  left  or  right
             click.   Only useful when using the #therecmdmenu command.  De-
             fault is `_'.
@@ -5733,19 +5724,6 @@
             When  asked  for  a location, the key to go to previous closest
             monster.  Default is `M'.
 
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              88
-
-
-
           getpos.obj.next
             When asked for a location, the key to go to  next  closest  ob-
             ject.  Default is `o'.
@@ -5755,9 +5733,21 @@
             object.  Default is `O'.
 
           getpos.menu
-            When asked for a location, and using one of the next or  previ-
-            ous  keys  to  cycle through targets, toggle showing a menu in-
-            stead.  Default is `!'.
+            When asked for a  location,  and  using  one  of  the  next  or
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              88
+
+
+
+            previous  keys  to cycle through targets, toggle showing a menu
+            instead.  Default is `!'.
 
           getpos.moveskip
             When asked for a location, and using the shifted movement  keys
@@ -5799,19 +5789,6 @@
             When  asked for a location, the key to go to next closest unex-
             plored location.  Default is `x'.
 
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              89
-
-
-
           getpos.unexplored.prev
             When asked for a location, the key to go  to  previous  closest
             unexplored location.  Default is `X'.
@@ -5823,6 +5800,17 @@
           getpos.valid.next
             When asked for a location, the key to go to next closest  valid
             location.  Default is `z'.
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              89
+
+
 
           getpos.valid.prev
             When  asked  for  a location, the key to go to previous closest
@@ -5863,21 +5851,6 @@
             matching  rule  is used. Put the general case first, exceptions
             below them.
 
-
-
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              90
-
-
-
           9.11.  Configuring Menu Colors
 
                Some platforms allow you to define colors used in menu lines
@@ -5893,6 +5866,18 @@
                  color      - the  color to use for lines matching the pat-
                               tern;
                  attribute  - the attribute to use for lines  matching  the
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              90
+
+
+
                               pattern.  The  attribute  is optional, and if
                               left out, you must also leave out the preced-
                               ing  ampersand.   If no attribute is defined,
@@ -5931,19 +5916,6 @@
           plicit_uncursed option off so that all items known to be uncursed
           are actually displayed with the "uncursed" description.
 
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              91
-
-
-
           9.12.  Configuring User Sounds
 
                Some  platforms allow you to define sound files to be played
@@ -5960,6 +5932,18 @@
           SOUND
             An  entry  that  maps  a sound file to a user-specified message
             pattern.  Each SOUND entry is broken down  into  the  following
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              91
+
+
+
             parts:
 
             MESG        - message window mapping (the only one supported in
@@ -5998,18 +5982,6 @@
 
           OPTION=hilite_status:hitpoints/<=30%/red/normal
 
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              92
-
-
-
           (That example is actually specifying red&normal for <=30% and no-
           color&normal for >30%.)
 
@@ -6024,6 +5996,19 @@
           genta,  light-cyan, and white.  And "no-color", the default fore-
           ground color on the display, which is not necessarily the same as
           black or white or any of the other colors.
+
+
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              92
+
+
 
                Allowed  attributes  are  none, bold, dim, underline, blink,
           and inverse.  "Normal" is a synonym for "none"; they  should  not
@@ -6063,20 +6048,8 @@
 
             Instead  of  a behavior, "condition" takes the following condi-
             tion flags: stone, slime,  strngl,  foodpois,  termill,  blind,
-            deaf,  stun,  conf,  hallu,  lev,  fly,  and ride.  You can use
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              93
-
-
-
-            "major_troubles" as an alias for stone  through  termill,  "mi-
+            deaf,  stun, conf, hallu, lev, fly, and ride.  You can use "ma-
+            jor_troubles" as an  alias  for  stone  through  termill,  "mi-
             nor_troubles" for blind through hallu, "movement" for lev, fly,
             and ride, and "all" for every condition.
 
@@ -6090,49 +6063,76 @@
                  out after statushilites turns.
 
                * "changed"  sets  the  field  attribute  for when the field
-                 value  changes.   This  attribute  times  out  after  sta-
-                 tushilites  turns.   (If a field has both a "changed" rule
-                 and an "up" or "down" rule which matches a change  in  the
-                 field's value, the "up" or "down" one takes precedence.)
+                 value   changes.    This   attribute   times   out   after
 
-               * percentage  sets  the field attribute when the field value
-                 matches the percentage.  It is specified as a  number  be-
-                 tween  0  and 100, followed by `%' (percent sign).  If the
-                 percentage is prefixed with `<=' or `>=', it also  matches
-                 when  value  is below or above the percentage.  Use prefix
-                 `<' or `>' to match when strictly below  or  above.   (The
-                 numeric  limit  is  relaxed  slightly  for those: >-1% and
-                 <101% are allowed.)  Only four fields  support  percentage
-                 rules.    Percentages  for  "hitpoints"  and  "power"  are
-                 straightforward; they're based on the corresponding  maxi-
-                 mum  field.   Percentage  highlight rules are also allowed
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              93
+
+
+
+                 statushilites  turns.   (If  a  field has both a "changed"
+                 rule and an "up" or "down" rule which matches a change  in
+                 the  field's  value,  the  "up" or "down" one takes prece-
+                 dence.)
+
+               * percentage sets the field attribute when the  field  value
+                 matches  the  percentage.  It is specified as a number be-
+                 tween 0 and 100, followed by `%' (percent sign).   If  the
+                 percentage  is prefixed with `<=' or `>=', it also matches
+                 when value is below or above the percentage.   Use  prefix
+                 `<'  or  `>'  to match when strictly below or above.  (The
+                 numeric limit is relaxed  slightly  for  those:  >-1%  and
+                 <101%  are  allowed.)  Only four fields support percentage
+                 rules.   Percentages  for  "hitpoints"  and  "power"   are
+                 straightforward;  they're based on the corresponding maxi-
+                 mum field.  Percentage highlight rules  are  also  allowed
                  for "experience level" and "experience points" (valid when
                  the showexp option is enabled).  For those, the percentage
                  is based on the progress from the start of the current ex-
-                 perience  level  to  the  start  of the next level.  So if
-                 level 2 starts at 20 points  and  level  3  starts  at  40
-                 points,  having  30  points  is  50% and 35 points is 75%.
-                 100% is unattainable for experience because you'll gain  a
-                 level  and  the  calculations  will  be reset for that new
-                 level, but a rule for =100% is  allowed  and  matches  the
-                 special  case of being exactly 1 experience point short of
+                 perience level to the start of  the  next  level.   So  if
+                 level  2  starts  at  20  points  and level 3 starts at 40
+                 points, having 30 points is 50%  and  35  points  is  75%.
+                 100%  is unattainable for experience because you'll gain a
+                 level and the calculations will  be  reset  for  that  new
+                 level,  but  a  rule  for =100% is allowed and matches the
+                 special case of being exactly 1 experience point short  of
                  the next level.
 
-               * absolute value sets the attribute  when  the  field  value
-                 matches  that number.  The number must be 0 or higher, ex-
-                 cept for "armor-class' which allows negative  values,  and
-                 may  optionally be preceded by `='.  If the number is pre-
-                 ceded by `<=' or `>=' instead, it also matches when  value
-                 is  below  or  above.   If  the prefix is `<' or `>', only
+               * absolute  value  sets  the  attribute when the field value
+                 matches that number.  The number must be 0 or higher,  ex-
+                 cept  for  "armor-class' which allows negative values, and
+                 may optionally be preceded by `='.  If the number is  pre-
+                 ceded  by `<=' or `>=' instead, it also matches when value
+                 is below or above.  If the prefix  is  `<'  or  `>',  only
                  match when strictly above or below.
 
                * text match sets the attribute when the field value matches
-                 the  text.  Text matches can only be used for "alignment",
-                 "carrying-capacity", "hunger", "dungeon-level",  and  "ti-
-                 tle".   For  title,  only the role's rank title is tested;
+                 the text.  Text matches can only be used for  "alignment",
+                 "carrying-capacity",  "hunger",  "dungeon-level", and "ti-
+                 tle".  For title, only the role's rank  title  is  tested;
+                 the character's name is ignored.
+
+               The  in-game options menu can help you determine the correct
+          syntax for a configuration file.
+
+               The whole feature can be disabled  by  setting  option  sta-
+          tushilites to 0.
+
+               Example hilites:
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6141,16 +6141,6 @@
           NetHack Guidebook                                              94
 
 
-
-                 the character's name is ignored.
-
-               The in-game options menu can help you determine the  correct
-          syntax for a configuration file.
-
-               The  whole  feature  can  be disabled by setting option sta-
-          tushilites to 0.
-
-               Example hilites:
 
                OPTION=hilite_status: gold/up/yellow/down/brown
                OPTION=hilite_status: characteristics/up/green/down/red
@@ -6167,23 +6157,23 @@
 
                NetHack can load entire symbol sets from the symbol file.
 
-               The options that are used to select a particular symbol  set
+               The  options that are used to select a particular symbol set
           from the symbol file are:
 
           symset
             Set the name of the symbol set that you want to load.
 
           roguesymset
-            Set  the  name of the symbol set that you want to load for dis-
+            Set the name of the symbol set that you want to load  for  dis-
             play on the rogue level.
 
-               You can also override one or more symbols using the  SYMBOLS
-          and  ROGUESYMBOLS configuration file options.  Symbols are speci-
+               You  can also override one or more symbols using the SYMBOLS
+          and ROGUESYMBOLS configuration file options.  Symbols are  speci-
           fied as name:value pairs.  Note that NetHack escape-processes the
-          value  string  in conventional C fashion.  This means that \ is a
-          prefix to take the following character literally.  Thus  \  needs
-          to  be represented as \\.  The special prefix form \m switches on
-          the meta bit in the symbol value, and the  ^  prefix  causes  the
+          value string in conventional C fashion.  This means that \  is  a
+          prefix  to  take the following character literally.  Thus \ needs
+          to be represented as \\.  The special prefix form \m switches  on
+          the  meta  bit  in  the symbol value, and the ^ prefix causes the
           following character to be treated as a control character.
 
           NetHack Symbols
@@ -6195,19 +6185,6 @@
           A  S_angel                (angelic being)
           a  S_ant                  (ant or other insect)
           ^  S_anti_magic_trap      (anti-magic field)
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              95
-
-
-
           [  S_armor                (suit or piece of armor)
           [  S_armour               (suit or piece of armor)
           ^  S_arrow_trap           (arrow trap)
@@ -6218,6 +6195,19 @@
           -  S_blcorn               (bottom left corner)
           b  S_blob                 (blob)
           +  S_book                 (spellbook)
+
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              95
+
+
+
           )  S_boomleft             (boomerang open left)
           (  S_boomright            (boomerang open right)
           `  S_boulder              (boulder)
@@ -6261,19 +6251,6 @@
           {  S_fountain             (fountain)
           F  S_fungus               (fungus or mold)
           *  S_gem                  (gem or rock)
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              96
-
-
-
              S_ghost                (ghost)
           H  S_giant                (giant humanoid)
           G  S_gnome                (gnome)
@@ -6284,6 +6261,19 @@
           #  S_hcdbridge            (horizontal raised drawbridge)
           +  S_hcdoor               (closed door in horizontal wall)
           .  S_hodbridge            (horizontal lowered drawbridge)
+
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              96
+
+
+
           |  S_hodoor               (open door in horizontal wall)
           ^  S_hole                 (hole)
           @  S_human                (human or elf)
@@ -6327,19 +6317,6 @@
           Q  S_quantmech            (quantum mechanic)
           =  S_ring                 (ring)
           `  S_rock                 (boulder or statue)
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              97
-
-
-
           r  S_rodent               (rodent)
           ^  S_rolling_boulder_trap (rolling boulder trap)
           .  S_room                 (floor of a room)
@@ -6350,6 +6327,19 @@
           #  S_sink                 (sink)
           ^  S_sleeping_gas_trap    (sleeping gas trap)
           S  S_snake                (snake)
+
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              97
+
+
+
           s  S_spider               (arachnid or centipede)
           ^  S_spiked_pit           (spiked pit)
           ^  S_squeaky_board        (squeaky board)
@@ -6393,19 +6383,6 @@
           .  S_venom                (splash of venom)
           ^  S_vibrating_square     (vibrating square)
           .  S_vodbridge            (vertical lowered drawbridge)
-
-
-
-          NetHack 3.7                                     February 19, 2023
-
-
-
-
-
-          NetHack Guidebook                                              98
-
-
-
           -  S_vodoor               (open door in vertical wall)
           v  S_vortex               (vortex)
           |  S_vwall                (vertical wall)
@@ -6416,6 +6393,19 @@
           w  S_worm                 (worm)
           ~  S_worm_tail            (long worm tail)
           W  S_wraith               (wraith)
+
+
+
+          NetHack 3.7                                     February 21, 2023
+
+
+
+
+
+          NetHack Guidebook                                              98
+
+
+
           x  S_xan                  (xan or other extraordinary insect)
           X  S_xorn                 (xorn)
           Y  S_yeti                 (apelike creature)
@@ -6427,22 +6417,22 @@
           Notes:
 
           * Several symbols in this table appear to be blank.  They are the
-            space character, except for S_pet_override and  S_hero_override
-            which  don't have any default value and can only be used if en-
+            space  character, except for S_pet_override and S_hero_override
+            which don't have any default value and can only be used if  en-
             abled in the "sysconf" file.
 
-          * S_rock is misleadingly  named;  rocks  and  stones  use  S_gem.
-            Statues  and boulders are the rock being referred to, but since
-            version 3.6.0, statues are displayed as the  monster  they  de-
-            pict.   So S_rock is only used for boulders and not used at all
+          * S_rock  is  misleadingly  named;  rocks  and  stones use S_gem.
+            Statues and boulders are the rock being referred to, but  since
+            version  3.6.0,  statues  are displayed as the monster they de-
+            pict.  So S_rock is only used for boulders and not used at  all
             if overridden by the more specific S_boulder.
 
           9.15.  Customizing Map Glyph Representations Using Unicode
 
-               If your platform or terminal supports the display  of  UTF-8
-          character  sequences,  you can customize your game display by as-
-          signing Unicode codepoint values  and  red-green-blue  colors  to
-          glyph  representations.  The  customizations can be specified for
+               If  your  platform or terminal supports the display of UTF-8
+          character sequences, you can customize your game display  by  as-
+          signing  Unicode  codepoint  values  and red-green-blue colors to
+          glyph representations. The customizations can  be  specified  for
           use with a symset that has a UTF8 handler within the symbols file
           such as the enhanced1 set, or individually within your nethack.rc
           file.
@@ -6452,17 +6442,27 @@
 
           OPTIONS=glyph:glyphidU+nnnn/R-G-B
 
-               The window port that is active needs to provide support  for
-          displaying  UTF-8 character sequences and explicit red-green-blue
-          colors in order for the glyph representation to be visible.   For
+               The  window port that is active needs to provide support for
+          displaying UTF-8 character sequences and explicit  red-green-blue
+          colors  in order for the glyph representation to be visible.  For
           example, the following line in your configuration file will cause
-          the glyph representation for glyphid G_pool to use Unicode  code-
+          the  glyph representation for glyphid G_pool to use Unicode code-
           point U+224B and the color represented by R-G-B value 0-0-160
 
           OPTIONS=glyph:G_pool/U+224B/0-0-160
 
+          The list of acceptable  glyphid's  can  be  produced  by  nethack
+          --dumpglyphids.  Individual NetHack glyphs can be specified using
+          the G_ prefix, or you can use an S_  symbol  for  a  glyphid  and
+          store the custom representation for all NetHack glyphs that would
+          map to that particular symbol.
 
-          NetHack 3.7                                     February 19, 2023
+          You will need to select a symset with a UTF8  handler  to  enable
+          the display of the customizations, such as the Enhanced symset.
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6472,47 +6472,38 @@
 
 
 
-          The  list  of  acceptable  glyphid's  can  be produced by nethack
-          --dumpglyphids.  Individual NetHack glyphs can be specified using
-          the  G_  prefix,  or  you  can use an S_ symbol for a glyphid and
-          store the custom representation for all NetHack glyphs that would
-          map to that particular symbol.
-
-          You  will  need  to select a symset with a UTF8 handler to enable
-          the display of the customizations, such as the Enhanced symset.
-
           9.16.  Configuring NetHack for Play by the Blind
 
-               NetHack can be set up to use only standard ASCII  characters
-          for  making maps of the dungeons. This makes even the MS-DOS ver-
-          sions of NetHack (which use special  line-drawing  characters  by
+               NetHack  can be set up to use only standard ASCII characters
+          for making maps of the dungeons. This makes even the MS-DOS  ver-
+          sions  of  NetHack  (which use special line-drawing characters by
           default) completely accessible to the blind who use speech and/or
           Braille access technologies.  Players will require a good working
           knowledge of their screen-reader's review features, and will have
-          to know how to navigate horizontally and vertically character  by
-          character.  They  will also find the search capabilities of their
-          screen-readers to be quite valuable. Be certain to  examine  this
+          to  know how to navigate horizontally and vertically character by
+          character. They will also find the search capabilities  of  their
+          screen-readers  to  be quite valuable. Be certain to examine this
           Guidebook before playing so you have an idea what the screen lay-
           out is like. You'll also need to be able to locate the PC cursor.
-          It  is  always  where your character is located. Merely searching
+          It is always where your character is  located.  Merely  searching
           for an @-sign will not always find your character since there are
-          other  humanoids represented by the same sign. Your screen-reader
+          other humanoids represented by the same sign. Your  screen-reader
           should also have a function which gives you the row and column of
           your review cursor and the PC cursor.  These co-ordinates are of-
-          ten useful in giving players a better sense of the overall  loca-
+          ten  useful in giving players a better sense of the overall loca-
           tion of items on the screen.
 
-               NetHack  can  also  be compiled with support for sending the
-          game messages to an external program, such  as  a  text-to-speech
-          synthesizer.   If the "#version" extended command shows "external
-          program as a message handler", your  NetHack  has  been  compiled
+               NetHack can also be compiled with support  for  sending  the
+          game  messages  to  an external program, such as a text-to-speech
+          synthesizer.  If the "#version" extended command shows  "external
+          program  as  a  message  handler", your NetHack has been compiled
           with the capability.  When compiling NetHack from source on Linux
-          and other POSIX systems, define MSGHANDLER to enable it.  To  use
-          the  capability,  set the environment variable NETHACK_MSGHANDLER
+          and  other POSIX systems, define MSGHANDLER to enable it.  To use
+          the capability, set the environment  variable  NETHACK_MSGHANDLER
           to an executable, which will be executed with the game message as
           the program's only parameter.
 
-               The  most  crucial settings to make the game more accessible
+               The most crucial settings to make the game  more  accessible
           are:
 
           symset:plain
@@ -6525,10 +6516,19 @@
             Show menus on a cleared screen and aligned to the left edge.
 
           number_pad
-            A lot of speech access programs use the  number-pad  to  review
+            A  lot  of  speech access programs use the number-pad to review
+            the screen.  If this is the case, disable the number_pad option
+            and use the traditional Rogue-like commands.
+
+          paranoid_confirmation:swim
+            Prevent walking into water or lava.
+
+          autodescribe
+            Automatically  describe  the terrain under the cursor when tar-
+            geting.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6538,50 +6538,40 @@
 
 
 
-            the screen.  If this is the case, disable the number_pad option
-            and use the traditional Rogue-like commands.
-
-          paranoid_confirmation:swim
-            Prevent walking into water or lava.
-
-          autodescribe
-            Automatically describe the terrain under the cursor  when  tar-
-            geting.
-
           mention_walls
-            Give  feedback  messages  when  walking  towards a wall or when
+            Give feedback messages when walking  towards  a  wall  or  when
             travel command was interrupted.
 
           whatis_coord:compass
-            When targeting with cursor, describe the cursor  position  with
+            When  targeting  with cursor, describe the cursor position with
             coordinates relative to your character.
 
           whatis_filter:area
-            When  targeting  with cursor, filter possible locations so only
-            those in the same area (eg. same room, or  same  corridor)  are
+            When targeting with cursor, filter possible locations  so  only
+            those  in  the  same area (eg. same room, or same corridor) are
             considered.
 
           whatis_moveskip
-            When  targeting  with cursor and using fast-move, skip the same
+            When targeting with cursor and using fast-move, skip  the  same
             glyphs instead of moving 8 units at a time.
 
           nostatus_updates
-            Prevent updates to the  status  lines  at  the  bottom  of  the
-            screen,  if  your screen-reader reads those lines. The same in-
+            Prevent  updates  to  the  status  lines  at  the bottom of the
+            screen, if your screen-reader reads those lines. The  same  in-
             formation can be seen via the "#attributes" command.
 
           9.17.  Global Configuration for System Administrators
 
-               If NetHack is compiled with the SYSCF option, a  system  ad-
-          ministrator  should set up a global configuration; this is a file
+               If  NetHack  is compiled with the SYSCF option, a system ad-
+          ministrator should set up a global configuration; this is a  file
           in the same format as the traditional per-user configuration file
           (see above).  This file should be named sysconf and placed in the
-          same directory as the other NetHack support files.   The  options
-          recognized  in  this  file  are listed below.  Any option not set
+          same  directory  as the other NetHack support files.  The options
+          recognized in this file are listed below.   Any  option  not  set
           uses a compiled-in default (which may not be appropriate for your
           system).
 
-            WIZARDS = A  space-separated list of user names who are allowed
+            WIZARDS = A space-separated list of user names who are  allowed
             to play in debug mode (commonly referred to as wizard mode).  A
             value of a single asterisk (*) allows anyone to start a game in
             debug mode.
@@ -6589,12 +6579,22 @@
             SHELLERS = A list of users who are allowed to use the shell es-
             cape command (!).  The syntax is the same as WIZARDS.
 
-            EXPLORERS = A  list of users who are allowed to use the explore
+            EXPLORERS = A list of users who are allowed to use the  explore
             mode.  The syntax is the same as WIZARDS.
 
+            MAXPLAYERS = Limit the maximum number of games that can be run-
+            ning at the same time.
+
+            SAVEFORMAT = A list of up to two save file formats separated by
+            space.   The  first  format in the list will written as well as
+            read. The second format will be read only if no  save  file  in
+            the  first  format  exists.  Valid choices are "historical" for
+            binary writing of entire structs, "lendian" for binary  writing
+            of  each  field in little-endian order, "ascii" for writing the
+            save file content in ascii text.
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6604,41 +6604,30 @@
 
 
 
-            MAXPLAYERS = Limit the maximum number of games that can be run-
-            ning at the same time.
-
-            SAVEFORMAT = A list of up to two save file formats separated by
-            space.  The first format in the list will written  as  well  as
-            read.  The  second  format will be read only if no save file in
-            the first format exists.  Valid choices  are  "historical"  for
-            binary  writing of entire structs, "lendian" for binary writing
-            of each field in little-endian order, "ascii" for  writing  the
-            save file content in ascii text.
-
-            BONESFORMAT = A  list of up to two bones file formats separated
+            BONESFORMAT = A list of up to two bones file formats  separated
             by space.  The first format in the list will written as well as
-            read.  The second format will be read only if no bones files in
+            read. The second format will be read only if no bones files  in
             the first format exist.  Valid choices are "historical" for bi-
             nary writing of entire structs, "lendian" for binary writing of
-            each field in little-endian  order,  "ascii"  for  writing  the
+            each  field  in  little-endian  order,  "ascii" for writing the
             bones file content in ascii text.
 
-            SUPPORT = A  string explaining how to get local support (no de-
+            SUPPORT = A string explaining how to get local support (no  de-
             fault value).
 
-            RECOVER = A string explaining how to recover  a  game  on  this
+            RECOVER = A  string  explaining  how  to recover a game on this
             system (no default value).
 
-            SEDUCE = 0  or 1 to disable or enable, respectively, the SEDUCE
+            SEDUCE = 0 or 1 to disable or enable, respectively, the  SEDUCE
             option.  When disabled, incubi and succubi behave like nymphs.
 
-            CHECK_PLNAME = Setting this to 1 will make the EXPLORERS,  WIZ-
-            ARDS,  and  SHELLERS  check  for the player name instead of the
+            CHECK_PLNAME = Setting  this to 1 will make the EXPLORERS, WIZ-
+            ARDS, and SHELLERS check for the player  name  instead  of  the
             user's login name.
 
             CHECK_SAVE_UID = 0 or 1 to disable or enable, respectively, the
-            UID  (used  identification  number) checking for save files (to
-            verify that the user who is  restoring  is  the  same  one  who
+            UID (used identification number) checking for  save  files  (to
+            verify  that  the  user  who  is  restoring is the same one who
             saved).
 
                The following four options affect the score file:
@@ -6647,20 +6636,31 @@
 
             ENTRYMAX = Maximum number of entries in the score file.
 
-            POINTSMIN = Minimum  number  of  points  to get an entry in the
+            POINTSMIN = Minimum number of points to get  an  entry  in  the
             score file.
 
-            PERS_IS_UID = 0 or 1 to use user names or numeric userids,  re-
+            PERS_IS_UID = 0  or 1 to use user names or numeric userids, re-
             spectively, to identify unique people for the score file.
 
-            HIDEUSAGE = 0  or  1 to control whether the help menu entry for
+            HIDEUSAGE = 0 or 1 to control whether the help menu  entry  for
             command line usage is shown or suppressed.
 
-            MAX_STATUENAME_RANK = Maximum number of score file  entries  to
+            MAX_STATUENAME_RANK = Maximum  number  of score file entries to
             use for random statue names (default is 10).
 
+            ACCESSIBILITY = 0 or 1 to disable or enable, respectively,  the
+            ability  for  players to set S_pet_override and S_hero_override
+            symbols in their configuration file.
 
-          NetHack 3.7                                     February 19, 2023
+            PORTABLE_DEVICE_PATHS = 0 or 1 Windows OS only, the  game  will
+            look  for  all  of  its external files, and write to all of its
+            output files in one place rather than  at  the  standard  loca-
+            tions.
+
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6670,18 +6670,9 @@
 
 
 
-            ACCESSIBILITY = 0  or 1 to disable or enable, respectively, the
-            ability for players to set S_pet_override  and  S_hero_override
-            symbols in their configuration file.
-
-            PORTABLE_DEVICE_PATHS = 0  or  1 Windows OS only, the game will
-            look for all of its external files, and write  to  all  of  its
-            output  files  in  one  place rather than at the standard loca-
-            tions.
-
             DUMPLOGFILE = A  filename  where  the  end-of-game  dumplog  is
-            saved.   Not defining this will prevent dumplog from being cre-
-            ated.  Only available if your game is  compiled  with  DUMPLOG.
+            saved.  Not defining this will prevent dumplog from being  cre-
+            ated.   Only  available  if your game is compiled with DUMPLOG.
             Allows the following placeholders:
 
                 %% - literal `%'
@@ -6694,39 +6685,48 @@
                 %n - player name
                 %N - first character of player name
 
-            LIVELOG = A  bit-mask of types of events that should be written
+            LIVELOG = A bit-mask of types of events that should be  written
             to the livelog file if one is present.  The sample sysconf file
-            accompanying  the  program  contains  a comment which lists the
-            meaning of the various bits used.  Intended for server  systems
-            supporting  simultaneous play by multiple players (to be clear,
+            accompanying the program contains a  comment  which  lists  the
+            meaning  of the various bits used.  Intended for server systems
+            supporting simultaneous play by multiple players (to be  clear,
             each one running a separate single player game), for displaying
             their game progress to observers.  Only relevant if the program
-            was built with LIVELOG enabled.  When available, it  should  be
-            left  commented out on single player installations because over
+            was  built  with LIVELOG enabled.  When available, it should be
+            left commented out on single player installations because  over
             time the file could grow to be extremely large unless it is ac-
             tively maintained.
 
           10.  Scoring
 
-               NetHack  maintains  a  list  of the top scores or scorers on
+               NetHack maintains a list of the top  scores  or  scorers  on
           your machine, depending on how it is set up.  In the latter case,
-          each  account  on the machine can post only one non-winning score
-          on this list.  If you score higher  than  someone  else  on  this
-          list,  or better your previous score, you will be inserted in the
-          proper place under your current name.  How many scores  are  kept
+          each account on the machine can post only one  non-winning  score
+          on  this  list.   If  you  score higher than someone else on this
+          list, or better your previous score, you will be inserted in  the
+          proper  place  under your current name.  How many scores are kept
           can also be set up when NetHack is compiled.
 
-               Your  score  is  chiefly  based upon how much experience you
+               Your score is chiefly based upon  how  much  experience  you
           gained, how much loot you accumulated, how deep you explored, and
           how the game ended.  If you quit the game, you escape with all of
-          your gold intact.  If, however, you get killed in  the  Mazes  of
+          your  gold  intact.   If, however, you get killed in the Mazes of
           Menace, the guild will only hear about 90% of your gold when your
-          corpse is discovered (adventurers  have  been  known  to  collect
-          finder's  fees).   So, consider whether you want to take one last
-          hit at that monster and possibly live,  or  quit  and  stop  with
+          corpse  is  discovered  (adventurers  have  been known to collect
+          finder's fees).  So, consider whether you want to take  one  last
+          hit  at  that  monster  and  possibly live, or quit and stop with
+          whatever you have.  If you quit, you keep all your gold,  but  if
+          you swing and live, you might find more.
+
+               If  you  just want to see what the current top players/games
+          list is, you can type nethack -s all on most versions.
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6736,63 +6736,63 @@
 
 
 
-          whatever  you  have.  If you quit, you keep all your gold, but if
-          you swing and live, you might find more.
-
-               If you just want to see what the current  top  players/games
-          list is, you can type nethack -s all on most versions.
-
           11.  Explore mode
 
-               NetHack  is  an intricate and difficult game.  Novices might
+               NetHack is an intricate and difficult game.   Novices  might
           falter in fear, aware of their ignorance of the means to survive.
           Well, fear not.  Your dungeon comes equipped with an "explore" or
-          "discovery" mode that enables you to  keep  old  save  files  and
-          cheat  death, at the paltry cost of not getting on the high score
+          "discovery"  mode  that  enables  you  to keep old save files and
+          cheat death, at the paltry cost of not getting on the high  score
           list.
 
-               There are two ways of enabling  explore  mode.   One  is  to
-          start  the game with the -X command-line switch or with the play-
-          mode:explore option.  The other is to  issue  the  "#exploremode"
-          extended  command while already playing the game.  Starting a new
+               There  are  two  ways  of  enabling explore mode.  One is to
+          start the game with the -X command-line switch or with the  play-
+          mode:explore  option.   The  other is to issue the "#exploremode"
+          extended command while already playing the game.  Starting a  new
           game in explore mode provides your character with a wand of wish-
-          ing  in  initial  inventory; switching during play does not.  The
-          other benefits of explore mode are left for the trepid reader  to
+          ing in initial inventory; switching during play  does  not.   The
+          other  benefits of explore mode are left for the trepid reader to
           discover.
 
           11.1.  Debug mode
 
                Debug mode, also known as wizard mode, is undocumented aside
-          from this brief description and the  various  "debug  mode  only"
-          commands  listed  among the command descriptions.  It is intended
+          from  this  brief  description  and the various "debug mode only"
+          commands listed among the command descriptions.  It  is  intended
           for tracking down problems within the program rather than to pro-
-          vide  god-like  powers to your character, and players who attempt
-          debugging are expected to figure out how to  use  it  themselves.
-          It  is  initiated  by  starting the game with the -D command-line
+          vide god-like powers to your character, and players  who  attempt
+          debugging  are  expected  to figure out how to use it themselves.
+          It is initiated by starting the game  with  the  -D  command-line
           switch or with the playmode:debug option.
 
-               For some systems, the player must be logged in under a  par-
-          ticular  user  name  to be allowed to use debug mode; for others,
-          the hero must be given a particular character name  (but  may  be
-          any  role;  there's  no  connection between "wizard mode" and the
-          Wizard role).  Attempting to start a game in debug mode when  not
-          allowed  or  not available will result in falling back to explore
+               For  some systems, the player must be logged in under a par-
+          ticular user name to be allowed to use debug  mode;  for  others,
+          the  hero  must  be given a particular character name (but may be
+          any role; there's no connection between  "wizard  mode"  and  the
+          Wizard  role).  Attempting to start a game in debug mode when not
+          allowed or not available will result in falling back  to  explore
           mode instead.
 
           12.  Credits
 
-               The original hack game was  modeled  on  the  Berkeley  UNIX
-          rogue  game.   Large  portions  of this document were shamelessly
-          cribbed from A Guide to the Dungeons of Doom, by Michael  C.  Toy
-          and  Kenneth  C.  R. C. Arnold.  Small portions were adapted from
+               The  original  hack  game  was  modeled on the Berkeley UNIX
+          rogue game.  Large portions of  this  document  were  shamelessly
+          cribbed  from  A Guide to the Dungeons of Doom, by Michael C. Toy
+          and Kenneth C. R. C. Arnold.  Small portions  were  adapted  from
           Further Exploration of the Dungeons of Doom, by Ken Arromdee.
 
                NetHack is the product of literally scores of people's work.
-          Main  events  in the course of the game development are described
+          Main events in the course of the game development  are  described
           below:
 
+               Jay  Fenlason  wrote the original Hack, with help from Kenny
+          Woodland, Mike Thome, and Jon Payne.
 
-          NetHack 3.7                                     February 19, 2023
+               Andries Brouwer did a  major  re-write  while  at  Stichting
+          Mathematisch   Centrum  (now  Centrum  Wiskunde  &  Informatica),
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6802,63 +6802,63 @@
 
 
 
-               Jay Fenlason wrote the original Hack, with help  from  Kenny
-          Woodland, Mike Thome, and Jon Payne.
+          transforming Hack into a very different game.  He  published  the
+          Hack  source  code  for  use  on  UNIX systems by posting that to
+          Usenet newsgroup net.sources (later renamed comp.sources) releas-
+          ing  version 1.0 in December of 1984, then versions 1.0.1, 1.0.2,
+          and  finally  1.0.3  in   July   of   1985.    Usenet   newsgroup
+          net.games.hack (later renamed rec.games.hack, eventually replaced
+          by rec.games.roguelike.nethack) was created for discussing it.
 
-               Andries  Brouwer  did  a  major  re-write while at Stichting
-          Mathematisch Centrum (now Centrum Wiskunde & Informatica), trans-
-          forming  Hack  into a very different game.  He published the Hack
-          source code for use on UNIX systems by  posting  that  to  Usenet
-          newsgroup net.sources (later renamed comp.sources) releasing ver-
-          sion 1.0 in December of 1984, then versions 1.0.1, 1.0.2, and fi-
-          nally  1.0.3  in  July  of 1985.  Usenet newsgroup net.games.hack
-          (later   renamed   rec.games.hack,   eventually    replaced    by
-          rec.games.roguelike.nethack) was created for discussing it.
-
-               Don  G. Kneller ported Hack 1.0.3 to Microsoft C and MS-DOS,
-          producing PC HACK 1.01e, added support for DEC  Rainbow  graphics
-          in  version 1.03g, and went on to produce at least four more ver-
+               Don G. Kneller ported Hack 1.0.3 to Microsoft C and  MS-DOS,
+          producing  PC  HACK 1.01e, added support for DEC Rainbow graphics
+          in version 1.03g, and went on to produce at least four more  ver-
           sions (3.0, 3.2, 3.51, and 3.6; note that these are old Hack ver-
           sion numbers, not contemporary NetHack ones).
 
-               R.  Black  ported  PC  HACK  3.51 to Lattice C and the Atari
+               R. Black ported PC HACK 3.51 to  Lattice  C  and  the  Atari
           520/1040ST, producing ST Hack 1.03.
 
                Mike Stephenson merged these various versions back together,
-          incorporating  many  of  the added features, and produced NetHack
-          version 1.4 in 1987.  He then coordinated a cast of thousands  in
+          incorporating many of the added features,  and  produced  NetHack
+          version  1.4 in 1987.  He then coordinated a cast of thousands in
           enhancing and debugging NetHack 1.4 and released NetHack versions
-          2.2 and 2.3.  Like Hack, they  were  released  by  posting  their
-          source  code  to  Usenet where they remained available in various
-          archives accessible via ftp and  uucp  after  expiring  from  the
+          2.2  and  2.3.   Like  Hack,  they were released by posting their
+          source code to Usenet where they remained  available  in  various
+          archives  accessible  via  ftp  and  uucp after expiring from the
           newsgroup.
 
-               Later,  Mike coordinated a major re-write of the game, head-
-          ing a team which included Ken Arromdee,  Jean-Christophe  Collet,
-          Steve  Creps,  Eric  Hendrickson, Izchak Miller, Eric S. Raymond,
-          John Rupley, Mike Threepoint, and Janet Walz, to produce  NetHack
+               Later, Mike coordinated a major re-write of the game,  head-
+          ing  a  team which included Ken Arromdee, Jean-Christophe Collet,
+          Steve Creps, Eric Hendrickson, Izchak Miller,  Eric  S.  Raymond,
+          John  Rupley, Mike Threepoint, and Janet Walz, to produce NetHack
           3.0c.
 
-               NetHack  3.0  was  ported  to the Atari by Eric R. Smith, to
-          OS/2 by Timo Hakulinen, and to VMS by David Gentzel.   The  three
+               NetHack 3.0 was ported to the Atari by  Eric  R.  Smith,  to
+          OS/2  by  Timo Hakulinen, and to VMS by David Gentzel.  The three
           of them and Kevin Darcy later joined the main NetHack Development
           Team to produce subsequent revisions of 3.0.
 
-               Olaf Seibert ported NetHack 2.3 and 3.0 to the Amiga.   Norm
-          Meluch,  Stephen  Spackman  and Pierre Martineau designed overlay
-          code for PC NetHack 3.0.  Johnny Lee ported NetHack  3.0  to  the
-          Macintosh.   Along with various other Dungeoneers, they continued
-          to enhance the PC, Macintosh, and Amiga ports through  the  later
+               Olaf  Seibert ported NetHack 2.3 and 3.0 to the Amiga.  Norm
+          Meluch, Stephen Spackman and Pierre  Martineau  designed  overlay
+          code  for  PC  NetHack 3.0.  Johnny Lee ported NetHack 3.0 to the
+          Macintosh.  Along with various other Dungeoneers, they  continued
+          to  enhance  the PC, Macintosh, and Amiga ports through the later
           revisions of 3.0.
 
-               Version  3.0  went  through  ten relatively rapidly released
-          "patch-level" revisions.  Versions at the time were known as  3.0
-          for  the  base  release  and  variously as "3.0a" through "3.0j",
-          "3.0 patchlevel 1"  through  "3.0 patchlevel 10",   or   "3.0pl1"
+               Version 3.0 went through  ten  relatively  rapidly  released
+          "patch-level"  revisions.  Versions at the time were known as 3.0
+          for the base release and  variously  as  "3.0a"  through  "3.0j",
+          "3.0 patchlevel 1"   through   "3.0 patchlevel 10",  or  "3.0pl1"
           through "3.0pl10" rather than 3.0.0 and 3.0.1 through 3.0.10; the
+          three component numbering scheme began to be used with 3.1.0.
+
+               Headed  by  Mike Stephenson and coordinated by Izchak Miller
+          and Janet Walz, the NetHack Development Team which  now  included
+          Ken  Arromdee,  David Cohrs, Jean-Christophe Collet, Kevin Darcy,
 
 
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6868,63 +6868,63 @@
 
 
 
-          three component numbering scheme began to be used with 3.1.0.
-
-               Headed by Mike Stephenson and coordinated by  Izchak  Miller
-          and  Janet  Walz, the NetHack Development Team which now included
-          Ken Arromdee, David Cohrs, Jean-Christophe Collet,  Kevin  Darcy,
-          Matt  Day, Timo Hakulinen, Steve Linhart, Dean Luick, Pat Rankin,
+          Matt Day, Timo Hakulinen, Steve Linhart, Dean Luick, Pat  Rankin,
           Eric Raymond, and Eric Smith undertook a radical revision of 3.0.
           They re-structured the game's design, and re-wrote major parts of
-          the code.  They added multiple dungeons, a new  display,  special
-          individual  character  quests,  a  new endgame and many other new
-          features, and produced NetHack 3.1.  Version 3.1.0  was  released
+          the  code.   They added multiple dungeons, a new display, special
+          individual character quests, a new endgame  and  many  other  new
+          features,  and  produced NetHack 3.1.  Version 3.1.0 was released
           in January of 1993.
 
-               Ken  Lorber,  Gregg  Wonderly and Greg Olson, with help from
-          Richard Addison, Mike Passaretti,  and  Olaf  Seibert,  developed
+               Ken Lorber, Gregg Wonderly and Greg Olson,  with  help  from
+          Richard  Addison,  Mike  Passaretti,  and Olaf Seibert, developed
           NetHack 3.1 for the Amiga.
 
-               Norm  Meluch and Kevin Smolkowski, with help from Carl Sche-
+               Norm Meluch and Kevin Smolkowski, with help from Carl  Sche-
           lin, Stephen Spackman, Steve VanDevender, and Paul Winner, ported
           NetHack 3.1 to the PC.
 
                Jon W{tte and Hao-yang Wang, with help from Ross Brown, Mike
-          Engber, David Hairston, Michael Hamel, Jonathan  Handler,  Johnny
-          Lee,  Tim  Lennan, Rob Menke, and Andy Swanson, developed NetHack
+          Engber,  David  Hairston, Michael Hamel, Jonathan Handler, Johnny
+          Lee, Tim Lennan, Rob Menke, and Andy Swanson,  developed  NetHack
           3.1 for the Macintosh, porting it for MPW.  Building on their de-
           velopment, Bart House added a Think C port.
 
-               Timo  Hakulinen  ported  NetHack  3.1  to  OS/2.  Eric Smith
-          ported NetHack 3.1 to the Atari.   Pat  Rankin,  with  help  from
-          Joshua  Delahunty, was responsible for the VMS version of NetHack
+               Timo Hakulinen ported  NetHack  3.1  to  OS/2.   Eric  Smith
+          ported  NetHack  3.1  to  the  Atari.  Pat Rankin, with help from
+          Joshua Delahunty, was responsible for the VMS version of  NetHack
           3.1.  Michael Allison ported NetHack 3.1 to Windows NT.
 
-               Dean Luick, with help from David  Cohrs,  developed  NetHack
+               Dean  Luick,  with  help from David Cohrs, developed NetHack
           3.1 for X11.  It drew the map as text rather than graphically but
-          included nh10.bdf, an optionally used custom X11 font  which  has
-          tiny  images  in place of letters and punctuation, a precursor of
-          tiles.  Those images don't extend to individual monster  and  ob-
-          ject  types, just replacements for monster and object classes (so
-          one custom image for all "a" insects and another for all "["  ar-
+          included  nh10.bdf,  an optionally used custom X11 font which has
+          tiny images in place of letters and punctuation, a  precursor  of
+          tiles.   Those  images don't extend to individual monster and ob-
+          ject types, just replacements for monster and object classes  (so
+          one  custom image for all "a" insects and another for all "[" ar-
           mor and so forth, not separate images for beetles and ants or for
           cloaks and boots).
 
-               Warwick Allison wrote a  graphically  displayed  version  of
-          NetHack  for  the Atari where the tiny pictures were described as
-          "icons" and were distinct for specific types of monsters and  ob-
+               Warwick  Allison  wrote  a  graphically displayed version of
+          NetHack for the Atari where the tiny pictures were  described  as
+          "icons"  and were distinct for specific types of monsters and ob-
           jects rather than just their classes.  He contributed them to the
-          NetHack Development Team which rechristened them "tiles",  origi-
-          nal  usage which has subsequently been picked up by various other
-          games.  NetHack's tiles support was  then  implemented  on  other
-          platforms  (initially  MS-DOS but eventually Windows, Qt, and X11
+          NetHack  Development Team which rechristened them "tiles", origi-
+          nal usage which has subsequently been picked up by various  other
+          games.   NetHack's  tiles  support  was then implemented on other
+          platforms (initially MS-DOS but eventually Windows, Qt,  and  X11
           too).
 
                The 3.2 NetHack Development Team, comprised of Michael Alli-
           son, Ken Arromdee, David Cohrs, Jessie Collet, Steve Creps, Kevin
+          Darcy,  Timo  Hakulinen,  Steve  Linhart, Dean Luick, Pat Rankin,
+          Eric Smith, Mike Stephenson, Janet Walz,  and  Paul  Winner,  re-
+          leased version 3.2.0 in April of 1996.
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -6934,63 +6934,63 @@
 
 
 
-          Darcy, Timo Hakulinen, Steve Linhart,  Dean  Luick,  Pat  Rankin,
-          Eric  Smith,  Mike  Stephenson,  Janet Walz, and Paul Winner, re-
-          leased version 3.2.0 in April of 1996.
-
                Version 3.2 marked the tenth anniversary of the formation of
-          the  development team.  In a testament to their dedication to the
-          game, all thirteen members of the  original  NetHack  Development
-          Team  remained  on the team at the start of work on that release.
-          During the interval between the release of 3.1.3 and  3.2.0,  one
-          of  the  founding  members  of  the NetHack Development Team, Dr.
-          Izchak Miller, was diagnosed with cancer and passed  away.   That
-          release  of  the game was dedicated to him by the development and
+          the development team.  In a testament to their dedication to  the
+          game,  all  thirteen  members of the original NetHack Development
+          Team remained on the team at the start of work on  that  release.
+          During  the  interval between the release of 3.1.3 and 3.2.0, one
+          of the founding members of  the  NetHack  Development  Team,  Dr.
+          Izchak  Miller,  was diagnosed with cancer and passed away.  That
+          release of the game was dedicated to him by the  development  and
           porting teams.
 
                Version 3.2 proved to be more stable than previous versions.
-          Many  bugs were fixed, abuses eliminated, and game features tuned
+          Many bugs were fixed, abuses eliminated, and game features  tuned
           for better game play.
 
                During the lifespan of NetHack 3.1 and 3.2, several enthusi-
-          asts  of  the  game added their own modifications to the game and
+          asts of the game added their own modifications to  the  game  and
           made these "variants" publicly available:
 
-               Tom Proudfoot and Yuval Oren created  NetHack++,  which  was
-          quickly  renamed  NetHack--  when some people incorrectly assumed
-          that it was a conversion of the C source code  to  C++.   Working
-          independently,  Stephen  White wrote NetHack Plus.  Tom Proudfoot
+               Tom  Proudfoot  and  Yuval Oren created NetHack++, which was
+          quickly renamed NetHack-- when some  people  incorrectly  assumed
+          that  it  was  a conversion of the C source code to C++.  Working
+          independently, Stephen White wrote NetHack Plus.   Tom  Proudfoot
           later merged NetHack Plus and his own NetHack-- to produce SLASH.
-          Larry  Stewart-Zerba and Warwick Allison improved the spell cast-
-          ing system with the Wizard Patch.  Warwick  Allison  also  ported
+          Larry Stewart-Zerba and Warwick Allison improved the spell  cast-
+          ing  system  with  the Wizard Patch.  Warwick Allison also ported
           NetHack to use the Qt interface.
 
-               Warren  Cheung  combined SLASH with the Wizard Patch to pro-
-          duce Slash'EM, and with the help of Kevin Hugo, added  more  fea-
-          tures.   Kevin  later joined the NetHack Development Team and in-
+               Warren Cheung combined SLASH with the Wizard Patch  to  pro-
+          duce  Slash'EM,  and with the help of Kevin Hugo, added more fea-
+          tures.  Kevin later joined the NetHack Development Team  and  in-
           corporated the best of these ideas into NetHack 3.3.
 
                The final update to 3.2 was the bug fix release 3.2.3, which
-          was  released  simultaneously with 3.3.0 in December 1999 just in
-          time for the Year 2000.  Because of the newer version, 3.2.3  was
-          released  as  a source code patch only, without any ready-to-play
+          was released simultaneously with 3.3.0 in December 1999  just  in
+          time  for the Year 2000.  Because of the newer version, 3.2.3 was
+          released as a source code patch only, without  any  ready-to-play
           distribution for systems that usually had such.
 
-               (To anyone considering resurrecting  an  old  version:   all
-          versions  before  3.2.3  had a Y2K bug.  The high scores file and
-          the log file contained dates which were formatted  using  a  two-
-          digit  year,  and 1999's year 99 was followed by 2000's year 100.
-          That got written out successfully but it  unintentionally  intro-
-          duced  an  extra  column in the file layout which prevented score
-          entries from being read back in correctly, interfering  with  in-
-          sertion  of  new  high scores and with retrieval of old character
-          names to use for random ghost and statue  names  in  the  current
+               (To  anyone  considering  resurrecting  an old version:  all
+          versions before 3.2.3 had a Y2K bug.  The high  scores  file  and
+          the  log  file  contained dates which were formatted using a two-
+          digit year, and 1999's year 99 was followed by 2000's  year  100.
+          That  got  written out successfully but it unintentionally intro-
+          duced an extra column in the file layout  which  prevented  score
+          entries  from  being read back in correctly, interfering with in-
+          sertion of new high scores and with retrieval  of  old  character
+          names  to  use  for  random ghost and statue names in the current
           game.)
 
+               The 3.3 NetHack Development Team, consisting of Michael  Al-
+          lison,  Ken  Arromdee,  David  Cohrs, Jessie Collet, Steve Creps,
+          Kevin Darcy, Timo Hakulinen, Kevin Hugo, Steve Linhart, Ken  Lor-
+          ber,  Dean  Luick, Pat Rankin, Eric Smith, Mike Stephenson, Janet
+          Walz, and Paul Winner, released 3.3.0 in December 1999 and  3.3.1
 
 
-
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -7000,63 +7000,63 @@
 
 
 
-               The  3.3 NetHack Development Team, consisting of Michael Al-
-          lison, Ken Arromdee, David Cohrs,  Jessie  Collet,  Steve  Creps,
-          Kevin  Darcy, Timo Hakulinen, Kevin Hugo, Steve Linhart, Ken Lor-
-          ber, Dean Luick, Pat Rankin, Eric Smith, Mike  Stephenson,  Janet
-          Walz,  and Paul Winner, released 3.3.0 in December 1999 and 3.3.1
           in August of 2000.
 
                Version 3.3 offered many firsts. It was the first version to
-          separate  race and profession. The Elf class was removed in pref-
+          separate race and profession. The Elf class was removed in  pref-
           erence to an elf race, and the races of dwarves, gnomes, and orcs
-          made  their  first  appearance in the game alongside the familiar
-          human race.  Monk and Ranger roles joined Archeologists,  Barbar-
-          ians,   Cavemen,  Healers,  Knights,  Priests,  Rogues,  Samurai,
-          Tourists, Valkyries and of course,  Wizards.   It  was  also  the
-          first  version  to  allow  you to ride a steed, and was the first
-          version to have a publicly available  web-site  listing  all  the
-          bugs  that  had been discovered.  Despite that constantly growing
-          bug list, 3.3 proved stable enough to last for more than  a  year
+          made their first appearance in the game  alongside  the  familiar
+          human  race.  Monk and Ranger roles joined Archeologists, Barbar-
+          ians,  Cavemen,  Healers,  Knights,  Priests,  Rogues,   Samurai,
+          Tourists,  Valkyries  and  of  course,  Wizards.  It was also the
+          first version to allow you to ride a steed,  and  was  the  first
+          version  to  have  a  publicly available web-site listing all the
+          bugs that had been discovered.  Despite that  constantly  growing
+          bug  list,  3.3 proved stable enough to last for more than a year
           and a half.
 
-               The  3.4  NetHack  Development  Team  initially consisted of
-          Michael Allison, Ken Arromdee, David Cohrs, Jessie Collet,  Kevin
-          Hugo,  Ken Lorber, Dean Luick, Pat Rankin, Mike Stephenson, Janet
-          Walz, and Paul Winner, with  Warwick Allison joining just  before
+               The 3.4 NetHack  Development  Team  initially  consisted  of
+          Michael  Allison, Ken Arromdee, David Cohrs, Jessie Collet, Kevin
+          Hugo, Ken Lorber, Dean Luick, Pat Rankin, Mike Stephenson,  Janet
+          Walz,  and Paul Winner, with  Warwick Allison joining just before
           the release of NetHack 3.4.0 in March 2002.
 
-               As  with version 3.3, various people contributed to the game
+               As with version 3.3, various people contributed to the  game
           as a whole as well as supporting ports on the different platforms
           that NetHack runs on:
 
                Pat Rankin maintained 3.4 for VMS.
 
-               Michael  Allison maintained NetHack 3.4 for the MS-DOS plat-
+               Michael Allison maintained NetHack 3.4 for the MS-DOS  plat-
           form.  Paul Winner and Yitzhak Sapir provided encouragement.
 
-               Dean Luick, Mark Modrall, and Kevin Hugo maintained and  en-
+               Dean  Luick, Mark Modrall, and Kevin Hugo maintained and en-
           hanced the Macintosh port of 3.4.
 
-               Michael  Allison,  David  Cohrs, Alex Kompel, Dion Nicolaas,
-          and Yitzhak Sapir maintained and enhanced 3.4 for  the  Microsoft
+               Michael Allison, David Cohrs, Alex  Kompel,  Dion  Nicolaas,
+          and  Yitzhak  Sapir maintained and enhanced 3.4 for the Microsoft
           Windows platform.  Alex Kompel contributed a new graphical inter-
-          face for the Windows port.  Alex Kompel also contributed  a  Win-
+          face  for  the Windows port.  Alex Kompel also contributed a Win-
           dows CE port for 3.4.1.
 
                Ron Van Iwaarden was the sole maintainer of NetHack for OS/2
-          the past several releases. Unfortunately Ron's last OS/2  machine
-          stopped  working  in  early  2006. A great many thanks to Ron for
+          the  past several releases. Unfortunately Ron's last OS/2 machine
+          stopped working in early 2006. A great many  thanks  to  Ron  for
           keeping NetHack alive on OS/2 all these years.
 
-               Janne Salmijarvi and Teemu Suikki  maintained  and  enhanced
-          the  Amiga  port of 3.4 after Janne Salmijarvi resurrected it for
+               Janne  Salmijarvi  and  Teemu Suikki maintained and enhanced
+          the Amiga port of 3.4 after Janne Salmijarvi resurrected  it  for
           3.3.1.
 
+               Christian "Marvin" Bressler maintained 3.4 for the Atari af-
+          ter he resurrected it for 3.3.1.
+
+               The release of NetHack 3.4.3 in December 2003 marked the be-
+          ginning of a long release hiatus. 3.4.3 proved to be a remarkably
+          stable version that provided continued enjoyment by the community
 
 
-
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -7066,63 +7066,63 @@
 
 
 
-               Christian "Marvin" Bressler maintained 3.4 for the Atari af-
-          ter he resurrected it for 3.3.1.
-
-               The release of NetHack 3.4.3 in December 2003 marked the be-
-          ginning of a long release hiatus. 3.4.3 proved to be a remarkably
-          stable version that provided continued enjoyment by the community
-          for more than a decade. The NetHack Development Team  slowly  and
-          quietly  continued  to  work on the game behind the scenes during
-          the tenure of 3.4.3. It was during that same period that  several
+          for  more  than a decade. The NetHack Development Team slowly and
+          quietly continued to work on the game behind  the  scenes  during
+          the  tenure of 3.4.3. It was during that same period that several
           new  variants  emerged  within  the  NetHack  community.  Notably
           sporkhack by Derek S. Ray, unnethack by Patric Mueller, nitrohack
-          and  its  successors originally by Daniel Thaler and then by Alex
-          Smith, and Dynahack by Tung Nguyen.  Some of those variants  con-
-          tinue  to  be developed, maintained, and enjoyed by the community
+          and its successors originally by Daniel Thaler and then  by  Alex
+          Smith,  and Dynahack by Tung Nguyen.  Some of those variants con-
+          tinue to be developed, maintained, and enjoyed by  the  community
           to this day.
 
                In September 2014, an interim snapshot of the code under de-
-          velopment  was  released  publicly  by other parties.  Since that
-          code was a work-in-progress and had not gone through the  process
-          of  debugging  it  as a suitable release, it was decided that the
-          version numbers present on that code snapshot  would  be  retired
-          and  never  used in an official NetHack release.  An announcement
+          velopment was released publicly by  other  parties.   Since  that
+          code  was a work-in-progress and had not gone through the process
+          of debugging it as a suitable release, it was  decided  that  the
+          version  numbers  present  on that code snapshot would be retired
+          and never used in an official NetHack release.   An  announcement
           was posted on the NetHack Development Team's official nethack.org
-          website  to  that  effect,  stating  that  there would never be a
+          website to that effect, stating  that  there  would  never  be  a
           3.4.4, 3.5, or 3.5.0 official release version.
 
-               In January  2015,  preparation  began  for  the  release  of
+               In  January  2015,  preparation  began  for  the  release of
           NetHack 3.6.
 
-               At  the  beginning  of development for what would eventually
-          get released as 3.6.0, the NetHack Development Team consisted  of
-          Warwick  Allison,  Michael  Allison,  Ken  Arromdee, David Cohrs,
-          Jessie Collet, Ken Lorber, Dean Luick, Pat Rankin, Mike  Stephen-
-          son,  Janet  Walz,  and Paul Winner.  In early 2015, ahead of the
+               At the beginning of development for  what  would  eventually
+          get  released as 3.6.0, the NetHack Development Team consisted of
+          Warwick Allison, Michael  Allison,  Ken  Arromdee,  David  Cohrs,
+          Jessie  Collet, Ken Lorber, Dean Luick, Pat Rankin, Mike Stephen-
+          son, Janet Walz, and Paul Winner.  In early 2015,  ahead  of  the
           release of 3.6.0, new members Sean Hunt, Pasi Kallinen, and Derek
           S. Ray joined the NetHack Development Team.
 
                Near the end of the development of 3.6.0, one of the signif-
-          icant inspirations for many of  the  humorous  and  fun  features
-          found  in the game, author Terry Pratchett, passed away.  NetHack
+          icant  inspirations  for  many  of  the humorous and fun features
+          found in the game, author Terry Pratchett, passed away.   NetHack
           3.6.0 introduced a tribute to him.
 
                3.6.0 was released in December 2015, and merged work done by
-          the  development team since the release of 3.4.3 with some of the
+          the development team since the release of 3.4.3 with some of  the
           beloved community patches. Many bugs were fixed and some code was
           restructured.
 
-               The  NetHack  Development Team, as well as Steve VanDevender
+               The NetHack Development Team, as well as  Steve  VanDevender
           and Kevin Smolkowski, ensured that NetHack 3.6 continued to oper-
           ate on various UNIX flavors and maintained the X11 interface.
 
-               Ken  Lorber,  Haoyang Wang, Pat Rankin, and Dean Luick main-
-          tained the port of NetHack 3.6 for Mac OSX.
+               Ken Lorber, Haoyang Wang, Pat Rankin, and Dean  Luick  main-
+          tained the port of NetHack 3.6 for MacOS.
+
+               Michael  Allison,  David  Cohrs,  Bart House, Pasi Kallinen,
+          Alex Kompel, Dion Nicolaas, Derek S. Ray and Yitzhak Sapir  main-
+          tained the port of NetHack 3.6 for Microsoft Windows.
+
+               Pat  Rankin  attempted  to  keep  the  VMS  port running for
+          NetHack 3.6, hindered by limited  access.  Kevin  Smolkowski  has
 
 
-
-          NetHack 3.7                                     February 19, 2023
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -7132,42 +7132,36 @@
 
 
 
-               Michael Allison, David Cohrs,  Bart  House,  Pasi  Kallinen,
-          Alex  Kompel, Dion Nicolaas, Derek S. Ray and Yitzhak Sapir main-
-          tained the port of NetHack 3.6 for Microsoft Windows.
+          updated  and  tested  it  for  the most recent version of OpenVMS
+          (V8.4 as of this writing) on Alpha and Integrity (aka Itanium aka
+          IA64) but not VAX.
 
-               Pat Rankin attempted  to  keep  the  VMS  port  running  for
-          NetHack 3.6, hindered by limited access. Kevin Smolkowski has up-
-          dated and tested it for the most recent version of OpenVMS  (V8.4
-          as of this writing) on Alpha and Integrity (aka Itanium aka IA64)
-          but not VAX.
-
-               Ray Chason resurrected the MS-DOS port for 3.6 and  contrib-
+               Ray  Chason resurrected the MS-DOS port for 3.6 and contrib-
           uted the necessary updates to the community at large.
 
-               In  late April 2018, several hundred bug fixes for 3.6.0 and
-          some new features were assembled and released as  NetHack  3.6.1.
+               In late April 2018, several hundred bug fixes for 3.6.0  and
+          some  new  features were assembled and released as NetHack 3.6.1.
           The NetHack Development Team at the time of release of 3.6.1 con-
-          sisted of Warwick Allison, Michael Allison, Ken  Arromdee,  David
-          Cohrs,  Jessie  Collet,  Pasi  Kallinen,  Ken Lorber, Dean Luick,
-          Patric Mueller, Pat  Rankin,  Derek  S.  Ray,  Alex  Smith,  Mike
+          sisted  of  Warwick Allison, Michael Allison, Ken Arromdee, David
+          Cohrs, Jessie Collet, Pasi  Kallinen,  Ken  Lorber,  Dean  Luick,
+          Patric  Mueller,  Pat  Rankin,  Derek  S.  Ray,  Alex Smith, Mike
           Stephenson, Janet Walz, and Paul Winner.
 
                In early May 2019, another 320 bug fixes along with some en-
-          hancements and the adopted curses window port, were  released  as
+          hancements  and  the adopted curses window port, were released as
           3.6.2.
 
-               Bart  House,  who  had  contributed to the game as a porting
+               Bart House, who had contributed to the  game  as  a  porting
           team participant for decades, joined the NetHack Development Team
           in late May 2019.
 
-               NetHack  3.6.3  was  released on December 5, 2019 containing
+               NetHack 3.6.3 was released on December  5,  2019  containing
           over 190 bug fixes to NetHack 3.6.2.
 
                NetHack 3.6.4 was released on December 18, 2019 containing a
           security fix and a few bug fixes.
 
-               NetHack  3.6.5  was  released on January 27, 2020 containing
+               NetHack 3.6.5 was released on January  27,  2020  containing
           some security fixes and a small number of bug fixes.
 
                NetHack 3.6.6 was released on March 8, 2020 containing a se-
@@ -7183,12 +7177,18 @@
           12.1.  Special Thanks
 
                On behalf of the NetHack community, thank you very much once
-          again to M. Drew Streib and Pasi Kallinen for providing a  public
-          NetHack  server  at  nethack.alt.org. Thanks to Keith Simpson and
-          Andy Thomson for hardfought.org.  Thanks  to  all  those  unnamed
+          again  to M. Drew Streib and Pasi Kallinen for providing a public
+          NetHack server at nethack.alt.org. Thanks to  Keith  Simpson  and
+          Andy Thomson for hardfought.org. Thanks to all those unnamed dun-
+          geoneers who invest their time and  effort  into  annual  NetHack
+          tournaments  such  as Junethack, The November NetHack Tournament,
+          and in days past, devnull.net (gone for now, but not  forgotten).
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -7198,18 +7198,12 @@
 
 
 
-          dungeoneers  who invest their time and effort into annual NetHack
-          tournaments such as Junethack, The November  NetHack  Tournament,
-          and  in days past, devnull.net (gone for now, but not forgotten).
-
-
-
           12.2.  Dungeoneers
 
-               From time to time, some depraved  individual  out  there  in
-          netland  sends a particularly intriguing modification to help out
+               From  time  to  time,  some depraved individual out there in
+          netland sends a particularly intriguing modification to help  out
           with the game.  The NetHack Development Team sometimes makes note
-          of  the  names of the worst of these miscreants in this, the list
+          of the names of the worst of these miscreants in this,  the  list
           of Dungeoneers:
 
                Adam Aronow           J. Ali Harlow          Mikko Juola
@@ -7251,10 +7245,16 @@
                Greg Olson            Michael Hamel            Tom West
              Gregg Wonderly         Michael Sokolov        Warren Cheung
               Hao-yang Wang           Mike Engber         Warwick Allison
+              Helge Hafting           Mike Gallop          Yitzhak Sapir
+          Irina Rempt-Drijfhout     Mike Passaretti
+              Izchak Miller         Mike Stephenson
 
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
@@ -7264,13 +7264,7 @@
 
 
 
-              Helge Hafting           Mike Gallop          Yitzhak Sapir
-          Irina Rempt-Drijfhout     Mike Passaretti
-              Izchak Miller         Mike Stephenson
-
-
-
-               Brand and product names are trademarks or registered  trade-
+               Brand  and product names are trademarks or registered trade-
           marks of their respective holders.
 
 
@@ -7320,7 +7314,13 @@
 
 
 
-          NetHack 3.7                                     February 19, 2023
+
+
+
+
+
+
+          NetHack 3.7                                     February 21, 2023
 
 
 
