@@ -4711,6 +4711,7 @@ zap_over_floor(
     struct rm *lev = &levl[x][y];
     boolean see_it = cansee(x, y), yourzap;
     int rangemod = 0, abstype = abs(type) % 10;
+    boolean lavawall = (lev->typ == LAVAWALL);
 
     if (type == PHYS_EXPL_TYPE) {
         /* this won't have any effect on the floor */
@@ -4780,15 +4781,17 @@ zap_over_floor(
         break; /* ZT_FIRE */
 
     case ZT_COLD:
-        if (is_pool(x, y) || is_lava(x, y) || levl[x][y].typ == LAVAWALL) {
-            boolean lava = (is_lava(x, y) || levl[x][y].typ == LAVAWALL),
+        if (is_pool(x, y) || is_lava(x, y) || lavawall) {
+            boolean lava = (is_lava(x, y) || lavawall),
                     moat = is_moat(x, y);
+            int chance = max(2, 5 + gl.level.flags.temperature * 10);
 
-            if (IS_WATERWALL(lev->typ)) {
+            if (IS_WATERWALL(lev->typ) || (lavawall && rn2(chance))) {
                 /* For now, don't let WATER freeze. */
                 Soundeffect(se_soft_crackling, 100);
                 if (see_it)
-                    pline_The("%s freezes for a moment.", hliquid("water"));
+                    pline_The("%s freezes for a moment.",
+                              hliquid(lavawall ? "lava" : "water"));
                 else
                     You_hear("a soft crackling.");
                 rangemod -= 1000; /* stop */
@@ -4804,7 +4807,17 @@ zap_over_floor(
                     lev->icedpool = lava ? 0
                                          : (lev->typ == POOL) ? ICED_POOL
                                                               : ICED_MOAT;
-                    lev->typ = lava ? ROOM : ICE;
+                    if (lavawall) {
+                        if ((isok(x, y-1) && IS_WALL(levl[x][y-1].typ))
+                            || (isok(x, y+1) && IS_WALL(levl[x][y+1].typ)))
+                            lev->typ = VWALL;
+                        else
+                            lev->typ = HWALL;
+                        fix_wall_spines(max(0,x-1), max(0,y-1),
+                                        min(COLNO,x+1), min(ROWNO,y+1));
+                    } else {
+                        lev->typ = lava ? ROOM : ICE;
+                    }
                 }
                 bury_objs(x, y);
                 if (!lava) {
