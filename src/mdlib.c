@@ -116,7 +116,7 @@ static struct win_information window_opts[] = {
 #ifdef MSDOS
       "traditional text with optional 'tiles' graphics",
 #else
-      /* assume that one or more of IBMgraphics, DECgraphics, or MACgraphics
+      /* assume that one or more of IBMgraphics, DECgraphics
          can be enabled; we can't tell from here whether that is accurate */
       "traditional text with optional line-drawing",
 #endif

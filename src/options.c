@@ -1808,49 +1808,6 @@ optfn_IBMgraphics(int optidx, int req, boolean negated,
     return optn_ok;
 }
 
-#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
-static int
-optfn_MACgraphics(int optidx, int req, boolean negated, char *opts, char *op)
-{
-    boolean badflag = FALSE;
-
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        /* "MACgraphics" */
-        if (!negated) {
-            if (gs.symset[PRIMARYSET].name) {
-                badflag = TRUE;
-            } else {
-                gs.symset[PRIMARYSET].name = dupstr(allopt[optidx].name);
-                if (!read_sym_file(PRIMARYSET)) {
-                    badflag = TRUE;
-                    clear_symsetentry(PRIMARYSET, TRUE);
-                }
-            }
-            if (badflag) {
-                config_error_add("Failure to load symbol set %s.",
-                                 allopt[optidx].name);
-                return FALSE;
-            } else {
-                switch_symbols(TRUE);
-                if (!go.opt_initial && Is_rogue_level(&u.uz))
-                    assign_graphics(ROGUESET);
-            }
-        }
-        return optn_ok;
-    }
-    if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
-}
-#endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
-
 static int
 optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
 {

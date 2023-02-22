@@ -1832,9 +1832,6 @@ the first letter of the command.
 .pg
 On \fIWindows\fP and \fIMS-DOS\fP,
 the \(lqAlt\(rq key can be used in this fashion.
-.\" On the \fIAmiga\fP, set the
-.\" .op altmeta
-.\" option to get this behavior.
 On other systems, if typing \(lqAlt\(rq plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
@@ -4842,11 +4839,7 @@ to customize and change the port behavior.
 Select an alternate way to handle keystrokes (Win32 tty NetHack only).
 The name of the handling type is one of \(lqdefault\(rq, \(lqray\(rq,
 \(lq340\(rq.
-.\" .lp "altmeta "
-.\" On Amiga, this option controls whether typing \(lqAlt\(rq plus another key
-.\" functions as a meta-shift for that key (default on).
 .lp "altmeta "
-.\" On other (non-Amiga) systems where this option is available, it can be
 On systems where this option is available, it can be
 set to tell NetHack to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
@@ -4866,12 +4859,6 @@ Use BIOS calls to update the screen
 display quickly and to read the keyboard (allowing the use of arrow
 keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
 OS/2, PC, and ST NetHack only).
-.lp flush
-(default off, Amiga NetHack only).
-.lp MACgraphics
-(default on, Mac NetHack only).
-.lp page_wait
-(default on, Mac NetHack only).
 .lp "rawio   "
 Force raw (non-cbreak) mode for faster output and more
 bulletproof input (MS-DOS sometimes treats \(oq\(haP\(cq as a printer toggle
@@ -6289,7 +6276,7 @@ various
 flavors and maintained the X11 interface.
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
-maintained the port of NetHack 3.6 for Mac OSX.
+maintained the port of NetHack 3.6 for MacOS.
 .pg
 \fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBart House\fP,
 \fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,

@@ -293,11 +293,6 @@ struct instance_flags {
 #if defined(MICRO) || defined(WIN32)
     boolean rawio; /* whether can use rawio (IOCTL call) */
 #endif
-#ifdef MAC_GRAPHICS_ENV
-    boolean MACgraphics; /* use Macintosh extended character set, as
-                            as defined in the special font HackFont */
-    unsigned use_stone;  /* use the stone ppats */
-#endif
 #if defined(MSDOS) || defined(WIN32)
     boolean tile_view;
     boolean over_view;
