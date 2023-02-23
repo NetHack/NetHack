@@ -409,7 +409,6 @@ spells that require a target spot rather than a direction (like skilled
 prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
-curses interface failed to honor menu_xxx option settings for menu interaction
 during engraving, spaces were counted instead of non-spaces [later: affected
 	code is gone, removed when engraving was converted into an occupation]
 when an explosion scatters objects, make any that fly over sinks stop there
@@ -1586,6 +1585,7 @@ curses: sometimes entering a count during menu selection caused the menu to
 	more digits typed followed by non-digit); in-out menu was still active
 	but no longer displayed
 curses: support backspace/delete when entering a count during menu selection
+curses: was failing to honor menu_xxx option settings for menu interaction
 curses: make extended command prompt behave more sensibly
 curses: if a menu of objects contains at least one iron ball, and player is
 	not already in the midst of entering a count, recognize '0' as a
@@ -1593,6 +1593,9 @@ curses: if a menu of objects contains at least one iron ball, and player is
 curses: obey timed_delay option
 curses: support tty-style extended role/race/&c selection at start of new game
 curses: implement mark_synch() and wait_synch()
+curses: only convert arrow keys to hjkl or 4286 if nethack wants a direction
+curses: conversion of arrows and other numpad-related function keys to digit
+	ignored phone-layout setting (inverted up/down) of the num_pad option
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project

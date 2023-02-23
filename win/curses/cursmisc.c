@@ -863,13 +863,16 @@ Currently this is limited to arrow keys, but this may be expanded. */
 int
 curses_convert_keys(int key)
 {
+    boolean reject = !gp.program_state.getting_a_command,
+            as_is = FALSE;
     int ret = key;
 
     if (ret == '\033') {
         ret = parse_escape_sequence();
     }
 
-    /* Handle arrow keys */
+    /* Handle arrow and keypad keys, but only when getting a command
+       (or a command-like keystroke for getpos() or getdir()). */
     switch (key) {
     case KEY_BACKSPACE:
         /* we can't distinguish between a separate backspace key and
@@ -877,96 +880,82 @@ curses_convert_keys(int key)
            a value for ^H greater than 255 is passed back to core's
            readchar() and stripping the value down to 0..255 yields ^G! */
         ret = C('H');
+        /*FALLTHRU*/
+    default:
+        /* use key as-is unless it's out of normal char range */
+        reject = ((uchar) ret < 1 || ret > 255);
+        as_is = TRUE;
         break;
 #ifdef KEY_B1
     case KEY_B1:
 #endif
     case KEY_LEFT:
-        if (iflags.num_pad) {
-            ret = '4';
-        } else {
-            ret = 'h';
-        }
+        ret = iflags.num_pad ? '4' : 'h';
         break;
 #ifdef KEY_B3
     case KEY_B3:
 #endif
     case KEY_RIGHT:
-        if (iflags.num_pad) {
-            ret = '6';
-        } else {
-            ret = 'l';
-        }
+        ret = iflags.num_pad ? '6' : 'l';
         break;
 #ifdef KEY_A2
     case KEY_A2:
 #endif
     case KEY_UP:
-        if (iflags.num_pad) {
-            ret = '8';
-        } else {
-            ret = 'k';
-        }
+        ret = iflags.num_pad ? '8' : 'k';
         break;
 #ifdef KEY_C2
     case KEY_C2:
 #endif
     case KEY_DOWN:
-        if (iflags.num_pad) {
-            ret = '2';
-        } else {
-            ret = 'j';
-        }
+        ret = iflags.num_pad ? '2' : 'j';
         break;
 #ifdef KEY_A1
     case KEY_A1:
 #endif
     case KEY_HOME:
-        if (iflags.num_pad) {
-            ret = '7';
-        } else {
-            ret = !gc.Cmd.swap_yz ? 'y' : 'z';
-        }
+        ret = iflags.num_pad ? '7' : (!gc.Cmd.swap_yz ? 'y' : 'z');
         break;
 #ifdef KEY_A3
     case KEY_A3:
 #endif
     case KEY_PPAGE:
-        if (iflags.num_pad) {
-            ret = '9';
-        } else {
-            ret = 'u';
-        }
+        ret = iflags.num_pad ? '9' : 'u';
         break;
 #ifdef KEY_C1
     case KEY_C1:
 #endif
     case KEY_END:
-        if (iflags.num_pad) {
-            ret = '1';
-        } else {
-            ret = 'b';
-        }
+        ret = iflags.num_pad ? '1' : 'b';
         break;
 #ifdef KEY_C3
     case KEY_C3:
 #endif
     case KEY_NPAGE:
-        if (iflags.num_pad) {
-            ret = '3';
-        } else {
-            ret = 'n';
-        }
+        ret = iflags.num_pad ? '3' : 'n';
         break;
 #ifdef KEY_B2
     case KEY_B2:
-        if (iflags.num_pad) {
-            ret = '5';
-        } else {
-            ret = 'g';
-        }
+        ret = iflags.num_pad ? '5' : 'g';
         break;
 #endif /* KEY_B2 */
+    }
+
+    /* phone layout is inverted, 123 on top and 789 on bottom; if player has
+       set num_pad to deal with that, we need to invert here too but only
+       when some key has been converted into a digit, not for actual digit */
+    if (iflags.num_pad && (iflags.num_pad_mode & 2) != 0 && !as_is) {
+        if (ret >= '1' && ret <= '3')
+            ret += 6; /* 1,2,3 -> 7,8,9 */
+        else if (ret >= '7' && ret <= '9')
+            ret -= 6; /* 7,8,9 -> 1,2,3 */
+    }
+
+    if (reject) {
+        /* an arrow or function key has been pressed during text entry */
+        beep();   /* not curses_nhbell() because it might end up getting
+                   * changed to deliver a sound effect */
+        ret = 0;  /* this ends up behaving like <escape> */
     }
 
     return ret;
@@ -1065,11 +1054,11 @@ parse_escape_sequence(void)
     ret = getch();
 
     if (ret != ERR) {           /* Likely an escape sequence */
-        if (((ret >= 'a') && (ret <= 'z')) || ((ret >= '0') && (ret <= '9'))) {
+        if ((ret >= 'a' && ret <= 'z') || (ret >= '0' && ret <= '9')) {
             ret |= 0x80;        /* Meta key support for most terminals */
         } else if (ret == 'O') {        /* Numeric keypad */
             ret = getch();
-            if ((ret != ERR) && (ret >= 112) && (ret <= 121)) {
+            if (ret != ERR && ret >= 112 && ret <= 121) {
                 ret = ret - 112 + '0';  /* Convert to number */
             } else {
                 ret = '\033';   /* Escape */
