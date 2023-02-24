@@ -481,6 +481,49 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
+LUA_FILES = $(DAT)\air.lua  $(DAT)\Arc-fila.lua $(DAT)\Arc-filb.lua \
+	$(DAT)\Arc-goal.lua $(DAT)\Arc-loca.lua $(DAT)\Arc-strt.lua \
+	$(DAT)\asmodeus.lua $(DAT)\astral.lua   $(DAT)\baalz.lua \
+	$(DAT)\Bar-fila.lua $(DAT)\Bar-filb.lua $(DAT)\Bar-goal.lua \
+	$(DAT)\Bar-loca.lua $(DAT)\Bar-strt.lua $(DAT)\bigrm-1.lua \
+	$(DAT)\bigrm-10.lua $(DAT)\bigrm-11.lua $(DAT)\bigrm-2.lua \
+	$(DAT)\bigrm-3.lua  $(DAT)\bigrm-4.lua  $(DAT)\bigrm-5.lua \
+	$(DAT)\bigrm-6.lua  $(DAT)\bigrm-7.lua  $(DAT)\bigrm-8.lua \
+	$(DAT)\bigrm-9.lua  $(DAT)\castle.lua   $(DAT)\Cav-fila.lua \
+	$(DAT)\Cav-filb.lua $(DAT)\Cav-goal.lua $(DAT)\Cav-loca.lua \
+	$(DAT)\Cav-strt.lua $(DAT)\dungeon.lua  $(DAT)\earth.lua \
+	$(DAT)\fakewiz1.lua $(DAT)\fakewiz2.lua $(DAT)\fire.lua \
+	$(DAT)\Hea-fila.lua $(DAT)\Hea-filb.lua $(DAT)\Hea-goal.lua \
+	$(DAT)\Hea-loca.lua $(DAT)\Hea-strt.lua $(DAT)\hellfill.lua \
+	$(DAT)\juiblex.lua  $(DAT)\Kni-fila.lua $(DAT)\Kni-filb.lua \
+	$(DAT)\Kni-goal.lua $(DAT)\Kni-loca.lua $(DAT)\Kni-strt.lua \
+	$(DAT)\knox.lua     $(DAT)\medusa-1.lua $(DAT)\medusa-2.lua \
+	$(DAT)\medusa-3.lua $(DAT)\medusa-4.lua $(DAT)\minefill.lua \
+	$(DAT)\minend-1.lua $(DAT)\minend-2.lua $(DAT)\minend-3.lua \
+	$(DAT)\minetn-1.lua $(DAT)\minetn-2.lua $(DAT)\minetn-3.lua \
+	$(DAT)\minetn-4.lua $(DAT)\minetn-5.lua $(DAT)\minetn-6.lua \
+	$(DAT)\minetn-7.lua $(DAT)\Mon-fila.lua $(DAT)\Mon-filb.lua \
+	$(DAT)\Mon-goal.lua $(DAT)\Mon-loca.lua $(DAT)\Mon-strt.lua \
+	$(DAT)\nhcore.lua   $(DAT)\nhlib.lua    $(DAT)\oracle.lua \
+	$(DAT)\orcus.lua    $(DAT)\Pri-fila.lua $(DAT)\Pri-filb.lua \
+	$(DAT)\Pri-goal.lua $(DAT)\Pri-loca.lua $(DAT)\Pri-strt.lua \
+	$(DAT)\quest.lua    $(DAT)\Ran-fila.lua $(DAT)\Ran-filb.lua \
+	$(DAT)\Ran-goal.lua $(DAT)\Ran-loca.lua $(DAT)\Ran-strt.lua \
+	$(DAT)\Rog-fila.lua $(DAT)\Rog-filb.lua $(DAT)\Rog-goal.lua \
+	$(DAT)\Rog-loca.lua $(DAT)\Rog-strt.lua $(DAT)\Sam-fila.lua \
+	$(DAT)\Sam-filb.lua $(DAT)\Sam-goal.lua $(DAT)\Sam-loca.lua \
+	$(DAT)\Sam-strt.lua $(DAT)\sanctum.lua  $(DAT)\soko1-1.lua \
+	$(DAT)\soko1-2.lua  $(DAT)\soko2-1.lua  $(DAT)\soko2-2.lua \
+	$(DAT)\soko3-1.lua  $(DAT)\soko3-2.lua  $(DAT)\soko4-1.lua \
+	$(DAT)\soko4-2.lua  $(DAT)\themerms.lua $(DAT)\Tou-fila.lua \
+	$(DAT)\Tou-filb.lua $(DAT)\Tou-goal.lua $(DAT)\Tou-loca.lua \
+	$(DAT)\Tou-strt.lua $(DAT)\tower1.lua   $(DAT)\tower2.lua \
+	$(DAT)\tower3.lua   $(DAT)\Val-fila.lua $(DAT)\Val-filb.lua \
+	$(DAT)\Val-goal.lua $(DAT)\Val-loca.lua $(DAT)\Val-strt.lua \
+	$(DAT)\valley.lua   $(DAT)\water.lua    $(DAT)\Wiz-fila.lua \
+	$(DAT)\Wiz-filb.lua $(DAT)\Wiz-goal.lua $(DAT)\Wiz-loca.lua \
+	$(DAT)\Wiz-strt.lua $(DAT)\wizard1.lua  $(DAT)\wizard2.lua \
+	$(DAT)\wizard3.lua
 #
 # Utility Objects.
 #
@@ -1716,7 +1759,7 @@ $(OGUI)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(DAT)\quest.lua \
+nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(LUA_FILES) \
 	$(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\optmenu $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute

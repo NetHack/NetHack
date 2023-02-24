@@ -680,7 +680,7 @@ $(DAT)/epitaph: $(DAT)/bogusmon
 $(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/epitaph.txt
 	$< -s
 
-$(DLBLST): | $(DAT_CLEAN) $(DAT_NOCLEAN)
+$(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo data > $(DLBLST)
 	echo oracles >> $(DLBLST)
 	echo options >> $(DLBLST)
@@ -840,6 +840,35 @@ ifneq "$(FMOD_MISSING)" ""
 $(error Error: Cannot proceed with fmod integration included)
 endif
 endif
+
+#===========================================
+# Lua level files, dungeon file, quest files
+#===========================================
+
+LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
+	asmodeus astral baalz Bar-fila Bar-filb Bar-goal \
+	Bar-loca Bar-strt bigrm-1 bigrm-10 bigrm-11 bigrm-2 \
+	bigrm-3 bigrm-4 bigrm-5 bigrm-6 bigrm-7 bigrm-8 \
+	bigrm-9 castle Cav-fila Cav-filb Cav-goal Cav-loca \
+	Cav-strt dungeon earth fakewiz1 fakewiz2 fire \
+	Hea-fila Hea-filb Hea-goal Hea-loca Hea-strt hellfill \
+	juiblex Kni-fila Kni-filb Kni-goal Kni-loca Kni-strt \
+	knox medusa-1 medusa-2 medusa-3 medusa-4 minefill \
+	minend-1 minend-2 minend-3 minetn-1 minetn-2 minetn-3 \
+	minetn-4 minetn-5 minetn-6 minetn-7 Mon-fila Mon-filb \
+	Mon-goal Mon-loca Mon-strt nhcore nhlib oracle \
+	orcus Pri-fila Pri-filb Pri-goal Pri-loca Pri-strt \
+	quest Ran-fila Ran-filb Ran-goal Ran-loca Ran-strt \
+	Rog-fila Rog-filb Rog-goal Rog-loca Rog-strt Sam-fila \
+	Sam-filb Sam-goal Sam-loca Sam-strt sanctum soko1-1 \
+	soko1-2 soko2-1 soko2-2 soko3-1 soko3-2 soko4-1 \
+	soko4-2 themerms Tou-fila Tou-filb Tou-goal Tou-loca \
+	Tou-strt tower1 tower2 tower3 Val-fila Val-filb \
+	Val-goal Val-loca Val-strt valley water Wiz-fila \
+	Wiz-filb Wiz-goal Wiz-loca Wiz-strt wizard1 wizard2 \
+	wizard3
+
+LUAFILES = $(addprefix $(DAT)/, $(addsuffix .lua, $(LUALIST)))
 
 #==========================================
 # Soundlib Support
