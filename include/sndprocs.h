@@ -139,6 +139,13 @@ enum instruments_broad {
 };
 #endif
 
+/*
+ * When adding entries to this enum list, please also add an entry to the
+ * soundeffect_automapping table in src/sounds.c, so that a soundlib that
+ * supports SND_SOUNDEFFECTS_AUTOMAP can locate a file meant to be mapped
+ * to the soundeffect.
+ */
+
 enum sound_effect_entries {
     se_zero_invalid                   = 0,
     se_faint_splashing                = 1,
