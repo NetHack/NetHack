@@ -243,6 +243,7 @@
     <ClInclude Include="$(IncDir)rm.h" />
     <ClInclude Include="$(IncDir)skills.h" />
     <ClInclude Include="$(IncDir)sndprocs.h" />
+    <ClInclude Include="$(IncDir)seffects.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
     <ClInclude Include="$(IncDir)sym.h" />

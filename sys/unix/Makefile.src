@@ -547,9 +547,9 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sndprocs.h sys.h system.h tcap.h timeout.h tradstdc.h \
-	trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h winX.h \
-	winprocs.h wintype.h you.h youprop.h
+	spell.h sndprocs.h seffects.h sys.h system.h tcap.h timeout.h \
+	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
+	winX.h winprocs.h wintype.h you.h youprop.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 
@@ -815,11 +815,12 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/context.h ../include/rm.h ../include/botl.h \
 		../include/rect.h ../include/region.h ../include/trap.h \
 		../include/display.h ../include/vision.h ../include/color.h \
-		../include/sndprocs.h ../include/decl.h ../include/quest.h \
-		../include/spell.h ../include/obj.h ../include/engrave.h \
-		../include/you.h ../include/attrib.h ../include/monst.h \
-		../include/mextra.h ../include/skills.h ../include/timeout.h \
-		../include/flag.h ../include/winprocs.h ../include/sys.h
+		../include/sndprocs.h ../include/seffects.h ../include/decl.h \
+		../include/quest.h ../include/spell.h ../include/obj.h \
+		../include/engrave.h ../include/you.h ../include/attrib.h \
+		../include/monst.h ../include/mextra.h ../include/skills.h \
+		../include/timeout.h ../include/flag.h ../include/winprocs.h \
+		../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -1121,10 +1122,10 @@ $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/monsters.h ../include/objclass.h \
 		../include/defsym.h ../include/objects.h ../include/wintype.h \
 		../include/sym.h ../include/artilist.h ../include/dungeon.h \
-		../include/sndprocs.h ../include/obj.h ../include/monst.h \
-		../include/mextra.h ../include/you.h ../include/attrib.h \
-		../include/prop.h ../include/skills.h ../include/context.h \
-		../include/flag.h ../include/dlb.h
+		../include/sndprocs.h ../include/seffects.h ../include/obj.h \
+		../include/monst.h ../include/mextra.h ../include/you.h \
+		../include/attrib.h ../include/prop.h ../include/skills.h \
+		../include/context.h ../include/flag.h ../include/dlb.h
 $(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)minion.o: minion.c $(HACK_H)
