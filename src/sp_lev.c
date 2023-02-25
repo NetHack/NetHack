@@ -3712,6 +3712,12 @@ lspo_level_flags(lua_State *L)
             gl.level.flags.temperature = 1;
         else if (!strcmpi(s, "cold"))
             gl.level.flags.temperature = -1;
+        else if (!strcmpi(s, "nomongen"))
+            gl.level.flags.rndmongen = 0;
+        else if (!strcmpi(s, "nodeathdrops"))
+            gl.level.flags.deathdrops = 0;
+        else if (!strcmpi(s, "noautosearch"))
+            gl.level.flags.noautosearch = 1;
         else {
             char buf[BUFSZ];
             Sprintf(buf, "Unknown level flag %s", s);
@@ -3783,6 +3789,9 @@ lspo_engraving(lua_State *L)
     long ecoord;
     coordxy x = -1, y = -1;
     int argc = lua_gettop(L);
+    boolean guardobjs = FALSE;
+    boolean wipeout = TRUE;
+    struct engr *ep;
 
     create_des_coder();
 
@@ -3795,6 +3804,8 @@ lspo_engraving(lua_State *L)
         y = ey;
         etyp = engrtypes2i[get_table_option(L, "type", "engrave", engrtypes)];
         txt = get_table_str(L, "text");
+        wipeout = get_table_boolean_opt(L, "degrade", TRUE);
+        guardobjs = get_table_boolean_opt(L, "guardobjects", FALSE);
     } else if (argc == 3) {
         lua_Integer ex, ey;
         (void) get_coord(L, 1, &ex, &ey);
@@ -3814,6 +3825,11 @@ lspo_engraving(lua_State *L)
     get_location_coord(&x, &y, DRY, gc.coder->croom, ecoord);
     make_engr_at(x, y, txt, 0L, etyp);
     Free(txt);
+    ep = engr_at(x, y);
+    if (ep) {
+        ep->guardobjects = guardobjs;
+        ep->nowipeout = !wipeout;
+    }
     return 0;
 }
 
@@ -6826,6 +6842,8 @@ sp_level_coder_init(void)
 
     gl.level.flags.is_maze_lev = 0;
     gl.level.flags.temperature = In_hell(&u.uz) ? 1 : 0;
+    gl.level.flags.rndmongen = 1;
+    gl.level.flags.deathdrops = 1;
 
     reset_xystart_size();
 

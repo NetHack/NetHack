@@ -355,6 +355,8 @@ struct you {
     d_level uz, uz0;    /* your level on this and the previous turn */
     d_level utolev;     /* level monster teleported you to, or uz */
     uchar utotype;      /* bitmask of goto_level() flags for utolev */
+    d_level ucamefrom;  /* level where you came from; used for tutorial */
+    boolean nofollowers; /* level change ignores monster followers/pets */
     boolean umoved;     /* changed map location (post-move) */
     int last_str_turn;  /* 0: none, 1: half turn, 2: full turn
                          * +: turn right, -: turn left */

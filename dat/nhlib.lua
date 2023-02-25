@@ -174,3 +174,55 @@ function table_stringify(tbl)
    -- pline("table_stringify:(%s)", str);
    return "{" .. str .. "}";
 end
+
+--
+-- TUTORIAL
+--
+
+-- extended commands available in tutorial
+local tutorial_whitelist_commands = {
+   ["movesouth"] = true,
+   ["movenorth"] = true,
+   ["moveeast"]  = true,
+   ["movewest"]  = true,
+   ["movesoutheast"] = true,
+   ["movenorthwest"] = true,
+   ["movenortheast"]  = true,
+   ["movesouthwest"]  = true,
+   ["kick"] = true,
+   ["search"] = true,
+   ["pickup"] = true,
+   ["wear"] = true,
+   ["wield"] = true,
+   -- ["save"] = true,
+};
+
+function tutorial_cmd_before(cmd)
+   -- nh.pline("TUT:cmd_before:" .. cmd);
+
+   if (tutorial_whitelist_commands[cmd]) then
+      return true;
+   else
+      return false;
+   end
+end
+
+function tutorial_enter()
+   -- nh.pline("TUT:enter");
+   nh.gamestate();
+end
+
+function tutorial_leave()
+   -- nh.pline("TUT:leave");
+
+   -- remove the tutorial level callbacks
+   nh.callback("cmd_before", "tutorial_cmd_before", true);
+   nh.callback("level_enter", "tutorial_enter", true);
+   nh.callback("level_leave", "tutorial_leave", true);
+   nh.callback("end_turn", "tutorial_turn", true);
+   nh.gamestate(true);
+end
+
+function tutorial_turn()
+   -- nh.pline("TUT:turn");
+end

@@ -19,7 +19,7 @@ typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(maze_like, 1);  /* is this a maze? */
     Bitfield(rogue_like, 1); /* is this an old-fashioned presentation? */
     Bitfield(align, 3);      /* dungeon alignment. */
-    Bitfield(unused, 1);     /* etc... */
+    Bitfield(unconnected, 1); /* dungeon not connected to any branch */
 } d_flags;
 
 typedef struct s_level { /* special dungeon level element */

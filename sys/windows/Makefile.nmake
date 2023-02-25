@@ -523,7 +523,7 @@ LUA_FILES = $(DAT)\air.lua  $(DAT)\Arc-fila.lua $(DAT)\Arc-filb.lua \
 	$(DAT)\valley.lua   $(DAT)\water.lua    $(DAT)\Wiz-fila.lua \
 	$(DAT)\Wiz-filb.lua $(DAT)\Wiz-goal.lua $(DAT)\Wiz-loca.lua \
 	$(DAT)\Wiz-strt.lua $(DAT)\wizard1.lua  $(DAT)\wizard2.lua \
-	$(DAT)\wizard3.lua
+	$(DAT)\wizard3.lua  $(DAT)\tut-1.lua
 #
 # Utility Objects.
 #

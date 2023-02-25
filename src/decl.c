@@ -45,6 +45,14 @@ const int shield_static[SHIELD_COUNT] = {
     S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
 };
 
+const char * const nhcb_name[NUM_NHCB] = {
+    "cmd_before",
+    "level_enter",
+    "level_leave",
+    "end_turn",
+};
+
+int nhcb_counts[NUM_NHCB] = DUMMY;
 
 NEARDATA const struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",

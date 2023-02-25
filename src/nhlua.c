@@ -36,6 +36,9 @@ static int nhl_timer_has_at(lua_State *);
 static int nhl_timer_peek_at(lua_State *);
 static int nhl_timer_stop_at(lua_State *);
 static int nhl_timer_start_at(lua_State *);
+static int nhl_get_cmd_key(lua_State *);
+static int nhl_callback(lua_State *);
+static int nhl_gamestate(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static char splev_typ2chr(schar);
@@ -1474,6 +1477,140 @@ nhl_timer_start_at(lua_State *L)
     return 0;
 }
 
+/* returns the visual interpretation of the key bound to an extended command,
+   or the ext cmd name if not bound to any key */
+/* local helpkey = eckey("help"); */
+static int
+nhl_get_cmd_key(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        const char *cmd = luaL_checkstring(L, 1);
+        char *key = cmd_from_ecname(cmd);
+
+        lua_pushstring(L, key);
+        return 1;
+    }
+
+    return 0;
+}
+
+/* add or remove a lua function callback */
+/* callback("level_enter", "function_name"); */
+/* callback("level_enter", "function_name", true); */
+/* level_enter, level_leave, cmd_before */
+static int
+nhl_callback(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    int i;
+
+    if (argc == 2) {
+        const char *fn = luaL_checkstring(L, -1);
+        const char *cb = luaL_checkstring(L, -2);
+
+        if (!gl.luacore) {
+            nhl_error(L, "nh luacore not inited");
+            /*NOTREACHED*/
+            return 0;
+        }
+
+        for (i = 0; i < NUM_NHCB; i++)
+            if (!strcmp(cb, nhcb_name[i]))
+                break;
+
+        if (i >= NUM_NHCB)
+            return 0;
+
+        nhcb_counts[i]++;
+
+        lua_getglobal(gl.luacore, "nh_callback_set");
+        lua_pushstring(gl.luacore, cb);
+        lua_pushstring(gl.luacore, fn);
+        nhl_pcall(gl.luacore, 2, 0);
+    } else if (argc == 3) {
+        boolean rm = lua_toboolean(L, -1);
+        const char *fn = luaL_checkstring(L, -2);
+        const char *cb = luaL_checkstring(L, -3);
+
+        if (!gl.luacore) {
+            nhl_error(L, "nh luacore not inited");
+            /*NOTREACHED*/
+            return 0;
+        }
+
+        for (i = 0; i < NUM_NHCB; i++)
+            if (!strcmp(cb, nhcb_name[i]))
+                break;
+
+        if (i >= NUM_NHCB)
+            return 0;
+
+        if (rm) {
+            nhcb_counts[i]--;
+            if (nhcb_counts[i] < 0)
+                impossible("nh.callback counts are wrong");
+        } else {
+            nhcb_counts[i]++;
+        }
+
+        lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
+        lua_pushstring(gl.luacore, cb);
+        lua_pushstring(gl.luacore, fn);
+        nhl_pcall(gl.luacore, 2, 0);
+    }
+
+    return 0;
+}
+
+/* store or restore game state */
+/* NOTE: doesn't work when saving/restoring the game */
+/* currently handles inventory and turns. */
+/* gamestate(); -- save state */
+/* gamestate(true); -- restore state */
+static int
+nhl_gamestate(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    boolean reststate = argc > 0 ? lua_toboolean(L, -1) : FALSE;
+    static struct obj *invent = NULL;
+    static long moves = 0;
+    static boolean stored = FALSE;
+
+    if (reststate && stored) {
+        /* restore game state */
+        gm.moves = moves;
+        while (gi.invent)
+            useupall(gi.invent);
+        while (invent) {
+            struct obj *otmp = invent;
+            long wornmask = otmp->owornmask;
+            otmp->owornmask = 0L;
+            extract_nobj(otmp, &invent);
+            addinv(otmp);
+            if (wornmask)
+                setworn(otmp, wornmask);
+        }
+        stored = FALSE;
+    } else {
+        /* store game state */
+        while (gi.invent) {
+            struct obj *otmp = gi.invent;
+            long wornmask = otmp->owornmask;
+            setnotworn(otmp);
+            freeinv(otmp);
+            otmp->nobj = invent;
+            otmp->owornmask = wornmask;
+            invent = otmp;
+        }
+        moves = gm.moves;
+        stored = TRUE;
+    }
+    update_inventory();
+    return 0;
+}
+
 RESTORE_WARNING_UNREACHABLE_CODE
 
 static const struct luaL_Reg nhl_functions[] = {
@@ -1499,6 +1636,9 @@ static const struct luaL_Reg nhl_functions[] = {
     {"menu", nhl_menu},
     {"text", nhl_text},
     {"getlin", nhl_getlin},
+    {"eckey", nhl_get_cmd_key},
+    {"callback", nhl_callback},
+    {"gamestate", nhl_gamestate},
 
     {"makeplural", nhl_makeplural},
     {"makesingular", nhl_makesingular},

@@ -296,8 +296,8 @@ wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
 {
     register struct engr *ep = engr_at(x, y);
 
-    /* Headstones are indelible */
-    if (ep && ep->engr_type != HEADSTONE) {
+    /* Headstones and some specially marked engravings are indelible */
+    if (ep && ep->engr_type != HEADSTONE && !ep->nowipeout) {
         debugpline1("asked to erode %d characters", cnt);
         if (ep->engr_type != BURN || is_ice(x, y) || (magical && !rn2(2))) {
             if (ep->engr_type != DUST && ep->engr_type != ENGR_BLOOD) {

@@ -389,6 +389,10 @@ struct levelflags {
                                   normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
                                   rather than ROOM */
+    Bitfield(rndmongen, 1);    /* random monster generation allowed? */
+    Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+    Bitfield(noautosearch, 1); /* automatic searching disabled */
+
     schar temperature;         /* +1 == hot, -1 == cold */
 };
 

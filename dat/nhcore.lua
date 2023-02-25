@@ -14,6 +14,45 @@ function get_variables_string()
    return "nh_lua_variables=" .. table_stringify(nh_lua_variables) .. ";";
 end
 
+function nh_callback_set(cb, fn)
+   local cbname = "_CB_" .. cb;
+
+   -- pline("callback_set(%s,%s)", cb, fn);
+
+   if (type(nh_lua_variables[cbname]) ~= "table") then
+      nh_lua_variables[cbname] = {};
+   end
+   nh_lua_variables[cbname][fn] = true;
+end
+
+function nh_callback_rm(cb, fn)
+   local cbname = "_CB_" .. cb;
+
+   -- pline("callback_RM(%s,%s)", cb, fn);
+
+   if (type(nh_lua_variables[cbname]) ~= "table") then
+      nh_lua_variables[cbname] = {};
+   end
+   nh_lua_variables[cbname][fn] = nil;
+end
+
+function nh_callback_run(cb, ...)
+   local cbname = "_CB_" .. cb;
+
+   -- pline("callback_run(%s)", cb);
+   -- pline("TYPE:%s", type(nh_lua_variables[cbname]));
+
+   if (type(nh_lua_variables[cbname]) ~= "table") then
+      nh_lua_variables[cbname] = {};
+   end
+   for k, v in pairs(nh_lua_variables[cbname]) do
+      if (not _G[k](table.unpack{...})) then
+         return false;
+      end
+   end
+   return true;
+end
+
 -- This is an example of generating an external file during gameplay,
 -- which is updated periodically.
 -- Intended for public servers using dgamelaunch as their login manager.

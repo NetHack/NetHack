@@ -4546,6 +4546,9 @@ Persistent.
 ." .lp travel_debug
 ." Display intended path during each step of travel (default off).
 ." Debug mode only.
+.lp tutorial
+Play a tutorial level at the start of the game.
+Setting this option on or off in the config file will skip the query.
 .lp "verbose "
 Provide more commentary during the game (default on).  Persistent.
 .lp whatis_coord

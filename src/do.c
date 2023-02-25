@@ -1481,6 +1481,12 @@ goto_level(
     if (on_level(newlevel, &u.uz))
         return; /* this can happen */
 
+    if (gl.luacore && nhcb_counts[NHCB_LVL_LEAVE]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_LEAVE]);
+        nhl_pcall(gl.luacore, 1, 0);
+    }
+
     /* tethered movement makes level change while trapped feasible */
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
         buried_ball_to_punishment(); /* (before we save/leave old level) */
@@ -1511,7 +1517,8 @@ goto_level(
     set_ustuck((struct monst *) 0); /* clear u.ustuck and u.uswallow */
     set_uinwater(0); /* u.uinwater = 0 */
     u.uundetected = 0; /* not hidden, even if means are available */
-    keepdogs(FALSE);
+    if (!u.nofollowers)
+        keepdogs(FALSE);
     recalc_mapseen(); /* recalculate map overview before we leave the level */
     /*
      *  We no longer see anything on the level.  Make sure that this
@@ -1611,6 +1618,7 @@ goto_level(
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         register struct trap *ttrap;
+        struct stairway *stway;
 
         for (ttrap = gf.ftrap; ttrap; ttrap = ttrap->ntrap)
             if (ttrap->ttyp == MAGIC_PORTAL)
@@ -1623,6 +1631,9 @@ goto_level(
                    after already getting expelled once. The portal back
                    doesn't exist anymore - see expulsion(). */
                 u_on_rndspot(0);
+            } else if ((stway = stairway_find_dir(TRUE)) != 0) {
+                /* returning from tutorial via portal */
+                u_on_newpos(stway->sx, stway->sy);
             } else {
                 panic("goto_level: no corresponding portal!");
             }

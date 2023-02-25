@@ -24,7 +24,8 @@ struct engr {
                                 * against monsters when an object is present
                                 * even when hero isn't (so behaves similarly
                                 * to how Elbereth did in 3.4.3) */
-    /* 7 free bits */
+    Bitfield(nowipeout, 1);    /* this engraving will not degrade */
+    /* 6 free bits */
 };
 
 #define newengr(lth) \

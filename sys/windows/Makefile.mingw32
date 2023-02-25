@@ -443,7 +443,7 @@ LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
 	Tou-strt tower1 tower2 tower3 Val-fila Val-filb \
 	Val-goal Val-loca Val-strt valley water Wiz-fila \
 	Wiz-filb Wiz-goal Wiz-loca Wiz-strt wizard1 wizard2 \
-	wizard3
+	wizard3 tut-1
 
 LUAFILES = $(addprefix $(DAT)/, $(addsuffix .lua, $(LUALIST)))
 

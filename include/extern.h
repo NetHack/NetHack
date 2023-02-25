@@ -245,6 +245,7 @@ extern int domonability(void);
 extern const struct ext_func_tab *ext_func_tab_from_func(int(*)(void));
 extern char cmd_from_func(int(*)(void));
 extern char cmd_from_dir(int, int);
+extern char *cmd_from_ecname(const char *);
 extern const char *cmdname_from_func(int(*)(void), char *, boolean);
 extern boolean redraw_cmd(char);
 extern const char *levltyp_to_name(int);
@@ -2008,6 +2009,7 @@ extern int shiny_obj(char);
 
 /* ### options.c ### */
 
+extern boolean ask_do_tutorial(void);
 extern boolean match_optname(const char *, const char *, int, boolean);
 extern uchar txt2key(char *);
 extern void initoptions(void);

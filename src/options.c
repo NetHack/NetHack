@@ -368,6 +368,52 @@ extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
 
+/* ask user if they want a tutorial, except if tutorial boolean option has been
+   set in config - either on or off - in which case just obey that setting
+   without asking. */
+boolean
+ask_do_tutorial(void)
+{
+    boolean dotut = flags.tutorial;
+
+    if (!opt_set_in_config[opt_tutorial]) {
+        winid win;
+        menu_item *sel;
+        anything any;
+        int n;
+
+        do {
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win, MENU_BEHAVE_STANDARD);
+            any = cg.zeroany;
+            any.a_char = 'y';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
+            any.a_char = 'n';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "No", MENU_ITEMFLAGS_NONE);
+
+            any = cg.zeroany;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "Put \"OPTIONS=notutorial\" in the config file to skip this query.", MENU_ITEMFLAGS_NONE);
+
+            end_menu(win, "Do you want a tutorial?");
+
+            n = select_menu(win, PICK_ONE, &sel);
+            destroy_nhwindow(win);
+        } while (n <= 0 && !gp.program_state.done_hup);
+        if (n > 0) {
+            dotut = (sel[0].item.a_char == 'y');
+            free((genericptr_t) sel);
+        }
+    }
+    return dotut;
+}
+
 /*
  **********************************
  *

@@ -714,9 +714,10 @@ get_dgn_flags(lua_State *L)
 {
     int dgn_flags = 0;
     static const char *const flagstrs[] = {
-        "town", "hellish", "mazelike", "roguelike", NULL
+        "town", "hellish", "mazelike", "roguelike", "unconnected", NULL
     };
-    static const int flagstrs2i[] = { TOWN, HELLISH, MAZELIKE, ROGUELIKE, 0 };
+    static const int flagstrs2i[] = { TOWN, HELLISH, MAZELIKE, ROGUELIKE,
+        UNCONNECTED, 0 };
 
     lua_getfield(L, -1, "flags");
     if (lua_type(L, -1) == LUA_TTABLE) {
@@ -1040,6 +1041,7 @@ init_dungeons(void)
         gd.dungeons[i].flags.maze_like = !!(dgn_flags & MAZELIKE);
         gd.dungeons[i].flags.rogue_like = !!(dgn_flags & ROGUELIKE);
         gd.dungeons[i].flags.align = dgn_align;
+        gd.dungeons[i].flags.unconnected = !!(dgn_flags & UNCONNECTED);
 
         /*
          * Set the entry level for this dungeon.  The entry value means:
@@ -1063,7 +1065,9 @@ init_dungeons(void)
             gd.dungeons[i].entry_lev = 1; /* defaults to top level */
         }
 
-        if (i) { /* set depth */
+        if (gd.dungeons[i].flags.unconnected) {
+            gd.dungeons[i].depth_start = 1;
+        } else if (i) { /* set depth */
             branch *br;
             schar from_depth;
             boolean from_up;

@@ -482,6 +482,15 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
 {
     int ecflags = extcmd->flags;
 
+    if (gl.luacore && nhcb_counts[NHCB_CMD_BEFORE]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_CMD_BEFORE]);
+        lua_pushstring(gl.luacore, extcmd->ef_txt);
+        nhl_pcall(gl.luacore, 2, 1);
+        if (!lua_toboolean(gl.luacore, -1))
+            return FALSE;
+    }
+
     if (!wizard && (ecflags & WIZMODECMD)) {
         pline(unavailcmd, extcmd->ef_txt);
         return FALSE;
@@ -3605,6 +3614,29 @@ cmd_from_func(int (*fn)(void))
     if (gc.Cmd.commands[' '] && gc.Cmd.commands[' ']->ef_funct == fn)
         return ' ';
     return '\0';
+}
+
+/* return visual interpretation of the key bound to extended command,
+   or the ext cmd name if not bound to any key. */
+char *
+cmd_from_ecname(const char *ecname)
+{
+    static char cmdnamebuf[QBUFSZ];
+    const struct ext_func_tab *extcmd;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (!strcmp(extcmd->ef_txt, ecname)) {
+            char key = cmd_from_func(extcmd->ef_funct);
+
+            if (key)
+                Sprintf(cmdnamebuf, "%s", visctrl(key));
+            else
+                Sprintf(cmdnamebuf, "#%s", ecname);
+            return cmdnamebuf;
+        }
+
+    cmdnamebuf[0] = '\0';
+    return cmdnamebuf;
 }
 
 static const char *

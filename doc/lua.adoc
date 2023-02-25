@@ -33,6 +33,26 @@ Example:
  local str = nh.an("unicorn");
 
 
+=== callback
+
+Add or remove a lua function to callback list.
+First argument is the callback list, second is the name of the lua function to be called.
+Two arguments adds the callback, if optional 3rd argument is true, removes the callback.
+Cannot add the same function to the same callback list does nothing.
+
+|===
+| cmd_before  | called before an extended command is executed. The command name is given as a parameter. If this function returns false, the command will not execute.
+| level_enter | called when hero enters the level for the first time.
+| level_leave | called when hero leaves the level.
+| end_turn    | called after player input is handled. May not be exact turn, if eg. hero is running or otherwise occupied.
+|===
+
+Example:
+
+ nh.callback("level_enter", "tutorial_enter");
+ nh.callback("level_enter", "tutorial_enter", true);
+
+
 === debug_flags
 
 Set debugging flags.
@@ -88,6 +108,16 @@ Only available if NetHack was compiled with DUMPLOG.
 Example:
 
  local filename = nh.dump_fmtstr("/tmp/nethack.%n.%d.log");
+
+
+=== eckey
+
+Return the key bound to an extended command, or the full extended
+command name, if it is not bound to any key.
+
+Example:
+
+ local k = nh.eckey("help");
 
 
 === getlin
@@ -482,6 +512,8 @@ Example:
 Create an engraving.
 
 * type is one of "dust", "engrave", "burn", "mark", or "blood".
+* optional boolean `degrade` defaults to true; engraving can degrade or be wiped out.
+* optional boolean `guardobjects` defaults to false (unless making a level and the text is "Elbereth"); are items on the engraving protected from monsters.
 
 Example:
 
@@ -579,6 +611,8 @@ Set flags for this level.
 | hot           | Level is hot. Dungeon flag "hellish" automatically sets this.
 | cold          | Level is cold.
 | temperate     | Level is neither hot nor cold.
+| nomongen      | Prevents random monster generation.
+| nodeathdrops  | Prevents killed monsters from dropping corpses or random death drops.
 |===
 
 Example:

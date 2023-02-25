@@ -524,6 +524,16 @@ enum nhcore_calls {
     NUM_NHCORE_CALLS
 };
 
+/* Lua callbacks. TODO: Merge with NHCORE */
+enum nhcb_calls {
+    NHCB_CMD_BEFORE = 0,
+    NHCB_LVL_ENTER,
+    NHCB_LVL_LEAVE,
+    NHCB_END_TURN,
+
+    NUM_NHCB
+};
+
 /* Macros for messages referring to hands, eyes, feet, etc... */
 enum bodypart_types {
     ARM       =  0,

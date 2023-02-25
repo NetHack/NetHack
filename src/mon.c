@@ -34,6 +34,7 @@ static void pacify_guard(struct monst *);
 
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
+     || !gl.level.flags.deathdrops    \
      || (gl.level.flags.graveyard && is_undead(mdat) && rn2(3)))
 
 /* A specific combination of x_monnam flags for livelogging. The livelog

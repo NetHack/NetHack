@@ -14,6 +14,7 @@
 
 static void moveloop_preamble(boolean);
 static void u_calc_moveamt(int);
+static void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -303,7 +304,7 @@ moveloop_core(void)
                     }
                 }
 
-                if (Searching && gm.multi >= 0)
+                if (!gl.level.flags.noautosearch && Searching && gm.multi >= 0)
                     (void) dosearch0(1);
                 if (Warning)
                     warnreveal();
@@ -498,12 +499,41 @@ moveloop_core(void)
         /* [should this be flush_screen() instead?] */
         display_nhwindow(WIN_MAP, FALSE);
     }
+
+    if (gl.luacore && nhcb_counts[NHCB_END_TURN]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_END_TURN]);
+        nhl_pcall(gl.luacore, 1, 0);
+    }
+}
+
+static void
+maybe_do_tutorial(void)
+{
+    s_level *sp = find_level("tut-1");
+
+    if (!sp)
+        return;
+
+    if (ask_do_tutorial()) {
+        assign_level(&u.ucamefrom, &u.uz);
+        u.nofollowers = TRUE;
+        schedule_goto(&sp->dlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        deferred_goto();
+        vision_recalc(0);
+        docrt();
+        u.nofollowers = FALSE;
+    }
 }
 
 void
 moveloop(boolean resuming)
 {
     moveloop_preamble(resuming);
+
+    if (!resuming)
+        maybe_do_tutorial();
+
     for (;;) {
         moveloop_core();
     }

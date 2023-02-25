@@ -245,6 +245,10 @@ extern const struct class_sym def_monsyms[MAXMCLASSES];
 /* current mon class symbols */
 extern uchar monsyms[MAXMCLASSES];
 
+/* lua callback queue names */
+extern const char * const nhcb_name[];
+extern int nhcb_counts[];
+
 #include "obj.h"
 extern NEARDATA struct obj *uarm, *uarmc, *uarmh, *uarms, *uarmg, *uarmf,
     *uarmu, /* under-wear, so to speak */

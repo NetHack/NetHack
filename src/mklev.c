@@ -1016,6 +1016,12 @@ makelevel(void)
     for (i = 0; i < gn.nroom; ++i) {
         fill_special_room(&gr.rooms[i]);
     }
+
+    if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_ENTER]);
+        nhl_pcall(gl.luacore, 1, 0);
+    }
 }
 
 /*
@@ -1518,6 +1524,9 @@ mktrap(
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
     if (t && (mktrapflags & MKTRAP_SEEN))
         t->tseen = TRUE;
+    if (kind == MAGIC_PORTAL && (u.ucamefrom.dnum || u.ucamefrom.dlevel)) {
+        assign_level(&t->dst, &u.ucamefrom);
+    }
 
     /* The hero isn't the only person who's entered the dungeon in
        search of treasure. On the very shallowest levels, there's a

@@ -1987,6 +1987,7 @@ add items given a Japanese name when playing as a Samurai to discoveries list
 make music improvisations more varied and interesting, as well as useful
 give a helpful tip when first entering "farlook" mode
 add a boolean option tips to disable all of the helpful tips
+add a tutorial level
 
 
 Platform- and/or Interface-Specific New Features

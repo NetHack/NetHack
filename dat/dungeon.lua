@@ -315,4 +315,15 @@ dungeon = {
          },
       }
    },
+   {
+      name = "The Tutorial",
+      base = 1,
+      flags = { "mazelike", "unconnected" },
+      levels = {
+         {
+            name = "tut-1",
+            base = 1,
+         },
+      }
+   },
 }
