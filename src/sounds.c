@@ -342,7 +342,7 @@ static const char *const h_sounds[] = {
     "eep",    "clatter", "hum",    "sizzle", "twitter", "wheeze",
     "rustle", "honk",    "lisp",   "yodel",  "coo",     "burp",
     "moo",    "boom",    "murmur", "oink",   "quack",   "rumble",
-    "twang",  "bellow",  "toot",   "gargle", "hoot",    "warble"
+    "twang",  "toot",    "gargle", "hoot",    "warble"
 };
 
 const char *
@@ -361,6 +361,9 @@ growl_sound(register struct monst* mtmp)
         break;
     case MS_ROAR:
         ret = "roar";
+        break;
+    case MS_BELLOW:
+        ret = "bellow";
         break;
     case MS_BUZZ:
         ret = "buzz";
@@ -580,6 +583,7 @@ maybe_gasp(struct monst* mon)
     case MS_GRUNT: /* ogres, trolls, gargoyles, one or two others */
     case MS_LAUGH: /* leprechaun, gremlin */
     case MS_ROAR: /* dragon, xorn, owlbear */
+    case MS_BELLOW: /* crocodile */
     /* capable of speech but only do so if hero is similar type */
     case MS_DJINNI:
     case MS_VAMPIRE: /* vampire in its own form */
@@ -603,9 +607,55 @@ maybe_gasp(struct monst* mon)
     return (const char *) 0;
 }
 
+/* for egg hatching; caller will apply "ing" suffix
+   [the old message when a carried egg hatches was
+   "its cries sound like {mommy,daddy}"
+   regardless of what type of sound--if any--the creature made] */
+const char *
+cry_sound(struct monst *mtmp)
+{
+    const char *ret = 0;
+    struct permonst *ptr = mtmp->data;
+
+    /* a relatively small subset of MS_ sound values are used by oviparous
+       species so we don't try to supply something for every MS_ type */
+    switch (ptr->msound) {
+    default:
+    case MS_SILENT: /* insects, arthropods, worms, sea creatures */
+        /* "chitter": have silent critters make some noise
+           or the mommy/daddy gag when hatching doesn't work */
+        ret = (ptr->mlet == S_EEL) ? "gurgle" : "chitter";
+        break;
+    case MS_HISS: /* chickatrice, pyrolisk, snakes */
+        ret = "hiss";
+        break;
+    case MS_ROAR: /* baby dragons; have them growl instead of roar */
+        /*FALLTHRU*/
+    case MS_GROWL: /* (none) */
+        ret = "growl";
+        break;
+    case MS_CHIRP: /* adult crocodiles bellow, babies chirp */
+        ret = "chirp";
+        break;
+    case MS_BUZZ: /* killer bees */
+        ret = "buzz";
+        break;
+    case MS_SQAWK: /* ravens */
+        ret = "screech";
+        break;
+    case MS_GRUNT: /* gargoyles */
+        ret = "grunt";
+        break;
+    case MS_MUMBLE: /* naga hatchlingss */
+        ret = "mumble";
+        break;
+    }
+    return ret;
+}
+
 /* return True if mon is a gecko or seems to look like one (hallucination) */
 static boolean
-mon_is_gecko(struct monst* mon)
+mon_is_gecko(struct monst *mon)
 {
     int glyph;
 
@@ -637,9 +687,8 @@ domonnoise(register struct monst* mtmp)
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
         return ECMD_OK;
-    if (is_silent(ptr)
-        /* shk_chat can handle nonverbal monsters */
-        && !mtmp->isshk)
+    /* shk_chat can handle nonverbal monsters */
+    if (is_silent(ptr) && !mtmp->isshk)
         return ECMD_OK;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
@@ -657,6 +706,8 @@ domonnoise(register struct monst* mtmp)
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
+    else if (msound == MS_MOO && !mtmp->mtame)
+        msound = MS_BELLOW;
     /* silliness; formerly had a slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
         msound = MS_SELL;
@@ -691,17 +742,18 @@ domonnoise(register struct monst* mtmp)
         break;
     case MS_VAMPIRE: {
         /* vampire messages are varied by tameness, peacefulness, and time of
-         * night */
+           night */
         boolean isnight = night();
         boolean kindred = (Upolyd && (u.umonnum == PM_VAMPIRE
                                       || u.umonnum == PM_VAMPIRE_LEADER));
-        boolean nightchild =
-            (Upolyd && (u.umonnum == PM_WOLF || u.umonnum == PM_WINTER_WOLF
-                        || u.umonnum == PM_WINTER_WOLF_CUB));
-        const char *racenoun =
-            (flags.female && gu.urace.individual.f)
-                ? gu.urace.individual.f
-                : (gu.urace.individual.m) ? gu.urace.individual.m : gu.urace.noun;
+        boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF
+                                         || u.umonnum == PM_WINTER_WOLF
+                                         || u.umonnum == PM_WINTER_WOLF_CUB));
+        const char *racenoun = (flags.female && gu.urace.individual.f)
+                               ? gu.urace.individual.f
+                               : (gu.urace.individual.m)
+                                 ? gu.urace.individual.m
+                                 : gu.urace.noun;
 
         if (mtmp->mtame) {
             if (kindred) {
@@ -738,14 +790,14 @@ domonnoise(register struct monst* mtmp)
             };
             int vampindex;
 
-            if (kindred)
+            if (kindred) {
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
-            else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
-                     || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
+            } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
+                       || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf, "%s!  Your silver sheen does not frighten me!",
-                        gy.youmonst.data == &mons[PM_SILVER_DRAGON]
+                        (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
                             ? "Fool"
                             : "Young Fool");
                 verbl_msg = verbuf;
@@ -771,11 +823,14 @@ domonnoise(register struct monst* mtmp)
             pline("%s throws back %s head and lets out a blood curdling %s!",
                   Monnam(mtmp), mhis(mtmp),
                   (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
-            Soundeffect(((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream : se_canine_howl), 80);
+            Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream
+                                                         : se_canine_howl,
+                        80);
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
-        } else
+        } else {
             pline_msg =
                 "whispers inaudibly.  All you can make out is \"moon\".";
+        }
         break;
     case MS_BARK:
         if (flags.moonphase == FULL_MOON && night()) {
@@ -788,8 +843,7 @@ domonnoise(register struct monst* mtmp)
             else if (mtmp->mtame && EDOG(mtmp)->hungrytime > gm.moves + 1000)
                 pline_msg = "yips.";
             else {
-                if (mtmp->data
-                    != &mons[PM_DINGO]) /* dingos do not actually bark */
+                if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
                     pline_msg = "barks.";
             }
         } else {
@@ -864,8 +918,18 @@ domonnoise(register struct monst* mtmp)
         }
         break;
     case MS_MOO:
-        Soundeffect((mtmp->mpeaceful ? se_bovine_moo : se_bovine_bellow), 80);
-        pline_msg = mtmp->mpeaceful ? "moos." : "bellows!";
+        Soundeffect(se_bovine_moo, 80);
+        pline_msg = "moos.";
+        break;
+    case MS_BELLOW:
+        Soundeffect((ptr->mlet == S_QUADRUPED) ? se_bovine_bellow
+                                               : se_croc_bellow,
+                    80);
+        pline_msg = "bellows!";
+        break;
+    case MS_CHIRP:
+        Soundeffect(se_chirp, 60);
+        pline_msg = "chirps.";
         break;
     case MS_WAIL:
         Soundeffect(se_sad_wailing, 60);
@@ -1004,13 +1068,11 @@ domonnoise(register struct monst* mtmp)
                    and they never verbalize step 2 so we don't either */
                 verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
                                              : "Phase three, profit!";
-            }
-            else {
+            } else {
                 verbl_msg =
                 "Many enter the dungeon, and few return to the sunlit lands.";
             }
-        }
-        else
+        } else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
                 /* 3.7: the 'complains' message used to be given if the
@@ -1040,7 +1102,8 @@ domonnoise(register struct monst* mtmp)
 
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
-                && could_seduce(mtmp, &gy.youmonst, (struct attack *) 0) == 1) {
+                && (could_seduce(mtmp, &gy.youmonst, (struct attack *) 0)
+                    == 1)) {
                 (void) doseduce(mtmp);
                 break;
             }
@@ -1872,7 +1935,7 @@ struct soundeffect_automapping {
 };
 
 static const struct soundeffect_automapping
-       se_mappings_init[number_of_se_entries] = {
+    se_mappings_init[number_of_se_entries] = {
     { se_zero_invalid,                  "" },
     { se_faint_splashing,               "faint_splashing" },
     { se_crackling_of_hellfire,         "crackling_of_hellfire" },

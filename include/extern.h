@@ -2601,6 +2601,7 @@ extern void yelp(struct monst *);
 extern void whimper(struct monst *);
 extern void beg(struct monst *);
 extern const char *maybe_gasp(struct monst *);
+extern const char *cry_sound(struct monst *);
 extern int dotalk(void);
 extern int tiphat(void);
 #ifdef USER_SOUNDS

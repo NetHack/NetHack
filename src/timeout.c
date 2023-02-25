@@ -1012,8 +1012,10 @@ hatch_egg(anything *arg, long timeout)
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
             if (yours) {
-                pline("%s cries sound like \"%s%s\"",
+                pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
+                      ing_suffix(cry_sound(mon)),
+                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
                 SetVoice(mon, 0, 80, 0);
