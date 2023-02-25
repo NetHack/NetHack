@@ -1540,7 +1540,8 @@ mktrap(
        lethal, and tend not to generate on shallower levels anyway.
        Finally, pits are excluded because it's weird to see an item
        in a pit and yet not be able to identify that the pit is there. */
-    if (kind != NO_TRAP && lvl <= (unsigned) rnd(4)
+    if (kind != NO_TRAP && !(mktrapflags & MKTRAP_NOVICTIM)
+        && lvl <= (unsigned) rnd(4)
         && kind != SQKY_BOARD && kind != RUST_TRAP
         /* rolling boulder trap might not have a boulder if there was no
            viable path (such as when placed in the corner of a room), in

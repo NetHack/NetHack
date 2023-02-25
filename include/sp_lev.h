@@ -127,6 +127,7 @@ typedef struct {
     xint16 type;
     boolean spider_on_web;
     boolean seen;
+    boolean novictim;
 } spltrap;
 
 typedef struct {

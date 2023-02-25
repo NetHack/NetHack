@@ -1797,6 +1797,8 @@ create_trap(spltrap* t, struct mkroom* croom)
         mktrap_flags |= MKTRAP_NOSPIDERONWEB;
     if (t->seen)
         mktrap_flags |= MKTRAP_SEEN;
+    if (t->novictim)
+        mktrap_flags |= MKTRAP_NOVICTIM;
 
     tm.x = x;
     tm.y = y;
@@ -4275,6 +4277,7 @@ lspo_trap(lua_State *L)
 
     tmptrap.spider_on_web = TRUE;
     tmptrap.seen = FALSE;
+    tmptrap.novictim = FALSE;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);
@@ -4300,6 +4303,7 @@ lspo_trap(lua_State *L)
         tmptrap.type = get_table_traptype_opt(L, "type", -1);
         tmptrap.spider_on_web = get_table_boolean_opt(L, "spider_on_web", 1);
         tmptrap.seen = get_table_boolean_opt(L, "seen", FALSE);
+        tmptrap.novictim = !get_table_boolean_opt(L, "victim", TRUE);
 
         lua_getfield(L, -1, "launchfrom");
         if (lua_type(L, -1) == LUA_TTABLE) {
