@@ -2132,6 +2132,8 @@ static const struct soundeffect_automapping
     { se_bars_clonk,                    "bars_clonk" },
     { se_boomerang_klonk,               "boomerang_klonk" },
     { se_bang_weapon_side,              "bang_weapon_side" },
+    { se_chirp,                         "chirp" },
+    { se_croc_bellow,                   "croc_bellow" },
 };
 
 static const char *semap_basenames[SIZE(se_mappings_init)];
