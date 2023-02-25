@@ -1934,6 +1934,20 @@ struct soundeffect_automapping {
     const char *base_filename;
 };
 
+/*
+ * The base_filename field represents the unique part of a file
+ * name to find in the file system (or in the embedded resources for
+ * some soundlibs). It is the soundeffects file that will be played
+ * for the sound effect identified by seid. Without an entry in the
+ * table below, the automapping of a soundeffect id to a particular
+ * file name will not occur and no soundeffect will be possible.
+
+ * The entries in the following table are not required to be in
+ * any particular order, but an entry for each soundeffect from the
+ * sound_effect_entries enum in sndprocs.h should be present.
+ *
+ */
+
 static const struct soundeffect_automapping
     se_mappings_init[number_of_se_entries] = {
     { se_zero_invalid,                  "" },
