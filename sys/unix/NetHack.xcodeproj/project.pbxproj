@@ -504,6 +504,7 @@
 		544768B523995488004B9739 /* nhlua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nhlua.h; path = ../../include/nhlua.h; sourceTree = "<group>"; };
 		544768B923995BB7004B9739 /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = ../../lib/lua/liblua.a; sourceTree = "<group>"; };
 		5462D14723E7B19200969423 /* insight.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = insight.c; path = ../../src/insight.c; sourceTree = "<group>"; };
+		546A4E5A29AAB2DA00E02495 /* seffects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = seffects.h; sourceTree = "<group>"; };
 		548FB9F9297F2B03000D04CF /* sndprocs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = sndprocs.h; path = ../../include/sndprocs.h; sourceTree = "<group>"; };
 		548FB9FA297F2BBD000D04CF /* optlist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = optlist.h; path = ../../include/optlist.h; sourceTree = "<group>"; };
 		548FB9FB297F2BBD000D04CF /* hacklib.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hacklib.h; path = ../../include/hacklib.h; sourceTree = "<group>"; };
@@ -761,6 +762,7 @@
 		3189579621A2046700FB2ABE /* include */ = {
 			isa = PBXGroup;
 			children = (
+				546A4E5A29AAB2DA00E02495 /* seffects.h */,
 				548FB9FD297F2BBD000D04CF /* defsym.h */,
 				548FB9FE297F2BBD000D04CF /* fnamesiz.h */,
 				548FB9FB297F2BBD000D04CF /* hacklib.h */,
