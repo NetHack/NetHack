@@ -457,8 +457,8 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
 	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
 	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
-	$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\wintype.h $(INCL)\you.h \
-	$(INCL)\youprop.h
+	$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\seffects.h \
+	$(INCL)\wintype.h $(INCL)\you.h $(INCL)\youprop.h
 
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific
@@ -871,7 +871,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\trap.h \
 		$(INCL)\flag.h $(INCL)\winprocs.h $(INCL)\sndprocs.h \
-		$(INCL)\sys.h
+		$(INCL)\seffects.h $(INCL)\sys.h
 
 TILE_H      = ..\win\share\tile.h
 
@@ -2358,7 +2358,8 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\seffects.h \
+#		$(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OTTY)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
@@ -2777,7 +2778,8 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h \
+#		$(INCL)\seffects.h $(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OGUI)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
