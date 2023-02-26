@@ -6061,12 +6061,12 @@ lspo_region(lua_State *L)
     } else if (argc == 2) {
         /* region(selection, "lit"); */
         static const char *const lits[] = { "unlit", "lit", NULL };
-        struct selectionvar *sel = l_selection_check(L, 1);
+        struct selectionvar *orig = l_selection_check(L, 1),
+                            *sel = selection_clone(orig);
 
         rlit = luaL_checkoption(L, 2, "lit", lits);
 
         /*
-    TODO: adjust region size for wall, but only if lit
     TODO: lit=random
         */
         if (rlit)

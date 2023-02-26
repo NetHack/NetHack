@@ -838,6 +838,11 @@ Example:
 
 Create a room region, which can be irregular; use the boundary <<_map_characters,map character>> to restrict the floodfilled area.
 
+If using the first form with a selection and "lit", the lit area will extend
+outward 1 space from the selection to attempt to accomodate adjacent walls,
+regardless of whether they are actually walls or not. If using "unlit", this
+will not happen.
+
 Example:
 
  des.region(selection, lit);
