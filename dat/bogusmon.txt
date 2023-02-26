@@ -458,6 +458,9 @@ fraggle
 # Harry Harrison
 stainless steel rat
 
+# The Culture
+antagonistic undecagonstring
+
 # Spoonerism
 mock role
 
