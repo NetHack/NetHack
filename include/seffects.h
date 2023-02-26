@@ -194,7 +194,6 @@
     seffect(squeak_G),
     seffect(squeak_G_sharp),
     seffect(squeal),
-    seffect(squeek),
     seffect(stone_breaking),
     seffect(stone_crumbling),
     seffect(swoosh),
