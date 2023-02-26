@@ -2,6 +2,8 @@
 /* Copyright (c) Michael Allison, 2023                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#if defined(SEFFECTS_ENUM) || defined(SEFFECTS_AUTOMAP)
+
 #if defined(SEFFECTS_ENUM)
 #define seffect(basename) se_##basename
 #else
@@ -207,8 +209,8 @@
     seffect(yelp),
     seffect(zap),
     seffect(zap_then_explosion),
-
 #undef seffect
+#endif   /* SEFFECTS_ENUM || SEFFECTS_AUTOMAP */
 
 /* seffects.h */
 
