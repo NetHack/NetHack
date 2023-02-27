@@ -388,10 +388,11 @@ VARDIR=$(HACKDIR)
 
 ifdef MAKEFILE_TOP
 .PHONY: bundle
-
+NHTOP=
 endif
 ifdef MAKEFILE_SRC
 .PHONY: buildbundle bundledir updatescript
+NHTOP=../
 abspath := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 ABSBUNDLEPATH := $(dir $(abspath))
 $(info ABSBUNDLEPATH=$(ABSBUNDLEPATH))
@@ -471,9 +472,11 @@ endif  # WANT_LIBNH
 # -- bundle ---
 #
 ifdef MAKEFILE_TOP
-bundle: update
+bundle: update uudecode
 	( cd src ; $(MAKE) WANT_BUNDLE=1 buildbundle )
 
+uudecode:
+	(cd util ; $(MAKE) WANT_BUNDLE=1 uudecode )
 endif   # MAKEFILE_TOP
 ifdef WANT_BUNDLE
 ifdef MAKEFILE_SRC
@@ -584,8 +587,8 @@ endif
 
 # We can't use a general rule because the file name of the .uu does not match the
 # uudecode target file name in this case (nhicns.uu to nethack.icns)
-$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) ../util/uudecode ../win/share/nhicns.uu
-	../util/uudecode ../win/share/nhicns.uu
+$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) $(NHTOP)util/uudecode $(NHTOP)win/share/nhicns.uu
+	$(NHTOP)util/uudecode ../win/share/nhicns.uu
 	mv nethack.icns $@
 
 endif   # MAKEFILE_SRC
