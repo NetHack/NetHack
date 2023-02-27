@@ -33,7 +33,7 @@
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
-.ds vr "NetHack 3.7
+.ds vr "NetHack 3.7.0
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
@@ -57,7 +57,7 @@ A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Original version - Eric S. Raymond
-(Edited and expanded for 3.7 by Mike Stephenson and others)
+(Edited and expanded for \*(vr by Mike Stephenson and others)
 .sp 1
 \*(f2
 .hn 1
@@ -3724,7 +3724,7 @@ and also
 .op autopickup_exception
 for ways to refine the behavior.
 .lp ""
-Note: prior to version 3.7, the default for
+Note: prior to version 3.7.0, the default for
 .op autopickup
 was \fIon\fP.
 .lp autoquiver
@@ -5242,7 +5242,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
-message window mapping (the only one supported in 3.7);
+message window mapping (the only one supported in 3.7.0);
 .PL msgtype
 optional; message type to use, see \(lqConfiguring Message Types\(rq
 .PL pattern
