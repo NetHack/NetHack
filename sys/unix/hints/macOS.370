@@ -491,15 +491,14 @@ buildbundle: bundledir $(BUNDLEDIRS) $(BUNDLELIST) updatescript
 	@echo $(GAME) bundle : $(BUNDLE_TOP)
 	@echo $(GAME)   game : $(BUNDLE_GAME)
 
-$(BUNDLE_RESOURCESDIR)/%: ../sound/wav/% | $(BUNDLE_RESOURCESDIR)
+$(BUNDLE_RESOURCESDIR)/%: $(NHTOP)sound/wav/% | $(BUNDLE_RESOURCESDIR)
 	cp $< $@
 
-$(BUNDLE_MACOSDIR)/%: ../win/macosx/% | $(BUNDLE_MACOSDIR)
-	cp $< $@
+#$(BUNDLE_MACOSDIR)/%: $(NHTOP)win/macosx/% | $(BUNDLE_MACOSDIR)
+#	cp $< $@
 
 $(BUNDLE_MACOSDIR)/%: $(dir $(GAMEBIN))/% | $(BUNDLE_MACOSDIR)
 	cp $< $@
-
 
 $(BUNDLE_PARENTDIR):
 		mkdir -p $@
@@ -531,6 +530,7 @@ $(BUNDLE_SHAREDFRAMEWORKSDIR): $(BUNDLE_CONTENTSDIR)
 $(BUNDLE_GAME): nethack
 	cp nethack $@
 
+#FIXME: replace hardcoded information with actual values derived from NetHack build
 $(BUNDLE_INFOPLIST):
 	@echo '<?xml version="1.0" encoding="UTF-8"?>' >$@
 	@echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >>$@
@@ -560,14 +560,11 @@ $(BUNDLE_INFOPLIST):
 	@echo '<string>3.7.0</string>' >>$@
 	@echo '<key>NSHumanReadableCopyright</key>' >>$@
 	@echo '<string>©By Stichting Mathematisch Centrum and M. Stephenson 1985-2023</string>' >>$@
-#	@echo '<key>CFBundleSignature</key>' >>$@
-#	@echo '<string>????</string>' >>$@
 	@echo '<key>LSApplicationCategoryType</key>' >>$@
-#	@echo '<string>public.app-category.role-playing-games</string>' >>$@
 	@echo '<string>public.app-category.adventure-games</string>' >>$@
 	@echo '</dict>' >>$@
 	@echo '</plist>' >>$@
-#		../sys/unix/hints/macosx.sh infoplist >$@
+#		$(NHTOP)sys/unix/hints/macosx.sh infoplist >$@
 
 $(BUNDLE_LAUNCHER):
 	@echo '#!/bin/sh' >$@
@@ -586,9 +583,10 @@ ifneq "$(SHELLDIR)" ""
 endif
 
 # We can't use a general rule because the file name of the .uu does not match the
-# uudecode target file name in this case (nhicns.uu to nethack.icns)
-$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) $(NHTOP)util/uudecode $(NHTOP)win/share/nhicns.uu
-	$(NHTOP)util/uudecode ../win/share/nhicns.uu
+# uudecode target file name inside the .uu file, in this case (nhicns.uu to nethack.icns)
+$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) $(NHTOP)util/uudecode \
+						$(NHTOP)win/share/nhicns.uu
+	$(NHTOP)util/uudecode $(NHTOP)win/share/nhicns.uu
 	mv nethack.icns $@
 
 endif   # MAKEFILE_SRC
