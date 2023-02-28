@@ -1541,7 +1541,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             if (isdigit(curletter) && !groupaccels[curletter]) {
                 count = curses_get_count(curletter);
                 /* after count, we know some non-digit is already pending */
-                curletter = getch();
+                curletter = curses_getch();
                 count_letter = (count > 0L) ? curletter : '\0';
 
                 /* remove the count wind (erases last line of message wind) */
