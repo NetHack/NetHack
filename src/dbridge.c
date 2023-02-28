@@ -322,24 +322,25 @@ u_to_e(struct entity *etmp)
 static void
 set_entity(coordxy x, coordxy y, struct entity *etmp)
 {
+    struct monst *mtmp;
+
     if (u_at(x, y))
         u_to_e(etmp);
-    else if (MON_AT(x, y))
-        m_to_e(m_at(x, y), x, y, etmp);
+    else if ((mtmp = m_at(x, y)) != 0 && !DEADMONSTER(mtmp))
+        m_to_e(mtmp, x, y, etmp);
     else
         etmp->edata = (struct permonst *) 0;
 }
 
 #define is_u(etmp) (etmp->emon == &gy.youmonst)
-#define e_canseemon(etmp) \
-    (is_u(etmp) ? (boolean) TRUE : canseemon(etmp->emon))
+#define e_canseemon(etmp) (is_u(etmp) || canseemon(etmp->emon))
 
 /*
  * e_strg is a utility routine which is not actually in use anywhere, since
  * the specialized routines below suffice for all current purposes.
  */
 
-/* #define e_strg(etmp, func) (is_u(etmp)? (char *)0 : func(etmp->emon)) */
+/* #define e_strg(etmp, func) (is_u(etmp) ? (char *) 0 : func(etmp->emon)) */
 
 static const char *
 e_nam(struct entity *etmp)
@@ -872,22 +873,20 @@ destroy_drawbridge(coordxy x, coordxy y)
         struct obj *otmp2;
         boolean lava = (lev1->drawbridgemask & DB_UNDER) == DB_LAVA;
 
+        if (!Deaf)
+            Soundeffect(se_loud_splash, 100);
         if (lev1->typ == DRAWBRIDGE_UP) {
-            if (cansee(x2, y2)) {
+            if (cansee(x2, y2) || u_at(x2, y2))
                 pline_The("portcullis of the drawbridge falls into the %s!",
                           lava ? hliquid("lava") : "moat");
-            } else if (!Deaf) {
-                Soundeffect(se_loud_splash, 100);
-                You_hear("a loud *SPLASH*!");
-            }
+            else
+                You_hear("a loud *SPLASH*!");  /* Deaf-aware */
         } else {
-            if (cansee(x, y)) {
+            if (cansee(x, y) || u_at(x, y))
                 pline_The("drawbridge collapses into the %s!",
                           lava ? hliquid("lava") : "moat");
-            } else if (!Deaf) {
-                Soundeffect(se_loud_splash, 100);
-                You_hear("a loud *SPLASH*!");
-            }
+            else
+                You_hear("a loud *SPLASH*!");  /* Deaf-aware */
         }
         lev1->typ = lava ? LAVAPOOL : MOAT;
         lev1->drawbridgemask = 0;
@@ -896,12 +895,13 @@ destroy_drawbridge(coordxy x, coordxy y)
             (void) flooreffects(otmp2, x, y, "fall");
         }
     } else {
-        if (cansee(x, y)) {
-            pline_The("drawbridge disintegrates!");
-        } else {
+        /* no moat beneath */
+        if (!Deaf)
             Soundeffect(se_lound_crash, 100);
-            You_hear("a loud *CRASH*!");
-        }
+        if (cansee(x, y) || u_at(x, y))
+            pline_The("drawbridge disintegrates!");
+        else
+            You_hear("a loud *CRASH*!");  /* Deaf-aware */
         lev1->typ = ((lev1->drawbridgemask & DB_ICE) ? ICE : ROOM);
         lev1->icedpool = ((lev1->drawbridgemask & DB_ICE) ? ICED_MOAT : 0);
     }
@@ -928,6 +928,7 @@ destroy_drawbridge(coordxy x, coordxy y)
     newsym(x2, y2);
     if (!does_block(x2, y2, lev2))
         unblock_point(x2, y2); /* vision */
+    vision_recalc(0);
     if (Is_stronghold(&u.uz))
         u.uevent.uopened_dbridge = TRUE;
 
