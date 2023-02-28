@@ -2265,8 +2265,12 @@ create_object(object *o, struct mkroom *croom)
         otmp->obroken = 1;
         otmp->olocked = 0; /* obj generation may set */
     }
-    if (o->trapped == 0 || o->trapped == 1)
-        otmp->otrapped = o->trapped;
+    if (o->trapped == 0 || o->trapped == 1) {
+        if (otmp->otyp == STATUE && o->trapped)
+            maketrap(x, y, STATUE_TRAP);
+        else
+            otmp->otrapped = o->trapped;
+    }
     otmp->greased = o->greased ? 1 : 0;
 
     if (o->quan > 0 && objects[otmp->otyp].oc_merge) {
@@ -2933,6 +2937,8 @@ fill_empty_maze(void)
                 while (is_pit(trytrap) || is_hole(trytrap))
                     trytrap = rndtrap();
             (void) maketrap(mm.x, mm.y, trytrap);
+            if (trytrap == STATUE_TRAP)
+                mk_trap_statue(mm.x, mm.y);
         }
     }
 }

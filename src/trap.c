@@ -7,7 +7,6 @@
 
 extern const char *const destroy_strings[][3]; /* from zap.c */
 
-static void mk_trap_statue(coordxy, coordxy);
 static int dng_bottom(d_level *lev);
 static void hole_destination(d_level *);
 static boolean keep_saddle_with_steedcorpse(unsigned, struct obj *,
@@ -368,7 +367,7 @@ grease_protect(
 }
 
 /* create a "living" statue at x,y */
-static void
+void
 mk_trap_statue(coordxy x, coordxy y)
 {
     struct monst *mtmp;
@@ -486,9 +485,6 @@ maketrap(coordxy x, coordxy y, int typ)
     switch (typ) {
     case SQKY_BOARD:
         ttmp->tnote = choose_trapnote(ttmp);
-        break;
-    case STATUE_TRAP: /* create a "living" statue */
-        mk_trap_statue(x, y);
         break;
     case ROLLING_BOULDER_TRAP: /* boulder will roll towards trigger */
         (void) mkroll_launch(ttmp, x, y, BOULDER, 1L);

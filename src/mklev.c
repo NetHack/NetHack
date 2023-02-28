@@ -1664,6 +1664,8 @@ mktrap(
        should prevent cases where that might not happen) but be paranoid */
     kind = t ? t->ttyp : NO_TRAP;
 
+    if (kind == STATUE_TRAP)
+        mk_trap_statue(m.x, m.y);
     if (kind == WEB && !(mktrapflags & MKTRAP_NOSPIDERONWEB))
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
     if (t && (mktrapflags & MKTRAP_SEEN))

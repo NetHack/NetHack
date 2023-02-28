@@ -3250,6 +3250,8 @@ wizterrainwish(struct _readobjnam_data *d)
         if (is_hole(trap) && !Can_fall_thru(&u.uz))
             trap = ROCKTRAP;
         if ((t = maketrap(x, y, trap)) != 0) {
+            if (t->ttyp == STATUE_TRAP)
+                mk_trap_statue(x, y);
             trap = t->ttyp;
             tname = trapname(trap, TRUE);
             pline("%s%s.", An(tname),
