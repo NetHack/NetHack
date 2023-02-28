@@ -903,7 +903,7 @@ destroy_drawbridge(coordxy x, coordxy y)
         }
     } else {
         /* no moat beneath */
-        Soundeffect(se_lound_crash, 100);  /* Deaf-aware */
+        Soundeffect(se_loud_crash, 100);  /* Deaf-aware */
         if (cansee(x, y) || u_at(x, y))
             pline_The("drawbridge disintegrates!");
         else

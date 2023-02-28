@@ -135,7 +135,6 @@
     seffect(loud_crash),
     seffect(loud_pop),
     seffect(loud_splash),
-    seffect(lound_crash),
     seffect(low_buzzing),
     seffect(low_hum),
     seffect(maniacal_laughter),
