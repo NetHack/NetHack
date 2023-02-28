@@ -947,6 +947,7 @@ curses_convert_keys(int key)
     case ALT_E:
     case ALT_F:
     case ALT_G:
+    case ALT_H:
     case ALT_I:
     case ALT_J:
     case ALT_K:
