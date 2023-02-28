@@ -939,6 +939,35 @@ curses_convert_keys(int key)
         ret = iflags.num_pad ? '5' : 'g';
         break;
 #endif /* KEY_B2 */
+#ifdef PDCURSES
+    case ALT_A:
+    case ALT_B:
+    case ALT_C:
+    case ALT_D:
+    case ALT_E:
+    case ALT_F:
+    case ALT_G:
+    case ALT_I:
+    case ALT_J:
+    case ALT_K:
+    case ALT_L:
+    case ALT_M:
+    case ALT_N:
+    case ALT_O:
+    case ALT_P:
+    case ALT_Q:
+    case ALT_R:
+    case ALT_S:
+    case ALT_T:
+    case ALT_U:
+    case ALT_V:
+    case ALT_W:
+    case ALT_X:
+    case ALT_Y:
+    case ALT_Z:
+        ret = M((ret - ALT_A) + 'a');
+        break;
+#endif
     }
 
     /* phone layout is inverted, 123 on top and 789 on bottom; if player has
