@@ -391,7 +391,9 @@ done_intr(int sig_unused UNUSED)
 static void
 done_hangup(int sig)
 {
+#ifdef HANGUPHANDLING
     gp.program_state.done_hup++;
+#endif
     sethanguphandler((void (*)(int)) SIG_IGN);
     done_intr(sig);
     return;
