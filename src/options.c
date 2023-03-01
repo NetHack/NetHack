@@ -371,6 +371,11 @@ extern char *curses_fmt_attrs(char *);
 /* ask user if they want a tutorial, except if tutorial boolean option has been
    set in config - either on or off - in which case just obey that setting
    without asking. */
+#ifdef SAFERHANGUP
+#define DONE_HUP gp.program_state.done_hup
+#else
+#define DONE_HUP 0
+#endif
 boolean
 ask_do_tutorial(void)
 {
@@ -405,7 +410,7 @@ ask_do_tutorial(void)
 
             n = select_menu(win, PICK_ONE, &sel);
             destroy_nhwindow(win);
-        } while (n <= 0 && !gp.program_state.done_hup);
+        } while (n <= 0 && !DONE_HUP);
         if (n > 0) {
             dotut = (sel[0].item.a_char == 'y');
             free((genericptr_t) sel);
@@ -413,6 +418,7 @@ ask_do_tutorial(void)
     }
     return dotut;
 }
+#undef DONE_HUP
 
 /*
  **********************************
