@@ -23,8 +23,18 @@
 static int curs_x = -1;
 static int curs_y = -1;
 
-static int parse_escape_sequence(void);
+static boolean modifiers_available =
+#ifndef PDCURSES
+    FALSE;
+#else
+    TRUE;
 
+static unsigned long last_getch_modifiers = 0L;
+#endif
+
+static int modified(int ch);
+static void update_modifiers(void);
+static int parse_escape_sequence(void);
 
 int
 curses_getch(void)
@@ -848,6 +858,9 @@ curses_convert_keys(int key)
             as_is = FALSE;
     int ret = key;
 
+    if (modifiers_available)
+        update_modifiers();
+
     if (ret == '\033') {
         ret = parse_escape_sequence();
     }
@@ -863,6 +876,8 @@ curses_convert_keys(int key)
         ret = C('H');
         /*FALLTHRU*/
     default:
+        if (modifiers_available)
+            ret = modified(ret);
 #if defined(ALT_A) && defined(ALT_Z)
         /* for PDcurses, but doesn't handle Alt+X for upper case X;
            ncurses doesn't have ALT_x definitions so we achieve a similar
@@ -1078,3 +1093,36 @@ parse_escape_sequence(void)
 #endif /* !PDCURSES */
 }
 
+static void
+update_modifiers(void)
+{
+#ifdef PDCURSES
+    last_getch_modifiers = PDC_get_key_modifiers();
+#endif
+}
+
+/* This will never be called if modifiers_available is FALSE */
+static int
+modified(int ch)
+{
+    int ret_ch = ch;
+
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
+    /* PDCurses key modifier masks:
+     * PDC_KEY_MODIFIER_SHIFT   = 1
+     * PDC_KEY_MODIFIER_CONTROL = 2
+     * PDC_KEY_MODIFIER_ALT     = 4
+     * PDC_KEY_MODIFIER_NUMLOCK = 8
+     * PDC_KEY_MODIFIER_REPEAT  = 16
+     * ALT + 'a' through ALT + 'z' returns ALT_A  through ALT_Z
+     *    and those are out of the normal character range and
+     *    code in curses_convert_keys() handles those.
+     * ALT + 'A' through ALT + 'Z' return normal 'A' through 'Z'
+     *    so we check the modifier here.
+     */
+    if (((last_getch_modifiers & PDC_KEY_MODIFIER_ALT) == PDC_KEY_MODIFIER_ALT)
+        && (ch >= 'A' && ch <= 'Z'))
+        ret_ch = M(ch);
+#endif
+    return ret_ch;
+}
