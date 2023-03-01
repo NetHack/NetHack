@@ -105,9 +105,11 @@ curses_message_win_puts(const char *message, boolean recursed)
         mesg_add_line(message);
     }
 
-    /* -2: room for trailing ">>" (if More>> is needed) or leading "  "
-       (if combining this message with preceding one) */
-    linespace = (width - 1) - 2 - (mx - border_space);
+    /* -3: room for trailing ">> " (in case More>> is needed) */
+    linespace = width - 3 - (mx - border_space);
+    /* -2: for leading "  " (if combining this message with preceding one) */
+    if (mx > border_space)
+        linespace -= 2;
 
     if (linespace < message_length) {
         if (my - border_space >= height - 1) {
@@ -146,18 +148,18 @@ curses_message_win_puts(const char *message, boolean recursed)
         curses_toggle_color_attr(win, NONE, A_BOLD, ON);
 
     /* will this message fit as-is or do we need to split it? */
-    if (mx == border_space && message_length > width - 2) {
+    if (mx == border_space && message_length > width - 3) {
         /* split needed */
-        tmpstr = curses_break_str(message, (width - 2), 1);
+        tmpstr = curses_break_str(message, (width - 3), 1);
         mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
         /* one space to separate first part of message from rest [is this
            actually useful?] */
-        if (mx < width - 2)
+        if (mx < width)
             ++mx;
         free(tmpstr);
         if (bold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
-        tmpstr = curses_str_remainder(message, (width - 2), 1);
+        tmpstr = curses_str_remainder(message, (width - 3), 1);
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
