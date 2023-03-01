@@ -1730,7 +1730,11 @@ static int lockfd = -1; /* for lock_file() to pass to unlock_file() */
 struct flock sflock; /* for unlocking, same as above */
 #endif
 
+#if defined(HANGUPHANDLING)
 #define HUP if (!gp.program_state.done_hup)
+#else
+#define HUP
+#endif
 
 #ifndef USE_FCNTL
 static char *

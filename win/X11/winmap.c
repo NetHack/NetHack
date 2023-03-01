@@ -2006,10 +2006,12 @@ x_event(int exit_condition)
                 inptr = (inptr + 1) % INBUF_SIZE;
                 /* pkey(retval); */
                 keep_going = FALSE;
-            } else if (gp.program_state.done_hup) {
+#if defined(HANGUPHANDLING)
+	    }  else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
+#endif
             }
             break;
         case EXIT_ON_KEY_OR_BUTTON_PRESS:
@@ -2025,11 +2027,13 @@ x_event(int exit_condition)
                     /* pkey(retval); */
                 }
                 keep_going = FALSE;
-            } else if (gp.program_state.done_hup) {
+#if defined(HANGUPHANDLING)
+	    } else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
-            }
+#endif
+	    }
             break;
         default:
             panic("x_event: unknown exit condition %d", exit_condition);

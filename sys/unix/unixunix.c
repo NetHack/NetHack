@@ -74,11 +74,13 @@ eraseoldlocks(void)
 {
     register int i;
 
+#if defined(HANGUPHANDLING)
     gp.program_state.preserve_locks = 0; /* not required but shows intent */
     /* cannot use maxledgerno() here, because we need to find a lock name
      * before starting everything (including the dungeon initialization
      * that sets astral_level, needed for maxledgerno()) up
      */
+#endif
     for (i = 1; i <= MAXDUNGEON * MAXLEVEL + 1; i++) {
         /* try to remove all */
         set_levelfile_name(gl.lock, i);

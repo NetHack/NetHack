@@ -1220,7 +1220,11 @@ X11_player_selection_dialog(void)
     if (plsel_align_radios)
         free(plsel_align_radios);
 
-    if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
+    if (ps_selected == PS_QUIT
+#if defined(HANGUPHANDLING)
+        || gp.program_state.done_hup
+#endif
+       ) {
         clearlocks();
         X11_exit_nhwindows((char *) 0);
         nh_terminate(0);
@@ -1294,7 +1298,11 @@ X11_player_selection_prompts(void)
         XtDestroyWidget(popup);
         free((genericptr_t) choices), choices = 0;
 
-        if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
+        if (ps_selected == PS_QUIT
+#if defined(HANGUPHANDLING)
+            || gp.program_state.done_hup
+#endif
+           ) {
             clearlocks();
             X11_exit_nhwindows((char *) 0);
             nh_terminate(0);
@@ -1363,7 +1371,11 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
+            if (ps_selected == PS_QUIT
+#if defined(HANGUPHANDLING)
+                || gp.program_state.done_hup
+#endif
+               ) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1431,7 +1443,11 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
+            if (ps_selected == PS_QUIT
+#if defined(HANGUPHANDLING)
+			    || gp.program_state.done_hup
+#endif
+                ) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);
@@ -1497,7 +1513,11 @@ X11_player_selection_prompts(void)
             XtDestroyWidget(popup);
             free((genericptr_t) choices), choices = 0;
 
-            if (ps_selected == PS_QUIT || gp.program_state.done_hup) {
+            if (ps_selected == PS_QUIT
+#if defined(HANGUPHANDLING)
+		|| gp.program_state.done_hup
+#endif
+               ) {
                 clearlocks();
                 X11_exit_nhwindows((char *) 0);
                 nh_terminate(0);

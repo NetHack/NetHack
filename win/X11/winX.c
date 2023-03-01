@@ -104,10 +104,12 @@ static int X11_io_error_handler(Display *);
 
 static int (*old_error_handler)(Display *, XErrorEvent *);
 
+#if defined(HANGUPHANDLING)
 #if !defined(NO_SIGNAL) && defined(SAFERHANGUP)
 #if XtSpecificationRelease >= 6
 #define X11_HANGUP_SIGNAL
 static XtSignalId X11_sig_id;
+#endif
 #endif
 #endif
 
@@ -1522,9 +1524,11 @@ static void
 X11_error_handler(String str)
 {
     nhUse(str);
+#if defined(HANGUPHANDLING)
     hangup(1);
 #ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
     end_of_input();
+#endif
 #endif
     /*NOTREACHED*/
     nh_terminate(EXIT_FAILURE);
@@ -1534,9 +1538,11 @@ static int
 X11_io_error_handler(Display *display)
 {
     nhUse(display);
+#if defined(HANGUPHANDLING)
     hangup(1);
 #ifdef SAFERHANGUP /* keeps going after hangup() for '#if SAFERHANGUP' */
     end_of_input();
+#endif
 #endif
     /*NOREACHED*/ /* but not declared NORETURN */
     return 0;
@@ -1765,7 +1771,9 @@ X11_hangup(Widget w, XEvent *event, String *params, Cardinal *num_params)
     nhUse(params);
     nhUse(num_params);
 
+#if defined(HANGUPHANDLING)
     hangup(1); /* 1 is commonly SIGHUP, but ignored anyway */
+#endif
     exit_x_event = TRUE;
 }
 
