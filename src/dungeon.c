@@ -49,6 +49,8 @@ static int possible_places(int, boolean *, struct proto_dungeon *);
 static xint16 pick_level(boolean *, int);
 static boolean place_level(int, struct proto_dungeon *);
 static int get_dgn_flags(lua_State *);
+static int get_dgn_align(lua_State *);
+static void init_dungeon_levels(lua_State *, struct proto_dungeon *, int);
 static boolean unplaced_floater(struct dungeon *);
 static boolean unreachable_level(d_level *, boolean);
 static void tport_menu(winid, char *, struct lchoice *, d_level *,
@@ -709,7 +711,7 @@ static struct level_map {
                   { X_GOAL, &nemesis_level },
                   { "", (d_level *) 0 } };
 
-int
+static int
 get_dgn_flags(lua_State *L)
 {
     int dgn_flags = 0;
@@ -745,9 +747,8 @@ get_dgn_flags(lua_State *L)
     return dgn_flags;
 }
 
-/* initialize the "dungeon" structs */
-void
-init_dungeons(void)
+static int
+get_dgn_align(lua_State *L)
 {
     static const char *const dgnaligns[] = {
         "unaligned", "noalign", "lawful", "neutral", "chaotic", NULL
@@ -756,6 +757,83 @@ init_dungeons(void)
         D_ALIGN_NONE, D_ALIGN_NONE, D_ALIGN_LAWFUL,
         D_ALIGN_NEUTRAL, D_ALIGN_CHAOTIC, D_ALIGN_NONE
     };
+
+    int a = dgnaligns2i[get_table_option(L, "alignment",
+                                         "unaligned", dgnaligns)];
+    return a;
+}
+
+static void
+init_dungeon_levels(lua_State *L, struct proto_dungeon *pd, int dngidx)
+{
+    char *lvl_name, *lvl_bonetag, *lvl_chain;
+    int lvl_base, lvl_range, lvl_nlevels, lvl_chance,
+        lvl_align, lvl_flags;
+    struct tmplevel *tmpl;
+    int bi, f, nlevels;
+
+    lua_len(L, -1);
+    nlevels = (int) lua_tointeger(L, -1);
+    pd->tmpdungeon[dngidx].levels = nlevels;
+    lua_pop(L, 1);
+    for (f = 0; f < nlevels; f++) {
+        lua_pushinteger(L, f + 1);
+        lua_gettable(L, -2);
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            lvl_name = get_table_str(L, "name");
+            lvl_bonetag = get_table_str_opt(L, "bonetag", emptystr);
+            lvl_chain = get_table_str_opt(L, "chainlevel", NULL);
+            lvl_base = get_table_int(L, "base");
+            lvl_range = get_table_int_opt(L, "range", 0);
+            lvl_nlevels = get_table_int_opt(L, "nlevels", 0);
+            lvl_chance = get_table_int_opt(L, "chance", 100);
+            lvl_align = get_dgn_align(L);
+            lvl_flags = get_dgn_flags(L);
+            /* array index is offset by cumulative number of levels
+               defined for preceding branches (iterations of 'while'
+               loop we're inside, not branch connections below) */
+            tmpl = &pd->tmplevel[pd->n_levs + f];
+
+            debugpline4("LEVEL[%i]:%s,(%i,%i)",
+                        f, lvl_name, lvl_base, lvl_range);
+            tmpl->name = lvl_name;
+            tmpl->chainlvl = lvl_chain;
+            tmpl->lev.base = lvl_base;
+            tmpl->lev.rand = lvl_range;
+            tmpl->chance = lvl_chance;
+            tmpl->rndlevs = lvl_nlevels;
+            tmpl->flags = lvl_flags | lvl_align;
+            tmpl->boneschar = *lvl_bonetag ? *lvl_bonetag : 0;
+            free(lvl_bonetag);
+            tmpl->chain = -1;
+            if (lvl_chain) {
+                debugpline1("CHAINLEVEL: %s", lvl_chain);
+                for (bi = 0; bi < pd->n_levs + f; bi++) {
+                    debugpline2("checking(%i):%s",
+                                bi, pd->tmplevel[bi].name);
+                    if (!strcmp(pd->tmplevel[bi].name, lvl_chain)) {
+                        tmpl->chain = bi;
+                        break;
+                    }
+                }
+                if (tmpl->chain == -1)
+                    panic("Could not chain level %s to %s",
+                          lvl_name, lvl_chain);
+                /* free(lvl_chain); -- recorded in pd.tmplevel[] */
+            }
+        } else
+            panic("dungeon[%i].levels[%i] is not a hash", dngidx, f);
+        lua_pop(L, 1);
+    }
+    pd->n_levs += nlevels;
+    if (pd->n_levs > LEV_LIMIT)
+        panic("init_dungeon: too many special levels");
+}
+
+/* initialize the "dungeon" structs */
+void
+init_dungeons(void)
+{
     lua_State *L;
     register int i, cl = 0;
     register s_level *x;
@@ -842,8 +920,7 @@ init_dungeons(void)
         dgn_protoname = get_table_str_opt(L, "protofile", emptystr);
         dgn_base = get_table_int(L, "base");
         dgn_range = get_table_int_opt(L, "range", 0);
-        dgn_align = dgnaligns2i[get_table_option(L, "alignment",
-                                                 "unaligned", dgnaligns)];
+        dgn_align = get_dgn_align(L);
         dgn_entry = get_table_int_opt(L, "entry", 0);
         dgn_chance = get_table_int_opt(L, "chance", 100);
         dgn_flags = get_dgn_flags(L);
@@ -868,69 +945,7 @@ init_dungeons(void)
         /* levels begin */
         lua_getfield(L, -1, "levels");
         if (lua_type(L, -1) == LUA_TTABLE) {
-            char *lvl_name, *lvl_bonetag, *lvl_chain;
-            int lvl_base, lvl_range, lvl_nlevels, lvl_chance,
-                lvl_align, lvl_flags;
-            struct tmplevel *tmpl;
-            int bi, f, nlevels;
-
-            lua_len(L, -1);
-            nlevels = (int) lua_tointeger(L, -1);
-            pd.tmpdungeon[i].levels = nlevels;
-            lua_pop(L, 1);
-            for (f = 0; f < nlevels; f++) {
-                lua_pushinteger(L, f + 1);
-                lua_gettable(L, -2);
-                if (lua_type(L, -1) == LUA_TTABLE) {
-                    lvl_name = get_table_str(L, "name");
-                    lvl_bonetag = get_table_str_opt(L, "bonetag", emptystr);
-                    lvl_chain = get_table_str_opt(L, "chainlevel", NULL);
-                    lvl_base = get_table_int(L, "base");
-                    lvl_range = get_table_int_opt(L, "range", 0);
-                    lvl_nlevels = get_table_int_opt(L, "nlevels", 0);
-                    lvl_chance = get_table_int_opt(L, "chance", 100);
-                    lvl_align = dgnaligns2i[get_table_option(L, "alignment",
-                                                     "unaligned", dgnaligns)];
-                    lvl_flags = get_dgn_flags(L);
-                    /* array index is offset by cumulative number of levels
-                       defined for preceding branches (iterations of 'while'
-                       loop we're inside, not branch connections below) */
-                    tmpl = &pd.tmplevel[pd.n_levs + f];
-
-                    debugpline4("LEVEL[%i]:%s,(%i,%i)",
-                                f, lvl_name, lvl_base, lvl_range);
-                    tmpl->name = lvl_name;
-                    tmpl->chainlvl = lvl_chain;
-                    tmpl->lev.base = lvl_base;
-                    tmpl->lev.rand = lvl_range;
-                    tmpl->chance = lvl_chance;
-                    tmpl->rndlevs = lvl_nlevels;
-                    tmpl->flags = lvl_flags | lvl_align;
-                    tmpl->boneschar = *lvl_bonetag ? *lvl_bonetag : 0;
-                    free(lvl_bonetag);
-                    tmpl->chain = -1;
-                    if (lvl_chain) {
-                        debugpline1("CHAINLEVEL: %s", lvl_chain);
-                        for (bi = 0; bi < pd.n_levs + f; bi++) {
-                            debugpline2("checking(%i):%s",
-                                        bi, pd.tmplevel[bi].name);
-                            if (!strcmp(pd.tmplevel[bi].name, lvl_chain)) {
-                                tmpl->chain = bi;
-                                break;
-                            }
-                        }
-                        if (tmpl->chain == -1)
-                            panic("Could not chain level %s to %s",
-                                  lvl_name, lvl_chain);
-                        /* free(lvl_chain); -- recorded in pd.tmplevel[] */
-                    }
-                } else
-                    panic("dungeon[%i].levels[%i] is not a hash", i, f);
-                lua_pop(L, 1);
-            }
-            pd.n_levs += nlevels;
-            if (pd.n_levs > LEV_LIMIT)
-                panic("init_dungeon: too many special levels");
+            init_dungeon_levels(L, &pd, i);
         } else if (lua_type(L, -1) != LUA_TNIL)
             panic("dungeon[%i].levels is not an array of hashes", i);
         lua_pop(L, 1);
