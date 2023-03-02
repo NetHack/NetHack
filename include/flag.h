@@ -221,6 +221,7 @@ struct instance_flags {
                             * as output from getdir(): simulated button used
                             * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
     int getloc_filter;     /* GFILTER_foo */
+    boolean bgcolors;      /* display background colors on a map position */
     boolean getloc_moveskip;
     boolean getloc_travelmode;
     boolean getloc_usemenu;

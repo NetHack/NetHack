@@ -172,6 +172,8 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(autounlock, Behavior, 80, opt_out, set_in_game,
                 Yes, Yes, No, Yes, NoAlias,
                 "action to take when encountering locked door or chest")
+    NHOPTB(bgcolors, Behavior, 0, opt_out, set_in_game,
+                On, Yes, No, No, NoAlias, &iflags.bgcolors, Term_Off)
     NHOPTO("bind keys", Advanced, o_bind_keys, BUFSZ, opt_in, set_in_game,
                 No, Yes, No, NoAlias, "edit key binds")
 #if defined(MICRO) && !defined(AMIGA)

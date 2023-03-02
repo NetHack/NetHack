@@ -2346,7 +2346,8 @@ get_bkglyph_and_framecolor(coordxy x, coordxy y, int *bkglyph, uint32 *framecolo
         return;
     }
 #endif
-    if (gw.wsettings.map_frame_color != NO_COLOR && mapxy_valid(x, y))
+    if (iflags.bgcolors
+        && gw.wsettings.map_frame_color != NO_COLOR && mapxy_valid(x, y))
         *framecolor = gw.wsettings.map_frame_color;
     else
         *framecolor = NO_COLOR;
