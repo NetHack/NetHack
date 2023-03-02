@@ -24,11 +24,13 @@ static int curs_x = -1;
 static int curs_y = -1;
 
 static boolean modifiers_available =
-#ifndef PDCURSES
-    FALSE;
-#else
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
     TRUE;
+#else
+    FALSE;
+#endif
 
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
 static unsigned long last_getch_modifiers = 0L;
 #endif
 
@@ -1096,7 +1098,7 @@ parse_escape_sequence(void)
 static void
 update_modifiers(void)
 {
-#ifdef PDCURSES
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
     last_getch_modifiers = PDC_get_key_modifiers();
 #endif
 }
