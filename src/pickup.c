@@ -3280,21 +3280,32 @@ dotip(void)
     const char *spillage = 0;
 
     /*
-     * doesn't require free hands;
-     * limbs are needed to tip floor containers
+     * Doesn't require free hands;
+     * limbs are needed to tip floor containers.
+     *
+     * Note: for menustyle:Traditional, using m prefix forces a menu
+     * of floor containers when more than one is present.  For other
+     * menustyle settings or when fewer than two floor containers are
+     * present, using 'm' skips floor and goes straight to invent.
+     * This somewhat unintuitive behavior is driven by the way that
+     * context-sensitive inventory item actions use m prefix.
      */
 
     /* at present, can only tip things at current spot, not adjacent ones */
     cc.x = u.ux, cc.y = u.uy;
 
     /* check floor container(s) first; at most one will be accessed */
-    if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
+    boxes = container_at(cc.x, cc.y, TRUE);
+    /* this is iffy for menustyle:traditional; 'm' prefix is ambiguous
+       for it: skip floor vs handle multiple containers via menu */
+    if (boxes > 0
+        && (!iflags.menu_requested
+            || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !Verbose(2, dotip)
                     ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-            if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
-                              || iflags.menu_requested)) {
+            if (boxes > 1) {
                 /* use menu to pick a container to tip */
                 int n, i;
                 winid win;
@@ -3369,7 +3380,8 @@ dotip(void)
         }
     }
 
-    /* either no floor container(s) or couldn't tip one or didn't tip any */
+    /* either no floor container(s) or 'm' prefix was used to ignore such
+       or couldn't tip one or didn't tip any */
     cobj = getobj("tip", tip_ok, GETOBJ_PROMPT);
     if (!cobj)
         return ECMD_CANCEL;

@@ -747,11 +747,12 @@ It can also be used with the `{\tt $\backslash$}' (known, show a
 list of all discovered objects) and the `{\tt \`{}}' (knownclass,
 show a list of discovered objects in a particular class) commands to offer
 a menu of several sorting alternatives (which sets a new value for the
-{\it sortdiscoveries\/} option).
+{\it sortdiscoveries\/}
+option); also for ``{\tt \#vanquished}'' command to offer a sorting menu.
 \\
 %.lp ""
 A few other commands (eat food, offer sacrifice, apply tinning-kit,
-drink/quaff, dip) use
+drink/quaff, dip, tip container) use
 the `{\tt m}' prefix to skip checking for applicable objects on
 the floor and go straight to checking inventory,
 or (for ``{\tt \#loot}'' to remove a saddle),
@@ -1773,8 +1774,20 @@ Debug mode only.
 %.lp
 \item[\tb{\#tip}]
 Tip over a container (bag or box) to pour out its contents.
+When there are containers on the floor, the game will prompt to pick one
+of them or ``tip something being carried''.
+\\
+%.lp ""
+If the latter is chosen, there will be another prompt for which item
+from inventory to tip.
+The `{\tt m}' prefix makes the command skip containers on the
+floor and pick one from inventory, except for the special case of
+{\it menustyle:Traditional\/}
+with two or more containers present; that situation will start with the
+floor container menu.
+\\
+%.lp ""
 Autocompletes. Default key is `{\tt M-T}'.
-The `{\tt m}' prefix makes the command use a menu.
 %.lp
 \item[\tb{\#travel}]
 Travel to a specific location on the map.

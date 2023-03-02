@@ -2844,6 +2844,15 @@ itemactions_pushkeys(struct obj *otmp, int act)
             cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_TIP_CONTAINER:
+            /* start with m-prefix to skip floor containers;
+               for menustyle:Traditional when more than one floor
+               container is present, player will get a #tip menu and
+               have to pick the "tip sometking being carried" choice,
+               then this item will be already chosen from inventory;
+               suboptimal but possibly an acceptable tradeoff since
+               combining item actions with use of traditional ggetobj()
+               is an unlikely scenario */
+            cmdq_add_ec(CQ_CANNED, do_reqmenu);
             cmdq_add_ec(CQ_CANNED, dotip);
             cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;

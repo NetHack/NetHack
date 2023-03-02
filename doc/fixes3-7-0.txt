@@ -1494,6 +1494,9 @@ hallucination of objects incorrectly included generic objects as candidates
 some actions that ask the user to pick a location allow typing '$' to show
 	valid spots, accept typing a second '$' prior to moving the cursor to
 	toggle the highlights off; ^R already did that; moving the cursor too
+change 'm' prefix for #tip from 'use menu to pick among floor containers'
+	(since that's already the default) to 'skip floor containers' so that
+	context-sensitive item-action Tip directly operates on the item
 
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
