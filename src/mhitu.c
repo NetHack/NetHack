@@ -1753,6 +1753,7 @@ mdamageu(struct monst *mtmp, int n)
         if (u.mh < 1)
             rehumanize();
     } else {
+        n = saving_grace(n);
         u.uhp -= n;
         if (u.uhp < 1)
             done_in_by(mtmp, DIED);

@@ -3711,6 +3711,19 @@ maybe_wail(void)
     }
 }
 
+/* once per game, if receiving a killing blow from above 90% HP,
+   allow the hero to survive with 1 HP */
+int
+saving_grace(int dmg)
+{
+    if (!u.usaving_grace && (u.uhp <= dmg)
+        && (u.uhp * 100 / u.uhpmax) > 90) {
+        dmg = u.uhp - 1;
+        u.usaving_grace = TRUE; /* used up */
+    }
+    return dmg;
+}
+
 void
 losehp(int n, const char *knam, schar k_format)
 {
@@ -3734,6 +3747,7 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 
+    n = saving_grace(n);
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */

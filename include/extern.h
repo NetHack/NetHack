@@ -987,6 +987,7 @@ extern int monster_nearby(void);
 extern void end_running(boolean);
 extern void nomul(int);
 extern void unmul(const char *);
+extern int saving_grace(int);
 extern void losehp(int, const char *, schar);
 extern int weight_cap(void);
 extern int inv_weight(void);
