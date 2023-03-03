@@ -2,6 +2,11 @@
 /* Copyright Michael Allison, 2023 */
 /* NetHack may be freely redistributed.  See license for details. */
 
+
+/*
+ * macsound
+ */
+
 #include "hack.h"
 
 #ifdef DEBUG
@@ -15,16 +20,6 @@
 #ifdef SPEECH_SOUNDS
 #import <AVFoundation/AVFoundation.h>
 #endif
-
-
-/*
- * Sample sound interface for NetHack
- *
- * Replace 'macsound' with your soundlib name in this template file.
- * Should be placed in ../sound/macsound/.
- */
-
-#define soundlib_macsound soundlib_nosound + 1
 
 static void macsound_init_nhsound(void);
 static void macsound_exit_nhsound(const char *);
@@ -156,6 +151,9 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
     char resourcename[120], *end_of_res = 0;
     const char *c = 0;
     float fvolume = (float) vol / 100.00;
+    int time_remaining = 0;
+    NSTimeInterval dur;
+    NSTimeInterval elapsed;
 
     if (fvolume < 0.1 || fvolume > 1.0)
         fvolume = 1.0;
@@ -237,16 +235,24 @@ static void macsound_hero_playnotes(int32_t instrument WAVEMUSICONLY,
                 affiliate(pseudo_seid, resourcename);
             }
             if (affiliation[pseudo_seid]) {
+                if ([seSound[pseudo_seid] isPlaying]) {
+                    dur = [seSound[pseudo_seid] duration];
+                    elapsed = [seSound[pseudo_seid] currentTime];
+                    time_remaining = (int) ((dur - elapsed) * 1000);
+                    msleep(time_remaining);
+                }
                 if ([seSound[pseudo_seid] isPlaying])
                     [seSound[pseudo_seid] stop];
                 if ([seSound[pseudo_seid] volume] != fvolume)
                     [seSound[pseudo_seid] setVolume:fvolume];
                 [seSound[pseudo_seid] play];
+#if 0
                 if (i < notecount - 1) {
                     /* more notes to follow */
                     msleep(150);
                     [seSound[pseudo_seid] stop];
                 }
+#endif
             }
         }
         c++;
@@ -271,6 +277,9 @@ int32_t moreinfo UNUSED)
 #ifdef ACHIEVEMENT_SOUNDS
     char resourcename[120];
     uint32_t pseudo_seid, pseudo_seid_base;
+    int time_remaining = 0;
+    NSTimeInterval dur;
+    NSTimeInterval elapsed;
 
     if (ach1 == 0 && ach2 == 0)
         return;
@@ -309,8 +318,15 @@ int32_t moreinfo UNUSED)
                 affiliate(pseudo_seid, resourcename);
             }
             if (affiliation[pseudo_seid]) {
-                if ([seSound[pseudo_seid] isPlaying])
+                if ([seSound[pseudo_seid] isPlaying]) {
+                    dur = [seSound[pseudo_seid] duration];
+                    elapsed = [seSound[pseudo_seid] currentTime];
+                    time_remaining = (int) ((dur - elapsed) * 1000);
+                    msleep(time_remaining);
+                }
+                if ([seSound[pseudo_seid] isPlaying]) {
                     [seSound[pseudo_seid] stop];
+                }
                 [seSound[pseudo_seid] play];
             }
         }
