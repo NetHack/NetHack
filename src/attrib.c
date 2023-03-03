@@ -23,9 +23,9 @@ static const struct innate {
     schar ulevel;
     long *ability;
     const char *gainstr, *losestr;
-} arc_abil[] = { { 1, &(HStealth), "", "" },
-                 { 1, &(HFast), "", "" },
-                 { 10, &(HSearching), "perceptive", "" },
+} arc_abil[] = { { 1, &(HSearching), "", "" },
+                 { 5, &(HStealth), "stealthy", "" },
+                 { 10, &(HFast), "quick", "slow" },
                  { 0, 0, 0, 0 } },
 
   bar_abil[] = { { 1, &(HPoison_resistance), "", "" },
@@ -78,7 +78,7 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   val_abil[] = { { 1, &(HCold_resistance), "", "" },
-                 { 1, &(HStealth), "", "" },
+                 { 3, &(HStealth), "stealthy", "" },
                  { 7, &(HFast), "quick", "slow" },
                  { 0, 0, 0, 0 } },
 
