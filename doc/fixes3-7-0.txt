@@ -1601,6 +1601,8 @@ curses: implement mark_synch() and wait_synch()
 curses: only convert arrow keys to hjkl or 4286 if nethack wants a direction
 curses: conversion of arrows and other numpad-related function keys to digit
 	ignored phone-layout setting (inverted up/down) of the num_pad option
+curses: fix an off-by-one error when deciding whether a long line on the
+	bottom line of the message window can fit ">>" (curses' "--More--")
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
