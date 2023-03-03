@@ -32,12 +32,11 @@ des.non_diggable();
 des.teleport_region({ region = { 9,3, 9,3 } });
 
 -- TODO:
---  - save hero state when entering, restore hero state when leaving
+--  - save (more of) hero state when entering
 --  - quit-command should maybe exit the tutorial?
 
 -- turn on some newbie-friendly options
 nh.parse_config("OPTIONS=mention_walls");
-nh.parse_config("OPTIONS=autoopen");
 nh.parse_config("OPTIONS=lit_corridor");
 
 local movekeys = nh.eckey("movewest") .. " " ..
@@ -55,6 +54,7 @@ des.engraving({ coord = { 5,2 }, type = "engrave", text = "Move diagonally with 
 
 --
 
+des.engraving({ coord = { 2,4 }, type = "engrave", text = "Some actions may require multiple tries before succeeding", degrade = false });
 des.engraving({ coord = { 2,5 }, type = "engrave", text = "Open the door by moving into it", degrade = false });
 des.door({ coord = { 2,6 }, state = "closed" });
 
