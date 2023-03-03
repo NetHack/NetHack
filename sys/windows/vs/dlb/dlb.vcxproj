@@ -4,6 +4,7 @@
   <Import Project="$(vsDir)config.props" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0303A585-3F83-4BB7-AF6B-1E12C8FB54AC}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(vsDir)default.props" />
