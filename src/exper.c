@@ -220,18 +220,14 @@ losexp(
        (drainer==NULL) resets a level 1 character to 0 experience points
        without reducing level and that isn't fatal so suppress the message
        in that situation */
-    if (u.ulevel > 1 || drainer) {
-        urgent_pline("%s level %d.", Goodbye(), u.ulevel);
-        SoundAchievement(0, sa2_xpleveldown, 0);
-        /* issue --More-- so that player acknowleges the loss in level
-           and also to give the sound effect enough time to play */
-        display_nhwindow(WIN_MESSAGE, TRUE);
-    }
+    if (u.ulevel > 1 || drainer)
+        pline("%s level %d.", Goodbye(), u.ulevel);
     if (u.ulevel > 1) {
         u.ulevel -= 1;
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
         livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel + 1);
+        SoundAchievement(0, sa2_xpleveldown, 0);
     } else {
         if (drainer) {
             gk.killer.format = KILLED_BY;
@@ -239,7 +235,7 @@ losexp(
                 Strcpy(gk.killer.name, drainer);
             done(DIED);
         }
-        /* no drainer or else lifesaved */
+        /* no drainer or lifesaved */
         u.uexp = 0;
         livelog_printf(LL_MINORAC, "lost all experience");
     }
@@ -343,16 +339,13 @@ pluslvl(
             u.uexp = newuexp(u.ulevel);
         }
         ++u.ulevel;
-        urgent_pline("Welcome %sto experience level %d.",
-                     (u.ulevelmax < u.ulevel) ? "" : "back ", u.ulevel);
-        SoundAchievement(0, sa2_xplevelup, 0);
-        /* issue --More-- so that player acknowleges the gain in level
-           and also to give the sound effect enough time to play */
-        display_nhwindow(WIN_MESSAGE, TRUE);
+        pline("Welcome %sto experience level %d.",
+              (u.ulevelmax < u.ulevel) ? "" : "back ",
+              u.ulevel);
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
-
+        SoundAchievement(0, sa2_xplevelup, 0);
         old_ach_cnt = count_achievements();
         newrank = xlev_to_rank(u.ulevel);
         if (newrank > oldrank)
