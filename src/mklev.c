@@ -1734,27 +1734,27 @@ static struct mkroom *
 generate_stairs_find_room(void)
 {
     struct mkroom *croom;
-    int i, phase, tryct = 0;
+    int i, phase, ai;
+    int *rmarr;
 
     if (!gn.nroom)
         return (struct mkroom *) 0;
 
-    for (phase = 2; phase > -1; phase--) {
-        do {
-            croom = &gr.rooms[rn2(gn.nroom)];
-            if (generate_stairs_room_good(croom, phase))
-                return croom;
-        } while (tryct++ < 50);
-    }
+    rmarr = (int *) alloc(sizeof(int) * gn.nroom);
 
-    for (phase = 2; phase > -2; phase--) {
-        for (i = 0; i < gn.nroom; i++) {
-            croom = &gr.rooms[i];
-            if (generate_stairs_room_good(croom, phase))
-                return croom;
+    for (phase = 2; phase > -1; phase--) {
+        ai = 0;
+        for (i = 0; i < gn.nroom; i++)
+            if (generate_stairs_room_good(&gr.rooms[i], phase))
+                rmarr[ai++] = i;
+        if (ai > 0) {
+            i = rmarr[rn2(ai)];
+            free(rmarr);
+            return &gr.rooms[i];
         }
     }
 
+    free(rmarr);
     croom = &gr.rooms[rn2(gn.nroom)];
     return croom;
 }
