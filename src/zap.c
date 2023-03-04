@@ -132,6 +132,7 @@ learnwand(struct obj *obj)
 int
 bhitm(struct monst *mtmp, struct obj *otmp)
 {
+    int ret = 0;
     boolean wake = TRUE; /* Most 'zaps' should wake monster */
     boolean reveal_invis = FALSE, learn_it = FALSE;
     boolean dbldam = Role_if(PM_KNIGHT) && u.uhave.questart;
@@ -344,6 +345,22 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         } else if (openfallingtrap(mtmp, TRUE, &learn_it)) {
             /* mtmp might now be on the migrating monsters list */
             break;
+        } else if (otyp == SPE_KNOCK) {
+            wake = TRUE;
+            ret = 1;
+            if (mtmp->data->msize < MZ_HUMAN && !m_is_steadfast(mtmp)) {
+                if (canseemon(mtmp))
+                    pline("%s is knocked back!",
+                          Monnam(mtmp));
+                mhurtle(mtmp, mtmp->mx - u.ux, mtmp->my - u.uy, rnd(2));
+            } else {
+                if (canseemon(mtmp))
+                    pline("%s doesn't budge.", Monnam(mtmp));
+            }
+            if (!DEADMONSTER(mtmp)) {
+                wakeup(mtmp, !mindless(mtmp->data));
+                abuse_dog(mtmp);
+            }
         } else if ((obj = which_armor(mtmp, W_SADDLE)) != 0) {
             char buf[BUFSZ];
 
@@ -478,7 +495,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
        that the wand itself has been seen */
     if (learn_it)
         learnwand(otmp);
-    return 0;
+    return ret;
 }
 
 /* hero is held by a monster or engulfed or holding a monster and has zapped
@@ -3458,6 +3475,8 @@ maybe_explode_trap(struct trap *ttmp, struct obj *otmp)
  *  This function reveals the absence of a remembered invisible monster in
  *  necessary cases (throwing or kicking weapons).  The presence of a real
  *  one is revealed for a weapon, but if not a weapon is left up to fhitm().
+ *
+ *  If fhitm returns non-zero value, stops the beam and returns the monster
  */
 struct monst *
 bhit(coordxy ddx, coordxy ddy, int range,  /* direction and range */
@@ -3673,7 +3692,10 @@ bhit(coordxy ddx, coordxy ddy, int range,  /* direction and range */
                 goto bhit_done;
             } else {
                 /* ZAPPED_WAND */
-                (*fhitm)(mtmp, obj);
+                if ((*fhitm)(mtmp, obj)) {
+                    result = mtmp;
+                    goto bhit_done;
+                }
                 range -= 3;
             }
         } else {

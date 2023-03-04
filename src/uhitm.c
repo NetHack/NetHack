@@ -52,7 +52,6 @@ static boolean m_slips_free(struct monst *, struct attack *);
 static void start_engulf(struct monst *);
 static void end_engulf(void);
 static int gulpum(struct monst *, struct attack *);
-static boolean m_is_steadfast(struct monst *);
 static boolean hmonas(struct monst *);
 static void nohandglow(struct monst *);
 static boolean mhurtle_to_doom(struct monst *, int, struct permonst **);
@@ -4803,7 +4802,7 @@ missum(
 }
 
 /* check whether equipment protects against knockback */
-static boolean
+boolean
 m_is_steadfast(struct monst *mtmp)
 {
     boolean is_u = (mtmp == &gy.youmonst);

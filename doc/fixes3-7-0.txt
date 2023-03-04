@@ -1116,6 +1116,7 @@ feedback if a named, shape-shifted vampire reverted to original shape rather
 	than dying when engulfed could say "Dracula turns into Dracula"
 adjust archeologist and valkyrie starting intrinsics
 once per game if receiving killing blow from near-full hp, leave 1 hp
+spell of knock can knock back small monsters
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
