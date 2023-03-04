@@ -1658,6 +1658,9 @@ handle_tip(int tip)
             pline("(Use '%s' prefix to step in if you really want to.)",
                   visctrl(cmd_from_func(do_reqmenu)));
             break;
+        case TIP_UNTRAP_MON:
+            pline("(Perhaps #untrap would help?)");
+            break;
         case TIP_GETPOS:
             l_nhcore_call(NHCORE_GETPOS_TIP);
             break;
@@ -1871,6 +1874,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
         /* all mtame are also mpeaceful, so this affects pets too */
         You("stop.  %s can't move out of that trap.",
             upstart(y_monnam(mtmp)));
+        handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
                && (!goodpos(u.ux0, u.uy0, mtmp, 0)

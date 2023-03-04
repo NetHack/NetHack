@@ -14,6 +14,7 @@
 enum nh_tips {
     TIP_ENHANCE = 0, /* #enhance */
     TIP_SWIM,        /* walking into water */
+    TIP_UNTRAP_MON,  /* walking into trapped peaceful */
     TIP_GETPOS,      /* getpos/farlook */
 
     NUM_TIPS
