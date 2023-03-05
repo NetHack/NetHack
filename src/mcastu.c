@@ -39,6 +39,7 @@ static void cursetxt(struct monst *, boolean);
 static int choose_magic_spell(int);
 static int choose_clerical_spell(int);
 static int m_cure_self(struct monst *, int);
+static char *death_inflicted_by(char *, const char *, struct monst *);
 static void cast_wizard_spell(struct monst *, int, int);
 static void cast_cleric_spell(struct monst *, int, int);
 static boolean is_undirected_spell(unsigned int, int);
@@ -345,23 +346,60 @@ m_cure_self(struct monst *mtmp, int dmg)
     return dmg;
 }
 
+/* unlike the finger of death spell which behaves like a wand of death,
+   this monster spell only attacks the hero */
 void
-touch_of_death(void)
+touch_of_death(struct monst *mtmp)
 {
-    static const char touchodeath[] = "touch of death";
+    char kbuf[BUFSZ];
     int dmg = 50 + d(8, 6);
     int drain = dmg / 2;
 
+    /* if we get here, we know that hero isn't magic resistant and isn't
+       poly'd into an undead or demon */
     You_feel("drained...");
+    (void) death_inflicted_by(kbuf, "the touch of death", mtmp);
 
-    if (drain >= u.uhpmax) {
-        gk.killer.format = KILLED_BY_AN;
-        Strcpy(gk.killer.name, touchodeath);
+    if (Upolyd) {
+        u.mh = 0;
+        rehumanize(); /* fatal iff Unchanging */
+    } else if (drain >= u.uhpmax) {
+        gk.killer.format = KILLED_BY;
+        Strcpy(gk.killer.name, kbuf);
         done(DIED);
     } else {
         u.uhpmax -= drain;
-        losehp(dmg, touchodeath, KILLED_BY_AN);
+        losehp(dmg, kbuf, KILLED_BY);
     }
+    gk.killer.name[0] = '\0'; /* not killed if we get here... */
+}
+
+/* give a reason for death by some monster spells */
+static char *
+death_inflicted_by(
+    char *outbuf,            /* assumed big enough; pm_names are short */
+    const char *deathreason, /* cause of death */
+    struct monst *mtmp)      /* monster who caused it */
+{
+    Strcpy(outbuf, deathreason);
+    if (mtmp) {
+        struct permonst *mptr = mtmp->data,
+            *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham] : mptr;
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+            *fakenm = pmname(mptr, Mgender(mtmp));
+
+        /* greatly simplfied extract from done_in_by(), primarily for
+           reason for death due to 'touch of death' spell; if mtmp is
+           shape changed, it won't be a vampshifter or mimic since they
+           can't cast spells */
+        if (!type_is_pname(champtr) && !the_unique_pm(mptr))
+            realnm = an(realnm);
+        Sprintf(eos(outbuf), " inflicted by %s%s",
+                the_unique_pm(mptr) ? "the " : "", realnm);
+        if (champtr != mptr)
+            Sprintf(eos(outbuf), " imitating %s", an(fakenm));
+    }
+    return outbuf;
 }
 
 /*
@@ -394,7 +432,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             if (Hallucination) {
                 You("have an out of body experience.");
             } else {
-                touch_of_death();
+                touch_of_death(mtmp);
             }
         } else {
             if (Antimagic) {
@@ -467,13 +505,18 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             monstseesu(M_SEEN_MAGR);
             You_feel("momentarily weakened.");
         } else {
+            char kbuf[BUFSZ];
+
             You("suddenly feel weaker!");
             dmg = mtmp->m_lev - 6;
             if (dmg < 1) /* paranoia since only chosen when m_lev is high */
                 dmg = 1;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
-            losestr(rnd(dmg), (const char *) 0, 0);
+            losestr(rnd(dmg),
+                    death_inflicted_by(kbuf, "strength loss", mtmp),
+                    KILLED_BY);
+            gk.killer.name[0] = '\0'; /* not killed if we get here... */
         }
         dmg = 0;
         break;

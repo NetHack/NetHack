@@ -3477,8 +3477,10 @@ mhitm_ad_pest(struct monst *magr, struct attack *mattk,
 }
 
 void
-mhitm_ad_deth(struct monst *magr, struct attack *mattk UNUSED,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_deth(
+    struct monst *magr,
+    struct attack *mattk UNUSED,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -3501,7 +3503,7 @@ mhitm_ad_deth(struct monst *magr, struct attack *mattk UNUSED,
         case 18:
         case 17:
             if (!Antimagic) {
-                touch_of_death();
+                touch_of_death(magr);
                 mhm->damage = 0;
                 return;
             }

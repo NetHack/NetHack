@@ -2228,10 +2228,10 @@ Amonnam(struct monst *mtmp)
 /* used for monster ID by the '/', ';', and 'C' commands to block remote
    identification of the endgame altars via their attending priests */
 char *
-distant_monnam(struct monst *mon,
-               int article, /* only ARTICLE_NONE and ARTICLE_THE
-                               are handled here */
-               char *outbuf)
+distant_monnam(
+    struct monst *mon,
+    int article, /* only ARTICLE_NONE and ARTICLE_THE are handled here */
+    char *outbuf)
 {
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does

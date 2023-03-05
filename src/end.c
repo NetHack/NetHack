@@ -409,9 +409,8 @@ done_in_by(struct monst *mtmp, int how)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data,
-                    *champtr = ((mtmp->cham >= LOW_PM)
-                                   ? &mons[mtmp->cham]
-                                   : mptr);
+                    *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham]
+                                                      : mptr;
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
@@ -442,7 +441,7 @@ done_in_by(struct monst *mtmp, int how)
     if (imitator) {
         char shape[BUFSZ];
         const char *realnm = pmname(champtr, Mgender(mtmp)),
-                             *fakenm = pmname(mptr, Mgender(mtmp));
+                   *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
@@ -498,7 +497,8 @@ done_in_by(struct monst *mtmp, int how)
     /* might need to fix up multi_reason if 'mtmp' caused the reason */
     if (gm.multi_reason
         && gm.multi_reason > gm.multireasonbuf
-        && gm.multi_reason < gm.multireasonbuf + sizeof gm.multireasonbuf - 1) {
+        && gm.multi_reason
+           < gm.multireasonbuf + sizeof gm.multireasonbuf - 1) {
         char reasondummy, *p;
         unsigned reasonmid = 0;
 
