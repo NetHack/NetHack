@@ -630,6 +630,9 @@ enum glyph_offsets {
 #define trap_to_glyph(trap)                                \
     cmap_to_glyph(trap_to_defsym(((int) (trap)->ttyp)))
 
+#define engraving_to_glyph(ep)                             \
+    cmap_to_glyph(engraving_to_defsym(ep))
+
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */
 #define objnum_to_glyph(onum) ((int) (onum) + GLYPH_OBJ_OFF)

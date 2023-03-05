@@ -43,6 +43,7 @@ static void domenucontrols(void);
 extern void port_help(void);
 #endif
 static char *setopt_cmd(char *);
+static boolean add_quoted_engraving(coordxy, coordxy, char *);
 
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
@@ -652,6 +653,10 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         case S_lava:
         case S_ice: /* for hallucination; otherwise defsyms[] would be fine */
             Strcpy(buf, waterbody_name(x, y));
+            break;
+        case S_engroom:
+        case S_engrcorr:
+            Strcpy(buf, "engraving");
             break;
         case S_stone:
             if (!levl[x][y].seenv) {
@@ -1266,6 +1271,12 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
                       : !(alt_i == S_stone
                           || strcmp(x_str, "air") == 0
                           || strcmp(x_str, "land") == 0);
+
+            if (alt_i == S_engroom || alt_i == S_engrcorr) {
+                article = 1;
+                x_str = "engraving";
+                need_to_look = TRUE;
+            }
             found = add_cmap_descr(found, alt_i, glyph, article,
                                    cc, x_str, prefix,
                                    &hit_trap, firstmatch, out_str);
@@ -1393,9 +1404,11 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
-                (void) strncat(out_str, temp_buf,
-                               BUFSZ - strlen(out_str) - 1);
+                if (strncmp(look_buf, "engraving", 9) != 0) {
+                    Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
+                    (void) strncat(out_str, temp_buf,
+                                   BUFSZ - strlen(out_str) - 1);
+                }
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
@@ -1407,6 +1420,24 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     }
 
     return found;
+}
+
+static boolean
+add_quoted_engraving(coordxy x, coordxy y, char *buf)
+{
+    char temp_buf[BUFSZ];
+    struct engr *ep = engr_at(x, y);
+
+    if (ep) {
+        if (ep->eread)
+            Snprintf(temp_buf, sizeof temp_buf, " with remembered text: \"%s\"",
+                     ep->engr_txt[remembered_text]);
+        else
+            Snprintf(temp_buf, sizeof temp_buf, " that you've never read");
+        (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* also used by getpos hack in do_name.c */
@@ -1604,6 +1635,18 @@ do_look(int mode, coord *click_cc)
 
         /* Finally, print out our explanation. */
         if (found) {
+            if (ans != LOOK_QUICK && ans != LOOK_ONCE
+                && (ans == LOOK_VERBOSE || (flags.help && !quick))
+                && !clicklook
+                && !strncmp(firstmatch, "engraving", 9)) {
+                    char engbuf[BUFSZ];
+
+                    engbuf[0] = '\0';
+                    if (add_quoted_engraving(cc.x, cc.y, engbuf)) {
+                        Snprintf(eos(out_str), BUFSZ - strlen(out_str) - 1,
+                                 engbuf);
+                    }
+            }
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
 #ifdef DUMPLOG

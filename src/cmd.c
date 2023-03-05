@@ -1216,18 +1216,23 @@ wiz_makemap(void)
     return ECMD_OK;
 }
 
-/* the #wizmap command - reveal the level map and any traps on it */
+/* the #wizmap command - reveal the level map
+   and any traps or engravings on it */
 static int
 wiz_map(void)
 {
     if (wizard) {
         struct trap *t;
+        struct engr *ep;
         long save_Hconf = HConfusion, save_Hhallu = HHallucination;
 
         HConfusion = HHallucination = 0L;
         for (t = gf.ftrap; t != 0; t = t->ntrap) {
             t->tseen = 1;
             map_trap(t, TRUE);
+        }
+        for (ep = head_engr; ep != 0; ep = ep->nxt_engr) {
+            map_engraving(ep, TRUE);
         }
         do_mapping();
         HConfusion = save_Hconf;

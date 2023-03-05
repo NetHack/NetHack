@@ -832,6 +832,9 @@ extern void del_engr(struct engr *);
 extern void rloc_engr(struct engr *);
 extern void make_grave(coordxy, coordxy, const char *);
 extern void disturb_grave(coordxy, coordxy);
+extern void map_engraving(struct engr *, int);
+extern void see_engraving(struct engr *);
+extern void feel_engraving(struct engr *);
 
 /* ### exper.c ### */
 

@@ -60,7 +60,7 @@
  *
  * map_background
  * map_object
- * map_trap
+ * map_trap or map_engraving
  * map_invisible
  * unmap_object
  *
@@ -305,6 +305,23 @@ map_trap(register struct trap *trap, register int show)
 }
 
 /*
+ * map_engraving()
+ *
+ * Map the engraving and print it out if directed.
+ */
+void
+map_engraving(struct engr *ep, register int show)
+{
+    coordxy x = ep->engr_x, y = ep->engr_y;
+    int glyph = engraving_to_glyph(ep);
+
+    if (gl.level.flags.hero_memory)
+        levl[x][y].glyph = glyph;
+    if (show)
+        show_glyph(x, y, glyph);
+}
+
+/*
  * map_object()
  *
  * Map the given object.  This routine assumes that the hero can physically
@@ -392,12 +409,15 @@ void
 unmap_object(register coordxy x, register coordxy y)
 {
     register struct trap *trap;
+    struct engr *ep;
 
     if (!gl.level.flags.hero_memory)
         return;
 
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
         map_trap(trap, 0);
+    } else if ((ep = engr_at(x, y)) != 0 && !covers_traps(x, y)) {
+        map_engraving(ep, 0);
     } else if (levl[x][y].seenv) {
         struct rm *lev = &levl[x][y];
 
@@ -424,11 +444,14 @@ unmap_object(register coordxy x, register coordxy y)
     {                                                                       \
         register struct obj *obj;                                           \
         register struct trap *trap;                                         \
+        struct engr *ep;                                                    \
                                                                             \
         if ((obj = vobj_at(x, y)) && !covers_objects(x, y))                 \
             map_object(obj, show);                                          \
         else if ((trap = t_at(x, y)) && trap->tseen && !covers_traps(x, y)) \
             map_trap(trap, show);                                           \
+        else if ((ep = engr_at(x, y)) && !covers_traps(x, y))  \
+            map_engraving(ep, show);                                        \
         else                                                                \
             map_background(x, y, show);                                     \
                                                                             \

@@ -1328,6 +1328,7 @@ show_map_spot(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct trap *t;
+    struct engr *ep;
     int oldglyph;
 
     if (Confusion && rn2(7))
@@ -1359,6 +1360,8 @@ show_map_spot(coordxy x, coordxy y)
     if (!IS_FURNITURE(lev->typ)) {
         if ((t = t_at(x, y)) != 0 && t->tseen) {
             map_trap(t, 1);
+        } else if ((ep = engr_at(x,y)) != 0) {
+            map_engraving(ep, 1);
         } else if (glyph_is_trap(oldglyph) || glyph_is_object(oldglyph)) {
             show_glyph(x, y, oldglyph);
             if (gl.level.flags.hero_memory)

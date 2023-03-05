@@ -254,7 +254,7 @@ ceiling(coordxy x, coordxy y)
 struct engr *
 engr_at(coordxy x, coordxy y)
 {
-    register struct engr *ep = head_engr;
+    struct engr *ep = head_engr;
 
     while (ep) {
         if (x == ep->engr_x && y == ep->engr_y)
@@ -277,8 +277,8 @@ sengr_at(const char *s, coordxy x, coordxy y, boolean strict)
     struct engr *ep = engr_at(x, y);
 
     if (ep && ep->engr_type != HEADSTONE && ep->engr_time <= gm.moves) {
-        if (strict ? !strcmpi(ep->engr_txt, s)
-                   : (strstri(ep->engr_txt, s) != 0))
+        if (strict ? !strcmpi(ep->engr_txt[actual_text], s)
+                   : (strstri(ep->engr_txt[actual_text], s) != 0))
             return ep;
     }
     return (struct engr *) NULL;
@@ -304,10 +304,10 @@ wipe_engr_at(coordxy x, coordxy y, xint16 cnt, boolean magical)
                 cnt = rn2(1 + 50 / (cnt + 1)) ? 0 : 1;
                 debugpline1("actually eroding %d characters", cnt);
             }
-            wipeout_text(ep->engr_txt, (int) cnt, 0);
-            while (ep->engr_txt[0] == ' ')
-                ep->engr_txt++;
-            if (!ep->engr_txt[0])
+            wipeout_text(ep->engr_txt[actual_text], (int) cnt, 0);
+            while (ep->engr_txt[actual_text][0] == ' ')
+                ep->engr_txt[actual_text]++;
+            if (!ep->engr_txt[actual_text][0])
                 del_engr(ep);
         }
     }
@@ -322,7 +322,7 @@ read_engr_at(coordxy x, coordxy y)
     /* Sensing an engraving does not require sight,
      * nor does it necessarily imply comprehension (literacy).
      */
-    if (ep && ep->engr_txt[0]) {
+    if (ep && ep->engr_txt[actual_text][0]) {
         switch (ep->engr_type) {
         case DUST:
             if (!Blind) {
@@ -373,14 +373,16 @@ read_engr_at(coordxy x, coordxy y)
                                  /* sizeof "literal" counts terminating \0 */
                                  - sizeof "You feel the words: \"\".");
 
-            if ((int) strlen(ep->engr_txt) > maxelen) {
-                (void) strncpy(buf, ep->engr_txt, maxelen);
+            if ((int) strlen(ep->engr_txt[actual_text]) > maxelen) {
+                (void) strncpy(buf, ep->engr_txt[actual_text], maxelen);
                 buf[maxelen] = '\0';
                 et = buf;
             } else {
-                et = ep->engr_txt;
+                et = ep->engr_txt[actual_text];
             }
             You("%s: \"%s\".", (Blind) ? "feel the words" : "read", et);
+            Strcpy(ep->engr_txt[remembered_text], ep->engr_txt[actual_text]);
+            ep->eread = 1;
             if (gc.context.run > 0)
                 nomul(0);
         }
@@ -390,19 +392,24 @@ read_engr_at(coordxy x, coordxy y)
 void
 make_engr_at(coordxy x, coordxy y, const char *s, long e_time, xint16 e_type)
 {
+    int i;
     struct engr *ep;
     unsigned smem = Strlen(s) + 1;
 
     if ((ep = engr_at(x, y)) != 0)
         del_engr(ep);
-    ep = newengr(smem);
-    (void) memset((genericptr_t) ep, 0, smem + sizeof (struct engr));
+
+    ep = newengr(smem * 3);
+    (void) memset((genericptr_t) ep, 0, (smem * 3) + sizeof (struct engr));
     ep->nxt_engr = head_engr;
     head_engr = ep;
     ep->engr_x = x;
     ep->engr_y = y;
-    ep->engr_txt = (char *) (ep + 1);
-    Strcpy(ep->engr_txt, s);
+    ep->engr_txt[actual_text] = (char *) (ep + 1);
+    ep->engr_txt[remembered_text] = ep->engr_txt[actual_text] + smem;
+    ep->engr_txt[pristine_text] = ep->engr_txt[remembered_text] + smem;
+    for(i = 0; i < text_states; ++i)
+        Strcpy(ep->engr_txt[i], s);
     if (!strcmp(s, "Elbereth")) {
         /* engraving "Elbereth":  if done when making a level, it creates
            an old-style Elbereth that deters monsters when any objects are
@@ -414,7 +421,9 @@ make_engr_at(coordxy x, coordxy y, const char *s, long e_time, xint16 e_type)
     }
     ep->engr_time = e_time;
     ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
-    ep->engr_lth = smem;
+    ep->engr_szeach = smem;
+    ep->engr_alloc = smem * 3;
+    /* we do not set ep->eread; the caller will need to if required */
 }
 
 /* delete any engraving at location <x,y> */
@@ -536,6 +545,8 @@ doengrave(void)
     boolean ptext = TRUE;     /* TRUE if we must prompt for engrave text */
     boolean teleengr = FALSE; /* TRUE if we move the old engraving */
     boolean zapwand = FALSE;  /* TRUE if we remove a wand charge */
+    boolean disprefresh = FALSE; /* TRUE if the display needs a refresh */
+
     xint16 type = DUST;       /* Type of engraving made */
     xint16 oetype = 0;        /* will be set to type of current engraving */
     char buf[BUFSZ];          /* Buffer for final/poly engraving text */
@@ -937,17 +948,28 @@ doengrave(void)
     }
     if (teleengr) {
         rloc_engr(oep);
+        oep->eread = 0;
+        disprefresh = TRUE;
         oep = (struct engr *) 0;
     }
     if (dengr) {
         del_engr(oep);
         oep = (struct engr *) 0;
+        disprefresh = TRUE;
     }
     /* Something has changed the engraving here */
     if (*buf) {
+        struct engr *tmp_ep;
+
         make_engr_at(u.ux, u.uy, buf, gm.moves, type);
-        if (!Blind)
-            pline_The("engraving now reads: \"%s\".", buf);
+        tmp_ep = engr_at(u.ux, u.uy);
+        if (!Blind) {
+            if (tmp_ep != 0) {
+                pline_The("engraving now reads: \"%s\".", buf);
+                tmp_ep->eread = 1;
+                disprefresh = TRUE;
+            }
+        }
         ptext = FALSE;
     }
     if (zapwand && (otmp->spe < 0)) {
@@ -965,6 +987,8 @@ doengrave(void)
     if (!ptext) {
         if (otmp && otmp->oclass == WAND_CLASS && !can_reach_floor(TRUE))
             cant_reach_floor(u.ux, u.uy, FALSE, TRUE);
+        if (disprefresh)
+            newsym(u.ux, u.uy);
         return ECMD_TIME;
     }
     /*
@@ -1004,6 +1028,7 @@ doengrave(void)
                                 : "written");
                     del_engr(oep);
                     oep = (struct engr *) 0;
+                    disprefresh = TRUE;
                 } else {
                     /* defer deletion until after we *know* we're engraving */
                     eow = TRUE;
@@ -1020,7 +1045,7 @@ doengrave(void)
                     You("will overwrite the current message.");
                 eow = TRUE;
             }
-        } else if (oep && (int) strlen(oep->engr_txt) >= BUFSZ - 1) {
+        } else if (oep && (int) strlen(oep->engr_txt[actual_text]) >= BUFSZ - 1) {
             There("is no room to add anything else here.");
             return ECMD_TIME;
         }
@@ -1107,6 +1132,7 @@ doengrave(void)
     if (eow) {
         del_engr(oep);
         oep = (struct engr *) 0;
+        disprefresh = TRUE;
     }
 
     Strcpy(gc.context.engraving.text, ebuf);
@@ -1129,6 +1155,8 @@ doengrave(void)
 
     /* Engraving will always take at least one action via being run as an
      * occupation, so do not count this setup as taking time. */
+    if (disprefresh)
+        newsym(u.ux, u.uy);
     return ECMD_OK;
 }
 
@@ -1144,6 +1172,7 @@ engrave(void)
     boolean firsttime = (gc.context.engraving.actionct == 0);
     int rate = 10; /* # characters that can be engraved in this action */
     boolean truncate = FALSE;
+    boolean neweng = (gc.context.engraving.actionct == 0);
 
     boolean carving = (gc.context.engraving.type == ENGRAVE
                        || gc.context.engraving.type == HEADSTONE);
@@ -1282,7 +1311,7 @@ engrave(void)
     buf[0] = '\0';
     oep = engr_at(u.ux, u.uy);
     if (oep) /* add to existing engraving */
-        Strcpy(buf, oep->engr_txt);
+        Strcpy(buf, oep->engr_txt[actual_text]);
 
     space_left = (int) (sizeof buf - strlen(buf) - 1U);
     if (endc - gc.context.engraving.nextc > space_left) {
@@ -1305,9 +1334,15 @@ engrave(void)
     (void) strncat(buf, gc.context.engraving.nextc,
                    min(space_left, endc - gc.context.engraving.nextc));
     make_engr_at(u.ux, u.uy, buf, gm.moves - gm.multi, gc.context.engraving.type);
+    oep = engr_at(u.ux, u.uy);
+    if (oep)
+        oep->eread = 1;
 
     if (*endc) {
         gc.context.engraving.nextc = endc;
+        if (neweng) {
+            newsym(gc.context.engraving.pos.x, gc.context.engraving.pos.y);
+	}
         return 1; /* not yet finished this turn */
     } else { /* finished engraving */
         /* actions that happen after the engraving is finished go here */
@@ -1324,6 +1359,8 @@ engrave(void)
         gc.context.engraving.nextc = (char *) 0;
         gc.context.engraving.stylus = (struct obj *) 0;
     }
+    if (neweng)
+        newsym(gc.context.engraving.pos.x, gc.context.engraving.pos.y);
     return 0;
 }
 
@@ -1335,7 +1372,7 @@ sanitize_engravings(void)
     struct engr *ep;
 
     for (ep = head_engr; ep; ep = ep->nxt_engr) {
-        sanitize_name(ep->engr_txt);
+        sanitize_name(ep->engr_txt[actual_text]);
     }
 }
 
@@ -1347,12 +1384,13 @@ save_engravings(NHFILE *nhfp)
 
     for (ep = head_engr; ep; ep = ep2) {
         ep2 = ep->nxt_engr;
-        if (ep->engr_lth && ep->engr_txt[0] && perform_bwrite(nhfp)) {
+        if (ep->engr_alloc
+            && ep->engr_txt[actual_text][0] && perform_bwrite(nhfp)) {
             if (nhfp->structlevel) {
-                bwrite(nhfp->fd, (genericptr_t)&(ep->engr_lth),
-                       sizeof ep->engr_lth);
+                bwrite(nhfp->fd, (genericptr_t)&(ep->engr_alloc),
+                       sizeof ep->engr_alloc);
                 bwrite(nhfp->fd, (genericptr_t)ep,
-                       sizeof (struct engr) + ep->engr_lth);
+                       sizeof (struct engr) + ep->engr_alloc);
             }
         }
         if (release_data(nhfp))
@@ -1385,7 +1423,13 @@ rest_engravings(NHFILE *nhfp)
         }
         ep->nxt_engr = head_engr;
         head_engr = ep;
-        ep->engr_txt = (char *) (ep + 1);    /* Andreas Bormann */
+        ep->engr_txt[actual_text] = (char *) (ep + 1);    /* Andreas Bormann */
+        ep->engr_txt[remembered_text] = ep->engr_txt[actual_text] + ep->engr_szeach;
+        ep->engr_txt[pristine_text] = ep->engr_txt[remembered_text] + ep->engr_szeach;
+        while (ep->engr_txt[actual_text][0] == ' ')
+            ep->engr_txt[actual_text]++;
+        while (ep->engr_txt[remembered_text][0] == ' ')
+            ep->engr_txt[remembered_text]++;
         /* mark as finished for bones levels -- no problem for
          * normal levels as the player must have finished engraving
          * to be able to move again */
@@ -1409,7 +1453,7 @@ engr_stats(
     *count = *size = 0L;
     for (ep = head_engr; ep; ep = ep->nxt_engr) {
         ++*count;
-        *size += (long) sizeof *ep + (long) ep->engr_lth;
+        *size += (long) sizeof *ep + (long) ep->engr_alloc;
     }
 }
 
@@ -1451,6 +1495,7 @@ rloc_engr(struct engr *ep)
 
     ep->engr_x = tx;
     ep->engr_y = ty;
+    newsym(tx, ty);  /* caller took care of the old location */
 }
 
 /* Create a headstone at the given location.
@@ -1491,6 +1536,23 @@ disturb_grave(coordxy x, coordxy y)
         (void) makemon(&mons[PM_GHOUL], x, y, NO_MM_FLAGS);
         exercise(A_WIS, FALSE);
     }
+}
+
+void
+see_engraving(struct engr *ep)
+{
+    newsym(ep->engr_x, ep->engr_y);
+}
+
+/* like see_engravings() but overrides vision, but
+   only for some types of engravings that can be felt */
+void
+feel_engraving(struct engr *ep)
+{
+    ep->eread = 1;
+    map_engraving(ep, 1);
+    /* in case it's beneath something, redisplay the something */
+    newsym(ep->engr_x, ep->engr_y);
 }
 
 static const char blind_writing[][21] = {
