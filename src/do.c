@@ -16,6 +16,7 @@ static boolean engulfer_digests_food(struct obj *);
 static boolean danger_uprops(void);
 static int wipeoff(void);
 static int menu_drop(int);
+static boolean u_stuck_cannot_go(const char *);
 static NHFILE *currentlevel_rewrite(void);
 static void familiar_level_msg(void);
 static void final_level(void);
@@ -1019,6 +1020,26 @@ menu_drop(int retry)
     return (n_dropped ? ECMD_TIME : ECMD_OK);
 }
 
+static boolean
+u_stuck_cannot_go(const char *updn)
+{
+    if (u.ustuck) {
+        if (u.uswallow || !sticks(gy.youmonst.data)) {
+            You("are %s, and cannot go %s.",
+                !u.uswallow ? "being held"
+                : digests(u.ustuck->data) ? "swallowed"
+                : "engulfed", updn);
+            return TRUE;
+        } else {
+            struct monst *mtmp = u.ustuck;
+
+            set_ustuck((struct monst *) 0);
+            You("release %s.", mon_nam(mtmp));
+        }
+    }
+    return FALSE;
+}
+
 /* the #down command */
 int
 dodown(void)
@@ -1103,20 +1124,8 @@ dodown(void)
         return ECMD_TIME; /* came out of hiding; need '>' again to go down */
     }
 
-    if (u.ustuck) {
-        if (u.uswallow || !sticks(gy.youmonst.data)) {
-            You("are %s, and cannot go down.",
-                !u.uswallow ? "being held"
-                : digests(u.ustuck->data) ? "swallowed"
-                  : "engulfed");
-            return ECMD_TIME;
-        } else {
-            struct monst *mtmp = u.ustuck;
-
-            set_ustuck((struct monst *) 0);
-            You("release %s.", mon_nam(mtmp));
-        }
-    }
+    if (u_stuck_cannot_go("down"))
+        return ECMD_TIME;
 
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
@@ -1213,20 +1222,10 @@ doup(void)
     if (stucksteed(TRUE)) {
         return ECMD_OK;
     }
-    if (u.ustuck) {
-        if (u.uswallow || !sticks(gy.youmonst.data)) {
-            You("are %s, and cannot go up.",
-                !u.uswallow ? "being held"
-                : digests(u.ustuck->data) ? "swallowed"
-                  : "engulfed");
-            return ECMD_TIME;
-        } else {
-            struct monst *mtmp = u.ustuck;
 
-            set_ustuck((struct monst *) 0);
-            You("release %s.", mon_nam(mtmp));
-        }
-    }
+    if (u_stuck_cannot_go("up"))
+        return ECMD_TIME;
+
     if (near_capacity() > SLT_ENCUMBER) {
         /* No levitation check; inv_weight() already allows for it */
         Your("load is too heavy to climb the %s.",
