@@ -20,6 +20,7 @@ static boolean u_stuck_cannot_go(const char *);
 static NHFILE *currentlevel_rewrite(void);
 static void familiar_level_msg(void);
 static void final_level(void);
+static void temperature_change_msg(schar);
 
 /* static boolean badspot(coordxy,coordxy); */
 
@@ -1830,16 +1831,7 @@ goto_level(
         }
     }
 
-    if (prev_temperature != gl.level.flags.temperature) {
-        if (gl.level.flags.temperature)
-            hellish_smoke_mesg();
-        else if (prev_temperature > 0)
-            pline_The("heat %s gone.",
-                      In_hell(&u.uz0)
-                      ? "and smoke are" : "is");
-        else if (prev_temperature < 0)
-            You("are out of the cold.");
-    }
+    temperature_change_msg(prev_temperature);
 
     /* this was originally done earlier; moved here to be logged after
        any achievement related to entering a dungeon branch
@@ -1901,6 +1893,22 @@ hellish_smoke_mesg(void)
     if (In_hell(&u.uz) && gl.level.flags.temperature > 0)
         pline("You %s smoke...",
               olfaction(gy.youmonst.data) ? "smell" : "sense");
+}
+
+/* give a message when the level temperature is different from previous */
+static void
+temperature_change_msg(schar prev_temperature)
+{
+    if (prev_temperature != gl.level.flags.temperature) {
+        if (gl.level.flags.temperature)
+            hellish_smoke_mesg();
+        else if (prev_temperature > 0)
+            pline_The("heat %s gone.",
+                      In_hell(&u.uz0)
+                      ? "and smoke are" : "is");
+        else if (prev_temperature < 0)
+            You("are out of the cold.");
+    }
 }
 
 /* usually called from goto_level(); might be called from Sting_effects() */
