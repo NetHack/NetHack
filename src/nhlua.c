@@ -1581,6 +1581,7 @@ nhl_gamestate(lua_State *L)
     if (reststate && stored) {
         /* restore game state */
         gm.moves = moves;
+        gl.lastinvnr = 51;
         while (gi.invent)
             useupall(gi.invent);
         while (invent) {
@@ -1604,6 +1605,7 @@ nhl_gamestate(lua_State *L)
             otmp->owornmask = wornmask;
             invent = otmp;
         }
+        gl.lastinvnr = 51;
         moves = gm.moves;
         stored = TRUE;
     }
