@@ -1430,7 +1430,8 @@ add_quoted_engraving(coordxy x, coordxy y, char *buf)
 
     if (ep) {
         if (ep->eread)
-            Snprintf(temp_buf, sizeof temp_buf, " with remembered text: \"%s\"",
+            Snprintf(temp_buf, sizeof temp_buf,
+                     " with remembered text: \"%s\"",
                      ep->engr_txt[remembered_text]);
         else
             Snprintf(temp_buf, sizeof temp_buf, " that you've never read");
@@ -1644,7 +1645,7 @@ do_look(int mode, coord *click_cc)
                     engbuf[0] = '\0';
                     if (add_quoted_engraving(cc.x, cc.y, engbuf)) {
                         Snprintf(eos(out_str), BUFSZ - strlen(out_str) - 1,
-                                 engbuf);
+                                 "%s", engbuf);
                     }
             }
             /* use putmixed() because there may be an encoded glyph present */
