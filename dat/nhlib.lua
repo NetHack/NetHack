@@ -223,6 +223,38 @@ function tutorial_leave()
    nh.gamestate(true);
 end
 
+local tutorial_events = {
+   {
+      ucoord = { 2, 5 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["close"] = true;
+         end,
+   },
+   {
+      ucoord = { 27, 10 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["takeoff"] = true;
+         end,
+   },
+   {
+      ucoord = { 22, 11 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["read"] = true;
+         end,
+   },
+};
+
 function tutorial_turn()
+   for k, v in pairs(tutorial_events) do
+      if ((v.ucoord and u.ux == v.ucoord[1] + 3 and u.uy == v.ucoord[2] + 3)
+         or (v.ucoord == nil)) then
+         if (v.func() or v.remove) then
+            tutorial_events[k] = nil;
+         end
+      end
+   end
    -- nh.pline("TUT:turn");
 end
