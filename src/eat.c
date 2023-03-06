@@ -2983,6 +2983,9 @@ use_tin_opener(struct obj *obj)
 static int
 bite(void)
 {
+    /* hack to pacify static analyzer incorporated into gcc 12.2 */
+    sa_victual(&gc.context.victual);
+
     if (gc.context.victual.canchoke && u.uhunger >= 2000) {
         choke(gc.context.victual.piece);
         return 1;
