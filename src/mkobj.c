@@ -786,7 +786,7 @@ costly_alteration(struct obj *obj, int alter_type)
             set_bknown(obj, 1);
         if (shkp) {
             SetVoice(shkp, 0, 80, 0);
-	}
+        }
         verbalize("You %s %s %s, you pay for %s!",
                   alteration_verbs[alter_type], those, simpleonames(obj),
                   them);

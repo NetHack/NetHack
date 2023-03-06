@@ -1342,7 +1342,7 @@ engrave(void)
         gc.context.engraving.nextc = endc;
         if (neweng) {
             newsym(gc.context.engraving.pos.x, gc.context.engraving.pos.y);
-	}
+        }
         return 1; /* not yet finished this turn */
     } else { /* finished engraving */
         /* actions that happen after the engraving is finished go here */
