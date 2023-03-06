@@ -1802,7 +1802,8 @@ seffect_earth(struct obj **sobjp)
         if (u.uswallow) {
             You_hear("rumbling.");
         } else {
-            if (!In_quest(&u.uz)) {
+            if (!In_quest(&u.uz)
+                && !Is_astralevel(&u.uz) && !Is_firelevel(&u.uz)) {
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
                           sblessed ? "around" : "above");
             } else {
