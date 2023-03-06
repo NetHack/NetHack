@@ -1815,7 +1815,7 @@ seffect_earth(struct obj **sobjp)
                       upstart(matbuf), vtense(matbuf, "materialize"),
                       sblessed ? "around" : "above");
             }
-	}
+        }
         gk.known = 1;
         sokoban_guilt();
 
