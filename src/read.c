@@ -1799,11 +1799,23 @@ seffect_earth(struct obj **sobjp)
         int nboulders = 0;
 
         /* Identify the scroll */
-        if (u.uswallow)
+        if (u.uswallow) {
             You_hear("rumbling.");
-        else
-            pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
+        } else {
+            if (!In_quest(&u.uz)) {
+                pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
+                          sblessed ? "around" : "above");
+            } else {
+                char matbuf[BUFSZ];
+                const char *const avalanche = "avalanche";
+
+                Sprintf(matbuf, "%s",
+                        sblessed ? makeplural(avalanche) : an(avalanche));
+                pline("%s of boulders %s %s you!",
+                      upstart(matbuf), vtense(matbuf, "materialize"),
                       sblessed ? "around" : "above");
+            }
+	}
         gk.known = 1;
         sokoban_guilt();
 
