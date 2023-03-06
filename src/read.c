@@ -52,6 +52,17 @@ static boolean create_particular_parse(char *,
                                        struct _create_particular_data *);
 static boolean create_particular_creation(struct _create_particular_data *);
 
+
+boolean
+avoid_ceiling(d_level *lev)
+{
+    if (In_quest(lev) || Is_astralevel(lev)
+        || Is_firelevel(lev) || !has_ceiling(lev))
+        return TRUE;
+    return FALSE;
+}
+
+
 static boolean
 learnscrolltyp(short scrolltyp)
 {
@@ -1802,8 +1813,7 @@ seffect_earth(struct obj **sobjp)
         if (u.uswallow) {
             You_hear("rumbling.");
         } else {
-            if (!In_quest(&u.uz)
-                && !Is_astralevel(&u.uz) && !Is_firelevel(&u.uz)) {
+            if (!avoid_ceiling(&u.uz)) {
                 pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
                           sblessed ? "around" : "above");
             } else {

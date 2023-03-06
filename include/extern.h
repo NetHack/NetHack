@@ -2348,6 +2348,7 @@ extern void punish(struct obj *);
 extern void unpunish(void);
 extern boolean cant_revive(int *, boolean, struct obj *);
 extern boolean create_particular(void);
+extern boolean avoid_ceiling(d_level *);
 
 /* ### rect.c ### */
 
