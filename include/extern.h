@@ -1322,6 +1322,7 @@ extern boolean usmellmon(struct permonst *);
 
 extern int castmu(struct monst *, struct attack *, boolean, boolean);
 extern void touch_of_death(struct monst *);
+extern char *death_inflicted_by(char *, const char *, struct monst *);
 extern int buzzmu(struct monst *, struct attack *);
 
 /* ### mdlib.c ### */

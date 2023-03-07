@@ -615,12 +615,15 @@ do_improvisation(struct obj* instr)
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
-            int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD : AD_FIRE);
+            int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD
+                                                             : AD_FIRE);
 
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
             Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
+            gc.current_wand = instr;
             ubuzz(BZ_U_WAND(type), rn1(6, 6));
+            gc.current_wand = 0;
         }
         makeknown(instr->otyp);
         break;

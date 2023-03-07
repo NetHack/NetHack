@@ -753,9 +753,11 @@ in_your_sanctuary(
 void
 ghod_hitsu(struct monst *priest)
 {
+    struct mkroom *troom;
+    struct monst *oldbuzzer;
+    struct obj *oldcurrwand;
     coordxy x, y, ax, ay;
     int roomno = (int) temple_occupied(u.urooms);
-    struct mkroom *troom;
 
     if (!roomno || !has_shrine(priest))
         return;
@@ -818,8 +820,14 @@ ghod_hitsu(struct monst *priest)
         break;
     }
 
-    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx),
-         sgn(gt.tby)); /* bolt of lightning */
+    /* bolt of lightning cast by unspecified monster */
+    oldcurrwand = gc.current_wand;
+    gc.current_wand = 0;
+    oldbuzzer = gb.buzzer;
+    gb.buzzer = 0;
+    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx), sgn(gt.tby));
+    gb.buzzer = oldbuzzer;
+    gc.current_wand = oldcurrwand;
     exercise(A_WIS, FALSE);
 }
 

@@ -677,12 +677,12 @@ enum getobj_callback_returns {
 #define BZ_U_SPELL(bztyp) (10 + (bztyp))
 /* hero breathing as a monster */
 #define BZ_U_BREATH(bztyp) (20 + (bztyp))
+/* monster shooting a wand */
+#define BZ_M_WAND(bztyp) (-0 - (bztyp))
 /* monster casting a spell */
 #define BZ_M_SPELL(bztyp) (-10 - (bztyp))
 /* monster breathing */
 #define BZ_M_BREATH(bztyp) (-20 - (bztyp))
-/* monster shooting a wand */
-#define BZ_M_WAND(bztyp) (-30 - (bztyp))
 
 /*
  * option setting restrictions

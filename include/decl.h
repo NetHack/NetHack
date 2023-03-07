@@ -793,6 +793,9 @@ struct instance_globals_b {
     /* pickup.c */
     boolean bucx_filter;
 
+    /* zap.c */
+    struct monst *buzzer; /* zapper/caster/breather who initiates buzz() */
+
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
 };

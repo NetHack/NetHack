@@ -1721,9 +1721,11 @@ do_storms(void)
         if (count < 100) {
             dirx = rn2(3) - 1;
             diry = rn2(3) - 1;
-            if (dirx != 0 || diry != 0)
-                buzz(-15, /* "monster" LIGHTNING spell */
-                     8, x, y, dirx, diry);
+            if (dirx != 0 || diry != 0) {
+                /* BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)): monster LIGHTNING spell */
+                gb.buzzer = 0; /* unspecified attacker */
+                buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 8, x, y, dirx, diry);
+            }
         }
     }
 

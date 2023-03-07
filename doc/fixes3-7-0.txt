@@ -530,6 +530,10 @@ prediscovered weapons adjustmens:  only knights and samurai know polearms;
 if the move counter ever reaches 1000000000, end the game
 knights get no metal armor penalty for clerical spells
 change touch of death from instadeath to maxhp reduction and damage
+report cause of death due to touch of death as "killed by the touch of death
+	inflicted by <monster>" instead of just "killed by a touch of death"
+report cause of death due to wand/spell/breath as "killed by <flash damage>
+	zapped/cast/exhaled by <monster>" instead of just "killed by <damage>"
 dying from being level-drained below level 1 killed hero without saying so
 	and jumped straight to "do you want your possessions identified?"
 conflict will now consider your charisma and requires line of sight

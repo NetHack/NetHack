@@ -252,6 +252,9 @@ const struct instance_globals_b g_init_b = {
     UNDEFINED_PTR, /* bbubbles */
     /* pickup.c */
     FALSE, /* bucx_filter */
+    /* zap.c */
+    NULL, /* buzzer -- monst that zapped/cast/breathed to initiate buzz() */
+
     TRUE, /* havestate*/
     IVMAGIC  /* b_magic to validate that structure layout has been preserved */
 };

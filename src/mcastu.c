@@ -39,7 +39,6 @@ static void cursetxt(struct monst *, boolean);
 static int choose_magic_spell(int);
 static int choose_clerical_spell(int);
 static int m_cure_self(struct monst *, int);
-static char *death_inflicted_by(char *, const char *, struct monst *);
 static void cast_wizard_spell(struct monst *, int, int);
 static void cast_cleric_spell(struct monst *, int, int);
 static boolean is_undirected_spell(unsigned int, int);
@@ -375,7 +374,7 @@ touch_of_death(struct monst *mtmp)
 }
 
 /* give a reason for death by some monster spells */
-static char *
+char *
 death_inflicted_by(
     char *outbuf,            /* assumed big enough; pm_names are short */
     const char *deathreason, /* cause of death */
@@ -909,7 +908,7 @@ spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 
 /* monster uses spell (ranged) */
 int
-buzzmu(register struct monst *mtmp, register struct attack *mattk)
+buzzmu(struct monst *mtmp, struct attack *mattk)
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
@@ -925,8 +924,10 @@ buzzmu(register struct monst *mtmp, register struct attack *mattk)
         if (canseemon(mtmp))
             pline("%s zaps you with a %s!", Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
-        buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn, mtmp->mx,
-             mtmp->my, sgn(gt.tbx), sgn(gt.tby));
+        gb.buzzer = mtmp;
+        buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,
+             mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby));
+        gb.buzzer = 0;
         return MM_HIT;
     }
     return MM_MISS;
