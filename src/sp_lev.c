@@ -3974,6 +3974,9 @@ lspo_room(lua_State *L)
             if (tmpcr) {
                 gc.coder->tmproomlist[gc.coder->n_subroom] = tmpcr;
                 gc.coder->failed_room[gc.coder->n_subroom] = FALSE;
+                /* added a subroom, make parent room irregular */
+                if (gc.coder->tmproomlist[gc.coder->n_subroom - 1])
+                    gc.coder->tmproomlist[gc.coder->n_subroom - 1]->irregular = TRUE;
                 gc.coder->n_subroom++;
                 update_croom();
                 lua_getfield(L, 1, "contents");
@@ -6007,11 +6010,14 @@ static void
 add_doors_to_room(struct mkroom *croom)
 {
     coordxy x, y;
+    int i;
 
     for (x = croom->lx - 1; x <= croom->hx + 1; x++)
         for (y = croom->ly - 1; y <= croom->hy + 1; y++)
             if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR)
                 maybe_add_door(x, y, croom);
+    for (i = 0; i < croom->nsubrooms; i++)
+        add_doors_to_room(croom->sbrooms[i]);
 }
 
 DISABLE_WARNING_UNREACHABLE_CODE

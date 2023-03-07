@@ -481,6 +481,7 @@ Example:
 === door
 
 Create a door at a coordinate on the map, or in a room's wall.
+When adding a door to a <<_room>>, it must be added after the subrooms in the room.
 
 * state is one of "random", "open", "closed", "locked", "nodoor", "broken", or "secret", defaulting to "random".
 
