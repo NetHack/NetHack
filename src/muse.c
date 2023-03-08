@@ -241,6 +241,8 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
         /* directly see the monster reading the scroll */
         pline("%s reads %s!", Monnam(mtmp), onambuf);
     } else {
+        char blindbuf[BUFSZ];
+
         boolean m_is_like_u = (!Hallucination
                                && same_race(gy.youmonst.data, mtmp->data));
         /* describe the unseen monster accurately if it is similar to the
@@ -254,9 +256,11 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
         if (couldsee(mtmp->mx, mtmp->my) && mdistu(mtmp) <= 10 * 10)
             map_invisible(mtmp->mx, mtmp->my);
 
-        You_hear("%s reading %s.",
+        Snprintf(blindbuf, sizeof blindbuf, "reading %s.", onambuf);
+        strsubst(blindbuf, "reading a scroll labeled", "incant");
+        You_hear("%s %s.",
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
-                 onambuf);
+                 blindbuf);
     }
     if (mtmp->mconf)
         pline("Being confused, %s mispronounces the magic words...",
