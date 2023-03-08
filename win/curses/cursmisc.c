@@ -23,15 +23,11 @@
 static int curs_x = -1;
 static int curs_y = -1;
 
-static boolean modifiers_available =
-#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
-    TRUE;
-#else
-    FALSE;
-#endif
-
 #if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
 static unsigned long last_getch_modifiers = 0L;
+static boolean modifiers_available = TRUE;
+#else
+static boolean modifiers_available = FALSE;
 #endif
 
 static int modified(int ch);
@@ -863,13 +859,19 @@ curses_convert_keys(int key)
     if (modifiers_available)
         update_modifiers();
 
-    if (ret == '\033') {
-        ret = parse_escape_sequence();
-    }
-
     /* Handle arrow and keypad keys, but only when getting a command
        (or a command-like keystroke for getpos() or getdir()). */
     switch (key) {
+    case '\033': /* ESC or ^[ */
+        /* changes ESC c to M-c or number pad key to corresponding digit
+           (but we only get here via key==ESC if curses' getch() didn't
+           change the latter to KEY_xyz) */
+        ret = parse_escape_sequence();
+        if (ret != '\033') {
+            reject = FALSE;
+            as_is = TRUE; /* don't perform phonepad inversion */
+        }
+        break;
     case KEY_BACKSPACE:
         /* we can't distinguish between a separate backspace key and
            explicit Ctrl+H intended to rush to the left; without this,
@@ -969,7 +971,7 @@ curses_convert_keys(int key)
         /* an arrow or function key has been pressed during text entry */
         beep();   /* not curses_nhbell() because it might end up getting
                    * changed to deliver a sound effect */
-        ret = 0;  /* this ends up behaving like <escape> */
+        ret = '\033'; /* ESC */
     }
 
     return ret;
@@ -1130,3 +1132,5 @@ modified(int ch)
 #endif
     return ret_ch;
 }
+
+/*cursmisc.c*/
