@@ -1073,8 +1073,10 @@ parse_escape_sequence(void)
     if (ret == 'O') {               /* Numeric keypad */
         /* ESC O <something> */
         ret = getch();
-        if (ret >= 112 && ret <= 121)
+        if (ret >= 112 && ret <= 121) {
+            timeout(-1);
             return ret - 112 + '0'; /* Convert to number */
+        }
 
         if (ret == ERR)
             ret = 'O'; /* there was no third char; treat as ESC O below */
