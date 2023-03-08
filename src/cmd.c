@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1671222065 2022/12/16 20:21:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.650 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1678312816 2023/03/08 22:00:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.666 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6475,7 +6475,7 @@ dotravel(void)
     coord cc;
 
     /*
-     * Travelling used to be a no-op if user toggled 'travel' option
+     * Traveling used to be a no-op if user toggled 'travel' option
      * Off.  However, travel was initially implemented as a mouse-only
      * command and the original purpose of the option was to be able
      * to prevent clicks on the map from initiating travel.
@@ -6521,8 +6521,17 @@ dotravel(void)
 static int
 dotravel_target(void)
 {
-    if (!isok(iflags.travelcc.x, iflags.travelcc.y))
+    if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
+        /* assume <0,0>, the value assigned when travel reaches destination */
+        pline("No travel destination set.");
         return ECMD_OK;
+    } else if (u_at(iflags.travelcc.x, iflags.travelcc.y)) {
+        /* maybe interrupted while traveling then just walked rest of way
+           so destination hasn't been reset yet */
+        You("are already here.");
+        iflags.travelcc.x = iflags.travelcc.y = 0;
+        return ECMD_OK;
+    }
 
     iflags.getloc_travelmode = FALSE;
 
