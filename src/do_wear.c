@@ -739,12 +739,12 @@ dragon_armor_handling(
     case BLUE_DRAGON_SCALE_MAIL:
         if (puton) {
             if (!Very_fast)
-                pline("You speed up%s.", Fast ? " a bit more" : "");
+                You("speed up%s.", Fast ? " a bit more" : "");
             EFast |= W_ARM;
         } else {
             EFast &= ~W_ARM;
             if (!Very_fast && !gc.context.takeoff.cancelled_don)
-                pline("You slow down.");
+                You("slow down.");
         }
         break;
     case GREEN_DRAGON_SCALES:
@@ -1948,7 +1948,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             /* break_armor() pushes boots off for centaurs,
                so don't let dowear() put them back on... */
             if (noisy)
-                pline("You have too many hooves to wear %s.",
+                You("have too many hooves to wear %s.",
                       c_boots); /* makeplural(body_part(FOOT)) yields
                                    "rear hooves" which sounds odd */
             err++;

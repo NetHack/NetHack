@@ -1891,7 +1891,7 @@ hellish_smoke_mesg(void)
               gl.level.flags.temperature > 0 ? "hot" : "cold");
 
     if (In_hell(&u.uz) && gl.level.flags.temperature > 0)
-        pline("You %s smoke...",
+        You("%s smoke...",
               olfaction(gy.youmonst.data) ? "smell" : "sense");
 }
 

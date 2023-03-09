@@ -528,7 +528,7 @@ food_detect(struct obj *sobj)
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
-                pline("Your %s starts to tingle.", body_part(NOSE));
+                Your("%s starts to tingle.", body_part(NOSE));
             u.uedibility = 1;
         }
     } else {
@@ -1081,7 +1081,7 @@ furniture_detect(void)
         }
 
     if (!found)
-        pline("There seems to be nothing of interest on this level.");
+        There("seems to be nothing of interest on this level.");
     else if (!revealed)
         /* [what about clipped map with points of interest outside of the
             currently shown area?] */

@@ -924,7 +924,7 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            pline("There are no appropriate %s symbol sets available.",
+            There("are no appropriate %s symbol sets available.",
                   rogueflag ? "rogue level" : "primary");
             return TRUE;
         }
@@ -1010,7 +1010,7 @@ do_symset(boolean rogueflag)
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        pline("There were no symbol sets found in \"%s\".", SYMBOLS);
+        There("were no symbol sets found in \"%s\".", SYMBOLS);
         return TRUE;
     }
 

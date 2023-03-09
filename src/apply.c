@@ -2629,7 +2629,7 @@ use_stone(struct obj *tstone)
         && obj->oclass == GEM_CLASS && !is_graystone(obj)
         && !obj_resists(obj, 80, 100)) {
         if (Blind)
-            pline("You feel something shatter.");
+            You_feel("something shatter.");
         else if (Hallucination)
             pline("Oh, wow, look at the pretty shards.");
         else
@@ -3430,7 +3430,7 @@ use_cream_pie(struct obj *obj)
     if (Hallucination)
         You("give yourself a facial.");
     else
-        pline("You immerse your %s in %s%s.", body_part(FACE),
+        You("immerse your %s in %s%s.", body_part(FACE),
               several ? "one of " : "",
               several ? makeplural(the(xname(obj))) : the(xname(obj)));
     if (can_blnd((struct monst *) 0, &gy.youmonst, AT_WEAP, obj)) {
@@ -4235,7 +4235,7 @@ static int
 flip_through_book(struct obj *obj)
 {
     if (Underwater) {
-        pline("You don't want to get the pages even more soggy, do you?");
+        You("don't want to get the pages even more soggy, do you?");
         return ECMD_OK;
     }
 

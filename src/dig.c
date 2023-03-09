@@ -1132,7 +1132,7 @@ use_pick_axe2(struct obj *obj)
 
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
-                    pline("You clear some debris from between the pits.");
+                    You("clear some debris from between the pits.");
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
                        && (trap_with_u = t_at(u.ux, u.uy)) != 0) {

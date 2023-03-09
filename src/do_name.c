@@ -1807,7 +1807,7 @@ namefloorobj(void)
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
-        pline("There doesn't seem to be any object %s.",
+        There("doesn't seem to be any object %s.",
               u_at(cc.x, cc.y) ? "under you" : "there");
         return;
     }

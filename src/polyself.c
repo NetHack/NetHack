@@ -449,7 +449,7 @@ polyself(int psflags)
             controllable_poly = Polymorph_control && !(Stunned || Unaware);
 
     if (Unchanging) {
-        pline("You fail to transform!");
+        You("fail to transform!");
         return;
     }
     /* being Stunned|Unaware doesn't negate this aspect of Poly_control */

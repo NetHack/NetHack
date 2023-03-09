@@ -921,7 +921,7 @@ test_move(
                so we won't get here, hence don't need to worry about
                "there" being somewhere the player isn't sure of */
             if (mode == DO_MOVE)
-                pline("There is an obstacle there.");
+                There("is an obstacle there.");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if (mode == DO_MOVE

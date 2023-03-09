@@ -1576,7 +1576,7 @@ wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
         pline("The fuzz tester will make NetHack execute random keypresses.");
-        pline("There is no conventional way out of this mode.");
+        There("is no conventional way out of this mode.");
     }
     if (paranoid_query(TRUE, "Do you want to start fuzz testing?"))
         iflags.debug_fuzzer = TRUE; /* Thoth, take the reins */
@@ -1943,7 +1943,7 @@ wiz_smell(void)
         return ECMD_OK;
     }
 
-    pline("You can move the cursor to a monster that you want to smell.");
+    You("can move the cursor to a monster that you want to smell.");
     do {
         pline("Pick a monster to smell.");
         ans = getpos(&cc, TRUE, "a monster");

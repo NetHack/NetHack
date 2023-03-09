@@ -603,7 +603,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
             fl.l_type = F_UNLCK;
             fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
-            pline("There is a%s message on this scroll.",
+            There("is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
         }
         msg = strchr(curline, ':');
