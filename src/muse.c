@@ -257,7 +257,8 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
             map_invisible(mtmp->mx, mtmp->my);
 
         Snprintf(blindbuf, sizeof blindbuf, "reading %s.", onambuf);
-        strsubst(blindbuf, "reading a scroll labeled", "incant");
+        strsubst(blindbuf, "reading a scroll labeled",
+                 mtmp->mconf ? "attempting to incant" : "incant");
         You_hear("%s %s.",
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
                  blindbuf);
