@@ -621,7 +621,7 @@ auto_describe(coordxy cx, coordxy cy)
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE),
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U),
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))

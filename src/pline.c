@@ -179,7 +179,7 @@ vpline(const char *line, va_list the_args)
     if (gv.vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
-        flush_screen(1); /* %% */
+        flush_screen((gp.pline_flags & NO_CURS_ON_U) ? 0 : 1); /* %% */
 
     putmesg(line);
 

@@ -499,6 +499,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define URGENT_MESSAGE   8
 #define PLINE_VERBALIZE 16
 #define PLINE_SPEECH    32
+#define NO_CURS_ON_U    64
 
 /* get_count flags */
 #define GC_NOFLAGS   0
