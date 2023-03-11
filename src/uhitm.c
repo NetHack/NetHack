@@ -613,7 +613,8 @@ known_hitum(
                 /* maybe should regurgitate if swallowed? */
                 monflee(mon, !rn2(3) ? rnd(100) : 0, FALSE, TRUE);
 
-                if (u.ustuck == mon && !u.uswallow && !sticks(gy.youmonst.data))
+                if (u.ustuck == mon && !u.uswallow
+                    && !sticks(gy.youmonst.data))
                     set_ustuck((struct monst *) 0);
             }
             /* Vorpal Blade hit converted to miss */
@@ -804,7 +805,7 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
        silver rings.  Note:  rings are worn under gloves, so you don't
        get both bonuses, and two silver rings don't give double bonus. */
     hmd->dmg += special_dmgval(&gy.youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
-                          &silverhit);
+                               &silverhit);
     hmd->barehand_silver_rings = (((silverhit & W_RINGL) ? 1 : 0)
                                   + ((silverhit & W_RINGR) ? 1 : 0));
     if (hmd->barehand_silver_rings > 0)
@@ -812,7 +813,10 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
 }
 
 static void
-hmon_hitmon_weapon_ranged(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_weapon_ranged(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     /* then do only 1-2 points of damage and don't use or
        train weapon's skill */
@@ -844,7 +848,10 @@ hmon_hitmon_weapon_ranged(struct _hitmon_data *hmd, struct monst *mon, struct ob
 }
 
 static void
-hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_weapon_melee(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     int wtype;
     struct obj *monwep;
@@ -953,7 +960,10 @@ hmon_hitmon_weapon_melee(struct _hitmon_data *hmd, struct monst *mon, struct obj
 }
 
 static void
-hmon_hitmon_weapon(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_weapon(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     /* is it not a melee weapon? */
     if (/* if you strike with a bow... */
@@ -974,7 +984,10 @@ hmon_hitmon_weapon(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 }
 
 static void
-hmon_hitmon_potion(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_potion(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     if (obj->quan > 1L)
         obj = splitobj(obj, 1L);
@@ -995,7 +1008,10 @@ hmon_hitmon_potion(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 }
 
 static void
-hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_misc_obj(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     switch (obj->otyp) {
     case BOULDER:         /* 1d20 */
@@ -1242,7 +1258,10 @@ hmon_hitmon_misc_obj(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
 
 /* do the actual hitting monster with obj/fists */
 static void
-hmon_hitmon_do_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_do_hit(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     if (!obj) { /* attack with bare hands */
         hmon_hitmon_barehands(hmd, mon);
@@ -1325,7 +1344,8 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
            enhancement */
         if (hmd->train_weapon_skill) {
             /* [this assumes that `!thrown' implies wielded...] */
-            int wtype = hmd->thrown ? weapon_type(skillwep) : uwep_skill_type();
+            int wtype = hmd->thrown ? weapon_type(skillwep)
+                                    : uwep_skill_type();
             use_skill(wtype, 1);
         }
     }
@@ -1338,7 +1358,10 @@ hmon_hitmon_dmg_recalc(struct _hitmon_data *hmd, struct obj *obj)
 }
 
 static void
-hmon_hitmon_poison(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_poison(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     int nopoison = (10 - (obj->owt / 10));
 
@@ -1366,7 +1389,10 @@ hmon_hitmon_poison(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
 }
 
 static void
-hmon_hitmon_jousting(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_jousting(
+    struct _hitmon_data *hmd,
+    struct monst *mon, /* target */
+    struct obj *obj) /* lance */
 {
     hmd->dmg += d(2, (obj == uwep) ? 10 : 2); /* [was in dmgval()] */
     You("joust %s%s", mon_nam(mon), canseemon(mon) ? exclam(hmd->dmg) : ".");
@@ -1392,7 +1418,10 @@ hmon_hitmon_jousting(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
 }
 
 static void
-hmon_hitmon_stagger(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNUSED)
+hmon_hitmon_stagger(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj UNUSED)
 {
     /* VERY small chance of stunning opponent if unarmed. */
     if (rnd(100) < P_SKILL(P_BARE_HANDED_COMBAT) && !bigmonst(hmd->mdat)
@@ -1407,7 +1436,10 @@ hmon_hitmon_stagger(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
 }
 
 static void
-hmon_hitmon_pet(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNUSED)
+hmon_hitmon_pet(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj UNUSED)
 {
     if (mon->mtame && hmd->dmg > 0) {
         /* do this even if the pet is being killed (affects revival) */
@@ -1420,9 +1452,13 @@ hmon_hitmon_pet(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNU
 }
 
 static void
-hmon_hitmon_splitmon(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_splitmon(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
-    if ((hmd->mdat == &mons[PM_BLACK_PUDDING] || hmd->mdat == &mons[PM_BROWN_PUDDING])
+    if ((hmd->mdat == &mons[PM_BLACK_PUDDING]
+         || hmd->mdat == &mons[PM_BROWN_PUDDING])
         /* pudding is alive and healthy enough to split */
         && mon->mhp > 1 && !mon->mcan
         /* iron weapon using melee or polearm hit [3.6.1: metal weapon too;
@@ -1449,7 +1485,10 @@ hmon_hitmon_splitmon(struct _hitmon_data *hmd, struct monst *mon, struct obj *ob
 }
 
 static void
-hmon_hitmon_msg_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj)
+hmon_hitmon_msg_hit(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj)
 {
     if (!hmd->hittxt /*( thrown => obj exists )*/
         && (!hmd->destroyed
@@ -1471,7 +1510,10 @@ hmon_hitmon_msg_hit(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj
 }
 
 static void
-hmon_hitmon_msg_silver(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNUSED)
+hmon_hitmon_msg_silver(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj UNUSED)
 {
     const char *fmt;
     char *whom = mon_nam(mon);
@@ -1507,7 +1549,10 @@ hmon_hitmon_msg_silver(struct _hitmon_data *hmd, struct monst *mon, struct obj *
 }
 
 static void
-hmon_hitmon_msg_lightobj(struct _hitmon_data *hmd, struct monst *mon, struct obj *obj UNUSED)
+hmon_hitmon_msg_lightobj(
+    struct _hitmon_data *hmd,
+    struct monst *mon,
+    struct obj *obj UNUSED)
 {
     const char *fmt;
     char *whom = mon_nam(mon);
@@ -1554,7 +1599,8 @@ hmon_hitmon(
     hmd.silvermsg = FALSE;
     hmd.silverobj = FALSE;
     hmd.lightobj = FALSE;
-    hmd.material = obj ? objects[obj->otyp].oc_material : 0; /* 0 == NO_MATERIAL */
+    hmd.material = obj ? objects[obj->otyp].oc_material
+                       : 0; /* 0 == NO_MATERIAL */
     hmd.jousting = 0;
     hmd.hittxt = FALSE;
     hmd.get_dmg_bonus = TRUE;
@@ -2073,7 +2119,8 @@ mhitm_ad_rust(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 mhm->done = TRUE;
                 return;
             }
-            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0
+                                            : MM_AGR_DIED));
             mhm->done = TRUE;
             return;
         }
@@ -4509,14 +4556,14 @@ explum(struct monst *mdef, struct attack *mattk)
     case AD_COLD:
     case AD_FIRE:
     case AD_ELEC:
-        /* See comment in mon_explodes() and in zap.c for an explanation of this
-         * math.  Here, the player is causing the explosion, so it should be in
-         * the +20 to +29 range instead of negative. */
+        /* See comment in mon_explodes() and in zap.c for an explanation
+           of this math.  Here, the player is causing the explosion, so it
+           should be in the +20 to +29 range instead of negative. */
         explode(u.ux, u.uy, (mattk->adtyp - 1) + 20, tmp, MON_EXPLODE,
                 adtyp_to_expltype(mattk->adtyp));
         if (mdef && DEADMONSTER(mdef)) {
             /* Other monsters may have died too, but return this if the actual
-             * target died. */
+               target died. */
             return MM_DEF_DIED;
         }
         break;
@@ -5111,7 +5158,8 @@ hmonas(struct monst *mon)
                 const char *verb = 0; /* verb or body part */
 
                 if (!u.uswallow
-                    && (compat = could_seduce(&gy.youmonst, mon, mattk)) != 0) {
+                    && (compat = could_seduce(&gy.youmonst, mon, mattk))
+                       != 0) {
                     You("%s %s %s.",
                         (mon->mcansee && haseyes(mon->data)) ? "smile at"
                                                              : "talk to",
@@ -5638,9 +5686,10 @@ passive(struct monst *mon,
  * Assumes the attack was successful.
  */
 void
-passive_obj(struct monst *mon,
-            struct obj *obj,      /* null means pick uwep, uswapwep or uarmg */
-            struct attack *mattk) /* null means we find one internally */
+passive_obj(
+    struct monst *mon,
+    struct obj *obj,      /* null means pick uwep, uswapwep or uarmg */
+    struct attack *mattk) /* null means we find one internally */
 {
     struct permonst *ptr = mon->data;
     int i;
