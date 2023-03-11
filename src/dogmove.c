@@ -381,7 +381,8 @@ dog_hunger(struct monst *mtmp, struct edog *edog)
 static int
 dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 {
-    int omx, omy, carryamt = 0;
+    coordxy omx, omy;
+    int carryamt = 0;
     struct obj *obj, *otmp;
 
     if (helpless(mtmp))

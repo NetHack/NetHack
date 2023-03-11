@@ -833,7 +833,7 @@ stucksteed(boolean checkfeeding)
 }
 
 void
-place_monster(struct monst* mon, int x, int y)
+place_monster(struct monst* mon, coordxy x, coordxy y)
 {
     struct monst *othermon;
     const char *monnm, *othnm;

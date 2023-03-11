@@ -2747,7 +2747,7 @@ extern boolean mount_steed(struct monst *, boolean);
 extern void exercise_steed(void);
 extern void kick_steed(void);
 extern void dismount_steed(int);
-extern void place_monster(struct monst *, int, int);
+extern void place_monster(struct monst *, coordxy, coordxy);
 extern boolean stucksteed(boolean);
 
 /* ### symbols.c ### */
@@ -2870,7 +2870,7 @@ extern struct obj *tt_oname(struct obj *);
 
 extern void initrack(void);
 extern void settrack(void);
-extern coord *gettrack(int, int);
+extern coord *gettrack(coordxy, coordxy);
 
 /* ### trap.c ### */
 
