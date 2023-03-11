@@ -4843,20 +4843,26 @@ mhitm_knockback(
 {
     char magrbuf[BUFSZ], mdefbuf[BUFSZ];
     struct obj *otmp;
+    const char *knockedhow;
+    coordxy dx, dy, defx, defy;
+    int knockdistance = rn2(3) ? 1 : 2; /* 67%: 1 step, 33%: 2 steps */
     boolean u_agr = (magr == &gy.youmonst);
     boolean u_def = (mdef == &gy.youmonst);
-    boolean was_u = FALSE;
+    boolean was_u = FALSE, dismount = FALSE;
 
     /* 1/6 chance of attack knocking back a monster */
     if (rn2(6))
         return FALSE;
 
     /* if hero is stuck to a cursed saddle, knock the steed back */
-    if (u_def && u.usteed
-        && (otmp = which_armor(u.usteed, W_SADDLE)) != 0 && otmp->cursed) {
-        mdef = u.usteed;
-        was_u = TRUE;
-        u_def = FALSE;
+    if (u_def && u.usteed) {
+        if ((otmp = which_armor(u.usteed, W_SADDLE)) != 0 && otmp->cursed) {
+            mdef = u.usteed;
+            was_u = TRUE;
+            u_def = FALSE;
+        } else {
+            dismount = TRUE; /* saddle is not cursed; knock hero out of it */
+        }
     }
 
     /* monsters must be alive */
@@ -4899,10 +4905,20 @@ mhitm_knockback(
         return FALSE;
     }
 
+    /* decide where the first step will place the target; not accurate
+       for being knocked out of saddle but doesn't need to be; used for
+       message before actual hurtle */
+    defx = u_def ? u.ux : mdef->mx;
+    defy = u_def ? u.uy : mdef->my;
+    dx = sgn(defx - (u_agr ? u.ux : magr->mx));
+    dy = sgn(defy - (u_agr ? u.uy : magr->my));
+    /* subtly vary the message text if monster won't actually move */
+    knockedhow = dismount ? "out of your saddle"
+                 : will_hurtle(mdef, defx + dx, defy + dy) ? "backward"
+                   : "back";
+
     /* give the message */
     if (u_def || canseemon(mdef)) {
-        boolean dosteed = u_def && u.usteed;
-
         Strcpy(magrbuf, u_agr ? "You" : Monnam(magr));
         Strcpy(mdefbuf, (u_def || was_u) ? "you" : y_monnam(mdef));
         if (was_u)
@@ -4914,36 +4930,33 @@ mhitm_knockback(
          * mhitm: The fire giant knocks the gnome back with a forceful strike!
          */
         pline("%s %s %s %s with a %s %s!",
-              magrbuf, vtense(magrbuf, "knock"), mdefbuf,
-              dosteed ? "out of your saddle" : "back",
+              magrbuf, vtense(magrbuf, "knock"), mdefbuf, knockedhow,
               rn2(2) ? "forceful" : "powerful", rn2(2) ? "blow" : "strike");
     } else if (u_agr) {
         /* hero knocks unseen foe back; noticed by touch */
-        You("knock %s back!", some_mon_nam(mdef));
+        You_feel("%s be knocked %s!", some_mon_nam(mdef), knockedhow);
     }
 
     /* do the actual knockback effect */
     if (u_def) {
-        /* normally dx,dy indicates direction hero is throwing, zapping, &c
-           but here it is used to pass the preferred direction for dismount
-           to dismount_steed (used for DISMOUNT_KNOCKED only) */
-        u.dx = sgn(u.ux - magr->mx); /* [sgn() is superfluous here] */
-        u.dy = sgn(u.uy - magr->my); /* [ditto] */
-        if (u.usteed)
+        if (dismount) {
+            /* normally u.dx,u.dy indicates the direction hero is throwing,
+               zapping, &c but here it is used to pass preferred direction
+               for dismount to dismount_steed (for DISMOUNT_KNOCKED only) */
+            u.dx = dx;
+            u.dy = dy;
             dismount_steed(DISMOUNT_KNOCKED);
-        else
-            hurtle(u.dx, u.dy, rnd(2), FALSE);
-
+        } else {
+            hurtle(dx, dy, knockdistance, FALSE);
+        }
         set_apparxy(magr); /* update magr's idea of where you are */
         if (!Stunned && !rn2(4))
-            make_stunned((long) rn1(2, 2), TRUE); /* 0..1 + 2 => 2..3 */
+            make_stunned((long) (knockdistance + 1), TRUE); /* 2 or 3 */
     } else {
-        coordxy x = u_agr ? u.ux : magr->mx;
-        coordxy y = u_agr ? u.uy : magr->my;
-
-        mhurtle(mdef, mdef->mx - x, mdef->my - y, rnd(2));
-        if (DEADMONSTER(mdef) && !was_u) {
-            *hitflags |= MM_DEF_DIED;
+        mhurtle(mdef, dx, dy, knockdistance);
+        if (DEADMONSTER(mdef)) {
+            if (!was_u)
+                *hitflags |= MM_DEF_DIED;
         } else if (!rn2(4)) {
             mdef->mstun = 1;
             /* if steed and hero were knocked back, update attacker's idea

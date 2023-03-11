@@ -975,20 +975,30 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     return TRUE;
 }
 
+/* used by mhurtle_step() for actual hurtling and also to vary message
+   if target will/won't change location when knocked back */
+boolean
+will_hurtle(struct monst *mon, coordxy x, coordxy y)
+{
+    if (!isok(x, y))
+        return FALSE;
+    /*
+     * TODO: Treat walls, doors, iron bars, etc. specially
+     * rather than just stopping before.
+     */
+    return goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA);
+}
+
 static boolean
 mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
 {
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;
 
-    /* TODO: Treat walls, doors, iron bars, etc. specially
-     * rather than just stopping before.
-     */
     if (!isok(x, y))
         return FALSE;
 
-    if (goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA)
-        && m_in_out_region(mon, x, y)) {
+    if (will_hurtle(mon, x, y) && m_in_out_region(mon, x, y)) {
         int res;
 
         if (mon != u.usteed) {
