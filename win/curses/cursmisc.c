@@ -612,6 +612,17 @@ curses_move_cursor(winid wid, int x, int y)
     }
 }
 
+/* update the ncurses stdscr cursor to where the cursor in our map is */
+void
+curses_update_stdscr_cursor(void)
+{
+#ifndef PDCURSES
+    int xadj = 0, yadj = 0;
+
+    curses_get_window_xy(MAP_WIN, &xadj, &yadj);
+    move(curs_y + yadj, curs_x + xadj);
+#endif
+}
 
 /* Perform actions that should be done every turn before nhgetch() */
 
