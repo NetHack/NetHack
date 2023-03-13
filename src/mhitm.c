@@ -9,6 +9,9 @@
 static const char brief_feeling[] =
     "have a %s feeling for a moment, then it passes.";
 
+static void noises(struct monst *, struct attack *);
+static void pre_mm_attack(struct monst *, struct monst *);
+static void missmm(struct monst *, struct monst *, struct attack *);
 static int hitmm(struct monst *, struct monst *, struct attack *,
                  struct obj *, int);
 static int gazemm(struct monst *, struct monst *, struct attack *);
@@ -17,14 +20,11 @@ static int explmm(struct monst *, struct monst *, struct attack *);
 static int mdamagem(struct monst *, struct monst *, struct attack *,
                     struct obj *, int);
 static void mswingsm(struct monst *, struct monst *, struct obj *);
-static void noises(struct monst *, struct attack *);
-static void pre_mm_attack(struct monst *, struct monst *);
-static void missmm(struct monst *, struct monst *, struct attack *);
 static int passivemm(struct monst *, struct monst *, boolean, int,
                      struct obj *);
 
 static void
-noises(register struct monst *magr, register struct attack *mattk)
+noises(struct monst *magr, struct attack *mattk)
 {
     boolean farq = (mdistu(magr) > 15);
 
@@ -71,29 +71,25 @@ pre_mm_attack(struct monst *magr, struct monst *mdef)
     }
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
+/* feedback for when a monster-vs-monster attack misses */
 static
 void
-missmm(register struct monst *magr, register struct monst *mdef,
-       struct attack *mattk)
+missmm(
+    struct monst *magr, /* attacker */
+    struct monst *mdef, /* defender */
+    struct attack *mattk) /* attack and damage types */
 {
-    const char *fmt;
-    char buf[BUFSZ];
-
     pre_mm_attack(magr, mdef);
 
     if (gv.vis) {
-        fmt = (could_seduce(magr, mdef, mattk) && !magr->mcan)
-                  ? "%s pretends to be friendly to"
-                  : "%s misses";
-        Sprintf(buf, fmt, Monnam(magr));
-        pline("%s %s.", buf, mon_nam_too(mdef, magr));
-    } else
+        pline("%s %s %s.", Monnam(magr),
+              (magr->mcan || !could_seduce(magr, mdef, mattk)) ? "misses"
+                  : "pretends to be friendly to",
+              mon_nam_too(mdef, magr));
+    } else {
         noises(magr, mattk);
+    }
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*
  *  fightm()  -- fight some other monster
@@ -632,7 +628,7 @@ hitmm(
                     Strcat(mdef_name, " flesh");
                 }
 
-                pline("%s %s sears %s!", magr_name, /*s_suffix(magr_name), */
+                pline("%s %s sears %s!", magr_name, /* s_suffix(magr_name), */
                       simpleonames(mwep), mdef_name);
             }
         }
@@ -758,19 +754,17 @@ gulpmm(
 {
     coordxy ax, ay, dx, dy;
     int status;
-    char buf[BUFSZ];
     struct obj *obj;
 
     if (!engulf_target(magr, mdef))
         return MM_MISS;
 
     if (gv.vis) {
-        /* [this two-part formatting dates back to when only one x_monnam
-           result could be included in an expression because the next one
-           would overwrite first's result -- that's no longer the case] */
-        Sprintf(buf, "%s %s", Monnam(magr),
-                digests(magr->data) ? "swallows" : "engulfs");
-        pline("%s %s.", buf, mon_nam(mdef));
+        pline("%s %s %s.", Monnam(magr),
+              digests(magr->data) ? "swallows"
+              : enfolds(magr->data) ? "encloses"
+                : "engulfs",
+              mon_nam(mdef));
     }
     if (!flaming(magr->data)) {
         for (obj = mdef->minvent; obj; obj = obj->nobj)

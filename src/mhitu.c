@@ -1203,6 +1203,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         } else {
             urgent_pline("%s %s!", Monnam(mtmp),
                          digests(mtmp->data) ? "swallows you whole"
+                         : enfolds(mtmp->data) ? "folds itself around you"
                            : "engulfs you");
         }
         stop_occupation();
@@ -1210,7 +1211,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
 
         if (u.utrap) {
             You("are released from the %s!",
-                u.utraptype == TT_WEB ? "web" : "trap");
+                (u.utraptype == TT_WEB) ? "web" : "trap");
             reset_utrap(FALSE);
         }
 

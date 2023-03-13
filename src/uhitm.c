@@ -4577,15 +4577,17 @@ explum(struct monst *mdef, struct attack *mattk)
 static void
 start_engulf(struct monst *mdef)
 {
+    boolean u_digest = digests(gy.youmonst.data),
+            u_enfold = enfolds(gy.youmonst.data);
+
     if (!Invisible) {
         map_location(u.ux, u.uy, TRUE);
         tmp_at(DISP_ALWAYS, mon_to_glyph(&gy.youmonst, rn2_on_display_rng));
         tmp_at(mdef->mx, mdef->my);
     }
-    if (digests(gy.youmonst.data))
-        You("swallow %s whole!", mon_nam(mdef));
-    else
-        You("engulf %s!", mon_nam(mdef));
+    You("%s %s%s!",
+        u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
+        mon_nam(mdef), u_digest ? " whole" : "");
     delay_output();
     delay_output();
 }
@@ -4605,12 +4607,14 @@ gulpum(struct monst *mdef, struct attack *mattk)
     static char msgbuf[BUFSZ]; /* for gn.nomovemsg */
     register int tmp;
     register int dam = d((int) mattk->damn, (int) mattk->damd);
-    boolean fatal_gulp, u_digest = digests(gy.youmonst.data);
+    boolean fatal_gulp,
+            u_digest = digests(gy.youmonst.data),
+            u_enfold = enfolds(gy.youmonst.data);
     struct obj *otmp;
     struct permonst *pd = mdef->data;
     const char *expel_verb = u_digest ? "regurgitate"
-                               : enfolds(gy.youmonst.data) ? "release"
-                                 : "expel";
+                             : u_enfold ? "release"
+                               : "expel";
 
     /* Not totally the same as for real monsters.  Specifically, these
      * don't take multiple moves.  (It's just too hard, for too little
@@ -4633,7 +4637,8 @@ gulpum(struct monst *mdef, struct attack *mattk)
            vampire form now instead of dealing with that when it dies */
         if (is_vampshifter(mdef)
             && newcham(mdef, &mons[mdef->cham], NO_NC_FLAGS)) {
-            You("%s it, then %s it.", u_digest ? "swallow" : "engulf",
+            You("%s it, then %s it.",
+                u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
                 expel_verb);
             if (canspotmon(mdef)) {
                 /* Avoiding a_monnam here: if the target is named, it gives us
@@ -4665,7 +4670,10 @@ gulpum(struct monst *mdef, struct attack *mattk)
             if (!type_is_pname(pd))
                 mnam = an(mnam);
             You("%s %s.", u_digest ? "englut" : "engulf", mon_nam(mdef));
-            Sprintf(kbuf, "%s %s%s", u_digest ? "swallowing" : "engulfing",
+            Sprintf(kbuf, "%s %s%s",
+                    u_digest ? "swallowing"
+                    : u_enfold ? "enclosing"
+                      : "engulfing",
                     mnam, u_digest ? " whole" : "");
             instapetrify(kbuf);
         } else {
