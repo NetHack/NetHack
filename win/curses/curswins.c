@@ -322,6 +322,7 @@ curses_del_nhwin(winid wid)
                    wid);
         return;
     }
+    delwin(nhwins[wid].curwin);
     nhwins[wid].curwin = NULL;
     nhwins[wid].nhwin = -1;
 }
