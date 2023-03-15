@@ -861,9 +861,7 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
         DeleteObject(blackBrush);
     }
 
-    if (bkglyph != NO_GLYPH
-        /* Don't use all black GLYPH_UNEXPLORED tile as a background */
-        && bkglyph != GLYPH_UNEXPLORED) {
+    if (bkglyph != NO_GLYPH) {
         ntile = data->bkmap[i][j].gm.tileidx;
         t_x = TILEBMP_X(ntile);
         t_y = TILEBMP_Y(ntile);
@@ -872,7 +870,10 @@ paintTile(PNHMapWindow data, int i, int j, RECT * rect)
                     data->xBackTile, data->yBackTile, data->tileDC,
                     t_x, t_y, GetNHApp()->mapTile_X,
                     GetNHApp()->mapTile_Y, SRCCOPY);
-        layer++;
+        /* Don't use all black GLYPH_UNEXPLORED tile as a background */
+        if (bkglyph != GLYPH_UNEXPLORED) {
+            layer++;
+        }
     }
 
     if ((glyph != NO_GLYPH) && (glyph != bkglyph)) {
