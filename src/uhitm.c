@@ -2240,12 +2240,10 @@ mhitm_ad_drli(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (!negated && !rn2(3)
-            && !(resists_drli(mdef) || defended(mdef, AD_DRLI))) {
+        if (!rn2(3) && !(resists_drli(mdef) || defended(mdef, AD_DRLI))
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl
                                     * (usually 1d8) */
             pline("%s becomes weaker!", Monnam(mdef));
@@ -2275,7 +2273,8 @@ mhitm_ad_drli(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated && !rn2(3) && !Drain_resistance) {
+        if (!rn2(3) && !Drain_resistance
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)){
             losexp("life drainage");
 
             /* unlike hitting with Stormbringer, wounded attacker doesn't
@@ -2287,10 +2286,10 @@ mhitm_ad_drli(
         boolean is_death = (mattk->adtyp == AD_DETH);
 
         if (is_death
-            || (!negated && !rn2(3)
-                && !(resists_drli(mdef) || defended(mdef, AD_DRLI)))) {
-            if (!is_death)
-                mhm->damage = d(2, 6); /* Stormbringer uses monhp_per_lvl (1d8) */
+            || (!rn2(3) && !(resists_drli(mdef) || defended(mdef, AD_DRLI))
+                && !mhitm_mgc_atk_negated(magr, mdef, TRUE))) {
+            if (!is_death) /* Stormbringer uses monhp_per_lvl (1d8) */
+                mhm->damage = d(2, 6);
             if (gv.vis && canspotmon(mdef))
                 pline("%s becomes weaker!", Monnam(mdef));
             if (mdef->mhpmax - mhm->damage > (int) mdef->m_lev) {
@@ -2317,12 +2316,11 @@ mhitm_ad_fire(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
     struct permonst *pd = mdef->data;
 
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2359,7 +2357,7 @@ mhitm_ad_fire(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated) {
+        if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             pline("You're %s!", on_fire(pd, mattk));
             if (completelyburns(pd)) { /* paper or straw golem */
                 You("go up in flames!");
@@ -2385,7 +2383,7 @@ mhitm_ad_fire(
         }
     } else {
         /* mhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2429,11 +2427,9 @@ mhitm_ad_cold(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2450,7 +2446,7 @@ mhitm_ad_cold(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated) {
+        if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             pline("You're covered in frost!");
             if (Cold_resistance) {
                 pline_The("frost doesn't seem cold!");
@@ -2463,7 +2459,7 @@ mhitm_ad_cold(
             mhm->damage = 0;
     } else {
         /* mhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2485,11 +2481,9 @@ mhitm_ad_elec(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2508,7 +2502,7 @@ mhitm_ad_elec(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated) {
+        if (!mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             You("get zapped!");
             if (Shock_resistance) {
                 pline_The("zap doesn't shock you!");
@@ -2523,7 +2517,7 @@ mhitm_ad_elec(
             mhm->damage = 0;
     } else {
         /* mhitm */
-        if (negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             mhm->damage = 0;
             return;
         }
@@ -2661,13 +2655,13 @@ mhitm_ad_tlpt(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
         if (mhm->damage <= 0)
             mhm->damage = 1;
-        if (!negated) {
+        if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
+            pline("%s is not affected.", Monnam(mdef));
+        } else {
             char nambuf[BUFSZ];
             boolean u_saw_mon = (canseemon(mdef) || engulfing_u(mdef));
 
@@ -2687,7 +2681,9 @@ mhitm_ad_tlpt(
         int tmphp;
 
         hitmsg(magr, mattk);
-        if (!negated) {
+        if (!mhitm_mgc_atk_negated(magr, mdef, FALSE)) {
+            You("are not affected.");
+        } else {
             if (Verbose(4, mhitm_ad_tlpt))
                 Your("position suddenly seems %suncertain!",
                      (Teleport_control && !Stunned && !unconscious()) ? ""
@@ -2726,7 +2722,12 @@ mhitm_ad_tlpt(
         }
     } else {
         /* mhitm */
-        if (!negated && mhm->damage < mdef->mhp && !tele_restrict(mdef)) {
+        if (magr->mcan || mhm->damage >= mdef->mhp || tele_restrict(mdef)) {
+            ; /* no negation message */
+        } else if (mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
+            if (gv.vis)
+                pline("%s is not affected.", Monnam(mdef));
+        } else {
             char mdef_Monnam[BUFSZ];
             boolean wasseen = canspotmon(mdef);
 
@@ -3162,11 +3163,10 @@ mhitm_ad_plys(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (!negated && mdef->mcanmove && !rn2(3) && mhm->damage < mdef->mhp) {
+        if (!rn2(3) && mhm->damage < mdef->mhp
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (!Blind)
                 pline("%s is frozen by you!", Monnam(mdef));
             paralyze_monst(mdef, rnd(10));
@@ -3174,7 +3174,8 @@ mhitm_ad_plys(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated && gm.multi >= 0 && !rn2(3)) {
+        if (gm.multi >= 0 && !rn2(3)
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (Free_action) {
                 You("momentarily stiffen.");
             } else {
@@ -3192,9 +3193,11 @@ mhitm_ad_plys(
         }
     } else {
         /* mhitm */
-        if (!negated && mdef->mcanmove) {
+        if (mdef->mcanmove && !rn2(3)
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (gv.vis && canspotmon(mdef)) {
                 char buf[BUFSZ];
+
                 Strcpy(buf, Monnam(mdef));
                 pline("%s is frozen by %s.", buf, mon_nam(magr));
             }
@@ -3208,11 +3211,10 @@ mhitm_ad_slee(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (!negated && !mdef->msleeping && sleep_monst(mdef, rnd(10), -1)) {
+        if (!mdef->msleeping && !mhitm_mgc_atk_negated(magr, mdef, FALSE)
+            && sleep_monst(mdef, rnd(10), -1)) {
             if (!Blind)
                 pline("%s is put to sleep by you!", Monnam(mdef));
             slept_monst(mdef);
@@ -3220,7 +3222,8 @@ mhitm_ad_slee(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated && gm.multi >= 0 && !rn2(5)) {
+        if (gm.multi >= 0 && !rn2(5)
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             if (Sleep_resistance) {
                 monstseesu(M_SEEN_SLEEP);
                 return;
@@ -3233,10 +3236,11 @@ mhitm_ad_slee(
         }
     } else {
         /* mhitm */
-        if (!negated && !mdef->msleeping
+        if (!mdef->msleeping && sleep_monst(mdef, rnd(10), -1)
             && sleep_monst(mdef, rnd(10), -1)) {
             if (gv.vis && canspotmon(mdef)) {
                 char buf[BUFSZ];
+
                 Strcpy(buf, Monnam(mdef));
                 pline("%s is put to sleep by %s.", buf, mon_nam(magr));
             }
@@ -3252,7 +3256,7 @@ mhitm_ad_slim(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
     struct permonst *pd = mdef->data;
 
     if (magr == &gy.youmonst) {
@@ -3278,8 +3282,11 @@ mhitm_ad_slim(
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (negated)
+        if (negated) {
+            if (!magr->mcan)
+                You("escape harm.");
             return;
+        }
         if (flaming(pd)) {
             pline_The("slime burns away!");
             mhm->damage = 0;
@@ -3373,7 +3380,7 @@ mhitm_ad_slow(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm UNUSED)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
 
     if (defended(mdef, AD_SLOW))
         return;
@@ -3448,22 +3455,33 @@ mhitm_ad_poly(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
+    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
         /* require weaponless attack in order to honor AD_POLY */
-        if (!uwep && !negated && mhm->damage < mdef->mhp)
-            mhm->damage = mon_poly(&gy.youmonst, mdef, mhm->damage);
+        if (!uwep && mhm->damage < mdef->mhp) {
+            if (negated) {
+                /* assume that you can tell by touch if blinded */
+                pline("%s is not transformted.", Monnam(mdef));
+            } else {
+                mhm->damage = mon_poly(&gy.youmonst, mdef, mhm->damage);
+            }
+        }
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
-        if (!negated
-            && Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp))
-            mhm->damage = mon_poly(magr, &gy.youmonst, mhm->damage);
+        if (Maybe_Half_Phys(mhm->damage) < (Upolyd ? u.mh : u.uhp)) {
+            if (negated) {
+                if (magr->mcan)
+                    You("aren't transformed.");
+            } else {
+                mhm->damage = mon_poly(magr, &gy.youmonst, mhm->damage);
+            }
+        }
     } else {
         /* mhitm */
-        if (!magr->mcan && mhm->damage < mdef->mhp)
+        if (mhm->damage < mdef->mhp && !negated)
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
     }
 }
@@ -3717,9 +3735,8 @@ mhitm_ad_phys(
                 }
             } else if (u.ustuck == magr) {
                 exercise(A_STR, FALSE);
-                You("are being %s.", (magr->data == &mons[PM_ROPE_GOLEM])
-                                         ? "choked"
-                                         : "crushed");
+                You("are being %s.",
+                    (pa == &mons[PM_ROPE_GOLEM]) ? "choked" : "crushed");
             }
         } else { /* hand to hand weapon */
             struct obj *otmp = MON_WEP(magr);
@@ -3747,9 +3764,9 @@ mhitm_ad_phys(
                     mhm->damage += rn1(4, 3); /* 3..6 */
                 if (mhm->damage <= 0)
                     mhm->damage = 1;
-                if (!(otmp->oartifact && artifact_hit(magr, mdef, otmp,
-                                                      &mhm->damage,
-                                                      gm.mhitu_dieroll))) {
+                if (!otmp->oartifact
+                    || !artifact_hit(magr, mdef, otmp, &mhm->damage,
+                                     gm.mhitu_dieroll)) {
                     hitmsg(magr, mattk);
                     mhm->hitflags |= MM_HIT;
                 }
@@ -3932,11 +3949,10 @@ mhitm_ad_were(
             return;
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
-        boolean negated = mhitm_mgc_atk_negated(magr, mdef, TRUE);
-
         hitmsg(magr, mattk);
-        if (!negated && !rn2(4) && u.ulycn == NON_PM
-            && !Protection_from_shape_changers && !defends(AD_WERE, uwep)) {
+        if (!rn2(4) && u.ulycn == NON_PM
+            && !Protection_from_shape_changers && !defends(AD_WERE, uwep)
+            && !mhitm_mgc_atk_negated(magr, mdef, TRUE)) {
             urgent_pline("You feel feverish.");
             exercise(A_CON, FALSE);
             set_ulycn(monsndx(pa));
