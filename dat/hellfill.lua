@@ -135,6 +135,42 @@ xxxx.........xxxx
 xxxxxx.....xxxxxx
 ]], contents = function() end });
    end,
+   function (coldhell)
+      des.map({ halign = rnd_halign(), valign = rnd_valign(), map = [[
+xxxxxx.xxxxxx
+xLLLLLLLLLLLx
+xL---------Lx
+xL|.......|Lx
+xL|.......|Lx
+.L|.......|L.
+xL|.......|Lx
+xL|.......|Lx
+xL---------Lx
+xLLLLLLLLLLLx
+xxxxxx.xxxxxx
+]], contents = function()
+   des.non_diggable(selection.area(2,2, 10,8));
+   des.region(selection.area(4,4, 8,6), "lit");
+   if (coldhell) then
+      des.replace_terrain({ region = {1,1, 11,9}, fromterrain="L", toterrain="P" });
+   end
+   local dblocs = {
+      { x = 1, y = 5, dir="east", state="closed" },
+      { x = 11, y = 5, dir="west", state="closed" },
+      { x = 6, y = 1, dir="south", state="closed" },
+      { x = 6, y = 9, dir="north", state="closed" }
+   }
+   shuffle(dblocs);
+   for i = 1, math.random(1, #dblocs) do
+      des.drawbridge(dblocs[i]);
+   end
+   local mons = { "H", "T", "@" };
+   shuffle(mons);
+   for i = 1, 3 + math.random(1, 5) do
+      des.monster(mons[1], 6, 5);
+   end
+      end });
+   end,
    function ()
       des.map({ halign = "center", valign = "center", map = [[
 ..............................................................
@@ -200,9 +236,9 @@ BBBBBBB]], contents = function()
    end,
 };
 
-function rnd_hell_prefab()
+function rnd_hell_prefab(coldhell)
    local pf = math.random(1, #hell_prefabs);
-   hell_prefabs[pf]();
+   hell_prefabs[pf](coldhell);
 end
 
 hells = {
@@ -228,7 +264,7 @@ hells = {
       local protected_area = selection.fillrect(bnds.lx, bnds.ly + 1, bnds.hx - 2, bnds.hy - 1);
       hell_tweaks(protected_area:negate());
       if (percent(25)) then
-         rnd_hell_prefab();
+         rnd_hell_prefab(false);
       end
    end,
 
@@ -254,7 +290,7 @@ hells = {
             -- replace some horizontal iron bars walls with floor
             des.replace_terrain({ mapfragment = ".\nF\n.", toterrain = ".", chance = 25 * math.random(4) });
          elseif (percent(25)) then
-            rnd_hell_prefab();
+            rnd_hell_prefab(false);
          end
       end
       des.terrain(outside_walls, " ");  -- return the outside back to solid wall
@@ -281,9 +317,6 @@ hells = {
       local outside_walls = selection.match(" ");
       local icey = selection.negate():percentage(10):grow():filter_mapchar(".");
       des.terrain(icey, "I");
-      if (cwid == 1 and percent(25)) then
-         rnd_hell_prefab();
-      end
       if (cwid > 1) then
          -- turn some ice into wall of water
          des.terrain(icey:percentage(1), "W");
@@ -291,6 +324,9 @@ hells = {
       des.terrain(icey:percentage(5), "P");
       if (percent(25)) then
          des.terrain(selection.match("w"), "W"); -- walls of water
+      end
+      if (cwid == 1 and percent(25)) then
+         rnd_hell_prefab(true);
       end
       des.terrain(outside_walls, " ");  -- return the outside back to solid wall
    end,
