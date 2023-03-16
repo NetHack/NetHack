@@ -245,6 +245,13 @@ local tutorial_events = {
          tutorial_whitelist_commands["read"] = true;
          end,
    },
+   {
+      ucoord = { 19, 7 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["drop"] = true;
+         end,
+   },
 };
 
 function tutorial_turn()
