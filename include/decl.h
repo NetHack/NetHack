@@ -1020,6 +1020,10 @@ struct instance_globals_h {
     /* dog.c */
     char horsename[PL_PSIZ];
 
+    /* mhitu.c */
+    unsigned hitmsg_mid;
+    struct attack *hitmsg_prev;
+
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
 };
