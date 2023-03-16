@@ -234,6 +234,23 @@ BBBBBBB]], contents = function()
    des.monster("L",04,04)
       end })
    end,
+   function ()
+      local mapstr = percent(30) and [[
+.....
+.LLL.
+.LZL.
+.LLL.
+.....]] or [[
+.....
+.PPP.
+.PWP.
+.PPP.
+.....]];
+      for dx = 1, 5 do
+         des.map({ x = dx*14 - 4, y = math.random(3, 15),
+                   map = mapstr, contents = function() end })
+      end
+   end,
 };
 
 function rnd_hell_prefab(coldhell)
