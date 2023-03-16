@@ -116,10 +116,24 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
                     : (cgend == CORPSTAT_MALE) ? MM_MALE : 0L);
 
         mtmp = makemon(pm, x, y, mmflags);
-        if (otmp && !mtmp) { /* monster was genocided or square occupied */
-            if (!quietly)
-                pline_The("figurine writhes and then shatters into pieces!");
-            break;
+        if (otmp) { /* figurine */
+            if (!mtmp) {
+                /* monster has been genocided or target spot is occupied */
+                if (!quietly)
+                    pline_The(
+                           "figurine writhes and then shatters into pieces!");
+                break;
+            } else if (mtmp->isminion) {
+                /* Fixup for figurine of an Angel:  makemon() is willing to
+                   create a random Angel as either an ordinary monster or as
+                   a minion of random allegiance.  We don't want the latter
+                   here in case it successfully becomes a pet. */
+                mtmp->isminion = 0;
+                free_emin(mtmp);
+                /* [This could and possibly should be redone as a new
+                   MM_flag passed to makemon() to suppress making a minion
+                   so that no post-creation fixup would be needed.] */
+            }
         }
     } while (!mtmp && --trycnt > 0);
 
