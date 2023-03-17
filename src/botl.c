@@ -249,7 +249,7 @@ do_statusline2(void)
 void
 bot(void)
 {
-    /* dosave() flags completion by setting u.uhp to -1; supprss_map_output()
+    /* dosave() flags completion by setting u.uhp to -1; suppress_map_output()
        covers program_state.restoring and is used for status as well as map */
     if (u.uhp != -1 && gy.youmonst.data
         && iflags.status_updates && !suppress_map_output()) {
@@ -743,7 +743,7 @@ bot_via_windowport(void)
     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name
-       but always keep at least 10 characters of it; when hitpintbar is
+       but always keep at least 10 characters of it; when hitpointbar is
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
         i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
@@ -1199,7 +1199,7 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
     /*
      * TODO:
      *  Dynamically update 'percent_matters' as rules are added or
-     *  removed to track whether any of them are precentage rules.
+     *  removed to track whether any of them are percentage rules.
      *  Then there'll be no need to assume that non-Null 'thresholds'
      *  means that percentages need to be kept up to date.
      *  [Affects exp_percent_changing() too.]
@@ -1922,7 +1922,7 @@ status_eval_next_unhilite(void)
     struct istat_s *curr;
     long next_unhilite, this_unhilite;
 
-    gb.bl_hilite_moves = gm.moves; /* simpllfied; at one point we used to try
+    gb.bl_hilite_moves = gm.moves; /* simplified; at one point we used to try
                                   * to encode fractional amounts for multiple
                                   * moves within same turn */
     /* figure out whether an unhilight needs to be performed now */

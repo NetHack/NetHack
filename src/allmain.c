@@ -355,7 +355,7 @@ moveloop_core(void)
 
         gh.hero_seq++; /* moves*8 + n for n == 1..7 */
 
-        /* although we checked for encumberance above, we need to
+        /* although we checked for encumbrance above, we need to
            check again for message purposes, as the weight of
            inventory may have changed in, e.g., nh_timeout(); we do
            need two checks here so that the player gets feedback
@@ -817,7 +817,7 @@ welcome(boolean new_game) /* false => restoring an old game */
         livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
                        gp.plname, buf);
     } else {
-        /* if restroing in Gehennom, give same hot/smoky message as when
+        /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */
         hellish_smoke_mesg();
     }

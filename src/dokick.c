@@ -347,7 +347,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
             /* Some of these are iffy, because a hostile guard
                won't become peaceful and resume leading hero
                out of the vault.  If he did do that, player
-               could try fighting, then weasle out of being
+               could try fighting, then weasel out of being
                killed by throwing his/her gold when losing. */
             SetVoice(mtmp, 0, 80, 0);
             verbalize(umoney ? "Drop the rest and follow me."
@@ -380,7 +380,7 @@ ghitm(register struct monst *mtmp, register struct obj *gold)
                 SetVoice(mtmp, 0, 80, 0);
                 if (goldreqd)
                     verbalize("That's not enough, coward!");
-                else /* unbribeable (watchman) */
+                else /* unbribable (watchman) */
                     verbalize("I don't take bribes from scum like you!");
             } else if (was_angry) {
                 SetVoice(mtmp, 0, 80, 0);

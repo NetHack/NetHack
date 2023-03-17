@@ -794,7 +794,7 @@ struct alt_spl {
 };
 
 /* figure out what type of monster a user-supplied string is specifying;
-   ingore anything past the monster name */
+   ignore anything past the monster name */
 int
 name_to_mon(const char *in_str, int *gender_name_var)
 {

@@ -387,7 +387,7 @@ death_inflicted_by(
         const char *realnm = pmname(champtr, Mgender(mtmp)),
             *fakenm = pmname(mptr, Mgender(mtmp));
 
-        /* greatly simplfied extract from done_in_by(), primarily for
+        /* greatly simplified extract from done_in_by(), primarily for
            reason for death due to 'touch of death' spell; if mtmp is
            shape changed, it won't be a vampshifter or mimic since they
            can't cast spells */

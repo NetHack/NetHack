@@ -279,7 +279,7 @@ mdisplacem(register struct monst *magr, register struct monst *mdef,
  *      0x0     MM_MISS
  *
  * Each successive attack has a lower probability of hitting.  Some rely on
- * success of previous attacks.  ** this doen't seem to be implemented -dl **
+ * success of previous attacks.  ** this doesn't seem to be implemented -dl **
  *
  * In the case of exploding monsters, the monster dies as well.
  */

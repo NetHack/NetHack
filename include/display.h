@@ -32,7 +32,7 @@
  * so treat those situations as blocking telepathy, detection, and warning
  * even though conceptually they shouldn't do so.
  *
- * [3.7 also] The macros whose name begins with an understore have been
+ * [3.7 also] The macros whose name begins with an underscore have been
  * converted to functions in order to have compilers generate smaller code.
  * The retained underscore versions are still used in display.c but should
  * only be used in other situations if the function calls actually produce
@@ -51,7 +51,7 @@
 
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
-   lava, but presumeably any monster there is on top so not sensed */
+   lava, but presumably any monster there is on top so not sensed */
 #define _sensemon(mon) \
     (   (!u.uswallow || (mon) == u.ustuck)                                   \
      && (!Underwater || (mdistu(mon) <= 2 && is_pool((mon)->mx, (mon)->my))) \

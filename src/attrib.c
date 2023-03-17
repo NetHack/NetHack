@@ -257,7 +257,7 @@ losestr(int num, const char *knam, schar k_format)
 #else
     nhUse(olduhpmax);
 #endif
-    /* 'num' chould have been reduced to 0 in the minimum strength loop;
+    /* 'num' could have been reduced to 0 in the minimum strength loop;
        '(Upolyd || !waspolyd)' is True unless damage caused rehumanization */
     if (num > 0 && (Upolyd || !waspolyd))
         (void) adjattrib(A_STR, -num, 1);

@@ -114,7 +114,7 @@ enum achivements {
      *  defeated nemesis (not same as acquiring Bell or artifact),
      *  completed quest (formally, by bringing artifact to leader),
      *  entered rogue level,
-     *  entered Fort Ludios level/branch (not guaranteed to be achieveable),
+     *  entered Fort Ludios level/branch (not guaranteed to be achievable),
      *  entered Medusa level,
      *  entered castle level,
      *  obtained castle wand (handle similarly to mines and sokoban prizes),

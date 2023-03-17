@@ -76,9 +76,9 @@ sanity_check_single_mon(
             mtmp->mnum = mndx;
         }
 #if 0   /*
-         * Gremlims don't obey the (mhpmax >= m_lev) rule so disable
+         * Gremlins don't obey the (mhpmax >= m_lev) rule so disable
          * this check, at least for the time being.  We could skip it
-         * when the cloned flag is set, but the original gremlim would
+         * when the cloned flag is set, but the original gremlin would
          * still be an issue.
          */
         /* check before DEADMONSTER() because dead monsters should still
@@ -1528,7 +1528,7 @@ mon_givit(struct monst *mtmp, struct permonst *ptr)
          * Invisible stalker isn't flagged as conferring invisibility
          * so prop is 0.  For hero, eating a stalker corpse confers
          * temporary invisibility if hero is visible.  When already
-         * invisible, if confers permanent invisibilty and also
+         * invisible, if confers permanent invisibility and also
          * permanent see invisible.  For monsters, only permanent
          * invisibility is possible; temporary invisibility and see
          * invisible aren't implemented for them.
@@ -1721,7 +1721,7 @@ can_touch_safely(struct monst *mtmp, struct obj *otmp)
  * this will probably cause very amusing behavior with pets and gold coins.
  *
  * TODO: allow picking up 2-N objects from a pile of N based on weight.
- *       Change from 'int' to 'long' to accomate big stacks of gold.
+ *       Change from 'int' to 'long' to accommodate big stacks of gold.
  *       Right now we fake it by reporting a partial quantity, but the
  *       likesgold handling m_move results in picking up the whole stack.
  */
@@ -1739,7 +1739,7 @@ can_carry(struct monst* mtmp, struct obj* otmp)
         return 0;
 
     /* hostile monsters who like gold will pick up the whole stack;
-       tame mosnters with hands will pick up the partial stack */
+       tame monsters with hands will pick up the partial stack */
     iquan = (otmp->quan > (long) LARGEST_INT)
                ? 20000 + rn2(LARGEST_INT - 20000 + 1)
                : (int) otmp->quan;
@@ -3049,7 +3049,7 @@ unstuck(struct monst *mtmp)
         /* prevent holder/engulfer from immediately re-holding/re-engulfing
            [note: this call to unstuck() might be because u.ustuck has just
            changed shape and doesn't have a holding attack any more, hence
-           don't set mspec_used uncondtionally] */
+           don't set mspec_used unconditionally] */
         if (!mtmp->mspec_used && (dmgtype(ptr, AD_STCK)
                                   || attacktype(ptr, AT_ENGL)
                                   || attacktype(ptr, AT_HUGS)))

@@ -320,7 +320,7 @@ distant_name(
          * (r * r) * 2 - r: instead of a square extending from the hero,
          * round the corners (so shorter distance imposed for diagonal).
          *
-         * distu() matrix convering a range of 3+ for one quadrant:
+         * distu() matrix covering a range of 3+ for one quadrant:
          *  16 17  -  -  -
          *   9 10 13 18  -
          *   4  5  8 13  -
@@ -3364,7 +3364,7 @@ wizterrainwish(struct _readobjnam_data *d)
         lev->flags = 0;
         /* [FIXME: if this isn't a wall or door location where 'horizontal'
             is already set up, that should be calculated for this spot.
-            Unforutnately, it can be tricky; placing one in open space
+            Unfortunately, it can be tricky; placing one in open space
             and then another adjacent might need to recalculate first one.] */
         pline("Iron bars.");
         madeterrain = TRUE;
@@ -4673,7 +4673,7 @@ readobjnam(char *bp, struct obj *no_wish)
     }
 
     if (d.spesgn == 0) {
-        /* spe not specifed; retain the randomly assigned value */
+        /* spe not specified; retain the randomly assigned value */
         d.spe = d.otmp->spe;
     } else if (wizard) {
         ; /* no restrictions except SPE_LIM */

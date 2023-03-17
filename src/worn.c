@@ -159,7 +159,7 @@ allunworn(void)
 }
 
 
-/* return item worn in slot indiciated by wornmask; needed by poly_obj() */
+/* return item worn in slot indicated by wornmask; needed by poly_obj() */
 struct obj *
 wearmask_to_obj(long wornmask)
 {
@@ -333,12 +333,12 @@ mon_adjust_speed(
     }
 }
 
-/* alchemy smock confers two properites, poison and acid resistance
+/* alchemy smock confers two properties, poison and acid resistance
    but objects[ALCHEMY_SMOCK].oc_oprop can only describe one of them;
    if it is poison resistance, alternate property is acid resistance;
-   if someone changes it to acid resistance, alt becomes posion resist;
+   if someone changes it to acid resistance, alt becomes poison resist;
    if someone changes it to hallucination resistance, all bets are off
-   [TODO: handle alternate propertices conferred by dragon scales/mail] */
+   [TODO: handle alternate properties conferred by dragon scales/mail] */
 #define altprop(o) \
     (((o)->otyp == ALCHEMY_SMOCK)                               \
      ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \

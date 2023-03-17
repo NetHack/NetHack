@@ -122,7 +122,7 @@ enum cost_alteration_types {
 /* bitmask flags for corpse_xname();
    PFX_THE takes precedence over ARTICLE, NO_PFX takes precedence over both */
 #define CXN_NORMAL 0    /* no special handling */
-#define CXN_SINGULAR 1  /* override quantity if greather than 1 */
+#define CXN_SINGULAR 1  /* override quantity if greater than 1 */
 #define CXN_NO_PFX 2    /* suppress "the" from "the Unique Monst */
 #define CXN_PFX_THE 4   /* prefix with "the " (unless pname) */
 #define CXN_ARTICLE 8   /* include a/an/the prefix */
@@ -639,7 +639,7 @@ enum getobj_callback_returns {
      * floor before getobj. */
     GETOBJ_EXCLUDE_NONINVENT = -2,
     /* invalid because it is an inaccessible or unwanted piece of gear, but
-     * psuedo-valid for the purposes of allowing the player to select it and
+     * pseudo-valid for the purposes of allowing the player to select it and
      * getobj to return it if there is a prompt instead of getting "silly
      * thing", in order for the getobj caller to present a specific failure
      * message. Other than that, the only thing this does differently from
@@ -647,7 +647,7 @@ enum getobj_callback_returns {
      * else to foo". */
     GETOBJ_EXCLUDE_INACCESS = -1,
     /* invalid for purposes of not showing a prompt if nothing is valid but
-     * psuedo-valid for selecting - identical to GETOBJ_EXCLUDE_INACCESS but
+     * pseudo-valid for selecting - identical to GETOBJ_EXCLUDE_INACCESS but
      * without the "else" in "You don't have anything else to foo". */
     GETOBJ_EXCLUDE_SELECTABLE = 0,
     /* valid - invlet not presented in the summary or the ? menu as a

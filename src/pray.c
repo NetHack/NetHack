@@ -2042,7 +2042,7 @@ pray_revive(void)
     return (revive(otmp, TRUE) != NULL);
 }
 
-/* #pray commmand */
+/* #pray command */
 int
 dopray(void)
 {
@@ -2291,7 +2291,7 @@ doturn(void)
      *  chaotic oneself (see "For some reason" above) and chaotic
      *  turning only makes targets peaceful.
      *
-     *  Paralysis duration probably ought to be based on the strengh
+     *  Paralysis duration probably ought to be based on the strength
      *  of turned creatures rather than on turner's level.
      *  Why doesn't this honor Free_action?  [Because being able to
      *  repeat #turn every turn would be too powerful.  Maybe instead

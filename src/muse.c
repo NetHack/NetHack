@@ -2941,7 +2941,7 @@ muse_unslime(
         boolean was_lit = obj->lamplit ? TRUE : FALSE, saw_lit = FALSE;
         /*
          * If not already lit, requires two actions.  We cheat and let
-         * monster do both rather than render the potion unuseable.
+         * monster do both rather than render the potion unusable.
          *
          * Monsters don't start with oil and don't actively pick up oil
          * so this may never occur in a real game.  (Possible though;

@@ -1027,7 +1027,7 @@ hold_another_object(
     char buf[BUFSZ];
 
     if (!Blind)
-        obj->dknown = 1; /* maximize mergibility */
+        obj->dknown = 1; /* maximize mergeability */
     if (obj->oartifact) {
         /* place_object may change these */
         boolean crysknife = (obj->otyp == CRYSKNIFE);
@@ -2847,7 +2847,7 @@ itemactions_pushkeys(struct obj *otmp, int act)
             /* start with m-prefix to skip floor containers;
                for menustyle:Traditional when more than one floor
                container is present, player will get a #tip menu and
-               have to pick the "tip sometking being carried" choice,
+               have to pick the "tip something being carried" choice,
                then this item will be already chosen from inventory;
                suboptimal but possibly an acceptable tradeoff since
                combining item actions with use of traditional ggetobj()
@@ -3397,7 +3397,7 @@ display_pickinv(
             /* wiz_identify stuffed the wiz_identify command character (^I)
                into iflags.override_ID for our use as an accelerator;
                it could be ambiguous if player has assigned a letter to
-               the #wizidentify command, so include it as a group accelator
+               the #wizidentify command, so include it as a group accelerator
                but use '_' as the primary selector */
             if (unid_cnt > 1)
                 Sprintf(eos(prompt), " (%s for all)",
@@ -5566,7 +5566,7 @@ sync_perminvent(void)
 
     if ((!iflags.perm_invent && gc.core_invent_state)) {
         /* Odd - but this could be end-of-game disclosure
-         * which just sets boolean iflag.perm_invent to
+         * which just sets boolean iflags.perm_invent to
          * FALSE without actually doing anything else.
          */
 #ifdef TTY_PERM_INVENT

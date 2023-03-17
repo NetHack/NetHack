@@ -330,7 +330,7 @@ getmattk(struct monst *magr, struct monst *mdef,
         attk = alt_attk_buf;
         /* 3.6.0 used 4d6 but since energy drain came out of max energy
            once current energy was gone, that tended to have a severe
-           effect on low energy characters; it's now 2d6 with ajustments */
+           effect on low energy characters; it's now 2d6 with adjustments */
         if (u.uen <= 5 * ulev && attk->damn > 1) {
             attk->damn -= 1; /* low energy: 2d6 -> 1d6 */
             if (u.uenmax <= 2 * ulev && attk->damd > 3)

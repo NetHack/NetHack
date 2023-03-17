@@ -392,7 +392,7 @@ look_at_monster(
     }
 
     /* we know the hero sees a monster at this location, but if it's shown
-       due to persistant monster detection he might remember something else */
+       due to persistent monster detection he might remember something else */
     if (mtmp->mundetected || M_AP_TYPE(mtmp))
         mhidden_description(mtmp, FALSE, eos(buf));
 
@@ -725,7 +725,7 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
     /*
      * TODO:
      * The switch from xname() to doname_vague_quan() in look_at_obj()
-     * had the unintendded side-effect of making names picked from
+     * had the unintended side-effect of making names picked from
      * pointing at map objects become harder to simplify for lookup.
      * We should split the prefix and suffix handling used by wish
      * parsing and also wizmode monster generation out into separate
@@ -2026,7 +2026,7 @@ doidtrap(void)
 }
 
 /*
-    Implements a rudimentary if/elif/else/endif interpretor and use
+    Implements a rudimentary if/elif/else/endif interpreter and use
     conditionals in dat/cmdhelp to describe what command each keystroke
     currently invokes, so that there isn't a lot of "(debug mode only)"
     and "(if number_pad is off)" cluttering the feedback that the user
@@ -2036,7 +2036,7 @@ doidtrap(void)
     keypad vs normal layout of digits, and QWERTZ keyboard swap between
     y/Y/^Y/M-y/M-Y/M-^Y and z/Z/^Z/M-z/M-Z/M-^Z.)
 
-    The interpretor understands
+    The interpreter understands
      '&#' for comment,
      '&? option' for 'if' (also '&? !option'
                            or '&? option=value[,value2,...]'

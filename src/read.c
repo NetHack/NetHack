@@ -184,7 +184,7 @@ tshirt_text(struct obj* tshirt, char* buf)
            Theory" although they didn't create it (and an actual T-shirt
            with pentagonal diagram showing which choices defeat which) */
         "rock--paper--scissors--lizard--Spock!",
-        /* "All men must die -- all men must serve" challange and response
+        /* "All men must die -- all men must serve" challenge and response
            from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
            TV show "Game of Thrones" (probably an actual T-shirt too...) */
         "/Valar morghulis/ -- /Valar dohaeris/",
@@ -3044,7 +3044,7 @@ create_particular_parse(
      * If d->fem is already set to MALE or FEMALE at this juncture, it means
      * one of those terms was explicitly specified.
      */
-    if (d->fem == MALE || d->fem == FEMALE) {     /* explicity expressed */
+    if (d->fem == MALE || d->fem == FEMALE) {     /* explicitly expressed */
         if ((gender_name_var != NEUTRAL) && (d->fem != gender_name_var)) {
             /* apparent selection incompatibility */
             d->genderconf = gender_name_var;        /* resolve later */
@@ -3107,7 +3107,7 @@ create_particular_creation(
         else if (d->randmonst)
             whichpm = rndmonst();
         if (d->genderconf == -1) {
-            /* no confict exists between explicit gender term and
+            /* no conflict exists between explicit gender term and
                the specified monster name */
             if (d->fem != -1 && (!whichpm || (!is_male(whichpm)
                                               && !is_female(whichpm))))

@@ -617,7 +617,7 @@ magic_whistled(struct obj *obj)
                           : ((n) <= 7) ? "several"  \
                             : "many")
         /* magic whistle is already discovered so rloc() message(s)
-           were suppressed above; if any discernible relocation occured,
+           were suppressed above; if any discernible relocation occurred,
            construct a message now and issue it below */
         if (shift > 0) {
             if (shift > 1)
@@ -1876,7 +1876,7 @@ is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
         coordxy dx = x - u.ux, dy = y - u.uy,
                 ax = abs(dx), ay = abs(dy);
 
-        /* diag: any non-orthogonal destination classifed as diagonal */
+        /* diag: any non-orthogonal destination classified as diagonal */
         diag = (magic || Passes_walls || (!dx && !dy)) ? jAny
                : !dy ? jHorz : !dx ? jVert : jDiag;
         /* traj: flatten out the trajectory => some diagonals re-classified */

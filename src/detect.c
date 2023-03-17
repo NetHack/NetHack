@@ -1427,7 +1427,7 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
      * issuing --More-- and then regular vision update, but we want
      * to avoid that when having a clairvoyant episode every N turns
      * (from donating to a temple priest or by carrying the Amulet).
-     * Unlike when casting the spell, it is much too intrustive when
+     * Unlike when casting the spell, it is much too intrusive when
      * in the midst of walking around or combatting monsters.
      *
      * As of 3.6.2, show terrain, then object, then monster like regular
@@ -1705,7 +1705,7 @@ findit(void)
     }
     /* note: non-\0 *buf implies that at least one previous type is present */
     if (found.num_scorrs) {
-        if (*buf) /* "doors and corrs" or "doors, coors ..." */
+        if (*buf) /* "doors and corrs" or "doors, corrs ..." */
             Strcat(buf, (k == 2) ? " and " : ", ");
         if (found.num_scorrs > 1)
             Sprintf(eos(buf), "%d secret corridors", found.num_scorrs);
@@ -1714,7 +1714,7 @@ findit(void)
         num += found.num_scorrs;
     }
     if (found.num_traps) {
-        if (*buf) /* "doors, corrs, and traps" or "{doors|coors} and traps"
+        if (*buf) /* "doors, corrs, and traps" or "{doors|corrs} and traps"
                    * or "..., traps ..." */
             Strcat(buf, (k == 3 && !found.num_mons) ? ", and "
                         : (k == 2) ? " and " : ", ");

@@ -1999,7 +1999,7 @@ steal_it(struct monst *mdef, struct attack *mattk)
     if (ustealo) { /* we will be taking everything */
         char heshe[20];
 
-        /* 3.7: this uses hero's base gender rather than nymph feminimity
+        /* 3.7: this uses hero's base gender rather than nymph femininity
            but was using hardcoded pronouns She/her for target monster;
            switch to dynamic pronoun */
         if (gender(mdef) == (int) u.mfemale
@@ -3841,7 +3841,7 @@ mhitm_ad_phys(
                 /* when magr's weapon is an artifact, caller suppressed its
                    usual 'hit' message in case artifact_hit() delivers one;
                    now we'll know and might need to deliver skipped message
-                   (note: if there's no message there'll be no auxilliary
+                   (note: if there's no message there'll be no auxiliary
                    damage so the message here isn't coming too late) */
                 if (!artifact_hit(magr, mdef, mwep, &mhm->damage,
                                   mhm->dieroll)) {
@@ -5590,7 +5590,7 @@ passive(struct monst *mon,
                  * positive enchantment, it ought to be subject to
                  * having that enchantment reduced.  But we don't have
                  * sufficient information here to know which hand/ring
-                 * has delived a weaponless blow.
+                 * has delivered a weaponless blow.
                  */
                 ;
             }

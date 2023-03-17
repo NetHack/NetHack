@@ -664,7 +664,7 @@ doextlist(void)
                     /* first try case-insensitive substring match */
                     && !strstri(efp->ef_txt, searchbuf)
                     && !strstri(efp->ef_desc, searchbuf)
-                    /* wildcard support; most interfaces use case-insensitve
+                    /* wildcard support; most interfaces use case-insensitive
                        pmatch rather than regexp for menu searching */
                     && !pmatchi(searchbuf, efp->ef_txt)
                     && !pmatchi(searchbuf, efp->ef_desc))
@@ -5879,7 +5879,7 @@ act_on_act(
 
     switch (act) {
     case MCMD_TRAVEL:
-        /* FIXME: player has explicilty picked "travel to this location"
+        /* FIXME: player has explicitly picked "travel to this location"
            from the menu but it will only work if flags.travelcmd is True.
            That option is intended as way to guard against stray mouse
            clicks and shouldn't inhibit explicit travel. */

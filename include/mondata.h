@@ -254,7 +254,7 @@
     (vegan(ptr)         \
      || ((ptr)->mlet == S_PUDDING && (ptr) != &mons[PM_BLACK_PUDDING]))
 
-/* monkeys are tameable via bananas but not pacifiable via food,
+/* monkeys are tamable via bananas but not pacifiable via food,
    otherwise their theft attack could be nullified too easily;
    dogs and cats can be tamed by anything they like to eat and are
    pacified by any other food;

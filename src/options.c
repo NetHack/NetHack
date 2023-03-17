@@ -526,7 +526,7 @@ parseoptions(
     if (!got_match) {
         /* spin through the aliases to see if there's a match in those.
            Note that if multiple delimited aliases for the same option
-           becomes desireable in the future, this is where you'll need
+           becomes desirable in the future, this is where you'll need
            to split a delimited allopt[i].alias field into each
            individual alias */
 

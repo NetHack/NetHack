@@ -947,7 +947,7 @@ mksobj(int otyp, boolean init, boolean artif)
             if (Is_pudding(otmp)) {
                 otmp->globby = 1;
                 /* for emphasis; glob quantity is always 1 and weight varies
-                   when other globs coallesce with it or this one shrinks */
+                   when other globs coalesce with it or this one shrinks */
                 otmp->quan = 1L;
                 /* 3.7: globs in 3.6.x left owt as 0 and let weight() fix
                    that up during 'obj->owt = weight(obj)' below, but now
@@ -1811,7 +1811,7 @@ weight(struct obj *obj)
                    obj->quan, simpleonames(obj));
         return 0;
     }
-    /* glob absorpsion means that merging globs combines their weight
+    /* glob absorption means that merging globs combines their weight
        while quantity stays 1; mksobj(), obj_absorb(), and shrink_glob()
        manage glob->owt and there is nothing for weight() to do except
        return the current value as-is */
@@ -2682,7 +2682,7 @@ hornoplenty(
            confers ownership of the created item to the shopkeeper */
         if (horn->unpaid)
             addtobill(obj, FALSE, FALSE, tipping);
-        /* if it ended up on bill, we don't want "(unpaid, N zorkids)"
+        /* if it ended up on bill, we don't want "(unpaid, N zorkmids)"
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {

@@ -489,7 +489,7 @@ eatfood(void)
      * an acidic corpse or temporary stoning resistance to do that while
      * eating a cockatrice corpse.  Protection is checked at the start
      * of the meal and having it go away mid-meal with a message about
-     * increased vulnerability but no consequences is too obvously wrong,
+     * increased vulnerability but no consequences is too obviously wrong,
      * but also too nit-picky to deal with.
      *
      * (Tins aren't handled by eatfood() and wouldn't need this anyway
@@ -1196,7 +1196,7 @@ cpostfx(int pm)
             make_stunned(2L, FALSE);
         if ((HConfusion & TIMEOUT) > 2)
             make_confused(2L, FALSE);
-        check_intrinsics = TRUE; /* might convery temporary stoning resist */
+        check_intrinsics = TRUE; /* might convey temporary stoning resist */
         break;
     case PM_CHAMELEON:
     case PM_DOPPELGANGER:
@@ -3574,7 +3574,7 @@ floorfood(
             otmp = (struct obj *) 0;
         }
     }
-    /* reseting 'getobj_else' here isn't essential; it will be cleared the
+    /* resetting 'getobj_else' here isn't essential; it will be cleared the
        next time it needs to be used */
     getobj_else = 0;
     return otmp;

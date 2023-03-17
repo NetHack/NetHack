@@ -250,7 +250,7 @@ losexp(
        strength loss or by a fire trap or by an attack by Death which
        all use a different minimum than life-saving or experience loss;
        we don't allow it to go up because that contradicts assumptions
-       elsewhere (such as healing wielder who drains with Strombringer) */
+       elsewhere (such as healing wielder who drains with Stormbringer) */
     if (u.uhpmax > olduhpmax)
         setuhpmax(olduhpmax);
 

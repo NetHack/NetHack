@@ -2805,7 +2805,7 @@ pooleffects(
             if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
                 return FALSE;
             /* even if we actually end up at same location, float_down()
-               has already done spoteffect()'s trap and pickup actions */
+               has already done trap and pickup actions of spoteffects() */
             if (newspot)
                 check_special_room(FALSE); /* spoteffects */
             return TRUE;
@@ -3453,7 +3453,7 @@ lookaround(void)
                         You("stop in front of the door.");
                     goto stop;
                 }
-                /* we're orthonal to a closed door, consider it a corridor */
+                /* we're orthogonal to a closed door, consider it a corridor */
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
                 /* corridor */

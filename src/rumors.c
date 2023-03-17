@@ -371,7 +371,7 @@ others_check(
             if (entrycount == 2) {
                 putstr(tmpwin, 0, "(only two entries)");
             } else {
-                /* showing an elipsis avoids ambiguity about whether
+                /* showing an ellipsis avoids ambiguity about whether
                    there are other lines; doing so three times (once for
                    each file) results in total output being 24 lines,
                    forcing a --More-- prompt if using a 24 line screen;
@@ -548,7 +548,7 @@ outrumor(
                                   : (rn2(2) ? "nonchalantly " : ""))));
         SetVoice((struct monst *) 0, 0, 80, voice_oracle);
         verbalize1(line);
-        /* [WIS exercized by getrumor()] */
+        /* [WIS exercised by getrumor()] */
         return;
     case BY_COOKIE:
         pline(fortune_msg);

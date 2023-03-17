@@ -1214,7 +1214,7 @@ weapon_insight(int final)
     int wtype;
 
     /* report being weaponless; distinguish whether gloves are worn
-       [perhaps mention silver ring(s) when not wearning gloves?] */
+       [perhaps mention silver ring(s) when not wearing gloves?] */
     if (!uwep) {
         you_are(empty_handed(), "");
 
@@ -1643,7 +1643,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
                     Levitation
                        ? " if you weren't levitating"
                        : (save_BFly == I_SPECIAL)
-                          /* this is an oversimpliction; being trapped
+                          /* this is an oversimplification; being trapped
                              might also be blocking levitation so flight
                              would still be blocked after escaping trap */
                           ? " if you weren't trapped"

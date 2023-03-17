@@ -228,7 +228,7 @@ bhitm(struct monst *mtmp, struct obj *otmp)
     case SPE_POLYMORPH:
     case POT_POLYMORPH:
         if (mtmp->data == &mons[PM_LONG_WORM] && has_mcorpsenm(mtmp)) {
-            /* if a long worm has mcorpsenm set, it was polymophed by
+            /* if a long worm has mcorpsenm set, it was polymorphed by
                the current zap and shouldn't be affected if hit again */
             ;
         } else if (resists_magm(mtmp)) {
@@ -737,7 +737,7 @@ montraits(
         mtmp2->mblinded = 0;
         mtmp2->mstun = 0;
         mtmp2->mconf = 0;
-        /* when traits are for a shopeekper, dummy monster 'mtmp' won't
+        /* when traits are for a shopkeeper, dummy monster 'mtmp' won't
            have necessary eshk data for replmon() -> replshk() */
         if (mtmp2->isshk) {
             neweshk(mtmp);
@@ -3320,7 +3320,7 @@ weffects(struct obj *obj)
     return;
 }
 
-/* augment damage for a spell dased on the hero's intelligence (and level) */
+/* augment damage for a spell based on the hero's intelligence (and level) */
 int
 spell_damage_bonus(
     int dmg) /* base amount to be adjusted by bonus or penalty */
@@ -3382,7 +3382,7 @@ spell_hit_bonus(int skill)
         /* Will change when print stuff below removed */
         hit_bon -= 0;
     else
-        /* Even increment for dextrous heroes (see weapon.c abon) */
+        /* Even increment for dexterous heroes (see weapon.c abon) */
         hit_bon += dex - 14;
 
     return hit_bon;

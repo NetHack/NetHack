@@ -45,7 +45,7 @@ static int potion_dip(struct obj *obj, struct obj *potion);
 /* used to indicate whether quaff or dip has skipped an opportunity to
    use a fountain or such, in order to vary the feedback if hero lacks
    any potions [reinitialized every time it's used so does not need to
-   be placed in struct instance_globals g] */
+   be placed in struct instance_globals gd] */
 static int drink_ok_extra = 0;
 
 /* force `val' to be within valid range for intrinsic timeout value */
@@ -1422,7 +1422,7 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
         }
     }
     if (cureblind) {
-        /* 3.6.1: it's debatible whether healing magic should clean off
+        /* 3.6.1: it's debatable whether healing magic should clean off
            mundane 'dirt', but if it doesn't, blindness isn't cured */
         u.ucreamed = 0;
         make_blinded(0L, TRUE);

@@ -1168,7 +1168,7 @@ trapeffect_rocktrap(
             pline("A trap door in %s opens and %s falls on your %s!",
                   the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
             if (uarmh) {
-                /* normally passes_rocks() would protect againt a falling
+                /* normally passes_rocks() would protect against a falling
                    rock, but not when wearing a helmet */
                 if (passes_rocks(gy.youmonst.data)) {
                     pline("Unfortunately, you are wearing %s.",
@@ -1435,7 +1435,7 @@ trapeffect_rust_trap(
             goto uglovecheck;
         default:
             pline("%s you!", A_gush_of_water_hits);
-            /* note: exclude primary and seconary weapons from splashing
+            /* note: exclude primary and secondary weapons from splashing
                because cases 1 and 2 target them [via water_damage()] */
             for (otmp = gi.invent; otmp; otmp = otmp->nobj)
                 if (otmp->lamplit && otmp != uwep
@@ -3330,7 +3330,7 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
         trap_result = trapeffect_selector(mtmp, trap, mintrapflags);
 
         /* mtmp can't stay hiding under an object if trapped in non-pit
-           (mtmp hiding under object at armed bear trap loccation, hero
+           (mtmp hiding under object at armed bear trap location, hero
            zaps wand of locking or spell of wizard lock at spot triggering
            the trap and trapping mtmp there) */
         if (!DEADMONSTER(mtmp) && mtmp->mtrapped) {

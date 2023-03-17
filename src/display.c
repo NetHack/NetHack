@@ -2447,8 +2447,8 @@ map_glyphinfo(
     }
     if (sysopt.accessibility == 1
         && (mgflags & MG_FLAG_NOOVERRIDE) && glyph_is_pet(glyph)) {
-        /* one more accessiblity kludge;
-           turn off override symbol if caller has specfieid NOOVERRIDE */
+        /* one more accessibility kludge;
+           turn off override symbol if caller has specified NOOVERRIDE */
         glyphinfo->gm.sym.symidx = mons[glyph_to_mon(glyph)].mlet + SYM_OFF_M;
     }
     glyphinfo->ttychar = gs.showsyms[glyphinfo->gm.sym.symidx];
@@ -2750,7 +2750,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             gmap->sym.symidx = cmap + SYM_OFF_P;
             cmap_color(cmap);
             /*
-             *   Some speciality color mappings not hardcoded in data init
+             *   Some specialty color mappings not hardcoded in data init
              */
             if (has_rogue_color) {
                 color = cmap_to_roguecolor(cmap);
@@ -3190,7 +3190,7 @@ set_seenv(
 }
 
 /* Called by blackout(vault.c) when vault guard removes temporary corridor,
-   turning spot <x0,y0> back coordxyo stone; <x1,y1> is an adjacent spot. */
+   turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
 void
 unset_seenv(
     struct rm *lev,         /* &levl[x1][y1] */
@@ -3243,7 +3243,7 @@ static const int wall_matrix[4][5] = {
  * in C_br (bottom right) terms.  All crosswalls with a single solid
  * quarter are rotated so the solid section is at the bottom right.
  * We pattern match on that, but return the correct result depending
- * on which row we'ere looking at.
+ * on which row we're looking at.
  */
 #define C_trcorn 0
 #define C_brcorn 1

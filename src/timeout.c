@@ -1904,7 +1904,7 @@ wiz_timeout_queue(void)
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
-    /* Timed properies:
+    /* Timed properties:
      * check every one; the majority can't obtain temporary timeouts in
      * normal play but those can be forced via the #wizintrinsic command.
      */
@@ -2526,7 +2526,7 @@ timer_stats(const char* hdrfmt, char *hdrbuf, long *count, long *size)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* reset all timers that are marked for reseting */
+/* reset all timers that are marked for resetting */
 void
 relink_timers(boolean ghostly)
 {
