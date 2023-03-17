@@ -6,7 +6,7 @@
 --
 des.level_init({ style = "solidfill", fg = " " });
 
-des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted")
+des.level_flags("mazelevel", "noteleport", "hardfloor", "shortsighted", "stormy")
 -- The following messages are somewhat obtuse, to make then
 -- equally meaningful if the player can see or not.
 des.message("What a strange feeling!")

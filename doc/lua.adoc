@@ -615,6 +615,7 @@ Set flags for this level.
 | nomongen      | Prevents random monster generation.
 | nodeathdrops  | Prevents killed monsters from dropping corpses or random death drops.
 | fumaroles     | Lava emits poison gas clouds at random.
+| stormy        | Clouds create lightning bolts at random.
 |===
 
 Example:

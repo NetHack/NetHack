@@ -3749,6 +3749,8 @@ lspo_level_flags(lua_State *L)
             gl.level.flags.noautosearch = 1;
         else if (!strcmpi(s, "fumaroles"))
             gl.level.flags.fumaroles = 1;
+        else if (!strcmpi(s, "stormy"))
+            gl.level.flags.stormy = 1;
         else {
             char buf[BUFSZ];
             Sprintf(buf, "Unknown level flag %s", s);
