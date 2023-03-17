@@ -4325,7 +4325,7 @@ decide_to_shapeshift(struct monst *mon, int shiftflags)
 }
 
 static int
-pickvampshape(struct monst* mon)
+pickvampshape(struct monst *mon)
 {
     int mndx = mon->cham, wolfchance = 10;
     /* avoid picking monsters with lowercase display symbols ('d' for wolf
@@ -4350,7 +4350,11 @@ pickvampshape(struct monst* mon)
         break;
     }
 
-    if (gm.mvitals[mndx].mvflags & G_GENOD)
+    /* return to base form if chosen poly target has been genocided
+       or randomly if already in an alternate form (to prevent always
+       switching back and forth between bat and fog) */
+    if ((gm.mvitals[mndx].mvflags & G_GENOD) != 0
+        || (mon->data != &mons[mon->cham] && !rn2(4)))
         return mon->cham;
 
     return mndx;
