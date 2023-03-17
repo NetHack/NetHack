@@ -20,6 +20,7 @@ extern void mkmap(lev_init *);
 
 static boolean match_maptyps(xint16, xint16);
 static void solidify_map(void);
+static void map_cleanup(void);
 static void lvlfill_maze_grid(int, int, int, int, schar);
 static void lvlfill_solid(schar, schar);
 static void lvlfill_swamp(schar, schar, schar);
@@ -320,6 +321,34 @@ solidify_map(void)
         for (y = 0; y < ROWNO; y++)
             if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y])
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
+}
+
+/* do a post-level-creation cleanup of map, such as
+   removing boulders and traps from lava */
+static void
+map_cleanup(void)
+{
+    struct obj *otmp;
+    struct trap *ttmp;
+    coordxy x, y;
+
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            schar typ = levl[x][y].typ;
+
+            if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)) {
+                /* in case any boulders are on liquid, delete them */
+                while ((otmp = sobj_at(BOULDER, x, y)) != 0) {
+                    obj_extract_self(otmp);
+                    obfree(otmp, (struct obj *)0);
+                }
+
+                /* traps on liquid? */
+                if (((ttmp = t_at(x, y)) != 0)
+                    && !undestroyable_trap(ttmp->ttyp))
+                    deltrap(ttmp);
+            }
+        }
 }
 
 static void
@@ -6473,6 +6502,8 @@ lspo_finalize_level(lua_State *L UNUSED)
     if (L && gc.coder->check_inaccessibles)
         ensure_way_out();
 
+    map_cleanup();
+
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see
      * the insect legs on Baalzebub's level, for instance). Since that
@@ -6946,6 +6977,8 @@ load_special(const char *name)
     /* TODO: ensure_way_out() needs rewrite */
     if (gc.coder->check_inaccessibles)
         ensure_way_out();
+
+    map_cleanup();
 
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see
