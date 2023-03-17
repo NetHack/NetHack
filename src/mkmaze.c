@@ -1390,15 +1390,25 @@ mkportal(coordxy x, coordxy y, xint16 todnum, xint16 todlevel)
 void
 fumaroles(void)
 {
-    xint16 n;
+    xint16 n, nmax = rn2(3);
+    int sizemin = 5;
     boolean snd = FALSE, loud = FALSE;
 
-    for (n = rn2(3) + 2; n; n--) {
+    if (Is_firelevel(&u.uz)) {
+        nmax++;
+        sizemin += 5;
+    }
+    if (gl.level.flags.temperature > 0) {
+        nmax++;
+        sizemin += 5;
+    }
+
+    for (n = nmax; n; n--) {
         coordxy x = rn1(COLNO - 4, 3);
         coordxy y = rn1(ROWNO - 4, 3);
 
         if (levl[x][y].typ == LAVAPOOL) {
-            NhRegion *r = create_gas_cloud(x, y, rn1(30, 20), rn1(10, 5));
+            NhRegion *r = create_gas_cloud(x, y, rn1(10, sizemin), rn1(10, 5));
 
             clear_heros_fault(r);
             snd = TRUE;

@@ -392,6 +392,7 @@ struct levelflags {
     Bitfield(rndmongen, 1);    /* random monster generation allowed? */
     Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
     Bitfield(noautosearch, 1); /* automatic searching disabled */
+    Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
 
     schar temperature;         /* +1 == hot, -1 == cold */
 };

@@ -614,6 +614,7 @@ Set flags for this level.
 | temperate     | Level is neither hot nor cold.
 | nomongen      | Prevents random monster generation.
 | nodeathdrops  | Prevents killed monsters from dropping corpses or random death drops.
+| fumaroles     | Lava emits poison gas clouds at random.
 |===
 
 Example:

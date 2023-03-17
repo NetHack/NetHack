@@ -1730,7 +1730,7 @@ goto_level(
     /* initial movement of bubbles just before vision_recalc */
     if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
         movebubbles();
-    else if (Is_firelevel(&u.uz))
+    else if (gl.level.flags.fumaroles)
         fumaroles();
 
     /* Reset the screen. */

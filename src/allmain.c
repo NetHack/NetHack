@@ -333,7 +333,7 @@ moveloop_core(void)
                 /* vision will be updated as bubbles move */
                 if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                     movebubbles();
-                else if (Is_firelevel(&u.uz))
+                else if (gl.level.flags.fumaroles)
                     fumaroles();
 
                 /* when immobile, count is in turns */
