@@ -343,10 +343,12 @@ getmattk(struct monst *magr, struct monst *mdef,
         }
 
     /* holders/engulfers who release the hero have mspec_used set to rnd(2)
-       and can't re-hold/re-engulf until it has been decremented to zero */
+       and can't re-hold/re-engulf until it has been decremented to zero;
+       likewise for transformation by genetic engineer */
     } else if (magr->mspec_used && (attk->aatyp == AT_ENGL
                                     || attk->aatyp == AT_HUGS
-                                    || attk->adtyp == AD_STCK)) {
+                                    || attk->adtyp == AD_STCK
+                                    || attk->adtyp == AD_POLY)) {
         boolean wimpy = (attk->damd == 0); /* lichen, violet fungus */
 
         /* can't re-engulf or re-grab yet; switch to simpler attack */

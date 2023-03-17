@@ -1015,6 +1015,7 @@ int
 mon_poly(struct monst *magr, struct monst *mdef, int dmg)
 {
     static const char freaky[] = " undergoes a freakish metamorphosis";
+    struct permonst *oldform = mdef->data;
 
     if (mdef == &gy.youmonst) {
         if (Antimagic) {
@@ -1090,6 +1091,11 @@ mon_poly(struct monst *magr, struct monst *mdef, int dmg)
                 pline1(nothing_happens);
         }
     }
+    /* when a transformation has happened, can't attack again for poly
+       effect during next turn or two; not enforced for poly'd hero */
+    if (mdef->data != oldform && magr != &gy.youmonst)
+        magr->mspec_used += rnd(2);
+
     return dmg;
 }
 

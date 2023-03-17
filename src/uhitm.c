@@ -3455,7 +3455,8 @@ mhitm_ad_poly(
     struct monst *magr, struct attack *mattk,
     struct monst *mdef, struct mhitm_data *mhm)
 {
-    boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
+    boolean negated = (mhitm_mgc_atk_negated(magr, mdef, FALSE)
+                       || magr->mspec_used);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
