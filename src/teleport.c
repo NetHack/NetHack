@@ -859,8 +859,16 @@ level_tele(void)
     char buf[BUFSZ];
     boolean force_dest = FALSE;
 
-    if (iflags.debug_fuzzer)
-        goto random_levtport;
+    if (iflags.debug_fuzzer) {
+        do {
+            newlevel.dnum = rn2(gn.n_dgns);
+        } while (newlevel.dnum == astral_level.dnum
+                 || gd.dungeons[newlevel.dnum].flags.unconnected
+                 || !gd.dungeons[newlevel.dnum].num_dunlevs);
+        newlevel.dlevel = 1 + rn2(dunlevs_in_dungeon(&newlevel));
+        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        return;
+    }
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
         You_feel("very disoriented for a moment.");
