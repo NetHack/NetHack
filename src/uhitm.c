@@ -3463,7 +3463,7 @@ mhitm_ad_poly(
         if (!uwep && mhm->damage < mdef->mhp) {
             if (negated) {
                 /* assume that you can tell by touch if blinded */
-                pline("%s is not transformted.", Monnam(mdef));
+                pline("%s is not transformed.", Monnam(mdef));
             } else {
                 mhm->damage = mon_poly(&gy.youmonst, mdef, mhm->damage);
             }
