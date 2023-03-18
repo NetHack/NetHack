@@ -330,6 +330,7 @@ map_cleanup(void)
 {
     struct obj *otmp;
     struct trap *ttmp;
+    struct engr *etmp;
     coordxy x, y;
 
     for (x = 0; x < COLNO; x++)
@@ -347,6 +348,10 @@ map_cleanup(void)
                 if (((ttmp = t_at(x, y)) != 0)
                     && !undestroyable_trap(ttmp->ttyp))
                     deltrap(ttmp);
+
+                /* engravings? */
+                if ((etmp = engr_at(x, y)) != 0)
+                  del_engr(etmp);
             }
         }
 }

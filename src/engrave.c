@@ -1377,6 +1377,34 @@ sanitize_engravings(void)
 }
 
 void
+engraving_sanity_check(void)
+{
+    struct engr *ep;
+    schar typ;
+
+    if (head_engr && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
+        impossible("engraving sanity: on plane of air/water");
+        return;
+    }
+
+    for (ep = head_engr; ep; ep = ep->nxt_engr) {
+        coordxy x = ep->engr_x, y = ep->engr_y;
+
+        if (!isok(x, y)) {
+            impossible("engraving sanity: !isok <%i,%i>", x, y);
+            return;
+        }
+
+        typ = levl[x][y].typ;
+        if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)
+            || typ == AIR || !accessible(x, y)) {
+            impossible("engraving sanity: illegal surface (%i)", typ);
+            return;
+        }
+    }
+}
+
+void
 save_engravings(NHFILE *nhfp)
 {
     struct engr *ep, *ep2;

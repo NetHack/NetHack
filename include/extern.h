@@ -827,6 +827,7 @@ extern void del_engr_at(coordxy, coordxy);
 extern int freehand(void);
 extern int doengrave(void);
 extern void sanitize_engravings(void);
+extern void engraving_sanity_check(void);
 extern void save_engravings(NHFILE *);
 extern void rest_engravings(NHFILE *);
 extern void engr_stats(const char *, char *, long *, long *);

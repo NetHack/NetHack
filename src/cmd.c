@@ -4247,6 +4247,7 @@ sanity_check(void)
     light_sources_sanity_check();
     bc_sanity_check();
     trap_sanity_check();
+    engraving_sanity_check();
 }
 
 /* qsort() comparison routine for use in list_migrating_mons() */
