@@ -5,13 +5,13 @@ des.level_flags("mazelevel", "noflip",
 
 des.map([[
 ---------------------------------------------------------------------------
-|-.--|.......|......|..S....|.............................................|
-|.-..........|......|--|....|.............................................|
-||.--|.......|..T......|....|.............................................|
-||.|.|.......|......|-.|....|.............................................|
-||.|.|.......|......||.|-.---.............................................|
-|-+-S---------..---.||......+.............................................|
-|......|          |.---------.............................................|
+|-.--|.......|......|..S....|.F.......|...................................|
+|.-..........|......|--|....|.F.....|.|...................................|
+||.--|.......|..T......|....|.F.....|.|...................................|
+||.|.|.......|......|-.|....|.F.....|.|...................................|
+||.|.|.......|......||.|-.-----------.-...................................|
+|-+-S---------..---.||....................................................|
+|......|          |.-------------------...................................|
 |......|  ######  |.........|.............................................|
 |----.-| -+-   #  |.....---.|.............................................|
 |----+----.----+---.|.--|.|.|.............................................|
@@ -165,8 +165,25 @@ des.engraving({ coord = { 25,5 }, type = "engrave", text = "Throw items with '" 
 
 --
 
-des.door({ coord = { 28,6 }, state = "locked" });
-des.engraving({ coord = { 29,6 }, type = "burn", text = "UNDER CONSTRUCTION", degrade = false });
+des.monster({ id = "wolf", coord = { 29,2 }, peaceful = 0, waiting = true, countbirth = false });
+
+des.engraving({ coord = { 37,4 }, type = "engrave", text = "Missiles, such as rocks, work better when fired from appropriate launcher", degrade = false });
+
+des.object({ coord = { 37,3 }, id = "sling", buc = "not-cursed", spe = 9 });
+des.engraving({ coord = { 37,3 }, type = "engrave", text = "Wield the sling", degrade = false });
+des.engraving({ coord = { 36,1 }, type = "engrave", text = "Use '" .. nh.eckey("fire") .. "' to fire missiles with the wielded launcher", degrade = false });
+
+des.engraving({ coord = { 35,4 }, type = "engrave", text = "Firing launches items from your quiver; Use '" .. nh.eckey("quiver") .. "' to put items in it", degrade = false });
+
+des.engraving({ coord = { 33,4 }, type = "engrave", text = "You can wait a turn with '" .. nh.eckey("wait") .. "'", degrade = false });
+
+
+--
+
+des.door({ coord = { 38,6 }, state = "locked" });
+des.engraving({ coord = { 39,6 }, type = "burn", text = "UNDER CONSTRUCTION", degrade = false });
+
+des.trap({ type = "magic portal", coord = { 45,6 }, seen = true });
 
 ----------------
 

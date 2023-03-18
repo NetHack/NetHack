@@ -192,6 +192,7 @@ local tutorial_whitelist_commands = {
    ["kick"] = true,
    ["search"] = true,
    ["pickup"] = true,
+   ["wait"] = true,
    ["wear"] = true,
    ["wield"] = true,
    -- ["save"] = true,
@@ -258,6 +259,7 @@ local tutorial_events = {
       func = function()
          tutorial_whitelist_commands["throw"] = true;
          tutorial_whitelist_commands["fire"] = true;
+         tutorial_whitelist_commands["quiver"] = true;
          end,
    },
 };
