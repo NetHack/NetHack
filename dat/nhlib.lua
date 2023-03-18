@@ -262,6 +262,14 @@ local tutorial_events = {
          tutorial_whitelist_commands["quiver"] = true;
          end,
    },
+   {
+      ucoord = { 38, 6 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["loot"] = true;
+         tutorial_whitelist_commands["zap"] = true;
+         end,
+   },
 };
 
 function tutorial_turn()
