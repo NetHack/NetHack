@@ -256,7 +256,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
         if (couldsee(mtmp->mx, mtmp->my) && mdistu(mtmp) <= 10 * 10)
             map_invisible(mtmp->mx, mtmp->my);
 
-        Snprintf(blindbuf, sizeof blindbuf, "reading %s.", onambuf);
+        Snprintf(blindbuf, sizeof blindbuf, "reading %s", onambuf);
         strsubst(blindbuf, "reading a scroll labeled",
                  mtmp->mconf ? "attempting to incant" : "incant");
         You_hear("%s %s.",
