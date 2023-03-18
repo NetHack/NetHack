@@ -179,33 +179,18 @@ end
 -- TUTORIAL
 --
 
--- extended commands available in tutorial
-local tutorial_whitelist_commands = {
-   ["movesouth"] = true,
-   ["movenorth"] = true,
-   ["moveeast"]  = true,
-   ["movewest"]  = true,
-   ["movesoutheast"] = true,
-   ["movenorthwest"] = true,
-   ["movenortheast"]  = true,
-   ["movesouthwest"]  = true,
-   ["kick"] = true,
-   ["search"] = true,
-   ["pickup"] = true,
-   ["wait"] = true,
-   ["wear"] = true,
-   ["wield"] = true,
-   -- ["save"] = true,
+-- extended commands NOT available in tutorial
+local tutorial_blacklist_commands = {
+   ["save"] = true,
 };
 
 function tutorial_cmd_before(cmd)
    -- nh.pline("TUT:cmd_before:" .. cmd);
 
-   if (tutorial_whitelist_commands[cmd]) then
-      return true;
-   else
+   if (tutorial_blacklist_commands[cmd]) then
       return false;
    end
+   return true;
 end
 
 function tutorial_enter()
@@ -226,54 +211,8 @@ end
 
 local tutorial_events = {
    {
-      ucoord = { 2, 5 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["close"] = true;
-         end,
-   },
-   {
-      ucoord = { 27, 10 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["takeoff"] = true;
-         end,
-   },
-   {
-      ucoord = { 22, 11 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["read"] = true;
-         end,
-   },
-   {
-      ucoord = { 19, 7 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["drop"] = true;
-         end,
-   },
-   {
-      ucoord = { 24, 6 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["throw"] = true;
-         tutorial_whitelist_commands["fire"] = true;
-         tutorial_whitelist_commands["quiver"] = true;
-         end,
-   },
-   {
-      ucoord = { 38, 6 },
-      remove = true,
-      func = function()
-         tutorial_whitelist_commands["loot"] = true;
-         tutorial_whitelist_commands["zap"] = true;
-         end,
-   },
-   {
       func = function()
          if (u.uhunger < 148) then
-            tutorial_whitelist_commands["eat"] = true;
             local o = obj.new("blessed food ration");
             o:placeobj(u.ux, u.uy);
             nh.pline("Looks like you're getting hungry.  You'll starve to death, unless you eat something.", true);
