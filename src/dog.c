@@ -490,6 +490,9 @@ mon_arrive(struct monst *mtmp, int when)
         if (t) {
             xlocale = t->tx, ylocale = t->ty;
             break;
+        } else if (iflags.debug_fuzzer && (stway = stairway_find_dir(TRUE)) != 0) {
+            /* debugfuzzer returning from knox */
+            xlocale = stway->sx, ylocale = stway->sy;
         } else if (!(u.uevent.qexpelled
                      && (Is_qstart(&u.uz0) || Is_qstart(&u.uz)))) {
             impossible("mon_arrive: no corresponding portal?");

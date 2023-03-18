@@ -1635,7 +1635,9 @@ goto_level(
                 /* returning from tutorial via portal */
                 u_on_newpos(stway->sx, stway->sy);
             } else {
-                panic("goto_level: no corresponding portal!");
+                if (!iflags.debug_fuzzer)
+                    impossible("goto_level: no corresponding portal!");
+                u_on_rndspot(0);
             }
         } else {
             seetrap(ttrap);
