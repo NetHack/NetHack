@@ -331,10 +331,12 @@ Example:
 === pline
 
 Show the text in the message area.
+Second parameter is an optional boolean; if true, force a `--more--` prompt.
 
 Example:
 
  nh.pline("Message text to show.");
+ nh.pline("Waiting for user.", true);
 
 
 === pushkey

@@ -270,6 +270,18 @@ local tutorial_events = {
          tutorial_whitelist_commands["zap"] = true;
          end,
    },
+   {
+      func = function()
+         if (u.uhunger < 148) then
+            tutorial_whitelist_commands["eat"] = true;
+            local o = obj.new("blessed food ration");
+            o:placeobj(u.ux, u.uy);
+            nh.pline("Looks like you're getting hungry.  You'll starve to death, unless you eat something.", true);
+            nh.pline("Comestibles are eaten with '" .. nh.eckey("eat") .. "'", true);
+            return true;
+         end
+      end
+   },
 };
 
 function tutorial_turn()

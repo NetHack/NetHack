@@ -603,14 +603,17 @@ nhl_impossible(lua_State *L)
 }
 
 /* pline("It hits!") */
+/* pline("It hits!", true) */
 static int
 nhl_pline(lua_State *L)
 {
     int argc = lua_gettop(L);
 
-    if (argc == 1)
+    if (argc == 1 || argc == 2) {
         pline("%s", luaL_checkstring(L, 1));
-    else
+        if (lua_toboolean(L, 2))
+            display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    } else
         nhl_error(L, "Wrong args");
 
     return 0;
@@ -1593,6 +1596,7 @@ nhl_gamestate(lua_State *L)
             if (wornmask)
                 setworn(otmp, wornmask);
         }
+        init_uhunger();
         stored = FALSE;
     } else {
         /* store game state */
