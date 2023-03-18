@@ -5,12 +5,12 @@ des.level_flags("mazelevel", "noflip",
 
 des.map([[
 ---------------------------------------------------------------------------
-|-.--|.......|......|..|..................................................|
-|.-..........|......|..|..................................................|
-||.--|.......|..T......|..................................................|
-||.|.|.......|......|-.|..................................................|
-||.|.|.......|......|..|-.................................................|
-|-+-S---------..---.|..+..................................................|
+|-.--|.......|......|..S....|.............................................|
+|.-..........|......|--|....|.............................................|
+||.--|.......|..T......|....|.............................................|
+||.|.|.......|......|-.|....|.............................................|
+||.|.|.......|......||.|-.---.............................................|
+|-+-S---------..---.||......+.............................................|
 |......|          |.---------.............................................|
 |......|  ######  |.........|.............................................|
 |----.-| -+-   #  |.....---.|.............................................|
@@ -68,12 +68,12 @@ des.trap({ type = "magic portal", coord = { 4,4 }, seen = true });
 
 --
 
-des.engraving({ coord = { 5,9 }, type = "engrave", text = "This door is locked. Kick it with " .. nh.eckey("kick"), degrade = false });
+des.engraving({ coord = { 5,9 }, type = "engrave", text = "This door is locked. Kick it with '" .. nh.eckey("kick") .. "'", degrade = false });
 des.door({ coord = { 5,10 }, state = "locked" });
 
 --
 
-des.engraving({ coord = { 10,13 }, type = "engrave", text = "Use " .. nh.eckey("search") .. " to search for secret doors", degrade = false });
+des.engraving({ coord = { 10,13 }, type = "engrave", text = "Use '" .. nh.eckey("search") .. "' to search for secret doors", degrade = false });
 
 --
 
@@ -159,10 +159,14 @@ des.engraving({ coord = { 22,4 }, type = "engrave", text = "You can drop partial
 
 --
 
-des.door({ coord = { 23,6 }, state = "locked" });
+des.monster({ id = "yellow mold", coord = { 26,2 }, waiting = true, countbirth = false });
 
-des.engraving({ coord = { 24,6 }, type = "burn", text = "UNDER CONSTRUCTION", degrade = false });
+des.engraving({ coord = { 25,5 }, type = "engrave", text = "Throw items with '" .. nh.eckey("throw") .. "'", degrade = false });
 
+--
+
+des.door({ coord = { 28,6 }, state = "locked" });
+des.engraving({ coord = { 29,6 }, type = "burn", text = "UNDER CONSTRUCTION", degrade = false });
 
 ----------------
 

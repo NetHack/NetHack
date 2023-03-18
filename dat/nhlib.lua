@@ -252,6 +252,14 @@ local tutorial_events = {
          tutorial_whitelist_commands["drop"] = true;
          end,
    },
+   {
+      ucoord = { 24, 6 },
+      remove = true,
+      func = function()
+         tutorial_whitelist_commands["throw"] = true;
+         tutorial_whitelist_commands["fire"] = true;
+         end,
+   },
 };
 
 function tutorial_turn()
