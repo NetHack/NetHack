@@ -163,6 +163,8 @@ des.monster({ id = "yellow mold", coord = { 26,2 }, waiting = true, countbirth =
 
 des.engraving({ coord = { 25,5 }, type = "engrave", text = "Throw items with '" .. nh.eckey("throw") .. "'", degrade = false });
 
+des.trap({ type = "magic portal", coord = { 21,1 }, seen = true });
+
 --
 
 des.monster({ id = "wolf", coord = { 29,2 }, peaceful = 0, waiting = true, countbirth = false });
