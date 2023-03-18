@@ -121,6 +121,8 @@ getrumor(
     dlb *rumors;
     long beginning, ending;
     char line[BUFSZ];
+    static const char *cookie_marker = "[cookie] ";
+    const int marklen = strlen(cookie_marker);
 
     rumor_buf[0] = '\0';
     if (gt.true_rumor_size < 0L) /* a previous try failed to open RUMORFILE */
@@ -163,9 +165,8 @@ getrumor(
             Strcpy(rumor_buf,
                    get_rnd_line(rumors, line, (unsigned) sizeof line, rn2,
                                 beginning, ending, MD_PAD_RUMORS));
-        } while (count++ < 50 && (exclude_cookie
-                                  && (strstri(rumor_buf, "fortune")
-                                      || strstri(rumor_buf, "pity"))));
+        } while (count++ < 50 && exclude_cookie
+                 && !strncmp(rumor_buf, cookie_marker, marklen));
         (void) dlb_fclose(rumors);
         if (count >= 50)
             impossible("Can't find non-cookie rumor?");
@@ -174,6 +175,16 @@ getrumor(
     } else {
         couldnt_open_file(RUMORFILE);
         gt.true_rumor_size = -1; /* don't try to open it again */
+    }
+    if (!exclude_cookie
+        && !strncmp(rumor_buf, cookie_marker, marklen)) {
+        /* remove cookie_marker from the string */
+        char *src = rumor_buf + marklen;
+        char *dst = rumor_buf;
+        for (; *src != '\0'; ++src, ++dst) {
+            *dst = *src;
+        }
+        *dst = '\0'; /* terminator wasn't copied */
     }
     return rumor_buf;
 }
