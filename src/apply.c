@@ -4181,8 +4181,9 @@ doapply(void)
         pline("Sorry, I don't know how to use that.");
         return ECMD_FAIL;
     }
-    if ((res & ECMD_TIME) && obj && obj->oartifact)
-        arti_speak(obj);
+    if (obj && obj->oartifact) {
+        res |= arti_speak(obj); /* sets ECMD_TIME bit if artifact speaks */
+    }
     return res;
 }
 

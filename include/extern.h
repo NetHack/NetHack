@@ -92,7 +92,7 @@ extern boolean artifact_hit(struct monst *, struct monst *, struct obj *,
                             int *, int);
 extern int doinvoke(void);
 extern boolean finesse_ahriman(struct obj *);
-extern void arti_speak(struct obj *);
+extern int arti_speak(struct obj *);
 extern boolean artifact_light(struct obj *);
 extern long spec_m2(struct obj *);
 extern boolean artifact_has_invprop(struct obj *, uchar);

@@ -1986,16 +1986,16 @@ artifact_light(struct obj *obj)
 }
 
 /* KMH -- Talking artifacts are finally implemented */
-void
+int
 arti_speak(struct obj *obj)
 {
-    register const struct artifact *oart = get_artifact(obj);
+    const struct artifact *oart = get_artifact(obj);
     const char *line;
     char buf[BUFSZ];
 
     /* Is this a speaking artifact? */
     if (!oart || !(oart->spfx & SPFX_SPEAK))
-        return;
+        return ECMD_OK; /* nothing happened */
 
     line = getrumor(bcsign(obj), buf, TRUE);
     if (!*line)
@@ -2003,7 +2003,7 @@ arti_speak(struct obj *obj)
     pline("%s:", Tobjnam(obj, "whisper"));
     SetVoice((struct monst *) 0, 0, 80, voice_talking_artifact);
     verbalize1(line);
-    return;
+    return ECMD_TIME;
 }
 
 boolean

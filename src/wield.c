@@ -230,7 +230,9 @@ ready_weapon(struct obj *wep)
         }
 
         /* KMH -- Talking artifacts are finally implemented */
-        arti_speak(wep);
+        if (wep && wep->oartifact) {
+            res |= arti_speak(wep); /* sets ECMD_TIME bit if artifact speaks */
+        }
 
         if (artifact_light(wep) && !wep->lamplit) {
             begin_burn(wep, FALSE);
