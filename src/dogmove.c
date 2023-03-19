@@ -876,7 +876,7 @@ pet_ranged_attk(struct monst *mtmp)
 
     /* Hungry pets are unlikely to use breath/spit attacks */
     if (mtarg && (!hungry || !rn2(5))) {
-        int mstatus = MM_MISS;
+        int mstatus = M_ATTK_MISS;
 
         if (mtarg == &gy.youmonst) {
             if (mattacku(mtmp))
@@ -887,19 +887,19 @@ pet_ranged_attk(struct monst *mtmp)
              * and "attacked but didn't die" cases, and this is preferable
              * to letting the pet attack the player and continuing to move.
              */
-            mstatus = MM_HIT;
+            mstatus = M_ATTK_HIT;
         } else {
             mstatus = mattackm(mtmp, mtarg);
 
             /* Shouldn't happen, really */
-            if (mstatus & MM_AGR_DIED)
+            if (mstatus & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
 
             /* Allow the targeted nasty to strike back - if
              * the targeted beast doesn't have a ranged attack,
              * nothing will happen.
              */
-            if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED)
+            if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED)
                 && rn2(4) && mtarg != &gy.youmonst) {
 
                 /* Can monster see?  If it can, it can retaliate
@@ -909,7 +909,7 @@ pet_ranged_attk(struct monst *mtmp)
                  */
                 if (mtarg->mcansee && haseyes(mtarg->data)) {
                     mstatus = mattackm(mtarg, mtmp);
-                    if (mstatus & MM_DEF_DIED)
+                    if (mstatus & M_ATTK_DEF_DIED)
                         return MMOVE_DIED;
                 }
             }
@@ -922,9 +922,9 @@ pet_ranged_attk(struct monst *mtmp)
          *    only ever try ranged options
          * 2. if the only attacks available to mattackm are ranged
          *    options, and the monster cannot make a ranged attack, it
-         *    will return MM_MISS.
+         *    will return M_ATTK_MISS.
          */
-        if (mstatus != MM_MISS)
+        if (mstatus != M_ATTK_MISS)
             return MMOVE_DONE;
     }
     return MMOVE_NOTHING;
@@ -1097,16 +1097,16 @@ dog_move(register struct monst *mtmp,
             mstatus = mattackm(mtmp, mtmp2);
 
             /* aggressor (pet) died */
-            if (mstatus & MM_AGR_DIED)
+            if (mstatus & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
 
-            if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+            if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED) && rn2(4)
                 && mtmp2->mlstmv != gm.moves
                 && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
                 && monnear(mtmp2, mtmp->mx, mtmp->my)) {
                 mstatus = mattackm(mtmp2, mtmp); /* return attack */
-                if (mstatus & MM_DEF_DIED)
+                if (mstatus & M_ATTK_DEF_DIED)
                     return MMOVE_DIED;
             }
             return MMOVE_DONE;
@@ -1117,7 +1117,7 @@ dog_move(register struct monst *mtmp,
             register struct monst *mtmp2 = m_at(nx, ny);
 
             mstatus = mdisplacem(mtmp, mtmp2, FALSE); /* displace monster */
-            if (mstatus & MM_DEF_DIED)
+            if (mstatus & M_ATTK_DEF_DIED)
                 return MMOVE_DIED;
             return MMOVE_NOTHING;
         }

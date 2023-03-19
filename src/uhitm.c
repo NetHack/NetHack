@@ -2088,7 +2088,7 @@ mhitm_ad_rust(struct monst *magr, struct attack *mattk, struct monst *mdef,
             pline("%s %s to pieces!", Monnam(mdef),
                   !mlifesaver(mdef) ? "falls" : "starts to fall");
             xkilled(mdef, XKILL_NOMSG);
-            mhm->hitflags |= MM_DEF_DIED;
+            mhm->hitflags |= M_ATTK_DEF_DIED;
         }
         erode_armor(mdef, ERODE_RUST);
         mhm->damage = 0; /* damageum(), int tmp */
@@ -2115,12 +2115,12 @@ mhitm_ad_rust(struct monst *magr, struct attack *mattk, struct monst *mdef,
                       !mlifesaver(mdef) ? "falls" : "starts to fall");
             monkilled(mdef, (char *) 0, AD_RUST);
             if (!DEADMONSTER(mdef)) {
-                mhm->hitflags = MM_MISS;
+                mhm->hitflags = M_ATTK_MISS;
                 mhm->done = TRUE;
                 return;
             }
-            mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0
-                                            : MM_AGR_DIED));
+            mhm->hitflags = (M_ATTK_DEF_DIED | (grow_up(magr, mdef) ? 0
+                                            : M_ATTK_AGR_DIED));
             mhm->done = TRUE;
             return;
         }
@@ -2194,12 +2194,12 @@ mhitm_ad_dcay(struct monst *magr, struct attack *mattk, struct monst *mdef,
             monkilled(mdef, (char *) 0, AD_DCAY);
             if (!DEADMONSTER(mdef)) {
                 mhm->done = TRUE;
-                mhm->hitflags = MM_MISS;
+                mhm->hitflags = M_ATTK_MISS;
                 return;
             }
             mhm->done = TRUE;
-            mhm->hitflags = (MM_DEF_DIED
-                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->hitflags = (M_ATTK_DEF_DIED
+                             | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
             return;
         }
         erode_armor(mdef, ERODE_ROT);
@@ -2398,12 +2398,12 @@ mhitm_ad_fire(
                                         : "is totally engulfed in flames");
             monkilled(mdef, (char *) 0, AD_FIRE);
             if (!DEADMONSTER(mdef)) {
-                mhm->hitflags = MM_MISS;
+                mhm->hitflags = M_ATTK_MISS;
                 mhm->done = TRUE;
                 return;
             }
-            mhm->hitflags = (MM_DEF_DIED
-                             | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+            mhm->hitflags = (M_ATTK_DEF_DIED
+                             | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
             mhm->done = TRUE;
             return;
         }
@@ -2867,14 +2867,14 @@ mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
                 }
                 mondied(mdef);
                 if (!DEADMONSTER(mdef)) {
-                    mhm->hitflags = MM_MISS;
+                    mhm->hitflags = M_ATTK_MISS;
                     mhm->done = TRUE;
                     return;
                 } else if (mdef->mtame && !gv.vis) {
                     You(brief_feeling, "strangely sad");
                 }
-                mhm->hitflags = (MM_DEF_DIED
-                                 | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                mhm->hitflags = (M_ATTK_DEF_DIED
+                                 | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
                 mhm->done = TRUE;
                 return;
             }
@@ -3017,7 +3017,7 @@ mhitm_ad_drin(
                regardless of current shape) or is noncorporeal
                (can't happen here; no one can poly into a ghost
                or shade) so this check for missing is academic */
-            if (eat_brains(magr, mdef, TRUE, (int *) 0) == MM_MISS)
+            if (eat_brains(magr, mdef, TRUE, (int *) 0) == M_ATTK_MISS)
                 return;
         }
         /* adjattrib gives dunce cap message when appropriate */
@@ -3273,7 +3273,7 @@ mhitm_ad_slim(
             }
             /* munslime attempt could have been fatal */
             if (DEADMONSTER(mdef)) {
-                mhm->hitflags = MM_DEF_DIED; /* skip death message */
+                mhm->hitflags = M_ATTK_DEF_DIED; /* skip death message */
                 mhm->done = TRUE;
                 return;
             }
@@ -3314,14 +3314,14 @@ mhitm_ad_slim(
                 if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags)) 
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
-                mhm->hitflags = MM_HIT;
+                mhm->hitflags = M_ATTK_HIT;
             }
             /* munslime attempt could have been fatal,
                potentially to multiple monsters (SCR_FIRE) */
             if (DEADMONSTER(magr))
-                mhm->hitflags |= MM_AGR_DIED;
+                mhm->hitflags |= M_ATTK_AGR_DIED;
             if (DEADMONSTER(mdef))
-                mhm->hitflags |= MM_DEF_DIED;
+                mhm->hitflags |= M_ATTK_DEF_DIED;
             mhm->damage = 0;
         }
     }
@@ -3667,14 +3667,14 @@ do_stone_mon(struct monst *magr, struct attack *mattk UNUSED,
         monstone(mdef);
  post_stone:
         if (!DEADMONSTER(mdef)) {
-            mhm->hitflags = MM_MISS;
+            mhm->hitflags = M_ATTK_MISS;
             mhm->done = TRUE;
             return;
         } else if (mdef->mtame && !gv.vis) {
             You(brief_feeling, "peculiarly sad");
         }
-        mhm->hitflags = (MM_DEF_DIED
-                         | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+        mhm->hitflags = (M_ATTK_DEF_DIED
+                         | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
         mhm->done = TRUE;
         return;
     }
@@ -3728,11 +3728,11 @@ mhitm_ad_phys(
             if (!u.ustuck && rn2(2)) {
                 if (u_slip_free(magr, mattk)) {
                     mhm->damage = 0;
-                    mhm->hitflags |= MM_MISS;
+                    mhm->hitflags |= M_ATTK_MISS;
                 } else {
                     set_ustuck(magr);
                     pline("%s grabs you!", Monnam(magr));
-                    mhm->hitflags |= MM_HIT;
+                    mhm->hitflags |= M_ATTK_HIT;
                 }
             } else if (u.ustuck == magr) {
                 exercise(A_STR, FALSE);
@@ -3753,7 +3753,7 @@ mhitm_ad_phys(
                           mons[otmp->corpsenm].pmnames[NEUTRAL]);
                     if (!Stoned) {
                         if (do_stone_u(magr)) {
-                            mhm->hitflags = MM_HIT;
+                            mhm->hitflags = M_ATTK_HIT;
                             mhm->done = 1;
                             return;
                         }
@@ -3769,7 +3769,7 @@ mhitm_ad_phys(
                     || !artifact_hit(magr, mdef, otmp, &mhm->damage,
                                      gm.mhitu_dieroll)) {
                     hitmsg(magr, mattk);
-                    mhm->hitflags |= MM_HIT;
+                    mhm->hitflags |= M_ATTK_HIT;
                 }
                 if (!mhm->damage)
                     return;
@@ -3805,7 +3805,7 @@ mhitm_ad_phys(
             } else if (mattk->aatyp != AT_TUCH || mhm->damage != 0
                        || magr != u.ustuck) {
                 hitmsg(magr, mattk);
-                mhm->hitflags |= MM_HIT;
+                mhm->hitflags |= M_ATTK_HIT;
             }
         }
     } else {
@@ -3849,14 +3849,14 @@ mhitm_ad_phys(
                     if (gv.vis)
                         pline("%s hits %s.", Monnam(magr),
                               mon_nam_too(mdef, magr));
-                    mhm->hitflags |= MM_HIT;
+                    mhm->hitflags |= M_ATTK_HIT;
                 }
                 /* artifact_hit updates 'tmp' but doesn't inflict any
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
                 if (DEADMONSTER(mdef)) {
-                    mhm->hitflags = (MM_DEF_DIED | (grow_up(magr, mdef) ? 0
-                                                    : MM_AGR_DIED));
+                    mhm->hitflags = (M_ATTK_DEF_DIED | (grow_up(magr, mdef) ? 0
+                                                    : M_ATTK_AGR_DIED));
                     mhm->done = TRUE;
                     return;
                 }
@@ -3919,7 +3919,7 @@ mhitm_ad_ston(
                  */
                 if (!rn2(10) || flags.moonphase == NEW_MOON) {
                     if (do_stone_u(magr)) {
-                        mhm->hitflags = MM_HIT;
+                        mhm->hitflags = M_ATTK_HIT;
                         mhm->done = TRUE;
                         return;
                     }
@@ -4028,14 +4028,14 @@ mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
             if (goaway) {
                 mongone(magr);
                 mhm->done = TRUE;
-                mhm->hitflags = MM_DEF_DIED; /* return 2??? */
+                mhm->hitflags = M_ATTK_DEF_DIED; /* return 2??? */
                 return;
             } else if (!rn2(33)) {
                 if (!tele_restrict(magr))
                     (void) rloc(magr, RLOC_MSG);
                 monflee(magr, d(3, 6), TRUE, FALSE);
                 mhm->done = TRUE;
-                mhm->hitflags = MM_HIT | MM_DEF_DIED; /* return 3??? */
+                mhm->hitflags = M_ATTK_HIT | M_ATTK_DEF_DIED; /* return 3??? */
                 return;
             }
             mhm->damage = 0;
@@ -4187,12 +4187,12 @@ mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
                                 : "vomits violently and drops dead");
             mondied(magr);
             if (!DEADMONSTER(magr)) {
-                mhm->hitflags = MM_MISS; /* lifesaved */
+                mhm->hitflags = M_ATTK_MISS; /* lifesaved */
                 mhm->done = TRUE;
                 return;
             } else if (magr->mtame && !gv.vis)
                 You(brief_feeling, "queasy");
-            mhm->hitflags = MM_AGR_DIED;
+            mhm->hitflags = M_ATTK_AGR_DIED;
             mhm->done = TRUE;
             return;
         }
@@ -4318,7 +4318,7 @@ mhitm_ad_sedu(
                   : "makes some remarks about how difficult theft is lately");
             if (!tele_restrict(magr))
                 (void) rloc(magr, RLOC_MSG);
-            mhm->hitflags = MM_AGR_DONE; /* return 3??? */
+            mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
             mhm->done = TRUE;
             return;
         } else if (magr->mcan) {
@@ -4330,7 +4330,7 @@ mhitm_ad_sedu(
             if (rn2(3)) {
                 if (!tele_restrict(magr))
                     (void) rloc(magr, RLOC_MSG);
-                mhm->hitflags = MM_AGR_DONE; /* return 3??? */
+                mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
                 mhm->done = TRUE;
                 return;
             }
@@ -4339,7 +4339,7 @@ mhitm_ad_sedu(
         buf[0] = '\0';
         switch (steal(magr, buf)) {
         case -1:
-            mhm->hitflags = MM_AGR_DIED; /* return 2??? */
+            mhm->hitflags = M_ATTK_AGR_DIED; /* return 2??? */
             mhm->done = TRUE;
             return;
         case 0:
@@ -4353,7 +4353,7 @@ mhitm_ad_sedu(
                           locomotion(magr->data, "run"), buf);
             }
             monflee(magr, 0, FALSE, FALSE);
-            mhm->hitflags = MM_AGR_DONE; /* return 3??? */
+            mhm->hitflags = M_ATTK_AGR_DONE; /* return 3??? */
             mhm->done = TRUE;
             return;
         }
@@ -4393,8 +4393,8 @@ mhitm_ad_sedu(
             mdef->mstrategy &= ~STRAT_WAITFORU;
             mselftouch(mdef, (const char *) 0, FALSE);
             if (DEADMONSTER(mdef)) {
-                mhm->hitflags = (MM_DEF_DIED
-                                 | (grow_up(magr, mdef) ? 0 : MM_AGR_DIED));
+                mhm->hitflags = (M_ATTK_DEF_DIED
+                                 | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
                 mhm->done = TRUE;
                 return;
             }
@@ -4425,7 +4425,7 @@ mhitm_ad_ssex(struct monst *magr, struct attack *mattk, struct monst *mdef,
         if (SYSOPT_SEDUCE) {
             if (could_seduce(magr, mdef, mattk) == 1 && !magr->mcan)
                 if (doseduce(magr)) {
-                    mhm->hitflags = MM_AGR_DONE;
+                    mhm->hitflags = M_ATTK_AGR_DONE;
                     mhm->done = TRUE;
                     return;
                 }
@@ -4504,7 +4504,7 @@ damageum(
     struct mhitm_data mhm;
 
     mhm.damage = d((int) mattk->damn, (int) mattk->damd);
-    mhm.hitflags = MM_MISS;
+    mhm.hitflags = M_ATTK_MISS;
     mhm.permdmg = 0;
     mhm.specialdmg = specialdmg;
     mhm.done = FALSE;
@@ -4512,7 +4512,7 @@ damageum(
     if (is_demon(gy.youmonst.data) && !rn2(13) && !uwep
         && u.umonnum != PM_AMOROUS_DEMON && u.umonnum != PM_BALROG) {
         demonpet();
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
 
     mhitm_adtyping(&gy.youmonst, mattk, mdef, &mhm);
@@ -4542,9 +4542,9 @@ damageum(
             killed(mdef); /* regular "you kill <mdef>" message */
         }
         gm.mkcorpstat_norevive = FALSE;
-        return MM_DEF_DIED;
+        return M_ATTK_DEF_DIED;
     }
-    return MM_HIT;
+    return M_ATTK_HIT;
 }
 
 /* Hero, as a monster which is capable of an exploding attack mattk, is
@@ -4581,14 +4581,14 @@ explum(struct monst *mdef, struct attack *mattk)
         if (mdef && DEADMONSTER(mdef)) {
             /* Other monsters may have died too, but return this if the actual
                target died. */
-            return MM_DEF_DIED;
+            return M_ATTK_DEF_DIED;
         }
         break;
     default:
         break;
     }
     wake_nearto(u.ux, u.uy, 7 * 7); /* same radius as exploding monster */
-    return MM_HIT;
+    return M_ATTK_HIT;
 }
 
 static void
@@ -4642,7 +4642,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
      */
 
     if (!engulf_target(&gy.youmonst, mdef))
-        return MM_MISS;
+        return M_ATTK_MISS;
 
     if (!(u_digest && u.uhunger >= 1500) && !u.uswallow) {
         if (!flaming(gy.youmonst.data)) {
@@ -4668,7 +4668,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             } else {
                 map_invisible(mdef->mx, mdef->my);
             }
-            return MM_HIT;
+            return M_ATTK_HIT;
         }
 
         /* engulfing a cockatrice or digesting a Rider or Medusa */
@@ -4705,7 +4705,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                             pmname(pd, Mgender(mdef)));
                     gk.killer.format = NO_KILLER_PREFIX;
                     done(DIED);
-                    return MM_MISS; /* lifesaved */
+                    return M_ATTK_MISS; /* lifesaved */
                 }
 
                 if (Slow_digestion) {
@@ -4765,7 +4765,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
                         exercise(A_CON, TRUE);
                 }
                 end_engulf();
-                return MM_DEF_DIED;
+                return M_ATTK_DEF_DIED;
             case AD_PHYS:
                 if (gy.youmonst.data == &mons[PM_FOG_CLOUD]) {
                     pline("%s is laden with your moisture.", Monnam(mdef));
@@ -4844,7 +4844,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             if (DEADMONSTER(mdef)) {
                 killed(mdef);
                 if (DEADMONSTER(mdef)) /* not lifesaved */
-                    return MM_DEF_DIED;
+                    return M_ATTK_DEF_DIED;
             }
             You("%s %s!", expel_verb, mon_nam(mdef));
             if ((Slow_digestion || is_animal(gy.youmonst.data)) && u_digest) {
@@ -4853,7 +4853,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             }
         }
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 void
@@ -4960,7 +4960,7 @@ mhitm_knockback(
 
     /* the attack must have hit */
     /* mon-vs-mon code path doesn't set up hitflags */
-    if ((u_agr || u_def) && !(*hitflags & MM_HIT))
+    if ((u_agr || u_def) && !(*hitflags & M_ATTK_HIT))
         return FALSE;
 
     /* steadfast defender cannot be pushed around */
@@ -5028,7 +5028,7 @@ mhitm_knockback(
         mhurtle(mdef, dx, dy, knockdistance);
         if (DEADMONSTER(mdef)) {
             if (!was_u)
-                *hitflags |= MM_DEF_DIED;
+                *hitflags |= M_ATTK_DEF_DIED;
         } else if (!rn2(4)) {
             mdef->mstun = 1;
             /* if steed and hero were knocked back, update attacker's idea
@@ -5039,7 +5039,7 @@ mhitm_knockback(
     }
     if (!u_agr) {
         if (DEADMONSTER(magr))
-            *hitflags |= MM_AGR_DIED;
+            *hitflags |= M_ATTK_AGR_DIED;
     }
 
     return TRUE;
@@ -5063,7 +5063,7 @@ hmonas(struct monst *mon)
        with more than one, alternate right and left when checking
        whether silver ring causes successful hit */
     for (i = 0; i < NATTK; i++) {
-        sum[i] = MM_MISS;
+        sum[i] = M_ATTK_MISS;
         mattk = getmattk(&gy.youmonst, mon, i, sum, &alt_attk);
         if (mattk->aatyp == AT_WEAP
             || mattk->aatyp == AT_CLAW || mattk->aatyp == AT_TUCH)
@@ -5074,7 +5074,7 @@ hmonas(struct monst *mon)
     gs.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
 
     for (i = 0; i < NATTK; i++) {
-        /* sum[i] = MM_MISS; -- now done above */
+        /* sum[i] = M_ATTK_MISS; -- now done above */
         mattk = getmattk(&gy.youmonst, mon, i, sum, &alt_attk);
         if (gs.skipdrin && mattk->aatyp == AT_TENT && mattk->adtyp == AD_DRIN)
             continue;
@@ -5088,7 +5088,7 @@ hmonas(struct monst *mon)
                get to make another weapon attack (note:  monsters who
                use weapons do not have this restriction, but they also
                never have the opportunity to use two weapons) */
-            if (weapon_used && (sum[i - 1] > MM_MISS)
+            if (weapon_used && (sum[i - 1] > M_ATTK_MISS)
                 && uwep && bimanual(uwep))
                 continue;
             /* Certain monsters don't use weapons when encountered as enemies,
@@ -5144,10 +5144,10 @@ hmonas(struct monst *mon)
             weapon = *originalweapon; /* might receive passive erosion */
             if (!monster_survived) {
                 /* enemy dead, before any special abilities used */
-                sum[i] = MM_DEF_DIED;
+                sum[i] = M_ATTK_DEF_DIED;
                 break;
             } else
-                sum[i] = dhit ? MM_HIT : MM_MISS;
+                sum[i] = dhit ? M_ATTK_HIT : M_ATTK_MISS;
             /* might be a worm that gets cut in half; if so, early return */
             if (m_at(u.ux + u.dx, u.uy + u.dy) != mon) {
                 i = NATTK; /* skip additional attacks */
@@ -5342,8 +5342,8 @@ hmonas(struct monst *mon)
                 if (silverhit && Verbose(4, hmonas3))
                     silver_sears(&gy.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
-            } else if (i >= 2 && (sum[i - 1] > MM_MISS)
-                       && (sum[i - 2] > MM_MISS)) {
+            } else if (i >= 2 && (sum[i - 1] > M_ATTK_MISS)
+                       && (sum[i - 2] > M_ATTK_MISS)) {
                 /* in case we're hugging a new target while already
                    holding something else; yields feedback
                    "<u.ustuck> is no longer in your clutches" */
@@ -5375,7 +5375,7 @@ hmonas(struct monst *mon)
                     Your("attempt to surround %s is harmless.", mon_nam(mon));
                 } else {
                     sum[i] = gulpum(mon, mattk);
-                    if (sum[i] == MM_DEF_DIED && (mon->data->mlet == S_ZOMBIE
+                    if (sum[i] == M_ATTK_DEF_DIED && (mon->data->mlet == S_ZOMBIE
                                         || mon->data->mlet == S_MUMMY)
                         && rn2(5) && !Sick_resistance) {
                         You_feel("%ssick.", (Sick) ? "very " : "");
@@ -5415,11 +5415,11 @@ hmonas(struct monst *mon)
             u.mh = -1; /* dead in the current form */
             rehumanize();
         }
-        if (sum[i] == MM_DEF_DIED) {
+        if (sum[i] == M_ATTK_DEF_DIED) {
             /* defender dead */
             (void) passive(mon, weapon, 1, 0, mattk->aatyp, FALSE);
         } else {
-            (void) passive(mon, weapon, (sum[i] != MM_MISS), 1,
+            (void) passive(mon, weapon, (sum[i] != M_ATTK_MISS), 1,
                            mattk->aatyp, FALSE);
         }
 
@@ -5463,8 +5463,8 @@ passive(struct monst *mon,
 {
     register struct permonst *ptr = mon->data;
     register int i, tmp;
-    int mhit = mhitb ? MM_HIT : MM_MISS;
-    int malive = maliveb ? MM_HIT : MM_MISS;
+    int mhit = mhitb ? M_ATTK_HIT : M_ATTK_MISS;
+    int malive = maliveb ? M_ATTK_HIT : M_ATTK_MISS;
 
     for (i = 0;; i++) {
         if (i >= NATTK)
@@ -5539,7 +5539,7 @@ passive(struct monst *mon,
                     && !(poly_when_stoned(gy.youmonst.data)
                          && polymon(PM_STONE_GOLEM))) {
                     done_in_by(mon, STONING); /* "You turn to stone..." */
-                    return MM_DEF_DIED;
+                    return M_ATTK_DEF_DIED;
                 }
             }
         }

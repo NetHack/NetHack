@@ -582,13 +582,13 @@ eat_brains(
 {
     struct permonst *pd = mdef->data;
     boolean give_nutrit = FALSE;
-    int result = MM_HIT, xtra_dmg = rnd(10);
+    int result = M_ATTK_HIT, xtra_dmg = rnd(10);
 
     if (noncorporeal(pd)) {
         if (visflag)
             pline("%s brain is unharmed.",
                   (mdef == &gy.youmonst) ? "Your" : s_suffix(Monnam(mdef)));
-        return MM_MISS; /* side-effects can't occur */
+        return M_ATTK_MISS; /* side-effects can't occur */
     } else if (magr == &gy.youmonst) {
         You("eat %s brain!", s_suffix(mon_nam(mdef)));
     } else if (mdef == &gy.youmonst) {
@@ -614,12 +614,12 @@ eat_brains(
             monstone(magr);
             if (!DEADMONSTER(magr)) {
                 /* life-saved; don't continue eating the brains */
-                return MM_MISS;
+                return M_ATTK_MISS;
             } else {
                 if (magr->mtame && !visflag)
                     /* parallels mhitm.c's brief_feeling */
                     You("have a sad thought for a moment, then it passes.");
-                return MM_AGR_DIED;
+                return M_ATTK_AGR_DIED;
             }
         }
     }
@@ -632,7 +632,7 @@ eat_brains(
         if (mindless(pd)) { /* (cannibalism not possible here) */
             pline("%s doesn't notice.", Monnam(mdef));
             /* all done; no extra harm inflicted upon target */
-            return MM_MISS;
+            return M_ATTK_MISS;
         } else if (is_rider(pd)) {
             pline("Ingesting that is fatal.");
             Sprintf(gk.killer.name, "unwisely ate the brain of %s",
@@ -697,11 +697,11 @@ eat_brains(
         if (mindless(pd)) {
             if (visflag && canspotmon(mdef))
                 pline("%s doesn't notice.", Monnam(mdef));
-            return MM_MISS;
+            return M_ATTK_MISS;
         } else if (is_rider(pd)) {
             mondied(magr);
             if (DEADMONSTER(magr))
-                result = MM_AGR_DIED;
+                result = M_ATTK_AGR_DIED;
             /* Rider takes extra damage regardless of whether attacker dies */
             *dmg_p += xtra_dmg;
         } else {

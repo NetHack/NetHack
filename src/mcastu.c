@@ -210,20 +210,20 @@ castmu(
                     if (foundyou)
                         impossible(
                        "spellcasting monster found you and doesn't know it?");
-                    return MM_MISS;
+                    return M_ATTK_MISS;
                 }
                 break;
             }
         } while (--cnt > 0
                  && spell_would_be_useless(mtmp, mattk->adtyp, spellnum));
         if (cnt == 0)
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
 
     /* monster unable to cast spells? */
     if (mtmp->mcan || mtmp->mspec_used || !ml) {
         cursetxt(mtmp, is_undirected_spell(mattk->adtyp, spellnum));
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
 
     if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
@@ -241,7 +241,7 @@ castmu(
               canseemon(mtmp) ? Monnam(mtmp) : "Something",
               is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
                                                 : "thin air");
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
 
     nomul(0);
@@ -249,7 +249,7 @@ castmu(
         Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf)
             pline_The("air crackles around %s.", mon_nam(mtmp));
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline("%s casts a spell%s!",
@@ -275,7 +275,7 @@ castmu(
             impossible(
               "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
                        Monnam(mtmp), mattk->adtyp);
-            return MM_MISS;
+            return M_ATTK_MISS;
         }
     } else if (mattk->damd)
         dmg = d((int) ((ml / 2) + mattk->damn), (int) mattk->damd);
@@ -284,7 +284,7 @@ castmu(
     if (Half_spell_damage)
         dmg = (dmg + 1) / 2;
 
-    ret = MM_HIT;
+    ret = M_ATTK_HIT;
     switch (mattk->adtyp) {
     case AD_FIRE:
         pline("You're enveloped in flames.");
@@ -913,11 +913,11 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
     if (!BZ_VALID_ADTYP(mattk->adtyp))
-        return MM_MISS;
+        return M_ATTK_MISS;
 
     if (mtmp->mcan || m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp))) {
         cursetxt(mtmp, FALSE);
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
@@ -928,9 +928,9 @@ buzzmu(struct monst *mtmp, struct attack *mattk)
         buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,
              mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby));
         gb.buzzer = 0;
-        return MM_HIT;
+        return M_ATTK_HIT;
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /*mcastu.c*/

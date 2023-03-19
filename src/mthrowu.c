@@ -785,13 +785,13 @@ thrwmm(struct monst* mtmp, struct monst* mtarg)
         mtmp->weapon_check = NEED_RANGED_WEAPON;
         /* mon_wield_item resets weapon_check as appropriate */
         if (mon_wield_item(mtmp) != 0)
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
 
     /* Pick a weapon */
     otmp = select_rwep(mtmp);
     if (!otmp)
-        return MM_MISS;
+        return M_ATTK_MISS;
     ispole = is_pole(otmp);
 
     x = mtmp->mx;
@@ -806,17 +806,17 @@ thrwmm(struct monst* mtmp, struct monst* mtarg)
             if (ammo_and_launcher(otmp, mwep)
                 && dist2(mtmp->mx, mtmp->my, mtarg->mx, mtarg->my)
                    > PET_MISSILE_RANGE2)
-                return MM_MISS; /* Out of range */
+                return M_ATTK_MISS; /* Out of range */
             /* Set target monster */
             gm.mtarget = mtarg;
             gm.marcher = mtmp;
             monshoot(mtmp, otmp, mwep); /* multishot shooting or throwing */
             gm.marcher = gm.mtarget = (struct monst *) 0;
             nomul(0);
-            return MM_HIT;
+            return M_ATTK_HIT;
         }
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /* monster spits substance at monster */
@@ -835,7 +835,7 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 You_hear("a dry rattle nearby.");
             }
         }
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
         boolean utarg = (mtarg == &gy.youmonst);
@@ -874,13 +874,13 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                     dog->hungrytime -= 5;
             }
 
-            return MM_HIT;
+            return M_ATTK_HIT;
         } else {
             obj_extract_self(otmp);
             obfree(otmp, (struct obj *) 0);
         }
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /* Return the name of a breath weapon. If the player is hallucinating, return
@@ -911,7 +911,7 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                     You_hear("a cough.");
                 }
             }
-            return MM_MISS;
+            return M_ATTK_MISS;
         }
 
         /* if we've seen the actual resistance, don't bother, or
@@ -919,7 +919,7 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
         if (m_seenres(mtmp, cvt_adtyp_to_mseenres(typ))
             || (m_seenres(mtmp, M_SEEN_REFL)
                 && monnear(mtmp, mtmp->mux, mtmp->muy)))
-            return MM_HIT;
+            return M_ATTK_HIT;
 
         if (!mtmp->mspec_used && rn2(3)) {
             if (BZ_VALID_ADTYP(typ)) {
@@ -951,9 +951,9 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 }
             } else impossible("Breath weapon %d used", typ-1);
         } else
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
-    return MM_HIT;
+    return M_ATTK_HIT;
 }
 
 /* remove an entire item from a monster's inventory; destroy that item */

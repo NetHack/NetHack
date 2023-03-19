@@ -756,7 +756,7 @@ dochug(register struct monst* mtmp)
             for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
-                    if ((castmu(mtmp, a, FALSE, FALSE) & MM_HIT)) {
+                    if ((castmu(mtmp, a, FALSE, FALSE) & M_ATTK_HIT)) {
                         status = MMOVE_DONE; /* bypass m_move() */
                         break;
                     }
@@ -1506,9 +1506,9 @@ m_move(register struct monst* mtmp, register int after)
 
             mtmp2 = m_at(nix, niy);
             mstatus = mdisplacem(mtmp, mtmp2, FALSE);
-            if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED))
+            if ((mstatus & M_ATTK_AGR_DIED) || (mstatus & M_ATTK_DEF_DIED))
                 return MMOVE_DIED;
-            if (mstatus & MM_HIT)
+            if (mstatus & M_ATTK_HIT)
                 return MMOVE_MOVED;
             return MMOVE_DONE;
         }
@@ -1796,15 +1796,15 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
     /* note: mstatus returns 0 if mtmp2 is nonexistent */
     mstatus = mattackm(mtmp, mtmp2);
 
-    if (mstatus & MM_AGR_DIED) /* aggressor died */
+    if (mstatus & M_ATTK_AGR_DIED) /* aggressor died */
         return MMOVE_DIED;
 
-    if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+    if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED) && rn2(4)
         && mtmp2->movement >= NORMAL_SPEED) {
         mtmp2->movement -= NORMAL_SPEED;
         gn.notonhead = 0;
         mstatus = mattackm(mtmp2, mtmp); /* return attack */
-        if (mstatus & MM_DEF_DIED)
+        if (mstatus & M_ATTK_DEF_DIED)
             return MMOVE_DIED;
     }
     return MMOVE_DONE;
