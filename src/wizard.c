@@ -496,7 +496,7 @@ clonewiz(void)
             (void) add_to_minv(mtmp2,
                                mksobj(FAKE_AMULET_OF_YENDOR, TRUE, FALSE));
         }
-        if (Protection_from_shape_changers) {
+        if (!Protection_from_shape_changers) {
             mtmp2->m_ap_type = M_AP_MONSTER;
             mtmp2->mappearance = wizapp[rn2(SIZE(wizapp))];
         }
