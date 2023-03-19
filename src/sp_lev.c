@@ -2259,8 +2259,8 @@ create_object(object* o, struct mkroom* croom)
     }
     if (o->recharged)
         otmp->recharged = (o->recharged % 8);
-    if (o->locked) {
-        otmp->olocked = 1;
+    if (o->locked == 0 || o->locked == 1) {
+        otmp->olocked = o->locked;
     } else if (o->broken) {
         otmp->obroken = 1;
         otmp->olocked = 0; /* obj generation may set */
@@ -3529,6 +3529,7 @@ lspo_object(lua_State *L)
     tmpobj.spe = -127;
     tmpobj.quan = -1;
     tmpobj.trapped = -1;
+    tmpobj.locked = -1;
     tmpobj.corpsenm = NON_PM;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
@@ -3579,7 +3580,7 @@ lspo_object(lua_State *L)
         tmpobj.buried = get_table_boolean_opt(L, "buried", 0);
         tmpobj.lit = get_table_boolean_opt(L, "lit", 0);
         tmpobj.eroded = get_table_int_opt(L, "eroded", 0);
-        tmpobj.locked = get_table_boolean_opt(L, "locked", 0);
+        tmpobj.locked = get_table_boolean_opt(L, "locked", -1);
         tmpobj.trapped = get_table_int_opt(L, "trapped", -1);
         tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
         tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
