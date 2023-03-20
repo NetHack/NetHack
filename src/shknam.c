@@ -731,6 +731,9 @@ stock_room(int shp_indx, register struct mkroom* sroom)
             n++;
         Sprintf(buf, "Closed for inventory");
         make_engr_at(m, n, buf, 0L, DUST);
+        if (levl[m][n].typ != CORR && levl[m][n].typ != ROOM)
+            levl[m][n].typ = (Is_special(&u.uz)
+                              || *in_rooms(m, n, 0)) ? ROOM : CORR;
     }
 
     if (gc.context.tribute.enabled && !gc.context.tribute.bookstock) {
