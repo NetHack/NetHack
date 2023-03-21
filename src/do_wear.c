@@ -38,6 +38,7 @@ static int select_off(struct obj *);
 static struct obj *do_takeoff(void);
 static int take_off(void);
 static int menu_remarm(int);
+static void wornarm_destroyed(struct obj *);
 static void count_worn_stuff(struct obj **, boolean);
 static int armor_or_accessory_off(struct obj *);
 static int accessory_or_armor_on(struct obj *);
@@ -239,7 +240,8 @@ Boots_off(void)
     case WATER_WALKING_BOOTS:
         /* check for lava since fireproofed boots make it viable */
         if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))
-            && !Levitation && !Flying && !is_clinger(gy.youmonst.data)
+            && !Levitation && !Flying
+            && !(is_clinger(gy.youmonst.data) && has_ceiling(&u.uz))
             && !gc.context.takeoff.cancelled_don
             /* avoid recursive call to lava_effects() */
             && !iflags.in_lava_effects) {
@@ -258,7 +260,10 @@ Boots_off(void)
     case LEVITATION_BOOTS:
         if (!oldprop && !HLevitation && !(BLevitation & FROMOUTSIDE)
             && !gc.context.takeoff.cancelled_don) {
-            (void) float_down(0L, 0L);
+            /* lava_effects() sets in_lava_effects and calls Boots_off()
+               so hero is already in midst of floating down */
+            if (!iflags.in_lava_effects)
+                (void) float_down(0L, 0L);
             makeknown(otyp);
         } else {
             float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
@@ -2933,9 +2938,45 @@ menu_remarm(int retry)
     return 0;
 }
 
+/* take off the specific worn object and if it still exists after that,
+   destroy it (taking off the item might already destroy it by dunking
+   hero into lava) */
+static void
+wornarm_destroyed(struct obj *wornarm)
+{
+    struct obj *invobj;
+    unsigned wornoid = wornarm->o_id;
+
+    if (wornarm == uarmc)
+        (void) Cloak_off();
+    else if (wornarm == uarm)
+        (void) Armor_off();
+    else if (wornarm == uarmu)
+        (void) Shirt_off();
+    else if (wornarm == uarmh)
+        (void) Helmet_off();
+    else if (wornarm == uarmg)
+        (void) Gloves_off();
+    else if (wornarm == uarmf)
+        (void) Boots_off();
+    else if (wornarm == uarms)
+        (void) Shield_off();
+
+    /* 'wornarm' might be destroyed as a side-effect of xxx_off() so
+       using carried() to check wornarm->where==OBJ_INVENT is not viable;
+       scan invent instead; if already freed it shouldn't be possible to
+       have re-used the stale memory for a new item yet but verify o_id
+       just in case */
+    for (invobj = gi.invent; invobj; invobj = invobj->nobj)
+        if (invobj == wornarm && invobj->o_id == wornoid) {
+            useup(wornarm);
+            break;
+        }
+}
+
 /* hit by destroy armor scroll/black dragon breath/monster spell */
 int
-destroy_arm(register struct obj *atmp)
+destroy_arm(struct obj *atmp)
 {
     struct obj *otmp;
     /*
@@ -2957,8 +2998,7 @@ destroy_arm(register struct obj *atmp)
         urgent_pline("Your %s crumbles and turns to dust!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
                      cloak_simple_name(uarmc));
-        (void) Cloak_off();
-        useup(otmp);
+        wornarm_destroyed(uarmc);
     } else if (DESTROY_ARM(uarm)) {
         const char *suit = suit_simple_name(uarm);
 
@@ -2972,41 +3012,35 @@ destroy_arm(register struct obj *atmp)
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, "turn"), vtense(suit, "fall"),
                      surface(u.ux, u.uy));
-        (void) Armor_gone();
-        useup(otmp);
+        wornarm_destroyed(uarm);
     } else if (DESTROY_ARM(uarmu)) {
         if (donning(otmp))
             cancel_don();
         urgent_pline("Your %s crumbles into tiny threads and falls apart!",
                      shirt_simple_name(uarmu)); /* always "shirt" */
-        (void) Shirt_off();
-        useup(otmp);
+        wornarm_destroyed(uarmu);
     } else if (DESTROY_ARM(uarmh)) {
         if (donning(otmp))
             cancel_don();
         urgent_pline("Your %s turns to dust and is blown away!",
                      helm_simple_name(uarmh)); /* "helm" or "hat" */
-        (void) Helmet_off();
-        useup(otmp);
+        wornarm_destroyed(uarmh);
     } else if (DESTROY_ARM(uarmg)) {
         if (donning(otmp))
             cancel_don();
         urgent_pline("Your %s vanish!", gloves_simple_name(uarmg));
-        (void) Gloves_off();
-        useup(otmp);
+        wornarm_destroyed(uarmg);
         selftouch("You");
     } else if (DESTROY_ARM(uarmf)) {
         if (donning(otmp))
             cancel_don();
         urgent_pline("Your %s disintegrate!", boots_simple_name(uarmf));
-        (void) Boots_off();
-        useup(otmp);
+        wornarm_destroyed(uarmf);
     } else if (DESTROY_ARM(uarms)) {
         if (donning(otmp))
             cancel_don();
         urgent_pline("Your %s crumbles away!", shield_simple_name(uarms));
-        (void) Shield_off();
-        useup(otmp);
+        wornarm_destroyed(uarms);
     } else {
         return 0; /* could not destroy anything */
     }

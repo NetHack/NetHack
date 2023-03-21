@@ -2635,6 +2635,12 @@ dealloc_obj(struct obj *obj)
         obj->where = OBJ_LUAFREE;
         return;
     }
+#ifdef DEBUG
+    /* clobber out of date information contained in the about-to-become
+       stale memory; do this before 'free()' in case a debugging malloc
+       implementation overwrites the memory with something else */
+    *obj = cg.zeroobj;
+#endif
     free((genericptr_t) obj);
 }
 

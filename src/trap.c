@@ -3607,7 +3607,7 @@ float_down(
         if (is_pool(u.ux, u.uy) && !Wwalking && !Swimming && !u.uinwater)
             no_msg = drown();
 
-        if (is_lava(u.ux, u.uy)) {
+        if (is_lava(u.ux, u.uy) && !iflags.in_lava_effects) {
             (void) lava_effects();
             no_msg = TRUE;
         }
@@ -6050,6 +6050,9 @@ unconscious(void)
 
 static const char lava_killer[] = "molten lava";
 
+/* hero enters pool of molten lava; returns True if hero is killed and
+   then life-saved (with teleport to safe spot), False for other survival;
+   no return at all if hero dies and isn't life-saved */
 boolean
 lava_effects(void)
 {
@@ -6057,6 +6060,10 @@ lava_effects(void)
     int dmg = d(6, 6); /* only applicable for water walking */
     boolean usurvive, boil_away;
 
+    if (iflags.in_lava_effects) {
+        debugpline0("Skipping recursive lava_effects().");
+        return FALSE;
+    }
     feel_newsym(u.ux, u.uy); /* in case Blind, map the lava here */
     burn_away_slime();
     if (likes_lava(gy.youmonst.data))

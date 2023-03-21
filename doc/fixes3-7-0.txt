@@ -1121,7 +1121,11 @@ feedback if a named, shape-shifted vampire reverted to original shape rather
 adjust archeologist and valkyrie starting intrinsics
 once per game if receiving killing blow from near-full hp, leave 1 hp
 spell of knock can knock back small monsters
-protection from shape changers prevents the Wizard from mimicking monsters
+protection from shape changers now prevents the Wizard from mimicking monsters
+having worn levitation boots removed and destroyed (scroll, monster spell,
+	dragon breath) and floating down into lava can destroy them twice;
+	yielded "object lost" panic if program had been built with a debugging
+	malloc implementation which overwrites the contents of freed memory
 
 
 Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
