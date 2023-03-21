@@ -1529,11 +1529,17 @@ cancel_don(void)
 {
     /* the piece of armor we were donning/doffing has vanished, so stop
      * wasting time on it (and don't dereference it when donning would
-     * otherwise finish)
+     * otherwise finish); afternmv never has some of these values because
+     * every item of the corresponding armor category takes 1 turn to wear,
+     * but check all of them anyway
      */
-    gc.context.takeoff.cancelled_don =
-        (ga.afternmv == Boots_on || ga.afternmv == Helmet_on
-         || ga.afternmv == Gloves_on || ga.afternmv == Armor_on);
+    gc.context.takeoff.cancelled_don = (ga.afternmv == Cloak_on
+                                        || ga.afternmv == Armor_on
+                                        || ga.afternmv == Shirt_on
+                                        || ga.afternmv == Helmet_on
+                                        || ga.afternmv == Gloves_on
+                                        || ga.afternmv == Boots_on
+                                        || ga.afternmv == Shield_on);
     ga.afternmv = (int (*)(void)) 0;
     gn.nomovemsg = (char *) 0;
     gm.multi = 0;
@@ -2947,6 +2953,12 @@ wornarm_destroyed(struct obj *wornarm)
     struct obj *invobj;
     unsigned wornoid = wornarm->o_id;
 
+    /* cancel_don() resets 'afternmv' when appropriate but doesn't reset
+       uarmc/uarm/&c so doing this now won't interfere with the tests in
+       'if (wornarm==uarmc) ... else if (wornarm==uarm) ... else ...' */
+    if (donning(wornarm))
+        cancel_don();
+
     if (wornarm == uarmc)
         (void) Cloak_off();
     else if (wornarm == uarm)
@@ -2979,6 +2991,7 @@ int
 destroy_arm(struct obj *atmp)
 {
     struct obj *otmp;
+    boolean losing_gloves = FALSE;
     /*
      * Note: if there were any artifact cloaks, the 90% chance of
      * resistance here means that the cloak could survive and then
@@ -2986,24 +2999,17 @@ destroy_arm(struct obj *atmp)
      * artifact suit over a shirt.  That would be a bug.  Since there
      * aren't any, we'll just look the other way.
      */
-#define DESTROY_ARM(o)                             \
-    (((otmp = (o)) != 0 && (!atmp || atmp == otmp) \
-             && (!obj_resists(otmp, 0, 90)))       \
-         ? (otmp->in_use = TRUE)                   \
-         : FALSE)
+#define DESTROY_ARM(o) \
+    (((otmp = (o)) != 0 && (!atmp || atmp == otmp)              \
+      && !obj_resists(otmp, 0, 90)) ? (otmp->in_use = 1) : 0)
 
     if (DESTROY_ARM(uarmc)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s crumbles and turns to dust!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
-                     cloak_simple_name(uarmc));
-        wornarm_destroyed(uarmc);
+                     cloak_simple_name(otmp));
     } else if (DESTROY_ARM(uarm)) {
-        const char *suit = suit_simple_name(uarm);
+        const char *suit = suit_simple_name(otmp);
 
-        if (donning(otmp))
-            cancel_don();
         /* for gold DSM, we don't want Armor_gone() to report that it
            stops shining _after_ we've been told that it is destroyed */
         if (otmp->lamplit)
@@ -3012,40 +3018,31 @@ destroy_arm(struct obj *atmp)
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, "turn"), vtense(suit, "fall"),
                      surface(u.ux, u.uy));
-        wornarm_destroyed(uarm);
     } else if (DESTROY_ARM(uarmu)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s crumbles into tiny threads and falls apart!",
-                     shirt_simple_name(uarmu)); /* always "shirt" */
-        wornarm_destroyed(uarmu);
+                     shirt_simple_name(otmp)); /* always "shirt" */
     } else if (DESTROY_ARM(uarmh)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s turns to dust and is blown away!",
-                     helm_simple_name(uarmh)); /* "helm" or "hat" */
-        wornarm_destroyed(uarmh);
+                     helm_simple_name(otmp)); /* "helm" or "hat" */
     } else if (DESTROY_ARM(uarmg)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s vanish!", gloves_simple_name(uarmg));
-        wornarm_destroyed(uarmg);
-        selftouch("You");
+        urgent_pline("Your %s vanish!", gloves_simple_name(otmp));
+        losing_gloves = TRUE;
     } else if (DESTROY_ARM(uarmf)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s disintegrate!", boots_simple_name(uarmf));
-        wornarm_destroyed(uarmf);
+        urgent_pline("Your %s disintegrate!", boots_simple_name(otmp));
     } else if (DESTROY_ARM(uarms)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s crumbles away!", shield_simple_name(uarms));
-        wornarm_destroyed(uarms);
+        urgent_pline("Your %s crumbles away!", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }
 
 #undef DESTROY_ARM
+
+    /* cancel_don() if applicable, Cloak_off()/Armor_off()/&c, and useup() */
+    wornarm_destroyed(otmp);
+    /* glove loss means wielded weapon will be touched */
+    if (losing_gloves)
+        selftouch("You");
+
     stop_occupation();
     return 1;
 }
