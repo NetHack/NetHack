@@ -574,6 +574,7 @@ plselInitDialog(struct plsel_data * data)
 {
     TCHAR wbuf[BUFSZ];
     LVCOLUMN lvcol;
+    control_t *control;
 
     SetWindowLongPtr(data->dialog, GWLP_USERDATA, (LONG_PTR) data);
 
@@ -654,10 +655,12 @@ plselInitDialog(struct plsel_data * data)
     plselAdjustSelections(data->dialog);
 
     /* set tab order */
-    control_t * control = &data->controls[psc_quit_button];
-    for(int i = psc_quit_button; i >= psc_name_box; i--, control++)
-        SetWindowPos(control->hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
+    for (int i = psc_quit_button; i >= psc_name_box; i--) {
+        control = &data->controls[i];
+        SetWindowPos(control->hWnd, NULL, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE);
+    }
     do_player_selector_layout(data);
 
     center_dialog(data->dialog);

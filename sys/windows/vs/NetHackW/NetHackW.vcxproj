@@ -219,7 +219,6 @@
     <ClInclude Include="$(IncDir)artifact.h" />
     <ClInclude Include="$(IncDir)artilist.h" />
     <ClInclude Include="$(IncDir)attrib.h" />
-    <ClInclude Include="$(IncDir)bitmfile.h" />
     <ClInclude Include="$(IncDir)botl.h" />
     <ClInclude Include="$(IncDir)color.h" />
     <ClInclude Include="$(IncDir)config.h" />
@@ -237,7 +236,6 @@
     <ClInclude Include="$(IncDir)flag.h" />
     <ClInclude Include="$(IncDir)fnamesiz.h" />
     <ClInclude Include="$(IncDir)func_tab.h" />
-    <ClInclude Include="$(IncDir)gem_rsc.h" />
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)integer.h" />
@@ -307,9 +305,6 @@
     <Image Include="$(WinWin32Dir)rip.bmp" />
     <Image Include="$(WinWin32Dir)splash.bmp" />
     <Image Include="$(WinWin32Dir)tiles.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">
