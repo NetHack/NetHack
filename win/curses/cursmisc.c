@@ -63,13 +63,6 @@ curses_read_char(void)
         ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     }
 
-#ifdef KEY_RESIZE
-    /* Handle resize events via get_nh_event, not this code */
-    if (ch == KEY_RESIZE) {
-        ch = C('r'); /* NetHack doesn't know what to do with KEY_RESIZE */
-    }
-#endif
-
     if (counting && !isdigit(ch)) { /* dismiss count window if necessary */
         curses_count_window(NULL);
         curses_refresh_nethack_windows();
@@ -964,6 +957,13 @@ curses_convert_keys(int key)
         ret = iflags.num_pad ? '5' : 'g';
         break;
 #endif /* KEY_B2 */
+#ifdef KEY_RESIZE
+    case KEY_RESIZE:
+        /* actual resize is handled elsewhere; just avoid beep/bell here */
+        ret = '\033'; /* was C('R'); -- nethack's redraw command */
+        reject = FALSE;
+        break;
+#endif
     }
 
     /* phone layout is inverted, 123 on top and 789 on bottom; if player has
