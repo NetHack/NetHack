@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1093 $ $NHDT-Date: 1672605786 2023/01/01 20:43:06 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1139 $ $NHDT-Date: 1679595146 2023/03/23 18:12:26 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1535,6 +1535,10 @@ curses: for screen refresh, don't attempt to refresh windows that haven't been
 	set up yet or have already been shut down
 curses: for raw_print() in #if PDCURSES config, don't attempt to write to
 	message window if it isn't set up yet or has already been shut down
+curses: typing ESC to cancel something issued a beep; if the terminal was set
+	to 'visible bell', the screen flashed; only beep when the ESC is part
+	of an escape sequence--other than M-c generating ESC c--and nethack
+	is expecting text rather than a command or direction
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching

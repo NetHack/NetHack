@@ -32,7 +32,7 @@ static boolean modifiers_available = FALSE;
 
 static int modified(int ch);
 static void update_modifiers(void);
-static int parse_escape_sequence(void);
+static int parse_escape_sequence(boolean *);
 
 int
 curses_getch(void)
@@ -864,7 +864,7 @@ int
 curses_convert_keys(int key)
 {
     boolean reject = !gp.program_state.getting_a_command,
-            as_is = FALSE;
+            as_is = FALSE, numpad_esc;
     int ret = key;
 
     if (modifiers_available)
@@ -877,11 +877,9 @@ curses_convert_keys(int key)
         /* changes ESC c to M-c or number pad key to corresponding digit
            (but we only get here via key==ESC if curses' getch() didn't
            change the latter to KEY_xyz) */
-        ret = parse_escape_sequence();
-        if (ret != '\033') {
-            reject = FALSE;
-            as_is = TRUE; /* don't perform phonepad inversion */
-        }
+        ret = parse_escape_sequence(&numpad_esc);
+        reject = ((uchar) ret < 1 || ret > 255);
+        as_is = !numpad_esc; /* don't perform phonepad inversion */
         break;
     case KEY_BACKSPACE:
         /* we can't distinguish between a separate backspace key and
@@ -980,8 +978,8 @@ curses_convert_keys(int key)
 
     if (reject) {
         /* an arrow or function key has been pressed during text entry */
-        beep();   /* not curses_nhbell() because it might end up getting
-                   * changed to deliver a sound effect */
+        curses_nhbell(); /* calls beep() which might cause unwanted screen
+                          * refresh if terminal is set for 'visible bell' */
         ret = '\033'; /* ESC */
     }
 
@@ -1074,35 +1072,37 @@ curses_mouse_support(int mode) /* 0: off, 1: on, 2: alternate on */
    note: curses converts a lot of escape sequences to single values greater
    than 255 and those won't look like ESC to caller so won't get here */
 static int
-parse_escape_sequence(void)
+parse_escape_sequence(boolean *keypadnum)
 {
 #ifndef PDCURSES
     int ret;
 
-    timeout(10);
+    *keypadnum = FALSE;
 
+    timeout(10);
     ret = getch();
 
     if (ret == 'O') {               /* Numeric keypad */
         /* ESC O <something> */
         ret = getch();
-        if (ret >= 112 && ret <= 121) {
-            timeout(-1);
-            return ret - 112 + '0'; /* Convert to number */
-        }
 
-        if (ret == ERR)
-            ret = 'O'; /* there was no third char; treat as ESC O below */
+        if (ret == ERR) {
+            ret = 'O'; /* there was no third char; treat as M-O below */
+        } else if (ret >= 112 && ret <= 121) { /* 'p'..'y' */
+            *keypadnum = TRUE; /* convert 'p'..'y' to '0'..'9' below */
+        }
     }
 
-    if (ret != ERR && ret <= 255) {
+    timeout(-1); /* reset to 'wait unlimited time for next input' */
+
+    if (*keypadnum) {
+        ret -= (112 - '0');         /* Convert c from 'ESC O c' to digit */
+    } else if (ret != ERR && ret <= 255) {
         /* ESC <something>; effectively 'altmeta' behind player's back */
         ret = M(ret);               /* Meta key support for most terminals */
     } else {
         ret = '\033';               /* Just an escape character */
     }
-
-    timeout(-1);
 
     return ret;
 #else
