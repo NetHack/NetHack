@@ -23,3 +23,6 @@ xpm2ppm.ttp
 # dev tool for analyzing data collected by nethack's #define MONITOR_HEAP
 heaputil
 heaputil.c
+#address san
+*.exp
+*.lib

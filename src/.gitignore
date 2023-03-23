@@ -12,4 +12,6 @@ graphicschk
 nhdat
 o
 nhdat*
-
+#address san
+*.exp
+*.lib
