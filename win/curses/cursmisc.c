@@ -1110,6 +1110,9 @@ parse_escape_sequence(boolean *keypadnum)
 #endif /* !PDCURSES */
 }
 
+/* update_modifiers() and modified() will never be
+   called if modifiers_available is FALSE */
+
 static void
 update_modifiers(void)
 {
@@ -1118,7 +1121,6 @@ update_modifiers(void)
 #endif
 }
 
-/* This will never be called if modifiers_available is FALSE */
 static int
 modified(int ch)
 {
