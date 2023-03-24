@@ -1318,13 +1318,21 @@ X11_doprev_message(void)
     return 0;
 }
 
+/* issue a beep to alert the user about something */
 void
 X11_nhbell(void)
 {
-    /* We can't use XBell until toplevel has been initialized. */
-    if (x_inited)
-        XBell(XtDisplay(toplevel), 0);
-    /* else print ^G ?? */
+    if (!flags.silent) {
+        /* We can't use XBell until toplevel has been initialized. */
+        if (x_inited) {
+            XBell(XtDisplay(toplevel), 0);
+#if 0
+        } else {
+            /* raw_print() uses puts() so appends a newline */
+            X11_raw_print("\a"); /* '\a' == '\007' (^G), ascii BEL */
+#endif
+        }
+    }
 }
 
 void
