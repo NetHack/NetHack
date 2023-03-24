@@ -617,6 +617,8 @@ E.  Misc. Routines
 make_sound(???) -- To be determined later.  THIS IS CURRENTLY UN-IMPLEMENTED.
 nhbell()	-- Beep at user.  [This will exist at least until sounds are
 		   redone, since sounds aren't attributable to windows anyway.]
+                   Implementation should respect the flags.silent setting just
+                   like the tty window-port does in tty_nhbell().
 mark_synch()	-- Don't go beyond this point in I/O on any channel until
 		   all channels are caught up to here.  Can be an empty call
 		   for the moment

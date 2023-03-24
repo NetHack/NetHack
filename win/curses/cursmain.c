@@ -977,7 +977,8 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
 void
 curses_nhbell(void)
 {
-    beep();
+    if (!flags.silent)
+        beep();
 }
 
 /*

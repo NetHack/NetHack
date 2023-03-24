@@ -628,7 +628,8 @@ int NetHackQtBind::qt_nh_poskey(coordxy *x, coordxy *y, int *mod)
 
 void NetHackQtBind::qt_nhbell()
 {
-    QApplication::beep();
+    if (!::flags.silent)
+        QApplication::beep();
 }
 
 int NetHackQtBind::qt_doprev_message()
