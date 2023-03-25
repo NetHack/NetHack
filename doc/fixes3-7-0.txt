@@ -1582,7 +1582,7 @@ Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),
 	fseek(), ftell() and fread()
 Windows: when VIRTUAL_TERMINAL_SEQUENCES was not defined, the preprocessing
 	would fail on consoletty.c
-Windows: Original fix for GLYPH_UNEXPLORED background tile merging resulted
+Windows: original fix for GLYPH_UNEXPLORED background tile merging resulted
 	in a new issue where the map wasn't being cleared on level changes
 X11: fix build failure if STATUS_HILITES is disabled
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
