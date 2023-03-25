@@ -984,6 +984,22 @@ curses_putmsghistory(const char *msg, boolean restoring_msghist)
         }
         initd = FALSE; /* reset */
     }
+
+    /*
+     * FIXME:
+     *  restoring a game with window borders on and align_status:left
+     *  (which pushes the starting column of the message window to the
+     *  right) brings up an initial display where the border around
+     *  the message window is missing.  Once a new message causes it
+     *  to be scrolled, its border appears.  This absurd hack forces
+     *  that to be shown right away.
+     */
+    if (restoring_msghist && curses_window_has_border(WIN_MESSAGE)) {
+        WINDOW *win = curses_get_nhwin(WIN_MESSAGE);
+
+        box(win, 0, 0);
+        wrefresh(win);
+    }
 }
 
 /*cursmesg.c*/

@@ -1539,6 +1539,9 @@ curses: typing ESC to cancel something issued a beep; if the terminal was set
 	to 'visible bell', the screen flashed; only beep when the ESC is part
 	of an escape sequence--other than M-c generating ESC c--and nethack
 	is expecting text rather than a command or direction
+curses: with window borders on and align_status:left, restoring brought up a
+	screen where the message window's border wasn't shown; once it needed
+	to be scrolled to fit a new message, the border appeared
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
