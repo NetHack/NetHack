@@ -239,7 +239,7 @@ struct monst {
     ((m)->data->mlet == S_TROLL && (o) && (o)->oartifact == ART_TROLLSBANE)
 
 #define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
-#define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove || (mon)->meating)
+#define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
 
 /* Get the maximum difficulty monsters that can currently be generated,
    given the current level difficulty and the hero's level. */

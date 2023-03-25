@@ -385,7 +385,7 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
     int carryamt = 0;
     struct obj *obj, *otmp;
 
-    if (helpless(mtmp))
+    if (helpless(mtmp) || mtmp->meating)
         return 0;
 
     omx = mtmp->mx;
@@ -938,13 +938,14 @@ pet_ranged_attk(struct monst *mtmp)
  *    (may have attacked something)
  */
 int
-dog_move(register struct monst *mtmp,
-         int after) /* this is extra fast monster movement */
+dog_move(
+    struct monst *mtmp, /* pet */
+    int after) /* this is extra fast monster movement */
 {
     int omx, omy; /* original mtmp position */
     int appr, whappr, udist;
     int i, j, k;
-    register struct edog *edog = EDOG(mtmp);
+    struct edog *edog = EDOG(mtmp);
     struct obj *obj = (struct obj *) 0;
     xint16 otyp;
     boolean has_edog, cursemsg[9], do_eat = FALSE;
@@ -979,9 +980,10 @@ dog_move(register struct monst *mtmp,
             return MMOVE_MOVED;
         }
         udist = 1;
-    } else if (!udist)
+    } else if (!udist) {
         /* maybe we tamed him while being swallowed --jgm */
         return MMOVE_NOTHING;
+    }
 
     nix = omx; /* set before newdogpos */
     niy = omy;
