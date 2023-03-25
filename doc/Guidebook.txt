@@ -13,9 +13,9 @@
 
 
                          Original version - Eric S. Raymond
-             (Edited and expanded for 3.7 by Mike Stephenson and others)
+          (Edited and expanded for NetHack 3.7.0 by Mike Stephenson and others)
 
-                                  February 21, 2023
+                                   March 16, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -691,7 +691,7 @@
 
                A few non-movement commands use the `m'  prefix  to  request
                operating    via   menu   (to   temporarily   override   the
-               menustyle:Traditional option).   Primarily  useful  for  `,'
+               menustyle:traditional option).   Primarily  useful  for  `,'
                (pickup)  when  there  is  only one class of objects present
                (where there won't be any "what kinds of objects?"   prompt,
                so no opportunity to answer `m' at that prompt).
@@ -702,13 +702,15 @@
                (knownclass, show a list of discovered objects in a particu-
                lar  class)  commands to offer a menu of several sorting al-
                ternatives (which sets a new value for  the  sortdiscoveries
-               option).
+               option);  also  for "#vanquished" command to offer a sorting
+               menu.
 
-               A  few other commands (eat food, offer sacrifice, apply tin-
-               ning-kit, drink/quaff, dip)  use  the  `m'  prefix  to  skip
-               checking for applicable objects on the floor and go straight
-               to checking inventory, or (for "#loot" to remove a  saddle),
-               skip containers and go straight to adjacent monsters.
+               A few other commands (eat food, offer sacrifice, apply  tin-
+               ning-kit,  drink/quaff, dip, tip container) use the `m' pre-
+               fix to skip checking for applicable objects on the floor and
+               go straight to checking inventory, or (for "#loot" to remove
+               a saddle), skip containers and go straight to adjacent  mon-
+               sters.
 
                In  debug  mode (aka "wizard mode"), the `m' prefix may also
                be used with the "#teleport" and "#wizlevelport" commands.
@@ -718,9 +720,7 @@
                there).
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1512,7 +1512,7 @@
                n', and `M-N'.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1578,7 +1578,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1710,7 +1710,7 @@
                Show the armor currently worn.  Default key is `['.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1776,7 +1776,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1819,8 +1819,18 @@
 
           #tip
                Tip  over a container (bag or box) to pour out its contents.
-               Autocompletes.  Default key is `M-T'.  The `m' prefix  makes
-               the command use a menu.
+               When there are containers on the floor, the game will prompt
+               to  pick  one  of them or "tip something being carried".  If
+               the latter is chosen, there will be another prompt for which
+               item from inventory to tip.
+
+               The  `m'  prefix  makes  the  command skip containers on the
+               floor and pick one from inventory, except  for  the  special
+               case  of  menustyle:traditional  with two or more containers
+               present; that situation will start with the floor  container
+               menu.
+
+               Autocompletes.  Default key is `M-T'.
 
           #travel
                Travel  to  a  specific location on the map.  Default key is
@@ -1831,6 +1841,17 @@
                your character does not know of a  path  to  that  location.
                See also #retravel.
 
+
+          NetHack 3.7.0                                      March 16, 2023
+
+
+
+
+
+          NetHack Guidebook                                              29
+
+
+
           #turn
                Turn undead away.  Autocompletes.  Default key is `M-t'.
 
@@ -1840,17 +1861,6 @@
 
                Note that you must use suitable weapons  for  this  type  of
                combat, or it will be automatically turned off.
-
-
-          NetHack 3.7                                     February 21, 2023
-
-
-
-
-
-          NetHack Guidebook                                              29
-
-
 
           #untrap
                Untrap something (trap, door, or chest).  Default key is `M-
@@ -1895,20 +1905,10 @@
 
           #versionshort
                Show the program's version number, plus the  date  and  time
-               that  the  running copy was built from sources (not the ver-
-               sion's release date).  Default key is `v'.
-
-          #vision
-               Show vision array.  Autocompletes.  Debug mode only.
-
-          #wait
-               Rest one move while doing nothing.  Default key is `.',  and
-               also ` ' if rest_on_space is on.
+               that  the  running  copy  was  built  from  sources (not the
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -1917,6 +1917,15 @@
           NetHack Guidebook                                              30
 
 
+
+               version's release date).  Default key is `v'.
+
+          #vision
+               Show vision array.  Autocompletes.  Debug mode only.
+
+          #wait
+               Rest one move while doing nothing.  Default key is `.',  and
+               also ` ' if rest_on_space is on.
 
           #wear
                Wear a piece of armor.  Default key is `W'.
@@ -1963,6 +1972,18 @@
                Set one or more intrinsic attributes.  Autocompletes.  Debug
                mode only.
 
+
+
+          NetHack 3.7.0                                      March 16, 2023
+
+
+
+
+
+          NetHack Guidebook                                              31
+
+
+
           #wizkill
                Remove monsters from play by just pointing at them.  By  de-
                fault the hero gets credit or blame for killing the targets.
@@ -1972,17 +1993,6 @@
           #wizlevelport
                Teleport to another level.  Autocompletes.  Debug mode only.
                Default key is `^V'.
-
-
-          NetHack 3.7                                     February 21, 2023
-
-
-
-
-
-          NetHack Guidebook                                              31
-
-
 
           #wizmap
                Map the level.  Autocompletes.  Debug  mode  only.   Default
@@ -2028,6 +2038,18 @@
           [8th, or "high"] bit), you can invoke many extended  commands  by
           meta-ing the first letter of the command.
 
+
+
+          NetHack 3.7.0                                      March 16, 2023
+
+
+
+
+
+          NetHack Guidebook                                              32
+
+
+
                On  Windows  and  MS-DOS,  the "Alt" key can be used in this
           fashion.  On other systems, if  typing  "Alt"  plus  another  key
           transmits  a  two character sequence consisting of an Escape fol-
@@ -2038,18 +2060,6 @@
 
                Unlike  control  characters, where ^x and ^X denote the same
           thing, meta characters are case-sensitive:  M-x and M-X represent
-
-
-          NetHack 3.7                                     February 21, 2023
-
-
-
-
-
-          NetHack Guidebook                                              32
-
-
-
           different  things.   Some  commands  which  can be run via a meta
           character require that the  letter  be  capitalized  because  the
           lower-case  equivalent  is used for another command, so the three
@@ -2094,6 +2104,18 @@
 
           M-r  #rub
 
+
+
+          NetHack 3.7.0                                      March 16, 2023
+
+
+
+
+
+          NetHack Guidebook                                              33
+
+
+
           M-R  #ride
 
           M-s  #sit
@@ -2103,18 +2125,6 @@
           M-T  #tip
 
           M-u  #untrap
-
-
-
-          NetHack 3.7                                     February 21, 2023
-
-
-
-
-
-          NetHack Guidebook                                              33
-
-
 
           M-v  #version
 
@@ -2160,6 +2170,18 @@
 
                Doorways connect rooms and corridors.  Some doorways have no
           doors; you can walk right through.  Others have  doors  in  them,
+
+
+          NetHack 3.7.0                                      March 16, 2023
+
+
+
+
+
+          NetHack Guidebook                                              34
+
+
+
           which may be open, closed, or locked.  To open a closed door, use
           the `o' (open) command; to close it again, use  the  `c'  (close)
           command.   By  default  the autoopen option is enabled, so simply
@@ -2170,18 +2192,6 @@
 
                Open  doors  cannot be entered diagonally; you must approach
           them straight on, horizontally or vertically.   Doorways  without
-
-
-          NetHack 3.7                                     February 21, 2023
-
-
-
-
-
-          NetHack Guidebook                                              34
-
-
-
           doors are not restricted in this fashion except on one particular
           level (described by "#overview" as "a primitive area").
 
@@ -2226,19 +2236,9 @@
           stuck for a few turns trying to climb out (see  below).   A  trap
           usually  won't  appear on your map until you trigger it by moving
           onto it, you see someone else trigger it, or you discover it with
-          the  `s' (search) command (multiple attempts are often needed; if
-          your luck is poor, many attempts might be needed).  Wands of  se-
-          cret  door detection and spell of detect unseen also reveal traps
-          within a modest radius but only if the trap is also within  line-
-          of-sight (whether you can see at the time or not).  There is also
-          other magic which can reveal traps.
-
-               Monsters can fall prey to traps, too, which can  potentially
-          be  used  as  a  defensive  strategy.  Unfortunately traps can be
-          harmful to  your  pet(s)  as  well.   Monsters,  including  pets,
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2248,8 +2248,18 @@
 
 
 
-          usually  will avoid moving onto a trap which is shown on your map
-          if they have encountered that type of trap before.
+          the  `s' (search) command (multiple attempts are often needed; if
+          your luck is poor, many attempts might be needed).  Wands of  se-
+          cret  door detection and spell of detect unseen also reveal traps
+          within a modest radius but only if the trap is also within  line-
+          of-sight (whether you can see at the time or not).  There is also
+          other magic which can reveal traps.
+
+               Monsters can fall prey to traps, too, which can  potentially
+          be  used  as  a  defensive  strategy.  Unfortunately traps can be
+          harmful to your pet(s) as well.  Monsters, including  pets,  usu-
+          ally  will avoid moving onto a trap which is shown on your map if
+          they have encountered that type of trap before.
 
                Some traps such as pits, bear traps, and webs  hold  you  in
           one  place.   You can escape by simply trying to move to an adja-
@@ -2292,19 +2302,9 @@
           more room to maneuver.)  Since NetHack does not support  an  undo
           capability,  some allowances are permitted in case you get stuck.
           For example, each level has at least one extra boulder.  Also, it
-          is  possible  to  drop  everything in order to be able to squeeze
-          into the same location as a boulder  (and  then  presumably  move
-          past it), or to destroy a boulder with magic or tools, or to cre-
-          ate new boulders with a scroll of  earth.   However,  doing  such
-          things  will  lower  your luck without any specific message given
-          about that.  See the Conduct section for information  about  get-
-          ting feedback for your actions in Sokoban.
 
 
-
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2313,6 +2313,14 @@
           NetHack Guidebook                                              36
 
 
+
+          is  possible  to  drop  everything in order to be able to squeeze
+          into the same location as a boulder  (and  then  presumably  move
+          past it), or to destroy a boulder with magic or tools, or to cre-
+          ate new boulders with a scroll of  earth.   However,  doing  such
+          things  will  lower  your luck without any specific message given
+          about that.  See the Conduct section for information  about  get-
+          ting feedback for your actions in Sokoban.
 
           5.3.  Stairs and ladders (`<', `>')
 
@@ -2360,17 +2368,9 @@
           won't allow you to leave the shop until you have  paid  any  debt
           you owe.
 
-               You  can  sell items to a shopkeeper by dropping them to the
-          floor while inside a shop.  You will either be offered an  amount
-          of  gold  and  asked whether you're willing to sell, or you'll be
-          told that the shopkeeper isn't interested (generally,  your  item
-          needs  to  be  compatible with the type of merchandise carried by
-          the shop).
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2379,6 +2379,13 @@
           NetHack Guidebook                                              37
 
 
+
+               You  can  sell items to a shopkeeper by dropping them to the
+          floor while inside a shop.  You will either be offered an  amount
+          of  gold  and  asked whether you're willing to sell, or you'll be
+          told that the shopkeeper isn't interested (generally,  your  item
+          needs  to  be  compatible with the type of merchandise carried by
+          the shop).
 
                If you drop something in a shop by accident, the  shopkeeper
           will  usually  claim ownership without offering any compensation.
@@ -2427,16 +2434,9 @@
 
                The  pile_limit option controls how many objects can be in a
           pile--sharing the same map location--for the game to state "there
-          are  objects  here"  instead  of listing them.  The default is 5.
-          Setting it to 1 would always give that message instead of listing
-          any objects.  Setting it to 0 is a special case which will always
-          list all objects no matter how big a pile is.  Note that the num-
-          ber  refers  to  the  count of separate stacks of objects present
-          rather than the sum of the quantities of those stacks (so  7  ar-
-          rows  or 25 gold pieces will each count as 1 rather than as 7 and
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2446,6 +2446,13 @@
 
 
 
+          are  objects  here"  instead  of listing them.  The default is 5.
+          Setting it to 1 would always give that message instead of listing
+          any objects.  Setting it to 0 is a special case which will always
+          list all objects no matter how big a pile is.  Note that the num-
+          ber  refers  to  the  count of separate stacks of objects present
+          rather than the sum of the quantities of those stacks (so  7  ar-
+          rows  or 25 gold pieces will each count as 1 rather than as 7 and
           25, respectively, and total to 2 when both are at the same  loca-
           tion).
 
@@ -2493,16 +2500,9 @@
           drawn when moving more than one step in a single command (so when
           rushing, running, or traveling).
 
-          5.6.  Rogue level
-
-               One  dungeon  level  (occurring  in mid to late teens of the
-          main dungeon) is a tribute to the ancestor game  hack's  inspira-
-          tion rogue.
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2511,6 +2511,12 @@
           NetHack Guidebook                                              39
 
 
+
+          5.6.  Rogue level
+
+               One  dungeon  level  (occurring  in mid to late teens of the
+          main dungeon) is a tribute to the ancestor game  hack's  inspira-
+          tion rogue.
 
                It  is usually displayed differently from other levels: pos-
           sibly in characters instead of  tiles,  or  without  line-drawing
@@ -2559,16 +2565,10 @@
           can set the paranoid_confirmation option to require a response of
           "yes" instead.
 
-               If you can't see a monster (if it is invisible,  or  if  you
-          are  blinded), the symbol `I' will be shown when you learn of its
-          presence.  If you attempt to walk into it, you will try to  fight
-          it  just  like a monster that you can see; of course, if the mon-
-          ster has moved, you will attack empty air.  If you guess that the
-          monster  has  moved  and you don't wish to fight, you can use the
-          `m' command to move without  fighting;  likewise,  if  you  don't
 
 
-          NetHack 3.7                                     February 21, 2023
+
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2578,8 +2578,15 @@
 
 
 
-          remember  a  monster but want to try fighting anyway, you can use
-          the `F' command.
+               If you can't see a monster (if it is invisible,  or  if  you
+          are  blinded), the symbol `I' will be shown when you learn of its
+          presence.  If you attempt to walk into it, you will try to  fight
+          it  just  like a monster that you can see; of course, if the mon-
+          ster has moved, you will attack empty air.  If you guess that the
+          monster  has  moved  and you don't wish to fight, you can use the
+          `m' command to move without fighting; likewise, if you don't  re-
+          member a monster but want to try fighting anyway, you can use the
+          `F' command.
 
           6.2.  Your pet
 
@@ -2625,16 +2632,9 @@
           tory  to  attempt to put that saddle on an adjacent creature.  If
           successful, it will be transferred to that creature's inventory.
 
-               Use the "#loot" command while adjacent to a saddled creature
-          to  try  to remove the saddle from that creature.  If successful,
-          it will be transferred to your inventory.
 
 
-
-
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2643,6 +2643,10 @@
           NetHack Guidebook                                              41
 
 
+
+               Use the "#loot" command while adjacent to a saddled creature
+          to  try  to remove the saddle from that creature.  If successful,
+          it will be transferred to your inventory.
 
           6.4.  Bones levels
 
@@ -2695,12 +2699,8 @@
           ally, you'll be so overloaded that you'll either have to  discard
           some of what you're carrying or collapse under its weight.
 
-               NetHack  will  tell  you how badly you have loaded yourself.
-          If you are encumbered, one of the conditions Burdened,  Stressed,
-          Strained,  Overtaxed,  or  Overloaded will be shown on the bottom
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2710,6 +2710,9 @@
 
 
 
+               NetHack  will  tell  you how badly you have loaded yourself.
+          If you are encumbered, one of the conditions Burdened,  Stressed,
+          Strained,  Overtaxed,  or  Overloaded will be shown on the bottom
           line status display.
 
                When you pick up an object, it is assigned an inventory let-
@@ -2761,12 +2764,9 @@
           objects, so even if you are stuck with one, you  can  still  have
           the  curse  lifted and the item removed.  Priests and Priestesses
           have an innate sensitivity to this property  in  any  object,  so
-          they  can  more  easily avoid cursed objects than other character
-          roles.  Dropping objects onto an altar will reveal their bless or
-          curse state provided that you can see them land.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2775,6 +2775,10 @@
           NetHack Guidebook                                              43
 
 
+
+          they  can  more  easily avoid cursed objects than other character
+          roles.  Dropping objects onto an altar will reveal their bless or
+          curse state provided that you can see them land.
 
                An  item with unknown status will be reported in your inven-
           tory with no prefix.  An item which you know the state of will be
@@ -2826,13 +2830,9 @@
           hands.  When wielding a two-handed weapon, you  can  not  wear  a
           shield,  and  vice versa.  When wielding a one-handed weapon, you
           can have another weapon ready to use by setting  things  up  with
-          the  `x'  command,  which  exchanges  your primary (the one being
-          wielded) and alternate weapons.  And if you have  proficiency  in
-          the  "two weapon combat" skill, you may wield both weapons simul-
-          taneously as primary and secondary; use the `X' command to engage
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2842,6 +2842,10 @@
 
 
 
+          the  `x'  command,  which  exchanges  your primary (the one being
+          wielded) and alternate weapons.  And if you have  proficiency  in
+          the  "two weapon combat" skill, you may wield both weapons simul-
+          taneously as primary and secondary; use the `X' command to engage
           or  disengage  that.   Only some types of characters (barbarians,
           for instance) have the necessary skill available.  Even with that
           skill,  using  two weapons at once incurs a penalty in the chance
@@ -2892,13 +2896,9 @@
           quiver sack, or have at the ready) when the inventory  slot  used
           for  `Q' runs out.  If your quiver is empty, autoquiver is false,
           and you are wielding a weapon which returns when thrown, you will
-          throw  that  weapon instead of filling the quiver.  The fire com-
-          mand also has extra assistance, if fireassist is on it  will  try
-          to wield a launcher matching the ammo in the quiver.
 
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2907,6 +2907,10 @@
           NetHack Guidebook                                              45
 
 
+
+          throw  that  weapon instead of filling the quiver.  The fire com-
+          mand also has extra assistance, if fireassist is on it  will  try
+          to wield a launcher matching the ammo in the quiver.
 
                Some  characters have the ability to throw or shoot a volley
           of multiple items (from the  same  stack)  in  a  single  action.
@@ -2958,13 +2962,9 @@
 
                Use of a weapon in which you're restricted or unskilled will
           incur a modest penalty in the chance to hit a monster and also in
-          the  amount of damage done when you do hit; at basic level, there
-          is no penalty or bonus; at skilled level, you  receive  a  modest
-          bonus  in  the chance to hit and amount of damage done; at expert
-          level, the bonus is higher.  A successful hit  has  a  chance  to
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -2974,6 +2974,10 @@
 
 
 
+          the  amount of damage done when you do hit; at basic level, there
+          is no penalty or bonus; at skilled level, you  receive  a  modest
+          bonus  in  the chance to hit and amount of damage done; at expert
+          level, the bonus is higher.  A successful hit  has  a  chance  to
           boost  your  training towards the next skill level (unless you've
           already reached the limit for this skill).   Once  such  training
           reaches  the  threshold  for that next level, you'll be told that
@@ -3024,13 +3028,9 @@
 
                Lots of unfriendly things lurk about; you need armor to pro-
           tect yourself from their blows.  Some types of armor offer better
-          protection  than  others.   Your armor class is a measure of this
-          protection.  Armor class (AC) is measured as in AD&D, with 10 be-
-          ing  the equivalent of no armor, and lower numbers meaning better
-          armor.  Each suit of armor which exists in AD&D  gives  the  same
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3040,6 +3040,10 @@
 
 
 
+          protection  than  others.   Your armor class is a measure of this
+          protection.  Armor class (AC) is measured as in AD&D, with 10 be-
+          ing  the equivalent of no armor, and lower numbers meaning better
+          armor.  Each suit of armor which exists in AD&D  gives  the  same
           protection in NetHack.
 
                Here  is  a list of the armor class values provided by suits
@@ -3090,13 +3094,9 @@
           won't be shown as likely candidates in a prompt for choosing what
           to put on or remove.
 
-          7.4.  Food (`%')
-
-               Food is necessary to survive.  If you go  too  long  without
-          eating  you  will  faint, and eventually die of starvation.  Some
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3106,6 +3106,10 @@
 
 
 
+          7.4.  Food (`%')
+
+               Food is necessary to survive.  If you go  too  long  without
+          eating  you  will  faint, and eventually die of starvation.  Some
           types of food will spoil, and become unhealthy  to  eat,  if  not
           protected.   Food  stored in ice boxes or tins ("cans") will usu-
           ally stay fresh, but ice boxes are heavy, and tins take  a  while
@@ -3154,15 +3158,11 @@
 
                The command to read a scroll is `r'.
 
-          7.6.  Potions (`!')
-
-               Potions are distinguished by the color of the liquid  inside
-          the flask.  They disappear after you quaff them.
 
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3171,6 +3171,11 @@
           NetHack Guidebook                                              49
 
 
+
+          7.6.  Potions (`!')
+
+               Potions are distinguished by the color of the liquid  inside
+          the flask.  They disappear after you quaff them.
 
                Clear  potions  are  potions  of water.  Sometimes these are
           blessed or cursed, resulting in holy or unholy water.  Holy water
@@ -3221,14 +3226,9 @@
                Putting on a ring activates its magic.  You can wear at most
           two rings at any time, one on the ring finger of each hand.
 
-               Most worn rings also cause you to grow hungry more  rapidly,
-          the rate varying with the type of ring.
-
-               When  wearing  gloves,  rings  are  worn underneath.  If the
-          gloves are cursed, rings cannot be put on and any  already  being
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3238,6 +3238,11 @@
 
 
 
+               Most worn rings also cause you to grow hungry more  rapidly,
+          the rate varying with the type of ring.
+
+               When  wearing  gloves,  rings  are  worn underneath.  If the
+          gloves are cursed, rings cannot be put on and any  already  being
           worn  cannot  be  removed.   When  worn gloves aren't cursed, you
           don't have to manually take them off before putting on or  remov-
           ing  a  ring and then re-wear them after.  That's done implicitly
@@ -3287,14 +3292,9 @@
           slots  are  shared with weapons skills.  (See also the section on
           "Weapon proficiency".)
 
-               Casting a spell also requires flexible movement, and wearing
-          various types of armor may interfere with that.
-
-               The  command to read a spellbook is the same as for scrolls,
-          `r' (read).  The `+' command lists each spell you know along with
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3304,6 +3304,11 @@
 
 
 
+               Casting a spell also requires flexible movement, and wearing
+          various types of armor may interfere with that.
+
+               The  command to read a spellbook is the same as for scrolls,
+          `r' (read).  The `+' command lists each spell you know along with
           its level, skill category, chance of failure when casting, and an
           estimate of how strongly it is remembered.  The `Z'  (cast)  com-
           mand casts a spell.
@@ -3354,13 +3359,8 @@
           Like wearing rings, wearing an amulet  affects  your  metabolism,
           causing you to grow hungry more rapidly.
 
-               The  commands  to use amulets are the same as for rings, `P'
-          (put on) and `R' (remove).  `A' can be  used  to  remove  various
-          worn  items  including  amulets.   Also, `W' (wear) and `T' (take
-          off) which are normally for armor can be  used  for  amulets  and
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3370,6 +3370,10 @@
 
 
 
+               The  commands  to use amulets are the same as for rings, `P'
+          (put on) and `R' (remove).  `A' can be  used  to  remove  various
+          worn  items  including  amulets.   Also, `W' (wear) and `T' (take
+          off) which are normally for armor can be  used  for  amulets  and
           other  accessories  (rings and eyewear), but accessories won't be
           shown as likely candidates in a prompt for choosing what to  wear
           or take off.
@@ -3421,12 +3425,8 @@
           be influenced by the amount of gold you are carrying (shopkeepers
           aside).
 
-               Gold pieces are the only type of  object  where  bless/curse
-          state  does  not  apply.   They're  always uncursed but never de-
-          scribed as uncursed even if you turn  off  the  implicit_uncursed
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3436,6 +3436,9 @@
 
 
 
+               Gold pieces are the only type of  object  where  bless/curse
+          state  does  not  apply.   They're  always uncursed but never de-
+          scribed as uncursed even if you turn  off  the  implicit_uncursed
           option.   You can set the goldX option if you prefer to have gold
           pieces be treated as bless/curse state  unknown  rather  than  as
           known  to  be uncursed.  Only matters when you're using an object
@@ -3487,12 +3490,9 @@
                A  strict  vegan  diet  is one which avoids any food derived
           from animals.  The primary source of nutrition is fruits and veg-
           etables.  The corpses and tins of blobs (`b'), jellies (`j'), and
-          fungi (`F') are also considered to be vegetable matter.   Certain
-          human  food  is  prepared without animal products; namely, lembas
-          wafers, cram rations, food rations (gunyoki), K-rations,  and  C-
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3502,6 +3502,9 @@
 
 
 
+          fungi (`F') are also considered to be vegetable matter.   Certain
+          human  food  is  prepared without animal products; namely, lembas
+          wafers, cram rations, food rations (gunyoki), K-rations,  and  C-
           rations.   Metal  or another normally indigestible material eaten
           while polymorphed into a creature that can digest it is also con-
           sidered  vegan  food.   Note however that eating such items still
@@ -3553,12 +3556,9 @@
           to be wielded as a weapon).  Another challenge is to win the game
           without using such a wielded weapon.  You are still permitted  to
           throw,  fire,  and kick weapons; use a wand, spell, or other type
-          of item; or fight with your hands and feet.
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3567,6 +3567,8 @@
           NetHack Guidebook                                              55
 
 
+
+          of item; or fight with your hands and feet.
 
                In NetHack, a pacifist refuses to cause  the  death  of  any
           other  monster  (i.e. if you would get experience for the death).
@@ -3620,11 +3622,9 @@
           without  an attempt to wish for any items is a challenge, as is a
           game without wishing for an artifact (even if the artifact  imme-
           diately  disappears).  When the game offers you an opportunity to
-          make a wish for an item, you may choose "nothing" if you want  to
-          decline.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3633,6 +3633,9 @@
           NetHack Guidebook                                              56
 
 
+
+          make a wish for an item, you may choose "nothing" if you want  to
+          decline.
 
           8.1.  Achievements
 
@@ -3684,13 +3687,10 @@
           enough  levels  to  revert  to lower rank(s) does not discard the
           corresponding achievement(s).
 
-               There's no guaranteed Novel so the achievement to  read  one
-          might not always be attainable (except perhaps by wishing).  Sim-
-          ilarly, the Big Room level is not always  present.   Unlike  with
-          the Novel, there's no way to wish for this opportunity.
 
 
-          NetHack 3.7                                     February 21, 2023
+
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3699,6 +3699,11 @@
           NetHack Guidebook                                              57
 
 
+
+               There's no guaranteed Novel so the achievement to  read  one
+          might not always be attainable (except perhaps by wishing).  Sim-
+          ilarly, the Big Room level is not always  present.   Unlike  with
+          the Novel, there's no way to wish for this opportunity.
 
                The "special items" hidden in Mines' End and Sokoban are not
           unique but are considered to be prizes or rewards  for  exploring
@@ -3747,16 +3752,11 @@
           home directory.  The file may not exist, but it is a normal ASCII
           text file and can be created with any text editor.
 
-               On Windows, it is ".nethackrc"  in  the  folder  "\%USERPRO-
-          FILE%\NetHack\(rq.   The  file  may not exist, but it is a normal
-          ASCII text file can can be created with any text  editor.   After
-          running  NetHack  for  the  first time, you should find a default
-          template for the configuration file  named  ".nethackrc.template"
-          in  "\%USERPROFILE%\NetHack\(rq.  If you had not created the con-
-          figuration file, NetHack will create the configuration  file  for
+               On Windows, the name is ".nethackrc" located in  the  folder
+          "%USERPROFILE%\NetHack\".   The  file  may not exist, but it is a
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3766,7 +3766,12 @@
 
 
 
-          you using the default template file.
+          normal ASCII text file can can be created with any  text  editor.
+          After  running  NetHack for the first time, you should find a de-
+          fault template for the configuration file named  ".nethackrc.tem-
+          plate"  in "%USERPROFILE%\NetHack\".  If you have not created the
+          configuration file, NetHack will create one for you using the de-
+          fault template file.
 
                On  MS-DOS,  it  is  "defaults.nh"  in  the  same  folder as
           nethack.exe.
@@ -3815,14 +3820,9 @@
 
           LEVELDIR
             The  location that in-progress level files are stored. Defaults
-            to HACKDIR, must be writable.
-
-          SAVEDIR
-            The location where saved games are kept. Defaults  to  HACKDIR,
-            must be writable.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3831,6 +3831,12 @@
           NetHack Guidebook                                              59
 
 
+
+            to HACKDIR, must be writable.
+
+          SAVEDIR
+            The location where saved games are kept. Defaults  to  HACKDIR,
+            must be writable.
 
           BONESDIR
             The  location  that  bones files are kept. Defaults to HACKDIR,
@@ -3876,19 +3882,13 @@
 
             Example:
 
-                 OPTIONS=color
-                 CHOOSE=char A,char B
-                 [char A]
-                 OPTIONS=role:arc,race:dwa,align:law,gender:fem
-                 [char B]
-                 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
-                 [] #end of CHOOSE
-                 OPTIONS=!rest_on_space
 
 
 
 
-          NetHack 3.7                                     February 21, 2023
+
+
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3897,6 +3897,15 @@
           NetHack Guidebook                                              60
 
 
+
+                 OPTIONS=color
+                 CHOOSE=char A,char B
+                 [char A]
+                 OPTIONS=role:arc,race:dwa,align:law,gender:fem
+                 [char B]
+                 OPTIONS=role:wiz,race:elf,align:cha,gender:mal
+                 [] #end of CHOOSE
+                 OPTIONS=!rest_on_space
 
             If [] is present, the preceding section is closed  and  no  new
             section  begins;  whatever  follows  will be common to all sec-
@@ -3945,16 +3954,7 @@
 
 
 
-          Here is an example of configuration file contents:
-
-
-
-
-
-
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -3963,6 +3963,10 @@
           NetHack Guidebook                                              61
 
 
+
+
+
+          Here is an example of configuration file contents:
 
           # Set your character's role, race, gender, and alignment.
           OPTIONS=role:Valkyrie, race:Human, gender:female, align:lawful
@@ -4013,14 +4017,10 @@
           to left.  Other types of configuration directives such as BIND or
           MSGTYPE are not allowed.
 
-               Instead of a comma-separated list of options, NETHACKOPTIONS
-          can be set to the full name of a configuration file you  want  to
-          use.   If  that  full name doesn't start with a slash, precede it
-          with `@' (at-sign) to let NetHack know that the rest is  intended
-          as  a  file  name.   If  it  does  start with `/', the at-sign is
 
 
-          NetHack 3.7                                     February 21, 2023
+
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4030,7 +4030,12 @@
 
 
 
-          optional.
+               Instead of a comma-separated list of options, NETHACKOPTIONS
+          can be set to the full name of a configuration file you  want  to
+          use.   If  that  full name doesn't start with a slash, precede it
+          with `@' (at-sign) to let NetHack know that the rest is  intended
+          as  a  file  name.  If it does start with `/', the at-sign is op-
+          tional.
 
           9.4.  Customization options
 
@@ -4077,16 +4082,11 @@
             See pickup_types and also autopickup_exception for ways to  re-
             fine the behavior.
 
-            Note: prior to version 3.7, the default for autopickup was on.
-
-          autoquiver
-            This  option  controls  what  happens  when you attempt the `f'
-            (fire) command when nothing is  quivered  or  readied  (default
-            false).   When  true,  the  computer  will  fill your quiver or
-            quiver sack or make ready some suitable weapon.  Note  that  it
+            Note:  prior  to  version 3.7.0, the default for autopickup was
+            on.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4096,30 +4096,35 @@
 
 
 
-            will  not take into account the blessed/cursed status, enchant-
-            ment, damage, or quality of the weapon; you are free  to  manu-
+          autoquiver
+            This option controls what happens  when  you  attempt  the  `f'
+            (fire)  command  when  nothing  is quivered or readied (default
+            false).  When true, the  computer  will  fill  your  quiver  or
+            quiver  sack  or make ready some suitable weapon.  Note that it
+            will not take into account the blessed/cursed status,  enchant-
+            ment,  damage,  or quality of the weapon; you are free to manu-
             ally fill your quiver or quiver sack or make ready with the `Q'
             command instead.  If no weapon is found or the option is false,
             the `t' (throw) command is executed instead.  Persistent.
 
           autounlock
-            Controls  what  action  to  take when attempting to walk into a
-            locked door or to loot a locked container.  Takes  a  plus-sign
+            Controls what action to take when attempting  to  walk  into  a
+            locked  door  or to loot a locked container.  Takes a plus-sign
             separated list of values:
 
-            Untrap    - prompt  about whether to attempt to find a trap; it
-                        might fail to find one even  when  present;  if  it
-                        does  find one, it will ask whether you want to try
-                        to disarm the trap; if you decline, your  character
+            Untrap    - prompt about whether to attempt to find a trap;  it
+                        might  fail  to  find  one even when present; if it
+                        does find one, it will ask whether you want to  try
+                        to  disarm the trap; if you decline, your character
                         will forget that the door or box is trapped;
-            Apply-Key - if  carrying  a key or other unlocking tool, prompt
+            Apply-Key - if carrying a key or other unlocking  tool,  prompt
                         about using it;
             Kick      - kick the door (if you omit untrap or decline to at-
-                        tempt  untrap  and you omit apply-key or you lack a
+                        tempt untrap and you omit apply-key or you  lack  a
                         key or you decline to use the key; has no effect on
                         containers);
-            Force     - try  to force a container's lid with your currently
-                        wielded weapon (if you omit untrap  or  decline  to
+            Force     - try to force a container's lid with your  currently
+                        wielded  weapon  (if  you omit untrap or decline to
                         attempt untrap and you omit apply-key or you lack a
                         key or you decline to use the key; has no effect on
                         doors);
@@ -4127,13 +4132,13 @@
                         choices.
 
             Omitting the value is treated as if autounlock:apply-key.  Pre-
-            ceding  autounlock  with  `!'  or  "no"  is  treated as autoun-
+            ceding autounlock with  `!'  or  "no"  is  treated  as  autoun-
             lock:none.
 
             Applying a key might set off a trap if the door or container is
             trapped.  Successfully kicking a door will break it and wake up
-            nearby monsters.  Successfully forcing a  container  open  will
-            break  its  lock and might also destroy some of its contents or
+            nearby  monsters.   Successfully  forcing a container open will
+            break its lock and might also destroy some of its  contents  or
             damage your weapon or both.
 
             The default is Apply-Key.  Persistent.
@@ -4143,16 +4148,11 @@
             tent.
 
           bones
-            Allow  saving  and loading bones files (default true).  Persis-
+            Allow saving and loading bones files (default  true).   Persis-
             tent.
 
-          boulder
-            Set the character used to  display  boulders  (default  is  the
-            "large rock" class symbol, ``').
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4162,34 +4162,38 @@
 
 
 
+          boulder
+            Set  the  character  used  to  display boulders (default is the
+            "large rock" class symbol, ``').
+
           catname
-            Name  your starting cat (for example "catname:Morris").  Cannot
+            Name your starting cat (for example "catname:Morris").   Cannot
             be set with the `O' command.
 
           character
-            Synonym for "role" to pick the type of your character (for  ex-
+            Synonym  for "role" to pick the type of your character (for ex-
             ample "character:Monk").  See role for more details.
 
           checkpoint
-            Save  game state after each level change, for possible recovery
+            Save game state after each level change, for possible  recovery
             after program crash (default on).  Persistent.
 
           cmdassist
-            Have the game provide some additional  command  assistance  for
-            new  players  if  it detects some anticipated mistakes (default
+            Have  the  game  provide some additional command assistance for
+            new players if it detects some  anticipated  mistakes  (default
             on).
 
           confirm
-            Have user confirm  attacks  on  pets,  shopkeepers,  and  other
+            Have  user  confirm  attacks  on  pets,  shopkeepers, and other
             peaceable creatures (default on).  Persistent.
 
           dark_room
             Show out-of-sight areas of lit rooms (default on).  Persistent.
 
           disclose
-            Controls  what  information  the  program reveals when the game
-            ends.  Value is a space separated  list  of  prompting/category
-            pairs  (default is "ni na nv ng nc no", prompt with default re-
+            Controls what information the program  reveals  when  the  game
+            ends.   Value  is  a space separated list of prompting/category
+            pairs (default is "ni na nv ng nc no", prompt with default  re-
             sponse of `n' for each candidate).  Persistent.  The possibili-
             ties are:
 
@@ -4200,8 +4204,8 @@
                  c - display your conduct; also achievements, if any;
                  o - display dungeon overview.
 
-            Each  disclosure  possibility  can  optionally be preceded by a
-            prefix which lets you refine how  it  behaves.   Here  are  the
+            Each disclosure possibility can optionally  be  preceded  by  a
+            prefix  which  lets  you  refine  how it behaves.  Here are the
             valid prefixes:
 
                  y - prompt you and default to yes on the prompt;
@@ -4209,16 +4213,12 @@
                  + - disclose it without prompting;
                  - - do not disclose it and do not prompt.
 
-            The  listing of vanquished monsters can be sorted, so there are
+            The listing of vanquished monsters can be sorted, so there  are
             two additional choices for `v':
 
-                 ? - prompt you and default to ask on the prompt;
-                 # - disclose it without prompting, ask for sort order.
-
-            Asking refers to picking one of the orderings from a menu.  The
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4228,23 +4228,27 @@
 
 
 
-            `+'  disclose  without  prompting choice, or being prompted and
+                 ? - prompt you and default to ask on the prompt;
+                 # - disclose it without prompting, ask for sort order.
+
+            Asking refers to picking one of the orderings from a menu.  The
+            `+' disclose without prompting choice, or  being  prompted  and
             answering `y' rather than `a', will default to showing monsters
             in the traditional order, from high level to low level.
 
             Omitted categories are implicitly added with `n' prefix.  Spec-
             ified categories with omitted prefix implicitly use `+' prefix.
-            Order  of  the  disclosure  categories does not matter, program
+            Order of the disclosure categories  does  not  matter,  program
             display for end-of-game disclosure follows a set sequence.
 
-            (for example "disclose:yi na +v -g o") The example sets  inven-
+            (for  example "disclose:yi na +v -g o") The example sets inven-
             tory to prompt and default to yes, attributes to prompt and de-
-            fault to no, vanquished to disclose  without  prompting,  geno-
-            cided  to  not  disclose  and not prompt, conduct to implicitly
-            prompt and default to no,  and  overview  to  disclose  without
+            fault  to  no,  vanquished to disclose without prompting, geno-
+            cided to not disclose and not  prompt,  conduct  to  implicitly
+            prompt  and  default  to  no,  and overview to disclose without
             prompting.
 
-            Note  that  the  vanquished monsters list includes all monsters
+            Note that the vanquished monsters list  includes  all  monsters
             killed by traps and each other as well as by you.  And the dun-
             geon overview shows all levels you had visited but does not re-
             veal things about them that you hadn't discovered.
@@ -4254,37 +4258,33 @@
             set with the `O' command.
 
           extmenu
-            Changes  the  extended  commands  interface to pop-up a menu of
+            Changes the extended commands interface to  pop-up  a  menu  of
             available commands.  It is keystroke compatible with the tradi-
-            tional  interface  except that it does not require that you hit
+            tional interface except that it does not require that  you  hit
             Enter.  It is implemented for the tty interface (default off).
 
             For the X11 interface, which always uses a menu for choosing an
             extended command, it controls whether the menu shows all avail-
-            able commands (on) or just the subset of  commands  which  have
+            able  commands  (on)  or just the subset of commands which have
             traditionally been considered extended ones (off).
 
           female
-            An  obsolete  synonym  for "gender:female".  Cannot be set with
+            An obsolete synonym for "gender:female".  Cannot  be  set  with
             the `O' command.
 
           fireassist
-            This option controls what happens  when  you  attempt  the  `f'
+            This  option  controls  what  happens  when you attempt the `f'
             (fire) and don't have an appropriate launcher, such as a bow or
-            a sling, wielded.  If on,  you  will  automatically  wield  the
+            a  sling,  wielded.   If  on,  you will automatically wield the
             launcher. Default is on.
 
           fixinv
-            An  object's  inventory  letter  sticks to it when it's dropped
-            (default on).  If this is off, dropping an  object  shifts  all
+            An object's inventory letter sticks to  it  when  it's  dropped
+            (default  on).   If  this is off, dropping an object shifts all
             the remaining inventory letters.  Persistent.
 
-          force_invmenu
-            Commands  asking for an inventory item show a menu instead of a
-            text query with possible menu letters. Default is off.
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4294,63 +4294,63 @@
 
 
 
+          force_invmenu
+            Commands asking for an inventory item show a menu instead of  a
+            text query with possible menu letters. Default is off.
+
           fruit
-            Name a fruit after something  you  enjoy  eating  (for  example
-            "fruit:mango")  (default  "slime mold").  Basically a nostalgic
-            whimsy that NetHack uses from time to  time.   You  should  set
-            this  to  something  you  find more appetizing than slime mold.
-            Apples, oranges, pears, bananas, and melons  already  exist  in
+            Name  a  fruit  after  something  you enjoy eating (for example
+            "fruit:mango") (default "slime mold").  Basically  a  nostalgic
+            whimsy  that  NetHack  uses  from time to time.  You should set
+            this to something you find more  appetizing  than  slime  mold.
+            Apples,  oranges,  pears,  bananas, and melons already exist in
             NetHack, so don't use those.
 
           gender
-            Your  starting  gender (gender:male or gender:female).  You may
-            specify just the first letter.  Although you can  still  denote
-            your  gender using either of the deprecated male and female op-
+            Your starting gender (gender:male or gender:female).   You  may
+            specify  just  the first letter.  Although you can still denote
+            your gender using either of the deprecated male and female  op-
             tions, if the gender option is also present it will take prece-
-            dence.   See  role  for a description of how to use negation to
+            dence.  See role for a description of how to  use  negation  to
             exclude choices.
 
-            Default is random.  Cannot be set with the `O'  command.   Per-
+            Default  is  random.  Cannot be set with the `O' command.  Per-
             sistent.
 
           goldX
-            When  filtering  objects  based  on  bless/curse  state (BUCX),
-            whether to treat gold pieces as X (unknown  bless/curse  state,
-            when  "on")  or  U  (known  to be uncursed, when "off", the de-
-            fault).  Gold is never blessed or cursed, but  it  is  not  de-
+            When filtering  objects  based  on  bless/curse  state  (BUCX),
+            whether  to  treat gold pieces as X (unknown bless/curse state,
+            when "on") or U (known to be  uncursed,  when  "off",  the  de-
+            fault).   Gold  is  never  blessed or cursed, but it is not de-
             scribed as "uncursed" even when the implicit_uncursed option is
             "off".
 
           help
-            If more information is available for an object looked  at  with
+            If  more  information is available for an object looked at with
             the `/' command, ask if you want to see it (default on).  Turn-
-            ing help off makes just looking at  things  faster,  since  you
-            aren't  interrupted  with  the "More info?" prompt, but it also
+            ing  help  off  makes  just looking at things faster, since you
+            aren't interrupted with the "More info?" prompt,  but  it  also
             means that you might miss some interesting and/or important in-
             formation.  Persistent.
 
           herecmd_menu
-            When  using  a  windowport  that supports mouse and clicking on
-            yourself or next to you, show a menu of  possible  actions  for
-            the  location.  Same as "#herecmdmenu" and "#therecmdmenu" com-
+            When using a windowport that supports  mouse  and  clicking  on
+            yourself  or  next  to you, show a menu of possible actions for
+            the location.  Same as "#herecmdmenu" and "#therecmdmenu"  com-
             mands.
 
           hilite_pet
-            Visually distinguish pets from similar animals  (default  off).
-            The  behavior  of  this option depends on the type of windowing
+            Visually  distinguish  pets from similar animals (default off).
+            The behavior of this option depends on the  type  of  windowing
             you use.  In text windowing, text highlighting or inverse video
-            is  often  used;  with tiles, generally displays a heart symbol
+            is often used; with tiles, generally displays  a  heart  symbol
             near pets.
 
-            With the curses interface, the petattr option controls  how  to
-            highlight  pets  and setting it will turn the hilite_pet option
-            on or off as warranted.
-
-          hilite_pile
-            Visually distinguish piles of objects from  individual  objects
+            With  the  curses interface, the petattr option controls how to
+            highlight pets and setting it will turn the  hilite_pet  option
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4360,18 +4360,22 @@
 
 
 
+            on or off as warranted.
+
+          hilite_pile
+            Visually  distinguish  piles of objects from individual objects
             (default off).  The behavior of this option depends on the type
-            of windowing you use.  In text windowing, text highlighting  or
-            inverse  video  is often used; with tiles, generally displays a
+            of  windowing you use.  In text windowing, text highlighting or
+            inverse video is often used; with tiles, generally  displays  a
             small plus-symbol beside the object on the top of the pile.
 
           hitpointbar
-            Show a hit point bar graph behind your name  and  title.   Only
-            available  for TTY and Windows GUI, and only when statushilites
+            Show  a  hit  point bar graph behind your name and title.  Only
+            available for TTY and Windows GUI, and only when  statushilites
             is on.
 
           horsename
-            Name your starting  horse  (for  example  "horsename:Trigger").
+            Name  your  starting  horse  (for example "horsename:Trigger").
             Cannot be set with the `O' command.
 
           ignintr
@@ -4380,7 +4384,7 @@
 
           implicit_uncursed
             Omit "uncursed" from object descriptions when it can be deduced
-            from  other  aspects  of the description (default on).  Persis-
+            from other aspects of the description  (default  on).   Persis-
             tent.
 
             If you use menu coloring, you may want to turn this off.
@@ -4390,33 +4394,29 @@
             on).  Persistent.
 
           lit_corridor
-            Show  corridor  squares  seen by night vision or a light source
+            Show corridor squares seen by night vision or  a  light  source
             held by your character as lit (default off).  Persistent.
 
           lootabc
-            When using a menu to interact with a  container,  use  the  old
-            `a',  `b', and `c' keyboard shortcuts rather than the mnemonics
+            When  using  a  menu  to interact with a container, use the old
+            `a', `b', and `c' keyboard shortcuts rather than the  mnemonics
             `o', `i', and `b' (default off).  Persistent.
 
           mail
             Enable mail delivery during the game (default on).  Persistent.
 
           male
-            An obsolete synonym for "gender:male".  Cannot be set with  the
+            An  obsolete synonym for "gender:male".  Cannot be set with the
             `O' command.
 
           mention_decor
-            Give  feedback  when walking onto various dungeon features such
-            as stairs, fountains, or altars which are ordinarily  only  de-
-            scribed  when  covered  by  one  or more objects (default off).
+            Give feedback when walking onto various dungeon  features  such
+            as  stairs,  fountains, or altars which are ordinarily only de-
+            scribed when covered by one  or  more  objects  (default  off).
             Cannot be set with the `O' command.  Persistent.
 
-          mention_walls
-            Give feedback when walking against a wall (default off).   Per-
-            sistent.
 
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4426,26 +4426,30 @@
 
 
 
+          mention_walls
+            Give  feedback when walking against a wall (default off).  Per-
+            sistent.
+
           menucolors
-            Enable  coloring  menu  lines  (default off).  See "Configuring
+            Enable coloring menu lines  (default  off).   See  "Configuring
             Menu Colors" on how to configure the colors.
 
           menustyle
             Controls the interface used when you need to choose various ob-
-            jects  (in  response  to  the Drop command, for instance).  The
-            value specified should be the first letter of one of  the  fol-
-            lowing:  traditional,  combination,  full, or partial.  Persis-
+            jects (in response to the Drop  command,  for  instance).   The
+            value  specified  should be the first letter of one of the fol-
+            lowing: traditional, combination, full,  or  partial.   Persis-
             tent.
 
-            Traditional was the only interface  available  for  very  early
-            versions;  it consists of a prompt for object class characters,
-            followed by an object-by-object prompt for all  items  matching
-            the  selected  object  class(es).   Combination  starts  with a
-            prompt for object class(es) of interest, but  then  displays  a
-            menu  of  matching  objects  rather  than prompting one-by-one.
-            Full displays a menu of object classes rather than a  character
-            prompt,  and  then  a  menu  of matching objects for selection.
-            Partial skips the object class filtering and  immediately  dis-
+            Traditional  was  the  only  interface available for very early
+            versions; it consists of a prompt for object class  characters,
+            followed  by  an object-by-object prompt for all items matching
+            the selected  object  class(es).   Combination  starts  with  a
+            prompt  for  object  class(es) of interest, but then displays a
+            menu of matching  objects  rather  than  prompting  one-by-one.
+            Full  displays a menu of object classes rather than a character
+            prompt, and then a menu  of  matching  objects  for  selection.
+            Partial  skips  the object class filtering and immediately dis-
             plays a menu of all objects.
 
           menu_deselect_all
@@ -4458,8 +4462,8 @@
             Key to jump to the first page in a menu.  Default `^'.
 
           menu_headings
-            Controls  how  the  headings in a menu are highlighted.  Values
-            are "none", "bold", "dim", "italic", "underline",  "blink",  or
+            Controls how the headings in a menu  are  highlighted.   Values
+            are  "none",  "bold", "dim", "italic", "underline", "blink", or
             "inverse".  Not all ports can actually display all types.
 
           menu_invert_all
@@ -4475,14 +4479,10 @@
             Key to go to the next menu page.  Default `>'.
 
           menu_objsyms
-            Show  object symbols in menu headings in menus where the object
-            symbols act as menu accelerators (default off).
-
-          menu_overlay
-            Do not clear the screen before drawing menus, and  align  menus
+            Show object symbols in menu headings in menus where the  object
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4492,14 +4492,18 @@
 
 
 
-            to  the  right edge of the screen. Only for the tty port.  (de-
+            symbols act as menu accelerators (default off).
+
+          menu_overlay
+            Do  not  clear the screen before drawing menus, and align menus
+            to the right edge of the screen. Only for the tty  port.   (de-
             fault on)
 
           menu_previous_page
             Key to go to the previous menu page.  Default `<'.
 
           menu_search
-            Key to search for some  text  and  toggle  selection  state  of
+            Key  to  search  for  some  text  and toggle selection state of
             matching menu items.  Default `:'.
 
           menu_select_all
@@ -4509,12 +4513,12 @@
             Key to select all items on this page of a menu.  Default `,'.
 
           menu_shift_left
-            Key  to  scroll a menu--one which has been scrolled right--back
-            to the left.  Implemented for perm_invent only  by  curses  and
+            Key to scroll a menu--one which has been  scrolled  right--back
+            to  the  left.   Implemented for perm_invent only by curses and
             X11.  Default `{'.
 
           menu_shift_right
-            Key  to  scroll  a menu which has text beyond the right edge to
+            Key to scroll a menu which has text beyond the  right  edge  to
             the right.  Implemented for perm_invent only by curses and X11.
             Default `}'.
 
@@ -4523,32 +4527,28 @@
             off).  Debug mode only.
 
           mouse_support
-            Allow use of the mouse for input and  travel.   Valid  settings
+            Allow  use  of  the mouse for input and travel.  Valid settings
             are:
 
                  0 - disabled
                  1 - enabled and make OS adjustments to support mouse use
                  2 - like 1 but does not make any OS adjustments
 
-            Omitting  a  value  is  the  same  as specifying 1 and negating
+            Omitting a value is the  same  as  specifying  1  and  negating
             mouse_support is the same as specifying 0.
 
           msghistory
-            The number of top line messages to keep (and be able to  recall
+            The  number of top line messages to keep (and be able to recall
             with `^P') (default 20).  Cannot be set with the `O' command.
 
           msg_window
-            Allows  you  to change the way recalled messages are displayed.
-            Currently it is only supported for tty (all four  choices)  and
-            for  curses  (`f'  and `r' choices, default `r').  The possible
+            Allows you to change the way recalled messages  are  displayed.
+            Currently  it  is only supported for tty (all four choices) and
+            for curses (`f' and `r' choices, default  `r').   The  possible
             values are:
 
 
-
-
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4563,16 +4563,16 @@
                  f - full window, oldest message first;
                  r - full window reversed, newest message first.
 
-            For backward compatibility, no  value  needs  to  be  specified
-            (which  defaults  to  "full"),  or  it  can  be  negated (which
+            For  backward  compatibility,  no  value  needs to be specified
+            (which defaults  to  "full"),  or  it  can  be  negated  (which
             defaults to "single").
 
           name
-            Set your character's name (defaults to your  user  name).   You
-            can  also set your character's role by appending a dash and one
+            Set  your  character's  name (defaults to your user name).  You
+            can also set your character's role by appending a dash and  one
             or more letters of the role (that is, by suffixing one of -A -B
-            -C  -H  -K  -M  -P -Ra -Ro -S -T -V -W).  If -@ is used for the
-            role, then a random one will be automatically  chosen.   Cannot
+            -C -H -K -M -P -Ra -Ro -S -T -V -W).  If -@  is  used  for  the
+            role,  then  a random one will be automatically chosen.  Cannot
             be set with the `O' command.
 
           news
@@ -4587,7 +4587,7 @@
             Send padding nulls to the terminal (default on).  Persistent.
 
           number_pad
-            Use  digit  keys instead of letters to move (default 0 or off).
+            Use digit keys instead of letters to move (default 0  or  off).
             Valid settings are:
 
              0 - move by letters; "yuhjklbn"
@@ -4597,24 +4597,24 @@
              4 - combines 3 with 2; phone layout plus MS-DOS compatibility
             -1 - by letters but use `z' to go northwest, `y' to zap wands
 
-            For backward compatibility, omitting a value  is  the  same  as
-            specifying  1 and negating number_pad is the same as specifying
-            0.  (Settings 2 and 4 are for compatibility with MS-DOS or  old
+            For  backward  compatibility,  omitting  a value is the same as
+            specifying 1 and negating number_pad is the same as  specifying
+            0.   (Settings 2 and 4 are for compatibility with MS-DOS or old
             PC Hack; in addition to the different behavior for `5', `Alt-5'
             acts as `G' and `Alt-0' acts as `I'.  Setting -1 is to accommo-
-            date  some  QWERTZ keyboards which have the location of the `y'
-            and `z' keys swapped.)  When moving  by  numbers,  to  enter  a
+            date some QWERTZ keyboards which have the location of  the  `y'
+            and  `z'  keys  swapped.)   When  moving by numbers, to enter a
             count prefix for those commands which accept one (such as "12s"
-            to search  twelve  times),  precede  it  with  the  letter  `n'
+            to  search  twelve  times),  precede  it  with  the  letter `n'
             ("n12s").
 
           packorder
-            Specify   the   order   to   list   object  types  in  (default
+            Specify  the  order  to   list   object   types   in   (default
             "")[%?+!=/(*`0_").  The value of this option should be a string
-            containing  the  symbols  for  the  various  object types.  Any
+            containing the symbols  for  the  various  object  types.   Any
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4627,52 +4627,52 @@
             omitted types are filled in at the end from the previous order.
 
           paranoid_confirmation
-            A space separated list of specific situations  where  alternate
+            A  space  separated list of specific situations where alternate
             prompting  is  desired.   The  default  is  "paranoid_confirma-
             tion:pray swim".
 
-            Confirm     - for any prompts which are set  to  require  "yes"
-                          rather  than `y', also require "no" to reject in-
+            Confirm     - for  any  prompts  which are set to require "yes"
+                          rather than `y', also require "no" to reject  in-
                           stead of accepting any non-yes response as no
             quit        - require "yes" rather than `y' to confirm quitting
-                          the  game  or  switching into non-scoring explore
+                          the game or switching  into  non-scoring  explore
                           mode;
-            die         - require "yes" rather than `y'  to  confirm  dying
-                          (not  useful  in  normal play; applies to explore
+            die         - require  "yes"  rather  than `y' to confirm dying
+                          (not useful in normal play;  applies  to  explore
                           mode);
-            bones       - require "yes" rather than `y' to  confirm  saving
+            bones       - require  "yes"  rather than `y' to confirm saving
                           bones data when dying in debug mode;
-            attack      - require  "yes" rather than `y' to confirm attack-
+            attack      - require "yes" rather than `y' to confirm  attack-
                           ing a peaceful monster;
             wand-break  - require "yes" rather than `y' to confirm breaking
                           a wand;
-            eating      - require  "yes" rather than `y' to confirm whether
+            eating      - require "yes" rather than `y' to confirm  whether
                           to continue eating;
             Were-change - require "yes" rather than `y' to confirm changing
-                          form  due  to lycanthropy when hero has polymorph
+                          form due to lycanthropy when hero  has  polymorph
                           control;
-            pray        - require `y' to confirm an attempt to pray  rather
+            pray        - require  `y' to confirm an attempt to pray rather
                           than immediately praying; on by default;
-            Remove      - require  selection from inventory for `R' and `T'
-                          commands even when wearing  just  one  applicable
+            Remove      - require selection from inventory for `R' and  `T'
+                          commands  even  when  wearing just one applicable
                           item.
             swim        - prevent walking into water or lava.
             all         - turn on all of the above.
 
-            By  default,  the  pray choice is enabled, the others disabled.
-            To disable it without setting any of  the  other  choices,  use
+            By default, the pray choice is enabled,  the  others  disabled.
+            To  disable  it  without  setting any of the other choices, use
             "paranoid_confirmation:none".  To keep it enabled while setting
-            any of the others, include it  in  the  list,  such  as  "para-
+            any  of  the  others,  include  it  in the list, such as "para-
             noid_confirmation:attack pray Remove".
 
           perm_invent
-            If  true,  always  display  your current inventory in a window.
-            This only makes sense for windowing system interfaces that  im-
+            If true, always display your current  inventory  in  a  window.
+            This  only makes sense for windowing system interfaces that im-
             plement this feature.
 
           petattr
-            Specifies  one or more text highlighting attributes to use when
-            showing pets  on  the  map.   Effectively  a  superset  of  the
+            Specifies one or more text highlighting attributes to use  when
+            showing  pets  on  the  map.   Effectively  a  superset  of the
             hilite_pet boolean option.  Curses interface only; value is one
             or more of the following letters.
 
@@ -4680,7 +4680,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4700,35 +4700,35 @@
                  l - Left line indicator
                  r - Right line indicator
 
-            Some of those choices might not work,  particularly  the  final
-            three,  depending  upon terminal hardware or terminal emulation
+            Some  of  those  choices might not work, particularly the final
+            three, depending upon terminal hardware or  terminal  emulation
             software.
 
-            Currently multiple highlight-style letters can be  combined  by
-            simply  stringing them together (for example, "bk"), but in the
-            future they might require being separated by plus  signs  (such
-            as  "b+k", which works already).  When using the `n' choice, it
-            should be specified on its own, not in combination with any  of
+            Currently  multiple  highlight-style letters can be combined by
+            simply stringing them together (for example, "bk"), but in  the
+            future  they  might require being separated by plus signs (such
+            as "b+k", which works already).  When using the `n' choice,  it
+            should  be specified on its own, not in combination with any of
             the other letters.
 
           pettype
-            Specify  the  type  of  your  initial pet, if you are playing a
-            character class that uses multiple types of pets; or choose  to
-            have  no initial pet at all.  Possible values are "cat", "dog",
+            Specify the type of your initial pet,  if  you  are  playing  a
+            character  class that uses multiple types of pets; or choose to
+            have no initial pet at all.  Possible values are "cat",  "dog",
             "horse", and "none".  If the choice is not allowed for the role
-            you  are  currently  playing, it will be silently ignored.  For
-            example, "horse" will only be honored when  playing  a  knight.
+            you are currently playing, it will be  silently  ignored.   For
+            example,  "horse"  will  only be honored when playing a knight.
             Cannot be set with the `O' command.
 
           pickup_burden
-            When  you  pick  up  an item that would exceed this encumbrance
-            level (Unencumbered, Burdened, streSsed,  straiNed,  overTaxed,
-            or  overLoaded),  you  will  be  asked if you want to continue.
+            When you pick up an item that  would  exceed  this  encumbrance
+            level  (Unencumbered,  Burdened, streSsed, straiNed, overTaxed,
+            or overLoaded), you will be asked  if  you  want  to  continue.
             (Default `S').  Persistent.
 
           pickup_thrown
-            If this option is on and autopickup is also on, try to pick  up
-            things  that  you threw, even if they aren't in pickup_types or
+            If  this option is on and autopickup is also on, try to pick up
+            things that you threw, even if they aren't in  pickup_types  or
             match an autopickup exception.  Default is on.  Persistent.
 
           pickup_types
@@ -4736,17 +4736,17 @@
             Default is all types.  Persistent.
 
             The value is a list of object symbols, such as pickup_types:$?!
-            to pick up  gold,  scrolls,  and  potions.   You  can  use  au-
-            topickup_exception  configuration  file lines to further refine
+            to  pick  up  gold,  scrolls,  and  potions.   You  can use au-
+            topickup_exception configuration file lines to  further  refine
             autopickup behavior.
 
-            There is no way to set pickup_types to "none".  (Setting it  to
-            an  empty  value reverts to "all".)  If you want to avoid auto-
+            There  is no way to set pickup_types to "none".  (Setting it to
+            an empty value reverts to "all".)  If you want to  avoid  auto-
             matically picking up any types of items but do want to have au-
-            topickup  on  in  order  to  have autopickup_exception settings
+            topickup on in  order  to  have  autopickup_exception  settings
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4757,62 +4757,62 @@
 
 
             control what you do and don't pick up, you can set pickup_types
-            to  `.'.   That is the type symbol for venom and you won't come
+            to `.'.  That is the type symbol for venom and you  won't  come
             across any venom items so won't unintentionally pick such up.
 
           pile_limit
-            When walking across a pile of objects on the  floor,  threshold
-            at  which the message "there are few/several/many objects here"
-            is given instead of showing a popup list of those  objects.   A
-            value  of 0 means "no limit" (always list the objects); a value
-            of 1 effectively means "never show the objects" since the  pile
-            size  will  always  be  at  least that big; default value is 5.
+            When  walking  across a pile of objects on the floor, threshold
+            at which the message "there are few/several/many objects  here"
+            is  given  instead of showing a popup list of those objects.  A
+            value of 0 means "no limit" (always list the objects); a  value
+            of  1 effectively means "never show the objects" since the pile
+            size will always be at least that  big;  default  value  is  5.
             Persistent.
 
           playmode
-            Values are "normal", "explore", or "debug".   Allows  selection
-            of  explore  mode  (also known as discovery mode) or debug mode
+            Values  are  "normal", "explore", or "debug".  Allows selection
+            of explore mode (also known as discovery mode)  or  debug  mode
             (also known as wizard mode) instead of normal play.  Debug mode
-            might  only be allowed for someone logged in under a particular
-            user name (on multi-user systems) or  specifying  a  particular
+            might only be allowed for someone logged in under a  particular
+            user  name  (on  multi-user systems) or specifying a particular
             character name (on single-user systems) or it might be disabled
-            entirely.  Requesting it when not allowed or not  possible  re-
+            entirely.   Requesting  it when not allowed or not possible re-
             sults in explore mode instead.  Default is normal play.
 
           pushweapon
-            Using  the  `w' (wield) command when already wielding something
-            pushes the old item into your alternate  weapon  slot  (default
-            off).   Likewise  for  the `a' (apply) command if it causes the
+            Using the `w' (wield) command when already  wielding  something
+            pushes  the  old  item into your alternate weapon slot (default
+            off).  Likewise for the `a' (apply) command if  it  causes  the
             applied item to become wielded.  Persistent.
 
           quick_farsight
-            When set, usually prevents the "you  sense  your  surroundings"
-            message  where play pauses to allow you to browse the map when-
+            When  set,  usually  prevents the "you sense your surroundings"
+            message where play pauses to allow you to browse the map  when-
             ever clairvoyance randomly activates.  Some situations, such as
-            being  underwater or engulfed, ignore this option.  It does not
+            being underwater or engulfed, ignore this option.  It does  not
             affect the clairvoyance spell where pausing to examine revealed
-            objects  or  monsters is less intrusive.  Default is off.  Per-
+            objects or monsters is less intrusive.  Default is  off.   Per-
             sistent.
 
           race
-            Selects your race (for example, race:human).  Choices  are  hu-
-            man,  dwarf,  elf, gnome, and orc but most roles restrict which
+            Selects  your  race (for example, race:human).  Choices are hu-
+            man, dwarf, elf, gnome, and orc but most roles  restrict  which
             of the non-human races are allowed.  See role for a description
             of how to use negation to exclude choices.
 
-            Default  is  random.  Cannot be set with the `O' command.  Per-
+            Default is random.  Cannot be set with the `O'  command.   Per-
             sistent.
 
           rest_on_space
-            Make the space bar a synonym for the `.' (#wait)  command  (de-
+            Make  the  space bar a synonym for the `.' (#wait) command (de-
             fault off).  Persistent.
 
           role
-            Pick  your  type of character (for example, role:Samurai); syn-
-            onym for character.   See  name  for  an  alternate  method  of
+            Pick your type of character (for example,  role:Samurai);  syn-
+            onym  for  character.   See  name  for  an  alternate method of
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4824,37 +4824,37 @@
 
             specifying your role.
 
-            This  option  can  also be used to limit selection when role is
-            chosen randomly.  Use a space-separated list of roles  and  ei-
-            ther  negate  each  one  or  negate  the option itself instead.
+            This option can also be used to limit selection  when  role  is
+            chosen  randomly.   Use a space-separated list of roles and ei-
+            ther negate each one  or  negate  the  option  itself  instead.
             Negation is accomplished in the same manner as with boolean op-
-            tions,  by  prefixing  the  option  or its value(s) with `!' or
+            tions, by prefixing the option or  its  value(s)  with  `!'  or
             "no".
             Examples:
 
                  OPTIONS=role:!arc !bar !kni
                  OPTIONS=!role:arc bar kni
 
-            There can be multiple instances of the role option  if  they're
+            There  can  be multiple instances of the role option if they're
             all negations.
 
-            Default  is  random.  Cannot be set with the `O' command.  Per-
+            Default is random.  Cannot be set with the `O'  command.   Per-
             sistent.
 
           roguesymset
-            This option may be used to select one of the named symbol  sets
-            found  within  "symbols"  to alter the symbols displayed on the
+            This  option may be used to select one of the named symbol sets
+            found within "symbols" to alter the symbols  displayed  on  the
             screen on the rogue level.
 
           rlecomp
             When writing out a save file, perform run length compression of
-            the  map.  Not all ports support run length compression. It has
+            the map.  Not all ports support run length compression. It  has
             no effect on reading an existing save file.
 
           runmode
-            Controls the amount of screen updating for the map window  when
-            engaged  in multi-turn movement (running via shift+direction or
-            control+direction and so forth, or via the  travel  command  or
+            Controls  the amount of screen updating for the map window when
+            engaged in multi-turn movement (running via shift+direction  or
+            control+direction  and  so  forth, or via the travel command or
             mouse click).  The possible values are:
 
             teleport - update the map after movement has finished;
@@ -4863,22 +4863,22 @@
             crawl    - like walk, but pause briefly after each step.
 
             This option only affects the game's screen display, not the ac-
-            tual results of moving.  The default is "run";  versions  prior
-            to  3.4.1  used  "teleport" only.  Whether or not the effect is
+            tual  results  of moving.  The default is "run"; versions prior
+            to 3.4.1 used "teleport" only.  Whether or not  the  effect  is
             noticeable will depend upon the window port used or on the type
             of terminal.  Persistent.
 
           safe_pet
-            Prevent  you from (knowingly) attacking your pets (default on).
+            Prevent you from (knowingly) attacking your pets (default  on).
             Persistent.
 
           safe_wait
-            Prevents you from waiting or searching when next to  a  hostile
+            Prevents  you  from waiting or searching when next to a hostile
             monster (default on). Persistent.
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4893,8 +4893,8 @@
             off).  Debug mode only.
 
           scores
-            Control what parts of the score list you are shown at  the  end
-            (for   example  "scores:5  top  scores/4  around  my  score/own
+            Control  what  parts of the score list you are shown at the end
+            (for  example  "scores:5  top  scores/4  around  my   score/own
             scores").  Only the first letter of each category (`t', `a', or
             `o') is necessary.  Persistent.
 
@@ -4903,9 +4903,9 @@
             off).  Persistent.
 
           showrace
-            Display yourself as the glyph for your race,  rather  than  the
-            glyph  for your role (default off).  Note that this setting af-
-            fects only the appearance of the display, not the way the  game
+            Display  yourself  as  the glyph for your race, rather than the
+            glyph for your role (default off).  Note that this setting  af-
+            fects  only the appearance of the display, not the way the game
             treats you.  Persistent.
 
           showscore
@@ -4921,17 +4921,17 @@
 
             The possible values are:
 
-            o - list  object types by class, in discovery order within each
+            o - list object types by class, in discovery order within  each
                 class; default;
-            s - list object types by sortloot classification: by class,  by
-                sub-class  within  class for classes which have substantial
-                groupings (like helmets, boots, gloves, and  so  forth  for
-                armor),  with  object  types partly-discovered via assigned
+            s - list  object types by sortloot classification: by class, by
+                sub-class within class for classes which  have  substantial
+                groupings  (like  helmets,  boots, gloves, and so forth for
+                armor), with object types  partly-discovered  via  assigned
                 name coming before fully identified types;
             c - list by class, alphabetically within each class;
             a - list alphabetically across all classes.
 
-            Can be interactively set via the `O' command or via  using  the
+            Can  be  interactively set via the `O' command or via using the
             `m' prefix before the `\' or ``' command.
 
           sortloot
@@ -4941,10 +4941,10 @@
             The possible values are:
 
             full - always sort the lists;
-            loot - only sort the lists that don't  use  inventory  letters,
+            loot - only  sort  the  lists that don't use inventory letters,
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -4958,7 +4958,7 @@
             none - show lists the traditional way without sorting; default.
 
           sortpack
-            Sort  the  pack contents by type when displaying inventory (de-
+            Sort the pack contents by type when displaying  inventory  (de-
             fault on).  Persistent.
 
           sortvanquished
@@ -4971,11 +4971,11 @@
                 ternal monster index; default;
             d - order by monster difficulty rating; ties broken by internal
                 index;
-            a - order  alphabetically,  first  any unique monsters then all
+            a - order alphabetically, first any unique  monsters  then  all
                 the others;
-            c - order by monster class, by low to high  level  within  each
+            c - order  by  monster  class, by low to high level within each
                 class;
-            n - order  by  count,  high to low; ties are broken by internal
+            n - order by count, high to low; ties are  broken  by  internal
                 monster index;
             z - order by count, low to high; ties broken by internal index.
 
@@ -4983,34 +4983,34 @@
             `m' prefix before the #vanquished command.
 
           sounds
-            Allow  sounds  to  be  emitted from an integrated sound library
+            Allow sounds to be emitted from  an  integrated  sound  library
             (default on).
 
           sparkle
             Display a sparkly effect when a monster (including yourself) is
-            hit  by  an attack to which it is resistant (default on).  Per-
+            hit by an attack to which it is resistant (default  on).   Per-
             sistent.
 
           standout
             Boldface monsters and "--More--" (default off).  Persistent.
 
           statushilites
-            Controls how many turns status hilite behaviors  highlight  the
-            field.   If  negated  or set to zero, disables status hiliting.
+            Controls  how  many turns status hilite behaviors highlight the
+            field.  If negated or set to zero,  disables  status  hiliting.
             See "Configuring Status Hilites" for further information.
 
           status_updates
-            Allow updates to the status lines at the bottom of  the  screen
+            Allow  updates  to the status lines at the bottom of the screen
             (default true).
 
           suppress_alert
-            This  option  may be set to a NetHack version level to suppress
-            alert notification messages about feature changes for that  and
+            This option may be set to a NetHack version level  to  suppress
+            alert  notification messages about feature changes for that and
             prior versions (for example "suppress_alert:3.3.1").
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5021,25 +5021,25 @@
 
 
           symset
-            This  option may be used to select one of the named symbol sets
-            found within "symbols" to alter the symbols  displayed  on  the
-            screen.   Use "symset:default" to explicitly select the default
+            This option may be used to select one of the named symbol  sets
+            found  within  "symbols"  to alter the symbols displayed on the
+            screen.  Use "symset:default" to explicitly select the  default
             symbols.
 
           time
-            Show the elapsed game time in turns  on  bottom  line  (default
+            Show  the  elapsed  game  time in turns on bottom line (default
             off).  Persistent.
 
           timed_delay
-            When  pausing  momentarily for display effect, such as with ex-
-            plosions and moving objects, use a timer  rather  than  sending
+            When pausing momentarily for display effect, such as  with  ex-
+            plosions  and  moving  objects, use a timer rather than sending
             extra characters to the screen.  (Applies to "tty" and "curses"
-            interfaces only; "X11" interface always uses a timer-based  de-
-            lay.   The default is on if configured into the program.)  Per-
+            interfaces  only; "X11" interface always uses a timer-based de-
+            lay.  The default is on if configured into the program.)   Per-
             sistent.
 
           tips
-            Show some helpful tips during gameplay (default  on).   Persis-
+            Show  some  helpful tips during gameplay (default on).  Persis-
             tent.
 
           tombstone
@@ -5048,17 +5048,21 @@
 
           toptenwin
             Put the ending display in a NetHack window instead of on stdout
-            (default  off).  Setting this option makes the score list visi-
-            ble when a windowing version of NetHack is  started  without  a
-            parent  window,  but  it no longer leaves the score list around
+            (default off).  Setting this option makes the score list  visi-
+            ble  when  a  windowing version of NetHack is started without a
+            parent window, but it no longer leaves the  score  list  around
             after game end on a terminal or emulating window.
 
           travel
             Allow the travel command via mouse click (default on).  Turning
-            this  option  off  will  prevent the game from attempting unin-
-            tended moves if you make inadvertent mouse clicks  on  the  map
+            this option off will prevent the  game  from  attempting  unin-
+            tended  moves  if  you make inadvertent mouse clicks on the map
             window.  Does not affect traveling via the `_' ("#travel") com-
             mand.  Persistent.
+
+          tutorial
+            Play  a  tutorial level at the start of the game.  Setting this
+            option on or off in the config file will skip the query.
 
           verbose
             Provide more commentary during the game (default on).   Persis-
@@ -5070,13 +5074,9 @@
             tion.   Also  works  in other situations where you are asked to
             pick a location.
 
-            The possible settings are:
 
 
-
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5085,6 +5085,8 @@
           NetHack Guidebook                                              78
 
 
+
+            The possible settings are:
 
                  c - compass ("east" or "3s" or "2n,4w");
                  f - full compass ("east" or "3south" or "2north,4west");
@@ -5140,9 +5142,7 @@
             off).  Debug mode only.
 
 
-
-
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5406,7 +5406,7 @@
             (80+2+26+2) is needed to show borders if align_status is set to
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5472,7 +5472,7 @@
             character to complete  the  two  character  sequence.   Type  a
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5538,7 +5538,7 @@
             Set the intensity level of  the  three  gray  scales  available
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5604,7 +5604,7 @@
           any corpse from autopickup.  The  last  example  results  in  the
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5670,7 +5670,7 @@
             the  getpos.pick.once  key (default `,') or the getpos.pick key
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5736,7 +5736,7 @@
             When asked for a  location,  and  using  one  of  the  next  or
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5802,7 +5802,7 @@
             location.  Default is `z'.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5868,7 +5868,7 @@
                  attribute  - the attribute to use for lines  matching  the
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5934,7 +5934,7 @@
             pattern.  Each SOUND entry is broken down  into  the  following
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -5947,7 +5947,7 @@
             parts:
 
             MESG        - message window mapping (the only one supported in
-                          3.7);
+                          3.7.0);
             msgtype     - optional; message type to use,  see  "Configuring
                           Message Types"
             pattern     - the pattern to match;
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6066,7 +6066,7 @@
                  value   changes.    This   attribute   times   out   after
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6528,7 +6528,7 @@
             geting.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6594,7 +6594,7 @@
             save file content in ascii text.
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6792,7 +6792,7 @@
           Mathematisch   Centrum  (now  Centrum  Wiskunde  &  Informatica),
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6858,7 +6858,7 @@
           Ken  Arromdee,  David Cohrs, Jean-Christophe Collet, Kevin Darcy,
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -6990,7 +6990,7 @@
           Walz, and Paul Winner, released 3.3.0 in December 1999 and  3.3.1
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -7056,7 +7056,7 @@
           stable version that provided continued enjoyment by the community
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -7122,7 +7122,7 @@
           NetHack 3.6, hindered by limited  access.  Kevin  Smolkowski  has
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -7188,7 +7188,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -7254,7 +7254,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
@@ -7320,7 +7320,7 @@
 
 
 
-          NetHack 3.7                                     February 21, 2023
+          NetHack 3.7.0                                      March 16, 2023
 
 
 
