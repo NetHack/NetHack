@@ -317,8 +317,13 @@ void
 read_engr_at(coordxy x, coordxy y)
 {
     struct engr *ep = engr_at(x, y);
+    const char *eloc = surface(x, y);
     int sensed = 0;
 
+    if (!spot_shows_engravings(x, y)) {
+        if (On_stairs(x, y))
+            eloc = "stairs";
+    }
     /* Sensing an engraving does not require sight,
      * nor does it necessarily imply comprehension (literacy).
      */
@@ -335,21 +340,20 @@ read_engr_at(coordxy x, coordxy y)
         case HEADSTONE:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
-                pline("%s is engraved here on the %s.", Something,
-                      surface(x, y));
+                pline("%s is engraved here on the %s.", Something, eloc);
             }
             break;
         case BURN:
             if (!Blind || can_reach_floor(TRUE)) {
                 sensed = 1;
                 pline("Some text has been %s into the %s here.",
-                      is_ice(x, y) ? "melted" : "burned", surface(x, y));
+                      is_ice(x, y) ? "melted" : "burned", eloc);
             }
             break;
         case MARK:
             if (!Blind) {
                 sensed = 1;
-                pline("There's some graffiti on the %s here.", surface(x, y));
+                pline("There's some graffiti on the %s here.", eloc);
             }
             break;
         case ENGR_BLOOD:
@@ -1052,6 +1056,10 @@ doengrave(void)
     }
 
     eloc = surface(u.ux, u.uy);
+    if (!spot_shows_engravings(u.ux, u.uy)) {
+        if (On_stairs(u.ux, u.uy))
+            eloc = "stairs";
+    }
     adding = (oep && !eow);
     switch (type) {
     default:

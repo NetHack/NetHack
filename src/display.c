@@ -416,12 +416,14 @@ unmap_object(register coordxy x, register coordxy y)
 
     if ((trap = t_at(x, y)) != 0 && trap->tseen && !covers_traps(x, y)) {
         map_trap(trap, 0);
-    } else if ((ep = engr_at(x, y)) != 0 && !covers_traps(x, y)) {
-        map_engraving(ep, 0);
     } else if (levl[x][y].seenv) {
         struct rm *lev = &levl[x][y];
 
-        map_background(x, y, 0);
+        if (spot_shows_engravings(x, y)
+               && (ep = engr_at(x, y)) != 0 && !covers_traps(x, y))
+            map_engraving(ep, 0);
+        else
+            map_background(x, y, 0);
 
         /* turn remembered dark room squares dark */
         if (!lev->waslit && lev->glyph == cmap_to_glyph(S_room)
@@ -450,7 +452,9 @@ unmap_object(register coordxy x, register coordxy y)
             map_object(obj, show);                                          \
         else if ((trap = t_at(x, y)) && trap->tseen && !covers_traps(x, y)) \
             map_trap(trap, show);                                           \
-        else if ((ep = engr_at(x, y)) && !covers_traps(x, y))  \
+        else if (spot_shows_engravings(x, y)                                \
+                 && (ep = engr_at(x, y)) != 0                               \
+                 && !covers_traps(x, y))                                    \
             map_engraving(ep, show);                                        \
         else                                                                \
             map_background(x, y, show);                                     \
