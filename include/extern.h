@@ -713,6 +713,9 @@ extern boolean Can_fall_thru(d_level *);
 extern boolean Can_dig_down(d_level *);
 extern boolean Can_rise_up(coordxy, coordxy, d_level *);
 extern boolean has_ceiling(d_level *);
+extern boolean avoid_ceiling(d_level *);
+extern const char *surface(coordxy, coordxy);
+extern const char *ceiling(coordxy, coordxy);
 extern boolean In_quest(d_level *);
 extern boolean In_mines(d_level *);
 extern branch *dungeon_branch(const char *);
@@ -815,8 +818,6 @@ extern char *random_engraving(char *);
 extern void wipeout_text(char *, int, unsigned);
 extern boolean can_reach_floor(boolean);
 extern void cant_reach_floor(coordxy, coordxy, boolean, boolean);
-extern const char *surface(coordxy, coordxy);
-extern const char *ceiling(coordxy, coordxy);
 extern struct engr *engr_at(coordxy, coordxy);
 extern struct engr *sengr_at(const char *, coordxy, coordxy, boolean);
 extern void u_wipe_engr(int);
@@ -2351,7 +2352,6 @@ extern void punish(struct obj *);
 extern void unpunish(void);
 extern boolean cant_revive(int *, boolean, struct obj *);
 extern boolean create_particular(void);
-extern boolean avoid_ceiling(d_level *);
 
 /* ### rect.c ### */
 

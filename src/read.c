@@ -52,17 +52,6 @@ static boolean create_particular_parse(char *,
                                        struct _create_particular_data *);
 static boolean create_particular_creation(struct _create_particular_data *);
 
-
-boolean
-avoid_ceiling(d_level *lev)
-{
-    if (In_quest(lev) || Is_astralevel(lev)
-        || Is_firelevel(lev) || !has_ceiling(lev))
-        return TRUE;
-    return FALSE;
-}
-
-
 static boolean
 learnscrolltyp(short scrolltyp)
 {

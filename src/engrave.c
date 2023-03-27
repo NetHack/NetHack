@@ -186,71 +186,6 @@ cant_reach_floor(coordxy x, coordxy y, boolean up, boolean check_pit)
                : surface(x, y));
 }
 
-const char *
-surface(coordxy x, coordxy y)
-{
-    struct rm *lev = &levl[x][y];
-
-    if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
-        /* 'husk' is iffy but maw is wrong for 't' class */
-        return digests(u.ustuck->data) ? "maw"
-               : enfolds(u.ustuck->data) ? "husk"
-                 : "nonesuch"; /* can't happen (fingers crossed...) */
-    else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
-        return "air";
-    else if (is_pool(x, y))
-        return (Underwater && !Is_waterlevel(&u.uz))
-            ? "bottom" : hliquid("water");
-    else if (is_ice(x, y))
-        return "ice";
-    else if (is_lava(x, y))
-        return hliquid("lava");
-    else if (lev->typ == DRAWBRIDGE_DOWN)
-        return "bridge";
-    else if (IS_ALTAR(levl[x][y].typ))
-        return "altar";
-    else if (IS_GRAVE(levl[x][y].typ))
-        return "headstone";
-    else if (IS_FOUNTAIN(levl[x][y].typ))
-        return "fountain";
-    else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
-             || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
-        return "floor";
-    else
-        return "ground";
-}
-
-const char *
-ceiling(coordxy x, coordxy y)
-{
-    struct rm *lev = &levl[x][y];
-    const char *what;
-
-    /* other room types will no longer exist when we're interested --
-     * see check_special_room()
-     */
-    if (*in_rooms(x, y, VAULT))
-        what = "vault's ceiling";
-    else if (*in_rooms(x, y, TEMPLE))
-        what = "temple's ceiling";
-    else if (*in_rooms(x, y, SHOPBASE))
-        what = "shop's ceiling";
-    else if (Is_waterlevel(&u.uz))
-        /* water plane has no surface; its air bubbles aren't below sky */
-        what = "water above";
-    else if (IS_AIR(lev->typ))
-        what = "sky";
-    else if (Underwater)
-        what = "water's surface";
-    else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
-             || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
-        what = "ceiling";
-    else
-        what = "rock cavern";
-
-    return what;
-}
-
 struct engr *
 engr_at(coordxy x, coordxy y)
 {
@@ -320,10 +255,6 @@ read_engr_at(coordxy x, coordxy y)
     const char *eloc = surface(x, y);
     int sensed = 0;
 
-    if (!spot_shows_engravings(x, y)) {
-        if (On_stairs(x, y))
-            eloc = "stairs";
-    }
     /* Sensing an engraving does not require sight,
      * nor does it necessarily imply comprehension (literacy).
      */
@@ -1056,10 +987,6 @@ doengrave(void)
     }
 
     eloc = surface(u.ux, u.uy);
-    if (!spot_shows_engravings(u.ux, u.uy)) {
-        if (On_stairs(u.ux, u.uy))
-            eloc = "stairs";
-    }
     adding = (oep && !eow);
     switch (type) {
     default:
