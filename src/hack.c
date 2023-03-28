@@ -2852,6 +2852,10 @@ spoteffects(boolean pick)
         /* or transformed trap (land mine -> pit) */
         && (!spottrap || !trap || trap->ttyp == spottraptyp))
         return;
+    /* when float_down() puts hero into lava and she teleports out,
+       defer spoteffects() until after "you are back on solid <surface>" */
+    if (iflags.in_lava_effects)
+        return;
 
     ++inspoteffects;
     spotterrain = levl[u.ux][u.uy].typ;

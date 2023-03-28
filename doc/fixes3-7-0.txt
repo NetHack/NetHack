@@ -1127,6 +1127,8 @@ having worn levitation boots removed and destroyed (scroll, monster spell,
 	yielded "object lost" panic if program had been built with a debugging
 	malloc implementation which overwrites the contents of freed memory
 ensure that all window interfaces respect flags.silent (suppress terminal beep)
+falling into lava, being life-saved, and teleporting out could yield redundant
+	descriptions of what was present at hero's new location
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

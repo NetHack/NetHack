@@ -6140,8 +6140,6 @@ lava_effects(void)
             }
         }
 
-        iflags.in_lava_effects--;
-
         /* s/he died... */
         boil_away = (u.umonnum == PM_WATER_ELEMENTAL
                      || u.umonnum == PM_STEAM_VORTEX
@@ -6160,8 +6158,34 @@ lava_effects(void)
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
         }
-        You("find yourself back on solid %s.", surface(u.ux, u.uy));
-        iflags.last_msg = PLNMSG_BACK_ON_GROUND;
+
+        iflags.in_lava_effects--;
+
+        /*
+         * 3.7: this used to be uncondtional "back on solid <surface>"
+         * but surface() could return a lot of things where that ends up
+         * sounding silly.  Deal with water, ignore furniture; assume
+         * surface types 'air' and 'cloud' won't be present on same level
+         * as lava so don't need to be catered for.
+         *
+         * Made it out of the lava.  We know that hero isn't levitating
+         * or flying but life-saving plus fireproof water walking boots
+         * (and no fire resistance) could put hero on water rather than
+         * "on solid ground"; likewise if poly'd into an aquatic form.
+         */
+        if (is_pool(u.ux, u.uy))
+            You("find yourself %s %s.", u.uinwater ? "in" : "on",
+                hliquid("water"));
+        else
+            You("find yourself back on solid %s.", surface(u.ux, u.uy));
+        iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor();
+                                                  * use for on-water too */
+        /* surface() just disclosed this */
+        iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
+        /* normally done via safe_teleds() -> teleds() -> spoteffects() but
+           spoteffects() was no-op when called with nonzero in_lava_effects */
+        spoteffects(FALSE); /* suppress auto-pickup for this landing... */
+
         return TRUE;
     } else if (!Wwalking && (!u.utrap || u.utraptype != TT_LAVA)) {
         boil_away = !Fire_resistance;
