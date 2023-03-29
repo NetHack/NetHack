@@ -1129,6 +1129,9 @@ having worn levitation boots removed and destroyed (scroll, monster spell,
 ensure that all window interfaces respect flags.silent (suppress terminal beep)
 falling into lava, being life-saved, and teleporting out could yield redundant
 	descriptions of what was present at hero's new location
+if hero had passes-walls capability and was at the location of a closed door,
+	attempting to use 'o' on own spot reported "you don't find anything
+	here to loot"; change to open door for '.' (or '<'), only loot for '>'
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -6162,7 +6162,7 @@ lava_effects(void)
         iflags.in_lava_effects--;
 
         /*
-         * 3.7: this used to be uncondtional "back on solid <surface>"
+         * 3.7: this used to be unconditional "back on solid <surface>"
          * but surface() could return a lot of things where that ends up
          * sounding silly.  Deal with water, ignore furniture; assume
          * surface types 'air' and 'cloud' won't be present on same level

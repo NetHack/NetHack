@@ -794,8 +794,9 @@ doopen_indir(coordxy x, coordxy y)
         return ECMD_OK;
     }
 
-    /* open at yourself/up/down */
-    if (u_at(cc.x, cc.y))
+    /* open at yourself/up/down: switch to loot unless there is a closed
+       door here (possible with Passes_walls) and direction isn't 'down' */
+    if (u_at(cc.x, cc.y) && (u.dz > 0 || !closed_door(u.ux, u.uy)))
         return doloot();
 
     /* this used to be done prior to get_adjacent_loc() but doing so was
@@ -958,7 +959,7 @@ doclose(void)
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
-    if (u_at(x, y)) {
+    if (u_at(x, y) && !Passes_walls) {
         You("are in the way!");
         return ECMD_TIME;
     }
