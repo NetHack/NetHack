@@ -305,9 +305,11 @@ bhitm(struct monst *mtmp, struct obj *otmp)
         if (disguised_mimic)
             seemimic(mtmp);
         reveal_invis = !u_teleport_mon(mtmp, TRUE);
+        learn_it = canspotmon(mtmp);
         break;
     case WAN_MAKE_INVISIBLE: {
         int oldinvis = mtmp->minvis;
+        boolean couldsee = canseemon(mtmp);
         char nambuf[BUFSZ];
 
         if (disguised_mimic)
@@ -319,6 +321,12 @@ bhitm(struct monst *mtmp, struct obj *otmp)
             pline("%s turns transparent!", nambuf);
             reveal_invis = TRUE;
             learn_it = TRUE;
+        }
+        else if (couldsee && !canseemon(mtmp)) {
+            /* keep the immediate effects of make invisible and teleportation
+             * ambiguous by using the same message that's used if we teleported
+             * mtmp (and it ended up somewhere you can't see) */
+            pline("%s vanishes!", nambuf);
         }
         break;
     }
