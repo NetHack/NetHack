@@ -97,11 +97,11 @@ dealloc_oextra(struct obj *o)
 
     if (x) {
         if (x->oname)
-            free((genericptr_t) x->oname);
+            free((genericptr_t) x->oname), x->oname = 0;
         if (x->omonst)
-            free_omonst(o);     /* 'o' rather than 'x' */
+            free_omonst(o); /* note: pass 'o' rather than 'x' */
         if (x->omailcmd)
-            free((genericptr_t) x->omailcmd);
+            free((genericptr_t) x->omailcmd), x->omailcmd = 0;
 
         free((genericptr_t) x);
         o->oextra = (struct oextra *) 0;
@@ -2635,12 +2635,13 @@ dealloc_obj(struct obj *obj)
         obj->where = OBJ_LUAFREE;
         return;
     }
-#ifdef DEBUG
-    /* clobber out of date information contained in the about-to-become
-       stale memory; do this before 'free()' in case a debugging malloc
-       implementation overwrites the memory with something else */
+
+    /* clear out of date information contained in the about-to-become
+       stale memory so that potential used-after-freed bugs (should never
+       happen) might trigger an object lost panic instead of continuing;
+       linking with a debugging malloc library is likely to do something
+       similar so this is mainly useful for ordinary malloc/free */
     *obj = cg.zeroobj;
-#endif
     free((genericptr_t) obj);
 }
 

@@ -2364,18 +2364,18 @@ dealloc_mextra(struct monst* m)
 
     if (x) {
         if (x->mgivenname)
-            free((genericptr_t) x->mgivenname);
+            free((genericptr_t) x->mgivenname), x->mgivenname = 0;
         if (x->egd)
-            free((genericptr_t) x->egd);
+            free((genericptr_t) x->egd), x->egd = 0;
         if (x->epri)
-            free((genericptr_t) x->epri);
+            free((genericptr_t) x->epri), x->epri = 0;
         if (x->eshk)
-            free((genericptr_t) x->eshk);
+            free((genericptr_t) x->eshk), x->eshk = 0;
         if (x->emin)
-            free((genericptr_t) x->emin);
+            free((genericptr_t) x->emin), x->emin = 0;
         if (x->edog)
-            free((genericptr_t) x->edog);
-        /* [no action needed for x->mcorpsenm] */
+            free((genericptr_t) x->edog), x->edog = 0;
+        x->mcorpsenm = NON_PM; /* no allocation to release */
 
         free((genericptr_t) x);
         m->mextra = (struct mextra *) 0;
@@ -2394,6 +2394,9 @@ dealloc_monst(struct monst *mon)
     }
     if (mon->mextra)
         dealloc_mextra(mon);
+    /* clear out of date information contained in the about-to-become
+       stale memory; see dealloc_obj() */
+    *mon = cg.zeromonst;
     free((genericptr_t) mon);
 }
 
