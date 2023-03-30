@@ -4059,7 +4059,7 @@ get_iter_mons_xy(boolean (*func)(struct monst *, coordxy, coordxy),
 
 /* force all chameleons and mimics to become themselves and werecreatures
    to revert to human form; called when Protection_from_shape_changers gets
-   activated via wearing or eating ring */
+   activated via wearing or eating ring or wizintrinsics */
 void
 rescham(void)
 {
