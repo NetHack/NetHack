@@ -30,7 +30,7 @@ CCFLAGS = -g
 #                                       -Wno-deprecated-declarations
 
 #ifeq "$(WANT_ASAN)" "1"
-NEED_ASAN=1
+#NEED_ASAN=1
 #endif
 
 # If you want to override the compiler detection just carried out
@@ -64,7 +64,7 @@ CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
 
 #ifeq "$(NEED_ASAN)" "1"
-CFLAGS+=-fsanitize=address
+#CFLAGS+=-fsanitize=address
 #endif
 
 #detection of clang vs gcc

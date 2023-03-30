@@ -72,8 +72,10 @@ endif   # WANT_WIN_QT
 
 #-INCLUDE multiw-3.370
 
+ifdef NEED_ASAN
 ifeq "$(NEED_ASAN)" "1"
-LFLAGS +=-fsanitize=address
+#LFLAGS +=-fsanitize=address
+endif
 endif
 
 # NetHack sources control
