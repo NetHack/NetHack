@@ -2129,6 +2129,8 @@ wiz_intrinsic(void)
             /* this has to be after incr_timeout() */
             if (p == LEVITATION || p == FLYING)
                 float_vs_flight();
+            else if (p == PROT_FROM_SHAPE_CHANGERS)
+                rescham();
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
