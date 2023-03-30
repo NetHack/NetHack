@@ -29,6 +29,9 @@ CCFLAGS = -g
 #    CPLUSPLUS_NEED_DEPSUPPRESS = 1 C++ -Wno-deprecated-copy,
 #                                       -Wno-deprecated-declarations
 
+#ifeq "$(WANT_ASAN)" "1"
+NEED_ASAN=1
+#endif
 
 # If you want to override the compiler detection just carried out
 # uncomment one of the following pairs. Note, however, that
@@ -59,6 +62,10 @@ CFLAGS+=-Wimplicit-int
 CFLAGS+=-Wmissing-prototypes
 CFLAGS+=-Wold-style-definition
 CFLAGS+=-Wstrict-prototypes
+
+#ifeq "$(NEED_ASAN)" "1"
+CFLAGS+=-fsanitize=address
+#endif
 
 #detection of clang vs gcc
 CCISCLANG := $(shell echo `$(CC) --version` | grep clang)

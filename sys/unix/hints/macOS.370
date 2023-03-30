@@ -72,6 +72,10 @@ endif   # WANT_WIN_QT
 
 #-INCLUDE multiw-3.370
 
+ifeq "$(NEED_ASAN)" "1"
+LFLAGS +=-fsanitize=address
+endif
+
 # NetHack sources control
 NHCFLAGS+=-DDLB
 NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"

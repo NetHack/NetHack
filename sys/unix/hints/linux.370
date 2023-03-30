@@ -56,6 +56,10 @@ endif  # WANT_WIN_QT
 #
 #-INCLUDE multiw-3.370
 
+ifeq "$(NEED_ASAN)" "1"
+LFLAGS+=-fsanitize=address
+endif
+
 ifeq "$(USE_CURSESLIB)" "1"
 # default
 CURSESLIB = -lncurses -ltinfo
@@ -159,7 +163,7 @@ WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
 WINLIB += $(WINX11LIB)
-LFLAGS=-L/opt/X11/lib
+LFLAGS+=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
@@ -294,7 +298,7 @@ endif   # GITSUBMODULES
 DLLIB = -ldl
 
 # Only needed for GLIBC stack trace:
-LFLAGS=-rdynamic
+LFLAGS+=-rdynamic
 
 # if TTY_TILES_ESCCODES
 #WINSRC += tile.c
