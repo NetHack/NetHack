@@ -1178,7 +1178,8 @@ void
 delobj(obj)
 register struct obj *obj;
 {
-    boolean update_map;
+    boolean update_map, was_pile, is_pile;
+    int x = 0, y = 0;
 
     if (obj->otyp == AMULET_OF_YENDOR
         || obj->otyp == CANDELABRUM_OF_INVOCATION
@@ -1192,9 +1193,19 @@ register struct obj *obj;
         return;
     }
     update_map = (obj->where == OBJ_FLOOR);
+    if (update_map) {
+        x = obj->ox;
+        y = obj->oy;
+        was_pile = (level.objects[x][y] && level.objects[x][y]->nexthere);
+    }
     obj_extract_self(obj);
-    if (update_map)
-        newsym(obj->ox, obj->oy);
+    if (update_map) {
+        is_pile = (level.objects[x][y] && level.objects[x][y]->nexthere);
+        if (was_pile != is_pile)
+            newsym_force(x, y);
+        else
+            newsym(x, y);
+    }
     obfree(obj, (struct obj *) 0); /* frees contents also */
 }
 
