@@ -55,12 +55,10 @@ static void wishcmdassist(int);
 static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 
 /*
- * FIXME:
- *  flash_types[0] for wand of magic missile is ambiguous.
- *  A positive index means zapped/cast/breathed by hero.
- *  A negative index means zapped/cast/breathed by a monster.
- *  Since abs(-0)==abs(0), there's no way to tell who zapped a wand of
- *  magic missile by just checking the index.
+ * A positive index means zapped/cast/breathed by hero.
+ * A negative index means zapped/cast/breathed by a monster, with value
+ * index fixup beyond abs() needed for wand zaps.  Wand zaps for monster
+ * use -39..-30 rather than -9..-0 because -0 is ambiguous (same as 0).
  */
 static const char *const flash_types[] = {
     "magic missile", /* Wands must be 0-9 */

@@ -673,17 +673,17 @@ enum getobj_callback_returns {
 #define BZ_OFS_WAN(otyp) (abs((otyp) - WAN_MAGIC_MISSILE) % 10)
 #define BZ_OFS_SPE(otyp) (abs((otyp) - SPE_MAGIC_MISSILE) % 10)
 /* hero shooting a wand */
-#define BZ_U_WAND(bztyp) (0 + (bztyp))
+#define BZ_U_WAND(bztyp) (0 + (bztyp))     /*  0..9  */
 /* hero casting a spell */
-#define BZ_U_SPELL(bztyp) (10 + (bztyp))
+#define BZ_U_SPELL(bztyp) (10 + (bztyp))   /* 10..19 */
 /* hero breathing as a monster */
-#define BZ_U_BREATH(bztyp) (20 + (bztyp))
-/* monster shooting a wand */
-#define BZ_M_WAND(bztyp) (-0 - (bztyp))
+#define BZ_U_BREATH(bztyp) (20 + (bztyp))  /* 20..29 */
 /* monster casting a spell */
-#define BZ_M_SPELL(bztyp) (-10 - (bztyp))
+#define BZ_M_SPELL(bztyp) (-10 - (bztyp))  /* -19..-10 */
 /* monster breathing */
-#define BZ_M_BREATH(bztyp) (-20 - (bztyp))
+#define BZ_M_BREATH(bztyp) (-20 - (bztyp)) /* -29..-20 */
+/* monster shooting a wand; note: not -9 to -0 because -0 is ambiguous  */
+#define BZ_M_WAND(bztyp) (-30 - (bztyp))   /* -39..-30 */
 
 /*
  * option setting restrictions
