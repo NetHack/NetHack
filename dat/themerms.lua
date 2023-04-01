@@ -93,6 +93,17 @@ themeroom_fills = {
       end });
    end,
 
+   -- Buried zombies
+   function(rm)
+      local zombifiable = { "kobold", "gnome", "orc", "dwarf", "elf", "human", "ettin", "giant" };
+      for i = 1, (rm.width * rm.height) / 2 do
+         shuffle(zombifiable);
+         local o = des.object({ id = "corpse", montype = zombifiable[1], buried = true });
+         o:stop_timer("rot-corpse");
+         o:start_timer("zombify-mon", 1000);
+      end
+   end,
+
    -- Massacre
    function(rm)
       local mon = { "apprentice", "warrior", "ninja", "thug",

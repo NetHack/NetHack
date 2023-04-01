@@ -786,7 +786,8 @@ Example:
 
 === object
 
-Create an object. The table parameter accepts the following:
+Create an object. Returns the object as an <<Obj>> class.
+The table parameter accepts the following:
 
 [options="header"]
 |===
@@ -828,6 +829,7 @@ Example:
  des.object({ class = "%" });
  des.object({ id = "boulder", x = 03, y = 12});
  des.object({ id = "chest", coord = {03, 12}, locked = true, contents = function(obj) des.object("rock"); end });
+ local o = des.object();
 
 
 === random_corridors

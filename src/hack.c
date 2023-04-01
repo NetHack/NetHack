@@ -1605,7 +1605,7 @@ check_buried_zombies(coordxy x, coordxy y)
             && otmp->oy >= y - 1 && otmp->oy <= y + 1
             && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
             t = stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
-            (void) start_timer(max(1, t - rn2(10)), TIMER_OBJECT,
+            (void) start_timer(max(1, (t*2/3)), TIMER_OBJECT,
                                ZOMBIFY_MON, obj_to_any(otmp));
         }
     }

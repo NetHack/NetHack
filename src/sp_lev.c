@@ -3691,7 +3691,9 @@ lspo_object(lua_State *L)
 
     Free(tmpobj.name.str);
 
-    return 0;
+    nhl_push_obj(L, otmp);
+
+    return 1;
 }
 
 /* level_flags("noteleport", "mazelevel", ... ); */
