@@ -2794,6 +2794,8 @@ cnf_line_SEDUCE(char *bufp)
 #ifdef SYSCF
     int src = iflags.parse_config_file_src;
     boolean in_sysconf = (src == set_in_sysconf);
+#else
+    boolean in_sysconf = FALSE;
 #endif
 
     /* allow anyone to disable it but can only enable it in sysconf
