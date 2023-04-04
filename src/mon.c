@@ -32,6 +32,8 @@ static struct permonst *accept_newcham_form(struct monst *, int);
 static void kill_eggs(struct obj *);
 static void pacify_guard(struct monst *);
 
+extern const struct shclass shtypes[]; /* defined in shknam.c */
+
 #define LEVEL_SPECIFIC_NOCORPSE(mdat) \
     (Is_rogue_level(&u.uz)            \
      || !gl.level.flags.deathdrops    \
@@ -2762,16 +2764,26 @@ mondead(struct monst *mtmp)
 
     if (mndx == PM_MEDUSA && gm.mvitals[mndx].died == 1) {
         record_achievement(ACH_MEDU); /* also generates a livelog event */
-    } else if (unique_corpstat(mtmp->data)) {
+    } else if (unique_corpstat(mtmp->data)
+               || (mtmp->isshk && !mtmp->mrevived)) {
         /*
          * livelog event; unique_corpstat() includes the Wizard and
          * any High Priest even though they aren't actually unique.
          *
-         * It would be nice to include shopkeepers.  Their names are
-         * unique within each game but unfortunately for this potential
-         * usage their kill count is lumped together in a group total.
+         * Shopkeeper kills are logged, but only the first time per
+         * shopkeeper, since their shared kill counter wouldn't work
+         * for this purpose (and it wouldn't account for polymorphed
+         * shopkeepers either).
          */
         int howmany = gm.mvitals[mndx].died;
+        char shkdetail[100];
+        shkdetail[0]='\0';
+        if (mtmp->isshk) {
+            struct eshk *eshk = ESHK(mtmp);
+            howmany = 1;
+            Sprintf(shkdetail, ", the %s proprietor",
+                    shtypes[eshk->shoptype - SHOPBASE].name);
+        }
 
         /* killing a unique more than once doesn't get logged every time;
            the Wizard and the Riders can be killed more than once
@@ -2792,9 +2804,9 @@ mondead(struct monst *mtmp)
             if (howmany > 1) /* "(2nd time)" or "(50th time)" */
                 Sprintf(xtra, " (%d%s time)", howmany, ordin(howmany));
 
-            livelog_printf(llevent_type, "%s %s%s",
+            livelog_printf(llevent_type, "%s %s%s%s",
                            nonliving(mtmp->data) ? "destroyed" : "killed",
-                           livelog_mon_nam(mtmp), xtra);
+                           livelog_mon_nam(mtmp), shkdetail, xtra);
         }
     }
 
