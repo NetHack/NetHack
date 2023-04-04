@@ -321,6 +321,7 @@ Example:
 === peek_timer_at
 
 When does timer at location at x,y trigger?
+See <<_timer_types>>.
 
 Example:
 
@@ -399,6 +400,7 @@ Example:
 === start_timer_at
 
 Start a timer at location x,y, with trigger time of `when` - relative to current turn.
+See <<_timer_types>>.
 
 Example:
 
@@ -409,6 +411,7 @@ Example:
 === stop_timer_at
 
 Stop a timer at location x,y.
+See <<_timer_types>>.
 
 Example:
 
@@ -1404,6 +1407,7 @@ Example:
 === has_timer
 
 Does object have an attached timer of certain type?
+See <<_timer_types>>.
 
 Example:
 
@@ -1414,6 +1418,7 @@ Example:
 
 Peek at an object timer. Returns the turn when timer triggers.
 Returns 0 if no such timer attached to the object.
+See <<_timer_types>>.
 
 Example:
 
@@ -1425,7 +1430,7 @@ Example:
 Stop object timer(s). Return the turn when timer would have triggered.
 Returns 0 if no such timer was attached to the object.
 Without a timer type parameters, stops all timers for the object,
-and returns nothing.
+and returns nothing. See <<_timer_types>>.
 
 Example:
 
@@ -1435,7 +1440,7 @@ Example:
 
 === start_timer
 
-Start an object timer.
+Start an object timer. See <<_timer_types>>.
 
 Example:
 
@@ -1493,4 +1498,21 @@ These constants are in the `nhc` table.
 | COLNO | Number of map columns
 | ROWNO | Number of map rows
 | DLB   | 1 or 0, depending if NetHack is compiled with DLB
+|===
+
+
+== Timer types
+
+[%header, cols="20%,10%,70%"]
+|===
+| Name          | Type | Description
+| rot-organic   | obj  | non-corpse object rotting away
+| rot-corpse    | obj  | corpse object rotting away
+| revive-mon    | obj  | monster corpse revival
+| zombify-mon   | obj  | monster corpse rising as a zombie
+| burn-obj      | obj  | light-source object is lit
+| hatch-egg     | obj  | egg hatching
+| fig-transform | obj  | cursed figurine automatical transform
+| shrink-glob   | obj  | glob object shrinking away
+| melt-ice      | map  | ice at map location melts
 |===
