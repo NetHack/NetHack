@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1654069053 2022/06/01 07:37:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.351 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1680625799 2023/04/04 16:29:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.373 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2724,6 +2724,8 @@ cnf_line_DUMPLOGFILE(char *bufp)
     if (sysopt.dumplogfile)
         free((genericptr_t) sysopt.dumplogfile);
     sysopt.dumplogfile = dupstr(bufp);
+#else
+    nhUse(bufp);
 #endif /*DUMPLOG*/
     return TRUE;
 }
