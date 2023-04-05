@@ -255,7 +255,7 @@ typedef __mode_t mode_t;
 # pragma message disable DOLLARID
 #endif
 
-#include "system.h"
+/* #include "system.h" */
 
 /* Use the high quality random number routines. */
 #ifndef USE_ISAAC64

@@ -210,6 +210,7 @@
     <ClInclude Include="$(IncDir)config1.h" />
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)cstd.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)display.h" />

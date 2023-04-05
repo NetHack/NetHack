@@ -5,46 +5,6 @@
 
 #include "hack.h"
 
-const char quitchars[] = " \r\n\033";
-const char vowels[] = "aeiouAEIOU";
-const char ynchars[] = "yn";
-const char ynqchars[] = "ynq";
-const char ynaqchars[] = "ynaq";
-const char ynNaqchars[] = "yn#aq";
-NEARDATA long yn_number = 0L;
-
-const char disclosure_options[] = "iavgco";
-
-/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
-const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
-const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
-const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };
-/* redordered directions, cardinals first */
-const schar dirs_ord[N_DIRS] =
-    { DIR_W, DIR_N, DIR_E, DIR_S, DIR_NW, DIR_NE, DIR_SE, DIR_SW };
-
-NEARDATA struct flag flags;
-NEARDATA boolean has_strong_rngseed = FALSE;
-NEARDATA struct instance_flags iflags;
-NEARDATA struct you u;
-NEARDATA time_t ubirthday;
-NEARDATA struct u_realtime urealtime;
-
-NEARDATA struct obj *uwep, *uarm, *uswapwep,
-    *uquiver, /* quiver */
-    *uarmu, /* under-wear, so to speak */
-    *uskin, /* dragon armor, if a dragon */
-    *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
-    *uright, *uleft, *ublindf, *uchain, *uball;
-
-struct engr *head_engr;
-
-const int shield_static[SHIELD_COUNT] = {
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
-};
-
 const char * const nhcb_name[NUM_NHCB] = {
     "cmd_before",
     "level_enter",
@@ -53,12 +13,10 @@ const char * const nhcb_name[NUM_NHCB] = {
 };
 
 int nhcb_counts[NUM_NHCB] = DUMMY;
-
 NEARDATA const struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
 };
-
 const char *c_obj_colors[] = {
     "black",          /* CLR_BLACK */
     "red",            /* CLR_RED */
@@ -78,44 +36,19 @@ const char *c_obj_colors[] = {
     "white",          /* CLR_WHITE */
 };
 
-const struct c_common_strings c_common_strings = { "Nothing happens.",
-                                             "That's enough tries!",
-                                             "That is a silly thing to %s.",
-                                             "shudder for a moment.",
-                                             "something",
-                                             "Something",
-                                             "You can move again.",
-                                             "Never mind.",
-                                             "vision quickly clears.",
-                                             { "the", "your" },
-                                             { "mon", "you" } };
-
-/* NOTE: the order of these words exactly corresponds to the
-   order of oc_material values #define'd in objclass.h. */
-const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
-                             "flesh",      "paper",   "cloth",      "leather",
-                             "wooden",     "bone",    "dragonhide", "iron",
-                             "metal",      "copper",  "silver",     "gold",
-                             "platinum",   "mithril", "plastic",    "glass",
-                             "gemstone",   "stone" };
-
-char emptystr[] = {0};       /* non-const */
-
-/* Global windowing data, defined here for multi-window-system support */
-NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
-#ifdef WIN32
-boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
-                                            FALSE, FALSE, FALSE,
-                                            FALSE, FALSE, FALSE,
-                                            FALSE };
-#endif
-
-#ifdef PREFIXES_IN_USE
-const char *fqn_prefix_names[PREFIX_COUNT] = {
-    "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
-    "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
+const struct c_common_strings c_common_strings =
+    { "Nothing happens.",
+      "That's enough tries!",
+      "That is a silly thing to %s.",
+      "shudder for a moment.",
+      "something",
+      "Something",
+      "You can move again.",
+      "Never mind.",
+      "vision quickly clears.",
+      { "the", "your" },
+      { "mon", "you" }
 };
-#endif
 
 const struct savefile_info default_sfinfo = {
 #ifdef NHSTDC
@@ -140,7 +73,67 @@ const struct savefile_info default_sfinfo = {
 #endif
 };
 
+const char disclosure_options[] = "iavgco";
+char emptystr[] = {0};       /* non-const */
+
+NEARDATA struct flag flags;  /* extern declaration is in flag.h, not decl.h */
+
+/* Global windowing data, defined here for multi-window-system support */
+#ifdef WIN32
+boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE };
+#endif
+#ifdef PREFIXES_IN_USE
+const char *fqn_prefix_names[PREFIX_COUNT] = {
+    "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
+    "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
+};
+#endif
+
+/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
+const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
+const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
+const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };
+/* redordered directions, cardinals first */
+const schar dirs_ord[N_DIRS] =
+    { DIR_W, DIR_N, DIR_E, DIR_S, DIR_NW, DIR_NE, DIR_SE, DIR_SW };
+
+NEARDATA boolean has_strong_rngseed = FALSE;
+struct engr *head_engr;
+NEARDATA struct instance_flags iflags;
+/* NOTE: the order of these words exactly corresponds to the
+   order of oc_material values #define'd in objclass.h. */
+const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
+                             "flesh",      "paper",   "cloth",      "leather",
+                             "wooden",     "bone",    "dragonhide", "iron",
+                             "metal",      "copper",  "silver",     "gold",
+                             "platinum",   "mithril", "plastic",    "glass",
+                             "gemstone",   "stone" };
+const char quitchars[] = " \r\n\033";
 NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
+const int shield_static[SHIELD_COUNT] = {
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+};
+NEARDATA struct you u;
+NEARDATA time_t ubirthday;
+NEARDATA struct u_realtime urealtime;
+NEARDATA struct obj *uwep, *uarm, *uswapwep,
+    *uquiver, /* quiver */
+    *uarmu, /* under-wear, so to speak */
+    *uskin, /* dragon armor, if a dragon */
+    *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
+    *uright, *uleft, *ublindf, *uchain, *uball;
+const char vowels[] = "aeiouAEIOU";
+NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
+const char ynchars[] = "yn";
+const char ynqchars[] = "ynq";
+const char ynaqchars[] = "ynaq";
+const char ynNaqchars[] = "yn#aq";
+NEARDATA long yn_number = 0L;
 
 #ifdef PANICTRACE
 const char *ARGV0;

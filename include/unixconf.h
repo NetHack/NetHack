@@ -314,7 +314,7 @@
 #define SHELL /* do not delete the '!' command */
 #endif
 
-#include "system.h"
+/* #include "system.h" */
 
 #if defined(POSIX_TYPES) || defined(__GNUC__)
 #include <stdlib.h>

@@ -903,7 +903,7 @@ erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
             tty_curs(window, 1, 0);
             cl_eos();
         } else if (clear) {
-            clear_screen();
+            term_clear_screen();
         } else {
             docrt();
             flush_screen(1);
@@ -1004,7 +1004,7 @@ tty_clear_nhwindow(winid window)
         gc.context.botlx = 1;
         /*FALLTHRU*/
     case NHW_BASE:
-        clear_screen();
+        term_clear_screen();
         /* [this should reset state for MESSAGE, MAP, and STATUS] */
         break;
     case NHW_MENU:
@@ -1312,7 +1312,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                     tty_curs(window, 1, 0);
                     cl_eos();
                 } else
-                    clear_screen();
+                    term_clear_screen();
             }
 
             rp = resp;
@@ -1669,7 +1669,7 @@ process_text_window(winid window, struct WinDesc *cw)
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             n = 0;
         }
         tty_curs(window, 1, n++);
@@ -1814,7 +1814,7 @@ tty_display_nhwindow(
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             ttyDisplay->toplin = TOPLINE_EMPTY;
         } else {
             if (WIN_MESSAGE != WIN_ERR)
@@ -1897,7 +1897,7 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MESSAGE)
         iflags.window_inited = 0;
     if (cw->type == NHW_MAP)
-        clear_screen();
+        term_clear_screen();
 #ifdef TTY_PERM_INVENT
     if (cw->type == NHW_PERMINVENT) {
         int r, c;

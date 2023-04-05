@@ -432,7 +432,7 @@ QUIETCC=0
 # Nothing below this line should have to be changed.
 #
 # Other things that have to be reconfigured are in config.h,
-# {unixconf.h, pcconf.h}, and possibly system.h
+# {unixconf.h, pcconf.h}, and possibly cstd.h
 
 # Add rule for possible cross-compiler
 $(TARGETPFX)%.o : %.c
@@ -549,7 +549,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
 	spell.h sndprocs.h seffects.h sys.h system.h tcap.h timeout.h \
 	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
-	winX.h winprocs.h wintype.h you.h youprop.h
+	winX.h winprocs.h wintype.h you.h youprop.h cstd.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 
@@ -800,7 +800,7 @@ depend: ../sys/unix/depend.awk \
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/integer.h \
 		../include/global.h ../include/coord.h ../include/vmsconf.h \
-		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+		../include/cstd.h ../include/nhlua.h ../include/unixconf.h \
 		../include/pcconf.h ../include/micro.h ../include/windconf.h \
 		../include/warnings.h ../include/fnamesiz.h
 	touch $(CONFIG_H)

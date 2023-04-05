@@ -453,7 +453,7 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\optlist.h $(INCL)\patchlevel.h $(INCL)\pcconf.h \
 	$(INCL)\permonst.h $(INCL)\prop.h $(INCL)\rect.h $(INCL)\region.h \
 	$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h $(INCL)\sp_lev.h \
-	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\system.h $(INCL)\tcap.h \
+	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\cstd.h $(INCL)\tcap.h \
 	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
 	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
 	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
@@ -851,7 +851,7 @@ RCFLAGS = $(RCFLAGS) -dRCWAV
 
 CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 		$(INCL)\tradstdc.h $(INCL)\global.h $(INCL)\coord.h \
-		$(INCL)\vmsconf.h $(INCL)\system.h $(INCL)\nhlua.h \
+		$(INCL)\vmsconf.h $(INCL)\cstd.h $(INCL)\nhlua.h \
 		$(INCL)\unixconf.h $(INCL)\pcconf.h $(INCL)\micro.h \
 		$(INCL)\windconf.h $(INCL)\warnings.h \
 		$(INCL)\fnamesiz.h
@@ -2339,7 +2339,7 @@ MOCPATH = moc.exe
 #$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 #		$(INCL)\tradstdc.h $(INCL)\integer.h \
 #		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\system.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
+#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
 #		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
 #		$(INCL)\warnings.h $(INCL)\fnamesiz.h
 #	touch $(CONFIG_H)
@@ -2759,7 +2759,7 @@ MOCPATH = moc.exe
 #$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 #		$(INCL)\tradstdc.h $(INCL)\integer.h \
 #		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\system.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
+#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
 #		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
 #		$(INCL)\warnings.h $(INCL)\fnamesiz.h
 #	touch $(CONFIG_H)

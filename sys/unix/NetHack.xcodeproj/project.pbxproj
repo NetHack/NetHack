@@ -306,7 +306,7 @@
 		3186A38521A4B0FB0052BF02 /* mextra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mextra.h; path = ../../include/mextra.h; sourceTree = "<group>"; };
 		3186A38721A4B0FB0052BF02 /* color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = color.h; path = ../../include/color.h; sourceTree = "<group>"; };
 		3186A38821A4B0FB0052BF02 /* artifact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artifact.h; path = ../../include/artifact.h; sourceTree = "<group>"; };
-		3186A38A21A4B0FB0052BF02 /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = ../../include/system.h; sourceTree = "<group>"; };
+		3186A38A21A4B0FB0052BF02 /* cstd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cstd.h; path = ../../include/cstd.h; sourceTree = "<group>"; };
 		3186A38E21A4B0FC0052BF02 /* dlb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dlb.h; path = ../../include/dlb.h; sourceTree = "<group>"; };
 		3186A38F21A4B0FC0052BF02 /* monflag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monflag.h; path = ../../include/monflag.h; sourceTree = "<group>"; };
 		3186A39121A4B0FC0052BF02 /* micro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = micro.h; path = ../../include/micro.h; sourceTree = "<group>"; };
@@ -823,7 +823,7 @@
 				3186A3B621A4B0FD0052BF02 /* sp_lev.h */,
 				3186A3A321A4B0FD0052BF02 /* spell.h */,
 				3186A3CB21A4B0FE0052BF02 /* sys.h */,
-				3186A38A21A4B0FB0052BF02 /* system.h */,
+				3186A38A21A4B0FB0052BF02 /* cstd.h */,
 				3186A3C321A4B0FE0052BF02 /* tcap.h */,
 				3186A3A121A4B0FD0052BF02 /* tile2x11.h */,
 				3186A39421A4B0FC0052BF02 /* tileset.h */,

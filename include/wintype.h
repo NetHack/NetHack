@@ -5,8 +5,6 @@
 #ifndef WINTYPE_H
 #define WINTYPE_H
 
-#include "integer.h"
-
 typedef int winid; /* a window identifier */
 
 /* generic parameter - must not be any larger than a pointer */

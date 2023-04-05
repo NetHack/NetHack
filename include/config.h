@@ -624,38 +624,12 @@ typedef unsigned char uchar;
 #ifdef CHRONICLE
 /* LIVELOG - log CHRONICLE events into LIVELOGFILE as they happen. */
 /* #define LIVELOG */
-#ifdef LIVELOG
-#define LIVELOGFILE "livelog" /* in-game events recorded, live */
-#endif /* LIVELOG */
 #endif /* CHRONICLE */
 #else
 #undef LIVELOG
 #endif /* NO_CHRONICLE */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
-#ifdef DUMPLOG
-
-#ifndef DUMPLOG_MSG_COUNT
-#define DUMPLOG_MSG_COUNT   50
-#endif
-
-#ifndef DUMPLOG_FILE
-#define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
-/* DUMPLOG_FILE allows following placeholders:
-   %% literal '%'
-   %v version (eg. "3.6.3-0")
-   %u game UID
-   %t game start time, UNIX timestamp format
-   %T current time, UNIX timestamp format
-   %d game start time, YYYYMMDDhhmmss format
-   %D current time, YYYYMMDDhhmmss format
-   %n player name
-   %N first character of player name
-   DUMPLOG_FILE is not used if SYSCF is defined
-*/
-#endif
-
-#endif
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
@@ -671,7 +645,39 @@ typedef unsigned char uchar;
 # endif
 #endif
 
+#include "cstd.h"
 #include "integer.h"
 #include "global.h" /* Define everything else according to choices above */
+
+/* Place the following after #include [platform]conf.h in global.h so that
+   overrides are possible in there, for things like unix-specfic file
+   paths. */
+
+#ifdef LIVELOG
+#ifndef LIVELOGFILE
+#define LIVELOGFILE "livelog" /* in-game events recorded, live */
+#endif /* LIVELOGFILE */
+#endif /* LIVELOG */
+
+#ifdef DUMPLOG
+#ifndef DUMPLOG_MSG_COUNT
+#define DUMPLOG_MSG_COUNT   50
+#endif /* DUMPLOG_MSG_COUNT */
+#ifndef DUMPLOG_FILE
+#define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
+/* DUMPLOG_FILE allows following placeholders:
+   %% literal '%'
+   %v version (eg. "3.6.3-0")
+   %u game UID
+   %t game start time, UNIX timestamp format
+   %T current time, UNIX timestamp format
+   %d game start time, YYYYMMDDhhmmss format
+   %D current time, YYYYMMDDhhmmss format
+   %n player name
+   %N first character of player name
+   DUMPLOG_FILE is not used if SYSCF is defined
+*/
+#endif /* DUMPLOG_FILE */
+#endif /* DUMPLOG */
 
 #endif /* CONFIG_H */

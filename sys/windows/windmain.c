@@ -36,7 +36,7 @@ extern void mswin_destroy_reg(void);
 extern void backsp(void);
 #endif
 #endif
-extern void clear_screen(void);
+extern void term_clear_screen(void);
 
 #ifdef update_file
 #undef update_file
@@ -1288,14 +1288,14 @@ getlock(void)
                         : "not start a new game");
 #ifdef WIN32CON
     if (istty)
-        clear_screen();
+        term_clear_screen();
 #endif
     raw_printf("%s", oops);
     if (prompt_result == 1) {          /* recover */
         if (recover_savefile()) {
 #if 0
             if (istty)
-                clear_screen(); /* display gets fouled up otherwise */
+                term_clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;
         } else {
@@ -1309,7 +1309,7 @@ getlock(void)
         if (eraseoldlocks()) {
 #ifdef WIN32CON
             if (istty)
-                clear_screen(); /* display gets fouled up otherwise */
+                term_clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;
         } else {

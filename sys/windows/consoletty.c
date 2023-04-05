@@ -1054,7 +1054,7 @@ tty_start_screen(void)
 void
 tty_end_screen(void)
 {
-    clear_screen();
+    term_clear_screen();
     really_move_cursor();
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     back_buffer_flip();
@@ -1067,7 +1067,7 @@ CtrlHandler(DWORD ctrltype)
     switch (ctrltype) {
     /* case CTRL_C_EVENT: */
     case CTRL_BREAK_EVENT:
-        clear_screen();
+        term_clear_screen();
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
@@ -1557,7 +1557,7 @@ raw_clear_screen(void)
 }
 
 void
-clear_screen(void)
+term_clear_screen(void)
 {
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     home();

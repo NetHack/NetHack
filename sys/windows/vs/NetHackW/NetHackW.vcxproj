@@ -225,6 +225,7 @@
     <ClInclude Include="$(IncDir)config1.h" />
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)cstd.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
@@ -273,7 +274,6 @@
     <ClInclude Include="$(IncDir)sp_lev.h" />
     <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)sys.h" />
-    <ClInclude Include="$(IncDir)system.h" />
     <ClInclude Include="$(IncDir)tcap.h" />
     <ClInclude Include="$(IncDir)tile2x11.h" />
     <ClInclude Include="$(IncDir)tileset.h" />

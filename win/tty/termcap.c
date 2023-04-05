@@ -496,7 +496,7 @@ tty_start_screen(void)
 void
 tty_end_screen(void)
 {
-    clear_screen();
+    term_clear_screen();
     xputs(VE);
     xputs(TE);
 }
@@ -618,7 +618,7 @@ cl_end(void)
 }
 
 void
-clear_screen(void)
+term_clear_screen(void)
 {
     /* note: if CL is null, then termcap initialization failed,
             so don't attempt screen-oriented I/O during final cleanup.

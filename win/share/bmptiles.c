@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "config.h"
-#include "integer.h"
 #include "tileset.h"
 
 /* First BMP file header */
