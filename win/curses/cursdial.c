@@ -1636,6 +1636,7 @@ menu_select_deselect(
 
     if (operation == DESELECT || (item->selected && operation == INVERT)) {
         item->selected = FALSE;
+        item->count = -1L;
         if (visible) {
             mvwaddch(win, item->line_num + 1, 1, ' ');
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);

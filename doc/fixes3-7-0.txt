@@ -1636,6 +1636,8 @@ curses: ensure alt+'A' through alt+'Z' and alt+'a' through alt+'z' work
 	correctly with PDCURSES
 curses: fix an off-by-one error when deciding whether a long line on the
 	bottom line of the message window can fit ">>" (curses' "--More--")
+curses: selecting a partial stack, unselecting it, and then selecting it
+	normally did not reset the quantity to the whole stack
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
