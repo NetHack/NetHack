@@ -24,6 +24,7 @@ static void offer_too_soon(aligntyp);
 static void desecrate_high_altar(aligntyp);
 static void offer_real_amulet(struct obj *, aligntyp); /* NORETURN */
 static void offer_different_alignment_altar(struct obj *, aligntyp);
+static int bestow_artifact(void);
 static boolean pray_revive(void);
 static boolean water_prayer(boolean);
 static boolean blocked_boulder(int, int);
@@ -1614,6 +1615,56 @@ offer_different_alignment_altar(
     }
 }
 
+static int
+bestow_artifact(void)
+{
+    int nartifacts = nartifact_exist();
+
+    /* you were already in pretty good standing */
+    /* The player can gain an artifact */
+    /* The chance goes down as the number of artifacts goes up */
+    if (u.ulevel > 2 && u.uluck >= 0
+        && !rn2(10 + (2 * u.ugifts * nartifacts))) {
+        struct obj *otmp;
+        otmp = mk_artifact((struct obj *) 0, a_align(u.ux, u.uy));
+        if (otmp) {
+            char buf[BUFSZ];
+
+            artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
+            if (otmp->spe < 0)
+                otmp->spe = 0;
+            if (otmp->cursed)
+                uncurse(otmp);
+            otmp->oerodeproof = TRUE;
+            Strcpy(buf, (Hallucination ? "a doodad"
+                            : Blind ? "an object"
+                            : ansimpleoname(otmp)));
+            if (!Blind)
+                Sprintf(eos(buf), " named %s",
+                        bare_artifactname(otmp));
+            at_your_feet(upstart(buf));
+            dropy(otmp);
+            godvoice(u.ualign.type, "Use my gift wisely!");
+            u.ugifts++;
+            u.ublesscnt = rnz(300 + (50 * nartifacts));
+            exercise(A_WIS, TRUE);
+            livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
+                            "was bestowed with %s by %s",
+                            artiname(otmp->oartifact),
+                            align_gname(u.ualign.type));
+            /* make sure we can use this weapon */
+            unrestrict_weapon_skill(weapon_type(otmp));
+            if (!Hallucination && !Blind) {
+                otmp->dknown = 1;
+                makeknown(otmp->otyp);
+                discover_artifact(otmp->oartifact);
+            }
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 /* the #offer command - sacrifice something to the gods */
 int
 dosacrifice(void)
@@ -1911,49 +1962,8 @@ dosacrifice(void)
                 }
             }
         } else {
-            int nartifacts = nartifact_exist();
-
-            /* you were already in pretty good standing */
-            /* The player can gain an artifact */
-            /* The chance goes down as the number of artifacts goes up */
-            if (u.ulevel > 2 && u.uluck >= 0
-                && !rn2(10 + (2 * u.ugifts * nartifacts))) {
-                otmp = mk_artifact((struct obj *) 0, a_align(u.ux, u.uy));
-                if (otmp) {
-                    char buf[BUFSZ];
-
-                    artifact_origin(otmp, ONAME_GIFT | ONAME_KNOW_ARTI);
-                    if (otmp->spe < 0)
-                        otmp->spe = 0;
-                    if (otmp->cursed)
-                        uncurse(otmp);
-                    otmp->oerodeproof = TRUE;
-                    Strcpy(buf, (Hallucination ? "a doodad"
-                                 : Blind ? "an object"
-                                   : ansimpleoname(otmp)));
-                    if (!Blind)
-                        Sprintf(eos(buf), " named %s",
-                                bare_artifactname(otmp));
-                    at_your_feet(upstart(buf));
-                    dropy(otmp);
-                    godvoice(u.ualign.type, "Use my gift wisely!");
-                    u.ugifts++;
-                    u.ublesscnt = rnz(300 + (50 * nartifacts));
-                    exercise(A_WIS, TRUE);
-                    livelog_printf (LL_DIVINEGIFT | LL_ARTIFACT,
-                                    "was bestowed with %s by %s",
-                                    artiname(otmp->oartifact),
-                                    align_gname(u.ualign.type));
-                    /* make sure we can use this weapon */
-                    unrestrict_weapon_skill(weapon_type(otmp));
-                    if (!Hallucination && !Blind) {
-                        otmp->dknown = 1;
-                        makeknown(otmp->otyp);
-                        discover_artifact(otmp->oartifact);
-                    }
-                    return ECMD_TIME;
-                }
-            }
+            if (bestow_artifact())
+                return ECMD_TIME;
             change_luck((value * LUCKMAX) / (MAXVALUE * 2));
             if ((int) u.uluck < 0)
                 u.uluck = 0;
