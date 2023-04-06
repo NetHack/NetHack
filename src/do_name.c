@@ -838,7 +838,6 @@ getpos(coord *ccp, boolean force, const char *goal)
 
         rushrun = FALSE;
 
-        gp.program_state.getting_a_command = 1;
         if ((cmdq = cmdq_pop()) != 0) {
             if (cmdq->typ == CMDQ_KEY) {
                 c = cmdq->key;

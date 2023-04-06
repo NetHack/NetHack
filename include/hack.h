@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1664837602 2022/10/03 22:53:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.196 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1680771353 2023/04/06 08:55:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -749,10 +749,21 @@ struct sinfo {
     int in_paniclog;            /* writing a panicloc entry */
 #endif
     int wizkit_wishing;         /* starting wizard mode game w/ WIZKIT file */
-    /* getting_a_command:  only used for ALTMETA config to process ESC, but
-       present and updated unconditionally; set by parse() when requesting
-       next command keystroke, reset by readchar() as it returns a key */
-    int getting_a_command;      /* next key pressed will be entering a cmnd */
+    /* input_state:  used in the core for the 'altmeta' option to process ESC;
+       used in the curses interface to avoid arrow keys when user is doing
+       something other than entering a command or direction and in the Qt
+       interface to suppress menu commands in similar conditions;
+       readchar() alrways resets it to 'otherInp' prior to returning */
+    int input_state; /* whether next key pressed will be entering a command */
+};
+
+/* value of program_state.input_state, significant during readchar();
+   get_count() expects digits then a command so sets it to commandInp */
+enum InputState {
+    otherInp   = 0, /* 'other' */
+    commandInp = 1, /* readchar() */
+    getposInp  = 2, /* getpos() */
+    getdirInp  = 3, /* getdir() */
 };
 
 /* sortloot() return type; needed before extern.h */
