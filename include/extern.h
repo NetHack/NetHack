@@ -2866,6 +2866,7 @@ extern void topten(int, time_t);
 extern void prscore(int, char **);
 extern struct toptenentry *get_rnd_toptenentry(void);
 extern struct obj *tt_oname(struct obj *);
+extern int tt_doppel(struct monst *);
 
 /* ### track.c ### */
 
