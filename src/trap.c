@@ -356,7 +356,7 @@ mk_trap_statue(coordxy x, coordxy y)
     int trycount = 10;
 
     do { /* avoid ultimately hostile co-aligned unicorn */
-        mptr = &mons[rndmonnum()];
+        mptr = &mons[rndmonnum_adj(5, 10)];
     } while (--trycount > 0 && is_unicorn(mptr)
              && sgn(u.ualign.type) == sgn(mptr->maligntyp));
     statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
