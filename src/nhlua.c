@@ -1206,7 +1206,7 @@ save_luadata(NHFILE *nhfp)
     char *lua_data = get_nh_lua_variables(); /* note: '\0' terminated */
 
     if (!lua_data)
-        lua_data = emptystr;
+        lua_data = dupstr(emptystr);
     lua_data_len = Strlen(lua_data) + 1; /* +1: include the terminator */
     bwrite(nhfp->fd, (genericptr_t) &lua_data_len,
            (unsigned) sizeof lua_data_len);
