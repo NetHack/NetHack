@@ -94,8 +94,12 @@ end
 
 -- the prefab maps must have contents-function, or populatemaze()
 -- puts the stuff only inside the prefab map.
+-- contains either a function, or an object with "repeatable" and "contents".
+-- function alone implies not repeatable.
 local hell_prefabs = {
-   function ()
+   {
+      repeatable = true,
+      contents = function ()
       des.map({ halign = rnd_halign(), valign = "center", map = [[
 ......
 ......
@@ -113,8 +117,11 @@ local hell_prefabs = {
 ......
 ......
 ......]], contents = function() end });
-   end,
-   function ()
+      end
+   },
+   {
+      repeatable = true,
+      contents = function ()
       des.map({ halign = rnd_halign(), valign = "center", map = [[
 xxxxxx.....xxxxxx
 xxxx.........xxxx
@@ -134,7 +141,8 @@ xx.............xx
 xxxx.........xxxx
 xxxxxx.....xxxxxx
 ]], contents = function() end });
-   end,
+      end
+   },
    function (coldhell)
       des.map({ halign = rnd_halign(), valign = rnd_valign(), map = [[
 xxxxxx.xxxxxx
@@ -171,15 +179,20 @@ xxxxxx.xxxxxx
    end
       end });
    end,
-   function ()
+   {
+      repeatable = true,
+      contents = function ()
       des.map({ halign = "center", valign = "center", map = [[
 ..............................................................
 ..............................................................
 ..............................................................
 ..............................................................
 ..............................................................]], contents = function() end });
-   end,
-   function ()
+      end
+   },
+   {
+      repeatable = true,
+      contents = function ()
       des.map({ halign = rnd_halign(), valign = rnd_valign(), lit = true, map = [[
 x.....x
 .......
@@ -188,7 +201,8 @@ x.....x
 .......
 .......
 x.....x]], contents = function() end  });
-   end,
+   end
+   },
    function ()
       des.map({ halign = rnd_halign(), valign = rnd_valign(), map = [[
 BBBBBBB
@@ -251,7 +265,9 @@ BBBBBBB]], contents = function()
                    map = mapstr, contents = function() end })
       end
    end,
-   function ()
+   {
+      repeatable = true,
+      contents = function ()
       local mapstr = [[
 ...
 ...
@@ -270,16 +286,31 @@ BBBBBBB]], contents = function()
 ...
 ...
 ...]];
-      for dx = 1, 3 + math.random(0, 5) do
+      for dx = 1, 3 do
          des.map({ x = math.random(3, 75), y = 3,
                    map = mapstr, contents = function() end })
       end
-   end,
+   end
+   },
 };
 
 function rnd_hell_prefab(coldhell)
-   local pf = math.random(1, #hell_prefabs);
-   hell_prefabs[pf](coldhell);
+   local dorepeat = true;
+   local nloops = 0;
+   repeat
+      nloops = nloops + 1;
+      local pf = math.random(1, #hell_prefabs);
+      local fab = hell_prefabs[pf];
+      local fabtype = type(fab);
+
+      if (fabtype == "function") then
+         fab(coldhell);
+         dorepeat = false;
+      elseif (fabtype == "table") then
+         fab.contents(coldhell);
+         dorepeat = not (fab.repeatable and math.random(0, nloops * 2) == 0);
+      end
+   until ((not dorepeat) or (nloops > 5));
 end
 
 hells = {
