@@ -313,7 +313,9 @@ monshoot(struct monst* mtmp, struct obj* otmp, struct obj* mwep)
 }
 
 /* an object launched by someone/thing other than player attacks a monster;
-   return 1 if the object has stopped moving (hit or its range used up) */
+   return 1 if the object has stopped moving (hit or its range used up)
+   can anger the monster, if this happened due to hero (eg. exploding
+   bag of holding throwing the items) */
 int
 ohitmon(
     struct monst *mtmp, /* accidental target, located at <gb.bhitpos.x,.y> */
@@ -484,6 +486,9 @@ ohitmon(
                 tmp = 127;
             mtmp->mblinded = tmp;
         }
+
+        if (!DEADMONSTER(mtmp) && !gc.context.mon_moving)
+            setmangry(mtmp, TRUE);
 
         objgone = drop_throw(otmp, 1, gb.bhitpos.x, gb.bhitpos.y);
         if (!objgone && range == -1) { /* special case */
