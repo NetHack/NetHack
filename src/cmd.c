@@ -3598,10 +3598,12 @@ cmd_from_dir(int dir, int mode)
     return cmd_from_func(move_funcs[dir][mode]);
 }
 
+/* return the key bound to extended command */
 char
 cmd_from_func(int (*fn)(void))
 {
     int i;
+    char ret = '\0';
 
     /* skip NUL; allowing it would wreak havoc */
     for (i = 1; i < 256; ++i) {
@@ -3615,12 +3617,17 @@ cmd_from_func(int (*fn)(void))
             && !gc.Cmd.num_pad)
             continue;
 
-        if (gc.Cmd.commands[i] && gc.Cmd.commands[i]->ef_funct == fn)
-            return (char) i;
+        if (gc.Cmd.commands[i] && gc.Cmd.commands[i]->ef_funct == fn) {
+            if (i >= ' ' && i <= '~')
+                return (char) i;
+            else {
+                ret = (char) i;
+            }
+        }
     }
     if (gc.Cmd.commands[' '] && gc.Cmd.commands[' ']->ef_funct == fn)
         return ' ';
-    return '\0';
+    return ret;
 }
 
 /* return visual interpretation of the key bound to extended command,
