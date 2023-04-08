@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1663890450 2022/09/22 23:47:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1680935652 2023/04/08 06:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2110,13 +2110,13 @@ trapeffect_magic_trap(
 
 static int
 trapeffect_anti_magic(
-    struct monst* mtmp,
-    struct trap* trap,
+    struct monst *mtmp, /* monster, possibly youmonst */
+    struct trap *trap,  /* trap->ttyp == ANTI_MAGIC */
     unsigned int trflags UNUSED)
 {
     if (mtmp == &gy.youmonst) {
-        int drain = d(2, 6);
-        int halfd = rnd(((drain + 1) / 2));
+        int drain = d(2, 6); /* 2d6 => 2..12 */
+        int halfd = rnd((drain + 1) / 2); /* 1..drain/2 (rounded up) */
 
         seetrap(trap);
         if (Antimagic) {
@@ -2144,13 +2144,14 @@ trapeffect_anti_magic(
 
             You_feel((dmgval2 >= hp) ? "unbearably torpid!"
                      : (dmgval2 >= hp / 4) ? "very lethargic."
-                     : "sluggish.");
+                       : "sluggish.");
             /* opposite of magical explosion */
             losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
+
         if (u.uenmax > halfd) {
-            u.uenmax -= halfd;
-            drain -= halfd;
+            u.uenmax -= halfd; /* drain_en() will set context.botl */
+            drain = halfd;
         }
         drain_en(drain);
     } else {
@@ -4599,6 +4600,11 @@ drown(void)
 void
 drain_en(int n)
 {
+    /*
+     * FIXME?
+     *  u.uenmax should probably have a higher mininum than 0;
+     *  perhaps u.ulevel or (u.ulevel + 1) / 2
+     */
     if (!u.uenmax) {
         /* energy is completely gone */
         You_feel("momentarily lethargic.");
@@ -4615,7 +4621,7 @@ drain_en(int n)
                 u.uenmax = 0;
             u.uen = 0;
         }
-        gc.context.botl = 1;
+        gc.context.botl = TRUE;
     }
 }
 

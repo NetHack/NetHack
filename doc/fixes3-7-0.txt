@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1139 $ $NHDT-Date: 1679595146 2023/03/23 18:12:26 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1146 $ $NHDT-Date: 1680935652 2023/04/08 06:34:12 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1515,6 +1515,8 @@ some actions that ask the user to pick a location allow typing '$' to show
 change 'm' prefix for #tip from 'use menu to pick among floor containers'
 	(since that's already the default) to 'skip floor containers' so that
 	context-sensitive item-action Tip directly operates on the item
+anti-magic field's reduction of hero's maximum energy could result in current
+	energy being one point higher than maximum
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
