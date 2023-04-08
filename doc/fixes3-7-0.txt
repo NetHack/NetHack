@@ -1132,6 +1132,7 @@ falling into lava, being life-saved, and teleporting out could yield redundant
 if hero had passes-walls capability and was at the location of a closed door,
 	attempting to use 'o' on own spot reported "you don't find anything
 	here to loot"; change to open door for '.' (or '<'), only loot for '>'
+items thrown by monster landing on an altar did not show BUC flash
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -299,6 +299,8 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             (void) obj_meld(&obj, &otmp);
         }
         res = (boolean) !obj;
+    } else if (IS_ALTAR(levl[x][y].typ) && cansee(x,y)) {
+        doaltarobj(obj);
     }
 
     gb.bhitpos = save_bhitpos;
@@ -314,7 +316,7 @@ doaltarobj(struct obj *obj)
 
     if (obj->oclass != COIN_CLASS) {
         /* KMH, conduct */
-        if (!u.uconduct.gnostic++)
+        if (!gc.context.mon_moving && !u.uconduct.gnostic++)
             livelog_printf(LL_CONDUCT,
                            "eschewed atheism, by dropping %s on an altar",
                            doname(obj));
