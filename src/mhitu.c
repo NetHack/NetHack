@@ -1406,7 +1406,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     case AD_DREN:
         /* AC magic cancellation doesn't help when engulfed */
         if (!mtmp->mcan && rn2(4)) /* 75% chance */
-            drain_en(tmp);
+            drain_en(tmp, FALSE);
         tmp = 0;
         break;
     default:

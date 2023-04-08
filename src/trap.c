@@ -2115,8 +2115,8 @@ trapeffect_anti_magic(
     unsigned int trflags UNUSED)
 {
     if (mtmp == &gy.youmonst) {
-        int drain = d(2, 6); /* 2d6 => 2..12 */
-        int halfd = rnd((drain + 1) / 2); /* 1..drain/2 (rounded up) */
+        int drain, halfd;
+        boolean exclaim_it = FALSE;
 
         seetrap(trap);
         if (Antimagic) {
@@ -2149,11 +2149,24 @@ trapeffect_anti_magic(
             losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
 
-        if (u.uenmax > halfd) {
+        /* if the drain amount is more than hero's maximum energy then up
+           to half of the amount comes directly out of maximum, the rest
+           comes out of current energy; drain_en() lowers the current
+           amount and when doing so it will take even more from maximum
+           if the new current value would drop below zero */
+        drain = d(2, 6); /* 2d6 => 2..12 */
+        halfd = rnd(drain / 2); /* 1..drain/2 (round down) */
+        if (u.uenmax > drain) { /* [was u.uenmax > halfd] */
+            /* note: since 'halfd' is no more than half, 'drain -= halfd'
+               is at least as big, so drain_en() is never asked to remove
+               less from current than what we're removing from maximum;
+               however, it might do that anyway (via its throttle check) so
+               it needs to make sure uen doesn't end up exceeding uenmax */
             u.uenmax -= halfd; /* drain_en() will set context.botl */
-            drain = halfd;
+            drain -= halfd;
+            exclaim_it = TRUE;
         }
-        drain_en(drain);
+        drain_en(drain, exclaim_it);
     } else {
         boolean trapkilled = FALSE;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
@@ -4598,31 +4611,48 @@ drown(void)
 }
 
 void
-drain_en(int n)
+drain_en(int n, boolean max_already_drained)
 {
+    const char *mesg;
+    char punct = max_already_drained ? '!' : '.';
+
     /*
      * FIXME?
      *  u.uenmax should probably have a higher mininum than 0;
      *  perhaps u.ulevel or (u.ulevel + 1) / 2
      */
-    if (!u.uenmax) {
+    if (u.uenmax < 1) {
         /* energy is completely gone */
-        You_feel("momentarily lethargic.");
+        if (u.uen || u.uenmax) { /* paranoia */
+            u.uen = u.uenmax = 0;
+            gc.context.botl = TRUE;
+        }
+        mesg = "momentarily lethargic";
     } else {
         /* throttle further loss a bit when there's not much left to lose */
         if (n > (u.uen + u.uenmax) / 3)
             n = rnd(n);
 
-        You_feel("your magical energy drain away%c", (n > u.uen) ? '!' : '.');
+        mesg = "your magical energy drain away";
+        if (n > u.uen)
+            punct = '!';
+
         u.uen -= n;
         if (u.uen < 0) {
             u.uenmax -= rnd(-u.uen);
             if (u.uenmax < 0)
                 u.uenmax = 0;
             u.uen = 0;
+        } else if (u.uen > u.uenmax) {
+            /* uen might be greater than uenmax if caller reduced uenmax
+               and then we throttled the loss being applied to current */
+            u.uen = u.uenmax;
         }
         gc.context.botl = TRUE;
     }
+    /* after manipulating u.uen,uenmax and setting context.botl, so
+       that You_feel() -> pline() will update status before the message */
+    You_feel("%s%c", mesg, punct);
 }
 
 /* the #untrap command - disarm a trap */

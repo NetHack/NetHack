@@ -1575,7 +1575,8 @@ getobj(
                     cntgiven = TRUE;
                     goto need_more_cq; /* now, get CMDQ_KEY */
                 } else {
-                    cmdq_clear(CQ_CANNED); /* this should maybe clear the CQ_REPEAT too? */
+                    cmdq_clear(CQ_CANNED);
+                    /* should maybe clear the CQ_REPEAT too? */
                     return NULL;
                 }
             }
@@ -4345,21 +4346,18 @@ look_here(
             There("are %s%s objects here.",
                   (obj_cnt == 2) ? "two"
                   : (obj_cnt < 5) ? "a few"
-                  : (obj_cnt < 10) ? "several"
-                  : "many",
+                    : (obj_cnt < 10) ? "several"
+                      : "many",
                   picked_some ? " more" : "");
         for (; otmp; otmp = otmp->nexthere)
             if (otmp->otyp == CORPSE && will_feel_cockatrice(otmp, FALSE)) {
                 pline("%s %s%s.",
-                      (obj_cnt > 1)
-                          ? "Including"
-                          : (otmp->quan > 1L)
-                              ? "They're"
-                              : "It's",
+                      (obj_cnt > 1) ? "Including"
+                      : (otmp->quan > 1L) ? "They're"
+                        : "It's",
                       corpse_xname(otmp, (const char *) 0, CXN_ARTICLE),
-                      poly_when_stoned(gy.youmonst.data)
-                          ? ""
-                          : ", unfortunately");
+                      poly_when_stoned(gy.youmonst.data) ? ""
+                      : ", unfortunately");
                 feel_cockatrice(otmp, FALSE);
                 break;
             }
@@ -5354,7 +5352,10 @@ worn_wield_only(struct obj *obj)
  *      MINV_ALL            - display all inventory
  */
 struct obj *
-display_minventory(struct monst *mon, int dflags, char *title)
+display_minventory(
+    struct monst *mon, /* monster whose minvent we're showing */
+    int dflags,        /* control over what to display */
+    char *title)       /* menu title */
 {
     struct obj *ret;
     char tmp[QBUFSZ];
@@ -5362,7 +5363,8 @@ display_minventory(struct monst *mon, int dflags, char *title)
     menu_item *selected = 0;
     int do_all = (dflags & MINV_ALL) != 0,
         incl_hero = (do_all && engulfing_u(mon)),
-        have_inv = (mon->minvent != 0), have_any = (have_inv || incl_hero),
+        have_inv = (mon->minvent != 0),
+        have_any = (have_inv || incl_hero),
         pickings = (dflags & MINV_PICKMASK);
 
     Sprintf(tmp, "%s %s:", s_suffix(noit_Monnam(mon)),
@@ -5383,7 +5385,7 @@ display_minventory(struct monst *mon, int dflags, char *title)
 
         iflags.suppress_price--;
         /* was 'set_uasmon();' but that potentially has side-effects */
-        gy.youmonst.data = &mons[u.umonnum]; /* most basic part of set_uasmon */
+        gy.youmonst.data = &mons[u.umonnum]; /* basic part of set_uasmon() */
     } else {
         invdisp_nothing(title ? title : tmp, "(none)");
         n = 0;

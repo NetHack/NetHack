@@ -2224,7 +2224,7 @@ mhitm_ad_dren(
         /* mhitu */
         hitmsg(magr, mattk);
         if (!negated && !rn2(4)) /* 25% chance */
-            drain_en(mhm->damage);
+            drain_en(mhm->damage, FALSE);
         mhm->damage = 0;
     } else {
         /* mhitm */
