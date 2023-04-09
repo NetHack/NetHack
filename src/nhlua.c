@@ -1580,6 +1580,7 @@ nhl_gamestate(lua_State *L)
     static struct obj *invent = NULL;
     static long moves = 0;
     static boolean stored = FALSE;
+    static struct you ubak;
 
     if (reststate && stored) {
         /* restore game state */
@@ -1596,6 +1597,7 @@ nhl_gamestate(lua_State *L)
             if (wornmask)
                 setworn(otmp, wornmask);
         }
+        u = ubak;
         init_uhunger();
         stored = FALSE;
     } else {
@@ -1611,6 +1613,7 @@ nhl_gamestate(lua_State *L)
         }
         gl.lastinvnr = 51;
         moves = gm.moves;
+        ubak = u;
         stored = TRUE;
     }
     update_inventory();
