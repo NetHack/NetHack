@@ -215,6 +215,8 @@ static int optfn_##a(int, int, boolean, char *, char *);
 #endif
     NHOPTB(dark_room, Advanced, 0, opt_out, set_in_game,
                 On, Yes, No, No, NoAlias, &flags.dark_room, Term_False)
+    NHOPTB(deaf, Advanced, 0, opt_in, set_in_config,
+                Off, Yes, No, No, "permadeaf", &u.uroleplay.deaf, Term_False)
 #ifdef BACKWARD_COMPAT
     NHOPTC(DECgraphics, Advanced, 70, opt_in, set_in_config,
                 Yes, Yes, No, No, NoAlias,

@@ -886,7 +886,8 @@ from_what(int propidx) /* special cases can have negative values */
              * There are exceptions.  Versatile jumping from spell or boots
              * takes priority over knight's innate but limited jumping.
              */
-            if (propidx == BLINDED && u.uroleplay.blind)
+            if ((propidx == BLINDED && u.uroleplay.blind)
+                || (propidx == DEAF && u.uroleplay.deaf))
                 Sprintf(buf, " from birth");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");

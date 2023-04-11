@@ -817,7 +817,8 @@ nh_timeout(void)
                      * to this number must be thoroughly play tested.
                      */
                     if ((inv_weight() > -500)) {
-                        You("make a lot of noise!");
+                        if (!Deaf)
+                            You("make a lot of noise!");
                         wake_nearby();
                     }
                 }

@@ -3355,6 +3355,8 @@ Reached the Elemental Planes.
 Reached the Astral Plane level.
 .PL Blind
 Blind from birth.
+.PL Deaf
+Deaf from birth.
 .PL Nudist
 Never wore any armor.
 .PL Ascended
@@ -3393,10 +3395,10 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP and \fINudist\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, and \fINudist\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
-In the case of \fIBlind\fP, the option also enforces the conduct.
+In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
 They aren't really significant accomplishments unless/until you make
 substantial progress into the dungeon.
 .
@@ -3815,6 +3817,9 @@ Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).  Persistent.
 .lp dark_room
 Show out-of-sight areas of lit rooms (default on).  Persistent.
+.lp "deaf    "
+Start the character permanently deaf (default false).
+Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
