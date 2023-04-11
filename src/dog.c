@@ -59,6 +59,7 @@ initedog(struct monst *mtmp)
     EDOG(mtmp)->revivals = 0;
     EDOG(mtmp)->mhpmax_penalty = 0;
     EDOG(mtmp)->killed_by_u = 0;
+    u.uconduct.pets++;
 }
 
 static int
@@ -152,6 +153,7 @@ make_familiar(struct obj *otmp, coordxy x, coordxy y, boolean quietly)
         /* 0,1,2:  b=80%,10,10; nc=10%,80,10; c=10%,10,80 */
         if (chance > 0) {
             mtmp->mtame = 0;   /* not tame after all */
+            u.uconduct.pets--; /* doesn't count as creating a pet */
             if (chance == 2) { /* hostile (cursed figurine) */
                 if (!quietly)
                     You("get a bad feeling about this.");

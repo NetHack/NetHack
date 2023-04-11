@@ -154,6 +154,7 @@ struct u_conduct {     /* number of times... */
     long wishes;       /* used a wish */
     long wisharti;     /* wished for an artifact */
     long sokocheat;    /* violated special 'rules' in Sokoban */
+    long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
 };
 

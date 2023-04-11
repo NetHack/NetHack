@@ -2047,6 +2047,9 @@ show_conduct(int final)
         you_have_X(buf);
     }
 
+    if (!u.uconduct.pets)
+        you_have_never("had a pet");
+
     ngenocided = num_genocides();
     if (ngenocided == 0) {
         you_have_never("genocided any monsters");

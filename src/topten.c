@@ -439,6 +439,8 @@ encodeconduct(void)
        entered-sokoban bit in the 'achieve' field */
     if (!u.uconduct.sokocheat && sokoban_in_play())
         e |= 1L << 12;
+    if (!u.uconduct.pets)
+        e |= 1L << 13;
 
     return e;
 }
@@ -594,6 +596,7 @@ encode_extended_conducts(char *buf)
     add_achieveX(buf, "deaf",         u.uroleplay.deaf);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
     add_achieveX(buf, "bonesless",    !flags.bones);
+    add_achieveX(buf, "petless",      !u.uconduct.pets);
 
     return buf;
 }

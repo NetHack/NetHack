@@ -2038,6 +2038,7 @@ add a boolean option tips to disable all of the helpful tips
 add a tutorial level
 engravings appear on the map display
 option to create the character deaf
+add conduct for petless
 
 
 Platform- and/or Interface-Specific New Features
