@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1146 $ $NHDT-Date: 1680935652 2023/04/08 06:34:12 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1152 $ $NHDT-Date: 1681293789 2023/04/12 10:03:09 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1135,6 +1135,10 @@ if hero had passes-walls capability and was at the location of a closed door,
 	attempting to use 'o' on own spot reported "you don't find anything
 	here to loot"; change to open door for '.' (or '<'), only loot for '>'
 items thrown by monster landing on an altar did not show BUC flash
+a chameleon in giant form who gets trapped (bear trap?) while carrying
+	boulders and changes shape could be killed when dropping them;
+	shape-change traversal of its inventory would continue after it
+	dropped everything, possibly resulting in a crash
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1679896593 2023/03/27 05:56:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.491 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1681293789 2023/04/12 10:03:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4735,7 +4735,7 @@ newcham(
 
     /* (this code used to try to adjust the monster's health based on
        a normal one of its type but there are too many special cases
-       which need to handled in order to do that correctly, so just
+       which need to be handled in order to do that correctly, so just
        give the new form the same proportion of HP as its old one had) */
     hpn = mtmp->mhp;
     hpd = mtmp->mhpmax;
@@ -4808,8 +4808,15 @@ newcham(
                 /* update swallow glyphs for new monster */
                 swallowed(0);
             }
-        } else if (!sticks(mdat) && !sticks(gy.youmonst.data))
+        } else if ((!sticks(mdat) && !sticks(gy.youmonst.data))
+                   /* sticky hero can't continue to hold mtmp if it has
+                      turned into a non-solid creature; we don't use
+                      uunstick() for that because its message would be
+                      shown out of sequence [before 'if (msg)' below];
+                      unstuck() doesn't issue any messages */
+                   || unsolid(mdat)) {
             unstuck(mtmp);
+        }
     }
 
     if (mdat == &mons[PM_LONG_WORM] && (mtmp->wormno = get_wormno()) != 0) {
@@ -4856,7 +4863,9 @@ newcham(
     if (mtmp->minvent && !throws_rocks(mdat)) {
         register struct obj *otmp, *otmp2;
 
-        for (otmp = mtmp->minvent; otmp; otmp = otmp2) {
+        /* DEADMONSTER(): it is possible for flooreffects() to kill mtmp;
+           the rest of its inventory would be dropped making otmp2 stale */
+        for (otmp = mtmp->minvent; otmp && !DEADMONSTER(mtmp); otmp = otmp2) {
             otmp2 = otmp->nobj;
             if (otmp->otyp == BOULDER) {
                 /* this keeps otmp from being polymorphed in the
