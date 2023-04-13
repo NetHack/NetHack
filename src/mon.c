@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1681293789 2023/04/12 10:03:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.494 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1681429657 2023/04/13 23:47:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.495 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1158,9 +1158,9 @@ m_consume_obj(struct monst *mtmp, struct obj *otmp)
         int poly, grow, heal, eyes, mstone, vis = canseemon(mtmp);
         int corpsenm = (otmp->otyp == CORPSE ? otmp->corpsenm : NON_PM);
 
-        deadmimic = (otmp->otyp == CORPSE && (otmp->corpsenm == PM_SMALL_MIMIC
-                                             || otmp->corpsenm == PM_LARGE_MIMIC
-                                             || otmp->corpsenm == PM_GIANT_MIMIC));
+        deadmimic = (otmp->otyp == CORPSE && (corpsenm == PM_SMALL_MIMIC
+                                              || corpsenm == PM_LARGE_MIMIC
+                                              || corpsenm == PM_GIANT_MIMIC));
         slimer = (otmp->otyp == GLOB_OF_GREEN_SLIME);
         poly = polyfodder(otmp);
         grow = mlevelgain(otmp);
@@ -4782,8 +4782,8 @@ newcham(
         if (u.uswallow) {
             if (!attacktype(mdat, AT_ENGL)) {
                 /* Does mdat care? */
-                if (!noncorporeal(mdat) && !amorphous(mdat)
-                    && !is_whirly(mdat) && (mdat != &mons[PM_YELLOW_LIGHT])) {
+                if (!noncorporeal(mdat) && !is_whirly(mdat)
+                    && !(amorphous(mdat) || mdat->mlet == S_LIGHT)) {
                     char msgtrail[BUFSZ];
 
                     if (is_vampshifter(mtmp)) {
@@ -4794,7 +4794,6 @@ newcham(
                     } else {
                         msgtrail[0] = '\0';
                     }
-
                     /* Do this even if msg is FALSE */
                     You("%s %s%s!",
                         (amorphous(olddata) || is_whirly(olddata))

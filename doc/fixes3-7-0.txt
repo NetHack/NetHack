@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1152 $ $NHDT-Date: 1681293789 2023/04/12 10:03:09 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1153 $ $NHDT-Date: 1681429662 2023/04/13 23:47:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1139,6 +1139,10 @@ a chameleon in giant form who gets trapped (bear trap?) while carrying
 	boulders and changes shape could be killed when dropping them;
 	shape-change traversal of its inventory would continue after it
 	dropped everything, possibly resulting in a crash
+if hero is engulfed and polymorphs into a monster form which is too big to be
+	engulfed, make engulfer expel the poly'd hero
+give feedback if monster holding onto the hero has to let go when hero polys
+	into a form which can't be held
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

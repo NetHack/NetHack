@@ -1,4 +1,4 @@
-/* NetHack 3.7	polyself.c	$NHDT-Date: 1647912064 2022/03/22 01:21:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.178 $ */
+/* NetHack 3.7	polyself.c	$NHDT-Date: 1681429658 2023/04/13 23:47:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.197 $ */
 /*      Copyright (C) 1987, 1988, 1989 by Ken Arromdee */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,7 +171,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 static void
 polyman(const char *fmt, const char *arg)
 {
-    boolean sticky = (sticks(gy.youmonst.data) && u.ustuck && !u.uswallow),
+    boolean sticking = (sticks(gy.youmonst.data) && u.ustuck && !u.uswallow),
             was_mimicking = (U_AP_TYPE != M_AP_NOTHING);
     boolean was_blind = !!Blind;
 
@@ -188,7 +188,7 @@ polyman(const char *fmt, const char *arg)
     skinback(FALSE);
     u.uundetected = 0;
 
-    if (sticky)
+    if (sticking)
         uunstick();
     find_ac();
     if (was_mimicking) {
@@ -680,9 +680,9 @@ polyself(int psflags)
 int
 polymon(int mntmp)
 {
-    char buf[BUFSZ];
-    boolean sticky = sticks(gy.youmonst.data) && u.ustuck && !u.uswallow,
-            was_blind = !!Blind, dochange = FALSE;
+    char buf[BUFSZ], ustuckNam[BUFSZ];
+    boolean sticking = sticks(gy.youmonst.data) && u.ustuck && !u.uswallow,
+            was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE;
     int mlvl, newMaxStr;
 
     if (gm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
@@ -737,6 +737,8 @@ polymon(int mntmp)
         if (gs.sex_change_ok && !rn2(10))
             dochange = TRUE;
     }
+
+    Strcpy(ustuckNam, u.ustuck ? Some_Monnam(u.ustuck) : "");
 
     Strcpy(buf, (u.umonnum != mntmp) ? "" : "new ");
     if (dochange) {
@@ -830,6 +832,7 @@ polymon(int mntmp)
         skinback(FALSE);
     break_armor();
     drop_weapon(1);
+    find_ac(); /* (repeated below) */
     (void) hideunder(&gy.youmonst);
 
     if (u.utrap && u.utraptype == TT_PIT) {
@@ -841,13 +844,55 @@ polymon(int mntmp)
     }
     newsym(u.ux, u.uy); /* Change symbol */
 
-    /* [note:  this 'sticky' handling is only sufficient for changing from
+    /* you now know what an egg of your type looks like; [moved from
+       below in case expels() -> spoteffects() drops hero onto any eggs] */
+    if (lays_eggs(gy.youmonst.data)) {
+        learn_egg_type(u.umonnum);
+        /* make queen bees recognize killer bee eggs */
+        learn_egg_type(egg_type_from_parent(u.umonnum, TRUE));
+    }
+
+    if (u.uswallow) {
+        uchar usiz;
+
+        /* if new form can't be swallowed, make engulfer expel hero */
+        if (unsolid(gy.youmonst.data)
+            /* subset of engulf_target() */
+            || (usiz = gy.youmonst.data->msize) >= MZ_HUGE
+            || (u.ustuck->data->msize < usiz && !is_whirly(u.ustuck->data))) {
+            boolean expels_mesg = TRUE;
+
+            if (unsolid(gy.youmonst.data)) {
+                if (canspotmon(u.ustuck)) /* [see below for explanation] */
+                    Strcpy(ustuckNam, Monnam(u.ustuck));
+                pline("%s can no longer contain you.", ustuckNam);
+                expels_mesg = FALSE;
+            }
+            expels(u.ustuck, u.ustuck->data, expels_mesg);
+            was_expelled = TRUE;
+            /* FIXME? if expels() triggered rehumanize then we should
+               return early */
+        }
+
+    /* [note:  this 'sticking' handling is only sufficient for changing from
        grabber to engulfer or vice versa because engulfing by poly'd hero
        always ends immediately so won't be in effect during a polymorph] */
-    if (!sticky && !u.uswallow && u.ustuck && sticks(gy.youmonst.data))
+    } else if (u.ustuck && !sticking /* && !u.uswallow */
+               /* being held; if now capable of holding, make holder
+                  release so that hero doesn't automagically start holding
+                  it; or, release if no longer capable of being held */
+               && (sticks(gy.youmonst.data) || unsolid(gy.youmonst.data))) {
+        /* u.ustuck name was saved above in case we're changing from can-see
+           to can't-see; but might have changed from can't-see to can-see so
+           override here if hero knows who u.ustuck is */
+        if (canspotmon(u.ustuck))
+            Strcpy(ustuckNam, Monnam(u.ustuck));
         set_ustuck((struct monst *) 0);
-    else if (sticky && !sticks(gy.youmonst.data))
+        pline("%s loses its grip on you.", ustuckNam);
+    } else if (sticking && !sticks(gy.youmonst.data)) {
+        /* was holding onto u.ustuck but no longer capable of that */
         uunstick();
+    }
 
     if (u.usteed) {
         if (touch_petrifies(u.usteed->data) && !Stone_resistance && rnl(3)) {
@@ -861,6 +906,70 @@ polymon(int mntmp)
             dismount_steed(DISMOUNT_POLY);
     }
 
+    find_ac();
+    if (((!Levitation && !u.ustuck && !Flying && is_pool_or_lava(u.ux, u.uy))
+         || (Underwater && !Swimming))
+        /* if expelled above, expels() already called spoteffects() */
+        && !was_expelled) {
+        spoteffects(TRUE);
+        /* FIXME? if spoteffects() triggered rehumanize then we should
+           return early */
+    }
+    if (Passes_walls && u.utrap
+        && (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
+        if (u.utraptype == TT_INFLOOR) {
+            pline_The("rock seems to no longer trap you.");
+        } else {
+            pline_The("buried ball is no longer bound to you.");
+            buried_ball_to_freedom();
+        }
+        reset_utrap(TRUE);
+    } else if (likes_lava(gy.youmonst.data) && u.utrap
+               && u.utraptype == TT_LAVA) {
+        pline_The("%s now feels soothing.", hliquid("lava"));
+        reset_utrap(TRUE);
+    }
+    if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
+        || unsolid(gy.youmonst.data)) {
+        if (Punished) {
+            You("slip out of the iron chain.");
+            unpunish();
+        } else if (u.utrap && u.utraptype == TT_BURIEDBALL) {
+            You("slip free of the buried ball and chain.");
+            buried_ball_to_freedom();
+        }
+    }
+    if (u.utrap && (u.utraptype == TT_WEB || u.utraptype == TT_BEARTRAP)
+        && (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
+            || unsolid(gy.youmonst.data)
+            || (gy.youmonst.data->msize <= MZ_SMALL
+                && u.utraptype == TT_BEARTRAP))) {
+        You("are no longer stuck in the %s.",
+            u.utraptype == TT_WEB ? "web" : "bear trap");
+        /* probably should burn webs too if PM_FIRE_ELEMENTAL */
+        reset_utrap(TRUE);
+    }
+    if (webmaker(gy.youmonst.data) && u.utrap && u.utraptype == TT_WEB) {
+        You("orient yourself on the web.");
+        reset_utrap(TRUE);
+    }
+    check_strangling(TRUE); /* maybe start strangling */
+
+    gc.context.botl = 1;
+    gv.vision_full_recalc = 1;
+    see_monsters();
+    (void) encumber_msg();
+
+    retouch_equipment(2);
+    /* this might trigger a recursive call to polymon() [stone golem
+       wielding cockatrice corpse and hit by stone-to-flesh, becomes
+       flesh golem above, now gets transformed back into stone golem;
+       fortunately neither form uses #monster] */
+    if (!uarmg)
+        selftouch(no_longer_petrify_resistant);
+
+    /* the explanation of '#monster' used to be shown sooner, but there are
+       possible fatalities above and it isn't useful unless hero survives */
     if (Verbose(2, polymon)) {
         static const char use_thec[] = "Use the command #%s to %s.";
         static const char monsterc[] = "monster";
@@ -900,67 +1009,6 @@ polymon(int mntmp)
             pline(use_thec, "sit",
                   eggs_in_water(uptr) ? "spawn in the water" : "lay an egg");
     }
-
-    /* you now know what an egg of your type looks like */
-    if (lays_eggs(gy.youmonst.data)) {
-        learn_egg_type(u.umonnum);
-        /* make queen bees recognize killer bee eggs */
-        learn_egg_type(egg_type_from_parent(u.umonnum, TRUE));
-    }
-    find_ac();
-    if ((!Levitation && !u.ustuck && !Flying && is_pool_or_lava(u.ux, u.uy))
-        || (Underwater && !Swimming))
-        spoteffects(TRUE);
-    if (Passes_walls && u.utrap
-        && (u.utraptype == TT_INFLOOR || u.utraptype == TT_BURIEDBALL)) {
-        if (u.utraptype == TT_INFLOOR) {
-            pline_The("rock seems to no longer trap you.");
-        } else {
-            pline_The("buried ball is no longer bound to you.");
-            buried_ball_to_freedom();
-        }
-        reset_utrap(TRUE);
-    } else if (likes_lava(gy.youmonst.data) && u.utrap
-               && u.utraptype == TT_LAVA) {
-        pline_The("%s now feels soothing.", hliquid("lava"));
-        reset_utrap(TRUE);
-    }
-    if (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
-        || unsolid(gy.youmonst.data)) {
-        if (Punished) {
-            You("slip out of the iron chain.");
-            unpunish();
-        } else if (u.utrap && u.utraptype == TT_BURIEDBALL) {
-            You("slip free of the buried ball and chain.");
-            buried_ball_to_freedom();
-        }
-    }
-    if (u.utrap && (u.utraptype == TT_WEB || u.utraptype == TT_BEARTRAP)
-        && (amorphous(gy.youmonst.data) || is_whirly(gy.youmonst.data)
-            || unsolid(gy.youmonst.data) || (gy.youmonst.data->msize <= MZ_SMALL
-                                          && u.utraptype == TT_BEARTRAP))) {
-        You("are no longer stuck in the %s.",
-            u.utraptype == TT_WEB ? "web" : "bear trap");
-        /* probably should burn webs too if PM_FIRE_ELEMENTAL */
-        reset_utrap(TRUE);
-    }
-    if (webmaker(gy.youmonst.data) && u.utrap && u.utraptype == TT_WEB) {
-        You("orient yourself on the web.");
-        reset_utrap(TRUE);
-    }
-    check_strangling(TRUE); /* maybe start strangling */
-
-    gc.context.botl = 1;
-    gv.vision_full_recalc = 1;
-    see_monsters();
-    (void) encumber_msg();
-
-    retouch_equipment(2);
-    /* this might trigger a recursive call to polymon() [stone golem
-       wielding cockatrice corpse and hit by stone-to-flesh, becomes
-       flesh golem above, now gets transformed back into stone golem] */
-    if (!uarmg)
-        selftouch(no_longer_petrify_resistant);
     return 1;
 }
 
