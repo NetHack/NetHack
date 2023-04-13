@@ -25,6 +25,7 @@ static boolean bydoor(coordxy, coordxy);
 static void mktrap_victim(struct trap *);
 static struct mkroom *find_branch_room(coord *);
 static struct mkroom *pos_to_room(coordxy, coordxy);
+static boolean cardinal_nextto_room(struct mkroom *, coordxy, coordxy);
 static boolean place_niche(struct mkroom *, coordxy *, coordxy *, coordxy *);
 static void makeniche(int);
 static void make_niches(void);
@@ -575,6 +576,28 @@ dosdoor(register coordxy x, register coordxy y, struct mkroom *aroom, int type)
     add_door(x, y, aroom);
 }
 
+/* is x,y location such that NEWS direction from it is inside aroom,
+   excluding subrooms */
+static boolean
+cardinal_nextto_room(struct mkroom *aroom, coordxy x, coordxy y)
+{
+    int rmno = (int) ((aroom - gr.rooms) + ROOMOFFSET);
+
+    if (isok(x - 1, y) && !levl[x - 1][y].edge
+        && (int) levl[x - 1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x + 1, y) && !levl[x + 1][y].edge
+        && (int) levl[x + 1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x, y - 1) && !levl[x][y - 1].edge
+        && (int) levl[x][y - 1].roomno == rmno)
+        return TRUE;
+    if (isok(x, y + 1) && !levl[x][y + 1].edge
+        && (int) levl[x][y + 1].roomno == rmno)
+        return TRUE;
+    return FALSE;
+}
+
 static boolean
 place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy)
 {
@@ -595,7 +618,8 @@ place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy
                        && levl[*xx][*yy + *dy].typ == STONE)
                       && (isok(*xx, *yy - *dy)
                           && !IS_POOL(levl[*xx][*yy - *dy].typ)
-                          && !IS_FURNITURE(levl[*xx][*yy - *dy].typ)));
+                          && !IS_FURNITURE(levl[*xx][*yy - *dy].typ))
+                      && cardinal_nextto_room(aroom, *xx, *yy));
 }
 
 /* there should be one of these per trap, in the same order as trap.h */
