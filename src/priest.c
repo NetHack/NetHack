@@ -113,7 +113,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
             }
         }
 
-        if (MON_AT(nix, niy))
+        if (MON_AT(nix, niy) || u_at(nix, niy))
             return 0;
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
