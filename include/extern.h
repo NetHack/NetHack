@@ -1342,6 +1342,7 @@ extern void dump_glyphids(void);
 extern int fightm(struct monst *);
 extern int mdisplacem(struct monst *, struct monst *, boolean);
 extern int mattackm(struct monst *, struct monst *);
+extern boolean failed_grab(struct monst *, struct monst *, struct attack *);
 extern boolean engulf_target(struct monst *, struct monst *);
 extern int mon_poly(struct monst *, struct monst *, int);
 extern void paralyze_monst(struct monst *, int);

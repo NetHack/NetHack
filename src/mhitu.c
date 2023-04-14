@@ -701,6 +701,9 @@ mattacku(register struct monst *mtmp)
                             || !touch_petrifies(gy.youmonst.data))) {
                 if (foundyou) {
                     if (tmp > (j = rnd(20 + i))) {
+                        if (unsolid(gy.youmonst.data)
+                            && failed_grab(mtmp, &gy.youmonst, mattk))
+                            continue;
                         if (mattk->aatyp != AT_KICK
                             || !thick_skinned(gy.youmonst.data))
                             sum[i] = hitmu(mtmp, mattk);
@@ -717,8 +720,10 @@ mattacku(register struct monst *mtmp)
         case AT_HUGS: /* automatic if prev two attacks succeed */
             /* Note: if displaced, prev attacks never succeeded */
             if ((!range2 && i >= 2 && sum[i - 1] && sum[i - 2])
-                || mtmp == u.ustuck)
-                sum[i] = hitmu(mtmp, mattk);
+                || mtmp == u.ustuck) {
+                if (!failed_grab(mtmp, &gy.youmonst, mattk))
+                    sum[i] = hitmu(mtmp, mattk);
+            }
             break;
 
         case AT_GAZE: /* can affect you either ranged or not */
@@ -1181,6 +1186,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         if (!engulf_target(mtmp, &gy.youmonst))
             return M_ATTK_MISS;
         if ((t && is_pit(t->ttyp)) && sobj_at(BOULDER, u.ux, u.uy))
+            return M_ATTK_MISS;
+        if (failed_grab(mtmp, &gy.youmonst, mattk))
             return M_ATTK_MISS;
 
         if (Punished)

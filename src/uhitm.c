@@ -5254,6 +5254,11 @@ hmonas(struct monst *mon)
                     Your("%s %s harmlessly through %s.",
                          verb, vtense(verb, "pass"), mon_nam(mon));
                 } else {
+                    /* either not a shade or no special silver/blessed damage,
+                       other unsolid monsters are immune to AT_TUCH+AD_WRAP */
+                    if (failed_grab(&gy.youmonst, mon, mattk))
+                        break; /* miss; message already given */
+
                     if (mattk->aatyp == AT_TENT) {
                         Your("tentacles suck %s.", mon_nam(mon));
                     } else {
@@ -5333,6 +5338,9 @@ hmonas(struct monst *mon)
                 }
                 break;
             }
+            /* can't grab unsolid creatures (checked after shade handling) */
+            if (failed_grab(&gy.youmonst, mon, mattk))
+                break;
             /* hug attack against ordinary foe */
             if (mon == u.ustuck) {
                 pline("%s is being %s%s.", Monnam(mon),
@@ -5371,12 +5379,17 @@ hmonas(struct monst *mon)
             mon_maybe_unparalyze(mon);
             if ((dhit = (tmp > rnd(20 + i)))) {
                 wakeup(mon, TRUE);
+                /* can't engulf unsolid creatures */
                 if (mon->data == &mons[PM_SHADE]) {
+                    /* no specialdmg check needed */
                     Your("attempt to surround %s is harmless.", mon_nam(mon));
+                } else if (failed_grab(&gy.youmonst, mon, mattk)) {
+                    ; /* non-shade miss; message already given */
                 } else {
                     sum[i] = gulpum(mon, mattk);
-                    if (sum[i] == M_ATTK_DEF_DIED && (mon->data->mlet == S_ZOMBIE
-                                        || mon->data->mlet == S_MUMMY)
+                    if (sum[i] == M_ATTK_DEF_DIED
+                        && (mon->data->mlet == S_ZOMBIE
+                            || mon->data->mlet == S_MUMMY)
                         && rn2(5) && !Sick_resistance) {
                         You_feel("%ssick.", (Sick) ? "very " : "");
                         mdamageu(mon, rnd(8));

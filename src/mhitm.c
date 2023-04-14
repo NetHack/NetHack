@@ -153,12 +153,14 @@ fightm(register struct monst *mtmp)
                 if (has_u_swallowed)
                     return 0;
 
-                /* Allow attacked monsters a chance to hit back. Primarily
-                 * to allow monsters that resist conflict to respond.
-                 */
-                if ((result & M_ATTK_HIT) && !(result & M_ATTK_DEF_DIED) && rn2(4)
-                    && mon->movement >= NORMAL_SPEED) {
-                    mon->movement -= NORMAL_SPEED;
+                /* allow attacked monsters a chance to hit back, primarily
+                   to allow monsters that resist conflict to respond */
+                if ((result & (M_ATTK_HIT | M_ATTK_DEF_DIED)) == M_ATTK_HIT
+                    && rn2(4) && mon->movement > rn2(NORMAL_SPEED)) {
+                    if (mon->movement > NORMAL_SPEED)
+                        mon->movement -= NORMAL_SPEED;
+                    else
+                        mon->movement = 0;
                     gn.notonhead = 0;
                     (void) mattackm(mon, mtmp); /* return attack */
                 }
@@ -287,7 +289,7 @@ int
 mattackm(register struct monst *magr, register struct monst *mdef)
 {
     int i,          /* loop counter */
-        tmp,        /* amour class difference */
+        tmp,        /* armor class difference */
         strike = 0, /* hit this attack */
         attk,       /* attack attempted this time */
         struck = 0, /* hit at least once */
@@ -360,13 +362,13 @@ mattackm(register struct monst *magr, register struct monst *mdef)
     for (i = 0; i < NATTK; i++) {
         res[i] = M_ATTK_MISS;
         mattk = getmattk(magr, mdef, i, res, &alt_attk);
-        mwep = (struct obj *) 0;
-        attk = 1;
         /* reduce verbosity for mind flayer attacking creature without a
            head (or worm's tail); this is similar to monster with multiple
            attacks after a wildmiss against displaced or invisible hero */
         if (gs.skipdrin && mattk->aatyp == AT_TENT && mattk->adtyp == AD_DRIN)
             continue;
+        mwep = (struct obj *) 0;
+        attk = 1;
 
         switch (mattk->aatyp) {
         case AT_WEAP: /* "hand to hand" attacks */
@@ -420,6 +422,14 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             if (mwep)
                 tmp -= hitval(mwep, mdef);
             if (strike) {
+                /* for eel AT_TUCH+AD_WRAP attack: can't grab an unsolid
+                   target; the unsolid test is redundant since failed_grab
+                   checks it too, but is cheap and avoids calling failed_grab
+                   for ordinary targets */
+                if (unsolid(mdef->data) && failed_grab(magr, mdef, mattk)) {
+                    strike = 0;
+                    break;
+                }
                 res[i] = hitmm(magr, mdef, mattk, mwep, dieroll);
                 if ((mdef->data == &mons[PM_BLACK_PUDDING]
                      || mdef->data == &mons[PM_BROWN_PUDDING])
@@ -429,13 +439,9 @@ mattackm(register struct monst *magr, register struct monst *mdef)
                     struct monst *mclone;
 
                     if ((mclone = clone_mon(mdef, 0, 0)) != 0) {
-                        if (gv.vis && canspotmon(mdef)) {
-                            char buf[BUFSZ];
-
-                            Strcpy(buf, Monnam(mdef));
-                            pline("%s divides as %s hits it!", buf,
-                                  mon_nam(magr));
-                        }
+                        if (gv.vis && canspotmon(mdef))
+                            pline("%s divides as %s hits it!",
+                                  Monnam(mdef), mon_nam(magr));
                         (void) mintrap(mclone, NO_TRAP_FLAGS);
                     }
                 }
@@ -444,10 +450,19 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             break;
 
         case AT_HUGS: /* automatic if prev two attacks succeed */
-            strike = (i >= 2 && res[i - 1] == M_ATTK_HIT && res[i - 2] == M_ATTK_HIT);
-            if (strike)
-                res[i] = hitmm(magr, mdef, mattk, (struct obj *) 0, 0);
-
+            strike = (i >= 2 && res[i - 1] == M_ATTK_HIT
+                      && res[i - 2] == M_ATTK_HIT);
+            if (strike) {
+                /* note: monsters with hug attacks don't wear cloaks or gloves
+                   so this doesn't need a special case for hugging a shade
+                   while covered by blessed armor (which does damage but does
+                   not achieve a successful hold); likewise, rope golems can't
+                   wield weapons so ability to choke isn't affected by such */
+                if (failed_grab(magr, mdef, mattk))
+                    strike = 0;
+                else
+                    res[i] = hitmm(magr, mdef, mattk, (struct obj *) 0, 0);
+            }
             break;
 
         case AT_GAZE:
@@ -484,12 +499,16 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             if (distmin(magr->mx, magr->my, mdef->mx, mdef->my) > 1)
                 continue;
             /* Engulfing attacks are directed at the hero if possible. -dlc */
-            if (engulfing_u(magr))
+            if (engulfing_u(magr)) {
                 strike = 0;
-            else if ((strike = (tmp > rnd(20 + i))) != 0)
-                res[i] = gulpmm(magr, mdef, mattk);
-            else
+            } else if ((strike = (tmp > rnd(20 + i))) != 0) {
+                if (failed_grab(magr, mdef, mattk))
+                    strike = 0; /* purple worm can't swallow unsolid mons */
+                else
+                    res[i] = gulpmm(magr, mdef, mattk);
+            } else {
                 missmm(magr, mdef, mattk);
+            }
             break;
 
         case AT_BREA:
@@ -542,9 +561,47 @@ mattackm(register struct monst *magr, register struct monst *mdef)
             return res[i];
         if (res[i] & M_ATTK_HIT)
             struck = 1; /* at least one hit */
-    }
+    } /* for (;i < NATTK;) loop */
 
     return (struck ? M_ATTK_HIT : M_ATTK_MISS);
+}
+
+/* can't hold an unsolid target (ghosts, lights, vortices, most elementals) */
+boolean
+failed_grab(
+    struct monst *magr,
+    struct monst *mdef,
+    struct attack *mattk)
+{
+    if (unsolid(mdef->data)
+        /* hug attack: most holders (owlbear, python, pit fiend, &c);
+           wrap damage: eel grabbing, trapper/lurker-above engulfing;
+           stick-to damage: mimic, lichen;
+           digestion damage: purple worm swallowing */
+        && (mattk->aatyp == AT_HUGS || mattk->adtyp == AD_WRAP
+            || mattk->adtyp == AD_STCK  || mattk->adtyp == AD_DGST)) {
+        if ((gv.vis && canspotmon(mdef)) /* mon-vs-mon */
+            || magr == &gy.youmonst || mdef == &gy.youmonst) {
+            char magrnam[BUFSZ], mdefnam[BUFSZ];
+            const char *verb = (mattk->adtyp == AD_DGST) ? "gulp"
+                               : (mattk->adtyp == AD_STCK) ? "adhere"
+                                 : "grab";
+
+            /* beware of "Foo's grab passes through Bar's ghost";
+               mon_nam(x_monnam) calls s_suffix() for named ghosts and
+               s_suffix() uses a single static buffer; make copies of
+               both names to overcome that */
+            Strcpy(magrnam, (magr == &gy.youmonst) ? "Your"
+                                                   : s_suffix(Monnam(magr)));
+            Strcpy(mdefnam, (mdef == &gy.youmonst) ? "you" : mon_nam(mdef));
+            /* this is actually somewhat iffy--how come ordinary attacks
+               don't also pass right through? */
+            pline("%.99s %s attempt passes right through %.99s!",
+                  magrnam, verb, mdefnam);
+        }
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* Returns the result of mdamagem(). */
@@ -726,7 +783,7 @@ engulf_target(struct monst *magr, struct monst *mdef)
         return FALSE;
 
     /* (hypothetical) engulfers who can pass through walls aren't
-     limited by rock|trees|bars */
+       limited by rock|trees|bars */
     if ((magr == &gy.youmonst) ? Passes_walls : passes_walls(magr->data))
         return TRUE;
 
