@@ -1338,10 +1338,7 @@ place_branch(
     }
 
     if (br->type == BR_PORTAL) {
-        if (u.ucamefrom.dnum || u.ucamefrom.dlevel)
-            mkportal(x, y, u.ucamefrom.dnum, u.ucamefrom.dlevel);
-        else
-            mkportal(x, y, dest->dnum, dest->dlevel);
+        mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
         boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up
                                                      : !br->end1_up;
