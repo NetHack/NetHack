@@ -2825,7 +2825,8 @@ pooleffects(
             if (lava_effects())
                 return TRUE;
         } else if ((!Wwalking || is_waterwall(u.ux,u.uy))
-                   && (newspot || !u.uinwater || !(Swimming || Amphibious))) {
+                   && (newspot || !u.uinwater
+                       || !(Swimming || Amphibious || Breathless))) {
             if (drown())
                 return TRUE;
         }

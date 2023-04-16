@@ -3094,8 +3094,7 @@ mhitm_ad_wrap(
                 }
             } else if (u.ustuck == mdef) {
                 /* Monsters don't wear amulets of magical breathing */
-                if (is_pool(u.ux, u.uy) && !is_swimmer(pd)
-                    && !amphibious(pd)) {
+                if (is_pool(u.ux, u.uy) && !cant_drown(pd)) {
                     You("drown %s...", mon_nam(mdef));
                     mhm->damage = mdef->mhp;
                 } else if (mattk->aatyp == AT_HUGS)
@@ -3124,7 +3123,8 @@ mhitm_ad_wrap(
                                  Some_Monnam(magr), coil ? "coils" : "swings");
                 }
             } else if (u.ustuck == magr) {
-                if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious) {
+                if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious
+                    && !Breathless) {
                     boolean moat = (levl[magr->mx][magr->my].typ != POOL)
                                    && !is_waterwall(magr->mx, magr->my)
                                    && !Is_medusa_level(&u.uz)
@@ -3311,7 +3311,7 @@ mhitm_ad_slim(
 
                 if (gv.vis && canseemon(mdef))
                     ncflags |= NC_SHOW_MSG;
-                if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags)) 
+                if (newcham(mdef, &mons[PM_GREEN_SLIME], ncflags))
                     pd = mdef->data;
                 mdef->mstrategy &= ~STRAT_WAITFORU;
                 mhm->hitflags = M_ATTK_HIT;
@@ -4769,7 +4769,7 @@ gulpum(struct monst *mdef, struct attack *mattk)
             case AD_PHYS:
                 if (gy.youmonst.data == &mons[PM_FOG_CLOUD]) {
                     pline("%s is laden with your moisture.", Monnam(mdef));
-                    if (amphibious(pd) && !flaming(pd)) {
+                    if ((breathless(pd) || amphibious(pd)) && !flaming(pd)) {
                         dam = 0;
                         pline("%s seems unharmed.", Monnam(mdef));
                     }

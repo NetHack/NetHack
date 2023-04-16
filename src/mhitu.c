@@ -1328,8 +1328,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                                  : amphibious(gy.youmonst.data)
                                        ? "feel comforted."
                                        : "can barely breathe!");
-            /* NB: Amphibious includes Breathless */
-            if (Amphibious && !flaming(gy.youmonst.data))
+            if ((Amphibious || Breathless) && !flaming(gy.youmonst.data))
                 tmp = 0;
         } else {
             You("are %s!", enfolds(mtmp->data) ? "being squashed"

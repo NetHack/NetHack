@@ -1002,8 +1002,7 @@ Amulet_off(void)
             /* HMagical_breathing must be set off
                 before calling drown() */
             setworn((struct obj *) 0, W_AMUL);
-            if (!breathless(gy.youmonst.data) && !amphibious(gy.youmonst.data)
-                && !Swimming) {
+            if (!cant_drown(gy.youmonst.data) && !Swimming) {
                 You("suddenly inhale an unhealthy amount of %s!",
                     hliquid("water"));
                 (void) drown();

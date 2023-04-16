@@ -4485,7 +4485,7 @@ drown(void)
     feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */
     if (u.uinwater && is_pool(u.ux - u.dx, u.uy - u.dy)
-        && (Swimming || Amphibious)) {
+        && (Swimming || Amphibious || Breathless)) {
         /* water effects on objects every now and then */
         if (!rn2(5))
             inpool_ok = TRUE;
@@ -4495,7 +4495,8 @@ drown(void)
 
     if (!u.uinwater) {
         You("%s into the %s%c", is_solid ? "plunge" : "fall",
-            waterbody_name(u.ux, u.uy), (Amphibious || Swimming) ? '.' : '!');
+            waterbody_name(u.ux, u.uy),
+            (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
     }
@@ -4520,8 +4521,8 @@ drown(void)
         unleash_all();
     }
 
-    if (Amphibious || Swimming) {
-        if (Amphibious) {
+    if (Amphibious || Breathless || Swimming) {
+        if (Amphibious || Breathless) {
             if (Verbose(3, drown))
                 pline("But you aren't drowning.");
             if (!Is_waterlevel(&u.uz)) {

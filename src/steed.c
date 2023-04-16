@@ -689,7 +689,7 @@ dismount_steed(
                     if (!Underwater)
                         pline("%s falls into the %s!", Monnam(mtmp),
                               surface(u.ux, u.uy));
-                    if (!is_swimmer(mdat) && !amphibious(mdat)) {
+                    if (!cant_drown(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
                     }
