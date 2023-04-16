@@ -1388,6 +1388,7 @@
 				"$(NH_DAT_DIR)/tower2.lua",
 				"$(NH_DAT_DIR)/tower3.lua",
 				"$(NH_DAT_DIR)/tut-1.lua",
+				"$(NH_DAT_DIR)/tut-2.lua",
 				"$(NH_DAT_DIR)/Val-fila.lua",
 				"$(NH_DAT_DIR)/Val-filb.lua",
 				"$(NH_DAT_DIR)/Val-goal.lua",
