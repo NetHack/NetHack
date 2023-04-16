@@ -50,8 +50,7 @@ static void wishcmdassist(int);
 
 #define is_hero_spell(type) ((type) >= 10 && (type) < 20)
 
-#define M_IN_WATER(ptr) \
-    ((ptr)->mlet == S_EEL || amphibious(ptr) || is_swimmer(ptr))
+#define M_IN_WATER(ptr) ((ptr)->mlet == S_EEL || cant_drown(ptr))
 
 static const char are_blinded_by_the_flash[] = "are blinded by the flash!";
 

@@ -378,8 +378,8 @@ e_survives_at(struct entity *etmp, coordxy x, coordxy y)
     if (noncorporeal(etmp->edata))
         return TRUE;
     if (is_pool(x, y))
-        return (boolean) ((is_u(etmp) && (Wwalking || Amphibious || Swimming
-                                          || Flying || Levitation))
+        return (boolean) ((is_u(etmp) && (Wwalking || Amphibious || Breathless
+                                          || Swimming || Flying || Levitation))
                           || is_swimmer(etmp->edata)
                           || is_flyer(etmp->edata)
                           || is_floater(etmp->edata));

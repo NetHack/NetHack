@@ -827,8 +827,7 @@ minliquid_core(struct monst* mtmp)
          * water damage to dead monsters' inventory, but survivors need to
          * be handled here.  Swimmers are able to protect their stuff...
          */
-        if ((waterwall || !is_clinger(mtmp->data))
-            && !is_swimmer(mtmp->data) && !amphibious(mtmp->data)) {
+        if ((waterwall || !is_clinger(mtmp->data)) && !cant_drown(mtmp->data)) {
             /* like hero with teleport intrinsic or spell, teleport away
                if possible */
             if (can_teleport(mtmp->data) && !tele_restrict(mtmp)) {
