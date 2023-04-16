@@ -1146,6 +1146,7 @@ give feedback if monster holding onto the hero has to let go when hero polys
 prevent hug attacks and touch or engulf attacks for wrap, stick-to, and
 	digestion damage from succeeding against unsolid targets (ghosts,
 	vortices, a few others)
+wand of speed gives temporary speed, potion gives intrinsic
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
