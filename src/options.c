@@ -8412,6 +8412,7 @@ doset_simple_menu(void)
     anything any;
     enum OptSection section;
     int i, k, pick_cnt, reslt;
+    boolean toggled_help = FALSE;
 
     /* we do this each time we're called instead of once in doset_simple()
        in case 'menu_tab_sep' ever gets included in the simple menu so
@@ -8423,8 +8424,18 @@ doset_simple_menu(void)
         Strcpy(fmtstr_doset_simple, fmtstr_tab_doset_simple);
     fmtstr = fmtstr_doset_simple;
 
+ redo_opt_help:
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+    any = cg.zeroany;
+    any.a_int = -2 + 1;
+    add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, 0,
+             gs.simple_options_help ? "hide help" : "show help",
+             MENU_ITEMFLAGS_NONE);
+    any = cg.zeroany;
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             0, "", MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
@@ -8482,6 +8493,15 @@ doset_simple_menu(void)
                 Strcat(buf, "  (for autopickup)");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            if (gs.simple_options_help && allopt[i].descr) {
+                any = cg.zeroany;
+                Sprintf(buf, "    %s", allopt[i].descr);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+                any = cg.zeroany;
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                         0, "", MENU_ITEMFLAGS_NONE);
+            }
         }
     }
     end_menu(tmpwin, "Options");
@@ -8495,7 +8515,10 @@ doset_simple_menu(void)
         k = pick_list[0].item.a_int - 1;
 
         abuf[0] = '\0';
-        if (allopt[k].opttyp == BoolOpt) {
+        if (k == -2) {
+            gs.simple_options_help = !gs.simple_options_help;
+            toggled_help = TRUE;
+        } else if (allopt[k].opttyp == BoolOpt) {
             /* boolean option */
             Sprintf(buf, "%s%s", *allopt[k].addr ? "!" : "", allopt[k].name);
             (void) parseoptions(buf, FALSE, FALSE);
@@ -8521,7 +8544,7 @@ doset_simple_menu(void)
                    'picked 1' to caller which will loop for another choice */
             }
         }
-        if (abuf[0] != '\033'
+        if (k >= 0 && abuf[0] != '\033'
             && (wc_supported(allopt[k].name)
                 || wc2_supported(allopt[k].name)))
             preference_update(allopt[k].name);
@@ -8531,6 +8554,11 @@ doset_simple_menu(void)
     /* tear down this instance of the menu; if pick_cnt is 1, caller
        will immediately call us back to put up another instance */
     destroy_nhwindow(tmpwin);
+
+    if (toggled_help) {
+        toggled_help = FALSE;
+        goto redo_opt_help;
+    }
 
     return pick_cnt;
 }

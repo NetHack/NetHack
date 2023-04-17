@@ -865,6 +865,7 @@ struct instance_globals_s {
                                       * list of available sets */
     boolean save_menucolors; /* copy of iflags.use_menu_colors */
     struct menucoloring *save_colorings; /* copy of gm.menu_colorings */
+    boolean simple_options_help;
 
     /* pickup.c */
     boolean shop_filter;

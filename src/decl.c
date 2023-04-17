@@ -736,6 +736,7 @@ const struct instance_globals_s g_init_s = {
     (struct symsetentry *) 0, /* symset_list */
     FALSE, /* save_menucolors */
     (struct menucoloring *) 0, /* save_colorings */
+    FALSE, /* simple_options_help */
     /* pickup.c */
     FALSE, /* shop_filter */
     /* pline.c */
