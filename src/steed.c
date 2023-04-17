@@ -634,6 +634,13 @@ dismount_steed(
     /* Release the steed and saddle */
     u.usteed = 0;
     u.ugallop = 0L;
+
+    if (u.utraptype == TT_BEARTRAP
+        || u.utraptype == TT_PIT
+        || u.utraptype == TT_WEB) {
+        mtmp->mtrapped = 1;
+    }
+
     /*
      * rloc(), rloc_to(), and monkilled()->mondead()->m_detach() all
      * expect mtmp to be on the map or else have mtmp->mx be 0, but
