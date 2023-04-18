@@ -58,6 +58,7 @@ static void tport_menu(winid, char *, struct lchoice *, d_level *,
 static const char *br_string(int);
 static char chr_u_on_lvl(d_level *);
 static void print_branch(winid, int, int, int, boolean, struct lchoice *);
+static void query_annotation(d_level *);
 static mapseen *load_mapseen(NHFILE *);
 static void save_mapseen(NHFILE *, mapseen *);
 static mapseen *find_mapseen(d_level *);
@@ -2561,15 +2562,16 @@ get_annotation(d_level *lev)
     return NULL;
 }
 
-/* #annotate command - add a custom name to the current level */
-int
-donamelevel(void)
+/* ask user to annotate level lev.
+   if lev is NULL, uses current level. */
+static void
+query_annotation(d_level *lev)
 {
     mapseen *mptr;
     char nbuf[BUFSZ]; /* Buffer for response */
 
-    if (!(mptr = find_mapseen(&u.uz)))
-        return ECMD_OK;
+    if (!(mptr = find_mapseen(lev ? lev : &u.uz)))
+        return;
 
     nbuf[0] = '\0';
 #ifdef EDIT_GETLIN
@@ -2591,7 +2593,7 @@ donamelevel(void)
     /* empty input or ESC means don't add or change annotation;
        space-only means discard current annotation without adding new one */
     if (!*nbuf || *nbuf == '\033')
-        return ECMD_OK;
+        return;
     /* strip leading and trailing spaces, compress out consecutive spaces */
     (void) mungspaces(nbuf);
 
@@ -2606,6 +2608,13 @@ donamelevel(void)
     if (*nbuf && strcmp(nbuf, " ")) {
         mptr->custom = dupstr_n(nbuf,&mptr->custom_lth);
     }
+}
+
+/* #annotate command - add a custom name to the current level */
+int
+donamelevel(void)
+{
+    query_annotation((d_level *)0);
     return ECMD_OK;
 }
 
@@ -3239,11 +3248,15 @@ show_overview(int why, /* 0 => #overview command,
 {
     winid win;
     int lastdun = -1;
+    menu_item *selected;
+    int n = 0;
 
     /* lazy initialization */
     (void) recalc_mapseen();
 
     win = create_nhwindow(NHW_MENU);
+    if (why == 0)
+        start_menu(win, MENU_BEHAVE_STANDARD);
     /* show the endgame levels before the rest of the dungeon,
        so that the Planes (dnum 5-ish) come out above main dungeon (dnum 0) */
     if (In_endgame(&u.uz))
@@ -3251,7 +3264,18 @@ show_overview(int why, /* 0 => #overview command,
     /* if game is over or we're not in the endgame yet, show the dungeon */
     if (why > 0 || !In_endgame(&u.uz))
         traverse_mapseenchn(FALSE, win, why, reason, &lastdun);
-    display_nhwindow(win, TRUE);
+    end_menu(win, (char *)0);
+    n = select_menu(win, (why > 0) ? PICK_NONE : PICK_ONE, &selected);
+    if (n > 0) {
+        int ledger;
+        d_level lev;
+
+        ledger = selected[0].item.a_int - 1;
+        lev.dnum = ledger_to_dnum(ledger);
+        lev.dlevel = ledger_to_dlev(ledger);
+        query_annotation(&lev);
+        free((genericptr_t) selected);
+    }
     destroy_nhwindow(win);
 }
 
@@ -3450,6 +3474,7 @@ print_mapseen(winid win, mapseen *mptr,
     char buf[BUFSZ], tmpbuf[BUFSZ];
     int i, depthstart, dnum;
     boolean died_here = (final == 2 && on_level(&u.uz, &mptr->lev));
+    anything any;
 
     /* Damnable special cases */
     /* The quest and knox should appear to be level 1 to match
@@ -3475,15 +3500,18 @@ print_mapseen(winid win, mapseen *mptr,
             Sprintf(buf, "%s: levels %d to %d",
                     gd.dungeons[dnum].dname, depthstart,
                     depthstart + gd.dungeons[dnum].dunlev_ureached - 1);
-        putstr(win, !final ? iflags.menu_headings : 0, buf);
+        any = cg.zeroany;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                 !final ? iflags.menu_headings : ATR_NONE, NO_COLOR,
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     /* calculate level number */
     i = depthstart + mptr->lev.dlevel - 1;
     if (In_endgame(&mptr->lev))
-        Sprintf(buf, "%s%s:", TAB, endgamelevelname(tmpbuf, i));
+        Sprintf(buf, "%s%s:", final ? TAB : "", endgamelevelname(tmpbuf, i));
     else
-        Sprintf(buf, "%sLevel %d:", TAB, i);
+        Sprintf(buf, "%sLevel %d:", final ? TAB : "", i);
 
     /* wizmode prints out proto dungeon names for clarity */
     if (wizard) {
@@ -3500,7 +3528,12 @@ print_mapseen(winid win, mapseen *mptr,
                 (!final || (final == 1 && how == ASCENDED)) ? "are"
                   : (final == 1 && how == ESCAPED) ? "left from"
                     : "were");
-    putstr(win, !final ? iflags.menu_headings : 0, buf);
+
+    any = cg.zeroany;
+    if (!final)
+        any.a_int = ledger_no(&(mptr->lev)) + 1;
+    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+             buf, MENU_ITEMFLAGS_NONE);
 
     if (mptr->flags.forgot)
         return;
@@ -3549,7 +3582,9 @@ print_mapseen(winid win, mapseen *mptr,
         buf[i] = highc(buf[i]);
         /* capitalizing it makes it a sentence; terminate with '.' */
         Strcat(buf, ".");
-        putstr(win, 0, buf);
+        any = cg.zeroany;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     /* we assume that these are mutually exclusive */
@@ -3585,12 +3620,17 @@ print_mapseen(winid win, mapseen *mptr,
     } else if (mptr->flags.msanctum) {
         Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
     }
-    if (*buf)
-        putstr(win, 0, buf);
+    if (*buf) {
+        any = cg.zeroany;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                 buf, MENU_ITEMFLAGS_NONE);
+    }
     /* quest entrance is not mutually-exclusive with bigroom or rogue level */
     if (mptr->flags.quest_summons) {
         Sprintf(buf, "%sSummoned by %s.", PREFIX, ldrname());
-        putstr(win, 0, buf);
+        any = cg.zeroany;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     /* print out branches */
@@ -3605,7 +3645,9 @@ print_mapseen(winid win, mapseen *mptr,
         if (mptr->br->end1_up && !In_endgame(&(mptr->br->end2)))
             Sprintf(eos(buf), ", level %d", depth(&(mptr->br->end2)));
         Strcat(buf, ".");
-        putstr(win, 0, buf);
+        any = cg.zeroany;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                 buf, MENU_ITEMFLAGS_NONE);
     }
 
     /* maybe print out bones details */
@@ -3618,7 +3660,9 @@ print_mapseen(winid win, mapseen *mptr,
                 ++kncnt;
         if (kncnt) {
             Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
-            putstr(win, 0, buf);
+            any = cg.zeroany;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                     buf, MENU_ITEMFLAGS_NONE);
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead
                    hero here doesn't give away whether bones are produced */
@@ -3630,13 +3674,17 @@ print_mapseen(winid win, mapseen *mptr,
                 (void) strsubst(tmpbuf, " her ", " your ");
                 Snprintf(buf, sizeof(buf), "%s%syou, %s%c", PREFIX, TAB,
                          tmpbuf, --kncnt ? ',' : '.');
-                putstr(win, 0, buf);
+                any = cg.zeroany;
+                add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                         buf, MENU_ITEMFLAGS_NONE);
             }
             for (bp = mptr->final_resting_place; bp; bp = bp->next) {
                 if (bp->bonesknown || wizard || final) {
                     Sprintf(buf, "%s%s%s, %s%c", PREFIX, TAB, bp->who,
                             bp->how, --kncnt ? ',' : '.');
-                    putstr(win, 0, buf);
+                    any = cg.zeroany;
+                    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
+                             buf, MENU_ITEMFLAGS_NONE);
                 }
             }
         }
