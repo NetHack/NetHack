@@ -2053,6 +2053,9 @@ add a tutorial level
 engravings appear on the map display
 option to create the character deaf
 add conduct for petless
+preceding #overview with the 'm' prefix brings up the overview display as a
+	menu allowing selection of any visited level to #annotate; it also
+	shows every level visited rather than just the "interesting" ones
 
 
 Platform- and/or Interface-Specific New Features

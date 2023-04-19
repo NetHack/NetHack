@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "March 16, 2023
+.ds f2 "April 19, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1409,12 +1409,21 @@ Precede with the \(oqm\(cq prefix to execute the simpler options command.
 \(oq\f(CRO\fP\(cq from simple options back to traditional advanced options.)
 .lp #overview
 Display information you've discovered about the dungeon.
-Any visited
-level (unless forgotten due to amnesia) with an annotation is included,
+Any visited level
+.\" [note: amnesia no longer causes levels to be forgotten so exclude this]
+.\" (unless forgotten due to amnesia)
+with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
 level will be included regardless of annotations.
+.lp ""
+Precede #overview with the \(oqm\(cq prefix to display the dungeon
+overview as a menu where you can select any visited level to add or
+remove an annotation without needing to return to that level.
+This will also force all visited levels to be displayed rather than just
+the \(lqinteresting\(rq subset.
+.lp ""
 Autocompletes.
 Default keys are \(oq\(haO\(cq, and \(oqM-O\(cq.
 .\" DON'T PANIC!

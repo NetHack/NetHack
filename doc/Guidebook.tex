@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{March 16, 2023}
+\date{April 19, 2023}
 
 \maketitle
 
@@ -1523,12 +1523,25 @@ Precede with the `{\tt m}' prefix to execute the simpler options command.
 `{\tt O}' from simple options back to traditional advanced options.)
 %.lp
 \item[\tb{\#overview}]
-Display information you've discovered about the dungeon.  Any visited
-level (unless forgotten due to amnesia) with an annotation is included,
+Display information you've discovered about the dungeon.
+Any visited level
+% [note: amnesia no longer causes levels to be forgotten so exclude this]
+% (unless forgotten due to amnesia)
+with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
-level will be included regardless of annotations. Autocompletes.
+level will be included regardless of annotations.
+\\
+%.lp ""
+Precede \#overview with the `{\tt m}' prefix to display the dungeon
+overview as a menu where you can select any visited level to add or
+remove an annotation without needing to return to that level.
+This will also force all visited levels to be displayed rather than just
+the ``interesting'' subset.
+\\
+%.lp ""
+Autocompletes.
 Default keys are `{\tt \^{}O}', and `{\tt M-O}'.
 % DON'T PANIC!
 %.lp

@@ -2636,9 +2636,12 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "optionsfull", "show all option settings, possibly change them",
               doset, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* #overview used to need autocomplete and has retained that even
-       after being assigned to ^O [old wizard mode ^O is now #wizwhere] */
+       after being assigned to ^O [old wizard mode ^O is now #wizwhere];
+       'm' prefix displays overview as a menu where player can choose a
+       level to supply with an annotation */
     { C('o'), "overview", "show a summary of the explored dungeon",
-              dooverview, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
+              dooverview,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     /* [should #panic actually autocomplete?] */
     { '\0',   "panic", "test panic routine (fatal to game)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
