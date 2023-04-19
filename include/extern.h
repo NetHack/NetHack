@@ -1711,6 +1711,8 @@ extern struct monst *find_pmmonst(int);
 extern int bee_eat_jelly(struct monst *, struct obj *);
 extern void monflee(struct monst *, int, boolean, boolean);
 extern void mon_yells(struct monst *, const char *);
+extern boolean m_can_break_boulder(struct monst *);
+extern void m_break_boulder(struct monst *, coordxy, coordxy);
 extern int dochug(struct monst *);
 extern boolean m_digweapon_check(struct monst *, coordxy, coordxy);
 extern int m_move(struct monst *, int);

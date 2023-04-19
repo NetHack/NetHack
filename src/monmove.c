@@ -104,6 +104,36 @@ mon_yells(struct monst* mon, const char* shout)
     }
 }
 
+/* can monster mtmp break boulders? */
+boolean
+m_can_break_boulder(struct monst *mtmp)
+{
+    return (is_rider(mtmp->data)
+            || (!mtmp->mspec_used
+                && (mtmp->isshk || mtmp->ispriest
+                    || (mtmp->data->msound == MS_LEADER))));
+}
+
+/* monster mtmp breaks boulder at x,y */
+void
+m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
+{
+    struct obj *otmp;
+
+    if (m_can_break_boulder(mtmp) && ((otmp = sobj_at(BOULDER, x, y)) != 0)) {
+        if (!is_rider(mtmp->data)) {
+            if (!Deaf && (mdistu(mtmp) < 4*4))
+                pline("%s mutters %s.",
+                      Monnam(mtmp),
+                      mtmp->ispriest ? "a prayer" : "an incantation");
+            mtmp->mspec_used += rn1(20, 10);
+        }
+        if (cansee(x, y))
+            pline_The("boulder falls apart.");
+        fracture_rock(otmp);
+    }
+}
+
 static void
 watch_on_duty(register struct monst* mtmp)
 {
@@ -1535,6 +1565,11 @@ m_move(register struct monst* mtmp, register int after)
 
         if (!m_in_out_region(mtmp, nix, niy))
             return MMOVE_DONE;
+
+        if ((info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {
+            (void) m_break_boulder(mtmp, nix, niy);
+            return MMOVE_DONE;
+        }
 
         /* move a normal monster; for a long worm, remove_monster() and
            place_monster() only manipulate the head; they leave tail as-is */

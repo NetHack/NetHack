@@ -101,7 +101,10 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 
     if (nix != omx || niy != omy) {
 
-        if (ninfo & ALLOW_M) {
+        if (ninfo & ALLOW_ROCK) {
+            m_break_boulder(mtmp, nix, niy);
+            return 1;
+        } else if (ninfo & ALLOW_M) {
             /* mtmp is deciding it would like to attack this turn.
              * Returns from m_move_aggress don't correspond to the same things
              * as this function should return, so we need to translate. */
