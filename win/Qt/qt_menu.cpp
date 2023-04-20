@@ -1286,25 +1286,37 @@ NetHackQtMenuOrTextWindow::NetHackQtMenuOrTextWindow(QWidget *parent_) :
 
 QWidget* NetHackQtMenuOrTextWindow::Widget()
 {
-    if (!actual) impossible("Widget called before we know if Menu or Text");
-    return actual->Widget();
+    QWidget *result = NULL;
+    if (!actual)
+        impossible("Widget called before we know if Menu or Text");
+    else
+        result = actual->Widget();
+    return result;
 }
 
 // Text
 void NetHackQtMenuOrTextWindow::Clear()
 {
-    if (!actual) impossible("Clear called before we know if Menu or Text");
-    actual->Clear();
+    if (!actual)
+        impossible("Clear called before we know if Menu or Text");
+    else
+        actual->Clear();
 }
 void NetHackQtMenuOrTextWindow::Display(bool block)
 {
-    if (!actual) impossible("Display called before we know if Menu or Text");
-    actual->Display(block);
+    if (!actual)
+        impossible("Display called before we know if Menu or Text");
+    else
+        actual->Display(block);
 }
 bool NetHackQtMenuOrTextWindow::Destroy()
 {
-    if (!actual) impossible("Destroy called before we know if Menu or Text");
-    return actual->Destroy();
+    bool result = false;
+    if (!actual)
+        impossible("Destroy called before we know if Menu or Text");
+    else
+        result = actual->Destroy();
+    return result;
 }
 
 void NetHackQtMenuOrTextWindow::PutStr(int attr, const QString& text)
@@ -1323,18 +1335,26 @@ void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
                                         char ch, char gch, int attr,
                                         const QString& str, unsigned itemflags)
 {
-    if (!actual) impossible("AddMenu called before we know if Menu or Text");
-    actual->AddMenu(glyph,identifier,ch,gch,attr,str,itemflags);
+    if (!actual)
+        impossible("AddMenu called before we know if Menu or Text");
+    else
+        actual->AddMenu(glyph, identifier, ch, gch, attr, str, itemflags);
 }
 void NetHackQtMenuOrTextWindow::EndMenu(const QString& prompt)
 {
-    if (!actual) impossible("EndMenu called before we know if Menu or Text");
-    actual->EndMenu(prompt);
+    if (!actual)
+        impossible("EndMenu called before we know if Menu or Text");
+    else
+        actual->EndMenu(prompt);
 }
 int NetHackQtMenuOrTextWindow::SelectMenu(int how, MENU_ITEM_P **menu_list)
 {
-    if (!actual) impossible("SelectMenu called before we know if Menu or Text");
-    return actual->SelectMenu(how,menu_list);
+    int result = -1;
+    if (!actual)
+        impossible("SelectMenu called before we know if Menu or Text");
+    else
+        result = actual->SelectMenu(how, menu_list);
+    return result;
 }
 
 } // namespace nethack_qt_
