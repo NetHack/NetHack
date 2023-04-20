@@ -910,6 +910,17 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
     return FALSE;
 }
 
+/* monster mtmp would love to consume object otmp, without picking it up */
+boolean
+mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
+{
+    if (otmp->otyp == CORPSE && !touch_petrifies(&mons[otmp->corpsenm])
+        && corpse_eater(mtmp->data))
+        return TRUE;
+
+    return FALSE;
+}
+
 boolean
 itsstuck(register struct monst* mtmp)
 {
@@ -1224,8 +1235,9 @@ m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, in
                 if (costly && !otmp->no_charge)
                     continue;
 
-                if (mon_would_take_item(mtmp, otmp)
-                    && (can_carry(mtmp, otmp) > 0)
+                if (((mon_would_take_item(mtmp, otmp)
+                      && (can_carry(mtmp, otmp) > 0))
+                     || mon_would_consume_item(mtmp, otmp))
                     && can_touch_safely(mtmp, otmp)) {
                     minr = distmin(omx, omy, xx, yy);
                     *ggx = otmp->ox;
@@ -1794,9 +1806,7 @@ m_move(register struct monst* mtmp, register int after)
                     return etmp; /* it died or got forced off the level */
             }
             /* Maybe a purple worm ate a corpse */
-            if (ptr == &mons[PM_PURPLE_WORM]
-                || ptr == &mons[PM_BABY_PURPLE_WORM]
-                || ptr == &mons[PM_PIRANHA]) {
+            if (corpse_eater(ptr)) {
                 if ((etmp = meatcorpse(mtmp)) >= 2)
                     return etmp; /* it died or got forced off the level */
             }

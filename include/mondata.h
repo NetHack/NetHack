@@ -254,6 +254,12 @@
     (vegan(ptr)         \
      || ((ptr)->mlet == S_PUDDING && (ptr) != &mons[PM_BLACK_PUDDING]))
 
+#define corpse_eater(ptr)                    \
+    (ptr == &mons[PM_PURPLE_WORM]            \
+     || ptr == &mons[PM_BABY_PURPLE_WORM]    \
+     || ptr == &mons[PM_GHOUL]               \
+     || ptr == &mons[PM_PIRANHA])
+
 /* monkeys are tamable via bananas but not pacifiable via food,
    otherwise their theft attack could be nullified too easily;
    dogs and cats can be tamed by anything they like to eat and are

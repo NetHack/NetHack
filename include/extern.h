@@ -1699,6 +1699,7 @@ extern int mstrength(struct permonst *);
 /* ### monmove.c ### */
 
 extern boolean mon_would_take_item(struct monst *, struct obj *);
+extern boolean mon_would_consume_item(struct monst *, struct obj *);
 extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
 extern void mon_track_add(struct monst *, coordxy, coordxy);
