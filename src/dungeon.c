@@ -3260,8 +3260,7 @@ show_overview(
     (void) recalc_mapseen();
 
     win = create_nhwindow(NHW_MENU);
-    if (why <= 0)
-        start_menu(win, MENU_BEHAVE_STANDARD);
+    start_menu(win, MENU_BEHAVE_STANDARD);
     /* show the endgame levels before the rest of the dungeon,
        so that the Planes (dnum 5-ish) come out above main dungeon (dnum 0) */
     if (In_endgame(&u.uz))
