@@ -802,7 +802,7 @@ void NetHackQtMenuWindow::ChooseNone()
         itemlist[row].preselected = false; // stale for all rows
         // skip if not selectable or already unselected or fails invert_test()
         if (!itemlist[row].Selectable()
-            || !itemlist[row].selected
+            || (!itemlist[row].selected && !isSelected(row))
             || !menuitem_invert_test(2, itemlist[row].itemflags, TRUE))
             continue;
         itemlist[row].selected = false;

@@ -1583,6 +1583,11 @@ Qt: changes in glyph handling in the core introduced a bug in the "paper doll"
 Qt: during role selection, icons for role and race showed giant ant tile after
 	the glyph overhaul changes
 Qt: resolve a use-after-free error when saving message history
+Qt: with a pick-one menu containing a pre-selected entry, clicking on that
+	worked to re-select it, as intended; clicking on any other entry
+	instead of typing the selector letter toggled off preselected entry
+	but failed to toggle on the explicitly selected one; clicking again
+	after nothing was pre-selected anymore refused to toggle anything on
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
