@@ -2943,7 +2943,7 @@ launch_obj(
         /* dstage@u.washington.edu -- Delay only if hero sees it */
         if (cansee(gb.bhitpos.x, gb.bhitpos.y))
             while (tmp-- > 0)
-                delay_output();
+                nh_delay_output();
 
         gb.bhitpos.x += dx;
         gb.bhitpos.y += dy;

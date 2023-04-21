@@ -1725,10 +1725,10 @@ X11_sig_cb(XtPointer not_used, XtSignalId *id)
 }
 #endif
 
-/* delay_output ----------------------------------------------------------- */
+/* X11_delay_output ------------------------------------------------------- */
 
 /*
- * Timeout callback for delay_output().  Send a fake message to the map
+ * Timeout callback for X11_delay_output().  Send a fake message to the map
  * window.
  */
 /* ARGSUSED */

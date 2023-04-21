@@ -1032,7 +1032,7 @@ shieldeff(coordxy x, coordxy y)
         for (i = 0; i < SHIELD_COUNT; i++) {
             show_glyph(x, y, cmap_to_glyph(shield_static[i]));
             flush_screen(1); /* make sure the glyph shows up */
-            delay_output();
+            nh_delay_output();
         }
         newsym(x, y); /* restore the old information */
     }
@@ -1050,7 +1050,7 @@ tether_glyph(coordxy x, coordxy y)
 /*
  * tmp_at()
  *
- * Temporarily place glyphs on the screen.  Do not call delay_output().  It
+ * Temporarily place glyphs on the screen.  Do not call nh_delay_output().  It
  * is up to the caller to decide if it wants to wait [presently, everyone
  * but explode() wants to delay].
  *
@@ -1145,7 +1145,7 @@ tmp_at(coordxy x, coordxy y)
                         show_glyph(tglyph->saved[i - 1].x,
                                    tglyph->saved[i - 1].y, tglyph->glyph);
                         flush_screen(0); /* make sure it shows up */
-                        delay_output();
+                        nh_delay_output();
                     }
                     tglyph->sidx = 1;
                 }
@@ -1229,7 +1229,7 @@ flash_glyph_at(coordxy x, coordxy y, int tg, int rpt)
     for (i = 0; i < rpt; i++) {
         show_glyph(x, y, glyph[i % 2]);
         flush_screen(1);
-        delay_output();
+        nh_delay_output();
     }
 }
 

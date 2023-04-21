@@ -3772,7 +3772,7 @@ bhit(
                 newsym(x, y);
             }
             tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-            delay_output();
+            nh_delay_output();
             /* kicked objects fall in pools */
             if ((weapon == KICKED_WEAPON)
                 && (is_pool(gb.bhitpos.x, gb.bhitpos.y)
@@ -3891,7 +3891,7 @@ boomhit(struct obj *obj, coordxy dx, coordxy dy)
             }
         }
         tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-        delay_output();
+        nh_delay_output();
         if (IS_SINK(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
             Soundeffect(se_boomerang_klonk, 75);
             if (!Deaf)
@@ -4467,7 +4467,7 @@ dobuzz(
             if (ZAP_POS(levl[sx][sy].typ)
                 || (isok(lsx, lsy) && cansee(lsx, lsy)))
                 tmp_at(sx, sy);
-            delay_output(); /* wait a little */
+            nh_delay_output(); /* wait a little */
         }
 
         /* hit() and miss() need gb.bhitpos to match the target */

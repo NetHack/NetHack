@@ -562,7 +562,7 @@ static struct window_procs hup_procs = {
     hup_int_ndecl,                                    /* doprev_message */
     hup_yn_function, hup_getlin, hup_int_ndecl,       /* get_ext_cmd */
     hup_void_fdecl_int,                               /* number_pad */
-    hup_void_ndecl,                                   /* delay_output  */
+    hup_void_ndecl,                                   /* nh_delay_output  */
 #ifdef CHANGE_COLOR
     hup_change_color,
 #ifdef MAC

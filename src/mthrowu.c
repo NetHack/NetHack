@@ -757,10 +757,10 @@ m_throw(
             break;
         }
         tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-        delay_output();
+        nh_delay_output();
     }
     tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-    delay_output();
+    nh_delay_output();
     tmp_at(DISP_END, 0);
     gm.mesg_given = 0; /* reset */
 

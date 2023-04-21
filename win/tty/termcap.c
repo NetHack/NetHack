@@ -837,7 +837,6 @@ cl_eos(void) /* free after Robert Viduya */
     macros used elsewhere within nethack; fortunately they're
     not needed beyond this point, so we don't need to worry
     about reconstructing them after the header file inclusion. */
-#undef delay_output
 #undef TRUE
 #undef FALSE
 #define m_move curses_m_move /* Some curses.h decl m_move(), not used here */

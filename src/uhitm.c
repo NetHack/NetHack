@@ -4605,8 +4605,8 @@ start_engulf(struct monst *mdef)
     You("%s %s%s!",
         u_digest ? "swallow" : u_enfold ? "enclose" : "engulf",
         mon_nam(mdef), u_digest ? " whole" : "");
-    delay_output();
-    delay_output();
+    nh_delay_output();
+    nh_delay_output();
 }
 
 static void

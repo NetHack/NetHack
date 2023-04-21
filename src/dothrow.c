@@ -971,7 +971,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     if (--*range < 0) /* make sure our range never goes negative */
         *range = 0;
     if (*range != 0)
-        delay_output();
+        nh_delay_output();
     return TRUE;
 }
 
@@ -1014,7 +1014,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             vision_recalc(0); /* new location => different lines of sight */
         }
         flush_screen(1);
-        delay_output();
+        nh_delay_output();
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
@@ -1411,7 +1411,7 @@ sho_obj_return_to_u(struct obj *obj)
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
         while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
-            delay_output();
+            nh_delay_output();
             x -= u.dx;
             y -= u.dy;
         }
@@ -1707,7 +1707,7 @@ throwit(struct obj *obj,
             || obj->oclass == VENOM_CLASS) {
             tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
             tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-            delay_output();
+            nh_delay_output();
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(gb.bhitpos.x, gb.bhitpos.y));
             breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE);

@@ -282,7 +282,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
     }
 
     if (obj) { /* take thrown/kicked candle or lamp off the map */
-        delay_output();
+        nh_delay_output();
         remove_object(obj);
     }
 }

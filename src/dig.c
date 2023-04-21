@@ -122,7 +122,7 @@ mkcavearea(boolean rockit)
         }
 
         flush_screen(1); /* make sure the new glyphs shows up */
-        delay_output();
+        nh_delay_output();
     }
 
     if (!rockit && levl[u.ux][u.uy].typ == CORR) {
@@ -1492,7 +1492,7 @@ zap_dig(void)
             break;
         room = &levl[zx][zy];
         tmp_at(zx, zy);
-        delay_output(); /* wait a little bit */
+        nh_delay_output(); /* wait a little bit */
 
         if (pitdig) { /* we are already in a pit if this is true */
             coord cc;
