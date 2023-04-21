@@ -7107,10 +7107,12 @@ parsebindings(char *bindings)
  *
  */
 
-static const struct color_names {
+struct color_names {
     const char *name;
     int color;
-} colornames[] = {
+};
+
+static const struct color_names colornames[] = {
     { "black", CLR_BLACK },
     { "red", CLR_RED },
     { "green", CLR_GREEN },
@@ -7127,7 +7129,7 @@ static const struct color_names {
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { "no color", NO_COLOR },
-    { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { (const char *) 0, CLR_BLACK }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
     { "purple", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
@@ -7140,10 +7142,12 @@ static const struct color_names {
     { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
-static const struct attr_names {
+struct attr_names {
     const char *name;
     int attr;
-} attrnames[] = {
+};
+
+static const struct attr_names attrnames[] = {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
@@ -7151,7 +7155,7 @@ static const struct attr_names {
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },
-    { NULL, ATR_NONE }, /* everything after this is an alias */
+    { (const char *) 0, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
     { "uline", ATR_ULINE },
     { "reverse", ATR_INVERSE },

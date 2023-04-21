@@ -99,15 +99,15 @@ static struct ll_achieve_msg achieve_msg [] = {
 /* macros to simplify output of enlightenment messages; also used by
    conduct and achievements */
 #define enl_msg(prefix, present, past, suffix, ps) \
-    enlght_line(prefix, final ? past : present, suffix, ps)
-#define you_are(attr, ps) enl_msg(You_, are, were, attr, ps)
-#define you_have(attr, ps) enl_msg(You_, have, had, attr, ps)
-#define you_can(attr, ps) enl_msg(You_, can, could, attr, ps)
-#define you_have_been(goodthing) enl_msg(You_, have_been, were, goodthing, "")
+    enlght_line((prefix), final ? (past) : (present), (suffix), (ps))
+#define you_are(attr, ps) enl_msg(You_, are, were, (attr), (ps))
+#define you_have(attr, ps) enl_msg(You_, have, had, (attr), (ps))
+#define you_can(attr, ps) enl_msg(You_, can, could, (attr), (ps))
+#define you_have_been(goodthing) enl_msg(You_, have_been, were, (goodthing), "")
 #define you_have_never(badthing) \
-    enl_msg(You_, have_never, never, badthing, "")
+    enl_msg(You_, have_never, never, (badthing), "")
 #define you_have_X(something) \
-    enl_msg(You_, have, (const char *) "", something, "")
+    enl_msg(You_, have, (const char *) "", (something), "")
 
 static void
 enlght_out(const char *buf)

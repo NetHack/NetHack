@@ -49,11 +49,4 @@
 #define DRAGON_SILVER CLR_BRIGHT_CYAN
 #define HI_ZAP CLR_BRIGHT_BLUE
 
-struct menucoloring {
-    struct nhregex *match;
-    char *origstr;
-    int color, attr;
-    struct menucoloring *next;
-};
-
 #endif /* COLOR_H */

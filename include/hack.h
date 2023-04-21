@@ -11,6 +11,7 @@
 #endif
 #include "lint.h"
 
+#include "color.h"
 #include "align.h"
 #include "dungeon.h"
 #include "objclass.h"
@@ -23,7 +24,6 @@
 #include "display.h"
 
 #include "botl.h"
-#include "color.h"
 #include "context.h"
 #include "dungeon.h"
 #include "engrave.h"
@@ -561,6 +561,12 @@ typedef struct ls_t {
     anything id; /* source's identifier */
 } light_source;
 
+struct menucoloring {
+    struct nhregex *match;
+    char *origstr;
+    int color, attr;
+    struct menucoloring *next;
+};
 
 enum movemodes {
     MV_ANY = -1,
