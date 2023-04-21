@@ -2309,7 +2309,10 @@ glyphinfo_at(coordxy x, coordxy y, int glyph)
  */
 
 static void
-get_bkglyph_and_framecolor(coordxy x, coordxy y, int *bkglyph, uint32 *framecolor)
+get_bkglyph_and_framecolor(
+    coordxy x, coordxy y,
+    int *bkglyph,
+    uint32 *framecolor)
 {
     int idx, tmp_bkglyph = GLYPH_UNEXPLORED;
     struct rm *lev = &levl[x][y];
@@ -3179,7 +3182,8 @@ const seenV seenv_matrix[3][3] = {
     { SV4, SV5,   SV6 }
 };
 
-#define sign(z) ((z) < 0 ? -1 : ((z) > 0 ? 1 : 0))
+/* negative: -1, zero: 0, positive +1; same as sgn() function (hacklib.c) */
+#define sign(z) ((z) < 0 ? -1 : ((z) != 0))
 
 /* Set the seen vector of lev as if seen from (x0,y0) to (x,y). */
 static void
@@ -3192,6 +3196,8 @@ set_seenv(
 
     lev->seenv |= seenv_matrix[sign(dy) + 1][sign(dx) + 1];
 }
+
+#undef sign
 
 /* Called by blackout(vault.c) when vault guard removes temporary corridor,
    turning spot <x0,y0> back into stone; <x1,y1> is an adjacent spot. */
@@ -3640,4 +3646,20 @@ fn_cmap_to_glyph(int cmap)
 {
     return cmap_to_glyph(cmap);
 }
+
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler (there are lots of other
+   macros defined above...) */
+#undef remember_topology
+#undef DETECTED
+#undef PHYSICALLY_SEEN
+#undef is_worm_tail
+#undef TMP_AT_MAX_GLYPHS
+#undef Glyphinfo_at
+#undef reset_glyph_bbox
+#undef HAS_ROGUE_IBM_GRAPHICS
+#undef HI_DOMESTIC
+#undef GMAP_SET
+#undef GMAP_ROGUELEVEL
+
 /*display.c*/

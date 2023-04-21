@@ -28,16 +28,18 @@
 #define WT_ELF 800
 #define WT_DRAGON 4500
 
-#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col, bn) \
-    {                                                                      \
-        {(const char *) 0, (const char *) 0, nam}, \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
+            flg1, flg2, flg3, d, col, bn)           \
+    {                                                                       \
+        { (const char *) 0, (const char *) 0, nam },                        \
+            sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)  \
     }
 
-#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col, bn) \
-    {                                                                      \
-        {namm, namf, namn}, \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, \
+             flg1, flg2, flg3, d, col, bn)                        \
+    {                                                                       \
+        { namm, namf, namn },                                               \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)      \
     }
 /* LVL() and SIZ() collect several fields to cut down on number of args
  * for MON()
@@ -71,11 +73,29 @@ struct permonst mons[SIZE(mons_init)];
 void
 monst_globals_init(void)
 {
-    memcpy(mons, mons_init, sizeof(mons));
+    memcpy(mons, mons_init, sizeof mons);
     return;
 }
 
 const struct attack c_sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
 const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef C
+#define C(c) (0x1f & (c)) /* global.h */
+#ifdef TEXTCOLOR
+#undef HI_DOMESTIC
+#undef HI_LORD
+#endif
+#undef NO_ATTK
+#undef WT_ELF
+#undef WT_DRAGON
+#undef MON
+#undef MON3
+#undef LVL
+#undef SIZ
+#undef ATTK
+#undef A
 
 /*monst.c*/

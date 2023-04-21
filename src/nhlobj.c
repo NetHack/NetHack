@@ -655,3 +655,8 @@ l_obj_register(lua_State *L)
     return 0;
 }
 
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef lobj_is_ok
+
+/*nhlobj.c*/

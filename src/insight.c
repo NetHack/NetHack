@@ -3222,4 +3222,14 @@ ustatusline(void)
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
 
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef enl_msg
+#undef you_are
+#undef you_have
+#undef you_can
+#undef you_have_been
+#undef you_have_never
+#undef you_have_X
+
 /*insight.c*/
