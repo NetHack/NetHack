@@ -56,7 +56,8 @@ endif  # WANT_WIN_QT
 #
 #-INCLUDE multiw-3.370
 
-ifeq "$(NEED_ASAN)" "1"
+ifeq "$(USE_ASAN)" "1"
+CFLAGS+=-fsanitize=address
 LFLAGS+=-fsanitize=address
 endif
 
