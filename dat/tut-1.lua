@@ -196,7 +196,13 @@ des.engraving({ coord = { 45,6 }, type = "engrave", text = "Magic wands are used
 
 --
 
-des.engraving({ coord = { 36,9 }, type = "engrave", text = "You can run by prefixing a movement key with '" .. nh.eckey("run") .. "'", degrade = false });
+des.door({ coord = { 35,9 }, state = "nodoor" });
+des.engraving({ coord = { 34,9 }, type = "engrave", text = "You can run by prefixing a movement key with '" .. nh.eckey("run") .. "'", degrade = false });
+
+--
+
+des.door({ coord = { 33,16 }, state = "nodoor" });
+des.engraving({ coord = { 35,15 }, type = "engrave", text = "Travel across the level with '" .. nh.eckey("travel") .. "'", degrade = false });
 
 --
 
