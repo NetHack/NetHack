@@ -502,22 +502,24 @@ show_mon_or_warn(coordxy x, coordxy y, int monglyph)
  *
  */
 static void
-display_monster(coordxy x, coordxy y,    /* display position */
-                struct monst *mon,   /* monster to display */
-                int sightflags,      /* 1 if the monster is physically seen;
-                                        2 if detected using Detect_monsters */
-                boolean worm_tail)   /* mon is actually a worm tail */
+display_monster(
+    coordxy x, coordxy y,   /* display position */
+    struct monst *mon,      /* monster to display */
+    int sightflags,         /* 1 if the monster is physically seen;
+                             * 2 if detected using Detect_monsters */
+    boolean worm_tail)      /* mon is actually a worm tail */
 {
     boolean mon_mimic = (M_AP_TYPE(mon) != M_AP_NOTHING);
     int sensed = (mon_mimic && (Protection_from_shape_changers
-                                || sensemon(mon)));
+                                || sensemon(mon))),
+        mgendercode = mon->female ? FEMALE : MALE;
+
     /*
      * We must do the mimic check first.  If the mimic is mimicing something,
      * and the location is in sight, we have to change the hero's memory
      * so that when the position is out of sight, the hero remembers what
      * the mimic was mimicing.
      */
-
     if (mon_mimic && (sightflags == PHYSICALLY_SEEN)) {
         switch (M_AP_TYPE(mon)) {
         default:
@@ -563,13 +565,13 @@ display_monster(coordxy x, coordxy y,    /* display position */
             break;
         }
 
-        case M_AP_MONSTER:
-            show_glyph(x, y,
-                       monnum_to_glyph(what_mon((int) mon->mappearance,
-                                                rn2_on_display_rng),
-                                       mon->female ? FEMALE : MALE));
+        case M_AP_MONSTER: {
+            int mndx = what_mon((int) mon->mappearance, rn2_on_display_rng);
+
+            show_glyph(x, y, monnum_to_glyph(mndx, mgendercode));
             break;
-        }
+        } /* case M_AP_MONSTER */
+        } /* switch M_AP_TYPE() */
     }
 
     /* If mimic is unsuccessfully mimicing something, display the monster. */
@@ -586,26 +588,26 @@ display_monster(coordxy x, coordxy y,    /* display position */
          */
         if (mon->mtame && !Hallucination) {
             if (worm_tail)
-                num = petnum_to_glyph(PM_LONG_WORM_TAIL,
-                        mon->female ? FEMALE : MALE);
+                num = petnum_to_glyph(PM_LONG_WORM_TAIL, mgendercode);
             else
                 num = pet_to_glyph(mon, rn2_on_display_rng);
         } else if (sightflags == DETECTED) {
             if (worm_tail)
-                num = detected_monnum_to_glyph(
-                             what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng),
-                            mon->female ? FEMALE : MALE);
+                num = detected_monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL,
+                                                        rn2_on_display_rng),
+                                               mgendercode);
             else
                 num = detected_mon_to_glyph(mon, rn2_on_display_rng);
         } else {
             if (worm_tail)
-                num = monnum_to_glyph(
-                             what_mon(PM_LONG_WORM_TAIL, rn2_on_display_rng),
-                             mon->female ? FEMALE : MALE);
+                num = monnum_to_glyph(what_mon(PM_LONG_WORM_TAIL,
+                                               rn2_on_display_rng),
+                                      mgendercode);
             else
                 num = mon_to_glyph(mon, rn2_on_display_rng);
         }
         show_mon_or_warn(x, y, num);
+        mon->meverseen = 1;
     }
 }
 
@@ -1405,13 +1407,24 @@ see_monsters(void)
     if (gd.defer_see_monsters)
         return;
 
+    /* steed and unseen engulfer/holder/holdee are recognized via touch
+       even if they don't aren't going to be rendered; other monsters
+       may get flagged as having been seen by display_monster() if it's
+       called by newsym() */
+    if (u.usteed)
+        u.usteed->meverseen = 1;
+    if (u.ustuck)
+        u.ustuck->meverseen = 1;
+
+    /* loop through level.monsters (aka fmon) */
     for (mon = fmon; mon; mon = mon->nmon) {
         if (DEADMONSTER(mon))
             continue;
         newsym(mon->mx, mon->my);
         if (mon->wormno)
             see_wsegs(mon);
-        if (Warn_of_mon && (gc.context.warntype.obj & mon->data->mflags2) != 0L)
+        if (Warn_of_mon
+            && (gc.context.warntype.obj & mon->data->mflags2) != 0L)
             new_warn_obj_cnt++;
     }
 

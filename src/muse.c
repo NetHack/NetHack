@@ -240,15 +240,20 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
     if (vismon) {
         /* directly see the monster reading the scroll */
         pline("%s reads %s!", Monnam(mtmp), onambuf);
-    } else {
+    } else { /* !Deaf, otherwise we wouldn't reach here */
         char blindbuf[BUFSZ];
-
-        boolean m_is_like_u = (!Hallucination
-                               && same_race(gy.youmonst.data, mtmp->data));
-        /* describe the unseen monster accurately if it is similar to the
-           hero's current form (unless hallucinating), else use "someone" */
+        boolean similar = same_race(gy.youmonst.data, mtmp->data),
+                uniqmon = ((mtmp->data->geno & G_UNIQ) != 0
+                           /* shopkeepers aren't unique monsters but since
+                              they have distinct names, treat them as such */
+                           || mtmp->isshk),
+                recognize = (!Hallucination
+                             && (mtmp->meverseen || (similar && !uniqmon)));
+        /* describe unseen monster accurately when not hallucinating if it
+           has ever been seen or is the same race as the hero (not yet seen
+           unique monsters excepted) */
         int mflags = (SUPPRESS_INVISIBLE | SUPPRESS_SADDLE
-                      | (m_is_like_u ? SUPPRESS_IT : AUGMENT_IT));
+                      | (recognize ? SUPPRESS_IT : AUGMENT_IT));
 
         /* monster can't be seen; hero might be blind or monster might
            be at a spot that isn't in view or might be invisible; remember
@@ -263,7 +268,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
                  blindbuf);
     }
-    if (mtmp->mconf)
+    if (mtmp->mconf) /* (note: won't get if not seen and hero can't hear) */
         pline("Being confused, %s mispronounces the magic words...",
               vismon ? mon_nam(mtmp) : mhe(mtmp));
 }

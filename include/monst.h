@@ -156,7 +156,7 @@ struct monst {
     Bitfield(iswiz, 1);     /* is the Wizard of Yendor */
     Bitfield(wormno, 5);    /* at most 31 worms on any level */
     Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
-    /* 1 free bit */
+    Bitfield(meverseen, 1); /* mon has been seen at some point */
 
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 

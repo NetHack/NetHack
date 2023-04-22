@@ -1002,6 +1002,8 @@ recharge(struct obj* obj, int curse_bless)
 static void
 forget(int howmuch)
 {
+    struct monst *mtmp;
+
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
 
@@ -1010,6 +1012,14 @@ forget(int howmuch)
 
     /* Forget some skills. */
     drain_weapon_skill(rnd(howmuch ? 5 : 3));
+
+    /* forget having seen monsts (affects recognizing unseen ones by sound) */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (mtmp != u.usteed && mtmp != u.ustuck)
+            mtmp->meverseen = 0;
+    /* [perhaps ought to forget having seen every monster on every level] */
+    for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon)
+        mtmp->meverseen = 0;
 }
 
 /* monster is hit by scroll of taming's effect */

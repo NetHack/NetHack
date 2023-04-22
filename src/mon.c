@@ -4822,6 +4822,8 @@ newcham(
         place_worm_tail_randomly(mtmp, mtmp->mx, mtmp->my);
     }
 
+    mtmp->meverseen = 0; /* never seen mon in present shape; newsym() ->
+                          * display_monster() may change it right back */
     newsym(mtmp->mx, mtmp->my);
 
     if (msg) {
