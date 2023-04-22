@@ -3,14 +3,6 @@
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
 
-#ifndef WT_ELF
-#define WT_ELF 800
-#endif
-
-#ifndef WT_DRAGON
-#define WT_DRAGON 4500
-#endif
-
 #if defined(MONS_ENUM)
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, \
             col, bn) PM_##bn

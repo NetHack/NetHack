@@ -25,9 +25,6 @@
         0, 0, 0, 0 \
     }
 
-#define WT_ELF 800
-#define WT_DRAGON 4500
-
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
             flg1, flg2, flg3, d, col, bn)           \
     {                                                                       \
@@ -89,8 +86,6 @@ const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
 #undef HI_LORD
 #endif
 #undef NO_ATTK
-#undef WT_ELF
-#undef WT_DRAGON
 #undef MON
 #undef MON3
 #undef LVL
