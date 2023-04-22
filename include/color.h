@@ -1,4 +1,4 @@
-/* NetHack 3.7	color.h	$NHDT-Date: 1596498528 2020/08/03 23:48:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.15 $ */
+/* NetHack 3.7	color.h	$NHDT-Date: 1682205020 2023/04/22 23:10:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Steve Linhart, Eric Raymond, 1989. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -32,6 +32,10 @@
 /* The "half-way" point for tty-based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
 #define BRIGHT 8
+
+/* color aliases used in monsters.h and display.c  */
+#define HI_DOMESTIC CLR_WHITE /* for player + pets */
+#define HI_LORD CLR_MAGENTA /* for high-end monsters */
 
 /* these can be configured */
 #define HI_OBJ CLR_MAGENTA

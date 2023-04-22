@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.c	$NHDT-Date: 1616891049 2021/03/28 00:24:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1682205027 2023/04/22 23:10:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,8 +14,6 @@
 #ifdef TEXTCOLOR
 #include "color.h"
 #define C(color) color
-#define HI_DOMESTIC CLR_WHITE /* use for player + friendlies */
-#define HI_LORD CLR_MAGENTA
 #else
 #define C(color)
 #endif
@@ -81,10 +79,6 @@ const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
    end of the source code seen by the compiler */
 #undef C
 #define C(c) (0x1f & (c)) /* global.h */
-#ifdef TEXTCOLOR
-#undef HI_DOMESTIC
-#undef HI_LORD
-#endif
 #undef NO_ATTK
 #undef MON
 #undef MON3

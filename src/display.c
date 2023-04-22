@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1672561294 2023/01/01 08:21:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1682205030 2023/04/22 23:10:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2403,7 +2403,6 @@ get_bkglyph_and_framecolor(
 #define HAS_ROGUE_IBM_GRAPHICS \
     (gc.currentgraphics == ROGUESET && SYMHANDLING(H_IBM))
 #endif
-#define HI_DOMESTIC CLR_WHITE /* monst.c */
 
 /* masks for per-level variances kept in gg.glyphmap_perlevel_flags */
 #define GMAP_SET            0x0001
@@ -3671,7 +3670,6 @@ fn_cmap_to_glyph(int cmap)
 #undef Glyphinfo_at
 #undef reset_glyph_bbox
 #undef HAS_ROGUE_IBM_GRAPHICS
-#undef HI_DOMESTIC
 #undef GMAP_SET
 #undef GMAP_ROGUELEVEL
 
