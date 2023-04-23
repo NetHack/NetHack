@@ -547,7 +547,7 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sndprocs.h seffects.h sys.h system.h tcap.h timeout.h \
+	spell.h sndprocs.h seffects.h sys.h tcap.h timeout.h \
 	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
 	winX.h winprocs.h wintype.h you.h youprop.h cstd.h
 

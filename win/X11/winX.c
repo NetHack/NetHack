@@ -1585,7 +1585,7 @@ X11_init_nhwindows(int *argcp, char **argv)
      * when opening X11 connections, in case the user is using xauth, since
      * the "games" or whatever user probably doesn't have permission to open
      * a window on the user's display.  This code is harmless if the binary
-     * is not installed setuid.  See include/system.h on compilation failures.
+     * is not installed setuid.
      */
     savuid = geteuid();
     (void) seteuid(getuid());
