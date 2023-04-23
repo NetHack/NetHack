@@ -1,10 +1,14 @@
-  NetHack Porting Guidelines		v 3.7			2019-12-05
+  NetHack Porting Guidelines		v 3.7			2023-04-23
 
 
      1.0	Introduction
 
 	This document goes through the steps required to port NetHack to a
-new machine.  The basic steps in porting the program are:
+new machine, with the intention of compiling natively on that machine. If
+you are cross-compiling for one platform on another, it is suggested that
+you read Cross-compiling.
+
+The basic steps in porting the program using a native compiler are:
 
 	1.  Get the code onto your build machine.  The parts of the current
 	    directory setup you definitely need include src (NetHack code
@@ -36,7 +40,7 @@ new machine.  The basic steps in porting the program are:
 
 	2.  Modify the appropriate include files to customize NetHack to
 	    your system.  You may need to add a new OS-specific "*conf.h"
-	    file (see unixconf.h, pcconf.h, tosconf.h, etc. as examples).
+	    file (see unixconf.h, windconf.h, pcconf.h, etc. as examples).
 
 	3.  If your machine uses a new OS instead of a variant of existing
 	    OSes, add a new sys subdirectory.  Add, if required, a OS-
@@ -108,12 +112,6 @@ wrote for your system.
 you must enter the names of the new external references (the functions defined
 there for external use) in this file.
 
-     2.4	system.h
-
-	This file contains references for all hooks into the OS (via the
-standard "C" libraries).  Depending on what your standard library looks like,
-you may have to put new entries into this file.
-
 
      3.0	Source files
 
@@ -138,18 +136,12 @@ add to one of those provided.
 
 	If your system wants to use tty windowing and it doesn't run off
 of a termcap or terminfo database, you may have to put the appropriate
-terminal control strings into termcap.c.  This has already been done for
-MSDOS, and these mods can be used as an example.  You can also consider
-using the termcap code from sys/share/tclib.c or sys/share/termcap.uu,
-especially if your system supports multiple kinds of terminals.
-
-     3.3	main.c
-
-	You may need to create a new "main.c" module.  If you do, call it
-[OS]main.c where the [OS] is replaced with the name of the OS you are porting
-to.  This file contains the mainline module, which reads options from the
-command line (or wherever) and processes them.  It also contains various
-functions associated with game startup.
+terminal control strings into termcap.c. You can also consider using the
+termcap code from sys/share/tclib.c or sys/share/termcap.uu, especially if
+your system supports multiple kinds of terminals. Alternatively, you can
+define NO_TERMS and provide alternative screen handling in a 
+platform-specific module. That has already been done for MSDOS and for
+the Windows console, and those mods can be used as an example.
 
      3.4	tty.c
 
@@ -263,7 +255,7 @@ processing by the embeded Lua interpreter during game execution.
 
 	Some of the build and option information that was formerly produced at
 build-time by makedefs, and contained information about the game platform and
-options selected during the build of the game can now be produced at run-time
+options selected during the build of the game, can now be produced at run-time
 by code within the game itself. That was done to facilitate cross-compiling of
 NetHack on one platform for game execution on another.
 
