@@ -97,10 +97,10 @@ monst.h       monsters.h    obj.h         objclass.h    objects.h
 optlist.h     patchlevel.h  pcconf.h      permonst.h    prop.h
 quest.h       rect.h        region.h      rm.h          seffects.h
 skills.h      sndprocs.h    sp_lev.h      spell.h       sym.h
-sys.h         system.h      tcap.h        tileset.h     timeout.h
-tradstdc.h    trap.h        unixconf.h    vision.h      vmsconf.h
-warnings.h    winami.h      wincurs.h     windconf.h    winprocs.h
-wintype.h     you.h         youprop.h
+sys.h         tcap.h        tileset.h     timeout.h     tradstdc.h
+trap.h        unixconf.h    vision.h      vmsconf.h     warnings.h
+winami.h      wincurs.h     windconf.h    winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -121,8 +121,8 @@ bitmfile.h  gem_rsc.h   load_img.h  wingem.h
 winGnome.h
 
 (files for all versions)
-amiconf.h   beconf.h    def_os2.h   os2conf.h   tosconf.h   trampoli.h
-wceconf.h
+amiconf.h   beconf.h    def_os2.h   os2conf.h   system.h    tosconf.h
+trampoli.h  wceconf.h
 
 (files for various Macintosh versions)
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
