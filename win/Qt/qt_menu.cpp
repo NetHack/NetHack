@@ -1284,11 +1284,21 @@ NetHackQtMenuOrTextWindow::NetHackQtMenuOrTextWindow(QWidget *parent_) :
 {
 }
 
+// StartMenu() turns a MenuOrTextWindow into a MenuWindow,
+// PutStr() turns one into a TextWindow;
+// calling any other MenuOrTextWindow routine before either of those
+// elicits a warning.  (Should probably quit via panic() instead.)
+void NetHackQtMenuOrTextWindow::MenuOrText_too_soon_warning(const char *which)
+{
+    impossible("'%s' called before we know whether window is Menu or Text.",
+               which);
+}
+
 QWidget* NetHackQtMenuOrTextWindow::Widget()
 {
     QWidget *result = NULL;
     if (!actual)
-        impossible("Widget called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("Widget");
     else
         result = actual->Widget();
     return result;
@@ -1298,14 +1308,14 @@ QWidget* NetHackQtMenuOrTextWindow::Widget()
 void NetHackQtMenuOrTextWindow::Clear()
 {
     if (!actual)
-        impossible("Clear called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("Clear");
     else
         actual->Clear();
 }
 void NetHackQtMenuOrTextWindow::Display(bool block)
 {
     if (!actual)
-        impossible("Display called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("Display");
     else
         actual->Display(block);
 }
@@ -1313,45 +1323,47 @@ bool NetHackQtMenuOrTextWindow::Destroy()
 {
     bool result = false;
     if (!actual)
-        impossible("Destroy called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("Destroy");
     else
         result = actual->Destroy();
     return result;
 }
-
 void NetHackQtMenuOrTextWindow::PutStr(int attr, const QString& text)
 {
-    if (!actual) actual=new NetHackQtTextWindow(parent);
-    actual->PutStr(attr,text);
+    if (!actual)
+        actual = new NetHackQtTextWindow(parent);
+    actual->PutStr(attr, text);
 }
 
 // Menu
 void NetHackQtMenuOrTextWindow::StartMenu(bool using_WIN_INVEN)
 {
-    if (!actual) actual=new NetHackQtMenuWindow(parent);
+    if (!actual)
+        actual = new NetHackQtMenuWindow(parent);
     actual->StartMenu(using_WIN_INVEN);
 }
-void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
-                                        char ch, char gch, int attr,
-                                        const QString& str, unsigned itemflags)
+void NetHackQtMenuOrTextWindow::AddMenu(
+    int glyph, const ANY_P* identifier,
+    char ch, char gch, int attr,
+    const QString& str, unsigned itemflags)
 {
     if (!actual)
-        impossible("AddMenu called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("AddMenu");
     else
         actual->AddMenu(glyph, identifier, ch, gch, attr, str, itemflags);
 }
 void NetHackQtMenuOrTextWindow::EndMenu(const QString& prompt)
 {
     if (!actual)
-        impossible("EndMenu called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("EndMenu");
     else
         actual->EndMenu(prompt);
 }
 int NetHackQtMenuOrTextWindow::SelectMenu(int how, MENU_ITEM_P **menu_list)
 {
-    int result = -1;
+    int result = -1; // cancelled
     if (!actual)
-        impossible("SelectMenu called before we know if Menu or Text");
+        MenuOrText_too_soon_warning("SelectMenu");
     else
         result = actual->SelectMenu(how, menu_list);
     return result;
