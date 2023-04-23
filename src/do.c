@@ -299,7 +299,8 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
             (void) obj_meld(&obj, &otmp);
         }
         res = (boolean) !obj;
-    } else if (IS_ALTAR(levl[x][y].typ) && cansee(x,y)) {
+    } else if (gc.context.mon_moving && IS_ALTAR(levl[x][y].typ)
+               && cansee(x,y)) {
         doaltarobj(obj);
     }
 
