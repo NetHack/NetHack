@@ -99,7 +99,6 @@ vpline(const char *line, va_list the_args)
     char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
     int msgtyp;
-    int vlen = 0;
     boolean no_repeat;
 
     if (!line || !*line)
@@ -111,24 +110,33 @@ vpline(const char *line, va_list the_args)
     if (gp.program_state.wizkit_wishing)
         return;
 
-    if (strchr(line, '%')) {
-        vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
-        if (vlen >= (int) sizeof pbuf)
-            panic("%s: truncation of buffer at %zu of %d bytes",
-                  "pline", sizeof pbuf, vlen);
-#else
-        nhUse(vlen);
-#endif
+    if (!strchr(line, '%')) {
+        /* format does not specify any substitutions; use it as-is */
+        ln = (int) strlen(line);
+    } else if (line[0] == '%' && line[1] == 's' && !line[2]) {
+        /* "%s" => single string; skip format and use its first argument;
+           unlike with the format, it is irrelevant whether the argument
+           contains any percent signs */
+        line = va_arg(the_args, const char *); /*VA_NEXT(line,const char *);*/
+        ln = (int) strlen(line);
+    } else {
+        /* perform printf() formatting */
+        ln = vsnprintf(pbuf, sizeof pbuf, line, the_args);
         line = pbuf;
+        /* note: 'ln' is number of characters attempted, not necessarily
+           strlen(line); that matters for the overflow check; if we avoid
+           the extremely-too-long panic then 'ln' will be actual length */
     }
-    if ((ln = (int) strlen(line)) > BUFSZ - 1) {
-        if (line != pbuf)                          /* no '%' was present */
-            (void) strncpy(pbuf, line, BUFSZ - 1); /* caveat: unterminated */
-        /* truncate, preserving the final 3 characters:
-           "___ extremely long text" -> "___ extremely l...ext"
+    if (ln > (int) sizeof pbuf - 1) /* extremely too long */
+        panic("pline attempting to print %d characters!", ln);
+
+    if (ln > BUFSZ - 1) {
+        /* too long but modestly so; allow but truncate, preserving final
+           3 chars: "___ extremely long text" -> "___ extremely l...ext"
            (this may be suboptimal if overflow is less than 3) */
-        memcpy(pbuf + BUFSZ - 1 - 6, "...", 3);
+        if (line != pbuf) /* no '%' was present or format was just "%s" */
+            (void) strncpy(pbuf, line, BUFSZ - 1); /* caveat: unterminated */
+        pbuf[BUFSZ - 1 - 6] = pbuf[BUFSZ - 1 - 5] = pbuf[BUFSZ - 1 - 4] = '.';
         /* avoid strncpy; buffers could overlap if excess is small */
         pbuf[BUFSZ - 1 - 3] = line[ln - 3];
         pbuf[BUFSZ - 1 - 2] = line[ln - 2];
@@ -503,13 +511,16 @@ impossible(const char *s, ...)
         panic("impossible called impossible");
 
     gp.program_state.in_impossible = 1;
-    (void) vsnprintf(pbuf, sizeof(pbuf), s, the_args);
+    (void) vsnprintf(pbuf, sizeof pbuf, s, the_args);
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     if (iflags.debug_fuzzer)
         panic("%s", pbuf);
+
+    gp.pline_flags = URGENT_MESSAGE;
     pline("%s", pbuf);
+    gp.pline_flags = 0;
     /* reuse pbuf[] */
     Strcpy(pbuf, "Program in disorder!");
     if (gp.program_state.something_worth_saving)

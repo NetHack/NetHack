@@ -1149,6 +1149,8 @@ prevent hug attacks and touch or engulf attacks for wrap, stick-to, and
 wand of speed gives temporary speed, potion gives intrinsic
 some monsters (riders, shopkeepers, priests, quest leader) can break boulders
 corpse-eating monsters will go out of their way to eat corpses on the floor
+warnings via impossible() would be unseen if message suppression via ESC at
+	--More-- prompt was in effect
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
