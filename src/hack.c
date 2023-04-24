@@ -3332,8 +3332,7 @@ pickup_checks(void)
         else if (IS_ALTAR(lev->typ))
             pline("Moving the altar would be a very bad idea.");
         else if (lev->typ == STAIRS)
-            pline_The("stairs are solidly fixed to the %s.",
-                      surface(u.ux, u.uy));
+            pline_The("stairs are solidly affixed.");
         else
             There("is nothing here to pick up.");
         return 0;
