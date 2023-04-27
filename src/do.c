@@ -2234,19 +2234,21 @@ donull(void)
 static int
 wipeoff(void)
 {
-    if (u.ucreamed < 4)
-        u.ucreamed = 0;
-    else
-        u.ucreamed -= 4;
-    if (Blinded < 4)
-        Blinded = 0;
-    else
-        Blinded -= 4;
-    if (!Blinded) {
+    unsigned udelta = u.ucreamed;
+    long ldelta = BlindedTimeout;
+
+    if (udelta > 4)
+        udelta = 4;
+    u.ucreamed -= udelta; /*u.ucreamed -= min(u.ucreamed,4);*/
+    if (ldelta > 4L)
+        ldelta = 4L;
+    incr_itimeout(&HBlinded, -ldelta); /*HBlinded -= min(BlindedTimeout,4L);*/
+
+    if (!HBlinded) {
         pline("You've got the glop off.");
         u.ucreamed = 0;
         if (!gulp_blnd_check()) {
-            Blinded = 1;
+            set_itimeout(&HBlinded, 1L);
             make_blinded(0L, TRUE);
         }
         return 0;

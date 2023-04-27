@@ -687,12 +687,15 @@ nh_timeout(void)
                 if (!Stunned)
                     stop_occupation();
                 break;
-            case BLINDED:
-                set_itimeout(&Blinded, 1L);
+            case BLINDED: {
+                boolean was_blind = !!Blind;
+
+                set_itimeout(&HBlinded, 1L);
                 make_blinded(0L, TRUE);
-                if (!Blind)
+                if (was_blind && !Blind)
                     stop_occupation();
                 break;
+            }
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);

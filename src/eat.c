@@ -1723,7 +1723,7 @@ rottenfood(struct obj *obj)
         pline("Everything suddenly goes dark.");
         /* hero is not Blind, but Blinded timer might be nonzero if
            blindness is being overridden by the Eyes of the Overworld */
-        make_blinded((Blinded & TIMEOUT) + (long) d(2, 10), FALSE);
+        make_blinded(BlindedTimeout + (long) d(2, 10), FALSE);
         if (!Blind)
             Your1(vision_clears);
     } else if (!rn2(3)) {

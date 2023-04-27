@@ -1259,7 +1259,7 @@ chest_shatter_msg(struct obj *otmp)
 {
     const char *disposition;
     const char *thing;
-    long save_Blinded;
+    long save_HBlinded, save_BBlinded;
 
     if (otmp->oclass == POTION_CLASS) {
         You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
@@ -1269,10 +1269,10 @@ chest_shatter_msg(struct obj *otmp)
     }
     /* We have functions for distant and singular names, but not one */
     /* which does _both_... */
-    save_Blinded = Blinded;
-    Blinded = 1;
+    save_HBlinded = HBlinded,  save_BBlinded = BBlinded;
+    HBlinded = 1L,  BBlinded = 0L;
     thing = singular(otmp, xname);
-    Blinded = save_Blinded;
+    HBlinded = save_HBlinded,  BBlinded = save_BBlinded;
     switch (objects[otmp->otyp].oc_material) {
     case PAPER:
         disposition = "is torn to shreds";

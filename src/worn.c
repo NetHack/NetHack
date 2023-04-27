@@ -37,7 +37,9 @@ const struct worn {
     ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC) != 0L) ? INVIS        \
      : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) != 0L                   \
         && !Role_if(PM_WIZARD)) ? CLAIRVOYANT                           \
-       : 0)
+       : (is_art(o, ART_EYES_OF_THE_OVERWORLD)                          \
+          && ((m) & W_TOOL) != 0L) ? BLINDED                            \
+         : 0)
 /* note: monsters don't have clairvoyance, so dependency on hero's role here
    has no significant effect on their use of w_blocks() */
 
@@ -1178,4 +1180,7 @@ extract_from_minvent(
         mwepgone(mon); /* unwields and sets weapon_check to NEED_WEAPON */
     }
 }
+
+#undef w_blocks
+
 /*worn.c*/

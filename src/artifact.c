@@ -1692,6 +1692,14 @@ arti_invoke(struct obj *obj)
                 healamt = (u.mhmax + 1 - u.mh) / 2;
             if (healamt || Sick || Slimed || Blinded > creamed)
                 You_feel("better.");
+            if (healamt || Sick || Slimed || BlindedTimeout > creamed)
+                You_feel("%sbetter.",
+                         (!healamt && !Sick && !Slimed
+                          /* when healing temporary blindness (aside from
+                             goop covering face), might still be blind
+                             due to PermaBlind or eyeless polymorph;
+                             vary the message in that situation */
+                          && (HBlinded & ~TIMEOUT) != 0L) ? "slightly " : "");
             else
                 goto nothing_special;
             if (healamt > 0) {
@@ -1704,7 +1712,7 @@ arti_invoke(struct obj *obj)
                 make_sick(0L, (char *) 0, FALSE, SICK_ALL);
             if (Slimed)
                 make_slimed(0L, (char *) 0);
-            if (Blinded > creamed)
+            if (BlindedTimeout > creamed)
                 make_blinded(creamed, FALSE);
             gc.context.botl = TRUE;
             break;

@@ -102,6 +102,7 @@ set_uasmon(void)
     PROPSET(PASSES_WALLS, passes_walls(mdat));
     PROPSET(REGENERATION, regenerates(mdat));
     PROPSET(REFLECTING, (mdat == &mons[PM_SILVER_DRAGON]));
+    PROPSET(BLINDED, !haseyes(mdat));
 #undef PROPSET
 
     float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
@@ -224,7 +225,7 @@ polyman(const char *fmt, const char *arg)
         set_utrap(rn1(6, 2), TT_PIT); /* time to escape resets */
     }
     if (was_blind && !Blind) { /* reverting from eyeless */
-        Blinded = 1L;
+        set_itimeout(&HBlinded, 1L);
         make_blinded(0L, TRUE); /* remove blindness */
     }
     check_strangling(TRUE);
@@ -675,8 +676,7 @@ polyself(int psflags)
     }
 }
 
-/* (try to) make a mntmp monster out of the player;
-   returns 1 if polymorph successful */
+/* (try to) make a mntmp monster out of the player; return 1 if successful */
 int
 polymon(int mntmp)
 {
@@ -839,7 +839,7 @@ polymon(int mntmp)
         set_utrap(rn1(6, 2), TT_PIT); /* time to escape resets */
     }
     if (was_blind && !Blind) { /* previous form was eyeless */
-        Blinded = 1L;
+        set_itimeout(&HBlinded, 1L);
         make_blinded(0L, TRUE); /* remove blindness */
     }
     newsym(u.ux, u.uy); /* Change symbol */

@@ -1759,7 +1759,7 @@ use_offensive(struct monst *mtmp)
         gm.m_using = TRUE;
         if (!Blind) {
             You("are blinded by the flash of light!");
-            make_blinded(Blinded + (long) rnd(1 + 50), FALSE);
+            make_blinded(BlindedTimeout + (long) rnd(1 + 50), FALSE);
         }
         lightdamage(otmp, TRUE, 5);
         gm.m_using = FALSE;

@@ -914,6 +914,11 @@ from_what(int propidx) /* special cases can have negative values */
                                              : ysimple_name(obj));
             else if (propidx == BLINDED && Blindfolded_only)
                 Sprintf(buf, because_of, ysimple_name(ublindf));
+            else if (propidx == BLINDED && u.ucreamed
+                     && BlindedTimeout == (long) u.ucreamed
+                     && !EBlinded && !(HBlinded & ~TIMEOUT))
+                Sprintf(buf, "due to goop coverting your %s",
+                        body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(buf, " pair of ")) != 0)
@@ -927,7 +932,8 @@ from_what(int propidx) /* special cases can have negative values */
                replace this with what_blocks() comparable to what_gives() */
             switch (-propidx) {
             case BLINDED:
-                if (is_art(ublindf, ART_EYES_OF_THE_OVERWORLD))
+                /* wearing the Eyes of the Overworld overrides blindness */
+                if (BBlinded && is_art(ublindf, ART_EYES_OF_THE_OVERWORLD))
                     Sprintf(buf, because_of, bare_artifactname(ublindf));
                 break;
             case INVIS:

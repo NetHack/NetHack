@@ -998,17 +998,16 @@ status_enlightenment(int mode, int final)
     if (Hallucination)
         you_are("hallucinating", "");
     if (Blind) {
-        /* from_what() (currently wizard-mode only) checks !haseyes()
-           before u.uroleplay.blind, so we should too */
+        /* check the reasons in same order as from_what() */
         Sprintf(buf, "%s blind",
-                !haseyes(gy.youmonst.data) ? "innately"
-                : u.uroleplay.blind ? "permanently"
-                  /* better phrasing desperately wanted... */
+                (HBlinded & FROMOUTSIDE) != 0L ? "permanently"
+                : (HBlinded & FROMFORM) ? "innately"
+                  /* better phrasing desparately wanted... */
                   : Blindfolded_only ? "deliberately"
+                    /* timed, possibly combined with blindfold */
                     : "temporarily");
-        if (wizard && (Blinded & TIMEOUT) != 0L
-            && !u.uroleplay.blind && haseyes(gy.youmonst.data))
-            Sprintf(eos(buf), " (%ld)", (Blinded & TIMEOUT));
+        if (wizard && (HBlinded == BlindedTimeout && !Blindfolded))
+            Sprintf(eos(buf), " (%ld)", BlindedTimeout);
         /* !haseyes: avoid "you are innately blind innately" */
         you_are(buf, !haseyes(gy.youmonst.data) ? "" : from_what(BLINDED));
     }
@@ -1493,14 +1492,17 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         you_can("recognize detrimental food", "");
 
     /*** Vision and senses ***/
-    if (!Blind && (Blinded || !haseyes(gy.youmonst.data)))
+    if ((HBlinded || EBlinded) && BBlinded) /* blind w/ blindness blocked */
         you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
     if (See_invisible) {
         if (!Blind)
             enl_msg(You_, "see", "saw", " invisible", from_what(SEE_INVIS));
-        else
+        else if (!PermaBlind)
             enl_msg(You_, "will see", "would have seen",
-                    " invisible when not blind", from_what(SEE_INVIS));
+                    " invisible when not blind", "");
+        else
+            enl_msg(You_, "would see", "would have seen",
+                    " invisible if not blind", "");
     }
     if (Blind_telepat)
         you_are("telepathic", from_what(TELEPAT));
@@ -3177,7 +3179,7 @@ ustatusline(void)
     if (Blind) {
         Strcat(info, ", blind");
         if (u.ucreamed) {
-            if ((long) u.ucreamed < Blinded || Blindfolded
+            if ((long) u.ucreamed < BlindedTimeout || Blindfolded
                 || !haseyes(gy.youmonst.data))
                 Strcat(info, ", cover");
             Strcat(info, "ed by sticky goop");

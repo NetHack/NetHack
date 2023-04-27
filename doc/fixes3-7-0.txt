@@ -1151,6 +1151,9 @@ some monsters (riders, shopkeepers, priests, quest leader) can break boulders
 corpse-eating monsters will go out of their way to eat corpses on the floor
 warnings via impossible() would be unseen if message suppression via ESC at
 	--More-- prompt was in effect
+wearing the Eyes of the Overworld overrides OPTIONS:blind; breaking the
+	always-blind conduct by doing that was intended but having permanent
+	blindness stay cured after removing them was not
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

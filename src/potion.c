@@ -54,8 +54,8 @@ itimeout(long val)
 {
     if (val >= TIMEOUT)
         val = TIMEOUT;
-    else if (val < 1)
-        val = 0;
+    else if (val < 1L)
+        val = 0L;
 
     return val;
 }
@@ -257,16 +257,16 @@ static const char eyemsg[] = "%s momentarily %s.";
 void
 make_blinded(long xtime, boolean talk)
 {
-    long old = Blinded;
+    long old = BlindedTimeout;
     boolean u_could_see, can_see_now;
     const char *eyes;
 
-    /* we need to probe ahead in case the Eyes of the Overworld
+    /* we probe ahead in case the Eyes of the Overworld
        are or will be overriding blindness */
     u_could_see = !Blind;
-    Blinded = xtime ? 1L : 0L;
+    set_itimeout(&HBlinded, xtime ? 1L : 0L);
     can_see_now = !Blind;
-    Blinded = old; /* restore */
+    set_itimeout(&HBlinded, old);
 
     if (Unaware)
         talk = FALSE;
@@ -320,7 +320,7 @@ make_blinded(long xtime, boolean talk)
         }
     }
 
-    set_itimeout(&Blinded, xtime);
+    set_itimeout(&HBlinded, xtime);
 
     if (u_could_see ^ can_see_now) { /* one or the other but not both */
         toggle_blindness();
@@ -1048,9 +1048,9 @@ peffect_speed(struct obj *otmp)
 static void
 peffect_blindness(struct obj *otmp)
 {
-    if (Blind)
+    if (Blind || ((HBlinded || EBlinded) && BBlinded))
         gp.potion_nothing++;
-    make_blinded(itimeout_incr(Blinded,
+    make_blinded(itimeout_incr(BlindedTimeout,
                                rn1(200, 250 - 125 * bcsign(otmp))),
                  (boolean) !Blind);
 }
@@ -2037,7 +2037,7 @@ potionbreathe(struct obj *obj)
             kn++;
             pline("It suddenly gets dark.");
         }
-        make_blinded(itimeout_incr(Blinded, rnd(5)), FALSE);
+        make_blinded(itimeout_incr(BlindedTimeout, rnd(5)), FALSE);
         if (!Blind && !Unaware)
             Your1(vision_clears);
         break;

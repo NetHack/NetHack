@@ -2126,7 +2126,7 @@ wiz_intrinsic(void)
                       oldtimeout ? "increased by" : "set to", amt);
                 break;
             }
-            /* this has to be after incr_timeout() */
+            /* this has to be after incr_itimeout() */
             if (p == LEVITATION || p == FLYING)
                 float_vs_flight();
             else if (p == PROT_FROM_SHAPE_CHANGERS)

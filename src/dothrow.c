@@ -1289,7 +1289,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                 if (otyp == BLINDING_VENOM && !Blind)
                     pline("It blinds you!");
                 u.ucreamed += blindinc;
-                make_blinded(Blinded + (long) blindinc, FALSE);
+                make_blinded(BlindedTimeout + (long) blindinc, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             }

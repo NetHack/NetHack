@@ -1185,7 +1185,7 @@ use_crystal_ball(struct obj **optr)
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
                 pline("%s your vision!", Tobjnam(obj, "damage"));
-                make_blinded((Blinded & TIMEOUT) + impair, FALSE);
+                make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {

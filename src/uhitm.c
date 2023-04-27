@@ -2773,7 +2773,7 @@ mhitm_ad_blnd(
         if (can_blnd(magr, mdef, mattk->aatyp, (struct obj *) 0)) {
             if (!Blind)
                 pline("%s blinds you!", Monnam(magr));
-            make_blinded(Blinded + (long) mhm->damage, FALSE);
+            make_blinded(BlindedTimeout + (long) mhm->damage, FALSE);
             if (!Blind) /* => Eyes of the Overworld */
                 Your1(vision_clears);
         }

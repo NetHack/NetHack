@@ -246,7 +246,7 @@ in_trouble(void)
             return TROUBLE_SADDLE;
     }
 
-    if (Blinded > 1 && haseyes(gy.youmonst.data)
+    if (BlindedTimeout > 1L && !(HBlinded & ~TIMEOUT)
         && (!u.uswallow
             || !attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         return TROUBLE_BLIND;

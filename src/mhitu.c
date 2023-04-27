@@ -1361,7 +1361,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                     Your1(vision_clears);
             } else
                 /* keep him blind until disgorged */
-                make_blinded(Blinded + 1, FALSE);
+                incr_itimeout(&HBlinded, 1L);
         }
         tmp = 0;
         break;

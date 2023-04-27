@@ -134,7 +134,7 @@ cursed_book(struct obj* bp)
         aggravate();
         break;
     case 2:
-        make_blinded(Blinded + rn1(100, 250), TRUE);
+        make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
         break;
     case 3:
         take_gold();
