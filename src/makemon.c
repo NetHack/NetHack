@@ -558,16 +558,18 @@ m_initweap(register struct monst *mtmp)
         (void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
 
-/*
- *   Makes up money for monster's inventory.
- */
+/* create a new stack of gold in monster's inventory */
 void
 mkmonmoney(struct monst *mtmp, long amount)
 {
-    struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
+    /* mk_mplayer() passes rn2(1000) so the amount might be 0 */
+    if (amount > 0L) {
+        struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
 
-    gold->quan = amount;
-    add_to_minv(mtmp, gold);
+        gold->quan = amount;
+        gold->owt = weight(gold);
+        add_to_minv(mtmp, gold);
+    }
 }
 
 static void
