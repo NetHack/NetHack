@@ -400,6 +400,9 @@ Helmet_on(void)
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
         break;
+    case HELM_OF_CAUTION:
+        see_monsters();
+        break;
     case HELM_OF_BRILLIANCE:
         adj_abon(uarmh, uarmh->spe);
         break;
@@ -486,6 +489,7 @@ Helmet_off(void)
         }
         break;
     case HELM_OF_TELEPATHY:
+    case HELM_OF_CAUTION:
         /* need to update ability before calling see_monsters() */
         setworn((struct obj *) 0, W_ARMH);
         see_monsters();
@@ -1400,7 +1404,7 @@ Blindf_off(struct obj *otmp)
    also used by poly_obj() when a worn item gets transformed */
 void
 set_wear(struct obj *obj) /* if null, do all worn items;
-                             otherwise just obj itself */
+                           * otherwise just obj itself */
 {
     gi.initial_don = !obj;
 
@@ -2078,7 +2082,7 @@ accessory_or_armor_on(struct obj *obj)
                 You("are suddenly overcome with shame and change your mind.");
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
-            gc.context.botl = 1; /*for AC after zeroing u.ublessed */
+            gc.context.botl = 1; /* for AC after zeroing u.ublessed */
             return ECMD_TIME;
         }
     } else {

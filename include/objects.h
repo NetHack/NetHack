@@ -441,22 +441,29 @@ HELM("fedora", NoDes,
                                                         FEDORA),
 HELM("cornuthaum", "conical hat",
      0, 1, CLAIRVOYANT,  3, 1,  4, 80, 10, 1, CLOTH, CLR_BLUE,
-                                                        CORNUTHAUM),
         /* name coined by devteam; confers clairvoyance for wizards,
            blocks clairvoyance if worn by role other than wizard */
+                                                        CORNUTHAUM),
 HELM("dunce cap", "conical hat",
      0, 1,           0,  3, 1,  4,  1, 10, 0, CLOTH, CLR_BLUE,
+        /* sets Int and Wis to fixed value of 6, so actually provides
+           protection against death caused by Int being drained below 3 */
                                                         DUNCE_CAP),
 HELM("dented pot", NoDes,
      1, 0,           0,  2, 0, 10,  8,  9, 0, IRON, CLR_BLACK,
                                                         DENTED_POT),
+HELM("helm of brilliance", "crystal helmet",
+     0, 1,           0,  3, 1, 40, 50,  9, 0, GLASS, CLR_WHITE,
+        /* used to be iron and shuffled as "etched helmet" but required
+           special case for the effect of iron armor on spell casting */
+                                                        HELM_OF_BRILLIANCE),
 /* with shuffled appearances... */
 HELM("helmet", "plumed helmet",
      0, 0,           0, 10, 1, 30, 10,  9, 0, IRON, HI_METAL,
                                                         HELMET),
-HELM("helm of brilliance", "etched helmet",
-     0, 1,           0,  6, 1, 50, 50,  9, 0, IRON, CLR_GREEN,
-                                                        HELM_OF_BRILLIANCE),
+HELM("helm of caution", "etched helmet",
+     0, 1,     WARNING,  3, 1, 50, 50,  9, 0, IRON, CLR_GREEN,
+                                                        HELM_OF_CAUTION),
 HELM("helm of opposite alignment", "crested helmet",
      0, 1,           0,  6, 1, 50, 50,  9, 0, IRON, HI_METAL,
                                                  HELM_OF_OPPOSITE_ALIGNMENT),

@@ -1154,6 +1154,8 @@ warnings via impossible() would be unseen if message suppression via ESC at
 wearing the Eyes of the Overworld overrides OPTIONS:blind; breaking the
 	always-blind conduct by doing that was intended but having permanent
 	blindness stay cured after removing them was not
+change helm of brilliance from iron to crystal so that it no longer needs to
+	be a special case for metallic armor vs spell casting
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1924,8 +1926,8 @@ boiling a pool or fountain now creates a temporary cloud of steam
 random themed rooms in the dungeons of doom
 extended achievement and conduct fields for xlogfile
 record amount of gold in hero's possession in xlogfile
-new objects:  amulets of flying and guarding, gold dragon scale mail and
-	set of gold dragon scales
+new objects:  amulets of flying and guarding, helm of caution,
+	gold dragon scale mail and set of gold dragon scales
 new monsters:  displacer beast ('f') and genetic engineer ('Q'), gold dragon
 	and baby gold dragon (both 'D')
 make camera flash which reveals previously unseen map features or objects or
