@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.c	$NHDT-Date: 1682205030 2023/04/22 23:10:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.7	display.c	$NHDT-Date: 1682758082 2023/04/29 08:48:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.216 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -627,8 +627,9 @@ display_warning(struct monst *mon)
     int glyph;
 
     if (mon_warning(mon)) {
-        int wl = Hallucination ?
-            rn2_on_display_rng(WARNCOUNT - 1) + 1 : warning_of(mon);
+        int wl = Hallucination ? rn2_on_display_rng(WARNCOUNT - 1) + 1
+                               : warning_of(mon);
+
         glyph = warning_to_glyph(wl);
     } else if (MATCH_WARN_OF_MON(mon)) {
         glyph = mon_to_glyph(mon, rn2_on_display_rng);
@@ -1408,7 +1409,7 @@ see_monsters(void)
         return;
 
     /* steed and unseen engulfer/holder/holdee are recognized via touch
-       even if they don't aren't going to be rendered; other monsters
+       even if they aren't going to be rendered; other monsters
        may get flagged as having been seen by display_monster() if it's
        called by newsym() */
     if (u.usteed)
