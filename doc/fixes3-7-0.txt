@@ -1159,6 +1159,9 @@ change helm of brilliance from iron to crystal so that it no longer needs to
 fake player monsters in endgame had a 1 in 1000 chance to be given a stack
 	of 0 gold pieces, eventually triggering an impossible warning (cited
 	one was "Calculating weight of 0 gold pieces?")
+avoid "wall_angle: unknown hwall mode 4" when using #terrain command to
+	display a spot remembered as a wall but actually a secret door that
+	has been transformed into an open door while not in sight
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

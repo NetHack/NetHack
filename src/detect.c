@@ -2061,18 +2061,26 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
                     && M_AP_TYPE(mtmp) == M_AP_FURNITURE) {
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
-                    /* we have a topology type but we want a screen
-                       symbol in order to derive a glyph; some screen
-                       symbols need the flags field of levl[][] in
-                       addition to the type (to disambiguate STAIRS to
-                       S_upstair or S_dnstair, for example; current
-                       flags might not be intended for remembered type,
-                       but we've got no other choice) */
-                    schar save_typ = levl[x][y].typ;
+                    struct rm save_spot;
 
+                    /*
+                     * We have a topology type but we want a screen symbol
+                     * in order to derive a glyph.  Some screen symbols need
+                     * the flags field of levl[][] in addition to the type
+                     * (to disambiguate STAIRS to S_upstair or S_dnstair,
+                     * for example).  Current flags might not be intended
+                     * for remembered type, but we've got no other choice.
+                     * An exception is wall_info which can be recalculated and
+                     * needs to be.  Otherwise back_to_glyph() -> wall_angle()
+                     * might issue an impossible() for it if it is currently
+                     * doormask==D_OPEN for an open door remembered as a wall.
+                     */
+                    save_spot = levl[x][y];
                     levl[x][y].typ = gl.lastseentyp[x][y];
+                    if (IS_WALL(levl[x][y].typ))
+                        xy_set_wall_state(x, y); /* levl[x][y].wall_info */
                     glyph = back_to_glyph(x, y);
-                    levl[x][y].typ = save_typ;
+                    levl[x][y] = save_spot;
                 }
             }
         }
