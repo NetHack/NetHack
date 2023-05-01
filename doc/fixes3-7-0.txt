@@ -1551,6 +1551,7 @@ anti-magic field's reduction of hero's maximum energy could result in current
 	energy being one point higher than maximum
 if hero was killed by a wand zapped by a monster, cause of death was reported
 	as "killed by a bolt of <damage type> imagined by <monster>"
+throttle the difficulty of the monsters in theme room "buried zombies"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

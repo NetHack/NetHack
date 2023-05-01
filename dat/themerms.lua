@@ -1,6 +1,7 @@
 -- NetHack themerms.lua	$NHDT-Date: 1652196294 2022/05/10 15:24:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
+--
 -- themerooms is an array of tables and/or functions.
 -- the tables define "frequency", "contents", "mindiff" and "maxdiff".
 -- frequency is optional; if omitted, 1 is assumed.
@@ -95,12 +96,21 @@ themeroom_fills = {
 
    -- Buried zombies
    function(rm)
-      local zombifiable = { "kobold", "gnome", "orc", "dwarf", "elf", "human", "ettin", "giant" };
+      local diff = nh.level_difficulty()
+      -- start with [1..4] for low difficulty
+      local zombifiable = { "kobold", "gnome", "orc", "dwarf" };
+      if diff > 3 then          -- medium difficulty
+         zombifiable[5], zombifiable[6] = "elf", "human";
+         if diff > 6 then       -- high difficulty (relatively speaking)
+            zombifiable[7], zombifiable[8] = "ettin", "giant";
+         end
+      end
       for i = 1, (rm.width * rm.height) / 2 do
          shuffle(zombifiable);
-         local o = des.object({ id = "corpse", montype = zombifiable[1], buried = true });
+         local o = des.object({ id = "corpse", montype = zombifiable[1],
+                                buried = true });
          o:stop_timer("rot-corpse");
-         o:start_timer("zombify-mon", 1000);
+         o:start_timer("zombify-mon", math.random(990, 1010));
       end
    end,
 
@@ -265,6 +275,7 @@ themerooms = {
                  end
       });
    end,
+
    {
       frequency = 6,
       contents = function()
