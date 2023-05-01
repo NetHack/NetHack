@@ -438,6 +438,7 @@ maketrap(coordxy x, coordxy y, int typ)
         /* old <tx,ty> remain valid */
     } else if ((IS_FURNITURE(lev->typ)
                 && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE)))
+               || (is_pool_or_lava(x, y) || IS_AIR(lev->typ))
                || (typ == LEVEL_TELEP && single_level_branch(&u.uz))) {
         /* no trap on top of furniture (caller usually screens the
            location to inhibit this, but wizard mode wishing doesn't)

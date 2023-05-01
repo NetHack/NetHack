@@ -1162,6 +1162,8 @@ fake player monsters in endgame had a 1 in 1000 chance to be given a stack
 avoid "wall_angle: unknown hwall mode 4" when using #terrain command to
 	display a spot remembered as a wall but actually a secret door that
 	has been transformed into an open door while not in sight
+it was possible to produce a web at a water or lava location; it would not be
+	visible but could trap the hero, resulting in drowning or incineration
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

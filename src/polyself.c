@@ -1422,11 +1422,17 @@ doremove(void)
 int
 dospinweb(void)
 {
-    register struct trap *ttmp = t_at(u.ux, u.uy);
+    coordxy x = u.ux, y = u.uy;
+    struct trap *ttmp = t_at(x, y);
+    /* disallow webs on water, lava, air & cloud */
+    boolean reject_terrain = is_pool_or_lava(x, y) || IS_AIR(levl[x][y].typ);
 
-    if (Levitation || Is_airlevel(&u.uz) || Underwater
-        || Is_waterlevel(&u.uz)) {
-        You("must be on the ground to spin a web.");
+    /* [at the time this was written, it was not possible to be both a
+       webmaker and a flyer, but with the advent of amulet of flying that
+       became a possibility; at present hero can spin a web while flying] */
+    if (Levitation || reject_terrain) {
+        You("must be on %s ground to spin a web.",
+            reject_terrain ? "solid" : "the");
         return ECMD_OK;
     }
     if (u.uswallow) {
@@ -1476,13 +1482,13 @@ dospinweb(void)
         case SPIKED_PIT:
             You("spin a web, covering up the pit.");
             deltrap(ttmp);
-            bury_objs(u.ux, u.uy);
-            newsym(u.ux, u.uy);
+            bury_objs(x, y);
+            newsym(x, y);
             return ECMD_TIME;
         case SQKY_BOARD:
             pline_The("squeaky board is muffled.");
             deltrap(ttmp);
-            newsym(u.ux, u.uy);
+            newsym(x, y);
             return ECMD_TIME;
         case TELEP_TRAP:
         case LEVEL_TELEP:
@@ -1498,12 +1504,12 @@ dospinweb(void)
             You("web over the %s.",
                 (ttmp->ttyp == TRAPDOOR) ? "trap door" : "hole");
             deltrap(ttmp);
-            newsym(u.ux, u.uy);
+            newsym(x, y);
             return ECMD_TIME;
         case ROLLING_BOULDER_TRAP:
             You("spin a web, jamming the trigger.");
             deltrap(ttmp);
-            newsym(u.ux, u.uy);
+            newsym(x, y);
             return ECMD_TIME;
         case ARROW_TRAP:
         case DART_TRAP:
@@ -1523,19 +1529,19 @@ dospinweb(void)
             impossible("Webbing over trap type %d?", ttmp->ttyp);
             return ECMD_OK;
         }
-    } else if (On_stairs(u.ux, u.uy)) {
+    } else if (On_stairs(x, y)) {
         /* cop out: don't let them hide the stairs */
         Your("web fails to impede access to the %s.",
-             (levl[u.ux][u.uy].typ == STAIRS) ? "stairs" : "ladder");
+             (levl[x][y].typ == STAIRS) ? "stairs" : "ladder");
         return ECMD_TIME;
     }
-    ttmp = maketrap(u.ux, u.uy, WEB);
+    ttmp = maketrap(x, y, WEB);
     if (ttmp) {
         You("spin a web.");
         ttmp->madeby_u = 1;
         feeltrap(ttmp);
-        if (*in_rooms(u.ux, u.uy, SHOPBASE))
-            add_damage(u.ux, u.uy, SHOP_WEB_COST);
+        if (*in_rooms(x, y, SHOPBASE))
+            add_damage(x, y, SHOP_WEB_COST);
     }
     return ECMD_TIME;
 }
