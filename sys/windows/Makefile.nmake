@@ -1604,7 +1604,7 @@ $(U)uudecode.exe: $(OUTL)uudecode.o
 	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ $(OUTL)uudecode.o
 
 $(OUTL)uudecode.o: $(SSYS)\uudecode.c
-	$(Q)$(CC) $(CFLAGS) $(TTYDEF) $(CROSSCOMPILE) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
+	$(Q)$(CC) $(CFLAGS) -wd4702 $(TTYDEF) $(CROSSCOMPILE) /D_CRT_SECURE_NO_DEPRECATE  -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWIN)\mnsel.bmp: $(U)uudecode.exe $(MSWIN)\mnsel.uu
 $(MSWIN)\mnselcnt.bmp: $(U)uudecode.exe $(MSWIN)\mnselcnt.uu
