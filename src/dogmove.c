@@ -461,8 +461,10 @@ dog_invent(struct monst *mtmp, struct edog *edog, int udist)
 /* set dog's goal -- gtyp, gx, gy;
    returns -1/0/1 (dog's desire to approach player) or -2 (abort move) */
 static int
-dog_goal(register struct monst *mtmp, struct edog *edog,
-         int after, int udist, int whappr)
+dog_goal(
+    register struct monst *mtmp,
+    struct edog *edog,
+    int after, int udist, int whappr)
 {
     register coordxy omx, omy;
     boolean in_masters_sight, dog_has_minvent;
@@ -520,7 +522,8 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
                     || !can_reach_location(mtmp, mtmp->mx, mtmp->my, nx, ny))
                     continue;
                 if (otyp < MANFOOD) {
-                    if (otyp < gg.gtyp || DDIST(nx, ny) < DDIST(gg.gx, gg.gy)) {
+                    if (otyp < gg.gtyp
+                        || DDIST(nx, ny) < DDIST(gg.gx, gg.gy)) {
                         gg.gx = nx;
                         gg.gy = ny;
                         gg.gtyp = otyp;
@@ -537,6 +540,8 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
                 }
             }
         }
+#undef DDIST
+#undef SQSRCHRADIUS
     }
 
     /* follow player if appropriate */
@@ -619,10 +624,14 @@ dog_goal(register struct monst *mtmp, struct edog *edog,
         edog->ogoal.x = 0;
     }
     return appr;
+#undef FARAWAY
 }
 
 static struct monst *
-find_targ(register struct monst *mtmp, int dx, int dy, int maxdist)
+find_targ(
+    register struct monst *mtmp,
+    int dx, int dy,
+    int maxdist)
 {
     struct monst *targ = 0;
     int curx = mtmp->mx, cury = mtmp->my;
@@ -945,10 +954,10 @@ dog_move(
     int omx, omy; /* original mtmp position */
     int appr, whappr, udist;
     int i, j, k;
-    struct edog *edog = EDOG(mtmp);
+    struct edog *edog = (mtmp->mtame && has_edog(mtmp)) ? EDOG(mtmp) : 0;
     struct obj *obj = (struct obj *) 0;
     xint16 otyp;
-    boolean has_edog, cursemsg[9], do_eat = FALSE;
+    boolean cursemsg[9], do_eat = FALSE;
     boolean better_with_displacing = FALSE;
     coordxy nix, niy;      /* position mtmp is (considering) moving to */
     coordxy nx, ny; /* temporary coordinates */
@@ -965,11 +974,14 @@ dog_move(
      * spend all their energy defending the player.  (They are the only
      * monsters with other structures that can be tame.)
      */
-    has_edog = !mtmp->isminion;
+    if (!edog && !mtmp->isminion) {
+        impossible("dog_move for non-pet?");
+        return MMOVE_NOTHING;
+    }
 
     omx = mtmp->mx;
     omy = mtmp->my;
-    if (has_edog && dog_hunger(mtmp, edog))
+    if (edog && dog_hunger(mtmp, edog))
         return MMOVE_DIED; /* starved */
 
     udist = distu(omx, omy);
@@ -990,7 +1002,7 @@ dog_move(
     cursemsg[0] = FALSE; /* lint suppression */
     info[0] = 0;         /* ditto */
 
-    if (has_edog) {
+    if (edog) {
         j = dog_invent(mtmp, edog, udist);
         if (j == 2)
             return MMOVE_DIED; /* died */
@@ -1001,13 +1013,12 @@ dog_move(
     } else
         whappr = 0;
 
-    appr = dog_goal(mtmp, has_edog ? edog : (struct edog *) 0, after, udist,
-                    whappr);
+    appr = dog_goal(mtmp, edog, after, udist, whappr);
     if (appr == -2)
         return MMOVE_NOTHING;
 
     if (Conflict && !resist_conflict(mtmp)) {
-        if (!has_edog) {
+        if (!edog) {
             /* Guardian angel refuses to be conflicted; rather,
              * it disappears, angrily, and sends in some nasties
              */
@@ -1057,7 +1068,7 @@ dog_move(
             continue;
 
         /* if a guardian, try to stay close by choice */
-        if (!has_edog && (j = distu(nx, ny)) > 16 && j >= udist)
+        if (!edog && (j = distu(nx, ny)) > 16 && j >= udist)
             continue;
 
         if ((info[i] & ALLOW_M) && MON_AT(nx, ny)) {
@@ -1065,17 +1076,17 @@ dog_move(
             register struct monst *mtmp2 = m_at(nx, ny);
             /* weight the audacity of the pet to attack a differently-leveled
              * foe based on its fraction of max HP:
-             *       100%:  up to level + 2
-             * 80% and up:  up to level + 1
-             * 60% to 80%:  up to level
-             * 40% to 60%:  up to level - 1
-             * 25% to 40%:  up to level - 2
-             *  below 25%:  won't attack peacefuls of any level (different case)
-             *  below 20%:  up to level - 3
+             *       100%: up to level + 2
+             * 80% and up: up to level + 1
+             * 60% to 80%: up to level
+             * 40% to 60%: up to level - 1
+             * 25% to 40%: up to level - 2
+             *  below 25%: won't attack peacefuls of any level (different case)
+             *  below 20%: up to level - 3
              *
              * note that balk's maximum value is +3, as it is the lowest level
-             * the pet will balk at attacking rather than the highest level they
-             * are willing to attack; note the >= used when comparing it.
+             * the pet will balk at attacking rather than the highest level
+             * they are willing to attack; note the >= used when comparing it.
              */
             int balk = mtmp->m_lev + ((5 * mtmp->mhp) / mtmp->mhpmax) - 2;
 
@@ -1102,7 +1113,8 @@ dog_move(
             if (mstatus & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
 
-            if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED) && rn2(4)
+            if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) == M_ATTK_HIT
+                && rn2(4)
                 && mtmp2->mlstmv != gm.moves
                 && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
@@ -1150,7 +1162,7 @@ dog_move(
 
         /* dog eschews cursed objects, but likes dog food */
         /* (minion isn't interested; `cursemsg' stays FALSE) */
-        if (has_edog) {
+        if (edog) {
             boolean can_reach_food = could_reach_item(mtmp, nx, ny);
             for (obj = gl.level.objects[nx][ny]; obj; obj = obj->nexthere) {
                 if (obj->cursed) {
@@ -1182,7 +1194,7 @@ dog_move(
          * hero.  Thus, only run it if not leashed and >5 tiles away.
          */
         if (!mtmp->mleashed && distmin(mtmp->mx, mtmp->my, u.ux, u.uy) > 5) {
-            k = has_edog ? uncursedcnt : cnt;
+            k = edog ? uncursedcnt : cnt;
             for (j = 0; j < MTSZ && j < k - 1; j++)
                 if (nx == mtmp->mtrack[j].x && ny == mtmp->mtrack[j].y)
                     if (rn2(MTSZ * (k - j)))
@@ -1289,6 +1301,7 @@ dog_move(
         set_apparxy(mtmp);
     }
     return MMOVE_MOVED;
+#undef GDIST
 }
 
 /* check if a monster could pick up objects from a location */
@@ -1451,5 +1464,9 @@ quickmimic(struct monst *mtmp)
         display_nhwindow(WIN_MAP, TRUE);
     }
 }
+
+#undef DOG_HUNGRY
+#undef DOG_WEAK
+#undef DOG_STARVE
 
 /*dogmove.c*/
