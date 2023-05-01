@@ -156,7 +156,7 @@ use_towel(struct obj *obj)
             dry_a_towel(obj, -1, drying_feedback);
         return ECMD_TIME;
     } else if (u.ucreamed) {
-        incr_itimeout(&HBlinded, -u.ucreamed);
+        incr_itimeout(&HBlinded, (-1 * (int) u.ucreamed));
         u.ucreamed = 0;
         if (!Blinded) {
             pline("You've got the glop off.");
