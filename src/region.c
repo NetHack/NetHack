@@ -1238,7 +1238,7 @@ region_safety(void)
         pline_The("gas cloud has dissipated.");
     }
     /* maybe cure blindness too */
-    if ((Blinded & TIMEOUT) == 1L)
+    if (BlindedTimeout == 1L)
         make_blinded(0L, TRUE);
 }
 

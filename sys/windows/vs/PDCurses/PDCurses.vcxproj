@@ -6,6 +6,7 @@
     <ProjectGuid>{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>PDCurses</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(vsDir)default_lib.props" />

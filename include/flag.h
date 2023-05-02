@@ -34,6 +34,8 @@ struct flag {
     boolean friday13;        /* it's Friday the 13th */
     boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
+    boolean tips;            /* show helpful hints? */
+    boolean tutorial;        /* ask if player wants tutorial level? */
     boolean ignintr;         /* ignore interrupts */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
@@ -219,6 +221,7 @@ struct instance_flags {
                             * as output from getdir(): simulated button used
                             * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
     int getloc_filter;     /* GFILTER_foo */
+    boolean bgcolors;      /* display background colors on a map position */
     boolean getloc_moveskip;
     boolean getloc_travelmode;
     boolean getloc_usemenu;
@@ -277,6 +280,7 @@ struct instance_flags {
     long hilite_delta;        /* number of moves to leave a temp hilite lit */
     long unhilite_deadline; /* time when oldest temp hilite should be unlit */
 #endif
+    boolean voices;           /* enable text-to-speech or other talking */
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
@@ -290,11 +294,6 @@ struct instance_flags {
 #endif
 #if defined(MICRO) || defined(WIN32)
     boolean rawio; /* whether can use rawio (IOCTL call) */
-#endif
-#ifdef MAC_GRAPHICS_ENV
-    boolean MACgraphics; /* use Macintosh extended character set, as
-                            as defined in the special font HackFont */
-    unsigned use_stone;  /* use the stone ppats */
 #endif
 #if defined(MSDOS) || defined(WIN32)
     boolean tile_view;

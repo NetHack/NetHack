@@ -84,6 +84,7 @@ win/share/oththin.txt
 
 #libnethack
 targets/*
+bundle/*
 #test.js
 #sys/lib/npm-package/build/nethack.js
 #sys/lib/npm-package/build/nethack.wasm

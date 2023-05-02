@@ -133,7 +133,7 @@ goodpos(
                 return (is_swimmer(mdat)
                         || (!Is_waterlevel(&u.uz)
                             && !is_waterwall(x, y)
-                            && !grounded(mdat)));
+                            && m_in_air(mtmp)));
         } else if (mdat->mlet == S_EEL && rn2(13) && !ignorewater) {
             return FALSE;
         } else if (is_lava(x, y) && !ignorelava) {
@@ -147,8 +147,7 @@ goodpos(
                             && uarmf->oerodeproof)
                         || (Upolyd && likes_lava(gy.youmonst.data)));
             else
-                return (is_floater(mdat) || is_flyer(mdat)
-                        || likes_lava(mdat));
+                return (m_in_air(mtmp) || likes_lava(mdat));
         }
         if (passes_walls(mdat) && may_passwall(x, y))
             return TRUE;
@@ -860,8 +859,17 @@ level_tele(void)
     char buf[BUFSZ];
     boolean force_dest = FALSE;
 
-    if (iflags.debug_fuzzer)
-        goto random_levtport;
+    if (iflags.debug_fuzzer) {
+        do {
+            newlevel.dnum = rn2(gn.n_dgns);
+        } while (newlevel.dnum == astral_level.dnum
+                 || gd.dungeons[newlevel.dnum].flags.unconnected
+                 || !gd.dungeons[newlevel.dnum].num_dunlevs);
+        newlevel.dlevel = 1 + rn2(dunlevs_in_dungeon(&newlevel));
+        assign_level(&u.ucamefrom, &u.uz);
+        schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        return;
+    }
     if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
         && !wizard) {
         You_feel("very disoriented for a moment.");
@@ -1017,6 +1025,7 @@ level_tele(void)
         }
         if (newlev <= -10) {
             You("arrive in heaven.");
+            SetVoice((struct monst *) 0, 0, 80, voice_deity);
             verbalize("Thou art early, but we'll admit thee.");
             gk.killer.format = NO_KILLER_PREFIX;
             Strcpy(gk.killer.name, "went to heaven prematurely");
@@ -1128,7 +1137,8 @@ void
 domagicportal(struct trap *ttmp)
 {
     struct d_level target_level;
-    boolean already_stunned;
+    s_level *tutlvl = find_level("tut-1");
+    const char *stunmsg = (char *) 0;
 
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
         buried_ball_to_punishment();
@@ -1154,13 +1164,16 @@ domagicportal(struct trap *ttmp)
         return;
     }
 
-    already_stunned = !!Stunned;
-    make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     target_level = ttmp->dst;
-    schedule_goto(&target_level, UTOTYPE_PORTAL,
-                  !already_stunned ? "You feel slightly dizzy."
-                                   : "You feel dizzier.",
-                  (char *) 0);
+
+    /* coming back from tutorial doesn't trigger stunning */
+    if (!(tutlvl && tutlvl->dlevel.dnum == u.uz.dnum)) {
+        stunmsg = !Stunned ? "You feel slightly dizzy."
+                            : "You feel dizzier.";
+        make_stunned((HStun & TIMEOUT) + 3L, FALSE);
+    }
+
+    schedule_goto(&target_level, UTOTYPE_PORTAL, stunmsg, (char *) 0);
 }
 
 void

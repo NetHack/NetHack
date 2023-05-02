@@ -20,27 +20,28 @@ des.level_init({ style="mines", fg=".", bg=" ", smoothed=true, joined=true, wall
 des.stair("up")
 des.stair("down")
 --
-des.object("*")
-des.object("*")
-des.object("*")
+for i = 1,math.random(2, 5) do
+   des.object("*")
+end
 des.object("(")
-des.object()
-des.object()
-des.object()
+for i = 1,math.random(2, 4) do
+   des.object()
+end
+if percent(75) then
+   for i = 1,math.random(1, 2) do
+      des.object("boulder")
+   end
+end
 --
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
-des.monster("gnome")
+for i = 1,math.random(6, 8) do
+   des.monster("gnome")
+end
 des.monster("gnome lord")
 des.monster("dwarf")
 des.monster("dwarf")
 des.monster("G")
 des.monster("G")
-des.monster("h")
+des.monster(percent(50) and "h" or "G")
 --
 des.trap()
 des.trap()

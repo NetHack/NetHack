@@ -28,6 +28,12 @@ des.map([[
                             ------------------                            
 ]]);
 
+
+if percent(25) then
+   local sel = selection.match("."):percentage(2):grow();
+   des.replace_terrain({ selection=sel, fromterrain=".", toterrain=percent(50) and "I" or "C" });
+end
+
 des.region(selection.area(00,00,72,18), "lit");
 
 des.stair("up");

@@ -22,6 +22,7 @@ boolean curses_is_menu(winid wid);
 boolean curses_is_text(winid wid);
 int curses_convert_glyph(int ch, int glyph);
 void curses_move_cursor(winid wid, int x, int y);
+void curses_update_stdscr_cursor(void);
 void curses_prehousekeeping(void);
 void curses_posthousekeeping(void);
 void curses_view_file(const char *filename, boolean must_exist);

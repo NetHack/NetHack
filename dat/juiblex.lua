@@ -4,7 +4,7 @@
 -- NetHack may be freely redistributed.  See license for details.
 --
 
-des.level_flags("mazelevel", "shortsighted", "noflip")
+des.level_flags("mazelevel", "shortsighted", "noflip", "temperate")
 -- des.level_init(mines,'.','}',true,true,unlit,false)
 des.level_init({ style = "swamp", lit = 0 });
 -- guarantee at least one open spot to ensure successful stair placement

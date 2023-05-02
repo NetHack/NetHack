@@ -57,24 +57,25 @@ enum levl_typ_types {
     WATER     = 18,
     DRAWBRIDGE_UP = 19,
     LAVAPOOL  = 20,
-    IRONBARS  = 21, /* KMH */
-    DOOR      = 22,
-    CORR      = 23,
-    ROOM      = 24,
-    STAIRS    = 25,
-    LADDER    = 26,
-    FOUNTAIN  = 27,
-    THRONE    = 28,
-    SINK      = 29,
-    GRAVE     = 30,
-    ALTAR     = 31,
-    ICE       = 32,
-    DRAWBRIDGE_DOWN = 33,
-    AIR       = 34,
-    CLOUD     = 35,
+    LAVAWALL  = 21,
+    IRONBARS  = 22, /* KMH */
+    DOOR      = 23,
+    CORR      = 24,
+    ROOM      = 25,
+    STAIRS    = 26,
+    LADDER    = 27,
+    FOUNTAIN  = 28,
+    THRONE    = 29,
+    SINK      = 30,
+    GRAVE     = 31,
+    ALTAR     = 32,
+    ICE       = 33,
+    DRAWBRIDGE_DOWN = 34,
+    AIR       = 35,
+    CLOUD     = 36,
 
-    MAX_TYPE  = 36,
-    MATCH_WALL = 37,
+    MAX_TYPE  = 37,
+    MATCH_WALL = 38,
     INVALID_TYPE = 127
 };
 
@@ -388,6 +389,12 @@ struct levelflags {
                                   normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
                                   rather than ROOM */
+    Bitfield(rndmongen, 1);    /* random monster generation allowed? */
+    Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+    Bitfield(noautosearch, 1); /* automatic searching disabled */
+    Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
+    Bitfield(stormy, 1);       /* clouds create lightning bolts at random */
+
     schar temperature;         /* +1 == hot, -1 == cold */
 };
 

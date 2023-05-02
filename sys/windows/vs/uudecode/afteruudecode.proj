@@ -72,6 +72,8 @@
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Wooden_Harp_E.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Wooden_Harp_F.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
 	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sound_Wooden_Harp_G.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sa2_xpleveldown.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
+	<Exec Command="&quot;$(ToolsDir)uudecode.exe&quot; &quot;$(SndWavDir)sa2_xplevelup.uu&quot;" WorkingDirectory="$(SndWavDir)"/>
   </Target>
   <Target Name="Clean">
 	<Delete Files="@(IconFiles);@(BmpFiles);@(RecordFiles)"/>

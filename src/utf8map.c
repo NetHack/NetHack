@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "integer.h"
 #include <ctype.h>
 
 extern const struct symparse loadsyms[];

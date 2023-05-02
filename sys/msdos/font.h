@@ -3,8 +3,6 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "integer.h"
-
 /*
  * The file format is Linux PSF, version 2. Version 1 is not supported.
  * Actual Linux fonts are restricted to 256 or 512 glyphs; for NetHack, the

@@ -11,7 +11,7 @@
 
 
 PREFIX=/usr
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+HACKDIR=$(PREFIX)/games/lib/nethackdir
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
 SHELLDIR=$(PREFIX)/games

@@ -44,9 +44,9 @@
 
 %.au
 \author{Original version - Eric S. Raymond\\
-(Edited and expanded for 3.7 by Mike Stephenson and others)}
+(Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{January 30, 2023}
+\date{April 19, 2023}
 
 \maketitle
 
@@ -747,11 +747,12 @@ It can also be used with the `{\tt $\backslash$}' (known, show a
 list of all discovered objects) and the `{\tt \`{}}' (knownclass,
 show a list of discovered objects in a particular class) commands to offer
 a menu of several sorting alternatives (which sets a new value for the
-{\it sortdiscoveries\/} option).
+{\it sortdiscoveries\/}
+option); also for ``{\tt \#vanquished}'' command to offer a sorting menu.
 \\
 %.lp ""
 A few other commands (eat food, offer sacrifice, apply tinning-kit,
-drink/quaff, dip) use
+drink/quaff, dip, tip container) use
 the `{\tt m}' prefix to skip checking for applicable objects on
 the floor and go straight to checking inventory,
 or (for ``{\tt \#loot}'' to remove a saddle),
@@ -1341,6 +1342,9 @@ Cast a spell. Default key is `{\tt Z}'.
 \item[\tb{\#chat}]
 Talk to someone. Default key is `{\tt M-c}'.
 %.lp
+\item[\tb{\#chronicle}]
+Show a list of important game events.
+%.lp
 \item[\tb{\#close}]
 Close a door. Default key is `{\tt c}'.
 %.lp
@@ -1403,6 +1407,11 @@ Default key is `{\tt f}'.
 %.lp
 \item[\tb{\#force}]
 Force a lock. Autocompletes. Default key is `{\tt M-f}'.
+%.lp
+\item[\tb{\#genocided}]
+List any monster types which have been genocided or become extinct.
+Autocompletes.
+Default key is `{\tt M-g}'.
 %.lp
 \item[\tb{\#glance}]
 Show what type of thing a map symbol corresponds to. Default key is `{\tt ;}'.
@@ -1514,12 +1523,25 @@ Precede with the `{\tt m}' prefix to execute the simpler options command.
 `{\tt O}' from simple options back to traditional advanced options.)
 %.lp
 \item[\tb{\#overview}]
-Display information you've discovered about the dungeon.  Any visited
-level (unless forgotten due to amnesia) with an annotation is included,
+Display information you've discovered about the dungeon.
+Any visited level
+% [note: amnesia no longer causes levels to be forgotten so exclude this]
+% (unless forgotten due to amnesia)
+with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
-level will be included regardless of annotations. Autocompletes.
+level will be included regardless of annotations.
+\\
+%.lp ""
+Precede \#overview with the `{\tt m}' prefix to display the dungeon
+overview as a menu where you can select any visited level to add or
+remove an annotation without needing to return to that level.
+This will also force all visited levels to be displayed rather than just
+the ``interesting'' subset.
+\\
+%.lp ""
+Autocompletes.
 Default keys are `{\tt \^{}O}', and `{\tt M-O}'.
 % DON'T PANIC!
 %.lp
@@ -1649,6 +1671,11 @@ otherwise `{\tt 5}' when it is set to 2~or~4.
 Save the game and exit the program.
 Default key is `{\tt S}'.
 %.lp
+\item[\tb{\#saveoptions}]
+Save configuration options to the config file.
+This will overwrite the file, removing all comments, so if you have
+manually edited the config file, don't use this.
+%.lp
 \item[\tb{\#search}]
 Search for traps and secret doors around you. Default key is `{\tt s}'.
 %.lp
@@ -1760,8 +1787,20 @@ Debug mode only.
 %.lp
 \item[\tb{\#tip}]
 Tip over a container (bag or box) to pour out its contents.
+When there are containers on the floor, the game will prompt to pick one
+of them or ``tip something being carried''.
+\\
+%.lp ""
+If the latter is chosen, there will be another prompt for which item
+from inventory to tip.
+The `{\tt m}' prefix makes the command skip containers on the
+floor and pick one from inventory, except for the special case of
+{\it menustyle:Traditional\/}
+with two or more containers present; that situation will start with the
+floor container menu.
+\\
+%.lp ""
 Autocompletes. Default key is `{\tt M-T}'.
-The `{\tt m}' prefix makes the command use a menu.
 %.lp
 \item[\tb{\#travel}]
 Travel to a specific location on the map.
@@ -1967,7 +2006,6 @@ letter of the command.
 
 On {\it Windows\/} and {\it MS-DOS\/},
 the `Alt' key can be used in this fashion.
-%% On the {\it Amiga}, set the {\it altmeta\/} option to get this behavior.
 On other systems, if typing `Alt' plus another key transmits a
 two character sequence consisting of an {\tt Escape}
 followed by the other key, you may set the {\it altmeta\/}
@@ -2013,6 +2051,9 @@ equivalent is used for another command, so the three key combination
 %.lp
 \item[\tb{M-f}]
 {\tt\#force}
+%.lp
+\item[\tb{M-g}]
+{\tt\#genocided}
 %.lp
 \item[\tb{M-i}]
 {\tt\#invoke}
@@ -2952,7 +2993,7 @@ weapons or having one of them be stolen or destroyed will also make you
 revert to single-weapon combat.
 
 %.hn 2
-\subsection*{Armor (`{\tt \verb+[+}')}
+\subsection*{Armor (`{\tt [}')}
 
 %.pg
 Lots of unfriendly things lurk about; you need armor to protect
@@ -3607,6 +3648,8 @@ Reached the Elemental Planes.
 Reached the Astral Plane level.
 \item[{\tt Blind}]
 Blind from birth.
+\item[{\tt Deaf}]
+Deaf from birth.
 \item[{\tt Nudist}]
 Never wore any armor.
 \item[{\tt Ascended}]
@@ -3655,10 +3698,10 @@ enough---but not too close!---to
 the Castle level's drawbridge or can be given to you via prayer boon.
 
 %.pg
-{\it Blind\/} and {\it Nudist\/} are also conducts, and they can only be
+{\it Blind\/}, {\it Deaf\/}, and {\it Nudist\/} are also conducts, and they can only be
 enabled by setting the correspondingly named option in {\tt NETHACKOPTIONS}
 or run-time configuration file prior to game start.
-In the case of {\it Blind\/}, the option also enforces the conduct.
+In the case of {\it Blind\/} and {\it Deaf\/}, the option also enforces the conduct.
 They aren't really significant accomplishments unless/until you make
 substantial progress into the dungeon.
 
@@ -3691,19 +3734,21 @@ operating systems.\\
 
 %.lp ""
 On UNIX, Linux and macOS it is \mbox{``.nethackrc''} in the user's home
-directory. The file may not exist, but it is a normal ASCII text file and
+directory.
+The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.\\
 
 %.lp ""
-On Windows, it is \mbox{``.nethackrc''} in the folder
-\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.7''}}. The
-file may not exist, but it is a normal ASCII text file and can be created
-with any text editor.
+On Windows, the name is \mbox{``.nethackrc''} location in the folder
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash''}}.
+The file may not exist,
+but it is a normal ASCII text file and can be created with any
+text editor.
 After runing {\it NetHack\/} for the first time, you should find a default
 template for ths configuration file named \mbox{``.nethackrc.template''} in
-\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash 3.7''}}.
-If you had not created the configuration file, {\it NetHack\/} will create
-the configuration file for you using the default template file.
+\mbox{{``\%USERPROFILE\%\textbackslash NetHack\textbackslash''}}.
+If you have not created the configuration file, {\it NetHack\/} will create
+the configuration file for you using the default template file.\\
 
 %.lp ""
 On MS-DOS it is \mbox{``defaults.nh''} in the same folder as
@@ -4032,7 +4077,7 @@ See ``{\it pickup\verb+_+types\/}'' and also
 ``{\it autopickup\verb+_+exception\/}'' for ways to refine the behavior.
 \\
 %.lp ""
-Note: prior to version 3.7, the default for {\it autopickup\/} was {\it on}.
+Note: prior to version 3.7.0, the default for {\it autopickup\/} was {\it on}.
 %.lp
 \item[\ib{autoquiver}]
 This option controls what happens when you attempt the `{\tt f}' (fire)
@@ -4130,6 +4175,9 @@ peaceable creatures (default on).  Persistent.
 %.lp
 \item[\ib{dark\verb+_+room}]
 Show out-of-sight areas of lit rooms (default on).  Persistent.
+%.lp
+\item[\ib{deaf}]
+Start the character permanently deaf (default false).  Persistent.
 %.lp
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
@@ -4941,6 +4989,9 @@ screen.  (Applies to ``tty'' and ``curses'' interfaces only; ``X11'' interface a
 uses a timer-based delay.  The default is on if configured into the
 program.)  Persistent.
 %.lp
+\item[\ib{tips}]
+Show some helpful tips during gameplay (default on).  Persistent.
+%.lp
 \item[\ib{tombstone}]
 Draw a tombstone graphic upon your death (default on).  Persistent.
 %.lp
@@ -4960,6 +5011,10 @@ command.  Persistent.
 % \item[ib{travel\verb+_+debug}]
 % Display intended path during each step of travel (default off).
 % Debug mode only.
+%.lp
+\item[\ib{tutorial}]
+Play a tutorial level at the start of the game.
+Setting this option on or off in the config file will skip the query.
 %.lp
 \item[\ib{verbose}]
 Provide more commentary during the game (default on).  Persistent.
@@ -5346,15 +5401,6 @@ At other prompts a single ESC suffices.
 Use BIOS calls to update the screen display quickly and to read the keyboard
 (allowing the use of arrow keys to move) on machines with an IBM PC
 compatible BIOS ROM (default off, {\it OS/2, PC\/ {\rm and} ST NetHack\/} only).
-%.lp
-\item[\ib{flush}]
-(default off, {\it Amiga NetHack \/} only).
-%.lp
-\item[\ib{Macgraphics}]
-(default on, {\it Mac NetHack \/} only).
-%.lp
-\item[\ib{page\verb+_+wait}]
-(default off, {\it Mac NetHack \/} only).
 %.lp
 \item[\ib{rawio}]
 Force raw (non-cbreak) mode for faster output and more
@@ -5805,7 +5851,7 @@ Each SOUND entry is broken down into the following parts:
 
 %.sd
 %.si
-{\tt MESG       } --- message window mapping (the only one supported in 3.7);\\
+{\tt MESG       } --- message window mapping (the only one supported in 3.7.0);\\
 {\tt msgtype    } --- optional; message type to use, see ``Configuring User Sounds''\\
 {\tt pattern    } --- the pattern to match;\\
 {\tt sound file } --- the sound file to play;\\
@@ -6125,6 +6171,7 @@ Default                      & Symbol Name                & Description\\
 \verb@K@ & S\verb+_+kop                     &	(Keystone Kop)\\
 \verb@^@ & S\verb+_+land\verb+_+mine              &	(land mine)\\
 \verb@}@ & S\verb+_+lava                    &	(molten lava)\\
+\verb@}@ & S\verb+_+lavawall                &	(wall of lava)\\
 \verb@l@ & S\verb+_+leprechaun              &	(leprechaun)\\
 \verb@^@ & S\verb+_+level\verb+_+teleporter       &	(level teleporter)\\
 \verb@L@ & S\verb+_+lich                    &	(lich)\\
@@ -6962,7 +7009,7 @@ operate on various UNIX flavors and maintained the X11 interface.
 %.pg
 \medskip
 {\it Ken Lorber}, {\it Haoyang Wang}, {\it Pat Rankin}, and {\it Dean Luick}
-maintained the port of {\it NetHack\/} 3.6 for Mac OSX.
+maintained the port of {\it NetHack\/} 3.6 for MacOS.
 
 %.pg
 \medskip
@@ -7024,6 +7071,11 @@ and a small number of bug fixes.
 %.pg
 \medskip
 NetHack 3.6.6 was released on March 8, 2020 containing a security fix and
+some bug fixes.
+
+%.pg
+\medskip
+NetHack 3.6.7 was released on February 16, 2023 containing a security fix and
 some bug fixes.
 
 %.pg

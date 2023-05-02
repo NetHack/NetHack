@@ -24,9 +24,9 @@
 #define SYSCF                /* Use a global configuration */
 #define SYSCF_FILE "sysconf" /* Use a file to hold the SYSCF configuration */
 
-#define DUMPLOG      /* Enable dumplog files */
-/*#define DUMPLOG_FILE "nethack-%n-%d.log"*/
-#define DUMPLOG_MSG_COUNT 50
+#ifdef DUMPLOG
+#define DUMPLOG_FILE "%TEMP%/nethack-%n-%d.log"
+#endif
 
 /*#define CHANGE_COLOR*/ /* allow palette changes */
 
@@ -292,7 +292,7 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 extern boolean file_exists(const char *);
 extern boolean file_newer(const char *, const char *);
 #ifndef SYSTEM_H
-#include "system.h"
+/* #include "system.h" */
 #endif
 
 /* Override the default version of nhassert.  The default version is unable

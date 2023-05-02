@@ -332,6 +332,7 @@ md_rush(struct monst *md,
         if (fx == tx && fy == ty)
             break;
 
+        SetVoice(md, 0, 80, 0);
         if ((mon = m_at(fx, fy)) != 0) /* save monster at this position */
             verbalize1(md_exclamations());
         else if (u_at(fx, fy))
@@ -342,7 +343,7 @@ md_rush(struct monst *md,
         place_monster(md, fx, fy); /* put md down */
         newsym(fx, fy);            /* see it */
         flush_screen(0);           /* make sure md shows up */
-        delay_output();            /* wait a little bit */
+        nh_delay_output();            /* wait a little bit */
 
         /* Remove md from the dungeon.  Restore original mon, if necessary. */
         remove_monster(fx, fy);
@@ -363,6 +364,7 @@ md_rush(struct monst *md,
         remove_monster(fx, fy);
         place_monster(md, fx, fy); /* display md with text below */
         newsym(fx, fy);
+        SetVoice(md, 0, 80, 0);
         verbalize("This place's too crowded.  I'm outta here.");
         remove_monster(fx, fy);
 
@@ -378,7 +380,7 @@ md_rush(struct monst *md,
     place_monster(md, fx, fy); /* place at final spot */
     newsym(fx, fy);
     flush_screen(0);
-    delay_output(); /* wait a little bit */
+    nh_delay_output(); /* wait a little bit */
 
     return TRUE;
 }
@@ -403,6 +405,7 @@ newmail(struct mail_info *info)
         goto go_back;
 
     message_seen = TRUE;
+    SetVoice(md, 0, 80, 0);
     verbalize("%s, %s!  %s.", Hello(md), gp.plname, info->display_txt);
 
     if (info->message_typ) {
@@ -413,8 +416,10 @@ newmail(struct mail_info *info)
         if (info->response_cmd)
             new_omailcmd(obj, info->response_cmd);
 
-        if (!next2u(md->mx, md->my))
+        if (!next2u(md->mx, md->my)) {
+            SetVoice(md, 0, 80, 0);
             verbalize("Catch!");
+        }
         display_nhwindow(WIN_MESSAGE, FALSE);
         obj = hold_another_object(obj, "Oops!", (const char *) 0,
                                   (const char *) 0);
@@ -598,7 +603,7 @@ read_simplemail(const char *mbox, boolean adminmsg)
             fl.l_type = F_UNLCK;
             fcntl(fileno(mb), F_UNLCK, &fl);
 #endif
-            pline("There is a%s message on this scroll.",
+            There("is a%s message on this scroll.",
                   seen_one_already ? "nother" : "");
         }
         msg = strchr(curline, ':');

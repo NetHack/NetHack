@@ -56,6 +56,11 @@ endif  # WANT_WIN_QT
 #
 #-INCLUDE multiw-3.370
 
+ifeq "$(USE_ASAN)" "1"
+CFLAGS+=-fsanitize=address
+LFLAGS+=-fsanitize=address
+endif
+
 ifeq "$(USE_CURSESLIB)" "1"
 # default
 CURSESLIB = -lncurses -ltinfo
@@ -159,7 +164,7 @@ WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
 WINLIB += $(WINX11LIB)
-LFLAGS=-L/opt/X11/lib
+LFLAGS+=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
@@ -258,7 +263,7 @@ endif  # WANT_LIBNH
 
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+HACKDIR=$(PREFIX)/games/lib/nethackdir
 SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
@@ -294,7 +299,7 @@ endif   # GITSUBMODULES
 DLLIB = -ldl
 
 # Only needed for GLIBC stack trace:
-LFLAGS=-rdynamic
+LFLAGS+=-rdynamic
 
 # if TTY_TILES_ESCCODES
 #WINSRC += tile.c

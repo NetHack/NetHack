@@ -102,6 +102,8 @@ public:
         static void qtsound_soundeffect(char *, int32_t, int32_t);
         static void qtsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
         static void qtsound_play_usersound(char *, int32_t, int32_t);
+        static void qtsound_ambience(int32_t, int32_t, int32_t);
+        static void qtsound_verbal(char *text, int32_t gender, int32_t tone, int32_t vol, int32_t moreinfo);
 #endif
 
 private:

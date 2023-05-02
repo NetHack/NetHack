@@ -1,7 +1,6 @@
 /* Maintain a data structure describing a monospaced bitmap font */
 
 #include "hack.h"
-#include "integer.h"
 #include "font.h"
 
 static uint32 read_u32(const unsigned char *);

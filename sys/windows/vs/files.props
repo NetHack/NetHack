@@ -127,6 +127,8 @@
     <Luafiles Include = "tower1.lua"/>
     <Luafiles Include = "tower2.lua"/>
     <Luafiles Include = "tower3.lua"/>
+    <Luafiles Include = "tut-1.lua"/>
+    <Luafiles Include = "tut-2.lua"/>
     <Luafiles Include = "Val-fila.lua"/>
     <Luafiles Include = "Val-filb.lua"/>
     <Luafiles Include = "Val-goal.lua"/>
@@ -212,6 +214,8 @@
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_E.uu"/>
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_F.uu"/>
     <UUFiles Include = "$(SndWavDir)sound_Wooden_Harp_G.uu"/>
+    <UUFiles Include = "$(SndWavDir)sa2_xpleveldown.uu"/>
+    <UUFiles Include = "$(SndWavDir)sa2_xplevelup.uu"/>
   </ItemGroup>
   <ItemGroup>
     <IconFiles Include = "$(WinWin32Dir)nethack.ico"/>

@@ -36,6 +36,9 @@ static int nhl_timer_has_at(lua_State *);
 static int nhl_timer_peek_at(lua_State *);
 static int nhl_timer_stop_at(lua_State *);
 static int nhl_timer_start_at(lua_State *);
+static int nhl_get_cmd_key(lua_State *);
+static int nhl_callback(lua_State *);
+static int nhl_gamestate(lua_State *);
 static int nhl_test(lua_State *);
 static int nhl_getmap(lua_State *);
 static char splev_typ2chr(schar);
@@ -49,6 +52,7 @@ static int nhl_pline(lua_State *);
 static int nhl_verbalize(lua_State *);
 static int nhl_parse_config(lua_State *);
 static int nhl_menu(lua_State *);
+static int nhl_text(lua_State *);
 static int nhl_getlin(lua_State *);
 static int nhl_makeplural(lua_State *);
 static int nhl_makesingular(lua_State *);
@@ -80,6 +84,7 @@ static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "restore_old_game",
     "moveloop_turn",
     "game_exit",
+    "getpos_tip",
 };
 static boolean nhcore_call_available[NUM_NHCORE_CALLS];
 
@@ -338,6 +343,7 @@ const struct {
                 { '}', MOAT },
                 { 'P', POOL },
                 { 'L', LAVAPOOL },
+                { 'Z', LAVAWALL },
                 { 'I', ICE },
                 { 'W', WATER },
                 { 'T', TREE },
@@ -597,14 +603,17 @@ nhl_impossible(lua_State *L)
 }
 
 /* pline("It hits!") */
+/* pline("It hits!", true) */
 static int
 nhl_pline(lua_State *L)
 {
     int argc = lua_gettop(L);
 
-    if (argc == 1)
+    if (argc == 1 || argc == 2) {
         pline("%s", luaL_checkstring(L, 1));
-    else
+        if (lua_toboolean(L, 2))
+            display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
+    } else
         nhl_error(L, "Wrong args");
 
     return 0;
@@ -766,6 +775,53 @@ nhl_menu(lua_State *L)
     }
 
     return 1;
+}
+
+/* text("foo\nbar\nbaz") */
+static int
+nhl_text(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc > 0) {
+        menu_item *picks = (menu_item *) 0;
+        winid tmpwin;
+        anything any = cg.zeroany;
+
+        tmpwin = create_nhwindow(NHW_MENU);
+        start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+        while (lua_gettop(L) > 0) {
+            char *ostr = dupstr(luaL_checkstring(L, 1));
+            char *ptr, *str = ostr;
+            char *lstr = str + strlen(str) - 1;
+
+            do {
+                char *nlp = strchr(str, '\n');
+
+                if (nlp && (nlp - str) <= 76) {
+                    ptr = nlp;
+                } else {
+                    ptr = str + 76;
+                    if (ptr > lstr)
+                        ptr = lstr;
+                }
+                while ((ptr > str) && !(*ptr == ' ' || *ptr == '\n'))
+                    ptr--;
+                *ptr = '\0';
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, 0,
+                         str, MENU_ITEMFLAGS_NONE);
+                str = ptr + 1;
+            } while (*str && str <= lstr);
+            lua_pop(L, 1);
+            free(ostr);
+        }
+
+        end_menu(tmpwin, (char *) 0);
+        (void) select_menu(tmpwin, PICK_NONE, &picks);
+        destroy_nhwindow(tmpwin);
+    }
+    return 0;
 }
 
 /* makeplural("zorkmid") */
@@ -1150,7 +1206,7 @@ save_luadata(NHFILE *nhfp)
     char *lua_data = get_nh_lua_variables(); /* note: '\0' terminated */
 
     if (!lua_data)
-        lua_data = emptystr;
+        lua_data = dupstr(emptystr);
     lua_data_len = Strlen(lua_data) + 1; /* +1: include the terminator */
     bwrite(nhfp->fd, (genericptr_t) &lua_data_len,
            (unsigned) sizeof lua_data_len);
@@ -1424,6 +1480,146 @@ nhl_timer_start_at(lua_State *L)
     return 0;
 }
 
+/* returns the visual interpretation of the key bound to an extended command,
+   or the ext cmd name if not bound to any key */
+/* local helpkey = eckey("help"); */
+static int
+nhl_get_cmd_key(lua_State *L)
+{
+    int argc = lua_gettop(L);
+
+    if (argc == 1) {
+        const char *cmd = luaL_checkstring(L, 1);
+        char *key = cmd_from_ecname(cmd);
+
+        lua_pushstring(L, key);
+        return 1;
+    }
+
+    return 0;
+}
+
+/* add or remove a lua function callback */
+/* callback("level_enter", "function_name"); */
+/* callback("level_enter", "function_name", true); */
+/* level_enter, level_leave, cmd_before */
+static int
+nhl_callback(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    int i;
+
+    if (argc == 2) {
+        const char *fn = luaL_checkstring(L, -1);
+        const char *cb = luaL_checkstring(L, -2);
+
+        if (!gl.luacore) {
+            nhl_error(L, "nh luacore not inited");
+            /*NOTREACHED*/
+            return 0;
+        }
+
+        for (i = 0; i < NUM_NHCB; i++)
+            if (!strcmp(cb, nhcb_name[i]))
+                break;
+
+        if (i >= NUM_NHCB)
+            return 0;
+
+        nhcb_counts[i]++;
+
+        lua_getglobal(gl.luacore, "nh_callback_set");
+        lua_pushstring(gl.luacore, cb);
+        lua_pushstring(gl.luacore, fn);
+        nhl_pcall(gl.luacore, 2, 0);
+    } else if (argc == 3) {
+        boolean rm = lua_toboolean(L, -1);
+        const char *fn = luaL_checkstring(L, -2);
+        const char *cb = luaL_checkstring(L, -3);
+
+        if (!gl.luacore) {
+            nhl_error(L, "nh luacore not inited");
+            /*NOTREACHED*/
+            return 0;
+        }
+
+        for (i = 0; i < NUM_NHCB; i++)
+            if (!strcmp(cb, nhcb_name[i]))
+                break;
+
+        if (i >= NUM_NHCB)
+            return 0;
+
+        if (rm) {
+            nhcb_counts[i]--;
+            if (nhcb_counts[i] < 0)
+                impossible("nh.callback counts are wrong");
+        } else {
+            nhcb_counts[i]++;
+        }
+
+        lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
+        lua_pushstring(gl.luacore, cb);
+        lua_pushstring(gl.luacore, fn);
+        nhl_pcall(gl.luacore, 2, 0);
+    }
+
+    return 0;
+}
+
+/* store or restore game state */
+/* NOTE: doesn't work when saving/restoring the game */
+/* currently handles inventory and turns. */
+/* gamestate(); -- save state */
+/* gamestate(true); -- restore state */
+static int
+nhl_gamestate(lua_State *L)
+{
+    int argc = lua_gettop(L);
+    boolean reststate = argc > 0 ? lua_toboolean(L, -1) : FALSE;
+    static struct obj *invent = NULL;
+    static long moves = 0;
+    static boolean stored = FALSE;
+    static struct you ubak;
+
+    if (reststate && stored) {
+        /* restore game state */
+        gm.moves = moves;
+        gl.lastinvnr = 51;
+        while (gi.invent)
+            useupall(gi.invent);
+        while (invent) {
+            struct obj *otmp = invent;
+            long wornmask = otmp->owornmask;
+            otmp->owornmask = 0L;
+            extract_nobj(otmp, &invent);
+            addinv(otmp);
+            if (wornmask)
+                setworn(otmp, wornmask);
+        }
+        u = ubak;
+        init_uhunger();
+        stored = FALSE;
+    } else {
+        /* store game state */
+        while (gi.invent) {
+            struct obj *otmp = gi.invent;
+            long wornmask = otmp->owornmask;
+            setnotworn(otmp);
+            freeinv(otmp);
+            otmp->nobj = invent;
+            otmp->owornmask = wornmask;
+            invent = otmp;
+        }
+        gl.lastinvnr = 51;
+        moves = gm.moves;
+        ubak = u;
+        stored = TRUE;
+    }
+    update_inventory();
+    return 0;
+}
+
 RESTORE_WARNING_UNREACHABLE_CODE
 
 static const struct luaL_Reg nhl_functions[] = {
@@ -1447,7 +1643,11 @@ static const struct luaL_Reg nhl_functions[] = {
     {"pline", nhl_pline},
     {"verbalize", nhl_verbalize},
     {"menu", nhl_menu},
+    {"text", nhl_text},
     {"getlin", nhl_getlin},
+    {"eckey", nhl_get_cmd_key},
+    {"callback", nhl_callback},
+    {"gamestate", nhl_gamestate},
 
     {"makeplural", nhl_makeplural},
     {"makesingular", nhl_makesingular},
@@ -2018,6 +2218,8 @@ static struct e ct_base_iffy[] = {
 };
 
 /* NHL_BASE_UNSAFE - include only if required */
+/* TODO: if NHL_BASE_UNSAFE is ever used, we need to wrap lua_load with
+ * something to forbid mode=="b" */
 static struct e ct_base_unsafe[] = {
     {IFFLAG, "dofile"},
     {IFFLAG, "loadfile"},

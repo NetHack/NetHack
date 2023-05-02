@@ -368,6 +368,58 @@ extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
 
+/* ask user if they want a tutorial, except if tutorial boolean option has been
+   set in config - either on or off - in which case just obey that setting
+   without asking. */
+#ifdef SAFERHANGUP
+#define DONE_HUP gp.program_state.done_hup
+#else
+#define DONE_HUP 0
+#endif
+boolean
+ask_do_tutorial(void)
+{
+    boolean dotut = flags.tutorial;
+
+    if (!opt_set_in_config[opt_tutorial]) {
+        winid win;
+        menu_item *sel;
+        anything any;
+        int n;
+
+        do {
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win, MENU_BEHAVE_STANDARD);
+            any = cg.zeroany;
+            any.a_char = 'y';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
+            any.a_char = 'n';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "No", MENU_ITEMFLAGS_NONE);
+
+            any = cg.zeroany;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "Put \"OPTIONS=notutorial\" in the config file to skip this query.", MENU_ITEMFLAGS_NONE);
+
+            end_menu(win, "Do you want a tutorial?");
+
+            n = select_menu(win, PICK_ONE, &sel);
+            destroy_nhwindow(win);
+        } while (n <= 0 && !DONE_HUP);
+        if (n > 0) {
+            dotut = (sel[0].item.a_char == 'y');
+            free((genericptr_t) sel);
+        }
+    }
+    return dotut;
+}
+#undef DONE_HUP
+
 /*
  **********************************
  *
@@ -474,7 +526,7 @@ parseoptions(
     if (!got_match) {
         /* spin through the aliases to see if there's a match in those.
            Note that if multiple delimited aliases for the same option
-           becomes desireable in the future, this is where you'll need
+           becomes desirable in the future, this is where you'll need
            to split a delimited allopt[i].alias field into each
            individual alias */
 
@@ -1807,49 +1859,6 @@ optfn_IBMgraphics(int optidx, int req, boolean negated,
     }
     return optn_ok;
 }
-
-#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
-static int
-optfn_MACgraphics(int optidx, int req, boolean negated, char *opts, char *op)
-{
-    boolean badflag = FALSE;
-
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        /* "MACgraphics" */
-        if (!negated) {
-            if (gs.symset[PRIMARYSET].name) {
-                badflag = TRUE;
-            } else {
-                gs.symset[PRIMARYSET].name = dupstr(allopt[optidx].name);
-                if (!read_sym_file(PRIMARYSET)) {
-                    badflag = TRUE;
-                    clear_symsetentry(PRIMARYSET, TRUE);
-                }
-            }
-            if (badflag) {
-                config_error_add("Failure to load symbol set %s.",
-                                 allopt[optidx].name);
-                return FALSE;
-            } else {
-                switch_symbols(TRUE);
-                if (!go.opt_initial && Is_rogue_level(&u.uz))
-                    assign_graphics(ROGUESET);
-            }
-        }
-        return optn_ok;
-    }
-    if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
-}
-#endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
 
 static int
 optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
@@ -7098,10 +7107,12 @@ parsebindings(char *bindings)
  *
  */
 
-static const struct color_names {
+struct color_names {
     const char *name;
     int color;
-} colornames[] = {
+};
+
+static const struct color_names colornames[] = {
     { "black", CLR_BLACK },
     { "red", CLR_RED },
     { "green", CLR_GREEN },
@@ -7118,7 +7129,7 @@ static const struct color_names {
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { "no color", NO_COLOR },
-    { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { (const char *) 0, CLR_BLACK }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
     { "purple", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
@@ -7131,10 +7142,12 @@ static const struct color_names {
     { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
-static const struct attr_names {
+struct attr_names {
     const char *name;
     int attr;
-} attrnames[] = {
+};
+
+static const struct attr_names attrnames[] = {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
@@ -7142,7 +7155,7 @@ static const struct attr_names {
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },
-    { NULL, ATR_NONE }, /* everything after this is an alias */
+    { (const char *) 0, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
     { "uline", ATR_ULINE },
     { "reverse", ATR_INVERSE },
@@ -8403,6 +8416,7 @@ doset_simple_menu(void)
     anything any;
     enum OptSection section;
     int i, k, pick_cnt, reslt;
+    boolean toggled_help = FALSE;
 
     /* we do this each time we're called instead of once in doset_simple()
        in case 'menu_tab_sep' ever gets included in the simple menu so
@@ -8414,8 +8428,18 @@ doset_simple_menu(void)
         Strcpy(fmtstr_doset_simple, fmtstr_tab_doset_simple);
     fmtstr = fmtstr_doset_simple;
 
+ redo_opt_help:
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
+
+    any = cg.zeroany;
+    any.a_int = -2 + 1;
+    add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, 0,
+             gs.simple_options_help ? "hide help" : "show help",
+             MENU_ITEMFLAGS_NONE);
+    any = cg.zeroany;
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+             0, "", MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
@@ -8473,6 +8497,15 @@ doset_simple_menu(void)
                 Strcat(buf, "  (for autopickup)");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            if (gs.simple_options_help && allopt[i].descr) {
+                any = cg.zeroany;
+                Sprintf(buf, "    %s", allopt[i].descr);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+                any = cg.zeroany;
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                         0, "", MENU_ITEMFLAGS_NONE);
+            }
         }
     }
     end_menu(tmpwin, "Options");
@@ -8486,7 +8519,10 @@ doset_simple_menu(void)
         k = pick_list[0].item.a_int - 1;
 
         abuf[0] = '\0';
-        if (allopt[k].opttyp == BoolOpt) {
+        if (k == -2) {
+            gs.simple_options_help = !gs.simple_options_help;
+            toggled_help = TRUE;
+        } else if (allopt[k].opttyp == BoolOpt) {
             /* boolean option */
             Sprintf(buf, "%s%s", *allopt[k].addr ? "!" : "", allopt[k].name);
             (void) parseoptions(buf, FALSE, FALSE);
@@ -8512,7 +8548,7 @@ doset_simple_menu(void)
                    'picked 1' to caller which will loop for another choice */
             }
         }
-        if (abuf[0] != '\033'
+        if (k >= 0 && abuf[0] != '\033'
             && (wc_supported(allopt[k].name)
                 || wc2_supported(allopt[k].name)))
             preference_update(allopt[k].name);
@@ -8522,6 +8558,11 @@ doset_simple_menu(void)
     /* tear down this instance of the menu; if pick_cnt is 1, caller
        will immediately call us back to put up another instance */
     destroy_nhwindow(tmpwin);
+
+    if (toggled_help) {
+        toggled_help = FALSE;
+        goto redo_opt_help;
+    }
 
     return pick_cnt;
 }
@@ -8572,13 +8613,13 @@ term_for_boolean(int idx, boolean *b)
     int i, f_t = (*b) ? 1: 0;
     const char *boolean_term;
     static const char *const booleanterms[2][num_terms] = {
-        { "false", "off", "disabled", },
-        { "true", "on", "enabled", },
+        { "false", "off", "disabled", "excluded from build" },
+        { "true", "on", "enabled", "included"},
     };
 
     boolean_term = booleanterms[f_t][0];
     i = (int) allopt[idx].termpref;
-    if (i > Term_False && i < num_terms)
+    if (i > Term_False && i < num_terms && i < SIZE(booleanterms[0]))
         boolean_term = booleanterms[f_t][i];
     return boolean_term;
 }

@@ -292,6 +292,8 @@ curs_add_invt(
         pi.array = (struct pi_line *) alloc(pi.allocsize * sizeof *aptr);
         for (idx = 0; idx < pi.allocsize; ++idx)
             pi.array[idx] = (idx < pi.inuseindx) ? aptr[idx] : zero_pi_line;
+        if (aptr)
+            free(aptr);
         aptr = pi.array;
     }
 

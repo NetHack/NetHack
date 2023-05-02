@@ -67,8 +67,8 @@
 #endif  /* OBJECTS_DESCR_INIT || OBJECTS_INIT || OBJECTS_ENUM */
 
 #define GENERIC(desc, class, gen_enum) \
-    OBJECT(OBJ(NoDes, desc),                                            \
-           BITS(0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, P_NONE, 0),            \
+    OBJECT(OBJ("generic " desc, desc),                                  \
+           BITS(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, 0),            \
            0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLR_GRAY, gen_enum)
 
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
@@ -441,22 +441,29 @@ HELM("fedora", NoDes,
                                                         FEDORA),
 HELM("cornuthaum", "conical hat",
      0, 1, CLAIRVOYANT,  3, 1,  4, 80, 10, 1, CLOTH, CLR_BLUE,
-                                                        CORNUTHAUM),
         /* name coined by devteam; confers clairvoyance for wizards,
            blocks clairvoyance if worn by role other than wizard */
+                                                        CORNUTHAUM),
 HELM("dunce cap", "conical hat",
      0, 1,           0,  3, 1,  4,  1, 10, 0, CLOTH, CLR_BLUE,
+        /* sets Int and Wis to fixed value of 6, so actually provides
+           protection against death caused by Int being drained below 3 */
                                                         DUNCE_CAP),
 HELM("dented pot", NoDes,
      1, 0,           0,  2, 0, 10,  8,  9, 0, IRON, CLR_BLACK,
                                                         DENTED_POT),
+HELM("helm of brilliance", "crystal helmet",
+     0, 1,           0,  3, 1, 40, 50,  9, 0, GLASS, CLR_WHITE,
+        /* used to be iron and shuffled as "etched helmet" but required
+           special case for the effect of iron armor on spell casting */
+                                                        HELM_OF_BRILLIANCE),
 /* with shuffled appearances... */
 HELM("helmet", "plumed helmet",
      0, 0,           0, 10, 1, 30, 10,  9, 0, IRON, HI_METAL,
                                                         HELMET),
-HELM("helm of brilliance", "etched helmet",
-     0, 1,           0,  6, 1, 50, 50,  9, 0, IRON, CLR_GREEN,
-                                                        HELM_OF_BRILLIANCE),
+HELM("helm of caution", "etched helmet",
+     0, 1,     WARNING,  3, 1, 50, 50,  9, 0, IRON, CLR_GREEN,
+                                                        HELM_OF_CAUTION),
 HELM("helm of opposite alignment", "crested helmet",
      0, 1,           0,  6, 1, 50, 50,  9, 0, IRON, HI_METAL,
                                                  HELM_OF_OPPOSITE_ALIGNMENT),
@@ -850,10 +857,16 @@ MARKER(LAST_AMULET, AMULET_OF_YENDOR)
     OBJECT(OBJ(name, desc),                                             \
            BITS(kn, 0, chg, 1, mgc, chg, 0, 0, 0, 0, 0, P_NONE, mat),   \
            0, TOOL_CLASS, prob, 0, wt, cost, 0, 0, 0, 0, wt, color, sn)
-#define WEPTOOL(name,desc,kn,mgc,bi,prob,wt,cost,sdam,ldam,hitbon,sub,mat,clr,sn)\
+#define EYEWEAR(name,desc,kn,prop,prob,wt,cost,mat,color,sn) \
+    OBJECT(OBJ(name, desc),                                             \
+           BITS(kn, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, P_NONE, mat),         \
+           prop, TOOL_CLASS, prob, 0, wt, cost, 0, 0, 0, 0, wt, color, sn)
+#define WEPTOOL(name,desc,kn,mgc,bi,prob,wt,cost,sdam,ldam,hitbon,sub, \
+                mat,clr,sn)                                             \
     OBJECT(OBJ(name, desc),                                             \
            BITS(kn, 0, 1, 0, mgc, 1, 0, 0, bi, 0, hitbon, sub, mat),    \
-           0, TOOL_CLASS, prob, 0, wt, cost, sdam, ldam, hitbon, 0, wt, clr, sn)
+           0, TOOL_CLASS, prob, 0, wt, cost, sdam, ldam, hitbon, 0, wt, \
+           clr, sn)
 /* containers */
 CONTAINER("large box",       NoDes, 1, 0, 0, 40, 350,   8, WOOD, HI_WOOD,
                                                                 LARGE_BOX),
@@ -891,17 +904,24 @@ TOOL("magic lamp",        "lamp", 0, 0, 1, 0, 15, 20, 50, COPPER, CLR_YELLOW,
                                                                 MAGIC_LAMP),
 /* other tools */
 TOOL("expensive camera",    NoDes, 1, 0, 0, 1, 15, 12,200, PLASTIC, CLR_BLACK,
-                                                              EXPENSIVE_CAMERA),
+                                                            EXPENSIVE_CAMERA),
 TOOL("mirror",   "looking glass", 0, 0, 0, 0, 45, 13, 10, GLASS, HI_SILVER,
                                                                 MIRROR),
 TOOL("crystal ball", "glass orb", 0, 0, 1, 1, 15,150, 60, GLASS, HI_GLASS,
                                                                 CRYSTAL_BALL),
-TOOL("lenses",              NoDes, 1, 0, 0, 0,  5,  3, 80, GLASS, HI_GLASS,
+/* eyewear - tools which can be worn on the face; (!mrg, !chg, !mgc)
+   worn lenses don't confer the Blinded property, blindfolds and towels do;
+   wet towel can be used as a weapon but is not a weptool and uses obj->spe
+   differently from weapons and weptools */
+EYEWEAR("lenses",           NoDes, 1,       0,  5,  3, 80, GLASS, HI_GLASS,
                                                                 LENSES),
-TOOL("blindfold",           NoDes, 1, 0, 0, 0, 50,  2, 20, CLOTH, CLR_BLACK,
+EYEWEAR("blindfold",        NoDes, 1, BLINDED, 50,  2, 20, CLOTH, CLR_BLACK,
                                                                 BLINDFOLD),
-TOOL("towel",               NoDes, 1, 0, 0, 0, 50,  5, 50, CLOTH, CLR_MAGENTA,
+EYEWEAR("towel",            NoDes, 1, BLINDED, 50,  2, 50, CLOTH, CLR_MAGENTA,
                                                                 TOWEL),
+#undef EYEWEAR
+
+/* still other tools */
 TOOL("saddle",              NoDes, 1, 0, 0, 0,  5,200,150, LEATHER, HI_LEATHER,
                                                                 SADDLE),
 TOOL("leash",               NoDes, 1, 0, 0, 0, 65, 12, 20, LEATHER, HI_LEATHER,
@@ -1540,7 +1560,7 @@ ROCK("luckstone", "gray",  0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY,
 ROCK("loadstone", "gray",  0,  10, 500,  1, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
                                                                     LOADSTONE),
 ROCK("touchstone", "gray", 0,   8,  10, 45, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
-                                                                    TOUCHSTONE),
+                                                                  TOUCHSTONE),
 ROCK("flint", "gray",      0,  10,  10,  1, 6, 6, 0, 10, 7, MINERAL, CLR_GRAY,
                                                                     FLINT),
 ROCK("rock", NoDes,         1, 100,  10,  0, 3, 3, 0, 10, 7, MINERAL, CLR_GRAY,

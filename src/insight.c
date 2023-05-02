@@ -99,15 +99,15 @@ static struct ll_achieve_msg achieve_msg [] = {
 /* macros to simplify output of enlightenment messages; also used by
    conduct and achievements */
 #define enl_msg(prefix, present, past, suffix, ps) \
-    enlght_line(prefix, final ? past : present, suffix, ps)
-#define you_are(attr, ps) enl_msg(You_, are, were, attr, ps)
-#define you_have(attr, ps) enl_msg(You_, have, had, attr, ps)
-#define you_can(attr, ps) enl_msg(You_, can, could, attr, ps)
-#define you_have_been(goodthing) enl_msg(You_, have_been, were, goodthing, "")
+    enlght_line((prefix), final ? (past) : (present), (suffix), (ps))
+#define you_are(attr, ps) enl_msg(You_, are, were, (attr), (ps))
+#define you_have(attr, ps) enl_msg(You_, have, had, (attr), (ps))
+#define you_can(attr, ps) enl_msg(You_, can, could, (attr), (ps))
+#define you_have_been(goodthing) enl_msg(You_, have_been, were, (goodthing), "")
 #define you_have_never(badthing) \
-    enl_msg(You_, have_never, never, badthing, "")
+    enl_msg(You_, have_never, never, (badthing), "")
 #define you_have_X(something) \
-    enl_msg(You_, have, (const char *) "", something, "")
+    enl_msg(You_, have, (const char *) "", (something), "")
 
 static void
 enlght_out(const char *buf)
@@ -998,17 +998,16 @@ status_enlightenment(int mode, int final)
     if (Hallucination)
         you_are("hallucinating", "");
     if (Blind) {
-        /* from_what() (currently wizard-mode only) checks !haseyes()
-           before u.uroleplay.blind, so we should too */
+        /* check the reasons in same order as from_what() */
         Sprintf(buf, "%s blind",
-                !haseyes(gy.youmonst.data) ? "innately"
-                : u.uroleplay.blind ? "permanently"
-                  /* better phrasing desperately wanted... */
+                (HBlinded & FROMOUTSIDE) != 0L ? "permanently"
+                : (HBlinded & FROMFORM) ? "innately"
+                  /* better phrasing desparately wanted... */
                   : Blindfolded_only ? "deliberately"
+                    /* timed, possibly combined with blindfold */
                     : "temporarily");
-        if (wizard && (Blinded & TIMEOUT) != 0L
-            && !u.uroleplay.blind && haseyes(gy.youmonst.data))
-            Sprintf(eos(buf), " (%ld)", (Blinded & TIMEOUT));
+        if (wizard && (HBlinded == BlindedTimeout && !Blindfolded))
+            Sprintf(eos(buf), " (%ld)", BlindedTimeout);
         /* !haseyes: avoid "you are innately blind innately" */
         you_are(buf, !haseyes(gy.youmonst.data) ? "" : from_what(BLINDED));
     }
@@ -1214,7 +1213,7 @@ weapon_insight(int final)
     int wtype;
 
     /* report being weaponless; distinguish whether gloves are worn
-       [perhaps mention silver ring(s) when not wearning gloves?] */
+       [perhaps mention silver ring(s) when not wearing gloves?] */
     if (!uwep) {
         you_are(empty_handed(), "");
 
@@ -1493,14 +1492,17 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
         you_can("recognize detrimental food", "");
 
     /*** Vision and senses ***/
-    if (!Blind && (Blinded || !haseyes(gy.youmonst.data)))
+    if ((HBlinded || EBlinded) && BBlinded) /* blind w/ blindness blocked */
         you_can("see", from_what(-BLINDED)); /* Eyes of the Overworld */
     if (See_invisible) {
         if (!Blind)
             enl_msg(You_, "see", "saw", " invisible", from_what(SEE_INVIS));
-        else
+        else if (!PermaBlind)
             enl_msg(You_, "will see", "would have seen",
-                    " invisible when not blind", from_what(SEE_INVIS));
+                    " invisible when not blind", "");
+        else
+            enl_msg(You_, "would see", "would have seen",
+                    " invisible if not blind", "");
     }
     if (Blind_telepat)
         you_are("telepathic", from_what(TELEPAT));
@@ -1643,7 +1645,7 @@ attributes_enlightenment(int unused_mode UNUSED, int final)
                     Levitation
                        ? " if you weren't levitating"
                        : (save_BFly == I_SPECIAL)
-                          /* this is an oversimpliction; being trapped
+                          /* this is an oversimplification; being trapped
                              might also be blocking levitation so flight
                              would still be blocked after escaping trap */
                           ? " if you weren't trapped"
@@ -2013,6 +2015,8 @@ show_conduct(int final)
 
     if (u.uroleplay.blind)
         you_have_been("blind from birth");
+    if (u.uroleplay.deaf)
+        you_have_been("deaf from birth");
     if (u.uroleplay.nudist)
         you_have_been("faithfully nudist");
 
@@ -2044,6 +2048,9 @@ show_conduct(int final)
                 plur(u.uconduct.literate));
         you_have_X(buf);
     }
+
+    if (!u.uconduct.pets)
+        you_have_never("had a pet");
 
     ngenocided = num_genocides();
     if (ngenocided == 0) {
@@ -2826,7 +2833,7 @@ list_vanquished(char defquery, boolean ask)
      * which needs putstr() and past tense.
      */
     } else if (!gp.program_state.gameover) {
-        /* #dovanquished rather than final disclosure, so pline() is ok */
+        /* #vanquished rather than final disclosure, so pline() is ok */
         pline("No creatures have been vanquished.");
 #ifdef DUMPLOG
     } else if (dumping) {
@@ -2852,6 +2859,7 @@ num_genocides(void)
     return n;
 }
 
+/* return a count of the number of extinct species */
 static int
 num_extinct(void)
 {
@@ -2866,6 +2874,8 @@ num_extinct(void)
     return n;
 }
 
+/* show genocided and extinct monster types for final disclosure/dumplog
+   or for the #genocided command */
 void
 list_genocided(char defquery, boolean ask)
 {
@@ -2933,11 +2943,24 @@ list_genocided(char defquery, boolean ask)
             display_nhwindow(klwin, TRUE);
             destroy_nhwindow(klwin);
         }
+
+    /* See the comment for similar code near the end of list_vanquished(). */
+    } else if (!gp.program_state.gameover) {
+        /* #genocided rather than final disclosure, so pline() is ok */
+        pline("No creatures have been genocided or become extinct.");
 #ifdef DUMPLOG
     } else if (dumping) {
         putstr(0, 0, "No species were genocided or became extinct.");
 #endif
     }
+}
+
+/* M-g - #genocided command */
+int
+dogenocided(void)
+{
+    list_genocided('y', FALSE);
+    return ECMD_OK;
 }
 
 /*
@@ -3156,7 +3179,7 @@ ustatusline(void)
     if (Blind) {
         Strcat(info, ", blind");
         if (u.ucreamed) {
-            if ((long) u.ucreamed < Blinded || Blindfolded
+            if ((long) u.ucreamed < BlindedTimeout || Blindfolded
                 || !haseyes(gy.youmonst.data))
                 Strcat(info, ", cover");
             Strcat(info, "ed by sticky goop");
@@ -3200,5 +3223,15 @@ ustatusline(void)
           Upolyd ? mons[u.umonnum].mlevel : u.ulevel, Upolyd ? u.mh : u.uhp,
           Upolyd ? u.mhmax : u.uhpmax, u.uac, info);
 }
+
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef enl_msg
+#undef you_are
+#undef you_have
+#undef you_can
+#undef you_have_been
+#undef you_have_never
+#undef you_have_X
 
 /*insight.c*/

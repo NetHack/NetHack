@@ -45,7 +45,7 @@ static int potion_dip(struct obj *obj, struct obj *potion);
 /* used to indicate whether quaff or dip has skipped an opportunity to
    use a fountain or such, in order to vary the feedback if hero lacks
    any potions [reinitialized every time it's used so does not need to
-   be placed in struct instance_globals g] */
+   be placed in struct instance_globals gd] */
 static int drink_ok_extra = 0;
 
 /* force `val' to be within valid range for intrinsic timeout value */
@@ -54,8 +54,8 @@ itimeout(long val)
 {
     if (val >= TIMEOUT)
         val = TIMEOUT;
-    else if (val < 1)
-        val = 0;
+    else if (val < 1L)
+        val = 0L;
 
     return val;
 }
@@ -257,16 +257,16 @@ static const char eyemsg[] = "%s momentarily %s.";
 void
 make_blinded(long xtime, boolean talk)
 {
-    long old = Blinded;
+    long old = BlindedTimeout;
     boolean u_could_see, can_see_now;
     const char *eyes;
 
-    /* we need to probe ahead in case the Eyes of the Overworld
+    /* we probe ahead in case the Eyes of the Overworld
        are or will be overriding blindness */
     u_could_see = !Blind;
-    Blinded = xtime ? 1L : 0L;
+    set_itimeout(&HBlinded, xtime ? 1L : 0L);
     can_see_now = !Blind;
-    Blinded = old; /* restore */
+    set_itimeout(&HBlinded, old);
 
     if (Unaware)
         talk = FALSE;
@@ -320,7 +320,7 @@ make_blinded(long xtime, boolean talk)
         }
     }
 
-    set_itimeout(&Blinded, xtime);
+    set_itimeout(&HBlinded, xtime);
 
     if (u_could_see ^ can_see_now) { /* one or the other but not both */
         toggle_blindness();
@@ -448,7 +448,8 @@ make_deaf(long xtime, boolean talk)
     if ((xtime != 0L) ^ (old != 0L)) {
         gc.context.botl = TRUE;
         if (talk)
-            You(old ? "can hear again." : "are unable to hear anything.");
+            You(old && !Deaf ? "can hear again."
+                             : "are unable to hear anything.");
     }
 }
 
@@ -1035,22 +1036,21 @@ peffect_speed(struct obj *otmp)
         return;
     }
 
-    if (!Very_fast) { /* wwf@doe.carleton.ca */
-        You("are suddenly moving %sfaster.", Fast ? "" : "much ");
-    } else {
-        Your("%s get new energy.", makeplural(body_part(LEG)));
-        gp.potion_unkn++;
+    speed_up(rn1(10, 100 + 60 * bcsign(otmp)));
+
+    /* non-cursed potion grants intrinsic speed */
+    if (is_speed && !otmp->cursed && !(HFast & INTRINSIC)) {
+        Your("quickness feels very natural.");
+        HFast |= FROMOUTSIDE;
     }
-    exercise(A_DEX, TRUE);
-    incr_itimeout(&HFast, rn1(10, 100 + 60 * bcsign(otmp)));
 }
 
 static void
 peffect_blindness(struct obj *otmp)
 {
-    if (Blind)
+    if (Blind || ((HBlinded || EBlinded) && BBlinded))
         gp.potion_nothing++;
-    make_blinded(itimeout_incr(Blinded,
+    make_blinded(itimeout_incr(BlindedTimeout,
                                rn1(200, 250 - 125 * bcsign(otmp))),
                  (boolean) !Blind);
 }
@@ -1422,7 +1422,7 @@ healup(int nhp, int nxtra, boolean curesick, boolean cureblind)
         }
     }
     if (cureblind) {
-        /* 3.6.1: it's debatible whether healing magic should clean off
+        /* 3.6.1: it's debatable whether healing magic should clean off
            mundane 'dirt', but if it doesn't, blindness isn't cured */
         u.ucreamed = 0;
         make_blinded(0L, TRUE);
@@ -2037,7 +2037,7 @@ potionbreathe(struct obj *obj)
             kn++;
             pline("It suddenly gets dark.");
         }
-        make_blinded(itimeout_incr(Blinded, rnd(5)), FALSE);
+        make_blinded(itimeout_incr(BlindedTimeout, rnd(5)), FALSE);
         if (!Blind && !Unaware)
             Your1(vision_clears);
         break;
@@ -2720,6 +2720,7 @@ djinni_from_bottle(struct obj *obj)
         chance = (chance == 0) ? rn2(4) : 4;
     /* 0,1,2,3,4:  b=80%,5,5,5,5; nc=20%,20,20,20,20; c=5%,5,5,5,80 */
 
+    SetVoice(mtmp, 0, 80, 0);
     switch (chance) {
     case 0:
         verbalize("I am in your debt.  I will grant one wish!");
@@ -2783,6 +2784,19 @@ split_mon(
         }
     }
     return mtmp2;
+}
+
+/* Character becomes very fast temporarily. */
+void
+speed_up(long duration)
+{
+   if (!Very_fast)
+       You("are suddenly moving %sfaster.", Fast ? "" : "much ");
+   else
+       Your("%s get new energy.", makeplural(body_part(LEG)));
+
+   exercise(A_DEX, TRUE);
+   incr_itimeout(&HFast, duration);
 }
 
 /*potion.c*/

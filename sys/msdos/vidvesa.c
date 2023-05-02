@@ -1062,7 +1062,7 @@ vesa_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /* clear_screen() */ /* not vesa_clear_screen() */
+        /* term_clear_screen() */ /* not vesa_clear_screen() */
         return;
     }
 #endif
@@ -1078,7 +1078,7 @@ vesa_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /* clear_screen() */ /* not vesa_clear_screen() */
+        /* term_clear_screen() */ /* not vesa_clear_screen() */
         return;
     }
 
@@ -1100,7 +1100,7 @@ vesa_Init(void)
     vesa_SetPalette(paletteptr);
     g_attribute = attrib_gr_normal;
     font = vesa_FontPtrs();
-    clear_screen();
+    term_clear_screen();
     clipx = 0;
     clipxmax = clipx + (viewport_cols - 1);
     clipy = 0;

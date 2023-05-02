@@ -1,5 +1,5 @@
 # monsters.txt - tile defintions for monsters
-#  Note too: lines beginning with '# tile ' are not comments; other
+#  Note: lines beginning with '# tile ' are not comments; other
 #  lines beginning with '#' are.
 . = (71, 108, 108)
 A = (0, 0, 0)

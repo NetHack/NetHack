@@ -13,6 +13,11 @@
 set debug to false
 
 set needshutdown to false
+
+tell application "Finder"
+	set bundleAppPath to POSIX path of (application file id "org.nethack.macos" as text)
+end tell
+
 tell application "Terminal"
 	# see if we're going to have to shut it down at the end because we started it up
 	if it is not running then
@@ -21,7 +26,7 @@ tell application "Terminal"
 	
 	activate
 	#open new window and run NetHack in it
-	do script with command "clear;sleep 1;/usr/local/bin/nethack;echo '(press RETURN to exit)';awk '{exit}';exit"
+	do script with command "clear;sleep 1;pwd;" & bundleAppPath & "/Contents/MacOS/nethack;echo '(press RETURN to exit)';awk '{exit}';exit"
 	set nhresult to result -- class is tab
 	set nhresrec to result as record
 	set nhreslist to result as list

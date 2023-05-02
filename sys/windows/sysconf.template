@@ -70,6 +70,12 @@ WIZARDS=*
 # numeric (1) user id.
 #PERS_IS_UID=1
 
+# Help menu control; 0 - include "command line usage" entry in help menu;
+# 1 - suppress it from the menu.  Does not affect 'nethack --usage' when
+# player has access to the command line.  The usage feedback describes
+# command line handling for UNIX so enabling it won't be much use here.
+HIDEUSAGE=1
+
 # Maximum number of score file entries to use for random statue names
 #MAX_STATUENAME_RANK=10
 

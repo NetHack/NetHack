@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1051 $ $NHDT-Date: 1665130022 2022/10/07 08:07:02 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1153 $ $NHDT-Date: 1681429662 2023/04/13 23:47:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -409,7 +409,6 @@ spells that require a target spot rather than a direction (like skilled
 prevent wish request "death wand" from matching Death monster and producing a
 	random wand instead of a wand of death
 grammar bit: "you hear a [AEF] note squeak in the distance" (should be "an")
-curses interface failed to honor menu_xxx option settings for menu interaction
 during engraving, spaces were counted instead of non-spaces [later: affected
 	code is gone, removed when engraving was converted into an occupation]
 when an explosion scatters objects, make any that fly over sinks stop there
@@ -531,6 +530,10 @@ prediscovered weapons adjustmens:  only knights and samurai know polearms;
 if the move counter ever reaches 1000000000, end the game
 knights get no metal armor penalty for clerical spells
 change touch of death from instadeath to maxhp reduction and damage
+report cause of death due to touch of death as "killed by the touch of death
+	inflicted by <monster>" instead of just "killed by a touch of death"
+report cause of death due to wand/spell/breath as "killed by <flash damage>
+	zapped/cast/exhaled by <monster>" instead of just "killed by <damage>"
 dying from being level-drained below level 1 killed hero without saying so
 	and jumped straight to "do you want your possessions identified?"
 conflict will now consider your charisma and requires line of sight
@@ -973,6 +976,8 @@ wielding a bec de corbin makes ravens generate peaceful
 moving with 'm' prefix allows hero to enter a known pit carefully
 rangers always succeed in disarming bear traps, unless impaired
 bigroom variant 2 may have ice floor in unlit areas
+bigroom variant 4 may have two large squares of terrain in the middle
+bigroom variant 5 may have patches of ice or clouds
 some large monsters can knock back smaller monsters with a hit
 change Demonbane to a mace, make it the first sac gift for priests,
 	and give it an invoke ability to banish demons
@@ -1101,12 +1106,68 @@ eating garlic makes nearby monsters flee
 giants occasionally get a battle axe or a two-handed sword
 give gremlin the property it stole, if possible
 'F'orcefighting with a war hammer has a small chance of breaking iron bars
+player assigned name for monsters, specific objects, or object types could be
+	longer than what was intented to be allowed; for 'curses', much longer
 very rarely random items are generated eroded, erodeproof, or greased
 Nazgul can see invisible
+fix a case where punished iron ball yanked hero on top of a monster
+slightly randomize amount of items and monsters in the mines
+dying in a wall spot (temporary gap or via Passes_walls) shared by two shops
+	could result in "place_object: \"<item>\" [0] off map <0,0>" warnings
+a monster capable of using a polymorph trap to deliberately change form could
+	do so when trapped in an adjacent web or pit; if that happened, the
+	monster remained flagged as 'trapped' and wouldn't be able to move
+give feedback when some types of damage are avoided due to MC (aka negation)
+feedback if a named, shape-shifted vampire reverted to original shape rather
+	than dying when engulfed could say "Dracula turns into Dracula"
+adjust archeologist and valkyrie starting intrinsics
+once per game if receiving killing blow from near-full hp, leave 1 hp
+spell of knock can knock back small monsters
+protection from shape changers now prevents the Wizard from mimicking monsters
+having worn levitation boots removed and destroyed (scroll, monster spell,
+	dragon breath) and floating down into lava can destroy them twice;
+	yielded "object lost" panic if program had been built with a debugging
+	malloc implementation which overwrites the contents of freed memory
+ensure that all window interfaces respect flags.silent (suppress terminal beep)
+falling into lava, being life-saved, and teleporting out could yield redundant
+	descriptions of what was present at hero's new location
+if hero had passes-walls capability and was at the location of a closed door,
+	attempting to use 'o' on own spot reported "you don't find anything
+	here to loot"; change to open door for '.' (or '<'), only loot for '>'
+items thrown by monster landing on an altar did not show BUC flash
+a chameleon in giant form who gets trapped (bear trap?) while carrying
+	boulders and changes shape could be killed when dropping them;
+	shape-change traversal of its inventory would continue after it
+	dropped everything, possibly resulting in a crash
+if hero is engulfed and polymorphs into a monster form which is too big to be
+	engulfed, make engulfer expel the poly'd hero
+give feedback if monster holding onto the hero has to let go when hero polys
+	into a form which can't be held
+prevent hug attacks and touch or engulf attacks for wrap, stick-to, and
+	digestion damage from succeeding against unsolid targets (ghosts,
+	vortices, a few others)
+wand of speed gives temporary speed, potion gives intrinsic
+some monsters (riders, shopkeepers, priests, quest leader) can break boulders
+corpse-eating monsters will go out of their way to eat corpses on the floor
+warnings via impossible() would be unseen if message suppression via ESC at
+	--More-- prompt was in effect
+wearing the Eyes of the Overworld overrides OPTIONS:blind; breaking the
+	always-blind conduct by doing that was intended but having permanent
+	blindness stay cured after removing them was not
+change helm of brilliance from iron to crystal so that it no longer needs to
+	be a special case for metallic armor vs spell casting
+fake player monsters in endgame had a 1 in 1000 chance to be given a stack
+	of 0 gold pieces, eventually triggering an impossible warning (cited
+	one was "Calculating weight of 0 gold pieces?")
+avoid "wall_angle: unknown hwall mode 4" when using #terrain command to
+	display a spot remembered as a wall but actually a secret door that
+	has been transformed into an open door while not in sight
+it was possible to produce a web at a water or lava location; it would not be
+	visible but could trap the hero, resulting in drowning or incineration
 
 
-Fixes to 3.7.0-x Problems that Were Exposed Via git Repository
-------------------------------------------------------------------
+Fixes to 3.7.0-x General Problems Exposed Via git Repository
+------------------------------------------------------------
 incrementing EDITLEVEL to invalidate incompatible save files was not working
 	as intended because VERSION_COMPABILITY was defined as 3.7.0-0 and up
 	rather than as 3.7.0-N for the current EDITLEVEL 'N'; undefine it
@@ -1480,7 +1541,20 @@ hallucination of objects incorrectly included generic objects as candidates
 	for what objects looked like; if an object had its dknown flag set,
 	formatting a generic object in its place was unreliable (Null pointer
 	deference prior to static analyzer fix, odd fake name "generic" after)
+some actions that ask the user to pick a location allow typing '$' to show
+	valid spots, accept typing a second '$' prior to moving the cursor to
+	toggle the highlights off; ^R already did that; moving the cursor too
+change 'm' prefix for #tip from 'use menu to pick among floor containers'
+	(since that's already the default) to 'skip floor containers' so that
+	context-sensitive item-action Tip directly operates on the item
+anti-magic field's reduction of hero's maximum energy could result in current
+	energy being one point higher than maximum
+if hero was killed by a wand zapped by a monster, cause of death was reported
+	as "killed by a bolt of <damage type> imagined by <monster>"
 
+
+Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
+------------------------------------------------------------------------------
 curses: 'msg_window' option wasn't functional for curses unless the binary
 	also included tty support
 curses: line input that doesn't take place on the bottom line of the message
@@ -1506,6 +1580,15 @@ curses: for screen refresh, don't attempt to refresh windows that haven't been
 	set up yet or have already been shut down
 curses: for raw_print() in #if PDCURSES config, don't attempt to write to
 	message window if it isn't set up yet or has already been shut down
+curses: scrollbar 'framecolor' wasn't being initialized before use
+	causing an asan crash because the value is used to index an array
+curses: typing ESC to cancel something issued a beep; if the terminal was set
+	to 'visible bell', the screen flashed; only beep when the ESC is part
+	of an escape sequence--other than M-c generating ESC c--and nethack
+	is expecting text rather than a command or direction
+curses: with window borders on and align_status:left, restoring brought up a
+	screen where the message window's border wasn't shown; once it needed
+	to be scrolled to fit a new message, the border appeared
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
@@ -1514,6 +1597,12 @@ Qt: changes in glyph handling in the core introduced a bug in the "paper doll"
 	display for inventory subset
 Qt: during role selection, icons for role and race showed giant ant tile after
 	the glyph overhaul changes
+Qt: resolve a use-after-free error when saving message history
+Qt: with a pick-one menu containing a pre-selected entry, clicking on that
+	worked to re-select it, as intended; clicking on any other entry
+	instead of typing the selector letter toggled off preselected entry
+	but failed to toggle on the explicitly selected one; clicking again
+	after nothing was pre-selected anymore refused to toggle anything on
 tty: redraw unexplored locations as S_unexplored rather than <space> after
 	map has been partially overwritten by popup menu or text display
 tty: previous change resulted in remnants of previous level being shown on
@@ -1526,6 +1615,9 @@ tty: changes to support utf8 resulted in lines of text windows being shown
 tty: changes to support TTY_PERM_INVENT resulted in blank inventory menu when
 	using the 'i' command while carrying only gold; didn't matter whether
 	or not TTY_PERM_INVENT was enabled during build
+tty: for the !DEF_PAGER configuration, redraw screen properly if attempting
+	to display a file fails and tty_display_file()'s caller requests
+	feedback for that situation
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new
@@ -1536,6 +1628,8 @@ Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),
 	fseek(), ftell() and fread()
 Windows: when VIRTUAL_TERMINAL_SEQUENCES was not defined, the preprocessing
 	would fail on consoletty.c
+Windows: original fix for GLYPH_UNEXPLORED background tile merging resulted
+	in a new issue where the map wasn't being cleared on level changes
 X11: fix build failure if STATUS_HILITES is disabled
 X11: was still initializing map to 'stone' instead of 'unexplored' after they
 	became separate glyphs
@@ -1568,6 +1662,7 @@ curses: sometimes entering a count during menu selection caused the menu to
 	more digits typed followed by non-digit); in-out menu was still active
 	but no longer displayed
 curses: support backspace/delete when entering a count during menu selection
+curses: was failing to honor menu_xxx option settings for menu interaction
 curses: make extended command prompt behave more sensibly
 curses: if a menu of objects contains at least one iron ball, and player is
 	not already in the midst of entering a count, recognize '0' as a
@@ -1575,6 +1670,15 @@ curses: if a menu of objects contains at least one iron ball, and player is
 curses: obey timed_delay option
 curses: support tty-style extended role/race/&c selection at start of new game
 curses: implement mark_synch() and wait_synch()
+curses: only convert arrow keys to hjkl or 4286 if nethack wants a direction
+curses: conversion of arrows and other numpad-related function keys to digit
+	ignored phone-layout setting (inverted up/down) of the num_pad option
+curses: ensure alt+'A' through alt+'Z' and alt+'a' through alt+'z' work
+	correctly with PDCURSES
+curses: fix an off-by-one error when deciding whether a long line on the
+	bottom line of the message window can fit ">>" (curses' "--More--")
+curses: selecting a partial stack, unselecting it, and then selecting it
+	normally did not reset the quantity to the whole stack
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
@@ -1725,6 +1829,7 @@ Windows: When there was no interesting background in get_bk_glyph()
 	Windows version, NetHackW.exe, was trying to use the tile mapped to
 	GLYPH_UNEXPLORED as a background tile to merge with the
 	foreground tile, so check for GLYPH_UNEXPLORED and bypass that
+Windows: fix range error detected by address sanitizer in plselInitDialog()
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions
@@ -1743,6 +1848,20 @@ X11: (possibly X11+macOS): try harder to resize the getlin() prompt, if needed,
 X11: set all selectable menu lines to the same length, left justified
 X11: initializing the get-extended-command widget modified memory beyond what
 	it dynamically allocated
+sound: add a soundlib interface that consists of a specification
+	documented in doc/sound.txt; default 'nosound' soundlib implementation
+	of the specification in src/sounds.c
+sound: added 'macsound' soundlib implementation for use on macOS; the
+	interface implementation resides in the objective C file
+	sound/macsound/macsound.m; built on top of the built-in AppKit
+	NSSound, #import <AppKit/AppKit.h>, linked using -framework AppKit.
+sound: added 'windsound' soundlib implementation for use on Windows; the
+	interface implementation resides in the file
+	sound/windsound/windsound.c; built on top of the win32 api,
+	header file mmsystem.h, linked with winmm.
+sound: add 'qtsound' soundlib implementation for use on any platform
+	with Qt; the interface implementation resides win/Qt/qt_bind.cpp;
+	built on top of Qt.
 
 
 General New Features
@@ -1815,8 +1934,8 @@ boiling a pool or fountain now creates a temporary cloud of steam
 random themed rooms in the dungeons of doom
 extended achievement and conduct fields for xlogfile
 record amount of gold in hero's possession in xlogfile
-new objects:  amulets of flying and guarding, gold dragon scale mail and
-	set of gold dragon scales
+new objects:  amulets of flying and guarding, helm of caution,
+	gold dragon scale mail and set of gold dragon scales
 new monsters:  displacer beast ('f') and genetic engineer ('Q'), gold dragon
 	and baby gold dragon (both 'D')
 make camera flash which reveals previously unseen map features or objects or
@@ -1945,9 +2064,20 @@ for ranger characters, shooting any type of arrow while wielding the Longbow
 change the #vanquished command from debug-only to general user command
 add 'sortvanquished' option to be able to set the preferred sort order without
 	using 'm #vanquished' and to have it persist across save/restore
+add #genocided command
 have 'I u' mention whether there are any unpaid items on the floor (unusual
 	but not impossible); it doesn't itemize them or show shop price
 add items given a Japanese name when playing as a Samurai to discoveries list
+make music improvisations more varied and interesting, as well as useful
+give a helpful tip when first entering "farlook" mode
+add a boolean option tips to disable all of the helpful tips
+add a tutorial level
+engravings appear on the map display
+option to create the character deaf
+add conduct for petless
+preceding #overview with the 'm' prefix brings up the overview display as a
+	menu allowing selection of any visited level to #annotate; it also
+	shows every level visited rather than just the "interesting" ones
 
 
 Platform- and/or Interface-Specific New Features

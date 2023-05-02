@@ -96,10 +96,41 @@ mon_yells(struct monst* mon, const char* shout)
         if (canspotmon(mon)) {
             pline("%s yells:", Amonnam(mon));
         } else {
-            Soundeffect(se_someone_yells, 75);
+            /* Soundeffect(se_someone_yells, 75); */
             You_hear("someone yell:");
         }
+        SetVoice(mon, 0, 80, 0);
         verbalize1(shout);
+    }
+}
+
+/* can monster mtmp break boulders? */
+boolean
+m_can_break_boulder(struct monst *mtmp)
+{
+    return (is_rider(mtmp->data)
+            || (!mtmp->mspec_used
+                && (mtmp->isshk || mtmp->ispriest
+                    || (mtmp->data->msound == MS_LEADER))));
+}
+
+/* monster mtmp breaks boulder at x,y */
+void
+m_break_boulder(struct monst *mtmp, coordxy x, coordxy y)
+{
+    struct obj *otmp;
+
+    if (m_can_break_boulder(mtmp) && ((otmp = sobj_at(BOULDER, x, y)) != 0)) {
+        if (!is_rider(mtmp->data)) {
+            if (!Deaf && (mdistu(mtmp) < 4*4))
+                pline("%s mutters %s.",
+                      Monnam(mtmp),
+                      mtmp->ispriest ? "a prayer" : "an incantation");
+            mtmp->mspec_used += rn1(20, 10);
+        }
+        if (cansee(x, y))
+            pline_The("boulder falls apart.");
+        fracture_rock(otmp);
     }
 }
 
@@ -404,6 +435,7 @@ monflee(
                     pline("%s flees from the painful light of %s.",
                           Monnam(mtmp), lsrc);
                 } else {
+                    SetVoice(mtmp, 0, 80, 0);
                     verbalize("Bright light!");
                 }
             } else {
@@ -754,7 +786,7 @@ dochug(register struct monst* mtmp)
             for (a = &mdat->mattk[0]; a < &mdat->mattk[NATTK]; a++) {
                 if (a->aatyp == AT_MAGC
                     && (a->adtyp == AD_SPEL || a->adtyp == AD_CLRC)) {
-                    if ((castmu(mtmp, a, FALSE, FALSE) & MM_HIT)) {
+                    if ((castmu(mtmp, a, FALSE, FALSE) & M_ATTK_HIT)) {
                         status = MMOVE_DONE; /* bypass m_move() */
                         break;
                     }
@@ -873,6 +905,17 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
     if (mtmp->data == &mons[PM_GELATINOUS_CUBE]
         && otmp->oclass != ROCK_CLASS && otmp->oclass != BALL_CLASS
         && !(otmp->otyp == CORPSE && touch_petrifies(&mons[otmp->corpsenm])))
+        return TRUE;
+
+    return FALSE;
+}
+
+/* monster mtmp would love to consume object otmp, without picking it up */
+boolean
+mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
+{
+    if (otmp->otyp == CORPSE && !touch_petrifies(&mons[otmp->corpsenm])
+        && corpse_eater(mtmp->data))
         return TRUE;
 
     return FALSE;
@@ -1098,19 +1141,22 @@ maybe_spin_web(struct monst *mtmp)
     }
 }
 
+/* max distmin() distance for monster to look for items */
 #define SQSRCHRADIUS 5
 
+/* monster looks for items it wants nearby */
 static boolean
 m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, int *appr)
 {
     register int minr = SQSRCHRADIUS; /* not too far away */
     register struct obj *otmp;
     register coordxy xx, yy;
-    coordxy oomx, oomy, lmx, lmy;
+    coordxy hmx, hmy, lmx, lmy;
     struct trap *ttmp;
     coordxy omx = mtmp->mx, omy = mtmp->my;
     struct permonst *ptr = mtmp->data;
     struct monst *mtoo;
+    boolean costly;
 
     /* cut down the search radius if it thinks character is closer. */
     if (distmin(mtmp->mux, mtmp->muy, omx, omy) < SQSRCHRADIUS
@@ -1120,76 +1166,94 @@ m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, in
     if (!mtmp->mpeaceful && is_mercenary(ptr))
         minr = 1;
 
-    if ((!*in_rooms(omx, omy, SHOPBASE) || (!rn2(25) && !mtmp->isshk))) {
-        oomx = min(COLNO - 1, omx + minr);
-        oomy = min(ROWNO - 1, omy + minr);
-        lmx = max(1, omx - minr);
-        lmy = max(0, omy - minr);
-        for (otmp = fobj; otmp; otmp = otmp->nobj) {
-            /* monsters may pick rocks up, but won't go out of their way
-               to grab them; this might hamper sling wielders, but it cuts
-               down on move overhead by filtering out most common item */
-            if (otmp->otyp == ROCK)
-                continue;
-            /* avoid special items; once hero picks them up, they'll
-               cease being special */
-            if (is_mines_prize(otmp) || is_soko_prize(otmp))
-                continue;
+    /* in shop, usually skip */
+    if (*in_rooms(omx, omy, SHOPBASE) && (rn2(25) || mtmp->isshk))
+        goto finish_search;
 
-            xx = otmp->ox;
-            yy = otmp->oy;
-            /* Nymphs take everything.  Most other creatures should not
-             * pick up corpses except as a special case like in
-             * searches_for_item().  We need to do this check in
-             * mpickstuff() as well.
-             */
-            if (xx >= lmx && xx <= oomx && yy >= lmy && yy <= oomy) {
-                /* don't get stuck circling around object that's
-                   underneath an immobile or hidden monster;
-                   paralysis victims excluded */
-                if ((mtoo = m_at(xx, yy)) != 0
-                    && (helpless(mtoo) || mtoo->mundetected
-                        || (mtoo->mappearance && !mtoo->iswiz)
-                        || !mtoo->data->mmove))
-                    continue;
-                /* the mfndpos() test for whether to allow a move to a
-                   water location accepts flyers, but they can't reach
-                   underwater objects, so being able to move to a spot
-                   is insufficient for deciding whether to do so */
-                if (!could_reach_item(mtmp, xx, yy))
-                    continue;
+    /* distmin() gives a rectangular area */
+    hmx = min(COLNO - 1, omx + minr);
+    hmy = min(ROWNO - 1, omy + minr);
+    lmx = max(1, omx - minr);
+    lmy = max(0, omy - minr);
 
-                /* ignore obj if there's a trap and monster knows it */
-                if ((ttmp = t_at(xx, yy)) != 0
-                    && mon_knows_traps(mtmp, ttmp->ttyp)) {
-                    if (*ggx == xx && *ggy == yy) {
-                        *ggx = mtmp->mux;
-                        *ggy = mtmp->muy;
-                    }
-                    continue;
+    for (xx = lmx; xx <= hmx; xx++) {
+        for (yy = lmy; yy <= hmy; yy++) {
+            /* no object here */
+            if (!OBJ_AT(xx, yy))
+                continue;
+            /* found an object closer already */
+            if (minr < distmin(omx, omy, xx, yy))
+                continue;
+            /* the mfndpos() test for whether to allow a move to a
+               water location accepts flyers, but they can't reach
+               underwater objects, so being able to move to a spot
+               is insufficient for deciding whether to do so */
+            if (!could_reach_item(mtmp, xx, yy))
+                continue;
+            /* hiders avoid hero's line of sight */
+            if (hides_under(ptr) && cansee(xx, yy))
+                continue;
+            /* don't get stuck circling around object that's
+               underneath an immobile or hidden monster;
+               paralysis victims excluded */
+            if ((mtoo = m_at(xx, yy)) != 0
+                && (helpless(mtoo) || mtoo->mundetected
+                    || (mtoo->mappearance && !mtoo->iswiz)
+                    || !mtoo->data->mmove))
+                continue;
+            /* Don't get stuck circling an Elbereth */
+            if (onscary(xx, yy, mtmp))
+                continue;
+            /* ignore obj if there's a trap and monster knows it */
+            if ((ttmp = t_at(xx, yy)) != 0
+                && mon_knows_traps(mtmp, ttmp->ttyp)) {
+                if (*ggx == xx && *ggy == yy) {
+                    *ggx = mtmp->mux;
+                    *ggy = mtmp->muy;
                 }
+                continue;
+            }
+            /* avoid getting stuck on eg. items in niches */
+            if (!m_cansee(mtmp, xx, yy))
+                continue;
 
-                if (((mon_would_take_item(mtmp, otmp) && (can_carry(mtmp, otmp) > 0))
-                     || (hides_under(ptr) && !cansee(otmp->ox, otmp->oy)))
-                    && can_touch_safely(mtmp, otmp)
-                    /* Don't get stuck circling an Elbereth */
-                    && !onscary(xx, yy, mtmp)) {
+            costly = costly_spot(xx, yy);
+
+            /* look through the items on this location */
+            for (otmp = gl.level.objects[xx][yy];
+                 otmp; otmp = otmp->nexthere) {
+                /* monsters may pick rocks up, but won't go out of their way
+                   to grab them; this might hamper sling wielders, but it cuts
+                   down on move overhead by filtering out most common item */
+                if (otmp->otyp == ROCK)
+                    continue;
+                /* avoid special items; once hero picks them up, they'll
+                   cease being special */
+                if (is_mines_prize(otmp) || is_soko_prize(otmp))
+                    continue;
+                /* skip shop merchandise */
+                if (costly && !otmp->no_charge)
+                    continue;
+
+                if (((mon_would_take_item(mtmp, otmp)
+                      && (can_carry(mtmp, otmp) > 0))
+                     || mon_would_consume_item(mtmp, otmp))
+                    && can_touch_safely(mtmp, otmp)) {
                     minr = distmin(omx, omy, xx, yy);
-                    oomx = min(COLNO - 1, omx + minr);
-                    oomy = min(ROWNO - 1, omy + minr);
-                    lmx = max(1, omx - minr);
-                    lmy = max(0, omy - minr);
                     *ggx = otmp->ox;
                     *ggy = otmp->oy;
                     if (*ggx == omx && *ggy == omy) {
                         *mmoved = MMOVE_DONE; /* actually unnecessary */
                         return TRUE;
                     }
+                    /* found an item of interest; skip the rest of the pile */
+                    break;
                 }
             }
         }
     }
 
+finish_search:
     if (minr < SQSRCHRADIUS && *appr == -1) {
         if (distmin(omx, omy, mtmp->mux, mtmp->muy) <= 3) {
             *ggx = mtmp->mux;
@@ -1313,8 +1377,10 @@ m_move(register struct monst* mtmp, register int after)
 
 #ifdef MAIL_STRUCTURES
     if (ptr == &mons[PM_MAIL_DAEMON]) {
-        if (!Deaf && canseemon(mtmp))
+        if (!Deaf && canseemon(mtmp)) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("I'm late!");
+        }
         mongone(mtmp);
         return MMOVE_DIED;
     }
@@ -1502,15 +1568,20 @@ m_move(register struct monst* mtmp, register int after)
 
             mtmp2 = m_at(nix, niy);
             mstatus = mdisplacem(mtmp, mtmp2, FALSE);
-            if ((mstatus & MM_AGR_DIED) || (mstatus & MM_DEF_DIED))
+            if ((mstatus & M_ATTK_AGR_DIED) || (mstatus & M_ATTK_DEF_DIED))
                 return MMOVE_DIED;
-            if (mstatus & MM_HIT)
+            if (mstatus & M_ATTK_HIT)
                 return MMOVE_MOVED;
             return MMOVE_DONE;
         }
 
         if (!m_in_out_region(mtmp, nix, niy))
             return MMOVE_DONE;
+
+        if ((info[chi] & ALLOW_ROCK) && m_can_break_boulder(mtmp)) {
+            (void) m_break_boulder(mtmp, nix, niy);
+            return MMOVE_DONE;
+        }
 
         /* move a normal monster; for a long worm, remove_monster() and
            place_monster() only manipulate the head; they leave tail as-is */
@@ -1735,9 +1806,7 @@ m_move(register struct monst* mtmp, register int after)
                     return etmp; /* it died or got forced off the level */
             }
             /* Maybe a purple worm ate a corpse */
-            if (ptr == &mons[PM_PURPLE_WORM]
-                || ptr == &mons[PM_BABY_PURPLE_WORM]
-                || ptr == &mons[PM_PIRANHA]) {
+            if (corpse_eater(ptr)) {
                 if ((etmp = meatcorpse(mtmp)) >= 2)
                     return etmp; /* it died or got forced off the level */
             }
@@ -1792,15 +1861,15 @@ m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
     /* note: mstatus returns 0 if mtmp2 is nonexistent */
     mstatus = mattackm(mtmp, mtmp2);
 
-    if (mstatus & MM_AGR_DIED) /* aggressor died */
+    if (mstatus & M_ATTK_AGR_DIED) /* aggressor died */
         return MMOVE_DIED;
 
-    if ((mstatus & MM_HIT) && !(mstatus & MM_DEF_DIED) && rn2(4)
+    if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED) && rn2(4)
         && mtmp2->movement >= NORMAL_SPEED) {
         mtmp2->movement -= NORMAL_SPEED;
         gn.notonhead = 0;
         mstatus = mattackm(mtmp2, mtmp); /* return attack */
-        if (mstatus & MM_DEF_DIED)
+        if (mstatus & M_ATTK_DEF_DIED)
             return MMOVE_DIED;
     }
     return MMOVE_DONE;

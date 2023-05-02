@@ -114,7 +114,7 @@ enum achivements {
      *  defeated nemesis (not same as acquiring Bell or artifact),
      *  completed quest (formally, by bringing artifact to leader),
      *  entered rogue level,
-     *  entered Fort Ludios level/branch (not guaranteed to be achieveable),
+     *  entered Fort Ludios level/branch (not guaranteed to be achievable),
      *  entered Medusa level,
      *  entered castle level,
      *  obtained castle wand (handle similarly to mines and sokoban prizes),
@@ -154,12 +154,14 @@ struct u_conduct {     /* number of times... */
     long wishes;       /* used a wish */
     long wisharti;     /* wished for an artifact */
     long sokocheat;    /* violated special 'rules' in Sokoban */
+    long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
 };
 
 struct u_roleplay {
     boolean blind;  /* permanently blind */
     boolean nudist; /* has not worn any armor, ever */
+    boolean deaf;   /* permanently deaf */
     long numbones;  /* # of bones files loaded  */
 };
 
@@ -355,6 +357,8 @@ struct you {
     d_level uz, uz0;    /* your level on this and the previous turn */
     d_level utolev;     /* level monster teleported you to, or uz */
     uchar utotype;      /* bitmask of goto_level() flags for utolev */
+    d_level ucamefrom;  /* level where you came from; used for tutorial */
+    boolean nofollowers; /* level change ignores monster followers/pets */
     boolean umoved;     /* changed map location (post-move) */
     int last_str_turn;  /* 0: none, 1: half turn, 2: full turn
                          * +: turn right, -: turn left */
@@ -417,7 +421,7 @@ struct you {
     Bitfield(uinvulnerable, 1); /* you're invulnerable (praying) */
     Bitfield(uburied, 1);       /* you're buried */
     Bitfield(uedibility, 1);    /* blessed food detect; sense unsafe food */
-    /* 1 free bit! */
+    Bitfield(usaving_grace, 1); /* prevents death once */
 
     unsigned udg_cnt;           /* how long you have been demigod */
     struct u_event uevent;      /* certain events have happened */

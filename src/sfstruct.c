@@ -193,7 +193,7 @@ bwrite(int fd, const genericptr_t loc, unsigned num)
 #endif
         }
         if (failed) {
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(HANGUPHANDLING)
             if (gp.program_state.done_hup)
                 nh_terminate(EXIT_FAILURE);
             else

@@ -654,7 +654,7 @@ walk_path(coord *src_cc, coord *dest_cc,
      * This should be replaced with a more versatile algorithm
      * since it handles slanted moves in a suboptimal way.
      * Going from 'x' to 'y' needs to pass through 'z', and will
-     * fail if there's an obstable there, but it could choose to
+     * fail if there's an obstacle there, but it could choose to
      * pass through 'Z' instead if that way imposes no obstacle.
      *     ..y          .Zy
      *     xz.    vs    x..
@@ -971,8 +971,22 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     if (--*range < 0) /* make sure our range never goes negative */
         *range = 0;
     if (*range != 0)
-        delay_output();
+        nh_delay_output();
     return TRUE;
+}
+
+/* used by mhurtle_step() for actual hurtling and also to vary message
+   if target will/won't change location when knocked back */
+boolean
+will_hurtle(struct monst *mon, coordxy x, coordxy y)
+{
+    if (!isok(x, y))
+        return FALSE;
+    /*
+     * TODO: Treat walls, doors, iron bars, etc. specially
+     * rather than just stopping before.
+     */
+    return goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA);
 }
 
 static boolean
@@ -981,14 +995,10 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;
 
-    /* TODO: Treat walls, doors, iron bars, etc. specially
-     * rather than just stopping before.
-     */
     if (!isok(x, y))
         return FALSE;
 
-    if (goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA)
-        && m_in_out_region(mon, x, y)) {
+    if (will_hurtle(mon, x, y) && m_in_out_region(mon, x, y)) {
         int res;
 
         if (mon != u.usteed) {
@@ -1004,7 +1014,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             vision_recalc(0); /* new location => different lines of sight */
         }
         flush_screen(1);
-        delay_output();
+        nh_delay_output();
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
@@ -1279,7 +1289,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                 if (otyp == BLINDING_VENOM && !Blind)
                     pline("It blinds you!");
                 u.ucreamed += blindinc;
-                make_blinded(Blinded + (long) blindinc, FALSE);
+                make_blinded(BlindedTimeout + (long) blindinc, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             }
@@ -1401,7 +1411,7 @@ sho_obj_return_to_u(struct obj *obj)
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
         while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
-            delay_output();
+            nh_delay_output();
             x -= u.dx;
             y -= u.dy;
         }
@@ -1697,7 +1707,7 @@ throwit(struct obj *obj,
             || obj->oclass == VENOM_CLASS) {
             tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
             tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-            delay_output();
+            nh_delay_output();
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(gb.bhitpos.x, gb.bhitpos.y));
             breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE);
@@ -1771,7 +1781,7 @@ return_throw_to_inv(
     struct obj *otmp = NULL;
 
     /* if 'obj' is from a stack split, we can put it back by undoing split
-       so there's no chance of merging with some other compatable stack */
+       so there's no chance of merging with some other compatible stack */
     if (obj->o_id == gc.context.objsplit.parent_oid
         || obj->o_id == gc.context.objsplit.child_oid) {
         obj->nobj = gi.invent;
@@ -1789,7 +1799,7 @@ return_throw_to_inv(
 
     /* if 'obj' wasn't from a stack split or if it wouldn't merge back
        (maybe new erosion damage?) then it needs to be added to invent;
-       don't merge with any other stack even if there is a compatable one
+       don't merge with any other stack even if there is a compatible one
        (others with similar erosion?) */
     if (!otmp) {
         obj->nomerge = 1;

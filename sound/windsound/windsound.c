@@ -23,6 +23,11 @@ static void windsound_achievement(schar, schar, int32_t);
 static void windsound_soundeffect(char *, int32_t, int32_t);
 static void windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
 static void windsound_play_usersound(char *, int32_t, int32_t);
+static void windsound_ambience(int32_t ambienceid, int32_t ambience_action,
+                               int32_t hero_proximity);
+static void windsound_verbal(char *text, int32_t gender, int32_t tone,
+                             int32_t vol, int32_t moreinfo);
+
 
 /* supporting routines */
 static void adjust_soundargs_for_compiler(int32_t *, DWORD *, char **);
@@ -31,32 +36,95 @@ static void maybe_preinsert_directory(int32_t, char *, char *, size_t);
 struct sound_procs windsound_procs = {
     SOUNDID(windsound),
     SOUND_TRIGGER_USERSOUNDS | SOUND_TRIGGER_SOUNDEFFECTS
-        | SOUND_TRIGGER_HEROMUSIC,
+        | SOUND_TRIGGER_HEROMUSIC | SOUND_TRIGGER_AMBIENCE
+        | SOUND_TRIGGER_ACHIEVEMENTS | SOUND_TRIGGER_VERBAL,
     windsound_init_nhsound,
     windsound_exit_nhsound,
     windsound_achievement,
     windsound_soundeffect,
     windsound_hero_playnotes,
     windsound_play_usersound,
+    windsound_ambience,
+    windsound_verbal,
 };
 
-void
+static void
 windsound_init_nhsound(void)
 {
     /* No steps required */
 }
 
-void
+static void
 windsound_exit_nhsound(const char *reason)
 {
 }
 
-void
+static void
 windsound_achievement(schar ach1, schar ach2, int32_t repeat)
+{
+    int reslt = 0;
+    const char *filename;
+    char resourcename[120], buf[PATHLEN];
+    int findsound_approach = sff_base_only;
+    DWORD fdwsound = SND_NODEFAULT;
+    char *exedir = (char *) 0;
+
+    adjust_soundargs_for_compiler(&findsound_approach, &fdwsound, &exedir);
+    maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
+    fdwsound |= SND_ASYNC;
+
+    if (ach1 == 0 && ach2 == 0)
+        return;
+
+    resourcename[0] = '\0';
+    if (ach1 == 0) {
+        int sa2 = (int) ach2;
+
+        if (sa2 > sa2_zero_invalid && sa2 < number_of_sa2_entries) {
+            switch(sa2) {
+                case sa2_splashscreen:
+                    Strcpy(resourcename, "sa2_splashscreen");
+                    break;
+                case sa2_newgame_nosplash:
+                    Strcpy(resourcename, "sa2_newgame_nosplash");
+                    break;
+                case sa2_restoregame:
+                    Strcpy(resourcename, "sa2_restoregame");
+                    break;
+                case sa2_xplevelup:
+                    Strcpy(resourcename, "sa2_xplevelup");
+                    break;
+                case sa2_xpleveldown:
+                    Strcpy(resourcename, "sa2_xpleveldown");
+                    break;
+            }
+        }
+    }
+    if (resourcename[0] == '\0')
+        return;
+    adjust_soundargs_for_compiler(&findsound_approach, &fdwsound, &exedir);
+    /* the final, or only, one is played ASYNC */
+    maybe_preinsert_directory(findsound_approach, exedir, buf, sizeof buf);
+    filename = base_soundname_to_filename(resourcename,
+                                          buf, sizeof buf, findsound_approach);
+    if (filename) {
+        reslt = PlaySound(filename, NULL, fdwsound);
+    }
+}
+
+static void
+windsound_ambience(int32_t ambienceid, int32_t ambience_action,
+                   int32_t hero_proximity)
 {
 }
 
-void
+static void
+windsound_verbal(char *text, int32_t gender, int32_t tone,
+                 int32_t vol, int32_t moreinfo)
+{
+}
+
+static void
 windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 {
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
@@ -86,7 +154,7 @@ windsound_soundeffect(char *desc, int32_t seid, int32_t volume)
 
 #define WAVEMUSIC_SOUNDS
 
-void
+static void
 windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 {
 #ifdef WAVEMUSIC_SOUNDS
@@ -174,14 +242,15 @@ windsound_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 #endif
 }
 
-void
+static void
 windsound_play_usersound(char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     /*    pline("play_usersound: %s (%d).", filename, volume); */
     (void) sndPlaySound(filename, SND_ASYNC | SND_NODEFAULT | SND_FILENAME);
 }
 
-static void adjust_soundargs_for_compiler(
+static void
+adjust_soundargs_for_compiler(
     int32_t *sefilename_flags,
     DWORD *fdwsound,
     char **dirbuf)
@@ -229,7 +298,7 @@ static void adjust_soundargs_for_compiler(
 static void
 maybe_preinsert_directory(int32_t findsound_approach, char *exedir, char *buf, size_t sz)
 {
-    int largest_se_basename = 35;
+    int largest_basename = 35;
 
     /* findsound_approach = sff_havdir_append_rest means a directory name will be
      * inserted into the begining of buf and the remaining parts of the
@@ -240,7 +309,7 @@ maybe_preinsert_directory(int32_t findsound_approach, char *exedir, char *buf, s
 
     if (findsound_approach == sff_havedir_append_rest) {
         if (exedir) {
-            if (strlen(exedir) < (sz - largest_se_basename))
+            if (strlen(exedir) < (sz - largest_basename))
                 Strcpy(buf, exedir);
             else
                 *buf = '\0';

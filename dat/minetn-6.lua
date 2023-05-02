@@ -24,24 +24,28 @@ x------xxxxxxxxxxxxxx-----------------xx
 .|...+..--+--.........|...|..|...|...|..
 .|...|..|...|..-----..|...|..|-+---+--..
 .-----..|...|--|...|..--+---+-.........x
-........|...|..|...+.............-----..
+........|...|..|...+.............-----.x
 ........-----..|...|......--+-...|...|..
 x----...|...|+------..{...|..|...+...|..
 x|..+...|...|.............|..|...|...|..
-x|..|...|...|-+-.....---+-------------.x
-x----...--+--..|..-+-|..................
-...|........|..|..|..|----....--------x.
-...|..T.....----..|..|...+....|......|x.
+.|..|...|...|-+-.....---+-------------.x
+.----...--+--..|..-+-|..................
+...|........|..|..|..|----....--------.x
+...|..T.....----..|..|...+....|......|..
 ...|-....{........|..|...|....+......|x.
 ...--..-....T.....--------....|......|x.
 .......--.....................----------
-xxxxx-----xxxxxxxxxxxxxxxxxx------------
+.xxxx-----xxxxxxxxxxxxxxxxxx------------
 xxxx-------xxxxxxxxxxxxxxx--------------
 ]] });
 
 des.region(selection.area(00,00,39,19),"lit")
-des.levregion({ type="stair-up", region={01,03,20,19}, region_islev=1, exclude={0,0,39,19} })
-des.levregion({ type="stair-down", region={61,03,75,19}, region_islev=1, exclude={0,0,39,19} })
+
+-- stairs can generate 1 column left or right inside the map,
+-- in case the randomly generated mines layout doesn't extend outside the map
+des.levregion({ type="stair-up", region={01,03,21,19}, region_islev=1, exclude={1,0,39,18} })
+des.levregion({ type="stair-down", region={60,03,75,19}, region_islev=1, exclude={0,0,38,18} })
+
 des.region(selection.area(13,7,14,8),"unlit")
 des.region({ region={09,09, 11,11}, lit=1, type="candle shop", filled=1 })
 des.region({ region={16,06, 18,08}, lit=1, type="tool shop", filled=1 })

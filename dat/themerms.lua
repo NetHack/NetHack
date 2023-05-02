@@ -93,6 +93,17 @@ themeroom_fills = {
       end });
    end,
 
+   -- Buried zombies
+   function(rm)
+      local zombifiable = { "kobold", "gnome", "orc", "dwarf", "elf", "human", "ettin", "giant" };
+      for i = 1, (rm.width * rm.height) / 2 do
+         shuffle(zombifiable);
+         local o = des.object({ id = "corpse", montype = zombifiable[1], buried = true });
+         o:stop_timer("rot-corpse");
+         o:start_timer("zombify-mon", 1000);
+      end
+   end,
+
    -- Massacre
    function(rm)
       local mon = { "apprentice", "warrior", "ninja", "thug",
@@ -235,10 +246,6 @@ themerooms = {
                     local hei = math.random(math.floor(rm.height / 2), rm.height - 2);
                     des.room({ type = "ordinary", w = wid,h = hei, filled = 1,
                                contents = function()
-                                  des.door({ state="random", wall="all" });
-                                  if (percent(15)) then
-                                     des.door({ state="random", wall="all" });
-                                  end
                                   if (percent(90)) then
                                      des.room({ type = "ordinary", filled = 1,
                                                 contents = function()
@@ -248,6 +255,10 @@ themerooms = {
                                                    end
                                                 end
                                      });
+                                  end
+                                  des.door({ state="random", wall="all" });
+                                  if (percent(15)) then
+                                     des.door({ state="random", wall="all" });
                                   end
                                end
                     });

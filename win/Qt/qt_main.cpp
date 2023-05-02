@@ -459,7 +459,8 @@ aboutMsg()
     char *p, vbuf[BUFSZ];
     /* nethack's getversionstring() includes a final period
        but we're using it mid-sentence so strip period off */
-    if ((p = strrchr(::getversionstring(vbuf, sizeof vbuf), '.')) != 0 && *(p + 1) == '\0')
+    if ((p = strrchr(::getversionstring(vbuf, sizeof vbuf), '.')) != 0
+        && *(p + 1) == '\0')
         *p = '\0';
     /* it's also long; break it into two pieces */
     (void) strsubst(vbuf, " - ", "\n- ");
@@ -1001,8 +1002,30 @@ public:
 };
 #endif
 
+/* used by doMenuItem() and for the toolbar buttons */
+bool NetHackQtMainWindow::ok_for_command()
+{
+    /*
+     * If the core expects text to be entered (perhaps typing in a wish,
+     * assigning a name to something, or answering a y/n prompt), or a
+     * map position or a direction is being picked, don't accept commands
+     * from the toolbar.
+     *
+     * FIXME: it would be much better to gray-out inapplicable entries
+     * when popping up a command menu instead of needing this.
+     */
+    if (::gp.program_state.input_state != commandInp) {
+        NetHackQtBind::qt_nhbell();
+        // possibly call doKeys("\033"); here?
+        return false;
+    }
+    return true;
+}
+
 void NetHackQtMainWindow::doMenuItem(QAction *action)
 {
+    if (!ok_for_command())
+        return;
     /* this converts meta characters to '?'; menu processing has been
        changed to send multi-character "#abc" instead (already needed
        for commands that didn't have either a regular keystroke or a

@@ -97,11 +97,11 @@ dealloc_oextra(struct obj *o)
 
     if (x) {
         if (x->oname)
-            free((genericptr_t) x->oname);
+            free((genericptr_t) x->oname), x->oname = 0;
         if (x->omonst)
-            free_omonst(o);     /* 'o' rather than 'x' */
+            free_omonst(o); /* note: pass 'o' rather than 'x' */
         if (x->omailcmd)
-            free((genericptr_t) x->omailcmd);
+            free((genericptr_t) x->omailcmd), x->omailcmd = 0;
 
         free((genericptr_t) x);
         o->oextra = (struct oextra *) 0;
@@ -784,6 +784,9 @@ costly_alteration(struct obj *obj, int alter_type)
     case OBJ_INVENT:
         if (learn_bknown)
             set_bknown(obj, 1);
+        if (shkp) {
+            SetVoice(shkp, 0, 80, 0);
+        }
         verbalize("You %s %s %s, you pay for %s!",
                   alteration_verbs[alter_type], those, simpleonames(obj),
                   them);
@@ -793,6 +796,9 @@ costly_alteration(struct obj *obj, int alter_type)
         if (learn_bknown)
             obj->bknown = 1; /* ok to bypass set_bknown() here */
         if (costly_spot(u.ux, u.uy) && objroom == *u.ushops) {
+            if (shkp) {
+                SetVoice(shkp, 0, 80, 0);
+            }
             verbalize("You %s %s, you pay for %s!",
                       alteration_verbs[alter_type], those, them);
             bill_dummy_object(obj);
@@ -941,7 +947,7 @@ mksobj(int otyp, boolean init, boolean artif)
             if (Is_pudding(otmp)) {
                 otmp->globby = 1;
                 /* for emphasis; glob quantity is always 1 and weight varies
-                   when other globs coallesce with it or this one shrinks */
+                   when other globs coalesce with it or this one shrinks */
                 otmp->quan = 1L;
                 /* 3.7: globs in 3.6.x left owt as 0 and let weight() fix
                    that up during 'obj->owt = weight(obj)' below, but now
@@ -1805,7 +1811,7 @@ weight(struct obj *obj)
                    obj->quan, simpleonames(obj));
         return 0;
     }
-    /* glob absorpsion means that merging globs combines their weight
+    /* glob absorption means that merging globs combines their weight
        while quantity stays 1; mksobj(), obj_absorb(), and shrink_glob()
        manage glob->owt and there is nothing for weight() to do except
        return the current value as-is */
@@ -2166,6 +2172,12 @@ place_object(struct obj *otmp, coordxy x, coordxy y)
                : impossible;
         (*func)("place_object: \"%s\" [%d] off map <%d,%d>",
                 safe_typename(otmp->otyp), otmp->where, x, y);
+
+        /* we'll only get to here if we've issued a warning (and fuzzer
+           is not running since it escalates impossible to panic), so
+           x,y has failed isok() but is within array bounds for the map;
+           in other words, x specifies column 0 which should not happen
+           but we let the game keep going */
     }
     if (otmp->where != OBJ_FREE)
         panic("place_object: obj \"%s\" [%d] not free",
@@ -2623,6 +2635,13 @@ dealloc_obj(struct obj *obj)
         obj->where = OBJ_LUAFREE;
         return;
     }
+
+    /* clear out of date information contained in the about-to-become
+       stale memory so that potential used-after-freed bugs (should never
+       happen) might trigger an object lost panic instead of continuing;
+       linking with a debugging malloc library is likely to do something
+       similar so this is mainly useful for ordinary malloc/free */
+    *obj = cg.zeroobj;
     free((genericptr_t) obj);
 }
 
@@ -2670,7 +2689,7 @@ hornoplenty(
            confers ownership of the created item to the shopkeeper */
         if (horn->unpaid)
             addtobill(obj, FALSE, FALSE, tipping);
-        /* if it ended up on bill, we don't want "(unpaid, N zorkids)"
+        /* if it ended up on bill, we don't want "(unpaid, N zorkmids)"
            being included in its formatted name during next message */
         iflags.suppress_price++;
         if (!tipping) {

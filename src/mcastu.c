@@ -210,20 +210,20 @@ castmu(
                     if (foundyou)
                         impossible(
                        "spellcasting monster found you and doesn't know it?");
-                    return MM_MISS;
+                    return M_ATTK_MISS;
                 }
                 break;
             }
         } while (--cnt > 0
                  && spell_would_be_useless(mtmp, mattk->adtyp, spellnum));
         if (cnt == 0)
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
 
     /* monster unable to cast spells? */
     if (mtmp->mcan || mtmp->mspec_used || !ml) {
         cursetxt(mtmp, is_undirected_spell(mattk->adtyp, spellnum));
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
 
     if (mattk->adtyp == AD_SPEL || mattk->adtyp == AD_CLRC) {
@@ -241,7 +241,7 @@ castmu(
               canseemon(mtmp) ? Monnam(mtmp) : "Something",
               is_waterwall(mtmp->mux,mtmp->muy) ? "empty water"
                                                 : "thin air");
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
 
     nomul(0);
@@ -249,7 +249,7 @@ castmu(
         Soundeffect(se_air_crackles, 60);
         if (canseemon(mtmp) && !Deaf)
             pline_The("air crackles around %s.", mon_nam(mtmp));
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (canspotmon(mtmp) || !is_undirected_spell(mattk->adtyp, spellnum)) {
         pline("%s casts a spell%s!",
@@ -275,7 +275,7 @@ castmu(
             impossible(
               "%s casting non-hand-to-hand version of hand-to-hand spell %d?",
                        Monnam(mtmp), mattk->adtyp);
-            return MM_MISS;
+            return M_ATTK_MISS;
         }
     } else if (mattk->damd)
         dmg = d((int) ((ml / 2) + mattk->damn), (int) mattk->damd);
@@ -284,7 +284,7 @@ castmu(
     if (Half_spell_damage)
         dmg = (dmg + 1) / 2;
 
-    ret = MM_HIT;
+    ret = M_ATTK_HIT;
     switch (mattk->adtyp) {
     case AD_FIRE:
         pline("You're enveloped in flames.");
@@ -345,23 +345,60 @@ m_cure_self(struct monst *mtmp, int dmg)
     return dmg;
 }
 
+/* unlike the finger of death spell which behaves like a wand of death,
+   this monster spell only attacks the hero */
 void
-touch_of_death(void)
+touch_of_death(struct monst *mtmp)
 {
-    static const char touchodeath[] = "touch of death";
+    char kbuf[BUFSZ];
     int dmg = 50 + d(8, 6);
     int drain = dmg / 2;
 
+    /* if we get here, we know that hero isn't magic resistant and isn't
+       poly'd into an undead or demon */
     You_feel("drained...");
+    (void) death_inflicted_by(kbuf, "the touch of death", mtmp);
 
-    if (drain >= u.uhpmax) {
-        gk.killer.format = KILLED_BY_AN;
-        Strcpy(gk.killer.name, touchodeath);
+    if (Upolyd) {
+        u.mh = 0;
+        rehumanize(); /* fatal iff Unchanging */
+    } else if (drain >= u.uhpmax) {
+        gk.killer.format = KILLED_BY;
+        Strcpy(gk.killer.name, kbuf);
         done(DIED);
     } else {
         u.uhpmax -= drain;
-        losehp(dmg, touchodeath, KILLED_BY_AN);
+        losehp(dmg, kbuf, KILLED_BY);
     }
+    gk.killer.name[0] = '\0'; /* not killed if we get here... */
+}
+
+/* give a reason for death by some monster spells */
+char *
+death_inflicted_by(
+    char *outbuf,            /* assumed big enough; pm_names are short */
+    const char *deathreason, /* cause of death */
+    struct monst *mtmp)      /* monster who caused it */
+{
+    Strcpy(outbuf, deathreason);
+    if (mtmp) {
+        struct permonst *mptr = mtmp->data,
+            *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham] : mptr;
+        const char *realnm = pmname(champtr, Mgender(mtmp)),
+            *fakenm = pmname(mptr, Mgender(mtmp));
+
+        /* greatly simplified extract from done_in_by(), primarily for
+           reason for death due to 'touch of death' spell; if mtmp is
+           shape changed, it won't be a vampshifter or mimic since they
+           can't cast spells */
+        if (!type_is_pname(champtr) && !the_unique_pm(mptr))
+            realnm = an(realnm);
+        Sprintf(eos(outbuf), " inflicted by %s%s",
+                the_unique_pm(mptr) ? "the " : "", realnm);
+        if (champtr != mptr)
+            Sprintf(eos(outbuf), " imitating %s", an(fakenm));
+    }
+    return outbuf;
 }
 
 /*
@@ -394,7 +431,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             if (Hallucination) {
                 You("have an out of body experience.");
             } else {
-                touch_of_death();
+                touch_of_death(mtmp);
             }
         } else {
             if (Antimagic) {
@@ -419,6 +456,7 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
         if (!count) {
             ; /* nothing was created? */
         } else if (mtmp->iswiz) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Destroy the thief, my pet%s!", plur(count));
         } else {
             boolean one = (count == 1);
@@ -466,13 +504,18 @@ cast_wizard_spell(struct monst *mtmp, int dmg, int spellnum)
             monstseesu(M_SEEN_MAGR);
             You_feel("momentarily weakened.");
         } else {
+            char kbuf[BUFSZ];
+
             You("suddenly feel weaker!");
             dmg = mtmp->m_lev - 6;
             if (dmg < 1) /* paranoia since only chosen when m_lev is high */
                 dmg = 1;
             if (Half_spell_damage)
                 dmg = (dmg + 1) / 2;
-            losestr(rnd(dmg), (const char *) 0, 0);
+            losestr(rnd(dmg),
+                    death_inflicted_by(kbuf, "strength loss", mtmp),
+                    KILLED_BY);
+            gk.killer.name[0] = '\0'; /* not killed if we get here... */
         }
         dmg = 0;
         break;
@@ -865,27 +908,29 @@ spell_would_be_useless(struct monst *mtmp, unsigned int adtyp, int spellnum)
 
 /* monster uses spell (ranged) */
 int
-buzzmu(register struct monst *mtmp, register struct attack *mattk)
+buzzmu(struct monst *mtmp, struct attack *mattk)
 {
     /* don't print constant stream of curse messages for 'normal'
        spellcasting monsters at range */
     if (!BZ_VALID_ADTYP(mattk->adtyp))
-        return MM_MISS;
+        return M_ATTK_MISS;
 
     if (mtmp->mcan || m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp))) {
         cursetxt(mtmp, FALSE);
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (lined_up(mtmp) && rn2(3)) {
         nomul(0);
         if (canseemon(mtmp))
             pline("%s zaps you with a %s!", Monnam(mtmp),
                   flash_str(BZ_OFS_AD(mattk->adtyp), FALSE));
-        buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn, mtmp->mx,
-             mtmp->my, sgn(gt.tbx), sgn(gt.tby));
-        return MM_HIT;
+        gb.buzzer = mtmp;
+        buzz(BZ_M_SPELL(BZ_OFS_AD(mattk->adtyp)), (int) mattk->damn,
+             mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby));
+        gb.buzzer = 0;
+        return M_ATTK_HIT;
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /*mcastu.c*/

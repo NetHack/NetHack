@@ -98,6 +98,7 @@ private:
 	void ShowIfReady();
         void AddToolButton(QToolBar *toolbar, QSignalMapper *sm,
                            const char *name, int (*func)(void), QPixmap xpm);
+        static bool ok_for_command();
 
 #ifdef KDE
 	KMenuBar* menubar;

@@ -43,6 +43,7 @@ static void domenucontrols(void);
 extern void port_help(void);
 #endif
 static char *setopt_cmd(char *);
+static boolean add_quoted_engraving(coordxy, coordxy, char *);
 
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
@@ -391,7 +392,7 @@ look_at_monster(
     }
 
     /* we know the hero sees a monster at this location, but if it's shown
-       due to persistant monster detection he might remember something else */
+       due to persistent monster detection he might remember something else */
     if (mtmp->mundetected || M_AP_TYPE(mtmp))
         mhidden_description(mtmp, FALSE, eos(buf));
 
@@ -518,6 +519,9 @@ waterbody_name(coordxy x, coordxy y)
         if (Is_waterlevel(&u.uz))
             return "limitless water"; /* even if hallucinating */
         Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("water"));
+        return pooltype;
+    } else if (ltyp == LAVAWALL) {
+        Snprintf(pooltype, sizeof pooltype, "wall of %s", hliquid("lava"));
         return pooltype;
     }
     /* default; should be unreachable */
@@ -650,6 +654,10 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
         case S_ice: /* for hallucination; otherwise defsyms[] would be fine */
             Strcpy(buf, waterbody_name(x, y));
             break;
+        case S_engroom:
+        case S_engrcorr:
+            Strcpy(buf, "engraving");
+            break;
         case S_stone:
             if (!levl[x][y].seenv) {
                 Strcpy(buf, "unexplored");
@@ -717,7 +725,7 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
     /*
      * TODO:
      * The switch from xname() to doname_vague_quan() in look_at_obj()
-     * had the unintendded side-effect of making names picked from
+     * had the unintended side-effect of making names picked from
      * pointing at map objects become harder to simplify for lookup.
      * We should split the prefix and suffix handling used by wish
      * parsing and also wizmode monster generation out into separate
@@ -1263,6 +1271,12 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
                       : !(alt_i == S_stone
                           || strcmp(x_str, "air") == 0
                           || strcmp(x_str, "land") == 0);
+
+            if (alt_i == S_engroom || alt_i == S_engrcorr) {
+                article = 1;
+                x_str = "engraving";
+                need_to_look = TRUE;
+            }
             found = add_cmap_descr(found, alt_i, glyph, article,
                                    cc, x_str, prefix,
                                    &hit_trap, firstmatch, out_str);
@@ -1390,9 +1404,11 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
             if (look_buf[0] != '\0')
                 *firstmatch = look_buf;
             if (*(*firstmatch)) {
-                Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
-                (void) strncat(out_str, temp_buf,
-                               BUFSZ - strlen(out_str) - 1);
+                if (strncmp(look_buf, "engraving", 9) != 0) {
+                    Snprintf(temp_buf, sizeof temp_buf, " (%s)", *firstmatch);
+                    (void) strncat(out_str, temp_buf,
+                                   BUFSZ - strlen(out_str) - 1);
+                }
                 found = 1; /* we have something to look up */
             }
             if (monbuf[0]) {
@@ -1404,6 +1420,25 @@ do_screen_description(coord cc, boolean looked, int sym, char *out_str,
     }
 
     return found;
+}
+
+static boolean
+add_quoted_engraving(coordxy x, coordxy y, char *buf)
+{
+    char temp_buf[BUFSZ];
+    struct engr *ep = engr_at(x, y);
+
+    if (ep) {
+        if (ep->eread)
+            Snprintf(temp_buf, sizeof temp_buf,
+                     " with remembered text: \"%s\"",
+                     ep->engr_txt[remembered_text]);
+        else
+            Snprintf(temp_buf, sizeof temp_buf, " that you've never read");
+        (void) strncat(buf, temp_buf, BUFSZ - strlen(buf) - 1);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 /* also used by getpos hack in do_name.c */
@@ -1601,6 +1636,18 @@ do_look(int mode, coord *click_cc)
 
         /* Finally, print out our explanation. */
         if (found) {
+            if (ans != LOOK_QUICK && ans != LOOK_ONCE
+                && (ans == LOOK_VERBOSE || (flags.help && !quick))
+                && !clicklook
+                && !strncmp(firstmatch, "engraving", 9)) {
+                    char engbuf[BUFSZ];
+
+                    engbuf[0] = '\0';
+                    if (add_quoted_engraving(cc.x, cc.y, engbuf)) {
+                        Snprintf(eos(out_str), BUFSZ - strlen(out_str) - 1,
+                                 "%s", engbuf);
+                    }
+            }
             /* use putmixed() because there may be an encoded glyph present */
             putmixed(WIN_MESSAGE, 0, out_str);
 #ifdef DUMPLOG
@@ -1979,7 +2026,7 @@ doidtrap(void)
 }
 
 /*
-    Implements a rudimentary if/elif/else/endif interpretor and use
+    Implements a rudimentary if/elif/else/endif interpreter and use
     conditionals in dat/cmdhelp to describe what command each keystroke
     currently invokes, so that there isn't a lot of "(debug mode only)"
     and "(if number_pad is off)" cluttering the feedback that the user
@@ -1989,7 +2036,7 @@ doidtrap(void)
     keypad vs normal layout of digits, and QWERTZ keyboard swap between
     y/Y/^Y/M-y/M-Y/M-^Y and z/Z/^Z/M-z/M-Z/M-^Z.)
 
-    The interpretor understands
+    The interpreter understands
      '&#' for comment,
      '&? option' for 'if' (also '&? !option'
                            or '&? option=value[,value2,...]'

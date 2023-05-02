@@ -802,7 +802,7 @@ void NetHackQtMenuWindow::ChooseNone()
         itemlist[row].preselected = false; // stale for all rows
         // skip if not selectable or already unselected or fails invert_test()
         if (!itemlist[row].Selectable()
-            || !itemlist[row].selected
+            || (!itemlist[row].selected && !isSelected(row))
             || !menuitem_invert_test(2, itemlist[row].itemflags, TRUE))
             continue;
         itemlist[row].selected = false;
@@ -1284,57 +1284,89 @@ NetHackQtMenuOrTextWindow::NetHackQtMenuOrTextWindow(QWidget *parent_) :
 {
 }
 
+// StartMenu() turns a MenuOrTextWindow into a MenuWindow,
+// PutStr() turns one into a TextWindow;
+// calling any other MenuOrTextWindow routine before either of those
+// elicits a warning.  (Should probably quit via panic() instead.)
+void NetHackQtMenuOrTextWindow::MenuOrText_too_soon_warning(const char *which)
+{
+    impossible("'%s' called before we know whether window is Menu or Text.",
+               which);
+}
+
 QWidget* NetHackQtMenuOrTextWindow::Widget()
 {
-    if (!actual) impossible("Widget called before we know if Menu or Text");
-    return actual->Widget();
+    QWidget *result = NULL;
+    if (!actual)
+        MenuOrText_too_soon_warning("Widget");
+    else
+        result = actual->Widget();
+    return result;
 }
 
 // Text
 void NetHackQtMenuOrTextWindow::Clear()
 {
-    if (!actual) impossible("Clear called before we know if Menu or Text");
-    actual->Clear();
+    if (!actual)
+        MenuOrText_too_soon_warning("Clear");
+    else
+        actual->Clear();
 }
 void NetHackQtMenuOrTextWindow::Display(bool block)
 {
-    if (!actual) impossible("Display called before we know if Menu or Text");
-    actual->Display(block);
+    if (!actual)
+        MenuOrText_too_soon_warning("Display");
+    else
+        actual->Display(block);
 }
 bool NetHackQtMenuOrTextWindow::Destroy()
 {
-    if (!actual) impossible("Destroy called before we know if Menu or Text");
-    return actual->Destroy();
+    bool result = false;
+    if (!actual)
+        MenuOrText_too_soon_warning("Destroy");
+    else
+        result = actual->Destroy();
+    return result;
 }
-
 void NetHackQtMenuOrTextWindow::PutStr(int attr, const QString& text)
 {
-    if (!actual) actual=new NetHackQtTextWindow(parent);
-    actual->PutStr(attr,text);
+    if (!actual)
+        actual = new NetHackQtTextWindow(parent);
+    actual->PutStr(attr, text);
 }
 
 // Menu
 void NetHackQtMenuOrTextWindow::StartMenu(bool using_WIN_INVEN)
 {
-    if (!actual) actual=new NetHackQtMenuWindow(parent);
+    if (!actual)
+        actual = new NetHackQtMenuWindow(parent);
     actual->StartMenu(using_WIN_INVEN);
 }
-void NetHackQtMenuOrTextWindow::AddMenu(int glyph, const ANY_P* identifier,
-                                        char ch, char gch, int attr,
-                                        const QString& str, unsigned itemflags)
+void NetHackQtMenuOrTextWindow::AddMenu(
+    int glyph, const ANY_P* identifier,
+    char ch, char gch, int attr,
+    const QString& str, unsigned itemflags)
 {
-    if (!actual) impossible("AddMenu called before we know if Menu or Text");
-    actual->AddMenu(glyph,identifier,ch,gch,attr,str,itemflags);
+    if (!actual)
+        MenuOrText_too_soon_warning("AddMenu");
+    else
+        actual->AddMenu(glyph, identifier, ch, gch, attr, str, itemflags);
 }
 void NetHackQtMenuOrTextWindow::EndMenu(const QString& prompt)
 {
-    if (!actual) impossible("EndMenu called before we know if Menu or Text");
-    actual->EndMenu(prompt);
+    if (!actual)
+        MenuOrText_too_soon_warning("EndMenu");
+    else
+        actual->EndMenu(prompt);
 }
 int NetHackQtMenuOrTextWindow::SelectMenu(int how, MENU_ITEM_P **menu_list)
 {
-    if (!actual) impossible("SelectMenu called before we know if Menu or Text");
-    return actual->SelectMenu(how,menu_list);
+    int result = -1; // cancelled
+    if (!actual)
+        MenuOrText_too_soon_warning("SelectMenu");
+    else
+        result = actual->SelectMenu(how, menu_list);
+    return result;
 }
 
 } // namespace nethack_qt_

@@ -977,7 +977,8 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
 void
 curses_nhbell(void)
 {
-    beep();
+    if (!flags.silent)
+        beep();
 }
 
 /*
@@ -1068,6 +1069,7 @@ curses_delay_output(void)
     if (flags.nap && !iflags.debug_fuzzer) {
         /* refreshing the whole display is a waste of time,
          * but that's why we're here */
+        curses_update_stdscr_cursor();
         refresh();
         napms(50);
     }

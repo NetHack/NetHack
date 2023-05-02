@@ -101,7 +101,10 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
 
     if (nix != omx || niy != omy) {
 
-        if (ninfo & ALLOW_M) {
+        if (ninfo & ALLOW_ROCK) {
+            m_break_boulder(mtmp, nix, niy);
+            return 1;
+        } else if (ninfo & ALLOW_M) {
             /* mtmp is deciding it would like to attack this turn.
              * Returns from m_move_aggress don't correspond to the same things
              * as this function should return, so we need to translate. */
@@ -113,7 +116,7 @@ move_special(struct monst *mtmp, boolean in_his_shop, schar appr,
             }
         }
 
-        if (MON_AT(nix, niy))
+        if (MON_AT(nix, niy) || u_at(nix, niy))
             return 0;
         remove_monster(omx, omy);
         place_monster(mtmp, nix, niy);
@@ -464,6 +467,7 @@ intemple(int roomno)
             msg1 = buf;
         }
         if (msg1 && can_speak && !Deaf) {
+            SetVoice(priest, 0, 80, 0);
             verbalize1(msg1);
             if (msg2)
                 verbalize1(msg2);
@@ -586,6 +590,7 @@ priest_talk(struct monst *priest)
             priest->mcanmove = 1;
         }
         priest->mpeaceful = 0;
+        SetVoice(priest, 0, 80, 0);
         verbalize1(cranky_msg[rn2(3)]);
         return;
     }
@@ -593,6 +598,7 @@ priest_talk(struct monst *priest)
     /* you desecrated the temple and now you want to chat? */
     if (priest->mpeaceful && *in_rooms(priest->mx, priest->my, TEMPLE)
         && !has_shrine(priest)) {
+        SetVoice(priest, 0, 80, 0);
         verbalize(
               "Begone!  Thou desecratest this holy place with thy presence.");
         priest->mpeaceful = 0;
@@ -621,18 +627,22 @@ priest_talk(struct monst *priest)
         pline("%s asks you for a contribution for the temple.",
               Monnam(priest));
         if ((offer = bribe(priest)) == 0) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou shalt regret thine action!");
             if (coaligned)
                 adjalign(-1);
         } else if (offer < (u.ulevel * 200)) {
             if (money_cnt(gi.invent) > (offer * 2L)) {
+                SetVoice(priest, 0, 80, 0);
                 verbalize("Cheapskate.");
             } else {
+                SetVoice(priest, 0, 80, 0);
                 verbalize("I thank thee for thy contribution.");
                 /* give player some token */
                 exercise(A_WIS, TRUE);
             }
         } else if (offer < (u.ulevel * 400)) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou art indeed a pious individual.");
             if (money_cnt(gi.invent) < (offer * 2L)) {
                 if (coaligned && u.ualign.record <= ALGN_SINNED)
@@ -648,6 +658,7 @@ priest_talk(struct monst *priest)
                    && (!(HProtection & INTRINSIC)
                        || (u.ublessed < 20
                            && (u.ublessed < 9 || !rn2(u.ublessed))))) {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thou hast been rewarded for thy devotion.");
             if (!(HProtection & INTRINSIC)) {
                 HProtection |= FROMOUTSIDE;
@@ -656,6 +667,7 @@ priest_talk(struct monst *priest)
             } else
                 u.ublessed++;
         } else {
+            SetVoice(priest, 0, 80, 0);
             verbalize("Thy selfless generosity is deeply appreciated.");
             if (money_cnt(gi.invent) < (offer * 2L) && coaligned) {
                 if (strayed && (gm.moves - u.ucleansed) > 5000L) {
@@ -744,9 +756,11 @@ in_your_sanctuary(
 void
 ghod_hitsu(struct monst *priest)
 {
+    struct mkroom *troom;
+    struct monst *oldbuzzer;
+    struct obj *oldcurrwand;
     coordxy x, y, ax, ay;
     int roomno = (int) temple_occupied(u.urooms);
-    struct mkroom *troom;
 
     if (!roomno || !has_shrine(priest))
         return;
@@ -809,8 +823,14 @@ ghod_hitsu(struct monst *priest)
         break;
     }
 
-    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx),
-         sgn(gt.tby)); /* bolt of lightning */
+    /* bolt of lightning cast by unspecified monster */
+    oldcurrwand = gc.current_wand;
+    gc.current_wand = 0;
+    oldbuzzer = gb.buzzer;
+    gb.buzzer = 0;
+    buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 6, x, y, sgn(gt.tbx), sgn(gt.tby));
+    gb.buzzer = oldbuzzer;
+    gc.current_wand = oldcurrwand;
     exercise(A_WIS, FALSE);
 }
 

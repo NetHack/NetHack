@@ -1,0 +1,45 @@
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.0 $ $NHDT-Date: 1676619775 2023/02/17 07:42:55 $
+
+fixes36.7 contains a summary of changes made to 3.6.6 in order to
+produce 3.6.7 as well as any post-release fixes in binaries.
+
+
+General Fixes and Modified Features
+-----------------------------------
+during engraving, spaces were counted instead of non-space (cherry-pick of
+	4e0a1e04 from NetHack-3.7)
+avoid potential buffer overflow in append_str()
+resolve missing dependency in NetHack.sln
+code in include/tradstdc.h was trying to suppress warn_unused result by
+	defining warn_unused_result to an empty string and that began causing
+	a build error within a system-supplied header file cdefs.h when using
+	ubuntu impish 21.10; disable that for any Linux unless GCC_URWARN is
+	defined to force it back into effect
+update_inventory() after leash goes slack
+player assigned name for monsters, specific objects, or object types could be
+	longer than what was intented to be allowed; for 'curses', much longer
+
+Platform- and/or Interface-Specific Fixes or Features
+-----------------------------------------------------
+windows: added winflexbison to travis-ci configuration to permit full build of
+	levcomp and dgncomp
+windows: a bad chdir specified in win/win32/dgnstuff.mak caused full build to
+	abort
+windows: the console.rc file had outdated information stating 3.6.3 when the
+	official 3.6.6 binary was built.
+windows: switch from using keyhandling dll's to incorporating the three
+	variations (default, ray, 340) in sys/winnt/nttty.c
+curses: cherry-picked selectsaved code from 3.7 for menu of save files
+NetHackW: fix delay rendering of cursor when using farlook
+
+
+General New Features
+--------------------
+none
+
+
+Fixes to 3.6.7 Post-release Problems and other Post-release changes
+-------------------------------------------------------------------
+none
+
+

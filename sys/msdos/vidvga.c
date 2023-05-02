@@ -268,7 +268,7 @@ void vga_cl_end(int col, int row)
     /*
      * This is being done via character writes.
      * This should perhaps be optimized for speed by using VGA write
-     * mode 2 methods as did clear_screen()
+     * mode 2 methods as did term_clear_screen()
      */
     for (count = col; count < (CO - 1); ++count) {
         vga_WriteChar(' ', count, row, BACKGROUND_VGA_COLOR);
@@ -769,7 +769,7 @@ vga_Init(void)
         iflags.over_view = FALSE;
         CO = 80;
         LI = 25;
-        /* clear_screen() */ /* not vga_clear_screen() */
+        /* term_clear_screen() */ /* not vga_clear_screen() */
         return;
     }
 #endif
@@ -807,7 +807,7 @@ vga_Init(void)
         psf_font = NULL;
     }
 
-    clear_screen();
+    term_clear_screen();
     clipx = 0;
     clipxmax = clipx + (viewport_size - 1);
 }

@@ -164,9 +164,11 @@ main(int argc, char *argv[])
      * It seems you really want to play.
      */
     u.uhp = 1; /* prevent RIP on early quits */
+#if defined(HANGUPHANDLING)
     gp.program_state.preserve_locks = 1;
 #ifndef NO_SIGNAL
     sethanguphandler((SIG_RET_TYPE) hangup);
+#endif
 #endif
 
     process_options(argc, argv); /* command line options */
@@ -237,7 +239,9 @@ main(int argc, char *argv[])
      */
     if (*gp.plname) {
         getlock();
+#if defined(HANGUPHANDLING)
         gp.program_state.preserve_locks = 0; /* after getlock() */
+#endif
     }
 
     if (*gp.plname && (nhfp = restore_saved_game()) != 0) {

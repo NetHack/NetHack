@@ -156,7 +156,7 @@ backsp(void)
 }
 
 void
-clear_screen(void)
+term_clear_screen(void)
 {
     if (!iflags.grmode) {
         txt_clear_screen();

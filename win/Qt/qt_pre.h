@@ -36,7 +36,7 @@
 #ifdef __clang__
 /* disable warnings for shadowed names; some of the Qt prototypes use
    placeholder argument names which conflict with nethack variables
-   ('g', 'u', a couple of others) */
+   ('u' and 'flags') */
 #pragma clang diagnostic ignored "-Wshadow"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wshadow"

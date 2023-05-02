@@ -122,7 +122,7 @@ use_towel(struct obj *obj)
                 u.ucreamed += rn1(10, 3);
                 pline("Yecch!  Your %s %s gunk on it!", body_part(FACE),
                       (old ? "has more" : "now has"));
-                make_blinded(Blinded + (long) u.ucreamed - old, TRUE);
+                make_blinded(BlindedTimeout + (long) u.ucreamed - old, TRUE);
             } else {
                 const char *what;
 
@@ -156,12 +156,12 @@ use_towel(struct obj *obj)
             dry_a_towel(obj, -1, drying_feedback);
         return ECMD_TIME;
     } else if (u.ucreamed) {
-        Blinded -= u.ucreamed;
+        incr_itimeout(&HBlinded, (-1 * (int) u.ucreamed));
         u.ucreamed = 0;
         if (!Blinded) {
             pline("You've got the glop off.");
             if (!gulp_blnd_check()) {
-                Blinded = 1;
+                set_itimeout(&HBlinded, 1L);
                 make_blinded(0L, TRUE);
             }
         } else {
@@ -617,7 +617,7 @@ magic_whistled(struct obj *obj)
                           : ((n) <= 7) ? "several"  \
                             : "many")
         /* magic whistle is already discovered so rloc() message(s)
-           were suppressed above; if any discernible relocation occured,
+           were suppressed above; if any discernible relocation occurred,
            construct a message now and issue it below */
         if (shift > 0) {
             if (shift > 1)
@@ -1409,11 +1409,15 @@ use_candle(struct obj **optr)
             pline_The("new %s magically %s!", s, vtense(s, "ignite"));
         else if (!otmp->lamplit && was_lamplit)
             pline("%s out.", (obj->quan > 1L) ? "They go" : "It goes");
-        if (obj->unpaid)
+        if (obj->unpaid) {
+            struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
+            SetVoice(shkp, 0, 80, 0);
             verbalize("You %s %s, you bought %s!",
                       otmp->lamplit ? "burn" : "use",
                       (obj->quan > 1L) ? "them" : "it",
                       (obj->quan > 1L) ? "them" : "it");
+        }
         if (obj->quan < 7L && otmp->spe == 7)
             pline("%s now has seven%s candles attached.", The(xname(otmp)),
                   otmp->lamplit ? " lit" : "");
@@ -1563,8 +1567,11 @@ catch_lit(struct obj *obj)
         if (obj->otyp == POT_OIL)
             makeknown(obj->otyp);
         if (carried(obj) && obj->unpaid && costly_spot(u.ux, u.uy)) {
+            struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
             /* if it catches while you have it, then it's your tough luck */
             check_unpaid(obj);
+            SetVoice(shkp, 0, 80, 0);
             verbalize("That's in addition to the cost of %s %s, of course.",
                       yname(obj),
                       (obj->quan == 1L) ? "itself" : "themselves");
@@ -1640,7 +1647,9 @@ use_lamp(struct obj *obj)
             if (obj->unpaid && costly_spot(u.ux, u.uy)
                 && obj->age == 20L * (long) objects[obj->otyp].oc_cost) {
                 const char *ithem = (obj->quan > 1L) ? "them" : "it";
+                struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
 
+                SetVoice(shkp, 0, 80, 0);
                 verbalize("You burn %s, you bought %s!", ithem, ithem);
                 bill_dummy_object(obj);
             }
@@ -1685,10 +1694,13 @@ light_cocktail(struct obj **optr)
         Blind ? "" : "  It gives off a dim light.");
 
     if (obj->unpaid && costly_spot(u.ux, u.uy)) {
+        struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+
         /* Normally, we shouldn't both partially and fully charge
          * for an item, but (Yendorian Fuel) Taxes are inevitable...
          */
         check_unpaid(obj);
+        SetVoice(shkp, 0, 80, 0);
         verbalize("That's in addition to the cost of the potion, of course.");
         bill_dummy_object(obj);
     }
@@ -1864,7 +1876,7 @@ is_valid_jump_pos(coordxy x, coordxy y, int magic, boolean showmsg)
         coordxy dx = x - u.ux, dy = y - u.uy,
                 ax = abs(dx), ay = abs(dy);
 
-        /* diag: any non-orthogonal destination classifed as diagonal */
+        /* diag: any non-orthogonal destination classified as diagonal */
         diag = (magic || Passes_walls || (!dx && !dy)) ? jAny
                : !dy ? jHorz : !dx ? jVert : jDiag;
         /* traj: flatten out the trajectory => some diagonals re-classified */
@@ -2141,12 +2153,21 @@ use_tinning_kit(struct obj *obj)
         /* Mark tinned tins. No spinach allowed... */
         set_tin_variety(can, HOMEMADE_TIN);
         if (carried(corpse)) {
-            if (corpse->unpaid)
+            if (corpse->unpaid) {
+                struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(
+                                                       u.ux, u.uy, SHOPBASE));
+
+                SetVoice(shkp, 0, 80, 0);
                 verbalize(you_buy_it);
+            }
             useup(corpse);
         } else {
-            if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge)
+            if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge) {
+                struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(corpse->ox,
+                                                 corpse->oy, SHOPBASE));
+                SetVoice(shkp, 0, 80, 0);
                 verbalize(you_buy_it);
+            }
             useupf(corpse, 1L);
         }
         (void) hold_another_object(can, "You make, but cannot pick up, %s.",
@@ -2173,7 +2194,7 @@ use_unicorn_horn(struct obj **optr)
                       xname(obj), TRUE, SICK_NONVOMITABLE);
             break;
         case 1:
-            make_blinded((Blinded & TIMEOUT) + lcount, TRUE);
+            make_blinded(BlindedTimeout + lcount, TRUE);
             break;
         case 2:
             if (!Confusion)
@@ -2214,7 +2235,7 @@ use_unicorn_horn(struct obj **optr)
     /* collect property troubles */
     if (TimedTrouble(Sick))
         prop_trouble(SICK);
-    if (TimedTrouble(Blinded) > (long) u.ucreamed
+    if (TimedTrouble(Blinded) > (long) u.ucreamed && !PermaBlind
         && !(u.uswallow
              && attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         prop_trouble(BLINDED);
@@ -2608,7 +2629,7 @@ use_stone(struct obj *tstone)
         && obj->oclass == GEM_CLASS && !is_graystone(obj)
         && !obj_resists(obj, 80, 100)) {
         if (Blind)
-            pline("You feel something shatter.");
+            You_feel("something shatter.");
         else if (Hallucination)
             pline("Oh, wow, look at the pretty shards.");
         else
@@ -2910,6 +2931,12 @@ use_whip(struct obj *obj)
     } else if (u.dz < 0) {
         You("flick a bug off of the %s.", ceiling(u.ux, u.uy));
 
+    } else if (!u.dz && (IS_WATERWALL(levl[rx][ry].typ)
+                         || levl[rx][ry].typ == LAVAWALL)) {
+        You("cause a small splash.");
+        if (levl[rx][ry].typ == LAVAWALL)
+            (void) fire_damage(uwep, FALSE, rx, ry);
+        return ECMD_TIME;
     } else if ((!u.dx && !u.dy) || (u.dz > 0)) {
         int dam;
 
@@ -2919,7 +2946,9 @@ use_whip(struct obj *obj)
             kick_steed();
             return ECMD_TIME;
         }
-        if (is_pool_or_lava(u.ux, u.uy)) {
+        if (is_pool_or_lava(u.ux, u.uy)
+            || IS_WATERWALL(levl[rx][ry].typ)
+            || levl[rx][ry].typ == LAVAWALL) {
             You("cause a small splash.");
             if (is_lava(u.ux, u.uy))
                 (void) fire_damage(uwep, FALSE, u.ux, u.uy);
@@ -3401,13 +3430,14 @@ use_cream_pie(struct obj *obj)
     if (Hallucination)
         You("give yourself a facial.");
     else
-        pline("You immerse your %s in %s%s.", body_part(FACE),
+        You("immerse your %s in %s%s.", body_part(FACE),
               several ? "one of " : "",
               several ? makeplural(the(xname(obj))) : the(xname(obj)));
     if (can_blnd((struct monst *) 0, &gy.youmonst, AT_WEAP, obj)) {
         int blindinc = rnd(25);
+
         u.ucreamed += blindinc;
-        make_blinded(Blinded + (long) blindinc, FALSE);
+        make_blinded(BlindedTimeout + (long) blindinc, FALSE);
         if (!Blind || (Blind && wasblind))
             pline("There's %ssticky goop all over your %s.",
                   wascreamed ? "more " : "", body_part(FACE));
@@ -4152,8 +4182,9 @@ doapply(void)
         pline("Sorry, I don't know how to use that.");
         return ECMD_FAIL;
     }
-    if ((res & ECMD_TIME) && obj && obj->oartifact)
-        arti_speak(obj);
+    if (obj && obj->oartifact) {
+        res |= arti_speak(obj); /* sets ECMD_TIME bit if artifact speaks */
+    }
     return res;
 }
 
@@ -4206,7 +4237,7 @@ static int
 flip_through_book(struct obj *obj)
 {
     if (Underwater) {
-        pline("You don't want to get the pages even more soggy, do you?");
+        You("don't want to get the pages even more soggy, do you?");
         return ECMD_OK;
     }
 

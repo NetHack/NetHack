@@ -14,6 +14,7 @@
 
 static void moveloop_preamble(boolean);
 static void u_calc_moveamt(int);
+static void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -303,7 +304,7 @@ moveloop_core(void)
                     }
                 }
 
-                if (Searching && gm.multi >= 0)
+                if (!gl.level.flags.noautosearch && Searching && gm.multi >= 0)
                     (void) dosearch0(1);
                 if (Warning)
                     warnreveal();
@@ -332,7 +333,7 @@ moveloop_core(void)
                 /* vision will be updated as bubbles move */
                 if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                     movebubbles();
-                else if (Is_firelevel(&u.uz))
+                else if (gl.level.flags.fumaroles)
                     fumaroles();
 
                 /* when immobile, count is in turns */
@@ -354,7 +355,7 @@ moveloop_core(void)
 
         gh.hero_seq++; /* moves*8 + n for n == 1..7 */
 
-        /* although we checked for encumberance above, we need to
+        /* although we checked for encumbrance above, we need to
            check again for message purposes, as the weight of
            inventory may have changed in, e.g., nh_timeout(); we do
            need two checks here so that the player gets feedback
@@ -498,12 +499,41 @@ moveloop_core(void)
         /* [should this be flush_screen() instead?] */
         display_nhwindow(WIN_MAP, FALSE);
     }
+
+    if (gl.luacore && nhcb_counts[NHCB_END_TURN]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_END_TURN]);
+        nhl_pcall(gl.luacore, 1, 0);
+    }
+}
+
+static void
+maybe_do_tutorial(void)
+{
+    s_level *sp = find_level("tut-1");
+
+    if (!sp)
+        return;
+
+    if (ask_do_tutorial()) {
+        assign_level(&u.ucamefrom, &u.uz);
+        u.nofollowers = TRUE;
+        schedule_goto(&sp->dlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        deferred_goto();
+        vision_recalc(0);
+        docrt();
+        u.nofollowers = FALSE;
+    }
 }
 
 void
 moveloop(boolean resuming)
 {
     moveloop_preamble(resuming);
+
+    if (!resuming)
+        maybe_do_tutorial();
+
     for (;;) {
         moveloop_core();
     }
@@ -626,8 +656,12 @@ init_sound_and_display_gamewindows(void)
 
     activate_chosen_soundlib();
 
-    SoundAchievement(0, sa2_splashscreen, 0);
-    /* ToDo: new splash screen invocation will go here */
+    if (iflags.wc_splash_screen && !flags.randomall) {
+        SoundAchievement(0, sa2_splashscreen, 0);
+        /* ToDo: new splash screen invocation will go here */
+    } else {
+        SoundAchievement(0, sa2_newgame_nosplash, 0);
+    }
 
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
@@ -783,7 +817,7 @@ welcome(boolean new_game) /* false => restoring an old game */
         livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
                        gp.plname, buf);
     } else {
-        /* if restroing in Gehennom, give same hot/smoky message as when
+        /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */
         hellish_smoke_mesg();
     }

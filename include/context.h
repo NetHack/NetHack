@@ -11,6 +11,15 @@
 
 #define CONTEXTVERBSZ 30
 
+enum nh_tips {
+    TIP_ENHANCE = 0, /* #enhance */
+    TIP_SWIM,        /* walking into water */
+    TIP_UNTRAP_MON,  /* walking into trapped peaceful */
+    TIP_GETPOS,      /* getpos/farlook */
+
+    NUM_TIPS
+};
+
 /*
  * The context structure houses things that the game tracks
  * or adjusts during the game, to preserve game state or context.
@@ -153,8 +162,7 @@ struct context_info {
     boolean botl;        /* partially redo status line */
     boolean botlx;       /* print an entirely new bottom line */
     boolean door_opened; /* set to true if door was opened during test_move */
-    boolean enhance_tip; /* player is informed about #enhance */
-    boolean swim_tip;    /* player was informed about walking into water */
+    boolean tips[NUM_TIPS];
     struct dig_info digging;
     struct victual_info victual;
     struct engrave_info engraving;
@@ -167,6 +175,7 @@ struct context_info {
     struct tribute_info tribute;
     struct novel_tracking novel;
     struct achievement_tracking achieveo;
+    char jingle[5 + 1];
 };
 
 #endif /* CONTEXT_H */

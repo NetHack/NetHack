@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.h	$NHDT-Date: 1596498550 2020/08/03 23:49:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.42 $ */
+/* NetHack 3.7	monst.h	$NHDT-Date: 1678560511 2023/03/11 18:48:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -156,7 +156,7 @@ struct monst {
     Bitfield(iswiz, 1);     /* is the Wizard of Yendor */
     Bitfield(wormno, 5);    /* at most 31 worms on any level */
     Bitfield(mtemplit, 1);  /* temporarily seen; only valid during bhit() */
-    /* 1 free bit */
+    Bitfield(meverseen, 1); /* mon has been seen at some point */
 
 #define MAX_NUM_WORMS 32    /* should be 2^(wormno bitfield size) */
 

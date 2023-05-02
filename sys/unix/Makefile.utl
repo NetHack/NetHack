@@ -23,6 +23,11 @@ NHSROOT=..
 # execute things like 'foo.o')
 # MAKE = make
 
+# NetHack 3.7 began introducing C99 code.
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# CSTD = -std=c99
+
 # if you are using gcc as your compiler,
 #	uncomment the CC definition below if it's not in your environment
 # CC = gcc
@@ -190,7 +195,7 @@ ODATE = $(OBJDIR)/date.o
 MAKEOBJS = makedefs.o $(OMONOBJ) $(ODATE) $(OALLOC)
 
 # object files for recovery utility
-RECOVOBJS = recover.o
+RECOVOBJS = $(TARGETPFX)recover.o
 
 # object files for the data librarian
 DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
@@ -203,7 +208,7 @@ DLBOBJS = dlb_main.o $(OBJDIR)/dlb.o $(OALLOC)
 
 TARGETPFX=
 TARGET_CC = $(CC)
-TARGET_CFLAGS = $(CFLAGS)
+TARGET_CFLAGS = $(CFLAGS) $(CSTD)
 TARGET_CLINK = $(CLINK)
 TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
@@ -226,7 +231,7 @@ makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) \
 		../include/monst.h ../include/monsters.h ../include/objects.h \
 		../include/you.h ../include/context.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h mdgrep.h
-	$(CC) $(CFLAGS) -c makedefs.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c makedefs.c -o $@
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
@@ -249,7 +254,7 @@ lintdefs:
 
 # support code used by several of the utility programs (but not makedefs)
 panic.o:     panic.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c panic.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c panic.c -o $@
 
 
 # with all of extern.h's functions to complain about, we drown in
@@ -261,11 +266,11 @@ lintdgn:
 
 #	dependencies for recover
 #
-recover: $(RECOVOBJS)
-	$(CLINK) $(LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
+$(TARGETPFX)recover: $(RECOVOBJS)
+	$(TARGET_CLINK) $(TARGET_LFLAGS) -o recover $(RECOVOBJS) $(LIBS)
 
-recover.o: recover.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c recover.c -o $@
+$(TARGETPFX)recover.o: recover.c $(CONFIG_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) $(CSTD) -c recover.c -o $@
 
 
 #	dependencies for dlb
@@ -274,7 +279,7 @@ dlb:	$(DLBOBJS)
 	$(CLINK) $(LFLAGS) -o dlb $(DLBOBJS) $(LIBS)
 
 dlb_main.o: dlb_main.c $(CONFIG_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c dlb_main.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c dlb_main.c -o $@
 
 
 #	dependencies for tile utilities
@@ -318,34 +323,34 @@ tilemap: tilemap.o $(OBJDIR)/objects.o $(OBJDIR)/monst.o $(OBJDIR)/drawing.o
 	./tilemap
 
 tiletext.o: ../win/share/tiletext.c $(CONFIG_H) ../win/share/tile.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/share/tiletext.c -o $@
+	$(CC) $(CFLAGS) $(CSTD)  -I../win/share -c ../win/share/tiletext.c -o $@
 tiletxt.o: ../win/share/tiletxt.c ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) -I../win/share -c ../win/share/tiletxt.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/share/tiletxt.c -o $@
 tilemap.o: ../win/share/tilemap.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../win/share/tilemap.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../win/share/tilemap.c -o $@
 
 gifread.o: ../win/share/gifread.c $(CONFIG_H) ../win/share/tile.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/share/gifread.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/share/gifread.c -o $@
 ppmwrite.o: ../win/share/ppmwrite.c $(CONFIG_H) ../win/share/tile.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/share/ppmwrite.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/share/ppmwrite.c -o $@
 
 tile2bmp.o: ../win/share/tile2bmp.c $(HACK_H) ../win/share/tile.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/share/tile2bmp.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/share/tile2bmp.c -o $@
 
 tile2x11.o: ../win/X11/tile2x11.c $(HACK_H) ../win/share/tile.h \
 						../include/tile2x11.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/X11/tile2x11.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/X11/tile2x11.c -o $@
 
 tile2img.o: ../win/gem/tile2img.c $(HACK_H) ../win/share/tile.h \
 						../include/bitmfile.h
-	$(CC) $(CFLAGS) -I../win/share -c ../win/gem/tile2img.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -I../win/share -c ../win/gem/tile2img.c -o $@
 xpm2img.o: ../win/gem/xpm2img.c $(HACK_H) ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c ../win/gem/xpm2img.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../win/gem/xpm2img.c -o $@
 bitmfile.o: ../win/gem/bitmfile.c ../include/bitmfile.h
-	$(CC) $(CFLAGS) -c ../win/gem/bitmfile.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../win/gem/bitmfile.c -o $@
 
 tile2beos.o: ../win/BeOS/tile2beos.cpp $(HACK_H) ../win/share/tile.h
-	$(CXX) $(CFLAGS) -I../win/share -c ../win/BeOS/tile2beos.cpp -o $@
+	$(CXX) $(CFLAGS) $(CSTD) -I../win/share -c ../win/BeOS/tile2beos.cpp -o $@
 
 # note: tileedit.cpp was developed for Qt2 and will not compile using Qt5
 tileedit.o: ../win/Qt/tileedit.cpp
@@ -353,6 +358,11 @@ tileedit.o: ../win/Qt/tileedit.cpp
 tileedit: tileedit.o $(TEXT_IO)
 	$(QTDIR)/bin/moc -o tileedit.moc tileedit.h
 	$(CXXLINK) -o tileedit -L$(QTDIR)/lib tileedit.o $(TEXT_IO) -lqt
+
+uudecode: uudecode.o
+	$(CLINK) $(LFLAGS) -o uudecode uudecode.o $(LIBS)
+uudecode.o: ../sys/share/uudecode.c
+	$(CC) $(CFLAGS) $(CSTD) -c -o uudecode.o ../sys/share/uudecode.c
 
 # using dependencies like
 #	../src/foo::
@@ -369,27 +379,27 @@ tileedit: tileedit.o $(TEXT_IO)
 # (note: these dependencies have been copied from Makefile.src so only come
 # indirectly from 'make depend', hence are subject to bit rot as src changes)
 $(OBJDIR)/alloc.o: ../src/alloc.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/alloc.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/alloc.c -o $@
 $(OBJDIR)/drawing.o: ../src/drawing.c $(CONFIG_H) ../include/color.h \
 		../include/rm.h ../include/objclass.h ../include/defsym.h \
 		../include/objects.h ../include/sym.h
-	$(CC) $(CFLAGS) -c ../src/drawing.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/drawing.c -o $@
 $(OBJDIR)/decl.o: ../src/decl.c $(HACK_H)
-	$(CC) $(CFLAGS) -c ../src/decl.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/decl.c -o $@
 $(OBJDIR)/monst.o: ../src/monst.c $(CONFIG_H) ../include/permonst.h \
 		../include/align.h ../include/monattk.h ../include/monflag.h \
 		../include/monsters.h ../include/sym.h ../include/defsym.h \
 		../include/color.h
-	$(CC) $(CFLAGS) -c ../src/monst.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/monst.c -o $@
 $(OBJDIR)/objects.o: ../src/objects.c $(CONFIG_H) ../include/obj.h \
 		../include/prop.h ../include/skills.h ../include/color.h \
 		../include/objclass.h ../include/defsym.h ../include/objects.h
-	$(CC) $(CFLAGS) -c ../src/objects.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/objects.c -o $@
 $(OBJDIR)/dlb.o: ../src/dlb.c $(CONFIG_H) ../include/dlb.h
-	$(CC) $(CFLAGS) -c ../src/dlb.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/dlb.c -o $@
 # this differs substantially from what Makefile.src specifies
 $(OBJDIR)/date.o: ../src/date.c $(CONFIG_H)
-	$(CC) $(CFLAGS) -c ../src/date.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c ../src/date.c -o $@
 
 # make sure hack.h dependencies get transitive information
 $(HACK_H): $(CONFIG_H)
@@ -402,10 +412,19 @@ SYSSHARE=../sys/share/
 tags: $(UTILSRCS)
 	@ctags -tw $(UTILSRCS)
 
-clean:
+# note:	3.6 copied tile.h from win/share/ to include/ and if someone
+#	switches branches from 3.6 to 3.7 without executing 'make spotless'
+#	first, the old tile.h sticks around and gets found during compile
+#	instead of current one; various tile utilities won't build in that
+#	mis-configuration so allow 'make clean' and 'make spotless' in 3.7
+#	to fix things up by deleting the out of date file (if present)
+clean-fixup:
+	-rm -f ../include/tile.h
+
+clean: clean-fixup
 	-rm -f *.o
 
 spotless: clean
 	-rm -f makedefs recover dlb
 	-rm -f gif2txt txt2ppm tile2x11 tile2img.ttp xpm2img.ttp \
-		tilemap tileedit tile2bmp
+		tilemap tileedit tile2bmp uudecode

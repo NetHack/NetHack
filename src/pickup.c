@@ -544,7 +544,7 @@ reset_justpicked(struct obj *olist)
 {
     struct obj *otmp;
     /*
-     * TODO?  Possible enchancement: don't reset if hero is still at same
+     * TODO?  Possible enhancement: don't reset if hero is still at same
      *  spot where most recent pickup took place.  Not resetting will be
      *  the correct behavior for autopickup immediately followed by manual
      *  pickup.  It would probably be correct for either or both pickups
@@ -2196,6 +2196,7 @@ reverse_loot(void)
             coffers = otmp;
 
         if (coffers) {
+            SetVoice((struct monst *) 0, 0, 80, 0);
             verbalize("Thank you for your contribution to reduce the debt.");
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);
@@ -2816,7 +2817,7 @@ use_container(
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
         gc.current_container->owt = weight(gc.current_container);
     }
-    /* might put something in if carring anything other than just the
+    /* might put something in if carrying anything other than just the
        container itself (invent is not the container or has a next object) */
     inokay = (gi.invent != 0 && (gi.invent != gc.current_container
                                 || gi.invent->nobj));
@@ -2844,7 +2845,7 @@ use_container(
      * include the next container choice ('n') when
      * relevant, and make it the default;
      * always include the quit choice ('q'), and make
-     * it the default if there's no next containter;
+     * it the default if there's no next container;
      * include the help choice (" or ?") if `cmdassist'
      * run-time option is set;
      * (Player can pick any of (o,i,b,r,n,s,?) even when
@@ -3279,21 +3280,32 @@ dotip(void)
     const char *spillage = 0;
 
     /*
-     * doesn't require free hands;
-     * limbs are needed to tip floor containers
+     * Doesn't require free hands;
+     * limbs are needed to tip floor containers.
+     *
+     * Note: for menustyle:Traditional, using m prefix forces a menu
+     * of floor containers when more than one is present.  For other
+     * menustyle settings or when fewer than two floor containers are
+     * present, using 'm' skips floor and goes straight to invent.
+     * This somewhat unintuitive behavior is driven by the way that
+     * context-sensitive inventory item actions use m prefix.
      */
 
     /* at present, can only tip things at current spot, not adjacent ones */
     cc.x = u.ux, cc.y = u.uy;
 
     /* check floor container(s) first; at most one will be accessed */
-    if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
+    boxes = container_at(cc.x, cc.y, TRUE);
+    /* this is iffy for menustyle:traditional; 'm' prefix is ambiguous
+       for it: skip floor vs handle multiple containers via menu */
+    if (boxes > 0
+        && (!iflags.menu_requested
+            || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !Verbose(2, dotip)
                     ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-            if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
-                              || iflags.menu_requested)) {
+            if (boxes > 1) {
                 /* use menu to pick a container to tip */
                 int n, i;
                 winid win;
@@ -3368,7 +3380,8 @@ dotip(void)
         }
     }
 
-    /* either no floor container(s) or couldn't tip one or didn't tip any */
+    /* either no floor container(s) or 'm' prefix was used to ignore such
+       or couldn't tip one or didn't tip any */
     cobj = getobj("tip", tip_ok, GETOBJ_PROMPT);
     if (!cobj)
         return ECMD_CANCEL;

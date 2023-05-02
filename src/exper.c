@@ -227,6 +227,7 @@ losexp(
         /* remove intrinsic abilities */
         adjabil(u.ulevel + 1, u.ulevel);
         livelog_printf(LL_MINORAC, "lost experience level %d", u.ulevel + 1);
+        SoundAchievement(0, sa2_xpleveldown, 0);
     } else {
         if (drainer) {
             gk.killer.format = KILLED_BY;
@@ -249,7 +250,7 @@ losexp(
        strength loss or by a fire trap or by an attack by Death which
        all use a different minimum than life-saving or experience loss;
        we don't allow it to go up because that contradicts assumptions
-       elsewhere (such as healing wielder who drains with Strombringer) */
+       elsewhere (such as healing wielder who drains with Stormbringer) */
     if (u.uhpmax > olduhpmax)
         setuhpmax(olduhpmax);
 
@@ -344,7 +345,7 @@ pluslvl(
         if (u.ulevelmax < u.ulevel)
             u.ulevelmax = u.ulevel;
         adjabil(u.ulevel - 1, u.ulevel); /* give new intrinsics */
-
+        SoundAchievement(0, sa2_xplevelup, 0);
         old_ach_cnt = count_achievements();
         newrank = xlev_to_rank(u.ulevel);
         if (newrank > oldrank)

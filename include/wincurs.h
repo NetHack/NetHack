@@ -164,6 +164,7 @@ extern boolean curses_is_menu(winid wid);
 extern boolean curses_is_text(winid wid);
 extern int curses_convert_glyph(int ch, int glyph);
 extern void curses_move_cursor(winid wid, int x, int y);
+extern void curses_update_stdscr_cursor(void);
 extern void curses_prehousekeeping(void);
 extern void curses_posthousekeeping(void);
 extern void curses_view_file(const char *filename, boolean must_exist);

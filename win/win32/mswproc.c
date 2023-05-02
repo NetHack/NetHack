@@ -1481,12 +1481,13 @@ mswin_nh_poskey(coordxy *x, coordxy *y, int *mod)
 
 /*
 nhbell()        -- Beep at user.  [This will exist at least until sounds are
-                   redone, since sounds aren't attributable to windows
-anyway.]
+                   redone, since sounds aren't attributable to windows anyway.]
 */
 void
 mswin_nhbell(void)
 {
+    /* this currently does nothing, but if that ever changes, the setting
+       of flags.silent should be respected */
     logDebug("mswin_nhbell()\n");
 }
 

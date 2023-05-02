@@ -40,7 +40,7 @@ static void zerocomp_bwrite(int, genericptr_t, unsigned int);
 static void zerocomp_bputc(int);
 #endif
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__) || defined(WIN32)
+#if defined(HANGUPHANDLING)
 #define HUP if (!gp.program_state.done_hup)
 #else
 #define HUP
@@ -58,7 +58,7 @@ dosave(void)
     } else {
         clear_nhwindow(WIN_MESSAGE);
         pline("Saving...");
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(HANGUPHANDLING)
         gp.program_state.done_hup = 0;
 #endif
         if (dosave0()) {

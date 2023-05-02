@@ -158,7 +158,7 @@ E void xputs(const char *);
 E void xputg(const glyph_info *, const glyph_info *);
 #endif
 E void cl_end(void);
-E void clear_screen(void);
+E void term_clear_screen(void);
 E void home(void);
 E void standoutbeg(void);
 E void standoutend(void);
@@ -291,7 +291,35 @@ E win_request_info *tty_ctrl_nhwindow(winid, int, win_request_info *);
 E void tty_refresh_inventory(int start, int stop, int y);
 #endif
 
-#ifdef NO_TERMS
+/* termcap is implied if NO_TERMS is not defined */
+#ifndef NO_TERMS
+#ifndef NO_TERMCAP_HEADERS
+#include <curses.h>
+#ifdef clear_screen /* avoid a conflict */
+#undef clear_screen
+#endif
+#include <term.h>
+#ifdef bell
+#undef bell
+#endif
+#ifdef color_names
+#undef color_names
+#endif
+#ifdef tone
+#undef tone
+#endif
+#ifdef hangup
+#undef hangup
+#endif
+#else
+extern int tgetent(char *, const char *);
+extern void tputs(const char *, int, int (*)(int));
+extern int tgetnum(const char *);
+extern int tgetflag(const char *);
+extern char *tgetstr(const char *, char **);
+extern char *tgoto(const char *, int, int);
+#endif /* NO_TERMCAP_HEADERS */
+#else  /* ?NO_TERMS */
 #ifdef MAC
 #ifdef putchar
 #undef putchar
@@ -317,7 +345,7 @@ E int term_puts(const char *str);
 E void video_update_positionbar(char *);
 #endif
 #endif /*MSDOS*/
-#endif /*NO_TERMS*/
+#endif /* NO_TERMS */
 
 #undef E
 

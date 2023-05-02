@@ -145,7 +145,7 @@ extern
 #define getlin (*windowprocs.win_getlin)
 #define get_ext_cmd (*windowprocs.win_get_ext_cmd)
 #define number_pad (*windowprocs.win_number_pad)
-#define delay_output (*windowprocs.win_delay_output)
+#define nh_delay_output (*windowprocs.win_delay_output)
 #ifdef CHANGE_COLOR
 #define change_color (*windowprocs.win_change_color)
 #ifdef MAC

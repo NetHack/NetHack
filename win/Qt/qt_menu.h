@@ -179,6 +179,8 @@ private:
 	NetHackQtWindow* actual;
         QWidget *parent;
 
+        static void MenuOrText_too_soon_warning(const char *);
+
 public:
 	NetHackQtMenuOrTextWindow(QWidget *parent = NULL);
 

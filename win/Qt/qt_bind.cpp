@@ -628,7 +628,8 @@ int NetHackQtBind::qt_nh_poskey(coordxy *x, coordxy *y, int *mod)
 
 void NetHackQtBind::qt_nhbell()
 {
-    QApplication::beep();
+    if (!::flags.silent)
+        QApplication::beep();
 }
 
 int NetHackQtBind::qt_doprev_message()
@@ -1062,6 +1063,12 @@ void NetHackQtBind::qtsound_soundeffect(char *desc UNUSED, int32_t seid UNUSED, 
 void NetHackQtBind::qtsound_hero_playnotes(int32_t instrument UNUSED, const char *str UNUSED, int32_t volume UNUSED)
 {
 }
+void NetHackQtBind::qtsound_ambience(int32_t ambienceid UNUSED, int32_t ambience_action UNUSED, int32_t proximity UNUSED)
+{
+}
+void NetHackQtBind::qtsound_verbal(char *text UNUSED, int32_t gender UNUSED, int32_t tone UNUSED, int32_t vol UNUSED, int32_t moreinfo UNUSED)
+{
+}
 #endif
 
 #if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
@@ -1182,6 +1189,8 @@ struct sound_procs qtsound_procs = {
     nethack_qt_::NetHackQtBind::qtsound_soundeffect,
     nethack_qt_::NetHackQtBind::qtsound_hero_playnotes,
     nethack_qt_::NetHackQtBind::qtsound_play_usersound,
+    nethack_qt_::NetHackQtBind::qtsound_ambience,
+    nethack_qt_::NetHackQtBind::qtsound_verbal,
 };
 #endif /* SND_LIB_QTSOUND and !QT_NO_SOUND */
 

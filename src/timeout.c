@@ -687,12 +687,15 @@ nh_timeout(void)
                 if (!Stunned)
                     stop_occupation();
                 break;
-            case BLINDED:
-                set_itimeout(&Blinded, 1L);
+            case BLINDED: {
+                boolean was_blind = !!Blind;
+
+                set_itimeout(&HBlinded, 1L);
                 make_blinded(0L, TRUE);
-                if (!Blind)
+                if (was_blind && !Blind)
                     stop_occupation();
                 break;
+            }
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
@@ -817,7 +820,8 @@ nh_timeout(void)
                      * to this number must be thoroughly play tested.
                      */
                     if ((inv_weight() > -500)) {
-                        You("make a lot of noise!");
+                        if (!Deaf)
+                            You("make a lot of noise!");
                         wake_nearby();
                     }
                 }
@@ -1012,10 +1016,13 @@ hatch_egg(anything *arg, long timeout)
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
             if (yours) {
-                pline("%s cries sound like \"%s%s\"",
+                pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
+                      ing_suffix(cry_sound(mon)),
+                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
+                SetVoice(mon, 0, 80, 0);
                 verbalize("Gleep!"); /* Mything eggs :-) */
             }
             break;
@@ -1703,8 +1710,8 @@ do_storms(void)
     int dirx, diry;
     int count;
 
-    /* no lightning if not the air level or too often, even then */
-    if (!Is_airlevel(&u.uz) || rn2(8))
+    /* no lightning if not stormy level or too often, even then */
+    if (!gl.level.flags.stormy || rn2(8))
         return;
 
     /* the number of strikes is 8-log2(nstrike) */
@@ -1718,9 +1725,11 @@ do_storms(void)
         if (count < 100) {
             dirx = rn2(3) - 1;
             diry = rn2(3) - 1;
-            if (dirx != 0 || diry != 0)
-                buzz(-15, /* "monster" LIGHTNING spell */
-                     8, x, y, dirx, diry);
+            if (dirx != 0 || diry != 0) {
+                /* BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)): monster LIGHTNING spell */
+                gb.buzzer = 0; /* unspecified attacker */
+                buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 8, x, y, dirx, diry);
+            }
         }
     }
 
@@ -1899,7 +1908,7 @@ wiz_timeout_queue(void)
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
-    /* Timed properies:
+    /* Timed properties:
      * check every one; the majority can't obtain temporary timeouts in
      * normal play but those can be forced via the #wizintrinsic command.
      */

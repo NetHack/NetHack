@@ -33,11 +33,11 @@
 .ds h0 "NetHack Guidebook
 .ds h1
 .ds h2 %
-.ds vr "NetHack 3.7
+.ds vr "NetHack 3.7.0
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "January 30, 2023
+.ds f2 "April 19, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -57,7 +57,7 @@ A Guide to the Mazes of Menace
 (Guidebook for NetHack)
 .au
 Original version - Eric S. Raymond
-(Edited and expanded for 3.7 by Mike Stephenson and others)
+(Edited and expanded for \*(vr by Mike Stephenson and others)
 .sp 1
 \*(f2
 .hn 1
@@ -643,7 +643,7 @@ a monster there).
 .lp ""
 A few non-movement commands use the \(oq\f(CRm\fP\(cq prefix to request
 operating via menu (to temporarily override the
-.op menustyle:Traditional
+.op menustyle \f(CR:traditional\fP
 option).
 Primarily useful for \(oq\f(CR,\fP\(cq (pickup) when there is only one class
 of objects present (where there won't be any \(lqwhat kinds of objects?\(rq
@@ -656,10 +656,10 @@ list of all discovered objects) and the \(oq\f(CR\`\fP\(cq (knownclass,
 show a list of discovered objects in a particular class) commands to offer
 a menu of several sorting alternatives (which sets a new value for the
 .op sortdiscoveries
-option).
+option); also for \(lq#vanquished\(rq command to offer a sorting menu.
 .lp ""
 A few other commands (eat food, offer sacrifice, apply tinning-kit,
-drink/quaff, dip) use
+drink/quaff, dip, tip container) use
 the \(oq\f(CRm\fP\(cq prefix to skip checking for applicable objects on
 the floor and go straight to checking inventory,
 or (for \(lq#loot\(rq to remove a saddle),
@@ -1232,6 +1232,8 @@ Default key is \(oqZ\(cq.
 .lp "#chat    "
 Talk to someone.
 Default key is \(oqM-c\(cq.
+.lp "#chronicle"
+Show a list of important game events.
 .lp "#close   "
 Close a door.
 Default key is \(oqc\(cq.
@@ -1296,6 +1298,10 @@ Default key is \(oqf\(cq.
 Force a lock.
 Autocompletes.
 Default key is \(oqM-f\(cq.
+.lp #genocided
+List any monster types which have been genocided or become extinct.
+Autocompletes.
+Default key is \(oqM-g\(cq.
 .lp "#glance  "
 Show what type of thing a map symbol corresponds to.
 Default key is \(oq;\(cq.
@@ -1403,12 +1409,21 @@ Precede with the \(oqm\(cq prefix to execute the simpler options command.
 \(oq\f(CRO\fP\(cq from simple options back to traditional advanced options.)
 .lp #overview
 Display information you've discovered about the dungeon.
-Any visited
-level (unless forgotten due to amnesia) with an annotation is included,
+Any visited level
+.\" [note: amnesia no longer causes levels to be forgotten so exclude this]
+.\" (unless forgotten due to amnesia)
+with an annotation is included,
 and many things (altars, thrones, fountains, and so on; extra stairs
 leading to another dungeon branch) trigger an automatic annotation.
 If dungeon overview is chosen during end-of-game disclosure, every visited
 level will be included regardless of annotations.
+.lp ""
+Precede #overview with the \(oqm\(cq prefix to display the dungeon
+overview as a menu where you can select any visited level to add or
+remove an annotation without needing to return to that level.
+This will also force all visited levels to be displayed rather than just
+the \(lqinteresting\(rq subset.
+.lp ""
 Autocompletes.
 Default keys are \(oq\(haO\(cq, and \(oqM-O\(cq.
 .\" DON'T PANIC!
@@ -1532,6 +1547,10 @@ otherwise \(oq5\(cq when it is set to 2 or 4.
 .lp "#save    "
 Save the game and exit the program.
 Default key is \(oqS\(cq.
+.lp "#saveoptions"
+Save configuration options to the config file.
+This will overwrite the file, removing all comments, so if you have
+manually edited the config file, don't use this.
 .lp "#search  "
 Search for traps and secret doors around you.
 Default key is \(oqs\(cq.
@@ -1634,9 +1653,19 @@ Autocompletes.
 Debug mode only.
 .lp "#tip     "
 Tip over a container (bag or box) to pour out its contents.
+When there are containers on the floor, the game will prompt to pick one
+of them or \(lqtip something being carried\(rq.
+If the latter is chosen, there will be another prompt for which item
+from inventory to tip.
+.lp ""
+The \(oq\f(CRm\fP\(cq prefix makes the command skip containers on the
+floor and pick one from inventory, except for the special case of
+.op menustyle \f(CR:traditional\fP
+with two or more containers present; that situation will start with the
+floor container menu.
+.lp ""
 Autocompletes.
 Default key is \(oqM-T\(cq.
-The \(oqm\(cq prefix makes the command use a menu.
 .lp "#travel  "
 Travel to a specific location on the map.
 Default key is \(oq_\(cq. \" underscore
@@ -1822,9 +1851,6 @@ the first letter of the command.
 .pg
 On \fIWindows\fP and \fIMS-DOS\fP,
 the \(lqAlt\(rq key can be used in this fashion.
-.\" On the \fIAmiga\fP, set the
-.\" .op altmeta
-.\" option to get this behavior.
 On other systems, if typing \(lqAlt\(rq plus another key transmits a
 two character sequence consisting of an \fBEscape\fP
 followed by the other key, you may set the
@@ -1861,6 +1887,8 @@ option is enabled)
 #enhance
 .lp M-f
 #force
+.lp M-g
+#genocided
 .lp M-i
 #invoke
 .lp M-j
@@ -3336,6 +3364,8 @@ Reached the Elemental Planes.
 Reached the Astral Plane level.
 .PL Blind
 Blind from birth.
+.PL Deaf
+Deaf from birth.
 .PL Nudist
 Never wore any armor.
 .PL Ascended
@@ -3374,10 +3404,10 @@ instrument played closely
 enough\(embut not too close!\(emto
 the Castle level's drawbridge or can be given to you via prayer boon.
 .pg
-\fIBlind\fP and \fINudist\fP are also conducts, and they can only be
+\fIBlind\fP, \fIDeaf\fP, and \fINudist\fP are also conducts, and they can only be
 enabled by setting the correspondingly named option in NETHACKOPTIONS
 or run-time configuration file prior to game start.
-In the case of \fIBlind\fP, the option also enforces the conduct.
+In the case of \fIBlind\fP and \fIDeaf\fP, the option also enforces the conduct.
 They aren't really significant accomplishments unless/until you make
 substantial progress into the dungeon.
 .
@@ -3401,8 +3431,8 @@ for system administrators.
 .hn 2
 Using a configuration file
 .pg
-.\" hw: don't hyphenate file names
-.hw .nethackrc defaults.nh nethack.exe nethackW.exe
+.\" hw: don't hyphenate file names; percent-sign doesn't need special handling
+.hw .nethackrc defaults.nh nethack.exe nethackW.exe %USERPROFILE%\\NetHack\\
 The default name of the configuration file varies on different
 operating systems.
 .pg
@@ -3413,15 +3443,16 @@ and macOS it is \(lq.nethackrc\(rq in the user's home directory.
 The file may not exist, but it is a normal ASCII text file and
 can be created with any text editor.
 .pg
-On Windows, it is \(lq.nethackrc\(rq in the folder
-\(lq\\%USERPROFILE%\\NetHack\\3.7\(rq.  The file may not exist,
+On Windows, the name is \(lq.nethackrc\(rq located in the folder
+\(lq%USERPROFILE%\\NetHack\\\(rq.
+The file may not exist,
 but it is a normal ASCII text file can can be created with any
 text editor.
 After running NetHack for the first time, you should find a default
 template for the configuration file named \(lq.nethackrc.template\(rq
-in \(lq\\%USERPROFILE%\\NetHack\\3.7\(rq.
-If you had not created the configuration file, NetHack will create
-the configuration file for you using the default template file.
+in \(lq%USERPROFILE%\\NetHack\\\(rq.
+If you have not created the configuration file, NetHack will create
+one for you using the default template file.
 .pg
 On MS-DOS, it is \(lqdefaults.nh\(rq in the same folder as nethack.exe.
 .pg
@@ -3715,7 +3746,7 @@ and also
 .op autopickup_exception
 for ways to refine the behavior.
 .lp ""
-Note: prior to version 3.7, the default for
+Note: prior to version 3.7.0, the default for
 .op autopickup
 was \fIon\fP.
 .lp autoquiver
@@ -3795,6 +3826,9 @@ Have user confirm attacks on pets, shopkeepers, and other
 peaceable creatures (default on).  Persistent.
 .lp dark_room
 Show out-of-sight areas of lit rooms (default on).  Persistent.
+.lp "deaf    "
+Start the character permanently deaf (default false).
+Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -4517,6 +4551,9 @@ screen.
 uses a timer-based delay.
 The default is on if configured into the program.)
 Persistent.
+.lp "tips    "
+Show some helpful tips during gameplay (default on).
+Persistent.
 .lp tombstone
 Draw a tombstone graphic upon your death (default on).
 Persistent.
@@ -4534,6 +4571,9 @@ Persistent.
 ." .lp travel_debug
 ." Display intended path during each step of travel (default off).
 ." Debug mode only.
+.lp tutorial
+Play a tutorial level at the start of the game.
+Setting this option on or off in the config file will skip the query.
 .lp "verbose "
 Provide more commentary during the game (default on).  Persistent.
 .lp whatis_coord
@@ -4827,11 +4867,7 @@ to customize and change the port behavior.
 Select an alternate way to handle keystrokes (Win32 tty NetHack only).
 The name of the handling type is one of \(lqdefault\(rq, \(lqray\(rq,
 \(lq340\(rq.
-.\" .lp "altmeta "
-.\" On Amiga, this option controls whether typing \(lqAlt\(rq plus another key
-.\" functions as a meta-shift for that key (default on).
 .lp "altmeta "
-.\" On other (non-Amiga) systems where this option is available, it can be
 On systems where this option is available, it can be
 set to tell NetHack to convert a two character sequence beginning with
 ESC into a meta-shifted version of the second character (default off).
@@ -4851,12 +4887,6 @@ Use BIOS calls to update the screen
 display quickly and to read the keyboard (allowing the use of arrow
 keys to move) on machines with an IBM PC compatible BIOS ROM (default off,
 OS/2, PC, and ST NetHack only).
-.lp flush
-(default off, Amiga NetHack only).
-.lp MACgraphics
-(default on, Mac NetHack only).
-.lp page_wait
-(default on, Mac NetHack only).
 .lp "rawio   "
 Force raw (non-cbreak) mode for faster output and more
 bulletproof input (MS-DOS sometimes treats \(oq\(haP\(cq as a printer toggle
@@ -5240,7 +5270,7 @@ An entry that maps a sound file to a user-specified message pattern.
 Each SOUND entry is broken down into the following parts:
 .PS "sound index"
 .PL MESG
-message window mapping (the only one supported in 3.7);
+message window mapping (the only one supported in 3.7.0);
 .PL msgtype
 optional; message type to use, see \(lqConfiguring Message Types\(rq
 .PL pattern
@@ -5560,6 +5590,7 @@ k	S_kobold	(kobold)
 K	S_kop	(Keystone Kop)
 \(ha	S_land_mine	(land mine)
 }	S_lava	(molten lava)
+}	S_lavawall	(wall of lava)
 l	S_leprechaun	(leprechaun)
 \(ha	S_level_teleporter	(level teleporter)
 L	S_lich	(lich)
@@ -6273,7 +6304,7 @@ various
 flavors and maintained the X11 interface.
 .pg
 \fBKen Lorber\fP, \fBHaoyang Wang\fP, \fBPat Rankin\fP, and \fBDean Luick\fP
-maintained the port of NetHack 3.6 for Mac OSX.
+maintained the port of NetHack 3.6 for MacOS.
 .pg
 \fBMichael Allison\fP, \fBDavid Cohrs\fP, \fBBart House\fP,
 \fBPasi Kallinen\fP, \fBAlex Kompel\fP, \fBDion Nicolaas\fP,
@@ -6313,6 +6344,9 @@ NetHack 3.6.5 was released on January 27, 2020 containing some security fixes
 and a small number of bug fixes.
 .pg
 NetHack 3.6.6 was released on March 8, 2020 containing a security fix and
+some bug fixes.
+.pg
+NetHack 3.6.7 was released on February 16, 2023 containing a security fix and
 some bug fixes.
 .pg
 The official NetHack web site is maintained by \fBKen Lorber\fP

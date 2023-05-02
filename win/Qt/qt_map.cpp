@@ -181,6 +181,11 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
     QPainter painter;
     painter.begin(this);
 
+    unsigned special, tileidx;
+#ifdef TEXTCOLOR
+    uint32 color;
+    uint32 framecolor;
+#endif
     if (Is_rogue_level(&u.uz) || iflags.wc_ascii_map) {
 	// You enter a VERY primitive world!
 
@@ -193,33 +198,22 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
 
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
-                uint32 color = Glyphcolor(i, j);
                 char32_t ch = Glyphttychar(i, j);
-                unsigned special = Glyphflags(i, j);
-                uint32 framecolor = GlyphFramecolor(i, j);
-/*              unsigned short tileidx = Glyphtileidx(i, j); */
+
+                special = Glyphflags(i, j);
                 if (SYMHANDLING(H_IBM)) {
                     ch = cp437(ch);
                 }
-                if (framecolor != NO_COLOR) {
-                     painter.fillRect(i*qt_settings->glyphs().width(),
-                                    j*qt_settings->glyphs().height(),
-                                    qt_settings->glyphs().width()-1,
-                                    qt_settings->glyphs().height()-1,
-                                    nhcolor_to_pen(framecolor).color());
-                }
-                    
 #ifdef TEXTCOLOR
-
-                 painter.setPen( nhcolor_to_pen(color) );
+                color = Glyphcolor(i, j);
+                painter.setPen(nhcolor_to_pen(color));
 #else
-                 painter.setPen( Qt::green );
+                painter.setPen(Qt::green);
 #endif
                 if (!DrawWalls(painter, i * gW, j * gH, gW, gH, ch)) {
                     painter.drawText(i * gW, j * gH, gW, gH, Qt::AlignCenter,
                                      QString(QChar(ch)).left(1));
                 }
-#ifdef TEXTCOLOR
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pet_annotation);
@@ -228,12 +222,14 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                     painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
                 }
+#ifdef TEXTCOLOR
+                framecolor = GlyphFramecolor(i, j);
                 if (framecolor != NO_COLOR) {
-                   painter.setPen( nhcolor_to_pen(framecolor) );
-                   painter.drawRect(i*qt_settings->glyphs().width(),
-                                    j*qt_settings->glyphs().height(),
-                                    qt_settings->glyphs().width()-1,
-                                    qt_settings->glyphs().height()-1);
+                   painter.setPen(nhcolor_to_pen(framecolor));
+                   painter.drawRect(i * qt_settings->glyphs().width(),
+                                    j * qt_settings->glyphs().height(),
+                                    qt_settings->glyphs().width() - 1,
+                                    qt_settings->glyphs().height() - 1);
                 }
 #endif
             }
@@ -243,11 +239,10 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
     } else { // tiles
         for (int j = garea.top(); j <= garea.bottom(); j++) {
             for (int i = garea.left(); i <= garea.right(); i++) {
-                unsigned short g = Glyph(i,j);
-		unsigned special = Glyphflags(i, j);
-		unsigned tileidx = Glyphtileidx(i, j);
-                uint32 framecolor = GlyphFramecolor(i, j);
+                unsigned short g = Glyph(i, j);
 
+                special = Glyphflags(i, j);
+                tileidx = Glyphtileidx(i, j);
                 glyphs.drawCell(painter, g, tileidx, i, j);
 
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
@@ -258,13 +253,16 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                     painter.drawPixmap(QPoint(i * gW, j * gH),
                                        pile_annotation);
                 }
+#ifdef TEXTCOLOR
+                framecolor = GlyphFramecolor(i, j);
                 if (framecolor != NO_COLOR) {
-                   painter.setPen( nhcolor_to_pen(framecolor) );
-                   painter.drawRect(i*qt_settings->glyphs().width(),
-                                    j*qt_settings->glyphs().height(),
-                                    qt_settings->glyphs().width()-1,
-                                    qt_settings->glyphs().height()-1);
+                   painter.setPen(nhcolor_to_pen(framecolor));
+                   painter.drawRect(i * qt_settings->glyphs().width(),
+                                    j * qt_settings->glyphs().height(),
+                                    qt_settings->glyphs().width() - 1,
+                                    qt_settings->glyphs().height() - 1);
                 }
+#endif
 	    }
 	}
     }

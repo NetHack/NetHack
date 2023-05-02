@@ -60,10 +60,6 @@
 #endif
 #endif
 
-#if __APPLE__
-#include "config.h"
-#endif
-
 /*
  * uudecode [input]
  *
@@ -85,7 +81,9 @@
 #include <stdlib.h>
 #endif
 
-#include "warnings.h"
+/* #include "warnings.h" */
+#define DISABLE_WARNING_UNREACHABLE_CODE
+#define RESTORE_WARNINGS
 
 static void decode(FILE *, FILE *);
 static void outdec(char *, FILE *, int);
@@ -130,7 +128,7 @@ main(int argc, char **argv)
     }
     (void) sscanf(buf, "begin %o %s", &mode, dest);
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__)
     /* handle ~user/file format */
     if (dest[0] == '~') {
         char *sl;
@@ -154,7 +152,7 @@ main(int argc, char **argv)
         strcat(dnbuf, sl);
         strcpy(dest, dnbuf);
     }
-#endif /* !defined(MSDOS) && !defined(VMS) */
+#endif /* !MSDOS && !VMS && !WIN32 && !__APPLE__  */
 
 /* create output file */
 #if defined(MSDOS) || defined(WIN32)
@@ -239,7 +237,8 @@ outdec(char *p, FILE *f, int n)
         putc(c3, f);
 }
 
-#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(MACOS)
+#if !defined(MSDOS) && !defined(VMS) && !defined(WIN32) && !defined(__APPLE__)
+
 /*
  * Return the ptr in sp at which the character c appears;
  * NULL if not found

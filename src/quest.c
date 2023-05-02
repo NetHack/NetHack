@@ -396,6 +396,7 @@ prisoner_speaks(struct monst *mtmp)
         /* Awaken the prisoner */
         if (canseemon(mtmp))
             pline("%s speaks:", Monnam(mtmp));
+        SetVoice(mtmp, 0, 80, 0);
         verbalize("I'm finally free!");
         mtmp->mstrategy &= ~STRAT_WAITMASK;
         mtmp->mpeaceful = 1;

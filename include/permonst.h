@@ -28,10 +28,11 @@ struct attack {
 
 #define NATTK 6
 
-/*     Weight of a human body
+/*     Weight of human body, elf, dragon
  */
-
 #define WT_HUMAN 1450
+#define WT_ELF 800
+#define WT_DRAGON 4500
 
 #ifndef ALIGN_H
 #include "align.h"

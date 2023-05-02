@@ -434,11 +434,13 @@ encodeconduct(void)
        reporting "obeyed sokoban rules" is misleading if sokoban wasn't
        completed or at least attempted; however, suppressing that when
        sokoban was never entered, as we do here, risks reporting
-       "violated sokoban rules" when no such thing occured; this can
+       "violated sokoban rules" when no such thing occurred; this can
        be disambiguated in xlogfile post-processors by testing the
        entered-sokoban bit in the 'achieve' field */
     if (!u.uconduct.sokocheat && sokoban_in_play())
         e |= 1L << 12;
+    if (!u.uconduct.pets)
+        e |= 1L << 13;
 
     return e;
 }
@@ -591,8 +593,10 @@ encode_extended_conducts(char *buf)
     if (sokoban_in_play())
         add_achieveX(buf, "sokoban",  !u.uconduct.sokocheat);
     add_achieveX(buf, "blind",        u.uroleplay.blind);
+    add_achieveX(buf, "deaf",         u.uroleplay.deaf);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
     add_achieveX(buf, "bonesless",    !flags.bones);
+    add_achieveX(buf, "petless",      !u.uconduct.pets);
 
     return buf;
 }
@@ -644,7 +648,7 @@ topten(int how, time_t when)
         gt.toptenwin = create_nhwindow(NHW_TEXT);
     }
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(HANGUPHANDLING)
 #define HUP if (!gp.program_state.done_hup)
 #else
 #define HUP

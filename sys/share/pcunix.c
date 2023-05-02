@@ -19,7 +19,7 @@ extern char orgdir[];
 
 #if defined(TTY_GRAPHICS)
 extern void backsp(void);
-extern void clear_screen(void);
+extern void term_clear_screen(void);
 #endif
 
 #if 0
@@ -189,7 +189,7 @@ getlock(void)
         if (recover_savefile()) {
 #if defined(TTY_GRAPHICS)
             if (WINDOWPORT(tty))
-                clear_screen(); /* display gets fouled up otherwise */
+                term_clear_screen(); /* display gets fouled up otherwise */
 #endif
             goto gotlock;
         } else {

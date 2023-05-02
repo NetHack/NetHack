@@ -558,16 +558,18 @@ m_initweap(register struct monst *mtmp)
         (void) mongets(mtmp, rnd_offensive_item(mtmp));
 }
 
-/*
- *   Makes up money for monster's inventory.
- */
+/* create a new stack of gold in monster's inventory */
 void
 mkmonmoney(struct monst *mtmp, long amount)
 {
-    struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
+    /* mk_mplayer() passes rn2(1000) so the amount might be 0 */
+    if (amount > 0L) {
+        struct obj *gold = mksobj(GOLD_PIECE, FALSE, FALSE);
 
-    gold->quan = amount;
-    add_to_minv(mtmp, gold);
+        gold->quan = amount;
+        gold->owt = weight(gold);
+        add_to_minv(mtmp, gold);
+    }
 }
 
 static void
@@ -1141,7 +1143,7 @@ makemon(
     fakemon = cg.zeromonst;
     cc.x = cc.y = 0;
 
-    if (iflags.debug_mongen)
+    if (iflags.debug_mongen || (!gl.level.flags.rndmongen && !ptr))
         return (struct monst *) 0;
 
     /* if caller wants random location, do it here */
@@ -1778,9 +1780,9 @@ mkclass_aligned(char class, int spc, /* special mons[].geno handling */
                    (this used to be done in the next loop, but that didn't
                    work well when multiple species had the same level and
                    were followed by one that was past the bias threshold;
-                   cited example was sucubus and incubus, where the bias
+                   cited example was succubus and incubus, where the bias
                    against picking the next demon resulted in incubus
-                   being picked nearly twice as often as sucubus);
+                   being picked nearly twice as often as succubus);
                    we need the '+1' in case the entire set is too high
                    level (really low gl.level hero) */
                 nums[last] = k + 1 - (adj_lev(&mons[last]) > (u.ulevel * 2));

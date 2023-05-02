@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1663890450 2022/09/22 23:47:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.508 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1680935652 2023/04/08 06:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -438,6 +438,7 @@ maketrap(coordxy x, coordxy y, int typ)
         /* old <tx,ty> remain valid */
     } else if ((IS_FURNITURE(lev->typ)
                 && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE)))
+               || (is_pool_or_lava(x, y) || IS_AIR(lev->typ))
                || (typ == LEVEL_TELEP && single_level_branch(&u.uz))) {
         /* no trap on top of furniture (caller usually screens the
            location to inhibit this, but wizard mode wishing doesn't)
@@ -1097,7 +1098,8 @@ trapeffect_dart_trap(
             otmp->opoisoned = 1;
         if (u.usteed && !rn2(2) && steedintrap(trap, otmp)) {
             ; /* nothing */
-        } else if (thitu(7, dmgval(otmp, &gy.youmonst), &otmp, "little dart")) {
+        } else if (thitu(7, dmgval(otmp, &gy.youmonst),
+                         &otmp, "little dart")) {
             if (otmp) {
                 if (otmp->opoisoned)
                     poisoned("dart", A_CON, "little dart",
@@ -1167,7 +1169,7 @@ trapeffect_rocktrap(
             pline("A trap door in %s opens and %s falls on your %s!",
                   the(ceiling(u.ux, u.uy)), an(xname(otmp)), body_part(HEAD));
             if (uarmh) {
-                /* normally passes_rocks() would protect againt a falling
+                /* normally passes_rocks() would protect against a falling
                    rock, but not when wearing a helmet */
                 if (passes_rocks(gy.youmonst.data)) {
                     pline("Unfortunately, you are wearing %s.",
@@ -1434,7 +1436,7 @@ trapeffect_rust_trap(
             goto uglovecheck;
         default:
             pline("%s you!", A_gush_of_water_hits);
-            /* note: exclude primary and seconary weapons from splashing
+            /* note: exclude primary and secondary weapons from splashing
                because cases 1 and 2 target them [via water_damage()] */
             for (otmp = gi.invent; otmp; otmp = otmp->nobj)
                 if (otmp->lamplit && otmp != uwep
@@ -1716,10 +1718,10 @@ trapeffect_pit(
                        plunged
                        ? "deliberately plunged into a pit of iron spikes"
                        : (conj_pit || deliberate)
-                       ? "stepped into a pit of iron spikes"
-                       : adj_pit
-                       ? "stumbled into a pit of iron spikes"
-                       : "fell into a pit of iron spikes",
+                         ? "stepped into a pit of iron spikes"
+                         : adj_pit
+                           ? "stumbled into a pit of iron spikes"
+                           : "fell into a pit of iron spikes",
                        NO_KILLER_PREFIX);
                 if (!rn2(6))
                     poisoned("spikes", A_STR,
@@ -2109,13 +2111,13 @@ trapeffect_magic_trap(
 
 static int
 trapeffect_anti_magic(
-    struct monst* mtmp,
-    struct trap* trap,
+    struct monst *mtmp, /* monster, possibly youmonst */
+    struct trap *trap,  /* trap->ttyp == ANTI_MAGIC */
     unsigned int trflags UNUSED)
 {
     if (mtmp == &gy.youmonst) {
-        int drain = d(2, 6);
-        int halfd = rnd(((drain + 1) / 2));
+        int drain, halfd;
+        boolean exclaim_it = FALSE;
 
         seetrap(trap);
         if (Antimagic) {
@@ -2143,15 +2145,29 @@ trapeffect_anti_magic(
 
             You_feel((dmgval2 >= hp) ? "unbearably torpid!"
                      : (dmgval2 >= hp / 4) ? "very lethargic."
-                     : "sluggish.");
+                       : "sluggish.");
             /* opposite of magical explosion */
             losehp(dmgval2, "anti-magic implosion", KILLED_BY_AN);
         }
-        if (u.uenmax > halfd) {
-            u.uenmax -= halfd;
+
+        /* if the drain amount is more than hero's maximum energy then up
+           to half of the amount comes directly out of maximum, the rest
+           comes out of current energy; drain_en() lowers the current
+           amount and when doing so it will take even more from maximum
+           if the new current value would drop below zero */
+        drain = d(2, 6); /* 2d6 => 2..12 */
+        halfd = rnd(drain / 2); /* 1..drain/2 (round down) */
+        if (u.uenmax > drain) { /* [was u.uenmax > halfd] */
+            /* note: since 'halfd' is no more than half, 'drain -= halfd'
+               is at least as big, so drain_en() is never asked to remove
+               less from current than what we're removing from maximum;
+               however, it might do that anyway (via its throttle check) so
+               it needs to make sure uen doesn't end up exceeding uenmax */
+            u.uenmax -= halfd; /* drain_en() will set context.botl */
             drain -= halfd;
+            exclaim_it = TRUE;
         }
-        drain_en(drain);
+        drain_en(drain, exclaim_it);
     } else {
         boolean trapkilled = FALSE;
         boolean in_sight = canseemon(mtmp) || (mtmp == u.usteed);
@@ -2650,7 +2666,7 @@ choose_trapnote(struct trap *ttmp)
 }
 
 static int
-steedintrap(struct trap* trap, struct obj* otmp)
+steedintrap(struct trap *trap, struct obj *otmp)
 {
     struct monst *steed = u.usteed;
     int tt;
@@ -2928,7 +2944,7 @@ launch_obj(
         /* dstage@u.washington.edu -- Delay only if hero sees it */
         if (cansee(gb.bhitpos.x, gb.bhitpos.y))
             while (tmp-- > 0)
-                delay_output();
+                nh_delay_output();
 
         gb.bhitpos.x += dx;
         gb.bhitpos.y += dy;
@@ -3306,9 +3322,9 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
                                 || (tt == HOLE && !mindless(mptr)));
 
         if (mtmp == u.usteed) {
-            /* true when called from dotrap, inescapable is not an option */
+            ; /* true when called from dotrap, inescapable is not an option */
         } else if (Sokoban && (is_pit(tt) || is_hole(tt)) && !trap->madeby_u) {
-            /* nothing here, the trap effects will handle messaging */
+            ; /* nothing here, the trap effects will handle messaging */
         } else if (!forcetrap) {
             if (floor_trigger(tt) && check_in_air(mtmp, mintrapflags)) {
                 return Trap_Effect_Finished;
@@ -3327,6 +3343,18 @@ mintrap(struct monst *mtmp, unsigned mintrapflags)
             setmangry(mtmp, FALSE);
 
         trap_result = trapeffect_selector(mtmp, trap, mintrapflags);
+
+        /* mtmp can't stay hiding under an object if trapped in non-pit
+           (mtmp hiding under object at armed bear trap location, hero
+           zaps wand of locking or spell of wizard lock at spot triggering
+           the trap and trapping mtmp there) */
+        if (!DEADMONSTER(mtmp) && mtmp->mtrapped) {
+            boolean alreadyspotted = canspotmon(mtmp);
+
+            maybe_unhide_at(mtmp->mx, mtmp->my);
+            if (!alreadyspotted && canseemon(mtmp))
+                pline("%s appears.", Amonnam(mtmp));
+        }
     }
     return trap_result;
 }
@@ -3560,7 +3588,7 @@ float_down(
         return 1;
     }
 
-    if (Punished && !carried(uball)
+    if (Punished && !carried(uball) && !m_at(uball->ox, uball->oy)
         && (is_pool(uball->ox, uball->oy)
             || ((trap = t_at(uball->ox, uball->oy))
                 && (is_pit(trap->ttyp) || is_hole(trap->ttyp))))) {
@@ -3594,7 +3622,7 @@ float_down(
         if (is_pool(u.ux, u.uy) && !Wwalking && !Swimming && !u.uinwater)
             no_msg = drown();
 
-        if (is_lava(u.ux, u.uy)) {
+        if (is_lava(u.ux, u.uy) && !iflags.in_lava_effects) {
             (void) lava_effects();
             no_msg = TRUE;
         }
@@ -4131,7 +4159,7 @@ acid_damage(struct obj* obj)
             ) {
             if (!Blind) {
                 if (victim == &gy.youmonst)
-                    pline("Your %s.", aobjnam(obj, "fade"));
+                    Your("%s.", aobjnam(obj, "fade"));
                 else if (vismon)
                     pline("%s %s.", s_suffix(Monnam(victim)),
                           aobjnam(obj, "fade"));
@@ -4219,7 +4247,7 @@ water_damage(
 #endif
            ) return 0;
         if (in_invent)
-            pline("Your %s %s.", ostr, vtense(ostr, "fade"));
+            Your("%s %s.", ostr, vtense(ostr, "fade"));
 
         obj->otyp = SCR_BLANK_PAPER;
         obj->dknown = 0;
@@ -4241,7 +4269,7 @@ water_damage(
             return 0;
         }
         if (in_invent)
-            pline("Your %s %s.", ostr, vtense(ostr, "fade"));
+            Your("%s %s.", ostr, vtense(ostr, "fade"));
 
         if (obj->otyp == SPE_NOVEL) {
             obj->novelidx = 0;
@@ -4309,7 +4337,7 @@ water_damage(
             return ER_DESTROYED;
         } else if (obj->odiluted) {
             if (in_invent)
-                pline("Your %s %s further.", ostr, vtense(ostr, "dilute"));
+                Your("%s %s further.", ostr, vtense(ostr, "dilute"));
 
             obj->otyp = POT_WATER;
             obj->dknown = 0;
@@ -4320,7 +4348,7 @@ water_damage(
             return ER_DAMAGED;
         } else if (obj->otyp != POT_WATER) {
             if (in_invent)
-                pline("Your %s %s.", ostr, vtense(ostr, "dilute"));
+                Your("%s %s.", ostr, vtense(ostr, "dilute"));
 
             obj->odiluted++;
             if (in_invent)
@@ -4458,7 +4486,7 @@ drown(void)
     feel_newsym(u.ux, u.uy); /* in case Blind, map the water here */
     /* happily wading in the same contiguous pool */
     if (u.uinwater && is_pool(u.ux - u.dx, u.uy - u.dy)
-        && (Swimming || Amphibious)) {
+        && (Swimming || Amphibious || Breathless)) {
         /* water effects on objects every now and then */
         if (!rn2(5))
             inpool_ok = TRUE;
@@ -4468,7 +4496,8 @@ drown(void)
 
     if (!u.uinwater) {
         You("%s into the %s%c", is_solid ? "plunge" : "fall",
-            waterbody_name(u.ux, u.uy), (Amphibious || Swimming) ? '.' : '!');
+            waterbody_name(u.ux, u.uy),
+            (Amphibious || Swimming || Breathless) ? '.' : '!');
         if (!Swimming && !is_solid)
             You("sink like %s.", Hallucination ? "the Titanic" : "a rock");
     }
@@ -4493,8 +4522,8 @@ drown(void)
         unleash_all();
     }
 
-    if (Amphibious || Swimming) {
-        if (Amphibious) {
+    if (Amphibious || Breathless || Swimming) {
+        if (Amphibious || Breathless) {
             if (Verbose(3, drown))
                 pline("But you aren't drowning.");
             if (!Is_waterlevel(&u.uz)) {
@@ -4584,26 +4613,48 @@ drown(void)
 }
 
 void
-drain_en(int n)
+drain_en(int n, boolean max_already_drained)
 {
-    if (!u.uenmax) {
+    const char *mesg;
+    char punct = max_already_drained ? '!' : '.';
+
+    /*
+     * FIXME?
+     *  u.uenmax should probably have a higher mininum than 0;
+     *  perhaps u.ulevel or (u.ulevel + 1) / 2
+     */
+    if (u.uenmax < 1) {
         /* energy is completely gone */
-        You_feel("momentarily lethargic.");
+        if (u.uen || u.uenmax) { /* paranoia */
+            u.uen = u.uenmax = 0;
+            gc.context.botl = TRUE;
+        }
+        mesg = "momentarily lethargic";
     } else {
         /* throttle further loss a bit when there's not much left to lose */
         if (n > (u.uen + u.uenmax) / 3)
             n = rnd(n);
 
-        You_feel("your magical energy drain away%c", (n > u.uen) ? '!' : '.');
+        mesg = "your magical energy drain away";
+        if (n > u.uen)
+            punct = '!';
+
         u.uen -= n;
         if (u.uen < 0) {
             u.uenmax -= rnd(-u.uen);
             if (u.uenmax < 0)
                 u.uenmax = 0;
             u.uen = 0;
+        } else if (u.uen > u.uenmax) {
+            /* uen might be greater than uenmax if caller reduced uenmax
+               and then we throttled the loss being applied to current */
+            u.uen = u.uenmax;
         }
-        gc.context.botl = 1;
+        gc.context.botl = TRUE;
     }
+    /* after manipulating u.uen,uenmax and setting context.botl, so
+       that You_feel() -> pline() will update status before the message */
+    You_feel("%s%c", mesg, punct);
 }
 
 /* the #untrap command - disarm a trap */
@@ -6037,6 +6088,9 @@ unconscious(void)
 
 static const char lava_killer[] = "molten lava";
 
+/* hero enters pool of molten lava; returns True if hero is killed and
+   then life-saved (with teleport to safe spot), False for other survival;
+   no return at all if hero dies and isn't life-saved */
 boolean
 lava_effects(void)
 {
@@ -6044,6 +6098,10 @@ lava_effects(void)
     int dmg = d(6, 6); /* only applicable for water walking */
     boolean usurvive, boil_away;
 
+    if (iflags.in_lava_effects) {
+        debugpline0("Skipping recursive lava_effects().");
+        return FALSE;
+    }
     feel_newsym(u.ux, u.uy); /* in case Blind, map the lava here */
     burn_away_slime();
     if (likes_lava(gy.youmonst.data))
@@ -6120,8 +6178,6 @@ lava_effects(void)
             }
         }
 
-        iflags.in_lava_effects--;
-
         /* s/he died... */
         boil_away = (u.umonnum == PM_WATER_ELEMENTAL
                      || u.umonnum == PM_STEAM_VORTEX
@@ -6140,8 +6196,34 @@ lava_effects(void)
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
         }
-        You("find yourself back on solid %s.", surface(u.ux, u.uy));
-        iflags.last_msg = PLNMSG_BACK_ON_GROUND;
+
+        iflags.in_lava_effects--;
+
+        /*
+         * 3.7: this used to be unconditional "back on solid <surface>"
+         * but surface() could return a lot of things where that ends up
+         * sounding silly.  Deal with water, ignore furniture; assume
+         * surface types 'air' and 'cloud' won't be present on same level
+         * as lava so don't need to be catered for.
+         *
+         * Made it out of the lava.  We know that hero isn't levitating
+         * or flying but life-saving plus fireproof water walking boots
+         * (and no fire resistance) could put hero on water rather than
+         * "on solid ground"; likewise if poly'd into an aquatic form.
+         */
+        if (is_pool(u.ux, u.uy))
+            You("find yourself %s %s.", u.uinwater ? "in" : "on",
+                hliquid("water"));
+        else
+            You("find yourself back on solid %s.", surface(u.ux, u.uy));
+        iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor();
+                                                  * use for on-water too */
+        /* surface() just disclosed this */
+        iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
+        /* normally done via safe_teleds() -> teleds() -> spoteffects() but
+           spoteffects() was no-op when called with nonzero in_lava_effects */
+        spoteffects(FALSE); /* suppress auto-pickup for this landing... */
+
         return TRUE;
     } else if (!Wwalking && (!u.utrap || u.utraptype != TT_LAVA)) {
         boil_away = !Fire_resistance;

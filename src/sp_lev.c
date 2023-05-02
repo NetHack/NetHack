@@ -20,6 +20,7 @@ extern void mkmap(lev_init *);
 
 static boolean match_maptyps(xint16, xint16);
 static void solidify_map(void);
+static void map_cleanup(void);
 static void lvlfill_maze_grid(int, int, int, int, schar);
 static void lvlfill_solid(schar, schar);
 static void lvlfill_swamp(schar, schar, schar);
@@ -320,6 +321,39 @@ solidify_map(void)
         for (y = 0; y < ROWNO; y++)
             if (IS_STWALL(levl[x][y].typ) && !SpLev_Map[x][y])
                 levl[x][y].wall_info |= (W_NONDIGGABLE | W_NONPASSWALL);
+}
+
+/* do a post-level-creation cleanup of map, such as
+   removing boulders and traps from lava */
+static void
+map_cleanup(void)
+{
+    struct obj *otmp;
+    struct trap *ttmp;
+    struct engr *etmp;
+    coordxy x, y;
+
+    for (x = 0; x < COLNO; x++)
+        for (y = 0; y < ROWNO; y++) {
+            schar typ = levl[x][y].typ;
+
+            if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)) {
+                /* in case any boulders are on liquid, delete them */
+                while ((otmp = sobj_at(BOULDER, x, y)) != 0) {
+                    obj_extract_self(otmp);
+                    obfree(otmp, (struct obj *)0);
+                }
+
+                /* traps on liquid? */
+                if (((ttmp = t_at(x, y)) != 0)
+                    && !undestroyable_trap(ttmp->ttyp))
+                    deltrap(ttmp);
+
+                /* engravings? */
+                if ((etmp = engr_at(x, y)) != 0)
+                  del_engr(etmp);
+            }
+        }
 }
 
 static void
@@ -1797,6 +1831,8 @@ create_trap(spltrap* t, struct mkroom* croom)
         mktrap_flags |= MKTRAP_NOSPIDERONWEB;
     if (t->seen)
         mktrap_flags |= MKTRAP_SEEN;
+    if (t->novictim)
+        mktrap_flags |= MKTRAP_NOVICTIM;
 
     tm.x = x;
     tm.y = y;
@@ -2223,8 +2259,8 @@ create_object(object* o, struct mkroom* croom)
     }
     if (o->recharged)
         otmp->recharged = (o->recharged % 8);
-    if (o->locked) {
-        otmp->olocked = 1;
+    if (o->locked == 0 || o->locked == 1) {
+        otmp->olocked = o->locked;
     } else if (o->broken) {
         otmp->obroken = 1;
         otmp->olocked = 0; /* obj generation may set */
@@ -3493,6 +3529,7 @@ lspo_object(lua_State *L)
     tmpobj.spe = -127;
     tmpobj.quan = -1;
     tmpobj.trapped = -1;
+    tmpobj.locked = -1;
     tmpobj.corpsenm = NON_PM;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
@@ -3543,7 +3580,7 @@ lspo_object(lua_State *L)
         tmpobj.buried = get_table_boolean_opt(L, "buried", 0);
         tmpobj.lit = get_table_boolean_opt(L, "lit", 0);
         tmpobj.eroded = get_table_int_opt(L, "eroded", 0);
-        tmpobj.locked = get_table_boolean_opt(L, "locked", 0);
+        tmpobj.locked = get_table_boolean_opt(L, "locked", -1);
         tmpobj.trapped = get_table_int_opt(L, "trapped", -1);
         tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
         tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
@@ -3654,7 +3691,9 @@ lspo_object(lua_State *L)
 
     Free(tmpobj.name.str);
 
-    return 0;
+    nhl_push_obj(L, otmp);
+
+    return 1;
 }
 
 /* level_flags("noteleport", "mazelevel", ... ); */
@@ -3710,6 +3749,16 @@ lspo_level_flags(lua_State *L)
             gl.level.flags.temperature = 1;
         else if (!strcmpi(s, "cold"))
             gl.level.flags.temperature = -1;
+        else if (!strcmpi(s, "nomongen"))
+            gl.level.flags.rndmongen = 0;
+        else if (!strcmpi(s, "nodeathdrops"))
+            gl.level.flags.deathdrops = 0;
+        else if (!strcmpi(s, "noautosearch"))
+            gl.level.flags.noautosearch = 1;
+        else if (!strcmpi(s, "fumaroles"))
+            gl.level.flags.fumaroles = 1;
+        else if (!strcmpi(s, "stormy"))
+            gl.level.flags.stormy = 1;
         else {
             char buf[BUFSZ];
             Sprintf(buf, "Unknown level flag %s", s);
@@ -3781,6 +3830,9 @@ lspo_engraving(lua_State *L)
     long ecoord;
     coordxy x = -1, y = -1;
     int argc = lua_gettop(L);
+    boolean guardobjs = FALSE;
+    boolean wipeout = TRUE;
+    struct engr *ep;
 
     create_des_coder();
 
@@ -3793,6 +3845,8 @@ lspo_engraving(lua_State *L)
         y = ey;
         etyp = engrtypes2i[get_table_option(L, "type", "engrave", engrtypes)];
         txt = get_table_str(L, "text");
+        wipeout = get_table_boolean_opt(L, "degrade", TRUE);
+        guardobjs = get_table_boolean_opt(L, "guardobjects", FALSE);
     } else if (argc == 3) {
         lua_Integer ex, ey;
         (void) get_coord(L, 1, &ex, &ey);
@@ -3812,6 +3866,11 @@ lspo_engraving(lua_State *L)
     get_location_coord(&x, &y, DRY, gc.coder->croom, ecoord);
     make_engr_at(x, y, txt, 0L, etyp);
     Free(txt);
+    ep = engr_at(x, y);
+    if (ep) {
+        ep->guardobjects = guardobjs;
+        ep->nowipeout = !wipeout;
+    }
     return 0;
 }
 
@@ -3956,6 +4015,9 @@ lspo_room(lua_State *L)
             if (tmpcr) {
                 gc.coder->tmproomlist[gc.coder->n_subroom] = tmpcr;
                 gc.coder->failed_room[gc.coder->n_subroom] = FALSE;
+                /* added a subroom, make parent room irregular */
+                if (gc.coder->tmproomlist[gc.coder->n_subroom - 1])
+                    gc.coder->tmproomlist[gc.coder->n_subroom - 1]->irregular = TRUE;
                 gc.coder->n_subroom++;
                 update_croom();
                 lua_getfield(L, 1, "contents");
@@ -4275,6 +4337,7 @@ lspo_trap(lua_State *L)
 
     tmptrap.spider_on_web = TRUE;
     tmptrap.seen = FALSE;
+    tmptrap.novictim = FALSE;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *trapstr = luaL_checkstring(L, 1);
@@ -4300,6 +4363,7 @@ lspo_trap(lua_State *L)
         tmptrap.type = get_table_traptype_opt(L, "type", -1);
         tmptrap.spider_on_web = get_table_boolean_opt(L, "spider_on_web", 1);
         tmptrap.seen = get_table_boolean_opt(L, "seen", FALSE);
+        tmptrap.novictim = !get_table_boolean_opt(L, "victim", TRUE);
 
         lua_getfield(L, -1, "launchfrom");
         if (lua_type(L, -1) == LUA_TTABLE) {
@@ -4961,18 +5025,18 @@ selection_do_ellipse(
     }
 }
 
-/* distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
+/* square of distance from line segment (x1,y1, x2,y2) to point (x3,y3) */
 static long
 line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
 {
     long px = x2 - x1;
     long py = y2 - y1;
     long s = px * px + py * py;
-    long x, y, dx, dy, dist = 0;
+    long x, y, dx, dy, distsq = 0;
     float lu = 0;
 
     if (x1 == x2 && y1 == y2)
-        return isqrt(dist2(x1, y1, x3, y3));
+        return dist2(x1, y1, x3, y3);
 
     lu = ((x3 - x1) * px + (y3 - y1) * py) / (float) s;
     if (lu > 1)
@@ -4984,18 +5048,19 @@ line_dist_coord(long x1, long y1, long x2, long y2, long x3, long y3)
     y = y1 + lu * py;
     dx = x - x3;
     dy = y - y3;
-    dist = isqrt(dx * dx + dy * dy);
+    distsq = dx * dx + dy * dy;
 
-    return dist;
+    return distsq;
 }
 
+/* guts of l_selection_gradient */
 void
 selection_do_gradient(
     struct selectionvar *ov,
     long x, long y,
     long x2,long y2,
     long gtyp,
-    long mind, long maxd, long limit)
+    long mind, long maxd)
 {
     long dx, dy, dofs;
 
@@ -5005,7 +5070,7 @@ selection_do_gradient(
         maxd = tmp;
     }
 
-    dofs = maxd - mind;
+    dofs = maxd * maxd - mind * mind;
     if (dofs < 1)
         dofs = 1;
 
@@ -5017,10 +5082,9 @@ selection_do_gradient(
         for (dx = 0; dx < COLNO; dx++)
             for (dy = 0; dy < ROWNO; dy++) {
                 long d0 = line_dist_coord(x, y, x2, y2, dx, dy);
-                if (d0 >= mind && (!limit || d0 <= maxd)) {
-                    if (d0 - mind > rn2(dofs))
-                        selection_setpoint(dx, dy, ov, 1);
-                }
+                if (d0 <= mind * mind
+                    || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs)))
+                    selection_setpoint(dx, dy, ov, 1);
             }
         break;
     }
@@ -5034,10 +5098,9 @@ selection_do_gradient(
                 long d5 = line_dist_coord(x, y, x2, y2, dx, dy);
                 long d0 = min(d5, min(max(d1, d2), max(d3, d4)));
 
-                if (d0 >= mind && (!limit || d0 <= maxd)) {
-                    if (d0 - mind > rn2(dofs))
-                        selection_setpoint(dx, dy, ov, 1);
-                }
+                if (d0 <= mind * mind
+                    || (d0 <= maxd * maxd && d0 - mind * mind < rn2(dofs)))
+                    selection_setpoint(dx, dy, ov, 1);
             }
         break;
     } /*case*/
@@ -5165,6 +5228,7 @@ selection_iterate(
                 (*func)(x, y, arg);
 }
 
+/* change map location terrain type during level creation */
 static void
 sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 {
@@ -5180,7 +5244,11 @@ sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
             levl[x][y].doormask = D_CLOSED;
         if (x && (IS_WALL(levl[x - 1][y].typ) || levl[x - 1][y].horizontal))
             levl[x][y].horizontal = 1;
-    }
+    } else if (levl[x][y].typ == HWALL
+               || levl[x][y].typ == IRONBARS)
+        levl[x][y].horizontal = 1;
+    else if (splev_init_present && levl[x][y].typ == ICE)
+        levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
 }
 
 static void
@@ -5887,7 +5955,8 @@ levregion_add(lev_region* lregion)
 /* get params from topmost lua hash:
    - region = {x1,y1,x2,y2}
    - exclude = {x1,y1,x2,y2} (optional)
-   - region_islev=true, exclude_idlev=true (optional) */
+   - region_islev=true, exclude_islev=true (optional)
+   - negative x and y are invalid */
 static void
 l_get_lregion(lua_State *L, lev_region *tmplregion)
 {
@@ -5899,7 +5968,7 @@ l_get_lregion(lua_State *L, lev_region *tmplregion)
     tmplregion->inarea.x2 = x2;
     tmplregion->inarea.y2 = y2;
 
-    x1 = y1 = x2 = y2 = 0;
+    x1 = y1 = x2 = y2 = -1;
     get_table_region(L, "exclude", &x1, &y1, &x2, &y2, TRUE);
     tmplregion->delarea.x1 = x1;
     tmplregion->delarea.y1 = y1;
@@ -5908,6 +5977,13 @@ l_get_lregion(lua_State *L, lev_region *tmplregion)
 
     tmplregion->in_islev = get_table_boolean_opt(L, "region_islev", 0);
     tmplregion->del_islev = get_table_boolean_opt(L, "exclude_islev", 0);
+
+    /* if x1 is still negative, exclude wasn't specified, so we should treat it
+     * as if there is no exclude region at all. Force exclude_islev to true so
+     * the -1,-1,-1,-1 region is safely off the map and won't interfere with
+     * branch or portal placement. */
+    if (x1 < 0)
+        tmplregion->del_islev = TRUE;
 }
 
 /* teleport_region({ region = { x1,y1, x2,y2} }); */
@@ -5980,11 +6056,14 @@ static void
 add_doors_to_room(struct mkroom *croom)
 {
     coordxy x, y;
+    int i;
 
     for (x = croom->lx - 1; x <= croom->hx + 1; x++)
         for (y = croom->ly - 1; y <= croom->hy + 1; y++)
             if (IS_DOOR(levl[x][y].typ) || levl[x][y].typ == SDOOR)
                 maybe_add_door(x, y, croom);
+    for (i = 0; i < croom->nsubrooms; i++)
+        add_doors_to_room(croom->sbrooms[i]);
 }
 
 DISABLE_WARNING_UNREACHABLE_CODE
@@ -6034,12 +6113,12 @@ lspo_region(lua_State *L)
     } else if (argc == 2) {
         /* region(selection, "lit"); */
         static const char *const lits[] = { "unlit", "lit", NULL };
-        struct selectionvar *sel = l_selection_check(L, 1);
+        struct selectionvar *orig = l_selection_check(L, 1),
+                            *sel = selection_clone(orig);
 
         rlit = luaL_checkoption(L, 2, "lit", lits);
 
         /*
-    TODO: adjust region size for wall, but only if lit
     TODO: lit=random
         */
         if (rlit)
@@ -6440,6 +6519,8 @@ lspo_finalize_level(lua_State *L UNUSED)
     if (L && gc.coder->check_inaccessibles)
         ensure_way_out();
 
+    map_cleanup();
+
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see
      * the insect legs on Baalzebub's level, for instance). Since that
@@ -6651,6 +6732,7 @@ TODO: gc.coder->croom needs to be updated
         reset_xystart_size();
     } else {
         coordxy mptyp;
+        terrain terr;
 
         /* Themed rooms should never overwrite anything */
         if (gi.in_mk_themerooms) {
@@ -6693,37 +6775,16 @@ TODO: gc.coder->croom needs to be updated
                 }
                 if (mptyp >= MAX_TYPE)
                     continue;
-                selection_setpoint(x, y, sel, 1);
-                levl[x][y].typ = mptyp;
-                levl[x][y].lit = lit;
                 /* clear out levl: load_common_data may set them */
                 levl[x][y].flags = 0;
                 levl[x][y].horizontal = 0;
                 levl[x][y].roomno = 0;
                 levl[x][y].edge = 0;
                 SpLev_Map[x][y] = 1;
-                /*
-                 *  Set secret doors to closed (why not trapped too?).  Set
-                 *  the horizontal bit.
-                 */
-                if (levl[x][y].typ == SDOOR || IS_DOOR(levl[x][y].typ)) {
-                    if (levl[x][y].typ == SDOOR)
-                        levl[x][y].doormask = D_CLOSED;
-                    /*
-                     *  If there is a wall to the left that connects to a
-                     *  (secret) door, then it is horizontal.  This does
-                     *  not allow (secret) doors to be corners of rooms.
-                     */
-                    if (x != gx.xstart && (IS_WALL(levl[x - 1][y].typ)
-                                          || levl[x - 1][y].horizontal))
-                        levl[x][y].horizontal = 1;
-                } else if (levl[x][y].typ == HWALL
-                           || levl[x][y].typ == IRONBARS)
-                    levl[x][y].horizontal = 1;
-                else if (levl[x][y].typ == LAVAPOOL)
-                    levl[x][y].lit = 1;
-                else if (splev_init_present && levl[x][y].typ == ICE)
-                    levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
+                selection_setpoint(x, y, sel, 1);
+                terr.ter = mptyp;
+                terr.tlit = lit;
+                sel_set_ter(x, y, &terr);
             }
     }
 
@@ -6815,6 +6876,8 @@ sp_level_coder_init(void)
 
     gl.level.flags.is_maze_lev = 0;
     gl.level.flags.temperature = In_hell(&u.uz) ? 1 : 0;
+    gl.level.flags.rndmongen = 1;
+    gl.level.flags.deathdrops = 1;
 
     reset_xystart_size();
 
@@ -6911,6 +6974,8 @@ load_special(const char *name)
     /* TODO: ensure_way_out() needs rewrite */
     if (gc.coder->check_inaccessibles)
         ensure_way_out();
+
+    map_cleanup();
 
     /* FIXME: Ideally, we want this call to only cover areas of the map
      * which were not inserted directly by the special level file (see

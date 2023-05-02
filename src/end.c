@@ -391,7 +391,9 @@ done_intr(int sig_unused UNUSED)
 static void
 done_hangup(int sig)
 {
+#ifdef HANGUPHANDLING
     gp.program_state.done_hup++;
+#endif
     sethanguphandler((void (*)(int)) SIG_IGN);
     done_intr(sig);
     return;
@@ -407,9 +409,8 @@ done_in_by(struct monst *mtmp, int how)
 {
     char buf[BUFSZ];
     struct permonst *mptr = mtmp->data,
-                    *champtr = ((mtmp->cham >= LOW_PM)
-                                   ? &mons[mtmp->cham]
-                                   : mptr);
+                    *champtr = (mtmp->cham >= LOW_PM) ? &mons[mtmp->cham]
+                                                      : mptr;
     boolean distorted = (boolean) (Hallucination && canspotmon(mtmp)),
             mimicker = (M_AP_TYPE(mtmp) == M_AP_MONSTER),
             imitator = (mptr != champtr || mimicker);
@@ -440,7 +441,7 @@ done_in_by(struct monst *mtmp, int how)
     if (imitator) {
         char shape[BUFSZ];
         const char *realnm = pmname(champtr, Mgender(mtmp)),
-                             *fakenm = pmname(mptr, Mgender(mtmp));
+                   *fakenm = pmname(mptr, Mgender(mtmp));
         boolean alt = is_vampshifter(mtmp);
 
         if (mimicker) {
@@ -496,7 +497,8 @@ done_in_by(struct monst *mtmp, int how)
     /* might need to fix up multi_reason if 'mtmp' caused the reason */
     if (gm.multi_reason
         && gm.multi_reason > gm.multireasonbuf
-        && gm.multi_reason < gm.multireasonbuf + sizeof gm.multireasonbuf - 1) {
+        && gm.multi_reason
+           < gm.multireasonbuf + sizeof gm.multireasonbuf - 1) {
         char reasondummy, *p;
         unsigned reasonmid = 0;
 
@@ -508,13 +510,13 @@ done_in_by(struct monst *mtmp, int how)
          * death reason becomes "Killed by a ghoul, while paralyzed."
          * instead of "Killed by a ghoul, while paralyzed by a ghoul."
          * (3.6.x gave "Killed by a ghoul, while paralyzed by a monster."
-         * which is potenitally misleading when the monster is also
+         * which is potentially misleading when the monster is also
          * the killer.)
          *
          * Note that if the hero is life-saved and then killed again
          * before the helplessness has cleared, the second death will
          * report the truncated helplessness reason even if some other
-         * monster peforms the /coup de grace/.
+         * monster performs the /coup de grace/.
          */
         if (sscanf(gm.multireasonbuf, "%u:%c", &reasonmid, &reasondummy) == 2
             && mtmp->m_id == reasonmid) {

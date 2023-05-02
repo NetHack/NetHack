@@ -124,6 +124,7 @@ M-C   conduct   view optional challenges
 M-d   dip       dip an object into something
 M-e   enhance   show weapon and spell skills, can improve them if eligible
 M-f   force     force a lock
+M-g   genocided list genocided and extinct monster types, if any
 M-i   invoke    invoke an object's special powers
 M-j   jump      jump to another location
 M-l   loot      loot a box on the floor

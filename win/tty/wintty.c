@@ -903,7 +903,7 @@ erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
             tty_curs(window, 1, 0);
             cl_eos();
         } else if (clear) {
-            clear_screen();
+            term_clear_screen();
         } else {
             docrt();
             flush_screen(1);
@@ -1004,7 +1004,7 @@ tty_clear_nhwindow(winid window)
         gc.context.botlx = 1;
         /*FALLTHRU*/
     case NHW_BASE:
-        clear_screen();
+        term_clear_screen();
         /* [this should reset state for MESSAGE, MAP, and STATUS] */
         break;
     case NHW_MENU:
@@ -1312,7 +1312,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                     tty_curs(window, 1, 0);
                     cl_eos();
                 } else
-                    clear_screen();
+                    term_clear_screen();
             }
 
             rp = resp;
@@ -1669,7 +1669,7 @@ process_text_window(winid window, struct WinDesc *cw)
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             n = 0;
         }
         tty_curs(window, 1, n++);
@@ -1814,7 +1814,7 @@ tty_display_nhwindow(
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             ttyDisplay->toplin = TOPLINE_EMPTY;
         } else {
             if (WIN_MESSAGE != WIN_ERR)
@@ -1897,7 +1897,7 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MESSAGE)
         iflags.window_inited = 0;
     if (cw->type == NHW_MAP)
-        clear_screen();
+        term_clear_screen();
 #ifdef TTY_PERM_INVENT
     if (cw->type == NHW_PERMINVENT) {
         int r, c;
@@ -2284,12 +2284,16 @@ tty_putstr(winid window, int attr, const char *str)
         }
         break;
     }
+    return;
 }
 
 void
-tty_display_file(const char *fname, boolean complain)
+tty_display_file(
+    const char *fname, /* name of file to display */
+    boolean complain)  /* whether to report problem if file can't be opened */
 {
 #ifdef DEF_PAGER /* this implies that UNIX is defined */
+    /* FIXME:  this won't work if fname is inside a dlb container */
     {
         /* use external pager; this may give security problems */
         int fd = open(fname, O_RDONLY);
@@ -2297,7 +2301,7 @@ tty_display_file(const char *fname, boolean complain)
         if (fd < 0) {
             if (complain)
                 pline("Cannot open %s.", fname);
-            else
+            else /* [is this refresh actually necessary?] */
                 docrt();
             return;
         }
@@ -2337,10 +2341,11 @@ tty_display_file(const char *fname, boolean complain)
                 tty_mark_synch();
                 tty_raw_print("");
                 perror(fname);
-                tty_wait_synch();
+                tty_wait_synch(); /* "Hit <space> to continue: " */
+                if (u.ux) /* if hero is on map, refresh the screen */
+                    docrt();
                 pline("Cannot open \"%s\".", fname);
-            } else if (u.ux)
-                docrt();
+            }
         } else {
             winid datawin = tty_create_nhwindow(NHW_TEXT);
             boolean empty = TRUE;
@@ -2376,6 +2381,7 @@ tty_display_file(const char *fname, boolean complain)
         }
     }
 #endif /* DEF_PAGER */
+    return;
 }
 
 void
@@ -4000,8 +4006,13 @@ tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-tty_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
-                  int color, unsigned long *colormasks)
+tty_status_update(
+    int fldidx,
+    genericptr_t ptr,
+    int chg UNUSED,
+    int percent,
+    int color,
+    unsigned long *colormasks)
 {
     int attrmask;
     long *condptr = (long *) ptr;

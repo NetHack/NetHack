@@ -42,6 +42,7 @@ private:
         bool changed;
         int currgetmsg;
 	NetHackQtMapWindow2* map;
+	char historybuf[BUFSZ];
 
 private slots:
 	void updateFont();
