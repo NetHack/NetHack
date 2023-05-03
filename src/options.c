@@ -1313,7 +1313,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
          *      DISCLOSE_PROMPT_DEFAULT_NO   ask with default answer no
          *      DISCLOSE_YES_WITHOUT_PROMPT  always disclose and don't ask
          *      DISCLOSE_NO_WITHOUT_PROMPT   never disclose and don't ask
-         *      DISCLOSE_PROMPT_DEFAULT_SPECIAL  for 'vanquished' only...
+         *      DISCLOSE_PROMPT_DEFAULT_SPECIAL  for 'vanq'/'genod' only...
          *      DISCLOSE_SPECIAL_WITHOUT_PROMPT  ...to set up sort order.
          *
          * Those setting values can be used in the option
@@ -1367,7 +1367,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
                     continue;
                 }
                 if (prefix_val != -1) {
-                    if (*dop != 'v') {
+                    if (*dop != 'v' && *dop != 'g') {
                         if (prefix_val == DISCLOSE_PROMPT_DEFAULT_SPECIAL)
                             prefix_val = DISCLOSE_PROMPT_DEFAULT_YES;
                         if (prefix_val == DISCLOSE_SPECIAL_WITHOUT_PROMPT)
@@ -3598,7 +3598,7 @@ optfn_sortvanquished(
         uchar prev_sortmode = flags.vanq_sortmode;
 
         /* return handler_sortvanquished(); */
-        (void) set_vanq_order(); /* insight.c */
+        (void) set_vanq_order(TRUE); /* insight.c */
         pline("'%s' %s \"%s: %s\".", optname,
               (flags.vanq_sortmode == prev_sortmode)
                  ? "not changed, still"
@@ -5287,7 +5287,7 @@ handler_disclose(void)
                      "Always disclose, without prompting",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v') {
+            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
@@ -5307,11 +5307,11 @@ handler_disclose(void)
                      "Prompt, with default answer of \"Yes\"",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v') {
+            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-            "Prompt, with default answer of \"Ask\" to request sort menu",
+                "Prompt, with default answer of \"Ask\" to request sort menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }

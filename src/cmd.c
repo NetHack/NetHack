@@ -581,7 +581,8 @@ int
 doextlist(void)
 {
     register const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
-    char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
+    char buf[BUFSZ], searchbuf[BUFSZ], descbuf[BUFSZ], promptbuf[QBUFSZ];
+    const char *cmd_desc;
     winid menuwin;
     anything any;
     menu_item *selected;
@@ -654,20 +655,10 @@ doextlist(void)
             for (efp = extcmdlist; efp->ef_txt; efp++) {
                 int wizc;
 
-                if ((efp->flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0)
+                if ((efp->flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) != 0)
                     continue;
                 /* if hiding non-autocomplete commands, skip such */
                 if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
-                    continue;
-                /* if searching, skip this command if it doesn't match */
-                if (*searchbuf
-                    /* first try case-insensitive substring match */
-                    && !strstri(efp->ef_txt, searchbuf)
-                    && !strstri(efp->ef_desc, searchbuf)
-                    /* wildcard support; most interfaces use case-insensitive
-                       pmatch rather than regexp for menu searching */
-                    && !pmatchi(searchbuf, efp->ef_txt)
-                    && !pmatchi(searchbuf, efp->ef_desc))
                     continue;
                 /* skip wizard mode commands if not in wizard mode;
                    when showing two sections, skip wizard mode commands
@@ -676,6 +667,26 @@ doextlist(void)
                 if (wizc && !wizard)
                     continue;
                 if (!onelist && pass != wizc)
+                    continue;
+                /* command descripton might get modified on the fly */
+                cmd_desc = efp->ef_desc;
+                /* suppress part of the descripton for #genocided if it
+                   doesn't apply during the current game */
+                if (!wizard && !discover
+                    && (efp->flags & GENERALCMD) != 0 /* minor optimization */
+                    && strstri(cmd_desc, "extinct"))
+                    cmd_desc = strsubst(strcpy(descbuf, cmd_desc),
+                                        " been genocided or become extinct",
+                                        " been genocided");
+                /* if searching, skip this command if it doesn't match */
+                if (*searchbuf
+                    /* first try case-insensitive substring match */
+                    && !strstri(efp->ef_txt, searchbuf)
+                    && !strstri(cmd_desc, searchbuf)
+                    /* wildcard support; most interfaces use case-insensitive
+                       pmatch rather than regexp for menu searching */
+                    && !pmatchi(searchbuf, efp->ef_txt)
+                    && !pmatchi(searchbuf, cmd_desc))
                     continue;
 
                 /* We're about to show an item, have we shown the menu yet?
@@ -692,7 +703,7 @@ doextlist(void)
                 /* longest ef_txt at present is "wizrumorcheck" (13 chars);
                    2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
                 Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
-                        doc_extcmd_flagstr(menuwin, efp), efp->ef_desc);
+                        doc_extcmd_flagstr(menuwin, efp), cmd_desc);
                 add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          clr, buf, MENU_ITEMFLAGS_NONE);
                 ++n;
@@ -2581,11 +2592,12 @@ struct ext_func_tab extcmdlist[] = {
               dofire, 0, NULL },
     { M('f'), "force", "force a lock",
               doforce, AUTOCOMPLETE, NULL },
-    { ';',    "glance", "show what type of thing a map symbol corresponds to",
-              doquickwhatis, IFBURIED | GENERALCMD, NULL },
     { M('g'), "genocided",
               "list monsters that have been genocided or become extinct",
-              dogenocided, IFBURIED | AUTOCOMPLETE, NULL },
+              dogenocided,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
+    { ';',    "glance", "show what type of thing a map symbol corresponds to",
+              doquickwhatis, IFBURIED | GENERALCMD, NULL },
     { '?',    "help", "give a help message",
               dohelp, IFBURIED | GENERALCMD, NULL },
     { '\0',   "herecmdmenu", "show menu of commands you can do here",
@@ -2768,7 +2780,8 @@ struct ext_func_tab extcmdlist[] = {
               /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
     { M('V'), "vanquished", "list vanquished monsters",
-              dovanquished, IFBURIED | AUTOCOMPLETE | CMD_M_PREFIX, NULL },
+              dovanquished,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('v'), "version",
               "list compile time options for this version of NetHack",
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },

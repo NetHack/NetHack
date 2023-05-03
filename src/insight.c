@@ -33,6 +33,7 @@ static void attributes_enlightenment(int, int);
 static void show_achievements(int);
 static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
 static int num_extinct(void);
+static int num_gone(int, int *);
 
 extern const char *const hu_stat[];  /* hunger status from eat.c */
 extern const char *const enc_stat[]; /* encumbrance status from botl.c */
@@ -2613,11 +2614,13 @@ vanqsort_cmp(
 
 /* returns -1 if cancelled via ESC */
 int
-set_vanq_order(void)
+set_vanq_order(boolean for_vanq)
 {
     winid tmpwin;
     menu_item *selected;
     anything any;
+    char buf[BUFSZ];
+    const char *desc;
     int i, n, choice,
         clr = 0;
 
@@ -2627,13 +2630,25 @@ set_vanq_order(void)
     for (i = 0; i < SIZE(vanqorders); i++) {
         if (i == VANQ_ALPHA_MIX || i == VANQ_MCLS_HTOL) /* skip these */
             continue;
+        /* suppress some orderings if this menu if for 'm #genocided' */
+        if (!for_vanq && (i == VANQ_COUNT_H_L || i == VANQ_COUNT_L_H))
+            continue;
+        desc = vanqorders[i][2];
+        /* unique monsters can't be genocided so "alpha, unique separate"
+           and "alpha, unique intermixed" are confusing descriptions when
+           this menu is for #genocided rather than for #vanquished */
+        if (!for_vanq && i == VANQ_ALPHA_SEP)
+            desc = "alphabetically";
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
                  ATR_NONE, clr, vanqorders[i][2],
                  (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
                                         : MENU_ITEMFLAGS_NONE);
     }
-    end_menu(tmpwin, "Sort order for vanquished monster counts");
+    Sprintf(buf, "Sort order for %s",
+            for_vanq ? "vanquished monster counts (also genocided types)"
+                     : "genocided monster types (also vanquished counts)");
+    end_menu(tmpwin, buf);
 
     n = select_menu(tmpwin, PICK_ONE, &selected);
     destroy_nhwindow(tmpwin);
@@ -2656,48 +2671,9 @@ dovanquished(void)
     return ECMD_OK;
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
-/* #wizborn extended command */
-int
-doborn(void)
-{
-    static const char fmt[] = "%4i %4i %c %-30s";
-    int i;
-    winid datawin = create_nhwindow(NHW_TEXT);
-    char buf[BUFSZ];
-    int nborn = 0, ndied = 0;
-
-    putstr(datawin, 0, "died born");
-    for (i = LOW_PM; i < NUMMONS; i++)
-        if (gm.mvitals[i].born || gm.mvitals[i].died
-            || (gm.mvitals[i].mvflags & G_GONE) != 0) {
-            Sprintf(buf, fmt,
-                    gm.mvitals[i].died, gm.mvitals[i].born,
-                    ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E'
-                    : ((gm.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G'
-                      : ((gm.mvitals[i].mvflags & G_GONE) != 0) ? 'X'
-                        : ' ',
-                    mons[i].pmnames[NEUTRAL]);
-            putstr(datawin, 0, buf);
-            nborn += gm.mvitals[i].born;
-            ndied += gm.mvitals[i].died;
-        }
-
-    putstr(datawin, 0, "");
-    Sprintf(buf, fmt, ndied, nborn, ' ', "");
-
-    display_nhwindow(datawin, FALSE);
-    destroy_nhwindow(datawin);
-
-    return ECMD_OK;
-}
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-
 /* high priests aren't unique but are flagged as such to simplify something */
-#define UniqCritterIndx(mndx) ((mons[mndx].geno & G_UNIQ) \
-                               && mndx != PM_HIGH_CLERIC)
+#define UniqCritterIndx(mndx) \
+    ((mons[mndx].geno & G_UNIQ) != 0 && mndx != PM_HIGH_CLERIC)
 
 #define done_stopprint gp.program_state.stopprint
 
@@ -2745,7 +2721,7 @@ list_vanquished(char defquery, boolean ask)
             if (c == 'a' && ntypes > 1) { /* ask player to choose sort order */
                 /* choose value for vanq_sortmode via menu; ESC cancels list
                    of vanquished monsters but does not set 'done_stopprint' */
-                if (set_vanq_order() < 0)
+                if (set_vanq_order(TRUE) < 0)
                     return;
             }
             uniq_header = (flags.vanq_sortmode == VANQ_ALPHA_SEP);
@@ -2807,7 +2783,7 @@ list_vanquished(char defquery, boolean ask)
                           : !digit(buf[2]) ? 4 : 0;
                 if (class_header)
                     ++pfx;
-                Snprintf(buftoo, sizeof(buftoo), "%*s%s", pfx, "", buf);
+                Snprintf(buftoo, sizeof buftoo, "%*s%s", pfx, "", buf);
                 putstr(klwin, 0, buftoo);
             }
             /*
@@ -2874,24 +2850,52 @@ num_extinct(void)
     return n;
 }
 
+/* collect both genocides and extintctions, skipping uniques */
+static int
+num_gone(int mvflags, int *mindx)
+{
+    uchar mflg = (uchar) mvflags;
+    int i, n = 0;
+
+    (void) memset((genericptr_t) mindx, 0, NUMMONS * sizeof *mindx);
+
+    for (i = LOW_PM; i < NUMMONS; ++i) {
+        /* uniques can't be genocided but can become extinct;
+           however, they're never reported as extinct, so skip them */
+        if (UniqCritterIndx(i))
+            continue;
+
+        if ((gm.mvitals[i].mvflags & mflg) != 0)
+            mindx[n++] = i;
+    }
+    return n;
+}
+
 /* show genocided and extinct monster types for final disclosure/dumplog
    or for the #genocided command */
 void
 list_genocided(char defquery, boolean ask)
 {
-    register int i;
-    int ngenocided, nextinct;
+    register int i, mndx;
+    int ngenocided, nextinct, ngone, mvflags, mindx[NUMMONS];
     char c;
     winid klwin;
     char buf[BUFSZ];
     boolean dumping; /* for DUMPLOG; doesn't need to be conditional */
+    boolean both = (gp.program_state.gameover || wizard || discover);
 
     dumping = (defquery == 'd');
     if (dumping)
         defquery = 'y';
 
+    /* this goess through the whole monster list up to three times but will
+       happen rarely and is simpler than a more general single pass check;
+       extinctions are only revealed during end of game disclosure or when
+       running in wizard or explore mode */
     ngenocided = num_genocides();
-    nextinct = num_extinct();
+    nextinct = both ? num_extinct() : 0;
+    mvflags = G_GENOD | (both ? G_EXTINCT : 0);
+    ngone = num_gone(mvflags, mindx);
 
     /* genocided or extinct species list */
     if (ngenocided != 0 || nextinct != 0) {
@@ -2899,10 +2903,36 @@ list_genocided(char defquery, boolean ask)
                 (nextinct && !ngenocided) ? "extinct " : "",
                 (ngenocided) ? " genocided" : "",
                 (nextinct && ngenocided) ? " and extinct" : "");
-        c = ask ? yn_function(buf, ynqchars, defquery, TRUE) : defquery;
+        c = ask ? yn_function(buf, ynaqchars, defquery, TRUE) : defquery;
         if (c == 'q')
             done_stopprint++;
-        if (c == 'y') {
+        if (c == 'y' || c == 'a') {
+            int save_sortmode;
+            char mlet, prev_mlet = 0;
+            boolean class_header = FALSE;
+
+            if (ngone > 1) {
+                if (c == 'a') { /* ask player to choose sort order */
+                    /* #genocided shares #vanquished's sort order */
+                    if (set_vanq_order(FALSE) < 0)
+                        return;
+                }
+                /* sort orderings count-high-to-low or count-low-to-high
+                   don't make sense for genocides; if the preferred order
+                   to set to either of those, use alphabetical instead;
+                   note: the tie breaker for by-class is level-high-to-low
+                   or level-low-to-high rather than count so is ok as-is */
+                save_sortmode = flags.vanq_sortmode;
+                if (flags.vanq_sortmode == VANQ_COUNT_H_L
+                    || flags.vanq_sortmode == VANQ_COUNT_L_H)
+                    flags.vanq_sortmode = VANQ_ALPHA_MIX;
+                qsort((genericptr_t) mindx, ngone,
+                      sizeof *mindx, vanqsort_cmp);
+                class_header = (flags.vanq_sortmode == VANQ_MCLS_LTOH
+                                || flags.vanq_sortmode == VANQ_MCLS_HTOL);
+                flags.vanq_sortmode = save_sortmode;
+            }
+
             klwin = create_nhwindow(NHW_MENU);
             Sprintf(buf, "%s%s species:",
                     (ngenocided) ? "Genocided" : "Extinct",
@@ -2911,23 +2941,29 @@ list_genocided(char defquery, boolean ask)
             if (!dumping)
                 putstr(klwin, 0, "");
 
-            for (i = LOW_PM; i < NUMMONS; i++) {
-                /* uniques can't be genocided but can become extinct;
-                   however, they're never reported as extinct, so skip them */
-                if (UniqCritterIndx(i))
-                    continue;
-                if (gm.mvitals[i].mvflags & G_GONE) {
-                    Sprintf(buf, " %s", makeplural(mons[i].pmnames[NEUTRAL]));
-                    /*
-                     * "Extinct" is unfortunate terminology.  A species
-                     * is marked extinct when its birth limit is reached,
-                     * but there might be members of the species still
-                     * alive, contradicting the meaning of the word.
-                     */
-                    if ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT)
-                        Strcat(buf, " (extinct)");
-                    putstr(klwin, 0, buf);
+            for (i = 0; i < ngone; ++i) {
+                mndx = mindx[i];
+                mlet = mons[mndx].mlet;
+                if (class_header && mlet != prev_mlet) {
+                    Strcpy(buf, def_monsyms[(int) mlet].explain);
+                    putstr(klwin, ask ? 0 : iflags.menu_headings,
+                           upstart(buf));
+                    prev_mlet = mlet;
                 }
+                Sprintf(buf, " %s", makeplural(mons[mndx].pmnames[NEUTRAL]));
+                /*
+                 * "Extinct" is unfortunate terminology.  A species
+                 * is marked extinct when its birth limit is reached,
+                 * but there might be members of the species still
+                 * alive, contradicting the meaning of the word.
+                 *
+                 * We only append "(extinct)" if the G_GENOD bit is
+                 * clear.  During normal play, 'mndx' won't be in the
+                 * collected list unless that bit is set.
+                 */
+                if ((gm.mvitals[mndx].mvflags & G_GONE) == G_EXTINCT)
+                    Strcat(buf, " (extinct)");
+                putstr(klwin, 0, buf);
             }
             if (!dumping)
                 putstr(klwin, 0, "");
@@ -2946,10 +2982,11 @@ list_genocided(char defquery, boolean ask)
 
     /* See the comment for similar code near the end of list_vanquished(). */
     } else if (!gp.program_state.gameover) {
-        /* #genocided rather than final disclosure, so pline() is ok */
-        pline("No creatures have been genocided or become extinct.");
+        /* #genocided rather than final disclosure, so pline() is ok and
+           extinction has been ignored */
+        pline("No creatures have been genocided.");
 #ifdef DUMPLOG
-    } else if (dumping) {
+    } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, "No species were genocided or became extinct.");
 #endif
     }
@@ -2959,9 +2996,48 @@ list_genocided(char defquery, boolean ask)
 int
 dogenocided(void)
 {
-    list_genocided('y', FALSE);
+    list_genocided(iflags.menu_requested ? 'a' : 'y', FALSE);
     return ECMD_OK;
 }
+
+DISABLE_WARNING_FORMAT_NONLITERAL
+
+/* #wizborn extended command */
+int
+doborn(void)
+{
+    static const char fmt[] = "%4i %4i %c %-30s";
+    int i;
+    winid datawin = create_nhwindow(NHW_TEXT);
+    char buf[BUFSZ];
+    int nborn = 0, ndied = 0;
+
+    putstr(datawin, 0, "died born");
+    for (i = LOW_PM; i < NUMMONS; i++)
+        if (gm.mvitals[i].born || gm.mvitals[i].died
+            || (gm.mvitals[i].mvflags & G_GONE) != 0) {
+            Sprintf(buf, fmt,
+                    gm.mvitals[i].died, gm.mvitals[i].born,
+                    ((gm.mvitals[i].mvflags & G_GONE) == G_EXTINCT) ? 'E'
+                    : ((gm.mvitals[i].mvflags & G_GONE) == G_GENOD) ? 'G'
+                      : ((gm.mvitals[i].mvflags & G_GONE) != 0) ? 'X'
+                        : ' ',
+                    mons[i].pmnames[NEUTRAL]);
+            putstr(datawin, 0, buf);
+            nborn += gm.mvitals[i].born;
+            ndied += gm.mvitals[i].died;
+        }
+
+    putstr(datawin, 0, "");
+    Sprintf(buf, fmt, ndied, nborn, ' ', "");
+
+    display_nhwindow(datawin, FALSE);
+    destroy_nhwindow(datawin);
+
+    return ECMD_OK;
+}
+
+RESTORE_WARNING_FORMAT_NONLITERAL
 
 /*
  * align_str(), piousness(), mstatusline() and ustatusline() once resided
@@ -3233,5 +3309,10 @@ ustatusline(void)
 #undef you_have_been
 #undef you_have_never
 #undef you_have_X
+#undef LL_majors
+#undef majorevent
+#undef spoilerevent
+#undef UniqCritterIndx
+#undef done_stopprint
 
 /*insight.c*/

@@ -1109,7 +1109,7 @@ extern schar achieve_rank(int);
 extern boolean sokoban_in_play(void);
 extern int do_gamelog(void);
 extern void show_gamelog(int);
-extern int set_vanq_order(void);
+extern int set_vanq_order(boolean);
 extern int dovanquished(void);
 extern int doborn(void);
 extern void list_vanquished(char, boolean);
