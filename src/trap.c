@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1680935652 2023/04/08 06:34:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.525 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1683116409 2023/05/03 12:20:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.530 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -497,8 +497,8 @@ maketrap(coordxy x, coordxy y, int typ)
             (void) set_levltyp(x, y, CORR);
         else if (IS_WALL(lev->typ) || lev->typ == SDOOR)
             (void) set_levltyp(x, y,  gl.level.flags.is_maze_lev ? ROOM
-                               : gl.level.flags.is_cavernous_lev ? CORR
-                                                                : DOOR);
+                                      : gl.level.flags.is_cavernous_lev ? CORR
+                                        : DOOR);
 
         unearth_objs(x, y);
         break;

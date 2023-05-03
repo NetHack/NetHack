@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1650875487 2022/04/25 08:31:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1683116397 2023/05/03 12:19:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2641,9 +2641,9 @@ set_vanq_order(boolean for_vanq)
             desc = "alphabetically";
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, *vanqorders[i][0], 0,
-                 ATR_NONE, clr, vanqorders[i][2],
+                 ATR_NONE, clr, desc,
                  (i == flags.vanq_sortmode) ? MENU_ITEMFLAGS_SELECTED
-                                        : MENU_ITEMFLAGS_NONE);
+                                            : MENU_ITEMFLAGS_NONE);
     }
     Sprintf(buf, "Sort order for %s",
             for_vanq ? "vanquished monster counts (also genocided types)"
