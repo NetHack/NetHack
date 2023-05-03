@@ -1720,10 +1720,12 @@ Can_rise_up(coordxy x, coordxy y, d_level *lev)
 boolean
 has_ceiling(d_level *lev)
 {
-    if (!(Is_astralevel(lev) || Is_firelevel(lev)
-         || Is_airlevel(lev) || Is_waterlevel(lev)))
-        return TRUE;
-    return FALSE;
+    /* FIXME: some (most? all?) of the quest home levels are conceptually
+       above ground and don't have ceilings outside of their buildings
+       but we don't presently check for that */
+    if (In_endgame(lev) && !Is_earthlevel(lev))
+        return FALSE;
+    return TRUE;
 }
 
 boolean
@@ -1779,14 +1781,16 @@ const char *
 surface(coordxy x, coordxy y)
 {
     struct rm *lev = &levl[x][y];
+    int levtyp = SURFACE_AT(x, y);
 
     if (u_at(x, y) && u.uswallow && is_animal(u.ustuck->data))
         /* 'husk' is iffy but maw is wrong for 't' class */
         return digests(u.ustuck->data) ? "maw"
                : enfolds(u.ustuck->data) ? "husk"
                  : "nonesuch"; /* can't happen (fingers crossed...) */
-    else if (IS_AIR(lev->typ) && Is_airlevel(&u.uz))
-        return "air";
+    else if (IS_AIR(levtyp))
+        return Is_waterlevel(&u.uz) ? "air bubble"
+                                    : (levtyp == CLOUD) ? "cloud" : "air";
     else if (is_pool(x, y))
         return (Underwater && !Is_waterlevel(&u.uz))
             ? "bottom" : hliquid("water");
@@ -1796,16 +1800,19 @@ surface(coordxy x, coordxy y)
         return hliquid("lava");
     else if (lev->typ == DRAWBRIDGE_DOWN)
         return "bridge";
-    else if (IS_ALTAR(levl[x][y].typ))
+    else if (IS_ALTAR(levtyp))
         return "altar";
-    else if (IS_GRAVE(levl[x][y].typ))
+    else if (IS_GRAVE(levtyp))
         return "headstone";
-    else if (IS_FOUNTAIN(levl[x][y].typ))
+    else if (IS_FOUNTAIN(levtyp))
         return "fountain";
     else if (On_stairs(x, y))
         return "stairs";
-    else if ((IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz))
-             || IS_WALL(lev->typ) || IS_DOOR(lev->typ) || lev->typ == SDOOR)
+    else if (IS_WALL(levtyp) || levtyp == SDOOR)
+        return "wall"; /* 'surface' during Passes_walls */
+    else if (IS_DOOR(levtyp))
+        return "doorway"; /* even for closed door */
+    else if (IS_ROOM(levtyp) && !Is_earthlevel(&u.uz))
         return "floor";
     else
         return "ground";

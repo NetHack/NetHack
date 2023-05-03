@@ -1895,11 +1895,8 @@ closed_door(coordxy x, coordxy y)
 boolean
 accessible(coordxy x, coordxy y)
 {
-    int levtyp = levl[x][y].typ;
-
     /* use underlying terrain in front of closed drawbridge */
-    if (levtyp == DRAWBRIDGE_UP)
-        levtyp = db_under_typ(levl[x][y].drawbridgemask);
+    int levtyp = SURFACE_AT(x, y);
 
     return (boolean) (ACCESSIBLE(levtyp) && !closed_door(x, y));
 }

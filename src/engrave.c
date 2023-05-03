@@ -407,6 +407,8 @@ stylus_ok(struct obj *obj)
 static boolean
 u_can_engrave(void)
 {
+    int levtyp = SURFACE_AT(u.ux, u.uy);
+
     if (u.uswallow) {
         if (is_animal(u.ustuck->data)) {
             pline("What would you write?  \"Jonah was here\"?");
@@ -420,18 +422,20 @@ u_can_engrave(void)
     } else if (is_lava(u.ux, u.uy)) {
         You_cant("write on the %s!", surface(u.ux, u.uy));
         return FALSE;
-    } else if (is_pool(u.ux, u.uy) || IS_FOUNTAIN(levl[u.ux][u.uy].typ)) {
+    } else if (is_pool(u.ux, u.uy) || IS_FOUNTAIN(levtyp)) {
         You_cant("write on the %s!", surface(u.ux, u.uy));
         return FALSE;
-    }
-    if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz) /* in bubble */) {
-        You_cant("write in thin air!");
+    } else if (IS_AIR(levtyp)) {
+        /* airlevel or inside bubble on waterlevel */
+        You_cant("write in %s!",
+                 (levtyp == CLOUD) ? "cloud vapor" : "thin air");
         return FALSE;
-    } else if (!accessible(u.ux, u.uy)) {
+    } else if (!ACCESSIBLE(levtyp)) {
         /* stone, tree, wall, secret corridor, pool, lava, bars */
         You_cant("write here.");
         return FALSE;
     }
+
     if (cantwield(gy.youmonst.data)) {
         You_cant("even hold anything!");
         return FALSE;
@@ -1315,7 +1319,7 @@ void
 engraving_sanity_check(void)
 {
     struct engr *ep;
-    schar typ;
+    int levtyp;
 
     if (head_engr && (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))) {
         impossible("engraving sanity: on plane of air/water");
@@ -1327,14 +1331,13 @@ engraving_sanity_check(void)
 
         if (!isok(x, y)) {
             impossible("engraving sanity: !isok <%i,%i>", x, y);
-            return;
+            continue;
         }
-
-        typ = levl[x][y].typ;
-        if (typ == LAVAPOOL || typ == LAVAWALL || IS_POOL(typ)
-            || typ == AIR || !accessible(x, y)) {
-            impossible("engraving sanity: illegal surface (%i)", typ);
-            return;
+        levtyp = SURFACE_AT(x, y);
+        if (is_pool_or_lava(x, y) || IS_AIR(levtyp) || !ACCESSIBLE(levtyp)) {
+            impossible("engraving sanity: illegal surface (%d: \"%s\")",
+                       levtyp, surface(x, y));
+            continue;
         }
     }
 }

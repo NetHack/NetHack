@@ -1164,6 +1164,9 @@ avoid "wall_angle: unknown hwall mode 4" when using #terrain command to
 	has been transformed into an open door while not in sight
 it was possible to produce a web at a water or lava location; it would not be
 	visible but could trap the hero, resulting in drowning or incineration
+engraving in an open doorway was allowed, engraving in closed one (presumably
+	via Passes_walls) was not, but closing the door on an engraving was;
+	change to allow engraving at closed door location
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1555,6 +1558,7 @@ throttle the difficulty of the monsters in theme room "buried zombies"
 buried troll whose auto-revive timer expired might triger panic with
         "revive default case 6"
 throwing a helm of brilliance could yield "breaking odd object?"
+sanity checking of engravings was stopping after first problem found
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

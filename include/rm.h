@@ -107,6 +107,14 @@ enum levl_typ_types {
 #define IS_AIR(typ) ((typ) == AIR || (typ) == CLOUD)
 #define IS_SOFT(typ) ((typ) == AIR || (typ) == CLOUD || IS_POOL(typ))
 #define IS_WATERWALL(typ) ((typ) == WATER)
+/* for surface checks when it's unknown whether a drawbridge is involved;
+   drawbridge_up is the spot in front of a closed drawbridge and not the
+   current surface at that spot; caveat: this evaluates its arguments more
+   than once and might make a function call */
+#define SURFACE_AT(x,y) \
+    ((levl[x][y].typ == DRAWBRIDGE_UP)            \
+     ? db_under_typ(levl[x][y].drawbridgemask)    \
+     : levl[x][y].typ)
 
 /*
  *      Note:  secret doors (SDOOR) want to use both rm.doormask and
