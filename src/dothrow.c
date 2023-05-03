@@ -641,9 +641,10 @@ hitfloor(
  * before the failed callback.
  */
 boolean
-walk_path(coord *src_cc, coord *dest_cc,
-          boolean (*check_proc)(genericptr_t, coordxy, coordxy),
-          genericptr_t arg)
+walk_path(
+    coord *src_cc, coord *dest_cc,
+    boolean (*check_proc)(genericptr_t, coordxy, coordxy),
+    genericptr_t arg)
 {
     int err;
     coordxy x, y, dx, dy, x_change, y_change, i, prev_x, prev_y;
@@ -982,6 +983,9 @@ will_hurtle(struct monst *mon, coordxy x, coordxy y)
 {
     if (!isok(x, y))
         return FALSE;
+    /* redundant when called by mhurtle() but needed for mhitm_knockback() */
+    if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped)
+        return FALSE;
     /*
      * TODO: Treat walls, doors, iron bars, etc. specially
      * rather than just stopping before.
@@ -1025,20 +1029,42 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             return FALSE;
         return TRUE;
     }
-    if ((mtmp = m_at(x, y)) != 0) {
+    if ((mtmp = m_at(x, y)) != 0 && mtmp != mon) {
         if (canseemon(mon) || canseemon(mtmp))
             pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
-        wakeup(mon, !gc.context.mon_moving);
         wakeup(mtmp, !gc.context.mon_moving);
+        /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
             minstapetrify(mon, !gc.context.mon_moving);
             newsym(mon->mx, mon->my);
         }
+        /* and whether 'mtmp' is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data)
             && !which_armor(mtmp, W_ARMU | W_ARM | W_ARMC)) {
             minstapetrify(mtmp, !gc.context.mon_moving);
             newsym(mtmp->mx, mtmp->my);
+        }
+    } else if (u_at(x, y)) {
+        /* a monster has caused 'mon' to hurtle against hero */
+        pline("%s bumps into you.", Some_Monnam(mon));
+        stop_occupation();
+        /* check whether 'mon' is turned to stone by touching poly'd hero */
+        if (Upolyd && touch_petrifies(gy.youmonst.data)
+            && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
+            /* give poly'd hero credit/blame despite a monster causing it */
+            minstapetrify(mon, TRUE);
+            newsym(mon->mx, mon->my);
+        }
+        /* and whether hero is turned to stone by being touched by 'mon' */
+        if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
+            Snprintf(gk.killer.name, sizeof gk.killer.name, "being hit by %s",
+                     /* combine m_monnam() and noname_monnam():
+                        "{your,a} hurtling cockatrice" w/o assigned name */
+                     x_monnam(mtmp, mtmp->mtame ? ARTICLE_YOUR : ARTICLE_A,
+                              "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
+            instapetrify(gk.killer.name);
+            newsym(u.ux, u.uy);
         }
     }
 
@@ -1111,6 +1137,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
 {
     coord mc, cc;
 
+    wakeup(mon, !gc.context.mon_moving);
     /* At the very least, debilitate the monster */
     mon->movement = 0;
     mon->mstun = 1;
@@ -1147,10 +1174,12 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     cc.x = mon->mx + (dx * range);
     cc.y = mon->my + (dy * range);
     (void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t) mon);
-    if (!DEADMONSTER(mon) && t_at(mon->mx, mon->my))
-        (void) mintrap(mon, FORCEBUNGLE);
-    else
-        (void) minliquid(mon);
+    if (!DEADMONSTER(mon)) {
+        if (t_at(mon->mx, mon->my))
+            (void) mintrap(mon, FORCEBUNGLE);
+        else
+            (void) minliquid(mon);
+    }
     return;
 }
 
