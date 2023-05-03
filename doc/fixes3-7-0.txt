@@ -1554,6 +1554,7 @@ if hero was killed by a wand zapped by a monster, cause of death was reported
 throttle the difficulty of the monsters in theme room "buried zombies"
 buried troll whose auto-revive timer expired might triger panic with
         "revive default case 6"
+throwing a helm of brilliance could yield "breaking odd object?"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
