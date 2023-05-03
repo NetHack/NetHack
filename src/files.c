@@ -1292,7 +1292,7 @@ get_saved_games(void)
 
                     /* rename file if it is not named as expected */
                     Strcpy(gp.plname, r);
-                    set_savefile_name(FALSE);
+                    set_savefile_name(TRUE);
                     fq_new_save = fqname(gs.SAVEF, SAVEPREFIX, 0);
                     fq_old_save = fqname(files[i], SAVEPREFIX, 1);
 
