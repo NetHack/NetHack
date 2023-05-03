@@ -2002,10 +2002,16 @@ revive_corpse(struct obj *corpse)
     char cname[BUFSZ];
     struct obj *container = (struct obj *) 0;
     int container_where = 0;
-    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
+    int montype;
+    boolean is_zomb;
     coordxy corpsex, corpsey;
 
     where = corpse->where;
+    montype = corpse->corpsenm;
+    /* treat buried auto-reviver (troll, Rider?) like a zombie
+       so that it can dig itself out of the ground if it revives */
+    is_zomb = (mons[montype].mlet == S_ZOMBIE
+               || (where == OBJ_BURIED && is_reviver(&mons[montype])));
     is_uwep = (corpse == uwep);
     chewed = (corpse->oeaten != 0);
     Strcpy(cname, corpse_xname(corpse,

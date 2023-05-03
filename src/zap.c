@@ -839,12 +839,18 @@ revive(struct obj *corpse, boolean by_hero)
     boolean one_of;
     mmflags_nht mmflags = NO_MINVENT | MM_NOWAIT | MM_NOMSG;
     int montype, cgend, container_nesting = 0;
-    boolean is_zomb = (mons[corpse->corpsenm].mlet == S_ZOMBIE);
+    boolean is_zomb;
 
     if (corpse->otyp != CORPSE) {
         impossible("Attempting to revive %s?", xname(corpse));
         return (struct monst *) 0;
     }
+    montype = corpse->corpsenm;
+    /* treat buried auto-reviver (troll, Rider?) like a zombie
+       so that it can dig itself out of the ground if it revives */
+    is_zomb = mons[montype].mlet == S_ZOMBIE
+              || (corpse->where == OBJ_BURIED && is_reviver(&mons[montype]));
+
     /* if this corpse is being eaten, stop doing that; this should be done
        after makemon() succeeds and skipped if it fails, but waiting until
        we know the result for that would be too late */
@@ -897,7 +903,6 @@ revive(struct obj *corpse, boolean by_hero)
         return (struct monst *) 0;
 
     /* prepare for the monster */
-    montype = corpse->corpsenm;
     mptr = &mons[montype];
     /* [should probably handle recorporealization first; if corpse and
        ghost are at same location, revived creature shouldn't be bumped

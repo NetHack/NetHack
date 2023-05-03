@@ -1552,6 +1552,8 @@ anti-magic field's reduction of hero's maximum energy could result in current
 if hero was killed by a wand zapped by a monster, cause of death was reported
 	as "killed by a bolt of <damage type> imagined by <monster>"
 throttle the difficulty of the monsters in theme room "buried zombies"
+buried troll whose auto-revive timer expired might triger panic with
+        "revive default case 6"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
@@ -1790,7 +1792,7 @@ Qt: use idPressed signal instead of buttonPressed and mappedString instead
 	of mapped for recent Qt (pr #913 by chasonr)
 Qt+macOS: fix control key (fixed all except for ^V); handle ^V as a shortcut
 Qt+macOS: rename menu entry "nethack->Preferences..." for invoking nethack's
-	key 'O' command to "Game->Run-time options" and entry "Game->Qt settings"
+	'O' command to "Game->Run-time options" and entry "Game->Qt settings"
 	for making persistent Qt customizations to "nethack->Preferences..."
 Qt+macOS: prevent game->Quit-without-saving from being hijacked for the nethack
 	menu by renaming it game->_Quit-without-saving (macOS only)
