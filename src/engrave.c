@@ -325,7 +325,11 @@ read_engr_at(coordxy x, coordxy y)
 }
 
 void
-make_engr_at(coordxy x, coordxy y, const char *s, long e_time, xint16 e_type)
+make_engr_at(
+    coordxy x, coordxy y,
+    const char *s,
+    long e_time,
+    int e_type)
 {
     int i;
     struct engr *ep;
@@ -355,7 +359,7 @@ make_engr_at(coordxy x, coordxy y, const char *s, long e_time, xint16 e_type)
             exercise(A_WIS, TRUE);
     }
     ep->engr_time = e_time;
-    ep->engr_type = e_type > 0 ? e_type : rnd(N_ENGRAVE - 1);
+    ep->engr_type = (xint8) ((e_type > 0) ? e_type : rnd(N_ENGRAVE - 1));
     ep->engr_szeach = smem;
     ep->engr_alloc = smem * 3;
     /* we do not set ep->eread; the caller will need to if required */
@@ -486,8 +490,8 @@ doengrave(void)
     boolean zapwand = FALSE;  /* TRUE if we remove a wand charge */
     boolean disprefresh = FALSE; /* TRUE if the display needs a refresh */
 
-    xint16 type = DUST;       /* Type of engraving made */
-    xint16 oetype = 0;        /* will be set to type of current engraving */
+    int type = DUST;          /* Type of engraving made */
+    int oetype = 0;           /* will be set to type of current engraving */
     char buf[BUFSZ];          /* Buffer for final/poly engraving text */
     char ebuf[BUFSZ];         /* Buffer for initial engraving text */
     char fbuf[BUFSZ];         /* Buffer for "your fingers" */
@@ -984,7 +988,7 @@ doengrave(void)
                     You("will overwrite the current message.");
                 eow = TRUE;
             }
-        } else if (oep && (int) strlen(oep->engr_txt[actual_text]) >= BUFSZ - 1) {
+        } else if (oep && Strlen(oep->engr_txt[actual_text]) >= BUFSZ - 1) {
             There("is no room to add anything else here.");
             return ECMD_TIME;
         }
@@ -1131,9 +1135,8 @@ engrave(void)
         stylus = (struct obj *) 0;
     } else {
         for (stylus = gi.invent; stylus; stylus = stylus->nobj) {
-            if (stylus == gc.context.engraving.stylus) {
+            if (stylus == gc.context.engraving.stylus)
                 break;
-            }
         }
         if (!stylus) {
             You("are unable to continue engraving.");
@@ -1187,7 +1190,7 @@ engrave(void)
         if (firsttime) {
             pline("%s dull.", Yobjnam2(stylus, "get"));
         }
-        if (gc.context.engraving.actionct % 2 == 1) { /* 1st, 3rd, ... action */
+        if (gc.context.engraving.actionct % 2 == 1) { /* 1st,3rd,... action */
             /* deduct a point on 1st, 3rd, 5th, ... turns, unless this is the
              * last character being engraved (a rather convoluted way to round
              * down), but always deduct a point on the 1st turn to prevent
@@ -1272,7 +1275,8 @@ engrave(void)
 
     (void) strncat(buf, gc.context.engraving.nextc,
                    min(space_left, endc - gc.context.engraving.nextc));
-    make_engr_at(u.ux, u.uy, buf, gm.moves - gm.multi, gc.context.engraving.type);
+    make_engr_at(u.ux, u.uy, buf, gm.moves - gm.multi,
+                 gc.context.engraving.type);
     oep = engr_at(u.ux, u.uy);
     if (oep)
         oep->eread = 1;

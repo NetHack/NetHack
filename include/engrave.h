@@ -6,7 +6,12 @@
 #ifndef ENGRAVE_H
 #define ENGRAVE_H
 
-enum engraving_texts { actual_text, remembered_text, pristine_text, text_states };
+enum engraving_texts {
+    actual_text,
+    remembered_text,
+    pristine_text,
+    text_states
+};
 
 struct engr {
     struct engr *nxt_engr;
@@ -37,9 +42,9 @@ struct engr {
 #define dealloc_engr(engr) free((genericptr_t) (engr))
 
 #define engraving_to_defsym(ep) \
-    (levl[(ep)->engr_x][(ep)->engr_y].typ == CORR ? S_engrcorr : S_engroom)
+    ((levl[(ep)->engr_x][(ep)->engr_y].typ == CORR) ? S_engrcorr : S_engroom)
 
-#define spot_shows_engravings(x,y)      \
+#define spot_shows_engravings(x,y) \
     (levl[(x)][(y)].typ == CORR         \
      || levl[(x)][(y)].typ == SCORR     \
      || levl[(x)][(y)].typ == ICE       \

@@ -4074,6 +4074,7 @@ repair_damage(
             break;
         }
         deltrap(ttmp);
+        del_engr_at(x, y);
         if (seeit)
             newsym(x, y);
         if (!catchup)
@@ -4100,6 +4101,7 @@ repair_damage(
 
     if (litter_getpos(litter, x, y, shkp))
         litter_scatter(litter, x, y, shkp);
+    del_engr_at(x, y);
 
     /* needed if hero has line-of-sight to the former gap from outside
        the shop but is farther than one step away; once the light inside

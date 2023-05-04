@@ -96,6 +96,7 @@ clear_fcorr(struct monst *grd, boolean forceshow)
             if (lev->typ == STONE)
                 blackout(fcx, fcy);
         }
+        del_engr_at(fcx, fcy);
         map_location(fcx, fcy, 1); /* bypass vision */
         if (!ACCESSIBLE(lev->typ))
             block_point(fcx, fcy);
@@ -689,6 +690,7 @@ wallify_vault(struct monst *grd)
                 levl[x][y].typ = typ;
                 levl[x][y].wall_info = 0;
                 xy_set_wall_state(x, y); /* set WA_MASK bits in .wall_info */
+                del_engr_at(x, y);
                 /*
                  * hack: player knows walls are restored because of the
                  * message, below, so show this on the screen.
@@ -870,12 +872,12 @@ gd_letknow(struct monst *grd)
 int
 gd_move(struct monst *grd)
 {
-    coordxy x, y, nx, ny, m, n;
+    coordxy x, y, nx, ny, m, n, ex, ey;
     coordxy dx, dy, ggx = 0, ggy = 0, fci;
     uchar typ;
     struct rm *crm;
     struct fakecorridor *fcp;
-    register struct egd *egrd = EGD(grd);
+    struct egd *egrd = EGD(grd);
     long umoney = 0L;
     boolean goldincorridor = FALSE, u_in_vault = FALSE, grd_in_vault = FALSE,
             semi_dead = DEADMONSTER(grd),
@@ -954,6 +956,7 @@ gd_move(struct monst *grd)
                 mnexto(grd, RLOC_NOMSG);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 levl[m][n].flags = egrd->fakecorr[0].flags;
+                del_engr_at(m, n);
                 newsym(m, n);
                 return -1;
             }
@@ -970,6 +973,7 @@ gd_move(struct monst *grd)
                 (void) rloc(grd, RLOC_MSG);
                 levl[m][n].typ = egrd->fakecorr[0].ftyp;
                 levl[m][n].flags = egrd->fakecorr[0].flags;
+                del_engr_at(m, n);
                 newsym(m, n);
                 grd->mpeaceful = 0;
                 gd_letknow(grd);
@@ -1079,6 +1083,7 @@ gd_move(struct monst *grd)
                         crm->doormask = D_NODOOR;
                     else
                         crm->flags = 0;
+                    del_engr_at(nx, ny);
                     goto proceed;
                 }
             }
@@ -1098,12 +1103,14 @@ gd_move(struct monst *grd)
         ny += dy;
 
     while ((typ = (crm = &levl[nx][ny])->typ) != STONE) {
+        ex = nx + nx - x;
+        ey = ny + ny - y;
         /* in view of the above we must have IS_WALL(typ) or typ == POOL */
         /* must be a wall here */
-        if (isok(nx + nx - x, ny + ny - y) && !IS_POOL(typ)
-            && IS_ROOM(levl[nx + nx - x][ny + ny - y].typ)) {
+        if (isok(ex, ey) && IS_ROOM(levl[ex][ey].typ)) {
             crm->typ = DOOR;
             crm->doormask = D_NODOOR;
+            del_engr_at(ex, ey);
             goto proceed;
         }
         if (dy && nx != x) {
@@ -1121,6 +1128,7 @@ gd_move(struct monst *grd)
         if (IS_ROOM(typ)) {
             crm->typ = DOOR;
             crm->doormask = D_NODOOR;
+            del_engr_at(ex, ey);
             goto proceed;
         }
         break;

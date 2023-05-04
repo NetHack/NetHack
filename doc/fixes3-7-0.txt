@@ -1167,6 +1167,8 @@ it was possible to produce a web at a water or lava location; it would not be
 engraving in an open doorway was allowed, engraving in closed one (presumably
 	via Passes_walls) was not, but closing the door on an engraving was;
 	change to allow engraving at closed door location
+engraving in a breach in a shop's or vault's wall or vault guard's temporary
+	corridor would leave the engraving intact after repair/cleanup
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
