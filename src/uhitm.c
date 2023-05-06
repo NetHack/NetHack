@@ -3467,6 +3467,8 @@ mhitm_ad_poly(
                 pline("%s is not transformed.", Monnam(mdef));
             } else {
                 mhm->damage = mon_poly(&gy.youmonst, mdef, mhm->damage);
+                mhm->hitflags |= M_ATTK_HIT;
+                mhm->done = TRUE;
             }
         }
     } else if (mdef == &gy.youmonst) {
@@ -3478,12 +3480,17 @@ mhitm_ad_poly(
                     You("aren't transformed.");
             } else {
                 mhm->damage = mon_poly(magr, &gy.youmonst, mhm->damage);
+                mhm->hitflags |= M_ATTK_HIT;
+                mhm->done = TRUE;
             }
         }
     } else {
         /* mhitm */
-        if (mhm->damage < mdef->mhp && !negated)
+        if (mhm->damage < mdef->mhp && !negated) {
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
+            mhm->hitflags |= M_ATTK_HIT;
+            mhm->done = TRUE;
+        }
     }
 }
 
