@@ -1173,8 +1173,23 @@ done(int how)
         bot();
     }
 
+    /* hero_seq is (moves<<3 + n) where n is number of moves made
+       by the hero on the current turn (since the 'moves' variable
+       actually counts turns); its details shouldn't matter here */
+    if (gd.done_seq < gh.hero_seq)
+        gd.done_seq = gh.hero_seq;
+
     if (iflags.debug_fuzzer) {
-        if (!(gp.program_state.panicking || how == PANICKED)) {
+        if (!gp.program_state.panicking && how != PANICKED
+            /* Guard against getting stuck in a loop if we die in one of
+             * the few ways where life-saving isn't effective (cited case
+             * was burning in lava when the level was too full to allow
+             * teleporting to safety).  Skip the life-save attempt if we've
+             * died on the same move more than 15 times; give up instead.
+             * (Note: theoretically we could get killed more than that in
+             * one move if there are multiple fast monsters with multiple
+             * attacks against a wimply hero, or a ton of ranged attacks.) */
+            && (gd.done_seq++ < gh.hero_seq + 15L)) {
             savelife(how);
             /* periodically restore characteristics and lost exp levels
                or cure lycanthropy */
@@ -1192,7 +1207,8 @@ done(int how)
             gk.killer.format = 0;
             return;
         }
-    } else
+    }
+
     if (how == ASCENDED || (!gk.killer.name[0] && how == GENOCIDED))
         gk.killer.format = NO_KILLER_PREFIX;
     /* Avoid killed by "a" burning or "a" starvation */
@@ -1237,6 +1253,12 @@ done(int how)
     }
     /* explore and wizard modes offer player the option to keep playing */
     if (!survive && (wizard || discover) && how <= GENOCIDED
+#ifdef HANGUPHANDLING
+        /* if hangup has occurred, the only possible answer to a paranoid
+           query is 'no'; we want 'no' as the default for "Die?" but can't
+           accept it more than once if there's no user supplying it */
+        && !(gp.program_state.done_hup && gd.done_seq++ == gh.hero_seq)
+#endif
         && !paranoid_query(ParanoidDie, "Die?")) {
         pline("OK, so you don't %s.", (how == CHOKING) ? "choke" : "die");
         iflags.last_msg = PLNMSG_OK_DONT_DIE;

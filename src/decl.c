@@ -320,6 +320,8 @@ const struct instance_globals_d g_init_d = {
     0, /* did_nothing_flag */
     /* dog.c */
     DUMMY, /* dogname */
+    /* end.c */
+    0L, /* done_seq */
     /* mon.c */
     FALSE, /* disintegested */
     /* o_init.c */

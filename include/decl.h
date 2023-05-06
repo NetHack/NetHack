@@ -307,6 +307,9 @@ struct instance_globals_d {
     /* dog.c */
     char dogname[PL_PSIZ];
 
+    /* end.c */
+    long done_seq; /* for counting deaths occurring on same hero_seq */
+
     /* mon.c */
     boolean disintegested;
 

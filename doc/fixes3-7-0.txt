@@ -1172,6 +1172,12 @@ engraving in a breach in a shop's or vault's wall or vault guard's temporary
 if a fire resistant non-fire immune monster wearing a thoroughly burnt wooden
 	shield got knocked into lava, burning the shield completely yielded
 	impossible warning "obfree: deleting worn obj"
+hangup in wizard or explore mode would result in answering ESC to "Die?"
+	prompt if that was reached, and since default is 'no' the hero would
+	be life-saved and the game would try to keep going; if circumstances
+	resulted in repeat death then the program might get stuck in a loop
+	instead of exiting [no reports of such, but if it ever happened the
+	process was probably killed without anyone knowing why it happened]
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1564,6 +1570,10 @@ buried troll whose auto-revive timer expired might triger panic with
         "revive default case 6"
 throwing a helm of brilliance could yield "breaking odd object?"
 sanity checking of engravings was stopping after first problem found
+the fuzzer could get stuck in a loop if hero died in a way where life-saving
+	just resulted in a repeat death (cited case was burning up in lava,
+	where life-saving teleports you out of it; if the level is full, the
+	teleport will fail and you'll immediately burn up again)
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
