@@ -164,7 +164,9 @@ awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
         if (DEADMONSTER(mtmp))
             continue;
         if (is_mercenary(mtmp->data) && mtmp->data != &mons[PM_GUARD]) {
-            mtmp->mpeaceful = mtmp->msleeping = mtmp->mfrozen = 0;
+            if (!mtmp->mtame)
+                mtmp->mpeaceful = 0;
+            mtmp->msleeping = mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
             mtmp->mstrategy &= ~STRAT_WAITMASK;
             if (canseemon(mtmp))
