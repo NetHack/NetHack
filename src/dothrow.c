@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1664979333 2022/10/05 14:15:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1683334246 2023/05/06 00:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1061,7 +1061,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             Snprintf(gk.killer.name, sizeof gk.killer.name, "being hit by %s",
                      /* combine m_monnam() and noname_monnam():
                         "{your,a} hurtling cockatrice" w/o assigned name */
-                     x_monnam(mtmp, mtmp->mtame ? ARTICLE_YOUR : ARTICLE_A,
+                     x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
                               "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
             instapetrify(gk.killer.name);
             newsym(u.ux, u.uy);
