@@ -190,9 +190,9 @@ erode_obj(
     uvictim = (victim == &gy.youmonst);
     vismon = victim && (victim != &gy.youmonst) && canseemon(victim);
     /* Is gb.bhitpos correct here? Ugh. */
-    visobj = !victim && cansee(gb.bhitpos.x, gb.bhitpos.y)
-        && (!is_pool(gb.bhitpos.x, gb.bhitpos.y)
-            || (next2u(gb.bhitpos.x,gb.bhitpos.y) && Underwater));
+    visobj = (!victim && cansee(gb.bhitpos.x, gb.bhitpos.y)
+              && (!is_pool(gb.bhitpos.x, gb.bhitpos.y)
+                  || (next2u(gb.bhitpos.x,gb.bhitpos.y) && Underwater)));
 
     switch (type) {
     case ERODE_BURN:
@@ -287,6 +287,7 @@ erode_obj(
 
         return ER_DAMAGED;
     } else if (ef_flags & EF_DESTROY) {
+        otmp->in_use = 1; /* in case of hangup during message w/ --More-- */
         if (uvictim || vismon || visobj)
             pline("%s %s %s away!",
                   uvictim ? "Your"
@@ -297,7 +298,23 @@ erode_obj(
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
 
-        setnotworn(otmp);
+        if (otmp->owornmask) {
+            /* unwear otmp before deleting it */
+            if (carried(otmp)) {
+                /* otmp remains in hero's invent */
+                remove_worn_item(otmp, TRUE); /* calls Cloak_off(),&c */
+            } else if (mcarried(otmp)) {
+                /* results in otmp->where==OBJ_FREE; delobj() doesn't care */
+                extract_from_minvent(otmp->ocarry, otmp, TRUE, FALSE);
+            } else { /* worn but not in hero invent or monster minvent ? */
+                impossible(
+            "erode_obj(%d): destroying strangely worn item [%d, 0x%08lx: %s]",
+                           type,
+                           otmp->where, otmp->owornmask, simpleonames(otmp));
+                otmp->owornmask = 0L; /* otherwise a second complaint (about
+                                       * deleting a worn item) will ensue */
+            }
+        }
         delobj(otmp);
         return ER_DESTROYED;
     } else {

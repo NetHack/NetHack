@@ -1169,6 +1169,9 @@ engraving in an open doorway was allowed, engraving in closed one (presumably
 	change to allow engraving at closed door location
 engraving in a breach in a shop's or vault's wall or vault guard's temporary
 	corridor would leave the engraving intact after repair/cleanup
+if a fire resistant non-fire immune monster wearing a thoroughly burnt wooden
+	shield got knocked into lava, burning the shield completely yielded
+	impossible warning "obfree: deleting worn obj"
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
