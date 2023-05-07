@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{April 19, 2023}
+\date{May 6, 2023}
 
 \maketitle
 
@@ -748,7 +748,8 @@ list of all discovered objects) and the `{\tt \`{}}' (knownclass,
 show a list of discovered objects in a particular class) commands to offer
 a menu of several sorting alternatives (which sets a new value for the
 {\it sortdiscoveries\/}
-option); also for ``{\tt \#vanquished}'' command to offer a sorting menu.
+option); also for ``{\tt \#vanquished}'' and ``{\tt \#genocided}'' commands
+to offer a sorting menu.
 \\
 %.lp ""
 A few other commands (eat food, offer sacrifice, apply tinning-kit,
@@ -1409,7 +1410,22 @@ Default key is `{\tt f}'.
 Force a lock. Autocompletes. Default key is `{\tt M-f}'.
 %.lp
 \item[\tb{\#genocided}]
-List any monster types which have been genocided or become extinct.
+List any monster types which have been genocided.
+In explore mode and debug mode it also shows types which have become
+extinct.
+\\
+%.lp ""
+The display order is the same as is used by {\\tt \#vanquished}.
+The `{\tt m}' prefix brings up a menu of available sorting orders, and
+doing that for either #genocided or #vanquished changes the order for both.
+\\
+%.lp ""
+If the sorting order is ``count high to low'' or ``count low to high''
+(which are applicable for {\tt \#vanquished}), that will be ignored
+for {\tt \#genocided} and alphabetical will be used instead.
+The menu omits those two choices when used for {\tt \#genocide}.
+\\
+%.lp ""
 Autocompletes.
 Default key is `{\tt M-g}'.
 %.lp
@@ -1849,6 +1865,9 @@ a menu of sorting orders available (provided that the vanquished monsters
 list contains at least two types of monsters).
 Whichever ordering is picked gets assigned to the {\it sortvanquished}
 option so is remembered for subsequent \#vanquished requests.
+The {\tt \#genocided} command shares this sorting order.
+\\
+%.lp ""
 During end-of-game disclosure, when asked whether to show vanquished
 monsters answering `{\tt a}' will let you choose from the sort menu.
 \\
@@ -4212,6 +4231,8 @@ lets you refine how it behaves.  Here are the valid prefixes:
 
 The listing of vanquished monsters can be sorted,
 so there are two additional choices for `{\tt v}':
+The listings of vanquished monsters and of genocided types can be sorted,
+so there are two additional choices for `q' and `g':
 %.sd
 %.si
 {\tt ?} --- prompt you and default to ask on the prompt;\\
@@ -4222,8 +4243,9 @@ so there are two additional choices for `{\tt v}':
 Asking refers to picking one of the orderings from a menu.
 The `{\tt +}' disclose without prompting choice,
 or being prompted and answering `{\tt y}' rather than `{\tt a}',
-will default to showing monsters in the traditional order,
-from high level to low level.\\
+will default to showing monsters in the order specified by the
+{\it sortvanquished\/} option.
+\\
 %.lp ""
 Omitted categories are implicitly added with `{\tt n}' prefix.
 Specified categories with omitted prefix implicitly use `{\tt +}' prefix.
@@ -4913,7 +4935,8 @@ Sort the pack contents by type when displaying inventory (default on).
 Persistent.
 %.lp
 \item[\tb{sortvanquished}]
-Controls the sorting behavior for the output of the \#vanquished command.
+Controls the sorting behavior for the output of the {\tt \#vanquished} command
+and also for the {\tt \#genocided} command.
 Persistent.
 \\
 %.lp ""
@@ -4949,7 +4972,8 @@ order by count, low to high; ties broken by internal index.
 \\
 %.PE
 Can be interactively set via the `{\tt m O}' command or via using
-the `{\tt m}' prefix before the \#vanquished command.
+the `{\tt m}' prefix before either the {\tt \#vanquished} command
+or the {\tt #genocided} command.
 %.lp
 \item[\ib{sounds}]
 Allow sounds to be emitted from an integrated sound library (default on).

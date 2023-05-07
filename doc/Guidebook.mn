@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "April 19, 2023
+.ds f2 "May 6, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -1309,8 +1309,8 @@ The \(oqm\(cq prefix brings up a menu of available sorting orders, and
 doing that for either #genocided or #vanquished changes the order for both.
 .lp ""
 If the sorting order is \(lqcount high to low\(rq or \(lqcount low to high\(rq
-(which are applicable for #vanquished), that will be ignored for #genocided
-and alphabetical will be used instead.
+(which are applicable for #vanquished), that will be ignored
+for #genocided and alphabetical will be used instead.
 The menu omits those two choices when used for #genocide.
 .lp ""
 Autocompletes.
