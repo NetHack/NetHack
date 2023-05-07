@@ -1560,8 +1560,8 @@ H2Opotion_dip(
         res = TRUE;
     }
     return res;
-#undef COST_alter)
-#undef COST_none)
+#undef COST_alter
+#undef COST_none
 }
 
 /* used when blessed or cursed scroll of light interacts with artifact light;
