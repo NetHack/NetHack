@@ -5027,12 +5027,15 @@ mhitm_knockback(
             dismount_steed(DISMOUNT_KNOCKED);
         } else {
             hurtle(dx, dy, knockdistance, FALSE);
+            *hitflags |= M_ATTK_HIT;
         }
         set_apparxy(magr); /* update magr's idea of where you are */
         if (!Stunned && !rn2(4))
             make_stunned((long) (knockdistance + 1), TRUE); /* 2 or 3 */
     } else {
         mhurtle(mdef, dx, dy, knockdistance);
+        if (!u_agr)
+            *hitflags |= M_ATTK_HIT;
         if (DEADMONSTER(mdef)) {
             if (!was_u)
                 *hitflags |= M_ATTK_DEF_DIED;
