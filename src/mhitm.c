@@ -559,6 +559,9 @@ mattackm(register struct monst *magr, register struct monst *mdef)
         /* return if aggressor can no longer attack */
         if (helpless(magr))
             return res[i];
+        /* eg. defender was knocked into a level teleport trap */
+        if (mon_offmap(mdef))
+            return res[i];
         if (res[i] & M_ATTK_HIT)
             struck = 1; /* at least one hit */
     } /* for (;i < NATTK;) loop */

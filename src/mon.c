@@ -989,7 +989,7 @@ movemon_singlemon(struct monst *mtmp)
         return FALSE;
 
     /* monster isn't on this map anymore */
-    if ((mtmp->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO|MON_OFFMAP)) != 0)
+    if (mon_offmap(mtmp))
         return FALSE;
 
     /* Find a monster that we have not treated yet. */
