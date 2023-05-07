@@ -917,8 +917,9 @@ pet_ranged_attk(struct monst *mtmp)
                  * if it's blind or unseeing, it can't retaliate
                  */
                 if (mtarg->mcansee && haseyes(mtarg->data)) {
-                    mstatus = mattackm(mtarg, mtmp);
-                    if (mstatus & M_ATTK_DEF_DIED)
+                    int mresp = mattackm(mtarg, mtmp);
+
+                    if (mresp & M_ATTK_DEF_DIED)
                         return MMOVE_DIED;
                 }
             }
