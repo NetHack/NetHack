@@ -1574,6 +1574,7 @@ the fuzzer could get stuck in a loop if hero died in a way where life-saving
 	just resulted in a repeat death (cited case was burning up in lava,
 	where life-saving teleports you out of it; if the level is full, the
 	teleport will fail and you'll immediately burn up again)
+fix unicorn horn's ability to repair blindness
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

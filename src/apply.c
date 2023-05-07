@@ -662,6 +662,8 @@ magic_whistled(struct obj *obj)
     return;
 }
 
+#undef HowMany
+
 boolean
 um_dist(coordxy x, coordxy y, xint16 n)
 {
@@ -884,6 +886,8 @@ mleashed_next2u(struct monst *mtmp)
     }
     return FALSE;
 }
+
+#undef MAXLEASHED
 
 boolean
 next_to_u(void)
@@ -1163,6 +1167,7 @@ use_mirror(struct obj *obj)
             pline("%s ignores %s reflection.", Monnam(mtmp), mhis(mtmp));
     }
     return ECMD_TIME;
+#undef SEENMON
 }
 
 static void
@@ -2163,8 +2168,9 @@ use_tinning_kit(struct obj *obj)
             useup(corpse);
         } else {
             if (costly_spot(corpse->ox, corpse->oy) && !corpse->no_charge) {
-                struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(corpse->ox,
-                                                 corpse->oy, SHOPBASE));
+                struct monst *shkp VOICEONLY
+                   = shop_keeper(*in_rooms(corpse->ox, corpse->oy, SHOPBASE));
+
                 SetVoice(shkp, 0, 80, 0);
                 verbalize(you_buy_it);
             }
@@ -2224,9 +2230,6 @@ use_unicorn_horn(struct obj **optr)
         return;
     }
 
-/*
- * Entries in the trouble list use a very simple encoding scheme.
- */
 #define prop_trouble(X) trouble_list[trouble_count++] = (X)
 #define TimedTrouble(P) (((P) && !((P) & ~TIMEOUT)) ? ((P) & TIMEOUT) : 0L)
 
@@ -2235,7 +2238,7 @@ use_unicorn_horn(struct obj **optr)
     /* collect property troubles */
     if (TimedTrouble(Sick))
         prop_trouble(SICK);
-    if (TimedTrouble(Blinded) > (long) u.ucreamed && !PermaBlind
+    if (TimedTrouble(HBlinded) > (long) u.ucreamed
         && !(u.uswallow
              && attacktype_fordmg(u.ustuck->data, AT_ENGL, AD_BLND)))
         prop_trouble(BLINDED);
@@ -3416,6 +3419,8 @@ use_pole(struct obj *obj, boolean autohit)
     return ECMD_TIME;
 }
 
+#undef glyph_is_poleable
+
 static int
 use_cream_pie(struct obj *obj)
 {
@@ -3693,12 +3698,11 @@ use_grapple(struct obj *obj)
     return ECMD_TIME;
 }
 
-#define BY_OBJECT ((struct monst *) 0)
-
 /* return 1 if the wand is broken, hence some time elapsed */
 static int
 do_break_wand(struct obj *obj)
 {
+#define BY_OBJECT ((struct monst *) 0)
     static const char nothing_else_happens[] = "But nothing else happens...";
     register int i;
     coordxy x, y;
@@ -3930,6 +3934,7 @@ do_break_wand(struct obj *obj)
         delobj(obj);
     nomul(0);
     return ECMD_TIME;
+#undef BY_OBJECT
 }
 
 /* getobj callback for object to apply - this is more complex than most other
