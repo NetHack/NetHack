@@ -281,7 +281,7 @@ make_blinded(long xtime, boolean talk)
     } else if (old && !xtime) {
         /* clearing temporary blindness without toggling blindness */
         if (talk) {
-            if (!haseyes(gy.youmonst.data)) {
+            if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
                 eyes = body_part(EYE);
@@ -307,7 +307,7 @@ make_blinded(long xtime, boolean talk)
     } else if (!old && xtime) {
         /* setting temporary blindness without toggling blindness */
         if (talk) {
-            if (!haseyes(gy.youmonst.data)) {
+            if (!haseyes(gy.youmonst.data) || PermaBlind) {
                 strange_feeling((struct obj *) 0, (char *) 0);
             } else if (Blindfolded) {
                 eyes = body_part(EYE);
@@ -1560,6 +1560,8 @@ H2Opotion_dip(
         res = TRUE;
     }
     return res;
+#undef COST_alter)
+#undef COST_none)
 }
 
 /* used when blessed or cursed scroll of light interacts with artifact light;

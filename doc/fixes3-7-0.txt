@@ -1178,6 +1178,8 @@ hangup in wizard or explore mode would result in answering ESC to "Die?"
 	resulted in repeat death then the program might get stuck in a loop
 	instead of exiting [no reports of such, but if it ever happened the
 	process was probably killed without anyone knowing why it happened]
+with OPTIONS=blind (blind from birth), being inflicted with timed blinding
+	yielded "your vision seems to dim for a moment but is normal now"
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
