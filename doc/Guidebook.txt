@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
           (Edited and expanded for NetHack 3.7.0 by Mike Stephenson and others)
 
-                                    May 07, 2023
+                                     May 7, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -720,7 +720,7 @@
                there).
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1446,7 +1446,7 @@
                Show a menu of possible actions  directed  at  your  current
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1578,7 +1578,7 @@
                that level.  This will also force all visited levels  to  be
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1710,7 +1710,7 @@
                Prefix key to rush towards a direction.  Default is `g' when
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1776,7 +1776,7 @@
                objects and monsters temporarily removed, making it possible
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -1974,7 +1974,7 @@
                Show monster birth, death, genocide, and extinct statistics.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2304,7 +2304,7 @@
           always below the current level.  Usually that will  be  the  next
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2370,7 +2370,7 @@
           previously visited level, it will be loaded from its file on disk
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2436,7 +2436,7 @@
           ventory-like display of any unpaid items which have been used up,
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2502,7 +2502,7 @@
           fountain or an altar  or  various  other  things  doesn't  elicit
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2568,7 +2568,7 @@
           Beware!  You may suddenly come upon one in a  dark  place.   Some
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2634,7 +2634,7 @@
           Initially, your pet may even be better  at  killing  things  than
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2700,7 +2700,7 @@
           sense--perhaps it is invisible and has just  tapped  you  on  the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2766,7 +2766,7 @@
           the "#name" command, for the same purpose at any  time,  to  name
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2832,7 +2832,7 @@
           (killing them first).  Without a weapon,  you  do  only  1-2  hit
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2898,7 +2898,7 @@
           "#enhance" (see below).
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -2964,7 +2964,7 @@
           spot.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3030,7 +3030,7 @@
           ondary is just an item in your inventory that's  been  designated
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3096,7 +3096,7 @@
           eventually  negative)  but  can also be enchanted.  Shirts are an
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3228,7 +3228,7 @@
           mana points from an otherwise spent wand, destroying  it  in  the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3294,7 +3294,7 @@
           you can end up wasting both the energy and the time  required  in
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3360,7 +3360,7 @@
           challenge which is very difficult to accomplish).
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3426,7 +3426,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3558,7 +3558,7 @@
           brains while polymorphed into a mind flayer, is considered eating
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3624,7 +3624,7 @@
           can't be bypassed,  such  as  being  unable  to  push  a  boulder
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3690,7 +3690,7 @@
           Soko-Prize - Explored to the top of Sokoban
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3756,7 +3756,7 @@
           NETHACKOPTIONS or  run-time  configuration  file  prior  to  game
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3888,7 +3888,7 @@
             extended  command.   Prefix the command with "!" to disable the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4020,7 +4020,7 @@
           initial values for the various options.  Some can only be  turned
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4086,7 +4086,7 @@
             lowed.   See  role  for a description of how to use negation to
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4152,7 +4152,7 @@
                         key or you decline to use the key; has no effect on
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4218,7 +4218,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4350,7 +4350,7 @@
             exclude choices.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4416,7 +4416,7 @@
             Ignore  interrupt  signals,  including  breaks  (default  off).
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4482,7 +4482,7 @@
             the  selected  object  class(es).   Combination  starts  with a
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4548,7 +4548,7 @@
             Key to select all items on this page of a menu.  Default `,'.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4614,7 +4614,7 @@
             Read the NetHack news file, if present (default on).  Since the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4680,7 +4680,7 @@
             attack      - require   "yes"   rather   than  `y'  to  confirm
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4746,7 +4746,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4812,7 +4812,7 @@
             entirely.  Requesting it  when  not  allowed  or  not  possible
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4878,7 +4878,7 @@
             This option may be used to select one of the named symbol  sets
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5010,7 +5010,7 @@
             c - order by monster class, by low to high  level  within  each
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5142,7 +5142,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5208,7 +5208,7 @@
           is supported by the window port that you are currently  using  by
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5274,7 +5274,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5340,7 +5340,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5406,7 +5406,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5472,7 +5472,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5736,7 +5736,7 @@
             When asked for a location,  the  key  to  toggle  autodescribe.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5868,7 +5868,7 @@
           type    - how the message should be shown;
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6066,7 +6066,7 @@
           already set up will replace the  earlier  attribute  rather  than
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6132,7 +6132,7 @@
                  straightforward;  they're  based  on   the   corresponding
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6264,7 +6264,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6462,7 +6462,7 @@
             pict.   So S_rock is only used for boulders and not used at all
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6528,7 +6528,7 @@
           ten useful in giving  players  a  better  sense  of  the  overall
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6660,7 +6660,7 @@
             option.  When disabled, incubi and succubi behave like nymphs.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6726,7 +6726,7 @@
             accompanying  the  program  contains  a comment which lists the
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6858,7 +6858,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -6990,7 +6990,7 @@
           made these "variants" publicly available:
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -7056,7 +7056,7 @@
           Hugo,  Ken Lorber, Dean Luick, Pat Rankin, Mike Stephenson, Janet
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -7122,7 +7122,7 @@
           website  to  that  effect,  stating  that  there would never be a
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -7188,7 +7188,7 @@
           3.6.2.
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -7254,7 +7254,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
@@ -7320,7 +7320,7 @@
 
 
 
-          NetHack 3.7.0                                        May 07, 2023
+          NetHack 3.7.0                                         May 7, 2023
 
 
 
