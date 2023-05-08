@@ -1860,12 +1860,16 @@ poly_obj(struct obj *obj, int id)
             }
         } /* old_wornmask */
     } else if (obj_location == OBJ_FLOOR) {
-        if (obj->otyp == BOULDER && otmp->otyp != BOULDER
-            && !does_block(ox, oy, &levl[ox][oy]))
-            unblock_point(ox, oy);
-        else if (obj->otyp != BOULDER && otmp->otyp == BOULDER)
-            /* (checking does_block() here would be redundant) */
-            block_point(ox, oy);
+        if (obj->otyp == BOULDER && otmp->otyp != BOULDER) {
+            if (!does_block(ox, oy, &levl[ox][oy]))
+                unblock_point(ox, oy);
+        } else if (obj->otyp != BOULDER && otmp->otyp == BOULDER) {
+            /* leaving boulder in liquid would trigger sanity_check warning */
+            if (is_pool_or_lava(ox, oy))
+                fracture_rock(otmp);
+            if (does_block(ox, oy, &levl[ox][oy]))
+                block_point(ox, oy);
+        }
     }
 
     /* note: if otmp is gone, billing for it was handled by useup() */
