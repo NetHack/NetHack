@@ -301,7 +301,11 @@ erode_obj(
         if (otmp->owornmask) {
             /* unwear otmp before deleting it */
             if (carried(otmp)) {
-                /* otmp remains in hero's invent */
+                /* otmp remains in hero's invent; if we get here because
+                   it is being burned up by lava, we don't need to worry
+                   about unwearing levitation boots and having that
+                   trigger float_down to then fall in again; if such
+                   were being worn, they wouldn't be in the lava now */
                 remove_worn_item(otmp, TRUE); /* calls Cloak_off(),&c */
             } else if (mcarried(otmp)) {
                 /* results in otmp->where==OBJ_FREE; delobj() doesn't care */
@@ -6113,8 +6117,9 @@ boolean
 lava_effects(void)
 {
     register struct obj *obj, *obj2;
-    int dmg = d(6, 6); /* only applicable for water walking */
+    int lifesave_limit;
     boolean usurvive, boil_away;
+    int dmg = d(6, 6); /* only applicable for water walking */
 
     if (iflags.in_lava_effects) {
         debugpline0("Skipping recursive lava_effects().");
@@ -6200,7 +6205,8 @@ lava_effects(void)
         boil_away = (u.umonnum == PM_WATER_ELEMENTAL
                      || u.umonnum == PM_STEAM_VORTEX
                      || u.umonnum == PM_FOG_CLOUD);
-        for (;;) {
+        lifesave_limit = 20; /* prevent fuzz testing from getting stuck */
+        do {
             u.uhp = -1;
             /* killer format and name are reconstructed every iteration
                because lifesaving resets them */
@@ -6213,9 +6219,20 @@ lava_effects(void)
                 break; /* successful life-save */
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
-        }
+        } while (--lifesave_limit > 0);
 
         iflags.in_lava_effects--;
+
+        if (!lifesave_limit) { /* failed to be teleported to safety */
+            gd.done_seq = 0L; /* reset the life-saves per move limit */
+            /* when fuzz testing, couldn't be rescued but mustn't stay stuck
+               in the done(BURNING) loop; if not fuzz testing, player has
+               answered no to "Die?" over and over (ridiculously persistent
+               or maybe pasted a bunch of junk into the input buffer) */
+            goto burn_stuff; /* moveloop() will kill hero again next move;
+                              * fuzzer will eventually pick wizard mode level
+                              * teleport for hero's randomly chosen action */
+        }
 
         /*
          * 3.7: this used to be unconditional "back on solid <surface>"
