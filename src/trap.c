@@ -6117,8 +6117,8 @@ boolean
 lava_effects(void)
 {
     register struct obj *obj, *obj2;
-    int lifesave_limit;
     boolean usurvive, boil_away;
+    int burncount = 0, burnmesgcount = 0;
     int dmg = d(6, 6); /* only applicable for water walking */
 
     if (iflags.in_lava_effects) {
@@ -6153,14 +6153,18 @@ lava_effects(void)
     /* Check whether we should burn away boots *first* so we know whether to
      * make the player sink into the lava. Assumption: water walking only
      * comes from boots.
+     * (3.7: that assumption is no longer true, but having boots be the first
+     * thing to come into contact with lava makes sense.)
      */
     if (uarmf && is_organic(uarmf) && !uarmf->oerodeproof) {
         obj = uarmf;
         pline("%s into flame!", Yobjnam2(obj, "burst"));
+        ++burnmesgcount;
         iflags.in_lava_effects++; /* (see above) */
         (void) Boots_off();
         useup(obj);
         iflags.in_lava_effects--;
+        ++burncount;
     }
 
     if (!Fire_resistance) {
@@ -6193,20 +6197,31 @@ lava_effects(void)
                           The(xname(obj)), hcolor("dark red"));
             } else if (obj->in_use) {
                 if (obj->owornmask) {
-                    if (usurvive)
+                    if (usurvive) {
                         pline("%s into flame!", Yobjnam2(obj, "burst"));
+                        ++burnmesgcount;
+                    }
                     remove_worn_item(obj, TRUE);
                 }
                 useupall(obj);
+                ++burncount;
             }
         }
+        if (usurvive && burncount > burnmesgcount)
+            pline("%s item%s in your inventory %s been destroyed.",
+                  (burnmesgcount > 0)
+                    ? ((burncount - burnmesgcount == 1) ? "Another" : "Other")
+                    : ((burncount == 1) ? "An" : "Some"),
+                  plur(burncount - burnmesgcount),
+                  (burncount - burnmesgcount == 1) ? "has" : "have");
 
         /* s/he died... */
         boil_away = (u.umonnum == PM_WATER_ELEMENTAL
                      || u.umonnum == PM_STEAM_VORTEX
                      || u.umonnum == PM_FOG_CLOUD);
-        lifesave_limit = 20; /* prevent fuzz testing from getting stuck */
-        do {
+        /* burn to death; if hero is life-saved on the first pass, try
+           to teleport to safety; if that fails, burn all over again */
+        for (burncount = 0; burncount < 2; ++burncount) {
             u.uhp = -1;
             /* killer format and name are reconstructed every iteration
                because lifesaving resets them */
@@ -6215,23 +6230,30 @@ lava_effects(void)
             urgent_pline("You %s...", boil_away ? "boil away"
                                                 : "burn to a crisp");
             done(BURNING);
-            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
+            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT)
+                /* if the level is completely full then this second attempt
+                   won't accomplish anything, but if it is only mostly full
+                   then hero still might manage to escape the lava */
+                || safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");
-        } while (--lifesave_limit > 0);
+        }
 
         iflags.in_lava_effects--;
 
-        if (!lifesave_limit) { /* failed to be teleported to safety */
-            gd.done_seq = 0L; /* reset the life-saves per move limit */
-            /* when fuzz testing, couldn't be rescued but mustn't stay stuck
-               in the done(BURNING) loop; if not fuzz testing, player has
-               answered no to "Die?" over and over (ridiculously persistent
-               or maybe pasted a bunch of junk into the input buffer) */
-            goto burn_stuff; /* moveloop() will kill hero again next move;
-                              * fuzzer will eventually pick wizard mode level
-                              * teleport for hero's randomly chosen action */
+        if (burncount == 2) {
+            /* life-saved twice (second time must have been due to declining
+               to die in wizard|explore mode) and failed to be teleported
+               to safety both times; moveloop() will just drop the hero into
+               the lava again on next move so take countermeasures to give
+               the player--or the debug fuzzer--a chance to try something
+               else instead of just immediately burning up all over again */
+            if (!Fire_resistance)
+                set_itimeout(&HFire_resistance, 5L);
+            if (!Wwalking)
+                set_itimeout(&HWwalking, 5L);
+            goto burn_stuff;
         }
 
         /*

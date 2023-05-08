@@ -55,13 +55,17 @@ static const struct propname {
     /* timed pass-walls is a potential prayer result if surrounded by stone
        with nowhere to be safely teleported to */
     { PASSES_WALLS, "pass thru walls" },
+    /* timed fire resistance and water walking are possible in explore mode
+       (as well as in wizard mode) after life-saving in lava if it fails to
+       teleport the hero to safety and player declines to die */
+    { WWALKING, "water walking" },
+    { FIRE_RES, "fire resistance" },
     /*
      * Properties beyond here don't have timed values during normal play,
      * so there's not much point in trying to order them sensibly.
      * They're either on or off based on equipment, role, actions, &c,
-     * but in wizard mode #wizintrinsic can give then as timed effects.
+     * but in wizard mode, #wizintrinsic can give them as timed effects.
      */
-    { FIRE_RES, "fire resistance" },
     { COLD_RES, "cold resistance" },
     { SLEEP_RES, "sleep resistance" },
     { DISINT_RES, "disintegration resistance" },
@@ -86,7 +90,6 @@ static const struct propname {
     { JUMPING, "jumping" },
     { TELEPORT_CONTROL, "teleport control" },
     { FLYING, "flying" },
-    { WWALKING, "water walking" },
     { SWIMMING, "swimming" },
     { MAGICAL_BREATHING, "magical breathing" },
     { SLOW_DIGESTION, "slow digestion" },
@@ -771,6 +774,19 @@ nh_timeout(void)
                     wielding_corpse(uswapwep, (struct obj *) 0, FALSE);
                 }
                 break;
+            case FIRE_RES:
+                /* timed fire resistance and timed water walking combine
+                   as a way to survive lava after multiple life-saving
+                   attempts fail to relocate hero; skip timeout message
+                   if hero has acquired fire resistance in the meantime */
+                if (!Fire_resistance)
+                    Your("temporary ability to survive burning has ended.");
+                break;
+            case WWALKING:
+                /* [see fire reeistance] */
+                if (!Wwalking)
+                    Your("temporary ability to walk on liquid has ended.");
+                break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
                     toggle_displacement((struct obj *) 0, 0L, FALSE);
@@ -778,12 +794,13 @@ nh_timeout(void)
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {
+                    struct permonst *wptr = gc.context.warntype.species;
+
+                    gc.context.warntype.species = (struct permonst *) 0;
                     gc.context.warntype.speciesidx = NON_PM;
-                    if (gc.context.warntype.species) {
+                    if (wptr)
                         You("are no longer warned about %s.",
-                     makeplural(gc.context.warntype.species->pmnames[NEUTRAL]));
-                        gc.context.warntype.species = (struct permonst *) 0;
-                    }
+                            makeplural(wptr->pmnames[NEUTRAL]));
                 }
                 break;
             case PASSES_WALLS:
@@ -1921,7 +1938,7 @@ wiz_timeout_queue(void)
             if ((ln = (int) strlen(propname)) > longestlen)
                 longestlen = ln;
         }
-        if (specindx == 0 && p == FIRE_RES)
+        if (specindx == 0 && p == COLD_RES) /* was FIRE_RES but has changed */
             specindx = i;
     }
     putstr(win, 0, "");

@@ -249,8 +249,9 @@
      && !BFlying)
 /* May touch surface; does not override any others */
 
+#define HWwalking u.uprops[WWALKING].intrinsic /* see lava_effects() */
 #define EWwalking u.uprops[WWALKING].extrinsic
-#define Wwalking (EWwalking && !Is_waterlevel(&u.uz))
+#define Wwalking ((HWwalking || EWwalking) && !Is_waterlevel(&u.uz))
 /* Don't get wet, can't go under water; overrides others except levitation */
 /* Wwalking is meaningless on water level */
 
