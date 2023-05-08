@@ -3660,6 +3660,36 @@ fn_cmap_to_glyph(int cmap)
     return cmap_to_glyph(cmap);
 }
 
+int
+glyph_to_cmap(int glyph)
+{
+    if (glyph == GLYPH_CMAP_STONE_OFF)
+        return S_stone;
+    if (glyph_is_cmap_main(glyph))
+        return (glyph - GLYPH_CMAP_MAIN_OFF) + S_vwall;
+    if (glyph_is_cmap_mines(glyph))
+        return (glyph - GLYPH_CMAP_MINES_OFF) + S_vwall;
+    if (glyph_is_cmap_gehennom(glyph))
+        return (glyph - GLYPH_CMAP_GEH_OFF) + S_vwall;
+    if (glyph_is_cmap_knox(glyph))
+        return (glyph - GLYPH_CMAP_KNOX_OFF) + S_vwall;
+    if (glyph_is_cmap_sokoban(glyph))
+        return (glyph - GLYPH_CMAP_SOKO_OFF) + S_vwall;
+    if (glyph_is_cmap_a(glyph))
+        return (glyph - GLYPH_CMAP_A_OFF) + S_ndoor;
+    if (glyph_is_cmap_altar(glyph))
+        return S_altar;
+    if (glyph_is_cmap_b(glyph))
+        return (glyph - GLYPH_CMAP_B_OFF) + S_grave;
+    if (glyph_is_cmap_c(glyph))
+        return (glyph - GLYPH_CMAP_C_OFF) + S_digbeam;
+    if (glyph_is_cmap_zap(glyph))
+        return ((glyph - GLYPH_ZAP_OFF) % 4) + S_vbeam;
+    /* final MAXPCHARS is legal array index because of trailing fencepost
+     * entry */
+    return MAXPCHARS;
+}
+
 /* for 'onefile' processing where end of this file isn't necessarily the
    end of the source code seen by the compiler (there are lots of other
    macros defined above...) */

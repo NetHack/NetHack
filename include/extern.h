@@ -454,6 +454,7 @@ extern int warning_of(struct monst *);
 extern void map_glyphinfo(coordxy, coordxy, int, unsigned, glyph_info *);
 extern void reset_glyphmap(enum glyphmap_change_triggers trigger);
 extern int fn_cmap_to_glyph(int);
+extern int glyph_to_cmap(int);
 
 /* ### do.c ### */
 
