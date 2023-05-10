@@ -1,4 +1,4 @@
-/* NetHack 3.6	winprocs.h	$NHDT-Date: 1567213890 2019/08/31 01:11:30 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.50 $ */
+/* NetHack 3.6	winprocs.h	$NHDT-Date: 1683746775 2023/05/10 19:26:15 $  $NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.53 $ */
 /* Copyright (c) David Cohrs, 1992				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -6,6 +6,9 @@
 #define WINPROCS_H
 
 #include "botl.h"
+#ifndef CLR_MAX
+#include "color.h"
+#endif
 
 /* NB: this MUST match chain_procs below */
 struct window_procs {

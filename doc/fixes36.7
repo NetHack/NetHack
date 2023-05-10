@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.4 $ $NHDT-Date: 1587039894 2020/04/16 12:24:54 $
+$NHDT-Branch: NetHack-3.6 $:$NHDT-Revision: 1.21 $ $NHDT-Date: 1683746783 2023/05/10 19:26:23 $
 
 fixes36.7 contains a summary of changes made to 3.6.6 in order to
 produce 3.6.7 as well as any post-release fixes in binaries.
@@ -40,9 +40,9 @@ none
 
 Fixes to 3.6.7 Post-release Problems and other Post-release changes
 -------------------------------------------------------------------
-extend the fix for build failure with newer c library headers to macOS (pr #988)
+extend the fix for build failure w/ newer C library headers to macOS (pr #988)
 Windows: fix range error detected by address sanitizer in plselInitDialog()
 hilite_pile can remain on the map after eating food off the floor
-
-
+vms: update winprocs.h to ensure that CLR_MAX is defined; necessary for
+	compiling vmsmail.c which uses winprocs.h but not hack.h
 
