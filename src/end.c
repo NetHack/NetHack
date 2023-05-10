@@ -1158,11 +1158,10 @@ fuzzer_savelife(int how)
          * the few ways where life-saving isn't effective (cited case
          * was burning in lava when the level was too full to allow
          * teleporting to safety).  Skip the life-save attempt if we've
-         * died on the same move more than 20 times; give up instead.
-         * (Note: theoretically we could get killed more than that in
-         * one move if there are multiple fast monsters with multiple
-         * attacks against a wimply hero, or a ton of ranged attacks.) */
-        && (gd.done_seq++ < gh.hero_seq + 20L)) {
+         * died on the same move more than 100 times; give up instead.
+         * [Note: 100 deaths on the same move may seem excessive but it
+         * has been demonstrated that a limit of 20 was not enough.] */
+        && (gd.done_seq++ < gh.hero_seq + 100L)) {
         savelife(how);
 
         /* periodically restore characteristics plus lost experience
