@@ -3467,6 +3467,8 @@ mhitm_ad_poly(
                 pline("%s is not transformed.", Monnam(mdef));
             } else {
                 mhm->damage = mon_poly(&gy.youmonst, mdef, mhm->damage);
+                if (DEADMONSTER(mdef))
+                    mhm->hitflags |= M_ATTK_DEF_DIED;
                 mhm->hitflags |= M_ATTK_HIT;
                 mhm->done = TRUE;
             }
@@ -3488,6 +3490,8 @@ mhitm_ad_poly(
         /* mhitm */
         if (mhm->damage < mdef->mhp && !negated) {
             mhm->damage = mon_poly(magr, mdef, mhm->damage);
+            if (DEADMONSTER(mdef))
+                mhm->hitflags |= M_ATTK_DEF_DIED;
             mhm->hitflags |= M_ATTK_HIT;
             mhm->done = TRUE;
         }
