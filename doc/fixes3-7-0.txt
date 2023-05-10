@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1153 $ $NHDT-Date: 1681429662 2023/04/13 23:47:42 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1177 $ $NHDT-Date: 1683710637 2023/05/10 09:23:57 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2106,6 +2106,7 @@ add conduct for petless
 preceding #overview with the 'm' prefix brings up the overview display as a
 	menu allowing selection of any visited level to #annotate; it also
 	shows every level visited rather than just the "interesting" ones
+include monster size in feedback for wand of probing and stethoscope
 
 
 Platform- and/or Interface-Specific New Features

@@ -1,4 +1,4 @@
-/* NetHack 3.7	insight.c	$NHDT-Date: 1683116397 2023/05/03 12:19:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.94 $ */
+/* NetHack 3.7	insight.c	$NHDT-Date: 1683710630 2023/05/10 09:23:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,6 +34,7 @@ static void show_achievements(int);
 static int QSORTCALLBACK vanqsort_cmp(const genericptr, const genericptr);
 static int num_extinct(void);
 static int num_gone(int, int *);
+static char *size_str(int);
 
 extern const char *const hu_stat[];  /* hunger status from eat.c */
 extern const char *const enc_stat[]; /* encumbrance status from botl.c */
@@ -3061,6 +3062,37 @@ align_str(aligntyp alignment)
     return "unknown";
 }
 
+static char *
+size_str(int msize)
+{
+    static char outbuf[40];
+
+    switch (msize) {
+    case MZ_TINY:
+        Strcpy(outbuf, "tiny");
+        break;
+    case MZ_SMALL:
+        Strcpy(outbuf, "small");
+        break;
+    case MZ_MEDIUM:
+        Strcpy(outbuf, "medium");
+        break;
+    case MZ_LARGE:
+        Strcpy(outbuf, "large");
+        break;
+    case MZ_HUGE:
+        Strcpy(outbuf, "huge");
+        break;
+    case MZ_GIGANTIC:
+        Strcpy(outbuf, "gigantic");
+        break;
+    default:
+        Sprintf(outbuf, "unknown size (%d)", msize);
+        break;
+    }
+    return outbuf;
+}
+
 /* used for self-probing */
 char *
 piousness(boolean showneg, const char *suffix)
@@ -3220,9 +3252,9 @@ mstatusline(struct monst *mtmp)
     Strcpy(monnambuf, x_monnam(mtmp, ARTICLE_THE, (char *) 0,
                                (SUPPRESS_IT | SUPPRESS_INVISIBLE), FALSE));
 
-    pline("Status of %s (%s):  Level %d  HP %d(%d)  AC %d%s.", monnambuf,
-          align_str(alignment), mtmp->m_lev, mtmp->mhp, mtmp->mhpmax,
-          find_mac(mtmp), info);
+    pline("Status of %s (%s, %s):  Level %d  HP %d(%d)  AC %d%s.",
+          monnambuf, align_str(alignment), size_str(mtmp->data->msize),
+          mtmp->m_lev, mtmp->mhp, mtmp->mhpmax, find_mac(mtmp), info);
 }
 
 /* stethoscope or probing applied to hero -- one-line feedback */
