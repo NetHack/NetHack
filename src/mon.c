@@ -817,7 +817,7 @@ minliquid_core(struct monst* mtmp)
             if (!DEADMONSTER(mtmp)) {
                 (void) fire_damage_chain(mtmp->minvent, FALSE, FALSE,
                                          mtmp->mx, mtmp->my);
-                (void) rloc(mtmp, RLOC_ERR|RLOC_NOMSG);
+                (void) rloc(mtmp, RLOC_MSG);
                 return 0;
             }
             return 1;
