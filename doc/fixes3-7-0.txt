@@ -1182,6 +1182,7 @@ with OPTIONS=blind (blind from birth), being inflicted with timed blinding
 	yielded "your vision seems to dim for a moment but is normal now"
 avoid sanity_check warning if statue in water or lava gets polymorphed into a
 	boulder; break it into a stack of rocks if that would happen
+werewolf or werejackal howling wakes up monsters
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
