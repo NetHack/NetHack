@@ -253,6 +253,8 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
  deletedwithboulder:
         if ((t = t_at(x, y)) != 0)
             deltrap(t);
+        if (u.utrap && u_at(x, y))
+            reset_utrap(FALSE);
         useupf(obj, 1L);
         bury_objs(x, y);
         newsym(x, y);
