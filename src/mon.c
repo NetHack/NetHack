@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1681429657 2023/04/13 23:47:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.495 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1683831104 2023/05/11 18:51:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.501 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -67,6 +67,7 @@ sanity_check_single_mon(
            but this would be too extreme to keep going */
         panic("illegal mon data %s; mnum=%d (%s)",
               fmt_ptr((genericptr_t) mptr), mtmp->mnum, msg);
+        /*NOTREACHED*/
     } else {
         int mndx = monsndx(mptr);
 
@@ -174,10 +175,15 @@ sanity_check_single_mon(
                              : (M_AP_TYPE(mtmp) == M_AP_OBJECT) ? "an object"
                                : "something strange";
 
-        if (Protection_from_shape_changers)
+        if (!strcmp(msg, "migr")) {
+            if (M_AP_TYPE(mtmp) != M_AP_MONSTER)
+                impossible("migrating %s mimicking %s %s",
+                           is_mimic ? "mimic" : "monster", what, msg);
+        } else if (Protection_from_shape_changers) {
             impossible(
                 "mimic%s concealed as %s despite Prot-from-shape-changers %s",
                        is_mimic ? "" : "ker", what, msg);
+        }
         /* the Wizard's clone after "double trouble" starts out mimicking
            some other monster; pet's quickmimic effect can temporarily take
            on furniture, object, or monster shape, but only until the pet
@@ -229,6 +235,12 @@ mon_sanity_check(void)
                        fmt_ptr((genericptr_t) mtmp), x, y);
         } else if (mtmp->wormno) {
             sanity_check_worm(mtmp);
+
+        /* TODO: figure out which other bits shouldn't be set for 'fmon' */
+        } else if ((mtmp->mstate & (MON_DETACH | MON_MIGRATING | MON_LIMBO))
+                   != 0) {
+            impossible("floor mon (%s) with mstate set to 0x%08lx",
+                       fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
         }
     }
 
@@ -253,6 +265,13 @@ mon_sanity_check(void)
 
     for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
+
+        /* TODO: figure out which other bits could or shouldn't be set
+         * when migrating */
+        if ((mtmp->mstate & (MON_DETACH)) != 0
+            || (mtmp->mstate & (MON_MIGRATING | MON_LIMBO)) == 0)
+            impossible("migrating mon (%s) with mstate set to 0x%08lx",
+                       fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
     }
 
     wormno_sanity_check(); /* test for bogus worm tail */
@@ -708,6 +727,8 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
         newsym(obj->ox, obj->oy);
     return obj;
 }
+
+#undef KEEPTRAITS
 
 /* check mtmp and water/lava for compatibility, 0 (survived), 1 (died) */
 int
@@ -1387,6 +1408,8 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
     }
     return (count > 0 || ecount > 0) ? 1 : 0;
 }
+
+#undef mstoning
 
 /* Monster eats a corpse off the ground.
  * Return value is 0 = nothing eaten, 1 = ate a corpse, 2 = died */
@@ -2778,6 +2801,8 @@ mondead(struct monst *mtmp)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
+#undef livelog_mon_nam
+
 /* TRUE if corpse might be dropped, magr may die if mon was swallowed */
 boolean
 corpse_chance(
@@ -3215,7 +3240,7 @@ xkilled(
     }
 
     if (wasinside) {
-        /* spoteffects() can end up clearing the level of monsters; grab a copy */
+        /* spoteffects() can end up clearing level of monsters; grab a copy */
         museum = *mtmp;
         museum.nmon = 0;
         museum.minvent = 0;
@@ -3300,6 +3325,8 @@ xkilled(
     adjalign(mtmp->malign);
     return;
 }
+
+#undef LEVEL_SPECIFIC_NOCORPSE
 
 /* changes the monster into a stone monster of the same type
    this should only be called when poly_when_stoned() is true */
@@ -4928,6 +4955,8 @@ egg_type_from_parent(
     }
     return mnum;
 }
+
+#undef BREEDER_EGG
 
 /* decide whether an egg of the indicated monster type is viable;
    also used to determine whether an egg or tin can be created... */
