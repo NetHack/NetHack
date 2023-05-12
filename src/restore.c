@@ -573,6 +573,7 @@ restgamestate(
     if (nhfp->structlevel)
         Mread(nhfp->fd, &u, sizeof u);
     gy.youmonst.cham = u.mcham;
+    Mread(nhfp->fd, &(gy.youmonst.movement), 2);
 
     if (nhfp->structlevel)
         Mread(nhfp->fd, timebuf, 14);

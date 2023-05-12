@@ -290,6 +290,7 @@ savegamestate(NHFILE *nhfp)
                                       urealtime.start_timing);
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) &u, sizeof u);
+        bwrite(nhfp->fd, (genericptr_t) &(gy.youmonst.movement), 2);
         bwrite(nhfp->fd, yyyymmddhhmmss(ubirthday), 14);
         bwrite(nhfp->fd, (genericptr_t) &urealtime.realtime,
                sizeof urealtime.realtime);

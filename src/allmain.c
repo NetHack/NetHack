@@ -68,6 +68,7 @@ moveloop_preamble(boolean resuming)
            clairvoyance (wizard with cornuthaum perhaps?); without this,
            first "random" occurrence would always kick in on turn 1 */
         gc.context.seer_turn = (long) rnd(30);
+        gy.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     }
     gc.context.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
@@ -83,7 +84,6 @@ moveloop_preamble(boolean resuming)
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    gy.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     gc.context.move = 0;
 
     gp.program_state.in_moveloop = 1;
