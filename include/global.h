@@ -199,7 +199,6 @@ typedef uchar nhsym;
 #define PORT_ID "Mac"
 #endif
 #ifdef __APPLE__
-#undef SVR4   /* avoid a conflict in X11 header file */
 #define PORT_ID "MacOS"
 #endif
 #ifdef MSDOS
