@@ -4212,6 +4212,7 @@ mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
             SetVoice(magr, 0, 80, 0);
             verbalize("Burrrrp!");
         }
+        wake_nearto(magr->mx, magr->my, 2 * 2); /* Burrrrp! */
         mhm->damage = mdef->mhp;
         /* Use up amulet of life saving */
         if ((obj = mlifesaver(mdef)) != 0)
