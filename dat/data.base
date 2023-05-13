@@ -1,5 +1,5 @@
 # NetHack 3.7	data.base
-# $NHDT-Date: 1608767189 2020/12/23 23:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
+# $NHDT-Date: 1684001509 2023/05/13 18:11:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -3333,12 +3333,19 @@ huge chunk of meat
 		[ Grace Before Meat, by Robert Burns ]
 # nethack's Medusa doesn't match the myth very closely, particularly in
 # how reflection is involved, but that's par for the course
+#
+# this used to begin "Medusa, one of the three Gorgons or Graeae" as
+# if Graeae and Gorgons where the same thing, but Bulfinch's Mythology
+# indicates that they are quite different; since the first paragraph is
+# a made-up introduction to an excerpt from that work, the contradictory
+# mention of Graeae has been removed
 medusa
 perseus
 shield of reflection
-	Medusa, one of the three Gorgons or Graeae, is the only one
-	of her sisters to have assumed mortal form and inhabited the
-	dungeon world.
+	Medusa, one of the three Gorgons, is the only one of her
+	sisters to have assumed mortal form and inhabited the dungeon
+	world.
+		[]
 
 	When Perseus was grown up Polydectes sent him to attempt the
 	conquest of Medusa, a terrible monster who had laid waste the
