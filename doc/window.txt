@@ -1027,11 +1027,11 @@ initoptions()			   /* read the resource file */
 init_nhwindows()		   /* initialize the window system */
 process_options(argc, argv)	   /* process command line options or equiv */
 if(save file is present) {
-  init_sound_and_display_gamewindows() /* init sound, create & display */
+  init_sound_disp_gamewindows() /* init sound, create & display */
   dorestore()			   /* restore old game; pline()s are OK */
 } else {
   player_selection()		   /* select a player type using a window */
-  init_sound_and_display_gamewindows() /* init sound, create & display  */
+  init_sound_disp_gamewindows() /* init sound, create & display  */
 }
 pline("Hello, welcome...");
 

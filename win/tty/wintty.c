@@ -587,7 +587,7 @@ tty_player_selection(void)
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before
- * init_sound_and_display_gamewindows().
+ * init_sound_disp_gamewindows().
  */
 void
 tty_askname(void)

@@ -650,7 +650,7 @@ stop_occupation(void)
 }
 
 void
-init_sound_and_display_gamewindows(void)
+init_sound_disp_gamewindows(void)
 {
     int menu_behavior = MENU_BEHAVE_STANDARD;
 
@@ -683,7 +683,7 @@ init_sound_and_display_gamewindows(void)
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
-     * have to split init_sound_and_display_gamewindows into
+     * have to split init_sound_disp_gamewindows into
      * create_gamewindows and show_gamewindows to get rid of this ifdef...
      */
     if (!strcmp(windowprocs.name, "mac"))

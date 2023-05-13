@@ -331,7 +331,7 @@ activation.
      value that the platform's main() may have placed there earlier
      via its own call to assign_soundlib()]
 
-    2. init_sound_and_display_gamewindows()
+    2. init_sound_disp_gamewindows()
            ->  activate_chosen_soundlib() is called prior to
                displaying the game windows.
 
