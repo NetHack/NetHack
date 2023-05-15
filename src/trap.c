@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1684138083 2023/05/15 08:08:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1684140131 2023/05/15 08:42:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.536 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6278,11 +6278,7 @@ lava_effects(void)
             urgent_pline("You %s...", boil_away ? "boil away"
                                                 : "burn to a crisp");
             done(BURNING);
-            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT)
-                /* if the level is completely full then this second attempt
-                   won't accomplish anything, but if it is only mostly full
-                   then hero still might manage to escape the lava */
-                || safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
+            if (safe_teleds(TELEDS_ALLOW_DRAG | TELEDS_TELEPORT))
                 break; /* successful life-save */
             /* nowhere safe to land; repeat burning loop */
             pline("You're still burning.");

@@ -1,13 +1,27 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1654710406 2022/06/08 17:46:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.169 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1684140122 2023/05/15 08:42:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
+#define NEW_SAFE_TELEDS /* check every map spot instead of 400 random ones */
+/* flag bits for collect_coords(); combining ring_pairs with unshuffled
+   makes no sense but is not disallowed */
+/* if collect_coords() gets promoted from local (static) to global, move
+   these flag defintions to hack.h and remove corresponding #undef's below */
+#define CC_NO_FLAGS    0x00 /* skip center, collect in distinct rings and
+                             * shuffle each ring, ignore monster occupants */
+#define CC_INCL_CENTER 0x01 /* include center point as ring #0 */
+#define CC_UNSHUFFLED  0x02 /* don't shuffle the rings */
+#define CC_RING_PAIRS  0x04 /* shuffle w/ odd and next even rings together */
+#define CC_SKIP_MONS   0x08 /* skip locations where a monster is present */
+
 static boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
 static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
 static boolean teleok(coordxy, coordxy, boolean);
+static int collect_coords(coord *, coordxy, coordxy, int, unsigned,
+                          boolean (*)(coordxy, coordxy));
 static void vault_tele(void);
 static boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
 static void rloc_to_core(struct monst *, coordxy, coordxy, unsigned);
@@ -283,6 +297,7 @@ enexto_core(
     cc->x = good[i].x;
     cc->y = good[i].y;
     return TRUE;
+#undef MAX_GOOD
 }
 
 /*
@@ -475,14 +490,183 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
     /* possible shop entry message comes after guard's shrill whistle */
     spoteffects(TRUE);
     invocation_message();
+    return;
 }
 
+/* make a list of coordinates in expanding distance from <cx,cy>;
+   return value is number of coordinates inserted into ccc[]  */
+static int
+collect_coords(
+    coord *ccc, /* pointer to array of at least size ROWNO*(COLNO-1) */
+    coordxy cx, coordxy cy, /* center point, not necessarly <u.ux,u.uy> */
+    int maxradius,          /* how far from center to go collecting spots;
+                             * 0 means collect entire map */
+    unsigned cc_flags,      /* incl_center: put <cx,cy> in output list
+                             * (provided that it passes filter, if any);
+                             * unshuffled: keep output in collection order;
+                             * ring_pairs: shuffle pairs of rings together
+                             * instead of keeping each ring distinct */
+    boolean (*filter)(coordxy, coordxy)) /* if Null, no filtering */
+{
+    coordxy x, y, lox, hix, loy, hiy;
+    int radius, rowrange, colrange, k, n = 0;
+    coord cc, *passcc = NULL;
+    boolean newpass, passend,
+            /* is <cx,cy> a candidate? */
+            include_cxcy = (cc_flags & CC_INCL_CENTER) != 0,
+            /* flag is negative; turn local variable into positive */
+            scramble = (cc_flags & CC_UNSHUFFLED) == 0,
+            /* if scrambling, shuffle rings 1+2, 3+4, &c together */
+            ring_pairs = (scramble && (cc_flags & CC_RING_PAIRS) != 0),
+            /* exclude locations containing monsters from output */
+            skip_mons = (cc_flags & CC_SKIP_MONS) != 0;
+    int result = 0;
+
+    rowrange = (cy < ROWNO / 2) ? (ROWNO - 1 - cy) : cy;
+    colrange = (cx < COLNO / 2) ? (COLNO - 1 - cx) : cx;
+    k = max(rowrange, colrange);
+    /* if no radius limit has been specified, cover the whole map */
+    if (!maxradius)
+        maxradius = k;
+    else
+        maxradius = min(maxradius, k);
+    /*
+     * We operate on an expanding radius around the center, optionally
+     * starting with the center spot itself, and shuffle the edges of
+     * each expanding square or "ring".  (So all 1's are shuffled at
+     * end of the pass for radius==1, then all 2's at end of radius==2,
+     * and so on.  Shuffling of each ring doesn't encroach on any of
+     * the others except when ring_pairs mode is specified.)
+     *
+     * Diagram of first three rings (four if 'include_cxcy' is specified)
+     *   rings       unshuffled output      sample shuffled output (varies)
+     *  3333333     25 26  .  .  .  . 31     33 29  .  .  .  . 44
+     *  3222223     32  9 10 11 12 13 33     35 22 16 14 24 13 40
+     *  3211123     34 14  1  2  3 15  .     38 20  2  8  3 15  .
+     *  3210123     .  16  4  0  5 17  .     .  11  1  0  6  9  .
+     *  3211123     .  18  6  7  8 19 39     .  19  5  7  4 12 25
+     *  3222223     40 20 21 22 23 24 41     43 10 21 17 23 18 27
+     *  3333333     42  .  .  .  . 47 48     37  .  .  .  . 30 36
+     * . == entry not shown to reduce clutter when viewing inner portion.
+     *
+     * The digits under 'rings' are ring number, which is also distmin
+     * from center, indicating the order in which sets of spots are
+     * evaluated.  Output gets collected in expanding rings.  For the
+     * two output grids, the number shown represents the position in the
+     * returned list of coordinates.  When shuffling while ring_pairs is
+     * specified, the 1's and 2's will be mixed together, the 3's and
+     * (unshown) 4's will be mixed together, and so forth.
+     *
+     * If caller processes the output list in order, the closest viable
+     * spot will be chosen.  If a compeletely random spot is preferred,
+     * the list can be requested to be unscrambled and then the caller
+     * can shuffle it, overriding the collection rings.  A filter function
+     * could be used to skip everything after the first acceptable spot.
+     * 'ring_pairs' mode allows for choosing a very close spot that isn't
+     * immediately adjacent to the center point, useful for emergency
+     * teleport to not always end up at the closest possible spot.
+     *
+     * TODO:
+     *  Redo filter interface to have caller pass in a context cookie
+     *  that can be passed through to filter so that it could have access
+     *  to more info than just <x,y>.  Also add a way to stop collecting
+     *  when an optimal value is found, without checking and skipping the
+     *  rest of the map.
+     */
+    for (radius = include_cxcy ? 0 : 1; radius <= maxradius; ++radius) {
+        if (!ring_pairs) {
+            newpass = passend = TRUE;
+        } else {
+            /* 0 (if include_cxcy) and maxradius override odd/even */
+            newpass = ((radius % 2) != 0 || radius == 0); /* odd */
+            passend = ((radius % 2) == 0 || radius == maxradius); /* even */
+        }
+        if (newpass || !passcc) { /* !passcc is redundant but used to fend
+                                   * off analyzers thinking use of passcc
+                                   * below might occur while still Null */
+            passcc = ccc; /* start of output entries for current radius (or
+                           * first half of radius pair depending on flags) */
+            n = 0; /* number of entries for passcc; used for shuffling */
+        }
+        lox = cx - radius, hix = cx + radius;
+        loy = cy - radius, hiy = cy + radius;
+        for (y = max(loy, 0); y <= hiy; ++y) {
+            if (y > ROWNO - 1)
+                break; /* done with collection for current radius */
+            for (x = max(lox, 1); x <= hix; ++x) { /* column 0 is not used */
+                if (x > COLNO - 1)
+                    break; /* advance to next 'y' */
+                if (x != lox && x != hix && y != loy && y != hiy)
+                    continue; /* not any edge of ring/square */
+                if (skip_mons && m_at(x, y))
+                    continue; /* quick filter */
+                if (filter && !(*filter)(x, y))
+                    continue;
+                cc.x = x, cc.y = y;
+                *ccc++ = cc;
+                ++n;
+                ++result;
+            }
+        }
+        if (scramble && passend) {
+            /* shuffle entries gathered for current radius (or pair) */
+            while (n > 1) {
+                k = rn2(n); /* 0..n-1 */
+                if (k) { /* swap [k] with [0] when k is 1..n-1 */
+                    cc = passcc[0];
+                    passcc[0] = passcc[k];
+                    passcc[k] = cc;
+                }
+                ++passcc; /* passcc[0] has reached its final place    */
+                --n;      /* and become exempt from further shuffling */
+            }
+        }
+    } /* radius loop */
+    debugpline4("collect_coords(,%d,%d,%d,,,)=%d", cx, cy, maxradius, result);
+    return result;
+}
+
+/* [try to] teleport hero to a safe spot */
 boolean
 safe_teleds(int teleds_flags)
 {
+    /*
+     * This used to try random locations up to 400 times, with first 200
+     * disallowing trap locations and remaining 200 accepting such.
+     * Now the entire map gets checked and the closest [or nearly closest
+     * due to 'ring_pairs' mode of collect_coords] viable spot is chosen.
+     * If no non-trap spot is found, first trap spot is used.
+     */
     coordxy nux, nuy;
-    int tcnt = 0;
+    int tcnt;
+#ifdef NEW_SAFE_TELEDS
+    coord candy[ROWNO * (COLNO - 1)], backupspot;
+    int candycount;
 
+    /*memset((genericptr_t) candy, 0, sizeof candy);*/ /*(not needed)*/
+    /* start with shuffled list of candidate locations */
+    candycount = collect_coords(candy, u.ux, u.uy, 0,
+                                CC_RING_PAIRS | CC_SKIP_MONS,
+                                (boolean (*)(coordxy, coordxy)) 0);
+    backupspot.x = backupspot.y = 0;
+    /* skip trap locations via teleok(,,FALSE) but remember first
+       encountered trap spot that is acceptable to teleok(,,TRUE) */
+    for (tcnt = 0; tcnt < candycount; ++tcnt) {
+        nux = candy[tcnt].x, nuy = candy[tcnt].y;
+        if (teleok(nux, nuy, FALSE)) {
+            teleds(nux, nuy, teleds_flags);
+            return TRUE;
+        }
+        if (!backupspot.x && t_at(nux, nuy) && teleok(nux, nuy, TRUE))
+            backupspot.x = nux, backupspot.y = nuy;
+    }
+    /* no non-trap spot found; if we skipped a viable trap spot, use it */
+    if (backupspot.x) {
+        teleds(backupspot.x, backupspot.y, teleds_flags);
+        return TRUE;
+    }
+#else /* !NEW_SAFE_TELEDS => old code; could be discarded */
+    tcnt = 0;
     do {
         nux = rnd(COLNO - 1);
         nuy = rn2(ROWNO);
@@ -491,14 +675,22 @@ safe_teleds(int teleds_flags)
     if (tcnt <= 400) {
         teleds(nux, nuy, teleds_flags);
         return TRUE;
-    } else
-        return FALSE;
+    }
+#endif /* ?NEW_SAFE_TELEDS */
+    return FALSE;
 }
+
+#undef NEW_SAFE_TELEDS
+#undef CC_NO_FLAGS
+#undef CC_INCL_CENTER
+#undef CC_UNSHUFFLED
+#undef CC_RING_PAIRS
+#undef CC_SKIP_MONS
 
 static void
 vault_tele(void)
 {
-    register struct mkroom *croom = search_special(VAULT);
+    struct mkroom *croom = search_special(VAULT);
     coord c;
 
     if (croom && somexyspace(croom, &c) && teleok(c.x, c.y, FALSE)) {
@@ -511,7 +703,7 @@ vault_tele(void)
 boolean
 teleport_pet(register struct monst* mtmp, boolean force_it)
 {
-    register struct obj *otmp;
+    struct obj *otmp;
 
     if (mtmp == u.usteed)
         return FALSE;
@@ -721,6 +913,11 @@ dotelecmd(void)
         (void) tport_spell(added + hidden - NOOP_SPELL);
 
     return res ? ECMD_TIME : ECMD_OK;
+#undef NOOP_SPELL
+#undef HIDE_SPELL
+#undef ADD_SPELL
+#undef UNHIDESPELL
+#undef REMOVESPELL
 }
 
 int
@@ -789,6 +986,7 @@ dotele(
            but they both yield the same result.] */
 #define spellev(spell_otyp) ((int) objects[spell_otyp].oc_level)
         energy = 5 * spellev(SPE_TELEPORT_AWAY);
+#undef spelllev
 #if 0
         /* the addition of !break_the_rules to the outer if-block in
            1ada454f rendered this dead code */
