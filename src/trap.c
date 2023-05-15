@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1683333758 2023/05/06 00:42:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.531 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1684138083 2023/05/15 08:08:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.535 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4495,7 +4495,53 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
     return FALSE;
 }
 
-/*  return TRUE iff player relocated */
+/* life-saving or divine rescue has attempted to get the hero out of hostile
+   terrain and put hero in an unexpected spot or failed due to overfull level
+   and just prevented death so "back on solid ground" may be inappropriate */
+void
+back_on_ground(int how)
+{
+    static const char find_yourself[] = "find yourself";
+    struct rm *lev = &levl[u.ux][u.uy];
+    boolean mesggiven = FALSE;
+
+    switch (how) {
+    case DROWNING:
+        if (is_pool(u.ux, u.uy)) {
+            You("%s %s of %s.", find_yourself,
+                (Is_waterlevel(&u.uz) || IS_WATERWALL(lev->typ))
+                  ? "in the midst" : "on top",
+                hliquid("water"));
+            mesggiven = TRUE;
+        } else if (IS_AIR(lev->typ)) {
+            You("%s in %s.", find_yourself,
+                Is_waterlevel(&u.uz) ? "an air bubble" : "mid air");
+            mesggiven = TRUE;
+        }
+        break;
+    case BURNING: /* moved onto lava without fire resistance */
+    case DISSOLVED: /* sunk into lava while fire resistant */
+        if (is_pool(u.ux, u.uy)) {
+            You("%s %s %s.", find_yourself,
+                u.uinwater ? "in" : "on", hliquid("water"));
+            mesggiven = TRUE;
+        } else if (is_lava(u.ux, u.uy)) {
+            You("%s on top of %s.", find_yourself, hliquid("molten lava"));
+            mesggiven = TRUE;
+        }
+        break;
+    default:
+        break;
+    }
+    if (!mesggiven)
+        You("%s back on solid %s.", find_yourself, surface(u.ux, u.uy));
+
+    iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor() */
+    /* feedback just disclosed this */
+    iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = lev->typ;
+}
+
+/* return TRUE iff player relocated */
 boolean
 drown(void)
 {
@@ -4526,9 +4572,9 @@ drown(void)
 
     water_damage_chain(gi.invent, FALSE);
 
-    if (u.umonnum == PM_GREMLIN && rn2(3))
+    if (u.umonnum == PM_GREMLIN && rn2(3)) {
         (void) split_mon(&gy.youmonst, (struct monst *) 0);
-    else if (u.umonnum == PM_IRON_GOLEM) {
+    } else if (u.umonnum == PM_IRON_GOLEM) {
         You("rust!");
         i = Maybe_Half_Phys(d(2, 6));
         if (u.mhmax > i)
@@ -4610,7 +4656,10 @@ drown(void)
     }
     set_uinwater(1); /* u.uinwater = 1 */
     urgent_pline("You drown.");
-    for (i = 0; i < 5; i++) { /* arbitrary number of loops */
+    /* first pass is survivable by using up an amulet of life-saving or by
+       answering no to "Die?" in explore|wizard mode; second pass can only
+       be survivable via the latter */
+    for (i = 0; i < 2; i++) {
         /* killer format and name are reconstructed every iteration
            because lifesaving resets them */
         pool_of_water = waterbody_name(u.ux, u.uy);
@@ -4626,11 +4675,10 @@ drown(void)
         /* nowhere safe to land; repeat drowning loop... */
         pline("You're still drowning.");
     }
-    if (u.uinwater) {
+
+    if (u.uinwater)
         set_uinwater(0); /* u.uinwater = 0 */
-        You("find yourself back %s.",
-            Is_waterlevel(&u.uz) ? "in an air bubble" : "on land");
-    }
+    back_on_ground(DROWNING);
     return TRUE;
 }
 
@@ -6255,28 +6303,8 @@ lava_effects(void)
                 set_itimeout(&HWwalking, 5L);
             goto burn_stuff;
         }
+        back_on_ground(BURNING);
 
-        /*
-         * 3.7: this used to be unconditional "back on solid <surface>"
-         * but surface() could return a lot of things where that ends up
-         * sounding silly.  Deal with water, ignore furniture; assume
-         * surface types 'air' and 'cloud' won't be present on same level
-         * as lava so don't need to be catered for.
-         *
-         * Made it out of the lava.  We know that hero isn't levitating
-         * or flying but life-saving plus fireproof water walking boots
-         * (and no fire resistance) could put hero on water rather than
-         * "on solid ground"; likewise if poly'd into an aquatic form.
-         */
-        if (is_pool(u.ux, u.uy))
-            You("find yourself %s %s.", u.uinwater ? "in" : "on",
-                hliquid("water"));
-        else
-            You("find yourself back on solid %s.", surface(u.ux, u.uy));
-        iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor();
-                                                  * use for on-water too */
-        /* surface() just disclosed this */
-        iflags.prev_decor = gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
         /* normally done via safe_teleds() -> teleds() -> spoteffects() but
            spoteffects() was no-op when called with nonzero in_lava_effects */
         spoteffects(FALSE); /* suppress auto-pickup for this landing... */

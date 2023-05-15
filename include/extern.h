@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1674294830 2023/01/21 09:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1223 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1684138080 2023/05/15 08:08:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1263 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2911,6 +2911,7 @@ extern void acid_damage(struct obj *);
 extern int water_damage(struct obj *, const char *, boolean);
 extern void water_damage_chain(struct obj *, boolean);
 extern boolean rnd_nextto_goodpos(coordxy *, coordxy *, struct monst *);
+extern void back_on_ground(int);
 extern boolean drown(void);
 extern void drain_en(int, boolean);
 extern int dountrap(void);
