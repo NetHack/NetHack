@@ -1077,7 +1077,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 struct customization_detail *find_display_sym_customization(
     const char *customization_name, const struct symparse *symparse,
     enum graphics_sets which_set);
-struct customization_detail *find_matching_symset_customization(
+struct customization_detail *find_matching_symset_customiz(
     const char *customization_name, int custtype,
     enum graphics_sets which_set);
 struct customization_detail *find_display_urep_customization(
@@ -1167,7 +1167,7 @@ shuffle_customizations(void)
 }
 
 struct customization_detail *
-find_matching_symset_customization(
+find_matching_symset_customiz(
     const char *customization_name,
     int custtype,
     enum graphics_sets which_set)

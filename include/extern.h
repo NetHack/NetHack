@@ -2783,7 +2783,7 @@ extern void savedsym_free(void);
 extern void savedsym_strbuf(strbuf_t *);
 extern boolean parsesymbols(char *, int);
 #ifdef ENHANCED_SYMBOLS
-extern struct customization_detail *find_matching_symset_customization(
+extern struct customization_detail *find_matching_symset_customiz(
                const char *symset_name, int custtype,
                enum graphics_sets which_set);
 extern void apply_customizations_to_symset(enum graphics_sets which_set);

@@ -598,8 +598,8 @@ add_custom_urep_entry(
         gdc->details = 0;
         gdc->details_end = 0;
     }
-    details = find_matching_symset_customization(customization_name,
-                                                 custom_symbols, which_set);
+    details = find_matching_symset_customiz(customization_name,
+                                            custom_symbols, which_set);
     if (details) {
         while (details) {
             if (details->content.urep.glyphidx == glyphidx) {
