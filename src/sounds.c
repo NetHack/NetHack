@@ -2084,7 +2084,7 @@ base_soundname_to_filename(
     consumes += 1; /* for trailing NUL */
     /* existinglen could be >= bufsz if caller didn't initialize buf
      * to properly include a trailing NUL */
-    if (baselen <= 0 || consumes > bufsz || existinglen >= bufsz)
+    if (!baselen || consumes > bufsz || existinglen >= bufsz)
         return (char *) 0;
 
 #if 0
