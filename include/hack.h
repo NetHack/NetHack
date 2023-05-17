@@ -1206,6 +1206,16 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define CORPSTAT_MALE   2
 #define CORPSTAT_NEUTER 3
 
+/* flag bits for collect_coords(); combining ring_pairs with unshuffled
+   makes no sense--if both are specified unshuffled takes precedence */
+#define CC_NO_FLAGS    0x00 /* skip center, collect in distinct rings and
+                             * shuffle each ring, ignore monster occupants */
+#define CC_INCL_CENTER 0x01 /* include center point as ring #0 */
+#define CC_UNSHUFFLED  0x02 /* don't shuffle the rings */
+#define CC_RING_PAIRS  0x04 /* shuffle w/ odd and next even rings together */
+#define CC_SKIP_MONS   0x08 /* skip locations occupied by monsters */
+#define CC_SKIP_INACCS 0x10 /* skip !ACCESSIBLE: rock and wall locations */
+
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
 #define SHIFT_MSG 0x02     /* always put out a message */

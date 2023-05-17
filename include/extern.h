@@ -2803,6 +2803,8 @@ extern boolean enexto(coord *, coordxy, coordxy, struct permonst *);
 extern boolean enexto_core(coord *, coordxy, coordxy, struct permonst *,
                            mmflags_nht);
 extern void teleds(coordxy, coordxy, int);
+extern int collect_coords(coord *, coordxy, coordxy, int, unsigned,
+                          boolean (*)(coordxy, coordxy));
 extern boolean safe_teleds(int);
 extern boolean teleport_pet(struct monst *, boolean);
 extern void tele(void);

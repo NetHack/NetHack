@@ -1183,6 +1183,8 @@ with OPTIONS=blind (blind from birth), being inflicted with timed blinding
 avoid sanity_check warning if statue in water or lava gets polymorphed into a
 	boulder; break it into a stack of rocks if that would happen
 werewolf or werejackal howling and purple worm burping wakes up monsters
+don't exclude map column 1 from consideration when rloc() picks a random spot
+	for destination of a teleported monster
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

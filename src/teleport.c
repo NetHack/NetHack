@@ -5,23 +5,9 @@
 
 #include "hack.h"
 
-#define NEW_SAFE_TELEDS /* check every map spot instead of 400 random ones */
-/* flag bits for collect_coords(); combining ring_pairs with unshuffled
-   makes no sense but is not disallowed */
-/* if collect_coords() gets promoted from local (static) to global, move
-   these flag defintions to hack.h and remove corresponding #undef's below */
-#define CC_NO_FLAGS    0x00 /* skip center, collect in distinct rings and
-                             * shuffle each ring, ignore monster occupants */
-#define CC_INCL_CENTER 0x01 /* include center point as ring #0 */
-#define CC_UNSHUFFLED  0x02 /* don't shuffle the rings */
-#define CC_RING_PAIRS  0x04 /* shuffle w/ odd and next even rings together */
-#define CC_SKIP_MONS   0x08 /* skip locations where a monster is present */
-
 static boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
 static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
 static boolean teleok(coordxy, coordxy, boolean);
-static int collect_coords(coord *, coordxy, coordxy, int, unsigned,
-                          boolean (*)(coordxy, coordxy));
 static void vault_tele(void);
 static boolean rloc_pos_ok(coordxy, coordxy, struct monst *);
 static void rloc_to_core(struct monst *, coordxy, coordxy, unsigned);
@@ -495,7 +481,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
 
 /* make a list of coordinates in expanding distance from <cx,cy>;
    return value is number of coordinates inserted into ccc[]  */
-static int
+int
 collect_coords(
     coord *ccc, /* pointer to array of at least size ROWNO*(COLNO-1) */
     coordxy cx, coordxy cy, /* center point, not necessarly <u.ux,u.uy> */
@@ -505,7 +491,9 @@ collect_coords(
                              * (provided that it passes filter, if any);
                              * unshuffled: keep output in collection order;
                              * ring_pairs: shuffle pairs of rings together
-                             * instead of keeping each ring distinct */
+                             * instead of keeping each ring distinct;
+                             * skip_mons: reject occupied spots;
+                             * skip_inaccs: reject !ACCESSIBLE() spots */
     boolean (*filter)(coordxy, coordxy)) /* if Null, no filtering */
 {
     coordxy x, y, lox, hix, loy, hiy;
@@ -519,7 +507,9 @@ collect_coords(
             /* if scrambling, shuffle rings 1+2, 3+4, &c together */
             ring_pairs = (scramble && (cc_flags & CC_RING_PAIRS) != 0),
             /* exclude locations containing monsters from output */
-            skip_mons = (cc_flags & CC_SKIP_MONS) != 0;
+            skip_mons = (cc_flags & CC_SKIP_MONS) != 0,
+            /* exclude !ACCESSIBLE() locations from output */
+            skip_inaccessible = (cc_flags & CC_SKIP_INACCS) != 0;
     int result = 0;
 
     rowrange = (cy < ROWNO / 2) ? (ROWNO - 1 - cy) : cy;
@@ -598,8 +588,9 @@ collect_coords(
                     break; /* advance to next 'y' */
                 if (x != lox && x != hix && y != loy && y != hiy)
                     continue; /* not any edge of ring/square */
-                if (skip_mons && m_at(x, y))
-                    continue; /* quick filter */
+                if ((skip_mons && m_at(x, y))
+                    || (skip_inaccessible && !ACCESSIBLE(levl[x][y].typ)))
+                    continue; /* quick filters */
                 if (filter && !(*filter)(x, y))
                     continue;
                 cc.x = x, cc.y = y;
@@ -630,23 +621,38 @@ collect_coords(
 boolean
 safe_teleds(int teleds_flags)
 {
+    coordxy nux, nuy;
+    unsigned cc_flags;
+    coord candy[ROWNO * (COLNO - 1)], backupspot;
+    int tcnt, candycount;
+
     /*
      * This used to try random locations up to 400 times, with first 200
-     * disallowing trap locations and remaining 200 accepting such.
-     * Now the entire map gets checked and the closest [or nearly closest
-     * due to 'ring_pairs' mode of collect_coords] viable spot is chosen.
-     * If no non-trap spot is found, first trap spot is used.
+     * tries disallowing trap locations and remaining 200 accepting such.
+     * On levels without many accessible locations (either due to being
+     * mostly stone or high monster population) it could fail to find a
+     * spot.
+     *
+     * Now it tries completely randomly only 40 times, all disallowing
+     * traps, then resorts to checking the entire map, near hero's spot
+     * first then expanding out from there.  If no non-trap spot is found,
+     * first trap spot is used.
      */
-    coordxy nux, nuy;
-    int tcnt;
-#ifdef NEW_SAFE_TELEDS
-    coord candy[ROWNO * (COLNO - 1)], backupspot;
-    int candycount;
+    for (tcnt = 0; tcnt < 40; ++tcnt) {
+        nux = rnd(COLNO - 1);
+        nuy = rn2(ROWNO);
+        if (!teleok(nux, nuy, FALSE)) {
+            teleds(nux, nuy, teleds_flags);
+            return TRUE;
+        }
+    }
 
-    /*memset((genericptr_t) candy, 0, sizeof candy);*/ /*(not needed)*/
-    /* start with shuffled list of candidate locations */
-    candycount = collect_coords(candy, u.ux, u.uy, 0,
-                                CC_RING_PAIRS | CC_SKIP_MONS,
+    /* get a shuffled list of candidate locations, starting with spots
+       1 or 2 steps from hero, then 3 or 4 steps, then 5 or 6, on up */
+    cc_flags = CC_RING_PAIRS | CC_SKIP_MONS;
+    if (!Passes_walls)
+        cc_flags |= CC_SKIP_INACCS;
+    candycount = collect_coords(candy, u.ux, u.uy, 0, cc_flags,
                                 (boolean (*)(coordxy, coordxy)) 0);
     backupspot.x = backupspot.y = 0;
     /* skip trap locations via teleok(,,FALSE) but remember first
@@ -665,27 +671,8 @@ safe_teleds(int teleds_flags)
         teleds(backupspot.x, backupspot.y, teleds_flags);
         return TRUE;
     }
-#else /* !NEW_SAFE_TELEDS => old code; could be discarded */
-    tcnt = 0;
-    do {
-        nux = rnd(COLNO - 1);
-        nuy = rn2(ROWNO);
-    } while (!teleok(nux, nuy, (boolean) (tcnt > 200)) && ++tcnt <= 400);
-
-    if (tcnt <= 400) {
-        teleds(nux, nuy, teleds_flags);
-        return TRUE;
-    }
-#endif /* ?NEW_SAFE_TELEDS */
     return FALSE;
 }
-
-#undef NEW_SAFE_TELEDS
-#undef CC_NO_FLAGS
-#undef CC_INCL_CENTER
-#undef CC_UNSHUFFLED
-#undef CC_RING_PAIRS
-#undef CC_SKIP_MONS
 
 static void
 vault_tele(void)
@@ -1458,15 +1445,15 @@ rloc_pos_ok(
                                         gu.updest.hx, gu.updest.hy)
                     && (!gu.updest.nlx
                         || !within_bounded_area(x, y,
-                                                gu.updest.nlx, gu.updest.nly,
-                                                gu.updest.nhx, gu.updest.nhy)));
+                                              gu.updest.nlx, gu.updest.nly,
+                                              gu.updest.nhx, gu.updest.nhy)));
         if (gd.dndest.lx && (yy & 1) == 0) /* moving down */
             return (within_bounded_area(x, y, gd.dndest.lx, gd.dndest.ly,
                                         gd.dndest.hx, gd.dndest.hy)
                     && (!gd.dndest.nlx
                         || !within_bounded_area(x, y,
-                                                gd.dndest.nlx, gd.dndest.nly,
-                                                gd.dndest.nhx, gd.dndest.nhy)));
+                                              gd.dndest.nlx, gd.dndest.nly,
+                                              gd.dndest.nhx, gd.dndest.nhy)));
     } else {
         /* [try to] prevent a shopkeeper or temple priest from being
            sent out of his room (caller might resort to goodpos() if
@@ -1636,16 +1623,17 @@ stairway_find_forwiz(boolean isladder, boolean up)
     return stway;
 }
 
-/* place a monster at a random location, typically due to teleport */
-/* return TRUE if successful, FALSE if not */
-/* rlocflags is RLOC_foo flags */
+/* place a monster at a random location, typically due to teleport;
+   return TRUE if successful, FALSE if not; rlocflags is RLOC_foo flags */
 boolean
 rloc(
-    struct monst *mtmp, /* mx==0 implies migrating monster arrival */
-    unsigned int rlocflags)
+    struct monst *mtmp, /* mtmp->mx==0 implies migrating monster arrival */
+    unsigned rlocflags)
 {
+    coord cc, candy[ROWNO * (COLNO - 1)]; /* room for entire map */
+    unsigned cc_flags;
     coordxy x, y;
-    int trycount;
+    int trycount, i, j, candycount;
 
     if (mtmp == u.usteed) {
         tele();
@@ -1657,7 +1645,7 @@ rloc(
 
         if (!In_W_tower(u.ux, u.uy, &u.uz)) {
             stway = stairway_find_forwiz(FALSE, TRUE);
-        } else if (!stairway_find_forwiz(TRUE, FALSE)) { /* bottom level of tower */
+        } else if (!stairway_find_forwiz(TRUE, FALSE)) { /* bottom of tower */
             stway = stairway_find_forwiz(TRUE, TRUE);
         } else {
             stway = stairway_find_forwiz(TRUE, FALSE);
@@ -1673,21 +1661,38 @@ rloc(
             goto found_xy;
     }
 
-    trycount = 0;
-    do {
-        x = rn1(COLNO - 3, 2);
-        y = rn2(ROWNO);
-        /* rloc_pos_ok() passes GP_CHECKSCARY to goodpos(), we don't */
-        if ((trycount < 500) ? rloc_pos_ok(x, y, mtmp)
-                             : goodpos(x, y, mtmp, NO_MM_FLAGS))
+    /* this used to try randomly 1000 times, then fallback to left-to-right
+       top-to-bottom exhaustive check; now that the exhaustive check uses
+       randomized order, reduce the number of random attempts to 50;
+       on levels with lots of available space, random can find a spot more
+       quickly but might fail to find one no matter how many tries it makes */
+    for (trycount = 0; trycount < 50; ++trycount) {
+        x = rnd(COLNO - 1); /* 1..COLNO-1 */
+        y = rn2(ROWNO); /* 0..ROWNO-1 */
+        if (rloc_pos_ok(x, y, mtmp)) /* rejects 'onscary' */
             goto found_xy;
-    } while (++trycount < 1000);
+    }
 
-    /* last ditch attempt to find a good place */
-    for (x = 2; x < COLNO - 1; x++)
-        for (y = 0; y < ROWNO; y++)
-            if (goodpos(x, y, mtmp, NO_MM_FLAGS))
-                goto found_xy;
+    /* try harder to find a good place; gather a list of all candidate
+       locations (every accessible unoccupied spot except for hero's;
+       goodpos() will reject that), then shuffle them ourselves instead
+       of having collect_coords() do it (which would be in rings centered
+       around arbitrary <COLNO/2,ROWNO/2>) */
+    cc_flags = CC_INCL_CENTER | CC_UNSHUFFLED | CC_SKIP_MONS;
+    if (!passes_walls(mtmp->data))
+        cc_flags |= CC_SKIP_INACCS;
+    candycount = collect_coords(candy, COLNO / 2, ROWNO / 2, 0, cc_flags,
+                                (boolean (*)(coordxy, coordxy)) 0);
+    for (i = 0; i < candycount; ++i) {
+        if ((j = rn2(candycount - i)) > 0) {
+            cc = candy[i];
+            candy[i] = candy[i + j];
+            candy[i + j] = cc;
+        }
+        x = candy[i].x, y = candy[i].y;
+        if (goodpos(x, y, mtmp, NO_MM_FLAGS)) /* accepts 'onscary' */
+            goto found_xy;
+    }
 
     /* level either full of monsters or somehow faulty */
     if ((rlocflags & RLOC_ERR) != 0)
@@ -1847,7 +1852,7 @@ mlevel_tele_trap(
 
 /* place object randomly, returns False if it's gone (eg broken) */
 boolean
-rloco(register struct obj* obj)
+rloco(struct obj *obj)
 {
     coordxy tx, ty, otx, oty;
     boolean restricted_fall;
@@ -1873,8 +1878,8 @@ rloco(register struct obj* obj)
                                           gd.dndest.hx, gd.dndest.hy)
                      || (gd.dndest.nlx
                          && within_bounded_area(tx, ty,
-                                                gd.dndest.nlx, gd.dndest.nly,
-                                                gd.dndest.nhx, gd.dndest.nhy))))
+                                              gd.dndest.nlx, gd.dndest.nly,
+                                              gd.dndest.nhx, gd.dndest.nhy))))
              /* on the Wizard Tower levels, objects inside should
                 stay inside and objects outside should stay outside */
              || (gd.dndest.nlx && On_W_tower_level(&u.uz)
