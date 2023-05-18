@@ -694,6 +694,7 @@ count_and_validate_winopts(void)
 #ifdef WIN32
         window_opts[i].valid = FALSE;
         if ((GUILaunched
+             && case_insensitive_comp(window_opts[i].id, "curses") != 0
              && case_insensitive_comp(window_opts[i].id, "mswin") != 0)
             || (!GUILaunched
                 && case_insensitive_comp(window_opts[i].id, "mswin") == 0))
