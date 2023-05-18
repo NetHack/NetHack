@@ -417,11 +417,11 @@ curses_ext_cmd(void)
 
     while (1) {
         wmove(extwin, starty, startx);
+        wclrtoeol(extwin);
         waddstr(extwin, "# ");
         wmove(extwin, starty, startx + 2);
         waddstr(extwin, cur_choice);
         wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
-        wclrtoeol(extwin);
 
         /* if we have an autocomplete command, AND it matches uniquely */
         if (matches == 1 && ecmatches) {
