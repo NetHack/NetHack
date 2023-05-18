@@ -175,6 +175,10 @@ curses_refresh_nethack_windows(void)
     map_window = curses_get_nhwin(MAP_WIN);
     inv_window = curses_get_nhwin(INV_WIN);
 
+    if (!iflags.window_inited) {
+        return;
+    }
+
     if ((gm.moves <= 1) && !gi.invent) {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);
@@ -322,8 +326,10 @@ curses_del_nhwin(winid wid)
                    wid);
         return;
     }
-    delwin(nhwins[wid].curwin);
-    nhwins[wid].curwin = NULL;
+    if (nhwins[wid].curwin != NULL) {
+        delwin(nhwins[wid].curwin);
+        nhwins[wid].curwin = NULL;
+    }
     nhwins[wid].nhwin = -1;
 }
 
