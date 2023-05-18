@@ -1,4 +1,4 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1684140122 2023/05/15 08:42:02 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.200 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1684374686 2023/05/18 01:51:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -493,7 +493,7 @@ collect_coords(
                              * ring_pairs: shuffle pairs of rings together
                              * instead of keeping each ring distinct;
                              * skip_mons: reject occupied spots;
-                             * skip_inaccs: reject !ACCESSIBLE() spots */
+                             * skip_inaccs: reject !ZAP_POS() spots */
     boolean (*filter)(coordxy, coordxy)) /* if Null, no filtering */
 {
     coordxy x, y, lox, hix, loy, hiy;
@@ -508,7 +508,7 @@ collect_coords(
             ring_pairs = (scramble && (cc_flags & CC_RING_PAIRS) != 0),
             /* exclude locations containing monsters from output */
             skip_mons = (cc_flags & CC_SKIP_MONS) != 0,
-            /* exclude !ACCESSIBLE() locations from output */
+            /* exclude !ZAP_POS() locations from output; allows pools+lava */
             skip_inaccessible = (cc_flags & CC_SKIP_INACCS) != 0;
     int result = 0;
 
@@ -589,7 +589,9 @@ collect_coords(
                 if (x != lox && x != hix && y != loy && y != hiy)
                     continue; /* not any edge of ring/square */
                 if ((skip_mons && m_at(x, y))
-                    || (skip_inaccessible && !ACCESSIBLE(levl[x][y].typ)))
+                    /* note: !ACCESSIBLE() would reject water and lava;
+                       !ZAP_POS() accepts them; caller needs to handle such */
+                    || (skip_inaccessible && !ZAP_POS(levl[x][y].typ)))
                     continue; /* quick filters */
                 if (filter && !(*filter)(x, y))
                     continue;
@@ -641,7 +643,7 @@ safe_teleds(int teleds_flags)
     for (tcnt = 0; tcnt < 40; ++tcnt) {
         nux = rnd(COLNO - 1);
         nuy = rn2(ROWNO);
-        if (!teleok(nux, nuy, FALSE)) {
+        if (teleok(nux, nuy, FALSE)) {
             teleds(nux, nuy, teleds_flags);
             return TRUE;
         }
@@ -1630,7 +1632,7 @@ rloc(
     struct monst *mtmp, /* mtmp->mx==0 implies migrating monster arrival */
     unsigned rlocflags)
 {
-    coord cc, candy[ROWNO * (COLNO - 1)]; /* room for entire map */
+    coord cc, backupcc, candy[ROWNO * (COLNO - 1)]; /* room for entire map */
     unsigned cc_flags;
     coordxy x, y;
     int trycount, i, j, candycount;
@@ -1683,6 +1685,7 @@ rloc(
         cc_flags |= CC_SKIP_INACCS;
     candycount = collect_coords(candy, COLNO / 2, ROWNO / 2, 0, cc_flags,
                                 (boolean (*)(coordxy, coordxy)) 0);
+    backupcc.x = backupcc.y = 0;
     for (i = 0; i < candycount; ++i) {
         if ((j = rn2(candycount - i)) > 0) {
             cc = candy[i];
@@ -1690,15 +1693,24 @@ rloc(
             candy[i + j] = cc;
         }
         x = candy[i].x, y = candy[i].y;
-        if (goodpos(x, y, mtmp, NO_MM_FLAGS)) /* accepts 'onscary' */
+        if (rloc_pos_ok(x, y, mtmp))
             goto found_xy;
+        if (!backupcc.x && goodpos(x, y, mtmp, NO_MM_FLAGS))
+            backupcc.x = x, backupcc.y = y;
     }
 
-    /* level either full of monsters or somehow faulty */
-    if ((rlocflags & RLOC_ERR) != 0)
-        impossible("rloc(): couldn't relocate monster");
-    return FALSE;
-
+    /* we didn't find any spot acceptable to rloc_pos_ok() which avoids
+       'onscary' and honors teleport regions, but if we did find a spot
+       that was acceptable to goodpos() (which ignores 'onscary' and
+       teleport regions) we'll use that; otherwise give up */
+    if (!backupcc.x) {
+        /* level either full of monsters or somehow faulty */
+        if ((rlocflags & RLOC_ERR) != 0)
+            impossible("rloc(): couldn't relocate monster");
+        return FALSE;
+    }
+    x = backupcc.x, y = backupcc.y;
+    /*goto found_xy;*/
  found_xy:
     rloc_to_core(mtmp, x, y, rlocflags);
     return TRUE;

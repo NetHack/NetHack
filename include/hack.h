@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1680771353 2023/04/06 08:55:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1684374685 2023/05/18 01:51:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1214,7 +1214,8 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define CC_UNSHUFFLED  0x02 /* don't shuffle the rings */
 #define CC_RING_PAIRS  0x04 /* shuffle w/ odd and next even rings together */
 #define CC_SKIP_MONS   0x08 /* skip locations occupied by monsters */
-#define CC_SKIP_INACCS 0x10 /* skip !ACCESSIBLE: rock and wall locations */
+#define CC_SKIP_INACCS 0x10 /* skip !ZAP_POS: reject rock and wall locations
+                             * but allow pools, unlike !ACCESSIBLE */
 
 /* flags for decide_to_shift() */
 #define SHIFT_SEENMSG 0x01 /* put out a message if in sight */
