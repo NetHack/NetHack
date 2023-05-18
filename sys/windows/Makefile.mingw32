@@ -111,6 +111,15 @@ INTERNET_AVAILABLE=Y
 GIT_AVAILABLE=Y
 endif
 
+# if WANT_GUICURSES=1 is passed, use the Bill Gray pdcursesmod and enable
+# curses in NetHackW
+ifeq "$(WANT_GUICURSES)" "1"
+PDCURSES=pdcursesmod
+else
+PDCURSES=pdcurses
+endif
+PDCURSESFLAGS = -DPDC_WIDE
+
 #
 #==============================================================================
 # Sanity checks for prerequisite Lua and pdcurses
@@ -167,10 +176,10 @@ endif  # LUA_MAY_PROCEED
 # Now, pdcurses
 ifeq "$(INTERNET_AVAILABLE)" "Y"
 ifeq "$(GIT_AVAILABLE)" "Y"
-PDCURSES_TOP=../submodules/pdcurses
+PDCURSES_TOP=../submodules/$(PDCURSES)
 ADD_CURSES=Y
 else  # GIT_AVAILABLE
-PDCURSES_TOP=../lib/pdcurses
+PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
 endif  # GIT_AVAILABLE
 else   # INTERNET_AVAILABLE is not Y below
@@ -179,11 +188,11 @@ else   # INTERNET_AVAILABLE is not Y below
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
 #
-ifneq ("$(wildcard ../submodules/pdcurses/curses.h)", "")
-PDCURSES_TOP=../submodules/pdcurses
+ifneq ("$(wildcard ../submodules/$(PDCURSES)/curses.h)", "")
+PDCURSES_TOP=../submodules/$(PDCURSES)
 ADD_CURSES=Y
-else ifneq ("$(wildcard ../lib/pdcurses/curses.h)", "")
-PDCURSES_TOP=../lib/pdcurses
+else ifneq ("$(wildcard ../lib/$(PDCURSES)/curses.h)", "")
+PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
 endif  # pdcurses sources available somewhere
 
@@ -499,15 +508,17 @@ CLEAN_FILE += $(RTARGETS) $(ROBJS)
 #==========================================
 ifeq "$(ADD_CURSES)" "Y"
 OP = $(O)pdcurses
-PDCOBJS = $(addprefix $(OP)/, addch.o addchstr.o addstr.o attr.o beep.o bkgd.o border.o \
-	  clear.o color.o debug.o delch.o deleteln.o getch.o getstr.o getyx.o \
-	  inch.o inchstr.o initscr.o inopts.o insch.o insstr.o \
-	  kernel.o keyname.o mouse.o move.o outopts.o overlay.o \
-	  pad.o panel.o pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o printw.o \
-	  refresh.o scanw.o scr_dump.o scroll.o slk.o termattr.o touch.o util.o window.o)
+PDCCOMMONOBJS = $(addprefix $(OP)/, \
+        addch.o addchstr.o addstr.o attr.o beep.o bkgd.o border.o clear.o \
+        color.o debug.o delch.o deleteln.o getch.o getstr.o getyx.o inch.o \
+        inchstr.o initscr.o inopts.o insch.o insstr.o kernel.o keyname.o \
+        mouse.o move.o outopts.o overlay.o pad.o panel.o printw.o refresh.o \
+        scanw.o scr_dump.o scroll.o slk.o termattr.o touch.o util.o window.o)
+PDCOBJS = $(PDCCOMMONOBJS) $(addprefix $(OP)/, \
+	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
 PDCSRC = $(PDCURSES_TOP)/pdcurses
 PDCWINCON = $(PDCURSES_TOP)/wincon
-PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCWINCON)
+PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC)
 PDCLIB = $(O)pdcurses.a
 PDCDEP = $(PDCURSES_TOP)/curses.h
 
@@ -517,16 +528,40 @@ $(PDCLIB): $(PDCOBJS)
 	ar rcs $@ $^
 
 $(OP)/%.o: $(PDCSRC)/%.c | $(OP)
-	$(cc) $(CFLAGS) $(PDCINCL) -D_LIB $< -o$@
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -D_LIB $< -o$@
 
 $(OP)/%.o: $(PDCWINCON)/%.c | $(OP)
-	$(cc) $(CFLAGS) $(PDCINCL) -D_LIB $< -o$@
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -I$(PDCWINCON) -D_LIB $< -o$@
 
 $(OP):
 	@mkdir -p $@
 
 CLEAN_DIR += $(OP)
 CLEAN_FILE += $(PDCLIB) $(PDCOBJS)
+
+ifneq ("$(wildcard $(PDCURSES_TOP)/wingui/pdcwin.h)", "")
+# pdcursesmod in use; enable Curses graphics on NetHackW
+OPW = $(O)pdcursesw
+PDCWOBJS = $(PDCCOMMONOBJS) $(addprefix $(OPW)/, \
+	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
+PDCWINGUI = $(PDCURSES_TOP)/wingui
+PDCWLIB = $(O)pdcursesw.a
+
+pdcursesw: $(PDCWLIB)
+
+$(PDCWLIB): $(PDCWOBJS)
+	ar rcs $@ $^
+
+$(OPW)/%.o: $(PDCWINGUI)/%.c | $(OPW)
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -I$(PDCWINGUI) -D_LIB $< -o$@
+
+$(OPW):
+	@mkdir -p $@
+
+CLEAN_DIR += $(OPW)
+CLEAN_FILE += $(PDCWLIB) $(PDCWOBJS)
+endif
+
 endif
 
 #==========================================
@@ -752,8 +787,8 @@ fetchlua:
 	git submodule update --remote ../submodules/lua ; fi
 fetchpdcurses:
 	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
-	git submodule init ../submodules/pdcurses && \
-	git submodule update --remote ../submodules/pdcurses ; fi
+	git submodule init ../submodules/$(PDCURSES) && \
+	git submodule update --remote ../submodules/$(PDCURSES) ; fi
 else  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
 CURLLUADST=lua-5.4.4.tar.gz
@@ -945,9 +980,14 @@ BMPS = $(addprefix $(MSWIN)/, $(addsuffix .bmp, mnsel mnselcnt mnunsel petmark p
 NHWRES = $(ONHW)/winres.o
 NHWTARGETS = $(GAMEDIR)/NetHackW.exe
 
+ifneq "$(PDCWINGUI)" ""
+CFLAGSW += $(NHCURSESFLAGS)
+NHWONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins guitty)
+endif
+
 nethackw: $(NHWTARGETS)
 
-$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) $(PDCWLIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ $(SOUNDLIBLIBS) -o$@
 
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
@@ -989,6 +1029,9 @@ $(ONHW)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
+$(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONH)
+	$(cc) $(CFLAGSW) $(PDCINCL) $< -o$@
+
 $(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
 	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
 
@@ -1019,7 +1062,8 @@ ONH = $(O)nethack
 
 NHONLY = consoletty.o getline.o topl.o wintty.o
 ifeq "$(ADD_CURSES)" "Y"
-CFLAGSNH += -DCURSES_GRAPHICS -DCHTYPE_32 -DPDC_NCMOUSE
+NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
+CFLAGSNH += $(NHCURSESFLAGS)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))
@@ -1091,7 +1135,7 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #=============== TARGETS ==================
 #==========================================
 
-.PHONY: all clean default install lua makedefs recover pdcurses \
+.PHONY: all clean default install lua makedefs recover pdcurses pdcursesw \
 	tile2bmp tilemap uudecode dlb nethackw nethack tileutil \
 	fetchlua fetchpdcurses
 
