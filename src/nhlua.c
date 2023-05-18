@@ -2020,7 +2020,7 @@ nhl_init(nhl_sandbox_info *sbi)
     /* It would be nice to import EXPECTED from each build system. XXX */
     /* And it would be nice to do it only once, but it's cheap. */
 #ifndef NHL_VERSION_EXPECTED
-#define NHL_VERSION_EXPECTED 50405
+#define NHL_VERSION_EXPECTED 50406
 #endif
 
 #ifdef NHL_SANDBOX
