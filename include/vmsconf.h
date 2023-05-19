@@ -306,5 +306,28 @@ extern int vms_open(const char *, int, unsigned);
 extern FILE *vms_fopen(const char *, const char *);
 char *vms_basename(const char *); /* vmsfiles.c */
 
+#ifdef NHSTDC
+
+/*
+ * Used for robust ANSI parameter forward declarations:
+ * int VDECL(sprintf, (char *, const char *, ...));
+ *
+ * VDECL() is used for functions with a variable number of arguments.
+ * Separate macros are needed because ANSI will mix old-style declarations
+ * with prototypes, except in the case of varargs
+  */
+
+#ifdef USE_STDARG
+#define VDECL(f, p) f p
+#else
+#define VDECL(f, p) f()
+#endif
+
+#else /* NHSTDC */ /* a "traditional" C  compiler */
+
+#define VDECL(f, p) f()
+
+#endif /* NHSTDC */
+
 #endif /* VMSCONF_H */
 #endif /* VMS */
