@@ -6,6 +6,7 @@
 # MacOS hints file with support for multiple window ports (interfaces)
 # Tested on:
 #     - MacOS Catalina 10.15
+#     - MacOS Ventura 13 (Intel processor)
 #
 # If this doesn't work for some other version of macOS, consider
 # making a new hints file it, rather than changing this one.
