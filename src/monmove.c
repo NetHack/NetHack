@@ -1,4 +1,4 @@
-/* NetHack 3.7	monmove.c	$NHDT-Date: 1651886999 2022/05/07 01:29:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.179 $ */
+/* NetHack 3.7	monmove.c	$NHDT-Date: 1684621592 2023/05/20 22:26:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1274,7 +1274,7 @@ finish_search:
  * 3: did not move, and can't do anything else either.
  */
 int
-m_move(register struct monst* mtmp, register int after)
+m_move(register struct monst *mtmp, int after)
 {
     int appr, etmp;
     coordxy ggx, ggy, nix, niy;
@@ -1332,22 +1332,30 @@ m_move(register struct monst* mtmp, register int after)
     }
 
     /* and the acquisitive monsters get special treatment */
-    if (is_covetous(ptr)) {
+    if (is_covetous(ptr)) { /* [should this include
+                             *  '&& mtmp->mstrategy != STRAT_NONE'?] */
+        int covetousattack;
         coordxy tx = STRAT_GOALX(mtmp->mstrategy),
-              ty = STRAT_GOALY(mtmp->mstrategy);
-        struct monst *intruder = m_at(tx, ty);
+                ty = STRAT_GOALY(mtmp->mstrategy);
+        struct monst *intruder = isok(tx, ty) ? m_at(tx, ty) : NULL;
         /*
          * if there's a monster on the object or in possession of it,
          * attack it.
          */
-        if ((dist2(mtmp->mx, mtmp->my, tx, ty) < 2) && intruder
-            && (intruder != mtmp)) {
+        if (intruder && intruder != mtmp
+            /* 3.7: this used to use 'dist2() < 2' which meant that intended
+               attack was disallowed if they were adjacent diagonally */
+            && dist2(mtmp->mx, mtmp->my, tx, ty) <= 2) {
+            gb.bhitpos.x = tx, gb.bhitpos.y = ty;
             gn.notonhead = (intruder->mx != tx || intruder->my != ty);
-            if (mattackm(mtmp, intruder) == 2)
+            covetousattack = mattackm(mtmp, intruder);
+            /* 3.7: this used to erroneously use '== 2' (M_ATTK_DEF_DIED) */
+            if (covetousattack & M_ATTK_AGR_DIED)
                 return MMOVE_DIED;
             mmoved = MMOVE_MOVED;
-        } else
+        } else {
             mmoved = MMOVE_NOTHING;
+        }
         goto postmov;
     }
 
@@ -1559,16 +1567,18 @@ m_move(register struct monst* mtmp, register int after)
          * Pets get taken care of above and shouldn't reach this code.
          * Conflict gets handled even farther away (movemon()).
          */
-        if ((info[chi] & ALLOW_M) || (nix == mtmp->mux && niy == mtmp->muy))
+        if ((info[chi] & ALLOW_M) != 0
+            || (nix == mtmp->mux && niy == mtmp->muy))
             return m_move_aggress(mtmp, nix, niy);
 
-        if ((info[chi] & ALLOW_MDISP)) {
+        if ((info[chi] & ALLOW_MDISP) != 0) {
             struct monst *mtmp2;
             int mstatus;
 
-            mtmp2 = m_at(nix, niy);
+            mtmp2 = m_at(nix, niy); /* ALLOW_MDISP implies m_at() is !Null */
             mstatus = mdisplacem(mtmp, mtmp2, FALSE);
-            if ((mstatus & M_ATTK_AGR_DIED) || (mstatus & M_ATTK_DEF_DIED))
+            /*[if either dies, this reports mtmp has died; is that correct?]*/
+            if (mstatus & (M_ATTK_AGR_DIED | M_ATTK_DEF_DIED))
                 return MMOVE_DIED;
             if (mstatus & M_ATTK_HIT)
                 return MMOVE_MOVED;
@@ -1850,25 +1860,31 @@ m_move(register struct monst* mtmp, register int after)
  * (mtmp died) or 3 (mtmp made its move).
  */
 int
-m_move_aggress(struct monst* mtmp, coordxy x, coordxy y)
+m_move_aggress(struct monst *mtmp, coordxy x, coordxy y)
 {
     struct monst *mtmp2;
-    int mstatus;
+    int mstatus = 0; /* M_ATTK_MISS */
 
     mtmp2 = m_at(x, y);
-
-    gn.notonhead = mtmp2 && (x != mtmp2->mx || y != mtmp2->my);
-    /* note: mstatus returns 0 if mtmp2 is nonexistent */
-    mstatus = mattackm(mtmp, mtmp2);
+    if (mtmp2) {
+        gb.bhitpos.x = x, gb.bhitpos.y = y;
+        gn.notonhead = (x != mtmp2->mx || y != mtmp2->my);
+        mstatus = mattackm(mtmp, mtmp2);
+    }
 
     if (mstatus & M_ATTK_AGR_DIED) /* aggressor died */
         return MMOVE_DIED;
 
-    if ((mstatus & M_ATTK_HIT) && !(mstatus & M_ATTK_DEF_DIED) && rn2(4)
-        && mtmp2->movement >= NORMAL_SPEED) {
-        mtmp2->movement -= NORMAL_SPEED;
-        gn.notonhead = 0;
+    if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) == M_ATTK_HIT
+        && rn2(4) && mtmp2->movement > rn2(NORMAL_SPEED)) {
+        if (mtmp2->movement > NORMAL_SPEED)
+            mtmp2->movement -= NORMAL_SPEED;
+        else
+            mtmp2->movement = 0;
+        gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
+        gn.notonhead = FALSE;
         mstatus = mattackm(mtmp2, mtmp); /* return attack */
+        /* note: at this point, defender is the original (moving) aggressor */
         if (mstatus & M_ATTK_DEF_DIED)
             return MMOVE_DIED;
     }
@@ -1903,7 +1919,7 @@ accessible(coordxy x, coordxy y)
 
 /* decide where the monster thinks you are standing */
 void
-set_apparxy(register struct monst* mtmp)
+set_apparxy(register struct monst *mtmp)
 {
     boolean notseen, notthere, gotu;
     int disp;

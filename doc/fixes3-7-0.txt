@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1177 $ $NHDT-Date: 1683710637 2023/05/10 09:23:57 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1181 $ $NHDT-Date: 1684621591 2023/05/20 22:26:31 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1185,6 +1185,8 @@ avoid sanity_check warning if statue in water or lava gets polymorphed into a
 werewolf or werejackal howling and purple worm burping wakes up monsters
 don't exclude map column 1 from consideration when rloc() picks a random spot
 	for destination of a teleported monster
+covetous monster attacking another monster to acquire special item would not
+	do so if positioned diagonally adjacent
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
