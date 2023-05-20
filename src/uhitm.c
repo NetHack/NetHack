@@ -2955,6 +2955,17 @@ mhitm_ad_drin(
     struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
+    struct obj *amu;
+    boolean lifsav;
+
+    /*
+     * Mind flayers have multiple AD_DRIN attacks (3 for plain mind flayer,
+     * 5 for master mind flayer).  If one of those kills the target, skip
+     * the others (for rest of attacker's current move).  To check whether
+     * hero has been killed, we check mortality counter.  For a monster,
+     * we check whether it was wearing an amulet of life-saving before the
+     * attack and no longer wearing any amulet after the attack.
+     */
 
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2984,8 +2995,15 @@ mhitm_ad_drin(
                   mhis(mdef));
             return;
         }
+        amu = which_armor(mdef, W_AMUL);
+        lifsav = amu && amu->otyp == AMULET_OF_LIFE_SAVING;
 
         (void) eat_brains(&gy.youmonst, mdef, TRUE, &mhm->damage);
+
+        /* skip further AD_DRIN if amulet of life-saving got used up */
+        if (lifsav && !which_armor(mdef, W_AMUL))
+            gs.skipdrin = TRUE;
+
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
@@ -3012,16 +3030,23 @@ mhitm_ad_drin(
         mhm->damage = 0; /* don't inflict a second dose below */
 
         if (!uarmh || uarmh->otyp != DUNCE_CAP) {
+            int oldmort = u.umortality,
+                mhitu = eat_brains(magr, mdef, TRUE, (int *) 0);
+
+            /* skip further AD_DRIN if hero's number of deaths went up */
+            if (u.umortality > oldmort)
+                gs.skipdrin = TRUE;
             /* eat_brains() will miss if target is mindless (won't
-               happen here; hero is considered to retain his mind
+               happen here--hero is considered to retain his mind
                regardless of current shape) or is noncorporeal
-               (can't happen here; no one can poly into a ghost
+               (can't happen here--no one can poly into a ghost
                or shade) so this check for missing is academic */
-            if (eat_brains(magr, mdef, TRUE, (int *) 0) == M_ATTK_MISS)
+            if (mhitu == M_ATTK_MISS)
                 return;
         }
         /* adjattrib gives dunce cap message when appropriate */
         (void) adjattrib(A_INT, -rnd(2), FALSE);
+
     } else {
         /* mhitm */
         char buf[BUFSZ];
@@ -3044,7 +3069,14 @@ mhitm_ad_drin(
             }
             return;
         }
+        amu = which_armor(mdef, W_AMUL);
+        lifsav = amu && amu->otyp == AMULET_OF_LIFE_SAVING;
+
         mhm->hitflags = eat_brains(magr, mdef, gv.vis, &mhm->damage);
+
+        /* skip further AD_DRIN if amulet of life-saving got used up */
+        if (lifsav && !which_armor(mdef, W_AMUL))
+            gs.skipdrin = TRUE;
     }
 }
 
