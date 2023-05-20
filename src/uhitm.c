@@ -646,6 +646,7 @@ hitum_cleave(
     static boolean clockwise = FALSE;
     int i;
     coord save_bhitpos;
+    boolean save_notonhead;
     int count, umort, x = u.ux, y = u.uy;
 
     /* find the direction toward primary target */
@@ -661,6 +662,7 @@ hitum_cleave(
     i = clockwise ? DIR_LEFT2(i) : DIR_RIGHT2(i);
     umort = u.umortality; /* used to detect life-saving */
     save_bhitpos = gb.bhitpos;
+    save_notonhead = gn.notonhead;
 
     /*
      * Three attacks:  adjacent to primary, primary, adjacent on other
@@ -692,8 +694,8 @@ hitum_cleave(
         mon_maybe_unparalyze(mtmp);
         dieroll = rnd(20);
         mhit = (tmp > dieroll);
-        gb.bhitpos.x = tx, gb.bhitpos.y = ty; /* normally set up by
-                                               do_attack() */
+        gb.bhitpos.x = tx, gb.bhitpos.y = ty; /* normally set by do_attack() */
+        gn.notonhead = (mtmp->mx != tx || mtmp->my != ty);
         (void) known_hitum(mtmp, uwep, &mhit, tmp, armorpenalty,
                            uattk, dieroll);
         (void) passive(mtmp, uwep, mhit, !DEADMONSTER(mtmp), AT_WEAP, !uwep);
@@ -706,7 +708,8 @@ hitum_cleave(
     /* set up for next time */
     clockwise = !clockwise; /* alternate */
     gb.bhitpos = save_bhitpos; /* in case somebody relies on bhitpos
-                             * designating the primary target */
+                                * designating the primary target */
+    gn.notonhead = save_notonhead;
 
     /* return False if primary target died, True otherwise; note: if 'target'
        was nonNull upon entry then it's still nonNull even if *target died */
@@ -3116,7 +3119,9 @@ mhitm_ad_wrap(
     if (magr == &gy.youmonst) {
         /* uhitm */
         if (!sticks(pd)) {
-            if (!u.ustuck && !rn2(10)) {
+            boolean tailmiss = !gn.notonhead;
+
+            if (!u.ustuck && !tailmiss && !rn2(10)) {
                 if (m_slips_free(mdef, mattk)) {
                     mhm->damage = 0;
                 } else {
@@ -3124,7 +3129,7 @@ mhitm_ad_wrap(
                         coil ? "coil" : "swing", mon_nam(mdef));
                     set_ustuck(mdef);
                 }
-            } else if (u.ustuck == mdef) {
+            } else if (u.ustuck == mdef && !tailmiss) {
                 /* Monsters don't wear amulets of magical breathing */
                 if (is_pool(u.ux, u.uy) && !cant_drown(pd)) {
                     You("drown %s...", mon_nam(mdef));
@@ -3134,11 +3139,11 @@ mhitm_ad_wrap(
             } else {
                 mhm->damage = 0;
                 if (Verbose(4, mhitm_ad_wrap1)) {
-                    if (coil)
+                    if (coil && !tailmiss)
                         You("brush against %s.", mon_nam(mdef));
                     else
                         You("brush against %s %s.", s_suffix(mon_nam(mdef)),
-                            mbodypart(mdef, LEG));
+                            tailmiss ? "tail" : mbodypart(mdef, LEG));
                 }
             }
         } else
@@ -3187,6 +3192,11 @@ mhitm_ad_wrap(
         /* mhitm */
         if (magr->mcan)
             mhm->damage = 0;
+
+        if (!mhm->damage && (canseemon(magr) || canseemon(mdef))) {
+            pline("%s brushes against %s.",
+                  Some_Monnam(magr), some_mon_nam(mdef));
+        }
     }
 }
 

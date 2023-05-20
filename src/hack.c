@@ -1748,9 +1748,9 @@ domove_attackmon_at(
     coordxy x, coordxy y,
     boolean *displaceu)
 {
-    /* only attack if we know it's there */
-    /* or if we used the 'F' command to fight blindly */
-    /* or if it hides_under, in which case we call do_attack() to print
+    /* only attack if we know it's there
+     * or if we used the 'F' command to fight blindly
+     * or if it hides_under, in which case we call do_attack() to print
      * the Wait! message.
      * This is different from ceiling hiders, who aren't handled in
      * do_attack().

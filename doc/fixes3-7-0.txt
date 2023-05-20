@@ -1145,7 +1145,7 @@ give feedback if monster holding onto the hero has to let go when hero polys
 	into a form which can't be held
 prevent hug attacks and touch or engulf attacks for wrap, stick-to, and
 	digestion damage from succeeding against unsolid targets (ghosts,
-	vortices, a few others)
+	vortices, a few others) or against worm tails
 wand of speed gives temporary speed, potion gives intrinsic
 some monsters (riders, shopkeepers, priests, quest leader) can break boulders
 corpse-eating monsters will go out of their way to eat corpses on the floor

@@ -660,8 +660,9 @@ find_targ(
 
         if ((targ = m_at(curx, cury)) != 0) {
             /* Is the monster visible to the pet? */
-            if ((!targ->minvis || perceives(mtmp->data))
-                && !targ->mundetected)
+            if ((!targ->minvis || perceives(mtmp->data)) && !targ->mundetected
+                /* if a long worm, only accept the head as a target */
+                && targ->mx == curx && targ->my == cury) /* not tail */
                 break;
             /* If the pet can't see it, it assumes it aint there */
             targ = 0;
@@ -898,6 +899,8 @@ pet_ranged_attk(struct monst *mtmp)
              */
             mstatus = M_ATTK_HIT;
         } else {
+            gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
+            gn.notonhead = FALSE;
             mstatus = mattackm(mtmp, mtarg);
 
             /* Shouldn't happen, really */
@@ -917,8 +920,11 @@ pet_ranged_attk(struct monst *mtmp)
                  * if it's blind or unseeing, it can't retaliate
                  */
                 if (mtarg->mcansee && haseyes(mtarg->data)) {
-                    int mresp = mattackm(mtarg, mtmp);
+                    int mresp;
 
+                    gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
+                    gn.notonhead = FALSE;
+                    mresp = mattackm(mtarg, mtmp);
                     if (mresp & M_ATTK_DEF_DIED)
                         return MMOVE_DIED;
                 }
@@ -1107,7 +1113,8 @@ dog_move(
             if (after)
                 return MMOVE_NOTHING; /* hit only once each move */
 
-            gn.notonhead = 0;
+            gb.bhitpos.x = nx, gb.bhitpos.y = ny;
+            gn.notonhead = mtmp2->mx != nx || mtmp2->my != ny;
             mstatus = mattackm(mtmp, mtmp2);
 
             /* aggressor (pet) died */
@@ -1120,6 +1127,8 @@ dog_move(
                 && !onscary(mtmp->mx, mtmp->my, mtmp2)
                 /* monnear check needed: long worms hit on tail */
                 && monnear(mtmp2, mtmp->mx, mtmp->my)) {
+                gb.bhitpos.x = mtmp->mx, gb.bhitpos.y = mtmp->my;
+                gn.notonhead = FALSE;
                 mstatus = mattackm(mtmp2, mtmp); /* return attack */
                 if (mstatus & M_ATTK_DEF_DIED)
                     return MMOVE_DIED;
