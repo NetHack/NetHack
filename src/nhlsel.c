@@ -337,6 +337,9 @@ l_selection_xor(lua_State *L)
             int val = selection_getpoint(x, y, sela) ^ selection_getpoint(x, y, selb);
             selection_setpoint(x, y, selr, val);
         }
+    /* this may have created a smaller or irregular selection with bounds_dirty
+     * set to true - update its boundaries */
+    selection_recalc_bounds(selr);
 
     lua_remove(L, 1);
     lua_remove(L, 1);
@@ -363,6 +366,9 @@ l_selection_sub(lua_State *L)
             int val = (a_pt ^ b_pt) & a_pt;
             selection_setpoint(x, y, selr, val);
         }
+    /* this may have created a smaller or irregular selection with bounds_dirty
+     * set to true - update its boundaries */
+    selection_recalc_bounds(selr);
 
     lua_remove(L, 1);
     lua_remove(L, 1);

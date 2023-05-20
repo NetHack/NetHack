@@ -124,7 +124,6 @@ static const char *get_mkroom_name(int);
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
-static void selection_recalc_bounds(struct selectionvar *);
 static lua_Integer get_table_intarray_entry(lua_State *, int, int);
 static struct sp_coder *sp_level_coder_init(void);
 
@@ -4562,7 +4561,7 @@ selection_getbounds(struct selectionvar *sel, NhRect *b)
 }
 
 /* recalc the boundary of selection, if necessary */
-static void
+void
 selection_recalc_bounds(struct selectionvar *sel)
 {
     coordxy x, y;
