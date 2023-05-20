@@ -1584,6 +1584,8 @@ the fuzzer could get stuck in a loop if hero died in a way where life-saving
 	where life-saving teleports you out of it; if the level is full, the
 	teleport will fail and you'll immediately burn up again)
 fix unicorn horn's ability to repair blindness
+quest nemesis and a few other special monsters are suppressed from bones;
+	their death feedback could be given when they were removed
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

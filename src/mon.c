@@ -16,7 +16,7 @@ static long mm_2way_aggression(struct monst *, struct monst *);
 static long mm_aggression(struct monst *, struct monst *);
 static long mm_displacement(struct monst *, struct monst *);
 static void mon_leaving_level(struct monst *);
-static void m_detach(struct monst *, struct permonst *);
+static void m_detach(struct monst *, struct permonst *, boolean);
 static void set_mon_min_mhpmax(struct monst *, int);
 static void lifesaved_monster(struct monst *);
 static boolean ok_to_obliterate(struct monst *);
@@ -2465,7 +2465,8 @@ mon_leaving_level(struct monst *mon)
 static void
 m_detach(
     struct monst *mtmp,
-    struct permonst *mptr) /* reflects mtmp->data _prior_ to mtmp's death */
+    struct permonst *mptr, /* reflects mtmp->data _prior_ to mtmp's death */
+    boolean due_to_death)
 {
     coordxy mx = mtmp->mx, my = mtmp->my;
 
@@ -2487,23 +2488,29 @@ m_detach(
     mon_leaving_level(mtmp);
 
     mtmp->mhp = 0; /* simplify some tests: force mhp to 0 */
-    if (mtmp->iswiz)
-        wizdead();
-    if (mtmp->data->msound == MS_NEMESIS) {
-        nemdead();
-        /* The Archeologist, Caveman, and Priest quest texts describe
-           the nemesis's body creating noxious fumes/gas when killed. */
-        if (stinky_nemesis(mtmp))
-            create_gas_cloud(mx, my, 5, 8);
+    /* foodead() might give quest feedback for foo having died; skip that
+       if we're called for mongone() rather than mondead(); saving bones
+       or wizard mode genocide of "*" can result in special monsters going
+       away without having been killed */
+    if (due_to_death) {
+        if (mtmp->iswiz)
+            wizdead();
+        if (mtmp->data->msound == MS_NEMESIS) {
+            nemdead();
+            /* The Archeologist, Caveman, and Priest quest texts describe
+               the nemesis's body creating noxious fumes/gas when killed. */
+            if (stinky_nemesis(mtmp))
+                create_gas_cloud(mx, my, 5, 8);
+        }
+        if (mtmp->data->msound == MS_LEADER)
+            leaddead();
+        /* release (drop onto map) all objects carried by mtmp; assumes that
+           mtmp->mx,my contains the appropriate location */
+        relobj(mtmp, 1, FALSE); /* drop mtmp->minvent, issue newsym(mx,my) */
     }
-    if (mtmp->data->msound == MS_LEADER)
-        leaddead();
-    if (mtmp->m_id == gs.stealmid)
-        thiefdead();
-    /* release (drop onto map) all objects carried by mtmp; assumes that
-       mtmp->mx,my contains the appropriate location */
-    relobj(mtmp, 1, FALSE); /* drop mtmp->minvent, then issue newsym(mx,my) */
 
+    if (mtmp->m_id == gs.stealmid)
+        thiefdead(); /* reset theft-in-progress data */
     if (mtmp->isshk)
         shkgone(mtmp);
     if (mtmp->wormno)
@@ -2795,7 +2802,7 @@ mondead(struct monst *mtmp)
     if (glyph_is_invisible(levl[mtmp->mx][mtmp->my].glyph))
         unmap_object(mtmp->mx, mtmp->my);
 
-    m_detach(mtmp, mptr);
+    m_detach(mtmp, mptr, TRUE);
     return;
 }
 
@@ -2898,7 +2905,7 @@ mongone(struct monst* mdef)
     mdrop_special_objs(mdef);
     /* release rest of monster's inventory--it is removed from game */
     discard_minvent(mdef, FALSE);
-    m_detach(mdef, mdef->data);
+    m_detach(mdef, mdef->data, FALSE);
 }
 
 /* drop a statue or rock and remove monster */
