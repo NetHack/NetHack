@@ -1384,12 +1384,19 @@ boolean
 builds_up(d_level *lev)
 {
     dungeon *dptr = &gd.dungeons[lev->dnum];
-    /*
-     * FIXME:  this misclassifies a single level branch reached via stairs
-     * from below.  Saving grace is that no such branches currently exist.
-     */
-    return (boolean) (dptr->num_dunlevs > 1
-                      && dptr->entry_lev == dptr->num_dunlevs);
+    branch *br;
+    if (dptr->num_dunlevs > 1)
+        return (boolean) (dptr->entry_lev == dptr->num_dunlevs);
+    /* else, single-level branch; find the branch connection that connects this
+     * dungeon from a parent dungeon and determine whether it builds up from
+     * that */
+    for (br = gb.branches; br; br = br->next) {
+        if (on_level(lev, &br->end2)) {
+            return br->end1_up;
+        }
+    }
+    impossible("builds_up: can't find branch for dungeon %d", lev->dnum);
+    return FALSE;
 }
 
 /* goto the next level (or appropriate dungeon) */
