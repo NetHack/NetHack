@@ -5254,6 +5254,12 @@ sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 static void
 sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
 {
+    if (!isok(x, y)) {
+#ifdef EXTRA_SANITY_CHECKS
+        impossible("sel_set_feature(%i,%i,%i) !isok", x, y, (*(int *) arg));
+#endif /*EXTRA_SANITY_CHECKS*/
+        return;
+    }
     if (IS_FURNITURE(levl[x][y].typ))
         return;
     levl[x][y].typ = (*(int *) arg);
@@ -5335,8 +5341,10 @@ lspo_door(lua_State *L)
         /*selection_iterate(sel, sel_set_door, (genericptr_t) &typ);*/
         get_location_coord(&x, &y, ANY_LOC, gc.coder->croom,
                            SP_COORD_PACK(x, y));
-        if (!isok(x, y))
+        if (!isok(x, y)) {
             nhl_error(L, "door coord not ok");
+            return 0;
+        }
         sel_set_door(x, y, (genericptr_t) &typ);
     }
 
@@ -5461,10 +5469,15 @@ lspo_feature(lua_State *L)
     int typ;
     int argc = lua_gettop(L);
     boolean can_have_flags = FALSE;
+    long fcoord;
+    int humidity;
 
     create_des_coder();
 
-    if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        typ = features2i[luaL_checkoption(L, 1, NULL, features)];
+        x = y = -1;
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
         && lua_type(L, 2) == LUA_TTABLE) {
         lua_Integer fx, fy;
         typ = features2i[luaL_checkoption(L, 1, NULL, features)];
@@ -5485,7 +5498,15 @@ lspo_feature(lua_State *L)
         can_have_flags = TRUE;
     }
 
-    get_location_coord(&x, &y, ANY_LOC, gc.coder->croom, SP_COORD_PACK(x, y));
+    if (x == -1 && y == -1) {
+        fcoord = SP_COORD_PACK_RANDOM(0);
+        humidity = DRY; /* pick a regular space, no rock or other furniture */
+    }
+    else {
+        fcoord = SP_COORD_PACK(x, y);
+        humidity = ANY_LOC; /* assume the author knows what they're doing */
+    }
+    get_location_coord(&x, &y, humidity, gc.coder->croom, fcoord);
 
     if (typ == STONE)
         impossible("feature has unknown type param.");
@@ -5582,6 +5603,10 @@ lspo_terrain(lua_State *L)
     } else {
         get_location_coord(&x, &y, ANY_LOC, gc.coder->croom,
                            SP_COORD_PACK(x, y));
+        if (!isok(x, y)) {
+            nhl_error(L, "terrain coord not ok");
+            return 0;
+        }
         sel_set_ter(x, y, (genericptr_t) &tmpterrain);
     }
 
@@ -6248,6 +6273,10 @@ lspo_drawbridge(lua_State *L)
     y = my;
 
     get_location_coord(&x, &y, DRY | WET | HOT, gc.coder->croom, dcoord);
+    if (!isok(mx, my)) {
+        nhl_error(L, "drawbridge coord not ok");
+        return 0;
+    }
     if (db_open == -1)
         db_open = !rn2(2);
     if (!create_drawbridge(x, y, dir, db_open ? TRUE : FALSE))
@@ -6297,8 +6326,10 @@ lspo_mazewalk(lua_State *L)
 
     get_location_coord(&x, &y, ANY_LOC, gc.coder->croom, mcoord);
 
-    if (!isok(x, y))
+    if (!isok(x, y)) {
+        nhl_error(L, "mazewalk coord not ok");
         return 0;
+    }
 
     if (ftyp < 1) {
         ftyp = gl.level.flags.corrmaze ? CORR : ROOM;
