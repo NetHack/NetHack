@@ -534,6 +534,9 @@ Create a feature, and set flags for it.
 Valid features are a fountain, a sink, a pool, a throne, or a tree.
 Throne has `looted` flag, tree has `looted` and `swarm`, fountain has `looted` and `warned`,
 sink has `pudding`, `dishwasher`, and `ring`.
+If passed with no coordinates, it will be placed in a random normal-floor spot
+in the enclosing room or region if one exists, or a random normal-floor spot
+anywhere on the level if one does not exist.
 
 Example:
 
