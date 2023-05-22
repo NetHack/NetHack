@@ -49,9 +49,11 @@
  * <uchar.h> (C11)       UTF-16 and UTF-32 character utilities
  *
  */
+#if !defined(__cplusplus)
 
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
 
+#endif /* !__cplusplus */
 #endif /* CSTD_H */
