@@ -4,6 +4,7 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
+#define NEW_ENEXTO
 
 static boolean goodpos_onscary(coordxy, coordxy, struct permonst *);
 static boolean tele_jump_ok(coordxy, coordxy, coordxy, coordxy);
@@ -188,6 +189,70 @@ enexto(
             || enexto_core(cc, xx, yy, mdat, NO_MM_FLAGS));
 }
 
+#ifdef NEW_ENEXTO
+
+boolean
+enexto_core(
+    coord *cc, /* output; <cc.x,cc.y> as close as feasible to <xx,yy> */
+    coordxy xx, coordxy yy, /* input coordinates */
+    struct permonst *mdat,  /* type of monster; affects whether water or
+                             * lava or boulder spots will be considered */
+    mmflags_nht entflags)   /* flags for goodpos() */
+{
+    coord candy[ROWNO * (COLNO - 1)]; /* enough room for every location */
+    int i, nearcandyct, allcandyct;
+    struct monst fakemon; /* dummy monster */
+    boolean allow_xx_yy = (boolean) ((entflags & GP_ALLOW_XY) != 0);
+    /* note: GP_ALLOW_XY isn't used by goodpos(); old enext_core() used no
+       mask it off to hide it from goodpos but that isn't required and we
+       want to keep it in case the debugpline() below prints 'entflags' */
+
+    if (!mdat) {
+        debugpline0("enexto() called with null mdat");
+        /* default to player's original monster type */
+        mdat = &mons[u.umonster];
+    }
+    fakemon = cg.zeromonst;
+    set_mon_data(&fakemon, mdat); /* set up for goodpos() */
+
+    /* gather candidate coordinates within 3 steps, those 1 step away in
+       random order first, then those 2 steps away in random order, then 3;
+       this will usually find a good spot without scanning the whole map */
+    nearcandyct = collect_coords(candy, xx, yy, 3, CC_NO_FLAGS,
+                                 (boolean (*)(coordxy, coordxy)) 0);
+    for (i = 0; i < nearcandyct; ++i) {
+        *cc = candy[i];
+        if (goodpos(cc->x, cc->y, &fakemon, entflags))
+            return TRUE;
+    }
+
+    /* didn't find a spot; gather coordinates for the whole map except
+       for <xx,yy> itself, ordered in expanding distance from <xx,yy>
+       (subsets of equal distance grouped together with order randomized) */
+    allcandyct = collect_coords(candy, xx, yy, 0, CC_NO_FLAGS,
+                                (boolean (*)(coordxy, coordxy)) 0);
+    /* skip first 'nearcandyct' spots, they have already been rejected;
+       they will occur in different random order but same overall total */
+    for (i = nearcandyct; i < allcandyct; ++i) {
+        *cc = candy[i];
+        if (goodpos(cc->x, cc->y, &fakemon, entflags))
+            return TRUE;
+    }
+
+    /* still didn't find a spot; maybe try <xx,yy> itself */
+    cc->x = xx, cc->y = yy; /* final value for 'cc' in case we return False */
+    if (allow_xx_yy && goodpos(cc->x, cc->y, &fakemon, entflags))
+        return TRUE;
+
+    /* failed to find any acceptable spot */
+    debugpline4("enexto(\"%s\",%d,%d,0x%08lx) failed",
+                mdat->pmnames[NEUTRAL], (int) xx, (int) yy,
+                (unsigned long) entflags);
+    return FALSE;
+}
+
+#else   /* !NEW_ENEXTO */
+
 boolean
 enexto_core(
     coord *cc,
@@ -272,7 +337,7 @@ enexto_core(
             return TRUE; /* 'cc' is set */
         } else {
             debugpline3("enexto(\"%s\",%d,%d) failed",
-                        mdat->pmnames[NEUTRAL], xx, yy);
+                        mdat->pmnames[NEUTRAL], (int) xx, (int) yy);
             return FALSE;
         }
     }
@@ -285,6 +350,8 @@ enexto_core(
     return TRUE;
 #undef MAX_GOOD
 }
+
+#endif /* ?NEW_ENEXTO */
 
 /*
  * Check for restricted areas present in some special levels.  (This might
