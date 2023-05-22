@@ -6829,7 +6829,12 @@ TODO: gc.coder->croom needs to be updated
  skipmap:
     mapfrag_free(&mf);
 
-    if (has_contents && !(gi.in_mk_themerooms && gt.themeroom_failed)) {
+    if (gi.in_mk_themerooms && gt.themeroom_failed) {
+        /* this mutated xstart and ystart in the process of trying to make a
+         * themed room, so undo them */
+        reset_xystart_size();
+    }
+    else if (has_contents) {
         l_push_wid_hei_table(L, gx.xsize, gy.ysize);
         if (nhl_pcall(L, 1, 0)){
             impossible("Lua error: %s", lua_tostring(L, -1));
