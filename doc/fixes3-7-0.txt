@@ -1187,6 +1187,9 @@ don't exclude map column 1 from consideration when rloc() picks a random spot
 	for destination of a teleported monster
 covetous monster attacking another monster to acquire special item would not
 	do so if positioned diagonally adjacent
+skip sanity_check handling when current command is ^P, otherwise it might
+	re-trigger and show new sanity warning every time when set for
+	line-at-a-line feedback
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -188,11 +188,14 @@ static const char *readchar_queue = "";
 static const char unavailcmd[] = "Unavailable command '%s'.";
 /* for rejecting #if !SHELL, !SUSPEND */
 static const char cmdnotavail[] = "'%s' command not available.";
+/* doesn't need to be in struct g|gw */
+static boolean was_doprev = FALSE;
 
 /* the #prevmsg command */
 static int
 doprev_message(void)
 {
+    was_doprev = TRUE;
     (void) nh_doprev_message();
     return ECMD_OK;
 }
@@ -4265,6 +4268,14 @@ you_sanity_check(void)
 void
 sanity_check(void)
 {
+    if (was_doprev) {
+        /* in case a recurring sanity_check warning occurs, we mustn't
+           re-trigger it when ^P is used, otherwise msg_window:Single
+           and msg_window:Combination will always repeat the most recent
+           instance, never able to go back to any earlier messages */
+        was_doprev = FALSE;
+        return;
+    }
     you_sanity_check();
     obj_sanity_check();
     timer_sanity_check();
