@@ -166,6 +166,11 @@ typedef uchar nhsym;
  * Please don't change the order.  It does matter.
  */
 
+#ifdef __vms
+#ifndef VMS
+#define VMS
+#endif
+#endif
 #ifdef VMS
 #include "vmsconf.h"
 #endif
