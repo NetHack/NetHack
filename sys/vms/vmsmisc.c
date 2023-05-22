@@ -4,6 +4,13 @@
 
 #include "config.h"
 #undef exit
+
+#ifdef VMS9
+#include <descrip.h>
+#include <lib$routines.h>
+#include <starlet.h>
+#endif
+
 #include <ssdef.h>
 #include <stsdef.h>
 
@@ -13,7 +20,10 @@ ATTRNORETURN void vms_exit(int);
 ATTRNORETURN void vms_abort(void);
 
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
+
+#ifndef VMS9
 extern void VDECL(lib$signal, (unsigned, ...));
+#endif
 
 /* terminate, converting Unix-style exit code into VMS status code */
 ATTRNORETURN void

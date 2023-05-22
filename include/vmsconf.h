@@ -17,7 +17,21 @@
  *   extra room for patching longer values into an existing executable.
  */
 #define Local_WIZARD "NHWIZARD\0\0\0\0"
-#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_5_X.PLAY]\0\0\0\0\0\0\0\0"
+#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_7_X.PLAY]\0\0\0\0\0\0\0\0"
+
+/*
+ * VMS9 uses a VSI C compiler and supports C99.
+ * It is the first version available on X86_64 so we can auto-detect it there.
+ */
+#ifdef __x86_64
+#define VMS9
+#endif
+/* #define VMS9 */
+
+#ifdef VMS9
+/* for version.c */
+typedef int64_t ssize_t;
+#endif
 
 /*
  * This section cleans up the stuff done in config.h so that it
@@ -162,8 +176,10 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 
 /* config.h defines USE_ISAAC64; we'll use it on Alpha or IA64 but not VAX;
    it overrides RANDOM */
+#if !defined(VMS9)
 #if (defined(VAX) || defined(vax) || defined(__vax)) && defined(USE_ISAAC64)
 #undef ISAAC64
+#endif
 #endif
 
 #define FCMASK 0660 /* file creation mask */
@@ -214,6 +230,20 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #endif
 #endif
 
+#ifdef VMS9
+#define NO_TERMCAP_HEADERS
+#undef __HIDE_FORBIDDEN_NAMES
+/* C99 */
+#include <types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <stat.h>
+#include <errno.h>
+#include <stsdef.h>
+#endif
+
 #ifdef _DECC_V4_SOURCE
 /* <types.h> excludes some necessary typedefs when _DECC_V4_SOURCE is defined
  */
@@ -234,9 +264,15 @@ typedef __gid_t gid_t;
 #define __MODE_T
 typedef __mode_t mode_t;
 #endif
+#ifndef __OFF_T
+#define __OFF_T
+typedef int32_t off_t;
+#endif
 #endif /* _DECC_V4_SOURCE */
 
 #include <time.h>
+
+#ifndef VMS9
 #if 0 /* <file.h> is missing for old gcc versions; skip it to save time */
 #include <file.h>
 #else /* values needed from missing include file */
@@ -245,6 +281,7 @@ typedef __mode_t mode_t;
 #define O_RDWR 2
 #define O_CREAT 0x200
 #define O_TRUNC 0x400
+#endif
 #endif
 
 #define tgetch vms_getchar
@@ -272,6 +309,7 @@ typedef __mode_t mode_t;
 # endif
 #endif
 
+#if !defined(VMS9)
 #ifndef __GNUC__
 #ifndef bcopy
 #define bcopy(s, d, n) memcpy((d), (s), (n)) /* vaxcrtl */
@@ -290,12 +328,16 @@ typedef __mode_t mode_t;
 #else
 #define unlink(f0) remove(f0) /* vaxcrtl, decc$shr */
 #endif
+#endif /* VMS9 */
+
 #define C$$TRANSLATE(n) c__translate(n) /* vmsfiles.c */
 
+#if !defined(VMS9)
 /* VMS global names are case insensitive... */
 #define An vms_an
 #define The vms_the
 #define Shk_Your vms_shk_your
+#endif /* VMS9 */
 
 /* avoid global symbol in Alpha/VMS V1.5 STARLET library (link trouble) */
 #define ospeed vms_ospeed

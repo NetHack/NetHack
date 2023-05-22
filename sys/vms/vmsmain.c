@@ -7,6 +7,12 @@
 #include "hack.h"
 #include "dlb.h"
 
+#ifdef VMS9
+#include <descrip.h>
+#include <lib$routines.h>
+#include <starlet.h>
+#endif
+
 #include <signal.h>
 
 static void whoami(void);
@@ -389,7 +395,9 @@ byebye(void)
     void (*hup)(int) ;
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
+#ifndef VMS9
     extern unsigned long sys$delprc(unsigned long *, const genericptr_t);
+#endif
 
     /* clean up any subprocess we've spawned that may still be hanging around
      */

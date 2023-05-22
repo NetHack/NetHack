@@ -10,6 +10,12 @@
 #include "config.h"
 #include <ctype.h>
 
+#ifdef VMS9
+#include <descrip.h>
+#include <lib$routines.h>
+#include <starlet.h>
+#endif
+
 /* lint supression due to lack of extern.h */
 int vms_link(const char *, const char *);
 int vms_unlink(const char *);
@@ -27,8 +33,11 @@ int c__translate(int);
 #ifndef C$$TRANSLATE /* don't rely on VAXCRTL's internal routine */
 #define C$$TRANSLATE(status) (errno = EVMSERR, vaxc$errno = (status))
 #endif
+
+#ifndef VMS9
 extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
 extern int VDECL(lib$match_cond, (int, int, ...));
+#endif
 
 #define vms_success(sts) ((sts) & 1)         /* odd, */
 #define vms_failure(sts) (!vms_success(sts)) /* even */

@@ -382,7 +382,9 @@ done_intr(int sig_unused UNUSED)
     done_stopprint++;
     (void) signal(SIGINT, SIG_IGN);
 #if defined(UNIX) || defined(VMS)
+#ifndef VMS9
     (void) signal(SIGQUIT, SIG_IGN);
+#endif
 #endif
     return;
 }
@@ -1389,7 +1391,9 @@ really_done(int how)
 #ifndef NO_SIGNAL
     (void) signal(SIGINT, (SIG_RET_TYPE) done_intr);
 #if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#ifndef VMS9
     (void) signal(SIGQUIT, (SIG_RET_TYPE) done_intr);
+#endif
     sethanguphandler(done_hangup);
 #endif
 #endif /* NO_SIGNAL */

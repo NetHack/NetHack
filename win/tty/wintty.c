@@ -377,7 +377,9 @@ winch_handler(int sig_unused UNUSED)
 #undef WINCH_MESSAGE
     }
 #endif
+#ifndef VMS
     getwindowsz();
+#endif
     /* For long running events such as multi-page menus and
      * display_file(), we note the signal's occurance and
      * hope the code there decides to handle the situation
@@ -3383,7 +3385,8 @@ g_putch(int in_ch)
 }
 #endif /* !WIN32CON */
 
-#if defined(ENHANCED_SYMBOLS) && defined(UNIX)
+#if defined(UNIX) || defined(VMS)
+#if defined(ENHANCED_SYMBOLS)
 void
 g_pututf8(uint8 *utf8str)
 {
@@ -3394,7 +3397,8 @@ g_pututf8(uint8 *utf8str)
     }
     return;
 }
-#endif /* ENHANCED_SYMBOLS && UNIX */
+#endif /* ENHANCED_SYMBOLS */
+#endif /* UNIX || VMS */
 
 #ifdef CLIPPING
 void

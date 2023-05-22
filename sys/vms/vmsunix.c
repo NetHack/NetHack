@@ -7,6 +7,14 @@
 
 #include "hack.h"
 
+#ifdef VMS9
+#include <lib$routines.h>
+#include <smg$routines.h>
+#include <starlet.h>
+#define sys$imgsta SYS$IMGSTA
+#include <unixio.h>
+#endif
+
 #include <descrip.h>
 #include <dvidef.h>
 #include <jpidef.h>
@@ -25,10 +33,13 @@
 
 extern int debuggable; /* defined in vmsmisc.c */
 
+#ifndef VMS9
 extern void VDECL(lib$signal, (unsigned, ...));
 extern unsigned long sys$setprv();
 extern unsigned long lib$getdvi(), lib$getjpi(), lib$spawn(), lib$attach();
 extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
+#endif
+
 #define vms_ok(sts) ((sts) & 1) /* odd => success */
 
 /* this could be static; it's only used within this file;
@@ -216,7 +227,10 @@ vms_define(const char *name, const char *value, int flag)
     };
     static struct itm3 itm_lst[] = { { 0, LNM$_STRING, 0, 0 }, { 0, 0 } };
     struct dsc nam_dsc, val_dsc, tbl_dsc;
-    unsigned long result, sys$crelnm(), lib$set_logical();
+    unsigned long result;
+#ifndef VMS9
+    unsigned long sys$crelnm(), lib$set_logical();
+#endif
 
     /* set up string descriptors */
     nam_dsc.mbz = val_dsc.mbz = tbl_dsc.mbz = 0;
@@ -581,8 +595,11 @@ struct dsc {
     char *adr;
 };                             /* descriptor */
 typedef unsigned long vmscond; /* vms condition value */
+
+#ifndef VMS9
 vmscond lib$find_file(const struct dsc *, struct dsc *, genericptr *);
 vmscond lib$find_file_end(void **);
+#endif
 
 /* collect a list of character names from all save files for this player */
 int
