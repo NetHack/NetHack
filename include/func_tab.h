@@ -1,4 +1,4 @@
-/* NetHack 3.7	func_tab.h	$NHDT-Date: 1596498537 2020/08/03 23:48:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.14 $ */
+/* NetHack 3.7	func_tab.h	$NHDT-Date: 1684791775 2023/05/22 21:42:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -20,6 +20,7 @@
 #define PREFIXCMD    0x0200 /* prefix command, requires another one after it */
 #define MOVEMENTCMD  0x0400 /* used to move hero/cursor */
 #define MOUSECMD     0x0800 /* cmd allowed to be bound to mouse button */
+#define CMD_INSANE   0x1000 /* suppress sanity check (for ^P and ^R) */
 
 /* flags for extcmds_match() */
 #define ECM_NOFLAGS       0
@@ -31,7 +32,7 @@ struct ext_func_tab {
     uchar key;
     const char *ef_txt, *ef_desc;
     int (*ef_funct)(void); /* must return ECMD_foo flags */
-    int flags;
+    unsigned flags;
     const char *f_text;
 };
 

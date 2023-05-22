@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1655161560 2022/06/13 23:06:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1684791761 2023/05/22 21:42:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -230,6 +230,7 @@ struct instance_flags {
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
+    boolean sanity_no_check; /* skip next sanity check */
     boolean debug_overwrite_stairs; /* debug: allow overwriting stairs */
     boolean debug_mongen;  /* debug: prevent monster generation */
     boolean debug_hunger;  /* debug: prevent hunger */
