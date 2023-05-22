@@ -29,8 +29,10 @@
 /* #define VMS9 */
 
 #ifdef VMS9
+#ifndef __cplusplus
 /* for version.c */
 typedef int64_t ssize_t;
+#endif
 #endif
 
 /*
