@@ -1456,7 +1456,6 @@ term_start_bgcolor(int color)
 #define tcfmtstr24bit "\033[38;2;%u;%u;%um"
 #define tcfmtstr256 "\033[38;5;%dm"
 #else
-#define tcfmtstr "\033[38:2:%ld:%ld:%ldm"
 #define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
 #define tcfmtstr256 "\033[38:5:%ldm"
 #endif
