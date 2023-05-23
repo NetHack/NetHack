@@ -640,7 +640,7 @@ stop_occupation(void)
     if (go.occupation) {
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", go.occtxt);
-        go.occupation = 0;
+        go.occupation = (int (*)(void)) 0;
         gc.context.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
     } else if (gm.multi >= 0) {

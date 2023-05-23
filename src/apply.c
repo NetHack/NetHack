@@ -2834,6 +2834,7 @@ use_trap(struct obj *otmp)
     return;
 }
 
+/* occupation routine called each turn while arming a beartrap or landmine */
 static int
 set_trap(void)
 {
@@ -2841,9 +2842,8 @@ set_trap(void)
     struct trap *ttmp;
     int ttyp;
 
-    if (!otmp || !carried(otmp) || u.ux != gt.trapinfo.tx
-        || u.uy != gt.trapinfo.ty) {
-        /* ?? */
+    if (!otmp || !carried(otmp) || !u_at(gt.trapinfo.tx, gt.trapinfo.ty)) {
+        /* trap object might have been stolen or hero teleported */
         reset_trapset();
         return 0;
     }
@@ -4171,6 +4171,8 @@ doapply(void)
     case LAND_MINE:
     case BEARTRAP:
         use_trap(obj);
+        if (go.occupation == set_trap)
+            obj = (struct obj *) 0; /* not gone yet but behave as if it was */
         break;
     case FLINT:
     case LUCKSTONE:
@@ -4190,8 +4192,8 @@ doapply(void)
         pline("Sorry, I don't know how to use that.");
         return ECMD_FAIL;
     }
-    /* This assumes that anything that potentially destroyed obj has kept track
-     * of it and set obj to null before this point. */
+    /* This assumes that anything that potentially destroyed obj has kept
+     * track of it and set obj to null before this point. */
     if (obj && obj->oartifact) {
         res |= arti_speak(obj); /* sets ECMD_TIME bit if artifact speaks */
     }
