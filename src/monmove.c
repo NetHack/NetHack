@@ -719,6 +719,7 @@ dochug(register struct monst* mtmp)
     /* mind flayers can make psychic attacks! */
     } else if (is_mind_flayer(mdat) && !rn2(20)) {
         mind_blast(mtmp);
+        distfleeck(mtmp, &inrange, &nearby, &scared);
     }
 
     /* If monster is nearby you, and has to wield a weapon, do so.  This
