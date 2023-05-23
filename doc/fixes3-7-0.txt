@@ -1190,6 +1190,8 @@ covetous monster attacking another monster to acquire special item would not
 skip sanity_check handling when current command is ^P, otherwise it might
 	re-trigger and show new sanity warning every time when set for
 	line-at-a-line feedback
+applying a cream pie (always) or lump of royal jelly (sometimes) would use up
+	the object and then access its memory after that had been freed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
