@@ -29,7 +29,7 @@ $	!	to avoid inadvertent logical name interaction
 $	play_files = "PERM.,RECORD.,LOGFILE.,XLOGFILE.,PANICLOG."
 $	help_files = "HELP.,HH.,CMDHELP.,KEYHELP.,WIZHELP.,OPTHELP.," -
 		   + "HISTORY.,LICENSE."
-$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,QUEST.DAT,TRIBUTE.," -
+$	data_files = "DATA.,RUMORS.,ORACLES.,OPTIONS.,TRIBUTE.," -
 		   + "ENGRAVE.,EPITAPH.,BOGUSMON."
 $	sysconf_file = "[.sys.vms]sysconf"
 $	guidebook  = "[.doc]Guidebook.txt"
@@ -37,10 +37,12 @@ $	invoc_proc = "[.sys.vms]nethack.com"
 $	trmcp_file = "[.sys.share]termcap"
 $	spec_files = "air.lua,asmodeus.lua,astral.lua,baalz.lua,"	-
 		+ "bigrm-*.lua,castle.lua,earth.lua,fakewiz%.lua,"	-
-		+ "fire.lua,juiblex.lua,knox.lua,medusa-%.lua,"		-
-		+ "minefill.lua,minetn-%.lua,minend-%.lua,nhlib.lua,"	-
-		+ "oracle.lua,orcus.lua,sanctum.lua,soko%-%.lua,"	-
-		+ "tower%.lua,valley.lua,water.lua,wizard%.lua,hellfill.lua,tut-%.lua"
+		+ "fire.lua,hellfill.lua,juiblex.lua,knox.lua,"		-
+		+ "medusa-%.lua,minefill.lua,minetn-%.lua,"		-
+		+ "minend-%.lua,nhcore.lua,nhlib.lua,"	-
+		+ "oracle.lua,orcus.lua,quest.lua,sanctum.lua,"		-
+		+ "soko%-%.lua,themerms.lua,tower%.lua,tut-%.lua,"	-
+		+ "valley.lua,water.lua,wizard%.lua"
 $	qstl_files = "%%%-goal.lua,%%%-fil%.lua,%%%-loca.lua,%%%-strt.lua"
 $	dngn_files = "dungeon.lua"
 $!
@@ -101,6 +103,8 @@ $ makedefs -h	!oracles.txt -> oracles
 $	milestone "(dungeon preprocess)"
 $ makedefs -s
 $	milestone "(engrave, epitaph, bogusmon)"
+$ makedefs -v
+$	milestone "(options)"
 $! makedefs -e	!dungeon.def -> dungeon.pdf
 $!	milestone "(quest text)"
 $ makedefs -q	!quest.txt -> quest.dat
