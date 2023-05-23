@@ -7,7 +7,7 @@
 
 #include "hack.h"
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <lib$routines.h>
 #include <smg$routines.h>
 #include <starlet.h>
@@ -33,7 +33,7 @@
 
 extern int debuggable; /* defined in vmsmisc.c */
 
-#ifndef VMS9
+#ifndef VMSVSI
 extern void VDECL(lib$signal, (unsigned, ...));
 extern unsigned long sys$setprv();
 extern unsigned long lib$getdvi(), lib$getjpi(), lib$spawn(), lib$attach();
@@ -228,7 +228,7 @@ vms_define(const char *name, const char *value, int flag)
     static struct itm3 itm_lst[] = { { 0, LNM$_STRING, 0, 0 }, { 0, 0 } };
     struct dsc nam_dsc, val_dsc, tbl_dsc;
     unsigned long result;
-#ifndef VMS9
+#ifndef VMSVSI
     unsigned long sys$crelnm(), lib$set_logical();
 #endif
 
@@ -596,7 +596,7 @@ struct dsc {
 };                             /* descriptor */
 typedef unsigned long vmscond; /* vms condition value */
 
-#ifndef VMS9
+#ifndef VMSVSI
 vmscond lib$find_file(const struct dsc *, struct dsc *, genericptr *);
 vmscond lib$find_file_end(void **);
 #endif

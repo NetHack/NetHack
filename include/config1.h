@@ -145,6 +145,12 @@
 #define _GNU_SOURCE
 #endif
 
+#ifdef __vms
+#ifndef VMS
+#define VMS
+#endif
+#endif
+
 #ifdef VMS /* really old compilers need special handling, detected here */
 #undef UNIX
 #ifdef __DECC
@@ -153,15 +159,21 @@
         /* [25 or so years later...  That was probably uchar widening to */
         /* 'unsigned int' rather than anything to do with typedefs.  pr] */
 #define USE_VARARGS
-#else
+#else              /* __DECC_VER not defined */
+#if __DECC_VER >= 70000000
+#define VMSVSI
+#endif /* _DECC_VER >= 70000000 */
+#ifndef VMSVSI
 #define NHSTDC
 #define USE_STDARG
 #define POSIX_TYPES
 #ifndef _DECC_V4_SOURCE /* only def here if not already def'd on comd line */
 #define _DECC_V4_SOURCE /* avoid some incompatible V5.x (and later) changes */
 #endif
+#endif /* !VMSVSI */
 #endif /*__DECC_VER*/
 #undef __HIDE_FORBIDDEN_NAMES /* need non-ANSI library support functions */
+#ifndef VMSVSI
 #ifdef VAXC    /* DEC C in VAX C compatibility mode; 'signed' works   */
 #define signed /* but causes diagnostic about VAX C not supporting it */
 #endif
@@ -190,6 +202,7 @@
 #undef USE_STDARG
 #endif
 #endif
+#endif /* !VMSVSI */
 #endif /*VMS*/
 
 #ifdef vax

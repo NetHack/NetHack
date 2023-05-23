@@ -5,7 +5,7 @@
 #include "config.h"
 #undef exit
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <descrip.h>
 #include <lib$routines.h>
 #include <starlet.h>
@@ -21,7 +21,7 @@ ATTRNORETURN void vms_abort(void);
 
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
 
-#ifndef VMS9
+#ifndef VMSVSI
 extern void VDECL(lib$signal, (unsigned, ...));
 #endif
 

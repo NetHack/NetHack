@@ -10,7 +10,7 @@
 #include "config.h"
 #include <ctype.h>
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <descrip.h>
 #include <lib$routines.h>
 #include <starlet.h>
@@ -34,7 +34,7 @@ int c__translate(int);
 #define C$$TRANSLATE(status) (errno = EVMSERR, vaxc$errno = (status))
 #endif
 
-#ifndef VMS9
+#ifndef VMSVSI
 extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
 extern int VDECL(lib$match_cond, (int, int, ...));
 #endif

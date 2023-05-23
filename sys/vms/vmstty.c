@@ -9,7 +9,7 @@
 #include "wintty.h"
 #include "tcap.h"
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <lib$routines.h>
 #include <smg$routines.h>
 #include <starlet.h>
@@ -40,12 +40,12 @@
 #include <signal.h>
 
 
-#ifndef VMS9
+#ifndef VMSVSI
 unsigned long lib$disable_ctrl(), lib$enable_ctrl();
 unsigned long sys$assign(), sys$dassgn(), sys$qiow();
 #endif
 #ifndef USE_QIO_INPUT
-#ifndef VMS9
+#ifndef VMSVSI
 unsigned long smg$create_virtual_keyboard(), smg$delete_virtual_keyboard(),
     smg$read_keystroke(), smg$cancel_input();
 #endif
@@ -533,7 +533,7 @@ introff(void)
 
 #ifdef TIMED_DELAY
 
-#ifndef VMS9
+#ifndef VMSVSI
 extern unsigned long lib$emul(const long *, const long *, const long *,
                               long *);
 extern unsigned long sys$schdwk(), sys$hiber();

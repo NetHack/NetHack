@@ -20,22 +20,6 @@
 #define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_7_X.PLAY]\0\0\0\0\0\0\0\0"
 
 /*
- * VMS9 uses a VSI C compiler and supports C99.
- * It is the first version available on X86_64 so we can auto-detect it there.
- */
-#ifdef __x86_64
-#define VMS9
-#endif
-/* #define VMS9 */
-
-#ifdef VMS9
-#ifndef __cplusplus
-/* for version.c */
-typedef int64_t ssize_t;
-#endif
-#endif
-
-/*
  * This section cleans up the stuff done in config.h so that it
  * shouldn't need to be modified.  It's conservative so that if
  * config.h is actually edited, the changes won't impact us.
@@ -178,7 +162,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 
 /* config.h defines USE_ISAAC64; we'll use it on Alpha or IA64 but not VAX;
    it overrides RANDOM */
-#if !defined(VMS9)
+#if !defined(VMSVSI)
 #if (defined(VAX) || defined(vax) || defined(__vax)) && defined(USE_ISAAC64)
 #undef ISAAC64
 #endif
@@ -207,6 +191,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 /* # define FILENAME_CMP strcmpi */ /* case insensitive */
 #endif
 
+#ifndef VMSVSI
 #if defined(VAXC) && !defined(ANCIENT_VAXC)
 #ifdef volatile
 #undef volatile
@@ -231,10 +216,10 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define ALLOCA_HACK /* used in util/panic.c */
 #endif
 #endif
+#endif /* !VMSVSI */
 
-#ifdef VMS9
+#ifdef VMSVSI
 #define NO_TERMCAP_HEADERS
-#undef __HIDE_FORBIDDEN_NAMES
 /* C99 */
 #include <types.h>
 #include <unistd.h>
@@ -274,7 +259,7 @@ typedef int32_t off_t;
 
 #include <time.h>
 
-#ifndef VMS9
+#ifndef VMSVSI
 #if 0 /* <file.h> is missing for old gcc versions; skip it to save time */
 #include <file.h>
 #else /* values needed from missing include file */
@@ -288,10 +273,12 @@ typedef int32_t off_t;
 
 #define tgetch vms_getchar
 
+#ifndef VMSVSI
 #if defined(__DECC_VER) && (__DECC_VER >= 50000000)
  /* for cc/Standard=ANSI89, suppress notification that '$' in identifiers
     is an extension; sys/vms/*.c needs it regardless of strict ANSI mode */
 # pragma message disable DOLLARID
+#endif
 #endif
 
 /* #include "system.h" */
@@ -311,7 +298,7 @@ typedef int32_t off_t;
 # endif
 #endif
 
-#if !defined(VMS9)
+#if !defined(VMSVSI)
 #ifndef __GNUC__
 #ifndef bcopy
 #define bcopy(s, d, n) memcpy((d), (s), (n)) /* vaxcrtl */
@@ -330,16 +317,16 @@ typedef int32_t off_t;
 #else
 #define unlink(f0) remove(f0) /* vaxcrtl, decc$shr */
 #endif
-#endif /* VMS9 */
+#endif /* VMSVSI */
 
 #define C$$TRANSLATE(n) c__translate(n) /* vmsfiles.c */
 
-#if !defined(VMS9)
+#if !defined(VMSVSI)
 /* VMS global names are case insensitive... */
 #define An vms_an
 #define The vms_the
 #define Shk_Your vms_shk_your
-#endif /* VMS9 */
+#endif /* VMSVSI */
 
 /* avoid global symbol in Alpha/VMS V1.5 STARLET library (link trouble) */
 #define ospeed vms_ospeed

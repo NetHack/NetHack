@@ -11,7 +11,7 @@ unsigned long enable_broadcast_trapping(void);
 unsigned long disable_broadcast_trapping(void);
 struct mail_info *parse_next_broadcast(void);
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <descrip.h>
 #include <lib$routines.h>
 #include <starlet.h>
@@ -46,7 +46,7 @@ extern size_t strspn(const char *, const char *);
 extern int VDECL(sscanf, (const char *, const char *, ...));
 #endif
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <smg$routines.h>
 #else
 extern unsigned long smg$create_pasteboard(), smg$get_broadcast_message(),

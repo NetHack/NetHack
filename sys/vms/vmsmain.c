@@ -7,7 +7,7 @@
 #include "hack.h"
 #include "dlb.h"
 
-#ifdef VMS9
+#ifdef VMSVSI
 #include <descrip.h>
 #include <lib$routines.h>
 #include <starlet.h>
@@ -395,7 +395,7 @@ byebye(void)
     void (*hup)(int) ;
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
-#ifndef VMS9
+#ifndef VMSVSI
     extern unsigned long sys$delprc(unsigned long *, const genericptr_t);
 #endif
 
