@@ -4,9 +4,6 @@ $ ! $NHDT-Date: 1609347486 2020/12/30 16:58:06 $  $NHDT-Branch: NetHack-3.7 $:$N
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
 $
-$!TODO: Separate the lua build and create an object library for it instead
-$!	of putting lua modules into nethack.olb.
-$
 $ luaver = "546"
 $ luadotver = "5.4.6"
 $ luaunderver = "5_4_6"
@@ -65,10 +62,12 @@ $	o_GNUC = 15
 $	o_LINK = 20
 $	o_SPCL = 25
 $	o_FETCHLUA = 33
-$	c_opt = f$locate("|"+p1, "|VSIC|VAXC|DECC|GNUC|LINK|SPECIAL|FETCHLUA") !5
-$     write sys$output c_opt
+$       o_BUILDLUA = 42
+$	c_opt = f$locate("|"+p1, -
+	"|VSIC|VAXC|DECC|GNUC|LINK|SPECIAL|FETCHLUA|BUILDLUA")
+$!     write sys$output c_opt
 $     if (c_opt/5)*5 .eq. c_opt then  goto p1_ok
-$     if c_opt .eq. 33 then goto fetchlua
+$     if (c_opt .eq. o_FETCHLUA) .OR. (c_opt .eq. o_BUILDLUA) then goto p1_ok
 $	copy sys$input: sys$error:	!p1 usage
 %first arg is compiler option; it must be one of
        "VSIC"      -- use VSI C to compile everything
@@ -78,7 +77,8 @@ $	copy sys$input: sys$error:	!p1 usage
    or  "LINK"      -- skip compilation, just relink nethack.exe
    or  "SPEC[IAL]" -- just compile and link dlb.exe and recover.exe
    or  "FETCHLUA"  -- skip compilaton, just fetch lua from lua.org
-   or    ""        -- default operation (VAXC unless 'CC' is defined)
+   or  "BUILDLUA"  -- build [-.lib.lua]lua'LUAVER'.olb
+   or  ""          -- carry out default operation (VAXC unless 'CC' is defined)
 
 Note: if a DCL symbol for CC is defined, "VAXC" and "GNUC" are no-ops.
       If the symbol value begins with "G" (or "g"), then the GNU C
@@ -169,7 +169,10 @@ $	  c_c_ = "/INCLUDE=[-.INCLUDE]" + c_c_
 $	  cxx_c_ = "/INCLUDE=[-.INCLUDE]" + cxx_c_
 $ !
 $got_cc:
-$	if c_opt.eq.o_VSIC
+$
+$!      not sure if 8.x DECC supports /NAMES=(AS_IS). Use next line, if so
+$!	if (c_opt.ne.o_VAXC) .and. (c_opt.ne.o_GNUC) .and. (c_opt.ne.o_DECC)
+$	if (c_opt.ne.o_VAXC) .and. (c_opt.ne.o_GNUC)
 $	then
 $	  c_c_ = c_c_ + "/NAMES=(AS_IS)
 $	  cxx_c_ = cxx_c_ + "/NAMES=(AS_IS)
@@ -244,7 +247,10 @@ $	if f$type('c_name'_options).nes."" then  f_opts = 'c_name'_options
 $	milestone " (",c_name,")"
 $	if f$search("''c_name'.obj").nes."" then  delete 'c_name'.obj;*
 $	'compiler' 'f_opts' 'c_file'
-$	if .not.no_lib then  nh_obj_list == nh_obj_list + ",''c_name'.obj;0"
+$	if .not.no_lib
+$       then
+$	    libr/Obj/Replace 'nethacklib' 'c_name'.obj;0
+$	endif
 $     return
 $!
 $compile_list:	!input via 'c_list'
@@ -257,10 +263,6 @@ $	if c_file.eqs."," then	goto c_done
 $	gosub compile_file
 $	goto c_loop
 $ c_done:
-$	nh_obj_list == f$extract(1,999,nh_obj_list)
-$	if nh_obj_list.nes."" then  libr/Obj 'nethacklib' 'nh_obj_list'/Replace
-$!	if nh_obj_list.nes."" then  delete 'nh_obj_list'
-$	delete/symbol/global nh_obj_list
 $     return
 $fetchlua:
 $	create/dir [-.lib]
@@ -278,12 +280,14 @@ $	pipe -
 	if (f$search("lua-''luaunderver'.DIR;1").nes."") .AND. -
 		(f$search("lua''luaver'.dir;1").eqs."") then -
 		rename lua-'luaunderver'.DIR;1  lua'luaver'.dir;1
+$ milestone "[-.lib.lua'''luaver']"
 $luafixdir:
 	set def [-.src]
 $       if f$search("[-.include]nhlua.h;-1").nes."" then -
 		purge [-.include]nhlua.h
 $	if f$search("[-.include]nhlua.h").nes."" then -
 		delete [-.include]nhlua.h;
+$ milestone " (wiped existing [-.include]nhlua.h)"
 $ exit
 $!
 $! 3.7 runtime LUA level parser/loader
@@ -292,6 +296,10 @@ $buildlua:
 $ if f$search("[-.lib]lua.dir;").eqs."" then -
 	create/dir [-.lib.lua]
 $ save_nethacklib = nethacklib
+$!
+$! Temporarily override the value of nethacklib so that
+$! the lua modules go into the lua library, not nethacklib.
+$!
 $ nethacklib = "[-.lib.lua]lua''luaver'.olb"
 $ if f$search("''nethacklib'").eqs."" then -
   libr/Obj 'nethacklib'/Create
@@ -315,10 +323,30 @@ $ c_list = "[-.lib.lua''luaver'.src]lapi,[-.lib.lua''luaver'.src]lauxlib" -
 	+ ",[-.lib.lua''luaver'.src]lutf8lib,[-.lib.lua''luaver'.src]lvm" -
 	+ ",[-.lib.lua''luaver'.src]lzio"
 $ gosub compile_list
-$ milestone " (''nethacklib')"
+$ milestone " ''nethacklib'"
+$ luafinish:
 $ nethacklib = save_nethacklib
 $ return
 $begin:
+$ if (c_opt .eq. o_FETCHLUA) .OR. (c_opt .eq. o_BUILDLUA)
+$ then
+$     if c_opt .eq. 33 then gosub fetchlua
+$     if c_opt .eq. 42 then gosub buildlua
+$     goto done
+$ endif
+$!
+$! Check some prerequisites
+$!
+$ if f$search("[-.lib]lua''luaver'.dir").eqs.""
+$ then
+$     write sys$output "You need to: @vmsbuild fetchlua
+$     exit
+$ endif
+$ if f$search("[-.lib.lua]lua''luaver'.olb").eqs.""
+$ then
+$     write sys$output "You need to: @vmsbuild buildlua
+$     exit
+$ endif
 $!
 $! miscellaneous special source file setup
 $!
@@ -356,6 +384,7 @@ $       write f "#include ""[-.lib.lua''luaver'.src]lauxlib.h"""
 $       write f "/*nhlua.h*/"
 $	close f
 $ endif
+$ milestone " ([-.include]nhlua.h)"
 $!
 $! create object library
 $!
@@ -366,7 +395,6 @@ $!
 $! compile and link makedefs, then nethack, dlb+recover.
 $!
 $ milestone "<compiling...>"
-$ gosub buildlua
 $!
 $ c_list = "[-.sys.vms]vmsmisc,[-.sys.vms]vmsfiles,[]alloc,dlb," -
 	+ "monst,objects,date,#[-.util]panic"
@@ -386,7 +414,7 @@ $! makedefs -v	!date.h
 $ milestone " (*.c)"
 $ set default [-.src]
 $! compile most of the source files:
-$ c_list = "decl,version,[-.sys.vms]vmsmain,[-.sys.vms]vmsunix" -
+$ c_list = "decl,version,[-.sys.vms]vmsunix" -
 	+ ",[-.sys.vms]vmstty,[-.sys.vms]vmsmail" -
 	+ ",[]isaac64" -			!already in [.src]
 	+ ",[]tclib,[]regex"			!copied from [-.sys.share]
@@ -401,54 +429,31 @@ $ gosub compile_list
 $ c_list = "hack,hacklib,insight,invent,light,lock,mail,makemon" -
 	+ ",mcastu,mdlib,mhitm,mhitu,minion,mklev,mkmap,mkmaze" -
 	+ ",mkobj,mkroom,mon,mondata,monmove,mplayer,mthrowu,muse" -
-	+ ",music,o_init,objnam,options,pager,pickup"
+	+ ",music"
 $ gosub compile_list
-$ c_list = "pline,polyself,potion,pray,priest,quest,questpgr,read" -
+$!
+$! Files added in 3.7 for Lua glue
+$!
+$ c_list = "nhlua,nhlobj,nhlsel"
+$ gosub compile_list
+$ c_list = "o_init,objnam,options,pager,pickup" -
+	+ ",pline,polyself,potion,pray,priest,quest,questpgr,read" -
 	+ ",rect,region,restore,rip,rnd,role,rumors,save,sfstruct,shk" -
 	+ ",shknam,sit,sounds,sp_lev,spell,steal,steed,symbols" -
 	+ ",sys,teleport,timeout,topten,track,trap,utf8map,u_init"
 $ gosub compile_list
 $ c_list = "uhitm,vault,vision,weapon,were,wield,windows" -
-	+ ",wizard,worm,worn,write,zap,date"
-$ gosub compile_list
-$!
-$! Files added in 3.7
-$!
-$ c_list = "nhlua,nhlobj,nhlsel"
+	+ ",wizard,worm,worn,write,zap"
 $ gosub compile_list
 $!
 $link:
+$! We do these at the end
+$ c_list = "#[-.sys.vms]vmsmain,#date"
+$ gosub compile_list
 $ milestone "<linking...>"
-$ link  vmsmain.obj, -
-	regex.obj, allmain.obj, alloc.obj, apply.obj, -
-	artifact.obj, attrib.obj, ball.obj, bones.obj, botl.obj, -
-	cmd.obj, dbridge.obj, decl.obj, detect.obj, dig.obj, display.obj, -
-	dlb.obj, do.obj, do_name.obj, do_wear.obj, dog.obj, dogmove.obj, -
-	dokick.obj, dothrow.obj, drawing.obj, dungeon.obj, eat.obj, -
-	end.obj, engrave.obj, exper.obj, explode.obj, extralev.obj, -
-	files.obj, fountain.obj, hack.obj, hacklib.obj, insight.obj, -
-	invent.obj, isaac64.obj, light.obj, lock.obj, mail.obj, -
-	makemon.obj, mcastu.obj, mdlib.obj, mhitm.obj, mhitu.obj, -
-	minion.obj, mklev.obj, mkmap.obj, mkmaze.obj, mkobj.obj, -
-	mkroom.obj, mon.obj, mondata.obj, monmove.obj, monst.obj, -
-	mplayer.obj, mthrowu.obj, muse.obj, music.obj, nhlua.obj, -
-	nhlsel.obj, nhlobj.obj, objnam.obj, o_init.obj, objects.obj, -
-	options.obj, pager.obj, pickup.obj, pline.obj, polyself.obj, -
-	potion.obj, pray.obj, priest.obj, quest.obj, questpgr.obj, -
-	read.obj, rect.obj, region.obj, restore.obj, rip.obj, rnd.obj, -
-	role.obj, rumors.obj, save.obj, sfstruct.obj, shk.obj, shknam.obj, -
-	sit.obj, sounds.obj, sp_lev.obj, spell.obj, steal.obj, steed.obj, -
-	symbols.obj, sys.obj, teleport.obj, timeout.obj, topten.obj, -
-	track.obj, trap.obj, u_init.obj, utf8map.obj, uhitm.obj, -
-	vault.obj, version.obj, vision.obj, weapon.obj, were.obj, -
-	wield.obj, windows.obj, wizard.obj, worm.obj, worn.obj, -
-	write.obj, zap.obj, vmsfiles.obj, vmsmail.obj, vmsmisc.obj, -
-	vmstty.obj, vmsunix.obj, getline.obj, termcap.obj, topl.obj, -
-	wintty.obj, tclib.obj, date.obj -
-        /EXECUTABLE=nethack.exe -
-        +sys$disk:[-.lib.lua]lua'luaver'.olb/library
-$! link/Exe=nethack.exe [-.lib.lua]lua'luaver'.olb/Lib, -
-$!	nethack.opt/Options,ident.opt/Options,crtl.opt/Options
+$ link /EXECUTABLE=nethack.exe vmsmain.obj,date.obj-
+        +[-.src]nethack.olb/library -
+        +sys$disk:[-.lib.lua]lua546.olb/library
 $ milestone "NetHack"
 $     if c_opt.eq.o_LINK then  goto done	!"LINK" only
 $special:
