@@ -897,7 +897,8 @@ minliquid_core(struct monst* mtmp)
 int
 mcalcmove(
     struct monst *mon,
-    boolean m_moving) /* True: adjust for moving; False: just adjust for speed */
+    boolean m_moving) /* True: adjust for moving;
+                       * False: just adjust for speed */
 {
     int mmove = mon->data->mmove;
     int mmove_adj;
@@ -1096,7 +1097,7 @@ movemon(void)
     iter_mons_safe(movemon_singlemon);
 
     if (any_light_source())
-        gv.vision_full_recalc = 1; /* in case a mon moved with a light source */
+        gv.vision_full_recalc = 1; /* in case a mon moved w/ a light source */
     /* reset obj bypasses after last monster has moved */
     if (gc.context.bypasses)
         clear_bypasses();

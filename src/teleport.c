@@ -203,9 +203,9 @@ enexto_core(
     int i, nearcandyct, allcandyct;
     struct monst fakemon; /* dummy monster */
     boolean allow_xx_yy = (boolean) ((entflags & GP_ALLOW_XY) != 0);
-    /* note: GP_ALLOW_XY isn't used by goodpos(); old enext_core() used no
+    /* note: GP_ALLOW_XY isn't used by goodpos(); old enext_core() used to
        mask it off to hide it from goodpos but that isn't required and we
-       want to keep it in case the debugpline() below prints 'entflags' */
+       want to keep it in case the debugpline4() gets called */
 
     if (!mdat) {
         debugpline0("enexto() called with null mdat");
@@ -682,7 +682,7 @@ collect_coords(
             }
         }
     } /* radius loop */
-    debugpline4("collect_coords(,%d,%d,%d,,,)=%d", cx, cy, maxradius, result);
+    debugpline4("collect_coords(,%d,%d,%d,,)=%d", cx, cy, maxradius, result);
     return result;
 }
 
