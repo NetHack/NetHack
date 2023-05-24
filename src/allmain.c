@@ -68,6 +68,9 @@ moveloop_preamble(boolean resuming)
            clairvoyance (wizard with cornuthaum perhaps?); without this,
            first "random" occurrence would always kick in on turn 1 */
         gc.context.seer_turn = (long) rnd(30);
+        /* give hero initial movement points; new game only--for restore,
+           pending movement points were included in the save file */
+        u.umovement = NORMAL_SPEED;
     }
     gc.context.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
@@ -83,7 +86,6 @@ moveloop_preamble(boolean resuming)
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    gy.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     gc.context.move = 0;
 
     gp.program_state.in_moveloop = 1;
@@ -135,9 +137,9 @@ u_calc_moveamt(int wtcap)
         break;
     }
 
-    gy.youmonst.movement += moveamt;
-    if (gy.youmonst.movement < 0)
-        gy.youmonst.movement = 0;
+    u.umovement += moveamt;
+    if (u.umovement < 0)
+        u.umovement = 0;
 }
 
 #if defined(MICRO) || defined(WIN32)
@@ -168,7 +170,7 @@ moveloop_core(void)
 
     if (gc.context.move) {
         /* actual time passed */
-        gy.youmonst.movement -= NORMAL_SPEED;
+        u.umovement -= NORMAL_SPEED;
 
         do { /* hero can't move this turn loop */
             mvl_wtcap = encumber_msg();
@@ -176,12 +178,12 @@ moveloop_core(void)
             gc.context.mon_moving = TRUE;
             do {
                 monscanmove = movemon();
-                if (gy.youmonst.movement >= NORMAL_SPEED)
+                if (u.umovement >= NORMAL_SPEED)
                     break; /* it's now your turn */
             } while (monscanmove);
             gc.context.mon_moving = FALSE;
 
-            if (!monscanmove && gy.youmonst.movement < NORMAL_SPEED) {
+            if (!monscanmove && u.umovement < NORMAL_SPEED) {
                 /* both hero and monsters are out of steam this round */
                 struct monst *mtmp;
 
@@ -347,7 +349,7 @@ moveloop_core(void)
                     }
                 }
             }
-        } while (gy.youmonst.movement < NORMAL_SPEED); /* hero can't move */
+        } while (u.umovement < NORMAL_SPEED); /* hero can't move */
 
         /******************************************/
         /* once-per-hero-took-time things go here */

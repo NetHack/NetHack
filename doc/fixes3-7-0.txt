@@ -1192,6 +1192,7 @@ skip sanity_check handling when current command is ^P, otherwise it might
 	line-at-a-line feedback
 applying a cream pie (always) or lump of royal jelly (sometimes) would use up
 	the object and then access its memory after that had been freed
+keep track of hero's pending movement points across save and restore
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
