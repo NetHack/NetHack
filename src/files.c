@@ -232,6 +232,40 @@ static boolean copy_bytes(int, int);
 #endif
 static NHFILE *viable_nhfile(NHFILE *);
 
+/* return a file's name without its path and optionally trailing 'type' */
+const char *
+nh_basename(const char *fname, boolean keep_suffix)
+{
+#ifndef VMS
+    static char basebuf[80];
+    const char *p;
+
+    if ((p = strrchr(fname, '/')) != 0)
+        fname = p + 1;
+#if defined(WIN32) || defined(MSDOS)
+    if ((p = strrchr(fname, '\\')) != 0)
+        fname = p + 1;
+#endif
+    if ((p = strrchr(fname, '.')) != 0 && !keep_suffix) {
+        size_t ln = (size_t) (p - fname);
+        /* note that without path, name should be reasonable length;
+           it is expected to refer to a source file name or run-time
+           configuration file name and those aren't arbitrarily long;
+           if "name" part of "name.suffix" is too long for 'basebuf[]',
+           just return that as-is without stripping off ".suffix" */
+
+        if (ln < sizeof basebuf) {
+            strncpy(basebuf, fname, ln);
+            basebuf[ln] = '\0';
+            fname = basebuf;
+        }
+    }
+#else /* VMS */
+    fname = vms_basename(fname, keep_suffix);
+#endif
+    return fname;
+}
+
 /*
  * fname_encode()
  *
@@ -4437,18 +4471,8 @@ debugcore(const char *filename, boolean wildcards)
     if (!debugfiles || !*debugfiles)
         return FALSE;
 
-/* strip filename's path if present */
-#ifdef UNIX
-    if ((p = strrchr(filename, '/')) != 0)
-        filename = p + 1;
-#endif
-#ifdef VMS
-    filename = vms_basename(filename);
-    /* vms_basename strips off 'type' suffix as well as path and version;
-       we want to put suffix back (".c" assumed); since it always returns
-       a pointer to a static buffer, we can safely modify its result */
-    Strcat((char *) filename, ".c");
-#endif
+    /* strip filename's path if present */
+    filename = nh_basename(filename, TRUE);
 
     /*
      * Wildcard match will only work if there's a single pattern (which

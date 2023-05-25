@@ -305,10 +305,10 @@ static char base_name[NAM$C_MAXRSS + 1];
 
 /* return a copy of the 'base' portion of a filename */
 char *
-vms_basename(const char *name)
+vms_basename(const char *name, boolean keep_suffix)
 {
     unsigned len;
-    char *base, *base_p;
+    char *base, *base_p, *xtra_p;
     register const char *name_p;
 
     /* skip directory/path */
@@ -323,10 +323,14 @@ vms_basename(const char *name)
     if (!*name)
         name = "."; /* this should never happen */
 
-    /* find extension/version and derive length of basename */
-    if ((name_p = strchr(name, '.')) == 0 || name_p == name)
-        name_p = strchr(name, ';');
-    len = (name_p && name_p > name) ? name_p - name : strlen(name);
+    /* find extension/version and derive length of basename;
+       for 'keep_suffix', this won't be accurate if version number is
+       present and delimited by dot instead of semi-colon, but normal
+       usage is for DEBUGFILES and that uses compiler supplied name */
+    name_p = strrchr(name, ';');
+    if (!keep_suffix && (xtra_p = strrchr(name, '.')) != 0)
+        name_p = xtra_p;
+    len = (name_p && name_p > name) ? name_p - name : (unsigned) strlen(name);
 
     /* return a lowercase copy of the name in a private static buffer */
     base = strncpy(base_name, name, len);

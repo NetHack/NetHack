@@ -335,7 +335,7 @@ typedef int32_t off_t;
 extern void vms_exit(int);
 extern int vms_open(const char *, int, unsigned);
 extern FILE *vms_fopen(const char *, const char *);
-char *vms_basename(const char *); /* vmsfiles.c */
+char *vms_basename(const char *, boolean); /* vmsfiles.c */
 
 #endif /* VMSCONF_H */
 #endif /* VMS */
