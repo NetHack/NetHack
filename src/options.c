@@ -368,14 +368,9 @@ extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
 
-/* ask user if they want a tutorial, except if tutorial boolean option has been
-   set in config - either on or off - in which case just obey that setting
-   without asking. */
-#ifdef SAFERHANGUP
-#define DONE_HUP gp.program_state.done_hup
-#else
-#define DONE_HUP 0
-#endif
+/* ask user if they want a tutorial, except if tutorial boolean option has
+   been set in config - either on or off - in which case just obey that
+   setting without asking */
 boolean
 ask_do_tutorial(void)
 {
@@ -385,8 +380,16 @@ ask_do_tutorial(void)
         winid win;
         menu_item *sel;
         anything any;
-        int n;
+        char buf[BUFSZ];
+        const char *rc;
+        boolean norc;
+        int n, pass = 0;
 
+        rc = nh_basename(configfile, TRUE);
+        norc = !strcmp(configfile, "/dev/null");
+        Snprintf(buf, sizeof buf,
+                 "Put \"OPTIONS=!tutorial\" in %s to skip this query.",
+                 (rc && *rc && !norc) ? rc : "your configuration file");
         do {
             win = create_nhwindow(NHW_MENU);
             start_menu(win, MENU_BEHAVE_STANDARD);
@@ -396,29 +399,32 @@ ask_do_tutorial(void)
                      ATR_NONE, 0, "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
             any.a_char = 'n';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, 0, "No", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, 0, "No, just start play", MENU_ITEMFLAGS_NONE);
 
             any = cg.zeroany;
             add_menu(win, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
             add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
-            add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, 0, "Put \"OPTIONS=notutorial\" in the config file to skip this query.", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            if (pass++) /* we'll get here after <space> or <return> */
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, 0, "(Please choose 'y' or 'n'.)",
+                         MENU_ITEMFLAGS_NONE);
 
             end_menu(win, "Do you want a tutorial?");
 
             n = select_menu(win, PICK_ONE, &sel);
             destroy_nhwindow(win);
-        } while (n <= 0 && !DONE_HUP);
+        } while (!n);
         if (n > 0) {
             dotut = (sel[0].item.a_char == 'y');
             free((genericptr_t) sel);
+        } else { /* ESC */
+            dotut = FALSE;
         }
     }
     return dotut;
 }
-#undef DONE_HUP
 
 /*
  **********************************
