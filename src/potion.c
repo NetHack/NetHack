@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1629497464 2021/08/20 22:11:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1685135014 2023/05/26 21:03:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1055,35 +1055,33 @@ peffect_blindness(struct obj *otmp)
                  (boolean) !Blind);
 }
 
-DISABLE_WARNING_FORMAT_NONLITERAL
-
 static void
 peffect_gain_level(struct obj *otmp)
 {
     if (otmp->cursed) {
+        boolean on_lvl_1 = (ledger_no(&u.uz) == 1);
+
         gp.potion_unkn++;
         /* they went up a level */
-        if ((ledger_no(&u.uz) == 1 && u.uhave.amulet)
-            || Can_rise_up(u.ux, u.uy, &u.uz)) {
-            static const char riseup[] = "rise up, through the %s!";
+        if (on_lvl_1 ? u.uhave.amulet : Can_rise_up(u.ux, u.uy, &u.uz)) {
+            int newlev;
+            d_level newlevel;
 
-            if (ledger_no(&u.uz) == 1) {
-                You(riseup, ceiling(u.ux, u.uy));
-                goto_level(&earth_level, FALSE, FALSE, FALSE);
+            if (on_lvl_1) {
+                assign_level(&newlevel, &earth_level);
             } else {
-                int newlev = depth(&u.uz) - 1;
-                d_level newlevel;
-
+                newlev = depth(&u.uz) - 1;
                 get_level(&newlevel, newlev);
                 if (on_level(&newlevel, &u.uz)) {
                     pline("It tasted bad.");
                     return;
-                } else
-                    You(riseup, ceiling(u.ux, u.uy));
-                goto_level(&newlevel, FALSE, FALSE, FALSE);
+                }
             }
-        } else
+            You("rise up, through the %s!", ceiling(u.ux, u.uy));
+            goto_level(&newlevel, FALSE, FALSE, FALSE);
+        } else {
             You("have an uneasy feeling.");
+        }
         return;
     }
     pluslvl(FALSE);
@@ -1092,8 +1090,6 @@ peffect_gain_level(struct obj *otmp)
     if (otmp->blessed)
         u.uexp = rndexp(TRUE);
 }
-
-RESTORE_WARNING_FORMAT_NONLITERAL
 
 static void
 peffect_healing(struct obj *otmp)
