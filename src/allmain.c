@@ -519,12 +519,12 @@ maybe_do_tutorial(void)
 
     if (ask_do_tutorial()) {
         assign_level(&u.ucamefrom, &u.uz);
-        u.nofollowers = TRUE;
+        iflags.nofollowers = TRUE;
         schedule_goto(&sp->dlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
         deferred_goto();
         vision_recalc(0);
         docrt();
-        u.nofollowers = FALSE;
+        iflags.nofollowers = FALSE;
     }
 }
 

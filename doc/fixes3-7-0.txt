@@ -1592,6 +1592,9 @@ the fuzzer could get stuck in a loop if hero died in a way where life-saving
 fix unicorn horn's ability to repair blindness
 quest nemesis and a few other special monsters are suppressed from bones;
 	their death feedback could be given when they were removed
+running the tutorial until completion and returning to normal play but left
+	the 'no followers' flag set; adjacent pets wouldn't tag along when
+	hero moved to other levels
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

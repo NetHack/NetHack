@@ -1522,7 +1522,7 @@ goto_level(
     set_ustuck((struct monst *) 0); /* clear u.ustuck and u.uswallow */
     set_uinwater(0); /* u.uinwater = 0 */
     u.uundetected = 0; /* not hidden, even if means are available */
-    if (!u.nofollowers)
+    if (!iflags.nofollowers)
         keepdogs(FALSE);
     recalc_mapseen(); /* recalculate map overview before we leave the level */
     /*
