@@ -1193,6 +1193,7 @@ skip sanity_check handling when current command is ^P, otherwise it might
 applying a cream pie (always) or lump of royal jelly (sometimes) would use up
 	the object and then access its memory after that had been freed
 keep track of hero's pending movement points across save and restore
+give feedback if hero sees a monster become hidden under an object or water
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

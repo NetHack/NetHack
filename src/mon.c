@@ -152,15 +152,19 @@ sanity_check_single_mon(
         if (m_at(mx, my) == mtmp && hides_under(mptr) && !OBJ_AT(mx, my))
             impossible("mon hiding under nonexistent obj (%s)", msg);
         if (mptr->mlet == S_EEL
-            && !is_pool(mx, my) && !Is_waterlevel(&u.uz))
-            impossible("eel hiding out of water (%s)", msg);
+            && !(is_pool(mx, my) && !Is_waterlevel(&u.uz)))
+            impossible("eel hiding %s (%s)",
+                       !Is_waterlevel(&u.uz) ? "out of water"
+                                             : "on Plane of Water", msg);
         if (ceiling_hider(mptr)
             /* normally !accessible would be overridable with passes_walls,
                but not for hiding on the ceiling */
             && (!has_ceiling(&u.uz) ||
                 !(levl[mx][my].typ == POOL
                   || levl[mx][my].typ == MOAT
+                  || levl[mx][my].typ == WATER
                   || levl[mx][my].typ == LAVAPOOL
+                  || levl[mx][my].typ == LAVAWALL
                   || accessible(mx, my))))
             impossible("ceiling hider hiding %s (%s)",
                        !has_ceiling(&u.uz) ? "without ceiling"
@@ -4189,6 +4193,8 @@ boolean
 hideunder(struct monst *mtmp)
 {
     struct trap *t;
+    const char *seenmon = (char *) 0, *seenobj = (char *) 0;
+    int seeit = canseemon(mtmp);
     boolean oldundetctd, undetected = FALSE, is_u = (mtmp == &gy.youmonst);
     coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
 
@@ -4200,16 +4206,20 @@ hideunder(struct monst *mtmp)
         ; /* undetected==FALSE; can't hide while stuck in a non-pit trap */
     } else if (mtmp->data->mlet == S_EEL) {
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
+        if (seeit)
+            seenobj = "the water";
     } else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
         struct obj *otmp = gl.level.objects[x][y];
 
+        if (seeit)
+            seenobj = ansimpleoname(otmp);
         /* most monsters won't hide under cockatrice corpse but they
            can hide under a pile containing more than just such corpses */
         while (otmp && otmp->otyp == CORPSE
                && touch_petrifies(&mons[otmp->corpsenm]))
             otmp = otmp->nexthere;
         if (otmp != 0 || ((mtmp == &gy.youmonst) ? Stone_resistance
-                                                : resists_ston(mtmp)))
+                                                 : resists_ston(mtmp)))
             undetected = TRUE;
     }
 
@@ -4217,8 +4227,13 @@ hideunder(struct monst *mtmp)
         oldundetctd = u.uundetected != 0;
         u.uundetected = undetected ? 1 : 0;
     } else {
+        if (seeit)
+            seenmon = y_monnam(mtmp);
         oldundetctd = mtmp->mundetected != 0;
         mtmp->mundetected = undetected ? 1 : 0;
+        if (undetected && seenmon && seenobj)
+            You_see("%s %s under %s", seenmon,
+                    locomotion(mtmp->data, "hide"), seenobj);
     }
     if (undetected != oldundetctd)
         newsym(x, y);
