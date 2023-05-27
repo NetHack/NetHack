@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1181 $ $NHDT-Date: 1684621591 2023/05/20 22:26:31 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1188 $ $NHDT-Date: 1685202441 2023/05/27 15:47:21 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1595,6 +1595,9 @@ quest nemesis and a few other special monsters are suppressed from bones;
 running the tutorial until completion and returning to normal play but left
 	the 'no followers' flag set; adjacent pets wouldn't tag along when
 	hero moved to other levels
+when a magic whistle moved a hidden pet it brought that out of hiding and
+	gave a message about "your <pet> appears" but the map was updated
+	while it was still hidden so nothing seemed to appear
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

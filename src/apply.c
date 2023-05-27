@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1655631557 2022/06/19 09:39:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.381 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1685202442 2023/05/27 15:47:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -540,7 +540,10 @@ magic_whistled(struct obj *obj)
         mnexto(mtmp, !already_discovered ? RLOC_MSG : RLOC_NONE);
 
         if (mtmp->mx != omx || mtmp->my != omy) {
-            mtmp->mundetected = 0; /* reveal non-mimic hider iff it moved */
+            if (mtmp->mundetected) { /* reveal non-mimic hider that moved */
+                mtmp->mundetected = 0;
+                newsym(mtmp->mx, mtmp->my);
+            }
             /*
              * FIXME:
              *  All relocated monsters should change positions essentially
