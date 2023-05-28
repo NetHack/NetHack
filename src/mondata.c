@@ -1279,13 +1279,13 @@ raceptr(struct monst *mtmp)
 }
 
 typedef const char *const locoverbs[4];
-locoverbs levitate = { "float", "Float", "wobble", "Wobble" },
-          flys = { "fly", "Fly", "flutter", "Flutter" },
-          flyl = { "fly", "Fly", "stagger", "Stagger" },
-          slither = { "slither", "Slither", "falter", "Falter" },
-          ooze = { "ooze", "Ooze", "tremble", "Tremble" },
-          immobile = { "wiggle", "Wiggle", "pulsate", "Pulsate" },
-          crawl = { "crawl", "Crawl", "falter", "Falter" };
+static locoverbs levitate = { "float", "Float", "wobble", "Wobble" },
+                 flys = { "fly", "Fly", "flutter", "Flutter" },
+                 flyl = { "fly", "Fly", "stagger", "Stagger" },
+                 slither = { "slither", "Slither", "falter", "Falter" },
+                 ooze = { "ooze", "Ooze", "tremble", "Tremble" },
+                 immobile = { "wiggle", "Wiggle", "pulsate", "Pulsate" },
+                 crawl = { "crawl", "Crawl", "falter", "Falter" };
 
 const char *
 locomotion(const struct permonst *ptr, const char *def)
