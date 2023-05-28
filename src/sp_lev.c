@@ -4053,7 +4053,7 @@ lspo_room(lua_State *L)
 }
 
 static void
-spo_endroom(struct sp_coder*coder UNUSED)
+spo_endroom(struct sp_coder *coder UNUSED)
 {
     if (gc.coder->n_subroom > 1) {
         gc.coder->n_subroom--;
