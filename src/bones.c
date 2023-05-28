@@ -391,6 +391,7 @@ remove_mon_from_bones(struct monst *mtmp)
     if (mtmp->iswiz || mptr == &mons[PM_MEDUSA]
         || mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER
         || mptr == &mons[PM_VLAD_THE_IMPALER]
+        || mtmp->cham == PM_VLAD_THE_IMPALER /* in case he's vampshifted */
         || (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
         mongone(mtmp);
 }

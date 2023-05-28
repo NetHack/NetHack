@@ -1037,11 +1037,16 @@ improve consistency between applying a key and explicitly opening a door:
 	isn't any door in the direction supplied, you're told "no door" and
 	time elapses if you discover the non-door's terrain type but doesn't
 	if you already knew the type there
-if a bones file contains a doppelganger imitating a unique monster, a game
-	that loads those bones will end up with that monster counted as
-	having already been created so it won't be created if/when the time
-	for that arrives (the doppelganger will change its shape normally,
+if a bones file contained a doppelganger imitating a unique monster, a game
+	that loaded those bones would end up with that monster counted as
+	having already been created so it wouldn't be created when the time
+	for that arrived (the doppelganger would change its shape normally,
 	not be stuck in the unique monster's form)
+if Vlad was lured to a level which allowed bones, he could be present in a
+	bones file for that level if he was in wolf/bat/cloud form at the
+	time hero died; getting those bones in another game would flag him
+	as extinct; if that occurred before entering his level he would not
+	be created there, leaving no way for hero to acquire the Candelabrum
 when mounted hero got hit by an explosion, hero and steed shared resistances
 removing an engraving from frost (ie, written with fingers on ice) reported
 	"you wipe out the message that was written in the _dust_"
