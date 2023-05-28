@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1665130027 2022/10/07 08:07:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.366 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1685312552 2023/05/28 22:22:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.409 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -315,9 +315,7 @@ attack_checks(
     return FALSE;
 }
 
-/*
- * It is unchivalrous for a knight to attack the defenseless or from behind.
- */
+/* it is unchivalrous for a knight to attack the defenseless or from behind */
 void
 check_caitiff(struct monst *mtmp)
 {
@@ -807,8 +805,8 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
     /* Blessed gloves give bonuses when fighting 'bare-handed'.  So do
        silver rings.  Note:  rings are worn under gloves, so you don't
        get both bonuses, and two silver rings don't give double bonus. */
-    hmd->dmg += special_dmgval(&gy.youmonst, mon, (W_ARMG | W_RINGL | W_RINGR),
-                               &silverhit);
+    hmd->dmg += special_dmgval(&gy.youmonst, mon,
+                               (W_ARMG | W_RINGL | W_RINGR), &silverhit);
     hmd->barehand_silver_rings = (((silverhit & W_RINGL) ? 1 : 0)
                                   + ((silverhit & W_RINGR) ? 1 : 0));
     if (hmd->barehand_silver_rings > 0)
@@ -1271,7 +1269,8 @@ hmon_hitmon_do_hit(
     } else {
         /* stone missile does not hurt xorn or earth elemental, but doesn't
            pass all the way through and continue on to some further target */
-        if ((hmd->thrown == HMON_THROWN || hmd->thrown == HMON_KICKED) /* not Applied */
+        if ((hmd->thrown == HMON_THROWN
+             || hmd->thrown == HMON_KICKED) /* not Applied */
             && stone_missile(obj) && passes_rocks(hmd->mdat)) {
             hit(mshot_xname(obj), mon, " but does no harm.");
             wakeup(mon, TRUE);
@@ -1495,7 +1494,8 @@ hmon_hitmon_msg_hit(
 {
     if (!hmd->hittxt /*( thrown => obj exists )*/
         && (!hmd->destroyed
-            || (hmd->thrown && gm.m_shot.n > 1 && gm.m_shot.o == obj->otyp))) {
+            || (hmd->thrown && gm.m_shot.n > 1
+                && gm.m_shot.o == obj->otyp))) {
         if (hmd->thrown)
             hit(mshot_xname(obj), mon, exclam(hmd->dmg));
         else if (!Verbose(4, hmon_hitmon2))
@@ -1926,9 +1926,7 @@ joust(struct monst *mon, /* target */
     return 0; /* no joust bonus; revert to ordinary attack */
 }
 
-/*
- * Send in a demon pet for the hero.  Exercise wisdom.
- */
+/* send in a demon pet for the hero; exercise wisdom */
 static void
 demonpet(void)
 {
@@ -2078,8 +2076,9 @@ steal_it(struct monst *mdef, struct attack *mattk)
 }
 
 void
-mhitm_ad_rust(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_rust(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -2134,8 +2133,9 @@ mhitm_ad_rust(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_corr(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_corr(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -2158,8 +2158,9 @@ mhitm_ad_corr(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_dcay(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_dcay(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -2810,8 +2811,9 @@ mhitm_ad_blnd(
 }
 
 void
-mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_curs(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pa = magr->data;
     struct permonst *pd = mdef->data;
@@ -2877,7 +2879,8 @@ mhitm_ad_curs(struct monst *magr, struct attack *mattk, struct monst *mdef,
                     You(brief_feeling, "strangely sad");
                 }
                 mhm->hitflags = (M_ATTK_DEF_DIED
-                                 | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
+                                 | (grow_up(magr, mdef) ? 0
+                                    : M_ATTK_AGR_DIED));
                 mhm->done = TRUE;
                 return;
             }
@@ -3157,7 +3160,8 @@ mhitm_ad_wrap(
                 } else {
                     set_ustuck(magr); /* before message, for botl update */
                     urgent_pline("%s %s itself around you!",
-                                 Some_Monnam(magr), coil ? "coils" : "swings");
+                                 Some_Monnam(magr),
+                                 coil ? "coils" : "swings");
                 }
             } else if (u.ustuck == magr) {
                 if (is_pool(magr->mx, magr->my) && !Swimming && !Amphibious
@@ -3251,7 +3255,8 @@ mhitm_ad_plys(
 void
 mhitm_ad_slee(
     struct monst *magr, struct attack *mattk,
-    struct monst *mdef, struct mhitm_data *mhm UNUSED)
+    struct monst *mdef,
+    struct mhitm_data *mhm UNUSED)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3372,7 +3377,8 @@ mhitm_ad_slim(
 void
 mhitm_ad_ench(
     struct monst *magr, struct attack *mattk,
-    struct monst *mdef, struct mhitm_data *mhm UNUSED)
+    struct monst *mdef,
+    struct mhitm_data *mhm UNUSED)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3420,7 +3426,8 @@ mhitm_ad_ench(
 void
 mhitm_ad_slow(
     struct monst *magr, struct attack *mattk,
-    struct monst *mdef, struct mhitm_data *mhm UNUSED)
+    struct monst *mdef,
+    struct mhitm_data *mhm UNUSED)
 {
     boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
 
@@ -3455,8 +3462,9 @@ mhitm_ad_slow(
 }
 
 void
-mhitm_ad_conf(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_conf(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -3541,8 +3549,10 @@ mhitm_ad_poly(
 }
 
 void
-mhitm_ad_famn(struct monst *magr, struct attack *mattk UNUSED,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_famn(
+    struct monst *magr,
+    struct attack *mattk UNUSED,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -3569,8 +3579,9 @@ mhitm_ad_famn(struct monst *magr, struct attack *mattk UNUSED,
 }
 
 void
-mhitm_ad_pest(struct monst *magr, struct attack *mattk,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_pest(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct attack alt_attk;
     struct permonst *pa = magr->data;
@@ -3655,8 +3666,10 @@ mhitm_ad_deth(
 }
 
 void
-mhitm_ad_halu(struct monst *magr, struct attack *mattk UNUSED,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_halu(
+    struct monst *magr,
+    struct attack *mattk UNUSED,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -3701,8 +3714,10 @@ do_stone_u(struct monst *mtmp)
 }
 
 void
-do_stone_mon(struct monst *magr, struct attack *mattk UNUSED,
-             struct monst *mdef, struct mhitm_data *mhm)
+do_stone_mon(
+    struct monst *magr,
+    struct attack *mattk UNUSED,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -3908,8 +3923,9 @@ mhitm_ad_phys(
                    damage; however, it might cause carried items to be
                    destroyed and they might do so */
                 if (DEADMONSTER(mdef)) {
-                    mhm->hitflags = (M_ATTK_DEF_DIED | (grow_up(magr, mdef) ? 0
-                                                    : M_ATTK_AGR_DIED));
+                    mhm->hitflags = (M_ATTK_DEF_DIED
+                                     | (grow_up(magr, mdef) ? 0
+                                        : M_ATTK_AGR_DIED));
                     mhm->done = TRUE;
                     return;
                 }
@@ -3968,7 +3984,7 @@ mhitm_ad_ston(
                  *
                  * Maintaining foodless conduct during a new moon might
                  * become a little harder.  Clearing out cockatrice nests
-                 * could become quite a bit harder.
+                 * during a new moon could become quite a bit harder.
                  */
                 if (!rn2(10) || flags.moonphase == NEW_MOON) {
                     if (do_stone_u(magr)) {
@@ -4021,8 +4037,9 @@ mhitm_ad_were(
 }
 
 void
-mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_heal(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -4111,8 +4128,9 @@ mhitm_ad_heal(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_stun(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_stun(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -4147,8 +4165,9 @@ mhitm_ad_stun(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_legs(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_legs(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -4213,8 +4232,10 @@ mhitm_ad_legs(struct monst *magr, struct attack *mattk, struct monst *mdef,
 }
 
 void
-mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
-              struct monst *mdef, struct mhitm_data *mhm)
+mhitm_ad_dgst(
+    struct monst *magr,
+    struct attack *mattk UNUSED,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     struct permonst *pd = mdef->data;
 
@@ -4289,8 +4310,9 @@ mhitm_ad_dgst(struct monst *magr, struct attack *mattk UNUSED,
 }
 
 void
-mhitm_ad_samu(struct monst *magr, struct attack *mattk, struct monst *mdef,
-              struct mhitm_data *mhm)
+mhitm_ad_samu(
+    struct monst *magr, struct attack *mattk,
+    struct monst *mdef, struct mhitm_data *mhm)
 {
     if (magr == &gy.youmonst) {
         /* uhitm */
@@ -4367,8 +4389,8 @@ mhitm_ad_sedu(
                    || dmgtype(gy.youmonst.data, AD_SSEX)) {
             pline("%s %s.", Monnam(magr),
                   Deaf ? "says something but you can't hear it"
-                       : magr->minvent
-                      ? "brags about the goods some dungeon explorer provided"
+                  : magr->minvent
+                    ? "brags about the goods some dungeon explorer provided"
                   : "makes some remarks about how difficult theft is lately");
             if (!tele_restrict(magr))
                 (void) rloc(magr, RLOC_MSG);
@@ -4448,7 +4470,8 @@ mhitm_ad_sedu(
             mselftouch(mdef, (const char *) 0, FALSE);
             if (DEADMONSTER(mdef)) {
                 mhm->hitflags = (M_ATTK_DEF_DIED
-                                 | (grow_up(magr, mdef) ? 0 : M_ATTK_AGR_DIED));
+                                 | (grow_up(magr, mdef) ? 0
+                                    : M_ATTK_AGR_DIED));
                 mhm->done = TRUE;
                 return;
             }
