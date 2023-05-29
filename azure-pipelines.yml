@@ -138,7 +138,7 @@ steps:
     export LUASRC=../submodules/lua
     export ADD_CURSES=Y
     export PDCURSES_TOP=../submodules/pdcurses
-    export LUA_VERSION=5.4.4
+    export LUA_VERSION=5.4.6
     #
     # 64-bit
     #export CURLSRC=https://github.com/brechtsanders/winlibs_mingw/releases/download/11.2.0-9.0.0-ucrt-r5/winlibs-x86_64-posix-seh-gcc-11.2.0-mingw-w64ucrt-9.0.0-r5.zip
@@ -238,7 +238,7 @@ steps:
     sh sys/msdos/fetch-cross-compiler.sh
     retVal=$?
     if [ $retVal -eq 0 ]; then
-        make LUA_VERSION=5.4.4 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+        make LUA_VERSION=5.4.6 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
     fi
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)

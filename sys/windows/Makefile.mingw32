@@ -96,7 +96,7 @@ USE_LUADLL = Y
 WANT_LUAC = N
 
 ifndef LUA_VERSION
-LUAVER=5.4.4
+LUAVER=5.4.6
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -350,7 +350,7 @@ CLEAN_DIR = $(GAMEDIR) $(OBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
 
 OLUA = $(O)lua
@@ -755,8 +755,8 @@ fetchpdcurses:
 	git submodule init ../submodules/pdcurses && \
 	git submodule update --remote ../submodules/pdcurses ; fi
 else  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
-CURLLUADST=lua-5.4.4.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
+CURLLUADST=lua-5.4.6.tar.gz
 
 CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCDST=pdcurses.zip

@@ -85,7 +85,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 #CHGRP = chgrp
 
 # Lua version
-LUA_VERSION = 5.4.4
+LUA_VERSION = 5.4.6
 
 #
 # end of configuration

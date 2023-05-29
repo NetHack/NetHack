@@ -96,8 +96,8 @@ Via zip download
 
     o obtain Lua
         cd lib
-        wget http://www.lua.org/ftp/lua-5.4.4.tar.gz
-        tar -xvf lua-5.4.4.tar.gz
+        wget http://www.lua.org/ftp/lua-5.4.6.tar.gz
+        tar -xvf lua-5.4.6.tar.gz
         cd ..
 
     o obtain pdcurses
@@ -120,7 +120,7 @@ Via zip download
         change from
             LUATOP = ../submodules/lua
         to
-            LUATOP = ../lib/lua-5.4.4
+            LUATOP = ../lib/lua-5.4.6
 
       In sys/windows/Makefile.nmake
         change from
@@ -131,7 +131,7 @@ Via zip download
         change from
             LUATOP = ..\submodules\lua
         to
-            LUATOP = ..\lib\lua-5.4.4
+            LUATOP = ..\lib\lua-5.4.6
 
 /-----------------------------------------------------------\
 | Building And Running Using Visual Studio 2017, 2019, 2022  |

@@ -42,7 +42,7 @@ II. There once was a time when people built NetHack right on their DOS machine.
     a DOS-extender (for including in msdos packaging) from:
         http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
     and Lua from:
-        http://www.lua.org/ftp/lua-5.4.4.tar.gz
+        http://www.lua.org/ftp/lua-5.4.6.tar.gz
 
     If you want the DOSVGA build, to support higher resolutions and Unicode
     symbols, you also need:

@@ -24,9 +24,9 @@ endif
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
-LUA_VERSION ?=5.4.4
+LUA_VERSION ?=5.4.6
 LUATOP ?= ../lib/lua-$(LUA_VERSION)
 LUASRCDIR ?= $(LUATOP)/src
 LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \

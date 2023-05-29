@@ -109,7 +109,7 @@ Q=@
 SKIP_NETHACKW = N
 
 !IFNDEF LUA_VERSION
-LUAVER=5.4.4
+LUAVER=5.4.6
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -354,7 +354,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 
 #===============-=================================================
 # LUA library
-# Official source for Lua is http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Official source for Lua is http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #
 # Source for the NetHack repository submodule in ../submodules/lua
 # is https://github.com/lua/lua.git
@@ -363,7 +363,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -373,7 +373,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 #
 
 !IFNDEF LUAVER
-LUAVER=5.4.4
+LUAVER=5.4.6
 !ENDIF
 
 LUALIB   = $(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU)-static.lib
@@ -1321,8 +1321,8 @@ $(PDCURSES_TOP)\curses.h:
 	git submodule update --remote ../submodules/$(PDCDIST)
 
 !ELSE  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
-CURLLUADST=lua-5.4.4.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
+CURLLUADST=lua-5.4.6.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.5.zip

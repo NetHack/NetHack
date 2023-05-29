@@ -3,7 +3,7 @@ matrix:
   include:
     - name: linux-xenial-gcc-win-all
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       compiler: gcc
       addons:
         apt:
@@ -21,7 +21,7 @@ matrix:
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-bionic-gcc-win-all
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       dist: bionic
       compiler: gcc
       addons:
@@ -40,7 +40,7 @@ matrix:
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-focal-clang-win-all
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       dist: focal
       compiler: clang
       addons:
@@ -59,7 +59,7 @@ matrix:
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-xenial-gcc-nocommon
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       dist: xenial
       compiler: gcc
       script:
@@ -70,7 +70,7 @@ matrix:
         - make install
     - name: linux-focal-gcc9-win-all
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       dist: focal
       compiler: gcc
       addons:
@@ -91,7 +91,7 @@ matrix:
         - make LUA_VERSION=$LUA_VERSION WANT_WIN_ALL=1 QT_SELECT=5 MOC=moc install
     - name: linux-xenial-gcc-minimal
       os: linux
-      env: HINTS=linux-minimal LUA_VERSION=5.4.4
+      env: HINTS=linux-minimal LUA_VERSION=5.4.6
       compiler: gcc
       script: |
               cd sys/unix/ && sh setup.sh hints/$HINTS && cd ../../
@@ -129,7 +129,7 @@ matrix:
       script:
         - export ADD_CURSES=Y
         - export PDCURSES_TOP=../lib/pdcurses
-        - export LUA_VERSION=5.4.4
+        - export LUA_VERSION=5.4.6
         - sh sys/windows/travis-gcc.sh
         - test -d "lib/lua-$LUA_VERSION/src" || exit 0
         - test -d "lib/pdcurses" || exit 0
@@ -138,7 +138,7 @@ matrix:
         - mingw32-make LUA_VERSION=$LUA_VERSION install
     - name: msdos-linux-focal-djgpp-crosscompile
       os: linux
-      env: HINTS=linux.370 LUA_VERSION=5.4.4
+      env: HINTS=linux.370 LUA_VERSION=5.4.6
       dist: focal
       compiler: gcc
       script:
