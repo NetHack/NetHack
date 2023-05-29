@@ -2302,6 +2302,22 @@ mbag_explodes(struct obj *obj, int depthin)
     return FALSE;
 }
 
+/* Loadstones are repelled by magic bags */
+static boolean
+mbag_repels(struct obj *obj)
+{
+    if (obj->otyp == LOADSTONE) {
+        return TRUE;
+    } else if (Has_contents(obj)) {
+        struct obj *otmp;
+
+        for (otmp = obj->cobj; otmp; otmp = otmp->nobj)
+            if (mbag_repels(otmp))
+                return TRUE;
+    }
+    return FALSE;
+}
+
 static boolean
 is_boh_item_gone(void)
 {
@@ -2373,6 +2389,12 @@ in_container(struct obj *obj)
     } else if ((obj->otyp == LOADSTONE) && obj->cursed) {
         set_bknown(obj, 1);
         pline_The("stone%s won't leave your person.", plur(obj->quan));
+        return 0;
+    } else if (Is_mbag(gc.current_container) && mbag_repels(obj)) {
+        /* Loadstones (and bags containing them) don't want to go in a
+           bag of holding.  They don't blow up the bag though. */
+        pline("As you put %s inside, a force repels %s!",
+              doname(obj), (obj->quan > 1L) ? "them" : "it");
         return 0;
     } else if (obj->otyp == AMULET_OF_YENDOR
                || obj->otyp == CANDELABRUM_OF_INVOCATION
