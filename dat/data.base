@@ -1002,7 +1002,6 @@ zorkmid*
 	Empire ]."  On the other side, the coin depicts Egreth Castle,
 	and says "In Frobs We Trust" in several languages.
 		[ Zork Zero, by Infocom ]
-# not "stethoscope"
 combat
 fight
 fracas
@@ -1018,6 +1017,7 @@ tiff
 	Blind Pew:  Oh.  Must have been more of a tiff then.
 		[ Yellowbeard, directed by Mel Damski, screenplay
 		  by Graham Chapman, Peter Cook, Bernard McKenna ]
+# not "*cope" because that would match "stethoscope"
 cope
 * cope
 	The cope is a liturgical vestment which may be worn by any
