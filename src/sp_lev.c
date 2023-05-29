@@ -2266,8 +2266,18 @@ create_object(object *o, struct mkroom *croom)
         otmp->olocked = 0; /* obj generation may set */
     }
     if (o->trapped == 0 || o->trapped == 1) {
-        if (otmp->otyp == STATUE && o->trapped)
+        if (otmp->otyp == STATUE && o->trapped) {
+            /* if x and y were specified randomly, there may already be a trap
+             * on this space; because of the coordinate packing system it's
+             * difficult to tell whether x and y here are supposed to be random
+             * or not, or to compute within lspo_object ahead of time what x and
+             * y will be and if there will be a trap there, so just get rid of
+             * the preexisting trap */
+            struct trap *trap = t_at(x, y);
+            if (trap)
+                deltrap(trap);
             maketrap(x, y, STATUE_TRAP);
+        }
         else
             otmp->otrapped = o->trapped;
     }
