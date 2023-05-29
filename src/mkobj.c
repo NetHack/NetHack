@@ -13,7 +13,6 @@ static void mksobj_init(struct obj *, boolean);
 static int item_on_ice(struct obj *);
 static void shrinking_glob_gone(struct obj *);
 static void obj_timer_checks(struct obj *, coordxy, coordxy, int);
-static void container_weight(struct obj *);
 static struct obj *save_mtraits(struct obj *, struct monst *);
 static void objlist_sanity(struct obj *, int, const char *);
 static void shop_obj_sanity(struct obj *, const char *);
@@ -2592,7 +2591,7 @@ add_to_buried(struct obj *obj)
 }
 
 /* Recalculate the weight of this container and all of _its_ containers. */
-static void
+void
 container_weight(struct obj *container)
 {
     container->owt = weight(container);

@@ -1188,9 +1188,7 @@ freeinv_core(struct obj *obj)
         set_artifact_intrinsic(obj, 0, W_ART);
     }
 
-    if (obj->otyp == LOADSTONE) {
-        curse(obj);
-    } else if (confers_luck(obj)) {
+    if (confers_luck(obj)) {
         set_moreluck();
         gc.context.botl = 1;
     } else if (obj->otyp == FIGURINE && obj->timed) {

@@ -858,6 +858,17 @@ obj_no_longer_held(struct obj *obj)
             obj->oerodeproof = 0;
         }
         break;
+    case LOADSTONE:
+        if (obj->blessed) {
+            unbless(obj);
+        } else {
+            curse(obj);
+        }
+        /* loadstone may change weight */
+        if (obj->where == OBJ_CONTAINED) {
+            container_weight(obj->ocontainer);
+        }
+        break;
     }
 }
 
