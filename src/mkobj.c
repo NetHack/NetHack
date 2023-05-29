@@ -1680,7 +1680,7 @@ bless(struct obj *otmp)
     otmp->blessed = 1;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == LOADSTONE)
         otmp->owt = weight(otmp);
     else if (otmp->otyp == FIGURINE && otmp->timed)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
@@ -1699,7 +1699,7 @@ unbless(struct obj *otmp)
     otmp->blessed = 0;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == LOADSTONE)
         otmp->owt = weight(otmp);
     if (otmp->lamplit)
         maybe_adjust_light(otmp, old_light);
@@ -1728,7 +1728,7 @@ curse(struct obj *otmp)
     /* some cursed items need immediate updating */
     if (carried(otmp) && confers_luck(otmp)) {
         set_moreluck();
-    } else if (otmp->otyp == BAG_OF_HOLDING) {
+    } else if (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == LOADSTONE) {
         otmp->owt = weight(otmp);
     } else if (otmp->otyp == FIGURINE) {
         if (otmp->corpsenm != NON_PM && !dead_species(otmp->corpsenm, TRUE)
@@ -1754,7 +1754,7 @@ uncurse(struct obj *otmp)
     otmp->cursed = 0;
     if (carried(otmp) && confers_luck(otmp))
         set_moreluck();
-    else if (otmp->otyp == BAG_OF_HOLDING)
+    else if (otmp->otyp == BAG_OF_HOLDING || otmp->otyp == LOADSTONE)
         otmp->owt = weight(otmp);
     else if (otmp->otyp == FIGURINE && otmp->timed)
         (void) stop_timer(FIG_TRANSFORM, obj_to_any(otmp));
@@ -1881,6 +1881,9 @@ weight(struct obj *obj)
         return (int) obj->owt; /* kludge for "very" heavy iron ball */
     } else if (obj->otyp == CANDELABRUM_OF_INVOCATION && obj->spe) {
         return wt + obj->spe * (int) objects[TALLOW_CANDLE].oc_weight;
+    }
+    if (obj->otyp == LOADSTONE && obj->blessed) {
+        wt /= 5;
     }
     return (wt ? wt * (int) obj->quan : ((int) obj->quan + 1) >> 1);
 }
