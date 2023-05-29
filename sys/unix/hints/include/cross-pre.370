@@ -138,7 +138,7 @@ ifdef CROSS_TO_MSDOS
 # 2. Then
 #     make CROSS_TO_MSDOS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
 #
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
