@@ -1029,7 +1029,7 @@ $(ONHW)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
-$(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONH)
+$(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $(PDCINCL) $< -o$@
 
 $(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
