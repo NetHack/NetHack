@@ -976,6 +976,10 @@ init_hilite(void)
             scratch = tparm(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_BLACK], scratch);
+
+            scratch = tparm(setf, COLOR_WHITE);
+            hilites[CLR_GRAY] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_GRAY], scratch);
         } else {
             /* On many terminals, esp. those using classic PC CGA/EGA/VGA
             * textmode, specifying "hilight" and "black" simultaneously
@@ -1022,6 +1026,8 @@ kill_hilite(void)
             free(hilites[CLR_RED]);
         if (hilites[CLR_BROWN])
             free(hilites[CLR_BROWN]);
+        if (hilites[CLR_GRAY])
+            free(hilites[CLR_GRAY]);
     } else {
         /* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
         /* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
