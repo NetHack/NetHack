@@ -417,10 +417,11 @@ sys/windows:
 (files for Windows 7/8.x/10/11 version)
 .nethackrc.template      Install.windows          Makefile.mingw32
 Makefile.mingw32.depend  Makefile.nmake           console.rc
-consoletty.c             nethack.def              nhico.uu
-nhsetup.bat              porthelp                 sysconf.template
-win10.c                  win10.h                  win32api.h
-windmain.c               windsys.c                winos.h
+consoletty.c             guitty.c                 nethack.def
+nhico.uu                 nhsetup.bat              porthelp
+sysconf.template         win10.c                  win10.h
+win32api.h               windmain.c               windsys.c
+winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
