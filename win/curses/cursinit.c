@@ -352,7 +352,8 @@ curses_init_nhcolors(void)
                 init_pair(1, COLOR_BLACK + 8, -1);
             }
 # endif
-            init_pair(9, COLOR_WHITE, -1);
+            init_pair(8, COLOR_WHITE, -1);
+            init_pair(9, -1, -1);
             init_pair(10, COLOR_RED + 8, -1);
             init_pair(11, COLOR_GREEN + 8, -1);
             init_pair(12, COLOR_YELLOW + 8, -1);
