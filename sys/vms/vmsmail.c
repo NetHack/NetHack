@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsmail.c	$NHDT-Date: 1596498307 2020/08/03 23:45:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.11 $ */
+/* NetHack 3.7	vmsmail.c	$NHDT-Date: 1685522048 2023/05/31 08:34:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
 /* Copyright (c) Robert Patrick Rankin, 1991.                     */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -43,7 +43,7 @@ extern int strncmpi(const char *, const char *, int);
 
 extern size_t strspn(const char *, const char *);
 #ifndef __DECC
-extern int VDECL(sscanf, (const char *, const char *, ...));
+extern int sscanf(const char *, const char *, ...);
 #endif
 
 #ifdef VMSVSI

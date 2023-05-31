@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsfiles.c	$NHDT-Date: 1596498306 2020/08/03 23:45:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	vmsfiles.c	$NHDT-Date: 1685522046 2023/05/31 08:34:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -36,13 +36,13 @@ int c__translate(int);
 
 #ifndef VMSVSI
 extern unsigned long sys$parse(), sys$search(), sys$enter(), sys$remove();
-extern int VDECL(lib$match_cond, (int, int, ...));
+extern int lib$match_cond(int, int, ...);
 #endif
 
 #define vms_success(sts) ((sts) & 1)         /* odd, */
 #define vms_failure(sts) (!vms_success(sts)) /* even */
 
-/* vms_link() -- create an additional directory for an existing file */
+/* vms_link() -- create an additional directory entry for an existing file */
 int
 vms_link(const char *file, const char *new)
 {

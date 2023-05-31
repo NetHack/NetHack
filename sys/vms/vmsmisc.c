@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsmisc.c	$NHDT-Date: 1596498308 2020/08/03 23:45:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.12 $ */
+/* NetHack 3.7	vmsmisc.c	$NHDT-Date: 1685522049 2023/05/31 08:34:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
 /*      Copyright (c) 2011 by Robert Patrick Rankin              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -22,7 +22,7 @@ ATTRNORETURN void vms_abort(void);
 /* first arg should be unsigned long but <lib$routines.h> has unsigned int */
 
 #ifndef VMSVSI
-extern void VDECL(lib$signal, (unsigned, ...));
+extern void lib$signal(unsigned, ...);
 #endif
 
 /* terminate, converting Unix-style exit code into VMS status code */
