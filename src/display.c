@@ -2497,9 +2497,9 @@ const int explodecolors[7] = {
 
 /* main_walls, mines_walls, gehennom_walls, knox_walls, sokoban_walls */
 int wallcolors[sokoban_walls + 1] = {
-    /* default init value is to match defsym[S_vwall + n].color (CLR_GRAY) */
+    /* default init value is to match defsym[S_vwall + n].color (NO_COLOR) */
     NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR,
-    /* CLR_GRAY, CLR_BROWN, CLR_RED, CLR_GRAY, CLR_BRIGHT_BLUE, */
+    /* NO_COLOR, CLR_BROWN, CLR_RED, CLR_GRAY, CLR_BRIGHT_BLUE, */
 };
 
 #endif /* text color */
@@ -2551,8 +2551,11 @@ cmap_to_roguecolor(int cmap)
         color = CLR_BROWN;
     else if (cmap >= S_arrow_trap && cmap <= S_polymorph_trap)
         color = CLR_MAGENTA;
+#if 0
     else if (cmap == S_corr || cmap == S_litcorr)
-        color = CLR_GRAY;
+	if (iflags.wc2_darkgray)
+        	color = CLR_BLACK;
+#endif
     else if (cmap >= S_room && cmap <= S_water
                 && cmap != S_darkroom)
         color = CLR_GREEN;

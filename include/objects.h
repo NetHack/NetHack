@@ -69,7 +69,7 @@
 #define GENERIC(desc, class, gen_enum) \
     OBJECT(OBJ("generic " desc, desc),                                  \
            BITS(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, P_NONE, 0),            \
-           0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, CLR_GRAY, gen_enum)
+           0, class, 0, 0, 0, 0, 0, 0, 0, 0, 0, NO_COLOR, gen_enum)
 
 /* dummy object[0] -- description [2nd arg] *must* be NULL */
 OBJECT(OBJ("strange object", NoDes),
@@ -594,7 +594,7 @@ ARMOR("T-shirt", NoDes,
 
 /* cloaks */
 CLOAK("mummy wrapping", NoDes,
-      1, 0,          0,  0, 0,  3,  2, 10, 1,  CLOTH, CLR_GRAY, MUMMY_WRAPPING),
+      1, 0,          0,  0, 0,  3,  2, 10, 1,  CLOTH, NO_COLOR, MUMMY_WRAPPING),
         /* worn mummy wrapping blocks invisibility */
 CLOAK("elven cloak", "faded pall",
       0, 1,    STEALTH,  8, 0, 10, 60,  9, 1,  CLOTH, CLR_BLACK, ELVEN_CLOAK),
@@ -1121,11 +1121,11 @@ POTION("enlightenment",        "swirly",  1, 0, 20, 200, CLR_BROWN,
                                                         POT_ENLIGHTENMENT),
 POTION("monster detection",    "bubbly",  1, 0, 40, 150, CLR_WHITE,
                                                         POT_MONSTER_DETECTION),
-POTION("object detection",      "smoky",  1, 0, 42, 150, CLR_GRAY,
+POTION("object detection",      "smoky",  1, 0, 42, 150, NO_COLOR,
                                                         POT_OBJECT_DETECTION),
 POTION("gain energy",          "cloudy",  1, 0, 42, 150, CLR_WHITE,
                                                         POT_GAIN_ENERGY),
-POTION("sleeping",       "effervescent",  1, 0, 42, 100, CLR_GRAY,
+POTION("sleeping",       "effervescent",  1, 0, 42, 100, NO_COLOR,
                                                         POT_SLEEPING),
 POTION("full healing",          "black",  1, 0, 10, 200, CLR_BLACK,
                                                         POT_FULL_HEALING),
@@ -1563,7 +1563,7 @@ ROCK("touchstone", "gray", 0,   8,  10, 45, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
                                                                   TOUCHSTONE),
 ROCK("flint", "gray",      0,  10,  10,  1, 6, 6, 0, 10, 7, MINERAL, CLR_GRAY,
                                                                     FLINT),
-ROCK("rock", NoDes,         1, 100,  10,  0, 3, 3, 0, 10, 7, MINERAL, CLR_GRAY,
+ROCK("rock", NoDes,         1, 100,  10,  0, 3, 3, 0, 10, 7, MINERAL, HI_MINERAL,
                                                                     ROCK),
 #undef GEM
 #undef ROCK
