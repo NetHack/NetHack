@@ -103,6 +103,7 @@ struct DisplayDesc {
     winid lastwin;     /* last window used for I/O */
     char dismiss_more; /* extra character accepted at --More-- */
     int topl_utf8;     /* non-zero if utf8 in str */
+    int mixed;         /* we are processing mixed output */
 };
 
 #endif /* WINDOW_STRUCTS */

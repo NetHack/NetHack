@@ -501,6 +501,8 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     ttyDisplay->color = NO_COLOR;
 #endif
     ttyDisplay->attrs = 0;
+    ttyDisplay->topl_utf8 = 0;
+    ttyDisplay->mixed = 0;
 
     /* set up the default windows */
     BASE_WINDOW = tty_create_nhwindow(NHW_BASE);
@@ -3746,6 +3748,7 @@ tty_putmixed(winid window, int attr, const char *str)
         tty_raw_print(str);
         return;
     }
+    ttyDisplay->mixed = 1;
 #ifdef ENHANCED_SYMBOLS
     if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
         mixed_to_utf8(buf, sizeof buf, str, &utf8flag);
@@ -3757,6 +3760,7 @@ tty_putmixed(winid window, int attr, const char *str)
     /* now send it to the normal tty_putstr */
     tty_putstr(window, attr, buf);
     ttyDisplay->topl_utf8 = 0;
+    ttyDisplay->mixed = 0;
 }
 
 /*
