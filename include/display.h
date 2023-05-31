@@ -304,9 +304,9 @@ enum altar_colors {
     altar_color_neutral = CLR_GRAY,
     altar_color_lawful  = CLR_WHITE,
 #else
-    altar_color_chaotic = CLR_GRAY,
-    altar_color_neutral = CLR_GRAY,
-    altar_color_lawful  = CLR_GRAY,
+    altar_color_chaotic = NO_COLOR,
+    altar_color_neutral = NO_COLOR,
+    altar_color_lawful  = NO_COLOR,
 #endif
     altar_color_other = CLR_BRIGHT_MAGENTA,
 };
