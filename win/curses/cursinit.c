@@ -352,6 +352,7 @@ curses_init_nhcolors(void)
                 init_pair(1, COLOR_BLACK + 8, -1);
             }
 # endif
+            /* include gray, it may differ from fg */
             init_pair(8, COLOR_WHITE, -1);
             init_pair(9, -1, -1);
             init_pair(10, COLOR_RED + 8, -1);

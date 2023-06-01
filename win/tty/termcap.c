@@ -961,14 +961,20 @@ init_hilite(void)
         scratch = tparm(setf, COLOR_WHITE|BRIGHT);
         hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + 1);
         Strcpy(hilites[CLR_WHITE], scratch);
+
+        /* include gray, it may differ from fg */
+        scratch = tparm(setf, COLOR_WHITE);
+        hilites[CLR_GRAY] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(hilites[CLR_GRAY], scratch);
     } else {
         scratch = tparm(setf, COLOR_WHITE);
         hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
         Strcpy(hilites[CLR_WHITE], MD);
         Strcat(hilites[CLR_WHITE], scratch);
+
+        hilites[CLR_GRAY] = nilstring;
     }
 
-    hilites[CLR_GRAY] = nilstring;
     hilites[NO_COLOR] = nilstring;
 
     if (iflags.wc2_darkgray) {
@@ -976,10 +982,6 @@ init_hilite(void)
             scratch = tparm(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_BLACK], scratch);
-
-            scratch = tparm(setf, COLOR_WHITE);
-            hilites[CLR_GRAY] = (char *) alloc(strlen(scratch) + 1);
-            Strcpy(hilites[CLR_GRAY], scratch);
         } else {
             /* On many terminals, esp. those using classic PC CGA/EGA/VGA
             * textmode, specifying "hilight" and "black" simultaneously
@@ -1026,6 +1028,7 @@ kill_hilite(void)
             free(hilites[CLR_RED]);
         if (hilites[CLR_BROWN])
             free(hilites[CLR_BROWN]);
+
         if (hilites[CLR_GRAY])
             free(hilites[CLR_GRAY]);
     } else {
@@ -1035,8 +1038,8 @@ kill_hilite(void)
         /* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
         /* CLR_RED overlaps CLR_ORANGE, do not free */
         /* CLR_BROWN overlaps CLR_YELLOW, do not free */
+        /* CLR_GRAY is static 'nilstring', do not free */
     }
-    /* CLR_GRAY is static 'nilstring', do not free */
     /* NO_COLOR is static 'nilstring', do not free */
     if (hilites[CLR_BRIGHT_BLUE])
         free(hilites[CLR_BRIGHT_BLUE]);
