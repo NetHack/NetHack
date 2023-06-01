@@ -1240,7 +1240,7 @@
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, 20, DRAGON_SILVER, SILVER_DRAGON),
+        0, 20, HI_SILVER, SILVER_DRAGON),
 #if 0 /* DEFERRED */
     /* shimmering scales/scale-mail would confer displacement when worn by
        the hero, so shimmering dragon ought to be displaced (hero who can
