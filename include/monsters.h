@@ -862,7 +862,7 @@
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(1300, 300, MS_NEIGH, MZ_LARGE), MR_POISON, MR_POISON,
         M1_NOHANDS | M1_HERBIVORE, M2_WANDER | M2_STRONG | M2_JEWELS,
-        M3_INFRAVISIBLE, 6, CLR_GRAY, GRAY_UNICORN),
+        M3_INFRAVISIBLE, 6, NO_COLOR, GRAY_UNICORN),
     MON("black unicorn", S_UNICORN, LVL(4, 24, 2, 70, -7), (G_GENO | 1),
         A(ATTK(AT_BUTT, AD_PHYS, 1, 12), ATTK(AT_KICK, AD_PHYS, 1, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
@@ -1221,7 +1221,7 @@
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_SEE_INVIS | M1_OVIPAROUS
             | M1_CARNIVORE,
         M2_HOSTILE | M2_STRONG | M2_NASTY | M2_GREEDY | M2_JEWELS | M2_MAGIC,
-        0, 20, CLR_GRAY, GRAY_DRAGON),
+        0, 20, NO_COLOR, GRAY_DRAGON),
     /* gold dragon can be seen via infravision but doesn't have infravision */
     MON("gold dragon", S_DRAGON, LVL(15, 9, -1, 20, 4), (G_GENO | 1),
         A(ATTK(AT_BREA, AD_FIRE, 4, 6), ATTK(AT_BITE, AD_PHYS, 3, 8),
@@ -1769,7 +1769,7 @@
         MR_FIRE | MR_COLD | MR_POISON,
         M1_BREATHLESS | M1_AMORPHOUS | M1_NOEYES | M1_NOLIMBS | M1_NOHEAD
             | M1_MINDLESS | M1_OMNIVORE | M1_ACID,
-        M2_HOSTILE | M2_NEUTER, 0, 4, CLR_GRAY, GRAY_OOZE),
+        M2_HOSTILE | M2_NEUTER, 0, 4, NO_COLOR, GRAY_OOZE),
     MON("brown pudding", S_PUDDING, LVL(5, 3, 8, 0, 0),
         (G_GENO | G_NOCORPSE | 1),
         A(ATTK(AT_BITE, AD_DCAY, 0, 0),
@@ -2259,7 +2259,7 @@
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(WT_ELF, 350, MS_HUMANOID, MZ_HUMAN), MR_SLEEP, MR_SLEEP,
         M1_HUMANOID | M1_OMNIVORE | M1_SEE_INVIS, M2_ELF | M2_COLLECT,
-        M3_INFRAVISIBLE | M3_INFRAVISION, 8, CLR_GRAY, GREY_ELF),
+        M3_INFRAVISIBLE | M3_INFRAVISION, 8, NO_COLOR, GREY_ELF),
     MON3("elf-lord", "elf-lady", "elf-noble",
         S_HUMAN, LVL(8, 12, 10, 20, -9), (G_GENO | G_SGROUP | 2),
         A(ATTK(AT_WEAP, AD_PHYS, 2, 4), ATTK(AT_WEAP, AD_PHYS, 2, 4),

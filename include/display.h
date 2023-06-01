@@ -301,7 +301,7 @@ enum altar_colors {
          * to handle platform-specific color variations.
          */
     altar_color_chaotic = CLR_BLACK,
-    altar_color_neutral = CLR_GRAY,
+    altar_color_neutral = NO_COLOR,
     altar_color_lawful  = CLR_WHITE,
 #else
     altar_color_chaotic = NO_COLOR,

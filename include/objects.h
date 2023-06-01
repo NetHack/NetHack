@@ -484,7 +484,7 @@ HELM("helm of telepathy", "visored helmet",
           cost, ac, 0, ARM_SUIT, DRAGON_HIDE, color,snam)
 /* 3.4.1: dragon scale mail reclassified as "magic" since magic is
    needed to create them */
-DRGN_ARMR("gray dragon scale mail",    1, ANTIMAGIC,  1200, 1, CLR_GRAY,
+DRGN_ARMR("gray dragon scale mail",    1, ANTIMAGIC,  1200, 1, NO_COLOR,
                                                     GRAY_DRAGON_SCALE_MAIL),
     /* gold DSM is a light source; there's no property for that */
 DRGN_ARMR("gold dragon scale mail",    1, 0,           900, 1, HI_GOLD,
@@ -512,7 +512,7 @@ DRGN_ARMR("yellow dragon scale mail",  1, ACID_RES,    900, 1, CLR_YELLOW,
 /* For now, only dragons leave these. */
 /* 3.4.1: dragon scales left classified as "non-magic"; they confer magical
    properties but are produced "naturally"; affects use as polypile fodder */
-DRGN_ARMR("gray dragon scales",        0, ANTIMAGIC,   700, 7, CLR_GRAY,
+DRGN_ARMR("gray dragon scales",        0, ANTIMAGIC,   700, 7, NO_COLOR,
                                                         GRAY_DRAGON_SCALES),
 DRGN_ARMR("gold dragon scales",        0, 0,           500, 7, HI_GOLD,
                                                         GOLD_DRAGON_SCALES),
@@ -1036,7 +1036,7 @@ OBJECT(OBJ("meat ring", NoDes),
        0, FOOD_CLASS, 0, 1, 5, 1, 0, 0, 0, 0, 5, CLR_BROWN, MEAT_RING),
 /* pudding 'corpses' will turn into these and combine;
    must be in same order as the pudding monsters */
-FOOD("glob of gray ooze",     0,  2, 20, 0, FLESH,  20, CLR_GRAY,
+FOOD("glob of gray ooze",     0,  2, 20, 0, FLESH,  20, NO_COLOR,
                                                         GLOB_OF_GRAY_OOZE),
 FOOD("glob of brown pudding", 0,  2, 20, 0, FLESH,  20, CLR_BROWN,
                                                         GLOB_OF_BROWN_PUDDING),
@@ -1337,7 +1337,7 @@ SPELL("invisibility",    "dark brown",
       P_ESCAPE_SPELL,      25,  5, 4, 1, NODIR, CLR_BROWN,
                                                         SPE_INVISIBILITY),
 SPELL("detect treasure", "gray",
-      P_DIVINATION_SPELL,  20,  5, 4, 1, NODIR, CLR_GRAY,
+      P_DIVINATION_SPELL,  20,  5, 4, 1, NODIR, NO_COLOR,
                                                         SPE_DETECT_TREASURE),
 SPELL("remove curse",    "wrinkled",
       P_CLERIC_SPELL,      25,  5, 3, 1, NODIR, HI_PAPER,
@@ -1555,13 +1555,13 @@ MARKER(LAST_GLASS_GEM, WORTHLESS_VIOLET_GLASS)
  * that is currently everything between luckstones and flint
  * (inclusive).
  */
-ROCK("luckstone", "gray",  0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, CLR_GRAY,
+ROCK("luckstone", "gray",  0,  10,  10, 60, 3, 3, 1, 10, 7, MINERAL, HI_MINERAL,
                                                                     LUCKSTONE),
-ROCK("loadstone", "gray",  0,  10, 500,  1, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
+ROCK("loadstone", "gray",  0,  10, 500,  1, 3, 3, 1, 10, 6, MINERAL, HI_MINERAL,
                                                                     LOADSTONE),
-ROCK("touchstone", "gray", 0,   8,  10, 45, 3, 3, 1, 10, 6, MINERAL, CLR_GRAY,
+ROCK("touchstone", "gray", 0,   8,  10, 45, 3, 3, 1, 10, 6, MINERAL, HI_MINERAL,
                                                                   TOUCHSTONE),
-ROCK("flint", "gray",      0,  10,  10,  1, 6, 6, 0, 10, 7, MINERAL, CLR_GRAY,
+ROCK("flint", "gray",      0,  10,  10,  1, 6, 6, 0, 10, 7, MINERAL, HI_MINERAL,
                                                                     FLINT),
 ROCK("rock", NoDes,         1, 100,  10,  0, 3, 3, 0, 10, 7, MINERAL, HI_MINERAL,
                                                                     ROCK),
