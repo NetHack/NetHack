@@ -904,22 +904,11 @@ init_hilite(void)
          * It's arbitrary to collapse all colors except gray
          * together, but that's what the previous code did.
          */
-        hilites[CLR_BLACK] = nh_HI;
-        hilites[CLR_RED] = nh_HI;
-        hilites[CLR_GREEN] = nh_HI;
-        hilites[CLR_BROWN] = nh_HI;
-        hilites[CLR_BLUE] = nh_HI;
-        hilites[CLR_MAGENTA] = nh_HI;
-        hilites[CLR_CYAN] = nh_HI;
-        hilites[CLR_GRAY] = nilstring;
-        hilites[NO_COLOR] = nilstring;
-        hilites[CLR_ORANGE] = nh_HI;
-        hilites[CLR_BRIGHT_GREEN] = nh_HI;
-        hilites[CLR_YELLOW] = nh_HI;
-        hilites[CLR_BRIGHT_BLUE] = nh_HI;
-        hilites[CLR_BRIGHT_MAGENTA] = nh_HI;
-        hilites[CLR_BRIGHT_CYAN] = nh_HI;
-        hilites[CLR_WHITE] = nh_HI;
+        for (c = 0; c < CLR_MAX; c++)
+            if (c == CLR_GRAY || c == NO_COLOR)
+                hilites[c] = nilstring;
+            else
+                hilites[c] = nh_HI;
         return;
     }
 
@@ -939,6 +928,15 @@ init_hilite(void)
             Strcpy(work, scratch);
             hilites[ti_map[c].nh_bright_color] = work;
         }
+
+        scratch = tparm(setf, COLOR_WHITE|BRIGHT);
+        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(hilites[CLR_WHITE], scratch);
+
+        /* include gray, it may differ from fg */
+        scratch = tparm(setf, COLOR_WHITE);
+        hilites[CLR_GRAY] = (char *) alloc(strlen(scratch) + 1);
+        Strcpy(hilites[CLR_GRAY], scratch);
     } else {
         /* 8 system colors */
         md_len = strlen(MD);
@@ -955,18 +953,7 @@ init_hilite(void)
             Strcpy(work, scratch);
             hilites[ti_map[c].nh_color] = work;
         }
-    }
 
-    if (colors >= 16) {
-        scratch = tparm(setf, COLOR_WHITE|BRIGHT);
-        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + 1);
-        Strcpy(hilites[CLR_WHITE], scratch);
-
-        /* include gray, it may differ from fg */
-        scratch = tparm(setf, COLOR_WHITE);
-        hilites[CLR_GRAY] = (char *) alloc(strlen(scratch) + 1);
-        Strcpy(hilites[CLR_GRAY], scratch);
-    } else {
         scratch = tparm(setf, COLOR_WHITE);
         hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
         Strcpy(hilites[CLR_WHITE], MD);
@@ -1011,53 +998,24 @@ kill_hilite(void)
     if (hilites[CLR_BLACK] == nh_HI)
         return;
 
-    if (hilites[CLR_BLACK]) {
-        if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
-            free(hilites[CLR_BLACK]);
-    }
-    if (tgetnum(nhStr("Co")) >= 16) {
-        if (hilites[CLR_BLUE])
-            free(hilites[CLR_BLUE]);
-        if (hilites[CLR_GREEN])
-            free(hilites[CLR_GREEN]);
-        if (hilites[CLR_CYAN])
-            free(hilites[CLR_CYAN]);
-        if (hilites[CLR_MAGENTA])
-            free(hilites[CLR_MAGENTA]);
-        if (hilites[CLR_RED])
-            free(hilites[CLR_RED]);
-        if (hilites[CLR_BROWN])
-            free(hilites[CLR_BROWN]);
-
-        if (hilites[CLR_GRAY])
-            free(hilites[CLR_GRAY]);
-    } else {
-        /* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
-        /* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
-        /* CLR_CYAN overlaps CLR_BRIGHT_CYAN, do not free */
-        /* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
-        /* CLR_RED overlaps CLR_ORANGE, do not free */
-        /* CLR_BROWN overlaps CLR_YELLOW, do not free */
-        /* CLR_GRAY is static 'nilstring', do not free */
+    for (c = 0; c < 7; c++) {
+        free(hilites[c]);
+        hilites[c] = 0;
     }
     /* NO_COLOR is static 'nilstring', do not free */
-    if (hilites[CLR_BRIGHT_BLUE])
-        free(hilites[CLR_BRIGHT_BLUE]);
-    if (hilites[CLR_BRIGHT_GREEN])
-        free(hilites[CLR_BRIGHT_GREEN]);
-    if (hilites[CLR_BRIGHT_CYAN])
-        free(hilites[CLR_BRIGHT_CYAN]);
-    if (hilites[CLR_BRIGHT_MAGENTA])
-        free(hilites[CLR_BRIGHT_MAGENTA]);
-    if (hilites[CLR_ORANGE])
-        free(hilites[CLR_ORANGE]);
-    if (hilites[CLR_YELLOW])
-        free(hilites[CLR_YELLOW]);
-    if (hilites[CLR_WHITE])
-        free(hilites[CLR_WHITE]);
 
-    for (c = 0; c < CLR_MAX; c++)
-        hilites[c] = 0;
+    if (tgetnum(nhStr("Co")) >= 16) {
+        free(hilites[CLR_GRAY]);
+        hilites[CLR_GRAY] = 0;
+
+        for (c = 9; c < CLR_MAX; c++) {
+            free(hilites[c]);
+            hilites[c] = 0;
+        }
+    } else {
+        free(hilites[CLR_WHITE]);
+        hilites[CLR_WHITE] = 0;
+    }
 }
 
 #else /* UNIX && TERMINFO */
