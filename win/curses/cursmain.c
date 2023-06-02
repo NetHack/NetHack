@@ -751,7 +751,11 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
 void
 curses_mark_synch(void)
 {
-    curses_refresh_nethack_windows();
+     /* full refresh has unintended side-effect of making a menu window
+        that has called core's get_count() to vanish; do a basic screen
+        refresh instead */
+     /*curses_refresh_nethack_windows();*/
+     refresh();
 }
 
 /*
