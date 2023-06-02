@@ -1137,7 +1137,7 @@
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
-        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, CLR_GRAY,
+        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, NO_COLOR,
         BABY_GRAY_DRAGON),
     MON("baby gold dragon", S_DRAGON, LVL(12, 9, 2, 10, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
@@ -1151,7 +1151,7 @@
           NO_ATTK),
         SIZ(1500, 500, MS_ROAR, MZ_HUGE), 0, 0,
         M1_FLY | M1_THICK_HIDE | M1_NOHANDS | M1_CARNIVORE,
-        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, DRAGON_SILVER,
+        M2_HOSTILE | M2_STRONG | M2_GREEDY | M2_JEWELS, 0, 13, HI_SILVER,
         BABY_SILVER_DRAGON),
 #if 0 /* DEFERRED */
     /* [see "shimmering dragon" below] */
