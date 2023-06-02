@@ -1642,6 +1642,7 @@ curses: typing ESC to cancel something issued a beep; if the terminal was set
 curses: with window borders on and align_status:left, restoring brought up a
 	screen where the message window's border wasn't shown; once it needed
 	to be scrolled to fit a new message, the border appeared
+curses: swapped gray/fg color
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
@@ -1671,6 +1672,7 @@ tty: changes to support TTY_PERM_INVENT resulted in blank inventory menu when
 tty: for the !DEF_PAGER configuration, redraw screen properly if attempting
 	to display a file fails and tty_display_file()'s caller requests
 	feedback for that situation
+tty: hardcoded gray to foreground
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new
@@ -2430,4 +2432,5 @@ replace some old 'time_t' hackery in system.h and hacklib.c with something
 remove the per dungeon level door limit
 remove various '#if LINT' hacks used to suppress warnings from pre-ANSI 'lint'
 VMS: removed NO_VSNPRINTF conditional code
+color: gray is for silver only, wiped dragon silver
 
