@@ -1391,7 +1391,7 @@ void
 domagicportal(struct trap *ttmp)
 {
     struct d_level target_level;
-    s_level *tutlvl = find_level("tut-1");
+    int totype;
     const char *stunmsg = (char *) 0;
 
     if (u.utrap && u.utraptype == TT_BURIEDBALL)
@@ -1421,13 +1421,17 @@ domagicportal(struct trap *ttmp)
     target_level = ttmp->dst;
 
     /* coming back from tutorial doesn't trigger stunning */
-    if (!(tutlvl && tutlvl->dlevel.dnum == u.uz.dnum)) {
+    if (u.uz.dnum == tutorial_dnum && target_level.dnum != tutorial_dnum) {
+        /* returning to normal play => arrive on level 1 stairs */
+        totype = UTOTYPE_ATSTAIRS;
+    } else {
+        totype = UTOTYPE_PORTAL;
         stunmsg = !Stunned ? "You feel slightly dizzy."
                             : "You feel dizzier.";
         make_stunned((HStun & TIMEOUT) + 3L, FALSE);
     }
 
-    schedule_goto(&target_level, UTOTYPE_PORTAL, stunmsg, (char *) 0);
+    schedule_goto(&target_level, totype, stunmsg, (char *) 0);
 }
 
 void

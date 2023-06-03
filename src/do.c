@@ -1411,11 +1411,19 @@ goto_level(
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
-    if (newdungeon && In_endgame(newlevel)) { /* 1st Endgame Level !!! */
-        if (!u.uhave.amulet)
-            return;  /* must have the Amulet */
-        if (!wizard) /* wizard ^V can bypass Earth level */
-            assign_level(newlevel, &earth_level); /* (redundant) */
+    if (newdungeon) {
+        if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
+            if (!u.uhave.amulet)
+                return;  /* must have the Amulet */
+            if (!wizard) /* wizard ^V can bypass Earth level */
+                assign_level(newlevel, &earth_level); /* (redundant) */
+        } else if (newlevel->dnum == tutorial_dnum) {
+            tutorial(TRUE); /* entering tutorial */
+        } else if (u.uz.dnum == tutorial_dnum) {
+            tutorial(FALSE); /* leaving tutorial */
+            up = FALSE; /* re-enter level 1 as if starting new game */
+            /* TODO: remove tutorial level(s) from #overview data */
+        }
     }
     new_ledger = ledger_no(newlevel);
     if (new_ledger <= 0)
@@ -1623,7 +1631,6 @@ goto_level(
     if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         register struct trap *ttrap;
-        struct stairway *stway;
 
         for (ttrap = gf.ftrap; ttrap; ttrap = ttrap->ntrap)
             if (ttrap->ttyp == MAGIC_PORTAL)
@@ -1636,9 +1643,6 @@ goto_level(
                    after already getting expelled once. The portal back
                    doesn't exist anymore - see expulsion(). */
                 u_on_rndspot(0);
-            } else if ((stway = stairway_find_dir(TRUE)) != 0) {
-                /* returning from tutorial via portal */
-                u_on_newpos(stway->sx, stway->sy);
             } else {
                 if (!iflags.debug_fuzzer)
                     impossible("goto_level: no corresponding portal!");

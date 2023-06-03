@@ -741,8 +741,9 @@ get_dgn_flags(lua_State *L)
     static const char *const flagstrs[] = {
         "town", "hellish", "mazelike", "roguelike", "unconnected", NULL
     };
-    static const int flagstrs2i[] = { TOWN, HELLISH, MAZELIKE, ROGUELIKE,
-        UNCONNECTED, 0 };
+    static const int flagstrs2i[] = {
+        TOWN, HELLISH, MAZELIKE, ROGUELIKE, UNCONNECTED, 0
+    };
 
     lua_getfield(L, -1, "flags");
     if (lua_type(L, -1) == LUA_TTABLE) {
@@ -1220,6 +1221,7 @@ init_dungeons(void)
     sokoban_dnum = dname_to_dnum("Sokoban");
     mines_dnum = dname_to_dnum("The Gnomish Mines");
     tower_dnum = dname_to_dnum("Vlad's Tower");
+    tutorial_dnum = dname_to_dnum("The Tutorial");
 
     /* one special fixup for dummy surface level */
     if ((x = find_level("dummy")) != 0) {

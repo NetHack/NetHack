@@ -445,7 +445,9 @@ describe_level(
         addbranch = FALSE;
     } else {
         /* ports with more room may expand this one */
-        if (!addbranch)
+        if (u.uz.dnum == tutorial_dnum)
+            Sprintf(buf, "Tutorial:%-2d", depth(&u.uz));
+        else if (!addbranch)
             Sprintf(buf, "Dlvl:%-2d", depth(&u.uz));
         else
             Sprintf(buf, "level %d", depth(&u.uz));

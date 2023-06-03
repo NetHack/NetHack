@@ -255,8 +255,9 @@ des.trap({ type = "magic portal", coord = { 66,2 }, seen = true });
 ----------------
 
 nh.callback("cmd_before", "tutorial_cmd_before");
-nh.callback("level_enter", "tutorial_enter");
-nh.callback("level_leave", "tutorial_leave");
+-- entering and leaving tutorial _branch_ now handled by core
+-- // nh.callback("level_enter", "tutorial_enter");
+-- // nh.callback("level_leave", "tutorial_leave");
 nh.callback("end_turn", "tutorial_turn");
 
 ----------------

@@ -1770,6 +1770,8 @@ arti_invoke(struct obj *obj)
             for (i = num_ok_dungeons = 0; i < gn.n_dgns; i++) {
                 if (!gd.dungeons[i].dunlev_ureached)
                     continue;
+                if (i == tutorial_dnum) /* can't portal into tutorial */
+                    continue;
                 any.a_int = i + 1;
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, clr,

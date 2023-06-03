@@ -1899,6 +1899,7 @@ extern int str_lines_max_width(const char *);
 extern char *stripdigits(char *);
 extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L);
+extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 #endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 

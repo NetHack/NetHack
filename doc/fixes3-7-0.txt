@@ -1604,6 +1604,11 @@ running the tutorial until completion and returning to normal play but left
 when a magic whistle moved a hidden pet it brought that out of hiding and
 	gave a message about "your <pet> appears" but the map was updated
 	while it was still hidden so nothing seemed to appear
+entering the tutorial stashed hero's equipment for eventual return to normal
+	play but going down stairs to the second tutorial level returned it
+	too soon and allowed any items gathered on the first level to be kept
+entering the tutorial and then returning to play made the tutorial branch be
+	eligible for a portal destination via wizard's Eye of the Aethiopica
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
