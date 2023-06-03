@@ -311,7 +311,8 @@ curses_init_nhcolors(void)
         init_pair(5, COLOR_BLUE, -1);
         init_pair(6, COLOR_MAGENTA, -1);
         init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, -1, -1);
+        init_pair(8, COLOR_WHITE, -1);
+        init_pair(9, -1, -1);
 
         {
             int i;
@@ -320,7 +321,7 @@ curses_init_nhcolors(void)
             static const int clr_remap[16] = {
                 COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
                 COLOR_BLUE,
-                COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
+                COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE, -1,
                 COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
                 COLOR_BLUE + 8,
                 COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
@@ -352,9 +353,6 @@ curses_init_nhcolors(void)
                 init_pair(1, COLOR_BLACK + 8, -1);
             }
 # endif
-            /* include gray, it may differ from fg */
-            init_pair(8, COLOR_WHITE, -1);
-            init_pair(9, -1, -1);
             init_pair(10, COLOR_RED + 8, -1);
             init_pair(11, COLOR_GREEN + 8, -1);
             init_pair(12, COLOR_YELLOW + 8, -1);
