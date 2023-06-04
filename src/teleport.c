@@ -1,4 +1,4 @@
-/* NetHack 3.7	teleport.c	$NHDT-Date: 1684374686 2023/05/18 01:51:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.202 $ */
+/* NetHack 3.7	teleport.c	$NHDT-Date: 1685863331 2023/06/04 07:22:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1421,9 +1421,10 @@ domagicportal(struct trap *ttmp)
     target_level = ttmp->dst;
 
     /* coming back from tutorial doesn't trigger stunning */
-    if (u.uz.dnum == tutorial_dnum && target_level.dnum != tutorial_dnum) {
+    if (In_tutorial(&u.uz) && !In_tutorial(&target_level)) {
         /* returning to normal play => arrive on level 1 stairs */
         totype = UTOTYPE_ATSTAIRS;
+        stunmsg = "Resuming regular play.";
     } else {
         totype = UTOTYPE_PORTAL;
         stunmsg = !Stunned ? "You feel slightly dizzy."

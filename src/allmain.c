@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1652831519 2022/05/17 23:51:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1685863328 2023/06/04 07:22:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -520,7 +520,8 @@ maybe_do_tutorial(void)
     if (ask_do_tutorial()) {
         assign_level(&u.ucamefrom, &u.uz);
         iflags.nofollowers = TRUE;
-        schedule_goto(&sp->dlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
+        schedule_goto(&sp->dlevel, UTOTYPE_NONE,
+                      "Entering the tutorial.", (char *) 0);
         deferred_goto();
         vision_recalc(0);
         docrt();

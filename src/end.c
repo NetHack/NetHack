@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1674546299 2023/01/24 07:44:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.265 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1685863329 2023/06/04 07:22:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.274 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -327,7 +327,13 @@ done1(int sig_unused UNUSED)
 int
 done2(void)
 {
-    if (!paranoid_query(ParanoidQuit, "Really quit?")) {
+    boolean abandon_tutorial = FALSE;
+
+    if (In_tutorial(&u.uz)
+        && y_n("Switch from the tutorial back to regular play?") == 'y')
+        abandon_tutorial = TRUE;
+
+    if (abandon_tutorial || !paranoid_query(ParanoidQuit, "Really quit?")) {
 #ifndef NO_SIGNAL
         (void) signal(SIGINT, (SIG_RET_TYPE) done1);
 #endif
@@ -340,8 +346,13 @@ done2(void)
             u.uinvulnerable = FALSE; /* avoid ctrl-C bug -dlc */
             u.usleep = 0;
         }
+
+        if (abandon_tutorial)
+            schedule_goto(&u.ucamefrom, UTOTYPE_ATSTAIRS,
+                          "Resuming regular play", (char *) 0);
         return ECMD_OK;
     }
+
 #if (defined(UNIX) || defined(VMS) || defined(LATTICE))
     if (wizard) {
         int c;

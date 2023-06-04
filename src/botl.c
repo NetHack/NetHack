@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1646171622 2022/03/01 21:53:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1685863332 2023/06/04 07:22:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -445,10 +445,9 @@ describe_level(
         addbranch = FALSE;
     } else {
         /* ports with more room may expand this one */
-        if (u.uz.dnum == tutorial_dnum)
-            Sprintf(buf, "Tutorial:%-2d", depth(&u.uz));
-        else if (!addbranch)
-            Sprintf(buf, "Dlvl:%-2d", depth(&u.uz));
+        if (!addbranch)
+            Sprintf(buf, "%s:%-2d", /* "Dlvl:n" (grep fodder) */
+                    In_tutorial(&u.uz) ? "Tutorial" : "Dlvl", depth(&u.uz));
         else
             Sprintf(buf, "level %d", depth(&u.uz));
         ret = 0;

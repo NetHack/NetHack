@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1683832317 2023/05/11 19:11:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.352 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1685863330 2023/06/04 07:22:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1417,9 +1417,9 @@ goto_level(
                 return;  /* must have the Amulet */
             if (!wizard) /* wizard ^V can bypass Earth level */
                 assign_level(newlevel, &earth_level); /* (redundant) */
-        } else if (newlevel->dnum == tutorial_dnum) {
+        } else if (In_tutorial(newlevel)) {
             tutorial(TRUE); /* entering tutorial */
-        } else if (u.uz.dnum == tutorial_dnum) {
+        } else if (In_tutorial(&u.uz)) {
             tutorial(FALSE); /* leaving tutorial */
             up = FALSE; /* re-enter level 1 as if starting new game */
             /* TODO: remove tutorial level(s) from #overview data */
