@@ -211,8 +211,17 @@ void NetHackQtMapViewport::paintEvent(QPaintEvent* event)
                 painter.setPen(Qt::green);
 #endif
                 if (!DrawWalls(painter, i * gW, j * gH, gW, gH, ch)) {
+                    ushort utf16[3];
+                    if (ch < 0x10000) {
+                        utf16[0] = static_cast<ushort>(ch);
+                        utf16[1] = 0;
+                    } else {
+                        utf16[0] = static_cast<ushort>((ch >> 10) + 0xD7C0);
+                        utf16[1] = static_cast<ushort>((ch & 0x3FF) + 0xDC00);
+                        utf16[2] = 0;
+                    }
                     painter.drawText(i * gW, j * gH, gW, gH, Qt::AlignCenter,
-                                     QString(QChar(ch)).left(1));
+                                     QString::fromUtf16(utf16));
                 }
                 if ((special & MG_PET) != 0 && ::iflags.hilite_pet) {
                     painter.drawPixmap(QPoint(i * gW, j * gH),
