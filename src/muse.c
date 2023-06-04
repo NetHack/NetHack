@@ -21,6 +21,7 @@ static void mreadmsg(struct monst *, struct obj *);
 static void mquaffmsg(struct monst *, struct obj *);
 static boolean m_use_healing(struct monst *);
 static boolean m_sees_sleepy_soldier(struct monst *);
+static void m_tele(struct monst *, boolean, boolean, int);
 static boolean linedup_chk_corpse(coordxy, coordxy);
 static void m_use_undead_turning(struct monst *, struct obj *);
 static boolean hero_behind_chokepoint(struct monst *);
@@ -364,6 +365,29 @@ m_sees_sleepy_soldier(struct monst *mtmp)
     return FALSE;
 }
 
+static void
+m_tele(
+    struct monst *mtmp, /* monst that might be teleported */
+    boolean vismon,     /* can see it */
+    boolean oseen,      /* have seen the object that triggered this */
+    int how)            /* type of that object */
+{
+    if (tele_restrict(mtmp)) { /* mysterious force... */
+        if (vismon && how)     /* mentions 'teleport' */
+            makeknown(how);
+        /* monster learns that teleportation isn't useful here */
+        if (noteleport_level(mtmp))
+            mon_learns_traps(mtmp, TELEP_TRAP);
+    } else if ((mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) && !rn2(3)) {
+        if (vismon)
+            pline("%s seems disoriented for a moment.", Monnam(mtmp));
+    } else {
+        if (oseen && how)
+            makeknown(how);
+        (void) rloc(mtmp, RLOC_MSG);
+    }
+}
+
 /* Select a defensive item/action for a monster.  Returns TRUE iff one is
    found. */
 boolean
@@ -683,7 +707,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
 int
 use_defensive(struct monst *mtmp)
 {
-    int i, fleetim, how = 0;
+    int i, fleetim;
     struct obj *otmp = gm.m.defensive;
     boolean vis, vismon, oseen;
     const char *Mnam;
@@ -734,24 +758,7 @@ use_defensive(struct monst *mtmp)
             return 2;
         m_flee(mtmp);
         mzapwand(mtmp, otmp, TRUE);
-        how = WAN_TELEPORTATION;
- mon_tele:
-        if (tele_restrict(mtmp)) { /* mysterious force... */
-            if (vismon && how)     /* mentions 'teleport' */
-                makeknown(how);
-            /* monster learns that teleportation isn't useful here */
-            if (noteleport_level(mtmp))
-                mon_learns_traps(mtmp, TELEP_TRAP);
-            return 2;
-        }
-        if ((mon_has_amulet(mtmp) || On_W_tower_level(&u.uz)) && !rn2(3)) {
-            if (vismon)
-                pline("%s seems disoriented for a moment.", Monnam(mtmp));
-            return 2;
-        }
-        if (oseen && how)
-            makeknown(how);
-        (void) rloc(mtmp, RLOC_MSG);
+        m_tele(mtmp, vismon, oseen, WAN_TELEPORTATION);
         return 2;
     case MUSE_WAN_TELEPORTATION:
         gz.zap_oseen = oseen;
@@ -769,32 +776,42 @@ use_defensive(struct monst *mtmp)
         if (mtmp->isshk || mtmp->isgd || mtmp->ispriest)
             return 2;
         m_flee(mtmp);
-        mreadmsg(mtmp, otmp);
-        m_useup(mtmp, otmp); /* otmp might be free'ed */
-        how = SCR_TELEPORTATION;
+        /* we want to be able to access otmp after the teleport but it
+           might get destroyed if still in mtmp's inventory (maybe mtmp
+           lands in lava or on a fire trap) so take it out in advance */
+        if (otmp->quan > 1L)
+            otmp = splitobj(otmp, 1L);
+        extract_from_minvent(mtmp, otmp, FALSE, FALSE);
+        /* 'last_msg' will be changed to PLNMSG_UNKNOWN if any messages
+           are issued by mreadmsg(), 'if (vismon) pline()', or m_tele() */
+        iflags.last_msg = PLNMSG_enum;
+        mreadmsg(mtmp, otmp); /* sets otmp->dknown if !Blind or !Deaf */
         if (obj_is_cursed || mtmp->mconf) {
             int nlev;
             d_level flev;
 
+            nlev = random_teleport_level();
             if (mon_has_amulet(mtmp) || In_endgame(&u.uz)) {
                 if (vismon)
                     pline("%s seems very disoriented for a moment.",
                           Monnam(mtmp));
-                return 2;
-            }
-            nlev = random_teleport_level();
-            if (nlev == depth(&u.uz)) {
+            } else if (nlev == depth(&u.uz)) {
                 if (vismon)
                     pline("%s shudders for a moment.", Monnam(mtmp));
-                return 2;
+            } else {
+                get_level(&flev, nlev);
+                migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
+                                 (coord *) 0);
             }
-            get_level(&flev, nlev);
-            migrate_to_level(mtmp, ledger_no(&flev), MIGR_RANDOM,
-                             (coord *) 0);
-            if (oseen)
-                makeknown(SCR_TELEPORTATION);
-        } else
-            goto mon_tele;
+        } else {
+            m_tele(mtmp, vismon, oseen, SCR_TELEPORTATION);
+        }
+        /* m_tele() handles makeknown(); trycall() will be a no-op when
+           otmp->otyp is already discovered */
+        if (otmp->dknown && iflags.last_msg != PLNMSG_enum)
+            trycall(otmp);
+        /* already removed from mtmp->minvent so not 'm_useup(mtmp, otmp)' */
+        obfree(otmp, (struct obj *) 0);
         return 2;
     }
     case MUSE_WAN_DIGGING: {
@@ -1047,8 +1064,9 @@ use_defensive(struct monst *mtmp)
         if (mtmp->wormno)
             worm_move(mtmp);
         newsym(gt.trapx, gt.trapy);
-
-        goto mon_tele;
+        /* 0: 'no object' rather than STRANGE_OBJECT; FALSE: obj not seen */
+        m_tele(mtmp, vismon, FALSE, 0);
+        return 2;
     case MUSE_POT_HEALING:
         mquaffmsg(mtmp, otmp);
         i = d(6 + 2 * bcsign(otmp), 4);

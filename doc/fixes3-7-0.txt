@@ -1199,6 +1199,10 @@ applying a cream pie (always) or lump of royal jelly (sometimes) would use up
 	the object and then access its memory after that had been freed
 keep track of hero's pending movement points across save and restore
 give feedback if hero sees a monster become hidden under an object or water
+hero might hear unseen monster read scroll of create monster or scroll of
+	teleportation; when it was create monster, player was given a chance
+	to call it something but not when it was teleportation, allowing the
+	player to deduce which type of scroll it actually was
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
