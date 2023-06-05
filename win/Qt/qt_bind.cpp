@@ -1043,7 +1043,7 @@ boolean NetHackQtBind::msgs_initd = false;
 static void Qt_positionbar(char *) {}
 #endif
 
-#if defined(SND_LIB_QTSOUND) && !defined(NO_QT_SOUND)
+#if defined(SND_LIB_QTSOUND) && !defined(QT_NO_SOUND)
 void NetHackQtBind::qtsound_init_nhsound(void)
 {
 }
@@ -1069,15 +1069,11 @@ void NetHackQtBind::qtsound_ambience(int32_t ambienceid UNUSED, int32_t ambience
 void NetHackQtBind::qtsound_verbal(char *text UNUSED, int32_t gender UNUSED, int32_t tone UNUSED, int32_t vol UNUSED, int32_t moreinfo UNUSED)
 {
 }
-#endif
 
-#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
 QSoundEffect *effect = NULL;
-#endif
 
 void NetHackQtBind::qtsound_play_usersound(char *filename, int32_t volume, int32_t idx UNUSED)
 {
-#if defined(USER_SOUNDS) && !defined(QT_NO_SOUND)
     if (!effect)
         effect = new QSoundEffect(nethack_qt_::NetHackQtBind::mainWidget());
     if (effect) {
@@ -1086,11 +1082,8 @@ void NetHackQtBind::qtsound_play_usersound(char *filename, int32_t volume, int32
         effect->setSource(QUrl::fromLocalFile(filename));
         effect->play();
     }
-#else
-    nhUse(filename);
-    nhUse(volume);
-#endif
 }
+#endif
 
 } // namespace nethack_qt_
 
