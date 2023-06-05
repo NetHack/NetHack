@@ -118,11 +118,13 @@ NetHackQtSettings::NetHackQtSettings() :
     // Tile/font sizes read from .nethackrc
     if (qt_tilewidth != NULL) {
 	tilewidth.setValue(atoi(qt_tilewidth));
-	delete[] qt_tilewidth;
+	free(qt_tilewidth);
+        qt_tilewidth = NULL;
     }
     if (qt_tileheight != NULL) {
 	tileheight.setValue(atoi(qt_tileheight));
-	delete[] qt_tileheight;
+	free(qt_tileheight);
+        qt_tileheight = NULL;
     }
     if (qt_fontsize != NULL) {
 	switch (tolower(qt_fontsize[0])) {
@@ -132,7 +134,8 @@ NetHackQtSettings::NetHackQtSettings() :
 	  case 's': default_fontsize = 3; break;
 	  case 't': default_fontsize = 4; break;
 	}
-	delete[] qt_fontsize;
+	free(qt_fontsize);
+        qt_fontsize = NULL;
     }
 
     theglyphs=new NetHackQtGlyphs();

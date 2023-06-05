@@ -877,17 +877,14 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
     int w=screensize.width()-10; // XXX arbitrary extra space for frame
     int h=screensize.height()-50;
 
-    int maxwn;
-    int maxhn;
-    if (qt_tilewidth != NULL) {
-	maxwn = atoi(qt_tilewidth) * COLNO + 10;
-    } else {
-	maxwn = 1400;
-    }
-    if (qt_tileheight != NULL) {
-	maxhn = atoi(qt_tileheight) * ROWNO * 6/4;
-    } else {
-	maxhn = 1024;
+    int maxwn = 1400;
+    int maxhn = 1024;
+    if (qt_settings != NULL) {
+        auto glyphs = &qt_settings->glyphs();
+        if (glyphs != NULL) {
+            maxwn = glyphs->width() * COLNO + 10;
+            maxhn = glyphs->height() * ROWNO * 6/4;
+        }
     }
 
     // Be exactly the size we want to be - full map...
@@ -1239,6 +1236,9 @@ void NetHackQtMainWindow::layout()
         splittersizes[2] = w / 2 - (d * 1 / 4); // status
         splittersizes[1] = d;                   // invusage
         splittersizes[0] = w / 2 - (d * 3 / 4); // messages
+        printf("w = %d d = %d splittersizes = %d %d %d\n",
+                w, d,
+                splittersizes[0], splittersizes[1], splittersizes[2]);
         hsplitter->setSizes(splittersizes);
     }
 }
