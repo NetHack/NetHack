@@ -2551,11 +2551,6 @@ cmap_to_roguecolor(int cmap)
         color = CLR_BROWN;
     else if (cmap >= S_arrow_trap && cmap <= S_polymorph_trap)
         color = CLR_MAGENTA;
-#if 0
-    else if (cmap == S_corr || cmap == S_litcorr)
-	if (iflags.wc2_darkgray)
-        	color = CLR_BLACK;
-#endif
     else if (cmap >= S_room && cmap <= S_water
                 && cmap != S_darkroom)
         color = CLR_GREEN;
