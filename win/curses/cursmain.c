@@ -22,6 +22,8 @@ extern char erase_char, kill_char;
 
 extern long curs_mesg_suppress_seq; /* from cursmesg.c */
 extern boolean curs_mesg_no_suppress; /* ditto */
+extern int mesg_mixed;
+extern glyph_info mesg_gi;
 
 /* stubs for curses_procs{} */
 #ifdef POSITIONBAR
@@ -70,7 +72,7 @@ struct window_procs curses_procs = {
     curses_destroy_nhwindow,
     curses_curs,
     curses_putstr,
-    genl_putmixed,
+    curses_putmixed,
     curses_display_file,
     curses_start_menu,
     curses_add_menu,
@@ -559,6 +561,19 @@ curses_putstr(winid wid, int attr, const char *text)
 
     /* urgent message handling is a one-shot operation; we're done */
     curs_mesg_no_suppress = FALSE;
+}
+
+void
+curses_putmixed(winid window, int attr, const char *str)
+{
+    if (window == WIN_MESSAGE) {
+        str = mixed_to_glyphinfo(str, &mesg_gi);
+        mesg_mixed = 1;
+    }
+    /* now send it to the normal putstr */
+    curses_putstr(window, attr, str);
+    if (window == WIN_MESSAGE)
+        mesg_mixed = 0;
 }
 
 /* Display the file named str.  Complain about missing files

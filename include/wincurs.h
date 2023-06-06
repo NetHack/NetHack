@@ -79,6 +79,7 @@ extern void curses_display_nhwindow(winid wid, boolean block);
 extern void curses_destroy_nhwindow(winid wid);
 extern void curses_curs(winid wid, int x, int y);
 extern void curses_putstr(winid wid, int attr, const char *text);
+extern void curses_putmixed(winid window, int attr, const char *str);
 extern void curses_display_file(const char *filename, boolean must_exist);
 extern void curses_start_menu(winid wid, unsigned long);
 extern void curses_add_menu(winid wid, const glyph_info *,

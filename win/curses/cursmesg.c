@@ -26,10 +26,13 @@ long curs_mesg_suppress_seq = -1L;
    message triggers More>> for the previous message and the player responds
    with ESC; we need to avoid initiating suppression in that situation */
 boolean curs_mesg_no_suppress = FALSE;
+/* curses_putmixed() will place information in these next two */
+int mesg_mixed = 0;
+glyph_info mesg_gi;
 
 /* Message window routines for curses interface */
 
-/* Private declatations */
+/* Private declarations */
 
 typedef struct nhpm {
     char *str;                  /* Message text */
@@ -43,6 +46,7 @@ static void unscroll_window(winid wid);
 static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
+static int curscolor(int nhcolor, boolean *boldon);
 
 static int turn_lines = 0;
 static int mx = 0;
@@ -61,8 +65,10 @@ curses_message_win_puts(const char *message, boolean recursed)
     int height, width, border_space, linespace;
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
-    boolean bold, border = curses_window_has_border(MESSAGE_WIN);
+    boolean bold, border = curses_window_has_border(MESSAGE_WIN),
+                  have_mixed_leadin = FALSE, adjustbold = FALSE;
     int message_length = (int) strlen(message);
+    cchar_t mixed_leadin_cchar[2];
 
 #if 0
     /*
@@ -110,6 +116,36 @@ curses_message_win_puts(const char *message, boolean recursed)
     /* -2: for leading "  " (if combining this message with preceding one) */
     if (mx > border_space)
         linespace -= 2;
+    bold = (height > 1 && !last_messages);
+
+    if (mesg_mixed) {
+        wchar_t w[2];
+        int leadin_color;
+
+        leadin_color = curscolor(mesg_gi.gm.sym.color, &adjustbold);
+        /*
+         * curses_putmixed() skipped past the \GNNNNNNNN encoding
+         * in the string, and filled in the mesg_gi glyphinfo. It
+         * flagged that to us by setting mesg_mixed.
+         */
+
+        w[0] = (wchar_t) mesg_gi.ttychar;
+#ifdef ENHANCED_SYMBOLS
+        if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)
+            && mesg_gi.gm.u) {
+            /* FIXME: this won't work with all unicode values (32 bits -> 16
+             * bits on Windows) */
+            w[0] = (wchar_t) mesg_gi.gm.u->utf32ch;
+        }
+#endif
+        w[1] = L'\0';
+        if (setcchar(mixed_leadin_cchar, w,
+                     (bold || adjustbold) ? A_BOLD : A_NORMAL,
+                     leadin_color, 0) == OK) {
+            have_mixed_leadin = TRUE;
+            message_length++; /* account for that additional column */
+        }
+    }
 
     if (linespace < message_length) {
         if (my - border_space >= height - 1) {
@@ -143,35 +179,76 @@ curses_message_win_puts(const char *message, boolean recursed)
         }
     }
 
-    bold = (height > 1 && !last_messages);
-    if (bold)
+    if (bold || adjustbold)
         curses_toggle_color_attr(win, NONE, A_BOLD, ON);
 
     /* will this message fit as-is or do we need to split it? */
     if (mx == border_space && message_length > width - 3) {
         /* split needed */
         tmpstr = curses_break_str(message, (width - 3), 1);
+        if (have_mixed_leadin) {
+            mvwadd_wch(win, my, mx, mixed_leadin_cchar);
+            ++mx;
+            message_length--;
+	    have_mixed_leadin = FALSE;
+	    mesg_mixed = 0;
+        }
         mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
         /* one space to separate first part of message from rest [is this
            actually useful?] */
         if (mx < width)
             ++mx;
         free(tmpstr);
-        if (bold)
+        if (bold || adjustbold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
         tmpstr = curses_str_remainder(message, (width - 3), 1);
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
+        if (have_mixed_leadin) {
+            mvwadd_wch(win, my, mx, mixed_leadin_cchar);
+            ++mx;
+            message_length--;
+	    have_mixed_leadin = FALSE;
+	    mesg_mixed = 0;
+        }
         mvwprintw(win, my, mx, "%s", message), mx += message_length;
-        if (bold)
+        if (bold || adjustbold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
     }
     wrefresh(win);
 }
 
-void
-curses_got_input(void)
+
+static int
+curscolor(int nhcolor, boolean *boldon)
+{
+    int curses_color;
+
+    *boldon = FALSE;
+    if (nhcolor == 0) { /* make black fg visible */
+#ifdef USE_DARKGRAY
+        if (iflags.wc2_darkgray) {
+            if (COLORS > 16) {
+                /* colorpair for black is already darkgray */
+            } else { /* Use bold for a bright black */
+                *boldon = TRUE;
+            }
+        } else
+#endif /* USE_DARKGRAY */
+            nhcolor = CLR_BLUE;
+    }
+    curses_color = nhcolor + 1;
+    if (COLORS < 16) {
+        if (curses_color > 8 && curses_color < 17)
+            curses_color -= 8;
+        else if (curses_color > (17 + 16))
+            curses_color -= 16;
+    }
+    return curses_color;
+}
+
+void curses_got_input(void)
 {
     /* if messages are being suppressed, reenable them */
     curs_mesg_suppress_seq = -1L;
