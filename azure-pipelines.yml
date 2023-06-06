@@ -137,7 +137,7 @@ steps:
     export LUATOP=../submodules/lua
     export LUASRC=../submodules/lua
     export ADD_CURSES=Y
-    export PDCURSES_TOP=../submodules/pdcurses
+    export PDCURSES_TOP=../submodules/pdcursesmod
     export LUA_VERSION=5.4.6
     #
     # 64-bit
