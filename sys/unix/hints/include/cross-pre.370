@@ -74,17 +74,17 @@ ifdef BUILD_PDCURSES
 # PD Curses library
 #===============-=================================================
 ifdef WANT_WIN_CURSES
-ifdef WANT_DOSVGA
 PDCTOP = ../lib/pdcursesmod
+ifdef WANT_DOSVGA
 PDCPORT = $(PDCTOP)/dosvga
 PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" \
 		-D"PDC_WIDE" -D"CURSES_UNICODE"
 else
-PDCTOP = ../lib/pdcurses
 PDCPORT = $(PDCTOP)/dos
 PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
-		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
+		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" \
+		-D"PDC_WIDE"
 endif # WANT_DOSVGA
 PDCLIBOBJ1= $(TARGETPFX)addch.o $(TARGETPFX)addchstr.o \
 		$(TARGETPFX)addstr.o $(TARGETPFX)attr.o \

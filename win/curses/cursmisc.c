@@ -857,7 +857,7 @@ int
 curses_convert_keys(int key)
 {
     boolean reject = (gp.program_state.input_state == otherInp),
-            as_is = FALSE, numpad_esc;
+            as_is = FALSE, numpad_esc = FALSE;
     int ret = key;
 
     if (modifiers_available)
@@ -1106,6 +1106,7 @@ parse_escape_sequence(boolean *keypadnum)
 
     return ret;
 #else
+    nhUse(keypadnum);
     return '\033';
 #endif /* !PDCURSES */
 }
