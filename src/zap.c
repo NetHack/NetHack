@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1664739715 2022/10/02 19:41:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.440 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1686178723 2023/06/07 22:58:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.472 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3553,7 +3553,7 @@ bhit(
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
 
     while (range-- > 0) {
-        coordxy x, y;
+        coordxy x, y, dbx, dby;
 
         gb.bhitpos.x += ddx;
         gb.bhitpos.y += ddy;
@@ -3573,7 +3573,7 @@ bhit(
             goto bhit_done;
         }
 
-        typ = levl[gb.bhitpos.x][gb.bhitpos.y].typ;
+        typ = levl[x][y].typ;
 
         /* WATER aka "wall of water" stops items */
         if (IS_WATERWALL(typ) || typ == LAVAWALL) {
@@ -3584,9 +3584,9 @@ bhit(
         /* iron bars will block anything big enough and break some things */
         if (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON) {
             if (obj->lamplit && !Blind)
-                show_transient_light(obj, gb.bhitpos.x, gb.bhitpos.y);
+                show_transient_light(obj, x, y);
             if (typ == IRONBARS
-                && hits_bars(pobj, x - ddx, y - ddy, gb.bhitpos.x, gb.bhitpos.y,
+                && hits_bars(pobj, x - ddx, y - ddy, x, y,
                              point_blank ? 0 : !rn2(5), 1)) {
                 /* caveat: obj might now be null... */
                 obj = *pobj;
@@ -3596,53 +3596,59 @@ bhit(
             }
         } else if (weapon == FLASHED_LIGHT) {
             if (!Blind)
-                show_transient_light((struct obj *) 0,
-                                     gb.bhitpos.x, gb.bhitpos.y);
+                show_transient_light((struct obj *) 0, x, y);
         }
 
-        if (weapon == ZAPPED_WAND && find_drawbridge(&x, &y)) {
+        dbx = x, dby = y;
+        if (weapon == ZAPPED_WAND && find_drawbridge(&dbx, &dby)) {
             boolean learn_it = FALSE;
 
             switch (obj->otyp) {
             case WAN_OPENING:
             case SPE_KNOCK:
-                if (is_db_wall(gb.bhitpos.x, gb.bhitpos.y)) {
-                    if (cansee(x, y) || cansee(gb.bhitpos.x, gb.bhitpos.y))
+                /* dbwall: 'closed door' of raised drawbridge */
+                if (is_db_wall(x, y)) {
+                    if (cansee(dbx, dby) || cansee(x, y))
                         learn_it = TRUE;
-                    open_drawbridge(x, y);
+                    open_drawbridge(dbx, dby);
                 }
                 break;
             case WAN_LOCKING:
             case SPE_WIZARD_LOCK:
-                if ((cansee(x, y) || cansee(gb.bhitpos.x, gb.bhitpos.y))
-                    && levl[x][y].typ == DRAWBRIDGE_DOWN)
+                /* drawbridge_down: span of lowered drawbridge */
+                if ((cansee(dbx, dby) || cansee(x, y))
+                    && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
                     learn_it = TRUE;
-                close_drawbridge(x, y);
+                close_drawbridge(dbx, dby);
                 break;
             case WAN_STRIKING:
             case SPE_FORCE_BOLT:
-                if (typ != DRAWBRIDGE_UP)
-                    destroy_drawbridge(x, y);
-                learn_it = TRUE;
+                /* !drawbridge_up: not spot in front of raised bridge,
+                   so either span of lowered bridge or portcullis */
+                if (typ != DRAWBRIDGE_UP) {
+                    learn_it = TRUE;
+                    destroy_drawbridge(dbx, dby);
+                }
                 break;
             }
             if (learn_it)
                 learnwand(obj);
         }
 
+        /* [shouldn't this trap handling be in zap_over_floor()?] */
         if (weapon == ZAPPED_WAND)
-            maybe_explode_trap(t_at(gb.bhitpos.x, gb.bhitpos.y), obj);
+            maybe_explode_trap(t_at(x, y), obj);
 
-        mtmp = m_at(gb.bhitpos.x, gb.bhitpos.y);
-        ttmp = t_at(gb.bhitpos.x, gb.bhitpos.y);
+        mtmp = m_at(x, y);
+        ttmp = t_at(x, y);
 
         if (!mtmp && ttmp && (ttmp->ttyp == WEB)
             && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && !rn2(3)) {
-            if (cansee(gb.bhitpos.x, gb.bhitpos.y)) {
+            if (cansee(x, y)) {
                 pline("%s gets stuck in a web!", Yname2(obj));
                 ttmp->tseen = TRUE;
-                newsym(gb.bhitpos.x, gb.bhitpos.y);
+                newsym(x, y);
             }
             break;
         }
@@ -3653,7 +3659,7 @@ bhit(
          * skiprange_start is only set if this is a thrown rock
          */
         if (skiprange_start && (range == skiprange_start) && allow_skip) {
-            if (is_pool(gb.bhitpos.x, gb.bhitpos.y) && !mtmp) {
+            if (is_pool(x, y) && !mtmp) {
                 in_skip = TRUE;
                 if (!Blind)
                     pline("%s %s%s.", Yname2(obj), otense(obj, "skip"),
@@ -3685,8 +3691,7 @@ bhit(
             mtmp = (struct monst *) 0;
 
         if (mtmp) {
-            gn.notonhead = (gb.bhitpos.x != mtmp->mx
-                           || gb.bhitpos.y != mtmp->my);
+            gn.notonhead = (x != mtmp->mx || y != mtmp->my);
             if (weapon == FLASHED_LIGHT) {
                 /* FLASHED_LIGHT hitting invisible monster should
                    pass through instead of stop so we call
@@ -3714,13 +3719,12 @@ bhit(
                     goto bhit_done;
                 }
             } else if (weapon != ZAPPED_WAND) {
-
                 /* THROWN_WEAPON, KICKED_WEAPON */
                 if (!tethered_weapon)
                     tmp_at(DISP_END, 0);
 
-                if (cansee(gb.bhitpos.x, gb.bhitpos.y) && !canspotmon(mtmp))
-                    map_invisible(gb.bhitpos.x, gb.bhitpos.y);
+                if (cansee(x, y) && !canspotmon(mtmp))
+                    map_invisible(x, y);
                 result = mtmp;
                 goto bhit_done;
             } else {
@@ -3733,20 +3737,18 @@ bhit(
             }
         } else {
             if (weapon == ZAPPED_WAND && obj->otyp == WAN_PROBING
-                && glyph_is_invisible(levl[gb.bhitpos.x][gb.bhitpos.y].glyph)) {
-                unmap_object(gb.bhitpos.x, gb.bhitpos.y);
+                && glyph_is_invisible(levl[x][y].glyph)) {
+                unmap_object(x, y);
                 newsym(x, y);
             }
         }
         if (fhito) {
-            if (bhitpile(obj, fhito, gb.bhitpos.x, gb.bhitpos.y, 0))
+            if (bhitpile(obj, fhito, x, y, 0))
                 range--;
         } else {
             if (weapon == KICKED_WEAPON
-                && ((obj->oclass == COIN_CLASS
-                     && OBJ_AT(gb.bhitpos.x, gb.bhitpos.y))
-                    || ship_object(obj, gb.bhitpos.x, gb.bhitpos.y,
-                                   costly_spot(gb.bhitpos.x, gb.bhitpos.y)))) {
+                && ((obj->oclass == COIN_CLASS && OBJ_AT(x, y))
+                    || ship_object(obj, x, y, costly_spot(x, y)))) {
                 tmp_at(DISP_END, 0);
                 goto bhit_done; /* result == (struct monst *) 0 */
             }
@@ -3759,20 +3761,19 @@ bhit(
             case SPE_KNOCK:
             case SPE_WIZARD_LOCK:
             case SPE_FORCE_BOLT:
-                if (doorlock(obj, gb.bhitpos.x, gb.bhitpos.y)) {
-                    if (cansee(gb.bhitpos.x, gb.bhitpos.y)
-                        || (obj->otyp == WAN_STRIKING && !Deaf))
+                if (doorlock(obj, x, y)) {
+                    if (cansee(x, y) || (obj->otyp == WAN_STRIKING && !Deaf))
                         learnwand(obj);
-                    if (levl[gb.bhitpos.x][gb.bhitpos.y].doormask == D_BROKEN
-                        && *in_rooms(gb.bhitpos.x, gb.bhitpos.y, SHOPBASE)) {
+                    if (levl[x][y].doormask == D_BROKEN
+                        && *in_rooms(x, y, SHOPBASE)) {
                         shopdoor = TRUE;
-                        add_damage(gb.bhitpos.x, gb.bhitpos.y, SHOP_DOOR_COST);
+                        add_damage(x, y, SHOP_DOOR_COST);
                     }
                 }
                 break;
             }
         }
-        if (!ZAP_POS(typ) || closed_door(gb.bhitpos.x, gb.bhitpos.y)) {
+        if (!ZAP_POS(typ) || closed_door(x, y)) {
             gb.bhitpos.x -= ddx;
             gb.bhitpos.y -= ddy;
             break;
@@ -3780,17 +3781,14 @@ bhit(
         if (weapon != ZAPPED_WAND && weapon != INVIS_BEAM) {
             /* 'I' present but no monster: erase */
             /* do this before the tmp_at() */
-            if (glyph_is_invisible(levl[gb.bhitpos.x][gb.bhitpos.y].glyph)
-                && cansee(x, y)) {
-                unmap_object(gb.bhitpos.x, gb.bhitpos.y);
+            if (glyph_is_invisible(levl[x][y].glyph) && cansee(x, y)) {
+                unmap_object(x, y);
                 newsym(x, y);
             }
-            tmp_at(gb.bhitpos.x, gb.bhitpos.y);
+            tmp_at(x, y);
             nh_delay_output();
             /* kicked objects fall in pools */
-            if ((weapon == KICKED_WEAPON)
-                && (is_pool(gb.bhitpos.x, gb.bhitpos.y)
-                    || is_lava(gb.bhitpos.x, gb.bhitpos.y)))
+            if ((weapon == KICKED_WEAPON) && is_pool_or_lava(x, y))
                 break;
             if (IS_SINK(typ) && weapon != FLASHED_LIGHT)
                 break; /* physical objects fall onto sink */
