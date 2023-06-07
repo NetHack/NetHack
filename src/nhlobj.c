@@ -106,7 +106,7 @@ l_obj_getcontents(lua_State *L)
 
 /* Puts object inside another object. */
 /* local box = obj.new("large chest");
-   box.addcontent(obj.new("rock"));
+   box:addcontent(obj.new("rock"));
 */
 static int
 l_obj_add_to_container(lua_State *L)
