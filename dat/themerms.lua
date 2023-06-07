@@ -628,10 +628,25 @@ xx|.....|xx
 }----}
 }}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, filled=0, joined=false });
      local nasty_undead = { "giant zombie", "ettin zombie", "vampire lord" };
-     des.object("chest", 2, 2);
-     des.object("chest", 3, 2);
-     des.object("chest", 2, 3);
-     des.object("chest", 3, 3);
+     local chest_spots = { { 2, 2 }, { 3, 2 }, { 2, 3 }, { 3, 3 } };
+
+     shuffle(chest_spots)
+     -- Guarantee an escape item inside one of the chests, to prevent the hero
+     -- falling in from above and becoming permanently stuck
+     -- [cf. generate_way_out_method(sp_lev.c)].
+     -- "pick-axe", "dwarvish mattock" could be included in the list of escape
+     -- items but don't normally generate in containers.
+     local escape_items = {
+        "scroll of teleportation", "ring of teleportation",
+        "wand of teleportation", "wand of digging"
+     };
+     local box = des.object({ id = "chest", coord = chest_spots[1] })
+     box:addcontent(obj.new(escape_items[math.random(#escape_items)]));
+
+     for i = 2, #chest_spots do
+         des.object({ id = "chest", coord = chest_spots[i] });
+     end
+
      shuffle(nasty_undead);
      des.monster(nasty_undead[1], 2, 2);
 end });
