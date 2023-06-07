@@ -68,7 +68,9 @@ curses_message_win_puts(const char *message, boolean recursed)
     boolean bold, border = curses_window_has_border(MESSAGE_WIN),
                   have_mixed_leadin = FALSE, adjustbold = FALSE;
     int message_length = (int) strlen(message);
+#if !defined(PDCURSES) || defined(PDC_WIDE)
     cchar_t mixed_leadin_cchar[2];
+#endif
 
 #if 0
     /*
@@ -118,6 +120,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         linespace -= 2;
     bold = (height > 1 && !last_messages);
 
+#if !defined(PDCURSES) || defined(PDC_WIDE)
     if (mesg_mixed) {
         wchar_t w[2];
         int leadin_color;
@@ -146,6 +149,7 @@ curses_message_win_puts(const char *message, boolean recursed)
             message_length++; /* account for that additional column */
         }
     }
+#endif  /* !PDCURSES || PDC_WIDE */
 
     if (linespace < message_length) {
         if (my - border_space >= height - 1) {
@@ -186,13 +190,15 @@ curses_message_win_puts(const char *message, boolean recursed)
     if (mx == border_space && message_length > width - 3) {
         /* split needed */
         tmpstr = curses_break_str(message, (width - 3), 1);
-        if (have_mixed_leadin) {
+#if !defined(PDCURSES) || defined(PDC_WIDE)
+	if (have_mixed_leadin) {
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
             message_length--;
 	    have_mixed_leadin = FALSE;
 	    mesg_mixed = 0;
         }
+#endif
         mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
         /* one space to separate first part of message from rest [is this
            actually useful?] */
@@ -205,6 +211,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
+#if !defined(PDCURSES) || defined(PDC_WIDE)
         if (have_mixed_leadin) {
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
@@ -212,6 +219,7 @@ curses_message_win_puts(const char *message, boolean recursed)
 	    have_mixed_leadin = FALSE;
 	    mesg_mixed = 0;
         }
+#endif
         mvwprintw(win, my, mx, "%s", message), mx += message_length;
         if (bold || adjustbold)
             curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
