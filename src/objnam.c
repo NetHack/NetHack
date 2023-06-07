@@ -2362,6 +2362,7 @@ static const struct sing_plur one_off[] = {
       "children" },      /* (for wise guys who give their food funny names) */
     { "cubus", "cubi" }, /* in-/suc-cubus */
     { "culus", "culi" }, /* homunculus */
+    { "Cyclops", "Cyclopes" },
     { "djinni", "djinn" },
     { "erinys", "erinyes" },
     { "foot", "feet" },
