@@ -1182,23 +1182,11 @@ init_hilite(void)
 {
     register int c;
 
-    if (!hilites[CLR_BLACK])
-        hilites[CLR_BLACK] = nullstr;
-    if (!hilites[CLR_BLACK | BRIGHT])
-        hilites[CLR_BLACK | BRIGHT] = hilites[CLR_BLACK];
+        hilites[NO_COLOR] = nullstr;
 
-    if (!hilites[CLR_GRAY])
-        hilites[CLR_GRAY] = nullstr;
-    if (!hilites[NO_COLOR])
-        hilites[NO_COLOR] = hilites[CLR_GRAY];
-
-    for (c = 0; c < CLR_MAX / 2; c++) {
-        if (c == CLR_BLACK)
-            continue;
+    for (c = 1; c < CLR_MAX / 2; c++) {
         hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
         Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
-        if (c == CLR_GRAY)
-            continue;
 #ifdef MICRO
         if (c == CLR_BLUE) {
             hilites[CLR_BLUE] = hilites[CLR_BLUE | BRIGHT];
@@ -1226,13 +1214,11 @@ kill_hilite(void)
 {
     register int c;
 
-    for (c = 0; c < CLR_MAX / 2; c++) {
-        if (c == CLR_GRAY || hilites[c] == nullstr)
+    for (c = 1; c < CLR_MAX / 2; c++) {
+        if (hilites[c] == nullstr)
             hilites[c] = 0;
         if (hilites[c | BRIGHT] == nullstr)
             hilites[c] = 0;
-        if (c == CLR_BLACK)
-            continue;
         if (hilites[c | BRIGHT] == hilites[c]) /* for blue */
             hilites[c | BRIGHT] = 0;
         if (hilites[c] && hilites[c] != nh_HI)
