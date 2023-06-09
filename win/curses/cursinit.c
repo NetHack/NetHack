@@ -304,14 +304,22 @@ curses_init_nhcolors(void)
 #ifdef TEXTCOLOR
     if (has_colors()) {
         use_default_colors();
-        init_pair(1, COLOR_BLACK, -1);
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_GREEN, -1);
-        init_pair(4, COLOR_YELLOW, -1);
-        init_pair(5, COLOR_BLUE, -1);
-        init_pair(6, COLOR_MAGENTA, -1);
-        init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, -1, -1);
+        int c;
+
+        init_pair(NO_COLOR + 1, -1, -1);
+
+        if (COLORS >= 16) {
+            for (c = 9; c < CLR_MAX; c++)
+                init_pair(c + 1, c, -1);
+
+            if (iflags.wc2_darkgray)
+                init_pair(1, CLR_BLACK + 8, -1);
+        } else
+            if (!iflags.wc2_darkgray)
+                init_pair(1, CLR_BLUE, -1);
+
+        for (c = 1; c <= CLR_GRAY; c++)
+            init_pair(c + 1, c, -1);
 
         {
             int i;
@@ -343,23 +351,6 @@ curses_init_nhcolors(void)
                 init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
                 init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
             }
-        }
-
-
-        if (COLORS >= 16) {
-# ifdef USE_DARKGRAY
-            if (iflags.wc2_darkgray) {
-                init_pair(1, COLOR_BLACK + 8, -1);
-            }
-# endif
-            init_pair(9, COLOR_WHITE, -1);
-            init_pair(10, COLOR_RED + 8, -1);
-            init_pair(11, COLOR_GREEN + 8, -1);
-            init_pair(12, COLOR_YELLOW + 8, -1);
-            init_pair(13, COLOR_BLUE + 8, -1);
-            init_pair(14, COLOR_MAGENTA + 8, -1);
-            init_pair(15, COLOR_CYAN + 8, -1);
-            init_pair(16, COLOR_WHITE + 8, -1);
         }
     }
 #endif
