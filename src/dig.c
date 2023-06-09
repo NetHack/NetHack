@@ -194,8 +194,8 @@ dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
             pline_The("throne is too hard to break apart.");
         return FALSE;
     } else if (IS_ALTAR(levl[x][y].typ)
-               && (madeby != BY_OBJECT || Is_astralevel(&u.uz)
-                   || Is_sanctum(&u.uz))) {
+               && (madeby != BY_OBJECT
+                   || (altarmask_at(x, y) & AM_SANCTUM) != 0)) {
         if (verbose)
             pline_The("altar is too hard to break apart.");
         return FALSE;
