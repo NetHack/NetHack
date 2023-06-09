@@ -450,15 +450,12 @@ tty_ascgraphics_hilite_fixup(void)
 {
     register int c;
 
-    for (c = 0; c < CLR_MAX / 2; c++)
-        if (c != CLR_BLACK) {
-            hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
-            Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
-            if (c != CLR_GRAY) {
-                hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
-                Sprintf(hilites[c], "\033[0;3%dm", c);
-            }
-        }
+    for (c = 1; c < CLR_MAX / 2; c++)
+        hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
+        Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
+        hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
+        Sprintf(hilites[c], "\033[0;3%dm", c);
+    }
 }
 #endif /* PC9800 */
 
