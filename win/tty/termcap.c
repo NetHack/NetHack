@@ -869,23 +869,19 @@ extern char *tparm();
 #endif
 #endif
 
-/* Mapping data for the six terminfo colors that resolve to pairs of nethack
- * colors.  Black and white are handled specially.
+/* Mapping data for the terminfo colors that resolve to pairs of nethack
+ * colors.  Black is handled specially.
+ * Gray may differ from foreground, count it to the colors.
  */
 const struct {
     int ti_color, nh_color, nh_bright_color;
-} ti_map[6] = { { COLOR_RED, CLR_RED, CLR_ORANGE },
+} ti_map[7] = { { COLOR_RED, CLR_RED, CLR_ORANGE },
                 { COLOR_GREEN, CLR_GREEN, CLR_BRIGHT_GREEN },
                 { COLOR_YELLOW, CLR_BROWN, CLR_YELLOW },
                 { COLOR_BLUE, CLR_BLUE, CLR_BRIGHT_BLUE },
                 { COLOR_MAGENTA, CLR_MAGENTA, CLR_BRIGHT_MAGENTA },
-                { COLOR_CYAN, CLR_CYAN, CLR_BRIGHT_CYAN } };
-
-typedef struct {
-    unsigned char r, g, b;
-} RGB;
-
-static char nilstring[] = "";
+                { COLOR_CYAN, CLR_CYAN, CLR_BRIGHT_CYAN },
+                { COLOR_WHITE, CLR_GRAY, CLR_WHITE } };
 
 static void
 init_hilite(void)
@@ -911,8 +907,8 @@ init_hilite(void)
         hilites[CLR_BLUE] = nh_HI;
         hilites[CLR_MAGENTA] = nh_HI;
         hilites[CLR_CYAN] = nh_HI;
-        hilites[CLR_GRAY] = nilstring;
-        hilites[NO_COLOR] = nilstring;
+        hilites[CLR_GRAY] = nullstr;
+        hilites[NO_COLOR] = nullstr;
         hilites[CLR_ORANGE] = nh_HI;
         hilites[CLR_BRIGHT_GREEN] = nh_HI;
         hilites[CLR_YELLOW] = nh_HI;
@@ -923,8 +919,10 @@ init_hilite(void)
         return;
     }
 
+    c = SIZE(ti_map);
+
     if (colors >= 16) {
-        for (c = 0; c < SIZE(ti_map); c++) {
+        while (c--) {
             char *work;
 
             /* system colors */
@@ -943,7 +941,6 @@ init_hilite(void)
         /* 8 system colors */
         md_len = strlen(MD);
 
-        c = 6;
         while (c--) {
             char *work;
 
@@ -957,19 +954,7 @@ init_hilite(void)
         }
     }
 
-    if (colors >= 16) {
-        scratch = tparm(setf, COLOR_WHITE|BRIGHT);
-        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + 1);
-        Strcpy(hilites[CLR_WHITE], scratch);
-    } else {
-        scratch = tparm(setf, COLOR_WHITE);
-        hilites[CLR_WHITE] = (char *) alloc(strlen(scratch) + md_len + 1);
-        Strcpy(hilites[CLR_WHITE], MD);
-        Strcat(hilites[CLR_WHITE], scratch);
-    }
-
-    hilites[CLR_GRAY] = nilstring;
-    hilites[NO_COLOR] = nilstring;
+    hilites[NO_COLOR] = nullstr;
 
     if (iflags.wc2_darkgray) {
         if (colors >= 16) {
@@ -1005,50 +990,23 @@ kill_hilite(void)
     if (hilites[CLR_BLACK] == nh_HI)
         return;
 
-    if (hilites[CLR_BLACK]) {
-        if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
+    if (hilites[CLR_BLACK])
+        if (hilites[CLR_BLACK] != hilites[CLR_BLUE]) {
             free(hilites[CLR_BLACK]);
-    }
-    if (tgetnum(nhStr("Co")) >= 16) {
-        if (hilites[CLR_BLUE])
-            free(hilites[CLR_BLUE]);
-        if (hilites[CLR_GREEN])
-            free(hilites[CLR_GREEN]);
-        if (hilites[CLR_CYAN])
-            free(hilites[CLR_CYAN]);
-        if (hilites[CLR_MAGENTA])
-            free(hilites[CLR_MAGENTA]);
-        if (hilites[CLR_RED])
-            free(hilites[CLR_RED]);
-        if (hilites[CLR_BROWN])
-            free(hilites[CLR_BROWN]);
-    } else {
-        /* CLR_BLUE overlaps CLR_BRIGHT_BLUE, do not free */
-        /* CLR_GREEN overlaps CLR_BRIGHT_GREEN, do not free */
-        /* CLR_CYAN overlaps CLR_BRIGHT_CYAN, do not free */
-        /* CLR_MAGENTA overlaps CLR_BRIGHT_MAGENTA, do not free */
-        /* CLR_RED overlaps CLR_ORANGE, do not free */
-        /* CLR_BROWN overlaps CLR_YELLOW, do not free */
-    }
-    /* CLR_GRAY is static 'nilstring', do not free */
-    /* NO_COLOR is static 'nilstring', do not free */
-    if (hilites[CLR_BRIGHT_BLUE])
-        free(hilites[CLR_BRIGHT_BLUE]);
-    if (hilites[CLR_BRIGHT_GREEN])
-        free(hilites[CLR_BRIGHT_GREEN]);
-    if (hilites[CLR_BRIGHT_CYAN])
-        free(hilites[CLR_BRIGHT_CYAN]);
-    if (hilites[CLR_BRIGHT_MAGENTA])
-        free(hilites[CLR_BRIGHT_MAGENTA]);
-    if (hilites[CLR_ORANGE])
-        free(hilites[CLR_ORANGE]);
-    if (hilites[CLR_YELLOW])
-        free(hilites[CLR_YELLOW]);
-    if (hilites[CLR_WHITE])
-        free(hilites[CLR_WHITE]);
+            hilites[CLR_BLACK] = 0;
+        }
 
-    for (c = 0; c < CLR_MAX; c++)
-        hilites[c] = 0;
+    /* NO_COLOR is static 'nullstr', do not free */
+    for (c = 1; c <= CLR_GRAY; c++) {
+        if (hilites[c]) {
+            free(hilites[c]);
+            hilites[c] = 0;
+        }
+        if (hilites[c|BRIGHT]) {
+            free(hilites[c|BRIGHT]);
+            hilites[c|BRIGHT] = 0;
+        }
+    }
 }
 
 #else /* UNIX && TERMINFO */
@@ -1219,20 +1177,18 @@ kill_hilite(void)
 #endif /* TEXTCOLOR && TERMLIB */
 
 #if defined(TEXTCOLOR) && !defined(TERMLIB) && defined(ANSI_DEFAULT)
-static char adef_nilstring[] = "";
-
 static void
 init_hilite(void)
 {
     register int c;
 
     if (!hilites[CLR_BLACK])
-        hilites[CLR_BLACK] = adef_nilstring;
+        hilites[CLR_BLACK] = nullstr;
     if (!hilites[CLR_BLACK | BRIGHT])
         hilites[CLR_BLACK | BRIGHT] = hilites[CLR_BLACK];
 
     if (!hilites[CLR_GRAY])
-        hilites[CLR_GRAY] = adef_nilstring;
+        hilites[CLR_GRAY] = nullstr;
     if (!hilites[NO_COLOR])
         hilites[NO_COLOR] = hilites[CLR_GRAY];
 
@@ -1271,9 +1227,9 @@ kill_hilite(void)
     register int c;
 
     for (c = 0; c < CLR_MAX / 2; c++) {
-        if (c == CLR_GRAY || hilites[c] == adef_nilstring)
+        if (c == CLR_GRAY || hilites[c] == nullstr)
             hilites[c] = 0;
-        if (hilites[c | BRIGHT] == adef_nilstring)
+        if (hilites[c | BRIGHT] == nullstr)
             hilites[c] = 0;
         if (c == CLR_BLACK)
             continue;
@@ -1292,8 +1248,6 @@ kill_hilite(void)
     }
 }
 #endif /* TEXTCOLOR && !TERMLIB && ANSI_DEFAULT */
-
-static char nulstr[] = "";
 
 static char *
 s_atr2str(int n)
@@ -1329,7 +1283,7 @@ s_atr2str(int n)
             return MH;
         break;
     }
-    return nulstr;
+    return nullstr;
 }
 
 static char *
@@ -1356,7 +1310,7 @@ e_atr2str(int n)
             return ME;
         break;
     }
-    return nulstr;
+    return nullstr;
 }
 
 /* suppress nonfunctional highlights so render_status() might be able to
