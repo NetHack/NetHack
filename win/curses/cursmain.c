@@ -867,10 +867,7 @@ curses_print_glyph(
         } else
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
-            if (iflags.wc_color)
-                color = 16 + (color * 2) + 1;
-            else /* if (iflags.use_inverse) */
-                attr = A_REVERSE;
+            attr = A_REVERSE;
         }
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */
