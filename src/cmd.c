@@ -1867,15 +1867,15 @@ wiz_map_levltyp(void)
 
 /* temporary? hack, since level type codes aren't the same as screen
    symbols and only the latter have easily accessible descriptions */
-const char *levltyp[] = {
+const char *levltyp[MAX_TYPE + 2] = {
     "stone", "vertical wall", "horizontal wall", "top-left corner wall",
     "top-right corner wall", "bottom-left corner wall",
     "bottom-right corner wall", "cross wall", "tee-up wall", "tee-down wall",
     "tee-left wall", "tee-right wall", "drawbridge wall", "tree",
     "secret door", "secret corridor", "pool", "moat", "water",
-    "drawbridge up", "lava pool", "iron bars", "door", "corridor", "room",
-    "stairs", "ladder", "fountain", "throne", "sink", "grave", "altar", "ice",
-    "drawbridge down", "air", "cloud",
+    "drawbridge up", "lava pool", "lava wall", "iron bars", "door",
+    "corridor", "room", "stairs", "ladder", "fountain", "throne", "sink",
+    "grave", "altar", "ice", "drawbridge down", "air", "cloud",
     /* not a real terrain type, but used for undiggable stone
        by wiz_map_levltyp() */
     "unreachable/undiggable",
