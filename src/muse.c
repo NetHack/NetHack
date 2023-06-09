@@ -621,8 +621,7 @@ find_defensive(struct monst *mtmp, boolean tryescape)
             && !(levl[x][y].wall_info & W_NONDIGGABLE)
             && !(Is_botlevel(&u.uz) || In_endgame(&u.uz))
             && !(is_ice(x, y) || is_pool(x, y) || is_lava(x, y))
-            && !(mtmp->data == &mons[PM_VLAD_THE_IMPALER]
-                 && In_V_tower(&u.uz))) {
+            && !(is_Vlad(mtmp) && In_V_tower(&u.uz))) {
             gm.m.defensive = obj;
             gm.m.has_defense = MUSE_WAN_DIGGING;
         }

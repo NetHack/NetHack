@@ -205,25 +205,29 @@ struct monst {
 #define MON_WEP(mon) ((mon)->mw)
 #define MON_NOWEP(mon) ((mon)->mw = (struct obj *) 0)
 
+/* dead monsters stay on the fmon list until dmonsfree() at end of turn */
 #define DEADMONSTER(mon) ((mon)->mhp < 1)
+
 #define is_starting_pet(mon) ((mon)->m_id == gc.context.startingpet_mid)
-#define is_vampshifter(mon)                                      \
+#define is_vampshifter(mon) \
     ((mon)->cham == PM_VAMPIRE || (mon)->cham == PM_VAMPIRE_LEADER \
      || (mon)->cham == PM_VLAD_THE_IMPALER)
 #define vampshifted(mon) (is_vampshifter((mon)) && !is_vampire((mon)->data))
+/* Vlad might be vampshifted so just checking monst->data is insufficient */
+#define is_Vlad(m) ((m)->data == &mons[PM_VLAD_THE_IMPALER]  \
+                    || (m)->cham == PM_VLAD_THE_IMPALER)
 
-/* monsters which cannot be displaced: priests, shopkeepers, vault guards,
-   Oracle, quest leader */
-#define mundisplaceable(mon) ((mon)->ispriest                    \
-                              || (mon)->isshk                    \
-                              || (mon)->isgd                     \
-                              || (mon)->data == &mons[PM_ORACLE] \
-                              || (mon)->m_id == gq.quest_status.leader_m_id)
+/* monsters which cannot be displaced: temple priests, shopkeepers,
+   vault guards, the Oracle, quest leader */
+#define mundisplaceable(mon) \
+    ((mon)->ispriest || (mon)->isshk                    \
+     || (mon)->isgd || (mon)->data == &mons[PM_ORACLE]  \
+     || (mon)->m_id == gq.quest_status.leader_m_id)
 
 /* mimic appearances that block vision/light */
-#define is_lightblocker_mappear(mon)                       \
+#define is_lightblocker_mappear(mon) \
     (is_obj_mappear(mon, BOULDER)                          \
-     || (M_AP_TYPE(mon) == M_AP_FURNITURE                    \
+     || (M_AP_TYPE(mon) == M_AP_FURNITURE                  \
          && ((mon)->mappearance == S_hcdoor                \
              || (mon)->mappearance == S_vcdoor             \
              || (mon)->mappearance < S_ndoor /* = walls */ \
