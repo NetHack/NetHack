@@ -3564,6 +3564,17 @@ mnexto(struct monst *mtmp, unsigned int rlocflags)
         deal_with_overcrowding(mtmp);
         return;
     }
+    /* wizard-mode player can choose destination by setting 'montelecontrol'
+       option; enexto()'s value for 'mm' will be the default; 'savemm' is
+       used to make sure player doesn't choose hero's location and then
+       answer 'y' to the 'override invalid spot' prompt */
+    if (iflags.mon_telecontrol) {
+        coord savemm = mm;
+
+        if (!control_mon_tele(mtmp, &mm, rlocflags, FALSE))
+            mm = savemm;
+    }
+
     rloc_to_flag(mtmp, mm.x, mm.y, rlocflags);
     return;
 }
@@ -3595,6 +3606,7 @@ maybe_mnexto(struct monst *mtmp)
         if (couldsee(mm.x, mm.y)
             /* don't move grid bugs diagonally */
             && (diagok || mm.x == mtmp->mx || mm.y == mtmp->my)) {
+            /* [this doesn't honor the 'montelecontrol' option] */
             rloc_to(mtmp, mm.x, mm.y);
             return;
         }
@@ -3658,6 +3670,7 @@ mnearto(
         newx = mm.x;
         newy = mm.y;
     }
+    /* [this doesn't honor the 'montelecontrol' option] */
     rloc_to_flag(mtmp, newx, newy, rlocflags);
 
     if (move_other && othermon) {

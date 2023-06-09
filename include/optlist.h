@@ -454,6 +454,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(monpolycontrol, Advanced, 0, opt_in, set_wizonly,
            Off, Yes, No, No, NoAlias, &iflags.mon_polycontrol, Term_False,
            "control monster polymorphs")
+    NHOPTB(montelecontrol, Advanced, 0, opt_in, set_wizonly,
+           Off, Yes, No, No, NoAlias, &iflags.mon_telecontrol, Term_False,
+           "control monster teleport destinations")
     NHOPTC(monsters, Advanced, MAXMCLASSES, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "list of symbols to use for monsters")

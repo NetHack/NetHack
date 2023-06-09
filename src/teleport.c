@@ -1735,6 +1735,16 @@ rloc(
             goto found_xy;
     }
 
+    /* wizard-mode player can choose destination by setting 'montelecontrol'
+       option; ignored if/when this is arrival of a migrating monster */
+    if (iflags.mon_telecontrol && mtmp->mx) {
+        cc.x = mtmp->mx, cc.y = mtmp->my;
+        if (control_mon_tele(mtmp, &cc, rlocflags, TRUE)) {
+            x = cc.x, y = cc.y;
+            goto found_xy;
+        }
+    }
+
     /* this used to try randomly 1000 times, then fallback to left-to-right
        top-to-bottom exhaustive check; now that the exhaustive check uses
        randomized order, reduce the number of random attempts to 50;
@@ -1786,6 +1796,45 @@ rloc(
  found_xy:
     rloc_to_core(mtmp, x, y, rlocflags);
     return TRUE;
+}
+
+/* let wizard-mode player choose a teleporting monster's destination */
+boolean
+control_mon_tele(
+    struct monst *mon,
+    coord *cc_p, /* input: default spot; output: player selected spot */
+    unsigned rlocflags,
+    boolean via_rloc)
+{
+    char tcbuf[BUFSZ];
+
+    if (!isok(cc_p->x, cc_p->y)) {
+        cc_p->x = mon->mx, cc_p->y = mon->my;
+        if (!isok(cc_p->x, cc_p->y))
+            cc_p->x = u.ux, cc_p->y = u.uy;
+    }
+
+    if (!wizard || !iflags.mon_telecontrol)
+        return FALSE;
+
+    pline("Teleport %s @ <%d,%d> where?",
+          noit_mon_nam(mon), mon->mx, mon->my);
+    /* getpos '?' will show "Move the cursor to <where to teleport Foo>:" */
+    Sprintf(tcbuf, "where to teleport %s", noit_mon_nam(mon));
+    if (getpos(cc_p, FALSE, tcbuf) >= 0 && !u_at(cc_p->x, cc_p->y)) {
+        if (via_rloc
+              ? rloc_pos_ok(cc_p->x, cc_p->y, mon)
+              : goodpos(cc_p->x, cc_p->y, mon, rlocflags))
+            return TRUE;
+        if (!iflags.debug_fuzzer) {
+            Sprintf(tcbuf, "<%d,%d> is not considered viable; force anyway?",
+                    mon->mx, mon->my);
+            if (y_n(tcbuf) == 'y')
+                return TRUE;
+        }
+    }
+    pline("%s destination.", via_rloc ? "Picking random" : "Using derived");
+    return FALSE;
 }
 
 static void
