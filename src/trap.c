@@ -457,8 +457,9 @@ maketrap(coordxy x, coordxy y, int typ)
                 || (u.utraptype == TT_LAVA && !is_lava(x, y))))
             reset_utrap(FALSE);
         /* old <tx,ty> remain valid */
-    } else if ((IS_FURNITURE(lev->typ)
-                && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE)))
+    } else if (!CAN_OVERWRITE_TERRAIN(lev->typ)
+               || (IS_FURNITURE(lev->typ)
+                   && (typ != PIT && typ != HOLE))
                || is_pool_or_lava(x, y)
                || (IS_AIR(lev->typ) && typ != MAGIC_PORTAL)
                || (typ == LEVEL_TELEP && single_level_branch(&u.uz))) {
