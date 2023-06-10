@@ -994,7 +994,7 @@ kill_hilite(void)
         }
 
     /* NO_COLOR is static 'nullstr', do not free */
-    for (c = 1; c <= CLR_GRAY; c++) {
+    for (c = 1; c < 8; c++) {
         if (hilites[c]) {
             free(hilites[c]);
             hilites[c] = 0;
@@ -1018,7 +1018,7 @@ analyze_seq(char *str, int *fg, int *bg)
 
 #ifdef MICRO
     *fg = CLR_GRAY;
-    *bg = CLR_BLACK;
+    *bg = NO_COLOR;
 #else
     *fg = *bg = NO_COLOR;
 #endif
@@ -1034,7 +1034,7 @@ analyze_seq(char *str, int *fg, int *bg)
             /* this also catches errors */
 #ifdef MICRO
             *fg = CLR_GRAY;
-            *bg = CLR_BLACK;
+            *bg = NO_COLOR;
 #else
             *fg = *bg = NO_COLOR;
 #endif

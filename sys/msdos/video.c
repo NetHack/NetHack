@@ -703,7 +703,7 @@ HideCursor(void)
 
 #ifdef TEXTCOLOR
 /*
- * CLR_BLACK            0
+ * NO_COLOR             0
  * CLR_RED              1
  * CLR_GREEN            2
  * CLR_BROWN            3       low-intensity yellow
@@ -711,7 +711,7 @@ HideCursor(void)
  * CLR_MAGENTA          5
  * CLR_CYAN             6
  * CLR_GRAY             7       low-intensity white
- * NO_COLOR             8
+ * CLR_BLACK            8
  * CLR_ORANGE           9
  * CLR_BRIGHT_GREEN     10
  * CLR_YELLOW           11

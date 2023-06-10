@@ -234,19 +234,12 @@ curscolor(int nhcolor, boolean *boldon)
     int curses_color;
 
     *boldon = FALSE;
-    if (nhcolor == 0) { /* make black fg visible */
 #ifdef USE_DARKGRAY
-        if (iflags.wc2_darkgray) {
-            if (COLORS > 16) {
-                /* colorpair for black is already darkgray */
-            } else { /* Use bold for a bright black */
-                *boldon = TRUE;
-            }
-        } else
-#endif /* USE_DARKGRAY */
-            nhcolor = CLR_BLUE;
-    }
-    curses_color = nhcolor + 1;
+    /* Use bold for a bright black */
+    if (nhcolor == CLR_BLACK && iflags.wc2_darkgray && COLORS <= 16)
+        *boldon = TRUE;
+#endif
+    curses_color = nhcolor;
     if (COLORS < 16) {
         if (curses_color > 8 && curses_color < 17)
             curses_color -= 8;
@@ -371,7 +364,7 @@ curses_clear_unhighlight_message_window(void)
 
         for (count = 0; count < mh; count++)
             mvwchgat(win, count + brdroffset, brdroffset,
-                     mw, COLOR_PAIR(8), A_NORMAL, NULL);
+                     mw, COLOR_PAIR(NO_COLOR), A_NORMAL, NULL);
         wnoutrefresh(win);
     }
     wmove(win, my, mx);

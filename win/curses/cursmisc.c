@@ -95,19 +95,12 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 #ifdef TEXTCOLOR
     }
 
-    if (color == 0) {           /* make black fg visible */
 # ifdef USE_DARKGRAY
-        if (iflags.wc2_darkgray) {
-            if (COLORS > 16) {
-                /* colorpair for black is already darkgray */
-            } else {            /* Use bold for a bright black */
-                wattron(win, A_BOLD);
-            }
-        } else
-# endif/* USE_DARKGRAY */
-            color = CLR_BLUE;
-    }
-    curses_color = color + 1;
+    /* Use bold for a bright black */
+    if (color == CLR_BLACK && iflags.wc2_darkgray && COLORS <= 16)
+        wattron(win, A_BOLD);
+# endif
+    curses_color = color;
     if (COLORS < 16) {
         if (curses_color > 8 && curses_color < 17)
             curses_color -= 8;

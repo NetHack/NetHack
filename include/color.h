@@ -11,7 +11,7 @@
  * exceptions, these are listed below.	Bright black doesn't mean very
  * much, so it is used as the "default" foreground color of the screen.
  */
-#define CLR_BLACK 0
+#define NO_COLOR 0
 #define CLR_RED 1
 #define CLR_GREEN 2
 #define CLR_BROWN 3 /* on IBM, low-intensity yellow is brown */
@@ -19,7 +19,7 @@
 #define CLR_MAGENTA 5
 #define CLR_CYAN 6
 #define CLR_GRAY 7 /* low-intensity white */
-#define NO_COLOR 8
+#define CLR_BLACK 8
 #define CLR_ORANGE 9
 #define CLR_BRIGHT_GREEN 10
 #define CLR_YELLOW 11

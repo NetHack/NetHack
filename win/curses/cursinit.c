@@ -306,20 +306,23 @@ curses_init_nhcolors(void)
         use_default_colors();
         int c;
 
-        init_pair(NO_COLOR + 1, -1, -1);
-
-        if (COLORS >= 16) {
-            for (c = 9; c < CLR_MAX; c++)
-                init_pair(c + 1, c, -1);
-
-            if (iflags.wc2_darkgray)
-                init_pair(1, CLR_BLACK + 8, -1);
-        } else
-            if (!iflags.wc2_darkgray)
-                init_pair(1, CLR_BLUE, -1);
-
+        /* COLOR_PAIR(0) is fg/bg */
         for (c = 1; c <= CLR_GRAY; c++)
-            init_pair(c + 1, c, -1);
+            init_pair(c, c, -1);
+
+# ifdef USE_DARKGRAY
+        if (iflags.wc2_darkgray)
+            if (COLORS < 16)
+                init_pair(CLR_BLACK, COLOR_BLACK, -1);
+            else
+                init_pair(CLR_BLACK, CLR_BLACK, -1);
+        else
+# endif
+            init_pair(CLR_BLACK, CLR_BLUE, -1);
+
+        if (COLORS >= 16)
+            for (c = 9; c < CLR_MAX; c++)
+                init_pair(c, c, -1);
 
         {
             int i;
