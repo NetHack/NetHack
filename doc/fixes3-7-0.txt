@@ -1206,6 +1206,8 @@ hero might hear unseen monster read scroll of create monster or scroll of
 wizard mode wish for terrain while on a fountain|sink spot made the counter
 	for number of fountains|sinks become one too big; would affect level
 	sound messages if all fountains|sinks were eventually destroyed
+add a level arrival region to the Gnone King's Wine Cellar variation of the
+	Mines' End level so that hero can't end up in the treature chamber
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
