@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1672829441 2023/01/04 10:50:41 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.386 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1686386790 2023/06/10 08:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.392 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3267,9 +3267,10 @@ wizterrainwish(struct _readobjnam_data *d)
     p = eos(bp);
     if (!BSTRCMPI(bp, p - 8, "fountain")) {
         lev->typ = FOUNTAIN;
-        gl.level.flags.nfountains++;
+        if (oldtyp != FOUNTAIN)
+            gl.level.flags.nfountains++;
         lev->looted = d->looted ? F_LOOTED : 0; /* overlays 'flags' */
-        lev->blessedftn = !strncmpi(bp, "magic ", 6);
+        lev->blessedftn = d->blessed || !strncmpi(bp, "magic ", 6);
         pline("A %sfountain.", lev->blessedftn ? "magic " : "");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 6, "throne")) {
@@ -3279,7 +3280,8 @@ wizterrainwish(struct _readobjnam_data *d)
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 4, "sink")) {
         lev->typ = SINK;
-        gl.level.flags.nsinks++;
+        if (oldtyp != SINK)
+            gl.level.flags.nsinks++;
         lev->looted = d->looted ? (S_LPUDDING | S_LDWASHER | S_LRING) : 0;
         pline("A sink.");
         madeterrain = TRUE;
@@ -3482,6 +3484,11 @@ wizterrainwish(struct _readobjnam_data *d)
 
     if (madeterrain) {
         feel_newsym(x, y); /* map the spot where the wish occurred */
+
+        if (oldtyp == FOUNTAIN && lev->typ != FOUNTAIN)
+            gl.level.flags.nfountains--;
+        else if (oldtyp == SINK && lev->typ != SINK)
+            gl.level.flags.nsinks--;
 
         /* hero started at <x,y> but might not be there anymore (create
            lava, decline to die, and get teleported away to safety) */

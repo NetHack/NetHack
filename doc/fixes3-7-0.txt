@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1188 $ $NHDT-Date: 1685202441 2023/05/27 15:47:21 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1196 $ $NHDT-Date: 1686386794 2023/06/10 08:46:34 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1203,6 +1203,9 @@ hero might hear unseen monster read scroll of create monster or scroll of
 	teleportation; when it was create monster, player was given a chance
 	to call it something but not when it was teleportation, allowing the
 	player to deduce which type of scroll it actually was
+wizard mode wish for terrain while on a fountain|sink spot made the counter
+	for number of fountains|sinks become one too big; would affect level
+	sound messages if all fountains|sinks were eventually destroyed
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
