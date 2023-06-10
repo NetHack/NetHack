@@ -3329,18 +3329,22 @@ wizterrainwish(struct _readobjnam_data *d)
         aligntyp al;
 
         lev->typ = ALTAR;
-        if (!strncmpi(bp, "chaotic ", 8))
-            al = A_CHAOTIC;
-        else if (!strncmpi(bp, "neutral ", 8))
-            al = A_NEUTRAL;
-        else if (!strncmpi(bp, "lawful ", 7))
-            al = A_LAWFUL;
-        else if (!strncmpi(bp, "unaligned ", 10))
-            al = A_NONE;
-        else /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
+        if (!strncmpi(bp, "chaotic ", 8)) {
+            al = A_CHAOTIC, bp += 8;
+        } else if (!strncmpi(bp, "neutral ", 8)) {
+            al = A_NEUTRAL, bp += 8;
+        } else if (!strncmpi(bp, "lawful ", 7)) {
+            al = A_LAWFUL, bp += 7;
+        } else if (!strncmpi(bp, "unaligned ", 10)) {
+            al = A_NONE, bp += 10;
+        } else { /* -1 - A_CHAOTIC, 0 - A_NEUTRAL, 1 - A_LAWFUL */
             al = !rn2(6) ? A_NONE : (rn2((int) A_LAWFUL + 2) - 1);
+        }
         lev->altarmask = Align2amask(al); /* overlays 'flags' */
-        pline("%s altar.", An(align_str(al)));
+        if (!strncmpi(bp, "high ", 5))
+            lev->altarmask |= AM_SANCTUM;
+        pline("%s %saltar.", An(align_str(al)),
+              (lev->altarmask & AM_SANCTUM) != 0 ? "high " : "");
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 5, "grave")
                || !BSTRCMPI(bp, p - 9, "headstone")) {
