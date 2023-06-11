@@ -46,7 +46,9 @@ static void unscroll_window(winid wid);
 static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
 static int curscolor(int nhcolor, boolean *boldon);
+#endif
 
 static int turn_lines = 0;
 static int mx = 0;
@@ -66,9 +68,10 @@ curses_message_win_puts(const char *message, boolean recursed)
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean bold, border = curses_window_has_border(MESSAGE_WIN),
-                  have_mixed_leadin = FALSE, adjustbold = FALSE;
+                  adjustbold = FALSE;
     int message_length = (int) strlen(message);
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
+    boolean have_mixed_leadin = FALSE;
     cchar_t mixed_leadin_cchar[2];
 #endif
 
@@ -120,7 +123,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         linespace -= 2;
     bold = (height > 1 && !last_messages);
 
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
     if (mesg_mixed) {
         wchar_t w[2];
         int leadin_color;
@@ -149,7 +152,7 @@ curses_message_win_puts(const char *message, boolean recursed)
             message_length++; /* account for that additional column */
         }
     }
-#endif  /* !PDCURSES || PDC_WIDE */
+#endif  /* CURSES_GENL_PUTMIXED || PDCURSES without PDC_WIDE */
 
     if (linespace < message_length) {
         if (my - border_space >= height - 1) {
@@ -190,7 +193,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     if (mx == border_space && message_length > width - 3) {
         /* split needed */
         tmpstr = curses_break_str(message, (width - 3), 1);
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
 	if (have_mixed_leadin) {
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
@@ -211,7 +214,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
     } else {
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
         if (have_mixed_leadin) {
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
@@ -227,7 +230,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     wrefresh(win);
 }
 
-
+#if !defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
 static int
 curscolor(int nhcolor, boolean *boldon)
 {
@@ -255,6 +258,7 @@ curscolor(int nhcolor, boolean *boldon)
     }
     return curses_color;
 }
+#endif
 
 void curses_got_input(void)
 {

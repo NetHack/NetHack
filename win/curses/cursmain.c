@@ -72,10 +72,10 @@ struct window_procs curses_procs = {
     curses_destroy_nhwindow,
     curses_curs,
     curses_putstr,
-#if !defined(PDCURSES) || defined(PDC_WIDE)
-    curses_putmixed,
-#else
+#if defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
     genl_putmixed,
+#else
+    curses_putmixed,
 #endif
     curses_display_file,
     curses_start_menu,
