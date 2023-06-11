@@ -24,6 +24,11 @@ extern long curs_mesg_suppress_seq; /* from cursmesg.c */
 extern boolean curs_mesg_no_suppress; /* ditto */
 extern int mesg_mixed;
 extern glyph_info mesg_gi;
+#ifndef CURSES_GENL_PUTMIXED
+#if !defined(PDCURSES) || defined(PDC_WIDE)
+#define USE_CURSES_PUTMIXED
+#endif
+#endif
 
 /* stubs for curses_procs{} */
 #ifdef POSITIONBAR
@@ -72,10 +77,10 @@ struct window_procs curses_procs = {
     curses_destroy_nhwindow,
     curses_curs,
     curses_putstr,
-#if defined(CURSES_GENL_PUTMIXED) || (defined(PDCURSES) && !defined(PDC_WIDE))
-    genl_putmixed,
-#else
+#ifdef USE_CURSES_PUTMIXED
     curses_putmixed,
+#else
+    genl_putmixed,
 #endif
     curses_display_file,
     curses_start_menu,
