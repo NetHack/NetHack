@@ -362,6 +362,8 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #if __GNUC__ >= 5
 #define NONNULL __attribute__((returns_nonnull))
+/* #pragma message is available */
+#define NH_PRAGMA_MESSAGE 1
 #endif
 #endif
 
@@ -369,6 +371,8 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifndef ATTRNORETURN
 #define ATTRNORETURN __declspec(noreturn)
 #endif
+/* #pragma message is available */
+#define NH_PRAGMA_MESSAGE 1
 #endif
 
 #ifndef PRINTF_F

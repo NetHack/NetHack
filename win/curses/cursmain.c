@@ -24,11 +24,16 @@ extern long curs_mesg_suppress_seq; /* from cursmesg.c */
 extern boolean curs_mesg_no_suppress; /* ditto */
 extern int mesg_mixed;
 extern glyph_info mesg_gi;
+
 #ifndef CURSES_GENL_PUTMIXED
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if defined(PDC_WIDE) || defined(NCURSES_WIDECHAR)
 #define USE_CURSES_PUTMIXED
+#else  /* WIDE */
+#ifdef NH_PRAGMA_MESSAGE
+#pragma message "Curses wide support not defined so NetHack curses message window functionality reduced"
 #endif
-#endif
+#endif /* WIDE */
+#endif /* CURSES_GENL_PUTMIXED */
 
 /* stubs for curses_procs{} */
 #ifdef POSITIONBAR

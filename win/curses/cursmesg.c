@@ -31,11 +31,14 @@ int mesg_mixed = 0;
 glyph_info mesg_gi;
 
 #ifndef CURSES_GENL_PUTMIXED
-#if !defined(PDCURSES) || defined(PDC_WIDE)
+#if defined(PDC_WIDE) || defined(NCURSES_WIDECHAR)
 #define USE_CURSES_PUTMIXED
+#else  /* WIDE */
+#ifdef NH_PRAGMA_MESSAGE
+#pragma message "Curses wide support not defined so NetHack curses message window functionality reduced"
 #endif
-#endif
-
+#endif /* WIDE */
+#endif /* CURSES_GENL_PUTMIXED */
 
 /* Message window routines for curses interface */
 
