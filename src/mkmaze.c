@@ -69,24 +69,36 @@ is_solid(coordxy x, coordxy y)
 
 /* set map terrain type, handling lava lit, ice melt timers, etc */
 boolean
-set_levltyp(coordxy x, coordxy y, schar typ)
+set_levltyp(coordxy x, coordxy y, schar newtyp)
 {
-    if (isok(x, y)) {
-        if ((typ < MAX_TYPE) && CAN_OVERWRITE_TERRAIN(levl[x][y].typ)) {
+    if (isok(x, y) && newtyp >= STONE && newtyp < MAX_TYPE) {
+        if (CAN_OVERWRITE_TERRAIN(levl[x][y].typ)) {
+            schar oldtyp = levl[x][y].typ;
             boolean was_ice = (levl[x][y].typ == ICE);
 
-            levl[x][y].typ = typ;
+            levl[x][y].typ = newtyp;
+            /* TODO?
+             *  if oldtyp used flags or horizontal differently from
+             *  from the way newtyp will use them, clear them.
+             */
 
-            if (typ == LAVAPOOL)
+            if (IS_LAVA(newtyp))
                 levl[x][y].lit = 1;
 
-            if (was_ice && typ != ICE)
+            if (was_ice && newtyp != ICE)
                 spot_stop_timers(x, y, MELT_ICE_AWAY);
+            if ((IS_FOUNTAIN(oldtyp) != IS_FOUNTAIN(newtyp))
+                || (IS_SINK(oldtyp) != IS_SINK(newtyp)))
+                count_level_features(); /* level.flags.nfountains,nsinks */
+
             return TRUE;
         }
 #ifdef EXTRA_SANITY_CHECKS
     } else {
-        impossible("set_levltyp(%i,%i,%i) !isok", x, y, typ);
+        impossible("set_levltyp(%d,%d,%d)%s%s",
+                   (int) x, (int) y, (int) newtyp,
+                   !isok(x, y) ? " not isok()" : "",
+                   (newtyp < STONE || newtyp >= MAX_TYPE) ? " bad type" : "");
 #endif /*EXTRA_SANITY_CHECKS*/
     }
     return FALSE;
@@ -99,14 +111,17 @@ set_levltyp_lit(coordxy x, coordxy y, schar typ, schar lit)
     boolean ret = set_levltyp(x, y, typ);
 
     if (ret && isok(x, y)) {
-        /* LAVAPOOL handled in set_levltyp */
-        if ((typ != LAVAPOOL) && (lit != SET_LIT_NOCHANGE)) {
+        if (lit != SET_LIT_NOCHANGE) {
 #ifdef EXTRA_SANITY_CHECKS
             if (lit < SET_LIT_NOCHANGE || lit > 1)
-                impossible("set_levltyp_lit(%i,%i,%i,%i)", x, y, typ, lit);
+                impossible("set_levltyp_lit(%d,%d,%d,%d)",
+                           (int) x, (int) y, (int) typ, (int) lit);
 #endif /*EXTRA_SANITY_CHECKS*/
-            if (lit == SET_LIT_RANDOM)
+            if (IS_LAVA(typ))
+                lit = 1;
+            else if (lit == SET_LIT_RANDOM)
                 lit = rn2(2);
+
             levl[x][y].lit = lit;
         }
     }

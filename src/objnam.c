@@ -3485,11 +3485,6 @@ wizterrainwish(struct _readobjnam_data *d)
     if (madeterrain) {
         feel_newsym(x, y); /* map the spot where the wish occurred */
 
-        if (oldtyp == FOUNTAIN && lev->typ != FOUNTAIN)
-            gl.level.flags.nfountains--;
-        else if (oldtyp == SINK && lev->typ != SINK)
-            gl.level.flags.nsinks--;
-
         /* hero started at <x,y> but might not be there anymore (create
            lava, decline to die, and get teleported away to safety) */
         if (u.uinwater && !is_pool(u.ux, u.uy)) {
@@ -3509,14 +3504,9 @@ wizterrainwish(struct _readobjnam_data *d)
             }
         }
 
-        /* fixups for replaced terrain that aren't handled above;
-           for fountain placed on fountain or sink placed on sink, the
-           increment above gets canceled out by the decrement here;
-           otherwise if fountain or sink was replaced, there's one less */
-        if (IS_FOUNTAIN(oldtyp))
-            gl.level.flags.nfountains--;
-        else if (IS_SINK(oldtyp))
-            gl.level.flags.nsinks--;
+        /* fixups for replaced terrain that aren't handled above */
+        if (IS_FOUNTAIN(oldtyp) || IS_SINK(oldtyp))
+            count_level_features(); /* update level.flags.nfountains,nsinks */
         /* horizontal is overlaid by fountain->blessedftn, grave->disturbed */
         if (IS_FOUNTAIN(oldtyp) || IS_GRAVE(oldtyp)
             || IS_WALL(oldtyp) || oldtyp == IRONBARS

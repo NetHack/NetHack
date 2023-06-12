@@ -1399,6 +1399,7 @@ extern void add_subroom(struct mkroom *, int, int, int, int, boolean, schar,
 extern void free_luathemes(boolean);
 extern void makecorridors(void);
 extern void add_door(coordxy, coordxy, struct mkroom *);
+extern void count_level_features(void);
 extern void clear_level_structures(void);
 extern void level_finalize_topology(void);
 extern void mklev(void);

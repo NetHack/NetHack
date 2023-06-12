@@ -363,27 +363,26 @@ polymorph_sink(void)
         return;
 
     sinklooted = levl[u.ux][u.uy].looted != 0;
-    gl.level.flags.nsinks--;
-    levl[u.ux][u.uy].doormask = 0; /* levl[][].flags */
+    /* gl.level.flags.nsinks--; // set_levltyp() will update this */
+    levl[u.ux][u.uy].flags = 0;
     switch (rn2(4)) {
     default:
     case 0:
         sym = S_fountain;
-        levl[u.ux][u.uy].typ = FOUNTAIN;
+        set_levltyp(u.ux, u.uy, FOUNTAIN); /* updates level.flags.nfountains */
         levl[u.ux][u.uy].blessedftn = 0;
         if (sinklooted)
             SET_FOUNTAIN_LOOTED(u.ux, u.uy);
-        gl.level.flags.nfountains++;
         break;
     case 1:
         sym = S_throne;
-        levl[u.ux][u.uy].typ = THRONE;
+        set_levltyp(u.ux, u.uy, THRONE);
         if (sinklooted)
             levl[u.ux][u.uy].looted = T_LOOTED;
         break;
     case 2:
         sym = S_altar;
-        levl[u.ux][u.uy].typ = ALTAR;
+        set_levltyp(u.ux, u.uy, ALTAR);
         /* 3.6.3: this used to pass 'rn2(A_LAWFUL + 2) - 1' to
            Align2amask() but that evaluates its argument more than once */
         algn = rn2(3) - 1; /* -1 (A_Cha) or 0 (A_Neu) or +1 (A_Law) */
@@ -392,7 +391,7 @@ polymorph_sink(void)
         break;
     case 3:
         sym = S_room;
-        levl[u.ux][u.uy].typ = ROOM;
+        set_levltyp(u.ux, u.uy, ROOM);
         make_grave(u.ux, u.uy, (char *) 0);
         if (levl[u.ux][u.uy].typ == GRAVE)
             sym = S_grave;
@@ -413,29 +412,36 @@ static boolean
 teleport_sink(void)
 {
     coordxy cx, cy;
-    int cnt = 0;
-    struct trap *trp;
-    struct engr *eng;
+    unsigned alreadylooted;
+    int trycnt = 0;
 
     do {
-        cx = rnd(COLNO - 1);
-        cy = rn2(ROWNO);
-        trp = t_at(cx, cy);
-        eng = engr_at(cx, cy);
-    } while ((levl[cx][cy].typ != ROOM || trp || eng || cansee(cx, cy))
-             && cnt++ < 200);
+#if 0   /* this isn't incorrect but it is extremely unlikely that spots
+         * on the level's edge will be ROOM so picking such wastes tries */
+        cx = rnd(COLNO - 1);           /* 1..COLNO-1 */
+        cy = rn2(ROWNO);               /* 0..ROWNO-1 */
+#else   /* use this instead */
+        cx = 1 + rnd((COLNO - 1) - 2); /* 2..COLNO-2 */
+        cy = 1 + rn2(ROWNO - 2);       /* 1..ROWNO-2 */
+#endif
+        if (levl[cx][cy].typ == ROOM
+            && !t_at(cx, cy) && !engr_at(cx, cy)
+            && (!cansee(cx, cy) || distu(cx, cy) > 3 * 3)) {
+            /* this ends up having set_levltyp() count all sinks and
+               fountains on the level twice but that is not a problem */
+            alreadylooted = levl[u.ux][u.uy].looted;
+            /* remove old sink */
+            set_levltyp(u.ux, u.uy, ROOM); /* was SINK so updates nsinks */
+            levl[u.ux][u.uy].looted = 0;
+            newsym(u.ux, u.uy);
+            /* create sink at new position */
+            set_levltyp(cx, cy, SINK); /* now SINK so also updates nsinks */
+            levl[cx][cy].looted = alreadylooted ? 1 : 0;
+            newsym(cx, cy);
+            return TRUE;
+        }
+    } while (++trycnt < 200);
 
-    if (levl[cx][cy].typ == ROOM && !trp && !eng) {
-        /* create sink at new position */
-        levl[cx][cy].typ = SINK;
-        levl[cx][cy].looted = levl[u.ux][u.uy].looted;
-        newsym(cx, cy);
-        /* remove old sink */
-        levl[u.ux][u.uy].typ = ROOM;
-        levl[u.ux][u.uy].looted = 0;
-        newsym(u.ux, u.uy);
-        return TRUE;
-    }
     return FALSE;
 }
 

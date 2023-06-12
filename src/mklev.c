@@ -26,7 +26,7 @@ static void mktrap_victim(struct trap *);
 static struct mkroom *find_branch_room(coord *);
 static struct mkroom *pos_to_room(coordxy, coordxy);
 static boolean cardinal_nextto_room(struct mkroom *, coordxy, coordxy);
-static boolean place_niche(struct mkroom *, coordxy *, coordxy *, coordxy *);
+static boolean place_niche(struct mkroom *, int *, coordxy *, coordxy *);
 static void makeniche(int);
 static void make_niches(void);
 static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
@@ -599,7 +599,10 @@ cardinal_nextto_room(struct mkroom *aroom, coordxy x, coordxy y)
 }
 
 static boolean
-place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy)
+place_niche(
+    struct mkroom *aroom,
+    int *dy,
+    coordxy *xx, coordxy *yy)
 {
     coord dd;
 
@@ -639,8 +642,8 @@ makeniche(int trap_type)
 {
     register struct mkroom *aroom;
     struct rm *rm;
-    int vct = 8;
-    coordxy dy, xx, yy;
+    int dy, vct = 8;
+    coordxy xx, yy;
     struct trap *ttmp;
 
     while (vct--) {
@@ -719,6 +722,24 @@ static void
 makevtele(void)
 {
     makeniche(TELEP_TRAP);
+}
+
+/* count the different features (sinks, fountains) in the level */
+void
+count_level_features(void)
+{
+    coordxy x, y;
+
+    gl.level.flags.nfountains = gl.level.flags.nsinks = 0;
+    for (y = 0; y < ROWNO; y++)
+        for (x = 0; x < COLNO; x++) {
+            int typ = levl[x][y].typ;
+
+            if (typ == FOUNTAIN)
+                gl.level.flags.nfountains++;
+            else if (typ == SINK)
+                gl.level.flags.nsinks++;
+        }
 }
 
 /* clear out various globals that keep information on the current level.

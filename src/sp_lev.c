@@ -32,7 +32,6 @@ static void flip_vault_guard(int, struct monst *,
                              coordxy, coordxy, coordxy, coordxy);
 static void sel_set_wall_property(coordxy, coordxy, genericptr_t);
 static void set_wall_property(coordxy, coordxy, coordxy, coordxy, int);
-static void count_features(void);
 static void remove_boundary_syms(void);
 static void set_door_orientation(int, int);
 static boolean shared_with_room(int, int, struct mkroom *);
@@ -986,25 +985,6 @@ set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
     for (y = y1; y <= y2; y++)
         for (x = x1; x <= x2; x++) {
             sel_set_wall_property(x, y, (genericptr_t)&prop);
-        }
-}
-
-/*
- * Count the different features (sinks, fountains) in the level.
- */
-static void
-count_features(void)
-{
-    coordxy x, y;
-
-    gl.level.flags.nfountains = gl.level.flags.nsinks = 0;
-    for (y = 0; y < ROWNO; y++)
-        for (x = 0; x < COLNO; x++) {
-            int typ = levl[x][y].typ;
-            if (typ == FOUNTAIN)
-                gl.level.flags.nfountains++;
-            else if (typ == SINK)
-                gl.level.flags.nsinks++;
         }
 }
 
@@ -6559,7 +6539,7 @@ lspo_finalize_level(lua_State *L UNUSED)
     if (L)
         flip_level_rnd(gc.coder->allow_flips, FALSE);
 
-    count_features();
+    count_level_features();
 
     if (L && gc.coder->solidify)
         solidify_map();
@@ -7016,7 +6996,7 @@ load_special(const char *name)
 
     flip_level_rnd(gc.coder->allow_flips, FALSE);
 
-    count_features();
+    count_level_features();
 
     if (gc.coder->solidify)
         solidify_map();
