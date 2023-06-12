@@ -171,7 +171,7 @@ extern void curses_posthousekeeping(void);
 extern void curses_view_file(const char *filename, boolean must_exist);
 extern void curses_rtrim(char *str);
 extern long curses_get_count(int first_digit);
-extern int curses_convert_attr(int attr);
+extern attr_t curses_convert_attr(int attr);
 extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 extern int curses_convert_keys(int key);

@@ -729,10 +729,10 @@ curses_get_count(int first_digit)
 /* Convert the given NetHack text attributes into the format curses
    understands, and return that format mask. */
 
-int
+attr_t
 curses_convert_attr(int attr)
 {
-    int curses_attr;
+    attr_t curses_attr;
 
     /* first, strip off control flags masked onto the display attributes
        (caller should have already done this...) */

@@ -28,7 +28,7 @@ void curses_posthousekeeping(void);
 void curses_view_file(const char *filename, boolean must_exist);
 void curses_rtrim(char *str);
 long curses_get_count(int first_digit);
-int curses_convert_attr(int attr);
+attr_t curses_convert_attr(int attr);
 int curses_read_attrs(const char *attrs);
 char *curses_fmt_attrs(char *);
 int curses_convert_keys(int key);
