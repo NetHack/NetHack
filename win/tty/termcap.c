@@ -970,11 +970,18 @@ init_hilite(void)
             Strcat(hilites[CLR_BLACK], scratch);
         }
     } else {
-        /* But it's concievable that hilighted black-on-black could
-         * still be invisible on many others.  We substitute blue for
-         * black.
-         */
-        hilites[CLR_BLACK] = hilites[CLR_BLUE];
+        if (colors > 16) {
+            /* allow real black */
+            scratch = tparm(setf, COLOR_BLACK);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_BLACK], scratch);
+        } else {
+            /* But it's concievable that hilighted black-on-black could
+             * still be invisible on many others.  We substitute blue for
+             * black.
+             */
+            hilites[CLR_BLACK] = hilites[CLR_BLUE];
+        }
     }
 }
 

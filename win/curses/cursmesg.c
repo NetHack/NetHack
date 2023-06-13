@@ -229,21 +229,19 @@ curses_message_win_puts(const char *message, boolean recursed)
 
 
 static int
-curscolor(int nhcolor, boolean *boldon)
+curscolor(int color, boolean *boldon)
 {
-    int curses_color;
-
+    int curses_color = color;
     *boldon = FALSE;
-#ifdef USE_DARKGRAY
-    /* Use bold for a bright black */
-    if (nhcolor == CLR_BLACK && iflags.wc2_darkgray && COLORS <= 16)
-        *boldon = TRUE;
-#endif
-    curses_color = nhcolor;
+
     if (COLORS < 16) {
-        if (curses_color > 8 && curses_color < 17)
+        /* Use bold for a bright black */
+        if (color == CLR_BLACK && iflags.wc2_darkgray)
+            *boldon = TRUE;
+
+        if (color > 8 && color < 17)
             curses_color -= 8;
-        else if (curses_color > (17 + 16))
+        else if (color > (17 + 16))
             curses_color -= 16;
     }
     return curses_color;
