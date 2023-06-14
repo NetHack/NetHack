@@ -2945,7 +2945,7 @@ spoteffects(boolean pick)
                   ceiling(u.ux, u.uy));
             if (mtmp->mtame) { /* jumps to greet you, not attack */
                 ;
-            } else if (uarmh && is_metallic(uarmh)) {
+            } else if (hard_helmet(uarmh)) {
                 pline("Its blow glances off your %s.",
                       helm_simple_name(uarmh));
             } else if (u.uac + 3 <= rnd(20)) {

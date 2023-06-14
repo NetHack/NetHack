@@ -1334,7 +1334,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     } else { /* neither potion nor other breaking object */
         int material = objects[otyp].oc_material;
         boolean is_silver = (material == SILVER),
-                less_damage = (uarmh && is_metallic(uarmh)
+                less_damage = (hard_helmet(uarmh)
                                && (!is_silver || !Hate_silver)),
                 harmless = (stone_missile(obj)
                             && passes_rocks(gy.youmonst.data)),

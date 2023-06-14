@@ -2164,7 +2164,11 @@ seffects(struct obj *sobj) /* sobj - scroll or fake spellbook for spell */
 }
 
 void
-drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, boolean skip_uswallow)
+drop_boulder_on_player(
+    boolean confused,
+    boolean helmet_protects,
+    boolean byu,
+    boolean skip_uswallow)
 {
     int dmg;
     struct obj *otmp2;
@@ -2185,7 +2189,7 @@ drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, b
         You("are hit by %s!", doname(otmp2));
         dmg = (int) (dmgval(otmp2, &gy.youmonst) * otmp2->quan);
         if (uarmh && helmet_protects) {
-            if (is_metallic(uarmh)) {
+            if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 if (dmg > 2)
                     dmg = 2;
@@ -2237,7 +2241,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
         if (helmet) {
-            if (is_metallic(helmet)) {
+            if (hard_helmet(helmet)) {
                 if (canspotmon(mtmp))
                     pline("Fortunately, %s is wearing a hard helmet.",
                           mon_nam(mtmp));

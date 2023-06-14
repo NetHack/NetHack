@@ -5095,7 +5095,7 @@ helm_simple_name(struct obj *helmet)
      *      fedora, cornuthaum, dunce cap       -> hat
      *      all other types of helmets          -> helm
      */
-    return (helmet && !is_metallic(helmet)) ? "hat" : "helm";
+    return !hard_helmet(helmet) ? "hat" : "helm";
 }
 
 /* gloves vs gauntlets; depends upon discovery state */

@@ -512,6 +512,30 @@ Helmet_off(void)
     return 0;
 }
 
+/* hard helms provide better protection against against falling rocks */
+boolean
+hard_helmet(struct obj *obj)
+{
+    static const char crystal_[] = "crystal ";
+    const char *ostr;
+    int otyp;
+
+    if (!obj || !is_helmet(obj))
+        return FALSE;
+    if (is_metallic(obj))
+        return TRUE;
+    /* make helm of brilliance (crystal helmet) be classified 'hard'; this
+       test would work for crystal plate mail too if suits reached here */
+    otyp = obj->otyp;
+    if (objects[otyp].oc_material == GLASS
+        && (((ostr = OBJ_NAME(objects[otyp])) != 0
+             && !strncmp(ostr, crystal_, 8))
+            || ((ostr = OBJ_DESCR(objects[otyp])) != 0
+                && !strncmp(ostr, crystal_, 8))))
+        return TRUE;
+    return FALSE;
+}
+
 static int
 Gloves_on(void)
 {
