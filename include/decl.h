@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1657918080 2022/07/15 20:48:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.303 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1686726249 2023/06/14 07:04:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -968,8 +968,6 @@ struct instance_globals_u {
     struct Race urace; /* player's race. May be munged in role_init() */
 
     /* save.c */
-    unsigned ustuck_id; /* need to preserve during save */
-    unsigned usteed_id; /* need to preserve during save */
     d_level uz_save;
 
     /* new stuff */

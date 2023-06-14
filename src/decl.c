@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1661896581 2022/08/30 21:56:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1686726255 2023/06/14 07:04:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -807,8 +807,6 @@ const struct instance_globals_u g_init_u = {
     { UNDEFINED_VALUES }, /* urole */
     UNDEFINED_VALUES, /* urace */
     /* save.c */
-    0U, /* ustuck_id */
-    0U, /* usteed_id */
     { 0, 0 }, /* uz_save */
     TRUE, /* havestate*/
     IVMAGIC  /* u_magic to validate that structure layout has been preserved */

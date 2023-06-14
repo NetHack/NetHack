@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1649530943 2022/04/09 19:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1686726258 2023/06/14 07:04:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,8 +27,8 @@ static struct monst *restmonchn(NHFILE *);
 static struct fruit *loadfruitchn(NHFILE *);
 static void freefruitchn(struct fruit *);
 static void ghostfruit(struct obj *);
-static boolean restgamestate(NHFILE *, unsigned int *, unsigned int *);
-static void restlevelstate(unsigned int, unsigned int);
+static boolean restgamestate(NHFILE *);
+static void restlevelstate(void);
 static int restlevelfile(xint8);
 static void rest_bubbles(NHFILE *);
 static void restore_gamelog(NHFILE *);
@@ -504,9 +504,7 @@ ghostfruit(register struct obj *otmp)
 
 static
 boolean
-restgamestate(
-    NHFILE *nhfp,
-    unsigned *stuckid, unsigned *steedid)
+restgamestate(NHFILE *nhfp)
 {
     struct flag newgameflags;
     struct context_info newgamecontext; /* all 0, but has some pointers */
@@ -670,14 +668,6 @@ restgamestate(
     }
     restore_artifacts(nhfp);
     restore_oracles(nhfp);
-    if (u.ustuck) {
-        if (nhfp->structlevel)
-            Mread(nhfp->fd, stuckid, sizeof *stuckid);
-    }
-    if (u.usteed) {
-        if (nhfp->structlevel)
-            Mread(nhfp->fd, steedid, sizeof *steedid);
-    }
     if (nhfp->structlevel) {
         Mread(nhfp->fd, gp.pl_character, sizeof gp.pl_character);
         Mread(nhfp->fd, gp.pl_fruit, sizeof gp.pl_fruit);
@@ -698,30 +688,15 @@ restgamestate(
 }
 
 /* update game state pointers to those valid for the current level (so we
- * don't dereference a wild u.ustuck when saving the game state, for instance)
- */
+   don't dereference a wild u.ustuck when saving game state, for instance) */
 static void
-restlevelstate(unsigned int stuckid, unsigned int steedid)
+restlevelstate(void)
 {
-    register struct monst *mtmp;
-
-    if (stuckid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == stuckid)
-                break;
-        if (!mtmp)
-            panic("Cannot find the monster ustuck.");
-        set_ustuck(mtmp);
-    }
-    if (steedid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == steedid)
-                break;
-        if (!mtmp)
-            panic("Cannot find the monster usteed.");
-        u.usteed = mtmp;
-        remove_monster(mtmp->mx, mtmp->my);
-    }
+    /*
+     * Note: restoring steed and engulfer/holder/holdee is now handled
+     * in getlev() and there's nothing left for restlevelstate() to do.
+     */
+    return;
 }
 
 /*ARGSUSED*/
@@ -747,7 +722,6 @@ restlevelfile(xint8 ltmp)
 int
 dorecover(NHFILE *nhfp)
 {
-    unsigned int stuckid = 0, steedid = 0; /* not a register */
     xint8 ltmp = 0;
     int rtmp;
 
@@ -756,7 +730,7 @@ dorecover(NHFILE *nhfp)
 
     get_plname_from_file(nhfp, gp.plname);
     getlev(nhfp, 0, (xint8) 0);
-    if (!restgamestate(nhfp, &stuckid, &steedid)) {
+    if (!restgamestate(nhfp)) {
         NHFILE tnhfp;
 
         display_nhwindow(WIN_MESSAGE, TRUE);
@@ -764,14 +738,15 @@ dorecover(NHFILE *nhfp)
         tnhfp.mode = FREEING;
         tnhfp.fd = -1;
         savelev(&tnhfp, 0); /* discard current level */
-        /* no need tfor close_nhfile(&tnhfp), which
+        /* no need for close_nhfile(&tnhfp), which
            is not really affiliated with an open file */
         close_nhfile(nhfp);
         (void) delete_savefile();
+        u.usteed_mid = u.ustuck_mid = 0;
         gp.program_state.restoring = 0;
         return 0;
     }
-    restlevelstate(stuckid, steedid);
+    restlevelstate();
 #ifdef INSURANCE
     savestateinlock();
 #endif
@@ -842,7 +817,7 @@ dorecover(NHFILE *nhfp)
 
     getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
-    restlevelstate(stuckid, steedid);
+    restlevelstate();
     gp.program_state.something_worth_saving = 1; /* useful data now exists */
 
     if (!wizard && !discover)
@@ -884,6 +859,7 @@ dorecover(NHFILE *nhfp)
         ge.early_raw_messages = 0;
         wait_synch();
     }
+    u.usteed_mid = u.ustuck_mid = 0;
     gp.program_state.beyond_savefile_load = 1;
 
     docrt();
@@ -1124,11 +1100,21 @@ getlev(NHFILE *nhfp, int pid, xint8 lev)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
-        place_monster(mtmp, mtmp->mx, mtmp->my);
-        if (mtmp->wormno)
-            place_wsegs(mtmp, NULL);
-        if (hides_under(mtmp->data) && mtmp->mundetected)
-            (void) hideunder(mtmp);
+        if (mtmp->m_id == u.usteed_mid) {
+            /* steed is kept on fmon list but off the map */
+            u.usteed = mtmp;
+            u.usteed_mid = 0;
+        } else {
+            if (mtmp->m_id == u.ustuck_mid) {
+                set_ustuck(mtmp);
+                u.ustuck_mid = 0;
+            }
+            place_monster(mtmp, mtmp->mx, mtmp->my);
+            if (mtmp->wormno)
+                place_wsegs(mtmp, NULL);
+            if (hides_under(mtmp->data) && mtmp->mundetected)
+                (void) hideunder(mtmp);
+        }
 
         /* regenerate monsters while on another level */
         if (!u.uz.dlevel)

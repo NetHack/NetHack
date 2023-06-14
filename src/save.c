@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1661240721 2022/08/23 07:45:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.195 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1686726259 2023/06/14 07:04:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -161,8 +161,6 @@ dosave0(void)
     if (nhfp && nhfp->fplog)
         (void) fprintf(nhfp->fplog, "# post-validation\n");
     store_plname_in_file(nhfp);
-    gu.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-    gu.usteed_id = (u.usteed ? u.usteed->m_id : 0);
     /* savelev() might save uball and uchain, releasing their memory if
        FREEING, so we need to check their status now; if hero is swallowed,
        uball and uchain will persist beyond saving map floor and inventory
@@ -328,16 +326,6 @@ savegamestate(NHFILE *nhfp)
     }
     save_artifacts(nhfp);
     save_oracles(nhfp);
-    if (gu.ustuck_id) {
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &gu.ustuck_id,
-                   sizeof gu.ustuck_id);
-    }
-    if (gu.usteed_id) {
-        if (nhfp->structlevel)
-            bwrite(nhfp->fd, (genericptr_t) &gu.usteed_id,
-                   sizeof gu.usteed_id);
-    }
     if (nhfp->structlevel) {
         bwrite(nhfp->fd, (genericptr_t) gp.pl_character,
                sizeof gp.pl_character);
@@ -437,8 +425,6 @@ savestateinlock(void)
             store_savefileinfo(nhfp);
             store_plname_in_file(nhfp);
 
-            gu.ustuck_id = (u.ustuck ? u.ustuck->m_id : 0);
-            gu.usteed_id = (u.usteed ? u.usteed->m_id : 0);
             /* if ball and/or chain aren't on floor or in invent, keep a copy
                of their pointers; not valid when on floor or in invent */
             gl.looseball = BALL_IN_MON ? uball : 0;
@@ -973,6 +959,10 @@ savemonchn(NHFILE* nhfp, register struct monst* mtmp)
                 gc.context.polearm.m_id = mtmp->m_id;
                 gc.context.polearm.hitmon = NULL;
             }
+            if (mtmp == u.ustuck)
+                u.ustuck_mid = u.ustuck->m_id;
+            if (mtmp == u.usteed)
+                u.usteed_mid = u.usteed->m_id;
             mtmp->nmon = NULL;  /* nmon saved into mtmp2 */
             dealloc_monst(mtmp);
         }
@@ -1071,7 +1061,7 @@ savelevchn(NHFILE* nhfp)
 }
 
 void
-store_plname_in_file(NHFILE* nhfp)
+store_plname_in_file(NHFILE *nhfp)
 {
     int plsiztmp = PL_NSIZ;
 
@@ -1086,7 +1076,7 @@ store_plname_in_file(NHFILE* nhfp)
 }
 
 static void
-save_msghistory(NHFILE* nhfp)
+save_msghistory(NHFILE *nhfp)
 {
     char *msg;
     int msgcount = 0, msglen;
