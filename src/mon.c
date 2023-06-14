@@ -4245,7 +4245,7 @@ hideunder(struct monst *mtmp)
         oldundetctd = mtmp->mundetected != 0;
         mtmp->mundetected = undetected ? 1 : 0;
         if (undetected && seenmon && seenobj)
-            You_see("%s %s under %s", seenmon,
+            You_see("%s %s under %s.", seenmon,
                     locomotion(mtmp->data, "hide"), seenobj);
     }
     if (undetected != oldundetctd)
