@@ -303,7 +303,8 @@ enum cost_alteration_types {
     COST_BRKLCK  = 15, /* break box/chest's lock */
     COST_RUST    = 16, /* rust damage */
     COST_ROT     = 17, /* rotting attack */
-    COST_CORRODE = 18 /* acid damage */
+    COST_CORRODE = 18, /* acid damage */
+    COST_CRACK   = 19, /* damage to crystal armor */
 };
 
 /* read.c, create_particular() & create_particular_parse() */

@@ -201,7 +201,8 @@ mkobj_erosions(struct obj *otmp)
         if (!rn2(100)) {
             otmp->oerodeproof = 1;
         } else {
-            if (!rn2(80) && (is_flammable(otmp) || is_rustprone(otmp))) {
+            if (!rn2(80) && (is_flammable(otmp) || is_rustprone(otmp)
+                             || is_crackable(otmp))) {
                 do {
                     otmp->oeroded++;
                 } while (otmp->oeroded < 3 && !rn2(9));
@@ -729,7 +730,7 @@ bill_dummy_object(struct obj *otmp)
 static const char *const alteration_verbs[] = {
     "cancel", "drain", "uncharge", "unbless", "uncurse", "disenchant",
     "degrade", "dilute", "erase", "burn", "neutralize", "destroy", "splatter",
-    "bite", "open", "break the lock on", "rust", "rot", "tarnish"
+    "bite", "open", "break the lock on", "rust", "rot", "tarnish", "crack",
 };
 
 /* possibly bill for an object which the player has just modified */

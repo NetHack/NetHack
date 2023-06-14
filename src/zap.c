@@ -1715,7 +1715,7 @@ poly_obj(struct obj *obj, int id)
     otmp->blessed = obj->blessed;
 
     if (erosion_matters(otmp)) {
-        if (is_flammable(otmp) || is_rustprone(otmp))
+        if (is_flammable(otmp) || is_rustprone(otmp) || is_crackable(otmp))
             otmp->oeroded = obj->oeroded;
         if (is_corrodeable(otmp) || is_rottable(otmp))
             otmp->oeroded2 = obj->oeroded2;
@@ -5144,7 +5144,9 @@ fracture_rock(struct obj *obj) /* no texts here! */
             /* shop message says "you owe <shk> <$> for it!" so we need
                to precede that with a message explaining what "it" is */
             You("fracture %s %s.", s_suffix(shkname(shkp)), xname(obj));
-            breakobj(obj, x, y, TRUE, FALSE); /* charges for shop goods */
+            /* breakobj won't destroy fracturing statue or boulder but
+               will charge for shop goods */
+            (void) breakobj(obj, x, y, TRUE, FALSE);
         }
     }
     if (by_you && obj->otyp == BOULDER)

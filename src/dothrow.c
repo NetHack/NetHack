@@ -1273,8 +1273,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         if (breaktest(obj)) {
             pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
             breakmsg(obj, !Blind);
-            breakobj(obj, u.ux, u.uy, TRUE, TRUE);
-            return FALSE;
+            return breakobj(obj, u.ux, u.uy, TRUE, TRUE) ? FALSE : TRUE;
         }
         action = "hits";
     } else {
@@ -1297,8 +1296,9 @@ toss_up(struct obj *obj, boolean hitsroof)
                        ? rnd(25)
                        : 0;
         breakmsg(obj, !Blind);
-        breakobj(obj, u.ux, u.uy, TRUE, TRUE);
-        obj = 0; /* it's now gone */
+        if (breakobj(obj, u.ux, u.uy, TRUE, TRUE))
+            obj = 0; /* it's now gone */
+
         switch (otyp) {
         case EGG:
             if (petrifier && !Stone_resistance
@@ -1326,7 +1326,11 @@ toss_up(struct obj *obj, boolean hitsroof)
         default:
             break;
         }
-        return FALSE;
+        if (!obj)
+            return FALSE;
+        /* 'obj' still exists, so drop it and return True */
+        hitfloor(obj, FALSE);
+        gt.thrownobj = 0;
     } else if (harmless_missile(obj)) {
         pline("It doesn't hurt.");
         hitfloor(obj, FALSE);
@@ -1739,9 +1743,10 @@ throwit(struct obj *obj,
             nh_delay_output();
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(gb.bhitpos.x, gb.bhitpos.y));
-            breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE);
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            if (breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE)) {
+                clear_thrownobj = TRUE;
+                goto throwit_return;
+            }
         }
         if (!Deaf && !Underwater) {
             /* Some sound effects when item lands in water or lava */
@@ -2334,9 +2339,10 @@ gem_accept(register struct monst *mon, register struct obj *obj)
  * Return 0 if the object didn't break, 1 if the object broke.
  */
 int
-hero_breaks(struct obj *obj,
-            coordxy x, coordxy y, /* object location (ox, oy may not be right) */
-            unsigned breakflags)
+hero_breaks(
+    struct obj *obj,
+    coordxy x, coordxy y, /* object location (ox, oy may not be right) */
+    unsigned breakflags)
 {
     /* from_invent: thrown or dropped by player; maybe on shop bill;
        by-hero is implicit so callers don't need to specify BRK_BY_HERO */
@@ -2351,8 +2357,7 @@ hero_breaks(struct obj *obj,
         return 0;
 
     breakmsg(obj, in_view);
-    breakobj(obj, x, y, TRUE, from_invent);
-    return 1;
+    return breakobj(obj, x, y, TRUE, from_invent);
 }
 
 /*
@@ -2361,16 +2366,16 @@ hero_breaks(struct obj *obj,
  * Return 0 if the object doesn't break, 1 if the object broke.
  */
 int
-breaks(struct obj *obj,
-       coordxy x, coordxy y) /* object location (ox, oy may not be right) */
+breaks(
+    struct obj *obj,
+    coordxy x, coordxy y) /* object location (ox, oy may not be right) */
 {
     boolean in_view = Blind ? FALSE : cansee(x, y);
 
     if (!breaktest(obj))
         return 0;
     breakmsg(obj, in_view);
-    breakobj(obj, x, y, FALSE, FALSE);
-    return 1;
+    return breakobj(obj, x, y, FALSE, FALSE);
 }
 
 void
@@ -2390,17 +2395,24 @@ release_camera_demon(struct obj *obj, coordxy x, coordxy y)
 }
 
 /*
- * Unconditionally break an object. Assumes all resistance checks
+ * Break an object.  Breakable armor goes through erosion steps; other
+ * items break unconditionally.  Assumes all resistance checks
  * and break messages have been delivered prior to getting here.
+ * (No longer true; breakmsg() is silent for crackable armor and we
+ * call erode_obj() for it and that delivers a damaged-the-item message.)
  */
-void
+int
 breakobj(
     struct obj *obj,
-    coordxy x, coordxy y,    /* object location (ox, oy may not be right) */
-    boolean hero_caused, /* is this the hero's fault? */
+    coordxy x, coordxy y,   /* object location (ox, oy may not be right) */
+    boolean hero_caused,    /* is this the hero's fault? */
     boolean from_invent)
 {
     boolean fracture = FALSE;
+
+    if (is_crackable(obj)) /* if erodeproof, erode_obj() will say so */
+        return (erode_obj(obj, armor_simple_name(obj), ERODE_CRACK,
+                          EF_DESTROY | EF_VERBOSE) == ER_DESTROYED);
 
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     case MIRROR:
@@ -2478,6 +2490,7 @@ breakobj(
     }
     if (!fracture)
         delobj(obj);
+    return 1;
 }
 
 /*
@@ -2490,15 +2503,16 @@ breaktest(struct obj *obj)
     int nonbreakchance = 1; /* chance for non-artifacts to resist */
 
     /* this may need to be changed if actual glass armor gets added someday;
-       for now, it affects crystal plate mail and helm of brilliance */
-    if (obj->oclass == ARMOR_CLASS)
-        nonbreakchance = 95;
+       for now, it affects crystal plate mail and helm of brilliance;
+       either of them will have to be cracked 4 times before breaking */
+    if (obj->oclass == ARMOR_CLASS && objects[obj->otyp].oc_material == GLASS)
+        nonbreakchance = 90;
 
     if (obj_resists(obj, nonbreakchance, 99))
-        return 0;
+        return FALSE;
     if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact
         && obj->oclass != GEM_CLASS)
-        return 1;
+        return TRUE;
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     case EXPENSIVE_CAMERA:
     case POT_WATER: /* really, all potions */
@@ -2507,9 +2521,9 @@ breaktest(struct obj *obj)
     case MELON:
     case ACID_VENOM:
     case BLINDING_VENOM:
-        return 1;
+        return TRUE;
     default:
-        return 0;
+        return FALSE;
     }
 }
 
@@ -2518,14 +2532,15 @@ breakmsg(struct obj *obj, boolean in_view)
 {
     const char *to_pieces;
 
+    if (is_crackable(obj)) /* breakobj() will call erode_obj() for message */
+        return;
+
     to_pieces = "";
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     default: /* glass or crystal wand */
         if (obj->oclass != WAND_CLASS)
             impossible("breaking odd object (%d)?", obj->otyp);
         /*FALLTHRU*/
-    case CRYSTAL_PLATE_MAIL:
-    case HELM_OF_BRILLIANCE:
     case LENSES:
     case MIRROR:
     case CRYSTAL_BALL:

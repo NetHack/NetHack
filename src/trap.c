@@ -171,9 +171,10 @@ erode_obj(
     int ef_flags)
 {
     static NEARDATA const char
-        *const action[] = { "smoulder", "rust", "rot", "corrode" },
-        *const msg[] = { "burnt", "rusted", "rotten", "corroded" },
-        *const bythe[] = { "heat", "oxidation", "decay", "corrosion" };
+        *const action[] = { "smoulder", "rust", "rot", "corrode", "crack" },
+        *const msg[] = { "burnt", "rusted", "rotten", "corroded", "cracked" },
+        *const bythe[] = { "heat", "oxidation", "decay", "corrosion",
+                           "impact" }; /* this could use improvement... */
     boolean vulnerable = FALSE, is_primary = TRUE,
             check_grease = (ef_flags & EF_GREASE) ? TRUE : FALSE,
             print = (ef_flags & EF_VERBOSE) ? TRUE : FALSE,
@@ -218,6 +219,11 @@ erode_obj(
         vulnerable = is_corrodeable(otmp);
         is_primary = FALSE;
         cost_type = COST_CORRODE;
+        break;
+    case ERODE_CRACK: /* crystal armor */
+        vulnerable = is_crackable(otmp);
+        is_primary = TRUE;
+        cost_type = COST_CRACK;
         break;
     default:
         impossible("Invalid erosion type in erode_obj");
@@ -288,13 +294,19 @@ erode_obj(
         return ER_DAMAGED;
     } else if (ef_flags & EF_DESTROY) {
         otmp->in_use = 1; /* in case of hangup during message w/ --More-- */
-        if (uvictim || vismon || visobj)
-            pline("%s %s %s away!",
+        if (uvictim || vismon || visobj) {
+            char actbuf[BUFSZ];
+
+            if (cost_type != COST_CRACK)
+                Sprintf(actbuf, "%s away", vtense(ostr, action[type]));
+            else
+                Sprintf(actbuf, "shatters");
+            pline("%s %s %s!",
                   uvictim ? "Your"
                           : !vismon ? "The" /* visobj */
                                     : s_suffix(Monnam(victim)),
-                  ostr, vtense(ostr, action[type]));
-
+                  ostr, actbuf);
+        }
         if (ef_flags & EF_PAY)
             costly_alteration(otmp, cost_type);
 
