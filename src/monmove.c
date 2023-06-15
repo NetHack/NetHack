@@ -1312,7 +1312,8 @@ m_move(register struct monst *mtmp, int after)
             finish_meating(mtmp);
         return MMOVE_DONE; /* still eating */
     }
-    if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my) && rn2(10))
+    if (hides_under(ptr) && OBJ_AT(mtmp->mx, mtmp->my)
+        && can_hide_under_obj(gl.level.objects[mtmp->mx][mtmp->my]) && rn2(10))
         return MMOVE_NOTHING; /* do not leave hiding place */
 
     /* Where does 'mtmp' think you are?  Not necessary if m_move() called
@@ -1891,6 +1892,21 @@ m_move_aggress(struct monst *mtmp, coordxy x, coordxy y)
             return MMOVE_DIED;
     }
     return MMOVE_DONE;
+}
+
+/* returns TRUE if a mon can hide under the obj */
+boolean
+can_hide_under_obj(struct obj *obj)
+{
+    struct trap *t;
+
+    if (!obj || (obj->otyp == STATUE
+          /* uncomment this next line for just statue traps */
+          /* && (t = t_at(obj->ox, obj->oy)) != 0 && t->ttyp == STATUE_TRAP */
+        ))
+        return FALSE;
+   return TRUE;
+   nhUse(t);
 }
 
 void

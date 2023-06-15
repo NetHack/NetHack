@@ -4196,7 +4196,9 @@ maybe_unhide_at(coordxy x, coordxy y)
     }
 
     if (undetected
-        && ((hides_under(mtmp->data) && (!OBJ_AT(x, y) || trapped))
+        && ((hides_under(mtmp->data)
+             && (!OBJ_AT(x, y) || trapped
+                 || !can_hide_under_obj(gl.level.objects[x][y])))
             || (mtmp->data->mlet == S_EEL && !is_pool(x, y))))
         (void) hideunder(mtmp);
 }
@@ -4210,6 +4212,7 @@ hideunder(struct monst *mtmp)
     int seeit = canseemon(mtmp);
     boolean oldundetctd, undetected = FALSE, is_u = (mtmp == &gy.youmonst);
     coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
+    struct obj *otmp;
 
     if (mtmp == u.ustuck) {
         ; /* undetected==FALSE; can't hide if holding you or held by you */
@@ -4221,9 +4224,8 @@ hideunder(struct monst *mtmp)
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz));
         if (seeit)
             seenobj = "the water";
-    } else if (hides_under(mtmp->data) && OBJ_AT(x, y)) {
-        struct obj *otmp = gl.level.objects[x][y];
-
+    } else if (hides_under(mtmp->data) && OBJ_AT(x, y)
+        && (otmp = gl.level.objects[x][y]) != 0 && can_hide_under_obj(otmp)) {
         if (seeit)
             seenobj = ansimpleoname(otmp);
         /* most monsters won't hide under cockatrice corpse but they
