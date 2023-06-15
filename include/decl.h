@@ -613,6 +613,11 @@ struct instance_globals_m {
     /* region.c */
     int max_regions;
 
+    /* trap.c */
+    boolean mentioned_water; /* set to True by water_damage() if it issues
+                              * a message about water; dodip() should make
+                              * POT_WATER should become discovered */
+
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
 };

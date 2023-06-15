@@ -551,6 +551,8 @@ const struct instance_globals_m g_init_m = {
     UNDEFINED_VALUES, /* mapped_menu_op */
     /* region.c */
     0, /* max_regions */
+    /* trap.c */
+    FALSE, /* mentioned_water */
     TRUE, /* havestate*/
     IVMAGIC  /* m_magic to validate that structure layout has been preserved */
 };

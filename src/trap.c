@@ -4208,8 +4208,7 @@ acid_damage(struct obj* obj)
 
 /* Get an object wet and damage it appropriately.
  *   "obj": if null, returns ER_NOTHING
- *   "ostr", if present, is used instead of the object name in some
- *     messages.
+ *   "ostr", if present, is used instead of the object name in some messages.
  *   "force" means not to roll luck to protect some objects.
  * Returns an erosion return value (ER_*)
  */
@@ -4253,14 +4252,18 @@ water_damage(
         return ER_GREASED;
     } else if (Is_container(obj)
                && (!Waterproof_container(obj) || (obj->cursed && !rn2(3)))) {
-        if (in_invent)
+        if (in_invent) {
             pline("Some %s gets into your %s!", hliquid("water"), ostr);
+            gm.mentioned_water = !Hallucination;
+        }
         water_damage_chain(obj->cobj, FALSE);
         return ER_DAMAGED; /* contents were damaged */
     } else if (Waterproof_container(obj)) {
         if (in_invent) {
             pline_The("%s slides right off your %s.", hliquid("water"), ostr);
-            makeknown(obj->otyp);
+            gm.mentioned_water = !Hallucination;
+            makeknown(obj->otyp); /* if an oilskin sack, discover it; doesn't
+                                   * matter for chest, large box, ice box */
         }
         /* not actually damaged, but because we /didn't/ get the "water
            gets into!" message, the player now has more information and

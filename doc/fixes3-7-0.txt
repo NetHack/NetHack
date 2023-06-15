@@ -1208,6 +1208,8 @@ wizard mode wish for terrain while on a fountain|sink spot made the counter
 	sound messages if all fountains|sinks were eventually destroyed
 add a level arrival region to the Gnone King's Wine Cellar variation of the
 	Mines' End level so that hero can't end up in the treature chamber
+make potion of water become discovered if dipping a carried container into an
+	uncursed one reports that water gets inside or slides right off
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
