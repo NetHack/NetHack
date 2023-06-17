@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1683831104 2023/05/11 18:51:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.501 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1687036544 2023/06/17 21:15:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.509 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2478,7 +2478,7 @@ m_detach(
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
 
-    if (mtmp->mx > 0 && emits_light(mptr))
+    if (mx > 0 && emits_light(mptr))
         del_light_source(LS_MONSTER, monst_to_any(mtmp));
 
     /*
@@ -2505,7 +2505,7 @@ m_detach(
             /* The Archeologist, Caveman, and Priest quest texts describe
                the nemesis's body creating noxious fumes/gas when killed. */
             if (stinky_nemesis(mtmp))
-                create_gas_cloud(mx, my, 5, 8);
+                nemesis_stinks(mx, my);
         }
         if (mtmp->data->msound == MS_LEADER)
             leaddead();
@@ -2759,12 +2759,6 @@ mondead(struct monst *mtmp)
             break;
         }
     }
-#if 0   /* moved to m_detach() to kick in if mongone() happens */
-    if (mtmp->iswiz)
-        wizdead();
-    if (mtmp->data->msound == MS_NEMESIS)
-        nemdead();
-#endif
 
     if (mndx == PM_MEDUSA && gm.mvitals[mndx].died == 1) {
         record_achievement(ACH_MEDU); /* also generates a livelog event */

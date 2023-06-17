@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1684138080 2023/05/15 08:08:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1263 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1687036542 2023/06/17 21:15:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1275 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2311,6 +2311,7 @@ extern void artitouch(struct obj *);
 extern boolean ok_to_quest(void);
 extern void leader_speaks(struct monst *);
 extern void nemesis_speaks(void);
+extern void nemesis_stinks(coordxy, coordxy);
 extern void quest_chat(struct monst *);
 extern void quest_talk(struct monst *);
 extern void quest_stat_check(struct monst *);

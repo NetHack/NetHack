@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1196 $ $NHDT-Date: 1686386794 2023/06/10 08:46:34 $
+HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1201 $ $NHDT-Date: 1687036542 2023/06/17 21:15:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1621,6 +1621,7 @@ entering the tutorial stashed hero's equipment for eventual return to normal
 entering the tutorial and then returning to play made the tutorial branch be
 	eligible for a portal destination via wizard's Eye of the Aethiopica
 'hard helmet' was based on being metallic so overlooked crystal helmet
+don't blame/credit hero for stinking cloud if dying quest nemesis releases one
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
