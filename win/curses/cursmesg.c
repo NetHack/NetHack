@@ -236,7 +236,7 @@ curscolor(int color, boolean *boldon)
 
     if (COLORS < 16) {
         /* Use bold for a bright black */
-        if (color == CLR_BLACK && iflags.wc2_darkgray)
+        if (color == CLR_BLACK && !iflags.wc2_black)
             *boldon = TRUE;
 
         if (color > 8 && color < 17)
@@ -362,7 +362,7 @@ curses_clear_unhighlight_message_window(void)
 
         for (count = 0; count < mh; count++)
             mvwchgat(win, count + brdroffset, brdroffset,
-                     mw, COLOR_PAIR(NO_COLOR), A_NORMAL, NULL);
+                     mw, COLOR_PAIR(0), A_NORMAL, NULL);
         wnoutrefresh(win);
     }
     wmove(win, my, mx);

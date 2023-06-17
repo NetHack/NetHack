@@ -35,7 +35,6 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
 #define INV_WIN     4
 #define NHWIN_MAX   5
 #define MESG_HISTORY_MAX   200
-#define CURSES_DARK_GRAY    17
 #define MAP_SCROLLBARS
 
 #if !defined(A_LEFTLINE) && defined(A_LEFT)

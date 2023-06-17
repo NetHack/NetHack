@@ -553,7 +553,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    |array |                      |                    |
                    |offset| macro for indexing   |   bitmask          |
                    |------+----------------------+--------------------+
-                   |   0  |   CLR_BLACK          |                    |
+                   |   0  |   NO_COLOR           |                    |
                    +------+----------------------+--------------------+
                    |   1  |   CLR_RED            |   00010110         |
                    +------+----------------------+--------------------+
@@ -569,7 +569,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    +------+----------------------+--------------------+
                    |   7  |   CLR_GRAY           |                    |
                    +------+----------------------+--------------------+
-                   |   8  |   NO_COLOR           |                    |
+                   |   8  |   CLR_BLACK          |                    |
                    +------+----------------------+--------------------+
                    |   9  |   CLR_ORANGE         |                    |
                    +------+----------------------+--------------------+
@@ -585,17 +585,19 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    +------+----------------------+--------------------+
                    |  15  |   CLR_WHITE          |                    |
                    +------+----------------------+--------------------+
-                   |  16  |   HL_ATTCLR_DIM      |                    | CLR_MAX
+                   |  16  |   CLR_DARKGRAY       |                    |
                    +------+----------------------+--------------------+
-                   |  17  |   HL_ATTCLR_BLINK    |                    |
+                   |  17  |   HL_ATTCLR_DIM      |                    | CLR_MAX
                    +------+----------------------+--------------------+
-                   |  18  |   HL_ATTCLR_ULINE    |                    |
+                   |  18  |   HL_ATTCLR_BLINK    |                    |
                    +------+----------------------+--------------------+
-                   |  19  |   HL_ATTCLR_INVERSE  |   00010110         |
+                   |  19  |   HL_ATTCLR_ULINE    |                    |
                    +------+----------------------+--------------------+
-                   |  20  |   HL_ATTCLR_BOLD     |                    |
+                   |  20  |   HL_ATTCLR_INVERSE  |   00010110         |
                    +------+----------------------+--------------------+
-                   |  21  | beyond array boundary|              | BL_ATTCLR_MAX
+                   |  22  |   HL_ATTCLR_BOLD     |                    |
+                   +------+----------------------+--------------------+
+                   |  22  | beyond array boundary|              | BL_ATTCLR_MAX
 
                    The window port can AND (&) the bits passed in the
                    ptr argument to status_update() with any non-zero
@@ -741,7 +743,7 @@ Your window port identifies what options it will react to and support
 by setting bits in the window_procs wincap mask and/or wincap2 mask.
 Your window port can also fill in the color-availability table for
 the window port, has_color[CLR_MAX] to flag the colors it supports
-1 it does, or 0 it doesn't. [CLR_MAX is 16 as of 3.6.3.]
+1 it does, or 0 it doesn't. [CLR_MAX is 17, was 16 since 3.6.3]
 
 See section IX for details of where the wincap masks reside.
 
@@ -862,7 +864,7 @@ to support:
   |  statuslines       | WC2_STATUSLINES    | wc2_statuslines    |int     |
   |  term_cols         | WC2_TERM_SIZE      | wc2_term_cols      |int     |
   |  term_rows         | WC2_TERM_SIZE      | wc2_term_rows      |int     |
-  |  use_darkgray      | WC2_DARKGRAY       | wc2_darkgray       |boolean |
+  |  black             | WC2_BLACK          | wc2_black          |boolean |
   |  windowborders     | WC2_WINDOWBORDERS  | wc2_windowborders  |int     |
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   +--------------------+--------------------+--------------------+--------+

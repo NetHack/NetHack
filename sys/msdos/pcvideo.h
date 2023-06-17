@@ -147,6 +147,7 @@ struct overview_planar_cell_struct {
  * settings.
  *
  */
+#define CLR_MAX 16
 
 #if defined(SCREEN_BIOS) || defined(SCREEN_DJGPPFAST)
 #define M_BLACK 8

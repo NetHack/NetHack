@@ -118,7 +118,7 @@ struct window_procs tty_procs = {
      | WC2_HILITE_STATUS | WC2_HITPOINTBAR | WC2_FLUSH_STATUS
      | WC2_RESET_STATUS
 #endif
-     | WC2_DARKGRAY | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
+     | WC2_BLACK | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
      | WC2_U_UTF8STR
 #if !defined(NO_TERMS) || defined(WIN32CON)
      | WC2_U_24BITCOLOR
@@ -4467,7 +4467,7 @@ condcolor(long bm, unsigned long *bmarray)
     int i;
 
     if (bm && bmarray)
-        for (i = 0; i < CLR_MAX; ++i) {
+        for (i = 1; i < CLR_MAX; ++i) {
             if ((bm & bmarray[i]) != 0)
                 return i;
         }

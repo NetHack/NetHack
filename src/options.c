@@ -7127,6 +7127,7 @@ static const struct color_names colornames[] = {
     { "magenta", CLR_MAGENTA },
     { "cyan", CLR_CYAN },
     { "gray", CLR_GRAY },
+    { "darkgray", CLR_DARKGRAY },
     { "orange", CLR_ORANGE },
     { "light green", CLR_BRIGHT_GREEN },
     { "yellow", CLR_YELLOW },
@@ -7135,12 +7136,13 @@ static const struct color_names colornames[] = {
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { "no color", NO_COLOR },
-    { (const char *) 0, CLR_BLACK }, /* everything after this is an alias */
+    { (const char *) 0, NO_COLOR }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
     { "purple", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
     { "bright purple", CLR_BRIGHT_MAGENTA },
     { "grey", CLR_GRAY },
+    { "darkgrey", CLR_DARKGRAY },
     { "bright red", CLR_ORANGE },
     { "bright green", CLR_BRIGHT_GREEN },
     { "bright blue", CLR_BRIGHT_BLUE },
@@ -9757,7 +9759,7 @@ static struct wc_Opt wc2_options[] = {
     { "statuslines", WC2_STATUSLINES },
     { "term_cols", WC2_TERM_SIZE },
     { "term_rows", WC2_TERM_SIZE },
-    { "use_darkgray", WC2_DARKGRAY },
+    { "black", WC2_BLACK },
     { "windowborders", WC2_WINDOWBORDERS },
     { "wraptext", WC2_WRAPTEXT },
     { (char *) 0, 0L }

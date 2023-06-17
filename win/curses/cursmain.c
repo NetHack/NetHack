@@ -45,7 +45,7 @@ struct window_procs curses_procs = {
      | WC_MOUSE_SUPPORT
 #endif
      | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
-    (WC2_DARKGRAY | WC2_HITPOINTBAR
+    (WC2_BLACK | WC2_HITPOINTBAR
 #ifdef CURSES_UNICODE
      | WC2_U_UTF8STR
 #endif

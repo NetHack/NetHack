@@ -374,7 +374,7 @@ struct instance_flags {
     boolean wc2_softkeyboard;   /* use software keyboard */
     boolean wc2_wraptext;       /* wrap text */
     boolean wc2_selectsaved;    /* display a menu of user's saved games */
-    boolean wc2_darkgray;    /* try to use dark-gray color for black glyphs */
+    boolean wc2_black; /* black and darkgray, or blue. darkgray by default */
     boolean wc2_hitpointbar;  /* show graphical bar representing hit points */
     boolean wc2_guicolor;       /* allow colours in gui (outside map) */
     int wc_mouse_support;       /* allow mouse support */

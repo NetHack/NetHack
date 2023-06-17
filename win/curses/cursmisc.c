@@ -98,7 +98,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     curses_color = color;
     if (COLORS < 16) {
         /* Use bold for a bright black */
-        if (color == CLR_BLACK && iflags.wc2_darkgray)
+        if (color == CLR_BLACK && !iflags.wc2_black)
             wattron(win, A_BOLD);
 
         if (color > 8 && color < 17)
@@ -121,12 +121,10 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     } else {                    /* Turn off color/attributes */
 
         if (color != NONE) {
-            if (COLORS < 16) {
-                if (color == CLR_BLACK)
+            if (COLORS < 16)
+                if (color >= 8 || color == CLR_BLACK)
                     wattroff(win, A_BOLD);
-                if (color > 7)
-                    wattroff(win, A_BOLD);
-            }
+
             if (iflags.use_inverse) {
                 wattroff(win, A_REVERSE);
             }

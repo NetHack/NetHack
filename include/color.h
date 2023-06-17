@@ -8,8 +8,7 @@
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
  * standard 8 colors, followed by their bright counterparts.  There are
- * exceptions, these are listed below.	Bright black doesn't mean very
- * much, so it is used as the "default" foreground color of the screen.
+ * exceptions, these are listed below.
  */
 #define NO_COLOR 0
 #define CLR_RED 1
@@ -27,7 +26,8 @@
 #define CLR_BRIGHT_MAGENTA 13
 #define CLR_BRIGHT_CYAN 14
 #define CLR_WHITE 15
-#define CLR_MAX 16
+#define CLR_DARKGRAY 16
+#define CLR_MAX 17
 
 /* The "half-way" point for tty-based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
@@ -38,7 +38,6 @@
 #define HI_LORD CLR_MAGENTA /* for high-end monsters */
 
 /* these can be configured */
-#define HI_OBJ CLR_MAGENTA
 #define HI_METAL CLR_CYAN
 #define HI_COPPER CLR_YELLOW
 #define HI_SILVER CLR_GRAY
@@ -52,5 +51,6 @@
 #define HI_MINERAL NO_COLOR
 #define DRAGON_SILVER CLR_BRIGHT_CYAN
 #define HI_ZAP CLR_BRIGHT_BLUE
+#define PALLID CLR_DARKGRAY
 
 #endif /* COLOR_H */

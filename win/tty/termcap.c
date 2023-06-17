@@ -450,7 +450,7 @@ tty_ascgraphics_hilite_fixup(void)
 {
     register int c;
 
-    for (c = 1; c < CLR_MAX / 2; c++)
+    for (c = 1; c < 8; c++)
         hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
         Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
         hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
@@ -953,7 +953,19 @@ init_hilite(void)
 
     hilites[NO_COLOR] = nullstr;
 
-    if (iflags.wc2_darkgray) {
+    if (iflags.wc2_black)
+        if (colors > 16) {
+            /* allow real black and darkgray */
+            scratch = tparm(setf, COLOR_BLACK);
+            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_BLACK], scratch);
+            windowprocs.has_color[CLR_DARKGRAY] = true;
+            scratch = tparm(setf, COLOR_BLACK|BRIGHT);
+            hilites[CLR_DARKGRAY] = (char *) alloc(strlen(scratch) + 1);
+            Strcpy(hilites[CLR_DARKGRAY], scratch);
+        } else
+            hilites[CLR_BLACK] = hilites[CLR_BLUE];
+    else
         if (colors >= 16) {
             scratch = tparm(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
@@ -969,20 +981,6 @@ init_hilite(void)
             Strcpy(hilites[CLR_BLACK], MD);
             Strcat(hilites[CLR_BLACK], scratch);
         }
-    } else {
-        if (colors > 16) {
-            /* allow real black */
-            scratch = tparm(setf, COLOR_BLACK);
-            hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
-            Strcpy(hilites[CLR_BLACK], scratch);
-        } else {
-            /* But it's concievable that hilighted black-on-black could
-             * still be invisible on many others.  We substitute blue for
-             * black.
-             */
-            hilites[CLR_BLACK] = hilites[CLR_BLUE];
-        }
-    }
 }
 
 static void
@@ -999,6 +997,11 @@ kill_hilite(void)
             free(hilites[CLR_BLACK]);
             hilites[CLR_BLACK] = 0;
         }
+
+    if (hilites[CLR_DARKGRAY]) {
+        free(hilites[CLR_DARKGRAY]);
+        hilites[CLR_DARKGRAY] = 0;
+    }
 
     /* NO_COLOR is static 'nullstr', do not free */
     for (c = 1; c < 8; c++) {
@@ -1023,11 +1026,11 @@ analyze_seq(char *str, int *fg, int *bg)
     register int c, code;
     int len;
 
+    *bg = NO_COLOR;
 #ifdef MICRO
     *fg = CLR_GRAY;
-    *bg = NO_COLOR;
 #else
-    *fg = *bg = NO_COLOR;
+    *fg = NO_COLOR;
 #endif
 
     c = (str[0] == '\233') ? 1 : 2; /* index of char beyond esc prefix */
@@ -1039,11 +1042,11 @@ analyze_seq(char *str, int *fg, int *bg)
     while (c < len) {
         if ((code = atoi(&str[c])) == 0) { /* reset */
             /* this also catches errors */
+            *bg = NO_COLOR;
 #ifdef MICRO
             *fg = CLR_GRAY;
-            *bg = NO_COLOR;
 #else
-            *fg = *bg = NO_COLOR;
+            *fg = NO_COLOR;
 #endif
         } else if (code == 1) { /* bold */
             *fg |= BRIGHT;
@@ -1126,14 +1129,14 @@ init_hilite(void)
 
     int backg, foreg, hi_backg, hi_foreg;
 
-    for (c = 0; c < SIZE(hilites); c++)
+    for (c = 1; c < 16; c++)
         hilites[c] = nh_HI;
-    hilites[CLR_GRAY] = hilites[NO_COLOR] = (char *) 0;
+    hilites[NO_COLOR] = (char *) 0;
 
     analyze_seq(nh_HI, &hi_foreg, &hi_backg);
     analyze_seq(nh_HE, &foreg, &backg);
 
-    for (c = 0; c < SIZE(hilites); c++)
+    for (c = 1; c < 16; c++)
         /* avoid invisibility */
         if ((backg & ~BRIGHT) != c) {
 #ifdef MICRO
@@ -1166,7 +1169,7 @@ kill_hilite(void)
 #ifndef TOS
     register int c;
 
-    for (c = 0; c < CLR_MAX / 2; c++) {
+    for (c = 0; c < 8; c++) {
         if (hilites[c | BRIGHT] == hilites[c])
             hilites[c | BRIGHT] = 0;
         if (hilites[c] && hilites[c] != nh_HI)
@@ -1188,7 +1191,7 @@ init_hilite(void)
 
     hilites[NO_COLOR] = nullstr;
 
-    for (c = 1; c < CLR_MAX / 2; c++) {
+    for (c = 1; c < 8; c++) {
         hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
         Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
 #ifdef MICRO
@@ -1202,14 +1205,12 @@ init_hilite(void)
         }
     }
 
-    /* See TEXTCOLOR && TERMLIB && UNIX && TERMINFO code above. */
-    if (iflags.wc2_darkgray) {
-        /* Bright black is dark gray. */
+    if (iflags.wc2_black)
+        hilites[CLR_BLACK] = hilites[CLR_BLUE];
+    else {
+        /* bright black */
         hilites[CLR_BLACK] = (char *) alloc(sizeof "\033[1;30m");
         Sprintf(hilites[CLR_BLACK], "\033[1;30m");
-    } else {
-        /* Use blue for black. */
-        hilites[CLR_BLACK] = hilites[CLR_BLUE];
     }
 }
 
@@ -1218,7 +1219,7 @@ kill_hilite(void)
 {
     register int c;
 
-    for (c = 1; c < CLR_MAX / 2; c++) {
+    for (c = 1; c < 8; c++) {
         if (hilites[c] == nullstr)
             hilites[c] = 0;
         if (hilites[c | BRIGHT] == nullstr)

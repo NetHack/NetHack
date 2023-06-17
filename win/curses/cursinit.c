@@ -310,19 +310,21 @@ curses_init_nhcolors(void)
         for (c = 1; c <= CLR_GRAY; c++)
             init_pair(c, c, -1);
 
-        if (iflags.wc2_darkgray)
+        if (iflags.wc2_black)
+            if (COLORS > 16) {
+                init_pair(CLR_BLACK, COLOR_BLACK, -1);
+                init_pair(CLR_DARKGRAY, CLR_BLACK, -1);
+                windowprocs.has_color[CLR_DARKGRAY] = true;
+            } else
+                init_pair(CLR_BLACK, CLR_BLUE, -1);
+        else
             if (COLORS < 16)
                 init_pair(CLR_BLACK, COLOR_BLACK, -1);
             else
                 init_pair(CLR_BLACK, CLR_BLACK, -1);
-        else
-            if (COLORS > 16)
-                init_pair(CLR_BLACK, COLOR_BLACK, -1);
-            else
-                init_pair(CLR_BLACK, CLR_BLUE, -1);
 
         if (COLORS >= 16)
-            for (c = 9; c < CLR_MAX; c++)
+            for (c = 9; c < 16; c++)
                 init_pair(c, c, -1);
 
         {
