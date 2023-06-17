@@ -442,7 +442,8 @@ enum plnmsg_types {
     PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
     PLNMSG_BACK_ON_GROUND,      /* leaving water */
     PLNMSG_GROWL,               /* growl() gave some message */
-    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
+    PLNMSG_HIDE_UNDER,          /* hero saw a monster hide under something */
+    PLNMSG_enum /* 'none of the above' */
 };
 
 /* runmode options */

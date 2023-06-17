@@ -1277,10 +1277,11 @@ makemon(
         break;
     case S_SPIDER:
     case S_SNAKE:
-        if (gi.in_mklev)
+        if (gi.in_mklev) {
             if (x && y)
                 (void) mkobj_at(RANDOM_CLASS, x, y, TRUE);
-        (void) hideunder(mtmp);
+            (void) hideunder(mtmp);
+        }
         break;
     case S_LIGHT:
     case S_ELEMENTAL:
@@ -1290,7 +1291,9 @@ makemon(
         }
         break;
     case S_EEL:
-        (void) hideunder(mtmp);
+        if (gi.in_mklev) {
+            (void) hideunder(mtmp);
+        }
         break;
     case S_LEPRECHAUN:
         mtmp->msleeping = 1;

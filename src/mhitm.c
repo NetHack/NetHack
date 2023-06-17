@@ -322,7 +322,7 @@ mattackm(
         mdef->msleeping = 0;
     }
 
-    /* undetect monsters become un-hidden if they are attacked */
+    /* mundetected monsters become un-hidden if they are attacked */
     if (mdef->mundetected) {
         mdef->mundetected = 0;
         newsym(mdef->mx, mdef->my);
@@ -336,8 +336,15 @@ mattackm(
                 if (!justone)
                     montype = makeplural(montype);
                 You("dream of %s.", montype);
-            } else
-                pline("Suddenly, you notice %s.", a_monnam(mdef));
+            } else {
+                if (iflags.last_msg == PLNMSG_HIDE_UNDER
+                    && mdef->m_id == gl.last_hider)
+                    pline("%s emerges from hiding.", Monnam(mdef));
+                else if (mdef->m_id == gl.last_hider)
+                    You("notice %s.", mon_nam(mdef));
+                else
+                    pline("Suddenly, you notice %s.", a_monnam(mdef));
+            }
         }
     }
 

@@ -1898,15 +1898,50 @@ m_move_aggress(struct monst *mtmp, coordxy x, coordxy y)
 boolean
 can_hide_under_obj(struct obj *obj)
 {
+/* uncomment '#define NO_HIDING_UNDER_STATUES' to prevent hiding under
+ * statues; that was introduced to avoid nullifying statue traps but
+ * isn't needed now that hiding at any non-pit trap site is disallowed */
+/* #define NO_HIDING_UNDER_STATUES */
     struct trap *t;
 
-    if (!obj || (obj->otyp == STATUE
-          /* uncomment this next line for just statue traps */
-          /* && (t = t_at(obj->ox, obj->oy)) != 0 && t->ttyp == STATUE_TRAP */
-        ))
+    if (!obj || obj->where != OBJ_FLOOR)
         return FALSE;
-   return TRUE;
-   nhUse(t);
+    /* can't hide in/on/under traps (except pits) even when there is an
+       object here; since obj is on floor, its <ox,oy> are up to date */
+    if ((t = t_at(obj->ox, obj->oy)) != 0 && !is_pit(t->ttyp))
+        return FALSE;
+    /* can't hide under small amount of coins unless non-coins are also
+       present; we expect coins to be a single stack but don't assume that */
+    if (obj->oclass == COIN_CLASS) {
+        long coinquan = 0L;
+
+        do {
+            /* 10 coins is arbitrary amount considered enough to hide under */
+            if ((coinquan += obj->quan) >= 10L)
+                break; /* fall through to other checks */
+            obj = obj->nexthere;
+            if (!obj)
+                return FALSE; /* whole pile was less than 10 coins */
+        } while (obj->oclass == COIN_CLASS);
+    }
+#ifdef NO_HIDING_UNDER_STATUES
+    /*
+     * 'obj' might have been changed, but only if we've skipped coins that
+     * are on the top of a pile.  However, the statue loop will clobber it.
+     */
+    /* can't hide under statues regardless of pile stacking order */
+    while (obj) {
+        if (obj->otyp == STATUE)
+            return FALSE;
+        obj = obj->nexthere;
+    }
+    /*
+     * If we reach here, 'obj' is now Null but wasn't earlier so the original
+     * 'obj' can be hidden beneath.
+     */
+#undef NO_HIDING_UNDER_STATUES
+#endif
+    return TRUE; /* can hide under the object */
 }
 
 void

@@ -682,7 +682,8 @@ polymon(int mntmp)
 {
     char buf[BUFSZ], ustuckNam[BUFSZ];
     boolean sticking = sticks(gy.youmonst.data) && u.ustuck && !u.uswallow,
-            was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE;
+            was_blind = !!Blind, dochange = FALSE, was_expelled = FALSE,
+            was_hiding_under = u.uundetected && hides_under(gy.youmonst.data);
     int mlvl, newMaxStr;
 
     if (gm.mvitals[mntmp].mvflags & G_GENOD) { /* allow G_EXTINCT */
@@ -833,7 +834,10 @@ polymon(int mntmp)
     break_armor();
     drop_weapon(1);
     find_ac(); /* (repeated below) */
-    (void) hideunder(&gy.youmonst);
+    /* if hiding under something and can't hide anymore, unhide now;
+       but don't auto-hide when not already hiding-under */
+    if (was_hiding_under)
+        (void) hideunder(&gy.youmonst);
 
     if (u.utrap && u.utraptype == TT_PIT) {
         set_utrap(rn1(6, 2), TT_PIT); /* time to escape resets */
@@ -1702,6 +1706,7 @@ dogaze(void)
     return ECMD_TIME;
 }
 
+/* called by domonability() for #monster */
 int
 dohide(void)
 {
@@ -1718,15 +1723,14 @@ dohide(void)
                      : !sticks(gy.youmonst.data) ? "being held"
                        : (humanoid(u.ustuck->data) ? "holding someone"
                                                    : "holding that creature"));
-        if (u.uundetected
-            || (ismimic && U_AP_TYPE != M_AP_NOTHING)) {
+        if (u.uundetected || (ismimic && U_AP_TYPE != M_AP_NOTHING)) {
             u.uundetected = 0;
             gy.youmonst.m_ap_type = M_AP_NOTHING;
             newsym(u.ux, u.uy);
         }
         return ECMD_OK;
     }
-    /* note: the eel and hides_under cases are hypothetical;
+    /* note: hero-as-eel handling is incomplete but unnecessary;
        such critters aren't offered the option of hiding via #monster */
     if (gy.youmonst.data->mlet == S_EEL && !is_pool(u.ux, u.uy)) {
         if (IS_FOUNTAIN(levl[u.ux][u.uy].typ))

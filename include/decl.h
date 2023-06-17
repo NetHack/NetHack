@@ -515,6 +515,9 @@ struct instance_globals_l {
     /* mklev.c */
     genericptr_t luathemes[MAXDUNGEON];
 
+    /* mon.c */
+    unsigned last_hider; /* m_id of hides-under mon seen going into hiding */
+
     /* nhlan.c */
 #ifdef MAX_LAN_USERNAME
     char lusername[MAX_LAN_USERNAME];

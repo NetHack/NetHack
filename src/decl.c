@@ -477,6 +477,8 @@ const struct instance_globals_l g_init_l = {
     UNDEFINED_PTR, /* light_base */
     /* mklev.c */
     { UNDEFINED_PTR }, /* luathemes[] */
+    /* mon.c */
+    0U, /* last_hider */
     /* nhlan.c */
 #ifdef MAX_LAN_USERNAME
     UNDEFINED_VALUES, /* lusername */
