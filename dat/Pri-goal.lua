@@ -1,4 +1,4 @@
--- NetHack Priest Pri-goal.lua	$NHDT-Date: 1652196008 2022/05/10 15:20:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1 $
+-- NetHack Priest Pri-goal.lua	$NHDT-Date: 1687033651 2023/06/17 20:27:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.2 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-2 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
@@ -29,8 +29,9 @@ local placeidx = math.random(1, #place);
 des.region(selection.area(00,00,25,10), "unlit")
 -- Stairs
 des.stair("up", 20,05)
--- Objects
-des.object({ id = "helm of brilliance", coord = place[placeidx], buc="blessed", spe=0, name="The Mitre of Holiness" })
+-- Objects [note: eroded=-1 => obj->oerodeproof=1]
+des.object({ id = "helm of brilliance", coord = place[placeidx],
+             buc="blessed", spe=0, eroded=-1, name="The Mitre of Holiness" })
 des.object()
 des.object()
 des.object()

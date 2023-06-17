@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1684140131 2023/05/15 08:42:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.536 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1687033655 2023/06/17 20:27:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.540 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -178,6 +178,7 @@ erode_obj(
     boolean vulnerable = FALSE, is_primary = TRUE,
             check_grease = (ef_flags & EF_GREASE) ? TRUE : FALSE,
             print = (ef_flags & EF_VERBOSE) ? TRUE : FALSE,
+            crackers = FALSE, /* True: different feedback if otmp destroyed */
             uvictim, vismon, visobj;
     int erosion, cost_type;
     struct monst *victim;
@@ -223,6 +224,7 @@ erode_obj(
     case ERODE_CRACK: /* crystal armor */
         vulnerable = is_crackable(otmp);
         is_primary = TRUE;
+        crackers = TRUE;
         cost_type = COST_CRACK;
         break;
     default:
@@ -253,8 +255,8 @@ erode_obj(
             && (uvictim || vismon || visobj))
             pline("Somehow, %s %s %s not affected by the %s.",
                   uvictim ? "your"
-                          : !vismon ? "the" /* visobj */
-                                    : s_suffix(mon_nam(victim)),
+                  : !vismon ? "the" /* visobj */
+                    : s_suffix(mon_nam(victim)),
                   ostr, vtense(ostr, "are"), bythe[type]);
         /* We assume here that if the object is protected because it
          * is blessed, it still shows some minor signs of wear, and
@@ -276,8 +278,8 @@ erode_obj(
         if (uvictim || vismon || visobj)
             pline("%s %s %s%s!",
                   uvictim ? "Your"
-                          : !vismon ? "The" /* visobj */
-                                    : s_suffix(Monnam(victim)),
+                  : !vismon ? "The" /* visobj */
+                    : s_suffix(Monnam(victim)),
                   ostr, vtense(ostr, action[type]), adverb);
 
         if (ef_flags & EF_PAY)
@@ -297,14 +299,14 @@ erode_obj(
         if (uvictim || vismon || visobj) {
             char actbuf[BUFSZ];
 
-            if (cost_type != COST_CRACK)
+            if (!crackers)
                 Sprintf(actbuf, "%s away", vtense(ostr, action[type]));
             else
                 Sprintf(actbuf, "shatters");
             pline("%s %s %s!",
                   uvictim ? "Your"
-                          : !vismon ? "The" /* visobj */
-                                    : s_suffix(Monnam(victim)),
+                  : !vismon ? "The" /* visobj */
+                    : s_suffix(Monnam(victim)),
                   ostr, actbuf);
         }
         if (ef_flags & EF_PAY)
