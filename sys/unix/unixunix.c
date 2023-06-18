@@ -14,7 +14,7 @@
 #endif
 #include <signal.h>
 
-static int veryold(int *);
+static int veryold(int);
 static int eraseoldlocks(void);
 
 #ifdef _M_UNIX
@@ -35,11 +35,11 @@ static struct stat buf;
 /* see whether we should throw away this xlock file;
    if yes, close it, otherwise leave it open */
 static int
-veryold(int *fd_p)
+veryold(int fd)
 {
     time_t date;
 
-    if (fstat(*fd_p, &buf))
+    if (fstat(fd, &buf))
         return 0; /* cannot get status */
 #ifndef INSURANCE
     if (buf.st_size != sizeof (int))
@@ -53,7 +53,7 @@ veryold(int *fd_p)
     if (date - buf.st_mtime < 3L * 24L * 60L * 60L) { /* recent */
         int lockedpid; /* should be the same size as hackpid */
 
-        if (read(*fd_p, (genericptr_t) &lockedpid, sizeof lockedpid)
+        if (read(fd, (genericptr_t) &lockedpid, sizeof lockedpid)
             != sizeof lockedpid)
             /* strange ... */
             return 0;
@@ -68,7 +68,11 @@ veryold(int *fd_p)
 #endif
             return 0;
     }
-    (void) close(*fd_p), *fd_p = -1;
+    /* this used to close the file upon success, leave it open upon failure;
+       that was supposed to simplify the caller's usage but ended up making
+       that be more complicated; always leave the file open so that caller
+       can close it unconditionally */
+    /*(void) close(fd);*/
     return 1;
 }
 
@@ -100,7 +104,7 @@ getlock(void)
 {
     static const char destroy_old_game_prompt[] =
     "There is already a game in progress under your name.  Destroy old game?";
-    int i = 0, fd, c;
+    int i = 0, fd, c, too_old;
     const char *fq_lock;
 
 #ifdef TTY_GRAPHICS
@@ -147,12 +151,11 @@ getlock(void)
                 error("Cannot open %s", fq_lock);
             }
 
-            /* veryold() closes fd if true and sets fd to -1; we'll need to
-               close it here if veryold() fails or if eraseoldlocks() fails */
-            if (veryold(&fd) && eraseoldlocks())
+            /* veryold() no longer conditionally closes fd */
+            too_old = veryold(fd);
+            (void) close(fd);
+            if (too_old && eraseoldlocks())
                 goto gotlock;
-            if (fd >= 0)
-                (void) close(fd);
         } while (i < gl.locknum);
 
         unlock_file(HLOCK);
@@ -167,12 +170,11 @@ getlock(void)
             error("Cannot open %s", fq_lock);
         }
 
-        /* veryold() closes fd if true and sets fd to -1; we'll need to
-           close it here if veryold() fails or if eraseoldlocks() fails */
-        if (veryold(&fd) && eraseoldlocks())
+        /* veryold() no longer conditionally closes fd */
+        too_old = veryold(fd);
+        (void) close(fd);
+        if (too_old && eraseoldlocks())
             goto gotlock;
-        if (fd >= 0)
-            (void) close(fd);
 
         if (iflags.window_inited) {
             /* this is a candidate for paranoid_confirmation */
