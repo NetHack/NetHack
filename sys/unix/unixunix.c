@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixunix.c	$NHDT-Date: 1605493693 2020/11/16 02:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.32 $ */
+/* NetHack 3.7	unixunix.c	$NHDT-Date: 1687124609 2023/06/18 21:43:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -13,6 +13,9 @@
 #include <fcntl.h>
 #endif
 #include <signal.h>
+
+static int veryold(int *);
+static int eraseoldlocks(void);
 
 #ifdef _M_UNIX
 extern void sco_mapon(void);
@@ -32,11 +35,11 @@ static struct stat buf;
 /* see whether we should throw away this xlock file;
    if yes, close it, otherwise leave it open */
 static int
-veryold(int fd)
+veryold(int *fd_p)
 {
     time_t date;
 
-    if (fstat(fd, &buf))
+    if (fstat(*fd_p, &buf))
         return 0; /* cannot get status */
 #ifndef INSURANCE
     if (buf.st_size != sizeof (int))
@@ -50,7 +53,7 @@ veryold(int fd)
     if (date - buf.st_mtime < 3L * 24L * 60L * 60L) { /* recent */
         int lockedpid; /* should be the same size as hackpid */
 
-        if (read(fd, (genericptr_t) &lockedpid, sizeof lockedpid)
+        if (read(*fd_p, (genericptr_t) &lockedpid, sizeof lockedpid)
             != sizeof lockedpid)
             /* strange ... */
             return 0;
@@ -65,7 +68,7 @@ veryold(int fd)
 #endif
             return 0;
     }
-    (void) close(fd);
+    (void) close(*fd_p), *fd_p = -1;
     return 1;
 }
 
@@ -95,7 +98,9 @@ eraseoldlocks(void)
 void
 getlock(void)
 {
-    register int i = 0, fd, c;
+    static const char destroy_old_game_prompt[] =
+    "There is already a game in progress under your name.  Destroy old game?";
+    int i = 0, fd, c;
     const char *fq_lock;
 
 #ifdef TTY_GRAPHICS
@@ -142,10 +147,12 @@ getlock(void)
                 error("Cannot open %s", fq_lock);
             }
 
-            /* veryold() closes fd if true */
-            if (veryold(fd) && eraseoldlocks())
+            /* veryold() closes fd if true and sets fd to -1; we'll need to
+               close it here if veryold() fails or if eraseoldlocks() fails */
+            if (veryold(&fd) && eraseoldlocks())
                 goto gotlock;
-            (void) close(fd);
+            if (fd >= 0)
+                (void) close(fd);
         } while (i < gl.locknum);
 
         unlock_file(HLOCK);
@@ -160,14 +167,12 @@ getlock(void)
             error("Cannot open %s", fq_lock);
         }
 
-        /* veryold() closes fd if true */
-        if (veryold(fd) && eraseoldlocks())
+        /* veryold() closes fd if true and sets fd to -1; we'll need to
+           close it here if veryold() fails or if eraseoldlocks() fails */
+        if (veryold(&fd) && eraseoldlocks())
             goto gotlock;
-        (void) close(fd);
-
-      {
-        const char destroy_old_game_prompt[] =
-    "There is already a game in progress under your name.  Destroy old game?";
+        if (fd >= 0)
+            (void) close(fd);
 
         if (iflags.window_inited) {
             /* this is a candidate for paranoid_confirmation */
@@ -184,7 +189,6 @@ getlock(void)
                     ; /* eat rest of line and newline */
             }
         }
-      }
         if (c == 'y' || c == 'Y') {
             if (eraseoldlocks()) {
                 goto gotlock;
@@ -198,7 +202,7 @@ getlock(void)
         }
     }
 
-gotlock:
+ gotlock:
     fd = creat(fq_lock, FCMASK);
     unlock_file(HLOCK);
     if (fd == -1) {
@@ -399,3 +403,5 @@ file_exists(const char *path)
     return TRUE;
 }
 #endif
+
+/*unixunix.c*/
