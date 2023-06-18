@@ -1,4 +1,4 @@
-/* NetHack 3.7	fountain.c	$NHDT-Date: 1646870844 2022/03/10 00:07:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.78 $ */
+/* NetHack 3.7	fountain.c	$NHDT-Date: 1687058871 2023/06/18 03:27:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -590,13 +590,13 @@ drinksink(void)
         }
         break;
     case 4:
-        do {
+        for (;;) {
             otmp = mkobj(POTION_CLASS, FALSE);
-            if (otmp->otyp == POT_WATER) {
-                obfree(otmp, (struct obj *) 0);
-                otmp = (struct obj *) 0;
-            }
-        } while (!otmp);
+            if (otmp->otyp != POT_WATER)
+                break;
+            /* reject water and try again */
+            obfree(otmp, (struct obj *) 0);
+        }
         otmp->cursed = otmp->blessed = 0;
         pline("Some %s liquid flows from the faucet.",
               Blind ? "odd" : hcolor(OBJ_DESCR(objects[otmp->otyp])));
