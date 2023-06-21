@@ -1,4 +1,4 @@
-/* NetHack 3.7	alloc.c	$NHDT-Date: 1596498147 2020/08/03 23:42:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	alloc.c	$NHDT-Date: 1687343500 2023/06/21 10:31:40 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -32,8 +32,34 @@ static FILE *heaplog = 0;
 static boolean tried_heaplog = FALSE;
 #endif
 
+/*
+ * For historical reasons, nethack's alloc() returns 'long *' rather
+ * than 'void *' or 'char *'.
+ *
+ * Some static analysis complains if it can't deduce that the number
+ * of bytes being allocated is a multiple of 'sizeof (long)'.  It
+ * recognizes that the following manipulation overcomes that via
+ * rounding the requested length up to the next long.  NetHack doesn't
+ * make a lot of tiny allocations, so this shouldn't waste much memory
+ * regardless of whether malloc() does something similar.
+ */
+#define ForceAlignedLength(LTH) \
+    do {                                                        \
+        if ((LTH) % sizeof (long) != 0)                         \
+            (LTH) += sizeof (long) - (LTH) % sizeof (long);     \
+    } while (0)
+
+#ifndef MONITOR_HEAP
 long *alloc(unsigned int) NONNULL;
 long *re_alloc(long *, unsigned int) NONNULL;
+#else
+    /* for #if MONITOR_HEAP, alloc() might return Null but only nhalloc()
+       should be calling it; nhalloc() never returns Null */
+long *alloc(unsigned int);
+long *re_alloc(long *, unsigned int);
+long *nhalloc(unsigned int, const char *, int) NONNULL;
+long *nhrealloc(long *, unsigned int, const char *, int) NONNULL;
+#endif
 ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 
 long *
@@ -41,10 +67,13 @@ alloc(unsigned int lth)
 {
     register genericptr_t ptr;
 
+    ForceAlignedLength(lth);
     ptr = malloc(lth);
 #ifndef MONITOR_HEAP
     if (!ptr)
         panic("Memory allocation failure; cannot get %u bytes", lth);
+#else
+    /* for #if MONITOR_HEAP, failure is handled in nhalloc() */
 #endif
     return (long *) ptr;
 }
@@ -53,11 +82,16 @@ alloc(unsigned int lth)
 long *
 re_alloc(long *oldptr, unsigned int newlth)
 {
-    long *newptr = (long *) realloc((genericptr_t) oldptr, (size_t) newlth);
+    long *newptr;
+
+    ForceAlignedLength(newlth);
+    newptr = (long *) realloc((genericptr_t) oldptr, (size_t) newlth);
 #ifndef MONITOR_HEAP
     /* "extend to":  assume it won't ever fail if asked to shrink */
     if (newlth && !newptr)
         panic("Memory allocation failure; cannot extend to %u bytes", newlth);
+#else
+    /* for #if MONITOR_HEAP, failure is handled in nhrealloc() */
 #endif
     return newptr;
 }
@@ -202,7 +236,7 @@ dupstr(const char *string)
     return strcpy((char *) alloc(len + 1), string);
 }
 
-/* similar for reasonable size strings, but return the length of the input as well */
+/* similar for reasonable size strings, but return length of input as well */
 char *
 dupstr_n(const char *string, unsigned int *lenout)
 {

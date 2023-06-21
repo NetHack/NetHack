@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1687036542 2023/06/17 21:15:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1275 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1687343496 2023/06/21 10:31:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1276 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,9 +8,15 @@
 /* ### alloc.c ### */
 
 #if 0
+/* routines in alloc.c depend on MONITOR_HEAP and are declared in global.h */
 extern long *alloc(unsigned int);
 #endif
 extern char *fmt_ptr(const void *) NONNULL;
+/* moved from hacklib.c to alloc.c so that utility programs have access */
+#define FITSint(x) FITSint_(x, __func__, __LINE__)
+extern int FITSint_(long long, const char *, int);
+#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
@@ -1088,10 +1094,6 @@ extern void shuffle_int_array(int *, int);
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...) PRINTF_F(5, 6);
-#define FITSint(x) FITSint_(x, __func__, __LINE__)
-extern int FITSint_(long long, const char *, int);
-#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
-extern unsigned FITSuint_(unsigned long long, const char *, int);
 #ifdef ENHANCED_SYMBOLS
 extern int unicodeval_to_utf8str(int, uint8 *, size_t);
 #endif
