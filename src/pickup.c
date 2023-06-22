@@ -1137,11 +1137,12 @@ query_objlist(const char *qstr,        /* query string */
  *
  */
 int
-query_category(const char *qstr,      /* query string */
-               struct obj *olist,     /* the list to pick from */
-               int qflags,            /* behavior modification flags */
-               menu_item **pick_list, /* return list of items picked */
-               int how)               /* type of query */
+query_category(
+    const char *qstr,      /* query string */
+    struct obj *olist,     /* the list to pick from */
+    int qflags,            /* behavior modification flags */
+    menu_item **pick_list, /* return list of items picked */
+    int how)               /* type of query */
 {
     int n;
     winid win;
@@ -1152,13 +1153,9 @@ query_category(const char *qstr,      /* query string */
     char invlet;
     int ccount;
     boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
-    boolean do_unpaid = FALSE;
-    boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
-            do_buc_unknown = FALSE;
-    int num_buc_types = 0;
-    unsigned itemflags = MENU_ITEMFLAGS_NONE;
-    int num_justpicked = 0;
-    int clr = 0;
+    boolean do_unpaid = FALSE, do_blessed = FALSE, do_cursed = FALSE,
+            do_uncursed = FALSE, do_buc_unknown = FALSE;
+    int num_buc_types = 0, num_justpicked = 0, clr = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist)
@@ -1219,25 +1216,23 @@ query_category(const char *qstr,      /* query string */
         invlet = 'A';
         any = cg.zeroany;
         any.a_int = 'A';
-        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
                                        : "Auto-select every relevant item",
-                 itemflags);
+                 MENU_ITEMFLAGS_SKIPINVERT);
 
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
     }
 
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
         invlet = 'a';
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
-        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  (qflags & WORN_TYPES) ? "All worn types" : "All types",
-                 itemflags);
+                 MENU_ITEMFLAGS_SKIPINVERT);
         invlet = 'b';
     } else
         invlet = 'a';
@@ -1248,15 +1243,16 @@ query_category(const char *qstr,      /* query string */
                 if (ofilter && !(*ofilter)(curr))
                     continue;
                 if (!collected_type_name) {
+                    int oclass = (int) curr->oclass;
+
                     any = cg.zeroany;
-                    any.a_int = curr->oclass;
-                    add_menu(
-                        win, &nul_glyphinfo, &any, invlet++,
-                        def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
-                        ATR_NONE, clr, let_to_name(*pack, FALSE,
-                                                  (how != PICK_NONE)
-                                                   && iflags.menu_head_objsym),
-                        MENU_ITEMFLAGS_NONE);
+                    any.a_int = oclass;
+                    add_menu(win, &nul_glyphinfo, &any, invlet++,
+                             (int) def_oc_syms[oclass].sym, ATR_NONE, clr,
+                             let_to_name(*pack, FALSE,
+                                         (how != PICK_NONE
+                                          && iflags.menu_head_objsym)),
+                             MENU_ITEMFLAGS_NONE);
                     collected_type_name = TRUE;
                 }
             }
@@ -1270,10 +1266,10 @@ query_category(const char *qstr,      /* query string */
     } while (*pack);
 
     if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
-        || do_uncursed || do_buc_unknown) {
+        || do_uncursed || do_buc_unknown || num_justpicked) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
     }
 
     /* unpaid items if there are any */
@@ -1282,7 +1278,7 @@ query_category(const char *qstr,      /* query string */
         any = cg.zeroany;
         any.a_int = 'u';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0,
-                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_SKIPINVERT);
     }
     /* billed items: checked by caller, so always include if BILLED_TYPES */
     if (qflags & BILLED_TYPES) {
@@ -1290,40 +1286,40 @@ query_category(const char *qstr,      /* query string */
         any = cg.zeroany;
         any.a_int = 'x';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Unpaid items already used up", MENU_ITEMFLAGS_NONE);
+                 "Unpaid items already used up", MENU_ITEMFLAGS_SKIPINVERT);
     }
 
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
        reversing the usual sequence of 'U' and 'C' in BUCX */
-    itemflags = MENU_ITEMFLAGS_SKIPINVERT;
     if (do_blessed) {
         invlet = 'B';
         any = cg.zeroany;
         any.a_int = 'B';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Blessed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Blessed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Cursed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Cursed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Uncursed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Uncursed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items of unknown Bless/Curse status", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items of unknown Bless/Curse status",
+                 MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (num_justpicked) {
         char tmpbuf[BUFSZ];
@@ -1332,12 +1328,12 @@ query_category(const char *qstr,      /* query string */
             Sprintf(tmpbuf, "Just picked up: %s",
                     doname(find_justpicked(olist)));
         else
-            Sprintf(tmpbuf, "Items you just picked up");
+            Strcpy(tmpbuf, "Items you just picked up");
         invlet = 'P';
         any = cg.zeroany;
         any.a_int = 'P';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, tmpbuf, itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 tmpbuf, MENU_ITEMFLAGS_SKIPINVERT);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
