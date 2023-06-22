@@ -33,6 +33,8 @@ static vms_handler_type vms_handler(genericptr_t, genericptr_t);
 static void wd_message(void);
 static boolean wiz_error_flag = FALSE;
 
+static char *progname = (char *) 0;
+
 int
 main(int argc, char *argv[])
 {
@@ -51,8 +53,11 @@ main(int argc, char *argv[])
     early_init();
 
     atexit(byebye);
-    gh.hname = argv[0];
-    gh.hname = vms_basename(gh.hname, FALSE); /* used in 'usage' type mesgs */
+    /* vms_basename(,FALSE) strips device, directory, suffix, and version;
+       the result is returned in a static buffer so we make a copy that
+       isn't at risk of gettting clobbered by core's handling of DEBUGFILES */
+    progname = dupstr(vms_basename(argv[0], FALSE));
+    gh.hname = progname;
     gh.hackpid = getpid();
     (void) umask(0);
 
@@ -392,7 +397,7 @@ whoami(void)
 static void
 byebye(void)
 {
-    void (*hup)(int) ;
+    void (*hup)(int);
 #ifdef SHELL
     extern unsigned long dosh_pid, mail_pid;
 #ifndef VMSVSI
@@ -406,11 +411,19 @@ byebye(void)
     if (mail_pid)
         (void) sys$delprc(&mail_pid, (genericptr_t) 0), mail_pid = 0;
 #endif
+#ifdef FREE_ALL_MEMORY
+    if (progname && !gp.program_state.panicking) {
+        if (gh.hname == progname)
+            gh.hname = (char *) 0;
+        free((genericptr_t) progname), progname = (char *) 0;
+    }
+#endif
 
     /* SIGHUP doesn't seem to do anything on VMS, so we fudge it here... */
-    hup = (void (*)(int) ) signal(SIGHUP, SIG_IGN);
-    if (!gp.program_state.exiting++ && hup != (void (*)(int) ) SIG_DFL
-        && hup != (void (*)(int) ) SIG_IGN) {
+    hup = (void (*)(int)) signal(SIGHUP, SIG_IGN);
+    if (!gp.program_state.exiting++
+        && hup != (void (*)(int)) SIG_DFL
+        && hup != (void (*)(int)) SIG_IGN) {
         (*hup)(SIGHUP);
     }
 
