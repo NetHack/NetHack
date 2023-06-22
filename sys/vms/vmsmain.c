@@ -52,7 +52,7 @@ main(int argc, char *argv[])
 
     atexit(byebye);
     gh.hname = argv[0];
-    gh.hname = vms_basename(gh.hname); /* name used in 'usage' type messages */
+    gh.hname = vms_basename(gh.hname, FALSE); /* used in 'usage' type mesgs */
     gh.hackpid = getpid();
     (void) umask(0);
 
