@@ -42,7 +42,7 @@ $     if f$type(gcc).eqs."STRING" then  gnuc_ = gcc
 $	gnulib = "gnu_cc:[000000]gcclib/Library"    !(not used w/ vaxc)
 $ ! common CC options (/obj=file doesn't work for GCC 1.36, use rename instead)
 $	c_c_  = "/INCLUDE=([-.INCLUDE],[-.LIB.lua''luaver'.SRC])" -
-		+ "/DEFINE=(""LUA_USE_C89"")"
+		+ "/DEFINE=(""LUA_USE_C89"",USE_FCNTL)"
 $       cxx_c_ = "/INCLUDE=([-.INCLUDE],[-.LIB.LUA''luaver'.SRC])"
 $	veryold_vms = f$extract(1,1,f$getsyi("VERSION")).eqs."4" -
 		.and. f$extract(3,3,f$getsyi("VERSION")).lts."6"
