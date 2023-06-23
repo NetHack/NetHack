@@ -1,4 +1,4 @@
-/* NetHack 3.7	recover.c	$NHDT-Date: 1658093138 2022/07/17 21:25:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
+/* NetHack 3.7	recover.c	$NHDT-Date: 1687547437 2023/06/23 19:10:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.33 $ */
 /*	Copyright (c) Janet Walz, 1992.				  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -59,7 +59,7 @@ int
 main(int argc, char *argv[])
 {
     int argno;
-    const char *dir = (char *) 0;
+    const char *dir = (char *) 0, *progname = (char *) 0;
 #ifdef AMIGA
     char *startdir = (char *) 0;
 #endif
@@ -72,14 +72,21 @@ main(int argc, char *argv[])
     if (!dir)
         dir = exepath(argv[0]);
 #endif
-    if (argc == 1 || (argc == 2 && !strcmp(argv[1], "-"))) {
+    if (argc > 0)
+        progname = argv[0];
+    if (!progname || !*progname)
+        progname = "recover";
+#ifdef VMS
+    /*progname = vms_basebame(progname, FALSE);*/ /* needs vmsfiles.obj */
+#endif
+
+    if (argc < 2 || (argc == 2 && !strcmp(argv[1], "-"))) {
         Fprintf(stderr, "Usage: %s [ -d directory ] base1 [ base2 ... ]\n",
-                argv[0]);
+                progname);
 #if defined(WIN32) || defined(MSDOS)
         if (dir) {
-            Fprintf(
-                stderr,
-                "\t(Unless you override it with -d, recover will look \n");
+            Fprintf(stderr,
+                   "\t(Unless you override it with -d, recover will look \n");
             Fprintf(stderr, "\t in the %s directory on your system)\n", dir);
         }
 #endif
