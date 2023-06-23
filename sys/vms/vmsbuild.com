@@ -1,12 +1,8 @@
 $ ! vms/vmsbuild.com -- compile and link NetHack 3.7.*			[pr]
 $	version_number = "3.7.0"
-$ ! $NHDT-Date: 1609347486 2020/12/30 16:58:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.35 $
+$ ! $NHDT-Date: 1687541093 2023/06/23 17:24:53 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $
 $ ! Copyright (c) 2018 by Robert Patrick Rankin
 $ ! NetHack may be freely redistributed.  See license for details.
-$
-$ luaver = "546"
-$ luadotver = "5.4.6"
-$ luaunderver = "5_4_6"
 $ !
 $ ! usage:
 $ !   $ set default [.src]	!or [-.-.src] if starting from [.sys.vms]
@@ -30,6 +26,11 @@ $ !	  to re-link with GNUC library, 'CC' must begin with "G" (or "g").
 $ !	All options are positional; to specify a later one without an earlier
 $ !	  one, use "" in the earlier one's position, such as
 $ !	$ @[-.sys.vms]vmsbuild "" "" "" "" "TTY+CURSES"
+$ !
+$ ! Lua Version
+$ luaver = "546"
+$ luadotver = "5.4.6"
+$ luaunderver = "5_4_6"
 $
 $	  decc_dflt = f$trnlnm("DECC$CC_DEFAULT")
 $	  j = (decc_dflt.nes."") .and. 1
@@ -353,8 +354,6 @@ $!
 $! default to using cppregex
 $ if f$search("regex.c").eqs."" then -
 	copy [-.sys.share]cppregex.cpp []regex.cpp
-$ if f$search("regex.c").eqs."" then -
-	copy [-.sys.share]pmatchregex.c []regex.c
 $! if f$search("random.c").eqs."" then  copy [-.sys.share]random.c []*.*
 $ if f$search("tclib.c") .eqs."" then -
 	copy [-.sys.share]tclib.c  []*.*
