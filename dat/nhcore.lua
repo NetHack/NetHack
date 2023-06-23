@@ -136,5 +136,9 @@ nhcore = {
 
     -- getpos_tip is called the first time the code enters getpos()
     getpos_tip = show_getpos_tip,
+
+    -- enter_tutorial and leave_tutorial
+    enter_tutorial = tutorial_enter,
+    leave_tutorial = tutorial_leave,
 };
 

@@ -85,6 +85,8 @@ static const char *const nhcore_call_names[NUM_NHCORE_CALLS] = {
     "moveloop_turn",
     "game_exit",
     "getpos_tip",
+    "enter_tutorial",
+    "leave_tutorial",
 };
 static boolean nhcore_call_available[NUM_NHCORE_CALLS];
 
@@ -1508,62 +1510,43 @@ nhl_callback(lua_State *L)
 {
     int argc = lua_gettop(L);
     int i;
+    boolean rm;
+    const char *fn, *cb;
 
-    if (argc == 2) {
-        const char *fn = luaL_checkstring(L, -1);
-        const char *cb = luaL_checkstring(L, -2);
-
-        if (!gl.luacore) {
-            nhl_error(L, "nh luacore not inited");
-            /*NOTREACHED*/
-            return 0;
-        }
-
-        for (i = 0; i < NUM_NHCB; i++)
-            if (!strcmp(cb, nhcb_name[i]))
-                break;
-
-        if (i >= NUM_NHCB)
-            return 0;
-
-        nhcb_counts[i]++;
-
-        lua_getglobal(gl.luacore, "nh_callback_set");
-        lua_pushstring(gl.luacore, cb);
-        lua_pushstring(gl.luacore, fn);
-        nhl_pcall(gl.luacore, 2, 0);
-    } else if (argc == 3) {
-        boolean rm = lua_toboolean(L, -1);
-        const char *fn = luaL_checkstring(L, -2);
-        const char *cb = luaL_checkstring(L, -3);
-
-        if (!gl.luacore) {
-            nhl_error(L, "nh luacore not inited");
-            /*NOTREACHED*/
-            return 0;
-        }
-
-        for (i = 0; i < NUM_NHCB; i++)
-            if (!strcmp(cb, nhcb_name[i]))
-                break;
-
-        if (i >= NUM_NHCB)
-            return 0;
-
-        if (rm) {
-            nhcb_counts[i]--;
-            if (nhcb_counts[i] < 0)
-                impossible("nh.callback counts are wrong");
-        } else {
-            nhcb_counts[i]++;
-        }
-
-        lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
-        lua_pushstring(gl.luacore, cb);
-        lua_pushstring(gl.luacore, fn);
-        nhl_pcall(gl.luacore, 2, 0);
+    if (!gl.luacore) {
+        nhl_error(L, "nh luacore not inited");
+        /*NOTREACHED*/
+        return 0;
     }
 
+    if (argc == 2) {
+        rm = FALSE;
+        fn = luaL_checkstring(L, -1);
+        cb = luaL_checkstring(L, -2);
+    } else if (argc == 3) {
+        rm = lua_toboolean(L, -1);
+        fn = luaL_checkstring(L, -2);
+        cb = luaL_checkstring(L, -3);
+    }
+
+    for (i = 0; i < NUM_NHCB; i++)
+        if (!strcmp(cb, nhcb_name[i]))
+            break;
+    if (i >= NUM_NHCB)
+        return 0;
+
+    if (rm) {
+        nhcb_counts[i]--;
+        if (nhcb_counts[i] < 0)
+            impossible("nh.callback counts are wrong");
+    } else {
+        nhcb_counts[i]++;
+    }
+
+    lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
+    lua_pushstring(gl.luacore, cb);
+    lua_pushstring(gl.luacore, fn);
+    nhl_pcall(gl.luacore, 2, 0);
     return 0;
 }
 
@@ -1637,13 +1620,13 @@ RESTORE_WARNING_UNREACHABLE_CODE
 void
 tutorial(boolean entering)
 {
-    lua_State *L = gl.luacore;
+    l_nhcore_call(entering ? NHCORE_ENTER_TUTORIAL : NHCORE_LEAVE_TUTORIAL);
 
-    /* pass FALSE when entering, to save state; pass TRUE when leaving,
-       to restore state */
-    lua_pushboolean(L, !entering);
-    (void) nhl_gamestate(L);
-    lua_pop(L, 1);
+    if (!entering) { /* after leaving, can't go back */
+        nhcore_call_available[NHCORE_ENTER_TUTORIAL]
+            = nhcore_call_available[NHCORE_LEAVE_TUTORIAL]
+                = FALSE;
+    }
 }
 
 static const struct luaL_Reg nhl_functions[] = {
@@ -1894,7 +1877,7 @@ nhl_pcall(lua_State *L, int nargs, int nresults)
 
     lua_pushcfunction(L, traceback_handler);
     lua_insert(L, 1);
-    (void)lua_getallocf(L, (void **)&nud);
+    (void) lua_getallocf(L, (void **) &nud);
 #ifdef NHL_SANDBOX
     if (nud && (nud->steps || nud->perpcall)) {
         if (nud->perpcall)

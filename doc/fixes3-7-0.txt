@@ -1618,6 +1618,8 @@ when a magic whistle moved a hidden pet it brought that out of hiding and
 entering the tutorial stashed hero's equipment for eventual return to normal
 	play but going down stairs to the second tutorial level returned it
 	too soon and allowed any items gathered on the first level to be kept
+entering the tutorial disables the Save command; exiting it is supposed to
+	re-enable that but the change to fix the second level broke that
 entering the tutorial and then returning to play made the tutorial branch be
 	eligible for a portal destination via wizard's Eye of the Aethiopica
 'hard helmet' was based on being metallic so overlooked crystal helmet

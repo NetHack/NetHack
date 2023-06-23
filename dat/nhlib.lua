@@ -195,17 +195,23 @@ end
 
 function tutorial_enter()
    -- nh.pline("TUT:enter");
+
+   -- add the tutorial branch callbacks
+   nh.callback("cmd_before", "tutorial_cmd_before");
+   nh.callback("end_turn", "tutorial_turn");
+
+   -- save state for later restore
    nh.gamestate();
 end
 
 function tutorial_leave()
    -- nh.pline("TUT:leave");
 
-   -- remove the tutorial level callbacks
+   -- remove the tutorial branch callbacks
    nh.callback("cmd_before", "tutorial_cmd_before", true);
-   nh.callback("level_enter", "tutorial_enter", true);
-   nh.callback("level_leave", "tutorial_leave", true);
    nh.callback("end_turn", "tutorial_turn", true);
+
+   -- restore state for regular play
    nh.gamestate(true);
 end
 
