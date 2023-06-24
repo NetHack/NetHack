@@ -2112,7 +2112,9 @@ reading a blessed scroll of light has a chance to improve bless/curse state
 	of wielded Sunsword or worn gold dragon scales/mail similar to dipping
 	those into holy water; cursed scroll has chance to worsen the state
 added a chronicle of major events, and optional live logging of those
-paranoid:swim to prevent accidental dunking into dangerous liquids
+paranoid_confirm:swim to prevent accidental dunking into dangerous liquids;
+        joins paranoid_confirm:pray as the default setting
+paranoid_confirm:Autoall to confirm picking 'A' in menustyle:Full filter menu
 looking at a monster will indicate whether it is asleep, and waking up a
 	monster yields a message
 extend farlook's "<mon>, asleep" to "<mon>, can't move (paralyzed or sleeping
