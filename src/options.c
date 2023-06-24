@@ -148,8 +148,9 @@ static const struct paranoia_opts {
     int synMinLen;
     const char *explain; /* for interactive menu */
 } paranoia[] = {
-    /* there are some initial-letter conflicts: "a"ttack vs "a"ll, "attack"
-       takes precedence and "all" isn't present in the interactive menu,
+    /* there are some initial-letter conflicts: "a"ttack vs "A"utoall vs
+       "a"ll, "attack" takes precedence and "all" isn't present in the
+       interactive menu with "Autoall" capitalized there,
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
        is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
@@ -173,12 +174,18 @@ static const struct paranoia_opts {
       "yes vs y to continue eating after first bite when satiated" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
+    /* extra y/n questions rather than changing y/n to yes/n[o] */
     { PARANOID_PRAY, "pray", 1, 0, 0,
-      "y to pray (supersedes old \"prayconfirm\" option)" },
-    { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
-      "always pick from inventory for Remove and Takeoff" },
+      "y required to pray (supersedes old \"prayconfirm\" option)" },
     { PARANOID_SWIM, "swim", 1, 0, 0,
-      "avoid walking into lava or water" },
+      /* 'm' movement prefix overrides this prompt */
+      "y required to deliberately walk into lava or water" },
+    { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
+      "y required to pick filter choice 'A' for menustyle:Full" },
+    /* not a yes/n[o] vs y/n change nor a y/n addition */
+    { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
+      /* normally when there is only 1 candidate it's chosen automatically */
+      "always pick from inventory for Remove and Takeoff" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
@@ -6613,7 +6620,7 @@ initoptions_init(void)
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
-    flags.paranoia_bits = PARANOID_PRAY|PARANOID_SWIM;
+    flags.paranoia_bits = PARANOID_PRAY | PARANOID_SWIM;
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;

@@ -115,6 +115,8 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
 }
 
 /*
+ * For menustyle:Traditional and menustyle:Combination.
+ *
  * Suppose some '?' and '!' objects are present, but '/' objects aren't:
  *      "a" picks all items without further prompting;
  *      "A" steps through all items, asking one by one;
@@ -125,11 +127,22 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
  *          (bug fix:  3.1.0 thru 3.1.3 treated it as "a");
  *      "?/a" or "a?/" or "/a?",&c picks all '?' even though no '/'
  *          (ie, treated as if it had just been "?a").
+ *
+ * Note: the behavior and meaning of 'a' vs 'A' is effectively reversed
+ * when using menustyle:Full.  For Traditional, the choice is based on
+ * ease of typing (using 'a' is much more common than 'A'); for Full,
+ * it was changed to enhance menu entry ordering ('A' stands out, but
+ * some players complain that it is too easy to choose accidentally).
  */
 static boolean
-query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
-              const char *action, struct obj *objs, boolean here,
-              int *menu_on_demand)
+query_classes(
+    char oclasses[], /* selected classes */
+    boolean *one_at_a_time, /* to tell caller that user picked 'A' */
+    boolean *everything, /* to tell caller that user picked 'a' */
+    const char *action, /* verb for what activity needs objects */
+    struct obj *objs, /* invent or container->cobj or level.objects[x][y] */
+    boolean here, /* True: traverse by obj->nexthere; False: by obj->nobj */
+    int *menu_on_demand) /* to tell caller that user picked 'm' */
 {
     char ilets[36], inbuf[BUFSZ] = DUMMY; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
@@ -1133,8 +1146,11 @@ query_objlist(const char *qstr,        /* query string */
 }
 
 /*
+ * For menustyle:Full.
+ *
  * allow menu-based category (class) selection (for Drop,take off etc.)
  *
+ * If ParanoidAutoAll, requires confirmation when 'A' has been picked.
  */
 int
 query_category(
@@ -1154,7 +1170,7 @@ query_category(
     int ccount;
     boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
     boolean do_unpaid = FALSE, do_blessed = FALSE, do_cursed = FALSE,
-            do_uncursed = FALSE, do_buc_unknown = FALSE;
+            do_uncursed = FALSE, do_buc_unknown = FALSE, verify_All = FALSE;
     int num_buc_types = 0, num_justpicked = 0, clr = 0;
 
     *pick_list = (menu_item *) 0;
@@ -1220,7 +1236,9 @@ query_category(
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
                                        : "Auto-select every relevant item",
                  MENU_ITEMFLAGS_SKIPINVERT);
+        verify_All = (how == PICK_ANY) && ParanoidAutoAll;
 
+        /* blank separator */
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
                  ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
@@ -1337,6 +1355,18 @@ query_category(
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+    if (n > 0 && verify_All) {
+        int i;
+
+        for (i = 0; i < n; ++i)
+            if (pick_list[i]->item.a_int == 'A') {
+                if (y_n("Really autoselect All?") != 'y') {
+                    n = 0;
+                    free((genericptr_t) *pick_list);
+                }
+                break; /* goto query_done; */
+            }
+    }
  query_done:
     destroy_nhwindow(win);
     if (n < 0)
