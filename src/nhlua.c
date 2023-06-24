@@ -1519,34 +1519,35 @@ nhl_callback(lua_State *L)
         return 0;
     }
 
-    if (argc == 2) {
-        rm = FALSE;
-        fn = luaL_checkstring(L, -1);
-        cb = luaL_checkstring(L, -2);
-    } else if (argc == 3) {
-        rm = lua_toboolean(L, -1);
-        fn = luaL_checkstring(L, -2);
-        cb = luaL_checkstring(L, -3);
+    if (argc == 2 || argc == 3) {
+        if (argc == 2) {
+            rm = FALSE;
+            fn = luaL_checkstring(L, -1);
+            cb = luaL_checkstring(L, -2);
+        } else {
+            rm = lua_toboolean(L, -1);
+            fn = luaL_checkstring(L, -2);
+            cb = luaL_checkstring(L, -3);
+        }
+        for (i = 0; i < NUM_NHCB; i++)
+            if (!strcmp(cb, nhcb_name[i]))
+                break;
+        if (i >= NUM_NHCB)
+            return 0;
+
+        if (rm) {
+            nhcb_counts[i]--;
+            if (nhcb_counts[i] < 0)
+                impossible("nh.callback counts are wrong");
+        } else {
+            nhcb_counts[i]++;
+        }
+
+        lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
+        lua_pushstring(gl.luacore, cb);
+        lua_pushstring(gl.luacore, fn);
+        nhl_pcall(gl.luacore, 2, 0);
     }
-
-    for (i = 0; i < NUM_NHCB; i++)
-        if (!strcmp(cb, nhcb_name[i]))
-            break;
-    if (i >= NUM_NHCB)
-        return 0;
-
-    if (rm) {
-        nhcb_counts[i]--;
-        if (nhcb_counts[i] < 0)
-            impossible("nh.callback counts are wrong");
-    } else {
-        nhcb_counts[i]++;
-    }
-
-    lua_getglobal(gl.luacore, rm ? "nh_callback_rm" : "nh_callback_set");
-    lua_pushstring(gl.luacore, cb);
-    lua_pushstring(gl.luacore, fn);
-    nhl_pcall(gl.luacore, 2, 0);
     return 0;
 }
 
