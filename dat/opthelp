@@ -211,9 +211,10 @@ packorder     a list of default symbols for kinds of       [")[%?+!=/(*`0_]
               some other things) gets shown if the 'sortpack' option is on
               (If you specify only some kinds of items, the others from the
               default order will be appended to the end.)
-paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
+paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
               of situations where alternate prompting is desired
-              Confirm -- when requiring "yes", also require "no" to reject
+              Confirm -- when requiring "yes", also require "no" to reject;
+                      also requires yes rather than y for pray, Autoall
               quit    -- yes vs y to confirm quitting or to enter explore mode
               die     -- yes vs y to confirm dying (for explore or debug mode)
               bones   -- yes vs y to confirm saving bones data in debug mode
@@ -223,10 +224,10 @@ paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
               Were-change -- yes vs y to confirm changing form due to
                       lycanthropy when hero has polymorph control;
               pray    -- y to confirm an attempt to pray; on by default
-              swim    -- y to confirm an attempt to move into water or lava
-                      when hero can see it and isn't impaired; on by default
+              swim    -- require m prefix to move into water or lava when
+                      hero has seen it and isn't impaired; on by default;
               AutoAll -- y to confirm if using menustyle:Full and choice 'A'
-                      in the object class filtering menu is selected
+                      in the object class filtering menu is selected;
               Remove  -- always pick from inventory for 'R' and 'T' even when
                       wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumbrance    [S]

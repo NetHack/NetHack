@@ -1361,7 +1361,11 @@ query_category(
 
         for (i = 0; i < n; ++i)
             if ((*pick_list)[i].item.a_int == 'A') {
-                if (y_n("Really autoselect All?") != 'y') {
+                /* ParanoidAutoAll is set (otherwise verify_All is false);
+                   if ParanoidConfirm is also set, require "yes" rather than
+                   just "y" to accept (and "no" rather than "n" to decline) */
+                if (paranoid_query(ParanoidConfirm,
+                                   "Really autoselect All?")) {
                     /* answer is "no", so take 'A' out of the list;
                        if it is the only entry, we'll return nothing,
                        otherwise go on to next menu without autoselect */

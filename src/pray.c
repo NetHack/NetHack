@@ -2057,14 +2057,24 @@ pray_revive(void)
 int
 dopray(void)
 {
+    boolean ok;
+
     /*
      * If ParanoidPray is set, confirm prayer to avoid accidental slips
-     * of Alt+p.
-     * YN(): don't save response in do-again buffer since if it is 'y',
-     * ^A would bypass confirmation, or if 'n', ^A would be pointless.
+     * of Alt+p.  If ParanoidConfirm is also set, require "yes" rather
+     * than just "y" (will also require "no" to decline).
      */
-    if (ParanoidPray && YN("Are you sure you want to pray?") != 'y')
-        return ECMD_OK;
+    if (ParanoidPray) {
+        ok = paranoid_query(ParanoidConfirm, "Are you sure you want to pray?");
+
+        /* clear command recall buffer; otherwise ^A to repeat p(ray) would
+           do so without confirmation (if 'ok') or do nothing (if '!ok') */
+        cmdq_clear(CQ_REPEAT);
+        cmdq_add_ec(CQ_REPEAT, dopray);
+
+        if (!ok) /* declined the "are you sure?" confirmation */
+            return ECMD_OK;
+    }
 
     if (!u.uconduct.gnostic++)
         /* breaking conduct should probably occur in can_pray() at
@@ -2085,7 +2095,16 @@ dopray(void)
            from the do-again buffer, so need to suppress this response too;
            otherwise subsequent ^A would use this answer for "are you sure?"
            and bypass confirmation */
-        if ((ParanoidPray ? YN(forcesuccess) : y_n(forcesuccess)) == 'y') {
+        if (ParanoidPray) {
+            boolean save_doagain = gi.in_doagain;
+
+            gi.in_doagain = FALSE;
+            ok = (YN(forcesuccess) == 'y');
+            gi.in_doagain = save_doagain;
+        } else {
+            ok = (y_n(forcesuccess) == 'y');
+        }
+        if (ok) {
             u.ublesscnt = 0;
             if (u.uluck < 0)
                 u.uluck = 0;
