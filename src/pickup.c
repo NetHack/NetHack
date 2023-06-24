@@ -1355,14 +1355,20 @@ query_category(
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+    /* handle ParanoidAutoAll by confirming 'A' choice if present */
     if (n > 0 && verify_All) {
-        int i;
+        int i, j;
 
         for (i = 0; i < n; ++i)
-            if (pick_list[i]->item.a_int == 'A') {
+            if ((*pick_list)[i].item.a_int == 'A') {
                 if (y_n("Really autoselect All?") != 'y') {
-                    n = 0;
-                    free((genericptr_t) *pick_list);
+                    /* answer is "no", so take 'A' out of the list;
+                       if it is the only entry, we'll return nothing,
+                       otherwise go on to next menu without autoselect */
+                    for (j = i + 1; j < n; ++j)
+                        (*pick_list)[j - 1] = (*pick_list)[j];
+                    if (!--n)
+                        free((genericptr_t) *pick_list), *pick_list = 0;
                 }
                 break; /* goto query_done; */
             }
@@ -1370,7 +1376,7 @@ query_category(
  query_done:
     destroy_nhwindow(win);
     if (n < 0)
-        n = 0; /* caller's don't expect -1 */
+        n = 0; /* callers don't expect -1 */
     return n;
 }
 
