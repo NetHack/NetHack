@@ -226,9 +226,9 @@ REGEXOBJ ?= $(TARGETPFX)posixregex.o
 #
 # files for a straight tty port using no native windowing system
 WINTTYSRC = ../win/tty/getline.c ../win/tty/termcap.c ../win/tty/topl.c \
-	../win/tty/wintty.c
+    ../win/tty/wintty.c ../win/share/colors.c
 WINTTYOBJ = $(TARGETPFX)getline.o $(TARGETPFX)termcap.o $(TARGETPFX)topl.o \
-	$(TARGETPFX)wintty.o
+    $(TARGETPFX)wintty.o $(TARGETPFX)colors.o
 #
 # Files for curses interface
 WINCURSESSRC = ../win/curses/cursmain.c ../win/curses/curswins.c \
@@ -884,6 +884,8 @@ $(TARGETPFX)cursmesg.o: ../win/curses/cursmesg.c $(HACK_H) \
 $(TARGETPFX)cursinvt.o: ../win/curses/cursinvt.c $(HACK_H) \
 		../include/wincurs.h ../win/curses/cursinvt.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/curses/cursinvt.c
+$(TARGETPFX)colors.o: ../win/share/colors.c $(HACK_H)
+	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/share/colors.c
 $(TARGETPFX)Window.o: ../win/X11/Window.c ../include/xwindowp.h \
 		../include/xwindow.h $(CONFIG_H) ../include/lint.h \
 		../include/winX.h ../include/color.h ../include/wintype.h

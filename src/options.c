@@ -7272,8 +7272,9 @@ basic_menu_colors(boolean load_colors)
                 if (!colornames[i].name) /* first alias entry has no name */
                     break;
                 c = colornames[i].color;
-                if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
-                    continue; /* skip these */
+                if (!iflags.wc2_black)
+                    if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
+                        continue; /* skip these */
                 Sprintf(cnm, patternfmt, colornames[i].name);
                 add_menu_coloring_parsed(cnm, c, ATR_NONE);
             }
@@ -9745,12 +9746,14 @@ static struct wc_Opt wc_options[] = {
     { (char *) 0, 0L }
 };
 static struct wc_Opt wc2_options[] = {
+    { "black", WC2_BLACK },
     { "fullscreen", WC2_FULLSCREEN },
     { "guicolor", WC2_GUICOLOR },
     { "hilite_status", WC2_HILITE_STATUS },
     { "hitpointbar", WC2_HITPOINTBAR },
     { "menu_shift", WC2_MENU_SHIFT },
     { "petattr", WC2_PETATTR },
+    { "setpalette", WC2_SETPALETTE },
     { "softkeyboard", WC2_SOFTKEYBOARD },
     /* name shown in 'O' menu is different */
     { "status hilite rules", WC2_HILITE_STATUS },
@@ -9759,7 +9762,6 @@ static struct wc_Opt wc2_options[] = {
     { "statuslines", WC2_STATUSLINES },
     { "term_cols", WC2_TERM_SIZE },
     { "term_rows", WC2_TERM_SIZE },
-    { "black", WC2_BLACK },
     { "windowborders", WC2_WINDOWBORDERS },
     { "wraptext", WC2_WRAPTEXT },
     { (char *) 0, 0L }

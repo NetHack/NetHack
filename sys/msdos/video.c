@@ -711,7 +711,7 @@ HideCursor(void)
  * CLR_MAGENTA          5
  * CLR_CYAN             6
  * CLR_GRAY             7       low-intensity white
- * CLR_BLACK            8
+ * CLR_DARKGRAY         8
  * CLR_ORANGE           9
  * CLR_BRIGHT_GREEN     10
  * CLR_YELLOW           11
@@ -719,7 +719,8 @@ HideCursor(void)
  * CLR_BRIGHT_MAGENTA   13
  * CLR_BRIGHT_CYAN      14
  * CLR_WHITE            15
- * CLR_MAX              16
+ * CLR_BLACK            16
+ * CLR_MAX              17
  * BRIGHT               8
  */
 
@@ -751,6 +752,8 @@ init_ttycolor(void)
     ttycolors[CLR_WHITE] = M_GRAY; /*  mapped to white */
     ttycolors[CLR_GRAY] = M_GRAY;  /*  mapped to white */
 #endif
+    ttycolors[NO_COLOR] = M_WHITE;
+    ttycolors[CLR_DARKGRAY] = M_GRAY;
 
 #ifdef VIDEOSHADES
     if (!colorflag) {
@@ -761,7 +764,6 @@ init_ttycolor(void)
         ttycolors[CLR_BLUE] = M_BLUE;
         ttycolors[CLR_MAGENTA] = M_MAGENTA;
         ttycolors[CLR_CYAN] = M_CYAN;
-        ttycolors[BRIGHT] = M_WHITE;
         ttycolors[CLR_ORANGE] = M_ORANGE;
         ttycolors[CLR_BRIGHT_GREEN] = M_BRIGHTGREEN;
         ttycolors[CLR_YELLOW] = M_YELLOW;

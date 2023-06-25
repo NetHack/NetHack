@@ -47,7 +47,7 @@ GAMEDIR = ../binary
 #
 # windsound uses built-in Microsoft API's, no 3rd party download is required.
 
-SOUND_LIBRARIES = windsound
+#SOUND_LIBRARIES = windsound
 
 #
 #---------------------------------------------------------------
@@ -91,7 +91,7 @@ GCC_EXTRA_WARNINGS = N
 #
 #==============================================================================
 
-SKIP_NETHACKW = N
+SKIP_NETHACKW = Y
 USE_LUADLL = Y
 WANT_LUAC = N
 
@@ -1060,7 +1060,7 @@ CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CO
 
 ONH = $(O)nethack
 
-NHONLY = consoletty.o getline.o topl.o wintty.o colors.o
+NHONLY = consoletty.o getline.o topl.o wintty.o
 ifeq "$(ADD_CURSES)" "Y"
 NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
 CFLAGSNH += $(NHCURSESFLAGS)

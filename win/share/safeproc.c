@@ -67,7 +67,7 @@
 
 struct window_procs safe_procs = {
     WPID(safestartup), 0L, 0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     safe_init_nhwindows, safe_player_selection, safe_askname,
     safe_get_nh_event,
     safe_exit_nhwindows, safe_suspend_nhwindows, safe_resume_nhwindows,

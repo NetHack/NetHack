@@ -194,6 +194,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
            Off, No, No, No, NoAlias, (boolean *) 0, Term_False,
            (char *)0)
 #endif
+    NHOPTB(black, Advanced, 0, opt_out, set_in_config,
+           Off, Yes, No, No, NoAlias, &iflags.wc2_black, Term_False,
+           "use deep black and darkgray, or blue instead on some systems")
     NHOPTB(blind, Advanced, 0, opt_in, set_in_config,
            Off, Yes, No, No, "permablind", &u.uroleplay.blind, Term_False,
            "your character is permanently blind")
@@ -588,6 +591,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(selectsaved, Advanced, 0, opt_out, set_in_config,
            On, Yes, No, No, NoAlias, &iflags.wc2_selectsaved, Term_False,
            (char *)0)
+    NHOPTB(setpalette, Advanced, 0, opt_out, set_in_config,
+           Off, Yes, No, No, NoAlias, &iflags.wc2_setpalette, Term_False,
+           "let nethack set the color palette")
     NHOPTB(showexp, Status, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.showexp, Term_False,
            "show experience points in status line")
@@ -723,9 +729,6 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(tutorial, Advanced, 0, opt_out, set_in_config,
            On, Yes, No, No, NoAlias, &flags.tutorial, Term_False,
            "ask if you want the tutorial")
-    NHOPTB(black, Advanced, 0, opt_out, set_in_config,
-           Off, Yes, No, No, NoAlias, &iflags.wc2_black, Term_False,
-           "black and darkgray, or blue. darkgray by default")
     NHOPTB(use_inverse, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.wc_inverse, Term_False,
            "display detected monsters in inverse")

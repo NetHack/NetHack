@@ -883,12 +883,11 @@ const struct {
 static void
 init_hilite(void)
 {
-    int c, colors;
-    char *setf, *scratch;
-
-    colors = tgetnum(nhStr("Co"));
-    iflags.colorcount = colors;
+    char *setf;
     int md_len = 0;
+    int c, colors = tgetnum(nhStr("Co"));
+    iflags.colorcount = colors;
+    hilites[NO_COLOR] = nullstr;
 
     if (colors < 8 || (MD == NULL) || (strlen(MD) == 0)
         || ((setf = tgetstr(nhStr("AF"), (char **) 0)) == (char *) 0
@@ -897,31 +896,16 @@ init_hilite(void)
          * It's arbitrary to collapse all colors except gray
          * together, but that's what the previous code did.
          */
-        hilites[CLR_BLACK] = nh_HI;
-        hilites[CLR_RED] = nh_HI;
-        hilites[CLR_GREEN] = nh_HI;
-        hilites[CLR_BROWN] = nh_HI;
-        hilites[CLR_BLUE] = nh_HI;
-        hilites[CLR_MAGENTA] = nh_HI;
-        hilites[CLR_CYAN] = nh_HI;
-        hilites[CLR_GRAY] = nullstr;
-        hilites[NO_COLOR] = nullstr;
-        hilites[CLR_ORANGE] = nh_HI;
-        hilites[CLR_BRIGHT_GREEN] = nh_HI;
-        hilites[CLR_YELLOW] = nh_HI;
-        hilites[CLR_BRIGHT_BLUE] = nh_HI;
-        hilites[CLR_BRIGHT_MAGENTA] = nh_HI;
-        hilites[CLR_BRIGHT_CYAN] = nh_HI;
-        hilites[CLR_WHITE] = nh_HI;
+        for(c = 1; c < CLR_MAX; c++)
+            hilites[c] = nh_HI;
         return;
     }
 
+    char *scratch, *work;
     c = SIZE(ti_map);
 
     if (colors >= 16) {
         while (c--) {
-            char *work;
-
             /* system colors */
             scratch = tparm(setf, ti_map[c].nh_color);
             work = (char *) alloc(strlen(scratch) + 1);
@@ -939,8 +923,6 @@ init_hilite(void)
         md_len = strlen(MD);
 
         while (c--) {
-            char *work;
-
             scratch = tparm(setf, ti_map[c].ti_color);
             work = (char *) alloc(strlen(scratch) + md_len + 1);
             Strcpy(work, MD);
@@ -951,7 +933,8 @@ init_hilite(void)
         }
     }
 
-    hilites[NO_COLOR] = nullstr;
+    if (iflags.wc2_setpalette)
+        init_default_palette();
 
     if (iflags.wc2_black)
         if (colors > 16) {
@@ -959,13 +942,16 @@ init_hilite(void)
             scratch = tparm(setf, COLOR_BLACK);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_BLACK], scratch);
-            windowprocs.has_color[CLR_DARKGRAY] = true;
+
             scratch = tparm(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_DARKGRAY] = (char *) alloc(strlen(scratch) + 1);
             Strcpy(hilites[CLR_DARKGRAY], scratch);
-        } else
+        } else {
             hilites[CLR_BLACK] = hilites[CLR_BLUE];
-    else
+            hilites[CLR_DARKGRAY] = hilites[NO_COLOR];
+        }
+    else {
+        hilites[CLR_DARKGRAY] = hilites[NO_COLOR];
         if (colors >= 16) {
             scratch = tparm(setf, COLOR_BLACK|BRIGHT);
             hilites[CLR_BLACK] = (char *) alloc(strlen(scratch) + 1);
@@ -981,6 +967,7 @@ init_hilite(void)
             Strcpy(hilites[CLR_BLACK], MD);
             Strcat(hilites[CLR_BLACK], scratch);
         }
+    }
 }
 
 static void
@@ -992,18 +979,19 @@ kill_hilite(void)
     if (hilites[CLR_BLACK] == nh_HI)
         return;
 
-    if (hilites[CLR_BLACK])
-        if (hilites[CLR_BLACK] != hilites[CLR_BLUE]) {
+    if (hilites[CLR_BLACK]) {
+        if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
             free(hilites[CLR_BLACK]);
-            hilites[CLR_BLACK] = 0;
-        }
-
-    if (hilites[CLR_DARKGRAY]) {
-        free(hilites[CLR_DARKGRAY]);
-        hilites[CLR_DARKGRAY] = 0;
+        hilites[CLR_BLACK] = 0;
     }
 
+    if (hilites[CLR_DARKGRAY]) {
+        if (hilites[CLR_DARKGRAY] != hilites[NO_COLOR])
+            free(hilites[CLR_DARKGRAY]);
+        hilites[CLR_DARKGRAY] = 0;
+    }
     /* NO_COLOR is static 'nullstr', do not free */
+
     for (c = 1; c < 8; c++) {
         if (hilites[c]) {
             free(hilites[c]);
@@ -1014,8 +1002,10 @@ kill_hilite(void)
             hilites[c|BRIGHT] = 0;
         }
     }
-}
 
+    if (iflags.wc2_setpalette)
+        reset_palette();
+}
 #else /* UNIX && TERMINFO */
 
 #ifndef TOS
@@ -1098,7 +1088,7 @@ init_hilite(void)
      * the dim ones look OK.
      */
     hilites[0] = NOCOL;
-    for (c = 1; c < SIZE(hilites); c++) {
+    for (c = 1; c < 16; c++) {
         char *foo;
         foo = (char *) alloc(sizeof "\033b0");
         if (tos_numcolors > 4)
@@ -1107,6 +1097,7 @@ init_hilite(void)
             Strcpy(foo, "\033b0");
         hilites[c] = foo;
     }
+    hilites[CLR_BLACK] = hilites[CLR_DARKGRAY];
 
     if (tos_numcolors == 4) {
         TI = nhStr("\033b0\033c3\033E\033e");
@@ -1121,8 +1112,8 @@ init_hilite(void)
         TI = nhStr("\033b0\033c\017\033E\033e");
         TE = nhStr("\033b\017\033c0\033J");
         nh_HE = COLHE;
-        hilites[CLR_WHITE] = hilites[CLR_BLACK] = NOCOL;
-        hilites[NO_COLOR] = hilites[CLR_GRAY];
+//      hilites[CLR_WHITE] = hilites[CLR_BLACK] = NOCOL;
+//      hilites[NO_COLOR] = hilites[CLR_GRAY];
     }
 
 #else /* TOS */
@@ -1150,11 +1141,13 @@ init_hilite(void)
                 Sprintf(hilites[c], "\033[%d", !!(c & BRIGHT));
                 if ((c | BRIGHT) != (foreg | BRIGHT))
                     Sprintf(eos(hilites[c]), ";3%d", c & ~BRIGHT);
-                if (backg != CLR_BLACK)
+                if (backg != 0) // !black
                     Sprintf(eos(hilites[c]), ";4%d", backg & ~BRIGHT);
                 Strcat(hilites[c], "m");
             }
         }
+
+    hilites[CLR_BLACK] = hilites[CLR_DARKGRAY];
 
 #ifdef MICRO
     /* brighten low-visibility colors */
@@ -1177,6 +1170,11 @@ kill_hilite(void)
         if (hilites[c | BRIGHT] && hilites[c | BRIGHT] != nh_HI)
             free((genericptr_t) hilites[c | BRIGHT]), hilites[c | BRIGHT] = 0;
     }
+    if (hilites[CLR_BLACK]) {
+        if (hilites[CLR_BLACK] != hilites[CLR_DARKGRAY])
+            free((genericptr_t) hilites[CLR_BLACK]);
+        hilites[CLR_BLACK] = 0;
+    }
 #endif
     return;
 }
@@ -1192,25 +1190,28 @@ init_hilite(void)
     hilites[NO_COLOR] = nullstr;
 
     for (c = 1; c < 8; c++) {
+        hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
+        Sprintf(hilites[c], "\033[0;3%dm", c);
+
         hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
         Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
-#ifdef MICRO
-        if (c == CLR_BLUE) {
-            hilites[CLR_BLUE] = hilites[CLR_BLUE | BRIGHT];
-        } else
-#endif
-        {
-            hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
-            Sprintf(hilites[c], "\033[0;3%dm", c);
-        }
     }
+    hilites[CLR_DARKGRAY] = (char *) alloc(sizeof "\033[1;30m");
+    Sprintf(hilites[CLR_DARKGRAY], "\033[1;30m");
 
-    if (iflags.wc2_black)
+    if (iflags.wc2_setpalette)
+        init_default_palette();
+
+    if (iflags.wc2_black) {
+#ifdef MICRO
         hilites[CLR_BLACK] = hilites[CLR_BLUE];
-    else {
-        /* bright black */
-        hilites[CLR_BLACK] = (char *) alloc(sizeof "\033[1;30m");
-        Sprintf(hilites[CLR_BLACK], "\033[1;30m");
+        hilites[CLR_BLUE] = hilites[CLR_BLUE | BRIGHT];
+#else
+        hilites[CLR_BLACK] = (char *) alloc(sizeof "\033[30m");
+        Sprintf(hilites[CLR_BLACK], "\033[30m");
+#endif
+    } else {
+        hilites[CLR_BLACK] = hilites[CLR_DARKGRAY];
     }
 }
 
@@ -1220,10 +1221,6 @@ kill_hilite(void)
     register int c;
 
     for (c = 1; c < 8; c++) {
-        if (hilites[c] == nullstr)
-            hilites[c] = 0;
-        if (hilites[c | BRIGHT] == nullstr)
-            hilites[c] = 0;
         if (hilites[c | BRIGHT] == hilites[c]) /* for blue */
             hilites[c | BRIGHT] = 0;
         if (hilites[c] && hilites[c] != nh_HI)
@@ -1231,12 +1228,20 @@ kill_hilite(void)
         if (hilites[c | BRIGHT] && hilites[c | BRIGHT] != nh_HI)
             free((genericptr_t) hilites[c | BRIGHT]), hilites[c | BRIGHT] = 0;
     }
-
+    if (hilites[CLR_DARKGRAY]) {
+        free((genericptr_t) hilites[CLR_DARKGRAY]);
+        hilites[CLR_DARKGRAY] = 0;
+    }
     if (hilites[CLR_BLACK]) {
-        if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
-            free(hilites[CLR_BLACK]);
+        if (hilites[CLR_BLACK] != hilites[CLR_BLUE] &&
+            hilites[CLR_BLACK] != hilites[CLR_DARKGRAY])
+            free((genericptr_t) hilites[CLR_BLACK]);
         hilites[CLR_BLACK] = 0;
     }
+    hilites[NO_COLOR] = 0;
+
+    if (iflags.wc2_setpalette)
+        reset_palette();
 }
 #endif /* TEXTCOLOR && !TERMLIB && ANSI_DEFAULT */
 

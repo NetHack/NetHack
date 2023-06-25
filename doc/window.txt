@@ -569,7 +569,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    +------+----------------------+--------------------+
                    |   7  |   CLR_GRAY           |                    |
                    +------+----------------------+--------------------+
-                   |   8  |   CLR_BLACK          |                    |
+                   |   8  |   CLR_DARKGRAY       |                    |
                    +------+----------------------+--------------------+
                    |   9  |   CLR_ORANGE         |                    |
                    +------+----------------------+--------------------+
@@ -585,7 +585,7 @@ status_update(int fldindex, genericptr_t ptr, int chg, int percentage, \
                    +------+----------------------+--------------------+
                    |  15  |   CLR_WHITE          |                    |
                    +------+----------------------+--------------------+
-                   |  16  |   CLR_DARKGRAY       |                    |
+                   |  16  |   CLR_BLACK          |                    |
                    +------+----------------------+--------------------+
                    |  17  |   HL_ATTCLR_DIM      |                    | CLR_MAX
                    +------+----------------------+--------------------+
@@ -852,6 +852,7 @@ to support:
   |                    |                    | iflags field       | data   |
   | player option      | bit in wincap mask |   for value        | type   |
   |--------------------+--------------------+--------------------+--------+
+  |  black             | WC2_BLACK          | wc2_black          |boolean |
   |  fullscreen        | WC2_FULLSCREEN     | wc2_fullscreen     |boolean |
   |  guicolor          | WC2_GUICOLOR       | wc2_guicolor       |boolean |
   |  hilite_status     | WC2_HILITE_STATUS  | wc2_hilite_status  |strings |
@@ -860,11 +861,11 @@ to support:
   |  menu_shift_right  | WC2_MENU_SHIFT     |  n/a               |char    |
   |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
+  |  setpalette        | WC2_SETPALETTE     | wc2_setpalette     |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
   |  statuslines       | WC2_STATUSLINES    | wc2_statuslines    |int     |
   |  term_cols         | WC2_TERM_SIZE      | wc2_term_cols      |int     |
   |  term_rows         | WC2_TERM_SIZE      | wc2_term_rows      |int     |
-  |  black             | WC2_BLACK          | wc2_black          |boolean |
   |  windowborders     | WC2_WINDOWBORDERS  | wc2_windowborders  |int     |
   |  wraptext          | WC2_WRAPTEXT       | wc2_wraptext       |boolean |
   +--------------------+--------------------+--------------------+--------+

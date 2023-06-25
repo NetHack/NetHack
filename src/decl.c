@@ -18,7 +18,6 @@ NEARDATA const struct c_color_names c_color_names = {
     "silver", "blue",  "purple", "white",      "orange"
 };
 const char *c_obj_colors[] = {
-    "transparent",    /* no_color */
     "black",          /* CLR_BLACK */
     "red",            /* CLR_RED */
     "green",          /* CLR_GREEN */
@@ -35,6 +34,7 @@ const char *c_obj_colors[] = {
     "bright magenta", /* CLR_BRIGHT_MAGENTA */
     "bright cyan",    /* CLR_BRIGHT_CYAN */
     "white",          /* CLR_WHITE */
+    "transparent",    /* no_color */
 };
 
 const struct c_common_strings c_common_strings =

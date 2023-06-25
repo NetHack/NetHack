@@ -95,7 +95,7 @@ struct window_procs mswin_procs = {
      WC2_U_UTF8STR | WC2_U_24BITCOLOR |
 #endif
     0L,
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},   /* color availability */
     mswin_init_nhwindows, mswin_player_selection, mswin_askname,
     mswin_get_nh_event, mswin_exit_nhwindows, mswin_suspend_nhwindows,
     mswin_resume_nhwindows, mswin_create_nhwindow, mswin_clear_nhwindow,

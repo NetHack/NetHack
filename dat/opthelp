@@ -10,6 +10,8 @@ autopickup     automatically pick up objects you move over         [True]
 autoquiver     when firing with an empty quiver, select some      [False]
                suitable inventory weapon to fill the quiver
 BIOS           allow the use of IBM ROM BIOS calls                [False]
+black          use deep black, one color more                     [False]
+               or blue instead on systems with less colors
 blind          your character is permanently blind                [False]
 bones          allow loading bones files                           [True]
 clicklook      look at map by clicking right mouse button         [False]
@@ -65,6 +67,7 @@ sparkle        display sparkly effect for resisted magical         [True]
                attacks (e.g. fire attack on fire-resistant monster)
 standout       use standout mode for --More-- on messages         [False]
 status_updates update the status lines                             [True]
+setpalette     let nethack set the color palette                  [False]
 time           display elapsed game time, in moves                [False]
 tips           show some helpful tips during gameplay              [True]
 tombstone      print tombstone when you die                        [True]
@@ -72,7 +75,6 @@ toptenwin      print topten in a window rather than stdout        [False]
 travel         enables travelling via mouse click if supported;    [True]
                can be toggled off to prevent mouse clicks on the map from
                attempting to move the hero; does not affect travel via '_'
-black          black and darkgray, or blue.  darkgray by default  [False]
 use_inverse    display detected monsters in highlighted manner    [False]
 verbose        print more commentary during the game               [True]
 whatis_menu    show menu when getting a map location              [False]

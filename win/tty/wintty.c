@@ -119,15 +119,15 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_BLACK | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
-     | WC2_U_UTF8STR
+     | WC2_U_UTF8STR | WC2_SETPALETTE
 #if !defined(NO_TERMS) || defined(WIN32CON)
      | WC2_U_24BITCOLOR
 #endif
     ),
 #ifdef TEXTCOLOR
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
 #else
-    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
+    {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
 #endif
     tty_init_nhwindows, tty_player_selection, tty_askname, tty_get_nh_event,
     tty_exit_nhwindows, tty_suspend_nhwindows, tty_resume_nhwindows,

@@ -125,7 +125,7 @@ xeditsysconf)
 		    -e "s:^GREPPATH=.*:$greppath:" \
 		    -e "s/^PANICTRACE_GDB=./PANICTRACE_GDB=$ptg/" \
 		    -e 's/^#OPTIONS=.*/&\
-OPTIONS=black/' \
+OPTIONS=setpalette/' \
 		    $src > $dest
 	fi
 	;;

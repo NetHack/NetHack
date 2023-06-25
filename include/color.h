@@ -18,7 +18,7 @@
 #define CLR_MAGENTA 5
 #define CLR_CYAN 6
 #define CLR_GRAY 7 /* low-intensity white */
-#define CLR_BLACK 8
+#define CLR_DARKGRAY 8
 #define CLR_ORANGE 9
 #define CLR_BRIGHT_GREEN 10
 #define CLR_YELLOW 11
@@ -26,7 +26,7 @@
 #define CLR_BRIGHT_MAGENTA 13
 #define CLR_BRIGHT_CYAN 14
 #define CLR_WHITE 15
-#define CLR_DARKGRAY 16
+#define CLR_BLACK 16
 #define CLR_MAX 17
 
 /* The "half-way" point for tty-based color systems.  This is used in */
@@ -52,5 +52,22 @@
 #define DRAGON_SILVER CLR_BRIGHT_CYAN
 #define HI_ZAP CLR_BRIGHT_BLUE
 #define PALLID CLR_DARKGRAY
+
+void init_default_palette(void);
+void set_palette(void);
+void reset_palette(void);
+
+typedef struct {
+    unsigned char b, g, r;
+} RGB;
+/*
+ * printf("0x%02X%02X%02X", c->r, c->g, c->b);
+ *
+ * defined reverse, so the whole prints RGB
+ *
+ *      printf("0x%06X", *c);
+ */
+
+RGB *stdclrval(const char*);
 
 #endif /* COLOR_H */

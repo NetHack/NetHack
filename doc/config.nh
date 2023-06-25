@@ -307,8 +307,12 @@
 # Enable travel (_) command.
 #OPTIONS=travel
 
-# Use the dark gray color
-#OPTIONS=use_darkgray
+# Use deep black, one color more.
+# Or blue instead on systems with 16 colors or less.
+#OPTIONS=black
+
+# Let nethack set the color palette.
+#OPTIONS=setpalette
 
 # Use inverse text attribute in eg. menu titles
 #OPTIONS=use_inverse

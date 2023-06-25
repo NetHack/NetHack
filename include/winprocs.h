@@ -254,7 +254,8 @@ extern
 #define WC2_MENU_SHIFT   0x010000L /* 17 horizontal menu scrolling */
 #define WC2_U_UTF8STR    0x020000L /* 18 utf8str support */
 #define WC2_U_24BITCOLOR 0x040000L /* 19 24-bit color support available */
-                                   /* 13 free bits */
+#define WC2_SETPALETTE   0x080000L /* 20 let nethack set the color palette */
+                                   /* 12 free bits */
 
 #define ALIGN_LEFT   1
 #define ALIGN_RIGHT  2

@@ -535,7 +535,7 @@ static win_request_info *hup_ctrl_nhwindow(winid, int, win_request_info *);
 static struct window_procs hup_procs = {
     WPID(hup), 0L, 0L,
     { FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
-      FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE }, /* colors */
+      FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE }, /* colors */
     hup_init_nhwindows,
     hup_void_ndecl,                                    /* player_selection */
     hup_void_ndecl,                                    /* askname */
