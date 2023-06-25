@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "June 8, 2023
+.ds f2 "June 25, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -924,7 +924,7 @@ If you're wearing more than one, you'll be prompted for which one to
 remove.
 When you're only wearing one, then by default it will be removed
 without asking, but you can set the
-.op paranoid_confirmation
+.op paranoid_confirmation:Remove
 option to require a prompt.
 .lp ""
 This command may also be used to take off armor.
@@ -979,7 +979,7 @@ and/or a shirt, or a suit covering a shirt, as if the underlying items
 weren't there.)
 When you're only wearing one, then by default it will
 be taken off without asking, but you can set the
-.op paranoid_confirmation
+.op paranoid_confirmation:Remove
 option to require a prompt.
 .lp ""
 This command may also be used to remove accessories.
@@ -2328,7 +2328,7 @@ moving into its location, you'll be asked to confirm your intent.
 By default an answer of \(oqy\(cq acknowledges that intent,
 which can be error prone if you're using \(oqy\(cq to move.
 You can set the
-.op paranoid_confirmation
+.op paranoid_confirmation:attack
 option to require a response of \(lqyes\(rq instead.
 .pg
 If you can't see a monster (if it is invisible, or if you are blinded),
@@ -4037,13 +4037,14 @@ Persistent.
 Enable coloring menu lines (default off).
 See \(lqConfiguring Menu Colors\(rq on how to configure the colors.
 .lp menustyle
-Controls the interface used when you need to choose various objects (in
-response to the Drop command, for instance).
+Controls the method used when you need to choose various objects (in
+response to the \f(CRDrop\fP (aka \f(CRdroptype\fP) command, for instance).
 The value specified should be the first letter of one of the following:
 traditional, combination, full, or partial.
+Default is \f(CRfull\fP.
 Persistent.
 .lp ""
-Traditional was the only interface available for very
+Traditional was the only method available for very
 early versions; it consists of a prompt for object class characters,
 followed by an object-by-object prompt for all items matching the selected
 object class(es).
@@ -4053,6 +4054,9 @@ prompting one-by-one.
 Full displays a menu of
 object classes rather than a character prompt, and then a menu of matching
 objects for selection.
+(Choosing its \(oqA\(cq (Autoselect-All) choice skips the second menu.
+To avoid choosing that by accident,
+set \f(CRparanoid_confirm:AutoAll\fP to require confirmation.)
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
 .lp menu_deselect_all
@@ -4216,7 +4220,7 @@ prompting is desired.  The default is \(lqparanoid_confirmation:pray swim\(rq.
 .PL Confirm
 for any prompts which are set to require \(lqyes\(rq rather than \(oqy\(cq,
 also require \(lqno\(rq to reject instead of accepting any non-yes response
-as no
+as no; changes pray and AutoAll to require \(lqyes\(rq or \(oqno\(cq too;
 .PL quit
 require \(lqyes\(rq rather than \(oqy\(cq to confirm quitting
 the game or switching into non-scoring explore mode;
@@ -4227,31 +4231,41 @@ useful in normal play; applies to explore mode);
 require \(lqyes\(rq rather than \(oqy\(cq to confirm saving
 bones data when dying in debug mode;
 .PL attack
-require \(lqyes\(rq rather than \(oqy\(cq to confirm attacking a peaceful monster;
+require \(lqyes\(rq rather than \(oqy\(cq to confirm attacking
+a peaceful monster;
 .PL wand-break
-require \(lqyes\(rq rather than \(oqy\(cq to confirm breaking a wand;
+require \(lqyes\(rq rather than \(oqy\(cq to confirm breaking
+a wand with the \f(CRapply\fP command;
 .PL eating
-require \(lqyes\(rq rather than \(oqy\(cq to confirm whether to continue eating;
+require \(lqyes\(rq rather than \(oqy\(cq to confirm whether to
+continue eating;
 .PL Were-change
-require \(lqyes\(rq rather than \(oqy\(cq to confirm changing form due to lycanthropy
-when hero has polymorph control;
+require \(lqyes\(rq rather than \(oqy\(cq to confirm changing form due
+to lycanthropy when hero has polymorph control;
 .PL pray
 require \(oqy\(cq to confirm an attempt to pray rather
 than immediately praying; on by default;
+(to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
+.PL swim
+prevent walking into water or lava; on by default; (to deliberately step
+onto/into such terrain when this is set, use the \(oq\f(CRm\fP\(cq
+movement prefix when adjacent);
+.PL AutoAll
+require confirmation when the \(oqA\(cq (Autoselect-All) choice is selected
+in object class filtering menus for \f(CRmenustyle:Full\fP;
+(to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
 .PL Remove
 require selection from inventory for \(oqR\(cq and \(oqT\(cq
-commands even when wearing just one applicable item.
-.PL swim
-prevent walking into water or lava.
+commands even when wearing just one applicable item;
 .PL all
 turn on all of the above.
 .PE
-By default, the pray choice is enabled, the others disabled.
-To disable it without setting
-any of the other choices, use \(lqparanoid_confirmation:none\(rq.
+By default, the pray and swim choices are enabled, the others disabled.
+To disable them without setting
+any of the other choices, use \f(CRparanoid_confirmation:none\fP.
 To keep
-it enabled while setting any of the others, include it in the list,
-such as \(lqparanoid_confirmation:attack pray Remove\(rq.
+them enabled while setting any of the others, include them in the new list,
+such as \f(CRparanoid_confirmation:attack pray swim Remove\fP.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.

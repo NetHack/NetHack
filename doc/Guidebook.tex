@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{June 8, 2023}
+\date{June 25, 2023}
 
 \maketitle
 
@@ -1024,7 +1024,7 @@ Remove a worn accessory (ring, amulet, or blindfold).\\
 If you're wearing more than one, you'll be prompted for which one to
 remove.  When you're only wearing one, then by default it will be removed
 without asking, but you can set the
-{\it paranoid\verb+_+confirmation\/}
+{\it paranoid\verb+_+confirmation:Remove\/}
 option to require a prompt.\\
 %.lp ""
 This command may also be used to take off armor.  The prompt for which
@@ -1082,7 +1082,7 @@ and/or a shirt, or a suit covering a shirt, as if the underlying items
 weren't there.)
 When you're only wearing one, then by default it will
 be taken off without asking, but you can set the
-{\it paranoid\verb+_+confirmation\/}
+{\it paranoid\verb+_+confirmation:Remove\/}
 option to require a prompt.\\
 %.lp ""
 This command may also be used to remove accessories.  The prompt
@@ -2572,7 +2572,7 @@ In most circumstances, if you attempt to attack a peaceful monster by
 moving into its location, you'll be asked to confirm your intent.  By
 default an answer of `{\tt y}' acknowledges that intent,
 which can be error prone if you're using `{\tt y}' to move.  You can set the
-{\it paranoid\verb+_+confirmation\/}
+{\it paranoid\verb+_+confirmation:attack\/}
 option to require a response of ``{\tt yes}'' instead.
 %.pg
 
@@ -4412,14 +4412,15 @@ Enable coloring menu lines (default off).
 See ``{\it Configuring Menu Colors\/}'' on how to configure the colors.
 %.lp
 \item[\ib{menustyle}]
-Controls the interface used when you need to choose various objects (in
-response to the Drop command, for instance).
+Controls the method used when you need to choose various objects (in
+response to the {\tt Drop} (aka {\tt droptype}) command, for instance).
 The value specified should be the first letter of one of the following:
 traditional, combination, full, or partial.
+Default is {\tt full}.
 Persistent.
 \\
 %.lp ""
-Traditional was the only interface available for very
+Traditional was the only method available for very
 early versions; it consists of a prompt for object class characters,
 followed by an object-by-object prompt for all items matching the selected
 object class(es).
@@ -4429,6 +4430,9 @@ prompting one-by-one.
 Full displays a menu of
 object classes rather than a character prompt, and then a menu of matching
 objects for selection.
+(Choosing its `A' (Autoselect-All) choice skips the second menu.
+To avoid choosing that by accident,
+set {\it paranoid\verb+_+confirm:AutoAll\/} to require confirmation.)
 Partial skips the object class filtering and
 immediately displays a menu of all objects.
 \item[\ib{menu\verb+_+deselect\verb+_+all}]
@@ -4615,7 +4619,8 @@ are filled in at the end from the previous order.
 %.lp
 \item[\ib{paranoid\verb+_+confirmation}]
 A space separated list of specific situations where alternate
-prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray swim}''.
+prompting is desired.
+The default is ``{\it paranoid\verb+_+confirmation:pray swim}''.
 %.sd
 %.si
 \newlength{\pcwidth}
@@ -4623,9 +4628,9 @@ prompting is desired.  The default is ``{\it paranoid\verb+_+confirmation:pray s
 \addtolength{\pcwidth}{\labelsep}
 \blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
 \item[{\tt Confirm}]
-for any prompts which are set to require ``yes''
-rather than `y', also require ``no'' to reject instead
-of accepting any non-yes response as no;
+for any prompts which are set to require ``yes'' rather than `y',
+also require ``no'' to reject instead of accepting any non-yes response
+as no; changes pray and AutoAll to require ``yes'' or ``no'' too;
 \item[{\tt quit~~~}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm quitting
 the game or switching into non-scoring explore mode;
@@ -4640,32 +4645,40 @@ require ``{\tt yes}'' rather than `{\tt y}' to confirm attacking
 a peaceful monster;
 \item[{\tt wand-break}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm breaking
-a wand;
+a wand with the {\it apply} command;
 \item[{\tt eating}]
 require ``{\tt yes}'' rather than `{\tt y}' to confirm whether to
 continue eating;
 \item[{\tt Were-change}]
-require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form
-due to lycanthropy
-when hero has polymorph control;
+require ``{\tt yes}'' rather than `{\tt y}' to confirm changing form due
+to lycanthropy when hero has polymorph control;
 \item[{\tt pray~~~}]
 require `{\tt y}' to confirm an attempt to pray rather
 than immediately praying; on by default;
-\item[{\tt Remove~}] require selection from inventory for `{\tt R}'
-and `{\tt T}'
-commands even when wearing just one applicable item.
+(to require ``yes'' rather than just `y', set Confirm too);
 \item[{\tt swim~~~}]
-prevent walking into water or lava.
+prevent walking into water or lava; on by default; (to deliberately step
+onto/into such terrain when this is set, use the `{\tt m}'
+movement prefix when adjacent);
+\item[{\tt AutoAll}]
+require confirmation when the `A' (Autoselect-All) choice is selected
+in object class filtering menus for {\it menustyle:Full};
+(to require ``yes'' rather than just `y', set Confirm too);
+\item[{\tt Remove~}]
+require selection from inventory for `{\tt R}' and `{\tt T}'
+commands even when wearing just one applicable item;
 \item[{\tt all~~~~}]
 turn on all of the above.
 \elist
 %.ei
 %.ed
-By default, the pray choice is enabled, the others disabled.
-To disable it without setting
-any of the other choices, use ``{\it paranoid\verb+_+confirmation:none}''.  To keep
-it enabled while setting any of the others, include it in the list,
-such as ``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~Remove}''.
+By default, the pray and swim choices are enabled, the others disabled.
+To disable them without setting
+any of the other choices, use ``{\it paranoid\verb+_+confirmation:none}''.
+To keep
+them enabled while setting any of the others, include them in the list,
+such as
+``{\it par\-a\-noid\verb+_+con\-fir\-ma\-tion:attack~pray~swim~Remove}''.
 %.lp
 \item[\ib{perm\verb+_+invent}]
 If true, always display your current inventory in a window.  This only
