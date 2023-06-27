@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1661218575 2022/08/23 01:36:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.601 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1687852124 2023/06/27 07:48:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.649 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,6 +17,7 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #endif
 
 #define BACKWARD_COMPAT
+#define COMPLAIN_ABOUT_PRAYCONFIRM
 
 /* whether the 'msg_window' option is used to control ^P behavior */
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
@@ -75,7 +76,6 @@ static struct allopt_t allopt_init[] = {
 #define PILE_LIMIT_DFLT 5
 #define rolestring(val, array, field) \
     ((val >= 0) ? array[val].field : (val == ROLE_RANDOM) ? randomrole : none)
-
 
 enum window_option_types {
     MESSAGE_OPTION = 1,
@@ -177,12 +177,11 @@ static const struct paranoia_opts {
     /* extra y/n questions rather than changing y/n to yes/n[o] */
     { PARANOID_PRAY, "pray", 1, 0, 0,
       "y required to pray (supersedes old \"prayconfirm\" option)" },
-    { PARANOID_SWIM, "swim", 1, 0, 0,
-      /* 'm' movement prefix overrides this prompt */
-      "y required to deliberately walk into lava or water" },
     { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
       "y required to pick filter choice 'A' for menustyle:Full" },
     /* not a yes/n[o] vs y/n change nor a y/n addition */
+    { PARANOID_SWIM, "swim", 1, 0, 0,
+      "'m' prefix necessary to deliberately walk into lava or water" },
     { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
       /* normally when there is only 1 candidate it's chosen automatically */
       "always pick from inventory for Remove and Takeoff" },
@@ -2628,94 +2627,203 @@ optfn_palette(
 }
 #endif /* CHANGE_COLOR */
 
+/* for "paranoid_confirmation:foo" and alias "[!]prayconfirm" */
 static int
 optfn_paranoid_confirmation(
     int optidx, int req, boolean negated,
     char *opts, char *op)
 {
     int i;
+    /*
+     * Player can change required response for some prompts (quit, die,
+     * attack, save-bones, continue-eating, break-wand, Were-change to
+     * need to be "yes<return>" instead of just 'y' keystroke to accept.
+     *
+     * For paranoid_confirm:Confirm, these prompts also need "no<return>"
+     * instead of 'n' or <space> or <return> to reject.  (<escape> always
+     * works as a way to reject.)
+     *
+     * Player can add an extra prompt (pray, AutoAll) that isn't
+     * ordinarily there.  (They ask for 'y' keystroke unless Confirm is
+     * also set, then they'll switch to "yes<return>", "no<return>".)
+     *
+     * Player can also change game's behavior.  paranoid_confirm:swim
+     * can be used to prevent accidentally stepping into water or lava;
+     * player must use the 'm' movement prefix to do that intentionally.
+     * paranoid_confirm:Remove [with synonym parnoid_confirm:Takeoff]
+     * changes the 'R' and 'T' commands [which have differing criteria
+     * for "only one candidate item"] to prompt for inventory item to
+     * remove/takeoff when there is only one candidate, so allows player
+     * a chance to cancel at the pick-an-item prompt or menu.
+     */
 
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
-        /* user can change required response for some prompts (quit, die,
-           hit), or add an extra prompt (pray, Remove) that isn't
-           ordinarily there */
+        char prayconfirm[1 + sizeof "pray"];
+        char *pp;
+        boolean plus_or_minus = FALSE;
 
-        if (strncmpi(opts, "prayconfirm", 4) != 0) { /* not prayconfirm */
-            /* at present we don't complain about duplicates for this
-               option, but we do throw away the old settings whenever
-               we process a new one [clearing old flags is essential
-               for handling default paranoid_confirm:pray sanely] */
-            flags.paranoia_bits = 0; /* clear all */
+        /*
+         * "prayconfirm" used to be a separate boolean option,
+         * now it is a synonym for paranoid_confirm:+pray and
+         * "!prayconfirm" has become one for paranoid_confirm:-pray.
+         */
+        if (!strncmpi(opts, "prayconfirm", 4)) {
+            if (*op) {
+                /* presence of any value is treated as an error whether
+                   complaining about the 'prayconfirm' deprecation or not;
+                   this will erroneously reject "prayconfirm:true"; too
+                   bad; back when prayconfirm was in active use, tacking on
+                   an explicit value to a boolean option wasn't supported */
+                config_error_add(
+           "deprecated %sprayconfirm option takes no parameters (found '%s')",
+                                 negated ? "!" : "", op);
+                return optn_silenterr;
+            }
+#ifdef COMPLAIN_ABOUT_PRAYCONFIRM
+            /* config file summary of complaints includes this in the count
+               of errors; we'd prefer that it be described as a warning but
+               that isn't supported [not important since this is considered
+               temporary until 'prayconfirm' gets removed altogether] */
+            config_error_add(
+                 "%sprayconfirm option is deprecated; switching to %s:%cpray",
+                             negated ? "!" : "",
+                             allopt[optidx].name,
+                             negated ? '-' : '+');
+            /* keep going */
+#endif
+            /* convert prayconfirm to paranoid_confirm:+pray and
+               !prayconfirm to paranoid_confirm:-pray */
+            Sprintf(prayconfirm, "%cpray", negated ? '-' : '+');
+            op = prayconfirm;
+            /* possibly changing !prayconfirm to paranoid_confirm:-pray
+               which clears a paranoia bit but isn't a negated option */
+            negated = FALSE;
+        /*
+         * end of 'prayconfirm' processing
+         */
+
+        } else if (!*op) {
+            /* "paranoid_confirm" without any arguments is disallowed;
+               "!paranoid_confirm" w/o args is same as paranoid_confirm:none;
+               "!paranoid_confirm:foo bar" won't get here so handled below */
             if (negated) {
-                flags.paranoia_bits = 0; /* [now redundant...] */
-            } else if (op != empty_optstr) {
-                char *pp, buf[BUFSZ];
-
-                strncpy(buf, op, sizeof buf - 1);
-                buf[sizeof buf - 1] = '\0';
-                op = mungspaces(buf);
-                for (;;) {
-                    /* We're looking to parse
-                       "paranoid_confirm:whichone wheretwo whothree"
-                       and "paranoid_confirm:" prefix has already
-                       been stripped off by the time we get here */
-                    pp = strchr(op, ' ');
-                    if (pp)
-                        *pp = '\0';
-                    /* we aren't matching option names but match_optname()
-                       does what we want once we've broken the space
-                       delimited aggregate into separate tokens */
-                    for (i = 0; i < SIZE(paranoia); ++i) {
-                        if (match_optname(op, paranoia[i].argname,
-                                          paranoia[i].argMinLen, FALSE)
-                            || (paranoia[i].synonym
-                                && match_optname(op, paranoia[i].synonym,
-                                                 paranoia[i].synMinLen,
-                                                 FALSE))) {
-                            if (paranoia[i].flagmask)
-                                flags.paranoia_bits |= paranoia[i].flagmask;
-                            else /* 0 == "none", so clear all */
-                                flags.paranoia_bits = 0;
-                            break;
-                        }
-                    }
-                    if (i == SIZE(paranoia)) {
-                        /* didn't match anything, so arg is bad;
-                           any flags already set will stay set */
-                        config_error_add("Unknown %s parameter '%s'",
-                                         allopt[optidx].name, op);
-                        return optn_err;
-                    }
-                    /* move on to next token */
-                    if (pp)
-                        op = pp + 1;
-                    else
-                        break; /* no next token */
-                }              /* for(;;) */
-            } else
-                return optn_err;
-            return optn_ok;
-        } else { /* prayconfirm */
-            if (negated)
-                flags.paranoia_bits &= ~PARANOID_PRAY;
-            else
-                flags.paranoia_bits |= PARANOID_PRAY;
+                flags.paranoia_bits = 0;
+                return optn_ok;
+            }
+            return optn_err;
         }
+
+        /*
+         * Multiple settings for paranoid_confirmation are allowed.
+         * When a new instance is processed, the behavior depends on the
+         * first character of its value:
+         *
+         * paranoid_confirm:foo bar
+         *   clears all confirmation bits (from previous settings, including
+         *   default), then sets the bits for foo and bar;
+         *
+         * paranoid_confirm:+foo bar
+         *   existing bits are kept, plus those for foo and bar are set;
+         *
+         * paranoid_confirm:-foo bar
+         *   existing bits are kept except those for foo and bar get cleared;
+         *
+         * !paranoid_confirm:foo bar
+         *   is treated as if it was paranoid_confirm:-foo bar, probably
+         *   ought to become deprecated. !paranoid_confirm:none is
+         *   nonsensical and yields same result as paranoid_confirm:none
+         *   and !paranoid_confirm:all.
+         *
+         * paranoid_confirm:+all is the same as paranoid_confirm:all;
+         * paranoid_confirm:-all is the same as paranoid_confirm:none;
+         * paranoid_confirm:+none and paranoid_confirm:-none are no-ops;
+         * !paranoid_confirm:[+|-]anything are disallowed.
+         */
+        (void) mungspaces(op);
+        if (*op != '+' && *op != '-') {
+            /* new value; clear all bits unless negated */
+            if (!negated)
+                flags.paranoia_bits = 0;
+        } else if (negated) {
+            /* first char is '+' or '-'; disallowed for !paranoid_confirm */
+            config_error_add("invalid !%s parameter '%s'",
+                             allopt[optidx].name, op);
+            return optn_silenterr;
+        } else {
+            /* augmenting existing value; keep old bits */
+            plus_or_minus = TRUE; /* only used for "+none" and "-none" */
+            negated = (*op == '-'); /* context is changed */
+            ++op; /* skip '+' or '-' and possible whitespace after it */
+            if (*op == ' ')
+                ++op;
+        }
+
+        for (;;) {
+            /* We're looking to parse
+               "paranoid_confirm:whichone wheretwo whothree"
+               and "paranoid_confirm:" prefix has already
+               been stripped off by the time we get here */
+            pp = strchr(op, ' ');
+            if (pp)
+                *pp = '\0';
+            /* we aren't matching option names but match_optname()
+               does what we want once we've broken the space
+               delimited aggregate into separate tokens */
+            for (i = 0; i < SIZE(paranoia); ++i) {
+                if (match_optname(op, paranoia[i].argname,
+                                  paranoia[i].argMinLen, FALSE)
+                    || (paranoia[i].synonym
+                        && match_optname(op, paranoia[i].synonym,
+                                         paranoia[i].synMinLen, FALSE))) {
+                    if (!paranoia[i].flagmask) {
+                        /* flagmask==0 is "none", clear all bits
+                           but "+none" and "-none" are no-ops */
+                        if (!plus_or_minus)
+                            flags.paranoia_bits = 0; /* clear all */
+                    } else if (negated) {
+                        flags.paranoia_bits &= ~paranoia[i].flagmask;
+                    } else {
+                        flags.paranoia_bits |= paranoia[i].flagmask;
+                    }
+                    break;
+                }
+            }
+            if (i == SIZE(paranoia)) {
+                /* didn't match anything, so arg is bad;
+                   any flags already modified will stay modified */
+                config_error_add("Unknown %s parameter '%s'",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            }
+            /* move on to next token */
+            if (pp)
+                op = pp + 1;
+            else
+                break; /* no next token */
+        } /* for(;;) */
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        char tmpbuf[QBUFSZ];
+        char tmpbuf[BUFSZ];
 
         if (!opts)
             return optn_err;
         tmpbuf[0] = '\0';
-        for (i = 0; paranoia[i].flagmask != 0; ++i)
-            if (flags.paranoia_bits & paranoia[i].flagmask)
-                Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
-        Strcpy(opts, tmpbuf[0] ? &tmpbuf[1] : "none");
+        for (i = 0; paranoia[i].flagmask != 0; ++i) {
+            if ((flags.paranoia_bits & paranoia[i].flagmask) != 0
+                /* hide paranoid_confirm:bones during play except for wizard
+                   mode; keep it for any mode if rewriting the config file */
+                && (paranoia[i].flagmask != PARANOID_BONES
+                    || wizard || req == get_cnf_val))
+                Snprintf(eos(tmpbuf), sizeof tmpbuf - strlen(tmpbuf),
+                         " %s", paranoia[i].argname);
+        }
+        /* note: always leaves enough room for caller to tack on '\n' */
+        opts[0] = '\0';
+        (void) strncat(opts, tmpbuf[0] ? &tmpbuf[1] : "none", BUFSZ - 1);
         return optn_ok;
     }
     if (req == do_handler) {
@@ -4440,7 +4548,10 @@ optfn_windowborders(
 
 #ifdef WINCHAIN
 static int
-optfn_windowchain(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_windowchain(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -5677,7 +5788,8 @@ handler_whatis_coord(void)
    "screen: row is offset to accommodate tty interface's use of top line",
                  MENU_ITEMFLAGS_NONE);
 #if COLNO == 80
-#define COL80ARG Verbose(2, handler_whatis_coord2) ? "; column 80 is not used" : ""
+#define COL80ARG \
+    (Verbose(2, handler_whatis_coord2) ? "; column 80 is not used" : "")
 #else
 #define COL80ARG ""
 #endif
@@ -10025,7 +10137,7 @@ wc_set_window_colors(char *op)
     return 1;
 }
 
-/* set up for wizard mode if player or save file has requested to it;
+/* set up for wizard mode if player or save file has requested it;
    called from port-specific startup code to handle `nethack -D' or
    OPTIONS=playmode:debug, or from dorecover()'s restgamestate() if
    restoring a game which was saved in wizard mode */
@@ -10043,7 +10155,8 @@ set_playmode(void)
     }
     /* don't need to do anything special for explore mode or normal play */
 }
-void
+
+static void
 enhance_menu_text(
     char *buf,
     size_t sz,
@@ -10071,7 +10184,14 @@ enhance_menu_text(
     return;
 }
 
+#undef OPTIONS_HEADING
+#undef CONFIG_SLOT
 
 #endif /* OPTION_LISTS_ONLY */
+
+#undef BACKWARD_COMPAT
+#undef COMPLAIN_ABOUT_PRAYCONFIRM
+#undef PREV_MSGS
+#undef PILE_LIMIT_DFLT
 
 /*options.c*/
