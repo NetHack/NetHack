@@ -1049,13 +1049,22 @@ dogfood(struct monst *mon, struct obj *obj)
 }
 
 /*
- * With the separate mextra structure added in 3.6.x this always
- * operates on the original mtmp. It now returns TRUE if the taming
- * succeeded.
+ * tamedog() used to return the monster, which might have changed address
+ * if a new one was created in order to allocate the edog extension.
+ * With the separate mextra structure added in 3.6.x it always operates
+ * on the original mtmp.  It now returns TRUE if the taming succeeded.
  */
 boolean
 tamedog(struct monst *mtmp, struct obj *obj)
 {
+    /* reduce timed sleep or paralysis, leaving mtmp->mcanmove as-is
+       (note: if mtmp is donning armor, this will reduce its busy time) */
+    if (mtmp->mfrozen)
+        mtmp->mfrozen = (mtmp->mfrozen + 1) / 2;
+    /* end indefinite sleep; using distance==1 limits the waking to mtmp */
+    if (mtmp->msleeping)
+        wake_nearto(mtmp->mx, mtmp->my, 1); /* [different from wakeup()] */
+
     /* The Wiz, Medusa and the quest nemeses aren't even made peaceful. */
     if (mtmp->iswiz || mtmp->data == &mons[PM_MEDUSA]
         || (mtmp->data->mflags3 & M3_WANTSARTI))
