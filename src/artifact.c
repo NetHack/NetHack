@@ -2304,22 +2304,27 @@ retouch_object(
     return 0;
 }
 
-/* an item which is worn/wielded or an artifact which conveys
-   something via being carried or which has an #invoke effect
-   currently in operation undergoes a touch test; if it fails,
-   it will be unworn/unwielded and revoked but not dropped */
+/* hero has changed form or alignment; an item which is worn/wielded
+   or an artifact which conveys something via being carried or which
+   has an #invoke effect currently in operation undergoes a touch test;
+   if it fails, it will be unworn/unwielded and maybe dropped */
 static boolean
-untouchable(struct obj *obj, boolean drop_untouchable)
+untouchable(
+    struct obj *obj, /* object to test; in invent or is steed's saddle */
+    boolean drop_untouchable) /* whether to drop it if it can't be touched */
 {
     struct artifact *art;
     boolean beingworn, carryeffect, invoked;
     long wearmask = ~(W_QUIVER | (u.twoweap ? 0L : W_SWAPWEP) | W_BALL);
 
-    beingworn = ((obj->owornmask & wearmask) != 0L
-                 /* some items in use don't have any wornmask setting */
-                 || (obj->oclass == TOOL_CLASS
-                     && (obj->lamplit || (obj->otyp == LEASH && obj->leashmon)
-                         || (Is_container(obj) && Has_contents(obj)))));
+    beingworn = (obj /* never Null; this pacifies static analysis when
+                      * the get_artifact() macro tests 'obj' for Null */
+                 && ((obj->owornmask & wearmask) != 0L
+                     /* some items in use don't have any wornmask setting */
+                     || (obj->oclass == TOOL_CLASS
+                         && (obj->lamplit
+                             || (obj->otyp == LEASH && obj->leashmon)
+                             || (Is_container(obj) && Has_contents(obj))))));
 
     if ((art = get_artifact(obj)) != 0) {
         carryeffect = (art->cary.adtyp || art->cspfx);
@@ -2346,7 +2351,8 @@ untouchable(struct obj *obj, boolean drop_untouchable)
 
 /* check all items currently in use (mostly worn) for touchability */
 void
-retouch_equipment(int dropflag) /* 0==don't drop, 1==drop all, 2==drop weapon */
+retouch_equipment(
+    int dropflag) /* 0==don't drop, 1==drop all, 2==drop weapon */
 {
     static int nesting = 0; /* recursion control */
     struct obj *obj;
