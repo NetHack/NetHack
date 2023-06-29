@@ -1271,9 +1271,10 @@ trapeffect_sqky_board(
     };
     boolean forcetrap = ((trflags & FORCETRAP) != 0
                          || (trflags & FAILEDUNTRAP) != 0);
+    boolean viasitting = (trflags & VIASITTING) != 0;
 
     if (mtmp == &gy.youmonst) {
-        if ((Levitation || Flying) && !forcetrap) {
+        if ((Levitation || Flying) && !forcetrap && !viasitting) {
             if (!Blind) {
                 seetrap(trap);
                 if (Hallucination)
