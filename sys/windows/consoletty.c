@@ -1911,12 +1911,16 @@ tty_utf8graphics_fixup(void)
 {
     CONSOLE_FONT_INFOEX console_font_info;
     if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
-        if (!console.hConOut)
+        char *tmpstr = 0;
+
+	if (!console.hConOut)
             console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
         /* the locale */
         if (console.localestr)
             free(console.localestr);
-        console.localestr = dupstr(setlocale(LC_ALL, ".UTF8"));
+        tmpstr = setlocale(LC_ALL, ".UTF8");
+	if (tmpstr)
+	    console.localestr = dupstr(tmpstr);
         /* the code page */
         SetConsoleOutputCP(65001);
         console.code_page = GetConsoleOutputCP();
