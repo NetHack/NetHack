@@ -1668,6 +1668,8 @@ curses: with window borders on and align_status:left, restoring brought up a
 curses: after changing curses_mark_synch() to do something, making a menu
 	selection by entering a count that uses more than 1 digit caused the
 	menu to vanish
+curses: setting up default roguesymset at startup clobbered primary symset if
+	config file picked Enhanced1 for primary (core bug exposed by curses)
 Qt: at Xp levels above 20 with 'showexp' On, the combined status field
 	"Level:NN/nnnnnnnn" was too big and truncated by a char at each end
 Qt: searching a text window for something that wasn't found and then searching
