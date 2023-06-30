@@ -5594,7 +5594,7 @@ handler_paranoid_confirmation(void)
     winid tmpwin;
     anything any;
     int i;
-    char mkey, mbuf[QBUFSZ], ebuf[QBUFSZ], cbuf[QBUFSZ];
+    char mkey, mbuf[QBUFSZ], ebuf[BUFSZ], cbuf[QBUFSZ];
     const char *explain, *cmdnm;
     menu_item *paranoia_picks = (menu_item *) 0;
     int clr = 0;
