@@ -1435,7 +1435,7 @@ tt_oname(struct obj *otmp)
 /* Randomly select a topten entry to mimic */
 int
 tt_doppel(struct monst *mon) {
-    struct toptenentry *tt = get_rnd_toptenentry();
+    struct toptenentry *tt = rn2(13) ? get_rnd_toptenentry() : NULL;
     int ret;
 
     if (!tt)
@@ -1447,7 +1447,7 @@ tt_doppel(struct monst *mon) {
             mon->female = 0;
         ret = classmon(tt->plrole);
         /* Only take on a name if the player can see
-           the doppelganger, otherwise we end up with 
+           the doppelganger, otherwise we end up with
            named monsters spoiling the fun - Kes */
         if (canseemon(mon))
             christen_monst(mon, tt->name);

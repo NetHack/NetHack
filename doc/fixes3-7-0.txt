@@ -2169,6 +2169,8 @@ preceding #overview with the 'm' prefix brings up the overview display as a
 	shows every level visited rather than just the "interesting" ones
 include monster size in feedback for wand of probing and stethoscope
 crystal armor is now subject to cracking damage rather than outright breakage
+when a doppelganger takes on mplayer (fake hero) form, usually choose role
+	from the high scores file; name too if visable at the time
 
 
 Platform- and/or Interface-Specific New Features
