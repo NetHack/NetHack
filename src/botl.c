@@ -2180,6 +2180,11 @@ get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc,
             case BL_TH_ALWAYS_HILITE:
                 rule = hl;
                 break;
+            case BL_TH_CRITICALHP:
+                if (critically_low_hp(FALSE)) {
+                    rule = hl;
+                }
+                break;
             case BL_TH_NONE:
                 break;
             default:
@@ -2435,7 +2440,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
     int coloridx = -1, successes = 0;
     int disp_attrib = 0;
     boolean percent, changed, numeric, down, up,
-            grt, lt, gte, le, eq, txtval, always;
+            grt, lt, gte, le, eq, txtval, always, criticalhp;
     const char *txt;
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
@@ -2486,6 +2491,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
         txt = (const char *)0;
         percent = numeric = always = FALSE;
         down = up = changed = FALSE;
+        criticalhp = FALSE;
         grt = gte = eq = le = lt = txtval = FALSE;
 #if 0
         /* threshold value - return on empty string */
@@ -2530,6 +2536,8 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
             txtval = TRUE;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
+        } else if (fld == BL_HP && !strcmpi(s[sidx], "criticalhp")) {
+            criticalhp = TRUE;
         } else if (is_ltgt_percentnumber(s[sidx])) {
             const char *op;
 
@@ -2693,7 +2701,9 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
             hilite.behavior = BL_TH_TEXTMATCH;
         else if (hilite.value.a_void)
             hilite.behavior = BL_TH_VAL_ABSOLUTE;
-       else
+        else if (criticalhp)
+            hilite.behavior = BL_TH_CRITICALHP;
+        else
             hilite.behavior = BL_TH_NONE;
 
         hilite.anytype = dt;
@@ -3254,6 +3264,9 @@ status_hilite2str(struct hilite_s *hl)
     case BL_TH_ALWAYS_HILITE:
         Sprintf(behavebuf, "always");
         break;
+    case BL_TH_CRITICALHP:
+        Sprintf(behavebuf, "criticalhp");
+        break;
     case BL_TH_NONE:
         break;
     default:
@@ -3367,6 +3380,15 @@ status_hilite_menu_choose_behavior(int fld)
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'p', 0, ATR_NONE,
                  clr, "Percentage threshold", MENU_ITEMFLAGS_NONE);
+        nopts++;
+    }
+
+    if (fld == BL_HP) {
+        any = cg.zeroany;
+        any.a_int = onlybeh = BL_TH_CRITICALHP;
+        Sprintf(buf,  "Highlight critically low %s", initblstats[fld].fldname);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'C', 0, ATR_NONE,
+                 clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 

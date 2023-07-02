@@ -210,7 +210,7 @@ extern int cond_idx[CONDITION_COUNT];
 #define BL_TH_CONDITION 103      /* threshold is bitmask of conditions */
 #define BL_TH_TEXTMATCH 104      /* threshold text value to match against */
 #define BL_TH_ALWAYS_HILITE 105  /* highlight regardless of value */
-
+#define BL_TH_CRITICALHP 106     /* highlight critically low HP */
 
 #define HL_ATTCLR_DIM     CLR_MAX + 0
 #define HL_ATTCLR_BLINK   CLR_MAX + 1
