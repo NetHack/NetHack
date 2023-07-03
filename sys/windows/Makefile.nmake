@@ -1372,12 +1372,14 @@ install:  envchk.tag libdir.tag ottydir.tag outldir.tag \
 !IF "$(GIT_AVAILABLE)" == "Y"
 $(LUASRC)\lua.h:
 	git submodule init ../submodules/lua
-	git submodule update --remote ../submodules/lua
+	git submodule update ../submodules/lua
+#	git submodule update --remote ../submodules/lua
 #
 #aka PDCDEP
 $(PDCURSES_TOP)\curses.h:
 	git submodule init ../submodules/$(PDCDIST)
-	git submodule update --remote ../submodules/$(PDCDIST)
+	git submodule update ../submodules/$(PDCDIST)
+#	git submodule update --remote ../submodules/$(PDCDIST)
 
 !ELSE  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz

@@ -150,7 +150,8 @@ luabin:
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:
 	git submodule init submodules/lua
-	git submodule update --remote submodules/lua
+	git submodule update submodules/lua
+#	git submodule update --remote submodules/lua
 
 # Note: many of the dependencies below are here to allow parallel make
 # to generate valid output
