@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1685863330 2023/06/04 07:22:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.355 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1688415121 2023/07/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1057,9 +1057,8 @@ int
 dodown(void)
 {
     struct trap *trap = 0;
-    stairway *stway = stairway_at(u.ux, u.uy);
-    boolean stairs_down = (stway && !stway->up && !stway->isladder),
-            ladder_down = (stway && !stway->up &&  stway->isladder);
+    stairway *stway;
+    boolean stairs_down, ladder_down;
 
     set_move_cmd(DIR_DOWN, 0);
 
@@ -1069,6 +1068,13 @@ dodown(void)
     if (stucksteed(TRUE)) {
         return ECMD_OK;
     }
+
+    stairs_down = ladder_down = FALSE;
+    if ((stway = stairway_at(u.ux, u.uy)) != 0 && !stway->up) {
+        stairs_down = !stway->isladder;
+        ladder_down = !stairs_down;
+    }
+
     /* Levitation might be blocked, but player can still use '>' to
        turn off controlled levitation */
     if (HLevitation || ELevitation) {
@@ -1096,16 +1102,18 @@ dodown(void)
         if (BLevitation) {
             ; /* weren't actually floating after all */
         } else if (Blind) {
+            /* glyph_to_cmap() is a macro which expands its argument many
+               times; use this to do part of its work just once */
+            int glyph_at_uxuy = levl[u.ux][u.uy].glyph;
+
             /* Avoid alerting player to an unknown stair or ladder.
              * Changes the message for a covered, known staircase
              * too; staircase knowledge is not stored anywhere.
              */
             if (stairs_down)
-                stairs_down =
-                    (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnstair);
+                stairs_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnstair);
             else if (ladder_down)
-                ladder_down =
-                    (glyph_to_cmap(levl[u.ux][u.uy].glyph) == S_dnladder);
+                ladder_down = (glyph_to_cmap(glyph_at_uxuy) == S_dnladder);
         }
         if (Is_airlevel(&u.uz))
             You("are floating in the %s.", surface(u.ux, u.uy));
@@ -1113,9 +1121,9 @@ dodown(void)
             You("are floating in %s.",
                 is_pool(u.ux, u.uy) ? "the water" : "a bubble of air");
         else
-            floating_above(stairs_down ? "stairs" : ladder_down
-                                                    ? "ladder"
-                                                    : surface(u.ux, u.uy));
+            floating_above(stairs_down ? "stairs"
+                           : ladder_down ? "ladder"
+                             : surface(u.ux, u.uy));
         return ECMD_OK; /* didn't move */
     }
 
