@@ -1628,6 +1628,7 @@ entering the tutorial and then returning to play made the tutorial branch be
 	eligible for a portal destination via wizard's Eye of the Aethiopica
 'hard helmet' was based on being metallic so overlooked crystal helmet
 don't blame/credit hero for stinking cloud if dying quest nemesis releases one
+Lua selection operations 'subtract' and 'xor' didn't always work as intended
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
