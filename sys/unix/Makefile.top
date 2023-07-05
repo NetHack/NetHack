@@ -307,12 +307,18 @@ fetch-lua: fetch-Lua
 
 fetch-Lua:
 	( mkdir -p lib && cd lib && \
-	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  curl -R -O https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
 	  tar zxf lua-$(LUA_VERSION).tar.gz && \
 	  rm -f lua-$(LUA_VERSION).tar.gz )
 # remove include/nhlua.h in case it was created for some other Lua version
 	@( if test -f include/nhlua.h ; then \
 	     rm -f include/nhlua.h && echo 'rm include/nhlua.h' ; fi )
+
+fetch-lua-http:
+	( mkdir -p lib && cd lib && \
+	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  tar zxf lua-$(LUA_VERSION).tar.gz && \
+	  rm -f lua-$(LUA_VERSION).tar.gz )
 
 # 'make update' can be used to install a revised version after making
 # customizations or such.  Unlike 'make install', it doesn't delete everything
