@@ -5285,6 +5285,8 @@ sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
     SpLev_Map[x][y] = 1;
 }
 
+DISABLE_WARNING_UNREACHABLE_CODE
+
 /* door({ x = 1, y = 1, state = "nodoor" }); */
 /* door({ coord = {1, 1}, state = "nodoor" }); */
 /* door({ wall = "north", pos = 3, state="secret" }); */
@@ -5345,6 +5347,7 @@ lspo_door(lua_State *L)
                            SP_COORD_PACK(x, y));
         if (!isok(x, y)) {
             nhl_error(L, "door coord not ok");
+            /*NOTREACHED*/
             return 0;
         }
         sel_set_door(x, y, (genericptr_t) &typ);
@@ -5352,6 +5355,8 @@ lspo_door(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
 l_table_getset_feature_flag(
@@ -5540,8 +5545,6 @@ lspo_feature(lua_State *L)
     return 0;
 }
 
-RESTORE_WARNING_UNREACHABLE_CODE
-
 /*
  * [lit_state: 1 On, 0 Off, -1 random, -2 leave as-is]
  * terrain({ x=NN, y=NN, typ=MAPCHAR, lit=lit_state });
@@ -5605,6 +5608,7 @@ lspo_terrain(lua_State *L)
                            SP_COORD_PACK(x, y));
         if (!isok(x, y)) {
             nhl_error(L, "terrain coord not ok");
+            /*NOTREACHED*/
             return 0;
         }
         sel_set_ter(x, y, (genericptr_t) &tmpterrain);
@@ -6240,8 +6244,6 @@ lspo_region(lua_State *L)
     return 0;
 }
 
-RESTORE_WARNING_UNREACHABLE_CODE
-
 /* drawbridge({ dir="east", state="closed", x=05,y=08 }); */
 /* drawbridge({ dir="east", state="closed", coord={05,08} }); */
 int
@@ -6278,6 +6280,7 @@ lspo_drawbridge(lua_State *L)
     get_location_coord(&x, &y, DRY | WET | HOT, gc.coder->croom, dcoord);
     if (!isok(mx, my)) {
         nhl_error(L, "drawbridge coord not ok");
+        /*NOTREACHED*/
         return 0;
     }
     if (db_open == -1)
@@ -6331,6 +6334,7 @@ lspo_mazewalk(lua_State *L)
 
     if (!isok(x, y)) {
         nhl_error(L, "mazewalk coord not ok");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -6393,6 +6397,8 @@ lspo_mazewalk(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* wall_property({ x1=0, y1=0, x2=78, y2=20, property="nondiggable" }); */
 /* wall_property({ region = {1,0, 78,20}, property="nonpasswall" }); */
