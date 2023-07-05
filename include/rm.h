@@ -31,10 +31,27 @@
  * +-           -+-             -+              |
  */
 
-/* Level location types.  [Some debugging code in src/display.c
-   defines array type_names[] which contains an entry for each of
-   these, so needs to be kept in sync if any new types are added
-   or existing ones renumbered.] */
+/*
+ * Level location types, values for 'level.locations[x][y].typ'.
+ *
+ * These are different from display symbols and while there is
+ * similarity between the cmap subset of those, there isn't any
+ * one-to-one correspondence between the two encodings.  For instance,
+ * the DOOR type has multiple symbols (closed|open|gone); so does the
+ * STAIRS type (down|up).  Conversely, DRAWBRIDGE_UP represents the
+ * location of the projected span if the drawbridge were down but
+ * there is no symbol for that; it is displayed as water, ice, lava, or
+ * floor depending on what is at that spot when the bridge is 'closed'.
+ *
+ * [Some debugging code in src/display.c defines array type_names[]
+ * which contains an entry for each of these, so needs to be kept in
+ * sync if any new types are added or existing ones renumbered.  The
+ * #terrain command also has a menu choice to display each map spot by
+ * a letter derived from these numeric values and another choice to
+ * display a legend showing the letter-to-type correspondence.  If any
+ * types are added, removed, or reordered, that needs to be updated to
+ * keep in synch.]
+ */
 enum levl_typ_types {
     STONE     =  0,
     VWALL     =  1,

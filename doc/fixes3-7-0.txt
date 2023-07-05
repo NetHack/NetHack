@@ -1214,6 +1214,11 @@ make potion of water become discovered if dipping a carried container into an
 a monster which was temporarily asleep wouldn't be affected by taming (either
 	food or magic), but one that was indefinitely asleep would be; when
 	tamable via food, it even caught and ate the food without waking up
+in wizard mode, #terrain has offers to view all map locations as single-
+	letter codes corresponding to the levl[][].typ numbers and to view
+	a legend showing letter-to-type correspondence; adding new type
+	"lava wall" didn't update that legend and misdescribed all the types
+	which have higher values
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
