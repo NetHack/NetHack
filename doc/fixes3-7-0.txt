@@ -1637,6 +1637,9 @@ Lua selection operations 'subtract' and 'xor' didn't always work as intended
 accept 'true' or 'false' as value for des.object field 'trapped'
 special level loader didn't check for bad coordinates supplied by <level>.lua
 	file thorougnly enough
+hero might not be credited with "entered Mine Town" achievement for the town
+	variations which treat the whole level as the town if that level gets
+	entered via falling or level teleport
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

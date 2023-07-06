@@ -410,13 +410,15 @@ struct levelflags {
     Bitfield(is_maze_lev, 1);
     Bitfield(is_cavernous_lev, 1);
     Bitfield(arboreal, 1);     /* Trees replace rock */
+    Bitfield(has_town, 1);     /* level contains a town */
     Bitfield(wizard_bones, 1); /* set if level came from a bones file
-                                  which was created in wizard mode (or
-                                  normal mode descendant of such) */
+                                * which was created in wizard mode (or
+                                * normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
-                                  rather than ROOM */
+                                * rather than ROOM */
     Bitfield(rndmongen, 1);    /* random monster generation allowed? */
     Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+
     Bitfield(noautosearch, 1); /* automatic searching disabled */
     Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
     Bitfield(stormy, 1);       /* clouds create lightning bolts at random */
