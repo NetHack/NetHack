@@ -313,9 +313,6 @@ init_aline()
 }
 
 #ifdef TEXTCOLOR
-/* used in termcap.c to decide how to set up the hilites */
-unsigned long tos_numcolors = 2;
-
 void
 set_colors()
 {
@@ -324,11 +321,7 @@ set_colors()
     if (!iflags.BIOS)
         return;
     init_aline();
-    tos_numcolors = 1 << (((unsigned char *) _a_line)[1]);
-    if (tos_numcolors <= 2) { /* mono */
-        iflags.use_color = FALSE;
-        return;
-    } else {
+    if (iflags.colorcount > 2) {
         colors_changed = TRUE;
         nh_HE = colorHE;
     }

@@ -124,8 +124,6 @@ xeditsysconf)
 		sed -e "s:^GDBPATH=.*:$gdbpath:" \
 		    -e "s:^GREPPATH=.*:$greppath:" \
 		    -e "s/^PANICTRACE_GDB=./PANICTRACE_GDB=$ptg/" \
-		    -e 's/^#OPTIONS=.*/&\
-OPTIONS=setpalette/' \
 		    $src > $dest
 	fi
 	;;

@@ -1063,7 +1063,7 @@ ONH = $(O)nethack
 NHONLY = consoletty.o getline.o topl.o wintty.o colors.o
 ifeq "$(ADD_CURSES)" "Y"
 NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
-CFLAGSNH += $(NHCURSESFLAGS)
+CFLAGSNH += $(NHCURSESFLAGS) $(PDCINCL)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))

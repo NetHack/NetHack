@@ -25,8 +25,8 @@ const char *c_obj_colors[] = {
     "blue",           /* CLR_BLUE */
     "magenta",        /* CLR_MAGENTA */
     "cyan",           /* CLR_CYAN */
-    "gray",           /* CLR_GRAY */
-    "darkgray",       /* CLR_DARKGRAY */
+    "silver",         /* CLR_GRAY */
+    "gray",           /* CLR_DARKGRAY */
     "orange",         /* CLR_ORANGE */
     "bright green",   /* CLR_BRIGHT_GREEN */
     "yellow",         /* CLR_YELLOW */

@@ -15,7 +15,7 @@ extern WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows  */
 extern WINDOW *activemenu;         /* curses window for menu requesting a
                                     * count; affects count_window refresh */
 
-#define TEXTCOLOR   /* Allow color */
+#define TEXTCOLOR   /* set RGB in pdcurses.h */
 #define NHW_END 19
 #define OFF 0
 #define ON 1

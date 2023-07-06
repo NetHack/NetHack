@@ -310,56 +310,6 @@ char erase_char, kill_char;
 static INPUT_RECORD bogus_key;
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-const char *esc_seq_colors[CLR_MAX];
-const char *esc_seq_bkcolors[CLR_MAX];
-
-static void
-init_color(void)
-{
-    char bkcolorbuf[32];
-
-    esc_seq_colors[CLR_RED]            = "\x1b[31m";
-    esc_seq_colors[CLR_GREEN]          = "\x1b[32m";
-    esc_seq_colors[CLR_BROWN]          = "\x1b[33m";
-    esc_seq_colors[CLR_BLUE]           = "\x1b[34m";
-    esc_seq_colors[CLR_MAGENTA]        = "\x1b[35m";
-    esc_seq_colors[CLR_CYAN]           = "\x1b[36m";
-    esc_seq_colors[CLR_GRAY]           = "\x1b[37m";
-    esc_seq_colors[NO_COLOR]           = "\x1b[39m";
-    esc_seq_colors[CLR_DARKGRAY]       = "\x1b[90m";
-    esc_seq_colors[CLR_ORANGE]         = "\x1b[91m";
-    esc_seq_colors[CLR_BRIGHT_GREEN]   = "\x1b[92m";
-    esc_seq_colors[CLR_YELLOW]         = "\x1b[93m";
-    esc_seq_colors[CLR_BRIGHT_BLUE]    = "\x1b[94m";
-    esc_seq_colors[CLR_BRIGHT_MAGENTA] = "\x1b[95m";
-    esc_seq_colors[CLR_BRIGHT_CYAN]    = "\x1b[96m";
-    esc_seq_colors[CLR_WHITE]          = "\x1b[97m";
-
-    for(int c = 1; c < 8; c++)
-    {
-        Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", 40 + c);
-        esc_seq_bkcolors[c] = dupstr(bkcolorbuf);
-        esc_seq_bkcolors[c + 8] = dupstr(bkcolorbuf);
-    }
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[49m");
-    esc_seq_bkcolors[NO_COLOR] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[100m");
-    esc_seq_bkcolors[CLR_DARKGRAY] = dupstr(bkcolorbuf);
-
-    if (iflags.wc2_setpalette)
-        init_default_palette();
-
-    if (iflags.wc2_black)
-    {
-        esc_seq_colors[CLR_BLACK] = "\x1b[30m";
-        Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[40m");
-        esc_seq_bkcolors[CLR_BLACK] = dupstr(bkcolorbuf);
-    } else {
-        esc_seq_colors[CLR_BLACK] = esc_seq_colors[CLR_DARKGRAY];
-        esc_seq_bkcolors[CLR_BLACK] = esc_seq_bkcolors[CLR_DARKGRAY];
-    }
-}
-
 void emit_start_bold(void);
 void emit_stop_bold(void);
 void emit_start_dim(void);
@@ -1130,8 +1080,8 @@ xputc_core(int ch)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
         /* this causes way too much performance degradation */
         /* cell.color24 = customcolors[console.current_nhcolor]; */
-        cell.colorseq = esc_seq_colors[console.current_nhcolor];
-        cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+        cell.colorseq = hilites[console.current_nhcolor];
+        cell.bkcolorseq = bghilites[console.current_nhbkcolor];
         cell.attr = console.attr;
         // if (console.color24)
         //    __debugbreak();
@@ -1225,8 +1175,8 @@ g_putch(int in_ch)
     cell.character = (console.has_unicode ? cp437[ch] : ch);
 #else
     cell.attr = console.attr;
-    cell.colorseq = esc_seq_colors[console.current_nhcolor];
-    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+    cell.colorseq = hilites[console.current_nhcolor];
+    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx = 0;
     wch[1] = 0;
@@ -1272,8 +1222,8 @@ g_pututf8(uint8 *sequence)
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     cell_t cell;
     cell.attr = console.attr;
-    cell.colorseq = esc_seq_colors[console.current_nhcolor];
-    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+    cell.colorseq = hilites[console.current_nhcolor];
+    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx =console.color256idx ? console.color256idx : 0;
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
@@ -2392,7 +2342,7 @@ void nethack_enter_consoletty(void)
         }
     }
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-    init_color();
+    init_hilite();
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhcolor = NO_COLOR;
     console.is_ready = TRUE;
@@ -2413,8 +2363,8 @@ VA_DECL(const char *, fmt)
         fprintf(stdout, "%s", buf);
     else {
 #ifdef TTY_GRAPHICS
-        if(!init_ttycolor_completed)
-            init_ttycolor();
+//      if(!init_ttycolor_completed)
+
         /* if we have generated too many messages ... ask the user to
          * confirm and then clear.
          */

@@ -289,7 +289,7 @@ enum zap_colors {
 
 enum altar_colors {
     altar_color_unaligned = CLR_RED,
-#if defined(USE_GENERAL_ALTAR_COLORS)
+#ifndef NO_ALTAR_COLORS
     altar_color_chaotic = CLR_BLACK,
     altar_color_neutral = PALLID,
     altar_color_lawful  = CLR_WHITE,

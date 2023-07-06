@@ -18,14 +18,6 @@ static void set_window_position(int *, int *, int *, int *, int,
                                 int *, int *, int *, int *, int,
                                 int, int);
 
-#if 0   /* no longer used */
-typedef struct nhrgb_type {
-    short r;
-    short g;
-    short b;
-} nhrgb;
-#endif
-
 /* Banners used for an optional ASCII splash screen */
 
 #define NETHACK_SPLASH_A \
@@ -304,26 +296,22 @@ curses_init_nhcolors(void)
 #ifdef TEXTCOLOR
     if (has_colors()) {
         use_default_colors();
-        int c;
+        register int c;
 
-        /* COLOR_PAIR(0) is fg/bg anyways */
-        for(c = 1; c < 16; c++)
-            if (COLORS < 16)
-                init_pair(c, c % 8, -1);
-            else
-                init_pair(c, c, -1);
-
-        if (iflags.wc2_setpalette)
-            init_default_palette();
-
-        if (iflags.wc2_black)
-            if (COLORS > 16)
-                init_pair(CLR_BLACK, COLOR_BLACK, -1);
-            else
-                init_pair(CLR_BLACK, CLR_BLUE, -1);
+        /* COLOR_PAIR(0) is fg/bg anyways
+         * black and darkgray is set by option
+         */
+        for(c = 1; c < 8; ++c)
+            init_pair(c, c, -1);
+        if (COLORS < 16)
+            for(c = 1; c < 8; ++c)
+                init_pair(c + 8, c, -1);
         else
-            init_pair(CLR_BLACK, CLR_DARKGRAY, -1);
-
+            for(c = 9; c < 16; ++c)
+                init_pair(c, c, -1);
+#ifdef MICRO
+        init_pair(CLR_BLACK, CLR_BLUE, -1);
+#endif
         {
             int i;
             boolean hicolor = FALSE;
@@ -799,6 +787,12 @@ curses_init_options(void)
 #else
     iflags.wc_mouse_support = 0;
 #endif
+
+    /* option parser did it to early for curses */
+    if (iflags.wc2_black)
+        set_black(iflags.wc2_black);
+    else if (iflags.wc2_black != 0)
+        set_black(0);
 }
 
 /* Display an ASCII splash screen if the splash_screen option is set */
@@ -839,4 +833,5 @@ curses_display_splash_window(void)
 void
 curses_cleanup(void)
 {
+    reset_palette();
 }

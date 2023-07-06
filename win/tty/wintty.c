@@ -119,7 +119,7 @@ struct window_procs tty_procs = {
      | WC2_RESET_STATUS
 #endif
      | WC2_BLACK | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_STATUSLINES
-     | WC2_U_UTF8STR | WC2_SETPALETTE
+     | WC2_U_UTF8STR
 #if !defined(NO_TERMS) || defined(WIN32CON)
      | WC2_U_24BITCOLOR
 #endif

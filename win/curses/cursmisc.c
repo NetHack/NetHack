@@ -98,7 +98,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
     curses_color = color;
     if (COLORS < 16) {
         /* Use bold for a bright black */
-        if (color == CLR_BLACK && !iflags.wc2_black)
+        if (color == CLR_BLACK)
             wattron(win, A_BOLD);
 
         if (color > 8 && color < 17)

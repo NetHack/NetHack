@@ -4819,11 +4819,10 @@ to \fITrue\fP forces
 .op ascii_map
 to be \fIFalse\fP.
 .lp black
-Use deep black, one color more.
-Or blue instead on systems with 16 colors or less (TTY only).
+Set the intensity of color black (tty).
+If negated or set to zero, use darkgray (bright black).
 .lp setpalette
 Let NetHack set the color palette.
-Toggles option black on.
 .lp use_inverse
 If NetHack can, it should display inverse when the game specifies it.
 .lp vary_msgcount

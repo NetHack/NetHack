@@ -49,13 +49,13 @@
 #define HI_PAPER CLR_WHITE
 #define HI_GLASS CLR_BRIGHT_CYAN
 #define HI_MINERAL NO_COLOR
-#define DRAGON_SILVER CLR_BRIGHT_CYAN
 #define HI_ZAP CLR_BRIGHT_BLUE
 #define PALLID CLR_DARKGRAY
-
-void init_default_palette(void);
-void set_palette(void);
-void reset_palette(void);
+#ifndef MICRO
+#define DRAGON_SILVER HI_SILVER
+#else
+#define DRAGON_SILVER HI_GLASS
+#endif
 
 typedef struct {
     unsigned char b, g, r;
@@ -68,6 +68,19 @@ typedef struct {
  *      printf("0x%06X", *c);
  */
 
-RGB *stdclrval(const char*);
+extern RGB *stdclrval(const char *);
+extern RGB *tpalette[CLR_MAX];
+extern void default_palette(void);
+extern void set_black(unsigned char);
+extern void use_darkgray(void);
+
+#ifdef TTY_GRAPHICS
+extern void set_palette(void);
+extern void reset_palette(void);
+
+extern void init_hilite(void);
+extern const NEARDATA char *hilites[CLR_MAX];
+extern const char *bghilites[CLR_MAX];
+#endif
 
 #endif /* COLOR_H */

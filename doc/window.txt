@@ -861,7 +861,6 @@ to support:
   |  menu_shift_right  | WC2_MENU_SHIFT     |  n/a               |char    |
   |  petattr           | WC2_PETATTR        | wc2_petattr        |int     |
   |  selectsaved       | WC2_SELECTSAVED    | wc2_selectsaved    |boolean |
-  |  setpalette        | WC2_SETPALETTE     | wc2_setpalette     |boolean |
   |  softkeyboard      | WC2_SOFTKEYBOARD   | wc2_softkeyboard   |boolean |
   |  statuslines       | WC2_STATUSLINES    | wc2_statuslines    |int     |
   |  term_cols         | WC2_TERM_SIZE      | wc2_term_cols      |int     |

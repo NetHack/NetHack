@@ -100,7 +100,7 @@
     PCHAR2(10, '|',  S_tlwall, "tlwall", "wall", CLR(NO_COLOR))
     PCHAR2(11, '|',  S_trwall, "trwall", "wall", CLR(NO_COLOR))
     /* start cmap A                                                      */
-    PCHAR2(12, '.',  S_ndoor,  "no door", "doorway", CLR(NO_COLOR))
+    PCHAR2(12, '.',  S_ndoor,  "no door", "doorway", CLR(CLR_DARKGRAY))
     PCHAR2(13, '-',  S_vodoor, "vertical open door",
                                "open door", CLR(CLR_BROWN))
     PCHAR2(14, '|',  S_hodoor, "horizontal open door",
@@ -111,10 +111,10 @@
                                "closed door", CLR(CLR_BROWN))
     PCHAR( 17, '#',  S_bars,   "iron bars", CLR(HI_METAL))
     PCHAR( 18, '#',  S_tree,   "tree", CLR(CLR_GREEN))
-    PCHAR( 19, '.',  S_room,   "floor of a room", CLR(NO_COLOR))
+    PCHAR( 19, '.',  S_room,   "floor of a room", CLR(CLR_DARKGRAY))
     PCHAR( 20, '.',  S_darkroom, "dark part of a room", CLR(CLR_BLACK))
     PCHAR( 21, '`',  S_engroom, "engraved part of a room", CLR(CLR_BRIGHT_BLUE))
-    PCHAR2(22, '#',  S_corr,   "dark corridor", "corridor", CLR(NO_COLOR))
+    PCHAR2(22, '#',  S_corr,   "dark corridor", "corridor", CLR(CLR_DARKGRAY))
     PCHAR( 23, '#',  S_litcorr, "lit corridor", CLR(NO_COLOR))
     PCHAR( 24, '#',  S_engrcorr, "engraved part of a corridor", CLR(CLR_BRIGHT_BLUE))
     PCHAR2(25, '<',  S_upstair, "up stairs", "staircase up", CLR(NO_COLOR))
@@ -145,7 +145,7 @@
     PCHAR2(45, '#',  S_hcdbridge, "horizontal closed drawbridge",
                                   "raised drawbridge", CLR(CLR_BROWN))
     PCHAR( 46, ' ',  S_air,    "air", CLR(CLR_CYAN))
-    PCHAR( 47, '#',  S_cloud,  "cloud", CLR(NO_COLOR))
+    PCHAR( 47, '#',  S_cloud,  "cloud", CLR(PALLID))
     PCHAR( 48, '}',  S_water,  "water", CLR(CLR_BLUE))
     /* end dungeon characters                                          */
     /*                                                                 */
@@ -153,12 +153,12 @@
     /*                                                                 */
     PCHAR( 49, '^',  S_arrow_trap, "arrow trap", CLR(HI_METAL))
     PCHAR( 50, '^',  S_dart_trap, "dart trap", CLR(HI_METAL))
-    PCHAR( 51, '^',  S_falling_rock_trap, "falling rock trap", CLR(NO_COLOR))
+    PCHAR( 51, '^',  S_falling_rock_trap, "falling rock trap", CLR(CLR_DARKGRAY))
     PCHAR( 52, '^',  S_squeaky_board, "squeaky board", CLR(CLR_BROWN))
     PCHAR( 53, '^',  S_bear_trap, "bear trap", CLR(HI_METAL))
     PCHAR( 54, '^',  S_land_mine, "land mine", CLR(CLR_RED))
     PCHAR( 55, '^',  S_rolling_boulder_trap, "rolling boulder trap",
-                                             CLR(NO_COLOR))
+                                             CLR(CLR_DARKGRAY))
     PCHAR( 56, '^',  S_sleeping_gas_trap, "sleeping gas trap", CLR(HI_ZAP))
     PCHAR( 57, '^',  S_rust_trap, "rust trap", CLR(CLR_BLUE))
     PCHAR( 58, '^',  S_fire_trap, "fire trap", CLR(CLR_ORANGE))
@@ -170,7 +170,7 @@
                                            CLR(CLR_MAGENTA))
     PCHAR( 64, '^',  S_level_teleporter, "level teleporter", CLR(CLR_MAGENTA))
     PCHAR( 65, '^',  S_magic_portal, "magic portal", CLR(CLR_BRIGHT_MAGENTA))
-    PCHAR( 66, '"',  S_web, "web", CLR(NO_COLOR))
+    PCHAR( 66, '"',  S_web, "web", CLR(PALLID))
     PCHAR( 67, '^',  S_statue_trap, "statue trap", CLR(NO_COLOR))
     PCHAR( 68, '^',  S_magic_trap, "magic trap", CLR(HI_ZAP))
     PCHAR2(69, '^',  S_anti_magic_trap, "anti magic trap", "anti-magic field",

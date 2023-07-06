@@ -236,7 +236,7 @@ curscolor(int color, boolean *boldon)
 
     if (COLORS < 16) {
         /* Use bold for a bright black */
-        if (color == CLR_BLACK && !iflags.wc2_black)
+        if (color == CLR_BLACK)
             *boldon = TRUE;
 
         if (color > 8 && color < 17)

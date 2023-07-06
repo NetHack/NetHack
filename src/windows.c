@@ -1359,16 +1359,6 @@ dump_redirect(boolean onoff_flag)
     }
 }
 
-#ifdef TTY_GRAPHICS
-#ifdef TEXTCOLOR
-#ifdef TOS
-extern const char *hilites[CLR_MAX];
-#else
-extern NEARDATA char *hilites[CLR_MAX];
-#endif
-#endif
-#endif
-
 int
 has_color(int color)
 {
