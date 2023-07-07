@@ -1219,6 +1219,8 @@ in wizard mode, #terrain has offers to view all map locations as single-
 	a legend showing letter-to-type correspondence; adding new type
 	"lava wall" didn't update that legend and misdescribed all the types
 	which have higher values
+restore the ability for trap creation via magic which creates pits to destroy
+	'furniture'
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
