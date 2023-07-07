@@ -1,4 +1,4 @@
-HDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1201 $ $NHDT-Date: 1687036542 2023/06/17 21:15:42 $
+DT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1201 $ $NHDT-Date: 1687036542 2023/06/17 21:15:42 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1640,6 +1640,8 @@ special level loader didn't check for bad coordinates supplied by <level>.lua
 hero might not be credited with "entered Mine Town" achievement for the town
 	variations which treat the whole level as the town if that level gets
 	entered via falling or level teleport
+in the theme room "water-surrounded vault", guarantee an item which can be
+	be used to escape from the room in one of the four chests
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
