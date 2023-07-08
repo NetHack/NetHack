@@ -2677,6 +2677,7 @@ extern void selection_free(struct selectionvar *, boolean);
 extern void selection_clear(struct selectionvar *, int);
 extern struct selectionvar *selection_clone(struct selectionvar *);
 extern void selection_getbounds(struct selectionvar *, NhRect *);
+extern void selection_recalc_bounds(struct selectionvar *);
 extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
 extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
                                 boolean);
@@ -2882,6 +2883,7 @@ extern void topten(int, time_t);
 extern void prscore(int, char **);
 extern struct toptenentry *get_rnd_toptenentry(void);
 extern struct obj *tt_oname(struct obj *);
+extern int tt_doppel(struct monst *);
 
 /* ### track.c ### */
 

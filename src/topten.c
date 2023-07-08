@@ -1432,6 +1432,29 @@ tt_oname(struct obj *otmp)
     return otmp;
 }
 
+/* Randomly select a topten entry to mimic */
+int
+tt_doppel(struct monst *mon) {
+    struct toptenentry *tt = rn2(13) ? get_rnd_toptenentry() : NULL;
+    int ret;
+
+    if (!tt)
+        ret = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+    else {
+        if (tt->plgend[0] == 'F')
+            mon->female = 1;
+        else if (tt->plgend[0] == 'M')
+            mon->female = 0;
+        ret = classmon(tt->plrole);
+        /* Only take on a name if the player can see
+           the doppelganger, otherwise we end up with
+           named monsters spoiling the fun - Kes */
+        if (canseemon(mon))
+            christen_monst(mon, tt->name);
+    }
+    return ret;
+}
+
 #ifdef NO_SCAN_BRACK
 /* Lattice scanf isn't up to reading the scorefile.  What */
 /* follows deals with that; I admit it's ugly. (KL) */

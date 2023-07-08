@@ -524,6 +524,7 @@ void
 fixup_special(void)
 {
     lev_region *r = gl.lregions;
+    s_level *sp;
     struct d_level lev;
     int x, y;
     struct mkroom *croom;
@@ -547,8 +548,7 @@ fixup_special(void)
                 lev = u.uz;
                 lev.dlevel = atoi(r->rname.str);
             } else {
-                s_level *sp = find_level(r->rname.str);
-
+                sp = find_level(r->rname.str);
                 lev = sp->dlevel;
             }
             /*FALLTHRU*/
@@ -647,6 +647,9 @@ fixup_special(void)
     } else if (u.uz.dnum == mines_dnum && gr.ransacked) {
        stolen_booty();
     }
+
+    if ((sp = Is_special(&u.uz)) != 0 && sp->flags.town) /* Mine Town */
+        gl.level.flags.has_town = 1;
 
     if (gl.lregions)
         free((genericptr_t) gl.lregions), gl.lregions = 0;
@@ -1076,6 +1079,7 @@ makemaz(const char *s)
     /* SPLEVTYPE format is "level-choice,level-choice"... */
     if (wizard && *protofile && sp && sp->rndlevs) {
         char *ep = getenv("SPLEVTYPE"); /* not nh_getenv */
+
         if (ep) {
             /* strrchr always succeeds due to code in prior block */
             int len = (int) ((strrchr(protofile, '-') - protofile) + 1);
@@ -1083,6 +1087,7 @@ makemaz(const char *s)
             while (ep && *ep) {
                 if (!strncmp(ep, protofile, len)) {
                     int pick = atoi(ep + len);
+
                     /* use choice only if valid */
                     if (pick > 0 && pick <= (int) sp->rndlevs)
                         Sprintf(protofile + len, "%d", pick);
@@ -1109,7 +1114,7 @@ makemaz(const char *s)
         impossible("Couldn't load \"%s\" - making a maze.", protofile);
     }
 
-    gl.level.flags.is_maze_lev = TRUE;
+    gl.level.flags.is_maze_lev = 1;
     gl.level.flags.corrmaze = !rn2(3);
 
     if (!Invocation_lev(&u.uz) && rn2(2)) {

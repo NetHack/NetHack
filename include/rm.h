@@ -31,10 +31,27 @@
  * +-           -+-             -+              |
  */
 
-/* Level location types.  [Some debugging code in src/display.c
-   defines array type_names[] which contains an entry for each of
-   these, so needs to be kept in sync if any new types are added
-   or existing ones renumbered.] */
+/*
+ * Level location types, values for 'level.locations[x][y].typ'.
+ *
+ * These are different from display symbols and while there is
+ * similarity between the cmap subset of those, there isn't any
+ * one-to-one correspondence between the two encodings.  For instance,
+ * the DOOR type has multiple symbols (closed|open|gone); so does the
+ * STAIRS type (down|up).  Conversely, DRAWBRIDGE_UP represents the
+ * location of the projected span if the drawbridge were down but
+ * there is no symbol for that; it is displayed as water, ice, lava, or
+ * floor depending on what is at that spot when the bridge is 'closed'.
+ *
+ * [Some debugging code in src/display.c defines array type_names[]
+ * which contains an entry for each of these, so needs to be kept in
+ * sync if any new types are added or existing ones renumbered.  The
+ * #terrain command also has a menu choice to display each map spot by
+ * a letter derived from these numeric values and another choice to
+ * display a legend showing the letter-to-type correspondence.  If any
+ * types are added, removed, or reordered, that needs to be updated to
+ * keep in synch.]
+ */
 enum levl_typ_types {
     STONE     =  0,
     VWALL     =  1,
@@ -393,13 +410,15 @@ struct levelflags {
     Bitfield(is_maze_lev, 1);
     Bitfield(is_cavernous_lev, 1);
     Bitfield(arboreal, 1);     /* Trees replace rock */
+    Bitfield(has_town, 1);     /* level contains a town */
     Bitfield(wizard_bones, 1); /* set if level came from a bones file
-                                  which was created in wizard mode (or
-                                  normal mode descendant of such) */
+                                * which was created in wizard mode (or
+                                * normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
-                                  rather than ROOM */
+                                * rather than ROOM */
     Bitfield(rndmongen, 1);    /* random monster generation allowed? */
     Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+
     Bitfield(noautosearch, 1); /* automatic searching disabled */
     Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
     Bitfield(stormy, 1);       /* clouds create lightning bolts at random */

@@ -784,11 +784,13 @@ ifeq "$(GIT_AVAILABLE)" "Y"
 fetchlua:
 	@if [ ! -f $(LUASRC)/lua.h ] ; then \
 	git submodule init ../submodules/lua && \
-	git submodule update --remote ../submodules/lua ; fi
+	git submodule update ../submodules/lua ; fi
+#	git submodule update --remote ../submodules/lua ; fi
 fetchpdcurses:
 	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
 	git submodule init ../submodules/$(PDCURSES) && \
-	git submodule update --remote ../submodules/$(PDCURSES) ; fi
+	git submodule update ../submodules/$(PDCURSES) ; fi
+#	git submodule update --remote ../submodules/$(PDCURSES) ; fi
 else  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
 CURLLUADST=lua-5.4.6.tar.gz

@@ -101,6 +101,23 @@ engine are incompatible.
 Additional regular expression implementations can be written. The full
 interface documentation is in sys/share/posixregex.c
 
+===========================================================
+HEADER FILE NOTES
+
+hack.h defines values that are available to all NetHack source files,
+contains enums for use in all NetHack source files, and contains a
+number of struct definitions for use in all NetHack source files.
+hack.h does not contain variable declarations or variable definitions.
+
+decl.h and decl.c are related: decl.h contains the extern declarations
+for variables that are defined in decl.c. These variables are global
+and available to all NetHack source files.
+decl.c variable definitions are generally laid out in much the same
+order as their corresponding declarations in decl.h.
+
+A new header file cstd.h was added to coincide with 3.7's switch to
+C99. It contains calls to some C99 standard header files.
+
 =================== NEXT FEATURE ==========================
 
 

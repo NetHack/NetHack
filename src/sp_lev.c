@@ -124,7 +124,6 @@ static const char *get_mkroom_name(int);
 static int get_table_roomtype_opt(lua_State *, const char *, int);
 static int get_table_traptype_opt(lua_State *, const char *, int);
 static int get_traptype_byname(const char *);
-static void selection_recalc_bounds(struct selectionvar *);
 static lua_Integer get_table_intarray_entry(lua_State *, int, int);
 static struct sp_coder *sp_level_coder_init(void);
 
@@ -3558,7 +3557,7 @@ lspo_object(lua_State *L)
         tmpobj.lit = get_table_boolean_opt(L, "lit", 0);
         tmpobj.eroded = get_table_int_opt(L, "eroded", 0);
         tmpobj.locked = get_table_boolean_opt(L, "locked", -1);
-        tmpobj.trapped = get_table_int_opt(L, "trapped", -1);
+        tmpobj.trapped = get_table_boolean_opt(L, "trapped", -1);
         tmpobj.recharged = get_table_int_opt(L, "recharged", 0);
         tmpobj.greased = get_table_boolean_opt(L, "greased", 0);
         tmpobj.broken = get_table_boolean_opt(L, "broken", 0);
@@ -4562,7 +4561,7 @@ selection_getbounds(struct selectionvar *sel, NhRect *b)
 }
 
 /* recalc the boundary of selection, if necessary */
-static void
+void
 selection_recalc_bounds(struct selectionvar *sel)
 {
     coordxy x, y;
@@ -5257,6 +5256,12 @@ sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
 static void
 sel_set_feature(coordxy x, coordxy y, genericptr_t arg)
 {
+    if (!isok(x, y)) {
+#ifdef EXTRA_SANITY_CHECKS
+        impossible("sel_set_feature(%i,%i,%i) !isok", x, y, (*(int *) arg));
+#endif /*EXTRA_SANITY_CHECKS*/
+        return;
+    }
     if (IS_FURNITURE(levl[x][y].typ))
         return;
     levl[x][y].typ = (*(int *) arg);
@@ -5279,6 +5284,8 @@ sel_set_door(coordxy dx, coordxy dy, genericptr_t arg)
     levl[x][y].doormask = typ;
     SpLev_Map[x][y] = 1;
 }
+
+DISABLE_WARNING_UNREACHABLE_CODE
 
 /* door({ x = 1, y = 1, state = "nodoor" }); */
 /* door({ coord = {1, 1}, state = "nodoor" }); */
@@ -5338,13 +5345,18 @@ lspo_door(lua_State *L)
         /*selection_iterate(sel, sel_set_door, (genericptr_t) &typ);*/
         get_location_coord(&x, &y, ANY_LOC, gc.coder->croom,
                            SP_COORD_PACK(x, y));
-        if (!isok(x, y))
+        if (!isok(x, y)) {
             nhl_error(L, "door coord not ok");
+            /*NOTREACHED*/
+            return 0;
+        }
         sel_set_door(x, y, (genericptr_t) &typ);
     }
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 static void
 l_table_getset_feature_flag(
@@ -5462,10 +5474,15 @@ lspo_feature(lua_State *L)
     int typ;
     int argc = lua_gettop(L);
     boolean can_have_flags = FALSE;
+    long fcoord;
+    int humidity;
 
     create_des_coder();
 
-    if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
+    if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
+        typ = features2i[luaL_checkoption(L, 1, NULL, features)];
+        x = y = -1;
+    } else if (argc == 2 && lua_type(L, 1) == LUA_TSTRING
         && lua_type(L, 2) == LUA_TTABLE) {
         lua_Integer fx, fy;
         typ = features2i[luaL_checkoption(L, 1, NULL, features)];
@@ -5486,7 +5503,15 @@ lspo_feature(lua_State *L)
         can_have_flags = TRUE;
     }
 
-    get_location_coord(&x, &y, ANY_LOC, gc.coder->croom, SP_COORD_PACK(x, y));
+    if (x == -1 && y == -1) {
+        fcoord = SP_COORD_PACK_RANDOM(0);
+        humidity = DRY; /* pick a regular space, no rock or other furniture */
+    }
+    else {
+        fcoord = SP_COORD_PACK(x, y);
+        humidity = ANY_LOC; /* assume the author knows what they're doing */
+    }
+    get_location_coord(&x, &y, humidity, gc.coder->croom, fcoord);
 
     if (typ == STONE)
         impossible("feature has unknown type param.");
@@ -5519,8 +5544,6 @@ lspo_feature(lua_State *L)
 
     return 0;
 }
-
-RESTORE_WARNING_UNREACHABLE_CODE
 
 /*
  * [lit_state: 1 On, 0 Off, -1 random, -2 leave as-is]
@@ -5583,6 +5606,11 @@ lspo_terrain(lua_State *L)
     } else {
         get_location_coord(&x, &y, ANY_LOC, gc.coder->croom,
                            SP_COORD_PACK(x, y));
+        if (!isok(x, y)) {
+            nhl_error(L, "terrain coord not ok");
+            /*NOTREACHED*/
+            return 0;
+        }
         sel_set_ter(x, y, (genericptr_t) &tmpterrain);
     }
 
@@ -6216,8 +6244,6 @@ lspo_region(lua_State *L)
     return 0;
 }
 
-RESTORE_WARNING_UNREACHABLE_CODE
-
 /* drawbridge({ dir="east", state="closed", x=05,y=08 }); */
 /* drawbridge({ dir="east", state="closed", coord={05,08} }); */
 int
@@ -6252,6 +6278,11 @@ lspo_drawbridge(lua_State *L)
     y = my;
 
     get_location_coord(&x, &y, DRY | WET | HOT, gc.coder->croom, dcoord);
+    if (!isok(mx, my)) {
+        nhl_error(L, "drawbridge coord not ok");
+        /*NOTREACHED*/
+        return 0;
+    }
     if (db_open == -1)
         db_open = !rn2(2);
     if (!create_drawbridge(x, y, dir, db_open ? TRUE : FALSE))
@@ -6301,8 +6332,11 @@ lspo_mazewalk(lua_State *L)
 
     get_location_coord(&x, &y, ANY_LOC, gc.coder->croom, mcoord);
 
-    if (!isok(x, y))
+    if (!isok(x, y)) {
+        nhl_error(L, "mazewalk coord not ok");
+        /*NOTREACHED*/
         return 0;
+    }
 
     if (ftyp < 1) {
         ftyp = gl.level.flags.corrmaze ? CORR : ROOM;
@@ -6363,6 +6397,8 @@ lspo_mazewalk(lua_State *L)
 
     return 0;
 }
+
+RESTORE_WARNING_UNREACHABLE_CODE
 
 /* wall_property({ x1=0, y1=0, x2=78, y2=20, property="nondiggable" }); */
 /* wall_property({ region = {1,0, 78,20}, property="nonpasswall" }); */
@@ -6799,7 +6835,12 @@ TODO: gc.coder->croom needs to be updated
  skipmap:
     mapfrag_free(&mf);
 
-    if (has_contents && !(gi.in_mk_themerooms && gt.themeroom_failed)) {
+    if (gi.in_mk_themerooms && gt.themeroom_failed) {
+        /* this mutated xstart and ystart in the process of trying to make a
+         * themed room, so undo them */
+        reset_xystart_size();
+    }
+    else if (has_contents) {
         l_push_wid_hei_table(L, gx.xsize, gy.ysize);
         if (nhl_pcall(L, 1, 0)){
             impossible("Lua error: %s", lua_tostring(L, -1));

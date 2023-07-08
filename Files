@@ -179,6 +179,10 @@ outdated/sys/unix/hints/include:
 (files that are no longer maintained for current game code)
 cross-amiga-post  cross-amiga-pre
 
+outdated/sys/vms:
+(files that are no longer maintained for current game code)
+lev_lex.h
+
 outdated/sys/wince:
 (files for Windows CE and PocketPC - untested for 3.7)
 Install.ce    bootstrp.mak  celib.c       cesetup.bat   cesound.c
@@ -409,9 +413,9 @@ multiw-1.370       multiw-2.370       multiw-3.370
 sys/vms:
 (files for VMS version)
 Install.vms   Makefile.dat  Makefile.doc  Makefile.src  Makefile.top
-Makefile.utl  install.com   lev_lex.h     nethack.com   oldcrtl.c
-spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
-vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
+Makefile.utl  install.com   nethack.com   oldcrtl.c     spec_lev.com
+sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c     vmsmain.c
+vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/windows:
 (files for Windows 7/8.x/10/11 version)

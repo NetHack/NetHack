@@ -3069,11 +3069,10 @@ in_rooms(register coordxy x, register coordxy y, register int typewanted)
 boolean
 in_town(coordxy x, coordxy y)
 {
-    s_level *slev = Is_special(&u.uz);
     register struct mkroom *sroom;
     boolean has_subrooms = FALSE;
 
-    if (!slev || !slev->flags.town)
+    if (!gl.level.flags.has_town)
         return FALSE;
 
     /*
@@ -3140,14 +3139,26 @@ check_special_room(boolean newlev)
     if (*u.ushops0)
         u_left_shop(u.ushops_left, newlev);
 
-    if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
-        return; /* no entrance messages necessary */
-
-    if (!gc.context.achieveo.minetn_reached
+    /*
+     * Check for attaining 'entered Mine Town' achievement.
+     * Most of the Mine Town variations have the town in one large room
+     * containing a bunch of subrooms; we check for entering that large
+     * room.  However, two of the variations cover the whole level rather
+     * than include a room with subrooms.  We need to check for town entry
+     * before the possible early return for not having entered a room in
+     * case we have arrived in the town but have not entered any room.
+     *
+     * TODO: change the minetn variants which don't include any town
+     * boundary to have such.
+     */
+    if (gl.level.flags.has_town && !gc.context.achieveo.minetn_reached
         && In_mines(&u.uz) && in_town(u.ux, u.uy)) {
         record_achievement(ACH_TOWN);
         gc.context.achieveo.minetn_reached = TRUE;
     }
+
+    if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
+        return; /* no entrance messages necessary */
 
     /* Did we just enter a shop? */
     if (*u.ushops_entered)

@@ -793,8 +793,14 @@ clear_level_structures(void)
     gl.level.flags.is_maze_lev = 0;
     gl.level.flags.is_cavernous_lev = 0;
     gl.level.flags.arboreal = 0;
+    gl.level.flags.has_town = 0;
     gl.level.flags.wizard_bones = 0;
     gl.level.flags.corrmaze = 0;
+    gl.level.flags.rndmongen = 0;
+    gl.level.flags.deathdrops = 0;
+    gl.level.flags.noautosearch = 0;
+    gl.level.flags.fumaroles = 0;
+    gl.level.flags.stormy = 0;
 
     gn.nroom = 0;
     gr.rooms[0].hx = -1;

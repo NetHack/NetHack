@@ -391,13 +391,12 @@ mk_trap_statue(coordxy x, coordxy y)
     int trycount = 10;
 
     do { /* avoid ultimately hostile co-aligned unicorn */
-        mptr = &mons[rndmonnum()];
+        mptr = &mons[rndmonnum_adj(3, 6)];
     } while (--trycount > 0 && is_unicorn(mptr)
              && sgn(u.ualign.type) == sgn(mptr->maligntyp));
     statue = mkcorpstat(STATUE, (struct monst *) 0, mptr, x, y,
                         CORPSTAT_NONE);
-    mtmp = makemon(&mons[statue->corpsenm], 0, 0,
-                   MM_NOCOUNTBIRTH|MM_NOMSG);
+    mtmp = makemon(&mons[statue->corpsenm], 0, 0, MM_NOCOUNTBIRTH | MM_NOMSG);
     if (!mtmp)
         return; /* should never happen */
     while (mtmp->minvent) {
@@ -471,8 +470,9 @@ maketrap(coordxy x, coordxy y, int typ)
                 || (u.utraptype == TT_LAVA && !is_lava(x, y))))
             reset_utrap(FALSE);
         /* old <tx,ty> remain valid */
-    } else if ((IS_FURNITURE(lev->typ)
-                && (!IS_GRAVE(lev->typ) || (typ != PIT && typ != HOLE)))
+    } else if (!CAN_OVERWRITE_TERRAIN(lev->typ)
+               || (IS_FURNITURE(lev->typ)
+                   && (typ != PIT && typ != HOLE))
                || is_pool_or_lava(x, y)
                || (IS_AIR(lev->typ) && typ != MAGIC_PORTAL)
                || (typ == LEVEL_TELEP && single_level_branch(&u.uz))) {

@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1685863328 2023/06/04 07:22:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1688415115 2023/07/03 20:11:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -830,22 +830,32 @@ welcome(boolean new_game) /* false => restoring an old game */
 static void
 do_positionbar(void)
 {
+    /* FIXME: this will break if any coordinate is too big for (char);
+       the sys/msdos/vid*.c code uses (unsigned char) which is less
+       vulnerable but not guaranteed to be able to hold coordxy values;
+       also, there doesn't appear to be any need for this to be static,
+       nor to contain pairs of (> or <) and x; it could just be a full
+       line of spaces and > or < characters with update_positionbar()
+       revised to reconstruct the x values for non-space characters */
     static char pbar[COLNO];
     char *p;
-    stairway *stway = gs.stairs;
+    stairway *stway;
+    coordxy x, y;
+    int glyph, symbol;
 
     p = pbar;
     /* TODO: use the same method as getpos() so objects don't cover stairs */
-    while (stway) {
-        int x = stway->sx;
-        int y = stway->sy;
-        int glyph = glyph_to_cmap(gl.level.locations[x][y].glyph);
+    /* FIXME: traversing 'stairs' list ignores mimics that pose as stairs */
+    for (stway = gs.stairs; stway; stway = stway->next) {
+        x = stway->sx;
+        y = stway->sy;
+        glyph = levl[x][y].glyph;
+        symbol = glyph_to_cmap(glyph);
 
-        if (is_cmap_stairs(glyph)) {
+        if (is_cmap_stairs(symbol)) {
             *p++ = (stway->up ? '<' : '>');
-            *p++ = stway->sx;
+            *p++ = (char) x;
         }
-        stway = stway->next;
      }
 
     /* hero location */

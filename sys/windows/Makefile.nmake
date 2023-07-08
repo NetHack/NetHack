@@ -10,7 +10,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition v 15.9.55
 #            - Microsoft Visual Studio 2019 Community Edition v 16.11.27
-#            - Microsoft Visual Studio 2022 Community Edition v 17.6.3
+#            - Microsoft Visual Studio 2022 Community Edition v 17.6.4
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -972,7 +972,7 @@ rc=Rc.exe
 # Recently tested versions:
 TESTEDVS2017 = 14.16.27050.0
 TESTEDVS2019 = 14.29.30151.0
-TESTEDVS2022 = 14.36.32534.0
+TESTEDVS2022 = 14.36.32535.0
 
 VS2017CUR = $(TESTEDVS2017:.=)
 VS2019CUR = $(TESTEDVS2019:.=)
@@ -1372,12 +1372,14 @@ install:  envchk.tag libdir.tag ottydir.tag outldir.tag \
 !IF "$(GIT_AVAILABLE)" == "Y"
 $(LUASRC)\lua.h:
 	git submodule init ../submodules/lua
-	git submodule update --remote ../submodules/lua
+	git submodule update ../submodules/lua
+#	git submodule update --remote ../submodules/lua
 #
 #aka PDCDEP
 $(PDCURSES_TOP)\curses.h:
 	git submodule init ../submodules/$(PDCDIST)
-	git submodule update --remote ../submodules/$(PDCDIST)
+	git submodule update ../submodules/$(PDCDIST)
+#	git submodule update --remote ../submodules/$(PDCDIST)
 
 !ELSE  # GIT_AVAILABLE no
 CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz

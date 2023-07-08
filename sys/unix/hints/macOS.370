@@ -116,10 +116,18 @@ else
 # CURSESLIB = -lncurses -ltinfo
 comma:=,
 NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
-ifneq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
-HAVE_NCURSESW=1
-else
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+ifeq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+#this indicates that pkg-config itself was unavailable
+CURSESLIB = $(NCURSES_LFLAGS)
+NHCFLAGS+=-DCURSES_UNICODE
+endif
+endif
+#$(info $(NCURSES_LFLAGS))
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
 HAVE_NCURSESW=0
+else
+HAVE_NCURSESW=1
 endif
 ifeq "$(HAVE_NCURSESW)" "1"
 CURSESLIB = $(NCURSES_LFLAGS)
@@ -787,4 +795,3 @@ endif	# end of build_qt_pkg
 endif	# WANT_WIN_QT for packaging
 endif	# MAKEFILE_TOP
 #
-

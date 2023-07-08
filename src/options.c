@@ -5594,6 +5594,8 @@ handler_paranoid_confirmation(void)
     winid tmpwin;
     anything any;
     int i;
+    char mkey, mbuf[QBUFSZ], ebuf[BUFSZ], cbuf[QBUFSZ];
+    const char *explain, *cmdnm;
     menu_item *paranoia_picks = (menu_item *) 0;
     int clr = 0;
 
@@ -5603,9 +5605,25 @@ handler_paranoid_confirmation(void)
     for (i = 0; paranoia[i].flagmask != 0; ++i) {
         if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
             continue;
+        /* the 'swim' choice mentions the 'm' movement prefix in its
+           explanation; if that's been bound to something else or been
+           unbound altogether, substitute the replacement in the text */
+        explain = paranoia[i].explain;
+        if (strstri(explain, "'m'")
+            && (mkey = cmd_from_func(do_reqmenu)) != 'm') {
+            if (mkey) { /* key for 'm' prefix */
+                Sprintf(mbuf, "'%.9s'", visctrl(mkey)); /* .5 is enough */
+            } else { /* extended command name for 'm' prefix */
+                cmdnm = cmdname_from_func(do_reqmenu, cbuf, TRUE);
+                if (!cmdnm)
+                    cmdnm = "reqmenu";
+                Sprintf(mbuf, "'%s%.31s'", (*cmdnm != '#') ? "#" : "", cmdnm);
+            }
+            explain = strsubst(strcpy(ebuf, explain), "'m'", mbuf);
+        }
         any.a_int = paranoia[i].flagmask;
         add_menu(tmpwin, &nul_glyphinfo, &any, *paranoia[i].argname,
-                 0, ATR_NONE, clr, paranoia[i].explain,
+                 0, ATR_NONE, clr, explain,
                  (flags.paranoia_bits & paranoia[i].flagmask)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
