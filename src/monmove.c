@@ -885,6 +885,8 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
 
     if (otmp == uball || otmp == uchain)
         return FALSE;
+    if (mtmp->mtame && otmp->cursed)
+        return FALSE; /* note: will get overridden if mtmp will eat otmp */
     if (is_unicorn(mtmp->data) && objects[otmp->otyp].oc_material != GEMSTONE)
         return FALSE;
     if (!mindless(mtmp->data) && !is_animal(mtmp->data) && pctload < 75
@@ -916,8 +918,15 @@ mon_would_take_item(struct monst *mtmp, struct obj *otmp)
 boolean
 mon_would_consume_item(struct monst *mtmp, struct obj *otmp)
 {
+    int ftyp;
+
     if (otmp->otyp == CORPSE && !touch_petrifies(&mons[otmp->corpsenm])
         && corpse_eater(mtmp->data))
+        return TRUE;
+
+    if (mtmp->mtame && has_edog(mtmp) /* has_edog(): not guardian angel */
+        && (ftyp = dogfood(mtmp, otmp)) < MANFOOD
+        && (ftyp < ACCFOOD || EDOG(mtmp)->hungrytime <= gm.moves))
         return TRUE;
 
     return FALSE;
@@ -1148,7 +1157,11 @@ maybe_spin_web(struct monst *mtmp)
 
 /* monster looks for items it wants nearby */
 static boolean
-m_search_items(struct monst *mtmp, coordxy *ggx, coordxy *ggy, schar *mmoved, int *appr)
+m_search_items(
+    struct monst *mtmp,
+    coordxy *ggx, coordxy *ggy,
+    schar *mmoved,
+    int *appr)
 {
     register int minr = SQSRCHRADIUS; /* not too far away */
     register struct obj *otmp;
@@ -1802,8 +1815,10 @@ m_move(register struct monst *mtmp, int after)
                 u.ux = mtmp->mx;
                 u.uy = mtmp->my;
                 swallowed(0);
-            } else
+            } else {
                 newsym(mtmp->mx, mtmp->my);
+            }
+#undef UnblockDoor
         }
         if (OBJ_AT(mtmp->mx, mtmp->my) && mtmp->mcanmove) {
 

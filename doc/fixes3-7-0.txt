@@ -1644,6 +1644,7 @@ hero might not be credited with "entered Mine Town" achievement for the town
 	entered via falling or level teleport
 in the theme room "water-surrounded vault", guarantee an item which can be
 	be used to escape from the room in one of the four chests
+pets capable of using items would pick up and wear cursed armor
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
