@@ -321,7 +321,10 @@ dosit(void)
                 u.utrap++;
             }
         } else {
-            You("sit down.");
+            /* when flying, "you land" might need some refinement; it aounds
+               as if you're staying on the ground but you will immediately
+               take off again unless you become stuck in a holding trap */
+            You("%s.", Flying ? "land" : "sit down");
             dotrap(trap, VIASITTING);
         }
     } else if ((Underwater || Is_waterlevel(&u.uz))
