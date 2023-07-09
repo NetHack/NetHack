@@ -1270,7 +1270,8 @@ trapeffect_sqky_board(
         se_squeak_A, se_squeak_B_flat, se_squeak_B,
     };
     boolean forcetrap = ((trflags & FORCETRAP) != 0
-                         || (trflags & FAILEDUNTRAP) != 0);
+                         || (trflags & FAILEDUNTRAP) != 0
+                         || (Flying && (trflags & VIASITTING) != 0));
 
     if (mtmp == &gy.youmonst) {
         if ((Levitation || Flying) && !forcetrap) {
