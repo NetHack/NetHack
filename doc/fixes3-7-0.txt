@@ -1783,8 +1783,9 @@ curses: selecting a partial stack, unselecting it, and then selecting it
 macOS: Xcode project was failing to build if the path to the NetHack source
 	tree contained a space; the issue was within some shell script code
 	contained within the project
-msdos: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
+MS-DOS: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
+MS-DOS: sample config file had same MENUCOLOR flaw as Windows (see below)
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
 Qt: [later] tiles load failure at startup now continues using an ascii map
 Qt: use more columns for extended command selection dialog so that the number
@@ -1936,6 +1937,8 @@ Windows: When there was no interesting background in get_bk_glyph()
 	GLYPH_UNEXPLORED as a background tile to merge with the
 	foreground tile, so check for GLYPH_UNEXPLORED and bypass that
 Windows: fix range error detected by address sanitizer in plselInitDialog()
+Windows: the .nethackrc template contained a sample MENUCOLOR pattern for
+	"cursed .* (being worn)" which didn't work; parentheses need quotes
 X11: substantial overhaul of status display, both 'fancy' and 'tty-style'
 X11: extend fancy status one-turn inverse video status-change highlighting to
 	hunger, encumbrance, and conditions

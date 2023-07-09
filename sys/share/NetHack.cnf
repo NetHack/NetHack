@@ -128,4 +128,4 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 #MENUCOLOR=" holy "=green
 #MENUCOLOR=" cursed "=red
 #MENUCOLOR=" unholy "=red
-#MENUCOLOR=" cursed .* (being worn)"=orange&underline
+#MENUCOLOR=" cursed .* \(being worn\)"=orange&underline
