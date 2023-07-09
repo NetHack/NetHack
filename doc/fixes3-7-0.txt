@@ -1221,6 +1221,7 @@ in wizard mode, #terrain has offers to view all map locations as single-
 	which have higher values
 restore the ability for trap creation via magic which creates pits to destroy
 	'furniture'
+allow #sit while flying over a squeaky board trap to trigger it
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
