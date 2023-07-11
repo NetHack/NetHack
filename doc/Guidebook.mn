@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "June 25, 2023
+.ds f2 "July 10, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4263,9 +4263,20 @@ turn on all of the above.
 By default, the pray and swim choices are enabled, the others disabled.
 To disable them without setting
 any of the other choices, use \f(CRparanoid_confirmation:none\fP.
-To keep
-them enabled while setting any of the others, include them in the new list,
-such as \f(CRparanoid_confirmation:attack pray swim Remove\fP.
+To keep them enabled while setting any of the others, you can
+include them in the new list, such as
+\f(CRparanoid_confirmation:attack pray swim Remove\fP
+or you can precede the first entry in the list with a plus sign,
+\f(CRparanoid_confirmation:+attack Remove\fP.
+To remove an entry that has been previously set without removing others,
+precede the first entry in the list with a minus sign,
+\f(CRparanoid_confirmation:-swim\fP.
+To both add some new entries and remove some old ones, you can use
+mulitple \fIparanoid_confirmation\fP option settings, or you can
+use the \(oq\f(CR+\fP\(cq form and list entries to be added by their name
+and entries to be removed by \(oq\f(CR!\fP\(cq and name.
+The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
+can be intermixed.
 .lp perm_invent
 If true, always display your current inventory in a window.  This only
 makes sense for windowing system interfaces that implement this feature.

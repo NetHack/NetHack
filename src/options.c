@@ -156,8 +156,10 @@ static const struct paranoia_opts {
        is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
        latter requires at least two letters; "e"at vs "ex"plore,
        "cont"inue eating vs "C"onfirm; "wand"-break vs "Were"-change,
-       both require at least two letters during config processing and use
-       case-senstivity for 'O's interactive menu */
+       both require at least two letters during config processing but use
+       one letter with case-senstivity for 'm O's interactive menu;
+       if any entry or alias beginning with 'n' gets added, aside from "none",
+       the parsing to accept "nofoo" to mean "!foo" will need fixing */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
     { PARANOID_QUIT, "quit", 1, "explore", 2,
@@ -2630,9 +2632,10 @@ optfn_palette(
 /* for "paranoid_confirmation:foo" and alias "[!]prayconfirm" */
 static int
 optfn_paranoid_confirmation(
-    int optidx, int req, boolean negated,
+    int optidx, int req, boolean opt_negated,
     char *opts, char *op)
 {
+    boolean fld_negated;
     int i;
     /*
      * Player can change required response for some prompts (quit, die,
@@ -2679,7 +2682,7 @@ optfn_paranoid_confirmation(
                    an explicit value to a boolean option wasn't supported */
                 config_error_add(
            "deprecated %sprayconfirm option takes no parameters (found '%s')",
-                                 negated ? "!" : "", op);
+                                 opt_negated ? "!" : "", op);
                 return optn_silenterr;
             }
 #ifdef COMPLAIN_ABOUT_PRAYCONFIRM
@@ -2689,31 +2692,38 @@ optfn_paranoid_confirmation(
                temporary until 'prayconfirm' gets removed altogether] */
             config_error_add(
                  "%sprayconfirm option is deprecated; switching to %s:%cpray",
-                             negated ? "!" : "",
+                             opt_negated ? "!" : "",
                              allopt[optidx].name,
-                             negated ? '-' : '+');
+                             opt_negated ? '-' : '+');
             /* keep going */
 #endif
             /* convert prayconfirm to paranoid_confirm:+pray and
                !prayconfirm to paranoid_confirm:-pray */
-            Sprintf(prayconfirm, "%cpray", negated ? '-' : '+');
+            Sprintf(prayconfirm, "%cpray", opt_negated ? '-' : '+');
             op = prayconfirm;
             /* possibly changing !prayconfirm to paranoid_confirm:-pray
                which clears a paranoia bit but isn't a negated option */
-            negated = FALSE;
+            opt_negated = FALSE;
         /*
          * end of 'prayconfirm' processing
          */
 
-        } else if (!*op) {
-            /* "paranoid_confirm" without any arguments is disallowed;
-               "!paranoid_confirm" w/o args is same as paranoid_confirm:none;
-               "!paranoid_confirm:foo bar" won't get here so handled below */
-            if (negated) {
+        } else if (opt_negated) {
+            /* "!paranoid_confirm" w/o args is same as paranoid_confirm:none;
+               "!paranoid_confirm:anything" is disallowed */
+            if (!*op) {
                 flags.paranoia_bits = 0;
                 return optn_ok;
+            } else {
+                config_error_add("!%s does not accept a value",
+                                 allopt[optidx].name);
+                return optn_silenterr;
             }
-            return optn_err;
+        } else if (!*op) {
+            /* "paranoid_confirm" without any arguments is disallowed */
+            config_error_add("%s requires a value; use 'none' to cancel all",
+                             allopt[optidx].name);
+            return optn_silenterr;
         }
 
         /*
@@ -2731,37 +2741,55 @@ optfn_paranoid_confirmation(
          * paranoid_confirm:-foo bar
          *   existing bits are kept except those for foo and bar get cleared;
          *
-         * !paranoid_confirm:foo bar
-         *   is treated as if it was paranoid_confirm:-foo bar, probably
-         *   ought to become deprecated. !paranoid_confirm:none is
-         *   nonsensical and yields same result as paranoid_confirm:none
-         *   and !paranoid_confirm:all.
+         * paranoid_confirm:+foo !bar
+         *   combination of paranoid_confirm:+foo,paranoid_confirm:-bar;
+         *
+         * paranoid_confirm:-foo !bar
+         *   the negation in '!bar' is ignored, treated as if '-foo bar';
+         *
+         * !paranoid_confirm
+         *   without a value is treated as paranoid_confirm:none and clears
+         *   all bits;
+         * !paranoid_confirm:anything
+         *   (including +anything_else or -anything_else) is disallowed;
          *
          * paranoid_confirm:+all is the same as paranoid_confirm:all;
          * paranoid_confirm:-all is the same as paranoid_confirm:none;
-         * paranoid_confirm:+none and paranoid_confirm:-none are no-ops;
-         * !paranoid_confirm:[+|-]anything are disallowed.
+         * paranoid_confirm:+none and paranoid_confirm:-none are no-ops.
          */
         (void) mungspaces(op);
         if (*op != '+' && *op != '-') {
-            /* new value; clear all bits unless negated */
-            if (!negated)
-                flags.paranoia_bits = 0;
-        } else if (negated) {
-            /* first char is '+' or '-'; disallowed for !paranoid_confirm */
-            config_error_add("invalid !%s parameter '%s'",
-                             allopt[optidx].name, op);
-            return optn_silenterr;
+            /* new value; first clear all old bits */
+            flags.paranoia_bits = 0;
         } else {
             /* augmenting existing value; keep old bits */
             plus_or_minus = TRUE; /* only used for "+none" and "-none" */
-            negated = (*op == '-'); /* context is changed */
-            ++op; /* skip '+' or '-' and possible whitespace after it */
-            if (*op == ' ')
+            opt_negated = (*op == '-'); /* context is changed */
+            if (*++op == ' ') /* skip '+' or '-', maybe whitespace */
                 ++op;
         }
 
         for (;;) {
+            fld_negated = (*op == '!');
+            if (fld_negated) {
+                /* there shouldn't be a space after '!' because then
+                   "! foo bar" looks like it might be intended to mean
+                   "!foo !bar" but if there is one, skip it to prevent
+                   a lookup attempt for "" which will fail and result in
+                   an unhelpful error message; accepting the space is
+                   simpler than another special case error message */
+                if (*++op == ' ') /* skip '!', maybe whitespace */
+                    ++op;
+            } else {
+                /* accept "nofoo" to be same as "!foo", unless "no" is
+                   followed by a space or 'foo' begins with "n" (to avoid
+                   confusion for "none" */
+                if (lowc(op[0]) == 'n' && lowc(op[1]) == 'o'
+                       && lowc(op[2] != 'n' && lowc(op[2]) != '\0')) {
+                    fld_negated = TRUE;
+                    op += 2; /* skip "no"; we know next char isn't space  */
+                }
+            }
             /* We're looking to parse
                "paranoid_confirm:whichone wheretwo whothree"
                and "paranoid_confirm:" prefix has already
@@ -2783,7 +2811,7 @@ optfn_paranoid_confirmation(
                            but "+none" and "-none" are no-ops */
                         if (!plus_or_minus)
                             flags.paranoia_bits = 0; /* clear all */
-                    } else if (negated) {
+                    } else if (opt_negated || fld_negated) {
                         flags.paranoia_bits &= ~paranoia[i].flagmask;
                     } else {
                         flags.paranoia_bits |= paranoia[i].flagmask;
@@ -2833,7 +2861,9 @@ optfn_paranoid_confirmation(
 }
 
 static int
-optfn_petattr(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_petattr(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok;
 
