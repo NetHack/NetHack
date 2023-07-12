@@ -1236,9 +1236,6 @@ void NetHackQtMainWindow::layout()
         splittersizes[2] = w / 2 - (d * 1 / 4); // status
         splittersizes[1] = d;                   // invusage
         splittersizes[0] = w / 2 - (d * 3 / 4); // messages
-        printf("w = %d d = %d splittersizes = %d %d %d\n",
-                w, d,
-                splittersizes[0], splittersizes[1], splittersizes[2]);
         hsplitter->setSizes(splittersizes);
     }
 }
