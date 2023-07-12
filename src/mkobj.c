@@ -1,4 +1,4 @@
-/* NetHack 3.7	mkobj.c	$NHDT-Date: 1654881236 2022/06/10 17:13:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.237 $ */
+/* NetHack 3.7	mkobj.c	$NHDT-Date: 1689180492 2023/07/12 16:48:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.272 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1837,11 +1837,27 @@ weight(struct obj *obj)
     }
     if (Is_container(obj) || obj->otyp == STATUE) {
         struct obj *contents;
-        register int cwt = 0;
+        int cwt;
 
-        if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM)
-            wt = (int) obj->quan * ((int) mons[obj->corpsenm].cwt * 3 / 2);
+        if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM) {
+            int msize = (int) mons[obj->corpsenm].msize, /* 0..7 */
+                minwt = (msize + msize + 1) * 100;
 
+            /* default statue weight is 1.5 times corpse weight */
+            wt = 3 * (int) mons[obj->corpsenm].cwt / 2;
+            /* some monsters that never leave a corpse when they die have
+               corpse weight defined as 0; statues resembling them need to
+               have non-zero weight; others are so tiny (killer bee) that
+               they weigh barely more than nothing or so insubstantial
+               (wraith) that they actually weigh nothing; statues of such
+               need more heft */
+            if (wt < minwt)
+                wt = minwt;
+            /* this has no effect because statues don't stack */
+            wt *= (int) obj->quan;
+        }
+
+        cwt = 0; /* contents weight */
         for (contents = obj->cobj; contents; contents = contents->nobj)
             cwt += weight(contents);
         /*
