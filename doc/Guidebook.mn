@@ -5424,6 +5424,11 @@ for stone through termill, \(lqminor_troubles\(rq for blind through hallu,
 Allowed behaviors are \(lqalways\(rq, \(lqup\(rq, \(lqdown\(rq,
 \(lqchanged\(rq, a percentage or absolute number threshold, or
 text to match against.
+For the \fIhitpoints\fP field, the additional behavior \(lqcriticalhp\(rq
+is available.
+It overrides always, percentage threshold, and absolute threshold if
+hit points are at or below the \fImajor problem\fP threshold
+(which varies depending upon maximum hit points and experience level).
 .si
 .lp "*"
 \(lqalways\(rq will set the default attributes for that field.
@@ -5478,6 +5483,10 @@ If the number is preceded by \(oq<=\(cq or \(oq>=\(cq instead,
 it also matches when value is below or above.
 If the prefix is \(oq<\(cq or \(oq>\(cq, only match when strictly
 above or below.
+.lp "*"
+criticalhp only applies to the hitpoints field and when defined it
+takes precedence over other hitpints rules except \fIchanged\fP,
+\fIup\fP, or \fIdown\fP.
 .lp "*"
 text match sets the attribute when the field value
 matches the text.

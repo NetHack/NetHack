@@ -2197,6 +2197,9 @@ when a doppelganger takes on mplayer (fake hero) form, usually choose role
 can now write unknown spellbook without need of Luck when spell is known;
 	if spell becomes known without having read its book (potential divine
 	gift), writing the book while the spell is still fresh will succeed
+new status highlight rule type for hitpoints:  "criticalhp" rule overrides
+	hit point rules if current HP is so low that prayer will consider it
+	to be major problem; applies to hitpointbar as well as HP status
 
 
 Platform- and/or Interface-Specific New Features
