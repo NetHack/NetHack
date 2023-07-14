@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{July 10, 2023}
+\date{July 13, 2023}
 
 \maketitle
 
@@ -6016,6 +6016,11 @@ for stone through termill, `minor\_troubles' for blind through hallu,
 %.lp ""
 Allowed behaviors are ``always'', ``up'', ``down'', ``changed'', a
 percentage or absolute number threshold, or text to match against.
+For the {\it hitpoints\/} field, the additional behavior ``criticalhp''
+is available.
+It overrides always, percentage threshold, and absolute threshold if
+hit points are at or below the {\it major problem\/} threshold
+(which varies depending upon maximum hit points and experience level).
 
 \blist{}
 %.lp "*"
@@ -6068,7 +6073,12 @@ it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
 %.lp "*"
-\item[{\tt text}] match sets the attribute when the field value matches the text.
+\item[{\tt criticalhp}] only applies to the hitpoints field and when defined
+it takes precedence over other hitpints rules except {\it changed\/},
+{\it up\/}, or {\it down\/}.
+%.lp "*"
+\item[{\tt text}] match sets the attribute when the field value
+matches the text.
 Text matches can only be used for ``{\it alignment\/}'',
 ``{\it carrying-capacity\/}'', ``{\it hunger\/}'', ``{\it dungeon-level\/}'',
 and ``{\it title\/}''.
@@ -6363,8 +6373,8 @@ character sequences and explicit 24-bit red-green-blue colors in order for the g
 representation to be visible as specified.
 
 For example, the following line in your configuration file will cause
-the glyph representation for glyphid G\verb+_+pool to use Unicode codepoint U+224B
-and the color represented by R-G-B value 0-0-160:\\
+the glyph representation for glyphid G\verb+_+pool to use Unicode codepoint
+U+224B and the color represented by R-G-B value 0-0-160:\\
 \begin{verbatim}
 OPTIONS=glyph:G_pool/U+224B/0-0-160
 \end{verbatim}

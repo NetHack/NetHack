@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "July 10, 2023
+.ds f2 "July 13, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5032,9 +5032,11 @@ rules and not saved with the game.
 .lp "Here are some examples:"
 .sd
 .si
+.ft CR
 autopickup_exception="<*arrow"
 autopickup_exception=">*corpse"
 autopickup_exception=">* cursed*"
+.ft
 .ei
 .ed
 .\" (this paragraph would look better unindented but can't use .lp hack...)
@@ -5227,8 +5229,10 @@ Here's an example of message types using NetHack's internal
 pattern matching facility:
 .sd
 .si
+.ft CR
 MSGTYPE=stop "You feel hungry."
 MSGTYPE=hide "You displaced *."
+.ft
 .ei
 .ed
 specifies that whenever a message \(lqYou feel hungry\(rq is shown,
@@ -5334,12 +5338,14 @@ The pattern should be a POSIX extended regular expression.
 For example:
 .sd
 .si
+.ft CR
 SOUNDDIR=C:\\nethack\\sounds
 SOUND=MESG "This door is locked" "lock.wav" 100
 SOUND=MESG hide "^You miss the " "swing.wav" 75
+.ft
 .ei
 .ed
-.pg
+.BR 0 .\" without this, the next section seems too close to this one
 .hn 2
 Configuring Status Hilites
 .pg
@@ -5484,8 +5490,8 @@ it also matches when value is below or above.
 If the prefix is \(oq<\(cq or \(oq>\(cq, only match when strictly
 above or below.
 .lp "*"
-criticalhp only applies to the hitpoints field and when defined it
-takes precedence over other hitpints rules except \fIchanged\fP,
+criticalhp only applies to the hitpoints field and when defined
+it takes precedence over other hitpints rules except \fIchanged\fP,
 \fIup\fP, or \fIdown\fP.
 .lp "*"
 text match sets the attribute when the field value
@@ -5507,6 +5513,7 @@ to 0.
 Example hilites:
 .sd
 .si
+.ft CR
 OPTION=hilite_status: gold/up/yellow/down/brown
 OPTION=hilite_status: characteristics/up/green/down/red
 OPTION=hilite_status: hitpoints/100%/gray&normal
@@ -5517,9 +5524,10 @@ OPTION=hilite_status: hitpoints/<33%/red&bold
 OPTION=hilite_status: hitpoints/<15%/red&inverse
 OPTION=hilite_status: condition/major/orange&inverse
 OPTION=hilite_status: condition/lev+fly/red&inverse
+.ft
 .ei
 .ed
-.pg
+.BR 0 .\" without this, the next section seems too close to this one
 .hn 2
 Modifying NetHack Symbols
 .pg
@@ -5761,7 +5769,6 @@ Statues and boulders are the rock being referred to, but since
 version 3.6.0, statues are displayed as the monster they depict.
 So S_rock is only used for boulders and not used at all if
 overridden by the more specific S_boulder.
-.pg
 .hn 2
 Customizing Map Glyph Representations Using Unicode
 .pg
@@ -5771,11 +5778,12 @@ codepoint values and \fIred-green-blue\fP colors to glyph
 representations. The customizations can be specified for use with a symset that
 has a UTF8 handler within the symbols file such as the enhanced1 set, or 
 individually within your nethack.rc file.
-
 .pg
 The format for defining a glyph representation is:
 .SD n
-\f(CROPTIONS=glyph:glyphid\fIU+nnnn\fP/\fIR-G-B\fP\fP
+.ft CR
+OPTIONS=glyph:\fIglyphid\fP/\fIU+nnnn\fP/\fIR-G-B\fP
+.ft
 .ED
 .pg
 The window port that is active needs to provide support for displaying
@@ -5783,9 +5791,11 @@ UTF-8 character sequences and explicit red-green-blue colors in order
 for the glyph representation to be visible.
 For example, the following line in your configuration file will cause
 the glyph representation for glyphid G_pool to use Unicode codepoint
-U+224B and the color represented by R-G-B value 0-0-160
+U+224B and the color represented by R-G-B value 0-0-160:
 .SD n
-\f(CROPTIONS=glyph:G_pool/U+224B/0-0-160\fP
+.ft CR
+OPTIONS=glyph:G_pool/U+224B/0-0-160
+.ft
 .ED
 The list of acceptable glyphid's can be produced by 
 \fBnethack \-\-dumpglyphids\fP.
@@ -5793,10 +5803,9 @@ Individual NetHack glyphs can be specified using the G_ prefix,
 or you can use an S_ symbol for a glyphid and store the custom
 representation for all NetHack glyphs that would map to that
 particular symbol.
-
+.pg
 You will need to select a symset with a UTF8 handler to enable the
 display of the customizations, such as the Enhanced symset.
-.pg
 .hn 2
 Configuring NetHack for Play by the Blind
 .pg
