@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitu.c	$NHDT-Date: 1625838648 2021/07/09 13:50:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.246 $ */
+/* NetHack 3.7	mhitu.c	$NHDT-Date: 1689448844 2023/07/15 19:20:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -877,16 +877,21 @@ summonmu(struct monst *mtmp, boolean youseeit)
     }
 
     if (is_were(mdat)) {
+        /* if hero has Protection_from_shape_changers, new_were() will work
+           in the critter-to-human direction but be a no-op the other way;
+           we repeat the criteria here for clarity */
         if (is_human(mdat)) { /* maybe switch to animal form */
-            if (!rn2(5 - (night() * 2)))
+            if (!Protection_from_shape_changers && !rn2(5 - (night() * 2)))
                 new_were(mtmp);
         } else { /* maybe switch to back human form */
-            if (!rn2(30))
+            if (Protection_from_shape_changers || !rn2(30))
                 new_were(mtmp);
         }
         mdat = mtmp->data; /* form change invalidates cached value */
 
-        if (!rn2(10)) { /* maybe summon compatible critters */
+        /* maybe summon compatible critters;
+           not blocked by Protection_from_shape_changers */
+        if (!rn2(10)) {
             int numseen, numhelp;
             char buf[BUFSZ], genericwere[BUFSZ];
 

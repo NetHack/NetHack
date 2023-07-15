@@ -1,4 +1,4 @@
-DT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1220 $ $NHDT-Date: 1689180503 2023/07/12 16:48:23 $
+DT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1222 $ $NHDT-Date: 1689448843 2023/07/15 19:20:43 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1223,6 +1223,8 @@ restore the ability for trap creation via magic which creates pits to destroy
 	'furniture'
 allow #sit while flying over a squeaky board trap to trigger it
 weight of statues of wraiths and of monsters which never leave a corpse was 0
+when a werecreature in human form attacked hero, it could transform to critter
+	despite hero having the Protection_from_shape_changers_attibute
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
