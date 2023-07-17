@@ -1,4 +1,4 @@
-/* NetHack 3.7	do.c	$NHDT-Date: 1688415121 2023/07/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.357 $ */
+/* NetHack 3.7	do.c	$NHDT-Date: 1689629244 2023/07/17 21:27:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.358 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1413,6 +1413,7 @@ goto_level(
     boolean cant_go_back, great_effort,
             up = (depth(newlevel) < depth(&u.uz)),
             newdungeon = (u.uz.dnum != newlevel->dnum),
+            leaving_tutorial = FALSE,
             was_in_W_tower = In_W_tower(u.ux, u.uy, &u.uz),
             familiar = FALSE,
             new = FALSE; /* made a new level? */
@@ -1436,7 +1437,7 @@ goto_level(
         } else if (In_tutorial(&u.uz)) {
             tutorial(FALSE); /* leaving tutorial */
             up = FALSE; /* re-enter level 1 as if starting new game */
-            /* TODO: remove tutorial level(s) from #overview data */
+            leaving_tutorial = TRUE;
         }
     }
     new_ledger = ledger_no(newlevel);
@@ -1561,13 +1562,13 @@ goto_level(
      * for the level being left, to recover dynamic memory in use and
      * to avoid dangling timers and light sources.
      */
-    cant_go_back = (newdungeon && In_endgame(newlevel));
+    cant_go_back = ((newdungeon && In_endgame(newlevel)) || leaving_tutorial);
     if (!cant_go_back) {
         update_mlstmv(); /* current monsters are becoming inactive */
         if (nhfp->structlevel)
             bufon(nhfp->fd);       /* use buffered output */
     } else {
-        free_luathemes(TRUE);
+        free_luathemes(leaving_tutorial ? tut_themes : most_themes);
     }
     save_mode = nhfp->mode;
     nhfp->mode = cant_go_back ? FREEING : (WRITING | FREEING);
@@ -1577,10 +1578,12 @@ goto_level(
     if (cant_go_back) {
         /* discard unreachable levels; keep #0 */
         for (l_idx = maxledgerno(); l_idx > 0; --l_idx)
-            delete_levelfile(l_idx);
+            if (!leaving_tutorial || ledger_to_dnum(l_idx) == tutorial_dnum)
+                delete_levelfile(l_idx);
         /* mark #overview data for all dungeon branches as uninteresting */
         for (l_idx = 0; l_idx < gn.n_dgns; ++l_idx)
-            remdun_mapseen(l_idx);
+            if (!leaving_tutorial || l_idx == tutorial_dnum)
+                remdun_mapseen(l_idx);
         /* get rid of mons & objs scheduled to migrate to discarded levels */
         discard_migrations();
     }

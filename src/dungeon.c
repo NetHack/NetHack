@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.c	$NHDT-Date: 1685180838 2023/05/27 09:47:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.7	dungeon.c	$NHDT-Date: 1689629244 2023/07/17 21:27:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.188 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2933,6 +2933,15 @@ interest_mapseen(mapseen *mptr)
         return TRUE;
     if (mptr->flags.unreachable || mptr->flags.forgot)
         return FALSE;
+    /* when in tutorial, show all tutorial levels visited whether interesting
+       or not and don't show any other levels; when outside tutorial, don't
+       show any tutorial levels even if they're considered interesting */
+    if (In_tutorial(&u.uz)) {
+        return In_tutorial(&mptr->lev);
+    } else {
+        if (In_tutorial(&mptr->lev))
+            return FALSE;
+    }
     /* level is of interest if it has an auto-generated annotation */
     if (mptr->flags.oracle || mptr->flags.bigroom || mptr->flags.roguelevel
         || mptr->flags.castle || mptr->flags.valley

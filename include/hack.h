@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.h	$NHDT-Date: 1684374685 2023/05/18 01:51:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.218 $ */
+/* NetHack 3.7	hack.h	$NHDT-Date: 1689629241 2023/07/17 21:27:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.222 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -400,6 +400,11 @@ struct dgn_topology { /* special dungeon levels for speed */
 #define dunlev_reached(x) (gd.dungeons[(x)->dnum].dunlev_ureached)
 #define MAXLINFO (MAXDUNGEON * MAXLEVEL)
 
+enum lua_theme_group {
+    all_themes = 1,  /* for end of game */
+    most_themes = 2, /* for entering endgame */
+    tut_themes = 3,  /* for leaving tutorial */
+};
 
 enum earlyarg {
     ARG_DEBUG, ARG_VERSION, ARG_SHOWPATHS

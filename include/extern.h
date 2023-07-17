@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1687343496 2023/06/21 10:31:36 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1276 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1689629242 2023/07/17 21:27:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1279 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1399,7 +1399,7 @@ extern void sort_rooms(void);
 extern void add_room(int, int, int, int, boolean, schar, boolean);
 extern void add_subroom(struct mkroom *, int, int, int, int, boolean, schar,
                         boolean);
-extern void free_luathemes(boolean);
+extern void free_luathemes(enum lua_theme_group);
 extern void makecorridors(void);
 extern void add_door(coordxy, coordxy, struct mkroom *);
 extern void count_level_features(void);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1648066813 2022/03/23 20:20:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1689629245 2023/07/17 21:27:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.154 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -241,12 +241,19 @@ add_subroom(struct mkroom *proom, int lowx, int lowy, int hix, int hiy,
 }
 
 void
-free_luathemes(boolean keependgame) /* F: done, T: discarding main dungeon */
+free_luathemes(enum lua_theme_group theme_group)
 {
     int i;
 
+    /*
+     * Release which group(s)?
+     *  tut_themes  => leaving tutorial, free tutorial themes only;
+     *  most_themes => entering endgame, free non-endgame themes;
+     *  all_themes  => end of game, free all themes.
+     */
     for (i = 0; i < gn.n_dgns; ++i) {
-        if (keependgame && i == astral_level.dnum)
+        if ((theme_group == tut_themes && i != tutorial_dnum)
+            || (theme_group == most_themes && i == astral_level.dnum))
             continue;
         if (gl.luathemes[i]) {
             nhl_done((lua_State *) gl.luathemes[i]);

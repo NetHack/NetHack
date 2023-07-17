@@ -1,4 +1,4 @@
-/* NetHack 3.7	save.c	$NHDT-Date: 1686726259 2023/06/14 07:04:19 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.206 $ */
+/* NetHack 3.7	save.c	$NHDT-Date: 1689629246 2023/07/17 21:27:26 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.207 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1142,7 +1142,7 @@ free_dungeons(void)
     tnhfp.mode = FREEING;
     savelevchn(&tnhfp);
     save_dungeon(&tnhfp, FALSE, TRUE);
-    free_luathemes(TRUE);
+    free_luathemes(all_themes);
 #endif
     return;
 }
