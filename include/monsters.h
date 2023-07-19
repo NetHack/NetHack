@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1665130023 2022/10/07 08:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1689793237 2023/07/19 19:00:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2713,26 +2713,33 @@
         M3_INFRAVISIBLE, 8, CLR_YELLOW, DJINNI),
     /*
      * sea monsters
+     *
+     * 3.7: all the fish except kraken used to specify M1_SLITHY, presumably
+     * cloned from giant eel.  Using "slither" to describe their movmement
+     * wasn't appropriate.  Unfortunately, locomotion() isn't able to choose
+     * "swim" as their movement description because it is only passed a
+     * monster type, not a specific monster (for <mx,my>) or the relevant
+     * location, and therefore doesn't know whether water is involved.
      */
     MON("jellyfish", S_EEL, LVL(3, 3, 6, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_STNG, AD_DRST, 3, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(80, 20, MS_SILENT, MZ_SMALL), MR_POISON, MR_POISON,
-        M1_SWIM | M1_AMPHIBIOUS | M1_SLITHY | M1_NOLIMBS | M1_NOHEAD
+        M1_SWIM | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD
             | M1_NOTAKE | M1_POIS,
         M2_HOSTILE, 0, 5, CLR_BLUE, JELLYFISH),
     MON("piranha", S_EEL, LVL(5, 18, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BITE, AD_PHYS, 2, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(60, 30, MS_SILENT, MZ_SMALL), 0, 0,
-        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,
         M2_HOSTILE, 0, 7, CLR_RED, PIRANHA),
     MON("shark", S_EEL, LVL(7, 12, 2, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(500, 350, MS_SILENT, MZ_LARGE), 0, 0,
-        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_THICK_HIDE | M1_NOTAKE,
         M2_HOSTILE, 0, 9, CLR_GRAY, SHARK),
     MON("giant eel", S_EEL, LVL(5, 9, -1, 0, 0), (G_GENO | G_NOGEN),

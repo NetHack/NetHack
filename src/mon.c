@@ -4259,7 +4259,8 @@ hideunder(struct monst *mtmp)
 {
     struct trap *t;
     struct obj *otmp;
-    const char *seenmon = (char *) 0, *seenobj = (char *) 0;
+    const char *seenmon = (char *) 0, *seenobj = (char *) 0,
+               *locomo = (char *) 0;
     int seeit = gi.in_mklev ? 0 : canseemon(mtmp);
     boolean oldundetctd, undetected = FALSE, is_u = (mtmp == &gy.youmonst);
     coordxy x = is_u ? u.ux : mtmp->mx, y = is_u ? u.uy : mtmp->my;
@@ -4276,8 +4277,10 @@ hideunder(struct monst *mtmp)
            under water unless some obstacle blocks line-of-sight */
         undetected = (is_pool(x, y) && !Is_waterlevel(&u.uz)
                       && (!Underwater || !couldsee(x, y)));
-        if (seeit)
+        if (seeit) {
             seenobj = "the water";
+            locomo = "dive";
+        }
     } else if (hides_under(mtmp->data)
                /* hider-underers only hide under objects */
                && (otmp = gl.level.objects[x][y]) != 0
@@ -4314,8 +4317,9 @@ hideunder(struct monst *mtmp)
            level creation because 'seeit' will be 0 so 'seenmon' and 'seenobj'
            will be Null */
         if (undetected && seenmon && seenobj) {
-            You_see("%s %s under %s.", seenmon,
-                    locomotion(mtmp->data, "hide"), seenobj);
+            if (!locomo)
+                locomo = locomotion(mtmp->data, "hide");
+            You_see("%s %s under %s.", seenmon, locomo, seenobj);
             iflags.last_msg = PLNMSG_HIDE_UNDER;
             gl.last_hider = mtmp->m_id;
         }

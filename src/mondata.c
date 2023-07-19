@@ -1283,6 +1283,10 @@ static locoverbs levitate = { "float", "Float", "wobble", "Wobble" },
                  flys = { "fly", "Fly", "flutter", "Flutter" },
                  flyl = { "fly", "Fly", "stagger", "Stagger" },
                  slither = { "slither", "Slither", "falter", "Falter" },
+                 /* it would be useful to incorporate "swim" but we lack
+                  * sufficient information to know whether water is involved
+                 swim = { "swim", "Swim", "flop", "Flop" },
+                  */
                  ooze = { "ooze", "Ooze", "tremble", "Tremble" },
                  immobile = { "wiggle", "Wiggle", "pulsate", "Pulsate" },
                  crawl = { "crawl", "Crawl", "falter", "Falter" };
