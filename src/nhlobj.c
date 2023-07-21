@@ -188,6 +188,7 @@ l_obj_objects_to_table(lua_State *L)
 
     if (otyp == -1) {
         nhl_error(L, "l_obj_objects_to_table: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -488,7 +489,6 @@ l_obj_timer_has(lua_State *L)
         nhl_error(L, "l_obj_timer_has: Wrong args");
     return 0;
 }
-
 
 /* peek at an object timer. return the turn when timer triggers.
    returns 0 if no such timer attached to the object. */

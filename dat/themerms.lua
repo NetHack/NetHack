@@ -634,14 +634,26 @@ xx|.....|xx
      -- Guarantee an escape item inside one of the chests, to prevent the hero
      -- falling in from above and becoming permanently stuck
      -- [cf. generate_way_out_method(sp_lev.c)].
+     -- If the escape item is made of glass or crystal, make sure that the
+     -- chest isn't locked so that kicking it to gain access to its contents
+     -- won't be necessary; otherwise retain lock state from random creation.
      -- "pick-axe", "dwarvish mattock" could be included in the list of escape
      -- items but don't normally generate in containers.
      local escape_items = {
         "scroll of teleportation", "ring of teleportation",
         "wand of teleportation", "wand of digging"
      };
-     local box = des.object({ id = "chest", coord = chest_spots[1] })
-     box:addcontent(obj.new(escape_items[math.random(#escape_items)]));
+     local itm = obj.new(escape_items[math.random(#escape_items)]);
+     local itmcls = itm:class()
+     local lckd;
+     if itmcls[ "material" ] == 19 then                         -- GLASS==19
+         lckd = false;      -- for glass item, force box to be unlocked
+     else
+         lckd = itm.locked; -- else keep random lock state from box's creation
+     end;
+     local box = des.object({ id = "chest", coord = chest_spots[1],
+                              locked = lckd });
+     box:addcontent(itm);
 
      for i = 2, #chest_spots do
          des.object({ id = "chest", coord = chest_spots[i] });
