@@ -645,14 +645,15 @@ xx|.....|xx
      };
      local itm = obj.new(escape_items[math.random(#escape_items)]);
      local itmcls = itm:class()
-     local lckd;
+     local box
      if itmcls[ "material" ] == 19 then                         -- GLASS==19
-         lckd = false;      -- for glass item, force box to be unlocked
+         -- item is made of glass so explicitly force chest to be unlocked
+	 box = des.object({ id = "chest", coord = chest_spots[1],
+                            olocked = "no" });
      else
-         lckd = itm.locked; -- else keep random lock state from box's creation
+         -- item isn't made of glass; accept random locked/unlocked state
+	 box = des.object({ id = "chest", coord = chest_spots[1] });
      end;
-     local box = des.object({ id = "chest", coord = chest_spots[1],
-                              locked = lckd });
      box:addcontent(itm);
 
      for i = 2, #chest_spots do
