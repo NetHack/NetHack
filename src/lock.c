@@ -1056,8 +1056,8 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
         break;
     case WAN_OPENING:
     case SPE_KNOCK:
-        if (obj->olocked) { /* unlock; couldn't be broken */
-            pline("Klick!");
+        if (obj->olocked) { /* unlock; isn't broken so doesn't need fixing */
+            Soundeffect(se_klick, 50);
             pline("Klick!");
             obj->olocked = 0;
             res = 1;
