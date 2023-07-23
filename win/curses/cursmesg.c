@@ -242,28 +242,19 @@ curses_message_win_puts(const char *message, boolean recursed)
 
 #ifdef USE_CURSES_PUTMIXED
 static int
-curscolor(int nhcolor, boolean *boldon)
+curscolor(int color, boolean *boldon)
 {
-    int curses_color;
-
+    int curses_color = color;
     *boldon = FALSE;
-    if (nhcolor == 0) { /* make black fg visible */
-#ifdef USE_DARKGRAY
-        if (iflags.wc2_darkgray) {
-            if (COLORS > 16) {
-                /* colorpair for black is already darkgray */
-            } else { /* Use bold for a bright black */
-                *boldon = TRUE;
-            }
-        } else
-#endif /* USE_DARKGRAY */
-            nhcolor = CLR_BLUE;
-    }
-    curses_color = nhcolor + 1;
+
     if (COLORS < 16) {
-        if (curses_color > 8 && curses_color < 17)
+        /* Use bold for a bright black */
+        if (color == CLR_BLACK)
+            *boldon = TRUE;
+
+        if (color > 8 && color < 17)
             curses_color -= 8;
-        else if (curses_color > (17 + 16))
+        else if (color > (17 + 16))
             curses_color -= 16;
     }
     return curses_color;
@@ -385,7 +376,7 @@ curses_clear_unhighlight_message_window(void)
 
         for (count = 0; count < mh; count++)
             mvwchgat(win, count + brdroffset, brdroffset,
-                     mw, COLOR_PAIR(8), A_NORMAL, NULL);
+                     mw, COLOR_PAIR(0), A_NORMAL, NULL);
         wnoutrefresh(win);
     }
     wmove(win, my, mx);

@@ -186,7 +186,7 @@ struct overview_planar_cell_struct {
 #endif                             /*SCREEN_VESA*/
 
 #if defined(PC9800)
-static unsigned char attr98[CLR_MAX] = {
+static unsigned char attr98[16] = {
     0xe1, /*  0 white            */
     0x21, /*  1 blue             */
     0x81, /*  2 green            */

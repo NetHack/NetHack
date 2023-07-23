@@ -493,7 +493,7 @@ struct qcolor {
     const char *nm;
 };
 // these match the tty colors, or better versions of same;
-// [0] is used for black, and [8] (the first white) corresponds to "no color"
+// [8] is used for black, and [0] corresponds to "no color"
 static const struct qcolor colors[] = {
     { QColor(64, 64, 64),    "64,64,64" },    // black
     { QColor(Qt::red),       "red" },

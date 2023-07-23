@@ -170,6 +170,7 @@ dosuspend(void)
 #endif
 #if defined(SIGTSTP) && !defined(NO_SIGNAL)
     if (signal(SIGTSTP, SIG_IGN) == SIG_DFL) {
+        reset_palette();
         suspend_nhwindows((char *) 0);
 #ifdef _M_UNIX
         sco_mapon();
@@ -189,6 +190,9 @@ dosuspend(void)
 #ifdef __linux__
         linux_mapoff();
 #endif
+        if (iflags.wc2_setpalette)
+            set_palette();
+        set_black(iflags.wc2_black);
         resume_nhwindows();
     } else {
         pline("I don't think your shell has job control.");

@@ -5,7 +5,6 @@
 
 #include "curses.h"
 #include "hack.h"
-#include "color.h"
 #include "wincurs.h"
 #ifdef CURSES_UNICODE
 #include <locale.h>
@@ -49,13 +48,18 @@ static char *dummy_get_color_string(void);
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
     WPID(curses),
-    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_COLOR | WC_INVERSE
-     | WC_HILITE_PET
+    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_INVERSE | WC_HILITE_PET
 #ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
      | WC_MOUSE_SUPPORT
 #endif
-     | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN),
-    (WC2_DARKGRAY | WC2_HITPOINTBAR
+     | WC_PERM_INVENT | WC_POPUP_DIALOG | WC_SPLASH_SCREEN
+#ifdef TEXTCOLOR
+     | WC_COLOR),
+    (WC2_GUICOLOR | WC2_BLACK |
+#else
+    ),(
+#endif
+       WC2_HITPOINTBAR
 #ifdef CURSES_UNICODE
      | WC2_U_UTF8STR
 #endif
@@ -66,9 +70,9 @@ struct window_procs curses_procs = {
      | WC2_HILITE_STATUS
 #endif
      | WC2_FLUSH_STATUS | WC2_TERM_SIZE
-     | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR | WC2_GUICOLOR
+     | WC2_STATUSLINES | WC2_WINDOWBORDERS | WC2_PETATTR
      | WC2_SUPPRESS_HIST | WC2_URGENT_MESG | WC2_MENU_SHIFT),
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     curses_init_nhwindows,
     curses_player_selection,
     curses_askname,
@@ -201,6 +205,12 @@ curses_init_nhwindows(
 #endif
 #endif
 
+    /* with simple printf before initsrc()
+     * currently raw_print() would break windows console
+     */
+    if (iflags.wc2_setpalette)
+        set_palette();
+
 #ifdef XCURSES
     base_term = Xinitscr(*argcp, argv);
 #else
@@ -211,16 +221,12 @@ curses_init_nhwindows(
         start_color();
         curses_init_nhcolors();
     } else {
-        iflags.use_color = FALSE;
-        set_option_mod_status("color", set_in_config);
+        iflags.wc_color = FALSE;
         iflags.wc2_guicolor = FALSE;
+        set_wc_option_mod_status(WC_COLOR, set_in_config);
         set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
+        set_wc2_option_mod_status(WC2_BLACK, set_in_config);
     }
-#else
-    iflags.use_color = FALSE;
-    set_option_mod_status("color", set_in_config);
-    iflags.wc2_guicolor = FALSE;
-    set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
 #endif
     noecho();
     raw();

@@ -65,6 +65,7 @@ sparkle        display sparkly effect for resisted magical         [True]
                attacks (e.g. fire attack on fire-resistant monster)
 standout       use standout mode for --More-- on messages         [False]
 status_updates update the status lines                             [True]
+setpalette     let nethack set the color palette                  [False]
 time           display elapsed game time, in moves                [False]
 tips           show some helpful tips during gameplay              [True]
 tombstone      print tombstone when you die                        [True]
@@ -72,7 +73,6 @@ toptenwin      print topten in a window rather than stdout        [False]
 travel         enables travelling via mouse click if supported;    [True]
                can be toggled off to prevent mouse clicks on the map from
                attempting to move the hero; does not affect travel via '_'
-use_darkgray   use bold black instead of blue for black glyphs.    [True]
 use_inverse    display detected monsters in highlighted manner    [False]
 verbose        print more commentary during the game               [True]
 whatis_menu    show menu when getting a map location              [False]
@@ -162,6 +162,7 @@ autounlock    when attempting to open a locked door or loot     [Apply-Key]
               containers; either will only be attempted if Untrap is
               omitted or skipped and Apply-Key is omitted or you aren't
               carrying an unlocking tool or you decline to use one
+black         intensity of color black; or use darkgray                [64]
 boulder       override the default boulder symbol                       [`]
 disclose      the types of information you want         [ni na nv ng nc no]
               offered at the end of the game

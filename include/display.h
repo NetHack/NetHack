@@ -289,24 +289,14 @@ enum zap_colors {
 
 enum altar_colors {
     altar_color_unaligned = CLR_RED,
-#if defined(USE_GENERAL_ALTAR_COLORS)
-        /* On OSX with TERM=xterm-color256 these render as
-         *  white -> tty: gray, curses: ok
-         *  gray  -> both tty and curses: black
-         *  black -> both tty and curses: blue
-         *  red   -> both tty and curses: ok.
-         * Since the colors have specific associations (with the
-         * unicorns matched with each alignment), we shouldn't use
-         * scrambled colors and we don't have sufficient information
-         * to handle platform-specific color variations.
-         */
+#ifndef NO_ALTAR_COLORS
     altar_color_chaotic = CLR_BLACK,
-    altar_color_neutral = CLR_GRAY,
+    altar_color_neutral = PALLID,
     altar_color_lawful  = CLR_WHITE,
 #else
-    altar_color_chaotic = CLR_GRAY,
-    altar_color_neutral = CLR_GRAY,
-    altar_color_lawful  = CLR_GRAY,
+    altar_color_chaotic = NO_COLOR,
+    altar_color_neutral = NO_COLOR,
+    altar_color_lawful  = NO_COLOR,
 #endif
     altar_color_other = CLR_BRIGHT_MAGENTA,
 };

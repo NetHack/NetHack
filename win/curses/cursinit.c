@@ -18,14 +18,6 @@ static void set_window_position(int *, int *, int *, int *, int,
                                 int *, int *, int *, int *, int,
                                 int, int);
 
-#if 0   /* no longer used */
-typedef struct nhrgb_type {
-    short r;
-    short g;
-    short b;
-} nhrgb;
-#endif
-
 /* Banners used for an optional ASCII splash screen */
 
 #define NETHACK_SPLASH_A \
@@ -304,15 +296,22 @@ curses_init_nhcolors(void)
 #ifdef TEXTCOLOR
     if (has_colors()) {
         use_default_colors();
-        init_pair(1, COLOR_BLACK, -1);
-        init_pair(2, COLOR_RED, -1);
-        init_pair(3, COLOR_GREEN, -1);
-        init_pair(4, COLOR_YELLOW, -1);
-        init_pair(5, COLOR_BLUE, -1);
-        init_pair(6, COLOR_MAGENTA, -1);
-        init_pair(7, COLOR_CYAN, -1);
-        init_pair(8, -1, -1);
+        register int c;
 
+        /* COLOR_PAIR(0) is fg/bg anyways
+         * black and darkgray is set by option
+         */
+        for(c = 1; c < 8; ++c)
+            init_pair(c, c, -1);
+        if (COLORS < 16)
+            for(c = 1; c < 8; ++c)
+                init_pair(c + 8, c, -1);
+        else
+            for(c = 9; c < 16; ++c)
+                init_pair(c, c, -1);
+#ifdef MICRO
+        init_pair(CLR_BLACK, CLR_BLUE, -1);
+#endif
         {
             int i;
             boolean hicolor = FALSE;
@@ -320,7 +319,7 @@ curses_init_nhcolors(void)
             static const int clr_remap[16] = {
                 COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
                 COLOR_BLUE,
-                COLOR_MAGENTA, COLOR_CYAN, -1, COLOR_WHITE,
+                COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE, -1,
                 COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
                 COLOR_BLUE + 8,
                 COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
@@ -343,23 +342,6 @@ curses_init_nhcolors(void)
                 init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
                 init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
             }
-        }
-
-
-        if (COLORS >= 16) {
-# ifdef USE_DARKGRAY
-            if (iflags.wc2_darkgray) {
-                init_pair(1, COLOR_BLACK + 8, -1);
-            }
-# endif
-            init_pair(9, COLOR_WHITE, -1);
-            init_pair(10, COLOR_RED + 8, -1);
-            init_pair(11, COLOR_GREEN + 8, -1);
-            init_pair(12, COLOR_YELLOW + 8, -1);
-            init_pair(13, COLOR_BLUE + 8, -1);
-            init_pair(14, COLOR_MAGENTA + 8, -1);
-            init_pair(15, COLOR_CYAN + 8, -1);
-            init_pair(16, COLOR_WHITE + 8, -1);
         }
     }
 #endif
@@ -805,6 +787,12 @@ curses_init_options(void)
 #else
     iflags.wc_mouse_support = 0;
 #endif
+
+    /* option parser did it to early for curses */
+    if (iflags.wc2_black)
+        set_black(iflags.wc2_black);
+    else if (iflags.wc2_black != 0)
+        set_black(0);
 }
 
 /* Display an ASCII splash screen if the splash_screen option is set */
@@ -845,4 +833,5 @@ curses_display_splash_window(void)
 void
 curses_cleanup(void)
 {
+    reset_palette();
 }

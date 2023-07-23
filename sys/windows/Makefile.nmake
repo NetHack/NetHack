@@ -669,7 +669,7 @@ VTTYOBJ24 = $(OTTY)timeout.o  $(OTTY)topten.o   $(OTTY)track.o    $(OTTY)trap.o
 VTTYOBJ25 = $(OTTY)u_init.o   $(OTTY)uhitm.o    $(OTTY)utf8map.o  $(OTTY)vault.o
 VTTYOBJ26 = $(OTTY)vision.o   $(OTTY)weapon.o   $(OTTY)were.o     $(OTTY)wield.o
 VTTYOBJ27 = $(OTTY)windows.o  $(OTTY)wizard.o   $(OTTY)worm.o     $(OTTY)worn.o
-VTTYOBJ28 = $(OTTY)write.o    $(OTTY)zap.o
+VTTYOBJ28 = $(OTTY)write.o    $(OTTY)zap.o      $(OTTY)colors.o
 
 OBJSTTY   = $(MDLIBTTY) \
 	$(VTTYOBJ01) $(VTTYOBJ02) $(VTTYOBJ03) $(VTTYOBJ04) $(VTTYOBJ05) \
@@ -2077,6 +2077,7 @@ $(OTTY)windsound.o: ..\sound\windsound\windsound.c $(HACK_H)
 #$(OTTY)sample.o: ..\sound\sample\sample.c $(HACK_H)
 $(OTTY)windmain.o: $(MSWSYS)\windmain.c $(WINDHDR) $(HACK_H)
 $(OTTY)safeproc.o: $(WSHR)\safeproc.c $(WINDHDR) $(HACK_H)
+$(OTTY)colors.o: $(WSHR)\colors.c $(WINDHDR) $(HACK_H)
 
 $(OGUI)consoletty.o:   $(MSWSYS)\consoletty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 $(OGUI)win10.o:  $(MSWSYS)\win10.c $(WINDHDR) $(HACK_H)

@@ -594,7 +594,7 @@ chainin_ctrl_nhwindow(
 struct window_procs chainin_procs = {
     WPIDMINUS(chainin), 0, /* wincap */
     0,             /* wincap2 */
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     /*
     XXX problem - the above need to come from the real window port, possibly
     modified.  May need to do something to call an additional init fn later

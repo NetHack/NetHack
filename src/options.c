@@ -1088,6 +1088,42 @@ optfn_autounlock(
 }
 
 static int
+optfn_black(int optidx, int req, boolean negated, char *opts, char *op)
+{
+    unsigned char itmp = 0;
+
+    if (req == do_init && opts == empty_optstr)
+        set_black(0);
+
+    if (req == do_set) {
+        if (negated)
+            use_darkgray();
+        else if (op != empty_optstr) {
+            itmp = atoi(op);
+            if (itmp == 0)
+                use_darkgray();
+
+            else if (itmp < 4 || itmp > 0x80) {
+                config_error_add("'%s:%s' is invalid; accepts 4 up to 128",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            } else {
+                set_black(itmp);
+                if (!go.opt_initial)
+                    go.opt_need_redraw = TRUE;
+            }
+        }
+    }
+    if (req == get_val) {
+        if (wc2_supported(allopt[optidx].name))
+            Sprintf(opts, "%d", iflags.wc2_black);
+        else
+            Strcpy(opts, "unknown");
+    }
+    return optn_ok;
+}
+
+static int
 optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
               char *opts, char *op UNUSED)
 {
@@ -7291,27 +7327,31 @@ static const struct color_names colornames[] = {
     { "green", CLR_GREEN },
     { "brown", CLR_BROWN },
     { "blue", CLR_BLUE },
-    { "magenta", CLR_MAGENTA },
+    { "purple", CLR_MAGENTA },
     { "cyan", CLR_CYAN },
-    { "gray", CLR_GRAY },
+    { "silver", CLR_GRAY },
+    { "gray", CLR_DARKGRAY },
     { "orange", CLR_ORANGE },
     { "light green", CLR_BRIGHT_GREEN },
     { "yellow", CLR_YELLOW },
     { "light blue", CLR_BRIGHT_BLUE },
     { "light magenta", CLR_BRIGHT_MAGENTA },
-    { "light cyan", CLR_BRIGHT_CYAN },
+    { "sea green", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { "no color", NO_COLOR },
-    { (const char *) 0, CLR_BLACK }, /* everything after this is an alias */
+    { (const char *) 0, NO_COLOR }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
-    { "purple", CLR_MAGENTA },
+    { "magenta", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
     { "bright purple", CLR_BRIGHT_MAGENTA },
-    { "grey", CLR_GRAY },
+    { "grey", CLR_DARKGRAY },
     { "bright red", CLR_ORANGE },
     { "bright green", CLR_BRIGHT_GREEN },
+    { "olive", CLR_BRIGHT_GREEN },
     { "bright blue", CLR_BRIGHT_BLUE },
     { "bright magenta", CLR_BRIGHT_MAGENTA },
+    { "violet", CLR_BRIGHT_MAGENTA },
+    { "light cyan", CLR_BRIGHT_CYAN },
     { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
@@ -7405,8 +7445,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
 /* True: temporarily replace menu color entries with a fake set of menu
    colors, { "light blue"=light_blue, "blue"=blue, "red"=red, &c }, that
    illustrates most colors for use when the pick-a-color menu is rendered;
-   suppresses black and white because one of those will likely be invisible
-   due to matching the background; False: restore user-specified colorings */
+   False: restore user-specified colorings */
 static void
 basic_menu_colors(boolean load_colors)
 {
@@ -7437,8 +7476,6 @@ basic_menu_colors(boolean load_colors)
                 if (!colornames[i].name) /* first alias entry has no name */
                     break;
                 c = colornames[i].color;
-                if (c == CLR_BLACK || c == CLR_WHITE || c == NO_COLOR)
-                    continue; /* skip these */
                 Sprintf(cnm, patternfmt, colornames[i].name);
                 add_menu_coloring_parsed(cnm, c, ATR_NONE);
             }
@@ -9910,6 +9947,7 @@ static struct wc_Opt wc_options[] = {
     { (char *) 0, 0L }
 };
 static struct wc_Opt wc2_options[] = {
+    { "black", WC2_BLACK },
     { "fullscreen", WC2_FULLSCREEN },
     { "guicolor", WC2_GUICOLOR },
     { "hilite_status", WC2_HILITE_STATUS },
@@ -9924,7 +9962,6 @@ static struct wc_Opt wc2_options[] = {
     { "statuslines", WC2_STATUSLINES },
     { "term_cols", WC2_TERM_SIZE },
     { "term_rows", WC2_TERM_SIZE },
-    { "use_darkgray", WC2_DARKGRAY },
     { "windowborders", WC2_WINDOWBORDERS },
     { "wraptext", WC2_WRAPTEXT },
     { (char *) 0, 0L }

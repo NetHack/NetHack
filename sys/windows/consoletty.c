@@ -299,9 +299,6 @@ struct keyboard_handling_t {
 };
 
 static DWORD ccount, acount;
-#ifndef CLR_MAX
-#define CLR_MAX 16
-#endif
 
 int ttycolors[CLR_MAX];
 int ttycolors_inv[CLR_MAX];
@@ -310,245 +307,9 @@ int ttycolors_inv[CLR_MAX];
 unsigned char key_overrides[MAX_OVERRIDES];
 static char nullstr[] = "";
 char erase_char, kill_char;
-#define DEFTEXTCOLOR ttycolors[7]
 static INPUT_RECORD bogus_key;
 
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-long customcolors[CLR_MAX];
-const char *esc_seq_colors[CLR_MAX];
-const char *esc_seq_bkcolors[CLR_MAX];
-
-struct rgbvalues {
-    int idx;
-    const char *name;
-    const char *hexval;
-    long r, gn, b;
-} rgbtable[] = {
-    { 0, "maroon", "#800000", 128, 0, 0 },
-    { 1, "dark red", "#8B0000", 139, 0, 0 },
-    { 2, "brown", "#A52A2A", 165, 42, 42 },
-    { 3, "firebrick", "#B22222", 178, 34, 34 },
-    { 4, "crimson", "#DC143C", 220, 20, 60 },
-    { 5, "red", "#FF0000", 255, 0, 0 },
-    { 6, "tomato", "#FF6347", 255, 99, 71 },
-    { 7, "coral", "#FF7F50", 255, 127, 80 },
-    { 8, "indian red", "#CD5C5C", 205, 92, 92 },
-    { 9, "light coral", "#F08080", 240, 128, 128 },
-    { 10, "dark salmon", "#E9967A", 233, 150, 122 },
-    { 11, "salmon", "#FA8072", 250, 128, 114 },
-    { 12, "light salmon", "#FFA07A", 255, 160, 122 },
-    { 13, "orange red", "#FF4500", 255, 69, 0 },
-    { 14, "dark orange", "#FF8C00", 255, 140, 0 },
-    { 15, "orange", "#FFA500", 255, 165, 0 },
-    { 16, "gold", "#FFD700", 255, 215, 0 },
-    { 17, "dark golden rod", "#B8860B", 184, 134, 11 },
-    { 18, "golden rod", "#DAA520", 218, 165, 32 },
-    { 19, "pale golden rod", "#EEE8AA", 238, 232, 170 },
-    { 20, "dark khaki", "#BDB76B", 189, 183, 107 },
-    { 21, "khaki", "#F0E68C", 240, 230, 140 },
-    { 22, "olive", "#808000", 128, 128, 0 },
-    { 23, "yellow", "#FFFF00", 255, 255, 0 },
-    { 24, "yellow green", "#9ACD32", 154, 205, 50 },
-    { 25, "dark olive green", "#556B2F", 85, 107, 47 },
-    { 26, "olive drab", "#6B8E23", 107, 142, 35 },
-    { 27, "lawn green", "#7CFC00", 124, 252, 0 },
-    { 28, "chart reuse", "#7FFF00", 127, 255, 0 },
-    { 29, "green yellow", "#ADFF2F", 173, 255, 47 },
-    { 30, "dark green", "#006400", 0, 100, 0 },
-    { 31, "green", "#008000", 0, 128, 0 },
-    { 32, "forest green", "#228B22", 34, 139, 34 },
-    { 33, "lime", "#00FF00", 0, 255, 0 },
-    { 34, "lime green", "#32CD32", 50, 205, 50 },
-    { 35, "light green", "#90EE90", 144, 238, 144 },
-    { 36, "pale green", "#98FB98", 152, 251, 152 },
-    { 37, "dark sea green", "#8FBC8F", 143, 188, 143 },
-    { 38, "medium spring green", "#00FA9A", 0, 250, 154 },
-    { 39, "spring green", "#00FF7F", 0, 255, 127 },
-    { 40, "sea green", "#2E8B57", 46, 139, 87 },
-    { 41, "medium aqua marine", "#66CDAA", 102, 205, 170 },
-    { 42, "medium sea green", "#3CB371", 60, 179, 113 },
-    { 43, "light sea green", "#20B2AA", 32, 178, 170 },
-    { 44, "dark slate gray", "#2F4F4F", 47, 79, 79 },
-    { 45, "teal", "#008080", 0, 128, 128 },
-    { 46, "dark cyan", "#008B8B", 0, 139, 139 },
-    { 47, "aqua", "#00FFFF", 0, 255, 255 },
-    { 48, "cyan", "#00FFFF", 0, 255, 255 },
-    { 49, "light cyan", "#E0FFFF", 224, 255, 255 },
-    { 50, "dark turquoise", "#00CED1", 0, 206, 209 },
-    { 51, "turquoise", "#40E0D0", 64, 224, 208 },
-    { 52, "medium turquoise", "#48D1CC", 72, 209, 204 },
-    { 53, "pale turquoise", "#AFEEEE", 175, 238, 238 },
-    { 54, "aqua marine", "#7FFFD4", 127, 255, 212 },
-    { 55, "powder blue", "#B0E0E6", 176, 224, 230 },
-    { 56, "cadet blue", "#5F9EA0", 95, 158, 160 },
-    { 57, "steel blue", "#4682B4", 70, 130, 180 },
-    { 58, "corn flower blue", "#6495ED", 100, 149, 237 },
-    { 59, "deep sky blue", "#00BFFF", 0, 191, 255 },
-    { 60, "dodger blue", "#1E90FF", 30, 144, 255 },
-    { 61, "light blue", "#ADD8E6", 173, 216, 230 },
-    { 62, "sky blue", "#87CEEB", 135, 206, 235 },
-    { 63, "light sky blue", "#87CEFA", 135, 206, 250 },
-    { 64, "midnight blue", "#191970", 25, 25, 112 },
-    { 65, "navy", "#000080", 0, 0, 128 },
-    { 66, "dark blue", "#00008B", 0, 0, 139 },
-    { 67, "medium blue", "#0000CD", 0, 0, 205 },
-    { 68, "blue", "#0000FF", 0, 0, 255 },
-    { 69, "royal blue", "#4169E1", 65, 105, 225 },
-    { 70, "blue violet", "#8A2BE2", 138, 43, 226 },
-    { 71, "indigo", "#4B0082", 75, 0, 130 },
-    { 72, "dark slate blue", "#483D8B", 72, 61, 139 },
-    { 73, "slate blue", "#6A5ACD", 106, 90, 205 },
-    { 74, "medium slate blue", "#7B68EE", 123, 104, 238 },
-    { 75, "medium purple", "#9370DB", 147, 112, 219 },
-    { 76, "dark magenta", "#8B008B", 139, 0, 139 },
-    { 77, "dark violet", "#9400D3", 148, 0, 211 },
-    { 78, "dark orchid", "#9932CC", 153, 50, 204 },
-    { 79, "medium orchid", "#BA55D3", 186, 85, 211 },
-    { 80, "purple", "#800080", 128, 0, 128 },
-    { 81, "thistle", "#D8BFD8", 216, 191, 216 },
-    { 82, "plum", "#DDA0DD", 221, 160, 221 },
-    { 83, "violet", "#EE82EE", 238, 130, 238 },
-    { 84, "magenta / fuchsia", "#FF00FF", 255, 0, 255 },
-    { 85, "orchid", "#DA70D6", 218, 112, 214 },
-    { 86, "medium violet red", "#C71585", 199, 21, 133 },
-    { 87, "pale violet red", "#DB7093", 219, 112, 147 },
-    { 88, "deep pink", "#FF1493", 255, 20, 147 },
-    { 89, "hot pink", "#FF69B4", 255, 105, 180 },
-    { 90, "light pink", "#FFB6C1", 255, 182, 193 },
-    { 91, "pink", "#FFC0CB", 255, 192, 203 },
-    { 92, "antique white", "#FAEBD7", 250, 235, 215 },
-    { 93, "beige", "#F5F5DC", 245, 245, 220 },
-    { 94, "bisque", "#FFE4C4", 255, 228, 196 },
-    { 95, "blanched almond", "#FFEBCD", 255, 235, 205 },
-    { 96, "wheat", "#F5DEB3", 245, 222, 179 },
-    { 97, "corn silk", "#FFF8DC", 255, 248, 220 },
-    { 98, "lemon chiffon", "#FFFACD", 255, 250, 205 },
-    { 99, "light golden rod yellow", "#FAFAD2", 250, 250, 210 },
-    { 100, "light yellow", "#FFFFE0", 255, 255, 224 },
-    { 101, "saddle brown", "#8B4513", 139, 69, 19 },
-    { 102, "sienna", "#A0522D", 160, 82, 45 },
-    { 103, "chocolate", "#D2691E", 210, 105, 30 },
-    { 104, "peru", "#CD853F", 205, 133, 63 },
-    { 105, "sandy brown", "#F4A460", 244, 164, 96 },
-    { 106, "burly wood", "#DEB887", 222, 184, 135 },
-    { 107, "tan", "#D2B48C", 210, 180, 140 },
-    { 108, "rosy brown", "#BC8F8F", 188, 143, 143 },
-    { 109, "moccasin", "#FFE4B5", 255, 228, 181 },
-    { 110, "navajo white", "#FFDEAD", 255, 222, 173 },
-    { 111, "peach puff", "#FFDAB9", 255, 218, 185 },
-    { 112, "misty rose", "#FFE4E1", 255, 228, 225 },
-    { 113, "lavender blush", "#FFF0F5", 255, 240, 245 },
-    { 114, "linen", "#FAF0E6", 250, 240, 230 },
-    { 115, "old lace", "#FDF5E6", 253, 245, 230 },
-    { 116, "papaya whip", "#FFEFD5", 255, 239, 213 },
-    { 117, "sea shell", "#FFF5EE", 255, 245, 238 },
-    { 118, "mint cream", "#F5FFFA", 245, 255, 250 },
-    { 119, "slate gray", "#708090", 112, 128, 144 },
-    { 120, "light slate gray", "#778899", 119, 136, 153 },
-    { 121, "light steel blue", "#B0C4DE", 176, 196, 222 },
-    { 122, "lavender", "#E6E6FA", 230, 230, 250 },
-    { 123, "floral white", "#FFFAF0", 255, 250, 240 },
-    { 124, "alice blue", "#F0F8FF", 240, 248, 255 },
-    { 125, "ghost white", "#F8F8FF", 248, 248, 255 },
-    { 126, "honeydew", "#F0FFF0", 240, 255, 240 },
-    { 127, "ivory", "#FFFFF0", 255, 255, 240 },
-    { 128, "azure", "#F0FFFF", 240, 255, 255 },
-    { 129, "snow", "#FFFAFA", 255, 250, 250 },
-    { 130, "black", "#000000", 0, 0, 0 },
-    { 131, "dim gray / dim grey", "#696969", 105, 105, 105 },
-    { 132, "gray / grey", "#808080", 128, 128, 128 },
-    { 133, "dark gray / dark grey", "#A9A9A9", 169, 169, 169 },
-    { 134, "silver", "#C0C0C0", 192, 192, 192 },
-    { 135, "light gray / light grey", "#D3D3D3", 211, 211, 211 },
-    { 136, "gainsboro", "#DCDCDC", 220, 220, 220 },
-    { 137, "white smoke", "#F5F5F5", 245, 245, 245 },
-    { 138, "white", "#FFFFFF", 255, 255, 255 },
-};
-
-long
-rgbtable_to_long(struct rgbvalues *tbl)
-{
-    long rgblong = (tbl->r << 0) | (tbl->gn << 8) | (tbl->b << 16);
-    return rgblong;
-}
-
-static void
-init_custom_colors(void)
-{
-    char bkcolorbuf[32];
-
-    customcolors[CLR_BLACK] = rgbtable_to_long(&rgbtable[131]);
-    customcolors[CLR_RED] = rgbtable_to_long(&rgbtable[5]);
-    customcolors[CLR_GREEN] = rgbtable_to_long(&rgbtable[31]);
-    customcolors[CLR_BROWN] = rgbtable_to_long(&rgbtable[104]);
-    customcolors[CLR_BLUE] = rgbtable_to_long(&rgbtable[58]);
-    customcolors[CLR_MAGENTA] = rgbtable_to_long(&rgbtable[76]);
-    customcolors[CLR_CYAN] = rgbtable_to_long(&rgbtable[48]);
-    customcolors[CLR_GRAY] = rgbtable_to_long(&rgbtable[73]);
-    customcolors[NO_COLOR] = rgbtable_to_long(&rgbtable[137]);
-    customcolors[CLR_ORANGE] = rgbtable_to_long(&rgbtable[15]);
-    customcolors[CLR_BRIGHT_GREEN] = rgbtable_to_long(&rgbtable[34]);
-    customcolors[CLR_YELLOW] = rgbtable_to_long(&rgbtable[18]);
-    customcolors[CLR_BRIGHT_BLUE] = rgbtable_to_long(&rgbtable[69]);
-    customcolors[CLR_BRIGHT_MAGENTA] = rgbtable_to_long(&rgbtable[84]);
-    customcolors[CLR_BRIGHT_CYAN] = rgbtable_to_long(&rgbtable[49]);
-    customcolors[CLR_WHITE] = rgbtable_to_long(&rgbtable[138]);
-
-/*    esc_seq_colors[CLR_BLACK] = "\x1b[30m"; */
-    esc_seq_colors[CLR_BLACK] = "\x1b[38;2;47;79;79m";
-    esc_seq_colors[CLR_RED] = "\x1b[31m";
-    esc_seq_colors[CLR_GREEN] = "\x1b[32m";
-    esc_seq_colors[CLR_YELLOW] = "\x1b[38;2;255;255;0m";
-    esc_seq_colors[CLR_BLUE] = "\x1b[38;2;100;149;237m";
-    esc_seq_colors[CLR_MAGENTA] = "\x1b[35m";
-    esc_seq_colors[CLR_CYAN] = "\x1b[36m";
-    esc_seq_colors[CLR_WHITE] = "\x1b[37m";
-
-    esc_seq_colors[CLR_BROWN] = "\x1b[38;2;205;133;63m";
-//    esc_seq_colors[CLR_GRAY] = "\x1b[31m\x1b[32m\x1b[34m";
-    esc_seq_colors[CLR_GRAY] = "\x1b[90m";
-    esc_seq_colors[NO_COLOR] = "\x1b[39m";
-    esc_seq_colors[CLR_ORANGE] = "\x1b[38;2;255;140;0m";
-    esc_seq_colors[CLR_BRIGHT_GREEN] = "\x1b[39m";
-    esc_seq_colors[CLR_BRIGHT_BLUE] = "\x1b[34m\x1b[94m";
-    esc_seq_colors[CLR_BRIGHT_MAGENTA] = "\x1b[35m\x1b[95m";
-    esc_seq_colors[CLR_BRIGHT_CYAN] = "\x1b[36m\x1b[96m";
-
-     /* Sprintf(tmp, "\033[%dm", ((color % 8) + 40)); */
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BLACK % 8) + 40));
-    esc_seq_bkcolors[CLR_BLACK] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_RED % 8) + 40));
-    esc_seq_bkcolors[CLR_RED] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_GREEN % 8) + 40));
-    esc_seq_bkcolors[CLR_GREEN] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_YELLOW % 8) + 40));
-    esc_seq_bkcolors[CLR_YELLOW] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BLUE % 8) + 40));
-    esc_seq_bkcolors[CLR_BLUE] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_MAGENTA % 8) + 40));
-    esc_seq_bkcolors[CLR_MAGENTA] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_CYAN % 8) + 40));
-    esc_seq_bkcolors[CLR_CYAN] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_WHITE % 8) + 40));
-    esc_seq_bkcolors[CLR_WHITE] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BROWN % 8) + 40));
-    esc_seq_bkcolors[CLR_BROWN] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_GRAY % 8) + 40));
-    esc_seq_bkcolors[CLR_GRAY] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((NO_COLOR % 8) + 40));
-    esc_seq_bkcolors[NO_COLOR] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_ORANGE % 8) + 40));
-    esc_seq_bkcolors[CLR_ORANGE] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_BLUE % 8) + 40));
-    esc_seq_bkcolors[CLR_BRIGHT_BLUE] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_GREEN % 8) + 40));
-    esc_seq_bkcolors[CLR_BRIGHT_GREEN] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_MAGENTA % 8) + 40));
-    esc_seq_bkcolors[CLR_BRIGHT_MAGENTA] = dupstr(bkcolorbuf);
-    Snprintf(bkcolorbuf, sizeof bkcolorbuf, "\x1b[%dm", ((CLR_BRIGHT_CYAN % 8) + 40));
-    esc_seq_bkcolors[CLR_BRIGHT_CYAN] = dupstr(bkcolorbuf);
-}
-
 void emit_start_bold(void);
 void emit_stop_bold(void);
 void emit_start_dim(void);
@@ -975,18 +736,10 @@ void buffer_write(cell_t * buffer, cell_t * cell, COORD pos)
 void
 gettty(void)
 {
-#ifndef TEXTCOLOR
-    int k;
-#endif
     erase_char = '\b';
     kill_char = 21; /* cntl-U */
     iflags.cbreak = TRUE;
-#ifdef TEXTCOLOR
     init_ttycolor();
-#else
-    for (k = 0; k < CLR_MAX; ++k)
-        ttycolors[k] = NO_COLOR;
-#endif
 }
 
 /* reset terminal to original state */
@@ -1327,8 +1080,8 @@ xputc_core(int ch)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
         /* this causes way too much performance degradation */
         /* cell.color24 = customcolors[console.current_nhcolor]; */
-        cell.colorseq = esc_seq_colors[console.current_nhcolor];
-        cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+        cell.colorseq = hilites[console.current_nhcolor];
+        cell.bkcolorseq = bghilites[console.current_nhbkcolor];
         cell.attr = console.attr;
         // if (console.color24)
         //    __debugbreak();
@@ -1422,8 +1175,8 @@ g_putch(int in_ch)
     cell.character = (console.has_unicode ? cp437[ch] : ch);
 #else
     cell.attr = console.attr;
-    cell.colorseq = esc_seq_colors[console.current_nhcolor];
-    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+    cell.colorseq = hilites[console.current_nhcolor];
+    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx = 0;
     wch[1] = 0;
@@ -1469,8 +1222,8 @@ g_pututf8(uint8 *sequence)
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     cell_t cell;
     cell.attr = console.attr;
-    cell.colorseq = esc_seq_colors[console.current_nhcolor];
-    cell.bkcolorseq = esc_seq_bkcolors[console.current_nhbkcolor];
+    cell.colorseq = hilites[console.current_nhcolor];
+    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx =console.color256idx ? console.color256idx : 0;
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",
@@ -1612,75 +1365,57 @@ tty_delay_output(void)
     }
 }
 
-/*
- * CLR_BLACK             0
- * CLR_RED               1
- * CLR_GREEN             2
- * CLR_BROWN             3  low-intensity yellow
- * CLR_BLUE              4
- * CLR_MAGENTA           5
- * CLR_CYAN              6
- * CLR_GRAY              7  low-intensity white
- * NO_COLOR              8
- * CLR_ORANGE            9
- * CLR_BRIGHT_GREEN     10
- * CLR_YELLOW           11
- * CLR_BRIGHT_BLUE      12
- * CLR_BRIGHT_MAGENTA   13
- * CLR_BRIGHT_CYAN      14
- * CLR_WHITE            15
- * CLR_MAX              16
- * BRIGHT                8
- */
-
 static void
 init_ttycolor(void)
 {
 #ifdef TEXTCOLOR
-    ttycolors[CLR_BLACK]        = FOREGROUND_INTENSITY; /* fix by Quietust */
-    ttycolors[CLR_RED]          = FOREGROUND_RED;
-    ttycolors[CLR_GREEN]        = FOREGROUND_GREEN;
-    ttycolors[CLR_BROWN]        = FOREGROUND_GREEN | FOREGROUND_RED;
-    ttycolors[CLR_BLUE]         = FOREGROUND_BLUE;
-    ttycolors[CLR_MAGENTA]      = FOREGROUND_BLUE | FOREGROUND_RED;
-    ttycolors[CLR_CYAN]         = FOREGROUND_GREEN | FOREGROUND_BLUE;
-    ttycolors[CLR_GRAY]         = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE;
-    ttycolors[NO_COLOR]         = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED;
-    ttycolors[CLR_ORANGE]       = FOREGROUND_RED | FOREGROUND_INTENSITY;
-    ttycolors[CLR_BRIGHT_GREEN] = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
-    ttycolors[CLR_YELLOW]       = FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
-    ttycolors[CLR_BRIGHT_BLUE]  = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-    ttycolors[CLR_BRIGHT_MAGENTA]=FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
-    ttycolors[CLR_BRIGHT_CYAN]  = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY;
-    ttycolors[CLR_WHITE]        = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED
-                                    | FOREGROUND_INTENSITY;
+    ttycolors[CLR_BLUE]           = 0x1;
+    ttycolors[CLR_GREEN]          = 0x2;
+    ttycolors[CLR_CYAN]           = 0x3;
+    ttycolors[CLR_RED]            = 0x4;
+    ttycolors[CLR_MAGENTA]        = 0x5;
+    ttycolors[CLR_BROWN]          = 0x6;
+    ttycolors[CLR_GRAY]           = 0x7;
+    ttycolors[CLR_BRIGHT_BLUE]    = 0x9;
+    ttycolors[CLR_BRIGHT_GREEN]   = 0xA;
+    ttycolors[CLR_BRIGHT_CYAN]    = 0xB;
+    ttycolors[CLR_ORANGE]         = 0xC;
+    ttycolors[CLR_BRIGHT_MAGENTA] = 0xD;
+    ttycolors[CLR_YELLOW]         = 0xE;
+    ttycolors[CLR_WHITE]          = 0xF;
 
-    ttycolors_inv[CLR_BLACK]       = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED
-                                        | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_RED]         = BACKGROUND_RED | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_GREEN]       = BACKGROUND_GREEN;
-    ttycolors_inv[CLR_BROWN]       = BACKGROUND_GREEN | BACKGROUND_RED;
-    ttycolors_inv[CLR_BLUE]        = BACKGROUND_BLUE | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_MAGENTA]     = BACKGROUND_BLUE | BACKGROUND_RED;
-    ttycolors_inv[CLR_CYAN]        = BACKGROUND_GREEN | BACKGROUND_BLUE;
-    ttycolors_inv[CLR_GRAY]        = BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE;
-    ttycolors_inv[NO_COLOR]        = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
-    ttycolors_inv[CLR_ORANGE]      = BACKGROUND_RED | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_BRIGHT_GREEN]= BACKGROUND_GREEN | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_YELLOW]      = BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_BRIGHT_BLUE] = BACKGROUND_BLUE | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_BRIGHT_MAGENTA] =BACKGROUND_BLUE | BACKGROUND_RED | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_BRIGHT_CYAN] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_INTENSITY;
-    ttycolors_inv[CLR_WHITE]       = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED
-                                       | BACKGROUND_INTENSITY;
+    ttycolors_inv[CLR_BLUE]           = 0x10;
+    ttycolors_inv[CLR_GREEN]          = 0x20;
+    ttycolors_inv[CLR_CYAN]           = 0x30;
+    ttycolors_inv[CLR_RED]            = 0x40;
+    ttycolors_inv[CLR_MAGENTA]        = 0x50;
+    ttycolors_inv[CLR_BROWN]          = 0x60;
+    ttycolors_inv[CLR_GRAY]           = 0x70;
+    ttycolors_inv[CLR_BRIGHT_BLUE]    = 0x90;
+    ttycolors_inv[CLR_BRIGHT_GREEN]   = 0xA0;
+    ttycolors_inv[CLR_BRIGHT_CYAN]    = 0xB0;
+    ttycolors_inv[CLR_ORANGE]         = 0xC0;
+    ttycolors_inv[CLR_BRIGHT_MAGENTA] = 0xD0;
+    ttycolors_inv[CLR_YELLOW]         = 0xE0;
+    ttycolors_inv[CLR_WHITE]          = 0xF0;
+
+    if (iflags.wc2_black) {
+        ttycolors[CLR_BLACK] = 0;
+        ttycolors_inv[CLR_BLACK] = 0;
+        ttycolors[CLR_DARKGRAY] = 0x8;
+        ttycolors_inv[CLR_DARKGRAY] = 0x80;
+    } else {
+        ttycolors[CLR_BLACK] = 0x8;
+        ttycolors_inv[CLR_BLACK] = 0x80;
+    }
 #else
     int k;
-    ttycolors[0] = FOREGROUND_INTENSITY;
-    ttycolors_inv[0] = BACKGROUND_INTENSITY;
-    for (k = 1; k < SIZE(ttycolors); ++k) {
-        ttycolors[k] = FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED;
-        ttycolors_inv[k] = BACKGROUND_GREEN | BACKGROUND_BLUE | BACKGROUND_RED;
+    for (k = 1; k < 8; ++k) {
+        ttycolors[k] = ttycolors[k + 8] = 0x7;
+        ttycolors_inv[k] = ttycolors_inv[k + 8] = 0x70;
     }
+    ttycolors[CLR_BLACK] = FOREGROUND_INTENSITY;
+    ttycolors_inv[CLR_BLACK] = BACKGROUND_INTENSITY;
 #endif
     init_ttycolor_completed = TRUE;
 }
@@ -1788,7 +1523,7 @@ void
 term_end_color(void)
 {
 #ifdef TEXTCOLOR
-    console.foreground = DEFTEXTCOLOR;
+//    console.foreground = DEFTEXTCOLOR;
 #endif
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
     console.attr = (console.foreground | console.background);
@@ -2616,7 +2351,7 @@ void nethack_enter_consoletty(void)
         }
     }
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
-    init_custom_colors();
+    init_hilite();
 #endif /* VIRTUAL_TERMINAL_SEQUENCES */
     console.current_nhcolor = NO_COLOR;
     console.is_ready = TRUE;
@@ -2637,8 +2372,8 @@ VA_DECL(const char *, fmt)
         fprintf(stdout, "%s", buf);
     else {
 #ifdef TTY_GRAPHICS
-        if(!init_ttycolor_completed)
-            init_ttycolor();
+//      if(!init_ttycolor_completed)
+
         /* if we have generated too many messages ... ask the user to
          * confirm and then clear.
          */

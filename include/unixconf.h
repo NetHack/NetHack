@@ -57,9 +57,7 @@
                         * the Makefile */
 #define TEXTCOLOR      /* Use System V r3.2 terminfo color support
                         * and/or ANSI color support on termcap systems
-                        * and/or X11 color.  Note:  if you get compiler
-                        * warnings about 'has_colors()' being implicitly
-                        * declared, uncomment NEED_HAS_COLORS_DECL below. */
+                        * and/or X11 color. */
 #define POSIX_JOB_CONTROL /* use System V / Solaris 2.x / POSIX job control
                            * (e.g., VSUSP) */
 #define POSIX_TYPES /* use POSIX types for system calls and termios */
@@ -364,16 +362,6 @@
 #define msleep(k) napms(k)
 #endif
 #endif
-
-/* Relevant for some systems which enable TEXTCOLOR:  some older versions
-   of curses (the run-time library optionally used by nethack's tty
-   interface in addition to its curses interface) supply 'has_colors()'
-   but corresponding <curses.h> doesn't declare it.  has_colors() is used
-   in unixtty.c by init_sco_cons() and init_linux_cons().  If the compiler
-   complains about has_colors() not being declared, try uncommenting
-   NEED_HAS_COLORS_DECL.  If the linker complains about has_colors not
-   being found, switch to ncurses() or update to newer version of curses. */
-/* #define NEED_HAS_COLORS_DECL */
 
 #ifdef hc /* older versions of the MetaWare High-C compiler define this */
 #ifdef __HC__

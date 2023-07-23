@@ -1101,7 +1101,7 @@ struct window_procs Qt_procs = {
      | WC2_U_UTF8STR | WC2_U_24BITCOLOR
 #endif
      | WC2_STATUSLINES),
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, /* color availability */
     nethack_qt_::NetHackQtBind::qt_init_nhwindows,
     nethack_qt_::NetHackQtBind::qt_player_selection,
     nethack_qt_::NetHackQtBind::qt_askname,

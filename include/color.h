@@ -8,10 +8,9 @@
 /*
  * The color scheme used is tailored for an IBM PC.  It consists of the
  * standard 8 colors, followed by their bright counterparts.  There are
- * exceptions, these are listed below.	Bright black doesn't mean very
- * much, so it is used as the "default" foreground color of the screen.
+ * exceptions, these are listed below.
  */
-#define CLR_BLACK 0
+#define NO_COLOR 0
 #define CLR_RED 1
 #define CLR_GREEN 2
 #define CLR_BROWN 3 /* on IBM, low-intensity yellow is brown */
@@ -19,7 +18,7 @@
 #define CLR_MAGENTA 5
 #define CLR_CYAN 6
 #define CLR_GRAY 7 /* low-intensity white */
-#define NO_COLOR 8
+#define CLR_DARKGRAY 8
 #define CLR_ORANGE 9
 #define CLR_BRIGHT_GREEN 10
 #define CLR_YELLOW 11
@@ -27,7 +26,8 @@
 #define CLR_BRIGHT_MAGENTA 13
 #define CLR_BRIGHT_CYAN 14
 #define CLR_WHITE 15
-#define CLR_MAX 16
+#define CLR_BLACK 16
+#define CLR_MAX 17
 
 /* The "half-way" point for tty-based color systems.  This is used in */
 /* the tty color setup code.  (IMHO, it should be removed - dean).    */
@@ -38,7 +38,6 @@
 #define HI_LORD CLR_MAGENTA /* for high-end monsters */
 
 /* these can be configured */
-#define HI_OBJ CLR_MAGENTA
 #define HI_METAL CLR_CYAN
 #define HI_COPPER CLR_YELLOW
 #define HI_SILVER CLR_GRAY
@@ -49,8 +48,39 @@
 #define HI_WOOD CLR_BROWN
 #define HI_PAPER CLR_WHITE
 #define HI_GLASS CLR_BRIGHT_CYAN
-#define HI_MINERAL CLR_GRAY
-#define DRAGON_SILVER CLR_BRIGHT_CYAN
+#define HI_MINERAL NO_COLOR
 #define HI_ZAP CLR_BRIGHT_BLUE
+#define PALLID CLR_DARKGRAY
+#ifndef MICRO
+#define DRAGON_SILVER HI_SILVER
+#else
+#define DRAGON_SILVER HI_GLASS
+#endif
+
+typedef struct {
+    unsigned char b, g, r;
+} RGB;
+/*
+ * printf("0x%02X%02X%02X", c->r, c->g, c->b);
+ *
+ * defined reverse, so the whole prints RGB
+ *
+ *      printf("0x%06X", *c);
+ */
+
+extern RGB *stdclrval(const char *);
+extern RGB *tpalette[CLR_MAX];
+extern void default_palette(void);
+extern void set_black(unsigned char);
+extern void use_darkgray(void);
+
+#ifdef TTY_GRAPHICS
+extern void set_palette(void);
+extern void reset_palette(void);
+
+extern void init_hilite(void);
+extern const NEARDATA char *hilites[CLR_MAX];
+extern const char *bghilites[CLR_MAX];
+#endif
 
 #endif /* COLOR_H */

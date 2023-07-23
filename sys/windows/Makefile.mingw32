@@ -961,7 +961,7 @@ COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl c
 	   hack hacklib insight invent isaac64 light lock \
 	   mail makemon mcastu mdlib mhitm mhitu minion mklev mkmap mkmaze mkobj mkroom \
 	   mon mondata monmove monst mplayer mthrowu muse music \
-	   nhlobj nhlsel nhlua windsound o_init objects objnam options \
+	   nhlobj nhlsel nhlua o_init objects objnam options \
 	   pager pickup pline polyself potion pray priest quest questpgr \
 	   random read rect region restore rip rnd role rumors \
 	   safeproc save sfstruct shk shknam sit sounds sp_lev spell steal steed \
@@ -1062,10 +1062,10 @@ CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CO
 
 ONH = $(O)nethack
 
-NHONLY = consoletty.o getline.o topl.o wintty.o
+NHONLY = consoletty.o getline.o topl.o wintty.o colors.o
 ifeq "$(ADD_CURSES)" "Y"
 NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
-CFLAGSNH += $(NHCURSESFLAGS)
+CFLAGSNH += $(NHCURSESFLAGS) $(PDCINCL)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))

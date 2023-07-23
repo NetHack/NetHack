@@ -25,8 +25,8 @@ const char *c_obj_colors[] = {
     "blue",           /* CLR_BLUE */
     "magenta",        /* CLR_MAGENTA */
     "cyan",           /* CLR_CYAN */
-    "gray",           /* CLR_GRAY */
-    "transparent",    /* no_color */
+    "silver",         /* CLR_GRAY */
+    "gray",           /* CLR_DARKGRAY */
     "orange",         /* CLR_ORANGE */
     "bright green",   /* CLR_BRIGHT_GREEN */
     "yellow",         /* CLR_YELLOW */
@@ -34,6 +34,7 @@ const char *c_obj_colors[] = {
     "bright magenta", /* CLR_BRIGHT_MAGENTA */
     "bright cyan",    /* CLR_BRIGHT_CYAN */
     "white",          /* CLR_WHITE */
+    "transparent",    /* no_color */
 };
 
 const struct c_common_strings c_common_strings =

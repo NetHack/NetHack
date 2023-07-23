@@ -264,7 +264,7 @@ A("The Palantir of Westernesse",        CRYSTAL_BALL,
      *  terminator; otyp must be zero
      */
     A(0, 0, 0, 0, 0, NO_ATTK, NO_DFNS, NO_CARY, 0, A_NONE, NON_PM, NON_PM, 0L,
-      0, TERMINATOR) /* 0 is CLR_BLACK rather than NO_COLOR but it doesn't matter here */
+      0, TERMINATOR)
 
 }; /* artilist[] (or artifact_names[]) */
 #endif
