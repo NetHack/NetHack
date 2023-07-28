@@ -230,7 +230,7 @@ steps:
     cd ../..
     make fetch-lua
     make WANT_MACSOUND=1 all
-  condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq( variables.buildTarget, 'all'))
+  condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq( variables.toolchain, 'all'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building mac full build'
 
