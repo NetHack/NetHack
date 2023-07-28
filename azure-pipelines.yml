@@ -235,7 +235,6 @@ steps:
   displayName: 'Building mac full build'
 
 - bash: |
-    export GCCVER=gcc1220
     cd sys/unix
     sh setup.sh hints/macos.370
     cd ../..
@@ -245,7 +244,7 @@ steps:
     if [ $retVal -eq 0 ]; then
         make LUA_VERSION=5.4.6 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
     fi
-  condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq( variables.toolchain, 'cross'))
+  condition: eq( variables['Agent.OS'], 'Darwin' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
   displayName: 'Building MSDOS package on macOS'
 
