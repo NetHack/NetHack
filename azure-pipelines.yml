@@ -4,28 +4,28 @@ strategy:
       imageName: 'ubuntu-latest'
       toolchainName: gcc9
       buildTargetName: minimal
-    linux_focal_clang_all:
-      imageName: 'ubuntu-20.04'
+    linux_jammy_clang_all:
+      imageName: 'ubuntu-22.04'
       toolchainName: clang
       buildTargetName: all
-    linux_focal_gcc9_all:
-      imageName: 'ubuntu-20.04'
+    linux_jammy_gcc9_all:
+      imageName: 'ubuntu-22.04'
       toolchainName: gcc9
       buildTargetName: all
-    linux_focal_gcc10_all:
-      imageName: 'ubuntu-20.04'
-      toolchainName: gcc10
-      buildTargetName: all
-    linux_jammy_gcc11_all:
+    linux_jammy_gcc12_all:
       imageName: 'ubuntu-22.04'
-      toolchainName: gcc11
+      toolchainName: gcc12
+      buildTargetName: all
+    linux_jammy_gcc12_all:
+      imageName: 'ubuntu-22.04'
+      toolchainName: gcc12
       buildTargetName: all
     macOS_latest_clang_all:
       imageName: 'macOS-latest'
       toolchainName: clang
       buildTargetName: all
-    macOS_monterey_clang13_all:
-      imageName: 'macOS-12'
+    macOS_Ventura_clang13_all:
+      imageName: 'macOS-13'
       toolchainName: clang
       buildTargetName: all
     windows-visualstudio:
@@ -37,7 +37,7 @@ strategy:
       toolchainName: mingw
       buildTargetName: all
     linux_focal_cross_msdos:
-      imageName: 'ubuntu-20.04'
+      imageName: 'ubuntu-22.04'
       toolchainName: cross
       buildTargetName: msdos
     linux_jammy_docs:
@@ -83,6 +83,11 @@ steps:
     then
       echo "##vso[task.setvariable variable=CC]gcc-11"
       echo "##vso[task.setvariable variable=CXX]g++-11"
+    fi
+    if [ "$(toolchain)" == "gcc12" ]
+    then
+      echo "##vso[task.setvariable variable=CC]gcc-12"
+      echo "##vso[task.setvariable variable=CXX]g++-12"
     fi
     if [ "$(toolchain)" == "clang" ]
     then
