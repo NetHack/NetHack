@@ -322,6 +322,7 @@ curs_show_invt(WINDOW *win)
     const char *str;
     char accelerator, tmpbuf[BUFSZ];
     int attr, color;
+    attr_t hilite;
     unsigned lineno, stroffset, widest, left_col, right_col,
         first_shown = 0, last_shown = 0, item_count = 0;
     int x, y, width, height, available_width,
@@ -389,11 +390,9 @@ curs_show_invt(WINDOW *win)
         }
 
         if (stroffset < strlen(str)) {
-            if (color == NO_COLOR)
-                color = NONE;
-            curses_menu_color_attr(win, color, attr, ON);
+            hilite = whilite(win, attr | colorattr(color));
             wprintw(win, "%.*s", available_width, str + stroffset);
-            curses_menu_color_attr(win, color, attr, OFF);
+            wattroff(win, hilite);
         }
 
         wclrtoeol(win);

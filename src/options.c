@@ -1080,35 +1080,38 @@ optfn_autounlock(
 }
 
 static int
-optfn_black(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_black(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 {
     unsigned char itmp = 0;
 
     if (req == do_init && opts == empty_optstr)
-        set_black(0);
+        set_black(1);
 
     if (req == do_set) {
-        if (negated)
-            use_darkgray();
-        else if (op != empty_optstr) {
+        if (op != empty_optstr)
             itmp = atoi(op);
-            if (itmp == 0)
-                use_darkgray();
 
-            else if (itmp < 4 || itmp > 0x80) {
-                config_error_add("'%s:%s' is invalid; accepts 4 up to 128",
-                                 allopt[optidx].name, op);
-                return optn_silenterr;
-            } else {
-                set_black(itmp);
-                if (!go.opt_initial)
-                    go.opt_need_redraw = TRUE;
-            }
+        if ((itmp < 4 || itmp > 0x80)
+            && itmp != 0 && itmp != 1 && itmp != 2) {
+            config_error_add("'%s:%s' is invalid; "
+                "must be from 4 to 128, 0, 1, or 2", allopt[optidx].name, op);
+            return optn_silenterr;
         }
+        iflags.wc2_black = itmp;
+        switch (itmp) {
+            case 0: case 2: break;
+            default: set_black(itmp);
+        }
+        if (!go.opt_initial)
+            go.opt_need_redraw = TRUE;
     }
-    if (req == get_val) {
+    if (req == get_val || req == get_cnf_val) {
         if (wc2_supported(allopt[optidx].name))
-            Sprintf(opts, "%d", iflags.wc2_black);
+            switch (iflags.wc2_black) {
+                case 0: Strcpy(opts, "darkgray"); break;
+                case 2: Strcpy(opts, "blue"); break;
+                default: Sprintf(opts, "%d", iflags.wc2_black);
+            }
         else
             Strcpy(opts, "unknown");
     }

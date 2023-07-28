@@ -428,10 +428,10 @@ curses_ext_cmd(void)
             struct ext_func_tab *ec = extcmds_getentry(ecmatches[0]);
 
             if (ec) {
-                curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, ON);
+                wattron(extwin, A_UNDERLINE);
                 wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
                 wprintw(extwin, "%s", ec->ef_txt + (int) strlen(cur_choice));
-                curses_toggle_color_attr(extwin, NONE, A_UNDERLINE, OFF);
+                wattroff(extwin, A_UNDERLINE);
             }
         }
 
@@ -1171,8 +1171,7 @@ menu_display_page(
     int count, curletter, entry_cols, start_col, num_lines;
     char *tmpstr;
     boolean first_accel = TRUE;
-    int color = NO_COLOR, attr = A_NORMAL;
-    boolean menu_color = FALSE;
+    int color = NO_COLOR, hilite;
 
     /* letters assigned to entries on current page */
     if (selectors)
@@ -1243,15 +1242,15 @@ menu_display_page(
                 selectors[(unsigned) (curletter & 0xFF)]++;
 
             if (menu_item_ptr->selected) {
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
+                hilite = whilite(win, A_REVERSE | colorattr(HIGHLIGHT_COLOR));
                 mvwaddch(win, menu_item_ptr->line_num + 1, 1, '<');
                 mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
                 mvwaddch(win, menu_item_ptr->line_num + 1, 3, '>');
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
+                wattroff(win, hilite);
             } else {
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+                hilite = whilite(win, colorattr(HIGHLIGHT_COLOR));
                 mvwaddch(win, menu_item_ptr->line_num + 1, 2, curletter);
-                curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+                wattroff(win, hilite);
                 mvwprintw(win, menu_item_ptr->line_num + 1, 3, ") ");
             }
         }
@@ -1266,27 +1265,19 @@ menu_display_page(
         /* FIXME: menuglyphs not implemented yet */
         if (menu_item_ptr->glyphinfo.glyph != NO_GLYPH
             && iflags.use_menu_glyphs) {
-            color = (int) menu_item_ptr->glyphinfo.color;
-            curses_toggle_color_attr(win, color, NONE, ON);
+            hilite = whilite(win, colorattr(menu_item_ptr->glyphinfo.color));
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col, curletter);
-            curses_toggle_color_attr(win, color, NONE, OFF);
+            wattroff(win, hilite);
             mvwaddch(win, menu_item_ptr->line_num + 1, start_col + 1, ' ');
             entry_cols -= 2;
             start_col += 2;
         }
 #endif
-        color = NONE;
-        menu_color = iflags.use_menu_color
-                     && get_menu_coloring(menu_item_ptr->str, &color, &attr);
-        if (menu_color) {
-            attr = curses_convert_attr(attr);
-            if (color != NONE || attr != A_NORMAL)
-                curses_menu_color_attr(win, color, attr, ON);
-        } else {
-            attr = menu_item_ptr->attr;
-            if (color != NONE || attr != A_NORMAL)
-                curses_toggle_color_attr(win, color, attr, ON);
-        }
+        if (get_menu_coloring(menu_item_ptr->str, &color, &hilite))
+            hilite = curses_convert_attr(hilite) | colorattr(color);
+        else
+            hilite = menu_item_ptr->attr;
+        hilite = whilite(win, hilite);
 
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
         for (count = 0; count < num_lines; count++) {
@@ -1298,12 +1289,7 @@ menu_display_page(
                 free(tmpstr);
             }
         }
-        if (color != NONE || attr != A_NORMAL) {
-            if (menu_color)
-                curses_menu_color_attr(win, color, attr, OFF);
-            else
-                curses_toggle_color_attr(win, color, attr, OFF);
-        }
+        wattroff(win, hilite);
 
         menu_item_ptr = menu_item_ptr->next_item;
     }
@@ -1319,21 +1305,21 @@ menu_display_page(
         }
         footer_x = !menu->bottom_heavy ? (menu->width - footwidth) : 2;
         if (page_num != 1) {
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+            hilite = whilite(win, colorattr(HIGHLIGHT_COLOR));
             mvwaddstr(win, menu->height, footer_x, "<=");
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+            wattroff(win, hilite);
         }
         mvwprintw(win, menu->height, footer_x + 2, " (Page %d of %d) ",
                   page_num, menu->num_pages);
         if (page_num != menu->num_pages) {
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+            hilite = whilite(win, colorattr(HIGHLIGHT_COLOR));
             mvwaddstr(win, menu->height, footer_x + footwidth - 2, "=>");
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+            wattroff(win, hilite);
         }
     }
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
+    hilite = whilite(win, colorattr(DIALOG_BORDER_COLOR));
     box(win, 0, 0);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
+    wattroff(win, hilite);
     wrefresh(win);
 }
 
@@ -1633,25 +1619,26 @@ menu_select_deselect(
 {
     int curletter = item->accelerator;
     boolean visible = (item->page_num == current_page);
+    attr_t hilite;
 
     if (operation == DESELECT || (item->selected && operation == INVERT)) {
         item->selected = FALSE;
         item->count = -1L;
         if (visible) {
             mvwaddch(win, item->line_num + 1, 1, ' ');
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);
+            hilite = whilite(win, colorattr(HIGHLIGHT_COLOR));
             mvwaddch(win, item->line_num + 1, 2, curletter);
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, OFF);
+            wattroff(win, hilite);
             mvwaddch(win, item->line_num + 1, 3, ')');
         }
     } else {
         item->selected = TRUE;
         if (visible) {
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, ON);
+            hilite = whilite(win, A_REVERSE | colorattr(HIGHLIGHT_COLOR));
             mvwaddch(win, item->line_num + 1, 1, '<');
             mvwaddch(win, item->line_num + 1, 2, curletter);
             mvwaddch(win, item->line_num + 1, 3, '>');
-            curses_toggle_color_attr(win, HIGHLIGHT_COLOR, A_REVERSE, OFF);
+            wattroff(win, hilite);
         }
     }
     if (visible)

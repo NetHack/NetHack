@@ -60,6 +60,7 @@ curses_create_window(int width, int height, orient orientation)
     WINDOW *win;
     boolean map_border = FALSE;
     int mapb_offset = 0;
+    attr_t hilite;
 
     if ((orientation == UP) || (orientation == DOWN) ||
         (orientation == LEFT) || (orientation == RIGHT)) {
@@ -142,9 +143,9 @@ curses_create_window(int width, int height, orient orientation)
     }
 
     win = newwin(height, width, starty, startx);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, ON);
+    hilite = whilite(win, colorattr(DIALOG_BORDER_COLOR));
     box(win, 0, 0);
-    curses_toggle_color_attr(win, DIALOG_BORDER_COLOR, NONE, OFF);
+    wattroff(win, hilite);
     return win;
 }
 
@@ -567,14 +568,15 @@ void
 curses_alert_win_border(winid wid, boolean onoff)
 {
     WINDOW *win = curses_get_nhwin(wid);
+    attr_t hilite;
 
     if (!win || !curses_window_has_border(wid))
         return;
     if (onoff)
-        curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, ON);
+        hilite = whilite(win, colorattr(ALERT_BORDER_COLOR));
     box(win, 0, 0);
     if (onoff)
-        curses_toggle_color_attr(win, ALERT_BORDER_COLOR, NONE, OFF);
+        wattroff(win, hilite);
     wnoutrefresh(win);
 }
 
@@ -604,39 +606,19 @@ is_main_window(winid wid)
 /* Unconditionally write a single character to a window at the given
 coordinates without a refresh.  Currently only used for the map. */
 
-static int
-get_framecolor(int nhcolor, int framecolor)
-{
-    boolean hicolor = (COLORS >= 16), adj_framecolor = framecolor;
-    static int framecolors[16][8] = {
-        { 0, 16, 8, 32, 17, 40, 48, 0 },    { 1, 18, 9, 33, 19, 41, 49, 1 },
-        { 2, 20, 10, 34, 21, 42, 50, 2 },   { 3, 22, 11, 35, 23, 43, 51, 3 },
-        { 4, 24, 12, 36, 25, 44, 52, 4 },   { 5, 26, 13, 37, 27, 45, 53, 5 },
-        { 6, 28, 14, 38, 29, 46, 54, 6 },   { 0, 30, 15, 72, 31, 88, 56, 0 },
-        { 0, 30, 15, 39, 31, 47, 55, 0 },   { 1, 18, 9, 73, 19, 89, 57, 121 },
-        { 2, 20, 10, 74, 21, 90, 58, 122 }, { 2, 22, 11, 75, 23, 91, 59, 123 },
-        { 4, 24, 12, 76, 25, 44, 60, 124 }, { 5, 26, 13, 77, 27, 93, 61, 125 },
-        { 6, 28, 14, 78, 29, 94, 62, 126 }, { 0, 30, 15, 79, 31, 95, 63, 127 },
-    };
-
-    if (framecolor < 16 && framecolor >= 8)
-        adj_framecolor = framecolor - 8;
-    return ((nhcolor < (hicolor ? 16 : 8) && adj_framecolor < 8)
-                ? framecolors[nhcolor][adj_framecolor]
-                : nhcolor);
-}
-
 static void
 write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
-    int curscolor = nch.color, cursattr = nch.attr;
+    attr_t hilite = A_NORMAL;
 
-    if (nch.framecolor != NO_COLOR) {
-        curscolor = get_framecolor(nch.color, nch.framecolor);
-        if (nch.attr == A_REVERSE)
-            cursattr = A_NORMAL; /* hilited pet looks odd otherwise */
+    nch.attr &= ~A_REVERSE; /* hilited pet looks odd otherwise */
+
+    hilite = whilite(win, nch.attr | colorpair(nch.color, nch.framecolor));
+
+    if (!hilite && nch.attr) {
+        hilite = nch.attr;
+        wattron(win, hilite);
     }
-    curses_toggle_color_attr(win, curscolor, cursattr, ON);
 #if defined(CURSES_UNICODE) && defined(ENHANCED_SYMBOLS)
     if ((nch.unicode_representation && nch.unicode_representation->utf8str)
         || SYMHANDLING(H_IBM)) {
@@ -675,8 +657,6 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
             0x2261, 0x00b1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00f7, 0x2248,
             0x00b0, 0x2219, 0x00b7, 0x221a, 0x207f, 0x00b2, 0x25a0, 0x00a0
         };
-        attr_t attr;
-        short pair;
         wchar_t wch[3];
         uint32 utf32ch;
         cchar_t cch;
@@ -698,8 +678,7 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
             wch[1] = L'\0';
         }
         wmove(win, y, x);
-        wattr_get(win, &attr, &pair, NULL);
-        setcchar(&cch, wch, attr, pair, NULL);
+        setcchar(&cch, wch, nch.attr, PAIR_NUMBER(hilite), NULL);
         mvwadd_wch(win, y, x, &cch);
     } else
 #endif
@@ -708,7 +687,7 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 #else
         mvwaddch(win, y, x, nch.ch);
 #endif
-    curses_toggle_color_attr(win, curscolor, cursattr, OFF);
+    wattroff(win, hilite);
 }
 
 

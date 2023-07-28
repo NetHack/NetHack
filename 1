@@ -1,0 +1,194 @@
+#nethackrc
+
+options=name:Duing,fruit:tomato
+#options=male,role:samurai,fruit:riceballs
+#options=male,role:knight,fruit:leg of ham
+#options=role:valkyrie,race:dwarf,fruit:mug of mate
+#options=role:monk,align:neutral,fruit:riceballs
+#options=male,role:wizard,race:elf,fruit:mango
+#options=role:ranger,race:elf,fruit:mango
+#options=male,role:priest,race:elf,fruit:mug of mate
+options=male,role:priest,align:lawful
+#options=male,role:tourist,fruit:slice of pizza
+#options=male,role:archeologist,race:gnome
+#options=male,role:healer,race:gnome,fruit:mango
+#options=male,role:wizard,race:gnome,fruit:mango
+options=notutorial,bones:false
+
+bind=!:loot,v:jump
+options=number_pad:-1 #qwertz
+options=windowtype:curses,windowborders:0,petattr:u
+symbols=S_corr:#,S_litcorr:#
+
+options=color,hitpointbar,time,showexp,statuslines:3,statushilites:8
+options=hilite_status:hitpoints/<100%/lightgreen/<60%/yellow/<40%/red&blink
+options=hilite_status:hunger/red
+options=hilite_status:condition/major_troubles/red
+options=hilite_status:characteristics/up/cyan/down/red
+options=hilite_status:experience-level/up/cyan/down/red
+options=menucolors,perm_invent,menu_headings:none
+options=autopickup,pickup_burden:unencumbered,pickup_types:$"%?+!=/(*
+#options=pickup_burden:unencumbered,pickup_types:$"%?+!=/*
+#options=pickup_burden:unencumbered,pickup_types:?!/
+
+# Chance of a wish; (semi-)permanent engraving.
+# Spellbooks disintegrate after they've been read three times.
+# 
+menucolor="smoky potion|potion.*djinn"=lightmagenta
+menucolor="(cloak|robe).*worn|protection.*hand"=lightmagenta
+menucolor="wand.*(fire|lightning)"=no-color&bold
+menucolor="(diamond|emerald|ruby|saphire|steel|topaz).*ring|ring.*H"=no-color&bold
+#menucolor="a.*ring.*(warning|cold|fire|invisibility|constitution)"=no-color&bold
+menucolor="spellbook.*named 3"=no-color&bold
+
+# Water
+#
+menucolor="[a1-9].*(clear potion|potions? .*water)"=no-color&dim
+
+# Beware of cursed items --
+#
+menucolor=" cursed|unholy"=red&dim
+menucolor="dull spellbook"=red&dim
+
+# Don't pickup a loadstone.
+# Never put a wand of cancellation into a bag of holding! Don't nest magic bags!
+#
+menucolor="^a.*(load(stone)?$|wand.*cancel)"=red&underline
+menucolor="^an?.*bag.*(holding|tricks)|named cancel|wand.*vanish"=magenta
+autopickup_exception="> load"
+autopickup_exception="< luck"
+autopickup_exception="> rock"
+autopickup_exception="> gray stone"
+autopickup_exception=">^[a0-9]+ stone"
+autopickup_exception=">worthless|junk"
+
+# Pickup artifacts and rare items. Name the real amulet!
+#
+menucolor="Amulet of Yendor named|named wealth"=lightmagenta
+autopickup_exception=">Amulet of Yendor"
+autopickup_exception="<Amulet of Yendor named"
+autopickup_exception="<^the "
+autopickup_exception="<amulet.*life"
+autopickup_exception="<athame"
+
+# Distinguish between vegetarian/vegan, and poisonous corpses.
+#   all veterian corpses are acidic
+#   yellow mold is vegan, poisonous and hallucinogen
+#   a footrice corpse can rub out entire forts
+#
+menucolor="corpse|glob|meat"=orange
+menucolor="globs? of (gray ooze|brown pudding|green slime)"=lightgreen
+menucolor="(lichen|mold|shrieker|fungus|jelly|blob|cube) corpse"=green
+menucolor="(kobold.*|soldier ant|bee(tle)?|[a0-9]+ snake|water moccasin|pit viper|cobra|were.*|gremlin|manes|homunculi|lemure|rabid rat|vampire bat|green dragon|guardian naga|quantum mechanic|jellyfish|salamander) corpse"=orange&dim
+menucolor="(Medusa|Chromatic Dragon|Scorpius) corpse"=orange&dim
+menucolor="yellow mold corpse"=lightgreen&dim
+menucolor="trice corpse"=yellow
+autopickup_exception=">corpse|glob"
+autopickup_exception="<lichen corpse" 
+autopickup_exception="<lizard corpse" 
+autopickup_exception="<newt corpse"
+autopickup_exception="<floating eye corpse"
+autopickup_exception="<wraith corpse"
+
+# Treat
+#   tame domestic animals (people food and corpses have a chance too)
+#   make pets follow more closely, and train their apport
+#   for non-orc non-caveman non-carnivore, tripe has a 1/2 chance of giving nausea,
+#   which actually cures food poisoning, but do not count on vomiting before you die
+#
+menucolor="tripe|meatball"=orange&dim
+menucolor="apple|banana|carrot"=green&dim
+
+# Scrolls
+#   amnesia is never usefull
+#   drop/stand on scare monster
+#   identify can be read regardless of beatitude
+#   fire and stinking cloud are strong offensive means
+# blessed
+#   remove BUC identification of the entire open inventory,
+#   and randomly curse/bless items - possibly water
+# uncursed
+#   enchant weapon and armor
+# cursed
+#   fire does less damage - can cure sliming
+#   confuse yourself, reverse genocide, levelport, detect portals/traps/potions
+#   create a horde of monsters for sacrifice
+#   destroy armor applies erodeproofing when read while confused
+#   disenchant armor and weapon
+#
+menucolor="unlabeled scroll|blank paper|plain spellbook"=no-color&dim
+menucolor="[a1-9].*scroll.*(amnesia|punishment)"=black
+menucolor="[a1-9].*scroll.*scare"=no-color&underline
+menucolor="[a1-9].*scroll.*identify"=cyan&dim
+menucolor="[a1-9].*scroll.*(fire|cloud)"=yellow&dim
+menucolor="(ncursed|blessed) scroll.*remove curse|scroll.*remove.*(ncursed|blessed)"=blue&dim
+menucolor="(ncursed|blessed) scroll.*enchant|scroll.*enchant.*(ncursed|blessed)"=lightblue
+menucolor=" cursed.*scroll.*(genocide|teleport)|scroll.*(genocide|teleport).* cursed"=red
+menucolor=" cursed.*scroll.*detect|scroll.*detect.* cursed"=red
+#menucolor=" cursed.*scroll.*create|scroll.*create.* cursed"=red
+menucolor=" cursed.*scroll.*destroy armor|scroll.*destroy armor.* cursed"=brown
+autopickup_exception=">scroll.* scare monster"
+
+# Potions
+#   acid and oil are different, as is water
+#   beatitude has no effect on potions dipped into, i.e. polymorph
+# blessed
+#   see invisible and invisbility grant the intrinsics permanently
+#   enlightenment increases intelligence and wisdom by one point
+# cursed
+#   use gain level as an escape item through the ceiling
+#   mix enlightenment with levitation to 6/10 gain level
+#
+menucolor=" holy|blessed.*(clear|potions? .*water)"=blue&dim
+menucolor="[a1-9].*potion.*(acid|oil)"=brown
+menucolor="[a1-9].*potion.*(blindness|confusion|sleeping|paralysis)"=yellow&dim
+menucolor="[a1-9].*potion.*heal"=blue
+menucolor="(ncursed|blessed).*potion.*gain.*|potion.*gain.*(ncursed|blessed)"=cyan
+menucolor="blessed.*potion.*enlightenment|potion.*enlightenment.*blessed"=cyan
+menucolor="blessed.*potion.*invisib.*|potion.*invisib.*blessed"=cyan&dim
+menucolor=" cursed.*potion.*level|potion.*level.* cursed"=red
+menucolor="[a1-9].*potion.*(polymorph|sickness|speed)"=magenta&dim
+menucolor=" cursed potion.*(energy|enlightenment|levitation)|potion.*(energy|enlightenment|levitation).* cursed"=magenta&dim
+autopickup_exception="<potion.*healing"
+autopickup_exception="<potion.*gain.*"
+#menucolor="[a1-9].*potion.*speed"=magenta
+
+# Metal armor hinders spell casting.
+#
+menucolor="(mail|coat|helm|pot|iron|hard|power|kick|shield).*worn"=blue
+menucolor="(crystal|dragon|leather|brilliance).*worn"=no-color
+menucolor="(wielded|weapon) in.*hand"=no-color&inverse
+menucolor=" cursed.*(hand|worn)"=red
+
+autopickup_exception=">:0)"
+autopickup_exception="> named empty"
+autopickup_exception="> nothing"
+autopickup_exception="<wand .* wish"
+autopickup_exception="<wand .* create monster"
+autopickup_exception="<wand .* tele"
+autopickup_exception="<wand .* poly"
+autopickup_exception="<wand .* fire"
+autopickup_exception="<wand .* lightning"
+autopickup_exception="<wand .* death"
+autopickup_exception=">wand .* cold$"
+
+menucolor=" cursed magic marker|marker named cursed"=red
+menucolor=" cursed.*whistle|whistle.* cursed"=red
+menucolor=" cursed bugle"=no-color
+autopickup_exception="<magic marker"
+autopickup_exception="< lamp"
+autopickup_exception=">lantern|oil lamp|lamp called oil"
+autopickup_exception=">chest|box|bag|sack"
+autopickup_exception=">bell|saddle"
+autopickup_exception=">pick-axe"
+autopickup_exception=">looking glass|mirror"
+autopickup_exception="<<"
+autopickup_exception=">>"
+autopickup_exception="< arrow"
+autopickup_exception="< ya"
+autopickup_exception="< crossbow bolt"
+autopickup_exception="< dart"
+autopickup_exception="< shuriken"
+autopickup_exception="< throwing star"
+autopickup_exception="> cursed.*(arrow|bolt|shuriken|star|ya)"
+autopickup_exception="> scroll"

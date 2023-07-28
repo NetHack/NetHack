@@ -70,17 +70,20 @@ typedef struct {
 
 extern RGB *stdclrval(const char *);
 extern RGB *tpalette[CLR_MAX];
-extern void default_palette(void);
 extern void set_black(unsigned char);
-extern void use_darkgray(void);
 
-#ifdef TTY_GRAPHICS
+#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
 extern void set_palette(void);
 extern void reset_palette(void);
 
 extern void init_hilite(void);
-extern const NEARDATA char *hilites[CLR_MAX];
-extern const char *bghilites[CLR_MAX];
+extern const char *fg_hilite(unsigned char);
+extern const char *bg_hilite(unsigned char);
+
+#ifdef CURSES_GRAPHICS
+#define colorattr(f) colorpair(f, 0)
+extern unsigned int colorpair(unsigned char, unsigned char);
+#endif
 #endif
 
 #endif /* COLOR_H */

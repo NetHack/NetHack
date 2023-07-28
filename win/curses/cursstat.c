@@ -309,6 +309,7 @@ draw_horizontal(boolean border)
         condstart = 0, conddummy = 0;
 #ifdef STATUS_HILITES
     int coloridx = NO_COLOR, attrmask = 0;
+    attr_t hilite;
 #endif /* STATUS_HILITES */
     boolean asis = FALSE;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
@@ -580,7 +581,7 @@ draw_horizontal(boolean border)
                 /* regular field, including title if no hitpointbar */
 #ifdef STATUS_HILITES
                 coloridx = curses_status_colors[fld]; /* includes attribute */
-                if (iflags.hilite_delta && coloridx != NO_COLOR) {
+                if (iflags.hilite_delta && coloridx) {
                     /* expect 1 leading space; don't highlight it */
                     while (*text == ' ') {
                         waddch(win, ' ');
@@ -593,8 +594,8 @@ draw_horizontal(boolean border)
                     }
 #ifdef TEXTCOLOR
                     coloridx &= 0x00FF;
-                    if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                        curses_toggle_color_attr(win, coloridx, NONE, ON);
+                    if (coloridx && coloridx < CLR_MAX)
+                        hilite = whilite(win, colorattr(coloridx));
 #endif
                 }
 #endif /* STATUS_HILITES */
@@ -604,8 +605,8 @@ draw_horizontal(boolean border)
 #ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
-                    if (coloridx != NO_COLOR)
-                        curses_toggle_color_attr(win, coloridx, NONE, OFF);
+                    if (hilite)
+                        wattroff(win, hilite);
 #endif
                     if (attrmask)
                         wattroff(win, attrmask);
@@ -701,6 +702,7 @@ draw_vertical(boolean border)
 #ifdef STATUS_HILITES
     char *p = 0, savedch = '\0';
     int coloridx = NO_COLOR, attrmask = 0;
+    attr_t hilite;
 #endif /* STATUS_HILITES */
     int height_needed, height, width, x = 0, y = 0;
     WINDOW *win = curses_get_nhwin(STATUS_WIN);
@@ -858,7 +860,7 @@ draw_vertical(boolean border)
                 ++text;
 #ifdef STATUS_HILITES
             coloridx = curses_status_colors[fld]; /* includes attributes */
-            if (iflags.hilite_delta && coloridx != NO_COLOR) {
+            if (iflags.hilite_delta && coloridx) {
                 /* most status_vals_long[] are "long-text : value" and
                    unlike horizontal status's abbreviated "ab:value",
                    we highlight just the value portion */
@@ -890,8 +892,8 @@ draw_vertical(boolean border)
                 }
 #ifdef TEXTCOLOR
                 coloridx &= 0x00FF;
-                if (coloridx != NO_COLOR && coloridx != CLR_MAX)
-                    curses_toggle_color_attr(win, coloridx, NONE, ON);
+                if (coloridx && coloridx < CLR_MAX)
+                    hilite = whilite(win, colorattr(coloridx));
 #endif
             } /* highlighting active */
 #endif /* STATUS_HILITES */
@@ -901,8 +903,8 @@ draw_vertical(boolean border)
 #ifdef STATUS_HILITES
             if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
-                if (coloridx != NO_COLOR)
-                    curses_toggle_color_attr(win, coloridx, NONE, OFF);
+                if (hilite)
+                    wattroff(win, hilite);
 #endif
                 if (attrmask)
                     wattroff(win, attrmask);
@@ -935,6 +937,7 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
     int coloridx = 0;
+    attr_t hilite;
 #endif
 #endif /* STATUS_HILITES */
     int k, bar_pos;
@@ -968,8 +971,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 #ifdef TEXTCOLOR
         if (iflags.hilite_delta) {
             coloridx = hpbar_color & 0x00FF;
-            if (coloridx != NO_COLOR)
-                curses_toggle_color_attr(win, coloridx, NONE, ON);
+            if (coloridx)
+                hilite = whilite(win, colorattr(coloridx));
         }
 #endif
 #endif /* STATUS_HILITES */
@@ -980,8 +983,8 @@ curs_HPbar(char *text, /* pre-padded with trailing spaces if short */
 #ifdef STATUS_HILITES
 #ifdef TEXTCOLOR
         if (iflags.hilite_delta) {
-            if (coloridx != NO_COLOR)
-                curses_toggle_color_attr(win, coloridx, NONE, OFF);
+            if (hilite)
+                wattroff(win, hilite);
         }
 #endif
 #endif /* STATUS_HILITES */
@@ -1044,6 +1047,7 @@ curs_stat_conds(
         int height = 0, width, cx, cy, cy0, cndlen;
 #ifdef STATUS_HILITES
         int attrmask = 0, color = NO_COLOR;
+        attr_t hilite;
 #endif /* STATUS_HILITES */
         boolean border, do_vert = (vert_cond != 0);
         WINDOW *win = curses_get_nhwin(STATUS_WIN);
@@ -1089,9 +1093,8 @@ curs_stat_conds(
                         wattron(win, attrmask);
                     }
 #ifdef TEXTCOLOR
-                    if ((color = condcolor(bitmsk, curses_colormasks))
-                        != NO_COLOR)
-                        curses_toggle_color_attr(win, color, NONE, ON);
+                    if ((color = condcolor(bitmsk, curses_colormasks)))
+                        hilite = whilite(win, colorattr(color));
 #endif
                 }
 #endif /* STATUS_HILITES */
@@ -1102,8 +1105,8 @@ curs_stat_conds(
 #ifdef STATUS_HILITES
                 if (iflags.hilite_delta) {
 #ifdef TEXTCOLOR
-                    if (color != NO_COLOR)
-                        curses_toggle_color_attr(win, color, NONE, OFF);
+                    if (hilite)
+                        wattroff(win, hilite);
 #endif
                     if (attrmask)
                         wattroff(win, attrmask);
@@ -1547,99 +1550,6 @@ draw_trouble_str(const char *str)
     wattron(win, attr);
     wprintw(win, "%s", str);
     wattroff(win, attr);
-}
-
-/* Returns a ncurses attribute for foreground and background.
-   This should probably be in cursinit.c or something. */
-attr_t
-curses_color_attr(int nh_color, int bg_color)
-{
-    int color = nh_color + 1;
-    attr_t cattr = A_NORMAL;
-
-    if (!nh_color) {
-        if (iflags.wc2_darkgray) {
-            if (COLORS <= 16)
-                cattr |= A_BOLD;
-        } else
-            color = COLOR_BLUE;
-    }
-
-    if (COLORS < 16 && color > 8) {
-        color -= 8;
-        cattr = A_BOLD;
-    }
-
-    /* Can we do background colors? We can if we have more than
-       16*7 colors (more than 8*7 for terminals with bold) */
-    if (COLOR_PAIRS > (COLORS >= 16 ? 16 : 8) * 7) {
-        /* NH3 has a rather overcomplicated way of defining
-           its colors past the first 16:
-           Pair    Foreground  Background
-           17      Black       Red
-           18      Black       Blue
-           19      Red         Red
-           20      Red         Blue
-           21      Green       Red
-           ...
-           (Foreground order: Black, Red, Green, Yellow, Blue,
-           Magenta, Cyan, Gray/White)
-
-           To work around these oddities, we define backgrounds
-           by the following pairs:
-
-           16 COLORS
-           49-64: Green
-           65-80: Yellow
-           81-96: Magenta
-           97-112: Cyan
-           113-128: Gray/White
-
-           8 COLORS
-           9-16: Green
-           33-40: Yellow
-           41-48: Magenta
-           49-56: Cyan
-           57-64: Gray/White */
-
-        if (bg_color == nh_color)
-            color = 1; /* Make foreground black if fg==bg */
-
-        if (bg_color == CLR_RED || bg_color == CLR_BLUE) {
-            /* already defined before extension */
-            color *= 2;
-            color += 16;
-            if (bg_color == CLR_RED)
-                color--;
-        } else {
-            boolean hicolor = FALSE;
-            if (COLORS >= 16)
-                hicolor = TRUE;
-
-            switch (bg_color) {
-            case CLR_GREEN:
-                color = (hicolor ? 48 : 8) + color;
-                break;
-            case CLR_BROWN:
-                color = (hicolor ? 64 : 32) + color;
-                break;
-            case CLR_MAGENTA:
-                color = (hicolor ? 80 : 40) + color;
-                break;
-            case CLR_CYAN:
-                color = (hicolor ? 96 : 48) + color;
-                break;
-            case CLR_GRAY:
-                color = (hicolor ? 112 : 56) + color;
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    cattr |= COLOR_PAIR(color);
-
-    return cattr;
 }
 
 /* Returns a complete curses attribute.

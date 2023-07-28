@@ -1080,8 +1080,8 @@ xputc_core(int ch)
 #ifdef VIRTUAL_TERMINAL_SEQUENCES
         /* this causes way too much performance degradation */
         /* cell.color24 = customcolors[console.current_nhcolor]; */
-        cell.colorseq = hilites[console.current_nhcolor];
-        cell.bkcolorseq = bghilites[console.current_nhbkcolor];
+        cell.colorseq = fg_hilite(console.current_nhcolor);
+        cell.bkcolorseq = bg_hilite(console.current_nhbkcolor);
         cell.attr = console.attr;
         // if (console.color24)
         //    __debugbreak();
@@ -1175,8 +1175,8 @@ g_putch(int in_ch)
     cell.character = (console.has_unicode ? cp437[ch] : ch);
 #else
     cell.attr = console.attr;
-    cell.colorseq = hilites[console.current_nhcolor];
-    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
+    cell.colorseq = fg_hilite(console.current_nhcolor);
+    cell.bkcolorseq = bg_hilite(console.current_nhbkcolor);
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx = 0;
     wch[1] = 0;
@@ -1222,8 +1222,8 @@ g_pututf8(uint8 *sequence)
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
     cell_t cell;
     cell.attr = console.attr;
-    cell.colorseq = hilites[console.current_nhcolor];
-    cell.bkcolorseq = bghilites[console.current_nhbkcolor];
+    cell.colorseq = fg_hilite(console.current_nhcolor);
+    cell.bkcolorseq = bg_hilite(console.current_nhbkcolor);
     cell.color24 = console.color24 ? console.color24 : 0L;
     cell.color256idx =console.color256idx ? console.color256idx : 0;
     Snprintf((char *) cell.utf8str, sizeof cell.utf8str, "%s",

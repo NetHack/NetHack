@@ -289,29 +289,14 @@ curses_create_main_windows(void)
     }
 }
 
+#if 0 /* pair init moved to colors.c */
+
 /* Initialize curses colors to colors used by NetHack */
 void
 curses_init_nhcolors(void)
 {
 #ifdef TEXTCOLOR
     if (has_colors()) {
-        use_default_colors();
-        register int c;
-
-        /* COLOR_PAIR(0) is fg/bg anyways
-         * black and darkgray is set by option
-         */
-        for(c = 1; c < 8; ++c)
-            init_pair(c, c, -1);
-        if (COLORS < 16)
-            for(c = 1; c < 8; ++c)
-                init_pair(c + 8, c, -1);
-        else
-            for(c = 9; c < 16; ++c)
-                init_pair(c, c, -1);
-#ifdef MICRO
-        init_pair(CLR_BLACK, CLR_BLUE, -1);
-#endif
         {
             int i;
             boolean hicolor = FALSE;
@@ -347,7 +332,7 @@ curses_init_nhcolors(void)
 #endif
 }
 
-#if 0   /* curses_choose_character + curses_character_dialog no longer used */
+/* curses_choose_character + curses_character_dialog no longer used */
 
 /* Allow player to pick character's role, race, gender, and alignment.
    Borrowed from the Gnome window port. */
@@ -787,19 +772,14 @@ curses_init_options(void)
 #else
     iflags.wc_mouse_support = 0;
 #endif
-
-    /* option parser did it to early for curses */
-    if (iflags.wc2_black)
-        set_black(iflags.wc2_black);
-    else if (iflags.wc2_black != 0)
-        set_black(0);
 }
 
 /* Display an ASCII splash screen if the splash_screen option is set */
 void
 curses_display_splash_window(void)
 {
-     int i, x_start, y_start;
+    int i, x_start, y_start;
+    attr_t hilite;
 
     curses_get_window_xy(MAP_WIN, &x_start, &y_start);
 
@@ -808,8 +788,7 @@ curses_display_splash_window(void)
     }
 
     if (iflags.wc_splash_screen) {
-         if (iflags.wc2_guicolor)
-              curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, ON);
+        hilite = whilite(stdscr, colorattr(CLR_WHITE));
         mvaddstr(y_start, x_start, NETHACK_SPLASH_A);
         mvaddstr(y_start + 1, x_start, NETHACK_SPLASH_B);
         mvaddstr(y_start + 2, x_start, NETHACK_SPLASH_C);
@@ -819,7 +798,7 @@ curses_display_splash_window(void)
         y_start += 7;
     }
     if (iflags.wc2_guicolor)
-         curses_toggle_color_attr(stdscr, CLR_WHITE, A_NORMAL, OFF);
+        wattroff(stdscr, hilite);
 
     for (i = 1; i <= 4; ++i) {
          mvaddstr(y_start, x_start, copyright_banner_line(i));

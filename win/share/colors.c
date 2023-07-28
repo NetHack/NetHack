@@ -7,17 +7,17 @@
 #include "curses.h"
 #endif
 #endif
+
 #include "hack.h"
 #include "wintty.h"
 
 RGB *tpalette[CLR_MAX];
-void default_palette(void);
-void set_black(unsigned char);
-void use_darkgray(void);
+static RGB black = { 64, 60, 64 };
 
-void
+static void
 default_palette(void)
 {
+#ifndef MICRO
     tpalette[NO_COLOR] = stdclrval("darkgray");
     tpalette[CLR_RED]     = stdclrval("firebrick");
     tpalette[CLR_GREEN]   = stdclrval("forestgreen");
@@ -33,83 +33,153 @@ default_palette(void)
     tpalette[CLR_BRIGHT_MAGENTA] = stdclrval("orchid");
     tpalette[CLR_BRIGHT_CYAN]    = stdclrval("seagreen");
     tpalette[CLR_WHITE]          = stdclrval("ivory");
+    tpalette[CLR_BLACK] = &black;
+#endif
 }
 
 void
-set_black(unsigned char b)
+set_black(unsigned char x)
 {
-    if (b == 0) b = 64;
-    iflags.wc2_black = b;
-    RGB varblack = { b, b - 4, b };
-    tpalette[CLR_BLACK] = &varblack;
-
-    if (iflags.wc2_setpalette) {
-        if (b < 90)
-            tpalette[CLR_DARKGRAY] = stdclrval("dimgray");
+    if (x == 1) {
+#ifdef MICRO
+        iflags.wc2_black = 2;
+    }
+#else
+        if (iflags.colorcount && iflags.colorcount < 16)
+            iflags.wc2_black = 0;
         else
-            tpalette[CLR_DARKGRAY] = stdclrval("gray");
+            iflags.wc2_black = black.b;
+    }
+    if (x >= 4) {
+        black.r = x;
+        black.g = x - 4;
+        black.b = x;
+    }
+    if (x < 90)
+        tpalette[CLR_DARKGRAY] = stdclrval("dimgray");
+    else
+        tpalette[CLR_DARKGRAY] = stdclrval("gray");
 
-#if defined(TTY_GRAPHICS) && !defined(MICRO)
-#ifndef TOS
-        printf("\033]4;0;#%02x%02x%02x\033\\",
-            tpalette[CLR_BLACK]->r,
-            tpalette[CLR_BLACK]->g,
-            tpalette[CLR_BLACK]->b);
-        printf("\033]4;8;#%02x%02x%02x\033\\",
+#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
+    if (iflags.default_palette) {
+        char buf[32];
+
+        Sprintf(buf, "\033]4;0;rgb:%02x/%02x/%02x\033\\",
+            black.r, black.g, black.b);
+        fwrite(buf, 1, strlen(buf), stdout);
+
+        Sprintf(buf, "\033]4;8;rgb:%02x/%02x/%02x\033\\",
             tpalette[CLR_DARKGRAY]->r,
             tpalette[CLR_DARKGRAY]->g,
             tpalette[CLR_DARKGRAY]->b);
-#endif
-
-        if (WINDOWPORT(curses)) {
-            init_pair(CLR_BLACK, COLOR_BLACK, -1);
-            init_pair(CLR_DARKGRAY, CLR_DARKGRAY, -1);
-        } else {
-#if defined(TERMLIB) && !defined(ANSI_DEFAULT)
-            char foo[16];
-            hilites[CLR_BLACK] = dupstr(tparm(setf, 0));
-            bghilites[CLR_BLACK] = dupstr(tparm(setb, 0));
-            foo = tparm(setf, COLOR_BLACK|BRIGHT);
-            hilites[CLR_DARKGRAY] = dupstr(foo);
-            foo = tparm(setb, COLOR_BLACK|BRIGHT);
-            bghilites[CLR_DARKGRAY] = dupstr(foo);
-#else
-/* FIXME WINDOWPORT(mswin) && !VIRTUAL_TERMINAL_SEQUENCES */
-            hilites[CLR_BLACK] = dupstr("\033[30m");
-            bghilites[CLR_BLACK] = dupstr("\033[40m");
-            hilites[CLR_DARKGRAY] = dupstr("\033[90m");
-            bghilites[CLR_DARKGRAY] = dupstr("\033[100m");
-#endif
-        }
-#endif
+        fwrite(buf, 1, strlen(buf), stdout);
     }
+#endif
+#endif
 }
 
-void
-use_darkgray(void)
+#if defined(TTY_GRAPHICS) && defined(TEXTCOLOR)
+static const NEARDATA char *efg[CLR_MAX];
+static const char *ebg[CLR_MAX];
+
+static unsigned char
+black_switch(unsigned char c)
 {
-    iflags.wc2_black = 0;
-#if defined(TTY_GRAPHICS) && !defined(MICRO)
-    if (WINDOWPORT(curses)) {
-        init_pair(CLR_BLACK, CLR_DARKGRAY, -1);
-        init_pair(CLR_DARKGRAY, -1, -1);
-    } else {
-        hilites[CLR_BLACK] = hilites[CLR_DARKGRAY];
-        hilites[CLR_DARKGRAY] = hilites[NO_COLOR];
-        bghilites[CLR_BLACK] = bghilites[CLR_DARKGRAY];
-        bghilites[CLR_DARKGRAY] = bghilites[NO_COLOR];
+    switch (c) {
+        case CLR_DARKGRAY:
+            switch (iflags.wc2_black) {
+                case 0:
+                case 2: return NO_COLOR;
+            } break;
+        case CLR_BLACK:
+            switch (iflags.wc2_black) {
+                case 0: return CLR_DARKGRAY;
+                case 2: return CLR_BLUE;
+            } break;
+        case CLR_BLUE:
+            switch (iflags.wc2_black)
+                case 2: return CLR_BRIGHT_BLUE;
     }
-#endif
+    return c;
 }
 
-#ifdef TTY_GRAPHICS
-void set_palette(void);
-void reset_palette(void);
-void init_hilite(void);
-const NEARDATA char *hilites[CLR_MAX];
-const char *bghilites[CLR_MAX];
+const char
+*fg_hilite(unsigned char c)
+{
+    c = black_switch(c);
+    return efg[c];
+}
 
-#if defined(TERMLIB) && !defined(ANSI_DEFAULT)
+const char
+*bg_hilite(unsigned char c)
+{
+    c = black_switch(c);
+    return ebg[c];
+}
+
+#ifdef CURSES_GRAPHICS
+/*
+ *  colorpair() returns attr_t including A_BOLD for bright on systems with
+ *  less than 16 colors.  Using A_REVERSE much lesser pairs are needed for
+ *  the whole palette.
+ */
+unsigned int
+colorpair(unsigned char f, unsigned char b)
+{
+    attr_t c, a = 0;
+    unsigned char m = 16;
+    register char z;
+
+    if (b)
+        b = black_switch(b);
+    if (COLORS < m) {
+        m = 8;
+        b %= m;
+    }
+    if (b && f == NO_COLOR)
+        f = b;
+    else {
+        f = black_switch(f);
+        if (m == BRIGHT) {
+            if (f >= m && (!b || f < CLR_BLACK))
+                a |= A_BOLD;
+
+            if (f == CLR_BLACK)
+                f = m;
+            if (f > m || (b && f == m))
+                f %= m;
+        }
+        if (f < b) {
+            c = b; b = f; f = c;
+            a |= A_REVERSE;
+        }
+    }
+    c = f + b * m;
+
+    z = (b > 1) ? b : 0;
+    while (z--)
+        c -= z;
+    if (m == BRIGHT && b)
+        c -= b - 1;
+
+    return COLOR_PAIR(c) | a;
+}
+#endif
+
+static void
+no_color(void)
+{
+    iflags.colorcount = FALSE;
+    iflags.wc_color = FALSE;
+    iflags.wc2_guicolor = FALSE;
+    iflags.use_menu_color = FALSE;
+    iflags.wc2_black = FALSE;
+    set_wc_option_mod_status(WC_COLOR, set_in_config);
+    set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
+    set_wc2_option_mod_status(WC2_BLACK, set_in_config);
+}
+
+#if defined(UNIX) && defined(TERMINFO) && !defined(ANSI_DEFAULT)
 /*
  * Sets up color highlighting, using terminfo(4) escape sequences.
  *
@@ -134,7 +204,6 @@ const char *bghilites[CLR_MAX];
  * characters on the assumed black background.
  */
 
-#ifdef TERMINFO
 /* `curses' is aptly named; various versions don't like these
     macros used elsewhere within nethack; fortunately they're
     not needed beyond this point, so we don't need to worry
@@ -144,7 +213,6 @@ const char *bghilites[CLR_MAX];
 #define m_move curses_m_move /* Some curses.h decl m_move(), not used here */
 
 #include <curses.h>
-#endif
 
 #if !defined(LINUX) && !defined(__FreeBSD__) && !defined(NOTPARMDECL)
 extern char *tparm();
@@ -177,180 +245,218 @@ extern char *tparm();
  */
 const struct {
     int ti_color, nh_color, nh_bright_color;
-} ti_map[7] = { { COLOR_RED, CLR_RED, CLR_ORANGE },
+} ti_map[8] = { { COLOR_BLACK, CLR_BLACK, CLR_DARKGRAY },
+                { COLOR_RED, CLR_RED, CLR_ORANGE },
                 { COLOR_GREEN, CLR_GREEN, CLR_BRIGHT_GREEN },
                 { COLOR_YELLOW, CLR_BROWN, CLR_YELLOW },
                 { COLOR_BLUE, CLR_BLUE, CLR_BRIGHT_BLUE },
                 { COLOR_MAGENTA, CLR_MAGENTA, CLR_BRIGHT_MAGENTA },
                 { COLOR_CYAN, CLR_CYAN, CLR_BRIGHT_CYAN },
                 { COLOR_WHITE, CLR_GRAY, CLR_WHITE } };
-
-const char *setf, *setb;
-(setf = dupstr(Tgetstr("AF")))
-    ?(setb = dupstr(Tgetstr("AB")))
-    :(setf = dupstr(Tgetstr("Sf")));
-#endif
+#endif // TERMINFO
 
 void
 init_hilite(void)
 {
     register int c;
-    char foo[16];
-    static char nullstr[] = "";
-    hilites[NO_COLOR] = nullstr;
 
-#if defined(TERMLIB) && !defined(ANSI_DEFAULT)
-    static char tbuf[512];
-    char *tbufptr;
-    tbufptr = tbuf;
-    char *md = dupstr(tgetstr("md"), &tbufptr);
+    for (c = NO_COLOR; c < CLR_MAX; c++)
+        efg[c] = ebg[c] = (char *) 0;
 
-    extern *MD;
-    int md_len = strlen(MD);
-    iflags.colorcount = tgetnum("Co");
+    if (iflags.default_palette)
+        set_palette();
 
-    if (iflags.colorcount < 8 || (MD == NULL || md_len == 0)
-        || setf == (char*) 0)
-            return;
+#ifdef CURSES_GRAPHICS
+    if (WINDOWPORT(curses)) {
+        if (has_colors()) {
+            unsigned char n, m;
+            register char f, b;
 
-    c = SIZE(ti_map);
+            start_color();
+            use_default_colors();
+            iflags.colorcount = COLORS;
+            if (COLORS < 16) {
+                iflags.wc2_black = 0;
+                m = 8;
+            } else
+                m = 16;
 
-    if (iflags.colorcount >= 16) {
-        while (c--) {
-            foo = tparm(setf, ti_map[c].nh_color);
-            hilites[ti_map[c].nh_color] = dupstr(foo);
-            foo = tparm(setf, ti_map[c].nh_bright_color);
-            hilites[ti_map[c].nh_bright_color] = dupstr(foo);
-            foo = tparm(setb, ti_map[c].nh_color);
-            bghilites[ti_map[c].nh_color] = dupstr(foo);
-            foo = tparm(setb, ti_map[c].nh_bright_color);
-            bghilites[ti_map[c].nh_bright_color] = dupstr(foo);
-        }
-    } else {
-        while (c--) {
-            foo = tparm(setf, ti_map[c].ti_color);
-            hilites[ti_map[c].nh_color] = dupstr(foo);
-            hilites[ti_map[c].nh_bright_color] = (char *) alloc(strlen(foo) + md_len + 1);
-            Strcpy(hilites[ti_map[c].nh_bright_color], md);
-            Strcat(hilites[ti_map[c].nh_bright_color], foo);
-            foo = tparm(setb, ti_map[c].ti_color);
-            bghilites[ti_map[c].nh_color] = dupstr(foo);
-            bghilites[ti_map[c].nh_bright_color] = bghilites[ti_map[c].nh_color];
-        }
-        foo = tparm(setf, COLOR_BLACK);
-        hilites[CLR_DARKGRAY] = (char *) alloc(strlen(foo) + md_len + 1);
-        Strcpy(hilites[CLR_DARKGRAY], md);
-        Strcat(hilites[CLR_DARKGRAY], foo);
-        foo = tparm(setb, COLOR_BLACK);
-        bghilites[CLR_DARKGRAY] = dupstr(foo);
-        use_darkgray();
-        set_wc2_option_mod_status(WC2_BLACK, set_in_config);
-    }
-#elif defined(TOS) && !defined(ANSI_DEFAULT)
-    extern char *TI, *TE, *nh_HE;
-    iflags.colorcount = 1 << (((unsigned char *) _a_line)[1]);
-    set_wc2_option_mod_status(WC2_BLACK, set_in_config);
+            for (b = 0; b < CLR_MAX; b++) {
+                if (COLORS < 16 && b >= BRIGHT)
+                    continue;
 
-    /* Under TOS, the "bright" and "dim" colors had been reversed.
-     * Moreover, on the Falcon the dim colors were *really* dim.
-     */
-    if (iflags.colorcount < 3)
-        iflags.wc_color = FALSE;
-        iflags.wc2_guicolor = FALSE;
-        set_wc_option_mod_status(WC_COLOR, set_in_config);
-        set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
-    else {
-        hilites[CLR_RED] = dupstr("\033b1");
-        hilites[CLR_GREEN] = dupstr("\033b2");
+                for (f = 1; f < CLR_MAX; f++) {
+                    if (COLORS < 16 && (f > BRIGHT || (f == BRIGHT && b)))
+                        continue;
 
-            if (iflags.colorcount > 4)
-            for(c = 3; c < 16; ++c) {
-                Sprintf(foo, "\033b%d", c);
-                hilites[c] = dupstr(foo);
+                    if (f >= b) {
+                        n = f + b * m;
+                        c = (b > 1) ? b : 0;
+                        while (c--)
+                            n -= c;
+                        if (COLORS < 16 && b)
+                            n -= b - 1;
+
+                        if (f == b)
+                            init_pair(n, -1, b % m);
+                        else
+                            if (!b)
+                                init_pair(n, f % m, -1);
+                            else
+                                init_pair(n, f % m, b % m);
+                    }
+                }
             }
-            if (iflags.colorcount > 16)
-                hilites[CLR_BLACK] = dupstr("\033b0");
-            else
-                hilites[CLR_BLACK] = hilites[CLR_DARKGRAY];
-        else
-            for(c = 3; c < CLR_MAX; ++c)
-                hilites[c] = hilites[NO_COLOR];
+        } else no_color();
+
+        return;
     }
+#endif
+#if defined(TOS) && !defined(ANSI_DEFAULT)
+//  iflags.colorcount = 1 << (((unsigned char *) _a_line)[1]);
+    char foo[8];
+
+    efg[CLR_RED] = dupstr("\033b1");
+    efg[CLR_GREEN] = dupstr("\033b2");
 
     if (iflags.colorcount == 4) {
-        hilites[CLR_BRIGHT_RED] = hilites[CLR_RED];
-        hilites[CLR_BRIGHT_GREEN] = hilites[CLR_GREEN];
+        efg[CLR_BRIGHT_RED] = efg[CLR_RED];
+        efg[CLR_BRIGHT_GREEN] = efg[CLR_GREEN];
 
         TI = dupstr("\033b0\033c3\033E\033e");
         TE = dupstr("\033b3\033c0\033J");
     } else {
+        for(c = 3; c < CLR_MAX; ++c) {
+            Sprintf(foo, "\033b%d", c % 16);
+            efg[c] = dupstr(foo);
+        }
         TI = dupstr("\033b0\033c\017\033E\033e");
         TE = dupstr("\033b\017\033c0\033J");
     }
     nh_HE = dupstr("\033q\033b0");
-#else
-    for(c = 1; c < 8; ++c) {
-        Sprintf(foo, "\033[3%dm", c);
-        hilites[c] = dupstr(foo);
-        Sprintf(foo, "\033[3%d;9%dm", c, c);
-        hilites[c|BRIGHT] = dupstr(foo);
-        Sprintf(foo, "\033[4%dm", c);
-        bghilites[c] = dupstr(foo);
-        Sprintf(foo, "\033[4%d;10%dm", c, c);
-        bghilites[c|BRIGHT] = dupstr(foo);
+
+#elif defined(UNIX) && defined(TERMINFO) && !defined(ANSI_DEFAULT)
+    extern const char *setf, *setb;
+    extern char *MD;
+    char *foo;
+
+    if (iflags.colorcount < 8 || (MD == NULL || strlen(MD) == 0) || !setf) {
+        no_color();
+        return;
     }
+
+    for (c = 0; c < SIZE(ti_map); c++) {
+        foo = tparm(setf, ti_map[c].ti_color);
+        efg[ti_map[c].nh_color] = dupstr(foo);
+
+        foo = tparm(setb, ti_map[c].ti_color);
+        ebg[ti_map[c].nh_color] = dupstr(foo);
+    }
+iflags.colorcount = 8;
+    if (iflags.colorcount >= 16)
+        for (c = 0; c < SIZE(ti_map); c++) {
+            foo = tparm(setf, ti_map[c].ti_color | BRIGHT);
+            efg[ti_map[c].nh_bright_color] = dupstr(foo);
+
+            foo = tparm(setb, ti_map[c].ti_color | BRIGHT);
+            ebg[ti_map[c].nh_bright_color] = dupstr(foo);
+        }
+    else {
+        /* On many terminals, esp. those using classic PC CGA/EGA/VGA
+         * textmode, specifying "hilight" and "black" simultaneously
+         * produces a dark shade of gray that is visible against a
+         * black background.  We can use it to represent black objects.
+         */
+        char *bar;
+        for (c = 0; c < SIZE(ti_map); c++) {
+            bar = tparm(setf, ti_map[c].ti_color);
+            Strcpy(foo, bar);
+            Strcat(foo, MD);
+            efg[ti_map[c].nh_bright_color] = dupstr(foo);
+
+            bar = tparm(setb, ti_map[c].ti_color);
+            ebg[ti_map[c].nh_bright_color] = dupstr(bar);
+        }
+    }
+#else // ANSI_DEFAULT
+    char foo[16];
+
+    for (c = 1; c < BRIGHT; c++) {
+        Sprintf(foo, "\033[3%dm", c);
+        efg[c] = dupstr(foo);
+
+        Sprintf(foo, "\033[4%dm", c);
+        ebg[c] = dupstr(foo);
+
+        Sprintf(foo, "\033[3%d;9%dm", c, c);
+        efg[c | BRIGHT] = dupstr(foo);
+
+        Sprintf(foo, "\033[4%d;10%dm", c, c);
+        ebg[c | BRIGHT] = dupstr(foo);
+    }
+    efg[CLR_BLACK] = dupstr("\033[30m");
+    ebg[CLR_BLACK] = dupstr("\033[40m");
+
+    efg[CLR_DARKGRAY] = dupstr("\033[30;90m");
+    ebg[CLR_DARKGRAY] = dupstr("\033[40;100m");
+
+    efg[NO_COLOR] = dupstr("\033[39m");
+    ebg[NO_COLOR] = dupstr("\033[49m");
 #endif
 
-#ifdef MICRO
-    hilites[CLR_BLACK] = hilites[CLR_BLUE];
-    hilites[CLR_BLUE] = hilites[CLR_BRIGHT_BLUE];
-    bghilites[CLR_BLACK] = bghilites[CLR_BLUE];
-    bghilites[CLR_BLUE] = bghilites[CLR_BRIGHT_BLUE];
-    set_wc2_option_mod_status(WC2_BLACK, set_in_config);
-#endif
-
-    if (iflags.wc2_setpalette)
-        set_palette();
+    if (iflags.colorcount && iflags.colorcount < 16)
+        iflags.wc2_black = 0;
 }
 
-#ifndef TOS
+#ifndef MICRO
 void
 set_palette(void)
 {
+// !PDCurses
     register int c;
-    RGB *foo;
+    char buf[32];
+    RGB *cursor;
 
     if (!tpalette[0])
         default_palette();
 
-    for(c = 1; c < 8; ++c)
-        printf("\033]4;%d;#%02x%02x%02x\033\\", c,
+    for (c = 1; c < CLR_MAX; c++) {
+        Sprintf(buf, "\033]4;%d;rgb:%02x/%02x/%02x\033\\", c % 16,
             tpalette[c]->r, tpalette[c]->g, tpalette[c]->b);
-    for(c = 9; c < 16; ++c)
-        printf("\033]4;%d;#%02x%02x%02x\033\\", c,
-            tpalette[c]->r, tpalette[c]->g, tpalette[c]->b);
-    printf("\033]10;#%02x%02x%02x\033\\",
-        tpalette[NO_COLOR]->r, tpalette[NO_COLOR]->g, tpalette[NO_COLOR]->b);
-    foo = stdclrval("black");
-    printf("\033]11;#%02x%02x%02x\033\\", foo->r, foo->g, foo->b);
-    foo = stdclrval("lightgray");
-    printf("\033]12;#%02x%02x%02x\033\\", foo->r, foo->g, foo->b);
-    printf("\033[2 q");
+        fwrite(buf, 1, strlen(buf), stdout);
+    }
+    Sprintf(buf, "\033]10;rgb:%02x/%02x/%02x\033\\",
+        tpalette[0]->r, tpalette[0]->g, tpalette[0]->b);
+    fwrite(buf, 1, strlen(buf), stdout);
+
+    Strcpy(buf, "\033]11;rgb:0/0/0\033\\");
+    fwrite(buf, 1, strlen(buf), stdout);
+
+#ifndef WIN32
+    cursor = stdclrval("lightgray");
+    Sprintf(buf, "\033]12;rgb:%02x/%02x/%02x\033\\",
+        cursor->r, cursor->g, cursor->b);
+    fwrite(buf, 1, strlen(buf), stdout);
+#endif
+    Strcpy(buf, "\033[2 q");
+    fwrite(buf, 1, strlen(buf), stdout);
 }
 
+#ifndef WIN32
 void
 reset_palette(void)
 {
-// !WIN32
-    printf("\033]104\033\\");
-    printf("\033]110\033\\");
-    printf("\033]111\033\\");
-    printf("\033]112\033\\");
-    printf("\033[0 q");
+    puts("\033]104\033\\");
+    puts("\033]110\033\\");
+    puts("\033]111\033\\");
+    puts("\033]112\033\\");
+    puts("\033[0 q");
 }
 #endif
-#endif // TTY_GRAPHICS
+#endif
+#endif // TTY_GRAPHICS && TEXTCOLOR
 
+#ifndef MICRO
 struct named_color {
     const char *name;
     RGB val;
@@ -501,22 +607,21 @@ struct named_color {
     { "white", { 255, 255, 255 } },
 };
 
-int num_named_colors = SIZE(stdclr);
-
 RGB
 *stdclrval(const char *name)
 {
     register int i;
 
-    for(i = 0; i < num_named_colors; ++i)
+    for (i = 0; i < SIZE(stdclr); ++i)
     {
-        if(strcmp(name, stdclr[i].name) == 0)
+        if (strcmp(name, stdclr[i].name) == 0)
             return &stdclr[i].val;
     }
-    if (tpalette[0])
-        return tpalette[0];
+    if (tpalette[NO_COLOR])
+        return tpalette[NO_COLOR];
     else
         return stdclrval("gray");
 }
+#endif
 
 //eof colors.c

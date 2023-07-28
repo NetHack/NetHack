@@ -10,8 +10,7 @@
 
 int curses_getch(void);
 int curses_read_char(void);
-void curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff);
-void curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff);
+attr_t whilite(WINDOW *, attr_t);
 void curses_bail(const char *mesg);
 winid curses_get_wid(int type);
 char *curses_copy_of(const char *s);

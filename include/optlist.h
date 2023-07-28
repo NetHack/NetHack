@@ -591,7 +591,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            On, Yes, No, No, NoAlias, &iflags.wc2_selectsaved, Term_False,
            (char *)0)
     NHOPTB(setpalette, Advanced, 0, opt_out, set_in_config,
-           On, Yes, No, No, NoAlias, &iflags.wc2_setpalette, Term_False,
+           On, Yes, No, No, NoAlias, &iflags.default_palette, Term_False,
            "let nethack set the color palette")
     NHOPTB(showexp, Status, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &flags.showexp, Term_False,

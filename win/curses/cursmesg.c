@@ -46,7 +46,6 @@ static void unscroll_window(winid wid);
 static void directional_scroll(winid wid, int nlines);
 static void mesg_add_line(const char *mline);
 static nhprev_mesg *get_msg_line(boolean reverse, int mindex);
-static int curscolor(int nhcolor, boolean *boldon);
 
 static int turn_lines = 0;
 static int mx = 0;
@@ -66,7 +65,7 @@ curses_message_win_puts(const char *message, boolean recursed)
     char *tmpstr;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
     boolean bold, border = curses_window_has_border(MESSAGE_WIN),
-                  have_mixed_leadin = FALSE, adjustbold = FALSE;
+                  have_mixed_leadin = FALSE;
     int message_length = (int) strlen(message);
 #if !defined(PDCURSES) || defined(PDC_WIDE)
     cchar_t mixed_leadin_cchar[2];
@@ -125,7 +124,7 @@ curses_message_win_puts(const char *message, boolean recursed)
         wchar_t w[2];
         int leadin_color;
 
-        leadin_color = curscolor(mesg_gi.gm.sym.color, &adjustbold);
+        leadin_color = colorattr(mesg_gi.gm.sym.color);
         /*
          * curses_putmixed() skipped past the \GNNNNNNNN encoding
          * in the string, and filled in the mesg_gi glyphinfo. It
@@ -143,7 +142,7 @@ curses_message_win_puts(const char *message, boolean recursed)
 #endif
         w[1] = L'\0';
         if (setcchar(mixed_leadin_cchar, w,
-                     (bold || adjustbold) ? A_BOLD : A_NORMAL,
+                     (bold) ? A_BOLD : A_NORMAL,
                      leadin_color, 0) == OK) {
             have_mixed_leadin = TRUE;
             message_length++; /* account for that additional column */
@@ -183,8 +182,8 @@ curses_message_win_puts(const char *message, boolean recursed)
         }
     }
 
-    if (bold || adjustbold)
-        curses_toggle_color_attr(win, NONE, A_BOLD, ON);
+    if (bold)
+        wattron(win, A_BOLD);
 
     /* will this message fit as-is or do we need to split it? */
     if (mx == border_space && message_length > width - 3) {
@@ -205,8 +204,8 @@ curses_message_win_puts(const char *message, boolean recursed)
         if (mx < width)
             ++mx;
         free(tmpstr);
-        if (bold || adjustbold)
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+        if (bold)
+            wattroff(win, A_BOLD);
         tmpstr = curses_str_remainder(message, (width - 3), 1);
         curses_message_win_puts(tmpstr, TRUE);
         free(tmpstr);
@@ -221,31 +220,12 @@ curses_message_win_puts(const char *message, boolean recursed)
         }
 #endif
         mvwprintw(win, my, mx, "%s", message), mx += message_length;
-        if (bold || adjustbold)
-            curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+        if (bold)
+            wattroff(win, A_BOLD);
     }
     wrefresh(win);
 }
 
-
-static int
-curscolor(int color, boolean *boldon)
-{
-    int curses_color = color;
-    *boldon = FALSE;
-
-    if (COLORS < 16) {
-        /* Use bold for a bright black */
-        if (color == CLR_BLACK)
-            *boldon = TRUE;
-
-        if (color > 8 && color < 17)
-            curses_color -= 8;
-        else if (color > (17 + 16))
-            curses_color -= 16;
-    }
-    return curses_color;
-}
 
 void curses_got_input(void)
 {
@@ -273,9 +253,10 @@ curses_block(
 {
     static const char resp[] = " \r\n\033"; /* space, enter, esc */
     static int prev_x = -1, prev_y = -1, blink = 0;
-    int height, width, moreattr, oldcrsr, ret = 0,
+    int height, width, oldcrsr, ret = 0,
         brdroffset = curses_window_has_border(MESSAGE_WIN) ? 1 : 0;
     WINDOW *win = curses_get_nhwin(MESSAGE_WIN);
+    attr_t hilite;
 
     curses_get_window_size(MESSAGE_WIN, &height, &width);
     if (mx - brdroffset > width - 3) { /* -3: room for ">>_" */
@@ -293,8 +274,11 @@ curses_block(
         prev_x = mx, prev_y = my;
         blink = 0;
     }
-    moreattr = !iflags.wc2_guicolor ? (int) A_REVERSE : NONE;
-    curses_toggle_color_attr(win, MORECOLOR, moreattr, ON);
+    hilite = whilite(win, colorattr(MORECOLOR));
+    if (!hilite) {
+        hilite = A_REVERSE;
+        wattron(win, hilite);
+    }
     if (blink) {
         wattron(win, A_BLINK);
         mvwprintw(win, my, mx, ">"), mx += 1;
@@ -303,7 +287,7 @@ curses_block(
     } else {
         mvwprintw(win, my, mx, ">>"), mx += 2;
     }
-    curses_toggle_color_attr(win, MORECOLOR, moreattr, OFF);
+    wattroff(win, hilite);
     wrefresh(win);
 
     /* cancel mesg suppression; all messages will have had chance to be read */
@@ -644,7 +628,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
         mx = border_space;
     }
 
-    curses_toggle_color_attr(win, NONE, A_BOLD, ON);
+    wattron(win, A_BOLD);
 
     for (i = 0; i < nlines - 1; i++) {
         tmpstr = curses_break_str(linestarts[i], width - 1, 1);
@@ -822,7 +806,7 @@ curses_message_win_getline(const char *prompt, char *answer, int buffer)
  alldone:
     free(linestarts);
     free(tmpbuf);
-    curses_toggle_color_attr(win, NONE, A_BOLD, OFF);
+    wattroff(win, A_BOLD);
     curs_set(orig_cursor);
     return;
 }

@@ -195,28 +195,13 @@ curses_init_nhwindows(
 #endif
 #endif
 
-    /* with simple printf before initsrc()
-     * currently raw_print() would break windows console
-     */
-    if (iflags.wc2_setpalette)
-        set_palette();
-
 #ifdef XCURSES
     base_term = Xinitscr(*argcp, argv);
 #else
     base_term = initscr();
 #endif
 #ifdef TEXTCOLOR
-    if (has_colors()) {
-        start_color();
-        curses_init_nhcolors();
-    } else {
-        iflags.wc_color = FALSE;
-        iflags.wc2_guicolor = FALSE;
-        set_wc_option_mod_status(WC_COLOR, set_in_config);
-        set_wc2_option_mod_status(WC2_GUICOLOR, set_in_config);
-        set_wc2_option_mod_status(WC2_BLACK, set_in_config);
-    }
+    init_hilite();
 #endif
     noecho();
     raw();
@@ -851,7 +836,7 @@ curses_print_glyph(
     int ch;
     int color;
     unsigned int special;
-    int attr = -1;
+    int attr = A_NORMAL;
 
     glyph = glyphinfo->glyph;
     special = glyphinfo->gm.glyphflags;
@@ -869,14 +854,11 @@ curses_print_glyph(
     if (wid == NHW_MAP) {
 /* hilite stairs not in 3.6, yet
         if ((special & MG_STAIRS) && iflags.hilite_hidden_stairs) {
-            color = 16 + (color * 2);
+            bkglyphinfo->framecolor = color;
         } else
 */
         if ((special & MG_OBJPILE) && iflags.hilite_pile) {
-            if (iflags.wc_color)
-                color = 16 + (color * 2) + 1;
-            else /* if (iflags.use_inverse) */
-                attr = A_REVERSE;
+            attr = A_REVERSE;
         }
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */

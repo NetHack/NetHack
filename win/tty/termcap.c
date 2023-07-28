@@ -24,15 +24,18 @@ void term_end_24bitcolor(void);
 #if (!defined(UNIX) || !defined(TERMINFO)) && !defined(TOS)
 static void analyze_seq(char *, int *, int *);
 #endif
+#if defined(UNIX) && defined(TERMINFO)
+const char *setf, *setb;
+#endif
 #endif
 
 /* (see tcap.h) -- nh_CM, nh_ND, nh_CD, nh_HI,nh_HE, nh_US,nh_UE, ul_hack */
 struct tc_lcl_data tc_lcl_data = { 0, 0, 0, 0, 0, 0, 0, FALSE };
 
-static char *HO, *CL, *CE, *UP, *XD, *BC, *SE, *TI, *TE;
+static char *HO, *CL, *CE, *UP, *XD, *BC, *SO, *SE, *TI, *TE;
 static char *VS, *VE;
 static char *ME, *MR, *MB, *MH;
-const char *SO, *MD;
+char *MD;
 static char *ZH, *ZR;
 
 #ifdef TERMLIB
@@ -287,6 +290,15 @@ tty_startup(int *wid, int *hgt)
     AE = Tgetstr(nhStr("ae")); /* alt charset end */
     nh_CD = Tgetstr(nhStr("cd")); /* clear lines from cursor and down */
 #ifdef TEXTCOLOR
+#if defined(UNIX) && defined(TERMINFO)
+    iflags.colorcount = tgetnum("Co");
+    if((setf = Tgetstr(nhStr("AF"))))
+        setb = Tgetstr(nhStr("AB"));
+    else {
+        setf = Tgetstr(nhStr("Sf"));
+        setb = Tgetstr(nhStr("Sb"));
+    }
+#endif
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin") || !strcmp(term, "tw52")
         || !strcmp(term, "st52")) {
@@ -744,6 +756,7 @@ cl_eos(void) /* free after Robert Viduya */
 }
 
 #if 0
+/* perhaps freeing before exit gets important to standalone builds */
 static void
 kill_hilite(void)
 {
@@ -758,7 +771,6 @@ kill_hilite(void)
             free(hilites[CLR_BLACK]);
         hilites[CLR_BLACK] = 0;
     }
-
     if (hilites[CLR_DARKGRAY]) {
         if (hilites[CLR_DARKGRAY] != hilites[NO_COLOR])
             free(hilites[CLR_DARKGRAY]);
@@ -766,15 +778,13 @@ kill_hilite(void)
     }
     /* NO_COLOR is static 'nullstr', do not free */
 
-    for (c = 1; c < 8; c++) {
-        if (hilites[c]) {
-            free(hilites[c]);
-            hilites[c] = 0;
-        }
-        if (hilites[c|BRIGHT]) {
-            free(hilites[c|BRIGHT]);
+    for(c = 1; c < 8; c++) {
+        if (hilites[c|BRIGHT] == hilites[c])
             hilites[c|BRIGHT] = 0;
-        }
+        if (hilites[c] && hilites[c] != nh_HI)
+            free(hilites[c]), hilites[c] = 0;
+        if (hilites[c|BRIGHT] && hilites[c|BRIGHT] != nh_HI)
+            free(hilites[c|BRIGHT]), hilites[c|BRIGHT] = 0;
     }
 }
 
@@ -1017,14 +1027,13 @@ term_end_color(void)
 void
 term_start_color(int color)
 {
-    if (color < CLR_MAX && hilites[color] && *hilites[color])
-        xputs(hilites[color]);
+    xputs(fg_hilite(color));
 }
 
 void
 term_start_bgcolor(int color)
 {
-    xputs(bghilites[color]);
+    xputs(bg_hilite(color));
 }
 #endif /* TEXTCOLOR */
 

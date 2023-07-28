@@ -16,10 +16,6 @@ extern WINDOW *activemenu;         /* curses window for menu requesting a
                                     * count; affects count_window refresh */
 
 #define TEXTCOLOR   /* set RGB in pdcurses.h */
-#define NHW_END 19
-#define OFF 0
-#define ON 1
-#define NONE -1
 #define KEY_ESC 0x1b
 #define DIALOG_BORDER_COLOR CLR_MAGENTA
 #define ALERT_BORDER_COLOR CLR_RED
@@ -148,9 +144,7 @@ extern boolean curses_map_borders(int *sx, int *sy, int *ex, int *ey,
 
 extern int curses_getch(void);
 extern int curses_read_char(void);
-extern void curses_toggle_color_attr(WINDOW *win, int color, int attr,
-                                     int onoff);
-extern void curses_menu_color_attr(WINDOW *, int, int, int);
+extern attr_t whilite(WINDOW *, attr_t);
 ATTRNORETURN extern void curses_bail(const char *mesg) NORETURN;
 extern winid curses_get_wid(int type);
 extern char *curses_copy_of(const char *s);

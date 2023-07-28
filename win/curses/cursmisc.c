@@ -71,89 +71,21 @@ curses_read_char(void)
     return ch;
 }
 
-/* Turn on or off the specified color and / or attribute */
-
-void
-curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
+attr_t
+whilite(WINDOW *win, attr_t attrs)
 {
-#ifdef TEXTCOLOR
-    int curses_color;
+    if (win == mapwin) {
+        if (!iflags.wc_color)
+            return 0;
+    } else if (win == statuswin || win == stdscr) {
+        if (!iflags.wc2_guicolor)
+            return 0;
+    } else if (!iflags.use_menu_color)
+            return 0;
 
-    /* if color is disabled, just show attribute */
-    if ((win == mapwin) ? !iflags.wc_color
-                        /* statuswin is for #if STATUS_HILITES
-                           but doesn't need to be conditional */
-                        : !(iflags.wc2_guicolor || win == statuswin)) {
-#endif
-        if (attr != NONE) {
-            if (onoff == ON)
-                wattron(win, attr);
-            else
-                wattroff(win, attr);
-        }
-        return;
-#ifdef TEXTCOLOR
-    }
+    wattron(win, attrs);
 
-    curses_color = color;
-    if (COLORS < 16) {
-        /* Use bold for a bright black */
-        if (color == CLR_BLACK)
-            wattron(win, A_BOLD);
-
-        if (color > 8 && color < 17)
-            curses_color -= 8;
-        else if (color > (17 + 16))
-            curses_color -= 16;
-    }
-    if (onoff == ON) {          /* Turn on color/attributes */
-        if (color != NONE) {
-            if ((((color > 7) && (color < 17)) ||
-                 (color > 17 + 17)) && (COLORS < 16)) {
-                wattron(win, A_BOLD);
-            }
-            wattron(win, COLOR_PAIR(curses_color));
-        }
-
-        if (attr != NONE) {
-            wattron(win, attr);
-        }
-    } else {                    /* Turn off color/attributes */
-
-        if (color != NONE) {
-            if (COLORS < 16)
-                if (color >= 8 || color == CLR_BLACK)
-                    wattroff(win, A_BOLD);
-
-            if (iflags.use_inverse) {
-                wattroff(win, A_REVERSE);
-            }
-            wattroff(win, COLOR_PAIR(curses_color));
-        }
-
-        if (attr != NONE) {
-            wattroff(win, attr);
-        }
-    }
-#else
-    nhUse(color);
-#endif /* TEXTCOLOR */
-}
-
-/* call curses_toggle_color_attr() with 'menucolors' instead of 'guicolor'
-   as the control flag */
-
-void
-curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff)
-{
-    boolean save_guicolor = iflags.wc2_guicolor;
-
-    /* curses_toggle_color_attr() uses 'guicolor' to decide whether to
-       honor specified color, but menu windows have their own
-       more-specific control, 'menucolors', so override with that here */
-    iflags.wc2_guicolor = iflags.use_menu_color;
-    curses_toggle_color_attr(win, color, attr, onoff);
-    iflags.wc2_guicolor = save_guicolor;
+    return attrs;
 }
 
 

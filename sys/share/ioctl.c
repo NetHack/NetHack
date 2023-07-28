@@ -190,9 +190,8 @@ dosuspend(void)
 #ifdef __linux__
         linux_mapoff();
 #endif
-        if (iflags.wc2_setpalette)
+        if (iflags.default_palette)
             set_palette();
-        set_black(iflags.wc2_black);
         resume_nhwindows();
     } else {
         pline("I don't think your shell has job control.");
