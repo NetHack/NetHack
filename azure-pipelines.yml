@@ -24,6 +24,10 @@ strategy:
       imageName: 'macOS-13'
       toolchainName: clang
       buildTargetName: all
+    macOS_Ventura_cross_msdos:
+      imageName: 'macOS-13'
+      toolchainName: cross
+      buildTargetName: msdos
     windows-visualstudio:
       imageName: 'windows-latest'
       toolchainName: vs
@@ -33,7 +37,7 @@ strategy:
       toolchainName: mingw
       buildTargetName: all
     linux_focal_cross_msdos:
-      imageName: 'ubuntu-22.04'
+      imageName: 'ubuntu-20.04'
       toolchainName: cross
       buildTargetName: msdos
     linux_jammy_docs:
@@ -231,6 +235,20 @@ steps:
   displayName: 'Building mac full build'
 
 - bash: |
+    cd sys/unix
+    sh setup.sh hints/macos.370
+    cd ../..
+    make fetch-lua
+    sh sys/msdos/fetch-cross-compiler.sh
+    retVal=$?
+    if [ $retVal -eq 0 ]; then
+        make LUA_VERSION=5.4.6 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
+    fi
+  condition: eq( variables['Agent.OS'], 'Darwin' ), eq( variables.toolchain, 'cross'))
+  workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
+  displayName: 'Building MSDOS package on macOS'
+
+- bash: |
     export GCCVER=gcc1220
     cd sys/unix
     sh setup.sh hints/linux.370
@@ -243,7 +261,7 @@ steps:
     fi
   condition: and(eq( variables['Agent.OS'], 'Linux' ), eq( variables.toolchain, 'cross'))
   workingDirectory: $(Agent.BuildDirectory)/$(netHackPath)
-  displayName: 'Building MSDOS build'
+  displayName: 'Building MSDOS package on Linux'
 - bash: |
     sudo apt-get install texlive
     make Guidebook
