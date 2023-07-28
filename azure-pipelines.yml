@@ -33,7 +33,7 @@ strategy:
       toolchainName: mingw
       buildTargetName: all
     linux_focal_cross_msdos:
-      imageName: 'ubuntu-22.04'
+      imageName: 'ubuntu-20.04'
       toolchainName: cross
       buildTargetName: msdos
     linux_jammy_docs:
