@@ -797,6 +797,9 @@ const struct instance_globals_t g_init_t = {
     1UL, /* timer_id */
     /* topten.c */
     WIN_ERR, /* toptenwin */
+    /* uhitm.c */
+    0, /* twohits */
+    /**/
     TRUE, /* havestate*/
     IVMAGIC  /* t_magic to validate that structure layout has been preserved */
 };

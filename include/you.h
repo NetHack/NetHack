@@ -503,6 +503,7 @@ struct you {
 struct _hitmon_data {
     int dmg;  /* damage */
     int thrown;
+    int twohits; /* 0: 1 of 1; 1: 1 of 2; 2: 2 of 2 */
     int dieroll;
     struct permonst *mdat;
     boolean use_weapon_skill;

@@ -941,11 +941,11 @@ struct instance_globals_t {
 
     /* rumors.c */
     long true_rumor_size; /* rumor size variables are signed so that value -1
-                            can be used as a flag */
+                           * can be used as a flag */
     unsigned long true_rumor_start; /* rumor start offsets are unsigned because
-                                       they're handled via %lx format */
+                                     * they're handled via %lx format */
     long true_rumor_end; /* rumor end offsets are signed because they're
-                            compared with [dlb_]ftell() */
+                          * compared with [dlb_]ftell() */
 
     /* sp_lev.c */
     boolean themeroom_failed;
@@ -957,6 +957,9 @@ struct instance_globals_t {
 
     /* topten.c */
     winid toptenwin;
+
+    /* uhitm.c */
+    int twohits; /* 0: single hit; 1: first of 2; 2: second of 2 */
 
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */

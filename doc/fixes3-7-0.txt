@@ -2202,6 +2202,7 @@ can now write unknown spellbook without need of Luck when spell is known;
 new status highlight rule type for hitpoints:  "criticalhp" rule overrides
 	hit point rules if current HP is so low that prayer will consider it
 	to be major problem; applies to hitpointbar as well as HP status
+high skill level in martial arts or bare-handed combat sometimes hits twice
 
 
 Platform- and/or Interface-Specific New Features
