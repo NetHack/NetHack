@@ -839,8 +839,8 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
        compatibility => playability), but when making two hits, only the
        ring on the hand making the attack is checked. */
     spcdmgflg = uarmg ? W_ARMG
-                : ((hmd->twohits == 0 || hmd->twohits == 1) ? W_RINGR : (0L
-                   | (hmd->twohits == 0 || hmd->twohits == 2)) ? W_RINGL : 0L);
+                : ((hmd->twohits == 0 || hmd->twohits == 1) ? W_RINGR : 0L
+                   | (hmd->twohits == 0 || hmd->twohits == 2) ? W_RINGL : 0L);
     hmd->dmg += special_dmgval(&gy.youmonst, mon, spcdmgflg, &silverhit);
 
     /* copy silverhit info back into struct _hitmon_data *hmd */
