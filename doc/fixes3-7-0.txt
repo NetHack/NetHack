@@ -1649,6 +1649,9 @@ hero might not be credited with "entered Mine Town" achievement for the town
 in the theme room "water-surrounded vault", guarantee an item which can be
 	be used to escape from the room in one of the four chests
 pets capable of using items would pick up and wear cursed armor
+if something breakable was set up as alternate weapon and the second of two
+	bare-handed hits succeeded, it would be broken and trigger impossible
+	"objfree: deleting worn obj"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

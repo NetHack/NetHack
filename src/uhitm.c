@@ -743,7 +743,8 @@ static boolean
 hitum(struct monst *mon, struct attack *uattk)
 {
     boolean malive, wep_was_destroyed = FALSE;
-    struct obj *wepbefore = uwep;
+    struct obj *wepbefore = uwep,
+        *secondwep = u.twoweap ? uswapwep : (struct obj *) 0;
     int tmp, dieroll, mhit, armorpenalty, attknum = 0,
         x = u.ux + u.dx, y = u.uy + u.dy, oldumort = u.umortality;
 
@@ -787,11 +788,12 @@ hitum(struct monst *mon, struct attack *uattk)
         mon_maybe_unparalyze(mon);
         dieroll = rnd(20);
         mhit = (tmp > dieroll || u.uswallow);
-        malive = known_hitum(mon, uswapwep, &mhit, tmp, armorpenalty, uattk,
+        malive = known_hitum(mon, secondwep, &mhit, tmp, armorpenalty, uattk,
                              dieroll);
         /* second passive counter-attack only occurs if second attack hits */
         if (mhit)
-            (void) passive(mon, uswapwep, mhit, malive, AT_WEAP, !uswapwep);
+            (void) passive(mon, secondwep, mhit, malive, AT_WEAP,
+                           secondwep && !uswapwep);
     }
     gt.twohits = 0;
     return malive;
