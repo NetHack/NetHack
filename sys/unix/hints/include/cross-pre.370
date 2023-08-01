@@ -400,6 +400,7 @@ MIPS_TARGET_CFLAGS = -c -O -I../include -I../sys/unix -I../win/share \
 	$(LUAINCL) -DDLB \
 	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET \
 	-DCROSS_TO_MIPS \
+	-DCURSES_GENL_PUTMIXED \
         -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
         -Wformat -Wswitch -Wshadow -Wwrite-strings \
 	-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
