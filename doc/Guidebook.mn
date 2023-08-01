@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.464 $ $NHDT-Date: 1655461129 2022/06/17 10:18:49 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.527 $ $NHDT-Date: 1690870385 2023/08/01 06:13:05 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "July 13, 2023
+.ds f2 "July 31, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -396,7 +396,7 @@ Not shown when \fBNormal\fP.
 .lp ""
 Encumbrance:
 an indication of how what you are carrying affects your ability to move.
-Values are \fBUnencumbered\fP, \fBEncumbered\fP, \fBStressed\fP,
+Values are \fBUnencumbered\fP, \fBBurdened\fP, \fBStressed\fP,
 \fBStrained\fP, \fBOvertaxed\fP, and \fBOverloaded\fP.
 Not shown when \fBUnencumbered\fP.
 .lp ""
