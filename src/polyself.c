@@ -1028,7 +1028,7 @@ uasmon_maxStr(void)
     struct permonst *ptr = &mons[mndx];
 
     if (is_orc(ptr)) {
-        if (mndx != PM_URUK_HAI)
+        if (mndx != PM_URUK_HAI && mndx != PM_ORC_CAPTAIN)
             mndx = PM_ORC;
     } else if (is_elf(ptr)) {
         mndx = PM_ELF;
@@ -1052,11 +1052,11 @@ uasmon_maxStr(void)
            hero poly'd into an orc the same; goblins, orc shamans, and orc
            zombies don't have strongmonst() attribute so won't get here;
            hobgoblins and orc mummies do get here and are limited to 18/50
-           like normal orcs; however, Uruk-hai retain 18/100 strength;
-           hero gnomes are also limited to 18/50; hero elves are limited
-           to 18/00 regardless of whether they're strongmonst, but the two
-           strongmonst types (monarchs and nobles) have current strength
-           set to 18 [by polymon()], the others don't */
+           like normal orcs; however, orc captains and Uruk-hai retain 18/100
+           strength; hero gnomes are also limited to 18/50; hero elves are
+           limited to 18/00 regardless of whether they're strongmonst, but
+           the two strongmonst types (monarchs and nobles) have current
+           strength set to 18 [by polymon()], the others don't */
         newMaxStr = R ? R->attrmax[A_STR] : live_H ? STR19(19) : STR18(100);
     } else {
         newMaxStr = R ? R->attrmax[A_STR] : 18; /* 18 is same as STR18(0) */

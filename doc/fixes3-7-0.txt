@@ -1652,6 +1652,8 @@ pets capable of using items would pick up and wear cursed armor
 if something breakable was set up as alternate weapon and the second of two
 	bare-handed hits succeeded, it would be broken and trigger impossible
 	"objfree: deleting worn obj"
+strength cap for hero poly'd into an orc captain was 18/50 even though it is
+	10/100 for Uruk-Hai and monster Uruk-Hai can grow into orc captains
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
