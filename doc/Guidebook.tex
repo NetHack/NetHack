@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{July 31, 2023}
+\date{August 5, 2023}
 
 \maketitle
 
@@ -6018,7 +6018,7 @@ Allowed behaviors are ``always'', ``up'', ``down'', ``changed'', a
 percentage or absolute number threshold, or text to match against.
 For the {\it hitpoints\/} field, the additional behavior ``criticalhp''
 is available.
-It overrides always, percentage threshold, and absolute threshold if
+It overrides other behavior rules if
 hit points are at or below the {\it major problem\/} threshold
 (which varies depending upon maximum hit points and experience level).
 
@@ -6073,9 +6073,11 @@ it also matches when value is below or above.
 If the prefix is `{\tt <}' or `{\tt >}', only match when strictly
 above or below.
 %.lp "*"
-\item[{\tt criticalhp}] only applies to the hitpoints field and when defined
-it takes precedence over other hitpints rules except {\it changed\/},
-{\it up\/}, or {\it down\/}.
+\item[{\tt criticalhp}] only applies to the hitpoints field and only
+when current hit points are below a threshold (which varies by maximum
+hit points and experience level).
+When the threshold is met, a criticalhp rule takes precedence over all
+other hitpoints rules.
 %.lp "*"
 \item[{\tt text}] match sets the attribute when the field value
 matches the text.

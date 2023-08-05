@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "July 31, 2023
+.ds f2 "August 5, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -5432,7 +5432,7 @@ Allowed behaviors are \(lqalways\(rq, \(lqup\(rq, \(lqdown\(rq,
 text to match against.
 For the \fIhitpoints\fP field, the additional behavior \(lqcriticalhp\(rq
 is available.
-It overrides always, percentage threshold, and absolute threshold if
+It overrides other behavior rules if
 hit points are at or below the \fImajor problem\fP threshold
 (which varies depending upon maximum hit points and experience level).
 .si
@@ -5490,9 +5490,11 @@ it also matches when value is below or above.
 If the prefix is \(oq<\(cq or \(oq>\(cq, only match when strictly
 above or below.
 .lp "*"
-criticalhp only applies to the hitpoints field and when defined
-it takes precedence over other hitpints rules except \fIchanged\fP,
-\fIup\fP, or \fIdown\fP.
+criticalhp only applies to the hitpoints field and only
+when current hit points are below a threshold (which varies by maximum
+hit points and experience level).
+When the threshold is met, a criticalhp rule takes precedence over all
+other hitpoints rules.
 .lp "*"
 text match sets the attribute when the field value
 matches the text.
