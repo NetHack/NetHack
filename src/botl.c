@@ -1222,7 +1222,7 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
                 ? percentage(curr, &gb.blstats[idx][fldmax])
                 : 0; /* bullet proofing; can't get here */
         if (pc != prev->percent_value)
-            chg = 1;
+            chg = (pc < prev->percent_value) ? -1 : 1;
         curr->percent_value = pc;
     } else {
         pc = 0;
@@ -1473,7 +1473,7 @@ init_blstats(void)
  *
  */
 static int
-compare_blstats(struct istat_s *bl1, struct istat_s*bl2)
+compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
 {
     int anytype, result = 0;
 
@@ -1484,8 +1484,8 @@ compare_blstats(struct istat_s *bl1, struct istat_s*bl2)
 
     anytype = bl1->anytype;
     if ((!bl1->a.a_void || !bl2->a.a_void)
-        && (anytype == ANY_IPTR || anytype == ANY_UPTR || anytype == ANY_LPTR
-            || anytype == ANY_ULPTR)) {
+        && (anytype == ANY_IPTR || anytype == ANY_UPTR
+            || anytype == ANY_LPTR || anytype == ANY_ULPTR)) {
         panic("compare_blstat: invalid pointer %s, %s",
               fmt_ptr((genericptr_t) bl1->a.a_void),
               fmt_ptr((genericptr_t) bl2->a.a_void));
