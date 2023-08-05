@@ -1654,6 +1654,7 @@ if something breakable was set up as alternate weapon and the second of two
 	"objfree: deleting worn obj"
 strength cap for hero poly'd into an orc captain was 18/50 even though it is
 	10/100 for Uruk-Hai and monster Uruk-Hai can grow into orc captains
+status_hilite rule for critical-hp takes precedence over up/down/changed HP
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

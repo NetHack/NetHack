@@ -103,11 +103,12 @@ static const char *const godvoices[] = {
 
 /* critically low hit points if hp <= 5 or hp <= maxhp/N for some N */
 boolean
-critically_low_hp(boolean only_if_injured) /* determines whether maxhp <= 5
-                                              matters */
+critically_low_hp(
+    boolean only_if_injured) /* determines whether maxhp <= 5 matters */
 {
-    int divisor, hplim, curhp = Upolyd ? u.mh : u.uhp,
-                        maxhp = Upolyd ? u.mhmax : u.uhpmax;
+    int divisor, hplim,
+        curhp = Upolyd ? u.mh : u.uhp,
+        maxhp = Upolyd ? u.mhmax : u.uhpmax;
 
     if (only_if_injured && !(curhp < maxhp))
         return FALSE;
