@@ -226,7 +226,10 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                     unsigned glyphflags; /* more detail about the entity */
 
 
-char yn_function(const char *ques, const char *choices, char default)
+char win_yn_function(const char *ques, const char *choices, char default)
+		-- Not to be confused with the core yn_function()
+		   added in 3.4.2 and no yn_function() macro is defined
+		   for this.
 		-- Print a prompt made up of ques, choices and default.
 		   Read a single character response that is contained in
 		   choices or default.  If choices is NULL, all possible
