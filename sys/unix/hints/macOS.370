@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $
+# NetHack 3.7  macOS.370 $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -97,6 +97,8 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DTTY_SOUND_ESCCODES
 #NHCFLAGS+=-DNO_CHRONICLE
 #NHCFLAGS+=-DLIVELOG
+# not NHCFLAGS - needed for makedefs
+CFLAGS+=-DCRASHREPORT=\"NetHackCrashReport.JavaScript\"
 
 ifdef MAKEFILE_SRC
 # default
@@ -328,11 +330,14 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
 		. sys/unix/hints/macosx.sh group2 $(GAMEGRP); \
-		mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
+		(mkdir $(SHELLDIR) || true); chown $(GAMEUID) $(SHELLDIR)
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		 ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		 chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
 
 else ifdef WANT_SOURCE_INSTALL
 
@@ -348,7 +353,11 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		    ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		    chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
+
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
@@ -372,11 +381,14 @@ ifdef ($(WANT_DEFAULT),X11)
 PREINSTALL+= cp -n win/X11/nethack.rc ~/.nethackrc || true;
 endif	# WANT_DEFAULT X11
 
-PREINSTALL+= mkdir $(SHELLDIR);
+PREINSTALL+= (mkdir $(SHELLDIR) || true);
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		  ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		  chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
 
 endif   # !WANT_SHARE_INSTALL
 
@@ -719,6 +731,7 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
+#XXX no code to package NetHackCrashReport.JavaScript
 	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form

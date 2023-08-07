@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.7  Guidebook.tex $NHDT-Date: 1431192762 2015/12/16 17:32:42 $  $NHDT-Branch: master $:$NHDT-Revision: 1.60 $ */
+% NetHack 3.7  Guidebook.tex $NHDT-Date: 1693084080 2023/08/26 21:08:00 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.530 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -6608,6 +6608,13 @@ Only relevant if the program was built with LIVELOG enabled.
 When available, it should be left commented out on single player
 installations because over time the file could grow to be extremely
 large unless it is actively maintained.
+%.lp
+\item[\ib{CRASHREPORTURL}]
+If set to
+{\tt https://www.nethack.org/common/contact.html}
+and support is compiled in, brings up a browser window populated with
+the information needed to report a problem if the game panics or ends
+up in an internally inconsistent state.
 \elist
 
 %.hn 1

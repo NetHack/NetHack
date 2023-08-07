@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1689629242 2023/07/17 21:27:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1279 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.1281 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -24,7 +24,7 @@ extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 /* ### allmain.c ### */
 
-extern void early_init(void);
+extern void early_init(int, char *[]);
 extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
@@ -814,6 +814,11 @@ extern struct kinfo *find_delayed_killer(int);
 extern void dealloc_killer(struct kinfo *);
 extern void save_killers(NHFILE *);
 extern void restore_killers(NHFILE *);
+#ifdef CRASHREPORT
+extern boolean submit_web_report(const char *, char *);
+extern void crashreport_init(int, char *[]);
+extern void crashreport_bidshow(void);
+#endif
 extern char *build_english_list(char *);
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
 extern void panictrace_setsignals(boolean);

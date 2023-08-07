@@ -1,4 +1,5 @@
 *.mn	NHSUBST
+*.tex	NHSUBST
 *.6	NHSUBST
 *.7	NHSUBST
 fixes*	NHSUBST

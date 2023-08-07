@@ -1,4 +1,4 @@
-/* NetHack 3.7	files.c	$NHDT-Date: 1680625799 2023/04/04 16:29:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.373 $ */
+/* NetHack 3.7	files.c	$NHDT-Date: 1693083234 2023/08/26 20:53:54 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.378 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -194,6 +194,7 @@ static boolean cnf_line_PANICTRACE_LIBC(char *);
 static boolean cnf_line_PANICTRACE_GDB(char *);
 static boolean cnf_line_GDBPATH(char *);
 static boolean cnf_line_GREPPATH(char *);
+static boolean cnf_line_CRASHREPORTURL(char *);
 static boolean cnf_line_SAVEFORMAT(char *);
 static boolean cnf_line_BONESFORMAT(char *);
 static boolean cnf_line_ACCESSIBILITY(char *);
@@ -3012,6 +3013,15 @@ cnf_line_GREPPATH(char *bufp)
 }
 
 static boolean
+cnf_line_CRASHREPORTURL(char *bufp)
+{
+    if (sysopt.crashreporturl)
+        free((genericptr_t) sysopt.crashreporturl);
+    sysopt.crashreporturl = dupstr(bufp);
+    return TRUE;
+}
+
+static boolean
 cnf_line_SAVEFORMAT(char *bufp)
 {
     parseformat(sysopt.saveformat, bufp);
@@ -3253,6 +3263,7 @@ static const struct match_config_line_stmt {
     CNFL_S(LIVELOG, 7),
     CNFL_S(PANICTRACE_LIBC, 15),
     CNFL_S(PANICTRACE_GDB, 14),
+    CNFL_S(CRASHREPORTURL, 13),
     CNFL_S(GDBPATH, 7),
     CNFL_S(GREPPATH, 7),
     CNFL_S(SAVEFORMAT, 10),

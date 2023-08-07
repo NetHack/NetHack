@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+# NetHack 3.7  linux.370 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -95,6 +95,8 @@ endif
 endif      #HAVE_NCURSESW
 endif      #MAKEFILE_SRC
 endif      #USE_CURSESLIB
+
+AUTOLIBS=$(shell (../util/makedefs --grep-defined CRASHREPORT && echo "-lcrypto" ) || true )
 
 # NetHack sources control
 NHCFLAGS+=-DDLB
@@ -278,7 +280,11 @@ VARDIR = $(HACKDIR)
 POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
 	$(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; \
 	$(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; \
-	chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+	chmod $(VARFILEPERM) $(INSTDIR)/sysconf; \
+	( util/makedefs --grep-defined CRASHREPORT && \
+	  ( cp win/share/nhcrashreport.lua $(INSTDIR) ; \
+	  chmod 555 $(INSTDIR)/nhcrashreport.lua ; \
+	  cp $(LUATOP)/lua $(INSTDIR)/nhlua); true)
 
 ifneq "$(CCISCLANG)" ""
 # gdb may not be installed if clang is chosen compiler so the game

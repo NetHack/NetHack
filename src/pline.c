@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1646255375 2022/03/02 21:09:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1693083243 2023/08/26 20:54:03 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -505,6 +505,7 @@ impossible(const char *s, ...)
 {
     va_list the_args;
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
+    char pbuf2[BUFSZ];
 
     va_start(the_args, s);
     if (gp.program_state.in_impossible)
@@ -521,15 +522,25 @@ impossible(const char *s, ...)
     gp.pline_flags = URGENT_MESSAGE;
     pline("%s", pbuf);
     gp.pline_flags = 0;
-    /* reuse pbuf[] */
-    Strcpy(pbuf, "Program in disorder!");
+
+    Strcpy(pbuf2, "Program in disorder!");
     if (gp.program_state.something_worth_saving)
-        Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
-    pline("%s", pbuf);
+        Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
+    pline("%s", pbuf2);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
     if (sysopt.support) {
         pline("Alternatively, contact local support: %s", sysopt.support);
     }
+
+#ifdef CRASHREPORT
+    if(sysopt.crashreporturl){
+	boolean report = ('y' == yn_function("Report now?","yn",'n',FALSE));
+	raw_print("");  // prove to the user the character was accepted
+	if(report){
+	    submit_web_report("Impossible", pbuf);
+	}
+    }
+#endif
 
     gp.program_state.in_impossible = 0;
 }
