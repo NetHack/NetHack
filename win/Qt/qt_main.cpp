@@ -764,7 +764,11 @@ NetHackQtMainWindow::NetHackQtMainWindow(NetHackQtKeyBuffer& ks) :
                 if (actchar[0]) {
                     QString name = menuitem;
                     QAction *action = item[i].menu->addAction(name);
-                    action->setData(actchar);
+#if QT_VERSION < 0x060000
+		    action->setData(actchar);
+#else
+		    action->setData(QString(actchar));
+#endif
                 }
 	    } else {
 		item[i].menu->addSeparator();

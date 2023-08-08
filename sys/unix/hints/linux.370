@@ -185,6 +185,7 @@ QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Q
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif    # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
+ifdef QT6MANUAL
 # Try some likely spots for a self-built Qt6.
 # You'll have to change these manually before using the hints file
 # if they don't match the installed location on your system.
@@ -204,7 +205,7 @@ QTCXXFLAGS += -I$(QTINCDIR)/QtNetwork -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtCore
 WINLIB += -L$(QTLIBDIR) -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 MOCPATH = /usr/lib/qt6/libexec/moc
 #/usr/lib/x86_64-linux-gnu/libQt6EglFSDeviceIntegration.so
-endif
+endif    # QTTOP/*
 ifndef QTINCDIR
 ifneq ($(wildcard /usr/local/Qt6/*),)
 QTDIR=/usr/local/Qt6
@@ -223,7 +224,12 @@ QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
 MOCPATH = $(QTDIR)/libexec/moc
 WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 endif   # QTLOCATED
-endif   # !QTINCDIR
+else    # !QT6MANUAL
+QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
+WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
+MOCPATH = /usr/lib/qt6/libexec/moc
+endif   # QT6MANUAL
+endif   # WANT_WIN_QT6
 ifndef QTDIR
 $(error QTDIR not defined in the environment or Makefile)
 endif	# QTDIR
