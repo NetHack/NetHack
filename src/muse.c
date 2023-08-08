@@ -2333,6 +2333,7 @@ use_misc(struct monst *mtmp)
         remove_monster(mtmp->mx, mtmp->my);
         newsym(mtmp->mx, mtmp->my);
         place_monster(mtmp, gt.trapx, gt.trapy);
+        maybe_unhide_at(gt.trapx, gt.trapy);
         if (mtmp->wormno)
             worm_move(mtmp);
         newsym(gt.trapx, gt.trapy);
