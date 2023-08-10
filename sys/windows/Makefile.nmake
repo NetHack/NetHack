@@ -8,9 +8,9 @@
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2017 Community Edition v 15.9.55
-#            - Microsoft Visual Studio 2019 Community Edition v 16.11.27
-#            - Microsoft Visual Studio 2022 Community Edition v 17.6.5
+#            - Microsoft Visual Studio 2017 Community Edition v 15.9.56
+#            - Microsoft Visual Studio 2019 Community Edition v 16.11.29
+#            - Microsoft Visual Studio 2022 Community Edition v 17.7.0
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -972,7 +972,7 @@ rc=Rc.exe
 # Recently tested versions:
 TESTEDVS2017 = 14.16.27050.0
 TESTEDVS2019 = 14.29.30151.0
-TESTEDVS2022 = 14.36.32537.0
+TESTEDVS2022 = 14.37.32822.0
 
 VS2017CUR = $(TESTEDVS2017:.=)
 VS2019CUR = $(TESTEDVS2019:.=)
