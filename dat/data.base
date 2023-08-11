@@ -1026,6 +1026,8 @@ cope
 	and are like a very long mantle or cloak, fastened at the breast
 	by a clasp.
 		[ Wikipedia, the free encyclopedia ]
+# the word "cornuthaum" was coined by devteam member jwalz and adopted in
+# 3.2.0, after searching for an actual name for pointy hat came up empty
 cornuthaum
 	He was dressed in a flowing gown with fur tippets which had
 	the signs of the zodiac embroidered over it, with various
@@ -4992,6 +4994,22 @@ statue*
 	the lion's back and the top of its head were covered with
 	snow.  Of course it must be only a statue!
 		[ The Lion, the Witch and the Wardrobe, by C.S. Lewis ]
+# the original stethoscope was a fixed tube open at both ends; subsequent
+# early ones were adaptations of an 'earhorn' used by the hard of hearing,
+# but players are unlikely to picture anything like that when they find one
+stethoscope
+	Tool used to listen closely to adjacent sound, typically by
+	a medical practioner to listen to a patient's heart, lungs,
+	or pulse.
+# joke suggested by stethoscope; a zillion things could be added but these
+# ought to suffice
+microscope
+telescope
+telephone
+television
+#tricorder
+#phaser
+	Not invented yet.
 sting
 	There was the usual dim grey light of the forest-day about
 	him when he came to his senses.  The spider lay dead beside
