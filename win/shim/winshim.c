@@ -203,7 +203,7 @@ struct window_procs shim_procs = {
     WPID(shim),
     (0
      | WC_ASCII_MAP
-     | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
+     | WC_COLOR | WC_HILITE_PET | WC_EIGHT_BIT_IN),
     (0
 #if defined(SELECTSAVED)
      | WC2_SELECTSAVED

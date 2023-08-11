@@ -1975,7 +1975,7 @@ wearing a wet towel confers "half damage from poison gas" attribute
 for end of game disclosure and dumplog, show 'achievements' (previously only
 	available as an encoded value in xlogfile) along with 'conduct'
 more grades of self-appearance than beautiful or handsome vs ugly
-when 'color' if Off and 'use_inverse' is On, draw ice on the map in inverse
+when 'color' is off and 'use_inverse' is on, draw ice on the map in inverse
 	video if it uses the same character as room floor or as dark floor
 new 'mention_decor' option; when On, describe dungeon features being stepped
 	on or floated/flown over even when they're not covered by objects

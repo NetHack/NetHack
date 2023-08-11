@@ -335,7 +335,6 @@ struct instance_flags {
     int wc_tile_width;        /* tile width                          */
     int wc_tile_height;       /* tile height                         */
     char *wc_tile_file;       /* name of tile file;overrides default */
-    boolean wc_inverse;       /* use inverse video for some things   */
     int wc_align_status;      /*  status win at top|bot|right|left   */
     int wc_align_message;     /* message win at top|bot|right|left   */
     int wc_vary_msgcount;     /* show more old messages at a time    */
@@ -412,7 +411,6 @@ struct instance_flags {
 #endif
 #define use_color wc_color
 #define hilite_pet wc_hilite_pet
-#define use_inverse wc_inverse
 #ifdef MAC_GRAPHICS_ENV
 #define large_font obsolete
 #endif

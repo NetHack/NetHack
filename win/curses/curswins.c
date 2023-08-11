@@ -611,8 +611,6 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 {
     attr_t hilite = A_NORMAL;
 
-    nch.attr &= ~A_REVERSE; /* hilited pet looks odd otherwise */
-
     hilite = whilite(win, nch.attr | colorpair(nch.color, nch.framecolor));
 
     // without color

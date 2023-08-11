@@ -116,7 +116,7 @@ static XtSignalId X11_sig_id;
 /* Interface definition, for windows.c */
 struct window_procs X11_procs = {
     WPID(X11),
-    ( WC_COLOR | WC_INVERSE | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
+    ( WC_COLOR | WC_HILITE_PET | WC_ASCII_MAP | WC_TILED_MAP
      | WC_PLAYER_SELECTION | WC_PERM_INVENT | WC_MOUSE_SUPPORT ),
     /* status requires VIA_WINDOWPORT(); WC2_FLUSH_STATUS ensures that */
     ( WC2_FLUSH_STATUS | WC2_SELECTSAVED

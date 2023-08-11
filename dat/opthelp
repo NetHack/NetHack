@@ -73,7 +73,6 @@ toptenwin      print topten in a window rather than stdout        [False]
 travel         enables travelling via mouse click if supported;    [True]
                can be toggled off to prevent mouse clicks on the map from
                attempting to move the hero; does not affect travel via '_'
-use_inverse    display detected monsters in highlighted manner    [False]
 verbose        print more commentary during the game               [True]
 whatis_menu    show menu when getting a map location              [False]
 whatis_moveskip skip same glyphs when getting a map location      [False]

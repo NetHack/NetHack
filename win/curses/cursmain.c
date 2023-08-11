@@ -38,7 +38,7 @@ static char *dummy_get_color_string(void);
 /* Interface definition, for windows.c */
 struct window_procs curses_procs = {
     WPID(curses),
-    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_INVERSE | WC_HILITE_PET
+    (WC_ALIGN_MESSAGE | WC_ALIGN_STATUS | WC_HILITE_PET
 #ifdef NCURSES_MOUSE_VERSION /* (this macro name works for PDCURSES too) */
      | WC_MOUSE_SUPPORT
 #endif
@@ -845,7 +845,7 @@ curses_print_glyph(
     if ((special & MG_PET) && iflags.hilite_pet) {
         attr = iflags.wc2_petattr;
     }
-    if ((special & MG_DETECT) && iflags.use_inverse) {
+    if (special & MG_DETECT) {
         attr = A_REVERSE;
     }
     if (SYMHANDLING(H_DEC))
@@ -862,7 +862,7 @@ curses_print_glyph(
         }
         /* water and lava look the same except for color; when color is off,
            render lava in inverse video so that they look different */
-        if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
+        if (special & (MG_BW_LAVA | MG_BW_ICE)) {
             /* reset_glyphmap() only sets MG_BW_foo if color is off */
             attr = A_REVERSE;
         }

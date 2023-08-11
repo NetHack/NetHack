@@ -307,15 +307,11 @@
 # Enable travel (_) command.
 #OPTIONS=travel
 
-# Use deep black, one color more.
-# Or blue instead on systems with 16 colors or less.
-#OPTIONS=black
+# Set the intensity of black. Zero to use darkgray, two to use blue instead.
+#OPTIONS=black:64
 
 # Let nethack set the color palette.
 #OPTIONS=setpalette
-
-# Use inverse text attribute in eg. menu titles
-#OPTIONS=use_inverse
 
 # Display this number of messages at a time in the message window.
 # WinCE, Windows GUI, and GEM only.

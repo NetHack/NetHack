@@ -4821,10 +4821,9 @@ to be \fIFalse\fP.
 .lp black
 Set the intensity of color black (tty).
 If negated or set to zero, use darkgray (bright black).
+Two to use blue instead.
 .lp setpalette
 Let NetHack set the color palette.
-.lp use_inverse
-If NetHack can, it should display inverse when the game specifies it.
 .lp vary_msgcount
 If NetHack can, it should display this number of messages at a time in
 the message window.

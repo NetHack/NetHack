@@ -1112,7 +1112,7 @@ xputc_core(int ch)
             cell.utf8str[1] = 0;
         }
 #else /* VIRTUAL_TERMINAL_SEQUENCES */
-        inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
+        inverse = (console.current_nhattr[ATR_INVERSE]);
         console.attr = (inverse) ? ttycolors_inv[console.current_nhcolor]
                                  : ttycolors[console.current_nhcolor];
         if (console.current_nhattr[ATR_BOLD])
@@ -1161,10 +1161,9 @@ g_putch(int in_ch)
     set_console_cursor(ttyDisplay->curx, ttyDisplay->cury);
 #ifndef VIRTUAL_TERMINAL_SEQUENCES
 
-    inverse = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse);
-    console.attr = (console.current_nhattr[ATR_INVERSE] && iflags.wc_inverse) ?
-                    ttycolors_inv[console.current_nhcolor] :
-                    ttycolors[console.current_nhcolor];
+    inverse = (console.current_nhattr[ATR_INVERSE]);
+    console.attr = (inverse) ? ttycolors_inv[console.current_nhcolor]
+                             : ttycolors[console.current_nhcolor];
     if (console.current_nhattr[ATR_BOLD])
         console.attr |= (inverse) ? BACKGROUND_INTENSITY : FOREGROUND_INTENSITY;
 

@@ -352,7 +352,6 @@ init_hilite(void)
         foo = tparm(setb, ti_map[c].ti_color);
         ebg[ti_map[c].nh_color] = dupstr(foo);
     }
-iflags.colorcount = 8;
     if (iflags.colorcount >= 16)
         for (c = 0; c < SIZE(ti_map); c++) {
             foo = tparm(setf, ti_map[c].ti_color | BRIGHT);

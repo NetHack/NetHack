@@ -5021,7 +5021,6 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
             break;
         case opt_wizmgender:
         case opt_showrace:
-        case opt_use_inverse:
         case opt_hilite_pile:
         case opt_perm_invent:
         case opt_ascii_map:
@@ -9776,7 +9775,6 @@ static struct wc_Opt wc_options[] = {
     { "scroll_amount", WC_SCROLL_AMOUNT },
     { "scroll_margin", WC_SCROLL_MARGIN },
     { "splash_screen", WC_SPLASH_SCREEN },
-    { "use_inverse", WC_INVERSE },
     { "vary_msgcount", WC_VARY_MSGCOUNT },
     { "windowcolors", WC_WINDOWCOLORS },
     { "mouse_support", WC_MOUSE_SUPPORT },

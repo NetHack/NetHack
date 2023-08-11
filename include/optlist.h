@@ -728,9 +728,6 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(tutorial, Advanced, 0, opt_out, set_in_config,
            On, Yes, No, No, NoAlias, &flags.tutorial, Term_False,
            "ask if you want the tutorial")
-    NHOPTB(use_inverse, Advanced, 0, opt_out, set_in_game,
-           On, Yes, No, No, NoAlias, &iflags.wc_inverse, Term_False,
-           "display detected monsters in inverse")
     NHOPTB(use_truecolor, Advanced, 0, opt_in, set_in_config,
                 Off, Yes, No, No, "use_truecolour",
            &iflags.use_truecolor, Term_False,

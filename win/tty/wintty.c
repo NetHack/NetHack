@@ -109,7 +109,7 @@ struct window_procs tty_procs = {
 #if defined(WIN32CON)
      | WC_MOUSE_SUPPORT
 #endif
-     | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
+     | WC_COLOR | WC_HILITE_PET | WC_EIGHT_BIT_IN),
     (0
 #if defined(SELECTSAVED)
      | WC2_SELECTSAVED
@@ -3521,16 +3521,15 @@ tty_print_glyph(
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
-        && bkglyphinfo && bkglyphinfo->framecolor != NO_COLOR) {
+        && bkglyphinfo && bkglyphinfo->framecolor) {
 #ifdef TEXTCOLOR
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
 #endif
-    } else if (((special & MG_PET) != 0 && iflags.hilite_pet)
-        || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-        || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
-        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK)) != 0
-            && iflags.use_inverse)) {
+    } else if (((special & MG_PET) && iflags.hilite_pet)
+        || ((special & MG_OBJPILE) && iflags.hilite_pile)
+        || ((special & MG_FEMALE) && wizard && iflags.wizmgender)
+        || (special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK))) {
         term_start_attr(ATR_INVERSE);
         inverse_on = TRUE;
     }

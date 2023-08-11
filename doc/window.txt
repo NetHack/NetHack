@@ -834,7 +834,6 @@ to support:
   |  tile_width        | WC_TILE_WIDTH      | wc_tile_width      |int     |
   |  tile_height       | WC_TILE_HEIGHT     | wc_tile_height     |int     |
   |  tile_file         | WC_TILE_FILE       | wc_tile_file       |char *  |
-  |  use_inverse       | WC_INVERSE         | wc_inverse         |boolean |
   |  vary_msgcount     | WC_VARY_MSGCOUNT   | wc_vary_msgcount   |int     |
   |  windowcolors      | WC_WINDOWCOLORS    | wc_foregrnd_menu   |char *  |
   |                    |                    | wc_backgrnd_menu   |char *  |
@@ -929,7 +928,6 @@ tile_height	-- port should display tiles with this height or round to
 		   closest if it can.
 tile_file	-- open this alternative tile file.  The file name is likely to
 		   be window-port or platform specific.
-use_inverse	-- port should display inverse when NetHack asks for it.
 vary_msgcount	-- port should display this number of messages at a time in
 		   the message window.
 windowborders   -- port should display borders around main NetHack windows.

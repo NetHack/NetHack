@@ -199,7 +199,7 @@ extern
 #define WC_TILE_WIDTH    0x00000020L /* 06 prefer this width of tile         */
 #define WC_TILE_HEIGHT   0x00000040L /* 07 prefer this height of tile        */
 #define WC_TILE_FILE     0x00000080L /* 08 alternative tile file name        */
-#define WC_INVERSE       0x00000100L /* 09 Port supports inverse video       */
+#define WC_FREE          0x00000100L /* 09 FREE                              */
 #define WC_ALIGN_MESSAGE 0x00000200L /* 10 supports mesg alignment top|b|l|r */
 #define WC_ALIGN_STATUS  0x00000400L /* 11 supports status alignmt top|b|l|r */
 #define WC_VARY_MSGCOUNT 0x00000800L /* 12 supports varying message window   */
