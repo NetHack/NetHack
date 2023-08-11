@@ -291,47 +291,6 @@ curses_create_main_windows(void)
 
 #if 0 /* pair init moved to colors.c */
 
-/* Initialize curses colors to colors used by NetHack */
-void
-curses_init_nhcolors(void)
-{
-#ifdef TEXTCOLOR
-    if (has_colors()) {
-        {
-            int i;
-            boolean hicolor = FALSE;
-
-            static const int clr_remap[16] = {
-                COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
-                COLOR_BLUE,
-                COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE, -1,
-                COLOR_RED + 8, COLOR_GREEN + 8, COLOR_YELLOW + 8,
-                COLOR_BLUE + 8,
-                COLOR_MAGENTA + 8, COLOR_CYAN + 8, COLOR_WHITE + 8
-            };
-
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair(17 + (i * 2) + 0, clr_remap[i], COLOR_RED);
-                init_pair(17 + (i * 2) + 1, clr_remap[i], COLOR_BLUE);
-            }
-
-            if (COLORS >= 16)
-                hicolor = TRUE;
-
-            /* Work around the crazy definitions above for more background
-               colors... */
-            for (i = 0; i < (COLORS >= 16 ? 16 : 8); i++) {
-                init_pair((hicolor ? 49 : 9) + i, clr_remap[i], COLOR_GREEN);
-                init_pair((hicolor ? 65 : 33) + i, clr_remap[i], COLOR_YELLOW);
-                init_pair((hicolor ? 81 : 41) + i, clr_remap[i], COLOR_MAGENTA);
-                init_pair((hicolor ? 97 : 49) + i, clr_remap[i], COLOR_CYAN);
-                init_pair((hicolor ? 113 : 57) + i, clr_remap[i], COLOR_WHITE);
-            }
-        }
-    }
-#endif
-}
-
 /* curses_choose_character + curses_character_dialog no longer used */
 
 /* Allow player to pick character's role, race, gender, and alignment.
@@ -812,5 +771,11 @@ curses_display_splash_window(void)
 void
 curses_cleanup(void)
 {
+#ifndef WIN32
+/* reset_palette() doesn't work on windows console
+ * and something is missing in Makefile.mingw32
+ * set_palette() doesn't work on pdcurses
+ */
     reset_palette();
+#endif
 }

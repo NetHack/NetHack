@@ -76,7 +76,7 @@ $(ONHW)/%.d: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 	$(cce) $(CFLAGSW) $< -o$@
 
 $(ONHW)/%.d: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
-	$(cce) $(CFLAGSW) $< -o$@
+	$(cce) $(CFLAGSW) $(PDCINCL) $< -o$@
 
 $(ONH)/%.d: $(SRC)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
@@ -97,7 +97,7 @@ $(ONH)/%.d: $(MSWIN)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@
 
 $(ONH)/%.d: $(WSHR)/%.c $(NHLUAH) | $(ONH)
-	$(cce) $(CFLAGSNH) $< -o$@
+	$(cce) $(CFLAGSNH) $(PDCINCL) $< -o$@
 
 $(ONH)/%.d: $(TTY)/%.c $(NHLUAH) | $(ONH)
 	$(cce) $(CFLAGSNH) $< -o$@

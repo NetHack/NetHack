@@ -952,7 +952,8 @@ endif   # HAVE_SOUNDLIB
 #==========================================
 # nethackw
 #==========================================
-COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib ball bones botl cmd cppregex \
+COREOBJS = $(addsuffix .o, allmain alloc apply artifact attrib \
+	   ball bones botl cmd color cppregex \
 	   dbridge decl detect dig display dlb do do_name do_wear \
 	   dog dogmove dokick dothrow drawing dungeon \
 	   eat end engrave exper explode extralev files fountain \
@@ -1060,10 +1061,10 @@ CPPFLAGSNH = $(CFLAGSU) $(CPPFLAGSXTRA) -DNO_TILE_C -DSAFEPROCS -D_LIB -DWIN32CO
 
 ONH = $(O)nethack
 
-NHONLY = consoletty.o getline.o topl.o wintty.o colors.o
+NHONLY = consoletty.o getline.o topl.o wintty.o
 ifeq "$(ADD_CURSES)" "Y"
 NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
-CFLAGSNH += $(NHCURSESFLAGS) $(PDCINCL)
+CFLAGSNH += $(NHCURSESFLAGS)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))
