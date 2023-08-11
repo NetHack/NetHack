@@ -615,6 +615,12 @@ write_char(WINDOW * win, int x, int y, nethack_char nch)
 
     hilite = whilite(win, nch.attr | colorpair(nch.color, nch.framecolor));
 
+    // without color
+    if (!hilite && nch.attr) {
+        hilite = nch.attr;
+        wattron(win, hilite);
+    }
+
 #if defined(CURSES_UNICODE) && defined(ENHANCED_SYMBOLS)
     if ((nch.unicode_representation && nch.unicode_representation->utf8str)
         || SYMHANDLING(H_IBM)) {
