@@ -2694,7 +2694,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
     x_monnam(mtmp, ARTICLE_THE, (char *) 0,                 \
              (SUPPRESS_IT | SUPPRESS_HALLUCINATION), FALSE)
 
-/* when a mon has died, maybe record an achievment or issue livelog message;
+/* when a mon has died, maybe record an achievement or issue livelog message;
    moved into separate routine to unclutter mondead() */
 static void
 logdeadmon(struct monst *mtmp, int mndx)
