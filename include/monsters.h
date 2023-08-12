@@ -1,4 +1,4 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1689793237 2023/07/19 19:00:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1691877846 2023/08/12 22:04:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2715,7 +2715,7 @@
      * sea monsters
      *
      * 3.7: all the fish except kraken used to specify M1_SLITHY, presumably
-     * cloned from giant eel.  Using "slither" to describe their movmement
+     * cloned from giant eel.  Using "slither" to describe their movement
      * wasn't appropriate.  Unfortunately, locomotion() isn't able to choose
      * "swim" as their movement description because it is only passed a
      * monster type, not a specific monster (for <mx,my>) or the relevant

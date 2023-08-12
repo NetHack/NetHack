@@ -1,4 +1,4 @@
-/* NetHack 3.7	mon.c	$NHDT-Date: 1687036544 2023/06/17 21:15:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.509 $ */
+/* NetHack 3.7	mon.c	$NHDT-Date: 1691877848 2023/08/12 22:04:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.514 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2694,7 +2694,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
     x_monnam(mtmp, ARTICLE_THE, (char *) 0,                 \
              (SUPPRESS_IT | SUPPRESS_HALLUCINATION), FALSE)
 
-/* when a mon has died, mabye record an achievment of issue livelog message;
+/* when a mon has died, maybe record an achievment or issue livelog message;
    moved into separate routine to unclutter mondead() */
 static void
 logdeadmon(struct monst *mtmp, int mndx)
