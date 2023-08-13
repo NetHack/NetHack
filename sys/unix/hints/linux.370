@@ -225,9 +225,14 @@ MOCPATH = $(QTDIR)/libexec/moc
 WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 endif   # QTLOCATED
 else    # !QT6MANUAL
-QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
-WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
+MOCDIR = $(shell pkg-config Qt6Gui --variable=libexecdir)
+ifneq ($(wildcard $(MOCDIR)/*),)
+MOCPATH = $(MOCDIR)/moc
+else
 MOCPATH = /usr/lib/qt6/libexec/moc
+endif   # MOCDIR
+QTCXXFLAGS += $(sort $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
+WINLIB += $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
 endif   # QT6MANUAL
 endif   # WANT_WIN_QT6
 ifndef QTDIR
