@@ -34,6 +34,8 @@ static int modified(int ch);
 static void update_modifiers(void);
 static int parse_escape_sequence(int, boolean *);
 
+#define SS3 M(C('O')) /* 8-bit escape sequence initiator for VT number pad */
+
 int
 curses_getch(void)
 {
@@ -866,7 +868,7 @@ curses_convert_keys(int key)
     /* Handle arrow and keypad keys, but only when getting a command
        (or a command-like keystroke for getpos() or getdir()). */
     switch (key) {
-    case M('O'): /* 8-bit version of ESC 'O' c for keypad key */
+    case SS3: /* M-^O, 8-bit version of ESC 'O' c for keypad key */
     case '\033': /* ESC or ^[ */
         /* changes ESC c to M-c or number pad key to corresponding digit
            (but we only get here via key==ESC if curses' getch() didn't
@@ -1076,16 +1078,16 @@ static int
 parse_escape_sequence(int key, boolean *keypadnum)
 {
 #ifndef PDCURSES
-    int ret;
+    int ret, keypadother = 0;
 
     *keypadnum = FALSE;
 
     timeout(10);
     ret = getch();
 
-    if (ret == 'O' || key == M('O')) { /* handle numeric keypad */
+    if (ret == 'O' || key == SS3) { /* handle numeric keypad */
         /*
-         * ESC O <pending> or M-O <something|nothing>.
+         * ESC O <pending> or M-^O <something|nothing>.
          *
          * For the former, we don't have the next char yet so get it now.
          * If there isn't one, treat ESC O as if user typed M-O (which
@@ -1093,8 +1095,8 @@ parse_escape_sequence(int key, boolean *keypadnum)
          * "ESC O").
          *
          * For the latter, it there wasn't another char then 'ret' will
-         * be ERR and we'll treat the result as M-O.  However, if there
-         * is another char and it is O meant as two characters "M-O O"
+         * be ERR and we'll treat the result as M-^O.  However, if there
+         * is another char and it is O meant as two characters "M-^O O"
          * we'll be fooled, but that's not a valid escape sequence so
          * don't worry about those two characters arriving together.
          */
@@ -1102,16 +1104,29 @@ parse_escape_sequence(int key, boolean *keypadnum)
             ret = getch();
 
         if (ret == ERR) {
-            ret = 'O'; /* there was no additional char; treat as M-O below */
+            /* there was no additional char; treat as M-O below */
+            ret = (key == '\033') ? 'O' : C('O');
         } else if (ret >= 112 && ret <= 121) { /* 'p'..'y' */
             *keypadnum = TRUE; /* convert 'p'..'y' to '0'..'9' below */
+        } else if (ret >= 108 && ret <= 110) { /* 'l'..'n' */
+            keypadother = 1;   /* convert 'l','m','n' to ',','.','-' below */
+        } else if (ret == 'M') {
+            keypadother = 2;   /* convert "ESC O M" or "SS3 M" to ^M */
         }
     }
 
     timeout(-1); /* reset to 'wait unlimited time for next input' */
 
     if (*keypadnum) {
-        ret -= (112 - '0');         /* Convert c from 'ESC O c' to digit */
+        /* 'p' -> '0', ..., 'y' -> '9' */
+        ret -= ('p' - '0');         /* Convert c from 'ESC O c' to digit */
+    } else if (keypadother > 0) {
+        /* conversion for VT keypad keys (no plus; ignore PF1 through PF4)
+           [typical PC keyboard has period and plus, no comma or minus] */
+        if (keypadother == 1)
+            ret -= ('l' - ',');     /* keypad comma, period, or minus */
+        else
+            ret = C('M');           /* keypad <enter> */
     } else if (ret != ERR && ret <= 255) {
         /* ESC <something>; effectively 'altmeta' behind player's back */
         ret = M(ret);               /* Meta key support for most terminals */
@@ -1126,6 +1141,8 @@ parse_escape_sequence(int key, boolean *keypadnum)
     return '\033';
 #endif /* !PDCURSES */
 }
+
+#undef SS3
 
 /* update_modifiers() and modified() will never be
    called if modifiers_available is FALSE */
