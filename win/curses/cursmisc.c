@@ -1071,7 +1071,7 @@ curses_mouse_support(int mode) /* 0: off, 1: on, 2: alternate on */
 #endif
 }
 
-/* caller just got an input character of ESC or M-O;
+/* caller just got an input character of ESC or M-^O;
    note: curses converts a lot of escape sequences to single values greater
    than 255 and those won't look like ESC to caller so won't get here */
 static int
@@ -1104,7 +1104,7 @@ parse_escape_sequence(int key, boolean *keypadnum)
             ret = getch();
 
         if (ret == ERR) {
-            /* there was no additional char; treat as M-O below */
+            /* there was no additional char; treat as M-O or M-^O below */
             ret = (key == '\033') ? 'O' : C('O');
         } else if (ret >= 112 && ret <= 121) { /* 'p'..'y' */
             *keypadnum = TRUE; /* convert 'p'..'y' to '0'..'9' below */
