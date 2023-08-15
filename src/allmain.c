@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1688415115 2023/07/03 20:11:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.219 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1691113621 2023/08/04 01:47:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -966,11 +966,15 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 
             if (extended_opt) {
                 extended_opt++;
+		    /* Deprecated in favor of "copy" - remove no later
+		       than  next major version */
                 if (match_optname(extended_opt, "paste", 5, FALSE)) {
+                    insert_into_pastebuf = TRUE;
+		} else if(match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
                 } else {
                     raw_printf(
-                   "-%sversion can only be extended with -%sversion:paste.\n",
+                   "-%sversion can only be extended with -%sversion:copy.\n",
                                dashdash, dashdash);
                     return TRUE;
                 }

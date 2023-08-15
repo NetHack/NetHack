@@ -111,11 +111,11 @@ nethack --directory:Dir -s
   as above; alternate directory, if specified, should come first.
 
 nethack --version
-nethack --version:paste
+nethack --version:copy
   '--version' display the program's version number and exit;
-  '--version:paste' display version number and also copy it into system
+  '--version:copy' display version number and also copy it into system
   pasteboard (should work on macOS and Windows; might not work on other
-  systems) so that it could be copied from there into a subsequent email
+  systems) so that it could be pasted from there into a subsequent email
   or web contact form, then exit.
 
 nethack --showpaths
