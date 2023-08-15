@@ -786,17 +786,18 @@ enum InputState {
 struct sortloot_item {
     struct obj *obj;
     char *str; /* result of loot_xname(obj) in some cases, otherwise null */
-    int indx; /* signed int, because sortloot()'s qsort comparison routine
-                 assumes (a->indx - b->indx) might yield a negative result */
-    xint16 orderclass; /* order rather than object class; 0 => not yet init'd */
-    xint16 subclass; /* subclass for some classes */
-    xint16 disco; /* discovery status */
+    /* these need to be signed; 'indx' should be big enough to hold a count
+       of the largest pile of items, the others would fit within char */
+    int indx;       /* index into original list (used as tie-breaker) */
+    int orderclass; /* order rather than object class; 0 => not yet init'd */
+    int subclass;   /* subclass for some classes */
+    int disco;      /* discovery status */
 };
 typedef struct sortloot_item Loot;
 
 typedef struct strbuf {
     int    len;
-    char * str;
+    char  *str;
     char   buf[256];
 } strbuf_t;
 

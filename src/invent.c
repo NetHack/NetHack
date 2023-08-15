@@ -94,7 +94,7 @@ loot_classify(Loot *sort_item, struct obj *obj)
         k = 1 + (int) (p - classorder);
     else
         k = 1 + (int) strlen(classorder) + (oclass != VENOM_CLASS);
-    sort_item->orderclass = (coordxy) k;
+    sort_item->orderclass = k;
     /* subclass designation; only a few classes have subclasses
        and the non-armor ones we use are fairly arbitrary */
     switch (oclass) {
@@ -210,13 +210,13 @@ loot_classify(Loot *sort_item, struct obj *obj)
         k = 1; /* any non-zero would do */
         break;
     }
-    sort_item->subclass = (coordxy) k;
+    sort_item->subclass = k;
     /* discovery status */
     k = !seen ? 1 /* unseen */
         : (discovered || !OBJ_DESCR(objects[otyp])) ? 4
           : (objects[otyp].oc_uname) ? 3 /* named (partially discovered) */
             : 2; /* undiscovered */
-    sort_item->disco = (coordxy) k;
+    sort_item->disco = k;
 }
 
 /* sortloot() formatting routine; for alphabetizing, not shown to user */
