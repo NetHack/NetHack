@@ -576,7 +576,7 @@ viable_nhfile(NHFILE *nhfp)
 /* ----------  BEGIN LEVEL FILE HANDLING ----------- */
 
 /* Construct a file name for a level-type file, which is of the form
- * somethingl.level (with any old level stripped off).
+ * something.level (with any old level stripped off).
  * This assumes there is space on the end of 'file' to append
  * a two digit number.  This is true for 'level'
  * but be careful if you use it for other things -dgk

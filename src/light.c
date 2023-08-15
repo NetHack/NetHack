@@ -270,7 +270,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
         if (DEADMONSTER(mon) || (mon->isgd && !mon->mx))
             continue;
         /* light range is the radius of a circle and we're limiting
-           canseemon() to a square exclosing that circle, but setting
+           canseemon() to a square enclosing that circle, but setting
            mtemplit 'erroneously' for a seen monster is not a problem;
            it just flags monsters for another canseemon() check when
            'obj' has reached its destination after missile traversal */
