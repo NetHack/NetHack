@@ -320,7 +320,7 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
                          *sli2 = (struct sortloot_item *) vptr2;
     struct obj *obj1 = sli1->obj,
                *obj2 = sli2->obj;
-    char *nam1, *nam2;
+    char *nam1, *nam2, *tmpstr;
     int val1, val2, namcmp;
 
     /* order by object class unless we're doing by-invlet without sortpack */
@@ -382,11 +382,17 @@ sortloot_cmp(const genericptr vptr1, const genericptr vptr2)
      * comparisons it gets subjected to.
      */
     nam1 = sli1->str;
-    if (!nam1)
-        nam1 = sli1->str = dupstr(loot_xname(obj1));
+    if (!nam1) {
+        tmpstr = loot_xname(obj1);
+        nam1 = sli1->str = dupstr(tmpstr);
+        maybereleaseobuf(tmpstr);
+    }
     nam2 = sli2->str;
-    if (!nam2)
-        nam2 = sli2->str = dupstr(loot_xname(obj2));
+    if (!nam2) {
+        tmpstr = loot_xname(obj2);
+        nam2 = sli2->str = dupstr(tmpstr);
+        maybereleaseobuf(tmpstr);
+    }
     if ((namcmp = strcmpi(nam1, nam2)) != 0)
         return namcmp;
 
