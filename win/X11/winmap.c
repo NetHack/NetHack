@@ -2027,7 +2027,7 @@ x_event(int exit_condition)
                 /* pkey(retval); */
                 keep_going = FALSE;
 #if defined(HANGUPHANDLING)
-	    }  else if (gp.program_state.done_hup) {
+            }  else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
@@ -2048,12 +2048,12 @@ x_event(int exit_condition)
                 }
                 keep_going = FALSE;
 #if defined(HANGUPHANDLING)
-	    } else if (gp.program_state.done_hup) {
+            } else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
 #endif
-	    }
+            }
             break;
         default:
             panic("x_event: unknown exit condition %d", exit_condition);

@@ -204,12 +204,12 @@ curses_message_win_puts(const char *message, boolean recursed)
         /* split needed */
         tmpstr = curses_break_str(message, (width - 3), 1);
 #ifdef USE_CURSES_PUTMIXED
-	if (have_mixed_leadin) {
+        if (have_mixed_leadin) {
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
             message_length--;
-	    have_mixed_leadin = FALSE;
-	    mesg_mixed = 0;
+            have_mixed_leadin = FALSE;
+            mesg_mixed = 0;
         }
 #endif
         mvwprintw(win, my, mx, "%s", tmpstr), mx += (int) strlen(tmpstr);
@@ -229,8 +229,8 @@ curses_message_win_puts(const char *message, boolean recursed)
             mvwadd_wch(win, my, mx, mixed_leadin_cchar);
             ++mx;
             message_length--;
-	    have_mixed_leadin = FALSE;
-	    mesg_mixed = 0;
+            have_mixed_leadin = FALSE;
+            mesg_mixed = 0;
         }
 #endif
         mvwprintw(win, my, mx, "%s", message), mx += message_length;

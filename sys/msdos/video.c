@@ -380,7 +380,7 @@ term_start_bgcolor(int bgcolor)
 #ifdef TEXTCOLOR
     if (!monoflag) {
         if (bgcolor >= 0 && bgcolor < CLR_MAX)
-	    curframecolor = bgcolor;
+            curframecolor = bgcolor;
     }
 #endif
     // pline("after  bgcolor = %d, curframecolor = %d", bgcolor, curframecolor);

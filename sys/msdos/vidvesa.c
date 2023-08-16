@@ -96,7 +96,7 @@ static struct map_struct {
             for (x = 0; x < COLNO; ++x) {                       \
                 map[y][x].glyph = GLYPH_UNEXPLORED;             \
                 map[y][x].ch = glyph2ttychar(GLYPH_UNEXPLORED); \
-		map[y][x].framecolor = NO_COLOR;                \
+                map[y][x].framecolor = NO_COLOR;                \
                 map[y][x].attr = 0;                             \
                 map[y][x].special = 0;                          \
                 map[y][x].tileidx = Tile_unexplored;            \
