@@ -966,11 +966,11 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 
             if (extended_opt) {
                 extended_opt++;
-		    /* Deprecated in favor of "copy" - remove no later
-		       than  next major version */
+                    /* Deprecated in favor of "copy" - remove no later
+                       than  next major version */
                 if (match_optname(extended_opt, "paste", 5, FALSE)) {
                     insert_into_pastebuf = TRUE;
-		} else if(match_optname(extended_opt, "copy", 4, FALSE)) {
+                } else if(match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
                 } else {
                     raw_printf(
