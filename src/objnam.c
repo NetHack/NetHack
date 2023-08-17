@@ -1394,9 +1394,12 @@ doname_base(
             Strcat(bp, " (wielded)");
         } else {
             const char *hand_s = body_part(HAND);
+            char *obufp, handsbuf[40];
 
-            if (bimanual(obj))
-                hand_s = makeplural(hand_s);
+            if (bimanual(obj)) {
+                hand_s = strcpy(handsbuf, obufp = makeplural(hand_s));
+                releaseobuf(obufp);
+            }
             /* note: Sting's glow message, if added, will insert text
                in front of "(weapon in hand)"'s closing paren */
             Sprintf(eos(bp), " (%s%s in %s%s)",
