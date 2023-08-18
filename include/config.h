@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1610141601 2021/01/08 21:33:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1692385755 2023/08/18 19:09:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -532,7 +532,7 @@ typedef unsigned char uchar;
 #define SELECTSAVED /* support for restoring via menu */
 
 /* TTY_TILES_ESCCODES: Enable output of special console escape codes
- * which act as hints for external programs such as EbonHack, or hterm.
+ * which act as hints for external programs such as EbonHack or hterm.
  *
  * TTY_SOUND_ESCCODES: Enable output of special console escape codes
  * which act as hints for theoretical external programs to play sound effect.
@@ -559,7 +559,8 @@ typedef unsigned char uchar;
  *
  * To compile NetHack with this, add tile.c to WINSRC and tile.o to WINOBJ
  * in the hints file or Makefile.
- * Set boolean option vt_xdata in your config file to turn either of these on.
+ * Set boolean option vt_tiledata and/or vt_sounddata in your config file
+ * to turn either of these on.
  * Note that gnome-terminal at least doesn't work with this. */
 /* #define TTY_TILES_ESCCODES */
 /* #define TTY_SOUND_ESCCODES */
