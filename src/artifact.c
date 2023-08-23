@@ -1145,7 +1145,7 @@ Mb_hit(struct monst *magr, /* attacker */
        boolean vis,        /* whether the action can be seen */
        char *hittee)       /* target's name: "you" or mon_nam(mdef) */
 {
-    struct permonst *old_uasmon;
+    struct permonst *old_mdat;
     const char *verb;
     boolean youattack = (magr == &gy.youmonst),
             youdefend = (mdef == &gy.youmonst),
@@ -1204,7 +1204,7 @@ Mb_hit(struct monst *magr, /* attacker */
     /* now perform special effects */
     switch (attack_indx) {
     case MB_INDEX_CANCEL:
-        old_uasmon = gy.youmonst.data;
+        old_mdat = youdefend ? gy.youmonst.data : mdef->data;
         /* No mdef->mcan check: even a cancelled monster can be polymorphed
          * into a golem, and the "cancel" effect acts as if some magical
          * energy remains in spellcasting defenders to be absorbed later.
@@ -1214,7 +1214,7 @@ Mb_hit(struct monst *magr, /* attacker */
         } else {
             do_stun = FALSE;
             if (youdefend) {
-                if (gy.youmonst.data != old_uasmon)
+                if (gy.youmonst.data != old_mdat)
                     *dmgptr = 0; /* rehumanized, so no more damage */
                 if (u.uenmax > 0) {
                     u.uenmax--;
@@ -1224,6 +1224,10 @@ Mb_hit(struct monst *magr, /* attacker */
                     You("lose magical energy!");
                 }
             } else {
+                /* canceled shapeshifter/vamp may have changed forms, so
+                   update its name if necessary */
+                if (mdef->data != old_mdat)
+                    Strcpy(hittee, mon_nam(mdef));
                 if (mdef->data == &mons[PM_CLAY_GOLEM])
                     mdef->mhp = 1; /* cancelled clay golems will die */
                 if (youattack && attacktype(mdef->data, AT_MAGC)) {
