@@ -126,8 +126,8 @@ l_obj_add_to_container(lua_State *L)
 
     /* was lo->obj merged? */
     if (otmp != lo->obj) {
-        lo->obj->lua_ref_cnt += refs;
         lo->obj = otmp;
+        lo->obj->lua_ref_cnt += refs;
     }
 
     return 0;
