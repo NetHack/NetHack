@@ -159,6 +159,7 @@ xxxxxx.xxxxxx
 ]], contents = function()
    des.non_diggable(selection.area(2,2, 10,8));
    des.region(selection.area(4,4, 8,6), "lit");
+   des.exclusion({ type = "teleport", region = { 2,2, 10,8 } });
    if (coldhell) then
       des.replace_terrain({ region = {1,1, 11,9}, fromterrain="L", toterrain="P" });
    end
@@ -228,6 +229,7 @@ BBBBBBB]], contents = function()
 ..........
 ..........
 ..........]], contents = function()
+   des.exclusion({ type = "teleport", region = { 4,4, 5,5 } });
    local mons = { "Angel", "D", "H", "L" };
    des.monster(mons[math.random(1, #mons)], 4,4);
       end });
@@ -245,6 +247,7 @@ BBBBBBB]], contents = function()
 .}}}}}}}.
 .........
 ]], contents = function(rm)
+   des.exclusion({ type = "teleport", region = { 3,3, 5,5 } });
    des.monster("L",04,04)
       end })
    end,

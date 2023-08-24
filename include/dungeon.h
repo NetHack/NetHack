@@ -58,6 +58,14 @@ typedef struct dest_area { /* non-stairway level change identifier */
     coordxy nhx, nhy;        /* opposite corner of invalid area */
 } dest_area;
 
+/* teleportation exclusion zones in the level */
+typedef struct exclusion_zone {
+    xint16 zonetype; /* level_region_types */
+    coordxy lx, ly;
+    coordxy hx, hy;
+    struct exclusion_zone *next;
+} exclusion_zone;
+
 typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
     char proto[15];        /* name of prototype file (eg. "tower") */

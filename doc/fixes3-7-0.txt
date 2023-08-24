@@ -1228,6 +1228,7 @@ when a werecreature in human form attacked hero, it could transform to critter
 status highlighting for hit points didn't work as intended for up or down HP
 	changes; 'up' rule was used for both, 'down' rule was ignored
 unhide an unseen water monster using a polymorph trap on land
+allow defining random-teleport exclusion zones in lua
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

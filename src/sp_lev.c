@@ -141,6 +141,7 @@ int lspo_ladder(lua_State *);
 int lspo_level_flags(lua_State *);
 int lspo_level_init(lua_State *);
 int lspo_levregion(lua_State *);
+int lspo_exclusion(lua_State *);
 int lspo_map(lua_State *);
 int lspo_mazewalk(lua_State *);
 int lspo_message(lua_State *);
@@ -6073,6 +6074,35 @@ lspo_levregion(lua_State *L)
     return 0;
 }
 
+/* exclusion({ type = "teleport", region = { x1,y1, x2,y2 } }); */
+int
+lspo_exclusion(lua_State *L)
+{
+    static const char *const ez_types[] = {
+        "teleport", "teleport-up", "teleport-down", NULL
+    };
+    static const int ez_types2i[] = {
+        LR_TELE, LR_UPTELE, LR_DOWNTELE, 0
+    };
+    struct exclusion_zone *ez = (struct exclusion_zone *) alloc(sizeof *ez);
+    lua_Integer x1,y1,x2,y2;
+
+    create_des_coder();
+    lcheck_param_table(L);
+    ez->zonetype = ez_types2i[get_table_option(L, "type", "teleport",
+                                                      ez_types)];
+    get_table_region(L, "region", &x1, &y1, &x2, &y2, FALSE);
+    ez->lx = x1;
+    ez->ly = y1;
+    ez->hx = x2;
+    ez->hy = y2;
+    cvt_to_abscoord(&ez->lx, &ez->ly);
+    cvt_to_abscoord(&ez->hx, &ez->hy);
+    ez->next = ge.exclusion_zones;
+    ge.exclusion_zones = ez;
+    return 0;
+}
+
 static void
 sel_set_lit(coordxy x, coordxy y, genericptr_t arg)
 {
@@ -6960,6 +6990,7 @@ static const struct luaL_Reg nhl_functions[] = {
     { "drawbridge", lspo_drawbridge },
     { "region", lspo_region },
     { "levregion", lspo_levregion },
+    { "exclusion", lspo_exclusion },
     { "wallify", lspo_wallify },
     { "wall_property", lspo_wall_property },
     { "non_diggable", lspo_non_diggable },

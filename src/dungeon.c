@@ -2675,6 +2675,66 @@ donamelevel(void)
     return ECMD_OK;
 }
 
+/* exclusion zones */
+void
+free_exclusions(void)
+{
+    struct exclusion_zone *ez = ge.exclusion_zones;
+
+    while (ez) {
+        struct exclusion_zone *nxtez = ez->next;
+
+        free(ez);
+        ez = nxtez;
+    }
+    ge.exclusion_zones = (struct exclusion_zone *) 0;
+}
+
+void
+save_exclusions(NHFILE *nhfp)
+{
+    struct exclusion_zone *ez;
+    int nez;
+
+    for (nez = 0, ez = ge.exclusion_zones; ez; ez = ez->next, ++nez) ;
+
+    if (nhfp->structlevel)
+        bwrite(nhfp->fd, (genericptr_t) &nez, sizeof nez);
+
+    for (ez = ge.exclusion_zones; ez; ez = ez->next) {
+        if (nhfp->structlevel) {
+            bwrite(nhfp->fd, (genericptr_t) &ez->zonetype, sizeof ez->zonetype);
+            bwrite(nhfp->fd, (genericptr_t) &ez->lx, sizeof ez->lx);
+            bwrite(nhfp->fd, (genericptr_t) &ez->ly, sizeof ez->ly);
+            bwrite(nhfp->fd, (genericptr_t) &ez->hx, sizeof ez->hx);
+            bwrite(nhfp->fd, (genericptr_t) &ez->hy, sizeof ez->hy);
+        }
+    }
+}
+
+void
+load_exclusions(NHFILE *nhfp)
+{
+    struct exclusion_zone *ez;
+    int nez = 0;
+
+    if (nhfp->structlevel)
+        mread(nhfp->fd, (genericptr_t) &nez, sizeof nez);
+
+    while (nez-- > 0) {
+        ez = (struct exclusion_zone *) alloc(sizeof *ez);
+        if (nhfp->structlevel) {
+            mread(nhfp->fd, (genericptr_t) &ez->zonetype, sizeof ez->zonetype);
+            mread(nhfp->fd, (genericptr_t) &ez->lx, sizeof ez->lx);
+            mread(nhfp->fd, (genericptr_t) &ez->ly, sizeof ez->ly);
+            mread(nhfp->fd, (genericptr_t) &ez->hx, sizeof ez->hx);
+            mread(nhfp->fd, (genericptr_t) &ez->hy, sizeof ez->hy);
+        }
+        ez->next = ge.exclusion_zones;
+        ge.exclusion_zones = ez;
+    }
+}
+
 /* find the particular mapseen object in the chain; may return null */
 static mapseen *
 find_mapseen(d_level *lev)

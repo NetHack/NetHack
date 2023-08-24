@@ -297,6 +297,22 @@ maze0xy(coord *cc)
     return;
 }
 
+static boolean
+is_exclusion_zone(xint16 type, coordxy x, coordxy y)
+{
+    struct exclusion_zone *ez = ge.exclusion_zones;
+
+    while (ez) {
+        if (((type == LR_DOWNTELE && (ez->zonetype == LR_DOWNTELE || ez->zonetype == LR_TELE))
+             || (type == LR_UPTELE && (ez->zonetype == LR_UPTELE || ez->zonetype == LR_TELE))
+             || type == ez->zonetype)
+            && within_bounded_area(x, y, ez->lx, ez->ly, ez->hx, ez->hy))
+            return TRUE;
+        ez = ez->next;
+    }
+    return FALSE;
+}
+
 /*
  * Bad if:
  *      pos is occupied OR
@@ -375,7 +391,7 @@ put_lregion_here(
 {
     struct monst *mtmp;
 
-    if (bad_location(x, y, nlx, nly, nhx, nhy)) {
+    if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y)) {
         if (!oneshot) {
             return FALSE; /* caller should try again */
         } else {
@@ -389,7 +405,7 @@ put_lregion_here(
                     mtmp->mtrapped = 0;
                 deltrap(t);
             }
-            if (bad_location(x, y, nlx, nly, nhx, nhy))
+            if (bad_location(x, y, nlx, nly, nhx, nhy) || is_exclusion_zone(rtype, x, y))
                 return FALSE;
         }
     }

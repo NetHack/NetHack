@@ -662,6 +662,7 @@ xx|.....|xx
 
      shuffle(nasty_undead);
      des.monster(nasty_undead[1], 2, 2);
+     des.exclusion({ type = "teleport", region = { 2,2, 3,3 } });
 end });
    end,
 

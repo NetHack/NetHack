@@ -553,6 +553,7 @@ savelev_core(NHFILE *nhfp, xint8 lev)
     savedamage(nhfp); /* pending shop wall and/or floor repair */
     save_regions(nhfp);
     save_bubbles(nhfp, lev); /* for water and air */
+    save_exclusions(nhfp);
 
     if (nhfp->mode != FREEING) {
         if (nhfp->structlevel)

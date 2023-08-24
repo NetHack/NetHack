@@ -340,6 +340,7 @@ struct instance_globals_e {
     struct bubble *ebubbles;
 
     /* new stuff */
+    struct exclusion_zone *exclusion_zones;
     int early_raw_messages;   /* if raw_prints occurred early prior
                                  to gb.beyond_savefile_load */
 

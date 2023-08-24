@@ -822,6 +822,7 @@ clear_level_structures(void)
     stairway_free_all();
     gm.made_branch = FALSE;
     clear_regions();
+    free_exclusions();
     reset_xystart_size();
     if (gl.lev_message) {
         free(gl.lev_message);

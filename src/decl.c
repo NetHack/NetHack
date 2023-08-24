@@ -342,6 +342,7 @@ const struct instance_globals_e g_init_e = {
     /* mkmaze.c */
     UNDEFINED_PTR, /* ebubbles */
     /* new */
+    NULL, /* exclusion_zones */
     0,      /* early_raw_messages */
     TRUE, /* havestate*/
     IVMAGIC  /* e_magic to validate that structure layout has been preserved */

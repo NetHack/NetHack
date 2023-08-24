@@ -528,6 +528,18 @@ Example:
  des.engraving({x,y}, "engrave", "Foo");
 
 
+=== exclusion
+
+Exclude an area of the map from being randomly chosen target when
+falling or teleporting into the level.  Multiple exclusions per level are allowed.
+
+* type is one of "teleport", "teleport-up", or "teleport-down".
+
+Example:
+
+ des.exclusion({ type = "teleport", region = { 0,0, 10,5 } });
+
+
 === feature
 
 Create a feature, and set flags for it.
