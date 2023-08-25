@@ -221,7 +221,8 @@ castmu(
     }
 
     /* monster unable to cast spells? */
-    if (mtmp->mcan || mtmp->mspec_used || !ml) {
+    if (mtmp->mcan || mtmp->mspec_used || !ml
+        || m_seenres(mtmp, cvt_adtyp_to_mseenres(mattk->adtyp))) {
         cursetxt(mtmp, is_undirected_spell(mattk->adtyp, spellnum));
         return M_ATTK_MISS;
     }
