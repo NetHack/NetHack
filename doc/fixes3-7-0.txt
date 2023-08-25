@@ -1229,6 +1229,8 @@ status highlighting for hit points didn't work as intended for up or down HP
 	changes; 'up' rule was used for both, 'down' rule was ignored
 unhide an unseen water monster using a polymorph trap on land
 allow defining random-teleport exclusion zones in lua
+if Magicbane cancelled a shapeshifter, forcing it to 'unshift', subsequent
+	messages continued to refer to the shifted form
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
