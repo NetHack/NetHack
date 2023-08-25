@@ -2617,7 +2617,7 @@ lifesaved_monster(struct monst* mtmp)
 
 DISABLE_WARNING_FORMAT_NONLITERAL
 
-/* when a ahape-shifted vampire is killed, it reverts to base form instead
+/* when a shape-shifted vampire is killed, it reverts to base form instead
    of dying; moved into separate routine to unclutter mondead() */
 static boolean
 vamprises(struct monst *mtmp)
@@ -2687,9 +2687,8 @@ vamprises(struct monst *mtmp)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* A specific combination of x_monnam flags for livelogging. The livelog
- * shouldn't show that you killed a hallucinatory monster and not what it
- * actually is. */
+/* specific combination of x_monnam flags for livelogging; show what was
+   actually killed even when unseen or hallucinated to be something else */
 #define livelog_mon_nam(mtmp) \
     x_monnam(mtmp, ARTICLE_THE, (char *) 0,                 \
              (SUPPRESS_IT | SUPPRESS_HALLUCINATION), FALSE)

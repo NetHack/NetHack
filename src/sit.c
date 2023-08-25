@@ -321,7 +321,7 @@ dosit(void)
                 u.utrap++;
             }
         } else {
-            /* when flying, "you land" might need some refinement; it aounds
+            /* when flying, "you land" might need some refinement; it sounds
                as if you're staying on the ground but you will immediately
                take off again unless you become stuck in a holding trap */
             You("%s.", Flying ? "land" : "sit down");
