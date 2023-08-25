@@ -1450,7 +1450,25 @@ cvt_adtyp_to_mseenres(uchar adtyp)
     }
 }
 
-/* Monsters remember hero resisting effect M_SEEN_foo */
+/* Convert property resistance to M_SEEN_bar */
+unsigned long
+cvt_prop_to_mseenres(uchar prop)
+{
+    switch (prop) {
+    case ANTIMAGIC: return M_SEEN_MAGR;
+    case FIRE_RES: return M_SEEN_FIRE;
+    case COLD_RES: return M_SEEN_COLD;
+    case SLEEP_RES: return M_SEEN_SLEEP;
+    case DISINT_RES: return M_SEEN_DISINT;
+    case POISON_RES: return M_SEEN_POISON;
+    case SHOCK_RES: return M_SEEN_ELEC;
+    case ACID_RES: return M_SEEN_ACID;
+    case REFLECTING: return M_SEEN_REFL;
+    default: return M_SEEN_NOTHING;
+    }
+}
+
+/* Monsters in line of sight remember hero resisting effect M_SEEN_foo */
 void
 monstseesu(unsigned long seenres)
 {
@@ -1462,6 +1480,20 @@ monstseesu(unsigned long seenres)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         if (!DEADMONSTER(mtmp) && m_canseeu(mtmp))
             m_setseenres(mtmp, seenres);
+}
+
+/* Monsters in line of sight forget hero resistance to M_SEEN_foo */
+void
+monstunseesu(unsigned long seenres)
+{
+    struct monst *mtmp;
+
+    if (seenres == M_SEEN_NOTHING || u.uswallow)
+        return;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (!DEADMONSTER(mtmp) && m_canseeu(mtmp))
+            m_clearseenres(mtmp, seenres);
 }
 
 /* Can monster resist conflict caused by hero?

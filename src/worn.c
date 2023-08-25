@@ -71,6 +71,10 @@ setworn(struct obj *obj, long mask)
                         p = objects[oobj->otyp].oc_oprop;
                         u.uprops[p].extrinsic =
                             u.uprops[p].extrinsic & ~wp->w_mask;
+                        /* if the hero removed an extrinsic-granting item,
+                           nearby monsters will notice and attempt attacks of
+                           that type again */
+                        monstunseesu_prop(p);
                         if ((p = w_blocks(oobj, mask)) != 0)
                             u.uprops[p].blocked &= ~wp->w_mask;
                         if (oobj->oartifact)
@@ -132,6 +136,7 @@ setnotworn(struct obj *obj)
             *(wp->w_obj) = (struct obj *) 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
+            monstunseesu_prop(p); /* remove this extrinsic from seenres */ 
             obj->owornmask &= ~wp->w_mask;
             if (obj->oartifact)
                 set_artifact_intrinsic(obj, 0, wp->w_mask);
