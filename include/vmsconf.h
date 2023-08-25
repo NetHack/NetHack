@@ -311,7 +311,7 @@ typedef int32_t off_t;
 #define link(f1, f2) vms_link(f1, f2)   /* vmsfiles.c */
 #define open(f, k, m) vms_open(f, k, m) /* vmsfiles.c */
 #define fopen(f, m) vms_fopen(f, m)     /* vmsfiles.c */
-/* #define unlink(f0) vms_unlink(f0)       /* vmsfiles.c */
+/* #define unlink(f0) vms_unlink(f0) */       /* vmsfiles.c */
 #ifdef VERYOLD_VMS
 #define unlink(f0) delete (f0) /* vaxcrtl */
 #else
