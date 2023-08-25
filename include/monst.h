@@ -88,7 +88,9 @@ enum m_seen_resistance {
 
 #define m_seenres(mon, mask) ((mon)->seen_resistance & (mask))
 #define m_setseenres(mon, mask) ((mon)->seen_resistance |= (mask))
+#define m_clearseenres(mon, mask) ((mon)->seen_resistance &= ~(mask))
 #define monstseesu_ad(adtyp) monstseesu(cvt_adtyp_to_mseenres(adtyp))
+#define monstunseesu_prop(prop) monstunseesu(cvt_prop_to_mseenres(prop))
 
 struct monst {
     struct monst *nmon;
