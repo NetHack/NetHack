@@ -307,7 +307,17 @@ fetch-lua: fetch-Lua
 
 fetch-Lua:
 	( mkdir -p lib && cd lib && \
+	  shac1=`command -v shasum`; \
+	  shac2=`command -v sha256sum`; \
+	  if [ ! -z $$shac1 ]; then \
+	      shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
+	      shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
+	  fi; \
 	  curl -R -O https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  if [ ! -z "$$shac" ]; then \
+	      echo Checking integrity with $$shac; \
+	      $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+	  fi; \
 	  tar zxf lua-$(LUA_VERSION).tar.gz && \
 	  rm -f lua-$(LUA_VERSION).tar.gz )
 # remove include/nhlua.h in case it was created for some other Lua version
