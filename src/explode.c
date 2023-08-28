@@ -636,6 +636,8 @@ explode(
         /* You resisted the damage, lets not keep that to ourselves */
         if (uhurt == 1)
             monstseesu_ad(adtyp);
+        else
+            monstunseesu_ad(adtyp);
 
         if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {
             if (Upolyd) {

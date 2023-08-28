@@ -2439,6 +2439,7 @@ mhitm_ad_fire(
             pline("You're %s!", on_fire(pd, mattk));
             if (completelyburns(pd)) { /* paper or straw golem */
                 You("go up in flames!");
+                monstunseesu(M_SEEN_FIRE);
                 /* KMH -- this is okay with unchanging */
                 rehumanize();
                 return;
@@ -2446,6 +2447,8 @@ mhitm_ad_fire(
                 pline_The("fire doesn't feel hot!");
                 monstseesu(M_SEEN_FIRE);
                 mhm->damage = 0;
+            } else {
+                monstunseesu(M_SEEN_FIRE);
             }
             if ((int) magr->m_lev > rn2(20))
                 destroy_item(SCROLL_CLASS, AD_FIRE);
@@ -2530,6 +2533,8 @@ mhitm_ad_cold(
                 pline_The("frost doesn't seem cold!");
                 monstseesu(M_SEEN_COLD);
                 mhm->damage = 0;
+            } else {
+                monstunseesu(M_SEEN_COLD);
             }
             if ((int) magr->m_lev > rn2(20))
                 destroy_item(POTION_CLASS, AD_COLD);
@@ -2586,6 +2591,8 @@ mhitm_ad_elec(
                 pline_The("zap doesn't shock you!");
                 monstseesu(M_SEEN_ELEC);
                 mhm->damage = 0;
+            } else {
+                monstunseesu(M_SEEN_ELEC);
             }
             if ((int) magr->m_lev > rn2(20))
                 destroy_item(WAND_CLASS, AD_ELEC);
@@ -2635,6 +2642,7 @@ mhitm_ad_acid(
             } else {
                 pline("You're covered in %s!  It burns!", hliquid("acid"));
                 exercise(A_STR, FALSE);
+                monstunseesu(M_SEEN_ACID);
             }
         else
             mhm->damage = 0;
@@ -3349,6 +3357,7 @@ mhitm_ad_slee(
                 monstseesu(M_SEEN_SLEEP);
                 return;
             }
+            monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(10), TRUE);
             if (Blind)
                 You("are put to sleep!");
@@ -5676,10 +5685,12 @@ passive(
                 You("are splashed by %s %s!", s_suffix(mon_nam(mon)),
                     hliquid("acid"));
 
-            if (!Acid_resistance)
+            if (!Acid_resistance) {
                 mdamageu(mon, tmp);
-            else
+                monstunseesu(M_SEEN_ACID);
+            } else {
                 monstseesu(M_SEEN_ACID);
+            }
             if (!rn2(30))
                 erode_armor(&gy.youmonst, ERODE_CORRODE);
         }
@@ -5749,6 +5760,7 @@ passive(
         } else {
             You("are hit by magic missiles appearing from thin air!");
             mdamageu(mon, tmp);
+            monstunseesu(M_SEEN_MAGR);
         }
         break;
     case AD_ENCH: /* KMH -- remove enchantment (disenchanter) */
@@ -5834,6 +5846,7 @@ passive(
                     ugolemeffects(AD_COLD, tmp);
                     break;
                 }
+                monstunseesu(M_SEEN_COLD);
                 You("are suddenly very cold!");
                 mdamageu(mon, tmp);
                 /* monster gets stronger with your heat! */
@@ -5858,6 +5871,7 @@ passive(
                     ugolemeffects(AD_FIRE, tmp);
                     break;
                 }
+                monstunseesu(M_SEEN_FIRE);
                 You("are suddenly very hot!");
                 mdamageu(mon, tmp); /* fire damage */
             }
@@ -5870,6 +5884,7 @@ passive(
                 ugolemeffects(AD_ELEC, tmp);
                 break;
             }
+            monstunseesu(M_SEEN_ELEC);
             You("are jolted with electricity!");
             mdamageu(mon, tmp);
             break;

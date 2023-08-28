@@ -884,6 +884,7 @@ peffect_sleeping(struct obj *otmp)
         You("yawn.");
     } else {
         You("suddenly fall asleep!");
+        monstunseesu(M_SEEN_SLEEP);
         fall_asleep(-rn1(10, 25 - 12 * bcsign(otmp)), TRUE);
     }
 }

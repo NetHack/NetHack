@@ -139,8 +139,10 @@ thitu(
                 pline_The("silver sears your flesh!");
                 exercise(A_CON, FALSE);
             }
-            if (is_acid)
+            if (is_acid) {
                 pline("It burns!");
+                monstunseesu(M_SEEN_ACID);
+            }
             losehp(dam, knm, kprefix); /* acid damage */
             exercise(A_STR, FALSE);
         }

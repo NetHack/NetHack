@@ -2591,6 +2591,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             } else
                 damage = d(1 + obj->spe, 6);
             exercise(A_STR, FALSE);
+            monstunseesu(M_SEEN_MAGR);
         }
         break;
 
@@ -2600,6 +2601,7 @@ zapyourself(struct obj *obj, boolean ordinary)
             You("shock yourself!");
             damage = d(12, 6);
             exercise(A_CON, FALSE);
+            monstunseesu(M_SEEN_ELEC);
         } else {
             shieldeff(u.ux, u.uy);
             You("zap yourself, but seem unharmed.");
@@ -2626,6 +2628,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         } else {
             pline("You've set yourself afire!");
             damage = d(12, 6);
+            monstunseesu(M_SEEN_FIRE);
         }
         burn_away_slime();
         (void) burnarmor(&gy.youmonst);
@@ -2648,6 +2651,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         } else {
             You("imitate a popsicle!");
             damage = d(12, 6);
+            monstunseesu(M_SEEN_COLD);
         }
         destroy_item(POTION_CLASS, AD_COLD);
         break;
@@ -2662,6 +2666,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         } else {
             damage = d(4, 6);
             pline("Idiot!  You've shot yourself!");
+            monstunseesu(M_SEEN_MAGR);
         }
         break;
 
@@ -2728,6 +2733,7 @@ zapyourself(struct obj *obj, boolean ordinary)
                 pline_The("sleep ray hits you!");
             else
                 You("fall alseep!");
+            monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-rnd(50), TRUE);
         }
         break;
@@ -4105,6 +4111,7 @@ zhitu(
         } else {
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
+            monstunseesu(M_SEEN_MAGR);
         }
         break;
     case ZT_FIRE:
@@ -4115,6 +4122,7 @@ zhitu(
             ugolemeffects(AD_FIRE, d(nd, 6));
         } else {
             dam = d(nd, 6);
+            monstunseesu(M_SEEN_FIRE);
         }
         burn_away_slime();
         if (burnarmor(&gy.youmonst)) { /* "body hit" */
@@ -4137,6 +4145,7 @@ zhitu(
             ugolemeffects(AD_COLD, d(nd, 6));
         } else {
             dam = d(nd, 6);
+            monstunseesu(M_SEEN_COLD);
         }
         if (!rn2(3))
             destroy_item(POTION_CLASS, AD_COLD);
@@ -4147,6 +4156,7 @@ zhitu(
             You("don't feel sleepy.");
             monstseesu(M_SEEN_SLEEP);
         } else {
+            monstunseesu(M_SEEN_SLEEP);
             fall_asleep(-d(nd, 25), TRUE); /* sleep ray */
         }
         break;
@@ -4160,7 +4170,9 @@ zhitu(
                 break;
             } else if (disn_prot) {
                 break;
-            } else if (uarms) {
+            }
+            monstunseesu(M_SEEN_DISINT);
+            if (uarms) {
                 /* destroy shield; other possessions are safe */
                 (void) destroy_arm(uarms);
                 break;
@@ -4187,6 +4199,7 @@ zhitu(
             You("aren't affected.");
             break;
         }
+        monstunseesu(M_SEEN_MAGR);
         gk.killer.format = KILLED_BY_AN;
         Strcpy(gk.killer.name, fltxt ? fltxt : "");
         /* when killed by disintegration breath, don't leave corpse */
@@ -4202,6 +4215,7 @@ zhitu(
         } else {
             dam = d(nd, 6);
             exercise(A_CON, FALSE);
+            monstunseesu(M_SEEN_ELEC);
         }
         if (!rn2(3))
             destroy_item(WAND_CLASS, AD_ELEC);
@@ -4220,6 +4234,7 @@ zhitu(
             pline_The("%s burns!", hliquid("acid"));
             dam = d(nd, 6);
             exercise(A_STR, FALSE);
+            monstunseesu(M_SEEN_ACID);
         }
         /* using two weapons at once makes both of them more vulnerable */
         if (!rn2(u.twoweap ? 3 : 6))
@@ -4605,6 +4620,7 @@ dobuzz(
                     /* flash_str here only used for killer; suppress
                      * hallucination */
                     zhitu(type, nd, flash_str(fltyp, TRUE), sx, sy);
+                    monstunseesu(M_SEEN_REFL);
                 }
             } else if (!Blind) {
                 pline("%s whizzes by you!", The(flash_str(fltyp, FALSE)));

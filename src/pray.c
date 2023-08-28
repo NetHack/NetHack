@@ -625,8 +625,11 @@ god_zaps_you(aligntyp resp_god)
             shieldeff(u.ux, u.uy);
             pline("It seems not to affect you.");
             monstseesu(M_SEEN_ELEC);
-        } else
+            monstunseesu(M_SEEN_REFL);
+        } else {
             fry_by_god(resp_god, FALSE);
+            monstunseesu(M_SEEN_REFL | M_SEEN_ELEC);
+        }
     }
 
     pline("%s is not deterred...", align_gname(resp_god));
@@ -657,6 +660,7 @@ god_zaps_you(aligntyp resp_god)
             (void) destroy_arm(uarmu);
         if (!Disint_resistance) {
             fry_by_god(resp_god, TRUE);
+            monstunseesu(M_SEEN_DISINT);
         } else {
             You("bask in its %s glow for a minute...", NH_BLACK);
             godvoice(resp_god, "I believe it not!");
