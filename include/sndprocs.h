@@ -1,4 +1,4 @@
-/* NetHack 3.7	sndprocs.h	$NHDT-Date: $  $NHDT-Branch: $:$NHDT-Revision: $ */
+/* NetHack 3.7	sndprocs.h	$NHDT-Date: 1693253118 2023/08/28 20:05:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Michael Allison, 2022                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
