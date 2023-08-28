@@ -1028,6 +1028,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             if (Half_gas_damage) /* worn towel */
                 dam = (dam + 1) / 2;
             losehp(dam, "gas cloud", KILLED_BY_AN);
+            monstunseesu(M_SEEN_POISON);
             return FALSE;
         } else {
             You("cough!");

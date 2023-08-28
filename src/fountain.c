@@ -574,8 +574,10 @@ drinksink(void)
         if (Fire_resistance) {
             pline("It seems quite tasty.");
             monstseesu(M_SEEN_FIRE);
-        } else
+        } else {
             losehp(rnd(6), "sipping boiling water", KILLED_BY);
+            monstunseesu(M_SEEN_FIRE);
+        }
         /* boiling water burns considered fire damage */
         break;
     case 3:

@@ -1355,6 +1355,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
     case AD_ACID:
         if (Acid_resistance) {
             You("are covered with a seemingly harmless goo.");
+            /* NB: the monst[un]seesu calls in gulpmu are no-ops since the
+               hero must be currently swallowed for the attack to hit... */
             monstseesu(M_SEEN_ACID);
             tmp = 0;
         } else {
@@ -1363,6 +1365,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
             else
                 You("are covered in slime!  It burns!");
             exercise(A_STR, FALSE);
+            monstunseesu(M_SEEN_ACID);
         }
         break;
     case AD_BLND:
@@ -1390,6 +1393,8 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 monstseesu(M_SEEN_ELEC);
                 ugolemeffects(AD_ELEC, tmp);
                 tmp = 0;
+            } else {
+                monstunseesu(M_SEEN_ELEC);
             }
         } else
             tmp = 0;
@@ -1402,8 +1407,10 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 monstseesu(M_SEEN_COLD);
                 ugolemeffects(AD_COLD, tmp);
                 tmp = 0;
-            } else
+            } else {
                 You("are freezing to death!");
+                monstunseesu(M_SEEN_COLD);
+            }
         } else
             tmp = 0;
         break;
@@ -1415,8 +1422,10 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
                 monstseesu(M_SEEN_FIRE);
                 ugolemeffects(AD_FIRE, tmp);
                 tmp = 0;
-            } else
+            } else {
                 You("are burning to a crisp!");
+                monstunseesu(M_SEEN_FIRE);
+            }
             burn_away_slime();
         } else
             tmp = 0;
@@ -1714,6 +1723,8 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                     monstseesu(M_SEEN_FIRE);
                     ugolemeffects(AD_FIRE, d(12, 6));
                     dmg = 0;
+                } else {
+                    monstunseesu(M_SEEN_FIRE);
                 }
                 burn_away_slime();
                 if (lev > rn2(20))
@@ -1741,6 +1752,7 @@ gazemu(struct monst *mtmp, struct attack *mattk)
                 fall_asleep(-rnd(10), TRUE);
                 pline("%s gaze makes you very sleepy...",
                       s_suffix(Monnam(mtmp)));
+                monstunseesu(M_SEEN_SLEEP);
             }
         }
         break;

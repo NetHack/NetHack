@@ -1422,6 +1422,7 @@ trapeffect_slp_gas_trap(
         } else {
             pline("A cloud of gas puts you to sleep!");
             fall_asleep(-rnd(25), TRUE);
+            monstunseesu(M_SEEN_SLEEP);
         }
         (void) steedintrap(trap, (struct obj *) 0);
     } else {
@@ -3835,6 +3836,7 @@ dofiretrap(
             u.mhmax -= rn2(min(u.mhmax, num + 1)), gc.context.botl = TRUE;
         if (u.mh > u.mhmax)
             u.mh = u.mhmax, gc.context.botl = TRUE;
+        monstunseesu(M_SEEN_FIRE);
     } else {
         int uhpmin = minuhpmax(1), olduhpmax = u.uhpmax;
 
@@ -3849,6 +3851,7 @@ dofiretrap(
         }
         if (u.uhp > u.uhpmax)
             u.uhp = u.uhpmax, gc.context.botl = TRUE;
+        monstunseesu(M_SEEN_FIRE);
     }
     if (!num)
         You("are uninjured.");
@@ -5843,8 +5846,10 @@ chest_trap(
                 You("don't seem to be affected.");
                 monstseesu(M_SEEN_ELEC);
                 dmg = 0;
-            } else
+            } else {
                 dmg = d(4, 4);
+                monstunseesu(M_SEEN_ELEC);
+            }
             destroy_item(RING_CLASS, AD_ELEC);
             destroy_item(WAND_CLASS, AD_ELEC);
             if (dmg)
@@ -6336,6 +6341,8 @@ lava_effects(void)
                        : " and are about to be immolated");
         if (Fire_resistance)
             monstseesu(M_SEEN_FIRE);
+        else
+            monstunseesu(M_SEEN_FIRE);
         if (u.uhp > 1)
             losehp(!boil_away ? 1 : (u.uhp / 2), lava_killer,
                    KILLED_BY); /* lava damage */

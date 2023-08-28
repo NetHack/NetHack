@@ -1760,6 +1760,7 @@ seffect_fire(struct obj **sobjp)
                 You_feel("a pleasant warmth in your %s.",
                          makeplural(body_part(HAND)));
         } else {
+            monstunseesu(M_SEEN_FIRE);
             pline_The("scroll catches fire and you burn your %s.",
                       makeplural(body_part(HAND)));
             losehp(1, "scroll of fire", KILLED_BY_AN);
