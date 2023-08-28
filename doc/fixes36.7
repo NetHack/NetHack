@@ -45,4 +45,5 @@ Windows: fix range error detected by address sanitizer in plselInitDialog()
 hilite_pile can remain on the map after eating food off the floor
 vms: update winprocs.h to ensure that CLR_MAX is defined; necessary for
 	compiling vmsmail.c which uses winprocs.h but not hack.h
-
+curses: when #quitting, just before the high scores are about to be shown
+	status_window was NULL and dereferenced, so add checks (issue #1090)
