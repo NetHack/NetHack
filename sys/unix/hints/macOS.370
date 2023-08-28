@@ -372,7 +372,7 @@ ifdef ($(WANT_DEFAULT),X11)
 PREINSTALL+= cp -n win/X11/nethack.rc ~/.nethackrc || true;
 endif	# WANT_DEFAULT X11
 
-PREINSTALL+= mkdir $(SHELLDIR);
+PREINSTALL+= (mkdir $(SHELLDIR) || true);
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
