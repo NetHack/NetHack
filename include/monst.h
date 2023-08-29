@@ -248,6 +248,8 @@ struct monst {
 #define engulfing_u(mon) (u.uswallow && (u.ustuck == (mon)))
 #define helpless(mon) ((mon)->msleeping || !(mon)->mcanmove)
 
+#define mon_perma_blind(mon) (!mon->mcansee && !mon->mblinded)
+
 #define mon_offmap(mon) (((mon)->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO|MON_OFFMAP)) != 0)
 
 /* Get the maximum difficulty monsters that can currently be generated,
