@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1222 $ $NHDT-Date: 1689448843 2023/07/15 19:20:43 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1233 $ $NHDT-Date: 1693292518 2023/08/29 07:01:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1661,6 +1661,9 @@ if something breakable was set up as alternate weapon and the second of two
 strength cap for hero poly'd into an orc captain was 18/50 even though it is
 	10/100 for Uruk-Hai and monster Uruk-Hai can grow into orc captains
 status_hilite rule for critical-hp takes precedence over up/down/changed HP
+livelog/#chronicle of multiple high priests reported their deaths as
+	"killed high priest" and "killed high priest (2nd time)" instead of
+	"killed high priest of Foo" and "killed high priest of Bar"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

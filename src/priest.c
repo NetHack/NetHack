@@ -1,4 +1,4 @@
-/* NetHack 3.7	priest.c	$NHDT-Date: 1624322670 2021/06/22 00:44:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.70 $ */
+/* NetHack 3.7	priest.c	$NHDT-Date: 1693292537 2023/08/29 07:02:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.93 $ */
 /* Copyright (c) Izchak Miller, Steve Linhart, 1989.              */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -301,6 +301,7 @@ char *
 priestname(
     struct monst *mon,
     int article,
+    boolean reveal_high_priest,
     char *pname) /* caller-supplied output buffer */
 {
     boolean do_hallu = Hallucination,
@@ -361,7 +362,8 @@ priestname(
 
     Strcat(pname, what);
     /* same as distant_monnam(), more or less... */
-    if (do_hallu || !high_priest || !Is_astralevel(&u.uz)
+    if (do_hallu || !high_priest || reveal_high_priest
+        || !Is_astralevel(&u.uz)
         || next2u(mon->mx, mon->my) || gp.program_state.gameover) {
         Strcat(pname, " of ");
         Strcat(pname, halu_gname(mon_aligntyp(mon)));

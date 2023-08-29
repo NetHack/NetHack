@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1689629242 2023/07/17 21:27:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1279 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1693292519 2023/08/29 07:01:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1282 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2292,7 +2292,7 @@ extern boolean inhistemple(struct monst *);
 extern int pri_move(struct monst *);
 extern void priestini(d_level *, struct mkroom *, int, int, boolean);
 extern aligntyp mon_aligntyp(struct monst *);
-extern char *priestname(struct monst *, int, char *);
+extern char *priestname(struct monst *, int, boolean, char *);
 extern boolean p_coaligned(struct monst *);
 extern struct monst *findpriest(char);
 extern void intemple(int);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1672605786 2023/01/01 20:43:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.280 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1693292527 2023/08/29 07:02:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1973,21 +1973,15 @@ x_monnam(
             EHalluc_resistance = 1L;
         if (!do_invis)
             mtmp->minvis = 0;
-        name = priestname(mtmp, article, buf2);
+        /* EXACT_NAME will force "of <deity>" on the Astral Plane */
+        name = priestname(mtmp, article,
+                          ((suppress & EXACT_NAME) == EXACT_NAME), buf2);
         EHalluc_resistance = save_prop;
         mtmp->minvis = save_invis;
         if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
             name += 4;
         return strcpy(buf, name);
     }
-#if 0   /* [now handled by mon_pmname()] */
-    /* an "aligned priest" not flagged as a priest or minion should be
-       "priest" or "priestess" (normally handled by priestname()) */
-    if (mdat == &mons[PM_ALIGNED_CLERIC])
-        pm_name = mtmp->female ? "priestess" : "priest";
-    else if (mdat == &mons[PM_HIGH_CLERIC] && mtmp->female)
-        pm_name = "high priestess";
-#endif
 
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
