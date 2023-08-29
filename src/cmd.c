@@ -1388,6 +1388,13 @@ wiz_kill(void)
             break;
         }
     }
+    /* since #wizkill takes no game time, it is possible to kill something
+       in the main dungeon and immediately level teleport into the endgame
+       which will delete the main dungeon's level files; avoid triggering
+       impossible "dmonsfree: 0 removed doesn't match N pending" by forcing
+       dead monster cleanup; we don't track whether anything was actually
+       killed above--if nothing was, this will be benign */
+    dmonsfree();
     /* distinction between ECMD_CANCEL and ECMD_OK is unimportant here */
     return ECMD_OK; /* no time elapses */
 }

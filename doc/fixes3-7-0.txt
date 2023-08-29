@@ -1664,6 +1664,9 @@ status_hilite rule for critical-hp takes precedence over up/down/changed HP
 livelog/#chronicle of multiple high priests reported their deaths as
 	"killed high priest" and "killed high priest (2nd time)" instead of
 	"killed high priest of Foo" and "killed high priest of Bar"
+using wizard mode #wizkill outside the endgame followed by m^V to enter the
+	endgame without any intervening moves would result in impossible
+	"dmonsfree: 0 removed doesn't match N pending on <endgame level>"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
