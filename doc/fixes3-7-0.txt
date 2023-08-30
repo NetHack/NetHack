@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1233 $ $NHDT-Date: 1693292518 2023/08/29 07:01:58 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1235 $ $NHDT-Date: 1693427872 2023/08/30 20:37:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1231,6 +1231,8 @@ unhide an unseen water monster using a polymorph trap on land
 allow defining random-teleport exclusion zones in lua
 if Magicbane cancelled a shapeshifter, forcing it to 'unshift', subsequent
 	messages continued to refer to the shifted form
+a pet that was poison resistant but not stoning resistant would eat Medusa's
+	corpse and be turned to stone
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

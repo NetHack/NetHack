@@ -1,4 +1,4 @@
-/* NetHack 3.7	dog.c	$NHDT-Date: 1652689621 2022/05/16 08:27:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	dog.c	$NHDT-Date: 1693427872 2023/08/30 20:37:52 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.146 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -936,7 +936,10 @@ dogfood(struct monst *mon, struct obj *obj)
         if (obj->otyp == CORPSE && is_rider(fptr))
             return TABU;
         if ((obj->otyp == CORPSE || obj->otyp == EGG)
-            && touch_petrifies(fptr) && !resists_ston(mon))
+            /* Medusa's corpse doesn't pass the touch_petrifies() test
+               but does cause petrification if eaten */
+            && (touch_petrifies(fptr) || obj->corpsenm == PM_MEDUSA)
+            && !resists_ston(mon))
             return POISON;
         if (obj->otyp == LUMP_OF_ROYAL_JELLY
             && mon->data == &mons[PM_KILLER_BEE]) {
