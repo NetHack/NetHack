@@ -8605,20 +8605,28 @@ doset_simple_menu(void)
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
+    /* when showing 'help', also describe how to run full doset() */
+    if (gs.simple_options_help) {
+        /* we could look up whether #optionsfull has been bound to a key
+           and show that, or whether #reqmenu and #options are both still
+           bound to keys and show those, but if meta keys are involved
+           the player might not know how to type them; keep this simple */
+        Strcpy(buf, "Use command '#optionsfull'"
+                    " to get the complete options list.");
+        any = cg.zeroany;
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 0, buf, MENU_ITEMFLAGS_NONE);
+    }
     any = cg.zeroany;
     any.a_int = -2 + 1;
     add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, 0,
              gs.simple_options_help ? "hide help" : "show help",
              MENU_ITEMFLAGS_NONE);
-    any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             0, "", MENU_ITEMFLAGS_NONE);
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
-        if (section != OptS_General)
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     0, "", MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 0, "", MENU_ITEMFLAGS_NONE);
         Sprintf(buf, " %-30s ", OptS_type[section]);
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                  iflags.menu_headings, 0,

@@ -1,12 +1,16 @@
  How dynamically setting options works:
 
- The options menu shows the current value for all options and lets
- you pick ones that you'd like to change.  Picking them doesn't make
- any immediate changes though.  That will take place once you close
- the menu.  For most of NetHack's interfaces, closing the menu is
- done by pressing the <enter> key or <return> key; others might
- require clicking on [ok].  Pressing the <escape> key or clicking
- on [cancel] will close the menu and discard any pending changes.
+ The simple options menu shows a relatively small subset of options
+ and operates on each choice you make immediately, then is put back
+ up to allow further changes.
+
+ The full options menu shows the current value for all options and
+ lets you pick ones that you'd like to change.  Picking them doesn't
+ make any changes though.  That will take place once you close the
+ menu.  For most of NetHack's interfaces, closing the menu is done
+ by pressing the <enter> key or <return> key; others might require
+ clicking on [ok].  Pressing the <escape> key or clicking on [cancel]
+ will close the menu and discard any pending changes.
 
  The options menu is too long to fit on one screen.  Some interfaces
  paginate menus; use the '>' key to advance a page or '<' to back
