@@ -1233,6 +1233,7 @@ if Magicbane cancelled a shapeshifter, forcing it to 'unshift', subsequent
 	messages continued to refer to the shifted form
 a pet that was poison resistant but not stoning resistant would eat Medusa's
 	corpse and be turned to stone
+ring of hunger prevents choking on your food
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
