@@ -51,15 +51,15 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #endif
 
 #ifdef AMIGA
-#define NH_abort_() Abort(0)
+#define NH_abort_ Abort(0)
 #else
 #ifdef SYSV
-#define NH_abort_() (void) abort()
+#define NH_abort_ (void) abort()
 #else
 #ifdef WIN32
-#define NH_abort_() win32_abort()
+#define NH_abort_ win32_abort()
 #else
-#define NH_abort_() abort()
+#define NH_abort_ abort()
 #endif
 #endif /* !SYSV */
 #endif /* !AMIGA */
@@ -98,7 +98,9 @@ ATTRNORETURN extern void nethack_exit(int) NORETURN;
 #endif
 #endif
 
+#ifdef PANICTRACE
 static void NH_abort(char *);
+#endif
 #ifndef NO_SIGNAL
 static void panictrace_handler(int);
 #endif
@@ -169,6 +171,7 @@ panictrace_setsignals(boolean set)
 }
 #endif /* NO_SIGNAL */
 
+#ifdef PANICTRACE
 static void
 NH_abort(char *why)
 {
@@ -204,8 +207,9 @@ NH_abort(char *why)
 #ifndef NO_SIGNAL
     panictrace_setsignals(FALSE);
 #endif
-    NH_abort_();
+    NH_abort_;
 }
+#endif
 
 /* Build a URL with a query string and try to launch a new browser window
  * to report from panic() or impossible().  Requires libc support for
