@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1693519381 2023/08/31 22:03:01 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.91 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -112,7 +112,7 @@ LUA2NHTOP = ../../..
 LUABASELIB = liblua-$(LUA_VERSION).a
 TOPLUALIB = lib/lua/$(LUABASELIB)
 
-ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb check-nhlua
 
 # first target is also the default target for 'make' without any arguments
 all:    $(ALLDEP)
@@ -125,8 +125,9 @@ $(GAME): lua_support
 lua_support: include/nhlua.h
 	@true
 $(LUATOP)/liblua.a: $(LUAHEADERS)/lua.h
-	( cd $(LUATOP) \
-	  && make $(LUAMAKEFLAGS) a && cd $(LUA2NHTOP) )
+	( cd $(LUATOP) && make $(LUAMAKEFLAGS) a ) && \
+	( util/makedefs --grep-defined CRASHREPORT && ( \
+	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
 $(TOPLUALIB): $(LUATOP)/liblua.a
 	@( if test -d lib/lua ; then true ; else mkdir -p lib/lua ; fi )
 	cp $(LUATOP)/liblua.a $@
@@ -146,6 +147,10 @@ lib/lua-$(LUA_VERSION)/src/lua.h:
 luabin:
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
+
+check-nhlua:
+	( util/makedefs --grep-defined CRASHREPORT && ( \
+	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
 
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:

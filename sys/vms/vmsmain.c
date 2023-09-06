@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsmain.c	$NHDT-Date: 1596498307 2020/08/03 23:45:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.45 $ */
+/* NetHack 3.7	vmsmain.c	$NHDT-Date: 1693359633 2023/08/30 01:40:33 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.57 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -50,7 +50,7 @@ main(int argc, char *argv[])
     privon();
 #endif
 
-    early_init();
+    early_init(argc, argv);
 
     atexit(byebye);
     /* vms_basename(,FALSE) strips device, directory, suffix, and version;

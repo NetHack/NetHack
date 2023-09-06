@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.527 $ $NHDT-Date: 1690870385 2023/08/01 06:13:05 $
+.\" $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.530 $ $NHDT-Date: 1693082582 2023/08/26 20:43:02 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -6001,6 +6001,12 @@ When available, it should be left commented out on single player
 installations because over time the file could grow to be extremely
 large unless it is actively maintained.
 .
+.lp
+CRASHREPORTURL\ =\ If set to
+\f(CRhttps://www.nethack.org/common/contact.html\fp
+and support is compiled in, brings up a browser window populated with
+the information needed to report a problem if the game panics or ends
+up in an internally inconsistent state.
 .hn 1
 Scoring
 .pg

@@ -1,4 +1,4 @@
-/* NetHack 3.7	windmain.c	$NHDT-Date: 1596498320 2020/08/03 23:45:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.157 $ */
+/* NetHack 3.7	windmain.c	$NHDT-Date: 1693359653 2023/08/30 01:40:53 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.189 $ */
 /* Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -484,7 +484,7 @@ MAIN(int argc, char *argv[])
     safe_routines();
 #endif /* WIN32CON */
 
-    early_init();
+    early_init(argc, argv);
 #ifdef _MSC_VER
 #ifdef DEBUG
     /* set these appropriately for VS debugging */

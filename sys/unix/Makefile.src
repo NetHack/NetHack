@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1693519377 2023/08/31 22:02:57 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.162 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -624,7 +624,8 @@ $(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS) \
+		$(AUTOLIBS)
 	@touch Sysunix
 
 Sys3B2:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile

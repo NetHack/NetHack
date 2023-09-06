@@ -8,8 +8,8 @@
 .de NR
 .ds Nr \\$2
 ..
-.NB $NHDT-Branch: NetHack-3.7 $
-.NR $NHDT-Revision: 1.18 $
+.NB $NHDT-Branch: keni-crashweb2 $
+.NR $NHDT-Revision: 1.21 $
 .ds Na Kenneth Lorber
 .SH NAME
 makedefs \- NetHack miscellaneous build-time functions
@@ -171,6 +171,11 @@ Turn on debug tracing for the grep function (
 .B --grep
 must be specified as well).
 .br
+.TP
+.BI --grep-defined " symbol"
+Exit shell true (0) if
+.I symbol
+is known and defined, otherwise exit shell false (1).
 .TP
 .BI --grep-define " symbol"
 Force the value of

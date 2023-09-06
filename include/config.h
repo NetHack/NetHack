@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1692385755 2023/08/18 19:09:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.174 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -205,6 +205,10 @@
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
  *              GDBPATH      (the path to the system gdb(1) program)
+ *              CRASHREPORT  (use CRASHREPORTURL if defined in syscf; this
+ *                           define specifies the name of the helper program
+ *                           used to launch the browser and enables the
+ *                           feature))
  *            Regular nethack options can also be specified in order to
  *            provide system-wide default values local to your system:
  *              OPTIONS      (same as in users' .nethackrc or defaults.nh)
@@ -233,6 +237,17 @@
 #endif
 #ifndef GREPPATH
 #define GREPPATH "/bin/grep"
+#endif
+
+#ifndef CRASHREPORT
+# ifdef MACOS
+    /* NB: This needs to be a full path unless it's in the playground. */
+//#define CRASHREPORT "NetHackCrashReport.JavaScript"
+# endif
+# ifdef __linux__
+    /* NB: This expects to find the nhlua binary as "./nhlua" */
+//#define CRASHREPORT "nhcrashreport.lua"
+# endif
 #endif
 
 /* note: "larger" is in comparison with 'record', the high-scores file

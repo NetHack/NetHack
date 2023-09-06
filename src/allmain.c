@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1691113621 2023/08/04 01:47:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1693359544 2023/08/30 01:39:04 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -26,9 +26,14 @@ static void debug_fields(const char *);
 static void dump_enums(void);
 #endif
 
+/*ARGSUSED*/
 void
-early_init(void)
+early_init(int argc UNUSED, char *argv[] UNUSED)
 {
+#ifdef CRASHREPORT
+	// Do this as early as possible, but let ports do other things first.
+    crashreport_init(argc, argv);
+#endif
     decl_globals_init();
     objects_globals_init();
     monst_globals_init();
@@ -906,6 +911,9 @@ static const struct early_opt earlyopts[] = {
 #ifdef WIN32
     { ARG_WINDOWS, "windows", 4, TRUE },
 #endif
+#ifdef CRASHREPORT
+    { ARG_BIDSHOW, "bidshow", 7, FALSE },
+#endif
 };
 
 #ifdef WIN32
@@ -993,6 +1001,11 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         case ARG_DUMPGLYPHIDS:
             dump_glyphids();
             return 2;
+#endif
+#ifdef CRASHREPORT
+	case ARG_BIDSHOW:
+	    crashreport_bidshow();
+	    return 2;
 #endif
 #ifdef WIN32
         case ARG_WINDOWS:

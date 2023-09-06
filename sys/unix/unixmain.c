@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1646313937 2022/03/03 13:25:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.117 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -65,7 +65,7 @@ main(int argc, char *argv[])
     boolean resuming = FALSE; /* assume new game */
     boolean plsel_once = FALSE;
 
-    early_init();
+    early_init(argc, argv);
 
 #if defined(__APPLE__)
     {
@@ -623,6 +623,15 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
             ++arg;
 
         switch (arg[1]) { /* char after leading dash */
+	case 'b':
+#ifdef CRASHREPORT
+		// --bidshow
+	    if (argcheck(argc, argv, ARG_BIDSHOW) == 2){
+                opt_terminate();
+                /*NOTREACHED*/
+	    }
+#endif
+	    break;
         case 'd':
             if (argcheck(argc, argv, ARG_DEBUG) == 1) {
                 consume_arg(ndx, argc_p, argv_p), consumed = 1;
