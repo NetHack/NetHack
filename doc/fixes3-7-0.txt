@@ -1670,6 +1670,7 @@ livelog/#chronicle of multiple high priests reported their deaths as
 using wizard mode #wizkill outside the endgame followed by m^V to enter the
 	endgame without any intervening moves would result in impossible
 	"dmonsfree: 0 removed doesn't match N pending on <endgame level>"
+dwarf/elf/orc/gnome hero killed by zombie would rise as human zombie for bones
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
