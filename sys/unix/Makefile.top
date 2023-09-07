@@ -142,7 +142,7 @@ include/nhlua.h: $(TOPLUALIB)
 	@echo '/*nhlua.h*/' >> $@
 # LUATESTTARGET is this by default
 lib/lua-$(LUA_VERSION)/src/lua.h:
-	@echo "Please do 'make fetch-lua' to obtain lua-$(LUA_VERSION)"
+	@echo "Please do 'make fetch-lua' in the top directory to obtain lua-$(LUA_VERSION)"
 	@false
 luabin:
 	( cd $(LUATOP) \
