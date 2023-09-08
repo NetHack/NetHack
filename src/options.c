@@ -176,9 +176,12 @@ static const struct paranoia_opts {
       "yes vs y to continue eating after first bite when satiated" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
-    /* extra y/n questions rather than changing y/n to yes/n[o] */
+    /* extra y/n questions rather than changing y/n to yes/n[o];
+       they switch to yes/no if paranoid:confirm is also set */
     { PARANOID_PRAY, "pray", 1, 0, 0,
       "y required to pray (supersedes old \"prayconfirm\" option)" },
+    { PARANOID_TRAP, "trap", 1, "move-trap", 1,
+      "y required to enter known trap unless considered harmless" },
     { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
       "y required to pick filter choice 'A' for menustyle:Full" },
     /* not a yes/n[o] vs y/n change nor a y/n addition */

@@ -214,7 +214,7 @@ packorder     a list of default symbols for kinds of       [")[%?+!=/(*`0_]
 paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
               of situations where alternate prompting is desired
               Confirm -- when requiring "yes", also require "no" to reject;
-                      also requires yes rather than y for pray, Autoall
+                      also requires yes rather than y for pray, trap, Autoall
               quit    -- yes vs y to confirm quitting or to enter explore mode
               die     -- yes vs y to confirm dying (for explore or debug mode)
               bones   -- yes vs y to confirm saving bones data in debug mode
@@ -224,6 +224,7 @@ paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
               Were-change -- yes vs y to confirm changing form due to
                       lycanthropy when hero has polymorph control;
               pray    -- y to confirm an attempt to pray; on by default
+              trap    -- y to enter a known trap unless it is harmless;
               swim    -- require m prefix to move into water or lava when
                       hero has seen it and isn't impaired; on by default;
               AutoAll -- y to confirm if using menustyle:Full and choice 'A'

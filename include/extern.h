@@ -2913,6 +2913,7 @@ extern struct monst *animate_statue(struct obj *, coordxy, coordxy,
                                     int, int *);
 extern struct monst *activate_statue_trap(struct trap *, coordxy, coordxy,
                                           boolean);
+extern int immune_to_trap(struct monst *, unsigned);
 extern void set_utrap(unsigned, unsigned);
 extern void reset_utrap(boolean);
 extern void dotrap(struct trap *, unsigned);

@@ -37,7 +37,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "August 5, 2023
+.ds f2 "September 8, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4246,6 +4246,11 @@ to lycanthropy when hero has polymorph control;
 require \(oqy\(cq to confirm an attempt to pray rather
 than immediately praying; on by default;
 (to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
+.PL trap
+require \(oqy\(cq to confirm an attempt to move into or onto a known trap,
+unless doing so is considered to be harmless;
+(to require \(lqyes\(rq rather than just \(oqy\(cq, set Confirm too);
+confirmation can be skipped by using the \(oq\f(CRm\fP\(cq movement prefix;
 .PL swim
 prevent walking into water or lava; on by default; (to deliberately step
 onto/into such terrain when this is set, use the \(oq\f(CRm\fP\(cq

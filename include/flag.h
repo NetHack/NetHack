@@ -85,7 +85,8 @@ struct flag {
 #define PARANOID_WERECHANGE 0x0100
 #define PARANOID_EATING     0x0200
 #define PARANOID_SWIM       0x0400
-#define PARANOID_AUTOALL    0x0800
+#define PARANOID_TRAP       0x0800
+#define PARANOID_AUTOALL    0x1000
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char discosort;    /* order of dodiscovery/doclassdisco output: o,s,c,a */
@@ -482,6 +483,8 @@ enum runmode_types {
 #define ParanoidEating ((flags.paranoia_bits & PARANOID_EATING) != 0)
 /* Prevent going into lava or water without explicitly forcing it */
 #define ParanoidSwim ((flags.paranoia_bits & PARANOID_SWIM) != 0)
+/* Prevent going onto/into known trap unless it is harmless */
+#define ParanoidTrap ((flags.paranoia_bits & PARANOID_TRAP) != 0)
 /* Require confirmation for choosing 'A' in class menu for menustyle:Full */
 #define ParanoidAutoAll ((flags.paranoia_bits & PARANOID_AUTOALL) != 0U)
 

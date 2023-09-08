@@ -2459,6 +2459,45 @@ domove_core(void)
     if (u_rooted())
         return;
 
+    /* warn maybe player before walking into known traps */
+    if (ParanoidTrap && (trap = t_at(x, y)) != 0 && trap->tseen
+        && (!gc.context.nopick || gc.context.run)
+        && !Stunned && !Confusion
+        && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
+            /* hallucination: all traps still show as ^, but the
+               hero can't tell what they are, so treat as dangerous */
+            || Hallucination)) {
+        char qbuf[QBUFSZ];
+        int traptype = (Hallucination ? rnd(TRAPNUM - 1) : (int) trap->ttyp);
+        boolean into = FALSE; /* "onto" the trap vs "into" */
+
+        switch (traptype) {
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TELEP_TRAP:
+        case LEVEL_TELEP:
+        case MAGIC_PORTAL:
+        case WEB:
+            into = TRUE;
+            break;
+        }
+        Snprintf(qbuf, sizeof qbuf, "Really %s %s that %s?",
+                 locomotion(gy.youmonst.data, "step"),
+                 into ? "into" : "onto",
+                 defsyms[trap_to_defsym(traptype)].explanation);
+        /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
+           isn't set, don't ask at all but if it is set (checked above),
+           ask via y/n if parnoid_confirm:confirm isn't also set or via
+           yes/no if it is */
+        if (!paranoid_query(ParanoidConfirm, qbuf)) {
+            nomul(0);
+            gc.context.move = 0;
+            return;
+        }
+    }
+
     if (u.utrap) {
         boolean moved = trapmove(x, y, trap);
 
