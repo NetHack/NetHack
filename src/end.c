@@ -224,10 +224,12 @@ NH_abort(char *why)
 
 #ifdef CRASHREPORT
 # include <fcntl.h>
+# define HASH_PRAGMA_START \
+    _Pragma("GCC diagnostic push"); \
+    _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+# define HASH_PRAGMA_END   _Pragma("GCC diagnostic pop");
 # ifdef MACOS
 #  include <CommonCrypto/CommonDigest.h>
-#  define HASH_PRAGMA_START
-#  define HASH_PRAGMA_END
 #  define HASH_CONTEXT CC_MD4_CTX
 #  define HASH_INIT(ctx) CC_MD4_Init(ctx)
 #  define HASH_UPDATE(ctx, ptr, len) CC_MD4_Update(ctx, ptr, len)
@@ -236,16 +238,11 @@ NH_abort(char *why)
 # endif
 # ifdef __linux__
 #  include <openssl/md4.h>
-#  define HASH_PRAGMA_START \
-	_Pragma("GCC diagnostic push"); \
-	_Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
-#  define HASH_PRAGMA_END   _Pragma("GCC diagnostic pop");
 #  define HASH_CONTEXT MD4_CTX
 #  define HASH_INIT(ctx) MD4_Init(ctx)
 #  define HASH_UPDATE(ctx, ptr, len) MD4_Update(ctx, ptr, len)
 #  define HASH_FINISH(ctx, out) MD4_Final(out, ctx)
 #  define HASH_RESULT_SIZE MD4_DIGEST_LENGTH
-
 # endif
 // Binary ID - Use only as a hint to contact.html for recognizing our own
 // binaries.  This is easily spoofed!
@@ -260,35 +257,35 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
     HASH_INIT(&ctx);
 #ifdef MACOS
     char *binfile = argv[0];
-    if(!binfile || !*binfile){
+    if (!binfile || !*binfile) {
 # ifdef BETA
-	    // If this triggers, investigate CFBundleGetMainBundle
-	    // or CFBundleCopyExecutableURL.
-	raw_print("BETA warning: crashreport_init called without useful info");
+                // If this triggers, investigate CFBundleGetMainBundle
+                // or CFBundleCopyExecutableURL.
+        raw_print("BETA warning: crashreport_init called without useful info");
 # endif
-	goto skip;
+        goto skip;
     }
 #endif
 #ifdef __linux__
     char binfile[PATH_MAX+1];
     int len = readlink("/proc/self/exe", binfile, sizeof(binfile)-1);
-    if(len>0) {
-	binfile[len] = '\0';
+    if (len>0) {
+        binfile[len] = '\0';
     } else {
-	goto skip;
+        goto skip;
     }
 #endif
     int fd = open(binfile, O_RDONLY, 0);
-    if(fd == -1) {
+    if (fd == -1) {
 # ifdef BETA
-	raw_printf("open e=%s",strerror(errno));
+        raw_printf("open e=%s",strerror(errno));
 # endif
-	goto skip;
+        goto skip;
     }
     int segsize;
     char segment[4096];
-    while(0 < (segsize = read(fd, segment,sizeof(segment)))){
-	HASH_UPDATE(&ctx, segment, segsize);
+    while (0 < (segsize = read(fd, segment,sizeof(segment)))) {
+        HASH_UPDATE(&ctx, segment, segsize);
     }
     HASH_FINISH(&ctx, tmp);
     close(fd);
@@ -296,8 +293,8 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
     char *p = bid;
     unsigned char *in = &tmp[0];
     char cnt=HASH_RESULT_SIZE;
-    while(cnt--){
-	p += snprintf(p, HASH_RESULT_SIZE-(p-bid), "%02x",*(in++));
+    while (cnt--) {
+        p += snprintf(p, HASH_RESULT_SIZE-(p-bid), "%02x",*(in++));
     }
     *p = '\0';
     return;
@@ -320,108 +317,108 @@ crashreport_bidshow(void){
 
 boolean
 submit_web_report(const char *msg, char *why){
-    if(sysopt.crashreporturl){
-	const char *xargv[SWR_LINES];
-	char version[100];
-	char versionstring[200];	// used twice as a temp
-	int  xargc = 0;
-	char wholetrace[SWR_LINES*80];  // XXX roughly 71 on MacOS, plus buffer
-	int  prelines = 0;		// count of lines in trace header
-	char nbuf[6];			// number buffer
-	extern char **environ;
-	pid_t pid;
+    if (sysopt.crashreporturl) {
+        const char *xargv[SWR_LINES];
+        char version[100];
+        char versionstring[200];        // used twice as a temp
+        int  xargc = 0;
+        char wholetrace[SWR_LINES*80];  // XXX roughly 71 on MacOS, plus buffer
+        int  prelines = 0;              // count of lines in trace header
+        char nbuf[6];                   // number buffer
+        extern char **environ;
+        pid_t pid;
 
-	SWR_ADD(CRASHREPORT);
-	SWR_ADD(sysopt.crashreporturl);
-	    // then pairs of key value
-	    // subject, generate something useful
-	SWR_ADD("subject");
-	snprintf(version, sizeof(version), "%s report for NetHack %s",
-		msg, version_string(versionstring, sizeof(versionstring)));
-	SWR_ADD(version);
-	    // name:  someday, this might be stored in nethackcnf
-	    // email: someday, this might be stored in nethackcnf
-	    // gitver, pull from version.c
-	SWR_ADD("gitver");
-	SWR_ADD(getversionstring(versionstring, sizeof(versionstring)));
-	    // hardware: leave for user
-	    // software: leave for user
-	    // comments: leave for user
-	    // details: stack trace
-	SWR_ADD("details");
+        SWR_ADD(CRASHREPORT);
+        SWR_ADD(sysopt.crashreporturl);
+                // then pairs of key value
+                // subject, generate something useful
+        SWR_ADD("subject");
+        snprintf(version, sizeof(version), "%s report for NetHack %s",
+            msg, version_string(versionstring, sizeof(versionstring)));
+        SWR_ADD(version);
+                // name:  someday, this might be stored in nethackcnf
+                // email: someday, this might be stored in nethackcnf
+                // gitver, pull from version.c
+        SWR_ADD("gitver");
+        SWR_ADD(getversionstring(versionstring, sizeof(versionstring)));
+                // hardware: leave for user
+                // software: leave for user
+                // comments: leave for user
+                // details: stack trace
+        SWR_ADD("details");
 
 // XXX header for wholetrace - what other info do we want?
 // NB: prelines not tested against size of SWR_FRAMES.
 #define SWR_HDR(line) \
-  if(endp<&wholetrace[sizeof(wholetrace)]){ \
+  if (endp<&wholetrace[sizeof(wholetrace)]) { \
     endp+=snprintf(endp, sizeof(wholetrace)-(endp-wholetrace), "%s\n",line); \
     prelines++; \
   }
 #define SWR_HDRnonl(line) \
-  if(endp<&wholetrace[sizeof(wholetrace)]){ \
+  if (endp<&wholetrace[sizeof(wholetrace)]) { \
     endp+=snprintf(endp, sizeof(wholetrace)-(endp-wholetrace), "%s",line); \
   }
-	char *endp = wholetrace;
-	wholetrace[0] = 0;
-	if(why){
-	    SWR_HDR(why);
-	}
+        char *endp = wholetrace;
+        wholetrace[0] = 0;
+        if (why) {
+            SWR_HDR(why);
+        }
 
-	SWR_HDRnonl("bid: ");
-	SWR_HDR(bid);
+        SWR_HDRnonl("bid: ");
+        SWR_HDR(bid);
 
-	void *bt[SWR_FRAMES];
-	int count, x;
-	char **info, buf[BUFSZ];
+        void *bt[SWR_FRAMES];
+        int count, x;
+        char **info, buf[BUFSZ];
 
-	count = backtrace(bt, SIZE(bt));
-	info = backtrace_symbols(bt, count);
-	for (x = 0; x < count; x++) {
-	    copynchars(buf, info[x], (int) sizeof buf - 1);
-	    /* try to remove up to 16 blank spaces by removing 8 twice */
-	    (void) strsubst(buf, "        ", "");
-	    (void) strsubst(buf, "        ", "");
-	    snprintf(endp, SWR_FRAMES*80-(endp-wholetrace), "[%02lu] %s\n",
-	      (unsigned long) x, buf);
-	    endp = eos(endp);
-	}
-	*(endp-1) = '\0';   // remove last newline
-	SWR_ADD(wholetrace);
+        count = backtrace(bt, SIZE(bt));
+        info = backtrace_symbols(bt, count);
+        for (x = 0; x < count; x++) {
+            copynchars(buf, info[x], (int) sizeof buf - 1);
+                /* try to remove up to 16 blank spaces by removing 8 twice */
+            (void) strsubst(buf, "        ", "");
+            (void) strsubst(buf, "        ", "");
+            snprintf(endp, SWR_FRAMES*80-(endp-wholetrace), "[%02lu] %s\n",
+                (unsigned long) x, buf);
+            endp = eos(endp);
+        }
+        *(endp-1) = '\0';   // remove last newline
+        SWR_ADD(wholetrace);
 
-	    // detailrows min(actual,50)  Guess since we can't know the
-	    //     width of the window.
-	SWR_ADD("detailrows");
-	(void)snprintf(nbuf,sizeof(nbuf),"%d",count+prelines);
-	SWR_ADD(nbuf);
-	xargv[xargc++] = 0; // terminate array
+                // detailrows min(actual,50)  Guess since we can't know the
+                //     width of the window.
+        SWR_ADD("detailrows");
+        (void)snprintf(nbuf,sizeof(nbuf),"%d",count+prelines);
+        SWR_ADD(nbuf);
+        xargv[xargc++] = 0; // terminate array
 
-	pid = fork();
-	if( pid == 0 ){
-	    execve(CRASHREPORT, (char * const *)xargv, environ);
-	    char err[100];
-	    sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
-	    raw_print(err);
-	} else {
-	    int status;
-	    errno=0;
-		// XXX do we _really_ know this is the right pid?
-	    (void)waitpid(pid, &status, 0);
-	    if(status){	// XXX check could be more precise
+        pid = fork();
+        if (pid == 0) {
+            execve(CRASHREPORT, (char * const *)xargv, environ);
+            char err[100];
+            sprintf(err, "Can't start " CRASHREPORT ": %s", strerror(errno));
+            raw_print(err);
+        } else {
+            int status;
+            errno=0;
+                    // XXX do we _really_ know this is the right pid?
+            (void)waitpid(pid, &status, 0);
+            if (status) {         // XXX check could be more precise
 #if 0
-// Not useful at the moment. XXX
-		char err[100];
-		sprintf(err, "pid=%d e=%d status=%0x",wpid,errno,status);
-		raw_print(err);
+                    // Not useful at the moment. XXX
+                char err[100];
+                sprintf(err, "pid=%d e=%d status=%0x",wpid,errno,status);
+                raw_print(err);
 #endif
-		return FALSE;
-	    }
-	}
-	/* free(info);   -- Don't risk it. */
-	return TRUE;
+                return FALSE;
+            }
+        }
+        /* free(info);   -- Don't risk it. */
+        return TRUE;
     }
     return FALSE;
 }
-#endif	// CRASHREPORT
+#endif  /* CRASHREPORT */
 #undef SWR_ADD
 #undef SWR_FRAMES
 #undef SWR_HDR
