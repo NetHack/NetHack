@@ -6008,7 +6008,7 @@ large unless it is actively maintained.
 .
 .lp
 CRASHREPORTURL\ =\ If set to
-\f(CRhttps://www.nethack.org/common/contact.html\fp
+\f(CRhttps://www.nethack.org/common/contact.html\fP
 and support is compiled in, brings up a browser window populated with
 the information needed to report a problem if the game panics or ends
 up in an internally inconsistent state.
