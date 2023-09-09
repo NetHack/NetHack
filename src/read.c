@@ -2506,15 +2506,18 @@ do_class_genocide(void)
     boolean gameover = FALSE; /* true iff killed self */
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
-    for (j = 0;; j++) {
+    for (j = 0; ; j++) {
         if (j >= 5) {
             pline1(thats_enough_tries);
             return;
         }
         Strcpy(promptbuf, "What class of monsters do you want to genocide?");
-        if (iflags.cmdassist && j > 0)
-            Strcat(promptbuf,
-                   " [enter the symbol or name representing a class]");
+        if (j > 0)
+            Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
+                     " [enter %s]",
+                     iflags.cmdassist
+                       ? "the symbol or name representing a class, or '?'"
+                       : "'?' to see previous genocides");
         getlin(promptbuf, buf);
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
@@ -2533,6 +2536,13 @@ do_class_genocide(void)
             livelog_printf(LL_GENOCIDE,
                            "declined to perform class genocide");
             return;
+        }
+        /* "?" runs #genocided to show existing genocides, then re-prompts;
+           accept "'?'" too because the prompt's hint shows it that way */
+        if (!strcmp(buf, "?") || !strcmp(buf, "'?'")) {
+            list_genocided('g', FALSE);
+            --j; /* don't count this iteration as one of the tries */
+            continue;
         }
 
         class = name_to_monclass(buf, (int *) 0);
@@ -2705,8 +2715,12 @@ do_genocide(
                 return;
             }
             Strcpy(promptbuf, "What type of monster do you want to genocide?");
-            if (iflags.cmdassist && i > 0)
-                Strcat(promptbuf, " [enter the name of a type of monster]");
+            if (i > 0)
+                Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
+                         " [enter %s]",
+                         iflags.cmdassist
+                           ? "the name of a type of monster, or '?'"
+                           : "'?' to see previous genocides");
             getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
@@ -2727,6 +2741,12 @@ do_genocide(
 
                 livelog_printf(LL_GENOCIDE, "declined to perform genocide");
                 return;
+            }
+            /* "?" or "'?'" runs #genocided to show existing genocides */
+            if (!strcmp(buf, "?") || !strcmp(buf, "'?'")) {
+                list_genocided('g', FALSE);
+                --i; /* don't count this iteration as one of the tries */
+                continue;
             }
 
             mndx = name_to_mon(buf, (int *) 0);

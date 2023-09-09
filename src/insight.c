@@ -2882,14 +2882,18 @@ list_genocided(char defquery, boolean ask)
     char c;
     winid klwin;
     char buf[BUFSZ];
-    boolean dumping; /* for DUMPLOG; doesn't need to be conditional */
+    boolean genoing, /* prompting for genocide or class genocide */
+            dumping; /* for DUMPLOG; doesn't need to be conditional */
     boolean both = (gp.program_state.gameover || wizard || discover);
 
     dumping = (defquery == 'd');
-    if (dumping)
+    genoing = (defquery == 'g');
+    if (dumping || genoing)
         defquery = 'y';
+    if (genoing)
+        both = FALSE; /* genocides only, not extinctions */
 
-    /* this goess through the whole monster list up to three times but will
+    /* this goes through the whole monster list up to three times but will
        happen rarely and is simpler than a more general single pass check;
        extinctions are only revealed during end of game disclosure or when
        running in wizard or explore mode */
@@ -2985,7 +2989,7 @@ list_genocided(char defquery, boolean ask)
     } else if (!gp.program_state.gameover) {
         /* #genocided rather than final disclosure, so pline() is ok and
            extinction has been ignored */
-        pline("No creatures have been genocided.");
+        pline("No creatures have been genocided%s.", genoing ? " yet" : "");
 #ifdef DUMPLOG
     } else if (dumping) { /* 'gameover' is True if we make it here */
         putstr(0, 0, "No species were genocided or became extinct.");
