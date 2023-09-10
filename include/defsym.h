@@ -146,7 +146,7 @@
                                   "raised drawbridge", CLR(CLR_BROWN))
     PCHAR( 46, ' ',  S_air,    "air", CLR(CLR_CYAN))
     PCHAR( 47, '#',  S_cloud,  "cloud", CLR(CLR_GRAY))
-    PCHAR( 48, '}',  S_water,  "water", CLR(CLR_BLUE))
+    PCHAR( 48, '}',  S_water,  "water", CLR(CLR_BRIGHT_BLUE))
     /* end dungeon characters                                          */
     /*                                                                 */
     /* begin traps                                                     */
