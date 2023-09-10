@@ -2733,7 +2733,7 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             if (!iflags.use_color) {
                 /* try to provide a visible difference between water and lava
                    if they use the same symbol and color is disabled */
-                if (cmap == S_lava
+                if ((cmap == S_lava || cmap == S_lavawall)
                     && (gs.showsyms[gmap->sym.symidx]
                             == gs.showsyms[S_pool + SYM_OFF_P]
                         || gs.showsyms[gmap->sym.symidx]
