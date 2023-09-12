@@ -15,7 +15,7 @@
                          Original version - Eric S. Raymond
           (Edited and expanded for NetHack 3.7.0 by Mike Stephenson and others)
 
-                                   August 5, 2023
+                                  September 8, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -192,7 +192,7 @@
           you have seen on the current dungeon level; as you  explore  more
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -390,7 +390,7 @@
                you have available for spell casting.  Again,  resting  will
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -522,7 +522,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -588,7 +588,7 @@
           ing  a  `*'  lists  your  entire  inventory,  so  you can see the
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -654,7 +654,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -720,7 +720,7 @@
                there).
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -786,7 +786,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -984,7 +984,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1050,7 +1050,7 @@
                for  which  one to take off.  (Note that this treats a cloak
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1116,7 +1116,7 @@
                that   redundant,   such   as  Caveman  or  Priestess),  and
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1182,7 +1182,7 @@
           (R)UNIX is a registered trademark of The Open Group.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1314,7 +1314,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1446,7 +1446,7 @@
                Show a menu of possible actions  directed  at  your  current
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1512,7 +1512,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1578,7 +1578,7 @@
                that level.  This will also force all visited levels  to  be
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1710,7 +1710,7 @@
                Prefix key to rush towards a direction.  Default is `g' when
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1776,7 +1776,7 @@
                objects and monsters temporarily removed, making it possible
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1842,7 +1842,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -1974,7 +1974,7 @@
                Show monster birth, death, genocide, and extinct statistics.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2106,7 +2106,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2172,7 +2172,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2238,7 +2238,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2304,7 +2304,7 @@
           always below the current level.  Usually that will  be  the  next
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2370,7 +2370,7 @@
           previously visited level, it will be loaded from its file on disk
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2436,7 +2436,7 @@
           ventory-like display of any unpaid items which have been used up,
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2502,7 +2502,7 @@
           fountain or an altar  or  various  other  things  doesn't  elicit
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2568,7 +2568,7 @@
           Beware!  You may suddenly come upon one in a  dark  place.   Some
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2634,7 +2634,7 @@
           Initially, your pet may even be better  at  killing  things  than
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2700,7 +2700,7 @@
           sense--perhaps it is invisible and has just  tapped  you  on  the
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2766,7 +2766,7 @@
           the "#name" command, for the same purpose at any  time,  to  name
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2832,7 +2832,7 @@
           (killing them first).  Without a weapon,  you  do  only  1-2  hit
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2898,7 +2898,7 @@
           "#enhance" (see below).
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -2964,7 +2964,7 @@
           spot.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3030,7 +3030,7 @@
           ondary is just an item in your inventory that's  been  designated
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3096,7 +3096,7 @@
           eventually  negative)  but  can also be enchanted.  Shirts are an
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3162,7 +3162,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3228,7 +3228,7 @@
           mana points from an otherwise spent wand, destroying  it  in  the
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3294,7 +3294,7 @@
           you can end up wasting both the energy and the time  required  in
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3360,7 +3360,7 @@
           challenge which is very difficult to accomplish).
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3426,7 +3426,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3492,7 +3492,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3558,7 +3558,7 @@
           brains while polymorphed into a mind flayer, is considered eating
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3624,7 +3624,7 @@
           can't be bypassed,  such  as  being  unable  to  push  a  boulder
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3690,7 +3690,7 @@
           Soko-Prize - Explored to the top of Sokoban
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3756,7 +3756,7 @@
           NETHACKOPTIONS or  run-time  configuration  file  prior  to  game
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3888,7 +3888,7 @@
             extended  command.   Prefix the command with "!" to disable the
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -3954,7 +3954,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4020,7 +4020,7 @@
           initial values for the various options.  Some can only be  turned
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4086,7 +4086,7 @@
             lowed.   See  role  for a description of how to use negation to
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4152,7 +4152,7 @@
                         key or you decline to use the key; has no effect on
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4218,7 +4218,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4350,7 +4350,7 @@
             exclude choices.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4416,7 +4416,7 @@
             Ignore  interrupt  signals,  including  breaks  (default  off).
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4482,7 +4482,7 @@
             the  selected  object  class(es).   Combination  starts  with a
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4548,7 +4548,7 @@
             Key to select all items in a menu.  Default `.'.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4614,7 +4614,7 @@
             can  also set your character's role by appending a dash and one
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4680,7 +4680,7 @@
                           too;
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4711,6 +4711,11 @@
                           than  immediately praying; on by default; (to re-
                           quire "yes" rather than  just  `y',  set  Confirm
                           too);
+            trap        - require `y' to confirm an attempt to move into or
+                          onto a known trap, unless doing so is  considered
+                          to  be  harmless;  (to  require "yes" rather than
+                          just `y', set Confirm too); confirmation  can  be
+                          skipped by using the `m' movement prefix;
             swim        - prevent  walking  into  water  or lava; on by de-
                           fault; (to deliberately step onto/into such  ter-
                           rain  when this is set, use the `m' movement pre-
@@ -4740,13 +4745,8 @@
             positive (no `!') and negative (with `!') entries can be inter-
             mixed.
 
-          perm_invent
-            If  true,  always  display  your current inventory in a window.
-            This only makes sense for windowing system interfaces that  im-
-            plement this feature.
 
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4755,6 +4755,11 @@
           NetHack Guidebook                                              73
 
 
+
+          perm_invent
+            If  true,  always  display  your current inventory in a window.
+            This only makes sense for windowing system interfaces that  im-
+            plement this feature.
 
           petattr
             Specifies  one or more text highlighting attributes to use when
@@ -4805,14 +4810,9 @@
 
           pickup_types
             Specify the object types to be picked up when autopickup is on.
-            Default is all types.  Persistent.
-
-            The value is a list of object symbols, such as pickup_types:$?!
-            to pick up  gold,  scrolls,  and  potions.   You  can  use  au-
-            topickup_exception  configuration  file lines to further refine
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4822,6 +4822,11 @@
 
 
 
+            Default is all types.  Persistent.
+
+            The value is a list of object symbols, such as pickup_types:$?!
+            to pick up  gold,  scrolls,  and  potions.   You  can  use  au-
+            topickup_exception  configuration  file lines to further refine
             autopickup behavior.
 
             There is no way to set pickup_types to "none".  (Setting it  to
@@ -4872,13 +4877,8 @@
             of the non-human races are allowed.  See role for a description
             of how to use negation to exclude choices.
 
-            Default  is  random.  Cannot be set with the `O' command.  Per-
-            sistent.
 
-
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4887,6 +4887,9 @@
           NetHack Guidebook                                              75
 
 
+
+            Default  is  random.  Cannot be set with the `O' command.  Per-
+            sistent.
 
           rest_on_space
             Make the space bar a synonym for the `.' (#wait)  command  (de-
@@ -4939,12 +4942,9 @@
             tual results of moving.  The default is "run";  versions  prior
             to  3.4.1  used  "teleport" only.  Whether or not the effect is
             noticeable will depend upon the window port used or on the type
-            of terminal.  Persistent.
 
 
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -4953,6 +4953,8 @@
           NetHack Guidebook                                              76
 
 
+
+            of terminal.  Persistent.
 
           safe_pet
             Prevent  you from (knowingly) attacking your pets (default on).
@@ -5006,11 +5008,9 @@
             a - list alphabetically across all classes.
 
             Can be interactively set via the `O' command or via  using  the
-            `m' prefix before the `\' or ``' command.
 
 
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5019,6 +5019,8 @@
           NetHack Guidebook                                              77
 
 
+
+            `m' prefix before the `\' or ``' command.
 
           sortloot
             Controls the sorting behavior of the pickup lists for inventory
@@ -5072,11 +5074,9 @@
           statushilites
             Controls  how  many turns status hilite behaviors highlight the
             field.  If negated or set to zero,  disables  status  hiliting.
-            See "Configuring Status Hilites" for further information.
 
 
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5085,6 +5085,8 @@
           NetHack Guidebook                                              78
 
 
+
+            See "Configuring Status Hilites" for further information.
 
           status_updates
             Allow  updates  to the status lines at the bottom of the screen
@@ -5140,9 +5142,7 @@
             option on or off in the config file will skip the query.
 
 
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5208,7 +5208,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5274,7 +5274,7 @@
             example, specified with the traps option) straight  through  to
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5340,7 +5340,7 @@
             If NetHack can,  it  should  display  the  map  in  the  manner
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5406,7 +5406,7 @@
             so  uses  the  statuslines  value  differently.   A  value of 3
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5472,7 +5472,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5538,7 +5538,7 @@
             tell NetHack to convert a two character sequence beginning with
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5670,7 +5670,7 @@
             ception rules and not saved with the game.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5736,7 +5736,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5802,7 +5802,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -5934,7 +5934,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6198,7 +6198,7 @@
                  ceded by `<=' or `>=' instead, it also matches when  value
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6264,7 +6264,7 @@
           value  string  in conventional C fashion.  This means that \ is a
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6396,7 +6396,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6528,7 +6528,7 @@
           file.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6594,7 +6594,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6660,7 +6660,7 @@
           recognized in this file are listed below.   Any  option  not  set
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6726,7 +6726,7 @@
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6788,11 +6788,11 @@
             time the file could grow to be extremely large unless it is ac-
             tively maintained.
 
+            CRASHREPORTURL = If set to  https://www.nethack.org/common/con-
+            tact.html  and  support  is  compiled  in,  brings up a browser
 
 
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6801,6 +6801,10 @@
           NetHack Guidebook                                             104
 
 
+
+            window populated with the information needed to report a  prob-
+            lem if the game panics or ends up in an internally inconsistent
+            state.
 
           10.  Scoring
 
@@ -6852,13 +6856,9 @@
           for tracking down problems within the program rather than to pro-
           vide god-like powers to your character, and players  who  attempt
           debugging  are  expected  to figure out how to use it themselves.
-          It is initiated by starting the game  with  the  -D  command-line
-          switch or with the playmode:debug option.
 
 
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6867,6 +6867,9 @@
           NetHack Guidebook                                             105
 
 
+
+          It is initiated by starting the game  with  the  -D  command-line
+          switch or with the playmode:debug option.
 
                For  some systems, the player must be logged in under a par-
           ticular user name to be allowed to use debug  mode;  for  others,
@@ -6919,12 +6922,9 @@
           archives  accessible  via  ftp  and  uucp after expiring from the
           newsgroup.
 
-               Later, Mike coordinated a major re-write of the game,  head-
-          ing  a  team which included Ken Arromdee, Jean-Christophe Collet,
-          Steve Creps, Eric Hendrickson, Izchak Miller,  Eric  S.  Raymond,
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -6934,6 +6934,9 @@
 
 
 
+               Later, Mike coordinated a major re-write of the game,  head-
+          ing  a  team which included Ken Arromdee, Jean-Christophe Collet,
+          Steve Creps, Eric Hendrickson, Izchak Miller,  Eric  S.  Raymond,
           John  Rupley, Mike Threepoint, and Janet Walz, to produce NetHack
           3.0c.
 
@@ -6986,11 +6989,8 @@
           Joshua Delahunty, was responsible for the VMS version of  NetHack
           3.1.  Michael Allison ported NetHack 3.1 to Windows NT.
 
-               Dean  Luick,  with  help from David Cohrs, developed NetHack
-          3.1 for X11.  It drew the map as text rather than graphically but
 
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7000,6 +7000,8 @@
 
 
 
+               Dean  Luick,  with  help from David Cohrs, developed NetHack
+          3.1 for X11.  It drew the map as text rather than graphically but
           included  nh10.bdf,  an optionally used custom X11 font which has
           tiny images in place of letters and punctuation, a  precursor  of
           tiles.   Those  images don't extend to individual monster and ob-
@@ -7051,12 +7053,10 @@
           ing  system  with  the Wizard Patch.  Warwick Allison also ported
           NetHack to use the Qt interface.
 
-               Warren Cheung combined SLASH with the Wizard Patch  to  pro-
-          duce  Slash'EM,  and with the help of Kevin Hugo, added more fea-
-          tures.  Kevin later  joined  the  NetHack  Development  Team  and
 
 
-          NetHack 3.7.0                                      August 5, 2023
+
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7066,7 +7066,10 @@
 
 
 
-          incorporated the best of these ideas into NetHack 3.3.
+               Warren Cheung combined SLASH with the Wizard Patch  to  pro-
+          duce  Slash'EM,  and with the help of Kevin Hugo, added more fea-
+          tures.  Kevin later joined the NetHack Development Team  and  in-
+          corporated the best of these ideas into NetHack 3.3.
 
                The final update to 3.2 was the bug fix release 3.2.3, which
           was released simultaneously with 3.3.0 in December 1999  just  in
@@ -7117,12 +7120,9 @@
 
                Pat Rankin maintained 3.4 for VMS.
 
-               Michael Allison maintained NetHack 3.4 for the MS-DOS  plat-
-          form.  Paul Winner and Yitzhak Sapir provided encouragement.
 
 
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7131,6 +7131,9 @@
           NetHack Guidebook                                             109
 
 
+
+               Michael Allison maintained NetHack 3.4 for the MS-DOS  plat-
+          form.  Paul Winner and Yitzhak Sapir provided encouragement.
 
                Dean  Luick, Mark Modrall, and Kevin Hugo maintained and en-
           hanced the Macintosh port of 3.4.
@@ -7182,13 +7185,10 @@
                At the beginning of development for  what  would  eventually
           get  released as 3.6.0, the NetHack Development Team consisted of
           Warwick Allison, Michael  Allison,  Ken  Arromdee,  David  Cohrs,
-          Jessie  Collet, Ken Lorber, Dean Luick, Pat Rankin, Mike Stephen-
-          son, Janet Walz, and Paul Winner.  In early 2015,  ahead  of  the
-          release of 3.6.0, new members Sean Hunt, Pasi Kallinen, and Derek
-          S. Ray joined the NetHack Development Team.
+          Jessie   Collet,   Ken  Lorber,  Dean  Luick,  Pat  Rankin,  Mike
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7197,6 +7197,10 @@
           NetHack Guidebook                                             110
 
 
+
+          Stephenson, Janet Walz, and Paul Winner.  In early 2015, ahead of
+          the  release  of 3.6.0, new members Sean Hunt, Pasi Kallinen, and
+          Derek S. Ray joined the NetHack Development Team.
 
                Near the end of the development of 3.6.0, one of the signif-
           icant  inspirations  for  many  of  the humorous and fun features
@@ -7247,14 +7251,10 @@
                NetHack 3.6.3 was released on December  5,  2019  containing
           over 190 bug fixes to NetHack 3.6.2.
 
-               NetHack 3.6.4 was released on December 18, 2019 containing a
-          security fix and a few bug fixes.
-
-               NetHack 3.6.5 was released on January  27,  2020  containing
-          some security fixes and a small number of bug fixes.
 
 
-          NetHack 3.7.0                                      August 5, 2023
+
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7263,6 +7263,12 @@
           NetHack Guidebook                                             111
 
 
+
+               NetHack 3.6.4 was released on December 18, 2019 containing a
+          security fix and a few bug fixes.
+
+               NetHack 3.6.5 was released on January  27,  2020  containing
+          some security fixes and a small number of bug fixes.
 
                NetHack 3.6.6 was released on March 8, 2020 containing a se-
           curity fix and some bug fixes.
@@ -7311,16 +7317,10 @@
              Bruce Mewborne          Keizo Yamamoto          Rob Menke
               Carl Schelin           Keith Simpson          Robin Bandy
                Chris Russo             Ken Arnold          Robin Johnson
-               David Cohrs            Ken Arromdee       Roderick Schertler
-             David Damerell            Ken Lorber          Roland McGrath
-              David Gentzel          Ken Washikita        Ron Van Iwaarden
-             David Hairston           Kevin Darcy          Ronnen Miller
-               Dean Luick              Kevin Hugo            Ross Brown
-                Del Lamb              Kevin Sitze         Sascha Wostmann
 
 
 
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
@@ -7330,6 +7330,12 @@
 
 
 
+               David Cohrs            Ken Arromdee       Roderick Schertler
+             David Damerell            Ken Lorber          Roland McGrath
+              David Gentzel          Ken Washikita        Ron Van Iwaarden
+             David Hairston           Kevin Darcy          Ronnen Miller
+               Dean Luick              Kevin Hugo            Ross Brown
+                Del Lamb              Kevin Sitze         Sascha Wostmann
               Derek S. Ray          Kevin Smolkowski        Scott Bigham
               Deron Meranda           Kevin Sweet         Scott R. Turner
               Dion Nicolaas           Lars Huttar            Sean Hunt
@@ -7380,13 +7386,7 @@
 
 
 
-
-
-
-
-
-
-          NetHack 3.7.0                                      August 5, 2023
+          NetHack 3.7.0                                   September 8, 2023
 
 
 
