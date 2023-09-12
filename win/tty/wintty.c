@@ -3518,7 +3518,7 @@ tty_print_glyph(
     }   /* iflags.use_color aka iflags.wc_color */
 
     /* must be after color check; term_end_color may turn off inverse too;
-       BW_LAVA and BW_ICE won't ever be set when color is on;
+       BW_LAVA, BW_ICE, BW_SINK, BW_ENGR won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
@@ -3527,11 +3527,12 @@ tty_print_glyph(
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
 #endif
-    } else if (((special & MG_PET) != 0 && iflags.hilite_pet)
-        || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-        || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
-        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK)) != 0
-            && iflags.use_inverse)) {
+    } else if ((((special & MG_PET) != 0 && iflags.hilite_pet)
+                || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+                || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
+                || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE
+                                | MG_BW_SINK | MG_BW_ENGR)) != 0))
+               && iflags.use_inverse) {
         term_start_attr(ATR_INVERSE);
         inverse_on = TRUE;
     }

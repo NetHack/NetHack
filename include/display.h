@@ -1026,6 +1026,7 @@ enum glyph_offsets {
 #define MG_BW_ICE  0x00200  /* similar for ice vs floor */
 #define MG_BW_SINK 0x00200  /* identical for sink vs fountain [note: someday
                              * this may become a distinct flag */
+#define MG_BW_ENGR 0x00200  /* likewise for corridor engravings */
 #define MG_NOTHING 0x00400  /* char represents GLYPH_NOTHING */
 #define MG_UNEXPL  0x00800  /* char represents GLYPH_UNEXPLORED */
 #define MG_MALE    0x01000  /* represents a male mon or statue of one */

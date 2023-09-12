@@ -154,12 +154,14 @@ X11_print_glyph(
         co_ptr = &map_info->text_map.colors[y][x];
         colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
                     || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE
+                                    | MG_BW_SINK | MG_BW_ENGR)) != 0
                         && iflags.use_inverse))
                       ? CLR_MAX : 0;
         color += colordif;
 #ifdef ENHANCED_SYMBOLS
-        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL && glyphinfo->gm.u->ucolor != 0) {
+        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
+            && glyphinfo->gm.u->ucolor != 0) {
             color = glyphinfo->gm.u->ucolor | 0x80000000;
             if (colordif != 0) {
                 color |= 0x40000000;

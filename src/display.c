@@ -2727,34 +2727,35 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
                 zap_color((offset >> 2));
         } else if ((offset = (glyph - GLYPH_CMAP_B_OFF)) >= 0) {
             int cmap = S_grave + offset;
+            int sym = gs.showsyms[cmap + SYM_OFF_P];
 
             gmap->sym.symidx = cmap + SYM_OFF_P;
             cmap_color(cmap);
             if (!iflags.use_color) {
+                unsigned spec_cmap = 0;
+
                 /* try to provide a visible difference between water and lava
-                   if they use the same symbol and color is disabled */
-                if ((cmap == S_lava || cmap == S_lavawall)
-                    && (gs.showsyms[gmap->sym.symidx]
-                            == gs.showsyms[S_pool + SYM_OFF_P]
-                        || gs.showsyms[gmap->sym.symidx]
-                               == gs.showsyms[S_water + SYM_OFF_P])) {
-                    gmap->glyphflags |= MG_BW_LAVA;
-
-                /* similar for floor [what about empty doorway?] and ice */
-                } else if (cmap == S_ice
-                           && (gs.showsyms[gmap->sym.symidx]
-                                   == gs.showsyms[S_room + SYM_OFF_P]
-                               || gs.showsyms[gmap->sym.symidx]
-                                      == gs.showsyms[S_darkroom
-                                                    + SYM_OFF_P])) {
-                    gmap->glyphflags |= MG_BW_ICE;
-
-                /* and for fountain vs sink */
-                } else if (cmap == S_sink
-                           && (gs.showsyms[gmap->sym.symidx]
-                               == gs.showsyms[S_fountain + SYM_OFF_P])) {
-                    gmap->glyphflags |= MG_BW_SINK;
+                   if they use the same symbol and color is disabled;
+                   similar for floor and ice, for fountain vs sink, and for
+                   corridor engravings (CMAP_A below) */
+                switch (cmap) {
+                case S_lava:
+                case S_lavawall:
+                    if (sym == gs.showsyms[S_pool + SYM_OFF_P]
+                        || sym == gs.showsyms[S_water + SYM_OFF_P])
+                        spec_cmap = MG_BW_LAVA;
+                    break;
+                case S_ice:
+                    if (sym == gs.showsyms[S_room + SYM_OFF_P]
+                        || sym == gs.showsyms[S_darkroom + SYM_OFF_P])
+                        spec_cmap = MG_BW_ICE;
+                    break;
+                case S_sink:
+                    if (sym == gs.showsyms[S_fountain + SYM_OFF_P])
+                        spec_cmap = MG_BW_SINK;
+                    break;
                 }
+                gmap->glyphflags |= spec_cmap;
             } else if (has_rogue_color) {
                 color = cmap_to_roguecolor(cmap);
             }
@@ -2766,9 +2767,11 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
             else
                 altar_color(offset);
         } else if ((offset = (glyph - GLYPH_CMAP_A_OFF)) >= 0) {
-            int cmap = S_ndoor + offset;
+            int sym, cmap = S_ndoor + offset;
+
             gmap->sym.symidx = cmap + SYM_OFF_P;
             cmap_color(cmap);
+            sym = gs.showsyms[gmap->sym.symidx];
             /*
              *   Some specialty color mappings not hardcoded in data init
              */
@@ -2777,11 +2780,15 @@ reset_glyphmap(enum glyphmap_change_triggers trigger)
 #ifdef TEXTCOLOR
             /* provide a visible difference if normal and lit corridor
                use the same symbol */
-            } else if ((cmap == S_litcorr)
-                       && gs.showsyms[gmap->sym.symidx]
-                              == gs.showsyms[S_corr + SYM_OFF_P]) {
+            } else if (cmap == S_litcorr
+                       && sym == gs.showsyms[S_corr + SYM_OFF_P]) {
                 color = CLR_WHITE;
 #endif
+            /* likewise for corridor and engraving-in-corridor */
+            } else if (cmap == S_engrcorr
+                       && (sym == gs.showsyms[S_corr + SYM_OFF_P]
+                           || sym == gs.showsyms[S_litcorr + SYM_OFF_P])) {
+                gmap->glyphflags |= MG_BW_ENGR;
             }
         } else if ((offset = (glyph - GLYPH_CMAP_SOKO_OFF)) >= 0) {
             gmap->sym.symidx = S_vwall + offset + SYM_OFF_P;
