@@ -7,10 +7,10 @@
 #include "hack.h"
 #include "fmod.h"
 
-FMOD_SYSTEM *systemvar;
-FMOD_SOUND *soundvar;
-FMOD_CHANNEL *channel1;
-FMOD_CHANNEL *channelMus;
+static FMOD_SYSTEM *systemvar;
+static FMOD_SOUND *soundvar;
+static FMOD_CHANNEL *channel1;
+static FMOD_CHANNEL *channelMus;
 
 static void fmod_init_nhsound(void);
 static void fmod_exit_nhsound(const char *);
@@ -23,7 +23,7 @@ static void fmod_verbal(char *, int32_t, int32_t, int32_t, int32_t);
 
 struct sound_procs fmod_procs = {
     SOUNDID(fmod),
-    SOUND_TRIGGER_USERSOUNDS,
+    SOUND_TRIGGER_USERSOUNDS | 0,
     fmod_init_nhsound,
     fmod_exit_nhsound,
     fmod_achievement,
@@ -31,7 +31,7 @@ struct sound_procs fmod_procs = {
     fmod_hero_playnotes,
     fmod_play_usersound,
     fmod_ambience,
-    fmod_verbal,
+    fmod_verbal
 };
 
 static void
