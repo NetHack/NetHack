@@ -16,13 +16,13 @@ static void fmod_init_nhsound(void);
 static void fmod_exit_nhsound(const char *);
 static void fmod_achievement(schar, schar, int32_t);
 static void fmod_soundeffect(char *, int32_t, int32_t);
-static void fmod_hero_playnotes(int32_t, char *, int32_t);
-static void fmod_play_usersound(char *, int32_t, int32_t);
-static void fmod_ambience(int32_t ambienceid, int32_t ambience_action,
-                            int32_t hero_proximity);
+static void fmod_hero_playnotes(int32_t, const char *, int32_t);
+static void fmod_play_usersound(const char *, int32_t, int32_t);
+static void fmod_ambience(int32_t, int32_t, int32_t);
+static void fmod_verbal(char *, int32_t, int32_t, int32_t, int32_t);
 
 struct sound_procs fmod_procs = {
-    SOUNDID(fmod),       
+    SOUNDID(fmod),
     SOUND_TRIGGER_USERSOUNDS,
     fmod_init_nhsound,
     fmod_exit_nhsound,
@@ -31,6 +31,7 @@ struct sound_procs fmod_procs = {
     fmod_hero_playnotes,
     fmod_play_usersound,
     fmod_ambience,
+    fmod_verbal,
 };
 
 static void
@@ -58,7 +59,7 @@ fmod_achievement(schar ach1, schar ach2, int32_t repeat)
 
 /* fulfill SNDCAP_SOUNDEFFECTS */
 static void
-fmod_soundeffect(char *desc, int32_t seid, int volume)
+fmod_soundeffect(char *desc, int32_t seid, int32_t volume)
 {
     //  to be added in future
 }
@@ -69,13 +70,13 @@ static void fmod_hero_playnotes(int32_t instrument, char *str, int32_t volume)
     //  to be added in future
 }
 
-/* fulfill  SNDCAP_USERSOUNDS */
+/* fulfill  SOUND_TRIGGER_USERSOUNDS */
 static void
 fmod_play_usersound(const char *filename, int32_t volume UNUSED, int32_t idx UNUSED)
 {
     FMOD_System_CreateSound(systemvar, filename, FMOD_CREATESAMPLE, 0,
                             &soundvar);
-    if (strstr(filename, "music_") != 0) {
+    if (strstr(filename, "music_") != NULL) {
         FMOD_Channel_Stop(channelMus);
         FMOD_System_PlaySound(systemvar, soundvar, 0, 0, &channelMus);
         FMOD_Channel_SetMode(channelMus, FMOD_LOOP_NORMAL);
@@ -86,11 +87,13 @@ fmod_play_usersound(const char *filename, int32_t volume UNUSED, int32_t idx UNU
 }
 
 static void
-sample_ambience(int32_t ambienceid, int32_t ambience_action,
+fmod_ambience(int32_t ambienceid, int32_t ambience_action,
                 int32_t hero_proximity)
 {
     //  to be added in future
 }
+
+
 
 #endif /* SND_LIB_FMOD  */
        /* end of fmod.c */
