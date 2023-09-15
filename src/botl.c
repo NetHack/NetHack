@@ -4121,7 +4121,7 @@ boolean
 status_hilite_menu(void)
 {
     winid tmpwin;
-    int i, res;
+    int i, fld, res;
     menu_item *picks = (menu_item *) 0;
     anything any;
     boolean redo;
@@ -4149,19 +4149,21 @@ status_hilite_menu(void)
     }
 
     for (i = 0; i < MAXBLSTATS; i++) {
-        int count = status_hilite_linestr_countfield(i);
+        int count;
         char buf[BUFSZ];
 
+        fld = initblstats[i].fld;
+        count = status_hilite_linestr_countfield(fld);
 #ifndef SCORE_ON_BOTL
         /* config file might contain rules for highlighting 'score'
            even when SCORE_ON_BOTL is disabled; if so, 'O' command
            menus will show them and allow deletions but not additions,
            otherwise, it won't show 'score' at all */
-        if (initblstats[i].fld == BL_SCORE && !count)
+        if (fld == BL_SCORE && !count)
             continue;
 #endif
         any = cg.zeroany;
-        any.a_int = i + 1;
+        any.a_int = fld + 1;
         Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
             Sprintf(eos(buf), " (%d defined)", count);
@@ -4171,11 +4173,11 @@ status_hilite_menu(void)
 
     end_menu(tmpwin, "Status hilites:");
     if ((res = select_menu(tmpwin, PICK_ONE, &picks)) > 0) {
-        i = picks->item.a_int - 1;
-        if (i < 0) {
+        fld = picks->item.a_int - 1;
+        if (fld < 0) {
             status_hilites_viewall();
         } else {
-            if (status_hilite_menu_fld(i))
+            if (status_hilite_menu_fld(fld))
                 reset_status_hilites();
         }
         free((genericptr_t) picks), picks = (menu_item *) 0;
