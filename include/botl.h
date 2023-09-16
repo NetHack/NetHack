@@ -1,4 +1,4 @@
-/* NetHack 3.7  botl.h  $NHDT-Date: 1596498528 2020/08/03 23:48:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
+/* NetHack 3.7  botl.h  $NHDT-Date: 1694893330 2023/09/16 19:42:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
 /* Copyright (c) Michael Allison, 2003                            */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -255,7 +255,7 @@ struct istat_s {
     boolean percent_matters;
     short percent_value;
     unsigned anytype;
-    anything a;
+    anything a, rawval;
     char *val;
     int valwidth;
     enum statusfields idxmax;

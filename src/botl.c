@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1685863332 2023/06/04 07:22:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1694893342 2023/09/16 19:42:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.239 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -529,12 +529,12 @@ static void status_hilites_viewall(void);
 
 #define INIT_BLSTAT(name, fmtstr, anytyp, wid, fld) \
     { name, fmtstr, 0L, FALSE, FALSE, 0, anytyp,                        \
-      { (genericptr_t) 0 }, (char *) 0,                                 \
-      wid,  -1, fld INIT_THRESH }
+      { (genericptr_t) 0 }, { (genericptr_t) 0 }, (char *) 0,           \
+      wid, -1, fld  INIT_THRESH }
 #define INIT_BLSTATP(name, fmtstr, anytyp, wid, maxfld, fld) \
     { name, fmtstr, 0L, FALSE, TRUE, 0, anytyp,                         \
-      { (genericptr_t) 0 }, (char *) 0,                                 \
-      wid,  maxfld, fld INIT_THRESH }
+      { (genericptr_t) 0 }, { (genericptr_t) 0 }, (char *) 0,           \
+      wid, maxfld, fld  INIT_THRESH }
 
 /* If entries are added to this, botl.h will require updating too.
    'max' value of BL_EXP gets special handling since the percentage
@@ -795,10 +795,12 @@ bot_via_windowport(void)
 
     /*  Hit points  */
     i = Upolyd ? u.mh : u.uhp;
-    if (i < 0)
+    if (i < 0) /* gameover sets u.uhp to -1 */
         i = 0;
+    gb.blstats[idx][BL_HP].rawval.a_int = i;
     gb.blstats[idx][BL_HP].a.a_int = min(i, 9999);
     i = Upolyd ? u.mhmax : u.uhpmax;
+    gb.blstats[idx][BL_HPMAX].rawval.a_int = i;
     gb.blstats[idx][BL_HPMAX].a.a_int = min(i, 9999);
 
     /*  Dungeon level. */
@@ -831,7 +833,9 @@ bot_via_windowport(void)
     gv.valset[BL_GOLD] = TRUE; /* indicate val already set */
 
     /* Power (magical energy) */
+    gb.blstats[idx][BL_ENE].rawval.a_int = u.uen;
     gb.blstats[idx][BL_ENE].a.a_int = min(u.uen, 9999);
+    gb.blstats[idx][BL_ENEMAX].rawval.a_int = u.uenmax;
     gb.blstats[idx][BL_ENEMAX].a.a_int = min(u.uenmax, 9999);
 
     /* Armor class */
@@ -1241,9 +1245,9 @@ eval_notify_windowport_field(
         || (fld == BL_HP && iflags.wc2_hitpointbar)) {
         fldmax = curr->idxmax;
         pc = (fldmax == BL_EXP) ? exp_percentage()
-             : (fldmax >= 0 && fldmax < MAXBLSTATS)
-                ? percentage(curr, &gb.blstats[idx][fldmax])
-                : 0; /* bullet proofing; can't get here */
+              : (fldmax >= 0 && fldmax < MAXBLSTATS)
+                 ? percentage(curr, &gb.blstats[idx][fldmax])
+                 : 0; /* bullet proofing; can't get here */
         if (pc != prev->percent_value)
             chg = (pc < prev->percent_value) ? -1 : 1;
         curr->percent_value = pc;
@@ -1504,7 +1508,9 @@ init_blstats(void)
 static int
 compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
 {
-    int anytype, result = 0;
+    anything *a1, *a2;
+    boolean use_rawval;
+    int anytype, fld, result = 0;
 
     if (!bl1 || !bl2) {
         panic("compare_blstat: bad istat pointer %s, %s",
@@ -1520,44 +1526,50 @@ compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
               fmt_ptr((genericptr_t) bl2->a.a_void));
     }
 
+    fld = bl1->fld;
+    use_rawval = (fld == BL_HP || fld == BL_HPMAX
+                  || fld == BL_ENE || fld == BL_ENEMAX);
+    a1 = use_rawval ? &bl1->rawval : &bl1->a;
+    a2 = use_rawval ? &bl2->rawval : &bl2->a;
+
     switch (anytype) {
     case ANY_INT:
-        result = (bl1->a.a_int < bl2->a.a_int) ? 1
-                     : (bl1->a.a_int > bl2->a.a_int) ? -1 : 0;
+        result = (a1->a_int < a2->a_int) ? 1
+                     : (a1->a_int > a2->a_int) ? -1 : 0;
         break;
     case ANY_IPTR:
-        result = (*bl1->a.a_iptr < *bl2->a.a_iptr) ? 1
-                     : (*bl1->a.a_iptr > *bl2->a.a_iptr) ? -1 : 0;
+        result = (*a1->a_iptr < *a2->a_iptr) ? 1
+                     : (*a1->a_iptr > *a2->a_iptr) ? -1 : 0;
         break;
     case ANY_LONG:
-        result = (bl1->a.a_long < bl2->a.a_long) ? 1
-                     : (bl1->a.a_long > bl2->a.a_long) ? -1 : 0;
+        result = (a1->a_long < a2->a_long) ? 1
+                     : (a1->a_long > a2->a_long) ? -1 : 0;
         break;
     case ANY_LPTR:
-        result = (*bl1->a.a_lptr < *bl2->a.a_lptr) ? 1
-                     : (*bl1->a.a_lptr > *bl2->a.a_lptr) ? -1 : 0;
+        result = (*a1->a_lptr < *a2->a_lptr) ? 1
+                     : (*a1->a_lptr > *a2->a_lptr) ? -1 : 0;
         break;
     case ANY_UINT:
-        result = (bl1->a.a_uint < bl2->a.a_uint) ? 1
-                     : (bl1->a.a_uint > bl2->a.a_uint) ? -1 : 0;
+        result = (a1->a_uint < a2->a_uint) ? 1
+                     : (a1->a_uint > a2->a_uint) ? -1 : 0;
         break;
     case ANY_UPTR:
-        result = (*bl1->a.a_uptr < *bl2->a.a_uptr) ? 1
-                     : (*bl1->a.a_uptr > *bl2->a.a_uptr) ? -1 : 0;
+        result = (*a1->a_uptr < *a2->a_uptr) ? 1
+                     : (*a1->a_uptr > *a2->a_uptr) ? -1 : 0;
         break;
     case ANY_ULONG:
-        result = (bl1->a.a_ulong < bl2->a.a_ulong) ? 1
-                     : (bl1->a.a_ulong > bl2->a.a_ulong) ? -1 : 0;
+        result = (a1->a_ulong < a2->a_ulong) ? 1
+                     : (a1->a_ulong > a2->a_ulong) ? -1 : 0;
         break;
     case ANY_ULPTR:
-        result = (*bl1->a.a_ulptr < *bl2->a.a_ulptr) ? 1
-                     : (*bl1->a.a_ulptr > *bl2->a.a_ulptr) ? -1 : 0;
+        result = (*a1->a_ulptr < *a2->a_ulptr) ? 1
+                     : (*a1->a_ulptr > *a2->a_ulptr) ? -1 : 0;
         break;
     case ANY_STR:
         result = sgn(strcmp(bl1->val, bl2->val));
         break;
     case ANY_MASK32:
-        result = (bl1->a.a_ulong != bl2->a.a_ulong);
+        result = (a1->a_ulong != a2->a_ulong);
         break;
     default:
         result = 1;
@@ -1655,15 +1667,18 @@ s_to_anything(anything *a, char *buf, int anytype)
 }
 #endif /* STATUS_HILITES */
 
+/* integer percentage is 100 * bl->a / maxbl->a */
 static int
 percentage(struct istat_s *bl, struct istat_s *maxbl)
 {
     int result = 0;
     int anytype;
-    int ival;
+    int ival, mval;
     long lval;
     unsigned uval;
     unsigned long ulval;
+    int fld = bl->fld;
+    boolean use_rawval = (fld == BL_HP || fld == BL_ENE);
 
     if (!bl || !maxbl) {
         impossible("percentage: bad istat pointer %s, %s",
@@ -1676,8 +1691,12 @@ percentage(struct istat_s *bl, struct istat_s *maxbl)
     if (maxbl->a.a_void) {
         switch (anytype) {
         case ANY_INT:
-            ival = bl->a.a_int;
-            result = ((100 * ival) / maxbl->a.a_int);
+            /* HP and energy are int so this is the only case that cares
+               about 'rawval'; for them, we use that rather than their
+               potentially truncated (to 9999) display value */
+            ival = use_rawval ? bl->rawval.a_int : bl->a.a_int;
+            mval = use_rawval ? maxbl->rawval.a_int : maxbl->a.a_int;
+            result = ((100 * ival) / mval);
             break;
         case ANY_LONG:
             lval  = bl->a.a_long;
@@ -1749,6 +1768,7 @@ exp_percentage(void)
             curval.a = maxval.a = cg.zeroany;
             curval.a.a_long = exp_val;
             maxval.a.a_long = nxt_exp_val;
+            curval.fld = maxval.fld = BL_EXP; /* (neither BL_HP nor BL_ENE) */
             /* maximum delta between levels is 10000000; calculation of
                100 * (10000000 - N) / 10000000 fits within 32-bit long */
             res = percentage(&curval, &maxval);
