@@ -44,9 +44,11 @@ enum statusfields {
     MAXBLSTATS /* [23] */
 };
 
-enum relationships { NO_LTEQGT = -1,
-                     EQ_VALUE, LT_VALUE, LE_VALUE,
-                     GE_VALUE, GT_VALUE, TXT_VALUE };
+enum relationships {
+    NO_LTEQGT = -1,
+    EQ_VALUE, LT_VALUE, LE_VALUE,
+    GE_VALUE, GT_VALUE, TXT_VALUE
+};
 
 enum blconditions {
     bl_bareh,
@@ -219,16 +221,18 @@ extern int cond_idx[CONDITION_COUNT];
 #define HL_ATTCLR_BOLD    CLR_MAX + 4
 #define BL_ATTCLR_MAX     CLR_MAX + 5
 
-enum hlattribs { HL_UNDEF   = 0x00,
-                 HL_NONE    = 0x01,
-                 HL_BOLD    = 0x02,
-                 HL_INVERSE = 0x04,
-                 HL_ULINE   = 0x08,
-                 HL_BLINK   = 0x10,
-                 HL_DIM     = 0x20 };
+enum hlattribs {
+    HL_UNDEF   = 0x00,
+    HL_NONE    = 0x01,
+    HL_BOLD    = 0x02,
+    HL_INVERSE = 0x04,
+    HL_ULINE   = 0x08,
+    HL_BLINK   = 0x10,
+    HL_DIM     = 0x20
+};
 
 #define MAXVALWIDTH 80 /* actually less, but was using 80 to allocate title
-                       * and leveldesc then using QBUFSZ everywhere else   */
+                        * and leveldesc then using QBUFSZ everywhere else   */
 #ifdef STATUS_HILITES
 struct hilite_s {
     enum statusfields fld;
