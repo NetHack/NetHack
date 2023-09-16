@@ -235,6 +235,10 @@ gnopts.h    gnplayer.c  gnplayer.h  gnsignal.c  gnsignal.h  gnstatus.c
 gnstatus.h  gntext.c    gntext.h    gnworn.c    gnworn.h    gnyesno.c
 gnyesno.h   mapbg.xpm
 
+sound/fmod:
+(file in top directory)
+fmod.c
+
 sound/macsound:
 (file in top directory)
 macsound.m
