@@ -1,4 +1,4 @@
-# NetHack 3.7  code_style.txt       $NHDT-Date: 1596498264 2020/08/03 23:44:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.5 $
+# NetHack 3.7  code_style.txt       $NHDT-Date: 1694890786 2023/09/16 18:59:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.8 $
 # Copyright (c) 2015 by Derek S. Ray
 # NetHack may be freely redistributed.  See license for details.
 
@@ -45,7 +45,7 @@ possible:
 Single blank lines should be used wherever convenient to improve readability.
 
 Functions and Control Statements
--------------------------------
+--------------------------------
 
 For a function definition, the return type, declarator, and opening brace
 should each appear on a line of their own. Arguments are defined in the following
@@ -183,6 +183,64 @@ immediately inside a pair of parentheses:
         /* body */
     }
 
+Casts and sizeof
+----------------
+
+Casts should separate the cast operator and its expression with a space:
+    '(char *) str'
+'sizeof (type)' requires the parentheses.  'sizeof expression' does not;
+using them is not wrong but omitting them avoids some visual clutter.
+Using them without the separating space gives the false impression of a
+function call or macro-with-argument(s) expansion; 'sizeof' is an operator
+and the parentheses required for '(type)' are to treat it like a cast.
+
+Comments
+--------
+
+Some block comments are undecorated, just split into reasonable width lines:
+    /* this is
+       a comment */
+They usually don't include sentence punctuation.
+
+Others are more elaborate:
+    /*
+     * This is
+     * another comment.
+     */
+This style is usually used with sentence punctation, particularly if they
+contain more than one sentence.
+
+End-of-line comments which need to span lines
+    somecode(); /* this comment
+                 * is ok */
+should start every continuation line with an asterisk, otherwise clang-format
+would convert them into a block comment
+    othercode(); /* this comment
+                    should be avoided */
+because it would be converted into
+    othercode();
+    /* this comment
+       should be avoided */
+if another bulk reformatting ever gets performed.  Similarly, multiple
+comments intended to read as one
+    morecode(); /* start of comment */
+                /* more of comment  */
+                /* end of comment   */
+are deprecated because they will end up losing the indentation of the
+followup lines if reformatted.
+
+Many files end with
+    /*filename*/
+usually preceded by a blank line.  This was intended as a workaround for a
+comment--somewhere, possibly in Amiga or Atari code--that stated that some
+compiler or other didn't always process the last line of the file.  If that
+last line is a comment, nothing is lost.  The real issue almost certainly
+was source file(s) that didn't end in newline.  These days we try to force
+the final newline for every file, prior to release if not always maintained
+day-to-day.  The name at the end can still be worthwhile when editing or
+browsing multiple files.
+
+
 Vim Configuration
 =================
 
@@ -202,7 +260,7 @@ ensure that indentation is done correctly:
 Visual Studio Configuration
 ===========================
 
-In Visual Studio under Tools->Options->Text Editor->C/C++, you can set the 
+In Visual Studio under Tools->Options->Text Editor->C/C++, you can set the
 following options to obtain desired behavior:
 
 [Tabs]
@@ -213,8 +271,8 @@ Insert Spaces
 
 There are a number of other options under [Formatting] that should be
 checked (Indentation, New Lines, Spacing, and Wrapping), but there are so
-many entries that reproducing them here is impractical. Fortunately, the 
-options are in plain English, so walking through them with a copy of 
+many entries that reproducing them here is impractical. Fortunately, the
+options are in plain English, so walking through them with a copy of
 this Guide handy and making changes as required will suffice.
 
 Emacs Configuration
