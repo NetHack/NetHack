@@ -174,3 +174,69 @@ function table_stringify(tbl)
    -- pline("table_stringify:(%s)", str);
    return "{" .. str .. "}";
 end
+
+--
+-- TUTORIAL
+--
+
+-- extended commands NOT available in tutorial
+local tutorial_blacklist_commands = {
+   ["save"] = true,
+};
+
+function tutorial_cmd_before(cmd)
+   -- nh.pline("TUT:cmd_before:" .. cmd);
+
+   if (tutorial_blacklist_commands[cmd]) then
+      return false;
+   end
+   return true;
+end
+
+function tutorial_enter()
+   -- nh.pline("TUT:enter");
+
+   -- add the tutorial branch callbacks
+   nh.callback("cmd_before", "tutorial_cmd_before");
+   nh.callback("end_turn", "tutorial_turn");
+
+   -- save state for later restore
+   nh.gamestate();
+end
+
+function tutorial_leave()
+   -- nh.pline("TUT:leave");
+
+   -- remove the tutorial branch callbacks
+   nh.callback("cmd_before", "tutorial_cmd_before", true);
+   nh.callback("end_turn", "tutorial_turn", true);
+
+   -- restore state for regular play
+   nh.gamestate(true);
+end
+
+local tutorial_events = {
+   {
+      func = function()
+         if (u.uhunger < 148) then
+            local o = obj.new("blessed food ration");
+            o:placeobj(u.ux, u.uy);
+            nh.pline("Looks like you're getting hungry.  You'll starve to death, unless you eat something.", true);
+            nh.pline("Comestibles are eaten with '" .. nh.eckey("eat") .. "'", true);
+            return true;
+         end
+      end
+   },
+};
+
+function tutorial_turn()
+   for k, v in pairs(tutorial_events) do
+      if ((v.ucoord and u.ux == v.ucoord[1] + 3 and u.uy == v.ucoord[2] + 3)
+         or (v.ucoord == nil)) then
+         if (v.func() or v.remove) then
+            tutorial_events[k] = nil;
+         end
+      end
+   end
+   -- nh.pline("TUT:turn");
+end

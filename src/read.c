@@ -173,7 +173,7 @@ tshirt_text(struct obj* tshirt, char* buf)
            Theory" although they didn't create it (and an actual T-shirt
            with pentagonal diagram showing which choices defeat which) */
         "rock--paper--scissors--lizard--Spock!",
-        /* "All men must die -- all men must serve" challange and response
+        /* "All men must die -- all men must serve" challenge and response
            from book series _A_Song_of_Ice_and_Fire_ by George R.R. Martin,
            TV show "Game of Thrones" (probably an actual T-shirt too...) */
         "/Valar morghulis/ -- /Valar dohaeris/",
@@ -1002,6 +1002,8 @@ recharge(struct obj* obj, int curse_bless)
 static void
 forget(int howmuch)
 {
+    struct monst *mtmp;
+
     if (Punished)
         u.bc_felt = 0; /* forget felt ball&chain */
 
@@ -1010,6 +1012,14 @@ forget(int howmuch)
 
     /* Forget some skills. */
     drain_weapon_skill(rnd(howmuch ? 5 : 3));
+
+    /* forget having seen monsts (affects recognizing unseen ones by sound) */
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+        if (mtmp != u.usteed && mtmp != u.ustuck)
+            mtmp->meverseen = 0;
+    /* [perhaps ought to forget having seen every monster on every level] */
+    for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon)
+        mtmp->meverseen = 0;
 }
 
 /* monster is hit by scroll of taming's effect */
@@ -1353,7 +1363,7 @@ seffect_scare_monster(struct obj **sobjp)
         if (confused || scursed) {
             Soundeffect(se_sad_wailing, 50);
         } else {
-            Soundeffect(se_sad_wailing, 50);
+            Soundeffect(se_maniacal_laughter, 50);
         }
         You_hear("%s %s.", (confused || scursed) ? "sad wailing"
                  : "maniacal laughter",
@@ -1750,6 +1760,7 @@ seffect_fire(struct obj **sobjp)
                 You_feel("a pleasant warmth in your %s.",
                          makeplural(body_part(HAND)));
         } else {
+            monstunseesu(M_SEEN_FIRE);
             pline_The("scroll catches fire and you burn your %s.",
                       makeplural(body_part(HAND)));
             losehp(1, "scroll of fire", KILLED_BY_AN);
@@ -1799,11 +1810,23 @@ seffect_earth(struct obj **sobjp)
         int nboulders = 0;
 
         /* Identify the scroll */
-        if (u.uswallow)
+        if (u.uswallow) {
             You_hear("rumbling.");
-        else
-            pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
+        } else {
+            if (!avoid_ceiling(&u.uz)) {
+                pline_The("%s rumbles %s you!", ceiling(u.ux, u.uy),
+                          sblessed ? "around" : "above");
+            } else {
+                char matbuf[BUFSZ];
+                const char *const avalanche = "avalanche";
+
+                Sprintf(matbuf, "%s",
+                        sblessed ? makeplural(avalanche) : an(avalanche));
+                pline("%s of boulders %s %s you!",
+                      upstart(matbuf), vtense(matbuf, "materialize"),
                       sblessed ? "around" : "above");
+            }
+        }
         gk.known = 1;
         sokoban_guilt();
 
@@ -2142,7 +2165,11 @@ seffects(struct obj *sobj) /* sobj - scroll or fake spellbook for spell */
 }
 
 void
-drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, boolean skip_uswallow)
+drop_boulder_on_player(
+    boolean confused,
+    boolean helmet_protects,
+    boolean byu,
+    boolean skip_uswallow)
 {
     int dmg;
     struct obj *otmp2;
@@ -2163,7 +2190,7 @@ drop_boulder_on_player(boolean confused, boolean helmet_protects, boolean byu, b
         You("are hit by %s!", doname(otmp2));
         dmg = (int) (dmgval(otmp2, &gy.youmonst) * otmp2->quan);
         if (uarmh && helmet_protects) {
-            if (is_metallic(uarmh)) {
+            if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 if (dmg > 2)
                     dmg = 2;
@@ -2215,7 +2242,7 @@ drop_boulder_on_monster(coordxy x, coordxy y, boolean confused, boolean byu)
 
         mdmg = dmgval(otmp2, mtmp) * otmp2->quan;
         if (helmet) {
-            if (is_metallic(helmet)) {
+            if (hard_helmet(helmet)) {
                 if (canspotmon(mtmp))
                     pline("Fortunately, %s is wearing a hard helmet.",
                           mon_nam(mtmp));
@@ -2479,15 +2506,18 @@ do_class_genocide(void)
     boolean gameover = FALSE; /* true iff killed self */
 
     buf[0] = '\0'; /* for EDIT_GETLIN */
-    for (j = 0;; j++) {
+    for (j = 0; ; j++) {
         if (j >= 5) {
             pline1(thats_enough_tries);
             return;
         }
         Strcpy(promptbuf, "What class of monsters do you want to genocide?");
-        if (iflags.cmdassist && j > 0)
-            Strcat(promptbuf,
-                   " [enter the symbol or name representing a class]");
+        if (j > 0)
+            Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
+                     " [enter %s]",
+                     iflags.cmdassist
+                       ? "the symbol or name representing a class, or '?'"
+                       : "'?' to see previous genocides");
         getlin(promptbuf, buf);
         (void) mungspaces(buf);
         /* avoid 'that does not represent any monster' for empty input */
@@ -2506,6 +2536,13 @@ do_class_genocide(void)
             livelog_printf(LL_GENOCIDE,
                            "declined to perform class genocide");
             return;
+        }
+        /* "?" runs #genocided to show existing genocides, then re-prompts;
+           accept "'?'" too because the prompt's hint shows it that way */
+        if (!strcmp(buf, "?") || !strcmp(buf, "'?'")) {
+            list_genocided('g', FALSE);
+            --j; /* don't count this iteration as one of the tries */
+            continue;
         }
 
         class = name_to_monclass(buf, (int *) 0);
@@ -2678,8 +2715,12 @@ do_genocide(
                 return;
             }
             Strcpy(promptbuf, "What type of monster do you want to genocide?");
-            if (iflags.cmdassist && i > 0)
-                Strcat(promptbuf, " [enter the name of a type of monster]");
+            if (i > 0)
+                Snprintf(eos(promptbuf), sizeof promptbuf - strlen(promptbuf),
+                         " [enter %s]",
+                         iflags.cmdassist
+                           ? "the name of a type of monster, or '?'"
+                           : "'?' to see previous genocides");
             getlin(promptbuf, buf);
             (void) mungspaces(buf);
             /* avoid 'such creatures do not exist' for empty input */
@@ -2700,6 +2741,12 @@ do_genocide(
 
                 livelog_printf(LL_GENOCIDE, "declined to perform genocide");
                 return;
+            }
+            /* "?" or "'?'" runs #genocided to show existing genocides */
+            if (!strcmp(buf, "?") || !strcmp(buf, "'?'")) {
+                list_genocided('g', FALSE);
+                --i; /* don't count this iteration as one of the tries */
+                continue;
             }
 
             mndx = name_to_mon(buf, (int *) 0);
@@ -2733,6 +2780,7 @@ do_genocide(
                      */
                     if (Verbose(3, do_genocide))
                         pline("A thunderous voice booms through the caverns:");
+                    SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize("No, mortal!  That will not be done.");
                 }
                 continue;
@@ -3020,7 +3068,7 @@ create_particular_parse(
      * If d->fem is already set to MALE or FEMALE at this juncture, it means
      * one of those terms was explicitly specified.
      */
-    if (d->fem == MALE || d->fem == FEMALE) {     /* explicity expressed */
+    if (d->fem == MALE || d->fem == FEMALE) {     /* explicitly expressed */
         if ((gender_name_var != NEUTRAL) && (d->fem != gender_name_var)) {
             /* apparent selection incompatibility */
             d->genderconf = gender_name_var;        /* resolve later */
@@ -3083,7 +3131,7 @@ create_particular_creation(
         else if (d->randmonst)
             whichpm = rndmonst();
         if (d->genderconf == -1) {
-            /* no confict exists between explicit gender term and
+            /* no conflict exists between explicit gender term and
                the specified monster name */
             if (d->fem != -1 && (!whichpm || (!is_male(whichpm)
                                               && !is_female(whichpm))))

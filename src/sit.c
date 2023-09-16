@@ -87,6 +87,7 @@ throne_sit_effect(void)
 
                 /* Magical voice not affected by deafness */
                 pline("A voice echoes:");
+                SetVoice((struct monst *) 0, 0, 80, voice_throne);
                 verbalize("Thine audience hath been summoned, %s!",
                           flags.female ? "Dame" : "Sire");
                 while (cnt--)
@@ -96,6 +97,7 @@ throne_sit_effect(void)
         case 8:
             /* Magical voice not affected by deafness */
             pline("A voice echoes:");
+            SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize("By thine Imperious order, %s...",
                       flags.female ? "Dame" : "Sire");
             do_genocide(5); /* REALLY|ONTHRONE, see do_genocide() */
@@ -103,10 +105,11 @@ throne_sit_effect(void)
         case 9:
             /* Magical voice not affected by deafness */
             pline("A voice echoes:");
+            SetVoice((struct monst *) 0, 0, 80, voice_throne);
             verbalize(
-                      "A curse upon thee for sitting upon this most holy throne!");
+                 "A curse upon thee for sitting upon this most holy throne!");
             if (Luck > 0) {
-                make_blinded(Blinded + rn1(100, 250), TRUE);
+                make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
                 change_luck((Luck > 1) ? -rnd(2) : -1);
             } else
                 rndcurse();
@@ -318,7 +321,10 @@ dosit(void)
                 u.utrap++;
             }
         } else {
-            You("sit down.");
+            /* when flying, "you land" might need some refinement; it sounds
+               as if you're staying on the ground but you will immediately
+               take off again unless you become stuck in a holding trap */
+            You("%s.", Flying ? "land" : "sit down");
             dotrap(trap, VIASITTING);
         }
     } else if ((Underwater || Is_waterlevel(&u.uz))

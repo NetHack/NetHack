@@ -1,4 +1,4 @@
-/* NetHack 3.7	sys.h	$NHDT-Date: 1646255373 2022/03/02 21:09:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
+/* NetHack 3.7	sys.h	$NHDT-Date: 1693083207 2023/08/26 20:53:27 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.41 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -40,6 +40,7 @@ struct sysopt {
     /* panic options */
     char *gdbpath;
     char *greppath;
+    char *crashreporturl;
     int panictrace_gdb;
     int panictrace_libc;
 

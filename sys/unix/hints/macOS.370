@@ -1,4 +1,4 @@
-# NetHack 3.7  macOS.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.116 $
+# NetHack 3.7  macOS.370 $NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.138 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -6,6 +6,7 @@
 # MacOS hints file with support for multiple window ports (interfaces)
 # Tested on:
 #     - MacOS Catalina 10.15
+#     - MacOS Ventura 13 (Intel processor)
 #
 # If this doesn't work for some other version of macOS, consider
 # making a new hints file it, rather than changing this one.
@@ -72,6 +73,11 @@ endif   # WANT_WIN_QT
 
 #-INCLUDE multiw-3.370
 
+ifeq "$(USE_ASAN)" "1"
+CFLAGS +=-fsanitize=address
+LFLAGS +=-fsanitize=address
+endif
+
 # NetHack sources control
 NHCFLAGS+=-DDLB
 NHCFLAGS+=-DHACKDIR=\"$(HACKDIR)\"
@@ -91,6 +97,8 @@ NHCFLAGS+=-DNOMAIL
 #NHCFLAGS+=-DTTY_SOUND_ESCCODES
 #NHCFLAGS+=-DNO_CHRONICLE
 #NHCFLAGS+=-DLIVELOG
+# not NHCFLAGS - needed for makedefs
+CFLAGS+=-DCRASHREPORT=\"NetHackCrashReport.JavaScript\"
 
 ifdef MAKEFILE_SRC
 # default
@@ -110,10 +118,18 @@ else
 # CURSESLIB = -lncurses -ltinfo
 comma:=,
 NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
-ifneq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
-HAVE_NCURSESW=1
-else
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+ifeq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+#this indicates that pkg-config itself was unavailable
+CURSESLIB = $(NCURSES_LFLAGS)
+NHCFLAGS+=-DCURSES_UNICODE
+endif
+endif
+#$(info $(NCURSES_LFLAGS))
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
 HAVE_NCURSESW=0
+else
+HAVE_NCURSESW=1
 endif
 ifeq "$(HAVE_NCURSESW)" "1"
 CURSESLIB = $(NCURSES_LFLAGS)
@@ -164,6 +180,9 @@ SNDCFLAGS+= -DSND_LIB_MACSOUND
 SNDLIBSRC = ../sound/macsound/macsound.m
 SNDLIBOBJ = macsound.o
 LFLAGS += -framework AppKit
+#ifdef WANT_SPEECH
+LFLAGS += -framework AVFoundation
+#endif
 endif
 
 #
@@ -249,7 +268,7 @@ GITHASH = -DNETHACK_GIT_SHA=\"$(GIT_HASH)\"
 endif
 ifdef GIT_BRANCH
 GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
-endif 
+endif
 
 ifdef WANT_LIBNH
 CFLAGS += -DSHIM_GRAPHICS -DNOTTYGRAPHICS -DNOSHELL -DLIBNH
@@ -281,8 +300,11 @@ override LUA2NHTOP = ../..
 override LUAMAKEFLAGS=$(LUAFLAGS)
 endif   # GITSUBMODULES
 
-WANT_BUNDLE=1
 ifdef WANT_SHARE_INSTALL
+
+#ifdef MAKEFILE_SRC
+#$(info WANT_SOURCE_INSTALL = $(WANT_SOURCE_INSTALL), WANT_SHARE_INSTALL = $(WANT_SHARE_INSTALL))
+#endif
 # if $GAMEUID is root, we install into roughly proper Mac locations, otherwise
 # we install into ~/nethackdir
 ifeq ($(GAMEUID),root)
@@ -308,14 +330,20 @@ ROOTCHECK= [[ `id -u` == 0 ]] || ( echo "Must run install with sudo."; exit 1)
 # make sure we have group GAMEUID and group GAMEGRP
 PREINSTALL= . sys/unix/hints/macosx.sh user2 $(GAMEUID); \
 		. sys/unix/hints/macosx.sh group2 $(GAMEGRP); \
-		mkdir $(SHELLDIR); chown $(GAMEUID) $(SHELLDIR)
+		(mkdir $(SHELLDIR) || true); chown $(GAMEUID) $(SHELLDIR)
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		 ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		 chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
 
 else ifdef WANT_SOURCE_INSTALL
 
+#ifdef MAKEFILE_SRC
+#$(info WANT_SOURCE_INSTALL = $(WANT_SOURCE_INSTALL), WANT_SHARE_INSTALL = $(WANT_SHARE_INSTALL))
+#endif
 PREFIX=$(abspath $(NHSROOT))
 # suppress nethack.sh
 #SHELLDIR=
@@ -325,13 +353,20 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
-POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf;
+POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		    ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		    chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
+
 # We can use "make all" to build the whole thing - but it misses some things:
 MOREALL=$(MAKE) install
 CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
 
 else	# !WANT_SOURCE_INSTALL
 
+#ifdef MAKEFILE_SRC
+#$(info WANT_SOURCE_INSTALL = $(WANT_SOURCE_INSTALL), WANT_SHARE_INSTALL = $(WANT_SHARE_INSTALL))
+#endif
 PREFIX:=$(wildcard ~)
 SHELLDIR=$(PREFIX)/bin
 HACKDIR=$(PREFIX)/nethackdir
@@ -340,45 +375,26 @@ CHGRP=/usr/bin/true
 GAMEPERM = 0700
 VARFILEPERM = 0600
 VARDIRPERM = 0700
+
 ifdef ($(WANT_DEFAULT),X11)
 # install nethack.rc as ~/.nethackrc if no ~/.nethackrc exists
-PREINSTALL= cp -n win/X11/nethack.rc ~/.nethackrc || true
+PREINSTALL+= cp -n win/X11/nethack.rc ~/.nethackrc || true;
 endif	# WANT_DEFAULT X11
 
+PREINSTALL+= (mkdir $(SHELLDIR) || true);
 POSTINSTALL+= sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(HACKDIR)/sysconf; \
 		$(CHOWN) $(GAMEUID) $(HACKDIR)/sysconf; \
 		$(CHGRP) $(GAMEGRP) $(HACKDIR)/sysconf; \
-		chmod $(VARFILEPERM) $(HACKDIR)/sysconf;
-ifdef WANT_BUNDLE
-#
-# Bundle
-#
-# $(HACKDIR)/$(GAME).app/
-#              Contents/
-#                 Frameworks/
-#                 Info.plist
-#                 MacOS/
-#                    $(GAME)
-#                 PkgInfo/
-#                 PlugIns/
-#                 Resources/
-#                 SharedFrameWorks/
-#
-BUNDLE = mkdir -p $(HACKDIR)/nethack.app/Contents/MacOS; \
-              sys/unix/hints/macosx.sh infoplist > $(HACKDIR)/nethack.app/Contents/Info.plist; \
-              mv $(HACKDIR)/nethack $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
-ifdef WANT_SHARE_INSTALL
-BUNDLE+= chmod $(GAMEPERM) $(HACKDIR)/nethack.app/Contents/MacOS/nethack;
-endif
+		chmod $(VARFILEPERM) $(HACKDIR)/sysconf; \
+		util/makedefs --grep-defined CRASHREPORT && \
+		  ( cp win/macosx/NetHackCrashReport.JavaScript $(HACKDIR) && \
+		  chmod 0500 $(HACKDIR)/NetHackCrashReport.JavaScript )
 
-POSTINSTALL+= $(BUNDLE)
-POSTINSTALL+= if test -f $(SHELLDIR)/$(GAME); then \
-			  sed -i '' 's;HACKDIR/$(GAME);HACKDIR/$(GAME).app/Contents/MacOS/$(GAME);' $(SHELLDIR)/$(GAME) ; fi;
-endif   # WANT_BUNDLE
 endif   # !WANT_SHARE_INSTALL
 
 INSTDIR=$(HACKDIR)
 VARDIR=$(HACKDIR)
+
 
 # ~/Library/Preferences/NetHack Defaults
 # OPTIONS=name:player,number_pad,menustyle:partial,!time,showexp
@@ -396,6 +412,70 @@ VARDIR=$(HACKDIR)
 #-INCLUDE multisnd2-pre.370
 #
 
+ifdef MAKEFILE_TOP
+.PHONY: bundle
+NHTOP=
+endif
+ifdef MAKEFILE_SRC
+.PHONY: buildbundle bundledir updatescript
+NHTOP=../
+abspath := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+ABSBUNDLEPATH := $(dir $(abspath))
+$(info ABSBUNDLEPATH=$(ABSBUNDLEPATH))
+
+ifdef WANT_BUNDLE
+#
+# bundle
+#
+# $(HACKDIR)/$(GAME).app/
+#              Contents/
+#                 Frameworks/
+#                 Info.plist
+#                 MacOS/
+#                    $(GAME)
+#                 PkgInfo/
+#                 PlugIns/
+#                 Resources/
+#                 SharedFrameWorks/
+#
+BUNDLE_NAME = NetHackTerm
+BUNDLE_GAMENAME = NetHack
+BUNDLE_PARENTDIR = $(ABSBUNDLEPATH)bundle
+BUNDLE_TOP = $(BUNDLE_PARENTDIR)/$(BUNDLE_NAME).app
+BUNDLE_CONTENTSDIR   = $(BUNDLE_TOP)/Contents
+BUNDLE_FRAMEWORKSDIR = $(BUNDLE_CONTENTSDIR)/Frameworks
+BUNDLE_MACOSDIR      = $(BUNDLE_CONTENTSDIR)/MacOS
+BUNDLE_PKGINFODIR    = $(BUNDLE_CONTENTSDIR)/PkgInfo
+BUNDLE_PLUGINSDIR    = $(BUNDLE_CONTENTSDIR)/PlugIns
+BUNDLE_RESOURCESDIR  = $(BUNDLE_CONTENTSDIR)/Resources
+BUNDLE_SHAREDFRAMEWORKSDIR = $(BUNDLE_CONTENTSDIR)/SharedFrameworks
+BUNDLE_INFOPLIST     = $(BUNDLE_CONTENTSDIR)/Info.plist
+BUNDLE_GAME          = $(BUNDLE_MACOSDIR)/$(BUNDLE_GAMENAME)
+BUNDLE_LAUNCHER      = $(BUNDLE_MACOSDIR)/$(BUNDLE_NAME)
+ifdef NEEDS_WAV
+BUNDLEWAVS = $(addsuffix .wav, $(SNDWAVS))
+endif
+
+IMAGESLIST = $(BUNDLE_NAME).icns
+
+RESOURCES_LIST = $(BUNDLEWAVS) $(IMAGESLIST)
+
+BUNDLE_ADD_TO_RESOURCES = $(addprefix $(BUNDLE_RESOURCESDIR)/, $(RESOURCES_LIST))
+
+MACOS_LIST = $(BUNDLE_GAMENAME)
+# NetHackGuidebook.applescript NetHackRecover.applescript NetHackTerm.applescript
+
+BUNDLE_ADD_TO_MACOS = $(addprefix $(BUNDLE_MACOSDIR)/, $(MACOS_LIST))
+
+endif   # WANT_BUNDLE
+#
+# We include the bundle outside of a WANT_BUNDLE block because
+# it is unlikely that anyone will use 'make WANT_BUNDLE=1 clean'
+#
+CLEANMORE += rm -rf ../bundle ;
+endif   # MAKEFILE_SRC
+
+#
 #-POST
 
 #
@@ -415,6 +495,132 @@ $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 	$(CC) $(CFLAGS) -c -o$@ $<
 endif  # WANT_LIBNH
 
+# -- bundle ---
+#
+ifdef MAKEFILE_TOP
+bundle: update uudecode
+	( cd src ; $(MAKE) WANT_BUNDLE=1 buildbundle )
+
+uudecode:
+	(cd util ; $(MAKE) WANT_BUNDLE=1 uudecode )
+endif   # MAKEFILE_TOP
+ifdef WANT_BUNDLE
+ifdef MAKEFILE_SRC
+
+BUNDLEDIRS = $(BUNDLE_PARENTDIR) $(BUNDLE_TOP) $(BUNDLE_CONTENTSDIR) $(BUNDLE_FRAMEWORKSDIR) \
+		$(BUNDLE_MACOSDIR) $(BUNDLE_PKGINFODIR) $(BUNDLE_PLUGINSDIR) \
+		$(BUNDLE_RESOURCESDIR) $(BUNDLE_SHAREDFRAMEWORKSDIR)
+
+BUNDLELIST = $(BUNDLE_INFOPLIST) $(BUNDLE_LAUNCHER) $(BUNDLE_ADD_TO_MACOS) $(BUNDLE_ADD_TO_RESOURCES)
+
+buildbundle: bundledir $(BUNDLEDIRS) $(BUNDLELIST) updatescript
+	@echo $(GAME) bundle : $(BUNDLE_TOP)
+	@echo $(GAME)   game : $(BUNDLE_GAME)
+
+$(BUNDLE_RESOURCESDIR)/%: $(NHTOP)sound/wav/% | $(BUNDLE_RESOURCESDIR)
+	cp $< $@
+
+#$(BUNDLE_MACOSDIR)/%: $(NHTOP)win/macosx/% | $(BUNDLE_MACOSDIR)
+#	cp $< $@
+
+$(BUNDLE_MACOSDIR)/%: $(dir $(GAMEBIN))/% | $(BUNDLE_MACOSDIR)
+	cp $< $@
+
+$(BUNDLE_PARENTDIR):
+		mkdir -p $@
+
+$(BUNDLE_TOP): $(BUNDLE_PARENTDIR)
+		mkdir -p $@
+
+$(BUNDLE_CONTENTSDIR): $(BUNDLE_TOP)
+		mkdir -p $@
+
+$(BUNDLE_FRAMEWORKSDIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_MACOSDIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_PKGINFODIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_PLUGINSDIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_RESOURCESDIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_SHAREDFRAMEWORKSDIR): $(BUNDLE_CONTENTSDIR)
+		mkdir -p $@
+
+$(BUNDLE_GAME): nethack
+	cp nethack $@
+
+#FIXME: replace hardcoded information with actual values derived from NetHack build
+$(BUNDLE_INFOPLIST):
+	@echo '<?xml version="1.0" encoding="UTF-8"?>' >$@
+	@echo '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">' >>$@
+	@echo '<plist version="1.0">' >>$@
+	@echo '<dict>' >>$@
+	@echo '<key>CFBundleInfoDictionaryVersion</key>' >>$@
+	@echo '<string>6.0</string>' >>$@
+	@echo '<key>CFBundleDevelopmentRegion</key>' >>$@
+	@echo '<string>en</string>' >>$@
+	@echo '<key>CFBundlePackageType</key>' >>$@
+	@echo '<string>APPL</string>' >>$@
+	@echo '<key>CFBundleGetInfoString</key>' >>$@
+	@echo '<string>$(BUNDLE_GAMENAME) 3.7 for MacOS</string>' >>$@
+	@echo '<key>CFBundleIdentifier</key>' >>$@
+	@echo '<string>org.nethack.macos</string>' >>$@
+	@echo '<key>CFBundleExecutable</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleIconFile</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleDisplayName</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleName</key>' >>$@
+	@echo '<string>$(BUNDLE_NAME)</string>' >>$@
+	@echo '<key>CFBundleVersion</key>' >>$@
+	@echo '<string>3.7.0b73</string>' >>$@
+	@echo '<key>CFBundleShortVersionString</key>' >>$@
+	@echo '<string>3.7.0</string>' >>$@
+	@echo '<key>NSHumanReadableCopyright</key>' >>$@
+	@echo '<string>©By Stichting Mathematisch Centrum and M. Stephenson 1985-2023</string>' >>$@
+	@echo '<key>LSApplicationCategoryType</key>' >>$@
+	@echo '<string>public.app-category.adventure-games</string>' >>$@
+	@echo '</dict>' >>$@
+	@echo '</plist>' >>$@
+#		$(NHTOP)sys/unix/hints/macosx.sh infoplist >$@
+
+$(BUNDLE_LAUNCHER):
+	@echo '#!/bin/sh' >$@
+	@echo 'dir=$$(dirname $$0)' >>$@
+	@echo 'open -a Terminal file://$${dir}/$(BUNDLE_GAMENAME)' >>$@
+	chmod +x $@
+
+updatescript:
+ifneq "$(SHELLDIR)" ""
+	if test -f $(SHELLDIR)/$(GAME); then \
+	  cp $(SHELLDIR)/$(GAME) $(GAME).tmp; \
+	  sed -i '' 's;\$$HACKDIR/$(GAME);$(BUNDLE_GAME);' $(SHELLDIR)/$(GAME) ; \
+	  diff -u $(GAME).tmp $(SHELLDIR)/$(GAME) | grep "="; \
+	  rm -f $(GAME).tmp; \
+	fi;
+endif
+
+# We can't use a general rule because the file name of the .uu does not match the
+# uudecode target file name inside the .uu file, in this case (nhicns.uu to nethack.icns)
+$(BUNDLE_RESOURCESDIR)/$(BUNDLE_NAME).icns: $(BUNDLE_RESOURCESDIR) $(NHTOP)util/uudecode \
+						$(NHTOP)win/share/nhicns.uu
+	$(NHTOP)util/uudecode $(NHTOP)win/share/nhicns.uu
+	mv nethack.icns $@
+
+endif   # MAKEFILE_SRC
+endif   # WANT_BUNDLE
+
+#
+# --- end of bundle ---
+#
 #
 #-INCLUDE cross-post.370
 #
@@ -525,6 +731,7 @@ build_package_root:
 	install -p doc/recover.6 $(PKGROOT_UG)/man/man6
 	install -p doc/Guidebook $(PKGROOT_UG)/doc
 	install -p dat/nhdat $(PKGROOT_UGLN)
+#XXX no code to package NetHackCrashReport.JavaScript
 	sys/unix/hints/macosx.sh editsysconf sys/unix/sysconf $(PKGROOT_UGLN)/sysconf
 	cd dat; install -p $(DATNODLB) ../$(PKGROOT_UGLN)
 # XXX these files should be somewhere else for good Mac form
@@ -601,4 +808,3 @@ endif	# end of build_qt_pkg
 endif	# WANT_WIN_QT for packaging
 endif	# MAKEFILE_TOP
 #
-

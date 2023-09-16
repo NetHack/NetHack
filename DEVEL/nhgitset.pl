@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $NHDT-Date: 1524689669 2018/04/25 20:54:29 $ $NHDT-Branch: NetHack-3.6.0 $:$NHDT-Revision: 1.2 $
+# $NHDT-Date: 1693357449 2023/08/30 01:04:09 $ $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -247,6 +247,15 @@ if(1){
 
 sub do_dir_hooksdir {
 	my($srcdir, $targetdir) = @_;
+
+	unless (-d $targetdir){
+		# Older versions of git, when cloning a repo and
+		# the expected source templates directory does not
+		# exist, does not create .git/hooks.  So do it here.
+	    mkdir $targetdir;
+	    print STDERR "WARNING: .git/hooks had to be created.\n";
+	    print STDERR "  You may want to update git.\n";
+	}
 
 	for my $path ( glob("$srcdir$DS*") ){
 

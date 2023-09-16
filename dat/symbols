@@ -133,6 +133,7 @@ start: Blank
         S_kop: \032
         S_land_mine: \032
         S_lava: \032
+        S_lavawall: \032
         S_leprechaun: \032
         S_level_teleporter: \032
         S_lich: \032
@@ -250,16 +251,19 @@ start: IBMgraphics
 	S_ndoor: \xfa			# meta-z, centered dot
 	S_vodoor: \xfe			# meta-~, small centered square
 	S_hodoor: \xfe			# meta-~, small centered square
+	S_engroom: \xee                 # epsilon
 	S_bars: \xf0			# equivalence symbol
 	S_tree: \xf1			# plus or minus symbol
 	S_room: \xfa			# meta-z, centered dot
 	S_corr: \xb0			# meta-0, light shading
 	S_litcorr: \xb1			# meta-1, medium shading
+	S_engrcorr: \xb0		# meta-0, light shading
 	S_fountain: \xf4		# meta-t, integral top half
 	S_sink: \xf4			# meta-t, integral top half
 	S_pool: \xf7			# meta-w, approx. equals
 	S_ice: \xfa			# meta-z, centered dot
 	S_lava: \xf7			# meta-w, approx. equals
+	S_lavawall: \xf7		# meta-w, approx. equals
 	S_vodbridge: \xfa		# meta-z, centered dot
 	S_hodbridge: \xfa		# meta-z, centered dot
 	S_water: \xf7			# meta-w, approx. equals
@@ -285,6 +289,7 @@ start: IBMGraphics_1
 	S_tdwall: \xc2			# meta-B, T down
 	S_tlwall: \xb4			# meta-4, T left
 	S_trwall: \xc3			# meta-C, T right
+	S_engroom: \xee                 # epsilon
 	S_vbeam: \xb3			# meta-3, vertical rule
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
@@ -309,8 +314,10 @@ start: IBMGraphics_2
 	S_trwall: \xc3			# meta-C, T right
 	S_vodoor: \xfe			# meta-~, small centered square
 	S_hodoor: \xfe			# meta-~, small centered square
+	S_engroom: \xee                 # epsilon
 	S_corr: \xb0			# meta-0, light shading
 	S_litcorr: \xb1			# meta-1, medium shading
+	S_engrcorr: \xb0		# meta-0, light shading
 	S_vbeam: \xb3			# meta-3, vertical rule
 	S_hbeam: \xc4			# meta-D, horizontal rule
 	S_sw_ml: \xb3			# meta-3, vertical rule
@@ -346,6 +353,7 @@ start: RogueIBM
 	S_room: \xfa			# centered dot
 	S_corr: \xb1
 	S_litcorr: \xb2
+	S_engrcorr: \xb1
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
 	S_brupstair: \xf0		# Greek Xi
@@ -372,8 +380,10 @@ start: RogueEpyx
 	S_vodoor: \xce
 	S_hodoor: \xce
 	S_room: \xfa			# centered dot
+	S_engroom: \xee                 # epsilon
 	S_corr: \xb1
 	S_litcorr: \xb2
+	S_engrcorr: \xb1
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
 	S_brupstair: \xf0		# Greek Xi
@@ -450,8 +460,10 @@ start: RogueWindows
 	S_vodoor: \xce
 	S_hodoor: \xce
 	S_room: \xfa			# centered dot
+	S_engroom: \xee                 # epsilon
 	S_corr: \xb1
 	S_litcorr: \xb2
+	S_engrcorr: \xb1
 	S_upstair: \xf0			# Greek Xi
 	S_dnstair: \xf0
 	S_brupstair: \xf0		# Greek Xi
@@ -477,8 +489,10 @@ start: curses
 	S_bars: \xfc			# meta-|, not-equals sign (was '#')
 	S_tree: \xe7			# meta-g, plus or minus sign
 	S_room: \xfe			# meta-z, centered dot
+	S_engroom: \xee                 # epsilon
 	S_corr: \xe1			# meta-a, solid block
 	S_litcorr: \xe1			# meta-a, solid block
+	S_engrcorr: \xe1			# meta-a, solid block
 	S_ice: \xfe			# meta-z, centered dot
 	S_vodbridge: \xfe		# meta-z, centered dot
 	S_hodbridge: \xfe		# meta-z, centered dot
@@ -519,6 +533,7 @@ start: DECgraphics
 	S_pool: \xe0			# meta-\, diamond
 	S_ice: \xfe			# meta-~, centered dot
 	S_lava: \xe0			# meta-\, diamond
+	S_lavawall: \xe0		# meta-\, diamond
 	S_vodbridge: \xfe		# meta-~, centered dot
 	S_hodbridge: \xfe		# meta-~, centered dot
 	S_water: \xe0			# meta-\, diamond
@@ -557,6 +572,7 @@ start: MACgraphics
 	S_bars: \xf0			# equivalency symbol
 	S_tree: \xf1			# plus-or-minus
 	S_corr: \xb0
+	S_engrcorr: \xb0
 	S_grave: \xef			# same as open door
 	S_pool: \xe0
 finish
@@ -582,6 +598,7 @@ start: Enhanced1
 	S_bars: U+2261                      # IDENTICAL TO
 	S_tree: U+03a8                      # GREEK CAPITAL LETTER PSI
 	S_room: U+00b7                      # MIDDLE DOT
+	S_engroom: U+03BE                   # Greek Small Letter Xi
 	S_darkroom: U+00b7                  # MIDDLE DOT
 	S_upladder: U+2264                  # LESS-THAN OR EQUAL TO
 	S_dnladder: U+2265                  # GREATER-THAN OR EQUAL TO
@@ -591,6 +608,7 @@ start: Enhanced1
 	S_pool: U+224b                      # TRIPLE TILDE
 	S_ice: U+00b7                       # MIDDLE DOT
 	S_lava: U+224b                      # TRIPLE TILDE
+	S_lavawall: U+2248                  # ALMOST EQUAL TO
 	S_vodbridge: U+00b7                 # MIDDLE DOT
 	S_hodbridge: U+00b7                 # MIDDLE DOT
 	S_water: U+2248                     # ALMOST EQUAL TO

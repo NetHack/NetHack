@@ -1,4 +1,4 @@
-/* NetHack 3.7	tradstdc.h	$NHDT-Date: 1596498565 2020/08/03 23:49:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.37 $ */
+/* NetHack 3.7	tradstdc.h	$NHDT-Date: 1685522034 2023/05/31 08:33:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.54 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -172,77 +172,8 @@ typedef const char *vA;
 
 #endif /* NEED_VARARGS */
 
-#if defined(NHSTDC) || defined(MSDOS) || defined(MAC) \
-    || defined(ULTRIX_PROTO) || defined(__BEOS__)
-
-/*
- * Used for robust ANSI parameter forward declarations:
- * int VDECL(sprintf, (char *, const char *, ...));
- *
- * VDECL() is used for functions with a variable number of arguments.
- * Separate macros are needed because ANSI will mix old-style declarations
- * with prototypes, except in the case of varargs
-  */
-
-#if defined(MSDOS) || defined(USE_STDARG)
-#define VDECL(f, p) f p
-#else
-#define VDECL(f, p) f()
-#endif
-
 /* generic pointer, always a macro; genericptr_t is usually a typedef */
 #define genericptr void *
-
-#if (defined(ULTRIX_PROTO) && !defined(__GNUC__)) || defined(OS2_CSET2)
-/* Cover for Ultrix on a DECstation with 2.0 compiler, which coredumps on
- *   typedef void * genericptr_t;
- *   extern void a(void(*)(int, genericptr_t));
- * Using the #define is OK for other compiler versions too.
- */
-/* And IBM CSet/2.  The redeclaration of free hoses the compile. */
-#define genericptr_t genericptr
-#else
-#if !defined(NHSTDC) && !defined(MAC)
-#define const
-#define signed
-#define volatile
-#endif
-#endif
-
-/*
- * Suppress `const' if necessary and not handled elsewhere.
- * Don't use `#if defined(xxx) && !defined(const)'
- * because some compilers choke on `defined(const)'.
- * This has been observed with Lattice, MPW, and High C.
- */
-#if (defined(ULTRIX_PROTO) && !defined(NHSTDC)) || defined(apollo)
-/* the system header files don't use `const' properly */
-#ifndef const
-#define const
-#endif
-#endif
-
-#else /* NHSTDC */ /* a "traditional" C  compiler */
-
-#define VDECL(f, p) f()
-
-#if defined(AMIGA) || defined(HPUX) || defined(POSIX_TYPES) \
-    || defined(__DECC) || defined(__BORLANDC__)
-#define genericptr void *
-#endif
-#ifndef genericptr
-#define genericptr char *
-#endif
-
-/*
- * Traditional C compilers don't have "signed", "const", or "volatile".
- */
-#define signed
-#define const
-#define volatile
-
-#endif /* NHSTDC */
-
 #ifndef genericptr_t
 typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
@@ -431,6 +362,8 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #endif
 #if __GNUC__ >= 5
 #define NONNULL __attribute__((returns_nonnull))
+/* #pragma message is available */
+#define NH_PRAGMA_MESSAGE 1
 #endif
 #endif
 
@@ -438,6 +371,8 @@ typedef genericptr genericptr_t; /* (void *) or (char *) */
 #ifndef ATTRNORETURN
 #define ATTRNORETURN __declspec(noreturn)
 #endif
+/* #pragma message is available */
+#define NH_PRAGMA_MESSAGE 1
 #endif
 
 #ifndef PRINTF_F

@@ -146,7 +146,7 @@ formatkiller(
     }
     *buf = '\0';
 
-    if (incl_helpless && gm.multi) {
+    if (incl_helpless && gm.multi < 0) {
         /* X <= siz: 'sizeof "string"' includes 1 for '\0' terminator */
         if (gm.multi_reason
             && strlen(gm.multi_reason) + sizeof ", while " <= siz)
@@ -359,7 +359,7 @@ writexlentry(FILE *rfile, struct toptenentry *tt, int how)
     Fprintf(rfile, "%s%cname=%s%cdeath=%s",
             buf, /* (already includes separator) */
             XLOG_SEP, gp.plname, XLOG_SEP, tmpbuf);
-    if (gm.multi)
+    if (gm.multi < 0)
         Fprintf(rfile, "%cwhile=%s", XLOG_SEP,
                 gm.multi_reason ? gm.multi_reason : "helpless");
     Fprintf(rfile, "%cconduct=0x%lx%cturns=%ld%cachieve=0x%lx", XLOG_SEP,
@@ -434,11 +434,13 @@ encodeconduct(void)
        reporting "obeyed sokoban rules" is misleading if sokoban wasn't
        completed or at least attempted; however, suppressing that when
        sokoban was never entered, as we do here, risks reporting
-       "violated sokoban rules" when no such thing occured; this can
+       "violated sokoban rules" when no such thing occurred; this can
        be disambiguated in xlogfile post-processors by testing the
        entered-sokoban bit in the 'achieve' field */
     if (!u.uconduct.sokocheat && sokoban_in_play())
         e |= 1L << 12;
+    if (!u.uconduct.pets)
+        e |= 1L << 13;
 
     return e;
 }
@@ -591,8 +593,10 @@ encode_extended_conducts(char *buf)
     if (sokoban_in_play())
         add_achieveX(buf, "sokoban",  !u.uconduct.sokocheat);
     add_achieveX(buf, "blind",        u.uroleplay.blind);
+    add_achieveX(buf, "deaf",         u.uroleplay.deaf);
     add_achieveX(buf, "nudist",       u.uroleplay.nudist);
     add_achieveX(buf, "bonesless",    !flags.bones);
+    add_achieveX(buf, "petless",      !u.uconduct.pets);
 
     return buf;
 }
@@ -644,7 +648,7 @@ topten(int how, time_t when)
         gt.toptenwin = create_nhwindow(NHW_TEXT);
     }
 
-#if defined(UNIX) || defined(VMS) || defined(__EMX__)
+#if defined(HANGUPHANDLING)
 #define HUP if (!gp.program_state.done_hup)
 #else
 #define HUP
@@ -1426,6 +1430,29 @@ tt_oname(struct obj *otmp)
     otmp = oname(otmp, tt->name, ONAME_NO_FLAGS);
 
     return otmp;
+}
+
+/* Randomly select a topten entry to mimic */
+int
+tt_doppel(struct monst *mon) {
+    struct toptenentry *tt = rn2(13) ? get_rnd_toptenentry() : NULL;
+    int ret;
+
+    if (!tt)
+        ret = rn1(PM_WIZARD - PM_ARCHEOLOGIST + 1, PM_ARCHEOLOGIST);
+    else {
+        if (tt->plgend[0] == 'F')
+            mon->female = 1;
+        else if (tt->plgend[0] == 'M')
+            mon->female = 0;
+        ret = classmon(tt->plrole);
+        /* Only take on a name if the player can see
+           the doppelganger, otherwise we end up with
+           named monsters spoiling the fun - Kes */
+        if (canseemon(mon))
+            christen_monst(mon, tt->name);
+    }
+    return ret;
 }
 
 #ifdef NO_SCAN_BRACK

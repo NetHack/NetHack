@@ -23,8 +23,18 @@
 static int curs_x = -1;
 static int curs_y = -1;
 
-static int parse_escape_sequence(void);
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
+static unsigned long last_getch_modifiers = 0L;
+static boolean modifiers_available = TRUE;
+#else
+static boolean modifiers_available = FALSE;
+#endif
 
+static int modified(int ch);
+static void update_modifiers(void);
+static int parse_escape_sequence(int, boolean *);
+
+#define SS3 M(C('O')) /* 8-bit escape sequence initiator for VT number pad */
 
 int
 curses_getch(void)
@@ -44,42 +54,16 @@ int
 curses_read_char(void)
 {
     int ch;
-#if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
-    int tmpch;
-#endif
 
     /* cancel message suppression; all messages have had a chance to be read */
     curses_got_input();
 
     ch = curses_getch();
-#if defined(ALT_0) || defined(ALT_9) || defined(ALT_A) || defined(ALT_Z)
-    tmpch = ch;
-#endif
     ch = curses_convert_keys(ch);
 
     if (ch == 0) {
         ch = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     }
-#if defined(ALT_0) && defined(ALT_9)    /* PDCurses, maybe others */
-    if ((ch >= ALT_0) && (ch <= ALT_9)) {
-        tmpch = (ch - ALT_0) + '0';
-        ch = M(tmpch);
-    }
-#endif
-
-#if defined(ALT_A) && defined(ALT_Z)    /* PDCurses, maybe others */
-    if ((ch >= ALT_A) && (ch <= ALT_Z)) {
-        tmpch = (ch - ALT_A) + 'a';
-        ch = M(tmpch);
-    }
-#endif
-
-#ifdef KEY_RESIZE
-    /* Handle resize events via get_nh_event, not this code */
-    if (ch == KEY_RESIZE) {
-        ch = C('r'); /* NetHack doesn't know what to do with KEY_RESIZE */
-    }
-#endif
 
     if (counting && !isdigit(ch)) { /* dismiss count window if necessary */
         curses_count_window(NULL);
@@ -623,6 +607,17 @@ curses_move_cursor(winid wid, int x, int y)
     }
 }
 
+/* update the ncurses stdscr cursor to where the cursor in our map is */
+void
+curses_update_stdscr_cursor(void)
+{
+#ifndef PDCURSES
+    int xadj = 0, yadj = 0;
+
+    curses_get_window_xy(MAP_WIN, &xadj, &yadj);
+    move(curs_y + yadj, curs_x + xadj);
+#endif
+}
 
 /* Perform actions that should be done every turn before nhgetch() */
 
@@ -719,11 +714,11 @@ curses_get_count(int first_digit)
        curses's message window will display that in count window instead */
     current_char = get_count(NULL, (char) first_digit,
                              /* 0L => no limit on value unless it wraps
-                                to negative */
+                              * to negative */
                              0L, &current_count,
-                             /* default: don't put into message history,
-                                don't echo until second digit entered */
-                             GC_NOFLAGS);
+                             /* don't put into message history, echo full
+                              * number rather than waiting until 2nd digit */
+                             GC_ECHOFIRST);
 
     ungetch(current_char);
     if (current_char == '\033') {     /* Cancelled with escape */
@@ -736,10 +731,10 @@ curses_get_count(int first_digit)
 /* Convert the given NetHack text attributes into the format curses
    understands, and return that format mask. */
 
-int
+attr_t
 curses_convert_attr(int attr)
 {
-    int curses_attr;
+    attr_t curses_attr;
 
     /* first, strip off control flags masked onto the display attributes
        (caller should have already done this...) */
@@ -863,110 +858,132 @@ Currently this is limited to arrow keys, but this may be expanded. */
 int
 curses_convert_keys(int key)
 {
+    boolean reject = (gp.program_state.input_state == otherInp),
+            as_is = FALSE, numpad_esc = FALSE;
     int ret = key;
 
-    if (ret == '\033') {
-        ret = parse_escape_sequence();
-    }
+    if (modifiers_available)
+        update_modifiers();
 
-    /* Handle arrow keys */
+    /* Handle arrow and keypad keys, but only when getting a command
+       (or a command-like keystroke for getpos() or getdir()). */
     switch (key) {
+    case SS3: /* M-^O, 8-bit version of ESC 'O' c for keypad key */
+    case '\033': /* ESC or ^[ */
+        /* changes ESC c to M-c or number pad key to corresponding digit
+           (but we only get here via key==ESC if curses' getch() didn't
+           change the latter to KEY_xyz) */
+        ret = parse_escape_sequence(key, &numpad_esc);
+        reject = ((uchar) ret < 1 || ret > 255);
+        as_is = !numpad_esc; /* don't perform phonepad inversion */
+        break;
     case KEY_BACKSPACE:
         /* we can't distinguish between a separate backspace key and
            explicit Ctrl+H intended to rush to the left; without this,
            a value for ^H greater than 255 is passed back to core's
            readchar() and stripping the value down to 0..255 yields ^G! */
         ret = C('H');
+        /*FALLTHRU*/
+    default:
+        if (modifiers_available)
+            ret = modified(ret);
+#if defined(ALT_A) && defined(ALT_Z)
+        /* for PDcurses, but doesn't handle Alt+X for upper case X;
+           ncurses doesn't have ALT_x definitions so we achieve a similar
+           effect via parse_escape_sequence(), and that works for upper
+           case and other non-letter, non-digit keys */
+        if (ret >= ALT_A && ret <= ALT_Z) {
+            ret = (ret - ALT_A) + 'a';
+            ret = M(ret);
+        }
+#endif
+#if defined(ALT_0) && defined(ALT_9)
+        if (ret >= ALT_0 && ret <= ALT_9) {
+            ret = (ret - ALT_0) + '0';
+            ret = M(ret);
+        }
+#endif
+        /* use key as-is unless it's out of normal char range */
+        reject = ((uchar) ret < 1 || ret > 255);
+        as_is = TRUE;
         break;
 #ifdef KEY_B1
     case KEY_B1:
 #endif
     case KEY_LEFT:
-        if (iflags.num_pad) {
-            ret = '4';
-        } else {
-            ret = 'h';
-        }
+        ret = iflags.num_pad ? '4' : 'h';
         break;
 #ifdef KEY_B3
     case KEY_B3:
 #endif
     case KEY_RIGHT:
-        if (iflags.num_pad) {
-            ret = '6';
-        } else {
-            ret = 'l';
-        }
+        ret = iflags.num_pad ? '6' : 'l';
         break;
 #ifdef KEY_A2
     case KEY_A2:
 #endif
     case KEY_UP:
-        if (iflags.num_pad) {
-            ret = '8';
-        } else {
-            ret = 'k';
-        }
+        ret = iflags.num_pad ? '8' : 'k';
         break;
 #ifdef KEY_C2
     case KEY_C2:
 #endif
     case KEY_DOWN:
-        if (iflags.num_pad) {
-            ret = '2';
-        } else {
-            ret = 'j';
-        }
+        ret = iflags.num_pad ? '2' : 'j';
         break;
 #ifdef KEY_A1
     case KEY_A1:
 #endif
     case KEY_HOME:
-        if (iflags.num_pad) {
-            ret = '7';
-        } else {
-            ret = !gc.Cmd.swap_yz ? 'y' : 'z';
-        }
+        ret = iflags.num_pad ? '7' : (!gc.Cmd.swap_yz ? 'y' : 'z');
         break;
 #ifdef KEY_A3
     case KEY_A3:
 #endif
     case KEY_PPAGE:
-        if (iflags.num_pad) {
-            ret = '9';
-        } else {
-            ret = 'u';
-        }
+        ret = iflags.num_pad ? '9' : 'u';
         break;
 #ifdef KEY_C1
     case KEY_C1:
 #endif
     case KEY_END:
-        if (iflags.num_pad) {
-            ret = '1';
-        } else {
-            ret = 'b';
-        }
+        ret = iflags.num_pad ? '1' : 'b';
         break;
 #ifdef KEY_C3
     case KEY_C3:
 #endif
     case KEY_NPAGE:
-        if (iflags.num_pad) {
-            ret = '3';
-        } else {
-            ret = 'n';
-        }
+        ret = iflags.num_pad ? '3' : 'n';
         break;
 #ifdef KEY_B2
     case KEY_B2:
-        if (iflags.num_pad) {
-            ret = '5';
-        } else {
-            ret = 'g';
-        }
+        ret = iflags.num_pad ? '5' : 'g';
         break;
 #endif /* KEY_B2 */
+#ifdef KEY_RESIZE
+    case KEY_RESIZE:
+        /* actual resize is handled elsewhere; just avoid beep/bell here */
+        ret = '\033'; /* was C('R'); -- nethack's redraw command */
+        reject = FALSE;
+        break;
+#endif
+    }
+
+    /* phone layout is inverted, 123 on top and 789 on bottom; if player has
+       set num_pad to deal with that, we need to invert here too but only
+       when some key has been converted into a digit, not for actual digit */
+    if (iflags.num_pad && (iflags.num_pad_mode & 2) != 0 && !as_is) {
+        if (ret >= '1' && ret <= '3')
+            ret += 6; /* 1,2,3 -> 7,8,9 */
+        else if (ret >= '7' && ret <= '9')
+            ret -= 6; /* 7,8,9 -> 1,2,3 */
+    }
+
+    if (reject) {
+        /* an arrow or function key has been pressed during text entry */
+        curses_nhbell(); /* calls beep() which might cause unwanted screen
+                          * refresh if terminal is set for 'visible bell' */
+        ret = '\033'; /* ESC */
     }
 
     return ret;
@@ -1054,36 +1071,113 @@ curses_mouse_support(int mode) /* 0: off, 1: on, 2: alternate on */
 #endif
 }
 
+/* caller just got an input character of ESC or M-^O;
+   note: curses converts a lot of escape sequences to single values greater
+   than 255 and those won't look like ESC to caller so won't get here */
 static int
-parse_escape_sequence(void)
+parse_escape_sequence(int key, boolean *keypadnum)
 {
 #ifndef PDCURSES
-    int ret;
+    int ret, keypadother = 0;
+
+    *keypadnum = FALSE;
 
     timeout(10);
-
     ret = getch();
 
-    if (ret != ERR) {           /* Likely an escape sequence */
-        if (((ret >= 'a') && (ret <= 'z')) || ((ret >= '0') && (ret <= '9'))) {
-            ret |= 0x80;        /* Meta key support for most terminals */
-        } else if (ret == 'O') {        /* Numeric keypad */
+    if (ret == 'O' || key == SS3) { /* handle numeric keypad */
+        /*
+         * ESC O <pending> or M-^O <something|nothing>.
+         *
+         * For the former, we don't have the next char yet so get it now.
+         * If there isn't one, treat ESC O as if user typed M-O (which
+         * is probably the case, via alt+shift+O combo sending two char
+         * "ESC O").
+         *
+         * For the latter, it there wasn't another char then 'ret' will
+         * be ERR and we'll treat the result as M-^O.  However, if there
+         * is another char and it is O meant as two characters "M-^O O"
+         * we'll be fooled, but that's not a valid escape sequence so
+         * don't worry about those two characters arriving together.
+         */
+        if (key == '\033')
             ret = getch();
-            if ((ret != ERR) && (ret >= 112) && (ret <= 121)) {
-                ret = ret - 112 + '0';  /* Convert to number */
-            } else {
-                ret = '\033';   /* Escape */
-            }
+
+        if (ret == ERR) {
+            /* there was no additional char; treat as M-O or M-^O below */
+            ret = (key == '\033') ? 'O' : C('O');
+        } else if (ret >= 112 && ret <= 121) { /* 'p'..'y' */
+            *keypadnum = TRUE; /* convert 'p'..'y' to '0'..'9' below */
+        } else if (ret >= 108 && ret <= 110) { /* 'l'..'n' */
+            keypadother = 1;   /* convert 'l','m','n' to ',','.','-' below */
+        } else if (ret == 'M') {
+            keypadother = 2;   /* convert "ESC O M" or "SS3 M" to ^M */
         }
-    } else {
-        ret = '\033';           /* Just an escape character */
     }
 
-    timeout(-1);
+    timeout(-1); /* reset to 'wait unlimited time for next input' */
+
+    if (*keypadnum) {
+        /* 'p' -> '0', ..., 'y' -> '9' */
+        ret -= ('p' - '0');         /* Convert c from 'ESC O c' to digit */
+    } else if (keypadother > 0) {
+        /* conversion for VT keypad keys (no plus; ignore PF1 through PF4)
+           [typical PC keyboard has period and plus, no comma or minus] */
+        if (keypadother == 1)
+            ret -= ('l' - ',');     /* keypad comma, period, or minus */
+        else
+            ret = C('M');           /* keypad <enter> */
+    } else if (ret != ERR && ret <= 255) {
+        /* ESC <something>; effectively 'altmeta' behind player's back */
+        ret = M(ret);               /* Meta key support for most terminals */
+    } else {
+        ret = '\033';               /* Just an escape character */
+    }
 
     return ret;
 #else
+    nhUse(key);
+    nhUse(keypadnum);
     return '\033';
 #endif /* !PDCURSES */
 }
 
+#undef SS3
+
+/* update_modifiers() and modified() will never be
+   called if modifiers_available is FALSE */
+
+static void
+update_modifiers(void)
+{
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
+    last_getch_modifiers = PDC_get_key_modifiers();
+#endif
+}
+
+static int
+modified(int ch)
+{
+    int ret_ch = ch;
+
+#if defined(PDCURSES) && defined(PDC_KEY_MODIFIER_ALT)
+    /* PDCurses key modifier masks:
+     * PDC_KEY_MODIFIER_SHIFT   = 1
+     * PDC_KEY_MODIFIER_CONTROL = 2
+     * PDC_KEY_MODIFIER_ALT     = 4
+     * PDC_KEY_MODIFIER_NUMLOCK = 8
+     * PDC_KEY_MODIFIER_REPEAT  = 16
+     * ALT + 'a' through ALT + 'z' returns ALT_A  through ALT_Z
+     *    and those are out of the normal character range and
+     *    code in curses_convert_keys() handles those.
+     * ALT + 'A' through ALT + 'Z' return normal 'A' through 'Z'
+     *    so we check the modifier here.
+     */
+    if (((last_getch_modifiers & PDC_KEY_MODIFIER_ALT) == PDC_KEY_MODIFIER_ALT)
+        && (ch >= 'A' && ch <= 'Z'))
+        ret_ch = M(ch);
+#endif
+    return ret_ch;
+}
+
+/*cursmisc.c*/

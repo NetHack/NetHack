@@ -1,4 +1,4 @@
-/* NetHack 3.7	config.h	$NHDT-Date: 1610141601 2021/01/08 21:33:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.148 $ */
+/* NetHack 3.7	config.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.175 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2016. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -205,6 +205,10 @@
  *            The following options pertain to crash reporting:
  *              GREPPATH     (the path to the system grep(1) utility)
  *              GDBPATH      (the path to the system gdb(1) program)
+ *              CRASHREPORT  (use CRASHREPORTURL if defined in syscf; this
+ *                           define specifies the name of the helper program
+ *                           used to launch the browser and enables the
+ *                           feature))
  *            Regular nethack options can also be specified in order to
  *            provide system-wide default values local to your system:
  *              OPTIONS      (same as in users' .nethackrc or defaults.nh)
@@ -233,6 +237,17 @@
 #endif
 #ifndef GREPPATH
 #define GREPPATH "/bin/grep"
+#endif
+
+#ifndef CRASHREPORT
+# ifdef MACOS
+    /* NB: This needs to be a full path unless it's in the playground. */
+//#define CRASHREPORT "NetHackCrashReport.JavaScript"
+# endif
+# ifdef __linux__
+    /* NB: This expects to find the nhlua binary as "./nhlua" */
+//#define CRASHREPORT "nhcrashreport.lua"
+# endif
 #endif
 
 /* note: "larger" is in comparison with 'record', the high-scores file
@@ -532,7 +547,7 @@ typedef unsigned char uchar;
 #define SELECTSAVED /* support for restoring via menu */
 
 /* TTY_TILES_ESCCODES: Enable output of special console escape codes
- * which act as hints for external programs such as EbonHack, or hterm.
+ * which act as hints for external programs such as EbonHack or hterm.
  *
  * TTY_SOUND_ESCCODES: Enable output of special console escape codes
  * which act as hints for theoretical external programs to play sound effect.
@@ -559,7 +574,8 @@ typedef unsigned char uchar;
  *
  * To compile NetHack with this, add tile.c to WINSRC and tile.o to WINOBJ
  * in the hints file or Makefile.
- * Set boolean option vt_xdata in your config file to turn either of these on.
+ * Set boolean option vt_tiledata and/or vt_sounddata in your config file
+ * to turn either of these on.
  * Note that gnome-terminal at least doesn't work with this. */
 /* #define TTY_TILES_ESCCODES */
 /* #define TTY_SOUND_ESCCODES */
@@ -624,38 +640,12 @@ typedef unsigned char uchar;
 #ifdef CHRONICLE
 /* LIVELOG - log CHRONICLE events into LIVELOGFILE as they happen. */
 /* #define LIVELOG */
-#ifdef LIVELOG
-#define LIVELOGFILE "livelog" /* in-game events recorded, live */
-#endif /* LIVELOG */
 #endif /* CHRONICLE */
 #else
 #undef LIVELOG
 #endif /* NO_CHRONICLE */
 
 /* #define DUMPLOG */  /* End-of-game dump logs */
-#ifdef DUMPLOG
-
-#ifndef DUMPLOG_MSG_COUNT
-#define DUMPLOG_MSG_COUNT   50
-#endif
-
-#ifndef DUMPLOG_FILE
-#define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
-/* DUMPLOG_FILE allows following placeholders:
-   %% literal '%'
-   %v version (eg. "3.6.3-0")
-   %u game UID
-   %t game start time, UNIX timestamp format
-   %T current time, UNIX timestamp format
-   %d game start time, YYYYMMDDhhmmss format
-   %D current time, YYYYMMDDhhmmss format
-   %n player name
-   %N first character of player name
-   DUMPLOG_FILE is not used if SYSCF is defined
-*/
-#endif
-
-#endif
 
 #define USE_ISAAC64 /* Use cross-plattform, bundled RNG */
 
@@ -671,7 +661,39 @@ typedef unsigned char uchar;
 # endif
 #endif
 
+#include "cstd.h"
 #include "integer.h"
 #include "global.h" /* Define everything else according to choices above */
+
+/* Place the following after #include [platform]conf.h in global.h so that
+   overrides are possible in there, for things like unix-specfic file
+   paths. */
+
+#ifdef LIVELOG
+#ifndef LIVELOGFILE
+#define LIVELOGFILE "livelog" /* in-game events recorded, live */
+#endif /* LIVELOGFILE */
+#endif /* LIVELOG */
+
+#ifdef DUMPLOG
+#ifndef DUMPLOG_MSG_COUNT
+#define DUMPLOG_MSG_COUNT   50
+#endif /* DUMPLOG_MSG_COUNT */
+#ifndef DUMPLOG_FILE
+#define DUMPLOG_FILE        "/tmp/nethack.%n.%d.log"
+/* DUMPLOG_FILE allows following placeholders:
+   %% literal '%'
+   %v version (eg. "3.6.3-0")
+   %u game UID
+   %t game start time, UNIX timestamp format
+   %T current time, UNIX timestamp format
+   %d game start time, YYYYMMDDhhmmss format
+   %D current time, YYYYMMDDhhmmss format
+   %n player name
+   %N first character of player name
+   DUMPLOG_FILE is not used if SYSCF is defined
+*/
+#endif /* DUMPLOG_FILE */
+#endif /* DUMPLOG */
 
 #endif /* CONFIG_H */

@@ -115,6 +115,8 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
 }
 
 /*
+ * For menustyle:Traditional and menustyle:Combination.
+ *
  * Suppose some '?' and '!' objects are present, but '/' objects aren't:
  *      "a" picks all items without further prompting;
  *      "A" steps through all items, asking one by one;
@@ -125,11 +127,22 @@ collect_obj_classes(char ilets[], struct obj *otmp, boolean here,
  *          (bug fix:  3.1.0 thru 3.1.3 treated it as "a");
  *      "?/a" or "a?/" or "/a?",&c picks all '?' even though no '/'
  *          (ie, treated as if it had just been "?a").
+ *
+ * Note: the behavior and meaning of 'a' vs 'A' is effectively reversed
+ * when using menustyle:Full.  For Traditional, the choice is based on
+ * ease of typing (using 'a' is much more common than 'A'); for Full,
+ * it was changed to enhance menu entry ordering ('A' stands out, but
+ * some players complain that it is too easy to choose accidentally).
  */
 static boolean
-query_classes(char oclasses[], boolean *one_at_a_time, boolean *everything,
-              const char *action, struct obj *objs, boolean here,
-              int *menu_on_demand)
+query_classes(
+    char oclasses[], /* selected classes */
+    boolean *one_at_a_time, /* to tell caller that user picked 'A' */
+    boolean *everything, /* to tell caller that user picked 'a' */
+    const char *action, /* verb for what activity needs objects */
+    struct obj *objs, /* invent or container->cobj or level.objects[x][y] */
+    boolean here, /* True: traverse by obj->nexthere; False: by obj->nobj */
+    int *menu_on_demand) /* to tell caller that user picked 'm' */
 {
     char ilets[36], inbuf[BUFSZ] = DUMMY; /* FIXME: hardcoded ilets[] length */
     int iletct, oclassct;
@@ -544,7 +557,7 @@ reset_justpicked(struct obj *olist)
 {
     struct obj *otmp;
     /*
-     * TODO?  Possible enchancement: don't reset if hero is still at same
+     * TODO?  Possible enhancement: don't reset if hero is still at same
      *  spot where most recent pickup took place.  Not resetting will be
      *  the correct behavior for autopickup immediately followed by manual
      *  pickup.  It would probably be correct for either or both pickups
@@ -1133,15 +1146,19 @@ query_objlist(const char *qstr,        /* query string */
 }
 
 /*
+ * For menustyle:Full.
+ *
  * allow menu-based category (class) selection (for Drop,take off etc.)
  *
+ * If ParanoidAutoAll, requires confirmation when 'A' has been picked.
  */
 int
-query_category(const char *qstr,      /* query string */
-               struct obj *olist,     /* the list to pick from */
-               int qflags,            /* behavior modification flags */
-               menu_item **pick_list, /* return list of items picked */
-               int how)               /* type of query */
+query_category(
+    const char *qstr,      /* query string */
+    struct obj *olist,     /* the list to pick from */
+    int qflags,            /* behavior modification flags */
+    menu_item **pick_list, /* return list of items picked */
+    int how)               /* type of query */
 {
     int n;
     winid win;
@@ -1152,13 +1169,9 @@ query_category(const char *qstr,      /* query string */
     char invlet;
     int ccount;
     boolean (*ofilter)(OBJ_P) = (boolean (*)(OBJ_P)) 0;
-    boolean do_unpaid = FALSE;
-    boolean do_blessed = FALSE, do_cursed = FALSE, do_uncursed = FALSE,
-            do_buc_unknown = FALSE;
-    int num_buc_types = 0;
-    unsigned itemflags = MENU_ITEMFLAGS_NONE;
-    int num_justpicked = 0;
-    int clr = 0;
+    boolean do_unpaid = FALSE, do_blessed = FALSE, do_cursed = FALSE,
+            do_uncursed = FALSE, do_buc_unknown = FALSE, verify_All = FALSE;
+    int num_buc_types = 0, num_justpicked = 0, clr = 0;
 
     *pick_list = (menu_item *) 0;
     if (!olist)
@@ -1219,25 +1232,25 @@ query_category(const char *qstr,      /* query string */
         invlet = 'A';
         any = cg.zeroany;
         any.a_int = 'A';
-        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  (qflags & WORN_TYPES) ? "Auto-select every item being worn"
                                        : "Auto-select every relevant item",
-                 itemflags);
+                 MENU_ITEMFLAGS_SKIPINVERT);
+        verify_All = (how == PICK_ANY) && ParanoidAutoAll;
 
+        /* blank separator */
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
     }
 
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
         invlet = 'a';
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
-        itemflags = MENU_ITEMFLAGS_SKIPINVERT;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  (qflags & WORN_TYPES) ? "All worn types" : "All types",
-                 itemflags);
+                 MENU_ITEMFLAGS_SKIPINVERT);
         invlet = 'b';
     } else
         invlet = 'a';
@@ -1248,15 +1261,16 @@ query_category(const char *qstr,      /* query string */
                 if (ofilter && !(*ofilter)(curr))
                     continue;
                 if (!collected_type_name) {
+                    int oclass = (int) curr->oclass;
+
                     any = cg.zeroany;
-                    any.a_int = curr->oclass;
-                    add_menu(
-                        win, &nul_glyphinfo, &any, invlet++,
-                        def_oc_syms[(int) objects[curr->otyp].oc_class].sym,
-                        ATR_NONE, clr, let_to_name(*pack, FALSE,
-                                                  (how != PICK_NONE)
-                                                   && iflags.menu_head_objsym),
-                        MENU_ITEMFLAGS_NONE);
+                    any.a_int = oclass;
+                    add_menu(win, &nul_glyphinfo, &any, invlet++,
+                             (int) def_oc_syms[oclass].sym, ATR_NONE, clr,
+                             let_to_name(*pack, FALSE,
+                                         (how != PICK_NONE
+                                          && iflags.menu_head_objsym)),
+                             MENU_ITEMFLAGS_NONE);
                     collected_type_name = TRUE;
                 }
             }
@@ -1270,10 +1284,10 @@ query_category(const char *qstr,      /* query string */
     } while (*pack);
 
     if (do_unpaid || (qflags & BILLED_TYPES) || do_blessed || do_cursed
-        || do_uncursed || do_buc_unknown) {
+        || do_uncursed || do_buc_unknown || num_justpicked) {
         any = cg.zeroany;
         add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
     }
 
     /* unpaid items if there are any */
@@ -1282,7 +1296,7 @@ query_category(const char *qstr,      /* query string */
         any = cg.zeroany;
         any.a_int = 'u';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0,
-                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, clr, "Unpaid items", MENU_ITEMFLAGS_SKIPINVERT);
     }
     /* billed items: checked by caller, so always include if BILLED_TYPES */
     if (qflags & BILLED_TYPES) {
@@ -1290,40 +1304,40 @@ query_category(const char *qstr,      /* query string */
         any = cg.zeroany;
         any.a_int = 'x';
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
-                 "Unpaid items already used up", MENU_ITEMFLAGS_NONE);
+                 "Unpaid items already used up", MENU_ITEMFLAGS_SKIPINVERT);
     }
 
     /* items with b/u/c/unknown if there are any;
        this cluster of menu entries is in alphabetical order,
        reversing the usual sequence of 'U' and 'C' in BUCX */
-    itemflags = MENU_ITEMFLAGS_SKIPINVERT;
     if (do_blessed) {
         invlet = 'B';
         any = cg.zeroany;
         any.a_int = 'B';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Blessed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Blessed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_cursed) {
         invlet = 'C';
         any = cg.zeroany;
         any.a_int = 'C';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Cursed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Cursed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_uncursed) {
         invlet = 'U';
         any = cg.zeroany;
         any.a_int = 'U';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items known to be Uncursed", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items known to be Uncursed", MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (do_buc_unknown) {
         invlet = 'X';
         any = cg.zeroany;
         any.a_int = 'X';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, "Items of unknown Bless/Curse status", itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 "Items of unknown Bless/Curse status",
+                 MENU_ITEMFLAGS_SKIPINVERT);
     }
     if (num_justpicked) {
         char tmpbuf[BUFSZ];
@@ -1332,19 +1346,41 @@ query_category(const char *qstr,      /* query string */
             Sprintf(tmpbuf, "Just picked up: %s",
                     doname(find_justpicked(olist)));
         else
-            Sprintf(tmpbuf, "Items you just picked up");
+            Strcpy(tmpbuf, "Items you just picked up");
         invlet = 'P';
         any = cg.zeroany;
         any.a_int = 'P';
-        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE,
-                 clr, tmpbuf, itemflags);
+        add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
+                 tmpbuf, MENU_ITEMFLAGS_SKIPINVERT);
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+    /* handle ParanoidAutoAll by confirming 'A' choice if present */
+    if (n > 0 && verify_All) {
+        int i, j;
+
+        for (i = 0; i < n; ++i)
+            if ((*pick_list)[i].item.a_int == 'A') {
+                /* ParanoidAutoAll is set (otherwise verify_All is false);
+                   if ParanoidConfirm is also set, require "yes" rather than
+                   just "y" to accept (and "no" rather than "n" to decline) */
+                if (paranoid_query(ParanoidConfirm,
+                                   "Really autoselect All?")) {
+                    /* answer is "no", so take 'A' out of the list;
+                       if it is the only entry, we'll return nothing,
+                       otherwise go on to next menu without autoselect */
+                    for (j = i + 1; j < n; ++j)
+                        (*pick_list)[j - 1] = (*pick_list)[j];
+                    if (!--n)
+                        free((genericptr_t) *pick_list), *pick_list = 0;
+                }
+                break; /* goto query_done; */
+            }
+    }
  query_done:
     destroy_nhwindow(win);
     if (n < 0)
-        n = 0; /* caller's don't expect -1 */
+        n = 0; /* callers don't expect -1 */
     return n;
 }
 
@@ -2196,6 +2232,7 @@ reverse_loot(void)
             coffers = otmp;
 
         if (coffers) {
+            SetVoice((struct monst *) 0, 0, 80, 0);
             verbalize("Thank you for your contribution to reduce the debt.");
             freeinv(goldob);
             (void) add_to_container(coffers, goldob);
@@ -2816,7 +2853,7 @@ use_container(
         You("owe %ld %s for lost merchandise.", loss, currency(loss));
         gc.current_container->owt = weight(gc.current_container);
     }
-    /* might put something in if carring anything other than just the
+    /* might put something in if carrying anything other than just the
        container itself (invent is not the container or has a next object) */
     inokay = (gi.invent != 0 && (gi.invent != gc.current_container
                                 || gi.invent->nobj));
@@ -2844,7 +2881,7 @@ use_container(
      * include the next container choice ('n') when
      * relevant, and make it the default;
      * always include the quit choice ('q'), and make
-     * it the default if there's no next containter;
+     * it the default if there's no next container;
      * include the help choice (" or ?") if `cmdassist'
      * run-time option is set;
      * (Player can pick any of (o,i,b,r,n,s,?) even when
@@ -3279,21 +3316,32 @@ dotip(void)
     const char *spillage = 0;
 
     /*
-     * doesn't require free hands;
-     * limbs are needed to tip floor containers
+     * Doesn't require free hands;
+     * limbs are needed to tip floor containers.
+     *
+     * Note: for menustyle:Traditional, using m prefix forces a menu
+     * of floor containers when more than one is present.  For other
+     * menustyle settings or when fewer than two floor containers are
+     * present, using 'm' skips floor and goes straight to invent.
+     * This somewhat unintuitive behavior is driven by the way that
+     * context-sensitive inventory item actions use m prefix.
      */
 
     /* at present, can only tip things at current spot, not adjacent ones */
     cc.x = u.ux, cc.y = u.uy;
 
     /* check floor container(s) first; at most one will be accessed */
-    if ((boxes = container_at(cc.x, cc.y, TRUE)) > 0) {
+    boxes = container_at(cc.x, cc.y, TRUE);
+    /* this is iffy for menustyle:traditional; 'm' prefix is ambiguous
+       for it: skip floor vs handle multiple containers via menu */
+    if (boxes > 0
+        && (!iflags.menu_requested
+            || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
         Sprintf(buf, "You can't tip %s while carrying so much.",
                 !Verbose(2, dotip)
                     ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
-            if (boxes > 1 && (flags.menu_style != MENU_TRADITIONAL
-                              || iflags.menu_requested)) {
+            if (boxes > 1) {
                 /* use menu to pick a container to tip */
                 int n, i;
                 winid win;
@@ -3368,7 +3416,8 @@ dotip(void)
         }
     }
 
-    /* either no floor container(s) or couldn't tip one or didn't tip any */
+    /* either no floor container(s) or 'm' prefix was used to ignore such
+       or couldn't tip one or didn't tip any */
     cobj = getobj("tip", tip_ok, GETOBJ_PROMPT);
     if (!cobj)
         return ECMD_CANCEL;

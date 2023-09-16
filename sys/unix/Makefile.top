@@ -1,5 +1,5 @@
 #      NetHack Top-level Makefile.
-# NetHack 3.7  Makefile.top    $NHDT-Date: 1642630921 2022/01/19 22:22:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.72 $
+# NetHack 3.7  Makefile.top    $NHDT-Date: 1693519381 2023/08/31 22:03:01 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.91 $
 # Copyright (c) 2015 by Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -85,7 +85,7 @@ VARDAT = $(VARDATD) $(VARDATND)
 #CHGRP = chgrp
 
 # Lua version
-LUA_VERSION = 5.4.4
+LUA_VERSION = 5.4.6
 
 #
 # end of configuration
@@ -97,7 +97,7 @@ SPEC_LEVS = asmodeus.lua baalz.lua bigrm-*.lua castle.lua fakewiz?.lua \
 	juiblex.lua knox.lua medusa-?.lua minend-?.lua minefill.lua \
 	minetn-?.lua oracle.lua orcus.lua sanctum.lua soko?-?.lua \
 	tower?.lua valley.lua wizard?.lua nhcore.lua nhlib.lua themerms.lua \
-	astral.lua air.lua earth.lua fire.lua water.lua hellfill.lua
+	astral.lua air.lua earth.lua fire.lua water.lua hellfill.lua tut-?.lua
 QUEST_LEVS = ???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua
 
 DATNODLB = $(VARDATND) license symbols
@@ -112,7 +112,7 @@ LUA2NHTOP = ../../..
 LUABASELIB = liblua-$(LUA_VERSION).a
 TOPLUALIB = lib/lua/$(LUABASELIB)
 
-ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb
+ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb check-nhlua
 
 # first target is also the default target for 'make' without any arguments
 all:    $(ALLDEP)
@@ -125,8 +125,9 @@ $(GAME): lua_support
 lua_support: include/nhlua.h
 	@true
 $(LUATOP)/liblua.a: $(LUAHEADERS)/lua.h
-	( cd $(LUATOP) \
-	  && make $(LUAMAKEFLAGS) a && cd $(LUA2NHTOP) )
+	( cd $(LUATOP) && make $(LUAMAKEFLAGS) a ) && \
+	( util/makedefs --grep-defined CRASHREPORT && ( \
+	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
 $(TOPLUALIB): $(LUATOP)/liblua.a
 	@( if test -d lib/lua ; then true ; else mkdir -p lib/lua ; fi )
 	cp $(LUATOP)/liblua.a $@
@@ -141,16 +142,21 @@ include/nhlua.h: $(TOPLUALIB)
 	@echo '/*nhlua.h*/' >> $@
 # LUATESTTARGET is this by default
 lib/lua-$(LUA_VERSION)/src/lua.h:
-	@echo "Please do 'make fetch-lua' to obtain lua-$(LUA_VERSION)"
+	@echo "Please do 'make fetch-lua' in the top directory to obtain lua-$(LUA_VERSION)"
 	@false
 luabin:
 	( cd $(LUATOP) \
 	  && make $(LUAMAKEFILES) all && cd $(LUA2NHTOP) )
 
+check-nhlua:
+	( util/makedefs --grep-defined CRASHREPORT && ( \
+	  cd $(LUATOP) && make $(LUAMAKEFLAGS) ); true )
+
 # hints file could set LUATESTTARGET to this if GITSUBMODULES is defined
 submodules/lua/lua.h:
 	git submodule init submodules/lua
-	git submodule update --remote submodules/lua
+	git submodule update submodules/lua
+#	git submodule update --remote submodules/lua
 
 # Note: many of the dependencies below are here to allow parallel make
 # to generate valid output
@@ -306,12 +312,28 @@ fetch-lua: fetch-Lua
 
 fetch-Lua:
 	( mkdir -p lib && cd lib && \
-	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  shac1=`command -v shasum`; \
+	  shac2=`command -v sha256sum`; \
+	  if [ ! -z $$shac1 ]; then \
+	      shac="$$shac1 -a 256"; elif [ ! -z $$shac2 ]; then \
+	      shac=$$shac2; else echo "CAUTION: no way to check integrity"; \
+	  fi; \
+	  curl -R -O https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  if [ ! -z "$$shac" ]; then \
+	      echo Checking integrity with $$shac; \
+	      $$shac -w -c ../submodules/CHKSUMS < lua-$(LUA_VERSION).tar.gz; \
+	  fi; \
 	  tar zxf lua-$(LUA_VERSION).tar.gz && \
 	  rm -f lua-$(LUA_VERSION).tar.gz )
 # remove include/nhlua.h in case it was created for some other Lua version
 	@( if test -f include/nhlua.h ; then \
 	     rm -f include/nhlua.h && echo 'rm include/nhlua.h' ; fi )
+
+fetch-lua-http:
+	( mkdir -p lib && cd lib && \
+	  curl -R -O http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz && \
+	  tar zxf lua-$(LUA_VERSION).tar.gz && \
+	  rm -f lua-$(LUA_VERSION).tar.gz )
 
 # 'make update' can be used to install a revised version after making
 # customizations or such.  Unlike 'make install', it doesn't delete everything

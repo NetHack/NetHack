@@ -37,7 +37,9 @@ const struct worn {
     ((o->otyp == MUMMY_WRAPPING && ((m) & W_ARMC) != 0L) ? INVIS        \
      : (o->otyp == CORNUTHAUM && ((m) & W_ARMH) != 0L                   \
         && !Role_if(PM_WIZARD)) ? CLAIRVOYANT                           \
-       : 0)
+       : (is_art(o, ART_EYES_OF_THE_OVERWORLD)                          \
+          && ((m) & W_TOOL) != 0L) ? BLINDED                            \
+         : 0)
 /* note: monsters don't have clairvoyance, so dependency on hero's role here
    has no significant effect on their use of w_blocks() */
 
@@ -69,6 +71,10 @@ setworn(struct obj *obj, long mask)
                         p = objects[oobj->otyp].oc_oprop;
                         u.uprops[p].extrinsic =
                             u.uprops[p].extrinsic & ~wp->w_mask;
+                        /* if the hero removed an extrinsic-granting item,
+                           nearby monsters will notice and attempt attacks of
+                           that type again */
+                        monstunseesu_prop(p);
                         if ((p = w_blocks(oobj, mask)) != 0)
                             u.uprops[p].blocked &= ~wp->w_mask;
                         if (oobj->oartifact)
@@ -130,6 +136,7 @@ setnotworn(struct obj *obj)
             *(wp->w_obj) = (struct obj *) 0;
             p = objects[obj->otyp].oc_oprop;
             u.uprops[p].extrinsic = u.uprops[p].extrinsic & ~wp->w_mask;
+            monstunseesu_prop(p); /* remove this extrinsic from seenres */ 
             obj->owornmask &= ~wp->w_mask;
             if (obj->oartifact)
                 set_artifact_intrinsic(obj, 0, wp->w_mask);
@@ -159,7 +166,7 @@ allunworn(void)
 }
 
 
-/* return item worn in slot indiciated by wornmask; needed by poly_obj() */
+/* return item worn in slot indicated by wornmask; needed by poly_obj() */
 struct obj *
 wearmask_to_obj(long wornmask)
 {
@@ -333,12 +340,12 @@ mon_adjust_speed(
     }
 }
 
-/* alchemy smock confers two properites, poison and acid resistance
+/* alchemy smock confers two properties, poison and acid resistance
    but objects[ALCHEMY_SMOCK].oc_oprop can only describe one of them;
    if it is poison resistance, alternate property is acid resistance;
-   if someone changes it to acid resistance, alt becomes posion resist;
+   if someone changes it to acid resistance, alt becomes poison resist;
    if someone changes it to hallucination resistance, all bets are off
-   [TODO: handle alternate propertices conferred by dragon scales/mail] */
+   [TODO: handle alternate properties conferred by dragon scales/mail] */
 #define altprop(o) \
     (((o)->otyp == ALCHEMY_SMOCK)                               \
      ? (POISON_RES + ACID_RES - objects[(o)->otyp].oc_oprop)    \
@@ -1178,4 +1185,7 @@ extract_from_minvent(
         mwepgone(mon); /* unwields and sets weapon_check to NEED_WEAPON */
     }
 }
+
+#undef w_blocks
+
 /*worn.c*/

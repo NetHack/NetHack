@@ -417,11 +417,11 @@ curses_ext_cmd(void)
 
     while (1) {
         wmove(extwin, starty, startx);
+        wclrtoeol(extwin);
         waddstr(extwin, "# ");
         wmove(extwin, starty, startx + 2);
         waddstr(extwin, cur_choice);
         wmove(extwin, starty, (int) strlen(cur_choice) + startx + 2);
-        wclrtoeol(extwin);
 
         /* if we have an autocomplete command, AND it matches uniquely */
         if (matches == 1 && ecmatches) {
@@ -1541,7 +1541,7 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             if (isdigit(curletter) && !groupaccels[curletter]) {
                 count = curses_get_count(curletter);
                 /* after count, we know some non-digit is already pending */
-                curletter = getch();
+                curletter = curses_getch();
                 count_letter = (count > 0L) ? curletter : '\0';
 
                 /* remove the count wind (erases last line of message wind) */
@@ -1636,6 +1636,7 @@ menu_select_deselect(
 
     if (operation == DESELECT || (item->selected && operation == INVERT)) {
         item->selected = FALSE;
+        item->count = -1L;
         if (visible) {
             mvwaddch(win, item->line_num + 1, 1, ' ');
             curses_toggle_color_attr(win, HIGHLIGHT_COLOR, NONE, ON);

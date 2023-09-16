@@ -139,15 +139,20 @@ static int changed_fields = 0;
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-curses_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
-                     int color_and_attr, unsigned long *colormasks)
+curses_status_update(
+    int fldidx,
+    genericptr_t ptr,
+    int chg UNUSED,
+    int percent,
+    int color_and_attr,
+    unsigned long *colormasks)
 {
     long *condptr = (long *) ptr;
     char *text = (char *) ptr;
 
     if (fldidx != BL_FLUSH) {
         if (fldidx < 0 || fldidx >= MAXBLSTATS) {
-            gc.context.botlx = gc.context.botl = FALSE; /* avoid another bot() */
+            gc.context.botlx = gc.context.botl = FALSE; /* avoid bot() */
             panic("curses_status_update(%d)", fldidx);
         }
         changed_fields |= (1 << fldidx);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	vmsunix.c	$NHDT-Date: 1605493693 2020/11/16 02:28:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
+/* NetHack 3.7	vmsunix.c	$NHDT-Date: 1685522050 2023/05/31 08:34:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.31 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,6 +6,14 @@
 /* This file implements things from unixunix.c, plus related stuff */
 
 #include "hack.h"
+
+#ifdef VMSVSI
+#include <lib$routines.h>
+#include <smg$routines.h>
+#include <starlet.h>
+#define sys$imgsta SYS$IMGSTA
+#include <unixio.h>
+#endif
 
 #include <descrip.h>
 #include <dvidef.h>
@@ -25,10 +33,13 @@
 
 extern int debuggable; /* defined in vmsmisc.c */
 
-extern void VDECL(lib$signal, (unsigned, ...));
+#ifndef VMSVSI
+extern void lib$signal(unsigned, ...);
 extern unsigned long sys$setprv();
 extern unsigned long lib$getdvi(), lib$getjpi(), lib$spawn(), lib$attach();
 extern unsigned long smg$init_term_table_by_type(), smg$del_term_table();
+#endif
+
 #define vms_ok(sts) ((sts) & 1) /* odd => success */
 
 /* this could be static; it's only used within this file;
@@ -216,7 +227,10 @@ vms_define(const char *name, const char *value, int flag)
     };
     static struct itm3 itm_lst[] = { { 0, LNM$_STRING, 0, 0 }, { 0, 0 } };
     struct dsc nam_dsc, val_dsc, tbl_dsc;
-    unsigned long result, sys$crelnm(), lib$set_logical();
+    unsigned long result;
+#ifndef VMSVSI
+    unsigned long sys$crelnm(), lib$set_logical();
+#endif
 
     /* set up string descriptors */
     nam_dsc.mbz = val_dsc.mbz = tbl_dsc.mbz = 0;
@@ -581,8 +595,11 @@ struct dsc {
     char *adr;
 };                             /* descriptor */
 typedef unsigned long vmscond; /* vms condition value */
+
+#ifndef VMSVSI
 vmscond lib$find_file(const struct dsc *, struct dsc *, genericptr *);
 vmscond lib$find_file_end(void **);
+#endif
 
 /* collect a list of character names from all save files for this player */
 int

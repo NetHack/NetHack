@@ -96,7 +96,7 @@ USE_LUADLL = Y
 WANT_LUAC = N
 
 ifndef LUA_VERSION
-LUAVER=5.4.4
+LUAVER=5.4.6
 else
 LUAVER=$(LUA_VERSION)
 endif
@@ -110,6 +110,15 @@ ifeq "$(git)" "1"
 INTERNET_AVAILABLE=Y
 GIT_AVAILABLE=Y
 endif
+
+# if WANT_GUICURSES=1 is passed, use the Bill Gray pdcursesmod and enable
+# curses in NetHackW
+ifeq "$(WANT_GUICURSES)" "1"
+PDCURSES=pdcursesmod
+else
+PDCURSES=pdcurses
+endif
+PDCURSESFLAGS = -DPDC_WIDE
 
 #
 #==============================================================================
@@ -167,10 +176,10 @@ endif  # LUA_MAY_PROCEED
 # Now, pdcurses
 ifeq "$(INTERNET_AVAILABLE)" "Y"
 ifeq "$(GIT_AVAILABLE)" "Y"
-PDCURSES_TOP=../submodules/pdcurses
+PDCURSES_TOP=../submodules/$(PDCURSES)
 ADD_CURSES=Y
 else  # GIT_AVAILABLE
-PDCURSES_TOP=../lib/pdcurses
+PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
 endif  # GIT_AVAILABLE
 else   # INTERNET_AVAILABLE is not Y below
@@ -179,11 +188,11 @@ else   # INTERNET_AVAILABLE is not Y below
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
 #
-ifneq ("$(wildcard ../submodules/pdcurses/curses.h)", "")
-PDCURSES_TOP=../submodules/pdcurses
+ifneq ("$(wildcard ../submodules/$(PDCURSES)/curses.h)", "")
+PDCURSES_TOP=../submodules/$(PDCURSES)
 ADD_CURSES=Y
-else ifneq ("$(wildcard ../lib/pdcurses/curses.h)", "")
-PDCURSES_TOP=../lib/pdcurses
+else ifneq ("$(wildcard ../lib/$(PDCURSES)/curses.h)", "")
+PDCURSES_TOP=../lib/$(PDCURSES)
 ADD_CURSES=Y
 endif  # pdcurses sources available somewhere
 
@@ -350,7 +359,7 @@ CLEAN_DIR = $(GAMEDIR) $(OBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
 
 OLUA = $(O)lua
@@ -418,6 +427,35 @@ $(NHLUAH):
 
 CLEAN_FILE += $(NHLUAH)
 
+#===========================================
+# Lua level files, dungeon file, quest files
+#===========================================
+
+LUALIST = air Arc-fila Arc-filb Arc-goal Arc-loca Arc-strt \
+	asmodeus astral baalz Bar-fila Bar-filb Bar-goal \
+	Bar-loca Bar-strt bigrm-1 bigrm-10 bigrm-11 bigrm-2 \
+	bigrm-3 bigrm-4 bigrm-5 bigrm-6 bigrm-7 bigrm-8 \
+	bigrm-9 castle Cav-fila Cav-filb Cav-goal Cav-loca \
+	Cav-strt dungeon earth fakewiz1 fakewiz2 fire \
+	Hea-fila Hea-filb Hea-goal Hea-loca Hea-strt hellfill \
+	juiblex Kni-fila Kni-filb Kni-goal Kni-loca Kni-strt \
+	knox medusa-1 medusa-2 medusa-3 medusa-4 minefill \
+	minend-1 minend-2 minend-3 minetn-1 minetn-2 minetn-3 \
+	minetn-4 minetn-5 minetn-6 minetn-7 Mon-fila Mon-filb \
+	Mon-goal Mon-loca Mon-strt nhcore nhlib oracle \
+	orcus Pri-fila Pri-filb Pri-goal Pri-loca Pri-strt \
+	quest Ran-fila Ran-filb Ran-goal Ran-loca Ran-strt \
+	Rog-fila Rog-filb Rog-goal Rog-loca Rog-strt Sam-fila \
+	Sam-filb Sam-goal Sam-loca Sam-strt sanctum soko1-1 \
+	soko1-2 soko2-1 soko2-2 soko3-1 soko3-2 soko4-1 \
+	soko4-2 themerms Tou-fila Tou-filb Tou-goal Tou-loca \
+	Tou-strt tower1 tower2 tower3 Val-fila Val-filb \
+	Val-goal Val-loca Val-strt valley water Wiz-fila \
+	Wiz-filb Wiz-goal Wiz-loca Wiz-strt wizard1 wizard2 \
+	wizard3 tut-1 tut-2
+
+LUAFILES = $(addprefix $(DAT)/, $(addsuffix .lua, $(LUALIST)))
+
 #==========================================
 # Makedefs
 #==========================================
@@ -470,15 +508,17 @@ CLEAN_FILE += $(RTARGETS) $(ROBJS)
 #==========================================
 ifeq "$(ADD_CURSES)" "Y"
 OP = $(O)pdcurses
-PDCOBJS = $(addprefix $(OP)/, addch.o addchstr.o addstr.o attr.o beep.o bkgd.o border.o \
-	  clear.o color.o debug.o delch.o deleteln.o getch.o getstr.o getyx.o \
-	  inch.o inchstr.o initscr.o inopts.o insch.o insstr.o \
-	  kernel.o keyname.o mouse.o move.o outopts.o overlay.o \
-	  pad.o panel.o pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o printw.o \
-	  refresh.o scanw.o scr_dump.o scroll.o slk.o termattr.o touch.o util.o window.o)
+PDCCOMMONOBJS = $(addprefix $(OP)/, \
+        addch.o addchstr.o addstr.o attr.o beep.o bkgd.o border.o clear.o \
+        color.o debug.o delch.o deleteln.o getch.o getstr.o getyx.o inch.o \
+        inchstr.o initscr.o inopts.o insch.o insstr.o kernel.o keyname.o \
+        mouse.o move.o outopts.o overlay.o pad.o panel.o printw.o refresh.o \
+        scanw.o scr_dump.o scroll.o slk.o termattr.o touch.o util.o window.o)
+PDCOBJS = $(PDCCOMMONOBJS) $(addprefix $(OP)/, \
+	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
 PDCSRC = $(PDCURSES_TOP)/pdcurses
 PDCWINCON = $(PDCURSES_TOP)/wincon
-PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC) -I$(PDCWINCON)
+PDCINCL = -I$(PDCURSES_TOP) -I$(PDCSRC)
 PDCLIB = $(O)pdcurses.a
 PDCDEP = $(PDCURSES_TOP)/curses.h
 
@@ -488,16 +528,40 @@ $(PDCLIB): $(PDCOBJS)
 	ar rcs $@ $^
 
 $(OP)/%.o: $(PDCSRC)/%.c | $(OP)
-	$(cc) $(CFLAGS) $(PDCINCL) -D_LIB $< -o$@
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -D_LIB $< -o$@
 
 $(OP)/%.o: $(PDCWINCON)/%.c | $(OP)
-	$(cc) $(CFLAGS) $(PDCINCL) -D_LIB $< -o$@
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -I$(PDCWINCON) -D_LIB $< -o$@
 
 $(OP):
 	@mkdir -p $@
 
 CLEAN_DIR += $(OP)
 CLEAN_FILE += $(PDCLIB) $(PDCOBJS)
+
+ifneq ("$(wildcard $(PDCURSES_TOP)/wingui/pdcwin.h)", "")
+# pdcursesmod in use; enable Curses graphics on NetHackW
+OPW = $(O)pdcursesw
+PDCWOBJS = $(PDCCOMMONOBJS) $(addprefix $(OPW)/, \
+	  pdcclip.o pdcdisp.o pdcgetsc.o pdckbd.o pdcscrn.o pdcsetsc.o pdcutil.o)
+PDCWINGUI = $(PDCURSES_TOP)/wingui
+PDCWLIB = $(O)pdcursesw.a
+
+pdcursesw: $(PDCWLIB)
+
+$(PDCWLIB): $(PDCWOBJS)
+	ar rcs $@ $^
+
+$(OPW)/%.o: $(PDCWINGUI)/%.c | $(OPW)
+	$(cc) $(CFLAGS) $(PDCURSESFLAGS) $(PDCINCL) -I$(PDCWINGUI) -D_LIB $< -o$@
+
+$(OPW):
+	@mkdir -p $@
+
+CLEAN_DIR += $(OPW)
+CLEAN_FILE += $(PDCWLIB) $(PDCWOBJS)
+endif
+
 endif
 
 #==========================================
@@ -680,7 +744,7 @@ $(DAT)/epitaph: $(DAT)/bogusmon
 $(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/epitaph.txt
 	$< -s
 
-$(DLBLST): | $(DAT_CLEAN) $(DAT_NOCLEAN)
+$(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo data > $(DLBLST)
 	echo oracles >> $(DLBLST)
 	echo options >> $(DLBLST)
@@ -720,14 +784,16 @@ ifeq "$(GIT_AVAILABLE)" "Y"
 fetchlua:
 	@if [ ! -f $(LUASRC)/lua.h ] ; then \
 	git submodule init ../submodules/lua && \
-	git submodule update --remote ../submodules/lua ; fi
+	git submodule update ../submodules/lua ; fi
+#	git submodule update --remote ../submodules/lua ; fi
 fetchpdcurses:
 	@if [ ! -f $(PDCURSES_TOP)/curses.h ] ; then \
-	git submodule init ../submodules/pdcurses && \
-	git submodule update --remote ../submodules/pdcurses ; fi
+	git submodule init ../submodules/$(PDCURSES) && \
+	git submodule update ../submodules/$(PDCURSES) ; fi
+#	git submodule update --remote ../submodules/$(PDCURSES) ; fi
 else  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
-CURLLUADST=lua-5.4.4.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
+CURLLUADST=lua-5.4.6.tar.gz
 
 CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCDST=pdcurses.zip
@@ -865,7 +931,8 @@ WAVLIST = se_squeak_A se_squeak_B se_squeak_B_flat se_squeak_C \
 	sound_Wooden_Harp_A sound_Wooden_Harp_B \
 	sound_Wooden_Harp_C sound_Wooden_Harp_D \
 	sound_Wooden_Harp_E sound_Wooden_Harp_F \
-	sound_Wooden_Harp_G
+	sound_Wooden_Harp_G sa2_xplevelup sa2_xpleveldown
+
 WAVS = $(addprefix $(SNDWAVDIR)/, $(addsuffix .wav, $(WAVLIST)))
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
@@ -915,9 +982,14 @@ BMPS = $(addprefix $(MSWIN)/, $(addsuffix .bmp, mnsel mnselcnt mnunsel petmark p
 NHWRES = $(ONHW)/winres.o
 NHWTARGETS = $(GAMEDIR)/NetHackW.exe
 
+ifneq "$(PDCWINGUI)" ""
+CFLAGSW += $(NHCURSESFLAGS)
+NHWONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins guitty)
+endif
+
 nethackw: $(NHWTARGETS)
 
-$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) | $(GAMEDIR)
+$(GAMEDIR)/NetHackW.exe: $(NHWOBJS) $(NHWRES) $(DATEW_O) $(LUALIB) $(PDCWLIB) | $(GAMEDIR)
 	$(ld) $(LDFLAGS) -mwindows $^ $(LIBS) -static -lstdc++ $(SOUNDLIBLIBS) -o$@
 
 $(ONHW)/%.o: $(SRC)/%.c $(NHLUAH) | $(ONHW)
@@ -959,6 +1031,9 @@ $(ONHW)/%.o: $(MSWIN)/%.c $(NHLUAH) | $(ONHW)
 $(ONHW)/%.o: $(WSHR)/%.c $(NHLUAH) | $(ONHW)
 	$(cc) $(CFLAGSW) $< -o$@
 
+$(ONHW)/%.o: $(WCURSES)/%.c $(NHLUAH) | $(ONHW)
+	$(cc) $(CFLAGSW) $(PDCINCL) $< -o$@
+
 $(NHWRES): $(MSWIN)/NetHackW.rc $(BMPS) $(WAV) $(MSWIN)/NetHack.ico | $(ONHW)
 	$(rc) --include-dir=$(MSWIN) $(RCFLAGS) --input=$< -o$@
 
@@ -989,7 +1064,8 @@ ONH = $(O)nethack
 
 NHONLY = consoletty.o getline.o topl.o wintty.o
 ifeq "$(ADD_CURSES)" "Y"
-CFLAGSNH += -DCURSES_GRAPHICS -DCHTYPE_32 -DPDC_NCMOUSE
+NHCURSESFLAGS = -DCURSES_GRAPHICS -DCURSES_UNICODE $(PDCURSESFLAGS) -DPDC_NCMOUSE
+CFLAGSNH += $(NHCURSESFLAGS)
 NHONLY += $(addsuffix .o, cursdial cursinit cursinvt cursmain cursmesg cursmisc cursstat curswins)
 endif
 DATE_O  = $(addsuffix .o, $(addprefix $(ONH)/, date))
@@ -1061,7 +1137,7 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 #=============== TARGETS ==================
 #==========================================
 
-.PHONY: all clean default install lua makedefs recover pdcurses \
+.PHONY: all clean default install lua makedefs recover pdcurses pdcursesw \
 	tile2bmp tilemap uudecode dlb nethackw nethack tileutil \
 	fetchlua fetchpdcurses
 

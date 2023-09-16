@@ -83,20 +83,28 @@
 #define HConfusion u.uprops[CONFUSION].intrinsic
 #define Confusion HConfusion
 
-#define Blinded u.uprops[BLINDED].intrinsic
-#define Blindfolded (ublindf && ublindf->otyp != LENSES)
-/* ...means blind because of a cover */
-#define Blind                                     \
-    ((u.uroleplay.blind || Blinded || Blindfolded \
-      || !haseyes(gy.youmonst.data))                 \
-     && !(ublindf && ublindf->oartifact == ART_EYES_OF_THE_OVERWORLD))
-/* ...the Eyes operate even when you really are blind
-    or don't have any eyes */
-#define Blindfolded_only                                            \
-    (Blindfolded && ublindf->oartifact != ART_EYES_OF_THE_OVERWORLD \
-     && !u.uroleplay.blind && !Blinded && haseyes(gy.youmonst.data))
-/* ...blind because of a blindfold, and *only* that */
+/* Blindness is more complex than other properties */
+#define HBlinded u.uprops[BLINDED].intrinsic /* TIMEOUT|FROMOUTSIDE|FROMFORM */
+#define EBlinded u.uprops[BLINDED].extrinsic /* W_TOOL */
+        /* wearing the Eyes of the Overworld overrides blindness */
+#define BBlinded u.uprops[BLINDED].blocked   /* W_TOOL */
+        /* non-blindfold: timed effect | u.uroleplay.blind | !haseyes() */
+#define Blinded (HBlinded && !BBlinded)
+#define BlindedTimeout (HBlinded & TIMEOUT)
+#define PermaBlind ((HBlinded & FROMOUTSIDE) != 0L) /* OPTIONS:blind */
+        /* worn blindfold (or towel; lenses don't set [BLINDED].extrinsic) */
+#define Blindfolded EBlinded
+#define Blindfolded_only (Blindfolded && !Blinded)
+        /* '#define Blind (Blinded || Blindfolded)' would work, but only
+           because BBlinded (conferred by artifact lenses) and Blindfolded
+           are mutually exclusive; explicitly applying !BBlinded to both
+           internal and external blindness should be more robust in case
+           of future changes */
+#define Blind ((HBlinded || EBlinded) && !BBlinded)
 
+/*
+ * Maladies
+ */
 #define Sick u.uprops[SICK].intrinsic
 #define Stoned u.uprops[STONED].intrinsic
 #define Strangled u.uprops[STRANGLED].intrinsic
@@ -114,7 +122,7 @@
 /* Timeout, plus a worn mask */
 #define HDeaf u.uprops[DEAF].intrinsic
 #define EDeaf u.uprops[DEAF].extrinsic
-#define Deaf (HDeaf || EDeaf)
+#define Deaf (HDeaf || EDeaf || u.uroleplay.deaf)
 
 #define HFumbling u.uprops[FUMBLING].intrinsic
 #define EFumbling u.uprops[FUMBLING].extrinsic
@@ -241,8 +249,9 @@
      && !BFlying)
 /* May touch surface; does not override any others */
 
+#define HWwalking u.uprops[WWALKING].intrinsic /* see lava_effects() */
 #define EWwalking u.uprops[WWALKING].extrinsic
-#define Wwalking (EWwalking && !Is_waterlevel(&u.uz))
+#define Wwalking ((HWwalking || EWwalking) && !Is_waterlevel(&u.uz))
 /* Don't get wet, can't go under water; overrides others except levitation */
 /* Wwalking is meaningless on water level */
 

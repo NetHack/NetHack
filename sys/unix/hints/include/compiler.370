@@ -29,6 +29,9 @@ CCFLAGS = -g
 #    CPLUSPLUS_NEED_DEPSUPPRESS = 1 C++ -Wno-deprecated-copy,
 #                                       -Wno-deprecated-declarations
 
+ifeq "$(WANT_ASAN)" "1"
+USE_ASAN=1
+endif
 
 # If you want to override the compiler detection just carried out
 # uncomment one of the following pairs. Note, however, that
@@ -82,6 +85,10 @@ endif   # GCC greater than or equal to 9
 else   # gcc or clang?
 CXX=clang++ -std=gnu++11
 # clang-specific follows
+CLANGGTEQ14 := $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 14)
+ifeq "$(CLANGGTEQ14)" "1"
+CFLAGS+=-Wno-deprecated-declarations
+endif
 # none
 endif  # clang-specific ends here
 
@@ -132,6 +139,9 @@ CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
 ifeq "$(CLANGPPGTEQ9)" "1"
 #CCXXFLAGS+=-Wformat-overflow
 endif
+ifeq "$(CLANGPPGTEQ14)" "1"
+CPLUSPLUS_NEED_DEPSUPPRESS=1
+endif
 ifdef CPLUSPLUS_NEED_DEPSUPPRESS
 CCXXFLAGS+=-Wno-deprecated
 CCXXFLAGS+=-Wno-deprecated-declarations
@@ -149,8 +159,39 @@ endif  # CPLUSPLUS_NEED17
 endif  # end of clang++-specific section
 CXX=$(CCXX)
 endif  # CPLUSPLUS_NEEDED
-
 endif   # MAKEFILE_SRC
+
+ifeq "$(c89)" "1"
+HAVECSTD=c89
+endif
+ifeq "$(C89)" "1"
+HAVECSTD=c89
+endif
+
+ifeq "$(c99)" "1"
+HAVECSTD=c99
+endif
+ifeq "$(C99)" "1"
+HAVECSTD=c99
+endif
+
+ifeq "$(c11)" "1"
+HAVECSTD=c11
+endif
+ifeq "$(C11)" "1"
+HAVECSTD=c11
+endif
+
+ifeq "$(c23)" "1"
+HAVECSTD=c2x
+endif
+ifeq "$(C23)" "1"
+HAVECSTD=c2x
+endif
+
+ifneq "$(HAVECSTD)" ""
+CSTD = -std=$(HAVECSTD)
+endif
 
 #end of compiler.370
 #------------------------------------------------------------------------------

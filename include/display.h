@@ -32,7 +32,7 @@
  * so treat those situations as blocking telepathy, detection, and warning
  * even though conceptually they shouldn't do so.
  *
- * [3.7 also] The macros whose name begins with an understore have been
+ * [3.7 also] The macros whose name begins with an underscore have been
  * converted to functions in order to have compilers generate smaller code.
  * The retained underscore versions are still used in display.c but should
  * only be used in other situations if the function calls actually produce
@@ -51,7 +51,7 @@
 
 /* organized to perform cheaper tests first;
    is_pool() vs is_pool_or_lava(): hero who is underwater can see adjacent
-   lava, but presumeably any monster there is on top so not sensed */
+   lava, but presumably any monster there is on top so not sensed */
 #define _sensemon(mon) \
     (   (!u.uswallow || (mon) == u.ustuck)                                   \
      && (!Underwater || (mdistu(mon) <= 2 && is_pool((mon)->mx, (mon)->my))) \
@@ -216,7 +216,8 @@
  * "cover" any objects or traps that might be there.
  */
 #define covers_objects(xx, yy) \
-    ((is_pool(xx, yy) && !Underwater) || (levl[xx][yy].typ == LAVAPOOL))
+    ((is_pool(xx, yy) && !Underwater) || (levl[xx][yy].typ == LAVAPOOL) \
+      || (levl[xx][yy].typ == LAVAWALL))
 
 #define covers_traps(xx, yy) covers_objects(xx, yy)
 
@@ -629,6 +630,9 @@ enum glyph_offsets {
 #define trap_to_glyph(trap)                                \
     cmap_to_glyph(trap_to_defsym(((int) (trap)->ttyp)))
 
+#define engraving_to_glyph(ep)                             \
+    cmap_to_glyph(engraving_to_defsym(ep))
+
 /* Not affected by hallucination.  Gives a generic body for CORPSE */
 /* MRKR: ...and the generic statue */
 #define objnum_to_glyph(onum) ((int) (onum) + GLYPH_OBJ_OFF)
@@ -1022,6 +1026,7 @@ enum glyph_offsets {
 #define MG_BW_ICE  0x00200  /* similar for ice vs floor */
 #define MG_BW_SINK 0x00200  /* identical for sink vs fountain [note: someday
                              * this may become a distinct flag */
+#define MG_BW_ENGR 0x00200  /* likewise for corridor engravings */
 #define MG_NOTHING 0x00400  /* char represents GLYPH_NOTHING */
 #define MG_UNEXPL  0x00800  /* char represents GLYPH_UNEXPLORED */
 #define MG_MALE    0x01000  /* represents a male mon or statue of one */

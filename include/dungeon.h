@@ -1,4 +1,4 @@
-/* NetHack 3.7	dungeon.h	$NHDT-Date: 1596498535 2020/08/03 23:48:55 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.39 $ */
+/* NetHack 3.7	dungeon.h	$NHDT-Date: 1685863327 2023/06/04 07:22:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.47 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -19,7 +19,7 @@ typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(maze_like, 1);  /* is this a maze? */
     Bitfield(rogue_like, 1); /* is this an old-fashioned presentation? */
     Bitfield(align, 3);      /* dungeon alignment. */
-    Bitfield(unused, 1);     /* etc... */
+    Bitfield(unconnected, 1); /* dungeon not connected to any branch */
 } d_flags;
 
 typedef struct s_level { /* special dungeon level element */
@@ -57,6 +57,14 @@ typedef struct dest_area { /* non-stairway level change identifier */
     coordxy nlx, nly;        /* outline of invalid area */
     coordxy nhx, nhy;        /* opposite corner of invalid area */
 } dest_area;
+
+/* teleportation exclusion zones in the level */
+typedef struct exclusion_zone {
+    xint16 zonetype; /* level_region_types */
+    coordxy lx, ly;
+    coordxy hx, hy;
+    struct exclusion_zone *next;
+} exclusion_zone;
 
 typedef struct dungeon {   /* basic dungeon identifier */
     char dname[24];        /* name of the dungeon (eg. "Hell") */
@@ -139,6 +147,7 @@ typedef struct branch {
 #define In_sokoban(x) ((x)->dnum == sokoban_dnum)
 #define Inhell In_hell(&u.uz) /* now gehennom */
 #define In_endgame(x) ((x)->dnum == astral_level.dnum)
+#define In_tutorial(x) ((x)->dnum == tutorial_dnum)
 
 #define within_bounded_area(X, Y, LX, LY, HX, HY) \
     ((X) >= (LX) && (X) <= (HX) && (Y) >= (LY) && (Y) <= (HY))

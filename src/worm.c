@@ -82,7 +82,7 @@ static long wgrowtime[MAX_NUM_WORMS] = DUMMY;
  *  there are no slots available.  This means that the worm head can exist,
  *  it just cannot ever grow a tail.
  *
- *  It, also, means that there is an optimisation to made.  The [0] positions
+ *  It, also, means that there is an optimization to made.  The [0] positions
  *  of the arrays are never used.  Meaning, we really *could* have one more
  *  tailed worm on the level, or use a smaller array (using wormno - 1).
  *

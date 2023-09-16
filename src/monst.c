@@ -1,4 +1,4 @@
-/* NetHack 3.7	monst.c	$NHDT-Date: 1616891049 2021/03/28 00:24:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.85 $ */
+/* NetHack 3.7	monst.c	$NHDT-Date: 1682205027 2023/04/22 23:10:27 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,8 +14,6 @@
 #ifdef TEXTCOLOR
 #include "color.h"
 #define C(color) color
-#define HI_DOMESTIC CLR_WHITE /* use for player + friendlies */
-#define HI_LORD CLR_MAGENTA
 #else
 #define C(color)
 #endif
@@ -25,19 +23,18 @@
         0, 0, 0, 0 \
     }
 
-#define WT_ELF 800
-#define WT_DRAGON 4500
-
-#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col, bn) \
-    {                                                                      \
-        {(const char *) 0, (const char *) 0, nam}, \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+#define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, \
+            flg1, flg2, flg3, d, col, bn)           \
+    {                                                                       \
+        { (const char *) 0, (const char *) 0, nam },                        \
+            sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)  \
     }
 
-#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, col, bn) \
-    {                                                                      \
-        {namm, namf, namn}, \
-        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)   \
+#define MON3(namm, namf, namn, sym, lvl, gen, atk, siz, mr1, mr2, \
+             flg1, flg2, flg3, d, col, bn)                        \
+    {                                                                       \
+        { namm, namf, namn },                                               \
+        sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, C(col)      \
     }
 /* LVL() and SIZ() collect several fields to cut down on number of args
  * for MON()
@@ -71,11 +68,23 @@ struct permonst mons[SIZE(mons_init)];
 void
 monst_globals_init(void)
 {
-    memcpy(mons, mons_init, sizeof(mons));
+    memcpy(mons, mons_init, sizeof mons);
     return;
 }
 
 const struct attack c_sa_yes[NATTK] = SEDUCTION_ATTACKS_YES;
 const struct attack c_sa_no[NATTK] = SEDUCTION_ATTACKS_NO;
+
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef C
+#define C(c) (0x1f & (c)) /* global.h */
+#undef NO_ATTK
+#undef MON
+#undef MON3
+#undef LVL
+#undef SIZ
+#undef ATTK
+#undef A
 
 /*monst.c*/

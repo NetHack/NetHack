@@ -1,4 +1,4 @@
-/* NetHack 3.7	botl.c	$NHDT-Date: 1646171622 2022/03/01 21:53:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.209 $ */
+/* NetHack 3.7	botl.c	$NHDT-Date: 1685863332 2023/06/04 07:22:12 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.233 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -249,7 +249,7 @@ do_statusline2(void)
 void
 bot(void)
 {
-    /* dosave() flags completion by setting u.uhp to -1; supprss_map_output()
+    /* dosave() flags completion by setting u.uhp to -1; suppress_map_output()
        covers program_state.restoring and is used for status as well as map */
     if (u.uhp != -1 && gy.youmonst.data
         && iflags.status_updates && !suppress_map_output()) {
@@ -446,7 +446,8 @@ describe_level(
     } else {
         /* ports with more room may expand this one */
         if (!addbranch)
-            Sprintf(buf, "Dlvl:%-2d", depth(&u.uz));
+            Sprintf(buf, "%s:%-2d", /* "Dlvl:n" (grep fodder) */
+                    In_tutorial(&u.uz) ? "Tutorial" : "Dlvl", depth(&u.uz));
         else
             Sprintf(buf, "level %d", depth(&u.uz));
         ret = 0;
@@ -743,7 +744,7 @@ bot_via_windowport(void)
     titl = !Upolyd ? rank() : pmname(&mons[u.umonnum], Ugender);
     i = (int) (strlen(buf) + sizeof " the " + strlen(titl) - sizeof "");
     /* if "Name the Rank/monster" is too long, we truncate the name
-       but always keep at least 10 characters of it; when hitpintbar is
+       but always keep at least 10 characters of it; when hitpointbar is
        enabled, anything beyond 30 (long monster name) will be truncated */
     if (i > 30) {
         i = 30 - (int) (sizeof " the " + strlen(titl) - sizeof "");
@@ -1199,7 +1200,7 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
     /*
      * TODO:
      *  Dynamically update 'percent_matters' as rules are added or
-     *  removed to track whether any of them are precentage rules.
+     *  removed to track whether any of them are percentage rules.
      *  Then there'll be no need to assume that non-Null 'thresholds'
      *  means that percentages need to be kept up to date.
      *  [Affects exp_percent_changing() too.]
@@ -1221,7 +1222,7 @@ eval_notify_windowport_field(int fld, boolean *valsetlist, int idx)
                 ? percentage(curr, &gb.blstats[idx][fldmax])
                 : 0; /* bullet proofing; can't get here */
         if (pc != prev->percent_value)
-            chg = 1;
+            chg = (pc < prev->percent_value) ? -1 : 1;
         curr->percent_value = pc;
     } else {
         pc = 0;
@@ -1472,7 +1473,7 @@ init_blstats(void)
  *
  */
 static int
-compare_blstats(struct istat_s *bl1, struct istat_s*bl2)
+compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
 {
     int anytype, result = 0;
 
@@ -1483,8 +1484,8 @@ compare_blstats(struct istat_s *bl1, struct istat_s*bl2)
 
     anytype = bl1->anytype;
     if ((!bl1->a.a_void || !bl2->a.a_void)
-        && (anytype == ANY_IPTR || anytype == ANY_UPTR || anytype == ANY_LPTR
-            || anytype == ANY_ULPTR)) {
+        && (anytype == ANY_IPTR || anytype == ANY_UPTR
+            || anytype == ANY_LPTR || anytype == ANY_ULPTR)) {
         panic("compare_blstat: invalid pointer %s, %s",
               fmt_ptr((genericptr_t) bl1->a.a_void),
               fmt_ptr((genericptr_t) bl2->a.a_void));
@@ -1894,10 +1895,10 @@ fldname_to_bl_indx(const char *name)
 }
 
 static boolean
-hilite_reset_needed(struct istat_s *bl_p,
-                    long augmented_time) /* no longer augmented; it once
-                                          * encoded fractional amounts for
-                                          * multiple moves within same turn */
+hilite_reset_needed(
+    struct istat_s *bl_p,
+    long augmented_time) /* no longer augmented; it once encoded fractional
+                          * amounts for multiple moves within same turn */
 {
     /*
      * This 'multi' handling may need some tuning...
@@ -1922,13 +1923,13 @@ status_eval_next_unhilite(void)
     struct istat_s *curr;
     long next_unhilite, this_unhilite;
 
-    gb.bl_hilite_moves = gm.moves; /* simpllfied; at one point we used to try
-                                  * to encode fractional amounts for multiple
-                                  * moves within same turn */
+    gb.bl_hilite_moves = gm.moves; /* simplified; at one point we used to
+                                    * try to encode fractional amounts for
+                                    * multiple moves within same turn */
     /* figure out whether an unhilight needs to be performed now */
     next_unhilite = 0L;
     for (i = 0; i < MAXBLSTATS; ++i) {
-        curr = &gb.blstats[0][i]; /* blstats[0][*].time == blstats[1][*].time */
+        curr = &gb.blstats[0][i]; /* blstats[0][*].time==blstats[1][*].time */
 
         if (curr->chg) {
             struct istat_s *prev = &gb.blstats[1][i];
@@ -2001,8 +2002,11 @@ noneoftheabove(const char *hl_text)
  *     pointer to rule that applies; Null if no rule does.
  */
 static struct hilite_s *
-get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc,
-           int *colorptr)
+get_hilite(
+    int idx, int fldidx,
+    genericptr_t vp,
+    int chg, int pc,
+    int *colorptr)
 {
     struct hilite_s *hl, *rule = 0;
     anything *value = (anything *) vp;
@@ -2022,11 +2026,20 @@ get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc,
            ancient configurations; we don't need LONG_MIN */
         long max_lval = -LONG_MAX, min_lval = LONG_MAX;
         boolean exactmatch = FALSE, updown = FALSE, changed = FALSE,
-                perc_or_abs = FALSE;
+                perc_or_abs = FALSE, crit_hp = FALSE;
 
         /* min_/max_ are used to track best fit */
         for (hl = gb.blstats[0][fldidx].thresholds; hl; hl = hl->next) {
             dt = initblstats[fldidx].anytype; /* only needed for 'absolute' */
+            /* for HP, if we already have a critical-hp rule then we ignore
+               other HP rules unless we hit another critical-hp one (last
+               one found wins); critical-hp takes precedence over temporary
+               HP highlights, otherwise a hero with regeneration and an up
+               or changed rule for HP would always show that up or changed
+               highlight even when within the critical-hp threshold because
+               the value will go up by at least one on every move */
+            if (crit_hp && hl->behavior != BL_TH_CRITICALHP)
+                continue;
             /* if we've already matched a temporary highlight, it takes
                precedence over all persistent ones; we still process
                updown rules to get the last one which qualifies */
@@ -2178,6 +2191,13 @@ get_hilite(int idx, int fldidx, genericptr_t vp, int chg, int pc,
                 break;
             case BL_TH_ALWAYS_HILITE:
                 rule = hl;
+                break;
+            case BL_TH_CRITICALHP:
+                if (fldidx == BL_HP && critically_low_hp(FALSE)) {
+                    rule = hl;
+                    crit_hp = TRUE;
+                    updown = changed = perc_or_abs = FALSE;
+                }
                 break;
             case BL_TH_NONE:
                 break;
@@ -2434,7 +2454,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
     int coloridx = -1, successes = 0;
     int disp_attrib = 0;
     boolean percent, changed, numeric, down, up,
-            grt, lt, gte, le, eq, txtval, always;
+            grt, lt, gte, le, eq, txtval, always, criticalhp;
     const char *txt;
     enum statusfields fld = BL_FLUSH;
     struct hilite_s hilite;
@@ -2485,6 +2505,7 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
         txt = (const char *)0;
         percent = numeric = always = FALSE;
         down = up = changed = FALSE;
+        criticalhp = FALSE;
         grt = gte = eq = le = lt = txtval = FALSE;
 #if 0
         /* threshold value - return on empty string */
@@ -2529,6 +2550,8 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
             txtval = TRUE;
         } else if (!strcmpi(s[sidx], "changed")) {
             changed = TRUE;
+        } else if (fld == BL_HP && !strcmpi(s[sidx], "criticalhp")) {
+            criticalhp = TRUE;
         } else if (is_ltgt_percentnumber(s[sidx])) {
             const char *op;
 
@@ -2692,7 +2715,9 @@ parse_status_hl2(char (*s)[QBUFSZ], boolean from_configfile)
             hilite.behavior = BL_TH_TEXTMATCH;
         else if (hilite.value.a_void)
             hilite.behavior = BL_TH_VAL_ABSOLUTE;
-       else
+        else if (criticalhp)
+            hilite.behavior = BL_TH_CRITICALHP;
+        else
             hilite.behavior = BL_TH_NONE;
 
         hilite.anytype = dt;
@@ -3253,6 +3278,9 @@ status_hilite2str(struct hilite_s *hl)
     case BL_TH_ALWAYS_HILITE:
         Sprintf(behavebuf, "always");
         break;
+    case BL_TH_CRITICALHP:
+        Sprintf(behavebuf, "criticalhp");
+        break;
     case BL_TH_NONE:
         break;
     default:
@@ -3366,6 +3394,15 @@ status_hilite_menu_choose_behavior(int fld)
         any.a_int = onlybeh = BL_TH_VAL_PERCENTAGE;
         add_menu(tmpwin, &nul_glyphinfo, &any, 'p', 0, ATR_NONE,
                  clr, "Percentage threshold", MENU_ITEMFLAGS_NONE);
+        nopts++;
+    }
+
+    if (fld == BL_HP) {
+        any = cg.zeroany;
+        any.a_int = onlybeh = BL_TH_CRITICALHP;
+        Sprintf(buf,  "Highlight critically low %s", initblstats[fld].fldname);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'C', 0, ATR_NONE,
+                 clr, buf, MENU_ITEMFLAGS_NONE);
         nopts++;
     }
 
@@ -4084,7 +4121,7 @@ boolean
 status_hilite_menu(void)
 {
     winid tmpwin;
-    int i, res;
+    int i, fld, res;
     menu_item *picks = (menu_item *) 0;
     anything any;
     boolean redo;
@@ -4112,19 +4149,21 @@ status_hilite_menu(void)
     }
 
     for (i = 0; i < MAXBLSTATS; i++) {
-        int count = status_hilite_linestr_countfield(i);
+        int count;
         char buf[BUFSZ];
 
+        fld = initblstats[i].fld;
+        count = status_hilite_linestr_countfield(fld);
 #ifndef SCORE_ON_BOTL
         /* config file might contain rules for highlighting 'score'
            even when SCORE_ON_BOTL is disabled; if so, 'O' command
            menus will show them and allow deletions but not additions,
            otherwise, it won't show 'score' at all */
-        if (initblstats[i].fld == BL_SCORE && !count)
+        if (fld == BL_SCORE && !count)
             continue;
 #endif
         any = cg.zeroany;
-        any.a_int = i + 1;
+        any.a_int = fld + 1;
         Sprintf(buf, "%-18s", initblstats[i].fldname);
         if (count)
             Sprintf(eos(buf), " (%d defined)", count);
@@ -4134,11 +4173,11 @@ status_hilite_menu(void)
 
     end_menu(tmpwin, "Status hilites:");
     if ((res = select_menu(tmpwin, PICK_ONE, &picks)) > 0) {
-        i = picks->item.a_int - 1;
-        if (i < 0) {
+        fld = picks->item.a_int - 1;
+        if (fld < 0) {
             status_hilites_viewall();
         } else {
-            if (status_hilite_menu_fld(i))
+            if (status_hilite_menu_fld(fld))
                 reset_status_hilites();
         }
         free((genericptr_t) picks), picks = (menu_item *) 0;

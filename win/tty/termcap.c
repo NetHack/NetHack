@@ -184,16 +184,16 @@ tty_startup(int *wid, int *hgt)
         buf[BUFSZ - 1] = '\0';
         error("Unknown terminal type: %s.", term);
     }
-    if ((pc = Tgetstr("pc")) != 0)
+    if ((pc = Tgetstr(nhStr("pc"))) != 0)
         PC = *pc;
 
-    if (!(BC = Tgetstr("le"))) /* both termcap and terminfo use le */
+    if (!(BC = Tgetstr(nhStr("le")))) { /* both termcap and terminfo use le */
 #ifdef TERMINFO
         error("Terminal must backspace.");
 #else
-        if (!(BC = Tgetstr("bc"))) { /* termcap also uses bc/bs */
+        if (!(BC = Tgetstr(nhStr("bc")))) { /* termcap also uses bc/bs */
 #ifndef MINIMAL_TERM
-            if (!tgetflag("bs"))
+            if (!tgetflag(nhStr("bs")))
                 error("Terminal must backspace.");
 #endif
             BC = tbufptr;
@@ -201,11 +201,12 @@ tty_startup(int *wid, int *hgt)
             *BC = '\b';
         }
 #endif
+    }
 
 #ifdef MINIMAL_TERM
     HO = (char *) 0;
 #else
-    HO = Tgetstr("ho");
+    HO = Tgetstr(nhStr("ho"));
 #endif
     /*
      * LI and CO are set in ioctl.c via a TIOCGWINSZ if available.  If
@@ -214,9 +215,9 @@ tty_startup(int *wid, int *hgt)
      */
 #ifndef MICRO
     if (!CO)
-        CO = tgetnum("co");
+        CO = tgetnum(nhStr("co"));
     if (!LI)
-        LI = tgetnum("li");
+        LI = tgetnum(nhStr("li"));
 #else
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin")) {
@@ -224,8 +225,8 @@ tty_startup(int *wid, int *hgt)
     } else
 #endif
     {
-        CO = tgetnum("co");
-        LI = tgetnum("li");
+        CO = tgetnum(nhStr("co"));
+        LI = tgetnum(nhStr("li"));
         if (!LI || !CO) /* if we don't override it */
             get_scr_size();
     }
@@ -234,49 +235,49 @@ tty_startup(int *wid, int *hgt)
     if (CO < COLNO || LI < ROWNO + 3)
         setclipped();
 #endif
-    nh_ND = Tgetstr("nd"); /* move cursor right 1 column */
-    if (tgetflag("os")) /* term can overstrike */
+    nh_ND = Tgetstr(nhStr("nd")); /* move cursor right 1 column */
+    if (tgetflag(nhStr("os"))) /* term can overstrike */
         error("NetHack can't have OS.");
-    if (tgetflag("ul")) /* underline by overstrike w/ underscore */
+    if (tgetflag(nhStr("ul"))) /* underline by overstrike w/ underscore */
         ul_hack = TRUE;
-    CE = Tgetstr("ce"); /* clear line from cursor to eol */
-    UP = Tgetstr("up"); /* move cursor up 1 line */
+    CE = Tgetstr(nhStr("ce")); /* clear line from cursor to eol */
+    UP = Tgetstr(nhStr("up")); /* move cursor up 1 line */
     /* It seems that xd is no longer supported, and we should use
        a linefeed instead; unfortunately this requires resetting
        CRMOD, and many output routines will have to be modified
        slightly. Let's leave that till the next release. */
-    XD = Tgetstr("xd");
+    XD = Tgetstr(nhStr("xd"));
     /* not:             XD = Tgetstr("do"); */
-    if (!(nh_CM = Tgetstr("cm"))) { /* cm: move cursor */
+    if (!(nh_CM = Tgetstr(nhStr("cm")))) { /* cm: move cursor */
         if (!UP && !HO)
             error("NetHack needs CM or UP or HO.");
         tty_raw_print("Playing NetHack on terminals without CM is suspect.");
         tty_wait_synch();
     }
-    SO = Tgetstr("so"); /* standout start */
-    SE = Tgetstr("se"); /* standout end */
-    nh_US = Tgetstr("us"); /* underline start */
-    nh_UE = Tgetstr("ue"); /* underline end */
-    ZH = Tgetstr("ZH"); /* italic start */
-    ZR = Tgetstr("ZR"); /* italic end */
-    SG = tgetnum("sg"); /* -1: not fnd; else # of spaces left by so */
+    SO = Tgetstr(nhStr("so")); /* standout start */
+    SE = Tgetstr(nhStr("se")); /* standout end */
+    nh_US = Tgetstr(nhStr("us")); /* underline start */
+    nh_UE = Tgetstr(nhStr("ue")); /* underline end */
+    ZH = Tgetstr(nhStr("ZH")); /* italic start */
+    ZR = Tgetstr(nhStr("ZR")); /* italic end */
+    SG = tgetnum(nhStr("sg")); /* -1: not fnd; else # of spaces left by so */
     if (!SO || !SE || (SG > 0))
         SO = SE = nh_US = nh_UE = nullstr;
-    TI = Tgetstr("ti"); /* nonconsequential cursor movement start */
-    TE = Tgetstr("te"); /* nonconsequential cursor movement end */
+    TI = Tgetstr(nhStr("ti")); /* nonconsequential cursor movement start */
+    TE = Tgetstr(nhStr("te")); /* nonconsequential cursor movement end */
     VS = VE = nullstr;
 #ifdef TERMINFO
-    VS = Tgetstr("eA"); /* enable graphics */
+    VS = Tgetstr(nhStr("eA")); /* enable graphics */
 #endif
-    KS = Tgetstr("ks"); /* keypad start (special mode) */
-    KE = Tgetstr("ke"); /* keypad end (ordinary mode [ie, digits]) */
-    MR = Tgetstr("mr"); /* reverse */
-    MB = Tgetstr("mb"); /* blink */
-    MD = Tgetstr("md"); /* boldface */
+    KS = Tgetstr(nhStr("ks")); /* keypad start (special mode) */
+    KE = Tgetstr(nhStr("ke")); /* keypad end (ordinary mode [ie, digits]) */
+    MR = Tgetstr(nhStr("mr")); /* reverse */
+    MB = Tgetstr(nhStr("mb")); /* blink */
+    MD = Tgetstr(nhStr("md")); /* boldface */
     if (!SO)
         SO = MD;
-    MH = Tgetstr("mh"); /* dim */
-    ME = Tgetstr("me"); /* turn off all attributes */
+    MH = Tgetstr(nhStr("mh")); /* dim */
+    ME = Tgetstr(nhStr("me")); /* turn off all attributes */
     if (!ME)
         ME = SE ? SE : nullstr; /* default to SE value */
 
@@ -293,9 +294,9 @@ tty_startup(int *wid, int *hgt)
     nh_HE = dupstr(&ME[i]);
     dynamic_HIHE = TRUE;
 
-    AS = Tgetstr("as"); /* alt charset start */
-    AE = Tgetstr("ae"); /* alt charset end */
-    nh_CD = Tgetstr("cd"); /* clear lines from cursor and down */
+    AS = Tgetstr(nhStr("as")); /* alt charset start */
+    AE = Tgetstr(nhStr("ae")); /* alt charset end */
+    nh_CD = Tgetstr(nhStr("cd")); /* clear lines from cursor and down */
 #ifdef TEXTCOLOR
 #if defined(TOS) && defined(__GNUC__)
     if (!strcmp(term, "builtin") || !strcmp(term, "tw52")
@@ -309,7 +310,7 @@ tty_startup(int *wid, int *hgt)
     *wid = CO;
     *hgt = LI;
     /* cl: clear screen, set cursor to upper left */
-    if (!(CL = Tgetstr("cl"))) /* last thing set */
+    if (!(CL = Tgetstr(nhStr("cl")))) /* last thing set */
         error("NetHack needs CL.");
     if ((int) (tbufptr - tbuf) > (int) (sizeof tbuf))
         error("TERMCAP entry too big...\n");
@@ -451,10 +452,10 @@ tty_ascgraphics_hilite_fixup(void)
 
     for (c = 0; c < CLR_MAX / 2; c++)
         if (c != CLR_BLACK) {
-            hilites[c | BRIGHT] = (char *) alloc(sizeof("\033[1;3%dm"));
+            hilites[c | BRIGHT] = (char *) alloc(sizeof "\033[1;3%dm");
             Sprintf(hilites[c | BRIGHT], "\033[1;3%dm", c);
             if (c != CLR_GRAY) {
-                hilites[c] = (char *) alloc(sizeof("\033[0;3%dm"));
+                hilites[c] = (char *) alloc(sizeof "\033[0;3%dm");
                 Sprintf(hilites[c], "\033[0;3%dm", c);
             }
         }
@@ -496,7 +497,7 @@ tty_start_screen(void)
 void
 tty_end_screen(void)
 {
-    clear_screen();
+    term_clear_screen();
     xputs(VE);
     xputs(TE);
 }
@@ -618,7 +619,7 @@ cl_end(void)
 }
 
 void
-clear_screen(void)
+term_clear_screen(void)
 {
     /* note: if CL is null, then termcap initialization failed,
             so don't attempt screen-oriented I/O during final cleanup.
@@ -836,7 +837,6 @@ cl_eos(void) /* free after Robert Viduya */
     macros used elsewhere within nethack; fortunately they're
     not needed beyond this point, so we don't need to worry
     about reconstructing them after the header file inclusion. */
-#undef delay_output
 #undef TRUE
 #undef FALSE
 #define m_move curses_m_move /* Some curses.h decl m_move(), not used here */
@@ -893,13 +893,13 @@ init_hilite(void)
     int c, colors;
     char *setf, *scratch;
 
-    colors = tgetnum("Co");
+    colors = tgetnum(nhStr("Co"));
     iflags.colorcount = colors;
     int md_len = 0;
 
     if (colors < 8 || (MD == NULL) || (strlen(MD) == 0)
-        || ((setf = tgetstr("AF", (char **) 0)) == (char *) 0
-            && (setf = tgetstr("Sf", (char **) 0)) == (char *) 0)) {
+        || ((setf = tgetstr(nhStr("AF"), (char **) 0)) == (char *) 0
+            && (setf = tgetstr(nhStr("Sf"), (char **) 0)) == (char *) 0)) {
         /* Fallback when colors not available
          * It's arbitrary to collapse all colors except gray
          * together, but that's what the previous code did.
@@ -1009,7 +1009,7 @@ kill_hilite(void)
         if (hilites[CLR_BLACK] != hilites[CLR_BLUE])
             free(hilites[CLR_BLACK]);
     }
-    if (tgetnum("Co") >= 16) {
+    if (tgetnum(nhStr("Co")) >= 16) {
         if (hilites[CLR_BLUE])
             free(hilites[CLR_BLUE]);
         if (hilites[CLR_GREEN])
@@ -1135,7 +1135,7 @@ init_hilite(void)
     hilites[0] = NOCOL;
     for (c = 1; c < SIZE(hilites); c++) {
         char *foo;
-        foo = (char *) alloc(sizeof("\033b0"));
+        foo = (char *) alloc(sizeof "\033b0");
         if (tos_numcolors > 4)
             Sprintf(foo, "\033b%c", (c & ~BRIGHT) + '0');
         else
@@ -1181,7 +1181,7 @@ init_hilite(void)
             if (c == foreg)
                 hilites[c] = (char *) 0;
             else if (c != hi_foreg || backg != hi_backg) {
-                hilites[c] = (char *) alloc(sizeof("\033[%d;3%d;4%dm"));
+                hilites[c] = (char *) alloc(sizeof "\033[%d;3%d;4%dm");
                 Sprintf(hilites[c], "\033[%d", !!(c & BRIGHT));
                 if ((c | BRIGHT) != (foreg | BRIGHT))
                     Sprintf(eos(hilites[c]), ";3%d", c & ~BRIGHT);
@@ -1456,7 +1456,6 @@ term_start_bgcolor(int color)
 #define tcfmtstr24bit "\033[38;2;%u;%u;%um"
 #define tcfmtstr256 "\033[38;5;%dm"
 #else
-#define tcfmtstr "\033[38:2:%ld:%ld:%ldm"
 #define tcfmtstr24bit "\033[38;2;%lu;%lu;%lum"
 #define tcfmtstr256 "\033[38:5:%ldm"
 #endif

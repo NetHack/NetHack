@@ -1054,7 +1054,7 @@ tty_start_screen(void)
 void
 tty_end_screen(void)
 {
-    clear_screen();
+    term_clear_screen();
     really_move_cursor();
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     back_buffer_flip();
@@ -1067,7 +1067,7 @@ CtrlHandler(DWORD ctrltype)
     switch (ctrltype) {
     /* case CTRL_C_EVENT: */
     case CTRL_BREAK_EVENT:
-        clear_screen();
+        term_clear_screen();
     case CTRL_CLOSE_EVENT:
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
@@ -1557,7 +1557,7 @@ raw_clear_screen(void)
 }
 
 void
-clear_screen(void)
+term_clear_screen(void)
 {
     buffer_fill_to_end(console.back_buffer, &clear_cell, 0, 0);
     home();
@@ -1911,12 +1911,18 @@ tty_utf8graphics_fixup(void)
 {
     CONSOLE_FONT_INFOEX console_font_info;
     if ((tty_procs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
+        char *localestr = 0;
+
         if (!console.hConOut)
             console.hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
         /* the locale */
-        if (console.localestr)
+        if (console.localestr) {
             free(console.localestr);
-        console.localestr = dupstr(setlocale(LC_ALL, ".UTF8"));
+            console.localestr = NULL;
+        }
+        localestr = setlocale(LC_ALL, ".UTF8");
+        if (localestr)
+            console.localestr = dupstr(localestr);
         /* the code page */
         SetConsoleOutputCP(65001);
         console.code_page = GetConsoleOutputCP();
@@ -2506,7 +2512,10 @@ void nethack_enter_consoletty(void)
     console.orig_code_page = GetConsoleOutputCP();
 
     /* store the original locale */
-    console.orig_localestr = dupstr(setlocale(LC_ALL, ""));
+    console.orig_localestr = NULL;
+    localestr = setlocale(LC_ALL, "");
+    if (localestr)
+        console.orig_localestr = dupstr(localestr);
 
     /* store the original font */
     console.orig_font_info.cbSize = sizeof(console.orig_font_info);

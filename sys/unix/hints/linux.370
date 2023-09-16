@@ -1,4 +1,4 @@
-# NetHack 3.7  linux.370 $NHDT-Date: 1668359835 2022/11/13 17:17:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.50 $
+# NetHack 3.7  linux.370 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -56,6 +56,11 @@ endif  # WANT_WIN_QT
 #
 #-INCLUDE multiw-3.370
 
+ifeq "$(USE_ASAN)" "1"
+CFLAGS+=-fsanitize=address
+LFLAGS+=-fsanitize=address
+endif
+
 ifeq "$(USE_CURSESLIB)" "1"
 # default
 CURSESLIB = -lncurses -ltinfo
@@ -65,10 +70,17 @@ CURSESLIB = -lncurses -ltinfo
 ifdef MAKEFILE_SRC
 comma:=,
 NCURSES_LFLAGS = $(shell pkg-config ncursesw --libs)
-ifneq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
-HAVE_NCURSESW=1
-else
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
+ifeq (,$(findstring ncurses, $(NCURSES_LFLAGS)))
+#this indicates that pkg-config itself was unavailable
+NCURSES_LFLAGS = -lncursesw -ltinfo
+endif
+endif
+#$(info $(NCURSES_LFLAGS))
+ifeq (,$(findstring ncursesw, $(NCURSES_LFLAGS)))
 HAVE_NCURSESW=0
+else
+HAVE_NCURSESW=1
 endif
 #$(info $(NCURSES_LFLAGS))
 #$(info HAVE_NCURSESW=$(HAVE_NCURSESW))
@@ -83,6 +95,8 @@ endif
 endif      #HAVE_NCURSESW
 endif      #MAKEFILE_SRC
 endif      #USE_CURSESLIB
+
+AUTOLIBS=$(shell (../util/makedefs --grep-defined CRASHREPORT && echo "-lcrypto" ) || true )
 
 # NetHack sources control
 NHCFLAGS+=-DDLB
@@ -159,7 +173,7 @@ WINX11LIB += -lXpm
 VARDATND0 += rip.xpm
 endif
 WINLIB += $(WINX11LIB)
-LFLAGS=-L/opt/X11/lib
+LFLAGS+=-L/opt/X11/lib
 endif	# WANT_WIN_X11
 
 ifdef WANT_WIN_QT
@@ -173,6 +187,7 @@ QTCXXFLAGS += $(sort $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Q
 WINLIB += $(shell PKG_CONFIG_PATH=$(QTDIR)/lib/pkgconfig pkg-config Qt5Gui Qt5Widgets Qt5Multimedia --libs)
 endif    # WANT_WIN_QT5
 ifdef WANT_WIN_QT6
+ifdef QT6MANUAL
 # Try some likely spots for a self-built Qt6.
 # You'll have to change these manually before using the hints file
 # if they don't match the installed location on your system.
@@ -192,7 +207,7 @@ QTCXXFLAGS += -I$(QTINCDIR)/QtNetwork -I$(QTINCDIR)/QtGui -I$(QTINCDIR)/QtCore
 WINLIB += -L$(QTLIBDIR) -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 MOCPATH = /usr/lib/qt6/libexec/moc
 #/usr/lib/x86_64-linux-gnu/libQt6EglFSDeviceIntegration.so
-endif
+endif    # QTTOP/*
 ifndef QTINCDIR
 ifneq ($(wildcard /usr/local/Qt6/*),)
 QTDIR=/usr/local/Qt6
@@ -211,7 +226,17 @@ QTCXXFLAGS += -I$(QTDIR)/include/QtWidgets
 MOCPATH = $(QTDIR)/libexec/moc
 WINLIB += -L$(QTDIR)/lib -lQt6Widgets -lQt6Multimedia -lQt6Network -lQt6Gui -lQt6Core
 endif   # QTLOCATED
-endif   # !QTINCDIR
+else    # !QT6MANUAL
+MOCDIR = $(shell pkg-config Qt6Gui --variable=libexecdir)
+ifneq ($(wildcard $(MOCDIR)/*),)
+MOCPATH = $(MOCDIR)/moc
+else
+MOCPATH = /usr/lib/qt6/libexec/moc
+endif   # MOCDIR
+QTCXXFLAGS += $(sort $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --cflags))
+WINLIB += $(shell pkg-config Qt6Gui Qt6Widgets Qt6Multimedia --libs)
+endif   # QT6MANUAL
+endif   # WANT_WIN_QT6
 ifndef QTDIR
 $(error QTDIR not defined in the environment or Makefile)
 endif	# QTDIR
@@ -258,7 +283,7 @@ endif  # WANT_LIBNH
 
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
-HACKDIR=$(PREFIX)/games/lib/$(GAME)dir
+HACKDIR=$(PREFIX)/games/lib/nethackdir
 SHELLDIR = $(PREFIX)/games
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
@@ -266,7 +291,11 @@ VARDIR = $(HACKDIR)
 POSTINSTALL+= cp -n sys/unix/sysconf $(INSTDIR)/sysconf; \
 	$(CHOWN) $(GAMEUID) $(INSTDIR)/sysconf; \
 	$(CHGRP) $(GAMEGRP) $(INSTDIR)/sysconf; \
-	chmod $(VARFILEPERM) $(INSTDIR)/sysconf;
+	chmod $(VARFILEPERM) $(INSTDIR)/sysconf; \
+	( util/makedefs --grep-defined CRASHREPORT && \
+	  ( cp win/share/nhcrashreport.lua $(INSTDIR) ; \
+	  chmod 555 $(INSTDIR)/nhcrashreport.lua ; \
+	  cp $(LUATOP)/lua $(INSTDIR)/nhlua); true)
 
 ifneq "$(CCISCLANG)" ""
 # gdb may not be installed if clang is chosen compiler so the game
@@ -294,7 +323,7 @@ endif   # GITSUBMODULES
 DLLIB = -ldl
 
 # Only needed for GLIBC stack trace:
-LFLAGS=-rdynamic
+LFLAGS+=-rdynamic
 
 # if TTY_TILES_ESCCODES
 #WINSRC += tile.c

@@ -55,7 +55,7 @@ ballfall(void)
 
         pline_The("iron ball falls on your %s.", body_part(HEAD));
         if (uarmh) {
-            if (is_metallic(uarmh)) {
+            if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 dmg = 3;
             } else if (Verbose(0, ballfall))
@@ -714,7 +714,7 @@ drag_ball(coordxy x, coordxy y, int *bc_control,
         }
 
         /* ball is two spaces horizontal or vertical from player; move*/
-        /* chain inbetween *unless* current chain position is OK */
+        /* chain in-between *unless* current chain position is OK */
         case 4:
             if (CHAIN_IN_MIDDLE(uchain->ox, uchain->oy))
                 break;

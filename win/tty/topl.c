@@ -125,7 +125,7 @@ redotoplin(const char *str)
 
     home();
     if (!ttyDisplay->topl_utf8) {
-        if (*str & 0x80) {
+        if (ttyDisplay->mixed && (*str & 0x80)) {
             /* kludge for the / command, the only time we ever want a */
             /* graphics character on the top line */
             g_putch((int) *str++);

@@ -4,6 +4,7 @@
   <Import Project="$(vsDir)config.props" />
   <PropertyGroup Label="Globals">
     <ProjectGuid>{63F9B82B-F589-4082-ABE5-D4F0682050AB}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(vsDir)default.props" />
@@ -29,7 +30,12 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="$(SysShareDir)uudecode.c" />
+    <ClCompile Include="$(SysShareDir)uudecode.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4820;4702;4706;4244;4245;4100;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4820;4702;4706;4244;4245;4100;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4820;4702;4706;4244;4245;4100;4310</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4820;4702;4706;4244;4245;4100;4310</DisableSpecificWarnings>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">

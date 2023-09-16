@@ -4,6 +4,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CEC5D360-8804-454F-8591-002184C23499}</ProjectGuid>
     <RootNamespace>NetHackW</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.20348.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="..\dirs.props" />
@@ -218,13 +219,13 @@
     <ClInclude Include="$(IncDir)artifact.h" />
     <ClInclude Include="$(IncDir)artilist.h" />
     <ClInclude Include="$(IncDir)attrib.h" />
-    <ClInclude Include="$(IncDir)bitmfile.h" />
     <ClInclude Include="$(IncDir)botl.h" />
     <ClInclude Include="$(IncDir)color.h" />
     <ClInclude Include="$(IncDir)config.h" />
     <ClInclude Include="$(IncDir)config1.h" />
     <ClInclude Include="$(IncDir)context.h" />
     <ClInclude Include="$(IncDir)coord.h" />
+    <ClInclude Include="$(IncDir)cstd.h" />
     <ClInclude Include="$(IncDir)decl.h" />
     <ClInclude Include="$(IncDir)defsym.h" />
     <ClInclude Include="$(IncDir)dgn_file.h" />
@@ -236,7 +237,6 @@
     <ClInclude Include="$(IncDir)flag.h" />
     <ClInclude Include="$(IncDir)fnamesiz.h" />
     <ClInclude Include="$(IncDir)func_tab.h" />
-    <ClInclude Include="$(IncDir)gem_rsc.h" />
     <ClInclude Include="$(IncDir)global.h" />
     <ClInclude Include="$(IncDir)hack.h" />
     <ClInclude Include="$(IncDir)integer.h" />
@@ -269,11 +269,11 @@
     <ClInclude Include="$(IncDir)rm.h" />
     <ClInclude Include="$(IncDir)skills.h" />
     <ClInclude Include="$(IncDir)sndprocs.h" />
+    <ClInclude Include="$(IncDir)seffects.h" />
     <ClInclude Include="$(IncDir)spell.h" />
     <ClInclude Include="$(IncDir)sp_lev.h" />
     <ClInclude Include="$(IncDir)sym.h" />
     <ClInclude Include="$(IncDir)sys.h" />
-    <ClInclude Include="$(IncDir)system.h" />
     <ClInclude Include="$(IncDir)tcap.h" />
     <ClInclude Include="$(IncDir)tile2x11.h" />
     <ClInclude Include="$(IncDir)tileset.h" />
@@ -305,9 +305,6 @@
     <Image Include="$(WinWin32Dir)rip.bmp" />
     <Image Include="$(WinWin32Dir)splash.bmp" />
     <Image Include="$(WinWin32Dir)tiles.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Target Name="AfterBuild">

@@ -543,6 +543,7 @@ mkswamp(void) /* Michiel Huisjes & Fred de Wilde */
                 if (!OBJ_AT(sx, sy) && !MON_AT(sx, sy) && !t_at(sx, sy)
                     && !nexttodoor(sx, sy)) {
                     if ((sx + sy) % 2) {
+                        del_engr_at(sx, sy);
                         levl[sx][sy].typ = POOL;
                         if (!eelct || !rn2(4)) {
                             /* mkclass() won't do, as we might get kraken */
@@ -1011,6 +1012,9 @@ cmap_to_type(int sym)
         break;
     case S_water:
         typ = WATER;
+        break;
+    case S_lavawall:
+        typ = LAVAWALL;
         break;
     default:
         break; /* not a cmap symbol? */

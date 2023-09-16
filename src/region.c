@@ -1,4 +1,4 @@
-/* NetHack 3.7	region.c	$NHDT-Date: 1596498203 2020/08/03 23:43:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.65 $ */
+/* NetHack 3.7	region.c	$NHDT-Date: 1683832331 2023/05/11 19:12:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.81 $ */
 /* Copyright (c) 1996 by Jean-Christophe Collet  */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1028,6 +1028,7 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
             if (Half_gas_damage) /* worn towel */
                 dam = (dam + 1) / 2;
             losehp(dam, "gas cloud", KILLED_BY_AN);
+            monstunseesu(M_SEEN_POISON);
             return FALSE;
         } else {
             You("cough!");
@@ -1229,7 +1230,7 @@ region_safety(void)
 
     if (n > 1 || (n == 1 && !r)) {
         /* multiple overlapping cloud regions or non-expiring one */
-        safe_teleds(FALSE);
+        safe_teleds(TELEDS_NO_FLAGS);
     } else if (r) {
         remove_region(r);
         pline_The("gas cloud enveloping you dissipates.");
@@ -1238,7 +1239,7 @@ region_safety(void)
         pline_The("gas cloud has dissipated.");
     }
     /* maybe cure blindness too */
-    if ((Blinded & TIMEOUT) == 1L)
+    if (BlindedTimeout == 1L)
         make_blinded(0L, TRUE);
 }
 

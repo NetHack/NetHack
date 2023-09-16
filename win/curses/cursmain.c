@@ -22,6 +22,18 @@ extern char erase_char, kill_char;
 
 extern long curs_mesg_suppress_seq; /* from cursmesg.c */
 extern boolean curs_mesg_no_suppress; /* ditto */
+extern int mesg_mixed;
+extern glyph_info mesg_gi;
+
+#ifndef CURSES_GENL_PUTMIXED
+#if defined(PDC_WIDE) || defined(NCURSES_WIDECHAR)
+#define USE_CURSES_PUTMIXED
+#else  /* WIDE */
+#ifdef NH_PRAGMA_MESSAGE
+#pragma message "Curses wide support not defined so NetHack curses message window functionality reduced"
+#endif
+#endif /* WIDE */
+#endif /* CURSES_GENL_PUTMIXED */
 
 /* stubs for curses_procs{} */
 #ifdef POSITIONBAR
@@ -70,7 +82,11 @@ struct window_procs curses_procs = {
     curses_destroy_nhwindow,
     curses_curs,
     curses_putstr,
+#ifdef USE_CURSES_PUTMIXED
+    curses_putmixed,
+#else
     genl_putmixed,
+#endif
     curses_display_file,
     curses_start_menu,
     curses_add_menu,
@@ -561,6 +577,19 @@ curses_putstr(winid wid, int attr, const char *text)
     curs_mesg_no_suppress = FALSE;
 }
 
+void
+curses_putmixed(winid window, int attr, const char *str)
+{
+    if (window == WIN_MESSAGE) {
+        str = mixed_to_glyphinfo(str, &mesg_gi);
+        mesg_mixed = 1;
+    }
+    /* now send it to the normal putstr */
+    curses_putstr(window, attr, str);
+    if (window == WIN_MESSAGE)
+        mesg_mixed = 0;
+}
+
 /* Display the file named str.  Complain about missing files
                    iff complain is TRUE.
 */
@@ -751,7 +780,11 @@ mark_synch()    -- Don't go beyond this point in I/O on any channel until
 void
 curses_mark_synch(void)
 {
-    curses_refresh_nethack_windows();
+     /* full refresh has unintended side-effect of making a menu window
+        that has called core's get_count() to vanish; do a basic screen
+        refresh instead */
+     /*curses_refresh_nethack_windows();*/
+     refresh();
 }
 
 /*
@@ -849,9 +882,12 @@ curses_print_glyph(
             else /* if (iflags.use_inverse) */
                 attr = A_REVERSE;
         }
-        /* water and lava look the same except for color; when color is off,
-           render lava in inverse video so that they look different */
-        if ((special & (MG_BW_LAVA | MG_BW_ICE)) != 0 && iflags.use_inverse) {
+        /* water and lava look the same except for color; when color is off
+           (checked by core), render lava in inverse video so that it looks
+           different from water; similar for floor vs ice, fountain vs sink,
+           and corridor vs engranving-in-corridor */
+        if ((special & (MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK | MG_BW_ENGR))
+            != 0 && iflags.use_inverse) {
             /* reset_glyphmap() only sets MG_BW_foo if color is off */
             attr = A_REVERSE;
         }
@@ -977,7 +1013,8 @@ nhbell()        -- Beep at user.  [This will exist at least until sounds are
 void
 curses_nhbell(void)
 {
-    beep();
+    if (!flags.silent)
+        beep();
 }
 
 /*
@@ -1068,6 +1105,7 @@ curses_delay_output(void)
     if (flags.nap && !iflags.debug_fuzzer) {
         /* refreshing the whole display is a waste of time,
          * but that's why we're here */
+        curses_update_stdscr_cursor();
         refresh();
         napms(50);
     }

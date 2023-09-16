@@ -528,7 +528,7 @@ food_detect(struct obj *sobj)
         You("%s %s nearby.", sobj ? "smell" : "sense", what);
         if (sobj && sobj->blessed) {
             if (!u.uedibility)
-                pline("Your %s starts to tingle.", body_part(NOSE));
+                Your("%s starts to tingle.", body_part(NOSE));
             u.uedibility = 1;
         }
     } else {
@@ -1081,7 +1081,7 @@ furniture_detect(void)
         }
 
     if (!found)
-        pline("There seems to be nothing of interest on this level.");
+        There("seems to be nothing of interest on this level.");
     else if (!revealed)
         /* [what about clipped map with points of interest outside of the
             currently shown area?] */
@@ -1185,7 +1185,7 @@ use_crystal_ball(struct obj **optr)
         case 3:
             if (!resists_blnd(&gy.youmonst)) {
                 pline("%s your vision!", Tobjnam(obj, "damage"));
-                make_blinded((Blinded & TIMEOUT) + impair, FALSE);
+                make_blinded(BlindedTimeout + impair, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             } else {
@@ -1328,6 +1328,7 @@ show_map_spot(coordxy x, coordxy y)
 {
     struct rm *lev;
     struct trap *t;
+    struct engr *ep;
     int oldglyph;
 
     if (Confusion && rn2(7))
@@ -1359,6 +1360,8 @@ show_map_spot(coordxy x, coordxy y)
     if (!IS_FURNITURE(lev->typ)) {
         if ((t = t_at(x, y)) != 0 && t->tseen) {
             map_trap(t, 1);
+        } else if ((ep = engr_at(x,y)) != 0) {
+            map_engraving(ep, 1);
         } else if (glyph_is_trap(oldglyph) || glyph_is_object(oldglyph)) {
             show_glyph(x, y, oldglyph);
             if (gl.level.flags.hero_memory)
@@ -1424,7 +1427,7 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
      * issuing --More-- and then regular vision update, but we want
      * to avoid that when having a clairvoyant episode every N turns
      * (from donating to a temple priest or by carrying the Amulet).
-     * Unlike when casting the spell, it is much too intrustive when
+     * Unlike when casting the spell, it is much too intrusive when
      * in the midst of walking around or combatting monsters.
      *
      * As of 3.6.2, show terrain, then object, then monster like regular
@@ -1702,7 +1705,7 @@ findit(void)
     }
     /* note: non-\0 *buf implies that at least one previous type is present */
     if (found.num_scorrs) {
-        if (*buf) /* "doors and corrs" or "doors, coors ..." */
+        if (*buf) /* "doors and corrs" or "doors, corrs ..." */
             Strcat(buf, (k == 2) ? " and " : ", ");
         if (found.num_scorrs > 1)
             Sprintf(eos(buf), "%d secret corridors", found.num_scorrs);
@@ -1711,7 +1714,7 @@ findit(void)
         num += found.num_scorrs;
     }
     if (found.num_traps) {
-        if (*buf) /* "doors, corrs, and traps" or "{doors|coors} and traps"
+        if (*buf) /* "doors, corrs, and traps" or "{doors|corrs} and traps"
                    * or "..., traps ..." */
             Strcat(buf, (k == 3 && !found.num_mons) ? ", and "
                         : (k == 2) ? " and " : ", ");
@@ -2058,18 +2061,26 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
                     && M_AP_TYPE(mtmp) == M_AP_FURNITURE) {
                     glyph = cmap_to_glyph(mtmp->mappearance);
                 } else {
-                    /* we have a topology type but we want a screen
-                       symbol in order to derive a glyph; some screen
-                       symbols need the flags field of levl[][] in
-                       addition to the type (to disambiguate STAIRS to
-                       S_upstair or S_dnstair, for example; current
-                       flags might not be intended for remembered type,
-                       but we've got no other choice) */
-                    schar save_typ = levl[x][y].typ;
+                    struct rm save_spot;
 
+                    /*
+                     * We have a topology type but we want a screen symbol
+                     * in order to derive a glyph.  Some screen symbols need
+                     * the flags field of levl[][] in addition to the type
+                     * (to disambiguate STAIRS to S_upstair or S_dnstair,
+                     * for example).  Current flags might not be intended
+                     * for remembered type, but we've got no other choice.
+                     * An exception is wall_info which can be recalculated and
+                     * needs to be.  Otherwise back_to_glyph() -> wall_angle()
+                     * might issue an impossible() for it if it is currently
+                     * doormask==D_OPEN for an open door remembered as a wall.
+                     */
+                    save_spot = levl[x][y];
                     levl[x][y].typ = gl.lastseentyp[x][y];
+                    if (IS_WALL(levl[x][y].typ))
+                        xy_set_wall_state(x, y); /* levl[x][y].wall_info */
                     glyph = back_to_glyph(x, y);
-                    levl[x][y].typ = save_typ;
+                    levl[x][y] = save_spot;
                 }
             }
         }

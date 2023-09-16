@@ -1,4 +1,4 @@
-/* NetHack 3.7	rm.h	$NHDT-Date: 1657918091 2022/07/15 20:48:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.96 $ */
+/* NetHack 3.7	rm.h	$NHDT-Date: 1684058570 2023/05/14 10:02:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.107 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -31,10 +31,27 @@
  * +-           -+-             -+              |
  */
 
-/* Level location types.  [Some debugging code in src/display.c
-   defines array type_names[] which contains an entry for each of
-   these, so needs to be kept in sync if any new types are added
-   or existing ones renumbered.] */
+/*
+ * Level location types, values for 'level.locations[x][y].typ'.
+ *
+ * These are different from display symbols and while there is
+ * similarity between the cmap subset of those, there isn't any
+ * one-to-one correspondence between the two encodings.  For instance,
+ * the DOOR type has multiple symbols (closed|open|gone); so does the
+ * STAIRS type (down|up).  Conversely, DRAWBRIDGE_UP represents the
+ * location of the projected span if the drawbridge were down but
+ * there is no symbol for that; it is displayed as water, ice, lava, or
+ * floor depending on what is at that spot when the bridge is 'closed'.
+ *
+ * [Some debugging code in src/display.c defines array type_names[]
+ * which contains an entry for each of these, so needs to be kept in
+ * sync if any new types are added or existing ones renumbered.  The
+ * #terrain command also has a menu choice to display each map spot by
+ * a letter derived from these numeric values and another choice to
+ * display a legend showing the letter-to-type correspondence.  If any
+ * types are added, removed, or reordered, that needs to be updated to
+ * keep in synch.]
+ */
 enum levl_typ_types {
     STONE     =  0,
     VWALL     =  1,
@@ -57,24 +74,25 @@ enum levl_typ_types {
     WATER     = 18,
     DRAWBRIDGE_UP = 19,
     LAVAPOOL  = 20,
-    IRONBARS  = 21, /* KMH */
-    DOOR      = 22,
-    CORR      = 23,
-    ROOM      = 24,
-    STAIRS    = 25,
-    LADDER    = 26,
-    FOUNTAIN  = 27,
-    THRONE    = 28,
-    SINK      = 29,
-    GRAVE     = 30,
-    ALTAR     = 31,
-    ICE       = 32,
-    DRAWBRIDGE_DOWN = 33,
-    AIR       = 34,
-    CLOUD     = 35,
+    LAVAWALL  = 21,
+    IRONBARS  = 22, /* KMH */
+    DOOR      = 23,
+    CORR      = 24,
+    ROOM      = 25,
+    STAIRS    = 26,
+    LADDER    = 27,
+    FOUNTAIN  = 28,
+    THRONE    = 29,
+    SINK      = 30,
+    GRAVE     = 31,
+    ALTAR     = 32,
+    ICE       = 33,
+    DRAWBRIDGE_DOWN = 34,
+    AIR       = 35,
+    CLOUD     = 36,
 
-    MAX_TYPE  = 36,
-    MATCH_WALL = 37,
+    MAX_TYPE  = 37,
+    MATCH_WALL = 38,
     INVALID_TYPE = 127
 };
 
@@ -95,6 +113,7 @@ enum levl_typ_types {
 #define ZAP_POS(typ) ((typ) >= POOL)
 #define SPACE_POS(typ) ((typ) > DOOR)
 #define IS_POOL(typ) ((typ) >= POOL && (typ) <= DRAWBRIDGE_UP)
+#define IS_LAVA(typ) ((typ) == LAVAPOOL || (typ) == LAVAWALL)
 #define IS_THRONE(typ) ((typ) == THRONE)
 #define IS_FOUNTAIN(typ) ((typ) == FOUNTAIN)
 #define IS_SINK(typ) ((typ) == SINK)
@@ -106,6 +125,14 @@ enum levl_typ_types {
 #define IS_AIR(typ) ((typ) == AIR || (typ) == CLOUD)
 #define IS_SOFT(typ) ((typ) == AIR || (typ) == CLOUD || IS_POOL(typ))
 #define IS_WATERWALL(typ) ((typ) == WATER)
+/* for surface checks when it's unknown whether a drawbridge is involved;
+   drawbridge_up is the spot in front of a closed drawbridge and not the
+   current surface at that spot; caveat: this evaluates its arguments more
+   than once and might make a function call */
+#define SURFACE_AT(x,y) \
+    ((levl[x][y].typ == DRAWBRIDGE_UP)            \
+     ? db_under_typ(levl[x][y].drawbridgemask)    \
+     : levl[x][y].typ)
 
 /*
  *      Note:  secret doors (SDOOR) want to use both rm.doormask and
@@ -383,11 +410,19 @@ struct levelflags {
     Bitfield(is_maze_lev, 1);
     Bitfield(is_cavernous_lev, 1);
     Bitfield(arboreal, 1);     /* Trees replace rock */
+    Bitfield(has_town, 1);     /* level contains a town */
     Bitfield(wizard_bones, 1); /* set if level came from a bones file
-                                  which was created in wizard mode (or
-                                  normal mode descendant of such) */
+                                * which was created in wizard mode (or
+                                * normal mode descendant of such) */
     Bitfield(corrmaze, 1);     /* Whether corridors are used for the maze
-                                  rather than ROOM */
+                                * rather than ROOM */
+    Bitfield(rndmongen, 1);    /* random monster generation allowed? */
+    Bitfield(deathdrops, 1);   /* monsters may drop corpses/death drops */
+
+    Bitfield(noautosearch, 1); /* automatic searching disabled */
+    Bitfield(fumaroles, 1);    /* lava emits poison gas at random */
+    Bitfield(stormy, 1);       /* clouds create lightning bolts at random */
+
     schar temperature;         /* +1 == hot, -1 == cold */
 };
 
@@ -423,14 +458,19 @@ typedef struct {
  * Macros for encapsulation of level.monsters references.
  */
 #if 0
+/* these wouldn't allow buried monster and surface monster at same location */
 #define MON_AT(x, y) \
-    (gl.level.monsters[x][y] != (struct monst *) 0 \
-     && !(gl.level.monsters[x][y])->mburied)
+    (gl.level.monsters[x][y] && !gl.level.monsters[x][y]->mburied)
 #define MON_BURIED_AT(x, y) \
-    (gl.level.monsters[x][y] != (struct monst *) 0 \
-     && (gl.level.monsters[x][y])->mburied)
+    (gl.level.monsters[x][y] && gl.level.monsters[x][y]->mburied)
+#define m_at(x, y) \
+    (MON_AT(x, y) ? gl.level.monsters[x][y] : (struct monst *) 0)
+#define m_buried_at(x, y) \
+    (MON_BURIED_AT(x, y) ? gl.level.monsters[x][y] : (struct monst *) 0)
 #else   /* without 'mburied' */
 #define MON_AT(x, y) (gl.level.monsters[x][y] != (struct monst *) 0)
+#define m_at(x, y) (gl.level.monsters[x][y])
+#define m_buried_at(x, y) ((struct monst *) 0)
 #endif
 #ifdef EXTRA_SANITY_CHECKS
 #define place_worm_seg(m, x, y) \
@@ -449,9 +489,6 @@ typedef struct {
 #define place_worm_seg(m, x, y) gl.level.monsters[x][y] = m
 #define remove_monster(x, y) gl.level.monsters[x][y] = (struct monst *) 0
 #endif
-#define m_at(x, y) (MON_AT(x, y) ? gl.level.monsters[x][y] : (struct monst *) 0)
-#define m_buried_at(x, y) \
-    (MON_BURIED_AT(x, y) ? gl.level.monsters[x][y] : (struct monst *) 0)
 
 /* restricted movement, potential luck penalties */
 #define Sokoban gl.level.flags.sokoban_rules

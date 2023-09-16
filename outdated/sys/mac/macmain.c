@@ -65,7 +65,7 @@ main(void)
      */
     vision_init();
 
-    init_sound_and_display_gamewindows();
+    init_sound_disp_gamewindows();
 
     set_playmode(); /* sets plname to "wizard" for wizard mode */
     /* strip role,race,&c suffix; calls askname() if plname[] is empty

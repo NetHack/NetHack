@@ -321,6 +321,11 @@ update_rogue_symset(const struct symparse* symp, int val)
 void
 clear_symsetentry(int which_set, boolean name_too)
 {
+#ifdef ENHANCED_SYMBOLS
+    int other_set = (which_set == PRIMARYSET) ? ROGUESET : PRIMARYSET;
+    enum symset_handling_types old_handling = gs.symset[which_set].handling;
+#endif
+
     if (gs.symset[which_set].desc)
         free((genericptr_t) gs.symset[which_set].desc);
     gs.symset[which_set].desc = (char *) 0;
@@ -337,7 +342,10 @@ clear_symsetentry(int which_set, boolean name_too)
         gs.symset[which_set].name = (char *) 0;
     }
 #ifdef ENHANCED_SYMBOLS
-    free_all_glyphmap_u();
+    /* if 'which_set' was using UTF8, it isn't anymore; if the other set
+       isn't using UTF8, discard the data for that */
+    if (old_handling == H_UTF8 && gs.symset[other_set].handling != H_UTF8)
+        free_all_glyphmap_u();
     purge_custom_entries(which_set);
 #endif
 }
@@ -924,7 +932,7 @@ do_symset(boolean rogueflag)
                 big_desc = thissize;
         }
         if (!setcount) {
-            pline("There are no appropriate %s symbol sets available.",
+            There("are no appropriate %s symbol sets available.",
                   rogueflag ? "rogue level" : "primary");
             return TRUE;
         }
@@ -1010,7 +1018,7 @@ do_symset(boolean rogueflag)
         return TRUE;
     } else if (!gs.symset_list) {
         /* The symbols file was empty */
-        pline("There were no symbol sets found in \"%s\".", SYMBOLS);
+        There("were no symbol sets found in \"%s\".", SYMBOLS);
         return TRUE;
     }
 
@@ -1077,7 +1085,7 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 struct customization_detail *find_display_sym_customization(
     const char *customization_name, const struct symparse *symparse,
     enum graphics_sets which_set);
-struct customization_detail *find_matching_symset_customization(
+struct customization_detail *find_matching_symset_customiz(
     const char *customization_name, int custtype,
     enum graphics_sets which_set);
 struct customization_detail *find_display_urep_customization(
@@ -1167,7 +1175,7 @@ shuffle_customizations(void)
 }
 
 struct customization_detail *
-find_matching_symset_customization(
+find_matching_symset_customiz(
     const char *customization_name,
     int custtype,
     enum graphics_sets which_set)

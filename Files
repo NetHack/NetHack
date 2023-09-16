@@ -75,11 +75,11 @@ fixes3-2-2.txt     fixes3-2-3.txt     fixes3-3-0.txt     fixes3-3-1.txt
 fixes3-4-0.txt     fixes3-4-1.txt     fixes3-4-2.txt     fixes3-4-3.txt
 fixes3-5-0.txt     fixes3-6-0.txt     fixes3-6-1.txt     fixes3-6-2.txt
 fixes3-6-3.txt     fixes3-6-4.txt     fixes3-6-5.txt     fixes3-6-6.txt
-fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc           makedefs.6
-makedefs.txt       mn.7               mn.txt             mnh.7
-mnh.txt            nethack.6          nethack.txt        options.txt
-recover.6          recover.txt        sound.txt          tmac.n
-tmac.nh            window.txt
+fixes3-6-7.txt     fixes3-7-0.txt     fixesX-X-X.txt     lua.adoc
+makedefs.6         makedefs.txt       mn.7               mn.txt
+mnh.7              mnh.txt            nethack.6          nethack.txt
+options.txt        recover.6          recover.txt        sound.txt
+tmac.n             tmac.nh            window.txt
 
 include:
 (files for X versions)
@@ -88,19 +88,19 @@ tile2x11.h  winX.h      xwindow.h   xwindowp.h
 (files for all versions)
 align.h       artifact.h    artilist.h    attrib.h      botl.h
 color.h       config.h      config1.h     context.h     coord.h
-decl.h        defsym.h      dgn_file.h    display.h     dlb.h
-dungeon.h     engrave.h     extern.h      flag.h        fnamesiz.h
-func_tab.h    global.h      hack.h        integer.h     isaac64.h
-lint.h        mail.h        mextra.h      mfndpos.h     micro.h
-mkroom.h      monattk.h     mondata.h     monflag.h     monst.h
-monsters.h    obj.h         objclass.h    objects.h     optlist.h
-patchlevel.h  pcconf.h      permonst.h    prop.h        quest.h
-rect.h        region.h      rm.h          skills.h      sndprocs.h
-sp_lev.h      spell.h       sym.h         sys.h         system.h
-tcap.h        tileset.h     timeout.h     tradstdc.h    trap.h
-unixconf.h    vision.h      vmsconf.h     warnings.h    winami.h
-wincurs.h     windconf.h    winprocs.h    wintype.h     you.h
-youprop.h
+cstd.h        decl.h        defsym.h      dgn_file.h    display.h
+dlb.h         dungeon.h     engrave.h     extern.h      flag.h
+fnamesiz.h    func_tab.h    global.h      hack.h        integer.h
+isaac64.h     lint.h        mail.h        mextra.h      mfndpos.h
+micro.h       mkroom.h      monattk.h     mondata.h     monflag.h
+monst.h       monsters.h    obj.h         objclass.h    objects.h
+optlist.h     patchlevel.h  pcconf.h      permonst.h    prop.h
+quest.h       rect.h        region.h      rm.h          seffects.h
+skills.h      sndprocs.h    sp_lev.h      spell.h       sym.h
+sys.h         tcap.h        tileset.h     timeout.h     tradstdc.h
+trap.h        unixconf.h    vision.h      vmsconf.h     warnings.h
+winami.h      wincurs.h     windconf.h    winprocs.h    wintype.h
+you.h         youprop.h
 
 (file for tty versions)
 wintty.h
@@ -121,8 +121,8 @@ bitmfile.h  gem_rsc.h   load_img.h  wingem.h
 winGnome.h
 
 (files for all versions)
-amiconf.h   beconf.h    def_os2.h   os2conf.h   tosconf.h   trampoli.h
-wceconf.h
+amiconf.h   beconf.h    def_os2.h   os2conf.h   system.h    tosconf.h
+trampoli.h  wceconf.h
 
 (files for various Macintosh versions)
 mac-carbon.h  mac-qt.h      mac-term.h    macconf.h     macpopup.h
@@ -178,6 +178,10 @@ macosx10.14
 outdated/sys/unix/hints/include:
 (files that are no longer maintained for current game code)
 cross-amiga-post  cross-amiga-pre
+
+outdated/sys/vms:
+(files that are no longer maintained for current game code)
+lev_lex.h
 
 outdated/sys/wince:
 (files for Windows CE and PocketPC - untested for 3.7)
@@ -242,6 +246,7 @@ README.md
 sound/wav:
 (files in top directory)
 README                       attributions.txt
+sa2_xpleveldown.uu           sa2_xplevelup.uu
 se_squeak_A.uu               se_squeak_B.uu
 se_squeak_B_flat.uu          se_squeak_C.uu
 se_squeak_D.uu               se_squeak_D_flat.uu
@@ -408,18 +413,19 @@ multiw-1.370       multiw-2.370       multiw-3.370
 sys/vms:
 (files for VMS version)
 Install.vms   Makefile.dat  Makefile.doc  Makefile.src  Makefile.top
-Makefile.utl  install.com   lev_lex.h     nethack.com   oldcrtl.c
-spec_lev.com  sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c
-vmsmain.c     vmsmisc.c     vmstty.c      vmsunix.c
+Makefile.utl  install.com   nethack.com   oldcrtl.c     spec_lev.com
+sysconf       vmsbuild.com  vmsfiles.c    vmsmail.c     vmsmain.c
+vmsmisc.c     vmstty.c      vmsunix.c
 
 sys/windows:
 (files for Windows 7/8.x/10/11 version)
 .nethackrc.template      Install.windows          Makefile.mingw32
 Makefile.mingw32.depend  Makefile.nmake           console.rc
-consoletty.c             nethack.def              nhico.uu
-nhsetup.bat              porthelp                 sysconf.template
-win10.c                  win10.h                  win32api.h
-windmain.c               windsys.c                winos.h
+consoletty.c             guitty.c                 nethack.def
+nhico.uu                 nhsetup.bat              porthelp
+sysconf.template         win10.c                  win10.h
+win32api.h               windmain.c               windsys.c
+winos.h
 
 sys/windows/vs:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)

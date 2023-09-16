@@ -1,4 +1,4 @@
-/* NetHack 3.7	restore.c	$NHDT-Date: 1649530943 2022/04/09 19:02:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.194 $ */
+/* NetHack 3.7	restore.c	$NHDT-Date: 1686726258 2023/06/14 07:04:18 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.211 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -27,8 +27,8 @@ static struct monst *restmonchn(NHFILE *);
 static struct fruit *loadfruitchn(NHFILE *);
 static void freefruitchn(struct fruit *);
 static void ghostfruit(struct obj *);
-static boolean restgamestate(NHFILE *, unsigned int *, unsigned int *);
-static void restlevelstate(unsigned int, unsigned int);
+static boolean restgamestate(NHFILE *);
+static void restlevelstate(void);
 static int restlevelfile(xint8);
 static void rest_bubbles(NHFILE *);
 static void restore_gamelog(NHFILE *);
@@ -61,6 +61,11 @@ extern int amii_numcolors;
 #include "display.h"
 
 #define Is_IceBox(o) ((o)->otyp == ICE_BOX ? TRUE : FALSE)
+
+/* third arg passed to mread() should be 'unsigned' but most calls use
+   sizeof so are attempting to pass 'size_t'; mread()'s prototype results
+   in an implicit conversion; this macro does it explicitly */
+#define Mread(fd,adr,siz) mread((fd), (genericptr_t) (adr), (unsigned) (siz))
 
 /* Recalculate gl.level.objects[x][y], since this info was not saved. */
 static void
@@ -121,19 +126,19 @@ inven_inuse(boolean quietly)
 }
 
 static void
-restlevchn(NHFILE* nhfp)
+restlevchn(NHFILE *nhfp)
 {
     int cnt = 0;
     s_level *tmplev, *x;
 
     gs.sp_levchn = (s_level *) 0;
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &cnt, sizeof(int));
+        Mread(nhfp->fd, &cnt, sizeof cnt);
 
     for (; cnt > 0; cnt--) {
         tmplev = (s_level *) alloc(sizeof(s_level));
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) tmplev, sizeof(s_level));
+            Mread(nhfp->fd, tmplev, sizeof *tmplev);
 
         if (!gs.sp_levchn)
             gs.sp_levchn = tmplev;
@@ -147,7 +152,7 @@ restlevchn(NHFILE* nhfp)
 }
 
 static void
-restdamage(NHFILE* nhfp)
+restdamage(NHFILE *nhfp)
 {
     unsigned int dmgcount = 0;
     int counter;
@@ -155,7 +160,7 @@ restdamage(NHFILE* nhfp)
     boolean ghostly = (nhfp->ftype == NHF_BONESFILE);
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &dmgcount, sizeof dmgcount);
+        Mread(nhfp->fd, &dmgcount, sizeof dmgcount);
     counter = (int) dmgcount;
 
     if (!counter)
@@ -163,7 +168,7 @@ restdamage(NHFILE* nhfp)
     do {
         tmp_dam = (struct damage *) alloc(sizeof *tmp_dam);
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) tmp_dam, sizeof *tmp_dam);
+            Mread(nhfp->fd, tmp_dam, sizeof *tmp_dam);
 
         if (ghostly)
             tmp_dam->when += (gm.moves - go.omoves);
@@ -175,12 +180,12 @@ restdamage(NHFILE* nhfp)
 
 /* restore one object */
 static void
-restobj(NHFILE* nhfp, struct obj *otmp)
+restobj(NHFILE *nhfp, struct obj *otmp)
 {
     int buflen = 0;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) otmp, sizeof(struct obj));
+        Mread(nhfp->fd, otmp, sizeof *otmp);
 
     otmp->lua_ref_cnt = 0;
     /* next object pointers are invalid; otmp->cobj needs to be left
@@ -192,17 +197,17 @@ restobj(NHFILE* nhfp, struct obj *otmp)
 
         /* oname - object's name */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
 
         if (buflen > 0) { /* includes terminating '\0' */
             new_oname(otmp, buflen);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) ONAME(otmp), buflen);
+                Mread(nhfp->fd, ONAME(otmp), buflen);
         }
 
         /* omonst - corpse or statue might retain full monster details */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             newomonst(otmp);
             /* this is actually a monst struct, so we
@@ -212,12 +217,12 @@ restobj(NHFILE* nhfp, struct obj *otmp)
 
         /* omailcmd - feedback mechanism for scroll of mail */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             char *omailcmd = (char *) alloc(buflen);
 
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) omailcmd, buflen);
+                Mread(nhfp->fd, omailcmd, buflen);
             new_omailcmd(otmp, omailcmd);
             free((genericptr_t) omailcmd);
         }
@@ -225,12 +230,12 @@ restobj(NHFILE* nhfp, struct obj *otmp)
         /* omid - monster id number, connecting corpse to ghost */
         newomid(otmp); /* superfluous; we're already allocated otmp->oextra */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &OMID(otmp), sizeof OMID(otmp));
+            Mread(nhfp->fd, &OMID(otmp), sizeof OMID(otmp));
     }
 }
 
 static struct obj *
-restobjchn(NHFILE* nhfp, boolean frozen)
+restobjchn(NHFILE *nhfp, boolean frozen)
 {
     register struct obj *otmp, *otmp2 = 0;
     register struct obj *first = (struct obj *) 0;
@@ -239,7 +244,7 @@ restobjchn(NHFILE* nhfp, boolean frozen)
 
     while (1) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+            Mread(nhfp->fd, &buflen, sizeof buflen);
 
         if (buflen == -1)
             break;
@@ -298,12 +303,12 @@ restobjchn(NHFILE* nhfp, boolean frozen)
 
 /* restore one monster */
 static void
-restmon(NHFILE* nhfp, struct monst* mtmp)
+restmon(NHFILE *nhfp, struct monst *mtmp)
 {
     int buflen = 0;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) mtmp, sizeof(struct monst));
+        Mread(nhfp->fd, mtmp, sizeof *mtmp);
 
     /* next monster pointer is invalid */
     mtmp->nmon = (struct monst *) 0;
@@ -313,67 +318,62 @@ restmon(NHFILE* nhfp, struct monst* mtmp)
 
         /* mgivenname - monster's name */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) { /* includes terminating '\0' */
             new_mgivenname(mtmp, buflen);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) MGIVENNAME(mtmp), buflen);
+                Mread(nhfp->fd, MGIVENNAME(mtmp), buflen);
         }
         /* egd - vault guard */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+            Mread(nhfp->fd, &buflen, sizeof buflen);
 
         if (buflen > 0) {
             newegd(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EGD(mtmp), sizeof (struct egd));
+                Mread(nhfp->fd, EGD(mtmp), sizeof (struct egd));
         }
         /* epri - temple priest */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             newepri(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EPRI(mtmp),
-                      sizeof (struct epri));
+                Mread(nhfp->fd, EPRI(mtmp), sizeof (struct epri));
         }
         /* eshk - shopkeeper */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             neweshk(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) ESHK(mtmp),
-                      sizeof (struct eshk));
+                Mread(nhfp->fd, ESHK(mtmp), sizeof (struct eshk));
         }
         /* emin - minion */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             newemin(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EMIN(mtmp),
-                      sizeof (struct emin));
+                Mread(nhfp->fd, EMIN(mtmp), sizeof (struct emin));
         }
         /* edog - pet */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen > 0) {
             newedog(mtmp);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) EDOG(mtmp),
-                      sizeof (struct edog));
+                Mread(nhfp->fd, EDOG(mtmp), sizeof (struct edog));
         }
         /* mcorpsenm - obj->corpsenm for mimic posing as corpse or
            statue (inline int rather than pointer to something) */
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &MCORPSENM(mtmp),
-                  sizeof MCORPSENM(mtmp));
+            Mread(nhfp->fd, &MCORPSENM(mtmp), sizeof MCORPSENM(mtmp));
     } /* mextra */
 }
 
 static struct monst *
-restmonchn(NHFILE* nhfp)
+restmonchn(NHFILE *nhfp)
 {
     register struct monst *mtmp, *mtmp2 = 0;
     register struct monst *first = (struct monst *) 0;
@@ -382,7 +382,7 @@ restmonchn(NHFILE* nhfp)
 
     while (1) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof(buflen));
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         if (buflen == -1)
             break;
 
@@ -450,7 +450,7 @@ restmonchn(NHFILE* nhfp)
 }
 
 static struct fruit *
-loadfruitchn(NHFILE* nhfp)
+loadfruitchn(NHFILE *nhfp)
 {
     register struct fruit *flist, *fnext;
 
@@ -458,7 +458,7 @@ loadfruitchn(NHFILE* nhfp)
     for (;;) {
         fnext = newfruit();
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t)fnext, sizeof *fnext);
+            Mread(nhfp->fd, fnext, sizeof *fnext);
         if (fnext->fid != 0) {
             fnext->nextf = flist;
             flist = fnext;
@@ -470,7 +470,7 @@ loadfruitchn(NHFILE* nhfp)
 }
 
 static void
-freefruitchn(register struct fruit* flist)
+freefruitchn(register struct fruit *flist)
 {
     register struct fruit *fnext;
 
@@ -482,7 +482,7 @@ freefruitchn(register struct fruit* flist)
 }
 
 static void
-ghostfruit(register struct obj* otmp)
+ghostfruit(register struct obj *otmp)
 {
     register struct fruit *oldf;
 
@@ -504,7 +504,7 @@ ghostfruit(register struct obj* otmp)
 
 static
 boolean
-restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
+restgamestate(NHFILE *nhfp)
 {
     struct flag newgameflags;
     struct context_info newgamecontext; /* all 0, but has some pointers */
@@ -515,7 +515,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     boolean defer_perm_invent;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &uid, sizeof uid);
+        Mread(nhfp->fd, &uid, sizeof uid);
 
     if (SYSOPT_CHECK_SAVE_UID
         && uid != (unsigned long) getuid()) { /* strange ... */
@@ -528,7 +528,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
 
     newgamecontext = gc.context; /* copy statically init'd context */
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &gc.context, sizeof (struct context_info));
+        Mread(nhfp->fd, &gc.context, sizeof gc.context);
     gc.context.warntype.species = (gc.context.warntype.speciesidx >= LOW_PM)
                                   ? &mons[gc.context.warntype.speciesidx]
                                   : (struct permonst *) 0;
@@ -541,7 +541,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
        if partial restore fails and we resort to starting a new game */
     newgameflags = flags;
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &flags, sizeof (struct flag));
+        Mread(nhfp->fd, &flags, sizeof flags);
 
     /* avoid keeping permanent inventory window up to date during restore
        (setworn() calls update_inventory); attempting to include the cost
@@ -569,18 +569,18 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     amii_setpens(amii_numcolors); /* use colors from save file */
 #endif
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &u, sizeof(struct you));
+        Mread(nhfp->fd, &u, sizeof u);
     gy.youmonst.cham = u.mcham;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) timebuf, 14);
+        Mread(nhfp->fd, timebuf, 14);
     timebuf[14] = '\0';
     ubirthday = time_from_yyyymmddhhmmss(timebuf);
     if (nhfp->structlevel)
-        mread(nhfp->fd, &urealtime.realtime, sizeof urealtime.realtime);
+        Mread(nhfp->fd, &urealtime.realtime, sizeof urealtime.realtime);
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) timebuf, 14);
+        Mread(nhfp->fd, timebuf, 14);
     timebuf[14] = '\0';
     urealtime.start_timing = time_from_yyyymmddhhmmss(timebuf);
 
@@ -632,7 +632,7 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     gm.migrating_mons = restmonchn(nhfp);
 
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) gm.mvitals, sizeof gm.mvitals);
+        Mread(nhfp->fd, &gm.mvitals[0], sizeof gm.mvitals);
     }
 
     /*
@@ -660,27 +660,17 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
     restore_dungeon(nhfp);
     restlevchn(nhfp);
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) &gm.moves, sizeof gm.moves);
+        Mread(nhfp->fd, &gm.moves, sizeof gm.moves);
         /* hero_seq isn't saved and restored because it can be recalculated */
         gh.hero_seq = gm.moves << 3; /* normally handled in moveloop() */
-        mread(nhfp->fd, (genericptr_t) &gq.quest_status,
-              sizeof (struct q_score));
-        mread(nhfp->fd, (genericptr_t) gs.spl_book,
-              (MAXSPELL + 1) * sizeof (struct spell));
+        Mread(nhfp->fd, &gq.quest_status, sizeof gq.quest_status);
+        Mread(nhfp->fd, gs.spl_book, (MAXSPELL + 1) * sizeof (struct spell));
     }
     restore_artifacts(nhfp);
     restore_oracles(nhfp);
-    if (u.ustuck) {
-        if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) stuckid, sizeof *stuckid);
-    }
-    if (u.usteed) {
-        if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) steedid, sizeof *steedid);
-    }
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) gp.pl_character, sizeof gp.pl_character);
-        mread(nhfp->fd, (genericptr_t) gp.pl_fruit, sizeof gp.pl_fruit);
+        Mread(nhfp->fd, gp.pl_character, sizeof gp.pl_character);
+        Mread(nhfp->fd, gp.pl_fruit, sizeof gp.pl_fruit);
     }
     freefruitchn(gf.ffruit); /* clean up fruit(s) made by initoptions() */
     gf.ffruit = loadfruitchn(nhfp);
@@ -698,30 +688,15 @@ restgamestate(NHFILE* nhfp, unsigned int* stuckid, unsigned int* steedid)
 }
 
 /* update game state pointers to those valid for the current level (so we
- * don't dereference a wild u.ustuck when saving the game state, for instance)
- */
+   don't dereference a wild u.ustuck when saving game state, for instance) */
 static void
-restlevelstate(unsigned int stuckid, unsigned int steedid)
+restlevelstate(void)
 {
-    register struct monst *mtmp;
-
-    if (stuckid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == stuckid)
-                break;
-        if (!mtmp)
-            panic("Cannot find the monster ustuck.");
-        set_ustuck(mtmp);
-    }
-    if (steedid) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
-            if (mtmp->m_id == steedid)
-                break;
-        if (!mtmp)
-            panic("Cannot find the monster usteed.");
-        u.usteed = mtmp;
-        remove_monster(mtmp->mx, mtmp->my);
-    }
+    /*
+     * Note: restoring steed and engulfer/holder/holdee is now handled
+     * in getlev() and there's nothing left for restlevelstate() to do.
+     */
+    return;
 }
 
 /*ARGSUSED*/
@@ -745,9 +720,8 @@ restlevelfile(xint8 ltmp)
 }
 
 int
-dorecover(NHFILE* nhfp)
+dorecover(NHFILE *nhfp)
 {
-    unsigned int stuckid = 0, steedid = 0; /* not a register */
     xint8 ltmp = 0;
     int rtmp;
 
@@ -756,7 +730,7 @@ dorecover(NHFILE* nhfp)
 
     get_plname_from_file(nhfp, gp.plname);
     getlev(nhfp, 0, (xint8) 0);
-    if (!restgamestate(nhfp, &stuckid, &steedid)) {
+    if (!restgamestate(nhfp)) {
         NHFILE tnhfp;
 
         display_nhwindow(WIN_MESSAGE, TRUE);
@@ -764,14 +738,15 @@ dorecover(NHFILE* nhfp)
         tnhfp.mode = FREEING;
         tnhfp.fd = -1;
         savelev(&tnhfp, 0); /* discard current level */
-        /* no need tfor close_nhfile(&tnhfp), which
+        /* no need for close_nhfile(&tnhfp), which
            is not really affiliated with an open file */
         close_nhfile(nhfp);
         (void) delete_savefile();
+        u.usteed_mid = u.ustuck_mid = 0;
         gp.program_state.restoring = 0;
         return 0;
     }
-    restlevelstate(stuckid, steedid);
+    restlevelstate();
 #ifdef INSURANCE
     savestateinlock();
 #endif
@@ -815,7 +790,7 @@ dorecover(NHFILE* nhfp)
     restoreinfo.mread_flags = 1; /* return despite error */
     while (1) {
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &ltmp, sizeof ltmp);
+            Mread(nhfp->fd, &ltmp, sizeof ltmp);
             if (restoreinfo.mread_flags == -1)
                 break;
         }
@@ -842,7 +817,7 @@ dorecover(NHFILE* nhfp)
 
     getlev(nhfp, 0, (xint8) 0);
     close_nhfile(nhfp);
-    restlevelstate(stuckid, steedid);
+    restlevelstate();
     gp.program_state.something_worth_saving = 1; /* useful data now exists */
 
     if (!wizard && !discover)
@@ -884,6 +859,7 @@ dorecover(NHFILE* nhfp)
         ge.early_raw_messages = 0;
         wait_synch();
     }
+    u.usteed_mid = u.ustuck_mid = 0;
     gp.program_state.beyond_savefile_load = 1;
 
     docrt();
@@ -896,7 +872,7 @@ dorecover(NHFILE* nhfp)
 }
 
 static void
-rest_stairs(NHFILE* nhfp)
+rest_stairs(NHFILE *nhfp)
 {
     int buflen = 0;
     stairway stway = UNDEFINED_VALUES;
@@ -905,14 +881,14 @@ rest_stairs(NHFILE* nhfp)
     stairway_free_all();
     while (1) {
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &buflen, sizeof buflen);
+            Mread(nhfp->fd, &buflen, sizeof buflen);
         }
 
         if (buflen == -1)
             break;
 
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) &stway, sizeof (stairway));
+            Mread(nhfp->fd, &stway, sizeof stway);
         }
         if (gp.program_state.restoring != REST_GSTATE
             && stway.tolev.dnum == u.uz.dnum) {
@@ -928,19 +904,19 @@ rest_stairs(NHFILE* nhfp)
 }
 
 void
-restcemetery(NHFILE* nhfp, struct cemetery** cemeteryaddr)
+restcemetery(NHFILE *nhfp, struct cemetery **cemeteryaddr)
 {
     struct cemetery *bonesinfo, **bonesaddr;
     int cflag = 0;
 
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &cflag, sizeof cflag);
+        Mread(nhfp->fd, &cflag, sizeof cflag);
     if (cflag == 0) {
         bonesaddr = cemeteryaddr;
         do {
             bonesinfo = (struct cemetery *) alloc(sizeof *bonesinfo);
             if (nhfp->structlevel)
-                mread(nhfp->fd, (genericptr_t) bonesinfo, sizeof *bonesinfo);
+                Mread(nhfp->fd, bonesinfo, sizeof *bonesinfo);
             *bonesaddr = bonesinfo;
             bonesaddr = &(*bonesaddr)->next;
         } while (*bonesaddr);
@@ -978,8 +954,8 @@ rest_levl(
                     j += 1;
                 } else {
                     if (nhfp->structlevel) {
-                        mread(nhfp->fd, (genericptr_t) &len, sizeof(uchar));
-                        mread(nhfp->fd, (genericptr_t) &r, sizeof(struct rm));
+                        Mread(nhfp->fd, &len, sizeof len);
+                        Mread(nhfp->fd, &r, sizeof r);
                     }
                 }
             }
@@ -990,7 +966,7 @@ rest_levl(
     }
 #endif /* RLECOMP */
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) levl, sizeof levl);
+        Mread(nhfp->fd, levl, sizeof levl);
     }
 }
 
@@ -1005,7 +981,7 @@ trickery(char *reason)
 }
 
 void
-getlev(NHFILE* nhfp, int pid, xint8 lev)
+getlev(NHFILE *nhfp, int pid, xint8 lev)
 {
     register struct trap *trap;
     register struct monst *mtmp;
@@ -1034,16 +1010,16 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
 
     /* First some sanity checks */
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &hpid, sizeof(hpid));
+        Mread(nhfp->fd, &hpid, sizeof hpid);
 
 /* CHECK:  This may prevent restoration */
 #ifdef TOS
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &tlev, sizeof(tlev));
+        Mread(nhfp->fd, &tlev, sizeof tlev);
     dlvl = tlev & 0x00ff;
 #else
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &dlvl, sizeof(dlvl));
+        Mread(nhfp->fd, &dlvl, sizeof dlvl);
 #endif
     if ((pid && pid != hpid) || (lev && dlvl != lev)) {
         char trickbuf[BUFSZ];
@@ -1061,25 +1037,26 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     rest_levl(nhfp,
               (boolean) ((sfrestinfo.sfi1 & SFI1_RLECOMP) == SFI1_RLECOMP));
     if (nhfp->structlevel) {
-        mread(nhfp->fd, (genericptr_t) gl.lastseentyp, sizeof(gl.lastseentyp));
-        mread(nhfp->fd, (genericptr_t) &go.omoves, sizeof(go.omoves));
+        Mread(nhfp->fd, gl.lastseentyp, sizeof gl.lastseentyp);
+        Mread(nhfp->fd, &go.omoves, sizeof go.omoves);
     }
     elapsed = gm.moves - go.omoves;
 
     if (nhfp->structlevel) {
         rest_stairs(nhfp);
-        mread(nhfp->fd, (genericptr_t)&gu.updest, sizeof(dest_area));
-        mread(nhfp->fd, (genericptr_t)&gd.dndest, sizeof(dest_area));
-        mread(nhfp->fd, (genericptr_t)&gl.level.flags, sizeof(gl.level.flags));
+        Mread(nhfp->fd, &gu.updest, sizeof gu.updest);
+        Mread(nhfp->fd, &gd.dndest, sizeof gd.dndest);
+        Mread(nhfp->fd, &gl.level.flags, sizeof gl.level.flags);
         if (gd.doors)
             free(gd.doors);
-        mread(nhfp->fd, (genericptr_t) &gd.doors_alloc, sizeof (gd.doors_alloc));
+        Mread(nhfp->fd, &gd.doors_alloc, sizeof gd.doors_alloc);
         gd.doors = (coord *) alloc(gd.doors_alloc * sizeof (coord));
-        mread(nhfp->fd, (genericptr_t) gd.doors, gd.doors_alloc * sizeof (coord));
+        Mread(nhfp->fd, gd.doors, gd.doors_alloc * sizeof (coord));
     }
     rest_rooms(nhfp); /* No joke :-) */
     if (gn.nroom)
-        gd.doorindex = gr.rooms[gn.nroom - 1].fdoor + gr.rooms[gn.nroom - 1].doorct;
+        gd.doorindex = gr.rooms[gn.nroom - 1].fdoor
+                       + gr.rooms[gn.nroom - 1].doorct;
     else
         gd.doorindex = 0;
 
@@ -1094,7 +1071,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     for (;;) {
         trap = newtrap();
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t)trap, sizeof(struct trap));
+            Mread(nhfp->fd, trap, sizeof *trap);
         if (trap->tx != 0) {
             if (gp.program_state.restoring != REST_GSTATE
                 && trap->dst.dnum == u.uz.dnum) {
@@ -1123,11 +1100,21 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (mtmp->isshk)
             set_residency(mtmp, FALSE);
-        place_monster(mtmp, mtmp->mx, mtmp->my);
-        if (mtmp->wormno)
-            place_wsegs(mtmp, NULL);
-        if (hides_under(mtmp->data) && mtmp->mundetected)
-            (void) hideunder(mtmp);
+        if (mtmp->m_id == u.usteed_mid) {
+            /* steed is kept on fmon list but off the map */
+            u.usteed = mtmp;
+            u.usteed_mid = 0;
+        } else {
+            if (mtmp->m_id == u.ustuck_mid) {
+                set_ustuck(mtmp);
+                u.ustuck_mid = 0;
+            }
+            place_monster(mtmp, mtmp->mx, mtmp->my);
+            if (mtmp->wormno)
+                place_wsegs(mtmp, NULL);
+            if (hides_under(mtmp->data) && mtmp->mundetected)
+                (void) hideunder(mtmp);
+        }
 
         /* regenerate monsters while on another level */
         if (!u.uz.dlevel)
@@ -1154,6 +1141,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
     restdamage(nhfp);
     rest_regions(nhfp);
     rest_bubbles(nhfp); /* for water and air; empty marker on other levels */
+    load_exclusions(nhfp);
 
     if (ghostly) {
         stairway *stway = gs.stairs;
@@ -1233,7 +1221,7 @@ getlev(NHFILE* nhfp, int pid, xint8 lev)
 }
 
 void
-get_plname_from_file(NHFILE* nhfp, char *plbuf)
+get_plname_from_file(NHFILE *nhfp, char *plbuf)
 {
     int pltmpsiz = 0;
 
@@ -1255,14 +1243,14 @@ rest_bubbles(NHFILE *nhfp)
        know what level is being restored */
     bbubbly = 0;
     if (nhfp->structlevel)
-        mread(nhfp->fd, (genericptr_t) &bbubbly, sizeof bbubbly);
+        Mread(nhfp->fd, &bbubbly, sizeof bbubbly);
 
     if (bbubbly)
         restore_waterlevel(nhfp);
 }
 
 static void
-restore_gamelog(NHFILE* nhfp)
+restore_gamelog(NHFILE *nhfp)
 {
     int slen = 0;
     char msg[BUFSZ*2];
@@ -1270,14 +1258,14 @@ restore_gamelog(NHFILE* nhfp)
 
     while (1) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t)&slen, sizeof(slen));
+            Mread(nhfp->fd, &slen, sizeof slen);
         if (slen == -1)
             break;
         if (slen > ((BUFSZ*2) - 1))
             panic("restore_gamelog: msg too big (%d)", slen);
         if (nhfp->structlevel) {
-            mread(nhfp->fd, (genericptr_t) msg, slen);
-            mread(nhfp->fd, (genericptr_t) &tmp, sizeof(tmp));
+            Mread(nhfp->fd, msg, slen);
+            Mread(nhfp->fd, &tmp, sizeof tmp);
             msg[slen] = '\0';
             gamelog_add(tmp.flags, tmp.turn, msg);
         }
@@ -1285,20 +1273,20 @@ restore_gamelog(NHFILE* nhfp)
 }
 
 static void
-restore_msghistory(NHFILE* nhfp)
+restore_msghistory(NHFILE *nhfp)
 {
     int msgsize = 0, msgcount = 0;
     char msg[BUFSZ];
 
     while (1) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) &msgsize, sizeof(msgsize));
+            Mread(nhfp->fd, &msgsize, sizeof msgsize);
         if (msgsize == -1)
             break;
-        if (msgsize > (BUFSZ - 1))
+        if (msgsize > BUFSZ - 1)
             panic("restore_msghistory: msg too big (%d)", msgsize);
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t) msg, msgsize);
+            Mread(nhfp->fd, msg, msgsize);
         msg[msgsize] = '\0';
         putmsghistory(msg, TRUE);
         ++msgcount;
@@ -1468,7 +1456,7 @@ restore_menu(
 #endif /* SELECTSAVED */
 
 int
-validate(NHFILE* nhfp, const char *name)
+validate(NHFILE *nhfp, const char *name)
 {
     readLenType rlen = 0;
     struct savefile_info sfi;
@@ -1477,18 +1465,22 @@ validate(NHFILE* nhfp, const char *name)
 
     if (nhfp->structlevel)
         utdflags |= UTD_CHECKSIZES;
-    if (!(reslt = uptodate(nhfp, name, utdflags))) return 1;
+    if (!(reslt = uptodate(nhfp, name, utdflags)))
+        return 1;
 
     if ((nhfp->mode & WRITING) == 0) {
         if (nhfp->structlevel)
-            rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
+            rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi,
+                                      sizeof sfi);
     } else {
         if (nhfp->structlevel)
-            rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi, sizeof sfi);
+            rlen = (readLenType) read(nhfp->fd, (genericptr_t) &sfi,
+                                      sizeof sfi);
         minit();        /* ZEROCOMP */
         if (rlen == 0) {
             if (verbose) {
-                pline("File \"%s\" is empty during save file feature check?", name);
+                pline("File \"%s\" is empty during save file feature check?",
+                      name);
                 wait_synch();
             }
             return -1;
@@ -1496,5 +1488,7 @@ validate(NHFILE* nhfp, const char *name)
     }
     return 0;
 }
+
+#undef Mread
 
 /*restore.c*/

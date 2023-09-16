@@ -270,7 +270,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
         if (DEADMONSTER(mon) || (mon->isgd && !mon->mx))
             continue;
         /* light range is the radius of a circle and we're limiting
-           canseemon() to a square exclosing that circle, but setting
+           canseemon() to a square enclosing that circle, but setting
            mtemplit 'erroneously' for a seen monster is not a problem;
            it just flags monsters for another canseemon() check when
            'obj' has reached its destination after missile traversal */
@@ -282,7 +282,7 @@ show_transient_light(struct obj *obj, coordxy x, coordxy y)
     }
 
     if (obj) { /* take thrown/kicked candle or lamp off the map */
-        delay_output();
+        nh_delay_output();
         remove_object(obj);
     }
 }
@@ -870,5 +870,11 @@ wiz_light_sources(void)
 
     return ECMD_OK;
 }
+
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef LSF_SHOW
+#undef LSF_NEEDS_FIXUP
+#undef mon_is_local
 
 /*light.c*/

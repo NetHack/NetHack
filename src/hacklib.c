@@ -26,6 +26,7 @@
         char *          stripdigits     (char *)
         unsigned        Strlen_         (const char *str, const char *, int)
         char *          eos             (char *)
+        const char *    c_eos           (const char *)
         boolean         str_start_is    (const char *, const char *, boolean)
         boolean         str_end_is      (const char *, const char *)
         int             str_lines_maxlen (const char *)
@@ -218,6 +219,14 @@ strip_newline(char *str)
 /* return the end of a string (pointing at '\0') */
 char *
 eos(register char *s)
+{
+    while (*s)
+        s++; /* s += strlen(s); */
+    return s;
+}
+
+const char *
+c_eos(const char *s)
 {
     while (*s)
         s++; /* s += strlen(s); */
@@ -571,7 +580,7 @@ strsubst(char *bp, const char *orig, const char *replacement)
 }
 
 /* substitute the Nth occurrence of a substring within a string (in place);
-   if N is 0, substitute all occurrences; returns the number of subsitutions;
+   if N is 0, substitute all occurrences; returns the number of substitutions;
    maximum output length is BUFSZ (BUFSZ-1 chars + terminating '\0') */
 int
 strNsubst(
@@ -713,7 +722,7 @@ distmin(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
     return (dx < dy) ? dy : dx;
 }
 
-/* square of euclidean distance between pair of pts */
+/* square of Euclidean distance between pair of pts */
 int
 dist2(coordxy x0, coordxy y0, coordxy x1, coordxy y1)
 {
@@ -1321,7 +1330,7 @@ DISABLE_WARNING_FORMAT_NONLITERAL
  * Wrap reasons:
  *   1. If there are any platform issues, we have one spot to fix them -
  *      snprintf is a routine with a troubling history of bad implementations.
- *   2. Add combersome error checking in one spot.  Problems with text
+ *   2. Add cumbersome error checking in one spot.  Problems with text
  *      wrangling do not have to be fatal.
  *   3. Gcc 9+ will issue a warning unless the return value is used.
  *      Annoyingly, explicitly casting to void does not remove the error.

@@ -1,9 +1,10 @@
-Cross-compiling NetHack 3.7 Last edit: December 7, 2020
+Cross-compiling NetHack 3.7 Last edit: February 18, 2023
 
 The NetHack 3.7 build process differs from the build process of previous
-versions in some important ways that make it possible to use a cross-compiler
-running on one platform (the "host" platform of the build) to produce a binary
-NetHack package that can execute on an entirely different platform.
+versions in some important ways. Those differences make it possible to use
+a cross-compiler running on one platform (the "host" platform of the build)
+to produce a binary NetHack package that can execute on an entirely different
+platform.
 
 Part A Contents:
     A1. Why cross-compile?
@@ -31,13 +32,13 @@ Part B Contents:
 By using cross-compilers on host platforms with fast processors, plenty of RAM
 and storage resources, and an available cross-compiler, it may be possible to
 keep or resurrect a working version of NetHack on platforms that are now too
-constrained to carry out the build process natively on the platform any more.
+constrained to carry out the build process natively on the platform anymore.
 
 Some of the constraints in carrying out a native build on the desired target
 may include, but not necessarily be limited to, any of the following:
 
   o Access: Somebody with a working knowledge of the NetHack build process may
-    not have the desired target build platform available to them. Conversly,
+    not have the desired target build platform available to them. Conversely,
     somebody with a keen knowledge of the target platform, and access to it,
     may not be all that familiar with the NetHack build process.
 
@@ -46,8 +47,8 @@ may include, but not necessarily be limited to, any of the following:
     compile process on the target platform.
 
   o Compilers: Some of the native compilers on historical platforms may only
-    support the particular dialect of C that was popular when the platform and
-    compiler were in their prime.
+    support the dialect of C that was popular when the platform and compiler
+    were in their prime.
 
 Another useful potential result of cross-compiling, is that it paves the way
 for carrying out test and production builds of NetHack for multiple target
@@ -127,7 +128,7 @@ steps to be carried out:
        several required output files that contain information required by the
        game, or contain information about the game during its execution, that
        are stored in a portable, platform-independent way, that need to be
-       inserted into the game package (makedefs -d, -z, -r, -h, -s).
+       inserted into the game package (makedefs -d, -o, -r, -h, -s).
     3. Compile and link several less critical utilities such as uudecode,
        tile-generation utilities, and so forth, all of which need to execute
        on the build platform during the build process to produce output files
@@ -139,10 +140,10 @@ steps to be carried out:
        NetHack itself, Lua, and any optional regular-expression or window port
        libraries that you plan to link into the NetHack game executable.
     5. Package the game and its required files including the output from
-       previous steps 2b, 3 and 4 above.
+       previous steps 2, 3 and 4 above.
 
-Step 4 is now the only impediment to cross-compiling NetHack, and is resolved
-by executing step 4 using a cross-compiler that runs on the build (host)
+Step 4 is now the only impediment to cross-compiling NetHack. That impediment
+is resolved by executing step 4 using a cross-compiler that runs on the build (host)
 platform to produce a resulting binary for the target platform, instead of
 executing the native compiler.
 
@@ -161,11 +162,11 @@ cross-compiling possible:
 
     o  There is no build-time level compiler involved. Instead, the level
        descriptions have been converted to Lua and are inserted into the game
-       package for processing by the embeded Lua during execution of NetHack.
+       package for processing by the embedded Lua during execution of NetHack.
 
     o  There is no build-time dungeon compiler involved. Instead, the dungeon
        description has been converted to Lua and is inserted into the game
-       package for processing by the embeded Lua during execution of NetHack.
+       package for processing by the embedded Lua during execution of NetHack.
 
     o  Some of the build and option information that was formerly produced
        during build time by makedefs, and contained information about the
@@ -242,7 +243,7 @@ You have to:
 
 It should be mentioned that you can execute the cross-compile build approach
 to generate binaries for the same platform as the host, where the HOST
-compilerand the TARGET compiler are actually one and the same.
+compiler and the TARGET compiler are the same.
 
 
   +------------------------------------------------------+
@@ -256,6 +257,7 @@ On the HOST, here are the mandatory things that have to be built.
        Compile and link the following with these compiler switches:
          -DCROSSCOMPILE
        from sources: util/makedefs.c, src/mdlib.c, src/monst.c, src/objects.c
+                     src/date.c, src/alloc.c
 
     b) Execute HOST native makedefs utility, util/makedefs, as follows:
           Required for complete packaging of the game, but not the C source
@@ -264,12 +266,6 @@ On the HOST, here are the mandatory things that have to be built.
               util/makedefs -r
               util/makedefs -h
               util/makedefs -s
-
-          For reference purposes, but no longer a required prerequisite for the
-          game compile process:
-              util/makedefs -v
-              util/makedefs -o
-              util/makedefs -p
 
     c) Using the HOST native compiler, build these additional utilities if your
        target platform requires components that they produce. It is important
@@ -323,7 +319,9 @@ On the HOST, here are the mandatory things that have to be built.
                    from sources: win/share/tile2bmp.c, win/share/tiletext.c,
                                  win/share/tilemap.c, src/drawing.c,
                                  src/monst.c, src/objects.c
-                   purpose:      <TBD>
+                   purpose:      Read win/share/monsters.txt,
+                                 win/share/objects.txt and win/share/other.txt
+                                 files and produce a .bmp file.
 
           util/gif2txt
 
@@ -331,7 +329,9 @@ On the HOST, here are the mandatory things that have to be built.
                                  win/share/tilemap.c, src/drawing.c,
                                  src/monst.c, src/objects.c,
                                  src/alloc.c, util/panic.c
-                   purpose:      <TBD>
+                   purpose:      Read win/share/monsters.txt,
+                                 win/share/objects.txt and win/share/other.txt
+                                 files and produce a .gif file.
 
           util/ppmwrite
 
@@ -339,7 +339,9 @@ On the HOST, here are the mandatory things that have to be built.
                                  win/share/tilemap.c, src/drawing.c,
                                  src/monst.c, src/objects.c,
                                  src/alloc.c, util/panic.c
-                   purpose:      <TBD>
+                   purpose:      Read win/share/monsters.txt,
+                                 win/share/objects.txt and win/share/other.txt
+                                 files and produce a .ppm file.
 
 
   +--------------------------------------------+
@@ -407,7 +409,7 @@ Using the cross-compiler, build the following targets:
 
     b) Lua (mandatory in 3.7)
 
-          lib/lua-5.4.0/src
+          lib/lua-5.4.6/src
 
                    from sources: lua.c, lapi.c, lauxlib.c, lbaselib.c, lcode.c,
                                  lcorolib.c, lctype.c, ldblib.c, ldebug.c,
@@ -500,7 +502,6 @@ Cross-compiler pre-built binary downloads:
     You can explicitly include tty and curses support if desired. The default
     you'll end up with is a tty-only cross-compile build:
 
-        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
 
     Result: The "make package" target will bundle all of the necessary

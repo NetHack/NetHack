@@ -17,7 +17,7 @@
  *   extra room for patching longer values into an existing executable.
  */
 #define Local_WIZARD "NHWIZARD\0\0\0\0"
-#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_5_X.PLAY]\0\0\0\0\0\0\0\0"
+#define Local_HACKDIR "DISK$USERS:[GAMES.NETHACK.3_7_X.PLAY]\0\0\0\0\0\0\0\0"
 
 /*
  * This section cleans up the stuff done in config.h so that it
@@ -162,8 +162,10 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 
 /* config.h defines USE_ISAAC64; we'll use it on Alpha or IA64 but not VAX;
    it overrides RANDOM */
+#if !defined(VMSVSI)
 #if (defined(VAX) || defined(vax) || defined(__vax)) && defined(USE_ISAAC64)
 #undef ISAAC64
+#endif
 #endif
 
 #define FCMASK 0660 /* file creation mask */
@@ -189,6 +191,7 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 /* # define FILENAME_CMP strcmpi */ /* case insensitive */
 #endif
 
+#ifndef VMSVSI
 #if defined(VAXC) && !defined(ANCIENT_VAXC)
 #ifdef volatile
 #undef volatile
@@ -213,6 +216,20 @@ PANICTRACE_GDB=2  #at conclusion of panic, show a call traceback and then
 #define ALLOCA_HACK /* used in util/panic.c */
 #endif
 #endif
+#endif /* !VMSVSI */
+
+#ifdef VMSVSI
+#define NO_TERMCAP_HEADERS
+/* C99 */
+#include <types.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <stat.h>
+#include <errno.h>
+#include <stsdef.h>
+#endif
 
 #ifdef _DECC_V4_SOURCE
 /* <types.h> excludes some necessary typedefs when _DECC_V4_SOURCE is defined
@@ -234,9 +251,15 @@ typedef __gid_t gid_t;
 #define __MODE_T
 typedef __mode_t mode_t;
 #endif
+#ifndef __OFF_T
+#define __OFF_T
+typedef int32_t off_t;
+#endif
 #endif /* _DECC_V4_SOURCE */
 
 #include <time.h>
+
+#ifndef VMSVSI
 #if 0 /* <file.h> is missing for old gcc versions; skip it to save time */
 #include <file.h>
 #else /* values needed from missing include file */
@@ -246,16 +269,19 @@ typedef __mode_t mode_t;
 #define O_CREAT 0x200
 #define O_TRUNC 0x400
 #endif
+#endif
 
 #define tgetch vms_getchar
 
+#ifndef VMSVSI
 #if defined(__DECC_VER) && (__DECC_VER >= 50000000)
  /* for cc/Standard=ANSI89, suppress notification that '$' in identifiers
     is an extension; sys/vms/*.c needs it regardless of strict ANSI mode */
 # pragma message disable DOLLARID
 #endif
+#endif
 
-#include "system.h"
+/* #include "system.h" */
 
 /* Use the high quality random number routines. */
 #ifndef USE_ISAAC64
@@ -272,6 +298,7 @@ typedef __mode_t mode_t;
 # endif
 #endif
 
+#if !defined(VMSVSI)
 #ifndef __GNUC__
 #ifndef bcopy
 #define bcopy(s, d, n) memcpy((d), (s), (n)) /* vaxcrtl */
@@ -284,18 +311,22 @@ typedef __mode_t mode_t;
 #define link(f1, f2) vms_link(f1, f2)   /* vmsfiles.c */
 #define open(f, k, m) vms_open(f, k, m) /* vmsfiles.c */
 #define fopen(f, m) vms_fopen(f, m)     /* vmsfiles.c */
-/* #define unlink(f0) vms_unlink(f0)       /* vmsfiles.c */
+/* #define unlink(f0) vms_unlink(f0) */       /* vmsfiles.c */
 #ifdef VERYOLD_VMS
 #define unlink(f0) delete (f0) /* vaxcrtl */
 #else
 #define unlink(f0) remove(f0) /* vaxcrtl, decc$shr */
 #endif
+#endif /* VMSVSI */
+
 #define C$$TRANSLATE(n) c__translate(n) /* vmsfiles.c */
 
+#if !defined(VMSVSI)
 /* VMS global names are case insensitive... */
 #define An vms_an
 #define The vms_the
 #define Shk_Your vms_shk_your
+#endif /* VMSVSI */
 
 /* avoid global symbol in Alpha/VMS V1.5 STARLET library (link trouble) */
 #define ospeed vms_ospeed
@@ -304,7 +335,7 @@ typedef __mode_t mode_t;
 extern void vms_exit(int);
 extern int vms_open(const char *, int, unsigned);
 extern FILE *vms_fopen(const char *, const char *);
-char *vms_basename(const char *); /* vmsfiles.c */
+char *vms_basename(const char *, boolean); /* vmsfiles.c */
 
 #endif /* VMSCONF_H */
 #endif /* VMS */

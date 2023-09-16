@@ -1,4 +1,4 @@
-/* NetHack 3.7  makedefs.c  $NHDT-Date: 1655402416 2022/06/16 18:00:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.215 $ */
+/* NetHack 3.7  makedefs.c  $NHDT-Date: 1693083328 2023/08/26 20:55:28 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.226 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Kenneth Lorber, Kensington, Maryland, 2015. */
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
@@ -571,6 +571,15 @@ do_ext_makedefs(int argc, char **argv)
             }
             CONTINUE;
         }
+	IS_OPTION("grep-defined"){
+	    struct grep_var *p;
+
+	    CONSUME;
+	    p = grepsearch(argv[0]);
+		// NB: Exit status is ready for the shell:
+		//     0=defined, 1=not defined
+	    makedefs_exit(!(p && p->is_defined));
+	}
 #ifdef notyet
         IS_OPTION("help") {
         }

@@ -1,4 +1,4 @@
-/* NetHack 3.7	pline.c	$NHDT-Date: 1646255375 2022/03/02 21:09:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
+/* NetHack 3.7	pline.c	$NHDT-Date: 1693083243 2023/08/26 20:54:03 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.124 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -74,8 +74,8 @@ putmesg(const char *line)
     if ((gp.pline_flags & SUPPRESS_HISTORY) != 0
         && (windowprocs.wincap2 & WC2_SUPPRESS_HIST) != 0)
         attr |= ATR_NOHISTORY;
-
     putstr(WIN_MESSAGE, attr, line);
+    SoundSpeak(line);
 }
 
 static void vpline(const char *, va_list);
@@ -99,7 +99,6 @@ vpline(const char *line, va_list the_args)
     char pbuf[BIGBUFSZ]; /* will get chopped down to BUFSZ-1 if longer */
     int ln;
     int msgtyp;
-    int vlen = 0;
     boolean no_repeat;
 
     if (!line || !*line)
@@ -111,24 +110,33 @@ vpline(const char *line, va_list the_args)
     if (gp.program_state.wizkit_wishing)
         return;
 
-    if (strchr(line, '%')) {
-        vlen = vsnprintf(pbuf, sizeof(pbuf), line, the_args);
-#if (NH_DEVEL_STATUS != NH_STATUS_RELEASED) && defined(DEBUG)
-        if (vlen >= (int) sizeof pbuf)
-            panic("%s: truncation of buffer at %zu of %d bytes",
-                  "pline", sizeof pbuf, vlen);
-#else
-        nhUse(vlen);
-#endif
+    if (!strchr(line, '%')) {
+        /* format does not specify any substitutions; use it as-is */
+        ln = (int) strlen(line);
+    } else if (line[0] == '%' && line[1] == 's' && !line[2]) {
+        /* "%s" => single string; skip format and use its first argument;
+           unlike with the format, it is irrelevant whether the argument
+           contains any percent signs */
+        line = va_arg(the_args, const char *); /*VA_NEXT(line,const char *);*/
+        ln = (int) strlen(line);
+    } else {
+        /* perform printf() formatting */
+        ln = vsnprintf(pbuf, sizeof pbuf, line, the_args);
         line = pbuf;
+        /* note: 'ln' is number of characters attempted, not necessarily
+           strlen(line); that matters for the overflow check; if we avoid
+           the extremely-too-long panic then 'ln' will be actual length */
     }
-    if ((ln = (int) strlen(line)) > BUFSZ - 1) {
-        if (line != pbuf)                          /* no '%' was present */
-            (void) strncpy(pbuf, line, BUFSZ - 1); /* caveat: unterminated */
-        /* truncate, preserving the final 3 characters:
-           "___ extremely long text" -> "___ extremely l...ext"
+    if (ln > (int) sizeof pbuf - 1) /* extremely too long */
+        panic("pline attempting to print %d characters!", ln);
+
+    if (ln > BUFSZ - 1) {
+        /* too long but modestly so; allow but truncate, preserving final
+           3 chars: "___ extremely long text" -> "___ extremely l...ext"
            (this may be suboptimal if overflow is less than 3) */
-        memcpy(pbuf + BUFSZ - 1 - 6, "...", 3);
+        if (line != pbuf) /* no '%' was present or format was just "%s" */
+            (void) strncpy(pbuf, line, BUFSZ - 1); /* caveat: unterminated */
+        pbuf[BUFSZ - 1 - 6] = pbuf[BUFSZ - 1 - 5] = pbuf[BUFSZ - 1 - 4] = '.';
         /* avoid strncpy; buffers could overlap if excess is small */
         pbuf[BUFSZ - 1 - 3] = line[ln - 3];
         pbuf[BUFSZ - 1 - 2] = line[ln - 2];
@@ -179,7 +187,7 @@ vpline(const char *line, va_list the_args)
     if (gv.vision_full_recalc)
         vision_recalc(0);
     if (u.ux)
-        flush_screen(1); /* %% */
+        flush_screen((gp.pline_flags & NO_CURS_ON_U) ? 0 : 1); /* %% */
 
     putmesg(line);
 
@@ -192,8 +200,11 @@ vpline(const char *line, va_list the_args)
     (void) strncpy(gp.prevmsg, line, BUFSZ), gp.prevmsg[BUFSZ - 1] = '\0';
     if (msgtyp == MSGTYP_STOP)
         display_nhwindow(WIN_MESSAGE, TRUE); /* --more-- */
-
  pline_done:
+#ifdef SND_SPEECH
+    /* clear the SPEECH flag so caller never has to */
+    gp.pline_flags &= ~PLINE_SPEECH;
+#endif
     --in_pline;
 }
 
@@ -386,11 +397,13 @@ verbalize(const char *line, ...)
     char *tmp;
 
     va_start(the_args, line);
+    gp.pline_flags |= PLINE_VERBALIZE;
     tmp = You_buf((int) strlen(line) + sizeof "\"\"");
     Strcpy(tmp, "\"");
     Strcat(tmp, line);
     Strcat(tmp, "\"");
     vpline(tmp, the_args);
+    gp.pline_flags &= ~PLINE_VERBALIZE;
     va_end(the_args);
 }
 
@@ -492,28 +505,42 @@ impossible(const char *s, ...)
 {
     va_list the_args;
     char pbuf[BIGBUFSZ]; /* will be chopped down to BUFSZ-1 if longer */
+    char pbuf2[BUFSZ];
 
     va_start(the_args, s);
     if (gp.program_state.in_impossible)
         panic("impossible called impossible");
 
     gp.program_state.in_impossible = 1;
-    (void) vsnprintf(pbuf, sizeof(pbuf), s, the_args);
+    (void) vsnprintf(pbuf, sizeof pbuf, s, the_args);
     va_end(the_args);
     pbuf[BUFSZ - 1] = '\0'; /* sanity */
     paniclog("impossible", pbuf);
     if (iflags.debug_fuzzer)
         panic("%s", pbuf);
+
+    gp.pline_flags = URGENT_MESSAGE;
     pline("%s", pbuf);
-    /* reuse pbuf[] */
-    Strcpy(pbuf, "Program in disorder!");
+    gp.pline_flags = 0;
+
+    Strcpy(pbuf2, "Program in disorder!");
     if (gp.program_state.something_worth_saving)
-        Strcat(pbuf, "  (Saving and reloading may fix this problem.)");
-    pline("%s", pbuf);
+        Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
+    pline("%s", pbuf2);
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
     if (sysopt.support) {
         pline("Alternatively, contact local support: %s", sysopt.support);
     }
+
+#ifdef CRASHREPORT
+    if(sysopt.crashreporturl){
+	boolean report = ('y' == yn_function("Report now?","yn",'n',FALSE));
+	raw_print("");  // prove to the user the character was accepted
+	if(report){
+	    submit_web_report("Impossible", pbuf);
+	}
+    }
+#endif
 
     gp.program_state.in_impossible = 0;
 }

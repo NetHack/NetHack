@@ -17,6 +17,12 @@
 #LFLAGS += -lm
 #endif   # WANT_TESTSOUND
 
+ifeq "$(HAVE_SNDLIB)" "1"
+ifeq "$(WANT_SPEECH)" "1"
+SNDCFLAGS+= -DSND_SPEECH
+endif   # WANT_SPEECH
+endif   # HAVE_SNDLIB
+
 # HAVE_SNDLIB or NEEDS_SND_USERSOUNDS or NEEDS_SND_SEAUTOMAP 
 # would have to be set prior to this. Any of them could have
 # been set just above, or they could have been set in

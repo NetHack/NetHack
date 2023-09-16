@@ -8,7 +8,7 @@ NETHACK INTERFACE
  * Implement curses_rip for optional fancier color tombstone, as well
  as one that will display correctly on smaller terminals.
  
- * I am confused as to how mark_synch, wait_synch, and delay_output
+ * I am confused as to how mark_synch, wait_synch, and nh_delay_output
  should work.  Help, please?
  
  * Both PDCurses and Ncurses have mouse support, so the poskey function
@@ -34,7 +34,7 @@ DISPLAY
  PDCurses, however.
 
  * Animation effects do not display properly - this could probably be
- fixed with a correct implementation of the delay_output function.
+ fixed with a correct implementation of the curses_delay_output function.
 
  * Support option to set forground and background colors for individual
  windows

@@ -50,13 +50,13 @@ endif
 ifeq "$(LUA_VERSION)" "5.3.5"
 LUAVER=535
 else
-LUAVER=544
+LUAVER=546
 endif
 #---------------------------------------------------------------
 # Location of LUA
 #
 # Original source needs to be obtained from: 
-#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -319,7 +319,7 @@ ALLOBJ = $(VOBJ) $(SOBJ) $(TILOBJ) $(TILOBJ2) $(VVOBJ)
 
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
 
 LUASRC   = $(LUATOP)/src
@@ -400,7 +400,7 @@ YOUPROP_H  = $(PERMONST_H)	$(MONDATA_H)	    $(INCL)/prop.h     \
 YOU_H	   = $(MONST_H)		$(YOUPROP_H)	    $(INCL)/align.h    \
 	     $(INCL)/attrib.h	$(INCL)/you.h
 DISPLAY_H  = $(MONDATA_H)	$(INCL)/vision.h    $(INCL)/display.h
-PCCONF_H   = $(INCL)/micro.h	$(INCL)/system.h    $(INCL)/pcconf.h   \
+PCCONF_H   = $(INCL)/micro.h	$(INCL)/cstd.h    $(INCL)/pcconf.h   \
 	    $(MSYS)/pcvideo.h
 CONFIG_H   = $(GLOBAL_H)	$(INCL)/fnamesiz.h  $(INCL)/tradstdc.h \
 	     $(INCL)/config1.h $(INCL)/config.h
@@ -1081,7 +1081,7 @@ TARGET_CFLAGS=$(cflags)
 #$(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 #		../include/tradstdc.h ../include/integer.h \
 #		../include/global.h ../include/coord.h ../include/vmsconf.h \
-#		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+#		../include/cstd.h ../include/nhlua.h ../include/unixconf.h \
 #		../include/pcconf.h ../include/micro.h ../include/windconf.h \
 #		../include/warnings.h ../include/fnamesiz.h
 #	touch $(CONFIG_H)

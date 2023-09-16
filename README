@@ -12,7 +12,7 @@ a list of fixes as they are committed.
 
 In short -- there are likely to be bugs. Don't treat NetHack-3.7 branch as
 released code, and if stability is paramount, then the most recent
-NetHack 3.6.6 release is safest for you.
+NetHack 3.6.7 release is safest for you.
 
 We're making the .0 work-in-progress available so that you can observe, test
 out, and contribute to its development. Constructive suggestions, GitHub pull

@@ -116,12 +116,12 @@ zoo_mon_sound(struct monst *mtmp)
 {
     if ((mtmp->msleeping || is_animal(mtmp->data))
         && mon_in_room(mtmp, ZOO)) {
-        int hallu = Hallucination ? 1 : 0;
+        int hallu = Hallucination ? 1 : 0, selection = rn2(2) + hallu;
         static const char *const zoo_msg[3] = {
             "a sound reminiscent of an elephant stepping on a peanut.",
             "a sound reminiscent of a seal barking.", "Doctor Dolittle!",
         };
-        You_hear1(zoo_msg[rn2(2) + hallu]);
+        You_hear1(zoo_msg[selection]);
         return TRUE;
     }
     return FALSE;
@@ -342,7 +342,7 @@ static const char *const h_sounds[] = {
     "eep",    "clatter", "hum",    "sizzle", "twitter", "wheeze",
     "rustle", "honk",    "lisp",   "yodel",  "coo",     "burp",
     "moo",    "boom",    "murmur", "oink",   "quack",   "rumble",
-    "twang",  "bellow",  "toot",   "gargle", "hoot",    "warble"
+    "twang",  "toot",    "gargle", "hoot",    "warble"
 };
 
 const char *
@@ -361,6 +361,9 @@ growl_sound(register struct monst* mtmp)
         break;
     case MS_ROAR:
         ret = "roar";
+        break;
+    case MS_BELLOW:
+        ret = "bellow";
         break;
     case MS_BUZZ:
         ret = "buzz";
@@ -523,6 +526,7 @@ beg(register struct monst* mtmp)
     } else if (mtmp->data->msound >= MS_HUMANOID) {
         if (!canspotmon(mtmp))
             map_invisible(mtmp->mx, mtmp->my);
+        SetVoice(mtmp, 0, 80, 0);
         verbalize("I'm hungry.");
     } else {
         /* this is pretty lame but is better than leaving out the block
@@ -579,6 +583,7 @@ maybe_gasp(struct monst* mon)
     case MS_GRUNT: /* ogres, trolls, gargoyles, one or two others */
     case MS_LAUGH: /* leprechaun, gremlin */
     case MS_ROAR: /* dragon, xorn, owlbear */
+    case MS_BELLOW: /* crocodile */
     /* capable of speech but only do so if hero is similar type */
     case MS_DJINNI:
     case MS_VAMPIRE: /* vampire in its own form */
@@ -602,9 +607,55 @@ maybe_gasp(struct monst* mon)
     return (const char *) 0;
 }
 
+/* for egg hatching; caller will apply "ing" suffix
+   [the old message when a carried egg hatches was
+   "its cries sound like {mommy,daddy}"
+   regardless of what type of sound--if any--the creature made] */
+const char *
+cry_sound(struct monst *mtmp)
+{
+    const char *ret = 0;
+    struct permonst *ptr = mtmp->data;
+
+    /* a relatively small subset of MS_ sound values are used by oviparous
+       species so we don't try to supply something for every MS_ type */
+    switch (ptr->msound) {
+    default:
+    case MS_SILENT: /* insects, arthropods, worms, sea creatures */
+        /* "chitter": have silent critters make some noise
+           or the mommy/daddy gag when hatching doesn't work */
+        ret = (ptr->mlet == S_EEL) ? "gurgle" : "chitter";
+        break;
+    case MS_HISS: /* chickatrice, pyrolisk, snakes */
+        ret = "hiss";
+        break;
+    case MS_ROAR: /* baby dragons; have them growl instead of roar */
+        /*FALLTHRU*/
+    case MS_GROWL: /* (none) */
+        ret = "growl";
+        break;
+    case MS_CHIRP: /* adult crocodiles bellow, babies chirp */
+        ret = "chirp";
+        break;
+    case MS_BUZZ: /* killer bees */
+        ret = "buzz";
+        break;
+    case MS_SQAWK: /* ravens */
+        ret = "screech";
+        break;
+    case MS_GRUNT: /* gargoyles */
+        ret = "grunt";
+        break;
+    case MS_MUMBLE: /* naga hatchlingss */
+        ret = "mumble";
+        break;
+    }
+    return ret;
+}
+
 /* return True if mon is a gecko or seems to look like one (hallucination) */
 static boolean
-mon_is_gecko(struct monst* mon)
+mon_is_gecko(struct monst *mon)
 {
     int glyph;
 
@@ -636,9 +687,8 @@ domonnoise(register struct monst* mtmp)
     /* presumably nearness and sleep checks have already been made */
     if (Deaf)
         return ECMD_OK;
-    if (is_silent(ptr)
-        /* shk_chat can handle nonverbal monsters */
-        && !mtmp->isshk)
+    /* shk_chat can handle nonverbal monsters */
+    if (is_silent(ptr) && !mtmp->isshk)
         return ECMD_OK;
 
     /* leader might be poly'd; if he can still speak, give leader speech */
@@ -656,6 +706,8 @@ domonnoise(register struct monst* mtmp)
                   || same_race(ptr, &mons[Race_switch])) /* unpoly'd form */
                  || Hallucination))
         msound = MS_HUMANOID;
+    else if (msound == MS_MOO && !mtmp->mtame)
+        msound = MS_BELLOW;
     /* silliness; formerly had a slight chance to interfere with shopping */
     else if (Hallucination && mon_is_gecko(mtmp))
         msound = MS_SELL;
@@ -690,17 +742,18 @@ domonnoise(register struct monst* mtmp)
         break;
     case MS_VAMPIRE: {
         /* vampire messages are varied by tameness, peacefulness, and time of
-         * night */
+           night */
         boolean isnight = night();
         boolean kindred = (Upolyd && (u.umonnum == PM_VAMPIRE
                                       || u.umonnum == PM_VAMPIRE_LEADER));
-        boolean nightchild =
-            (Upolyd && (u.umonnum == PM_WOLF || u.umonnum == PM_WINTER_WOLF
-                        || u.umonnum == PM_WINTER_WOLF_CUB));
-        const char *racenoun =
-            (flags.female && gu.urace.individual.f)
-                ? gu.urace.individual.f
-                : (gu.urace.individual.m) ? gu.urace.individual.m : gu.urace.noun;
+        boolean nightchild = (Upolyd && (u.umonnum == PM_WOLF
+                                         || u.umonnum == PM_WINTER_WOLF
+                                         || u.umonnum == PM_WINTER_WOLF_CUB));
+        const char *racenoun = (flags.female && gu.urace.individual.f)
+                               ? gu.urace.individual.f
+                               : (gu.urace.individual.m)
+                                 ? gu.urace.individual.m
+                                 : gu.urace.noun;
 
         if (mtmp->mtame) {
             if (kindred) {
@@ -737,14 +790,14 @@ domonnoise(register struct monst* mtmp)
             };
             int vampindex;
 
-            if (kindred)
+            if (kindred) {
                 verbl_msg =
                     "This is my hunting ground that you dare to prowl!";
-            else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
-                     || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
+            } else if (gy.youmonst.data == &mons[PM_SILVER_DRAGON]
+                       || gy.youmonst.data == &mons[PM_BABY_SILVER_DRAGON]) {
                 /* Silver dragons are silver in color, not made of silver */
                 Sprintf(verbuf, "%s!  Your silver sheen does not frighten me!",
-                        gy.youmonst.data == &mons[PM_SILVER_DRAGON]
+                        (gy.youmonst.data == &mons[PM_SILVER_DRAGON])
                             ? "Fool"
                             : "Young Fool");
                 verbl_msg = verbuf;
@@ -770,11 +823,14 @@ domonnoise(register struct monst* mtmp)
             pline("%s throws back %s head and lets out a blood curdling %s!",
                   Monnam(mtmp), mhis(mtmp),
                   (ptr == &mons[PM_HUMAN_WERERAT]) ? "shriek" : "howl");
-            Soundeffect(((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream : se_canine_howl), 80);
+            Soundeffect((ptr == &mons[PM_HUMAN_WERERAT]) ? se_scream
+                                                         : se_canine_howl,
+                        80);
             wake_nearto(mtmp->mx, mtmp->my, 11 * 11);
-        } else
+        } else {
             pline_msg =
                 "whispers inaudibly.  All you can make out is \"moon\".";
+        }
         break;
     case MS_BARK:
         if (flags.moonphase == FULL_MOON && night()) {
@@ -787,8 +843,7 @@ domonnoise(register struct monst* mtmp)
             else if (mtmp->mtame && EDOG(mtmp)->hungrytime > gm.moves + 1000)
                 pline_msg = "yips.";
             else {
-                if (mtmp->data
-                    != &mons[PM_DINGO]) /* dingos do not actually bark */
+                if (ptr != &mons[PM_DINGO]) /* dingos do not actually bark */
                     pline_msg = "barks.";
             }
         } else {
@@ -863,8 +918,18 @@ domonnoise(register struct monst* mtmp)
         }
         break;
     case MS_MOO:
-        Soundeffect((mtmp->mpeaceful ? se_bovine_moo : se_bovine_bellow), 80);
-        pline_msg = mtmp->mpeaceful ? "moos." : "bellows!";
+        Soundeffect(se_bovine_moo, 80);
+        pline_msg = "moos.";
+        break;
+    case MS_BELLOW:
+        Soundeffect((ptr->mlet == S_QUADRUPED) ? se_bovine_bellow
+                                               : se_croc_bellow,
+                    80);
+        pline_msg = "bellows!";
+        break;
+    case MS_CHIRP:
+        Soundeffect(se_chirp, 60);
+        pline_msg = "chirps.";
         break;
     case MS_WAIL:
         Soundeffect(se_sad_wailing, 60);
@@ -1003,13 +1068,11 @@ domonnoise(register struct monst* mtmp)
                    and they never verbalize step 2 so we don't either */
                 verbl_msg = (gnomeplan == 1) ? "Phase one, collect underpants."
                                              : "Phase three, profit!";
-            }
-            else {
+            } else {
                 verbl_msg =
                 "Many enter the dungeon, and few return to the sunlit lands.";
             }
-        }
-        else
+        } else
             switch (monsndx(ptr)) {
             case PM_HOBBIT:
                 /* 3.7: the 'complains' message used to be given if the
@@ -1039,7 +1102,8 @@ domonnoise(register struct monst* mtmp)
 
         if (SYSOPT_SEDUCE) {
             if (ptr->mlet != S_NYMPH
-                && could_seduce(mtmp, &gy.youmonst, (struct attack *) 0) == 1) {
+                && (could_seduce(mtmp, &gy.youmonst, (struct attack *) 0)
+                    == 1)) {
                 (void) doseduce(mtmp);
                 break;
             }
@@ -1058,9 +1122,10 @@ domonnoise(register struct monst* mtmp)
         }
     } break;
     case MS_ARREST:
-        if (mtmp->mpeaceful)
+        if (mtmp->mpeaceful) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("Just the facts, %s.", flags.female ? "Ma'am" : "Sir");
-        else {
+        } else {
             static const char *const arrest_msg[3] = {
                 "Anything you say can be used against you.",
                 "You're under arrest!", "Stop in the name of the Law!",
@@ -1151,6 +1216,7 @@ domonnoise(register struct monst* mtmp)
     if (pline_msg) {
         pline("%s %s", Monnam(mtmp), pline_msg);
     } else if (mtmp->mcan && verbl_msg_mcan) {
+        SetVoice(mtmp, 0, 80, 0);
         verbalize1(verbl_msg_mcan);
     } else if (verbl_msg) {
         /* more 3.6 tribute */
@@ -1158,9 +1224,11 @@ domonnoise(register struct monst* mtmp)
             /* Death talks in CAPITAL LETTERS
                and without quotation marks */
             char tmpbuf[BUFSZ];
-
             pline1(ucase(strcpy(tmpbuf, verbl_msg)));
+            SetVoice((struct monst *) 0, 0, 80, voice_death); 
+            sound_speak(tmpbuf);
         } else {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize1(verbl_msg);
         }
     }
@@ -1645,12 +1713,14 @@ extern struct sound_procs qtsound_procs;
 struct sound_procs nosound_procs = {
     SOUNDID(nosound),
     0L,
-    (void (*)(void)) 0,                     /* init_nhsound    */
-    (void (*)(const char *)) 0,             /* exit_nhsound    */
-    (void (*)(schar, schar, int32_t)) 0,    /* achievement     */
-    (void (*)(char *, int32_t, int32_t)) 0, /* sound effect    */
-    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes  */
-    (void (*)(char *, int32_t, int32_t)) 0, /* play_usersound  */
+    (void (*)(void)) 0,                           /* init_nhsound   */
+    (void (*)(const char *)) 0,                   /* exit_nhsound   */
+    (void (*)(schar, schar, int32_t)) 0,          /* achievement    */
+    (void (*)(char *, int32_t, int32_t)) 0,       /* sound effect   */
+    (void (*)(int32_t, const char *, int32_t)) 0, /* hero_playnotes */
+    (void (*)(char *, int32_t, int32_t)) 0,       /* play_usersound */
+    (void (*)(int32_t, int32_t, int32_t)) 0,      /* ambience       */
+    (void (*)(char *, int32_t, int32_t, int32_t, int32_t)) 0, /* verbal */
 };
 
 /* The order of these array entries must match the
@@ -1811,6 +1881,9 @@ static void nosound_resume_nhsound(void);
 static void nosound_achievement(schar, schar, int32_t);
 static void nosound_soundeffect(int32_t, int32_t);
 static void nosound_play_usersound(char *, int32_t, int32_t);
+static void nosound_ambience(int32_t, int32_t, int32_t);
+static void nosound_verbal(char *text, int32_t gender, int32_t tone,
+                           int32_t vol, int32_t moreinfo);
 
 static void
 nosound_init_nhsound(void)
@@ -1841,6 +1914,18 @@ static void
 nosound_play_usersound(char *filename, int volume, int idx)
 {
 }
+
+static void
+nosound_ambience(int32_t ambienceid, int32_t ambience_action,
+                int32_t hero_proximity)
+{
+}
+
+static void
+nosound_verbal(char *text, int32_t gender, int32_t tone,
+               int32_t vol, int32_t moreinfo)
+{
+}
 #endif
 
 #ifdef SND_SOUNDEFFECTS_AUTOMAP
@@ -1849,205 +1934,13 @@ struct soundeffect_automapping {
     const char *base_filename;
 };
 
+#define SEFFECTS_AUTOMAP
 static const struct soundeffect_automapping
-       se_mappings_init[number_of_se_entries] = {
+    se_mappings_init[number_of_se_entries] = {
     { se_zero_invalid,                  "" },
-    { se_faint_splashing,               "faint_splashing" },
-    { se_crackling_of_hellfire,         "crackling_of_hellfire" },
-    { se_heart_beat,                    "heart_beat" },
-    { se_typing_noise,                  "typing_noise" },
-    { se_hollow_sound,                  "hollow_sound" },
-    { se_rustling_paper,                "rustling_paper" },
-    { se_crushing_sound,                "crushing_sound" },
-    { se_splash,                        "splash" },
-    { se_chains_rattling_gears_turning, "chains_rattling_gears_turning" },
-    { se_smashing_and_crushing,         "smashing_and_crushing" },
-    { se_gears_turning_chains_rattling, "gears_turning_chains_rattling" },
-    { se_loud_splash,                   "loud_splash" },
-    { se_lound_crash,                   "lound_crash" },
-    { se_crashing_rock,                 "crashing_rock" },
-    { se_sizzling,                      "sizzling" },
-    { se_crashing_boulder,              "crashing_boulder" },
-    { se_boulder_drop,                  "boulder_drop" },
-    { se_item_tumble_downwards,         "item_tumble_downwards" },
-    { se_drain_noises,                  "drain_noises" },
-    { se_ring_in_drain,                 "ring_in_drain" },
-    { se_groans_and_moans,              "groans_and_moans" },
-    { se_scratching,                    "scratching" },
-    { se_glass_shattering,              "glass_shattering" },
-    { se_egg_cracking,                  "egg_cracking" },
-    { se_gushing_sound,                 "gushing_sound" },
-    { se_glass_crashing,                "glass_crashing" },
-    { se_egg_splatting,                 "egg_splatting" },
-    { se_sinister_laughter,             "sinister_laughter" },
-    { se_blast,                         "blast" },
-    { se_stone_breaking,                "stone_breaking" },
-    { se_stone_crumbling,               "stone_crumbling" },
-    { se_snakes_hissing,                "snakes_hissing" },
-    { se_loud_pop,                      "loud_pop" },
-    { se_clanking_pipe,                 "clanking_pipe" },
-    { se_sewer_song,                    "sewer_song" },
-    { se_monster_behind_boulder,        "monster_behind_boulder" },
-    { se_wailing_of_the_banshee,        "wailing_of_the_banshee" },
-    { se_swoosh,                        "swoosh" },
-    { se_explosion,                     "explosion" },
-    { se_crashing_sound,                "crashing_sound" },
-    { se_someone_summoning,             "someone_summoning" },
-    { se_rushing_wind_noise,            "rushing_wind_noise" },
-    { se_splat_from_engulf,             "splat_from_engulf" },
-    { se_faint_sloshing,                "faint_sloshing" },
-    { se_crunching_sound,               "crunching_sound" },
-    { se_slurping_sound,                "slurping_sound" },
-    { se_masticating_sound,             "masticating_sound" },
-    { se_distant_thunder,               "distant_thunder" },
-    { se_applause,                      "applause" },
-    { se_shrill_whistle,                "shrill_whistle" },
-    { se_someone_yells,                 "someone_yells" },
-    { se_door_unlock_and_open,          "door_unlock_and_open" },
-    { se_door_open,                     "door_open" },
-    { se_door_crash_open,               "door_crash_open" },
-    { se_dry_throat_rattle,             "dry_throat_rattle" },
-    { se_cough,                         "cough" },
-    { se_angry_snakes,                  "angry_snakes" },
-    { se_zap_then_explosion,            "zap_then_explosion" },
-    { se_zap,                           "zap" },
-    { se_horn_being_played,             "horn_being_played" },
-    { se_mon_chugging_potion,           "mon_chugging_potion" },
-    { se_bugle_playing_reveille,        "bugle_playing_reveille" },
-    { se_crash_through_floor,           "crash_through_floor" },
-    { se_thump,                         "thump" },
-    { se_scream,                        "scream" },
-    { se_tumbler_click,                 "tumbler_click" },
-    { se_gear_turn,                     "gear_turn" },
-    { se_divine_music,                  "divine_music" },
-    { se_thunderclap,                   "thunderclap" },
-    { se_sad_wailing,                   "sad_wailing" },
-    { se_maniacal_laughter,             "maniacal_laughter" },
-    { se_rumbling_of_earth,             "rumbling_of_earth" },
-    { se_clanging_sound,                "clanging_sound" },
-    { se_mutter_imprecations,           "mutter_imprecations" },
-    { se_mutter_incantation,            "mutter_incantation" },
-    { se_angry_voice,                   "angry_voice" },
-    { se_sceptor_pounding,              "sceptor_pounding" },
-    { se_courtly_conversation,          "courtly_conversation" },
-    { se_low_buzzing,                   "low_buzzing" },
-    { se_angry_drone,                   "angry_drone" },
-    { se_bees,                          "bees" },
-    { se_someone_searching,             "someone_searching" },
-    { se_guards_footsteps,              "guards_footsteps" },
-    { se_faint_chime,                   "faint_chime" },
-    { se_loud_click,                    "loud_click" },
-    { se_soft_click,                    "soft_click" },
-    { se_squeak,                        "squeak" },
-    { se_squeak_C,                      "squeak_C" },
-    { se_squeak_D_flat,                 "squeak_D_flat" },
-    { se_squeak_D,                      "squeak_D" },
-    { se_squeak_E_flat,                 "squeak_E_flat" },
-    { se_squeak_E,                      "squeak_E" },
-    { se_squeak_F,                      "squeak_F" },
-    { se_squeak_F_sharp,                "squeak_F_sharp" },
-    { se_squeak_G,                      "squeak_G" },
-    { se_squeak_G_sharp,                "squeak_G_sharp" },
-    { se_squeak_A,                      "squeak_A" },
-    { se_squeak_B_flat,                 "squeak_B_flat" },
-    { se_squeak_B,                      "squeak_B" },
-    { se_someone_bowling,               "someone_bowling" },
-    { se_rumbling,                      "rumbling" },
-    { se_loud_crash,                    "loud_crash" },
-    { se_deafening_roar_atmospheric,    "deafening_roar_atmospheric" },
-    { se_low_hum,                       "low_hum" },
-    { se_laughter,                      "laughter" },
-    { se_cockatrice_hiss,               "cockatrice_hiss" },
-    { se_chant,                         "chant" },
-    { se_cracking_sound,                "cracking_sound" },
-    { se_ripping_sound,                 "ripping_sound" },
-    { se_thud,                          "thud" },
-    { se_clank,                         "clank" },
-    { se_crumbling_sound,               "crumbling_sound" },
-    { se_soft_crackling,                "soft_crackling" },
-    { se_crackling,                     "crackling" },
-    { se_sharp_crack,                   "sharp_crack" },
-    { se_wall_of_force,                 "wall_of_force" },
-    { se_alarm,                         "alarm" },
-    { se_kick_door_it_shatters,         "kick_door_it_shatters" },
-    { se_kick_door_it_crashes_open,     "kick_door_it_crashes_open" },
-    { se_bubble_rising,                 "bubble_rising" },
-    { se_bolt_of_lightning,             "bolt_of_lightning" },
-    { se_board_squeak,                  "board_squeak" },
-    { se_board_squeaks_loudly,          "board_squeaks_loudly" },
-    { se_boing,                         "boing" },
-    { se_crashed_ceiling,               "crashed_ceiling" },
-    { se_clash,                         "clash" },
-    { se_crash_door,                    "crash_door" },
-    { se_crash,                         "crash" },
-    { se_crash_throne_destroyed,        "crash_throne_destroyed" },
-    { se_crash_something_broke,         "crash_something_broke" },
-    { se_kadoom_boulder_falls_in,       "kadoom_boulder_falls_in" },
-    { se_klunk_pipe,                    "klunk_pipe" },
-    { se_kerplunk_boulder_gone,         "kerplunk_boulder_gone" },
-    { se_klunk,                         "klunk" },
-    { se_klick,                         "klick" },
-    { se_kaboom_door_explodes,          "kaboom_door_explodes" },
-    { se_kaboom_boom_boom,              "kaboom_boom_boom" },
-    { se_kaablamm_of_mine,              "kaablamm_of_mine" },
-    { se_kaboom,                        "kaboom" },
-    { se_splat_egg,                     "splat_egg" },
-    { se_destroy_web,                   "destroy_web" },
-    { se_iron_ball_dragging_you,        "iron_ball_dragging_you" },
-    { se_iron_ball_hits_you,            "iron_ball_hits_you" },
-    { se_lid_slams_open_falls_shut,     "lid_slams_open_falls_shut" },
-    { se_chain_shatters,                "chain_shatters" },
-    { se_furious_bubbling,              "furious_bubbling" },
-    { se_air_crackles,                  "air_crackles" },
-    { se_potion_crash_and_break,        "potion_crash_and_break" },
-    { se_hiss,                          "hiss" },
-    { se_growl,                         "growl" },
-    { se_canine_bark,                   "canine_bark" },
-    { se_canine_growl,                  "canine_growl" },
-    { se_canine_whine,                  "canine_whine" },
-    { se_canine_yip,                    "canine_yip" },
-    { se_canine_howl,                   "canine_howl" },
-    { se_canine_yowl,                   "canine_yowl" },
-    { se_canine_yelp,                   "canine_yelp" },
-    { se_feline_meow,                   "feline_meow" },
-    { se_feline_purr,                   "feline_purr" },
-    { se_feline_yip,                    "feline_yip" },
-    { se_feline_mew,                    "feline_mew" },
-    { se_feline_yowl,                   "feline_yowl" },
-    { se_feline_yelp,                   "feline_yelp" },
-    { se_roar,                          "roar" },
-    { se_snarl,                         "snarl" },
-    { se_buzz,                          "buzz" },
-    { se_squeek,                        "squeek" },
-    { se_squawk,                        "squawk" },
-    { se_squeal,                        "squeal" },
-    { se_screech,                       "screech" },
-    { se_equine_neigh,                  "equine_neigh" },
-    { se_equine_whinny,                 "equine_whinny" },
-    { se_equine_whicker,                "equine_whicker" },
-    { se_bovine_moo,                    "bovine_moo" },
-    { se_bovine_bellow,                 "bovine_bellow" },
-    { se_wail,                          "wail" },
-    { se_groan,                         "groan" },
-    { se_grunt,                         "grunt" },
-    { se_gurgle,                        "gurgle" },
-    { se_elephant_trumpet,              "elephant_trumpet" },
-    { se_snake_rattle,                  "snake_rattle" },
-    { se_yelp,                          "yelp" },
-    { se_jabberwock_burble,             "jabberwock_burble" },
-    { se_shriek,                        "shriek" },
-    { se_bone_rattle,                   "bone_rattle" },
-    { se_orc_grunt,                     "orc_grunt" },
-    { se_avian_screak,                  "avian_screak" },
-    { se_paranoid_confirmation,         "paranoid_confirmation" },
-    { se_bars_whang,                    "bars_whang" },
-    { se_bars_whap,                     "bars_whap" },
-    { se_bars_flapp,                    "bars_flapp" },
-    { se_bars_clink,                    "bars_clink" },
-    { se_bars_clonk,                    "bars_clonk" },
-    { se_boomerang_klonk,               "boomerang_klonk" },
-    { se_bang_weapon_side,              "bang_weapon_side" },
+#include "seffects.h"
 };
+#undef SEFFECTS_AUTOMAP
 
 static const char *semap_basenames[SIZE(se_mappings_init)];
 static boolean basenames_initialized = FALSE;
@@ -2191,7 +2084,7 @@ base_soundname_to_filename(
     consumes += 1; /* for trailing NUL */
     /* existinglen could be >= bufsz if caller didn't initialize buf
      * to properly include a trailing NUL */
-    if (baselen <= 0 || consumes > bufsz || existinglen >= bufsz)
+    if (!baselen || consumes > bufsz || existinglen >= bufsz)
         return (char *) 0;
 
 #if 0
@@ -2224,6 +2117,70 @@ base_soundname_to_filename(
     }
 #endif
     return buf;
+}
+
+#ifdef SND_SPEECH
+#define SPEECHONLY
+#else
+#define SPEECHONLY UNUSED
+#endif
+
+void
+set_voice(struct monst *mtmp SPEECHONLY, int32_t tone SPEECHONLY, int32_t volume SPEECHONLY, int32_t moreinfo SPEECHONLY)
+{
+#ifdef SND_SPEECH
+    int32_t gender = (mtmp && mtmp->female) ? FEMALE : MALE;
+
+    if (gv.voice.nameid)
+        free((genericptr_t) gv.voice.nameid);
+    gv.voice.gender = gender;
+    gv.voice.serialno = mtmp ? mtmp->m_id 
+                             : ((moreinfo & voice_talking_artifact) != 0)  ? 3
+                                 : ((moreinfo & voice_deity) != 0) ? 4 : 2;
+    gv.voice.tone = tone;
+    gv.voice.volume = volume;
+    gv.voice.moreinfo = moreinfo;
+    gv.voice.nameid = (const char *) 0;
+    gp.pline_flags |= PLINE_SPEECH; 
+#endif
+}
+
+void
+sound_speak(const char *text SPEECHONLY)
+{
+#ifdef SND_SPEECH
+    const char *cp1, *cp2;
+    char *cpdst;
+    char buf[BUFSZ + BUFSZ];
+
+    if (!text || (text && *text == '\0'))
+        return;
+    if (iflags.voices && soundprocs.sound_verbal
+        && (soundprocs.sound_triggers & SOUND_TRIGGER_VERBAL)) {
+        cp1 = text;
+        cpdst = buf;
+        cp2 = c_eos(cp1);
+        cp2--;  /* last non-NUL */
+        *cpdst = '\0';
+        if ((gp.pline_flags & PLINE_VERBALIZE) != 0) {
+            if (*cp1 == '"')
+                cp1++;
+            if (*cp2 == '"')
+                cp2--;
+        }
+        /* cp1 -> 1st, cp2 -> last non-nul) */
+        if ((unsigned)(cp2 - cp1) < (sizeof buf - 1U)) {
+            while (cp1 <= cp2) {
+                *cpdst = *cp1;
+                cp1++;
+                cpdst++;
+            }
+            *cpdst = '\0';
+        }
+        (*soundprocs.sound_verbal)(buf, gv.voice.gender, gv.voice.tone,
+                                   gv.voice.volume, gv.voice.moreinfo); 
+    }
+#endif
 }
 
 /*sounds.c*/

@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1674294830 2023/01/21 09:53:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1223 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.1281 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -8,9 +8,15 @@
 /* ### alloc.c ### */
 
 #if 0
+/* routines in alloc.c depend on MONITOR_HEAP and are declared in global.h */
 extern long *alloc(unsigned int);
 #endif
 extern char *fmt_ptr(const void *) NONNULL;
+/* moved from hacklib.c to alloc.c so that utility programs have access */
+#define FITSint(x) FITSint_(x, __func__, __LINE__)
+extern int FITSint_(long long, const char *, int);
+#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
+extern unsigned FITSuint_(unsigned long long, const char *, int);
 
 /* This next pre-processor directive covers almost the entire file,
  * interrupted only occasionally to pick up specific functions as needed. */
@@ -18,11 +24,11 @@ extern char *fmt_ptr(const void *) NONNULL;
 
 /* ### allmain.c ### */
 
-extern void early_init(void);
+extern void early_init(int, char *[]);
 extern void moveloop_core(void);
 extern void moveloop(boolean);
 extern void stop_occupation(void);
-extern void init_sound_and_display_gamewindows(void);
+extern void init_sound_disp_gamewindows(void);
 extern void newgame(void);
 extern void welcome(boolean);
 extern int argcheck(int, char **, enum earlyarg);
@@ -92,7 +98,7 @@ extern boolean artifact_hit(struct monst *, struct monst *, struct obj *,
                             int *, int);
 extern int doinvoke(void);
 extern boolean finesse_ahriman(struct obj *);
-extern void arti_speak(struct obj *);
+extern int arti_speak(struct obj *);
 extern boolean artifact_light(struct obj *);
 extern long spec_m2(struct obj *);
 extern boolean artifact_has_invprop(struct obj *, uchar);
@@ -245,6 +251,7 @@ extern int domonability(void);
 extern const struct ext_func_tab *ext_func_tab_from_func(int(*)(void));
 extern char cmd_from_func(int(*)(void));
 extern char cmd_from_dir(int, int);
+extern char *cmd_from_ecname(const char *);
 extern const char *cmdname_from_func(int(*)(void), char *, boolean);
 extern boolean redraw_cmd(char);
 extern const char *levltyp_to_name(int);
@@ -331,6 +338,7 @@ extern void destroy_drawbridge(coordxy, coordxy);
 /* ### decl.c ### */
 
 extern void decl_globals_init(void);
+extern void sa_victual(volatile struct victual_info *);
 
 /* ### detect.c ### */
 
@@ -562,6 +570,7 @@ extern int stop_donning(struct obj *);
 extern int Armor_off(void);
 extern int Armor_gone(void);
 extern int Helmet_off(void);
+extern boolean hard_helmet(struct obj *);
 extern void wielding_corpse(struct obj *, struct obj *, boolean);
 extern int Gloves_off(void);
 extern int Boots_on(void);
@@ -642,6 +651,9 @@ extern int dothrow(void);
 extern int dofire(void);
 extern void endmultishot(boolean);
 extern void hitfloor(struct obj *, boolean);
+extern boolean hurtle_jump(genericptr_t, coordxy, coordxy);
+extern boolean hurtle_step(genericptr_t, coordxy, coordxy);
+extern boolean will_hurtle(struct monst *, coordxy, coordxy);
 extern void hurtle(int, int, int, boolean);
 extern void mhurtle(struct monst *, int, int, int);
 extern boolean harmless_missile(struct obj *);
@@ -652,12 +664,10 @@ extern int thitmonst(struct monst *, struct obj *);
 extern int hero_breaks(struct obj *, coordxy, coordxy, unsigned);
 extern int breaks(struct obj *, coordxy, coordxy);
 extern void release_camera_demon(struct obj *, coordxy, coordxy);
-extern void breakobj(struct obj *, coordxy, coordxy, boolean, boolean);
+extern int breakobj(struct obj *, coordxy, coordxy, boolean, boolean);
 extern boolean breaktest(struct obj *);
 extern boolean walk_path(coord *, coord *,
                          boolean(*)(void *, coordxy, coordxy), genericptr_t);
-extern boolean hurtle_jump(genericptr_t, coordxy, coordxy);
-extern boolean hurtle_step(genericptr_t, coordxy, coordxy);
 
 /* ### drawing.c ### */
 
@@ -710,6 +720,9 @@ extern boolean Can_fall_thru(d_level *);
 extern boolean Can_dig_down(d_level *);
 extern boolean Can_rise_up(coordxy, coordxy, d_level *);
 extern boolean has_ceiling(d_level *);
+extern boolean avoid_ceiling(d_level *);
+extern const char *surface(coordxy, coordxy);
+extern const char *ceiling(coordxy, coordxy);
 extern boolean In_quest(d_level *);
 extern boolean In_mines(d_level *);
 extern branch *dungeon_branch(const char *);
@@ -732,6 +745,9 @@ extern char *stairs_description(stairway *, char *, boolean);
 extern schar print_dungeon(boolean, schar *, xint16 *);
 extern char *get_annotation(d_level *);
 extern int donamelevel(void);
+extern void free_exclusions(void);
+extern void save_exclusions(NHFILE *);
+extern void load_exclusions(NHFILE *);
 extern int dooverview(void);
 extern void show_overview(int, int);
 extern void rm_mapseen(int);
@@ -801,6 +817,11 @@ extern struct kinfo *find_delayed_killer(int);
 extern void dealloc_killer(struct kinfo *);
 extern void save_killers(NHFILE *);
 extern void restore_killers(NHFILE *);
+#ifdef CRASHREPORT
+extern boolean submit_web_report(const char *, char *);
+extern void crashreport_init(int, char *[]);
+extern void crashreport_bidshow(void);
+#endif
 extern char *build_english_list(char *);
 #if defined(PANICTRACE) && !defined(NO_SIGNAL)
 extern void panictrace_setsignals(boolean);
@@ -812,18 +833,17 @@ extern char *random_engraving(char *);
 extern void wipeout_text(char *, int, unsigned);
 extern boolean can_reach_floor(boolean);
 extern void cant_reach_floor(coordxy, coordxy, boolean, boolean);
-extern const char *surface(coordxy, coordxy);
-extern const char *ceiling(coordxy, coordxy);
 extern struct engr *engr_at(coordxy, coordxy);
 extern struct engr *sengr_at(const char *, coordxy, coordxy, boolean);
 extern void u_wipe_engr(int);
 extern void wipe_engr_at(coordxy, coordxy, xint16, boolean);
 extern void read_engr_at(coordxy, coordxy);
-extern void make_engr_at(coordxy, coordxy, const char *, long, xint16);
+extern void make_engr_at(coordxy, coordxy, const char *, long, int);
 extern void del_engr_at(coordxy, coordxy);
 extern int freehand(void);
 extern int doengrave(void);
 extern void sanitize_engravings(void);
+extern void engraving_sanity_check(void);
 extern void save_engravings(NHFILE *);
 extern void rest_engravings(NHFILE *);
 extern void engr_stats(const char *, char *, long *, long *);
@@ -831,6 +851,9 @@ extern void del_engr(struct engr *);
 extern void rloc_engr(struct engr *);
 extern void make_grave(coordxy, coordxy, const char *);
 extern void disturb_grave(coordxy, coordxy);
+extern void map_engraving(struct engr *, int);
+extern void see_engraving(struct engr *);
+extern void feel_engraving(struct engr *);
 
 /* ### exper.c ### */
 
@@ -860,6 +883,7 @@ extern void makerogueghost(void);
 
 /* ### files.c ### */
 
+extern const char *nh_basename(const char *, boolean);
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 extern int l_get_config_errors(lua_State *);
 #endif
@@ -966,6 +990,7 @@ extern int wiz_debug_cmd_traveldisplay(void);
 extern boolean u_rooted(void);
 extern boolean u_maybe_impaired(void);
 extern const char *u_locomotion(const char *);
+extern void handle_tip(int);
 extern void domove(void);
 extern void runmode_delay_output(void);
 extern void overexert_hp(void);
@@ -985,6 +1010,7 @@ extern int monster_nearby(void);
 extern void end_running(boolean);
 extern void nomul(int);
 extern void unmul(const char *);
+extern int saving_grace(int);
 extern void losehp(int, const char *, schar);
 extern int weight_cap(void);
 extern int inv_weight(void);
@@ -1012,6 +1038,7 @@ extern char *strip_newline(char *);
 extern char *stripchars(char *, const char *, const char *);
 extern char *stripdigits(char *);
 extern char *eos(char *);
+extern const char *c_eos(const char *);
 extern unsigned Strlen_(const char *, const char *, int);
 extern boolean str_start_is(const char *, const char *, boolean);
 extern boolean str_end_is(const char *, const char *);
@@ -1075,10 +1102,6 @@ extern void shuffle_int_array(int *, int);
     nh_snprintf(__func__, __LINE__, str, size, __VA_ARGS__)
 extern void nh_snprintf(const char *func, int line, char *str, size_t size,
                         const char *fmt, ...) PRINTF_F(5, 6);
-#define FITSint(x) FITSint_(x, __func__, __LINE__)
-extern int FITSint_(long long, const char *, int);
-#define FITSuint(x) FITSuint_(x, __func__, __LINE__)
-extern unsigned FITSuint_(unsigned long long, const char *, int);
 #ifdef ENHANCED_SYMBOLS
 extern int unicodeval_to_utf8str(int, uint8 *, size_t);
 #endif
@@ -1098,12 +1121,13 @@ extern schar achieve_rank(int);
 extern boolean sokoban_in_play(void);
 extern int do_gamelog(void);
 extern void show_gamelog(int);
-extern int set_vanq_order(void);
+extern int set_vanq_order(boolean);
 extern int dovanquished(void);
 extern int doborn(void);
 extern void list_vanquished(char, boolean);
 extern int num_genocides(void);
 extern void list_genocided(char, boolean);
+extern int dogenocided(void);
 extern const char *align_str(aligntyp);
 extern char *piousness(boolean, const char *);
 extern void mstatusline(struct monst *);
@@ -1312,7 +1336,8 @@ extern boolean usmellmon(struct permonst *);
 /* ### mcastu.c ### */
 
 extern int castmu(struct monst *, struct attack *, boolean, boolean);
-extern void touch_of_death(void);
+extern void touch_of_death(struct monst *);
+extern char *death_inflicted_by(char *, const char *, struct monst *);
 extern int buzzmu(struct monst *, struct attack *);
 
 /* ### mdlib.c ### */
@@ -1329,6 +1354,7 @@ extern void dump_glyphids(void);
 extern int fightm(struct monst *);
 extern int mdisplacem(struct monst *, struct monst *, boolean);
 extern int mattackm(struct monst *, struct monst *);
+extern boolean failed_grab(struct monst *, struct monst *, struct attack *);
 extern boolean engulf_target(struct monst *, struct monst *);
 extern int mon_poly(struct monst *, struct monst *, int);
 extern void paralyze_monst(struct monst *, int);
@@ -1381,9 +1407,10 @@ extern void sort_rooms(void);
 extern void add_room(int, int, int, int, boolean, schar, boolean);
 extern void add_subroom(struct mkroom *, int, int, int, int, boolean, schar,
                         boolean);
-extern void free_luathemes(boolean);
+extern void free_luathemes(enum lua_theme_group);
 extern void makecorridors(void);
 extern void add_door(coordxy, coordxy, struct mkroom *);
+extern void count_level_features(void);
 extern void clear_level_structures(void);
 extern void level_finalize_topology(void);
 extern void mklev(void);
@@ -1672,7 +1699,9 @@ extern const char *msummon_environ(struct permonst *, const char **);
 extern const struct permonst *raceptr(struct monst *);
 extern boolean olfaction(struct permonst *);
 unsigned long cvt_adtyp_to_mseenres(uchar);
+unsigned long cvt_prop_to_mseenres(uchar);
 extern void monstseesu(unsigned long);
+extern void monstunseesu(unsigned long);
 extern boolean resist_conflict(struct monst *);
 extern boolean mon_knows_traps(struct monst *, int);
 extern void mon_learns_traps(struct monst *, int);
@@ -1685,6 +1714,7 @@ extern int mstrength(struct permonst *);
 /* ### monmove.c ### */
 
 extern boolean mon_would_take_item(struct monst *, struct obj *);
+extern boolean mon_would_consume_item(struct monst *, struct obj *);
 extern boolean itsstuck(struct monst *);
 extern boolean mb_trapped(struct monst *, boolean);
 extern void mon_track_add(struct monst *, coordxy, coordxy);
@@ -1697,6 +1727,8 @@ extern struct monst *find_pmmonst(int);
 extern int bee_eat_jelly(struct monst *, struct obj *);
 extern void monflee(struct monst *, int, boolean, boolean);
 extern void mon_yells(struct monst *, const char *);
+extern boolean m_can_break_boulder(struct monst *);
+extern void m_break_boulder(struct monst *, coordxy, coordxy);
 extern int dochug(struct monst *);
 extern boolean m_digweapon_check(struct monst *, coordxy, coordxy);
 extern int m_move(struct monst *, int);
@@ -1710,6 +1742,7 @@ extern boolean can_fog(struct monst *);
 extern boolean should_displace(struct monst *, coord *, long *, int, coordxy,
                                coordxy);
 extern boolean undesirable_disp(struct monst *, coordxy, coordxy);
+extern boolean can_hide_under_obj(struct obj *);
 
 /* ### monst.c ### */
 
@@ -1881,6 +1914,7 @@ extern int str_lines_max_width(const char *);
 extern char *stripdigits(char *);
 extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L);
+extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 #endif /* MAKEDEFS_C MDLIB_C CPPREGEX_C */
 
@@ -2005,6 +2039,7 @@ extern int shiny_obj(char);
 
 /* ### options.c ### */
 
+extern boolean ask_do_tutorial(void);
 extern boolean match_optname(const char *, const char *, int, boolean);
 extern uchar txt2key(char *);
 extern void initoptions(void);
@@ -2234,6 +2269,7 @@ extern void mongrantswish(struct monst **);
 extern void djinni_from_bottle(struct obj *);
 extern struct monst *split_mon(struct monst *, struct monst *);
 extern const char *bottlename(void);
+extern void speed_up(long);
 
 /* ### pray.c ### */
 
@@ -2261,7 +2297,7 @@ extern boolean inhistemple(struct monst *);
 extern int pri_move(struct monst *);
 extern void priestini(d_level *, struct mkroom *, int, int, boolean);
 extern aligntyp mon_aligntyp(struct monst *);
-extern char *priestname(struct monst *, int, char *);
+extern char *priestname(struct monst *, int, boolean, char *);
 extern boolean p_coaligned(struct monst *);
 extern struct monst *findpriest(char);
 extern void intemple(int);
@@ -2287,6 +2323,7 @@ extern void artitouch(struct obj *);
 extern boolean ok_to_quest(void);
 extern void leader_speaks(struct monst *);
 extern void nemesis_speaks(void);
+extern void nemesis_stinks(coordxy, coordxy);
 extern void quest_chat(struct monst *);
 extern void quest_talk(struct monst *);
 extern void quest_stat_check(struct monst *);
@@ -2598,6 +2635,7 @@ extern void yelp(struct monst *);
 extern void whimper(struct monst *);
 extern void beg(struct monst *);
 extern const char *maybe_gasp(struct monst *);
+extern const char *cry_sound(struct monst *);
 extern int dotalk(void);
 extern int tiphat(void);
 #ifdef USER_SOUNDS
@@ -2620,6 +2658,8 @@ extern char *get_sound_effect_filename(int32_t seidint,
                                        char *buf, size_t bufsz, int32_t);
 #endif
 extern char *base_soundname_to_filename(char *, char *, size_t, int32_t);
+extern void set_voice(struct monst *, int32_t, int32_t, int32_t); 
+extern void sound_speak(const char *);
 
 /* ### sp_lev.c ### */
 
@@ -2647,6 +2687,7 @@ extern void selection_free(struct selectionvar *, boolean);
 extern void selection_clear(struct selectionvar *, int);
 extern struct selectionvar *selection_clone(struct selectionvar *);
 extern void selection_getbounds(struct selectionvar *, NhRect *);
+extern void selection_recalc_bounds(struct selectionvar *);
 extern void set_selection_floodfillchk(int(*)(coordxy, coordxy));
 extern void selection_floodfill(struct selectionvar *, coordxy, coordxy,
                                 boolean);
@@ -2670,7 +2711,7 @@ extern void set_floodfillchk_match_under(coordxy);
 extern void selection_do_ellipse(struct selectionvar *, int, int, int, int,
                                  int);
 extern void selection_do_gradient(struct selectionvar *, long, long, long,
-                                  long, long, long, long, long);
+                                  long, long, long, long);
 extern int lspo_reset_level(lua_State *);
 extern int lspo_finalize_level(lua_State *);
 extern boolean get_coord(lua_State *, int, lua_Integer *, lua_Integer *);
@@ -2731,7 +2772,7 @@ extern boolean mount_steed(struct monst *, boolean);
 extern void exercise_steed(void);
 extern void kick_steed(void);
 extern void dismount_steed(int);
-extern void place_monster(struct monst *, int, int);
+extern void place_monster(struct monst *, coordxy, coordxy);
 extern boolean stucksteed(boolean);
 
 /* ### symbols.c ### */
@@ -2761,7 +2802,7 @@ extern void savedsym_free(void);
 extern void savedsym_strbuf(strbuf_t *);
 extern boolean parsesymbols(char *, int);
 #ifdef ENHANCED_SYMBOLS
-extern struct customization_detail *find_matching_symset_customization(
+extern struct customization_detail *find_matching_symset_customiz(
                const char *symset_name, int custtype,
                enum graphics_sets which_set);
 extern void apply_customizations_to_symset(enum graphics_sets which_set);
@@ -2781,6 +2822,8 @@ extern boolean enexto(coord *, coordxy, coordxy, struct permonst *);
 extern boolean enexto_core(coord *, coordxy, coordxy, struct permonst *,
                            mmflags_nht);
 extern void teleds(coordxy, coordxy, int);
+extern int collect_coords(coord *, coordxy, coordxy, int, unsigned,
+                          boolean (*)(coordxy, coordxy));
 extern boolean safe_teleds(int);
 extern boolean teleport_pet(struct monst *, boolean);
 extern void tele(void);
@@ -2794,6 +2837,7 @@ extern void level_tele_trap(struct trap *, unsigned);
 extern void rloc_to(struct monst *, coordxy, coordxy);
 extern void rloc_to_flag(struct monst *, coordxy, coordxy, unsigned);
 extern boolean rloc(struct monst *, unsigned);
+extern boolean control_mon_tele(struct monst *, coord *cc, unsigned, boolean);
 extern boolean tele_restrict(struct monst *);
 extern void mtele_trap(struct monst *, struct trap *, int);
 extern int mlevel_tele_trap(struct monst *, struct trap *, boolean, int);
@@ -2849,12 +2893,13 @@ extern void topten(int, time_t);
 extern void prscore(int, char **);
 extern struct toptenentry *get_rnd_toptenentry(void);
 extern struct obj *tt_oname(struct obj *);
+extern int tt_doppel(struct monst *);
 
 /* ### track.c ### */
 
 extern void initrack(void);
 extern void settrack(void);
-extern coord *gettrack(int, int);
+extern coord *gettrack(coordxy, coordxy);
 
 /* ### trap.c ### */
 
@@ -2868,6 +2913,7 @@ extern struct monst *animate_statue(struct obj *, coordxy, coordxy,
                                     int, int *);
 extern struct monst *activate_statue_trap(struct trap *, coordxy, coordxy,
                                           boolean);
+extern int immune_to_trap(struct monst *, unsigned);
 extern void set_utrap(unsigned, unsigned);
 extern void reset_utrap(boolean);
 extern void dotrap(struct trap *, unsigned);
@@ -2889,8 +2935,9 @@ extern void acid_damage(struct obj *);
 extern int water_damage(struct obj *, const char *, boolean);
 extern void water_damage_chain(struct obj *, boolean);
 extern boolean rnd_nextto_goodpos(coordxy *, coordxy *, struct monst *);
+extern void back_on_ground(int);
 extern boolean drown(void);
-extern void drain_en(int);
+extern void drain_en(int, boolean);
 extern int dountrap(void);
 extern int could_untrap(boolean, boolean);
 extern void cnv_trap_obj(int, int, struct trap *, boolean);
@@ -3022,6 +3069,7 @@ extern void do_stone_mon(struct monst *, struct attack *, struct monst *,
 extern int damageum(struct monst *, struct attack *, int);
 extern int explum(struct monst *, struct attack *);
 extern void missum(struct monst *, struct attack *, boolean);
+extern boolean m_is_steadfast(struct monst *);
 extern boolean mhitm_knockback(struct monst *, struct monst *,struct attack *,
                                int *, boolean);
 extern int passive(struct monst *, struct obj *, boolean, boolean, uchar,
@@ -3091,6 +3139,7 @@ extern int hide_privileges(boolean);
 #ifdef ENHANCED_SYMBOLS
 extern int glyphrep(const char *);
 extern char *mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *);
+extern const char *mixed_to_glyphinfo(const char *str, glyph_info *gip);
 extern int match_glyph(char *);
 extern void dump_all_glyphids(FILE *fp);
 extern void fill_glyphid_cache(void);
@@ -3184,7 +3233,7 @@ extern int vms_creat(const char *, unsigned int);
 extern int vms_open(const char *, int, unsigned int);
 extern boolean same_dir(const char *, const char *);
 extern int c__translate(int);
-extern char *vms_basename(const char *);
+extern char *vms_basename(const char *, boolean);
 
 /* ### vmsmail.c ### */
 
@@ -3224,6 +3273,9 @@ extern void introff(void);
 ATTRNORETURN extern void error (const char *, ...) PRINTF_F(1, 2) NORETURN;
 #ifdef TIMED_DELAY
 extern void msleep(unsigned);
+#endif
+#ifdef ENHANCED_SYMBOLS
+extern void tty_utf8graphics_fixup(void);
 #endif
 
 /* ### vmsunix.c ### */

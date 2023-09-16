@@ -1,4 +1,4 @@
-/* NetHack 3.7	do_name.c	$NHDT-Date: 1655663780 2022/06/19 18:36:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.254 $ */
+/* NetHack 3.7	do_name.c	$NHDT-Date: 1693292527 2023/08/29 07:02:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.289 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Pasi Kallinen, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -6,7 +6,8 @@
 #include "hack.h"
 
 static char *nextmbuf(void);
-static void getpos_getvalids_selection(struct selectionvar *, boolean (*)(coordxy, coordxy));
+static void getpos_getvalids_selection(struct selectionvar *,
+                                       boolean (*)(coordxy, coordxy));
 static void selection_force_newsyms(struct selectionvar *);
 static void getpos_help_keyxhelp(winid, const char *, const char *, int);
 static void getpos_help(boolean, const char *);
@@ -19,6 +20,8 @@ static void gloc_filter_done(void);
 static boolean gather_locs_interesting(coordxy, coordxy, int);
 static void gather_locs(coord **, int *, int);
 static void truncate_to_map(int *, int *, schar, schar);
+static void getpos_refresh(int *);
+static char *name_from_player(char *, const char *, const char *);
 static void do_mgivenname(void);
 static boolean alreadynamed(struct monst *, char *, char *);
 static void do_oname(struct obj *);
@@ -59,7 +62,8 @@ getpos_sethilite(
     getpos_hilitefunc = gp_hilitef;
     getpos_getvalid = gp_getvalidf;
     getpos_getvalids_selection(sel, getpos_getvalid);
-    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE : NO_COLOR;
+    gw.wsettings.map_frame_color = (getpos_getvalid != NULL) ? CLR_BLUE
+                                                             : NO_COLOR;
     if ((boolean) (getpos_getvalid != NULL) != was_valid)
         selection_force_newsyms(sel);
     selection_free(sel, TRUE);
@@ -74,7 +78,9 @@ mapxy_valid(coordxy x, coordxy y)
 }
 
 static void
-getpos_getvalids_selection(struct selectionvar *sel, boolean (*validf)(coordxy, coordxy))
+getpos_getvalids_selection(
+    struct selectionvar *sel,
+    boolean (*validf)(coordxy, coordxy))
 {
     coordxy x, y;
 
@@ -232,7 +238,7 @@ getpos_help(boolean force, const char *goal)
             putstr(tmpwin, 0, sbuf);
         }
         if (getpos_hilitefunc) {
-            Sprintf(sbuf, "Use '%s' to display valid locations.",
+            Sprintf(sbuf, "Use '%s' to toggle marking of valid locations.",
                     visctrl(gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]));
             putstr(tmpwin, 0, sbuf);
         }
@@ -615,11 +621,11 @@ auto_describe(coordxy cx, coordxy cy)
     if (do_screen_description(cc, TRUE, sym, tmpbuf, &firstmatch,
                               (struct permonst **) 0)) {
         (void) coord_desc(cx, cy, tmpbuf, iflags.getpos_coords);
-        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE),
+        custompline((SUPPRESS_HISTORY | OVERRIDE_MSGTYPE | NO_CURS_ON_U),
                     "%s%s%s%s%s", firstmatch, *tmpbuf ? " " : "", tmpbuf,
                     (iflags.autodescribe
                      && getpos_getvalid && !(*getpos_getvalid)(cx, cy))
-                      ? " (illegal)" : "",
+                      ? " (invalid target)" : "",
                     (iflags.getloc_travelmode && !is_valid_travelpt(cx, cy))
                       ? " (no travel path)" : "");
         curs(WIN_MAP, cx, cy);
@@ -713,6 +719,23 @@ truncate_to_map(int *cx, int *cy, schar dx, schar dy)
     *cy += dy;
 }
 
+enum hilite_states {
+    Hilite_Inactive = 0,  /* no highlighting of valid target spots */
+    Hilite_Active = 1,    /* '$' has just highlighted valid target spots */
+    Hilite_Passive = 2,   /* second '$' will unhighlight */
+};
+
+/* called when ^R typed or for SHOWVALID if second '$' typed to explicitly
+   reverse previous '$' for highlighting valid target spots */
+static void
+getpos_refresh(int *hilite_statep)
+{
+    if (*hilite_statep == Hilite_Active)
+        (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+    docrt(); /* redraw everything */
+    *hilite_statep = Hilite_Inactive;
+}
+
 /* have the player use movement keystrokes to position the cursor at a
    particular map location, then use one of [.,:;] to pick the spot */
 int
@@ -747,10 +770,10 @@ getpos(coord *ccp, boolean force, const char *goal)
     int result = 0;
     int cx, cy, i, c;
     int sidx;
-    coordxy tx = u.ux, ty = u.uy;
+    coordxy tx = u.ux, ty = u.uy, vx = 0, vy = 0;
     boolean msg_given = TRUE; /* clear message window by default */
     boolean show_goal_msg = FALSE;
-    boolean hilite_state = FALSE;
+    int hilite_state = Hilite_Inactive;
     coord *garr[NUM_GLOCS] = DUMMY;
     int gcount[NUM_GLOCS] = DUMMY;
     int gidx[NUM_GLOCS] = DUMMY;
@@ -783,6 +806,8 @@ getpos(coord *ccp, boolean force, const char *goal)
         mMoOdDxX[i] = gc.Cmd.spkeys[mMoOdDxX_def[i]];
     mMoOdDxX[SIZE(mMoOdDxX_def)] = '\0';
 
+    handle_tip(TIP_GETPOS);
+
     if (!goal)
         goal = "desired location";
     if (Verbose(0, getpos1)) {
@@ -807,13 +832,12 @@ getpos(coord *ccp, boolean force, const char *goal)
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
             show_goal_msg = FALSE;
-        } else if (iflags.autodescribe && !msg_given && !hilite_state) {
+        } else if (iflags.autodescribe && !msg_given) {
             auto_describe(cx, cy);
         }
 
         rushrun = FALSE;
 
-        gp.program_state.getting_a_command = 1;
         if ((cmdq = cmdq_pop()) != 0) {
             if (cmdq->typ == CMDQ_KEY) {
                 c = cmdq->key;
@@ -832,9 +856,11 @@ getpos(coord *ccp, boolean force, const char *goal)
                 cmdq_add_key(CQ_REPEAT, c);
         }
 
-        if (hilite_state) {
-            (*getpos_hilitefunc)(2);
-            hilite_state = FALSE;
+        /* update SHOWVALID if it is in use */
+        if (hilite_state == Hilite_Active) {
+            /* 'valid spot' glyph gets reset to whatever it was covering */
+            (*getpos_hilitefunc)(2); /* tmp_at(DISP_END) */
+            hilite_state = Hilite_Passive;
             curs(WIN_MAP, cx, cy);
             flush_screen(0);
         }
@@ -896,20 +922,33 @@ getpos(coord *ccp, boolean force, const char *goal)
         }
 
         if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP] || redraw_cmd(c)) {
+            /* '?' will redraw twice, first when removing popup text window
+               after showing the help text, then to reset highlighting */
             if (c == gc.Cmd.spkeys[NHKF_GETPOS_HELP])
                 getpos_help(force, goal);
-            else /* ^R */
-                docrt(); /* redraw */
+            /* ^R: docrt(), hilite_state = Hilite_Inactive */
+            getpos_refresh(&hilite_state);
             /* update message window to reflect that we're still targeting */
             show_goal_msg = TRUE;
-            msg_given = TRUE;
-        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]
-                   && getpos_hilitefunc) {
-            if (!hilite_state) {
-                (*getpos_hilitefunc)(0);
-                (*getpos_hilitefunc)(1);
-                hilite_state = TRUE;
+        } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_SHOWVALID]) {
+            if (getpos_hilitefunc) {
+                if (hilite_state == Hilite_Inactive
+                    || (hilite_state == Hilite_Passive
+                        && (cx != vx || cy != vy))) {
+                    /* toggling 'showvalid' on */
+                    (*getpos_hilitefunc)(0); /* tmp_at(DISP_start) */
+                    (*getpos_hilitefunc)(1); /* update appropriate spots */
+                    hilite_state = Hilite_Active;
+                    vx = cx, vy = cy;
+                } else {
+                    /* 'showvalid' was on, toggle it off:
+                       docrt(), hilite_state = Hilite_Inactive */
+                    getpos_refresh(&hilite_state);
+                    vx = vy = 0;
+                }
+                curs(WIN_MAP, cx, cy);
             }
+            show_goal_msg = TRUE; /* we're still targeting */
             goto nxtc;
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
@@ -1180,6 +1219,34 @@ safe_oname(struct obj *obj)
     return "";
 }
 
+/* get a name for a monster or an object from player;
+   truncate if longer than PL_PSIZ, then return it */
+static char *
+name_from_player(
+    char *outbuf,       /* output buffer, assumed to be at least BUFSZ long;
+                         * anything longer than PL_PSIZ will be truncated */
+    const char *prompt,
+    const char *defres) /* only used if EDIT_GETLIN is enabled; only useful
+                         * if windowport xxx's xxx_getlin() supports that */
+{
+    outbuf[0] = '\0';
+#ifdef EDIT_GETLIN
+    if (defres && *defres)
+        Strcpy(outbuf, defres); /* default response from getlin() */
+#else
+    nhUse(defres);
+#endif
+    getlin(prompt, outbuf);
+    if (!*outbuf || *outbuf == '\033')
+        return NULL;
+
+    /* strip leading and trailing spaces, condense internal sequences */
+    (void) mungspaces(outbuf);
+    if (strlen(outbuf) >= PL_PSIZ)
+        outbuf[PL_PSIZ - 1] = '\0';
+    return outbuf;
+}
+
 /* historical note: this returns a monster pointer because it used to
    allocate a new bigger block of memory to hold the monster and its name */
 struct monst *
@@ -1290,17 +1357,10 @@ do_mgivenname(void)
     /* special case similar to the one in lookat() */
     Sprintf(qbuf, "What do you want to call %s?",
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
-    buf[0] = '\0';
-#ifdef EDIT_GETLIN
-    /* if there's an existing name, make it be the default answer */
-    if (has_mgivenname(mtmp))
-        Strcpy(buf, MGIVENNAME(mtmp));
-#endif
-    getlin(qbuf, buf);
-    if (!*buf || *buf == '\033')
+    /* use getlin() to get a name string from the player */
+    if (!name_from_player(buf, qbuf,
+                          has_mgivenname(mtmp) ? MGIVENNAME(mtmp) : NULL))
         return;
-    /* strip leading and trailing spaces; unnames monster if all spaces */
-    (void) mungspaces(buf);
 
     /* Unique monsters have their own specific names or titles.
      * Shopkeepers, temple priests and other minions use alternate
@@ -1316,8 +1376,10 @@ do_mgivenname(void)
     } else if (mtmp->isshk
                && !(Deaf || helpless(mtmp)
                     || mtmp->data->msound <= MS_ANIMAL)) {
-        if (!alreadynamed(mtmp, monnambuf, buf))
+        if (!alreadynamed(mtmp, monnambuf, buf)) {
+            SetVoice(mtmp, 0, 80, 0);
             verbalize("I'm %s, not %s.", shkname(mtmp), buf);
+        }
     } else if (mtmp->ispriest || mtmp->isminion || mtmp->isshk
                || mtmp->data == &mons[PM_GHOST]) {
         if (!alreadynamed(mtmp, monnambuf, buf))
@@ -1348,17 +1410,9 @@ do_oname(struct obj *obj)
     Sprintf(qbuf, "What do you want to name %s ",
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
-    buf[0] = '\0';
-#ifdef EDIT_GETLIN
-    /* if there's an existing name, make it be the default answer */
-    if (has_oname(obj))
-        Strcpy(buf, ONAME(obj));
-#endif
-    getlin(qbuf, buf);
-    if (!*buf || *buf == '\033')
+    /* use getlin() to get a name string from the player */
+    if (!name_from_player(buf, qbuf, safe_oname(obj)))
         return;
-    /* strip leading and trailing spaces; unnames item if all spaces */
-    (void) mungspaces(buf);
 
     /*
      * We don't violate illiteracy conduct here, although it is
@@ -1701,14 +1755,8 @@ docall(struct obj *obj)
                          docall_xname, simpleonames, "thing");
     /* pointer to old name */
     str1 = &(objects[obj->otyp].oc_uname);
-    buf[0] = '\0';
-#ifdef EDIT_GETLIN
-    /* if there's an existing name, make it be the default answer */
-    if (*str1)
-        Strcpy(buf, *str1);
-#endif
-    getlin(qbuf, buf);
-    if (!*buf || *buf == '\033')
+    /* use getlin() to get a name string from the player */
+    if (!name_from_player(buf, qbuf, *str1))
         return;
 
     /* clear old name */
@@ -1758,7 +1806,7 @@ namefloorobj(void)
     }
     if (!obj) {
         /* "under you" is safe here since there's no object to hide under */
-        pline("There doesn't seem to be any object %s.",
+        There("doesn't seem to be any object %s.",
               u_at(cc.x, cc.y) ? "under you" : "there");
         return;
     }
@@ -1925,21 +1973,15 @@ x_monnam(
             EHalluc_resistance = 1L;
         if (!do_invis)
             mtmp->minvis = 0;
-        name = priestname(mtmp, article, buf2);
+        /* EXACT_NAME will force "of <deity>" on the Astral Plane */
+        name = priestname(mtmp, article,
+                          ((suppress & EXACT_NAME) == EXACT_NAME), buf2);
         EHalluc_resistance = save_prop;
         mtmp->minvis = save_invis;
         if (article == ARTICLE_NONE && !strncmp(name, "the ", 4))
             name += 4;
         return strcpy(buf, name);
     }
-#if 0   /* [now handled by mon_pmname()] */
-    /* an "aligned priest" not flagged as a priest or minion should be
-       "priest" or "priestess" (normally handled by priestname()) */
-    if (mdat == &mons[PM_ALIGNED_CLERIC])
-        pm_name = mtmp->female ? "priestess" : "priest";
-    else if (mdat == &mons[PM_HIGH_CLERIC] && mtmp->female)
-        pm_name = "high priestess";
-#endif
 
     /* Shopkeepers: use shopkeeper name.  For normal shopkeepers, just
      * "Asidonhopo"; for unusual ones, "Asidonhopo the invisible
@@ -2179,10 +2221,10 @@ Amonnam(struct monst *mtmp)
 /* used for monster ID by the '/', ';', and 'C' commands to block remote
    identification of the endgame altars via their attending priests */
 char *
-distant_monnam(struct monst *mon,
-               int article, /* only ARTICLE_NONE and ARTICLE_THE
-                               are handled here */
-               char *outbuf)
+distant_monnam(
+    struct monst *mon,
+    int article, /* only ARTICLE_NONE and ARTICLE_THE are handled here */
+    char *outbuf)
 {
     /* high priest(ess)'s identity is concealed on the Astral Plane,
        unless you're adjacent (overridden for hallucination which does

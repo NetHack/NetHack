@@ -3,7 +3,6 @@
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
-#include "integer.h"
 #include <ctype.h>
 
 extern const struct symparse loadsyms[];
@@ -543,6 +542,33 @@ mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *retflags)
     return buf;
 }
 
+/*
+ * helper routine if a window port wants to extract the unicode
+ * representation from a glyph representation in the string;
+ * the returned string is the remainder of the string after
+ * extracting the \GNNNNNNNN information.
+ */
+const char *
+mixed_to_glyphinfo(const char *str, glyph_info *gip)
+{
+    int dcount, ggv;
+
+    if (!str || !gip)
+        return " ";
+
+    *gip = nul_glyphinfo;
+    if (*str == '\\' && *(str + 1) == 'G') {
+        if ((dcount = decode_glyph(str + 2, &ggv))) {
+            map_glyphinfo(0, 0, ggv, 0, gip);
+            /* 'str' is ready for the next loop iteration and
+                '*str' should not be copied at the end of this
+                iteration */
+            str += (dcount + 2);
+        }
+    }
+    return str;
+}
+
 void
 dump_all_glyphids(FILE *fp)
 {
@@ -599,8 +625,8 @@ add_custom_urep_entry(
         gdc->details = 0;
         gdc->details_end = 0;
     }
-    details = find_matching_symset_customization(customization_name,
-                                                 custom_symbols, which_set);
+    details = find_matching_symset_customiz(customization_name,
+                                            custom_symbols, which_set);
     if (details) {
         while (details) {
             if (details->content.urep.glyphidx == glyphidx) {

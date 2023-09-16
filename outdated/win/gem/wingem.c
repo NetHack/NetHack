@@ -495,7 +495,7 @@ Gem_player_selection()
  * plname is filled either by an option (-u Player  or  -uPlayer) or
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting pl_character.
- * Always called after init_nhwindows() and before init_sound_and_display_gamewindows().
+ * Always called after init_nhwindows() and before init_sound_disp_gamewindows().
  */
 
 void

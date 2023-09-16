@@ -53,10 +53,11 @@ struct tmpbranch {
 /*
  *    Flags that map into the dungeon flags bitfields.
  */
-#define TOWN 1 /* levels only */
-#define HELLISH 2
-#define MAZELIKE 4
-#define ROGUELIKE 8
+#define TOWN        0x01 /* levels only */
+#define HELLISH     0x02
+#define MAZELIKE    0x04
+#define ROGUELIKE   0x08
+#define UNCONNECTED 0x10
 
 #define D_ALIGN_NONE 0
 #define D_ALIGN_CHAOTIC (AM_CHAOTIC << 4)

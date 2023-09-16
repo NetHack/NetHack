@@ -38,7 +38,6 @@
 #endif /* POSIX_TYPES */
 #ifdef LINUX
 #include <sys/ioctl.h>
-#undef delay_output /* curses redefines this */
 #include <curses.h>
 #endif
 #define kill_sym c_cc[VKILL]

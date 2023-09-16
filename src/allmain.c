@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1652831519 2022/05/17 23:51:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.185 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1693359544 2023/08/30 01:39:04 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.220 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -14,6 +14,7 @@
 
 static void moveloop_preamble(boolean);
 static void u_calc_moveamt(int);
+static void maybe_do_tutorial(void);
 #ifdef POSITIONBAR
 static void do_positionbar(void);
 #endif
@@ -25,9 +26,14 @@ static void debug_fields(const char *);
 static void dump_enums(void);
 #endif
 
+/*ARGSUSED*/
 void
-early_init(void)
+early_init(int argc UNUSED, char *argv[] UNUSED)
 {
+#ifdef CRASHREPORT
+	// Do this as early as possible, but let ports do other things first.
+    crashreport_init(argc, argv);
+#endif
     decl_globals_init();
     objects_globals_init();
     monst_globals_init();
@@ -67,6 +73,9 @@ moveloop_preamble(boolean resuming)
            clairvoyance (wizard with cornuthaum perhaps?); without this,
            first "random" occurrence would always kick in on turn 1 */
         gc.context.seer_turn = (long) rnd(30);
+        /* give hero initial movement points; new game only--for restore,
+           pending movement points were included in the save file */
+        u.umovement = NORMAL_SPEED;
     }
     gc.context.botlx = TRUE; /* for STATUS_HILITES */
     if (resuming) { /* restoring old game */
@@ -82,7 +91,6 @@ moveloop_preamble(boolean resuming)
     initrack();
 
     u.uz0.dlevel = u.uz.dlevel;
-    gy.youmonst.movement = NORMAL_SPEED; /* give hero some movement points */
     gc.context.move = 0;
 
     gp.program_state.in_moveloop = 1;
@@ -134,9 +142,9 @@ u_calc_moveamt(int wtcap)
         break;
     }
 
-    gy.youmonst.movement += moveamt;
-    if (gy.youmonst.movement < 0)
-        gy.youmonst.movement = 0;
+    u.umovement += moveamt;
+    if (u.umovement < 0)
+        u.umovement = 0;
 }
 
 #if defined(MICRO) || defined(WIN32)
@@ -167,7 +175,7 @@ moveloop_core(void)
 
     if (gc.context.move) {
         /* actual time passed */
-        gy.youmonst.movement -= NORMAL_SPEED;
+        u.umovement -= NORMAL_SPEED;
 
         do { /* hero can't move this turn loop */
             mvl_wtcap = encumber_msg();
@@ -175,12 +183,12 @@ moveloop_core(void)
             gc.context.mon_moving = TRUE;
             do {
                 monscanmove = movemon();
-                if (gy.youmonst.movement >= NORMAL_SPEED)
+                if (u.umovement >= NORMAL_SPEED)
                     break; /* it's now your turn */
             } while (monscanmove);
             gc.context.mon_moving = FALSE;
 
-            if (!monscanmove && gy.youmonst.movement < NORMAL_SPEED) {
+            if (!monscanmove && u.umovement < NORMAL_SPEED) {
                 /* both hero and monsters are out of steam this round */
                 struct monst *mtmp;
 
@@ -303,7 +311,7 @@ moveloop_core(void)
                     }
                 }
 
-                if (Searching && gm.multi >= 0)
+                if (!gl.level.flags.noautosearch && Searching && gm.multi >= 0)
                     (void) dosearch0(1);
                 if (Warning)
                     warnreveal();
@@ -332,7 +340,7 @@ moveloop_core(void)
                 /* vision will be updated as bubbles move */
                 if (Is_waterlevel(&u.uz) || Is_airlevel(&u.uz))
                     movebubbles();
-                else if (Is_firelevel(&u.uz))
+                else if (gl.level.flags.fumaroles)
                     fumaroles();
 
                 /* when immobile, count is in turns */
@@ -346,7 +354,7 @@ moveloop_core(void)
                     }
                 }
             }
-        } while (gy.youmonst.movement < NORMAL_SPEED); /* hero can't move */
+        } while (u.umovement < NORMAL_SPEED); /* hero can't move */
 
         /******************************************/
         /* once-per-hero-took-time things go here */
@@ -354,7 +362,7 @@ moveloop_core(void)
 
         gh.hero_seq++; /* moves*8 + n for n == 1..7 */
 
-        /* although we checked for encumberance above, we need to
+        /* although we checked for encumbrance above, we need to
            check again for message purposes, as the weight of
            inventory may have changed in, e.g., nh_timeout(); we do
            need two checks here so that the player gets feedback
@@ -498,12 +506,42 @@ moveloop_core(void)
         /* [should this be flush_screen() instead?] */
         display_nhwindow(WIN_MAP, FALSE);
     }
+
+    if (gl.luacore && nhcb_counts[NHCB_END_TURN]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_END_TURN]);
+        nhl_pcall(gl.luacore, 1, 0);
+    }
+}
+
+static void
+maybe_do_tutorial(void)
+{
+    s_level *sp = find_level("tut-1");
+
+    if (!sp)
+        return;
+
+    if (ask_do_tutorial()) {
+        assign_level(&u.ucamefrom, &u.uz);
+        iflags.nofollowers = TRUE;
+        schedule_goto(&sp->dlevel, UTOTYPE_NONE,
+                      "Entering the tutorial.", (char *) 0);
+        deferred_goto();
+        vision_recalc(0);
+        docrt();
+        iflags.nofollowers = FALSE;
+    }
 }
 
 void
 moveloop(boolean resuming)
 {
     moveloop_preamble(resuming);
+
+    if (!resuming)
+        maybe_do_tutorial();
+
     for (;;) {
         moveloop_core();
     }
@@ -610,7 +648,7 @@ stop_occupation(void)
     if (go.occupation) {
         if (!maybe_finished_meal(TRUE))
             You("stop %s.", go.occtxt);
-        go.occupation = 0;
+        go.occupation = (int (*)(void)) 0;
         gc.context.botl = TRUE; /* in case u.uhs changed */
         nomul(0);
     } else if (gm.multi >= 0) {
@@ -620,14 +658,18 @@ stop_occupation(void)
 }
 
 void
-init_sound_and_display_gamewindows(void)
+init_sound_disp_gamewindows(void)
 {
     int menu_behavior = MENU_BEHAVE_STANDARD;
 
     activate_chosen_soundlib();
 
-    SoundAchievement(0, sa2_splashscreen, 0);
-    /* ToDo: new splash screen invocation will go here */
+    if (iflags.wc_splash_screen && !flags.randomall) {
+        SoundAchievement(0, sa2_splashscreen, 0);
+        /* ToDo: new splash screen invocation will go here */
+    } else {
+        SoundAchievement(0, sa2_newgame_nosplash, 0);
+    }
 
     WIN_MESSAGE = create_nhwindow(NHW_MESSAGE);
     if (VIA_WINDOWPORT()) {
@@ -649,7 +691,7 @@ init_sound_and_display_gamewindows(void)
 
 #ifdef MAC
     /* This _is_ the right place for this - maybe we will
-     * have to split init_sound_and_display_gamewindows into
+     * have to split init_sound_disp_gamewindows into
      * create_gamewindows and show_gamewindows to get rid of this ifdef...
      */
     if (!strcmp(windowprocs.name, "mac"))
@@ -783,7 +825,7 @@ welcome(boolean new_game) /* false => restoring an old game */
         livelog_printf(LL_ACHIEVE, "%s the%s entered the dungeon",
                        gp.plname, buf);
     } else {
-        /* if restroing in Gehennom, give same hot/smoky message as when
+        /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */
         hellish_smoke_mesg();
     }
@@ -793,22 +835,32 @@ welcome(boolean new_game) /* false => restoring an old game */
 static void
 do_positionbar(void)
 {
+    /* FIXME: this will break if any coordinate is too big for (char);
+       the sys/msdos/vid*.c code uses (unsigned char) which is less
+       vulnerable but not guaranteed to be able to hold coordxy values;
+       also, there doesn't appear to be any need for this to be static,
+       nor to contain pairs of (> or <) and x; it could just be a full
+       line of spaces and > or < characters with update_positionbar()
+       revised to reconstruct the x values for non-space characters */
     static char pbar[COLNO];
     char *p;
-    stairway *stway = gs.stairs;
+    stairway *stway;
+    coordxy x, y;
+    int glyph, symbol;
 
     p = pbar;
     /* TODO: use the same method as getpos() so objects don't cover stairs */
-    while (stway) {
-        int x = stway->sx;
-        int y = stway->sy;
-        int glyph = glyph_to_cmap(gl.level.locations[x][y].glyph);
+    /* FIXME: traversing 'stairs' list ignores mimics that pose as stairs */
+    for (stway = gs.stairs; stway; stway = stway->next) {
+        x = stway->sx;
+        y = stway->sy;
+        glyph = levl[x][y].glyph;
+        symbol = glyph_to_cmap(glyph);
 
-        if (is_cmap_stairs(glyph)) {
+        if (is_cmap_stairs(symbol)) {
             *p++ = (stway->up ? '<' : '>');
-            *p++ = stway->sx;
+            *p++ = (char) x;
         }
-        stway = stway->next;
      }
 
     /* hero location */
@@ -858,6 +910,9 @@ static const struct early_opt earlyopts[] = {
 #endif
 #ifdef WIN32
     { ARG_WINDOWS, "windows", 4, TRUE },
+#endif
+#ifdef CRASHREPORT
+    { ARG_BIDSHOW, "bidshow", 7, FALSE },
 #endif
 };
 
@@ -919,11 +974,15 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
 
             if (extended_opt) {
                 extended_opt++;
+                    /* Deprecated in favor of "copy" - remove no later
+                       than  next major version */
                 if (match_optname(extended_opt, "paste", 5, FALSE)) {
+                    insert_into_pastebuf = TRUE;
+                } else if(match_optname(extended_opt, "copy", 4, FALSE)) {
                     insert_into_pastebuf = TRUE;
                 } else {
                     raw_printf(
-                   "-%sversion can only be extended with -%sversion:paste.\n",
+                   "-%sversion can only be extended with -%sversion:copy.\n",
                                dashdash, dashdash);
                     return TRUE;
                 }
@@ -942,6 +1001,11 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
         case ARG_DUMPGLYPHIDS:
             dump_glyphids();
             return 2;
+#endif
+#ifdef CRASHREPORT
+	case ARG_BIDSHOW:
+	    crashreport_bidshow();
+	    return 2;
 #endif
 #ifdef WIN32
         case ARG_WINDOWS:

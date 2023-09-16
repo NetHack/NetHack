@@ -55,6 +55,11 @@ if percent(50) then
    end
 end
 
+-- uncontroled arrival (via trap door, level teleport) will be in the central
+-- portion of level to prevent ending up stuck in the treasure area, whether
+-- arriving from above or below (despite this being bottom of Mines branch,
+-- hero might arrive from below by invoking Wiz role's Eye of the Aethiopica)
+des.teleport_region({ region={23,03,48,16}, region_islev=1 })
 
 -- Dungeon Description
 des.feature("fountain", {14,13})

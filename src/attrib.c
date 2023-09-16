@@ -23,9 +23,9 @@ static const struct innate {
     schar ulevel;
     long *ability;
     const char *gainstr, *losestr;
-} arc_abil[] = { { 1, &(HStealth), "", "" },
-                 { 1, &(HFast), "", "" },
-                 { 10, &(HSearching), "perceptive", "" },
+} arc_abil[] = { { 1, &(HSearching), "", "" },
+                 { 5, &(HStealth), "stealthy", "" },
+                 { 10, &(HFast), "quick", "slow" },
                  { 0, 0, 0, 0 } },
 
   bar_abil[] = { { 1, &(HPoison_resistance), "", "" },
@@ -78,7 +78,7 @@ static const struct innate {
                  { 0, 0, 0, 0 } },
 
   val_abil[] = { { 1, &(HCold_resistance), "", "" },
-                 { 1, &(HStealth), "", "" },
+                 { 3, &(HStealth), "stealthy", "" },
                  { 7, &(HFast), "quick", "slow" },
                  { 0, 0, 0, 0 } },
 
@@ -257,7 +257,7 @@ losestr(int num, const char *knam, schar k_format)
 #else
     nhUse(olduhpmax);
 #endif
-    /* 'num' chould have been reduced to 0 in the minimum strength loop;
+    /* 'num' could have been reduced to 0 in the minimum strength loop;
        '(Upolyd || !waspolyd)' is True unless damage caused rehumanization */
     if (num > 0 && (Upolyd || !waspolyd))
         (void) adjattrib(A_STR, -num, 1);
@@ -886,7 +886,8 @@ from_what(int propidx) /* special cases can have negative values */
              * There are exceptions.  Versatile jumping from spell or boots
              * takes priority over knight's innate but limited jumping.
              */
-            if (propidx == BLINDED && u.uroleplay.blind)
+            if ((propidx == BLINDED && u.uroleplay.blind)
+                || (propidx == DEAF && u.uroleplay.deaf))
                 Sprintf(buf, " from birth");
             else if (innateness == FROM_ROLE || innateness == FROM_RACE)
                 Strcpy(buf, " innately");
@@ -913,6 +914,11 @@ from_what(int propidx) /* special cases can have negative values */
                                              : ysimple_name(obj));
             else if (propidx == BLINDED && Blindfolded_only)
                 Sprintf(buf, because_of, ysimple_name(ublindf));
+            else if (propidx == BLINDED && u.ucreamed
+                     && BlindedTimeout == (long) u.ucreamed
+                     && !EBlinded && !(HBlinded & ~TIMEOUT))
+                Sprintf(buf, "due to goop coverting your %s",
+                        body_part(FACE));
 
             /* remove some verbosity and/or redundancy */
             if ((p = strstri(buf, " pair of ")) != 0)
@@ -926,7 +932,8 @@ from_what(int propidx) /* special cases can have negative values */
                replace this with what_blocks() comparable to what_gives() */
             switch (-propidx) {
             case BLINDED:
-                if (is_art(ublindf, ART_EYES_OF_THE_OVERWORLD))
+                /* wearing the Eyes of the Overworld overrides blindness */
+                if (BBlinded && is_art(ublindf, ART_EYES_OF_THE_OVERWORLD))
                     Sprintf(buf, because_of, bare_artifactname(ublindf));
                 break;
             case INVIS:

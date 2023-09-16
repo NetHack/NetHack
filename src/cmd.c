@@ -1,4 +1,4 @@
-/* NetHack 3.7	cmd.c	$NHDT-Date: 1671222065 2022/12/16 20:21:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.650 $ */
+/* NetHack 3.7	cmd.c	$NHDT-Date: 1684791777 2023/05/22 21:42:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.677 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -43,7 +43,7 @@ extern int dofire(void);             /**/
 extern int dothrow(void);            /**/
 extern int doeat(void);              /**/
 extern int done2(void);              /**/
-extern int vanquished(void);         /**/
+extern int dovanquished(void);       /**/
 extern int doengrave(void);          /**/
 extern int dopickup(void);           /**/
 extern int ddoinv(void);             /**/
@@ -482,6 +482,15 @@ can_do_extcmd(const struct ext_func_tab *extcmd)
 {
     int ecflags = extcmd->flags;
 
+    if (gl.luacore && nhcb_counts[NHCB_CMD_BEFORE]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_CMD_BEFORE]);
+        lua_pushstring(gl.luacore, extcmd->ef_txt);
+        nhl_pcall(gl.luacore, 2, 1);
+        if (!lua_toboolean(gl.luacore, -1))
+            return FALSE;
+    }
+
     if (!wizard && (ecflags & WIZMODECMD)) {
         pline(unavailcmd, extcmd->ef_txt);
         return FALSE;
@@ -572,7 +581,8 @@ int
 doextlist(void)
 {
     register const struct ext_func_tab *efp = (struct ext_func_tab *) 0;
-    char buf[BUFSZ], searchbuf[BUFSZ], promptbuf[QBUFSZ];
+    char buf[BUFSZ], searchbuf[BUFSZ], descbuf[BUFSZ], promptbuf[QBUFSZ];
+    const char *cmd_desc;
     winid menuwin;
     anything any;
     menu_item *selected;
@@ -645,20 +655,10 @@ doextlist(void)
             for (efp = extcmdlist; efp->ef_txt; efp++) {
                 int wizc;
 
-                if ((efp->flags & (CMD_NOT_AVAILABLE|INTERNALCMD)) != 0)
+                if ((efp->flags & (CMD_NOT_AVAILABLE | INTERNALCMD)) != 0)
                     continue;
                 /* if hiding non-autocomplete commands, skip such */
                 if (menumode == 1 && (efp->flags & AUTOCOMPLETE) == 0)
-                    continue;
-                /* if searching, skip this command if it doesn't match */
-                if (*searchbuf
-                    /* first try case-insensitive substring match */
-                    && !strstri(efp->ef_txt, searchbuf)
-                    && !strstri(efp->ef_desc, searchbuf)
-                    /* wildcard support; most interfaces use case-insensitve
-                       pmatch rather than regexp for menu searching */
-                    && !pmatchi(searchbuf, efp->ef_txt)
-                    && !pmatchi(searchbuf, efp->ef_desc))
                     continue;
                 /* skip wizard mode commands if not in wizard mode;
                    when showing two sections, skip wizard mode commands
@@ -667,6 +667,26 @@ doextlist(void)
                 if (wizc && !wizard)
                     continue;
                 if (!onelist && pass != wizc)
+                    continue;
+                /* command descripton might get modified on the fly */
+                cmd_desc = efp->ef_desc;
+                /* suppress part of the descripton for #genocided if it
+                   doesn't apply during the current game */
+                if (!wizard && !discover
+                    && (efp->flags & GENERALCMD) != 0 /* minor optimization */
+                    && strstri(cmd_desc, "extinct"))
+                    cmd_desc = strsubst(strcpy(descbuf, cmd_desc),
+                                        " been genocided or become extinct",
+                                        " been genocided");
+                /* if searching, skip this command if it doesn't match */
+                if (*searchbuf
+                    /* first try case-insensitive substring match */
+                    && !strstri(efp->ef_txt, searchbuf)
+                    && !strstri(cmd_desc, searchbuf)
+                    /* wildcard support; most interfaces use case-insensitive
+                       pmatch rather than regexp for menu searching */
+                    && !pmatchi(searchbuf, efp->ef_txt)
+                    && !pmatchi(searchbuf, cmd_desc))
                     continue;
 
                 /* We're about to show an item, have we shown the menu yet?
@@ -683,7 +703,7 @@ doextlist(void)
                 /* longest ef_txt at present is "wizrumorcheck" (13 chars);
                    2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
                 Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
-                        doc_extcmd_flagstr(menuwin, efp), efp->ef_desc);
+                        doc_extcmd_flagstr(menuwin, efp), cmd_desc);
                 add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                          clr, buf, MENU_ITEMFLAGS_NONE);
                 ++n;
@@ -1207,18 +1227,23 @@ wiz_makemap(void)
     return ECMD_OK;
 }
 
-/* the #wizmap command - reveal the level map and any traps on it */
+/* the #wizmap command - reveal the level map
+   and any traps or engravings on it */
 static int
 wiz_map(void)
 {
     if (wizard) {
         struct trap *t;
+        struct engr *ep;
         long save_Hconf = HConfusion, save_Hhallu = HHallucination;
 
         HConfusion = HHallucination = 0L;
         for (t = gf.ftrap; t != 0; t = t->ntrap) {
             t->tseen = 1;
             map_trap(t, TRUE);
+        }
+        for (ep = head_engr; ep != 0; ep = ep->nxt_engr) {
+            map_engraving(ep, TRUE);
         }
         do_mapping();
         HConfusion = save_Hconf;
@@ -1363,6 +1388,13 @@ wiz_kill(void)
             break;
         }
     }
+    /* since #wizkill takes no game time, it is possible to kill something
+       in the main dungeon and immediately level teleport into the endgame
+       which will delete the main dungeon's level files; avoid triggering
+       impossible "dmonsfree: 0 removed doesn't match N pending" by forcing
+       dead monster cleanup; we don't track whether anything was actually
+       killed above--if nothing was, this will be benign */
+    dmonsfree();
     /* distinction between ECMD_CANCEL and ECMD_OK is unimportant here */
     return ECMD_OK; /* no time elapses */
 }
@@ -1562,7 +1594,7 @@ wiz_fuzzer(void)
 {
     if (flags.suppress_alert < FEATURE_NOTICE_VER(3,7,0)) {
         pline("The fuzz tester will make NetHack execute random keypresses.");
-        pline("There is no conventional way out of this mode.");
+        There("is no conventional way out of this mode.");
     }
     if (paranoid_query(TRUE, "Do you want to start fuzz testing?"))
         iflags.debug_fuzzer = TRUE; /* Thoth, take the reins */
@@ -1842,15 +1874,15 @@ wiz_map_levltyp(void)
 
 /* temporary? hack, since level type codes aren't the same as screen
    symbols and only the latter have easily accessible descriptions */
-const char *levltyp[] = {
+const char *levltyp[MAX_TYPE + 2] = {
     "stone", "vertical wall", "horizontal wall", "top-left corner wall",
     "top-right corner wall", "bottom-left corner wall",
     "bottom-right corner wall", "cross wall", "tee-up wall", "tee-down wall",
     "tee-left wall", "tee-right wall", "drawbridge wall", "tree",
     "secret door", "secret corridor", "pool", "moat", "water",
-    "drawbridge up", "lava pool", "iron bars", "door", "corridor", "room",
-    "stairs", "ladder", "fountain", "throne", "sink", "grave", "altar", "ice",
-    "drawbridge down", "air", "cloud",
+    "drawbridge up", "lava pool", "lava wall", "iron bars", "door",
+    "corridor", "room", "stairs", "ladder", "fountain", "throne", "sink",
+    "grave", "altar", "ice", "drawbridge down", "air", "cloud",
     /* not a real terrain type, but used for undiggable stone
        by wiz_map_levltyp() */
     "unreachable/undiggable",
@@ -1929,7 +1961,7 @@ wiz_smell(void)
         return ECMD_OK;
     }
 
-    pline("You can move the cursor to a monster that you want to smell.");
+    You("can move the cursor to a monster that you want to smell.");
     do {
         pline("Pick a monster to smell.");
         ans = getpos(&cc, TRUE, "a monster");
@@ -2112,9 +2144,11 @@ wiz_intrinsic(void)
                       oldtimeout ? "increased by" : "set to", amt);
                 break;
             }
-            /* this has to be after incr_timeout() */
+            /* this has to be after incr_itimeout() */
             if (p == LEVITATION || p == FLYING)
                 float_vs_flight();
+            else if (p == PROT_FROM_SHAPE_CHANGERS)
+                rescham();
         }
         if (n >= 1)
             free((genericptr_t) pick_list);
@@ -2565,6 +2599,10 @@ struct ext_func_tab extcmdlist[] = {
               dofire, 0, NULL },
     { M('f'), "force", "force a lock",
               doforce, AUTOCOMPLETE, NULL },
+    { M('g'), "genocided",
+              "list monsters that have been genocided or become extinct",
+              dogenocided,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { ';',    "glance", "show what type of thing a map symbol corresponds to",
               doquickwhatis, IFBURIED | GENERALCMD, NULL },
     { '?',    "help", "give a help message",
@@ -2617,9 +2655,12 @@ struct ext_func_tab extcmdlist[] = {
     { '\0',   "optionsfull", "show all option settings, possibly change them",
               doset, IFBURIED | GENERALCMD | CMD_M_PREFIX, NULL },
     /* #overview used to need autocomplete and has retained that even
-       after being assigned to ^O [old wizard mode ^O is now #wizwhere] */
+       after being assigned to ^O [old wizard mode ^O is now #wizwhere];
+       'm' prefix displays overview as a menu where player can choose a
+       level to supply with an annotation */
     { C('o'), "overview", "show a summary of the explored dungeon",
-              dooverview, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
+              dooverview,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     /* [should #panic actually autocomplete?] */
     { '\0',   "panic", "test panic routine (fatal to game)",
               wiz_panic, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
@@ -2634,7 +2675,7 @@ struct ext_func_tab extcmdlist[] = {
     { M('p'), "pray", "pray to the gods for help",
               dopray, IFBURIED | AUTOCOMPLETE, NULL },
     { C('p'), "prevmsg", "view recent game messages",
-              doprev_message, IFBURIED | GENERALCMD, NULL },
+              doprev_message, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
     { 'P',    "puton", "put on an accessory (ring, amulet, etc)",
               doputon, 0, NULL },
     { 'q',    "quaff", "quaff (drink) something",
@@ -2647,7 +2688,7 @@ struct ext_func_tab extcmdlist[] = {
     { 'r',    "read", "read a scroll or spellbook",
               doread, 0, NULL },
     { C('r'), "redraw", "redraw screen",
-              doredraw, IFBURIED | GENERALCMD, NULL },
+              doredraw, IFBURIED | GENERALCMD | CMD_INSANE, NULL },
     { 'R',    "remove", "remove an accessory (ring, amulet, etc)",
               doremring, 0, NULL },
     { C('a'), "repeat", "repeat a previous command",
@@ -2746,7 +2787,8 @@ struct ext_func_tab extcmdlist[] = {
               /* (see comment for dodown() above */
               doup, CMD_M_PREFIX, NULL },
     { M('V'), "vanquished", "list vanquished monsters",
-              dovanquished, IFBURIED | AUTOCOMPLETE | CMD_M_PREFIX, NULL },
+              dovanquished,
+              IFBURIED | AUTOCOMPLETE | GENERALCMD | CMD_M_PREFIX, NULL },
     { M('v'), "version",
               "list compile time options for this version of NetHack",
               doextversion, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
@@ -3579,10 +3621,12 @@ cmd_from_dir(int dir, int mode)
     return cmd_from_func(move_funcs[dir][mode]);
 }
 
+/* return the key bound to extended command */
 char
 cmd_from_func(int (*fn)(void))
 {
     int i;
+    char ret = '\0';
 
     /* skip NUL; allowing it would wreak havoc */
     for (i = 1; i < 256; ++i) {
@@ -3596,12 +3640,40 @@ cmd_from_func(int (*fn)(void))
             && !gc.Cmd.num_pad)
             continue;
 
-        if (gc.Cmd.commands[i] && gc.Cmd.commands[i]->ef_funct == fn)
-            return (char) i;
+        if (gc.Cmd.commands[i] && gc.Cmd.commands[i]->ef_funct == fn) {
+            if (i >= ' ' && i <= '~')
+                return (char) i;
+            else {
+                ret = (char) i;
+            }
+        }
     }
     if (gc.Cmd.commands[' '] && gc.Cmd.commands[' ']->ef_funct == fn)
         return ' ';
-    return '\0';
+    return ret;
+}
+
+/* return visual interpretation of the key bound to extended command,
+   or the ext cmd name if not bound to any key. */
+char *
+cmd_from_ecname(const char *ecname)
+{
+    static char cmdnamebuf[QBUFSZ];
+    const struct ext_func_tab *extcmd;
+
+    for (extcmd = extcmdlist; extcmd->ef_txt; ++extcmd)
+        if (!strcmp(extcmd->ef_txt, ecname)) {
+            char key = cmd_from_func(extcmd->ef_funct);
+
+            if (key)
+                Sprintf(cmdnamebuf, "%s", visctrl(key));
+            else
+                Sprintf(cmdnamebuf, "#%s", ecname);
+            return cmdnamebuf;
+        }
+
+    cmdnamebuf[0] = '\0';
+    return cmdnamebuf;
 }
 
 static const char *
@@ -4056,14 +4128,14 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 static int
 wiz_display_macros(void)
 {
+    static const char display_issues[] = "Display macro issues:";
     char buf[BUFSZ];
     winid win;
-    int test, trouble = 0, no_glyph = NO_GLYPH, max_glyph = MAX_GLYPH;
-    static const char *const display_issues = "Display macro issues:";
+    int glyph, test, trouble = 0, no_glyph = NO_GLYPH, max_glyph = MAX_GLYPH;
 
     win = create_nhwindow(NHW_TEXT);
 
-    for (int glyph = 0; glyph < MAX_GLYPH; ++glyph) {
+    for (glyph = 0; glyph < MAX_GLYPH; ++glyph) {
         /* glyph_is_cmap / glyph_to_cmap() */
         if (glyph_is_cmap(glyph)) {
             test = glyph_to_cmap(glyph);
@@ -4200,6 +4272,14 @@ you_sanity_check(void)
 void
 sanity_check(void)
 {
+    if (iflags.sanity_no_check) {
+        /* in case a recurring sanity_check warning occurs, we mustn't
+           re-trigger it when ^P is used, otherwise msg_window:Single
+           and msg_window:Combination will always repeat the most recent
+           instance, never able to go back to any earlier messages */
+        iflags.sanity_no_check = FALSE;
+        return;
+    }
     you_sanity_check();
     obj_sanity_check();
     timer_sanity_check();
@@ -4207,6 +4287,7 @@ sanity_check(void)
     light_sources_sanity_check();
     bc_sanity_check();
     trap_sanity_check();
+    engraving_sanity_check();
 }
 
 /* qsort() comparison routine for use in list_migrating_mons() */
@@ -4923,6 +5004,12 @@ rhack(char *cmd)
                         cmdq_clear(CQ_REPEAT);
                     }
                 }
+                /* some commands shouldn't trigger sanity_check() because
+                   if it produces output that might interfere with them;
+                   note: if sanity_check is False, this has no effect */
+                if ((tlist->flags & CMD_INSANE) != 0)
+                    iflags.sanity_no_check = iflags.sanity_check;
+
                 res = (*func)(); /* perform the command */
                 /* if 'func' is doextcmd(), 'tlist' is for Cmd.commands['#']
                    rather than for the command that doextcmd() just ran;
@@ -5166,6 +5253,7 @@ getdir(const char *s)
     }
 
  retry:
+    gp.program_state.input_state = getdirInp;
     if (gi.in_doagain || *readchar_queue)
         dirsym = readchar();
     else
@@ -5838,7 +5926,7 @@ act_on_act(
 
     switch (act) {
     case MCMD_TRAVEL:
-        /* FIXME: player has explicilty picked "travel to this location"
+        /* FIXME: player has explicitly picked "travel to this location"
            from the menu but it will only work if flags.travelcmd is True.
            That option is intended as way to guard against stray mouse
            clicks and shouldn't inhibit explicit travel. */
@@ -6175,7 +6263,7 @@ get_count(
     unsigned gc_flags)   /* control flags: GC_SAVEHIST, GC_ECHOFIRST */
 {
     char qbuf[QBUFSZ];
-    int key;
+    int key, save_input_state = gp.program_state.input_state;
     long cnt = 0L, first = inkey ? (long) (inkey - '0') : 0L;
     boolean backspaced = FALSE, showzero = TRUE,
             /* should "Count: 123" go into message history? */
@@ -6195,8 +6283,9 @@ get_count(
             key = inkey;
             inkey = '\0';
         } else {
-            gp.program_state.getting_a_command = 1; /* readchar altmeta
-                                                    * compatibility */
+            /* if readchar() has already been called in this loop, it will
+               have reset input_state; put that back to its previous value */
+            gp.program_state.input_state = save_input_state;
             key = readchar();
         }
 
@@ -6256,9 +6345,9 @@ parse(void)
     gc.context.move = TRUE; /* assume next command will take game time */
     flush_screen(1); /* Flush screen buffer. Put the cursor on the hero. */
 
-    gp.program_state.getting_a_command = 1; /* affects readchar() behavior for
-                                            * ESC iff 'altmeta' option is On;
-                                            * reset to 0 by readchar() */
+    /* affects readchar() behavior for ESC iff 'altmeta' option is On;
+       reset to 0 by readchar() */
+    gp.program_state.input_state = commandInp;
     if (!gc.Cmd.num_pad || (foo = readchar()) == gc.Cmd.spkeys[NHKF_COUNT]) {
         foo = get_count((char *) 0, '\0', LARGEST_INT,
                         &gc.command_count, GC_NOFLAGS);
@@ -6317,7 +6406,8 @@ hangup(
        must continue running longer before attempting a hangup save. */
     gp.program_state.done_hup++;
     /* defer hangup iff game appears to be in progress */
-    if (gp.program_state.in_moveloop && gp.program_state.something_worth_saving)
+    if (gp.program_state.in_moveloop
+        && gp.program_state.something_worth_saving)
         return;
 #endif /* SAFERHANGUP */
     end_of_input();
@@ -6355,8 +6445,10 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
 {
     register int sym;
 
-    if (iflags.debug_fuzzer)
-        return randomkey();
+    if (iflags.debug_fuzzer) {
+        sym = randomkey();
+        goto readchar_done;
+    }
     if (*readchar_queue)
         sym = *readchar_queue++;
     else if (gi.in_doagain)
@@ -6386,9 +6478,11 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
         sym = '\033';
 #ifdef ALTMETA
     } else if (sym == '\033' && iflags.altmeta
-               && gp.program_state.getting_a_command) {
+               && gp.program_state.input_state != otherInp) {
         /* iflags.altmeta: treat two character ``ESC c'' as single `M-c' but
-           only when we're called by parse() [possibly via get_count()] */
+           only when we're called by parse() [possibly via get_count()]
+           or getpos() [to support Alt+digit] or getdir() [for arrow keys
+           under curses] */
         sym = *readchar_queue ? *readchar_queue++ : pgetchar();
         if (sym == EOF || sym == 0)
             sym = '\033';
@@ -6400,12 +6494,15 @@ readchar_core(coordxy *x, coordxy *y, int *mod)
         gc.clicklook_cc.x = gc.clicklook_cc.y = -1;
         click_to_cmd(*x, *y, *mod);
     }
-    gp.program_state.getting_a_command = 0; /* next readchar() will be for an
-                                            * ordinary char unless parse()
-                                            * sets this back to 1 */
+
+ readchar_done:
+    /* next readchar() will be for an ordinary char unless parse()
+       sets this back to non-zero */
+    gp.program_state.input_state = otherInp;
     return (char) sym;
 }
 
+/* get a character */
 char
 readchar(void)
 {
@@ -6417,11 +6514,13 @@ readchar(void)
     return ch;
 }
 
+/* used by getpos() to accept mouse input as well as keyboard input */
 char
 readchar_poskey(coordxy *x, coordxy *y, int *mod)
 {
     char ch;
 
+    gp.program_state.input_state = getposInp;
     ch = readchar_core(x, y, mod);
     return ch;
 }
@@ -6433,7 +6532,7 @@ dotravel(void)
     coord cc;
 
     /*
-     * Travelling used to be a no-op if user toggled 'travel' option
+     * Traveling used to be a no-op if user toggled 'travel' option
      * Off.  However, travel was initially implemented as a mouse-only
      * command and the original purpose of the option was to be able
      * to prevent clicks on the map from initiating travel.
@@ -6479,8 +6578,17 @@ dotravel(void)
 static int
 dotravel_target(void)
 {
-    if (!isok(iflags.travelcc.x, iflags.travelcc.y))
+    if (!isok(iflags.travelcc.x, iflags.travelcc.y)) {
+        /* assume <0,0>, the value assigned when travel reaches destination */
+        pline("No travel destination set.");
         return ECMD_OK;
+    } else if (u_at(iflags.travelcc.x, iflags.travelcc.y)) {
+        /* maybe interrupted while traveling then just walked rest of way
+           so destination hasn't been reset yet */
+        You("are already here.");
+        iflags.travelcc.x = iflags.travelcc.y = 0;
+        return ECMD_OK;
+    }
 
     iflags.getloc_travelmode = FALSE;
 
@@ -6557,6 +6665,12 @@ yn_function(
         else
             cmdq_clear(CQ_CANNED); /* 'res' is ESC */
     } else {
+#ifdef SND_SPEECH
+        if ((gp.pline_flags & PLINE_SPEECH) != 0) {
+            sound_speak(query);
+            gp.pline_flags &= ~PLINE_SPEECH;
+        }
+#endif
         res = (*windowprocs.win_yn_function)(query, resp, def);
         if (addcmdq)
             cmdq_add_key(CQ_REPEAT, res);
@@ -6572,6 +6686,8 @@ yn_function(
         dumplogmsg(dumplog_buf);
     }
 #endif
+    /* in case we're called via getdir() which sets input_state */
+    gp.program_state.input_state = otherInp;
     return res;
 }
 

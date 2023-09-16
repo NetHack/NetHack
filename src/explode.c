@@ -5,6 +5,7 @@
 #include "hack.h"
 
 static int explosionmask(struct monst *, uchar, char);
+static void engulfer_explosion_msg(uchar, char);
 
 /* Note: Arrays are column first, while the screen is row first */
 static const int explosion[3][3] = {
@@ -113,6 +114,70 @@ explosionmask(
     return res;
 }
 
+static void
+engulfer_explosion_msg(uchar adtyp, char olet)
+{
+    const char *adj = (char *) 0;
+
+    if (digests(u.ustuck->data)) {
+        switch (adtyp) {
+        case AD_FIRE:
+            adj = "heartburn";
+            break;
+        case AD_COLD:
+            adj = "chilly";
+            break;
+        case AD_DISN:
+            if (olet == WAND_CLASS)
+                adj = "irradiated by pure energy";
+            else
+                adj = "perforated";
+            break;
+        case AD_ELEC:
+            adj = "shocked";
+            break;
+        case AD_DRST:
+            adj = "poisoned";
+            break;
+        case AD_ACID:
+            adj = "an upset stomach";
+            break;
+        default:
+            adj = "fried";
+            break;
+        }
+        pline("%s gets %s!", Monnam(u.ustuck), adj);
+    } else {
+        switch (adtyp) {
+        case AD_FIRE:
+            adj = "toasted";
+            break;
+        case AD_COLD:
+            adj = "chilly";
+            break;
+        case AD_DISN:
+            if (olet == WAND_CLASS)
+                adj = "overwhelmed by pure energy";
+            else
+                adj = "perforated";
+            break;
+        case AD_ELEC:
+            adj = "shocked";
+            break;
+        case AD_DRST:
+            adj = "intoxicated";
+            break;
+        case AD_ACID:
+            adj = "burned";
+            break;
+        default:
+            adj = "fried";
+            break;
+        }
+        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
+    }
+}
+
 /* Note: I had to choose one of three possible kinds of "type" when writing
  * this function: a wand type (like in zap.c), an adtyp, or an object type.
  * Wand types get complex because they must be converted to adtyps for
@@ -194,6 +259,8 @@ explode(
     } else if (olet == SCROLL_CLASS) {
         /* ditto */
         exploding_wand_typ = SCR_FIRE;
+    } else if (olet == TRAP_EXPLODE) {
+        type = 0; /* hardcoded to generic magic explosion */
     }
     /* muse_unslime: SCR_FIRE */
     if (expltype < 0) {
@@ -350,7 +417,7 @@ explode(
                                        cmap_to_glyph(shield_static[k]));
                     }
                 curs_on_u(); /* will flush screen and output */
-                delay_output();
+                nh_delay_output();
             }
 
             /* Cover last shield glyph with blast symbol. */
@@ -365,8 +432,8 @@ explode(
                 }
 
         } else { /* delay a little bit. */
-            delay_output();
-            delay_output();
+            nh_delay_output();
+            nh_delay_output();
         }
 
         tmp_at(DISP_END, 0); /* clear the explosion */
@@ -433,65 +500,7 @@ explode(
                     str = hallu_buf;
                 }
                 if (engulfing_u(mtmp)) {
-                    const char *adj = (char *) 0;
-
-                    if (digests(u.ustuck->data)) {
-                        switch (adtyp) {
-                        case AD_FIRE:
-                            adj = "heartburn";
-                            break;
-                        case AD_COLD:
-                            adj = "chilly";
-                            break;
-                        case AD_DISN:
-                            if (olet == WAND_CLASS)
-                                adj = "irradiated by pure energy";
-                            else
-                                adj = "perforated";
-                            break;
-                        case AD_ELEC:
-                            adj = "shocked";
-                            break;
-                        case AD_DRST:
-                            adj = "poisoned";
-                            break;
-                        case AD_ACID:
-                            adj = "an upset stomach";
-                            break;
-                        default:
-                            adj = "fried";
-                            break;
-                        }
-                        pline("%s gets %s!", Monnam(u.ustuck), adj);
-                    } else {
-                        switch (adtyp) {
-                        case AD_FIRE:
-                            adj = "toasted";
-                            break;
-                        case AD_COLD:
-                            adj = "chilly";
-                            break;
-                        case AD_DISN:
-                            if (olet == WAND_CLASS)
-                                adj = "overwhelmed by pure energy";
-                            else
-                                adj = "perforated";
-                            break;
-                        case AD_ELEC:
-                            adj = "shocked";
-                            break;
-                        case AD_DRST:
-                            adj = "intoxicated";
-                            break;
-                        case AD_ACID:
-                            adj = "burned";
-                            break;
-                        default:
-                            adj = "fried";
-                            break;
-                        }
-                        pline("%s gets slightly %s!", Monnam(u.ustuck), adj);
-                    }
+                    engulfer_explosion_msg(adtyp, olet);
                 } else if (cansee(xx, yy)) {
                     if (mtmp->m_ap_type)
                         seemimic(mtmp);
@@ -627,6 +636,8 @@ explode(
         /* You resisted the damage, lets not keep that to ourselves */
         if (uhurt == 1)
             monstseesu_ad(adtyp);
+        else
+            monstunseesu_ad(adtyp);
 
         if (u.uhp <= 0 || (Upolyd && u.mh <= 0)) {
             if (Upolyd) {
@@ -864,7 +875,7 @@ scatter(coordxy sx, coordxy sy,  /* location of objects to scatter */
                 } else {
                     if (scflags & VIS_EFFECTS) {
                         /* tmp_at(gb.bhitpos.x, gb.bhitpos.y); */
-                        /* delay_output(); */
+                        /* nh_delay_output(); */
                     }
                 }
                 stmp->ox = gb.bhitpos.x;

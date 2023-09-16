@@ -55,7 +55,7 @@ struct obj {
                 * oil lamp, tallow/wax candle (1 for no apparent reason?);
                 * marks spinach tins (1 iff corpsenm==NON_PM);
                 * marks tin variety (various: homemade, stir fried, &c);
-                * eggs laid by you (1), eggs upgraded with rojal jelly (2);
+                * eggs laid by you (1), eggs upgraded with royal jelly (2);
                 * Schroedinger's Box (1) or royal coffers for a court (2);
                 * named fruit index;
                 * candy bar wrapper index;
@@ -323,7 +323,7 @@ struct obj {
 #define Is_mbag(o) ((o)->otyp == BAG_OF_HOLDING || (o)->otyp == BAG_OF_TRICKS)
 #define SchroedingersBox(o) ((o)->otyp == LARGE_BOX && (o)->spe == 1)
 /* usually waterproof; random chance to be subjected to leakage if cursed;
-   excludes statues, which aren't vulernable to water even when cursed */
+   excludes statues, which aren't vulnerable to water even when cursed */
 #define Waterproof_container(o) \
     ((o)->otyp == OILSKIN_SACK || (o)->otyp == ICE_BOX || Is_box(o))
 
@@ -436,6 +436,7 @@ struct obj {
 #define ERODE_RUST 1
 #define ERODE_ROT 2
 #define ERODE_CORRODE 3
+#define ERODE_CRACK 4 /* crystal armor */
 
 /* erosion flags for erode_obj() */
 #define EF_NONE 0

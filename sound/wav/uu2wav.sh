@@ -60,4 +60,6 @@ uudecode sound_Wooden_Harp_D.uu
 uudecode sound_Wooden_Harp_E.uu
 uudecode sound_Wooden_Harp_F.uu
 uudecode sound_Wooden_Harp_G.uu
+uudecode sa2_xpleveldown.uu
+uudecode sa2_xplevelup.uu
 

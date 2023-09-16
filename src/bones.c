@@ -381,7 +381,7 @@ can_make_bones(void)
     return TRUE;
 }
 
-/* monster removed before saving a bones file,
+/* monster might need to be removed before saving a bones file,
    in case these characters are not in their home bases */
 static void
 remove_mon_from_bones(struct monst *mtmp)
@@ -390,7 +390,7 @@ remove_mon_from_bones(struct monst *mtmp)
 
     if (mtmp->iswiz || mptr == &mons[PM_MEDUSA]
         || mptr->msound == MS_NEMESIS || mptr->msound == MS_LEADER
-        || mptr == &mons[PM_VLAD_THE_IMPALER]
+        || is_Vlad(mtmp) /* mptr == &mons[VLAD_THE_IMPALER] || cham == VLAD */
         || (mptr == &mons[PM_ORACLE] && !fixuporacle(mtmp)))
         mongone(mtmp);
 }

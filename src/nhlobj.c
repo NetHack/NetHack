@@ -106,7 +106,7 @@ l_obj_getcontents(lua_State *L)
 
 /* Puts object inside another object. */
 /* local box = obj.new("large chest");
-   box.addcontent(obj.new("rock"));
+   box:addcontent(obj.new("rock"));
 */
 static int
 l_obj_add_to_container(lua_State *L)
@@ -126,8 +126,8 @@ l_obj_add_to_container(lua_State *L)
 
     /* was lo->obj merged? */
     if (otmp != lo->obj) {
-        lo->obj->lua_ref_cnt += refs;
         lo->obj = otmp;
+        lo->obj->lua_ref_cnt += refs;
     }
 
     return 0;
@@ -188,6 +188,7 @@ l_obj_objects_to_table(lua_State *L)
 
     if (otyp == -1) {
         nhl_error(L, "l_obj_objects_to_table: Wrong args");
+        /*NOTREACHED*/
         return 0;
     }
 
@@ -489,7 +490,6 @@ l_obj_timer_has(lua_State *L)
     return 0;
 }
 
-
 /* peek at an object timer. return the turn when timer triggers.
    returns 0 if no such timer attached to the object. */
 /* local timeout = o:peek_timer("hatch-egg"); */
@@ -655,3 +655,8 @@ l_obj_register(lua_State *L)
     return 0;
 }
 
+/* for 'onefile' processing where end of this file isn't necessarily the
+   end of the source code seen by the compiler */
+#undef lobj_is_ok
+
+/*nhlobj.c*/

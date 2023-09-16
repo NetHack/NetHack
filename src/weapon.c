@@ -1,4 +1,4 @@
-/* NetHack 3.7	weapon.c	$NHDT-Date: 1646688071 2022/03/07 21:21:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
+/* NetHack 3.7	weapon.c	$NHDT-Date: 1690488665 2023/07/27 20:11:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.111 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -77,11 +77,7 @@ give_may_advance_msg(int skill)
                  : (skill <= P_LAST_WEAPON) ? "weapon "
                      : (skill <= P_LAST_SPELL) ? "spell casting "
                          : "fighting ");
-
-    if (!gc.context.enhance_tip) {
-        gc.context.enhance_tip = TRUE;
-        pline("(Use the #enhance command to advance them.)");
-    }
+    handle_tip(TIP_ENHANCE);
 }
 
 /* weapon's skill category name for use as generalized description of weapon;
@@ -1170,7 +1166,7 @@ enhance_weapon_skill(void)
     int clr = 0;
 
     /* player knows about #enhance, don't show tip anymore */
-    gc.context.enhance_tip = TRUE;
+    gc.context.tips[TIP_ENHANCE] = TRUE;
 
     if (wizard && y_n("Advance skills without practice?") == 'y')
         speedy = TRUE;
@@ -1255,19 +1251,23 @@ enhance_weapon_skill(void)
                 (void) skill_level_name(i, sklnambuf);
                 if (wizard) {
                     if (!iflags.menu_tab_sep)
-                        Snprintf(buf, sizeof(buf), " %s%-*s %-12s %5d(%4d)", prefix,
+                        Snprintf(buf, sizeof buf,
+                                 " %s%-*s %-12s %5d(%4d)", prefix,
                                  longest, P_NAME(i), sklnambuf, P_ADVANCE(i),
                                  practice_needed_to_advance(P_SKILL(i)));
                     else
-                        Snprintf(buf, sizeof(buf), " %s%s\t%s\t%5d(%4d)", prefix, P_NAME(i),
+                        Snprintf(buf, sizeof buf,
+                                 " %s%s\t%s\t%5d(%4d)", prefix, P_NAME(i),
                                  sklnambuf, P_ADVANCE(i),
                                  practice_needed_to_advance(P_SKILL(i)));
                 } else {
                     if (!iflags.menu_tab_sep)
-                        Snprintf(buf, sizeof(buf), " %s %-*s [%s]", prefix, longest,
+                        Snprintf(buf, sizeof buf,
+                                 " %s %-*s [%s]", prefix, longest,
                                  P_NAME(i), sklnambuf);
                     else
-                        Snprintf(buf, sizeof(buf), " %s%s\t[%s]", prefix, P_NAME(i),
+                        Snprintf(buf, sizeof buf,
+                                 " %s%s\t[%s]", prefix, P_NAME(i),
                                  sklnambuf);
                 }
                 any.a_int = can_advance(i, speedy) ? i + 1 : 0;

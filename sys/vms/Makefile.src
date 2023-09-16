@@ -1,5 +1,5 @@
 #	NetHack Makefile (VMS) - for building nethack itself.
-#	NetHack 3.7	Makefile.src	$NHDT-Date: 1609347463 2020/12/30 16:57:43 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.55 $
+#	NetHack 3.7	Makefile.src	$NHDT-Date: 1683748060 2023/05/10 19:47:40 $	$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.60 $
 # Copyright (c) 2011 by Robert Patrick Rankin
 # NetHack may be freely redistributed.  See license for details.
 
@@ -410,7 +410,7 @@ vmsunix.obj :	$(VMS)vmsunix.c $(HACK_H)
 vmsmisc.obj :	$(VMS)vmsmisc.c $(VMS)oldcrtl.c $(CONFIG_H)
 vmsfiles.obj :	$(VMS)vmsfiles.c $(CONFIG_H)
 vmsmail.obj :	$(VMS)vmsmail.c $(CONFIG_H) $(INC)mail.h \
-		$(INC)wintype.h $(INC)winprocs.h
+		$(INC)wintype.h $(INC)winprocs.h $(INC)color.h
 #	conditionally used code -- VMS always wants these
 isaac64.obj :	isaac64.c $(CONFIG_H) $(INC)isaac64.h
 random.obj :	random.c $(HACK_H)
@@ -419,7 +419,7 @@ random.c :	$(SYSSHR)random.c
 tclib.obj :	tclib.c $(CONFIG_H)
 tclib.c :	$(SYSSHR)tclib.c
 	copy $(SYSSHR)tclib.c tclib.c
-#	user interface code -- VMS uses tty or curses or both, not X11
+#	user interface code -- VMS uses tty, not curses or X11
 getline.obj :	$(TTY)getline.c $(HACK_H) $(INC)func_tab.h
 termcap.obj :	$(TTY)termcap.c $(HACK_H) $(INC)tcap.h
 topl.obj :	$(TTY)topl.c $(HACK_H) $(INC)tcap.h

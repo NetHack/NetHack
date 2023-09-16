@@ -93,12 +93,21 @@ enum trap_types {
 };
 
 /* some trap-related function return results */
-enum { Trap_Effect_Finished = 0,
-       Trap_Is_Gone = 0,
-       Trap_Caught_Mon = 1,
-       Trap_Killed_Mon = 2,
-       Trap_Moved_Mon = 3, /* new location, or new level */
+enum trap_result {
+    Trap_Effect_Finished = 0,
+    Trap_Is_Gone = 0,
+    Trap_Caught_Mon = 1,
+    Trap_Killed_Mon = 2,
+    Trap_Moved_Mon = 3, /* new location, or new level */
 };
+
+/* return codes from immune_to_trap() */
+enum trap_immunities {
+    TRAP_NOT_IMMUNE = 0,
+    TRAP_CLEARLY_IMMUNE = 1,
+    TRAP_HIDDEN_IMMUNE = 2,
+};
+
 
 #define is_pit(ttyp) ((ttyp) == PIT || (ttyp) == SPIKED_PIT)
 #define is_hole(ttyp)  ((ttyp) == HOLE || (ttyp) == TRAPDOOR)

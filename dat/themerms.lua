@@ -1,6 +1,7 @@
 -- NetHack themerms.lua	$NHDT-Date: 1652196294 2022/05/10 15:24:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
+--
 -- themerooms is an array of tables and/or functions.
 -- the tables define "frequency", "contents", "mindiff" and "maxdiff".
 -- frequency is optional; if omitted, 1 is assumed.
@@ -91,6 +92,26 @@ themeroom_fills = {
                          des.object();
                       end
       end });
+   end,
+
+   -- Buried zombies
+   function(rm)
+      local diff = nh.level_difficulty()
+      -- start with [1..4] for low difficulty
+      local zombifiable = { "kobold", "gnome", "orc", "dwarf" };
+      if diff > 3 then          -- medium difficulty
+         zombifiable[5], zombifiable[6] = "elf", "human";
+         if diff > 6 then       -- high difficulty (relatively speaking)
+            zombifiable[7], zombifiable[8] = "ettin", "giant";
+         end
+      end
+      for i = 1, (rm.width * rm.height) / 2 do
+         shuffle(zombifiable);
+         local o = des.object({ id = "corpse", montype = zombifiable[1],
+                                buried = true });
+         o:stop_timer("rot-corpse");
+         o:start_timer("zombify-mon", math.random(990, 1010));
+      end
    end,
 
    -- Massacre
@@ -235,10 +256,6 @@ themerooms = {
                     local hei = math.random(math.floor(rm.height / 2), rm.height - 2);
                     des.room({ type = "ordinary", w = wid,h = hei, filled = 1,
                                contents = function()
-                                  des.door({ state="random", wall="all" });
-                                  if (percent(15)) then
-                                     des.door({ state="random", wall="all" });
-                                  end
                                   if (percent(90)) then
                                      des.room({ type = "ordinary", filled = 1,
                                                 contents = function()
@@ -249,11 +266,16 @@ themerooms = {
                                                 end
                                      });
                                   end
+                                  des.door({ state="random", wall="all" });
+                                  if (percent(15)) then
+                                     des.door({ state="random", wall="all" });
+                                  end
                                end
                     });
                  end
       });
    end,
+
    {
       frequency = 6,
       contents = function()
@@ -606,12 +628,41 @@ xx|.....|xx
 }----}
 }}}}}}]], contents = function(m) des.region({ region={3,3,3,3}, type="themed", irregular=true, filled=0, joined=false });
      local nasty_undead = { "giant zombie", "ettin zombie", "vampire lord" };
-     des.object("chest", 2, 2);
-     des.object("chest", 3, 2);
-     des.object("chest", 2, 3);
-     des.object("chest", 3, 3);
+     local chest_spots = { { 2, 2 }, { 3, 2 }, { 2, 3 }, { 3, 3 } };
+
+     shuffle(chest_spots)
+     -- Guarantee an escape item inside one of the chests, to prevent the hero
+     -- falling in from above and becoming permanently stuck
+     -- [cf. generate_way_out_method(sp_lev.c)].
+     -- If the escape item is made of glass or crystal, make sure that the
+     -- chest isn't locked so that kicking it to gain access to its contents
+     -- won't be necessary; otherwise retain lock state from random creation.
+     -- "pick-axe", "dwarvish mattock" could be included in the list of escape
+     -- items but don't normally generate in containers.
+     local escape_items = {
+        "scroll of teleportation", "ring of teleportation",
+        "wand of teleportation", "wand of digging"
+     };
+     local itm = obj.new(escape_items[math.random(#escape_items)]);
+     local itmcls = itm:class()
+     local box
+     if itmcls[ "material" ] == 19 then                         -- GLASS==19
+         -- item is made of glass so explicitly force chest to be unlocked
+	 box = des.object({ id = "chest", coord = chest_spots[1],
+                            olocked = "no" });
+     else
+         -- item isn't made of glass; accept random locked/unlocked state
+	 box = des.object({ id = "chest", coord = chest_spots[1] });
+     end;
+     box:addcontent(itm);
+
+     for i = 2, #chest_spots do
+         des.object({ id = "chest", coord = chest_spots[i] });
+     end
+
      shuffle(nasty_undead);
      des.monster(nasty_undead[1], 2, 2);
+     des.exclusion({ type = "teleport", region = { 2,2, 3,3 } });
 end });
    end,
 

@@ -1,4 +1,4 @@
-/* NetHack 3.7	were.c	$NHDT-Date: 1596498227 2020/08/03 23:43:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.25 $ */
+/* NetHack 3.7	were.c	$NHDT-Date: 1689448846 2023/07/15 19:20:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.34 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -33,6 +33,7 @@ were_change(struct monst *mon)
                 if (howler) {
                     Soundeffect(se_canine_howl, 50);
                     You_hear("a %s howling at the moon.", howler);
+                    wake_nearto(mon->mx, mon->my, 4 * 4);
                 }
             }
         }
@@ -95,6 +96,12 @@ new_were(struct monst *mon)
 {
     int pm;
 
+    /* neither hero nor werecreature can change from human form to
+       critter form if hero has Protection_from_shape_changers extrinsic;
+       if already in critter form, always change to human form for that */
+    if (Protection_from_shape_changers && is_human(mon->data))
+        return;
+
     pm = counter_were(monsndx(mon->data));
     if (pm < LOW_PM) {
         impossible("unknown lycanthrope %s.",
@@ -105,6 +112,7 @@ new_were(struct monst *mon)
     if (canseemon(mon) && !Hallucination)
         pline("%s changes into a %s.", Monnam(mon),
               is_human(&mons[pm]) ? "human"
+                                  /* pmname()+4: skip past "were" prefix */
                                   : pmname(&mons[pm], Mgender(mon)) + 4);
 
     set_mon_data(mon, &mons[pm]);

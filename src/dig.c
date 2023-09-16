@@ -122,7 +122,7 @@ mkcavearea(boolean rockit)
         }
 
         flush_screen(1); /* make sure the new glyphs shows up */
-        delay_output();
+        nh_delay_output();
     }
 
     if (!rockit && levl[u.ux][u.uy].typ == CORR) {
@@ -194,8 +194,8 @@ dig_check(struct monst *madeby, boolean verbose, coordxy x, coordxy y)
             pline_The("throne is too hard to break apart.");
         return FALSE;
     } else if (IS_ALTAR(levl[x][y].typ)
-               && (madeby != BY_OBJECT || Is_astralevel(&u.uz)
-                   || Is_sanctum(&u.uz))) {
+               && (madeby != BY_OBJECT
+                   || (altarmask_at(x, y) & AM_SANCTUM) != 0)) {
         if (verbose)
             pline_The("altar is too hard to break apart.");
         return FALSE;
@@ -1101,6 +1101,11 @@ use_pick_axe2(struct obj *obj)
             } else if (lev->typ == IRONBARS) {
                 pline("Clang!");
                 wake_nearby();
+            } else if (IS_WATERWALL(lev->typ)) {
+                pline("Splash!");
+            } else if (lev->typ == LAVAWALL) {
+                pline("Splash!");
+                (void) fire_damage(uwep, FALSE, rx, ry);
             } else if (IS_TREE(lev->typ)) {
                 You("need an axe to cut down a tree.");
             } else if (IS_ROCK(lev->typ)) {
@@ -1127,7 +1132,7 @@ use_pick_axe2(struct obj *obj)
 
                     trap_with_u->conjoined |= (1 << idx);
                     trap->conjoined |= (1 << adjidx);
-                    pline("You clear some debris from between the pits.");
+                    You("clear some debris from between the pits.");
                 }
             } else if (u.utrap && u.utraptype == TT_PIT
                        && (trap_with_u = t_at(u.ux, u.uy)) != 0) {
@@ -1246,6 +1251,7 @@ watch_dig(struct monst *mtmp, coordxy x, coordxy y, boolean zap)
             mtmp = get_iter_mons(watchman_canseeu);
 
         if (mtmp) {
+            SetVoice(mtmp, 0, 80, 0);
             if (zap || gc.context.digging.warned) {
                 verbalize("Halt, vandal!  You're under arrest!");
                 (void) angry_guards(!!Deaf);
@@ -1453,7 +1459,7 @@ zap_dig(void)
                 }
                 You("loosen a rock from the %s.", ceiling(u.ux, u.uy));
                 pline("It falls on your %s!", body_part(HEAD));
-                dmg = rnd((uarmh && is_metallic(uarmh)) ? 2 : 6);
+                dmg = rnd(hard_helmet(uarmh) ? 2 : 6);
                 losehp(Maybe_Half_Phys(dmg), "falling rock", KILLED_BY_AN);
                 otmp = mksobj_at(ROCK, u.ux, u.uy, FALSE, FALSE);
                 if (otmp) {
@@ -1486,7 +1492,7 @@ zap_dig(void)
             break;
         room = &levl[zx][zy];
         tmp_at(zx, zy);
-        delay_output(); /* wait a little bit */
+        nh_delay_output(); /* wait a little bit */
 
         if (pitdig) { /* we are already in a pit if this is true */
             coord cc;

@@ -175,6 +175,10 @@ curses_refresh_nethack_windows(void)
     map_window = curses_get_nhwin(MAP_WIN);
     inv_window = curses_get_nhwin(INV_WIN);
 
+    if (!iflags.window_inited) {
+        return;
+    }
+
     if ((gm.moves <= 1) && !gi.invent) {
         /* Main windows not yet displayed; refresh base window instead */
         touchwin(stdscr);
@@ -322,7 +326,10 @@ curses_del_nhwin(winid wid)
                    wid);
         return;
     }
-    nhwins[wid].curwin = NULL;
+    if (nhwins[wid].curwin != NULL) {
+        delwin(nhwins[wid].curwin);
+        nhwins[wid].curwin = NULL;
+    }
     nhwins[wid].nhwin = -1;
 }
 
@@ -725,18 +732,22 @@ curses_draw_map(int sx, int sy, int ex, int ey)
 #ifdef MAP_SCROLLBARS
     hsb_back.ch = '-';
     hsb_back.color = SCROLLBAR_BACK_COLOR;
+    hsb_back.framecolor = NO_COLOR;
     hsb_back.attr = A_NORMAL;
     hsb_back.unicode_representation = NULL;
     hsb_bar.ch = '*';
     hsb_bar.color = SCROLLBAR_COLOR;
+    hsb_bar.framecolor = NO_COLOR;
     hsb_bar.attr = A_NORMAL;
     hsb_bar.unicode_representation = NULL;
     vsb_back.ch = '|';
     vsb_back.color = SCROLLBAR_BACK_COLOR;
+    vsb_back.framecolor = NO_COLOR;
     vsb_back.attr = A_NORMAL;
     vsb_back.unicode_representation = NULL;
     vsb_bar.ch = '*';
     vsb_bar.color = SCROLLBAR_COLOR;
+    vsb_bar.framecolor = NO_COLOR;
     vsb_bar.attr = A_NORMAL;
     vsb_bar.unicode_representation = NULL;
 

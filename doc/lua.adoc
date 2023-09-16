@@ -33,6 +33,26 @@ Example:
  local str = nh.an("unicorn");
 
 
+=== callback
+
+Add or remove a lua function to callback list.
+First argument is the callback list, second is the name of the lua function to be called.
+Two arguments adds the callback, if optional 3rd argument is true, removes the callback.
+Cannot add the same function to the same callback list does nothing.
+
+|===
+| cmd_before  | called before an extended command is executed. The command name is given as a parameter. If this function returns false, the command will not execute.
+| level_enter | called when hero enters the level for the first time.
+| level_leave | called when hero leaves the level.
+| end_turn    | called after player input is handled. May not be exact turn, if eg. hero is running or otherwise occupied.
+|===
+
+Example:
+
+ nh.callback("level_enter", "tutorial_enter");
+ nh.callback("level_enter", "tutorial_enter", true);
+
+
 === debug_flags
 
 Set debugging flags.
@@ -88,6 +108,16 @@ Only available if NetHack was compiled with DUMPLOG.
 Example:
 
  local filename = nh.dump_fmtstr("/tmp/nethack.%n.%d.log");
+
+
+=== eckey
+
+Return the key bound to an extended command, or the full extended
+command name, if it is not bound to any key.
+
+Example:
+
+ local k = nh.eckey("help");
 
 
 === getlin
@@ -291,6 +321,7 @@ Example:
 === peek_timer_at
 
 When does timer at location at x,y trigger?
+See <<_timer_types>>.
 
 Example:
 
@@ -301,10 +332,12 @@ Example:
 === pline
 
 Show the text in the message area.
+Second parameter is an optional boolean; if true, force a `--more--` prompt.
 
 Example:
 
  nh.pline("Message text to show.");
+ nh.pline("Waiting for user.", true);
 
 
 === pushkey
@@ -367,6 +400,7 @@ Example:
 === start_timer_at
 
 Start a timer at location x,y, with trigger time of `when` - relative to current turn.
+See <<_timer_types>>.
 
 Example:
 
@@ -377,11 +411,21 @@ Example:
 === stop_timer_at
 
 Stop a timer at location x,y.
+See <<_timer_types>>.
 
 Example:
 
  nh.stop_timer_at(x,y, "melt-ice");
  nh.stop_timer_at({x=5,y=6}, "melt-ice");
+
+
+=== text
+
+Show long texts in a menu window. Wordwraps automatically.
+
+Example:
+
+ nh.text("long long long string\nwith newlines too.");
 
 
 === variable
@@ -442,6 +486,7 @@ Example:
 === door
 
 Create a door at a coordinate on the map, or in a room's wall.
+When adding a door to a <<_room>>, it must be added after the subrooms in the room.
 
 * state is one of "random", "open", "closed", "locked", "nodoor", "broken", or "secret", defaulting to "random".
 
@@ -473,6 +518,8 @@ Example:
 Create an engraving.
 
 * type is one of "dust", "engrave", "burn", "mark", or "blood".
+* optional boolean `degrade` defaults to true; engraving can degrade or be wiped out.
+* optional boolean `guardobjects` defaults to false (unless making a level and the text is "Elbereth"); are items on the engraving protected from monsters.
 
 Example:
 
@@ -481,12 +528,27 @@ Example:
  des.engraving({x,y}, "engrave", "Foo");
 
 
+=== exclusion
+
+Exclude an area of the map from being randomly chosen target when
+falling or teleporting into the level.  Multiple exclusions per level are allowed.
+
+* type is one of "teleport", "teleport-up", or "teleport-down".
+
+Example:
+
+ des.exclusion({ type = "teleport", region = { 0,0, 10,5 } });
+
+
 === feature
 
 Create a feature, and set flags for it.
 Valid features are a fountain, a sink, a pool, a throne, or a tree.
 Throne has `looted` flag, tree has `looted` and `swarm`, fountain has `looted` and `warned`,
 sink has `pudding`, `dishwasher`, and `ring`.
+If passed with no coordinates, it will be placed in a random normal-floor spot
+in the enclosing room or region if one exists, or a random normal-floor spot
+anywhere on the level if one does not exist.
 
 Example:
 
@@ -570,6 +632,10 @@ Set flags for this level.
 | hot           | Level is hot. Dungeon flag "hellish" automatically sets this.
 | cold          | Level is cold.
 | temperate     | Level is neither hot nor cold.
+| nomongen      | Prevents random monster generation.
+| nodeathdrops  | Prevents killed monsters from dropping corpses or random death drops.
+| fumaroles     | Lava emits poison gas clouds at random.
+| stormy        | Clouds create lightning bolts at random.
 |===
 
 Example:
@@ -738,7 +804,8 @@ Example:
 
 === object
 
-Create an object. The table parameter accepts the following:
+Create an object. Returns the object as an <<Obj>> class.
+The table parameter accepts the following:
 
 [options="header"]
 |===
@@ -780,6 +847,7 @@ Example:
  des.object({ class = "%" });
  des.object({ id = "boulder", x = 03, y = 12});
  des.object({ id = "chest", coord = {03, 12}, locked = true, contents = function(obj) des.object("rock"); end });
+ local o = des.object();
 
 
 === random_corridors
@@ -794,6 +862,11 @@ Example:
 === region
 
 Create a room region, which can be irregular; use the boundary <<_map_characters,map character>> to restrict the floodfilled area.
+
+If using the first form with a selection and "lit", the lit area will extend
+outward 1 space from the selection to attempt to accomodate adjacent walls,
+regardless of whether they are actually walls or not. If using "unlit", this
+will not happen.
 
 Example:
 
@@ -896,7 +969,7 @@ Example:
 Example:
 
  des.teleport_region({ region = { x1,y1, x2,y2} });
- des.teleport_region({ region = { x1,y1, x2,y2}, region_islev = 1, exclude = { x1,y1, x2,y2}, exclude_islen = 1, dir = "up" });
+ des.teleport_region({ region = { x1,y1, x2,y2}, region_islev = 1, exclude = { x1,y1, x2,y2}, exclude_islev = 1, dir = "up" });
 
 
 === terrain
@@ -920,6 +993,7 @@ Example:
  des.trap({ type = "hole", x = 1, y = 1 });
  des.trap({ type = "hole", coord = {2, 2} });
  des.trap({ type = "web", coord = {2, 2}, spider_on_web = false, seen = true });
+ des.trap({ type = "falling rock", victim = false });
  des.trap({ type = "rolling boulder", coord = {7, 5}, launchfrom = {-2, -2} });
  des.trap("hole", 3, 4);
  des.trap("level teleport", {5, 8});
@@ -1090,11 +1164,23 @@ Example:
 
 === gradient
 
-Create a "gradient" of selected positions.
+Create a "gradient" of selected positions, radiating outward from a center point
+or line.
+x and y are required; x2 and y2 are not required. If they are provided and are
+different from x and y, the center of the gradient will be a line; otherwise it
+will be a point source at (x,y).
+type is either "radial" or "square"; defaults to "radial" if not provided.
+mindist is not required and is 0 by default. Points within (mindist) tiles of
+the center will always be added to the selection.
+maxdist is required. Points more than (maxdist) tiles from the center will never
+be added to the selection.
+For any given point between mindist and maxdist, there is a random chance it
+will be added to the selection; this chance starts at 100% at mindist and
+decreases linearly to 0% at maxdist.
 
 Example:
 
- local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10, limited = false });
+ local s = selection.gradient({ type = "radial", x = 3, y = 5, x2 = 10, y2 = 12, mindist = 4, maxdist = 10 });
 
 
 === grow
@@ -1336,6 +1422,7 @@ Example:
 === has_timer
 
 Does object have an attached timer of certain type?
+See <<_timer_types>>.
 
 Example:
 
@@ -1346,6 +1433,7 @@ Example:
 
 Peek at an object timer. Returns the turn when timer triggers.
 Returns 0 if no such timer attached to the object.
+See <<_timer_types>>.
 
 Example:
 
@@ -1357,7 +1445,7 @@ Example:
 Stop object timer(s). Return the turn when timer would have triggered.
 Returns 0 if no such timer was attached to the object.
 Without a timer type parameters, stops all timers for the object,
-and returns nothing.
+and returns nothing. See <<_timer_types>>.
 
 Example:
 
@@ -1367,7 +1455,7 @@ Example:
 
 === start_timer
 
-Start an object timer.
+Start an object timer. See <<_timer_types>>.
 
 Example:
 
@@ -1407,6 +1495,7 @@ Example:
 | `"}"`     | moat
 | `"P"`     | pool of water
 | `"L"`     | lava pool
+| `"Z"`     | wall of lava
 | `"I"`     | ice
 | `"W"`     | water
 | `"T"`     | tree
@@ -1424,4 +1513,21 @@ These constants are in the `nhc` table.
 | COLNO | Number of map columns
 | ROWNO | Number of map rows
 | DLB   | 1 or 0, depending if NetHack is compiled with DLB
+|===
+
+
+== Timer types
+
+[%header, cols="20%,10%,70%"]
+|===
+| Name          | Type | Description
+| rot-organic   | obj  | non-corpse object rotting away
+| rot-corpse    | obj  | corpse object rotting away
+| revive-mon    | obj  | monster corpse revival
+| zombify-mon   | obj  | monster corpse rising as a zombie
+| burn-obj      | obj  | light-source object is lit
+| hatch-egg     | obj  | egg hatching
+| fig-transform | obj  | cursed figurine automatical transform
+| shrink-glob   | obj  | glob object shrinking away
+| melt-ice      | map  | ice at map location melts
 |===

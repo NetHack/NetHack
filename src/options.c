@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1661218575 2022/08/23 01:36:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.601 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1687852124 2023/06/27 07:48:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.649 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -17,6 +17,7 @@ NEARDATA struct instance_flags iflags; /* provide linkage */
 #endif
 
 #define BACKWARD_COMPAT
+#define COMPLAIN_ABOUT_PRAYCONFIRM
 
 /* whether the 'msg_window' option is used to control ^P behavior */
 #if defined(TTY_GRAPHICS) || defined(CURSES_GRAPHICS)
@@ -75,7 +76,6 @@ static struct allopt_t allopt_init[] = {
 #define PILE_LIMIT_DFLT 5
 #define rolestring(val, array, field) \
     ((val >= 0) ? array[val].field : (val == ROLE_RANDOM) ? randomrole : none)
-
 
 enum window_option_types {
     MESSAGE_OPTION = 1,
@@ -148,15 +148,18 @@ static const struct paranoia_opts {
     int synMinLen;
     const char *explain; /* for interactive menu */
 } paranoia[] = {
-    /* there are some initial-letter conflicts: "a"ttack vs "a"ll, "attack"
-       takes precedence and "all" isn't present in the interactive menu,
+    /* there are some initial-letter conflicts: "a"ttack vs "A"utoall vs
+       "a"ll, "attack" takes precedence and "all" isn't present in the
+       interactive menu with "Autoall" capitalized there,
        and "d"ie vs "d"eath, synonyms for each other so doesn't matter;
        (also "p"ray vs "P"aranoia, "pray" takes precedence since "Paranoia"
        is just a synonym for "Confirm"); "b"ones vs "br"eak-wand, the
        latter requires at least two letters; "e"at vs "ex"plore,
        "cont"inue eating vs "C"onfirm; "wand"-break vs "Were"-change,
-       both require at least two letters during config processing and use
-       case-senstivity for 'O's interactive menu */
+       both require at least two letters during config processing but use
+       one letter with case-senstivity for 'm O's interactive menu;
+       if any entry or alias beginning with 'n' gets added, aside from "none",
+       the parsing to accept "nofoo" to mean "!foo" will need fixing */
     { PARANOID_CONFIRM, "Confirm", 1, "Paranoia", 2,
       "for \"yes\" confirmations, require \"no\" to reject" },
     { PARANOID_QUIT, "quit", 1, "explore", 2,
@@ -173,12 +176,20 @@ static const struct paranoia_opts {
       "yes vs y to continue eating after first bite when satiated" },
     { PARANOID_WERECHANGE, "Were-change", 2, (const char *) 0, 0,
       "yes vs y to change form when lycanthropy is controllable" },
+    /* extra y/n questions rather than changing y/n to yes/n[o];
+       they switch to yes/no if paranoid:confirm is also set */
     { PARANOID_PRAY, "pray", 1, 0, 0,
-      "y to pray (supersedes old \"prayconfirm\" option)" },
-    { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
-      "always pick from inventory for Remove and Takeoff" },
+      "y required to pray (supersedes old \"prayconfirm\" option)" },
+    { PARANOID_TRAP, "trap", 1, "move-trap", 1,
+      "y required to enter known trap unless considered harmless" },
+    { PARANOID_AUTOALL, "Autoall", 2, "autoselect-all", 2,
+      "y required to pick filter choice 'A' for menustyle:Full" },
+    /* not a yes/n[o] vs y/n change nor a y/n addition */
     { PARANOID_SWIM, "swim", 1, 0, 0,
-      "avoid walking into lava or water" },
+      "'m' prefix necessary to deliberately walk into lava or water" },
+    { PARANOID_REMOVE, "Remove", 1, "Takeoff", 1,
+      /* normally when there is only 1 candidate it's chosen automatically */
+      "always pick from inventory for Remove and Takeoff" },
     /* for config file parsing; interactive menu skips these */
     { 0, "none", 4, 0, 0, 0 }, /* require full word match */
     { ~0, "all", 3, 0, 0, 0 }, /* ditto */
@@ -368,6 +379,64 @@ extern int curses_read_attrs(const char *attrs);
 extern char *curses_fmt_attrs(char *);
 #endif
 
+/* ask user if they want a tutorial, except if tutorial boolean option has
+   been set in config - either on or off - in which case just obey that
+   setting without asking */
+boolean
+ask_do_tutorial(void)
+{
+    boolean dotut = flags.tutorial;
+
+    if (!opt_set_in_config[opt_tutorial]) {
+        winid win;
+        menu_item *sel;
+        anything any;
+        char buf[BUFSZ];
+        const char *rc;
+        boolean norc;
+        int n, pass = 0;
+
+        rc = nh_basename(configfile, TRUE);
+        norc = !strcmp(configfile, "/dev/null");
+        Snprintf(buf, sizeof buf,
+                 "Put \"OPTIONS=!tutorial\" in %s to skip this query.",
+                 (rc && *rc && !norc) ? rc : "your configuration file");
+        do {
+            win = create_nhwindow(NHW_MENU);
+            start_menu(win, MENU_BEHAVE_STANDARD);
+            any = cg.zeroany;
+            any.a_char = 'y';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
+            any.a_char = 'n';
+            add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
+                     ATR_NONE, 0, "No, just start play", MENU_ITEMFLAGS_NONE);
+
+            any = cg.zeroany;
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
+            add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                     ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            if (pass++) /* we'll get here after <space> or <return> */
+                add_menu(win, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, 0, "(Please choose 'y' or 'n'.)",
+                         MENU_ITEMFLAGS_NONE);
+
+            end_menu(win, "Do you want a tutorial?");
+
+            n = select_menu(win, PICK_ONE, &sel);
+            destroy_nhwindow(win);
+        } while (!n);
+        if (n > 0) {
+            dotut = (sel[0].item.a_char == 'y');
+            free((genericptr_t) sel);
+        } else { /* ESC */
+            dotut = FALSE;
+        }
+    }
+    return dotut;
+}
+
 /*
  **********************************
  *
@@ -474,7 +543,7 @@ parseoptions(
     if (!got_match) {
         /* spin through the aliases to see if there's a match in those.
            Note that if multiple delimited aliases for the same option
-           becomes desireable in the future, this is where you'll need
+           becomes desirable in the future, this is where you'll need
            to split a delimited allopt[i].alias field into each
            individual alias */
 
@@ -1261,7 +1330,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
          *      DISCLOSE_PROMPT_DEFAULT_NO   ask with default answer no
          *      DISCLOSE_YES_WITHOUT_PROMPT  always disclose and don't ask
          *      DISCLOSE_NO_WITHOUT_PROMPT   never disclose and don't ask
-         *      DISCLOSE_PROMPT_DEFAULT_SPECIAL  for 'vanquished' only...
+         *      DISCLOSE_PROMPT_DEFAULT_SPECIAL  for 'vanq'/'genod' only...
          *      DISCLOSE_SPECIAL_WITHOUT_PROMPT  ...to set up sort order.
          *
          * Those setting values can be used in the option
@@ -1315,7 +1384,7 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
                     continue;
                 }
                 if (prefix_val != -1) {
-                    if (*dop != 'v') {
+                    if (*dop != 'v' && *dop != 'g') {
                         if (prefix_val == DISCLOSE_PROMPT_DEFAULT_SPECIAL)
                             prefix_val = DISCLOSE_PROMPT_DEFAULT_YES;
                         if (prefix_val == DISCLOSE_SPECIAL_WITHOUT_PROMPT)
@@ -1807,49 +1876,6 @@ optfn_IBMgraphics(int optidx, int req, boolean negated,
     }
     return optn_ok;
 }
-
-#if defined(BACKWARD_COMPAT) && defined(MAC_GRAPHICS_ENV)
-static int
-optfn_MACgraphics(int optidx, int req, boolean negated, char *opts, char *op)
-{
-    boolean badflag = FALSE;
-
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        /* "MACgraphics" */
-        if (!negated) {
-            if (gs.symset[PRIMARYSET].name) {
-                badflag = TRUE;
-            } else {
-                gs.symset[PRIMARYSET].name = dupstr(allopt[optidx].name);
-                if (!read_sym_file(PRIMARYSET)) {
-                    badflag = TRUE;
-                    clear_symsetentry(PRIMARYSET, TRUE);
-                }
-            }
-            if (badflag) {
-                config_error_add("Failure to load symbol set %s.",
-                                 allopt[optidx].name);
-                return FALSE;
-            } else {
-                switch_symbols(TRUE);
-                if (!go.opt_initial && Is_rogue_level(&u.uz))
-                    assign_graphics(ROGUESET);
-            }
-        }
-        return optn_ok;
-    }
-    if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
-}
-#endif /* BACKWARD_COMPAT && MAC_GRAPHICS_ENV */
 
 static int
 optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
@@ -2606,94 +2632,229 @@ optfn_palette(
 }
 #endif /* CHANGE_COLOR */
 
+/* for "paranoid_confirmation:foo" and alias "[!]prayconfirm" */
 static int
 optfn_paranoid_confirmation(
-    int optidx, int req, boolean negated,
+    int optidx, int req, boolean opt_negated,
     char *opts, char *op)
 {
+    boolean fld_negated;
     int i;
+    /*
+     * Player can change required response for some prompts (quit, die,
+     * attack, save-bones, continue-eating, break-wand, Were-change to
+     * need to be "yes<return>" instead of just 'y' keystroke to accept.
+     *
+     * For paranoid_confirm:Confirm, these prompts also need "no<return>"
+     * instead of 'n' or <space> or <return> to reject.  (<escape> always
+     * works as a way to reject.)
+     *
+     * Player can add an extra prompt (pray, AutoAll) that isn't
+     * ordinarily there.  (They ask for 'y' keystroke unless Confirm is
+     * also set, then they'll switch to "yes<return>", "no<return>".)
+     *
+     * Player can also change game's behavior.  paranoid_confirm:swim
+     * can be used to prevent accidentally stepping into water or lava;
+     * player must use the 'm' movement prefix to do that intentionally.
+     * paranoid_confirm:Remove [with synonym parnoid_confirm:Takeoff]
+     * changes the 'R' and 'T' commands [which have differing criteria
+     * for "only one candidate item"] to prompt for inventory item to
+     * remove/takeoff when there is only one candidate, so allows player
+     * a chance to cancel at the pick-an-item prompt or menu.
+     */
 
     if (req == do_init) {
         return optn_ok;
     }
     if (req == do_set) {
-        /* user can change required response for some prompts (quit, die,
-           hit), or add an extra prompt (pray, Remove) that isn't
-           ordinarily there */
+        char prayconfirm[1 + sizeof "pray"];
+        char *pp;
+        boolean plus_or_minus = FALSE;
 
-        if (strncmpi(opts, "prayconfirm", 4) != 0) { /* not prayconfirm */
-            /* at present we don't complain about duplicates for this
-               option, but we do throw away the old settings whenever
-               we process a new one [clearing old flags is essential
-               for handling default paranoid_confirm:pray sanely] */
-            flags.paranoia_bits = 0; /* clear all */
-            if (negated) {
-                flags.paranoia_bits = 0; /* [now redundant...] */
-            } else if (op != empty_optstr) {
-                char *pp, buf[BUFSZ];
+        /*
+         * "prayconfirm" used to be a separate boolean option,
+         * now it is a synonym for paranoid_confirm:+pray and
+         * "!prayconfirm" has become one for paranoid_confirm:-pray.
+         */
+        if (!strncmpi(opts, "prayconfirm", 4)) {
+            if (*op) {
+                /* presence of any value is treated as an error whether
+                   complaining about the 'prayconfirm' deprecation or not;
+                   this will erroneously reject "prayconfirm:true"; too
+                   bad; back when prayconfirm was in active use, tacking on
+                   an explicit value to a boolean option wasn't supported */
+                config_error_add(
+           "deprecated %sprayconfirm option takes no parameters (found '%s')",
+                                 opt_negated ? "!" : "", op);
+                return optn_silenterr;
+            }
+#ifdef COMPLAIN_ABOUT_PRAYCONFIRM
+            /* config file summary of complaints includes this in the count
+               of errors; we'd prefer that it be described as a warning but
+               that isn't supported [not important since this is considered
+               temporary until 'prayconfirm' gets removed altogether] */
+            config_error_add(
+                 "%sprayconfirm option is deprecated; switching to %s:%cpray",
+                             opt_negated ? "!" : "",
+                             allopt[optidx].name,
+                             opt_negated ? '-' : '+');
+            /* keep going */
+#endif
+            /* convert prayconfirm to paranoid_confirm:+pray and
+               !prayconfirm to paranoid_confirm:-pray */
+            Sprintf(prayconfirm, "%cpray", opt_negated ? '-' : '+');
+            op = prayconfirm;
+            /* possibly changing !prayconfirm to paranoid_confirm:-pray
+               which clears a paranoia bit but isn't a negated option */
+            opt_negated = FALSE;
+        /*
+         * end of 'prayconfirm' processing
+         */
 
-                strncpy(buf, op, sizeof buf - 1);
-                buf[sizeof buf - 1] = '\0';
-                op = mungspaces(buf);
-                for (;;) {
-                    /* We're looking to parse
-                       "paranoid_confirm:whichone wheretwo whothree"
-                       and "paranoid_confirm:" prefix has already
-                       been stripped off by the time we get here */
-                    pp = strchr(op, ' ');
-                    if (pp)
-                        *pp = '\0';
-                    /* we aren't matching option names but match_optname()
-                       does what we want once we've broken the space
-                       delimited aggregate into separate tokens */
-                    for (i = 0; i < SIZE(paranoia); ++i) {
-                        if (match_optname(op, paranoia[i].argname,
-                                          paranoia[i].argMinLen, FALSE)
-                            || (paranoia[i].synonym
-                                && match_optname(op, paranoia[i].synonym,
-                                                 paranoia[i].synMinLen,
-                                                 FALSE))) {
-                            if (paranoia[i].flagmask)
-                                flags.paranoia_bits |= paranoia[i].flagmask;
-                            else /* 0 == "none", so clear all */
-                                flags.paranoia_bits = 0;
-                            break;
-                        }
-                    }
-                    if (i == SIZE(paranoia)) {
-                        /* didn't match anything, so arg is bad;
-                           any flags already set will stay set */
-                        config_error_add("Unknown %s parameter '%s'",
-                                         allopt[optidx].name, op);
-                        return optn_err;
-                    }
-                    /* move on to next token */
-                    if (pp)
-                        op = pp + 1;
-                    else
-                        break; /* no next token */
-                }              /* for(;;) */
-            } else
-                return optn_err;
-            return optn_ok;
-        } else { /* prayconfirm */
-            if (negated)
-                flags.paranoia_bits &= ~PARANOID_PRAY;
-            else
-                flags.paranoia_bits |= PARANOID_PRAY;
+        } else if (opt_negated) {
+            /* "!paranoid_confirm" w/o args is same as paranoid_confirm:none;
+               "!paranoid_confirm:anything" is disallowed */
+            if (!*op) {
+                flags.paranoia_bits = 0;
+                return optn_ok;
+            } else {
+                config_error_add("!%s does not accept a value",
+                                 allopt[optidx].name);
+                return optn_silenterr;
+            }
+        } else if (!*op) {
+            /* "paranoid_confirm" without any arguments is disallowed */
+            config_error_add("%s requires a value; use 'none' to cancel all",
+                             allopt[optidx].name);
+            return optn_silenterr;
         }
+
+        /*
+         * Multiple settings for paranoid_confirmation are allowed.
+         * When a new instance is processed, the behavior depends on the
+         * first character of its value:
+         *
+         * paranoid_confirm:foo bar
+         *   clears all confirmation bits (from previous settings, including
+         *   default), then sets the bits for foo and bar;
+         *
+         * paranoid_confirm:+foo bar
+         *   existing bits are kept, plus those for foo and bar are set;
+         *
+         * paranoid_confirm:-foo bar
+         *   existing bits are kept except those for foo and bar get cleared;
+         *
+         * paranoid_confirm:+foo !bar
+         *   combination of paranoid_confirm:+foo,paranoid_confirm:-bar;
+         *
+         * paranoid_confirm:-foo !bar
+         *   the negation in '!bar' is ignored, treated as if '-foo bar';
+         *
+         * !paranoid_confirm
+         *   without a value is treated as paranoid_confirm:none and clears
+         *   all bits;
+         * !paranoid_confirm:anything
+         *   (including +anything_else or -anything_else) is disallowed;
+         *
+         * paranoid_confirm:+all is the same as paranoid_confirm:all;
+         * paranoid_confirm:-all is the same as paranoid_confirm:none;
+         * paranoid_confirm:+none and paranoid_confirm:-none are no-ops.
+         */
+        (void) mungspaces(op);
+        if (*op != '+' && *op != '-') {
+            /* new value; first clear all old bits */
+            flags.paranoia_bits = 0;
+        } else {
+            /* augmenting existing value; keep old bits */
+            plus_or_minus = TRUE; /* only used for "+none" and "-none" */
+            opt_negated = (*op == '-'); /* context is changed */
+            if (*++op == ' ') /* skip '+' or '-', maybe whitespace */
+                ++op;
+        }
+
+        for (;;) {
+            fld_negated = (*op == '!');
+            if (fld_negated) {
+                /* there shouldn't be a space after '!' because then
+                   "! foo bar" looks like it might be intended to mean
+                   "!foo !bar" but if there is one, skip it to prevent
+                   a lookup attempt for "" which will fail and result in
+                   an unhelpful error message; accepting the space is
+                   simpler than another special case error message */
+                if (*++op == ' ') /* skip '!', maybe whitespace */
+                    ++op;
+            } else {
+                /* accept "nofoo" to be same as "!foo", unless "no" is
+                   followed by a space or 'foo' begins with "n" (to avoid
+                   confusion for "none" */
+                if (lowc(op[0]) == 'n' && lowc(op[1]) == 'o'
+                       && lowc(op[2] != 'n' && lowc(op[2]) != '\0')) {
+                    fld_negated = TRUE;
+                    op += 2; /* skip "no"; we know next char isn't space  */
+                }
+            }
+            /* We're looking to parse
+               "paranoid_confirm:whichone wheretwo whothree"
+               and "paranoid_confirm:" prefix has already
+               been stripped off by the time we get here */
+            pp = strchr(op, ' ');
+            if (pp)
+                *pp = '\0';
+            /* we aren't matching option names but match_optname()
+               does what we want once we've broken the space
+               delimited aggregate into separate tokens */
+            for (i = 0; i < SIZE(paranoia); ++i) {
+                if (match_optname(op, paranoia[i].argname,
+                                  paranoia[i].argMinLen, FALSE)
+                    || (paranoia[i].synonym
+                        && match_optname(op, paranoia[i].synonym,
+                                         paranoia[i].synMinLen, FALSE))) {
+                    if (!paranoia[i].flagmask) {
+                        /* flagmask==0 is "none", clear all bits
+                           but "+none" and "-none" are no-ops */
+                        if (!plus_or_minus)
+                            flags.paranoia_bits = 0; /* clear all */
+                    } else if (opt_negated || fld_negated) {
+                        flags.paranoia_bits &= ~paranoia[i].flagmask;
+                    } else {
+                        flags.paranoia_bits |= paranoia[i].flagmask;
+                    }
+                    break;
+                }
+            }
+            if (i == SIZE(paranoia)) {
+                /* didn't match anything, so arg is bad;
+                   any flags already modified will stay modified */
+                config_error_add("Unknown %s parameter '%s'",
+                                 allopt[optidx].name, op);
+                return optn_silenterr;
+            }
+            /* move on to next token */
+            if (pp)
+                op = pp + 1;
+            else
+                break; /* no next token */
+        } /* for(;;) */
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        char tmpbuf[QBUFSZ];
+        char tmpbuf[BUFSZ];
 
         if (!opts)
             return optn_err;
         tmpbuf[0] = '\0';
-        for (i = 0; paranoia[i].flagmask != 0; ++i)
-            if (flags.paranoia_bits & paranoia[i].flagmask)
-                Sprintf(eos(tmpbuf), " %s", paranoia[i].argname);
-        Strcpy(opts, tmpbuf[0] ? &tmpbuf[1] : "none");
+        for (i = 0; paranoia[i].flagmask != 0; ++i) {
+            if ((flags.paranoia_bits & paranoia[i].flagmask) != 0
+                /* hide paranoid_confirm:bones during play except for wizard
+                   mode; keep it for any mode if rewriting the config file */
+                && (paranoia[i].flagmask != PARANOID_BONES
+                    || wizard || req == get_cnf_val))
+                Snprintf(eos(tmpbuf), sizeof tmpbuf - strlen(tmpbuf),
+                         " %s", paranoia[i].argname);
+        }
+        /* note: always leaves enough room for caller to tack on '\n' */
+        opts[0] = '\0';
+        (void) strncat(opts, tmpbuf[0] ? &tmpbuf[1] : "none", BUFSZ - 1);
         return optn_ok;
     }
     if (req == do_handler) {
@@ -2703,7 +2864,9 @@ optfn_paranoid_confirmation(
 }
 
 static int
-optfn_petattr(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_petattr(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok;
 
@@ -3589,7 +3752,7 @@ optfn_sortvanquished(
         uchar prev_sortmode = flags.vanq_sortmode;
 
         /* return handler_sortvanquished(); */
-        (void) set_vanq_order(); /* insight.c */
+        (void) set_vanq_order(TRUE); /* insight.c */
         pline("'%s' %s \"%s: %s\".", optname,
               (flags.vanq_sortmode == prev_sortmode)
                  ? "not changed, still"
@@ -4418,7 +4581,10 @@ optfn_windowborders(
 
 #ifdef WINCHAIN
 static int
-optfn_windowchain(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_windowchain(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -5278,7 +5444,7 @@ handler_disclose(void)
                      "Always disclose, without prompting",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v') {
+            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_SPECIAL_WITHOUT_PROMPT; /* '#' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
@@ -5298,11 +5464,11 @@ handler_disclose(void)
                      "Prompt, with default answer of \"Yes\"",
                      (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                        : MENU_ITEMFLAGS_NONE);
-            if (*disclosure_names[i] == 'v') {
+            if (*disclosure_names[i] == 'v' || *disclosure_names[i] == 'g') {
                 any.a_char = DISCLOSE_PROMPT_DEFAULT_SPECIAL; /* '?' */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0,
                          any.a_char, ATR_NONE, clr,
-            "Prompt, with default answer of \"Ask\" to request sort menu",
+                "Prompt, with default answer of \"Ask\" to request sort menu",
                          (c == any.a_char) ? MENU_ITEMFLAGS_SELECTED
                                            : MENU_ITEMFLAGS_NONE);
             }
@@ -5461,6 +5627,8 @@ handler_paranoid_confirmation(void)
     winid tmpwin;
     anything any;
     int i;
+    char mkey, mbuf[QBUFSZ], ebuf[BUFSZ], cbuf[QBUFSZ];
+    const char *explain, *cmdnm;
     menu_item *paranoia_picks = (menu_item *) 0;
     int clr = 0;
 
@@ -5470,9 +5638,25 @@ handler_paranoid_confirmation(void)
     for (i = 0; paranoia[i].flagmask != 0; ++i) {
         if (paranoia[i].flagmask == PARANOID_BONES && !wizard)
             continue;
+        /* the 'swim' choice mentions the 'm' movement prefix in its
+           explanation; if that's been bound to something else or been
+           unbound altogether, substitute the replacement in the text */
+        explain = paranoia[i].explain;
+        if (strstri(explain, "'m'")
+            && (mkey = cmd_from_func(do_reqmenu)) != 'm') {
+            if (mkey) { /* key for 'm' prefix */
+                Sprintf(mbuf, "'%.9s'", visctrl(mkey)); /* .5 is enough */
+            } else { /* extended command name for 'm' prefix */
+                cmdnm = cmdname_from_func(do_reqmenu, cbuf, TRUE);
+                if (!cmdnm)
+                    cmdnm = "reqmenu";
+                Sprintf(mbuf, "'%s%.31s'", (*cmdnm != '#') ? "#" : "", cmdnm);
+            }
+            explain = strsubst(strcpy(ebuf, explain), "'m'", mbuf);
+        }
         any.a_int = paranoia[i].flagmask;
         add_menu(tmpwin, &nul_glyphinfo, &any, *paranoia[i].argname,
-                 0, ATR_NONE, clr, paranoia[i].explain,
+                 0, ATR_NONE, clr, explain,
                  (flags.paranoia_bits & paranoia[i].flagmask)
                      ? MENU_ITEMFLAGS_SELECTED
                      : MENU_ITEMFLAGS_NONE);
@@ -5655,7 +5839,8 @@ handler_whatis_coord(void)
    "screen: row is offset to accommodate tty interface's use of top line",
                  MENU_ITEMFLAGS_NONE);
 #if COLNO == 80
-#define COL80ARG Verbose(2, handler_whatis_coord2) ? "; column 80 is not used" : ""
+#define COL80ARG \
+    (Verbose(2, handler_whatis_coord2) ? "; column 80 is not used" : "")
 #else
 #define COL80ARG ""
 #endif
@@ -6598,7 +6783,7 @@ initoptions_init(void)
     flags.end_own = FALSE;
     flags.end_top = 3;
     flags.end_around = 2;
-    flags.paranoia_bits = PARANOID_PRAY|PARANOID_SWIM;
+    flags.paranoia_bits = PARANOID_PRAY | PARANOID_SWIM;
     flags.pile_limit = PILE_LIMIT_DFLT;  /* 5 */
     flags.runmode = RUN_LEAP;
     iflags.msg_history = 20;
@@ -7098,10 +7283,12 @@ parsebindings(char *bindings)
  *
  */
 
-static const struct color_names {
+struct color_names {
     const char *name;
     int color;
-} colornames[] = {
+};
+
+static const struct color_names colornames[] = {
     { "black", CLR_BLACK },
     { "red", CLR_RED },
     { "green", CLR_GREEN },
@@ -7118,7 +7305,7 @@ static const struct color_names {
     { "light cyan", CLR_BRIGHT_CYAN },
     { "white", CLR_WHITE },
     { "no color", NO_COLOR },
-    { NULL, CLR_BLACK }, /* everything after this is an alias */
+    { (const char *) 0, CLR_BLACK }, /* everything after this is an alias */
     { "transparent", NO_COLOR },
     { "purple", CLR_MAGENTA },
     { "light purple", CLR_BRIGHT_MAGENTA },
@@ -7131,10 +7318,12 @@ static const struct color_names {
     { "bright cyan", CLR_BRIGHT_CYAN }
 };
 
-static const struct attr_names {
+struct attr_names {
     const char *name;
     int attr;
-} attrnames[] = {
+};
+
+static const struct attr_names attrnames[] = {
     { "none", ATR_NONE },
     { "bold", ATR_BOLD },
     { "dim", ATR_DIM },
@@ -7142,7 +7331,7 @@ static const struct attr_names {
     { "underline", ATR_ULINE },
     { "blink", ATR_BLINK },
     { "inverse", ATR_INVERSE },
-    { NULL, ATR_NONE }, /* everything after this is an alias */
+    { (const char *) 0, ATR_NONE }, /* everything after this is an alias */
     { "normal", ATR_NONE },
     { "uline", ATR_ULINE },
     { "reverse", ATR_INVERSE },
@@ -8403,6 +8592,7 @@ doset_simple_menu(void)
     anything any;
     enum OptSection section;
     int i, k, pick_cnt, reslt;
+    boolean toggled_help = FALSE;
 
     /* we do this each time we're called instead of once in doset_simple()
        in case 'menu_tab_sep' ever gets included in the simple menu so
@@ -8414,14 +8604,32 @@ doset_simple_menu(void)
         Strcpy(fmtstr_doset_simple, fmtstr_tab_doset_simple);
     fmtstr = fmtstr_doset_simple;
 
+ redo_opt_help:
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
 
+    /* when showing 'help', also describe how to run full doset() */
+    if (gs.simple_options_help) {
+        /* we could look up whether #optionsfull has been bound to a key
+           and show that, or whether #reqmenu and #options are both still
+           bound to keys and show those, but if meta keys are involved
+           the player might not know how to type them; keep this simple */
+        Strcpy(buf, "Use command '#optionsfull'"
+                    " to get the complete options list.");
+        any = cg.zeroany;
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 0, buf, MENU_ITEMFLAGS_NONE);
+    }
+    any = cg.zeroany;
+    any.a_int = -2 + 1;
+    add_menu(tmpwin, &nul_glyphinfo, &any, '?', 0, ATR_NONE, 0,
+             gs.simple_options_help ? "hide help" : "show help",
+             MENU_ITEMFLAGS_NONE);
+
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
-        if (section != OptS_General)
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     0, "", MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                 0, "", MENU_ITEMFLAGS_NONE);
         Sprintf(buf, " %-30s ", OptS_type[section]);
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                  iflags.menu_headings, 0,
@@ -8473,6 +8681,15 @@ doset_simple_menu(void)
                 Strcat(buf, "  (for autopickup)");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            if (gs.simple_options_help && allopt[i].descr) {
+                any = cg.zeroany;
+                Sprintf(buf, "    %s", allopt[i].descr);
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+                         ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+                any = cg.zeroany;
+                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
+                         0, "", MENU_ITEMFLAGS_NONE);
+            }
         }
     }
     end_menu(tmpwin, "Options");
@@ -8486,7 +8703,10 @@ doset_simple_menu(void)
         k = pick_list[0].item.a_int - 1;
 
         abuf[0] = '\0';
-        if (allopt[k].opttyp == BoolOpt) {
+        if (k == -2) {
+            gs.simple_options_help = !gs.simple_options_help;
+            toggled_help = TRUE;
+        } else if (allopt[k].opttyp == BoolOpt) {
             /* boolean option */
             Sprintf(buf, "%s%s", *allopt[k].addr ? "!" : "", allopt[k].name);
             (void) parseoptions(buf, FALSE, FALSE);
@@ -8512,7 +8732,7 @@ doset_simple_menu(void)
                    'picked 1' to caller which will loop for another choice */
             }
         }
-        if (abuf[0] != '\033'
+        if (k >= 0 && abuf[0] != '\033'
             && (wc_supported(allopt[k].name)
                 || wc2_supported(allopt[k].name)))
             preference_update(allopt[k].name);
@@ -8522,6 +8742,11 @@ doset_simple_menu(void)
     /* tear down this instance of the menu; if pick_cnt is 1, caller
        will immediately call us back to put up another instance */
     destroy_nhwindow(tmpwin);
+
+    if (toggled_help) {
+        toggled_help = FALSE;
+        goto redo_opt_help;
+    }
 
     return pick_cnt;
 }
@@ -8572,13 +8797,13 @@ term_for_boolean(int idx, boolean *b)
     int i, f_t = (*b) ? 1: 0;
     const char *boolean_term;
     static const char *const booleanterms[2][num_terms] = {
-        { "false", "off", "disabled", },
-        { "true", "on", "enabled", },
+        { "false", "off", "disabled", "excluded from build" },
+        { "true", "on", "enabled", "included"},
     };
 
     boolean_term = booleanterms[f_t][0];
     i = (int) allopt[idx].termpref;
-    if (i > Term_False && i < num_terms)
+    if (i > Term_False && i < num_terms && i < SIZE(booleanterms[0]))
         boolean_term = booleanterms[f_t][i];
     return boolean_term;
 }
@@ -9971,7 +10196,7 @@ wc_set_window_colors(char *op)
     return 1;
 }
 
-/* set up for wizard mode if player or save file has requested to it;
+/* set up for wizard mode if player or save file has requested it;
    called from port-specific startup code to handle `nethack -D' or
    OPTIONS=playmode:debug, or from dorecover()'s restgamestate() if
    restoring a game which was saved in wizard mode */
@@ -9989,7 +10214,8 @@ set_playmode(void)
     }
     /* don't need to do anything special for explore mode or normal play */
 }
-void
+
+static void
 enhance_menu_text(
     char *buf,
     size_t sz,
@@ -10017,7 +10243,14 @@ enhance_menu_text(
     return;
 }
 
+#undef OPTIONS_HEADING
+#undef CONFIG_SLOT
 
 #endif /* OPTION_LISTS_ONLY */
+
+#undef BACKWARD_COMPAT
+#undef COMPLAIN_ABOUT_PRAYCONFIRM
+#undef PREV_MSGS
+#undef PILE_LIMIT_DFLT
 
 /*options.c*/

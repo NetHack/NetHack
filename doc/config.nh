@@ -1,7 +1,7 @@
 # NetHack 3.7  config.nh       $NHDT-Date: 1596498144 2020/08/03 23:42:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
 # Copyright (c) 2016 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
-# Sample config file for NetHack 3.7
+# Sample config file for NetHack 3.7.0
 #
 # A '#' at the beginning of a line means the rest of the line is a comment.
 #

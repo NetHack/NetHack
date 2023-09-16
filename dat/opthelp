@@ -66,6 +66,7 @@ sparkle        display sparkly effect for resisted magical         [True]
 standout       use standout mode for --More-- on messages         [False]
 status_updates update the status lines                             [True]
 time           display elapsed game time, in moves                [False]
+tips           show some helpful tips during gameplay              [True]
 tombstone      print tombstone when you die                        [True]
 toptenwin      print topten in a window rather than stdout        [False]
 travel         enables travelling via mouse click if supported;    [True]
@@ -134,6 +135,7 @@ tiled_map      show map as tiles, forces ascii_map Off; Qt, X11
 Boolean options available when running in debug mode (aka wizard mode):
 menu_tab_sep   menu formatting--do not touch
 monpolycontrol have player choose shape-changing monsters' new shapes
+montelecontrol let player choose destination for teleported monsters
 travel_debug   show state of travel pathfinding algorithm on the map
 wizweight      include item weights in inventory display
 
@@ -209,9 +211,10 @@ packorder     a list of default symbols for kinds of       [")[%?+!=/(*`0_]
               some other things) gets shown if the 'sortpack' option is on
               (If you specify only some kinds of items, the others from the
               default order will be appended to the end.)
-paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
+paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
               of situations where alternate prompting is desired
-              Confirm -- when requiring "yes", also require "no" to reject
+              Confirm -- when requiring "yes", also require "no" to reject;
+                      also requires yes rather than y for pray, trap, Autoall
               quit    -- yes vs y to confirm quitting or to enter explore mode
               die     -- yes vs y to confirm dying (for explore or debug mode)
               bones   -- yes vs y to confirm saving bones data in debug mode
@@ -221,6 +224,11 @@ paranoid_confirmation  space separated list    [paranoid_confirmation:pray]
               Were-change -- yes vs y to confirm changing form due to
                       lycanthropy when hero has polymorph control;
               pray    -- y to confirm an attempt to pray; on by default
+              trap    -- y to enter a known trap unless it is harmless;
+              swim    -- require m prefix to move into water or lava when
+                      hero has seen it and isn't impaired; on by default;
+              AutoAll -- y to confirm if using menustyle:Full and choice 'A'
+                      in the object class filtering menu is selected;
               Remove  -- always pick from inventory for 'R' and 'T' even when
                       wearing just one applicable item to remove or take off
 pickup_burden when you pick up an item that exceeds this encumbrance    [S]

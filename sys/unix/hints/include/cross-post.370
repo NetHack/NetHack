@@ -103,6 +103,32 @@ $(TARGETPFX)winshim.o : ../win/shim/winshim.c $(HACK_H)
 $(TARGETPFX)libnhmain.o : ../sys/libnh/libnhmain.c $(HACK_H)
 endif  # CROSS_TO_WASM
 #
+ifdef CROSS_TO_MIPS
+$(MIPS_TARGET): pregame $(TARGETPFX)date.o $(HOSTOBJ) $(HOBJ) $(LUACROSSLIB) $(MIPS_DATA_DIR)
+	-rm $@
+	$(TARGET_CC) $(TARGET_LFLAGS) $(TARGET_CFLAGS) -o $@ \
+		$(HOBJ) $(TARGETPFX)date.o $(TARGET_LIBS)
+
+$(MIPS_DATA_DIR): $(MIPS_DATA_DIR)/nhdat
+	touch $(MIPS_DATA_DIR)/perm
+	touch $(MIPS_DATA_DIR)/record
+	touch $(MIPS_DATA_DIR)/logfile
+	touch $(MIPS_DATA_DIR)/xlogfile
+	touch $(MIPS_DATA_DIR)/livelog
+	cp ../sys/unix/sysconf $(MIPS_DATA_DIR)/sysconf
+
+$(MIPS_DATA_DIR)/nhdat:
+	( cd ..; $(MAKE) INSTDIR='$(MIPS_DATA_DIR)' $(MIPSDEP) dofiles-dlb )
+
+#
+$(TARGETPFX)unixmain.o : ../sys/unix/unixmain.c $(HACK_H)
+$(TARGETPFX)unixres.o : ../sys/unix/unixres.c $(HACK_H)
+$(TARGETPFX)unixunix.o : ../sys/unix/unixunix.c $(HACK_H)
+$(TARGETPFX)ioctl.o : ../sys/share/ioctl.c $(HACK_H)
+$(TARGETPFX)unixtty.o : ../sys/share/unixtty.c $(HACK_H)
+endif  # CROSS_TO_MIPS
+#
+
 
 ifdef CROSS_SHARED
 # shared file dependencies
@@ -165,12 +191,31 @@ $(TARGETPFX)lvm.o : $(LUATOP)/src/lvm.c
 $(TARGETPFX)lzio.o : $(LUATOP)/src/lzio.c
 endif  # BUILD_TARGET_LUA
 
+ifdef BUILD_TARGET_NCURSES
+.PHONY: build-ncurses
+ifdef MAKEFILE_SRC
+../lib/ncurses.tar.gz:
+	@echo "You will need to successfully execute 'make CROSS_TO_MIPS=1 fetch-ncurses' first"
+	@false
+$(TARGETPFX)ncurses/lib/libncurses.a: ../lib/ncurses.tar.gz
+	(cd $(TARGETDIR) ; mkdir -p ncurses ; cd ncurses ; tar -xf ../../../lib/ncurses.tar.gz --strip-components=1 ; \
+	./configure --build i686-pc-linux-gnu --host mipsel-linux-gnu ; \
+	make ; \
+	cd ../../../src)
+endif   #MAKEFILE_SRC
+ifdef MAKEFILE_TOP
+.PHONY: fetch-ncurses
+fetch-ncurses:
+	(cd lib ; curl https://invisible-island.net/datafiles/release/ncurses.tar.gz --output ncurses.tar.gz ; cd ..)
+endif
+endif   #BUILD_TARGET_NCURSES
+
 ifdef BUILD_PDCURSES
 ifdef WANT_WIN_CURSES
 $(TARGETPFX)pdclib.a : $(PDCLIBOBJS) $(PDCOBJS)
 	if [ -f $@ ]; then rm $@; fi;
 	$(TARGET_AR) rcs $@ $(PDCLIBOBJS) $(PDCOBJS)
-endif
+endif  #WANT_WIN_CURSES
 # PDCurses src
 $(TARGETPFX)addch.o : $(PDCTOP)/pdcurses/addch.c
 $(TARGETPFX)addchstr.o : $(PDCTOP)/pdcurses/addchstr.c
@@ -223,5 +268,3 @@ endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section
 #===============-=================================================
-
-

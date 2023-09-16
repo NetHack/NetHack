@@ -55,13 +55,17 @@ static const struct propname {
     /* timed pass-walls is a potential prayer result if surrounded by stone
        with nowhere to be safely teleported to */
     { PASSES_WALLS, "pass thru walls" },
+    /* timed fire resistance and water walking are possible in explore mode
+       (as well as in wizard mode) after life-saving in lava if it fails to
+       teleport the hero to safety and player declines to die */
+    { WWALKING, "water walking" },
+    { FIRE_RES, "fire resistance" },
     /*
      * Properties beyond here don't have timed values during normal play,
      * so there's not much point in trying to order them sensibly.
      * They're either on or off based on equipment, role, actions, &c,
-     * but in wizard mode #wizintrinsic can give then as timed effects.
+     * but in wizard mode, #wizintrinsic can give them as timed effects.
      */
-    { FIRE_RES, "fire resistance" },
     { COLD_RES, "cold resistance" },
     { SLEEP_RES, "sleep resistance" },
     { DISINT_RES, "disintegration resistance" },
@@ -86,7 +90,6 @@ static const struct propname {
     { JUMPING, "jumping" },
     { TELEPORT_CONTROL, "teleport control" },
     { FLYING, "flying" },
-    { WWALKING, "water walking" },
     { SWIMMING, "swimming" },
     { MAGICAL_BREATHING, "magical breathing" },
     { SLOW_DIGESTION, "slow digestion" },
@@ -687,12 +690,15 @@ nh_timeout(void)
                 if (!Stunned)
                     stop_occupation();
                 break;
-            case BLINDED:
-                set_itimeout(&Blinded, 1L);
+            case BLINDED: {
+                boolean was_blind = !!Blind;
+
+                set_itimeout(&HBlinded, 1L);
                 make_blinded(0L, TRUE);
-                if (!Blind)
+                if (was_blind && !Blind)
                     stop_occupation();
                 break;
+            }
             case DEAF:
                 set_itimeout(&HDeaf, 1L);
                 make_deaf(0L, TRUE);
@@ -768,6 +774,19 @@ nh_timeout(void)
                     wielding_corpse(uswapwep, (struct obj *) 0, FALSE);
                 }
                 break;
+            case FIRE_RES:
+                /* timed fire resistance and timed water walking combine
+                   as a way to survive lava after multiple life-saving
+                   attempts fail to relocate hero; skip timeout message
+                   if hero has acquired fire resistance in the meantime */
+                if (!Fire_resistance)
+                    Your("temporary ability to survive burning has ended.");
+                break;
+            case WWALKING:
+                /* [see fire reeistance] */
+                if (!Wwalking)
+                    Your("temporary ability to walk on liquid has ended.");
+                break;
             case DISPLACED:
                 if (!Displaced) /* give a message */
                     toggle_displacement((struct obj *) 0, 0L, FALSE);
@@ -775,12 +794,13 @@ nh_timeout(void)
             case WARN_OF_MON:
                 /* timed Warn_of_mon is via #wizintrinsic only */
                 if (!Warn_of_mon) {
+                    struct permonst *wptr = gc.context.warntype.species;
+
+                    gc.context.warntype.species = (struct permonst *) 0;
                     gc.context.warntype.speciesidx = NON_PM;
-                    if (gc.context.warntype.species) {
+                    if (wptr)
                         You("are no longer warned about %s.",
-                     makeplural(gc.context.warntype.species->pmnames[NEUTRAL]));
-                        gc.context.warntype.species = (struct permonst *) 0;
-                    }
+                            makeplural(wptr->pmnames[NEUTRAL]));
                 }
                 break;
             case PASSES_WALLS:
@@ -817,7 +837,8 @@ nh_timeout(void)
                      * to this number must be thoroughly play tested.
                      */
                     if ((inv_weight() > -500)) {
-                        You("make a lot of noise!");
+                        if (!Deaf)
+                            You("make a lot of noise!");
                         wake_nearby();
                     }
                 }
@@ -1012,10 +1033,13 @@ hatch_egg(anything *arg, long timeout)
                 You_see("%s %s out of your pack!", monnambuf,
                         locomotion(mon->data, "drop"));
             if (yours) {
-                pline("%s cries sound like \"%s%s\"",
+                pline("%s %s %s like \"%s%s\"",
                       siblings ? "Their" : "Its",
+                      ing_suffix(cry_sound(mon)),
+                      (is_silent(mon->data) || Deaf) ? "seems" : "sounds",
                       flags.female ? "mommy" : "daddy", egg->spe ? "." : "?");
             } else if (mon->data->mlet == S_DRAGON && !Deaf) {
+                SetVoice(mon, 0, 80, 0);
                 verbalize("Gleep!"); /* Mything eggs :-) */
             }
             break;
@@ -1703,8 +1727,8 @@ do_storms(void)
     int dirx, diry;
     int count;
 
-    /* no lightning if not the air level or too often, even then */
-    if (!Is_airlevel(&u.uz) || rn2(8))
+    /* no lightning if not stormy level or too often, even then */
+    if (!gl.level.flags.stormy || rn2(8))
         return;
 
     /* the number of strikes is 8-log2(nstrike) */
@@ -1718,9 +1742,11 @@ do_storms(void)
         if (count < 100) {
             dirx = rn2(3) - 1;
             diry = rn2(3) - 1;
-            if (dirx != 0 || diry != 0)
-                buzz(-15, /* "monster" LIGHTNING spell */
-                     8, x, y, dirx, diry);
+            if (dirx != 0 || diry != 0) {
+                /* BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)): monster LIGHTNING spell */
+                gb.buzzer = 0; /* unspecified attacker */
+                buzz(BZ_M_SPELL(BZ_OFS_AD(AD_ELEC)), 8, x, y, dirx, diry);
+            }
         }
     }
 
@@ -1899,7 +1925,7 @@ wiz_timeout_queue(void)
     putstr(win, 0, "");
     print_queue(win, gt.timer_base);
 
-    /* Timed properies:
+    /* Timed properties:
      * check every one; the majority can't obtain temporary timeouts in
      * normal play but those can be forced via the #wizintrinsic command.
      */
@@ -1912,7 +1938,7 @@ wiz_timeout_queue(void)
             if ((ln = (int) strlen(propname)) > longestlen)
                 longestlen = ln;
         }
-        if (specindx == 0 && p == FIRE_RES)
+        if (specindx == 0 && p == COLD_RES) /* was FIRE_RES but has changed */
             specindx = i;
     }
     putstr(win, 0, "");
@@ -2521,7 +2547,7 @@ timer_stats(const char* hdrfmt, char *hdrbuf, long *count, long *size)
 
 RESTORE_WARNING_FORMAT_NONLITERAL
 
-/* reset all timers that are marked for reseting */
+/* reset all timers that are marked for resetting */
 void
 relink_timers(boolean ghostly)
 {

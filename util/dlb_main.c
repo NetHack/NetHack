@@ -1,4 +1,4 @@
-/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1629969943 2021/08/26 09:25:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.18 $ */
+/* NetHack 3.7	dlb_main.c	$NHDT-Date: 1687547434 2023/06/23 19:10:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) Kenneth Lorber, Bethesda, Maryland, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -168,10 +168,12 @@ main(int argc UNUSED_if_no_DLB, char **argv UNUSED_if_no_DLB)
     char action = ' ';
     library lib;
 
-    if (argc > 0 && argv[0] && *argv[0])
+    if (argc > 0)
         progname = argv[0];
+    if (!progname || !*progname)
+        progname = default_progname;
 #ifdef VMS
-    progname = vms_basename(progname);
+    progname = vms_basename(progname, FALSE);
 #endif
 
     if (argc < 2) {

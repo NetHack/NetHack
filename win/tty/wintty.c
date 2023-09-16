@@ -377,7 +377,9 @@ winch_handler(int sig_unused UNUSED)
 #undef WINCH_MESSAGE
     }
 #endif
+#ifndef VMS
     getwindowsz();
+#endif
     /* For long running events such as multi-page menus and
      * display_file(), we note the signal's occurance and
      * hope the code there decides to handle the situation
@@ -499,6 +501,8 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     ttyDisplay->color = NO_COLOR;
 #endif
     ttyDisplay->attrs = 0;
+    ttyDisplay->topl_utf8 = 0;
+    ttyDisplay->mixed = 0;
 
     /* set up the default windows */
     BASE_WINDOW = tty_create_nhwindow(NHW_BASE);
@@ -587,7 +591,7 @@ tty_player_selection(void)
  * explicitly (by being the wizard) or by askname.
  * It may still contain a suffix denoting the role, etc.
  * Always called after init_nhwindows() and before
- * init_sound_and_display_gamewindows().
+ * init_sound_disp_gamewindows().
  */
 void
 tty_askname(void)
@@ -903,7 +907,7 @@ erase_menu_or_text(winid window, struct WinDesc *cw, boolean clear)
             tty_curs(window, 1, 0);
             cl_eos();
         } else if (clear) {
-            clear_screen();
+            term_clear_screen();
         } else {
             docrt();
             flush_screen(1);
@@ -1004,7 +1008,7 @@ tty_clear_nhwindow(winid window)
         gc.context.botlx = 1;
         /*FALLTHRU*/
     case NHW_BASE:
-        clear_screen();
+        term_clear_screen();
         /* [this should reset state for MESSAGE, MAP, and STATUS] */
         break;
     case NHW_MENU:
@@ -1312,7 +1316,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                     tty_curs(window, 1, 0);
                     cl_eos();
                 } else
-                    clear_screen();
+                    term_clear_screen();
             }
 
             rp = resp;
@@ -1669,7 +1673,7 @@ process_text_window(winid window, struct WinDesc *cw)
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             n = 0;
         }
         tty_curs(window, 1, n++);
@@ -1814,7 +1818,7 @@ tty_display_nhwindow(
                 tty_curs(window, 1, 0);
                 cl_eos();
             } else
-                clear_screen();
+                term_clear_screen();
             ttyDisplay->toplin = TOPLINE_EMPTY;
         } else {
             if (WIN_MESSAGE != WIN_ERR)
@@ -1897,7 +1901,7 @@ tty_destroy_nhwindow(winid window)
     if (cw->type == NHW_MESSAGE)
         iflags.window_inited = 0;
     if (cw->type == NHW_MAP)
-        clear_screen();
+        term_clear_screen();
 #ifdef TTY_PERM_INVENT
     if (cw->type == NHW_PERMINVENT) {
         int r, c;
@@ -2284,12 +2288,16 @@ tty_putstr(winid window, int attr, const char *str)
         }
         break;
     }
+    return;
 }
 
 void
-tty_display_file(const char *fname, boolean complain)
+tty_display_file(
+    const char *fname, /* name of file to display */
+    boolean complain)  /* whether to report problem if file can't be opened */
 {
 #ifdef DEF_PAGER /* this implies that UNIX is defined */
+    /* FIXME:  this won't work if fname is inside a dlb container */
     {
         /* use external pager; this may give security problems */
         int fd = open(fname, O_RDONLY);
@@ -2297,7 +2305,7 @@ tty_display_file(const char *fname, boolean complain)
         if (fd < 0) {
             if (complain)
                 pline("Cannot open %s.", fname);
-            else
+            else /* [is this refresh actually necessary?] */
                 docrt();
             return;
         }
@@ -2337,10 +2345,11 @@ tty_display_file(const char *fname, boolean complain)
                 tty_mark_synch();
                 tty_raw_print("");
                 perror(fname);
-                tty_wait_synch();
+                tty_wait_synch(); /* "Hit <space> to continue: " */
+                if (u.ux) /* if hero is on map, refresh the screen */
+                    docrt();
                 pline("Cannot open \"%s\".", fname);
-            } else if (u.ux)
-                docrt();
+            }
         } else {
             winid datawin = tty_create_nhwindow(NHW_TEXT);
             boolean empty = TRUE;
@@ -2376,6 +2385,7 @@ tty_display_file(const char *fname, boolean complain)
         }
     }
 #endif /* DEF_PAGER */
+    return;
 }
 
 void
@@ -3377,7 +3387,8 @@ g_putch(int in_ch)
 }
 #endif /* !WIN32CON */
 
-#if defined(ENHANCED_SYMBOLS) && defined(UNIX)
+#if defined(UNIX) || defined(VMS)
+#if defined(ENHANCED_SYMBOLS)
 void
 g_pututf8(uint8 *utf8str)
 {
@@ -3388,7 +3399,8 @@ g_pututf8(uint8 *utf8str)
     }
     return;
 }
-#endif /* ENHANCED_SYMBOLS && UNIX */
+#endif /* ENHANCED_SYMBOLS */
+#endif /* UNIX || VMS */
 
 #ifdef CLIPPING
 void
@@ -3506,7 +3518,7 @@ tty_print_glyph(
     }   /* iflags.use_color aka iflags.wc_color */
 
     /* must be after color check; term_end_color may turn off inverse too;
-       BW_LAVA and BW_ICE won't ever be set when color is on;
+       BW_LAVA, BW_ICE, BW_SINK, BW_ENGR won't ever be set when color is on;
        (tried bold for ice but it didn't look very good; inverse is easier
        to see although the Valkyrie quest ends up being hard on the eyes) */
     if (iflags.use_color
@@ -3515,11 +3527,12 @@ tty_print_glyph(
         ttyDisplay->framecolor = bkglyphinfo->framecolor;
         term_start_bgcolor(bkglyphinfo->framecolor);
 #endif
-    } else if (((special & MG_PET) != 0 && iflags.hilite_pet)
-        || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-        || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
-        || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE | MG_BW_SINK)) != 0
-            && iflags.use_inverse)) {
+    } else if ((((special & MG_PET) != 0 && iflags.hilite_pet)
+                || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
+                || ((special & MG_FEMALE) != 0 && wizard && iflags.wizmgender)
+                || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE
+                                | MG_BW_SINK | MG_BW_ENGR)) != 0))
+               && iflags.use_inverse) {
         term_start_attr(ATR_INVERSE);
         inverse_on = TRUE;
     }
@@ -3736,6 +3749,7 @@ tty_putmixed(winid window, int attr, const char *str)
         tty_raw_print(str);
         return;
     }
+    ttyDisplay->mixed = 1;
 #ifdef ENHANCED_SYMBOLS
     if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
         mixed_to_utf8(buf, sizeof buf, str, &utf8flag);
@@ -3747,6 +3761,7 @@ tty_putmixed(winid window, int attr, const char *str)
     /* now send it to the normal tty_putstr */
     tty_putstr(window, attr, buf);
     ttyDisplay->topl_utf8 = 0;
+    ttyDisplay->mixed = 0;
 }
 
 /*
@@ -4000,8 +4015,13 @@ tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
 DISABLE_WARNING_FORMAT_NONLITERAL
 
 void
-tty_status_update(int fldidx, genericptr_t ptr, int chg UNUSED, int percent,
-                  int color, unsigned long *colormasks)
+tty_status_update(
+    int fldidx,
+    genericptr_t ptr,
+    int chg UNUSED,
+    int percent,
+    int color,
+    unsigned long *colormasks)
 {
     int attrmask;
     long *condptr = (long *) ptr;

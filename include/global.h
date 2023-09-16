@@ -146,6 +146,21 @@ typedef uchar nhsym;
 
 #include "coord.h"
 
+/* define USING_ADDRESS_SANITIZER if ASAN is in use */
+#if defined(__clang__)
+#if defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define USING_ADDRESS_SANITIZER
+#endif  /* __has_feature */
+#endif  /* __has_feature(address_sanitizer) */
+#else   /* ?__clang__ */
+#if defined(__GNUC__) || defined(_MSC_VER)
+#ifdef __SANITIZE_ADDRESS__
+#define USING_ADDRESS_SANITIZER
+#endif  /* __SANITIZE_ADDRESS__ */
+#endif  /* __GNUC__ || _MSC_VER */
+#endif  /* !__clang__ */
+
 /*
  * Automatic inclusions for the subsidiary files.
  * Please don't change the order.  It does matter.

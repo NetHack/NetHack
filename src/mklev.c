@@ -1,4 +1,4 @@
-/* NetHack 3.7	mklev.c	$NHDT-Date: 1648066813 2022/03/23 20:20:13 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	mklev.c	$NHDT-Date: 1691877661 2023/08/12 22:01:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.155 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Alex Smith, 2017. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -22,9 +22,11 @@ void clear_level_structures(void);
 static void fill_ordinary_room(struct mkroom *);
 static void makelevel(void);
 static boolean bydoor(coordxy, coordxy);
+static void mktrap_victim(struct trap *);
 static struct mkroom *find_branch_room(coord *);
 static struct mkroom *pos_to_room(coordxy, coordxy);
-static boolean place_niche(struct mkroom *, coordxy *, coordxy *, coordxy *);
+static boolean cardinal_nextto_room(struct mkroom *, coordxy, coordxy);
+static boolean place_niche(struct mkroom *, int *, coordxy *, coordxy *);
 static void makeniche(int);
 static void make_niches(void);
 static int QSORTCALLBACK mkroom_cmp(const genericptr, const genericptr);
@@ -239,12 +241,19 @@ add_subroom(struct mkroom *proom, int lowx, int lowy, int hix, int hiy,
 }
 
 void
-free_luathemes(boolean keependgame) /* F: done, T: discarding main dungeon */
+free_luathemes(enum lua_theme_group theme_group)
 {
     int i;
 
+    /*
+     * Release which group(s)?
+     *  tut_themes  => leaving tutorial, free tutorial themes only;
+     *  most_themes => entering endgame, free non-endgame themes;
+     *  all_themes  => end of game, free all themes.
+     */
     for (i = 0; i < gn.n_dgns; ++i) {
-        if (keependgame && i == astral_level.dnum)
+        if ((theme_group == tut_themes && i != tutorial_dnum)
+            || (theme_group == most_themes && i == astral_level.dnum))
             continue;
         if (gl.luathemes[i]) {
             nhl_done((lua_State *) gl.luathemes[i]);
@@ -574,8 +583,33 @@ dosdoor(register coordxy x, register coordxy y, struct mkroom *aroom, int type)
     add_door(x, y, aroom);
 }
 
+/* is x,y location such that NEWS direction from it is inside aroom,
+   excluding subrooms */
 static boolean
-place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy)
+cardinal_nextto_room(struct mkroom *aroom, coordxy x, coordxy y)
+{
+    int rmno = (int) ((aroom - gr.rooms) + ROOMOFFSET);
+
+    if (isok(x - 1, y) && !levl[x - 1][y].edge
+        && (int) levl[x - 1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x + 1, y) && !levl[x + 1][y].edge
+        && (int) levl[x + 1][y].roomno == rmno)
+        return TRUE;
+    if (isok(x, y - 1) && !levl[x][y - 1].edge
+        && (int) levl[x][y - 1].roomno == rmno)
+        return TRUE;
+    if (isok(x, y + 1) && !levl[x][y + 1].edge
+        && (int) levl[x][y + 1].roomno == rmno)
+        return TRUE;
+    return FALSE;
+}
+
+static boolean
+place_niche(
+    struct mkroom *aroom,
+    int *dy,
+    coordxy *xx, coordxy *yy)
 {
     coord dd;
 
@@ -594,7 +628,8 @@ place_niche(register struct mkroom *aroom, coordxy *dy, coordxy *xx, coordxy *yy
                        && levl[*xx][*yy + *dy].typ == STONE)
                       && (isok(*xx, *yy - *dy)
                           && !IS_POOL(levl[*xx][*yy - *dy].typ)
-                          && !IS_FURNITURE(levl[*xx][*yy - *dy].typ)));
+                          && !IS_FURNITURE(levl[*xx][*yy - *dy].typ))
+                      && cardinal_nextto_room(aroom, *xx, *yy));
 }
 
 /* there should be one of these per trap, in the same order as trap.h */
@@ -614,8 +649,8 @@ makeniche(int trap_type)
 {
     register struct mkroom *aroom;
     struct rm *rm;
-    int vct = 8;
-    coordxy dy, xx, yy;
+    int dy, vct = 8;
+    coordxy xx, yy;
     struct trap *ttmp;
 
     while (vct--) {
@@ -696,6 +731,24 @@ makevtele(void)
     makeniche(TELEP_TRAP);
 }
 
+/* count the different features (sinks, fountains) in the level */
+void
+count_level_features(void)
+{
+    coordxy x, y;
+
+    gl.level.flags.nfountains = gl.level.flags.nsinks = 0;
+    for (y = 0; y < ROWNO; y++)
+        for (x = 1; x < COLNO; x++) {
+            int typ = levl[x][y].typ;
+
+            if (typ == FOUNTAIN)
+                gl.level.flags.nfountains++;
+            else if (typ == SINK)
+                gl.level.flags.nsinks++;
+        }
+}
+
 /* clear out various globals that keep information on the current level.
  * some of this is only necessary for some types of levels (maze, normal,
  * special) but it's easier to put it all in one place than make sure
@@ -747,8 +800,14 @@ clear_level_structures(void)
     gl.level.flags.is_maze_lev = 0;
     gl.level.flags.is_cavernous_lev = 0;
     gl.level.flags.arboreal = 0;
+    gl.level.flags.has_town = 0;
     gl.level.flags.wizard_bones = 0;
     gl.level.flags.corrmaze = 0;
+    gl.level.flags.rndmongen = 0;
+    gl.level.flags.deathdrops = 0;
+    gl.level.flags.noautosearch = 0;
+    gl.level.flags.fumaroles = 0;
+    gl.level.flags.stormy = 0;
 
     gn.nroom = 0;
     gr.rooms[0].hx = -1;
@@ -763,6 +822,7 @@ clear_level_structures(void)
     stairway_free_all();
     gm.made_branch = FALSE;
     clear_regions();
+    free_exclusions();
     reset_xystart_size();
     if (gl.lev_message) {
         free(gl.lev_message);
@@ -1015,6 +1075,12 @@ makelevel(void)
      * level, proto level, or ordinary level. */
     for (i = 0; i < gn.nroom; ++i) {
         fill_special_room(&gr.rooms[i]);
+    }
+
+    if (gl.luacore && nhcb_counts[NHCB_LVL_ENTER]) {
+        lua_getglobal(gl.luacore, "nh_callback_run");
+        lua_pushstring(gl.luacore, nhcb_name[NHCB_LVL_ENTER]);
+        nhl_pcall(gl.luacore, 1, 0);
     }
 }
 
@@ -1307,7 +1373,10 @@ place_branch(
     }
 
     if (br->type == BR_PORTAL) {
-        mkportal(x, y, dest->dnum, dest->dlevel);
+        if (iflags.debug_fuzzer && (u.ucamefrom.dnum || u.ucamefrom.dlevel))
+            mkportal(x, y, u.ucamefrom.dnum, u.ucamefrom.dlevel);
+        else
+            mkportal(x, y, dest->dnum, dest->dlevel);
     } else if (make_stairs) {
         boolean goes_up = on_level(&br->end1, &u.uz) ? br->end1_up
                                                      : !br->end1_up;
@@ -1379,6 +1448,122 @@ occupied(coordxy x, coordxy y)
     return (boolean) (t_at(x, y) || IS_FURNITURE(levl[x][y].typ)
                       || is_lava(x, y) || is_pool(x, y)
                       || invocation_pos(x, y));
+}
+
+/* generate a corpse and some items on top of a trap */
+static void
+mktrap_victim(struct trap *ttmp)
+{
+    /* Object generated by the trap; initially NULL, stays NULL if
+       we fail to generate an object or if the trap doesn't
+       generate objects. */
+    struct obj *otmp = NULL;
+    int victim_mnum; /* race of the victim */
+    unsigned lvl = level_difficulty();
+    int kind = ttmp->ttyp;
+    coordxy x = ttmp->tx, y = ttmp->ty;
+
+    /* Not all trap types have special handling here; only the ones
+       that kill in a specific way that's obvious after the fact. */
+    switch (kind) {
+    case ARROW_TRAP:
+        otmp = mksobj(ARROW, TRUE, FALSE);
+        otmp->opoisoned = 0;
+        /* don't adjust the quantity; maybe the trap shot multiple
+           times, there was an untrapping attempt, etc... */
+        break;
+    case DART_TRAP:
+        otmp = mksobj(DART, TRUE, FALSE);
+        break;
+    case ROCKTRAP:
+        otmp = mksobj(ROCK, TRUE, FALSE);
+        break;
+    default:
+        /* no item dropped by the trap */
+        break;
+    }
+    if (otmp) {
+        place_object(otmp, x, y);
+    }
+
+    /* now otmp is reused for other items we're placing */
+
+    /* Place a random possession. This could be a weapon, tool,
+       food, or gem, i.e. the item classes that are typically
+       nonmagical and not worthless. */
+    do {
+        int poss_class = RANDOM_CLASS; /* init => lint suppression */
+
+        switch (rn2(4)) {
+        case 0:
+            poss_class = WEAPON_CLASS;
+            break;
+        case 1:
+            poss_class = TOOL_CLASS;
+            break;
+        case 2:
+            poss_class = FOOD_CLASS;
+            break;
+        case 3:
+            poss_class = GEM_CLASS;
+            break;
+        }
+
+        otmp = mkobj(poss_class, FALSE);
+        /* these items are always cursed, both for flavour (owned
+           by a dead adventurer, bones-pile-style) and for balance
+           (less useful to use, and encourage pets to avoid the trap) */
+        if (otmp) {
+            otmp->blessed = 0;
+            otmp->cursed = 1;
+            otmp->owt = weight(otmp);
+            place_object(otmp, x, y);
+        }
+
+        /* 20% chance of placing an additional item, recursively */
+    } while (!rn2(5));
+
+    /* Place a corpse. */
+    switch (rn2(15)) {
+    case 0:
+        /* elf corpses are the rarest as they're the most useful */
+        victim_mnum = PM_ELF;
+        /* elven adventurers get sleep resistance early; so don't
+           generate elf corpses on sleeping gas traps unless a)
+           we're on dlvl 2 (1 is impossible) and b) we pass a coin
+           flip */
+        if (kind == SLP_GAS_TRAP && !(lvl <= 2 && rn2(2)))
+            victim_mnum = PM_HUMAN;
+        break;
+    case 1: case 2:
+        victim_mnum = PM_DWARF;
+        break;
+    case 3: case 4: case 5:
+        victim_mnum = PM_ORC;
+        break;
+    case 6: case 7: case 8: case 9:
+        /* more common as they could have come from the Mines */
+        victim_mnum = PM_GNOME;
+        /* 10% chance of a candle too */
+        if (!rn2(10)) {
+            otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
+                          TRUE, FALSE);
+            otmp->quan = 1;
+            otmp->blessed = 0;
+            otmp->cursed = 1;
+            otmp->owt = weight(otmp);
+            place_object(otmp, x, y);
+        }
+        break;
+    default:
+        /* the most common race */
+        victim_mnum = PM_HUMAN;
+        break;
+    }
+    otmp = mkcorpstat(CORPSE, NULL, &mons[victim_mnum], x, y,
+                      CORPSTAT_INIT);
+    if (otmp)
+        otmp->age -= (TAINT_AGE + 1); /* died too long ago to eat */
 }
 
 /* make a trap somewhere (in croom if mazeflag = 0 && !tm) */
@@ -1518,6 +1703,9 @@ mktrap(
         (void) makemon(&mons[PM_GIANT_SPIDER], m.x, m.y, NO_MM_FLAGS);
     if (t && (mktrapflags & MKTRAP_SEEN))
         t->tseen = TRUE;
+    if (kind == MAGIC_PORTAL && (u.ucamefrom.dnum || u.ucamefrom.dlevel)) {
+        assign_level(&t->dst, &u.ucamefrom);
+    }
 
     /* The hero isn't the only person who's entered the dungeon in
        search of treasure. On the very shallowest levels, there's a
@@ -1540,7 +1728,8 @@ mktrap(
        lethal, and tend not to generate on shallower levels anyway.
        Finally, pits are excluded because it's weird to see an item
        in a pit and yet not be able to identify that the pit is there. */
-    if (kind != NO_TRAP && lvl <= (unsigned) rnd(4)
+    if (kind != NO_TRAP && !(mktrapflags & MKTRAP_NOVICTIM)
+        && lvl <= (unsigned) rnd(4)
         && kind != SQKY_BOARD && kind != RUST_TRAP
         /* rolling boulder trap might not have a boulder if there was no
            viable path (such as when placed in the corner of a room), in
@@ -1548,113 +1737,7 @@ mktrap(
         && !(kind == ROLLING_BOULDER_TRAP
              && t->launch.x == t->tx && t->launch.y == t->ty)
         && !is_pit(kind) && kind < HOLE) {
-        /* Object generated by the trap; initially NULL, stays NULL if
-           we fail to generate an object or if the trap doesn't
-           generate objects. */
-        struct obj *otmp = NULL;
-        int victim_mnum; /* race of the victim */
-
-        /* Not all trap types have special handling here; only the ones
-           that kill in a specific way that's obvious after the fact. */
-        switch (kind) {
-        case ARROW_TRAP:
-            otmp = mksobj(ARROW, TRUE, FALSE);
-            otmp->opoisoned = 0;
-            /* don't adjust the quantity; maybe the trap shot multiple
-               times, there was an untrapping attempt, etc... */
-            break;
-        case DART_TRAP:
-            otmp = mksobj(DART, TRUE, FALSE);
-            break;
-        case ROCKTRAP:
-            otmp = mksobj(ROCK, TRUE, FALSE);
-            break;
-        default:
-            /* no item dropped by the trap */
-            break;
-        }
-        if (otmp) {
-            place_object(otmp, m.x, m.y);
-        }
-
-        /* now otmp is reused for other items we're placing */
-
-        /* Place a random possession. This could be a weapon, tool,
-           food, or gem, i.e. the item classes that are typically
-           nonmagical and not worthless. */
-        do {
-            int poss_class = RANDOM_CLASS; /* init => lint suppression */
-
-            switch (rn2(4)) {
-            case 0:
-                poss_class = WEAPON_CLASS;
-                break;
-            case 1:
-                poss_class = TOOL_CLASS;
-                break;
-            case 2:
-                poss_class = FOOD_CLASS;
-                break;
-            case 3:
-                poss_class = GEM_CLASS;
-                break;
-            }
-
-            otmp = mkobj(poss_class, FALSE);
-            /* these items are always cursed, both for flavour (owned
-               by a dead adventurer, bones-pile-style) and for balance
-               (less useful to use, and encourage pets to avoid the trap) */
-            if (otmp) {
-                otmp->blessed = 0;
-                otmp->cursed = 1;
-                otmp->owt = weight(otmp);
-                place_object(otmp, m.x, m.y);
-            }
-
-            /* 20% chance of placing an additional item, recursively */
-        } while (!rn2(5));
-
-        /* Place a corpse. */
-        switch (rn2(15)) {
-        case 0:
-            /* elf corpses are the rarest as they're the most useful */
-            victim_mnum = PM_ELF;
-            /* elven adventurers get sleep resistance early; so don't
-               generate elf corpses on sleeping gas traps unless a)
-               we're on dlvl 2 (1 is impossible) and b) we pass a coin
-               flip */
-            if (kind == SLP_GAS_TRAP && !(lvl <= 2 && rn2(2)))
-                victim_mnum = PM_HUMAN;
-            break;
-        case 1: case 2:
-            victim_mnum = PM_DWARF;
-            break;
-        case 3: case 4: case 5:
-            victim_mnum = PM_ORC;
-            break;
-        case 6: case 7: case 8: case 9:
-            /* more common as they could have come from the Mines */
-            victim_mnum = PM_GNOME;
-            /* 10% chance of a candle too */
-            if (!rn2(10)) {
-                otmp = mksobj(rn2(4) ? TALLOW_CANDLE : WAX_CANDLE,
-                              TRUE, FALSE);
-                otmp->quan = 1;
-                otmp->blessed = 0;
-                otmp->cursed = 1;
-                otmp->owt = weight(otmp);
-                place_object(otmp, m.x, m.y);
-            }
-            break;
-        default:
-            /* the most common race */
-            victim_mnum = PM_HUMAN;
-            break;
-        }
-        otmp = mkcorpstat(CORPSE, NULL, &mons[victim_mnum], m.x, m.y,
-                          CORPSTAT_INIT);
-        if (otmp)
-            otmp->age -= (TAINT_AGE + 1); /* died too long ago to eat */
+        mktrap_victim(t);
     }
 }
 
@@ -1724,27 +1807,27 @@ static struct mkroom *
 generate_stairs_find_room(void)
 {
     struct mkroom *croom;
-    int i, phase, tryct = 0;
+    int i, phase, ai;
+    int *rmarr;
 
     if (!gn.nroom)
         return (struct mkroom *) 0;
 
-    for (phase = 2; phase > -1; phase--) {
-        do {
-            croom = &gr.rooms[rn2(gn.nroom)];
-            if (generate_stairs_room_good(croom, phase))
-                return croom;
-        } while (tryct++ < 50);
-    }
+    rmarr = (int *) alloc(sizeof(int) * gn.nroom);
 
-    for (phase = 2; phase > -2; phase--) {
-        for (i = 0; i < gn.nroom; i++) {
-            croom = &gr.rooms[i];
-            if (generate_stairs_room_good(croom, phase))
-                return croom;
+    for (phase = 2; phase > -1; phase--) {
+        ai = 0;
+        for (i = 0; i < gn.nroom; i++)
+            if (generate_stairs_room_good(&gr.rooms[i], phase))
+                rmarr[ai++] = i;
+        if (ai > 0) {
+            i = rmarr[rn2(ai)];
+            free(rmarr);
+            return &gr.rooms[i];
         }
     }
 
+    free(rmarr);
     croom = &gr.rooms[rn2(gn.nroom)];
     return croom;
 }
@@ -1953,7 +2036,7 @@ mkinvokearea(void)
         }
 
         flush_screen(1); /* make sure the new glyphs shows up */
-        delay_output();
+        nh_delay_output();
     }
 
     You("are standing at the top of a stairwell leading down!");

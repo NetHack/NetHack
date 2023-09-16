@@ -139,8 +139,10 @@ thitu(
                 pline_The("silver sears your flesh!");
                 exercise(A_CON, FALSE);
             }
-            if (is_acid)
+            if (is_acid) {
                 pline("It burns!");
+                monstunseesu(M_SEEN_ACID);
+            }
             losehp(dam, knm, kprefix); /* acid damage */
             exercise(A_STR, FALSE);
         }
@@ -313,7 +315,9 @@ monshoot(struct monst* mtmp, struct obj* otmp, struct obj* mwep)
 }
 
 /* an object launched by someone/thing other than player attacks a monster;
-   return 1 if the object has stopped moving (hit or its range used up) */
+   return 1 if the object has stopped moving (hit or its range used up)
+   can anger the monster, if this happened due to hero (eg. exploding
+   bag of holding throwing the items) */
 int
 ohitmon(
     struct monst *mtmp, /* accidental target, located at <gb.bhitpos.x,.y> */
@@ -484,6 +488,9 @@ ohitmon(
                 tmp = 127;
             mtmp->mblinded = tmp;
         }
+
+        if (!DEADMONSTER(mtmp) && !gc.context.mon_moving)
+            setmangry(mtmp, TRUE);
 
         objgone = drop_throw(otmp, 1, gb.bhitpos.x, gb.bhitpos.y);
         if (!objgone && range == -1) { /* special case */
@@ -752,16 +759,16 @@ m_throw(
             break;
         }
         tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-        delay_output();
+        nh_delay_output();
     }
     tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-    delay_output();
+    nh_delay_output();
     tmp_at(DISP_END, 0);
     gm.mesg_given = 0; /* reset */
 
     if (blindinc) {
         u.ucreamed += blindinc;
-        make_blinded(Blinded + (long) blindinc, FALSE);
+        make_blinded(BlindedTimeout + (long) blindinc, FALSE);
         if (!Blind)
             Your1(vision_clears);
     }
@@ -785,13 +792,13 @@ thrwmm(struct monst* mtmp, struct monst* mtarg)
         mtmp->weapon_check = NEED_RANGED_WEAPON;
         /* mon_wield_item resets weapon_check as appropriate */
         if (mon_wield_item(mtmp) != 0)
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
 
     /* Pick a weapon */
     otmp = select_rwep(mtmp);
     if (!otmp)
-        return MM_MISS;
+        return M_ATTK_MISS;
     ispole = is_pole(otmp);
 
     x = mtmp->mx;
@@ -806,17 +813,17 @@ thrwmm(struct monst* mtmp, struct monst* mtarg)
             if (ammo_and_launcher(otmp, mwep)
                 && dist2(mtmp->mx, mtmp->my, mtarg->mx, mtarg->my)
                    > PET_MISSILE_RANGE2)
-                return MM_MISS; /* Out of range */
+                return M_ATTK_MISS; /* Out of range */
             /* Set target monster */
             gm.mtarget = mtarg;
             gm.marcher = mtmp;
             monshoot(mtmp, otmp, mwep); /* multishot shooting or throwing */
             gm.marcher = gm.mtarget = (struct monst *) 0;
             nomul(0);
-            return MM_HIT;
+            return M_ATTK_HIT;
         }
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /* monster spits substance at monster */
@@ -835,7 +842,7 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 You_hear("a dry rattle nearby.");
             }
         }
-        return MM_MISS;
+        return M_ATTK_MISS;
     }
     if (m_lined_up(mtarg, mtmp)) {
         boolean utarg = (mtarg == &gy.youmonst);
@@ -874,13 +881,13 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                     dog->hungrytime -= 5;
             }
 
-            return MM_HIT;
+            return M_ATTK_HIT;
         } else {
             obj_extract_self(otmp);
             obfree(otmp, (struct obj *) 0);
         }
     }
-    return MM_MISS;
+    return M_ATTK_MISS;
 }
 
 /* Return the name of a breath weapon. If the player is hallucinating, return
@@ -911,7 +918,7 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                     You_hear("a cough.");
                 }
             }
-            return MM_MISS;
+            return M_ATTK_MISS;
         }
 
         /* if we've seen the actual resistance, don't bother, or
@@ -919,7 +926,7 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
         if (m_seenres(mtmp, cvt_adtyp_to_mseenres(typ))
             || (m_seenres(mtmp, M_SEEN_REFL)
                 && monnear(mtmp, mtmp->mux, mtmp->muy)))
-            return MM_HIT;
+            return M_ATTK_HIT;
 
         if (!mtmp->mspec_used && rn2(3)) {
             if (BZ_VALID_ADTYP(typ)) {
@@ -927,8 +934,10 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 if (canseemon(mtmp))
                     pline("%s breathes %s!",
                           Monnam(mtmp), breathwep_name(typ));
+                gb.buzzer = mtmp;
                 dobuzz(BZ_M_BREATH(BZ_OFS_AD(typ)), (int) mattk->damn,
                        mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby), utarget);
+                gb.buzzer = 0;
                 nomul(0);
                 /* breath runs out sometimes. Also, give monster some
                  * cunning; don't breath if the target fell asleep.
@@ -949,9 +958,9 @@ breamm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 }
             } else impossible("Breath weapon %d used", typ-1);
         } else
-            return MM_MISS;
+            return M_ATTK_MISS;
     }
-    return MM_HIT;
+    return M_ATTK_HIT;
 }
 
 /* remove an entire item from a monster's inventory; destroy that item */
@@ -1259,8 +1268,17 @@ hit_bars(
         if (!(harmless_missile(otmp) || is_flimsy(otmp)))
             noise = 4 * 4;
 
-        if (your_fault && otmp->otyp == WAR_HAMMER) {
-            int chance = (melee_attk ? 40 : 60) - ACURR(A_STR) - otmp->spe;
+        if (your_fault && (otmp->otyp == WAR_HAMMER
+                           || otmp->otyp == HEAVY_IRON_BALL)) {
+            /* iron ball isn't a weapon or wep-tool so doesn't use obj->spe;
+               weight is normally 480 but can be increased by increments
+               of 160 (scrolls of punishment read while already punished) */
+            int spe = ((otmp->otyp == HEAVY_IRON_BALL) /* 3+ for iron ball */
+                       ? ((int) otmp->owt / IRON_BALL_W_INCR)
+                       : otmp->spe);
+            /* chance: used in saving throw for the bars; more likely to
+               break those when 'chance' is _lower_; acurrstr(): 3..25 */
+            int chance = (melee_attk ? 40 : 60) - acurrstr() - spe;
 
             if (!rn2(max(2, chance))) {
                 You("break the bars apart!");

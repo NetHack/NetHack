@@ -116,7 +116,7 @@ static struct win_information window_opts[] = {
 #ifdef MSDOS
       "traditional text with optional 'tiles' graphics",
 #else
-      /* assume that one or more of IBMgraphics, DECgraphics, or MACgraphics
+      /* assume that one or more of IBMgraphics, DECgraphics
          can be enabled; we can't tell from here whether that is accurate */
       "traditional text with optional line-drawing",
 #endif
@@ -232,7 +232,7 @@ static struct soundlib_information soundlib_opts[] = {
  * Use this to explicitly mask out features during version checks.
  *
  * ZEROCOMP, RLECOMP, and ZLIB_COMP describe compression features
- * that the port/plaform which wrote the savefile was capable of
+ * that the port/platform which wrote the savefile was capable of
  * dealing with. Don't reject a savefile just because the port
  * reading the savefile doesn't match on all/some of them.
  * The actual compression features used to produce the savefile are
@@ -694,6 +694,7 @@ count_and_validate_winopts(void)
 #ifdef WIN32
         window_opts[i].valid = FALSE;
         if ((GUILaunched
+             && case_insensitive_comp(window_opts[i].id, "curses") != 0
              && case_insensitive_comp(window_opts[i].id, "mswin") != 0)
             || (!GUILaunched
                 && case_insensitive_comp(window_opts[i].id, "mswin") == 0))

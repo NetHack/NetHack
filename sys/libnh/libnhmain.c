@@ -1,4 +1,4 @@
-/* NetHack 3.7	libnhmain.c	$NHDT-Date: 1596498297 2020/08/03 23:44:57 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.87 $ */
+/* NetHack 3.7	libnhmain.c	$NHDT-Date: 1693359589 2023/08/30 01:39:49 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.106 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -79,7 +79,7 @@ nhmain(int argc, char *argv[])
     //     printf ("argv[%d]: %s\n", i, argv[i]);
     // }
 
-    early_init();
+    early_init(argc, argv);
 
     gh.hname = argv[0];
     gh.hackpid = getpid();
@@ -102,6 +102,11 @@ nhmain(int argc, char *argv[])
     if (argc > 1) {
         if (argcheck(argc, argv, ARG_VERSION) == 2)
             exit(EXIT_SUCCESS);
+
+#ifdef CRASHREPORT
+	if (argcheck(argc, argv, ARG_BIDSHOW))
+	    exit(EXIT_SUCCESS);
+#endif
 
         if (argcheck(argc, argv, ARG_SHOWPATHS) == 2) {
 #ifdef CHDIR
@@ -247,7 +252,7 @@ nhmain(int argc, char *argv[])
      */
     vision_init();
 
-    init_sound_and_display_gamewindows();
+    init_sound_disp_gamewindows();
 
     /*
      * First, try to find and restore a save file for specified character.

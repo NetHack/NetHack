@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1664979333 2022/10/05 14:15:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.250 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1683334246 2023/05/06 00:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -641,9 +641,10 @@ hitfloor(
  * before the failed callback.
  */
 boolean
-walk_path(coord *src_cc, coord *dest_cc,
-          boolean (*check_proc)(genericptr_t, coordxy, coordxy),
-          genericptr_t arg)
+walk_path(
+    coord *src_cc, coord *dest_cc,
+    boolean (*check_proc)(genericptr_t, coordxy, coordxy),
+    genericptr_t arg)
 {
     int err;
     coordxy x, y, dx, dy, x_change, y_change, i, prev_x, prev_y;
@@ -654,7 +655,7 @@ walk_path(coord *src_cc, coord *dest_cc,
      * This should be replaced with a more versatile algorithm
      * since it handles slanted moves in a suboptimal way.
      * Going from 'x' to 'y' needs to pass through 'z', and will
-     * fail if there's an obstable there, but it could choose to
+     * fail if there's an obstacle there, but it could choose to
      * pass through 'Z' instead if that way imposes no obstacle.
      *     ..y          .Zy
      *     xz.    vs    x..
@@ -971,8 +972,25 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     if (--*range < 0) /* make sure our range never goes negative */
         *range = 0;
     if (*range != 0)
-        delay_output();
+        nh_delay_output();
     return TRUE;
+}
+
+/* used by mhurtle_step() for actual hurtling and also to vary message
+   if target will/won't change location when knocked back */
+boolean
+will_hurtle(struct monst *mon, coordxy x, coordxy y)
+{
+    if (!isok(x, y))
+        return FALSE;
+    /* redundant when called by mhurtle() but needed for mhitm_knockback() */
+    if (mon->data->msize >= MZ_HUGE || mon == u.ustuck || mon->mtrapped)
+        return FALSE;
+    /*
+     * TODO: Treat walls, doors, iron bars, etc. specially
+     * rather than just stopping before.
+     */
+    return goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA);
 }
 
 static boolean
@@ -981,14 +999,10 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
     struct monst *mon = (struct monst *) arg;
     struct monst *mtmp;
 
-    /* TODO: Treat walls, doors, iron bars, etc. specially
-     * rather than just stopping before.
-     */
     if (!isok(x, y))
         return FALSE;
 
-    if (goodpos(x, y, mon, MM_IGNOREWATER | MM_IGNORELAVA)
-        && m_in_out_region(mon, x, y)) {
+    if (will_hurtle(mon, x, y) && m_in_out_region(mon, x, y)) {
         int res;
 
         if (mon != u.usteed) {
@@ -1004,7 +1018,7 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             vision_recalc(0); /* new location => different lines of sight */
         }
         flush_screen(1);
-        delay_output();
+        nh_delay_output();
         set_apparxy(mon);
         if (is_waterwall(x, y))
             return FALSE;
@@ -1015,20 +1029,42 @@ mhurtle_step(genericptr_t arg, coordxy x, coordxy y)
             return FALSE;
         return TRUE;
     }
-    if ((mtmp = m_at(x, y)) != 0) {
+    if ((mtmp = m_at(x, y)) != 0 && mtmp != mon) {
         if (canseemon(mon) || canseemon(mtmp))
             pline("%s bumps into %s.", Monnam(mon), a_monnam(mtmp));
-        wakeup(mon, !gc.context.mon_moving);
         wakeup(mtmp, !gc.context.mon_moving);
+        /* check whether 'mon' is turned to stone by touching 'mtmp' */
         if (touch_petrifies(mtmp->data)
             && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
             minstapetrify(mon, !gc.context.mon_moving);
             newsym(mon->mx, mon->my);
         }
+        /* and whether 'mtmp' is turned to stone by being touched by 'mon' */
         if (touch_petrifies(mon->data)
             && !which_armor(mtmp, W_ARMU | W_ARM | W_ARMC)) {
             minstapetrify(mtmp, !gc.context.mon_moving);
             newsym(mtmp->mx, mtmp->my);
+        }
+    } else if (u_at(x, y)) {
+        /* a monster has caused 'mon' to hurtle against hero */
+        pline("%s bumps into you.", Some_Monnam(mon));
+        stop_occupation();
+        /* check whether 'mon' is turned to stone by touching poly'd hero */
+        if (Upolyd && touch_petrifies(gy.youmonst.data)
+            && !which_armor(mon, W_ARMU | W_ARM | W_ARMC)) {
+            /* give poly'd hero credit/blame despite a monster causing it */
+            minstapetrify(mon, TRUE);
+            newsym(mon->mx, mon->my);
+        }
+        /* and whether hero is turned to stone by being touched by 'mon' */
+        if (touch_petrifies(mon->data) && !(uarmu || uarm || uarmc)) {
+            Snprintf(gk.killer.name, sizeof gk.killer.name, "being hit by %s",
+                     /* combine m_monnam() and noname_monnam():
+                        "{your,a} hurtling cockatrice" w/o assigned name */
+                     x_monnam(mon, mon->mtame ? ARTICLE_YOUR : ARTICLE_A,
+                              "hurtling", EXACT_NAME | SUPPRESS_NAME, FALSE));
+            instapetrify(gk.killer.name);
+            newsym(u.ux, u.uy);
         }
     }
 
@@ -1101,6 +1137,7 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
 {
     coord mc, cc;
 
+    wakeup(mon, !gc.context.mon_moving);
     /* At the very least, debilitate the monster */
     mon->movement = 0;
     mon->mstun = 1;
@@ -1137,10 +1174,12 @@ mhurtle(struct monst *mon, int dx, int dy, int range)
     cc.x = mon->mx + (dx * range);
     cc.y = mon->my + (dy * range);
     (void) walk_path(&mc, &cc, mhurtle_step, (genericptr_t) mon);
-    if (!DEADMONSTER(mon) && t_at(mon->mx, mon->my))
-        (void) mintrap(mon, FORCEBUNGLE);
-    else
-        (void) minliquid(mon);
+    if (!DEADMONSTER(mon)) {
+        if (t_at(mon->mx, mon->my))
+            (void) mintrap(mon, FORCEBUNGLE);
+        else
+            (void) minliquid(mon);
+    }
     return;
 }
 
@@ -1234,8 +1273,7 @@ toss_up(struct obj *obj, boolean hitsroof)
         if (breaktest(obj)) {
             pline("%s hits the %s.", Doname2(obj), ceiling(u.ux, u.uy));
             breakmsg(obj, !Blind);
-            breakobj(obj, u.ux, u.uy, TRUE, TRUE);
-            return FALSE;
+            return breakobj(obj, u.ux, u.uy, TRUE, TRUE) ? FALSE : TRUE;
         }
         action = "hits";
     } else {
@@ -1258,8 +1296,9 @@ toss_up(struct obj *obj, boolean hitsroof)
                        ? rnd(25)
                        : 0;
         breakmsg(obj, !Blind);
-        breakobj(obj, u.ux, u.uy, TRUE, TRUE);
-        obj = 0; /* it's now gone */
+        if (breakobj(obj, u.ux, u.uy, TRUE, TRUE))
+            obj = 0; /* it's now gone */
+
         switch (otyp) {
         case EGG:
             if (petrifier && !Stone_resistance
@@ -1279,7 +1318,7 @@ toss_up(struct obj *obj, boolean hitsroof)
                 if (otyp == BLINDING_VENOM && !Blind)
                     pline("It blinds you!");
                 u.ucreamed += blindinc;
-                make_blinded(Blinded + (long) blindinc, FALSE);
+                make_blinded(BlindedTimeout + (long) blindinc, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
             }
@@ -1287,7 +1326,11 @@ toss_up(struct obj *obj, boolean hitsroof)
         default:
             break;
         }
-        return FALSE;
+        if (!obj)
+            return FALSE;
+        /* 'obj' still exists, so drop it and return True */
+        hitfloor(obj, FALSE);
+        gt.thrownobj = 0;
     } else if (harmless_missile(obj)) {
         pline("It doesn't hurt.");
         hitfloor(obj, FALSE);
@@ -1295,7 +1338,7 @@ toss_up(struct obj *obj, boolean hitsroof)
     } else { /* neither potion nor other breaking object */
         int material = objects[otyp].oc_material;
         boolean is_silver = (material == SILVER),
-                less_damage = (uarmh && is_metallic(uarmh)
+                less_damage = (hard_helmet(uarmh)
                                && (!is_silver || !Hate_silver)),
                 harmless = (stone_missile(obj)
                             && passes_rocks(gy.youmonst.data)),
@@ -1401,7 +1444,7 @@ sho_obj_return_to_u(struct obj *obj)
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
         while (isok(x,y) && (x != u.ux || y != u.uy)) {
             tmp_at(x, y);
-            delay_output();
+            nh_delay_output();
             x -= u.dx;
             y -= u.dy;
         }
@@ -1697,12 +1740,13 @@ throwit(struct obj *obj,
             || obj->oclass == VENOM_CLASS) {
             tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
             tmp_at(gb.bhitpos.x, gb.bhitpos.y);
-            delay_output();
+            nh_delay_output();
             tmp_at(DISP_END, 0);
             breakmsg(obj, cansee(gb.bhitpos.x, gb.bhitpos.y));
-            breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE);
-            clear_thrownobj = TRUE;
-            goto throwit_return;
+            if (breakobj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE, TRUE)) {
+                clear_thrownobj = TRUE;
+                goto throwit_return;
+            }
         }
         if (!Deaf && !Underwater) {
             /* Some sound effects when item lands in water or lava */
@@ -1771,7 +1815,7 @@ return_throw_to_inv(
     struct obj *otmp = NULL;
 
     /* if 'obj' is from a stack split, we can put it back by undoing split
-       so there's no chance of merging with some other compatable stack */
+       so there's no chance of merging with some other compatible stack */
     if (obj->o_id == gc.context.objsplit.parent_oid
         || obj->o_id == gc.context.objsplit.child_oid) {
         obj->nobj = gi.invent;
@@ -1789,7 +1833,7 @@ return_throw_to_inv(
 
     /* if 'obj' wasn't from a stack split or if it wouldn't merge back
        (maybe new erosion damage?) then it needs to be added to invent;
-       don't merge with any other stack even if there is a compatable one
+       don't merge with any other stack even if there is a compatible one
        (others with similar erosion?) */
     if (!otmp) {
         obj->nomerge = 1;
@@ -2295,9 +2339,10 @@ gem_accept(register struct monst *mon, register struct obj *obj)
  * Return 0 if the object didn't break, 1 if the object broke.
  */
 int
-hero_breaks(struct obj *obj,
-            coordxy x, coordxy y, /* object location (ox, oy may not be right) */
-            unsigned breakflags)
+hero_breaks(
+    struct obj *obj,
+    coordxy x, coordxy y, /* object location (ox, oy may not be right) */
+    unsigned breakflags)
 {
     /* from_invent: thrown or dropped by player; maybe on shop bill;
        by-hero is implicit so callers don't need to specify BRK_BY_HERO */
@@ -2312,8 +2357,7 @@ hero_breaks(struct obj *obj,
         return 0;
 
     breakmsg(obj, in_view);
-    breakobj(obj, x, y, TRUE, from_invent);
-    return 1;
+    return breakobj(obj, x, y, TRUE, from_invent);
 }
 
 /*
@@ -2322,16 +2366,16 @@ hero_breaks(struct obj *obj,
  * Return 0 if the object doesn't break, 1 if the object broke.
  */
 int
-breaks(struct obj *obj,
-       coordxy x, coordxy y) /* object location (ox, oy may not be right) */
+breaks(
+    struct obj *obj,
+    coordxy x, coordxy y) /* object location (ox, oy may not be right) */
 {
     boolean in_view = Blind ? FALSE : cansee(x, y);
 
     if (!breaktest(obj))
         return 0;
     breakmsg(obj, in_view);
-    breakobj(obj, x, y, FALSE, FALSE);
-    return 1;
+    return breakobj(obj, x, y, FALSE, FALSE);
 }
 
 void
@@ -2351,17 +2395,24 @@ release_camera_demon(struct obj *obj, coordxy x, coordxy y)
 }
 
 /*
- * Unconditionally break an object. Assumes all resistance checks
+ * Break an object.  Breakable armor goes through erosion steps; other
+ * items break unconditionally.  Assumes all resistance checks
  * and break messages have been delivered prior to getting here.
+ * (No longer true; breakmsg() is silent for crackable armor and we
+ * call erode_obj() for it and that delivers a damaged-the-item message.)
  */
-void
+int
 breakobj(
     struct obj *obj,
-    coordxy x, coordxy y,    /* object location (ox, oy may not be right) */
-    boolean hero_caused, /* is this the hero's fault? */
+    coordxy x, coordxy y,   /* object location (ox, oy may not be right) */
+    boolean hero_caused,    /* is this the hero's fault? */
     boolean from_invent)
 {
     boolean fracture = FALSE;
+
+    if (is_crackable(obj)) /* if erodeproof, erode_obj() will say so */
+        return (erode_obj(obj, armor_simple_name(obj), ERODE_CRACK,
+                          EF_DESTROY | EF_VERBOSE) == ER_DESTROYED);
 
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     case MIRROR:
@@ -2439,6 +2490,7 @@ breakobj(
     }
     if (!fracture)
         delobj(obj);
+    return 1;
 }
 
 /*
@@ -2448,11 +2500,19 @@ breakobj(
 boolean
 breaktest(struct obj *obj)
 {
-    if (obj_resists(obj, 1, 99))
-        return 0;
+    int nonbreakchance = 1; /* chance for non-artifacts to resist */
+
+    /* this may need to be changed if actual glass armor gets added someday;
+       for now, it affects crystal plate mail and helm of brilliance;
+       either of them will have to be cracked 4 times before breaking */
+    if (obj->oclass == ARMOR_CLASS && objects[obj->otyp].oc_material == GLASS)
+        nonbreakchance = 90;
+
+    if (obj_resists(obj, nonbreakchance, 99))
+        return FALSE;
     if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact
         && obj->oclass != GEM_CLASS)
-        return 1;
+        return TRUE;
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     case EXPENSIVE_CAMERA:
     case POT_WATER: /* really, all potions */
@@ -2461,9 +2521,9 @@ breaktest(struct obj *obj)
     case MELON:
     case ACID_VENOM:
     case BLINDING_VENOM:
-        return 1;
+        return TRUE;
     default:
-        return 0;
+        return FALSE;
     }
 }
 
@@ -2472,13 +2532,15 @@ breakmsg(struct obj *obj, boolean in_view)
 {
     const char *to_pieces;
 
+    if (is_crackable(obj)) /* breakobj() will call erode_obj() for message */
+        return;
+
     to_pieces = "";
     switch (obj->oclass == POTION_CLASS ? POT_WATER : obj->otyp) {
     default: /* glass or crystal wand */
         if (obj->oclass != WAND_CLASS)
-            impossible("breaking odd object?");
+            impossible("breaking odd object (%d)?", obj->otyp);
         /*FALLTHRU*/
-    case CRYSTAL_PLATE_MAIL:
     case LENSES:
     case MIRROR:
     case CRYSTAL_BALL:

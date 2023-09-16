@@ -38,6 +38,7 @@ static int select_off(struct obj *);
 static struct obj *do_takeoff(void);
 static int take_off(void);
 static int menu_remarm(int);
+static void wornarm_destroyed(struct obj *);
 static void count_worn_stuff(struct obj **, boolean);
 static int armor_or_accessory_off(struct obj *);
 static int accessory_or_armor_on(struct obj *);
@@ -239,7 +240,8 @@ Boots_off(void)
     case WATER_WALKING_BOOTS:
         /* check for lava since fireproofed boots make it viable */
         if ((is_pool(u.ux, u.uy) || is_lava(u.ux, u.uy))
-            && !Levitation && !Flying && !is_clinger(gy.youmonst.data)
+            && !Levitation && !Flying
+            && !(is_clinger(gy.youmonst.data) && has_ceiling(&u.uz))
             && !gc.context.takeoff.cancelled_don
             /* avoid recursive call to lava_effects() */
             && !iflags.in_lava_effects) {
@@ -258,7 +260,10 @@ Boots_off(void)
     case LEVITATION_BOOTS:
         if (!oldprop && !HLevitation && !(BLevitation & FROMOUTSIDE)
             && !gc.context.takeoff.cancelled_don) {
-            (void) float_down(0L, 0L);
+            /* lava_effects() sets in_lava_effects and calls Boots_off()
+               so hero is already in midst of floating down */
+            if (!iflags.in_lava_effects)
+                (void) float_down(0L, 0L);
             makeknown(otyp);
         } else {
             float_vs_flight(); /* maybe toggle (BFlying & I_SPECIAL) */
@@ -395,6 +400,9 @@ Helmet_on(void)
     case ORCISH_HELM:
     case HELM_OF_TELEPATHY:
         break;
+    case HELM_OF_CAUTION:
+        see_monsters();
+        break;
     case HELM_OF_BRILLIANCE:
         adj_abon(uarmh, uarmh->spe);
         break;
@@ -481,6 +489,7 @@ Helmet_off(void)
         }
         break;
     case HELM_OF_TELEPATHY:
+    case HELM_OF_CAUTION:
         /* need to update ability before calling see_monsters() */
         setworn((struct obj *) 0, W_ARMH);
         see_monsters();
@@ -501,6 +510,15 @@ Helmet_off(void)
     setworn((struct obj *) 0, W_ARMH);
     gc.context.takeoff.cancelled_don = FALSE;
     return 0;
+}
+
+/* hard helms provide better protection against against falling rocks */
+boolean
+hard_helmet(struct obj *obj)
+{
+    if (!obj || !is_helmet(obj))
+        return FALSE;
+    return (is_metallic(obj) || is_crackable(obj)) ? TRUE : FALSE;
 }
 
 static int
@@ -739,12 +757,12 @@ dragon_armor_handling(
     case BLUE_DRAGON_SCALE_MAIL:
         if (puton) {
             if (!Very_fast)
-                pline("You speed up%s.", Fast ? " a bit more" : "");
+                You("speed up%s.", Fast ? " a bit more" : "");
             EFast |= W_ARM;
         } else {
             EFast &= ~W_ARM;
             if (!Very_fast && !gc.context.takeoff.cancelled_don)
-                pline("You slow down.");
+                You("slow down.");
         }
         break;
     case GREEN_DRAGON_SCALES:
@@ -997,8 +1015,7 @@ Amulet_off(void)
             /* HMagical_breathing must be set off
                 before calling drown() */
             setworn((struct obj *) 0, W_AMUL);
-            if (!breathless(gy.youmonst.data) && !amphibious(gy.youmonst.data)
-                && !Swimming) {
+            if (!cant_drown(gy.youmonst.data) && !Swimming) {
                 You("suddenly inhale an unhealthy amount of %s!",
                     hliquid("water"));
                 (void) drown();
@@ -1396,7 +1413,7 @@ Blindf_off(struct obj *otmp)
    also used by poly_obj() when a worn item gets transformed */
 void
 set_wear(struct obj *obj) /* if null, do all worn items;
-                             otherwise just obj itself */
+                           * otherwise just obj itself */
 {
     gi.initial_don = !obj;
 
@@ -1524,11 +1541,17 @@ cancel_don(void)
 {
     /* the piece of armor we were donning/doffing has vanished, so stop
      * wasting time on it (and don't dereference it when donning would
-     * otherwise finish)
+     * otherwise finish); afternmv never has some of these values because
+     * every item of the corresponding armor category takes 1 turn to wear,
+     * but check all of them anyway
      */
-    gc.context.takeoff.cancelled_don =
-        (ga.afternmv == Boots_on || ga.afternmv == Helmet_on
-         || ga.afternmv == Gloves_on || ga.afternmv == Armor_on);
+    gc.context.takeoff.cancelled_don = (ga.afternmv == Cloak_on
+                                        || ga.afternmv == Armor_on
+                                        || ga.afternmv == Shirt_on
+                                        || ga.afternmv == Helmet_on
+                                        || ga.afternmv == Gloves_on
+                                        || ga.afternmv == Boots_on
+                                        || ga.afternmv == Shield_on);
     ga.afternmv = (int (*)(void)) 0;
     gn.nomovemsg = (char *) 0;
     gm.multi = 0;
@@ -1948,7 +1971,7 @@ canwearobj(struct obj *otmp, long *mask, boolean noisy)
             /* break_armor() pushes boots off for centaurs,
                so don't let dowear() put them back on... */
             if (noisy)
-                pline("You have too many hooves to wear %s.",
+                You("have too many hooves to wear %s.",
                       c_boots); /* makeplural(body_part(FOOT)) yields
                                    "rear hooves" which sounds odd */
             err++;
@@ -2068,7 +2091,7 @@ accessory_or_armor_on(struct obj *obj)
                 You("are suddenly overcome with shame and change your mind.");
             u.ublessed = 0; /* lose your god's protection */
             makeknown(obj->otyp);
-            gc.context.botl = 1; /*for AC after zeroing u.ublessed */
+            gc.context.botl = 1; /* for AC after zeroing u.ublessed */
             return ECMD_TIME;
         }
     } else {
@@ -2410,7 +2433,7 @@ glibr(void)
             dropx(otmp);
     }
     otmp = uwep;
-    if (otmp && !welded(otmp)) {
+    if (otmp && otmp->otyp != AKLYS && !welded(otmp)) {
         long savequan = otmp->quan;
 
         /* nice wording if both weapons are the same type */
@@ -2933,11 +2956,54 @@ menu_remarm(int retry)
     return 0;
 }
 
+/* take off the specific worn object and if it still exists after that,
+   destroy it (taking off the item might already destroy it by dunking
+   hero into lava) */
+static void
+wornarm_destroyed(struct obj *wornarm)
+{
+    struct obj *invobj;
+    unsigned wornoid = wornarm->o_id;
+
+    /* cancel_don() resets 'afternmv' when appropriate but doesn't reset
+       uarmc/uarm/&c so doing this now won't interfere with the tests in
+       'if (wornarm==uarmc) ... else if (wornarm==uarm) ... else ...' */
+    if (donning(wornarm))
+        cancel_don();
+
+    if (wornarm == uarmc)
+        (void) Cloak_off();
+    else if (wornarm == uarm)
+        (void) Armor_off();
+    else if (wornarm == uarmu)
+        (void) Shirt_off();
+    else if (wornarm == uarmh)
+        (void) Helmet_off();
+    else if (wornarm == uarmg)
+        (void) Gloves_off();
+    else if (wornarm == uarmf)
+        (void) Boots_off();
+    else if (wornarm == uarms)
+        (void) Shield_off();
+
+    /* 'wornarm' might be destroyed as a side-effect of xxx_off() so
+       using carried() to check wornarm->where==OBJ_INVENT is not viable;
+       scan invent instead; if already freed it shouldn't be possible to
+       have re-used the stale memory for a new item yet but verify o_id
+       just in case */
+    for (invobj = gi.invent; invobj; invobj = invobj->nobj)
+        if (invobj == wornarm && invobj->o_id == wornoid) {
+            useup(wornarm);
+            break;
+        }
+}
+
 /* hit by destroy armor scroll/black dragon breath/monster spell */
 int
-destroy_arm(register struct obj *atmp)
+destroy_arm(struct obj *atmp)
 {
     struct obj *otmp;
+    boolean losing_gloves = FALSE;
     /*
      * Note: if there were any artifact cloaks, the 90% chance of
      * resistance here means that the cloak could survive and then
@@ -2945,25 +3011,17 @@ destroy_arm(register struct obj *atmp)
      * artifact suit over a shirt.  That would be a bug.  Since there
      * aren't any, we'll just look the other way.
      */
-#define DESTROY_ARM(o)                             \
-    (((otmp = (o)) != 0 && (!atmp || atmp == otmp) \
-             && (!obj_resists(otmp, 0, 90)))       \
-         ? (otmp->in_use = TRUE)                   \
-         : FALSE)
+#define DESTROY_ARM(o) \
+    (((otmp = (o)) != 0 && (!atmp || atmp == otmp)              \
+      && !obj_resists(otmp, 0, 90)) ? (otmp->in_use = 1) : 0)
 
     if (DESTROY_ARM(uarmc)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s crumbles and turns to dust!",
                      /* cloak/robe/apron/smock (ID'd apron)/wrapping */
-                     cloak_simple_name(uarmc));
-        (void) Cloak_off();
-        useup(otmp);
+                     cloak_simple_name(otmp));
     } else if (DESTROY_ARM(uarm)) {
-        const char *suit = suit_simple_name(uarm);
+        const char *suit = suit_simple_name(otmp);
 
-        if (donning(otmp))
-            cancel_don();
         /* for gold DSM, we don't want Armor_gone() to report that it
            stops shining _after_ we've been told that it is destroyed */
         if (otmp->lamplit)
@@ -2972,46 +3030,31 @@ destroy_arm(register struct obj *atmp)
                      /* suit might be "dragon scales" so vtense() is needed */
                      suit, vtense(suit, "turn"), vtense(suit, "fall"),
                      surface(u.ux, u.uy));
-        (void) Armor_gone();
-        useup(otmp);
     } else if (DESTROY_ARM(uarmu)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s crumbles into tiny threads and falls apart!",
-                     shirt_simple_name(uarmu)); /* always "shirt" */
-        (void) Shirt_off();
-        useup(otmp);
+                     shirt_simple_name(otmp)); /* always "shirt" */
     } else if (DESTROY_ARM(uarmh)) {
-        if (donning(otmp))
-            cancel_don();
         urgent_pline("Your %s turns to dust and is blown away!",
-                     helm_simple_name(uarmh)); /* "helm" or "hat" */
-        (void) Helmet_off();
-        useup(otmp);
+                     helm_simple_name(otmp)); /* "helm" or "hat" */
     } else if (DESTROY_ARM(uarmg)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s vanish!", gloves_simple_name(uarmg));
-        (void) Gloves_off();
-        useup(otmp);
-        selftouch("You");
+        urgent_pline("Your %s vanish!", gloves_simple_name(otmp));
+        losing_gloves = TRUE;
     } else if (DESTROY_ARM(uarmf)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s disintegrate!", boots_simple_name(uarmf));
-        (void) Boots_off();
-        useup(otmp);
+        urgent_pline("Your %s disintegrate!", boots_simple_name(otmp));
     } else if (DESTROY_ARM(uarms)) {
-        if (donning(otmp))
-            cancel_don();
-        urgent_pline("Your %s crumbles away!", shield_simple_name(uarms));
-        (void) Shield_off();
-        useup(otmp);
+        urgent_pline("Your %s crumbles away!", shield_simple_name(otmp));
     } else {
         return 0; /* could not destroy anything */
     }
 
 #undef DESTROY_ARM
+
+    /* cancel_don() if applicable, Cloak_off()/Armor_off()/&c, and useup() */
+    wornarm_destroyed(otmp);
+    /* glove loss means wielded weapon will be touched */
+    if (losing_gloves)
+        selftouch("You");
+
     stop_occupation();
     return 1;
 }

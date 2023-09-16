@@ -514,7 +514,7 @@ landing_spot(
                 if (min_distance < 0 /* no viable candidate yet */
                     /* or better than pending candidate (note: orthogonal
                        spots are distance 1 and diagonal ones distance 2;
-                       treating one as better than the other is arbitary
+                       treating one as better than the other is arbitrary
                        and not wanted for DISMOUNT_KNOCKED) */
                     || ((best_j == -1) ? (distance < min_distance) : (j < 3))
                     /* or equally good, maybe substitute this one */
@@ -634,6 +634,13 @@ dismount_steed(
     /* Release the steed and saddle */
     u.usteed = 0;
     u.ugallop = 0L;
+
+    if (u.utraptype == TT_BEARTRAP
+        || u.utraptype == TT_PIT
+        || u.utraptype == TT_WEB) {
+        mtmp->mtrapped = 1;
+    }
+
     /*
      * rloc(), rloc_to(), and monkilled()->mondead()->m_detach() all
      * expect mtmp to be on the map or else have mtmp->mx be 0, but
@@ -689,7 +696,7 @@ dismount_steed(
                     if (!Underwater)
                         pline("%s falls into the %s!", Monnam(mtmp),
                               surface(u.ux, u.uy));
-                    if (!is_swimmer(mdat) && !amphibious(mdat)) {
+                    if (!cant_drown(mdat)) {
                         killed(mtmp);
                         adjalign(-1);
                     }
@@ -833,7 +840,7 @@ stucksteed(boolean checkfeeding)
 }
 
 void
-place_monster(struct monst* mon, int x, int y)
+place_monster(struct monst* mon, coordxy x, coordxy y)
 {
     struct monst *othermon;
     const char *monnm, *othnm;

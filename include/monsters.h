@@ -1,15 +1,7 @@
-/* NetHack 3.7	monsters.h	$NHDT-Date: 1665130023 2022/10/07 08:07:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.103 $ */
+/* NetHack 3.7	monsters.h	$NHDT-Date: 1691877846 2023/08/12 22:04:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.110 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
-
-#ifndef WT_ELF
-#define WT_ELF 800
-#endif
-
-#ifndef WT_DRAGON
-#define WT_DRAGON 4500
-#endif
 
 #if defined(MONS_ENUM)
 #define MON(nam, sym, lvl, gen, atk, siz, mr1, mr2, flg1, flg2, flg3, d, \
@@ -739,14 +731,14 @@
     MON("titanothere", S_QUADRUPED, LVL(12, 12, 6, 0, 0), (G_GENO | 2),
         A(ATTK(AT_CLAW, AD_PHYS, 2, 8), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(2650, 650, MS_SILENT, MZ_LARGE), 0, 0,
+        SIZ(2650, 650, MS_BELLOW, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_HERBIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, 13, CLR_GRAY,
         TITANOTHERE),
     MON("baluchitherium", S_QUADRUPED, LVL(14, 12, 5, 0, 0), (G_GENO | 2),
         A(ATTK(AT_CLAW, AD_PHYS, 5, 4), ATTK(AT_CLAW, AD_PHYS, 5, 4), NO_ATTK,
           NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(3800, 800, MS_SILENT, MZ_LARGE), 0, 0,
+        SIZ(3800, 800, MS_BELLOW, MZ_LARGE), 0, 0,
         M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS | M1_HERBIVORE,
         M2_HOSTILE | M2_STRONG, M3_INFRAVISIBLE, 15, CLR_GRAY,
         BALUCHITHERIUM),
@@ -2721,26 +2713,33 @@
         M3_INFRAVISIBLE, 8, CLR_YELLOW, DJINNI),
     /*
      * sea monsters
+     *
+     * 3.7: all the fish except kraken used to specify M1_SLITHY, presumably
+     * cloned from giant eel.  Using "slither" to describe their movement
+     * wasn't appropriate.  Unfortunately, locomotion() isn't able to choose
+     * "swim" as their movement description because it is only passed a
+     * monster type, not a specific monster (for <mx,my>) or the relevant
+     * location, and therefore doesn't know whether water is involved.
      */
     MON("jellyfish", S_EEL, LVL(3, 3, 6, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_STNG, AD_DRST, 3, 3), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(80, 20, MS_SILENT, MZ_SMALL), MR_POISON, MR_POISON,
-        M1_SWIM | M1_AMPHIBIOUS | M1_SLITHY | M1_NOLIMBS | M1_NOHEAD
+        M1_SWIM | M1_AMPHIBIOUS | M1_NOLIMBS | M1_NOHEAD
             | M1_NOTAKE | M1_POIS,
         M2_HOSTILE, 0, 5, CLR_BLUE, JELLYFISH),
     MON("piranha", S_EEL, LVL(5, 18, 4, 0, 0), (G_GENO | G_NOGEN | G_SGROUP),
         A(ATTK(AT_BITE, AD_PHYS, 2, 6), ATTK(AT_BITE, AD_PHYS, 2, 6),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
         SIZ(60, 30, MS_SILENT, MZ_SMALL), 0, 0,
-        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_NOTAKE,
         M2_HOSTILE, 0, 7, CLR_RED, PIRANHA),
     MON("shark", S_EEL, LVL(7, 12, 2, 0, 0), (G_GENO | G_NOGEN),
         A(ATTK(AT_BITE, AD_PHYS, 5, 6), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(500, 350, MS_SILENT, MZ_LARGE), 0, 0,
-        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_SLITHY | M1_NOLIMBS
+        M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOLIMBS
             | M1_CARNIVORE | M1_OVIPAROUS | M1_THICK_HIDE | M1_NOTAKE,
         M2_HOSTILE, 0, 9, CLR_GRAY, SHARK),
     MON("giant eel", S_EEL, LVL(5, 9, -1, 0, 0), (G_GENO | G_NOGEN),
@@ -2789,7 +2788,7 @@
     MON("baby crocodile", S_LIZARD, LVL(3, 6, 7, 0, 0), G_GENO,
         A(ATTK(AT_BITE, AD_PHYS, 1, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
-        SIZ(200, 200, MS_SILENT, MZ_MEDIUM), 0, 0,
+        SIZ(200, 200, MS_CHIRP, MZ_MEDIUM), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_NOHANDS | M1_CARNIVORE,
         M2_HOSTILE, 0, 4, CLR_BROWN, BABY_CROCODILE),
     MON("lizard", S_LIZARD, LVL(5, 6, 6, 10, 0), (G_GENO | 5),
@@ -2808,7 +2807,7 @@
     MON("crocodile", S_LIZARD, LVL(6, 9, 5, 0, 0), (G_GENO | 1),
         A(ATTK(AT_BITE, AD_PHYS, 4, 2), ATTK(AT_CLAW, AD_PHYS, 1, 12),
           NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK),
-        SIZ(WT_HUMAN, 400, MS_SILENT, MZ_LARGE), 0, 0,
+        SIZ(WT_HUMAN, 400, MS_BELLOW, MZ_LARGE), 0, 0,
         M1_SWIM | M1_AMPHIBIOUS | M1_ANIMAL | M1_THICK_HIDE | M1_NOHANDS
             | M1_OVIPAROUS | M1_CARNIVORE,
         M2_STRONG | M2_HOSTILE, 0, 7, CLR_BROWN, CROCODILE),

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1654287121 2022/06/03 20:12:01 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.145 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1693519377 2023/08/31 22:02:57 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.162 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -44,7 +44,7 @@ SHELL=/bin/sh
 #LINK=$(CC)
 
 # If we're cross-compiling, a hints file will override this
-# to a uniq target directory, but otherwise it just goes in
+# to a unique target directory, but otherwise it just goes in
 # ../src
 TARGETPFX=
 
@@ -68,6 +68,11 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 #SYSOBJ = $(TARGETPFX)bemain.o $(TARGETPFX)unixtty.o $(TARGETPFX)ioctl.o
 
 
+# NetHack 3.7 began introducing C99 code.
+#
+# If your compiler needs an appropriate switch to accept C99 code.
+# CSTD = -std=c99
+
 # if you are using gcc as your compiler:
 #	uncomment the CC definition below if it's not in your environment
 #	if you get setcgtty() warnings during execution, you are feeding gcc
@@ -90,6 +95,11 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # CC = arm-linux-gcc
 #
 #
+# The gcc compiler switch for accepting C99 code. Because gcc had extensions in
+# earlier versions, a number of C99 features were already compiling cleanly, but
+# not all (e.g., 'for' loop initial declarations).
+# CSTD = -std=c99
+
 # if you're debugging and want gcc to check as much as possible, use:
 # CC = gcc -W -Wimplicit -Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wcast-qual -Wwrite-strings
 
@@ -109,6 +119,11 @@ SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
 # CFLAGS = -mshort -O2 -fomit-frame-pointer -I../include
 # LFLAGS = -mshort -s
 
+# Curses, use one of the following:
+# -D_XOPEN_SOURCE_EXTENDED=1  allows any map character to appear in the message window
+# during far look with the '/' command.
+# -DCURSES_GENL_PUTMIXED to disable that and fall back to displaying only the historical tty character.
+#
 # flags for AIX 3.1 cc on IBM RS/6000 to define
 # a suitable subset of standard libraries
 # (note that there is more info regarding the "-qchars=signed"
@@ -189,7 +204,7 @@ MOCPATH ?= $(QTDIR)/bin/$(MOC)
 # If we're cross-compiling these will get overridden elsewhere, likely via
 # a hints file. TARGETPFX was set above earlier.
 TARGET_CC = $(CC)
-TARGET_CFLAGS = $(CFLAGS)
+TARGET_CFLAGS = $(CFLAGS) $(CSTD)
 TARGET_LINK = $(LINK)
 TARGET_LFLAGS = $(LFLAGS)
 TARGET_CXX = $(CXX)
@@ -422,7 +437,7 @@ QUIETCC=0
 # Nothing below this line should have to be changed.
 #
 # Other things that have to be reconfigured are in config.h,
-# {unixconf.h, pcconf.h}, and possibly system.h
+# {unixconf.h, pcconf.h}, and possibly cstd.h
 
 # Add rule for possible cross-compiler
 $(TARGETPFX)%.o : %.c
@@ -461,14 +476,12 @@ AT = $(AT_V$(QUIETCC))
 # verbosity-adjacent; these will already have 'real' values if hints have
 # set up cross-compiling, in which case these assignments will be no-ops
 PREGAME=@true
-CLEANMORE=@true
 PACKAGE=@true
-
 
 MAKEDEFS = ../util/makedefs
 
 # -lm required by lua
-LUA_VERSION ?=5.4.4
+LUA_VERSION ?=5.4.6
 LUABASE = liblua-$(LUA_VERSION).a
 LUALIB = ../lib/lua/$(LUABASE)
 LUALIBS = $(LUALIB) -lm $(DLLIB)
@@ -539,9 +552,9 @@ HACKINCL = align.h artifact.h artilist.h attrib.h botl.h \
 	micro.h mkroom.h monattk.h mondata.h monflag.h monst.h monsters.h \
 	obj.h objects.h objclass.h optlist.h patchlevel.h pcconf.h \
 	permonst.h prop.h rect.h region.h sym.h defsym.h rm.h sp_lev.h \
-	spell.h sndprocs.h sys.h system.h tcap.h timeout.h tradstdc.h \
-	trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h winX.h \
-	winprocs.h wintype.h you.h youprop.h
+	spell.h sndprocs.h seffects.h sys.h tcap.h timeout.h \
+	tradstdc.h trap.h unixconf.h vision.h vmsconf.h wintty.h wincurs.h \
+	winX.h winprocs.h wintype.h you.h youprop.h cstd.h
 
 HSOURCES = $(HACKINCL) dgn_file.h
 
@@ -611,7 +624,8 @@ $(GAME):	pregame $(MAKEDEFS) $(LUALIB) $(WAVS) $(SYSTEM)
 Sysunix:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
 	@echo "Linking $(GAME)."
 	$(AT)$(TARGET_LINK) $(TARGET_LFLAGS) -o $(GAMEBIN) \
-		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS)
+		$(HOBJ) $(DATE_O) $(WINLIB) $(TARGET_LIBS) $(LUALIBS) \
+		$(AUTOLIBS)
 	@touch Sysunix
 
 Sys3B2:	$(HOSTOBJ) $(HOBJ) $(DATE_O) $(BUILDMORE) Makefile
@@ -676,11 +690,11 @@ $(LUALIB) ../include/nhlua.h:
 # special rules, to force update of makedefs, real dependencies should be
 # below in the 'make depend' output.
 monst.o:
-	$(CC) $(CFLAGS) -c -o $@ monst.c
+	$(CC) $(CFLAGS) $(CSTD) -c -o $@ monst.c
 	@rm -f $(MAKEDEFS)
 
 objects.o:
-	$(CC) $(CFLAGS) -c -o $@ objects.c
+	$(CC) $(CFLAGS) $(CSTD) -c -o $@ objects.c
 	@rm -f $(MAKEDEFS)
 
 # outdated Qt 3 windowport meta-object-compiler output
@@ -754,7 +768,7 @@ tags: $(CSOURCES)
 clean:
 	-rm -f *.o $(HACK_H) $(CONFIG_H)
 	-rm -f monstr.c vis_tab.c ../include/vis_tab.h #obsolete generated files
-	$(CLEANMORE)
+	true; $(CLEANMORE)
 
 spotless: clean
 	-rm -f a.out core $(GAMEBIN) Sys*
@@ -792,7 +806,7 @@ depend: ../sys/unix/depend.awk \
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
 		../include/tradstdc.h ../include/integer.h \
 		../include/global.h ../include/coord.h ../include/vmsconf.h \
-		../include/system.h ../include/nhlua.h ../include/unixconf.h \
+		../include/cstd.h ../include/nhlua.h ../include/unixconf.h \
 		../include/pcconf.h ../include/micro.h ../include/windconf.h \
 		../include/warnings.h ../include/fnamesiz.h
 	touch $(CONFIG_H)
@@ -807,11 +821,12 @@ $(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
 		../include/context.h ../include/rm.h ../include/botl.h \
 		../include/rect.h ../include/region.h ../include/trap.h \
 		../include/display.h ../include/vision.h ../include/color.h \
-		../include/decl.h ../include/quest.h ../include/spell.h \
-		../include/obj.h ../include/engrave.h ../include/you.h \
-		../include/attrib.h ../include/monst.h ../include/mextra.h \
-		../include/skills.h ../include/timeout.h ../include/flag.h \
-		../include/winprocs.h ../include/sndprocs.h ../include/sys.h
+		../include/sndprocs.h ../include/seffects.h ../include/decl.h \
+		../include/quest.h ../include/spell.h ../include/obj.h \
+		../include/engrave.h ../include/you.h ../include/attrib.h \
+		../include/monst.h ../include/mextra.h ../include/skills.h \
+		../include/timeout.h ../include/flag.h ../include/winprocs.h \
+		../include/sys.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -906,7 +921,6 @@ $(TARGETPFX)wintext.o: ../win/X11/wintext.c $(HACK_H) ../include/winX.h \
 $(TARGETPFX)winval.o: ../win/X11/winval.c $(HACK_H) ../include/winX.h
 	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -c -o $@ ../win/X11/winval.c
 $(TARGETPFX)tile.o: tile.c $(HACK_H)
-	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ tile.c
 $(TARGETPFX)winshim.o: ../win/shim/winshim.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/shim/winshim.c
 $(TARGETPFX)cppregex.o: ../sys/share/cppregex.cpp $(CONFIG_H)
@@ -938,7 +952,8 @@ $(TARGETPFX)qt_glyph.o: ../win/Qt/qt_glyph.cpp $(HACK_H) \
 		../win/Qt/qt_str.h $(QTn_H)
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_glyph.cpp
 $(TARGETPFX)qt_icon.o: ../win/Qt/qt_icon.cpp $(HACK_H) ../win/Qt/qt_pre.h \
-		../win/Qt/qt_post.h ../win/Qt/qt_icon.h $(QTn_H)
+		../win/Qt/qt_post.h ../win/Qt/qt_icon.h ../win/Qt/qt_str.h \
+		$(QTn_H)
 	$(TARGET_CXX) $(TARGET_CXXFLAGS) -c -o $@ ../win/Qt/qt_icon.cpp
 $(TARGETPFX)qt_inv.o: ../win/Qt/qt_inv.cpp $(HACK_H) ../win/Qt/qt_pre.h \
 		../win/Qt/qt_post.h ../win/Qt/qt_inv.h ../win/Qt/qt_glyph.h \
@@ -1054,6 +1069,7 @@ qt_xcmd.moc: ../win/Qt/qt_xcmd.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_xcmd.h
 qt_yndlg.moc: ../win/Qt/qt_yndlg.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_yndlg.h
+$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
@@ -1112,10 +1128,10 @@ $(TARGETPFX)mdlib.o: mdlib.c $(CONFIG_H) ../include/permonst.h \
 		../include/monsters.h ../include/objclass.h \
 		../include/defsym.h ../include/objects.h ../include/wintype.h \
 		../include/sym.h ../include/artilist.h ../include/dungeon.h \
-		../include/obj.h ../include/monst.h ../include/mextra.h \
-		../include/you.h ../include/attrib.h ../include/prop.h \
-		../include/skills.h ../include/context.h ../include/flag.h \
-		../include/dlb.h
+		../include/sndprocs.h ../include/seffects.h ../include/obj.h \
+		../include/monst.h ../include/mextra.h ../include/you.h \
+		../include/attrib.h ../include/prop.h ../include/skills.h \
+		../include/context.h ../include/flag.h ../include/dlb.h
 $(TARGETPFX)mhitm.o: mhitm.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)mhitu.o: mhitu.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)minion.o: minion.c $(HACK_H)

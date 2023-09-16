@@ -21,7 +21,7 @@ static int n_rects = 0;
 static int rect_cnt;
 
 /*
- * Initialisation of internal structures. Should be called for every
+ * Initialization of internal structures. Should be called for every
  * new level to be build...
  */
 

@@ -36,6 +36,8 @@ static void charm_monsters(int);
 static void do_earthquake(int);
 static const char *generic_lvl_desc(void);
 static int do_improvisation(struct obj *);
+static char *improvised_notes(boolean *);
+
 
 /*
  * Wake every monster in range...
@@ -162,7 +164,9 @@ awaken_soldiers(struct monst* bugler  /* monster that played instrument */)
         if (DEADMONSTER(mtmp))
             continue;
         if (is_mercenary(mtmp->data) && mtmp->data != &mons[PM_GUARD]) {
-            mtmp->mpeaceful = mtmp->msleeping = mtmp->mfrozen = 0;
+            if (!mtmp->mtame)
+                mtmp->mpeaceful = 0;
+            mtmp->msleeping = mtmp->mfrozen = 0;
             mtmp->mcanmove = 1;
             mtmp->mstrategy &= ~STRAT_WAITMASK;
             if (canseemon(mtmp))
@@ -493,7 +497,9 @@ do_improvisation(struct obj* instr)
 {
     int damage, mode, do_spec = !(Stunned || Confusion);
     struct obj itmp;
-    boolean mundane = FALSE;
+    boolean mundane = FALSE, same_old_song = FALSE;
+    static char my_goto_song[] = {'C', '\0'},
+                *improvisation SOUNDLIBONLY = my_goto_song;
 
     itmp = *instr;
     itmp.oextra = (struct oextra *) 0; /* ok on this copy as instr maintains
@@ -570,23 +576,27 @@ do_improvisation(struct obj* instr)
 #undef PLAY_CONFUSED
 #undef PLAY_HALLU
 
+    improvisation = improvised_notes(&same_old_song);
+
     switch (itmp.otyp) { /* note: itmp.otyp might differ from instr->otyp */
     case MAGIC_FLUTE: /* Make monster fall asleep */
         consume_obj_charge(instr, TRUE);
 
-        You("%sproduce %s music.", !Deaf ? "" : "seem to ",
-            Hallucination ? "piped" : "soft");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        You("%sproduce %s%s music.", !Deaf ? "" : "seem to ",
+            Hallucination ? "piped" : "soft",
+            same_old_song ? ", familiar" : "");
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         put_monsters_to_sleep(u.ulevel * 5);
         exercise(A_DEX, TRUE);
         break;
     case WOODEN_FLUTE: /* May charm snakes */
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         if (!Deaf)
-            pline("%s.", Tobjnam(instr, do_spec ? "trill" : "toot"));
+            pline("%s%s.", Tobjnam(instr, do_spec ? "trill" : "toot"),
+                  same_old_song ? " a familiar tune" : "");
         else
             You_feel("%s %s.", yname(instr), do_spec ? "trill" : "toot");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
             charm_snakes(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -603,34 +613,39 @@ do_improvisation(struct obj* instr)
                 char buf[BUFSZ];
 
                 Sprintf(buf, "using a magical horn on %sself", uhim());
-                Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+                Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
                 losehp(damage, buf, KILLED_BY); /* fire or frost damage */
             }
         } else {
-            int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD : AD_FIRE);
+            int type = BZ_OFS_AD((instr->otyp == FROST_HORN) ? AD_COLD
+                                                             : AD_FIRE);
 
             if (!Blind)
                 pline("A %s blasts out of the horn!", flash_str(type, FALSE));
-            Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+            Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
+            gc.current_wand = instr;
             ubuzz(BZ_U_WAND(type), rn1(6, 6));
+            gc.current_wand = 0;
         }
         makeknown(instr->otyp);
         break;
     case TOOLED_HORN: /* Awaken or scare monsters */
         if (!Deaf)
-            You("produce a frightful, grave sound.");
+            You("produce a frightful, grave%s sound.",
+                same_old_song ? ", yet familiar," : "");
         else
             You("blow into the horn.");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
         awaken_monsters(u.ulevel * 30);
         exercise(A_WIS, FALSE);
         break;
     case BUGLE: /* Awaken & attract soldiers */
         if (!Deaf)
-            You("extract a loud noise from %s.", yname(instr));
+            You("extract a loud%s noise from %s.",
+                same_old_song ? ", familiar" : "", yname(instr));
         else
             You("blow into the bugle.");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 80);
         awaken_soldiers(&gy.youmonst);
         exercise(A_WIS, FALSE);
         break;
@@ -638,10 +653,11 @@ do_improvisation(struct obj* instr)
         consume_obj_charge(instr, TRUE);
 
         if (!Deaf)
-            pline("%s very attractive music.", Tobjnam(instr, "produce"));
+            pline("%s very attractive%s music.",
+                  Tobjnam(instr, "produce"), same_old_song ? " and familiar" : "");
         else
             You_feel("very soothing vibrations.");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         charm_monsters((u.ulevel - 1) / 3 + 1);
         exercise(A_DEX, TRUE);
         break;
@@ -649,10 +665,12 @@ do_improvisation(struct obj* instr)
         do_spec &= (rn2(ACURR(A_DEX)) + u.ulevel > 25);
         if (!Deaf)
             pline("%s %s.", Yname2(instr),
-                  do_spec ? "produces a lilting melody" : "twangs");
+                  (do_spec && same_old_song) ? "produces a familiar, lilting melody"
+                      : (do_spec) ? "produces a lilting melody"
+                  : (same_old_song) ? "twangs a familar tune" : "twangs");
         else
             You_feel("soothing vibrations.");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         if (do_spec)
             calm_nymphs(u.ulevel * 3);
         exercise(A_DEX, TRUE);
@@ -665,7 +683,7 @@ do_improvisation(struct obj* instr)
         consume_obj_charge(instr, TRUE);
 
         You("produce a heavy, thunderous rolling!");
-        Hero_playnotes(obj_to_instr(&itmp), "C", 50);
+        Hero_playnotes(obj_to_instr(&itmp), "C", 100);
         pline_The("entire %s is shaking around you!", generic_lvl_desc());
         do_earthquake((u.ulevel - 1) / 3 + 1);
         /* shake up monsters in a much larger radius... */
@@ -675,7 +693,8 @@ do_improvisation(struct obj* instr)
     case LEATHER_DRUM: /* Awaken monsters */
         if (!mundane) {
             if (!Deaf) {
-                You("beat a deafening row!");
+                You("beat a %sdeafening row!",
+                    same_old_song ? "familiar " : "");
                 Hero_playnotes(obj_to_instr(&itmp), "CCC", 100);
                 incr_itimeout(&HDeaf, rn1(20, 30));
             } else {
@@ -687,7 +706,7 @@ do_improvisation(struct obj* instr)
             You("%s %s.",
                 rn2(2) ? "butcher" : rn2(2) ? "manage" : "pull off",
                 an(beats[rn2(SIZE(beats))]));
-            Hero_playnotes(obj_to_instr(&itmp), "CCCCC", 50);
+            Hero_playnotes(obj_to_instr(&itmp), improvisation, 50);
         }
         awaken_monsters(u.ulevel * (mundane ? 5 : 40));
         gc.context.botl = TRUE;
@@ -697,6 +716,28 @@ do_improvisation(struct obj* instr)
         return 0;
     }
     return 2; /* That takes time */
+}
+
+static char *
+improvised_notes(boolean *same_as_last_time)
+{
+    static const char notes[] = "ABCDEFG";
+    /* target buffer has to be in gc.context, otherwise saving game 
+     * between improvised recitals would not be able to maintain
+     * the same_as_last_time context. */
+
+    /* You can change your tune, usually */
+    if (!(Unchanging && gc.context.jingle[0] != '\0')) {
+        int i, notecount = rnd(SIZE(gc.context.jingle) - 1); /* 1 - 5 */
+        for (i = 0; i < notecount; ++i) {
+            gc.context.jingle[i] = notes[rn2(SIZE(notes) - 1)]; /* -1 to exclude '\0' */
+        }
+        gc.context.jingle[notecount] = '\0';
+        *same_as_last_time = FALSE;
+    } else {
+        *same_as_last_time = TRUE;
+    }
+    return gc.context.jingle;
 }
 
 /*

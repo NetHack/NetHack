@@ -552,11 +552,13 @@ pick_lock(
         if (mtmp && canseemon(mtmp) && M_AP_TYPE(mtmp) != M_AP_FURNITURE
             && M_AP_TYPE(mtmp) != M_AP_OBJECT) {
             if (picktyp == CREDIT_CARD
-                && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE]))
+                && (mtmp->isshk || mtmp->data == &mons[PM_ORACLE])) {
+                SetVoice(mtmp, 0, 80, 0);
                 verbalize("No checks, no credit, no problem.");
-            else
+            } else {
                 pline("I don't think %s would appreciate that.",
                       mon_nam(mtmp));
+            }
             return PICKLOCK_LEARNED_SOMETHING;
         } else if (mtmp && is_door_mappear(mtmp)) {
             /* "The door actually was a <mimic>!" */
@@ -792,8 +794,9 @@ doopen_indir(coordxy x, coordxy y)
         return ECMD_OK;
     }
 
-    /* open at yourself/up/down */
-    if (u_at(cc.x, cc.y))
+    /* open at yourself/up/down: switch to loot unless there is a closed
+       door here (possible with Passes_walls) and direction isn't 'down' */
+    if (u_at(cc.x, cc.y) && (u.dz > 0 || !closed_door(u.ux, u.uy)))
         return doloot();
 
     /* this used to be done prior to get_adjacent_loc() but doing so was
@@ -956,7 +959,7 @@ doclose(void)
 
     x = u.ux + u.dx;
     y = u.uy + u.dy;
-    if (u_at(x, y)) {
+    if (u_at(x, y) && !Passes_walls) {
         You("are in the way!");
         return ECMD_TIME;
     }
@@ -1053,8 +1056,8 @@ boxlock(struct obj *obj, struct obj *otmp) /* obj *is* a box */
         break;
     case WAN_OPENING:
     case SPE_KNOCK:
-        if (obj->olocked) { /* unlock; couldn't be broken */
-            pline("Klick!");
+        if (obj->olocked) { /* unlock; isn't broken so doesn't need fixing */
+            Soundeffect(se_klick, 50);
             pline("Klick!");
             obj->olocked = 0;
             res = 1;
@@ -1256,7 +1259,7 @@ chest_shatter_msg(struct obj *otmp)
 {
     const char *disposition;
     const char *thing;
-    long save_Blinded;
+    long save_HBlinded, save_BBlinded;
 
     if (otmp->oclass == POTION_CLASS) {
         You("%s %s shatter!", Blind ? "hear" : "see", an(bottlename()));
@@ -1266,10 +1269,10 @@ chest_shatter_msg(struct obj *otmp)
     }
     /* We have functions for distant and singular names, but not one */
     /* which does _both_... */
-    save_Blinded = Blinded;
-    Blinded = 1;
+    save_HBlinded = HBlinded,  save_BBlinded = BBlinded;
+    HBlinded = 1L,  BBlinded = 0L;
     thing = singular(otmp, xname);
-    Blinded = save_Blinded;
+    HBlinded = save_HBlinded,  BBlinded = save_BBlinded;
     switch (objects[otmp->otyp].oc_material) {
     case PAPER:
         disposition = "is torn to shreds";

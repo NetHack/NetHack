@@ -1,56 +1,22 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1661896581 2022/08/30 21:56:21 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1686726255 2023/06/14 07:04:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #include "hack.h"
 
-const char quitchars[] = " \r\n\033";
-const char vowels[] = "aeiouAEIOU";
-const char ynchars[] = "yn";
-const char ynqchars[] = "ynq";
-const char ynaqchars[] = "ynaq";
-const char ynNaqchars[] = "yn#aq";
-NEARDATA long yn_number = 0L;
-
-const char disclosure_options[] = "iavgco";
-
-/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
-const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
-const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
-const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };
-/* redordered directions, cardinals first */
-const schar dirs_ord[N_DIRS] =
-    { DIR_W, DIR_N, DIR_E, DIR_S, DIR_NW, DIR_NE, DIR_SE, DIR_SW };
-
-NEARDATA struct flag flags;
-NEARDATA boolean has_strong_rngseed = FALSE;
-NEARDATA struct instance_flags iflags;
-NEARDATA struct you u;
-NEARDATA time_t ubirthday;
-NEARDATA struct u_realtime urealtime;
-
-NEARDATA struct obj *uwep, *uarm, *uswapwep,
-    *uquiver, /* quiver */
-    *uarmu, /* under-wear, so to speak */
-    *uskin, /* dragon armor, if a dragon */
-    *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
-    *uright, *uleft, *ublindf, *uchain, *uball;
-
-struct engr *head_engr;
-
-const int shield_static[SHIELD_COUNT] = {
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
-    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+const char * const nhcb_name[NUM_NHCB] = {
+    "cmd_before",
+    "level_enter",
+    "level_leave",
+    "end_turn",
 };
 
-
+int nhcb_counts[NUM_NHCB] = DUMMY;
 NEARDATA const struct c_color_names c_color_names = {
     "black",  "amber", "golden", "light blue", "red",   "green",
     "silver", "blue",  "purple", "white",      "orange"
 };
-
 const char *c_obj_colors[] = {
     "black",          /* CLR_BLACK */
     "red",            /* CLR_RED */
@@ -70,44 +36,19 @@ const char *c_obj_colors[] = {
     "white",          /* CLR_WHITE */
 };
 
-const struct c_common_strings c_common_strings = { "Nothing happens.",
-                                             "That's enough tries!",
-                                             "That is a silly thing to %s.",
-                                             "shudder for a moment.",
-                                             "something",
-                                             "Something",
-                                             "You can move again.",
-                                             "Never mind.",
-                                             "vision quickly clears.",
-                                             { "the", "your" },
-                                             { "mon", "you" } };
-
-/* NOTE: the order of these words exactly corresponds to the
-   order of oc_material values #define'd in objclass.h. */
-const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
-                             "flesh",      "paper",   "cloth",      "leather",
-                             "wooden",     "bone",    "dragonhide", "iron",
-                             "metal",      "copper",  "silver",     "gold",
-                             "platinum",   "mithril", "plastic",    "glass",
-                             "gemstone",   "stone" };
-
-char emptystr[] = {0};       /* non-const */
-
-/* Global windowing data, defined here for multi-window-system support */
-NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
-#ifdef WIN32
-boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
-                                            FALSE, FALSE, FALSE,
-                                            FALSE, FALSE, FALSE,
-                                            FALSE };
-#endif
-
-#ifdef PREFIXES_IN_USE
-const char *fqn_prefix_names[PREFIX_COUNT] = {
-    "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
-    "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
+const struct c_common_strings c_common_strings =
+    { "Nothing happens.",
+      "That's enough tries!",
+      "That is a silly thing to %s.",
+      "shudder for a moment.",
+      "something",
+      "Something",
+      "You can move again.",
+      "Never mind.",
+      "vision quickly clears.",
+      { "the", "your" },
+      { "mon", "you" }
 };
-#endif
 
 const struct savefile_info default_sfinfo = {
 #ifdef NHSTDC
@@ -132,7 +73,67 @@ const struct savefile_info default_sfinfo = {
 #endif
 };
 
+const char disclosure_options[] = "iavgco";
+char emptystr[] = {0};       /* non-const */
+
+NEARDATA struct flag flags;  /* extern declaration is in flag.h, not decl.h */
+
+/* Global windowing data, defined here for multi-window-system support */
+#ifdef WIN32
+boolean fqn_prefix_locked[PREFIX_COUNT] = { FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE, FALSE, FALSE,
+                                            FALSE };
+#endif
+#ifdef PREFIXES_IN_USE
+const char *fqn_prefix_names[PREFIX_COUNT] = {
+    "hackdir",  "leveldir", "savedir",    "bonesdir",  "datadir",
+    "scoredir", "lockdir",  "sysconfdir", "configdir", "troubledir"
+};
+#endif
+
+/* x/y/z deltas for the 10 movement directions (8 compass pts, 2 down/up) */
+const schar xdir[N_DIRS_Z] = { -1, -1,  0,  1,  1,  1,  0, -1, 0,  0 };
+const schar ydir[N_DIRS_Z] = {  0, -1, -1, -1,  0,  1,  1,  1, 0,  0 };
+const schar zdir[N_DIRS_Z] = {  0,  0,  0,  0,  0,  0,  0,  0, 1, -1 };
+/* redordered directions, cardinals first */
+const schar dirs_ord[N_DIRS] =
+    { DIR_W, DIR_N, DIR_E, DIR_S, DIR_NW, DIR_NE, DIR_SE, DIR_SW };
+
+NEARDATA boolean has_strong_rngseed = FALSE;
+struct engr *head_engr;
+NEARDATA struct instance_flags iflags;
+/* NOTE: the order of these words exactly corresponds to the
+   order of oc_material values #define'd in objclass.h. */
+const char *materialnm[] = { "mysterious", "liquid",  "wax",        "organic",
+                             "flesh",      "paper",   "cloth",      "leather",
+                             "wooden",     "bone",    "dragonhide", "iron",
+                             "metal",      "copper",  "silver",     "gold",
+                             "platinum",   "mithril", "plastic",    "glass",
+                             "gemstone",   "stone" };
+const char quitchars[] = " \r\n\033";
 NEARDATA struct savefile_info sfcap, sfrestinfo, sfsaveinfo;
+const int shield_static[SHIELD_COUNT] = {
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4, /* 7 per row */
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+    S_ss1, S_ss2, S_ss3, S_ss2, S_ss1, S_ss2, S_ss4,
+};
+NEARDATA struct you u;
+NEARDATA time_t ubirthday;
+NEARDATA struct u_realtime urealtime;
+NEARDATA struct obj *uwep, *uarm, *uswapwep,
+    *uquiver, /* quiver */
+    *uarmu, /* under-wear, so to speak */
+    *uskin, /* dragon armor, if a dragon */
+    *uarmc, *uarmh, *uarms, *uarmg,*uarmf, *uamul,
+    *uright, *uleft, *ublindf, *uchain, *uball;
+const char vowels[] = "aeiouAEIOU";
+NEARDATA winid WIN_MESSAGE, WIN_STATUS, WIN_MAP, WIN_INVEN;
+const char ynchars[] = "yn";
+const char ynqchars[] = "ynq";
+const char ynaqchars[] = "ynaq";
+const char ynNaqchars[] = "yn#aq";
+NEARDATA long yn_number = 0L;
 
 #ifdef PANICTRACE
 const char *ARGV0;
@@ -244,6 +245,9 @@ const struct instance_globals_b g_init_b = {
     UNDEFINED_PTR, /* bbubbles */
     /* pickup.c */
     FALSE, /* bucx_filter */
+    /* zap.c */
+    NULL, /* buzzer -- monst that zapped/cast/breathed to initiate buzz() */
+
     TRUE, /* havestate*/
     IVMAGIC  /* b_magic to validate that structure layout has been preserved */
 };
@@ -316,6 +320,8 @@ const struct instance_globals_d g_init_d = {
     0, /* did_nothing_flag */
     /* dog.c */
     DUMMY, /* dogname */
+    /* end.c */
+    0L, /* done_seq */
     /* mon.c */
     FALSE, /* disintegested */
     /* o_init.c */
@@ -336,6 +342,7 @@ const struct instance_globals_e g_init_e = {
     /* mkmaze.c */
     UNDEFINED_PTR, /* ebubbles */
     /* new */
+    NULL, /* exclusion_zones */
     0,      /* early_raw_messages */
     TRUE, /* havestate*/
     IVMAGIC  /* e_magic to validate that structure layout has been preserved */
@@ -403,6 +410,9 @@ const struct instance_globals_h g_init_h = {
               * higher if polymorphed into something that's even faster */
     /* dog.c */
     DUMMY, /* horsename */
+    /* mhitu.c */
+    0U, /* hitmsg_mid */
+    NULL, /* hitmsg_prev */
     /* save.c */
     TRUE, /* havestate*/
     IVMAGIC  /* h_magic to validate that structure layout has been preserved */
@@ -468,6 +478,8 @@ const struct instance_globals_l g_init_l = {
     UNDEFINED_PTR, /* light_base */
     /* mklev.c */
     { UNDEFINED_PTR }, /* luathemes[] */
+    /* mon.c */
+    0U, /* last_hider */
     /* nhlan.c */
 #ifdef MAX_LAN_USERNAME
     UNDEFINED_VALUES, /* lusername */
@@ -542,6 +554,8 @@ const struct instance_globals_m g_init_m = {
     UNDEFINED_VALUES, /* mapped_menu_op */
     /* region.c */
     0, /* max_regions */
+    /* trap.c */
+    FALSE, /* mentioned_water */
     TRUE, /* havestate*/
     IVMAGIC  /* m_magic to validate that structure layout has been preserved */
 };
@@ -729,6 +743,7 @@ const struct instance_globals_s g_init_s = {
     (struct symsetentry *) 0, /* symset_list */
     FALSE, /* save_menucolors */
     (struct menucoloring *) 0, /* save_colorings */
+    FALSE, /* simple_options_help */
     /* pickup.c */
     FALSE, /* shop_filter */
     /* pline.c */
@@ -783,6 +798,9 @@ const struct instance_globals_t g_init_t = {
     1UL, /* timer_id */
     /* topten.c */
     WIN_ERR, /* toptenwin */
+    /* uhitm.c */
+    0, /* twohits */
+    /**/
     TRUE, /* havestate*/
     IVMAGIC  /* t_magic to validate that structure layout has been preserved */
 };
@@ -797,8 +815,6 @@ const struct instance_globals_u g_init_u = {
     { UNDEFINED_VALUES }, /* urole */
     UNDEFINED_VALUES, /* urace */
     /* save.c */
-    0U, /* ustuck_id */
-    0U, /* usteed_id */
     { 0, 0 }, /* uz_save */
     TRUE, /* havestate*/
     IVMAGIC  /* u_magic to validate that structure layout has been preserved */
@@ -825,6 +841,7 @@ const struct instance_globals_v g_init_v = {
     UNDEFINED_PTR, /* viz_rmin */
     UNDEFINED_PTR, /* viz_rmax */
     FALSE, /* vision_full_recalc */
+    UNDEFINED_VALUES,  /* voice */
     TRUE, /* havestate*/
     IVMAGIC  /* v_magic to validate that structure layout has been preserved */
 };
@@ -1038,5 +1055,18 @@ decl_globals_init(void)
 #ifndef NO_VERBOSE_GRANULARITY
 long verbosity_suppressions[vb_elements] = { 0L, 0L, 0L, 0L, 0L, };
 #endif
+
+/* gcc 12.2's static analyzer thinks that some fields of gc.context.victual
+   are uninitialized when compiling 'bite(eat.c)' but that's impossible;
+   it is defined at global scope so guaranteed to be given implicit
+   initialization for fields that aren't explicitly initialized (all of
+   'context'); having bite() pass &gc.context.victual to this no-op
+   eliminates the analyzer's very verbose complaint */
+void
+sa_victual(
+    volatile struct victual_info *context_victual UNUSED)
+{
+    return;
+}
 
 /*decl.c*/

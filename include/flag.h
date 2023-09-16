@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1655161560 2022/06/13 23:06:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.201 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1684791761 2023/05/22 21:42:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -34,6 +34,8 @@ struct flag {
     boolean friday13;        /* it's Friday the 13th */
     boolean goldX;           /* for BUCX filtering, whether gold is X or U */
     boolean help;            /* look in data file for info about stuff */
+    boolean tips;            /* show helpful hints? */
+    boolean tutorial;        /* ask if player wants tutorial level? */
     boolean ignintr;         /* ignore interrupts */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */
@@ -83,6 +85,8 @@ struct flag {
 #define PARANOID_WERECHANGE 0x0100
 #define PARANOID_EATING     0x0200
 #define PARANOID_SWIM       0x0400
+#define PARANOID_TRAP       0x0800
+#define PARANOID_AUTOALL    0x1000
     int pickup_burden; /* maximum burden before prompt */
     int pile_limit;    /* controls feedback when walking over objects */
     char discosort;    /* order of dodiscovery/doclassdisco output: o,s,c,a */
@@ -195,6 +199,7 @@ struct instance_flags {
     boolean invis_goldsym; /* gold symbol is ' '? */
     boolean in_lua;        /* executing a lua script */
     boolean lua_testing;   /* doing lua tests */
+    boolean nofollowers;   /* level change ignores pets (for tutorial) */
     boolean partly_eaten_hack; /* extra flag for xname() used when it's called
                                 * indirectly so we can't use xname_flags() */
     boolean remember_getpos; /* save getpos() positioning in do-again queue */
@@ -219,6 +224,7 @@ struct instance_flags {
                             * as output from getdir(): simulated button used
                             * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
     int getloc_filter;     /* GFILTER_foo */
+    boolean bgcolors;      /* display background colors on a map position */
     boolean getloc_moveskip;
     boolean getloc_travelmode;
     boolean getloc_usemenu;
@@ -227,10 +233,12 @@ struct instance_flags {
     boolean window_inited; /* true if init_nhwindows() completed */
     boolean vision_inited; /* true if vision is ready */
     boolean sanity_check;  /* run sanity checks */
+    boolean sanity_no_check; /* skip next sanity check */
     boolean debug_overwrite_stairs; /* debug: allow overwriting stairs */
     boolean debug_mongen;  /* debug: prevent monster generation */
     boolean debug_hunger;  /* debug: prevent hunger */
     boolean mon_polycontrol; /* debug: control monster polymorphs */
+    boolean mon_telecontrol; /* debug: control monster teleports */
     boolean in_dumplog;    /* doing the dumplog right now? */
     boolean in_parse;      /* is a command being parsed? */
      /* suppress terminate during options parsing, for --showpaths */
@@ -277,6 +285,7 @@ struct instance_flags {
     long hilite_delta;        /* number of moves to leave a temp hilite lit */
     long unhilite_deadline; /* time when oldest temp hilite should be unlit */
 #endif
+    boolean voices;           /* enable text-to-speech or other talking */
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
@@ -290,11 +299,6 @@ struct instance_flags {
 #endif
 #if defined(MICRO) || defined(WIN32)
     boolean rawio; /* whether can use rawio (IOCTL call) */
-#endif
-#ifdef MAC_GRAPHICS_ENV
-    boolean MACgraphics; /* use Macintosh extended character set, as
-                            as defined in the special font HackFont */
-    unsigned use_stone;  /* use the stone ppats */
 #endif
 #if defined(MSDOS) || defined(WIN32)
     boolean tile_view;
@@ -440,7 +444,8 @@ enum plnmsg_types {
     PLNMSG_OK_DONT_DIE,         /* overriding death in explore/wizard mode */
     PLNMSG_BACK_ON_GROUND,      /* leaving water */
     PLNMSG_GROWL,               /* growl() gave some message */
-    PLNMSG_enum /* allows inserting new entries with unconditional trailing comma */
+    PLNMSG_HIDE_UNDER,          /* hero saw a monster hide under something */
+    PLNMSG_enum /* 'none of the above' */
 };
 
 /* runmode options */
@@ -478,6 +483,10 @@ enum runmode_types {
 #define ParanoidEating ((flags.paranoia_bits & PARANOID_EATING) != 0)
 /* Prevent going into lava or water without explicitly forcing it */
 #define ParanoidSwim ((flags.paranoia_bits & PARANOID_SWIM) != 0)
+/* Prevent going onto/into known trap unless it is harmless */
+#define ParanoidTrap ((flags.paranoia_bits & PARANOID_TRAP) != 0)
+/* Require confirmation for choosing 'A' in class menu for menustyle:Full */
+#define ParanoidAutoAll ((flags.paranoia_bits & PARANOID_AUTOALL) != 0U)
 
 /* command parsing, mainly dealing with number_pad handling;
    not saved and restored */

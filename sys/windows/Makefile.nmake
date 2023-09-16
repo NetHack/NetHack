@@ -8,9 +8,9 @@
 #       MS Visual Studio Visual C++ compiler
 #
 #       Visual Studio Compilers Tested:
-#            - Microsoft Visual Studio 2017 Community Edition v 15.9.51
-#            - Microsoft Visual Studio 2019 Community Edition v 16.11.22
-#            - Microsoft Visual Studio 2022 Community Edition v 17.4.3
+#            - Microsoft Visual Studio 2017 Community Edition v 15.9.57
+#            - Microsoft Visual Studio 2019 Community Edition v 16.11.30
+#            - Microsoft Visual Studio 2022 Community Edition v 17.7.4
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -50,6 +50,17 @@ GAMEDIR = ..\binary               # Default game build directory
 # windsound uses built-in Microsoft API's, no 3rd party download is required.
 
 SOUND_LIBRARIES = windsound
+
+#------------------------------------------------------------------------------
+# Curses options.
+#
+# Do you want console curses included?
+
+CURSES_CONSOLE = Y
+
+# Do you want graphical curses included?
+
+CURSES_GRAPHICAL = Y
 
 #
 #------------------------------------------------------------------------------
@@ -109,7 +120,7 @@ Q=@
 SKIP_NETHACKW = N
 
 !IFNDEF LUA_VERSION
-LUAVER=5.4.4
+LUAVER=5.4.6
 !ELSE
 LUAVER=$(LUA_VERSION)
 !ENDIF
@@ -205,6 +216,15 @@ LUA_MAY_PROCEED=Y
 !ENDIF  # LUA_MAY_PROCEED
 
 # Now, pdcurses
+!IF "$(CURSES_CONSOLE)" == "Y"
+WANT_CURSES=Y
+!ENDIF
+!IF "$(CURSES_GRAPHICAL)" == "Y"
+WANT_CURSES=Y
+!ENDIF
+
+# Now, pdcurses
+!IF "$(WANT_CURSES)" == "Y"
 PDCDIST=pdcursesmod
 !IF "$(INTERNET_AVAILABLE)" == "Y"
 !IF "$(GIT_AVAILABLE)" == "Y"
@@ -234,6 +254,7 @@ ADD_CURSES=Y
 !MESSAGE so that will be used.
 !ENDIF  # ADD_CURSES == Y
 !ENDIF  # INTERNET_AVAILABLE
+!ENDIF  # WANT_CURSES
 
 !IF "$(ADD_CURSES)" != "Y"
 !MESSAGE NetHack 3.7 will be built without support for the curses window-port.
@@ -310,27 +331,27 @@ DLBDEF =
 #  Object file directories.
 #
 
-OBJTTY_B   = objtty
-OBJGUI_B   = objgui
-OBJUTIL_B  = objutil
-OBJLUA_B   = objlua
-OBJPDC_B   = objpdc
+OBJTTY_B    = objtty
+OBJGUI_B    = objgui
+OBJUTIL_B   = objutil
+OBJLUA_B    = objlua
+OBJPDC_B    = objpdc
 
-OBJTTY     = $(OBJTTY_B)\$(TARGET_CPU)
-OBJGUI     = $(OBJGUI_B)\$(TARGET_CPU)
-OBJUTIL    = $(OBJUTIL_B)\$(TARGET_CPU)
-OBJLUA     = $(OBJLUA_B)\$(TARGET_CPU)
-OBJPDC     = $(OBJPDC_B)\$(TARGET_CPU)
+OBJTTY      = $(OBJTTY_B)\$(TARGET_CPU)
+OBJGUI      = $(OBJGUI_B)\$(TARGET_CPU)
+OBJUTIL     = $(OBJUTIL_B)\$(TARGET_CPU)
+OBJLUA      = $(OBJLUA_B)\$(TARGET_CPU)
+OBJPDC      = $(OBJPDC_B)\$(TARGET_CPU)
 
 #
 # Shorten up the location for some files
 #
 
-OTTY  = $(OBJTTY)^\
-OGUI  = $(OBJGUI)^\
-OUTL  = $(OBJUTIL)^\
-OLUA  = $(OBJLUA)^\
-OPDC  = $(OBJPDC)^\
+OTTY   = $(OBJTTY)^\
+OGUI   = $(OBJGUI)^\
+OUTL   = $(OBJUTIL)^\
+OLUA   = $(OBJLUA)^\
+OPDC   = $(OBJPDC)^\
 
 U  = $(UTIL)^\
 
@@ -354,7 +375,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 
 #===============-=================================================
 # LUA library
-# Official source for Lua is http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Official source for Lua is http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #
 # Source for the NetHack repository submodule in ../submodules/lua
 # is https://github.com/lua/lua.git
@@ -363,7 +384,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 # Location of LUA
 #
 # Original source needs to be obtained from:
-#    http://www.lua.org/ftp/lua-5.4.4.tar.gz
+#    http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #
 #    This build assumes that the LUA sources are located
 #    at the specified location. If they are actually elsewhere
@@ -373,7 +394,7 @@ GITBRANCH = -DNETHACK_GIT_BRANCH=\"$(GIT_BRANCH)\"
 #
 
 !IFNDEF LUAVER
-LUAVER=5.4.4
+LUAVER=5.4.6
 !ENDIF
 
 LUALIB   = $(LIBDIR)\lua$(LUAVER)-$(TARGET_CPU)-static.lib
@@ -413,24 +434,39 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 # is https://github.com/wmcbrine/PDCurses.git
 # or https://github.com/Bill-Gray/PDCursesMod
 #=================================================================
+
 !IF "$(ADD_CURSES)" == "Y"
 PDCURSES_CURSES_H	= $(PDCURSES_TOP)\curses.h
 PDCURSES_CURSPRIV_H	= $(PDCURSES_TOP)\curspriv.h
 PDCURSES_HEADERS	= $(PDCURSES_CURSES_H) $(PDCURSES_CURSPRIV_H)
 PDCSRC                  = $(PDCURSES_TOP)\pdcurses
 PDCWINCON               = $(PDCURSES_TOP)\wincon
+PDCWINGUI               = $(PDCURSES_TOP)\wingui
 PDCDEP                  = $(PDCURSES_TOP)\curses.h
 
-PDCLIBOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $(OPDC)beep.o \
-	$(OPDC)bkgd.o $(OPDC)border.o $(OPDC)clear.o $(OPDC)color.o $(OPDC)delch.o $(OPDC)deleteln.o \
-	$(OPDC)getch.o $(OPDC)getstr.o $(OPDC)getyx.o $(OPDC)inch.o $(OPDC)inchstr.o \
-	$(OPDC)initscr.o $(OPDC)inopts.o $(OPDC)insch.o $(OPDC)insstr.o $(OPDC)instr.o $(OPDC)kernel.o \
-	$(OPDC)keyname.o $(OPDC)mouse.o $(OPDC)move.o $(OPDC)outopts.o $(OPDC)overlay.o $(OPDC)pad.o \
-	$(OPDC)panel.o $(OPDC)printw.o $(OPDC)refresh.o $(OPDC)scanw.o $(OPDC)scr_dump.o $(OPDC)scroll.o \
-	$(OPDC)slk.o $(OPDC)termattr.o $(OPDC)touch.o $(OPDC)util.o $(OPDC)window.o $(OPDC)debug.o
+PDCCOMMONOBJS = $(OPDC)addch.o $(OPDC)addchstr.o $(OPDC)addstr.o $(OPDC)attr.o $(OPDC)beep.o \
+	$(OPDC)bkgd.o $(OPDC)border.o $(OPDC)clear.o $(OPDC)color.o $(OPDC)debug.o \
+	$(OPDC)delch.o $(OPDC)deleteln.o $(OPDC)getch.o $(OPDC)getstr.o \
+	$(OPDC)getyx.o $(OPDC)inch.o $(OPDC)inchstr.o $(OPDC)initscr.o \
+	$(OPDC)inopts.o $(OPDC)insch.o $(OPDC)insstr.o $(OPDC)instr.o \
+	$(OPDC)kernel.o $(OPDC)keyname.o $(OPDC)mouse.o $(OPDC)move.o \
+	$(OPDC)outopts.o $(OPDC)overlay.o $(OPDC)pad.o $(OPDC)panel.o \
+	$(OPDC)printw.o $(OPDC)refresh.o $(OPDC)scanw.o $(OPDC)scr_dump.o \
+	$(OPDC)scroll.o $(OPDC)slk.o $(OPDC)termattr.o $(OPDC)touch.o \
+	$(OPDC)util.o $(OPDC)window.o
 
-PDCOBJS = $(OPDC)pdcclip.o $(OPDC)pdcdisp.o $(OPDC)pdcgetsc.o $(OPDC)pdckbd.o $(OPDC)pdcscrn.o \
-	$(OPDC)pdcsetsc.o $(OPDC)pdcutil.o
+#PDCOBJS = $(OPDC)pdcclip.o $(OPDC)pdcdisp.o $(OPDC)pdcgetsc.o $(OPDC)pdckbd.o $(OPDC)pdcscrn.o \
+#	$(OPDC)pdcsetsc.o $(OPDC)pdcutil.o
+
+PDCWINCONOBJS = $(OPDC)pdcclip_wincon.o $(OPDC)pdcdisp_wincon.o \
+	$(OPDC)pdcgetsc_wincon.o $(OPDC)pdckbd_wincon.o \
+	$(OPDC)pdcscrn_wincon.o $(OPDC)pdcsetsc_wincon.o \
+	$(OPDC)pdcutil_wincon.o
+
+PDCWINGUIOBJS = $(OPDC)pdcclip_wingui.o $(OPDC)pdcdisp_wingui.o \
+	$(OPDC)pdcgetsc_wingui.o $(OPDC)pdckbd_wingui.o \
+	$(OPDC)pdcscrn_wingui.o $(OPDC)pdcsetsc_wingui.o \
+	$(OPDC)pdcutil_wingui.o
 
 PDCLIB = $(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib
 
@@ -439,6 +475,7 @@ PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
 PDCLIB =
 PDCDEP =
 !ENDIF
+
 
 #=================================================================
 HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
@@ -453,12 +490,12 @@ HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\optlist.h $(INCL)\patchlevel.h $(INCL)\pcconf.h \
 	$(INCL)\permonst.h $(INCL)\prop.h $(INCL)\rect.h $(INCL)\region.h \
 	$(INCL)\sym.h $(INCL)\defsym.h $(INCL)\rm.h $(INCL)\sp_lev.h \
-	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\system.h $(INCL)\tcap.h \
+	$(INCL)\spell.h $(INCL)\sys.h $(INCL)\cstd.h $(INCL)\tcap.h \
 	$(INCL)\timeout.h $(INCL)\tradstdc.h $(INCL)\trap.h \
 	$(INCL)\unixconf.h $(INCL)\vision.h $(INCL)\vmsconf.h \
 	$(INCL)\wintty.h $(INCL)\wincurs.h $(INCL)\winX.h \
-	$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\wintype.h $(INCL)\you.h \
-	$(INCL)\youprop.h
+	$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\seffects.h \
+	$(INCL)\wintype.h $(INCL)\you.h $(INCL)\youprop.h
 
 # all .c that are part of the main NetHack program and are not operating- or
 # windowing-system specific
@@ -481,6 +518,49 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   vault.c version.c vision.c weapon.c were.c wield.c \
 	   windows.c wizard.c worm.c worn.c write.c zap.c
 
+LUA_FILES = $(DAT)\air.lua  $(DAT)\Arc-fila.lua $(DAT)\Arc-filb.lua \
+	$(DAT)\Arc-goal.lua $(DAT)\Arc-loca.lua $(DAT)\Arc-strt.lua \
+	$(DAT)\asmodeus.lua $(DAT)\astral.lua   $(DAT)\baalz.lua \
+	$(DAT)\Bar-fila.lua $(DAT)\Bar-filb.lua $(DAT)\Bar-goal.lua \
+	$(DAT)\Bar-loca.lua $(DAT)\Bar-strt.lua $(DAT)\bigrm-1.lua \
+	$(DAT)\bigrm-10.lua $(DAT)\bigrm-11.lua $(DAT)\bigrm-2.lua \
+	$(DAT)\bigrm-3.lua  $(DAT)\bigrm-4.lua  $(DAT)\bigrm-5.lua \
+	$(DAT)\bigrm-6.lua  $(DAT)\bigrm-7.lua  $(DAT)\bigrm-8.lua \
+	$(DAT)\bigrm-9.lua  $(DAT)\castle.lua   $(DAT)\Cav-fila.lua \
+	$(DAT)\Cav-filb.lua $(DAT)\Cav-goal.lua $(DAT)\Cav-loca.lua \
+	$(DAT)\Cav-strt.lua $(DAT)\dungeon.lua  $(DAT)\earth.lua \
+	$(DAT)\fakewiz1.lua $(DAT)\fakewiz2.lua $(DAT)\fire.lua \
+	$(DAT)\Hea-fila.lua $(DAT)\Hea-filb.lua $(DAT)\Hea-goal.lua \
+	$(DAT)\Hea-loca.lua $(DAT)\Hea-strt.lua $(DAT)\hellfill.lua \
+	$(DAT)\juiblex.lua  $(DAT)\Kni-fila.lua $(DAT)\Kni-filb.lua \
+	$(DAT)\Kni-goal.lua $(DAT)\Kni-loca.lua $(DAT)\Kni-strt.lua \
+	$(DAT)\knox.lua     $(DAT)\medusa-1.lua $(DAT)\medusa-2.lua \
+	$(DAT)\medusa-3.lua $(DAT)\medusa-4.lua $(DAT)\minefill.lua \
+	$(DAT)\minend-1.lua $(DAT)\minend-2.lua $(DAT)\minend-3.lua \
+	$(DAT)\minetn-1.lua $(DAT)\minetn-2.lua $(DAT)\minetn-3.lua \
+	$(DAT)\minetn-4.lua $(DAT)\minetn-5.lua $(DAT)\minetn-6.lua \
+	$(DAT)\minetn-7.lua $(DAT)\Mon-fila.lua $(DAT)\Mon-filb.lua \
+	$(DAT)\Mon-goal.lua $(DAT)\Mon-loca.lua $(DAT)\Mon-strt.lua \
+	$(DAT)\nhcore.lua   $(DAT)\nhlib.lua    $(DAT)\oracle.lua \
+	$(DAT)\orcus.lua    $(DAT)\Pri-fila.lua $(DAT)\Pri-filb.lua \
+	$(DAT)\Pri-goal.lua $(DAT)\Pri-loca.lua $(DAT)\Pri-strt.lua \
+	$(DAT)\quest.lua    $(DAT)\Ran-fila.lua $(DAT)\Ran-filb.lua \
+	$(DAT)\Ran-goal.lua $(DAT)\Ran-loca.lua $(DAT)\Ran-strt.lua \
+	$(DAT)\Rog-fila.lua $(DAT)\Rog-filb.lua $(DAT)\Rog-goal.lua \
+	$(DAT)\Rog-loca.lua $(DAT)\Rog-strt.lua $(DAT)\Sam-fila.lua \
+	$(DAT)\Sam-filb.lua $(DAT)\Sam-goal.lua $(DAT)\Sam-loca.lua \
+	$(DAT)\Sam-strt.lua $(DAT)\sanctum.lua  $(DAT)\soko1-1.lua \
+	$(DAT)\soko1-2.lua  $(DAT)\soko2-1.lua  $(DAT)\soko2-2.lua \
+	$(DAT)\soko3-1.lua  $(DAT)\soko3-2.lua  $(DAT)\soko4-1.lua \
+	$(DAT)\soko4-2.lua  $(DAT)\themerms.lua $(DAT)\Tou-fila.lua \
+	$(DAT)\Tou-filb.lua $(DAT)\Tou-goal.lua $(DAT)\Tou-loca.lua \
+	$(DAT)\Tou-strt.lua $(DAT)\tower1.lua   $(DAT)\tower2.lua \
+	$(DAT)\tower3.lua   $(DAT)\Val-fila.lua $(DAT)\Val-filb.lua \
+	$(DAT)\Val-goal.lua $(DAT)\Val-loca.lua $(DAT)\Val-strt.lua \
+	$(DAT)\valley.lua   $(DAT)\water.lua    $(DAT)\Wiz-fila.lua \
+	$(DAT)\Wiz-filb.lua $(DAT)\Wiz-goal.lua $(DAT)\Wiz-loca.lua \
+	$(DAT)\Wiz-strt.lua $(DAT)\wizard1.lua  $(DAT)\wizard2.lua \
+	$(DAT)\wizard3.lua  $(DAT)\tut-1.lua    $(DAT)\tut-2.lua
 #
 # Utility Objects.
 #
@@ -516,14 +596,32 @@ WINDHDR = $(MSWSYS)\win10.h $(MSWSYS)\winos.h $(MSWSYS)\win32api.h
 #
 
 !IF "$(ADD_CURSES)" == "Y"
-CURSESDEF1=-D"CURSES_GRAPHICS"
-CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
-CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o $(OTTY)cursmain.o \
-	   $(OTTY)cursmesg.o $(OTTY)cursmisc.o $(OTTY)cursstat.o $(OTTY)curswins.o
+PDCURSESFLAGS = -DPDC_WIDE
+CURSESOBJ= $(OTTY)cursdial.o $(OTTY)cursinit.o $(OTTY)cursinvt.o \
+	$(OTTY)cursmain.o $(OTTY)cursmesg.o $(OTTY)cursmisc.o \
+	$(OTTY)cursstat.o $(OTTY)curswins.o
+!IF "$(CURSES_CONSOLE)" == "Y"
+CURSESWINCONOBJS = $(CURSESOBJ)
+PDCWINCONLIB = $(PDCLIB)
+CURSESDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
+#CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
+CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
+!ENDIF
+!IF "$(CURSES_GRAPHICAL)" == "Y"
+CURSESWINGUIOBJS = $(CURSESOBJ) $(OGUI)guitty.o
+PDCWINGUILIB = $(PDCLIB)
+CURSESDEF1=-D"CURSES_GRAPHICS" -DPDC_NCMOUSE
+#CURSESDEF2=-D"CURSES_BRIEF_INCLUDE" -DCHTYPE_32
+CURSESDEF2=-DCURSES_UNICODE $(PDCURSESFLAGS)
+!ENDIF
 !ELSE
 !UNDEF CURSDEF
 !UNDEF CURSESLIB
 !UNDEF CURSESOBJ
+!UNDEF CURSESWINCONOBJS
+!UNDEF CURSESWINGUIOBJS
+!UNDEF PDCWINCONLIB
+!UNDEF PDCWINGUILIB
 !ENDIF
 
 #
@@ -588,7 +686,7 @@ ALLOBJTTY  = $(SOBJTTY) $(DLBOBJTTY) $(OBJSTTY) $(VVOBJTTY) $(LUAOBJTTY)
 # - GUI
 #
 
-GUIDEF= -DTILES -DMSWIN_GRAPHICS -DNOTTYGRAPHICS
+GUIDEF= -DTILES -DMSWIN_GRAPHICS -DNOTTYGRAPHICS $(CURSESDEF1)
 
 ALL_GUIHDR = $(MSWIN)\mhaskyn.h $(MSWIN)\mhdlg.h $(MSWIN)\mhfont.h \
 	$(MSWIN)\mhinput.h $(MSWIN)\mhmain.h $(MSWIN)\mhmap.h $(MSWIN)\mhmenu.h \
@@ -788,7 +886,8 @@ WAVS = $(SndWavDir)\se_squeak_A.wav $(SndWavDir)\se_squeak_B.wav \
 	$(SndWavDir)\sound_Wooden_Harp_A.wav $(SndWavDir)\sound_Wooden_Harp_B.wav \
 	$(SndWavDir)\sound_Wooden_Harp_C.wav $(SndWavDir)\sound_Wooden_Harp_D.wav \
 	$(SndWavDir)\sound_Wooden_Harp_E.wav $(SndWavDir)\sound_Wooden_Harp_F.wav \
-	$(SndWavDir)\sound_Wooden_Harp_G.wav
+	$(SndWavDir)\sound_Wooden_Harp_G.wav $(SndWavDir)\sa2_xpleveldown.wav \
+	$(SndWavDir)\sa2_xplevelup.wav
 
 !IF "$(HAVE_SOUNDLIB)" == "Y"
 !IF "$(NEED_USERSOUNDS)" == "Y"
@@ -807,7 +906,7 @@ RCFLAGS = $(RCFLAGS) -dRCWAV
 
 CONFIG_H = $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 		$(INCL)\tradstdc.h $(INCL)\global.h $(INCL)\coord.h \
-		$(INCL)\vmsconf.h $(INCL)\system.h $(INCL)\nhlua.h \
+		$(INCL)\vmsconf.h $(INCL)\cstd.h $(INCL)\nhlua.h \
 		$(INCL)\unixconf.h $(INCL)\pcconf.h $(INCL)\micro.h \
 		$(INCL)\windconf.h $(INCL)\warnings.h \
 		$(INCL)\fnamesiz.h
@@ -827,7 +926,7 @@ HACK_H = $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
 		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\trap.h \
 		$(INCL)\flag.h $(INCL)\winprocs.h $(INCL)\sndprocs.h \
-		$(INCL)\sys.h
+		$(INCL)\seffects.h $(INCL)\sys.h
 
 TILE_H      = ..\win\share\tile.h
 
@@ -871,9 +970,9 @@ rc=Rc.exe
 # is too old or untested.
 #
 # Recently tested versions:
-TESTEDVS2017 = 14.16.27048.0
-TESTEDVS2019 = 14.29.30147.0
-TESTEDVS2022 = 14.34.31937.0
+TESTEDVS2017 = 14.16.27051.0
+TESTEDVS2019 = 14.29.30152.0
+TESTEDVS2022 = 14.37.32824.0
 
 VS2017CUR = $(TESTEDVS2017:.=)
 VS2019CUR = $(TESTEDVS2019:.=)
@@ -1058,7 +1157,7 @@ LFLAGS   = $(lflags) $(conlibs) $(MACHINE)
 # - Game build
 #==========================================
 
-LIBS= user32.lib winmm.lib $(ZLIB) $(CURSESLIB)
+LIBS= user32.lib winmm.lib $(ZLIB)
 
 ! IF ("$(USE_DLB)"=="Y")
 DLB = nhdat$(NHV)
@@ -1193,7 +1292,7 @@ DLB =
 #==========================================
 
 {$(WCURSES)}.c{$(OBJTTY)}.o:
-	$(Q)$(CC) -DPDC_NCMOUSE $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(TTYDEF) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for files in PDCurses
@@ -1201,13 +1300,16 @@ DLB =
 
 #
 {$(PDCURSES_TOP)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCSRC)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+
+{$(PDCWINGUI)}.c{$(OBJPDC)}.o:
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files
@@ -1270,16 +1372,18 @@ install:  envchk.tag libdir.tag ottydir.tag outldir.tag \
 !IF "$(GIT_AVAILABLE)" == "Y"
 $(LUASRC)\lua.h:
 	git submodule init ../submodules/lua
-	git submodule update --remote ../submodules/lua
+	git submodule update ../submodules/lua
+#	git submodule update --remote ../submodules/lua
 #
 #aka PDCDEP
 $(PDCURSES_TOP)\curses.h:
 	git submodule init ../submodules/$(PDCDIST)
-	git submodule update --remote ../submodules/$(PDCDIST)
+	git submodule update ../submodules/$(PDCDIST)
+#	git submodule update --remote ../submodules/$(PDCDIST)
 
 !ELSE  # GIT_AVAILABLE no
-CURLLUASRC=http://www.lua.org/ftp/lua-5.4.4.tar.gz
-CURLLUADST=lua-5.4.4.tar.gz
+CURLLUASRC=http://www.lua.org/ftp/lua-5.4.6.tar.gz
+CURLLUADST=lua-5.4.6.tar.gz
 
 #CURLPDCSRC=https://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip
 CURLPDCSRC=https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.5.zip
@@ -1343,18 +1447,18 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 #
 
 $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
-			$(ALLOBJTTY) $(CURSESOBJ) $(TTYSOUNDOBJS) $(OTTY)date.o $(OTTY)console.res \
-			$(LUALIB) $(PDCLIB) $(TTYOBJ)
+			$(ALLOBJTTY) $(CURSESWINCONOBJS) \
+			$(TTYSOUNDOBJS) $(OTTY)date.o $(OTTY)console.res \
+			$(LUALIB) $(TTYOBJ) $(PDCWINCONLIB) $(PDCWINCONOBJS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
 	$(link) $(LFLAGS) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(OTTY)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(LUALIB) $(TTYSOUNDLIBS) \
+		$(LIBS) $(PDCWINCONLIB) $(LUALIB) $(TTYSOUNDLIBS) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJTTY)
 		$(ALLOBJTTY)
-                $(TTYOBJ)
-                $(TTYSOUNDOBJS)
-                $(CURSESOBJ)
+		$(TTYOBJ)
+		$(TTYSOUNDOBJS) $(CURSESWINCONOBJS) $(PDCWINCONOBJS)
 		$(OTTY)consoletty.o
 		$(OTTY)date.o
 		$(OTTY)console.res
@@ -1367,18 +1471,19 @@ $(GAMEDIR)\NetHack.exe : gamedir.tag $(OTTY)consoletty.o \
 #
 $(GAMEDIR)\NetHackW.exe : gamedir.tag $(OGUI)tile.o \
 			$(ALLOBJGUI) $(GAMEOBJGUI) $(GUIOBJ) $(GUISOUNDOBJS) \
-			$(OGUI)date.o \
+			$(CURSESWINGUIOBJS) $(OGUI)date.o \
 			$(OGUI)NetHackW.res \
-			$(LUALIB)
+			$(LUALIB) $(PDCWINGUILIB) $(PDCWINGUIOBJS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(LFLAGS) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(LUALIB) $(GUISOUNDLIBS) \
+		/MAP:$(OGUI)$(@B).MAP $(LIBS) $(PDCWINGUILIB) $(LUALIB) \
+		$(GUISOUNDLIBS) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJGUI)
 		$(ALLOBJGUI)
 		$(GUIOBJ)
-		$(GUISOUNDOBJS)
+		$(GUISOUNDOBJS) $(CURSESWINGUIOBJS) $(PDCWINGUIOBJS)
 		$(OGUI)tile.o
 		$(OGUI)date.o
 		$(OGUI)NetHackW.res
@@ -1560,7 +1665,7 @@ $(U)uudecode.exe: $(OUTL)uudecode.o
 	@$(link) $(LFLAGS) /PDB:"$(OUTL)$(@B).PDB" /MAP:"$(OUTL)$(@B).MAP" -out:$@ $(OUTL)uudecode.o
 
 $(OUTL)uudecode.o: $(SSYS)\uudecode.c
-	$(Q)$(CC) $(CFLAGS) $(TTYDEF) $(CROSSCOMPILE) /D_CRT_SECURE_NO_DEPRECATE -Fo$@ $(SSYS)\uudecode.c
+	$(Q)$(CC) $(CFLAGS) -wd4702 $(TTYDEF) $(CROSSCOMPILE) /D_CRT_SECURE_NO_DEPRECATE  -Fo$@ $(SSYS)\uudecode.c
 
 $(MSWIN)\mnsel.bmp: $(U)uudecode.exe $(MSWIN)\mnsel.uu
 $(MSWIN)\mnselcnt.bmp: $(U)uudecode.exe $(MSWIN)\mnselcnt.uu
@@ -1715,7 +1820,7 @@ $(OGUI)dlb_main.o: $(UTIL)\dlb_main.c $(INCL)\config.h $(INCL)\dlb.h
 $(DAT)\porthelp: $(MSWSYS)\porthelp
 	@copy $(MSWSYS)\porthelp $@ >nul
 
-nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(DAT)\quest.lua \
+nhdat$(NHV):	$(U)dlb.exe $(DAT)\data $(DAT)\oracles $(OPTIONS_FILE) $(LUA_FILES) \
 	$(DAT)\rumors $(DAT)\help $(DAT)\hh $(DAT)\cmdhelp $(DAT)\keyhelp \
 	$(DAT)\history $(DAT)\opthelp $(DAT)\optmenu $(DAT)\wizhelp $(DAT)\porthelp \
 	$(DAT)\license $(DAT)\engrave $(DAT)\epitaph $(DAT)\bogusmon $(DAT)\tribute
@@ -1878,12 +1983,44 @@ $(SRC)\x11tiles: $(U)tile2x11.exe $(WSHR)\monsters.txt $(WSHR)\objects.txt \
 # PDCurses
 #===============================================================================
 
-$(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib : $(PDCLIBOBJS) $(PDCOBJS)
+$(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib : $(PDCCOMMONOBJS)
 	@echo Building library $@ from $**
-	@$(librarian) -nologo /out:$@ $(PDCLIBOBJS) $(PDCOBJS)
+	@$(librarian) -nologo /out:$@ $(PDCCOMMONOBJS)
+
+$(OPDC)pdcclip_wincon.o: $(PDCWINCON)\pdcclip.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcclip.c
+$(OPDC)pdcdisp_wincon.o: $(PDCWINCON)\pdcdisp.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcdisp.c
+$(OPDC)pdcgetsc_wincon.o: $(PDCWINCON)\pdcgetsc.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcgetsc.c
+$(OPDC)pdckbd_wincon.o: $(PDCWINCON)\pdckbd.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdckbd.c
+$(OPDC)pdcscrn_wincon.o: $(PDCWINCON)\pdcscrn.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcscrn.c
+$(OPDC)pdcsetsc_wincon.o: $(PDCWINCON)\pdcsetsc.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcsetsc.c
+$(OPDC)pdcutil_wincon.o: $(PDCWINCON)\pdcutil.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINCON)\pdcutil.c
+
+$(OPDC)pdcclip_wingui.o: $(PDCWINGUI)\pdcclip.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcclip.c
+$(OPDC)pdcdisp_wingui.o: $(PDCWINGUI)\pdcdisp.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcdisp.c
+$(OPDC)pdcgetsc_wingui.o: $(PDCWINGUI)\pdcgetsc.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcgetsc.c
+$(OPDC)pdckbd_wingui.o: $(PDCWINGUI)\pdckbd.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdckbd.c
+$(OPDC)pdcscrn_wingui.o: $(PDCWINGUI)\pdcscrn.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcscrn.c
+$(OPDC)pdcsetsc_wingui.o: $(PDCWINGUI)\pdcsetsc.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcsetsc.c
+$(OPDC)pdcutil_wingui.o: $(PDCWINGUI)\pdcutil.c
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -Fo$@ $(PDCWINGUI)\pdcutil.c
+
+$(OGUI)guitty.o: $(MSWSYS)\guitty.c $(WINDHDR) $(HACK_H) $(TILE_H)
 
 #$(OPDC)pdcscrn.o : $(PDCURSES_HEADERS) $(PDCWINCON)\pdcscrn.c
-#	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(CURSESDEF1) $(CURSESDEF2) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
+#	$(Q)$(CC) $(PDCINCL) $(CFLAGS) $(CURSESDEF2) -wd4996 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) \
 #		-Fo$@ $(PDCWINCON)\pdcscrn.c
 
 #===============================================================================
@@ -2145,6 +2282,8 @@ $(SndWavDir)\sound_Wooden_Harp_D.wav: $(SndWavDir)\sound_Wooden_Harp_D.uu $(U)uu
 $(SndWavDir)\sound_Wooden_Harp_E.wav: $(SndWavDir)\sound_Wooden_Harp_E.uu $(U)uudecode.exe
 $(SndWavDir)\sound_Wooden_Harp_F.wav: $(SndWavDir)\sound_Wooden_Harp_F.uu $(U)uudecode.exe
 $(SndWavDir)\sound_Wooden_Harp_G.wav: $(SndWavDir)\sound_Wooden_Harp_G.uu $(U)uudecode.exe
+$(SndWavDir)\sa2_xpleveldown.wav: $(SndWavDir)\sa2_xpleveldown.uu $(U)uudecode.exe
+$(SndWavDir)\sa2_xplevelup.wav: $(SndWavDir)\sa2_xplevelup.uu $(U)uudecode.exe
 
 #===============================================================================
 # Housekeeping
@@ -2293,7 +2432,7 @@ MOCPATH = moc.exe
 #$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 #		$(INCL)\tradstdc.h $(INCL)\integer.h \
 #		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\system.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
+#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
 #		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
 #		$(INCL)\warnings.h $(INCL)\fnamesiz.h
 #	touch $(CONFIG_H)
@@ -2312,7 +2451,8 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\seffects.h \
+#		$(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OTTY)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
@@ -2712,7 +2852,7 @@ MOCPATH = moc.exe
 #$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
 #		$(INCL)\tradstdc.h $(INCL)\integer.h \
 #		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\system.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
+#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
 #		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
 #		$(INCL)\warnings.h $(INCL)\fnamesiz.h
 #	touch $(CONFIG_H)
@@ -2731,7 +2871,8 @@ MOCPATH = moc.exe
 #		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
 #		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
 #		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\sys.h
+#		$(INCL)\winprocs.h $(INCL)\sndprocs.h \
+#		$(INCL)\seffects.h $(INCL)\sys.h
 #	touch $(HACK_H)
 #
 $(OGUI)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h

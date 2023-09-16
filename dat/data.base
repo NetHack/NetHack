@@ -1,5 +1,5 @@
 # NetHack 3.7	data.base
-# $NHDT-Date: 1608767189 2020/12/23 23:46:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.99 $
+# $NHDT-Date: 1684001509 2023/05/13 18:11:49 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.106 $
 #	Copyright (c) 1994, 1995, 1996 by the NetHack Development Team
 #	Copyright (c) 1994 by Boudewijn Wayers
 #	NetHack may be freely redistributed.  See license for details.
@@ -772,6 +772,7 @@ kitten
 	predatory felines (_Felis ochreata domestica_), with a thick,
 	soft pelt; often kept as a pet.  Various folklores have the
 	cat associated with magic and the gods of ancient Egypt.
+		[]
 
 	So Ulthar went to sleep in vain anger; and when the people
 	awakened at dawn - behold!  Every cat was back at his
@@ -1002,7 +1003,6 @@ zorkmid*
 	Empire ]."  On the other side, the coin depicts Egreth Castle,
 	and says "In Frobs We Trust" in several languages.
 		[ Zork Zero, by Infocom ]
-# not "stethoscope"
 combat
 fight
 fracas
@@ -1018,6 +1018,7 @@ tiff
 	Blind Pew:  Oh.  Must have been more of a tiff then.
 		[ Yellowbeard, directed by Mel Damski, screenplay
 		  by Graham Chapman, Peter Cook, Bernard McKenna ]
+# not "*cope" because that would match "stethoscope"
 cope
 * cope
 	The cope is a liturgical vestment which may be worn by any
@@ -1025,6 +1026,8 @@ cope
 	and are like a very long mantle or cloak, fastened at the breast
 	by a clasp.
 		[ Wikipedia, the free encyclopedia ]
+# the word "cornuthaum" was coined by devteam member jwalz and adopted in
+# 3.2.0, after searching for an actual name for pointy hat came up empty
 cornuthaum
 	He was dressed in a flowing gown with fur tippets which had
 	the signs of the zodiac embroidered over it, with various
@@ -3333,12 +3336,19 @@ huge chunk of meat
 		[ Grace Before Meat, by Robert Burns ]
 # nethack's Medusa doesn't match the myth very closely, particularly in
 # how reflection is involved, but that's par for the course
+#
+# this used to begin "Medusa, one of the three Gorgons or Graeae" as
+# if Graeae and Gorgons where the same thing, but Bulfinch's Mythology
+# indicates that they are quite different; since the first paragraph is
+# a made-up introduction to an excerpt from that work, the contradictory
+# mention of Graeae has been removed
 medusa
 perseus
 shield of reflection
-	Medusa, one of the three Gorgons or Graeae, is the only one
-	of her sisters to have assumed mortal form and inhabited the
-	dungeon world.
+	Medusa, one of the three Gorgons, is the only one of her
+	sisters to have assumed mortal form and inhabited the dungeon
+	world.
+		[]
 
 	When Perseus was grown up Polydectes sent him to attempt the
 	conquest of Medusa, a terrible monster who had laid waste the
@@ -4984,6 +4994,22 @@ statue*
 	the lion's back and the top of its head were covered with
 	snow.  Of course it must be only a statue!
 		[ The Lion, the Witch and the Wardrobe, by C.S. Lewis ]
+# the original stethoscope was a fixed tube open at both ends; subsequent
+# early ones were adaptations of an 'earhorn' used by the hard of hearing,
+# but players are unlikely to picture anything like that when they find one
+stethoscope
+	Tool used to listen closely to adjacent sound, typically by
+	a medical practioner to listen to a patient's heart, lungs,
+	or pulse.
+# joke suggested by stethoscope; a zillion things could be added but these
+# ought to suffice
+microscope
+telescope
+telephone
+television
+#tricorder
+#phaser
+	Not invented yet.
 sting
 	There was the usual dim grey light of the forest-day about
 	him when he came to his senses.  The spider lay dead beside

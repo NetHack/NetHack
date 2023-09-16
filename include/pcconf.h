@@ -177,7 +177,7 @@
 
 #ifndef SYSTEM_H
 #if !defined(_MSC_VER)
-#include "system.h"
+/* #include "system.h" */
 #endif
 #endif
 

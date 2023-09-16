@@ -1,4 +1,4 @@
-/* NetHack 3.7	pcmain.c	$NHDT-Date: 1596498282 2020/08/03 23:44:42 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.121 $ */
+/* NetHack 3.7	pcmain.c	$NHDT-Date: 1693359605 2023/08/30 01:40:05 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.133 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -76,7 +76,7 @@ mingw_main(int argc, char *argv[])
 {
     boolean resuming;
 
-    early_init();
+    early_init(argc, argv);
     resuming = pcmain(argc, argv);
     moveloop(resuming);
     nethack_exit(EXIT_SUCCESS);
@@ -448,7 +448,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
      */
     vision_init();
 
-    init_sound_and_display_gamewindows();
+    init_sound_disp_gamewindows();
 /*
  * First, try to find and restore a save file for specified character.
  * We'll return here if new game player_selection() renames the hero.

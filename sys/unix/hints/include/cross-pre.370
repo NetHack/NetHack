@@ -26,6 +26,18 @@ override TARGETPFX = $(TARGETDIR)/
 override TARGET_LIBS=
 endif
 
+ifdef CROSS_TO_MIPS
+CROSS=1
+BUILD_TARGET_LUA=1
+BUILD_TARGET_NCURSES=1
+HACKDIR=/
+PREFIX=
+override TARGET = mips
+override TARGETDIR=../targets/$(TARGET)
+override TARGETPFX = $(TARGETDIR)/
+override TARGET_LIBS=
+endif
+
 ifdef CROSS
 override PREGAME=
 override BUILDMORE=
@@ -36,9 +48,9 @@ endif
 ifdef BUILD_TARGET_LUA
 #===============-=================================================
 # LUA library
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
-LUA_VERSION ?=5.4.4
+LUA_VERSION ?=5.4.6
 LUATOP ?= ../lib/lua-$(LUA_VERSION)
 LUASRCDIR ?= $(LUATOP)/src
 LUAOBJFILES1 =  $(TARGETPFX)lapi.o $(TARGETPFX)lauxlib.o \
@@ -74,14 +86,13 @@ ifdef BUILD_PDCURSES
 # PD Curses library
 #===============-=================================================
 ifdef WANT_WIN_CURSES
-ifdef WANT_DOSVGA
 PDCTOP = ../lib/pdcursesmod
+ifdef WANT_DOSVGA
 PDCPORT = $(PDCTOP)/dosvga
 PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE" \
 		-D"PDC_WIDE" -D"CURSES_UNICODE"
 else
-PDCTOP = ../lib/pdcurses
 PDCPORT = $(PDCTOP)/dos
 PDCURSESDEF= -I$(PDCTOP) -I$(PDCPORT) \
 		-D"CURSES_GRAPHICS" -D"CURSES_BRIEF_INCLUDE"
@@ -127,10 +138,22 @@ PDCINCL=
 endif  # WANT_WIN_CURSES
 endif  # BUILD_PDCURSES
 
+ifdef BUILD_TARGET_NCURSES
+#=================================================================
+# ncurses
+# Source from https://invisible-island.net/datafiles/release/ncurses.tar.gz
+#
+#=================================================================
+NCURSESLIBDIR ?= $(TARGETPFX)ncurses/lib
+NCURSESLIB ?= $(NCURSESLIBDIR)/libncurses.a
+#override TARGET_LIBS += $(NCURSESLIB)
+override BUILDMORE += $(NCURSESLIB)
+endif  # BUILD_TARGET_NCURSES
+
 ifdef CROSS_TO_MSDOS
-#===============-=================================================
+#=================================================================
 # MSDOS cross-compile recipe
-#===============-=================================================
+#=================================================================
 # Uses an MSDOS djgpp cross-compiler on linux or macos.
 #
 # 1. You can obtain the cross-compiler for your system via:
@@ -138,7 +161,7 @@ ifdef CROSS_TO_MSDOS
 # 2. Then
 #     make CROSS_TO_MSDOS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
 #
-# Source from http://www.lua.org/ftp/lua-5.4.4.tar.gz
+# Source from http://www.lua.org/ftp/lua-5.4.6.tar.gz
 #=================================================================
 
 CFLAGS += -DCROSSCOMPILE
@@ -345,6 +368,75 @@ $(TARGETPFX)%.o : ../sys/libnh/%.c
 $(TARGETPFX)%.o : ../win/shim/%.c
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
 endif  # CROSS_TO_WASM
+
+
+ifdef CROSS_TO_MIPS
+#================================================================
+# MIPS cross-compile recipe
+#================================================================
+# Uses an MIPS linux cross-compiler on linux or macos.
+#
+# 1. You can obtain the cross-compiler for ubuntu via:
+#     sudo apt -y install gcc-mipsel-linux-gnu g++-mipsel-linux-gnu
+#    For macOS, perhaps check for a mips cross-compiler on
+#    home-brew or macports.
+#
+# 2. Then
+#     make CROSS_TO_MIPS=1 WANT_WIN_TTY=1 WANT_WIN_CURSES=1 all
+#
+#=================================================================
+
+CFLAGS += -DCROSSCOMPILE
+
+#
+# Override the build tools and some obj files to
+# reflect the mips cross-compiler.
+#
+override TARGET_CC = mipsel-linux-gnu-gcc
+override TARGET_CXX = CXX=mipsel-linux-gnu-g++
+override TARGET_AR = mipsel-linux-gnu-ar
+#override TARGET_LINK = mipsel-linux-gnu-ld
+MIPS_TARGET_CFLAGS = -c -O -I../include -I../sys/unix -I../win/share \
+	$(LUAINCL) -DDLB \
+	-DCROSSCOMPILE -DCROSSCOMPILE_TARGET \
+	-DCROSS_TO_MIPS \
+	-DCURSES_GENL_PUTMIXED \
+        -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
+        -Wformat -Wswitch -Wshadow -Wwrite-strings \
+	-Wimplicit -Wimplicit-function-declaration -Wimplicit-int \
+	-Wmissing-parameter-type -Wold-style-definition -Wstrict-prototypes
+MIPS_TARGET_CXXFLAGS = -c -O -I../include -I../sys/unix -I../win/share \
+        $(LUAINCL) -DDLB  \
+        -DUSE_TILES -DCROSSCOMPILE -DCROSSCOMPILE_TARGET -DCROSS_TO_MIPS \
+        -Wall -Wextra -Wno-missing-field-initializers -Wreturn-type -Wunused \
+        -Wformat -Wswitch -Wshadow -Wwrite-strings -Wno-maybe-uninitialized
+override TARGET_CFLAGS = $(MIPS_TARGET_CFLAGS) -Wmissing-declarations \
+			-Wmissing-prototypes -pedantic -Wmissing-declarations \
+			-Wformat-nonliteral
+override TARGET_CXXFLAGS = $(MIPS_TARGET_CXXFLAGS)
+ifdef CPLUSPLUS_NEEDED
+override TARGET_LINK = mipsel-linux-gnu-gcc
+else
+override TARGET_LINK = mipsel-linux-gnu-g++
+endif
+override TARGET_LFLAGS=
+override SYSOBJ = $(TARGETPFX)ioctl.o $(TARGETPFX)unixmain.o $(TARGETPFX)unixtty.o \
+	$(TARGETPFX)unixunix.o $(TARGETPFX)unixres.o
+override WINLIB = $(NCURSESLIB)
+override LUALIB=
+override LUALIBS=
+override TOPLUALIB=
+#override GAMEBIN=
+#override PACKAGE=
+override PREGAME += mkdir -p $(TARGETDIR) ;
+override CLEANMORE += rm -f -r $(TARGETDIR) ;
+# Rule for file in sys/unix
+#$(TARGETPFX)%.o : ../sys/unix/%.c
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
+# Rule for file in sys/share
+#$(TARGETPFX)%.o : ../sys/share/%.c
+#	$(TARGET_CC) $(TARGET_CFLAGS) -c -o$@ $<
+endif  # CROSS_TO_MIPS
 #=================================================================
 
 ifdef WANT_WIN_CURSES

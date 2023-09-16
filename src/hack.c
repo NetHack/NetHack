@@ -921,7 +921,7 @@ test_move(
                so we won't get here, hence don't need to worry about
                "there" being somewhere the player isn't sure of */
             if (mode == DO_MOVE)
-                pline("There is an obstacle there.");
+                There("is an obstacle there.");
             return FALSE;
         } else if (tmpr->typ == IRONBARS) {
             if (mode == DO_MOVE
@@ -1078,7 +1078,7 @@ test_move(
         /* FIXME: should be using lastseentyp[x][y] rather than seen vector
          */
         if ((levl[x][y].seenv && is_pool_or_lava(x, y)) /* known pool/lava */
-            && (IS_WATERWALL(levl[x][y].typ) /* never enter wall of water */
+            && ((IS_WATERWALL(levl[x][y].typ) || levl[x][y].typ == LAVAWALL) /* never enter wall of liquid */
                 /* don't enter pool or lava (must be one of the two to
                    get here) unless flying or levitating or have known
                    water-walking for pool or known lava-walking and
@@ -1322,10 +1322,10 @@ findtravelpath(int mode)
                 for (i = 0; i < nn; ++i) {
                     tmp_at(travelstepx[1 - set][i], travelstepy[1 - set][i]);
                 }
-                delay_output();
+                nh_delay_output();
                 if (flags.runmode == RUN_CRAWL) {
-                    delay_output();
-                    delay_output();
+                    nh_delay_output();
+                    nh_delay_output();
                 }
                 tmp_at(DISP_END, 0);
             }
@@ -1381,12 +1381,12 @@ findtravelpath(int mode)
                 /* Use of warning glyph is arbitrary. It stands out. */
                 tmp_at(DISP_ALL, warning_to_glyph(2));
                 tmp_at(px, py);
-                delay_output();
+                nh_delay_output();
                 if (flags.runmode == RUN_CRAWL) {
-                    delay_output();
-                    delay_output();
-                    delay_output();
-                    delay_output();
+                    nh_delay_output();
+                    nh_delay_output();
+                    nh_delay_output();
+                    nh_delay_output();
                 }
                 tmp_at(DISP_END, 0);
             }
@@ -1605,7 +1605,7 @@ check_buried_zombies(coordxy x, coordxy y)
             && otmp->oy >= y - 1 && otmp->oy <= y + 1
             && (t = peek_timer(ZOMBIFY_MON, obj_to_any(otmp))) > 0) {
             t = stop_timer(ZOMBIFY_MON, obj_to_any(otmp));
-            (void) start_timer(max(1, t - rn2(10)), TIMER_OBJECT,
+            (void) start_timer(max(1, (t*2/3)), TIMER_OBJECT,
                                ZOMBIFY_MON, obj_to_any(otmp));
         }
     }
@@ -1630,6 +1630,8 @@ u_simple_floortyp(coordxy x, coordxy y)
 
     if (is_waterwall(x, y))
         return WATER; /* wall of water, fly/lev does not matter */
+    if (levl[x][y].typ == LAVAWALL)
+        return LAVAWALL; /* wall of lava, fly/lev does not matter */
     if (!u_in_air) {
         if (is_pool(x, y))
             return POOL;
@@ -1639,12 +1641,45 @@ u_simple_floortyp(coordxy x, coordxy y)
     return ROOM;
 }
 
+/* maybe show a helpful gameplay tip? */
+void
+handle_tip(int tip)
+{
+    if (!flags.tips)
+        return;
+
+    if (tip >= 0 && tip < NUM_TIPS && !gc.context.tips[tip]) {
+        gc.context.tips[tip] = TRUE;
+        switch (tip) {
+        case TIP_ENHANCE:
+            pline("(Use the #enhance command to advance them.)");
+            break;
+        case TIP_SWIM:
+            pline("(Use '%s' prefix to step in if you really want to.)",
+                  visctrl(cmd_from_func(do_reqmenu)));
+            break;
+        case TIP_UNTRAP_MON:
+            pline("(Perhaps #untrap would help?)");
+            break;
+        case TIP_GETPOS:
+            l_nhcore_call(NHCORE_GETPOS_TIP);
+            break;
+        default:
+            impossible("Unknown tip in handle_tip(%i)", tip);
+        }
+    }
+}
+
 /* Is it dangerous for hero to move to x,y due to water or lava? */
 static boolean
 swim_move_danger(coordxy x, coordxy y)
 {
     schar newtyp = u_simple_floortyp(x, y);
-    boolean liquid_wall = IS_WATERWALL(newtyp);
+    boolean liquid_wall = IS_WATERWALL(newtyp)
+        || newtyp == LAVAWALL;
+
+    if (Underwater && (is_pool(x,y) || IS_WATERWALL(newtyp)))
+        return FALSE;
 
     if ((newtyp != u_simple_floortyp(u.ux, u.uy))
         && !Stunned && !Confusion && levl[x][y].seenv
@@ -1662,18 +1697,13 @@ swim_move_danger(coordxy x, coordxy y)
             || liquid_wall) {
             if (gc.context.nopick) {
                 /* moving with m-prefix */
-                gc.context.swim_tip = TRUE;
+                gc.context.tips[TIP_SWIM] = TRUE;
                 return FALSE;
             } else if (ParanoidSwim || liquid_wall) {
                 You("avoid %s into the %s.",
                     ing_suffix(u_locomotion("step")),
                     waterbody_name(x, y));
-                if (!gc.context.swim_tip) {
-                    pline(
-                        "(Use '%s' prefix to step in if you really want to.)",
-                          visctrl(cmd_from_func(do_reqmenu)));
-                    gc.context.swim_tip = TRUE;
-                }
+                handle_tip(TIP_SWIM);
                 return TRUE;
             }
         }
@@ -1718,9 +1748,9 @@ domove_attackmon_at(
     coordxy x, coordxy y,
     boolean *displaceu)
 {
-    /* only attack if we know it's there */
-    /* or if we used the 'F' command to fight blindly */
-    /* or if it hides_under, in which case we call do_attack() to print
+    /* only attack if we know it's there
+     * or if we used the 'F' command to fight blindly
+     * or if it hides_under, in which case we call do_attack() to print
      * the Wait! message.
      * This is different from ceiling hiders, who aren't handled in
      * do_attack().
@@ -1847,6 +1877,7 @@ domove_swap_with_pet(struct monst *mtmp, coordxy x, coordxy y)
         /* all mtame are also mpeaceful, so this affects pets too */
         You("stop.  %s can't move out of that trap.",
             upstart(y_monnam(mtmp)));
+        handle_tip(TIP_UNTRAP_MON);
         didnt_move = TRUE;
     } else if (mtmp->mpeaceful
                && (!goodpos(u.ux0, u.uy0, mtmp, 0)
@@ -2164,7 +2195,7 @@ avoid_moving_on_liquid(
          || gc.context.travel)
         /* and you know you won't fall in */
         && (in_air || Known_lwalking || (is_pool(x, y) && Known_wwalking))
-        && !IS_WATERWALL(levl[x][y].typ)) {
+        && !(IS_WATERWALL(levl[x][y].typ) || levl[x][y].typ == LAVAWALL)) {
         /* XXX: should send 'is_clinger(gy.youmonst.data)' here once clinging
            polyforms are allowed to move over water */
         return FALSE; /* liquid is safe to traverse */
@@ -2428,6 +2459,45 @@ domove_core(void)
     if (u_rooted())
         return;
 
+    /* warn maybe player before walking into known traps */
+    if (ParanoidTrap && (trap = t_at(x, y)) != 0 && trap->tseen
+        && (!gc.context.nopick || gc.context.run)
+        && !Stunned && !Confusion
+        && (immune_to_trap(&gy.youmonst, trap->ttyp) != TRAP_CLEARLY_IMMUNE
+            /* hallucination: all traps still show as ^, but the
+               hero can't tell what they are, so treat as dangerous */
+            || Hallucination)) {
+        char qbuf[QBUFSZ];
+        int traptype = (Hallucination ? rnd(TRAPNUM - 1) : (int) trap->ttyp);
+        boolean into = FALSE; /* "onto" the trap vs "into" */
+
+        switch (traptype) {
+        case BEAR_TRAP:
+        case PIT:
+        case SPIKED_PIT:
+        case HOLE:
+        case TELEP_TRAP:
+        case LEVEL_TELEP:
+        case MAGIC_PORTAL:
+        case WEB:
+            into = TRUE;
+            break;
+        }
+        Snprintf(qbuf, sizeof qbuf, "Really %s %s that %s?",
+                 locomotion(gy.youmonst.data, "step"),
+                 into ? "into" : "onto",
+                 defsyms[trap_to_defsym(traptype)].explanation);
+        /* handled like paranoid_confirm:pray; when paranoid_confirm:trap
+           isn't set, don't ask at all but if it is set (checked above),
+           ask via y/n if parnoid_confirm:confirm isn't also set or via
+           yes/no if it is */
+        if (!paranoid_query(ParanoidConfirm, qbuf)) {
+            nomul(0);
+            gc.context.move = 0;
+            return;
+        }
+    }
+
     if (u.utrap) {
         boolean moved = trapmove(x, y, trap);
 
@@ -2592,12 +2662,12 @@ runmode_delay_output(void)
             /* moveloop() suppresses time_botl when running */
             iflags.time_botl = flags.time;
             curs_on_u();
-            delay_output();
+            nh_delay_output();
             if (flags.runmode == RUN_CRAWL) {
-                delay_output();
-                delay_output();
-                delay_output();
-                delay_output();
+                nh_delay_output();
+                nh_delay_output();
+                nh_delay_output();
+                nh_delay_output();
             }
         }
     }
@@ -2679,7 +2749,8 @@ switch_terrain(void)
 {
     struct rm *lev = &levl[u.ux][u.uy];
     boolean blocklev = (IS_ROCK(lev->typ) || closed_door(u.ux, u.uy)
-                        || IS_WATERWALL(lev->typ)),
+                        || IS_WATERWALL(lev->typ)
+                        || lev->typ == LAVAWALL),
             was_levitating = !!Levitation, was_flying = !!Flying;
 
     if (blocklev) {
@@ -2776,7 +2847,7 @@ pooleffects(
             if (Is_airlevel(&u.uz) || Is_waterlevel(&u.uz))
                 return FALSE;
             /* even if we actually end up at same location, float_down()
-               has already done spoteffect()'s trap and pickup actions */
+               has already done trap and pickup actions of spoteffects() */
             if (newspot)
                 check_special_room(FALSE); /* spoteffects */
             return TRUE;
@@ -2793,7 +2864,8 @@ pooleffects(
             if (lava_effects())
                 return TRUE;
         } else if ((!Wwalking || is_waterwall(u.ux,u.uy))
-                   && (newspot || !u.uinwater || !(Swimming || Amphibious))) {
+                   && (newspot || !u.uinwater
+                       || !(Swimming || Amphibious || Breathless))) {
             if (drown())
                 return TRUE;
         }
@@ -2822,6 +2894,10 @@ spoteffects(boolean pick)
         && spotterrain == levl[u.ux][u.uy].typ
         /* or transformed trap (land mine -> pit) */
         && (!spottrap || !trap || trap->ttyp == spottraptyp))
+        return;
+    /* when float_down() puts hero into lava and she teleports out,
+       defer spoteffects() until after "you are back on solid <surface>" */
+    if (iflags.in_lava_effects)
         return;
 
     ++inspoteffects;
@@ -2908,7 +2984,7 @@ spoteffects(boolean pick)
                   ceiling(u.ux, u.uy));
             if (mtmp->mtame) { /* jumps to greet you, not attack */
                 ;
-            } else if (uarmh && is_metallic(uarmh)) {
+            } else if (hard_helmet(uarmh)) {
                 pline("Its blow glances off your %s.",
                       helm_simple_name(uarmh));
             } else if (u.uac + 3 <= rnd(20)) {
@@ -3032,11 +3108,10 @@ in_rooms(register coordxy x, register coordxy y, register int typewanted)
 boolean
 in_town(coordxy x, coordxy y)
 {
-    s_level *slev = Is_special(&u.uz);
     register struct mkroom *sroom;
     boolean has_subrooms = FALSE;
 
-    if (!slev || !slev->flags.town)
+    if (!gl.level.flags.has_town)
         return FALSE;
 
     /*
@@ -3103,14 +3178,26 @@ check_special_room(boolean newlev)
     if (*u.ushops0)
         u_left_shop(u.ushops_left, newlev);
 
-    if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
-        return; /* no entrance messages necessary */
-
-    if (!gc.context.achieveo.minetn_reached
+    /*
+     * Check for attaining 'entered Mine Town' achievement.
+     * Most of the Mine Town variations have the town in one large room
+     * containing a bunch of subrooms; we check for entering that large
+     * room.  However, two of the variations cover the whole level rather
+     * than include a room with subrooms.  We need to check for town entry
+     * before the possible early return for not having entered a room in
+     * case we have arrived in the town but have not entered any room.
+     *
+     * TODO: change the minetn variants which don't include any town
+     * boundary to have such.
+     */
+    if (gl.level.flags.has_town && !gc.context.achieveo.minetn_reached
         && In_mines(&u.uz) && in_town(u.ux, u.uy)) {
         record_achievement(ACH_TOWN);
         gc.context.achieveo.minetn_reached = TRUE;
     }
+
+    if (!*u.uentered && !*u.ushops_entered) /* implied by newlev */
+        return; /* no entrance messages necessary */
 
     /* Did we just enter a shop? */
     if (*u.ushops_entered)
@@ -3168,6 +3255,7 @@ check_special_room(boolean newlev)
             struct monst *oracle = monstinroom(&mons[PM_ORACLE], roomno);
 
             if (oracle) {
+                SetVoice(oracle, 0, 80, 0);
                 if (!oracle->mpeaceful)
                     verbalize("You're in Delphi, %s.", gp.plname);
                 else
@@ -3294,8 +3382,7 @@ pickup_checks(void)
         else if (IS_ALTAR(lev->typ))
             pline("Moving the altar would be a very bad idea.");
         else if (lev->typ == STAIRS)
-            pline_The("stairs are solidly fixed to the %s.",
-                      surface(u.ux, u.uy));
+            pline_The("stairs are solidly affixed.");
         else
             There("is nothing here to pick up.");
         return 0;
@@ -3423,7 +3510,7 @@ lookaround(void)
                         You("stop in front of the door.");
                     goto stop;
                 }
-                /* we're orthonal to a closed door, consider it a corridor */
+                /* we're orthogonal to a closed door, consider it a corridor */
                 goto bcorr;
             } else if (levl[x][y].typ == CORR) {
                 /* corridor */
@@ -3685,6 +3772,19 @@ maybe_wail(void)
     }
 }
 
+/* once per game, if receiving a killing blow from above 90% HP,
+   allow the hero to survive with 1 HP */
+int
+saving_grace(int dmg)
+{
+    if (!u.usaving_grace && (u.uhp <= dmg)
+        && (u.uhp * 100 / u.uhpmax) > 90) {
+        dmg = u.uhp - 1;
+        u.usaving_grace = TRUE; /* used up */
+    }
+    return dmg;
+}
+
 void
 losehp(int n, const char *knam, schar k_format)
 {
@@ -3708,6 +3808,7 @@ losehp(int n, const char *knam, schar k_format)
         return;
     }
 
+    n = saving_grace(n);
     u.uhp -= n;
     if (u.uhp > u.uhpmax)
         u.uhpmax = u.uhp; /* perhaps n was negative */

@@ -65,14 +65,7 @@
 #endif
 
 #ifndef SYSTEM_H
-#include "system.h"
-#endif
-
-#ifndef index
-#define index strchr
-#endif
-#ifndef rindex
-#define rindex strrchr
+/* #include "system.h" */
 #endif
 
 #include <time.h>

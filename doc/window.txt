@@ -226,7 +226,10 @@ print_glyph(window, x, y, glyphinfo, bkglyphinfo)
                     unsigned glyphflags; /* more detail about the entity */
 
 
-char yn_function(const char *ques, const char *choices, char default)
+char win_yn_function(const char *ques, const char *choices, char default)
+		-- Not to be confused with the core yn_function()
+		   added in 3.4.2 and no yn_function() macro is defined
+		   for this.
 		-- Print a prompt made up of ques, choices and default.
 		   Read a single character response that is contained in
 		   choices or default.  If choices is NULL, all possible
@@ -617,6 +620,8 @@ E.  Misc. Routines
 make_sound(???) -- To be determined later.  THIS IS CURRENTLY UN-IMPLEMENTED.
 nhbell()	-- Beep at user.  [This will exist at least until sounds are
 		   redone, since sounds aren't attributable to windows anyway.]
+                   Implementation should respect the flags.silent setting just
+                   like the tty window-port does in tty_nhbell().
 mark_synch()	-- Don't go beyond this point in I/O on any channel until
 		   all channels are caught up to here.  Can be an empty call
 		   for the moment
@@ -1025,11 +1030,11 @@ initoptions()			   /* read the resource file */
 init_nhwindows()		   /* initialize the window system */
 process_options(argc, argv)	   /* process command line options or equiv */
 if(save file is present) {
-  init_sound_and_display_gamewindows() /* init sound, create & display */
+  init_sound_disp_gamewindows() /* init sound, create & display */
   dorestore()			   /* restore old game; pline()s are OK */
 } else {
   player_selection()		   /* select a player type using a window */
-  init_sound_and_display_gamewindows() /* init sound, create & display  */
+  init_sound_disp_gamewindows() /* init sound, create & display  */
 }
 pline("Hello, welcome...");
 

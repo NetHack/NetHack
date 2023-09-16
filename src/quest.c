@@ -1,4 +1,4 @@
-/* NetHack 3.7	quest.c	$NHDT-Date: 1596498200 2020/08/03 23:43:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.29 $ */
+/* NetHack 3.7	quest.c	$NHDT-Date: 1687036547 2023/06/17 21:15:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.38 $ */
 /*      Copyright 1991, M. Stephenson             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -378,6 +378,22 @@ nemesis_speaks(void)
         qt_pager("discourage");
 }
 
+/* create cloud of stinking gas around dying nemesis */
+void
+nemesis_stinks(coordxy mx, coordxy my)
+{
+    boolean save_mon_moving = gc.context.mon_moving;
+
+    /*
+     * Some nemeses (determined by caller) release a cloud of noxious
+     * gas when they die.  Don't make the hero be responsible for such
+     * a cloud even if hero has just killed nemesis.
+     */
+    gc.context.mon_moving = TRUE;
+    create_gas_cloud(mx, my, 5, 8);
+    gc.context.mon_moving = save_mon_moving;
+}
+
 static void
 chat_with_guardian(void)
 {
@@ -396,6 +412,7 @@ prisoner_speaks(struct monst *mtmp)
         /* Awaken the prisoner */
         if (canseemon(mtmp))
             pline("%s speaks:", Monnam(mtmp));
+        SetVoice(mtmp, 0, 80, 0);
         verbalize("I'm finally free!");
         mtmp->mstrategy &= ~STRAT_WAITMASK;
         mtmp->mpeaceful = 1;

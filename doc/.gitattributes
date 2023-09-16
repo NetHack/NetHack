@@ -1,8 +1,9 @@
 *.mn	NHSUBST
+*.tex	NHSUBST
 *.6	NHSUBST
 *.7	NHSUBST
 fixes*	NHSUBST
-window.txt NHSUBST
+*.txt NHSUBST
 config.nh NHSUBST
 Guidebook.txt NH_header=no
 tmac.n NH_header=no

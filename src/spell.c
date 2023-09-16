@@ -134,7 +134,7 @@ cursed_book(struct obj* bp)
         aggravate();
         break;
     case 2:
-        make_blinded(Blinded + rn1(100, 250), TRUE);
+        make_blinded(BlindedTimeout + rn1(100, 250), TRUE);
         break;
     case 3:
         take_gold();
@@ -1630,7 +1630,8 @@ sortspells(void)
     }
 
     /* usual case, sort the index rather than the spells themselves */
-    qsort((genericptr_t) gs.spl_orderindx, n, sizeof *gs.spl_orderindx, spell_cmp);
+    qsort((genericptr_t) gs.spl_orderindx, n,
+          sizeof *gs.spl_orderindx, spell_cmp);
     return;
 }
 
@@ -1662,7 +1663,8 @@ spellsortmenu(void)
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, let, 0,
                  ATR_NONE, clr, spl_sortchoices[i],
-                 (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
+                 (i == gs.spl_sortmode) ? MENU_ITEMFLAGS_SELECTED
+                                        : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, "View known spells list sorted");
 
@@ -1823,10 +1825,10 @@ percent_success(int spell)
      */
     int chance, splcaster, special, statused;
     int difficulty;
-    int skill;
+    int skill, skilltype = spell_skilltype(spellid(spell));
     /* Knights don't get metal armor penalty for clerical spells */
-    boolean paladin_bonus = Role_if(PM_KNIGHT)
-        && spell_skilltype(spellid(spell)) == P_CLERIC_SPELL;
+    boolean paladin_bonus = (Role_if(PM_KNIGHT)
+                             && skilltype == P_CLERIC_SPELL);
 
     /* Calculate intrinsic ability (splcaster) */
 
@@ -1843,7 +1845,7 @@ percent_success(int spell)
         splcaster += gu.urole.spelshld;
 
     if (!paladin_bonus) {
-        if (uarmh && is_metallic(uarmh) && uarmh->otyp != HELM_OF_BRILLIANCE)
+        if (uarmh && is_metallic(uarmh)) /* && otyp != HELM_OF_BRILLIANCE */
             splcaster += uarmhbon;
         if (uarmg && is_metallic(uarmg))
             splcaster += uarmgbon;
@@ -1877,7 +1879,7 @@ percent_success(int spell)
      * The difficulty is based on the hero's level and their skill level
      * in that spell type.
      */
-    skill = P_SKILL(spell_skilltype(spellid(spell)));
+    skill = P_SKILL(skilltype);
     skill = max(skill, P_UNSKILLED) - 1; /* unskilled => 0 */
     difficulty =
         (spellev(spell) - 1) * 4 - ((skill * 6) + (u.ulevel / 3) + 1);

@@ -1,4 +1,4 @@
-/* NetHack 3.7	questpgr.c	$NHDT-Date: 1655065145 2022/06/12 20:19:05 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.79 $ */
+/* NetHack 3.7	questpgr.c	$NHDT-Date: 1687036548 2023/06/17 21:15:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.82 $ */
 /*      Copyright 1991, M. Stephenson                             */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -171,8 +171,8 @@ stinky_nemesis(struct monst *mon)
     (void) com_pager_core(gu.urole.filecode, "killed_nemesis", FALSE, &mesg);
 #endif
 
-    /* this is somewhat fragile; it assumes that when both (noxious or
-       poisonous or toxic) and (gas or fumes) are present, the latter
+    /* this is somewhat fragile; it assumes that when both {noxious or
+       poisonous or toxic} and {gas or fumes} are present, the latter
        refers to the former rather than to something unrelated; it does
        make sure that fumes occurs after noxious rather than before */
     if (mesg) {

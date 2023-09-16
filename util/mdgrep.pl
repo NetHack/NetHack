@@ -1,5 +1,5 @@
 #!perl
-# NetHack 3.7  mdgrep.pl  $NHDT-Date: 1596498260 2020/08/03 23:44:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.20 $
+# NetHack 3.7  mdgrep.pl  $NHDT-Date: 1693083351 2023/08/26 20:55:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.24 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland
 # NetHack may be freely redistributed.  See license for details.
 
@@ -23,6 +23,7 @@
 	VAR_PLAYGROUND DLB SHELL SUSPEND NOSAVEONHANGUP HANGUPHANDLING
 	BSD_JOB_CONTROL MAIL POSIX_JOB_CONTROL INSURANCE
 	UNICODE_DRAWING UNICODE_WIDEWINPORT UNICODE_PLAYERTEXT
+	CRASHREPORT
 /;
 
 # Miscellaneous
@@ -53,10 +54,10 @@
 
 $outfile = "mdgrep.h";
 sub start_file {
-	($rev) = ('$NHDT-Revision: 1.20 $') =~ m/: (.*) .$/;
-	my $date = '$NHDT-Date: 1596498261 2020/08/03 23:44:21 $';
-	my $branch = '$NHDT-Branch: NetHack-3.7 $';
-	my $revision = '$NHDT-Revision: 1.20 $';
+	($rev) = ('$NHDT-Revision: 1.24 $') =~ m/: (.*) .$/;
+	my $date = '$NHDT-Date: 1693083351 2023/08/26 20:55:51 $';
+	my $branch = '$NHDT-Branch: keni-crashweb2 $';
+	my $revision = '$NHDT-Revision: 1.24 $';
 	open(OUT, ">$outfile") || die "open $outfile: $!";
 # NB: Date and Revision below will be modified when mdgrep.h is written to
 # git - this is correct (but it means you must commit changes to mdgrep.pl

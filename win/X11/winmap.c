@@ -1,4 +1,4 @@
-/* NetHack 3.7	winmap.c	$NHDT-Date: 1643328598 2022/01/28 00:09:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.49 $ */
+/* NetHack 3.7	winmap.c	$NHDT-Date: 1682206649 2023/04/22 23:37:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.59 $ */
 /* Copyright (c) Dean Luick, 1992                                 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -57,10 +57,14 @@ extern int total_tiles_used, Tile_corr;
 #define COL0_OFFSET 1 /* change to 0 to revert to displaying unused column 0 */
 
 static X11_map_symbol glyph_char(const glyph_info *glyphinfo);
+#ifdef TEXTCOLOR
 static GC X11_make_gc(struct xwindow *wp, struct text_map_info_t *text_map,
                       X11_color color, boolean inverted);
 #ifdef ENHANCED_SYMBOLS
 static void X11_free_gc(struct xwindow *wp, GC gc, X11_color color);
+#endif
+#endif /* TEXTCOLOR */
+#ifdef ENHANCED_SYMBOLS
 static void X11_set_map_font(struct xwindow *wp);
 #endif
 static void X11_draw_image_string(Display *display, Drawable d,
@@ -150,12 +154,14 @@ X11_print_glyph(
         co_ptr = &map_info->text_map.colors[y][x];
         colordif = (((special & MG_PET) != 0 && iflags.hilite_pet)
                     || ((special & MG_OBJPILE) != 0 && iflags.hilite_pile)
-                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE)) != 0
+                    || ((special & (MG_DETECT | MG_BW_LAVA | MG_BW_ICE
+                                    | MG_BW_SINK | MG_BW_ENGR)) != 0
                         && iflags.use_inverse))
                       ? CLR_MAX : 0;
         color += colordif;
 #ifdef ENHANCED_SYMBOLS
-        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL && glyphinfo->gm.u->ucolor != 0) {
+        if (SYMHANDLING(H_UTF8) && glyphinfo->gm.u != NULL
+            && glyphinfo->gm.u->ucolor != 0) {
             color = glyphinfo->gm.u->ucolor | 0x80000000;
             if (colordif != 0) {
                 color |= 0x40000000;
@@ -894,8 +900,12 @@ map_check_size_change(struct xwindow *wp)
  * by querying the widget with the resource name.
  */
 static void
-set_gc(Widget w, Font font, const char *resource_name, Pixel bgpixel,
-       GC *regular, GC *inverse)
+set_gc(
+    Widget w,
+    Font font,
+    const char *resource_name,
+    Pixel bgpixel,
+    GC *regular, GC *inverse)
 {
     XGCValues values;
     XtGCMask mask = GCFunction | GCForeground | GCBackground | GCFont;
@@ -1392,10 +1402,11 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                 int src_x, src_y;
                 int dest_x = (cur_col - COL0_OFFSET) * tile_map->square_width;
                 int dest_y = row * tile_map->square_height;
+                unsigned gflags = tile_map->glyphs[row][cur_col].glyphflags;
 
 #if 0
                 /* not required with the new glyph representations */
-                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_FEMALE))
+                if ((gflags & MG_FEMALE) != 0)
                     tile++; /* advance to the female tile variation */
 #endif
                 src_x = (tile % TILES_PER_ROW) * tile_width;
@@ -1405,7 +1416,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                           src_x, src_y, tile_width, tile_height,
                           dest_x, dest_y);
 
-                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_PET) && iflags.hilite_pet) {
+                if ((gflags & MG_PET) != 0 && iflags.hilite_pet) {
                     /* draw pet annotation (a heart) */
                     XSetForeground(dpy, tile_map->black_gc,
                                    pet_annotation.foreground);
@@ -1419,8 +1430,7 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                     XSetClipMask(dpy, tile_map->black_gc, None);
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
-                }
-                if ((tile_map->glyphs[row][cur_col].glyphflags & MG_OBJPILE)) {
+                } else if ((gflags & MG_OBJPILE) != 0) {
                     /* draw object pile annotation (a plus sign) */
                     XSetForeground(dpy, tile_map->black_gc,
                                    pile_annotation.foreground);
@@ -1436,13 +1446,18 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
                     XSetForeground(dpy, tile_map->black_gc,
                                    BlackPixelOfScreen(screen));
                 }
-                if (tile_map->glyphs[row][cur_col].framecolor != NO_COLOR) {
-                    XDrawRectangle(dpy, XtWindow(wp->w),
-                                   map_info->text_map.color_gcs[tile_map->glyphs[row][cur_col].framecolor],
-                                   dest_x, dest_y,
-                                   tile_map->square_width - 1 ,
-                                   tile_map->square_height - 1);
+#ifdef TEXTCOLOR
+                {
+                    uint32_t fc = tile_map->glyphs[row][cur_col].framecolor;
+
+                    if (fc != NO_COLOR)
+                        XDrawRectangle(dpy, XtWindow(wp->w),
+                                       map_info->text_map.color_gcs[fc],
+                                       dest_x, dest_y,
+                                       tile_map->square_width - 1 ,
+                                       tile_map->square_height - 1);
                 }
+#endif
             }
         }
 
@@ -1538,8 +1553,11 @@ map_update(struct xwindow *wp, int start_row, int stop_row, int start_col, int s
 
 #ifdef TEXTCOLOR
 static GC
-X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
-            X11_color color, boolean inverted)
+X11_make_gc(
+    struct xwindow *wp UNUSED,
+    struct text_map_info_t *text_map,
+    X11_color color,
+    boolean inverted)
 {
     boolean cur_inv = inverted;
     GC ggc;
@@ -1582,13 +1600,13 @@ X11_make_gc(struct xwindow *wp UNUSED, struct text_map_info_t *text_map,
             color -= CLR_MAX;
             cur_inv = !cur_inv;
         }
-        ggc = iflags.use_color
-           ? (cur_inv
-              ? text_map->inv_color_gcs[color]
-              : text_map->color_gcs[color])
-           : (cur_inv
-              ? text_map->inv_copy_gc
-              : text_map->copy_gc);
+        ggc = (iflags.use_color
+               ? (cur_inv
+                  ? text_map->inv_color_gcs[color]
+                  : text_map->color_gcs[color])
+               : (cur_inv
+                  ? text_map->inv_copy_gc
+                  : text_map->copy_gc));
     }
     return ggc;
 }
@@ -1606,9 +1624,12 @@ X11_free_gc(struct xwindow *wp, GC ggc, X11_color color)
 #endif /* TEXTCOLOR */
 
 static void
-X11_draw_image_string(Display *display, Drawable d,
-                      GC ggc, int x, int y,
-                      const X11_map_symbol *string, int length)
+X11_draw_image_string(
+    Display *display,
+    Drawable d,
+    GC ggc,
+    int x, int y,
+    const X11_map_symbol *string, int length)
 {
 #ifdef ENHANCED_SYMBOLS
     /* This doesn't support the supplementary planes. The basic Xlib seems
@@ -1878,6 +1899,7 @@ X11_get_map_font_struct(struct xwindow *wp)
 #ifdef ENHANCED_SYMBOLS
     struct map_info_t *map_info = wp->map_information;
     XFontStruct *fs = map_info->text_map.font;
+
     if (fs == NULL) {
         fs = WindowFontStruct(wp->w);
     }
@@ -2006,10 +2028,12 @@ x_event(int exit_condition)
                 inptr = (inptr + 1) % INBUF_SIZE;
                 /* pkey(retval); */
                 keep_going = FALSE;
-            } else if (gp.program_state.done_hup) {
+#if defined(HANGUPHANDLING)
+            }  else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
+#endif
             }
             break;
         case EXIT_ON_KEY_OR_BUTTON_PRESS:
@@ -2025,10 +2049,12 @@ x_event(int exit_condition)
                     /* pkey(retval); */
                 }
                 keep_going = FALSE;
+#if defined(HANGUPHANDLING)
             } else if (gp.program_state.done_hup) {
                 retval = '\033';
                 inptr = (inptr + 1) % INBUF_SIZE;
                 keep_going = FALSE;
+#endif
             }
             break;
         default:
