@@ -2411,6 +2411,8 @@ add Unicode support to DOS Curses port (pr #889 by chasonr)
 add Unicode support to Win32 (pr #903 by chasonr)
 add Unicode support to Qt (pr #910 by chasonr)
 add Unicode, IBMgraphics and DECgraphics support to X11 (pr #923 by chasonr)
+add some glue code for those that might wish to build with 3rd party fmod
+	sound library support (pr #962 by MrEveryDay98)
 
 
 Code Cleanup and Reorganization
