@@ -1,5 +1,5 @@
-/* Copyright (c) Taylor Daley, 2023. */
 /* fmod.c */
+/* Copyright (c) Taylor Daley, 2023. */
 /* NetHack may be freely redistributed.  See license for details. */
 
 #ifdef SND_LIB_FMOD
