@@ -1920,8 +1920,8 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
     return;
 }
 
-#define quest_arti_hits_leader(obj, mon)      \
-    (obj->oartifact && is_quest_artifact(obj) \
+#define special_obj_hits_leader(obj, mon)      \
+    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique) \
      && mon->m_id == gq.quest_status.leader_m_id)
 
 /*
@@ -2024,7 +2024,7 @@ thitmonst(
     /* don't make game unwinnable if naive player throws artifact
        at leader... (kicked artifact is ok too; HMON_APPLIED could
        occur if quest artifact polearm or grapnel ever gets added) */
-    if (hmode != HMON_APPLIED && quest_arti_hits_leader(obj, mon)) {
+    if (hmode != HMON_APPLIED && special_obj_hits_leader(obj, mon)) {
         /* AIS: changes to wakeup() means that it's now less inappropriate
            here than it used to be, but manual version works just as well */
         mon->msleeping = 0;

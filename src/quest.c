@@ -221,17 +221,40 @@ expulsion(boolean seal)
    give another message about the character keeping the artifact
    and using the magic portal to return to the dungeon. */
 void
-finish_quest(struct obj *obj) /* quest artifact; possibly null if carrying
-                                 Amulet */
+finish_quest(struct obj *obj) /* quest artifact or thrown unique item;
+                                 possibly null if carrying Amulet */
 {
     struct obj *otmp;
 
-    if (u.uhave.amulet) { /* unlikely but not impossible */
+    if (obj && objects[obj->otyp].oc_unique) {
+        /* tossed one of the invocation items (or AoY) at the quest leader */ 
+        if (Deaf)
+            return; /* optional (unlike quest completion) so skip if deaf */
+        /* do ID first so that the message identifying the item will refer to
+           it by name (and so justify the ID we already gave...) */
+        fully_identify_obj(obj);
+        /* update_inventory() is not necessary or helpful here because item
+           was thrown, so isn't currently in inventory anyway */
+        if (obj->otyp == AMULET_OF_YENDOR)
+            qt_pager("hasamulet");
+        else
+            verbalize("Ah, I see you've found %s.", the(xname(obj)));
+        return;
+    }
+
+    if (u.uhave.amulet) {
+        /* has the amulet in inventory -- most likely the player has already
+           completed the quest and stopped in on her way back up, but it's not
+           impossible to have gotten the amulet before formally presenting the
+           quest artifact to the leader. */
         qt_pager("hasamulet");
         /* leader IDs the real amulet but ignores any fakes */
-        if ((otmp = carrying(AMULET_OF_YENDOR)) != 0)
+        if ((otmp = carrying(AMULET_OF_YENDOR)) != (struct obj *) 0) {
             fully_identify_obj(otmp);
+            update_inventory();
+        }
     } else {
+        /* normal quest completion; threw artifact or walked up carrying it */
         qt_pager(!Qstat(got_thanks) ? "offeredit" : "offeredit2");
         /* should have obtained bell during quest;
            if not, suggest returning for it now */
