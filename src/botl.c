@@ -810,6 +810,7 @@ bot_via_windowport(void)
     /* Gold */
     if ((money = money_cnt(gi.invent)) < 0L)
         money = 0L; /* ought to issue impossible() and then discard gold */
+    gb.blstats[idx][BL_GOLD].rawval.a_long = money;
     gb.blstats[idx][BL_GOLD].a.a_long = min(money, 999999L);
     /*
      * The tty port needs to display the current symbol for gold
@@ -1528,7 +1529,8 @@ compare_blstats(struct istat_s *bl1, struct istat_s *bl2)
 
     fld = bl1->fld;
     use_rawval = (fld == BL_HP || fld == BL_HPMAX
-                  || fld == BL_ENE || fld == BL_ENEMAX);
+                  || fld == BL_ENE || fld == BL_ENEMAX
+                  || fld == BL_GOLD);
     a1 = use_rawval ? &bl1->rawval : &bl1->a;
     a2 = use_rawval ? &bl2->rawval : &bl2->a;
 
