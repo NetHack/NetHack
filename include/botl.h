@@ -247,6 +247,11 @@ struct hilite_s {
 };
 #endif
 
+/*
+ * Note: If you add/change/remove fields in istat_s, you need to
+ * update the initialization of the istat_s struct blstats[][]
+ * array in instance_globals_b (decl.c).
+ */
 struct istat_s {
     const char *fldname;
     const char *fldfmt;
