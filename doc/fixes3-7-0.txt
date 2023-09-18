@@ -1236,6 +1236,7 @@ a pet that was poison resistant but not stoning resistant would eat Medusa's
 ring of hunger prevents choking on your food
 paranoid_confirm:pray can be changed to require yes/no response instead of y/n
 	by also setting paranoid_confirm:Confirm
+wand of probing reveals map locations in the ray path
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

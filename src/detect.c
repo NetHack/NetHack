@@ -23,7 +23,6 @@ static void sense_trap(struct trap *, coordxy, coordxy, int);
 static int detect_obj_traps(struct obj *, boolean, int);
 static void display_trap_map(struct trap *, int);
 static int furniture_detect(void);
-static void show_map_spot(coordxy, coordxy);
 static void findone(coordxy, coordxy, genericptr_t);
 static void openone(coordxy, coordxy, genericptr_t);
 static int mfind0(struct monst *, boolean);
@@ -1323,15 +1322,15 @@ use_crystal_ball(struct obj **optr)
     return;
 }
 
-static void
-show_map_spot(coordxy x, coordxy y)
+void
+show_map_spot(coordxy x, coordxy y, boolean cnf)
 {
     struct rm *lev;
     struct trap *t;
     struct engr *ep;
     int oldglyph;
 
-    if (Confusion && rn2(7))
+    if (cnf && rn2(7))
         return;
     lev = &levl[x][y];
 
@@ -1379,7 +1378,7 @@ do_mapping(void)
     unconstrained = unconstrain_map();
     for (zx = 1; zx < COLNO; zx++)
         for (zy = 0; zy < ROWNO; zy++)
-            show_map_spot(zx, zy);
+            show_map_spot(zx, zy, Confusion);
 
     if (!gl.level.flags.hero_memory || unconstrained) {
         flush_screen(1);                 /* flush temp screen */
@@ -1452,7 +1451,7 @@ do_vicinity_map(struct obj *sobj) /* scroll--actually fake spellbook--object */
         for (zy = lo_y; zy <= hi_y; zy++) {
             oldglyph = glyph_at(zx, zy);
             /* this will remove 'remembered, unseen mon' (and objects) */
-            show_map_spot(zx, zy);
+            show_map_spot(zx, zy, Confusion);
             /* if there are any objects here, see the top one */
             if (OBJ_AT(zx, zy)) {
                 /* not vobj_at(); this is not vision-based access;
