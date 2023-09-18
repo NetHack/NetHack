@@ -1244,16 +1244,16 @@ query_category(
                  ATR_NONE, NO_COLOR, "", MENU_ITEMFLAGS_NONE);
     }
 
+    invlet = 'a';
     if ((qflags & ALL_TYPES) && (ccount > 1)) {
-        invlet = 'a';
         any = cg.zeroany;
         any.a_int = ALL_TYPES_SELECTED;
         add_menu(win, &nul_glyphinfo, &any, invlet, 0, ATR_NONE, clr,
                  (qflags & WORN_TYPES) ? "All worn types" : "All types",
                  MENU_ITEMFLAGS_SKIPINVERT);
-        invlet = 'b';
-    } else
-        invlet = 'a';
+        ++invlet; /* invlet = 'b'; */
+    }
+
     do {
         collected_type_name = FALSE;
         for (curr = olist; curr; curr = FOLLOW(curr, qflags)) {
@@ -1355,6 +1355,7 @@ query_category(
     }
     end_menu(win, qstr);
     n = select_menu(win, how, pick_list);
+
     /* handle ParanoidAutoAll by confirming 'A' choice if present */
     if (n > 0 && verify_All) {
         int i, j;
@@ -1363,18 +1364,37 @@ query_category(
             if ((*pick_list)[i].item.a_int == 'A') {
                 /* ParanoidAutoAll is set (otherwise verify_All is false);
                    if ParanoidConfirm is also set, require "yes" rather than
-                   just "y" to accept (and "no" rather than "n" to decline) */
-                if (!paranoid_query(ParanoidConfirm,
-                                    "Really autoselect All?")) {
-                    /* answer is "no", so take 'A' out of the list;
-                       if it is the only entry, we'll return nothing,
-                       otherwise go on to next menu without autoselect */
-                    for (j = i + 1; j < n; ++j)
-                        (*pick_list)[j - 1] = (*pick_list)[j];
-                    if (!--n)
-                        free((genericptr_t) *pick_list), *pick_list = 0;
+                   just "y" to accept (and "no" rather than "n" to decline;
+                   accepts "quit" and ESC without converting them to 'n') */
+                switch (paranoid_ynq(ParanoidConfirm,
+                                     "Really autoselect All?", TRUE)) {
+                case 'y':
+                    /* yes => honor Auto-select All */
+                    break;
+                case 'n':
+                    /* no => remove 'A' from the list; if that would make
+                       it empty then replace with 'a' */
+                    if (n > 1) {
+                        for (j = i + 1; j < n; ++j)
+                            (*pick_list)[j - 1] = (*pick_list)[j];
+                        --n;
+                        break; /* from switch */
+                    } else if ((qflags & ALL_TYPES) != 0) {
+                        /* 'A' was the only choice; convert it to 'a' and
+                           then let the next menu offer a choice of all */
+                        (*pick_list)[0].item.a_int = ALL_TYPES_SELECTED;
+                        /* assert( n == 1 ); */
+                        break; /* from switch */
+                    }
+                    /*FALLTHRU*/
+                case 'q':
+                default:
+                    /* quit | ESC => cancel, no Auto-select and no 2nd menu */
+                    n = 0;
+                    free((genericptr_t) *pick_list), *pick_list = 0;
+                    break;
                 }
-                break; /* goto query_done; */
+                break; /* from for => goto query_done; */
             }
     }
  query_done:
