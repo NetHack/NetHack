@@ -1,4 +1,4 @@
-/* NetHack 3.7	apply.c	$NHDT-Date: 1685202442 2023/05/27 15:47:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.420 $ */
+/* NetHack 3.7	apply.c	$NHDT-Date: 1695159606 2023/09/19 21:40:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.422 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3499,9 +3499,7 @@ use_royal_jelly(struct obj **optr)
             update_inventory(); /* freeinv() updated perminv w/ obj omitted */
         } else {
             /* this lump was already separate; pervent merge */
-            obj->nomerge = 1;
-            addinv(obj); /* put the unused lump back; updates perminv */
-            obj->nomerge = 0;
+            addinv_nomerge(obj); /* put unused lump back; updates perminv */
         }
         return ECMD_CANCEL;
     }

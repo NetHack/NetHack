@@ -1,4 +1,4 @@
-/* NetHack 3.7	wield.c	$NHDT-Date: 1650875488 2022/04/25 08:31:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.90 $ */
+/* NetHack 3.7	wield.c	$NHDT-Date: 1695159631 2023/09/19 21:40:31 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -430,9 +430,7 @@ dowield(void)
     if (finish_splitting) {
         /* wep was split off from something; give it its own invlet */
         freeinv(wep);
-        wep->nomerge = 1;
-        addinv(wep);
-        wep->nomerge = 0;
+        addinv_nomerge(wep);
     }
 
     /* Set your new primary weapon */
@@ -635,9 +633,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
  quivering:
     if (finish_splitting) {
         freeinv(newquiver);
-        newquiver->nomerge = 1;
-        addinv(newquiver);
-        newquiver->nomerge = 0;
+        addinv_nomerge(newquiver);
     }
 
     if (!strcmp(verb, "ready")) {

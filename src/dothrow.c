@@ -1,4 +1,4 @@
-/* NetHack 3.7	dothrow.c	$NHDT-Date: 1683334246 2023/05/06 00:50:46 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.266 $ */
+/* NetHack 3.7	dothrow.c	$NHDT-Date: 1695159620 2023/09/19 21:40:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.269 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1834,9 +1834,9 @@ return_throw_to_inv(
     /* if 'obj' wasn't from a stack split or if it wouldn't merge back
        (maybe new erosion damage?) then it needs to be added to invent;
        don't merge with any other stack even if there is a compatible one
-       (others with similar erosion?) */
+       (others with similar erosion?); can't use addinv_nomerge() here */
     if (!otmp) {
-        obj->nomerge = 1;
+        obj->nomerge = 1; /* redundant unless 'oldslot' somehow went away */
         obj = addinv_before(obj, oldslot);
         obj->nomerge = 0;
 

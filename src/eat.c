@@ -1,4 +1,4 @@
-/* NetHack 3.7	eat.c	$NHDT-Date: 1674294705 2023/01/21 09:51:45 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.301 $ */
+/* NetHack 3.7	eat.c	$NHDT-Date: 1695159623 2023/09/19 21:40:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -367,9 +367,7 @@ touchfood(struct obj *otmp)
             dropy(otmp);
             sellobj_state(SELL_NORMAL);
         } else {
-            otmp->nomerge = 1; /* used to prevent merge */
-            otmp = addinv(otmp);
-            otmp->nomerge = 0;
+            otmp = addinv_nomerge(otmp);
         }
     }
     return otmp;

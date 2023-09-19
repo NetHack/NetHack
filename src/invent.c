@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1672827802 2023/01/04 10:23:22 $  $NHDT-Branch: naming-overflow-fix $:$NHDT-Revision: 1.439 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1695159625 2023/09/19 21:40:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.449 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -860,11 +860,11 @@ addinv_core1(struct obj *obj)
     if (is_mines_prize(obj)) {
         record_achievement(ACH_MINE_PRIZE);
         gc.context.achieveo.mines_prize_oid = 0; /* done with luckstone o_id */
-        obj->nomerge = 0;
+        obj->nomerge = 0; /* was set in create_object(sp_lev.c) */
     } else if (is_soko_prize(obj)) {
         record_achievement(ACH_SOKO_PRIZE);
         gc.context.achieveo.soko_prize_oid = 0; /* done with bag/amulet o_id */
-        obj->nomerge = 0;
+        obj->nomerge = 0; /* (got set in sp_lev.c) */
     }
 }
 
@@ -914,7 +914,7 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
         reset_justpicked(gi.invent);
     }
 
-    addinv_core1(obj);
+    addinv_core1(obj); /* handle most side effects of carrying obj */
 
     /* for addinv_before(); if something has been removed and is now being
        reinserted, try to put it in the same place instead of merging or
@@ -975,7 +975,7 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
         setuqwep(obj);
  added:
     obj->pickup_prev = 1;
-    addinv_core2(obj);
+    addinv_core2(obj); /* handle extrinsics conferred by carrying obj */
     carry_obj_effects(obj); /* carrying affects the obj */
     if (update_perm_invent)
         update_inventory();
@@ -989,11 +989,26 @@ addinv(struct obj *obj)
     return addinv_core0(obj, (struct obj *) 0, TRUE);
 }
 
-/* add obj to the hero's inventory by inserting in front of a specific item */
+/* add obj to the hero's inventory by inserting in front of a specific item;
+   used for throw-and-return in case '!fixinv' is in effect */
 struct obj *
 addinv_before(struct obj *obj, struct obj *other_obj)
 {
+    /* if 'other_obj' is present this will implicitly be 'nomerge' */
     return addinv_core0(obj, other_obj, TRUE);
+}
+
+/* return value will always be 'obj' */
+struct obj *
+addinv_nomerge(struct obj *obj)
+{
+    struct obj *result;
+    unsigned save_nomerge = obj->nomerge;
+
+    obj->nomerge = 1;
+    result = addinv(obj);
+    obj->nomerge = save_nomerge;
+    return result;
 }
 
 /*
@@ -1063,7 +1078,8 @@ hold_another_object(
     }
     if (Fumbling) {
         obj->nomerge = 1;
-        /* dropping expects obj to be in invent */
+        /* dropping expects obj to be in invent; since it's going to be
+           dropped, avoid perminv update when temporarily adding it */
         obj = addinv_core0(obj, (struct obj *) 0, FALSE);
         goto drop_it;
     } else {

@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1693359531 2023/08/30 01:38:51 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.1281 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1695159584 2023/09/19 21:39:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1287 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1148,6 +1148,7 @@ extern void addinv_core1(struct obj *);
 extern void addinv_core2(struct obj *);
 extern struct obj *addinv(struct obj *);
 extern struct obj *addinv_before(struct obj *, struct obj *);
+extern struct obj *addinv_nomerge(struct obj *);
 extern struct obj *hold_another_object(struct obj *, const char *,
                                        const char *, const char *);
 extern void useupall(struct obj *);
