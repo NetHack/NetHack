@@ -1240,6 +1240,8 @@ wand of probing reveals map locations in the ray path
 applying a wielded, lit potion of oil to unlight it while other unlit
 	potion(s) of oil were quivered would trigger panic
 	"addinv: null obj after quiver merge otyp=N" where N is POT_OIL
+casting stone-to-flesh at self turned wielded or quivered rocks into unwielded,
+	unquivered meatballs, merging stacks if there were some in each slot
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

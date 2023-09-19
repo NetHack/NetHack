@@ -1818,8 +1818,8 @@ poly_obj(struct obj *obj, int id)
         /*
          * We may need to do extra adjustments for the hero if we're
          * messing with the hero's inventory.  The following calls are
-         * equivalent to calling freeinv on obj and addinv on otmp,
-         * while doing an in-place swap of the actual objects.
+         * equivalent to calling freeinv() on obj and addinv_nomerge()
+         * on otmp, while doing an in-place swap of the actual objects.
          */
         freeinv_core(obj);
         addinv_core1(otmp);
@@ -1834,9 +1834,12 @@ poly_obj(struct obj *obj, int id)
         if (old_wornmask) {
             boolean was_twohanded = bimanual(obj), was_twoweap = u.twoweap;
 
-            /* wearslot() returns a mask which might have multiple bits set;
-               narrow that down to the bit(s) currently in use */
-            new_wornmask = wearslot(otmp) & old_wornmask;
+            /* wearslot() expects us to deal with wielded/alt-wep/quivered
+               items in case they're not weapons; for other slots it might
+               return multiple bits (ring left|right); narrow that down to
+               the bit(s) currently in use */
+            new_wornmask = ((old_wornmask & W_WEAPONS) != 0L) ? old_wornmask
+                           : (wearslot(otmp) & old_wornmask);
             remove_worn_item(obj, TRUE);
             /* if the new form can be worn in the same slot, make it so */
             if ((new_wornmask & W_WEP) != 0L) {
@@ -2855,17 +2858,21 @@ zapyourself(struct obj *obj, boolean ordinary)
         }
         /*
          * It is possible that we can now merge some inventory.
-         * Do a highly paranoid merge.  Restart from the beginning
-         * until no merges.
+         * Do a highly paranoid merge.  Restart from the beginning until
+         * no merges.  Don't merge worn items (in case of stone-to-flesh
+         * of rocks wielded in differing weapon/alt-wep/quiver slot).
          */
         do {
             didmerge = FALSE;
-            for (otmp = gi.invent; !didmerge && otmp; otmp = otmp->nobj)
+            for (otmp = gi.invent; !didmerge && otmp; otmp = otmp->nobj) {
+                if (otmp->owornmask)
+                    continue;
                 for (onxt = otmp->nobj; onxt; onxt = onxt->nobj)
                     if (merged(&otmp, &onxt)) {
                         didmerge = TRUE;
                         break;
                     }
+            }
         } while (didmerge);
         break;
     }
