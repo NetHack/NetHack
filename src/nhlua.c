@@ -1583,7 +1583,9 @@ nhl_gamestate(lua_State *L)
             wornmask = otmp->owornmask;
             otmp->owornmask = 0L;
             extract_nobj(otmp, &gmst_invent);
+            otmp->nomerge = 1;
             addinv(otmp);
+            otmp->nomerge = 0;
             if (wornmask)
                 setworn(otmp, wornmask);
         }

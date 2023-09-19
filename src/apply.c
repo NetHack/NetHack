@@ -1684,10 +1684,14 @@ light_cocktail(struct obj **optr)
         /*
          * Free & add to re-merge potion.  This will average the
          * age of the potions.  Not exactly the best solution,
-         * but its easy.
+         * but its easy.  Don't do that unless obj is not worn (uwep,
+         * uswapwep, or uquiver) because if wielded and other oil is
+         * quivered a "null obj after quiver merge" panic will occur.
          */
-        freeinv(obj);
-        *optr = addinv(obj);
+        if (!obj->owornmask) {
+            freeinv(obj);
+            *optr = addinv(obj);
+        }
         return;
     } else if (Underwater) {
         There("is not enough oxygen to sustain a fire.");
@@ -1702,7 +1706,8 @@ light_cocktail(struct obj **optr)
         Blind ? "" : "  It gives off a dim light.");
 
     if (obj->unpaid && costly_spot(u.ux, u.uy)) {
-        struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy, SHOPBASE));
+        struct monst *shkp VOICEONLY = shop_keeper(*in_rooms(u.ux, u.uy,
+                                                             SHOPBASE));
 
         /* Normally, we shouldn't both partially and fully charge
          * for an item, but (Yendorian Fuel) Taxes are inevitable...
@@ -3477,10 +3482,10 @@ use_royal_jelly(struct obj **optr)
 {
     int oldcorpsenm;
     unsigned was_timed;
-    struct obj *obj = *optr;
-    struct obj *eobj;
+    struct obj *eobj, *obj = *optr;
+    boolean splitit = (obj->quan > 1L);
 
-    if (obj->quan > 1L)
+    if (splitit)
         obj = splitobj(obj, 1L);
     /* remove from inventory so that it won't be offered as a choice
        to rub on itself */
@@ -3489,8 +3494,15 @@ use_royal_jelly(struct obj **optr)
     /* right now you can rub one royal jelly on an entire stack of eggs */
     eobj = getobj("rub the royal jelly on", jelly_ok, GETOBJ_PROMPT);
     if (!eobj) {
-        addinv(obj); /* put the unused lump back; if it came from
-                      * a split, it should merge back */
+        if (splitit) {
+            (void) unsplitobj(obj);
+            update_inventory(); /* freeinv() updated perminv w/ obj omitted */
+        } else {
+            /* this lump was already separate; pervent merge */
+            obj->nomerge = 1;
+            addinv(obj); /* put the unused lump back; updates perminv */
+            obj->nomerge = 0;
+        }
         return ECMD_CANCEL;
     }
 

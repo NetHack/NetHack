@@ -1237,6 +1237,9 @@ ring of hunger prevents choking on your food
 paranoid_confirm:pray can be changed to require yes/no response instead of y/n
 	by also setting paranoid_confirm:Confirm
 wand of probing reveals map locations in the ray path
+applying a wielded, lit potion of oil to unlight it while other unlit
+	potion(s) of oil were quivered would trigger panic
+	"addinv: null obj after quiver merge otyp=N" where N is POT_OIL
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -1676,6 +1679,9 @@ using wizard mode #wizkill outside the endgame followed by m^V to enter the
 dwarf/elf/orc/gnome hero killed by zombie would rise as human zombie for bones
 paranoid_confirm:Autoall for menustyle:full has the test handling backward and
 	was treating 'yes' as no and 'n' or ESC as 'y'
+applying a wielded lump of royal jelly but not picking something to rub it on
+	while other lumps of jelly were quivered would trigger a panic,
+	"addinv: null obj after quiver merge" (like applying lit potion of oil)
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
