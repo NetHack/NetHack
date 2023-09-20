@@ -659,4 +659,6 @@ deliver_splev_message(void)
     }
 }
 
+#undef QTEXT_FILE
+
 /*questpgr.c*/

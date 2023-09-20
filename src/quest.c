@@ -219,15 +219,26 @@ expulsion(boolean seal)
    artifact or you've just thrown it to/at him or her.  If quest
    completion text hasn't been given yet, give it now.  Otherwise
    give another message about the character keeping the artifact
-   and using the magic portal to return to the dungeon. */
+   and using the magic portal to return to the dungeon.  Also called
+   if hero throws or kicks an invocation item (probably the Bell)
+   at the leader. */
 void
 finish_quest(struct obj *obj) /* quest artifact or thrown unique item;
-                                 possibly null if carrying Amulet */
+                               * possibly null if carrying the Amulet */
 {
     struct obj *otmp;
 
+    /*
+     * Possible extensions [would mostly need to be done in thitmonst()]:
+     *   if the invocation has already been performed, leader keeps any
+     *     thrown (or kicked) invocation item, perhaps stating the intent
+     *     to guard it for the future;
+     *   if the item is an unidentified fake Amulet, identify it instead
+     *     of treating the throw as an attack.
+     */
+
     if (obj && objects[obj->otyp].oc_unique) {
-        /* tossed one of the invocation items (or AoY) at the quest leader */ 
+        /* tossed one of the invocation items (or AoY) at the quest leader */
         if (Deaf)
             return; /* optional (unlike quest completion) so skip if deaf */
         /* do ID first so that the message identifying the item will refer to
@@ -494,8 +505,10 @@ void
 quest_stat_check(struct monst *mtmp)
 {
     if (mtmp->data->msound == MS_NEMESIS)
-        Qstat(in_battle) = (!helpless(mtmp)
-                            && monnear(mtmp, u.ux, u.uy));
+        Qstat(in_battle) = (!helpless(mtmp) && monnear(mtmp, u.ux, u.uy));
 }
+
+#undef Not_firsttime
+#undef Qstat
 
 /*quest.c*/

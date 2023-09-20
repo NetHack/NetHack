@@ -2248,6 +2248,8 @@ high skill level in martial arts or bare-handed combat sometimes hits twice
 answering '?<return>' at the "genocide what?" prompt (for either monster class
 	or single species) runs the #genocided command to show what types of
 	monsters have already been genocided and then re-prompts
+throwing the silver bell (or other invocation item, or the Amulet) to the
+	quest leader will identify it instead of being treated as an attack
 
 
 Platform- and/or Interface-Specific New Features

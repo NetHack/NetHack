@@ -1920,8 +1920,8 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
     return;
 }
 
-#define special_obj_hits_leader(obj, mon)      \
-    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique) \
+#define special_obj_hits_leader(obj, mon) \
+    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique)   \
      && mon->m_id == gq.quest_status.leader_m_id)
 
 /*
@@ -2031,12 +2031,12 @@ thitmonst(
         mon->mstrategy &= ~STRAT_WAITMASK;
 
         if (mon->mcanmove) {
-            pline("%s catches %s.", Monnam(mon), the(xname(obj)));
+            pline("%s catches %s.", Some_Monnam(mon), the(xname(obj)));
             if (mon->mpeaceful) {
                 boolean next2u = monnear(mon, u.ux, u.uy);
 
                 finish_quest(obj); /* acknowledge quest completion */
-                pline("%s %s %s back to you.", Monnam(mon),
+                pline("%s %s %s back to you.", Some_Monnam(mon),
                       (next2u ? "hands" : "tosses"), the(xname(obj)));
                 if (!next2u)
                     sho_obj_return_to_u(obj);
@@ -2229,6 +2229,8 @@ thitmonst(
 
     return 0;
 }
+
+#undef special_obj_hits_leader
 
 static int
 gem_accept(register struct monst *mon, register struct obj *obj)
@@ -2645,5 +2647,7 @@ throw_gold(struct obj *obj)
     newsym(gb.bhitpos.x, gb.bhitpos.y);
     return ECMD_TIME;
 }
+
+#undef AutoReturn
 
 /*dothrow.c*/
