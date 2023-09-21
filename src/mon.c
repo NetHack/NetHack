@@ -4214,6 +4214,9 @@ restrap(struct monst *mtmp)
         /* can't hide while trapped except in pits */
         || (mtmp->mtrapped && (t = t_at(mtmp->mx, mtmp->my)) != 0
             && !is_pit(t->ttyp))
+        /* can't hide on ceiling if there isn't one */
+        || (ceiling_hider(mtmp->data) && !has_ceiling(&u.uz))
+        /* won't hide when adjacent to hero */
         || (sensemon(mtmp) && next2u(mtmp->mx, mtmp->my)))
         return FALSE;
 

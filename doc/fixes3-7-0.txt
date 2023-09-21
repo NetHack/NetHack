@@ -1684,6 +1684,8 @@ paranoid_confirm:Autoall for menustyle:full has the test handling backward and
 applying a wielded lump of royal jelly but not picking something to rub it on
 	while other lumps of jelly were quivered would trigger a panic,
 	"addinv: null obj after quiver merge" (like applying lit potion of oil)
+ceiling hider could become hidden when there was no ceiling, triggering a
+	warning if sanity_check was On
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
