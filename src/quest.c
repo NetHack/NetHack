@@ -223,8 +223,8 @@ expulsion(boolean seal)
    if hero throws or kicks an invocation item (probably the Bell)
    at the leader. */
 void
-finish_quest(struct obj *obj) /* quest artifact or thrown unique item;
-                               * possibly null if carrying the Amulet */
+finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
+                               * AoY; possibly null if carrying the Amulet */
 {
     struct obj *otmp;
 
@@ -233,12 +233,10 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item;
      *   if the invocation has already been performed, leader keeps any
      *     thrown (or kicked) invocation item, perhaps stating the intent
      *     to guard it for the future;
-     *   if the item is an unidentified fake Amulet, identify it instead
-     *     of treating the throw as an attack.
      */
 
-    if (obj && objects[obj->otyp].oc_unique) {
-        /* tossed one of the invocation items (or AoY) at the quest leader */
+    if (obj && !is_quest_artifact(obj)) {
+        /* tossed an invocation item (or [fake] AoY) at the quest leader */
         if (Deaf)
             return; /* optional (unlike quest completion) so skip if deaf */
         /* do ID first so that the message identifying the item will refer to
@@ -246,10 +244,14 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item;
         fully_identify_obj(obj);
         /* update_inventory() is not necessary or helpful here because item
            was thrown, so isn't currently in inventory anyway */
-        if (obj->otyp == AMULET_OF_YENDOR)
+        if (obj->otyp == AMULET_OF_YENDOR) {
             qt_pager("hasamulet");
-        else
+        } else if (obj->otyp == FAKE_AMULET_OF_YENDOR) {
+            verbalize(
+      "Sorry to say, this is a mere imitation of the true Amulet of Yendor.");
+        } else {
             verbalize("Ah, I see you've found %s.", the(xname(obj)));
+        }
         return;
     }
 
