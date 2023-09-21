@@ -1921,7 +1921,8 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
 }
 
 #define special_obj_hits_leader(obj, mon) \
-    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique)   \
+    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique    \
+      || (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known))   \
      && mon->m_id == gq.quest_status.leader_m_id)
 
 /*
