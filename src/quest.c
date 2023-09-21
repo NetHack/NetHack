@@ -228,13 +228,6 @@ finish_quest(struct obj *obj) /* quest artifact or thrown unique item or faux
 {
     struct obj *otmp;
 
-    /*
-     * Possible extensions [would mostly need to be done in thitmonst()]:
-     *   if the invocation has already been performed, leader keeps any
-     *     thrown (or kicked) invocation item, perhaps stating the intent
-     *     to guard it for the future;
-     */
-
     if (obj && !is_quest_artifact(obj)) {
         /* tossed an invocation item (or [fake] AoY) at the quest leader */
         if (Deaf)
