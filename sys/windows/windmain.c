@@ -114,6 +114,8 @@ void set_default_prefix_locations(const char *programPath);
 void copy_sysconf_content(void);
 void copy_config_content(void);
 void copy_hack_content(void);
+void copy_symbols_content(void);
+
 #ifdef PORT_HELP
 void port_help(void);
 #endif
@@ -343,7 +345,8 @@ copy_file(
     const char * dst_folder,
     const char * dst_name,
     const char * src_folder,
-    const char * src_name)
+    const char * src_name,
+    boolean copy_even_if_it_exists)
 {
     char dst_path[MAX_PATH];
     strcpy(dst_path, dst_folder);
@@ -356,11 +359,11 @@ copy_file(
     if(!file_exists(src_path))
         error("Unable to copy file '%s' as it does not exist", src_path);
 
-    if(file_exists(dst_path))
+    if(file_exists(dst_path) && !copy_even_if_it_exists)
         return;
 
-    BOOL success = CopyFileA(src_path, dst_path, TRUE);
-    if(!success) error("Failed to copy '%s' to '%s'", src_path, dst_path);
+    BOOL success = CopyFileA(src_path, dst_path, !copy_even_if_it_exists);
+    if(!success) error("Failed to copy '%s' to '%s' (%d)", src_path, dst_path, errno);
 }
 
 /* update file copying if it does not exist or src is newer then dst */
@@ -399,6 +402,32 @@ update_file(
 
 }
 
+void
+copy_symbols_content(void)
+{
+    char dst_path[MAX_PATH],
+         interim_path[MAX_PATH],
+         orig_path[MAX_PATH];
+
+    /* Using the SYSCONFPREFIX path, lock it so that it does not change */
+    fqn_prefix_locked[SYSCONFPREFIX] = TRUE;
+
+    strcpy(orig_path, gf.fqn_prefix[DATAPREFIX]);
+    strcat(orig_path, SYMBOLS_TEMPLATE);
+    strcpy(interim_path, gf.fqn_prefix[SYSCONFPREFIX]);
+    strcat(interim_path, SYMBOLS_TEMPLATE);
+    strcpy(dst_path, gf.fqn_prefix[SYSCONFPREFIX]);
+    strcat(dst_path, SYMBOLS);
+
+    if (!file_exists(interim_path) || file_newer(orig_path, interim_path))
+        copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
+                  gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, TRUE);
+
+    if (!file_exists(dst_path) || file_newer(interim_path, dst_path))
+        copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
+                    gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE, TRUE);
+}
+
 void copy_sysconf_content(void)
 {
     /* Using the SYSCONFPREFIX path, lock it so that it does not change */
@@ -407,15 +436,9 @@ void copy_sysconf_content(void)
     update_file(gf.fqn_prefix[SYSCONFPREFIX], SYSCF_TEMPLATE,
         gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
-//    update_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS_TEMPLATE,
-//        gf.fqn_prefix[DATAPREFIX], SYMBOLS_TEMPLATE, FALSE);
-
     /* If the required early game file does not exist, copy it */
     copy_file(gf.fqn_prefix[SYSCONFPREFIX], SYSCF_FILE,
-        gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE);
-
-    update_file(gf.fqn_prefix[SYSCONFPREFIX], SYMBOLS,
-        gf.fqn_prefix[DATAPREFIX], SYMBOLS, TRUE);
+        gf.fqn_prefix[DATAPREFIX], SYSCF_TEMPLATE, FALSE);
 
 }
 
@@ -431,7 +454,7 @@ void copy_config_content(void)
     /* If the required early game file does not exist, copy it */
     /* NOTE: We never replace .nethackrc or sysconf */
     copy_file(gf.fqn_prefix[CONFIGPREFIX], CONFIG_FILE,
-        gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE);
+        gf.fqn_prefix[DATAPREFIX], CONFIG_TEMPLATE, FALSE);
 }
 
 void
@@ -530,6 +553,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     check_recordfile((char *) 0);
     iflags.windowtype_deferred = TRUE;
     copy_sysconf_content();
+    copy_symbols_content();
     initoptions();
 
     /* Now that sysconf has had a chance to set the TROUBLEPREFIX, don't
@@ -1385,8 +1409,8 @@ RESTORE_WARNING_UNREACHABLE_CODE
 boolean
 file_newer(const char* a_path, const char* b_path)
 {
-    struct stat a_sb;
-    struct stat b_sb;
+    struct stat a_sb = { 0 };
+    struct stat b_sb = { 0 };
     double timediff;
 
     if (stat(a_path, &a_sb))
