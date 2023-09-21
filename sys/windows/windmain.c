@@ -160,10 +160,15 @@ get_known_folder_path(
 void
 create_directory(const char * path)
 {
-    HRESULT hr = CreateDirectoryA(path, NULL);
 
-    if (FAILED(hr) && hr != ERROR_ALREADY_EXISTS)
-        error("Unable to create directory '%s'", path);
+    BOOL dres = CreateDirectoryA(path, NULL);
+
+    if (!dres) {
+        DWORD dw = GetLastError();
+
+        if (dw != ERROR_ALREADY_EXISTS)
+            error("Unable to create directory '%s'", path);
+    }
 }
 
 RESTORE_WARNING_UNREACHABLE_CODE
@@ -697,7 +702,7 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
         raw_print("Cannot create lock file");
     } else {
         gh.hackpid = GetCurrentProcessId();
-        write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid));
+        (void) write(nhfp->fd, (genericptr_t) &gh.hackpid, sizeof(gh.hackpid));
         close_nhfile(nhfp);
     }
     /*
@@ -1058,8 +1063,8 @@ fakeconsole(void)
             AllocConsole();
             AttachConsole(GetCurrentProcessId());
             /*  rval = SetStdHandle(STD_OUTPUT_HANDLE, hWrite); */
-            freopen("CON", "w", stdout);
-            freopen("CON", "r", stdin);
+            (void) freopen("CON", "w", stdout);
+            (void) freopen("CON", "r", stdin);
         }
         has_fakeconsole = TRUE;
     }
