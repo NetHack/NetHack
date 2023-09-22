@@ -613,7 +613,7 @@ getbones(void)
         return 0;
     }
 
-    if (validate(nhfp, gb.bones) != 0) {
+    if (validate(nhfp, gb.bones, FALSE) != 0) {
         if (!wizard)
             pline("Discarding unusable bones; no need to panic...");
         ok = FALSE;

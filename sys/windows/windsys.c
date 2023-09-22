@@ -491,7 +491,7 @@ nethack_exit(int code)
         /* use our custom version which works
            a little cleaner than the stdio one */
         windowprocs.win_nhgetch = windows_console_custom_nhgetch;
-    }
+    } else
 #endif
     if (getreturn_enabled) {
         raw_print("\n");
@@ -525,7 +525,8 @@ getreturn(const char *str)
     raw_print(buf);
     if (WINDOWPORT(tty))
         windows_console_custom_nhgetch();
-    wait_synch();
+    else
+        wait_synch();
     in_getreturn = FALSE;
     return;
 }

@@ -552,8 +552,8 @@ _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);*/
     chdir(gf.fqn_prefix[HACKPREFIX]);
 #endif
 
-    if (GUILaunched || IsDebuggerPresent())
-        getreturn_enabled = TRUE;
+    /* if (GUILaunched || IsDebuggerPresent()) */
+    getreturn_enabled = TRUE;
 
     check_recordfile((char *) 0);
     iflags.windowtype_deferred = TRUE;

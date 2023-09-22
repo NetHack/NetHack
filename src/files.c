@@ -1200,7 +1200,7 @@ restore_saved_game(void)
 
     nh_uncompress(fq_save);
     if ((nhfp = open_savefile()) != 0) {
-        if (validate(nhfp, fq_save) != 0) {
+        if (validate(nhfp, fq_save, FALSE) != 0) {
             close_nhfile(nhfp);
             nhfp = (NHFILE *)0;
             (void) delete_savefile();
@@ -1210,8 +1210,9 @@ restore_saved_game(void)
 }
 
 #if defined(SELECTSAVED)
+
 char *
-plname_from_file(const char *filename)
+plname_from_file(const char *filename, boolean without_wait_synch_per_file)
 {
     NHFILE *nhfp = (NHFILE *) 0;
     char *result = 0;
@@ -1229,7 +1230,7 @@ plname_from_file(const char *filename)
 #endif
     nh_uncompress(gs.SAVEF);
     if ((nhfp = open_savefile()) != 0) {
-        if (validate(nhfp, filename) == 0) {
+        if (validate(nhfp, filename, without_wait_synch_per_file) == 0) {
             char tplname[PL_NSIZ];
 
             get_plname_from_file(nhfp, tplname);
@@ -1272,6 +1273,9 @@ plname_from_file(const char *filename)
 }
 #endif /* defined(SELECTSAVED) */
 
+#define SUPPRESS_WAITSYNCH_PERFILE TRUE
+#define ALLOW_WAITSYNCH_PERFILE FALSE
+
 char **
 get_saved_games(void)
 {
@@ -1281,6 +1285,7 @@ get_saved_games(void)
 #endif
     int j = 0;
     char **result = 0;
+
 #ifdef WIN32
     {
         char *foundfile;
@@ -1288,7 +1293,7 @@ get_saved_games(void)
         const char *fq_new_save;
         const char *fq_old_save;
         char **files = 0;
-        int i;
+        int i, count_failures = 0;
 
         Strcpy(gp.plname, "*");
         set_savefile_name(FALSE);
@@ -1321,10 +1326,9 @@ get_saved_games(void)
             (void) memset((genericptr_t) result, 0, (n + 1) * sizeof(char *));
             for(i = 0; i < n; i++) {
                 char *r;
-                r = plname_from_file(files[i]);
+                r = plname_from_file(files[i], SUPPRESS_WAITSYNCH_PERFILE);
 
                 if (r) {
-
                     /* rename file if it is not named as expected */
                     Strcpy(gp.plname, r);
                     set_savefile_name(TRUE);
@@ -1336,12 +1340,15 @@ get_saved_games(void)
                         (void) rename(fq_old_save, fq_new_save);
 
                     result[j++] = r;
+                } else {
+                    count_failures++;
                 }
             }
         }
 
         free_saved_games(files);
-
+        if (count_failures)
+            wait_synch();
     }
 #endif
 #ifdef UNIX
@@ -1373,7 +1380,7 @@ get_saved_games(void)
                         char *r;
 
                         Sprintf(filename, "save/%d%s", uid, name);
-                        r = plname_from_file(filename);
+                        r = plname_from_file(filename, ALLOW_WAITSYNCH_PERFILE);
                         if (r)
                             result[j++] = r;
                     }
@@ -1398,8 +1405,11 @@ get_saved_games(void)
         free_saved_games(result);
     }
 #endif /* SELECTSAVED */
+
     return 0;
 }
+#undef SUPPRESS_WAITSYNCH_PERFILE
+#undef ALLOW_WAITSYNCH_PERFILE
 
 void
 free_saved_games(char **saved)

@@ -830,6 +830,7 @@ typedef struct {
 #define UTD_CHECKFIELDCOUNTS           0x02
 #define UTD_SKIP_SANITY1               0x04
 #define UTD_SKIP_SAVEFILEINFO          0x08
+#define UTD_WITHOUT_WAITSYNCH_PERFILE  0x10
 
 #define ENTITIES 2
 struct valuable_data {

@@ -311,7 +311,8 @@ check_version(
         ) {
         if (complain) {
             pline("Version mismatch for file \"%s\".", filename);
-            display_nhwindow(WIN_MESSAGE, TRUE);
+            if (WIN_MESSAGE != WIN_ERR)
+                 display_nhwindow(WIN_MESSAGE, TRUE);
         }
         return FALSE;
     } else if (
@@ -358,14 +359,17 @@ uptodate(NHFILE *nhfp, const char *name, unsigned long utdflags)
     if (rlen == 0) {
         if (verbose) {
             pline("File \"%s\" is empty?", name);
-            wait_synch();
+            if ((utdflags & UTD_WITHOUT_WAITSYNCH_PERFILE) == 0)
+                wait_synch();
         }
         return FALSE;
     }
 
     if (!check_version(&vers_info, name, verbose, utdflags)) {
-        if (verbose)
-            wait_synch();
+        if (verbose) {
+            if ((utdflags & UTD_WITHOUT_WAITSYNCH_PERFILE) == 0)
+                wait_synch();
+        }
         return FALSE;
     }
     return TRUE;

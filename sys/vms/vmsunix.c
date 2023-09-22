@@ -629,7 +629,7 @@ vms_get_saved_games(const char *savetemplate, /* wildcarded save file name in na
             if (filename[l - 1] != ' ')
                 break;
         filename[l] = '\0';
-        if ((charname = plname_from_file(filename)) != 0)
+        if ((charname = plname_from_file(filename, FALSE)) != 0)
             savefile(charname, count++, &asize, outarray);
     }
     (void) lib$find_file_end(&context);

@@ -939,7 +939,7 @@ extern void paniclog(const char *, const char *);
 extern void testinglog(const char *, const char *, const char *);
 extern int validate_prefix_locations(char *);
 #ifdef SELECTSAVED
-extern char *plname_from_file(const char *);
+extern char *plname_from_file(const char *, boolean);
 #endif
 extern char **get_saved_games(void);
 extern void free_saved_games(char **);
@@ -2421,7 +2421,7 @@ extern int restore_menu(winid);
 #endif
 extern void minit(void);
 extern boolean lookup_id_mapping(unsigned, unsigned *);
-extern int validate(NHFILE *, const char *);
+extern int validate(NHFILE *, const char *, boolean);
 extern void reset_restpref(void);
 extern void set_restpref(const char *);
 extern void set_savepref(const char *);

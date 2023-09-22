@@ -812,7 +812,7 @@ dorecover(NHFILE *nhfp)
     }
     restoreinfo.mread_flags = 0;
     rewind_nhfile(nhfp);        /* return to beginning of file */
-    (void) validate(nhfp, (char *) 0);
+    (void) validate(nhfp, (char *) 0, FALSE);
     get_plname_from_file(nhfp, gp.plname);
 
     getlev(nhfp, 0, (xint8) 0);
@@ -1456,7 +1456,7 @@ restore_menu(
 #endif /* SELECTSAVED */
 
 int
-validate(NHFILE *nhfp, const char *name)
+validate(NHFILE *nhfp, const char *name, boolean without_waitsynch_perfile)
 {
     readLenType rlen = 0;
     struct savefile_info sfi;
@@ -1465,6 +1465,8 @@ validate(NHFILE *nhfp, const char *name)
 
     if (nhfp->structlevel)
         utdflags |= UTD_CHECKSIZES;
+    if (without_waitsynch_perfile)
+        utdflags |= UTD_WITHOUT_WAITSYNCH_PERFILE;
     if (!(reslt = uptodate(nhfp, name, utdflags)))
         return 1;
 

@@ -39,7 +39,7 @@
 #endif
 #endif
 
-extern boolean getreturn_enabled; /* from sys/share/pcsys.c */
+extern boolean getreturn_enabled; /* from windmain.c */
 extern int redirect_stdout;
 
 #ifdef TTY_GRAPHICS
