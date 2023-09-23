@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		NetHackProperties.props = NetHackProperties.props
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pdcursesgui", "PDCursesGui\Pdcursesgui.vcxproj", "{1693F852-A207-4348-8223-222C2A7FEEEB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -131,6 +133,14 @@ Global
 		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|Win32.Build.0 = Release|Win32
 		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|x64.ActiveCfg = Release|x64
 		{BAA70D0F-3EC7-4D10-91F0-974F1F49308B}.Release|x64.Build.0 = Release|x64
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Debug|Win32.Build.0 = Debug|Win32
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Debug|x64.ActiveCfg = Debug|x64
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Debug|x64.Build.0 = Debug|x64
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Release|Win32.ActiveCfg = Release|Win32
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Release|Win32.Build.0 = Release|Win32
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Release|x64.ActiveCfg = Release|x64
+		{1693F852-A207-4348-8223-222C2A7FEEEB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
