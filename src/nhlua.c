@@ -1230,6 +1230,7 @@ restore_luadata(NHFILE *nhfp)
     if (!gl.luacore)
         l_nhcore_init();
     luaL_loadstring(gl.luacore, lua_data);
+    free(lua_data);
     nhl_pcall(gl.luacore, 0, 0);
 }
 
