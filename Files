@@ -510,6 +510,10 @@ sys/windows/vs/PDCurses:
 (file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 PDCurses.vcxproj
 
+sys/windows/vs/PDCursesGui:
+(file for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
+pdcursesgui.vcxproj
+
 sys/windows/vs/dlb:
 (files for Visual Studio 2017 or 2019 or 2022 Community Edition builds)
 afterdlb.proj  dlb.vcxproj
