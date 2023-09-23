@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1661295670 2022/08/23 23:01:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.326 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1695430217 2023/09/23 00:50:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3838,7 +3838,7 @@ static struct tty_status_fields tty_status[2][MAXBLSTATS]; /* 2: NOW,BEFORE */
 static int hpbar_percent, hpbar_color;
 extern const struct conditions_t conditions[CONDITION_COUNT];
 
-static const char *encvals[3][6] = {
+static const char *const encvals[3][6] = {
     { "", "Burdened", "Stressed", "Strained", "Overtaxed", "Overloaded" },
     { "", "Burden",   "Stress",   "Strain",   "Overtax",   "Overload"   },
     { "", "Brd",      "Strs",     "Strn",     "Ovtx",      "Ovld"       }
@@ -3929,8 +3929,11 @@ tty_status_init(void)
 }
 
 void
-tty_status_enablefield(int fieldidx, const char *nm, const char *fmt,
-                       boolean enable)
+tty_status_enablefield(
+    int fieldidx,
+    const char *nm,
+    const char *fmt,
+    boolean enable)
 {
     genl_status_enablefield(fieldidx, nm, fmt, enable);
 }
@@ -4311,15 +4314,15 @@ check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS])
 static void
 status_sanity_check(void)
 {
-    int i;
-    static boolean in_sanity_check = FALSE;
     static const char *const idxtext[] = {
-        "BL_TITLE", "BL_STR", "BL_DX", "BL_CO", "BL_IN", "BL_WI", /* 0.. 5   */
-        "BL_CH","BL_ALIGN", "BL_SCORE", "BL_CAP", "BL_GOLD",     /* 6.. 10  */
-        "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",       /* 11.. 15 */
-        "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",           /* 16.. 19 */
-        "BL_LEVELDESC", "BL_EXP", "BL_CONDITION"              /* 20.. 22 */
+        "BL_TITLE", "BL_STR", "BL_DX", "BL_CO", "BL_IN", "BL_WI", /*  0.. 5 */
+        "BL_CH","BL_ALIGN", "BL_SCORE", "BL_CAP", "BL_GOLD",      /*  6..10 */
+        "BL_ENE", "BL_ENEMAX", "BL_XP", "BL_AC", "BL_HD",         /* 11..15 */
+        "BL_TIME", "BL_HUNGER", "BL_HP", "BL_HPMAX",              /* 16..19 */
+        "BL_LEVELDESC", "BL_EXP", "BL_CONDITION",                 /* 20..22 */
     };
+    static boolean in_sanity_check = FALSE;
+    int i;
 
     if (in_sanity_check)
         return;
@@ -4330,9 +4333,15 @@ status_sanity_check(void)
      */
     for (i = 0; i < MAXBLSTATS; ++i) {
         if (tty_status[NOW][i].sanitycheck) {
-            char panicmsg[BUFSZ];
+            char panicmsg[BUFSZ], indxtxt[40];
 
-            Sprintf(panicmsg, "failed on tty_status[NOW][%s].", idxtext[i]);
+            /* guard against an increase in MAXBLSTATS in botl.h without
+               a corresponding expansion of idxtext[] here */
+            if (i < SIZE(idxtext))
+                Strcpy(indxtxt, idxtext[i]);
+            else
+                Sprintf(indxtxt, "%d", i);
+            Sprintf(panicmsg, "failed on tty_status[NOW][%s].", indxtxt);
             paniclog("status_sanity_check", panicmsg);
             tty_status[NOW][i].sanitycheck = FALSE;
             /*
