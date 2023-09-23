@@ -2128,7 +2128,8 @@ revive_corpse(struct obj *corpse)
                     struct trap *ttmp;
 
                     ttmp = t_at(mtmp->mx, mtmp->my);
-                    ttmp->tseen = TRUE;
+                    if (ttmp)
+                        ttmp->tseen = TRUE;
                     pline("%s claws itself out of the ground!",
                           canspotmon(mtmp) ? Amonnam(mtmp) : Something);
                     newsym(mtmp->mx, mtmp->my);
