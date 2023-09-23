@@ -1921,7 +1921,8 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
 }
 
 #define special_obj_hits_leader(obj, mon) \
-    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique)   \
+    ((is_quest_artifact(obj) || objects[obj->otyp].oc_unique    \
+      || (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known))   \
      && mon->m_id == gq.quest_status.leader_m_id)
 
 /*
@@ -2032,7 +2033,30 @@ thitmonst(
 
         if (mon->mcanmove) {
             pline("%s catches %s.", Some_Monnam(mon), the(xname(obj)));
-            if (mon->mpeaceful) {
+            /* leader will keep tossed invocation item after you've done the
+               invocation and it's become unnecessary for completion.. */
+            if ((u.uevent.invoked && objects[obj->otyp].oc_unique
+                 && obj->otyp != AMULET_OF_YENDOR)
+                /* ...or any special item, if you've made him angry */
+                || !mon->mpeaceful) {
+                /* give an explanation for keeping the item only if leader is
+                   not doing it out of anger */ 
+                if (mon->mpeaceful && !Deaf) {
+                    /* just in case, identify the object so its name will
+                       appear in the message */
+                    fully_identify_obj(obj);
+                    verbalize("%s part in this is finished.",
+                              s_suffix(The(xname(obj))));
+                    verbalize(
+               "We will guard it in case it is ever needed again, %s forbid.",
+                              align_gname(u.ualignbase[A_ORIGINAL]));
+                }
+                if (*u.ushops || obj->unpaid) /* not very likely... */
+                    check_shop_obj(obj, mon->mx, mon->my, FALSE);
+                (void) mpickobj(mon, obj);
+            } else {
+                /* under normal circumstances, leader will say something and
+                   then return the item to the hero */ 
                 boolean next2u = monnear(mon, u.ux, u.uy);
 
                 finish_quest(obj); /* acknowledge quest completion */
@@ -2042,11 +2066,6 @@ thitmonst(
                     sho_obj_return_to_u(obj);
                 obj = addinv(obj); /* back into your inventory */
                 (void) encumber_msg();
-            } else {
-                /* angry leader caught it and isn't returning it */
-                if (*u.ushops || obj->unpaid) /* not very likely... */
-                    check_shop_obj(obj, mon->mx, mon->my, FALSE);
-                (void) mpickobj(mon, obj);
             }
             return 1; /* caller doesn't need to place it */
         }
