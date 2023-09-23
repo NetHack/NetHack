@@ -16,7 +16,7 @@ static void fmod_init_nhsound(void);
 static void fmod_exit_nhsound(const char *);
 static void fmod_achievement(schar, schar, int32_t);
 static void fmod_soundeffect(char *, int32_t, int32_t);
-static void fmod_hero_playnotes(int32_t, const char *, int32_t);
+static void fmod_hero_playnotes(int32_t instrument, const char *str, int32_t volume);
 static void fmod_play_usersound(const char *, int32_t, int32_t);
 static void fmod_ambience(int32_t, int32_t, int32_t);
 static void fmod_verbal(char *, int32_t, int32_t, int32_t, int32_t);
@@ -46,8 +46,8 @@ static void
 fmod_exit_nhsound(const char *reason)
 {
     /* Close / Terminate external sound library */
-    FMOD_System_Close(&systemvar);
-    FMOD_System_Release(&systemvar);
+    FMOD_System_Close(systemvar);
+    FMOD_System_Release(systemvar);
 }
 
 /* fulfill SNDCAP_ACHIEVEMENTS */
@@ -65,7 +65,7 @@ fmod_soundeffect(char *desc, int32_t seid, int32_t volume)
 }
 
 /* fulfill SNDCAP_HEROMUSIC */
-static void fmod_hero_playnotes(int32_t instrument, char *str, int32_t volume)
+static void fmod_hero_playnotes(int32_t instrument, const char *str, int32_t volume)
 {
     //  to be added in future
 }
@@ -88,12 +88,17 @@ fmod_play_usersound(const char *filename, int32_t volume UNUSED, int32_t idx UNU
 
 static void
 fmod_ambience(int32_t ambienceid, int32_t ambience_action,
-                int32_t hero_proximity)
+              int32_t hero_proximity)
 {
     //  to be added in future
 }
 
-
+static void
+fmod_verbal(char *text, int32_t gender, int32_t tone,
+            int32_t vol, int32_t moreinfo)
+{
+    //  to be added in future
+}
 
 #endif /* SND_LIB_FMOD  */
        /* end of fmod.c */

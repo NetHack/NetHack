@@ -50,6 +50,7 @@ GAMEDIR = ..\binary               # Default game build directory
 # windsound uses built-in Microsoft API's, no 3rd party download is required.
 
 SOUND_LIBRARIES = windsound
+#SOUND_LIBRARIES = windsound fmod
 
 #------------------------------------------------------------------------------
 # Curses options.
@@ -805,20 +806,17 @@ NEED_USERSOUNDS=Y
 NEED_SEAUTOMAP=Y
 NEED_WAV=Y
 FMODROOT=..\lib\fmod\api\core
+FMODDLLBASENAME = fmod.dll
 SOUNDLIBINCL = $(SOUNDLIBINCL) -I$(FMODROOT)/inc
 SOUNDLIBDEFS = $(SOUNDLIBDEFS) -DSND_LIB_FMOD
 TTYSOUNDOBJS = $(TTYSOUNDOBJS) $(OTTY)fmod.o
 GUISOUNDOBJS = $(GUISOUNDOBJS) $(OGUI)fmod.o
 FMODLIBDIR = $(FMODROOT)\lib\$(TARGET_CPU)
-FMODLIBDLL = fmod_vc.dll
-!IF "$(TARGET_CPU)" == "x86"
+FMODLIBDLL = $(FMODLIBDIR)\$(FMODDLLBASENAME)
+FMODFLAGS = -wd4201
 TTYSOUNDLIBS = $(TTYSOUNDLIBS) $(FMODLIBDIR)\fmod_vc.lib
 GUISOUNDLIBS = $(GUISOUNDLIBS) $(FMODLIBDIR)\fmod_vc.lib
-#!ELSE
-#TTYSOUNDLIBS = $(TTYSOUNDLIBS) $(FMODLIBDIR)\fmod_vc.lib
-#GUISOUNDLIBS = $(GUISOUNDLIBS) $(FMODLIBDIR)\fmod_vc.lib
-!ENDIF
-GAMEDIRDLLS = $(GAMEDIRDLLS) $(GAMEDIR)\$(FMODLIBDLL)
+GAMEDIRDLLS = $(GAMEDIRDLLS) $(GAMEDIR)\$(FMODDLLBASENAME)
 FMODDIR = ..\sound\fmod
 SOUNDSRCS = $(SOUNDSRCS) $(FMODDIR)\fmod.c
 !MESSAGE ---------------------------------------------------------------------
@@ -827,7 +825,7 @@ SOUNDSRCS = $(SOUNDSRCS) $(FMODDIR)\fmod.c
 !MESSAGE fmod include directory    : $(FMODROOT)\inc
 !MESSAGE fmod library directory    : $(FMODLIBDIR)
 !MESSAGE fmod library to link with : $(FMODLIBDIR)\fmod_vc.lib
-!MESSAGE fmod library dll          : $(FMODLIBDIR)\$(FMODLIBDLL)
+!MESSAGE fmod library dll          : $(FMODLIBDLL)
 !MESSAGE ---------------------------------------------------------------------
 FMOD_MISSING=
 !IF !EXIST("$(FMODROOT)\inc")
@@ -842,9 +840,9 @@ FMOD_MISSING= $(FMOD_MISSING) $(FMODLIBDIR)
 FMOD_MISSING= $(FMOD_MISSING) $(FMODLIBDIR)\fmod_vc.lib
 !MESSAGE Error: missing $(FMODLIBDIR)\fmod_vc.lib
 !ENDIF
-!IF !EXIST("$(FMODLIBDIR)\$(FMODLIBDLL)")
-FMOD_MISSING= $(FMOD_MISSING) $(FMODLIBDIR)\$(FMODLIBDLL)
-!MESSAGE Error: missing $(FMODLIBDIR)\$(FMODLIBDLL)
+!IF !EXIST("$(FMODLIBDLL)")
+FMOD_MISSING= $(FMOD_MISSING) $(FMODLIBDLL)
+!MESSAGE Error: missing $(FMODLIBDLL)
 !ENDIF
 !IF "$(FMOD_MISSING)" != ""
 !ERROR Error: Cannot proceed with fmod integration included
@@ -1341,10 +1339,10 @@ DLB =
 #==========================================
 
 {$(FMODDIR)}.c{$(OBJTTY)}.o:
-	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) $(CFLAGS) $(FMODFLAGS) -I$(WSHR) $(TTYDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(FMODDIR)}.c{$(OBJGUI)}.o:
-	$(Q)$(CC) $(CFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) $(CFLAGS) $(FMODFLAGS) -I$(WSHR) $(GUIDEF) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 #=============== TARGETS ==================
@@ -2063,8 +2061,8 @@ $(OTTY)fmod.o: $(FMODDIR)\fmod.c $(HACK_H)
 $(OGUI)fmod.o: $(FMODDIR)\fmod.c $(HACK_H)
 
 # Copy the DLL to GAMEDIR
-$(GAMEDIR)\FMODLIBDLL: $(FMODLIBDIR)\$(FMODLIBDLL)
-	copy $(FMODLIBDIR)\$(FMODLIBDLL) $@
+$(GAMEDIR)\$(FMODDLLBASENAME):
+	copy $(FMODLIBDLL) $@
 !ENDIF
 #===================================================================
 # sys/windows dependencies
