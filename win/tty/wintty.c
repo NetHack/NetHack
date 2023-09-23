@@ -234,6 +234,7 @@ static void tty_putsym(winid, int, int, char);
 #endif
 #ifdef STATUS_HILITES
 #define MAX_STATUS_ROWS 3
+#define StatusRows() ((iflags.wc2_statuslines <= 2) ? 2 : MAX_STATUS_ROWS)
 static boolean check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS]);
 static void render_status(void);
 static void tty_putstatusfield(const char *, int, int);
@@ -314,7 +315,7 @@ print_vt_code(int i, int c, int d)
     }
 }
 #else
-# define print_vt_code(i, c, d) ;
+#define print_vt_code(i, c, d) /*empty*/
 #endif /* !TTY_TILES_ESCCODES */
 #define print_vt_code1(i)     print_vt_code((i), -1, -1)
 #define print_vt_code2(i,c)   print_vt_code((i), (c), -1)
@@ -334,9 +335,9 @@ print_vt_soundcode_idx(int idx, int v)
                    idx, VT_ANSI_COMMAND);
     }
 }
-#else
-# define print_vt_soundcode_idx(idx, v) ;
-#endif /* !TTY_SOUND_ESCCODES */
+#else /* !(USER_SOUNDS && TTY_SOUND_ESCCODES) */
+#define print_vt_soundcode_idx(idx, v) ;
+#endif /* ?(USER_SOUNDS && TTY_SOUND_ESCCODES) */
 
 /* clean up and quit */
 static void
@@ -541,7 +542,7 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
 
     /* 'statuslines' defaults to set_in_config, allowed but invisible;
        make it dynamically settable if feasible, otherwise visible */
-    if (tty_procs.wincap2 & WC2_STATUSLINES)
+    if ((tty_procs.wincap2 & WC2_STATUSLINES) != 0)
         set_wc2_option_mod_status(WC2_STATUSLINES,
 #ifndef CLIPPING
                                   (LI < 1 + ROWNO + 2) ? set_gameview :
@@ -1269,7 +1270,7 @@ process_menu_window(winid window, struct WinDesc *cw)
     gacc[0] = '\0';
     if (cw->how != PICK_NONE) {
         int i, gcnt[128];
-#define GSELIDX(c) (c & 127) /* guard against `signed char' */
+#define GSELIDX(c) ((c) & 127) /* guard against `signed char' */
 
         for (i = 0; i < SIZE(gcnt); i++)
             gcnt[i] = 0;
@@ -1293,6 +1294,7 @@ process_menu_window(winid window, struct WinDesc *cw)
                     *rp++ = curr->gselector;
                     *rp = '\0'; /* re-terminate for strchr() */
                 }
+#undef GSELIDX
     }
     resp_len = 0; /* lint suppression */
 
@@ -1650,6 +1652,7 @@ process_menu_window(winid window, struct WinDesc *cw)
     } /* while */
     cw->morestr = msave;
     free((genericptr_t) morestr);
+#undef MENU_EXPLICIT_CHOICE
 }
 
 static void
@@ -3868,6 +3871,8 @@ static const enum statusfields
       blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD, blPAD }
 };
 static const enum statusfields (*fieldorder)[MAX_PER_ROW];
+#undef MAX_PER_ROW
+#undef blPAD
 
 static int finalx[3][2];    /* [rows][NOW or BEFORE] */
 static boolean windowdata_init = FALSE;
@@ -3906,7 +3911,7 @@ tty_status_init(void)
 #ifdef STATUS_HILITES
     int i, num_rows;
 
-    num_rows = (iflags.wc2_statuslines < 3) ? 2 : 3;
+    num_rows = StatusRows(); /* 2 or 3 */
     fieldorder = (num_rows != 3) ? twolineorder : threelineorder;
 
     for (i = 0; i < MAXBLSTATS; ++i) {
@@ -4151,8 +4156,7 @@ make_things_fit(boolean force_update)
     int trycnt, fitting = 0, requirement;
     int rowsz[MAX_STATUS_ROWS], num_rows, condrow, otheroptions = 0;
 
-    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS)
-                    ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows();
     condrow = num_rows - 1; /* always last row, 1 for 0..1 or 2 for 0..2 */
     cond_shrinklvl = 0;
     if (enc_shrinklvl > 0 && num_rows == 2)
@@ -4218,9 +4222,7 @@ check_fields(boolean forcefields, int sz[MAX_STATUS_ROWS])
     if (!windowdata_init && !check_windowdata())
         return FALSE;
 
-    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS)
-                    ? 2 : MAX_STATUS_ROWS;
-
+    num_rows = StatusRows(); /* 2 or 3 */
     for (row = 0; row < num_rows; ++row) {
         sz[row] = 0;
         col = 1;
@@ -4569,7 +4571,7 @@ render_status(void)
         return;
     }
 
-    num_rows = (iflags.wc2_statuslines < MAX_STATUS_ROWS) ? 2 : MAX_STATUS_ROWS;
+    num_rows = StatusRows(); /* 2 or 3 */
     for (row = 0; row < num_rows; ++row) {
         HUPSKIP();
         y = row;
@@ -4777,16 +4779,61 @@ render_status(void)
     return;
 }
 
+#undef Begin_Attr
+#undef End_Attr
+#ifdef condcolor
+#undef condcolor
+#endif
+#ifdef term_start_color
+#undef term_start_color
+#undef term_end_color
+#endif
+#undef FORCE_RESET
+#undef NO_RESET
+#undef MAX_STATUS_ROWS
+#undef StatusRows
+
 #endif /* STATUS_HILITES */
 
 #if defined(USER_SOUNDS) && defined(TTY_SOUND_ESCCODES)
 void
 play_usersound_via_idx(int idx, int volume)
 {
-     print_vt_soundcode_idx(idx, volume);
+    print_vt_soundcode_idx(idx, volume);
 }
 #endif /* USER_SOUNDS && TTY_SOUND_ESCCODES */
 
+#ifdef VT_ANSI_COMMAND
+#undef VT_ANSI_COMMAND
+#endif
+#ifdef AVTC_GLYPH_START /* TTY_TILES_ESCCODES */
+#undef AVTC_GLYPH_START
+#undef AVTC_GLYPH_END
+#undef AVTC_SELECT_WINDOW
+#undef AVTC_INLINE_SYNC
+#endif
+#ifdef AVTC_SOUND_PLAY /* TTY_SOUND_ESCCODES */
+#undef AVTC_SOUND_PLAY
+#endif
+
+#ifdef print_vt_code
+#undef print_vt_code
+#endif
+#undef print_vt_code1
+#undef print_vt_code2
+#undef print_vt_code3
+#ifdef print_vt_soundcode_idx
+#undef print_vt_soundcode_idx
+#endif
+
+#ifdef getret
+#undef getret
+#endif
+#undef HUPSKIP
+#undef HUPSKIP_RESULT
+
 #endif /* TTY_GRAPHICS */
+
+#undef H2344_BROKEN
 
 /*wintty.c*/
