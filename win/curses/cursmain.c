@@ -584,12 +584,37 @@ curses_putstr(winid wid, int attr, const char *text)
 void
 curses_putmixed(winid window, int attr, const char *str)
 {
+    const char *substr = 0;
+    char buf[BUFSZ];
+    boolean done_output = FALSE;
+#ifdef ENHANCED_SYMBOLS
+    int utf8flag = 0;
+#endif
+
     if (window == WIN_MESSAGE) {
         str = mixed_to_glyphinfo(str, &mesg_gi);
         mesg_mixed = 1;
+    } else {
+        if ((substr = strstri(str, "\\G")) != 0) {
+#ifdef ENHANCED_SYMBOLS
+            if ((windowprocs.wincap2 & WC2_U_UTF8STR) && SYMHANDLING(H_UTF8)) {
+                mixed_to_utf8(buf, sizeof buf, str, &utf8flag);
+            } else {
+#endif
+                decode_mixed(buf, str);
+#ifdef ENHANCED_SYMBOLS
+            }
+#endif
+            /* now send buf to the normal putstr */
+            curses_putstr(window, attr, buf);
+            done_output = TRUE;
+	}
     }
-    /* now send it to the normal putstr */
-    curses_putstr(window, attr, str);
+
+    if (!done_output) {
+        /* just send str to the normal putstr */
+        curses_putstr(window, attr, str);
+    }
     if (window == WIN_MESSAGE)
         mesg_mixed = 0;
 }
