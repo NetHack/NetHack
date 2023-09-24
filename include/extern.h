@@ -3142,7 +3142,6 @@ extern int hide_privileges(boolean);
 #ifdef ENHANCED_SYMBOLS
 extern int glyphrep(const char *);
 extern char *mixed_to_utf8(char *buf, size_t bufsz, const char *str, int *);
-extern const char *mixed_to_glyphinfo(const char *str, glyph_info *gip);
 extern int match_glyph(char *);
 extern void dump_all_glyphids(FILE *fp);
 extern void fill_glyphid_cache(void);
@@ -3417,6 +3416,7 @@ extern char *decode_mixed(char *, const char *);
 extern void genl_putmixed(winid, int, const char *);
 extern void genl_display_file(const char *, boolean);
 extern boolean menuitem_invert_test(int, unsigned, boolean);
+extern const char *mixed_to_glyphinfo(const char *str, glyph_info *gip);
 
 /* ### windows.c ### */
 
