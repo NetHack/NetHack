@@ -495,7 +495,8 @@ nethack_exit(int code)
 #endif
     if (getreturn_enabled) {
         raw_print("\n");
-        wait_synch();
+        if (iflags.window_inited)
+            wait_synch();
     }
     exit(code);
 }
