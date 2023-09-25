@@ -1988,6 +1988,11 @@ mbodypart(struct monst *mon, int part)
     };
     struct permonst *mptr = mon->data;
 
+    if (part <= NO_PART) {
+        impossible("mbodypart: bad part %d", part);
+        return "mystery part";
+    }
+
     /* some special cases */
     if (mptr->mlet == S_DOG || mptr->mlet == S_FELINE
         || mptr->mlet == S_RODENT || mptr == &mons[PM_OWLBEAR]) {

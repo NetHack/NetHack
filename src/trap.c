@@ -6265,7 +6265,7 @@ b_trapped(const char* item, int bodypart)
     wake_nearby();
     losehp(Maybe_Half_Phys(dmg), "explosion", KILLED_BY_AN);
     exercise(A_STR, FALSE);
-    if (bodypart)
+    if (bodypart != NO_PART)
         exercise(A_CON, FALSE);
     make_stunned((HStun & TIMEOUT) + (long) dmg, TRUE);
 }
