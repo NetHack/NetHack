@@ -132,6 +132,7 @@ enum bhit_call_types {
 
 /* Macros for messages referring to hands, eyes, feet, etc... */
 enum bodypart_types {
+    NO_PART   = -1,
     ARM       =  0,
     EYE       =  1,
     FACE      =  2,

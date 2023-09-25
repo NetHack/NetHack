@@ -454,7 +454,7 @@ dig(void)
         }
         if (IS_DOOR(lev->typ) && (lev->doormask & D_TRAPPED)) {
             lev->doormask = D_NODOOR;
-            b_trapped("door", 0);
+            b_trapped("door", NO_PART);
             newsym(dpx, dpy);
         }
  cleanup:
