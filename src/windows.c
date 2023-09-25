@@ -1564,10 +1564,12 @@ menuitem_invert_test(
 }
 
 /*
- * helper routine if a window port wants to extract the unicode
- * representation from a glyph representation in the string;
+ * helper routine if a window port wants to extract the glyph
+ * information from a glyph number representation in the string;
  * the returned string is the remainder of the string after
- * extracting the \GNNNNNNNN information.
+ * extracting the \GNNNNNNNN information. The glyph details,
+ * including the utf8 representation under ENHANCED_SYMBOLS,
+ * will be stored in the glyph_info struct pointed to by gip.
  */
 const char *
 mixed_to_glyphinfo(const char *str, glyph_info *gip)
