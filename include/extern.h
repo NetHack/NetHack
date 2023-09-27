@@ -366,11 +366,11 @@ extern void warnreveal(void);
 extern int dosearch0(int);
 extern int dosearch(void);
 extern void sokoban_detect(void);
-extern void reveal_terrain_docrt(int, int);
+extern void reveal_terrain_docrt(int);
 #ifdef DUMPLOG
 extern void dump_map(void);
 #endif
-extern void reveal_terrain(int, int);
+extern void reveal_terrain(int);
 extern int wiz_mgender(void);
 
 /* ### dig.c ### */

@@ -2238,16 +2238,16 @@ doterrain(void)
 
     switch (which) {
     case 1: /* known map */
-        reveal_terrain(0, TER_MAP);
+        reveal_terrain(TER_MAP);
         break;
     case 2: /* known map with known traps */
-        reveal_terrain(0, TER_MAP | TER_TRP);
+        reveal_terrain(TER_MAP | TER_TRP);
         break;
     case 3: /* known map with known traps and objects */
-        reveal_terrain(0, TER_MAP | TER_TRP | TER_OBJ);
+        reveal_terrain(TER_MAP | TER_TRP | TER_OBJ);
         break;
     case 4: /* full map */
-        reveal_terrain(1, TER_MAP);
+        reveal_terrain(TER_MAP | TER_FULL);
         break;
     case 5: /* map internals */
         wiz_map_levltyp();

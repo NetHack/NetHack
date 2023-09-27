@@ -26,7 +26,7 @@ static int furniture_detect(void);
 static void findone(coordxy, coordxy, genericptr_t);
 static void openone(coordxy, coordxy, genericptr_t);
 static int mfind0(struct monst *, boolean);
-static int reveal_terrain_getglyph(coordxy, coordxy, int, unsigned, int, int);
+static int reveal_terrain_getglyph(coordxy, coordxy, unsigned, int, int);
 
 /* dummytrap: used when detecting traps finds a door or chest trap; the
    couple of fields that matter are always re-initialized during use so
@@ -2004,16 +2004,18 @@ sokoban_detect(void)
 }
 
 static int
-reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
+reveal_terrain_getglyph(coordxy x, coordxy y, unsigned swallowed,
                         int default_glyph, int which_subset)
 {
     int glyph, levl_glyph;
     uchar seenv;
-    boolean keep_traps = (which_subset & TER_TRP) !=0,
+    boolean keep_traps = (which_subset & TER_TRP) != 0,
             keep_objs = (which_subset & TER_OBJ) != 0,
-            keep_mons = (which_subset & TER_MON) != 0;
+            keep_mons = (which_subset & TER_MON) != 0,
+            keep_map  = (which_subset & TER_MAP);
     struct monst *mtmp;
     struct trap *t;
+    boolean full = (which_subset & TER_FULL) != 0;
 
     /* for 'full', show the actual terrain for the entire level,
        otherwise what the hero remembers for seen locations with
@@ -2046,6 +2048,8 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
             if ((t = t_at(x, y)) != 0 && t->tseen)
                 glyph = trap_to_glyph(t);
         }
+        if (glyph_is_cmap(glyph) && !keep_map)
+            glyph = GLYPH_NOTHING;
         if ((glyph_is_object(glyph) && !keep_objs)
             || (glyph_is_trap(glyph) && !keep_traps)
             || glyph_is_invisible(glyph)) {
@@ -2093,7 +2097,7 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
 }
 
 void
-reveal_terrain_docrt(int full, int which_subset)
+reveal_terrain_docrt(int which_subset)
 {
     coordxy x, y;
     int glyph, default_glyph;
@@ -2102,7 +2106,7 @@ reveal_terrain_docrt(int full, int which_subset)
                                                           : S_stone);
     for (x = 1; x < COLNO; x++) {
         for (y = 0; y < ROWNO; y++) {
-            glyph = reveal_terrain_getglyph(x,y, full, iflags.save_uswallow,
+            glyph = reveal_terrain_getglyph(x, y, iflags.save_uswallow,
                                             default_glyph, which_subset);
             show_glyph(x, y, glyph);
         }
@@ -2138,7 +2142,7 @@ dump_map(void)
             int ch;
             glyph_info glyphinfo;
 
-            glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
+            glyph = reveal_terrain_getglyph(x, y, u.uswallow,
                                             default_glyph, subset);
             map_glyphinfo(x, y, glyph, 0, &glyphinfo);
             ch = glyphinfo.ttychar;
@@ -2170,10 +2174,10 @@ dump_map(void)
 /* idea from crawl; show known portion of map without any monsters,
    objects, or traps occluding the view of the underlying terrain */
 void
-reveal_terrain(
-    int full,      /* wizard|explore modes allow player to request full map */
-    int which_subset) /* if not full, whether to suppress objs and/or traps */
+reveal_terrain(int which_subset) /* if not full, whether to suppress objs and/or traps */
 {
+    boolean full = (which_subset & TER_FULL) != 0;
+
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");
     } else {
@@ -2186,7 +2190,7 @@ reveal_terrain(
         if (unconstrain_map())
             docrt();
 
-        reveal_terrain_docrt(full, which_subset);
+        reveal_terrain_docrt(which_subset);
 
         /* hero's location is not highlighted, but getpos() starts with
            cursor there, and after moving it anywhere '@' moves it back */

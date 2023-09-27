@@ -1647,7 +1647,7 @@ docrt(void)
     see_monsters();
 
     if (iflags.terrainmode)
-        reveal_terrain_docrt(FALSE, iflags.terrainmode);
+        reveal_terrain_docrt(iflags.terrainmode);
 
  post_map:
 

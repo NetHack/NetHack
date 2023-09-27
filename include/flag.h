@@ -219,6 +219,7 @@ struct instance_flags {
 #define TER_OBJ    0x04
 #define TER_MON    0x08
 #define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
+#define TER_FULL   0x20
     int getdir_click;      /* as input to getdir(): non-zero, accept simulated
                             * click that's not adjacent to or on hero;
                             * as output from getdir(): simulated button used
