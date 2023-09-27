@@ -452,7 +452,7 @@ new_status_window(void)
 
 #ifdef CLIPPING
     if (u.ux) {
-        if (LI < 1 + ROWNO + iflags.wc2_statuslines) {
+        if (CO < COLNO || LI < 1 + ROWNO + iflags.wc2_statuslines) {
             setclipped();
             tty_cliparound(u.ux, u.uy);
         } else {
