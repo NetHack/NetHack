@@ -1646,6 +1646,9 @@ docrt(void)
     /* overlay with monsters */
     see_monsters();
 
+    if (iflags.terrainmode)
+        reveal_terrain_docrt(FALSE, iflags.terrainmode);
+
  post_map:
 
     /* perm_invent */
@@ -2071,10 +2074,13 @@ flush_screen(int cursor_on_u)
         register gbuf_entry *gptr = &gg.gbuf[y][x = gg.gbuf_start[y]];
 
         for (; x <= gg.gbuf_stop[y]; gptr++, x++) {
-            get_bkglyph_and_framecolor(x, y, &bkglyph, &bkglyphinfo.framecolor);
+            get_bkglyph_and_framecolor(x, y, &bkglyph,
+                                       &bkglyphinfo.framecolor);
             if (gptr->gnew
-                || (gw.wsettings.map_frame_color != NO_COLOR && bkglyphinfo.framecolor != NO_COLOR)) {
-                map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
+                || (gw.wsettings.map_frame_color != NO_COLOR
+                    && bkglyphinfo.framecolor != NO_COLOR)) {
+                /* map_glyphinfo won't touch framecolor */
+                map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo);
                 print_glyph(WIN_MAP, x, y,
                             Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
                 gptr->gnew = 0;

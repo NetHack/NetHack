@@ -2092,6 +2092,23 @@ reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
     return glyph;
 }
 
+void
+reveal_terrain_docrt(int full, int which_subset)
+{
+    coordxy x, y;
+    int glyph, default_glyph;
+
+    default_glyph = cmap_to_glyph(gl.level.flags.arboreal ? S_tree
+                                                          : S_stone);
+    for (x = 1; x < COLNO; x++) {
+        for (y = 0; y < ROWNO; y++) {
+            glyph = reveal_terrain_getglyph(x,y, full, iflags.save_uswallow,
+                                            default_glyph, which_subset);
+            show_glyph(x, y, glyph);
+        }
+    }
+}
+
 #ifdef DUMPLOG
 void
 dump_map(void)
@@ -2160,26 +2177,16 @@ reveal_terrain(
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");
     } else {
-        coordxy x, y;
-        int glyph, default_glyph;
         char buf[BUFSZ];
         /* there is a TER_MAP bit too; we always show map regardless of it */
-        boolean keep_traps = (which_subset & TER_TRP) !=0,
+        boolean keep_traps = (which_subset & TER_TRP) != 0,
                 keep_objs = (which_subset & TER_OBJ) != 0,
                 keep_mons = (which_subset & TER_MON) != 0; /* not used */
-        unsigned swallowed = u.uswallow; /* before unconstrain_map() */
 
         if (unconstrain_map())
             docrt();
-        default_glyph = cmap_to_glyph(gl.level.flags.arboreal ? S_tree
-                                                             : S_stone);
 
-        for (x = 1; x < COLNO; x++)
-            for (y = 0; y < ROWNO; y++) {
-                glyph = reveal_terrain_getglyph(x,y, full, swallowed,
-                                                default_glyph, which_subset);
-                show_glyph(x, y, glyph);
-            }
+        reveal_terrain_docrt(full, which_subset);
 
         /* hero's location is not highlighted, but getpos() starts with
            cursor there, and after moving it anywhere '@' moves it back */
