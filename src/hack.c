@@ -1,4 +1,4 @@
-/* NetHack 3.7	hack.c	$NHDT-Date: 1655116515 2022/06/13 10:35:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.360 $ */
+/* NetHack 3.7	hack.c	$NHDT-Date: 1695932717 2023/09/28 20:25:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.410 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -34,6 +34,7 @@ static boolean escape_from_sticky_mon(coordxy, coordxy);
 static void domove_core(void);
 static void maybe_smudge_engr(coordxy, coordxy, coordxy, coordxy);
 static struct monst *monstinroom(struct permonst *, int);
+static boolean furniture_present(int, int);
 static void move_update(boolean);
 static int pickup_checks(void);
 static boolean doorless_door(coordxy, coordxy);
@@ -3039,6 +3040,23 @@ monstinroom(struct permonst *mdat, int roomno)
     return (struct monst *) 0;
 }
 
+/* check whether room contains a particular type of furniture */
+static boolean
+furniture_present(int furniture, int roomno)
+{
+    int x, y, lx, ly, hx, hy;
+    struct mkroom *sroom = &gr.rooms[roomno];
+
+    ly = sroom->ly, hy = sroom->hy;
+    lx = sroom->lx; hx = sroom->hx;
+    /* the inside_room() check handles irregularly shaped rooms */
+    for (y = ly; y <= hy; ++y)
+        for (x = lx; x <= hx; ++x)
+            if (levl[x][y].typ == furniture && inside_room(sroom, x, y))
+                return TRUE;
+    return FALSE;
+}
+
 char *
 in_rooms(register coordxy x, register coordxy y, register int typewanted)
 {
@@ -3220,7 +3238,9 @@ check_special_room(boolean newlev)
                   Blind ? "humid" : "muddy");
             break;
         case COURT:
-            You("enter an opulent throne room!");
+            You("enter an opulent%s room!",
+                /* the throne room in Sam quest home level lacks a throne */
+                !furniture_present(THRONE, roomno) ? "" : " throne");
             break;
         case LEPREHALL:
             You("enter a leprechaun hall!");

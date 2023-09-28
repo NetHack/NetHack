@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1235 $ $NHDT-Date: 1693427872 2023/08/30 20:37:52 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1247 $ $NHDT-Date: 1695932713 2023/09/28 20:25:13 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1242,6 +1242,9 @@ applying a wielded, lit potion of oil to unlight it while other unlit
 	"addinv: null obj after quiver merge otyp=N" where N is POT_OIL
 casting stone-to-flesh at self turned wielded or quivered rocks into unwielded,
 	unquivered meatballs, merging stacks if there were some in each slot
+the throne room on the Samurai quest home level lacked a throne but gave
+	"You enter an opulent throne room!" message the first time it was
+	entered; vary the message rather than add a throne
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

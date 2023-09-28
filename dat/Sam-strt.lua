@@ -1,4 +1,4 @@
--- NetHack Samurai Sam-strt.lua	$NHDT-Date: 1652196014 2022/05/10 15:20:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
+-- NetHack Samurai Sam-strt.lua	$NHDT-Date: 1695932714 2023/09/28 20:25:14 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.4 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1991-92 by M. Stephenson, P. Winner
 -- NetHack may be freely redistributed.  See license for details.
@@ -8,6 +8,10 @@
 --
 --	Here you meet your (besieged) class leader, Lord Sato
 --	and receive your quest assignment.
+--
+--      The throne room designation produces random atmospheric
+--      messages (until the room is entered) but this one doesn't
+--      actually contain any throne.
 --
 des.level_init({ style = "solidfill", fg = " " });
 
@@ -55,8 +59,8 @@ des.door("closed",50,04)
 des.door("closed",50,06)
 -- Lord Sato
 des.monster({ id = "Lord Sato", coord = {20, 04}, inventory = function()
-   des.object({ id = "splint mail", spe = 5 });
-   des.object({ id = "katana", spe = 4 });
+   des.object({ id = "splint mail", spe = 5, eroded=-1, buc="not-cursed" });
+   des.object({ id = "katana", spe = 4, eroded=-1, buc="not-cursed" });
 end })
 -- The treasure of Lord Sato
 des.object("chest", 20, 04)
