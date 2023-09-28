@@ -1745,14 +1745,11 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                 break;
             }
  do_illness:
-            if ((mon->mhpmax > 3) && !resist(mon, POTION_CLASS, 0, NOTELL))
-                mon->mhpmax /= 2;
-            if ((mon->mhp > 2) && !resist(mon, POTION_CLASS, 0, NOTELL))
+            if (mon->mhp > 2) {
                 mon->mhp /= 2;
-            if (mon->mhp > mon->mhpmax)
-                mon->mhp = mon->mhpmax;
-            if (canseemon(mon))
-                pline("%s looks rather ill.", Monnam(mon));
+                if (canseemon(mon))
+                    pline("%s looks rather ill.", Monnam(mon));
+            }
             break;
         case POT_CONFUSION:
         case POT_BOOZE:
