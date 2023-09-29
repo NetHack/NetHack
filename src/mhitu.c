@@ -165,17 +165,31 @@ u_slow_down(void)
     exercise(A_DEX, FALSE);
 }
 
-/* monster attacked your displaced image */
+/* monster attacked wrong location due to monster blindness, hero
+   invisibility, hero displacement, or hero being underwater */
 static void
 wildmiss(struct monst *mtmp, struct attack *mattk)
 {
     int compat;
-    const char *Monst_name; /* Monnam(mtmp) */
+    const char *Monst_name; /* Monnam(), deferred until after early returns */
+    /* expected reasons for wildmiss() */
+    boolean unotseen = (!mtmp->mcansee || (Invis && !perceives(mtmp->data))),
+            unotthere = (Displaced != 0), usubmerged = (Underwater != 0);
+
+    /* the reasons for wildmiss end up getting checked twice so that the
+       impossible can be given, if warranted, before the early returns */
+    if (!unotseen && !unotthere && !usubmerged) {
+        /* this used to be the 'else' case below */
+        impossible("%s attacks you without knowing your location?",
+                   Some_Monnam(mtmp));
+        return;
+    }
 
     /* no map_invisible() -- no way to tell where _this_ is coming from */
 
     if (!Verbose(1, wildmiss))
         return;
+    /* no feedback if hero doesn't see the monster's spot */
     if (!cansee(mtmp->mx, mtmp->my))
         return;
     /* maybe it's attacking an image around the corner? */
@@ -184,7 +198,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
               ? could_seduce(mtmp, &gy.youmonst, mattk) : 0);
     Monst_name = Monnam(mtmp);
 
-    if (!mtmp->mcansee || (Invis && !perceives(mtmp->data))) {
+    if (unotseen) { /* !mtmp->cansee || (Invis && !perceives(mtmp->data)) */
         const char *swings = (mattk->aatyp == AT_BITE) ? "snaps"
                              : (mattk->aatyp == AT_KICK) ? "kicks"
                                : (mattk->aatyp == AT_STNG
@@ -213,7 +227,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
                 break;
             }
 
-    } else if (Displaced) {
+    } else if (unotthere) { /* Displaced */
         /* give 'displaced' message even if hero is Blind */
         if (compat)
             pline("%s smiles %s at your %sdisplaced image...", Monst_name,
@@ -226,7 +240,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
                    * image, since the displaced image is also invisible. */
                   Monst_name, Invis ? "invisible " : "");
 
-    } else if (Underwater) {
+    } else if (usubmerged) { /* Underwater */
         /* monsters may miss especially on water level where
            bubbles shake the player here and there */
         if (compat)
@@ -235,9 +249,9 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
             pline("%s is fooled by water reflections and misses!",
                   Monst_name);
 
-    } else
-        impossible("%s attacks you without knowing your location?",
-                   Monst_name);
+    } else {
+        ; /*NOTREACHED*/
+    }
 }
 
 void
@@ -676,22 +690,27 @@ mattacku(register struct monst *mtmp)
 
     /* Unlike defensive stuff, don't let them use item _and_ attack. */
     if (find_offensive(mtmp)) {
-        int foo = use_offensive(mtmp);
+        int offended = use_offensive(mtmp);
 
-        if (foo != 0)
-            return (foo == 1);
+        if (offended != 0)
+            return (offended == 1);
     }
 
     gs.skipdrin = FALSE; /* [see mattackm(mhitm.c)] */
     firstfoundyou = foundyou;
 
     for (i = 0; i < NATTK; i++) {
-        /* recalc in case attack moved hero */
-        calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
         sum[i] = M_ATTK_MISS;
-        if (i > 0 && firstfoundyou /* previous attack might have moved hero */
-            && (mtmp->mux != u.ux || mtmp->muy != u.uy))
-            continue; /* fill in sum[] with 'miss' but skip other actions */
+        if (i > 0) {
+            /* recalc in case prior attack moved hero; mtmp doesn't make
+               another attempt to guess your location but might have
+               accidentally knocked you to where it thought you were
+               [not sure whether that's actually possible] */
+            calc_mattacku_vars(mtmp, &ranged, &range2, &foundyou, &youseeit);
+            /* if hero was found but isn't anymore, avoid wildmiss now */
+            if (firstfoundyou && !foundyou)
+                continue; /* set sum[i] to 'miss' but skip other actions */
+        }
         mon_currwep = (struct obj *) 0;
         mattk = getmattk(mtmp, &gy.youmonst, i, sum, &alt_attk);
         if ((u.uswallow && mattk->aatyp != AT_ENGL)
