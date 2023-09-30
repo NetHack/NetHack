@@ -1246,6 +1246,7 @@ the throne room on the Samurai quest home level lacked a throne but gave
 	"You enter an opulent throne room!" message the first time it was
 	entered; vary the message rather than add a throne
 coughing due to stinking cloud wakes up nearby monsters
+stop occupation when timed levitation or choking issues a message
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

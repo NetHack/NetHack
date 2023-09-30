@@ -292,6 +292,7 @@ choke_dialogue(void)
                 urgent_pline(str, hcolor(NH_BLUE));
             else
                 urgent_pline("%s", str);
+            stop_occupation();
         }
     }
     exercise(A_STR, FALSE);
@@ -357,6 +358,7 @@ levitation_dialogue(void)
                          danger ? surface(u.ux, u.uy) : "air");
         } else
             pline1(s);
+        stop_occupation();
     }
 }
 
