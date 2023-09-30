@@ -1,4 +1,4 @@
-         Copyright (c) NetHack Development Team 1990-2022
+         Copyright (c) NetHack Development Team 1990-2023
          NetHack may be freely redistributed.  See license for details.
          ==============================================================
                   Instructions for compiling and installing
@@ -83,7 +83,7 @@ Via git (recommended)
     submodules/lua and submodules/pdcurses folders:
 
     git submodule init
-    git submodule update --remote
+    git submodule update
 
 
 Via zip download
@@ -100,13 +100,13 @@ Via zip download
         tar -xvf lua-5.4.6.tar.gz
         cd ..
 
-    o obtain pdcurses
+    o obtain pdcursesmod
         cd lib
         wget --no-check-certificate ^
-             http://github.com/wmcbrine/PDCurses/archive/refs/tags/3.9.zip ^
-             --output-document=pdcurses3.9.zip
-        tar -xvf pdcurses3.9.zip
-        ren PDCurses-3.9 pdcurses
+             https://github.com/Bill-Gray/PDCursesMod/archive/refs/tags/v4.3.7.tar.gz ^
+             --output-document=pdcursesmod.tar.gz
+        tar -xvf pdcursesmod.tar.gz
+        ren PDCursesMod-4.3.7 pdcursesmod
         cd ..
 
     o update your Makefiles to reflect:
@@ -124,9 +124,9 @@ Via zip download
 
       In sys/windows/Makefile.nmake
         change from
-            PDCURSES_TOP = ..\submodules\pdcurses
+            PDCURSES_TOP = ..\submodules\pdcursesmod
         to
-            PDCURSES_TOP = ..\lib\pdcurses
+            PDCURSES_TOP = ..\lib\pdcursesmod
 
         change from
             LUATOP = ..\submodules\lua

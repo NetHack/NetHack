@@ -469,6 +469,8 @@ curses_display_nhwindow(winid wid, boolean block)
 {
     menu_item *selected = NULL;
 
+    if (wid == WIN_ERR)
+        return;
     if (curses_is_menu(wid) || curses_is_text(wid)) {
         curses_end_menu(wid, "");
         (void) curses_select_menu(wid, PICK_NONE, &selected);

@@ -236,7 +236,7 @@ PDCURSES_TOP=$(LIBDIR)\$(PDCDIST)
 ADD_CURSES=Y
 !ENDIF # GIT_AVAILABLE
 !ELSE  # INTERNET_AVAILABLE is not Y below
-# Your Makefile settings do not allow pdcurses or pdcursesmod to be obtained by
+# Your Makefile settings do not allow $(PDCDIST) to be obtained by
 # git or by download. Check to see if it is available at one of
 # the expected locations already, with precedence given to ../submodules,
 # then ../lib.
@@ -249,7 +249,7 @@ PDCURSES_TOP=$(LIBDIR)\$(PDCDIST)
 ADD_CURSES=Y
 !ENDIF  # pdcurses sources available somewhere
 !IF "$(ADD_CURSES)" == "Y"
-!MESSAGE Your Makefile settings do not allow pdcurses or pdcursesmod to be
+!MESSAGE Your Makefile settings do not allow $(PDCDIST) to be
 !MESSAGE obtained by git or by download, but a copy of pdcurses was
 !MESSAGE found in $(PDCURSES_TOP),
 !MESSAGE so that will be used.
@@ -431,9 +431,9 @@ LUAOBJFILES =   $(LUAOBJFILES) $(OLUA)lbitlib.o
 # PDCurses build macros
 # Source for the NetHack repository submodule in
 #        ../submodules/pdcurses
-#    or  ../submodules/pdcursesmod
 # is https://github.com/wmcbrine/PDCurses.git
-# or https://github.com/Bill-Gray/PDCursesMod
+#        ../submodules/pdcursesmod
+# is https://github.com/Bill-Gray/PDCursesMod
 #=================================================================
 
 !IF "$(ADD_CURSES)" == "Y"
@@ -471,7 +471,9 @@ PDCWINGUIOBJS = $(OPDC)pdcclip_wingui.o $(OPDC)pdcdisp_wingui.o \
 
 PDCLIB = $(LIBDIR)\$(PDCDIST)-$(TARGET_CPU).lib
 
-PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
+PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC)
+PDCINCLGUI = /I$(PDCWINCON)
+PDCINCLCON = /I$(PDCWINGUI)
 !ELSE
 PDCLIB =
 PDCDEP =
@@ -1304,10 +1306,10 @@ DLB =
 	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS:-w44774= ) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINCON)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLCON) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 {$(PDCWINGUI)}.c{$(OBJPDC)}.o:
-	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
+	$(Q)$(CC) /wd4244 /wd4267 /wd4774 $(PDCINCL) $(PDCINCLGUI) $(CFLAGS) $(CURSESDEF2) $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $<
 
 #==========================================
 # Rules for LUA files

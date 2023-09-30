@@ -16,7 +16,7 @@
   <PropertyGroup>
     <OutDir>$(BinDir)</OutDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="Exists('$(PDCURSES)')">
+  <ItemDefinitionGroup Condition="Exists('$(PDCURSESMOD)')">
     <ClCompile>
       <AdditionalIncludeDirectories>$(PDCURSES);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CURSES_GRAPHICS;PDC_NCMOUSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
