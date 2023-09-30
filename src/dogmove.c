@@ -18,7 +18,6 @@ static int dog_goal(struct monst *, struct edog *, int, int, int);
 static struct monst *find_targ(struct monst *, int, int, int);
 static int find_friends(struct monst *, struct monst *, int);
 static struct monst *best_target(struct monst *);
-static int pet_ranged_attk(struct monst *);
 static long score_targ(struct monst *, struct monst *);
 static boolean can_reach_location(struct monst *, coordxy, coordxy, coordxy,
                                   coordxy);
@@ -866,7 +865,7 @@ best_target(struct monst *mtmp)   /* Pet */
 }
 
 /* Pet considers and maybe executes a ranged attack */
-static int
+int
 pet_ranged_attk(struct monst *mtmp)
 {
     struct monst *mtarg;

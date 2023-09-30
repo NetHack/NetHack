@@ -1247,6 +1247,7 @@ the throne room on the Samurai quest home level lacked a throne but gave
 	entered; vary the message rather than add a throne
 coughing due to stinking cloud wakes up nearby monsters
 stop occupation when timed levitation or choking issues a message
+use #monster to make dragon steed breathe
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

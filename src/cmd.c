@@ -960,6 +960,9 @@ domonability(void)
             aggravate();
     } else if (is_vampire(uptr) || is_vampshifter(&gy.youmonst)) {
         return dopoly();
+    } else if (u.usteed && can_breathe(u.usteed->data)) {
+        (void) pet_ranged_attk(u.usteed);
+        return ECMD_TIME;
     } else if (Upolyd) {
         pline("Any special ability you may have is purely reflexive.");
     } else {
