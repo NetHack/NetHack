@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1693519377 2023/08/31 22:02:57 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.162 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1696193939 2023/10/01 20:58:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -804,29 +804,29 @@ depend: ../sys/unix/depend.awk \
 
 # config.h timestamp
 $(CONFIG_H): ../include/config.h ../include/config1.h ../include/patchlevel.h \
-		../include/tradstdc.h ../include/integer.h \
+		../include/tradstdc.h ../include/cstd.h ../include/integer.h \
 		../include/global.h ../include/coord.h ../include/vmsconf.h \
-		../include/cstd.h ../include/nhlua.h ../include/unixconf.h \
-		../include/pcconf.h ../include/micro.h ../include/windconf.h \
-		../include/warnings.h ../include/fnamesiz.h
+		../include/unixconf.h ../include/pcconf.h ../include/micro.h \
+		../include/windconf.h ../include/warnings.h \
+		../include/fnamesiz.h
 	touch $(CONFIG_H)
 # hack.h timestamp
-$(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/align.h \
-		../include/dungeon.h ../include/wintype.h ../include/sym.h \
-		../include/defsym.h ../include/mkroom.h ../include/artilist.h \
-		../include/objclass.h ../include/objects.h \
-		../include/youprop.h ../include/prop.h ../include/permonst.h \
-		../include/monattk.h ../include/monflag.h \
-		../include/monsters.h ../include/mondata.h \
-		../include/context.h ../include/rm.h ../include/botl.h \
-		../include/rect.h ../include/region.h ../include/trap.h \
-		../include/display.h ../include/vision.h ../include/color.h \
-		../include/sndprocs.h ../include/seffects.h ../include/decl.h \
-		../include/quest.h ../include/spell.h ../include/obj.h \
-		../include/engrave.h ../include/you.h ../include/attrib.h \
-		../include/monst.h ../include/mextra.h ../include/skills.h \
-		../include/timeout.h ../include/flag.h ../include/winprocs.h \
-		../include/sys.h
+$(HACK_H): ../include/hack.h $(CONFIG_H) ../include/lint.h ../include/color.h \
+		../include/align.h ../include/dungeon.h ../include/objclass.h \
+		../include/defsym.h ../include/objects.h ../include/wintype.h \
+		../include/flag.h ../include/rect.h ../include/sym.h \
+		../include/trap.h ../include/youprop.h ../include/prop.h \
+		../include/permonst.h ../include/monattk.h \
+		../include/monflag.h ../include/monsters.h \
+		../include/mondata.h ../include/display.h ../include/vision.h \
+		../include/botl.h ../include/context.h ../include/engrave.h \
+		../include/mkroom.h ../include/obj.h ../include/quest.h \
+		../include/region.h ../include/rm.h ../include/sndprocs.h \
+		../include/seffects.h ../include/spell.h ../include/sys.h \
+		../include/timeout.h ../include/winprocs.h ../include/you.h \
+		../include/attrib.h ../include/monst.h ../include/mextra.h \
+		../include/skills.h ../include/artilist.h ../include/nhlua.h \
+		../include/decl.h
 	touch $(HACK_H)
 #
 $(TARGETPFX)pcmain.o: ../sys/share/pcmain.c $(HACK_H) ../include/dlb.h
@@ -1078,7 +1078,7 @@ $(TARGETPFX)wc_trace.o: ../win/chain/wc_trace.c $(HACK_H) ../include/wintty.h \
 		../include/func_tab.h
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_trace.c
 $(TARGETPFX)allmain.o: allmain.c $(HACK_H)
-$(TARGETPFX)alloc.o: alloc.c $(CONFIG_H)
+$(TARGETPFX)alloc.o: alloc.c $(CONFIG_H) ../include/nhlua.h
 $(TARGETPFX)apply.o: apply.c $(HACK_H)
 $(TARGETPFX)artifact.o: artifact.c $(HACK_H) ../include/artifact.h
 $(TARGETPFX)attrib.o: attrib.c $(HACK_H)
