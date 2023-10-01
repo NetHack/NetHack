@@ -2795,6 +2795,9 @@ mondead(struct monst *mtmp)
     if (be_sad)
         You("have a sad feeling for a moment, then it passes.");
 
+    if (mtmp->data == &mons[PM_STEAM_VORTEX])
+        create_gas_cloud(mtmp->mx, mtmp->my, rn2(10) + 5, 0); /* harmless */
+
     /* dead vault guard is actually kept at coordinate <0,0> until
        his temporary corridor to/from the vault has been removed;
        need to do this after life-saving and before m_detach() */
