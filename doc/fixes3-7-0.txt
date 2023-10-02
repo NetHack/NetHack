@@ -1249,7 +1249,8 @@ coughing due to stinking cloud wakes up nearby monsters
 stop occupation when timed levitation or choking issues a message
 use #monster to make dragon steed breathe
 wand of probing reveals tin contents
-steam vortices leave steam clouds behind
+steam vortices and fog clouds leave steam clouds behind
+fog clouds maintain any clouds they are in, even poisonous ones
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

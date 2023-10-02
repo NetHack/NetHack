@@ -1015,6 +1015,13 @@ movemon_singlemon(struct monst *mtmp)
     if (mon_offmap(mtmp))
         return FALSE;
 
+    if (mtmp->data == &mons[PM_FOG_CLOUD]) {
+        NhRegion *reg = visible_region_at(mtmp->mx, mtmp->my);
+
+        if (!reg)
+            create_gas_cloud(mtmp->mx, mtmp->my, 1, 0); /* harmless vapor */
+    }
+
     /* Find a monster that we have not treated yet. */
     if (mtmp->movement < NORMAL_SPEED)
         return FALSE;

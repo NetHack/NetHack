@@ -1010,6 +1010,10 @@ inside_gas_cloud(genericptr_t p1, genericptr_t p2)
      * start next to water and spread over it.
      */
 
+    /* fog clouds maintain gas clouds, even poisonous ones */
+    if (reg->ttl < 20 && mtmp && mtmp->data == &mons[PM_FOG_CLOUD])
+        reg->ttl += 5;
+
     if (dam < 1)
         return FALSE; /* if no damage then there's nothing to do here... */
 
