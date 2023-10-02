@@ -1865,7 +1865,7 @@ $(OUTL)recover.o: $(CONFIG_H) $(U)recover.c $(MSWSYS)\win32api.h
 #  Tile Mapping
 #==========================================
 
-$(SRC)\tile.c: $(U)tilemap.exe
+tile.c: $(U)tilemap.exe
 	@$(U)tilemap
 	@echo A new $(@:\=/) has been created
 
@@ -2399,10 +2399,9 @@ clean:
 #===================================================================
 # OTHER DEPENDENCIES
 #===================================================================
-#
 # The rest are stolen from sys/unix/Makefile.src,
 # twice, with the following changes:
-#   * the CONFIG_H and HACK_H sections comment out
+#   * the CONFIG_H and HACK_H sections comment out or removed completely
 #   * ../include/ changed to $(INCL)\
 #   * slashes changed to back-slashes
 #   * -c (which is included in cflagsBuild) substituted with -Fo$@
@@ -2428,69 +2427,42 @@ TARGET_CXX=$(cc)
 TARGET_CXXFLAGS=$(CPPFLAGS) $(TTYDEF)
 MOCPATH = moc.exe
 
-# config.h timestamp
-#$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
-#		$(INCL)\tradstdc.h $(INCL)\integer.h \
-#		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
-#		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
-#		$(INCL)\warnings.h $(INCL)\fnamesiz.h
-#	touch $(CONFIG_H)
-# hack.h timestamp
-#$(HACK_H): $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
-#		$(INCL)\dungeon.h $(INCL)\wintype.h $(INCL)\sym.h \
-#		$(INCL)\defsym.h $(INCL)\mkroom.h $(INCL)\artilist.h \
-#		$(INCL)\objclass.h $(INCL)\objects.h \
-#		$(INCL)\youprop.h $(INCL)\prop.h $(INCL)\permonst.h \
-#		$(INCL)\monattk.h $(INCL)\monflag.h \
-#		$(INCL)\monsters.h $(INCL)\mondata.h \
-#		$(INCL)\context.h $(INCL)\rm.h $(INCL)\botl.h \
-#		$(INCL)\rect.h $(INCL)\region.h $(INCL)\trap.h \
-#		$(INCL)\display.h $(INCL)\vision.h $(INCL)\color.h \
-#		$(INCL)\decl.h $(INCL)\quest.h $(INCL)\spell.h \
-#		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
-#		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
-#		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h $(INCL)\seffects.h \
-#		$(INCL)\sys.h
-#	touch $(HACK_H)
-#
 $(OTTY)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcmain.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcmain.c
 $(OTTY)pcsys.o: ..\sys\share\pcsys.c $(HACK_H) $(INCL)\wintty.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcsys.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcsys.c
 $(OTTY)pctty.o: ..\sys\share\pctty.c $(HACK_H) $(INCL)\wintty.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pctty.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pctty.c
 $(OTTY)pcunix.o: ..\sys\share\pcunix.c $(HACK_H) $(INCL)\wintty.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcunix.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcunix.c
 $(OTTY)pmatchregex.o: ..\sys\share\pmatchregex.c $(HACK_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pmatchregex.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pmatchregex.c
 $(OTTY)posixregex.o: ..\sys\share\posixregex.c $(HACK_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\posixregex.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\posixregex.c
 $(OTTY)random.o: ..\sys\share\random.c $(HACK_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\random.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\random.c
 $(OTTY)ioctl.o: ..\sys\share\ioctl.c $(HACK_H) $(INCL)\tcap.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\ioctl.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\ioctl.c
 $(OTTY)unixtty.o: ..\sys\share\unixtty.c $(HACK_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\unixtty.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\unixtty.c
 $(OTTY)unixmain.o: ..\sys\unix\unixmain.c $(HACK_H) $(INCL)\dlb.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixmain.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixmain.c
 $(OTTY)unixunix.o: ..\sys\unix\unixunix.c $(HACK_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixunix.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixunix.c
 $(OTTY)unixres.o: ..\sys\unix\unixres.c $(CONFIG_H)
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixres.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\unix\unixres.c
 $(OTTY)getline.o: ..\win\tty\getline.c $(HACK_H) $(INCL)\wintty.h \
 		$(INCL)\func_tab.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\getline.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\getline.c
 $(OTTY)termcap.o: ..\win\tty\termcap.c $(HACK_H) $(INCL)\wintty.h \
 		$(INCL)\tcap.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\termcap.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\termcap.c
 $(OTTY)topl.o: ..\win\tty\topl.c $(HACK_H) $(INCL)\tcap.h \
 		$(INCL)\wintty.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\topl.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\topl.c
 $(OTTY)wintty.o: ..\win\tty\wintty.c $(HACK_H) $(INCL)\dlb.h \
 		$(INCL)\tcap.h $(INCL)\wintty.h
-#	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\wintty.c
+	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\tty\wintty.c
 $(OTTY)cursmain.o: ..\win\curses\cursmain.c $(HACK_H) $(INCL)\wincurs.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\curses\cursmain.c
 $(OTTY)curswins.o: ..\win\curses\curswins.c $(HACK_H) \
@@ -2519,7 +2491,7 @@ $(OTTY)cursinvt.o: ..\win\curses\cursinvt.c $(HACK_H) \
 #$(OTTY)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h \
 #		$(INCL)\xwindow.h $(CONFIG_H) $(INCL)\lint.h \
 #		$(INCL)\winX.h $(INCL)\color.h $(INCL)\wintype.h
-##	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\Window.c
+#	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\Window.c
 $(OTTY)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H) $(INCL)\lint.h \
 		$(INCL)\winX.h $(INCL)\color.h $(INCL)\wintype.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\dialogs.c
@@ -2561,36 +2533,37 @@ $(OTTY)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_icon.h ..\win\Qt\qt_streq.h ..\win\Qt\qt_line.h \
 		..\win\Qt\qt_yndlg.h ..\win\Qt\qt_str.h $(INCL)\dlb.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_bind.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_bind.cpp
 $(OTTY)qt_click.o: ..\win\Qt\qt_click.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_click.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_click.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_click.cpp
 $(OTTY)qt_clust.o: ..\win\Qt\qt_clust.cpp ..\win\Qt\qt_clust.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
 $(OTTY)qt_delay.o: ..\win\Qt\qt_delay.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_delay.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_delay.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_delay.cpp
 $(OTTY)qt_glyph.o: ..\win\Qt\qt_glyph.cpp $(HACK_H) \
 		$(INCL)\tile2x11.h ..\win\Qt\qt_pre.h ..\win\Qt\qt_post.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h ..\win\Qt\qt_inv.h \
 		..\win\Qt\qt_map.h ..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_glyph.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_glyph.cpp
 $(OTTY)qt_icon.o: ..\win\Qt\qt_icon.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
-		..\win\Qt\qt_post.h ..\win\Qt\qt_icon.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_icon.cpp
+		..\win\Qt\qt_post.h ..\win\Qt\qt_icon.h ..\win\Qt\qt_str.h \
+		$(QTn_H)
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_icon.cpp
 $(OTTY)qt_inv.o: ..\win\Qt\qt_inv.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_inv.h ..\win\Qt\qt_glyph.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_bind.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_inv.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_inv.cpp
 $(OTTY)qt_key.o: ..\win\Qt\qt_key.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_key.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_key.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_key.cpp
 $(OTTY)qt_line.o: ..\win\Qt\qt_line.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_line.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_line.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_line.cpp
 $(OTTY)qt_main.o: ..\win\Qt\qt_main.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		qt_main.moc ..\win\Qt\qt_bind.h ..\win\Qt\qt_glyph.h \
@@ -2598,62 +2571,62 @@ $(OTTY)qt_main.o: ..\win\Qt\qt_main.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h ..\win\Qt\qt_msg.h \
 		..\win\Qt\qt_set.h ..\win\Qt\qt_stat.h ..\win\Qt\qt_icon.h \
 		..\win\Qt\qt_str.h qt_kde0.moc $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_main.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_main.cpp
 $(OTTY)qt_map.o: ..\win\Qt\qt_map.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_clust.h qt_map.moc ..\win\Qt\qt_click.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_map.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_map.cpp
 $(OTTY)qt_menu.o: ..\win\Qt\qt_menu.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_menu.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_rip.h qt_menu.moc ..\win\Qt\qt_key.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_streq.h \
 		..\win\Qt\qt_line.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_menu.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_menu.cpp
 $(OTTY)qt_msg.o: ..\win\Qt\qt_msg.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_msg.h ..\win\Qt\qt_win.h \
 		qt_msg.moc ..\win\Qt\qt_map.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_msg.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_msg.cpp
 $(OTTY)qt_plsel.o: ..\win\Qt\qt_plsel.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_plsel.h qt_plsel.moc \
 		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_plsel.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_plsel.cpp
 $(OTTY)qt_rip.o: ..\win\Qt\qt_rip.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_rip.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_rip.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_rip.cpp
 $(OTTY)qt_set.o: ..\win\Qt\qt_set.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h qt_set.moc \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_xcmd.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_set.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_set.cpp
 $(OTTY)qt_stat.o: ..\win\Qt\qt_stat.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_stat.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_icon.h qt_stat.moc ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		..\win\Qt\qt_str.h ..\win\Qt\qt_xpms.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_stat.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_stat.cpp
 $(OTTY)qt_str.o: ..\win\Qt\qt_str.cpp ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_str.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_str.cpp
 $(OTTY)qt_streq.o: ..\win\Qt\qt_streq.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_streq.h ..\win\Qt\qt_line.h \
 		..\win\Qt\qt_str.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_streq.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_streq.cpp
 $(OTTY)qt_svsel.o: ..\win\Qt\qt_svsel.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_svsel.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_svsel.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_svsel.cpp
 $(OTTY)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_win.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_click.h \
@@ -2661,39 +2634,40 @@ $(OTTY)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_icon.h ..\win\Qt\qt_map.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_menu.h ..\win\Qt\qt_rip.h ..\win\Qt\qt_msg.h \
 		..\win\Qt\qt_set.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
 $(OTTY)qt_xcmd.o: ..\win\Qt\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
 		..\win\Qt\qt_pre.h ..\win\Qt\qt_post.h ..\win\Qt\qt_xcmd.h \
 		qt_xcmd.moc ..\win\Qt\qt_key.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_xcmd.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_xcmd.cpp
 $(OTTY)qt_yndlg.o: ..\win\Qt\qt_yndlg.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_yndlg.h qt_yndlg.moc \
 		..\win\Qt\qt_key.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_yndlg.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_yndlg.cpp
 qt_kde0.moc: ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_kde0.h
+	$(MOCPATH)  ..\win\Qt\qt_kde0.h
 qt_main.moc: ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_main.h
+	$(MOCPATH)  ..\win\Qt\qt_main.h
 qt_map.moc: ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_map.h
+	$(MOCPATH)  ..\win\Qt\qt_map.h
 qt_menu.moc: ..\win\Qt\qt_menu.h ..\win\Qt\qt_win.h ..\win\Qt\qt_rip.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_menu.h
+	$(MOCPATH)  ..\win\Qt\qt_menu.h
 qt_msg.moc: ..\win\Qt\qt_msg.h ..\win\Qt\qt_win.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_msg.h
+	$(MOCPATH)  ..\win\Qt\qt_msg.h
 qt_plsel.moc: ..\win\Qt\qt_plsel.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_plsel.h
+	$(MOCPATH)  ..\win\Qt\qt_plsel.h
 qt_set.moc: ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_set.h
+	$(MOCPATH)  ..\win\Qt\qt_set.h
 qt_stat.moc: ..\win\Qt\qt_stat.h ..\win\Qt\qt_win.h ..\win\Qt\qt_icon.h \
 		$(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_stat.h
+	$(MOCPATH)  ..\win\Qt\qt_stat.h
 qt_xcmd.moc: ..\win\Qt\qt_xcmd.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_xcmd.h
+	$(MOCPATH)  ..\win\Qt\qt_xcmd.h
 qt_yndlg.moc: ..\win\Qt\qt_yndlg.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_yndlg.h
+	$(MOCPATH)  ..\win\Qt\qt_yndlg.h
+#$(OTTY)tile.o: tile.c $(HACK_H)
 $(OTTY)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\chain\wc_chainin.c
 $(OTTY)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
@@ -2702,7 +2676,7 @@ $(OTTY)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\wintty.h \
 		$(INCL)\func_tab.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\chain\wc_trace.c
 $(OTTY)allmain.o: allmain.c $(HACK_H)
-$(OTTY)alloc.o: alloc.c $(CONFIG_H)
+$(OTTY)alloc.o: alloc.c $(CONFIG_H) $(INCL)\nhlua.h
 $(OTTY)apply.o: apply.c $(HACK_H)
 $(OTTY)artifact.o: artifact.c $(HACK_H) $(INCL)\artifact.h
 $(OTTY)attrib.o: attrib.c $(HACK_H)
@@ -2752,10 +2726,10 @@ $(OTTY)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\monsters.h $(INCL)\objclass.h \
 		$(INCL)\defsym.h $(INCL)\objects.h $(INCL)\wintype.h \
 		$(INCL)\sym.h $(INCL)\artilist.h $(INCL)\dungeon.h \
-		$(INCL)\obj.h $(INCL)\monst.h $(INCL)\mextra.h \
-		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\prop.h \
-		$(INCL)\skills.h $(INCL)\context.h $(INCL)\flag.h \
-		$(INCL)\dlb.h
+		$(INCL)\sndprocs.h $(INCL)\seffects.h $(INCL)\obj.h \
+		$(INCL)\monst.h $(INCL)\mextra.h $(INCL)\you.h \
+		$(INCL)\attrib.h $(INCL)\prop.h $(INCL)\skills.h \
+		$(INCL)\context.h $(INCL)\flag.h $(INCL)\dlb.h
 $(OTTY)mhitm.o: mhitm.c $(HACK_H) $(INCL)\artifact.h
 $(OTTY)mhitu.o: mhitu.c $(HACK_H) $(INCL)\artifact.h
 $(OTTY)minion.o: minion.c $(HACK_H)
@@ -2832,13 +2806,14 @@ $(OTTY)vision.o: vision.c $(HACK_H)
 $(OTTY)weapon.o: weapon.c $(HACK_H)
 $(OTTY)were.o: were.c $(HACK_H)
 $(OTTY)wield.o: wield.c $(HACK_H)
-$(OTTY)windows.o: windows.c $(HACK_H) $(INCL)\wintty.h
+$(OTTY)windows.o: windows.c $(HACK_H) $(INCL)\dlb.h $(INCL)\wintty.h
 $(OTTY)wizard.o: wizard.c $(HACK_H)
 $(OTTY)worm.o: worm.c $(HACK_H)
 $(OTTY)worn.o: worn.c $(HACK_H)
 $(OTTY)write.o: write.c $(HACK_H)
 $(OTTY)zap.o: zap.c $(HACK_H)
-
+#
+#
 #---------------------------------------------
 # GUI
 #
@@ -2848,33 +2823,6 @@ TARGET_CXX=$(cc)
 TARGET_CXXFLAGS=$(CPPFLAGS) $(GUIDEF)
 MOCPATH = moc.exe
 
-# config.h timestamp
-#$(CONFIG_H): $(INCL)\config.h $(INCL)\config1.h $(INCL)\patchlevel.h \
-#		$(INCL)\tradstdc.h $(INCL)\integer.h \
-#		$(INCL)\global.h $(INCL)\coord.h $(INCL)\vmsconf.h \
-#		$(INCL)\cstd.h $(INCL)\nhlua.h $(INCL)\unixconf.h \
-#		$(INCL)\pcconf.h $(INCL)\micro.h $(INCL)\windconf.h \
-#		$(INCL)\warnings.h $(INCL)\fnamesiz.h
-#	touch $(CONFIG_H)
-# hack.h timestamp
-#$(HACK_H): $(INCL)\hack.h $(CONFIG_H) $(INCL)\lint.h $(INCL)\align.h \
-#		$(INCL)\dungeon.h $(INCL)\wintype.h $(INCL)\sym.h \
-#		$(INCL)\defsym.h $(INCL)\mkroom.h $(INCL)\artilist.h \
-#		$(INCL)\objclass.h $(INCL)\objects.h \
-#		$(INCL)\youprop.h $(INCL)\prop.h $(INCL)\permonst.h \
-#		$(INCL)\monattk.h $(INCL)\monflag.h \
-#		$(INCL)\monsters.h $(INCL)\mondata.h \
-#		$(INCL)\context.h $(INCL)\rm.h $(INCL)\botl.h \
-#		$(INCL)\rect.h $(INCL)\region.h $(INCL)\trap.h \
-#		$(INCL)\display.h $(INCL)\vision.h $(INCL)\color.h \
-#		$(INCL)\decl.h $(INCL)\quest.h $(INCL)\spell.h \
-#		$(INCL)\obj.h $(INCL)\engrave.h $(INCL)\you.h \
-#		$(INCL)\attrib.h $(INCL)\monst.h $(INCL)\mextra.h \
-#		$(INCL)\skills.h $(INCL)\timeout.h $(INCL)\flag.h \
-#		$(INCL)\winprocs.h $(INCL)\sndprocs.h \
-#		$(INCL)\seffects.h $(INCL)\sys.h
-#	touch $(HACK_H)
-#
 $(OGUI)pcmain.o: ..\sys\share\pcmain.c $(HACK_H) $(INCL)\dlb.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\sys\share\pcmain.c
 $(OGUI)pcsys.o: ..\sys\share\pcsys.c $(HACK_H) $(INCL)\wintty.h
@@ -2939,7 +2887,7 @@ $(OGUI)cursinvt.o: ..\win\curses\cursinvt.c $(HACK_H) \
 #$(OGUI)Window.o: ..\win\X11\Window.c $(INCL)\xwindowp.h \
 #		$(INCL)\xwindow.h $(CONFIG_H) $(INCL)\lint.h \
 #		$(INCL)\winX.h $(INCL)\color.h $(INCL)\wintype.h
-##	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\Window.c
+#	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\Window.c
 $(OGUI)dialogs.o: ..\win\X11\dialogs.c $(CONFIG_H) $(INCL)\lint.h \
 		$(INCL)\winX.h $(INCL)\color.h $(INCL)\wintype.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) $(X11CFLAGS) -Fo$@ ..\win\X11\dialogs.c
@@ -2981,36 +2929,37 @@ $(OGUI)qt_bind.o: ..\win\Qt\qt_bind.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_icon.h ..\win\Qt\qt_streq.h ..\win\Qt\qt_line.h \
 		..\win\Qt\qt_yndlg.h ..\win\Qt\qt_str.h $(INCL)\dlb.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_bind.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_bind.cpp
 $(OGUI)qt_click.o: ..\win\Qt\qt_click.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_click.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_click.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_click.cpp
 $(OGUI)qt_clust.o: ..\win\Qt\qt_clust.cpp ..\win\Qt\qt_clust.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_clust.cpp
 $(OGUI)qt_delay.o: ..\win\Qt\qt_delay.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_delay.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_delay.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_delay.cpp
 $(OGUI)qt_glyph.o: ..\win\Qt\qt_glyph.cpp $(HACK_H) \
 		$(INCL)\tile2x11.h ..\win\Qt\qt_pre.h ..\win\Qt\qt_post.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h ..\win\Qt\qt_inv.h \
 		..\win\Qt\qt_map.h ..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_glyph.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_glyph.cpp
 $(OGUI)qt_icon.o: ..\win\Qt\qt_icon.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
-		..\win\Qt\qt_post.h ..\win\Qt\qt_icon.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_icon.cpp
+		..\win\Qt\qt_post.h ..\win\Qt\qt_icon.h ..\win\Qt\qt_str.h \
+		$(QTn_H)
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_icon.cpp
 $(OGUI)qt_inv.o: ..\win\Qt\qt_inv.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_inv.h ..\win\Qt\qt_glyph.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_bind.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_inv.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_inv.cpp
 $(OGUI)qt_key.o: ..\win\Qt\qt_key.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_key.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_key.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_key.cpp
 $(OGUI)qt_line.o: ..\win\Qt\qt_line.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_line.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_line.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_line.cpp
 $(OGUI)qt_main.o: ..\win\Qt\qt_main.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		qt_main.moc ..\win\Qt\qt_bind.h ..\win\Qt\qt_glyph.h \
@@ -3018,62 +2967,62 @@ $(OGUI)qt_main.o: ..\win\Qt\qt_main.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h ..\win\Qt\qt_msg.h \
 		..\win\Qt\qt_set.h ..\win\Qt\qt_stat.h ..\win\Qt\qt_icon.h \
 		..\win\Qt\qt_str.h qt_kde0.moc $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_main.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_main.cpp
 $(OGUI)qt_map.o: ..\win\Qt\qt_map.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_clust.h qt_map.moc ..\win\Qt\qt_click.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_map.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_map.cpp
 $(OGUI)qt_menu.o: ..\win\Qt\qt_menu.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_menu.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_rip.h qt_menu.moc ..\win\Qt\qt_key.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_streq.h \
 		..\win\Qt\qt_line.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_menu.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_menu.cpp
 $(OGUI)qt_msg.o: ..\win\Qt\qt_msg.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_msg.h ..\win\Qt\qt_win.h \
 		qt_msg.moc ..\win\Qt\qt_map.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_msg.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_msg.cpp
 $(OGUI)qt_plsel.o: ..\win\Qt\qt_plsel.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_plsel.h qt_plsel.moc \
 		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_set.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_plsel.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_plsel.cpp
 $(OGUI)qt_rip.o: ..\win\Qt\qt_rip.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_rip.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_rip.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_rip.cpp
 $(OGUI)qt_set.o: ..\win\Qt\qt_set.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h qt_set.moc \
 		..\win\Qt\qt_glyph.h ..\win\Qt\qt_xcmd.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_set.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_set.cpp
 $(OGUI)qt_stat.o: ..\win\Qt\qt_stat.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_stat.h ..\win\Qt\qt_win.h \
 		..\win\Qt\qt_icon.h qt_stat.moc ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h \
 		..\win\Qt\qt_str.h ..\win\Qt\qt_xpms.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_stat.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_stat.cpp
 $(OGUI)qt_str.o: ..\win\Qt\qt_str.cpp ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_str.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_str.cpp
 $(OGUI)qt_streq.o: ..\win\Qt\qt_streq.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_streq.h ..\win\Qt\qt_line.h \
 		..\win\Qt\qt_str.h ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_streq.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_streq.cpp
 $(OGUI)qt_svsel.o: ..\win\Qt\qt_svsel.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_svsel.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_str.h \
 		$(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_svsel.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_svsel.cpp
 $(OGUI)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_win.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_click.h \
@@ -3081,39 +3030,40 @@ $(OGUI)qt_win.o: ..\win\Qt\qt_win.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_icon.h ..\win\Qt\qt_map.h ..\win\Qt\qt_clust.h \
 		..\win\Qt\qt_menu.h ..\win\Qt\qt_rip.h ..\win\Qt\qt_msg.h \
 		..\win\Qt\qt_set.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_win.cpp
 $(OGUI)qt_xcmd.o: ..\win\Qt\qt_xcmd.cpp $(HACK_H) $(INCL)\func_tab.h \
 		..\win\Qt\qt_pre.h ..\win\Qt\qt_post.h ..\win\Qt\qt_xcmd.h \
 		qt_xcmd.moc ..\win\Qt\qt_key.h ..\win\Qt\qt_bind.h \
 		..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h ..\win\Qt\qt_set.h \
 		..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_xcmd.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_xcmd.cpp
 $(OGUI)qt_yndlg.o: ..\win\Qt\qt_yndlg.cpp $(HACK_H) ..\win\Qt\qt_pre.h \
 		..\win\Qt\qt_post.h ..\win\Qt\qt_yndlg.h qt_yndlg.moc \
 		..\win\Qt\qt_key.h ..\win\Qt\qt_str.h $(QTn_H)
-	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_yndlg.cpp
+#	$(TARGET_CXX) $(TARGET_CXXFLAGS) -Fo$@ ..\win\Qt\qt_yndlg.cpp
 qt_kde0.moc: ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_kde0.h
+	$(MOCPATH)  ..\win\Qt\qt_kde0.h
 qt_main.moc: ..\win\Qt\qt_main.h ..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_main.h
+	$(MOCPATH)  ..\win\Qt\qt_main.h
 qt_map.moc: ..\win\Qt\qt_map.h ..\win\Qt\qt_win.h ..\win\Qt\qt_clust.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_map.h
+	$(MOCPATH)  ..\win\Qt\qt_map.h
 qt_menu.moc: ..\win\Qt\qt_menu.h ..\win\Qt\qt_win.h ..\win\Qt\qt_rip.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_menu.h
+	$(MOCPATH)  ..\win\Qt\qt_menu.h
 qt_msg.moc: ..\win\Qt\qt_msg.h ..\win\Qt\qt_win.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_msg.h
+	$(MOCPATH)  ..\win\Qt\qt_msg.h
 qt_plsel.moc: ..\win\Qt\qt_plsel.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_plsel.h
+	$(MOCPATH)  ..\win\Qt\qt_plsel.h
 qt_set.moc: ..\win\Qt\qt_set.h ..\win\Qt\qt_bind.h ..\win\Qt\qt_main.h \
 		..\win\Qt\qt_kde0.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_set.h
+	$(MOCPATH)  ..\win\Qt\qt_set.h
 qt_stat.moc: ..\win\Qt\qt_stat.h ..\win\Qt\qt_win.h ..\win\Qt\qt_icon.h \
 		$(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_stat.h
+	$(MOCPATH)  ..\win\Qt\qt_stat.h
 qt_xcmd.moc: ..\win\Qt\qt_xcmd.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_xcmd.h
+	$(MOCPATH)  ..\win\Qt\qt_xcmd.h
 qt_yndlg.moc: ..\win\Qt\qt_yndlg.h $(QTn_H)
-	$(MOCPATH) ..\win\Qt\qt_yndlg.h
+	$(MOCPATH)  ..\win\Qt\qt_yndlg.h
+#$(OGUI)tile.o: tile.c $(HACK_H)
 $(OGUI)wc_chainin.o: ..\win\chain\wc_chainin.c $(HACK_H)
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\chain\wc_chainin.c
 $(OGUI)wc_chainout.o: ..\win\chain\wc_chainout.c $(HACK_H)
@@ -3122,7 +3072,7 @@ $(OGUI)wc_trace.o: ..\win\chain\wc_trace.c $(HACK_H) $(INCL)\wintty.h \
 		$(INCL)\func_tab.h
 #	$(TARGET_CC) $(TARGET_CFLAGS) -Fo$@ ..\win\chain\wc_trace.c
 $(OGUI)allmain.o: allmain.c $(HACK_H)
-$(OGUI)alloc.o: alloc.c $(CONFIG_H)
+$(OGUI)alloc.o: alloc.c $(CONFIG_H) $(INCL)\nhlua.h
 $(OGUI)apply.o: apply.c $(HACK_H)
 $(OGUI)artifact.o: artifact.c $(HACK_H) $(INCL)\artifact.h
 $(OGUI)attrib.o: attrib.c $(HACK_H)
@@ -3172,10 +3122,10 @@ $(OGUI)mdlib.o: mdlib.c $(CONFIG_H) $(INCL)\permonst.h \
 		$(INCL)\monsters.h $(INCL)\objclass.h \
 		$(INCL)\defsym.h $(INCL)\objects.h $(INCL)\wintype.h \
 		$(INCL)\sym.h $(INCL)\artilist.h $(INCL)\dungeon.h \
-		$(INCL)\obj.h $(INCL)\monst.h $(INCL)\mextra.h \
-		$(INCL)\you.h $(INCL)\attrib.h $(INCL)\prop.h \
-		$(INCL)\skills.h $(INCL)\context.h $(INCL)\flag.h \
-		$(INCL)\dlb.h
+		$(INCL)\sndprocs.h $(INCL)\seffects.h $(INCL)\obj.h \
+		$(INCL)\monst.h $(INCL)\mextra.h $(INCL)\you.h \
+		$(INCL)\attrib.h $(INCL)\prop.h $(INCL)\skills.h \
+		$(INCL)\context.h $(INCL)\flag.h $(INCL)\dlb.h
 $(OGUI)mhitm.o: mhitm.c $(HACK_H) $(INCL)\artifact.h
 $(OGUI)mhitu.o: mhitu.c $(HACK_H) $(INCL)\artifact.h
 $(OGUI)minion.o: minion.c $(HACK_H)
@@ -3197,7 +3147,7 @@ $(OGUI)mthrowu.o: mthrowu.c $(HACK_H)
 $(OGUI)muse.o: muse.c $(HACK_H)
 $(OGUI)music.o: music.c $(HACK_H)
 $(OGUI)nhlua.o: nhlua.c $(HACK_H) $(INCL)\dlb.h
-	$(Q)$(CC) $(CFLAGS) -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(@B).c
+	$(Q)$(CC) $(CFLAGS) $(GUIDEF) -wd4324 $(CROSSCOMPILE) $(CROSSCOMPILE_TARGET) -Fo$@ $(@B).c
 $(OGUI)nhlsel.o: nhlsel.c $(HACK_H) $(INCL)\sp_lev.h
 $(OGUI)nhlobj.o: nhlobj.c $(HACK_H) $(INCL)\sp_lev.h
 $(OGUI)o_init.o: o_init.c $(HACK_H)
@@ -3252,11 +3202,10 @@ $(OGUI)vision.o: vision.c $(HACK_H)
 $(OGUI)weapon.o: weapon.c $(HACK_H)
 $(OGUI)were.o: were.c $(HACK_H)
 $(OGUI)wield.o: wield.c $(HACK_H)
-$(OGUI)windows.o: windows.c $(HACK_H) $(INCL)\wintty.h
+$(OGUI)windows.o: windows.c $(HACK_H) $(INCL)\dlb.h $(INCL)\wintty.h
 $(OGUI)wizard.o: wizard.c $(HACK_H)
 $(OGUI)worm.o: worm.c $(HACK_H)
 $(OGUI)worn.o: worn.c $(HACK_H)
 $(OGUI)write.o: write.c $(HACK_H)
 $(OGUI)zap.o: zap.c $(HACK_H)
-
 # DEPENDENCIES MUST END AT END OF FILE
