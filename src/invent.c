@@ -2935,7 +2935,9 @@ itemactions(struct obj *otmp)
     }
 
     /* a: apply */
-    if (otmp->otyp == CREAM_PIE)
+    if (otmp->oclass == COIN_CLASS)
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Flip a coin");
+    else if (otmp->otyp == CREAM_PIE)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Hit yourself with this cream pie");
     else if (otmp->otyp == BULLWHIP)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', "Lash out with this whip");

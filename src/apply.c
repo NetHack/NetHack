@@ -40,6 +40,7 @@ static int use_grapple(struct obj *);
 static int do_break_wand(struct obj *);
 static int apply_ok(struct obj *);
 static int flip_through_book(struct obj *);
+static int flip_coin(struct obj *);
 static boolean figurine_location_checks(struct obj *, coord *, boolean);
 static boolean check_jump(genericptr_t, coordxy, coordxy);
 static boolean is_valid_jump_pos(coordxy, coordxy, int, boolean);
@@ -3963,7 +3964,7 @@ apply_ok(struct obj *obj)
     /* all tools, all wands (breaking), all spellbooks (flipping through -
        including blank/novel/Book of the Dead) */
     if (obj->oclass == TOOL_CLASS || obj->oclass == WAND_CLASS
-        || obj->oclass == SPBOOK_CLASS)
+        || obj->oclass == SPBOOK_CLASS || obj->oclass == COIN_CLASS)
         return GETOBJ_SUGGEST;
 
     /* certain weapons */
@@ -4035,6 +4036,9 @@ doapply(void)
 
     if (obj->oclass == SPBOOK_CLASS)
         return flip_through_book(obj);
+
+    if (obj->oclass == COIN_CLASS)
+        return flip_coin(obj);
 
     switch (obj->otyp) {
     case BLINDFOLD:
@@ -4309,6 +4313,37 @@ flip_through_book(struct obj *obj)
               fadeness[findx]);
     }
 
+    return ECMD_TIME;
+}
+
+static int
+flip_coin(struct obj *obj)
+{
+    struct obj *otmp = obj;
+    boolean lose_coin = FALSE;
+
+    You("flip %s.", an(xname(obj)));
+    if (Underwater) {
+        pline_The("%s floats away.", xname(obj));
+        lose_coin = TRUE;
+    } else if (Glib || Fumbling || (ACURR(A_DEX) < 10 && !rn2(ACURR(A_DEX)))) {
+        pline_The("%s slips between your %s.", xname(obj),
+              fingers_or_gloves(FALSE));
+        lose_coin = TRUE;
+    }
+
+    if (lose_coin) {
+        if (otmp->quan > 1L) {
+            otmp = splitobj(otmp, 1L);
+        }
+        if (carried(otmp))
+            dropx(otmp);
+        else
+            stackobj(otmp);
+        return ECMD_TIME;
+    }
+    pline_The("%s comes up %s.", xname(obj), 
+                                rn2(2) ? "heads" : "tails");
     return ECMD_TIME;
 }
 
