@@ -960,7 +960,7 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
             } else if (user_typed_name && pass == 0 && !pass1found_in_file)
-                pline("I don't have any information on those things.");
+                pline("You don't have any information on those things.");
         }
     }
     goto checkfile_done; /* skip error feedback */
@@ -1450,6 +1450,7 @@ do_look(int mode, coord *click_cc)
     boolean quick = (mode == 1); /* use cursor; don't search for "more info" */
     boolean clicklook = (mode == 2); /* right mouse-click method */
     char out_str[BUFSZ] = DUMMY;
+    struct _cmd_queue cq, *cmdq;
     const char *firstmatch = 0;
     struct permonst *pm = 0, *supplemental_pm = 0;
     int i = '\0', ans = 0;
@@ -1462,6 +1463,16 @@ do_look(int mode, coord *click_cc)
 
     cc.x = 0;
     cc.y = 0;
+
+    if ((cmdq = cmdq_pop()) != 0) {
+        cq = *cmdq;
+        free((genericptr_t) cmdq);
+        if (cq.typ == CMDQ_KEY)
+            i = cq.key;
+        else
+            cmdq_clear(CQ_CANNED);
+        goto dowhatiscmd;
+    }
 
     if (!clicklook) {
         if (quick) {
@@ -1533,6 +1544,7 @@ do_look(int mode, coord *click_cc)
             destroy_nhwindow(win);
         }
 
+dowhatiscmd:
         switch (i) {
         default:
         case 'q':
