@@ -2679,6 +2679,7 @@ enum item_action_actions {
     IA_WEAR_OBJ,
     IA_SWAPWEAPON,
     IA_ZAP_OBJ,
+    IA_WHATIS_OBJ, /* '/' specify inventory object */
 };
 
 /* construct text for the menu entries for IA_NAME_OBJ and IA_NAME_OTYP */
@@ -2896,6 +2897,11 @@ itemactions_pushkeys(struct obj *otmp, int act)
             break;
         case IA_ZAP_OBJ:
             cmdq_add_ec(CQ_CANNED, dozap);
+            cmdq_add_key(CQ_CANNED, otmp->invlet);
+            break;
+        case IA_WHATIS_OBJ:
+            cmdq_add_ec(CQ_CANNED, dowhatis);
+            cmdq_add_key(CQ_CANNED, 'i');
             cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         }
@@ -3185,6 +3191,9 @@ itemactions(struct obj *otmp)
     /* z: Zap wand */
     if (otmp->oclass == WAND_CLASS)
         ia_addmenu(win, IA_ZAP_OBJ, 'z', "Zap this wand to release its magic");
+
+    /* ?: Look up an item in the game's database */
+    ia_addmenu(win, IA_WHATIS_OBJ, '/', "Look up information about this item");
 
     Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
     end_menu(win, buf);
