@@ -40,6 +40,7 @@ static int use_grapple(struct obj *);
 static int do_break_wand(struct obj *);
 static int apply_ok(struct obj *);
 static int flip_through_book(struct obj *);
+static int flip_coin(struct obj *);
 static boolean figurine_location_checks(struct obj *, coord *, boolean);
 static boolean check_jump(genericptr_t, coordxy, coordxy);
 static boolean is_valid_jump_pos(coordxy, coordxy, int, boolean);
@@ -3966,6 +3967,11 @@ apply_ok(struct obj *obj)
         || obj->oclass == SPBOOK_CLASS)
         return GETOBJ_SUGGEST;
 
+    /* applying coins to flip them is a minor easter egg, so do not suggest
+       coin application to the player */
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_DOWNPLAY;
+
     /* certain weapons */
     if (obj->oclass == WEAPON_CLASS
         && (is_pick(obj) || is_axe(obj) || is_pole(obj)
@@ -4035,6 +4041,9 @@ doapply(void)
 
     if (obj->oclass == SPBOOK_CLASS)
         return flip_through_book(obj);
+
+    if (obj->oclass == COIN_CLASS)
+        return flip_coin(obj);
 
     switch (obj->otyp) {
     case BLINDFOLD:
@@ -4309,6 +4318,38 @@ flip_through_book(struct obj *obj)
               fadeness[findx]);
     }
 
+    return ECMD_TIME;
+}
+
+static int
+flip_coin(struct obj *obj)
+{
+    struct obj *otmp = obj;
+    boolean lose_coin = FALSE;
+
+    You("flip %s.", an(cxname_singular(obj)));
+    if (Underwater) {
+        pline_The("%s floats away.", xname(obj));
+        lose_coin = TRUE;
+    } else if (Glib || Fumbling || (ACURR(A_DEX) < 10 && !rn2(ACURR(A_DEX)))) {
+        pline_The("%s slips between your %s.", xname(obj),
+              fingers_or_gloves(FALSE));
+        lose_coin = TRUE;
+    }
+
+    if (lose_coin) {
+        if (otmp->quan > 1L)
+            otmp = splitobj(otmp, 1L);
+        dropx(otmp);
+        return ECMD_TIME;
+    }
+    if (Hallucination) {
+        pline(rn2(100) ? "Wow, a double header!"
+                        /* edge case */
+                       : "The coin miraculously lands on its edge!");
+    } else {
+        pline("It comes up %s.", rn2(2) ? "heads" : "tails");
+    }
     return ECMD_TIME;
 }
 
