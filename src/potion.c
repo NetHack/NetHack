@@ -806,10 +806,10 @@ peffect_invisibility(struct obj *otmp)
     } else {
         self_invis_message();
     }
-    if (otmp->blessed)
+    if (otmp->blessed && !rn2(HInvis ? 15 : 30))
         HInvis |= FROMOUTSIDE;
     else
-        incr_itimeout(&HInvis, rn1(15, 31));
+        incr_itimeout(&HInvis, d(6 - 3 * bcsign(otmp), 100) + 100);
     newsym(u.ux, u.uy); /* update position */
     if (otmp->cursed) {
         pline("For some reason, you feel your presence is known.");
