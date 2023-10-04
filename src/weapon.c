@@ -663,6 +663,8 @@ select_hwep(struct monst *mtmp)
 
     if (is_giant(mtmp->data)) /* giants just love to use clubs */
         Oselect(CLUB);
+    else if (mtmp->data == &mons[PM_BALROG] && uwep)
+        Oselect(BULLWHIP);
 
     /* only strong monsters can wield big (esp. long) weapons */
     /* big weapon is basically the same as bimanual */
