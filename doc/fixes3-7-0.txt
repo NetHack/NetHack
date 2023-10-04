@@ -1253,6 +1253,7 @@ steam vortices and fog clouds leave steam clouds behind
 fog clouds maintain any clouds they are in, even poisonous ones
 bone devils summon skeletons
 adjust wand of make invisible and potion of invisibility effects
+barbed devils have an attack that sticks you to them
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

@@ -3175,16 +3175,22 @@ mhitm_ad_stck(
 {
     boolean negated = mhitm_mgc_atk_negated(magr, mdef, FALSE);
     struct permonst *pd = mdef->data;
+    boolean barbs = (magr->data == &mons[PM_BARBED_DEVIL]);
 
     if (magr == &gy.youmonst) {
         /* uhitm */
-        if (!negated && !sticks(pd) && next2u(mdef->mx, mdef->my))
+        if (!negated && !sticks(pd) && next2u(mdef->mx, mdef->my)) {
             set_ustuck(mdef); /* it's now stuck to you */
+            if (barbs)
+                Your("barbs stick to %s!", y_monnam(mdef));
+        }
     } else if (mdef == &gy.youmonst) {
         /* mhitu */
         hitmsg(magr, mattk);
         if (!negated && !u.ustuck && !sticks(pd)) {
             set_ustuck(magr);
+            if (barbs)
+                pline("The barbs stick to you!");
         }
     } else {
         /* mhitm */
@@ -5168,6 +5174,9 @@ mhitm_knockback(
         /* hero knocks unseen foe back; noticed by touch */
         You_feel("%s be knocked %s!", some_mon_nam(mdef), knockedhow);
     }
+
+    if (u.ustuck && (u_def || u_agr))
+        unstuck(u.ustuck);
 
     /* do the actual knockback effect */
     if (u_def) {
