@@ -4336,14 +4336,16 @@ flip_coin(struct obj *obj)
         if (otmp->quan > 1L) {
             otmp = splitobj(otmp, 1L);
         }
-        if (carried(otmp))
-            dropx(otmp);
-        else
-            stackobj(otmp);
+        dropx(otmp);
         return ECMD_TIME;
     }
-    pline_The("%s comes up %s.", xname(obj), 
-                                rn2(2) ? "heads" : "tails");
+    if (Hallucination) {
+        pline(rn2(100) ? "Wow, a double header!"
+                       : "The coin miraculously lands on its edge!");
+    } else {
+        pline_The("%s comes up %s.", xname(obj), 
+                                    rn2(2) ? "heads" : "tails");
+    }
     return ECMD_TIME;
 }
 
