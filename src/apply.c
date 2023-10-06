@@ -3964,8 +3964,13 @@ apply_ok(struct obj *obj)
     /* all tools, all wands (breaking), all spellbooks (flipping through -
        including blank/novel/Book of the Dead) */
     if (obj->oclass == TOOL_CLASS || obj->oclass == WAND_CLASS
-        || obj->oclass == SPBOOK_CLASS || obj->oclass == COIN_CLASS)
+        || obj->oclass == SPBOOK_CLASS)
         return GETOBJ_SUGGEST;
+
+    /* applying coins to flip them is a minor easter egg, so do not suggest
+       coin application to the player */
+    if (obj->oclass == COIN_CLASS)
+        return GETOBJ_DOWNPLAY;
 
     /* certain weapons */
     if (obj->oclass == WEAPON_CLASS
@@ -4322,7 +4327,7 @@ flip_coin(struct obj *obj)
     struct obj *otmp = obj;
     boolean lose_coin = FALSE;
 
-    You("flip %s.", an(xname(obj)));
+    You("flip %s.", an(cxname_singular(obj)));
     if (Underwater) {
         pline_The("%s floats away.", xname(obj));
         lose_coin = TRUE;
@@ -4343,8 +4348,7 @@ flip_coin(struct obj *obj)
                         /* edge case */
                        : "The coin miraculously lands on its edge!");
     } else {
-        pline_The("%s comes up %s.", xname(obj), 
-                                    rn2(2) ? "heads" : "tails");
+        pline("It comes up %s.", rn2(2) ? "heads" : "tails");
     }
     return ECMD_TIME;
 }
