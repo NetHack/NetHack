@@ -1510,6 +1510,7 @@ dungeon*
 	As from the Center thrice to th' utmost Pole.
 		[ Paradise Lost, by John Milton ]
 ~dwarf ??m*
+~dwar* cloak
 #~dwar* cave*man
 dwarf*
 	Dwarfs have faces like men (ugly men, with wrinkled, leathery
@@ -1533,6 +1534,15 @@ dwarf*
 	they like, and a dwarvish gift is likely to turn to gold in
 	the hand.  But on the whole they are a snappish lot.
 	    [ The Immortals, by Derek and Julia Parker ]
+# accept "dwarfish" and "dwarvish"
+dwar* cloak
+hooded cloak
+	That's how they all came to start, jogging off from the inn one
+	fine morning just before May, on laden ponies; and Bilbo was
+	wearing a dark-green hood (a little weather-stained) and a
+	dark-green cloak borrowed from Dwalin.  They were too large for
+	him, and he looked rather comic.
+		[ The Hobbit, by J.R.R. Tolkien ]
 earendil
 elwing
 	In after days, when because of the triumph of Morgoth Elves and
