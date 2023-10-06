@@ -862,6 +862,12 @@ checkfile(
         if (alt && (ap = strstri(alt, " (")) != 0 && ap > alt)
             *ap = '\0';
 
+        /* If the object's name matches the player-specified fruitname,
+           then "fruit" is the alternate description. We do this here so that
+           if the fruit name is an extant object, looking at the fruit yields
+           that object's description. */
+        if (!alt && !strncmpi(dbase_str, gp.pl_fruit, PL_FSIZ))
+            alt = strcpy(newstr, obj_descr[SLIME_MOLD].oc_name);
         /*
          * If the object is named, then the name is the alternate description;
          * otherwise, the result of makesingular() applied to the name is.
@@ -869,7 +875,7 @@ checkfile(
          * user will usually be found under their name, rather than under
          * their object type, so looking for a singular form is pointless.
          */
-        if (!alt)
+        else if (!alt)
             alt = makesingular(dbase_str);
 
         pass1found_in_file = FALSE;
