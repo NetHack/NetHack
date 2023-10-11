@@ -1311,14 +1311,15 @@ seffect_confuse_monster(struct obj **sobjp)
             make_confused(0L, TRUE);
         }
     } else {
-        int incr = 0;
+        /* scroll vs spell */
+        int incr = (sobj->oclass == SCROLL_CLASS) ? 3 : 0;
 
         if (!sblessed) {
             Your("%s%s %s%s.", makeplural(body_part(HAND)),
                  altfeedback ? "" : " begin to glow",
                  altfeedback ? (const char *) "tingle" : hcolor(NH_RED),
                  u.umconf ? " even more" : "");
-            incr = rnd(2);
+            incr += rnd(2);
         } else {
             if (altfeedback)
                 Your("%s tingle %s sharply.", makeplural(body_part(HAND)),
@@ -1327,7 +1328,7 @@ seffect_confuse_monster(struct obj **sobjp)
                 Your("%s glow %s brilliant %s.",
                      makeplural(body_part(HAND)),
                      u.umconf ? "an even more" : "a", hcolor(NH_RED));
-            incr = rn1(8, 2);
+            incr += rn1(8, 2);
         }
         /* after a while, repeated uses become less effective */
         if (u.umconf >= 40)
