@@ -901,8 +901,10 @@ peffect_monster_detection(struct obj *otmp)
         /* after a while, repeated uses become less effective */
         if ((HDetect_monsters & TIMEOUT) >= 300L)
             i = 1;
-        else
+        else if (otmp->oclass == SPBOOK_CLASS)
             i = rn1(40, 21);
+        else /* potion */
+            i = rn2(100) + 100;
         incr_itimeout(&HDetect_monsters, i);
         for (x = 1; x < COLNO; x++) {
             for (y = 0; y < ROWNO; y++) {
