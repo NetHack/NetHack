@@ -152,6 +152,7 @@ static void t_warn(struct rm *);
 static int wall_angle(struct rm *);
 
 #define remember_topology(x, y) (gl.lastseentyp[x][y] = levl[x][y].typ)
+#define _glyph_at(x, y) gg.gbuf[y][x].glyphinfo.glyph
 
 /*
  *      See display.h for descriptions of tp_sensemon() through
@@ -1528,7 +1529,7 @@ see_traps(void)
     int glyph;
 
     for (trap = gf.ftrap; trap; trap = trap->ntrap) {
-        glyph = glyph_at(trap->tx, trap->ty);
+        glyph = _glyph_at(trap->tx, trap->ty);
         if (glyph_is_trap(glyph))
             newsym(trap->tx, trap->ty);
     }
@@ -1599,17 +1600,31 @@ doredraw(void)
     return ECMD_OK;
 }
 
+/* the main refresh-the-screen routine */
 void
 docrt(void)
 {
+    docrt_flags(docrtRecalc);
+}
+
+/* docrt() with finer control */
+void
+docrt_flags(int refresh_flags)
+{
     coordxy x, y;
     register struct rm *lev;
+    boolean maponly = (refresh_flags & docrtMapOnly) != 0,
+            redrawonly = (refresh_flags & docrtRefresh) != 0;
 
     if (!u.ux || gp.program_state.in_docrt)
         return; /* display isn't ready yet */
 
     gp.program_state.in_docrt = TRUE;
 
+    if (redrawonly) {
+        redraw_map(FALSE);
+        goto post_map;
+    }
     if (u.uswallow) {
         swallowed(1);
         goto post_map;
@@ -1618,7 +1633,7 @@ docrt(void)
         under_water(1);
         goto post_map;
     }
-    if (u.uburied) {
+    if (u.uburied) { /* [not implemented] */
         under_ground(1);
         goto post_map;
     }
@@ -1648,17 +1663,20 @@ docrt(void)
 
  post_map:
 
-    /* perm_invent */
-    update_inventory();
-
-    gc.context.botlx = 1; /* force a redraw of the bottom line */
+    if (!maponly) {
+        /* perm_invent */
+        update_inventory();
+        /* status */
+        gc.context.botlx = 1; /* force a redraw of the bottom lines */
+        /* note: caller needs to call bot() to actually redraw status */
+    }
     gp.program_state.in_docrt = FALSE;
 }
 
 /* for panning beyond a clipped region; resend the current map data to
    the interface rather than use docrt()'s regeneration of that data */
 void
-redraw_map(void)
+redraw_map(boolean cursor_on_u)
 {
     coordxy x, y;
     int glyph;
@@ -1682,12 +1700,13 @@ redraw_map(void)
      */
     for (y = 0; y < ROWNO; ++y)
         for (x = 1; x < COLNO; ++x) {
-            glyph = glyph_at(x, y); /* not levl[x][y].glyph */
-            get_bkglyph_and_framecolor(x, y, &bkglyphinfo.glyph, &bkglyphinfo.framecolor);
+            glyph = _glyph_at(x, y); /* not levl[x][y].glyph */
+            get_bkglyph_and_framecolor(x, y, &bkglyphinfo.glyph,
+                                       &bkglyphinfo.framecolor);
             print_glyph(WIN_MAP, x, y,
                         Glyphinfo_at(x, y, glyph), &bkglyphinfo);
         }
-    flush_screen(1);
+    flush_screen(cursor_on_u);
 #ifndef UNBUFFERED_GLYPHINFO
     nhUse(glyph);
 #endif
@@ -2023,7 +2042,7 @@ cls(void)
         return;
     in_cls = TRUE;
     display_nhwindow(WIN_MESSAGE, FALSE); /* flush messages */
-    gc.context.botlx = 1;                    /* force update of botl window */
+    gc.context.botlx = 1;                 /* force update of botl window */
     clear_nhwindow(WIN_MAP);              /* clear physical screen */
 
     clear_glyph_buffer(); /* force gbuf[][].glyph to unexplored */
@@ -2073,7 +2092,8 @@ flush_screen(int cursor_on_u)
         for (; x <= gg.gbuf_stop[y]; gptr++, x++) {
             get_bkglyph_and_framecolor(x, y, &bkglyph, &bkglyphinfo.framecolor);
             if (gptr->gnew
-                || (gw.wsettings.map_frame_color != NO_COLOR && bkglyphinfo.framecolor != NO_COLOR)) {
+                || (gw.wsettings.map_frame_color != NO_COLOR
+                    && bkglyphinfo.framecolor != NO_COLOR)) {
                 map_glyphinfo(x, y, bkglyph, 0, &bkglyphinfo); /* won't touch framecolor */
                 print_glyph(WIN_MAP, x, y,
                             Glyphinfo_at(x, y, gptr->glyph), &bkglyphinfo);
@@ -2298,7 +2318,7 @@ glyph_at(coordxy x, coordxy y)
 {
     if (x < 0 || y < 0 || x >= COLNO || y >= ROWNO)
         return cmap_to_glyph(S_room); /* XXX */
-    return gg.gbuf[y][x].glyphinfo.glyph;
+    return gg.gbuf[y][x].glyphinfo.glyph; /* _glyph_at(x,y) */
 }
 
 #ifdef UNBUFFERED_GLYPHINFO
@@ -3671,6 +3691,7 @@ fn_cmap_to_glyph(int cmap)
    end of the source code seen by the compiler (there are lots of other
    macros defined above...) */
 #undef remember_topology
+#undef _glyph_at
 #undef DETECTED
 #undef PHYSICALLY_SEEN
 #undef is_worm_tail

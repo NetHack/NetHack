@@ -3438,7 +3438,7 @@ tty_cliparound(int x, int y)
         clipy = clipymax - (LI - 1 - iflags.wc2_statuslines);
     }
     if (clipx != oldx || clipy != oldy) {
-        redraw_map(); /* ask the core to resend the map window's data */
+        redraw_map(TRUE); /* ask the core to resend the map window's data */
     }
 }
 #endif /* CLIPPING */

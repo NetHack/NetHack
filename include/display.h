@@ -1033,6 +1033,14 @@ enum glyph_offsets {
 #define MG_FEMALE  0x02000  /* represents a female mon or statue of one */
 #define MG_BADXY   0x04000  /* bad coordinates were passed */
 
+/* docrt(): re-draw whole screen; docrt_flags(): docrt() with more control */
+enum docrt_flags_bits {
+    docrtRecalc  = 0, /* full docrt(), recalculate what the map should show */
+    docrtRefresh = 1, /* redraw_map(), draw what we think the map shows */
+    docrtMapOnly = 2, /* ORed with Recalc or Refresh; draw the map but not
+                       * status or perminv */
+};
+
 typedef struct {
     xint8 gnew; /* perhaps move this bit into the rm structure. */
     glyph_info glyphinfo;
