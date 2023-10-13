@@ -15,7 +15,7 @@ static void trap_description(char *, int, coordxy, coordxy);
 static void look_at_object(char *, coordxy, coordxy, int);
 static void look_at_monster(char *, char *, struct monst *, coordxy, coordxy);
 static struct permonst *lookat(coordxy, coordxy, char *, char *);
-static void checkfile(char *, struct permonst *, boolean, boolean, char *);
+static void checkfile(char *, struct permonst *, unsigned, char *);
 static int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
                           boolean *, const char **, char *);
@@ -44,6 +44,16 @@ extern void port_help(void);
 #endif
 static char *setopt_cmd(char *);
 static boolean add_quoted_engraving(coordxy, coordxy, char *);
+
+enum checkfileflags {
+    chkfilNone     = 0,
+    chkfilUsrTyped = 1,
+    chkfilDontAsk  = 2,
+    chkfilIaCheck  = 4,
+};
+
+/* checkfile() sets this in lieu of a return value if given IaCheck flag */
+static char checkfile_hack; /* once set, always 'F' or 'T' */
 
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
@@ -680,6 +690,21 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
     return (pm && !Hallucination) ? pm : (struct permonst *) 0;
 }
 
+/* used to decide whether the context-sensitive inventory action menu for
+   item 'otmp' should include the "/ - look up this item" choice */
+boolean
+ia_checkfile(struct obj *otmp)
+{
+    char itemnam[BUFSZ];
+
+    checkfile_hack = 'F'; /* checkfile() might change it */
+    /* singular() of xname() of otmp is what "/i" looks up */
+    Strcpy(itemnam, singular(otmp, xname));
+    checkfile(itemnam, (struct permonst *) 0,
+              chkfilIaCheck | chkfilDontAsk, (char *) 0);
+    return (checkfile_hack == 'T');
+}
+
 /*
  * Look in the "data" file for more info.  Called if the user typed in the
  * whole name (user_typed_name == TRUE), or we've found a possible match
@@ -691,12 +716,18 @@ lookat(coordxy x, coordxy y, char *buf, char *monbuf)
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
  */
 static void
-checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
-          boolean without_asking, char *supplemental_name)
+checkfile(
+    char *inp, /* string to look up */
+    struct permonst *pm, /* monster type to look up (overrides 'inp') */
+    unsigned chkflags,
+    char *supplemental_name)
 {
     dlb *fp;
     char buf[BUFSZ], newstr[BUFSZ], givenname[BUFSZ];
     char *ep, *dbase_str;
+    boolean user_typed_name = (chkflags & chkfilUsrTyped) != 0,
+            without_asking = (chkflags & chkfilDontAsk) != 0,
+            ia_checking = (chkflags & chkfilIaCheck) != 0;
     unsigned long txt_offset = 0L;
     winid datawin = WIN_ERR;
 
@@ -924,6 +955,10 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
                         pline("? Seek error on 'data' file!");
                         goto checkfile_done;
                     }
+                    if (ia_checking) {
+                        checkfile_hack = 'T';
+                        goto checkfile_done;
+                    }
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
                         /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
@@ -959,8 +994,9 @@ checkfile(char *inp, struct permonst *pm, boolean user_typed_name,
                     display_nhwindow(datawin, FALSE);
                     destroy_nhwindow(datawin), datawin = WIN_ERR;
                 }
-            } else if (user_typed_name && pass == 0 && !pass1found_in_file)
+            } else if (user_typed_name && pass == 0 && !pass1found_in_file) {
                 pline("You don't have any information on those things.");
+            }
         }
     }
     goto checkfile_done; /* skip error feedback */
@@ -1075,9 +1111,11 @@ add_cmap_descr(
 }
 
 int
-do_screen_description(coord cc, boolean looked, int sym, char *out_str,
-                      const char **firstmatch,
-                      struct permonst **for_supplement)
+do_screen_description(
+    coord cc, boolean looked,
+    int sym, char *out_str,
+    const char **firstmatch,
+    struct permonst **for_supplement)
 {
     static const char mon_interior[] = "the interior of a monster",
                       unreconnoitered[] = "unreconnoitered";
@@ -1516,23 +1554,23 @@ do_look(int mode, coord *click_cc)
                          clr, "nearby monsters", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'M';
                 add_menu(win, &nul_glyphinfo, &any,
-                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         clr, "all monsters shown on map", MENU_ITEMFLAGS_NONE);
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE, clr,
+                         "all monsters shown on map", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'o';
                 add_menu(win, &nul_glyphinfo, &any,
                          flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
                          clr, "nearby objects", MENU_ITEMFLAGS_NONE);
                 any.a_char = 'O';
                 add_menu(win, &nul_glyphinfo, &any,
-                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
-                         clr, "all objects shown on map", MENU_ITEMFLAGS_NONE);
-                any.a_char = '^';
+                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE, clr,
+                         "all objects shown on map", MENU_ITEMFLAGS_NONE);
+                any.a_char = 't';
                 add_menu(win, &nul_glyphinfo, &any,
-                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         flags.lootabc ? 0 : any.a_char, '^', ATR_NONE,
                          clr, "nearby traps", MENU_ITEMFLAGS_NONE);
-                any.a_char = '\"';
+                any.a_char = 'T';
                 add_menu(win, &nul_glyphinfo, &any,
-                         flags.lootabc ? 0 : any.a_char, 0, ATR_NONE,
+                         flags.lootabc ? 0 : any.a_char, '\"', ATR_NONE,
                          clr, "all seen or remembered traps",
                          MENU_ITEMFLAGS_NONE);
             }
@@ -1544,7 +1582,7 @@ do_look(int mode, coord *click_cc)
             destroy_nhwindow(win);
         }
 
-dowhatiscmd:
+ dowhatiscmd:
         switch (i) {
         default:
         case 'q':
@@ -1567,11 +1605,12 @@ dowhatiscmd:
             *out_str = '\0';
             for (invobj = gi.invent; invobj; invobj = invobj->nobj)
                 if (invobj->invlet == invlet) {
-                    strcpy(out_str, singular(invobj, xname));
+                    Strcpy(out_str, singular(invobj, xname));
                     break;
                 }
             if (*out_str)
-                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
+                checkfile(out_str, pm, chkfilUsrTyped | chkfilDontAsk,
+                          (char *) 0);
             return ECMD_OK;
           }
         case '?':
@@ -1585,7 +1624,8 @@ dowhatiscmd:
                 return ECMD_OK;
 
             if (out_str[1]) { /* user typed in a complete string */
-                checkfile(out_str, pm, TRUE, TRUE, (char *) 0);
+                checkfile(out_str, pm,  chkfilUsrTyped | chkfilDontAsk,
+                          (char *) 0);
                 return ECMD_OK;
             }
             sym = out_str[0];
@@ -1602,10 +1642,10 @@ dowhatiscmd:
         case 'O':
             look_all(FALSE, FALSE); /* list all objects */
             return ECMD_OK;
-        case '^':
+        case 't':
             look_traps(TRUE); /* list nearby traps */
             return ECMD_OK;
-        case '\"':
+        case 'T':
             look_traps(FALSE); /* list all traps (visible or remembered) */
             return ECMD_OK;
         }
@@ -1686,8 +1726,9 @@ dowhatiscmd:
 
                 supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
-                checkfile(temp_buf, pm, FALSE,
-                          (boolean) (ans == LOOK_VERBOSE), supplemental_name);
+                checkfile(temp_buf, pm,
+                          (ans == LOOK_VERBOSE) ? chkfilDontAsk : chkfilNone,
+                          supplemental_name);
                 if (supplemental_pm)
                     do_supplemental_info(supplemental_name, supplemental_pm,
                                          (boolean) (ans == LOOK_VERBOSE));

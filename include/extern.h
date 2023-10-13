@@ -2098,6 +2098,7 @@ extern char *monhealthdescr(struct monst *mon, boolean, char *);
 extern void mhidden_description(struct monst *, boolean, char *);
 extern boolean object_from_map(int, coordxy, coordxy, struct obj **);
 extern const char *waterbody_name(coordxy, coordxy);
+extern boolean ia_checkfile(struct obj *);
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **);
 extern int do_look(int, coord *);

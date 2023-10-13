@@ -2900,8 +2900,8 @@ itemactions_pushkeys(struct obj *otmp, int act)
             cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         case IA_WHATIS_OBJ:
-            cmdq_add_ec(CQ_CANNED, dowhatis);
-            cmdq_add_key(CQ_CANNED, 'i');
+            cmdq_add_ec(CQ_CANNED, dowhatis); /* "/" command */
+            cmdq_add_key(CQ_CANNED, 'i');     /* "i" == item from inventory */
             cmdq_add_key(CQ_CANNED, otmp->invlet);
             break;
         }
@@ -3193,7 +3193,9 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_ZAP_OBJ, 'z', "Zap this wand to release its magic");
 
     /* ?: Look up an item in the game's database */
-    ia_addmenu(win, IA_WHATIS_OBJ, '/', "Look up information about this item");
+    if (ia_checkfile(otmp))
+        ia_addmenu(win, IA_WHATIS_OBJ, '/',
+                   "Look up information about this item");
 
     Sprintf(buf, "Do what with %s?", the(cxname(otmp)));
     end_menu(win, buf);
