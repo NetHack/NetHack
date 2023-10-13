@@ -582,6 +582,23 @@ VA_DECL(const char *, s)
 #endif
     exit(EXIT_FAILURE);
 }
+
+#ifdef SIGWINCH
+/* called by resize_tty(wintty.c) after receiving a SIGWINCH signal;
+   terminal size has changed and we should update LI and CO (from termcap) */
+void
+getwindowsz(void)
+{
+    /*
+     * gettty() has code to do this, but it can't be used directly because
+     * it fetches terminal state in order to reset that upon termination.
+     * We need to avoid clobbering other saved state with values used by
+     * game-in-progress.  For now, do nothing.
+     */
+    return;
+}
+#endif
+
 #ifdef ENHANCED_SYMBOLS
 /*
  * set in tty_start_screen() and allows
@@ -592,6 +609,8 @@ VA_DECL(const char *, s)
 void
 tty_utf8graphics_fixup(void)
 {
+    return;
 }
 #endif  /* ENHANCED_SYMBOLS */
 
+/*vmstty.c */

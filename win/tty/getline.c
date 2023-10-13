@@ -39,7 +39,10 @@ tty_getlin(const char *query, register char *bufp)
 }
 
 static void
-hooked_tty_getlin(const char *query, register char *bufp, getlin_hook_proc hook)
+hooked_tty_getlin(
+    const char *query,
+    register char *bufp,
+    getlin_hook_proc hook)
 {
     register char *obufp = bufp;
     register int c;

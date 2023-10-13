@@ -374,6 +374,7 @@ const struct instance_globals_g g_init_g = {
     UNDEFINED_VALUES, /* gbug_stop */
 
     /* do_name.c */
+    0, 0, /* getposx, getposy */
     UNDEFINED_PTR, /* gloc_filter_map */
     UNDEFINED_VALUE, /* gloc_filter_floodfill_match_glyph */
     /* dog.c */

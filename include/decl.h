@@ -381,6 +381,7 @@ struct instance_globals_g {
     coordxy gbuf_stop[ROWNO];
 
     /* do_name.c */
+    coordxy getposx, getposy; /* cursor position in case of async resize */
     struct selectionvar *gloc_filter_map;
     int gloc_filter_floodfill_match_glyph;
 

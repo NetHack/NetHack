@@ -45,16 +45,17 @@ typedef struct tty_mi {
 
 /* descriptor for tty-based windows */
 struct WinDesc {
-    int flags;           /* window flags */
-    xint16 type;          /* type of window */
-    boolean active;      /* true if window is active */
-    short offx, offy;    /* offset from topleft of display */
-    long rows, cols;     /* dimensions */
-    long curx, cury;     /* current cursor position */
-    long maxrow, maxcol; /* the maximum size used -- for MENU wins */
+    int flags;             /* window flags */
+    xint16 type;           /* type of window */
+    boolean active;        /* true if window is active */
+    boolean blanked;       /* for erase_tty_screen(); not used [yet?] */
+    short offx, offy;      /* offset from topleft of display */
+    long rows, cols;       /* dimensions */
+    long curx, cury;       /* current cursor position */
+    long maxrow, maxcol;   /* the maximum size used -- for MENU wins;
+                            * maxcol is also used by WIN_MESSAGE for
+                            * tracking the ^P command */
     unsigned long mbehavior; /* menu behavior flags (MENU) */
-    /* maxcol is also used by WIN_MESSAGE for */
-    /* tracking the ^P command */
     short *datlen;         /* allocation size for *data */
     char **data;           /* window data [row][column] */
     char *morestr;         /* string to display instead of default */
@@ -218,6 +219,7 @@ E void g_putch(int);
 E void g_pututf8(uint8 *);
 #endif
 #endif /* ENHANCED_SYMBOLS */
+extern void erase_tty_screen(void);
 E void win_tty_init(int);
 
 /* external declarations */

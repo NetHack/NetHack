@@ -826,8 +826,8 @@ getpos(coord *ccp, boolean force, const char *goal)
               visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
     }
-    cx = ccp->x;
-    cy = ccp->y;
+    cx = gg.getposx = ccp->x;
+    cy = gg.getposy = ccp->y;
 #ifdef CLIPPING
     cliparound(cx, cy);
 #endif
@@ -1134,7 +1134,7 @@ getpos(coord *ccp, boolean force, const char *goal)
             break;
         }
  nxtc:
-        ;
+        gg.getposx = cx, gg.getposy = cy;
 #ifdef CLIPPING
         cliparound(cx, cy);
 #endif
@@ -1150,6 +1150,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         clear_nhwindow(WIN_MESSAGE);
     ccp->x = cx;
     ccp->y = cy;
+    gg.getposx = gg.getposy = 0;
     for (i = 0; i < NUM_GLOCS; i++)
         if (garr[i])
             free((genericptr_t) garr[i]);

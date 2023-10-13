@@ -627,6 +627,8 @@ term_clear_screen(void)
     if (CL) {
         xputs(CL);
         home();
+        /* set remembered data to all spaces */
+        erase_tty_screen();
     }
 }
 
