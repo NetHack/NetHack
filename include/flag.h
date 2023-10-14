@@ -207,23 +207,24 @@ struct instance_flags {
     int at_midnight;       /* only valid during end of game disclosure */
     int at_night;          /* also only valid during end of game disclosure */
     int failing_untrap;    /* move_into_trap() -> spoteffects() -> dotrap() */
+    int getdir_click;      /* as input to getdir(): non-zero, accept simulated
+                            * click that's not adjacent to or on hero;
+                            * as output from getdir(): simulated button used
+                            * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
+    int getloc_filter;     /* GFILTER_foo */
     int in_lava_effects;   /* hack for Boots_off() */
     int last_msg;          /* indicator of last message player saw */
     int override_ID;       /* true to force full identification of objects */
     int parse_config_file_src;  /* hack for parse_config_line() */
     int purge_monsters;    /* # of dead monsters still on fmon list */
     int suppress_price;    /* controls doname() for unpaid objects */
-    int terrainmode; /* for getpos()'s autodescribe when #terrain is active */
-#define TER_MAP    0x01
-#define TER_TRP    0x02
-#define TER_OBJ    0x04
-#define TER_MON    0x08
-#define TER_DETECT 0x10    /* detect_foo magic rather than #terrain */
-    int getdir_click;      /* as input to getdir(): non-zero, accept simulated
-                            * click that's not adjacent to or on hero;
-                            * as output from getdir(): simulated button used
-                            * 0 (none) or CLICK_1 (left) or CLICK_2 (right) */
-    int getloc_filter;     /* GFILTER_foo */
+    unsigned  terrainmode; /* for getpos()'s autodescribe during #terrain */
+#define TER_MAP    0x01U
+#define TER_TRP    0x02U
+#define TER_OBJ    0x04U
+#define TER_MON    0x08U
+#define TER_FULL   0x10U   /* explore|wizard mode view full map */
+#define TER_DETECT 0x20U   /* detect_foo magic rather than #terrain */
     boolean bgcolors;      /* display background colors on a map position */
     boolean getloc_moveskip;
     boolean getloc_travelmode;

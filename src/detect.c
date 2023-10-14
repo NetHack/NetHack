@@ -14,7 +14,7 @@
 static boolean unconstrain_map(void);
 static void reconstrain_map(void);
 static void map_redisplay(void);
-static void browse_map(int, const char *);
+static void browse_map(unsigned, const char *);
 static void map_monst(struct monst *, boolean);
 static void do_dknown_of(struct obj *);
 static boolean check_map_spot(coordxy, coordxy, char, unsigned);
@@ -26,7 +26,7 @@ static int furniture_detect(void);
 static void findone(coordxy, coordxy, genericptr_t);
 static void openone(coordxy, coordxy, genericptr_t);
 static int mfind0(struct monst *, boolean);
-static int reveal_terrain_getglyph(coordxy, coordxy, int, unsigned, int, int);
+static int reveal_terrain_getglyph(coordxy, coordxy, unsigned, int, unsigned);
 
 /* dummytrap: used when detecting traps finds a door or chest trap; the
    couple of fields that matter are always re-initialized during use so
@@ -88,7 +88,7 @@ map_redisplay(void)
 
 /* use getpos()'s 'autodescribe' to view whatever is currently shown on map */
 static void
-browse_map(int ter_typ, const char *ter_explain)
+browse_map(unsigned ter_typ, const char *ter_explain)
 {
     coord dummy_pos; /* don't care whether player actually picks a spot */
     boolean save_autodescribe;
@@ -106,13 +106,13 @@ browse_map(int ter_typ, const char *ter_explain)
 static void
 map_monst(struct monst *mtmp, boolean showtail)
 {
-    if (def_monsyms[(int) mtmp->data->mlet].sym == ' ')
-        show_glyph(mtmp->mx, mtmp->my,
-                   detected_mon_to_glyph(mtmp, newsym_rn2));
-    else
-        show_glyph(mtmp->mx, mtmp->my, mtmp->mtame
-                   ? pet_to_glyph(mtmp, newsym_rn2)
-                   : mon_to_glyph(mtmp, newsym_rn2));
+    int glyph = (def_monsyms[(int) mtmp->data->mlet].sym == ' ')
+                ? detected_mon_to_glyph(mtmp, newsym_rn2)
+                : mtmp->mtame
+                  ? pet_to_glyph(mtmp, newsym_rn2)
+                  : mon_to_glyph(mtmp, newsym_rn2);
+
+    show_glyph(mtmp->mx, mtmp->my, glyph);
 
     if (showtail && mtmp->data == &mons[PM_LONG_WORM])
         detect_wsegs(mtmp, 0);
@@ -2004,14 +2004,18 @@ sokoban_detect(void)
 }
 
 static int
-reveal_terrain_getglyph(coordxy x, coordxy y, int full, unsigned swallowed,
-                        int default_glyph, int which_subset)
+reveal_terrain_getglyph(
+    coordxy x, coordxy y,
+    unsigned swallowed,
+    int default_glyph,
+    unsigned which_subset)
 {
     int glyph, levl_glyph;
     uchar seenv;
-    boolean keep_traps = (which_subset & TER_TRP) !=0,
+    boolean keep_traps = (which_subset & TER_TRP) != 0,
             keep_objs = (which_subset & TER_OBJ) != 0,
-            keep_mons = (which_subset & TER_MON) != 0;
+            keep_mons = (which_subset & TER_MON) != 0,
+            full = (which_subset & TER_FULL) != 0;
     struct monst *mtmp;
     struct trap *t;
 
@@ -2098,7 +2102,7 @@ dump_map(void)
 {
     coordxy x, y;
     int glyph, skippedrows, lastnonblank;
-    int subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
+    unsigned subset = TER_MAP | TER_TRP | TER_OBJ | TER_MON;
     int default_glyph = cmap_to_glyph(gl.level.flags.arboreal ? S_tree
                                                              : S_stone);
     char buf[COLBUFSZ];
@@ -2121,7 +2125,7 @@ dump_map(void)
             int ch;
             glyph_info glyphinfo;
 
-            glyph = reveal_terrain_getglyph(x, y, FALSE, u.uswallow,
+            glyph = reveal_terrain_getglyph(x, y, u.uswallow,
                                             default_glyph, subset);
             map_glyphinfo(x, y, glyph, 0, &glyphinfo);
             ch = glyphinfo.ttychar;
@@ -2151,12 +2155,15 @@ dump_map(void)
 #endif /* DUMPLOG */
 
 /* idea from crawl; show known portion of map without any monsters,
-   objects, or traps occluding the view of the underlying terrain */
+   objects, or traps occluding the view of the underlying terrain;
+   in explore or wizard modes, can also display unexplored portion */
 void
 reveal_terrain(
-    int full,      /* wizard|explore modes allow player to request full map */
-    int which_subset) /* if not full, whether to suppress objs and/or traps */
+    unsigned which_subset) /* TER_TRP | TER_OBJ | TER_MON | TER_FULL */
 {
+    /* 'full' overrides impairment and implies no-traps, no-objs, no-mons */
+    boolean full = (which_subset & TER_FULL) != 0; /* show whole map */
+
     if ((Hallucination || Stunned || Confusion) && !full) {
         You("are too disoriented for this.");
     } else {
@@ -2164,7 +2171,7 @@ reveal_terrain(
         int glyph, default_glyph;
         char buf[BUFSZ];
         /* there is a TER_MAP bit too; we always show map regardless of it */
-        boolean keep_traps = (which_subset & TER_TRP) !=0,
+        boolean keep_traps = (which_subset & TER_TRP) != 0,
                 keep_objs = (which_subset & TER_OBJ) != 0,
                 keep_mons = (which_subset & TER_MON) != 0; /* not used */
         unsigned swallowed = u.uswallow; /* before unconstrain_map() */
@@ -2176,7 +2183,7 @@ reveal_terrain(
 
         for (x = 1; x < COLNO; x++)
             for (y = 0; y < ROWNO; y++) {
-                glyph = reveal_terrain_getglyph(x,y, full, swallowed,
+                glyph = reveal_terrain_getglyph(x,y, swallowed,
                                                 default_glyph, which_subset);
                 show_glyph(x, y, glyph);
             }

@@ -369,7 +369,7 @@ extern void sokoban_detect(void);
 #ifdef DUMPLOG
 extern void dump_map(void);
 #endif
-extern void reveal_terrain(int, int);
+extern void reveal_terrain(unsigned);
 extern int wiz_mgender(void);
 
 /* ### dig.c ### */
