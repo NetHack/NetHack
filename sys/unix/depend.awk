@@ -1,6 +1,6 @@
 # depend.awk -- awk script used to construct makefile dependencies
 # for nethack's source files (`make depend' support for Makefile.src).
-# $NHDT-Date: 1612127123 2021/01/31 21:05:23 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.13 $
+# $NHDT-Date: 1697316508 2023/10/14 20:48:28 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.16 $
 #
 # usage:
 #   awk -f depend.awk ../include/*.h list-of-.c/.cpp-files
@@ -90,7 +90,7 @@ function output_dep(				base, targ, moc)
   if (moc || base ~ /(.+\/)*qt_.*[.]cpp$/) {
     deps[file] = deps[file] " $(QTn_H)"
   }
-  if (base ~ /[.]cp*$/ || moc) {
+  if ((base ~ /[.]cp*$/ || moc) && !(base in basedone)) {
     #prior to very first .c|.cpp file, handle some special header file cases
     if (!c_count++)
       output_specials()
@@ -98,6 +98,9 @@ function output_dep(				base, targ, moc)
     targ = base;  sub("[.]cp*$", ".o", targ)
     #format and write the collected dependencies
     format_dep(targ, file)
+    #generated file tile.c can appear more than once in the list of files
+    #so track which files have already been handled; can't reuse done[] here
+    basedone[base]++;
   }
 }
 

@@ -1,5 +1,5 @@
 #	NetHack Makefile.
-# NetHack 3.7  Makefile.src    $NHDT-Date: 1696193939 2023/10/01 20:58:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.163 $
+# NetHack 3.7  Makefile.src    $NHDT-Date: 1697316523 2023/10/14 20:48:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.164 $
 # Copyright (c) 2018 by Pasi Kallinen
 # NetHack may be freely redistributed.  See license for details.
 
@@ -1069,7 +1069,6 @@ qt_xcmd.moc: ../win/Qt/qt_xcmd.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_xcmd.h
 qt_yndlg.moc: ../win/Qt/qt_yndlg.h $(QTn_H)
 	$(MOCPATH) -o $@ ../win/Qt/qt_yndlg.h
-$(TARGETPFX)tile.o: tile.c $(HACK_H)
 $(TARGETPFX)wc_chainin.o: ../win/chain/wc_chainin.c $(HACK_H)
 	$(TARGET_CC) $(TARGET_CFLAGS) -c -o $@ ../win/chain/wc_chainin.c
 $(TARGETPFX)wc_chainout.o: ../win/chain/wc_chainout.c $(HACK_H)
