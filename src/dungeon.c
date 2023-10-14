@@ -3590,16 +3590,30 @@ tunesuffix(
 #endif
 #define COMMA (i++ > 0 ? ", " : PREFIX)
 /* "iterate" once; safe to use as ``if (cond) ADDTOBUF(); else whatever;'' */
-#define ADDNTOBUF(nam, var)                                                  \
+#define ADDTOBUF(nam, var) \
+    do {                                             \
+        if (var)                                     \
+            Sprintf(eos(buf), "%s%s", COMMA, (nam)); \
+    } while (0)
+#define ADDNTOBUF(nam, var) \
     do {                                                                     \
         if (var)                                                             \
             Sprintf(eos(buf), "%s%s %s%s", COMMA, seen_string((var), (nam)), \
                     (nam), plur(var));                                       \
     } while (0)
-#define ADDTOBUF(nam, var)                           \
-    do {                                             \
-        if (var)                                     \
-            Sprintf(eos(buf), "%s%s", COMMA, (nam)); \
+/* ADD2NTOBUF: for "M temples and N altars"; seen_string() is safe to use
+   multiple times within one expression; so is plur() */
+#define ADD2NTOBUF(nam, var, nam2, var2) \
+    do {                                                                \
+        if (var && var2) {                                              \
+            Sprintf(eos(buf), "%s%s %s%s and %s %s%s", COMMA,           \
+                    seen_string((var), (nam)), (nam), plur(var),        \
+                    seen_string((var2), (nam2)), (nam2), plur(var2));   \
+        } else if (var) {                                               \
+            ADDNTOBUF(nam, var);                                        \
+        } else if (var2) {                                              \
+            ADDNTOBUF(nam2, var2);                                      \
+        }                                                               \
     } while (0)
 
 static void
@@ -3692,14 +3706,16 @@ print_mapseen(
                 Sprintf(eos(buf), "%s%s", COMMA,
                         an(shop_string(mptr->feat.shoptype)));
         }
-        if (mptr->feat.naltar > 0) {
+        if (mptr->feat.naltar > 0 || mptr->feat.ntemple > 0) {
             unsigned atmp;
 
-            /* Temples + non-temple altars get munged into just "altars" */
-            if (mptr->feat.ntemple != mptr->feat.naltar)
-                ADDNTOBUF("altar", mptr->feat.naltar);
-            else
-                ADDNTOBUF("temple", mptr->feat.ntemple);
+            /* being aware of a temple doesn't guarantee being aware of its
+               altar (via entrance message when entering while blinded, or
+               possibly it being out of view in an irregularly shaped room);
+               FIXME: if all temples present have been desecrated, we ought
+               to say so */
+            ADD2NTOBUF("temple", mptr->feat.ntemple,
+                       "altar", mptr->feat.naltar);
 
             /* only print out altar's god if they are all to your god */
             atmp = mptr->feat.msalign;              /*    0,  1,  2,  3 */
