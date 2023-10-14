@@ -4327,13 +4327,13 @@ flip_coin(struct obj *obj)
     struct obj *otmp = obj;
     boolean lose_coin = FALSE;
 
-    You("flip %s.", an(cxname_singular(obj)));
+    You("flip %s.", an(singular(obj, xname)));
     if (Underwater) {
-        pline_The("%s floats away.", xname(obj));
+        pline("It tumbles away.");
         lose_coin = TRUE;
-    } else if (Glib || Fumbling || (ACURR(A_DEX) < 10 && !rn2(ACURR(A_DEX)))) {
-        pline_The("%s slips between your %s.", xname(obj),
-              fingers_or_gloves(FALSE));
+    } else if (Glib || Fumbling
+               || (ACURR(A_DEX) < 10 && !rn2(ACURR(A_DEX)))) {
+        pline("It slips between your %s.", fingers_or_gloves(FALSE));
         lose_coin = TRUE;
     }
 

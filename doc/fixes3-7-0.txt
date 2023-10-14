@@ -2271,6 +2271,8 @@ answering '?<return>' at the "genocide what?" prompt (for either monster class
 	monsters have already been genocided and then re-prompts
 throwing the silver bell (or other invocation item, or the Amulet) to the
 	quest leader will identify it instead of being treated as an attack
+applying gold pieces will flip one and report "heads" or "tails"; with a stack
+	of more than one, normally the flipped coin will rejoin the stack
 
 
 Platform- and/or Interface-Specific New Features
