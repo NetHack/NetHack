@@ -90,7 +90,7 @@ function output_dep(				base, targ, moc)
   if (moc || base ~ /(.+\/)*qt_.*[.]cpp$/) {
     deps[file] = deps[file] " $(QTn_H)"
   }
-  if ((base ~ /[.]cp*$/ || moc) && !(base in basedone)) {
+  if ((base ~ /[.]cp*$/ || moc) && !(file in filedone)) {
     #prior to very first .c|.cpp file, handle some special header file cases
     if (!c_count++)
       output_specials()
@@ -100,7 +100,7 @@ function output_dep(				base, targ, moc)
     format_dep(targ, file)
     #generated file tile.c can appear more than once in the list of files
     #so track which files have already been handled; can't reuse done[] here
-    basedone[base]++;
+    filedone[file]++;
   }
 }
 
