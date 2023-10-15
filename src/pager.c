@@ -15,7 +15,7 @@ static void trap_description(char *, int, coordxy, coordxy);
 static void look_at_object(char *, coordxy, coordxy, int);
 static void look_at_monster(char *, char *, struct monst *, coordxy, coordxy);
 static struct permonst *lookat(coordxy, coordxy, char *, char *);
-static void checkfile(char *, struct permonst *, unsigned, char *);
+static boolean checkfile(char *, struct permonst *, unsigned, char *);
 static int add_cmap_descr(int, int, int, int, coord,
                           const char *, const char *,
                           boolean *, const char **, char *);
@@ -51,9 +51,6 @@ enum checkfileflags {
     chkfilDontAsk  = 2,
     chkfilIaCheck  = 4,
 };
-
-/* checkfile() sets this in lieu of a return value if given IaCheck flag */
-static char checkfile_hack; /* once set, always 'F' or 'T' */
 
 static const char invisexplain[] = "remembered, unseen, creature",
            altinvisexplain[] = "unseen creature"; /* for clairvoyance */
@@ -697,12 +694,10 @@ ia_checkfile(struct obj *otmp)
 {
     char itemnam[BUFSZ];
 
-    checkfile_hack = 'F'; /* checkfile() might change it */
     /* singular() of xname() of otmp is what "/i" looks up */
     Strcpy(itemnam, singular(otmp, xname));
-    checkfile(itemnam, (struct permonst *) 0,
-              chkfilIaCheck | chkfilDontAsk, (char *) 0);
-    return (checkfile_hack == 'T');
+    return checkfile(itemnam, (struct permonst *) 0,
+                     chkfilIaCheck | chkfilDontAsk, (char *) 0);
 }
 
 /*
@@ -714,8 +709,10 @@ ia_checkfile(struct obj *otmp)
  *       must not be changed directly, e.g. via lcase(). We want to force
  *       lcase() for data.base lookup so that we can have a clean key.
  *       Therefore, we create a copy of inp _just_ for data.base lookup.
+ *
+ * Returns True if an entry is found, False otherwise.
  */
-static void
+static boolean
 checkfile(
     char *inp, /* string to look up */
     struct permonst *pm, /* monster type to look up (overrides 'inp') */
@@ -730,11 +727,12 @@ checkfile(
             ia_checking = (chkflags & chkfilIaCheck) != 0;
     unsigned long txt_offset = 0L;
     winid datawin = WIN_ERR;
+    boolean res = FALSE;
 
     fp = dlb_fopen(DATAFILE, "r");
     if (!fp) {
         pline("Cannot open 'data' file!");
-        return;
+        return res;
     }
     /* If someone passed us garbage, prevent fault. */
     if (!inp || strlen(inp) > (BUFSZ - 1)) {
@@ -961,10 +959,10 @@ checkfile(
                         pline("? Seek error on 'data' file!");
                         goto checkfile_done;
                     }
-                    if (ia_checking) {
-                        checkfile_hack = 'T';
+                    res = TRUE;
+                    if (ia_checking)
                         goto checkfile_done;
-                    }
+
                     datawin = create_nhwindow(NHW_MENU);
                     for (i = 0; i < entry_count; i++) {
                         /* room for 1-tab or 8-space prefix + BUFSZ-1 + \0 */
@@ -1013,7 +1011,7 @@ checkfile(
     if (datawin != WIN_ERR)
         destroy_nhwindow(datawin);
     (void) dlb_fclose(fp);
-    return;
+    return res;
 }
 
 /* extracted from do_screen_description() */
@@ -1615,8 +1613,8 @@ do_look(int mode, coord *click_cc)
                     break;
                 }
             if (*out_str)
-                checkfile(out_str, pm, chkfilUsrTyped | chkfilDontAsk,
-                          (char *) 0);
+                (void) checkfile(out_str, pm, chkfilUsrTyped | chkfilDontAsk,
+                                 (char *) 0);
             return ECMD_OK;
           }
         case '?':
@@ -1630,8 +1628,8 @@ do_look(int mode, coord *click_cc)
                 return ECMD_OK;
 
             if (out_str[1]) { /* user typed in a complete string */
-                checkfile(out_str, pm,  chkfilUsrTyped | chkfilDontAsk,
-                          (char *) 0);
+                (void) checkfile(out_str, pm,  chkfilUsrTyped | chkfilDontAsk,
+                                 (char *) 0);
                 return ECMD_OK;
             }
             sym = out_str[0];
@@ -1732,9 +1730,10 @@ do_look(int mode, coord *click_cc)
 
                 supplemental_name[0] = '\0';
                 Strcpy(temp_buf, firstmatch);
-                checkfile(temp_buf, pm,
-                          (ans == LOOK_VERBOSE) ? chkfilDontAsk : chkfilNone,
-                          supplemental_name);
+                (void) checkfile(temp_buf, pm,
+                                 (ans == LOOK_VERBOSE) ? chkfilDontAsk
+                                                       : chkfilNone,
+                                 supplemental_name);
                 if (supplemental_pm)
                     do_supplemental_info(supplemental_name, supplemental_pm,
                                          (boolean) (ans == LOOK_VERBOSE));
