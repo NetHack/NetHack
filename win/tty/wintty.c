@@ -1493,11 +1493,15 @@ process_menu_window(winid window, struct WinDesc *cw)
                 }
             }
             /* set extra chars.. */
-            Strcat(resp, default_menu_cmds);
+            if (*gacc) {
+                Strcat(resp, gacc);             /* group accelerators */
+                if (cw->how == PICK_ONE)
+                    resp_len = (int) strlen(resp);
+            }
             Strcat(resp, " ");                  /* next page or end */
             Strcat(resp, "0123456789\033\n\r"); /* counts, quit */
-            Strcat(resp, gacc);                 /* group accelerators */
             Strcat(resp, gm.mapped_menu_cmds);
+            Strcat(resp, default_menu_cmds);
 
             if (cw->npages > 1)
                 Sprintf(cw->morestr, "(%d of %d)", curr_page + 1,

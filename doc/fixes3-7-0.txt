@@ -1777,6 +1777,8 @@ tty: changes to support TTY_PERM_INVENT resulted in blank inventory menu when
 tty: for the !DEF_PAGER configuration, redraw screen properly if attempting
 	to display a file fails and tty_display_file()'s caller requests
 	feedback for that situation
+tty: if a group accelerator matched a menu command ('^' in menu for '/')
+	it wouldn't work to select, just to manipulate the menu
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
 Windows: new tile additions in win/share did not trigger the creation of a new
@@ -1802,6 +1804,8 @@ X11: use visctrl(response) when X11_yn_function() echoes prompt+response in
 X11: when trying to lookup scrollbars in order to handle scrolling via keys,
 	menu handling always ended up finding the top window
 X11: enable horizontal scrollbar for persistent inventory window
+X11: if a group accelerator matched a menu command ('^' in menu for '/')
+	it wouldn't work to select, just to manipulate the menu
 X11+macOS: after the "bad Atom" fix (below), the persistent inventory window
 	crept downward every time it got updated
 
