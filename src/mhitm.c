@@ -315,7 +315,7 @@ mattackm(
         && magr->my != mdef->my)
         return M_ATTK_MISS;
 
-    /* Calculate the armour class differential. */
+    /* Calculate the armor class differential. */
     tmp = find_mac(mdef) + magr->m_lev;
     if (mdef->mconf || helpless(mdef)) {
         tmp += 4;

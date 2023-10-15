@@ -63,7 +63,7 @@
 #define AD_SITM 21  /* steals item (nymphs) */
 #define AD_SEDU 22  /* seduces & steals multiple items */
 #define AD_TLPT 23  /* teleports you (Quantum Mech.) */
-#define AD_RUST 24  /* rusts armour (Rust Monster)*/
+#define AD_RUST 24  /* rusts armor (Rust Monster)*/
 #define AD_CONF 25  /* confuses (Umber Hulk) */
 #define AD_DGST 26  /* digests opponent (trapper, etc.) */
 #define AD_HEAL 27  /* heals opponent's wounds (nurse) */

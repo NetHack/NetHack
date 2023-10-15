@@ -133,7 +133,7 @@ display inventory of encased items in statues zapped with wand of probing
 display inventory of buried items below, by zapping wand of probing downwards
 set dknown bit for all objects hit by probing beam
 add ceiling function to alter the ceiling messages appropriately
-fix 3.1.2's fix for reseting certain class-specific artifact properties
+fix 3.1.2's fix for resetting certain class-specific artifact properties
 add selection menus to pickup and some apply functions
 pre-menu container interface:  don't let "%a" select all objects if no food
 	is present; make user's "<missing class(es)> a" become "A" instead
@@ -151,7 +151,7 @@ don't give "heat and smoke are gone" message when entering Vlad's tower if
 	arriving from somewhere other than Gehennom (portal via W's quest arti)
 when a wielded cockatrice corpse rots away, set `unweapon' so that
 	further combat will elicit "bashing with gloved hands" message
-fix behaviour of wielded eggs (breaking, stoning, etc)
+fix behavior of wielded eggs (breaking, stoning, etc)
 tiny chance for "queen bee" eggs, rather than always killer bee eggs
 change Tourist quest home base to Ankh-Morpork
 prevent activated statue traps from creating hidden monsters
@@ -225,12 +225,12 @@ allow '%' as destination on rogue level when specifying position by map feature
 fire traps can burn up scrolls and spellbooks on the floor
 fix inverted cancellation check for AD_SLOW and AD_DREN damage
 bullwhips can be applied to disarm monsters and hero
-bullwhips can be applied by hero to haul themself out of a pit
+bullwhips can be applied by hero to haul themselves out of a pit
 ensure that thrown potions hit their mark if you are swallowed
 attempting to engrave on an altar causes altar_wrath
 differentiate between a hole and a trapdoor, digging always makes a hole
 check the right hit point values when polymorphed and encumbered
-improve guard behaviour in vaults when player is blind
+improve guard behavior in vaults when player is blind
 prevent dwarves from digging while wielding cursed weapons
 displacing a pet mimic unhides it
 '(' shows the proper tools as in use

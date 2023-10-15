@@ -633,7 +633,7 @@ explode(
             gc.context.botl = 1;
         }
 
-        /* You resisted the damage, lets not keep that to ourselves */
+        /* You resisted the damage, let's not keep that to ourselves */
         if (uhurt == 1)
             monstseesu_ad(adtyp);
         else

@@ -28,7 +28,7 @@ engrave.c	Correction to "feel" code. (mike@genat)
 		Corrected switch for message determination. (patrickm@hpisof0)
 		BURN'ed engravings made un-erasable again. (kyrimis@princeton)
 
-pri.c		Added colour highliting functions (sweet@scubed)
+pri.c		Added colour highlighting functions (sweet@scubed)
 
 prisym.c	changed "symbol.room" to "ROOM_SYM" (one I missed; Ralf.Brown)
 		Changed "dirlet()" to return an int. (maartenj@cs.vu)
@@ -66,7 +66,7 @@ mhitu.c		Argument mismatches fixed. (walz@mimsy)
 
 potion.c	Argument mismatch fixed. (walz@mimsy)
 		Blind modifications for blindfolding.  (eric@snark)
-		Poison handling made more dependant on poison resistance.
+		Poison handling made more dependent on poison resistance.
 		(From an idea by Steve Creps - creps@silver)
 
 mklev.c		Fixed up installation of vamp traps. (sweet@scubed)
@@ -283,7 +283,7 @@ New Features
 	on the net).  I haven't had much chance to test out this feature of
 	the game.  Mirrors have also been added, and seem to work quite well.
 
-	- Changes have been made to the object ocurrence chances in objects.h,
+	- Changes have been made to the object occurrence chances in objects.h,
 	so that the relatively rare tools, etc. have at least a 1% chance of
 	showing up.
 
@@ -321,7 +321,7 @@ New Features
 	plained about it).
 
 	- A new trap, the "polymorph" trap has been added by Richard Hughey.
-	It's inclusion is dependant on having "KAA" defined.
+	It's inclusion is dependent on having "KAA" defined.
 
 	- In wizard mode, the wizard player has infinite wishes, and the
 	ability to instantly identify everything (s)he is carrying. The wizard

@@ -53,7 +53,7 @@ non-weapon iron objects should rust when dipped in fountains since
 suppress "turn to flee" message if monster is mfrozen
 don't silently interrupt monster's hold on you if Levitation/Flying ends
 	while over water
-you could specifiy '~' with crystal ball and have it try to detect monsters, 
+you could specify '~' with crystal ball and have it try to detect monsters, 
 	but it never revealed anything; show the entire long worm now
 allow a crystal ball to detect ghosts-and-shades via space key,  and display
 	the results using detected_mon_to_glyph() so that they show up in 
@@ -80,7 +80,7 @@ when polymorphed into a quantum mechanic on a no teleport level and swallowed,
 	no feedback was given when you teleported the swallower away
 allow Conflict-resistant monsters to respond to conflict attacks rather than
 	sitting there and taking the attacks until they die
-prefer herbivorous stone-to-flesh message when hero is a vegitarian
+prefer herbivorous stone-to-flesh message when hero is a vegetarian
 try even harder to avoid incorrect map display while changing levels
 no "freaked" message by exploding black light, unless you really are
 sleeping monster could respond to attacks by other monsters

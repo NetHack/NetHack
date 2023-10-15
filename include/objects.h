@@ -1008,7 +1008,7 @@ OBJECT(OBJ("Bell of Opening", "silver bell"),
            FOOD_CLASS, prob, delay, wt, nutrition / 20 + 5, 0, 0, 0, 0, \
            nutrition, color, sn)
 /* All types of food (except tins & corpses) must have a delay of at least 1.
- * Delay on corpses is computed and is weight dependant.
+ * Delay on corpses is computed and is weight dependent.
  * Domestic pets prefer tripe rations above all others.
  * Fortune cookies can be read, using them up without ingesting them.
  * Carrots improve your vision.

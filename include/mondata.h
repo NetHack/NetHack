@@ -226,6 +226,12 @@
 
 #define is_vampire(ptr) ((ptr)->mlet == S_VAMPIRE)
 
+#define is_kobold(ptr) \
+    ((ptr)->mlet == S_KOBOLD || (ptr) == &mons[PM_KOBOLD_ZOMBIE] || (ptr) == &mons[PM_KOBOLD_MUMMY])
+	
+#define is_hobbit(ptr) \
+    ((ptr) == &mons[PM_HOBBIT] || (ptr) == &mons[PM_HOBBIT_ZOMBIE] || (ptr) == &mons[PM_HOBBIT_MUMMY])
+
 #define hates_light(ptr) ((ptr) == &mons[PM_GREMLIN])
 
 /* used to vary a few messages */

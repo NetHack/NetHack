@@ -148,7 +148,7 @@ apply.c		Blindfolded set/unset to "INTRINSIC" (many sources)
 lev.c		new restmonchn() code. (Tom May)
 save.c
 
-o_init.c	OS independance in init_objects (Tom May)
+o_init.c	OS independence in init_objects (Tom May)
 objclass.h	(removal of oc_descr_i)
 
 shk.c		declaration of typename() (Tom May)

@@ -359,6 +359,8 @@ zombie_form(struct permonst *pm)
     case S_HUMANOID:
         if (is_dwarf(pm))
             return PM_DWARF_ZOMBIE;
+        else if (is_hobbit(pm))
+            return PM_HOBBIT_ZOMBIE;
         else
             break;
     case S_GNOME:
@@ -408,6 +410,10 @@ undead_to_corpse(int mndx)
     case PM_ETTIN_ZOMBIE:
     case PM_ETTIN_MUMMY:
         mndx = PM_ETTIN;
+        break;
+    case PM_HOBBIT_ZOMBIE:
+    case PM_HOBBIT_MUMMY:
+        mndx = PM_HOBBIT;
         break;
     default:
         break;
@@ -581,6 +587,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_KOBOLD_MUMMY:
     case PM_DWARF_MUMMY:
     case PM_GNOME_MUMMY:
+    case PM_HOBBIT_MUMMY:
     case PM_ORC_MUMMY:
     case PM_ELF_MUMMY:
     case PM_HUMAN_MUMMY:
@@ -589,6 +596,7 @@ make_corpse(struct monst *mtmp, unsigned int corpseflags)
     case PM_KOBOLD_ZOMBIE:
     case PM_DWARF_ZOMBIE:
     case PM_GNOME_ZOMBIE:
+    case PM_HOBBIT_ZOMBIE:
     case PM_ORC_ZOMBIE:
     case PM_ELF_ZOMBIE:
     case PM_HUMAN_ZOMBIE:

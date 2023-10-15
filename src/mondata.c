@@ -693,10 +693,8 @@ same_race(struct permonst *pm1, struct permonst *pm2)
         return is_golem(pm2); /* even moreso... */
     if (is_mind_flayer(pm1))
         return is_mind_flayer(pm2);
-    if (let1 == S_KOBOLD || pm1 == &mons[PM_KOBOLD_ZOMBIE]
-        || pm1 == &mons[PM_KOBOLD_MUMMY])
-        return (let2 == S_KOBOLD || pm2 == &mons[PM_KOBOLD_ZOMBIE]
-                || pm2 == &mons[PM_KOBOLD_MUMMY]);
+    if (is_kobold(pm1))
+        return is_kobold(pm2);
     if (let1 == S_OGRE)
         return (let2 == S_OGRE);
     if (let1 == S_NYMPH)
@@ -895,6 +893,8 @@ name_to_monplus(
             { "woodland nymph", PM_WOOD_NYMPH, NEUTRAL },
             { "halfling", PM_HOBBIT, NEUTRAL },    /* potential guess for
                                                     * polyself */
+            { "halfling zombie", PM_HOBBIT_ZOMBIE, NEUTRAL },
+            { "halfling mummy", PM_HOBBIT_MUMMY, NEUTRAL },
             { "genie", PM_DJINNI, NEUTRAL }, /* potential guess for
                                               * ^G/#wizgenesis */
             /* prefix used to workaround duplicate monster names for

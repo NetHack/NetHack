@@ -187,7 +187,7 @@ wizard mode ^F command reveals floor traps along with the map
 pager: '/' was not finding data.base entries for shopkeepers, mimics, or
 	race/role spit when picking from the screen
 small monsters like hobbits and gnome zombies couldn't wear cloaks/wraps
-make sure non-erodable objects aren't eroded or erodeproof (could happen by
+make sure non-erodible objects aren't eroded or erodeproof (could happen by
 	wishing or object polymorph)
 consistently let iron non-weapons rust, etc.
 handle more spelling variations ("boots of speed",&c) when granting wishes
