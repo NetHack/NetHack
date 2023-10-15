@@ -2363,11 +2363,12 @@ hell hound*
 	dark form and savage face which broke upon us out of the wall
 	of fog.
 	  [ The Hound of the Baskervilles, by Sir Arthur Conan Doyle ]
+# note: nethack's helm of brilliance got changed to crystal
 helm of brilliance
-	A helm he set on his head, high of steel; thereon was many gemstone,
-	all encompassed with gold; it was Uther’s, the noble king’s; it was
-	named Goswhit, each other unlike.
-		[ Layamon's Brut, translated by Sir Frederic Madden, K.H. ]
+	A helm he set on his head, high of steel; thereon was many
+	gemstone, all encompassed with gold; it was Uther's, the noble
+	king's; it was named Goswhit, each other unlike.
+	  [ Layamon's Brut, translated by Sir Frederic Madden, K.H. ]
 hermes
 	Messenger and herald of the Olympians.  Being required to do
 	a great deal of travelling and speaking in public, he became
@@ -2604,13 +2605,16 @@ hunter
 	Where is the haste that ye hurry by?
 	Brother, I go to my lair to die.
 		[ The Jungle Book, by Rudyard Kipling ]
+# note: this might need to be reformatted; it's much wider than other entries
+# but should be able to fit within a normal-width screen once nethack strips
+# off the leading <tab>.
 ice box
 	Ice, white ice, like a winding-sheet, sheathing each smoke-grimed wall;
 	Ice on the stove-pipe, ice on the bed, ice gleaming over all;
 	Sparkling ice on the dead man’s chest, glittering ice in his hair,
 	Ice on his fingers, ice in his heart, ice in his glassy stare;
 	Hard as a log and trussed like a frog, with his arms and legs outspread.
-	I gazed at the coffin I’d brought for him, and I gazed at the gruesome dead,
+	I gazed at the coffin I'd brought for him, and I gazed at the gruesome dead,
 	And at last I spoke: "Bill liked his joke; but still, goldarn his eyes,
 	A man had ought to consider his mates in the way he goes and dies."
 		[ The Ballad of Blasphemous Bill, by Robert W. Service ]
@@ -4190,7 +4194,7 @@ potion of sickness
 *venom
 	Fate intervened. Some of us, that day, she led inexorably
 	through the gates of death. Some of us, innocent and unsuspecting,
-	took, unwillingly, that one last step to oblivion. Some of us took 
+	took, unwillingly, that one last step to oblivion. Some of us took
 	very little sugar.
 		[ We Have Always Lived in the Castle,
 			by Shirley Jackson ]
@@ -4608,7 +4612,7 @@ dwarven root
 	"Wild Elves know them not; Grey-elves have not found them;
 	the proud ones from over the Sea are too proud to delve,"
 	said Mim.
-	
+
 	"What is their name?" said Turin. Mim looked at him sidelong.
 	"They have no name, save in the Dwarf-tongue, which we do not
 	teach," he said. "And we not teach Men to find them, for Men
@@ -4617,7 +4621,7 @@ dwarven root
 	blundering in the wild. No more will you learn of me; but you
 	may have enough of my bounty, as long as you speak fair and
 	do not spy or steal." Then again he laughed in his throat.
-	
+
 	"They are of great worth." he said. "More than gold in the
 	hungry winter, for they may be hoarded like the nuts of a
 	squirrel, and already we were building our store from the
@@ -4893,19 +4897,19 @@ shark
 ~white*
 *shield
 	In his hands he took his shield, all glittering: no one ever
-	broke it with a blow or crushed it. And a wonder it was to see; 
-	for its whole orb shimmered with enamel and white ivory and 
-	electrum, and it glowed with shining gold; and there were zones 
-	of cyanus drawn upon it. In the center was Fear worked in adamant, 
+	broke it with a blow or crushed it. And a wonder it was to see;
+	for its whole orb shimmered with enamel and white ivory and
+	electrum, and it glowed with shining gold; and there were zones
+	of cyanus drawn upon it. In the center was Fear worked in adamant,
 	unspeakable, staring backwards with eyes that glowed with fire.
 	His mouth was full of teeth in a white row, fearful and  daunting,
 	and upon his grim brow hovered frightful Strife who arrays the
 	throng of men: pitiless she, for she took away the mind and senses
 	of poor wretches who made war against the son of Zeus. Their souls
-	passed beneath the earth and went down into the house of Hades; 
+	passed beneath the earth and went down into the house of Hades;
 	but their bones, when the skin is rotted about them, crumble away
 	on the dark earth under parching Sirius.
-		[ Hesiod, The Homeric Hymns and Homerica, 
+		[ Hesiod, The Homeric Hymns and Homerica,
 			translation by Hugh G. Evelyn-White ]
 shito
 	A Japanese stabbing knife.
@@ -5173,30 +5177,30 @@ stair*
 		[ Ghostbusters, directed by Ivan Reitman,
 		  written by Dan Ackroyd and Harold Ramis ]
 *stalker
-	“You don’t understand,” he said, “who I am or what I am. I’ll show
-	you. By Heaven! I’ll show you.” Then he put his open palm over his
-	face and withdrew it. The centre of his face became a black
-	cavity. “Here,” he said. He stepped forward and handed Mrs. Hall
+	"You don't understand," he said, "who I am or what I am.  I'll show
+	you.  By Heaven!  I'll show you."  Then he put his open palm over
+	his face and withdrew it.  The centre of his face became a black
+	cavity.  "Here," he said.  He stepped forward and handed Mrs. Hall
 	something which she, staring at his metamorphosed face, accepted
-	automatically. Then, when she saw what it was, she screamed
-	loudly, dropped it, and staggered back. The nose—it was the
-	stranger’s nose! pink and shining—rolled on the floor.
+	automatically.  Then, when she saw what it was, she screamed
+	loudly, dropped it, and staggered back.  The nose--it was the
+	stranger's nose! pink and shining--rolled on the floor.
 
-	Then he removed his spectacles, and everyone in the bar gasped. He
+	Then he removed his spectacles, and everyone in the bar gasped.  He
 	took off his hat, and with a violent gesture tore at his whiskers
-	and bandages. For a moment they resisted him. A flash of horrible
-	anticipation passed through the bar. “Oh, my Gard!” said some one.
+	and bandages.  For a moment they resisted him.  A flash of horrible
+	anticipation passed through the bar.  "Oh, my Gard!" said some one.
 	Then off they came.
 
-	It was worse than anything. Mrs. Hall, standing open-mouthed and
+	It was worse than anything.  Mrs. Hall, standing open-mouthed and
 	horror-struck, shrieked at what she saw, and made for the door of
-	the house. Everyone began to move. They were prepared for scars,
-	disfigurements, tangible horrors, but nothing! The bandages and
+	the house.  Everyone began to move.  They were prepared for scars,
+	disfigurements, tangible horrors, but nothing!  The bandages and
 	false hair flew across the passage into the bar, making a
-	hobbledehoy jump to avoid them. Everyone tumbled on everyone else
-	down the steps. For the man who stood there shouting some
+	hobbledehoy jump to avoid them.  Everyone tumbled on everyone else
+	down the steps.  For the man who stood there shouting some
 	incoherent explanation, was a solid gesticulating figure up to the
-	coat-collar of him, and then—nothingness, no visible thing at all!
+	coat-collar of him, and then--nothingness, no visible thing at all!
 		[ The Invisible Man, by H. G. Wells ]
 ~statue trap
 statue*
@@ -5649,9 +5653,9 @@ unreconnoitered
 uruk*hai shield
 white-handed shield
 	They were armed with short broad-bladed swords, not with the
-	curved scimitars usual with Orcs: and they had bows of yew, 
-	in length and shape like the bows of Men. Upon their shields 
-	they bore a strange device: a small white hand in the centre 
+	curved scimitars usual with Orcs: and they had bows of yew,
+	in length and shape like the bows of Men. Upon their shields
+	they bore a strange device: a small white hand in the centre
 	of a black field; on the front of their iron helms was set an
 	S-rune, wrought of some white metal.
 		[ The Two Towers, by J.R.R. Tolkien ]
