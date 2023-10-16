@@ -1294,12 +1294,9 @@ major demon
 	they are friendly.
 	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
 demonbane
-	Do not be deceived, Wormwood. Our cause is never more in danger
-	than when a human, no longer desiring, but still intending, to do
-	our Enemy's will, looks round upon a universe from which every
-	trace of Him seems to have vanished, and asks why he has been
-	forsaken, and still obeys.
-		[ The Screwtape Letters, by C.S. Lewis ]
+	Think not that I am come to send peace on earth: I came not to send
+	peace, but a sword.
+	    [ The Gospel According to Matthew, 10:34 ]
 dented pot
 	Here was a sight to beat all: a man in the prime of life rambling
 	barefoot down the wilderness road, dressed in raggedy pantaloons
@@ -2363,8 +2360,7 @@ hell hound*
 	dark form and savage face which broke upon us out of the wall
 	of fog.
 	  [ The Hound of the Baskervilles, by Sir Arthur Conan Doyle ]
-# note: nethack's helm of brilliance got changed to crystal
-helm of brilliance
+helm*
 	A helm he set on his head, high of steel; thereon was many
 	gemstone, all encompassed with gold; it was Uther's, the noble
 	king's; it was named Goswhit, each other unlike.
@@ -2605,19 +2601,22 @@ hunter
 	Where is the haste that ye hurry by?
 	Brother, I go to my lair to die.
 		[ The Jungle Book, by Rudyard Kipling ]
-# note: this might need to be reformatted; it's much wider than other entries
-# but should be able to fit within a normal-width screen once nethack strips
-# off the leading <tab>.
 ice box
-	Ice, white ice, like a winding-sheet, sheathing each smoke-grimed wall;
-	Ice on the stove-pipe, ice on the bed, ice gleaming over all;
-	Sparkling ice on the dead man’s chest, glittering ice in his hair,
-	Ice on his fingers, ice in his heart, ice in his glassy stare;
-	Hard as a log and trussed like a frog, with his arms and legs outspread.
-	I gazed at the coffin I'd brought for him, and I gazed at the gruesome dead,
-	And at last I spoke: "Bill liked his joke; but still, goldarn his eyes,
-	A man had ought to consider his mates in the way he goes and dies."
-		[ The Ballad of Blasphemous Bill, by Robert W. Service ]
+	I have eaten
+	the plums
+	that were in
+	the icebox
+	
+	and which
+	you were probably
+	saving
+	for breakfast
+	
+	Forgive me
+	they were delicious
+	so sweet
+	and so cold	
+	  [ This Is Just To Say, by William Carlos Williams ]
 ice devil
 	Ice devils are large semi-insectoid creatures, who are
 	equally at home in the fires of Hell and the cold of Limbo,
