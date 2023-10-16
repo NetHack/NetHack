@@ -897,7 +897,7 @@ checkfile(
            then "fruit" is the alternate description. We do this here so that
            if the fruit name is an extant object, looking at the fruit yields
            that object's description. */
-        if (!alt && !strncmpi(dbase_str, gp.pl_fruit, PL_FSIZ))
+        if (!alt && fruit_from_name(dbase_str, TRUE, (int *) 0))
             alt = strcpy(newstr, obj_descr[SLIME_MOLD].oc_name);
         /*
          * If the object is named, then the name is the alternate description;
