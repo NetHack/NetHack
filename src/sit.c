@@ -286,8 +286,10 @@ dosit(void)
             if (obj->otyp == CORPSE && amorphous(&mons[obj->corpsenm]))
                 pline("It's squishy...");
             else if (obj->otyp == CREAM_PIE) {
-                if (!Deaf)
-                    pline("Squelch!");
+                 if (!Deaf) {
+                   Soundeffect(se_squelch, 30);
+                   pline("Squelch!");
+                }
                 useupf(obj, obj->quan);
             } else if (!(Is_box(obj) || objects[obj->otyp].oc_material == CLOTH))
                 pline("It's not very comfortable...");
