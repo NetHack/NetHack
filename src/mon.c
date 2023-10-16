@@ -4092,8 +4092,8 @@ normal_shape(struct monst *mon)
     }
 }
 
-/* iterate all monsters on the level, even dead ones, calling func
-   for each monster. if func returns TRUE, stop iterating.
+/* iterate all monsters on the level, even dead or off-map ones,
+   calling func for each monster. if func returns TRUE, stop iterating.
    safe for list deletions and insertions, and guarantees
    calling func once per monster in the list. */
 void
@@ -4128,7 +4128,7 @@ iter_mons(void (*func)(struct monst *))
     struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
+        if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
         func(mtmp);
     }
@@ -4143,7 +4143,7 @@ get_iter_mons(boolean (*func)(struct monst *))
     struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
+        if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
         if (func(mtmp))
             return mtmp;
@@ -4161,7 +4161,7 @@ get_iter_mons_xy(boolean (*func)(struct monst *, coordxy, coordxy),
     struct monst *mtmp;
 
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
-        if (DEADMONSTER(mtmp))
+        if (DEADMONSTER(mtmp) || mon_offmap(mtmp))
             continue;
         if (func(mtmp, x, y))
             return mtmp;
