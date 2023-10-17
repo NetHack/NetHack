@@ -1148,8 +1148,9 @@ CLEAN_FILE += $(NHTARGET) $(NHOBJS) $(NHRES)
 all: install
 
 TO_INSTALL = $(GAMEDIR)/NetHack.exe $(RTARGETS) $(GAMEDIRDLLS) \
-	     $(addprefix $(GAMEDIR)/, $(addsuffix .template, sysconf .nethackrc) \
-	     Guidebook.txt NetHack.txt license opthelp record symbols)
+	     $(addprefix $(GAMEDIR)/, \
+	     $(addsuffix .template, sysconf .nethackrc symbols) \
+	     Guidebook.txt NetHack.txt license opthelp record)
 
 ifeq "$(HAVE_SOUNDLIB)" "Y"
 TO_INSTALL += $(addprefix $(GAMEDIR)/, $(addsuffix .wav, $(WAVLIST)))
@@ -1183,7 +1184,7 @@ $(GAMEDIR)/$(FMODLIBDLL): $(FMODLIBDIR)/$(FMODLIBDLL)
         cp $< $@
 endif
 
-$(GAMEDIR)/symbols: $(DAT)/symbols
+$(GAMEDIR)/symbols.template: $(DAT)/symbols
 	cp $< $@
 
 $(GAMEDIR)/NetHack.txt: $(DOC)/nethack.txt
