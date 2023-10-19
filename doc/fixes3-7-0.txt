@@ -1237,7 +1237,8 @@ a pet that was poison resistant but not stoning resistant would eat Medusa's
 ring of hunger prevents choking on your food
 paranoid_confirm:pray can be changed to require yes/no response instead of y/n
 	by also setting paranoid_confirm:Confirm
-wand of probing reveals map locations in the ray path
+wand of probing reveals map locations and traps in the ray path; also reveals
+	secret doors and secret corridors if the ray hits such
 applying a wielded, lit potion of oil to unlight it while other unlit
 	potion(s) of oil were quivered would trigger panic
 	"addinv: null obj after quiver merge otyp=N" where N is POT_OIL
@@ -1249,7 +1250,7 @@ the throne room on the Samurai quest home level lacked a throne but gave
 coughing due to stinking cloud wakes up nearby monsters
 stop occupation when timed levitation or choking issues a message
 use #monster to make dragon steed breathe
-wand of probing reveals tin contents
+wand of probing reveals tin and egg contents
 steam vortices and fog clouds leave steam clouds behind
 fog clouds maintain any clouds they are in, even poisonous ones
 bone devils summon skeletons

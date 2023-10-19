@@ -23,7 +23,8 @@ static void zhitu(int, int, const char *, coordxy, coordxy);
 static void revive_egg(struct obj *);
 static boolean zap_steed(struct obj *);
 static void skiprange(int, int *, int *);
-static void maybe_explode_trap(struct trap *, struct obj *);
+static void maybe_explode_trap(struct trap *, struct obj *, boolean *);
+static void zap_map(coordxy, coordxy, struct obj *);
 static int zap_hit(int, int);
 static void disintegrate_mon(struct monst *, int, const char *);
 static int adtyp_to_prop(int);
@@ -2164,8 +2165,20 @@ bhito(struct obj *obj, struct obj *otmp)
                     (void) display_cinventory(obj);
                 }
                 res = 1;
-            } else if (obj->otyp == TIN)
+            } else if (obj->otyp == TIN) {
+                /* don't learn wand if tin is already known */
+                if (!obj->known || !obj->cknown)
+                    res = 1;
                 obj->known = 1;
+                set_cknown_lknown(obj); /* if TIN obj->cknown = 1 */
+            } else if (obj->otyp == EGG) {
+                /* if egg is unhatchable, probing it won't learn wand
+                   because even when flagged as known, it's just "an egg" */
+                if (!obj->known && obj->corpsenm != NON_PM)
+                    res = 1;
+                obj->known = 1;
+                /* [should this call learn_egg_type()?] */
+            }
             if (res)
                 learn_it = TRUE;
             break;
@@ -3087,7 +3100,6 @@ zap_updown(struct obj *obj) /* wand or spell */
     struct obj *otmp;
     struct engr *e;
     struct trap *ttmp;
-    char buf[BUFSZ];
     stairway *stway = gs.stairs;
 
     /* some wands have special effects other than normal bhitpile */
@@ -3231,43 +3243,9 @@ zap_updown(struct obj *obj) /* wand or spell */
         /* zapping downward */
         (void) bhitpile(obj, bhito, x, y, u.dz);
 
-        /* subset of engraving effects; none sets `disclose' */
-        if ((e = engr_at(x, y)) != 0 && e->engr_type != HEADSTONE) {
-            switch (obj->otyp) {
-            case WAN_POLYMORPH:
-            case SPE_POLYMORPH:
-                del_engr(e);
-                make_engr_at(x, y, random_engraving(buf), gm.moves, 0);
-                break;
-            case WAN_CANCELLATION:
-            case SPE_CANCELLATION:
-            case WAN_MAKE_INVISIBLE:
-                del_engr(e);
-                break;
-            case WAN_TELEPORTATION:
-            case SPE_TELEPORT_AWAY:
-                rloc_engr(e);
-                break;
-            case SPE_STONE_TO_FLESH:
-                if (e->engr_type == ENGRAVE) {
-                    /* only affects things in stone */
-                    pline_The(Hallucination
-                                  ? "floor runs like butter!"
-                                  : "edges on the floor get smoother.");
-                    wipe_engr_at(x, y, d(2, 4), TRUE);
-                }
-                break;
-            case WAN_STRIKING:
-            case SPE_FORCE_BOLT:
-                wipe_engr_at(x, y, d(2, 4), TRUE);
-                break;
-            default:
-                break;
-            }
-        }
-
-        maybe_explode_trap(ttmp, obj);
-        /* note: ttmp might be now gone */
+        /* note: engraving handling that used to be here has been moved
+           to zap_map() */
+        zap_map(x, y, obj);
 
     } else if (u.dz < 0) {
         /* zapping upward */
@@ -3470,11 +3448,14 @@ skiprange(int range, int *skipstart, int *skipend)
         *skipend = tmp - 1;
 }
 
-/* maybe explode a trap hit by object otmp's effect;
+/* Maybe explode a trap hit by object otmp's effect;
    cancellation beam hitting a magical trap causes an explosion.
-   might delete the trap.  */
+   Might delete the trap; won't destroy otmp. */
 static void
-maybe_explode_trap(struct trap *ttmp, struct obj *otmp)
+maybe_explode_trap(
+    struct trap *ttmp,
+    struct obj *otmp,
+    boolean *learn_it)
 {
     if (!ttmp || !otmp)
         return;
@@ -3486,16 +3467,192 @@ maybe_explode_trap(struct trap *ttmp, struct obj *otmp)
             if (cansee(x, y)) {
                 ttmp->tseen = 1;
                 newsym(x, y);
+                *learn_it = TRUE;
             }
         } else if (is_magical_trap(ttmp->ttyp)) {
-            if (!Deaf)
+            int seeit = cansee(x, y);
+
+            if (!Deaf) {
+                Soundeffect(se_kaboom, 80);
                 pline("Kaboom!");
+            }
+            /* note: this explosion mustn't destroy otmp */
             explode(x, y, -WAN_CANCELLATION,
-                    20+d(3,6), TRAP_EXPLODE, EXPL_MAGICAL);
+                    20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
             deltrap(ttmp);
             newsym(x, y);
+            if (seeit)
+                *learn_it = TRUE;
         }
     }
+}
+
+/* zap_map() occurs before hitting monsters or objects and handles wands or
+   spells that don't dish out 'elemental' damage */
+static void
+zap_map(
+    coordxy x, coordxy y,
+    struct obj *obj) /* zapped wand, or book for cast spell */
+{
+    struct trap *ttmp = t_at(x, y);
+    coordxy dbx = x, dby = y; /* might be changed by drawbridge handling */
+    boolean learn_it = FALSE;
+
+    /*
+     * We handle drawbridge for lateral zaps; zap_updown() handles up/down.
+     * Engravings only get hit by down zaps and we handle that here.
+     */
+
+    /* cancellation */
+    maybe_explode_trap(ttmp, obj, &learn_it);
+    ttmp = t_at(x, y); /* refresh in case trap was altered or is gone */
+
+    if (u.dz > 0) { /* zapping down */
+        char ebuf[BUFSZ];
+        struct engr *e = engr_at(x, y);
+
+        /* subset of engraving effects; none sets `disclose' */
+        if (e && e->engr_type != HEADSTONE) {
+            switch (obj->otyp) {
+            case WAN_POLYMORPH:
+            case SPE_POLYMORPH:
+                del_engr(e);
+                make_engr_at(x, y, random_engraving(ebuf), gm.moves, 0);
+                break;
+            case WAN_CANCELLATION:
+            case SPE_CANCELLATION:
+            case WAN_MAKE_INVISIBLE:
+                del_engr(e);
+                break;
+            case WAN_TELEPORTATION:
+            case SPE_TELEPORT_AWAY:
+                rloc_engr(e);
+                break;
+            case SPE_STONE_TO_FLESH:
+                if (e->engr_type == ENGRAVE) {
+                    /* only affects things in stone */
+                    pline_The(Hallucination
+                                  ? "floor runs like butter!"
+                                  : "edges on the floor get smoother.");
+                    wipe_engr_at(x, y, d(2, 4), TRUE);
+                }
+                break;
+            case WAN_STRIKING:
+            case SPE_FORCE_BOLT:
+                wipe_engr_at(x, y, d(2, 4), TRUE);
+                break;
+            default:
+                break;
+            }
+        }
+
+    } else if (!u.dz) {
+        int ltyp = levl[x][y].typ;
+
+        if (find_drawbridge(&dbx, &dby)) {
+            switch (obj->otyp) {
+            case WAN_OPENING:
+            case SPE_KNOCK:
+                /* dbwall: 'closed door' of raised drawbridge */
+                if (is_db_wall(x, y)) {
+                    if (cansee(dbx, dby) || cansee(x, y))
+                        learn_it = TRUE;
+                    open_drawbridge(dbx, dby);
+                }
+                break;
+            case WAN_LOCKING:
+            case SPE_WIZARD_LOCK:
+                /* drawbridge_down: span of lowered drawbridge */
+                if ((cansee(dbx, dby) || cansee(x, y))
+                    && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
+                    learn_it = TRUE;
+                close_drawbridge(dbx, dby);
+                break;
+            case WAN_STRIKING:
+            case SPE_FORCE_BOLT:
+                /* !drawbridge_up: not spot in front of raised bridge,
+                   so either span of lowered bridge or portcullis */
+                if (ltyp != DRAWBRIDGE_UP) {
+                    learn_it = TRUE;
+                    destroy_drawbridge(dbx, dby);
+                }
+                break;
+            }
+        } /* find_drawbridge */
+    } /* !u.uz */
+
+    if (obj->otyp == WAN_PROBING) {
+        /*
+         * Probing, either up/down or lateral.
+         *
+         * TODO: if terrain is ice, report on its thaw timer.
+         */
+
+        /* map unseen terrain */
+        if (!cansee(x, y)) {
+            int oldglyph = glyph_at(x, y);
+
+            show_map_spot(x, y, FALSE);
+            if (oldglyph != glyph_at(x, y)) {
+                /* TODO: need to give some message */
+                learn_it = TRUE;
+            }
+        }
+        /* secret door gets revealed, converted into regular door */
+        if (levl[x][y].typ == SDOOR) {
+            cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
+            newsym(x, y);
+            if (cansee(x, y)) {
+                pline("Probing reveals a secret door.");
+                learn_it = TRUE;
+            } else if (Is_rogue_level(&u.uz)) { /* from zap_over_floor() */
+                draft_message(FALSE); /* "You feel a draft." (open doorway) */
+            }
+
+        /* secret corridor likewise, although only ones within view will
+           still be secret; for the !cansee(x,y) case, show_map_spot()
+           above has already converted the spot to regular corridor */
+        } else if (levl[x][y].typ == SCORR) {
+            levl[x][y].typ = CORR;
+            unblock_point(x, y);
+            newsym(x, y);
+            pline("Probing exposes a secret corridor.");
+            learn_it = TRUE;
+        }
+        /*
+         * Probing reveals undiscovered traps.
+         *
+         * FIXME?  This finds floor traps even when zapping up and
+         * ceiling traps even when zapping down.
+         */
+        if (ttmp) {
+            const char *ttmpname;
+            unsigned t_already_seen = ttmp->tseen;
+            boolean use_the, hallu = Hallucination != 0;
+
+            /* should probably be changed to use sense_trap(detect.c)
+               so that trap can temporarily be forced to be shown and
+               map browsing can take place before it reverts to being
+               covered by monster or object(s) */
+            ttmp->tseen = 1;
+            newsym(x, y);
+
+            if (!t_already_seen || hallu) {
+                ttmpname = trapname(ttmp->ttyp, FALSE);
+                use_the = !hallu ? (ttmp->ttyp == VIBRATING_SQUARE
+                                    && Invocation_lev(&u.uz))
+                                 : !rn2(4);
+                You("find %s%c",
+                    use_the ? the(ttmpname) : an(ttmpname),
+                    use_the ? '!' : '.');
+                learn_it = !hallu;
+            }
+        } /* t_at() */
+    } /* probing */
+
+    if (learn_it)
+        learnwand(obj);
+    return;
 }
 
 /*
@@ -3564,7 +3721,7 @@ bhit(
         tmp_at(DISP_FLASH, obj_to_glyph(obj, rn2_on_display_rng));
 
     while (range-- > 0) {
-        coordxy x, y, dbx, dby;
+        coordxy x, y;
 
         gb.bhitpos.x += ddx;
         gb.bhitpos.y += ddy;
@@ -3610,65 +3767,15 @@ bhit(
                 show_transient_light((struct obj *) 0, x, y);
         }
 
-        dbx = x, dby = y;
-        if (weapon == ZAPPED_WAND && find_drawbridge(&dbx, &dby)) {
-            boolean learn_it = FALSE;
-
-            switch (obj->otyp) {
-            case WAN_OPENING:
-            case SPE_KNOCK:
-                /* dbwall: 'closed door' of raised drawbridge */
-                if (is_db_wall(x, y)) {
-                    if (cansee(dbx, dby) || cansee(x, y))
-                        learn_it = TRUE;
-                    open_drawbridge(dbx, dby);
-                }
-                break;
-            case WAN_LOCKING:
-            case SPE_WIZARD_LOCK:
-                /* drawbridge_down: span of lowered drawbridge */
-                if ((cansee(dbx, dby) || cansee(x, y))
-                    && levl[dbx][dby].typ == DRAWBRIDGE_DOWN)
-                    learn_it = TRUE;
-                close_drawbridge(dbx, dby);
-                break;
-            case WAN_STRIKING:
-            case SPE_FORCE_BOLT:
-                /* !drawbridge_up: not spot in front of raised bridge,
-                   so either span of lowered bridge or portcullis */
-                if (typ != DRAWBRIDGE_UP) {
-                    learn_it = TRUE;
-                    destroy_drawbridge(dbx, dby);
-                }
-                break;
-            }
-            if (learn_it)
-                learnwand(obj);
-        } else if (weapon == ZAPPED_WAND) {
-            boolean learn_it = FALSE;
-
-            if (obj->otyp == WAN_PROBING) {
-                if (!cansee(x, y)) {
-                    int oldglyph = glyph_at(x, y);
-
-                    show_map_spot(x, y, FALSE);
-                    if (oldglyph != glyph_at(x, y)) {
-                        /* TODO: need to give some message */
-                        learn_it = TRUE;
-                    }
-                }
-            }
-            if (learn_it)
-                learnwand(obj);
+        if (weapon == ZAPPED_WAND) {
+            /* cancellation/opening/locking/striking/probing */
+            zap_map(x, y, obj);
+            /* terrain might have changed (exposed secret door|corridor) */
+            typ = levl[x][y].typ;
         }
-
-        /* [shouldn't this trap handling be in zap_over_floor()?] */
-        if (weapon == ZAPPED_WAND)
-            maybe_explode_trap(t_at(x, y), obj);
 
         mtmp = m_at(x, y);
         ttmp = t_at(x, y);
-
         if (!mtmp && ttmp && (ttmp->ttyp == WEB)
             && (weapon == THROWN_WEAPON || weapon == KICKED_WEAPON)
             && !rn2(3)) {
