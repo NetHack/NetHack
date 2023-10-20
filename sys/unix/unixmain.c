@@ -992,14 +992,12 @@ wd_message(void)
         } else {
             You("cannot access debug (wizard) mode.");
         }
-        wizard = 0; /* (paranoia) */
-        if (!explore_error_flag) {
+        wizard = FALSE; /* (paranoia) */
+        if (!explore_error_flag)
             pline("Entering explore/discovery mode instead.");
-            discover = 1;
-        }
     } else if (explore_error_flag) {
         You("cannot access explore mode."); /* same as enter_explore_mode */
-        discover = 0; /* (more paranoia) */
+        discover = iflags.deferred_X = FALSE; /* (more paranoia) */
     } else if (discover)
         You("are in non-scoring explore/discovery mode.");
 }
