@@ -10209,8 +10209,10 @@ set_playmode(void)
         else
             wizard = FALSE; /* not allowed or not available */
         /* try explore mode if we didn't make it into wizard mode */
+        /* if requesting wizard mode when restoring a normal game, this will
+           set iflags.deferred_X and prompt to activate explore mode after the
+           save file has already been deleted */
         discover = !wizard;
-        iflags.deferred_X = FALSE;
     }
     if (discover && !authorize_explore_mode()) {
         discover = iflags.deferred_X = FALSE;
