@@ -2117,6 +2117,7 @@ extern int dohistory(void);
 extern void chdirx(char *, boolean);
 #endif /* CHDIR */
 extern boolean authorize_wizard_mode(void);
+extern boolean authorize_explore_mode(void);
 #endif
 #if defined(WIN32)
 extern int getlock(void);
@@ -3093,6 +3094,7 @@ extern void port_help(void);
 #endif
 extern void sethanguphandler(void(*)(int));
 extern boolean authorize_wizard_mode(void);
+extern boolean authorize_explore_mode(void);
 extern void append_slash(char *);
 extern boolean check_user_string(const char *);
 extern char *get_login_name(void);
@@ -3257,6 +3259,7 @@ extern void chdirx(const char *, boolean);
 #endif /* CHDIR */
 extern void sethanguphandler(void(*)(int));
 extern boolean authorize_wizard_mode(void);
+extern boolean authorize_explore_mode(void);
 
 /* ### vmsmisc.c ### */
 

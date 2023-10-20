@@ -53,7 +53,7 @@ extern void init_linux_cons(void);
 #endif
 
 static void wd_message(void);
-static boolean wiz_error_flag = FALSE;
+static boolean wiz_error_flag = FALSE, explore_error_flag = FALSE;
 static struct passwd *get_unix_pw(void);
 
 int
@@ -955,6 +955,22 @@ authorize_wizard_mode(void)
     return FALSE;
 }
 
+/* similar to above, validate explore mode access */
+boolean
+authorize_explore_mode(void)
+{
+#ifdef SYSCF
+    if (sysopt.explorers && sysopt.explorers[0]) {
+        if (check_user_string(sysopt.explorers))
+            return TRUE;
+    }
+    explore_error_flag = TRUE; /* not being allowed into explore mode */
+    return FALSE;
+#else
+    return TRUE; /* if sysconf disabled, no restrictions on explore mode */
+#endif
+}
+
 static void
 wd_message(void)
 {
@@ -964,9 +980,17 @@ wd_message(void)
             pline("Only user%s %s may access debug (wizard) mode.",
                   strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
             free(tmp);
-        } else
+        } else {
+            You("cannot access debug (wizard) mode.");
+        }
+        wizard = 0; /* (paranoia) */
+        if (!explore_error_flag) {
             pline("Entering explore/discovery mode instead.");
-        wizard = 0, discover = 1; /* (paranoia) */
+            discover = 1;
+        }
+    } else if (explore_error_flag) {
+        You("cannot access explore mode."); /* same as enter_explore_mode */
+        discover = 0; /* (more paranoia) */
     } else if (discover)
         You("are in non-scoring explore/discovery mode.");
 }

@@ -560,8 +560,8 @@ restgamestate(NHFILE *nhfp)
     if (newgameflags.debug) {
         /* authorized by startup code; wizard mode exists and is allowed */
         wizard = TRUE, discover = iflags.deferred_X = FALSE;
-    } else if (wizard) {
-        /* specified by save file; check authorization now */
+    } else if (wizard || discover) {
+        /* specified by save file; check authorization now. */
         set_playmode();
     }
     role_init(); /* Reset the initial role, race, gender, and alignment */
