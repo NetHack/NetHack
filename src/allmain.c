@@ -1,4 +1,4 @@
-/* NetHack 3.7	allmain.c	$NHDT-Date: 1693359544 2023/08/30 01:39:04 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.220 $ */
+/* NetHack 3.7	allmain.c	$NHDT-Date: 1697779529 2023/10/20 05:25:29 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.223 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -65,6 +65,7 @@ moveloop_preamble(boolean resuming)
     }
 
     if (!resuming) { /* new game */
+        gp.program_state.beyond_savefile_load = 1; /* for TTY_PERM_INVENT */
         gc.context.rndencode = rnd(9000);
         set_wear((struct obj *) 0); /* for side-effects of starting gear */
         reset_justpicked(gi.invent);
