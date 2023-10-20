@@ -965,10 +965,7 @@ enter_explore_mode(void)
     } else {
         const char *oldmode = !wizard ? "normal game" : "debug mode";
 
-#ifdef SYSCF
-#if defined(UNIX)
-        if (!sysopt.explorers || !sysopt.explorers[0]
-            || !check_user_string(sysopt.explorers)) {
+        if (!authorize_explore_mode()) {
             if (!wizard) {
                 You("cannot access explore mode.");
                 return ECMD_OK;
@@ -978,8 +975,6 @@ enter_explore_mode(void)
                 /* keep going */
             }
         }
-#endif
-#endif
         pline("Beware!  From explore mode there will be no return to %s,",
               oldmode);
         if (paranoid_query(ParanoidQuit,

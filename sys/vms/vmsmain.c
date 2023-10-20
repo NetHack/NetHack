@@ -484,6 +484,13 @@ authorize_wizard_mode(void)
     return FALSE;
 }
 
+/* similar to above, validate explore mode access */
+boolean
+authorize_explore_mode(void)
+{
+    return TRUE; /* no restrictions on explore mode */
+}
+
 static void
 wd_message(void)
 {
