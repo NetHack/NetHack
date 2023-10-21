@@ -127,12 +127,34 @@ enlght_out(const char *buf)
 }
 
 static void
-enlght_line(const char *start, const char *middle, const char *end,
-            const char *ps)
+enlght_line(
+    const char *start,
+    const char *middle,
+    const char *end,
+    const char *ps)
 {
+#ifndef NO_ENLGHT_CONTRACTIONS
+    static const struct contrctn {
+        const char *twowords, *contrctn;
+    } contra[] = {
+        { " are not ", " aren't " },
+        { " were not ", " weren't " },
+        { " have not ", " haven't " },
+        { " had not ", " hadn't " },
+        { " can not ", " can't " },
+        { " could not ", " couldn't " },
+    };
+    int i;
+#endif
     char buf[BUFSZ];
 
     Sprintf(buf, " %s%s%s%s.", start, middle, end, ps);
+#ifndef NO_ENLGHT_CONTRACTIONS
+    if (strstri(buf, " not ")) { /* TODO: switch to libc strstr() */
+        for (i = 0; i < SIZE(contra); ++i)
+            (void) strsubst(buf, contra[i].twowords, contra[i].contrctn);
+    }
+#endif
     enlght_out(buf);
 }
 
