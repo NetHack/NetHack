@@ -568,7 +568,7 @@ mattackm(
         if (res[i] & M_ATTK_AGR_DIED)
             return res[i];
         /* return if aggressor can no longer attack */
-        if (helpless(magr))
+        if ((res[i] & M_ATTK_AGR_DONE) || helpless(magr))
             return res[i];
         /* eg. defender was knocked into a level teleport trap */
         if (mon_offmap(mdef))
