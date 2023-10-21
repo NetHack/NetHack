@@ -1969,8 +1969,11 @@ tty_destroy_nhwindow(winid window)
 {
     register struct WinDesc *cw = 0;
 
-    if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0)
+    if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0) {
+        if (window == WIN_INVEN) /* Null wins[WIN_INVEN] is tolerated */
+            return;
         panic(winpanicstr, window);
+    }
 
     if (cw->active)
         tty_dismiss_nhwindow(window);
@@ -2974,7 +2977,7 @@ ttyinv_remove_data(boolean destroy)
     }
     if (destroy) {
         cw->maxrow = cw->maxcol = 0;
-        WIN_INVEN = WIN_ERR;
+        /*WIN_INVEN = WIN_ERR;*/ /* caller's responsibility */
         done_tty_perm_invent_init = FALSE;
     }
 }
@@ -2985,21 +2988,17 @@ ttyinv_add_menu(winid window UNUSED, struct WinDesc *cw, char ch,
 {
     char invbuf[BUFSZ];
     const char *text;
-    boolean inuse_only = (ttyinvmode & InvInUse) != 0,
-            show_gold = (ttyinvmode & InvShowGold) != 0,
-            /* sparse = (ttyinvmode & InvSparse) != 0, */
+    boolean show_gold = (ttyinvmode & InvShowGold) != 0,
             ignore = FALSE;
-    int row, side, slot = 0, rows_per_side = (!show_gold ? 26 : 27);
+    int row, side, slot,
+        rows_per_side = (!show_gold ? 26 : 27);
 
     if (!gp.program_state.in_moveloop)
         return;
     slot = selector_to_slot(ch, ttyinvmode, &ignore);
     if (!ignore) {
-        /* inuse_only = ((ttyinvmode & InvInUse) != 0); */
         slot_tracker[slot] = TRUE;
-        text = Empty; /* lint suppression */
-        /*            maxslot = ((int) cw->maxrow - 2) * (!inuse_only ? 2 :
-         * 1); */
+        /* maxslot = ((int) cw->maxrow - 2) * (!inuse_only ? 2 : 1); */
 
         /* TODO: check for MENUCOLORS match */
         text = str; /* 'text' will switch to invbuf[] below */
@@ -3020,46 +3019,63 @@ ttyinv_add_menu(winid window UNUSED, struct WinDesc *cw, char ch,
         text = invbuf;
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
-        side = slot < rows_per_side ? 0 : 1;
-        if (!(inuse_only && side == 1))
-            ttyinv_populate_slot(cw, row, side, text, 0);
+        side = slot / rows_per_side;
+        ttyinv_populate_slot(cw, row, side, text, 0);
     }
     return;
 }
 
+/* convert a..zA..Z to 0..51 or for 'show_gold' $a..zA..Z# to 0..53 */
 static int
 selector_to_slot(char ch, const int invflags, boolean *ignore)
 {
     int slot = 0;
     boolean show_gold = (invflags & InvShowGold) != 0,
-            /* sparse = (invflags & InvSparse) != 0, */
             inuse_only = (invflags & InvInUse) != 0;
 
     *ignore = FALSE;
-    switch (ch) {
-    case '$':
-        if (!show_gold)
+    if (inuse_only) {
+        /*
+         * Inuse_only uses slots 0 to N-1 instead of fixed positions.
+         * Caller--or caller's caller's ... caller--only passes us
+         * relevant items so no filtering is necessary here; '!show_gold'
+         * gets ignored here since gold might be quivered or wielded and
+         * become an in-use item.
+         * Inuse_only items might include one (or more than one) with
+         * invlet '#' but it isn't special for Inuse_only.
+         */
+        slot = inuse_only_start++;
+    } else {
+        /* normal perminv */
+        switch (ch) {
+        case '$':
+            if (!show_gold)
+                *ignore = TRUE;
+            else
+                slot = 0;
+            break;
+        case '#':
+            /* overflow item won't be gold but there is only room allocated
+               for it when gold is also eligible to be shown (hero doesn't
+               have to be carrying any, we just need the extra row it gets) */
+            if (!show_gold)
+                *ignore = TRUE;
+            else
+                /* fixed location, bottom of right-hand panel; if there is
+                   more than 1 overflow item, we are only able to show 1 */
+                slot = 0 + 52 + 1; /* 0 for gold, 2 * 26 letters, then '#' */
+            break;
+        case '\0':
             *ignore = TRUE;
-        slot = 0;
-        break;
-    case '#':
-        slot = 52 + (show_gold ? 1 : 0);
-        break;
-    case 0:
-        *ignore = TRUE;
-        break;
-    default:
-        if (!inuse_only) {
+            break;
+        default:
             if (ch >= 'a' && ch <= 'z')
                 slot = (ch - 'a') + (show_gold ? 1 : 0);
-            if (ch >= 'A' && ch <= 'Z')
+            else if (ch >= 'A' && ch <= 'Z')
                 slot = (ch - 'A') + (show_gold ? 1 : 0) + 26;
-        } else {
-            if ((ch >= 'a' && ch <= 'z')
-                || (ch >= 'A' && ch <= 'Z'))
-                slot = (show_gold ? 1 : 0) + inuse_only_start++;
+            break;
         }
-    }
+    } /* normal vs inuse_only */
     return slot;
 }
 
@@ -3077,6 +3093,10 @@ ttyinv_render(winid window, struct WinDesc *cw)
     slot_limit = SIZE(slot_tracker);
     if (inuse_only) {
         rows_per_side = cw->maxrow - 2; /* -2 top and bottom borders */
+        slot_limit = rows_per_side;
+    } else if (!show_gold) {
+        slot_limit -= 2; /* slots [52] and [53] would wrap back row 0 and 1,
+                          * attempting to use a non-existent third side */
     }
     for (slot = 0; slot < slot_limit; ++slot)
         if (slot_tracker[slot])
@@ -3085,6 +3105,10 @@ ttyinv_render(winid window, struct WinDesc *cw)
         if (slot_tracker[slot])
            continue;
         if (slot == 0 && !filled_count) {
+            /* FIXME: this isn't correct; it shows "empty" if hero has gold
+               and player hasn't set ttyinvmode to display it; it can also
+               be drawn and briefly seen while other stuff (that player
+               just dropped or used up) hasn't been erased yet */
             Sprintf(invbuf, "%-4s[%s]", "",
                     !filled_count ? "empty"
                     : inuse_only  ? "no items are in use"
@@ -3095,9 +3119,8 @@ ttyinv_render(winid window, struct WinDesc *cw)
         }
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
-        side = slot < rows_per_side ? 0 : 1;
-        if (!(inuse_only && side == 1))
-            ttyinv_populate_slot(cw, row, side, text, 0);
+        side = slot / rows_per_side;
+        ttyinv_populate_slot(cw, row, side, text, 0);
     }
     /* has there been a glyph reset since we last got here? */
     if (gg.glyph_reset_timestamp > last_glyph_reset_when) {
@@ -3180,13 +3203,14 @@ ttyinv_populate_slot(
     struct tty_perminvent_cell *cell;
     char c;
     int ccnt, col, endcol;
+    boolean inuse_only = (ttyinvmode & InvInUse) != 0;
 
-    /* FIXME: this needs a review. Crashed under InvInUse without */
-    if ((ttyinvmode & InvInUse) != 0)
-        col = bordercol[0] + 1;
-    else
-        col = bordercol[side] + 1;
+    if (inuse_only && side == 1) /* there might be more in use than fits */
+        return;
+    if (row < 0 || (long) row >= cw->maxrow || side < 0 || side > 1)
+        panic("ttyinv_populate_slot row=%d, size=%d", row, side);
 
+    col = bordercol[side] + 1;
     endcol = bordercol[side + 1] - 1;
     cell = &cw->cells[row][col];
     if (cell->color != color)
@@ -3201,16 +3225,13 @@ ttyinv_populate_slot(
             cell->glyph = 0; /* cell->content.gi is gone */
         }
 
-        if ((c = *text) != '\0') {
-            if (cell->content.ttychar != c)
-                cell->refresh = 1;
-            cell->content.ttychar = c;
+        if ((c = *text) != '\0')
             ++text;
-        } else {
-            if (cell->content.ttychar != ' ')
-                cell->refresh = 1;
-            cell->content.ttychar = ' ';
-        }
+        else
+            c = ' ';
+        if (cell->content.ttychar != c)
+            cell->refresh = 1;
+        cell->content.ttychar = c;
         cell->text = 1; /* cell->content.ttychar is current */
     }
 }
