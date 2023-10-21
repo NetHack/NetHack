@@ -5344,7 +5344,8 @@ getdir(const char *s)
                 break;
             }
         }
-        iflags.getdir_click = mod;
+        if (iflags.getdir_click)
+            iflags.getdir_click = mod;
         return (pos >= 0);
     } else if (!(is_mov = movecmd(dirsym, MV_ANY)) && !u.dz) {
         boolean did_help = FALSE, help_requested;
