@@ -3294,16 +3294,25 @@ launch_obj(
                 unblock_point(gb.bhitpos.x, gb.bhitpos.y);
         }
 
-        /* if about to hit iron bars, do so now */
-        if (dist > 0 && isok(gb.bhitpos.x + dx, gb.bhitpos.y + dy)
-            && levl[gb.bhitpos.x + dx][gb.bhitpos.y + dy].typ == IRONBARS) {
-            x2 = gb.bhitpos.x, y2 = gb.bhitpos.y; /* object stops here */
-            if (hits_bars(&singleobj, x2, y2, x2 + dx, y2 + dy, !rn2(20), 0)) {
-                if (!singleobj) {
-                    used_up = TRUE;
-                    launch_drop_spot((struct obj *) 0, 0, 0);
+        /* if about to hit something, do so now */
+        if (dist > 0 && isok(gb.bhitpos.x + dx, gb.bhitpos.y + dy)) {
+            coordxy fx = gb.bhitpos.x + dx, fy = gb.bhitpos.y + dy;
+            uchar typ = levl[fx][fy].typ;
+
+            if (typ == IRONBARS) {
+                x2 = gb.bhitpos.x, y2 = gb.bhitpos.y; /* object stops here */
+                if (hits_bars(&singleobj, x2, y2, fx, fy, !rn2(20), 0)) {
+                    if (!singleobj) {
+                        used_up = TRUE;
+                        launch_drop_spot((struct obj *) 0, 0, 0);
+                    }
+                    break;
                 }
-                break;
+            } else if (IS_STWALL(typ) || IS_TREE(typ)) {
+                x2 = gb.bhitpos.x, y2 = gb.bhitpos.y; /* object stops here */
+                if (!Deaf)
+                    pline("Thump!");
+                wake_nearto(x2, y2, 16);
             }
         }
     }

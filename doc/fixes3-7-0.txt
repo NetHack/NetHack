@@ -1262,6 +1262,7 @@ buff scroll of confuse monster and blessed potion of monster detection
 if a temple was entered while blind, #overview could show a line of just "."
 	when describing altars if no other interesting features on that level
 	were known
+rolling boulders ignored walls and trees
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
