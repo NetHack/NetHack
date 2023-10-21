@@ -454,6 +454,8 @@ mattackm(
                             pline("%s divides as %s hits it!",
                                   Monnam(mdef), mon_nam(magr));
                         (void) mintrap(mclone, NO_TRAP_FLAGS);
+                        if (DEADMONSTER(magr))
+                            res[i] |= M_ATTK_AGR_DIED;
                     }
                 }
             } else

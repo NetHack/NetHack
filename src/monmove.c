@@ -1892,7 +1892,7 @@ m_move_aggress(struct monst *mtmp, coordxy x, coordxy y)
         mstatus = mattackm(mtmp, mtmp2);
     }
 
-    if (mstatus & M_ATTK_AGR_DIED) /* aggressor died */
+    if ((mstatus & M_ATTK_AGR_DIED) || DEADMONSTER(mtmp)) /* aggressor died */
         return MMOVE_DIED;
 
     if ((mstatus & (M_ATTK_HIT | M_ATTK_DEF_DIED)) == M_ATTK_HIT
