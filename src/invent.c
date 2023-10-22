@@ -733,6 +733,13 @@ merged(struct obj **potmp, struct obj **pobj)
         /* and puddings!!!1!!one! */
         else if (!Is_pudding(otmp))
             otmp->owt += obj->owt;
+
+        /* if a stack of unknown BUC is merging with a stack of
+           known BUC, make sure the BUC of the combined stack is
+           known */
+        if (otmp->oclass != COIN_CLASS)
+            otmp->bknown = obj->bknown = otmp->bknown || obj->bknown;
+
         if (!has_oname(otmp) && has_oname(obj))
             otmp = *potmp = oname(otmp, ONAME(obj), ONAME_SKIP_INVUPD);
         obj_extract_self(obj);
@@ -4531,7 +4538,6 @@ mergable(
         return FALSE;
 
     if (obj->dknown != otmp->dknown
-        || (obj->bknown != otmp->bknown && !Role_if(PM_CLERIC))
         || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
         || obj->greased != otmp->greased)
         return FALSE;
