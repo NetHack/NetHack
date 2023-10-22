@@ -2500,12 +2500,7 @@ update_inventory(void)
      */
     save_suppress_price = iflags.suppress_price;
     iflags.suppress_price = 0;
-#if defined(TTY_PERM_INVENT)
-    if (WINDOWPORT(tty))
-        sync_perminvent();
-    else
-#endif
-        (*windowprocs.win_update_inventory)(0);
+    (*windowprocs.win_update_inventory)(0);
     iflags.suppress_price = save_suppress_price;
 }
 
