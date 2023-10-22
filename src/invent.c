@@ -3296,7 +3296,7 @@ display_pickinv(
     Loot *sortedinvent, *srtinv;
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
     int clr = 0, menu_behavior = MENU_BEHAVE_STANDARD;
-    boolean show_gold = TRUE, sparse = FALSE, inuse_only = FALSE,
+    boolean show_gold = TRUE, inuse_only = FALSE,
             skipped_gold = FALSE, skipped_noninuse = FALSE,
             doing_perm_invent = FALSE, save_flags_sortpack = flags.sortpack;
 
@@ -3324,10 +3324,8 @@ display_pickinv(
         menu_behavior = MENU_BEHAVE_PERMINV;
         prepare_perminvent(win);
         show_gold = ((wri_info.fromcore.invmode & InvShowGold) != 0);
-        sparse = ((wri_info.fromcore.invmode & InvSparse) != 0);
         inuse_only = ((wri_info.fromcore.invmode & InvInUse) != 0);
         doing_perm_invent = TRUE;
-        nhUse(sparse);
     }
     /*
      * Exit early if no inventory -- but keep going if we are doing
@@ -3348,7 +3346,7 @@ display_pickinv(
         : lets ? (int) strlen(lets)
                : !gi.invent ? 0 : !gi.invent->nobj ? 1 : 2;
     /* for xtra_choice, there's another 'item' not included in initial 'n';
-       for !lets (full gi.invent) and for override_ID (wizard mode identify),
+       for !lets (full invent) and for override_ID (wizard mode identify),
        skip message_menu handling of single item even if item count was 1 */
     if (xtra_choice || (n == 1 && (!lets || wizid)))
         ++n;
@@ -3442,7 +3440,7 @@ display_pickinv(
         if (flags.sortpack)
             add_menu(win, &nul_glyphinfo, &any, 0, 0,
                      iflags.menu_headings, clr,
-                    "Miscellaneous", MENU_ITEMFLAGS_NONE);
+                     "Miscellaneous", MENU_ITEMFLAGS_NONE);
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
                  clr, xtra_choice, MENU_ITEMFLAGS_NONE);

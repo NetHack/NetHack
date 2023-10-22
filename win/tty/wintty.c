@@ -257,7 +257,6 @@ void g_pututf8(uint8 *utf8str);
 #endif
 
 #ifdef TTY_PERM_INVENT
-static char Empty[1] = { '\0' };
 static struct tty_perminvent_cell zerottycell = { 0, 0, 0, { 0 }, 0 };
 static glyph_info zerogi = { 0 };
 static struct to_core zero_tocore = { 0 };
@@ -278,13 +277,14 @@ static int ttyinv_create_window(int, struct WinDesc *);
 static void ttyinv_remove_data(boolean);
 static void ttyinv_add_menu(winid, struct WinDesc *, char ch, int attr,
                             int clr, const char *str);
+static int selector_to_slot(char ch, const int invflags, boolean *ignore);
+static char slot_to_invlet(int, boolean);
 static void ttyinv_render(winid window, struct WinDesc *cw);
 static void tty_invent_box_glyph_init(struct WinDesc *cw);
 static boolean assesstty(enum inv_modes, short *, short *,
                          long *, long *, long *, long *, long *);
 static void ttyinv_populate_slot(struct WinDesc *, int, int,
                                  const char *, int32_t);
-static int selector_to_slot(char ch, const int invflags, boolean *ignore);
 #endif
 
 /*
@@ -3054,8 +3054,14 @@ selector_to_slot(
          * become an in-use item.
          * Inuse_only items might include one (or more than one) with
          * invlet '#' but it isn't special for Inuse_only.
+         * When nothing is in use, the core sends a menu header line to
+         * to indicate such in order to avoid having an empty menu; we
+         * ignore that and reconstruct one in ttyinv_render().
          */
-        slot = inuse_only_start++;
+        if (!ch)
+            *ignore = TRUE;
+        else
+            slot = inuse_only_start++;
     } else {
         /* normal perminv */
         switch (ch) {
@@ -3090,15 +3096,40 @@ selector_to_slot(
     return slot;
 }
 
+static char
+slot_to_invlet(int slot, boolean incl_gold)
+{
+    char res = '\0';
+
+    switch (slot) {
+    case 0:
+        res = incl_gold ? '$' : 'a';
+        break;
+    case 53:
+        /* if (!incl_gold) impossible("ttyinv_render: slot %d?", slot); */
+        res = '#';
+        break;
+    default:
+        if (incl_gold)
+            --slot; /* simplify 1..52 (0 and 53 won't get here) to 0..51 */
+        res = (slot < 26) ? ('a' + slot)
+              : (slot < 52) ? ('A' + slot - 26)
+                : '?'; /* won't happen */
+        break;
+    }
+    return res;
+}
+
 static void
 ttyinv_render(winid window, struct WinDesc *cw)
 {
     int row, col, slot, side, filled_count = 0, slot_limit;
     struct tty_perminvent_cell *cell;
-    char invbuf[BUFSZ], *text;
+    char invbuf[BUFSZ];
     boolean force_redraw = gp.program_state.in_docrt ? TRUE : FALSE,
             show_gold = (ttyinvmode & InvShowGold) != 0,
-            inuse_only = (ttyinvmode & InvInUse) != 0;
+            inuse_only = (ttyinvmode & InvInUse) != 0,
+            sparse = (ttyinvmode & InvSparse) != 0 && !inuse_only;
     int rows_per_side = (!show_gold ? 26 : 27);
 
     slot_limit = SIZE(slot_tracker);
@@ -3118,22 +3149,19 @@ ttyinv_render(winid window, struct WinDesc *cw)
         if (slot_tracker[slot])
            continue;
         if (slot == 0 && !filled_count) {
-            /* FIXME: this isn't correct; it shows "empty" if hero has gold
-               and player hasn't set ttyinvmode to display it; it can also
-               be drawn and briefly seen while other stuff (that player
-               just dropped or used up) hasn't been erased yet */
             Sprintf(invbuf, "%-4s[%s]", "",
-                    !filled_count ? "empty"
-                    : inuse_only  ? "no items are in use"
-                                  : "only gold");
-            text = invbuf;
+                    inuse_only ? "no items are in use"
+                    : (!show_gold && money_cnt(gi.invent)) ? "only gold"
+                      : "empty");
+        } else if (sparse && filled_count) {
+            Sprintf(invbuf, "%c", slot_to_invlet(slot, show_gold));
         } else {
-            text = Empty; /* "" => fill slot with spaces */
+            invbuf[0] = '\0'; /* "" => fill slot with spaces */
         }
         row = (slot % rows_per_side) + 1; /* +1: top border */
         /* side: left side panel or right side panel, not a window column */
         side = slot / rows_per_side;
-        ttyinv_populate_slot(cw, row, side, text, 0);
+        ttyinv_populate_slot(cw, row, side, invbuf, 0);
     }
     /* has there been a glyph reset since we last got here? */
     if (gg.glyph_reset_timestamp > last_glyph_reset_when) {
