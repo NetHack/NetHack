@@ -3217,7 +3217,6 @@ ttyinv_populate_slot(
 {
     struct tty_perminvent_cell *cell;
     char c;
-    boolean inuse_only = ((ttyinvmode & InvInUse) != 0);
     int ccnt, col, endcol;
     boolean inuse_only = (ttyinvmode & InvInUse) != 0;
 
