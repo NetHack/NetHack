@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1695159625 2023/09/19 21:40:25 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.449 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1698017900 2023/10/22 23:38:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.455 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4746,10 +4746,15 @@ dopramulet(void)
 static boolean
 tool_being_used(struct obj *obj)
 {
+    /*
+     * [Should this also include lit potions of oil?  They're not tools
+     *  but they are "in use" without being noticeable via obj->oworkmask.]
+     */
     if ((obj->owornmask & (W_TOOL | W_SADDLE)) != 0L)
         return TRUE;
     if (obj->oclass != TOOL_CLASS)
         return FALSE;
+    /* [don't actually need to check uwep here; caller catches it] */
     return (boolean) (obj == uwep || obj->lamplit
                       || (obj->otyp == LEASH && obj->leashmon));
 }

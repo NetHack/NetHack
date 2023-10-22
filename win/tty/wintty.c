@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1695430217 2023/09/23 00:50:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.344 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1698017917 2023/10/22 23:38:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.354 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -3049,9 +3049,9 @@ selector_to_slot(
         /*
          * Inuse_only uses slots 0 to N-1 instead of fixed positions.
          * Caller--or caller's caller's ... caller--only passes us
-         * relevant items so no filtering is necessary here; '!show_gold'
-         * gets ignored here since gold might be quivered or wielded and
-         * become an in-use item.
+         * relevant items so no filtering is necessary here.
+         * '!show_gold' gets ignored here since gold might be quivered
+         * and become an in-use item.
          * Inuse_only items might include one (or more than one) with
          * invlet '#' but it isn't special for Inuse_only.
          * When nothing is in use, the core sends a menu header line to
@@ -3219,13 +3219,9 @@ assesstty(
     /* "normal" max for items in use would be 3 weapon + 7 armor + 4
        accessories == 14, but being punished and picking up the ball will
        add 1, and some quest artifacts have an an #invoke property that's
-       tracked via obj->owornmask so could add more; if hero ends up with
-       more than 15 in-use items, some will be left out;
-       Qt's "paper doll" adds first lit lamp/candle and first active
-       leash; those aren't tracked via owornmask so we don't notice them
-       [note: that was accurate when TTY_PERM_INVENT 'pulled' inventory
-       from the core but now that things have changed so that the core
-       'pushes' inventory to us, it might no longer be true] */
+       tracked via obj->owornmask so could add more; also, lit lamps/candles
+       and attached leashes are included; if hero ends up with more than
+       15 in-use items, some will be left out */
     if (inuse_only)
         *minrow = 1 + 15 + 1; /* top border + 15 lines + bottom border */
     *maxrow = *minrow; /* FIXME: inuse_only should be able to use more
