@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1247 $ $NHDT-Date: 1695932713 2023/09/28 20:25:13 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1268 $ $NHDT-Date: 1698090922 2023/10/23 19:55:22 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1239,6 +1239,8 @@ paranoid_confirm:pray can be changed to require yes/no response instead of y/n
 	by also setting paranoid_confirm:Confirm
 wand of probing reveals map locations and traps in the ray path; also reveals
 	secret doors and secret corridors if the ray hits such
+wand of probing zapped downward while hero is over water shows items under that
+wand of probing reveals tin and egg contents
 applying a wielded, lit potion of oil to unlight it while other unlit
 	potion(s) of oil were quivered would trigger panic
 	"addinv: null obj after quiver merge otyp=N" where N is POT_OIL
@@ -1250,7 +1252,6 @@ the throne room on the Samurai quest home level lacked a throne but gave
 coughing due to stinking cloud wakes up nearby monsters
 stop occupation when timed levitation or choking issues a message
 use #monster to make dragon steed breathe
-wand of probing reveals tin and egg contents
 steam vortices and fog clouds leave steam clouds behind
 fog clouds maintain any clouds they are in, even poisonous ones
 bone devils summon skeletons

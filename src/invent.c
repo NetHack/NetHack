@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1698017900 2023/10/22 23:38:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.455 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1698090922 2023/10/23 19:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.456 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -5527,8 +5527,8 @@ only_here(struct obj *obj)
 }
 
 /*
- * Display a list of buried items in inventory style.  Return a non-zero
- * value if there were items at that spot.
+ * Display a list of buried or underwater items in inventory style.
+ * Return a non-zero value if there were items at that spot.
  *
  * Currently, this is only used with a wand of probing zapped downwards.
  */
@@ -5536,10 +5536,42 @@ int
 display_binventory(coordxy x, coordxy y, boolean as_if_seen)
 {
     struct obj *obj;
+    char qbuf[QBUFSZ];
+    const char *underwhat = "here";
     menu_item *selected = 0;
-    int n;
+    int n, n2 = 0;
 
-    /* count # of objects here */
+    /* if hero is levitating or flying over water or lava, list any items
+       below (the map won't be showing them); if hero is underwater, player
+       should use the normal look_here command instead of probing (caller
+       has already used bhitpile() which will have set dknown on all items) */
+    if (is_pool_or_lava(x, y) && !Underwater
+        && (obj = gl.level.objects[x][y]) != 0) {
+        const char *real_liquid = is_pool(x, y) ? "water" : "lava",
+                   *seen_liquid = hliquid(real_liquid);
+
+        if (!obj->nexthere) {
+            boolean more_than_1 = is_plural(obj);
+
+            There("%s %s under the %s here.", more_than_1 ? "are" : "is",
+                  doname(obj), seen_liquid);
+            n2 = 1;
+            /* "pair of boots" is singular but "beneath it" sounds strange */
+            if (pair_of(obj))
+                more_than_1 = TRUE;
+            underwhat = more_than_1 ? "under them" : "beneath it";
+        } else {
+            Sprintf(qbuf, "Things that are under the %s here:", seen_liquid);
+            if (query_objlist(qbuf, &gl.level.objects[x][y], BY_NEXTHERE,
+                              &selected, PICK_NONE, allow_all) > 0)
+                free((genericptr_t) selected), selected = 0;
+            for (n2 = 0; obj; obj = obj->nexthere)
+                ++n2;
+            underwhat = "beneath them";
+        }
+    }
+
+    /* count # of buried objects here */
     for (n = 0, obj = gl.level.buriedobjlist; obj; obj = obj->nobj)
         if (obj->ox == x && obj->oy == y) {
             if (as_if_seen)
@@ -5550,13 +5582,14 @@ display_binventory(coordxy x, coordxy y, boolean as_if_seen)
     if (n) {
         go.only.x = x;
         go.only.y = y;
-        if (query_objlist("Things that are buried here:",
-                          &gl.level.buriedobjlist, INVORDER_SORT,
+        /* "buried here", but vary if we've already shown underwater items */
+        Sprintf(qbuf, "Things that are buried %s:", underwhat);
+        if (query_objlist(qbuf, &gl.level.buriedobjlist, INVORDER_SORT,
                           &selected, PICK_NONE, only_here) > 0)
             free((genericptr_t) selected);
         go.only.x = go.only.y = 0;
     }
-    return n;
+    return n + n2;
 }
 
 void
