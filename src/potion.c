@@ -2269,6 +2269,16 @@ dodip(void)
                 return ECMD_TIME;
             }
             ++drink_ok_extra;
+        } else if (IS_SINK(here)) {
+            Snprintf(qbuf, sizeof(qbuf), "%s%s into the sink?", Dip_,
+                     flags.verbose ? obuf : shortestname);
+            if (y_n(qbuf) == 'y') {
+                if (!is_hands)
+                    obj->pickup_prev = 0;
+                dipsink(obj);
+                return ECMD_TIME;
+            }
+            ++drink_ok_extra;
         } else if (is_pool(u.ux, u.uy)) {
             const char *pooltype = waterbody_name(u.ux, u.uy);
 

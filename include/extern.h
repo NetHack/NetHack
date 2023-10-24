@@ -472,6 +472,7 @@ extern int dodrop(void);
 extern boolean boulder_hits_pool(struct obj *, coordxy, coordxy, boolean);
 extern boolean flooreffects(struct obj *, coordxy, coordxy, const char *);
 extern void doaltarobj(struct obj *);
+extern void polymorph_sink(void);
 extern void trycall(struct obj *);
 extern boolean canletgo(struct obj *, const char *);
 extern void dropx(struct obj *);
@@ -975,6 +976,7 @@ extern void dipfountain(struct obj *);
 extern int wash_hands(void);
 extern void breaksink(coordxy, coordxy);
 extern void drinksink(void);
+extern void dipsink(struct obj *);
 
 /* ### hack.c ### */
 

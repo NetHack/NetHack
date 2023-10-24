@@ -7,7 +7,6 @@
 
 #include "hack.h"
 
-static void polymorph_sink(void);
 static boolean teleport_sink(void);
 static void dosinkring(struct obj *);
 static int drop(struct obj *);
@@ -352,7 +351,7 @@ trycall(struct obj *obj)
 
 /* Transforms the sink at the player's position into
    a fountain, throne, altar or grave. */
-static void
+void
 polymorph_sink(void)
 {
     uchar sym = S_sink;
