@@ -1604,6 +1604,7 @@ vesa_WriteCharXY(uint32 chr, int pixx, int pixy, uint32 colour)
     chr_cache_lastx = pixx;
     chr_cache[chr_cache_size].chr = chr;
     chr_cache[chr_cache_size].colour = colour;
+    chr_cache[chr_cache_size].bgcolour = BACKGROUND_VESA_COLOR;
     ++chr_cache_size;
 }
 
