@@ -1856,6 +1856,7 @@ macOS: Xcode project was failing to build if the path to the NetHack source
 MS-DOS: add -DSTATUES_LOOK_LIKE_MONSTERS to Makefile1.cross so the VESA mode
 	can display statue glyphs
 MS-DOS: sample config file had same MENUCOLOR flaw as Windows (see below)
+MS-DOS: implement inverse text attribute
 Qt: quit if can't load tiles file instead of continuing and then segfaulting
 Qt: [later] tiles load failure at startup now continues using an ascii map
 Qt: use more columns for extended command selection dialog so that the number

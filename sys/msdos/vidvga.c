@@ -138,6 +138,7 @@ extern boolean clipping;    /* clipping on? from wintty.c */
 extern int savevmode;       /* store the original video mode */
 extern int curcol, currow;  /* current column and row        */
 extern int g_attribute;
+extern int inversed;
 extern int attrib_text_normal;  /* text mode normal attribute */
 extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_text_intense; /* text mode intense attribute */
@@ -964,6 +965,12 @@ vga_WriteChar(uint32 chr, int col, int row, int colour)
         bgcolor = vgacmap[curframecolor];
     else
         bgcolor = BACKGROUND_VGA_COLOR;
+
+    if (inversed) {
+        int tmpc = actual_colour;
+        actual_colour = bgcolor;
+        bgcolor = tmpc;
+    }
 
     x = min(col, (CO - 1));         /* min() used protection from callers */
     pixy = min(row, (LI - 1)) * 16; /* assumes 8 x 16 char set */

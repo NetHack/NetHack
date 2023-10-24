@@ -24,6 +24,7 @@ extern int total_tiles_used, Tile_corr, Tile_unexplored;  /* from tile.c */
 struct VesaCharacter {
     uint32 colour, bgcolour;
     uint32 chr;
+    char inverse;
 };
 
 static unsigned long vesa_SetWindow(int window, unsigned long offset);
@@ -69,6 +70,7 @@ extern int clipx, clipxmax; /* current clipping column from wintty.c */
 extern int clipy, clipymax; /* current clipping row from wintty.c */
 extern int curcol, currow;  /* current column and row        */
 extern int g_attribute;
+extern int inversed;
 extern int attrib_text_normal;  /* text mode normal attribute */
 extern int attrib_gr_normal;    /* graphics mode normal attribute */
 extern int attrib_gr_intense;   /* graphics mode intense attribute */
@@ -1603,6 +1605,7 @@ vesa_WriteCharXY(uint32 chr, int pixx, int pixy, uint32 colour)
     }
     chr_cache_lastx = pixx;
     chr_cache[chr_cache_size].chr = chr;
+    chr_cache[chr_cache_size].inverse = inversed;
     chr_cache[chr_cache_size].colour = colour;
     chr_cache[chr_cache_size].bgcolour = BACKGROUND_VESA_COLOR;
     ++chr_cache_size;
@@ -1694,6 +1697,15 @@ vesa_WriteTextRow(int pixx, int pixy, struct VesaCharacter const *t_row,
                 fg[2] = (pix >> 16) & 0xFF;
                 fg[3] = (pix >> 24) & 0xFF;
             }
+
+            if (t_row[i].inverse) {
+                unsigned char tmpx[4];
+                tmpx[0] = bg[0]; bg[0] = fg[0]; fg[0] = tmpx[0];
+                tmpx[1] = bg[1]; bg[1] = fg[1]; fg[1] = tmpx[1];
+                tmpx[2] = bg[2]; bg[2] = fg[2]; fg[2] = tmpx[2];
+                tmpx[3] = bg[3]; bg[3] = fg[3]; fg[3] = tmpx[3];
+            }
+
             /* Third loop: draw eight pixels */
             for (px = 0; px < (int) vesa_char_width; px += 8) {
                 /* Fourth loop: draw one pixel */

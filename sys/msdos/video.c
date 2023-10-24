@@ -128,6 +128,7 @@ int savevmode;               /* store the original video mode in here */
 int curcol, currow;          /* graphics mode current cursor locations */
 int g_attribute;             /* Current attribute to use */
 int monoflag;                /* 0 = not monochrome, else monochrome */
+int inversed;
 int attrib_text_normal;      /* text mode normal attribute */
 int attrib_gr_normal;        /* graphics mode normal attribute */
 int attrib_text_intense;     /* text mode intense attribute */
@@ -296,10 +297,12 @@ void
 term_end_attr(int attr)
 {
     switch (attr) {
+    case ATR_INVERSE:
+        inversed = 0;
+        /*FALLTHRU*/
     case ATR_ULINE:
     case ATR_BOLD:
     case ATR_BLINK:
-    case ATR_INVERSE:
     default:
         g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
     }
@@ -343,13 +346,8 @@ term_start_attr(int attr)
         }
         break;
     case ATR_INVERSE:
-        if (monoflag) {
-            g_attribute = ATTRIB_MONO_REVERSE;
-        } else {
-            g_attribute =
-                iflags.grmode ? attrib_gr_intense : attrib_text_intense;
-        }
-        break;
+        inversed = 1;
+        /*FALLTHRU*/
     default:
         g_attribute = iflags.grmode ? attrib_gr_normal : attrib_text_normal;
         break;
@@ -477,6 +475,8 @@ tty_startup(int *wid, int *hgt)
 #else
     monoflag = 0;
 #endif
+
+    inversed = 0;
 }
 
 void
@@ -600,6 +600,9 @@ xputc(int ch) /* write out character (and attribute) */
     }
 
     if (!iflags.grmode) {
+        if (inversed) {
+            attribute = (g_attribute % 8) << 4;
+        }
         txt_xputc(ch, attribute);
 #ifdef SCREEN_VGA
     } else if (iflags.usevga) {
