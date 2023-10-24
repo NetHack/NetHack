@@ -694,4 +694,47 @@ drinksink(void)
     }
 }
 
+void
+dipsink(struct obj *obj)
+{
+    boolean try_call = FALSE;
+
+    if (obj == &cg.zeroobj || obj == uarmg) {
+        (void) wash_hands();
+        return;
+    } else if (obj->oclass != POTION_CLASS) {
+        You("hold %s under the tap.", the(xname(obj)));
+        if (water_damage(obj, (const char *) 0, TRUE) == ER_NOTHING)
+            pline("Nothing seems to happen.");
+        return;
+    }
+
+    /* at this point the object must be a potion */
+    You("pour %s%s down the drain.", (obj->quan > 1L ? "one of " : ""),
+        the(xname(obj)));
+    switch (obj->otyp) {
+    case POT_POLYMORPH:
+        polymorph_sink();
+        try_call = TRUE;
+        break;
+    case POT_OIL:
+        if (!Blind) {
+            pline("It leaves an oily film on the basin.");
+            try_call = TRUE;
+        }
+        break;
+    default:
+        /* hero can feel the vapor on her skin, so no need to check Blind or
+           breathless for this message */
+        pline("A wisp of vapor rises up...");
+        /* NB: potionbreathe calls trycall or makeknown as appropriate */
+        if (!breathless(gy.youmonst.data) || haseyes(gy.youmonst.data))
+            potionbreathe(obj);
+        break;
+    }
+    if (try_call && obj->dknown)
+        trycall(obj);
+    useup(obj);
+}
+
 /*fountain.c*/
