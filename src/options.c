@@ -10262,6 +10262,7 @@ set_playmode(void)
            set iflags.deferred_X and prompt to activate explore mode after the
            save file has already been deleted */
         discover = !wizard;
+        iflags.deferred_X = FALSE;
     }
     if (discover && !authorize_explore_mode()) {
         discover = iflags.deferred_X = FALSE;
