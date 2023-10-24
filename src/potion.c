@@ -2177,8 +2177,10 @@ mixtype(struct obj *o1, struct obj *o2)
 static int
 dip_ok(struct obj *obj)
 {
-    /* dipping hands and gold isn't currently implemented */
-    if (!obj || obj->oclass == COIN_CLASS)
+    if (!obj)
+        return GETOBJ_DOWNPLAY;
+    /* dipping gold isn't currently implemented */
+    if (obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
 
     if (inaccessible_equipment(obj, (const char *) 0, FALSE))
@@ -2218,14 +2220,16 @@ dodip(void)
     uchar here;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
+    boolean is_hands;
 
     if (!(obj = getobj("dip", dip_ok, GETOBJ_PROMPT)))
         return ECMD_CANCEL;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
-    shortestname = (is_plural(obj) || pair_of(obj)) ? "them" : "it";
-
+    is_hands = (obj == &cg.zeroobj);
+    shortestname = (is_hands || is_plural(obj) || pair_of(obj)) ? "them"
+                                                                : "it";
     drink_ok_extra = 0;
     /* preceding #dip with 'm' skips the possibility of dipping into
        fountains and pools plus the prompting which those entail */
@@ -2239,10 +2243,16 @@ dodip(void)
          * supplied type name.
          * getobj: "What do you want to dip <the object> into? [xyz or ?*] "
          */
-        Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
-                             /* 128 - (24 + 54 + 1) leaves 49 for <object> */
-                                 QBUFSZ - sizeof "What do you want to dip \
+        if (is_hands) {
+            Snprintf(obuf, sizeof(obuf), "your %s",
+                     makeplural(body_part(HAND)));
+        } else {
+            Strcpy(obuf, short_oname(obj, doname, thesimpleoname,
+                                     /* 128 - (24 + 54 + 1) leaves 49 for
+                                        <object> */
+                                     QBUFSZ - sizeof "What do you want to dip\
  into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
+        }
 
         here = levl[u.ux][u.uy].typ;
         /* Is there a fountain to dip into here? */
@@ -2253,7 +2263,8 @@ dodip(void)
                      flags.verbose ? obuf : shortestname);
             /* "Dip <the object> into the fountain?" */
             if (y_n(qbuf) == 'y') {
-                obj->pickup_prev = 0;
+                if (!is_hands)
+                    obj->pickup_prev = 0;
                 dipfountain(obj);
                 return ECMD_TIME;
             }
@@ -2270,6 +2281,10 @@ dodip(void)
                 } else if (u.usteed && !is_swimmer(u.usteed->data)
                            && P_SKILL(P_RIDING) < P_BASIC) {
                     rider_cant_reach(); /* not skilled enough to reach */
+                } else if (is_hands || obj == uarmg) {
+                    if (!is_hands)
+                        obj->pickup_prev = 0;
+                    (void) wash_hands();
                 } else {
                     obj->pickup_prev = 0;
                     if (obj->otyp == POT_ACID)
@@ -2336,6 +2351,11 @@ potion_dip(struct obj *obj, struct obj *potion)
 
     if (potion == obj && potion->quan == 1L) {
         pline("That is a potion bottle, not a Klein bottle!");
+        return ECMD_OK;
+    }
+    if (obj == &cg.zeroobj) {
+        You("can't fit your %s into the mouth of the bottle!",
+            body_part(HAND));
         return ECMD_OK;
     }
 

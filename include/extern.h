@@ -972,6 +972,7 @@ extern void dogushforth(int);
 extern void dryup(coordxy, coordxy, boolean);
 extern void drinkfountain(void);
 extern void dipfountain(struct obj *);
+extern int wash_hands(void);
 extern void breaksink(coordxy, coordxy);
 extern void drinksink(void);
 

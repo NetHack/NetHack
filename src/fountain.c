@@ -389,6 +389,7 @@ void
 dipfountain(register struct obj *obj)
 {
     int er = ER_NOTHING;
+    boolean is_hands = (obj == &cg.zeroobj);
 
     if (Levitation) {
         floating_above("fountain");
@@ -437,17 +438,19 @@ dipfountain(register struct obj *obj)
         if (in_town(u.ux, u.uy))
             (void) angry_guards(FALSE);
         return;
+    } else if (is_hands || obj == uarmg) {
+        er = wash_hands();
     } else {
         er = water_damage(obj, NULL, TRUE);
+    }
 
-        if (er == ER_DESTROYED || (er != ER_NOTHING && !rn2(2))) {
-            return; /* no further effect */
-        }
+    if (er == ER_DESTROYED || (er != ER_NOTHING && !rn2(2))) {
+        return; /* no further effect */
     }
 
     switch (rnd(30)) {
     case 16: /* Curse the item */
-        if (obj->oclass != COIN_CLASS && !obj->cursed) {
+        if (!is_hands && obj->oclass != COIN_CLASS && !obj->cursed) {
             curse(obj);
         }
         break;
@@ -455,7 +458,7 @@ dipfountain(register struct obj *obj)
     case 18:
     case 19:
     case 20: /* Uncurse the item */
-        if (obj->cursed) {
+        if (!is_hands && obj->cursed) {
             if (!Blind)
                 pline_The("%s glows for a moment.", hliquid("water"));
             uncurse(obj);
@@ -537,6 +540,27 @@ dipfountain(register struct obj *obj)
     }
     update_inventory();
     dryup(u.ux, u.uy, TRUE);
+}
+
+int
+wash_hands(void)
+{
+    const char *hands = makeplural(body_part(HAND));
+    int res = ER_NOTHING;
+
+    You("wash your %s%s in the %s.", uarmg ? "gloved " : "", hands,
+        hliquid("water"));
+    if (Glib) {
+        make_glib(0);
+        Your("%s are no longer slippery.",
+             uarmg ? gloves_simple_name(uarmg) : hands);
+        /* not what ER_GREASED is for, but the checks in dipfountain just
+           compare the result to ER_DESTROYED and ER_NOTHING, so it works */
+        res = ER_GREASED;
+    } else if (uarmg) {
+        res = water_damage(uarmg, (const char *) 0, TRUE);
+    }
+    return res;
 }
 
 void
