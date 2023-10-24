@@ -404,6 +404,8 @@ struct instance_flags {
                                     chosen_windowport[], but do not switch to
                                     it in the midst of options processing */
     genericptr_t returning_missile; /* 'struct obj *'; Mjollnir or aklys */
+    boolean wiz_error_flag;     /* flag for tracking failed wizmode auth */
+    boolean explore_error_flag; /* ditto for explore mode */
     boolean obsolete;  /* obsolete options can point at this, it isn't used */
 };
 

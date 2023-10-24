@@ -53,7 +53,6 @@ extern void init_linux_cons(void);
 #endif
 
 static void wd_message(void);
-static boolean wiz_error_flag = FALSE, explore_error_flag = FALSE;
 static struct passwd *get_unix_pw(void);
 
 int
@@ -951,7 +950,7 @@ authorize_wizard_mode(void)
         if (check_user_string(sysopt.wizards))
             return TRUE;
     }
-    wiz_error_flag = TRUE; /* not being allowed into wizard mode */
+    iflags.wiz_error_flag = TRUE; /* not being allowed into wizard mode */
     return FALSE;
 }
 
@@ -964,7 +963,7 @@ authorize_explore_mode(void)
         if (check_user_string(sysopt.explorers))
             return TRUE;
     }
-    explore_error_flag = TRUE; /* not being allowed into explore mode */
+    iflags.explore_error_flag = TRUE; /* not allowed into explore mode */
     return FALSE;
 #else
     return TRUE; /* if sysconf disabled, no restrictions on explore mode */
@@ -974,7 +973,7 @@ authorize_explore_mode(void)
 static void
 wd_message(void)
 {
-    if (wiz_error_flag) {
+    if (iflags.wiz_error_flag) {
         if (sysopt.wizards && sysopt.wizards[0]) {
             char *tmp = build_english_list(sysopt.wizards);
             pline("Only user%s %s may access debug (wizard) mode.",
@@ -984,9 +983,9 @@ wd_message(void)
             You("cannot access debug (wizard) mode.");
         }
         wizard = FALSE; /* (paranoia) */
-        if (!explore_error_flag)
+        if (!iflags.explore_error_flag)
             pline("Entering explore/discovery mode instead.");
-    } else if (explore_error_flag) {
+    } else if (iflags.explore_error_flag) {
         You("cannot access explore mode."); /* same as enter_explore_mode */
         discover = iflags.deferred_X = FALSE; /* (more paranoia) */
     } else if (discover)
