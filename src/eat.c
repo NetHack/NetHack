@@ -19,7 +19,6 @@ static void do_reset_eat(void);
 static void maybe_extend_timed_resist(int);
 static void done_eating(boolean);
 static void cprefx(int);
-static int intrinsic_possible(int, struct permonst *);
 static boolean temp_givit(int, struct permonst *);
 static void givit(int, struct permonst *);
 static void eye_of_newt_buzz(void);
@@ -847,7 +846,7 @@ fix_petrification(void)
  */
 
 /* intrinsic_possible() returns TRUE iff a monster can give an intrinsic. */
-static int
+int
 intrinsic_possible(int type, struct permonst *ptr)
 {
     int res = 0;

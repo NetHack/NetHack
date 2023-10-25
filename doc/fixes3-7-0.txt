@@ -1264,6 +1264,7 @@ if a temple was entered while blind, #overview could show a line of just "."
 	when describing altars if no other interesting features on that level
 	were known
 rolling boulders ignored walls and trees
+shopkeepers consider the monster type when charging for tins, eggs and corpses
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

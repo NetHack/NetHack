@@ -792,6 +792,7 @@ extern long temp_resist(int);
 extern void eating_conducts(struct permonst *);
 extern int eat_brains(struct monst *, struct monst *, boolean, int *);
 extern void fix_petrification(void);
+extern int intrinsic_possible(int, struct permonst *);
 extern boolean should_givit(int, struct permonst *);
 extern void consume_oeaten(struct obj *, int);
 extern boolean maybe_finished_meal(boolean);

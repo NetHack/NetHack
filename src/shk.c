@@ -48,6 +48,7 @@ static long cheapest_item(struct monst *);
 static int dopayobj(struct monst *, struct bill_x *, struct obj **, int,
                     boolean);
 static long stolen_container(struct obj *, struct monst *, long, boolean);
+static long corpsenm_price_adj(struct obj *);
 static long getprice(struct obj *, boolean);
 static void shk_names_obj(struct monst *, struct obj *, const char *, long,
                           const char *);
@@ -3612,6 +3613,51 @@ doinvbill(
     return 0;
 }
 
+/* adjust tin, egg, or corpse price based on monster data */
+static long
+corpsenm_price_adj(struct obj *obj)
+{
+    long val = 0L;
+
+    if ((obj->otyp == TIN || obj->otyp == EGG || obj->otyp == CORPSE)
+        && obj->corpsenm >= LOW_PM) {
+        int i;
+        long tmp = 1L;
+        struct permonst *ptr = &mons[obj->corpsenm];
+        struct {
+            int trinsic;
+            int cost;
+        } const icost[] = {
+            { FIRE_RES,   2 },
+            { SLEEP_RES,  3 },
+            { COLD_RES,   2 },
+            { DISINT_RES, 5 },
+            { SHOCK_RES,  4 },
+            { POISON_RES, 2 },
+            { ACID_RES,   1 },
+            { STONE_RES,  3 },
+            { TELEPORT,   2 },
+            { TELEPORT_CONTROL,  3 },
+            { TELEPAT,  5 }
+        };
+
+        for (i = 0; i < SIZE(icost); i++)
+            if (intrinsic_possible(icost[i].trinsic, ptr))
+                tmp += icost[i].cost;
+        if (unique_corpstat(ptr))
+            tmp += 50;
+
+
+        val = max(1, ((ptr->mlevel - 1) * 2));
+        if (obj->otyp == CORPSE)
+            val += max(1, (ptr->cnutrit / 30));
+
+        val = val * tmp;
+    }
+
+    return val;
+}
+
 static long
 getprice(register struct obj* obj, boolean shk_buying)
 {
@@ -3624,6 +3670,8 @@ getprice(register struct obj* obj, boolean shk_buying)
     }
     switch (obj->oclass) {
     case FOOD_CLASS:
+        tmp += corpsenm_price_adj(obj);
+
         /* simpler hunger check, (2-4)*cost */
         if (u.uhs >= HUNGRY && !shk_buying)
             tmp *= (long) u.uhs;
