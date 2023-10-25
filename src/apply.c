@@ -49,7 +49,6 @@ static boolean get_valid_polearm_position(coordxy, coordxy);
 static boolean find_poleable_mon(coord *, int, int);
 
 static const char
-    Nothing_seems_to_happen[] = "Nothing seems to happen.",
     no_elbow_room[] = "don't have enough elbow-room to maneuver.";
 
 static int
@@ -1010,7 +1009,7 @@ use_mirror(struct obj *obj)
         if (!Blind)
             pline_The("%s fogs up and doesn't reflect!", mirror);
         else
-            pline("%s", Nothing_seems_to_happen);
+            pline("%s", nothing_seems_to_happen);
         return ECMD_TIME;
     }
     if (!u.dx && !u.dy && !u.dz) {
@@ -1629,7 +1628,7 @@ use_lamp(struct obj *obj)
             if (!Blind)
                 Your("lantern is out of power.");
             else
-                pline("%s", Nothing_seems_to_happen);
+                pline("%s", nothing_seems_to_happen);
         } else {
             pline("This %s has no oil.", xname(obj));
         }
@@ -1644,7 +1643,7 @@ use_lamp(struct obj *obj)
             pline("%s for a moment, then %s.", Tobjnam(obj, "flicker"),
                   otense(obj, "die"));
         } else {
-            pline("%s", Nothing_seems_to_happen);
+            pline("%s", nothing_seems_to_happen);
         }
     } else {
         if (lamp) { /* lamp or lantern */
@@ -2232,7 +2231,7 @@ use_unicorn_horn(struct obj **optr)
             break;
         case 6:
             if (Deaf) /* make_deaf() won't give feedback when already deaf */
-                pline("%s", Nothing_seems_to_happen);
+                pline("%s", nothing_seems_to_happen);
             make_deaf((HDeaf & TIMEOUT) + lcount, TRUE);
             break;
         }
@@ -2320,7 +2319,7 @@ use_unicorn_horn(struct obj **optr)
     if (did_prop)
         gc.context.botl = TRUE;
     else
-        pline("%s", Nothing_seems_to_happen);
+        pline("%s", nothing_seems_to_happen);
 
 #undef PROP_COUNT
 #undef prop_trouble
@@ -3519,7 +3518,7 @@ use_royal_jelly(struct obj **optr)
         if (eobj->timed || eobj->corpsenm != oldcorpsenm)
             pline("The %s %s feebly.", xname(eobj), otense(eobj, "quiver"));
         else
-            pline("%s", Nothing_seems_to_happen);
+            pline("%s", nothing_seems_to_happen);
         kill_egg(eobj);
         goto useup_jelly;
     }
@@ -3538,7 +3537,7 @@ use_royal_jelly(struct obj **optr)
         || eobj->corpsenm != oldcorpsenm)
         pline("The %s %s briefly.", xname(eobj), otense(eobj, "quiver"));
     else
-        pline("%s", Nothing_seems_to_happen);
+        pline("%s", nothing_seems_to_happen);
 
  useup_jelly:
     /* not useup() because we've already done freeinv() */

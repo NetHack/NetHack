@@ -535,7 +535,7 @@ dipfountain(register struct obj *obj)
         break;
     default:
         if (er == ER_NOTHING)
-            pline("Nothing seems to happen.");
+            pline1(nothing_seems_to_happen);
         break;
     }
     update_inventory();
@@ -705,7 +705,7 @@ dipsink(struct obj *obj)
     } else if (obj->oclass != POTION_CLASS) {
         You("hold %s under the tap.", the(xname(obj)));
         if (water_damage(obj, (const char *) 0, TRUE) == ER_NOTHING)
-            pline("Nothing seems to happen.");
+            pline1(nothing_seems_to_happen);
         return;
     }
 
@@ -721,7 +721,42 @@ dipsink(struct obj *obj)
         if (!Blind) {
             pline("It leaves an oily film on the basin.");
             try_call = TRUE;
+        } else {
+            pline1(nothing_seems_to_happen);
         }
+        break;
+    case POT_ACID:
+        /* acts like a drain cleaner product */
+        try_call = TRUE;
+        if (!Blind) {
+            pline_The("drain seems less clogged.");
+        } else if (!Deaf) {
+            You_hear("a sucking sound.");
+        } else {
+            pline1(nothing_seems_to_happen);
+            try_call = FALSE;
+        }
+        break;
+    case POT_LEVITATION:
+        sink_backs_up(u.ux, u.uy);
+        try_call = TRUE;
+        break;
+    case POT_OBJECT_DETECTION:
+        if (!(levl[u.ux][u.uy].looted & S_LRING)) {
+            You("sense a ring lost down the drain.");
+            try_call = TRUE;
+            break;
+        }
+        /* FALLTHRU */
+    case POT_GAIN_LEVEL:
+    case POT_GAIN_ENERGY:
+    case POT_MONSTER_DETECTION:
+    case POT_FRUIT_JUICE:
+    case POT_WATER:
+        /* potions with no potionbreathe() effects, plus water.  if effects
+           are added to potionbreathe these should go to that instead (except
+           for water). */
+        pline1(nothing_seems_to_happen);
         break;
     default:
         /* hero can feel the vapor on her skin, so no need to check Blind or
@@ -735,6 +770,30 @@ dipsink(struct obj *obj)
     if (try_call && obj->dknown)
         trycall(obj);
     useup(obj);
+}
+
+void
+sink_backs_up(coordxy x, coordxy y)
+{
+    char buf[BUFSZ];
+
+    if (!Blind)
+        Strcpy(buf, "Muddy waste pops up from the drain");
+    else if (!Deaf)
+        Strcpy(buf, "You hear a sloshing sound"); /* Deaf-aware */
+    else
+        Sprintf(buf, "Something splashes you in the %s", body_part(FACE));
+    pline("%s%s.", !Deaf ? "Flupp!  " : "", buf);
+
+    if (!(levl[x][y].looted & S_LRING)) { /* once per sink */
+        if (!Blind)
+            You_see("a ring shining in its midst.");
+        (void) mkobj_at(RING_CLASS, x, y, TRUE);
+        newsym(x, y);
+        exercise(A_DEX, TRUE);
+        exercise(A_WIS, TRUE); /* a discovery! */
+        levl[x][y].looted |= S_LRING;
+    }
 }
 
 /*fountain.c*/

@@ -977,6 +977,7 @@ extern int wash_hands(void);
 extern void breaksink(coordxy, coordxy);
 extern void drinksink(void);
 extern void dipsink(struct obj *);
+extern void sink_backs_up(coordxy, coordxy);
 
 /* ### hack.c ### */
 

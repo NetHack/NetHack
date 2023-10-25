@@ -2405,7 +2405,7 @@ potion_dip(struct obj *obj, struct obj *potion)
                 prinv((char *) 0, obj, 0L);
                 return ECMD_TIME;
             } else {
-                pline("Nothing seems to happen.");
+                pline1(nothing_seems_to_happen);
                 goto poof;
             }
         }
