@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1654760203 2022/06/09 07:36:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.310 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1698264789 2023/10/25 20:13:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -291,6 +291,25 @@ rider_corpse_revival(struct obj *obj, boolean remotely)
     return TRUE;
 }
 
+/* wand of probing zapped down; perhaps hero is levitating while blind */
+void
+force_decor(boolean via_probing)
+{
+    /* we don't want describe_decor() to defer feedback if hero is fumbling
+       with 1 turn left, or for ice_descr() to skip thawing details if hero
+       is probing when levitating while blind (those will be skipped for
+       look_here() and farlook() or autodescribe); we can't control that by
+       temporarily tweaking properties because that could become noticeable
+       if status gets updated while decor feedback is being delivered */
+    gd.decor_fumble_override = TRUE;
+    gd.decor_levitate_override = via_probing;
+    /* force current terrain to be different from previous location */
+    iflags.prev_decor = STONE;
+    (void) describe_decor();
+    gd.decor_fumble_override = gd.decor_levitate_override = FALSE;
+    gl.lastseentyp[u.ux][u.uy] = levl[u.ux][u.uy].typ;
+}
+
 void
 deferred_decor(boolean setup) /* True: deferring, False: catching up */
 {
@@ -312,7 +331,8 @@ describe_decor(void)
     const char *dfeature;
     int ltyp;
 
-    if ((HFumbling & TIMEOUT) == 1L && !iflags.defer_decor) {
+    if ((HFumbling & TIMEOUT) == 1L && !iflags.defer_decor
+        && !gd.decor_fumble_override) { /* probe_decor() */
         /*
          * Work around a message sequencing issue:  avoid
          *  |You are back on floor.
@@ -324,9 +344,7 @@ describe_decor(void)
         return FALSE;
     }
 
-    ltyp = levl[u.ux][u.uy].typ;
-    if (ltyp == DRAWBRIDGE_UP) /* surface for spot in front of closed db */
-        ltyp = db_under_typ(levl[u.ux][u.uy].drawbridgemask);
+    ltyp = SURFACE_AT(u.ux, u.uy);
     dfeature = dfeature_at(u.ux, u.uy, fbuf);
 
     /* we don't mention "ordinary" doors but do mention broken ones (and
@@ -337,6 +355,10 @@ describe_decor(void)
     if (doorhere || Underwater
         || (ltyp == ICE && IS_POOL(iflags.prev_decor))) /* pooleffects() */
         dfeature = 0;
+    /*
+     * TODO: if on ice, report moving between thicker and thinner ice (based
+     * on ice_descr()'s classification) as if moving onto different terrain.
+     */
 
     if (ltyp == iflags.prev_decor && !IS_FURNITURE(ltyp)) {
         res = FALSE;
@@ -353,18 +375,26 @@ describe_decor(void)
                 Strcpy(fbuf, dfeature);
             Sprintf(outbuf, "%s.", upstart(fbuf));
         }
-        pline("%s", outbuf);
+        if (ltyp == ICE)
+            Norep("%s", outbuf);
+        else
+            pline("%s", outbuf);
     } else if (!Underwater) {
         if (IS_POOL(iflags.prev_decor)
-            || iflags.prev_decor == LAVAPOOL
+            || IS_LAVA(iflags.prev_decor)
             || iflags.prev_decor == ICE) {
-            const char *ground = surface(u.ux, u.uy);
+            if (iflags.last_msg != PLNMSG_BACK_ON_GROUND) {
+                const char *surf = is_ice(u.ux, u.uy)
+                                       ? ice_descr(u.ux, u.uy, fbuf)
+                                       : surface(u.ux, u.uy);
 
-            if (iflags.last_msg != PLNMSG_BACK_ON_GROUND)
+                if (!strcmpi(surf, "floor") || !strcmpi(surf, "ground"))
+                    surf = "solid ground";
                 pline("%s %s %s.",
                       Verbose(2, describe_decor2) ? "You are back" : "Back",
-                      (Levitation || Flying) ? "over" : "on",
-                      ground);
+                      (Levitation || Flying) ? "over" : "on", surf);
+            }
+
         }
     }
     iflags.prev_decor = ltyp;

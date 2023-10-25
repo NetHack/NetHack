@@ -1,4 +1,4 @@
-/* NetHack 3.7	decl.c	$NHDT-Date: 1686726255 2023/06/14 07:04:15 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.286 $ */
+/* NetHack 3.7	decl.c	$NHDT-Date: 1698264780 2023/10/25 20:13:00 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.293 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2009. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -328,6 +328,9 @@ const struct instance_globals_d g_init_d = {
     DUMMY, /* disco */
     /* objname.c */
     0, /* distantname */
+    /* pickup.c */
+    FALSE, /* decor_fumble_override */
+    FALSE, /* decor_levitate_override */
     TRUE, /* havestate*/
     IVMAGIC  /* d_magic to validate that structure layout has been preserved */
 };

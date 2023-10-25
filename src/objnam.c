@@ -1,4 +1,4 @@
-/* NetHack 3.7	objnam.c	$NHDT-Date: 1686386790 2023/06/10 08:46:30 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.392 $ */
+/* NetHack 3.7	objnam.c	$NHDT-Date: 1698264786 2023/10/25 20:13:06 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.398 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1858,7 +1858,7 @@ singular(struct obj* otmp, char* (*func)(OBJ_P))
 char *
 just_an(char *outbuf, const char *str)
 {
-    char c0;
+    char c0, *p;
 
     *outbuf = '\0';
     c0 = lowc(*str);
@@ -1866,7 +1866,10 @@ just_an(char *outbuf, const char *str)
         /* single letter; might be used for named fruit or a musical note */
         Strcpy(outbuf, strchr("aefhilmnosx", c0) ? "an " : "a ");
     } else if (!strncmpi(str, "the ", 4) || !strcmpi(str, "molten lava")
-               || !strcmpi(str, "iron bars") || !strcmpi(str, "ice")) {
+               || !strcmpi(str, "iron bars") || !strcmpi(str, "ice")
+               || !strncmpi(str, "frozen ", 7) /* ice while hallucinating */
+               /* thawing ice ("solid ice", "thin ice", &c) */
+               || ((p = strchr(str, ' ')) != 0 && !strcmpi(p, " ice"))) {
         ; /* no article */
     } else {
         /* normal case is "an <vowel>" or "a <consonant>" */

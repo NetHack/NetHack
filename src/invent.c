@@ -1,4 +1,4 @@
-/* NetHack 3.7	invent.c	$NHDT-Date: 1698090922 2023/10/23 19:55:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.456 $ */
+/* NetHack 3.7	invent.c	$NHDT-Date: 1698264784 2023/10/25 20:13:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.457 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Derek S. Ray, 2015. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -4224,7 +4224,7 @@ dfeature_at(coordxy x, coordxy y, char *buf)
     else if (is_lava(x, y))
         cmap = S_lava; /* "molten lava" */
     else if (is_ice(x, y))
-        cmap = S_ice; /* "ice" */
+        dfeature = ice_descr(x, y, altbuf), cmap = -1; /* "ice" */
     else if (is_pool(x, y))
         dfeature = "pool of water";
     else if (IS_SINK(ltyp))
@@ -4330,19 +4330,28 @@ look_here(
         if (dfeature && !strncmp(dfeature, "altar ", 6)) {
             /* don't say "altar" twice, dfeature has more info */
             You("try to feel what is here.");
+        } else if (SURFACE_AT(u.ux, u.uy) == ICE) {
+            /* using describe_decor() to handle ice is simpler than
+               replicating it in the conditional message construction */
+            if (!flags.mention_decor || iflags.prev_decor == ICE)
+                force_decor(FALSE);
+            /* plain "ice" if blind and levitating, otherwise "solid ice" &c;
+              "There is [thin ]ice here.  You try to feel what is on it." */
+            You("try to feel what is on it.");
+            skip_dfeature = TRUE; /* ice already described */
         } else {
-            const char *where = (Blind && !can_reach_floor(TRUE))
-                                    ? "lying beneath you"
-                                    : "lying here on the ",
-                       *onwhat = (Blind && !can_reach_floor(TRUE))
-                                     ? ""
-                                     : surface(u.ux, u.uy);
+            boolean cant_reach = !can_reach_floor(TRUE);
+            const char *surf = surface(u.ux, u.uy),
+                       *where = cant_reach ? "lying beneath you"
+                                           : "lying here on the ",
+                       *onwhat = cant_reach ? "" : surf;
 
             You("try to feel what is %s%s.", drift ? "floating here" : where,
                 drift ? "" : onwhat);
+
+            if (dfeature && !drift && !strcmp(dfeature, surf))
+                skip_dfeature = TRUE; /* terrain feature already identified */
         }
-        if (dfeature && !drift && !strcmp(dfeature, surface(u.ux, u.uy)))
-            dfeature = 0; /* ice already identified */
         trap = t_at(u.ux, u.uy);
         if (!can_reach_floor(trap && is_pit(trap->ttyp))) {
             pline("But you can't reach it!");

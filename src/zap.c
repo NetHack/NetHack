@@ -1,4 +1,4 @@
-/* NetHack 3.7	zap.c	$NHDT-Date: 1686178723 2023/06/07 22:58:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.472 $ */
+/* NetHack 3.7	zap.c	$NHDT-Date: 1698264791 2023/10/25 20:13:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.481 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -3094,7 +3094,7 @@ cancel_monst(struct monst *mdef, struct obj *obj, boolean youattack,
 static boolean
 zap_updown(struct obj *obj) /* wand or spell */
 {
-    boolean striking = FALSE, disclose = FALSE;
+    boolean striking = FALSE, disclose = FALSE, map_zapped = FALSE;
     coordxy x, y, xx, yy;
     int ptmp;
     struct obj *otmp;
@@ -3113,9 +3113,24 @@ zap_updown(struct obj *obj) /* wand or spell */
         ptmp = 0;
         if (u.dz < 0) {
             You("probe towards the %s.", ceiling(x, y));
-        } else {
+        } else { /* down */
+            const char *surf;
+            schar ltyp, rememberedltyp = gl.lastseentyp[x][y];
+
             ptmp += bhitpile(obj, bhito, x, y, u.dz);
-            You("probe beneath the %s.", surface(x, y));
+            /* sequencing: zap_map() calls force_decor() for ice or furniture;
+               we need to call it before probing for buried objects */
+            ltyp = SURFACE_AT(x, y);
+            zap_map(x, y, obj);
+            map_zapped = TRUE;
+            if (ltyp == ICE || IS_FURNITURE(ltyp)) {
+                surf = "it";
+                if (gl.lastseentyp[x][y] != rememberedltyp)
+                    ptmp += 1;
+            } else {
+                surf = the(surface(x, y));
+            }
+            You("probe beneath %s.", surf);
             ptmp += display_binventory(x, y, TRUE);
         }
         if (!ptmp)
@@ -3245,7 +3260,8 @@ zap_updown(struct obj *obj) /* wand or spell */
 
         /* note: engraving handling that used to be here has been moved
            to zap_map() */
-        zap_map(x, y, obj);
+        if (!map_zapped)
+            zap_map(x, y, obj);
 
     } else if (u.dz < 0) {
         /* zapping upward */
@@ -3582,10 +3598,9 @@ zap_map(
     } /* !u.uz */
 
     if (obj->otyp == WAN_PROBING) {
+        schar ltyp;
         /*
          * Probing, either up/down or lateral.
-         *
-         * TODO: if terrain is ice, report on its thaw timer.
          */
 
         /* map unseen terrain */
@@ -3598,8 +3613,9 @@ zap_map(
                 learn_it = TRUE;
             }
         }
+        ltyp = SURFACE_AT(x, y);
         /* secret door gets revealed, converted into regular door */
-        if (levl[x][y].typ == SDOOR) {
+        if (ltyp == SDOOR) {
             cvt_sdoor_to_door(&levl[x][y]); /* .typ = DOOR */
             newsym(x, y);
             if (cansee(x, y)) {
@@ -3612,12 +3628,20 @@ zap_map(
         /* secret corridor likewise, although only ones within view will
            still be secret; for the !cansee(x,y) case, show_map_spot()
            above has already converted the spot to regular corridor */
-        } else if (levl[x][y].typ == SCORR) {
+        } else if (ltyp == SCORR) {
             levl[x][y].typ = CORR;
             unblock_point(x, y);
             newsym(x, y);
             pline("Probing exposes a secret corridor.");
             learn_it = TRUE;
+
+        /* if on or over ice, describe it ("solid ice", "thin ice", &c);
+           likewise for furniture in case hero is levitating while blind */
+        } else if (ltyp == ICE || IS_FURNITURE(ltyp)) {
+            if (u.dz > 0) { /* down, which also means x,y == u.ux,u.uy */
+                force_decor(TRUE);
+                learn_it = TRUE;
+            }
         }
         /*
          * Probing reveals undiscovered traps.

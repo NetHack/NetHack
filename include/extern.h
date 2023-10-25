@@ -1,4 +1,4 @@
-/* NetHack 3.7	extern.h	$NHDT-Date: 1695159584 2023/09/19 21:39:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1287 $ */
+/* NetHack 3.7	extern.h	$NHDT-Date: 1698264776 2023/10/25 20:12:56 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1296 $ */
 /* Copyright (c) Steve Creps, 1988.                               */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -2099,6 +2099,7 @@ extern char *monhealthdescr(struct monst *mon, boolean, char *);
 extern void mhidden_description(struct monst *, boolean, char *);
 extern boolean object_from_map(int, coordxy, coordxy, struct obj **);
 extern const char *waterbody_name(coordxy, coordxy);
+extern const char *ice_descr(coordxy, coordxy, char *);
 extern boolean ia_checkfile(struct obj *);
 extern int do_screen_description(coord, boolean, int, char *, const char **,
                                  struct permonst **);
@@ -2162,6 +2163,7 @@ extern void getlock(void);
 extern int collect_obj_classes(char *, struct obj *, boolean,
                                boolean(*)(struct obj *), int *);
 extern boolean rider_corpse_revival(struct obj *, boolean);
+extern void force_decor(boolean);
 extern void deferred_decor(boolean);
 extern boolean menu_class_present(int);
 extern void add_valid_menu_class(int);

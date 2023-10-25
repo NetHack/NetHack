@@ -1,4 +1,4 @@
-/* NetHack 3.7  decl.h  $NHDT-Date: 1686726249 2023/06/14 07:04:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.333 $ */
+/* NetHack 3.7  decl.h  $NHDT-Date: 1698264758 2023/10/25 20:12:38 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -321,6 +321,10 @@ struct instance_globals_d {
        xname_flags(); it would be much cleaner if this were a parameter,
        but that would require all xname() and doname() calls to be modified */
     int distantname;
+
+    /* pickup.c */
+    boolean decor_fumble_override;
+    boolean decor_levitate_override;
 
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */

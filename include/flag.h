@@ -1,4 +1,4 @@
-/* NetHack 3.7	flag.h	$NHDT-Date: 1684791761 2023/05/22 21:42:41 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.217 $ */
+/* NetHack 3.7	flag.h	$NHDT-Date: 1698264779 2023/10/25 20:12:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.224 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -290,6 +290,7 @@ struct instance_flags {
     boolean zerocomp;         /* write zero-compressed save files */
     boolean rlecomp;          /* alternative to zerocomp; run-length encoding
                                * compression of levels when writing savefile */
+    schar ice_rating;         /* ice_descr()'s classification of ice terrain */
     schar prev_decor;         /* 'mention_decor' just mentioned this */
     uchar num_pad_mode;
     uchar bouldersym;         /* symbol for boulder display */

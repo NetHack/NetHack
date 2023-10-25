@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1268 $ $NHDT-Date: 1698090922 2023/10/23 19:55:22 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1271 $ $NHDT-Date: 1698264796 2023/10/25 20:13:16 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2284,6 +2284,7 @@ applying gold pieces will flip one and report "heads" or "tails"; with a stack
 	of more than one, normally the flipped coin will rejoin the stack
 during enlightenment and end-of-game disclosure, use contraction "<verb>n't"
 	for "<verb> not"
+give feedback about the thaw status of ice terrain
 
 
 Platform- and/or Interface-Specific New Features
