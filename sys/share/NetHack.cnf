@@ -129,3 +129,16 @@ OPTIONS=time,noshowexp,number_pad:2,lit_corridor
 #MENUCOLOR=" cursed "=red
 #MENUCOLOR=" unholy "=red
 #MENUCOLOR=" cursed .* \(being worn\)"=orange&underline
+
+# statusbar highlighting
+#OPTIONS=hitpointbar
+#OPTIONS=hilite_status:hitpoints/100%/gray&normal
+#OPTIONS=hilite_status:hitpoints/<100%/green&normal
+#OPTIONS=hilite_status:hitpoints/<66%/yellow&normal
+#OPTIONS=hilite_status:hitpoints/<50%/orange&normal
+#OPTIONS=hilite_status:hitpoints/<33%/red&bold
+#OPTIONS=hilite_status:hitpoints/<15%/red&inverse
+#OPTIONS=hilite_status:power-max/up/green
+#OPTIONS=hilite_status:power-max/down/red
+#OPTIONS=hilite_status:armor-class/down/green
+#OPTIONS=hilite_status:armor-class/up/red
