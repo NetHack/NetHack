@@ -3865,7 +3865,7 @@ tipcontainer_checks(
 
         if (box->spe < old_spe) {
             if (bag && !totseen)
-                pline("Nothing seems to happen.");
+                pline1(nothing_seems_to_happen);
             /* check_unpaid wants to see a non-zero charge count */
             box->spe = old_spe;
             check_unpaid_usage(box, TRUE);

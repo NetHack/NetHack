@@ -29,6 +29,7 @@ extern NEARDATA const struct c_color_names c_color_names;
 /* common_strings */
 extern const struct c_common_strings c_common_strings;
 #define nothing_happens c_common_strings.c_nothing_happens
+#define nothing_seems_to_happen c_common_strings.c_nothing_seems_to_happen
 #define thats_enough_tries c_common_strings.c_thats_enough_tries
 #define silly_thing_to c_common_strings.c_silly_thing_to
 #define shudder_for_moment c_common_strings.c_shudder_for_moment

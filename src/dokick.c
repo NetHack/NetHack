@@ -958,7 +958,6 @@ dokick(void)
     int glyph, oldglyph = -1;
     register struct monst *mtmp;
     boolean no_kick = FALSE;
-    char buf[BUFSZ];
 
     if (nolimbs(gy.youmonst.data) || slithy(gy.youmonst.data)) {
         You("have no legs to kick with.");
@@ -1419,25 +1418,7 @@ dokick(void)
                 exercise(A_DEX, TRUE);
                 return ECMD_TIME;
             } else if (!rn2(3)) {
-                if (Blind && Deaf)
-                    Sprintf(buf, " %s", body_part(FACE));
-                else
-                    buf[0] = '\0';
-                pline("%s%s%s.", !Deaf ? "Flupp! " : "",
-                      !Blind
-                          ? "Muddy waste pops up from the drain"
-                          : !Deaf
-                              ? "You hear a sloshing sound"  /* Deaf-aware */
-                              : "Something splashes you in the", buf);
-                if (!(gm.maploc->looted & S_LRING)) { /* once per sink */
-                    if (!Blind)
-                        You_see("a ring shining in its midst.");
-                    (void) mkobj_at(RING_CLASS, x, y, TRUE);
-                    newsym(x, y);
-                    exercise(A_DEX, TRUE);
-                    exercise(A_WIS, TRUE); /* a discovery! */
-                    gm.maploc->looted |= S_LRING;
-                }
+                sink_backs_up(x, y);
                 return ECMD_TIME;
             }
             kick_ouch(x, y, "");

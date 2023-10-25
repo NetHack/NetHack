@@ -38,6 +38,7 @@ const char *c_obj_colors[] = {
 
 const struct c_common_strings c_common_strings =
     { "Nothing happens.",
+      "Nothing seems to happen.",
       "That's enough tries!",
       "That is a silly thing to %s.",
       "shudder for a moment.",
