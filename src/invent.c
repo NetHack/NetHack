@@ -4775,7 +4775,7 @@ tool_being_used(struct obj *obj)
 {
     /*
      * [Should this also include lit potions of oil?  They're not tools
-     *  but they are "in use" without being noticeable via obj->oworkmask.]
+     *  but they are "in use" without being noticeable via obj->owornmask.]
      */
     if ((obj->owornmask & (W_TOOL | W_SADDLE)) != 0L)
         return TRUE;

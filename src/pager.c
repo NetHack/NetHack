@@ -546,7 +546,7 @@ ice_descr(coordxy x, coordxy y, char *outbuf)
     int r = (u.xray_range > 2) ? u.xray_range : 2,
         neardist = (r * r) * 2 - r; /* same as r*r + r*(r-1) */
 
-    iflags.ice_rating = -1; /* secondary output, for ' mention_decor' */
+    iflags.ice_rating = -1; /* secondary output, for 'mention_decor' */
     if (levl[x][y].typ != ICE) {
         Sprintf(outbuf, "[ice:%d?]", (int) levl[x][y].typ);
     } else if ((distu(x, y) > neardist
