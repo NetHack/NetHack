@@ -4359,8 +4359,26 @@ look_here(
         }
     }
 
-    if (dfeature && !skip_dfeature)
-        Sprintf(fbuf, "There is %s here.", an(dfeature));
+    if (dfeature && !skip_dfeature) {
+        const char *p;
+        int article = 1; /* 0 => none, 1 => a/an, 2 => the (not used here) */
+
+        /* "molten lava", "iron bars", and plain "ice" are handled as special
+           cases in an() but probably shouldn't be; don't rely on that */
+        if (!strcmp(dfeature, "molten lava")
+            || !strcmp(dfeature, "iron bars")
+            || !strcmp(dfeature, "ice")
+            || !strncmp(dfeature, "frozen ", 7) /* ice while hallucinating */
+            /* thawing ice ("solid ice", "thin ice", &c) */
+            || ((p = strchr(dfeature, ' ')) != 0 && !strcmpi(p, " ice")))
+            article = 0;
+        if (article == 1)
+            dfeature = an(dfeature);
+
+        /* hardcoded "is" worked here because "iron bars" is actually
+           "set of iron bars"; use vtense() instead of relying on that */
+        Sprintf(fbuf, "There %s %s here.", vtense(dfeature, "are"), dfeature);
+    }
 
     if (!otmp || is_lava(u.ux, u.uy)
         || (is_pool(u.ux, u.uy) && !Underwater)) {

@@ -365,7 +365,7 @@ describe_decor(void)
     } else if (dfeature) {
         if (waterhere)
             dfeature = strcpy(fbuf, waterbody_name(u.ux, u.uy));
-        if (strcmp(dfeature, "swamp"))
+        if (strcmp(dfeature, "swamp") && ltyp != ICE)
             dfeature = an(dfeature);
 
         if (Verbose(2, describe_decor1)) {

@@ -1062,7 +1062,7 @@ add_cmap_descr(
     const char **firstmatch, /* output: pointer to 1st matching description */
     char *out_str)      /* input/output: current description gets appended */
 {
-    char *mbuf = NULL;
+    char *mbuf = NULL, *p;
     int absidx = abs(idx);
 
     if (glyph == NO_GLYPH) {
@@ -1111,11 +1111,17 @@ add_cmap_descr(
             Strcpy(mbuf, "lava");
         x_str = mbuf;
         article = !(!strncmp(x_str, "water", 5)
+                    || !strncmp(x_str, "ice", 3)
                     || !strncmp(x_str, "lava", 4)
                     || !strncmp(x_str, "swamp", 5)
                     || !strncmp(x_str, "molten", 6)
                     || !strncmp(x_str, "shallow", 7)
-                    || !strncmp(x_str, "limitless", 9));
+                    || !strncmp(x_str, "limitless", 9)
+                    /* ice while hallucinating */
+                    || !strncmp(x_str, "frozen", 6)
+                    /* thawing ice ("solid ice", "thin ice", &c) */
+                    || ((p = strchr(x_str, ' ')) != 0 && !strcmpi(p, " ice"))
+                    );
     }
 
     if (!found) {
@@ -1124,9 +1130,9 @@ add_cmap_descr(
             Sprintf(out_str, "%sa trap", prefix);
             *hit_trap = TRUE;
         } else {
-            Sprintf(out_str, "%s%s", prefix,
-                    article == 2 ? the(x_str)
-                    : article == 1 ? an(x_str) : x_str);
+            Sprintf(out_str, "%s%s", prefix, (article == 2) ? the(x_str)
+                                             : (article == 1) ? an(x_str)
+                                               : x_str);
         }
         *firstmatch = x_str;
         found = 1;
@@ -1226,6 +1232,7 @@ do_screen_description(
         if (x_str == unreconnoitered)
             goto didlook;
     }
+
  check_monsters:
     /* Check for monsters */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_MON) != 0) {
@@ -1282,8 +1289,8 @@ do_screen_description(
     if (sym == DEF_INVISIBLE) {
         /* for active clairvoyance, use alternate "unseen creature" */
         boolean usealt = (EDetect_monsters & I_SPECIAL) != 0L;
-        const char *unseen_explain = usealt ? altinvisexplain
-                                    : Blind ? altinvisexplain : invisexplain;
+        const char *unseen_explain = (usealt || Blind) ? altinvisexplain
+                                                       : invisexplain;
 
         if (!found) {
             Sprintf(out_str, "%s%s", prefix, an(unseen_explain));
