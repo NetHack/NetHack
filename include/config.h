@@ -6,13 +6,6 @@
 #ifndef CONFIG_H /* make sure the compiler does not see the typedefs twice */
 #define CONFIG_H
 
-#define EXTRA_SANITY_CHECKS
-#define MONITOR_HEAP
-#define DUMPLOG
-#define SCORE_ON_BOTL
-#define EDIT_GETLIN
-#define LIVELOG
-
 /*
  * Section 1:   Operating and window systems selection.
  *              Select the version of the OS you are using.
@@ -589,7 +582,7 @@ typedef unsigned char uchar;
 
 /* An experimental minimalist inventory list capability under tty if you have
  * at least 28 additional rows beneath the status window on your terminal  */
-#define TTY_PERM_INVENT /**/
+/* #define TTY_PERM_INVENT */
 
 /* NetHack will execute an external program whenever a new message-window
  * message is shown.  The program to execute is given in environment variable
