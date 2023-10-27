@@ -154,7 +154,8 @@
  * the free XPM library.  The second option allows you to then use other
  * programs to generate tiles files.  For example, the PBMPlus tools
  * would allow:
- *  xpmtoppm <x11tiles.xpm | pnmscale 1.25 | ppmquant 90 >x11tiles_big.xpm
+ *  xpmtoppm <x11tiles.xpm | pnmscale 1.25 | ppmquant 90 | \
+ *      ppmtoxpm >x11tiles_big.xpm
  */
 /* # define USE_XPM */ /* Disable if you do not have the XPM library */
 #ifdef USE_XPM
