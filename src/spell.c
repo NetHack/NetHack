@@ -28,6 +28,7 @@
 static int spell_let_to_idx(char);
 static boolean cursed_book(struct obj * bp);
 static boolean confused_book(struct obj *);
+static void deadbook_pacify_undead(struct monst *);
 static void deadbook(struct obj *);
 static int learn(void);
 static boolean rejectcasting(void);
@@ -197,12 +198,31 @@ confused_book(struct obj* spellbook)
     return gone;
 }
 
+/* pacify or tame an undead monster */
+static void
+deadbook_pacify_undead(struct monst *mtmp)
+{
+    if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
+        && cansee(mtmp->mx, mtmp->my)) {
+        mtmp->mpeaceful = TRUE;
+        if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
+            && mdistu(mtmp) < 4)
+            if (mtmp->mtame) {
+                if (mtmp->mtame < 20)
+                    mtmp->mtame++;
+            } else
+                (void) tamedog(mtmp, (struct obj *) 0);
+        else
+            monflee(mtmp, 0, FALSE, TRUE);
+    }
+}
+
 /* special effects for The Book of the Dead; reading it while blind is
    allowed so that needs to be taken into account too */
 static void
 deadbook(struct obj* book2)
 {
-    struct monst *mtmp, *mtmp2;
+    struct monst *mtmp;
     coord mm;
 
     You("turn the pages of the Book of the Dead...");
@@ -295,25 +315,7 @@ deadbook(struct obj* book2)
         mm.y = u.uy;
         mkundead(&mm, TRUE, NO_MINVENT);
     } else if (book2->blessed) {
-        for (mtmp = fmon; mtmp; mtmp = mtmp2) {
-            mtmp2 = mtmp->nmon; /* tamedog() changes chain */
-            if (DEADMONSTER(mtmp))
-                continue;
-
-            if ((is_undead(mtmp->data) || is_vampshifter(mtmp))
-                && cansee(mtmp->mx, mtmp->my)) {
-                mtmp->mpeaceful = TRUE;
-                if (sgn(mtmp->data->maligntyp) == sgn(u.ualign.type)
-                    && mdistu(mtmp) < 4)
-                    if (mtmp->mtame) {
-                        if (mtmp->mtame < 20)
-                            mtmp->mtame++;
-                    } else
-                        (void) tamedog(mtmp, (struct obj *) 0);
-                else
-                    monflee(mtmp, 0, FALSE, TRUE);
-            }
-        }
+        iter_mons(deadbook_pacify_undead);
     } else {
         switch (rn2(3)) {
         case 0:
