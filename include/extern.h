@@ -365,7 +365,7 @@ extern void find_trap(struct trap *);
 extern void warnreveal(void);
 extern int dosearch0(int);
 extern int dosearch(void);
-extern void sokoban_detect(void);
+extern void premap_detect(void);
 #ifdef DUMPLOG
 extern void dump_map(void);
 #endif

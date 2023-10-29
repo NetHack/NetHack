@@ -3714,6 +3714,8 @@ lspo_level_flags(lua_State *L)
             gc.coder->premapped = 1;
         else if (!strcmpi(s, "solidify"))
             gc.coder->solidify = 1;
+        else if (!strcmpi(s, "sokoban"))
+            Sokoban = 1; /* gl.level.flags.sokoban_rules */
         else if (!strcmpi(s, "inaccessibles"))
             gc.coder->check_inaccessibles = 1;
         else if (!strcmpi(s, "noflipx"))
@@ -6612,12 +6614,12 @@ lspo_finalize_level(lua_State *L UNUSED)
     if (L && gc.coder->solidify)
         solidify_map();
 
-    /* This must be done before sokoban_detect(),
+    /* This must be done before premap_detect(),
      * otherwise branch stairs won't be premapped. */
     fixup_special();
 
     if (L && gc.coder->premapped)
-        sokoban_detect();
+        premap_detect();
 
     level_finalize_topology();
 
@@ -7075,12 +7077,12 @@ load_special(const char *name)
     if (gc.coder->solidify)
         solidify_map();
 
-    /* This must be done before sokoban_detect(),
+    /* This must be done before premap_detect(),
      * otherwise branch stairs won't be premapped. */
     fixup_special();
 
     if (gc.coder->premapped)
-        sokoban_detect();
+        premap_detect();
 
     result = TRUE;
  give_up:

@@ -624,6 +624,7 @@ Set flags for this level.
 | icedpools     | Ice generated with the level will be treated as frozen pools instead of frozen moats.
 | corrmaze      |
 | premapped     | Map, including traps and boulders, is revealed on entrance.
+| sokoban       | Level has special Sokoban rules
 | solidify      | Areas outside the specified level map are made undiggable and unphaseable.
 | inaccessibles | If inaccessible areas are generated, generate ways for them to connect to the "accessible" area.
 | noflip        | Prevent flipping the level.
