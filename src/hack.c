@@ -3801,6 +3801,11 @@ saving_grace(int dmg)
         && (u.uhp * 100 / u.uhpmax) > 90) {
         dmg = u.uhp - 1;
         u.usaving_grace = TRUE; /* used up */
+        end_running(TRUE);
+        if (u.usleep)
+            unmul("Suddenly you wake up!");
+        if (is_fainted())
+            reset_faint();
     }
     return dmg;
 }
