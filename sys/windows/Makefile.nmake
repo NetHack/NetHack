@@ -10,7 +10,7 @@
 #       Visual Studio Compilers Tested:
 #            - Microsoft Visual Studio 2017 Community Edition v 15.9.58
 #            - Microsoft Visual Studio 2019 Community Edition v 16.11.31
-#            - Microsoft Visual Studio 2022 Community Edition v 17.7.5
+#            - Microsoft Visual Studio 2022 Community Edition v 17.7.6
 #
 #==============================================================================
 #   This is used for building two distinct executables of NetHack:
@@ -1360,8 +1360,9 @@ DLB =
 
 all :	install
 
-install:  envchk.tag libdir.tag ottydir.tag outldir.tag \
-		oguidir.tag oluadir.tag opdcdir.tag\
+install:  envchk.tag libdir.tag ottydir$(TARGET_CPU).tag \
+		outldir$(TARGET_CPU).tag oguidir$(TARGET_CPU).tag \
+		oluadir$(TARGET_CPU).tag opdcdir$(TARGET_CPU).tag \
 		$(LUASRC)\lua.h $(PDCDEP) \
 		$(INCL)\nhlua.h $(OUTL)utility.tag \
 		$(DAT)\data $(DAT)\rumors $(DAT)\oracles $(DAT)\engrave \
@@ -1541,7 +1542,7 @@ recover: $(U)recover.exe
 	if exist $(U)recover.exe copy $(U)recover.exe  $(GAMEDIR)
 	if exist $(DOC)\recover.txt copy $(DOC)\recover.txt $(GAMEDIR)\recover.txt
 
-$(OUTL)utility.tag: $(INCL)\nhlua.h $(U)tile2bmp.exe $(U)makedefs.exe
+$(OUTL)utility.tag: $(INCL)\nhlua.h outldir$(TARGET_CPU).tag $(U)tile2bmp.exe $(U)makedefs.exe
 	     @echo utilities made >$@
 	     @echo utilities made.
 
@@ -1693,27 +1694,27 @@ gamedir.tag:
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo directory created > $@
 
-ottydir.tag:
+ottydir$(TARGET_CPU).tag:
 	@if not exist $(OBJTTY)\*.* echo creating directory $(OBJTTY:\=/)
 	@if not exist $(OBJTTY)\*.* mkdir $(OBJTTY)
 	@echo directory created >$@
 
-oguidir.tag:
+oguidir$(TARGET_CPU).tag:
 	@if not exist $(OBJGUI)\*.* echo creating directory $(OBJGUI:\=/)
 	@if not exist $(OBJGUI)\*.* mkdir $(OBJGUI)
 	@echo directory created >$@
 
-outldir.tag:
+outldir$(TARGET_CPU).tag:
 	@if not exist $(OBJUTIL)\*.* echo creating directory $(OBJUTIL:\=/)
 	@if not exist $(OBJUTIL)\*.* mkdir $(OBJUTIL)
 	@echo directory created >$@
 
-oluadir.tag:
+oluadir$(TARGET_CPU).tag:
 	@if not exist $(OBJLUA)\*.* echo creating directory $(OBJLUA:\=/)
 	@if not exist $(OBJLUA)\*.* mkdir $(OBJLUA)
 	@echo directory created >$@
 
-opdcdir.tag:
+opdcdir$(TARGET_CPU).tag:
 	@if not exist $(OBJPDC)\*.* echo creating directory $(OBJPDC:\=/)
 	@if not exist $(OBJPDC)\*.* mkdir $(OBJPDC)
 	@echo directory created >$@
@@ -2306,11 +2307,16 @@ spotless: clean
 	if exist $(DAT)\bogusmon        del $(DAT)\bogusmon
 	if exist $(DAT)\porthelp	del $(DAT)\porthelp
 	if exist nhdat$(NHV).	        del nhdat$(NHV).
-	if exist outldir.tag            del outldir.tag
-	if exist ottydir.tag            del ottydir.tag
-	if exist oguidir.tag            del oguidir.tag
-	if exist oluadir.tag            del oluadir.tag
-	if exist opdcdir.tag            del opdcdir.tag
+	if exist outldirx86.tag         del outldirx86.tag
+	if exist ottydirx86.tag         del ottydirx86.tag
+	if exist oguidirx86.tag         del oguidirx86.tag
+	if exist oluadirx86.tag         del oluadirx86.tag
+	if exist opdcdirx86.tag         del opdcdirx86.tag
+	if exist outldirx64.tag         del outldirx64.tag
+	if exist ottydirx64.tag         del ottydirx64.tag
+	if exist oguidirx64.tag         del oguidirx64.tag
+	if exist oluadirx64.tag         del oluadirx64.tag
+	if exist opdcdirx64.tag         del opdcdirx64.tag
 	if exist libdir.tag             del libdir.tag
 	if exist gamedir.tag            del gamedir.tag
 	if exist $(MSWIN)\mnsel.bmp     del $(MSWIN)\mnsel.bmp
