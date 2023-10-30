@@ -85,7 +85,10 @@ curs_update_invt(int arg)
     werase(win);
 
     if (!arg) {
-
+        /*
+         * 'arg'==0 means basic inventory_update():  [re-]populate and
+         * [re-]display the persistent invetory window.
+         */
         if (pi.array) /* previous data is obsolete */
             curs_purge_perminv_data(FALSE);
 
@@ -95,7 +98,13 @@ curs_update_invt(int arg)
         display_inventory(NULL, FALSE);
         curs_invt_updated(win);
 
-    } else { /* 'arg' is non-zero but otherwise unused */
+    } else {
+        /*
+         * 'arg'!=0 means #perminv command is providing the player
+         * with opportunity to scroll the already displayed persistent
+         * inventory window.  Aside from being non-zero, the value of
+         * 'arg' is ignored.
+         */
         int scrollingdone;
 
         /* previous data is still valid; let player interactively scroll it */
@@ -400,10 +409,14 @@ curs_show_invt(WINDOW *win)
     } /* lineno loop */
 
     if (pi.inuseindx > (unsigned) height) {
-        /* some lines aren't shown; overwrite rightmost portion of
-           last line with something like "[1-24 of 30>"; right justified
-           so that the line might still show something useful; could be on
-           line of its own, in which case we need to erase that first */
+        /*
+         * More lines than will fit at one time so some lines aren't shown.
+         * Overwrite the rightmost portion of last line with something
+         * like "[1-24 of 30>" or "<7-30 of 30]" if we've already scrolled
+         * forward.  Right justified so that the line might still show
+         * something useful. It could be on a line of its own, in which
+         * case we need to erase that first.
+         */
         y = height - (1 - border);
         if ((unsigned) y == pi.inuseindx - pi.rowoffset) {
             wmove(win, y, x);
@@ -416,8 +429,22 @@ curs_show_invt(WINDOW *win)
         mvwaddstr(win, y, x + (width - (int) strlen(tmpbuf)), tmpbuf);
     }
     if (widest > (unsigned) width) {
-        /* some columns aren't shown; overwrite rightmost portion of
-           first line with something like "[1-25 of 40}" */
+        /*
+         * More columns than the persistent inventory window can fit so
+         * some columns aren't shown.  Overwrite the rightmost portion of
+         * first line with something like "[1-25 of 40}" or "{16-40 of 40]".
+         * For the usual case, that line will be an object class header
+         * so we won't be obscuring an item, but that might not be the
+         * situation on page 2 and definitely won't be if 'sortpack' is Off.
+         *
+         * WISHLIST:  if the first line contains an item and there are any
+         * blank lines at the bottom, we could shift every line down one
+         * producing a blank line at the top, then write the column
+         * indicator there.  Much simpler to insert a blank line all the
+         * time, but we don't want to do that because it might push things
+         * into needing an additional page, and also it could turn out that
+         * no lines are wide enough to need the column indicator.
+         */
         Sprintf(tmpbuf, "%c%u-%u of %u%c",
                 (left_col > 1) ? '{' : '[',
                 left_col, right_col, widest,

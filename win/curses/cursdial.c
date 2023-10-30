@@ -1538,7 +1538,8 @@ menu_get_selections(WINDOW *win, nhmenu *menu, int how)
             }
             /*FALLTHRU*/
         default:
-            if (isdigit(curletter) && !groupaccels[curletter]) {
+            if (isdigit(curletter) && !selectors[curletter]
+                && !groupaccels[curletter]) {
                 count = curses_get_count(curletter);
                 /* after count, we know some non-digit is already pending */
                 curletter = curses_getch();
