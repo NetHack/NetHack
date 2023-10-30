@@ -2569,10 +2569,19 @@ obj_to_let(struct obj *obj)
 void
 prinv(const char *prefix, struct obj *obj, long quan)
 {
+    boolean total_of = (quan && (quan < obj->quan));
+    char totalbuf[QBUFSZ];
+
     if (!prefix)
         prefix = "";
-    pline("%s%s%s", prefix, *prefix ? " " : "",
-          xprname(obj, (char *) 0, obj_to_let(obj), TRUE, 0L, quan));
+
+    totalbuf[0] = '\0';
+    if (total_of)
+        Snprintf(totalbuf, sizeof totalbuf,
+                 " (%ld in total).", obj->quan);
+    pline("%s%s%s%s", prefix, *prefix ? " " : "",
+          xprname(obj, (char *) 0, obj_to_let(obj), !total_of, 0L, quan),
+          flags.verbose ? totalbuf : "");
 }
 
 DISABLE_WARNING_FORMAT_NONLITERAL

@@ -912,7 +912,7 @@ kick_door(coordxy x, coordxy y, int avrg_attrib)
         boolean shopdoor = *in_rooms(x, y, SHOPBASE) ? TRUE : FALSE;
         /* break the door */
         if (gm.maploc->doormask & D_TRAPPED) {
-            if (Verbose(0, dokick))
+            if (flags.verbose)
                 You("kick the door.");
             exercise(A_STR, FALSE);
             gm.maploc->doormask = D_NODOOR;

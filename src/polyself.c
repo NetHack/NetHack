@@ -974,7 +974,7 @@ polymon(int mntmp)
 
     /* the explanation of '#monster' used to be shown sooner, but there are
        possible fatalities above and it isn't useful unless hero survives */
-    if (Verbose(2, polymon)) {
+    if (flags.verbose) {
         static const char use_thec[] = "Use the command #%s to %s.";
         static const char monsterc[] = "monster";
         struct permonst *uptr = gy.youmonst.data;

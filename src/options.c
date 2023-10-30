@@ -448,7 +448,7 @@ parseoptions(
     boolean tfrom_file)
 {
     char *op;
-    boolean negated, got_match = FALSE;
+    boolean negated, got_match = FALSE, pfx_match = FALSE;
 #if 0
     boolean has_val = FALSE;
 #endif
@@ -505,7 +505,7 @@ parseoptions(
         if (allopt[i].pfx) {
             if (str_start_is(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
-                got_match = TRUE;
+                got_match = pfx_match = TRUE;
             }
         }
 #if 0   /* this prevents "boolopt:True" &c */
