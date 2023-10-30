@@ -1573,9 +1573,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
 #include "nhlua.h"
 #endif
-
 #include "extern.h"
 #include "decl.h"
-
 #endif /* HACK_H */
 

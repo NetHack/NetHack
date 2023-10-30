@@ -245,13 +245,13 @@ erode_obj(
     } else if (!erosion_matters(otmp)) {
         return ER_NOTHING;
     } else if (!vulnerable || (otmp->oerodeproof && otmp->rknown)) {
-        if (Verbose(3, erode_obj1) && print && (uvictim || vismon))
+        if (flags.verbose && print && (uvictim || vismon))
             pline("%s %s %s not affected by %s.",
                   uvictim ? "Your" : s_suffix(Monnam(victim)),
                   ostr, vtense(ostr, "are"), bythe[type]);
         return ER_NOTHING;
     } else if (otmp->oerodeproof || (otmp->blessed && !rnl(4))) {
-        if (Verbose(3, erode_obj2) && (print || otmp->oerodeproof)
+        if (flags.verbose && (print || otmp->oerodeproof)
             && (uvictim || vismon || visobj))
             pline("Somehow, %s %s %s not affected by the %s.",
                   uvictim ? "your"
@@ -336,7 +336,7 @@ erode_obj(
         delobj(otmp);
         return ER_DESTROYED;
     } else {
-        if (Verbose(3, erode_obj3) && print) {
+        if (flags.verbose && print) {
             if (uvictim)
                 Your("%s %s completely %s.",
                      ostr, vtense(ostr, Blind ? "feel" : "look"), msg[type]);
@@ -1213,7 +1213,7 @@ trapeffect_rocktrap(
                 } else if (hard_helmet(uarmh)) {
                     pline("Fortunately, you are wearing a hard helmet.");
                     dmg = 2;
-                } else if (Verbose(3, trapeffect_rocktrap)) {
+                } else if (flags.verbose) {
                     pline("%s does not protect you.", Yname2(uarmh));
                 }
             } else if (passes_rocks(gy.youmonst.data)) {
@@ -3946,7 +3946,7 @@ climb_pit(void)
             pitname);
         fill_pit(u.ux, u.uy);
         gv.vision_full_recalc = 1; /* vision limits change */
-    } else if (u.dz || Verbose(3, climb_pit)) {
+    } else if (u.dz || flags.verbose) {
         /* these should use 'pitname' rather than "pit" for hallucination
            but that would nullify Norep (this message can be repeated
            many times without further user intervention by using a run
@@ -4789,7 +4789,7 @@ drown(void)
 
     if (Amphibious || Breathless || Swimming) {
         if (Amphibious || Breathless) {
-            if (Verbose(3, drown))
+            if (flags.verbose)
                 pline("But you aren't drowning.");
             if (!Is_waterlevel(&u.uz)) {
                 if (Hallucination)

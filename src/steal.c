@@ -764,7 +764,7 @@ relobj(
     } /* isgd && has gold */
 
     while ((otmp = (is_pet ? droppables(mtmp) : mtmp->minvent)) != 0) {
-        mdrop_obj(mtmp, otmp, is_pet && Verbose(1, relobj));
+        mdrop_obj(mtmp, otmp, is_pet && flags.verbose);
     }
 
     if (show && cansee(omx, omy))

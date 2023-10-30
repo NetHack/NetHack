@@ -489,7 +489,7 @@ ghost_from_bottle(void)
     }
     pline("As you open the bottle, an enormous %s emerges!",
           Hallucination ? rndmonnam(NULL) : (const char *) "ghost");
-    if (Verbose(3, ghost_from_bottle))
+    if (flags.verbose)
         You("are frightened to death, and unable to move.");
     nomul(-3);
     gm.multi_reason = "being frightened to death";
@@ -2253,7 +2253,7 @@ dodip(void)
             ; /* can't dip something into fountain or pool if can't reach */
         } else if (IS_FOUNTAIN(here)) {
             Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
-                     Verbose(3, dodip1) ? obuf : shortestname);
+                     flags.verbose ? obuf : shortestname);
             /* "Dip <the object> into the fountain?" */
             if (y_n(qbuf) == 'y') {
                 obj->pickup_prev = 0;
@@ -2265,7 +2265,7 @@ dodip(void)
             const char *pooltype = waterbody_name(u.ux, u.uy);
 
             Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
-                     Verbose(3, dodip2) ? obuf : shortestname, pooltype);
+                     flags.verbose ? obuf : shortestname, pooltype);
             /* "Dip <the object> into the {pool, moat, &c}?" */
             if (y_n(qbuf) == 'y') {
                 if (Levitation) {
@@ -2289,7 +2289,7 @@ dodip(void)
 
     /* "What do you want to dip <the object> into? [xyz or ?*] " */
     Snprintf(qbuf, sizeof qbuf, "dip %s into",
-             Verbose(3, dodip3) ? obuf : shortestname);
+             flags.verbose ? obuf : shortestname);
     potion = getobj(qbuf, drink_ok, GETOBJ_NOFLAGS);
     if (!potion)
         return ECMD_CANCEL;

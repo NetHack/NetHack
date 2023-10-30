@@ -1199,7 +1199,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
                 } else {
                     /* for mtmp, mb_trapped() does is own wake_nearto() */
                     loudness = 40;
-                    if (Verbose(1, doorlock1)) {
+                    if (flags.verbose) {
                         Soundeffect(se_kaboom_door_explodes, 75);
                         if ((sawit || seeit) && !Unaware) {
                             pline("KABOOM!!  You see a door explode.");
@@ -1218,7 +1218,7 @@ doorlock(struct obj *otmp, coordxy x, coordxy y)
             unblock_point(x, y);
             seeit = cansee(x, y);
             newsym(x, y);
-            if (Verbose(1, doorlock2)) {
+            if (flags.verbose) {
                 if ((sawit || seeit) && !Unaware) {
                     pline_The("door crashes open!");
                 } else if (!Deaf) {

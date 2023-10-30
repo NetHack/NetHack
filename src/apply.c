@@ -422,7 +422,7 @@ use_stethoscope(struct obj *obj)
             pline("%s %s %s really %s.",
                   use_plural ? "Those" : "That", what,
                   use_plural ? "are" : "is", mnm);
-        } else if (Verbose(0, use_stethoscope) && !canspotmon(mtmp)) {
+        } else if (flags.verbose && !canspotmon(mtmp)) {
             There("is %s there.", mnm);
         }
 

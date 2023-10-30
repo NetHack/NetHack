@@ -518,7 +518,7 @@ teleds(coordxy nux, coordxy nuy, int teleds_flags)
 
     /* this used to take place sooner, but if a --More-- prompt was issued
        then the old map display was shown instead of the new one */
-    if (is_teleport && Verbose(2, teleds))
+    if (is_teleport && flags.verbose)
         You("materialize in %s location!",
             (nux == u.ux0 && nuy == u.uy0) ? "the same" : "a different");
     /* if terrain type changes, levitation or flying might become blocked
@@ -1370,9 +1370,8 @@ level_tele(void)
     }
 
     schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
-                  Verbose(2, level_tele)
-                      ? "You materialize on a different level!"
-                      : (char *) 0);
+                  flags.verbose ? "You materialize on a different level!"
+                                : (char *) 0);
 #if 0   /* always wait until end of turn to change level, otherwise code
          * that references monsters as this call stack unwinds won't be
          * able to access them reliably; the do-the-change-now code here

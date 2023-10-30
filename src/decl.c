@@ -1056,9 +1056,6 @@ decl_globals_init(void)
     gu.urace = urace_init_data;
 }
 
-#ifndef NO_VERBOSE_GRANULARITY
-long verbosity_suppressions[vb_elements] = { 0L, 0L, 0L, 0L, 0L, };
-#endif
 
 /* gcc 12.2's static analyzer thinks that some fields of gc.context.victual
    are uninitialized when compiling 'bite(eat.c)' but that's impossible;
@@ -1072,5 +1069,4 @@ sa_victual(
 {
     return;
 }
-
 /*decl.c*/

@@ -523,7 +523,7 @@ do_attack(struct monst *mtmp)
 
     if (gu.unweapon) {
         gu.unweapon = FALSE;
-        if (Verbose(4, do_attack)) {
+        if (flags.verbose) {
             if (uwep)
                 You("begin bashing monsters with %s.", yname(uwep));
             else if (!cantwield(gy.youmonst.data))
@@ -587,7 +587,7 @@ known_hitum(
     if (go.override_confirmation) {
         /* this may need to be generalized if weapons other than
            Stormbringer acquire similar anti-social behavior... */
-        if (Verbose(4, known_hitum))
+        if (flags.verbose)
             Your("bloodthirsty blade attacks!");
     }
 
@@ -1550,7 +1550,7 @@ hmon_hitmon_splitmon(
 
         if ((mclone = clone_mon(mon, 0, 0)) != 0) {
             withwhat[0] = '\0';
-            if (u.twoweap && Verbose(4, hmon_hitmon1))
+            if (u.twoweap && flags.verbose)
                 Sprintf(withwhat, " with %s", yname(obj));
             pline("%s divides as you hit it%s!", Monnam(mon), withwhat);
             hmd->hittxt = TRUE;
@@ -1571,7 +1571,7 @@ hmon_hitmon_msg_hit(
                 && gm.m_shot.o == obj->otyp))) {
         if (hmd->thrown)
             hit(mshot_xname(obj), mon, exclam(hmd->dmg));
-        else if (!Verbose(4, hmon_hitmon2))
+        else if (!flags.verbose)
             You("hit it.");
         else /* hand_to_hand */
             You("%s %s%s",
@@ -2771,7 +2771,7 @@ mhitm_ad_tlpt(
         if (!mhitm_mgc_atk_negated(magr, mdef, FALSE)) {
             You("are not affected.");
         } else {
-            if (Verbose(4, mhitm_ad_tlpt))
+            if (flags.verbose)
                 Your("position suddenly seems %suncertain!",
                      (Teleport_control && !Stunned && !unconscious()) ? ""
                      : "very ");
@@ -3230,7 +3230,7 @@ mhitm_ad_wrap(
                     pline("%s is being crushed.", Monnam(mdef));
             } else {
                 mhm->damage = 0;
-                if (Verbose(4, mhitm_ad_wrap1)) {
+                if (flags.verbose) {
                     if (coil && !tailmiss)
                         You("brush against %s.", mon_nam(mdef));
                     else
@@ -3271,7 +3271,7 @@ mhitm_ad_wrap(
                 }
             } else {
                 mhm->damage = 0;
-                if (Verbose(4, mhitm_ad_wrap2)) {
+                if (flags.verbose) {
                     if (coil)
                         pline("%s brushes against you.", Monnam(magr));
                     else
@@ -4360,7 +4360,7 @@ mhitm_ad_dgst(
             mhm->done = TRUE;
             return;
         }
-        if (Verbose(4, mhitm_ad_dgst) && !Deaf) {
+        if (flags.verbose && !Deaf) {
             /* Soundeffect? */
             SetVoice(magr, 0, 80, 0);
             verbalize("Burrrrp!");
@@ -4702,7 +4702,7 @@ damageum(
             You_feel("embarrassed for a moment.");
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
-        } else if (!Verbose(4, damageum)) {
+        } else if (!flags.verbose) {
             You("destroy it!");
             if (mhm.damage)
                 xkilled(mdef, XKILL_NOMSG);
@@ -5035,7 +5035,7 @@ missum(
 
     if (could_seduce(&gy.youmonst, mdef, mattk))
         You("pretend to be friendly to %s.", mon_nam(mdef));
-    else if (canspotmon(mdef) && Verbose(4, missum))
+    else if (canspotmon(mdef) && flags.verbose)
         You("miss %s.", mon_nam(mdef));
     else
         You("miss it.");
@@ -5444,7 +5444,7 @@ hmonas(struct monst *mon)
                         if (mattk->aatyp == AT_CLAW)
                             verb = "hit"; /* not "claws" */
                         You("%s %s.", verb, mon_nam(mon));
-                        if (silverhit && Verbose(4, hmonas1))
+                        if (silverhit && flags.verbose)
                             silver_sears(&gy.youmonst, mon, silverhit);
                     }
                     sum[i] = damageum(mon, mattk, specialdmg);
@@ -5508,7 +5508,7 @@ hmonas(struct monst *mon)
                    choking hug; deals damage but never grabs hold */
                 if (specialdmg) {
                     You("%s %s%s", verb, mon_nam(mon), exclam(specialdmg));
-                    if (silverhit && Verbose(4, hmonas2))
+                    if (silverhit && flags.verbose)
                         silver_sears(&gy.youmonst, mon, silverhit);
                     sum[i] = damageum(mon, mattk, specialdmg);
                 } else {
@@ -5526,7 +5526,7 @@ hmonas(struct monst *mon)
                       byhand ? "throttled" : "crushed",
                       /* extra feedback for non-breather being choked */
                       unconcerned ? " but doesn't seem concerned" : "");
-                if (silverhit && Verbose(4, hmonas3))
+                if (silverhit && flags.verbose)
                     silver_sears(&gy.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
             } else if (i >= 2 && (sum[i - 1] > M_ATTK_MISS)
@@ -5538,7 +5538,7 @@ hmonas(struct monst *mon)
                     uunstick();
                 You("grab %s!", mon_nam(mon));
                 set_ustuck(mon);
-                if (silverhit && Verbose(4, hmonas4))
+                if (silverhit && flags.verbose)
                     silver_sears(&gy.youmonst, mon, silverhit);
                 sum[i] = damageum(mon, mattk, specialdmg);
             }
@@ -5690,7 +5690,7 @@ passive(
         break;
     case AD_ACID:
         if (mhitb && rn2(2)) {
-            if (Blind || !Verbose(4, passive))
+            if (Blind || !flags.verbose)
                 You("are splashed!");
             else
                 You("are splashed by %s %s!", s_suffix(mon_nam(mon)),
@@ -6091,7 +6091,7 @@ flash_hits_mon(struct monst *mtmp,
                 mtmp->mcansee = 0;
                 mtmp->mblinded = (tmp < 3) ? 0 : rnd(1 + 50 / tmp);
             }
-        } else if (Verbose(4, flash_hits_mon) && useeit) {
+        } else if (flags.verbose && useeit) {
             if (lev->lit)
                 pline("The flash of light shines on %s.", mon_nam(mtmp));
             else

@@ -404,7 +404,7 @@ call_kops(struct monst *shkp, boolean nearshop)
               && (gm.mvitals[PM_KOP_KAPTAIN].mvflags & G_GONE));
 
     if (!angry_guards(!!Deaf) && nokops) {
-        if (Verbose(3, call_kops1) && !Deaf)
+        if (flags.verbose && !Deaf)
             pline("But no one seems to respond to it.");
         return;
     }
@@ -420,14 +420,14 @@ call_kops(struct monst *shkp, boolean nearshop)
 
         if (nearshop) {
             /* Create swarm around you, if you merely "stepped out" */
-            if (Verbose(3, call_kops2))
+            if (flags.verbose)
                 pline_The("Keystone Kops appear!");
             mm.x = u.ux;
             mm.y = u.uy;
             makekops(&mm);
             return;
         }
-        if (Verbose(3, call_kops3))
+        if (flags.verbose)
             pline_The("Keystone Kops are after you!");
         /* Create swarm near down staircase (hinders return to level) */
         if (isok(sx, sy)) {

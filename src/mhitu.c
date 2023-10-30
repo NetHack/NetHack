@@ -93,7 +93,7 @@ missmu(struct monst *mtmp, boolean nearmiss, struct attack *mattk)
         pline("%s pretends to be friendly.", Monnam(mtmp));
     else
         pline("%s %smisses!", Monnam(mtmp),
-              (nearmiss && Verbose(1, missmu)) ? "just " : "");
+              (nearmiss && flags.verbose) ? "just " : "");
 
     stop_occupation();
 }
@@ -131,7 +131,7 @@ mswings(
     struct obj *otemp,  /* attacker's weapon */
     boolean bash)       /* True: polearm used at too close range */
 {
-    if (Verbose(1, mswings) && !Blind && mon_visible(mtmp)) {
+    if (flags.verbose && !Blind && mon_visible(mtmp)) {
         pline("%s %s %s%s %s.", Monnam(mtmp), mswings_verb(otemp, bash),
               (otemp->quan > 1L) ? "one of " : "", mhis(mtmp), xname(otemp));
     }
@@ -187,7 +187,7 @@ wildmiss(struct monst *mtmp, struct attack *mattk)
 
     /* no map_invisible() -- no way to tell where _this_ is coming from */
 
-    if (!Verbose(1, wildmiss))
+    if (!flags.verbose)
         return;
     /* no feedback if hero doesn't see the monster's spot */
     if (!cansee(mtmp->mx, mtmp->my))
@@ -1488,7 +1488,7 @@ gulpmu(struct monst *mtmp, struct attack *mattk)
         You("get %s!", digests(mtmp->data) ? "regurgitated"
                        : enfolds(mtmp->data) ? "released"
                          : "expelled");
-        if (Verbose(1, gulpmu)
+        if (flags.verbose
             && (digests(mtmp->data) && Slow_digestion))
             pline("Obviously %s doesn't like your taste.", mon_nam(mtmp));
         expels(mtmp, mtmp->data, FALSE);
@@ -1536,7 +1536,7 @@ explmu(struct monst *mtmp, struct attack *mattk, boolean ufound)
                 make_blinded((long) tmp, FALSE);
                 if (!Blind)
                     Your1(vision_clears);
-            } else if (Verbose(1, explmu))
+            } else if (flags.verbose)
                 You("get the impression it was not terribly bright.");
         }
         break;

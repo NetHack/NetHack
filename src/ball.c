@@ -58,7 +58,7 @@ ballfall(void)
             if (hard_helmet(uarmh)) {
                 pline("Fortunately, you are wearing a hard helmet.");
                 dmg = 3;
-            } else if (Verbose(0, ballfall))
+            } else if (flags.verbose)
                 pline("%s does not protect you.", Yname2(uarmh));
         }
         losehp(Maybe_Half_Phys(dmg), "crunched in the head by an iron ball",

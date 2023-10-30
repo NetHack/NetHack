@@ -30,7 +30,7 @@ static int vamp_shift(struct monst *, struct permonst *, boolean);
 boolean
 mb_trapped(struct monst *mtmp, boolean canseeit)
 {
-    if (Verbose(2, mb_trapped)) {
+    if (flags.verbose) {
         if (canseeit && !Unaware)
             pline("KABOOM!!  You see a door explode.");
         else if (!Deaf)
@@ -1714,7 +1714,7 @@ m_move(register struct monst *mtmp, int after)
                 }
                 if ((here->doormask & (D_LOCKED | D_CLOSED)) != 0
                     && amorphous(ptr)) {
-                    if (Verbose(2, m_move1) && canseemon(mtmp))
+                    if (flags.verbose && canseemon(mtmp))
                         pline("%s %s under the door.", Monnam(mtmp),
                               (ptr == &mons[PM_FOG_CLOUD]
                                || ptr->mlet == S_LIGHT) ? "flows" : "oozes");
@@ -1728,7 +1728,7 @@ m_move(register struct monst *mtmp, int after)
                         if (mb_trapped(mtmp, canseeit))
                             return MMOVE_DIED;
                     } else {
-                        if (Verbose(2, m_move2)) {
+                        if (flags.verbose) {
                             if (canseeit && canspotmon(mtmp)) {
                                 pline("%s unlocks and opens a door.",
                                       Monnam(mtmp));
@@ -1746,7 +1746,7 @@ m_move(register struct monst *mtmp, int after)
                         if (mb_trapped(mtmp, canseeit))
                             return MMOVE_DIED;
                     } else {
-                        if (Verbose(2, m_move3)) {
+                        if (flags.verbose) {
                             if (canseeit && canspotmon(mtmp)) {
                                 pline("%s opens a door.", Monnam(mtmp));
                             } else if (canseeit) {
@@ -1769,7 +1769,7 @@ m_move(register struct monst *mtmp, int after)
                         if (mb_trapped(mtmp, canseeit))
                             return MMOVE_DIED;
                     } else {
-                        if (Verbose(2, m_move4)) {
+                        if (flags.verbose) {
                             if (canseeit && canspotmon(mtmp)) {
                                 pline("%s smashes down a door.",
                                       Monnam(mtmp));
@@ -1796,7 +1796,7 @@ m_move(register struct monst *mtmp, int after)
                         pline("%s eats through the iron bars.", Monnam(mtmp));
                     dissolve_bars(mtmp->mx, mtmp->my);
                     return MMOVE_DONE;
-                } else if (Verbose(2, m_move5) && canseemon(mtmp))
+                } else if (flags.verbose && canseemon(mtmp))
                     Norep("%s %s %s the iron bars.", Monnam(mtmp),
                           /* pluralization fakes verb conjugation */
                           makeplural(locomotion(ptr, "pass")),

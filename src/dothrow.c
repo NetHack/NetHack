@@ -1389,7 +1389,7 @@ toss_up(struct obj *obj, boolean hitsroof)
 
             /* helmet definitely protects you when it blocks petrification */
             } else if (!petrifier) {
-                if (Verbose(0, toss_up))
+                if (flags.verbose)
                     Your("%s does not protect you.", helm_simple_name(uarmh));
             }
             /* stone missile against hero in xorn form would have been

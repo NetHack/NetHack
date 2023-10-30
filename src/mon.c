@@ -1260,7 +1260,7 @@ meatmetal(struct monst *mtmp)
                     /* call distant_name() for its side-effects even when
                        !verbose so won't be printed */
                     otmpname = distant_name(otmp, doname);
-                    if (Verbose(1, meatmetal1))
+                    if (flags.verbose)
                         pline("%s eats %s!", Monnam(mtmp), otmpname);
                 }
                 /* The object's rustproofing is gone now */
@@ -1269,7 +1269,7 @@ meatmetal(struct monst *mtmp)
                 if (vis) {
                     /* (see above; format even if it won't be printed) */
                     otmpname = distant_name(otmp, doname);
-                    if (Verbose(1, meatmetal2))
+                    if (flags.verbose)
                         pline("%s spits %s out in disgust!",
                               Monnam(mtmp), otmpname);
                 }
@@ -1277,10 +1277,10 @@ meatmetal(struct monst *mtmp)
                 if (cansee(mtmp->mx, mtmp->my)) {
                     /* (see above; format even if it won't be printed) */
                     otmpname = distant_name(otmp, doname);
-                    if (Verbose(1, meatmetal3))
+                    if (flags.verbose)
                         pline("%s eats %s!", Monnam(mtmp), otmpname);
                 } else {
-                    if (Verbose(1, meatmetal4)) {
+                    if (flags.verbose) {
                         Soundeffect(se_crunching_sound, 50);
                         You_hear("a crunching sound.");
                     }
@@ -1385,7 +1385,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
             if (cansee(mtmp->mx, mtmp->my)) {
                 /* (see above; distant_name() sometimes has side-effects */
                 otmpname = distant_name(otmp, doname);
-                if (Verbose(2, meatobj1))
+                if (flags.verbose)
                     pline("%s eats %s!", Monnam(mtmp), otmpname);
                 /* give this one even if !verbose */
                 if (otmp->oclass == SCROLL_CLASS
@@ -1393,7 +1393,7 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
                     pline("Yum%c", otmp->blessed ? '!' : '.');
             } else {
                 Soundeffect(se_slurping_sound, 30);
-                if (Verbose(2, meatobj2))
+                if (flags.verbose)
                     You_hear("a slurping sound.");
             }
             m_consume_obj(mtmp, otmp);
@@ -1409,9 +1409,9 @@ meatobj(struct monst* mtmp) /* for gelatinous cubes */
     }
 
     if (ecount > 0) {
-        if (cansee(mtmp->mx, mtmp->my) && Verbose(2, meatobj3) && buf[0])
+        if (cansee(mtmp->mx, mtmp->my) && flags.verbose && buf[0])
             pline1(buf);
-        else if (Verbose(2, meatobj4))
+        else if (flags.verbose)
             You_hear("%s slurping sound%s.",
                      (ecount == 1) ? "a" : "several", plur(ecount));
     }
@@ -1467,11 +1467,11 @@ meatcorpse(
                the result won't be printed */
             char *otmpname = distant_name(otmp, doname);
 
-            if (Verbose(2, meatcorpse1))
+            if (flags.verbose)
                 pline("%s eats %s!", Monnam(mtmp), otmpname);
         } else {
             Soundeffect(se_masticating_sound, 50);
-            if (Verbose(2, meatcorpse2))
+            if (flags.verbose)
                 You_hear("a masticating sound.");
         }
 
@@ -1605,7 +1605,7 @@ mpickgold(register struct monst* mtmp)
         obj_extract_self(gold);
         add_to_minv(mtmp, gold);
         if (cansee(mtmp->mx, mtmp->my)) {
-            if (Verbose(2, mpickgold) && !mtmp->isgd)
+            if (flags.verbose && !mtmp->isgd)
                 pline("%s picks up some %s.", Monnam(mtmp),
                       mat_idx == GOLD ? "gold" : "money");
             newsym(mtmp->mx, mtmp->my);
@@ -1665,7 +1665,7 @@ mpickstuff(struct monst *mtmp)
                    from floor and subsequent pickup by mtmp */
                 char *otmpname = distant_name(otmp, doname);
 
-                if (Verbose(2, mpickstuff))
+                if (flags.verbose)
                     pline("%s picks up %s.", Monnam(mtmp), otmpname);
             }
             obj_extract_self(otmp3);      /* remove from floor */
@@ -3856,7 +3856,7 @@ peacefuls_respond(struct monst *mtmp)
                         alreadyfleeing = (mon->mflee || mon->mfleetim);
                         monflee(mon, rn2(50) + 25, TRUE, !exclaimed);
                         if (exclaimed) {
-                            if (Verbose(2, setmangry) && !alreadyfleeing) {
+                            if (flags.verbose && !alreadyfleeing) {
                                 Strcat(buf, " and then turns to flee.");
                                 needpunct = FALSE;
                             }

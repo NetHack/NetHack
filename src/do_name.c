@@ -821,7 +821,7 @@ getpos(coord *ccp, boolean force, const char *goal)
 
     if (!goal)
         goal = "desired location";
-    if (Verbose(0, getpos1)) {
+    if (flags.verbose) {
         pline("(For instructions type a '%s')",
               visctrl(gc.Cmd.spkeys[NHKF_GETPOS_HELP]));
         msg_given = TRUE;
@@ -965,7 +965,7 @@ getpos(coord *ccp, boolean force, const char *goal)
         } else if (c == gc.Cmd.spkeys[NHKF_GETPOS_AUTODESC]) {
             iflags.autodescribe = !iflags.autodescribe;
             pline("Automatic description %sis %s.",
-                  Verbose(0, getpos2) ? "of features under cursor " : "",
+                  flags.verbose ? "of features under cursor " : "",
                   iflags.autodescribe ? "on" : "off");
             if (!iflags.autodescribe)
                 show_goal_msg = TRUE;

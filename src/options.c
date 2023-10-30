@@ -5215,7 +5215,7 @@ handler_menustyle(void)
     }
     destroy_nhwindow(tmpwin);
     chngd = (flags.menu_style != old_menu_style);
-    if (chngd || Verbose(2, handler_menustyle))
+    if (chngd || flags.verbose)
         pline("'menustyle' %s \"%s\".", chngd ? "changed to" : "is still",
               menutype[(int) flags.menu_style][0]);
     return optn_ok;
@@ -5302,7 +5302,7 @@ handler_autounlock(int optidx)
     }
     destroy_nhwindow(tmpwin);
     chngd = (flags.autounlock != oldflags);
-    if ((chngd || Verbose(2, handler_autounlock)) && give_opt_msg) {
+    if ((chngd || flags.verbose) && give_opt_msg) {
         optfn_autounlock(optidx, get_val, FALSE, buf, (char *) NULL);
         pline("'%s' %s '%s'.", optname,
               chngd ? "changed to" : "is still", buf);
@@ -5477,7 +5477,7 @@ handler_msg_window(void)
         }
         destroy_nhwindow(tmpwin);
         chngd = (iflags.prevmsg_window != old_prevmsg_window);
-        if (chngd || Verbose(2, handler_msg_window)) {
+        if (chngd || flags.verbose) {
             (void) optfn_msg_window(opt_msg_window, get_val,
                                     FALSE, buf, empty_optstr);
             pline("'msg_window' %.20s \"%.20s\".",
@@ -5759,8 +5759,7 @@ handler_whatis_coord(void)
              "", MENU_ITEMFLAGS_NONE);
     Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
             1, 0, COLNO - 1, ROWNO - 1,
-            Verbose(2, handler_whatis_coord1)
-                ? "; column 0 unused, off left edge" : "");
+            flags.verbose ? "; column 0 unused, off left edge" : "");
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
@@ -5768,8 +5767,7 @@ handler_whatis_coord(void)
    "screen: row is offset to accommodate tty interface's use of top line",
                  MENU_ITEMFLAGS_NONE);
 #if COLNO == 80
-#define COL80ARG \
-    (Verbose(2, handler_whatis_coord2) ? "; column 80 is not used" : "")
+#define COL80ARG flags.verbose ? "; column 80 is not used" : ""
 #else
 #define COL80ARG ""
 #endif

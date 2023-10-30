@@ -1716,7 +1716,7 @@ do_look(int mode, coord *click_cc)
 
         if (from_screen || clicklook) {
             if (from_screen) {
-                if (Verbose(2, dolook))
+                if (flags.verbose)
                     pline("Please move the cursor to %s.",
                           what_is_an_unknown_object);
                 else

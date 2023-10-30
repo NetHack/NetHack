@@ -368,7 +368,7 @@ describe_decor(void)
         if (strcmp(dfeature, "swamp") && ltyp != ICE)
             dfeature = an(dfeature);
 
-        if (Verbose(2, describe_decor1)) {
+        if (flags.verbose) {
             Sprintf(outbuf, "There is %s here.", dfeature);
         } else {
             if (dfeature != fbuf)
@@ -391,7 +391,7 @@ describe_decor(void)
                 if (!strcmpi(surf, "floor") || !strcmpi(surf, "ground"))
                     surf = "solid ground";
                 pline("%s %s %s.",
-                      Verbose(2, describe_decor2) ? "You are back" : "Back",
+                      flags.verbose ? "You are back" : "Back",
                       (Levitation || Flying) ? "over" : "on", surf);
             }
 
@@ -2340,7 +2340,7 @@ loot_mon(struct monst *mtmp, int *passed_info, boolean *prev_loot)
                 return 1;
             }
             extract_from_minvent(mtmp, otmp, TRUE, FALSE);
-            if (Verbose(2, loot_mon))
+            if (flags.verbose)
                 You("take %s off of %s.",
                     thesimpleoname(otmp), mon_nam(mtmp));
             otmp = hold_another_object(otmp, "You drop %s!", doname(otmp),
@@ -3388,8 +3388,7 @@ dotip(void)
         && (!iflags.menu_requested
             || (flags.menu_style == MENU_TRADITIONAL && boxes > 1))) {
         Sprintf(buf, "You can't tip %s while carrying so much.",
-                !Verbose(2, dotip)
-                    ? "a container" : (boxes > 1) ? "one" : "it");
+                !flags.verbose ? "a container" : (boxes > 1) ? "one" : "it");
         if (!check_capacity(buf) && able_to_loot(cc.x, cc.y, FALSE)) {
             if (boxes > 1) {
                 /* use menu to pick a container to tip */

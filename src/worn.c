@@ -327,7 +327,7 @@ mon_adjust_speed(
         if (petrify) {
             /* mimic the player's petrification countdown; "slowing down"
                even if fast movement rate retained via worn speed boots */
-            if (Verbose(3, mon_adjust_speed))
+            if (flags.verbose)
                 pline("%s is slowing down.", Monnam(mon));
         } else if (adjust > 0 || mon->mspeed == MFAST)
             pline("%s is suddenly moving %sfaster.", Monnam(mon), howmuch);

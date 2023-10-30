@@ -1735,7 +1735,7 @@ getobj(
             }
         }
         if (strchr(quitchars, ilet)) {
-            if (Verbose(1, getobj1))
+            if (flags.verbose)
                 pline1(Never_mind);
             return (struct obj *) 0;
         }
@@ -1780,7 +1780,7 @@ getobj(
             if (ilet == HANDS_SYM)
                 return (struct obj *) &cg.zeroobj; /* cast away 'const' */
             if (ilet == '\033') {
-                if (Verbose(1, getobj2))
+                if (flags.verbose)
                     pline1(Never_mind);
                 return (struct obj *) 0;
             }
@@ -4630,7 +4630,7 @@ doprgold(void)
        person, but you have no such preternatural gold-sense. */
     long hmoney = hidden_gold(FALSE);
 
-    if (Verbose(1, doprgold)) {
+    if (flags.verbose) {
         char buf[BUFSZ];
 
         if (!umoney) {

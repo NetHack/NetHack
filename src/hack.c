@@ -278,7 +278,7 @@ moverock(void)
                         deliver_part1 = TRUE;
                     map_invisible(rx, ry);
                 }
-                if (Verbose(1, moverock)) {
+                if (flags.verbose) {
                     char you_or_steed[BUFSZ];
 
                     Strcpy(you_or_steed,
@@ -610,7 +610,7 @@ still_chewing(coordxy x, coordxy y)
         watch_dig((struct monst *) 0, x, y, FALSE);
         return 1;
     } else if ((gc.context.digging.effort += (30 + u.udaminc)) <= 100) {
-        if (Verbose(1, still_chewing))
+        if (flags.verbose)
             You("%s chewing on the %s.",
                 gc.context.digging.chew ? "continue" : "begin",
                 boulder
@@ -1453,7 +1453,7 @@ trapmove(
 
     switch (u.utraptype) {
     case TT_BEARTRAP:
-        if (Verbose(1, trapmove1)) {
+        if (flags.verbose) {
             predicament = "caught in a bear trap";
             if (u.usteed)
                 Norep("%s is %s.", upstart(steedname), predicament);
@@ -1481,7 +1481,7 @@ trapmove(
             break;
         }
         if (--u.utrap) {
-            if (Verbose(1, trapmove2)) {
+            if (flags.verbose) {
                 predicament = "stuck to the web";
                 if (u.usteed)
                     Norep("%s is %s.", upstart(steedname), predicament);
@@ -1496,7 +1496,7 @@ trapmove(
         }
         break;
     case TT_LAVA:
-        if (Verbose(1, trapmove3)) {
+        if (flags.verbose) {
             predicament = "stuck in the lava";
             if (u.usteed)
                 Norep("%s is %s.", upstart(steedname), predicament);
@@ -1532,13 +1532,13 @@ trapmove(
                    our next attempt to move out of tether range
                    after this successful move would have its
                    can't-do-that message suppressed by Norep */
-                if (Verbose(1, trapmove4))
+                if (flags.verbose)
                     Norep("You move within the chain's reach.");
                 return TRUE;
             }
         }
         if (--u.utrap) {
-            if (Verbose(1, trapmove5)) {
+            if (flags.verbose) {
                 if (anchored) {
                     predicament = "chained to the";
                     culprit = "buried ball";

@@ -360,7 +360,7 @@ doread(void)
 
     /* outrumor has its own blindness check */
     if (otyp == FORTUNE_COOKIE) {
-        if (Verbose(3, doread1))
+        if (flags.verbose)
             You("break up the cookie and throw away the pieces.");
         outrumor(bcsign(scroll), BY_COOKIE);
         if (!Blind)
@@ -387,8 +387,7 @@ doread(void)
             return ECMD_OK;
         }
         if (otyp == HAWAIIAN_SHIRT) {
-            pline("%s features %s.",
-                  Verbose(3, doread2) ? "The design" : "It",
+            pline("%s features %s.", flags.verbose ? "The design" : "It",
                   hawaiian_design(scroll, buf));
             return ECMD_TIME;
         }
@@ -401,7 +400,7 @@ doread(void)
         mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
                                  : apron_text(scroll, buf);
         endpunct = "";
-        if (Verbose(3, doread3)) {
+        if (flags.verbose) {
             int ln = (int) strlen(mesg);
 
             /* we will be displaying a sentence; need ending punctuation */
@@ -465,7 +464,7 @@ doread(void)
         if (Blind) {
             You("feel the embossed numbers:");
         } else {
-            if (Verbose(3, doread4))
+            if (flags.verbose)
                 pline("It reads:");
             pline("\"%s\"",
                   scroll->oartifact
@@ -480,7 +479,7 @@ doread(void)
               ((int) scroll->o_id % 10),
               (!((int) scroll->o_id % 3)),
               (((int) scroll->o_id * 7) % 10),
-              (Verbose(3, doread5) || Blind) ? "." : "");
+              (flags.verbose || Blind) ? "." : "");
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
                            "became literate by reading a credit card");
@@ -501,7 +500,7 @@ doread(void)
             You_cant(find_any_braille);
             return ECMD_OK;
         }
-        if (Verbose(3, doread6))
+        if (flags.verbose)
             pline("It reads:");
         Sprintf(buf, "%s", pmname(pm, NEUTRAL));
         pline("\"Magic Marker(TM) %s Red Ink Marker Pen.  Water Soluble.\"",
@@ -514,7 +513,7 @@ doread(void)
     } else if (scroll->oclass == COIN_CLASS) {
         if (Blind)
             You("feel the embossed words:");
-        else if (Verbose(3, doread7))
+        else if (flags.verbose)
             You("read:");
         pline("\"1 Zorkmid.  857 GUE.  In Frobs We Trust.\"");
         if (!u.uconduct.literate++)
@@ -2195,7 +2194,7 @@ drop_boulder_on_player(
                 pline("Fortunately, you are wearing a hard helmet.");
                 if (dmg > 2)
                     dmg = 2;
-            } else if (Verbose(3, drop_boulder_on_player)) {
+            } else if (flags.verbose) {
                 pline("%s does not protect you.", Yname2(uarmh));
             }
         }
@@ -2779,7 +2778,7 @@ do_genocide(
                      * circumstances.  Who's speaking?  Divine pronouncements
                      * aren't supposed to be hampered by deafness....
                      */
-                    if (Verbose(3, do_genocide))
+                    if (flags.verbose)
                         pline("A thunderous voice booms through the caverns:");
                     SetVoice((struct monst *) 0, 0, 80, voice_deity);
                     verbalize("No, mortal!  That will not be done.");

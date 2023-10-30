@@ -618,7 +618,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
             wake_nearby();
         } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
-        } else if (cansee(x, y) && Verbose(0, digactualhole1)) {
+        } else if (cansee(x, y) && flags.verbose) {
             pline("A pit appears in the %s.", surface_type);
         }
         /* in case we're digging down while encased in solid rock
@@ -650,7 +650,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         else if (!madeby_obj && canseemon(madeby))
             pline("%s digs a hole through the %s.", Monnam(madeby),
                   surface_type);
-        else if (cansee(x, y) && Verbose(0, digactualhole2))
+        else if (cansee(x, y) && flags.verbose)
             pline("A hole appears in the %s.", surface_type);
 
         if (at_u) {
@@ -1304,7 +1304,7 @@ mdig_tunnel(struct monst *mtmp)
                 return TRUE;
             }
         } else {
-            if (Verbose(0, mdig_tunnel1)) {
+            if (flags.verbose) {
                 if (!Unaware && !rn2(3)) /* not too often.. */
                     draft_message(TRUE); /* "You feel an unexpected draft." */
             }
@@ -1331,7 +1331,7 @@ mdig_tunnel(struct monst *mtmp)
 
     if (IS_WALL(here->typ)) {
         /* KMH -- Okay on arboreal levels (room walls are still stone) */
-        if (Verbose(0, mdig_tunnel2) && !rn2(5)) {
+        if (flags.verbose && !rn2(5)) {
             Soundeffect(se_crashing_rock, 75);
             You_hear("crashing rock.");
         }
@@ -2018,7 +2018,7 @@ rot_corpse(anything *arg, long timeout)
         x = obj->ox;
         y = obj->oy;
     } else if (in_invent) {
-        if (Verbose(0, rot_corpse)) {
+        if (flags.verbose) {
             char *cname = corpse_xname(obj, (const char *) 0, CXN_NO_PFX);
 
             Your("%s%s %s away%c", obj == uwep ? "wielded " : "", cname,

@@ -170,7 +170,7 @@ adjattrib(
         abonflg = (ABON(ndx) > 0);
     }
     if (ACURR(ndx) == old_acurr) {
-        if (msgflg == 0 && Verbose(0, adjattrib)) {
+        if (msgflg == 0 && flags.verbose) {
             if (ABASE(ndx) == old_abase && AMAX(ndx) == old_amax) {
                 pline("You're %s as %s as you can get.",
                       abonflg ? "currently" : "already", attrstr);
