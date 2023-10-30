@@ -336,6 +336,10 @@ CHGRP=true
 VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
+
+# suppress several hundred warnings with recent *roff
+NROFF_FLAGS = -W font
+
 #
 #-INCLUDE cross-pre.370
 #
