@@ -337,19 +337,6 @@ VARDIRPERM = 0755
 VARFILEPERM = 0600
 GAMEPERM = 0755
 
-# suppress several hundred warnings with groff 1.23
-#detection of groff
-NROFFISGROFF := $(shell echo `nroff --version | grep "GNU groff version"`)
-#$(info NROFFISGROFF=$(NROFFISGROFF))
-ifneq "$(NROFFISGROFF)" ""
-# get the version of groff
-GROFFGE123 := $(shell expr `echo $(NROFFISGROFF) | cut -f2 -d.` \>= 23)
-#$(info GROFFGE123=$(GROFFGE123))
-ifeq "$(GROFFGE123)" "1"
-NROFF_FLAGS = -W font
-endif
-endif  # NROFFISGROFF
-
 #
 #-INCLUDE cross-pre.370
 #
