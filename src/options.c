@@ -361,9 +361,6 @@ static int handler_whatis_filter(void);
 static int handler_autopickup_exception(void);
 static int handler_menu_colors(void);
 static int handler_msgtype(void);
-#ifndef NO_VERBOSE_GRANULARITY
-static int handler_verbose(int optidx);
-#endif
 static int handler_windowborders(void);
 
 static boolean is_wc_option(const char *);
@@ -451,7 +448,7 @@ parseoptions(
     boolean tfrom_file)
 {
     char *op;
-    boolean negated, got_match = FALSE, pfx_match = FALSE;
+    boolean negated, got_match = FALSE;
 #if 0
     boolean has_val = FALSE;
 #endif
@@ -508,7 +505,7 @@ parseoptions(
         if (allopt[i].pfx) {
             if (str_start_is(opts, allopt[i].name, TRUE)) {
                 matchidx = i;
-                got_match = pfx_match = TRUE;
+                got_match = TRUE;
             }
         }
 #if 0   /* this prevents "boolopt:True" &c */
@@ -4900,74 +4897,6 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
 }
 #endif
 
-#ifndef NO_VERBOSE_GRANULARITY
-int
-pfxfn_verbose(
-    int optidx UNUSED,
-    int req,
-     boolean negated,
-    char *opts,
-    char *op)
-{
-    long ltmp = 0;
-    int reslt;
-    char *p;
-    boolean param_optional = FALSE;
-
-    if (req == do_init) {
-        flags.verbose = allopt[optidx].opt_in_out;
-        return optn_ok;
-    }
-    if (req == do_set) {
-        if (opts) {
-            if (!strncmp(opts, "verbose", 7)) {
-                p = strchr("01234", *(opts + 7));
-                if (p && *p == '\0')  /* plain verbose, not verboseN */
-                    param_optional = TRUE;
-                if ((op = string_for_opt(opts, param_optional)) != empty_optstr) {
-                    ltmp = atol(op);
-                    int idx;
-
-                    if (p && (*p != '\0')) {
-                        idx = *p - '0';
-                        if (idx >= 0 && idx < vb_elements)
-                            verbosity_suppressions[idx] = ltmp;
-                        return optn_ok;
-                    }
-                } else {
-                    if (param_optional) {
-                        /* indicates plain verbose, not verboseN */
-                        flags.verbose = (negated ? 0 : 1);
-                        return optn_ok;
-                    }
-                }
-            }
-        }
-        return optn_err;
-    }
-    if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        opts[0] = '\0';
-        return optn_ok;
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s,%ld,%ld,%ld,%ld,%ld", flags.verbose ? "On" : "Off",
-                verbosity_suppressions[0], verbosity_suppressions[1],
-                verbosity_suppressions[2], verbosity_suppressions[3],
-                verbosity_suppressions[4]);
-        return optn_ok;
-    }
-    if (req == do_handler) {
-        reslt = handler_verbose(optidx);
-        return reslt;
-    }
-    return optn_ok;
-}
-#endif
-
 /*
  *    General boolean option handler
  *    (Use optidx to reference the specific option)
@@ -6161,75 +6090,6 @@ handler_msgtype(void)
     return optn_ok;
 }
 
-#ifndef NO_VERBOSE_GRANULARITY
-
-DISABLE_WARNING_FORMAT_NONLITERAL
-
-static int
-handler_verbose(int optidx)
-{
-    winid tmpwin;
-    anything any;
-    char buf[BUFSZ];
-    int pick_cnt;
-    int i;
-    menu_item *picks = (menu_item *) 0;
-    static const char *const vbstrings[] = {
-        " verbose toggle (currently %s)",
-        " verbose_suppressor[%d] =%08X",
-    };
-    char vbbuf[QBUFSZ];
-    int clr = 0;
-
-    tmpwin = create_nhwindow(NHW_MENU);
-    start_menu(tmpwin, MENU_BEHAVE_STANDARD);
-    any = cg.zeroany;
-    Snprintf(vbbuf, sizeof vbbuf, vbstrings[0], flags.verbose ? "On" : "Off");
-    any.a_int = 1;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 'a', 0, ATR_NONE, clr,
-             vbbuf, MENU_ITEMFLAGS_NONE);
-    for (i = 0; i < vb_elements; i++) {
-        Snprintf(vbbuf, sizeof vbbuf, vbstrings[1], i,
-                 verbosity_suppressions[i]);
-        any.a_int = i + 2;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'b' + i, 0,
-                 ATR_NONE, clr, vbbuf, MENU_ITEMFLAGS_NONE);
-    }
-    end_menu(tmpwin, "Select verbosity choices:");
-
-    pick_cnt = select_menu(tmpwin, PICK_ANY, &picks);
-    destroy_nhwindow(tmpwin);
-    if (pick_cnt > 0) {
-        int j;
-        /* PICK_ANY, with one preselected entry (ATR_NONE) which
-           should be excluded if any other choices were picked */
-        for (i = 0; i < pick_cnt; ++i) {
-            char abuf[BUFSZ];
-            j = picks[i].item.a_int - 2;
-            if (j < 0) {
-                flags.verbose = !flags.verbose;
-            } else {
-                Sprintf(buf,
-               "Set verbose_suppressor[%d] (%ld) to what new decimal value ?",
-                        j, verbosity_suppressions[j]);
-                abuf[0] = '\0';
-                getlin(buf, abuf);
-                if (abuf[0] == '\033')
-                    continue;
-                Sprintf(buf, "%s%d:", allopt[optidx].name, j);
-                (void) strncat(eos(buf), abuf, (sizeof buf - 1 - strlen(buf)));
-                /* pass the buck */
-                (void) parseoptions(buf, TRUE, TRUE);
-            }
-        }
-        free((genericptr_t) picks), picks = (menu_item *) 0;
-    }
-    return optn_ok;
-}
-
-RESTORE_WARNING_FORMAT_NONLITERAL
-
-#endif
 
 static int
 handler_windowborders(void)

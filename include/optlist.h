@@ -738,11 +738,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
            (char *)0)
     NHOPTC(vary_msgcount, Advanced, 20, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias, "show more old messages at a time")
-#if defined(NO_VERBOSE_GRANULARITY)
     NHOPTB(verbose, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.verbose, Term_False,
            (char *)0)
-#endif
 #ifdef MSDOS
     NHOPTC(video, Advanced, 20, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "method of video updating")
@@ -835,10 +833,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTP(IBM_, Advanced, 0, opt_in, set_hidden,
                 No, No, Yes, No, NoAlias, "prefix for old micro IBM_ options")
 #endif /* MICRO */
-#if !defined(NO_VERBOSE_GRANULARITY)
-    NHOPTP(verbose, Advanced, 0, opt_out, set_in_game,
-                Yes, Yes, Yes, Yes, NoAlias, "suppress verbose messages")
-#endif
+
 #undef NoAlias
 #undef NHOPTB
 #undef NHOPTC

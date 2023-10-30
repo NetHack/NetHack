@@ -1007,8 +1007,7 @@ enum verbosity_values {
     vb3hit                   = 0x01000000,
     vb3miss                  = 0x02000000,
     vb3makewish              = 0x04000000,
-    vb3prinv                 = 0x08000000,
-    /* 3 available bits*/
+    /* 4 available bits*/
 
     vb4do_attack             = 0x00000001,
     vb4known_hitum           = 0x00000002,
