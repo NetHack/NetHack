@@ -1032,10 +1032,8 @@ enum verbosity_values {
 #undef VB_ELEMENTS
 extern long verbosity_suppressions[vb_elements];   /* in decl.c */
 
-#define Verbose(n,s) (flags.verbose && \
-    (((n) >= 0 && (n) < vb_elements) && \
-        !(verbosity_suppressions[(n)] & vb##n##s)))
-
+#define Verbose(n,s) (flags.verbose && ((n) < vb_elements) \
+                      && !(verbosity_suppressions[(n)] & vb##n##s))
 #else       /* NO_VERBOSE_GRANULARITY */
 #define Verbose(n,s) (flags.verbose)
 #endif      /* !NO_VERBOSE_GRANULARITY */
