@@ -1127,6 +1127,9 @@ dump_enums(void)
     };
 #define dump_om(om) { om, #om }
     static const struct enum_dump omdump[] = {
+        dump_om(LAST_GENERIC),
+        dump_om(OBJCLASS_HACK),
+        dump_om(FIRST_OBJECT),
         dump_om(FIRST_AMULET),
         dump_om(LAST_AMULET),
         dump_om(FIRST_SPELL),

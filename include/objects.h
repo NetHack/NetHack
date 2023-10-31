@@ -98,6 +98,14 @@ GENERIC("iron ball",  BALL_CLASS,    GENERIC_BALL),    /* [15] */
 GENERIC("iron chain", CHAIN_CLASS,   GENERIC_CHAIN),   /* [16] */
 GENERIC("venom",      VENOM_CLASS,   GENERIC_VENOM),   /* [17] */
 #undef GENERIC
+/* FIRST_OBJECT: it would be simpler just to use MARKER(FIRST_OBJECT,ARROW)
+   below but that is vulnerable to neglecting to update the marker enum
+   after inserting something in front of arrow */
+MARKER(LAST_GENERIC, GENERIC_VENOM)
+MARKER(FIRST_OBJECT, LAST_GENERIC + 1)
+/* this definition of FIRST_OBJECT advances the default value for next enum;
+   backtrack to fix that, otherwise ARROW and the rest would be off by 1 */
+MARKER(OBJCLASS_HACK, FIRST_OBJECT - 1)
 
 /* weapons ... */
 #define WEAPON(name,desc,kn,mg,bi,prob,wt,                          \
@@ -810,9 +818,9 @@ MARKER(FIRST_AMULET, AMULET_OF_ESP)
 AMULET("amulet of life saving",       "spherical", LIFESAVED, 75,
                                                         AMULET_OF_LIFE_SAVING),
 AMULET("amulet of strangulation",          "oval", STRANGLED, 115,
-                                                        AMULET_OF_STRANGULATION),
+                                                      AMULET_OF_STRANGULATION),
 AMULET("amulet of restful sleep",    "triangular", SLEEPY, 115,
-                                                        AMULET_OF_RESTFUL_SLEEP),
+                                                      AMULET_OF_RESTFUL_SLEEP),
 AMULET("amulet versus poison",        "pyramidal", POISON_RES, 115,
                                                         AMULET_VERSUS_POISON),
 AMULET("amulet of change",               "square", 0, 115,

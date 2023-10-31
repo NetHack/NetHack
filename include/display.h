@@ -181,14 +181,10 @@
  *
  * Respectively return a random monster or object.
  * random_object() won't return STRANGE_OBJECT or the generic objects.
- * -/+ MAXOCLASSES is used to skip it and them.
- * NUM_OBJECTS and MAXOCLASSES are from different enum lists and recent C++
- * (for the Qt interface) complains about mixing them in arithmatic so cast
- * them to int here.  Doesn't impact compiling random_object() with C.
+ * -/+ FIRST_OBJECT is used to skip it and them.
  */
 #define random_monster(rng) ((*rng)(NUMMONS))
-#define random_object(rng) \
-    ((*rng)((int) NUM_OBJECTS - (int) MAXOCLASSES) + (int) MAXOCLASSES)
+#define random_object(rng) ((*rng)(NUM_OBJECTS - FIRST_OBJECT) + FIRST_OBJECT)
 
 /*
  * what_obj()
@@ -861,22 +857,22 @@ enum glyph_offsets {
 #define glyph_is_statue(glyph) \
     (glyph_is_male_statue(glyph) || glyph_is_fem_statue(glyph))
 /* generic objects are after strange object (GLYPH_OBJ_OFF) and before
-   other objects (GLYPH_OBJ_OFF + MAXOCLASSES) */
+   other objects (GLYPH_OBJ_OFF + FIRST_OBJECT) */
 #define glyph_is_normal_generic_obj(glyph) \
-    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + MAXOCLASSES)
+    ((glyph) > GLYPH_OBJ_OFF && (glyph) < GLYPH_OBJ_OFF + FIRST_OBJECT)
 #define glyph_is_piletop_generic_obj(glyph) \
     ((glyph) > GLYPH_OBJ_PILETOP_OFF                            \
-     && (glyph) < GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES)
+     && (glyph) < GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT)
 #define glyph_is_generic_object(glyph) \
     (glyph_is_normal_generic_obj(glyph)                         \
      || glyph_is_piletop_generic_obj(glyph))
 #define glyph_is_normal_piletop_obj(glyph) \
     ((glyph) == GLYPH_OBJ_PILETOP_OFF                           \
-     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + MAXOCLASSES          \
+     || ((glyph) > GLYPH_OBJ_PILETOP_OFF + FIRST_OBJECT         \
          && (glyph) < (GLYPH_OBJ_PILETOP_OFF + NUM_OBJECTS)))
 #define glyph_is_normal_object(glyph) \
     ((glyph) == GLYPH_OBJ_OFF                                   \
-     || ((glyph) >= GLYPH_OBJ_OFF + MAXOCLASSES                 \
+     || ((glyph) >= GLYPH_OBJ_OFF + FIRST_OBJECT                \
          && (glyph) < (GLYPH_OBJ_OFF + NUM_OBJECTS))            \
      || glyph_is_normal_piletop_obj(glyph))
 
