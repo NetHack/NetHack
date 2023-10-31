@@ -1266,8 +1266,6 @@ if a temple was entered while blind, #overview could show a line of just "."
 rolling boulders ignored walls and trees
 shopkeepers consider the monster type when charging for tins, eggs and corpses
 separate level flags premapped and sokoban
-add ../include/nhlua.h to the alloc.o dependencies in Makefile.utl to
-	match Makefile.src
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
@@ -2003,6 +2001,8 @@ Unix: work-around a build issue in ubuntu 21.10 by using ifdef to skip the
 	define of warn_unused_result to empty string in tradstdc.h whenever
 	__linux__ is defined during build unless GCC_URWARN is also defined
 Unix: re-do command line parsing
+Unix: add ../include/nhlua.h to the alloc.o dependencies in Makefile.utl to
+	match Makefile.src
 user_sounds: move the message hook from inside individual window display ports
 	to the core where it allows MSGTYP_NOSHOW msgtyp's to still trigger
 	sounds to correct a reported github issue; also fixes a past reported
