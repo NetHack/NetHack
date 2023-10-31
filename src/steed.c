@@ -873,8 +873,7 @@ place_monster(struct monst* mon, coordxy x, coordxy y)
     }
     mon->mx = x, mon->my = y;
     gl.level.monsters[x][y] = mon;
-    mon->mstate &= ~(MON_OFFMAP | MON_MIGRATING | MON_LIMBO | MON_BUBBLEMOVE
-                     | MON_ENDGAME_FREE | MON_ENDGAME_MIGR);
+    mon->mstate = MON_FLOOR;
 }
 
 /*steed.c*/

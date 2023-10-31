@@ -64,7 +64,6 @@ enum m_ap_types {
 #define MON_ENDGAME_FREE 0x20
 #define MON_ENDGAME_MIGR 0x40
 #define MON_OBLITERATE   0x80
-#define MSTATE_MASK      0xFF
 
 #define M_AP_TYPMASK  0x7
 #define M_AP_F_DKNOWN 0x8
@@ -250,7 +249,7 @@ struct monst {
 
 #define mon_perma_blind(mon) (!mon->mcansee && !mon->mblinded)
 
-#define mon_offmap(mon) (((mon)->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO|MON_OFFMAP)) != 0)
+#define mon_offmap(mon) ((mon)->mstate != MON_FLOOR)
 
 /* Get the maximum difficulty monsters that can currently be generated,
    given the current level difficulty and the hero's level. */
