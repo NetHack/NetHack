@@ -87,7 +87,7 @@ curs_update_invt(int arg)
     if (!arg) {
         /*
          * 'arg'==0 means basic inventory_update():  [re-]populate and
-         * [re-]display the persistent invetory window.
+         * [re-]display the persistent inventory window.
          */
         if (pi.array) /* previous data is obsolete */
             curs_purge_perminv_data(FALSE);
