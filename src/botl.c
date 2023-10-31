@@ -1043,8 +1043,7 @@ condopt(int idx, boolean *addr, boolean negated)
         condtests[idx].enabled = negated ? FALSE : TRUE;
         condtests[idx].choice = condtests[idx].enabled;
         /* avoid lingering false positives if test is no longer run */
-        if (!condtests[idx].enabled)
-            condtests[idx].test = FALSE;
+        condtests[idx].test = FALSE;
     }
 }
 
@@ -1090,7 +1089,9 @@ parse_cond_option(boolean negated, char *opts)
     return 1;  /* !0 indicates error */
 }
 
-void
+/* display a menu of all available status condition options and let player
+   toggled them on or off; returns True iff any changes are made */
+boolean
 cond_menu(void)
 {
     static const char *const menutitle[2] = {
@@ -1104,6 +1105,7 @@ cond_menu(void)
     char mbuf[QBUFSZ];
     boolean showmenu = TRUE;
     int clr = 0;
+    boolean changed = FALSE;
 
     do {
         for (i = 0; i < CONDITION_COUNT; ++i) {
@@ -1164,10 +1166,11 @@ cond_menu(void)
         for (i = 0; i < CONDITION_COUNT; ++i)
             if (condtests[i].enabled != condtests[i].choice) {
                 condtests[i].enabled = condtests[i].choice;
-                gc.context.botl = TRUE;
+                condtests[idx].test = FALSE;
+                gc.context.botl = changed = TRUE;
             }
     }
-    return;
+    return changed;
 }
 
 /* called by all_options_conds() to get value for next cond_xyz option

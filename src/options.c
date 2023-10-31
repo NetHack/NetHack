@@ -4699,7 +4699,7 @@ optfn_windowtype(int optidx, int req, boolean negated UNUSED,
 
 static int
 pfxfn_cond_(
-    int optidx,
+    int optidx UNUSED,
     int req,
     boolean negated,
     char *opts,
@@ -4714,7 +4714,7 @@ pfxfn_cond_(
 
         switch (reslt) {
         case 0:
-            opt_set_in_config[optidx] = TRUE;
+            opt_set_in_config[pfx_cond_] = TRUE;
             break;
         case 3:
             config_error_add("Ambiguous condition option %s", opts);
@@ -4737,8 +4737,8 @@ pfxfn_cond_(
         opts[0] = '\0';
         return optn_ok;
     }
-    if (req == do_handler) {
-        cond_menu();    /* in botl.c */
+    if (req == do_handler) { /* not used */
+        (void) cond_menu();    /* in botl.c */
         return optn_ok;
     }
     return optn_ok;
@@ -8339,7 +8339,8 @@ optfn_o_status_cond(
         ; /* handled inline by all_options_strbuf() via all_options_conds() */
     }
     if (req == do_handler) {
-        cond_menu();
+        if (cond_menu())
+            opt_set_in_config[pfx_cond_] = TRUE;
         return optn_ok;
     }
     return optn_ok;
@@ -8574,7 +8575,7 @@ doset_simple_menu(void)
                 reslt = (*allopt[k].optfn)(allopt[k].idx, do_handler, FALSE,
                                            empty_optstr, empty_optstr);
                 /* if player eventually saves options, include this one */
-                if (reslt == optn_ok)
+                if (reslt == optn_ok && allopt[k].idx != pfx_cond_)
                     opt_set_in_config[k] = TRUE;
             } else {
                 Sprintf(buf, "Set %s to what?", allopt[k].name);
@@ -9564,8 +9565,10 @@ all_options_strbuf(strbuf_t *sbuf)
     }
 
     /* cond_xyz are closer to regular options than the other 'other opts'
-       so put them next */
-    if (opt_set_in_config[opt_o_status_cond])
+       so put them next; [pfx_cond_] will be set if any cond_Foo were
+       present when RC file was read in or if player made any changes via
+       status conditions menu; ignore opt_set_in_config[opt_o_status_cond] */
+    if (opt_set_in_config[pfx_cond_])
         all_options_conds(sbuf);
 
     get_changed_key_binds(sbuf);
