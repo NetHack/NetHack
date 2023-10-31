@@ -9421,6 +9421,10 @@ option_help(void)
     return;
 }
 
+/* gather all non-default cond_xyz options into one OPTIONS=cond_foo,!cond_bar
+   entry spread across multiple lines with backslash+newline if needed;
+   conditions with their default settings (cond_blind, !cond_glowhands, &c)
+   are excluded */
 static void
 all_options_conds(strbuf_t *sbuf)
 {
@@ -9449,9 +9453,14 @@ all_options_conds(strbuf_t *sbuf)
         }
         ++idx;
     }
-    /* finish off final line */
-    Strcat(buf, "\n");
-    strbuf_append(sbuf, buf);
+    /* finish off final line; value might be empty if one or more cond_xyz
+       options were changed in such a manner that that they're all back
+       to their default values; that will produce "OPTIONS=" will nothing
+       after the equals sign, if which case we need to suppress it */
+    if (strcmp(buf, "OPTIONS=")) {
+        Strcat(buf, "\n");
+        strbuf_append(sbuf, buf);
+    }
 }
 
 /* append menucolor lines to strbuf */
