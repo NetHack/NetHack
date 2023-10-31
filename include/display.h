@@ -1,4 +1,4 @@
-/* NetHack 3.7	display.h	$NHDT-Date: 1661295667 2022/08/23 23:01:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.77 $ */
+/* NetHack 3.7	display.h	$NHDT-Date: 1698741423 2023/10/31 08:37:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
 /* Copyright (c) Dean Luick, with acknowledgements to Kevin Darcy */
 /* and Dave Cohrs, 1990.                                          */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -182,9 +182,13 @@
  * Respectively return a random monster or object.
  * random_object() won't return STRANGE_OBJECT or the generic objects.
  * -/+ MAXOCLASSES is used to skip it and them.
+ * NUM_OBJECTS and MAXOCLASSES are from different enum lists and recent C++
+ * (for the Qt interface) complains about mixing them in arithmatic so cast
+ * them to int here.  Doesn't impact compiling random_object() with C.
  */
 #define random_monster(rng) ((*rng)(NUMMONS))
-#define random_object(rng) ((*rng)(NUM_OBJECTS - MAXOCLASSES) + MAXOCLASSES)
+#define random_object(rng) \
+    ((*rng)((int) NUM_OBJECTS - (int) MAXOCLASSES) + (int) MAXOCLASSES)
 
 /*
  * what_obj()
