@@ -9552,10 +9552,7 @@ all_options_strbuf(strbuf_t *sbuf)
                 break;
             /* FIXME: get_option_value for:
                - menu_deselect_all &c menu control keys,
-               - mouse_support
-               - pettype
-               - term_cols, term_rows
-               - verbose */
+               - term_cols, term_rows */
             buf2 = get_option_value(name, TRUE);
             if (buf2) {
                 Snprintf(tmp, sizeof tmp - 1, "OPTIONS=%s:%s", name, buf2);
