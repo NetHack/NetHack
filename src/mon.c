@@ -237,9 +237,9 @@ mon_sanity_check(void)
         } else if (mtmp->wormno) {
             sanity_check_worm(mtmp);
 
-        /* TODO: figure out which other bits shouldn't be set for 'fmon' */
-        } else if ((mtmp->mstate & (MON_DETACH | MON_MIGRATING | MON_LIMBO))
-                   != 0) {
+        /* some temp mstate bits can be expected for a mon on fmon, as part of
+           removing it, but DEADMONSTER check above should skip those. */
+        } else if (mon_offmap(mtmp)) {
             impossible("floor mon (%s) with mstate set to 0x%08lx",
                        fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
         }
@@ -267,10 +267,9 @@ mon_sanity_check(void)
     for (mtmp = gm.migrating_mons; mtmp; mtmp = mtmp->nmon) {
         sanity_check_single_mon(mtmp, FALSE, "migr");
 
-        /* TODO: figure out which other bits could or shouldn't be set
-         * when migrating */
-        if ((mtmp->mstate & (MON_DETACH)) != 0
-            || (mtmp->mstate & (MON_MIGRATING | MON_LIMBO)) == 0)
+        if ((mtmp->mstate
+             & ~(MON_MIGRATING | MON_LIMBO | MON_ENDGAME_MIGR)) != 0L
+            || !(mtmp->mstate & MON_MIGRATING))
             impossible("migrating mon (%s) with mstate set to 0x%08lx",
                        fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
     }

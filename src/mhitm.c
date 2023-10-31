@@ -1040,8 +1040,8 @@ mdamagem(
 
     if (mhitm_knockback(magr, mdef, mattk, &mhm.hitflags,
                         (MON_WEP(magr) != 0))
-        && ((mhm.hitflags & (M_ATTK_DEF_DIED|M_ATTK_HIT)) != 0
-            || (mdef->mstate & (MON_DETACH|MON_MIGRATING|MON_LIMBO)) != 0))
+        && ((mhm.hitflags & (M_ATTK_DEF_DIED | M_ATTK_HIT)) != 0
+            || mon_offmap(mdef)))
         return mhm.hitflags;
 
     if (mhm.done)
