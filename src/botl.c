@@ -1174,7 +1174,8 @@ cond_menu(void)
 }
 
 /* called by all_options_conds() to get value for next cond_xyz option
-   so that #saveoptions can collect it and write the set into new RC file */
+   so that #saveoptions can collect it and write the set into new RC file.
+   returns zero-length string if the option is the default value. */
 boolean
 opt_next_cond(int indx, char *outbuf)
 {
@@ -1200,8 +1201,11 @@ opt_next_cond(int indx, char *outbuf)
      * wasn't used to choose their preferred order.
      */
 
-    Sprintf(outbuf, "%scond_%s", condtests[indx].enabled ? "" : "!",
-            condtests[indx].useroption);
+    if ((condtests[indx].opt == opt_in && condtests[indx].enabled)
+        || (condtests[indx].opt == opt_out && !condtests[indx].enabled)) {
+        Sprintf(outbuf, "%scond_%s", condtests[indx].enabled ? "" : "!",
+                condtests[indx].useroption);
+    }
     return TRUE;
 }
 

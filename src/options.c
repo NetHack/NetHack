@@ -9426,6 +9426,7 @@ all_options_conds(strbuf_t *sbuf)
 {
     char buf[BUFSZ], nextcond[BUFSZ];
     int idx = 0;
+    boolean gotone = FALSE;
 
     buf[0] = '\0';
     while (opt_next_cond(idx, nextcond)) {
@@ -9439,10 +9440,13 @@ all_options_conds(strbuf_t *sbuf)
             strbuf_append(sbuf, buf);
             /* indent continuation line */
             Sprintf(buf, "%8s", " "); /* 8: strlen("OPTIONS=") */
-        } else {
+        } else if (nextcond[0] && gotone) {
             Strcat(buf, ",");
         }
-        Strcat(buf, nextcond);
+        if (nextcond[0]) {
+            gotone = TRUE;
+            Strcat(buf, nextcond);
+        }
         ++idx;
     }
     /* finish off final line */
