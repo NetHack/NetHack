@@ -1266,6 +1266,8 @@ if a temple was entered while blind, #overview could show a line of just "."
 rolling boulders ignored walls and trees
 shopkeepers consider the monster type when charging for tins, eggs and corpses
 separate level flags premapped and sokoban
+add ../include/nhlua.h to the alloc.o dependencies in Makefile.utl to
+	match Makefile.src
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
