@@ -136,6 +136,7 @@ CCXX=clang++ -std=c++11
 CLANGPPGTEQ9 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 9)
 CLANGPPGTEQ11 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 11)
 CLANGPPGTEQ14 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 14)
+CLANGPPGTEQ17 := $(shell expr `$(CXX) -dumpversion | cut -f1 -d.` \>= 17)
 ifeq "$(CLANGPPGTEQ9)" "1"
 #CCXXFLAGS+=-Wformat-overflow
 endif
@@ -151,10 +152,11 @@ endif  # CPLUSPLUS_NEED_DEPSUPPRESS
 CFLAGS+=-fPIC
 ifdef CPLUSPLUS_NEED17
 ifeq "$(CLANGPPGTEQ14)" "1"
-CCXX=clang++ -std=c++20
-else
 CCXX=clang++ -std=c++17
 endif  # clang++ greater than or equal to 14
+ifeq "$(CLANGPPGTEQ17)" "1"
+CCXX=clang++ -std=c++20
+endif  # clang++ greater than or equal to 17
 endif  # CPLUSPLUS_NEED17
 endif  # end of clang++-specific section
 CXX=$(CCXX)
