@@ -215,6 +215,8 @@ remove_worn_item(
     struct obj *obj,
     boolean unchain_ball) /* whether to unpunish or just unwield */
 {
+    unsigned oldinuse;
+
     if (donning(obj))
         cancel_don();
     if (!obj->owornmask)
@@ -235,6 +237,7 @@ remove_worn_item(
      * and defending the game against deliberate hangup when player sees a
      * message about something undesireable followed by --More--.
      */
+    oldinuse = obj->in_use;
     obj->in_use = 1;
 
     if (obj->owornmask & W_ARMOR) {
@@ -295,7 +298,7 @@ remove_worn_item(
      * that are affected aren't ones that will be unworn and trigger
      * the whole mess.
      */
-    obj->in_use = 0;
+    obj->in_use = oldinuse;
 }
 
 /* Returns 1 when something was stolen (or at least, when N should flee now),
