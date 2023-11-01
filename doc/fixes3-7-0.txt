@@ -1266,6 +1266,9 @@ if a temple was entered while blind, #overview could show a line of just "."
 rolling boulders ignored walls and trees
 shopkeepers consider the monster type when charging for tins, eggs and corpses
 separate level flags premapped and sokoban
+hero had worn amulet of magical breathing become unworn during theft by nymph,
+	dropped it to be able to crawl out of water, so it wasn't there when
+	game tried to transfer it to thief, triggering an "object lost" panic
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository

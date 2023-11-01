@@ -220,6 +220,23 @@ remove_worn_item(
     if (!obj->owornmask)
         return;
 
+    /*
+     * Losing worn gear might drop hero into water or lava or onto a
+     * location-changing trap or take away the ability to breathe in water.
+     * Marking it 'in_use' prevents emergency_disrobe() from dropping it.
+     * in_lava() appears to be ok; other cases impacting object location
+     * (or destruction) might still have issues.
+     *
+     * Note:  if a hangup save occurs when 'in_use' is set, the item will
+     * be destroyed via useup() during restore.  Maybe remove_worn_item()
+     * and emergency_disrobe() should switch to using obj->bypass instead
+     * but that would need a lot more cooperation by callers.  It's a
+     * tradeoff between protecting the player against unintentional hangup
+     * and defending the game against deliberate hangup when player sees a
+     * message about something undesireable followed by --More--.
+     */
+    obj->in_use = 1;
+
     if (obj->owornmask & W_ARMOR) {
         if (obj == uskin) {
             impossible("Removing embedded scales?");
@@ -264,6 +281,21 @@ remove_worn_item(
         /* catchall */
         setnotworn(obj);
     }
+
+    /*
+     * Fingers crossed; hope unwearing obj didn't destroy it.  Loss of
+     * levitation, flight, water walking, magical breathing or perhaps
+     * some other property can subject hero to hardship.  drown() won't
+     * drop an 'in_use' item during emergency_disrobe() to crawl out
+     * of water.  Surviving in_lava() only burns up items which aren't
+     * able to confer such properties but dying to it will destroy all
+     * in-use items, keeping them out of subsequent bones.  Triggering
+     * traps might pose a risk of item destruction (fire, explosion)
+     * but usually that will be like the surviving lava case--the items
+     * that are affected aren't ones that will be unworn and trigger
+     * the whole mess.
+     */
+    obj->in_use = 0;
 }
 
 /* Returns 1 when something was stolen (or at least, when N should flee now),
@@ -470,8 +502,9 @@ steal(struct monst* mtmp, char* objnambuf)
             impossible("Tried to steal a strange worn thing. [%d]",
                        otmp->oclass);
         }
-    } else if (otmp->owornmask) /* weapon or ball&chain */
+    } else if (otmp->owornmask) { /* weapon or ball&chain */
         remove_worn_item(otmp, TRUE);
+    }
 
     /* do this before removing it from inventory */
     if (objnambuf)

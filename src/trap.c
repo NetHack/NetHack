@@ -4634,14 +4634,16 @@ emergency_disrobe(boolean *lostsome)
                  * Undroppables are: body armor, boots, gloves,
                  * amulets, and rings because of the time and effort
                  * in removing them + loadstone and other cursed stuff
-                 * for obvious reasons.
+                 * for obvious reasons.  Also, any item in the midst
+                 * of being taken off or stolen.
                  */
                 if (!((obj->otyp == LOADSTONE && obj->cursed) || obj == uamul
                       || obj == uleft || obj == uright || obj == ublindf
                       || obj == uarm || obj == uarmc || obj == uarmg
                       || obj == uarmf || obj == uarmu
                       || (obj->cursed && (obj == uarmh || obj == uarms))
-                      || welded(obj)))
+                      || welded(obj)
+                      || obj->o_id == gs.stealoid || obj->in_use))
                     otmp = obj;
                 /* reached the mark and found some stuff to drop? */
                 if (--i < 0 && otmp)
