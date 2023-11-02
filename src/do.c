@@ -305,6 +305,7 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
                && cansee(x,y)) {
         doaltarobj(obj);
     }
+    check_buried_zombies(x, y);
 
     gb.bhitpos = save_bhitpos;
     return res;

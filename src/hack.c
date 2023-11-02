@@ -12,7 +12,6 @@ static int moverock(void);
 static void dosinkfall(void);
 static boolean findtravelpath(int);
 static boolean trapmove(coordxy, coordxy, struct trap *);
-static void check_buried_zombies(coordxy, coordxy);
 static schar u_simple_floortyp(coordxy, coordxy);
 static boolean swim_move_danger(coordxy, coordxy);
 static boolean domove_bump_mon(struct monst *, int);
@@ -1594,7 +1593,7 @@ u_rooted(void)
 }
 
 /* reduce zombification timeout of buried zombies around px, py */
-static void
+void
 check_buried_zombies(coordxy x, coordxy y)
 {
     struct obj *otmp;
