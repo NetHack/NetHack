@@ -649,6 +649,11 @@ explode(
                     else if (str != gk.killer.name && str != hallu_buf)
                         Strcpy(gk.killer.name, str);
                     gk.killer.format = KILLED_BY_AN;
+                } else if (olet == TRAP_EXPLODE) {
+                    gk.killer.format = NO_KILLER_PREFIX;
+                    Snprintf(gk.killer.name, sizeof gk.killer.name,
+                             "caught %sself in a %s", uhim(),
+                             str);
                 } else if (type >= 0 && olet != SCROLL_CLASS) {
                     gk.killer.format = NO_KILLER_PREFIX;
                     Snprintf(gk.killer.name, sizeof gk.killer.name,

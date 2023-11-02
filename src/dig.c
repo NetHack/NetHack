@@ -802,7 +802,10 @@ dighole(boolean pit_only, boolean by_magic, coord *cc)
             && (lev->wall_info & W_NONDIGGABLE) != 0)) {
         pline_The("%s %shere is too hard to dig in.", surface(dig_x, dig_y),
                   (dig_x != u.ux || dig_y != u.uy) ? "t" : "");
-
+    } else if (ttmp && is_magical_trap(ttmp->ttyp)) {
+        explode(dig_x, dig_y, 0, 20 + d(3, 6), TRAP_EXPLODE, EXPL_MAGICAL);
+        deltrap(ttmp);
+        newsym(dig_x, dig_y);
     } else if (is_pool_or_lava(dig_x, dig_y)) {
         pline_The("%s sloshes furiously for a moment, then subsides.",
                   hliquid(is_lava(dig_x, dig_y) ? "lava" : "water"));

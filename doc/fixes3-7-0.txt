@@ -1269,6 +1269,7 @@ separate level flags premapped and sokoban
 hero had worn amulet of magical breathing become unworn during theft by nymph,
 	dropped it to be able to crawl out of water, so it wasn't there when
 	game tried to transfer it to thief, triggering an "object lost" panic
+digging down on a magical trap causes it to explode
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
