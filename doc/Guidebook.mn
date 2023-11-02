@@ -27,14 +27,11 @@
 .
 .so tmac.nh	\" extra macros which aren't in tmac.n
 .
-.\" \n(fF=1: fixed-width font (Guidebook.txt), =0: proportional-width font
-.nr fF (\w'f'p)=(\w'F'p) \" compare width of 'f' to that of 'F'
-.
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
 .\" a warning each time any font can't be loaded; earlier versions silently
 .\" proceeded so lack of CR (fixed-width, moot for plain text) didn't matter
-.if \n(fF .do ftr CR R  \" if using fixed-width, substitute R for CR
-.                       \" (the substitution affects both '\f' and '.ft')
+.if n .do ftr CR R  \" if formatting for a terminal, substitute R for CR
+.                   \" (the substitution affects both '\f' and '.ft')
 .
 .ds h0 "NetHack Guidebook
 .ds h1
@@ -3315,7 +3312,7 @@ and to limit the number of questions during disclosure.
 Listed here roughly in order of difficulty and not necessarily in the order
 in which you might accomplish them.
 .\" Vary the output between Guidebook.txt and Guidebook.{ps,pdf}
-.ie \n(fF \{\
+.ie n \{\
 .\" fixed-width font: default key width is fine;
 .\" display longest entries (below) across two lines for Guidebook.txt
 .PS "Mines'\~End"
@@ -3345,7 +3342,7 @@ Read a passage from a Discworld Novel.
 Entered Sokoban.
 .PL "Big\~Room"
 Entered the Big Room.
-.ie \n(fF \{\
+.ie n \{\
 .PL "Soko-Prize"
 Explored to the top of Sokoban
 .br
@@ -3392,7 +3389,7 @@ Never wore any armor.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
-.if !\n(fF .in -5n  \" undo proportional-width font-specific indentation
+.if t .in -5n  \" undo proportional-width font-specific indentation
 .sp
 .lp "Notes:  "
 .pg
@@ -3630,13 +3627,12 @@ Example:
 .pg
 \ \" dummy paragraph to force some separation [.BR isn't working as intended]
 .pg
-.SD n \" suppress indentation
+.SD n \" begin display without indentation
 Here is an example of configuration file contents:
 .ED
 .\" [conditional indentation; see description of NETHACKOPTIONS below]
-.ds sD i \" assume proportional, indentation acceptable and preferred
-.\" Check for fixed-width font; fF set up at top of file
-.if \n(fF .ds sD n \" if same width, suppress indentation
+.ds sD i  \" typesetter; display indentation acceptable and preferred
+.if n .ds sD n  \" terminal; suppress indentation
 .SD \*(sD \" string variable sD will expand to either 'i' or 'n'
 .ft CR \" set font to constant-width Roman
 # Set your character's role, race, gender, and alignment.
@@ -3682,12 +3678,8 @@ you would enter the command
 .\" but the 'setenv' example is too wide for Guidebook.txt unless the
 .\" indentation is suppressed (.SD n).  Even though the second example
 .\" can be indented, it should match the first or they'll both look odd.
-.\" groff has a built-in register allowing recognition of '-T', but we
-.\" can't rely on that.  Assume Guidebook.ps uses a proportional font
-.\" and Guidebook.txt a fixed-width one and test which sort we're using.
-.ds sD i \" assume proportional, indentation acceptable and preferred
-.\" Check for fixed-width font; fF set up at top of file
-.if \n(fF .ds sD n \" if same width, suppress indentation
+.ds sD i  \" typesetter; display indentation acceptable and preferred
+.if n .ds sD n  \" terminal; suppress indentation
 .SD \*(sD
 \f(CR% setenv NETHACKOPTIONS "color,\\!leg,name:Blue Meanie,fruit:lime"\fP
 .ED
