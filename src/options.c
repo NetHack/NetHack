@@ -9454,9 +9454,9 @@ all_options_conds(strbuf_t *sbuf)
         ++idx;
     }
     /* finish off final line; value might be empty if one or more cond_xyz
-       options were changed in such a manner that that they're all back
-       to their default values; that will produce "OPTIONS=" will nothing
-       after the equals sign, if which case we need to suppress it */
+       options were changed in such a manner that they're all back to their
+       default values--which will produce "OPTIONS=" with nothing after the
+       equals sign; only add to the output when there is more present */
     if (strcmp(buf, "OPTIONS=")) {
         Strcat(buf, "\n");
         strbuf_append(sbuf, buf);
