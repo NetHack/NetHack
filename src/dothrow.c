@@ -924,8 +924,7 @@ hurtle_step(genericptr_t arg, coordxy x, coordxy y)
     check_special_room(FALSE);
 
     if (is_pool(x, y) && !u.uinwater) {
-        if ((Is_waterlevel(&u.uz) && is_waterwall(x,y))
-            || !(Levitation || Flying || Wwalking)) {
+        if (is_waterwall(x, y) || !(Levitation || Flying || Wwalking)) {
             /* couldn't move while hurtling; allow movement now so that
                drown() will give a chance to crawl out of pool and survive */
             gm.multi = 0;
