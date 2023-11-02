@@ -1,4 +1,4 @@
-/* NetHack 3.7	mhitm.c	$NHDT-Date: 1627412283 2021/07/27 18:58:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.199 $ */
+/* NetHack 3.7	mhitm.c	$NHDT-Date: 1698939796 2023/11/02 15:43:16 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.244 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -797,7 +797,9 @@ boolean
 engulf_target(struct monst *magr, struct monst *mdef)
 {
     struct rm *lev;
-    int dx, dy;
+    int ax, ay, dx, dy;
+    boolean uatk = (magr == &gy.youmonst),
+            udef = (mdef == &gy.youmonst);
 
     /* can't swallow something that's too big */
     if (mdef->data->msize >= MZ_HUGE
@@ -808,21 +810,25 @@ engulf_target(struct monst *magr, struct monst *mdef)
     if (mdef->mtrapped || magr->mtrapped)
         return FALSE;
 
-    /* (hypothetical) engulfers who can pass through walls aren't
-       limited by rock|trees|bars */
-    if ((magr == &gy.youmonst) ? Passes_walls : passes_walls(magr->data))
-        return TRUE;
-
-    /* don't swallow something in a spot where attacker wouldn't
-       otherwise be able to move onto; we don't want to engulf
-       a wall-phaser and end up with a non-phaser inside a wall */
-    dx = mdef->mx, dy = mdef->my;
-    if (mdef == &gy.youmonst)
-        dx = u.ux, dy = u.uy;
+    /* if attacker is phasing in solid rock and defender can't move there,
+       or vice versa, don't allow engulf to succeeed; otherwise expelling
+       might not be able to place attacker and defender both back on map;
+       when defender is the hero, a sanity_check complaint about placing
+       the hero on top of a monster can occur */
+    dx = (mdef == &gy.youmonst) ? u.ux : mdef->mx;
+    dy = (mdef == &gy.youmonst) ? u.uy : mdef->my;
     lev = &levl[dx][dy];
-    if (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
-        /* not passes_bars(); engulfer isn't squeezing through */
-        || (lev->typ == IRONBARS && !is_whirly(magr->data)))
+    if (!(udef ? Passes_walls : passes_walls(mdef->data))
+          && (IS_ROCK(lev->typ) || closed_door(dx, dy) || IS_TREE(lev->typ)
+              /* not passes_bars(); engulfer isn't squeezing through */
+              || (lev->typ == IRONBARS && !is_whirly(magr->data))))
+        return FALSE;
+    ax = (magr == &gy.youmonst) ? u.ux : magr->mx;
+    ay = (magr == &gy.youmonst) ? u.uy : magr->my;
+    lev = &levl[ax][ay];
+    if (!(uatk ? Passes_walls : passes_walls(magr->data))
+        && (IS_ROCK(lev->typ) || closed_door(ax, ay) || IS_TREE(lev->typ)
+            || (lev->typ == IRONBARS && !is_whirly(mdef->data))))
         return FALSE;
 
     return TRUE;

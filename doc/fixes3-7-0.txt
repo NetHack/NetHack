@@ -1713,6 +1713,10 @@ applying a wielded lump of royal jelly but not picking something to rub it on
 	"addinv: null obj after quiver merge" (like applying lit potion of oil)
 ceiling hider could become hidden when there was no ceiling, triggering a
 	warning if sanity_check was On
+hero could be forced onto a monster's location if a level was full and an
+	engulfer was occupying an adjacent but inaccessible spot, engulfed
+	hero, then expelled hero while now occupying hero's accessible spot,
+	triggering sanity_check warning "you over monster"
 experimental #saveoptions wasn't saving the set of cond_xyz options correctly;
 	if player viewed the 'm O' submenu for status conditions, they would
 	get saved even if not changed; otherwise, ones that came in from the
