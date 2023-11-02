@@ -33,8 +33,8 @@
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
 .\" a warning each time any font can't be loaded; earlier versions silently
 .\" proceeded so lack of CR (fixed-width, moot for plain text) didn't matter
-.if \n(fF .do ftr CR R .fi  \" if using fixed-width, substitute R for CR
-.                           \" (the substitution affects both '\f' and '.ft')
+.if \n(fF .do ftr CR R  \" if using fixed-width, substitute R for CR
+.                       \" (the substitution affects both '\f' and '.ft')
 .
 .ds h0 "NetHack Guidebook
 .ds h1
@@ -3392,7 +3392,7 @@ Never wore any armor.
 .PL Ascended
 Delivered the Amulet to its final destination.
 .PE
-.if !\n(fF .in -5n .fi \" undo proportional-width font-specific indentation
+.if !\n(fF .in -5n  \" undo proportional-width font-specific indentation
 .sp
 .lp "Notes:  "
 .pg
