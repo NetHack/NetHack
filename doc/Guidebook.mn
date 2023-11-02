@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.530 $ $NHDT-Date: 1693082582 2023/08/26 20:43:02 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ $NHDT-Date: 1698899756 2023/11/02 04:35:56 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -29,6 +29,12 @@
 .
 .\" \n(fF=1: fixed-width font (Guidebook.txt), =0: proportional-width font
 .nr fF (\w'f'p)=(\w'F'p) \" compare width of 'f' to that of 'F'
+.
+.\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
+.\" a warning each time any font can't be loaded; earlier versions silently
+.\" proceeded so lack of CR (fixed-width, moot for plain text) didn't matter
+.if \n(fF .do ftr CR R .fi  \" if using fixed-width, substitute R for CR
+.                           \" (the substitution affects both '\f' and '.ft')
 .
 .ds h0 "NetHack Guidebook
 .ds h1

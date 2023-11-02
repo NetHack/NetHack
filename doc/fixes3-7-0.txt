@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1271 $ $NHDT-Date: 1698264796 2023/10/25 20:13:16 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1277 $ $NHDT-Date: 1698899752 2023/11/02 04:35:52 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2053,6 +2053,9 @@ sound: added 'windsound' soundlib implementation for use on Windows; the
 sound: add 'qtsound' soundlib implementation for use on any platform
 	with Qt; the interface implementation resides win/Qt/qt_bind.cpp;
 	built on top of Qt.
+documentation: when building plain text Guidebook.txt from Guidebook.mn, avoid
+	attempting to use CR font; change doesn't affect building Guidebook.ps
+	which utilizes CR to get various instances of fixed-width text
 
 
 General New Features
