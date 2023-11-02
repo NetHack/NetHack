@@ -4225,6 +4225,8 @@ dfeature_at(coordxy x, coordxy y, char *buf)
         cmap = S_lava; /* "molten lava" */
     else if (is_ice(x, y))
         dfeature = ice_descr(x, y, altbuf), cmap = -1; /* "ice" */
+    else if (IS_WATERWALL(ltyp))
+        dfeature = "wall of water";
     else if (is_pool(x, y))
         dfeature = "pool of water";
     else if (IS_SINK(ltyp))
