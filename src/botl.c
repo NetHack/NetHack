@@ -4084,16 +4084,12 @@ status_hilite_menu_fld(int fld)
             hlstr = hlstr->next;
         }
     } else {
-        any = cg.zeroany;
         Sprintf(buf, "No current hilites for %s", initblstats[fld].fldname);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, buf);
     }
 
     /* separator line */
-    any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, "",
-             MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, "");
 
     if (count) {
         any = cg.zeroany;
@@ -4219,9 +4215,7 @@ status_hilite_menu(void)
                  clr, "View all hilites in config format",
                  MENU_ITEMFLAGS_NONE);
 
-        any = cg.zeroany;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, "");
     }
 
     for (i = 0; i < MAXBLSTATS; i++) {
