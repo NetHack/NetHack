@@ -3412,12 +3412,10 @@ display_pickinv(
             Sprintf(eos(prompt),
                     " -- unidentified or partially identified item%s",
                     plur(unid_cnt));
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, prompt,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, prompt);
         if (!unid_cnt) {
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                     "(all items are permanently identified already)",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu_str(win,
+                         "(all items are permanently identified already)");
             gotsomething = TRUE;
         } else {
             any.a_obj = &wizid_fakeobj;
@@ -3522,12 +3520,10 @@ display_pickinv(
        there isn't anything applicable to list; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
     if (iflags.perm_invent && !lets && !gotsomething) {
-        any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+        add_menu_str(win,
                  (inuse_only && skipped_noninuse) ? not_using_anything
                  : (!show_gold && skipped_gold) ? only_carrying_gold
-                   : not_carrying_anything,
-                 MENU_ITEMFLAGS_NONE);
+                     : not_carrying_anything);
         want_reply = FALSE;
     }
 #ifdef TTY_PERM_INVENT
@@ -5353,18 +5349,13 @@ static void
 invdisp_nothing(const char *hdr, const char *txt)
 {
     winid win;
-    anything any;
     menu_item *selected;
-    int clr = 0;
 
-    any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
     add_menu_heading(win, hdr);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "", MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, txt,
-             MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "");
+    add_menu_str(win, txt);
     end_menu(win, (char *) 0);
     if (select_menu(win, PICK_NONE, &selected) > 0)
         free((genericptr_t) selected);

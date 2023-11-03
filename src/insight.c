@@ -114,14 +114,8 @@ static struct ll_achieve_msg achieve_msg [] = {
 static void
 enlght_out(const char *buf)
 {
-    int clr = 0;
-
     if (ge.en_via_menu) {
-        anything any;
-
-        any = cg.zeroany;
-        add_menu(ge.en_win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(ge.en_win, buf);
     } else
         putstr(ge.en_win, 0, buf);
 }
