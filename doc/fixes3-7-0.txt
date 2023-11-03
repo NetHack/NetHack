@@ -838,7 +838,8 @@ clear obj->bypass for buried objects [a giant on ice triggers a fire trap,
 	other inventory, ice is melted, boulder plugs resulting pool burying
 	rest of giant's dropped inventory, subsequent sanity checks report
 	that there are buried objects which are 'flagged bypass']
-only give Sunsword or Demonbane as starting gear to lawful Angels
+give Sunsword as starting gear only to lawful Angels; since Demonbane has
+	become a mace and Angels only get swords, they won't start with it
 for #knownclass with menustyle=Tradtional, allow player to ask for `a even if
 	no artifacts have been discovered yet, same as `<any-object-class>;
 	likewise for `u to ask to see unique items

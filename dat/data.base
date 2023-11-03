@@ -1299,13 +1299,20 @@ major demon
 	them difficult to deal with, even on the rare occasions when
 	they are friendly.
 	  [ The Tough Guide to Fantasyland, by Diana Wynne Jones ]
+# added by PR #1108 by NullCGT then replaced by PR #1109 by entrez
+# (Demonbane has been changed from a sword to a mace so the new quote doesn't
+# seem to be very appropriate)
 demonbane
-	Do not be deceived, Wormwood. Our cause is never more in danger
-	than when a human, no longer desiring, but still intending, to do
-	our Enemy's will, looks round upon a universe from which every
-	trace of Him seems to have vanished, and asks why he has been
-	forsaken, and still obeys.
-		[ The Screwtape Letters, by C.S. Lewis ]
+#	Do not be deceived, Wormwood. Our cause is never more in danger
+#	than when a human, no longer desiring, but still intending, to do
+#	our Enemy's will, looks round upon a universe from which every
+#	trace of Him seems to have vanished, and asks why he has been
+#	forsaken, and still obeys.
+#		[ The Screwtape Letters, by C.S. Lewis ]
+#
+	Think not that I am come to send peace on earth:  I came not to
+	send peace, but a sword.
+		[ The Gospel According to Matthew, 10:34 ]
 dented pot
 	Here was a sight to beat all: a man in the prime of life rambling
 	barefoot down the wilderness road, dressed in raggedy pantaloons
@@ -1410,7 +1417,8 @@ pup*
 	loyalty to man and gentleness with children, it is the
 	world's most popular domestic animal.  It can easily be
 	trained to perform various tasks.
-# typing "spellbook or a closed door" shouldn't yield this entry
+# typing "spellbook or a closed door" (map description for "+" when using
+# the default symbol set) shouldn't yield this entry
 ~trap*door
 ~*spellbook*
 *door
@@ -2369,9 +2377,31 @@ hell hound*
 	dark form and savage face which broke upon us out of the wall
 	of fog.
 	  [ The Hound of the Baskervilles, by Sir Arthur Conan Doyle ]
-# note: nethack's helm of brilliance got changed to crystal
+~helm of *
+~crystal helmet
+helm*
+dented pot
+* helmet
+	A piece of armor designed to protect the head.
+	(What were you expecting?)
+helm of telepathy
+	A helmet which allows the wearer to detect sentient creatures
+	within a modest radius, or within the whole level when blind.
+helm of opposite alignment
+	A helmet which changes the wearer's alignment while worn.
+	Alignment will change back when the helmet is taken off.
+helm of caution
+	A helmet which confers the "warning" property, sensing the
+	strength of threats posed by unseen hostile creatures.
+# note: this quotation had "high of steel" but we're going to cheat--it is
+# now deliberately mistranslated as "high of crystal" to match nethack 3.7's
+# change to helm of brilliance and become more useful to players.
+# PR #1109 wanted to change it to be for all helms but being covered with
+# gems and gold is not appropriate for ordinary helmets (plus it states that
+# it is unique, so is somewhat inappropriate for helm of brilliance too)
 helm of brilliance
-	A helm he set on his head, high of steel; thereon was many
+crystal helmet
+	A helm he set on his head, high of crystal; thereon was many
 	gemstone, all encompassed with gold; it was Uther's, the noble
 	king's; it was named Goswhit, each other unlike.
 	  [ Layamon's Brut, translated by Sir Frederic Madden, K.H. ]
@@ -2611,19 +2641,43 @@ hunter
 	Where is the haste that ye hurry by?
 	Brother, I go to my lair to die.
 		[ The Jungle Book, by Rudyard Kipling ]
+# added in PR #1108 by NullCGT for ice box object but has been changed to
+# ice terrain
 # note: this might need to be reformatted; it's much wider than other entries
 # but should be able to fit within a normal-width screen once nethack strips
 # off the leading <tab>.
-ice box
+~ice box
+ice
+# thawing ice: "solid ice", "thin ice", &c
+* ice
+# hallucinating: "frozen <hallucination liquid>"
+frozen *
 	Ice, white ice, like a winding-sheet, sheathing each smoke-grimed wall;
 	Ice on the stove-pipe, ice on the bed, ice gleaming over all;
-	Sparkling ice on the dead man’s chest, glittering ice in his hair,
+	Sparkling ice on the dead man's chest, glittering ice in his hair,
 	Ice on his fingers, ice in his heart, ice in his glassy stare;
 	Hard as a log and trussed like a frog, with his arms and legs outspread.
 	I gazed at the coffin I'd brought for him, and I gazed at the gruesome dead,
 	And at last I spoke: "Bill liked his joke; but still, goldarn his eyes,
 	A man had ought to consider his mates in the way he goes and dies."
 		[ The Ballad of Blasphemous Bill, by Robert W. Service ]
+# part of PR #1109 by entrez
+ice box
+	I have eaten
+	the plums
+	that were in
+	the icebox
+
+	and which
+	you were probably
+	saving
+	for breakfast
+
+	Forgive me
+	they were delicious
+	so sweet
+	and so cold
+		[ This Is Just To Say, by William Carlos Williams ]
 ice devil
 	Ice devils are large semi-insectoid creatures, who are
 	equally at home in the fires of Hell and the cold of Limbo,
