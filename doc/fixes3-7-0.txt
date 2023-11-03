@@ -1722,6 +1722,11 @@ experimental #saveoptions wasn't saving the set of cond_xyz options correctly;
 	if player viewed the 'm O' submenu for status conditions, they would
 	get saved even if not changed; otherwise, ones that came in from the
 	old RC file wouldn't be included in the new one
+knockback or recoil while levitating could hurtle the hero through a wall of
+	water to the spot beyond unless it happened on the Plane of Water
+if recoil from throwing an item while levitating sent hero into a wall of
+	water, the thrown item got placed in that water rather than at its
+	intended destination
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
