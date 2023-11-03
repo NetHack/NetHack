@@ -541,20 +541,16 @@ doc_extcmd_flagstr(
     const struct ext_func_tab *efp) /* if Null, add a footnote to the menu */
 {
     static char Abuf[10]; /* 5 would suffice: {'[','m','A',']','\0'} */
-    int clr = 0;
 
     /* note: tag shown for menu prefix is 'm' even if m-prefix action
        has been bound to some other key */
     if (!efp) {
         char qbuf[QBUFSZ];
-        anything any = cg.zeroany;
 
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "[A] Command autocompletes", MENU_ITEMFLAGS_NONE);
+        add_menu_str(menuwin, "[A] Command autocompletes");
         Sprintf(qbuf, "[m] Command accepts '%s' prefix",
                 visctrl(cmd_from_func(do_reqmenu)));
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, qbuf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(menuwin, qbuf);
         return (char *) 0;
     } else {
         boolean mprefix = accept_menu_prefix(efp),
@@ -600,11 +596,8 @@ doextlist(void)
         redisplay = FALSE;
         any = cg.zeroany;
         start_menu(menuwin, MENU_BEHAVE_STANDARD);
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "Extended Commands List",
-                 MENU_ITEMFLAGS_NONE);
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(menuwin, "Extended Commands List");
+        add_menu_str(menuwin, "");
 
         Sprintf(buf, "Switch to %s commands that don't autocomplete",
                 menumode ? "including" : "excluding");
@@ -642,9 +635,7 @@ doextlist(void)
        : "Switch to showing all alphabetically, including debugging commands",
                      MENU_ITEMFLAGS_NONE);
         }
-        any = cg.zeroany;
-        add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(menuwin, "");
         menushown[0] = menushown[1] = 0;
         n = 0;
         for (pass = 0; pass <= 1; ++pass) {
@@ -702,17 +693,14 @@ doextlist(void)
                    2nd field will be "    " or " [A]" or " [m]" or "[mA]" */
                 Sprintf(buf, " %-14s %4s %s", efp->ef_txt,
                         doc_extcmd_flagstr(menuwin, efp), cmd_desc);
-                add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         clr, buf, MENU_ITEMFLAGS_NONE);
+                add_menu_str(menuwin, buf);
                 ++n;
             }
             if (n)
-                add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         clr, "", MENU_ITEMFLAGS_NONE);
+                add_menu_str(menuwin, "");
         }
         if (*searchbuf && !n)
-            add_menu(menuwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                     clr, "no matches", MENU_ITEMFLAGS_NONE);
+            add_menu_str(menuwin, "no matches");
         else
             (void) doc_extcmd_flagstr(menuwin, (struct ext_func_tab *) 0);
 
@@ -2033,9 +2021,7 @@ wiz_intrinsic(void)
             Sprintf(buf,
         "[Precede any selection with a count to increment by other than %d.]",
                     DEFAULT_TIMEOUT_INCR);
-            any.a_int = 0;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu_str(win, buf);
         }
         for (i = 0; (propname = property_by_index(i, &p)) != 0; ++i) {
             if (p == HALLUC_RES) {
@@ -2049,9 +2035,7 @@ wiz_intrinsic(void)
                 /* FIRE_RES and properties beyond it (in the propertynames[]
                    ordering, not their numerical PROP values), can only be
                    set to timed values here so show a separator */
-                any.a_int = 0;
-                add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, clr, "--", MENU_ITEMFLAGS_NONE);
+                add_menu_str(win, "--");
             }
             any.a_int = i + 1; /* +1: avoid 0 */
             oldtimeout = u.uprops[p].intrinsic & TIMEOUT;
@@ -3043,19 +3027,15 @@ handler_rebind_keys_add(boolean keyfirst)
             Sprintf(buf, "Key '%s' is not bound to anything.",
                     key2txt(key, buf2));
         }
-        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, buf,
-                 MENU_ITEMFLAGS_NONE);
-        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, buf);
+        add_menu_str(win, "");
     }
 
     any.a_int = -1;
     add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "nothing: unbind the key",
              MENU_ITEMFLAGS_NONE);
 
-    any.a_int = 0;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "",
-             MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "");
 
     for (i = 0; i < extcmdlist_length; i++) {
         ec = &extcmdlist[i];
