@@ -305,7 +305,6 @@ flooreffects(struct obj *obj, coordxy x, coordxy y, const char *verb)
                && cansee(x,y)) {
         doaltarobj(obj);
     }
-    check_buried_zombies(x, y);
 
     gb.bhitpos = save_bhitpos;
     return res;
@@ -779,6 +778,7 @@ dropz(struct obj *obj, boolean with_impact)
         place_object(obj, u.ux, u.uy);
         if (with_impact)
             container_impact_dmg(obj, u.ux, u.uy);
+        impact_disturbs_zombies(obj, with_impact);
         if (obj == uball)
             drop_ball(u.ux, u.uy);
         else if (gl.level.flags.has_shop)

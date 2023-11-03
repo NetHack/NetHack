@@ -291,6 +291,15 @@ moverock(void)
                 goto cannot_push;
             }
 
+            if (closed_door(rx, ry))
+                goto nopushmsg;
+
+            /* at this point the boulder should be able to move (though
+               potentially into something like a trap, pool, or lava) */
+
+            /* rumbling disturbs buried zombies */
+            disturb_buried_zombies(sx, sy);
+
             if (ttmp) {
                 int newlev = 0; /* lint suppression */
                 d_level dest;
@@ -401,8 +410,6 @@ moverock(void)
                 }
             }
 
-            if (closed_door(rx, ry))
-                goto nopushmsg;
             if (boulder_hits_pool(otmp, rx, ry, TRUE))
                 continue;
 
@@ -1592,9 +1599,20 @@ u_rooted(void)
     return FALSE;
 }
 
+/* maybe disturb buried zombies when an object is dropped or thrown nearby */
+void
+impact_disturbs_zombies(struct obj *obj, boolean violent)
+{
+    /* if object won't make a noticeable impact, let buried zombies rest */
+    if (obj->owt < (violent ? 10 : 100) || is_flimsy(obj))
+        return;
+
+    disturb_buried_zombies(obj->ox, obj->oy);
+}
+
 /* reduce zombification timeout of buried zombies around px, py */
 void
-check_buried_zombies(coordxy x, coordxy y)
+disturb_buried_zombies(coordxy x, coordxy y)
 {
     struct obj *otmp;
     long t;
@@ -2601,7 +2619,7 @@ domove_core(void)
     }
 
     if (!Levitation && !Flying && !Stealth)
-        check_buried_zombies(u.ux, u.uy);
+        disturb_buried_zombies(u.ux, u.uy);
 
     if (hides_under(gy.youmonst.data) || gy.youmonst.data->mlet == S_EEL
         || u.dx || u.dy)

@@ -993,7 +993,8 @@ extern boolean test_move(coordxy, coordxy, coordxy, coordxy, int);
 extern int wiz_debug_cmd_traveldisplay(void);
 #endif
 extern boolean u_rooted(void);
-extern void check_buried_zombies(coordxy, coordxy);
+extern void impact_disturbs_zombies(struct obj *, boolean);
+extern void disturb_buried_zombies(coordxy, coordxy);
 extern boolean u_maybe_impaired(void);
 extern const char *u_locomotion(const char *);
 extern void handle_tip(int);

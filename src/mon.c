@@ -4033,6 +4033,7 @@ wake_nearto(coordxy x, coordxy y, int distance)
             }
         }
     }
+    disturb_buried_zombies(x, y);
 }
 
 /* NOTE: we must check for mimicry before calling this routine */
