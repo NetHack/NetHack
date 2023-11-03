@@ -4587,6 +4587,7 @@ water_damage_chain(
 {
     struct obj *otmp;
     coordxy x, y;
+    coord save_bhitpos;
 
     if (!obj)
         return;
@@ -4595,7 +4596,10 @@ water_damage_chain(
        acid nor unseen have exploded during this water damage sequence */
     ga.acid_ctx.dkn_boom = ga.acid_ctx.unk_boom = 0;
     ga.acid_ctx.ctx_valid = TRUE;
-
+    /* we don't want to permanently overwrite bhitpos below, since we can get
+       here from scenarios where it was in use up the call stack (e.g. thrown
+       item hurtling the levitating hero into a wall of water) */
+    save_bhitpos = gb.bhitpos;
     /* erode_obj() relies on bhitpos if target objects aren't carried by
        the hero or a monster, to check visibility controlling feedback */
     if (get_obj_location(obj, &x, &y, CONTAINED_TOO))
@@ -4606,9 +4610,10 @@ water_damage_chain(
         water_damage(obj, (char *) 0, FALSE);
     }
 
-    /* reset acid context */
+    /* reset acid context and bhitpos */
     ga.acid_ctx.dkn_boom = ga.acid_ctx.unk_boom = 0;
     ga.acid_ctx.ctx_valid = FALSE;
+    gb.bhitpos = save_bhitpos;
 }
 
 /*
