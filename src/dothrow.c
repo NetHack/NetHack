@@ -1777,9 +1777,11 @@ throwit(struct obj *obj,
         /* container contents might break;
            do so before turning ownership of gt.thrownobj over to shk
            (container_impact_dmg handles item already owned by shop) */
-        if (!IS_SOFT(levl[gb.bhitpos.x][gb.bhitpos.y].typ))
+        if (!IS_SOFT(levl[gb.bhitpos.x][gb.bhitpos.y].typ)) {
             /* <x,y> is spot where you initiated throw, not gb.bhitpos */
             container_impact_dmg(obj, u.ux, u.uy);
+            impact_disturbs_zombies(obj, TRUE);
+        }
         /* charge for items thrown out of shop;
            shk takes possession for items thrown into one */
         if ((*u.ushops || obj->unpaid) && obj != uball)
