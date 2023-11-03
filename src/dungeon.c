@@ -3735,9 +3735,7 @@ print_mapseen(
         buf[i] = highc(buf[i]);
         /* capitalizing it makes it a sentence; terminate with '.' */
         Strcat(buf, ".");
-        any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                 buf, MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, buf);
     }
 
     /* we assume that these are mutually exclusive */
@@ -3774,16 +3772,12 @@ print_mapseen(
         Sprintf(buf, "%sMoloch's Sanctum.", PREFIX);
     }
     if (*buf) {
-        any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                 buf, MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, buf);
     }
     /* quest entrance is not mutually-exclusive with bigroom or rogue level */
     if (mptr->flags.quest_summons) {
         Sprintf(buf, "%sSummoned by %s.", PREFIX, ldrname());
-        any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                 buf, MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, buf);
     }
 
     /* print out branches */
@@ -3798,9 +3792,7 @@ print_mapseen(
         if (mptr->br->end1_up && !In_endgame(&(mptr->br->end2)))
             Sprintf(eos(buf), ", level %d", depth(&(mptr->br->end2)));
         Strcat(buf, ".");
-        any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                 buf, MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, buf);
     }
 
     /* maybe print out bones details */
@@ -3813,9 +3805,7 @@ print_mapseen(
                 ++kncnt;
         if (kncnt) {
             Sprintf(buf, "%s%s", PREFIX, "Final resting place for");
-            any = cg.zeroany;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                     buf, MENU_ITEMFLAGS_NONE);
+            add_menu_str(win, buf);
             if (died_here) {
                 /* disclosure occurs before bones creation, so listing dead
                    hero here doesn't give away whether bones are produced */
@@ -3827,18 +3817,13 @@ print_mapseen(
                 (void) strsubst(tmpbuf, " her ", " your ");
                 Snprintf(buf, sizeof(buf), "%s%syou, %s%c", PREFIX, TAB,
                          tmpbuf, --kncnt ? ',' : '.');
-                any = cg.zeroany;
-                add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
-                         buf, MENU_ITEMFLAGS_NONE);
+                add_menu_str(win, buf);
             }
             for (bp = mptr->final_resting_place; bp; bp = bp->next) {
                 if (bp->bonesknown || wizard || final > 0) {
                     Sprintf(buf, "%s%s%s, %s%c", PREFIX, TAB, bp->who,
                             bp->how, --kncnt ? ',' : '.');
-                    any = cg.zeroany;
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             ATR_NONE, NO_COLOR,
-                             buf, MENU_ITEMFLAGS_NONE);
+                    add_menu_str(win, buf);
                 }
             }
         }
