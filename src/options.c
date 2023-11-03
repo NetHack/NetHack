@@ -409,15 +409,10 @@ ask_do_tutorial(void)
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
                      ATR_NONE, 0, "No, just start play", MENU_ITEMFLAGS_NONE);
 
-            any = cg.zeroany;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, 0, "", MENU_ITEMFLAGS_NONE);
-            add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
+            add_menu_str(win, "");
+            add_menu_str(win, buf);
             if (pass++) /* we'll get here after <space> or <return> */
-                add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, 0, "(Please choose 'y' or 'n'.)",
-                         MENU_ITEMFLAGS_NONE);
+                add_menu_str(win, "(Please choose 'y' or 'n'.)");
 
             end_menu(win, "Do you want a tutorial?");
 
@@ -5199,9 +5194,7 @@ handler_menustyle(void)
                                          : MENU_ITEMFLAGS_NONE);
         /* second line is prefixed by spaces that "c - " would use */
         Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, menutype[i][2]);
-        any.a_int = 0;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, buf);
     }
     end_menu(tmpwin, "Select menustyle:");
     n = select_menu(tmpwin, PICK_ONE, &style_pick);
@@ -5461,9 +5454,7 @@ handler_msg_window(void)
                                                   : MENU_ITEMFLAGS_NONE);
             /* second line is prefixed by spaces that "c - " would use */
             Sprintf(buf, "%4s%-12.12s%c%.60s", "", "", sep, msgwind[i][2]);
-            any.a_char = '\0';
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                     MENU_ITEMFLAGS_NONE);
+            add_menu_str(tmpwin, buf);
         }
         end_menu(tmpwin, "Select message history display type:");
         n = select_menu(tmpwin, PICK_ONE, &window_pick);
@@ -5754,18 +5745,14 @@ handler_whatis_coord(void)
              0, ATR_NONE, clr, "none (no coordinates displayed)",
              (gpc == GPCOORDS_NONE)
                 ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-    any.a_long = 0L;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "", MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, "");
     Sprintf(buf, "map: upper-left: <%d,%d>, lower-right: <%d,%d>%s",
             1, 0, COLNO - 1, ROWNO - 1,
             flags.verbose ? "; column 0 unused, off left edge" : "");
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, buf);
     if (strcmp(windowprocs.name, "tty")) /* only show for non-tty */
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-   "screen: row is offset to accommodate tty interface's use of top line",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin,
+      "screen: row is offset to accommodate tty interface's use of top line");
 #if COLNO == 80
 #define COL80ARG flags.verbose ? "; column 80 is not used" : ""
 #else
@@ -5774,10 +5761,8 @@ handler_whatis_coord(void)
     Sprintf(buf, "screen: upper-left: [%02d,%02d], lower-right: [%d,%d]%s",
             0 + 2, 1, ROWNO - 1 + 2, COLNO - 1, COL80ARG);
 #undef COL80ARG
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             buf, MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "", MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, buf);
+    add_menu_str(tmpwin, "");
     end_menu(tmpwin,
         "Select coordinate display when auto-describing a map position:");
     if ((pick_cnt = select_menu(tmpwin, PICK_ONE, &window_pick)) > 0) {
@@ -8473,9 +8458,7 @@ doset_simple_menu(void)
            the player might not know how to type them; keep this simple */
         Strcpy(buf, "Use command '#optionsfull'"
                     " to get the complete options list.");
-        any = cg.zeroany;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 0, buf, MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, buf);
     }
     any = cg.zeroany;
     any.a_int = -2 + 1;
@@ -8485,8 +8468,7 @@ doset_simple_menu(void)
 
     for (section = OptS_General; section < OptS_Advanced; section++) {
         any = cg.zeroany;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 0, "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, "");
         Sprintf(buf, " %-30s ", OptS_type[section]);
         add_menu_heading(tmpwin, buf);
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -8537,13 +8519,9 @@ doset_simple_menu(void)
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
             if (gs.simple_options_help && allopt[i].descr) {
-                any = cg.zeroany;
                 Sprintf(buf, "    %s", allopt[i].descr);
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                         ATR_NONE, 0, buf, MENU_ITEMFLAGS_NONE);
-                any = cg.zeroany;
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         0, "", MENU_ITEMFLAGS_NONE);
+                add_menu_str(tmpwin, buf);
+                add_menu_str(tmpwin, "");
             }
         }
     }
@@ -8709,9 +8687,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
         for (i = 0; i < SIZE(helptext); ++i) {
             if (helptext[i]) {
                 Sprintf(buf, "%4s%.75s", "", helptext[i]);
-                any.a_int = 0;
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, FALSE, clr,
-                         buf, MENU_ITEMFLAGS_NONE);
+                add_menu_str(tmpwin, buf);
             } else {
                 any.a_int = '?' + 1; /* processing pick_list subtracts 1 */
                 add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
@@ -8771,9 +8747,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                          ATR_NONE, clr, buf, MENU_ITEMFLAGS_NONE);
             }
-    any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+
+    add_menu_str(tmpwin, "");
     add_menu_heading(tmpwin,
                      "Compounds (selecting will prompt for new value):");
 
@@ -8791,9 +8766,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
             }
         }
 
-    any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, "");
     add_menu_heading(tmpwin, "Other settings:");
 
     for (pass = startpass; pass <= endpass; pass++)
@@ -8811,9 +8784,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
         }
 
 #ifdef PREFIXES_IN_USE
-    any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+    add_menu_str(tmpwin, "");
     add_menu_heading(tmpwin,
              "Variable playground locations:");
     for (i = 0; i < PREFIX_COUNT; i++)
@@ -9712,8 +9683,7 @@ choose_classes_menu(const char *prompt,
     if (category == 1 && next_accelerator <= 'z') {
         /* for objects, add "A - ' '  all classes", after a separator */
         any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, "");
         any.a_int = (int) ' ';
         Sprintf(buf, "%c  %s", (char) any.a_int, "all classes of objects");
         /* we won't preselect this even if the incoming list is empty;
