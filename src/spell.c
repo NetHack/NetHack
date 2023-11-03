@@ -1656,9 +1656,7 @@ spellsortmenu(void)
         if (i == SORTRETAINORDER) {
             let = 'z'; /* assumes fewer than 26 sort choices... */
             /* separate final choice from others with a blank line */
-            any.a_int = 0;
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+            add_menu_str(tmpwin, "");
         } else {
             let = 'a' + i;
         }
