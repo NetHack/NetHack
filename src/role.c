@@ -1915,8 +1915,7 @@ role_menu_extra(int which, winid where, boolean preselect)
         any.a_int = 0;
         /* use four spaces of padding to fake a grayed out menu choice */
         Sprintf(buf, "%4s%s forces %s", "", constrainer, forcedvalue);
-        add_menu(where, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, buf,
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(where, buf);
     } else if (what) {
         any.a_int = RS_menu_arg(which);
         Sprintf(buf, "Pick%s %s first", (f >= 0) ? " another" : "", what);
@@ -2296,8 +2295,7 @@ genl_player_setup(int screenheight)
                     role_menu_extra(ROLE_RANDOM, win, TRUE);
                     any = cg.zeroany; /* separator, not a choice */
                     if (excess < 1 || excess > 2)
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                        add_menu_str(win, "");
                     role_menu_extra(RS_RACE, win, FALSE);
                     role_menu_extra(RS_GENDER, win, FALSE);
                     role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -2391,8 +2389,7 @@ genl_player_setup(int screenheight)
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                        add_menu_str(win, "");
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -2480,8 +2477,7 @@ genl_player_setup(int screenheight)
                         /* add miscellaneous menu entries */
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                        add_menu_str(win, "");
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_ALGNMNT, win, FALSE);
@@ -2565,8 +2561,7 @@ genl_player_setup(int screenheight)
                         setup_algnmenu(win, TRUE, ROLE, RACE, GEND);
                         role_menu_extra(ROLE_RANDOM, win, TRUE);
                         any.a_int = 0; /* separator, not a choice */
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
+                        add_menu_str(win, "");
                         role_menu_extra(RS_ROLE, win, FALSE);
                         role_menu_extra(RS_RACE, win, FALSE);
                         role_menu_extra(RS_GENDER, win, FALSE);
@@ -2709,36 +2704,27 @@ static boolean
 reset_role_filtering(void)
 {
     winid win;
-    anything any;
-    int i, n, clr = 0;
+    int i, n;
     char filterprompt[QBUFSZ];
     menu_item *selected = 0;
 
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
-    any = cg.zeroany;
 
     /* no extra blank line preceding this entry; end_menu supplies one */
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             "Unacceptable roles", MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "Unacceptable roles");
     setup_rolemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "Unacceptable races", MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "");
+    add_menu_str(win, "Unacceptable races");
     setup_racemenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "Unacceptable genders", MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "");
+    add_menu_str(win, "Unacceptable genders");
     setup_gendmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, "Unacceptable alignments", MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, "");
+    add_menu_str(win, "Unacceptable alignments");
     setup_algnmenu(win, FALSE, ROLE_NONE, ROLE_NONE, ROLE_NONE);
 
     Sprintf(filterprompt, "Pick all that apply%s",
@@ -2797,9 +2783,7 @@ plsel_startmenu(int ttyrows, int aspect)
 {
     char qbuf[QBUFSZ];
     winid win;
-    anything any;
     const char *rolename;
-    int clr = 0;
 
     /* whatever aspect was just chosen might force others (Orc => chaotic,
        Samurai => Human+lawful, Valkyrie => female) */
@@ -2830,12 +2814,9 @@ plsel_startmenu(int ttyrows, int aspect)
         panic("could not create role selection window");
     start_menu(win, MENU_BEHAVE_STANDARD);
 
-    any = cg.zeroany;
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-             qbuf, MENU_ITEMFLAGS_NONE);
+    add_menu_str(win, qbuf);
     if (maybe_skip_seps(ttyrows, aspect) != 2)
-        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "", MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, "");
     return win;
 }
 

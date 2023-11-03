@@ -1408,13 +1408,10 @@ restore_menu(
             clear_nhwindow(bannerwin);
             /* COPYRIGHT_BANNER_[ABCD] */
             for (k = 1; k <= 4; ++k)
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                         clr, copyright_banner_line(k), MENU_ITEMFLAGS_NONE);
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, "",
-                     MENU_ITEMFLAGS_NONE);
+                add_menu_str(tmpwin, copyright_banner_line(k));
+            add_menu_str(tmpwin, "");
         }
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-                 clr, "Select one of your saved games", MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, "Select one of your saved games");
         for (k = 0; saved[k]; ++k) {
             any.a_int = k + 1;
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
