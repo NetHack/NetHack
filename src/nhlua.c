@@ -788,7 +788,6 @@ nhl_text(lua_State *L)
     if (argc > 0) {
         menu_item *picks = (menu_item *) 0;
         winid tmpwin;
-        anything any = cg.zeroany;
 
         tmpwin = create_nhwindow(NHW_MENU);
         start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -811,8 +810,7 @@ nhl_text(lua_State *L)
                 while ((ptr > str) && !(*ptr == ' ' || *ptr == '\n'))
                     ptr--;
                 *ptr = '\0';
-                add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, 0,
-                         str, MENU_ITEMFLAGS_NONE);
+                add_menu_str(tmpwin, str);
                 str = ptr + 1;
             } while (*str && str <= lstr);
             lua_pop(L, 1);

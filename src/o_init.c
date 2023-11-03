@@ -592,18 +592,13 @@ choose_disco_sort(
         /* called via 'm `' where full alphabetize doesn't make sense
            (only showing one class so can't span all classes) but the
            chosen sort will stick and also apply to '\' usage */
-        any = cg.zeroany;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "", MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "Note: full alphabetical and alphabetical within class",
-                 MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "      are equivalent for single class discovery, but",
-                 MENU_ITEMFLAGS_NONE);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
-                 "      will matter for future use of total discoveries.",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu_str(tmpwin, "");
+        add_menu_str(tmpwin,
+                     "Note: full alphabetical and alphabetical within class");
+        add_menu_str(tmpwin,
+                     "      are equivalent for single class discovery, but");
+        add_menu_str(tmpwin,
+                     "      will matter for future use of total discoveries.");
     }
     end_menu(tmpwin, "Ordering of discoveries");
 
