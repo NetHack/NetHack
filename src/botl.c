@@ -19,6 +19,26 @@ static const char *rank(void);
 static void bot_via_windowport(void);
 static void stat_update_time(void);
 
+void
+add_menu_heading(winid tmpwin, const char *buf)
+{
+    anything any = cg.zeroany;
+
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings, 0,
+             buf, MENU_ITEMFLAGS_NONE);
+}
+
+void
+add_menu_str(winid tmpwin, const char *buf)
+{
+    anything any = cg.zeroany;
+
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, 0,
+             buf, MENU_ITEMFLAGS_NONE);
+}
+
 static char *
 get_strength_str(void)
 {
@@ -1127,8 +1147,7 @@ cond_menu(void)
                  clr, mbuf, MENU_ITEMFLAGS_SKIPINVERT);
         any = cg.zeroany;
         Sprintf(mbuf, "sorted %s", menutitle[gc.condmenu_sortorder]);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                 iflags.menu_headings, clr, mbuf, MENU_ITEMFLAGS_NONE);
+        add_menu_heading(tmpwin, mbuf);
         for (i = 0; i < SIZE(condtests); i++) {
             idx = sequence[i];
             Sprintf(mbuf, "cond_%-14s", condtests[idx].useroption);

@@ -2764,8 +2764,10 @@ list_vanquished(char defquery, boolean ask)
                 mlet = mons[i].mlet;
                 if (class_header && mlet != prev_mlet) {
                     Strcpy(buf, def_monsyms[(int) mlet].explain);
-                    putstr(klwin, ask ? 0 : iflags.menu_headings,
-                           upstart(buf));
+                    if (ask)
+                        putstr(klwin, 0, upstart(buf));
+                    else
+                        add_menu_heading(klwin, upstart(buf));
                     prev_mlet = mlet;
                 }
                 if (UniqCritterIndx(i)) {
@@ -2973,8 +2975,10 @@ list_genocided(char defquery, boolean ask)
                 mlet = mons[mndx].mlet;
                 if (class_header && mlet != prev_mlet) {
                     Strcpy(buf, def_monsyms[(int) mlet].explain);
-                    putstr(klwin, ask ? 0 : iflags.menu_headings,
-                           upstart(buf));
+                    if (ask)
+                        putstr(klwin, 0, upstart(buf));
+                    else
+                        add_menu_heading(klwin, upstart(buf));
                     prev_mlet = mlet;
                 }
                 Sprintf(buf, " %s", makeplural(mons[mndx].pmnames[NEUTRAL]));

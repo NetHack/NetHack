@@ -1226,9 +1226,7 @@ enhance_weapon_skill(void)
                 /* Print headings for skill types */
                 any = cg.zeroany;
                 if (i == skill_ranges[pass].first)
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             iflags.menu_headings, clr,
-                             skill_ranges[pass].name, MENU_ITEMFLAGS_NONE);
+                    add_menu_heading(win, skill_ranges[pass].name);
 
                 if (P_RESTRICTED(i))
                     continue;

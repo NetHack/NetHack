@@ -2427,10 +2427,8 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
     s_level *slev;
     dungeon *dptr;
     branch *br;
-    anything any;
     struct lchoice lchoices;
     winid win = create_nhwindow(NHW_MENU);
-    int clr = 0;
 
     if (bymenu) {
         start_menu(win, MENU_BEHAVE_STANDARD);
@@ -2461,9 +2459,7 @@ print_dungeon(boolean bymenu, schar *rlev, xint16 *rdgn)
                         dptr->depth_start + dptr->entry_lev - 1);
         }
         if (bymenu) {
-            any = cg.zeroany;
-            add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     iflags.menu_headings, clr, buf, MENU_ITEMFLAGS_NONE);
+            add_menu_heading(win, buf);
         } else
             putstr(win, 0, buf);
 
@@ -3654,9 +3650,10 @@ print_mapseen(
                     gd.dungeons[dnum].dname, depthstart,
                     depthstart + gd.dungeons[dnum].dunlev_ureached - 1);
         any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 !final ? iflags.menu_headings : ATR_NONE, NO_COLOR,
-                 buf, MENU_ITEMFLAGS_NONE);
+        if (final)
+            add_menu_str(win, buf);
+        else
+            add_menu_heading(win, buf);
     }
 
     /* calculate level number */

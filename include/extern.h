@@ -177,6 +177,8 @@ extern boolean bones_include_name(const char *);
 
 /* ### botl.c ### */
 
+extern void add_menu_heading(winid, const char *);
+extern void add_menu_str(winid, const char *);
 extern char *do_statusline1(void);
 extern void check_gold_symbol(void);
 extern char *do_statusline2(void);

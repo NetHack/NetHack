@@ -5887,10 +5887,8 @@ handler_autopickup_exception(void)
         if (numapes) {
             ape = ga.apelist;
             any = cg.zeroany;
-            add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                     iflags.menu_headings, clr,
-                     "Always pickup '<'; never pickup '>'",
-                     MENU_ITEMFLAGS_NONE);
+            add_menu_heading(tmpwin,
+                             "Always pickup '<'; never pickup '>'");
             for (i = 0; i < numapes && ape; i++) {
                 any.a_void = (opt_idx == 1) ? 0 : ape;
                 /* length of pattern plus quotes (plus '<'/'>') is
@@ -8490,9 +8488,7 @@ doset_simple_menu(void)
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
                  0, "", MENU_ITEMFLAGS_NONE);
         Sprintf(buf, " %-30s ", OptS_type[section]);
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                 iflags.menu_headings, 0,
-                 buf /*OptS_type[section]*/, MENU_ITEMFLAGS_NONE);
+        add_menu_heading(tmpwin, buf);
         for (i = 0; (name = allopt[i].name) != 0; i++) {
             if (allopt[i].section != section)
                 continue;
@@ -8744,8 +8740,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings, clr,
-             "Booleans (selecting will toggle value):", MENU_ITEMFLAGS_NONE);
+    add_menu_heading(tmpwin,
+             "Booleans (selecting will toggle value):");
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
@@ -8778,9 +8774,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     any = cg.zeroany;
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings, clr,
-             "Compounds (selecting will prompt for new value):",
-             MENU_ITEMFLAGS_NONE);
+    add_menu_heading(tmpwin,
+                     "Compounds (selecting will prompt for new value):");
 
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -8799,9 +8794,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     any = cg.zeroany;
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             iflags.menu_headings, clr,
-             "Other settings:", MENU_ITEMFLAGS_NONE);
+    add_menu_heading(tmpwin, "Other settings:");
 
     for (pass = startpass; pass <= endpass; pass++)
         for (i = 0; (name = allopt[i].name) != 0; i++) {
@@ -8821,9 +8814,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     any = cg.zeroany;
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             iflags.menu_headings, clr,
-             "Variable playground locations:", MENU_ITEMFLAGS_NONE);
+    add_menu_heading(tmpwin,
+             "Variable playground locations:");
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], fmtstr_doset, -1, 0);
 #endif

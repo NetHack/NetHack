@@ -1077,12 +1077,10 @@ query_objlist(const char *qstr,        /* query string */
                 /* if sorting, print type name (once only) */
                 if (sorted && !printed_type_name) {
                     any = cg.zeroany;
-                    add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                             iflags.menu_headings, clr,
+                    add_menu_heading(win,
                              let_to_name(*pack, FALSE,
                                          ((how != PICK_NONE)
-                                          && iflags.menu_head_objsym)),
-                             MENU_ITEMFLAGS_NONE);
+                                          && iflags.menu_head_objsym)));
                     printed_type_name = TRUE;
                 }
 
@@ -1109,8 +1107,7 @@ query_objlist(const char *qstr,        /* query string */
         if (sorted && n > 1) {
             Sprintf(buf, "%s Creatures",
                     digests(u.ustuck->data) ? "Swallowed" : "Engulfed");
-            add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings,
-                     clr, buf, MENU_ITEMFLAGS_NONE);
+            add_menu_heading(win, buf);
         }
         fake_hero_object = cg.zeroobj;
         fake_hero_object.quan = 1L; /* not strictly necessary... */

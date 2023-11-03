@@ -1763,8 +1763,7 @@ dospellmenu(
     if (wizard)
         Sprintf(eos(buf), "%c%6s", sep, "turns");
 
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             iflags.menu_headings, clr, buf, MENU_ITEMFLAGS_NONE);
+    add_menu_heading(tmpwin, buf);
     for (i = 0; i < MAXSPELL && spellid(i) != NO_SPELL; i++) {
         splnum = !gs.spl_orderindx ? i : gs.spl_orderindx[i];
         Sprintf(buf, fmt, spellname(splnum), spellev(splnum),

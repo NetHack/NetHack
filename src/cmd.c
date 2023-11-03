@@ -695,9 +695,7 @@ doextlist(void)
                    results menu. */
                 if (!menushown[pass]) {
                     Strcpy(buf, headings[pass]);
-                    add_menu(menuwin, &nul_glyphinfo, &any, 0, 0,
-                             iflags.menu_headings, clr, buf,
-                             MENU_ITEMFLAGS_NONE);
+                    add_menu_heading(menuwin, buf);
                     menushown[pass] = 1;
                 }
                 /* longest ef_txt at present is "wizrumorcheck" (13 chars);

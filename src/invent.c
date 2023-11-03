@@ -3438,9 +3438,7 @@ display_pickinv(
    } else if (xtra_choice) {
         /* wizard override ID and xtra_choice are mutually exclusive */
         if (flags.sortpack)
-            add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                     iflags.menu_headings, clr,
-                     "Miscellaneous", MENU_ITEMFLAGS_NONE);
+            add_menu_heading(win, "Miscellaneous");
         any.a_char = HANDS_SYM; /* '-' */
         add_menu(win, &nul_glyphinfo, &any, HANDS_SYM, 0, ATR_NONE,
                  clr, xtra_choice, MENU_ITEMFLAGS_NONE);
@@ -3476,11 +3474,9 @@ display_pickinv(
             any = cg.zeroany; /* all bits zero */
             ilet = otmp->invlet;
             if (flags.sortpack && !classcount) {
-                add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                         iflags.menu_headings, clr,
+                add_menu_heading(win,
                          let_to_name(*invlet, FALSE,
-                                     (want_reply && iflags.menu_head_objsym)),
-                         MENU_ITEMFLAGS_NONE);
+                                     (want_reply && iflags.menu_head_objsym)));
                 classcount++;
             }
             if (wizid)
@@ -3515,8 +3511,7 @@ display_pickinv(
     if (iflags.force_invmenu && lets && want_reply
         && (int) strlen(lets) < inv_cnt(TRUE)) {
         any = cg.zeroany;
-        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                 iflags.menu_headings, clr, "Special", MENU_ITEMFLAGS_NONE);
+        add_menu_heading(win, "Special");
         any.a_char = '*';
         add_menu(win, &nul_glyphinfo, &any, '*', 0, ATR_NONE, clr,
                  "(list everything)", MENU_ITEMFLAGS_NONE);
@@ -3645,10 +3640,8 @@ display_used_invlets(char avoidlet)
                 if (!flags.sortpack || otmp->oclass == *invlet) {
                     if (flags.sortpack && !classcount) {
                         any = cg.zeroany; /* zero */
-                        add_menu(win, &nul_glyphinfo, &any, 0, 0,
-                                 iflags.menu_headings, clr,
-                                 let_to_name(*invlet, FALSE, FALSE),
-                                 MENU_ITEMFLAGS_NONE);
+                        add_menu_heading(win,
+                                         let_to_name(*invlet, FALSE, FALSE));
                         classcount++;
                     }
                     any.a_char = ilet;
@@ -5365,8 +5358,7 @@ invdisp_nothing(const char *hdr, const char *txt)
     any = cg.zeroany;
     win = create_nhwindow(NHW_MENU);
     start_menu(win, MENU_BEHAVE_STANDARD);
-    add_menu(win, &nul_glyphinfo, &any, 0, 0, iflags.menu_headings, clr,
-             hdr, MENU_ITEMFLAGS_NONE);
+    add_menu_heading(win, hdr);
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
              "", MENU_ITEMFLAGS_NONE);
     add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr, txt,
