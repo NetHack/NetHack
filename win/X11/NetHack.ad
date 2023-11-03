@@ -30,8 +30,9 @@ NetHack*text*borderWidth:  0
 ! tile_file names a file containing full-color tiles for the map.
 ! If you use a 100dpi (or greater) monitor you may wish to double the
 ! tile size so you can see the figures.  If NetHack was compiled to
-! use XPM (USE_XPM in config.h or via the Makefile),
-! the tile_file is a standard XPM file.
+! use XPM (via #define USE_XPM in config.h or via -DUSE_XPM in src/Makefile,
+! which happens when using WANT_WIN_X11=1 or WANT_WIN_ALL=1 with setup.sh
+! 'hints' that support such), the tile_file is a standard XPM file.
 ! Otherwise, it is a custom format.  double_tile_size only applies to
 ! the custom format - to enlarge an XPM file, use processing tools
 ! such as XV or preferably PBMplus.
