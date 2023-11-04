@@ -1273,6 +1273,7 @@ hero had worn amulet of magical breathing become unworn during theft by nymph,
 digging down on a magical trap causes it to explode
 thrown potion of sickness now bypasses target's innate magic resistance but
 	only affects current hit points, no longer also reducing maximum HP
+lightning has a small chance of melting iron bars
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
