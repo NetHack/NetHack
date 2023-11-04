@@ -1705,8 +1705,8 @@ percentage(struct istat_s *bl, struct istat_s *maxbl)
     long lval;
     unsigned uval;
     unsigned long ulval;
-    int fld = bl->fld;
-    boolean use_rawval = (fld == BL_HP || fld == BL_ENE);
+    int fld;
+    boolean use_rawval;
 
     if (!bl || !maxbl) {
         impossible("percentage: bad istat pointer %s, %s",
@@ -1714,6 +1714,8 @@ percentage(struct istat_s *bl, struct istat_s *maxbl)
         return 0;
     }
 
+    fld = bl->fld;
+    use_rawval = (fld == BL_HP || fld == BL_ENE);
     ival = 0, lval = 0L, uval = 0U, ulval = 0UL;
     anytype = bl->anytype;
     if (maxbl->a.a_void) {
