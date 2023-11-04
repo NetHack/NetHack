@@ -1964,8 +1964,9 @@ can_hide_under_obj(struct obj *obj)
 void
 dissolve_bars(coordxy x, coordxy y)
 {
-    levl[x][y].typ = (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
-    levl[x][y].flags = 0;
+    levl[x][y].typ = (levl[x][y].edge == 1) ? DOOR
+        : (Is_special(&u.uz) || *in_rooms(x, y, 0)) ? ROOM : CORR;
+    levl[x][y].flags = 0; /* doormask = D_NODOOR */
     newsym(x, y);
     if (u_at(x, y))
         switch_terrain();
