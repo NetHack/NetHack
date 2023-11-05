@@ -277,8 +277,9 @@ The bat bites!
 Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15 Neutral
 Dlvl:1 $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 T:752 Hungry Conf
 .TE
-.ft \" revert to previous font
+.ft R
 .ce 1
+.if t .sp 0.5v
 Figure 1
 .
 .\" Figure 2 uses trailing spaces to force the same width as Figure 1.
@@ -291,8 +292,9 @@ Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \"
 Neutral $:993 HP:9(12) Pw:3(3) AC:10 Exp:1/19 Hungry          \"
 Dlvl:1 T:752                                  Conf            \"
 .TE
-.ft
+.ft R
 .ce 1
+.if t .sp 0.5v
 Figure 2
 .
 .hn 2
@@ -635,9 +637,11 @@ h\- . \-l	\ 	4\- . \-6\ 	\"
 / | \\	\ 	/ | \\\ 	\"
 b  j  n	\ 	1  2  3\ 	\"
 \fR\ 	\ 	(if \fBnumber_pad\fR is set)\ 	\"
-\fR\ 	Figure 3\ 	\ 	\"
 .TE
-.ft
+.ft R
+.if t .sp 0.5v
+.ce 1
+Figure 3
 .ED
 .
 .lp [YUHJKLBN]
