@@ -1275,6 +1275,7 @@ thrown potion of sickness now bypasses target's innate magic resistance but
 	only affects current hit points, no longer also reducing maximum HP
 lightning has a small chance of melting iron bars
 make spell menu work with repeat
+when attempting to look up a named fruit in data.base, try harder
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
