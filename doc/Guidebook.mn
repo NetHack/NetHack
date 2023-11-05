@@ -48,9 +48,11 @@
 .\" \(oq = left (open) single quote
 .\" \(cq = right (close) single quote    \(aq = apostrophe / single quote
 .\"    - = hyphen                        \-   = minus sign
-.\"                                      \(em = M-sized dash
+.\" \(rs = backslash                     \(em = dash as wide as 'M' is tall
 .\"    ^ = small circumflex punctuation  \(ha = larger circumflex character
 .\"    ~ = small tilde punctuation       \(ti = larger tilde character
+.\"
+.\" See groff_man_style(7) or groff_char(7) for more on these.
 .
 .
 .\" finally, start the actual Guidebook...
