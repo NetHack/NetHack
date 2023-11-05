@@ -695,6 +695,7 @@ getspell(int* spell_no)
 {
     int nspells, idx;
     char ilet, lets[BUFSZ], qbuf[QBUFSZ];
+    struct _cmd_queue cq, *cmdq;
 
     if (spellid(0) == NO_SPELL) {
         You("don't know any spells right now.");
@@ -702,6 +703,21 @@ getspell(int* spell_no)
     }
     if (rejectcasting())
         return FALSE; /* no spell chosen */
+
+    if ((cmdq = cmdq_pop()) != 0) {
+        cq = *cmdq;
+        free(cmdq);
+        if (cq.typ == CMDQ_KEY) {
+            nspells = num_spells();
+            idx = spell_let_to_idx(cq.key);
+            if (idx < 0 || idx >= nspells)
+                return FALSE;
+            *spell_no = idx;
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
 
     if (flags.menu_style == MENU_TRADITIONAL) {
         /* we know there is at least 1 known spell */
@@ -777,9 +793,11 @@ docast(void)
 {
     int spell_no;
 
-    if (getspell(&spell_no))
+    if (getspell(&spell_no)) {
+        cmdq_add_key(CQ_REPEAT, spellet(spell_no));
         return spelleffects(gs.spl_book[spell_no].sp_id, FALSE, FALSE);
-    return ECMD_OK;
+    }
+    return ECMD_FAIL;
 }
 
 static const char *
