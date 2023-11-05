@@ -902,7 +902,7 @@ interrupt_multi(const char *msg)
 static const struct early_opt earlyopts[] = {
     { ARG_DEBUG, "debug", 5, TRUE },
     { ARG_VERSION, "version", 4, TRUE },
-    { ARG_SHOWPATHS, "showpaths", 9, FALSE },
+    { ARG_SHOWPATHS, "showpaths", 8, FALSE },
 #ifndef NODUMPENUMS
     { ARG_DUMPENUMS, "dumpenums", 9, FALSE },
 #endif
