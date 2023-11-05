@@ -2800,10 +2800,9 @@ win_request_info *
 tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
 {
 #if !defined(TTY_PERM_INVENT)
+    wri = (win_request_info *) 0;
     nhUse(window);
     nhUse(request);
-    nhUse(wri);
-    return (win_request_info *) 0;
 #else
     boolean tty_ok /*, show_gold */, inuse_only;
     int maxslot;
@@ -2831,18 +2830,24 @@ tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
         wri->tocore.haverows = (int) ttyDisplay->rows;
         wri->tocore.havecols = (int) ttyDisplay->cols;
         if (!tty_ok) {
-            wri->tocore.tocore_flags |= prohibited; /* prohibited */
+#ifdef RESIZABLE
+            /* terminal isn't big enough right now but player might resize it
+               and then use 'm O' to try to set 'perm_invent' again */
+            wri->tocore.tocore_flags |= too_small;
+#else
+            wri->tocore.tocore_flags |= prohibited;
+#endif
         } else {
             maxslot = (maxrow - 2) * (!inuse_only ? 2 : 1);
             wri->tocore.maxslot = maxslot;
         }
         break;
     default:
-        impossible("invalid request to tty_update_invent_slot %u", request);
+        impossible("invalid request to tty_ctrl_nhwindow: %d", request);
         break;
     }
-    return wri;
 #endif
+    return wri;
 }
 
 #ifdef TTY_PERM_INVENT
@@ -3023,6 +3028,13 @@ ttyinv_add_menu(
             if (text[1] == 'h' && text[2] == 'e' && text[3] == ' ')
                 text += 4;
         }
+        /*
+         * TODO?
+         *  Replace "c - " prefix with "c: " or just "c " to have a bit more
+         *  room for 'text' (the item description).  If this prefix gets
+         *  changed, the indentation for empty inventory in ttyinv_render()
+         *  should be changed to match.
+         */
         Snprintf(invbuf, sizeof invbuf, "%c - %s", ch, text);
         text = invbuf;
         row = (slot % rows_per_side) + 1; /* +1: top border */

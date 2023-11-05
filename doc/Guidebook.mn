@@ -40,7 +40,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "September 8, 2023
+.ds f2 "November 4, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4281,8 +4281,38 @@ and entries to be removed by \(oq\f(CR!\fP\(cq and name.
 The positive (no \(oq!\(cq) and negative (with \(oq!\(cq) entries
 can be intermixed.
 .lp perm_invent
-If true, always display your current inventory in a window.  This only
+If true, always display your current inventory in a window (default false).
+.lp ""
+This only
 makes sense for windowing system interfaces that implement this feature.
+For those that do, the
+.op perminv_mode
+option can be used to refine what gets displayed for \fIperm_invent\fP.
+Setting that to a value other than \fInone\fP while \fIperm_invent\fP is
+false will change it to true.
+.lp perminv_mode
+Augments the
+.op perm_invent
+option.
+Value is one of
+.PS "\f(CRin-use\fP"
+.PL "\f(CRnone\fP"
+behave as if \fIperm_invent\fP is false;
+.PL "\f(CRall\fP"
+show all inventory except for gold;
+.PL "\f(CRfull\fP"
+show full inventory including gold;
+.PL "\f(CRin-use\fP"
+only show items which are in use (worn, wielded, lit lamp).
+.\" %if these get uncommented, change .PS argument to "\f(CRgold+grid\fP"
+.\" %and the terminator for in-use to semi-colon.
+.\" .PL "\f(CRon+grid\fP"
+.\" special for tty only, show \fIall\fP plus unused inventory letters;
+.\" .PL "\f(CRgold+grid\fP"
+.\" special for tty only, show \fIfull\fP plus unused inventory letters.
+.PE
+Default is \fInone\fP but if \fIperm_invent\fP gets set to true while
+it is \fInone\fP it will be changed to \fIall\fP.
 .\" petattr is a wincap option but we'll document it here...
 .lp "petattr "
 Specifies one or more text highlighting attributes to use when showing

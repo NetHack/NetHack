@@ -47,7 +47,7 @@ static void mime_action(const char *);
 /* enum and structs are defined in wintype.h */
 static win_request_info zerowri = { { 0L, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0 } };
 static win_request_info wri_info;
-static int done_setting_perminv_flags = 0;
+static int perminv_flags = InvOptNone;
 static boolean in_perm_invent_toggled;
 
 /* wizards can wish for venom, which will become an invisible inventory
@@ -3288,7 +3288,7 @@ display_pickinv(
     struct obj *otmp, wizid_fakeobj;
     char ilet, ret, *formattedobj;
     const char *invlet = flags.inv_order;
-    int n, classcount;
+    int n, classcount, inusecount = 0;
     winid win; /* windows being used */
     anything any;
     menu_item *selected;
@@ -3310,7 +3310,7 @@ display_pickinv(
 #endif
     if (lets || xtra_choice || wizid || want_reply
 #ifdef TTY_PERM_INVENT
-        || !gi.in_sync_perminvent
+        /*|| !gi.in_sync_perminvent*/
 #endif
         || WIN_INVEN == WIN_ERR) {
         /* partial inventory in perm_invent setting; don't operate on
@@ -3342,7 +3342,7 @@ display_pickinv(
      * more than 1; for the last one, we don't need a precise number.
      * For perm_invent update we force 'more than 1'.
      */
-    n = (iflags.perm_invent && !lets && !want_reply) ? 2
+    n = (doing_perm_invent && !lets && !want_reply) ? 2
         : lets ? (int) strlen(lets)
                : !gi.invent ? 0 : !gi.invent->nobj ? 1 : 2;
     /* for xtra_choice, there's another 'item' not included in initial 'n';
@@ -3455,18 +3455,20 @@ display_pickinv(
             if (wizid && !not_fully_identified(otmp))
                 continue;
             if (doing_perm_invent) {
-                /* when showing equipment in use, gold shouldn't be excluded
-                   just because !show_gold is set; it might be quivered;
-                   tool_being_used() matches lit lamps/candles and active
-                   leashes, neither of which set owornmask */
+                /* don't skip gold if it is quivered, even for !show_gold */
                 if (inuse_only) {
                     if (!otmp->owornmask && !tool_being_used(otmp)) {
                         skipped_noninuse = TRUE;
                         continue;
                     }
-                } else if (otmp->invlet == GOLD_SYM && !show_gold) {
-                    skipped_gold = TRUE;
-                    continue;
+                    /* for inuse-only, start with an extra header */
+                    if (!inusecount++)
+                        add_menu_str(win, "In use");
+                } else if (!show_gold) {
+                    if (otmp->invlet == GOLD_SYM && !otmp->owornmask) {
+                        skipped_gold = TRUE;
+                        continue;
+                    }
                 }
             }
             any = cg.zeroany; /* all bits zero */
@@ -3519,11 +3521,10 @@ display_pickinv(
     /* for permanent inventory where nothing has been listed (because
        there isn't anything applicable to list; the n==0 case above
        gets skipped for perm_invent), put something into the menu */
-    if (iflags.perm_invent && !lets && !gotsomething) {
-        add_menu_str(win,
-                 (inuse_only && skipped_noninuse) ? not_using_anything
-                 : (!show_gold && skipped_gold) ? only_carrying_gold
-                     : not_carrying_anything);
+    if (doing_perm_invent && !lets && !gotsomething) {
+        add_menu_str(win, inuse_only ? not_using_anything
+                          : (!show_gold && skipped_gold) ? only_carrying_gold
+                            : not_carrying_anything);
         want_reply = FALSE;
     }
 #ifdef TTY_PERM_INVENT
@@ -5608,23 +5609,15 @@ void
 prepare_perminvent(winid window)
 {
     win_request_info *wri;
+    int invmode = (int) iflags.perminv_mode;
 
-    if (!done_setting_perminv_flags) {
-        /*TEMPORARY*/
-        char *envtmp = !gp.program_state.gameover ? nh_getenv("TTYINV") : 0;
-        /* default for non-tty includes gold, for tty excludes gold;
-           if non-tty specifies any value, gold will be excluded unless
-           that value includes the show-gold bit (1) */
-        int invmode = envtmp ? atoi(envtmp)
-                      : !WINDOWPORT(tty) ? InvShowGold
-                        : InvNormal;
-
+    if (perminv_flags != invmode) {
         wri_info = zerowri;
         wri_info.fromcore.invmode = invmode;
         /*  relay the mode settings to the window port */
         wri = ctrl_nhwindow(window, set_mode, &wri_info);
+        perminv_flags = invmode;
         nhUse(wri);
-        done_setting_perminv_flags = 1;
     }
 }
 
@@ -5641,8 +5634,7 @@ sync_perminvent(void)
                  && gp.perm_invent_toggling_direction == toggling_on))
             return;
     }
-    if (!done_setting_perminv_flags && WIN_INVEN != WIN_ERR)
-        prepare_perminvent(WIN_INVEN);
+    prepare_perminvent(WIN_INVEN);
 
     if ((!iflags.perm_invent && gc.core_invent_state)) {
         /* Odd - but this could be end-of-game disclosure
@@ -5662,33 +5654,34 @@ sync_perminvent(void)
      * 1. iflags.perm_invent is on
      *      AND
      *    gc.core_invent_state is still zero.
-     *
      * OR
-     *
      * 2. iflags.perm_invent is off, but we're in the
      *    midst of toggling it on.
+     * OR
+     * 3. iflags.perminv_mode has been changed via 'm O'.
      */
 
     if ((iflags.perm_invent && !gc.core_invent_state)
-        || ((!iflags.perm_invent
+        || (!iflags.perm_invent
             && (in_perm_invent_toggled
-                && gp.perm_invent_toggling_direction == toggling_on)))) {
-
+                && gp.perm_invent_toggling_direction == toggling_on))) {
         /* Send windowport a request to return the related settings to us */
         if ((iflags.perm_invent && !gc.core_invent_state)
             || in_perm_invent_toggled) {
-            if ((wri = ctrl_nhwindow(WIN_INVEN, request_settings, &wri_info))
-                != 0) {
-                if ((wri->tocore.tocore_flags & prohibited) != 0) {
+            wri = ctrl_nhwindow(WIN_INVEN, request_settings, &wri_info);
+            if (wri != 0) {
+                if ((wri->tocore.tocore_flags & (too_small | prohibited))
+                    != 0) {
                     /* sizes aren't good enough */
-                    set_option_mod_status("perm_invent", set_gameview);
+                    if ((wri->tocore.tocore_flags & prohibited) != 0) {
+                        set_option_mod_status("perm_invent", set_gameview);
+                        set_option_mod_status("perminv_mode", set_gameview);
+                    }
                     iflags.perm_invent = FALSE;
                     if (WIN_INVEN != WIN_ERR)
                         destroy_nhwindow(WIN_INVEN), WIN_INVEN = WIN_ERR;
-                    if (WINDOWPORT(tty) && iflags.perm_invent)
-                        wport_id = "tty perm_invent";
-                    else
-                        wport_id = "perm_invent";
+                    wport_id = WINDOWPORT(tty) ? "tty perm_invent"
+                                               : "perm_invent";
                     pline("%s could not be enabled.", wport_id);
                     pline("%s needs a terminal that is at least %dx%d, yours "
                           "is %dx%d.",
@@ -5729,6 +5722,8 @@ perm_invent_toggled(boolean negated)
         gc.core_invent_state = 0;
     } else {
         gp.perm_invent_toggling_direction = toggling_on;
+        if (iflags.perminv_mode == InvOptNone)
+            iflags.perminv_mode = InvOptOn; /* all inventory except gold */
         sync_perminvent();
     }
     gp.perm_invent_toggling_direction = toggling_not;

@@ -271,7 +271,7 @@ struct instance_flags {
     boolean menu_tab_sep;     /* Use tabs to separate option menu fields */
     boolean news;             /* print news */
     boolean num_pad;          /* use numbers for movement commands */
-    boolean perm_invent;      /* keep full inventories up until dismissed */
+    boolean perm_invent;      /* display persistent inventory window */
     boolean renameallowed;    /* can change hero name during role selection */
     boolean renameinprogress; /* we are changing hero name */
     boolean sounds;           /* master on/off switch for using soundlib */
@@ -292,7 +292,14 @@ struct instance_flags {
                                * compression of levels when writing savefile */
     schar ice_rating;         /* ice_descr()'s classification of ice terrain */
     schar prev_decor;         /* 'mention_decor' just mentioned this */
-    uchar num_pad_mode;
+    uchar num_pad_mode;       /* for num_pad==True, controls how 5 behaves
+                               * and/or 789456123 vs phone-style 123456789;
+                               * for False, qwertY vs qwertZ */
+    uchar perminv_mode;       /* what to display in persistent invent window
+                               * 0: nothing, 1: all inventory except gold,
+                               * 2: full including gold, 8: in-use items only,
+                               * 5|6: 1|2 with invent letters shown in empty
+                               * slots (TTY only: 'sparse' modes) */
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */
     boolean extmenu;          /* extended commands use menu interface */

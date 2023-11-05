@@ -175,13 +175,31 @@ typedef struct gi {
 
 enum perm_invent_toggles {toggling_off = -1, toggling_not = 0, toggling_on = 1 };
 
-/* inventory modes */
-enum inv_modes { InvNormal = 0, InvShowGold = 1, InvSparse = 2, InvInUse = 4 };
+/* perm_invent modes */
+enum inv_mode_bits {
+    InvNormal   = 1,
+    InvShowGold = 2,
+    InvSparse   = 4, /* must be ORed with Normal or ShowGold to be valid */
+    InvInUse    = 8
+};
+enum inv_modes { /* 'perminv_mode' option settings */
+    InvOptNone       = 0,           /* no perm_invent */
+    InvOptOn         = InvNormal,   /* 1 */
+    InvOptFull       = InvShowGold, /* 2 */
+#if 1 /*#ifdef TTY_PERM_INVENT*/
+    /* confusingly-named "sparse mode" shows all inventory letters, even when
+       their slots are empty; only meaningful for tty's perm_invent */
+    InvOptOn_grid    = InvNormal | InvSparse,   /* 5 */
+    InvOptFull_grid  = InvShowGold | InvSparse, /* 6 */
+#endif
+    InvOptInUse      = InvInUse,    /* 8 */
+};
 
 enum to_core_flags {
     active           = 0x001,
     prohibited       = 0x002,
-    no_init_done     = 0x004
+    no_init_done     = 0x004,
+    too_small        = 0x008,
 };
 
 enum from_core_requests {

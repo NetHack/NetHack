@@ -515,8 +515,11 @@ static int optfn_##a(int, int, boolean, char *, char *);
                 Yes, Yes, Yes, Yes, "prayconfirm",
                 "extra prompting in certain situations")
     NHOPTB(perm_invent, Advanced, 0, opt_in, set_in_game,
-           Off, Yes, No, No, NoAlias, &iflags.perm_invent, Term_False,
-           "show permanent inventory window")
+                Off, Yes, No, No, NoAlias, &iflags.perm_invent, Term_Off,
+                "show persistent inventory window")
+    NHOPTC(perminv_mode, Advanced, 20, opt_in, set_in_game,
+                Yes, Yes, No, Yes, NoAlias,
+                "what to show in persistent inventory window")
     NHOPTC(petattr, Advanced, 88, opt_in, set_in_game, /* curses only */
                 No, Yes, No, No, NoAlias, "attributes for highlighting pets")
     /* pettype is ignored for some roles */

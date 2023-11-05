@@ -231,6 +231,15 @@ paranoid_confirmation  space separated list    [paranoid_confirm:pray swim]
                       in the object class filtering menu is selected;
               Remove  -- always pick from inventory for 'R' and 'T' even when
                       wearing just one applicable item to remove or take off
+perminv_mode  if the interface supports a persistent inventory window   [a]
+              and the perm_invent option is true, this controls what
+              will be shown:
+              none/off -- behave as if perm_invent is false
+              all/on   -- show inventory except for gold (default)
+              full     -- show inventory including gold
+              in-use   -- only show worn and wielded items
+              (the tty interface's optional perm_invent support includes
+              a couple of additional choices that vary all and full)
 pickup_burden when you pick up an item that exceeds this encumbrance    [S]
               level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
               or overLoaded), you will be asked if you want to continue.
