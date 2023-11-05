@@ -689,10 +689,11 @@ curses_add_menu(winid wid, const glyph_info *glyphinfo,
     attr &= ~(ATR_URGENT | ATR_NOHISTORY);
     curses_attr = curses_convert_attr(attr);
 
+    /* 'inv_update': 0 for normal menus, 1 and up for perminv window */
     if (inv_update) {
         /* persistent inventory window; nothing is selectable;
            omit glyphinfo because perm_invent is to the side of
-           the map so usually cramped for space */
+           the map so usually cramped for horizontal space */
         curs_add_invt(inv_update, accelerator, curses_attr, str);
         inv_update++;
         return;

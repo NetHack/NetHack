@@ -332,9 +332,12 @@ curs_show_invt(WINDOW *win)
     char accelerator, tmpbuf[BUFSZ];
     int attr, color;
     unsigned lineno, stroffset, widest, left_col, right_col,
-        first_shown = 0, last_shown = 0, item_count = 0;
+        first_shown = 0, last_shown = 0, item_count = 0, xtra_line = 0;
     int x, y, width, height, available_width,
-        border = curses_window_has_border(INV_WIN) ? 1 : 0;
+        border = curses_window_has_border(INV_WIN) ? 1 : 0,
+        /* we actually care about the topmost of message, map, or status
+           but either they all have borders or none do so just check map */
+        otherborder = curses_window_has_border(MAP_WIN) ? 1 : 0;
 
     x = border; /* same for every line; 1 if border, 0 otherwise */
 
@@ -342,6 +345,25 @@ curs_show_invt(WINDOW *win)
     widest = pi.widest;
     left_col = pi.coloffset + 1;
     right_col = left_col + (unsigned) width - 1;
+
+    /*
+     * If there will be any blank lines left at the bottom, sometimes
+     * insert one blank line at the top.  If the first line is an item
+     * (via !sortpack) which will be obscured by the column indicator,
+     * or there is only one line (such as "not carrying anything") if
+     * that line would be at the very top aligned with the top border
+     * of another window (windowborders=3,4) because that looks odd.
+     * This only handles the single page case [because scrolling always
+     * fills pages beyond the first rather than just continuing from
+     * last line of preceding page, hence no blank line(s) at bottom].
+     */
+    if ((pi.array[0].letter && pi.inuseindx < (unsigned) height
+         && widest > (unsigned) width)
+        || (pi.inuseindx == 1 && otherborder && !border)) {
+        wmove(win, 1, x);
+        wprintw(win, "%.*s", width - 2 * border, "");
+        xtra_line = 1;
+    }
 
     for (lineno = 0; lineno < pi.rowoffset; ++lineno)
         if (pi.array[lineno].letter)
@@ -357,7 +379,7 @@ curs_show_invt(WINDOW *win)
             ++item_count;
 
         /* Figure out where to draw the line */
-        y = (int) (lineno - pi.rowoffset) + border;
+        y = (int) (lineno + xtra_line - pi.rowoffset) + border;
         if (y - border >= height) { /* height already -2 for Top+Btm border */
             /* 'y' has grown too big; there are too many lines to fit */
             continue; /* skip, but still loop to update 'item_count' */
@@ -436,14 +458,6 @@ curs_show_invt(WINDOW *win)
          * For the usual case, that line will be an object class header
          * so we won't be obscuring an item, but that might not be the
          * situation on page 2 and definitely won't be if 'sortpack' is Off.
-         *
-         * WISHLIST:  if the first line contains an item and there are any
-         * blank lines at the bottom, we could shift every line down one
-         * producing a blank line at the top, then write the column
-         * indicator there.  Much simpler to insert a blank line all the
-         * time, but we don't want to do that because it might push things
-         * into needing an additional page, and also it could turn out that
-         * no lines are wide enough to need the column indicator.
          */
         Sprintf(tmpbuf, "%c%u-%u of %u%c",
                 (left_col > 1) ? '{' : '[',
