@@ -1152,17 +1152,13 @@ level_tele(void)
                             the previous input was invalid so don't use it
                             as getlin()'s preloaded default answer */
             getlin(qbuf, buf);
-            if (!strcmp(buf, "\033")) { /* cancelled */
-                if (Confusion && rnl(5)) {
-                    pline("Oops...");
-                    goto random_levtport;
-                }
-                return;
-            } else if (!strcmp(buf, "*")) {
+            if (!strcmp(buf, "*")) {
                 goto random_levtport;
             } else if (Confusion && rnl(5)) {
                 pline("Oops...");
                 goto random_levtport;
+            } else if (!strcmp(buf, "\033")) { /* cancelled */
+                return;
             }
             if (wizard && !strcmp(buf, "?")) {
                 schar destlev;
