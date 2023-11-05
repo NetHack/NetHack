@@ -34,8 +34,7 @@ PSCMD = groff
 # GUIDECMD= $(GUIDE_PREFORMAT) | perl -pe 's/^(.mt)$$/.pl 4720v\n.in 0\n.po 8\n.ll 64m\n$$1/' | nroff -c -Tascii | $(COLCMD)
 #
 GUIDECMD = $(GUIDE_PREFORMAT) | nroff -c -Tascii $(NROFF_FLAGS) | $(COLCMD)
-ONEPAGECMD = $(ONEPAGE_PREFORMAT) | nroff -c -Tascii $(NROFF_FLAGS) | $(COLCMD) \
-	| sed -e '/EOF--EOF/,12345D'
+ONEPAGECMD = $(ONEPAGE_PREFORMAT) | nroff -c -Tascii $(NROFF_FLAGS) | $(COLCMD)
 
 # Only generate output for the current configuration:
 NHGREP = $(MAKEDEFS) --grep --input - --output -
