@@ -251,13 +251,13 @@ The way the screen looks for you depends on your platform.
 .\" situations.  Originally the character had only reached a second room
 .\" (unchanged here) by turn 257 (now changed to 752) and was already
 .\" Weak from hunger (now changed to just Hungry) and also lacked any of
-\." Tourist's starting gold.  Confusion is added to include a condition.)
+.\" Tourist's starting gold.  Confusion is added to include a
+.\" condition.)
 .\"
-.\" Width is constrained by the margins of plain text output (Guidebook.txt).
-.\" Text output shows an extra space in front of the right hand boundary box
-.\" which isn't present in this data nor in the Postscript output.  It also
-.\" overwrites the label on the bottom boundary box line so that ends ups as
-.\" ------Figure-N------.  Odd but acceptable.
+.\" Width is constrained by the margins of plain text output
+.\" (Guidebook.txt).  Text output might show an extra space inboard of
+.\" the left and right box boundaries that does not appear in PostScript
+.\" output.  This behavior is specific to GNU tbl.
 .BR 2
 .ft CR \" set font to constant-width Roman
 .TS
