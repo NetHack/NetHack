@@ -258,7 +258,7 @@ The way the screen looks for you depends on your platform.
 .\" ------Figure-N------.  Odd but acceptable.
 .BR 2
 .ft CR \" set font to constant-width Roman
-.TS S
+.TS
 center box tab(~);
 L.
 The bat bites!
@@ -282,7 +282,7 @@ Figure 1
 .\" Figure 2 uses trailing spaces to force the same width as Figure 1.
 .BR 1
 .ft CR
-.TS S
+.TS
 center box tab(~);
 L.
 Player the Rambler   St:12 Dx:7 Co:18 In:11 Wi:9 Ch:15        \"
@@ -624,7 +624,7 @@ others (below) are \(lqsafe.\(rq
 .\"       the whole to shift left since fully centered doesn't look good.
 .\"       "Figure 3 " includes a trailing space to shift left a little.
 .ft CR
-.TS S
+.TS
 center;
 ce c ce ce.
 y  k  u	\ 	7  8  9\ 	\"
@@ -2768,7 +2768,7 @@ Here is a list of the armor class values provided by suits of armor:
 .\" it to get the second column (number) closer to the text on most lines.
 .\" Both AC4 and AC7 have trailing tab plus empty comment on their first
 .\" line and leading spaces to indent their second line.
-.TS S
+.TS
 center;
 a n.
 Dragon scale mail	1
@@ -5436,7 +5436,7 @@ the \f(CRtty\fP interface) rather than all at once, the only way a
 situation like that can be controlled is to specify just one attribute.
 .pg
 You can adjust the appearance of the following status fields:
-.TS S
+.TS
 center;
 c c c.
 .\"TABLE_START
@@ -5601,7 +5601,7 @@ control character.
 .\" to be too wide when generating plain text output.  Two spaces leaves
 .\" some room between the symbol character and name.)  Entries in first
 .\" column now use constant-width Roman font to approximate TeX tt font.
-.TS S
+.TS
 center;
 l s s
 l1fCR l1 l.
@@ -6488,7 +6488,7 @@ Development Team sometimes makes note of the names of the worst of these
 miscreants in this, the list of Dungeoneers:
 .BR 1
 .
-.TS S
+.TS
 center;
 c2 c2 c.
 .\"TABLE_START
