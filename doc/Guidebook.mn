@@ -33,14 +33,14 @@
 .if n .do ftr CR R  \" if formatting for a terminal, substitute R for CR
 .                   \" (the substitution affects both '\f' and '.ft')
 .
-.ds h0 "NetHack Guidebook
-.ds h1
+.ds h0 NetHack Guidebook
+.ds h1 \" empty
 .ds h2 %
-.ds vr "NetHack 3.7.0
-.ds f0 "\*(vr
-.ds f1
-.\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "November 6, 2023
+.ds vr NetHack 3.7.0
+.ds f0 \*(vr
+.ds f1 \" empty
+.\"DO NOT REMOVE NH_DATESUB .ds f2 DATE(%B %-d, %Y)
+.ds f2 November 6, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote

@@ -2,7 +2,7 @@
 ifdef MAKEFILE_DOC
 ifdef GB_DATESTAMP
 Guidebook.dated.mn: $(GUIDEBOOK_MN_SRC)
-	@awk 'f{$$0=".ds f2 \"$(GB_DATESTAMP)";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_MN_SRC) > $@
+	@awk 'f{$$0=".ds f2 $(GB_DATESTAMP)";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_MN_SRC) > $@
 Guidebook.dated.tex: $(GUIDEBOOK_TEX_SRC)
 	@awk 'f{$$0="\\date{$(GB_DATESTAMP)}";f=0}/NH_DATESUB/{f=1} 1' < $(GUIDEBOOK_TEX_SRC) > $@
 endif   # GB_DATESTAMP
