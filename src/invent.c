@@ -3525,6 +3525,7 @@ display_pickinv(
         add_menu_str(win, inuse_only ? not_using_anything
                           : (!show_gold && skipped_gold) ? only_carrying_gold
                             : not_carrying_anything);
+        nhUse(skipped_noninuse); /* no longer needed */
         want_reply = FALSE;
     }
 #ifdef TTY_PERM_INVENT
