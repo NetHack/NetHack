@@ -1604,7 +1604,7 @@ void
 impact_disturbs_zombies(struct obj *obj, boolean violent)
 {
     /* if object won't make a noticeable impact, let buried zombies rest */
-    if (obj->owt < (violent ? 10 : 100) || is_flimsy(obj))
+    if (obj->owt < (violent ? 10U : 100U) || is_flimsy(obj))
         return;
 
     disturb_buried_zombies(obj->ox, obj->oy);
