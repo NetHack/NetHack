@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1277 $ $NHDT-Date: 1698899752 2023/11/02 04:35:52 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1286 $ $NHDT-Date: 1699233285 2023/11/06 01:14:45 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1809,6 +1809,8 @@ tty: if a group accelerator matched a menu command ('^' in menu for '/')
 	it wouldn't work to select, just to manipulate the menu
 Unix: after lua changes to Makefiles, 'make spotless' for dat subdirectory
 	left some generated data files which should have been deleted
+Unix: reject "--sX" on command line except if "X" is "cores" (so "--scores");
+	single dash form still accepts "-sX" to lookup scores for "X"
 Windows: new tile additions in win/share did not trigger the creation of a new
 	NetHackW.res file
 Windows: nhl_loadlua() was missing the RDBMODE argument on the [dlb_]fopen(),

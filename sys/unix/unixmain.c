@@ -1,4 +1,4 @@
-/* NetHack 3.7	unixmain.c	$NHDT-Date: 1693359574 2023/08/30 01:39:34 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.117 $ */
+/* NetHack 3.7	unixmain.c	$NHDT-Date: 1699233290 2023/11/06 01:14:50 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.118 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2011. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -606,7 +606,8 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
     /*
      * Both *argc_p and *argv_p account for the program name as (*argv_p)[0];
      * local argc and argv impicitly discard that (by starting 'ndx' at 1).
-     * argcheck() doesn't mind, prscore() (via scores_only()) does.
+     * argcheck() doesn't mind, prscore() (via scores_only()) does (for the
+     * number of args it gets passed, not for the value of argv[0]).
      */
     for (ndx = 1; ndx < *argc_p; ndx += (consumed ? 0 : 1)) {
         consumed = 0;
@@ -687,8 +688,16 @@ early_options(int *argc_p, char ***argv_p, char **hackdir_p)
                 /*NOTREACHED*/
             }
             /* check for "-s" request to show scores */
-            if (lopt(arg,
-                     (ArgValDisallowed | ArgNamOneLetter | ArgErrComplain),
+            if (lopt(arg, ((ArgValDisallowed | ArgErrComplain)
+                           /* only accept one-letter if there is just one
+                              dash; reject "--s" because prscore() via
+                              scores_only() doesn't understand it */
+                           | ((origarg[1] != '-') ? ArgNamOneLetter : 0)),
+                           /* [ought to omit val-disallowed and accept
+                              --scores=foo since -s foo and -sfoo are
+                              allowed, but -s form can take more than one
+                              space-separated argument and --scores=foo
+                              isn't suited for that] */
                      "-scores", origarg, &argc, &argv)) {
                 /* at this point, argv[0] contains "-scores" or a leading
                    substring of it; prscore() (via scores_only()) expects
