@@ -25,6 +25,12 @@
 .\" with an optional filtering step between 'cat' and 'tbl':
 .\"  cat... |../util/makedefs --grep --input - --output - |tbl...
 .
+.if n \{\
+.po 5n
+.ll 70n
+.lt 70n
+.\}
+.
 .so tmac.nh	\" extra macros which aren't in tmac.n
 .
 .\" building Guidebook.txt doesn't have CR font available; groff 1.23 issues
