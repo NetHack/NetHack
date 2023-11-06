@@ -1,4 +1,4 @@
-.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.532 $ $NHDT-Date: 1698899756 2023/11/02 04:35:56 $
+.\" $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.536 $ $NHDT-Date: 1699260377 2023/11/06 08:46:17 $
 .\"
 .\" This is an excerpt from the 'roff' man page from the 'groff' package.
 .\"+--
@@ -40,7 +40,7 @@
 .ds f0 "\*(vr
 .ds f1
 .\"DO NOT REMOVE NH_DATESUB .ds f2 "DATE(%B %-d, %Y)
-.ds f2 "November 4, 2023
+.ds f2 "November 6, 2023
 .
 .\" A note on some special characters:
 .\" \(lq = left double quote
@@ -4287,9 +4287,10 @@ This only
 makes sense for windowing system interfaces that implement this feature.
 For those that do, the
 .op perminv_mode
-option can be used to refine what gets displayed for \fIperm_invent\fP.
-Setting that to a value other than \fInone\fP while \fIperm_invent\fP is
-false will change it to true.
+option can be used to refine what gets displayed
+for \fIperm_invent\fP.
+Setting that to a value other than \fInone\fP
+while \fIperm_invent\fP is false will change it to true.
 .lp perminv_mode
 Augments the
 .op perm_invent
@@ -4311,8 +4312,11 @@ only show items which are in use (worn, wielded, lit lamp).
 .\" .PL "\f(CRgold+grid\fP"
 .\" special for tty only, show \fIfull\fP plus unused inventory letters.
 .PE
-Default is \fInone\fP but if \fIperm_invent\fP gets set to true while
-it is \fInone\fP it will be changed to \fIall\fP.
+Default is \fInone\fP but if \fIperm_invent\fP gets set to true
+while it is \fInone\fP it will be changed to \fIall\fP.
+.lp ""
+Note: if gold has been equipped in quiver/ammo-pouch then it will be
+included for \fIall\fP despite that mode normally omitting gold.
 .\" petattr is a wincap option but we'll document it here...
 .lp "petattr "
 Specifies one or more text highlighting attributes to use when showing

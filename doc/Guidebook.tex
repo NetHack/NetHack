@@ -1,5 +1,5 @@
 \documentstyle[titlepage,longtable]{article}
-% NetHack 3.7  Guidebook.tex $NHDT-Date: 1693084080 2023/08/26 21:08:00 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.530 $ */
+% NetHack 3.7  Guidebook.tex $NHDT-Date: 1699260377 2023/11/06 08:46:17 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.531 $ */
 %+% we're still limping along in LaTeX 2.09 compatibility mode
 %-%\documentclass{article}
 %-%\usepackage{hyperref} % before longtable
@@ -46,7 +46,7 @@
 \author{Original version - Eric S. Raymond\\
 (Edited and expanded for 3.7.0 by Mike Stephenson and others)}
 %DO NOT REMOVE NH_DATESUB \date{DATE(%B %-d, %Y)}
-\date{September 8, 2023}
+\date{November 6, 2023}
 
 \maketitle
 
@@ -4696,8 +4696,44 @@ The positive (no `!') and negative (with `!') entries
 can be intermixed.
 %.lp
 \item[\ib{perm\verb+_+invent}]
-If true, always display your current inventory in a window.  This only
+If true, always display your current inventory in a window (default is false).
+%.lp ""
+\\
+This only
 makes sense for windowing system interfaces that implement this feature.
+For those that do, the
+{\tt perminv\verb+_+mode}
+option can be used to refine what gets displayed
+for {\it perm\verb+_+invent\/}.
+Setting that to a value other than {\it none\/}
+while {\it perm\verb+_+invent\/} is false will change it to true.
+%.lp
+\item[\ib{perminv\verb+_+mode}]
+Augments the
+{\tt perm\verb+_+invent}
+option.
+Value is one of
+%.PS "\f(CRin-use\fP"
+\settowidth{\pcwidth}{\tt in-use}  %reuse the paranoid_confirm width
+\addtolength{\pcwidth}{\labelsep}
+\blist{\leftmargin \pcwidth \topsep 1mm \itemsep 0mm}
+%.PL
+\item[{\tt none}]
+behave as if {\it perm\verb+_+invent\/} is false;
+\item[{all}]
+show all inventory except for gold;
+\item[{full}]
+show full inventory including gold;
+\item[{in-use}]
+only show items which are in use (worn, wielded, lit lamp).
+%.PE
+\elist
+Default is {\it none\/} but if {\it perm\verb+_+invent\/} gets set to true
+while it is {\it none\/} it will be changed to {\it all\/}.
+%.lp ""
+\\
+Note: if gold has been equipped in quiver/ammo-pouch then it will be
+included for {\it all\/} despite that mode normally omitting gold.
 %.lp
 %.\" petattr is a wincap option but we'll document it here...
 \item[\ib{petattr}]
