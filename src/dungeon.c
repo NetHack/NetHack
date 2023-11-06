@@ -3649,8 +3649,8 @@ print_mapseen(
             Sprintf(buf, "%s: levels %d to %d",
                     gd.dungeons[dnum].dname, depthstart,
                     depthstart + gd.dungeons[dnum].dunlev_ureached - 1);
-        any = cg.zeroany;
-        if (final)
+
+        if (final) /* no highlighting during end-of-game disclosure */
             add_menu_str(win, buf);
         else
             add_menu_heading(win, buf);

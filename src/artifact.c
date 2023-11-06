@@ -1071,7 +1071,8 @@ dump_artifact_info(winid tmpwin)
     int m;
     char buf[BUFSZ], buf2[BUFSZ];
 
-    add_menu_heading(tmpwin, "Artifacts");
+    /* not a menu, but header uses same bold or whatever attribute as such */
+    putstr(tmpwin, iflags.menu_headings, "Artifacts");
     for (m = 1; m <= NROFARTIFACTS; ++m) {
         Snprintf(buf2, sizeof buf2,
                 "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
