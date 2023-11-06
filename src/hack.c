@@ -2822,11 +2822,15 @@ pooleffects(
         if (!is_pool(u.ux, u.uy)) {
             if (Is_waterlevel(&u.uz)) {
                 You("pop into an air bubble.");
+                iflags.last_msg = PLNMSG_BACK_ON_GROUND;
             } else if (is_lava(u.ux, u.uy)) {
                 You("leave the %s...", hliquid("water")); /* oops! */
             } else {
-                You("are on solid %s again.",
-                    is_ice(u.ux, u.uy) ? "ice" : "land");
+                char icebuf[BUFSZ];
+                You("are %s %s again.",
+                    (Levitation || Flying) ? "over" : "on",
+                    is_ice(u.ux, u.uy) ? ice_descr(u.ux, u.uy, icebuf)
+                      : "solid land");
                 iflags.last_msg = PLNMSG_BACK_ON_GROUND;
             }
         } else if (Is_waterlevel(&u.uz)) {
