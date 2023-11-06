@@ -617,32 +617,23 @@ If you sense or remember a monster there, you will fight the monster
 instead.
 Only these one-step movement commands cause you to fight monsters; the
 others (below) are \(lqsafe.\(rq
-.SD n
-.\" note: the two number pad layouts are separated by a tab on each line;
-.\"       [that's out of date; it's now tab,backslash,space,tab]
-.\"       converting those tabs to spaces will screw up the formatting;
-.\"       the '(if ... set)' line starts with <backslash><space><tab>
-.\"       and is intended to line up with the right hand layout rather
-.\"       than be centered.  Second column forces the label to be evenly
-.\"       spaced between first and third; Phantom fourth column forces
-.\"       the whole to shift left since fully centered doesn't look good.
-.\"       "Figure 3 " includes a trailing space to shift left a little.
 .ft CR
+.tr -\-@\(rs
 .TS
-center;
-ce c ce ce.
-y  k  u	\ 	7  8  9\ 	\"
-\\ | /	\ 	\\ | /\ 	\"
-h\- . \-l	\ 	4\- . \-6\ 	\"
-/ | \\	\ 	/ | \\\ 	\"
-b  j  n	\ 	1  2  3\ 	\"
-\fR\ 	\ 	(if \fBnumber_pad\fR is set)\ 	\"
+box center expand;
+C C.
+y  k  u	7  8  9
+@ | /	@ | /
+h- . -l	4- . -6
+/ | @	/ | @
+b  j  n	1  2  3
+\fR(\fBnumber_pad\fP off)	\fR(\fBnumber_pad\fP on)
 .TE
+.tr --@@
 .ft R
 .if t .sp 0.5v
 .ce 1
 Figure 3
-.ED
 .
 .lp [YUHJKLBN]
 Go in that direction until you hit a wall or run into something.
