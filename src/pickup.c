@@ -384,17 +384,22 @@ describe_decor(void)
             || IS_LAVA(iflags.prev_decor)
             || iflags.prev_decor == ICE) {
             if (iflags.last_msg != PLNMSG_BACK_ON_GROUND) {
-                const char *surf = is_ice(u.ux, u.uy)
-                                       ? ice_descr(u.ux, u.uy, fbuf)
-                                       : surface(u.ux, u.uy);
+                const char *preposit = (Levitation || Flying) ? "over" : "on", 
+                           *surf = surface(u.ux, u.uy);
 
-                if (!strcmpi(surf, "floor") || !strcmpi(surf, "ground"))
+                if (is_ice(u.ux, u.uy)) {
+                    surf = ice_descr(u.ux, u.uy, fbuf);
+                } else if (!strcmpi(surf, "floor")
+                           || !strcmpi(surf, "ground")) {
                     surf = "solid ground";
+                } else { /* "cloud", "air", "air bubble", "wall" */
+                    surf = !strcmp(surf, "air") ? the(surf) : an(surf);
+                    preposit = "in";
+                }
                 pline("%s %s %s.",
                       flags.verbose ? "You are back" : "Back",
-                      (Levitation || Flying) ? "over" : "on", surf);
+                      preposit, surf);
             }
-
         }
     }
     iflags.prev_decor = ltyp;
