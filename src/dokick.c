@@ -627,6 +627,7 @@ really_kick_object(coordxy x, coordxy y)
         }
         if (!flooreffects(gk.kickedobj, u.ux, u.uy, "fall")) {
             place_object(gk.kickedobj, u.ux, u.uy);
+            impact_disturbs_zombies(gk.kickedobj, TRUE);
             stackobj(gk.kickedobj);
             newsym(u.ux, u.uy);
         }
@@ -770,6 +771,7 @@ really_kick_object(coordxy x, coordxy y)
             donate_gold(gtg, shkp, FALSE);
     }
     place_object(gk.kickedobj, gb.bhitpos.x, gb.bhitpos.y);
+    impact_disturbs_zombies(gk.kickedobj, TRUE);
     stackobj(gk.kickedobj);
     newsym(gk.kickedobj->ox, gk.kickedobj->oy);
     return 1;
