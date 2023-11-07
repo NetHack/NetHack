@@ -49,6 +49,7 @@ static int mkroll_launch(struct trap *, coordxy, coordxy, short, long);
 static boolean isclearpath(coord *, int, schar, schar);
 static void dofiretrap(struct obj *);
 static void domagictrap(void);
+static void pot_acid_damage(struct obj *, boolean, boolean);
 static boolean emergency_disrobe(boolean *);
 static int untrap_prob(struct trap *);
 static void move_into_trap(struct trap *);
@@ -4382,6 +4383,59 @@ acid_damage(struct obj* obj)
         erode_obj(obj, (char *) 0, ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
 }
 
+static void
+pot_acid_damage(
+    struct obj *obj,    
+    boolean in_invent,
+    boolean described)
+{
+    char *bufp;
+    boolean one, exploded;
+
+    one = (obj->quan == 1L);
+    exploded = FALSE;
+
+    if (Blind && !in_invent)
+        obj->dknown = 0;
+    if (ga.acid_ctx.ctx_valid)
+        exploded = ((obj->dknown ? ga.acid_ctx.dkn_boom
+                                 : ga.acid_ctx.unk_boom) > 0);
+    if (described) {
+        /* just gave "The grease washes off your potion of acid."
+            or "...your <color> potion." (or just "...your potion.");
+            don't re-describe potion here; if we used "It explodes!"
+            then "it" might be misconstrued as applying to "grease" */
+        pline_The("potion%s %s!",
+                    plur(obj->quan), otense(obj, "explode"));
+    } else {
+        /* First message is
+            * "a [potion|<color> potion|potion of acid] explodes"
+            * depending on obj->dknown (potion has been seen) and
+            * objects[POT_ACID].oc_name_known (fully discovered),
+            * or "some {plural version} explode" when relevant.
+            * Second and subsequent messages for same chain and
+            * matching dknown status are
+            * "another [potion|<color> &c] explodes" or plural
+            * variant.
+            */
+        bufp = simpleonames(obj);
+        pline("%s%s %s!", /* "A potion explodes!" */
+                !exploded ? (one ? "A " : "Some ")
+                        : (one ? "Another " : "More "),
+            bufp, vtense(bufp, "explode"));
+    }
+    if (ga.acid_ctx.ctx_valid) {
+        if (obj->dknown)
+            ga.acid_ctx.dkn_boom++;
+        else
+            ga.acid_ctx.unk_boom++;
+    }
+    setnotworn(obj);
+    delobj(obj);
+    if (in_invent)
+        update_inventory();
+}
+
 /* Get an object wet and damage it appropriately.
  *   "obj": if null, returns ER_NOTHING
  *   "ostr", if present, is used instead of the object name in some messages.
@@ -4422,8 +4476,10 @@ water_damage(
                 update_inventory();
             }
             /* ungreased potions of acid will always be destroyed by water */
-            if (obj->otyp == POT_ACID)
-                goto pot_acid;
+            if (obj->otyp == POT_ACID) {
+                pot_acid_damage(obj, in_invent, described);
+                return ER_DESTROYED;
+            }
         }
         return ER_GREASED;
     } else if (Is_container(obj)
@@ -4509,52 +4565,7 @@ water_damage(
         return ER_DAMAGED;
     } else if (obj->oclass == POTION_CLASS) {
         if (obj->otyp == POT_ACID) {
-            char *bufp;
-            boolean one, exploded;
-
- pot_acid:
-            one = (obj->quan == 1L);
-            exploded = FALSE;
-
-            if (Blind && !in_invent)
-                obj->dknown = 0;
-            if (ga.acid_ctx.ctx_valid)
-                exploded = ((obj->dknown ? ga.acid_ctx.dkn_boom
-                                         : ga.acid_ctx.unk_boom) > 0);
-            if (described) {
-                /* just gave "The grease washes off your potion of acid."
-                   or "...your <color> potion." (or just "...your potion.");
-                   don't re-describe potion here; if we used "It explodes!"
-                   then "it" might be misconstrued as applying to "grease" */
-                pline_The("potion%s %s!",
-                          plur(obj->quan), otense(obj, "explode"));
-            } else {
-                /* First message is
-                 * "a [potion|<color> potion|potion of acid] explodes"
-                 * depending on obj->dknown (potion has been seen) and
-                 * objects[POT_ACID].oc_name_known (fully discovered),
-                 * or "some {plural version} explode" when relevant.
-                 * Second and subsequent messages for same chain and
-                 * matching dknown status are
-                 * "another [potion|<color> &c] explodes" or plural
-                 * variant.
-                 */
-                bufp = simpleonames(obj);
-                pline("%s%s %s!", /* "A potion explodes!" */
-                      !exploded ? (one ? "A " : "Some ")
-                                : (one ? "Another " : "More "),
-                  bufp, vtense(bufp, "explode"));
-            }
-            if (ga.acid_ctx.ctx_valid) {
-                if (obj->dknown)
-                    ga.acid_ctx.dkn_boom++;
-                else
-                    ga.acid_ctx.unk_boom++;
-            }
-            setnotworn(obj);
-            delobj(obj);
-            if (in_invent)
-                update_inventory();
+            pot_acid_damage(obj, in_invent, described);
             return ER_DESTROYED;
         } else if (obj->odiluted) {
             if (in_invent)
