@@ -50,7 +50,6 @@ extern void init_linux_cons(void);
 #endif
 
 static void wd_message(void);
-static boolean wiz_error_flag = FALSE;
 static struct passwd *get_unix_pw(void);
 
 #ifdef __EMSCRIPTEN__
@@ -597,28 +596,48 @@ port_help(void)
 boolean
 authorize_wizard_mode(void)
 {
-    struct passwd *pw = get_unix_pw();
-
-    if (pw && sysopt.wizards && sysopt.wizards[0]) {
+    if (sysopt.wizards && sysopt.wizards[0]) {
         if (check_user_string(sysopt.wizards))
             return TRUE;
     }
-    wiz_error_flag = TRUE; /* not being allowed into wizard mode */
+    iflags.wiz_error_flag = TRUE; /* not being allowed into wizard mode */
     return FALSE;
+}
+
+/* similar to above, validate explore mode access */
+boolean
+authorize_explore_mode(void)
+{
+#ifdef SYSCF
+    if (sysopt.explorers && sysopt.explorers[0]) {
+        if (check_user_string(sysopt.explorers))
+            return TRUE;
+    }
+    iflags.explore_error_flag = TRUE; /* not allowed into explore mode */
+    return FALSE;
+#else
+    return TRUE; /* if sysconf disabled, no restrictions on explore mode */
+#endif
 }
 
 static void
 wd_message(void)
 {
-    if (wiz_error_flag) {
+    if (iflags.wiz_error_flag) {
         if (sysopt.wizards && sysopt.wizards[0]) {
             char *tmp = build_english_list(sysopt.wizards);
             pline("Only user%s %s may access debug (wizard) mode.",
                   strchr(sysopt.wizards, ' ') ? "s" : "", tmp);
             free(tmp);
-        } else
+        } else {
+            You("cannot access debug (wizard) mode.");
+        }
+        wizard = FALSE; /* (paranoia) */
+        if (!iflags.explore_error_flag)
             pline("Entering explore/discovery mode instead.");
-        wizard = 0, discover = 1; /* (paranoia) */
+    } else if (iflags.explore_error_flag) {
+        You("cannot access explore mode."); /* same as enter_explore_mode */
+        discover = iflags.deferred_X = FALSE; /* (more paranoia) */
     } else if (discover)
         You("are in non-scoring explore/discovery mode.");
 }
