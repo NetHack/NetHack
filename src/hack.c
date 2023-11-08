@@ -2618,7 +2618,9 @@ domove_core(void)
                 nomul(0);
     }
 
-    if (!Levitation && !Flying && !Stealth)
+    /* your tread on the ground may disturb the slumber of nearby zombies */
+    if (!Levitation && !Flying && !Stealth
+        && gy.youmonst.data->cwt >= (WT_ELF / 2))
         disturb_buried_zombies(u.ux, u.uy);
 
     if (hides_under(gy.youmonst.data) || gy.youmonst.data->mlet == S_EEL
