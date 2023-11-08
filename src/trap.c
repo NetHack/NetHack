@@ -4699,11 +4699,46 @@ rnd_nextto_goodpos(coordxy *x, coordxy *y, struct monst *mtmp)
     return FALSE;
 }
 
+/* print a message about being back on the ground after leaving a pool */
+void
+back_on_ground(boolean rescued)
+{
+    const char *preposit = (Levitation || Flying) ? "over" : "on", 
+               *surf = surface(u.ux, u.uy), *you_are_back;
+    char icebuf[QBUFSZ];
+
+    if (is_ice(u.ux, u.uy)) {
+        /* "on ice" */
+        surf = ice_descr(u.ux, u.uy, icebuf);
+    } else if (!strcmpi(surf, "floor") || !strcmpi(surf, "ground")) {
+        /* "on solid ground" */
+        surf = "solid ground";
+    } else if (!strcmpi(surf, "bridge") || !strcmpi(surf, "altar")
+               || !strcmpi(surf, "headstone")) {
+        /* "on a bridge" */
+        surf = an(surf);
+    } else if (!strcmpi(surf, "stairs") || !strcmpi(surf, "lava")
+               || !strcmpi(surf, "bottom")) {
+        /* "on the stairs" */
+        surf = the(surf);
+    } else { /* "cloud", "air", "air bubble", "wall", "fountain", "doorway" */
+        /* "in a cloud", "in the air" */
+        surf = !strcmp(surf, "air") ? the(surf) : an(surf);
+        preposit = "in";
+    }
+    if (rescued) {
+        you_are_back = "You find yourself";
+    } else {
+        you_are_back = flags.verbose ? "You are back" : "Back";
+    }
+    pline("%s %s %s.", you_are_back, preposit, surf);
+}
+
 /* life-saving or divine rescue has attempted to get the hero out of hostile
    terrain and put hero in an unexpected spot or failed due to overfull level
    and just prevented death so "back on solid ground" may be inappropriate */
 void
-back_on_ground(int how)
+rescued_from_terrain(int how)
 {
     static const char find_yourself[] = "find yourself";
     struct rm *lev = &levl[u.ux][u.uy];
@@ -4738,7 +4773,7 @@ back_on_ground(int how)
         break;
     }
     if (!mesggiven)
-        You("%s back on solid %s.", find_yourself, surface(u.ux, u.uy));
+        back_on_ground(TRUE);
 
     iflags.last_msg = PLNMSG_BACK_ON_GROUND; /* for describe_decor() */
     /* feedback just disclosed this */
@@ -4882,7 +4917,7 @@ drown(void)
 
     if (u.uinwater)
         set_uinwater(0); /* u.uinwater = 0 */
-    back_on_ground(DROWNING);
+    rescued_from_terrain(DROWNING);
     return TRUE;
 }
 
@@ -6505,7 +6540,7 @@ lava_effects(void)
                 set_itimeout(&HWwalking, 5L);
             goto burn_stuff;
         }
-        back_on_ground(BURNING);
+        rescued_from_terrain(BURNING);
 
         /* normally done via safe_teleds() -> teleds() -> spoteffects() but
            spoteffects() was no-op when called with nonzero in_lava_effects */

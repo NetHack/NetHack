@@ -389,8 +389,8 @@ fix_worst_trouble(int trouble)
         /* teleport should always succeed, but if not, just untrap them */
         if (!safe_teleds(TELEDS_NO_FLAGS))
             reset_utrap(TRUE);
-        back_on_ground(DISSOLVED); /* DISSOLVED: pending cause of death
-                                    * if trouble didn't get cured */
+        rescued_from_terrain(DISSOLVED); /* DISSOLVED: pending cause of death
+                                          * if trouble didn't get cured */
         break;
     case TROUBLE_STARVING:
         /* temporarily lost strength recovery now handled by init_uhunger() */
