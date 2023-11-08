@@ -1276,6 +1276,7 @@ thrown potion of sickness now bypasses target's innate magic resistance but
 lightning has a small chance of melting iron bars
 make spell menu work with repeat
 when attempting to look up a named fruit in data.base, try harder
+set and check mon->mstate flags more consistently
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
