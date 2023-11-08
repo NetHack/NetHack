@@ -580,12 +580,12 @@ static int
 l_selection_randline(lua_State *L)
 {
     int argc = lua_gettop(L);
-    struct selectionvar *sel = (struct selectionvar *) 0;
+    struct selectionvar *sel;
     coordxy x1 = 0, y1 = 0, x2 = 0, y2 = 0;
     int roughness = 7;
 
     if (argc == 6) {
-        sel = l_selection_check(L, 1);
+        (void) l_selection_check(L, 1);
         x1 = (coordxy) luaL_checkinteger(L, 2);
         y1 = (coordxy) luaL_checkinteger(L, 3);
         x2 = (coordxy) luaL_checkinteger(L, 4);
@@ -600,7 +600,7 @@ l_selection_randline(lua_State *L)
         roughness = (int) luaL_checkinteger(L, 5);
         lua_pop(L, 5);
         (void) l_selection_new(L);
-        sel = l_selection_check(L, 1);
+        (void) l_selection_check(L, 1);
     }
 
     get_location_coord(&x1, &y1, ANY_LOC,
