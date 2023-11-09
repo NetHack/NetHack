@@ -3384,6 +3384,7 @@ wizterrainwish(struct _readobjnam_data *d)
         lev->typ = CLOUD;
         lev->flags = 0;
         pline("A cloud.");
+        del_engr_at(x, y);
         madeterrain = TRUE;
     } else if (!BSTRCMPI(bp, p - 4, "door")
                || (d->doorless && !BSTRCMPI(bp, p - 7, "doorway"))) {

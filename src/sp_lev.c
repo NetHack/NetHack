@@ -5255,6 +5255,8 @@ sel_set_ter(coordxy x, coordxy y, genericptr_t arg)
         levl[x][y].horizontal = 1;
     } else if (splev_init_present && levl[x][y].typ == ICE) {
         levl[x][y].icedpool = icedpools ? ICED_POOL : ICED_MOAT;
+    } else if (levl[x][y].typ == CLOUD) {
+        del_engr_at(x, y); /* clouds cannot have engravings */
     }
 }
 
