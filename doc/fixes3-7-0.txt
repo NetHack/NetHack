@@ -2321,7 +2321,9 @@ during enlightenment and end-of-game disclosure, use contraction "<verb>n't"
 	for "<verb> not"
 give feedback about the thaw status of ice terrain
 allow #dip '-' in a fountain, pool, or sink to clean slippery fingers/gloves
-allow #dip into a sink to dilute potions or blank out scrolls and books
+allow #dip potions into a sink to get a hint about what they are, similar to
+	dropping rings into a sink; dipping other stuff causes water damage
+	so could be used to blank out scrolls and books
 
 
 Platform- and/or Interface-Specific New Features

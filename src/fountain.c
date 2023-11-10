@@ -710,7 +710,7 @@ dipsink(struct obj *obj)
         /* can't rely on using sink for unlimited scroll blanking; however,
            since sink will be converted into a fountain, hero can dip again */
         breaksink(u.ux, u.uy); /* "The pipes break!  Water spurts out!" */
-        if (Glib)
+        if (Glib && (!obj || obj == uarmg))
             Your("%s are still slippery.", fingers_or_gloves(TRUE));
         return;
     } else if (obj == &cg.zeroobj || obj == uarmg) {
