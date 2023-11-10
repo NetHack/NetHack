@@ -1926,6 +1926,35 @@ tmiss(struct obj *obj, struct monst *mon, boolean maybe_wakeup)
       || (obj->otyp == FAKE_AMULET_OF_YENDOR && !obj->known))   \
      && mon->m_id == gq.quest_status.leader_m_id)
 
+/* whether or not object should be destroyed when it hits its target */
+boolean
+should_mulch_missile(struct obj *obj)
+{
+    boolean broken;
+    int chance;
+
+    /* only ammo (excluding magic stones) or missiles will break */
+    if (!obj || !(is_ammo(obj) || is_missile(obj))
+        || objects[obj->otyp].oc_magic)
+        return FALSE;
+
+    /* we had been breaking 2/3 of everything unconditionally.  we still don't
+       want anything to survive unconditionally, but we need ammo to stay
+       around longer on average. */
+    chance = 3 + greatest_erosion(obj) - obj->spe;
+    broken = chance > 1 ? rn2(chance) : !rn2(4);
+    if (obj->blessed && (gc.context.mon_moving ? !rn2(3) : !rnl(4)))
+        broken = FALSE;
+
+    /* Flint and hard gems don't break easily */
+    if (((obj->oclass == GEM_CLASS && objects[obj->otyp].oc_tough)
+         || obj->otyp == FLINT)
+        && !rn2(2))
+        broken = FALSE;
+
+    return broken;
+}
+
 /*
  * Object thrown by player arrives at monster's location.
  * Return 1 if obj has disappeared or otherwise been taken care of,
@@ -2141,34 +2170,11 @@ thitmonst(
             /* projectiles other than magic stones sometimes disappear
                when thrown; projectiles aren't among the types of weapon
                that hmon() might have destroyed so obj is intact */
-            if (objects[otyp].oc_skill < P_NONE
-                && objects[otyp].oc_skill > -P_BOOMERANG
-                && !objects[otyp].oc_magic) {
-                /* we were breaking 2/3 of everything unconditionally.
-                 * we still don't want anything to survive unconditionally,
-                 * but we need ammo to stay around longer on average.
-                 */
-                int broken, chance;
-
-                chance = 3 + greatest_erosion(obj) - obj->spe;
-                if (chance > 1)
-                    broken = rn2(chance);
-                else
-                    broken = !rn2(4);
-                if (obj->blessed && !rnl(4))
-                    broken = 0;
-
-                /* Flint and hard gems don't break easily */
-                if (((obj->oclass == GEM_CLASS && objects[otyp].oc_tough)
-                     || obj->otyp == FLINT) && !rn2(2))
-                    broken = 0;
-
-                if (broken) {
-                    if (*u.ushops || obj->unpaid)
-                        check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE);
-                    obfree(obj, (struct obj *) 0);
-                    return 1;
-                }
+            if (should_mulch_missile(obj)) {
+                if (*u.ushops || obj->unpaid)
+                    check_shop_obj(obj, gb.bhitpos.x, gb.bhitpos.y, TRUE);
+                obfree(obj, (struct obj *) 0);
+                return 1;
             }
             passive_obj(mon, obj, (struct attack *) 0);
         } else {

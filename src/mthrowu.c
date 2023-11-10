@@ -9,7 +9,7 @@ static int monmulti(struct monst *, struct obj *, struct obj *);
 static void monshoot(struct monst *, struct obj *, struct obj *);
 static boolean ucatchgem(struct obj *, struct monst *);
 static const char* breathwep_name(int);
-static int drop_throw(struct obj *, boolean, coordxy, coordxy);
+static boolean drop_throw(struct obj *, boolean, coordxy, coordxy);
 static int m_lined_up(struct monst *, struct monst *);
 
 #define URETREATING(x, y) \
@@ -152,51 +152,43 @@ thitu(
 
 /* Be sure this corresponds with what happens to player-thrown objects in
  * dothrow.c (for consistency). --KAA
- * Returns 0 if object still exists (not destroyed).
+ * Returns FALSE if object still exists (not destroyed).
  */
-static int
+static boolean
 drop_throw(
     register struct obj *obj,
     boolean ohit,
     coordxy x,
     coordxy y)
 {
-    int retvalu = 1;
-    int create;
-    struct monst *mtmp;
-    struct trap *t;
+    boolean broken;
 
     if (obj->otyp == CREAM_PIE || obj->oclass == VENOM_CLASS
-        || (ohit && obj->otyp == EGG))
-        create = 0;
-    else if (ohit && (is_multigen(obj) || obj->otyp == ROCK))
-        create = !rn2(3);
-    else
-        create = 1;
+        || (ohit && obj->otyp == EGG)) {
+        broken = TRUE;
+    } else {
+        broken = (ohit && should_mulch_missile(obj));
+    }
 
-    if (create && !((mtmp = m_at(x, y)) != 0 && mtmp->mtrapped
-                    && (t = t_at(x, y)) != 0
-                    && is_pit(t->ttyp))) {
-        int objgone = 0;
-
+    if (broken) {
+        delobj(obj);
+    } else {
         if (down_gate(x, y) != -1)
-            objgone = ship_object(obj, x, y, FALSE);
-        if (!objgone) {
-            if (!flooreffects(obj, x, y, "fall")) {
+            broken = ship_object(obj, x, y, FALSE);
+        if (!broken) {
+            struct monst *mtmp = m_at(x, y);
+            if (!(broken = flooreffects(obj, x, y, "fall"))) {
                 place_object(obj, x, y);
                 if (!mtmp && u_at(x, y))
                     mtmp = &gy.youmonst;
                 if (mtmp && ohit)
                     passive_obj(mtmp, obj, (struct attack *) 0);
                 stackobj(obj);
-                retvalu = 0;
             }
         }
-    } else {
-        delobj(obj);
     }
     gt.thrownobj = 0;
-    return retvalu;
+    return broken;
 }
 
 /* calculate multishot volley count for mtmp throwing otmp (if not ammo) or
@@ -318,7 +310,7 @@ monshoot(struct monst* mtmp, struct obj* otmp, struct obj* mwep)
    return 1 if the object has stopped moving (hit or its range used up)
    can anger the monster, if this happened due to hero (eg. exploding
    bag of holding throwing the items) */
-int
+boolean
 ohitmon(
     struct monst *mtmp, /* accidental target, located at <gb.bhitpos.x,.y> */
     struct obj *otmp,   /* missile; might be destroyed by drop_throw */
@@ -328,8 +320,7 @@ ohitmon(
     boolean verbose)/* give message(s) even when you can't see what happened */
 {
     int damage, tmp;
-    boolean vis, ismimic;
-    int objgone = 1;
+    boolean vis, ismimic, objgone;
     struct obj *mon_launcher = gm.marcher ? MON_WEP(gm.marcher) : NULL;
 
     gn.notonhead = (gb.bhitpos.x != mtmp->mx || gb.bhitpos.y != mtmp->my);
@@ -495,11 +486,11 @@ ohitmon(
         objgone = drop_throw(otmp, 1, gb.bhitpos.x, gb.bhitpos.y);
         if (!objgone && range == -1) { /* special case */
             obj_extract_self(otmp);    /* free it for motion again */
-            return 0;
+            return FALSE;
         }
-        return 1;
+        return TRUE;
     }
-    return 0;
+    return FALSE;
 }
 
 /* hero catches gem thrown by mon iff poly'd into unicorn; might drop it */
