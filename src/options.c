@@ -630,12 +630,10 @@ parseoptions(
     if (pfx_match && optresult == optn_err) {
         char pfxbuf[BUFSZ], *pfxp;
 
-        if (opts) {
-            Snprintf(pfxbuf, sizeof pfxbuf, "%s", opts);
-            if ((pfxp = strchr(pfxbuf, ':')) != 0)
-                *pfxp = '\0';
-            config_error_add("bad option suffix variation '%s'", pfxbuf);
-        }
+        Snprintf(pfxbuf, sizeof pfxbuf, "%s", opts);
+        if ((pfxp = strchr(pfxbuf, ':')) != 0)
+            *pfxp = '\0';
+        config_error_add("bad option suffix variation '%s'", pfxbuf);
         return FALSE;
     }
     if (got_match && optresult == optn_err)
