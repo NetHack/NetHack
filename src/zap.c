@@ -5999,7 +5999,7 @@ makewish(void)
            to retain wishless conduct */
         livelog_printf(LL_WISH, "declined to make a wish");
         return;
-    } else if (otmp == &cg.zeroobj) {
+    } else if (otmp == &gi.invalid_obj) {
         /* wizard mode terrain wish: skip livelogging, etc */
         return;
     }

@@ -2564,7 +2564,7 @@ use_grease(struct obj *obj)
         consume_obj_charge(obj, TRUE);
 
         oldglib = (int) (Glib & TIMEOUT);
-        if (otmp != &cg.zeroobj) {
+        if (otmp != &gi.invalid_obj) {
             You("cover %s with a thick layer of grease.", yname(otmp));
             otmp->greased = 1;
             if (obj->cursed && !nohands(gy.youmonst.data)) {

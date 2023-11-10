@@ -2886,7 +2886,7 @@ munslime(struct monst *mon, boolean by_you)
             }
         }
         if (t && t->ttyp == FIRE_TRAP)
-            return muse_unslime(mon, (struct obj *) &cg.zeroobj, t, by_you);
+            return muse_unslime(mon, &gi.invalid_obj, t, by_you);
 
     } /* MUSE */
 

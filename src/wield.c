@@ -384,7 +384,7 @@ dowield(void)
     }
 
     /* Handle no object, or object in other slot */
-    if (wep == &cg.zeroobj) {
+    if (wep == &gi.invalid_obj) {
         wep = (struct obj *) 0;
     } else if (wep == uswapwep) {
         return doswapweapon();
@@ -516,7 +516,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
     if (!newquiver) {
         /* Cancelled */
         return ECMD_CANCEL;
-    } else if (newquiver == &cg.zeroobj) { /* no object */
+    } else if (newquiver == &gi.invalid_obj) { /* no object */
         /* Explicitly nothing */
         if (uquiver) {
             You("now have no ammunition readied.");

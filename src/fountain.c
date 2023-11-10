@@ -391,7 +391,7 @@ void
 dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
-    boolean is_hands = (obj == &cg.zeroobj);
+    boolean is_hands = (obj == &gi.invalid_obj);
 
     if (Levitation) {
         floating_above("fountain");
@@ -713,7 +713,7 @@ dipsink(struct obj *obj)
         if (Glib && (!obj || obj == uarmg))
             Your("%s are still slippery.", fingers_or_gloves(TRUE));
         return;
-    } else if (obj == &cg.zeroobj || obj == uarmg) {
+    } else if (obj == &gi.invalid_obj || obj == uarmg) {
         (void) wash_hands();
         return;
     } else if (obj->oclass != POTION_CLASS) {

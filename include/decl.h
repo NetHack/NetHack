@@ -467,6 +467,9 @@ struct instance_globals_i {
     /* sp_lev.c */
     boolean in_mk_themerooms;
 
+    /* new */
+    struct obj invalid_obj;
+
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
 };

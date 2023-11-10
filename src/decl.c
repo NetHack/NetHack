@@ -440,6 +440,8 @@ const struct instance_globals_i g_init_i = {
     UNDEFINED_PTR, /* id_map */
     /* sp_lev.c */
     FALSE, /* in_mk_themerooms */
+    DUMMY,  /* invalid_obj */
+
     TRUE, /* havestate*/
     IVMAGIC  /* i_magic to validate that structure layout has been preserved */
 };
