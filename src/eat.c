@@ -3507,7 +3507,7 @@ floorfood(
                 c = yn_function(qbuf, ynqchars, 'n', TRUE);
             }
             if (c == 'y')
-                return (struct obj *) &gi.invalid_obj; /* csst away 'const' */
+                return &gi.invalid_obj;
             else if (c == 'q')
                 return (struct obj *) 0;
             ++getobj_else;
