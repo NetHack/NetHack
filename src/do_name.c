@@ -1967,6 +1967,16 @@ x_monnam(
     if (article == ARTICLE_YOUR && !mtmp->mtame)
         article = ARTICLE_THE;
 
+    if (mtmp == u.ustuck) {
+        /*
+         * This monster has become important, for the moment anyway.
+         * As the hero's consumer, it is worthy of ARTICLE_THE.
+         * Also, suppress invisible as that particular characteristic
+         * is unimportant now and you can see it's interior anyway.
+         */
+        article = ARTICLE_THE;
+        suppress |= SUPPRESS_INVISIBLE;
+    }
     do_hallu = Hallucination && !(suppress & SUPPRESS_HALLUCINATION);
     do_invis = mtmp->minvis && !(suppress & SUPPRESS_INVISIBLE);
     do_it = !canspotmon(mtmp) && article != ARTICLE_YOUR
