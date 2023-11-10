@@ -823,7 +823,7 @@ The table parameter accepts the following:
 | lit         | boolean  | Is the object lit?
 | eroded      | int      | Object erosion
 | locked      | boolean  | Is the object locked?
-| trapped     | boolean  | Is the object trapped?
+| trapped     | boolean  | Is the object trapped? (If the object is a statue, a statue trap will be created underneath it.)
 | recharged   | boolean  | Is the object recharged?
 | greased     | boolean  | Is the object greased?
 | broken      | boolean  | Is the object broken?

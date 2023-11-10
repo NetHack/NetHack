@@ -2923,6 +2923,7 @@ extern coord *gettrack(coordxy, coordxy);
 
 extern boolean burnarmor(struct monst *);
 extern int erode_obj(struct obj *, const char *, int, int);
+extern void mk_trap_statue(coordxy, coordxy);
 extern boolean grease_protect(struct obj *, const char *, struct monst *);
 extern struct trap *maketrap(coordxy, coordxy, int);
 extern d_level *clamp_hole_destination(d_level *);
