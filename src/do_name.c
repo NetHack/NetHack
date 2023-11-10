@@ -1335,6 +1335,7 @@ do_mgivenname(void)
     coord cc;
     int cx, cy;
     struct monst *mtmp = 0;
+    boolean do_swallow = FALSE;
 
     if (Hallucination) {
         You("would never recognize it anyway.");
@@ -1358,12 +1359,23 @@ do_mgivenname(void)
     } else
         mtmp = m_at(cx, cy);
 
-    if (!mtmp
+    /* Allow you to name the monster that has swallowed you */
+    if (!mtmp && u.uswallow) {
+        int glyph = glyph_at(cx, cy);
+
+        if (glyph_is_swallow(glyph)) {
+            mtmp = u.ustuck;
+            do_swallow = TRUE;
+        }
+    }
+
+    if (!do_swallow && (!mtmp
         || (!sensemon(mtmp)
             && (!(cansee(cx, cy) || see_with_infrared(mtmp))
                 || mtmp->mundetected || M_AP_TYPE(mtmp) == M_AP_FURNITURE
                 || M_AP_TYPE(mtmp) == M_AP_OBJECT
-                || (mtmp->minvis && !See_invisible)))) {
+                || (mtmp->minvis && !See_invisible))))) {
+
         pline("I see no monster there.");
         return;
     }

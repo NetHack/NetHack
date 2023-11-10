@@ -1278,6 +1278,8 @@ make spell menu work with repeat
 when attempting to look up a named fruit in data.base, try harder
 set and check mon->mstate flags more consistently
 fix sanity error when cloud was created over an engraving
+docall naming of the monster that currently has the hero swallowed by
+	using their visible interior
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
