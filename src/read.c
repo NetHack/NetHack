@@ -3160,6 +3160,9 @@ create_particular_creation(
             /* whichpm = rndmonst(); */
             /* mmflags |= (d->fem == FEMALE) ? MM_FEMALE : MM_MALE; */
         }
+        if (d->invisible)
+            mmflags |= MM_MINVIS;
+
         mtmp = makemon(whichpm, u.ux, u.uy, mmflags);
         if (!mtmp) {
             /* quit trying if creation failed and is going to repeat */
@@ -3181,24 +3184,17 @@ create_particular_creation(
 
             put_saddle_on_mon(otmp, mtmp);
         }
-        if (d->invisible) {
-            mon_set_minvis(mtmp);
-            if (does_block(mx, my, &levl[mx][my]))
-                block_point(mx, my);
-            else
-                unblock_point(mx, my);
-        }
-       if (d->hidden
+        if (d->hidden
            && ((is_hider(mtmp->data) && mtmp->data->mlet != S_MIMIC)
                || (hides_under(mtmp->data) && OBJ_AT(mx, my))
                || (mtmp->data->mlet == S_EEL && is_pool(mx, my))))
             mtmp->mundetected = 1;
         if (d->sleeping)
             mtmp->msleeping = 1;
-        /* iff asking for 'hidden', show location of every created monster
+        /* if asking for 'hidden', show location of every created monster
            that can't be seen--whether that's due to successfully hiding
            or vision issues (line-of-sight, invisibility, blindness) */
-        if (d->hidden && !canspotmon(mtmp)) {
+        if ((d->hidden || d->invisible) && !canspotmon(mtmp)) {
             int count = couldsee(mx, my) ? 8 : 4;
             char saveviz = gv.viz_array[my][mx];
 

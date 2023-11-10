@@ -1043,6 +1043,7 @@ typedef uint32_t mmflags_nht;     /* makemon MM_ flags */
 #define GP_CHECKSCARY 0x200000L /* check monster for onscary() */
 #define MM_NOEXCLAM   0x400000L /* more sedate "<mon> appears." mesg for ^G */
 #define MM_IGNORELAVA 0x800000L /* ignore lava when positioning */
+#define MM_MINVIS   0x01000000L /* for ^G/create_particular */
 
 /* flags for make_corpse() and mkcorpstat(); 0..7 are recorded in obj->spe */
 #define CORPSTAT_NONE     0x00
