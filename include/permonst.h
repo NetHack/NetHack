@@ -30,9 +30,9 @@ struct attack {
 
 /*     Weight of human body, elf, dragon
  */
-#define WT_HUMAN 1450
-#define WT_ELF 800
-#define WT_DRAGON 4500
+#define WT_HUMAN 1450U
+#define WT_ELF 800U
+#define WT_DRAGON 4500U
 
 #ifndef ALIGN_H
 #include "align.h"
