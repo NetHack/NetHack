@@ -913,8 +913,7 @@ fill_ordinary_room(struct mkroom *croom)
                 x = pos.x;
                 y = pos.y;
             } while (levl[x][y].typ != ROOM && !rn2(40));
-            if (!(IS_POOL(levl[x][y].typ)
-                    || IS_FURNITURE(levl[x][y].typ)))
+            if (levl[x][y].typ == ROOM)
                 make_engr_at(x, y, mesg, 0L, MARK);
         }
     }
