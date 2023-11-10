@@ -5981,8 +5981,9 @@ makewish(void)
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &zeroobj.  That includes an artifact which has been denied.
-     *  Wishing for "nothing" requires a separate value to remain distinct.
+     *  otmp == &gi.invalid_obj.  That includes an artifact which has been
+     *  denied. Wishing for "nothing" requires a separate value to remain
+     *  distinct.
      */
     strcpy(bufcpy, buf);
     otmp = readobjnam(buf, &nothing);

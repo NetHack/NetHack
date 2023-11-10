@@ -2719,7 +2719,7 @@ doeat(void)
         }
     }
 
-    /* from floorfood(), &zeroobj means iron bars at current spot */
+    /* from floorfood(), &gi.invalid_obj means iron bars at current spot */
     if (otmp == &gi.invalid_obj) {
         /* hero in metallivore form is eating [diggable] iron bars
            at current location so skip the other assorted checks;
