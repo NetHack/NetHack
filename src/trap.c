@@ -1,4 +1,4 @@
-/* NetHack 3.7	trap.c	$NHDT-Date: 1687033655 2023/06/17 20:27:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.540 $ */
+/* NetHack 3.7	trap.c	$NHDT-Date: 1699640827 2023/11/10 18:27:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.554 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -2382,9 +2382,9 @@ trapeffect_landmine(
         coordxy tx = trap->tx, ty = trap->ty;
 
         /* heavier monsters are more likely to set off a land mine; on the
-           other hand, any mon lighter than the trigger weight is immune. */
-#define MINE_TRIGGER_WT (WT_ELF / 2)
-        if (rn2(mtmp->data->cwt + 1) < MINE_TRIGGER_WT)
+           other hand, any mon lighter than the trigger weight is immune */
+#define MINE_TRIGGER_WT (WT_ELF / 2U)
+        if (rn2(mtmp->data->cwt + 1) < (int) MINE_TRIGGER_WT)
             return Trap_Effect_Finished;
         if (is_flyer(mptr)) {
             boolean already_seen = trap->tseen;
