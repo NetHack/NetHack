@@ -2318,6 +2318,8 @@ applying gold pieces will flip one and report "heads" or "tails"; with a stack
 during enlightenment and end-of-game disclosure, use contraction "<verb>n't"
 	for "<verb> not"
 give feedback about the thaw status of ice terrain
+allow #dip '-' in a fountain, pool, or sink to clean slippery fingers/gloves
+allow #dip into a sink to dilute potions or blank out scrolls and books
 
 
 Platform- and/or Interface-Specific New Features
