@@ -1807,6 +1807,22 @@ dosacrifice(void)
     otmp = floorfood("sacrifice", 1);
     if (!otmp)
         return ECMD_OK;
+
+    if (otmp->otyp == AMULET_OF_YENDOR) {
+        if (!highaltar) {
+            offer_too_soon(altaralign);
+            return ECMD_TIME;
+        } else {
+            offer_real_amulet(otmp, altaralign);
+            /*NOTREACHED*/
+        }
+    } /* real Amulet */
+
+    if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
+        offer_fake_amulet(otmp, highaltar, altaralign);
+        return ECMD_TIME;
+    } /* fake Amulet */
+
     /*
      * Was based on nutritional value and aging behavior (< 50 moves).
      * Sacrificing a food ration got you max luck instantly, making the
@@ -1818,7 +1834,12 @@ dosacrifice(void)
      */
 #define MAXVALUE 24 /* Highest corpse value (besides Wiz) */
 
-    if (otmp->otyp == CORPSE) {
+    if (otmp->otyp != CORPSE) {
+        pline1(nothing_happens);
+        return ECMD_TIME;
+    }
+
+    {
         register struct permonst *ptr = &mons[otmp->corpsenm];
         struct monst *mtmp;
 
@@ -1903,21 +1924,6 @@ dosacrifice(void)
             }
         }
     } /* corpse */
-
-    if (otmp->otyp == AMULET_OF_YENDOR) {
-        if (!highaltar) {
-            offer_too_soon(altaralign);
-            return ECMD_TIME;
-        } else {
-            offer_real_amulet(otmp, altaralign);
-            /*NOTREACHED*/
-        }
-    } /* real Amulet */
-
-    if (otmp->otyp == FAKE_AMULET_OF_YENDOR) {
-        offer_fake_amulet(otmp, highaltar, altaralign);
-        return ECMD_TIME;
-    } /* fake Amulet */
 
     if (value == 0) {
         pline1(nothing_happens);
