@@ -4960,7 +4960,7 @@ readobjnam(char *bp, struct obj *no_wish)
          || (d.otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, ONAME_NO_FLAGS);
         obfree(d.otmp, (struct obj *) 0);
-        d.otmp = (struct obj *) &gi.invalid_obj;
+        d.otmp = &gi.invalid_obj;
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
         return d.otmp;
