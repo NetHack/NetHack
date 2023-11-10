@@ -704,16 +704,17 @@ void
 dipsink(struct obj *obj)
 {
     boolean try_call = FALSE,
-            not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0;
+            not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0,
+            is_hands = (obj == &gi.invalid_obj || (uarmg && obj == uarmg));
 
     if (!rn2(not_looted_yet ? 25 : 15)) {
         /* can't rely on using sink for unlimited scroll blanking; however,
            since sink will be converted into a fountain, hero can dip again */
         breaksink(u.ux, u.uy); /* "The pipes break!  Water spurts out!" */
-        if (Glib && (!obj || obj == uarmg))
+        if (Glib && is_hands)
             Your("%s are still slippery.", fingers_or_gloves(TRUE));
         return;
-    } else if (obj == &gi.invalid_obj || obj == uarmg) {
+    } else if (is_hands) {
         (void) wash_hands();
         return;
     } else if (obj->oclass != POTION_CLASS) {
