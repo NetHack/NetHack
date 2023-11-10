@@ -1,4 +1,4 @@
-/* NetHack 3.7	fountain.c	$NHDT-Date: 1687058871 2023/06/18 03:27:51 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.95 $ */
+/* NetHack 3.7	fountain.c	$NHDT-Date: 1699582923 2023/11/10 02:22:03 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.100 $ */
 /*      Copyright Scott R. Turner, srt@ucla, 10/27/86 */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -238,6 +238,7 @@ dryup(coordxy x, coordxy y, boolean isyou)
     }
 }
 
+/* quaff from a fountain when standing on its location */
 void
 drinkfountain(void)
 {
@@ -385,8 +386,9 @@ drinkfountain(void)
     dryup(u.ux, u.uy, TRUE);
 }
 
+/* dip an object into a fountain when standing on its location */
 void
-dipfountain(register struct obj *obj)
+dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
     boolean is_hands = (obj == &cg.zeroobj);
@@ -495,6 +497,7 @@ dipfountain(register struct obj *obj)
         {
             long money = money_cnt(gi.invent);
             struct obj *otmp;
+
             if (money > 10) {
                 /* Amount to lose.  Might get rounded up as fountains don't
                  * pay change... */
@@ -542,6 +545,7 @@ dipfountain(register struct obj *obj)
     dryup(u.ux, u.uy, TRUE);
 }
 
+/* dipping '-' in fountain, pool, or sink */
 int
 wash_hands(void)
 {
@@ -552,8 +556,7 @@ wash_hands(void)
         hliquid("water"));
     if (Glib) {
         make_glib(0);
-        Your("%s are no longer slippery.",
-             uarmg ? gloves_simple_name(uarmg) : hands);
+        Your("%s are no longer slippery.", fingers_or_gloves(TRUE));
         /* not what ER_GREASED is for, but the checks in dipfountain just
            compare the result to ER_DESTROYED and ER_NOTHING, so it works */
         res = ER_GREASED;
@@ -563,6 +566,7 @@ wash_hands(void)
     return res;
 }
 
+/* convert a sink into a fountain */
 void
 breaksink(coordxy x, coordxy y)
 {
@@ -576,6 +580,7 @@ breaksink(coordxy x, coordxy y)
     newsym(x, y);
 }
 
+/* quaff from a sink while standing on its location */
 void
 drinksink(void)
 {
@@ -694,12 +699,21 @@ drinksink(void)
     }
 }
 
+/* for #dip(potion.c) when standing on a sink */
 void
 dipsink(struct obj *obj)
 {
-    boolean try_call = FALSE;
+    boolean try_call = FALSE,
+            not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0;
 
-    if (obj == &cg.zeroobj || obj == uarmg) {
+    if (!rn2(not_looted_yet ? 25 : 15)) {
+        /* can't rely on using sink for unlimited scroll blanking; however,
+           since sink will be converted into a fountain, hero can dip again */
+        breaksink(u.ux, u.uy); /* "The pipes break!  Water spurts out!" */
+        if (Glib)
+            Your("%s are still slippery.", fingers_or_gloves(TRUE));
+        return;
+    } else if (obj == &cg.zeroobj || obj == uarmg) {
         (void) wash_hands();
         return;
     } else if (obj->oclass != POTION_CLASS) {
@@ -772,6 +786,7 @@ dipsink(struct obj *obj)
     useup(obj);
 }
 
+/* find a ring in a sink */
 void
 sink_backs_up(coordxy x, coordxy y)
 {

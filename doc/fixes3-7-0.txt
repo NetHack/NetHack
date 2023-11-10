@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1286 $ $NHDT-Date: 1699233285 2023/11/06 01:14:45 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1290 $ $NHDT-Date: 1699582923 2023/11/10 02:22:03 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1735,6 +1735,8 @@ knockback or recoil while levitating could hurtle the hero through a wall of
 if recoil from throwing an item while levitating sent hero into a wall of
 	water, the thrown item got placed in that water rather than at its
 	intended destination
+include '-' as suggested item in "what to dip?" prompt if dipping at pool or
+	fountain or sink with slippery hands
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository

@@ -1,4 +1,4 @@
-/* NetHack 3.7	potion.c	$NHDT-Date: 1685135014 2023/05/26 21:03:34 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.238 $ */
+/* NetHack 3.7	potion.c	$NHDT-Date: 1699582924 2023/11/10 02:22:04 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.251 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2013. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -38,6 +38,7 @@ static boolean H2Opotion_dip(struct obj *, struct obj *, boolean,
                              const char *);
 static short mixtype(struct obj *, struct obj *);
 static int dip_ok(struct obj *);
+static int dip_hands_ok(struct obj *);
 static void hold_potion(struct obj *, const char *, const char *,
                         const char *);
 static int potion_dip(struct obj *obj, struct obj *potion);
@@ -2179,6 +2180,7 @@ dip_ok(struct obj *obj)
 {
     if (!obj)
         return GETOBJ_DOWNPLAY;
+
     /* dipping gold isn't currently implemented */
     if (obj->oclass == COIN_CLASS)
         return GETOBJ_EXCLUDE;
@@ -2189,12 +2191,24 @@ dip_ok(struct obj *obj)
     return GETOBJ_SUGGEST;
 }
 
+/* getobj callback for object to be dipped when hero has slippery hands */
+static int
+dip_hands_ok(struct obj *obj)
+{
+    if (!obj && (Glib && can_reach_floor(FALSE)))
+        return GETOBJ_SUGGEST;
+
+    return dip_ok(obj);
+}
+
 /* call hold_another_object() to deal with a transformed potion; its weight
    won't have changed but it might require an extra slot that isn't available
    or it might merge into some other carried stack */
 static void
-hold_potion(struct obj *potobj, const char *drop_fmt, const char *drop_arg,
-            const char *hold_msg)
+hold_potion(
+    struct obj *potobj,
+    const char *drop_fmt, const char *drop_arg,
+    const char *hold_msg)
 {
     int cap = near_capacity(),
         save_pickup_burden = flags.pickup_burden;
@@ -2211,18 +2225,23 @@ hold_potion(struct obj *potobj, const char *drop_fmt, const char *drop_arg,
     return;
 }
 
-/* #dip command - get item to dip, then get potion to dip it into */
+/* #dip command - get item to dip, then get potion to dip it into;
+   precede with 'm' to bypass fountain, pool, or sink at hero's spot */
 int
 dodip(void)
 {
     static const char Dip_[] = "Dip ";
     struct obj *potion, *obj;
-    uchar here;
     char qbuf[QBUFSZ], obuf[QBUFSZ];
     const char *shortestname; /* last resort obj name for prompt */
-    boolean is_hands;
+    uchar here = levl[u.ux][u.uy].typ;
+    boolean is_hands, at_pool = is_pool(u.ux, u.uy),
+            at_fountain = IS_FOUNTAIN(here), at_sink = IS_SINK(here),
+            at_here = (!iflags.menu_requested
+                       && (at_pool || at_fountain || at_sink));
 
-    if (!(obj = getobj("dip", dip_ok, GETOBJ_PROMPT)))
+    obj = getobj("dip", at_here ? dip_hands_ok : dip_ok, GETOBJ_PROMPT);
+    if (!obj)
         return ECMD_CANCEL;
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
@@ -2231,8 +2250,8 @@ dodip(void)
     shortestname = (is_hands || is_plural(obj) || pair_of(obj)) ? "them"
                                                                 : "it";
     drink_ok_extra = 0;
-    /* preceding #dip with 'm' skips the possibility of dipping into
-       fountains and pools plus the prompting which those entail */
+    /* preceding #dip with 'm' skips the possibility of dipping into pools,
+       fountains, and sinks plus the extra prompting which those entail */
     if (!iflags.menu_requested) {
         /*
          * Bypass safe_qbuf() since it doesn't handle varying suffix without
@@ -2254,11 +2273,10 @@ dodip(void)
  into? [abdeghjkmnpqstvwyzBCEFHIKLNOQRTUWXZ#-# or ?*] "));
         }
 
-        here = levl[u.ux][u.uy].typ;
         /* Is there a fountain to dip into here? */
         if (!can_reach_floor(FALSE)) {
             ; /* can't dip something into fountain or pool if can't reach */
-        } else if (IS_FOUNTAIN(here)) {
+        } else if (at_fountain) {
             Snprintf(qbuf, sizeof(qbuf), "%s%s into the fountain?", Dip_,
                      flags.verbose ? obuf : shortestname);
             /* "Dip <the object> into the fountain?" */
@@ -2269,7 +2287,7 @@ dodip(void)
                 return ECMD_TIME;
             }
             ++drink_ok_extra;
-        } else if (IS_SINK(here)) {
+        } else if (at_sink) {
             Snprintf(qbuf, sizeof(qbuf), "%s%s into the sink?", Dip_,
                      flags.verbose ? obuf : shortestname);
             if (y_n(qbuf) == 'y') {
@@ -2279,7 +2297,7 @@ dodip(void)
                 return ECMD_TIME;
             }
             ++drink_ok_extra;
-        } else if (is_pool(u.ux, u.uy)) {
+        } else if (at_pool) {
             const char *pooltype = waterbody_name(u.ux, u.uy);
 
             Snprintf(qbuf, sizeof(qbuf), "%s%s into the %s?", Dip_,
