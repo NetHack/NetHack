@@ -1,5 +1,5 @@
 
-	   Copyright (c) NetHack PC Development Team 1990-2021.
+	   Copyright (c) NetHack PC Development Team 1990-2023.
        NetHack may be freely redistributed.  See license for details.
        ==============================================================
               Instructions for compiling and installing
@@ -83,19 +83,17 @@ II. There once was a time when people built NetHack right on their DOS machine.
     The MSDOS cross-compile can then be carried out by specifying
     CROSS_TO_MSDOS=1 on the make command line:
 
-        make CROSS_TO_MSDOS=1 all
         make CROSS_TO_MSDOS=1 package
 
     You can explicitly include tty and curses support if desired. The default
-    you'll end up with is a tty-only cross-compile build:
+    you'll end up with if you don't specify any WANT_ command line options
+    is a tty-only cross-compile build:
 
-        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 all
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 package
 
     Add WANT_DOSVGA for a curses build that supports higher resolutions,
     external fonts and Unicode symbols:
 
-        make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 all
         make WANT_WIN_TTY=1 WANT_WIN_CURSES=1 CROSS_TO_MSDOS=1 WANT_DOSVGA=1 package
 
     Result: The "make package" target will bundle all of the necessary
@@ -117,6 +115,53 @@ Appendix A - Additional Notes
     them according to your style of play.
 
 2. Play NetHack.  If it works, you're done!
+
+Appendix B - Common Difficulties Encountered
+
+  i) The cross-compile stops with an error about "No rule to make target
+     '../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S'"
+
+     For example:
+         make CROSS_TO_MSDOS=1 package
+         ( cd src ; make LUA_VERSION=5.4.6 nethack )
+         make[1]: Entering directory '/home/johndoe/NHsource/src'
+         mkdir -p ../targets/msdos ; make ../targets/msdos/exceptn.o ;
+         make[2]: Entering directory '/home/johndoe/NHsource/src'
+         make[2]: *** No rule to make target
+                  '../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S',
+                  needed by '../targets/msdos/exceptn.o'.  Stop.
+         make[2]: Leaving directory '/home/johndoe/git/NHsource/src'
+         make[1]: *** [Makefile:2027: pregame] Error 2
+         make[1]: Leaving directory '/home/johndoe/git/NHsource/src'
+         make: *** [Makefile:1531: nethack] Error 2
+
+     That result usually indicates that you haven't successfully run
+     the script to fetch the cross-compiler. Try again:
+         sh sys/msdos/fetch-cross-compiler.sh
+
+  ii) The cross-compile stops with an error "libfl.so.2: cannot open
+      shared object file: No such file or directory.
+
+      This indicates that your host system does not have the flex
+      library installed, and the cross-compiler needs it to be.
+      On Ubuntu systems, you can easily rectify this issue by
+      just installing flex, as follows:
+
+          sudo apt-get install flex
+
+             Reading package lists... Done
+             Building dependency tree... Done
+             Reading state information... Done
+             The following additional packages will be installed:
+                 libfl-dev libfl2 m4
+             Suggested packages:
+                 bison flex-doc m4-doc
+             The following NEW packages will be installed:
+                 flex libfl-dev libfl2 m4
+             0 upgraded, 4 newly installed, 0 to remove and 0 not upgraded.
+             Need to get 558 kB of archives.
+             After this operation, 1699 kB of additional disk space will be
+             used. Do you want to continue? [Y/n] Y
 
 Appendix D - Contacting the Development Team
 
