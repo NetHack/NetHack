@@ -3230,8 +3230,6 @@ optfn_pickup_types(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         oc_to_str(flags.pickup_types, ocl);
         Sprintf(opts, "%s", ocl[0] ? ocl : "all");
         return optn_ok;
