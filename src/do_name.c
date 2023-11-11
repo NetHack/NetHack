@@ -1967,7 +1967,7 @@ x_monnam(
     if (article == ARTICLE_YOUR && !mtmp->mtame)
         article = ARTICLE_THE;
 
-    if (mtmp == u.ustuck) {
+    if (u.uswallow && mtmp == u.ustuck) {
         /*
          * This monster has become important, for the moment anyway.
          * As the hero's consumer, it is worthy of ARTICLE_THE.
