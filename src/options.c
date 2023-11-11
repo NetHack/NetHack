@@ -7948,13 +7948,19 @@ boolean
 get_menu_coloring(const char *str, int *color, int *attr)
 {
     struct menucoloring *tmpmc;
+    boolean first_match = TRUE;
 
     if (iflags.use_menu_color)
         for (tmpmc = gm.menu_colorings; tmpmc; tmpmc = tmpmc->next)
             if (regex_match(str, tmpmc->match)) {
-                *color = tmpmc->color;
+                if (first_match) {
+                    *color = tmpmc->color;
+                    first_match = FALSE;
+                }
                 *attr = tmpmc->attr;
-                return TRUE;
+                if (*attr != ATR_NONE) {
+                    return TRUE;
+                }
             }
     return FALSE;
 }
