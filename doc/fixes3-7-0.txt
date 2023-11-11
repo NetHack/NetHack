@@ -1280,6 +1280,8 @@ set and check mon->mstate flags more consistently
 fix sanity error when cloud was created over an engraving
 docall naming of the monster that currently has the hero swallowed by
 	using their visible interior
+give missiles thrown or shot by monsters the same chance to get used up upon
+	hitting as when thrown or shot by the hero
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
