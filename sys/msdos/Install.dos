@@ -130,9 +130,9 @@ Appendix B - Common Difficulties Encountered
          make[2]: *** No rule to make target
                   '../lib/djgpp/djgpp-patch/src/libc/go32/exceptn.S',
                   needed by '../targets/msdos/exceptn.o'.  Stop.
-         make[2]: Leaving directory '/home/johndoe/git/NHsource/src'
+         make[2]: Leaving directory '/home/johndoe/NHsource/src'
          make[1]: *** [Makefile:2027: pregame] Error 2
-         make[1]: Leaving directory '/home/johndoe/git/NHsource/src'
+         make[1]: Leaving directory '/home/johndoe/NHsource/src'
          make: *** [Makefile:1531: nethack] Error 2
 
      That result usually indicates that you haven't successfully run
