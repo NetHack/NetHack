@@ -532,7 +532,7 @@ doengrave(void)
     if (!otmp) /* otmp == cg.zeroobj if fingers */
         return ECMD_CANCEL;
 
-    if (otmp == &gi.invalid_obj) {
+    if (otmp == &hands_obj) {
         Strcat(strcpy(fbuf, "your "), body_part(FINGERTIP));
         writer = fbuf;
     } else {
@@ -563,7 +563,7 @@ doengrave(void)
         return ECMD_OK;
     }
     if (IS_GRAVE(levl[u.ux][u.uy].typ)) {
-        if (otmp == &gi.invalid_obj) { /* using only finger */
+        if (otmp == &hands_obj) { /* using only finger */
             You("would only make a small smudge on the %s.",
                 surface(u.ux, u.uy));
             return ECMD_OK;
@@ -1024,7 +1024,7 @@ doengrave(void)
     }
 
     /* Tell adventurer what is going on */
-    if (otmp != &gi.invalid_obj)
+    if (otmp != &hands_obj)
         You("%s the %s with %s.", everb, eloc, doname(otmp));
     else
         You("%s the %s with your %s.", everb, eloc, body_part(FINGERTIP));
@@ -1131,7 +1131,7 @@ engrave(void)
     }
     /* Stylus might have been taken out of inventory and destroyed somehow.
      * Not safe to dereference stylus until after this. */
-    if (gc.context.engraving.stylus == &gi.invalid_obj) { /* bare finger */
+    if (gc.context.engraving.stylus == &hands_obj) { /* bare finger */
         stylus = (struct obj *) 0;
     } else {
         for (stylus = gi.invent; stylus; stylus = stylus->nobj) {

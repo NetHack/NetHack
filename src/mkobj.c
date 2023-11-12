@@ -2631,6 +2631,10 @@ dealloc_obj(struct obj *obj)
         panic("dealloc_obj with nobj");
     if (obj->cobj)
         panic("dealloc_obj with cobj");
+    if (obj == &hands_obj) {
+        impossible("dealloc_obj with hands_obj");
+        return;
+    }
 
     /* free up any timers attached to the object */
     if (obj->timed)

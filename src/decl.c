@@ -440,7 +440,6 @@ const struct instance_globals_i g_init_i = {
     UNDEFINED_PTR, /* id_map */
     /* sp_lev.c */
     FALSE, /* in_mk_themerooms */
-    DUMMY,  /* invalid_obj */
 
     TRUE, /* havestate*/
     IVMAGIC  /* i_magic to validate that structure layout has been preserved */
@@ -1059,6 +1058,8 @@ decl_globals_init(void)
     gu.urace = urace_init_data;
 }
 
+/* fields in 'hands_obj' don't matter, just its distinct address */
+struct obj hands_obj = DUMMY;
 
 /* gcc 12.2's static analyzer thinks that some fields of gc.context.victual
    are uninitialized when compiling 'bite(eat.c)' but that's impossible;

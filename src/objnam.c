@@ -3266,7 +3266,7 @@ wizterrainwish(struct _readobjnam_data *d)
                   (trap != MAGIC_PORTAL) ? "" : " to nowhere");
         } else
             pline("Creation of %s failed.", an(tname));
-        return &gi.invalid_obj;
+        return &hands_obj;
     }
 
     /* furniture and terrain (use at your own risk; can clobber stairs
@@ -3540,7 +3540,7 @@ wizterrainwish(struct _readobjnam_data *d)
     }
     if (madeterrain || badterrain) {
         /* cast 'const' away; caller won't modify this */
-        return &gi.invalid_obj;
+        return &hands_obj;
     }
 
     return (struct obj *) 0;
@@ -4495,7 +4495,7 @@ readobjnam_postparse3(struct _readobjnam_data *d)
  * Return something wished for.  Specifying a null pointer for
  * the user request string results in a random object.  Otherwise,
  * if asking explicitly for "nothing" (or "nil") return no_wish;
- * if not an object return &gi.invalid_obj; if an error (no matching object),
+ * if not an object return &hands_obj; if an error (no matching object),
  * return null.
  */
 struct obj *
@@ -4960,7 +4960,7 @@ readobjnam(char *bp, struct obj *no_wish)
          || (d.otmp->oartifact && rn2(nartifact_exist()) > 1)) && !wizard) {
         artifact_exists(d.otmp, safe_oname(d.otmp), FALSE, ONAME_NO_FLAGS);
         obfree(d.otmp, (struct obj *) 0);
-        d.otmp = &gi.invalid_obj;
+        d.otmp = &hands_obj;
         pline("For a moment, you feel %s in your %s, but it disappears!",
               something, makeplural(body_part(HAND)));
         return d.otmp;

@@ -391,7 +391,7 @@ void
 dipfountain(struct obj *obj)
 {
     int er = ER_NOTHING;
-    boolean is_hands = (obj == &gi.invalid_obj);
+    boolean is_hands = (obj == &hands_obj);
 
     if (Levitation) {
         floating_above("fountain");
@@ -705,7 +705,7 @@ dipsink(struct obj *obj)
 {
     boolean try_call = FALSE,
             not_looted_yet = (levl[u.ux][u.uy].looted & S_LRING) == 0,
-            is_hands = (obj == &gi.invalid_obj || (uarmg && obj == uarmg));
+            is_hands = (obj == &hands_obj || (uarmg && obj == uarmg));
 
     if (!rn2(not_looted_yet ? 25 : 15)) {
         /* can't rely on using sink for unlimited scroll blanking; however,

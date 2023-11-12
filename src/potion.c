@@ -2246,7 +2246,7 @@ dodip(void)
     if (inaccessible_equipment(obj, "dip", FALSE))
         return ECMD_OK;
 
-    is_hands = (obj == &gi.invalid_obj);
+    is_hands = (obj == &hands_obj);
     shortestname = (is_hands || is_plural(obj) || pair_of(obj)) ? "them"
                                                                 : "it";
     drink_ok_extra = 0;
@@ -2381,7 +2381,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         pline("That is a potion bottle, not a Klein bottle!");
         return ECMD_OK;
     }
-    if (obj == &gi.invalid_obj) {
+    if (obj == &hands_obj) {
         You("can't fit your %s into the mouth of the bottle!",
             body_part(HAND));
         return ECMD_OK;

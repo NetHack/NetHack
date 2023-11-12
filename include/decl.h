@@ -468,7 +468,6 @@ struct instance_globals_i {
     boolean in_mk_themerooms;
 
     /* new */
-    struct obj invalid_obj;
 
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
@@ -1148,6 +1147,8 @@ struct const_globals {
 };
 
 extern const struct const_globals cg;
+
+extern struct obj hands_obj;
 
 #endif /* DECL_H */
 

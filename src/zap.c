@@ -5981,7 +5981,7 @@ makewish(void)
     }
     /*
      *  Note: if they wished for and got a non-object successfully,
-     *  otmp == &gi.invalid_obj.  That includes an artifact which has been
+     *  otmp == &hands_obj.  That includes an artifact which has been
      *  denied. Wishing for "nothing" requires a separate value to remain
      *  distinct.
      */
@@ -6000,7 +6000,7 @@ makewish(void)
            to retain wishless conduct */
         livelog_printf(LL_WISH, "declined to make a wish");
         return;
-    } else if (otmp == &gi.invalid_obj) {
+    } else if (otmp == &hands_obj) {
         /* wizard mode terrain wish: skip livelogging, etc */
         return;
     }
