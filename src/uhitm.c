@@ -1,4 +1,4 @@
-/* NetHack 3.7	uhitm.c	$NHDT-Date: 1685312552 2023/05/28 22:22:32 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.409 $ */
+/* NetHack 3.7	uhitm.c	$NHDT-Date: 1699813308 2023/11/12 18:21:48 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.419 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -715,8 +715,8 @@ hitum_cleave(
     return (target && DEADMONSTER(target)) ? FALSE : TRUE;
 }
 
-/* returns True if hero is fighting without a weapon and has sufficient
-   skill in bare-handeded combat or martial arts to attack twice */
+/* returns True if hero is fighting without a weapon and without a shield and
+   has sufficient skill in bare-handed/martial arts to attack twice */
 static boolean
 double_punch(void)
 {
@@ -733,7 +733,7 @@ double_punch(void)
      *  master      (5) : 60%
      *  grandmaster (6) : 80%
      */
-    if (!uwep && skl_lvl > P_BASIC)
+    if (!uwep && !uarms && skl_lvl > P_BASIC)
         return (skl_lvl - P_BASIC) > rn2(5);
     return FALSE;
 }

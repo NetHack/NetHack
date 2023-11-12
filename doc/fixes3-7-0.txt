@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1290 $ $NHDT-Date: 1699582923 2023/11/10 02:22:03 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1294 $ $NHDT-Date: 1699813307 2023/11/12 18:21:47 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -1741,6 +1741,7 @@ if recoil from throwing an item while levitating sent hero into a wall of
 	intended destination
 include '-' as suggested item in "what to dip?" prompt if dipping at pool or
 	fountain or sink with slippery hands
+don't attempt a second hit for bare handed/martial arts if wearing a shield
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
