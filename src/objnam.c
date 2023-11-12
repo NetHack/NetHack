@@ -3538,10 +3538,8 @@ wizterrainwish(struct _readobjnam_data *d)
            while in xorn form and replacing solid stone with furniture) */
         switch_terrain();
     }
-    if (madeterrain || badterrain) {
-        /* cast 'const' away; caller won't modify this */
+    if (madeterrain || badterrain)
         return &hands_obj;
-    }
 
     return (struct obj *) 0;
 }
