@@ -1619,6 +1619,26 @@ add_menu(
                                 ch, gch, attr, color, str, itemflags);
 }
 
+void
+add_menu_heading(winid tmpwin, const char *buf)
+{
+    anything any = cg.zeroany;
+
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             iflags.menu_headings.attr, iflags.menu_headings.color,
+             buf, MENU_ITEMFLAGS_NONE);
+}
+
+void
+add_menu_str(winid tmpwin, const char *buf)
+{
+    anything any = cg.zeroany;
+
+    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
+             ATR_NONE, NO_COLOR,
+             buf, MENU_ITEMFLAGS_NONE);
+}
+
 static boolean
 get_menu_coloring(const char *str, int *color, int *attr)
 {

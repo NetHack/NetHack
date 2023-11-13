@@ -177,8 +177,6 @@ extern boolean bones_include_name(const char *);
 
 /* ### botl.c ### */
 
-extern void add_menu_heading(winid, const char *);
-extern void add_menu_str(winid, const char *);
 extern char *do_statusline1(void);
 extern void check_gold_symbol(void);
 extern char *do_statusline2(void);
@@ -3441,6 +3439,8 @@ extern boolean menuitem_invert_test(int, unsigned, boolean);
 extern const char *mixed_to_glyphinfo(const char *str, glyph_info *gip);
 extern void add_menu(winid, const glyph_info *, const ANY_P *,
                      char, char, int, int, const char *, unsigned int);
+extern void add_menu_heading(winid, const char *);
+extern void add_menu_str(winid, const char *);
 
 /* ### windows.c ### */
 
