@@ -1612,8 +1612,12 @@ add_menu(
     const char *str,            /* menu text */
     unsigned int itemflags)     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
-    if (iflags.use_menu_color)
-        (void) get_menu_coloring(str, &color, &attr);
+    if (iflags.use_menu_color) {
+        if ((itemflags & MENU_ITEMFLAGS_SKIPMENUCOLORS) == 0)
+            (void) get_menu_coloring(str, &color, &attr);
+    }
+    /* this is the only function that cared about this flag; remove it now */
+    itemflags &= ~MENU_ITEMFLAGS_SKIPMENUCOLORS;
 
     (*windowprocs.win_add_menu)(window, glyphinfo, identifier,
                                 ch, gch, attr, color, str, itemflags);
@@ -1626,7 +1630,7 @@ add_menu_heading(winid tmpwin, const char *buf)
 
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
              iflags.menu_headings.attr, iflags.menu_headings.color,
-             buf, MENU_ITEMFLAGS_NONE);
+             buf, MENU_ITEMFLAGS_SKIPMENUCOLORS);
 }
 
 void

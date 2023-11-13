@@ -158,9 +158,10 @@ typedef struct gi {
 #define MENU_INVERT_PAGE        '~'
 #define MENU_SEARCH             ':'
 
-#define MENU_ITEMFLAGS_NONE       0x0000000U
-#define MENU_ITEMFLAGS_SELECTED   0x0000001U
-#define MENU_ITEMFLAGS_SKIPINVERT 0x0000002U
+#define MENU_ITEMFLAGS_NONE           0x0000000U
+#define MENU_ITEMFLAGS_SELECTED       0x0000001U
+#define MENU_ITEMFLAGS_SKIPINVERT     0x0000002U
+#define MENU_ITEMFLAGS_SKIPMENUCOLORS 0x0000004U
 
 /* 3.7+ enhanced menu flags that not all window ports are likely to
  * support initially.
