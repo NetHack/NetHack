@@ -720,6 +720,16 @@ vesa_xputg(const glyph_info *glyphinfo, const glyph_info *bkglyphinfo UNUSED)
                 decal_packed(packcell, special);
 #endif
             vesa_DisplayCell(glyphinfo->gm.tileidx, col - clipx, ry - clipy);
+            if (bkglyphinfo->framecolor != NO_COLOR) {
+                int curtypbak = cursor_type;
+                int cclr = cursor_color;
+
+                cursor_type = CURSOR_FRAME;
+                cursor_color = bkglyphinfo->framecolor;
+                vesa_DrawCursor();
+                cursor_type = curtypbak;
+                cursor_color = cclr;
+            }
         }
     }
     if (col < (CO - 1))
@@ -2227,14 +2237,14 @@ vesa_DrawCursor(void)
 
     default:
         for (x = left; x <= right; ++x) {
-            vesa_WritePixel(x, top, FIRST_TEXT_COLOR + 15);
+            vesa_WritePixel(x, top, FIRST_TEXT_COLOR + cursor_color);
         }
         for (y = top + 1; y <= bottom - 1; ++y) {
-            vesa_WritePixel(left , y, FIRST_TEXT_COLOR + 15);
-            vesa_WritePixel(right, y, FIRST_TEXT_COLOR + 15);
+            vesa_WritePixel(left , y, FIRST_TEXT_COLOR + cursor_color);
+            vesa_WritePixel(right, y, FIRST_TEXT_COLOR + cursor_color);
         }
         for (x = left; x <= right; ++x) {
-            vesa_WritePixel(x, bottom, FIRST_TEXT_COLOR + 15);
+            vesa_WritePixel(x, bottom, FIRST_TEXT_COLOR + cursor_color);
         }
         break;
     }

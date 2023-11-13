@@ -415,6 +415,16 @@ vga_xputg(const glyph_info *glyphinfo,
             if (map[ry][col].special)
                 decal_planar(&planecell, special);
             vga_DisplayCell(&planecell, col - clipx, row);
+            if (bkglyphinfo->framecolor != NO_COLOR) {
+                int curtypbak = cursor_type;
+                int cclr = cursor_color;
+
+                cursor_type = CURSOR_FRAME;
+                cursor_color = bkglyphinfo->framecolor;
+                vga_DrawCursor();
+                cursor_type = curtypbak;
+                cursor_color = cclr;
+            }
         }
     } else {
         read_planar_tile_O(glyphnum, &planecell_O);
