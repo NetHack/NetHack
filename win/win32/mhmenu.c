@@ -991,9 +991,6 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
     char *p, *p1;
     int column;
     int spacing = 0;
-
-    int color = NO_COLOR, attr;
-    boolean menucolr = FALSE;
     double monitorScale = win10_monitor_scale(hWnd);
     int tileXScaled = (int) (TILE_X * monitorScale);
     int tileYScaled = (int) (TILE_Y * monitorScale);
@@ -1020,6 +1017,9 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
                          menu_fg_brush
                              ? menu_fg_color
                              : (COLORREF) GetSysColor(DEFAULT_COLOR_FG_MENU));
+
+    if (item->color != NO_COLOR)
+        (void) SetTextColor(lpdis->hDC, nhcolor_to_RGB(item->color));
 
     GetTextMetrics(lpdis->hDC, &tm);
     spacing = tm.tmAveCharWidth;
@@ -1058,15 +1058,6 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         if (item->accelerator != 0) {
             buf[0] = item->accelerator;
             buf[1] = '\x0';
-
-            if (iflags.use_menu_color
-                && (menucolr = get_menu_coloring(item->str, &color, &attr))) {
-                cached_font * menu_font = mswin_get_font(NHW_MENU, attr, lpdis->hDC, FALSE);
-                SelectObject(lpdis->hDC, menu_font->hFont);
-                if (color != NO_COLOR)
-                    SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
-            }
-
             SetRect(&drawRect, x, lpdis->rcItem.top, lpdis->rcItem.right,
                     lpdis->rcItem.bottom);
             DrawText(lpdis->hDC, NH_A2W(buf, wbuf, 2), 1, &drawRect,
@@ -1074,12 +1065,6 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
         x += tm.tmAveCharWidth + tm.tmOverhang + spacing;
     } else {
-        /* heading */
-        if (iflags.use_menu_color) {
-            color = item->color;
-            if (color != NO_COLOR)
-                (void) SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
-        }
         x += tileXScaled + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
     }
 

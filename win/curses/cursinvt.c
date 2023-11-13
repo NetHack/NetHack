@@ -375,8 +375,10 @@ curs_show_invt(WINDOW *win)
     for (lineno = pi.rowoffset; lineno < pi.inuseindx; ++lineno) {
         str = pi.array[lineno].invtxt;
         accelerator = pi.array[lineno].letter;
-        attr = pi.array[lineno].c_attr;
+        attr = curses_convert_attr(pi.array[lineno].c_attr);
         color = pi.array[lineno].color;
+        if (color == NO_COLOR)
+            color = NONE;
 
         if (accelerator)
             ++item_count;
@@ -413,17 +415,9 @@ curs_show_invt(WINDOW *win)
             stroffset = pi_article_skip(str); /* to skip "a "/"an "/"the " */
             /* if/when scrolled right, invtxt for item lines gets shifted */
             stroffset += pi.coloffset;
-
-            /* only perform menu coloring on item entries, not subtitles */
-            if (iflags.use_menu_color) {
-                get_menu_coloring(str, &color, (int *) &attr);
-                attr = curses_convert_attr(attr);
-            }
         }
 
         if (stroffset < strlen(str)) {
-            if (color == NO_COLOR)
-                color = NONE;
             curses_menu_color_attr(win, color, attr, ON);
             wprintw(win, "%.*s", available_width, str + stroffset);
             curses_menu_color_attr(win, color, attr, OFF);

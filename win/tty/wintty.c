@@ -1419,11 +1419,8 @@ process_menu_window(winid window, struct WinDesc *cw)
                     (void) putchar(' ');
                     ++ttyDisplay->curx;
 
-                    if (!iflags.use_menu_color
-                        || !get_menu_coloring(curr->str, &color, &attr)) {
-                        attr = curr->attr;
-                        color = curr->color;
-                    }
+                    attr = curr->attr;
+                    color = curr->color;
 
                     /* which character to start attribute highlighting;
                        whole line for headers and such, after the selector

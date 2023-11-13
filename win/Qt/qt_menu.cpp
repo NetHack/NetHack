@@ -293,12 +293,6 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P *identifier,
 		+ str.mid(bracket+2);
 	}
     }
-    int mcolor, mattr;
-    if (::iflags.use_menu_color
-        && get_menu_coloring(str.toLatin1().constData(), &mcolor, &mattr)) {
-	itemlist[itemcount].attr = mattr;
-	itemlist[itemcount].color = mcolor;
-    }
     ++itemcount;
 
     if (glyph != NO_GLYPH)

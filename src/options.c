@@ -8014,21 +8014,6 @@ add_menu_coloring(char *tmpstr) /* never Null but could be empty */
     return add_menu_coloring_parsed(tmps, c, a);
 }
 
-boolean
-get_menu_coloring(const char *str, int *color, int *attr)
-{
-    struct menucoloring *tmpmc;
-
-    if (iflags.use_menu_color)
-        for (tmpmc = gm.menu_colorings; tmpmc; tmpmc = tmpmc->next)
-            if (regex_match(str, tmpmc->match)) {
-                *color = tmpmc->color;
-                *attr = tmpmc->attr;
-                return TRUE;
-            }
-    return FALSE;
-}
-
 /* release all menu color patterns */
 void
 free_menu_coloring(void)

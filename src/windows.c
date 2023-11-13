@@ -61,6 +61,7 @@ extern void *trace_procs_chain(int, int, void *, void *, void *);
 
 static void def_raw_print(const char *s);
 static void def_wait_synch(void);
+static boolean get_menu_coloring(const char *, int *, int *);
 
 #ifdef DUMPLOG
 static winid dump_create_nhwindow(int);
@@ -1591,5 +1592,47 @@ mixed_to_glyphinfo(const char *str, glyph_info *gip)
     }
     return str;
 }
+
+
+/*
+ *   Common code point leading into the interface-specifc
+ *   add_menu() to allow single-spot adjustments to the parameters,
+ *   such as those done by menu_colors.
+ */
+void
+add_menu(
+    winid window,  /* window to use, must be of type NHW_MENU */
+    const glyph_info *glyphinfo, /* glyph info with glyph to
+                                  * display with item */
+    const anything *identifier, /* what to return if selected */
+    char ch,                    /* selector letter (0 = pick our own) */
+    char gch,                   /* group accelerator (0 = no group) */
+    int attr,                   /* attribute for menu text (str) */
+    int color,                  /* color for menu text (str) */
+    const char *str,            /* menu text */
+    unsigned int itemflags)     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
+{
+    if (iflags.use_menu_color)
+        (void) get_menu_coloring(str, &color, &attr);
+
+    (*windowprocs.win_add_menu)(window, glyphinfo, identifier,
+                                ch, gch, attr, color, str, itemflags);
+}
+
+static boolean
+get_menu_coloring(const char *str, int *color, int *attr)
+{
+    struct menucoloring *tmpmc;
+
+    if (iflags.use_menu_color)
+        for (tmpmc = gm.menu_colorings; tmpmc; tmpmc = tmpmc->next)
+            if (regex_match(str, tmpmc->match)) {
+                *color = tmpmc->color;
+                *attr = tmpmc->attr;
+                return TRUE;
+            }
+    return FALSE;
+}
+
 
 /*windows.c*/

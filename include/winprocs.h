@@ -125,7 +125,11 @@ extern
 #define putmixed (*windowprocs.win_putmixed)
 #define display_file (*windowprocs.win_display_file)
 #define start_menu (*windowprocs.win_start_menu)
-#define add_menu (*windowprocs.win_add_menu)
+/* 3.7: There is a real add_menu() in the core now, which does
+ *      some common activities, such as menu_colors.
+ *      add_menu() is in windows.c
+ */
+/* #define add_menu (*windowprocs.win_add_menu) */
 #define end_menu (*windowprocs.win_end_menu)
 #define select_menu (*windowprocs.win_select_menu)
 #define message_menu (*windowprocs.win_message_menu)

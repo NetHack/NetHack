@@ -1314,11 +1314,9 @@ menu_create_entries(struct xwindow *wp, struct menu *curr_menu)
         XtSetArg(args[num_args], nhStr(XtNborderWidth), 0); num_args++;
         XtSetArg(args[num_args], nhStr(XtNvertDistance), 0); num_args++;
 
-        if (!iflags.use_menu_color || wp->menu_information->disable_mcolors
-            || !get_menu_coloring(curr->str, &color, &attr)) {
-            attr = curr->attr;
+        attr = curr->attr;
+        if (!wp->menu_information->disable_mcolors)
             color = curr->color;
-        }
 
         if (color != NO_COLOR) {
             if (attr != ATR_INVERSE)
