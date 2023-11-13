@@ -1170,12 +1170,16 @@ set_item_state(
     HUPSKIP();
     tty_curs(window, 4, lineno);
     term_start_attr(item->attr);
+#ifdef TEXTCOLOR
     if (item->color != NO_COLOR)
         term_start_color(item->color);
+#endif
     (void) putchar(ch);
     ttyDisplay->curx++;
+#ifdef TEXTCOLOR
     if (item->color != NO_COLOR)
         term_end_color();
+#endif
     term_end_attr(item->attr);
 }
 
