@@ -15,7 +15,7 @@
                        Original version - Eric S. Raymond
      (Edited and expanded for NetHack 3.7.0 by Mike Stephenson and others)
 
-                                November 6, 2023
+                               November 13, 2023
 
 
 
@@ -126,7 +126,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -192,7 +192,7 @@
      NetHack continues this fine tradition.  Unlike  text  adventure  games
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -258,7 +258,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -324,7 +324,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -390,7 +390,7 @@
           The number of turns elapsed so far, displayed  if  you  have  the
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -456,7 +456,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -522,7 +522,7 @@
           vicious.  Sometimes, however, they can be helpful.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -588,7 +588,7 @@
           another  location;  `,'  will  explain  the  symbol  but skip any
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -654,7 +654,7 @@
           kinds of objects?"  prompt, so no opportunity to  answer  `m'  at
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -720,7 +720,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -786,7 +786,7 @@
           and novelty (`P', recently picked up items; controlled by picking
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -852,7 +852,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -918,7 +918,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -984,7 +984,7 @@
           not  wielding  a  bow,  you  are  throwing it by hand and it will
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1050,7 +1050,7 @@
           switch  from  normal  play  to  "explore  mode",  also  known  as
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1116,7 +1116,7 @@
      (R)UNIX is a registered trademark of The Open Group.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1182,7 +1182,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1248,7 +1248,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1314,7 +1314,7 @@
           Engrave writing on the floor.  Default key is `E'.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1380,7 +1380,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1446,7 +1446,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1512,7 +1512,7 @@
           tion:quit option to require a response of yes instead.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1578,7 +1578,7 @@
           Read a scroll, a spellbook, or something else.   Default  key  is
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1644,7 +1644,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1710,7 +1710,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1776,7 +1776,7 @@
           of a path to that location.  See also #retravel.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1842,7 +1842,7 @@
           Show  the  program's  version number, plus the date and time that
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1908,7 +1908,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -1974,7 +1974,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2040,7 +2040,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2106,7 +2106,7 @@
      doors; you can walk right through.  Others have doors in  them,  which
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2172,7 +2172,7 @@
      the trap is also within line-of-sight (whether you can see at the time
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2238,7 +2238,7 @@
      Sokoban.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2304,7 +2304,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2370,7 +2370,7 @@
      and without giving feedback about them.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2436,7 +2436,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2502,7 +2502,7 @@
      grow  over time, gaining hit points and doing more damage.  Initially,
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2568,7 +2568,7 @@
      sense--perhaps it is invisible and has just tapped you on the noggin--
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2634,7 +2634,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2700,7 +2700,7 @@
      weapons,  like  arrows and spears.  To hit monsters with a weapon, you
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2766,7 +2766,7 @@
      ventory  which are considered likely to be thrown, or picking `*' will
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2832,7 +2832,7 @@
      level, and use of the weapons.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2898,7 +2898,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -2964,7 +2964,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3030,7 +3030,7 @@
      file  name of your mailbox.  You may also want to set the "MAILREADER"
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3096,7 +3096,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3162,7 +3162,7 @@
      fect  all  spells  within  the group.  Advanced skill may increase the
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3228,7 +3228,7 @@
      harmful, which are activated by putting them on.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3294,7 +3294,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3360,7 +3360,7 @@
      pared without animal products; namely, lembas  wafers,  cram  rations,
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3426,7 +3426,7 @@
      gain experience by other means.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3492,7 +3492,7 @@
      it  because  they fall into the same category of "bragging rights" and
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3558,7 +3558,7 @@
      other  instances  of the same objects doesn't record the corresponding
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3624,7 +3624,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3690,7 +3690,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3756,7 +3756,7 @@
        Change  the  way messages are shown in the top status line.  See the
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3822,7 +3822,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3888,7 +3888,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -3954,7 +3954,7 @@
        Kick      - kick  the door (if you omit untrap or decline to attempt
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4020,7 +4020,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4086,7 +4086,7 @@
        with the `O' command.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4152,7 +4152,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4218,7 +4218,7 @@
        Show corridor squares seen by night vision or a light source held by
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4284,7 +4284,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4350,7 +4350,7 @@
        Prompt  for  new  form  whenever  any monster changes shape (default
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4416,7 +4416,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4482,7 +4482,7 @@
        trap        - require `y' to confirm an attempt to move into or onto
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4548,7 +4548,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4614,7 +4614,7 @@
        empty  value  reverts to "all".)  If you want to avoid automatically
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4680,7 +4680,7 @@
        role.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4746,7 +4746,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4812,7 +4812,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4878,7 +4878,7 @@
        "symset:default" to explicitly select the default symbols.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -4944,7 +4944,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5010,7 +5010,7 @@
      Not  all  window  ports will adjust for all settings listed here.  You
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5076,7 +5076,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5142,7 +5142,7 @@
        If NetHack can, it should display a menu of existing saved games for
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5208,7 +5208,7 @@
        Specify the preferred width of each tile in a tile capable port
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5274,7 +5274,7 @@
      btntext,  captiontext,  graytext,  greytext, highlight, highlighttext,
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5340,7 +5340,7 @@
        display tiles, using  the  full  capability  of  the  VGA  hardware.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5406,7 +5406,7 @@
             > - never pickup an object that matches rest of pattern.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5472,7 +5472,7 @@
        text", and if bound to same keys, only one of those commands will be
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5538,7 +5538,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5604,7 +5604,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5670,7 +5670,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5736,7 +5736,7 @@
      ports support the use of user sounds.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5802,7 +5802,7 @@
      OPTION=hilite_status:wisdom/down/red/up/green
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5868,7 +5868,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -5934,7 +5934,7 @@
      tax for a configuration file.
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6000,7 +6000,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6066,7 +6066,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6132,7 +6132,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6198,7 +6198,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6264,7 +6264,7 @@
      representation   for  all  NetHack  glyphs  that  would  map  to  that
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6330,7 +6330,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6396,7 +6396,7 @@
        tle-endian order, "ascii" for writing the save file content in ascii
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6462,7 +6462,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6528,7 +6528,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6594,7 +6594,7 @@
      versions 1.0.1, 1.0.2, and finally 1.0.3  in  July  of  1985.   Usenet
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6660,7 +6660,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6726,7 +6726,7 @@
      Many  bugs  were fixed, abuses eliminated, and game features tuned for
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6792,7 +6792,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6858,7 +6858,7 @@
      ment Team's official nethack.org website to that effect, stating  that
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6924,7 +6924,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -6990,7 +6990,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
@@ -7056,7 +7056,7 @@
 
 
 
-     NetHack 3.7.0                                         November 6, 2023
+     NetHack 3.7.0                                        November 13, 2023
 
 
 
