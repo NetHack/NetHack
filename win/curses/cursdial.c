@@ -34,6 +34,7 @@ typedef struct nhmi {
     char accelerator;           /* Character used to select item from menu */
     char group_accel;           /* Group accelerator for menu item, if any */
     int attr;                   /* Text attributes for item */
+    int color;                  /* Color for item */
     const char *str;            /* Text of menu item */
     boolean presel;             /* Whether menu item should be preselected */
     boolean selected;           /* Whether item is currently selected */
@@ -585,7 +586,8 @@ curs_new_menu_item(winid wid, const char *str)
     new_item->identifier = cg.zeroany;
     new_item->accelerator = '\0';
     new_item->group_accel = '\0';
-    new_item->attr = 0;
+    new_item->attr = ATR_NONE;
+    new_item->color = NO_COLOR;
     new_item->str = new_str;
     new_item->presel = FALSE;
     new_item->selected = FALSE;
@@ -607,6 +609,7 @@ curses_add_nhmenu_item(
     char accelerator,
     char group_accel,
     int attr,
+    int clr,
     const char *str,
     unsigned itemflags)
 {
@@ -630,6 +633,7 @@ curses_add_nhmenu_item(
     new_item->accelerator = accelerator;
     new_item->group_accel = group_accel;
     new_item->attr = attr;
+    new_item->color = clr;
     new_item->presel = presel;
     new_item->itemflags = itemflags;
     current_items = current_menu->entries;
@@ -1204,7 +1208,9 @@ menu_display_page(
 
         for (count = 0; count < num_lines; count++) {
             tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
+            curses_toggle_color_attr(win, NO_COLOR, A_NORMAL, ON);
             mvwprintw(win, count + 1, 1, "%s", tmpstr);
+            curses_toggle_color_attr(win, NO_COLOR, A_NORMAL, OFF);
             free(tmpstr);
         }
     }
@@ -1284,6 +1290,7 @@ menu_display_page(
                 curses_menu_color_attr(win, color, attr, ON);
         } else {
             attr = menu_item_ptr->attr;
+            color = menu_item_ptr->color;
             if (color != NONE || attr != A_NORMAL)
                 curses_toggle_color_attr(win, color, attr, ON);
         }

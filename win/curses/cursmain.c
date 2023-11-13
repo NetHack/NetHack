@@ -682,7 +682,7 @@ void
 curses_add_menu(winid wid, const glyph_info *glyphinfo,
                 const ANY_P *identifier,
                 char accelerator, char group_accel, int attr,
-                int clr UNUSED, const char *str, unsigned itemflags)
+                int clr, const char *str, unsigned itemflags)
 {
     int curses_attr;
 
@@ -694,14 +694,14 @@ curses_add_menu(winid wid, const glyph_info *glyphinfo,
         /* persistent inventory window; nothing is selectable;
            omit glyphinfo because perm_invent is to the side of
            the map so usually cramped for horizontal space */
-        curs_add_invt(inv_update, accelerator, curses_attr, str);
+        curs_add_invt(inv_update, accelerator, curses_attr, clr, str);
         inv_update++;
         return;
     }
 
     curses_add_nhmenu_item(wid, glyphinfo, identifier,
                            accelerator, group_accel,
-                           curses_attr, str, itemflags);
+                           curses_attr, clr, str, itemflags);
 }
 
 /*

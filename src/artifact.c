@@ -1072,7 +1072,7 @@ dump_artifact_info(winid tmpwin)
     char buf[BUFSZ], buf2[BUFSZ];
 
     /* not a menu, but header uses same bold or whatever attribute as such */
-    putstr(tmpwin, iflags.menu_headings, "Artifacts");
+    putstr(tmpwin, iflags.menu_headings.attr, "Artifacts");
     for (m = 1; m <= NROFARTIFACTS; ++m) {
         Snprintf(buf2, sizeof buf2,
                 "[%s%s%s%s%s%s%s%s%s]", /* 9 bits overall */
@@ -1767,7 +1767,7 @@ arti_invoke(struct obj *obj)
             d_level newlev;
             winid tmpwin = create_nhwindow(NHW_MENU);
             anything any;
-            int clr = 0;
+            int clr = NO_COLOR;
 
             any = cg.zeroany; /* set all bits to zero */
             start_menu(tmpwin, MENU_BEHAVE_STANDARD);

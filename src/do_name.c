@@ -643,7 +643,7 @@ getpos_menu(coord *ccp, int gloc)
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
     char tmpbuf[BUFSZ];
-    int clr = 0;
+    int clr = NO_COLOR;
 
     gather_locs(&garr, &gcount, gloc);
 
@@ -1635,7 +1635,7 @@ docallcmd(void)
     char ch = 0;
     /* if player wants a,b,c instead of i,o when looting, do that here too */
     boolean abc = flags.lootabc;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if ((cmdq = cmdq_pop()) != 0) {
         cq = *cmdq;

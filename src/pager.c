@@ -1543,7 +1543,7 @@ do_look(int mode, coord *click_cc)
     coord cc;             /* screen pos of unknown glyph */
     boolean save_verbose; /* saved value of flags.verbose */
     boolean from_screen;  /* question from the screen */
-    int clr = 0;
+    int clr = NO_COLOR;
 
     cc.x = 0;
     cc.y = 0;
@@ -2601,7 +2601,7 @@ dohelp(void)
     menu_item *selected;
     anything any;
     int sel;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     any = cg.zeroany; /* zero all bits */
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);

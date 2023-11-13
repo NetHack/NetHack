@@ -488,7 +488,7 @@ curses_prev_mesg(void)
     boolean do_lifo = (iflags.prevmsg_window != 'f');
 #ifdef DEBUG
     static int showturn = 0; /* 1: show hero_seq value in separators */
-    int clr = 0;
+    int clr = NO_COLOR;
 
     /*
      * Set DEBUGFILES=MesgTurn in environment or sysconf to decorate

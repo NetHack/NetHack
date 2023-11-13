@@ -22,6 +22,7 @@ static void curs_show_invt(WINDOW *);
 struct pi_line {
     char *invtxt;  /* class header or inventory item without letter prefix */
     attr_t c_attr; /* attribute for class headers */
+    int color;
     char letter;   /* inventory letter; accelerator if this was really a menu;
                     * used to distinguish item lines from header lines and for
                     * display (no selection possible) */
@@ -290,6 +291,7 @@ curs_add_invt(
     int linenum,      /* line index; 1..n rather than 0..n-1 */
     char accelerator, /* selector letter for items, 0 for class headers */
     attr_t attr,      /* curses attribute for headers, 0 for items */
+    int clr,          /* NetHack color for headers, NO_COLOR for items */
     const char *str)  /* formatted inventory item, without invlet prefix,
                        * or class header text */
 {
@@ -309,6 +311,7 @@ curs_add_invt(
     newelement.invtxt = dupstr(str);
     newelement.c_attr = attr; /* note: caller has already converted 'attr'
                                * from tty-style attribute to curses one */
+    newelement.color = clr;
     newelement.letter = accelerator;
     aptr[pi.inuseindx++] = newelement;
 
@@ -373,7 +376,7 @@ curs_show_invt(WINDOW *win)
         str = pi.array[lineno].invtxt;
         accelerator = pi.array[lineno].letter;
         attr = pi.array[lineno].c_attr;
-        color = NO_COLOR;
+        color = pi.array[lineno].color;
 
         if (accelerator)
             ++item_count;
@@ -413,7 +416,6 @@ curs_show_invt(WINDOW *win)
 
             /* only perform menu coloring on item entries, not subtitles */
             if (iflags.use_menu_color) {
-                attr = 0;
                 get_menu_coloring(str, &color, (int *) &attr);
                 attr = curses_convert_attr(attr);
             }

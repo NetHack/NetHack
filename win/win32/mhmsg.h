@@ -54,7 +54,7 @@ typedef struct mswin_nhmsg_add_menu {
     char accelerator;
     char group_accel;
     int attr;
-    int clr;
+    int color;
     const char *str;
     boolean presel;
     unsigned int itemflags;

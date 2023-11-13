@@ -381,20 +381,7 @@ add_menu(windid window, glyphinfo, const anything identifier, char accelerator,
 		   If a window-port does not support all of these, it may map
 		   unsupported attributes to a supported one (e.g. map them
 		   all to ATR_INVERSE).
-                -- clr color will hold a color value including 24-bit
-                   true color values. To do that, and make it
-                   distinguishable on the windowport side of things, the
-                   windowport needs to treat it as follows:
-                      0      = not used, just ignore the clr value.
-                      1-16   = indicates a normal NetHack color value from
-                               0 - 15, so subtract 1 to get the NetHack
-                               color value.
-                      17...  = indicates a 24-bit RGB color value, so
-                               subtract 17 to get the actual 24-bit
-                               color value.
-                   When placing the values into this parameter, the core
-                   will add 1 to a NetHack color value, and add 17 to a
-                   24-bit RGB color value. 
+                -- clr is color and is one of the NetHack CLR_ defines.
                 -- str is a pointer to the menu item text.
 		-- itemflags on this item (such as MENU_ITEMFLAGS_SELECTED etc.).
 

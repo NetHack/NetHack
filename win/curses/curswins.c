@@ -534,7 +534,7 @@ curses_puts(winid wid, int attr, const char *text)
         }
         Id = cg.zeroany;
         curses_add_nhmenu_item(wid, &nul_glyphinfo, &Id, 0, 0,
-                               attr, text, MENU_ITEMFLAGS_NONE);
+                               attr, NO_COLOR, text, MENU_ITEMFLAGS_NONE);
     } else {
         waddstr(win, text);
         wnoutrefresh(win);

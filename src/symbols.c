@@ -893,7 +893,7 @@ do_symset(boolean rogueflag)
     char *symset_name, fmtstr[20];
     struct symsetentry *sl;
     int res, which_set, setcount = 0, chosen = -2, defindx = 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     which_set = rogueflag ? ROGUESET : PRIMARYSET;
     gs.symset_list = (struct symsetentry *) 0;

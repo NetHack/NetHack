@@ -188,7 +188,7 @@ extern int curses_ext_cmd(void);
 extern void curses_create_nhmenu(winid wid, unsigned long);
 extern void curses_add_nhmenu_item(winid wid, const glyph_info *,
                                    const ANY_P *identifier, char accelerator,
-                                   char group_accel, int attr,
+                                   char group_accel, int attr, int clr,
                                    const char *str, unsigned itemflags);
 extern void curs_menu_set_bottom_heavy(winid);
 extern void curses_finalize_nhmenu(winid wid, const char *prompt);
@@ -207,7 +207,7 @@ extern void curses_status_update(int, genericptr_t, int, int, int,
 
 extern void curs_purge_perminv_data(boolean);
 extern void curs_update_invt(int);
-extern void curs_add_invt(int, char, attr_t, const char *);
+extern void curs_add_invt(int, char, attr_t, int, const char *);
 
 /* cursinit.c */
 

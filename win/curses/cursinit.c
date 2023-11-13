@@ -689,7 +689,7 @@ curses_character_dialog(const char **choices, const char *prompt)
     anything identifier;
     menu_item *selected = NULL;
     winid wid = curses_get_wid(NHW_MENU);
-    int clr = 0;
+    int clr = NO_COLOR;
 
     identifier.a_void = 0;
     curses_start_menu(wid, MENU_BEHAVE_STANDARD);

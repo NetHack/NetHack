@@ -4071,8 +4071,8 @@ Key to jump to the first page in a menu.
 Default \(oq\(ha\(cq.
 .lp menu_headings
 Controls how the headings in a menu are highlighted.
-Values are \(lqnone\(rq, \(lqbold\(rq, \(lqdim\(rq, \(lqitalic\(rq,
-\(lqunderline\(rq, \(lqblink\(rq, or \(lqinverse\(rq.
+Takes a text attribute, or text color and attribute separated by ampersand.
+For allowed attributes and colors, see \(lqConfiguring Menu Colors\(rq.
 Not all ports can actually display all types.
 .lp menu_invert_all
 Key to invert all items in a menu.

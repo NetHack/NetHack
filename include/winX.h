@@ -157,6 +157,7 @@ typedef struct x11_mi {
     long pick_count;     /* specific selection count; -1 if none */
     char *str;           /* The text of the item. */
     int attr;            /* Attribute for the line. */
+    int color;           /* Color for the line. */
     boolean selected;    /* Been selected? */
     boolean preselected; /*   in advance?  */
     unsigned itemflags;  /* MENU_ITEMFLAGS_foo */

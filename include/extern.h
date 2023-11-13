@@ -2090,6 +2090,7 @@ extern void set_playmode(void);
 extern int sym_val(const char *);
 extern int query_color(const char *);
 extern int query_attr(const char *);
+extern boolean query_color_attr(color_attr *, const char *);
 extern const char *clr2colorname(int);
 extern int match_str2clr(char *);
 extern int match_str2attr(const char *, boolean);

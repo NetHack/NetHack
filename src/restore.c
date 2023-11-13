@@ -1403,7 +1403,7 @@ restore_menu(
     char **saved;
     menu_item *chosen_game = (menu_item *) 0;
     int k, clet, ch = 0; /* ch: 0 => new game */
-    int clr = 0;
+    int clr = NO_COLOR;
 
     *gp.plname = '\0';
     saved = get_saved_games(); /* array of character names */

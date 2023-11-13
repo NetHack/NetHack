@@ -103,7 +103,7 @@ void NetHackQtWindow::PutStr(int attr UNUSED, const QString& text UNUSED) { puts
 void NetHackQtWindow::StartMenu(bool using_WIN_INVEN UNUSED)
                                 { puts("unexpected StartMenu"); }
 void NetHackQtWindow::AddMenu(int glyph UNUSED, const ANY_P* identifier UNUSED,
-                              char ch UNUSED, char gch UNUSED, int attr UNUSED,
+                              char ch UNUSED, char gch UNUSED, int attr UNUSED, int clr UNUSED,
                               const QString& str UNUSED, unsigned itemflags UNUSED)
                               { puts("unexpected AddMenu"); }
 void NetHackQtWindow::EndMenu(const QString& prompt UNUSED) { puts("unexpected EndMenu"); }

@@ -587,7 +587,7 @@ doextlist(void)
     boolean redisplay = TRUE, search = FALSE;
     static const char *const headings[] = { "Extended commands",
                                       "Debugging Extended Commands" };
-    int clr = 0;
+    int clr = NO_COLOR;
 
     searchbuf[0] = '\0';
     menuwin = create_nhwindow(NHW_MENU);
@@ -778,7 +778,7 @@ extcmd_via_menu(void)
     int accelerator, prevaccelerator;
     int matchlevel = 0;
     boolean wastoolong, one_per_line;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     ret = 0;
     cbuf[0] = '\0';
@@ -2006,7 +2006,7 @@ wiz_intrinsic(void)
         long oldtimeout, newtimeout;
         const char *propname;
         menu_item *pick_list = (menu_item *) 0;
-        int clr = 0;
+        int clr = NO_COLOR;
 
         any = cg.zeroany;
         win = create_nhwindow(NHW_MENU);
@@ -2157,7 +2157,7 @@ doterrain(void)
     anything any;
     int n;
     int which;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     /*
      * normal play: choose between known map without mons, obj, and traps
@@ -3001,6 +3001,7 @@ handler_rebind_keys_add(boolean keyfirst)
     char buf[BUFSZ];
     char buf2[QBUFSZ];
     uchar key = '\0';
+    int clr = NO_COLOR;
 
     if (keyfirst) {
         pline("Bind which key? ");
@@ -3027,7 +3028,8 @@ handler_rebind_keys_add(boolean keyfirst)
     }
 
     any.a_int = -1;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "nothing: unbind the key",
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
+             "nothing: unbind the key",
              MENU_ITEMFLAGS_NONE);
 
     add_menu_str(win, "");
@@ -3040,7 +3042,7 @@ handler_rebind_keys_add(boolean keyfirst)
 
         any.a_int = (i + 1);
         Sprintf(buf, "%s: %s", ec->ef_txt, ec->ef_desc);
-        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, buf,
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, buf,
              MENU_ITEMFLAGS_NONE);
     }
     if (key)
@@ -3096,6 +3098,7 @@ handler_rebind_keys(void)
     anything any;
     int i, npick;
     menu_item *picks = (menu_item *) 0;
+    int clr = NO_COLOR;
 
 redo_rebind:
 
@@ -3104,14 +3107,14 @@ redo_rebind:
     any = cg.zeroany;
 
     any.a_int = 1;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "bind key to a command",
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "bind key to a command",
              MENU_ITEMFLAGS_NONE);
     any.a_int = 2;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "bind command to a key",
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "bind command to a key",
              MENU_ITEMFLAGS_NONE);
     if (count_bind_keys()) {
         any.a_int = 3;
-        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, 0, "view changed key binds",
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "view changed key binds",
                  MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, "Do what?");
@@ -5647,7 +5650,7 @@ static void
 mcmd_addmenu(winid win, int act, const char *txt)
 {
     anything any;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     /* TODO: fixed letters for the menu entries? */
     any = cg.zeroany;

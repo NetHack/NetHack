@@ -258,7 +258,7 @@ NetHackQtMenuWindow::MenuItem::~MenuItem()
 }
 
 void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P *identifier,
-                                  char ch, char gch, int attr,
+                                  char ch, char gch, int attr, int clr,
                                   const QString& str, unsigned itemflags)
 {
     bool presel = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
@@ -279,11 +279,11 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P *identifier,
     itemlist[itemcount].ch = ch;
     itemlist[itemcount].gch = gch;
     itemlist[itemcount].attr = attr;
+    itemlist[itemcount].color = clr;
     itemlist[itemcount].str = str;
     itemlist[itemcount].selected = itemlist[itemcount].preselected = presel;
     itemlist[itemcount].itemflags = itemflags;
     itemlist[itemcount].count = -1L;
-    itemlist[itemcount].color = -1;
     // Display the boulder symbol correctly
     if (str.left(8) == "boulder\t") {
 	int bracket = str.indexOf('[');
@@ -294,7 +294,7 @@ void NetHackQtMenuWindow::AddMenu(int glyph, const ANY_P *identifier,
 	}
     }
     int mcolor, mattr;
-    if (attr == 0 && ::iflags.use_menu_color
+    if (::iflags.use_menu_color
         && get_menu_coloring(str.toLatin1().constData(), &mcolor, &mattr)) {
 	itemlist[itemcount].attr = mattr;
 	itemlist[itemcount].color = mcolor;
@@ -618,7 +618,7 @@ void NetHackQtMenuWindow::AddRow(int row, const MenuItem& mi)
     table->item(row, 4)->setFlags(Qt::ItemIsEnabled);
     WidenColumn(4, fm.QFM_WIDTH(text));
 
-    if ((int) mi.color != -1) {
+    if ((int) mi.color != NO_COLOR) {
 	twi->setForeground(colors[mi.color].q);
     }
 
@@ -1344,13 +1344,13 @@ void NetHackQtMenuOrTextWindow::StartMenu(bool using_WIN_INVEN)
 }
 void NetHackQtMenuOrTextWindow::AddMenu(
     int glyph, const ANY_P* identifier,
-    char ch, char gch, int attr,
+    char ch, char gch, int attr, int clr,
     const QString& str, unsigned itemflags)
 {
     if (!actual)
         MenuOrText_too_soon_warning("AddMenu");
     else
-        actual->AddMenu(glyph, identifier, ch, gch, attr, str, itemflags);
+        actual->AddMenu(glyph, identifier, ch, gch, attr, clr, str, itemflags);
 }
 void NetHackQtMenuOrTextWindow::EndMenu(const QString& prompt)
 {

@@ -337,7 +337,7 @@ prompt_for_player_selection(void)
     anything any;
     menu_item *selected = 0;
     DWORD box_result;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     logDebug("prompt_for_player_selection()\n");
 
@@ -1156,6 +1156,7 @@ mswin_add_menu(winid wid, const glyph_info *glyphinfo,
         data.accelerator = accelerator;
         data.group_accel = group_accel;
         data.attr = attr;
+        data.color = clr;
         data.str = str;
         data.presel = presel;
         data.itemflags = itemflags;

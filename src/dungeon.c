@@ -2281,7 +2281,7 @@ tport_menu(
 {
     char tmpbuf[BUFSZ];
     anything any;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     lchoices->lev[lchoices->idx] = lvl_p->dlevel;
     lchoices->dgn[lchoices->idx] = lvl_p->dnum;

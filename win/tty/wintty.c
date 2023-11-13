@@ -1170,8 +1170,12 @@ set_item_state(
     HUPSKIP();
     tty_curs(window, 4, lineno);
     term_start_attr(item->attr);
+    if (item->color != NO_COLOR)
+        term_start_color(item->color);
     (void) putchar(ch);
     ttyDisplay->curx++;
+    if (item->color != NO_COLOR)
+        term_end_color();
     term_end_attr(item->attr);
 }
 
@@ -1412,8 +1416,10 @@ process_menu_window(winid window, struct WinDesc *cw)
                     ++ttyDisplay->curx;
 
                     if (!iflags.use_menu_color
-                        || !get_menu_coloring(curr->str, &color, &attr))
+                        || !get_menu_coloring(curr->str, &color, &attr)) {
                         attr = curr->attr;
+                        color = curr->color;
+                    }
 
                     /* which character to start attribute highlighting;
                        whole line for headers and such, after the selector
@@ -2514,7 +2520,7 @@ tty_add_menu(
     char ch,                /* selector letter (0 = pick our own) */
     char gch,               /* group accelerator (0 = no group) */
     int attr,               /* attribute for string (like tty_putstr()) */
-    int clr UNUSED,         /* color for string */
+    int clr,                /* color for string */
     const char *str,        /* menu string */
     unsigned int itemflags) /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
@@ -2564,6 +2570,7 @@ tty_add_menu(
     item->selector = ch;
     item->gselector = gch;
     item->attr = attr;
+    item->color = clr;
     item->str = dupstr(newstr);
 
     item->next = cw->mlist;
@@ -2601,7 +2608,7 @@ tty_end_menu(
     short len;
     int lmax, n;
     char menu_ch;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (window == WIN_ERR || (cw = wins[window]) == (struct WinDesc *) 0
         || cw->type != NHW_MENU) {

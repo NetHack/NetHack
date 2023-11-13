@@ -78,6 +78,10 @@ curses_read_char(void)
 void
 curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
+    if (color == NO_COLOR)
+        color = NONE;
+    if (attr == ATR_NONE)
+        attr = NONE;
 #ifdef TEXTCOLOR
     int curses_color;
 
@@ -661,7 +665,7 @@ curses_view_file(const char *filename, boolean must_exist)
     char buf[BUFSZ];
     menu_item *selected = NULL;
     dlb *fp = dlb_fopen(filename, "r");
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (fp == NULL) {
         if (must_exist)

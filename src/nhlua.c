@@ -703,7 +703,7 @@ nhl_menu(lua_State *L)
     winid tmpwin;
     anything any;
     menu_item *picks = (menu_item *) 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (argc < 2 || argc > 4) {
         nhl_error(L, "Wrong args");

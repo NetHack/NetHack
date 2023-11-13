@@ -37,7 +37,7 @@ public:
         }
 	virtual void StartMenu(bool using_WIN_INVEN = false);
         virtual void AddMenu(int glyph, const ANY_P* identifier,
-                             char ch, char gch, int attr,
+                             char ch, char gch, int attr, int clr,
                              const QString& str, unsigned itemflags);
 	virtual void EndMenu(const QString& prompt);
 	virtual int SelectMenu(int how, MENU_ITEM_P **menu_list);

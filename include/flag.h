@@ -186,6 +186,10 @@ struct debug_flags {
 #endif
 };
 
+typedef struct color_and_attr {
+    int color, attr;
+} color_attr;
+
 /*
  * Stuff that really isn't option or platform related and does not
  * get saved and restored.  They are set and cleared during the game
@@ -251,7 +255,7 @@ struct instance_flags {
     int getpos_coords;    /* show coordinates when getting cursor position */
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
-    int menu_headings;    /* ATR for menu headings */
+    color_attr menu_headings;    /* ATR for menu headings */
     uint32_t colorcount;    /* store how many colors terminal is capable of */
     boolean use_truecolor;  /* force use of truecolor */
 #ifdef ALTMETA

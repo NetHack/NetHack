@@ -471,11 +471,11 @@ void NetHackQtBind::qt_start_menu(winid wid, unsigned long mbehavior UNUSED)
 }
 
 void NetHackQtBind::qt_add_menu(winid wid, const glyph_info *glyphinfo,
-    const ANY_P * identifier, char ch, char gch, int attr, int clr UNUSED,
+    const ANY_P * identifier, char ch, char gch, int attr, int clr,
     const char *str, unsigned itemflags)
 {
     NetHackQtWindow* window=id_to_window[(int)wid];
-    window->AddMenu(glyphinfo->glyph, identifier, ch, gch, attr,
+    window->AddMenu(glyphinfo->glyph, identifier, ch, gch, attr, clr,
             QString::fromLatin1(str),
             itemflags);
 }

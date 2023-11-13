@@ -1081,11 +1081,12 @@ disclose(int how, boolean taken)
         if (c == 'y') {
             /* save and restore menu_headings in case something like
                #saveoptions is ever allowed to be run at the very end */
-            int save_menu_headings = iflags.menu_headings;
+            color_attr save_menu_headings = iflags.menu_headings;
 
             /* caller has already ID'd everything; we pass 'want_reply=True'
                to force display_pickinv() to avoid using WIN_INVENT */
-            iflags.menu_headings = ATR_NONE; /* don't highlight class hdrs */
+            iflags.menu_headings.attr = ATR_NONE; /* don't highlight class hdrs */
+            iflags.menu_headings.color = NO_COLOR;
             (void) display_inventory((char *) 0, TRUE);
             iflags.menu_headings = save_menu_headings;
             container_contents(gi.invent, TRUE, TRUE, FALSE);

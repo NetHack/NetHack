@@ -15,7 +15,7 @@ int curses_ext_cmd(void);
 void curses_create_nhmenu(winid wid, unsigned long);
 void curses_add_nhmenu_item(winid wid, const glyph_info *glyphinfo,
                             const ANY_P *identifier, char accelerator,
-                            char group_accel, int attr,
+                            char group_accel, int attr, int clr,
                             const char *str, unsigned itemflags);
 void curs_menu_set_bottom_heavy(winid);
 void curses_finalize_nhmenu(winid wid, const char *prompt);

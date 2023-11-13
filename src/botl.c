@@ -25,7 +25,7 @@ add_menu_heading(winid tmpwin, const char *buf)
     anything any = cg.zeroany;
 
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             iflags.menu_headings, 0,
+             iflags.menu_headings.attr, iflags.menu_headings.color,
              buf, MENU_ITEMFLAGS_NONE);
 }
 
@@ -35,7 +35,7 @@ add_menu_str(winid tmpwin, const char *buf)
     anything any = cg.zeroany;
 
     add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, 0,
+             ATR_NONE, NO_COLOR,
              buf, MENU_ITEMFLAGS_NONE);
 }
 
@@ -1124,7 +1124,7 @@ cond_menu(void)
     menu_item *picks = (menu_item *) 0;
     char mbuf[QBUFSZ];
     boolean showmenu = TRUE;
-    int clr = 0;
+    int clr = NO_COLOR;
     boolean changed = FALSE;
 
     do {
@@ -2465,7 +2465,7 @@ query_arrayvalue(
     anything any;
     menu_item *picks = (menu_item *) 0;
     int adj = (arrmin > 0) ? 1 : arrmax;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -2820,7 +2820,7 @@ query_conditions(void)
     winid tmpwin;
     anything any;
     menu_item *picks = (menu_item *) 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -3296,7 +3296,7 @@ static char *
 status_hilite2str(struct hilite_s *hl)
 {
     static char buf[BUFSZ];
-    int clr = 0, attr = 0;
+    int clr = NO_COLOR, attr = ATR_NONE;
     char behavebuf[BUFSZ];
     char clrbuf[BUFSZ];
     char attrbuf[BUFSZ];
@@ -3381,7 +3381,7 @@ status_hilite_menu_choose_field(void)
     int i, res, fld = BL_FLUSH;
     anything any;
     menu_item *picks = (menu_item *) 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -3419,7 +3419,7 @@ status_hilite_menu_choose_behavior(int fld)
     char buf[BUFSZ];
     int at;
     int onlybeh = BL_TH_NONE, nopts = 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (fld < 0 || fld >= MAXBLSTATS)
         return BL_TH_NONE;
@@ -3523,7 +3523,7 @@ status_hilite_menu_choose_updownboth(
     char buf[BUFSZ];
     anything any;
     menu_item *picks = (menu_item *) 0;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
@@ -4060,7 +4060,7 @@ status_hilite_menu_fld(int fld)
     struct _status_hilite_line_str *hlstr;
     char buf[BUFSZ];
     boolean acted;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (!count) {
         if (status_hilite_menu_add(fld)) {
@@ -4200,7 +4200,7 @@ status_hilite_menu(void)
     anything any;
     boolean redo;
     int countall;
-    int clr = 0;
+    int clr = NO_COLOR;
 
  shlmenu_redo:
     redo = FALSE;

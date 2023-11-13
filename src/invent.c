@@ -2763,7 +2763,7 @@ static void
 ia_addmenu(winid win, int act, char let, const char *txt)
 {
     anything any;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     any = cg.zeroany;
     any.a_int = act;
@@ -3295,7 +3295,7 @@ display_pickinv(
     unsigned sortflags;
     Loot *sortedinvent, *srtinv;
     boolean wizid = (wizard && iflags.override_ID), gotsomething = FALSE;
-    int clr = 0, menu_behavior = MENU_BEHAVE_STANDARD;
+    int clr = NO_COLOR, menu_behavior = MENU_BEHAVE_STANDARD;
     boolean show_gold = TRUE, inuse_only = FALSE,
             skipped_gold = FALSE, skipped_noninuse = FALSE,
             doing_perm_invent = FALSE, save_flags_sortpack = flags.sortpack;
@@ -3623,7 +3623,7 @@ display_used_invlets(char avoidlet)
     winid win;
     anything any;
     menu_item *selected;
-    int clr = 0;
+    int clr = NO_COLOR;
 
     if (gi.invent) {
         win = create_nhwindow(NHW_MENU);

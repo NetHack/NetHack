@@ -32,6 +32,7 @@ typedef struct mswin_menu_item {
     char accelerator;
     char group_accel;
     int attr;
+    int color;
     char str[NHMENU_STR_SIZE];
     boolean presel;
     unsigned int itemflags;
@@ -623,6 +624,7 @@ onMSNHCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
         data->menui.menu.items[new_item].accelerator = msg_data->accelerator;
         data->menui.menu.items[new_item].group_accel = msg_data->group_accel;
         data->menui.menu.items[new_item].attr = msg_data->attr;
+        data->menui.menu.items[new_item].color = msg_data->color;
         strncpy(data->menui.menu.items[new_item].str, msg_data->str,
                 NHMENU_STR_SIZE);
         /* prevent & being interpreted as a mnemonic start */
@@ -1072,6 +1074,12 @@ onDrawItem(HWND hWnd, WPARAM wParam, LPARAM lParam)
         }
         x += tm.tmAveCharWidth + tm.tmOverhang + spacing;
     } else {
+        /* heading */
+        if (iflags.use_menu_color) {
+            color = item->color;
+            if (color != NO_COLOR)
+                (void) SetTextColor(lpdis->hDC, nhcolor_to_RGB(color));
+        }
         x += tileXScaled + tm.tmAveCharWidth + tm.tmOverhang + 2 * spacing;
     }
 
