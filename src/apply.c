@@ -38,6 +38,7 @@ static int grapple_range(void);
 static boolean can_grapple_location(coordxy, coordxy);
 static int use_grapple(struct obj *);
 static void discard_broken_wand(void);
+static void broken_wand_explode(struct obj *, int, int);
 static int do_break_wand(struct obj *);
 static int apply_ok(struct obj *);
 static int flip_through_book(struct obj *);
@@ -3726,6 +3727,14 @@ discard_broken_wand(void)
     nomul(0);
 }
 
+static void
+broken_wand_explode(struct obj *obj, int dmg, int expltype)
+{
+    explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
+    makeknown(obj->otyp); /* explode describes the effect */
+    discard_broken_wand();
+}
+
 /* return 1 if the wand is broken, hence some time elapsed */
 static int
 do_break_wand(struct obj *obj)
@@ -3739,7 +3748,6 @@ do_break_wand(struct obj *obj)
     boolean affects_objects;
     boolean shop_damage = FALSE;
     boolean fillmsg = FALSE;
-    int expltype = EXPL_MAGICAL;
     char confirm[QBUFSZ], buf[BUFSZ];
     boolean is_fragile = (objdescr_is(obj, "balsa")
                           || objdescr_is(obj, "glass"));
@@ -3815,21 +3823,16 @@ do_break_wand(struct obj *obj)
         return ECMD_TIME;
     case WAN_DEATH:
     case WAN_LIGHTNING:
-        dmg *= 4;
-        goto wanexpl;
+        broken_wand_explode(obj, dmg * 4, EXPL_MAGICAL);
+        return ECMD_TIME;
     case WAN_FIRE:
-        expltype = EXPL_FIERY;
-        /*FALLTHRU*/
+        broken_wand_explode(obj, dmg * 2, EXPL_FIERY);
+        return ECMD_TIME;
     case WAN_COLD:
-        if (expltype == EXPL_MAGICAL)
-            expltype = EXPL_FROSTY;
-        dmg *= 2;
-        /*FALLTHRU*/
+        broken_wand_explode(obj, dmg * 2, EXPL_FROSTY);
+        return ECMD_TIME;
     case WAN_MAGIC_MISSILE:
- wanexpl:
-        explode(u.ux, u.uy, -(obj->otyp), dmg, WAND_CLASS, expltype);
-        makeknown(obj->otyp); /* explode describes the effect */
-        discard_broken_wand();
+        broken_wand_explode(obj, dmg, EXPL_MAGICAL);
         return ECMD_TIME;
     case WAN_STRIKING:
         /* we want this before the explosion instead of at the very end */
