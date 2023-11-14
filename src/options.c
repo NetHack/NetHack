@@ -423,10 +423,12 @@ ask_do_tutorial(void)
             any = cg.zeroany;
             any.a_char = 'y';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, NO_COLOR, "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, NO_COLOR,
+                     "Yes, do a tutorial", MENU_ITEMFLAGS_NONE);
             any.a_char = 'n';
             add_menu(win, &nul_glyphinfo, &any, any.a_char, 0,
-                     ATR_NONE, NO_COLOR, "No, just start play", MENU_ITEMFLAGS_NONE);
+                     ATR_NONE, NO_COLOR,
+                     "No, just start play", MENU_ITEMFLAGS_NONE);
 
             add_menu_str(win, "");
             add_menu_str(win, buf);
@@ -5820,7 +5822,8 @@ handler_perminv_mode(void)
         Sprintf(buf, "%s%s%s", pi0, sepbuf, perminv_modes[i][2]);
         let = ((i & (int) InvSparse) != 0) ? highc(pi1[0]) : pi0[0];
         any.a_int = i + 1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, let, '0' + i, ATR_NONE, 0,
+        add_menu(tmpwin, &nul_glyphinfo, &any, let, '0' + i,
+                 ATR_NONE, NO_COLOR,
                  buf, (i == old_pi) ? MENU_ITEMFLAGS_SELECTED
                                     : MENU_ITEMFLAGS_NONE);
     }

@@ -3555,8 +3555,8 @@ status_hilite_menu_choose_updownboth(
             Sprintf(buf, "Value goes up");
         any = cg.zeroany;
         any.a_int = 10 + GT_VALUE;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE,
-             clr, buf, MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0, ATR_NONE, clr,
+                 buf, MENU_ITEMFLAGS_NONE);
     }
     Sprintf(buf, "Select field %s value:", initblstats[fld].fldname);
     end_menu(tmpwin, buf);
@@ -4076,9 +4076,8 @@ status_hilite_menu_fld(int fld)
     if (count) {
         any = cg.zeroany;
         any.a_int = -1;
-        add_menu(tmpwin, &nul_glyphinfo, &any, 'X', 0, ATR_NONE,
-                 clr, "Remove selected hilites",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(tmpwin, &nul_glyphinfo, &any, 'X', 0, ATR_NONE, clr,
+                 "Remove selected hilites", MENU_ITEMFLAGS_NONE);
     }
 
 #ifndef SCORE_ON_BOTL

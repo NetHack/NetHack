@@ -3107,15 +3107,15 @@ redo_rebind:
     any = cg.zeroany;
 
     any.a_int = 1;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "bind key to a command",
-             MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
+             "bind key to a command", MENU_ITEMFLAGS_NONE);
     any.a_int = 2;
-    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "bind command to a key",
-             MENU_ITEMFLAGS_NONE);
+    add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
+             "bind command to a key", MENU_ITEMFLAGS_NONE);
     if (count_bind_keys()) {
         any.a_int = 3;
-        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr, "view changed key binds",
-                 MENU_ITEMFLAGS_NONE);
+        add_menu(win, &nul_glyphinfo, &any, '\0', 0, ATR_NONE, clr,
+                 "view changed key binds", MENU_ITEMFLAGS_NONE);
     }
     end_menu(win, "Do what?");
     npick = select_menu(win, PICK_ONE, &picks);
