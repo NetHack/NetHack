@@ -859,7 +859,7 @@ spitmm(struct monst* mtmp, struct attack* mattk, struct monst* mtarg)
                 gm.mtarget = mtarg;
             m_throw(mtmp, mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby),
                     distmin(mtmp->mx,mtmp->my,tx,ty), otmp);
-            gm.mtarget = (struct monst *)0;
+            gm.mtarget = (struct monst *) 0;
             nomul(0);
 
             /* If this is a pet, it'll get hungry. Minions and

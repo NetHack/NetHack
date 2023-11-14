@@ -341,7 +341,7 @@ map_cleanup(void)
                 /* in case any boulders are on liquid, delete them */
                 while ((otmp = sobj_at(BOULDER, x, y)) != 0) {
                     obj_extract_self(otmp);
-                    obfree(otmp, (struct obj *)0);
+                    obfree(otmp, (struct obj *) 0);
                 }
 
                 /* traps on liquid? */

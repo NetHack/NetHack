@@ -107,7 +107,7 @@ sysopt_release(void)
         sysopt.debugfiles = (char *) 0;
 #ifdef DUMPLOG
     if (sysopt.dumplogfile)
-        free((genericptr_t)sysopt.dumplogfile), sysopt.dumplogfile=(char *)0;
+        free((genericptr_t) sysopt.dumplogfile), sysopt.dumplogfile=(char *) 0;
 #endif
     if (sysopt.genericusers)
         free((genericptr_t) sysopt.genericusers),

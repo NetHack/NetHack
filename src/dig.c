@@ -2129,7 +2129,7 @@ escape_tomb(void)
                 surface(u.ux, u.uy));
 
             good = (tunnels(gy.youmonst.data) && !needspick(gy.youmonst.data))
-                      ? dighole(TRUE, FALSE, (coord *)0) : TRUE;
+                      ? dighole(TRUE, FALSE, (coord *) 0) : TRUE;
             if (good)
                 unearth_you();
         }

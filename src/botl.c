@@ -3765,7 +3765,7 @@ status_hilite_menu_add(int origfld)
         if (initblstats[fld].anytype != ANY_STR) {
             boolean ltok = (fld != BL_TIME), gtok = TRUE;
 
-            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *)0,
+            lt_gt_eq = status_hilite_menu_choose_updownboth(fld, (char *) 0,
                                                             ltok, gtok);
             if (lt_gt_eq == NO_LTEQGT)
                 goto choose_behavior;

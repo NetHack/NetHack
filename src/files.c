@@ -504,9 +504,9 @@ zero_nhfile(NHFILE *nhfp)
         nhfp->fieldlevel = FALSE;
         nhfp->addinfo = FALSE;
         nhfp->bendian = IS_BIGENDIAN();
-        nhfp->fpdef = (FILE *)0;
-        nhfp->fplog = (FILE *)0;
-        nhfp->fpdebug = (FILE *)0;
+        nhfp->fpdef = (FILE *) 0;
+        nhfp->fplog = (FILE *) 0;
+        nhfp->fpdebug = (FILE *) 0;
         nhfp->count = 0;
         nhfp->eof = FALSE;
         nhfp->fnidx = 0;
@@ -1202,7 +1202,7 @@ restore_saved_game(void)
     if ((nhfp = open_savefile()) != 0) {
         if (validate(nhfp, fq_save, FALSE) != 0) {
             close_nhfile(nhfp);
-            nhfp = (NHFILE *)0;
+            nhfp = (NHFILE *) 0;
             (void) delete_savefile();
         }
     }

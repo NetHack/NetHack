@@ -1473,7 +1473,7 @@ do_screen_description(
 
  didlook:
     if (looked) {
-        struct permonst *pm = (struct permonst *)0;
+        struct permonst *pm = (struct permonst *) 0;
 
         if (found > 1 || need_to_look) {
             char monbuf[BUFSZ];

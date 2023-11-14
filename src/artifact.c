@@ -137,7 +137,7 @@ artiname(int artinum)
    into an artifact of matching type, or returned as-is if that's not
    possible.
    For the 2nd case, caller should use ``obj = mk_artifact(obj, A_NONE);''
-   for the 1st, ``obj = mk_artifact((struct obj *)0, some_alignment);''.
+   for the 1st, ``obj = mk_artifact((struct obj *) 0, some_alignment);''.
  */
 struct obj *
 mk_artifact(

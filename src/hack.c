@@ -1809,7 +1809,7 @@ domove_fight_ironbars(coordxy x, coordxy y)
             if (obj->quan > 1L)
                 obj = splitobj(obj, 1L);
             else
-                setuwep((struct obj *)0);
+                setuwep((struct obj *) 0);
             freeinv(obj);
             breakflags |= BRK_KNOWN2BREAK;
         } else {

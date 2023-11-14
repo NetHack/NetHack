@@ -1522,7 +1522,7 @@ cancel_doff(struct obj *obj, long slotmask)
 {
     /* Called by setworn() for old item in specified slot or by setnotworn()
      * for specified item.  We don't want to call cancel_don() if we got
-     * here via <X>_off() -> setworn((struct obj *)0) -> cancel_doff()
+     * here via <X>_off() -> setworn((struct obj *) 0) -> cancel_doff()
      * because that would stop the 'A' command from continuing with next
      * selected item.  So do_takeoff() sets a flag in takeoff.mask for us.
      * [For taking off an individual item with 'T'/'R'/'w-', it doesn't

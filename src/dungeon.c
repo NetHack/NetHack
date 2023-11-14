@@ -2667,7 +2667,7 @@ query_annotation(d_level *lev)
 int
 donamelevel(void)
 {
-    query_annotation((d_level *)0);
+    query_annotation((d_level *) 0);
     return ECMD_OK;
 }
 
@@ -2760,7 +2760,7 @@ find_mapseen_by_str(const char *s)
 void
 rm_mapseen(int ledger_num)
 {
-    mapseen *mptr, *mprev = (mapseen *)0;
+    mapseen *mptr, *mprev = (mapseen *) 0;
     struct cemetery *bp, *bpnext;
 
     for (mptr = gm.mapseenchn; mptr; mprev = mptr, mptr = mptr->next)
@@ -3393,7 +3393,7 @@ show_overview(
     /* if game is over or we're not in the endgame yet, show the dungeon */
     if (why != 0 || !In_endgame(&u.uz))
         traverse_mapseenchn(0, win, why, reason, &lastdun);
-    end_menu(win, (char *)0);
+    end_menu(win, (char *) 0);
     n = select_menu(win, (why != -1) ? PICK_NONE : PICK_ONE, &selected);
     if (n > 0) {
         int ledger;
