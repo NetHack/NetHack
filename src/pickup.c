@@ -1716,6 +1716,7 @@ pickup_object(
     boolean telekinesis) /* not picking it up directly by hand */
 {
     int res, nearload;
+    const char* prefix;
 
     if (obj->quan < count) {
         impossible("pickup_object: count %ld > quan %ld?", count, obj->quan);
@@ -1785,8 +1786,12 @@ pickup_object(
     if (uwep && uwep == obj)
         gm.mrg_to_wielded = TRUE;
     nearload = near_capacity();
-    prinv(nearload == SLT_ENCUMBER ? moderateloadmsg : (char *) 0, obj,
-          count);
+    prefix = (nearload >= EXT_ENCUMBER) ? overloadmsg
+        : (nearload >= HVY_ENCUMBER) ? nearloadmsg
+        : (nearload >= MOD_ENCUMBER) ? moderateloadmsg
+        : (nearload >= SLT_ENCUMBER) ? slightloadmsg
+        : (char *) 0;
+    prinv(prefix, obj, count);
     gm.mrg_to_wielded = FALSE;
     return 1;
 }
