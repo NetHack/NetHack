@@ -62,7 +62,8 @@ static void tipcontainer(struct obj *);
 #define Icebox (gc.current_container->otyp == ICE_BOX)
 
 static const char
-        moderateloadmsg[] = "You have a little trouble lifting",
+        slightloadmsg[] = "You have a little trouble lifting",
+        moderateloadmsg[] = "You have trouble lifting",
         nearloadmsg[] = "You have much trouble lifting",
         overloadmsg[] = "You have extreme difficulty lifting";
 
@@ -1672,11 +1673,10 @@ lift_object(
                 long savequan = obj->quan;
 
                 obj->quan = *cnt_p;
-                Strcpy(qbuf, (next_encumbr > HVY_ENCUMBER)
-                                 ? overloadmsg
-                                 : (next_encumbr > MOD_ENCUMBER)
-                                       ? nearloadmsg
-                                       : moderateloadmsg);
+                Strcpy(qbuf, (next_encumbr >= EXT_ENCUMBER) ? overloadmsg
+                                 : (next_encumbr >= HVY_ENCUMBER) ? nearloadmsg
+                                 : (next_encumbr >= MOD_ENCUMBER) ? moderateloadmsg
+                                 : slightloadmsg);
                 if (container)
                     (void) strsubst(qbuf, "lifting", "removing");
                 Strcat(qbuf, " ");
