@@ -356,7 +356,7 @@ nh_snprintf(const char *func UNUSED, int line UNUSED, char *str, size_t size,
     n = vsnprintf(str, size, fmt, ap);
     va_end(ap);
 
-    if (n < 0 || (size_t)n >= size) { /* is there a problem? */
+    if (n < 0 || (size_t) n >= size) { /* is there a problem? */
         str[size-1] = 0; /* make sure it is nul terminated */
     }
 

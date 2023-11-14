@@ -84,7 +84,7 @@ rn2_on_display_rng(register int x)
 {
     static unsigned seed = 1;
     seed *= 2739110765;
-    return (int)((seed >> 16) % (unsigned)x);
+    return (int) ((seed >> 16) % (unsigned) x);
 }
 #endif  /* USE_ISAAC64 */
 

@@ -1335,7 +1335,7 @@ nhl_debug_flags(lua_State *L)
     /* disable monster generation */
     val = get_table_boolean_opt(L, "mongen", -1);
     if (val != -1) {
-        iflags.debug_mongen = !(boolean)val; /* value in lua is negated */
+        iflags.debug_mongen = !(boolean) val; /* value in lua is negated */
         if (iflags.debug_mongen) {
             register struct monst *mtmp, *mtmp2;
 
@@ -1351,13 +1351,13 @@ nhl_debug_flags(lua_State *L)
     /* prevent hunger */
     val = get_table_boolean_opt(L, "hunger", -1);
     if (val != -1) {
-        iflags.debug_hunger = !(boolean)val; /* value in lua is negated */
+        iflags.debug_hunger = !(boolean) val; /* value in lua is negated */
     }
 
     /* allow overwriting stairs */
     val = get_table_boolean_opt(L, "overwrite_stairs", -1);
     if (val != -1) {
-        iflags.debug_overwrite_stairs = (boolean)val;
+        iflags.debug_overwrite_stairs = (boolean) val;
     }
 
     return 0;
@@ -1955,7 +1955,7 @@ nhl_loadlua(lua_State *L, const char *fname)
          * in use, and fseek(SEEK_END) only yields an upper bound on
          * the actual amount of data in that situation.]
          */
-        if ((cnt = dlb_fread(bufin, 1, min((int)buflen, LOADCHUNKSIZE), fh)) < 0L)
+        if ((cnt = dlb_fread(bufin, 1, min((int) buflen, LOADCHUNKSIZE), fh)) < 0L)
             break;
         buflen -= cnt; /* set up for next iteration, if any */
         if (cnt == 0L) {
@@ -2384,7 +2384,7 @@ opencheckpat(lua_State *L, const char *ename, int param)
     lua_pushstring(luapat, string);                              /* -0,+1 */
 
 
-    (void)lua_getfield(L, -1, ename);       /* pattern              -0,+1 */
+    (void) lua_getfield(L, -1, ename);       /* pattern              -0,+1 */
     lua_pop(L, 1);                                               /* -1,+0 */
     string = lua_tolstring(L, -1, NULL);                         /* -0,+0 */
     lua_pushstring(luapat, string);                              /* -0,+1 */
@@ -2511,7 +2511,7 @@ hook_open(lua_State *L)
          * doesn't have to work, but POSIX says it does.  So it
          * _should_ work everywhere but all we can do without messing
          * around inside Lua is to try to keep the compiler quiet. */
-        io_open = (int (*)(lua_State *))lua_topointer(L, -1);
+        io_open = (int (*)(lua_State *)) lua_topointer(L, -1);
         lua_pushcfunction(L, hooked_open);
         lua_setfield(L, -1, "open");
         rv = TRUE;

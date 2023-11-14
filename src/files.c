@@ -285,7 +285,7 @@ nh_basename(const char *fname, boolean keep_suffix)
  *
  *   Sample:
  *      The following call:
- *  (void)fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+ * (void) fname_encode("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
  *                     '%', "This is a % test!", buf, 512);
  *      results in this encoding:
  *          "This%20is%20a%20%25%20test%21"
@@ -516,7 +516,7 @@ zero_nhfile(NHFILE *nhfp)
 static NHFILE *
 new_nhfile(void)
 {
-    NHFILE *nhfp = (NHFILE *)alloc(sizeof(NHFILE));
+    NHFILE *nhfp = (NHFILE *) alloc(sizeof(NHFILE));
 
     zero_nhfile(nhfp);
     return nhfp;

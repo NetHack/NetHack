@@ -80,7 +80,7 @@ create_region(NhRect *rects, int nrect)
     NhRegion *reg;
 
     reg = (NhRegion *) alloc(sizeof(NhRegion));
-    (void) memset((genericptr_t)reg, 0, sizeof(NhRegion));
+    (void) memset((genericptr_t) reg, 0, sizeof(NhRegion));
     /* Determines bounding box */
     if (nrect > 0) {
         reg->bounding_box = rects[0];

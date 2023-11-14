@@ -317,7 +317,7 @@ lib_dlb_fread(char *buf, int size, int quan, dlb *dp)
     dp->mark += nbytes;
     dp->lib->fmark += nbytes;
 
-    return (int)nread;
+    return (int) nread;
 }
 
 static int

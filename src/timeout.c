@@ -2315,7 +2315,7 @@ write_timer(NHFILE* nhfp, timer_element* timer)
     case TIMER_OBJECT:
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+                bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
         } else {
             /* replace object pointer with id */
             arg_save.a_obj = timer->arg.a_obj;
@@ -2323,7 +2323,7 @@ write_timer(NHFILE* nhfp, timer_element* timer)
             timer->arg.a_uint = (arg_save.a_obj)->o_id;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+                bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
             timer->arg.a_obj = arg_save.a_obj;
             timer->needs_fixup = 0;
         }
@@ -2332,7 +2332,7 @@ write_timer(NHFILE* nhfp, timer_element* timer)
     case TIMER_MONSTER:
         if (timer->needs_fixup) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+                bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
         } else {
             /* replace monster pointer with id */
             arg_save.a_monst = timer->arg.a_monst;
@@ -2340,7 +2340,7 @@ write_timer(NHFILE* nhfp, timer_element* timer)
             timer->arg.a_uint = (arg_save.a_monst)->m_id;
             timer->needs_fixup = 1;
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t)timer, sizeof(timer_element));
+                bwrite(nhfp->fd, (genericptr_t) timer, sizeof(timer_element));
             timer->arg.a_monst = arg_save.a_monst;
             timer->needs_fixup = 0;
         }

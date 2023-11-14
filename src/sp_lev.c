@@ -961,7 +961,7 @@ flip_level_rnd(int flp, boolean extras)
 static void
 sel_set_wall_property(coordxy x, coordxy y, genericptr_t arg)
 {
-    int prop = *(int *)arg;
+    int prop = *(int *) arg;
 
     if (IS_STWALL(levl[x][y].typ) || IS_TREE(levl[x][y].typ)
         /* 3.6.2: made iron bars eligible to be flagged nondiggable
@@ -984,7 +984,7 @@ set_wall_property(coordxy x1, coordxy y1, coordxy x2, coordxy y2, int prop)
     y2 = min(y2, ROWNO - 1);
     for (y = y1; y <= y2; y++)
         for (x = x1; x <= x2; x++) {
-            sel_set_wall_property(x, y, (genericptr_t)&prop);
+            sel_set_wall_property(x, y, (genericptr_t) &prop);
         }
 }
 
@@ -6112,7 +6112,7 @@ lspo_exclusion(lua_State *L)
 static void
 sel_set_lit(coordxy x, coordxy y, genericptr_t arg)
 {
-     int lit = *(int *)arg;
+     int lit = *(int *) arg;
 
      levl[x][y].lit = (levl[x][y].typ == LAVAPOOL) ? 1 : lit;
 }

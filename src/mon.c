@@ -4107,7 +4107,7 @@ iter_mons_safe(boolean (*func)(struct monst *))
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         nmons++;
 
-    monarr = (struct monst **)alloc(nmons * sizeof(struct monst *));
+    monarr = (struct monst **) alloc(nmons * sizeof(struct monst *));
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
         monarr[i++] = mtmp;
 

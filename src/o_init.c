@@ -367,9 +367,9 @@ savenames(NHFILE* nhfp)
 
     if (perform_bwrite(nhfp)) {
         if (nhfp->structlevel) {
-            bwrite(nhfp->fd, (genericptr_t)gb.bases, sizeof gb.bases);
-            bwrite(nhfp->fd, (genericptr_t)gd.disco, sizeof gd.disco);
-            bwrite(nhfp->fd, (genericptr_t)objects,
+            bwrite(nhfp->fd, (genericptr_t) gb.bases, sizeof gb.bases);
+            bwrite(nhfp->fd, (genericptr_t) gd.disco, sizeof gd.disco);
+            bwrite(nhfp->fd, (genericptr_t) objects,
                    sizeof(struct objclass) * NUM_OBJECTS);
         }
     }
@@ -381,8 +381,8 @@ savenames(NHFILE* nhfp)
             if (perform_bwrite(nhfp)) {
                 len = Strlen(objects[i].oc_uname) + 1;
                 if (nhfp->structlevel) {
-                    bwrite(nhfp->fd, (genericptr_t)&len, sizeof len);
-                    bwrite(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
+                    bwrite(nhfp->fd, (genericptr_t) &len, sizeof len);
+                    bwrite(nhfp->fd, (genericptr_t) objects[i].oc_uname, len);
                 }
             }
             if (release_data(nhfp)) {
@@ -411,7 +411,7 @@ restnames(NHFILE* nhfp)
             }
             objects[i].oc_uname = (char *) alloc(len);
             if (nhfp->structlevel) {
-                mread(nhfp->fd, (genericptr_t)objects[i].oc_uname, len);
+                mread(nhfp->fd, (genericptr_t) objects[i].oc_uname, len);
             }
         }
     }

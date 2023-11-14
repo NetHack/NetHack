@@ -79,7 +79,7 @@ l_selection_gc(lua_State *L)
 static struct selectionvar *
 l_selection_to(lua_State *L, int index)
 {
-    struct selectionvar *sel = (struct selectionvar *)lua_touserdata(L, index);
+    struct selectionvar *sel = (struct selectionvar *) lua_touserdata(L, index);
 
     if (!sel)
         nhl_error(L, "Selection error");

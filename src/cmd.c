@@ -1150,8 +1150,8 @@ makemap_prepost(boolean pre, boolean wiztower)
         /* escape from trap */
         reset_utrap(FALSE);
         check_special_room(TRUE); /* room exit */
-        (void) memset((genericptr_t)&gd.dndest, 0, sizeof (dest_area));
-        (void) memset((genericptr_t)&gu.updest, 0, sizeof (dest_area));
+        (void) memset((genericptr_t) &gd.dndest, 0, sizeof (dest_area));
+        (void) memset((genericptr_t) &gu.updest, 0, sizeof (dest_area));
         u.ustuck = (struct monst *) 0;
         u.uswallow = u.uswldtim = 0;
         set_uinwater(0); /* u.uinwater = 0 */
@@ -5124,8 +5124,8 @@ movecmd(char sym, int mode)
 {
     int d = DIR_ERR;
 
-    if (gc.Cmd.commands[(uchar)sym]) {
-        int (*fnc)(void) = gc.Cmd.commands[(uchar)sym]->ef_funct;
+    if (gc.Cmd.commands[(uchar) sym]) {
+        int (*fnc)(void) = gc.Cmd.commands[(uchar) sym]->ef_funct;
 
         if (mode == MV_ANY) {
             for (d = N_DIRS_Z - 1; d > DIR_ERR; d--)

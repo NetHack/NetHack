@@ -299,7 +299,7 @@ crashreport_init(int argc UNUSED, char *argv[] UNUSED){
     *p = '\0';
     return;
 skip:
-    strncpy((char *)bid,"unknown",sizeof(bid)-1);
+    strncpy((char *) bid, "unknown", sizeof(bid) - 1);
     HASH_PRAGMA_END
 }
 #undef HASH_CONTEXT
@@ -388,7 +388,7 @@ submit_web_report(const char *msg, char *why){
                 // detailrows min(actual,50)  Guess since we can't know the
                 //     width of the window.
         SWR_ADD("detailrows");
-        (void)snprintf(nbuf,sizeof(nbuf),"%d",count+prelines);
+        (void) snprintf(nbuf, sizeof nbuf,"%d",count+prelines);
         SWR_ADD(nbuf);
         xargv[xargc++] = 0; // terminate array
 
@@ -402,7 +402,7 @@ submit_web_report(const char *msg, char *why){
             int status;
             errno=0;
                     // XXX do we _really_ know this is the right pid?
-            (void)waitpid(pid, &status, 0);
+            (void) waitpid(pid, &status, 0);
             if (status) {         // XXX check could be more precise
 #if 0
                     // Not useful at the moment. XXX
@@ -2207,7 +2207,7 @@ save_killers(NHFILE *nhfp)
     if (perform_bwrite(nhfp)) {
         for (kptr = &gk.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
             if (nhfp->structlevel)
-                bwrite(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
+                bwrite(nhfp->fd, (genericptr_t) kptr, sizeof(struct kinfo));
         }
     }
     if (release_data(nhfp)) {
@@ -2226,7 +2226,7 @@ restore_killers(NHFILE *nhfp)
 
     for (kptr = &gk.killer; kptr != (struct kinfo *) 0; kptr = kptr->next) {
         if (nhfp->structlevel)
-            mread(nhfp->fd, (genericptr_t)kptr, sizeof(struct kinfo));
+            mread(nhfp->fd, (genericptr_t) kptr, sizeof(struct kinfo));
         if (kptr->next) {
             kptr->next = (struct kinfo *) alloc(sizeof (struct kinfo));
         }

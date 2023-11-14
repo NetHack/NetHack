@@ -3593,7 +3593,7 @@ display_inventory(const char *lets, boolean want_reply)
             for (otmp = gi.invent; otmp; otmp = otmp->nobj)
                 if (otmp->invlet == cmdq->key
                     && (!lets || !*lets
-                        || strchr(lets, def_oc_syms[(int)otmp->oclass].sym))) {
+                        || strchr(lets, def_oc_syms[(int) otmp->oclass].sym))) {
                     free(cmdq);
                     return otmp->invlet;
                 }
