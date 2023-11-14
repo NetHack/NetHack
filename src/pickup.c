@@ -1716,7 +1716,7 @@ pickup_object(
     boolean telekinesis) /* not picking it up directly by hand */
 {
     int res, nearload;
-    const char* prefix;
+    const char *prefix;
 
     if (obj->quan < count) {
         impossible("pickup_object: count %ld > quan %ld?", count, obj->quan);
