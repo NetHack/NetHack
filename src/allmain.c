@@ -31,7 +31,7 @@ void
 early_init(int argc UNUSED, char *argv[] UNUSED)
 {
 #ifdef CRASHREPORT
-	// Do this as early as possible, but let ports do other things first.
+    /* Do this as early as possible, but let ports do other things first. */
     crashreport_init(argc, argv);
 #endif
     decl_globals_init();
@@ -1004,9 +1004,9 @@ argcheck(int argc, char *argv[], enum earlyarg e_arg)
             return 2;
 #endif
 #ifdef CRASHREPORT
-	case ARG_BIDSHOW:
-	    crashreport_bidshow();
-	    return 2;
+        case ARG_BIDSHOW:
+            crashreport_bidshow();
+            return 2;
 #endif
 #ifdef WIN32
         case ARG_WINDOWS:
