@@ -329,6 +329,7 @@ static int opt2roleopt(int);
 static char *getoptstr(int, int);
 static void saveoptstr(int, const char *);
 static void unsaveoptstr(int, int);
+static int petname_optfn(int, int, boolean, char *, char *);
 static int shared_menu_optfn(int, int, boolean, char *, char *);
 static int spcfn_misc_menu_cmd(int, int, boolean, char *, char *);
 
@@ -799,6 +800,36 @@ restoptvals(NHFILE *nhfp)
 
 #endif /* 0 */
 
+/* common to optfn_catname(), optfn_dogname(), optfn_horsename() */
+static int
+petname_optfn(
+    int optidx, int req,
+    boolean negated,
+    char *opts, char *op)
+{
+    char failsafe[PL_PSIZ + 1];
+    char *petname = (optidx == opt_catname) ? gc.catname
+                    : (optidx == opt_dogname) ? gd.dogname
+                      : (optidx == opt_horsename) ? gh.horsename
+                        : failsafe;
+
+    if (req == do_init) {
+        ;
+    } else if (req == do_set) {
+        if (op == empty_optstr && !negated)
+            return optn_err;
+        if (negated || !strcmp(op, "none") || !strcmp(op, none))
+            op = empty_optstr;
+        nmcpy(petname, op, PL_PSIZ);
+        sanitize_name(petname);
+    } else if (req == get_val || req == get_cnf_val) {
+        failsafe[0] = '\0';
+        Sprintf(opts, "%s", *petname ? petname
+                            : (req == get_cnf_val) ? "none" : none);
+    }
+    return optn_ok;
+}
+
 /*
  **********************************
  *
@@ -833,8 +864,6 @@ optfn_alignment(
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initalign, aligns, adj));
         return optn_ok;
     }
@@ -882,8 +911,6 @@ optfn_align_message(
     if (req == get_val || req == get_cnf_val) {
         int which;
 
-        if (!opts)
-            return optn_err;
         which = iflags.wc_align_message;
         Sprintf(opts, "%s",
                 (which == ALIGN_TOP) ? "top"
@@ -931,8 +958,6 @@ optfn_align_status(int optidx, int req, boolean negated, char *opts, char *op)
     if (req == get_val || req == get_cnf_val) {
         int which;
 
-        if (!opts)
-            return optn_err;
         which = iflags.wc_align_status;
         Sprintf(opts, "%s",
                 (which == ALIGN_TOP) ? "top"
@@ -973,8 +998,6 @@ optfn_altkeyhandling(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
 #ifdef WIN32
         Sprintf(opts, "%s",
@@ -1075,8 +1098,6 @@ optfn_autounlock(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (!flags.autounlock) {
             Strcpy(opts, "none");
         } else {
@@ -1166,8 +1187,6 @@ optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
 #endif
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
 #ifdef BACKWARD_COMPAT
         Sprintf(opts, "%c",
@@ -1182,38 +1201,11 @@ optfn_boulder(int optidx UNUSED, int req, boolean negated UNUSED,
 
 static int
 optfn_catname(
-    int optidx, int req, boolean negated UNUSED,
+    int optidx, int req,
+    boolean negated,
     char *opts, char *op)
 {
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-            != empty_optstr) {
-            nmcpy(gc.catname, op, PL_PSIZ);
-        } else {
-            return optn_err;
-        }
-        sanitize_name(gc.catname);
-        return optn_ok;
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", gc.catname[0] ? gc.catname : none);
-        return optn_ok;
-    }
-    if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        if (gc.catname[0])
-            Sprintf(opts, "%s", gc.catname);
-        else
-            opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
+    return petname_optfn(optidx, req, negated, opts, op);
 }
 
 #ifdef CURSES_GRAPHICS
@@ -1258,8 +1250,6 @@ optfn_cursesgraphics(int optidx, int req, boolean negated,
 #endif
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1308,8 +1298,6 @@ optfn_DECgraphics(int optidx, int req, boolean negated,
 #endif
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1419,9 +1407,6 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-
         opts[0] = '\0';
         for (i = 0; i < NUM_DISCLOSURE_OPTIONS; i++) {
             if (i)
@@ -1438,28 +1423,12 @@ optfn_disclose(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_dogname(int optidx UNUSED, int req, boolean negated UNUSED,
-              char *opts, char *op)
+optfn_dogname(
+    int optidx, int req,
+    boolean negated,
+    char *opts, char *op)
 {
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        if (op != empty_optstr) {
-            nmcpy(gd.dogname, op, PL_PSIZ);
-        } else {
-            return optn_err;
-        }
-        sanitize_name(gd.dogname);
-        return optn_ok;
-    }
-    if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", gd.dogname[0] ? gd.dogname : none);
-        return optn_ok;
-    }
-    return optn_ok;
+    return petname_optfn(optidx, req, negated, opts, op);
 }
 
 static int
@@ -1473,14 +1442,10 @@ optfn_dungeon(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1498,14 +1463,10 @@ optfn_effects(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1656,8 +1617,6 @@ optfn_fruit(int optidx UNUSED, int req, boolean negated,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", gp.pl_fruit);
         return optn_ok;
     }
@@ -1691,8 +1650,6 @@ optfn_gender(
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initgend, genders, adj));
         return optn_ok;
     }
@@ -1733,14 +1690,10 @@ optfn_glyph(int optidx UNUSED, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1780,8 +1733,6 @@ optfn_hilite_status(
 #endif
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
 #ifdef STATUS_HILITES
         if (req == get_val)
@@ -1796,38 +1747,11 @@ optfn_hilite_status(
 
 static int
 optfn_horsename(
-    int optidx, int req, boolean negated UNUSED,
+    int optidx,
+    int req, boolean negated,
     char *opts, char *op)
 {
-    if (req == do_init) {
-        return optn_ok;
-    }
-    if (req == do_set) {
-        if ((op = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-            != empty_optstr) {
-            nmcpy(gh.horsename, op, PL_PSIZ);
-        } else {
-            return optn_err;
-        }
-        sanitize_name(gh.horsename);
-        return optn_ok;
-    }
-    if (req == get_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%s", gh.horsename[0] ? gh.horsename : none);
-        return optn_ok;
-    }
-    if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        if (gh.horsename[0])
-            Sprintf(opts, "%s", gh.horsename);
-        else
-            opts[0] = '\0';
-        return optn_ok;
-    }
-    return optn_ok;
+    return petname_optfn(optidx, req, negated, opts, op);
 }
 
 static int
@@ -1880,8 +1804,6 @@ optfn_IBMgraphics(int optidx, int req, boolean negated,
 #endif
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -1946,8 +1868,6 @@ optfn_map_mode(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         i = iflags.wc_map_mode;
         Sprintf(opts, "%s",
                 (i == MAP_MODE_TILES) ? "tiles"
@@ -1985,14 +1905,10 @@ shared_menu_optfn(int optidx UNUSED, int req, boolean negated UNUSED,
         return spcfn_misc_menu_cmd(res, req, negated, opts, op);
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -2166,8 +2082,6 @@ optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", color_attr_to_str(&iflags.menu_headings));
         return optn_ok;
     }
@@ -2199,8 +2113,6 @@ optfn_menuinvertmode(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%d", iflags.menuinvertmode);
         return optn_ok;
     }
@@ -2254,8 +2166,6 @@ optfn_menustyle(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", menutype[(int) flags.menu_style][0]);
         return optn_ok;
     }
@@ -2276,8 +2186,6 @@ optfn_monsters(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -2333,16 +2241,11 @@ optfn_mouse_support(
 #undef MOUSEFIX2
         int ms = iflags.wc_mouse_support;
 
-        if (!opts)
-            return optn_err;
-
         if (ms >= 0 && ms <= 2)
             Sprintf(opts, "%s%s", mousemodes[ms][0], mousemodes[ms][1]);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%i", iflags.wc_mouse_support);
         return optn_ok;
     }
@@ -2394,8 +2297,6 @@ optfn_msg_window(int optidx, int req, boolean negated, char *opts, char *op)
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
 #if PREV_MSGS
         tmp = iflags.prevmsg_window;
@@ -2434,8 +2335,6 @@ optfn_msghistory(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%u", iflags.msg_history);
         return optn_ok;
     }
@@ -2443,7 +2342,9 @@ optfn_msghistory(int optidx, int req, boolean negated, char *opts, char *op)
 }
 
 static int
-optfn_name(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
+optfn_name(
+    int optidx, int req, boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2459,8 +2360,6 @@ optfn_name(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", gp.plname);
         return optn_ok;
     }
@@ -2468,7 +2367,9 @@ optfn_name(int optidx, int req, boolean negated UNUSED, char *opts, char *op)
 }
 
 static int
-optfn_number_pad(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_number_pad(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     boolean compat;
 
@@ -2526,8 +2427,6 @@ optfn_number_pad(int optidx, int req, boolean negated, char *opts, char *op)
                                            : (gc.Cmd.pcHack_compat ? 2 : 1))
                        : gc.Cmd.swap_yz ? 5 : 0;
 
-        if (!opts)
-            return optn_err;
         if (req == get_val)
             Strcpy(opts, numpadmodes[indx]);
         else {
@@ -2552,14 +2451,10 @@ optfn_objects(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -2583,8 +2478,6 @@ optfn_packorder(int optidx UNUSED, int req, boolean negated UNUSED,
     if (req == get_val || req == get_cnf_val) {
         char ocl[MAXOCLASSES + 1];
 
-        if (!opts)
-            return optn_err;
         oc_to_str(flags.inv_order, ocl);
         Sprintf(opts, "%s", ocl);
         return optn_ok;
@@ -2686,8 +2579,6 @@ optfn_palette(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         Sprintf(opts, "%s", get_color_string());
         return optn_ok;
@@ -2904,8 +2795,6 @@ optfn_paranoid_confirmation(
     if (req == get_val || req == get_cnf_val) {
         char tmpbuf[BUFSZ];
 
-        if (!opts)
-            return optn_err;
         tmpbuf[0] = '\0';
         for (i = 0; paranoia[i].flagmask != 0; ++i) {
             if ((flags.paranoia_bits & paranoia[i].flagmask) != 0
@@ -3063,9 +2952,6 @@ optfn_petattr(
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-
 #ifdef CURSES_GRAPHICS
         if (WINDOWPORT(curses)) {
             char tmpbuf[QBUFSZ];
@@ -3123,8 +3009,6 @@ optfn_pettype(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", (gp.preferred_pet == 'c') ? "cat"
                            : (gp.preferred_pet == 'd') ? "dog"
                              : (gp.preferred_pet == 'h') ? "horse"
@@ -3133,8 +3017,6 @@ optfn_pettype(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (gp.preferred_pet)
             Sprintf(opts, "%c", gp.preferred_pet);
         else
@@ -3187,8 +3069,6 @@ optfn_pickup_burden(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", burdentype[flags.pickup_burden]);
         return optn_ok;
     }
@@ -3324,8 +3204,6 @@ optfn_pile_limit(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%d", flags.pile_limit);
         return optn_ok;
     }
@@ -3358,8 +3236,6 @@ optfn_player_selection(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 iflags.wc_player_selection ? "prompts" : "dialog");
         return optn_ok;
@@ -3395,8 +3271,6 @@ optfn_playmode(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Strcpy(opts, wizard ? "debug" : discover ? "explore" : "normal");
         return optn_ok;
     }
@@ -3430,8 +3304,6 @@ optfn_race(
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initrace, races, noun));
         return optn_ok;
     }
@@ -3469,8 +3341,6 @@ optfn_roguesymset(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 gs.symset[ROGUESET].name ? gs.symset[ROGUESET].name
                                          : "default");
@@ -3511,8 +3381,6 @@ optfn_role(
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", rolestring(flags.initrole, roles, name.m));
         return optn_ok;
     }
@@ -3554,8 +3422,6 @@ optfn_runmode(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", runmodes[flags.runmode]);
         return optn_ok;
     }
@@ -3640,8 +3506,6 @@ optfn_scores(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         *opts = '\0';
         if (flags.end_top > 0)
             Sprintf(opts, "%d top", flags.end_top);
@@ -3680,8 +3544,6 @@ optfn_scroll_amount(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_scroll_amount)
             Sprintf(opts, "%d", iflags.wc_scroll_amount);
         else
@@ -3712,8 +3574,6 @@ optfn_scroll_margin(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_scroll_margin)
             Sprintf(opts, "%d", iflags.wc_scroll_margin);
         else
@@ -3751,8 +3611,6 @@ optfn_soundlib(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         get_soundlib_name(soundlibbuf, WINTYPELEN);
         Sprintf(opts, "%s", soundlibbuf);
         return optn_ok;
@@ -3852,8 +3710,6 @@ optfn_sortloot(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         for (i = 0; i < SIZE(sortltype); i++)
             if (flags.sortloot == sortltype[i][0]) {
                 Strcpy(opts, sortltype[i]);
@@ -3959,8 +3815,6 @@ optfn_statushilites(
 #endif
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
 #ifdef STATUS_HILITES
         if (!iflags.hilite_delta)
             Strcpy(opts, "0 (off: don't highlight status fields)");
@@ -3974,16 +3828,18 @@ optfn_statushilites(
     }
     if (req == get_cnf_val) {
 #ifdef STATUS_HILITES
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%ld", iflags.hilite_delta);
+#else
+        opts[0] = '\0';
 #endif
     }
     return optn_ok;
 }
 
 static int
-optfn_statuslines(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_statuslines(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     int retval = optn_ok, itmp = 0;
 
@@ -4014,8 +3870,6 @@ optfn_statuslines(int optidx, int req, boolean negated, char *opts, char *op)
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (wc2_supported(allopt[optidx].name))
             Strcpy(opts, (iflags.wc2_statuslines < 3) ? "2" : "3");
         else
@@ -4027,8 +3881,12 @@ optfn_statuslines(int optidx, int req, boolean negated, char *opts, char *op)
 
 #ifdef WIN32CON
 static int
-optfn_subkeyvalue(int optidx UNUSED, int req, boolean negated UNUSED,
-                  char *opts, char *op UNUSED)
+optfn_subkeyvalue(
+    int optidx UNUSED,
+    int req,
+    boolean negated UNUSED,
+    char *opts,
+    char *op UNUSED)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4042,8 +3900,6 @@ optfn_subkeyvalue(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4067,8 +3923,6 @@ optfn_suppress_alert(int optidx, int req, boolean negated,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (req == get_cnf_val && flags.suppress_alert == 0L)
             opts[0] = '\0';
         else if (flags.suppress_alert == 0L)
@@ -4123,8 +3977,6 @@ optfn_symset(
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
                                           : "default");
@@ -4137,8 +3989,6 @@ optfn_symset(
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 gs.symset[PRIMARYSET].name ? gs.symset[PRIMARYSET].name
                                           : "default");
@@ -4193,8 +4043,6 @@ optfn_term_cols(int optidx, int req, boolean negated, char *opts, char *op)
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc2_term_cols)
             Sprintf(opts, "%d", iflags.wc2_term_cols);
         else if (req == get_cnf_val)
@@ -4234,8 +4082,6 @@ optfn_term_rows(int optidx, int req, boolean negated, char *opts, char *op)
         return retval;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc2_term_rows)
             Sprintf(opts, "%d", iflags.wc2_term_rows);
         else if (req == get_cnf_val)
@@ -4265,15 +4111,11 @@ optfn_tile_file(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 iflags.wc_tile_file ? iflags.wc_tile_file : defopt);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_tile_file)
             Sprintf(opts, "%s", iflags.wc_tile_file);
         else
@@ -4302,8 +4144,6 @@ optfn_tile_height(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_tile_height)
             Sprintf(opts, "%d", iflags.wc_tile_height);
         else if (req == get_cnf_val)
@@ -4334,8 +4174,6 @@ optfn_tile_width(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_tile_width)
             Sprintf(opts, "%d", iflags.wc_tile_width);
         else if (req == get_cnf_val)
@@ -4358,14 +4196,10 @@ optfn_traps(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4393,8 +4227,6 @@ optfn_vary_msgcount(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         if (iflags.wc_vary_msgcount)
             Sprintf(opts, "%d", iflags.wc_vary_msgcount);
         else if (req == get_cnf_val)
@@ -4429,8 +4261,6 @@ optfn_videocolors(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d-%d",
                 ttycolors[CLR_RED], ttycolors[CLR_GREEN],
                 ttycolors[CLR_BROWN], ttycolors[CLR_BLUE],
@@ -4465,8 +4295,6 @@ optfn_videoshades(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s-%s-%s", shade[0], shade[1], shade[2]);
         return optn_ok;
     }
@@ -4490,8 +4318,6 @@ optfn_video_width(int optidx UNUSED, int req, boolean negated,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
     }
     return optn_ok;
@@ -4512,8 +4338,6 @@ optfn_video_height(int optidx UNUSED, int req, boolean negated,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
     }
     return optn_ok;
@@ -4541,14 +4365,10 @@ optfn_video(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", to_be_done);
         return optn_ok;
     }
     if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4572,8 +4392,6 @@ optfn_warnings(int optidx, int req, boolean negated UNUSED,
         return reslt ? optn_ok : optn_err;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4581,7 +4399,9 @@ optfn_warnings(int optidx, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_whatis_coord(int optidx, int req, boolean negated, char *opts, char *op)
+optfn_whatis_coord(
+    int optidx, int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -4609,8 +4429,6 @@ optfn_whatis_coord(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 (iflags.getpos_coords == GPCOORDS_MAP) ? "map"
                 : (iflags.getpos_coords == GPCOORDS_COMPASS) ? "compass"
@@ -4662,8 +4480,6 @@ optfn_whatis_filter(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 (iflags.getloc_filter == GFILTER_VIEW) ? "view"
                 : (iflags.getloc_filter == GFILTER_AREA) ? "area"
@@ -4713,18 +4529,7 @@ optfn_windowborders(
         }
         return retval;
     }
-    if (req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-        Sprintf(opts, "%i", iflags.wc2_windowborders);
-        return optn_ok;
-    }
-    if (req == do_handler) {
-        return handler_windowborders();
-    }
     if (req == get_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s",
                 (iflags.wc2_windowborders == 0) ? "0=off"
                 : (iflags.wc2_windowborders == 1) ? "1=on"
@@ -4735,6 +4540,13 @@ optfn_windowborders(
                         ? "4=auto, except off for perm_invent"
                         : defopt);
         return optn_ok;
+    }
+    if (req == get_cnf_val) {
+        Sprintf(opts, "%i", iflags.wc2_windowborders);
+        return optn_ok;
+    }
+    if (req == do_handler) {
+        return handler_windowborders();
     }
     return optn_ok;
 }
@@ -4761,8 +4573,6 @@ optfn_windowchain(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4793,8 +4603,6 @@ optfn_windowcolors(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(
             opts, "%s/%s %s/%s %s/%s %s/%s",
             iflags.wc_foregrnd_menu ? iflags.wc_foregrnd_menu : defbrief,
@@ -4848,8 +4656,6 @@ optfn_windowtype(int optidx, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         Sprintf(opts, "%s", windowprocs.name);
         return optn_ok;
     }
@@ -4895,8 +4701,6 @@ pfxfn_cond_(
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -4990,9 +4794,6 @@ pfxfn_font(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
-
         if (optidx == opt_font_map) {
             Sprintf(opts, "%s",
                     iflags.wc_font_map ? iflags.wc_font_map : defopt);
@@ -5051,8 +4852,6 @@ pfxfn_IBM_(int optidx UNUSED, int req, boolean negated UNUSED,
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -5281,8 +5080,6 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
@@ -5309,8 +5106,6 @@ spcfn_misc_menu_cmd(int midx, int req, boolean negated, char *opts, char *op)
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        if (!opts)
-            return optn_err;
         opts[0] = '\0';
         return optn_ok;
     }
