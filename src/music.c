@@ -308,6 +308,7 @@ do_earthquake(int force)
                 if (cansee(x, y))
                     pline_The("%s altar falls%s.",
                               align_str(algn), into_a_chasm);
+                desecrate_altar(FALSE, algn);
                 goto do_pit;
             case GRAVE:
                 if (cansee(x, y))
