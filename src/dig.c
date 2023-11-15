@@ -561,7 +561,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
     register struct trap *ttmp;
-    char surface_type[BUFSZ];
+    const char *surface_type, *furniture = (const char *) 0;
     struct rm *lev = &levl[x][y];
     boolean shopdoor;
     struct monst *mtmp = m_at(x, y); /* may be madeby */
@@ -569,6 +569,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     boolean madeby_obj = (madeby == BY_OBJECT);
     boolean at_u = u_at(x, y);
     boolean wont_fall = Levitation || Flying;
+    int old_typ;
 
     if (at_u && u.utrap) {
         if (u.utraptype == TT_BURIEDBALL)
@@ -586,12 +587,14 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         ttyp = PIT;
     }
 
-    /* maketrap() might change it, also, in this situation,
-       surface() returns an inappropriate string for a grave */
-    if (IS_GRAVE(lev->typ))
-        Strcpy(surface_type, "grave");
-    else
-        Strcpy(surface_type, surface(x, y));
+    old_typ = lev->typ; /* maketrap() might change it */
+    if (IS_FURNITURE(lev->typ)) {
+        surface_type = (IS_ROOM(old_typ) && !Is_earthlevel(&u.uz)
+                         ? "floor" : "ground");
+        furniture = surface(x, y);
+    } else {
+        surface_type = surface(x, y);
+    }
     shopdoor = IS_DOOR(lev->typ) && *in_rooms(x, y, SHOPBASE);
     oldobjs = gl.level.objects[x][y];
     ttmp = maketrap(x, y, ttyp);
@@ -621,6 +624,8 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         } else if (cansee(x, y) && flags.verbose) {
             pline("A pit appears in the %s.", surface_type);
         }
+        if (furniture && cansee(x, y))
+            pline_The("%s falls into the pit!", furniture);
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         switch_terrain();
@@ -644,14 +649,16 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
         }
     } else { /* was TRAPDOOR now a HOLE*/
-
-        if (madeby_u)
+        if (madeby_u) {
             You("dig a hole through the %s.", surface_type);
-        else if (!madeby_obj && canseemon(madeby))
+        } else if (!madeby_obj && canseemon(madeby)) {
             pline("%s digs a hole through the %s.", Monnam(madeby),
                   surface_type);
-        else if (cansee(x, y) && flags.verbose)
+        } else if (cansee(x, y) && flags.verbose) {
             pline("A hole appears in the %s.", surface_type);
+        }
+        if (furniture && cansee(x, y))
+            pline_The("%s falls through the hole!", furniture);
 
         if (at_u) {
             /* in case we're digging down while encased in solid rock
