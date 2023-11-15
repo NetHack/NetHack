@@ -326,17 +326,6 @@ do_earthquake(int force)
             case CORR:
             case ROOM: /* Try to make a pit. */
  do_pit:
-                /* maketrap() won't replace furniture with a trap,
-                   so remove the furniture first */
-                if (levl[x][y].typ != CORR) {
-                    if (levl[x][y].typ != DOOR) {
-                        levl[x][y].typ = ROOM;
-                        /* clear blessed fountain, disturbed grave */
-                        levl[x][y].horizontal = 0;
-                    }
-                    /* clear doormask, altarmask, looted throne */
-                    levl[x][y].flags = 0; /* same as 'doormask = D_NODOOR' */
-                }
                 chasm = maketrap(x, y, PIT);
                 if (!chasm)
                     break; /* no pit if portal at that location */
