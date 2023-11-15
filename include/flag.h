@@ -255,7 +255,7 @@ struct instance_flags {
     int getpos_coords;    /* show coordinates when getting cursor position */
     int menuinvertmode;  /* 0 = invert toggles every item;
                             1 = invert skips 'all items' item */
-    color_attr menu_headings;    /* ATR for menu headings */
+    color_attr menu_headings;    /* CLR_ and ATR_ for menu headings */
     uint32_t colorcount;    /* store how many colors terminal is capable of */
     boolean use_truecolor;  /* force use of truecolor */
 #ifdef ALTMETA
