@@ -3774,7 +3774,7 @@ add_damage(
     tmp_dam->flags = levl[x][y].flags;
     tmp_dam->next = gl.level.damagelist;
     gl.level.damagelist = tmp_dam;
-    /* If player saw damage, display as a wall forever */
+    /* If player saw damage, display walls post-repair as walls, not stone */
     if (cansee(x, y))
         levl[x][y].seenv = SVALL;
 }
@@ -4478,7 +4478,7 @@ makekops(coord* mm)
 }
 
 void
-pay_for_damage(const char* dmgstr, boolean cant_mollify)
+pay_for_damage(const char *dmgstr, boolean cant_mollify)
 {
     register struct monst *shkp = (struct monst *) 0;
     char shops_affected[5];
