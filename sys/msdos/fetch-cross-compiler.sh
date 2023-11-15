@@ -79,7 +79,10 @@ if [ ! -d djgpp/cwsdpmi ]; then
       	#Mac
 	curl http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip -o csdpmi7b.zip
     else
-	wget --quiet --no-hsts http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
+        wget --quiet --no-hsts https://www.delorie.com/pub/djgpp/current/v2misc/csdpmi7b.zip
+        if [ $? -ne 0 ]; then
+	    wget --quiet --no-hsts --timeout=20 http://sandmann.dotster.com/cwsdpmi/csdpmi7b.zip
+        fi
     fi
     cd djgpp
     mkdir -p cwsdpmi
