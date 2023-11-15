@@ -21,7 +21,6 @@ static void gods_angry(aligntyp);
 static void gods_upset(aligntyp);
 static void consume_offering(struct obj *);
 static void offer_too_soon(aligntyp);
-static void desecrate_high_altar(aligntyp);
 static void offer_real_amulet(struct obj *, aligntyp); /* NORETURN */
 static void offer_fake_amulet(struct obj *, boolean, aligntyp);
 static void offer_different_alignment_altar(struct obj *, aligntyp);
@@ -1474,17 +1473,27 @@ offer_too_soon(aligntyp altaralign)
                         : "ashamed");
 }
 
-static void
-desecrate_high_altar(aligntyp altaralign)
+void
+desecrate_altar(boolean highaltar, aligntyp altaralign)
 {
+    char gvbuf[BUFSZ];
+
     /*
      * REAL BAD NEWS!!! High altars cannot be converted.  Even an attempt
-     * gets the god who owns it truly pissed off.
+     * gets the god who owns it truly pissed off.  The same effect for
+     * deliberately destroying a normal altar.
      */
+    /* if you did this to your own altar, your god will hold a grudge... */
+    if (altaralign == u.ualign.type) {
+        adjalign(-20);
+        u.ugangr += 5;
+    }
     You_feel("the air around you grow charged...");
-    pline("Suddenly, you realize that %s has noticed you...", a_gname());
-    godvoice(altaralign,
-                "So, mortal!  You dare desecrate my High Temple!");
+    pline("Suddenly, you realize that %s has noticed you...",
+          align_gname(altaralign));
+    Sprintf(gvbuf, "So, mortal!  You dare desecrate my %s!",
+            highaltar ? "High Temple" : "altar");
+    godvoice(altaralign, gvbuf);
     /* Throw everything we have at the player */
     god_zaps_you(altaralign);
 }
@@ -1581,7 +1590,7 @@ offer_fake_amulet(
         u.ugangr += 3;
         /* value = -3; */
         if (altaralign != u.ualign.type && highaltar) {
-            desecrate_high_altar(altaralign);
+            desecrate_altar(highaltar, altaralign);
         } else { /* value < 0 */
             gods_upset(altaralign);
         }
@@ -1674,7 +1683,7 @@ sacrifice_your_race(
 
     if (highaltar
         && (altaralign != A_CHAOTIC || u.ualign.type != A_CHAOTIC)) {
-        desecrate_high_altar(altaralign);
+        desecrate_altar(highaltar, altaralign);
         return;
     } else if (altaralign != A_CHAOTIC && altaralign != A_NONE) {
         /* curse the lawful/neutral altar */
@@ -1928,7 +1937,7 @@ dosacrifice(void)
     }
 
     if (altaralign != u.ualign.type && highaltar) {
-        desecrate_high_altar(altaralign);
+        desecrate_altar(highaltar, altaralign);
     } else if (value < 0) { /* don't think the gods are gonna like this... */
         gods_upset(altaralign);
     } else if (u.ualign.type != altaralign) {

@@ -569,7 +569,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     boolean madeby_obj = (madeby == BY_OBJECT);
     boolean at_u = u_at(x, y);
     boolean wont_fall = Levitation || Flying;
-    int old_typ;
+    int old_typ, old_aligntyp = A_NONE;
 
     if (at_u && u.utrap) {
         if (u.utraptype == TT_BURIEDBALL)
@@ -592,6 +592,8 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         surface_type = (IS_ROOM(old_typ) && !Is_earthlevel(&u.uz)
                          ? "floor" : "ground");
         furniture = surface(x, y);
+        if (IS_ALTAR(lev->typ))
+            old_aligntyp = Amask2align(levl[x][y].altarmask & AM_MASK);
     } else {
         surface_type = surface(x, y);
     }
@@ -626,6 +628,9 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         }
         if (furniture && cansee(x, y))
             pline_The("%s falls into the pit!", furniture);
+        /* wrath should immediately follow altar destruction message */
+        if ((madeby_u || madeby_obj) && old_typ == ALTAR)
+            desecrate_altar(FALSE, old_aligntyp);
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         switch_terrain();
@@ -659,6 +664,9 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         }
         if (furniture && cansee(x, y))
             pline_The("%s falls through the hole!", furniture);
+        /* wrath should immediately follow altar destruction message */
+        if ((madeby_u || madeby_obj) && old_typ == ALTAR)
+            desecrate_altar(FALSE, old_aligntyp);
 
         if (at_u) {
             /* in case we're digging down while encased in solid rock

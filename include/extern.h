@@ -2291,6 +2291,7 @@ extern void speed_up(long);
 
 extern boolean critically_low_hp(boolean);
 extern boolean stuck_in_wall(void);
+extern void desecrate_altar(boolean, aligntyp);
 extern int dosacrifice(void);
 extern boolean can_pray(boolean);
 extern int dopray(void);
