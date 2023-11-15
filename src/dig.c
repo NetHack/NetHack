@@ -561,7 +561,8 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
     register struct trap *ttmp;
-    const char *surface_type, *furniture = (const char *) 0;
+    const char *surface_type, *tname, *in_thru;
+    char furniture[BUFSZ];
     struct rm *lev = &levl[x][y];
     boolean shopdoor;
     struct monst *mtmp = m_at(x, y); /* may be madeby */
@@ -587,13 +588,20 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
         ttyp = PIT;
     }
 
-    old_typ = lev->typ; /* maketrap() might change it */
+    /* maketrap() might change terrain type but we deliver messages after
+       that, so prepare in advance */
+    old_typ = lev->typ;
+    furniture[0] = '\0';
     if (IS_FURNITURE(lev->typ)) {
-        surface_type = (IS_ROOM(old_typ) && !Is_earthlevel(&u.uz)
+        /* should mirror the word used by surface() for normal floor */
+        surface_type = (IS_ROOM(lev->typ) && !Is_earthlevel(&u.uz)
                          ? "floor" : "ground");
-        furniture = surface(x, y);
-        if (IS_ALTAR(lev->typ))
+        if (IS_ALTAR(lev->typ)) {
             old_aligntyp = Amask2align(levl[x][y].altarmask & AM_MASK);
+            Strcpy(furniture, align_str(old_aligntyp));
+            Strcat(furniture, " ");
+        }
+        Strcat(furniture, surface(x, y));
     } else {
         surface_type = surface(x, y);
     }
@@ -610,27 +618,34 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     else if (madeby_u)
         feeltrap(ttmp);
 
+    tname = trapname(ttyp, TRUE);
+    in_thru = (ttyp == HOLE ? "through" : "in");
+    if (madeby_u) {
+        if (x != u.ux || y != u.uy)
+            You("dig an adjacent %s.", tname);
+        else
+            You("dig %s %s the %s.", an(tname), in_thru, surface_type);
+    } else if (!madeby_obj && canseemon(madeby)) {
+        pline("%s digs %s %s the %s.", Monnam(madeby), an(tname), in_thru,
+              surface_type);
+    } else if (cansee(x, y) && flags.verbose) {
+        pline("%s appears in the %s.", An(tname), surface_type);
+    }
+    if (IS_FURNITURE(old_typ) && cansee(x, y))
+        pline_The("%s falls into the %s!", furniture, tname);
+    /* wrath should immediately follow altar destruction message */
+    if ((madeby_u || madeby_obj) && old_typ == ALTAR)
+        desecrate_altar(FALSE, old_aligntyp);
+
+    /* now deal with actual post-trap creation effects */
     if (ttyp == PIT) {
         if (madeby_u) {
-            if (x != u.ux || y != u.uy)
-                You("dig an adjacent pit.");
-            else
-                You("dig a pit in the %s.", surface_type);
             if (shopdoor)
                 pay_for_damage("ruin", FALSE);
             else
-                add_damage(x, y, madeby_u ? SHOP_PIT_COST : 0L);
+                add_damage(x, y, SHOP_PIT_COST);
             wake_nearby();
-        } else if (!madeby_obj && canseemon(madeby)) {
-            pline("%s digs a pit in the %s.", Monnam(madeby), surface_type);
-        } else if (cansee(x, y) && flags.verbose) {
-            pline("A pit appears in the %s.", surface_type);
         }
-        if (furniture && cansee(x, y))
-            pline_The("%s falls into the pit!", furniture);
-        /* wrath should immediately follow altar destruction message */
-        if ((madeby_u || madeby_obj) && old_typ == ALTAR)
-            desecrate_altar(FALSE, old_aligntyp);
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         switch_terrain();
@@ -654,20 +669,6 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 (void) mintrap(mtmp, NO_TRAP_FLAGS);
         }
     } else { /* was TRAPDOOR now a HOLE*/
-        if (madeby_u) {
-            You("dig a hole through the %s.", surface_type);
-        } else if (!madeby_obj && canseemon(madeby)) {
-            pline("%s digs a hole through the %s.", Monnam(madeby),
-                  surface_type);
-        } else if (cansee(x, y) && flags.verbose) {
-            pline("A hole appears in the %s.", surface_type);
-        }
-        if (furniture && cansee(x, y))
-            pline_The("%s falls through the hole!", furniture);
-        /* wrath should immediately follow altar destruction message */
-        if ((madeby_u || madeby_obj) && old_typ == ALTAR)
-            desecrate_altar(FALSE, old_aligntyp);
-
         if (at_u) {
             /* in case we're digging down while encased in solid rock
                which is blocking levitation or flight */
