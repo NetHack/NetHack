@@ -399,7 +399,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(menu_first_page, Advanced, 4, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "jump to the first page in a menu")
     NHOPTC(menu_headings, Advanced, 4, opt_in, set_in_game,
-                No, Yes, No, Yes, NoAlias, "display style for menu headings")
+                Yes, Yes, No, Yes, NoAlias, "display style for menu headings")
     NHOPTC(menu_invert_all, Advanced, 4, opt_in, set_in_config,
                 No, Yes, No, No, NoAlias, "invert all items in a menu")
     NHOPTC(menu_invert_page, Advanced, 4, opt_in, set_in_config,

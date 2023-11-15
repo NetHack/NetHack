@@ -3911,14 +3911,14 @@ status_hilite_menu_add(int origfld)
     }
 
  choose_color:
-    clr = query_color(colorqry);
+    clr = query_color(colorqry, NO_COLOR);
     if (clr == -1) {
         if (behavior != BL_TH_ALWAYS_HILITE)
             goto choose_value;
         else
             goto choose_behavior;
     }
-    atr = query_attr(attrqry);
+    atr = query_attr(attrqry, ATR_NONE);
     if (atr == -1)
         goto choose_color;
 

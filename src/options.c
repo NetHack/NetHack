@@ -2037,7 +2037,8 @@ color_attr_parse_str(color_attr *ca, char *str)
         amp++;
         c = match_str2clr(buf);
         a = match_str2attr(amp, TRUE);
-        /* FIXME: match_str2clr & match_str2attr give config_error_add(), so this is useless */
+        /* FIXME: match_str2clr & match_str2attr give config_error_add(),
+           so this is useless */
         if (c >= CLR_MAX && a == -1) {
             /* try other way around */
             c = match_str2clr(amp);
@@ -2063,8 +2064,10 @@ color_attr_parse_str(color_attr *ca, char *str)
 }
 
 static int
-optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
-                    char *opts, char *op UNUSED)
+optfn_menu_headings(
+    int optidx,
+    int req, boolean negated,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -2072,17 +2075,28 @@ optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
     if (req == do_set) {
         color_attr ca;
 
-        if ((opts = string_for_env_opt(allopt[optidx].name, opts, FALSE))
-            == empty_optstr) {
-            return optn_err;
+        if (op == empty_optstr) {
+            /* OPTIONS=menu_headings w/o value => no-color&inverse;
+               OPTIONS=!menu_headings => no-color&none */
+            iflags.menu_headings.attr = negated ? ATR_NONE : ATR_INVERSE;
+            iflags.menu_headings.color = NO_COLOR;
+            return optn_ok;
+        } else if (negated) { /* 'op != empty_optstr' to get here */
+            bad_negation(allopt[optidx].name, TRUE);
+            return optn_silenterr;
         }
-        if (!color_attr_parse_str(&ca, opts))
+        if (!color_attr_parse_str(&ca, op))
             return optn_err;
         iflags.menu_headings = ca;
         return optn_ok;
     }
     if (req == get_val || req == get_cnf_val) {
-        Sprintf(opts, "%s", color_attr_to_str(&iflags.menu_headings));
+        char ca_buf[BUFSZ];
+
+        Strcpy(ca_buf, color_attr_to_str(&iflags.menu_headings));
+        /* change "no color" to "no-color" or "light blue" to "light-blue" */
+        (void) strNsubst(ca_buf, " ", "-", 0);
+        Strcpy(opts, ca_buf);
         return optn_ok;
     }
     if (req == do_handler) {
@@ -2092,8 +2106,10 @@ optfn_menu_headings(int optidx, int req, boolean negated UNUSED,
 }
 
 static int
-optfn_menuinvertmode(int optidx, int req, boolean negated UNUSED,
-                     char *opts, char *op)
+optfn_menuinvertmode(
+    int optidx, int req,
+    boolean negated UNUSED,
+    char *opts, char *op)
 {
     if (req == do_init) {
         return optn_ok;
@@ -5996,8 +6012,8 @@ handler_menu_colors(void)
             goto menucolors_done;
         if (*mcbuf
             && test_regex_pattern(mcbuf, "MENUCOLORS regex")
-            && (mcclr = query_color((char *) 0)) != -1
-            && (mcattr = query_attr((char *) 0)) != -1
+            && (mcclr = query_color((char *) 0, NO_COLOR)) != -1
+                && (mcattr = query_attr((char *) 0, ATR_NONE)) != -1
             && !add_menu_coloring_parsed(mcbuf, mcclr, mcattr)) {
             pline("Error adding the menu color.");
             wait_synch();
@@ -7361,13 +7377,12 @@ basic_menu_colors(boolean load_colors)
 RESTORE_WARNING_FORMAT_NONLITERAL
 
 int
-query_color(const char *prompt)
+query_color(const char *prompt, int dflt_color)
 {
     winid tmpwin;
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
-    int clr = NO_COLOR;
 
     /* replace user patterns with color name ones and force 'menucolors' On */
     basic_menu_colors(TRUE);
@@ -7380,9 +7395,9 @@ query_color(const char *prompt)
             break;
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-                 ATR_NONE, clr, colornames[i].name,
-                 (colornames[i].color == NO_COLOR) ? MENU_ITEMFLAGS_SELECTED
-                                                   : MENU_ITEMFLAGS_NONE);
+                 ATR_NONE, NO_COLOR, colornames[i].name,
+                 (colornames[i].color == dflt_color) ? MENU_ITEMFLAGS_SELECTED
+                                                     : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick a color");
     pick_cnt = select_menu(tmpwin, PICK_ONE, &picks);
@@ -7402,7 +7417,7 @@ query_color(const char *prompt)
         return i;
     } else if (pick_cnt == 0) {
         /* pick_cnt==0: explicitly picking preselected entry toggled it off */
-        return NO_COLOR;
+        return dflt_color;
     }
     return -1;
 }
@@ -7412,18 +7427,15 @@ query_color(const char *prompt)
    for status highlighting, multiple attributes are allowed [overkill;
    life would be much simpler if that were restricted to one also...] */
 int
-query_attr(const char *prompt)
+query_attr(const char *prompt, int dflt_attr)
 {
     winid tmpwin;
     anything any;
     int i, pick_cnt;
     menu_item *picks = (menu_item *) 0;
     boolean allow_many = (prompt && !strncmpi(prompt, "Choose", 6));
-    int default_attr = ATR_NONE;
     int clr = NO_COLOR;
 
-    if (prompt && strstri(prompt, "menu headings"))
-        default_attr = iflags.menu_headings.attr;
     tmpwin = create_nhwindow(NHW_MENU);
     start_menu(tmpwin, MENU_BEHAVE_STANDARD);
     any = cg.zeroany;
@@ -7433,8 +7445,8 @@ query_attr(const char *prompt)
         any.a_int = i + 1;
         add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                  attrnames[i].attr, clr, attrnames[i].name,
-                 (attrnames[i].attr == default_attr) ? MENU_ITEMFLAGS_SELECTED
-                                                     : MENU_ITEMFLAGS_NONE);
+                 (attrnames[i].attr == dflt_attr) ? MENU_ITEMFLAGS_SELECTED
+                                                  : MENU_ITEMFLAGS_NONE);
     }
     end_menu(tmpwin, (prompt && *prompt) ? prompt : "Pick an attribute");
     pick_cnt = select_menu(tmpwin, allow_many ? PICK_ANY : PICK_ONE, &picks);
@@ -7475,7 +7487,7 @@ query_attr(const char *prompt)
             j = picks[0].item.a_int - 1;
             /* pick_cnt==2: explicitly picked something other than the
                preselected entry */
-            if (pick_cnt == 2 && attrnames[j].attr == default_attr)
+            if (pick_cnt == 2 && attrnames[j].attr == dflt_attr)
                 j = picks[1].item.a_int - 1;
             k = attrnames[j].attr;
         }
@@ -7483,7 +7495,7 @@ query_attr(const char *prompt)
         return k;
     } else if (pick_cnt == 0 && !allow_many) {
         /* PICK_ONE, preselected entry explicitly chosen */
-        return default_attr;
+        return dflt_attr;
     }
     /* either ESC to explicitly cancel (pick_cnt==-1) or
        PICK_ANY with preselected entry toggled off and nothing chosen */
@@ -7495,10 +7507,10 @@ query_color_attr(color_attr *ca, const char *prompt)
 {
     int c, a;
 
-    c = query_color(prompt);
+    c = query_color(prompt, ca->color);
     if (c == -1)
         return FALSE;
-    a = query_attr(prompt);
+    a = query_attr(prompt, ca->attr);
     if (a == -1)
         return FALSE;
     ca->color = c;
