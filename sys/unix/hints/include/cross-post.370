@@ -264,6 +264,9 @@ $(TARGETPFX)pdckbd.o : $(PDCPORT)/pdckbd.c
 $(TARGETPFX)pdcscrn.o : $(PDCPORT)/pdcscrn.c
 $(TARGETPFX)pdcsetsc.o : $(PDCPORT)/pdcsetsc.c
 $(TARGETPFX)pdcutil.o : $(PDCPORT)/pdcutil.c
+	$(TARGET_CC) $(PDCINCL) $(PDC_TARGET_CFLAGS) \
+		-Wno-sign-compare -o$@  $(PDCPORT)/pdcutil.c
+# -Wno-sign-compare
 endif  # BUILD_PDCURSES
 #
 # End of cross-compiling -POST section
