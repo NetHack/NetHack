@@ -560,16 +560,15 @@ void
 digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
 {
     struct obj *oldobjs, *newobjs;
-    register struct trap *ttmp;
+    struct trap *ttmp;
     const char *surface_type, *tname, *in_thru;
     char furniture[BUFSZ];
     struct rm *lev = &levl[x][y];
-    boolean shopdoor;
     struct monst *mtmp = m_at(x, y); /* may be madeby */
-    boolean madeby_u = (madeby == BY_YOU);
-    boolean madeby_obj = (madeby == BY_OBJECT);
-    boolean at_u = u_at(x, y);
-    boolean wont_fall = Levitation || Flying;
+    boolean madeby_u = (madeby == BY_YOU), madeby_obj = (madeby == BY_OBJECT),
+            /* BY_OBJECT means the hero broke a wand, so blame her for it */
+            heros_fault = (madeby_u || madeby_obj);
+    boolean shopdoor, at_u = u_at(x, y), wont_fall = Levitation || Flying;
     int old_typ, old_aligntyp = A_NONE;
 
     if (at_u && u.utrap) {
@@ -611,7 +610,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     if (!ttmp)
         return;
     newobjs = gl.level.objects[x][y];
-    ttmp->madeby_u = madeby_u;
+    ttmp->madeby_u = heros_fault;
     ttmp->tseen = 0;
     if (cansee(x, y))
         seetrap(ttmp);
@@ -634,18 +633,17 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
     if (IS_FURNITURE(old_typ) && cansee(x, y))
         pline_The("%s falls into the %s!", furniture, tname);
     /* wrath should immediately follow altar destruction message */
-    if ((madeby_u || madeby_obj) && old_typ == ALTAR)
+    if (heros_fault && old_typ == ALTAR)
         desecrate_altar(FALSE, old_aligntyp);
 
     /* now deal with actual post-trap creation effects */
     if (ttyp == PIT) {
-        if (madeby_u) {
-            if (shopdoor)
-                pay_for_damage("ruin", FALSE);
-            else
-                add_damage(x, y, SHOP_PIT_COST);
+        if (shopdoor && heros_fault)
+            pay_for_damage("ruin", FALSE);
+        else
+            add_damage(x, y, heros_fault ? SHOP_PIT_COST : 0L);
+        if (madeby_u)
             wake_nearby();
-        }
         /* in case we're digging down while encased in solid rock
            which is blocking levitation or flight */
         switch_terrain();
@@ -691,18 +689,15 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                     impact_drop((struct obj *) 0, x, y, 0);
                 if (oldobjs != newobjs)
                     (void) pickup(1);
-                if (shopdoor && madeby_u)
+                if (shopdoor && heros_fault)
                     pay_for_damage("ruin", FALSE);
-
             } else {
                 d_level newlevel;
 
-                if (*u.ushops && madeby_u)
+                if (*u.ushops && heros_fault)
                     shopdig(1); /* shk might snatch pack */
-                /* handle earlier damage, eg breaking wand of digging */
-                else if (!madeby_u)
+                else /* handle any earlier hero-caused damage */
                     pay_for_damage("dig into", TRUE);
-
                 You("fall through...");
                 /* Earlier checks must ensure that the destination
                  * level exists and is in the present dungeon.
@@ -714,7 +709,7 @@ digactualhole(coordxy x, coordxy y, struct monst *madeby, int ttyp)
                 spoteffects(FALSE);
             }
         } else {
-            if (shopdoor && madeby_u)
+            if (shopdoor && heros_fault)
                 pay_for_damage("ruin", FALSE);
             if (newobjs)
                 impact_drop((struct obj *) 0, x, y, 0);
