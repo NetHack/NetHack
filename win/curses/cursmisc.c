@@ -80,8 +80,7 @@ curses_toggle_color_attr(WINDOW *win, int color, int attr, int onoff)
 {
     if (color == NO_COLOR)
         color = NONE;
-    if (attr == ATR_NONE)
-        attr = NONE;
+
 #ifdef TEXTCOLOR
     int curses_color;
 

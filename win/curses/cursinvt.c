@@ -375,7 +375,7 @@ curs_show_invt(WINDOW *win)
     for (lineno = pi.rowoffset; lineno < pi.inuseindx; ++lineno) {
         str = pi.array[lineno].invtxt;
         accelerator = pi.array[lineno].letter;
-        attr = curses_convert_attr(pi.array[lineno].c_attr);
+        attr = pi.array[lineno].c_attr; /* already converted when stored */
         color = pi.array[lineno].color;
         if (color == NO_COLOR)
             color = NONE;

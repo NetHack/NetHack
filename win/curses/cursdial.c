@@ -1175,7 +1175,7 @@ menu_display_page(
     int count, curletter, entry_cols, start_col, num_lines;
     char *tmpstr;
     boolean first_accel = TRUE;
-    int color = NO_COLOR, attr = A_NORMAL;
+    int color = NO_COLOR, attr;
 
     /* letters assigned to entries on current page */
     if (selectors)
@@ -1280,14 +1280,12 @@ menu_display_page(
             start_col += 2;
         }
 #endif
-        if (color != NO_COLOR)
-            color = menu_item_ptr->color;
-
+	color = menu_item_ptr->color;
         if (color == NO_COLOR)
             color = NONE;
-        attr = menu_item_ptr->attr;
-        attr = curses_convert_attr(attr);
-        if (color != NONE || attr != A_NORMAL)
+	attr = menu_item_ptr->attr;
+	/* attr is already a curses attr (A_ not ATR_) */
+	if (color != NONE || attr != A_NORMAL)
             curses_menu_color_attr(win, color, attr, ON);
 
         num_lines = curses_num_lines(menu_item_ptr->str, entry_cols);
