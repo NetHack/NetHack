@@ -1,4 +1,4 @@
-/* NetHack 3.7	pickup.c	$NHDT-Date: 1698264789 2023/10/25 20:13:09 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.339 $ */
+/* NetHack 3.7	pickup.c	$NHDT-Date: 1700012890 2023/11/15 01:48:10 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.348 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1066,11 +1066,12 @@ query_objlist(const char *qstr,        /* query string */
             if ((*allow)(curr)) {
                 /* if sorting, print type name (once only) */
                 if (sorted && !printed_type_name) {
+                    boolean with_oc_sym = (how != PICK_NONE
+                                           && iflags.menu_head_objsym);
+
                     any = cg.zeroany;
                     add_menu_heading(win,
-                             let_to_name(*pack, FALSE,
-                                         ((how != PICK_NONE)
-                                          && iflags.menu_head_objsym)));
+                                     let_to_name(*pack, FALSE, with_oc_sym));
                     printed_type_name = TRUE;
                 }
 

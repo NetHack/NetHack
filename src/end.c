@@ -1,4 +1,4 @@
-/* NetHack 3.7	end.c	$NHDT-Date: 1693519356 2023/08/31 22:02:36 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.277 $ */
+/* NetHack 3.7	end.c	$NHDT-Date: 1700012887 2023/11/15 01:48:07 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.282 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -1079,16 +1079,9 @@ disclose(int how, boolean taken)
         ask = should_query_disclose_option('i', &defquery);
         c = ask ? yn_function(qbuf, ynqchars, defquery, TRUE) : defquery;
         if (c == 'y') {
-            /* save and restore menu_headings in case something like
-               #saveoptions is ever allowed to be run at the very end */
-            color_attr save_menu_headings = iflags.menu_headings;
-
             /* caller has already ID'd everything; we pass 'want_reply=True'
                to force display_pickinv() to avoid using WIN_INVENT */
-            iflags.menu_headings.attr = ATR_NONE; /* don't highlight class hdrs */
-            iflags.menu_headings.color = NO_COLOR;
             (void) display_inventory((char *) 0, TRUE);
-            iflags.menu_headings = save_menu_headings;
             container_contents(gi.invent, TRUE, TRUE, FALSE);
         }
         if (c == 'q')

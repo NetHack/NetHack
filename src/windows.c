@@ -1,4 +1,4 @@
-/* NetHack 3.7	windows.c	$NHDT-Date: 1661202202 2022/08/22 21:03:22 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.97 $ */
+/* NetHack 3.7	windows.c	$NHDT-Date: 1700012891 2023/11/15 01:48:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.109 $ */
 /* Copyright (c) D. Cohrs, 1993. */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -1623,23 +1623,29 @@ add_menu(
                                 ch, gch, attr, color, str, itemflags);
 }
 
+/* insert a non-selectable, possibly highlighted line of text into a menu */
 void
 add_menu_heading(winid tmpwin, const char *buf)
 {
     anything any = cg.zeroany;
+    int attr = iflags.menu_headings.attr,
+        color = iflags.menu_headings.color;
 
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             iflags.menu_headings.attr, iflags.menu_headings.color,
+    /* suppress highlighting during end-of-game disclosure */
+    if (gp.program_state.gameover)
+        attr = ATR_NONE, color = NO_COLOR;
+
+    add_menu(tmpwin, &nul_glyphinfo, &any, '\0', '\0', attr, color,
              buf, MENU_ITEMFLAGS_SKIPMENUCOLORS);
 }
 
+/* insert a non-selectable, unhighlighted line of text into a menu */
 void
 add_menu_str(winid tmpwin, const char *buf)
 {
     anything any = cg.zeroany;
 
-    add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
-             ATR_NONE, NO_COLOR,
+    add_menu(tmpwin, &nul_glyphinfo, &any, '\0', '\0', ATR_NONE, NO_COLOR,
              buf, MENU_ITEMFLAGS_NONE);
 }
 

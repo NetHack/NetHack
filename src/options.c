@@ -1,4 +1,4 @@
-/* NetHack 3.7	options.c	$NHDT-Date: 1687852124 2023/06/27 07:48:44 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.649 $ */
+/* NetHack 3.7	options.c	$NHDT-Date: 1700012888 2023/11/15 01:48:08 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.675 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2008. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -8780,8 +8780,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
     indexoffset = 1;
     any = cg.zeroany;
-    add_menu_heading(tmpwin,
-             "Booleans (selecting will toggle value):");
+    add_menu_heading(tmpwin, "Booleans (selecting will toggle value):");
     any.a_int = 0;
     /* first list any other non-modifiable booleans, then modifiable ones */
     for (pass = 0; pass <= 1; pass++)
@@ -8849,8 +8848,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
 
 #ifdef PREFIXES_IN_USE
     add_menu_str(tmpwin, "");
-    add_menu_heading(tmpwin,
-             "Variable playground locations:");
+    add_menu_heading(tmpwin, "Variable playground locations:");
     for (i = 0; i < PREFIX_COUNT; i++)
         doset_add_menu(tmpwin, fqn_prefix_names[i], fmtstr_doset, -1, 0);
 #endif
