@@ -1050,7 +1050,7 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     if (Has_contents(obj))
         picked_container(obj); /* clear no_charge */
     obj_was_thrown = obj->was_thrown;
-    obj->was_thrown = 0;       /* not meaningful for invent */
+    obj->was_thrown = obj->was_dropped = 0; /* not meaningful for invent */
 
     if (gl.loot_reset_justpicked) {
         gl.loot_reset_justpicked = FALSE;

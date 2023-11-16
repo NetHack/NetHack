@@ -108,6 +108,7 @@ resetobjs(struct obj *ochain, boolean restore)
             otmp->invlet = 0;
             otmp->no_charge = 0;
             otmp->was_thrown = 0;
+            otmp->was_dropped = 0;
 
             /* strip user-supplied names */
             /* Statue and some corpse names are left intact,

@@ -531,6 +531,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(pickup_burden, Advanced, 20, opt_in, set_in_game,
                 No, Yes, No, Yes, NoAlias,
                 "maximum burden picked up before prompt")
+    NHOPTB(pickup_dropped, Behavior, 0, opt_out, set_in_game,
+           On, Yes, No, No, NoAlias, &flags.pickup_dropped, Term_False,
+           "consider dropped items for autopickup")
     NHOPTB(pickup_thrown, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.pickup_thrown, Term_False,
            "autopickup thrown items")

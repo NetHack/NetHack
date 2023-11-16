@@ -50,6 +50,7 @@ null           allow nulls to be sent to your terminal             [True]
                delay code) if moving objects seem to teleport across rooms
 perm_invent    keep inventory in a permanent window               [False]
 pickup_thrown  override pickup_types for thrown objects            [True]
+pickup_dropped evaluate pickup_types for dropped objects           [True]
 pushweapon     when wielding a new weapon, put your previously    [False]
                wielded weapon into the secondary weapon slot
 quick_farsight usually skip the chance to browse the map when     [False]
