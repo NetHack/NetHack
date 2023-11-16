@@ -749,7 +749,7 @@ extern schar lev_by_name(const char *);
 extern boolean known_branch_stairs(stairway *);
 extern char *stairs_description(stairway *, char *, boolean);
 extern schar print_dungeon(boolean, schar *, xint16 *);
-extern char *get_annotation(d_level *);
+extern void print_level_annotation(void);
 extern int donamelevel(void);
 extern void free_exclusions(void);
 extern void save_exclusions(NHFILE *);

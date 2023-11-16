@@ -832,6 +832,8 @@ welcome(boolean new_game) /* false => restoring an old game */
         /* if restoring in Gehennom, give same hot/smoky message as when
            first entering it */
         hellish_smoke_mesg();
+        /* remind player of the level annotation, like in goto_level() */
+        print_level_annotation();
     }
 }
 

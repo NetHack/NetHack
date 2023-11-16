@@ -56,6 +56,7 @@ static void tport_menu(winid, char *, struct lchoice *, d_level *, boolean);
 static const char *br_string(int);
 static char chr_u_on_lvl(d_level *);
 static void print_branch(winid, int, int, int, boolean, struct lchoice *);
+static char *get_annotation(d_level *);
 static void query_annotation(d_level *);
 static mapseen *load_mapseen(NHFILE *);
 static void save_mapseen(NHFILE *, mapseen *);
@@ -2603,7 +2604,7 @@ recbranch_mapseen(d_level *source, d_level *dest)
     }
 }
 
-char *
+static char *
 get_annotation(d_level *lev)
 {
     mapseen *mptr;
@@ -2611,6 +2612,16 @@ get_annotation(d_level *lev)
     if ((mptr = find_mapseen(lev)))
         return mptr->custom;
     return NULL;
+}
+
+/* print the annotation for the current level, if it exists */
+void
+print_level_annotation(void)
+{
+    const char *annotation;
+
+    if ((annotation = get_annotation(&u.uz)) != 0)
+        You("remember this level as %s.", annotation);
 }
 
 /* ask user to annotate level lev.
