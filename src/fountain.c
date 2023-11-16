@@ -551,18 +551,20 @@ wash_hands(void)
 {
     const char *hands = makeplural(body_part(HAND));
     int res = ER_NOTHING;
+    boolean was_glib = !!Glib;
 
     You("wash your %s%s in the %s.", uarmg ? "gloved " : "", hands,
         hliquid("water"));
     if (Glib) {
         make_glib(0);
         Your("%s are no longer slippery.", fingers_or_gloves(TRUE));
-        /* not what ER_GREASED is for, but the checks in dipfountain just
-           compare the result to ER_DESTROYED and ER_NOTHING, so it works */
-        res = ER_GREASED;
-    } else if (uarmg) {
-        res = water_damage(uarmg, (const char *) 0, TRUE);
     }
+    if (uarmg)
+        res = water_damage(uarmg, (const char *) 0, TRUE);
+    /* not what ER_GREASED is for, but the checks in dipfountain just
+       compare the result to ER_DESTROYED and ER_NOTHING, so it works */
+    if (was_glib && res == ER_NOTHING)
+        res = ER_GREASED;
     return res;
 }
 
