@@ -590,7 +590,7 @@ void
 emit_start_bold(void)
 {
     DWORD unused, reserved;
-    static const char escseq[] = "\x1b[4m";
+    static const char escseq[] = "\x1b[1m";
 
     WriteConsoleA(console.hConOut, (LPCSTR) escseq, (int) strlen(escseq),
                   &unused, &reserved);
