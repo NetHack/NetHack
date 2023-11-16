@@ -1419,7 +1419,6 @@ goto_level(
             new = FALSE; /* made a new level? */
     struct monst *mtmp;
     char whynot[BUFSZ];
-    char *annotation;
     int dist = depth(newlevel) - depth(&u.uz);
     boolean do_fall_dmg = FALSE;
     schar prev_temperature = gl.level.flags.temperature;
@@ -1881,9 +1880,7 @@ goto_level(
     save_currentstate();
 #endif
 
-    if ((annotation = get_annotation(&u.uz)) != 0)
-        You("remember this level as %s.", annotation);
-
+    print_level_annotation();
     /* give room entrance message, if any */
     check_special_room(FALSE);
     /* deliver objects traveling with player */
