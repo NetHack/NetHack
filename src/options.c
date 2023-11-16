@@ -8718,6 +8718,8 @@ term_for_boolean(int idx, boolean *b)
     return boolean_term;
 }
 
+#define HELP_IDX (SIZE(allopt))
+
 /* the #optionsfull command */
 int
 doset(void) /* changing options via menu by Per Liboriussen */
@@ -8766,7 +8768,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
                 Sprintf(buf, "%4s%.75s", "", helptext[i]);
                 add_menu_str(tmpwin, buf);
             } else {
-                any.a_int = '?' + 1; /* processing pick_list subtracts 1 */
+                any.a_int = HELP_IDX + 1; /* processing pick_list subtracts 1 */
                 add_menu(tmpwin, &nul_glyphinfo, &any, '?', '?', ATR_NONE,
                          clr, "view help for options menu",
                          MENU_ITEMFLAGS_SKIPINVERT);
@@ -8877,7 +8879,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
          */
         for (pick_idx = 0; pick_idx < pick_cnt; ++pick_idx) {
             opt_indx = pick_list[pick_idx].item.a_int - 1;
-            if (opt_indx == '?') {
+            if (opt_indx == HELP_IDX) {
                 display_file(OPTMENUHELP, FALSE);
                 gavehelp = TRUE;
                 continue; /* just handled '?'; there might be more picks */
@@ -8946,6 +8948,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     }
     return ECMD_OK;
 }
+
+#undef HELP_IDX
 
 /* doset(#optionsfull command) menu entries for compound options */
 static void
