@@ -127,6 +127,7 @@ struct obj {
     Bitfield(greased, 1);    /* covered with grease */
     Bitfield(nomerge, 1);    /* set temporarily to prevent merging */
     Bitfield(was_thrown, 1); /* thrown by hero since last picked up */
+    Bitfield(was_dropped, 1); /* dropped deliberately by the hero */
 
     Bitfield(in_use, 1); /* for magic items before useup items */
     Bitfield(bypass, 1); /* mark this as an object to be skipped by bhito() */
@@ -144,9 +145,9 @@ struct obj {
     Bitfield(eknown, 1); /* effect known for wands zapped or rings worn when
                           * not seen yet after being picked up while blind
                           * [maybe for remaining stack of used potion too] */
-    /* 0 free bits */
+    /* 7 free bits */
 #else
-    /* 2 free bits */
+    /* 1 free bit */
 #endif
 
     int corpsenm;         /* type of corpse is mons[corpsenm] */
