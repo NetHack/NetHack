@@ -5418,6 +5418,7 @@ handler_menu_headings(void)
         if (iflags.perm_invent)
             update_inventory();
     }
+    adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
     return optn_ok;
 }
 
