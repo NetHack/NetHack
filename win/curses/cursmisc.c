@@ -169,7 +169,8 @@ curses_menu_color_attr(WINDOW *win, int color, int attr, int onoff)
     /* curses_toggle_color_attr() uses 'guicolor' to decide whether to
        honor specified color, but menu windows have their own
        more-specific control, 'menucolors', so override with that here */
-    iflags.wc2_guicolor = iflags.use_menu_color;
+/*    iflags.wc2_guicolor = iflags.use_menu_color; */
+    iflags.wc2_guicolor = (color != NONE);
     curses_toggle_color_attr(win, color, attr, onoff);
     iflags.wc2_guicolor = save_guicolor;
 }

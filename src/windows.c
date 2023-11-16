@@ -1602,10 +1602,12 @@ void
 adjust_menu_promptstyle(winid window, color_attr *style)
 {
     win_request_info wri = zerowri;
-    wri.fromcore.menu_promptstyle.color = style->color;
+    wri.fromcore.menu_promptstyle.color =
+            (iflags.wc_color) ? style->color : NO_COLOR;
     wri.fromcore.menu_promptstyle.attr = style->attr;
     /*  relay the style change to the window port */
     (void) ctrl_nhwindow(window, set_menu_promptstyle, &wri);
+    go.opt_need_promptstyle = FALSE;
 }
 
 /*
@@ -1626,13 +1628,15 @@ add_menu(
     const char *str,            /* menu text */
     unsigned int itemflags)     /* itemflags such as MENU_ITEMFLAGS_SELECTED */
 {
-    if (iflags.use_menu_color) {
+    if (iflags.wc_color && iflags.use_menu_color) {
         if ((itemflags & MENU_ITEMFLAGS_SKIPMENUCOLORS) == 0)
             (void) get_menu_coloring(str, &color, &attr);
     }
     /* this is the only function that cared about this flag; remove it now */
     itemflags &= ~MENU_ITEMFLAGS_SKIPMENUCOLORS;
 
+    if (!iflags.wc_color)
+        color = NO_COLOR;
     (*windowprocs.win_add_menu)(window, glyphinfo, identifier,
                                 ch, gch, attr, color, str, itemflags);
 }

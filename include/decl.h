@@ -721,6 +721,7 @@ struct instance_globals_o {
     boolean opt_from_file;
     boolean opt_need_redraw; /* for doset() */
     boolean opt_need_glyph_reset;
+    boolean opt_need_promptstyle;
 
     /* pickup.c */
     int oldcap; /* last encumberance */

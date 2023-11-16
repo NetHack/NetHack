@@ -5071,10 +5071,12 @@ optfn_boolean(int optidx, int req, boolean negated, char *opts, char *op)
 #endif
             go.opt_need_redraw = TRUE;
             go.opt_need_glyph_reset = TRUE;
+            go.opt_need_promptstyle = TRUE;
             break;
         case opt_menucolors:
         case opt_guicolor:
             update_inventory();
+            go.opt_need_promptstyle = TRUE;
             break;
         case opt_mention_decor:
             iflags.prev_decor = STONE;
@@ -8693,6 +8695,8 @@ doset_simple(void)
             docrt();
             flush_screen(1);
         }
+        if (go.opt_need_promptstyle)
+            adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
         if (gc.context.botl || gc.context.botlx) {
             bot();
         }
@@ -8942,6 +8946,9 @@ doset(void) /* changing options via menu by Per Liboriussen */
         check_gold_symbol();
         reglyph_darkroom();
         docrt();
+    }
+    if (go.opt_need_promptstyle) {
+        adjust_menu_promptstyle(WIN_INVEN, &iflags.menu_headings);
     }
     if (gc.context.botl || gc.context.botlx) {
         bot();
