@@ -76,7 +76,7 @@ COLORREF message_bg_color = RGB(0, 0, 0);
 COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 
 strbuf_t raw_print_strbuf = { 0 };
-mswin_menu_promptstyle = { NO_COLOR, ATR_NONE };
+color_attr mswin_menu_promptstyle = { NO_COLOR, ATR_NONE };
 
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
