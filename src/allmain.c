@@ -662,6 +662,7 @@ void
 init_sound_disp_gamewindows(void)
 {
     int menu_behavior = MENU_BEHAVE_STANDARD;
+    color_attr menu_promptstyle = { NO_COLOR, ATR_INVERSE };
 
     activate_chosen_soundlib();
 
@@ -680,6 +681,8 @@ init_sound_disp_gamewindows(void)
     }
     WIN_MAP = create_nhwindow(NHW_MAP);
     WIN_INVEN = create_nhwindow(NHW_MENU);
+    if (WIN_INVEN != WIN_ERR)
+        adjust_menu_promptstyle(WIN_INVEN, &menu_promptstyle);
 #ifdef TTY_PERM_INVENT
     if (WINDOWPORT(tty) && WIN_INVEN != WIN_ERR) {
         menu_behavior = MENU_BEHAVE_PERMINV;

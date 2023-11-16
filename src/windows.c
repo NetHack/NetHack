@@ -1593,6 +1593,20 @@ mixed_to_glyphinfo(const char *str, glyph_info *gip)
     return str;
 }
 
+/* enum and structs are defined in wintype.h */
+
+win_request_info zerowri = { { 0L, 0, 0, 0, 0, 0, 0, 0 },
+                             { 0, 0, { NO_COLOR, ATR_NONE }}};
+
+void
+adjust_menu_promptstyle(winid window, color_attr *style)
+{
+    win_request_info wri = zerowri;
+    wri.fromcore.menu_promptstyle.color = style->color;
+    wri.fromcore.menu_promptstyle.attr = style->attr;
+    /*  relay the style change to the window port */
+    (void) ctrl_nhwindow(window, set_menu_promptstyle, &wri);
+}
 
 /*
  *   Common code point leading into the interface-specifc

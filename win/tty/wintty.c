@@ -2593,6 +2593,8 @@ reverse(tty_menu_item *curr)
     return head;
 }
 
+static color_attr tty_menu_promptstyle = { NO_COLOR, ATR_NONE };
+
 /*
  * End a menu in this window, window must a type NHW_MENU.  This routine
  * processes the string list.  We calculate the # of pages, then assign
@@ -2642,7 +2644,8 @@ tty_end_menu(
         tty_add_menu(window, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, clr, "", MENU_ITEMFLAGS_NONE);
         tty_add_menu(window, &nul_glyphinfo, &any, 0, 0,
-                     ATR_NONE, clr, prompt, MENU_ITEMFLAGS_NONE);
+                     tty_menu_promptstyle.attr, tty_menu_promptstyle.color,
+                     prompt, MENU_ITEMFLAGS_NONE);
     }
 
     /* 52: 'a'..'z' and 'A'..'Z'; avoids selector duplication within a page */
@@ -2807,22 +2810,20 @@ RESTORE_WARNING_FORMAT_NONLITERAL
 win_request_info *
 tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
 {
-#if !defined(TTY_PERM_INVENT)
-    wri = (win_request_info *) 0;
-    nhUse(window);
-    nhUse(request);
-#else
+#if defined(TTY_PERM_INVENT)
     boolean tty_ok /*, show_gold */, inuse_only;
     int maxslot;
     /* these types are set match the wintty.h field declarations */
     long minrow; /* long to match maxrow declaration in wintty.h */
     short offx, offy;
     long rows, cols, maxrow, maxcol;
+#endif
 
     if (!wri)
         return (win_request_info *) 0;
 
     switch (request) {
+#if defined(TTY_PERM_INVENT)
     case set_mode:
     case request_settings:
         ttyinvmode = wri->fromcore.invmode;
@@ -2850,11 +2851,14 @@ tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
             wri->tocore.maxslot = maxslot;
         }
         break;
+#endif  /* TTY_PERM_INVENT */
+    case set_menu_promptstyle:
+        tty_menu_promptstyle = wri->fromcore.menu_promptstyle;
+        break;
     default:
         impossible("invalid request to tty_ctrl_nhwindow: %d", request);
         break;
     }
-#endif
     return wri;
 }
 

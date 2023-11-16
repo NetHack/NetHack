@@ -149,6 +149,7 @@ int orig_cursor;            /* Preserve initial cursor state */
 WINDOW *base_term;          /* underlying terminal window */
 boolean counting;           /* Count window is active */
 WINDOW *mapwin, *statuswin, *messagewin;    /* Main windows */
+color_attr curses_menu_promptstyle = { NO_COLOR, ATR_NONE };
 
 /* Track if we're performing an update to the permanent window.
    Needed since we aren't using the normal menu functions to handle
@@ -799,10 +800,32 @@ curses_update_inventory(int arg)
 win_request_info *
 curses_ctrl_nhwindow(
     winid window UNUSED,
-    int request UNUSED,
-    win_request_info *wri UNUSED)
+    int request,
+    win_request_info *wri)
 {
-    return (win_request_info *) 0;
+    int attr;
+
+    if (!wri)
+        return (win_request_info *) 0;
+
+    switch (request) {
+#if 0
+    case set_mode:
+    case request_settings:
+        break;
+#endif
+    case set_menu_promptstyle:
+	curses_menu_promptstyle.color = wri->fromcore.menu_promptstyle.color;
+        if (curses_menu_promptstyle.color == NO_COLOR)
+            curses_menu_promptstyle.color = NONE;
+	attr = wri->fromcore.menu_promptstyle.attr;
+	curses_menu_promptstyle.attr = curses_convert_attr(attr);;
+        break;
+    default:
+        impossible("invalid request to ctrl_nhwindow: %d", request);
+        break;
+    }
+    return wri;
 }
 
 /*

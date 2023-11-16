@@ -76,6 +76,7 @@ COLORREF message_bg_color = RGB(0, 0, 0);
 COLORREF message_fg_color = RGB(0xFF, 0xFF, 0xFF);
 
 strbuf_t raw_print_strbuf = { 0 };
+mswin_menu_promptstyle = { NO_COLOR, ATR_NONE };
 
 /* Interface definition, for windows.c */
 struct window_procs mswin_procs = {
@@ -1255,7 +1256,18 @@ mswin_ctrl_nhwindow(
     int request,
     win_request_info *wri)
 {
-    return (win_request_info *) 0;
+    if (!wri)
+        return (win_request_info *) 0;
+
+    switch(request) {
+    case set_menu_promptstyle:
+        mswin_menu_promptstyle = wri->fromcore.menu_promptstyle;
+        break;
+    default:
+        impossible("invalid request to ctrl_nhwindow: %d", request);
+        break;
+    }
+    return wri;
 }
 
 /*

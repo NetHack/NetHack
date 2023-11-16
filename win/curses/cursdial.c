@@ -1164,6 +1164,8 @@ get_menuitem_y(
 
 /* Displays menu selections in the given window */
 
+extern color_attr curses_menu_promptstyle; /*cursmain.c */
+
 static void
 menu_display_page(
     nhmenu *menu, WINDOW *win,
@@ -1207,9 +1209,11 @@ menu_display_page(
 
         for (count = 0; count < num_lines; count++) {
             tmpstr = curses_break_str(menu->prompt, menu->width, count + 1);
-            curses_toggle_color_attr(win, NO_COLOR, A_NORMAL, ON);
+            curses_toggle_color_attr(win, curses_menu_promptstyle.color,
+			             curses_menu_promptstyle.attr, ON);
             mvwprintw(win, count + 1, 1, "%s", tmpstr);
-            curses_toggle_color_attr(win, NO_COLOR, A_NORMAL, OFF);
+            curses_toggle_color_attr(win, curses_menu_promptstyle.color,
+			             curses_menu_promptstyle.attr, OFF);
             free(tmpstr);
         }
     }

@@ -445,6 +445,10 @@ extern struct nomakedefs_s nomakedefs;
 #define MAXMONNO 120 /* extinct monst after this number created */
 #define MHPMAX 500   /* maximum monster hp */
 
+typedef struct color_and_attr {
+           int color, attr;
+} color_attr;
+
 /*
  * Version 3.7.x has aspirations of portable file formats. We
  * make a distinction between MAIL functionality and MAIL_STRUCTURES

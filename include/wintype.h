@@ -204,8 +204,9 @@ enum to_core_flags {
 };
 
 enum from_core_requests {
-    set_mode         = 1,
-    request_settings = 2,
+    set_mode             = 1,
+    request_settings     = 2,
+    set_menu_promptstyle = 3
 };
 
 struct to_core {
@@ -220,6 +221,7 @@ struct to_core {
 struct from_core {
     enum from_core_requests core_request;
     enum inv_modes invmode;
+    color_attr menu_promptstyle;
 };
 
 struct win_request_info_t {
@@ -228,6 +230,7 @@ struct win_request_info_t {
 };
 
 typedef struct win_request_info_t win_request_info;
+extern win_request_info zerowri;    /* windows.c */
 
 /* #define CORE_INVENT */
 

@@ -504,12 +504,24 @@ void NetHackQtBind::qt_update_inventory(int arg UNUSED)
 }
 
 win_request_info *NetHackQtBind::qt_ctrl_nhwindow(
-    winid wid UNUSED,
-    int request UNUSED,
-    win_request_info *wri UNUSED)
+    winid wid,
+    int request,
+    win_request_info *wri)
 {
     NetHackQtWindow* window UNUSED =id_to_window[(int)wid];
-    return (win_request_info *) 0;
+
+    if (!wri)
+        return (win_request_info *) 0;
+
+    switch(request) {
+    case set_menu_promptstyle:
+        /* = wri->fromcore.menu_promptstyle; */
+        break;
+    default:
+        impossible("invalid request to ctrl_nhwindow: %d", request);
+        break;
+    }
+    return wri;
 }
 
 void NetHackQtBind::qt_mark_synch()

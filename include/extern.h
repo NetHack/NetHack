@@ -3437,6 +3437,7 @@ extern void genl_putmixed(winid, int, const char *);
 extern void genl_display_file(const char *, boolean);
 extern boolean menuitem_invert_test(int, unsigned, boolean);
 extern const char *mixed_to_glyphinfo(const char *str, glyph_info *gip);
+extern void adjust_menu_promptstyle(winid, color_attr *);
 extern void add_menu(winid, const glyph_info *, const ANY_P *,
                      char, char, int, int, const char *, unsigned int);
 extern void add_menu_heading(winid, const char *);

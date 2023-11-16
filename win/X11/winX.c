@@ -98,6 +98,7 @@ void (*input_func)(Widget, XEvent *, String *, Cardinal *);
 int click_x, click_y, click_button; /* Click position on a map window
                                      * (filled by set_button_values()). */
 int updated_inventory; /* used to indicate perm_invent updating */
+color_attr X11_menu_promptstyle = { NO_COLOR, ATR_NONE };
 
 static void X11_error_handler(String) NORETURN;
 static int X11_io_error_handler(Display *);
@@ -1308,7 +1309,18 @@ X11_ctrl_nhwindow(
     int request UNUSED,
     win_request_info *wri UNUSED)
 {
-    return (win_request_info *) 0;
+    if (!wri)
+        return (win_request_info *) 0;
+
+    switch(request) {
+    case set_menu_promptstyle:
+        X11_menu_promptstyle = wri->fromcore.menu_promptstyle;
+        break;
+    default:
+        impossible("invalid request to ctrl_nhwindow: %d", request);
+        break;
+    }
+    return wri;
 }
 
 /* The current implementation has all of the saved lines on the screen. */
