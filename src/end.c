@@ -851,6 +851,7 @@ panic VA_DECL(const char *, str)
     if (gp.program_state.panicking++)
         NH_abort(NULL); /* avoid loops - this should never happen*/
 
+    gb.bot_disabled = TRUE;
     if (iflags.window_inited) {
         raw_print("\r\nOops...");
         wait_synch(); /* make sure all pending output gets flushed */

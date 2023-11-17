@@ -152,7 +152,7 @@ curses_status_update(
 
     if (fldidx != BL_FLUSH) {
         if (fldidx < 0 || fldidx >= MAXBLSTATS) {
-            gc.context.botlx = gc.context.botl = FALSE; /* avoid bot() */
+            /* panic immediately sets gb.bot_disabled to avoid bot() */
             panic("curses_status_update(%d)", fldidx);
         }
         changed_fields |= (1 << fldidx);

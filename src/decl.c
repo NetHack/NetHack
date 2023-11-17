@@ -248,6 +248,7 @@ const struct instance_globals_b g_init_b = {
     FALSE, /* bucx_filter */
     /* zap.c */
     NULL, /* buzzer -- monst that zapped/cast/breathed to initiate buzz() */
+    FALSE, /* bot_disabled */
 
     TRUE, /* havestate*/
     IVMAGIC  /* b_magic to validate that structure layout has been preserved */

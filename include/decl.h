@@ -201,6 +201,9 @@ struct instance_globals_b {
     /* zap.c */
     struct monst *buzzer; /* zapper/caster/breather who initiates buzz() */
 
+    /* new */
+    boolean bot_disabled;
+
     boolean havestate;
     unsigned long magic; /* validate that structure layout is preserved */
 };
