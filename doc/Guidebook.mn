@@ -3874,7 +3874,7 @@ picked up, even if
 .op autopickup
 is also on and they are in
 .op pickup_types
-or match a positive autopickup exception (defualt off).  Persistent.
+or match a positive autopickup exception (defualt on).  Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
