@@ -904,10 +904,10 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
     if (costly && !otmp->no_charge)
         return FALSE;
 
-    /* pickup_thrown/!pickup_dropped override pickup_types and exceptions */
+    /* pickup_thrown/nopick_dropped override pickup_types and exceptions */
     if (flags.pickup_thrown && otmp->was_thrown)
         return TRUE;
-    if (!flags.pickup_dropped && otmp->was_dropped)
+    if (flags.nopick_dropped && otmp->was_dropped)
         return FALSE;
 
     /* check for pickup_types */
