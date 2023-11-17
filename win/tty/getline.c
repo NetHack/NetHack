@@ -58,6 +58,11 @@ hooked_tty_getlin(
 
     /*
      * Issue the prompt.
+     *
+     * custompline() will call vpline() which calls flush_screen() which
+     * calls bot(). The core now disables bot() processing while inside
+     * getlin, so the screen won't be modified during whatever this prompt
+     * is for.
      */
     custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
 
