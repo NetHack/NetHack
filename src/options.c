@@ -8739,7 +8739,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     menu_item *pick_list;
     int indexoffset, startpass, endpass;
     boolean setinitial = FALSE, fromfile = FALSE,
-            gavehelp = FALSE, skiphelp = !iflags.cmdassist;
+            gavehelp = FALSE, skiphelp = !iflags.cmdassist,
+            save_bot_disabled;
     int clr = NO_COLOR;
 
     if (iflags.menu_requested) {
@@ -8874,6 +8875,8 @@ doset(void) /* changing options via menu by Per Liboriussen */
     end_menu(tmpwin, "Set what options?");
     go.opt_need_redraw = FALSE;
     go.opt_need_glyph_reset = FALSE;
+    save_bot_disabled = gb.bot_disabled;
+    gb.bot_disabled = TRUE;
     if ((pick_cnt = select_menu(tmpwin, PICK_ANY, &pick_list)) > 0) {
         /*
          * Walk down the selection list and either invert the booleans
@@ -8930,6 +8933,7 @@ doset(void) /* changing options via menu by Per Liboriussen */
     }
 
     destroy_nhwindow(tmpwin);
+    gb.bot_disabled = save_bot_disabled;
 
     if (pick_cnt == 1 && gavehelp) {
         /* when '?' is only the thing selected, go back and pick all

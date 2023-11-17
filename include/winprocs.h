@@ -125,13 +125,15 @@ extern
 #define putmixed (*windowprocs.win_putmixed)
 #define display_file (*windowprocs.win_display_file)
 #define start_menu (*windowprocs.win_start_menu)
-/* 3.7: There is a real add_menu() in the core now, which does
- *      some common activities, such as menu_colors.
- *      add_menu() is in windows.c
+#define end_menu (*windowprocs.win_end_menu)
+/* 3.7: There are real add_menu() and select_menu
+ *      in the core now.
+ *      add_menu does some common activities, such as menu_colors.
+ *      select_menu does some before and after activities. 
+ *      add_menu() and select_menu() are in windows.c
  */
 /* #define add_menu (*windowprocs.win_add_menu) */
-#define end_menu (*windowprocs.win_end_menu)
-#define select_menu (*windowprocs.win_select_menu)
+/* #define select_menu (*windowprocs.win_select_menu) */
 #define message_menu (*windowprocs.win_message_menu)
 
 #define mark_synch (*windowprocs.win_mark_synch)
