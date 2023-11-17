@@ -17,7 +17,7 @@ cmdassist      give help for errors on direction & other commands  [True]
 color          use different colors for objects on screen  [True for micros]
 confirm        ask before hitting tame or peaceful monsters        [True]
 dark_room      show floor not in sight in different color          [True]
-dropped_nopick exclude dropped objects from autopickup            [False]
+dropped_nopick exclude dropped objects from autopickup             [True]
 eight_bit_tty  send 8-bit characters straight to terminal         [False]
 extmenu        tty, curses: use menu for # (extended commands)    [False]
                X11: menu has all commands (T) or traditional subset (F)
