@@ -489,6 +489,11 @@ allow_all(struct obj *obj UNUSED)
 boolean
 allow_category(struct obj *obj)
 {
+    /* If no filters are active, nothing will match. */
+    if (!gc.class_filter && !gs.shop_filter && !gb.bucx_filter
+        && !gp.picked_filter)
+        return FALSE;
+
     /* For coins, if any class filter is specified, accept if coins
      * are included regardless of whether either unpaid or BUC-status
      * is also specified since player has explicitly requested coins.
@@ -3117,7 +3122,7 @@ static int
 menu_loot(int retry, boolean put_in)
 {
     int n, i, n_looted = 0;
-    boolean all_categories = TRUE, loot_everything = FALSE, autopick = FALSE;
+    boolean all_categories = TRUE, autopick = FALSE;
     char buf[BUFSZ];
     boolean loot_justpicked = FALSE;
     const char *action = put_in ? "Put in" : "Take out";
@@ -3135,21 +3140,19 @@ menu_loot(int retry, boolean put_in)
                   | JUSTPICKED );
         n = query_category(buf, put_in ? gi.invent : gc.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
-        if (!n)
-            return ECMD_OK;
+        if (!n || (n == 1 && pick_list[0].item.a_int == 'A'))
+            return ECMD_OK; /* no non-autopick category filters specified */
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == 'A') {
-                loot_everything = autopick = TRUE;
+                autopick = TRUE;
             } else if (put_in && pick_list[i].item.a_int == 'P') {
                 loot_justpicked = TRUE;
                 count = max(0, pick_list[i].count);
                 add_valid_menu_class(pick_list[i].item.a_int);
-                loot_everything = FALSE;
             } else if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
-                loot_everything = FALSE;
             }
         }
         free((genericptr_t) pick_list);
@@ -3176,7 +3179,7 @@ menu_loot(int retry, boolean put_in)
          */
         for (otmp = firstobj; otmp && gc.current_container; otmp = otmp2) {
             otmp2 = otmp->nobj;
-            if (loot_everything || all_categories || allow_category(otmp)) {
+            if (all_categories || allow_category(otmp)) {
                 res = (*inout_func)(otmp);
                 if (res < 0)
                     break;

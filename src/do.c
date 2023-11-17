@@ -914,7 +914,7 @@ menu_drop(int retry)
     int n, i, n_dropped = 0;
     struct obj *otmp, *otmp2;
     menu_item *pick_list;
-    boolean all_categories = TRUE, drop_everything = FALSE, autopick = FALSE;
+    boolean all_categories = TRUE, autopick = FALSE;
     boolean drop_justpicked = FALSE;
     long justpicked_quan = 0;
 
@@ -927,21 +927,19 @@ menu_drop(int retry)
                             | BUC_BLESSED | BUC_CURSED | BUC_UNCURSED
                             | BUC_UNKNOWN | JUSTPICKED | INCLUDE_VENOM),
                            &pick_list, PICK_ANY);
-        if (!n)
-            goto drop_done;
+        if (!n || (n == 1 && pick_list[0].item.a_int == 'A'))
+            goto drop_done; /* no non-autopick category filters specified */
         for (i = 0; i < n; i++) {
             if (pick_list[i].item.a_int == ALL_TYPES_SELECTED) {
                 all_categories = TRUE;
             } else if (pick_list[i].item.a_int == 'A') {
-                drop_everything = autopick = TRUE;
+                autopick = TRUE;
             } else if (pick_list[i].item.a_int == 'P') {
                 justpicked_quan = max(0, pick_list[i].count);
                 drop_justpicked = TRUE;
-                drop_everything = FALSE;
                 add_valid_menu_class(pick_list[i].item.a_int);
             } else {
                 add_valid_menu_class(pick_list[i].item.a_int);
-                drop_everything = FALSE;
             }
         }
         free((genericptr_t) pick_list);
@@ -980,7 +978,7 @@ menu_drop(int retry)
          */
         bypass_objlist(gi.invent, FALSE); /* clear bypass bit for invent */
         while ((otmp = nxt_unbypassed_obj(gi.invent)) != 0) {
-            if (drop_everything || all_categories || allow_category(otmp))
+            if (all_categories || allow_category(otmp))
                 n_dropped += ((drop(otmp) & ECMD_TIME) != 0) ? 1 : 0;
         }
         /* we might not have dropped everything (worn armor, welded weapon,
@@ -1002,7 +1000,7 @@ menu_drop(int retry)
             /*
              * picklist[] contains a set of pointers into inventory, but
              * as soon as something gets dropped, they might become stale
-             * (see the drop_everything code above for an explanation).
+             * (see the autopick code above for an explanation).
              * Just checking to see whether one is still in the gi.invent
              * chain is not sufficient validation since destroyed items
              * will be freed and items we've split here might have already
