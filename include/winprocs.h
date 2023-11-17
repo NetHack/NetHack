@@ -149,7 +149,12 @@ extern
 #define nh_poskey (*windowprocs.win_nh_poskey)
 #define nhbell (*windowprocs.win_nhbell)
 #define nh_doprev_message (*windowprocs.win_doprev_message)
-#define getlin (*windowprocs.win_getlin)
+/* 3.7: There is a real getlin() in the core now, which does
+ *      some before and after activities.
+ *      [alternative fix for menu search via ':'.]
+ *      getlin() is in windows.c
+ */
+/* #define getlin (*windowprocs.win_getlin) */
 #define get_ext_cmd (*windowprocs.win_get_ext_cmd)
 #define number_pad (*windowprocs.win_number_pad)
 #define nh_delay_output (*windowprocs.win_delay_output)

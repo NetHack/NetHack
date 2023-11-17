@@ -58,16 +58,7 @@ hooked_tty_getlin(
 
     /*
      * Issue the prompt.
-     *
-     * custompline() will call vpline() which calls flush_screen() which
-     * calls bot().  We don't want bot() modifying the screen during
-     * whatever this prompt is for.  If the status area hasn't been
-     * overwritten, no update is needed, but if has been overwritten (by
-     * a menu or text window) we don't want status refresh to clobber that
-     * when the window hasn't finished yet.  [Fix for menu search via ':'.]
      */
-    if (ttyDisplay->lastwin != WIN_STATUS)
-        gc.context.botl = gc.context.botlx = iflags.time_botl = FALSE;
     custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
 
 #ifdef EDIT_GETLIN

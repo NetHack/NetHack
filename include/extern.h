@@ -3442,6 +3442,7 @@ extern void add_menu(winid, const glyph_info *, const ANY_P *,
                      char, char, int, int, const char *, unsigned int);
 extern void add_menu_heading(winid, const char *);
 extern void add_menu_str(winid, const char *);
+extern void getlin(const char *, char *);
 
 /* ### windows.c ### */
 

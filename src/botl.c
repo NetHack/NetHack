@@ -245,6 +245,8 @@ do_statusline2(void)
 void
 bot(void)
 {
+    if (gp.program_state.in_getlin)
+        return;
     /* dosave() flags completion by setting u.uhp to -1; suppress_map_output()
        covers program_state.restoring and is used for status as well as map */
     if (u.uhp != -1 && gy.youmonst.data
@@ -265,6 +267,8 @@ bot(void)
 void
 timebot(void)
 {
+    if (gp.program_state.in_getlin)
+        return;
     /* we're called when iflags.time_botl is set and general gc.context.botl
        is clear; iflags.time_botl gets set whenever gm.moves changes value
        so there's no benefit in tracking previous value to decide whether

@@ -1679,5 +1679,11 @@ get_menu_coloring(const char *str, int *color, int *attr)
     return FALSE;
 }
 
-
+void
+getlin(const char *query, register char *bufp)
+{
+    gp.program_state.in_getlin = TRUE;
+    (*windowprocs.win_getlin)(query, bufp);
+    gp.program_state.in_getlin = FALSE;
+}
 /*windows.c*/
