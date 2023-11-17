@@ -758,7 +758,7 @@ drop(struct obj *obj)
         if (!IS_ALTAR(levl[u.ux][u.uy].typ) && flags.verbose)
             You("drop %s.", doname(obj));
     }
-    obj->was_dropped = 1;
+    obj->how_lost = LOST_DROPPED;
     dropx(obj);
     return ECMD_TIME;
 }

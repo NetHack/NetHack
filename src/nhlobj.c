@@ -312,7 +312,7 @@ l_obj_to_table(lua_State *L)
     nhl_add_table_entry_int(L, "globby", obj->globby);
     nhl_add_table_entry_int(L, "greased", obj->greased);
     nhl_add_table_entry_int(L, "nomerge", obj->nomerge);
-    nhl_add_table_entry_int(L, "was_thrown", obj->was_thrown);
+    nhl_add_table_entry_int(L, "how_lost", obj->how_lost);
     nhl_add_table_entry_int(L, "in_use", obj->in_use);
     nhl_add_table_entry_int(L, "bypass", obj->bypass);
     nhl_add_table_entry_int(L, "cknown", obj->cknown);

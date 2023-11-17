@@ -942,7 +942,7 @@ merged(struct obj **potmp, struct obj **pobj)
            items, where this would be too spammy as such items get
            unidentified by monsters very frequently). */
         if (discovered && otmp->where == OBJ_INVENT &&
-            !obj->was_thrown && !otmp->was_thrown) {
+            obj->how_lost != LOST_THROWN && otmp->how_lost != LOST_THROWN) {
             pline("You learn more about your items by comparing them.");
         }
 
@@ -1049,8 +1049,8 @@ addinv_core0(struct obj *obj, struct obj *other_obj,
     obj->no_charge = 0; /* should not be set in hero's invent */
     if (Has_contents(obj))
         picked_container(obj); /* clear no_charge */
-    obj_was_thrown = obj->was_thrown;
-    obj->was_thrown = obj->was_dropped = 0; /* not meaningful for invent */
+    obj_was_thrown = (obj->how_lost == LOST_THROWN);
+    obj->how_lost = LOST_NONE;
 
     if (gl.loot_reset_justpicked) {
         gl.loot_reset_justpicked = FALSE;
@@ -4820,8 +4820,7 @@ mergable(
     if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
         || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
         || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
-        || obj->was_thrown != otmp->was_thrown
-        || obj->was_dropped != otmp->was_dropped)
+        || obj->how_lost != otmp->how_lost)
         return FALSE;
 
     if (obj->oclass == FOOD_CLASS
