@@ -809,11 +809,9 @@ curses_ctrl_nhwindow(
         return (win_request_info *) 0;
 
     switch (request) {
-#if 0
     case set_mode:
     case request_settings:
         break;
-#endif
     case set_menu_promptstyle:
 	curses_menu_promptstyle.color = wri->fromcore.menu_promptstyle.color;
         if (curses_menu_promptstyle.color == NO_COLOR)
@@ -822,7 +820,6 @@ curses_ctrl_nhwindow(
 	curses_menu_promptstyle.attr = curses_convert_attr(attr);;
         break;
     default:
-        impossible("invalid request to ctrl_nhwindow: %d", request);
         break;
     }
     return wri;

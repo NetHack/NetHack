@@ -1313,11 +1313,13 @@ X11_ctrl_nhwindow(
         return (win_request_info *) 0;
 
     switch(request) {
+    case set_mode:
+    case request_settings:
+        break;
     case set_menu_promptstyle:
         X11_menu_promptstyle = wri->fromcore.menu_promptstyle;
         break;
     default:
-        impossible("invalid request to ctrl_nhwindow: %d", request);
         break;
     }
     return wri;

@@ -2823,9 +2823,9 @@ tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
         return (win_request_info *) 0;
 
     switch (request) {
-#if defined(TTY_PERM_INVENT)
     case set_mode:
     case request_settings:
+#if defined(TTY_PERM_INVENT)
         ttyinvmode = wri->fromcore.invmode;
         if (request == set_mode)
             break;
@@ -2850,13 +2850,12 @@ tty_ctrl_nhwindow(winid window UNUSED, int request, win_request_info *wri)
             maxslot = (maxrow - 2) * (!inuse_only ? 2 : 1);
             wri->tocore.maxslot = maxslot;
         }
-        break;
 #endif  /* TTY_PERM_INVENT */
+        break;
     case set_menu_promptstyle:
         tty_menu_promptstyle = wri->fromcore.menu_promptstyle;
         break;
     default:
-        impossible("invalid request to tty_ctrl_nhwindow: %d", request);
         break;
     }
     return wri;
