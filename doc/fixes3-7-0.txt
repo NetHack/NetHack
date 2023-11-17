@@ -2332,6 +2332,7 @@ allow #dip '-' in a fountain, pool, or sink to clean slippery fingers/gloves
 allow #dip potions into a sink to get a hint about what they are, similar to
 	dropping rings into a sink; dipping other stuff causes water damage
 	so could be used to blank out scrolls and books
+when restoring, show current level's player-applied annotation if there is one
 
 
 Platform- and/or Interface-Specific New Features
