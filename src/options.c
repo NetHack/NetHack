@@ -9748,6 +9748,7 @@ choose_classes_menu(const char *prompt,
             break;
         default:
             impossible("choose_classes_menu: invalid category %d", category);
+            buf[0] = '\0';
         }
         if (way && *class_select) { /* Selections there already */
             if (strchr(class_select, *class_list)) {
