@@ -3422,7 +3422,7 @@ show_overview(
     if (In_endgame(&u.uz))
         traverse_mapseenchn(1, win, why, reason, &lastdun);
     /* if game is over or we're not in the endgame yet, show the dungeon */
-    if (why != 0 || !In_endgame(&u.uz))
+    if (why > 0 || !In_endgame(&u.uz))
         traverse_mapseenchn(0, win, why, reason, &lastdun);
     end_menu(win, (char *) 0);
     n = select_menu(win, (why != -1) ? PICK_NONE : PICK_ONE, &selected);
