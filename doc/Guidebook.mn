@@ -3868,6 +3868,13 @@ Show out-of-sight areas of lit rooms (default on).  Persistent.
 .lp "deaf    "
 Start the character permanently deaf (default false).
 Persistent.
+.lp dropped_nopick
+If this option is on, items you dropped will not be automatically
+picked up, even if
+.op autopickup
+is also on and they are in
+.op pickup_types
+or match a positive autopickup exception (defualt off).  Persistent.
 .lp disclose
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -4386,17 +4393,6 @@ When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
 (Default \(oqS\(cq).
-Persistent.
-.lp pickup_dropped
-If this option is on, items you dropped will be treated like normal items for
-.op autopickup
-purposes.   If it is disabled, items you dropped will not be automatically
-picked up, even if
-.op autopickup
-is on and they are in
-.op pickup_types
-or match a positive autopickup exception.
-Default is on.
 Persistent.
 .lp pickup_thrown
 If this option is on and

@@ -261,6 +261,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(dogname, Advanced, PL_PSIZ, opt_in, set_gameview,
                 No, Yes, No, No, NoAlias,
                 "name of your starting pet if it is a little dog")
+    NHOPTB(dropped_nopick, Behavior, 0, opt_in, set_in_game,
+           Off, Yes, No, No, NoAlias, &flags.nopick_dropped, Term_False,
+           "don't autopickup dropped items")
     NHOPTC(dungeon, Advanced, MAXDCHARS + 1,opt_in, set_in_config,
                 No, Yes, No, No, NoAlias,
                 "list of symbols to use in drawing the dungeon map")
@@ -531,9 +534,6 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTC(pickup_burden, Advanced, 20, opt_in, set_in_game,
                 No, Yes, No, Yes, NoAlias,
                 "maximum burden picked up before prompt")
-    NHOPTB(pickup_dropped, Behavior, 0, opt_out, set_in_game,
-           On, Yes, No, No, NoAlias, &flags.pickup_dropped, Term_False,
-           "consider dropped items for autopickup")
     NHOPTB(pickup_thrown, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.pickup_thrown, Term_False,
            "autopickup thrown items")

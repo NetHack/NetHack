@@ -8592,7 +8592,7 @@ doset_simple_menu(void)
                spelling of their names; emphasize what it means */
             if (allopt[i].idx == opt_pickup_types
                 || allopt[i].idx == opt_pickup_thrown
-                || allopt[i].idx == opt_pickup_dropped)
+                || allopt[i].idx == opt_dropped_nopick)
                 Strcat(buf, "  (for autopickup)");
             add_menu(tmpwin, &nul_glyphinfo, &any, 0, 0,
                      ATR_NONE, NO_COLOR, buf, MENU_ITEMFLAGS_NONE);

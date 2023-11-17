@@ -4224,6 +4224,12 @@ Show out-of-sight areas of lit rooms (default on).  Persistent.
 \item[\ib{deaf}]
 Start the character permanently deaf (default false).  Persistent.
 %.lp
+\item[\ib{dropped\verb+_+nopick}]
+If this option is on, items you dropped will not be automatically picked up,
+even if ``{\it autopickup\/}'' is also on and they are in
+``{\it pickup\verb+_+types\/}'' or match a positive autopickup exception
+(default off).  Persistent.
+%.lp
 \item[\ib{disclose}]
 Controls what information the program reveals when the game ends.
 Value is a space separated list of prompting/category pairs
@@ -4808,15 +4814,6 @@ When you pick up an item that would exceed this encumbrance
 level (Unencumbered, Burdened, streSsed, straiNed, overTaxed,
 or overLoaded), you will be asked if you want to continue.
 (Default `S').  Persistent.
-%.lp
-\item[\ib{pickup\verb+_+dropped}]
-If this option is on, items you dropped will be treated like normal items for
-``{\it autopickup\/}'' purposes.  If it disabled, items you dropped will not be
-automatically picked up, even if ``{\it autopickup\/}'' is on and they are in
-``{\it pickup\verb+_+types\/}'' or
-match an autopickup exception.
-Default is on.
-Persistent.
 %.lp
 \item[\ib{pickup\verb+_+thrown}]
 If this option is on and ``{\it autopickup\/}'' is also on, try to pick up

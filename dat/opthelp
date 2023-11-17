@@ -17,6 +17,7 @@ cmdassist      give help for errors on direction & other commands  [True]
 color          use different colors for objects on screen  [True for micros]
 confirm        ask before hitting tame or peaceful monsters        [True]
 dark_room      show floor not in sight in different color          [True]
+dropped_nopick exclude dropped objects from autopickup            [False]
 eight_bit_tty  send 8-bit characters straight to terminal         [False]
 extmenu        tty, curses: use menu for # (extended commands)    [False]
                X11: menu has all commands (T) or traditional subset (F)
@@ -50,7 +51,6 @@ null           allow nulls to be sent to your terminal             [True]
                delay code) if moving objects seem to teleport across rooms
 perm_invent    keep inventory in a permanent window               [False]
 pickup_thrown  override pickup_types for thrown objects            [True]
-pickup_dropped evaluate pickup_types for dropped objects           [True]
 pushweapon     when wielding a new weapon, put your previously    [False]
                wielded weapon into the secondary weapon slot
 quick_farsight usually skip the chance to browse the map when     [False]
