@@ -1,4 +1,4 @@
-/* NetHack 3.7	getline.c	$NHDT-Date: 1596498343 2020/08/03 23:45:43 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.44 $ */
+/* NetHack 3.7	getline.c	$NHDT-Date: 1700204638 2023/11/17 07:03:58 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.56 $ */
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
@@ -28,8 +28,9 @@ extern char erase_char, kill_char; /* from appropriate tty.c file */
 /*
  * Read a line closed with '\n' into the array char bufp[BUFSZ].
  * (The '\n' is not stored. The string is closed with a '\0'.)
- * Reading can be interrupted by an escape ('\033') - now the
- * resulting string is "\033".
+ * Reading can be interrupted by an escape ('\033').  If there is already
+ * some text, it is removed and prompting continues as if from the start.
+ * However, if there is no text yet (or anymore) then "\033" is returned.
  */
 void
 tty_getlin(const char *query, register char *bufp)
@@ -55,8 +56,20 @@ hooked_tty_getlin(
     ttyDisplay->toplin = TOPLINE_SPECIAL_PROMPT;
     ttyDisplay->inread++;
 
-    /* issue the prompt */
+    /*
+     * Issue the prompt.
+     *
+     * custompline() will call vpline() which calls flush_screen() which
+     * calls bot().  We don't want bot() modifying the screen during
+     * whatever this prompt is for.  If the status area hasn't been
+     * overwritten, no update is needed, but if has been overwritten (by
+     * a menu or text window) we don't want status refresh to clobber that
+     * when the window hasn't finished yet.  [Fix for menu search via ':'.]
+     */
+    if (ttyDisplay->lastwin != WIN_STATUS)
+        gc.context.botl = gc.context.botlx = iflags.time_botl = FALSE;
     custompline(OVERRIDE_MSGTYPE | SUPPRESS_HISTORY, "%s ", query);
+
 #ifdef EDIT_GETLIN
     /* bufp is input/output; treat current contents (presumed to be from
        previous getlin()) as default input */
@@ -90,7 +103,7 @@ hooked_tty_getlin(
             ttyDisplay->intr--;
             *bufp = 0;
         }
-        if (c == '\020') { /* ctrl-P */
+        if (c == '\020') { /* ctrl-P, doesn't honor rebinding #prevmsg cmd */
             if (iflags.prevmsg_window != 's') {
                 int sav = ttyDisplay->inread;
 

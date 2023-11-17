@@ -1,4 +1,4 @@
-$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1294 $ $NHDT-Date: 1699813307 2023/11/12 18:21:47 $
+$NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.1297 $ $NHDT-Date: 1700204638 2023/11/17 07:03:58 $
 
 General Fixes and Modified Features
 -----------------------------------
@@ -2024,6 +2024,8 @@ tty: if a menu used full screen and brought up another menu that wasn't full
 	it with most of the map left blank until after the menu was dismissed
 tty: have <return> dismiss pick-none menus instead of acting like '>' (not
 	only wouldn't dismiss when not on last page, wouldn't dismiss at all)
+tty: menu search via ':' would clobber part of the menu with a status line
+	refresh if the menu was tall enough to cover that
 Unix: when user name is used as default character name, keep hyphenated value
 	intact instead stripping off dash and whatever follows as if that
 	specified role/race/&c (worked once upon a time; broken since 3.3.0)
