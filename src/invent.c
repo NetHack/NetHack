@@ -4819,7 +4819,9 @@ mergable(
 
     if (obj->unpaid != otmp->unpaid || obj->spe != otmp->spe
         || obj->no_charge != otmp->no_charge || obj->obroken != otmp->obroken
-        || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit)
+        || obj->otrapped != otmp->otrapped || obj->lamplit != otmp->lamplit
+        || obj->was_thrown != otmp->was_thrown
+        || obj->was_dropped != otmp->was_dropped)
         return FALSE;
 
     if (obj->oclass == FOOD_CLASS
