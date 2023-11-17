@@ -1504,7 +1504,7 @@ throwit(struct obj *obj,
     }
 
     gt.thrownobj = obj;
-    gt.thrownobj->was_thrown = 1;
+    gt.thrownobj->how_lost = LOST_THROWN;
     iflags.returning_missile = AutoReturn(obj, wep_mask) ? (genericptr_t) obj
                                                          : (genericptr_t) 0;
     /* NOTE:  No early returns after this point or returning_missile
@@ -1719,7 +1719,7 @@ throwit(struct obj *obj,
                 if (tethered_weapon)
                     tmp_at(DISP_END, 0);
                 /* when this location is stepped on, the weapon will be
-                   auto-picked up due to 'obj->was_thrown' of 1;
+                   auto-picked up due to 'obj->how_lost' of LOST_THROWN;
                    addinv() prevents thrown Mjollnir from being placed
                    into the quiver slot, but an aklys will end up there if
                    that slot is empty at the time; since hero will need to

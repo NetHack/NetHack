@@ -904,10 +904,12 @@ autopick_testobj(struct obj *otmp, boolean calc_costly)
     if (costly && !otmp->no_charge)
         return FALSE;
 
-    /* pickup_thrown/nopick_dropped override pickup_types and exceptions */
-    if (flags.pickup_thrown && otmp->was_thrown)
+    /* pickup_thrown/pickup_stolen/nopick_dropped override pickup_types and
+       exceptions */
+    if ((flags.pickup_thrown && otmp->how_lost == LOST_THROWN)
+        || (flags.pickup_stolen && otmp->how_lost == LOST_STOLEN))
         return TRUE;
-    if (flags.nopick_dropped && otmp->was_dropped)
+    if (flags.nopick_dropped && otmp->how_lost == LOST_DROPPED)
         return FALSE;
 
     /* check for pickup_types */
@@ -3667,7 +3669,7 @@ tipcontainer(struct obj *box) /* or bag */
                     (void) add_to_container(targetbox, otmp);
                 }
             } else if (highdrop) {
-                otmp->was_dropped = 1;
+                otmp->how_lost = LOST_DROPPED;
                 /* might break or fall down stairs; handles altars itself */
                 hitfloor(otmp, TRUE);
             } else {
@@ -3680,7 +3682,7 @@ tipcontainer(struct obj *box) /* or bag */
                     pline("%s%c", doname(otmp), nobj ? ',' : '.');
                     iflags.last_msg = PLNMSG_OBJNAM_ONLY;
                 }
-                otmp->was_dropped = 1;
+                otmp->how_lost = LOST_DROPPED;
                 dropy(otmp);
                 if (iflags.last_msg != PLNMSG_OBJNAM_ONLY)
                     terse = FALSE; /* terse formatting has been interrupted */
