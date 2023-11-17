@@ -1743,6 +1743,9 @@ if recoil from throwing an item while levitating sent hero into a wall of
 include '-' as suggested item in "what to dip?" prompt if dipping at pool or
 	fountain or sink with slippery hands
 don't attempt a second hit for bare handed/martial arts if wearing a shield
+when using 'm #overview' to annotate a level other than current the one,
+	include level number, and dungeon branch if not current one, in the
+	prompt instead of generic "this level"
 
 
 Fixes to 3.7.0-x Platform and/or Interface Problems Exposed Via git Repository
