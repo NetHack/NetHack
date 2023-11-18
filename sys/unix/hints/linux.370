@@ -295,10 +295,25 @@ override GAME=
 MOREALL += ( cd src ; $(MAKE) pregame ; $(MAKE) $(TARGETPFX)libnh.a )
 endif  # WANT_LIBNH
 
+ifdef WANT_SOURCE_INSTALL
+PREFIX=$(abspath $(NHSROOT))
+#SHELLDIR=
+HACKDIR=$(PREFIX)/playground
+GAMEPERM = 0700
+VARFILEPERM = 0600
+VARDIRPERM = 0700
+CFLAGS+=-DSYSCF -DSYSCF_FILE=\"$(HACKDIR)/sysconf\" -DSECURE
+MOREALL=$(MAKE) install
+else #!WANT_SOURCE_INTSALL
 #PREFIX=/usr
 PREFIX=$(wildcard ~)/nh/install
 HACKDIR=$(PREFIX)/games/lib/nethackdir
 SHELLDIR = $(PREFIX)/games
+VARDIRPERM = 0755
+VARFILEPERM = 0600
+GAMEPERM = 0755
+endif #?WANT_SOURCE_INSTALL
+
 INSTDIR=$(HACKDIR)
 VARDIR = $(HACKDIR)
 
@@ -347,10 +362,6 @@ LFLAGS+=-rdynamic
 CHOWN=true
 CHGRP=true
 
-VARDIRPERM = 0755
-VARFILEPERM = 0600
-GAMEPERM = 0755
-#
 # manpages directory
 MANDIR=/usr/share/man/man6
 #
