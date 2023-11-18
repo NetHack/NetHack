@@ -23,6 +23,7 @@ static void look_region_nearby(coordxy *, coordxy *, coordxy *, coordxy *,
                                boolean);
 static void look_all(boolean, boolean);
 static void look_traps(boolean);
+static void look_engrs(boolean);
 static void do_supplemental_info(char *, struct permonst *, boolean);
 static void whatdoes_help(void);
 static void docontact(void);
@@ -1646,6 +1647,15 @@ do_look(int mode, coord *click_cc)
                          flags.lootabc ? 0 : any.a_char, '\"', ATR_NONE,
                          clr, "all seen or remembered traps",
                          MENU_ITEMFLAGS_NONE);
+                any.a_char = 'e';
+                add_menu(win, &nul_glyphinfo, &any,
+                         flags.lootabc ? 0 : any.a_char, '`', ATR_NONE,
+                         clr, "nearby engravings", MENU_ITEMFLAGS_NONE);
+                any.a_char = 'E';
+                add_menu(win, &nul_glyphinfo, &any,
+                         flags.lootabc ? 0 : any.a_char, '|', ATR_NONE,
+                         clr, "all seen or remembered engravings",
+                         MENU_ITEMFLAGS_NONE);
             }
             end_menu(win, "What do you want to look at:");
             if (select_menu(win, PICK_ONE, &pick_list) > 0) {
@@ -1720,6 +1730,12 @@ do_look(int mode, coord *click_cc)
             return ECMD_OK;
         case 'T':
             look_traps(FALSE); /* list all traps (visible or remembered) */
+            return ECMD_OK;
+        case 'e':
+            look_engrs(TRUE); /* list nearby engravings */
+            return ECMD_OK;
+        case 'E':
+            look_engrs(FALSE); /* list all engravings (visible|remembered) */
             return ECMD_OK;
         }
     } else { /* clicklook */
@@ -1979,6 +1995,97 @@ look_traps(boolean nearby)
         display_nhwindow(win, TRUE);
     else
         pline("No traps seen or remembered%s.", nearby ? " nearby" : "");
+    destroy_nhwindow(win);
+}
+
+/* display of discovered engravings including headstones, even when they're
+   covered provided they've been read */
+static void
+look_engrs(boolean nearby)
+{
+    winid win;
+    struct engr *e;
+    char lookbuf[BUFSZ], outbuf[BUFSZ];
+    nhsym sym;
+    coordxy x, y, lo_x, lo_y, hi_x, hi_y;
+    boolean is_headstone;
+    int glyph, count = 0;
+
+    win = create_nhwindow(NHW_TEXT);
+    look_region_nearby(&lo_x, &lo_y, &hi_x, &hi_y, nearby);
+    for (y = lo_y; y <= hi_y; y++) {
+        for (x = lo_x; x <= hi_x; x++) {
+            lookbuf[0] = '\0';
+            /* this won't find remembered engravings which aren't there
+               anymore (in case the hero is unaware that they're gone;
+               scuffed away by monster movement or deleted during shop
+               or vault wall repair); not sure what to do about that */
+            e = engr_at(x, y);
+            if (!e)
+                continue;
+            glyph = glyph_at(x, y);
+            sym = ((levl[x][y].typ == GRAVE || gl.lastseentyp[x][y] == GRAVE)
+                   ? S_grave
+                   : (levl[x][y].typ == CORR) ? S_engrcorr
+                     : S_engroom);
+            is_headstone = (sym == S_grave);
+            Sprintf(lookbuf, "(%s", is_headstone ? "grave" : "engraving");
+            (void) add_quoted_engraving(x, y, lookbuf);
+            /* the paren is used by farlook and add_quoted_engraving()
+               expected to see it; we don't want it here */
+            if (is_headstone) {
+                (void) strsubst(lookbuf, "(grave with ", "");
+                (void) strsubst(lookbuf, "(grave whose ", "");
+            } else {
+                (void) strsubst(lookbuf, "(engraving with ", "");
+                (void) strsubst(lookbuf, "(engraving that ", "one that ");
+            }
+
+            if (glyph_is_cmap(glyph) && !glyph_is_trap(glyph)) {
+                /* engraving or grave+headstone shown on the map */
+                ++count;
+            } else if (e->eread || is_headstone) {
+                /* engraving or grave covered by object(s) */
+                Snprintf(eos(lookbuf), sizeof lookbuf - strlen(lookbuf),
+                         ", obscured by %s", encglyph(glyph));
+                glyph = is_headstone ? cmap_to_glyph(S_grave)
+                                     : engraving_to_glyph(e);
+                ++count;
+            } else {
+                continue;
+            }
+            if (*lookbuf) { /* (redundant) */
+                char coordbuf[20], cmode;
+
+                cmode = (iflags.getpos_coords != GPCOORDS_NONE)
+                           ? iflags.getpos_coords : GPCOORDS_MAP;
+                if (count == 1) {
+                    Sprintf(outbuf, "%sseen or remembered engravings%s:",
+                            nearby ? "nearby " : "",
+                            nearby ? "" : " on this level");
+                    putstr(win, 0, upstart(outbuf));
+                    /* hack alert! Qt watches a text window for any line
+                       with 4 consecutive spaces and renders the window
+                       in a fixed-width font it if finds at least one */
+                    putstr(win, 0, "    "); /* separator */
+                }
+                /* prefix: "coords  C  " where 'C' is engrvng|grave symbol */
+                Sprintf(outbuf, (cmode == GPCOORDS_SCREEN) ? "%s  "
+                                  : (cmode == GPCOORDS_MAP) ? "%8s  "
+                                      : "%12s  ",
+                        coord_desc(x, y, coordbuf, cmode));
+                Sprintf(eos(outbuf), "%s  ", encglyph(glyph));
+                /* guard against potential overflow */
+                lookbuf[sizeof lookbuf - 1 - strlen(outbuf)] = '\0';
+                Strcat(outbuf, lookbuf);
+                putmixed(win, 0, outbuf);
+            }
+        }
+    }
+    if (count)
+        display_nhwindow(win, TRUE);
+    else
+        pline("No engravings seen or remembered%s.", nearby ? " nearby" : "");
     destroy_nhwindow(win);
 }
 

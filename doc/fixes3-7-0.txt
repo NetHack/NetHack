@@ -2305,7 +2305,7 @@ make music improvisations more varied and interesting, as well as useful
 give a helpful tip when first entering "farlook" mode
 add a boolean option tips to disable all of the helpful tips
 add a tutorial level
-engravings appear on the map display
+engravings appear on the map display; 'whatis' can list them ('/e', '/E')
 option to create the character deaf
 add conduct for petless
 preceding #overview with the 'm' prefix brings up the overview display as a
