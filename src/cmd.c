@@ -6379,7 +6379,7 @@ hangup(
         gp.program_state.in_moveloop = 0;
     nhwindows_hangup();
 #ifdef SAFERHANGUP
-    /* When using SAFERHANGUP, the done_hup flag it tested in rhack
+    /* When using SAFERHANGUP, the done_hup flag is tested in rhack
        and a couple of other places; actual hangup handling occurs then.
        This is 'safer' because it disallows certain cheats and also
        protects against losing objects in the process of being thrown,
