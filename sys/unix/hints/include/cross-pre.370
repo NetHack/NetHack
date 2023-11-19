@@ -351,7 +351,7 @@ override WINOBJ=
 # don't bother Making regular NetHack executable
 override GAME=
 # the real VARDAT hasn't been defined yet for use in ALLDEP override
-WASM_DAT = bogusmon data engrave epitaph oracles options quest.lua rumors
+WASM_DAT = bogusmon data engrave epitaph oracles quest.lua rumors
 WASMDEP = include/nhlua.h $(WASM_DAT) spec_levs check-dlb
 override ALLDEP = $(WASMDEP) wasm
 override PREGAME += mkdir -p $(TARGETDIR)/wasm-data ;
