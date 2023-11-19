@@ -52,7 +52,7 @@
 #define RUMOR_FILE "rumors"
 
 /* These are affiliated with outdated options
-   but we define them for us in messages */
+   but we define them for use in messages */
 #define DATE_FILE "date.h"
 #define MONST_FILE "pm.h"
 #define ONAME_FILE "onames.h"
