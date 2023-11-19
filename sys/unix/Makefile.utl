@@ -194,11 +194,6 @@ ODATE = $(OBJDIR)/date.o
 # object files for makedefs
 MAKEOBJS = makedefs.o $(OMONOBJ) $(ODATE) $(OALLOC)
 
-# To include old makedefs options support, define
-# OLD_MAKEDEFS_OPTIONS
-#OLD_MAKEDEFS_OPTIONS = -DOLD_MAKEDEFS_OPTIONS
-OLD_MAKEDEFS_OPTIONS =
-
 # object files for recovery utility
 RECOVOBJS = $(TARGETPFX)recover.o
 
@@ -236,7 +231,7 @@ makedefs.o: makedefs.c ../src/mdlib.c $(CONFIG_H) \
 		../include/monst.h ../include/monsters.h ../include/objects.h \
 		../include/you.h ../include/context.h ../include/flag.h \
 		../include/dlb.h ../include/patchlevel.h mdgrep.h
-	$(CC) $(CFLAGS) $(CSTD) $(OLD_MAKEDEFS_OPTIONS) -c makedefs.c -o $@
+	$(CC) $(CFLAGS) $(CSTD) -c makedefs.c -o $@
 
 # Don't require perl to build; that is why mdgrep.h is spelled wrong below.
 mdgreph: mdgrep.pl
