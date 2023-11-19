@@ -67,7 +67,7 @@ DIRPERM  = 0755
 #	Qt without X11; assumes GRAPHIC_TOMBSTONE:
 # VARDATND = nhtiles.bmp pet_mark.xbm pilemark.xbm rip.xpm
 
-VARDATD = bogusmon data engrave epitaph oracles options quest.lua rumors
+VARDATD = bogusmon data engrave epitaph oracles quest.lua rumors
 VARDAT = $(VARDATD) $(VARDATND)
 
 #	Some versions of make use the SHELL environment variable as the
@@ -245,8 +245,9 @@ GEM_RSC.RSC:
 title.img:
 	( cd dat ; $(MAKE) title.img )
 
-check-dlb: options
-	@if egrep -s librarian dat/options ; then $(MAKE) dlb ; else true ; fi
+check-dlb:
+	@true
+#	@if egrep -s librarian options; then $(MAKE) dlb ; else true ; fi
 
 dlb:
 	( cd util ; $(MAKE) dlb )
@@ -264,12 +265,12 @@ recover: $(GAME)
 	( cd util ; $(MAKE) recover )
 
 dofiles:
-	target=`sed -n					\
-		-e '/librarian/{' 			\
-		-e	's/.*/dlb/p' 			\
-		-e	'q' 				\
-		-e '}' 					\
-	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
+#	target=`sed -n					\
+#		-e '/librarian/{' 			\
+#		-e	's/.*/dlb/p' 			\
+#		-e	'q' 				\
+#		-e '}' 					\
+#	  	-e '$$s/.*/nodlb/p' < dat/options` ;	\
 	$(MAKE) dofiles-$${target-nodlb}
 	cp src/$(GAME) $(INSTDIR)
 	cp util/recover $(INSTDIR)

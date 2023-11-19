@@ -746,9 +746,9 @@ $(TARGETPFX)date.o: date.c $(HACK_H) $(HACKCSRC) $(HOBJ)
 #	Do NOT include ../dat/gitinfo.txt as either a prerequisite or target.
 #	'makedefs -v' processes it when present and ignores it if not.
 #
-../include/date.h: ../util/makedefs $(VERSOURCES) $(HACK_H)
-	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
-	../util/makedefs -v
+#../include/date.h: ../util/makedefs $(VERSOURCES) $(HACK_H)
+#	-$(SHELL) ../sys/unix/gitinfo.sh $(GITINFO) #before 'makedefs -v'
+#	../util/makedefs -v
 
 lint:
 # lint cannot have -p here because (i) capitals are meaningful:

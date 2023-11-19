@@ -701,7 +701,7 @@ CLEAN_FILE += $(UTARGETS) $(UOBJS)
 #==========================================
 ODLB = $(O)dlb
 DLBOBJS = $(addprefix $(ODLB)/, alloc.o dlb.o dlb_main.o panic.o)
-DAT_CLEAN = $(addprefix $(DAT)/, data oracles options porthelp rumors engrave epitaph bogusmon)
+DAT_CLEAN = $(addprefix $(DAT)/, data oracles porthelp rumors engrave epitaph bogusmon)
 DAT_NOCLEAN = $(addprefix $(DAT)/, help hh cmdhelp keyhelp history opthelp optmenu \
 	      wizhelp license engrave epitaph bogusmon tribute)
 DLBLST = $(DAT)/dlb.lst
@@ -728,9 +728,6 @@ $(DAT)/data: $(U)makedefs.exe $(DAT)/data.base
 $(DAT)/oracles: $(U)makedefs.exe $(DAT)/oracles.txt
 	$< -h
 
-$(DAT)/options $(INCL)/date.h: $(U)makedefs.exe
-	$< -v
-
 $(DAT)/porthelp: $(MSWSYS)/porthelp
 	cp $< $@
 
@@ -747,9 +744,6 @@ $(DAT)/bogusmon: $(U)makedefs.exe $(DAT)/bogusmon.txt $(DAT)/engrave.txt $(DAT)/
 $(DLBLST): $(LUAFILES) | $(DAT_CLEAN) $(DAT_NOCLEAN)
 	echo data > $(DLBLST)
 	echo oracles >> $(DLBLST)
-	echo options >> $(DLBLST)
-	if [ -f $(DAT)/ttyoptions ] ; then echo ttyoptions >> $(DLBLST) ; fi
-	if [ -f $(DAT)/guioptions ] ; then echo guioptions >> $(DLBLST) ; fi
 	echo porthelp >> $(DLBLST)
 	echo rumors >> $(DLBLST)
 	echo help >> $(DLBLST)
