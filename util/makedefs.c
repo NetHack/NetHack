@@ -363,6 +363,7 @@ do_makedefs(char *options)
                 " for '%c' (%s) support.\n",
                 *options, oldfunctionality(*options));
             (void) fflush(stderr);
+            /*NOTREACHED*/
             break;
 #endif /* OLD_MAKEDEFS_OPTIONS */
         default:
