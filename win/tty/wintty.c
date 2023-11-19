@@ -1077,9 +1077,9 @@ tty_clear_nhwindow(winid window)
         break;
     case NHW_MENU:
     case NHW_TEXT:
-        if (cw->active)
-            erase_menu_or_text(window, cw, TRUE);
         if (!erasing_tty_screen) {
+            if (cw->active)
+                erase_menu_or_text(window, cw, TRUE);
             free_window_info(cw, FALSE);
         }
         break;
@@ -1953,7 +1953,7 @@ tty_dismiss_nhwindow(winid window)
                final run-down in case this is the end-of-game window;
                the contents of that window should remain shown even when
                the window itself has gone away */
-            if (iflags.window_inited) {
+            if (iflags.window_inited && !erasing_tty_screen) {
                 boolean clearscreen = FALSE; /* just erase the menu */
 
                 /* during role/race/&c selection, menus are put up on top
@@ -2006,6 +2006,7 @@ erase_tty_screen(void)
     struct WinDesc *cw;
     int i;
 
+    HUPSKIP();
     if (erasing_tty_screen++)
         return;
 #if 0   /* originally we called term_clear_screen() but now it calls us */
