@@ -1,4 +1,4 @@
-/* NetHack 3.7	wintty.c	$NHDT-Date: 1698017917 2023/10/22 23:38:37 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.354 $ */
+/* NetHack 3.7	wintty.c	$NHDT-Date: 1700385095 2023/11/19 09:11:35 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.365 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -595,9 +595,9 @@ tty_init_nhwindows(int *argcp UNUSED, char **argv UNUSED)
     if ((tty_procs.wincap2 & WC2_STATUSLINES) != 0)
         set_wc2_option_mod_status(WC2_STATUSLINES,
 #ifndef CLIPPING
-                                  (LI < 1 + ROWNO + 2) ? set_gameview :
+                                  (LI <= 1 + ROWNO + 2) ? set_gameview :
 #endif
-                                   set_in_game);
+                                      set_in_game);
 }
 
 void
