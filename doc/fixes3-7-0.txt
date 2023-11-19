@@ -511,6 +511,8 @@ any blessed key was behaving as if was the rogue's Master Key when unlocking
 when an unseen non-pet picks up or uses an item, hero loses known/dknown/
 	bknown/cknown/lknown memory of that item (so becomes unidentified; in
 	particular, player won't be asked what to call unseen thrown potion)
+when picking up a stackable item, it can be identified by comparing it to
+        another identical item that is already identified
 wishing for a partly eaten wraith corpse yielded "partly eaten food (1) more
 	nutritious than untouched food (0)"
 if PREFIXES_IN_USE was defined (and VAR_PLAYGROUND forces it to be) when

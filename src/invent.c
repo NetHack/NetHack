@@ -707,6 +707,7 @@ int
 merged(struct obj **potmp, struct obj **pobj)
 {
     register struct obj *otmp = *potmp, *obj = *pobj;
+    boolean discovered = FALSE;
 
     if (mergable(otmp, obj)) {
         /* Approximate age: we do it this way because if we were to
@@ -744,6 +745,29 @@ merged(struct obj **potmp, struct obj **pobj)
             obj_merge_light_sources(obj, otmp);
         if (obj->timed)
             obj_stop_timers(obj); /* follows lights */
+
+        /* objects can be identified by comparing them (unless Blind,
+           but that is handled in mergable()); the object becomes
+           identified in a particular dimension if either object was
+           previously identified in that dimension, and if the
+           identification states don't match, one of them must have
+           previously been identified */
+        if (obj->known != otmp->known) {
+            otmp->known = TRUE;
+            discovered = TRUE;
+        }
+        if (obj->rknown != otmp->rknown) {
+            otmp->rknown = TRUE;
+            if (otmp->oerodeproof) {
+                discovered = TRUE;
+            }
+        }
+        if (obj->bknown != otmp->bknown) {
+            otmp->bknown = TRUE;
+            if (!Role_if(PM_CLERIC)) {
+                discovered = TRUE;
+            }
+        }
 
         /* fixup for `#adjust' merging wielded darts, daggers, &c */
         if (obj->owornmask && carried(otmp)) {
@@ -800,6 +824,15 @@ merged(struct obj **potmp, struct obj **pobj)
             pudding_merge_message(otmp, obj);
             obj_absorb(potmp, pobj);
             return 1;
+        }
+
+        /* Print a message if item comparison discovers more
+           information about the items (with the exception of thrown
+           items, where this would be too spammy as such items get
+           unidentified by monsters very frequently). */
+        if (discovered && otmp->where == OBJ_INVENT &&
+            !obj->was_thrown && !otmp->was_thrown) {
+            pline("You learn more about your items by comparing them.");
         }
 
         obfree(obj, otmp); /* free(obj), bill->otmp */
@@ -4548,14 +4581,15 @@ mergable(
         return FALSE;
 
     if (obj->dknown != otmp->dknown
-        || (obj->bknown != otmp->bknown && !Role_if(PM_CLERIC))
+        || (obj->bknown != otmp->bknown && !Role_if(PM_CLERIC) &&
+            (Blind || Hallucination))
         || obj->oeroded != otmp->oeroded || obj->oeroded2 != otmp->oeroded2
         || obj->greased != otmp->greased)
         return FALSE;
 
     if ((obj->oclass == WEAPON_CLASS || obj->oclass == ARMOR_CLASS)
         && (obj->oerodeproof != otmp->oerodeproof
-            || obj->rknown != otmp->rknown))
+            || (obj->rknown != otmp->rknown && (Blind || Hallucination))))
         return FALSE;
 
     if (obj->otyp == CORPSE || obj->otyp == EGG || obj->otyp == TIN) {
@@ -4614,7 +4648,10 @@ mergable(
     if (obj->oartifact != otmp->oartifact)
         return FALSE;
 
-    return (obj->known == otmp->known) ? TRUE : FALSE;
+    if (obj->known != otmp->known && (Blind || Hallucination))
+        return FALSE;
+
+    return TRUE;
 }
 
 /* the #showgold command */
