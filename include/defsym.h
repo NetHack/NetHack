@@ -113,10 +113,12 @@
     PCHAR( 18, '#',  S_tree,   "tree", CLR(CLR_GREEN))
     PCHAR( 19, '.',  S_room,   "floor of a room", CLR(CLR_GRAY))
     PCHAR( 20, '.',  S_darkroom, "dark part of a room", CLR(CLR_BLACK))
-    PCHAR( 21, '`',  S_engroom, "engraved part of a room", CLR(CLR_BRIGHT_BLUE))
+    PCHAR2(21, '`',  S_engroom, "engraving in a room", "engraving",
+                                CLR(CLR_BRIGHT_BLUE))
     PCHAR2(22, '#',  S_corr,   "dark corridor", "corridor", CLR(CLR_GRAY))
     PCHAR( 23, '#',  S_litcorr, "lit corridor", CLR(CLR_GRAY))
-    PCHAR( 24, '#',  S_engrcorr, "engraved part of a corridor", CLR(CLR_BRIGHT_BLUE))
+    PCHAR2(24, '#',  S_engrcorr, "engraving in a corridor", "engraving",
+                                 CLR(CLR_BRIGHT_BLUE))
     PCHAR2(25, '<',  S_upstair, "up stairs", "staircase up", CLR(CLR_GRAY))
     PCHAR2(26, '>',  S_dnstair, "down stairs", "staircase down", CLR(CLR_GRAY))
     PCHAR2(27, '<',  S_upladder, "up ladder", "ladder up", CLR(CLR_BROWN))

@@ -1,4 +1,4 @@
-/* NetHack 3.7  wintype.h       $NHDT-Date: 1596498573 2020/08/03 23:49:33 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.23 $ */
+/* NetHack 3.7  wintype.h       $NHDT-Date: 1700470031 2023/11/20 08:47:11 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.46 $ */
 /* Copyright (c) David Cohrs, 1991                                */
 /* NetHack may be freely redistributed.  See license for details. */
 
@@ -34,8 +34,8 @@ typedef union any {
     unsigned long a_mask32; /* used by status highlighting */
     /* add types as needed */
 } anything;
-#define ANY_P union any /* avoid typedef in prototypes */
-                        /* (buggy old Ultrix compiler) */
+#define ANY_P union any /* avoid typedef in prototypes
+                         * (buggy old Ultrix compiler) */
 
 /* symbolic names for the data types housed in anything */
 enum any_types {
@@ -174,7 +174,11 @@ typedef struct gi {
 #define MENU_BEHAVE_STANDARD      0x0000000U
 #define MENU_BEHAVE_PERMINV       0x0000001U
 
-enum perm_invent_toggles {toggling_off = -1, toggling_not = 0, toggling_on = 1 };
+enum perm_invent_toggles {
+    toggling_off = -1,
+    toggling_not =  0,
+    toggling_on  =  1
+};
 
 /* perm_invent modes */
 enum inv_mode_bits {
@@ -198,15 +202,15 @@ enum inv_modes { /* 'perminv_mode' option settings */
 
 enum to_core_flags {
     active           = 0x001,
-    prohibited       = 0x002,
-    no_init_done     = 0x004,
-    too_small        = 0x008,
+    too_small        = 0x002,
+    prohibited       = 0x004,
+    no_init_done     = 0x008,
 };
 
 enum from_core_requests {
     set_mode             = 1,
     request_settings     = 2,
-    set_menu_promptstyle = 3
+    set_menu_promptstyle = 3,
 };
 
 struct to_core {
