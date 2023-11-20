@@ -18,6 +18,8 @@
 #
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2
+#-INCLUDE general-pre.370
+#
 #-INCLUDE multiw-1.370
 
 ifneq "$(USEMACPORTS)" "1"

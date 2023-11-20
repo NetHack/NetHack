@@ -17,6 +17,8 @@
 # as Ubuntu focal).
 
 # note: '#-INCLUDE' is not just a comment
+#
+#-INCLUDE general-pre.370
 #        multiw-1.370 contains sections 1 to 2
 #-INCLUDE multiw-1.370
 
