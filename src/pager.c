@@ -1269,8 +1269,7 @@ do_screen_description(
 
     /* Now check for objects */
     if (!iflags.terrainmode || (iflags.terrainmode & TER_OBJ) != 0) {
-        /* need a static buffer in case it gets returned as *firstmatch */
-        static char oc_buf[40]; /* does not need to be in 'struct g' */
+        const char *oc_ptr;
         nhsym bouldersym;
 
         j = SYM_BOULDER + SYM_OFF_X;
@@ -1280,21 +1279,21 @@ do_screen_description(
             bouldersym = def_oc_syms[ROCK_CLASS].sym;
 
         for (i = 1; i < MAXOCLASSES; i++) {
-            if (sym == (looked ? gs.showsyms[i + SYM_OFF_O]
-                               : def_oc_syms[i].sym)
-                || (i == ROCK_CLASS && (glyph_is_statue(glyph)
-                                        || sym == bouldersym))) {
-                Strcpy(oc_buf, def_oc_syms[i].explain);
+            if ((i != ROCK_CLASS)
+                ? (sym == (looked ? gs.showsyms[i + SYM_OFF_O]
+                                  : def_oc_syms[i].sym))
                 /* ROCK_CLASS is complicated; statues are displayed as the
                    monster they depict rather than as S_rock; boulders might
-                   be displayed as a custom symbol rather than as S_rock;
-                   for added fun, engravings are shown with the same symbol
+                   be displayed as a custom symbol rather than as S_rock */
+                : (glyph_is_statue(glyph) || sym == bouldersym)) {
+                oc_ptr = def_oc_syms[i].explain;
+                /* for added fun, engravings are shown with the same symbol
                    as S_rock which is why we want to shorten this */
-                if (i == ROCK_CLASS && !strcmp(oc_buf, "boulder or statue")) {
+                if (i == ROCK_CLASS && !strcmp(oc_ptr, "boulder or statue")) {
                     if (sym == bouldersym)
-                        Strcpy(oc_buf, "boulder"); /* discard "or statue" */
+                        oc_ptr = "boulder"; /* discard "or statue" */
                     else if (glyph_is_statue(glyph))
-                        Strcpy(oc_buf, "statue"); /* discard "boulder or" */
+                        oc_ptr = "statue"; /* discard "boulder or" */
                     else if (looked)
                         continue; /* discard both */
                 }
@@ -1304,11 +1303,15 @@ do_screen_description(
                     continue;
                 }
                 if (!found) {
-                    Sprintf(out_str, "%s%s", prefix, an(oc_buf));
-                    *firstmatch = oc_buf;
+                    Sprintf(out_str, "%s%s", prefix, an(oc_ptr));
+                    /* note: if the value assigned to *firstmatch ever
+                       becomes dynamically constructed, it will need to be
+                       copied into a static buffer; as of now, all alternate
+                       values are string literals and implicitly static */
+                    *firstmatch = oc_ptr;
                     found++;
                 } else {
-                    found += append_str(out_str, an(oc_buf));
+                    found += append_str(out_str, an(oc_ptr));
                 }
             }
         }
