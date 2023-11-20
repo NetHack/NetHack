@@ -7,6 +7,7 @@ SUPATH :=$(mkfile_dir)sys/unix/
 #$(info $(.VARIABLES))
 ifeq ($(MAKELEVEL),0)
 notified=No
+touchquiet=
 # Check the placed Makefiles against the time stamp
 # of their source in sys/unix, and report if appropriate.
 MFCHECKDAT := $(shell [ $(SUPATH)Makefile.dat -nt $(mkfile_dir)dat/Makefile ] \
@@ -22,25 +23,33 @@ MFCHECKTOP := $(shell [ $(SUPATH)Makefile.top -nt $(mkfile_dir)Makefile ] \
 ifeq ($(MFCHECKDAT),outdated)
 $(info Attention: ../sys/unix/Makefile.dat is newer than dat/Makefile)
 notified=Yes
+touchquiet += dat/Makefile
 endif
 ifeq ($(MFCHECKSRC),outdated)
 $(info Attention: ../sys/unix/Makefile.src is newer than src/Makefile)
 notified=Yes
+touchquiet += src/Makefile
 endif
 ifeq ($(MFCHECKUTL),outdated)
 $(info Attention: ../sys/unix/Makefile.utl is newer than util/Makefile)
 notified=Yes
+touchquiet += util/Makefile
 endif
 ifeq ($(MFCHECKDOC),outdated)
 $(info Attention: ../sys/unix/Makefile.doc is newer than doc/Makefile)
 notified=Yes
+touchquiet += doc/Makefile
 endif
 ifeq ($(MFCHECKTOP),outdated)
 $(info Attention: ../sys/unix/Makefile.top is newer than Makefile)
 notified=Yes
+touchquiet += Makefile
 endif
 ifeq ("$(notified)","Yes")
 $(info You should consider re-executing sys/unix/setup.sh)
+ifneq ("$(touchquiet)","")
+$(info or to quiet this message: 'touch $(touchquiet)')
+endif
 $(info )
 endif  # notified
 endif  # MAKELEVEL = 0
