@@ -604,10 +604,12 @@ mon_catchup_elapsed_time(
         mtmp->mstun = 0;
 
     /* might finish eating or be able to use special ability again */
-    if (imv > mtmp->meating)
-        finish_meating(mtmp);
-    else
-        mtmp->meating -= imv;
+    if (mtmp->meating) {
+        if (imv > mtmp->meating)
+            finish_meating(mtmp);
+        else
+            mtmp->meating -= imv;
+    }
     if (imv > mtmp->mspec_used)
         mtmp->mspec_used = 0;
     else
