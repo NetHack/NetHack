@@ -1285,6 +1285,7 @@ docall naming of the monster that currently has the hero swallowed by
 give missiles thrown or shot by monsters the same chance to get used up upon
 	hitting as when thrown or shot by the hero
 change menu_headings to also accept a color or color&attribute
+issue feedback for encumbrance more consistently during pickup up
 
 
 Fixes to 3.7.0-x General Problems Exposed Via git Repository
