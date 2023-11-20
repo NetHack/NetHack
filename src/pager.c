@@ -1123,9 +1123,6 @@ add_cmap_descr(
                     /* thawing ice ("solid ice", "thin ice", &c) */
                     || ((p = strchr(x_str, ' ')) != 0 && !strcmpi(p, " ice"))
                     );
-    } else if (idx == S_engroom || idx == S_engrcorr) {
-        x_str = "engraving";
-        article = 1;
     }
 
     if (!found) {
