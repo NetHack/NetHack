@@ -6,7 +6,7 @@ mkfile_dir := $(dir $(mkfile_path))
 SUPATH :=$(mkfile_dir)sys/unix/
 #$(info $(.VARIABLES))
 ifeq ($(MAKELEVEL),0)
-notified=0
+notified=No
 # Check the placed Makefiles against the time stamp
 # of their source in sys/unix, and report if appropriate.
 MFCHECKDAT := $(shell [ $(SUPATH)Makefile.dat -nt $(mkfile_dir)dat/Makefile ] \
@@ -21,25 +21,25 @@ MFCHECKTOP := $(shell [ $(SUPATH)Makefile.top -nt $(mkfile_dir)Makefile ] \
 	&& echo "outdated")
 ifeq ($(MFCHECKDAT),outdated)
 $(info Attention: ../sys/unix/Makefile.dat is newer than dat/Makefile)
-notified=1
+notified=Yes
 endif
 ifeq ($(MFCHECKSRC),outdated)
 $(info Attention: ../sys/unix/Makefile.src is newer than src/Makefile)
-notified=1
+notified=Yes
 endif
 ifeq ($(MFCHECKUTL),outdated)
 $(info Attention: ../sys/unix/Makefile.utl is newer than util/Makefile)
-notified=1
+notified=Yes
 endif
 ifeq ($(MFCHECKDOC),outdated)
 $(info Attention: ../sys/unix/Makefile.doc is newer than doc/Makefile)
-notified=1
+notified=Yes
 endif
 ifeq ($(MFCHECKTOP),outdated)
 $(info Attention: ../sys/unix/Makefile.top is newer than Makefile)
-notified=1
+notified=Yes
 endif
-ifneq (notified,0)
+ifeq ("$(notified)","Yes")
 $(info You should consider re-executing sys/unix/setup.sh)
 $(info )
 endif  # notified
