@@ -473,7 +473,10 @@ const struct instance_globals_l g_init_l = {
     /* dbridge.c */
     { { 0 } }, /* lastseentyp */
     { UNDEFINED_VALUES }, /* level_info */
-    { {0}, {0}, {0}, NULL, NULL, NULL, NULL, NULL, {0} }, /* level */
+    { { {0}, {0} },
+      { {0}, {0} },
+      { {0}, {0} },
+      NULL, NULL, NULL, NULL, NULL, {0} }, /* level */
 #if defined(UNIX) || defined(VMS)
     0, /* locknum */
 #endif
