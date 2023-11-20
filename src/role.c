@@ -569,7 +569,7 @@ const struct Role roles[NUM_ROLES+1] = {
       SPE_MAGIC_MISSILE,
       -4 },
     /* Array terminator */
-    { { 0, 0 } }
+    UNDEFINED_ROLE,
 };
 
 /* Table of all races */
@@ -676,7 +676,7 @@ const struct Race races[] = {
         { 1, 0, 1, 0, 1, 0 }  /* Energy */
     },
     /* Array terminator */
-    { 0, 0, 0, 0, { 0, 0 }, NON_PM }
+    UNDEFINED_RACE,
 };
 
 /* Table of all genders */

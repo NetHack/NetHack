@@ -308,10 +308,14 @@ const struct instance_globals_d g_init_d = {
     0L, /* done_money */
     0L, /* domove_attempting */
     0L, /* domove_succeeded */
-    { { UNDEFINED_VALUES } }, /* dungeons */
+    { { {0},{0},{0},{0}, 0, {0}, 0, 0, 0, 0, 0 } }, /* dungeons */
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* dndest */
     FALSE, /* defer_see_monsters */
-    { DUMMY }, /* dungeon_topology */
+    { {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+      {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+       0, 0, 0, 0, 0,
+      {0}, {0}, {0},
+      {0}, {0}, {0} }, /* dungeon_topology */
     0, /* doors_alloc */
     NULL, /* doors */
     /* dig.c */
@@ -469,7 +473,7 @@ const struct instance_globals_l g_init_l = {
     /* dbridge.c */
     { { 0 } }, /* lastseentyp */
     { UNDEFINED_VALUES }, /* level_info */
-    { { { UNDEFINED_VALUES } } }, /* level */
+    { {0}, {0}, {0}, NULL, NULL, NULL, NULL, NULL, {0} }, /* level */
 #if defined(UNIX) || defined(VMS)
     0, /* locknum */
 #endif
@@ -709,7 +713,7 @@ const struct instance_globals_r g_init_r = {
     /* role.c */
     UNDEFINED_VALUES, /* role_pa */
     UNDEFINED_VALUE, /* role_post_attrib */
-    { UNDEFINED_VALUES }, /* rfilter */
+    { { 0 }, 0 }, /* rfilter */
     /* shk.c */
     UNDEFINED_VALUES, /* repo */
     TRUE, /* havestate*/
@@ -820,7 +824,7 @@ const struct instance_globals_u g_init_u = {
     { 0, 0, 0, 0, 0, 0, 0, 0 }, /* updest */
     FALSE, /* unweapon */
     /* role.c */
-    { UNDEFINED_VALUES }, /* urole */
+    UNDEFINED_ROLE, /* urole */
     UNDEFINED_VALUES, /* urace */
     /* save.c */
     { 0, 0 }, /* uz_save */

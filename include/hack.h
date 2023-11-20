@@ -1007,6 +1007,36 @@ typedef struct {
 #define UNDEFINED_VALUES { 0 }
 #define UNDEFINED_PTR NULL
 
+/* The UNDEFINED_ROLE macro is used to initialize Role variables */
+#define UNDEFINED_ROLE \
+    { {0}, { {0} },                \
+      /* strings */                \
+      NULL, NULL, NULL,            \
+      NULL, NULL, NULL,            \
+      /* indices */                \
+      0, 0, 0, 0, 0, 0, 0,         \
+      0, 0, 0,                     \
+      /* Bitmasks */               \
+      0,                           \
+      /* Attributes */             \
+      {0}, {0}, {0}, {0}, 0, 0,    \
+      /* spell statistics */       \
+      0, 0, 0, 0, 0, 0, 0 }
+
+/* The UNDEFINED_RACE macro is used to initialize Race variables */
+#define UNDEFINED_RACE \
+    {                              \
+      /* strings */                \
+      NULL, NULL, NULL, NULL, {0}, \
+      /* Indices */                \
+      0, 0, 0,                     \
+      /* Bitmasks */               \
+      0, 0, 0, 0,                  \
+      /* Attributes */             \
+      {0}, {0}, {0}, {0}           \
+      /* Properties */             \
+    }
+
 #define MATCH_WARN_OF_MON(mon) \
     (Warn_of_mon                                                        \
      && ((gc.context.warntype.obj & (mon)->data->mflags2) != 0           \

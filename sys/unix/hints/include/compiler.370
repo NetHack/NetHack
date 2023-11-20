@@ -45,10 +45,12 @@ endif
 #CXX=clang++ -std=gnu++11
 
 CFLAGS=$(CCFLAGS) -I../include -DNOTPARMDECL
-CFLAGS+=-Wall -Wextra -Wno-missing-field-initializers \
+CFLAGS+=-Wall -Wextra  \
 	-Wreturn-type -Wunused -Wformat -Wswitch -Wshadow -Wwrite-strings
 CFLAGS+=-pedantic
 CFLAGS+=-Wmissing-declarations
+#CFLAGS+=-Wno-missing-field-initializers
+#CFLAGS+=-Wformat=2
 
 # these are left out of the C++ flags
 CFLAGS+=-Wformat-nonliteral
