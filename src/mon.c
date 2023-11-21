@@ -5462,4 +5462,53 @@ check_gear_next_turn(struct monst *mon)
 {
     mon->misc_worn_check |= I_SPECIAL;
 }
+
+/* make erinyes more dangerous based on your alignment abuse */
+void
+adj_erinys(unsigned abuse)
+{
+    struct permonst *pm = &mons[PM_ERINYS];
+
+    if (abuse > 5L) {
+        pm->mflags1 |= M1_SEE_INVIS;
+    }
+    if (abuse > 10L) {
+        pm->mflags1 |= M1_AMPHIBIOUS;
+    }
+    if (abuse > 15L) {
+        pm->mflags1 |= M1_FLY;
+    }
+    if (abuse > 20L) {
+        /* more powerful attack */
+        pm->mattk[0].damn = 3;
+    }
+    if (abuse > 25L) {
+        pm->mflags1 |= M1_REGEN;
+    }
+    if (abuse > 30L) {
+        pm->mflags1 |= M1_TPORT_CNTRL;
+    }
+    if (abuse > 35L) {
+        /* second attack */
+        pm->mattk[1].aatyp = AT_WEAP;
+        pm->mattk[1].adtyp = AD_DRST;
+        pm->mattk[1].damn = 3;
+        pm->mattk[1].damd = 4;
+    }
+    if (abuse > 40L) {
+        pm->mflags1 |= M1_TPORT;
+    }
+    if (abuse > 50L) {
+        /* third (spellcasting) attack */
+        pm->mattk[2].aatyp = AT_MAGC;
+        pm->mattk[2].adtyp = AD_SPEL;
+        pm->mattk[2].damn = 3;
+        pm->mattk[2].damd = 4;
+    }
+
+    /* also adjust level and difficulty */
+    pm->mlevel = min(7 + u.ualign.abuse, 50);
+    pm->difficulty = min(10 + (u.ualign.abuse / 3), 25);
+}
+
 /*mon.c*/

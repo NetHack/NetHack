@@ -692,6 +692,7 @@ restgamestate(NHFILE *nhfp)
     /* must come after all mons & objs are restored */
     relink_timers(FALSE);
     relink_light_sources(FALSE);
+    adj_erinys(u.ualign.abuse);
     /* inventory display is now viable */
     iflags.perm_invent = defer_perm_invent;
     return TRUE;

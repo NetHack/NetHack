@@ -1759,6 +1759,7 @@ extern void copy_mextra(struct monst *, struct monst *);
 extern void dealloc_mextra(struct monst *);
 extern boolean usmellmon(struct permonst *);
 extern void mimic_hit_msg(struct monst *, short);
+extern void adj_erinys(unsigned);
 
 /* ### mondata.c ### */
 

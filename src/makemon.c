@@ -2129,6 +2129,8 @@ peace_minded(register struct permonst *ptr)
         return TRUE;
     if (ptr->msound == MS_NEMESIS)
         return FALSE;
+    if (ptr == &mons[PM_ERINYS])
+        return !u.ualign.abuse;
 
     if (race_peaceful(ptr))
         return TRUE;
