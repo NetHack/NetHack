@@ -503,7 +503,7 @@ struct instance_globals_l {
     /* cmd.c */
     cmdcount_nht last_command_count;
 
-    /* dbridge.c */
+    /* decl.c (before being incorporated into instance_globals_*) */
     schar lastseentyp[COLNO][ROWNO]; /* last seen/touched dungeon typ */
     struct linfo level_info[MAXLINFO];
     dlevel_t level; /* level map */
