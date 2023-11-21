@@ -1257,18 +1257,19 @@ uchangealign(int newalign,
             (u.ualign.type != oldalign) ? "sudden " : "");
     } else {
         /* putting on or taking off a helm of opposite alignment */
+        u.ualign.type = (aligntyp) newalign;
         if (reason == 1) {
+            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
+            make_confused(rn1(2, 3), FALSE);
+            summon_furies(Is_astralevel(&u.uz) ? 0 : 1);
             /* don't livelog taking it back off */
             livelog_printf(LL_ALIGNMENT, "used a helm to turn %s",
                            aligns[1 - newalign].adj);
-        }
-        u.ualign.type = (aligntyp) newalign;
-        if (reason == 1)
-            Your("mind oscillates %s.", Hallucination ? "wildly" : "briefly");
-        else if (reason == 2)
+        } else if (reason == 2) {
             Your("mind is %s.", Hallucination
                                     ? "much of a muchness"
                                     : "back in sync with your body");
+        }
     }
     if (u.ualign.type != oldalign) {
         u.ualign.record = 0; /* slate is wiped clean */

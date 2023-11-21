@@ -1426,6 +1426,7 @@ extern int mbirth_limit(int);
 extern void mkmonmoney(struct monst *, long) NONNULLARG1;
 extern int bagotricks(struct obj *, boolean, int *);
 extern boolean propagate(int, boolean, boolean);
+extern void summon_furies(int);
 
 /* ### mcastu.c ### */
 
