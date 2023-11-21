@@ -470,12 +470,12 @@ const struct instance_globals_k g_init_k = {
 const struct instance_globals_l g_init_l = {
     /* cmd.c */
     UNDEFINED_VALUE, /* last_command_count */
-    /* dbridge.c */
+    /* decl.c */
     { { 0 } }, /* lastseentyp */
     { UNDEFINED_VALUES }, /* level_info */
-    { { {0}, {0} },
-      { {0}, {0} },
-      { {0}, {0} },
+    { { { UNDEFINED_VALUES } }, /* level.locations */
+      { { UNDEFINED_PTR } },    /* level.objects   */
+      { { UNDEFINED_PTR } },    /* level.monsters  */
       NULL, NULL, NULL, NULL, NULL, {0} }, /* level */
 #if defined(UNIX) || defined(VMS)
     0, /* locknum */
