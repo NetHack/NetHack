@@ -489,8 +489,8 @@ endif   # MAKEFILE_SRC
 #
 
 .PHONY: checkmakefiles
-checkmakefiles: checkstamp
-       ( $(MAKE) -f sys/unix/Makefile.check )
+checkmakefiles:
+	( $(MAKE) -f sys/unix/Makefile.check )
 
 
 ifdef WANT_LIBNH
