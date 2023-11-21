@@ -25,7 +25,6 @@ HINTSVERSION := 370
 ifdef MAKEFILE_TOP
 ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
-HINTSVERSION := 370
 # all files included from this hints file get listed
 # in HINTSINCLNAMES (without suffix and without a path)
 HINTSINCLNAMES := compiler cross-pre cross-post \
