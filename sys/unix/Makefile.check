@@ -1,12 +1,12 @@
 # NetHack 3.7  Makefile.check $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7
 
 SUPATH := sys/unix/
-MKINCLVERS := 370
 MKHINTSPATH := $(SUPATH)hints/
 MKINCLPATH := $(SUPATH)hints/include/
 
 #
 # Expectations:
+#
 # HINTSFILE and HINTSINCLFILES are passed from the calling Makefile
 # which is the case with the hints/*.370 and hints/include/*.370
 # set.
