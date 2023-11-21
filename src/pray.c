@@ -1810,6 +1810,9 @@ dosacrifice(void)
     if (!on_altar() || u.uswallow) {
         You("are not standing on an altar.");
         return ECMD_OK;
+    } else if (Confusion || Stunned || Hallucination) {
+        You("are too impaired to perform the rite.");
+        return ECMD_OK;
     }
     highaltar = (levl[u.ux][u.uy].altarmask & AM_SANCTUM);
 
