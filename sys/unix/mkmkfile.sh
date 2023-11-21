@@ -17,6 +17,8 @@ echo "# Your changes will be lost.  See sys/unix/NewInstall.unx." >> $3
 echo "# Identify this file:" >> $3
 echo "MAKEFILE_$2=1" >> $3
 echo "" >> $3
+echo "HINTSFILE=$5" >> $3
+echo "" >> $3
 
 echo "###" >> $3
 echo "### Start $5 PRE" >> $3

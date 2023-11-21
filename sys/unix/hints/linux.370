@@ -20,7 +20,21 @@
 #        multiw-1.370 contains sections 1 to 2
 #-INCLUDE multiw-1.370
 
+HINTSVERSION := 370
+
+ifdef MAKEFILE_TOP
+ifeq ($(MAKELEVEL),0)
 PRECHECK+=checkmakefiles
+HINTSVERSION := 370
+# all files included from this hints file get listed
+# in HINTSINCLNAMES (without suffix and without a path)
+HINTSINCLNAMES := compiler cross-pre cross-post \
+		gbdates-pre gbdates-post \
+		multiw-1 multiw-2 multiw-3 \
+		multisnd1-pre multisnd2-pre multisnd-post
+HINTSINCLFILES := $(addsuffix .$(HINTSVERSION), $(HINTSINCLNAMES))
+endif
+endif
 
 ifndef LIBXPM
 LIBXPM= -L/opt/X11/lib -lXpm
@@ -359,9 +373,14 @@ GAMEPERM = 0755
 #-INCLUDE multisnd-post.370
 #
 
+ifdef MAKEFILE_TOP
+ifeq ($(MAKELEVEL),0)
 .PHONY: checkmakefiles
 checkmakefiles:
-	( $(MAKE) -f sys/unix/Makefile.check )
+	@$(MAKE) -f sys/unix/Makefile.check \
+		HINTSFILE="$(HINTSFILE)" HINTSINCLFILES="$(HINTSINCLFILES)"
+endif
+endif
 
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a

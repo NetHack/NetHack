@@ -1,30 +1,37 @@
 # NetHack 3.7  Makefile.check $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7
 
-mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
-mkfile_dir := $(dir $(mkfile_path))
 SUPATH := sys/unix/
 MKINCLVERS := 370
+MKHINTSPATH := $(SUPATH)hints/
 MKINCLPATH := $(SUPATH)hints/include/
-MKINCLNAMES := compiler cross-pre cross-post \
-		 gbdates-pre gbdates-post \
-		 multiw-1 multiw-2 multiw-3 \
-		 multisnd1-pre multisnd2-pre multisnd-post
-MKINCLFILES := $(addprefix $(MKINCLPATH), $(addsuffix .$(MKINCLVERS), $(MKINCLNAMES)))
 
-allmakefiles: dat/Makefile src/Makefile util/Makefile doc/Makefile Makefile
+#
+# Expectations:
+# HINTSFILE and HINTSINCLFILES are passed from the calling Makefile
+# which is the case with the hints/*.370 and hints/include/*.370
+# set.
+#
+ifneq ("$(HINTSFILE)","")
+MKHINTSFILE := $(addprefix $(MKHINTSPATH), $(notdir $(HINTSFILE)))
+endif
+ifneq ("$(HINTSINCLFILES)","")
+MKINCLFILES := $(addprefix $(MKINCLPATH), $(HINTSINCLFILES))
+endif
 
-dat/Makefile: $(SUPATH)Makefile.dat $(MKINCLFILES)
+checkmakefiles: dat/Makefile src/Makefile util/Makefile doc/Makefile Makefile
+
+dat/Makefile: $(SUPATH)Makefile.dat $(MKHINTSFILE) $(MKINCLFILES)
 	@echo Attention: $@ is older than: $?
 
-src/Makefile: $(SUPATH)Makefile.src $(MKINCLFILES)
+src/Makefile: $(SUPATH)Makefile.src $(MKHINTSFILE) $(MKINCLFILES)
 	@echo Attention: $@ is older than: $?
 
-util/Makefile: $(SUPATH)Makefile.utl $(MKINCLFILES)
+util/Makefile: $(SUPATH)Makefile.utl $(MKHINTSFILE) $(MKINCLFILES)
 	@echo Attention: $@ is older than: $?
 
-doc/Makefile: $(SUPATH)Makefile.doc $(MKINCLFILES)
+doc/Makefile: $(SUPATH)Makefile.doc $(MKHINTSFILE) $(MKINCLFILES)
 	@echo Attention: $@ is older than: $?
 
-Makefile: $(SUPATH)Makefile.top $(MKINCLFILES)
+Makefile: $(SUPATH)Makefile.top $(MKHINTSFILE) $(MKINCLFILES)
 	@echo Attention: $@ is older than: $?
 
