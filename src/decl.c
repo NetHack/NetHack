@@ -675,6 +675,7 @@ const struct instance_globals_p g_init_p = {
     0,       /* perm_invent_toggling_direction */
     /* pickup.c */
     FALSE, /* picked_filter */
+    0, /* pickup_encumbrance */
     /* pline.c */
     0U, /* pline_flags */
     UNDEFINED_VALUES, /* prevmsg */

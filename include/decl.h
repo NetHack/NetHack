@@ -775,6 +775,8 @@ struct instance_globals_p {
 
     /* pickup.c */
     boolean picked_filter;
+    int pickup_encumbrance; /* when picking up multiple items in a single
+                             * operation, encumbrance after previous item */
 
     /* pline.c */
     unsigned pline_flags;

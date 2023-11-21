@@ -28,6 +28,7 @@ static int delta_cwt(struct obj *, struct obj *);
 static long carry_count(struct obj *, struct obj *, long, boolean, int *,
                         int *);
 static int lift_object(struct obj *, struct obj *, long *, boolean);
+static void pickup_prinv(struct obj *, long, const char *);
 static boolean mbag_explodes(struct obj *, int);
 static boolean is_boh_item_gone(void);
 static void do_boh_explosion(struct obj *, boolean);
@@ -62,10 +63,10 @@ static void tipcontainer(struct obj *);
 #define Icebox (gc.current_container->otyp == ICE_BOX)
 
 static const char
-        slightloadmsg[] = "You have a little trouble lifting",
-        moderateloadmsg[] = "You have trouble lifting",
-        nearloadmsg[] = "You have much trouble lifting",
-        overloadmsg[] = "You have extreme difficulty lifting";
+    slightloadpfx[] = "You have a little trouble",
+    moderateloadpfx[] = "You have trouble",
+    nearloadpfx[] = "You have much trouble",
+    overloadpfx[] = "You have extreme difficulty";
 
 /* BUG: this lets you look at cockatrice corpses while blind without
    touching them */
@@ -649,6 +650,9 @@ pickup(int what) /* should be a long */
         return 0;
     }
 
+    /* used by pickup_object() for encumbrance feedback */
+    gp.pickup_encumbrance = 0;
+
     if (what < 0) /* pick N of something */
         count = -what;
     else /* pick anything */
@@ -861,6 +865,7 @@ pickup(int what) /* should be a long */
             check_here(n_picked > 0);
     }
  pickupdone:
+    gp.pickup_encumbrance = 0;
     add_valid_menu_class(0); /* reset */
     return (n_tried > 0);
 }
@@ -1674,13 +1679,12 @@ lift_object(
                 long savequan = obj->quan;
 
                 obj->quan = *cnt_p;
-                Strcpy(qbuf, (next_encumbr >= EXT_ENCUMBER) ? overloadmsg
-                                 : (next_encumbr >= HVY_ENCUMBER) ? nearloadmsg
-                                 : (next_encumbr >= MOD_ENCUMBER) ? moderateloadmsg
-                                 : slightloadmsg);
-                if (container)
-                    (void) strsubst(qbuf, "lifting", "removing");
-                Strcat(qbuf, " ");
+                Sprintf(qbuf, "%s %s ",
+                        (next_encumbr >= EXT_ENCUMBER) ? overloadpfx
+                        : (next_encumbr >= HVY_ENCUMBER) ? nearloadpfx
+                          : (next_encumbr >= MOD_ENCUMBER) ? moderateloadpfx
+                            : slightloadpfx,
+                        !container ? "lifting" : "removing");
                 (void) safe_qbuf(qbuf, qbuf, ".  Continue?", obj, doname,
                                  ansimpleoname, something);
                 obj->quan = savequan;
@@ -1712,11 +1716,10 @@ lift_object(
 int
 pickup_object(
     struct obj *obj,
-    long count,
+    long count, /* if non-zero, pick up a subset of this amount */
     boolean telekinesis) /* not picking it up directly by hand */
 {
-    int res, nearload;
-    const char *prefix;
+    int res;
 
     if (obj->quan < count) {
         impossible("pickup_object: count %ld > quan %ld?", count, obj->quan);
@@ -1785,13 +1788,7 @@ pickup_object(
 
     if (uwep && uwep == obj)
         gm.mrg_to_wielded = TRUE;
-    nearload = near_capacity();
-    prefix = (nearload >= EXT_ENCUMBER) ? overloadmsg
-        : (nearload >= HVY_ENCUMBER) ? nearloadmsg
-        : (nearload >= MOD_ENCUMBER) ? moderateloadmsg
-        : (nearload >= SLT_ENCUMBER) ? slightloadmsg
-        : (char *) 0;
-    prinv(prefix, obj, count);
+    pickup_prinv(obj, count, "lifting");
     gm.mrg_to_wielded = FALSE;
     return 1;
 }
@@ -1842,6 +1839,36 @@ pick_obj(struct obj *otmp)
         remote_burglary(ox, oy);
 
     return result;
+}
+
+/* pickup_object()/out_container() helper;
+   print an added-to-invent message for current object, limiting feedback
+   about encumbrance to the first item which causes that to change */
+static void
+pickup_prinv(
+    struct obj *obj,
+    long count,
+    const char *verb)
+{
+    char pbuf[QBUFSZ];
+    const char *prefix;
+    int nearload = near_capacity();
+
+    pbuf[0] = '\0';
+    if (nearload == gp.pickup_encumbrance) {
+        prefix = (char *) 0;
+    } else {
+        prefix = (nearload >= EXT_ENCUMBER) ? overloadpfx
+                 : (nearload >= HVY_ENCUMBER) ? nearloadpfx
+                   : (nearload >= MOD_ENCUMBER) ? moderateloadpfx
+                     : (nearload >= SLT_ENCUMBER) ? slightloadpfx
+                       : (char *) 0;
+        gp.pickup_encumbrance = nearload;
+    }
+    if (prefix)
+        Sprintf(pbuf, "%s %s", prefix, verb);
+
+    prinv(pbuf, obj, count);
 }
 
 /*
@@ -2595,10 +2622,10 @@ ck_bag(struct obj *obj)
 static int
 out_container(struct obj *obj)
 {
-    register struct obj *otmp;
-    boolean is_gold = (obj->oclass == COIN_CLASS);
-    int res, loadlev;
+    struct obj *otmp;
+    int res;
     long count;
+    boolean is_gold = (obj->oclass == COIN_CLASS);
 
     if (!gc.current_container) {
         impossible("<out> no gc.current_container?");
@@ -2637,12 +2664,7 @@ out_container(struct obj *obj)
         pick_pick(obj); /* shopkeeper feedback */
 
     otmp = addinv(obj);
-    loadlev = near_capacity();
-    prinv(loadlev ? ((loadlev < MOD_ENCUMBER)
-                        ? "You have a little trouble removing"
-                        : "You have much trouble removing")
-                  : (char *) 0,
-          otmp, count);
+    pickup_prinv(otmp, count, "removing");
 
     if (is_gold) {
         bot(); /* update character's gold piece count immediately */
@@ -3104,6 +3126,7 @@ traditional_loot(boolean put_in)
         objlist = &(gc.current_container->cobj);
         actionfunc = out_container;
         checkfunc = (int (*)(OBJ_P)) 0;
+        gp.pickup_encumbrance = 0; /* used to limit verbosity */
     }
 
     if (query_classes(selection, &one_by_one, &allflag, action, *objlist,
@@ -3131,6 +3154,8 @@ menu_loot(int retry, boolean put_in)
     int mflags, res;
     long count = 0;
 
+    gp.pickup_encumbrance = 0; /* used by out_container(); no harm in
+                                * zeroing it if about to use in_container() */
     if (retry) {
         all_categories = (retry == -2);
     } else if (flags.menu_style == MENU_FULL) {
@@ -3138,7 +3163,8 @@ menu_loot(int retry, boolean put_in)
         Sprintf(buf, "%s what type of objects?", action);
         mflags = (ALL_TYPES | UNPAID_TYPES | BUCX_TYPES | CHOOSE_ALL
                   | JUSTPICKED );
-        n = query_category(buf, put_in ? gi.invent : gc.current_container->cobj,
+        n = query_category(buf,
+                           put_in ? gi.invent : gc.current_container->cobj,
                            mflags, &pick_list, PICK_ANY);
         if (!n)
             return ECMD_OK;
