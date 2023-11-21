@@ -380,11 +380,11 @@ pmatchregex.c
 
 sys/unix:
 (files for UNIX versions)
-Install.unx     Makefile.dat    Makefile.doc    Makefile.src
-Makefile.top    Makefile.utl    NewInstall.unx  README.xcode
-XCode.xcconfig  depend.awk      gitinfo.sh      mkmkfile.sh
-nethack.sh      setup.sh        sysconf         unixmain.c
-unixres.c       unixunix.c
+Install.unx     Makefile.check  Makefile.dat    Makefile.doc
+Makefile.src    Makefile.top    Makefile.utl    NewInstall.unx
+README.xcode    XCode.xcconfig  depend.awk      gitinfo.sh
+mkmkfile.sh     nethack.sh      setup.sh        sysconf
+unixmain.c      unixres.c       unixunix.c
 
 sys/unix/NetHack.xcodeproj:
 (file for macOS Xcode)
@@ -411,8 +411,8 @@ unix
 sys/unix/hints/include:
 (files for configuring UNIX NetHack versions)
 compiler.370       cross-post.370     cross-pre.370      gbdates-post.370
-gbdates-pre.370    general-pre.370    multisnd-post.370  multisnd1-pre.370
-multisnd2-pre.370  multiw-1.370       multiw-2.370       multiw-3.370
+gbdates-pre.370    multisnd-post.370  multisnd1-pre.370  multisnd2-pre.370
+multiw-1.370       multiw-2.370       multiw-3.370
 
 sys/vms:
 (files for VMS version)
