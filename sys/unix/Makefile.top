@@ -112,7 +112,7 @@ LUA2NHTOP = ../../..
 LUABASELIB = liblua-$(LUA_VERSION).a
 TOPLUALIB = lib/lua/$(LUABASELIB)
 
-ALLDEP = $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb check-nhlua
+ALLDEP = $(PRECHECK) $(GAME) recover Guidebook $(VARDAT) spec_levs check-dlb check-nhlua
 
 # first target is also the default target for 'make' without any arguments
 all:    $(ALLDEP)
@@ -338,7 +338,7 @@ fetch-lua-http:
 # 'make update' can be used to install a revised version after making
 # customizations or such.  Unlike 'make install', it doesn't delete everything
 # from the target directory to have a clean start.
-update: $(GAME) recover $(VARDAT) spec_levs
+update: $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
 #	(don't yank the old version out from under people who're playing it)
 	-mv $(INSTDIR)/$(GAME) $(INSTDIR)/$(GAME).old
 	-mv $(INSTDIR)/nhdat $(INSTDIR)/nhdat.old
@@ -352,7 +352,7 @@ update: $(GAME) recover $(VARDAT) spec_levs
 rootcheck:
 	@true; $(ROOTCHECK)
 
-install: rootcheck $(GAME) recover $(VARDAT) spec_levs
+install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs
 	true; $(PREINSTALL)
 # set up the directories
 # not all mkdirs have -p; those that don't will create a -p directory

@@ -18,9 +18,10 @@
 #
 
 # note: '#-INCLUDE' is not just a comment; multiw-1 contains sections 1 to 2
-#-INCLUDE general-pre.370
-#
 #-INCLUDE multiw-1.370
+
+
+PRECHECK+=checkmakefiles
 
 ifneq "$(USEMACPORTS)" "1"
 HAVE_HOMEBREW := $(shell expr `which -s brew; echo $$?` = 0)
@@ -486,6 +487,11 @@ endif   # MAKEFILE_SRC
 #
 #-INCLUDE multisnd-post.370
 #
+
+.PHONY: checkmakefiles
+checkmakefiles: checkstamp
+       ( $(MAKE) -f sys/unix/Makefile.check )
+
 
 ifdef WANT_LIBNH
 $(TARGETPFX)libnh.a: $(HOBJ) $(LIBNHSYSOBJ) ../lib/lua/liblua.a

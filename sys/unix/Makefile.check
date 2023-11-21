@@ -1,0 +1,30 @@
+# NetHack 3.7  Makefile.check $NHDT-Date: 1599687610 2020/09/09 21:40:10 $  $NHDT-Branch: NetHack-3.7
+
+mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
+mkfile_dir := $(dir $(mkfile_path))
+SUPATH := sys/unix/
+MKINCLVERS := 370
+MKINCLPATH := $(SUPATH)hints/include/
+MKINCLNAMES := compiler cross-pre cross-post \
+		 gbdates-pre gbdates-post \
+		 multiw-1 multiw-2 multiw-3 \
+		 multisnd1-pre multisnd2-pre multisnd-post
+MKINCLFILES := $(addprefix $(MKINCLPATH), $(addsuffix .$(MKINCLVERS), $(MKINCLNAMES)))
+
+allmakefiles: dat/Makefile src/Makefile util/Makefile doc/Makefile Makefile
+
+dat/Makefile: $(SUPATH)Makefile.dat $(MKINCLFILES)
+	@echo Attention: $@ is older than: $?
+
+src/Makefile: $(SUPATH)Makefile.src $(MKINCLFILES)
+	@echo Attention: $@ is older than: $?
+
+util/Makefile: $(SUPATH)Makefile.utl $(MKINCLFILES)
+	@echo Attention: $@ is older than: $?
+
+doc/Makefile: $(SUPATH)Makefile.doc $(MKINCLFILES)
+	@echo Attention: $@ is older than: $?
+
+Makefile: $(SUPATH)Makefile.top $(MKINCLFILES)
+	@echo Attention: $@ is older than: $?
+
