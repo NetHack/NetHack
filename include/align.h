@@ -10,6 +10,7 @@ typedef schar aligntyp; /* basic alignment type */
 typedef struct align { /* alignment & record */
     aligntyp type;
     int record;
+    unsigned abuse;
 } align;
 
 /* bounds for "record" -- respect initial alignments of 10 */

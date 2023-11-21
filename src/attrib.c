@@ -1204,8 +1204,14 @@ adjalign(int n)
     int newalign = u.ualign.record + n;
 
     if (n < 0) {
+        unsigned newabuse = u.ualign.abuse - n;
+
         if (newalign < u.ualign.record)
             u.ualign.record = newalign;
+        if (newabuse > u.ualign.abuse) {
+            u.ualign.abuse = newabuse;
+            adj_erinys(newabuse);
+        }
     } else if (newalign > u.ualign.record) {
         u.ualign.record = newalign;
         if (u.ualign.record > ALIGNLIM)

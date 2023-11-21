@@ -639,6 +639,10 @@ dochug(register struct monst* mtmp)
         return 0;
     }
 
+    /* Erinyes will inform surrounding monsters of your crimes */
+    if (mdat == &mons[PM_ERINYS] && !mtmp->mpeaceful && m_canseeu(mtmp))
+        aggravate();
+
     /* Shriekers and Medusa have irregular abilities which must be
        checked every turn. These abilities do not cost a turn when
        used. */

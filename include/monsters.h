@@ -2489,12 +2489,14 @@
        and spelled this way */
     MON("erinys", S_DEMON, LVL(7, 12, 2, 30, 10),
         (G_HELL | G_NOCORPSE | G_SGROUP | 2),
+        /* erinys attacks (among other things) are variable depending on your
+           alignment abuse, can be increased from here by adj_erinys(mon.c) */
         A(ATTK(AT_WEAP, AD_DRST, 2, 4), NO_ATTK, NO_ATTK, NO_ATTK, NO_ATTK,
           NO_ATTK),
         SIZ(WT_HUMAN, 400, MS_SILENT, MZ_HUMAN), MR_FIRE | MR_POISON, 0,
         M1_HUMANOID | M1_POIS,
-        M2_NOPOLY | M2_DEMON | M2_STALK | M2_HOSTILE | M2_STRONG | M2_NASTY
-            | M2_FEMALE | M2_COLLECT,
+        M2_NOPOLY | M2_DEMON | M2_STALK | M2_STRONG | M2_NASTY | M2_FEMALE
+            | M2_COLLECT,
         M3_INFRAVISIBLE | M3_INFRAVISION, 10, CLR_RED, ERINYS),
     MON("barbed devil", S_DEMON, LVL(8, 12, 0, 35, 8),
         (G_HELL | G_NOCORPSE | G_SGROUP | 2),
