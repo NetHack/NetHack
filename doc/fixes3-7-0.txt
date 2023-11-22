@@ -2647,3 +2647,5 @@ VMS: removed NO_VSNPRINTF conditional code
 remove the window port get_menu_coloring() calls from all the existing window
 	ports, and implement the functionality on the core-side of the
 	interface prior to calling the window port's foo_add_menu() function
+remove TEXTCOLOR build option
+
