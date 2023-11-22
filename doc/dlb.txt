@@ -64,7 +64,7 @@ BUGS
 
 COPYRIGHT
        This  file  is  Copyright  (C)  Kenneth  Lorber,   2022   for   version
-       NetHack-3.7:1.10.   NetHack  may  be freely redistributed.  See license
+       NetHack-3.7:1.12.   NetHack  may  be freely redistributed.  See license
        for details.
 
 

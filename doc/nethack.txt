@@ -16,7 +16,7 @@ SYNOPSIS
        nethack [ -d|--directory directory ] -s|--scores [ -v ]
        [ -p profession ] [ -r race ] [ playernames ]
 
-       nethack [ --usage | --help ] [ --showpaths ] [ --version[:paste] ]
+       nethack [ --usage | --help ] [ --showpaths ] [ --version[:copy] ]
 
 DESCRIPTION
        NetHack is a display oriented Dungeons & Dragons(tm) - like game.   The
@@ -153,10 +153,10 @@ DESCRIPTION
        --version  can be used to cause NetHack to show the version information
        it was compiled with, then exit.  That will include the git commit hash
        if  the  information was available when the game was compiled.  On some
-       platforms, such as Windows and macOS, a variation  --version:paste  can
-       be  used  to  cause NetHack to show the version information, then exit,
-       while also leaving a copy of the version information in the paste  buf-
-       fer or clipboard for potential insertion into things like bug reports.
+       platforms, such as Windows and macOS, a variation --version:copy can be
+       used to cause NetHack to show the version information, then exit, while
+       also leaving a copy of the version information in the paste  buffer  or
+       clipboard for potential insertion into things like bug reports.
 
        --showpaths  can be used to cause NetHack to show where it is expecting
        to find various files.  Among other things it shows  the  path  to  and
@@ -271,7 +271,7 @@ BUGS
 
 COPYRIGHT
        This file is Copyright (C) Robert  Patrick  Rankin,  2022  for  version
-       NetHack-3.7:1.27.   NetHack  may  be freely redistributed.  See license
+       NetHack-3.7:1.31.   NetHack  may  be freely redistributed.  See license
        for details.
 
        Dungeons & Dragons is a Trademark of Wizards of the Coast, Inc.
