@@ -1,7 +1,5 @@
 DLB(6)                           Games Manual                           DLB(6)
 
-
-
 NAME
        dlb - NetHack data librarian
 
@@ -11,21 +9,19 @@ SYNOPSIS
 DESCRIPTION
        Dlb  is  a file archiving tool in the spirit (and tradition) of tar for
        NetHack version 3.1 and higher.  It is used  to  maintain  the  archive
-       files  from which NetHack reads special level files and other read-only
+       files  from which NetHack reads special level files and other read‐only
        information.  Note that like tar the command and option specifiers  are
-       specified  as  a  continuous  string  and are followed by any arguments
-       required in the same order as the option specifiers.
+       specified  as a continuous string and are followed by any arguments re‐
+       quired in the same order as the option specifiers.
 
-       ^?ALLDOCS This facility is optional and may be excluded during  NetHack
-       configuration.   ^:  ^?DLB This facility is optional but is included in
-       this NetHack configuration.  ^:  This  facility  is  optional  and  was
-       excluded from this NetHack configuration.  ^.  ^.
+       This facility is optional but is included in  this  NetHack  configura‐
+       tion.
 
 COMMANDS
        The  x  command  causes dlb to extract the contents of the archive into
        the current directory.
 
-       The c command causes dlb to create a new archive from files in the cur-
+       The c command causes dlb to create a new archive from files in the cur‐
        rent directory.
 
        The t command lists the files in the archive.
@@ -40,14 +36,14 @@ OPTIONS AND ARGUMENTS
        or extract from the archive if no files are listed on the command line.
        Default for archive creation if no files are listed is LIBLISTFILE.
 
-       C dir       change directory.  Changes directory before trying to  read
+       C  dir       change directory.  Changes directory before trying to read
        any files (including the archive and the lfile).
 
 EXAMPLES
        Create the default archive from the default file list:
                    dlb c
 
-       List the contents of the archive 'foo':
+       List the contents of the archive ’foo’:
                    dlb tf foo
 
 AUTHOR
@@ -57,16 +53,14 @@ SEE ALSO
        nethack(6), tar(1)
 
 BUGS
-       Not  a  good  tar  emulation;  - does not mean stdin or stdout.  Should
-       include an optional compression facility.  Not all read-only files  for
+       Not a good tar emulation; ‐ does not mean stdin or stdout.  Should  in‐
+       clude  an  optional  compression facility.  Not all read‐only files for
        NetHack can be read out of an archive; examining the source is the only
        way to know which files can be.
 
 COPYRIGHT
        This  file  is  Copyright  (C)  Kenneth  Lorber,   2022   for   version
-       NetHack-3.7:1.12.   NetHack  may  be freely redistributed.  See license
+       NetHack‐3.7:1.12.   NetHack  may  be freely redistributed.  See license
        for details.
-
-
 
 NETHACK                         8 February 2022                         DLB(6)
